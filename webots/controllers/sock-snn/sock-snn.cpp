@@ -51,7 +51,11 @@ int main(int argc, char ** argv)
 
         if (completedTakeoff) {
 
-            thrust = THRUST_BASE - 25 * state.dz;
+            const auto correction = -25 * state.dz;
+
+            printf("%+f\n", correction);
+
+            thrust = THRUST_BASE + correction;
         }
 
         else if (hitTakeoffButton) {

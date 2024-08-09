@@ -28,26 +28,11 @@ snn:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller controllers/snn/snn
 
+takeoff:
+	webots worlds/standard.wbt &
+	/usr/local/webots/webots-controller controllers/takeoff/takeoff
+
 haskell:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
 
-python:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/python/python.py
-
-pytakeoff:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/pytakeoff/pytakeoff.py
-
-playback-motors:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/playback-motors/playback-motors.py
-
-playback-demands:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/playback-demands/playback-demands.py
-
-playback-pose:
-	webots worlds/supervised.wbt &
-	/usr/local/webots/webots-controller controllers/playback-pose/playback-pose.py
