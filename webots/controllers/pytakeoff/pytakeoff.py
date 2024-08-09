@@ -89,8 +89,13 @@ def plot(tic, z_history, dz_history, motor_history):
 
 def main():
 
-    viz_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    viz_socket.connect((VIZ_HOST, VIZ_PORT))
+    try:
+        viz_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        viz_socket.connect((VIZ_HOST, VIZ_PORT))
+
+    except Exception as e:
+        print('Unable to connect to the viz server: did you start it?')
+        exit(1)
 
     robot = Robot()
     gps = GPS("gps")
