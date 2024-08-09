@@ -75,24 +75,23 @@ int main(int argc, char ** argv)
 
         vector<int> counts;
         snn->get_counts(counts);
-        printf("%ld\n", counts.size());
 
         char message[100];
 
         sprintf(message,
             "{\"Event Counts\":[%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d],"
             "\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n",
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0);
+            counts[0], 
+            counts[1], 
+            counts[2], 
+            counts[3], 
+            counts[4], 
+            counts[5], 
+            counts[6], 
+            counts[7], 
+            counts[8], 
+            counts[9], 
+            counts[10]);
 
         socket_write(viz_client, message);
 
