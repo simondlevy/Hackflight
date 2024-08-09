@@ -83,7 +83,7 @@ class SNN
         void step(
                 vector <double>  &observations,
                 vector <double> &actions,
-                vector<int> & counts)
+                vector<int> & decoder_counts)
         {
             proc->clear_activity();
 
@@ -94,9 +94,9 @@ class SNN
             proc->run(sim_time, 0);
 
             vector <double> times;
-            decoder_array.get_output_counts_and_times(counts, times, *(proc), 0);
+            decoder_array.get_output_counts_and_times(decoder_counts, times, *(proc), 0);
 
-            actions = decoder_array.get_data(counts, times);
+            actions = decoder_array.get_data(decoder_counts, times);
         }
 
     private:

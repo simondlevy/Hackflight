@@ -69,8 +69,8 @@ int main(int argc, char ** argv)
 
         vector<double> observations = {state.z, state.dz};
         vector <double> actions;
-        vector<int> counts;
-        snn->step(observations, actions, counts);
+        vector<int> decoder_counts;
+        snn->step(observations, actions, decoder_counts);
         const auto motor = actions[0];
 
         char message[100];
@@ -78,7 +78,7 @@ int main(int argc, char ** argv)
         sprintf(message,
             "{\"Event Counts\":[0,0,%d,0,0,0,0,0,0,0,0],"
             "\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n",
-            counts[0]);
+            decoder_counts[0]);
 
         socket_write(viz_client, message);
 
