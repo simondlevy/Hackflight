@@ -80,10 +80,7 @@ class SNN
             delete net;
         }
 
-        void step(
-                vector <double>  &observations,
-                vector <double> &actions,
-                vector<int> & decoder_counts)
+        void step(vector <double>  &observations, vector <double> &actions)
         {
 
             proc->clear_activity();
@@ -94,10 +91,16 @@ class SNN
 
             proc->run(sim_time, 0);
 
+            vector <int> counts;
             vector <double> times;
-            decoder_array.get_output_counts_and_times(decoder_counts, times, *(proc), 0);
+            decoder_array.get_output_counts_and_times(counts, times, *(proc), 0);
 
-            actions = decoder_array.get_data(decoder_counts, times);
+            actions = decoder_array.get_data(counts, times);
+        }
+
+        void get_counts(vector<int> & counts)
+        {
+            counts = proc->neuron_counts();
         }
 
     private:

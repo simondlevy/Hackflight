@@ -69,16 +69,30 @@ int main(int argc, char ** argv)
 
         vector<double> observations = {state.z, state.dz};
         vector <double> actions;
-        vector<int> decoder_counts;
-        snn->step(observations, actions, decoder_counts);
+        //vector<int> counts;
+        snn->step(observations, actions/*, counts*/);
         const auto motor = actions[0];
+
+        vector<int> counts;
+        snn->get_counts(counts);
+        printf("%ld\n", counts.size());
 
         char message[100];
 
         sprintf(message,
-            "{\"Event Counts\":[0,0,%d,0,0,0,0,0,0,0,0],"
+            "{\"Event Counts\":[%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d],"
             "\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n",
-            decoder_counts[0]);
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0);
 
         socket_write(viz_client, message);
 
