@@ -91,11 +91,16 @@ def main():
 
     try:
         viz_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        viz_socket.connect((VIZ_HOST, VIZ_PORT))
+        viz_socket.bind((VIZ_HOST, VIZ_PORT))
+        viz_socket.listen(1)
 
     except Exception as e:
-        print('Unable to connect to the viz server: did you start it?')
+        print('Socket servicie failed: ' + str(e))
         exit(1)
+
+    print('Waiting for viz client to connect ...')
+
+    viz_connection, _ = viz_socket.accept()
 
     robot = Robot()
     gps = GPS("gps")

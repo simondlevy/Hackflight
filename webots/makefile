@@ -35,8 +35,13 @@ sock:
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null &
 
 pytakeoff:
+
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/pytakeoff/pytakeoff.py
+	/usr/local/webots/webots-controller --stdout-redirect controllers/pytakeoff/pytakeoff.py &
+
+	cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(NETWORK) \
+		# --use_name_neuron '{"2":"xd","3":"xd","4":"theta_l","5":"theta_l","6":"thetad_l","7":"thetad_l","0":"x","1":"x","9":"left","8":"no action","10":"right"}' \
+		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null &
 
 haskell:
 	webots worlds/standard.wbt &
