@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
     printf("Listening for viz client on port %d ...", VIZ_PORT);
     fflush(stdout);
 
-    const auto viz_client = serve_socket(VIZ_PORT);
+    const auto viz_client = socket_serve(VIZ_PORT);
 
     while (true) {
 
@@ -70,7 +70,8 @@ int main(int argc, char ** argv)
         snn->getActions(o, a);
         const auto motor = a[0];
 
-        printf("{\"Event Counts\":[0,2,2,0,1,1,0,2,0,1],\"Neuron Alias\":[0,1,2,3,4,5,6,7,8,9]}\n");
+        const auto message = "{\"Event Counts\":[0,2,2,0,1,1,0,2,0,1,0],\"Neuron Alias\":[0,6,15,10,53,66,2,9,1,5,18]}\n";
+        socket_write(viz_client, message);
 
         sim.setMotors(motor, motor, motor, motor);
     }

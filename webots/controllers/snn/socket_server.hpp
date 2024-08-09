@@ -19,8 +19,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
 
-int serve_socket(const int port)
+int socket_serve(const int port)
 {
     const auto listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -37,6 +39,12 @@ int serve_socket(const int port)
     listen(listenfd, 1);
 
     return accept(listenfd, (struct sockaddr*)NULL, NULL);
+}
+
+int socket_write(const int connfd, const char * msg)
+{
+    return write(connfd, msg, strlen(msg));
+
 }
 
 
