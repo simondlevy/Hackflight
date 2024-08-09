@@ -70,6 +70,8 @@ int main(int argc, char ** argv)
         snn->getActions(o, a);
         const auto motor = a[0];
 
+        printf("{\"Event Counts\":[0,2,2,0,1,1,0,2,0,1],\"Neuron Alias\":[0,1,2,3,4,5,6,7,8,9]}\n");
+
         sim.setMotors(motor, motor, motor, motor);
     }
 
