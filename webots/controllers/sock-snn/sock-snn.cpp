@@ -25,7 +25,7 @@
 
 static const float THRUST_TAKEOFF = 56;
 
-static const float THRUST_BASE = 55.2;
+static const float THRUST_BASE = 55.385;
 
 int main(int argc, char ** argv)
 {
