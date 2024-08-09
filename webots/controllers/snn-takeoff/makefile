@@ -18,9 +18,9 @@ LIBRARIES = $(FDIR)/lib/libframework.a \
 		    $(PDIR)/lib/libproc1.a \
 		    $(PDIR)/lib/libproc2.a
 
-CXX_SOURCES = snn.cpp
+CXX_SOURCES = snn-takeoff.cpp
 
-all: snn
+all: snn-takeoff
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
@@ -28,7 +28,7 @@ USE_C_API = true
 VERBOSE = 1
 
 edit:
-	vim snn.cpp
+	vim snn-takeoff.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

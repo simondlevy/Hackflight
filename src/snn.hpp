@@ -85,6 +85,7 @@ class SNN
                 vector <double> &actions,
                 vector<int> & decoder_counts)
         {
+
             proc->clear_activity();
 
             auto spikes = encoder_array.get_spikes(observations);

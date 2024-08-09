@@ -26,9 +26,9 @@ cplusplus:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
 
-snn:
+snn-takeoff:
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/snn/snn $(NEW_NETWORK) &
+	/usr/local/webots/webots-controller controllers/snn-takeoff/snn-takeoff $(NEW_NETWORK) &
 
 	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(NEW_NETWORK) \
 		--use_name_neuron '{"0":"z","1":"dz/dt","2":"motor"}' \
