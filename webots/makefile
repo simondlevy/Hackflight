@@ -28,14 +28,11 @@ snn:
 sock:
 
 	$(FDIR)/cpp-apps/bin/polebalance_risp -a test -n $(NETWORK) \
-		--all_counts_stream '{"source":"serve","port":8100}' \
-		--extra_app_params '{"output":{"source":"serve","port":8888}}' &
+		--all_counts_stream '{"source":"serve","port":8100}' &
 
 	cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(NETWORK) \
 		--use_name_neuron '{"2":"xd","3":"xd","4":"theta_l","5":"theta_l","6":"thetad_l","7":"thetad_l","0":"x","1":"x","9":"left","8":"no action","10":"right"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null &
-
-	cd $(FDIR)/cpp-apps/applications/polebalance/newviz; love . -v 8888 -s 1000; 
 
 haskell:
 	webots worlds/standard.wbt &
