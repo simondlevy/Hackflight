@@ -14,7 +14,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(FDIR)/networks/polebalance_risp-1.txt
+NETWORK = $(FDIR)/cpp-apps/networks/takeoff_risp.txt
 
 
 cplusplus:
