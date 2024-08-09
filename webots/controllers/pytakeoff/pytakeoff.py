@@ -84,7 +84,7 @@ def plot(tic, z_history, dz_history, motor_history):
     plt.xlabel('Time (sec)')
     plt.ylabel('Motor (rad/sec)')
 
-    plt.show()
+    # plt.show()
 
 
 def main():
