@@ -65,10 +65,11 @@ int main(int argc, char ** argv)
             break;
         }
 
-        vector<double> o = {state.z, state.dz};
-        vector <double> a;
-        snn->getActions(o, a);
-        const auto motor = a[0];
+        vector<double> observations = {state.z, state.dz};
+        vector <double> actions;
+        vector<int> counts;
+        snn->step(observations, actions, counts);
+        const auto motor = actions[0];
 
         const auto message = "{\"Event Counts\":[0,2,2,0,1,1,0,2,0,1,0],\"Neuron Alias\":[0,6,15,10,53,66,2,9,1,5,18]}\n";
         socket_write(viz_client, message);

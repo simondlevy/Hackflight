@@ -80,7 +80,7 @@ class SNN
             delete net;
         }
 
-        void getActions(vector <double>  &o, vector <double> &a)
+        void step(vector <double>  &o, vector <double> &a, vector<int> & counts)
         {
             proc->clear_activity();
 
@@ -91,7 +91,6 @@ class SNN
             proc->run(sim_time, 0);
 
             vector <double> times;
-            vector <int> counts;
             decoder_array.get_output_counts_and_times(counts, times, *(proc), 0);
 
             a = decoder_array.get_data(counts, times);
