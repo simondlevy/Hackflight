@@ -14,9 +14,9 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-OLD_NETWORK = $(FDIR)/networks/polebalance_risp-1.txt
+TAKEOFF_NETWORK = $(FDIR)/cpp-apps/networks/takeoff_risp.txt
 
-NEW_NETWORK = $(FDIR)/cpp-apps/networks/takeoff_risp.txt
+CLIMBRATE_NETWORK = $(FDIR)/cpp-apps/networks/climbrate_risp.txt
 
 VIZ_HOST = "localhost"
 VIZ_PORT = 8100
@@ -30,13 +30,19 @@ snn-takeoff:
 
 	@webots worlds/standard.wbt &
 
-	@/usr/local/webots/webots-controller controllers/snn-takeoff/snn-takeoff $(NEW_NETWORK) & 
+	@/usr/local/webots/webots-controller controllers/snn-takeoff/snn-takeoff $(TAKEOFF_NETWORK) & 
 	
 	@sleep 1
 
-	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(NEW_NETWORK) \
+	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(TAKEOFF_NETWORK) \
 		--use_name_neuron '{"0":"z","1":"dz/dt","2":"motor"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
+
+snn-climbrate:
+
+	@webots worlds/standard.wbt &
+
+	@/usr/local/webots/webots-controller controllers/snn-climbrate/snn-climbrate $(CLIMBRATE_NETWORK)
 
 haskell:
 	webots worlds/standard.wbt &

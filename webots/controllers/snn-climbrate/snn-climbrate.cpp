@@ -18,9 +18,15 @@
 
 #include <sim.hpp>
 #include <snn.hpp>
-//#include <socket_server.hpp>
+#include <socket_server.hpp>
 
 static const int VIZ_PORT = 8100;
+
+static const float THRUST_TAKEOFF = 56;
+
+static const float THRUST_BASE = 55.385;
+
+static const float K_CLIMBRATE = 25;
 
 int main(int argc, char ** argv)
 {
@@ -52,42 +58,32 @@ int main(int argc, char ** argv)
 
     //const auto viz_client = socket_serve(VIZ_PORT);
 
-    //printf("\nClient connected\n");
+    printf("\nClient connected\n");
 
     while (true) {
 
         hf::state_t state = {};
 
-        if (!sim.step(state)) {
+        bool hitTakeoffButton = false;
+
+        bool completedTakeoff = false;
+
+        hf::demands_t demands;
+
+        if (!sim.step(demands, state, hitTakeoffButton, completedTakeoff)) {
             break;
         }
 
-        vector<double> observations = {state.z, state.dz};
+        vector<double> observations = {demands.thrust, state.dz};
         vector <double> actions;
         snn->step(observations, actions);
-        const auto motor = actions[0];
 
-        vector<int> counts;
-        snn->get_counts(counts);
-
-        char message[100];
-
-        sprintf(message,
-            "{\"Event Counts\":[%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d],"
-            "\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n",
-            counts[0], 
-            counts[1], 
-            counts[2], 
-            counts[3], 
-            counts[4], 
-            counts[5], 
-            counts[6], 
-            counts[7], 
-            counts[8], 
-            counts[9], 
-            counts[10]);
-
-        socket_write(viz_client, message);
+        const auto motor =
+            completedTakeoff ? 
+            THRUST_BASE + actions[0] : //K_CLIMBRATE *  (demands.thrust - state.dz) :
+            hitTakeoffButton ? 
+            THRUST_TAKEOFF :
+            0;
 
         sim.setMotors(motor, motor, motor, motor);
     }
