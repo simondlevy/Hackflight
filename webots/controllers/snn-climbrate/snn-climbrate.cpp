@@ -26,8 +26,6 @@ static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;
 
-static const float K_CLIMBRATE = 25;
-
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -80,7 +78,7 @@ int main(int argc, char ** argv)
 
         const auto motor =
             completedTakeoff ? 
-            THRUST_BASE + actions[0] : //K_CLIMBRATE *  (demands.thrust - state.dz) :
+            THRUST_BASE + actions[0] :
             hitTakeoffButton ? 
             THRUST_TAKEOFF :
             0;
