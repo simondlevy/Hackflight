@@ -76,8 +76,6 @@ int main(int argc, char ** argv)
             THRUST_TAKEOFF :
             0;
 
-        snn->send_counts_to_visualizer();
-
         sim.setMotors(motor, motor, motor, motor);
     }
 

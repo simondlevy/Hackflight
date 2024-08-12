@@ -36,7 +36,7 @@ snn-takeoff:
 
 	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(TAKEOFF_NETWORK) \
 		--use_name_neuron '{"0":"z","1":"dz/dt","2":"motor"}' \
-		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
+		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 0 > /dev/null
 
 snn-climbrate:
 
@@ -48,7 +48,7 @@ snn-climbrate:
 
 	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(CLIMBRATE_NETWORK) \
 		--use_name_neuron '{"0":"setpoint","1":"dz/dt","2":"motor"}' \
-		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
+		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 0 > /dev/null
 
 haskell:
 	webots worlds/standard.wbt &
