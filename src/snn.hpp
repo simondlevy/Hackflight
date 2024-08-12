@@ -19,6 +19,12 @@
 
 #pragma once
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
+
 #include <vector>
 #include <string>
 
@@ -82,7 +88,6 @@ class SNN
 
         void step(vector <double>  &observations, vector <double> &actions)
         {
-
             proc->clear_activity();
 
             auto spikes = encoder_array.get_spikes(observations);
@@ -98,9 +103,61 @@ class SNN
             actions = decoder_array.get_data(counts, times);
         }
 
-        void get_counts(vector<int> & counts)
+        void serve_visualizer(const int port)
         {
-            counts = proc->neuron_counts();
+            // Serve up a socket for the visualizer
+            printf("Listening for viz client on port %d ...", port);
+            fflush(stdout);
+
+            const auto listenfd = socket(AF_INET, SOCK_STREAM, 0);
+
+            struct sockaddr_in serv_addr = {};
+
+            serv_addr.sin_family = AF_INET;
+
+            serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+            serv_addr.sin_port = htons(port);
+
+            bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+            listen(listenfd, 1);
+
+            viz_client = accept(listenfd, (struct sockaddr*)NULL, NULL);
+
+            printf("\nClient connected\n");
+        }
+
+        bool send_counts_to_visualizer(void)
+        {
+            const auto counts = proc->neuron_counts();
+
+            string msg = "{\"Event Counts\":[";
+
+            char tmp[100];
+
+            const auto n1 = counts.size() - 1;
+
+            for (size_t i=0; i<n1; ++i) {
+                sprintf(tmp, "%d,", counts[i]);
+                msg += tmp;
+            }
+
+            sprintf(tmp, "%d],\"Neuron Alias\":[", counts[n1]);
+            msg += tmp;
+
+            for (size_t i=0; i<n1; ++i) {
+                sprintf(tmp, "%d,", net->sorted_node_vector[i]->id);
+                msg += tmp;
+            }
+
+            sprintf(tmp, "%d]}\n", net->sorted_node_vector[n1]->id);
+
+            msg += tmp;
+
+            const auto len = msg.size();
+
+            return write(viz_client, msg.c_str(), len) == (int)len;
         }
 
     private:
@@ -115,6 +172,10 @@ class SNN
 
         int sim_time;
 
+        int viz_client;
+
         // This is unused, but leaving it out will cause link errors
         neuro::IO_Stream prompt_stream;    
 };
+
+

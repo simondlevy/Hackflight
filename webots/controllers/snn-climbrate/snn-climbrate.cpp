@@ -50,12 +50,6 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    // Serve up a socket for the visualizer
-    //printf("Listening for viz client on port %d ...", VIZ_PORT);
-    //fflush(stdout);
-
-    //const auto viz_client = socket_serve(VIZ_PORT);
-
     printf("\nClient connected\n");
 
     while (true) {
