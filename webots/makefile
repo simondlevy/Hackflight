@@ -42,7 +42,13 @@ snn-climbrate:
 
 	@webots worlds/standard.wbt &
 
-	@/usr/local/webots/webots-controller controllers/snn-climbrate/snn-climbrate $(CLIMBRATE_NETWORK)
+	@/usr/local/webots/webots-controller controllers/snn-climbrate/snn-climbrate $(CLIMBRATE_NETWORK) &
+
+	@sleep 1
+
+	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(CLIMBRATE_NETWORK) \
+		--use_name_neuron '{"0":"setpoint","1":"dz/dt","2":"motor"}' \
+		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
 
 haskell:
 	webots worlds/standard.wbt &

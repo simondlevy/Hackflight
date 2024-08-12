@@ -18,7 +18,6 @@
 
 #include <sim.hpp>
 #include <snn.hpp>
-#include <socket_server.hpp>
 
 static const int VIZ_PORT = 8100;
 
@@ -50,7 +49,7 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    printf("\nClient connected\n");
+    snn->serve_visualizer(VIZ_PORT);
 
     while (true) {
 
@@ -76,6 +75,8 @@ int main(int argc, char ** argv)
             hitTakeoffButton ? 
             THRUST_TAKEOFF :
             0;
+
+        snn->send_counts_to_visualizer();
 
         sim.setMotors(motor, motor, motor, motor);
     }
