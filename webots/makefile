@@ -26,6 +26,14 @@ cplusplus:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
 
+haskell:
+	webots worlds/standard.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
+
+roll:
+	webots worlds/standard.wbt &
+	/usr/local/webots/webots-controller controllers/cplusplus/cplusplus | ./rollplot.py
+
 snn-takeoff:
 
 	@webots worlds/standard.wbt &
@@ -49,8 +57,3 @@ snn-climbrate:
 	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(CLIMBRATE_NETWORK) \
 		--use_name_neuron '{"0":"setpoint","1":"dz/dt","2":"motor"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 0 > /dev/null
-
-haskell:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
-

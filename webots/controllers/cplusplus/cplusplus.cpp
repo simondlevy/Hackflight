@@ -49,9 +49,6 @@ int main(int argc, char ** argv)
 
     sim.init();
     
-    auto logfp = fopen("log.csv", "w");
-    fprintf(logfp, "demand,dz,output\n");
-
     while (true) {
 
         hf::state_t state = {};
@@ -80,14 +77,6 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        if (completedTakeoff) {
-            fprintf(logfp, "%f,%f,%f\n", 
-                    demands.thrust, 
-                    state.dz,
-                    K_CLIMBRATE *  (demands.thrust - state.dz));
-            fflush(logfp);
-        }
-
         demands.thrust = 
             completedTakeoff ? 
             THRUST_BASE + K_CLIMBRATE *  (demands.thrust - state.dz) :
@@ -96,8 +85,12 @@ int main(int argc, char ** argv)
             0;
 
         demands.roll = K_POSITION * (demands.roll - state.dy);
+
         demands.roll = K_PITCH_ROLL_ANGLE * (demands.roll - state.phi);
+
         demands.roll = K_PITCH_ROLL_RATE * (demands.roll - state.dphi);
+
+        printf("%+3.3f %+3.3f\n", state.phi, state.dphi);
 
         demands.pitch = K_POSITION * (demands.pitch - state.dx);
         demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);
