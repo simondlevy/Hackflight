@@ -86,11 +86,13 @@ int main(int argc, char ** argv)
 
         demands.roll = K_POSITION * (demands.roll - state.dy);
 
+        const auto rollin = demands.roll;
+
         demands.roll = K_PITCH_ROLL_ANGLE * (demands.roll - state.phi);
 
         demands.roll = K_PITCH_ROLL_RATE * (demands.roll - state.dphi);
 
-        printf("%+3.3f %+3.3f\n", state.phi, state.dphi);
+        printf("%+3.3f %+3.3f %+3.3f\n", rollin, state.phi, state.dphi);
 
         demands.pitch = K_POSITION * (demands.pitch - state.dx);
         demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);
