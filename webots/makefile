@@ -32,7 +32,7 @@ haskell:
 
 roll:
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/cplusplus/cplusplus | ./rollplot.py
+	/usr/local/webots/webots-controller controllers/cplusplus/cplusplus > roll.log
 
 snn-takeoff:
 

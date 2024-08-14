@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -23,11 +24,18 @@ def main():
             phi.append(float(words[0]))
             dphi.append(float(words[1]))
 
+    n = len(phi)
+    time = np.linspace(0, n/32, n)
+
     plt.subplot(2, 1, 1)
-    plt.plot(phi)
+    plt.plot(time, phi)
+    plt.xticks([], [])
+    plt.ylabel('Angle (deg)')
 
     plt.subplot(2, 1, 2)
-    plt.plot(dphi)
+    plt.plot(time, dphi)
+    plt.xlabel('Time (sec)')
+    plt.ylabel('Angular velocity (deg/sec)')
 
     plt.show()
 
