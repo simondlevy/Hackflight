@@ -51,5 +51,16 @@ def main():
 
     plt.show()
 
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    ax.scatter(demand, phi, dphi)
+    ax.set_xlim([-15, 15])
+    ax.set_ylim([-10, 10])
+    ax.set_zlim([-40, 40])
+    ax.set_xlabel('Demand (deg)')
+    ax.set_ylabel('Angle (deg)')
+    ax.set_zlabel('Angular velocity (deg/sec)')
+    plt.show()
+
 
 main()
