@@ -107,16 +107,19 @@ int main(int argc, char ** argv)
 
         const auto rollFinalDemand = demands.roll;
 
-        fprintf(logfp,"%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f\n",
-                state.dy,
-                state.phi, 
-                state.dphi,
-                stickDemands.roll, 
-                rollAngleDemand, 
-                rollRateDemand,
-                rollRateDemand);
+        if (completedTakeoff) {
 
-        fflush(logfp);
+            fprintf(logfp,"%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f\n",
+                    state.dy,
+                    state.phi, 
+                    state.dphi,
+                    stickDemands.roll, 
+                    rollAngleDemand, 
+                    rollRateDemand,
+                    rollRateDemand);
+
+            fflush(logfp);
+        }
 
         demands.pitch = K_POSITION * (demands.pitch - state.dx);
         demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);
