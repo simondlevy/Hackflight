@@ -48,7 +48,18 @@ int main(int argc, char ** argv)
     hf::Simulator sim = {};
 
     sim.init();
+
+    FILE * logfp = fopen("roll.csv", "w");
     
+    fprintf(logfp, 
+            "state.dy,"
+            "state.phi,"
+            "state.dphi,"
+            "stickDemands.roll,"
+            "rollAngleDemand,"
+            "rollAngleDemand,"
+            "rollFinalDemand\n");
+
     while (true) {
 
         hf::state_t state = {};
@@ -86,13 +97,29 @@ int main(int argc, char ** argv)
 
         demands.roll = K_POSITION * (demands.roll - state.dy);
 
-        const auto rollin = demands.roll;
+        const auto rollAngleDemand = demands.roll;
 
         demands.roll = K_PITCH_ROLL_ANGLE * (demands.roll - state.phi);
 
+        const auto rollRateDemand = demands.roll;
+
         demands.roll = K_PITCH_ROLL_RATE * (demands.roll - state.dphi);
 
-        printf("%+3.3f %+3.3f %+3.3f\n", rollin, state.phi, state.dphi);
+        const auto rollFinalDemand = demands.roll;
+
+        if (completedTakeoff) {
+
+            fprintf(logfp,"%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f\n",
+                    state.dy,
+                    state.phi, 
+                    state.dphi,
+                    stickDemands.roll, 
+                    rollAngleDemand, 
+                    rollRateDemand,
+                    rollRateDemand);
+
+            fflush(logfp);
+        }
 
         demands.pitch = K_POSITION * (demands.pitch - state.dx);
         demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);

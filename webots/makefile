@@ -30,10 +30,6 @@ haskell:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
 
-roll:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/cplusplus/cplusplus > roll.log
-
 snn-takeoff:
 
 	@webots worlds/standard.wbt &
