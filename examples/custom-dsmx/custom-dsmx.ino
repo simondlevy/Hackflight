@@ -48,7 +48,7 @@
 
 static const bool USE_EKF = false;
 
-static const auto DEBUG_TASK = hf::DebugTask::NONE;
+static const auto DEBUG_TASK = hf::DebugTask::DANGLES;
 
 // PID Control constants -----------------------------------------------------
 
@@ -107,7 +107,7 @@ static hf::MadgwickFilter _madgwick;
 
 // We use Crazyflie QuadX motor layout ----------------------------------------
 
-static const std::vector<uint8_t> MOTOR_PINS = { 1, 2, 3, 0 };
+static const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
 
 static auto _motors = OneShot125(MOTOR_PINS);
 
@@ -367,10 +367,14 @@ static void getVehicleState(
 
     hf::Utils::quat2euler(_quat, state.phi, state.theta, state.psi);
 
-    // Get angular velocities directly from gyro.  We swap the X and Y axes and 
-    // negate Y and Z for nose-down, nose-right positive.
-    state.dphi = gyro.y;  
-    state.dtheta = -gyro.x; 
+    // Negate roll, pitch angles for backwards IMU orientation
+    state.phi = -state.phi;
+    state.theta = -state.theta;
+
+    // Get angular velocities directly from gyro.  We swap the X and Y axes and
+    // negate for board orientation.
+    state.dphi = -gyro.y;  
+    state.dtheta = gyro.x; 
     state.dpsi = -gyro.z; 
 }
 

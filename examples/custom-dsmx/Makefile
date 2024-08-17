@@ -1,4 +1,4 @@
-SKETCH = sbus
+SKETCH = custom-dsmx
 
 BOARD = teensy:avr:teensy40
 
