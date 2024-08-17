@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -2667,33 +2667,6 @@ part number 2062-2P from STA</description>
 <text x="-5.08" y="6.985" size="1.778" layer="25">&gt;Name</text>
 <text x="-5.08" y="-10.16" size="1.778" layer="25">&gt;Value</text>
 </package>
-<package name="JST-6-SMD-HORI-1.0MM">
-<description>&lt;h3&gt;JST SH Vertical 6-Pin SMT&lt;/h3&gt;
-&lt;p&gt;Specifications:
-&lt;ul&gt;&lt;li&gt;Pin count:6&lt;/li&gt;
-&lt;li&gt;Pin pitch: 1 mm&lt;/li&gt;
-&lt;/ul&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=”https://www.sparkfun.com/datasheets/GPS/EM406-SMDConnector-eSH.pdf”&gt;Datasheet referenced for footprint&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Example device(s):
-&lt;ul&gt;&lt;li&gt;JST_6PIN_VERTICAL&lt;/li&gt;
-&lt;/ul&gt;&lt;/p&gt;</description>
-<circle x="-3.44" y="-5.16" radius="0.1047" width="0.4064" layer="21"/>
-<wire x1="-2.9" y1="-0.1" x2="2.9" y2="-0.1" width="0.254" layer="21"/>
-<wire x1="-4" y1="-2.1" x2="-4" y2="-4.4" width="0.254" layer="21"/>
-<wire x1="3.1" y1="-4.4" x2="4" y2="-4.4" width="0.254" layer="21"/>
-<wire x1="4" y1="-4.4" x2="4" y2="-2.1" width="0.254" layer="21"/>
-<wire x1="-4" y1="-4.4" x2="-3.1" y2="-4.4" width="0.254" layer="21"/>
-<smd name="1" x="-2.5" y="-4.775" dx="0.6" dy="1.55" layer="1"/>
-<smd name="2" x="-1.5" y="-4.775" dx="0.6" dy="1.55" layer="1"/>
-<smd name="3" x="-0.5" y="-4.775" dx="0.6" dy="1.55" layer="1"/>
-<smd name="4" x="0.5" y="-4.775" dx="0.6" dy="1.55" layer="1"/>
-<smd name="5" x="1.5" y="-4.775" dx="0.6" dy="1.55" layer="1"/>
-<smd name="6" x="2.5" y="-4.775" dx="0.6" dy="1.55" layer="1"/>
-<smd name="M1" x="-3.8" y="-0.9" dx="1.2" dy="1.8" layer="1"/>
-<smd name="M2" x="3.8" y="-0.9" dx="1.2" dy="1.8" layer="1"/>
-<text x="-1.524" y="0.54" size="0.6096" layer="25" font="vector" ratio="20">&gt;NAME</text>
-<text x="-1.905" y="-6.667" size="0.6096" layer="27" font="vector" ratio="20">&gt;VALUE</text>
-</package>
 </packages>
 <symbols>
 <symbol name="CONN_05">
@@ -2759,27 +2732,6 @@ part number 2062-2P from STA</description>
 <text x="-2.54" y="5.588" size="1.778" layer="95" font="vector">&gt;NAME</text>
 <pin name="1" x="7.62" y="0" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 <pin name="2" x="7.62" y="2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-</symbol>
-<symbol name="CONN_06">
-<description>&lt;h3&gt;6 Pin Connection&lt;/h3&gt;</description>
-<wire x1="1.27" y1="-7.62" x2="-5.08" y2="-7.62" width="0.4064" layer="94"/>
-<wire x1="-1.27" y1="0" x2="0" y2="0" width="0.6096" layer="94"/>
-<wire x1="-1.27" y1="-2.54" x2="0" y2="-2.54" width="0.6096" layer="94"/>
-<wire x1="-1.27" y1="-5.08" x2="0" y2="-5.08" width="0.6096" layer="94"/>
-<wire x1="-5.08" y1="10.16" x2="-5.08" y2="-7.62" width="0.4064" layer="94"/>
-<wire x1="1.27" y1="-7.62" x2="1.27" y2="10.16" width="0.4064" layer="94"/>
-<wire x1="-5.08" y1="10.16" x2="1.27" y2="10.16" width="0.4064" layer="94"/>
-<wire x1="-1.27" y1="5.08" x2="0" y2="5.08" width="0.6096" layer="94"/>
-<wire x1="-1.27" y1="2.54" x2="0" y2="2.54" width="0.6096" layer="94"/>
-<wire x1="-1.27" y1="7.62" x2="0" y2="7.62" width="0.6096" layer="94"/>
-<text x="-5.08" y="-9.906" size="1.778" layer="96" font="vector">&gt;VALUE</text>
-<text x="-5.08" y="10.668" size="1.778" layer="95" font="vector">&gt;NAME</text>
-<pin name="1" x="5.08" y="-5.08" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-<pin name="2" x="5.08" y="-2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-<pin name="3" x="5.08" y="0" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-<pin name="4" x="5.08" y="2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-<pin name="5" x="5.08" y="5.08" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-<pin name="6" x="5.08" y="7.62" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -3864,48 +3816,6 @@ part number 2062-2P from STA</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="JST_6_PIN_HORIZONTAL" prefix="J">
-<description>&lt;h3&gt;JST 6 pin horizontal connector&lt;/h3&gt;
-JST-SH type.
-
-&lt;p&gt;&lt;/p&gt;
-&lt;b&gt;Here is the connector we sell at SparkFun:&lt;/b&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="link"&gt;name&lt;/a&gt; (XXX-00000)&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.sparkfun.com/datasheets/GPS/EM406-SMDConnector-eSH.pdf"&gt;Datasheet&lt;/a&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;/p&gt;
-&lt;b&gt;It was used on these SparkFun products:&lt;/b&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="link"&gt;name&lt;/a&gt; (XXX-00000)&lt;/li&gt;
-&lt;li&gt;&lt;a href="link"&gt;name&lt;/a&gt; (XXX-00000)&lt;/li&gt;
-&lt;/ul&gt;</description>
-<gates>
-<gate name="A" symbol="CONN_06" x="0" y="0"/>
-<gate name="B" symbol="CONN_02" x="17.78" y="-5.08"/>
-</gates>
-<devices>
-<device name="" package="JST-6-SMD-HORI-1.0MM">
-<connects>
-<connect gate="A" pin="1" pad="1"/>
-<connect gate="A" pin="2" pad="2"/>
-<connect gate="A" pin="3" pad="3"/>
-<connect gate="A" pin="4" pad="4"/>
-<connect gate="A" pin="5" pad="5"/>
-<connect gate="A" pin="6" pad="6"/>
-<connect gate="B" pin="1" pad="M1"/>
-<connect gate="B" pin="2" pad="M2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="XXX-00000" constant="no"/>
-<attribute name="VALUE" value="BM06B-SRSS-TB" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
 </devicesets>
 </library>
 <library name="headers(2mm)">
@@ -3992,6 +3902,45 @@ JST-SH type.
 </deviceset>
 </devicesets>
 </library>
+<library name="wirepad">
+<description>&lt;b&gt;Single Pads&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="SMD1,27-2,54">
+<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
+<smd name="1" x="0" y="0" dx="1.27" dy="2.54" layer="1"/>
+<text x="0" y="0" size="0.0254" layer="27">&gt;VALUE</text>
+<text x="-0.8" y="-2.4" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+</package>
+</packages>
+<symbols>
+<symbol name="PAD">
+<wire x1="-1.016" y1="1.016" x2="1.016" y2="-1.016" width="0.254" layer="94"/>
+<wire x1="-1.016" y1="-1.016" x2="1.016" y2="1.016" width="0.254" layer="94"/>
+<text x="-1.143" y="1.8542" size="1.778" layer="95">&gt;NAME</text>
+<text x="-1.143" y="-3.302" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="P" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="SMD2" prefix="PAD" uservalue="yes">
+<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
+<gates>
+<gate name="1" symbol="PAD" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SMD1,27-2,54">
+<connects>
+<connect gate="1" pin="P" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -4015,7 +3964,12 @@ JST-SH type.
 <part name="U$4" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="U$6" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="U$7" library="headers(2mm)" deviceset="1X1" device=""/>
-<part name="J1" library="SparkFun-Connectors" deviceset="JST_6_PIN_HORIZONTAL" device="" value="BM06B-SRSS-TB"/>
+<part name="GND" library="wirepad" deviceset="SMD2" device=""/>
+<part name="VBAT" library="wirepad" deviceset="SMD2" device=""/>
+<part name="M4" library="wirepad" deviceset="SMD2" device=""/>
+<part name="M3" library="wirepad" deviceset="SMD2" device=""/>
+<part name="M2" library="wirepad" deviceset="SMD2" device=""/>
+<part name="M1" library="wirepad" deviceset="SMD2" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -4059,9 +4013,23 @@ JST-SH type.
 <instance part="U$4" gate="G$1" x="-27.94" y="17.78" smashed="yes"/>
 <instance part="U$6" gate="G$1" x="-27.94" y="-2.54" smashed="yes"/>
 <instance part="U$7" gate="G$1" x="-27.94" y="-10.16" smashed="yes"/>
-<instance part="J1" gate="A" x="0" y="83.82" smashed="yes">
-<attribute name="VALUE" x="-5.08" y="73.914" size="1.778" layer="96" font="vector"/>
-<attribute name="NAME" x="-5.08" y="94.488" size="1.778" layer="95" font="vector"/>
+<instance part="GND" gate="1" x="2.54" y="114.3" smashed="yes">
+<attribute name="VALUE" x="1.397" y="110.998" size="1.778" layer="96"/>
+</instance>
+<instance part="VBAT" gate="1" x="2.54" y="109.22" smashed="yes">
+<attribute name="VALUE" x="1.397" y="105.918" size="1.778" layer="96"/>
+</instance>
+<instance part="M4" gate="1" x="2.54" y="104.14" smashed="yes">
+<attribute name="VALUE" x="1.397" y="100.838" size="1.778" layer="96"/>
+</instance>
+<instance part="M3" gate="1" x="2.54" y="99.06" smashed="yes">
+<attribute name="VALUE" x="1.397" y="95.758" size="1.778" layer="96"/>
+</instance>
+<instance part="M2" gate="1" x="2.54" y="93.98" smashed="yes">
+<attribute name="VALUE" x="1.397" y="90.678" size="1.778" layer="96"/>
+</instance>
+<instance part="M1" gate="1" x="2.54" y="88.9" smashed="yes">
+<attribute name="VALUE" x="1.397" y="85.598" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -4136,9 +4104,9 @@ JST-SH type.
 <label x="-53.34" y="0" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J1" gate="A" pin="6"/>
-<wire x1="5.08" y1="91.44" x2="10.16" y2="91.44" width="0.1524" layer="91"/>
-<label x="5.08" y="91.44" size="1.778" layer="95"/>
+<pinref part="GND" gate="1" pin="P"/>
+<wire x1="5.08" y1="114.3" x2="10.16" y2="114.3" width="0.1524" layer="91"/>
+<label x="5.08" y="114.3" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SDA" class="0">
@@ -4225,21 +4193,9 @@ JST-SH type.
 </net>
 <net name="M4" class="0">
 <segment>
-<pinref part="J1" gate="A" pin="4"/>
-<wire x1="5.08" y1="86.36" x2="10.16" y2="86.36" width="0.1524" layer="91"/>
-<label x="5.08" y="86.36" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="6"/>
-<wire x1="53.34" y1="45.72" x2="48.26" y2="45.72" width="0.1524" layer="91"/>
-<label x="48.26" y="45.72" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="M1" class="0">
-<segment>
-<pinref part="J1" gate="A" pin="1"/>
-<wire x1="5.08" y1="78.74" x2="10.16" y2="78.74" width="0.1524" layer="91"/>
-<label x="5.08" y="78.74" size="1.778" layer="95"/>
+<pinref part="M4" gate="1" pin="P"/>
+<wire x1="5.08" y1="104.14" x2="10.16" y2="104.14" width="0.1524" layer="91"/>
+<label x="5.08" y="104.14" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="3"/>
@@ -4247,28 +4203,40 @@ JST-SH type.
 <label x="48.26" y="53.34" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="M2" class="0">
+<net name="M1" class="0">
 <segment>
-<pinref part="J1" gate="A" pin="2"/>
-<wire x1="5.08" y1="81.28" x2="10.16" y2="81.28" width="0.1524" layer="91"/>
-<label x="5.08" y="81.28" size="1.778" layer="95"/>
+<pinref part="M1" gate="1" pin="P"/>
+<wire x1="5.08" y1="88.9" x2="10.16" y2="88.9" width="0.1524" layer="91"/>
+<label x="5.08" y="88.9" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="4"/>
-<wire x1="53.34" y1="50.8" x2="48.26" y2="50.8" width="0.1524" layer="91"/>
-<label x="48.26" y="50.8" size="1.778" layer="95"/>
+<pinref part="U$1" gate="G$1" pin="6"/>
+<wire x1="53.34" y1="45.72" x2="48.26" y2="45.72" width="0.1524" layer="91"/>
+<label x="48.26" y="45.72" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="M3" class="0">
+<net name="M2" class="0">
 <segment>
-<pinref part="J1" gate="A" pin="3"/>
-<wire x1="5.08" y1="83.82" x2="10.16" y2="83.82" width="0.1524" layer="91"/>
-<label x="5.08" y="83.82" size="1.778" layer="95"/>
+<pinref part="M2" gate="1" pin="P"/>
+<wire x1="5.08" y1="93.98" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
+<label x="5.08" y="93.98" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="5"/>
 <wire x1="53.34" y1="48.26" x2="48.26" y2="48.26" width="0.1524" layer="91"/>
 <label x="48.26" y="48.26" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="M3" class="0">
+<segment>
+<pinref part="M3" gate="1" pin="P"/>
+<wire x1="5.08" y1="99.06" x2="10.16" y2="99.06" width="0.1524" layer="91"/>
+<label x="5.08" y="99.06" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="4"/>
+<wire x1="53.34" y1="50.8" x2="48.26" y2="50.8" width="0.1524" layer="91"/>
+<label x="48.26" y="50.8" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VBAT" class="0">
@@ -4278,9 +4246,9 @@ JST-SH type.
 <label x="15.24" y="53.34" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J1" gate="A" pin="5"/>
-<wire x1="5.08" y1="88.9" x2="10.16" y2="88.9" width="0.1524" layer="91"/>
-<label x="5.08" y="88.9" size="1.778" layer="95"/>
+<pinref part="VBAT" gate="1" pin="P"/>
+<wire x1="5.08" y1="109.22" x2="10.16" y2="109.22" width="0.1524" layer="91"/>
+<label x="5.08" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="INT" class="0">
