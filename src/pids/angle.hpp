@@ -66,13 +66,12 @@ namespace hf {
 
                 public:
 
-                    void run(
+                    float run(
                             const float dt,
                             const float des,
                             const float imu,
                             const bool reset,
-                            const float gyro,
-                            float & pid)
+                            const float gyro)
                     {
                         const auto error = des - imu;
 
@@ -84,14 +83,13 @@ namespace hf {
 
                         _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
 
-                        const auto derivative = gyro;
-
-                        pid = SCALE * (KP_PITCH_ROLL * error +
-                                KI_PITCH_ROLL * _integral - KD_PITCH_ROLL * derivative); 
+                        const auto output = SCALE * (KP_PITCH_ROLL * error +
+                                KI_PITCH_ROLL * _integral - KD_PITCH_ROLL * gyro); 
 
                         _integral_prev = _integral;
-                    }
 
+                        return output;
+                    }
 
                 private:
 
@@ -103,12 +101,10 @@ namespace hf {
 
                 public:
 
-                    void run(
-                            const float dt,
+                    float run( const float dt,
                             const float des,
                             const bool reset,
-                            const float gyro,
-                            float & pid)
+                            const float gyro)
                     {
                         const auto error = des - gyro;
 
@@ -122,10 +118,13 @@ namespace hf {
 
                         const auto derivative = (error - _error_prev) / dt;
 
-                        pid = SCALE * (KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative); 
+                        const auto output =
+                            SCALE * (KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative); 
 
                         _integral_prev = _integral;
                         _error_prev = error;
+
+                        return output;
                     }
 
 
@@ -155,17 +154,17 @@ namespace hf {
                     const float GyroX,
                     const float GyroY,
                     const float GyroZ,
-                    float & roll_PID,
-                    float & pitch_PID,
-                    float & yaw_PID) 
+                    float & roll_out,
+                    float & pitch_out,
+                    float & yaw_out) 
             {
                 const auto reset = throttle < THROTTLE_DOWN;
 
-                _rollPid.run(dt, roll_des, roll_IMU, reset, GyroX, roll_PID);
+                roll_out = _rollPid.run(dt, roll_des, roll_IMU, reset, GyroX);
 
-                _pitchPid.run(dt, pitch_des, pitch_IMU, reset, GyroY, pitch_PID);
+                pitch_out = _pitchPid.run(dt, pitch_des, pitch_IMU, reset, GyroY);
 
-                _yawPid.run(dt, yaw_des, reset, GyroZ, yaw_PID);
+                yaw_out = _yawPid.run(dt, yaw_des, reset, GyroZ);
             }    
 
     };
