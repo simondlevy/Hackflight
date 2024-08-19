@@ -494,6 +494,7 @@ static void blinkOnStartup(void)
         delay(BLINK_INIT_TIME_MSEC);
     }
 }
+
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() {
