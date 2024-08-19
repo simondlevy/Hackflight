@@ -378,6 +378,36 @@ static void getVehicleState(
     state.dpsi = -gyro.z; 
 }
 
+static void damp(float & curr, const float prev)
+{            
+    curr = LPF_L * curr;
+    curr = hf::Utils::fconstrain(curr, -ANGLE_MAX, ANGLE_MAX);
+    curr = (1.0 - LPF_B) * prev + LPF_B * curr;
+}
+
+static void runClosedLoop(
+        const hf::state_t & state,
+        const float dt,
+        const bool reset,
+        hf::demands_t & demands)
+{
+    static float _roll_des_prev;
+
+    static float _pitch_des_prev;
+
+    _pitchRollAngleController.run( PITCH_ROLL_ANGLE_KP, state, dt, demands);
+
+    damp(demands.roll, _roll_des_prev);
+    damp(demands.pitch, _pitch_des_prev);
+
+    _pitchRollRateController.run(
+            PITCH_ROLL_RATE_KP, PITCH_ROLL_RATE_KD, state, dt, demands);
+
+    _yawAngleController.run(state, dt, demands);
+
+    _yawRateController.run(YAW_RATE_KP, state, dt, demands);
+}
+
 // Main program ===============================================================
 
 void setup() 
@@ -407,36 +437,6 @@ void setup()
 
     //Indicate entering main loop with some quick blinks
     blinkOnStartup(); 
-}
-
-static void damp(float & curr, const float prev)
-{            
-    curr = LPF_L * curr;
-    curr = hf::Utils::fconstrain(curr, -ANGLE_MAX, ANGLE_MAX);
-    curr = (1.0 - LPF_B) * prev + LPF_B * curr;
-}
-
-static void runClosedLoop(
-        const hf::state_t & state,
-        const float dt,
-        const bool reset,
-        hf::demands_t & demands)
-{
-    static float _roll_des_prev;
-
-    static float _pitch_des_prev;
-
-    _pitchRollAngleController.run( PITCH_ROLL_ANGLE_KP, state, dt, demands);
-
-    damp(demands.roll, _roll_des_prev);
-    damp(demands.pitch, _pitch_des_prev);
-
-    _pitchRollRateController.run(
-            PITCH_ROLL_RATE_KP, PITCH_ROLL_RATE_KD, state, dt, demands);
-
-    _yawAngleController.run(state, dt, demands);
-
-    _yawRateController.run(YAW_RATE_KP, state, dt, demands);
 }
 
 

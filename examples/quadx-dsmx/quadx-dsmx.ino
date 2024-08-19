@@ -29,6 +29,8 @@
 #include <hackflight.hpp>
 #include <utils.hpp>
 #include <mixers.hpp>
+#include <tasks/debug.hpp>
+#include <tasks/blink.hpp>
 
 // Receiver -------------------------------------------------------------------
 
@@ -53,6 +55,18 @@ static const float ACCEL_SCALE_FACTOR = 16384.0;
 
 static MPU6050 mpu6050;
 
+// Das Blinkenlights ---------------------------------------------------------
+
+static const float    BLINK_RATE_HZ = 1.5;
+static hf::BlinkTask _blinkTask;
+static const uint8_t LED_PIN = 13;
+
+// Debugging -----------------------------------------------------------------
+
+static const float DEBUG_RATE_HZ = 100;
+//static hf::DebugTask _debugTask;
+static const auto DEBUG_TASK = hf::DebugTask::DANGLES;
+
 // Motors --------------------------------------------------------------------
 
 static const std::vector<uint8_t> MOTOR_PINS = { 5, 3, 2, 4 };
@@ -63,12 +77,12 @@ static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
 
 //Radio failsafe values for every channel in the event that bad reciever data is detected. Recommended defaults:
-static const unsigned long channel_1_fs = 1000; //thro
-static const unsigned long channel_2_fs = 1500; //ail
-static const unsigned long channel_3_fs = 1500; //elev
-static const unsigned long channel_4_fs = 1500; //rudd
-static const unsigned long channel_5_fs = 2000; //gear, greater than 1500 = throttle cut
-static const unsigned long channel_6_fs = 2000; //aux1
+static const unsigned long CHANNEL_1_FS = 1000; //thro
+static const unsigned long CHANNEL_2_FS = 1500; //ail
+static const unsigned long CHANNEL_3_FS = 1500; //elev
+static const unsigned long CHANNEL_4_FS = 1500; //rudd
+static const unsigned long CHANNEL_5_FS = 2000; //gear, greater than 1500 = throttle cut
+static const unsigned long CHANNEL_6_FS = 2000; //aux1
 
 //Controller parameters (take note of defaults before modifying!): 
 static const float I_LIMIT = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
@@ -103,7 +117,7 @@ static float GYRO_ERROR_Z = 0.0;
 
 //General stuff
 float dt;
-unsigned long current_time, prev_time;
+unsigned long usec_curr, usec_prev;
 unsigned long print_counter, serial_counter;
 unsigned long blink_counter, blink_delay;
 bool blinkAlternate;
@@ -134,14 +148,14 @@ static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev, derivat
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
 
 //Flight status
-static bool armedFly;
+static bool _isArmed;
 
 
 
 static void armedStatus() {
     //DESCRIPTION: Check if the throttle cut is off and the throttle input is low to prepare for flight.
     if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
-        armedFly = true;
+        _isArmed = true;
     }
 }
 
@@ -282,17 +296,18 @@ static void calculate_IMU_error()
 }
 
 static void calibrateAttitude() {
-    //DESCRIPTION: Used to warm up the main loop to allow the madwick filter to converge before commands can be sent to the actuators
-    //Assuming vehicle is powered up on level surface!
+    //DESCRIPTION: Used to warm up the main loop to allow the madwick filter to
+    //converge before commands can be sent to the actuators Assuming vehicle is
+    //powered up on level surface!
     /*
      * This function is used on startup to warm up the attitude estimation and is what causes startup to take a few seconds
      * to boot. 
      */
     //Warm up IMU and madgwick filter in simulated main loop
     for (int i = 0; i <= 10000; i++) {
-        prev_time = current_time;      
-        current_time = micros();      
-        dt = (current_time - prev_time)/1000000.0; 
+        usec_prev = usec_curr;      
+        usec_curr = micros();      
+        dt = (usec_curr - usec_prev)/1000000.0; 
         getIMUdata();
         Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, roll_IMU, pitch_IMU, yaw_IMU);
         loopRate(2000); //do not exceed 2000Hz
@@ -599,16 +614,16 @@ static void failSafe() {
 
     //If any failures, set to default failsafe values
     if ((check1 + check2 + check3 + check4 + check5 + check6) > 0) {
-        channel_1_pwm = channel_1_fs;
-        channel_2_pwm = channel_2_fs;
-        channel_3_pwm = channel_3_fs;
-        channel_4_pwm = channel_4_fs;
-        channel_5_pwm = channel_5_fs;
-        channel_6_pwm = channel_6_fs;
+        channel_1_pwm = CHANNEL_1_FS;
+        channel_2_pwm = CHANNEL_2_FS;
+        channel_3_pwm = CHANNEL_3_FS;
+        channel_4_pwm = CHANNEL_4_FS;
+        channel_5_pwm = CHANNEL_5_FS;
+        channel_6_pwm = CHANNEL_6_FS;
     }
 }
 
-static void runMotors(void) 
+static void runMotors() 
 {
     _motors.set(0, _m1_usec);
     _motors.set(1, _m2_usec);
@@ -620,8 +635,8 @@ static void runMotors(void)
 
 static void cutMotors() 
 {
-    if ((channel_5_pwm < 1500) || (armedFly == false)) {
-        armedFly = false;
+    if ((channel_5_pwm < 1500) || (_isArmed == false)) {
+        _isArmed = false;
         _m1_usec = 120;
         _m2_usec = 120;
         _m3_usec = 120;
@@ -648,44 +663,14 @@ static void loopRate(int freq)
     unsigned long checker = micros();
 
     //Sit in loop until appropriate time has passed
-    while (invFreq > (checker - current_time)) {
+    while (invFreq > (checker - usec_curr)) {
         checker = micros();
     }
 }
 
-static void loopBlink() 
-{
-    //DESCRIPTION: Blink LED on board to indicate main loop is running
-    /*
-     * It looks cool.
-     */
-    if (current_time - blink_counter > blink_delay) {
-        blink_counter = micros();
-        digitalWrite(13, blinkAlternate); //Pin 13 is built in LED
-
-        if (blinkAlternate == 1) {
-            blinkAlternate = 0;
-            blink_delay = 100000;
-        }
-        else if (blinkAlternate == 0) {
-            blinkAlternate = 1;
-            blink_delay = 2000000;
-        }
-    }
-}
-
-static void setupBlink(int numBlinks,int upTime, int downTime) {
-    //DESCRIPTION: Simple function to make LED on board blink as desired
-    for (int j = 1; j<= numBlinks; j++) {
-        digitalWrite(13, LOW);
-        delay(downTime);
-        digitalWrite(13, HIGH);
-        delay(upTime);
-    }
-}
 
 static void printRadioData() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F(" CH1:"));
         Serial.print(channel_1_pwm);
@@ -700,12 +685,12 @@ static void printRadioData() {
         Serial.print(F(" CH6:"));
         Serial.print(channel_6_pwm);
         Serial.print(F(" Armed:"));
-        Serial.println(armedFly);
+        Serial.println(_isArmed);
     }
 }
 
 static void printDesiredState() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("thro_des:"));
         Serial.print(thro_des);
@@ -719,7 +704,7 @@ static void printDesiredState() {
 }
 
 static void printGyroData() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("GyroX:"));
         Serial.print(GyroX);
@@ -731,7 +716,7 @@ static void printGyroData() {
 }
 
 static void printAccelData() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("AccX:"));
         Serial.print(AccX);
@@ -743,7 +728,7 @@ static void printAccelData() {
 }
 
 static void printRollPitchYaw() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("roll:"));
         Serial.print(roll_IMU);
@@ -755,7 +740,7 @@ static void printRollPitchYaw() {
 }
 
 static void printPIDoutput() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("roll_PID:"));
         Serial.print(roll_PID);
@@ -767,7 +752,7 @@ static void printPIDoutput() {
 }
 
 static void printMotorCommands() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("m1_command:"));
         Serial.print(_m1_usec);
@@ -781,13 +766,26 @@ static void printMotorCommands() {
 }
 
 static void printLoopRate() {
-    if (current_time - print_counter > 10000) {
+    if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("dt:"));
         Serial.println(dt*1000000.0);
     }
 }
 
+static void blinkOnStartup(void)
+{
+    // These constants are arbitrary, so we hide them here
+    static const uint8_t  BLINK_INIT_COUNT = 10;
+    static const uint32_t BLINK_INIT_TIME_MSEC = 100;
+
+    for (uint8_t j=0; j<BLINK_INIT_COUNT; j++) {
+        digitalWrite(LED_PIN, LOW);
+        delay(BLINK_INIT_TIME_MSEC);
+        digitalWrite(LED_PIN, HIGH);
+        delay(BLINK_INIT_TIME_MSEC);
+    }
+}
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() {
@@ -801,20 +799,20 @@ void setup() {
     Serial2.begin(115200);
 
     //Initialize all pins
-    pinMode(13, OUTPUT); 
+    pinMode(LED_PIN, OUTPUT); 
 
     //Set LED to turn on to signal startup
-    digitalWrite(13, HIGH);
+    digitalWrite(LED_PIN, HIGH);
 
     delay(5);
 
     //Set radio channels to default (safe) values before entering main loop
-    channel_1_pwm = channel_1_fs;
-    channel_2_pwm = channel_2_fs;
-    channel_3_pwm = channel_3_fs;
-    channel_4_pwm = channel_4_fs;
-    channel_5_pwm = channel_5_fs;
-    channel_6_pwm = channel_6_fs;
+    channel_1_pwm = CHANNEL_1_FS;
+    channel_2_pwm = CHANNEL_2_FS;
+    channel_3_pwm = CHANNEL_3_FS;
+    channel_4_pwm = CHANNEL_4_FS;
+    channel_5_pwm = CHANNEL_5_FS;
+    channel_6_pwm = CHANNEL_6_FS;
 
     //Initialize IMU communication
     IMUinit();
@@ -840,18 +838,16 @@ void setup() {
     armMotor(_m4_usec);
     _motors.arm();
 
-    //Indicate entering main loop with 3 quick blinks
-    setupBlink(3,160,70); //numBlinks, upTime (ms), downTime (ms)
+    //Indicate entering main loop with some quick blinks
+    blinkOnStartup(); 
 }
 
 void loop() 
 {
     //Keep track of what time it is and how much time has elapsed since the last loop
-    prev_time = current_time;      
-    current_time = micros();      
-    dt = (current_time - prev_time)/1000000.0;
-
-    loopBlink(); //Indicate we are in main loop with short blink every 1.5 seconds
+    usec_prev = usec_curr;      
+    usec_curr = micros();      
+    dt = (usec_curr - usec_prev)/1000000.0;
 
     //Print data at 100hz (uncomment one at a time for troubleshooting) - SELECT ONE:
     //printRadioData();     
@@ -874,6 +870,17 @@ void loop()
 
     // Get arming status
     armedStatus(); //Check if the throttle cut is off and throttle is low.
+
+    // LED should be on when armed
+    if (_isArmed) {
+        digitalWrite(LED_PIN, HIGH);
+    }
+
+    // Otherwise, blink LED as heartbeat
+    else {
+        _blinkTask.run(usec_curr, BLINK_RATE_HZ);
+    }
+
 
     //Get vehicle state
     getIMUdata(); 
