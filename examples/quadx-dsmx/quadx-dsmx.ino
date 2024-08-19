@@ -33,6 +33,8 @@
 #include <tasks/blink.hpp>
 #include <pids/angle.hpp>
 
+#include <pids/angle2.hpp>
+
 // Receiver -------------------------------------------------------------------
 
 static Dsm2048 _rx;
