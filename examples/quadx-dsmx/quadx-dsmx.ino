@@ -29,7 +29,6 @@
 #include <hackflight.hpp>
 #include <utils.hpp>
 #include <mixers.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/blink.hpp>
 #include <pids/angle.hpp>
 
@@ -67,12 +66,6 @@ static const float    BLINK_RATE_HZ = 1.5;
 static hf::BlinkTask _blinkTask;
 static const uint8_t LED_PIN = 13;
 
-// Debugging -----------------------------------------------------------------
-
-static const float DEBUG_RATE_HZ = 100;
-//static hf::DebugTask _debugTask;
-static const auto DEBUG_TASK = hf::DebugTask::DANGLES;
-
 // Motors --------------------------------------------------------------------
 
 static const std::vector<uint8_t> MOTOR_PINS = { 5, 3, 2, 4 };
@@ -90,27 +83,10 @@ static const unsigned long CHANNEL_4_FS = 1500; //rudd
 static const unsigned long CHANNEL_5_FS = 2000; //gear, greater than 1500 = throttle cut
 static const unsigned long CHANNEL_6_FS = 2000; //aux1
 
-//Controller parameters (take note of defaults before modifying!): 
-static const float I_LIMIT = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
-
-static const float MAX_PITCH_ROLL = 30.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+//Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+static const float MAX_PITCH_ROLL = 30.0;    
 
 static const float MAX_YAW = 160.0;     //Max yaw rate in deg/sec
-
-static const float KP_PITCH_ROLL_ANGLE = 0.2;    
-static const float KI_PITCH_ROLL_ANGLE = 0.3;    
-static const float KD_PITCH_ROLL_ANGLE = 0.05;   
-
-// Damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
-static const float B_LOOP_PITCH_ROLL = 0.9;      
-
-static const float KP_PITCH_ROLL_RATE = 0.15;    
-static const float KI_PITCH_ROLL_RATE = 0.2;     
-static const float KD_PITCH_ROLL_RATE = 0.0002;  
-
-static const float KP_YAW = 0.3;           
-static const float KI_YAW = 0.05;          
-static const float KD_YAW = 0.00015;       
 
 //IMU calibration parameters
 static float ACC_ERROR_X = 0.0;
@@ -459,20 +435,11 @@ void loop()
     //Compute desired state
     getDesState(); //Convert raw commands to normalized values based on saturated control limits
 
-    _anglePid.run(
-            dt, 
-            roll_demand, 
-            pitch_demand, 
-            yaw_demand, 
-            roll_angle,
-            pitch_angle,
+    _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
+            roll_angle, pitch_angle,
             channel_1_pwm,
-            GyroX,
-            GyroY,
-            GyroZ,
-            roll_PID,
-            pitch_PID,
-            yaw_PID);
+            GyroX, GyroY, GyroZ,
+            roll_PID, pitch_PID, yaw_PID);
 
 
     // Run motor mixer
