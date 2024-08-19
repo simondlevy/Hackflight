@@ -47,7 +47,7 @@
 
 static const bool USE_EKF = false;
 
-static const auto DEBUG_TASK = hf::DebugTask::NONE;
+static const auto DEBUG_TASK = hf::DebugTask::ANGLES;
 
 // PID Control constants -----------------------------------------------------
 
@@ -59,8 +59,8 @@ static const float ANGLE_MAX = 240;
 static const float LPF_B = 0.9;
 static const float LPF_L = 30;
 
-static const float PITCH_ROLL_RATE_KP = 0.0015;    
-static const float PITCH_ROLL_RATE_KD = 0.000002;  
+static const float PITCH_ROLL_RATE_KP = 0;//0.0015;    
+static const float PITCH_ROLL_RATE_KD = 0;//0.000002;  
 
 // ---------------------------------------------------------------------------
 
