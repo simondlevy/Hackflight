@@ -88,7 +88,7 @@ static const float MAX_PITCH_ROLL = 30.0;
 
 static const float MAX_YAW = 160.0;     //Max yaw rate in deg/sec
 
-//IMU calibration parameters
+// IMU calibration parameters
 static float ACC_ERROR_X = 0.0;
 static float ACC_ERROR_Y = 0.0;
 static float ACC_ERROR_Z = 0.0;
@@ -96,16 +96,9 @@ static float GYRO_ERROR_X = 0.0;
 static float GYRO_ERROR_Y= 0.0;
 static float GYRO_ERROR_Z = 0.0;
 
-//Radio communication:
+// Radio communication:
 uint32_t channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
 uint32_t channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
-
-// IMU
-static float AccX, AccY, AccZ;
-static float AccX_prev, AccY_prev, AccZ_prev;
-static float GyroX, GyroY, GyroZ;
-static float GyroX_prev, GyroY_prev, GyroZ_prev;
-static float roll_angle, pitch_angle, yaw_angle;
 
 // Normalized desired state:
 static float thro_demand, roll_demand, pitch_demand, yaw_demand;
@@ -149,7 +142,13 @@ static void initImu()
 
 }
 
-static void getIMUdata() {
+static void getImuData(
+        float & AccX, float & AccY, float & AccZ,
+        float & GyroX, float & GyroY, float & GyroZ
+        ) 
+{
+    static float AccX_prev, AccY_prev, AccZ_prev;
+    static float GyroX_prev, GyroY_prev, GyroZ_prev;
 
     int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
@@ -424,10 +423,17 @@ void loop()
         _blinkTask.run(usec_curr, BLINK_RATE_HZ);
     }
 
-
     //Get vehicle state
-    getIMUdata(); 
-    Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, roll_angle, pitch_angle, yaw_angle);
+
+    float AccX = 0, AccY = 0, AccZ = 0;
+    float GyroX = 0, GyroY = 0, GyroZ = 0;
+
+    getImuData(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
+
+    float roll_angle = 0, pitch_angle = 0, yaw_angle = 0;
+
+    Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ,
+            roll_angle, pitch_angle, yaw_angle);
 
     //Compute desired state
     getDesState(); //Convert raw commands to normalized values based on saturated control limits
