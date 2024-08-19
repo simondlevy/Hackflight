@@ -30,9 +30,9 @@ namespace hf {
         //DESCRIPTION: Computes control commands based on state error (angle)
         /*
          * Basic PID control to stablize on angle setpoint based on desired
-         * states roll_des, pitch_des, and yaw_des computed in getDesState().
+         * states roll_demand, pitch_demand, and yaw_demand computed in getDesState().
          * Error is simply the desired state minus the actual state (ex.
-         * roll_des - roll_IMU). Two safety features are implimented here
+         * roll_demand - roll_angle). Two safety features are implimented here
          * regarding the I terms. The I terms are saturated within specified
          * limits on startup to prevent excessive buildup. This can be seen by
          * holding the vehicle at an angle and seeing the motors ramp up on one
@@ -145,26 +145,26 @@ namespace hf {
 
             void run(
                     const float dt, 
-                    const float roll_des, 
-                    const float pitch_des, 
-                    const float yaw_des, 
-                    const float roll_IMU,
-                    const float pitch_IMU,
+                    const float roll_demand, 
+                    const float pitch_demand, 
+                    const float yaw_demand, 
+                    const float roll_angle,
+                    const float pitch_angle,
                     const uint32_t throttle,
-                    const float GyroX,
-                    const float GyroY,
-                    const float GyroZ,
+                    const float gyro_x,
+                    const float gyro_y,
+                    const float gyro_z,
                     float & roll_out,
                     float & pitch_out,
                     float & yaw_out) 
             {
                 const auto reset = throttle < THROTTLE_DOWN;
 
-                roll_out = _rollPid.run(dt, roll_des, roll_IMU, reset, GyroX);
+                roll_out = _rollPid.run(dt, roll_demand, roll_angle, reset, gyro_x);
 
-                pitch_out = _pitchPid.run(dt, pitch_des, pitch_IMU, reset, GyroY);
+                pitch_out = _pitchPid.run(dt, pitch_demand, pitch_angle, reset, gyro_y);
 
-                yaw_out = _yawPid.run(dt, yaw_des, reset, GyroZ);
+                yaw_out = _yawPid.run(dt, yaw_demand, reset, gyro_z);
             }    
 
     };

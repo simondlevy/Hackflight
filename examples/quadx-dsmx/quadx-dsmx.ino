@@ -133,10 +133,10 @@ static float AccX, AccY, AccZ;
 static float AccX_prev, AccY_prev, AccZ_prev;
 static float GyroX, GyroY, GyroZ;
 static float GyroX_prev, GyroY_prev, GyroZ_prev;
-static float roll_IMU, pitch_IMU, yaw_IMU;
+static float roll_angle, pitch_angle, yaw_angle;
 
 // Normalized desired state:
-static float thro_des, roll_des, pitch_des, yaw_des;
+static float thro_demand, roll_demand, pitch_demand, yaw_demand;
 
 // Controller:
 static float roll_PID;
@@ -222,16 +222,16 @@ static void getIMUdata() {
 
 static void getDesState() 
 {
-    thro_des = (channel_1_pwm - 1000.0)/1000.0; //Between 0 and 1
-    roll_des = (channel_2_pwm - 1500.0)/500.0; //Between -1 and 1
-    pitch_des = (channel_3_pwm - 1500.0)/500.0; //Between -1 and 1
-    yaw_des = -(channel_4_pwm - 1500.0)/500.0; //Between -1 and 1
+    thro_demand = (channel_1_pwm - 1000.0)/1000.0; //Between 0 and 1
+    roll_demand = (channel_2_pwm - 1500.0)/500.0; //Between -1 and 1
+    pitch_demand = (channel_3_pwm - 1500.0)/500.0; //Between -1 and 1
+    yaw_demand = -(channel_4_pwm - 1500.0)/500.0; //Between -1 and 1
 
     //Constrain within normalized bounds
-    thro_des = constrain(thro_des, 0.0, 1.0); //Between 0 and 1
-    roll_des = constrain(roll_des, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
-    pitch_des = constrain(pitch_des, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
-    yaw_des = constrain(yaw_des, -1.0, 1.0)*MAX_YAW; //Between -MAX_YAW and +MAX_YAW
+    thro_demand = constrain(thro_demand, 0.0, 1.0); //Between 0 and 1
+    roll_demand = constrain(roll_demand, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
+    pitch_demand = constrain(pitch_demand, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
+    yaw_demand = constrain(yaw_demand, -1.0, 1.0)*MAX_YAW; //Between -MAX_YAW and +MAX_YAW
 }
 
 static void armMotor(uint8_t & m_usec)
@@ -400,14 +400,14 @@ static void printRadioData() {
 static void printDesiredState() {
     if (usec_curr - print_counter > 10000) {
         print_counter = micros();
-        Serial.print(F("thro_des:"));
-        Serial.print(thro_des);
-        Serial.print(F(" roll_des:"));
-        Serial.print(roll_des);
-        Serial.print(F(" pitch_des:"));
-        Serial.print(pitch_des);
-        Serial.print(F(" yaw_des:"));
-        Serial.println(yaw_des);
+        Serial.print(F("thro_demand:"));
+        Serial.print(thro_demand);
+        Serial.print(F(" roll_demand:"));
+        Serial.print(roll_demand);
+        Serial.print(F(" pitch_demand:"));
+        Serial.print(pitch_demand);
+        Serial.print(F(" yaw_demand:"));
+        Serial.println(yaw_demand);
     }
 }
 
@@ -439,11 +439,11 @@ static void printRollPitchYaw() {
     if (usec_curr - print_counter > 10000) {
         print_counter = micros();
         Serial.print(F("roll:"));
-        Serial.print(roll_IMU);
+        Serial.print(roll_angle);
         Serial.print(F(" pitch:"));
-        Serial.print(pitch_IMU);
+        Serial.print(pitch_angle);
         Serial.print(F(" yaw:"));
-        Serial.println(yaw_IMU);
+        Serial.println(yaw_angle);
     }
 }
 
@@ -579,18 +579,18 @@ void loop()
 
     //Get vehicle state
     getIMUdata(); 
-    Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, roll_IMU, pitch_IMU, yaw_IMU);
+    Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, roll_angle, pitch_angle, yaw_angle);
 
     //Compute desired state
     getDesState(); //Convert raw commands to normalized values based on saturated control limits
 
     _anglePid.run(
             dt, 
-            roll_des, 
-            pitch_des, 
-            yaw_des, 
-            roll_IMU,
-            pitch_IMU,
+            roll_demand, 
+            pitch_demand, 
+            yaw_demand, 
+            roll_angle,
+            pitch_angle,
             channel_1_pwm,
             GyroX,
             GyroY,
@@ -601,7 +601,7 @@ void loop()
 
 
     // Run motor mixer
-    hf::Mixer::runDF(thro_des, roll_PID, pitch_PID, yaw_PID, 
+    hf::Mixer::runDF(thro_demand, roll_PID, pitch_PID, yaw_PID, 
             m1_command_scaled, 
             m2_command_scaled, 
             m3_command_scaled, 
