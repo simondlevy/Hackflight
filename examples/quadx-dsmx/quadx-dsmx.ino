@@ -31,6 +31,7 @@
 #include <mixers.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/blink.hpp>
+#include <pids/angle.hpp>
 
 // Receiver -------------------------------------------------------------------
 
@@ -585,23 +586,7 @@ void loop()
     //Compute desired state
     getDesState(); //Convert raw commands to normalized values based on saturated control limits
 
-    void controlANGLE(
-            const float dt, 
-            const float roll_des, 
-            const float pitch_des, 
-            const float yaw_des, 
-            const float roll_IMU,
-            const float pitch_IMU,
-            const uint32_t channel_1_pwm,
-            const float GyroX,
-            const float GyroY,
-            const float GyroZ,
-            float & roll_PID,
-            float & pitch_PID,
-            float & yaw_PID);
-
-    //PID Controller - SELECT ONE:
-    controlANGLE(
+    hf::AnglePid::run(
             dt, 
             roll_des, 
             pitch_des, 
