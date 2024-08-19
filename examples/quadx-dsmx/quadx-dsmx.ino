@@ -122,7 +122,6 @@ static float GYRO_ERROR_Z = 0.0;
 
 //General stuff
 static unsigned long usec_curr;
-static unsigned long print_counter;
 
 //Radio communication:
 uint32_t channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
@@ -376,111 +375,6 @@ static void runLoopDelay(const uint32_t usec_curr, const uint32_t freq)
     }
 }
 
-
-static void printRadioData() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F(" CH1:"));
-        Serial.print(channel_1_pwm);
-        Serial.print(F(" CH2:"));
-        Serial.print(channel_2_pwm);
-        Serial.print(F(" CH3:"));
-        Serial.print(channel_3_pwm);
-        Serial.print(F(" CH4:"));
-        Serial.print(channel_4_pwm);
-        Serial.print(F(" CH5:"));
-        Serial.print(channel_5_pwm);
-        Serial.print(F(" CH6:"));
-        Serial.print(channel_6_pwm);
-        Serial.print(F(" Armed:"));
-        Serial.println(_isArmed);
-    }
-}
-
-static void printDesiredState() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("thro_demand:"));
-        Serial.print(thro_demand);
-        Serial.print(F(" roll_demand:"));
-        Serial.print(roll_demand);
-        Serial.print(F(" pitch_demand:"));
-        Serial.print(pitch_demand);
-        Serial.print(F(" yaw_demand:"));
-        Serial.println(yaw_demand);
-    }
-}
-
-static void printGyroData() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("GyroX:"));
-        Serial.print(GyroX);
-        Serial.print(F(" GyroY:"));
-        Serial.print(GyroY);
-        Serial.print(F(" GyroZ:"));
-        Serial.println(GyroZ);
-    }
-}
-
-static void printAccelData() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("AccX:"));
-        Serial.print(AccX);
-        Serial.print(F(" AccY:"));
-        Serial.print(AccY);
-        Serial.print(F(" AccZ:"));
-        Serial.println(AccZ);
-    }
-}
-
-static void printRollPitchYaw() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("roll:"));
-        Serial.print(roll_angle);
-        Serial.print(F(" pitch:"));
-        Serial.print(pitch_angle);
-        Serial.print(F(" yaw:"));
-        Serial.println(yaw_angle);
-    }
-}
-
-static void printPIDoutput() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("roll_PID:"));
-        Serial.print(roll_PID);
-        Serial.print(F(" pitch_PID:"));
-        Serial.print(pitch_PID);
-        Serial.print(F(" yaw_PID:"));
-        Serial.println(yaw_PID);
-    }
-}
-
-static void printMotorCommands() {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("m1_command:"));
-        Serial.print(_m1_usec);
-        Serial.print(F(" m2_command:"));
-        Serial.print(_m2_usec);
-        Serial.print(F(" m3_command:"));
-        Serial.print(_m3_usec);
-        Serial.print(F(" m4_command:"));
-        Serial.println(_m4_usec);
-    }
-}
-
-static void printLoopRate(const float dt) {
-    if (usec_curr - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("dt:"));
-        Serial.println(dt*1000000.0);
-    }
-}
-
 static void blinkOnStartup(void)
 {
     // These constants are arbitrary, so we hide them here
@@ -543,25 +437,6 @@ void loop()
     usec_prev = usec_curr;      
     usec_curr = micros();      
     const float dt = (usec_curr - usec_prev)/1000000.0;
-
-    //Print data at 100hz (uncomment one at a time for troubleshooting) - SELECT ONE:
-    //printRadioData();     
-    //printDesiredState();  
-    //printGyroData();     
-    //printAccelData();    
-    //printRollPitchYaw(); 
-    //printPIDoutput();    
-    //printMotorCommands();
-    //printLoopRate(dt);     
-
-    (void)printRadioData;     
-    (void)printDesiredState;  
-    (void)printGyroData;      
-    (void)printAccelData;     
-    (void)printRollPitchYaw;  
-    (void)printPIDoutput;     
-    (void)printMotorCommands; 
-    (void)printLoopRate;      
 
     // Get arming status
     armedStatus(); //Check if the throttle cut is off and throttle is low.
