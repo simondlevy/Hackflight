@@ -31,21 +31,61 @@ namespace hf {
 
             static constexpr float I_LIMIT = 25.0;     
 
-            static constexpr float KP_PITCH_ROLL_ANGLE = 0.2;    
-            static constexpr float KI_PITCH_ROLL_ANGLE = 0.3;    
-            static constexpr float KD_PITCH_ROLL_ANGLE = 0.05;   
-
-            static constexpr float KP_PITCH_ROLL_RATE = 0.15;    
-            static constexpr float KI_PITCH_ROLL_RATE = 0.2;     
-            static constexpr float KD_PITCH_ROLL_RATE = 0.0002;  
+            static constexpr float KP_PITCH_ROLL = 0.2;    
+            static constexpr float KI_PITCH_ROLL = 0.3;    
+            static constexpr float KD_PITCH_ROLL = 0.05;   
 
             static constexpr float KP_YAW = 0.3;           
             static constexpr float KI_YAW = 0.05;          
             static constexpr float KD_YAW = 0.00015;       
 
+            static constexpr float SCALE = 0.01;
+
+            class PidController {
+
+                public:
+
+                    void run(
+                            const float kp,
+                            const float ki,
+                            const float kd,
+                            const float dt,
+                            const float des,
+                            const float imu,
+                            const uint32_t channel_1_pwm,
+                            const float gyro,
+                            float & pid)
+                    {
+                        const auto error = des - imu;
+
+                        _integral = _integral_prev + error * dt;
+
+                        if (channel_1_pwm < 1060) {
+                            _integral = 0;
+                        }
+
+                        _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
+
+                        const auto derivative = gyro;
+
+                        pid = SCALE * (kp * error + ki * _integral - kd * derivative); 
+
+                        _integral_prev = _integral;
+                    }
+
+
+                private:
+
+                    float _integral;
+                    float _integral_prev;
+            };
+
+            PidController _rollPid;
+            PidController _pitchPid;
+
         public:
 
-            static void run(
+            void run(
                     const float dt, 
                     const float roll_des, 
                     const float pitch_des, 
@@ -78,38 +118,16 @@ namespace hf {
                  * of the vehicle in the mixer.
                  */
 
-                static float _integral_roll;
-                static float _integral_roll_prev;
-
-                static float _integral_pitch;
-                static float _integral_pitch_prev;
-
                 static float _integral_yaw;
                 static float _integral_yaw_prev;
 
                 static float _error_yaw_prev;
 
-                //Roll
-                const auto error_roll = roll_des - roll_IMU;
-                _integral_roll = _integral_roll_prev + error_roll*dt;
-                if (channel_1_pwm < 1060) {
-                    _integral_roll = 0;
-                }
-                _integral_roll = hf::Utils::fconstrain(_integral_roll, -I_LIMIT, I_LIMIT); 
-                const auto derivative_roll = GyroX;
-                roll_PID = 0.01*(KP_PITCH_ROLL_ANGLE*error_roll + 
-                        KI_PITCH_ROLL_ANGLE*_integral_roll - KD_PITCH_ROLL_ANGLE*derivative_roll); 
+                _rollPid.run(KP_PITCH_ROLL, KI_PITCH_ROLL, KD_PITCH_ROLL, dt,
+                        roll_des, roll_IMU, channel_1_pwm, GyroX, roll_PID);
 
-                //Pitch
-                const auto error_pitch = pitch_des - pitch_IMU;
-                _integral_pitch = _integral_pitch_prev + error_pitch*dt;
-                if (channel_1_pwm < 1060) {   
-                    _integral_pitch = 0;
-                }
-                _integral_pitch = hf::Utils::fconstrain(_integral_pitch, -I_LIMIT, I_LIMIT); 
-                const auto derivative_pitch = GyroY;
-                pitch_PID = .01*(KP_PITCH_ROLL_ANGLE*error_pitch + 
-                        KI_PITCH_ROLL_ANGLE*_integral_pitch - KD_PITCH_ROLL_ANGLE*derivative_pitch); 
+                _pitchPid.run(KP_PITCH_ROLL, KI_PITCH_ROLL, KD_PITCH_ROLL, dt,
+                        pitch_des, pitch_IMU, channel_1_pwm, GyroY, pitch_PID);
 
                 //Yaw, stablize on rate from GyroZ
                 const auto error_yaw = yaw_des - GyroZ;
@@ -122,11 +140,9 @@ namespace hf {
                 yaw_PID = .01*(KP_YAW*error_yaw + KI_YAW*_integral_yaw + KD_YAW*derivative_yaw); 
 
                 //Update roll variables
-                _integral_roll_prev = _integral_roll;
-                _integral_pitch_prev = _integral_pitch;
                 _error_yaw_prev = error_yaw;
                 _integral_yaw_prev = _integral_yaw;
             }    
-    
+
     };
 }

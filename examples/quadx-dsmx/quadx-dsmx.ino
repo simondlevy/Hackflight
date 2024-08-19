@@ -56,6 +56,11 @@ static const float ACCEL_SCALE_FACTOR = 16384.0;
 
 static MPU6050 _mpu6050;
 
+// PID control ---------------------------------------------------------------
+
+static hf::AnglePid _anglePid;
+
+
 // Das Blinkenlights ---------------------------------------------------------
 
 static const float    BLINK_RATE_HZ = 1.5;
@@ -578,7 +583,7 @@ void loop()
     //Compute desired state
     getDesState(); //Convert raw commands to normalized values based on saturated control limits
 
-    hf::AnglePid::run(
+    _anglePid.run(
             dt, 
             roll_des, 
             pitch_des, 
