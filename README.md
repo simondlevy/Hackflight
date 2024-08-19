@@ -41,7 +41,7 @@ represent the need for functions that have state (instance variables); for
 example, the maintenance of an error integral in a PID controller:
 
 <p align="center"> 
-<img src="media/dataflow2.png" width=700>
+<img src="media/dataflow.png" width=700>
 </p>
 
 By using header-only C++ classes whenever possible, avoiding C-style macros and 

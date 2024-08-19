@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    FILE * logfp = fopen("roll.csv", "w");
+    FILE * logfp = fopen("log.csv", "w");
     
     fprintf(logfp, 
             "state.dy,"
