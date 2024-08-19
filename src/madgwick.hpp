@@ -1,141 +1,103 @@
-/*
-   Madgwick filter for Hackflight
+//Filter parameters - Defaults tuned for 2kHz loop rate; Do not touch unless you know what you are doing:
+static const float B_madgwick = 0.04;  //Madgwick filter parameter
+static const float B_accel = 0.14;     //Accelerometer LP filter paramter
+static const float B_gyro = 0.1;       //Gyro LP filter paramter
 
-   Copyright (C) 2024 Simon D. Levy
+static float q0 = 1.0f; //Initialize quaternion for madgwick filter
+static float q1 = 0.0f;
+static float q2 = 0.0f;
+static float q3 = 0.0f;
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, in version 3.
+static float invSqrt(float x) 
+{
+    return 1.0/sqrtf(x);
+}
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU General Public License for more details.
+static void Madgwick6DOF(
+        const float dt, 
+        float gx, float gy, float gz, 
+        float ax, float ay, float az,
+        float & roll_IMU, float & pitch_IMU, float & yaw_IMU)
+{
+    float recipNorm;
+    float qDot1, qDot2, qDot3, qDot4;
+    float _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2 ,_8q1, _8q2, q0q0, q1q1, q2q2, q3q3;
 
-   You should have received a copy of the GNU General Public License
-   along with this program. If not, see <http:--www.gnu.org/licenses/>.
- */
+    //Convert gyroscope degrees/sec to radians/sec
+    gx *= 0.0174533f;
+    gy *= 0.0174533f;
+    gz *= 0.0174533f;
 
-#pragma once
+    //Rate of change of quaternion from gyroscope
+    qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
+    qDot2 = 0.5f * (q0 * gx + q2 * gz - q3 * gy);
+    qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx);
+    qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
 
-#include <hackflight.hpp>
-#include <utils.hpp>
+    //Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
+    if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
+        //Normalise accelerometer measurement
+        recipNorm = invSqrt(ax * ax + ay * ay + az * az);
+        ax *= recipNorm;
+        ay *= recipNorm;
+        az *= recipNorm;
 
-namespace hf {
+        //Auxiliary variables to avoid repeated arithmetic
+        _2q0 = 2.0f * q0;
+        _2q1 = 2.0f * q1;
+        _2q2 = 2.0f * q2;
+        _2q3 = 2.0f * q3;
+        _4q0 = 4.0f * q0;
+        _4q1 = 4.0f * q1;
+        _4q2 = 4.0f * q2;
+        _8q1 = 8.0f * q1;
+        _8q2 = 8.0f * q2;
+        q0q0 = q0 * q0;
+        q1q1 = q1 * q1;
+        q2q2 = q2 * q2;
+        q3q3 = q3 * q3;
 
-    class MadgwickFilter {
+        //Gradient decent algorithm corrective step
 
-        public:
+        auto s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
 
-            void init(void)
-            {
-                _q0 = 1;
-                _q1 = 0;
-                _q2 = 0;
-                _q3 = 0;
-            }
+        auto s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - 
+            _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
 
-            /**
-             * @param dt time constant
-             * @param gyro gyro values in deg/sec
-             * @param accel accel values in gs
-             * @param quat quaternion output
-             */
-            void getQuat(
-                    const float dt, 
-                    const axis3_t & gyro, 
-                    const axis3_t & accel, 
-                    quat_t & quat)
-            {
-                // Convert gyroscope degrees/sec to radians/sec
-                const auto gx = Utils::DEG2RAD * gyro.x;
-                const auto gy = Utils::DEG2RAD * gyro.y;
-                const auto gz = Utils::DEG2RAD * gyro.z;
+        auto s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - 
+            _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
 
-                // Rate of change of quaternion from gyro
-                auto qDot1 = (-_q1 * gx - _q2 * gy - _q3 * gz) / 2;
-                auto qDot2 = (_q0 * gx + _q2 * gz - _q3 * gy) / 2;
-                auto qDot3 = (_q0 * gy - _q1 * gz + _q3 * gx) / 2;
-                auto qDot4 = (_q0 * gz + _q1 * gy - _q2 * gx) / 2;
+        auto s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
 
-                // Compute feedback only if accelerometer measurement valid (avoids NaN in
-                // accelerometer normalisation)
-                if (!((accel.x == 0) && (accel.y == 0) && (accel.z == 0))) {
+        recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); //normalise step magnitude
 
-                    auto ax = accel.x;
-                    auto ay = accel.y;
-                    auto az = accel.z;
+        s0 *= recipNorm;
+        s1 *= recipNorm;
+        s2 *= recipNorm;
+        s3 *= recipNorm;
 
-                    // Normalize accelerometer measurement
-                    const auto recipNorm = invSqrt(ax * ax + ay * ay + az * az);
+        //Apply feedback step
+        qDot1 -= B_madgwick * s0;
+        qDot2 -= B_madgwick * s1;
+        qDot3 -= B_madgwick * s2;
+        qDot4 -= B_madgwick * s3;
+    }
 
-                    ax *= recipNorm;
-                    ay *= recipNorm;
-                    az *= recipNorm;
+    //Integrate rate of change of quaternion to yield quaternion
+    q0 += qDot1 * dt;
+    q1 += qDot2 * dt;
+    q2 += qDot3 * dt;
+    q3 += qDot4 * dt;
 
-                    // Gradient-decent algorithm corrective step
+    //Normalise quaternion
+    recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
+    q0 *= recipNorm;
+    q1 *= recipNorm;
+    q2 *= recipNorm;
+    q3 *= recipNorm;
 
-                    auto s0 = 4*_q0 * _q2*_q2 + 2*_q2*ax + 4*_q0*_q1*_q1 - 2*_q1*ay;
-
-                    auto s1 = 4*_q1 * _q3*_q3 - 2*_q3*ax + 4*_q0*_q0 * _q1 - 
-                        2*_q0*ay - 4*_q1 + 8*_q1 * _q1*_q1 + 8*_q1 * _q2*_q2 +
-                        4*_q1 * az;
-
-                    auto s2 = 4 * _q0*_q0 * _q2 + 2*_q0 * ax + 4*_q2 * _q3*_q3 -
-                        2*_q3 * ay - 4*_q2 + 8*_q2 * _q1*_q1 + 8*_q2 * _q2*_q2 +
-                        4*_q2 * az;
-
-                    auto s3 = 4 * _q1*_q1 * _q3 - 2*_q1 * ax + 4 * _q2*_q2 * _q3 -
-                        2*_q2 * ay;
-
-                    normalize(s0, s1, s2, s3);
-
-                    // Apply feedback step
-                    qDot1 -= B_madgwick * s0;
-                    qDot2 -= B_madgwick * s1;
-                    qDot3 -= B_madgwick * s2;
-                    qDot4 -= B_madgwick * s3;
-                }
-
-                // Integrate rate of change of quaternion to yield quaternion
-                _q0 += qDot1 * dt;
-                _q1 += qDot2 * dt;
-                _q2 += qDot3 * dt;
-                _q3 += qDot4 * dt;
-
-                // Normalise quaternion
-                normalize(_q0, _q1, _q2, _q3);
-
-                quat.w = _q0;
-                quat.x = _q1;
-                quat.y = _q2;
-                quat.z = _q3;
-            }
-
-        private:
-
-            static void normalize(float & q0, float & q1, float & q2, float & q3) 
-            {
-                const auto recipNorm =
-                    invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
-
-                q0 *= recipNorm;
-                q1 *= recipNorm;
-                q2 *= recipNorm;
-                q3 *= recipNorm;            
-            }
-
-            static constexpr float B_madgwick = 0.04; 
-
-            float _q0;
-            float _q1;
-            float _q2;
-            float _q3;
-
-            static float invSqrt(float x) 
-            {
-                return 1 / sqrtf(x); 
-            }
-    };
-
+    //Compute angles
+    roll_IMU = atan2(q0*q1 + q2*q3, 0.5f - q1*q1 - q2*q2)*57.29577951; //degrees
+    pitch_IMU = -asin(constrain(-2.0f * (q1*q3 - q0*q2),-0.999999,0.999999))*57.29577951; //degrees
+    yaw_IMU = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3)*57.29577951; //degrees
 }
