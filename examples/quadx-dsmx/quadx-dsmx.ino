@@ -123,7 +123,6 @@ static unsigned long print_counter;
 uint32_t channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
 uint32_t channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
 
-
 // IMU
 static float AccX, AccY, AccZ;
 static float AccX_prev, AccY_prev, AccZ_prev;
@@ -133,7 +132,6 @@ static float roll_IMU, pitch_IMU, yaw_IMU;
 
 // Normalized desired state:
 static float thro_des, roll_des, pitch_des, yaw_des;
-static float roll_passthru, pitch_passthru, yaw_passthru;
 
 // Controller:
 static float roll_PID;
@@ -223,18 +221,12 @@ static void getDesState()
     roll_des = (channel_2_pwm - 1500.0)/500.0; //Between -1 and 1
     pitch_des = (channel_3_pwm - 1500.0)/500.0; //Between -1 and 1
     yaw_des = -(channel_4_pwm - 1500.0)/500.0; //Between -1 and 1
-    roll_passthru = roll_des/2.0; //Between -0.5 and 0.5
-    pitch_passthru = pitch_des/2.0; //Between -0.5 and 0.5
-    yaw_passthru = yaw_des/2.0; //Between -0.5 and 0.5
 
     //Constrain within normalized bounds
     thro_des = constrain(thro_des, 0.0, 1.0); //Between 0 and 1
     roll_des = constrain(roll_des, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
     pitch_des = constrain(pitch_des, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
     yaw_des = constrain(yaw_des, -1.0, 1.0)*MAX_YAW; //Between -MAX_YAW and +MAX_YAW
-    roll_passthru = constrain(roll_passthru, -0.5, 0.5);
-    pitch_passthru = constrain(pitch_passthru, -0.5, 0.5);
-    yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
 static void armMotor(uint8_t & m_usec)
