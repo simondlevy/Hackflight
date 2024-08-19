@@ -96,9 +96,6 @@ static float GYRO_ERROR_X = 0.0;
 static float GYRO_ERROR_Y= 0.0;
 static float GYRO_ERROR_Z = 0.0;
 
-//General stuff
-static unsigned long usec_curr;
-
 //Radio communication:
 uint32_t channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
 uint32_t channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
@@ -408,14 +405,14 @@ void setup() {
 
 void loop() 
 {
-    //Keep track of what time it is and how much time has elapsed since the last loop
-    static uint32_t usec_prev;
-    usec_prev = usec_curr;      
-    usec_curr = micros();      
-    const float dt = (usec_curr - usec_prev)/1000000.0;
+    // Keep track of what time it is and how much time has elapsed since the last loop
+    const auto usec_curr = micros();      
+    static uint32_t _usec_prev;
+    const float dt = (usec_curr - _usec_prev)/1000000.0;
+    _usec_prev = usec_curr;      
 
     // Get arming status
-    armedStatus(); //Check if the throttle cut is off and throttle is low.
+    armedStatus();
 
     // LED should be on when armed
     if (_isArmed) {
