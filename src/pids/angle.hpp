@@ -1,3 +1,23 @@
+/*
+  Angle PID controller
+
+  Adapted from https://github.com/nickrehm/dRehmFlight
+ 
+  Copyright (C) 2024 Simon D. Levy
+ 
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, in version 3.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <hackflight.hpp>
@@ -9,19 +29,11 @@ namespace hf {
 
         private:
 
-            //Controller parameters (take note of defaults before modifying!): 
-            static constexpr float I_LIMIT = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
-
-            static constexpr float MAX_PITCH_ROLL = 30.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-
-            static constexpr float MAX_YAW = 160.0;     //Max yaw rate in deg/sec
+            static constexpr float I_LIMIT = 25.0;     
 
             static constexpr float KP_PITCH_ROLL_ANGLE = 0.2;    
             static constexpr float KI_PITCH_ROLL_ANGLE = 0.3;    
             static constexpr float KD_PITCH_ROLL_ANGLE = 0.05;   
-
-            // Damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
-            static constexpr float B_LOOP_PITCH_ROLL = 0.9;      
 
             static constexpr float KP_PITCH_ROLL_RATE = 0.15;    
             static constexpr float KI_PITCH_ROLL_RATE = 0.2;     
@@ -80,38 +92,38 @@ namespace hf {
                 //Roll
                 const auto error_roll = roll_des - roll_IMU;
                 _integral_roll = _integral_roll_prev + error_roll*dt;
-                if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
+                if (channel_1_pwm < 1060) {
                     _integral_roll = 0;
                 }
-                _integral_roll = hf::Utils::fconstrain(_integral_roll, -I_LIMIT, I_LIMIT); //Saturate integrator to prevent unsafe buildup
+                _integral_roll = hf::Utils::fconstrain(_integral_roll, -I_LIMIT, I_LIMIT); 
                 const auto derivative_roll = GyroX;
-                roll_PID = 0.01*(KP_PITCH_ROLL_ANGLE*error_roll + KI_PITCH_ROLL_ANGLE*_integral_roll - KD_PITCH_ROLL_ANGLE*derivative_roll); //Scaled by .01 to bring within -1 to 1 range
+                roll_PID = 0.01*(KP_PITCH_ROLL_ANGLE*error_roll + 
+                        KI_PITCH_ROLL_ANGLE*_integral_roll - KD_PITCH_ROLL_ANGLE*derivative_roll); 
 
                 //Pitch
                 const auto error_pitch = pitch_des - pitch_IMU;
                 _integral_pitch = _integral_pitch_prev + error_pitch*dt;
-                if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
+                if (channel_1_pwm < 1060) {   
                     _integral_pitch = 0;
                 }
-                _integral_pitch = hf::Utils::fconstrain(_integral_pitch, -I_LIMIT, I_LIMIT); //Saturate integrator to prevent unsafe buildup
+                _integral_pitch = hf::Utils::fconstrain(_integral_pitch, -I_LIMIT, I_LIMIT); 
                 const auto derivative_pitch = GyroY;
-                pitch_PID = .01*(KP_PITCH_ROLL_ANGLE*error_pitch + KI_PITCH_ROLL_ANGLE*_integral_pitch - KD_PITCH_ROLL_ANGLE*derivative_pitch); //Scaled by .01 to bring within -1 to 1 range
+                pitch_PID = .01*(KP_PITCH_ROLL_ANGLE*error_pitch + 
+                        KI_PITCH_ROLL_ANGLE*_integral_pitch - KD_PITCH_ROLL_ANGLE*derivative_pitch); 
 
                 //Yaw, stablize on rate from GyroZ
                 const auto error_yaw = yaw_des - GyroZ;
                 _integral_yaw = _integral_yaw_prev + error_yaw*dt;
-                if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
+                if (channel_1_pwm < 1060) {   
                     _integral_yaw = 0;
                 }
-                _integral_yaw = hf::Utils::fconstrain(_integral_yaw, -I_LIMIT, I_LIMIT); //Saturate integrator to prevent unsafe buildup
+                _integral_yaw = hf::Utils::fconstrain(_integral_yaw, -I_LIMIT, I_LIMIT); 
                 const auto derivative_yaw = (error_yaw - _error_yaw_prev)/dt; 
-                yaw_PID = .01*(KP_YAW*error_yaw + KI_YAW*_integral_yaw + KD_YAW*derivative_yaw); //Scaled by .01 to bring within -1 to 1 range
+                yaw_PID = .01*(KP_YAW*error_yaw + KI_YAW*_integral_yaw + KD_YAW*derivative_yaw); 
 
                 //Update roll variables
                 _integral_roll_prev = _integral_roll;
-                //Update pitch variables
                 _integral_pitch_prev = _integral_pitch;
-                //Update yaw variables
                 _error_yaw_prev = error_yaw;
                 _integral_yaw_prev = _integral_yaw;
             }    
