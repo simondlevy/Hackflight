@@ -49,17 +49,6 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    FILE * logfp = fopen("log.csv", "w");
-    
-    fprintf(logfp, 
-            "state.dy,"
-            "state.phi,"
-            "state.dphi,"
-            "stickDemands.roll,"
-            "rollAngleDemand,"
-            "rollAngleDemand,"
-            "rollFinalDemand\n");
-
     while (true) {
 
         hf::state_t state = {};
@@ -81,56 +70,30 @@ int main(int argc, char ** argv)
         _yaw_angle_target = cap_yaw_angle(_yaw_angle_target + 
                 YAW_ANGLE_MAX * stickDemands.yaw * YAW_DEMAND_SCALE);
 
-        hf::demands_t demands = { 
-            stickDemands.thrust,
-            stickDemands.roll,
-            stickDemands.pitch,
-            stickDemands.yaw
-        };
-
-        demands.thrust = 
+        const auto thrust_demand = 
             completedTakeoff ? 
-            THRUST_BASE + K_CLIMBRATE *  (demands.thrust - state.dz) :
+            THRUST_BASE + K_CLIMBRATE *  (stickDemands.thrust - state.dz) :
             hitTakeoffButton ? 
             THRUST_TAKEOFF :
             0;
 
-        demands.roll = K_POSITION * (demands.roll - state.dy);
+        auto roll_demand = K_POSITION * (stickDemands.roll - state.dy);
+        roll_demand = K_PITCH_ROLL_ANGLE * (roll_demand - state.phi);
+        roll_demand = K_PITCH_ROLL_RATE * (roll_demand - state.dphi);
 
-        const auto rollAngleDemand = demands.roll;
+        auto pitch_demand = K_POSITION * (stickDemands.pitch - state.dx);
+        pitch_demand = K_PITCH_ROLL_ANGLE * (pitch_demand - state.theta);
+        pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - state.dtheta);
 
-        demands.roll = K_PITCH_ROLL_ANGLE * (demands.roll - state.phi);
+        auto yaw_demand = K_YAW_ANGLE * (_yaw_angle_target - state.psi);
+        yaw_demand = K_YAW_RATE *( yaw_demand - state.dpsi);
 
-        const auto rollRateDemand = demands.roll;
+        float m1=0, m2=0, m3=0, m4=0;
+        hf::Mixer::runCF(
+                thrust_demand, roll_demand, pitch_demand, yaw_demand,
+                m1, m2, m3, m4);
 
-        demands.roll = K_PITCH_ROLL_RATE * (demands.roll - state.dphi);
-
-        const auto rollFinalDemand = demands.roll;
-
-        if (completedTakeoff) {
-
-            fprintf(logfp,"%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f\n",
-                    state.dy,
-                    state.phi, 
-                    state.dphi,
-                    stickDemands.roll, 
-                    rollAngleDemand, 
-                    rollRateDemand,
-                    rollRateDemand);
-
-            fflush(logfp);
-        }
-
-        demands.pitch = K_POSITION * (demands.pitch - state.dx);
-        demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);
-        demands.pitch = K_PITCH_ROLL_RATE * (demands.pitch - state.dtheta);
-
-        demands.yaw = K_YAW_ANGLE * (_yaw_angle_target - state.psi);
-        demands.yaw = K_YAW_RATE *( demands.yaw - state.dpsi);
-
-        hf::Mixer::runCF(demands, motors);
-
-        sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
+        sim.setMotors(m1, m2, m3, m4);
     }
 
     sim.close();
