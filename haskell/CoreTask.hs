@@ -53,20 +53,17 @@ thrust_base = 55.385 :: SFloat
 
 -- Streams from C++ ----------------------------------------------------------
 
-throttleStick :: SFloat
-throttleStick = extern "stream_throttleStick" Nothing
+throttle_stick :: SFloat
+throttle_stick = extern "stream_throttle" Nothing
 
-rollStick :: SFloat
-rollStick = extern "stream_rollStick" Nothing
+roll_stick :: SFloat
+roll_stick = extern "stream_roll" Nothing
 
-pitchStick :: SFloat
-pitchStick = extern "stream_pitchStick" Nothing
+pitch_stick :: SFloat
+pitch_stick = extern "stream_pitch" Nothing
 
-yawStick :: SFloat
-yawStick = extern "stream_yawStick" Nothing
-
-stateStruct :: Stream StateStruct
-stateStruct = extern "stream_vehicleState" Nothing
+yaw_stick :: SFloat
+yaw_stick = extern "stream_yaw" Nothing
 
 hitTakeoffButton :: SBool
 hitTakeoffButton = extern "stream_hitTakeoffButton" Nothing
@@ -74,11 +71,50 @@ hitTakeoffButton = extern "stream_hitTakeoffButton" Nothing
 completedTakeoff :: SBool
 completedTakeoff = extern "stream_completedTakeoff" Nothing
 
+state_dx :: SFloat
+state_dx = extern "stream_dx" Nothing
+
+state_dy :: SFloat
+state_dy = extern "stream_dy" Nothing
+
+state_z :: SFloat
+state_z = extern "stream_z" Nothing
+
+state_dz :: SFloat
+state_dz = extern "stream_dz" Nothing
+
+state_phi :: SFloat
+state_phi = extern "stream_phi" Nothing
+
+state_dphi :: SFloat
+state_dphi = extern "stream_dphi" Nothing
+
+state_theta :: SFloat
+state_theta = extern "stream_theta" Nothing
+
+state_dtheta :: SFloat
+state_dtheta = extern "stream_dtheta" Nothing
+
+state_psi :: SFloat
+state_psi = extern "stream_psi" Nothing
+
+state_dpsi :: SFloat
+state_dpsi = extern "stream_dpsi" Nothing
+
 step = motors where
 
-  state = liftState stateStruct
+  state = State  state_dx 
+                 state_dy 
+                 state_z 
+                 state_dz 
+                 state_phi 
+                 state_dphi 
+                 state_theta 
+                 state_dtheta 
+                 state_psi 
+                 state_dpsi
 
-  stickDemands = Demands throttleStick rollStick pitchStick yawStick
+  stickDemands = Demands throttle_stick roll_stick pitch_stick yaw_stick
 
   dt = rateToPeriod clock_rate
 

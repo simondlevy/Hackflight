@@ -26,10 +26,21 @@ static hf::Simulator _sim;
 
 hf::state_t stream_vehicleState;
 
-float stream_throttleStick;
-float stream_rollStick;
-float stream_pitchStick;
-float stream_yawStick;
+float stream_throttle;
+float stream_roll;
+float stream_pitch;
+float stream_yaw;
+
+float stream_dx;
+float stream_dy;
+float stream_z;
+float stream_dz;
+float stream_phi;
+float stream_dphi;
+float stream_theta;
+float stream_dtheta;
+float stream_psi;
+float stream_dpsi;
 
 bool stream_hitTakeoffButton;
 
@@ -53,14 +64,26 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    while (_sim.step(
-                stream_throttleStick, 
-                stream_rollStick, 
-                stream_pitchStick, 
-                stream_yawStick, 
-                stream_vehicleState,
-                stream_hitTakeoffButton, 
-                stream_completedTakeoff)) {
+    while (_sim.step()) {
+
+        stream_throttle = _sim.throttle();
+        stream_roll = _sim.roll();
+        stream_pitch = _sim.pitch();
+        stream_yaw = _sim.yaw();
+
+        stream_hitTakeoffButton = _sim.hitTakeoffButton();
+        stream_completedTakeoff = _sim.completedTakeoff();
+
+        stream_dx = _sim.dx();
+        stream_dy = _sim.dy();
+        stream_z = _sim.z();
+        stream_dz = _sim.dz();
+        stream_phi = _sim.phi();
+        stream_dphi = _sim.dphi();
+        stream_theta = _sim.theta();
+        stream_dtheta = _sim.dtheta();
+        stream_psi = _sim.psi();
+        stream_dpsi = _sim.dpsi();
 
         copilot_step_core();
     }
