@@ -96,12 +96,13 @@ static float thro_demand, roll_demand, pitch_demand, yaw_demand;
 //Mixer
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
 
-//Flight status
+// Safety
 static bool _isArmed;
+static bool _gotFailsafe;
 
 static void armedStatus() {
     //DESCRIPTION: Check if the throttle cut is off and the throttle input is low to prepare for flight.
-    if ((channel_5 > 1500) && (channel_1 < 1050)) {
+    if (!_gotFailsafe && (channel_5 > 1500) && (channel_1 < 1050)) {
         _isArmed = true;
     }
 }
@@ -224,7 +225,8 @@ static void readReceiver() {
      */
 
     if (_rx.timedOut(micros())) {
-        //Serial.println("*** DSM RX TIMED OUT ***");
+        _isArmed = false;
+        _gotFailsafe = true;
     }
     else if (_rx.gotNewFrame()) {
         uint16_t values[NUM_DSM_CHANNELS];
@@ -251,7 +253,7 @@ static void runMotors()
 
 static void cutMotors() 
 {
-    if ((channel_5 < 1500) || (_isArmed == false)) {
+    if (channel_5 < 1500 || !_isArmed) {
         _isArmed = false;
         _m1_usec = 120;
         _m2_usec = 120;
