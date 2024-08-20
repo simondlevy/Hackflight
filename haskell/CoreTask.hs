@@ -53,8 +53,17 @@ thrust_base = 55.385 :: SFloat
 
 -- Streams from C++ ----------------------------------------------------------
 
-demandsStruct :: Stream DemandsStruct
-demandsStruct = extern "stream_stickDemands" Nothing
+throttleStick :: SFloat
+throttleStick = extern "stream_throttleStick" Nothing
+
+rollStick :: SFloat
+rollStick = extern "stream_rollStick" Nothing
+
+pitchStick :: SFloat
+pitchStick = extern "stream_pitchStick" Nothing
+
+yawStick :: SFloat
+yawStick = extern "stream_yawStick" Nothing
 
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
@@ -69,7 +78,7 @@ step = motors where
 
   state = liftState stateStruct
 
-  stickDemands = liftDemands demandsStruct
+  stickDemands = Demands throttleStick rollStick pitchStick yawStick
 
   dt = rateToPeriod clock_rate
 

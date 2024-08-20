@@ -68,7 +68,10 @@ namespace hf {
             }
 
             bool step(
-                    demands_t & stickDemands,
+                    float & throttle,
+                    float & roll,
+                    float & pitch,
+                    float & yaw,
                     state_t & vehicleState,
                     bool & hitTakeoffButton,
                     bool & completedTakeoff)
@@ -79,7 +82,7 @@ namespace hf {
 
                 bool button = false;
 
-                _readSticks(stickDemands, button);
+                _readSticks(throttle, roll, pitch, yaw, button);
 
                 _getVehicleState(vehicleState);
 
@@ -91,7 +94,7 @@ namespace hf {
 
                 hitTakeoffButton = _button_was_hit;
                 
-                stickDemands.thrust *= THROTTLE_SCALE; 
+                throttle *= THROTTLE_SCALE; 
 
                 static uint32_t _tick;
                 
@@ -233,65 +236,75 @@ namespace hf {
                 return normalizeJoystickAxis(readJoystickRaw(index));
             }
 
-            void readJoystick(demands_t & demands, bool & button)
+            void readJoystick(
+                    float & throttle,
+                    float & roll,
+                    float & pitch,
+                    float & yaw,
+                    bool & button)
             {
                 auto joyname = wb_joystick_get_model();
 
                 auto axes = JOYSTICK_AXIS_MAP[joyname];
 
-                demands.thrust = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+                throttle = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
 
-                demands.roll = readJoystickAxis(axes.roll);
-                demands.pitch = readJoystickAxis(axes.pitch); 
-                demands.yaw = readJoystickAxis(axes.yaw);
+                roll = readJoystickAxis(axes.roll);
+                pitch = readJoystickAxis(axes.pitch); 
+                yaw = readJoystickAxis(axes.yaw);
 
                 button = axes.button_fun();
 
                 // Run throttle stick through deadband
-                demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
+                throttle = fabs(throttle) < 0.05 ? 0 : throttle;
 
-                // Handle bogus large demands.thrust values on startup
-                if (!ready && demands.thrust > -1.0) {
+                // Handle bogus large throttle values on startup
+                if (!ready && throttle > -1.0) {
                     ready = true;
                 }
 
-                demands.thrust = ready ? demands.thrust : 0;
+                throttle = ready ? throttle : 0;
             }
 
-            static void readKeyboard(demands_t & demands, bool & button)
+            static void readKeyboard(
+                    float & throttle,
+                    float & roll,
+                    float & pitch,
+                    float & yaw,
+                    bool & button)
             {
                 switch (wb_keyboard_get_key()) {
 
                     case WB_KEYBOARD_UP:
-                        demands.pitch = +1.0;
+                        pitch = +1.0;
                         break;
 
                     case WB_KEYBOARD_DOWN:
-                        demands.pitch = -1.0;
+                        pitch = -1.0;
                         break;
 
                     case WB_KEYBOARD_RIGHT:
-                        demands.roll = +1.0;
+                        roll = +1.0;
                         break;
 
                     case WB_KEYBOARD_LEFT:
-                        demands.roll = -1.0;
+                        roll = -1.0;
                         break;
 
                     case 'Q':
-                        demands.yaw = -1.0;
+                        yaw = -1.0;
                         break;
 
                     case 'E':
-                        demands.yaw = +1.0;
+                        yaw = +1.0;
                         break;
 
                     case 'W':
-                        demands.thrust = +1.0;
+                        throttle = +1.0;
                         break;
 
                     case 'S':
-                        demands.thrust = -1.0;
+                        throttle = -1.0;
                         break;
 
                     case 32: // spacebar
@@ -364,19 +377,24 @@ namespace hf {
                 return sensor;
             }
 
-            void _readSticks(demands_t & demands, bool & button)
+            void _readSticks(
+                    float & throttle,
+                    float & roll,
+                    float & pitch,
+                    float & yaw,
+                    bool & button)
             {
                 auto joystickStatus = haveJoystick();
 
-                demands.thrust = 0;
-                demands.roll = 0;
-                demands.pitch = 0;
-                demands.yaw = 0;
+                throttle = 0;
+                roll = 0;
+                pitch = 0;
+                yaw = 0;
 
                 button = false;
 
                 if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                    readJoystick(demands, button);
+                    readJoystick(throttle, roll, pitch, yaw, button);
                 }
 
                 else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
@@ -384,7 +402,7 @@ namespace hf {
                 }
 
                 else {
-                    readKeyboard(demands, button);
+                    readKeyboard(throttle, roll, pitch, yaw, button);
                 }
             }
 

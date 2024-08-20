@@ -49,13 +49,17 @@ int main(int argc, char ** argv)
 
         hf::state_t state = {};
 
-        hf::demands_t stickDemands = {};
-
         bool hitTakeoffButton = false;
 
         bool completedTakeoff = false;
 
-        if (!sim.step(stickDemands, state, hitTakeoffButton, completedTakeoff)) {
+        float stick_throttle=0, stick_roll=0, stick_pitch=0, stick_yaw=0;
+
+        if (!sim.step(
+                    stick_throttle, stick_roll, stick_pitch, stick_yaw,
+                    state, 
+                    hitTakeoffButton, 
+                    completedTakeoff)) {
             break;
         }
 
@@ -63,22 +67,22 @@ int main(int argc, char ** argv)
 
         const auto thrust_demand = 
             completedTakeoff ? 
-            THRUST_BASE + K_CLIMBRATE *  (stickDemands.thrust - state.dz) :
+            THRUST_BASE + K_CLIMBRATE *  (stick_throttle - state.dz) :
             hitTakeoffButton ? 
             THRUST_TAKEOFF :
             0;
 
-        auto roll_demand = K_POSITION * (stickDemands.roll - state.dy);
+        auto roll_demand = K_POSITION * (stick_roll - state.dy);
 
         roll_demand = K_PITCH_ROLL_ANGLE * (roll_demand - state.phi);
         roll_demand = K_PITCH_ROLL_RATE * (roll_demand - state.dphi);
 
-        auto pitch_demand = K_POSITION * (stickDemands.pitch - state.dx);
+        auto pitch_demand = K_POSITION * (stick_pitch - state.dx);
 
         pitch_demand = K_PITCH_ROLL_ANGLE * (pitch_demand - state.theta);
         pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - state.dtheta);
 
-        auto yaw_demand = stickDemands.yaw * YAW_DEMAND_SCALE;
+        auto yaw_demand = stick_yaw * YAW_DEMAND_SCALE;
 
         float new_roll_demand = 0;
         float new_pitch_demand = 0;
@@ -96,6 +100,8 @@ int main(int argc, char ** argv)
                 new_roll_demand,
                 new_pitch_demand,
                 yaw_demand);
+
+        printf("%+3.3f  %+3.3f\n", roll_demand, new_roll_demand);
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(

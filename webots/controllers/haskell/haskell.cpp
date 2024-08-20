@@ -24,9 +24,12 @@ static hf::Simulator _sim;
 
 // Global data and routines shared with Haskell Copilot ----------------------
 
-hf::demands_t stream_stickDemands;
-
 hf::state_t stream_vehicleState;
+
+float stream_throttleStick;
+float stream_rollStick;
+float stream_pitchStick;
+float stream_yawStick;
 
 bool stream_hitTakeoffButton;
 
@@ -51,7 +54,10 @@ int main(int argc, char ** argv)
     _sim.init();
 
     while (_sim.step(
-                stream_stickDemands, 
+                stream_throttleStick, 
+                stream_rollStick, 
+                stream_pitchStick, 
+                stream_yawStick, 
                 stream_vehicleState,
                 stream_hitTakeoffButton, 
                 stream_completedTakeoff)) {

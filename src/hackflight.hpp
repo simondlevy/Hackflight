@@ -61,15 +61,6 @@ namespace hf {
 
     typedef struct {
 
-        float thrust;
-        float roll;
-        float pitch;
-        float yaw;
-
-    } demands_t;
-
-    typedef struct {
-
         float m1;
         float m2;
         float m3;

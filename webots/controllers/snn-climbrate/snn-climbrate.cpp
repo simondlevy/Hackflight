@@ -59,13 +59,17 @@ int main(int argc, char ** argv)
 
         bool completedTakeoff = false;
 
-        hf::demands_t demands;
+        float stick_throttle=0, stick_roll=0, stick_pitch=0, stick_yaw=0;
 
-        if (!sim.step(demands, state, hitTakeoffButton, completedTakeoff)) {
+        if (!sim.step(
+                    stick_throttle, stick_roll, stick_pitch, stick_yaw,
+                    state, 
+                    hitTakeoffButton, 
+                    completedTakeoff)) {
             break;
         }
 
-        vector<double> observations = {demands.thrust, state.dz};
+        vector<double> observations = {stick_throttle, state.dz};
         vector <double> actions;
         snn->step(observations, actions);
 
