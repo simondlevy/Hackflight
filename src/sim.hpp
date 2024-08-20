@@ -147,12 +147,17 @@ namespace hf {
                 return _throttle;
             }
 
+            float z()
+            {
+                return _vehicleState.z;
+            }
+
             float dz()
             {
                 return _vehicleState.dz;
             }
 
-            bool hitTakeofButton()
+            bool hitTakeoffButton()
             {
                 return _button_was_hit;
             }

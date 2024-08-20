@@ -62,9 +62,9 @@ int main(int argc, char ** argv)
         snn->step(observations, actions);
 
         const auto motor =
-            completedTakeoff ? 
+            sim.completedTakeoff() ? 
             THRUST_BASE + actions[0] :
-            hitTakeoffButton ? 
+            sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
 

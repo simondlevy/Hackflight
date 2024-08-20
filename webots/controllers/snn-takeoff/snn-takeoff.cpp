@@ -49,13 +49,11 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        hf::state_t state = {};
-
-        if (!sim.step(state)) {
+        if (!sim.step()) {
             break;
         }
 
-        vector<double> observations = {state.z, state.dz};
+        vector<double> observations = {sim.z(), sim.dz()};
         vector <double> actions;
         snn->step(observations, actions);
         const auto motor = actions[0];
