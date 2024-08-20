@@ -154,6 +154,9 @@ static void readImu(
     GyroX_prev = GyroX;
     GyroY_prev = GyroY;
     GyroZ_prev = GyroZ;
+
+    // Negate GyroZ for nose-right positive
+    GyroZ = -GyroZ;
 }
 
 static void armMotor(uint8_t & m_usec)
@@ -327,7 +330,7 @@ void loop()
     float roll_angle = 0, pitch_angle = 0, yaw_angle = 0;
 
     // Note negations 
-    Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ,
+    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ,
             roll_angle, pitch_angle, yaw_angle);
 
     // Compute desired state
@@ -345,10 +348,8 @@ void loop()
     _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
             roll_angle, pitch_angle,
             chan_1,
-            GyroX, GyroY, -GyroZ,
+            GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
-
-    printf("%+3.3f\n", yaw_PID);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
