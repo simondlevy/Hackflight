@@ -50,15 +50,15 @@ namespace hf {
 
             static constexpr float I_LIMIT = 25.0;     
 
-            static constexpr float KP_PITCH_ROLL = 0.2;    
-            static constexpr float KI_PITCH_ROLL = 0.3;    
-            static constexpr float KD_PITCH_ROLL = 0.05;   
+            static constexpr float KP_PITCH_ROLL = 0.2 * 0.01;    
+            static constexpr float KI_PITCH_ROLL = 0.3 * 0.01;    
+            static constexpr float KD_PITCH_ROLL = 0.05 * 0.01;   
 
-            static constexpr float KP_YAW = 0.3;           
-            static constexpr float KI_YAW = 0.05;          
-            static constexpr float KD_YAW = 0.00015;       
+            static constexpr float KP_YAW = 0.3 * 0.01;           
+            static constexpr float KI_YAW = 0.05 * 0.01;          
+            static constexpr float KD_YAW = 0.00015 * 0.01;       
 
-            static constexpr float SCALE = 0.01;
+            static constexpr float SCALE = 1.0;//0.01;
 
             static const uint32_t THROTTLE_DOWN = 1060;
 
