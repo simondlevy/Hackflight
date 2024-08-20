@@ -326,14 +326,21 @@ void loop()
 
     float roll_angle = 0, pitch_angle = 0, yaw_angle = 0;
 
+    // Note negations 
     Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ,
             roll_angle, pitch_angle, yaw_angle);
 
     // Compute desired state
-    const float thro_demand = constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    const float roll_demand = constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
-    const float pitch_demand = constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
-    const float yaw_demand = -constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
+    const float thro_demand =
+        constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
+    const float roll_demand = 
+        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+    const float pitch_demand =
+        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+    const float yaw_demand = 
+        -constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
+
+    //printf("%+3.3f\n", GyroZ);
 
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;

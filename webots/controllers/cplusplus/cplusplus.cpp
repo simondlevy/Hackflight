@@ -86,6 +86,7 @@ int main(int argc, char ** argv)
         pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - state.dtheta);
 
         auto yaw_demand = K_YAW_ANGLE * (_yaw_angle_target - state.psi);
+        printf("%+3.3f\n", yaw_demand);
         yaw_demand = K_YAW_RATE *( yaw_demand - state.dpsi);
 
         float m1=0, m2=0, m3=0, m4=0;
