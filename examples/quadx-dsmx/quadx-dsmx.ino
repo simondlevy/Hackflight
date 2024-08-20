@@ -89,10 +89,6 @@ static float GYRO_ERROR_Z = 0.0;
 // Radio communication:
 static uint32_t channel_1, channel_2, channel_3, channel_4, channel_5, channel_6;
 
-// Normalized desired state:
-static float thro_demand, roll_demand, pitch_demand, yaw_demand;
-
-
 static void initImu() 
 {
     Wire.begin();
@@ -165,13 +161,6 @@ static void readImu(
 
 static void getDesState() 
 {
-    thro_demand = constrain((channel_1 - 1000.0) / 1000.0, 0.0, 1.0);
-
-    roll_demand = constrain((channel_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
-
-    pitch_demand = constrain((channel_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
-
-    yaw_demand = -constrain((channel_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
 }
 
 static void armMotor(uint8_t & m_usec)
@@ -337,7 +326,10 @@ void loop()
             roll_angle, pitch_angle, yaw_angle);
 
     // Compute desired state
-    getDesState(); 
+    const float thro_demand = constrain((channel_1 - 1000.0) / 1000.0, 0.0, 1.0);
+    const float roll_demand = constrain((channel_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+    const float pitch_demand = constrain((channel_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+    const float yaw_demand = -constrain((channel_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
 
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
