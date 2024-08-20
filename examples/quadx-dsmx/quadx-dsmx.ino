@@ -74,15 +74,6 @@ static auto _motors = OneShot125(MOTOR_PINS);
 
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
-
-//Radio failsafe values for every channel in the event that bad reciever data is detected. Recommended defaults:
-static const unsigned long CHANNEL_1_FS = 1000; //thro
-static const unsigned long CHANNEL_2_FS = 1500; //ail
-static const unsigned long CHANNEL_3_FS = 1500; //elev
-static const unsigned long CHANNEL_4_FS = 1500; //rudd
-static const unsigned long CHANNEL_5_FS = 2000; //gear, greater than 1500 = throttle cut
-static const unsigned long CHANNEL_6_FS = 2000; //aux1
-
 //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
 static const float MAX_PITCH_ROLL = 30.0;    
 
@@ -265,43 +256,6 @@ static void getCommands() {
     channel_4_pwm_prev = channel_4_pwm;
 }
 
-static void failSafe() {
-    //DESCRIPTION: If radio gives garbage values, set all commands to default values
-    /*
-     * Radio connection failsafe used to check if the getCommands() function is returning acceptable pwm values. If any of 
-     * the commands are lower than 800 or higher than 2200, then we can be certain that there is an issue with the radio
-     * connection (most likely hardware related). If any of the channels show this failure, then all of the radio commands 
-     * channel_x_pwm are set to default failsafe values specified in the setup. Comment out this function when troubleshooting 
-     * your radio connection in case any extreme values are triggering this function to overwrite the printed variables.
-     */
-    unsigned minVal = 800;
-    unsigned maxVal = 2200;
-    int check1 = 0;
-    int check2 = 0;
-    int check3 = 0;
-    int check4 = 0;
-    int check5 = 0;
-    int check6 = 0;
-
-    //Triggers for failure criteria
-    if (channel_1_pwm > maxVal || channel_1_pwm < minVal) check1 = 1;
-    if (channel_2_pwm > maxVal || channel_2_pwm < minVal) check2 = 1;
-    if (channel_3_pwm > maxVal || channel_3_pwm < minVal) check3 = 1;
-    if (channel_4_pwm > maxVal || channel_4_pwm < minVal) check4 = 1;
-    if (channel_5_pwm > maxVal || channel_5_pwm < minVal) check5 = 1;
-    if (channel_6_pwm > maxVal || channel_6_pwm < minVal) check6 = 1;
-
-    //If any failures, set to default failsafe values
-    if ((check1 + check2 + check3 + check4 + check5 + check6) > 0) {
-        channel_1_pwm = CHANNEL_1_FS;
-        channel_2_pwm = CHANNEL_2_FS;
-        channel_3_pwm = CHANNEL_3_FS;
-        channel_4_pwm = CHANNEL_4_FS;
-        channel_5_pwm = CHANNEL_5_FS;
-        channel_6_pwm = CHANNEL_6_FS;
-    }
-}
-
 static void runMotors() 
 {
     _motors.set(0, _m1_usec);
@@ -377,14 +331,6 @@ void setup() {
     digitalWrite(LED_PIN, HIGH);
 
     delay(5);
-
-    // Set radio channels to default (safe) values before entering main loop
-    channel_1_pwm = CHANNEL_1_FS;
-    channel_2_pwm = CHANNEL_2_FS;
-    channel_3_pwm = CHANNEL_3_FS;
-    channel_4_pwm = CHANNEL_4_FS;
-    channel_5_pwm = CHANNEL_5_FS;
-    channel_6_pwm = CHANNEL_6_FS;
 
     // Initialize IMU communication
     initImu();
@@ -462,8 +408,7 @@ void loop()
     runMotors(); 
 
     //Get vehicle commands for next loop iteration
-    getCommands(); //Pulls current available radio commands
-    failSafe(); //Prevent failures in event of bad receiver connection, defaults to failsafe values assigned in setup
+    getCommands(); 
 
     // Regulate loop rate: Do not exceed 2000Hz, all filter parameters tuned to
     // 2000Hz by default
