@@ -343,6 +343,8 @@ void loop()
     const float yaw_demand = 
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
 
+    printf("%+3.3f\n", yaw_demand);
+
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
     _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 

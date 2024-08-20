@@ -30,18 +30,11 @@ static const float K_POSITION = 25;
 
 static const float YAW_ANGLE_MAX = 200;
 
-static const float YAW_DEMAND_SCALE = .01;
+static const float YAW_DEMAND_SCALE = 160; // deg/sec
 
 static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;
-
-static float cap_yaw_angle(const float angle)
-{
-    const float angle1 = angle > 180 ? angle - 360 : angle;
-
-    return angle1 < -180 ? angle1 + 360 : angle1;
-}
 
 int main(int argc, char ** argv)
 {
@@ -63,12 +56,7 @@ int main(int argc, char ** argv)
             break;
         }
 
-        static float _yaw_angle_target;
-
         hf::quad_motors_t motors = {};
-
-        _yaw_angle_target = cap_yaw_angle(_yaw_angle_target + 
-                YAW_ANGLE_MAX * stickDemands.yaw * YAW_DEMAND_SCALE);
 
         const auto thrust_demand = 
             completedTakeoff ? 
@@ -85,8 +73,10 @@ int main(int argc, char ** argv)
         pitch_demand = K_PITCH_ROLL_ANGLE * (pitch_demand - state.theta);
         pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - state.dtheta);
 
-        auto yaw_demand = K_YAW_ANGLE * (_yaw_angle_target - state.psi);
+        auto yaw_demand = stickDemands.yaw * YAW_DEMAND_SCALE;
+
         printf("%+3.3f\n", yaw_demand);
+
         yaw_demand = K_YAW_RATE *( yaw_demand - state.dpsi);
 
         float m1=0, m2=0, m3=0, m4=0;

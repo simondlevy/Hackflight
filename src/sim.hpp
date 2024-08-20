@@ -279,11 +279,11 @@ namespace hf {
                         break;
 
                     case 'Q':
-                        demands.yaw = -0.5;
+                        demands.yaw = -1.0;
                         break;
 
                     case 'E':
-                        demands.yaw = +0.5;
+                        demands.yaw = +1.0;
                         break;
 
                     case 'W':
