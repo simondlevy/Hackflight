@@ -67,12 +67,12 @@ int main(int argc, char ** argv)
         auto yaw_demand = sim.yaw() * YAW_DEMAND_SCALE;
 
         _anglePid.run(DT,
+                2000, // XXX fake throttle for now
                 roll_demand,
                 pitch_demand,
                 yaw_demand,
                 sim.phi(),
                 sim.theta(),
-                2000,
                 sim.dphi(),
                 sim.dtheta(),
                 sim.dpsi(),

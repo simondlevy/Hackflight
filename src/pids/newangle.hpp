@@ -49,9 +49,9 @@ namespace hf {
 
             static constexpr float I_LIMIT = 25.0;     
 
-            static constexpr float KP_PITCH_ROLL = 0.2;    
+            static constexpr float KP_PITCH_ROLL = 6;    
             static constexpr float KI_PITCH_ROLL = 0.3;    
-            static constexpr float KD_PITCH_ROLL = 0.05;   
+            static constexpr float KD_PITCH_ROLL = 0.0125;   
 
             static constexpr float KP_YAW = 0.3;           
             static constexpr float KI_YAW = 0.05;          
@@ -61,22 +61,19 @@ namespace hf {
 
             static const uint32_t THROTTLE_DOWN = 1060;
 
-            static constexpr float K_PITCH_ROLL_ANGLE = 6;
-            static constexpr float K_PITCH_ROLL_RATE = 0.0125;
-
-
             class PitchRollPidController {
 
                 public:
 
                     float run(
                             const float dt,
-                            const float des,
-                            const float imu,
                             const bool reset,
-                            const float gyro)
+                            const float demand,
+                            const float angle,
+                            const float dangle)
                     {
-                        const auto error = des - imu;
+
+                        const auto error = demand - angle;
 
                         _integral = _integral_prev + error * dt;
 
@@ -86,8 +83,9 @@ namespace hf {
 
                         _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
 
-                        const auto output = SCALE * (KP_PITCH_ROLL * error +
-                                KI_PITCH_ROLL * _integral - KD_PITCH_ROLL * gyro); 
+                        auto output = KP_PITCH_ROLL * error;
+
+                        output = KD_PITCH_ROLL * (output - dangle);
 
                         _integral_prev = _integral;
 
@@ -105,11 +103,11 @@ namespace hf {
                 public:
 
                     float run( const float dt,
-                            const float demand,
                             const bool reset,
-                            const float gyro)
+                            const float demand,
+                            const float dangle)
                     {
-                        const auto error = demand - gyro;
+                        const auto error = demand - dangle;
 
                         _integral = _integral_prev + error * dt;
 
@@ -148,12 +146,12 @@ namespace hf {
 
             void run(
                     const float dt, 
+                    const uint32_t throttle,
                     const float roll_demand, 
                     const float pitch_demand, 
                     const float yaw_demand, 
                     const float phi,
                     const float theta,
-                    const uint32_t throttle,
                     const float dphi,
                     const float dtheta,
                     const float dpsi,
@@ -163,17 +161,11 @@ namespace hf {
             {
                 const auto reset = throttle < THROTTLE_DOWN;
 
-                //roll_out = _rollPid.run(dt, roll_demand, phi, reset, dphi);
-                //pitch_out = _pitchPid.run(dt, pitch_demand, theta, reset, dtheta);
+                roll_out = _rollPid.run(dt, reset, roll_demand, phi, dphi);
 
+                pitch_out = _pitchPid.run(dt, reset, pitch_demand, theta, dtheta);
 
-                roll_out = K_PITCH_ROLL_ANGLE * (roll_demand - phi);
-                roll_out = K_PITCH_ROLL_RATE * (roll_out - dphi);
-
-                pitch_out = K_PITCH_ROLL_ANGLE * (pitch_demand - theta);
-                pitch_out = K_PITCH_ROLL_RATE * (pitch_out - dtheta);
-
-                yaw_out = _yawPid.run(dt, yaw_demand, reset, dpsi);
+                yaw_out = _yawPid.run(dt, reset, yaw_demand, dpsi);
             }    
 
     };

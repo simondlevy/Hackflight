@@ -345,9 +345,9 @@ void loop()
 
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
-    _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
+    _anglePid.run(dt, chan_1, 
+            roll_demand, pitch_demand, yaw_demand, 
             roll_angle, pitch_angle,
-            chan_1,
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
