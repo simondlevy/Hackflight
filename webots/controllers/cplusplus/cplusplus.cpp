@@ -18,7 +18,7 @@
 #include <hackflight.hpp>
 #include <mixers.hpp>
 
-#include <pids/newangle.hpp>
+#include <pids/angle.hpp>
 
 static const float DT = 0.01;
 
@@ -43,7 +43,7 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    hf::YawPidController _yawPid = {};
+    hf::AnglePid _anglePid = {};
 
     while (true) {
 
@@ -80,7 +80,22 @@ int main(int argc, char ** argv)
 
         auto yaw_demand = stickDemands.yaw * YAW_DEMAND_SCALE;
 
-        yaw_demand = _yawPid.run(DT, yaw_demand, false, state.dpsi);
+        float new_roll_demand = 0;
+        float new_pitch_demand = 0;
+
+        _anglePid.run(DT,
+                roll_demand,
+                pitch_demand,
+                yaw_demand,
+                state.phi,
+                state.theta,
+                2000,
+                state.dphi,
+                state.dtheta,
+                state.dpsi,
+                new_roll_demand,
+                new_pitch_demand,
+                yaw_demand);
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
