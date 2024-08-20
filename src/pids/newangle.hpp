@@ -83,9 +83,8 @@ namespace hf {
 
                         _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
 
-                        auto output = KP_PITCH_ROLL * error;
-
-                        output = KD_PITCH_ROLL * (output - dangle);
+                        const auto output =
+                            KD_PITCH_ROLL * (KP_PITCH_ROLL * error - dangle);
 
                         _integral_prev = _integral;
 
