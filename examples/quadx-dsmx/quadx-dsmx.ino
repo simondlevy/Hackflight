@@ -88,8 +88,7 @@ static float GYRO_ERROR_Y= 0.0;
 static float GYRO_ERROR_Z = 0.0;
 
 // Radio communication:
-uint32_t channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
-uint32_t channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
+uint32_t channel_1, channel_2, channel_3, channel_4, channel_5, channel_6;
 
 // Normalized desired state:
 static float thro_demand, roll_demand, pitch_demand, yaw_demand;
@@ -107,7 +106,7 @@ static bool _isArmed;
 
 static void armedStatus() {
     //DESCRIPTION: Check if the throttle cut is off and the throttle input is low to prepare for flight.
-    if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
+    if ((channel_5 > 1500) && (channel_1 < 1050)) {
         _isArmed = true;
     }
 }
@@ -184,10 +183,10 @@ static void getImuData(
 
 static void getDesState() 
 {
-    thro_demand = (channel_1_pwm - 1000.0)/1000.0; //Between 0 and 1
-    roll_demand = (channel_2_pwm - 1500.0)/500.0; //Between -1 and 1
-    pitch_demand = (channel_3_pwm - 1500.0)/500.0; //Between -1 and 1
-    yaw_demand = -(channel_4_pwm - 1500.0)/500.0; //Between -1 and 1
+    thro_demand = (channel_1 - 1000.0)/1000.0; //Between 0 and 1
+    roll_demand = (channel_2 - 1500.0)/500.0; //Between -1 and 1
+    pitch_demand = (channel_3 - 1500.0)/500.0; //Between -1 and 1
+    yaw_demand = -(channel_4 - 1500.0)/500.0; //Between -1 and 1
 
     //Constrain within normalized bounds
     thro_demand = constrain(thro_demand, 0.0, 1.0); //Between 0 and 1
@@ -216,11 +215,11 @@ static void scaleMotors()
     _m4_usec = scaleMotor(m4_command_scaled);
 }
 
-static void getCommands() {
+static void readReceiver() {
     //DESCRIPTION: Get raw PWM values for every channel from the radio
     /*
      * Updates radio PWM commands in loop based on current available commands.
-     * channel_x_pwm is the raw command used in the rest of the loop. If using
+     * channel_x is the raw command used in the rest of the loop. If using
      * a PWM or PPM receiver, the radio commands are retrieved from a function
      * in the readPWM file separate from this one which is running a bunch of
      * interrupts to continuously update the radio readings. If using an SBUS
@@ -236,24 +235,13 @@ static void getCommands() {
         uint16_t values[NUM_DSM_CHANNELS];
         _rx.getChannelValues(values, NUM_DSM_CHANNELS);
 
-        channel_1_pwm = values[0];
-        channel_2_pwm = values[1];
-        channel_3_pwm = values[2];
-        channel_4_pwm = values[3];
-        channel_5_pwm = values[4];
-        channel_6_pwm = values[5];
+        channel_1 = values[0];
+        channel_2 = values[1];
+        channel_3 = values[2];
+        channel_4 = values[3];
+        channel_5 = values[4];
+        channel_6 = values[5];
     }
-
-    //Low-pass the critical commands and update previous values
-    float b = 0.7; //Lower=slower, higher=noiser
-    channel_1_pwm = (1.0 - b)*channel_1_pwm_prev + b*channel_1_pwm;
-    channel_2_pwm = (1.0 - b)*channel_2_pwm_prev + b*channel_2_pwm;
-    channel_3_pwm = (1.0 - b)*channel_3_pwm_prev + b*channel_3_pwm;
-    channel_4_pwm = (1.0 - b)*channel_4_pwm_prev + b*channel_4_pwm;
-    channel_1_pwm_prev = channel_1_pwm;
-    channel_2_pwm_prev = channel_2_pwm;
-    channel_3_pwm_prev = channel_3_pwm;
-    channel_4_pwm_prev = channel_4_pwm;
 }
 
 static void runMotors() 
@@ -268,7 +256,7 @@ static void runMotors()
 
 static void cutMotors() 
 {
-    if ((channel_5_pwm < 1500) || (_isArmed == false)) {
+    if ((channel_5 < 1500) || (_isArmed == false)) {
         _isArmed = false;
         _m1_usec = 120;
         _m2_usec = 120;
@@ -386,7 +374,7 @@ void loop()
 
     _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
             roll_angle, pitch_angle,
-            channel_1_pwm,
+            channel_1,
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
@@ -407,8 +395,8 @@ void loop()
     // Run motors
     runMotors(); 
 
-    //Get vehicle commands for next loop iteration
-    getCommands(); 
+    // Get vehicle commands for next loop iteration
+    readReceiver(); 
 
     // Regulate loop rate: Do not exceed 2000Hz, all filter parameters tuned to
     // 2000Hz by default
