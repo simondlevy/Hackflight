@@ -62,9 +62,9 @@ static hf::AnglePid _anglePid;
 
 // Das Blinkenlights ---------------------------------------------------------
 
-static const float    BLINK_RATE_HZ = 1.5;
-static hf::BlinkTask _blinkTask;
+static const float BLINK_RATE_HZ = 1.5;
 static const uint8_t LED_PIN = 13;
+static hf::BlinkTask _blinkTask;
 
 // Motors --------------------------------------------------------------------
 
@@ -88,15 +88,10 @@ static float GYRO_ERROR_Y= 0.0;
 static float GYRO_ERROR_Z = 0.0;
 
 // Radio communication:
-uint32_t channel_1, channel_2, channel_3, channel_4, channel_5, channel_6;
+static uint32_t channel_1, channel_2, channel_3, channel_4, channel_5, channel_6;
 
 // Normalized desired state:
 static float thro_demand, roll_demand, pitch_demand, yaw_demand;
-
-// Controller:
-static float roll_PID;
-static float pitch_PID; 
-static float yaw_PID;
 
 //Mixer
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
@@ -369,15 +364,16 @@ void loop()
     Madgwick6DOF(dt, GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ,
             roll_angle, pitch_angle, yaw_angle);
 
-    //Compute desired state
-    getDesState(); //Convert raw commands to normalized values based on saturated control limits
+    // Compute desired state
+    getDesState(); 
 
+    // Run demands through PID controller
+    float roll_PID=0, pitch_PID=0, yaw_PID=0;
     _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
             roll_angle, pitch_angle,
             channel_1,
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
-
 
     // Run motor mixer
     hf::Mixer::runDF(thro_demand, roll_PID, pitch_PID, yaw_PID, 
