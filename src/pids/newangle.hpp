@@ -27,7 +27,6 @@ namespace hf {
 
     class AnglePid {
 
-        //DESCRIPTION: Computes control commands based on state error (angle)
         /*
          * Basic PID control to stablize on angle setpoint based on desired
          * states roll_demand, pitch_demand, and yaw_demand computed in getDesState().
@@ -61,6 +60,10 @@ namespace hf {
             static constexpr float SCALE = 0.01;
 
             static const uint32_t THROTTLE_DOWN = 1060;
+
+            static constexpr float K_PITCH_ROLL_ANGLE = 6;
+            static constexpr float K_PITCH_ROLL_RATE = 0.0125;
+
 
             class PitchRollPidController {
 
@@ -160,9 +163,15 @@ namespace hf {
             {
                 const auto reset = throttle < THROTTLE_DOWN;
 
-                roll_out = _rollPid.run(dt, roll_demand, phi, reset, dphi);
+                //roll_out = _rollPid.run(dt, roll_demand, phi, reset, dphi);
+                //pitch_out = _pitchPid.run(dt, pitch_demand, theta, reset, dtheta);
 
-                pitch_out = _pitchPid.run(dt, pitch_demand, theta, reset, dtheta);
+
+                roll_out = K_PITCH_ROLL_ANGLE * (roll_demand - phi);
+                roll_out = K_PITCH_ROLL_RATE * (roll_out - dphi);
+
+                pitch_out = K_PITCH_ROLL_ANGLE * (pitch_demand - theta);
+                pitch_out = K_PITCH_ROLL_RATE * (pitch_out - dtheta);
 
                 yaw_out = _yawPid.run(dt, yaw_demand, reset, dpsi);
             }    
