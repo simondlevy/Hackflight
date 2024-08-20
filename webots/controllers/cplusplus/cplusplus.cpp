@@ -18,7 +18,7 @@
 #include <hackflight.hpp>
 #include <mixers.hpp>
 
-#include <pids/angle.hpp>
+#include <pids/newangle.hpp>
 
 static const float DT = 0.01;
 
@@ -27,7 +27,7 @@ static const float K_PITCH_ROLL_RATE = 0.0125;
 
 static const float K_CLIMBRATE = 25;
 
-static const float K_POSITION = 25;
+static const float K_POSITION = 10;
 
 static const float YAW_ANGLE_MAX = 200;
 
@@ -88,8 +88,6 @@ int main(int argc, char ** argv)
                 new_roll_demand,
                 new_pitch_demand,
                 yaw_demand);
-
-        printf("%+3.3f  %+3.3f\n", roll_demand, new_roll_demand);
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
