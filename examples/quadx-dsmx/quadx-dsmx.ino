@@ -165,16 +165,13 @@ static void readImu(
 
 static void getDesState() 
 {
-    thro_demand = (channel_1 - 1000.0)/1000.0; //Between 0 and 1
-    roll_demand = (channel_2 - 1500.0)/500.0; //Between -1 and 1
-    pitch_demand = (channel_3 - 1500.0)/500.0; //Between -1 and 1
-    yaw_demand = -(channel_4 - 1500.0)/500.0; //Between -1 and 1
+    thro_demand = constrain((channel_1 - 1000.0) / 1000.0, 0.0, 1.0);
 
-    //Constrain within normalized bounds
-    thro_demand = constrain(thro_demand, 0.0, 1.0); //Between 0 and 1
-    roll_demand = constrain(roll_demand, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
-    pitch_demand = constrain(pitch_demand, -1.0, 1.0)*MAX_PITCH_ROLL; //Between -MAX_PITCH_ROLL and +MAX_PITCH_ROLL
-    yaw_demand = constrain(yaw_demand, -1.0, 1.0)*MAX_YAW; //Between -MAX_YAW and +MAX_YAW
+    roll_demand = constrain((channel_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+
+    pitch_demand = constrain((channel_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+
+    yaw_demand = -constrain((channel_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
 }
 
 static void armMotor(uint8_t & m_usec)
