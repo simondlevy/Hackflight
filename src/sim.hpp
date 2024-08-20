@@ -263,19 +263,19 @@ namespace hf {
                 switch (wb_keyboard_get_key()) {
 
                     case WB_KEYBOARD_UP:
-                        demands.pitch = +0.5;
+                        demands.pitch = +1.0;
                         break;
 
                     case WB_KEYBOARD_DOWN:
-                        demands.pitch = -0.5;
+                        demands.pitch = -1.0;
                         break;
 
                     case WB_KEYBOARD_RIGHT:
-                        demands.roll = +0.5;
+                        demands.roll = +1.0;
                         break;
 
                     case WB_KEYBOARD_LEFT:
-                        demands.roll = -0.5;
+                        demands.roll = -1.0;
                         break;
 
                     case 'Q':
@@ -287,11 +287,11 @@ namespace hf {
                         break;
 
                     case 'W':
-                        demands.thrust = +0.5;
+                        demands.thrust = +1.0;
                         break;
 
                     case 'S':
-                        demands.thrust = -0.5;
+                        demands.thrust = -1.0;
                         break;
 
                     case 32: // spacebar
