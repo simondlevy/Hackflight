@@ -147,14 +147,69 @@ namespace hf {
                 return _throttle;
             }
 
+            float roll()
+            {
+                return _roll;
+            }
+
+            float pitch()
+            {
+                return _pitch;
+            }
+
+            float yaw()
+            {
+                return _yaw;
+            }
+
             float z()
             {
                 return _vehicleState.z;
             }
 
+            float dx()
+            {
+                return _vehicleState.dx;
+            }
+
+            float dy()
+            {
+                return _vehicleState.dy;
+            }
+
             float dz()
             {
                 return _vehicleState.dz;
+            }
+
+            float phi()
+            {
+                return _vehicleState.phi;
+            }
+
+            float dphi()
+            {
+                return _vehicleState.dphi;
+            }
+
+            float theta()
+            {
+                return _vehicleState.theta;
+            }
+
+            float dtheta()
+            {
+                return _vehicleState.dtheta;
+            }
+
+            float psi()
+            {
+                return _vehicleState.psi;
+            }
+
+            float dpsi()
+            {
+                return _vehicleState.dpsi;
             }
 
             bool hitTakeoffButton()

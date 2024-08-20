@@ -47,42 +47,30 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        hf::state_t state = {};
-
-        bool hitTakeoffButton = false;
-
-        bool completedTakeoff = false;
-
-        float stick_throttle=0, stick_roll=0, stick_pitch=0, stick_yaw=0;
-
-        if (!sim.step(
-                    stick_throttle, stick_roll, stick_pitch, stick_yaw,
-                    state, 
-                    hitTakeoffButton, 
-                    completedTakeoff)) {
+        if (!sim.step()) {
             break;
         }
 
         hf::quad_motors_t motors = {};
 
         const auto thrust_demand = 
-            completedTakeoff ? 
-            THRUST_BASE + K_CLIMBRATE *  (stick_throttle - state.dz) :
-            hitTakeoffButton ? 
+            sim.completedTakeoff() ? 
+            THRUST_BASE + K_CLIMBRATE *  (sim.throttle() - sim.dz()) :
+            sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
 
-        auto roll_demand = K_POSITION * (stick_roll - state.dy);
+        auto roll_demand = K_POSITION * (sim.roll() - sim.dy());
 
-        roll_demand = K_PITCH_ROLL_ANGLE * (roll_demand - state.phi);
-        roll_demand = K_PITCH_ROLL_RATE * (roll_demand - state.dphi);
+        roll_demand = K_PITCH_ROLL_ANGLE * (roll_demand - sim.phi());
+        roll_demand = K_PITCH_ROLL_RATE * (roll_demand - sim.dphi());
 
-        auto pitch_demand = K_POSITION * (stick_pitch - state.dx);
+        auto pitch_demand = K_POSITION * (sim.pitch() - sim.dx());
 
-        pitch_demand = K_PITCH_ROLL_ANGLE * (pitch_demand - state.theta);
-        pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - state.dtheta);
+        pitch_demand = K_PITCH_ROLL_ANGLE * (pitch_demand - sim.theta());
+        pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - sim.dtheta());
 
-        auto yaw_demand = stick_yaw * YAW_DEMAND_SCALE;
+        auto yaw_demand = sim.yaw() * YAW_DEMAND_SCALE;
 
         float new_roll_demand = 0;
         float new_pitch_demand = 0;
@@ -91,12 +79,12 @@ int main(int argc, char ** argv)
                 roll_demand,
                 pitch_demand,
                 yaw_demand,
-                state.phi,
-                state.theta,
+                sim.phi(),
+                sim.theta(),
                 2000,
-                state.dphi,
-                state.dtheta,
-                state.dpsi,
+                sim.dphi(),
+                sim.dtheta(),
+                sim.dpsi(),
                 new_roll_demand,
                 new_pitch_demand,
                 yaw_demand);
