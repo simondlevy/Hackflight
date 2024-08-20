@@ -59,7 +59,6 @@ static MPU6050 _mpu6050;
 
 static hf::AnglePid _anglePid;
 
-
 // Das Blinkenlights ---------------------------------------------------------
 
 static const float BLINK_RATE_HZ = 1.5;
@@ -93,8 +92,6 @@ static uint32_t channel_1, channel_2, channel_3, channel_4, channel_5, channel_6
 // Normalized desired state:
 static float thro_demand, roll_demand, pitch_demand, yaw_demand;
 
-//Mixer
-static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
 
 static void initImu() 
 {
@@ -190,14 +187,6 @@ static uint8_t scaleMotor(const float mval)
 {
     return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
 
-}
-
-static void scaleMotors() 
-{
-    _m1_usec = scaleMotor(m1_command_scaled);
-    _m2_usec = scaleMotor(m2_command_scaled);
-    _m3_usec = scaleMotor(m3_command_scaled);
-    _m4_usec = scaleMotor(m4_command_scaled);
 }
 
 static void readReceiver(bool & isArmed, bool & gotFailsafe) 
@@ -361,15 +350,17 @@ void loop()
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
+    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
+
     // Run motor mixer
     hf::Mixer::runDF(thro_demand, roll_PID, pitch_PID, yaw_PID, 
-            m1_command_scaled, 
-            m2_command_scaled, 
-            m3_command_scaled, 
-            m4_command_scaled);
+            m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125
-    scaleMotors(); 
+    _m1_usec = scaleMotor(m1_command);
+    _m2_usec = scaleMotor(m2_command);
+    _m3_usec = scaleMotor(m3_command);
+    _m4_usec = scaleMotor(m4_command);
 
     // Turn off motors under various conditions
     cutMotors(_isArmed); 
