@@ -51,7 +51,7 @@ namespace hf {
 
             static constexpr float KP_PITCH_ROLL = 7.5;    
             static constexpr float KI_PITCH_ROLL = 12.75;    
-            static constexpr float KD_PITCH_ROLL = 1.25;   
+            static constexpr float KD_PITCH_ROLL = 1.875;   
 
             static constexpr float KP_YAW = 0.3;           
             static constexpr float KI_YAW = 0.05;          
