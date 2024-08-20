@@ -49,7 +49,7 @@ namespace hf {
 
             static constexpr float I_LIMIT = 25.0;     
 
-            static constexpr float KP_PITCH_ROLL = 6;    
+            static constexpr float KP_PITCH_ROLL = 0.075;    
             static constexpr float KI_PITCH_ROLL = 0.3;    
             static constexpr float KD_PITCH_ROLL = 0.0125;   
 
@@ -84,7 +84,7 @@ namespace hf {
                         _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
 
                         const auto output =
-                             (KD_PITCH_ROLL * KP_PITCH_ROLL * error - KD_PITCH_ROLL * dangle);
+                             (KP_PITCH_ROLL * error - KD_PITCH_ROLL * dangle);
 
                         _integral_prev = _integral;
 
