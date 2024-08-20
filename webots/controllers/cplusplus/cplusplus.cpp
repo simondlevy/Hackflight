@@ -21,8 +21,7 @@
 static const float K_PITCH_ROLL_ANGLE = 6;
 static const float K_PITCH_ROLL_RATE = 0.0125;
 
-static const float K_YAW_ANGLE = 6;
-static const float K_YAW_RATE = 0.012;
+static const float KP_YAW = 0.012;
 
 static const float K_CLIMBRATE = 25;
 
@@ -75,9 +74,7 @@ int main(int argc, char ** argv)
 
         auto yaw_demand = stickDemands.yaw * YAW_DEMAND_SCALE;
 
-        printf("%+3.3f\n", yaw_demand);
-
-        yaw_demand = K_YAW_RATE *( yaw_demand - state.dpsi);
+        yaw_demand = KP_YAW *( yaw_demand - state.dpsi);
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
