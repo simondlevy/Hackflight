@@ -67,6 +67,32 @@ namespace hf {
                 _motor4 = _makeMotor("motor4", -1);
             }
 
+            bool step()
+            {
+                if (wb_robot_step((int)_timestep) == -1) {
+                    return false;
+                }
+
+                bool button = false;
+
+                _readSticks(_throttle, _roll, _pitch, _yaw, button);
+
+                _getVehicleState(_vehicleState);
+
+                if (button) {
+                    _button_was_hit = true;
+                }
+
+                _throttle *= THROTTLE_SCALE; 
+
+                const double time =
+                    _button_was_hit ? _tick++ * _timestep / 1000 : 0;
+
+                _completedTakeoff = time > TAKEOFF_TIME;
+
+                return true;
+            }
+
             bool step(
                     float & throttle,
                     float & roll,
@@ -86,8 +112,6 @@ namespace hf {
 
                 _getVehicleState(vehicleState);
 
-                static bool _button_was_hit;
-
                 if (button) {
                     _button_was_hit = true;
                 }
@@ -98,7 +122,8 @@ namespace hf {
 
                 static uint32_t _tick;
                 
-                const double time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
+                const double time =
+                    _button_was_hit ? _tick++ * _timestep / 1000 : 0;
 
                 completedTakeoff = time > TAKEOFF_TIME;
 
@@ -115,6 +140,26 @@ namespace hf {
                 _getVehicleState(vehicleState);
 
                 return true;
+            }
+
+            float throttle()
+            {
+                return _throttle;
+            }
+
+            float dz()
+            {
+                return _vehicleState.dz;
+            }
+
+            bool hitTakeofButton()
+            {
+                return _button_was_hit;
+            }
+
+            bool completedTakeoff()
+            {
+                return _completedTakeoff;
             }
 
             void setMotors(
@@ -154,6 +199,19 @@ namespace hf {
 
             double _timestep;
 
+            float _throttle;
+            float _roll;
+            float _pitch;
+            float _yaw;
+
+            state_t _vehicleState;
+
+            bool _completedTakeoff;
+
+            bool _button_was_hit;
+
+            uint32_t _tick;
+                
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;
             WbDeviceTag _motor3;

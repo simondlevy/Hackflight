@@ -53,23 +53,11 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        hf::state_t state = {};
-
-        bool hitTakeoffButton = false;
-
-        bool completedTakeoff = false;
-
-        float stick_throttle=0, stick_roll=0, stick_pitch=0, stick_yaw=0;
-
-        if (!sim.step(
-                    stick_throttle, stick_roll, stick_pitch, stick_yaw,
-                    state, 
-                    hitTakeoffButton, 
-                    completedTakeoff)) {
+        if (!sim.step()) {
             break;
         }
 
-        vector<double> observations = {stick_throttle, state.dz};
+        vector<double> observations = {sim.throttle(), sim.dz()};
         vector <double> actions;
         snn->step(observations, actions);
 
