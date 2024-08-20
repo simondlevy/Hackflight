@@ -86,9 +86,6 @@ static float GYRO_ERROR_X = 0.0;
 static float GYRO_ERROR_Y= 0.0;
 static float GYRO_ERROR_Z = 0.0;
 
-// Radio communication:
-static uint32_t channel_1, channel_2, channel_3, channel_4, channel_5, channel_6;
-
 static void initImu() 
 {
     Wire.begin();
@@ -159,10 +156,6 @@ static void readImu(
     GyroZ_prev = GyroZ;
 }
 
-static void getDesState() 
-{
-}
-
 static void armMotor(uint8_t & m_usec)
 {
     // OneShot125 range from 125 to 250 usec
@@ -175,22 +168,31 @@ static uint8_t scaleMotor(const float mval)
 
 }
 
-static void readReceiver(bool & isArmed, bool & gotFailsafe) 
+static void readReceiver(
+        uint32_t & chan_1,
+        uint32_t & chan_2,
+        uint32_t & chan_3,
+        uint32_t & chan_4,
+        uint32_t & chan_5,
+        uint32_t & chan_6,
+        bool & isArmed, 
+        bool & gotFailsafe) 
 {
     if (_rx.timedOut(micros())) {
         isArmed = false;
         gotFailsafe = true;
     }
+
     else if (_rx.gotNewFrame()) {
         uint16_t values[NUM_DSM_CHANNELS];
         _rx.getChannelValues(values, NUM_DSM_CHANNELS);
 
-        channel_1 = values[0];
-        channel_2 = values[1];
-        channel_3 = values[2];
-        channel_4 = values[3];
-        channel_5 = values[4];
-        channel_6 = values[5];
+        chan_1 = values[0];
+        chan_2 = values[1];
+        chan_3 = values[2];
+        chan_4 = values[3];
+        chan_5 = values[4];
+        chan_6 = values[5];
     }
 }
 
@@ -204,9 +206,9 @@ static void runMotors()
     _motors.run();
 }
 
-static void cutMotors(bool & isArmed) 
+static void cutMotors(const uint32_t chan_5, bool & isArmed) 
 {
-    if (channel_5 < 1500 || !isArmed) {
+    if (chan_5 < 1500 || !isArmed) {
         isArmed = false;
         _m1_usec = 120;
         _m2_usec = 120;
@@ -292,6 +294,8 @@ void loop()
     static bool _isArmed;
     static bool _gotFailsafe;
 
+    static uint32_t chan_1, chan_2, chan_3, chan_4, chan_5, chan_6;
+
     // Keep track of what time it is and how much time has elapsed since the last loop
     const auto usec_curr = micros();      
     static uint32_t _usec_prev;
@@ -299,7 +303,7 @@ void loop()
     _usec_prev = usec_curr;      
 
     // Arm vehicle if safe
-    if (!_gotFailsafe && (channel_5 > 1500) && (channel_1 < 1050)) {
+    if (!_gotFailsafe && (chan_5 > 1500) && (chan_1 < 1050)) {
         _isArmed = true;
     }
 
@@ -326,16 +330,16 @@ void loop()
             roll_angle, pitch_angle, yaw_angle);
 
     // Compute desired state
-    const float thro_demand = constrain((channel_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    const float roll_demand = constrain((channel_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
-    const float pitch_demand = constrain((channel_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
-    const float yaw_demand = -constrain((channel_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
+    const float thro_demand = constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
+    const float roll_demand = constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+    const float pitch_demand = constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+    const float yaw_demand = -constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
 
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
     _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
             roll_angle, pitch_angle,
-            channel_1,
+            chan_1,
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
@@ -352,13 +356,14 @@ void loop()
     _m4_usec = scaleMotor(m4_command);
 
     // Turn off motors under various conditions
-    cutMotors(_isArmed); 
+    cutMotors(chan_5, _isArmed); 
 
     // Run motors
     runMotors(); 
 
     // Get vehicle commands for next loop iteration
-    readReceiver(_isArmed, _gotFailsafe); 
+    readReceiver(chan_1, chan_2, chan_3, chan_4, chan_5, chan_6,
+            _isArmed, _gotFailsafe); 
 
     // Regulate loop rate: Do not exceed 2000Hz, all filter parameters tuned to
     // 2000Hz by default
