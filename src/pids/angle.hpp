@@ -102,11 +102,11 @@ namespace hf {
                 public:
 
                     float run( const float dt,
-                            const float des,
+                            const float demand,
                             const bool reset,
                             const float gyro)
                     {
-                        const auto error = des - gyro;
+                        const auto error = demand - gyro;
 
                         _integral = _integral_prev + error * dt;
 
