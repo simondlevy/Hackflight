@@ -77,7 +77,54 @@ namespace hf {
 
                 _readSticks(_throttle, _roll, _pitch, _yaw, button);
 
-                _getVehicleState(_vehicleState);
+                // Track previous time and position for calculating motion
+                static float tprev;
+                static float xprev;
+                static float yprev;
+                static float zprev;
+
+                const auto tcurr = wb_robot_get_time();
+                const auto dt =  tcurr - tprev;
+                tprev = tcurr;
+
+                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
+
+                _z = wb_gps_get_values(_gps)[2];
+
+                _phi = Utils::RAD2DEG*(
+                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
+
+                _dphi = Utils::RAD2DEG*(
+                        wb_gyro_get_values(_gyro)[0]);
+
+                _theta = Utils::RAD2DEG*(
+                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+
+                _dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
+
+                _psi  =  -Utils::RAD2DEG*(psi); 
+
+                _dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
+
+                // Use temporal first difference to get world-cooredinate
+                // velocities
+                auto x = wb_gps_get_values(_gps)[0];
+                auto y = wb_gps_get_values(_gps)[1];
+                auto dx = (x - xprev) / dt;
+                auto dy = (y - yprev) / dt;
+                _dz = (_z - zprev) / dt;
+
+                // Rotate X,Y world velocities into body frame to simulate
+                // optical-flow sensor
+                auto cospsi = cos(psi);
+                auto sinpsi = sin(psi);
+                _dx = dx * cospsi + dy * sinpsi;
+                _dy = dx * sinpsi - dy * cospsi;
+
+                // Save past time and position for next time step
+                xprev = x;
+                yprev = y;
+                zprev = _z;
 
                 if (button) {
                     _button_was_hit = true;
@@ -89,18 +136,6 @@ namespace hf {
                     _button_was_hit ? _tick++ * _timestep / 1000 : 0;
 
                 _completedTakeoff = time > TAKEOFF_TIME;
-
-                return true;
-            }
-
-            // Minimalist version of above
-            bool step(state_t & vehicleState)
-            {
-                if (wb_robot_step((int)_timestep) == -1) {
-                    return false;
-                }
-
-                _getVehicleState(vehicleState);
 
                 return true;
             }
@@ -127,52 +162,52 @@ namespace hf {
 
             float z()
             {
-                return _vehicleState.z;
+                return _z;
             }
 
             float dx()
             {
-                return _vehicleState.dx;
+                return _dx;
             }
 
             float dy()
             {
-                return _vehicleState.dy;
+                return _dy;
             }
 
             float dz()
             {
-                return _vehicleState.dz;
+                return _dz;
             }
 
             float phi()
             {
-                return _vehicleState.phi;
+                return _phi;
             }
 
             float dphi()
             {
-                return _vehicleState.dphi;
+                return _dphi;
             }
 
             float theta()
             {
-                return _vehicleState.theta;
+                return _theta;
             }
 
             float dtheta()
             {
-                return _vehicleState.dtheta;
+                return _dtheta;
             }
 
             float psi()
             {
-                return _vehicleState.psi;
+                return _psi;
             }
 
             float dpsi()
             {
-                return _vehicleState.dpsi;
+                return _dpsi;
             }
 
             bool hitTakeoffButton()
@@ -227,7 +262,16 @@ namespace hf {
             float _pitch;
             float _yaw;
 
-            state_t _vehicleState;
+            float _dx;
+            float _dy;
+            float _z;
+            float _dz;
+            float _phi;
+            float _dphi;
+            float _theta;
+            float _dtheta;
+            float _psi;
+            float _dpsi;
 
             bool _completedTakeoff;
 
@@ -485,58 +529,6 @@ namespace hf {
                 else {
                     readKeyboard(throttle, roll, pitch, yaw, button);
                 }
-            }
-
-            void _getVehicleState(state_t & state)
-            {
-                // Track previous time and position for calculating motion
-                static float tprev;
-                static float xprev;
-                static float yprev;
-                static float zprev;
-
-                const auto tcurr = wb_robot_get_time();
-                const auto dt =  tcurr - tprev;
-                tprev = tcurr;
-
-                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
-
-                state.z = wb_gps_get_values(_gps)[2];
-
-                state.phi = Utils::RAD2DEG*(
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
-
-                state.dphi = Utils::RAD2DEG*(
-                        wb_gyro_get_values(_gyro)[0]);
-
-                state.theta = Utils::RAD2DEG*(
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
-
-                state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
-
-                state.psi  =  -Utils::RAD2DEG*(psi); 
-
-                state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
-
-                // Use temporal first difference to get world-cooredinate
-                // velocities
-                auto x = wb_gps_get_values(_gps)[0];
-                auto y = wb_gps_get_values(_gps)[1];
-                auto dx = (x - xprev) / dt;
-                auto dy = (y - yprev) / dt;
-                state.dz = (state.z - zprev) / dt;
-
-                // Rotate X,Y world velocities into body frame to simulate
-                // optical-flow sensor
-                auto cospsi = cos(psi);
-                auto sinpsi = sin(psi);
-                state.dx = dx * cospsi + dy * sinpsi;
-                state.dy = dx * sinpsi - dy * cospsi;
-
-                // Save past time and position for next time step
-                xprev = x;
-                yprev = y;
-                zprev = state.z;
             }
     };
 
