@@ -64,11 +64,11 @@ namespace hf {
             static constexpr float KI_PITCH_ROLL = 0;    
             static constexpr float KD_PITCH_ROLL = 0;   
 
-            static constexpr float KP_YAW = 0.012;           
-            static constexpr float KI_YAW = 0;
-            static constexpr float KD_YAW = 0;
+            static constexpr float KP_YAW = 0.3;           
+            static constexpr float KI_YAW = 0.05;
+            static constexpr float KD_YAW = 0.00015;
 
-            static constexpr float SCALE = 1;
+            static constexpr float SCALE = 0.01;
 
             static const uint32_t THROTTLE_DOWN = 1060;
 

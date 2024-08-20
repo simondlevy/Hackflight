@@ -18,7 +18,7 @@
 #include <hackflight.hpp>
 #include <mixers.hpp>
 
-#include "newangle.hpp"
+#include <pids/newangle.hpp>
 
 static const float DT = 0.01;
 
@@ -69,10 +69,12 @@ int main(int argc, char ** argv)
             0;
 
         auto roll_demand = K_POSITION * (stickDemands.roll - state.dy);
+
         roll_demand = K_PITCH_ROLL_ANGLE * (roll_demand - state.phi);
         roll_demand = K_PITCH_ROLL_RATE * (roll_demand - state.dphi);
 
         auto pitch_demand = K_POSITION * (stickDemands.pitch - state.dx);
+
         pitch_demand = K_PITCH_ROLL_ANGLE * (pitch_demand - state.theta);
         pitch_demand = K_PITCH_ROLL_RATE * (pitch_demand - state.dtheta);
 
