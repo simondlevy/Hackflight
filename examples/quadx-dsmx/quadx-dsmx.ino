@@ -96,17 +96,6 @@ static float thro_demand, roll_demand, pitch_demand, yaw_demand;
 //Mixer
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
 
-// Safety
-static bool _isArmed;
-static bool _gotFailsafe;
-
-static void armedStatus() {
-    //DESCRIPTION: Check if the throttle cut is off and the throttle input is low to prepare for flight.
-    if (!_gotFailsafe && (channel_5 > 1500) && (channel_1 < 1050)) {
-        _isArmed = true;
-    }
-}
-
 static void initImu() 
 {
     Wire.begin();
@@ -128,7 +117,7 @@ static void initImu()
 
 }
 
-static void getImuData(
+static void readImu(
         float & AccX, float & AccY, float & AccZ,
         float & GyroX, float & GyroY, float & GyroZ
         ) 
@@ -211,22 +200,11 @@ static void scaleMotors()
     _m4_usec = scaleMotor(m4_command_scaled);
 }
 
-static void readReceiver() {
-    //DESCRIPTION: Get raw PWM values for every channel from the radio
-    /*
-     * Updates radio PWM commands in loop based on current available commands.
-     * channel_x is the raw command used in the rest of the loop. If using
-     * a PWM or PPM receiver, the radio commands are retrieved from a function
-     * in the readPWM file separate from this one which is running a bunch of
-     * interrupts to continuously update the radio readings. If using an SBUS
-     * receiver, the alues are pulled from the SBUS library directly.  The raw
-     * radio commands are filtered with a first order low-pass filter to
-     * eliminate any really high frequency noise. 
-     */
-
+static void readReceiver(bool & isArmed, bool & gotFailsafe) 
+{
     if (_rx.timedOut(micros())) {
-        _isArmed = false;
-        _gotFailsafe = true;
+        isArmed = false;
+        gotFailsafe = true;
     }
     else if (_rx.gotNewFrame()) {
         uint16_t values[NUM_DSM_CHANNELS];
@@ -251,10 +229,10 @@ static void runMotors()
     _motors.run();
 }
 
-static void cutMotors() 
+static void cutMotors(bool & isArmed) 
 {
-    if (channel_5 < 1500 || !_isArmed) {
-        _isArmed = false;
+    if (channel_5 < 1500 || !isArmed) {
+        isArmed = false;
         _m1_usec = 120;
         _m2_usec = 120;
         _m3_usec = 120;
@@ -335,14 +313,20 @@ void setup() {
 
 void loop() 
 {
+    // Safety
+    static bool _isArmed;
+    static bool _gotFailsafe;
+
     // Keep track of what time it is and how much time has elapsed since the last loop
     const auto usec_curr = micros();      
     static uint32_t _usec_prev;
     const float dt = (usec_curr - _usec_prev)/1000000.0;
     _usec_prev = usec_curr;      
 
-    // Get arming status
-    armedStatus();
+    // Arm vehicle if safe
+    if (!_gotFailsafe && (channel_5 > 1500) && (channel_1 < 1050)) {
+        _isArmed = true;
+    }
 
     // LED should be on when armed
     if (_isArmed) {
@@ -359,7 +343,7 @@ void loop()
     float AccX = 0, AccY = 0, AccZ = 0;
     float GyroX = 0, GyroY = 0, GyroZ = 0;
 
-    getImuData(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
+    readImu(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
 
     float roll_angle = 0, pitch_angle = 0, yaw_angle = 0;
 
@@ -388,13 +372,13 @@ void loop()
     scaleMotors(); 
 
     // Turn off motors under various conditions
-    cutMotors(); 
+    cutMotors(_isArmed); 
 
     // Run motors
     runMotors(); 
 
     // Get vehicle commands for next loop iteration
-    readReceiver(); 
+    readReceiver(_isArmed, _gotFailsafe); 
 
     // Regulate loop rate: Do not exceed 2000Hz, all filter parameters tuned to
     // 2000Hz by default
