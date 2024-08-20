@@ -24,8 +24,6 @@ static hf::Simulator _sim;
 
 // Global data and routines shared with Haskell Copilot ----------------------
 
-hf::state_t stream_vehicleState;
-
 float stream_throttle;
 float stream_roll;
 float stream_pitch;

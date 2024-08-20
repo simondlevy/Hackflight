@@ -30,24 +30,6 @@ namespace hf {
 
     } axis3_t;
 
-    // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004)
-    typedef struct {
-
-        float x;
-        float dx;
-        float y;
-        float dy;
-        float z;
-        float dz;
-        float phi;
-        float dphi;
-        float theta;
-        float dtheta;
-        float psi;
-        float dpsi;
-
-    } state_t;
-
     typedef struct {
 
         uint32_t c1;
