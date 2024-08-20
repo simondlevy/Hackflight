@@ -93,43 +93,6 @@ namespace hf {
                 return true;
             }
 
-            bool step(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw,
-                    state_t & vehicleState,
-                    bool & hitTakeoffButton,
-                    bool & completedTakeoff)
-            {
-                if (wb_robot_step((int)_timestep) == -1) {
-                    return false;
-                }
-
-                bool button = false;
-
-                _readSticks(throttle, roll, pitch, yaw, button);
-
-                _getVehicleState(vehicleState);
-
-                if (button) {
-                    _button_was_hit = true;
-                }
-
-                hitTakeoffButton = _button_was_hit;
-                
-                throttle *= THROTTLE_SCALE; 
-
-                static uint32_t _tick;
-                
-                const double time =
-                    _button_was_hit ? _tick++ * _timestep / 1000 : 0;
-
-                completedTakeoff = time > TAKEOFF_TIME;
-
-                return true;
-            }
-
             // Minimalist version of above
             bool step(state_t & vehicleState)
             {
