@@ -18,10 +18,12 @@
 #include <hackflight.hpp>
 #include <mixers.hpp>
 
+#include "newangle.hpp"
+
+static const float DT = 0.01;
+
 static const float K_PITCH_ROLL_ANGLE = 6;
 static const float K_PITCH_ROLL_RATE = 0.0125;
-
-static const float KP_YAW = 0.012;
 
 static const float K_CLIMBRATE = 25;
 
@@ -40,6 +42,8 @@ int main(int argc, char ** argv)
     hf::Simulator sim = {};
 
     sim.init();
+
+    hf::YawPidController _yawPid = {};
 
     while (true) {
 
@@ -74,7 +78,7 @@ int main(int argc, char ** argv)
 
         auto yaw_demand = stickDemands.yaw * YAW_DEMAND_SCALE;
 
-        yaw_demand = KP_YAW *( yaw_demand - state.dpsi);
+        yaw_demand = _yawPid.run(DT, yaw_demand, false, state.dpsi);
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(

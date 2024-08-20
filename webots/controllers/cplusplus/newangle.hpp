@@ -25,6 +25,60 @@
 
 namespace hf {
 
+    class YawPidController {
+
+        public:
+
+            float run( const float dt,
+                    const float des,
+                    const bool reset,
+                    const float gyro)
+            {
+                const auto error = des - gyro;
+
+                _integral = _integral_prev + error * dt;
+
+                if (reset) {
+                    _integral = 0;
+                }
+
+                _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
+
+                const auto derivative = (error - _error_prev) / dt;
+
+                const auto output =
+                    SCALE * (KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative); 
+
+                _integral_prev = _integral;
+                _error_prev = error;
+
+                return output;
+            }
+
+
+        private:
+
+            static constexpr float I_LIMIT = 25.0;     
+
+            static constexpr float KP_PITCH_ROLL = 6;    
+            static constexpr float KI_PITCH_ROLL = 0;    
+            static constexpr float KD_PITCH_ROLL = 0;   
+
+            static constexpr float KP_YAW = 0.012;           
+            static constexpr float KI_YAW = 0;
+            static constexpr float KD_YAW = 0;
+
+            static constexpr float SCALE = 1;
+
+            static const uint32_t THROTTLE_DOWN = 1060;
+
+ 
+            float _integral;
+            float _integral_prev;
+            float _error_prev;
+    };
+
+
     class AnglePid {
 
         //DESCRIPTION: Computes control commands based on state error (angle)
@@ -95,44 +149,6 @@ namespace hf {
 
                     float _integral;
                     float _integral_prev;
-            };
-
-            class YawPidController {
-
-                public:
-
-                    float run( const float dt,
-                            const float des,
-                            const bool reset,
-                            const float gyro)
-                    {
-                        const auto error = des - gyro;
-
-                        _integral = _integral_prev + error * dt;
-
-                        if (reset) {
-                            _integral = 0;
-                        }
-
-                        _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
-
-                        const auto derivative = (error - _error_prev) / dt;
-
-                        const auto output =
-                            SCALE * (KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative); 
-
-                        _integral_prev = _integral;
-                        _error_prev = error;
-
-                        return output;
-                    }
-
-
-                private:
-
-                    float _integral;
-                    float _integral_prev;
-                    float _error_prev;
             };
 
             PitchRollPidController _rollPid;
