@@ -340,8 +340,6 @@ void loop()
     const float yaw_demand = 
         -constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
 
-    //printf("%+3.3f\n", GyroZ);
-
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
     _anglePid.run(dt, roll_demand, pitch_demand, yaw_demand, 
@@ -350,10 +348,12 @@ void loop()
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
+    // printf("%+3.3f\n", yaw_PID);
+
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
     // Run motor mixer
-    hf::Mixer::runDF(thro_demand, roll_PID, pitch_PID, yaw_PID, 
+    hf::Mixer::runDF(thro_demand, roll_PID, pitch_PID, -yaw_PID, 
             m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125
