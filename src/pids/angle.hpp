@@ -32,7 +32,7 @@ namespace hf {
          * Basic PID control to stablize on angle setpoint based on desired
          * states roll_demand, pitch_demand, and yaw_demand computed in getDesState().
          * Error is simply the desired state minus the actual state (ex.
-         * roll_demand - roll_angle). Two safety features are implimented here
+         * roll_demand - phi). Two safety features are implimented here
          * regarding the I terms. The I terms are saturated within specified
          * limits on startup to prevent excessive buildup. This can be seen by
          * holding the vehicle at an angle and seeing the motors ramp up on one
@@ -148,23 +148,23 @@ namespace hf {
                     const float roll_demand, 
                     const float pitch_demand, 
                     const float yaw_demand, 
-                    const float roll_angle,
-                    const float pitch_angle,
+                    const float phi,
+                    const float theta,
                     const uint32_t throttle,
-                    const float gyro_x,
-                    const float gyro_y,
-                    const float gyro_z,
+                    const float dphi,
+                    const float dtheta,
+                    const float dpsi,
                     float & roll_out,
                     float & pitch_out,
                     float & yaw_out) 
             {
                 const auto reset = throttle < THROTTLE_DOWN;
 
-                roll_out = _rollPid.run(dt, roll_demand, roll_angle, reset, gyro_x);
+                roll_out = _rollPid.run(dt, roll_demand, phi, reset, dphi);
 
-                pitch_out = _pitchPid.run(dt, pitch_demand, pitch_angle, reset, gyro_y);
+                pitch_out = _pitchPid.run(dt, pitch_demand, theta, reset, dtheta);
 
-                yaw_out = _yawPid.run(dt, yaw_demand, reset, gyro_z);
+                yaw_out = _yawPid.run(dt, yaw_demand, reset, dpsi);
             }    
 
     };
