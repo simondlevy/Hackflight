@@ -66,9 +66,6 @@ int main(int argc, char ** argv)
 
         auto yaw_demand = sim.yaw() * YAW_DEMAND_SCALE;
 
-        float roll_out = 0;
-        float pitch_out = 0;
-
         _anglePid.run(DT,
                 roll_demand,
                 pitch_demand,
@@ -79,12 +76,9 @@ int main(int argc, char ** argv)
                 sim.dphi(),
                 sim.dtheta(),
                 sim.dpsi(),
-                roll_out,
-                pitch_out,
+                roll_demand,
+                pitch_demand,
                 yaw_demand);
-
-        roll_demand = roll_out;
-        pitch_demand = pitch_out;
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
