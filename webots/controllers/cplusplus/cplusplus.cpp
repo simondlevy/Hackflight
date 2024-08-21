@@ -31,9 +31,9 @@ static const float K_POSITION = 10;
 
 static const float YAW_ANGLE_MAX = 200;
 
-static const float PITCH_ROLL_DEMAND_SCALE = 30; // deg
+static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
 
-static const float YAW_DEMAND_SCALE = 160; // deg/sec
+static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
 
 static const float THRUST_TAKEOFF = 56;
 
@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 
         auto pitch_demand = K_POSITION * (sim.pitch() - sim.dx());
 
-        auto yaw_demand = sim.yaw() * YAW_DEMAND_SCALE;
+        auto yaw_demand = sim.yaw() * YAW_DEMAND_PRE_SCALE;
 
         _anglePid.run(DT,
                 2000, // XXX fake throttle for now
@@ -82,9 +82,9 @@ int main(int argc, char ** argv)
                 pitch_demand,
                 yaw_demand);
 
-        roll_demand *= PITCH_ROLL_DEMAND_SCALE;
+        roll_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
-        pitch_demand *= PITCH_ROLL_DEMAND_SCALE;
+        pitch_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
