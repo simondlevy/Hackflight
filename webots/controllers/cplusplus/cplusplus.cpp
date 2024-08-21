@@ -31,6 +31,8 @@ static const float K_POSITION = 10;
 
 static const float YAW_ANGLE_MAX = 200;
 
+static const float PITCH_ROLL_DEMAND_SCALE = 30; // deg
+
 static const float YAW_DEMAND_SCALE = 160; // deg/sec
 
 static const float THRUST_TAKEOFF = 56;
@@ -80,8 +82,9 @@ int main(int argc, char ** argv)
                 pitch_demand,
                 yaw_demand);
 
-        roll_demand *= 38;
-        pitch_demand *= 38;
+        roll_demand *= PITCH_ROLL_DEMAND_SCALE;
+
+        pitch_demand *= PITCH_ROLL_DEMAND_SCALE;
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
