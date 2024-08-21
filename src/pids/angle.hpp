@@ -50,15 +50,13 @@ namespace hf {
 
             static constexpr float I_LIMIT = 25.0;     
 
-            static constexpr float KP_PITCH_ROLL = 0.2 * 0.01;    
-            static constexpr float KI_PITCH_ROLL = 0.3 * 0.01;    
-            static constexpr float KD_PITCH_ROLL = 0.05 * 0.01;   
+            static constexpr float KP_PITCH_ROLL = 0.002;    
+            static constexpr float KI_PITCH_ROLL = 0.003;    
+            static constexpr float KD_PITCH_ROLL = 0.0005;   
 
-            static constexpr float KP_YAW = 0.3 * 0.01;           
-            static constexpr float KI_YAW = 0.05 * 0.01;          
-            static constexpr float KD_YAW = 0.00015 * 0.01;       
-
-            static constexpr float SCALE = 1.0;//0.01;
+            static constexpr float KP_YAW = 0.003;           
+            static constexpr float KI_YAW = 0.0005;          
+            static constexpr float KD_YAW = 0.0000015;       
 
             static const uint32_t THROTTLE_DOWN = 1060;
 
@@ -83,8 +81,8 @@ namespace hf {
 
                         _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
 
-                        const auto output = SCALE * (KP_PITCH_ROLL * error +
-                                KI_PITCH_ROLL * _integral - KD_PITCH_ROLL * dangle); 
+                        const auto output = KP_PITCH_ROLL * error +
+                                KI_PITCH_ROLL * _integral - KD_PITCH_ROLL * dangle; 
 
                         _integral_prev = _integral;
 
@@ -120,7 +118,7 @@ namespace hf {
                         const auto derivative = (error - _error_prev) / dt;
 
                         const auto output =
-                            SCALE * (KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative); 
+                            KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative; 
 
                         _integral_prev = _integral;
                         _error_prev = error;
