@@ -18,7 +18,7 @@
 #include <hackflight.hpp>
 #include <mixers.hpp>
 
-#include <pids/newangle.hpp>
+#include <pids/angle.hpp>
 
 static const float DT = 0.01;
 
@@ -79,6 +79,9 @@ int main(int argc, char ** argv)
                 roll_demand,
                 pitch_demand,
                 yaw_demand);
+
+        roll_demand *= 38;
+        pitch_demand *= 38;
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runCF(
