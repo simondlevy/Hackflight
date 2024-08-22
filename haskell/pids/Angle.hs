@@ -42,32 +42,34 @@ kd_yaw = 0.0000015 :: SFloat
 
 throttle_down = 1060 :: SInt32;
 
-runPitchRoll dt reset demand angle dangle integral_prev 
-
-  =  (output, integral, integral_prev) where
+runPitchRoll dt reset demand angle dangle integral =  (output, integral') where
 
     error = demand - angle
 
-    integral = constrain
-               (if reset then 0 else integral_prev + error * dt)
+    integral' = constrain
+               (if reset then 0 else integral + error * dt)
                (-i_limit) i_limit
 
     output = kp_pitch_roll * error +
-             ki_pitch_roll * integral - 
+             ki_pitch_roll * integral' - 
              kd_pitch_roll * dangle
-
-    integral_prev = integral
 
 
 angleController dt throttle state demands = demands' where
 
   reset = false -- throttle < throttle_down
 
-  (roll_out, roll_integral, roll_integral_prev) = 
+  (roll_out, roll_integral) = 
     runPitchRoll dt reset (roll demands) (phi state) (dphi state) 
                  roll_integral'
 
   roll_integral' = [0] ++ roll_integral
 
-  demands' = demands
+  (pitch_out, pitch_integral) = 
+    runPitchRoll dt reset (pitch demands) (theta state) (dtheta state) 
+                 pitch_integral'
+
+  pitch_integral' = [0] ++ pitch_integral
+
+  demands' = Demands throttle roll_out 0 0
 
