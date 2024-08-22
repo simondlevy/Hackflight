@@ -73,7 +73,7 @@ namespace hf {
                     {
                         const auto error = demand - angle;
 
-                        _integral = _integral_prev + error * dt;
+                        _integral += error * dt;
 
                         if (reset) {
                             _integral = 0;
@@ -87,15 +87,12 @@ namespace hf {
                             KI_PITCH_ROLL * _integral - 
                             KD_PITCH_ROLL * dangle; 
 
-                        _integral_prev = _integral;
-
                         return output;
                     }
 
                 private:
 
                     float _integral;
-                    float _integral_prev;
             };
 
             class YawPidController {
@@ -110,7 +107,7 @@ namespace hf {
                     {
                         const auto error = demand - dangle;
 
-                        _integral = _integral_prev + error * dt;
+                        _integral += error * dt;
 
                         if (reset) {
                             _integral = 0;
@@ -123,7 +120,6 @@ namespace hf {
                         const auto output =
                             KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative; 
 
-                        _integral_prev = _integral;
                         _error_prev = error;
 
                         return output;
@@ -133,7 +129,6 @@ namespace hf {
                 private:
 
                     float _integral;
-                    float _integral_prev;
                     float _error_prev;
             };
 
