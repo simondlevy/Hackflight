@@ -55,6 +55,20 @@ runPitchRoll dt reset demand angle dangle integral =  (output, integral') where
              kd_pitch_roll * dangle
 
 
+runYaw dt reset demand angle dangle integral error =  
+  (output, integral', error') where
+
+    error' = demand - dangle
+
+    integral' = constrain
+               (if reset then 0 else integral + error' * dt)
+               (-i_limit) i_limit
+
+    derivative = (error - error') / dt;
+
+    output = kp_yaw * error + ki_yaw * integral' - kd_yaw * derivative
+
+
 angleController dt throttle state demands = demands' where
 
   reset = false -- throttle < throttle_down
@@ -71,5 +85,12 @@ angleController dt throttle state demands = demands' where
 
   pitch_integral' = [0] ++ pitch_integral
 
-  demands' = Demands throttle roll' pitch' 0
+  (yaw', yaw_integral, yaw_error) = 
+    runYaw dt reset (yaw demands) (psi state) (dpsi state) 
+      yaw_integral' yaw_error'
+
+  yaw_integral' = [0] ++ yaw_integral
+  yaw_error' = [0] ++ yaw_error
+
+  demands' = Demands throttle roll' pitch' yaw'
 
