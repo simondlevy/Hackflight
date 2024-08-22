@@ -74,9 +74,9 @@ static auto _motors = OneShot125(MOTOR_PINS);
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
 //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-static const float MAX_PITCH_ROLL = 30.0;    
+static const float MAX_PITCH_ROLL_ANGLE = 30.0;    
 
-static const float MAX_YAW = 160.0;     //Max yaw rate in deg/sec
+static const float MAX_YAW_RATE = 160.0;     //Max yaw rate in deg/sec
 
 // IMU calibration parameters
 static float ACC_ERROR_X = 0.0;
@@ -327,27 +327,25 @@ void loop()
 
     readImu(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
 
-    float roll_angle = 0, pitch_angle = 0, yaw_angle = 0;
+    // Get Euler angles from IMU (note negations)
+    float phi = 0, theta = 0, psi = 0;
+    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ, phi, theta, psi);
 
-    // Note negations 
-    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ,
-            roll_angle, pitch_angle, yaw_angle);
-
-    // Compute desired state
+    // Convert stick demands to appropriate intervals
     const float thro_demand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
     const float roll_demand = 
-        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
     const float pitch_demand =
-        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL;
+        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
     const float yaw_demand = 
-        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW;
+        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
-    _anglePid.run(dt, chan_1, 
+    _anglePid.run(dt, thro_demand, 
             roll_demand, pitch_demand, yaw_demand, 
-            roll_angle, pitch_angle,
+            phi, theta,
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 

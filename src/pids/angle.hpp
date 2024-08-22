@@ -58,7 +58,7 @@ namespace hf {
             static constexpr float KI_YAW = 0.0005;          
             static constexpr float KD_YAW = 0.0000015;       
 
-            static const uint32_t THROTTLE_DOWN = 1060;
+            static constexpr float THROTTLE_DOWN = 0.06;
 
             class PitchRollPidController {
 
@@ -145,7 +145,7 @@ namespace hf {
 
             void run(
                     const float dt, 
-                    const uint32_t throttle,
+                    const float thro_demand, 
                     const float roll_demand, 
                     const float pitch_demand, 
                     const float yaw_demand, 
@@ -158,7 +158,7 @@ namespace hf {
                     float & pitch_out,
                     float & yaw_out) 
             {
-                const auto reset = throttle < THROTTLE_DOWN;
+                const auto reset = thro_demand < THROTTLE_DOWN;
 
                 roll_out = _rollPid.run(dt, reset, roll_demand, phi, dphi);
 
