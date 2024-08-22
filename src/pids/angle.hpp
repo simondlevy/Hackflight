@@ -113,12 +113,15 @@ namespace hf {
                             _integral = 0;
                         }
 
-                        _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
+                        _integral = hf::Utils::fconstrain(
+                                _integral, -I_LIMIT, I_LIMIT); 
 
                         const auto derivative = (error - _error_prev) / dt;
 
                         const auto output =
-                            KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative; 
+                            KP_YAW * error + 
+                            KI_YAW * _integral - 
+                            KD_YAW * derivative; 
 
                         _error_prev = error;
 

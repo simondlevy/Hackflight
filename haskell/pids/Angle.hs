@@ -59,17 +59,17 @@ angleController dt throttle state demands = demands' where
 
   reset = false -- throttle < throttle_down
 
-  (roll_out, roll_integral) = 
+  (roll', roll_integral) = 
     runPitchRoll dt reset (roll demands) (phi state) (dphi state) 
                  roll_integral'
 
   roll_integral' = [0] ++ roll_integral
 
-  (pitch_out, pitch_integral) = 
+  (pitch', pitch_integral) = 
     runPitchRoll dt reset (pitch demands) (theta state) (dtheta state) 
                  pitch_integral'
 
   pitch_integral' = [0] ++ pitch_integral
 
-  demands' = Demands throttle roll_out 0 0
+  demands' = Demands throttle roll' pitch' 0
 
