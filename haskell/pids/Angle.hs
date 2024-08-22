@@ -48,7 +48,9 @@ runPitchRollPidController dt reset demand angle dangle integral_prev
 
     error = demand - angle
 
-    integral = if reset then 0 else integral_prev + error * dt
+    integral = constrain
+               (if reset then 0 else integral_prev + error * dt)
+               (-i_limit) i_limit
 
 angleController dt throttle state demands = demands' where
 
