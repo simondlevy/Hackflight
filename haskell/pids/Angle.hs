@@ -44,13 +44,20 @@ throttle_down = 1060 :: SInt32;
 
 runPitchRollPidController dt reset demand angle dangle integral_prev 
 
-  =  (error, integral, integral_prev) where
+  =  (output, integral, integral_prev) where
 
     error = demand - angle
 
     integral = constrain
                (if reset then 0 else integral_prev + error * dt)
                (-i_limit) i_limit
+
+    output = kp_pitch_roll * error +
+             ki_pitch_roll * integral - 
+             kd_pitch_roll * dangle
+
+    integral_prev = integral
+
 
 angleController dt throttle state demands = demands' where
 
