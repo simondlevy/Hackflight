@@ -1,3 +1,4 @@
 copilot*
 haskell
-build/*
+build/
+dist-newstyle/

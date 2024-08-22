@@ -29,13 +29,33 @@ DEF ROBOT Robot {
             width 324
             height 324
     }
+
     GPS {
     }
+
     Gyro {
     }
+
     InertialUnit {
         name "inertial_unit"
     }
+
+    DEF FASTHELIX Shape {
+        appearance PBRAppearance {
+            baseColor 0.1 0.1 0.1
+                baseColorMap ImageTexture {
+                    url [
+                        "../meshes/textures/fast_helix.png"
+                    ]
+                }
+            metalness 0
+        }
+        geometry Cylinder {
+            height 0.001
+                radius 0.025
+        }
+    }
+
     DEF M1 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 -0.031 0.008  
@@ -49,23 +69,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation 0.031 -0.031 0.008
-                children [
-                DEF FASTHELIX Shape {
-                    appearance PBRAppearance {
-                        baseColor 0.1 0.1 0.1
-                            baseColorMap ImageTexture {
-                                url [
-                                    "../meshes/textures/fast_helix.png"
-                                ]
-                            }
-                        metalness 0
-                    }
-                    geometry Cylinder {
-                        height 0.001
-                            radius 0.025
-                    }
-                }
-                ]
+                children [ USE FASTHELIX ]
         }
         slowHelix Solid {
             translation 0.031 -0.031 0.008
@@ -97,9 +101,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation -0.031 -0.031 0.008
-                children [
-                USE FASTHELIX
-                ]
+                children [ USE FASTHELIX ]
         }
         slowHelix Solid {
             translation -0.031 -0.031 0.008
@@ -121,9 +123,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation -0.031 0.031 0.008
-                children [
-                USE FASTHELIX
-                ]
+                children [ USE FASTHELIX ]
         }
         slowHelix Solid {
             translation -0.031 0.031 0.008
@@ -145,9 +145,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation 0.031 0.031 0.008
-                children [
-                USE FASTHELIX
-                ]
+                children [ USE FASTHELIX ]
         }
         slowHelix DEF PROP Solid {
             translation 0.031 0.031 0.007
