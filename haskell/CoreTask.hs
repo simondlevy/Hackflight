@@ -36,10 +36,12 @@ import Utils
 import Constants
 
 -- PID controllers
+import Angle
 import ClimbRate
+import Position
+
 import PitchRollAngle
 import PitchRollRate
-import Position
 import YawAngle
 import YawRate
 
