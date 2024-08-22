@@ -86,12 +86,12 @@ int main(int argc, char ** argv)
 
         pitch_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
-        float m1=0, m2=0, m3=0, m4=0;
-        hf::Mixer::runCF(
+        float m_nw=0, m_se=0, m_sw=0, m_ne=0;
+        hf::Mixer::runQuadX(
                 thrust_demand, roll_demand, pitch_demand, yaw_demand,
-                m1, m2, m3, m4);
+                m_nw, m_se, m_sw, m_ne);
 
-        sim.setMotors(m1, m2, m3, m4);
+        sim.setMotors(m_nw, m_se, m_sw, m_ne);
     }
 
     sim.close();

@@ -80,6 +80,16 @@ namespace hf {
                 m4 = t + r + p  + y;
             }
 
+            static void runQuadX(
+                    const float t, const float r, const float p, const float y,
+                    float & m1, float & m2, float & m3, float & m4)
+            {
+                m1 = t - r - p  + y;
+                m2 = t - r + p  - y;
+                m3 = t + r + p  + y;
+                m4 = t + r - p  - y;
+            }
+
      };
 
 }
