@@ -66,7 +66,7 @@ runYaw dt reset demand angle dangle integral error =
 
     derivative = (error - error') / dt;
 
-    output = kp_yaw * error + ki_yaw * integral' - kd_yaw * derivative
+    output = kp_yaw * error -- + ki_yaw * integral' - kd_yaw * derivative
 
 
 angleController dt throttle state demands = demands' where
@@ -92,5 +92,5 @@ angleController dt throttle state demands = demands' where
   yaw_integral' = [0] ++ yaw_integral
   yaw_error' = [0] ++ yaw_error
 
-  demands' = Demands throttle roll' pitch' yaw'
+  demands' = Demands (thrust demands) 0 0 yaw'
 
