@@ -29,7 +29,18 @@ import Demands
 import State
 import Utils
 
+
+throttle_down = 1060 :: SInt32;
+
+runRollPid dt reset roll_demand phi dphi = 
+
+  roll_demand
+
 angleController dt throttle state demands = demands' where
+
+  reset = false -- throttle < throttle_down
+
+  roll_out = runRollPid dt reset (roll demands) (phi state) (dphi state)
 
   demands' = demands
 
