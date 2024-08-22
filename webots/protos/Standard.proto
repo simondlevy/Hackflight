@@ -80,7 +80,7 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0            
             fastHelixThreshold 50                 
             device RotationalMotor {
-                name "motor1"
+                name "motor_nw"
                     maxVelocity 100                     
                     maxTorque 30                        
             }
@@ -114,7 +114,7 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
             device RotationalMotor {
-                name "motor2"
+                name "motor_se"
                     maxVelocity 100
                     maxTorque 30
             }
@@ -149,7 +149,7 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
             device RotationalMotor {
-                name "motor3"
+                name "motor_sw"
                     maxVelocity 100
                     maxTorque 30
             }
@@ -184,7 +184,7 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
             device RotationalMotor {
-                name "motor4"
+                name "motor_ne"
                     maxVelocity 100  # rad/sec
                     maxTorque 30
             }

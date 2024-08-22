@@ -61,10 +61,10 @@ namespace hf {
                 wb_joystick_enable(_timestep);
                 wb_keyboard_enable(_timestep);
 
-                _motor1 = _makeMotor("motor1", +1);
-                _motor2 = _makeMotor("motor2", -1);
-                _motor3 = _makeMotor("motor3", +1);
-                _motor4 = _makeMotor("motor4", -1);
+                _motor_nw = _makeMotor("motor_nw", +1);
+                _motor_se = _makeMotor("motor_se", -1);
+                _motor_sw = _makeMotor("motor_sw", +1);
+                _motor_ne = _makeMotor("motor_ne", -1);
             }
 
             bool step()
@@ -226,10 +226,10 @@ namespace hf {
                     const float m3, 
                     const float m4)
             {
-                wb_motor_set_velocity(_motor1, +m1);
-                wb_motor_set_velocity(_motor2, -m2);
-                wb_motor_set_velocity(_motor3, +m3);
-                wb_motor_set_velocity(_motor4, -m4);
+                wb_motor_set_velocity(_motor_nw, +m1);
+                wb_motor_set_velocity(_motor_se, -m2);
+                wb_motor_set_velocity(_motor_sw, +m3);
+                wb_motor_set_velocity(_motor_ne, -m4);
             }
 
             void close(void)
@@ -279,10 +279,10 @@ namespace hf {
 
             uint32_t _tick;
                 
-            WbDeviceTag _motor1;
-            WbDeviceTag _motor2;
-            WbDeviceTag _motor3;
-            WbDeviceTag _motor4;
+            WbDeviceTag _motor_nw;
+            WbDeviceTag _motor_se;
+            WbDeviceTag _motor_sw;
+            WbDeviceTag _motor_ne;
 
             WbDeviceTag _camera;
             WbDeviceTag _gps;
