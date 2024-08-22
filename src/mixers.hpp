@@ -27,42 +27,6 @@ namespace hf {
         public:
 
             /*
-               Betaflight QuadX:
-
-               4     2
-                  x
-               3     1
-
-             */
-            static void runBF(
-                    const float t, const float r, const float p, const float y,
-                    float & m1, float & m2, float & m3, float & m4)
-            {
-                m1 = t - r + p  - y;
-                m2 = t - r - p  + y;
-                m3 = t + r + p  + y;
-                m4 = t + r - p  - y;
-            }        
-
-            /*
-               Crazyflie QuadX:
-
-               4     1
-                  x
-               3     2
-
-             */
-            static void runCF(
-                    const float t, const float r, const float p, const float y,
-                    float & m1, float & m2, float & m3, float & m4)
-            {
-                m1 = t - r - p  + y;
-                m2 = t - r + p  - y;
-                m3 = t + r + p  + y;
-                m4 = t + r - p  - y;
-            }
-
-            /*
                dRehmFlight QuadX:
 
                1     2
