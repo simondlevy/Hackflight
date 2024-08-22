@@ -61,10 +61,10 @@ namespace hf {
                 wb_joystick_enable(_timestep);
                 wb_keyboard_enable(_timestep);
 
-                _motor_nw = _makeMotor("motor_nw", +1);
-                _motor_se = _makeMotor("motor_se", -1);
-                _motor_sw = _makeMotor("motor_sw", +1);
-                _motor_ne = _makeMotor("motor_ne", -1);
+                _motor_nw = _makeMotor("motor_nw");
+                _motor_se = _makeMotor("motor_se");
+                _motor_sw = _makeMotor("motor_sw");
+                _motor_ne = _makeMotor("motor_ne");
             }
 
             bool step()
@@ -481,13 +481,11 @@ namespace hf {
                 }
             }
 
-            static WbDeviceTag _makeMotor(
-                    const char * name, const float direction)
+            static WbDeviceTag _makeMotor(const char * name)
             {
                 auto motor = wb_robot_get_device(name);
 
                 wb_motor_set_position(motor, INFINITY);
-                wb_motor_set_velocity(motor, direction);
 
                 return motor;
             }
