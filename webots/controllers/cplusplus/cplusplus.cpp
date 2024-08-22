@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
         auto yaw_demand = sim.yaw() * YAW_DEMAND_PRE_SCALE;
 
         _anglePid.run(DT,
-                2000, // XXX fake throttle for now
+                1.0, // fake throttle to max for now, so no PID integral reset
                 roll_demand,
                 pitch_demand,
                 yaw_demand,
