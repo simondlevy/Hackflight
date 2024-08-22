@@ -40,11 +40,6 @@ import Angle
 import ClimbRate
 import Position
 
-import PitchRollAngle
-import PitchRollRate
-import YawAngle
-import YawRate
-
 -- Constants
 
 k_climbrate = 25 :: SFloat
@@ -52,6 +47,10 @@ k_climbrate = 25 :: SFloat
 thrust_takeoff = 56 :: SFloat
 
 thrust_base = 55.385 :: SFloat
+
+pitch_roll_demand_post_scale = 30 :: SFloat -- deg
+
+yaw_demand_pre_scale = 160 :: SFloat -- deg/sec
 
 -- Streams from C++ ----------------------------------------------------------
 
@@ -116,23 +115,22 @@ step = motors where
                  state_psi 
                  state_dpsi
 
-  stickDemands = Demands throttle_stick roll_stick pitch_stick yaw_stick
+  stickDemands = Demands throttle_stick 
+                 roll_stick 
+                 pitch_stick 
+                 (yaw_demand_pre_scale * yaw_stick)
 
   dt = rateToPeriod clock_rate
 
   pids = [climbRateController hitTakeoffButton completedTakeoff,
           positionController dt,
-          angleController dt throttle_stick,
-          pitchRollAngleController dt,
-          pitchRollRateController dt,
-          yawAngleController dt,
-          yawRateController dt]
+          angleController dt throttle_stick]
 
   demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
   motors = runCF $ Demands (thrust demands')
-                           (roll demands') 
-                           (pitch demands')
+                           (pitch_roll_demand_post_scale * (roll demands'))
+                           (pitch_roll_demand_post_scale * (pitch demands'))
                            (yaw demands')
 
 ------------------------------------------------------------------------------

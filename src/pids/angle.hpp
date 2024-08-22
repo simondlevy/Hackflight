@@ -30,19 +30,19 @@ namespace hf {
         //DESCRIPTION: Computes control commands based on state error (angle)
         /*
          * Basic PID control to stablize on angle setpoint based on desired
-         * states roll_demand, pitch_demand, and yaw_demand computed in getDesState().
-         * Error is simply the desired state minus the actual state (ex.
-         * roll_demand - phi). Two safety features are implimented here
-         * regarding the I terms. The I terms are saturated within specified
-         * limits on startup to prevent excessive buildup. This can be seen by
-         * holding the vehicle at an angle and seeing the motors ramp up on one
-         * side until they've maxed out throttle...saturating I to a specified
-         * limit fixes this. The second feature defaults the I terms to 0 if
-         * the throttle is at the minimum setting. This means the motors will
-         * not start spooling up on the ground, and the I terms will always
-         * start from 0 on takeoff. This function updates the variables
-         * roll_PID, pitch_PID, and yaw_PID which can be thought of as 1-D
-         * stablized signals. They are mixed to the configuration of the
+         * states roll_demand, pitch_demand, and yaw_demand computed in
+         * getDesState().  Error is simply the desired state minus the actual
+         * state (ex.  roll_demand - phi). Two safety features are implimented
+         * here regarding the I terms. The I terms are saturated within
+         * specified limits on startup to prevent excessive buildup. This can
+         * be seen by holding the vehicle at an angle and seeing the motors
+         * ramp up on one side until they've maxed out throttle...saturating I
+         * to a specified limit fixes this. The second feature defaults the I
+         * terms to 0 if the throttle is at the minimum setting. This means the
+         * motors will not start spooling up on the ground, and the I terms
+         * will always start from 0 on takeoff. This function updates the
+         * variables roll_PID, pitch_PID, and yaw_PID which can be thought of
+         * as 1-D stablized signals. They are mixed to the configuration of the
          * vehicle in the mixer.
          */
 
@@ -73,7 +73,7 @@ namespace hf {
                     {
                         const auto error = demand - angle;
 
-                        _integral = _integral_prev + error * dt;
+                        _integral += error * dt;
 
                         if (reset) {
                             _integral = 0;
@@ -87,15 +87,12 @@ namespace hf {
                             KI_PITCH_ROLL * _integral - 
                             KD_PITCH_ROLL * dangle; 
 
-                        _integral_prev = _integral;
-
                         return output;
                     }
 
                 private:
 
                     float _integral;
-                    float _integral_prev;
             };
 
             class YawPidController {
@@ -110,20 +107,22 @@ namespace hf {
                     {
                         const auto error = demand - dangle;
 
-                        _integral = _integral_prev + error * dt;
+                        _integral += error * dt;
 
                         if (reset) {
                             _integral = 0;
                         }
 
-                        _integral = hf::Utils::fconstrain(_integral, -I_LIMIT, I_LIMIT); 
+                        _integral = hf::Utils::fconstrain(
+                                _integral, -I_LIMIT, I_LIMIT); 
 
                         const auto derivative = (error - _error_prev) / dt;
 
                         const auto output =
-                            KP_YAW * error + KI_YAW * _integral - KD_YAW * derivative; 
+                            KP_YAW * error + 
+                            KI_YAW * _integral - 
+                            KD_YAW * derivative; 
 
-                        _integral_prev = _integral;
                         _error_prev = error;
 
                         return output;
@@ -133,7 +132,6 @@ namespace hf {
                 private:
 
                     float _integral;
-                    float _integral_prev;
                     float _error_prev;
             };
 
