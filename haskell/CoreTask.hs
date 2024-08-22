@@ -48,6 +48,8 @@ thrust_takeoff = 56 :: SFloat
 
 thrust_base = 55.385 :: SFloat
 
+pitch_roll_demand_post_scale = 30 :: SFloat -- deg
+
 yaw_demand_pre_scale = 160 :: SFloat -- deg/sec
 
 -- Streams from C++ ----------------------------------------------------------
@@ -127,8 +129,8 @@ step = motors where
   demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
   motors = runCF $ Demands (thrust demands')
-                           (roll demands') 
-                           (pitch demands')
+                           (pitch_roll_demand_post_scale * (roll demands'))
+                           (pitch_roll_demand_post_scale * (pitch demands'))
                            (yaw demands')
 
 ------------------------------------------------------------------------------
