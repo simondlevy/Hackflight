@@ -128,10 +128,10 @@ step = motors where
 
   demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
-  motors = runCF $ Demands (thrust demands')
-                           (pitch_roll_demand_post_scale * (roll demands'))
-                           (pitch_roll_demand_post_scale * (pitch demands'))
-                           (yaw demands')
+  motors = runQuadX $ Demands (thrust demands')
+                              (pitch_roll_demand_post_scale * (roll demands'))
+                              (pitch_roll_demand_post_scale * (pitch demands'))
+                              (yaw demands')
 
 ------------------------------------------------------------------------------
  

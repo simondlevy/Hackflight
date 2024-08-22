@@ -221,15 +221,15 @@ namespace hf {
             }
 
             void setMotors(
-                    const float m1, 
-                    const float m2, 
-                    const float m3, 
-                    const float m4)
+                    const float nw, 
+                    const float se, 
+                    const float sw, 
+                    const float ne)
             {
-                wb_motor_set_velocity(_motor_nw, +m1);
-                wb_motor_set_velocity(_motor_se, -m2);
-                wb_motor_set_velocity(_motor_sw, +m3);
-                wb_motor_set_velocity(_motor_ne, -m4);
+                wb_motor_set_velocity(_motor_nw, +nw);
+                wb_motor_set_velocity(_motor_se, -se);
+                wb_motor_set_velocity(_motor_sw, +sw);
+                wb_motor_set_velocity(_motor_ne, -ne);
             }
 
             void close(void)

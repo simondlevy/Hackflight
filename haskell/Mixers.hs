@@ -27,22 +27,13 @@ import Copilot.Compile.C99
 import Demands
 import Utils
 
-{--
- Crazyflie QuadX:
+runQuadX :: Demands -> (SFloat, SFloat, SFloat, SFloat)
 
-            4     1
-               x
-            3     2
-
---}
-
-runCF :: Demands -> (SFloat, SFloat, SFloat, SFloat)
-
-runCF demands = (m1, m2, m3, m4) where 
+runQuadX demands = (nw, se, sw, ne) where 
 
    (t, r, p, y) = getDemands demands
 
-   m1 = t - r - p  + y
-   m2 = t - r + p  - y
-   m3 = t + r + p  + y
-   m4 = t + r - p  - y
+   nw = t - r - p  + y
+   se = t - r + p  - y
+   sw = t + r + p  + y
+   ne = t + r - p  - y
