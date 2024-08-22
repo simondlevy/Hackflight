@@ -122,6 +122,7 @@ step = motors where
 
   pids = [climbRateController hitTakeoffButton completedTakeoff,
           positionController dt,
+          angleController dt,
           pitchRollAngleController dt,
           pitchRollRateController dt,
           yawAngleController dt,
