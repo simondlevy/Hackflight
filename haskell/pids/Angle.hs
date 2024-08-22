@@ -29,7 +29,7 @@ import Demands
 import State
 import Utils
 
-angleController dt state demands = demands' where
+angleController dt throttle state demands = demands' where
 
   demands' = demands
 
