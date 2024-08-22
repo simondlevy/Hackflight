@@ -42,7 +42,7 @@ kd_yaw = 0.0000015 :: SFloat
 
 throttle_down = 1060 :: SInt32;
 
-runPitchRollPidController dt reset demand angle dangle integral_prev 
+runPitchRoll dt reset demand angle dangle integral_prev 
 
   =  (output, integral, integral_prev) where
 
@@ -63,7 +63,11 @@ angleController dt throttle state demands = demands' where
 
   reset = false -- throttle < throttle_down
 
-  -- roll_out = runRollPid dt reset (roll demands) (phi state) (dphi state)
+  (roll_out, roll_integral, roll_integral_prev) = 
+    runPitchRoll dt reset (roll demands) (phi state) (dphi state) 
+                 roll_integral'
+
+  roll_integral' = [0] ++ roll_integral
 
   demands' = demands
 
