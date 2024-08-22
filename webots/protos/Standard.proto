@@ -40,7 +40,7 @@ DEF ROBOT Robot {
         name "inertial_unit"
     }
 
-    DEF FASTHELIX Shape {
+    DEF FASTHELIX_NORTH Shape {
         appearance PBRAppearance {
             baseColor 0.1 0.1 0.1
                 baseColorMap ImageTexture {
@@ -56,7 +56,24 @@ DEF ROBOT Robot {
         }
     }
 
-    DEF M1 Propeller {
+    DEF FASTHELIX_SOUTH Shape {
+        appearance PBRAppearance {
+            baseColor 0.4 0.0 0.0
+                baseColorMap ImageTexture {
+                    url [
+                        "../meshes/textures/fast_helix.png"
+                    ]
+                }
+            metalness 0
+        }
+        geometry Cylinder {
+            height 0.001
+                radius 0.025
+        }
+    }
+
+    # Northeast prop/motor
+    Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 -0.031 0.008  
             thrustConstants 4e-05 0               
@@ -69,7 +86,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation 0.031 -0.031 0.008
-                children [ USE FASTHELIX ]
+                children [ USE FASTHELIX_NORTH ]
         }
         slowHelix Solid {
             translation 0.031 -0.031 0.008
@@ -88,7 +105,9 @@ DEF ROBOT Robot {
                 ]
         }
     }
-    DEF M2 Propeller {
+
+    # Southeast prop/motor
+    Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 -0.031 0.008
             thrustConstants -4e-05 0
@@ -101,19 +120,19 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation -0.031 -0.031 0.008
-                children [ USE FASTHELIX ]
+                children [ USE FASTHELIX_SOUTH ]
         }
         slowHelix Solid {
             translation -0.031 -0.031 0.008
                 children [
                     Shape {
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0 0 0
+                            baseColor 1 0 0
                                 metalness 0.3
                         }
                         geometry Mesh {
                             url [
-                                "../meshes/collada_files/ccw_prop.dae"
+                                "../meshes/collada_files/cw_prop.dae"
                             ]
                         }
                     }
@@ -121,7 +140,9 @@ DEF ROBOT Robot {
                 ]
         }
     }
-    DEF M3 Propeller {
+
+    # Southwest prop/motor
+    Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 0.031 0.008
             thrustConstants 4e-05 0
@@ -134,14 +155,14 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation -0.031 0.031 0.008
-                children [ USE FASTHELIX ]
+                children [ USE FASTHELIX_SOUTH ]
         }
         slowHelix Solid {
             translation -0.031 0.031 0.008
                 children [
                     Shape {
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0 0 0
+                            baseColor 1 0 0
                                 metalness 0.3
                         }
                         geometry Mesh {
@@ -154,7 +175,9 @@ DEF ROBOT Robot {
                 ]
         }
     }
-    DEF M4 Propeller {
+
+    # Northest prop/motor
+    Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 0.031 0.008
             thrustConstants -4e-05 0
@@ -167,7 +190,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation 0.031 0.031 0.008
-                children [ USE FASTHELIX ]
+                children [ USE FASTHELIX_NORTH ]
         }
         slowHelix DEF PROP Solid {
             translation 0.031 0.031 0.007
@@ -179,7 +202,7 @@ DEF ROBOT Robot {
                         }
                         geometry Mesh {
                             url [
-                                "../meshes/collada_files/ccw_prop.dae"
+                                "../meshes/collada_files/cw_prop.dae"
                             ]
                         }
                     }
