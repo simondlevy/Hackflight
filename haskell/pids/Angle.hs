@@ -30,6 +30,16 @@ import State
 import Utils
 
 
+i_limit = 25.0 :: SFloat     
+
+kp_pitch_roll = 0.002 :: SFloat    
+ki_pitch_roll = 0.003 :: SFloat    
+kd_pitch_roll = 0.0005 :: SFloat   
+
+kp_yaw = 0.003 :: SFloat           
+ki_yaw = 0.0005 :: SFloat          
+kd_yaw = 0.0000015 :: SFloat       
+
 throttle_down = 1060 :: SInt32;
 
 runRollPid dt reset roll_demand phi dphi = 
