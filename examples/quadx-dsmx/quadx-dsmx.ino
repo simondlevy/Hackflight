@@ -30,7 +30,8 @@
 #include <utils.hpp>
 #include <mixers.hpp>
 #include <tasks/blink.hpp>
-#include <pids/angle.hpp>
+#include <pids/angle2.hpp>
+#include <pids/yaw.hpp>
 
 // Receiver -------------------------------------------------------------------
 
@@ -58,6 +59,7 @@ static MPU6050 _mpu6050;
 // PID control ---------------------------------------------------------------
 
 static hf::AnglePid _anglePid;
+static hf::YawPid _yawPid;
 
 // Das Blinkenlights ---------------------------------------------------------
 
@@ -341,13 +343,16 @@ void loop()
     const float yaw_demand = 
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
-    // Run demands through PID controller
-    float roll_PID=0, pitch_PID=0, yaw_PID=0;
-    _anglePid.run(dt, thro_demand, 
-            roll_demand, pitch_demand, yaw_demand, 
-            phi, theta,
-            GyroX, GyroY, GyroZ,
-            roll_PID, pitch_PID, yaw_PID);
+    // Run demands through PID controllers
+
+    const auto reset = thro_demand < 0.06;
+
+    float roll_PID=0, pitch_PID=0;
+    _anglePid.run(dt, reset, roll_demand, pitch_demand, phi, theta,
+            GyroX, GyroY, roll_PID, pitch_PID);
+
+    float yaw_PID=0;
+    _yawPid.run(dt, reset, yaw_demand, GyroZ, yaw_PID);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 

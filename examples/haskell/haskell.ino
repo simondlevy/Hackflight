@@ -376,7 +376,7 @@ void loop()
 
     // Run demands through PID controller
     _anglePid.run(stream_dt, stream_thro_demand, 
-            stream_roll_demand, stream_pitch_demand, stream_yaw_demand, 
+            stream_roll_demand, stream_pitch_demand, stream_yaw_demand,
             stream_phi, stream_theta,
             stream_gyroX, stream_gyroY, stream_gyroZ,
             stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
