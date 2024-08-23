@@ -260,6 +260,11 @@ static void blinkOnStartup(void)
 
 // Shared with Haskell Copilot -----------------------------------------------
 
+float stream_thro_demand;
+float stream_roll_PID;
+float stream_pitch_PID;
+float stream_yaw_PID;
+
 void setMotors(float m1, float m2, float m3, float m4)
 {
 }
@@ -338,7 +343,7 @@ void loop()
     Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ, phi, theta, psi);
 
     // Convert stick demands to appropriate intervals
-    const float thro_demand =
+    stream_thro_demand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
     const float roll_demand = 
         constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
@@ -351,17 +356,17 @@ void loop()
     copilot_step_core();
 
     // Run demands through PID controller
-    float roll_PID=0, pitch_PID=0, yaw_PID=0;
-    _anglePid.run(dt, thro_demand, 
+    _anglePid.run(dt, stream_thro_demand, 
             roll_demand, pitch_demand, yaw_demand, 
             phi, theta,
             GyroX, GyroY, GyroZ,
-            roll_PID, pitch_PID, yaw_PID);
+            stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
     // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
+    hf::Mixer::runBetaFlightQuadX(
+            stream_thro_demand, stream_roll_PID, stream_pitch_PID, stream_yaw_PID, 
             m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125
