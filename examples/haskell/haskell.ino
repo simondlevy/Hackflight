@@ -72,8 +72,6 @@ static auto _motors = OneShot125(MOTOR_PINS);
 
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
-static float _m1_command, _m2_command, _m3_command, _m4_command;
-
 // ---------------------------------------------------------------------------
 
 
@@ -169,11 +167,7 @@ static void armMotor(uint8_t & m_usec)
     m_usec = 125;
 }
 
-static uint8_t scaleMotor(const float mval)
-{
-    return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
 
-}
 
 static void readReceiver(
         uint32_t & chan_1,
@@ -280,12 +274,17 @@ float stream_gyroX;
 float stream_gyroY;
 float stream_gyroZ;
 
+static uint8_t scaleMotor(const float mval)
+{
+    return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
+
+}
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    _m1_command = m1;
-    _m2_command = m2;
-    _m3_command = m3;
-    _m4_command = m4;
+    _m1_usec = scaleMotor(m1);
+    _m2_usec = scaleMotor(m2);
+    _m3_usec = scaleMotor(m3);
+    _m4_usec = scaleMotor(m4);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -385,10 +384,6 @@ void loop()
     copilot_step_core();
 
     // Rescale motor values for OneShot125
-    _m1_usec = scaleMotor(_m1_command);
-    _m2_usec = scaleMotor(_m2_command);
-    _m3_usec = scaleMotor(_m3_command);
-    _m4_usec = scaleMotor(_m4_command);
 
     // Turn off motors under various conditions
     cutMotors(chan_5, _isArmed); 
