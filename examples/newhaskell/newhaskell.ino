@@ -1,5 +1,6 @@
 /*
-  Hackflight example sketch custom QuadX frame with Spektrum DSMX receiver
+  Hackflight Haskell example sketch custom QuadX frame with Spektrum DSMX
+  receiver
 
   Adapted from https://github.com/nickrehm/dRehmFlight
  
@@ -24,13 +25,17 @@
 #include <MPU6050.h>
 #include <oneshot125.hpp>
 
-#include "madgwick.hpp"
-
 #include <hackflight.hpp>
+#include <madgwick.hpp>
 #include <utils.hpp>
 #include <mixers.hpp>
 #include <tasks/blink.hpp>
+
 #include <pids/angle.hpp>
+
+static hf::AnglePid _anglePid;
+
+//#include "copilot_core.h"
 
 // Receiver -------------------------------------------------------------------
 
@@ -54,10 +59,6 @@ static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static const float ACCEL_SCALE_FACTOR = 16384.0;
 
 static MPU6050 _mpu6050;
-
-// PID control ---------------------------------------------------------------
-
-static hf::AnglePid _anglePid;
 
 // Das Blinkenlights ---------------------------------------------------------
 
@@ -258,6 +259,34 @@ static void blinkOnStartup(void)
     }
 }
 
+// Shared with Haskell Copilot ------------------------------------------------
+
+float stream_throttle;
+float stream_roll;
+float stream_phi;
+float stream_pitch;
+float stream_theta;
+float stream_yaw;
+float stream_dphi;
+float stream_dtheta;
+float stream_dpsi;
+
+float stream_roll_PID;
+float stream_pitch_PID;
+float stream_yaw_PID;
+
+void setMotors(
+        float m1_command, float m2_command, float m3_command, float m4_command)
+{
+    // Rescale motor values for OneShot125
+    _m1_usec = scaleMotor(m1_command);
+    _m2_usec = scaleMotor(m2_command);
+    _m3_usec = scaleMotor(m3_command);
+    _m4_usec = scaleMotor(m4_command);
+
+}
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() {
@@ -328,38 +357,35 @@ void loop()
     readImu(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
 
     // Get Euler angles from IMU (note negations)
-    float phi = 0, theta = 0, psi = 0;
-    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ, phi, theta, psi);
+    float psi=0; // unused
+    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ,
+            stream_phi, stream_theta, psi);
 
-    // Convert stick demands to appropriate intervals
-    const float thro_demand =
+    // Convert stick demands to appropriate intervals for sharing with Haskell
+    stream_throttle =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    const float roll_demand = 
+    stream_roll = 
         constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float pitch_demand =
+    stream_pitch =
         constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float yaw_demand = 
+    stream_yaw = 
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
+    // Share angular rates with Haskell
+    stream_dphi = GyroX;
+    stream_dtheta = GyroY;
+    stream_dpsi = GyroZ;
+
     // Run demands through PID controller
-    float roll_PID=0, pitch_PID=0, yaw_PID=0;
-    _anglePid.run(dt, thro_demand, 
-            roll_demand, pitch_demand, yaw_demand, 
-            phi, theta,
-            GyroX, GyroY, GyroZ,
-            roll_PID, pitch_PID, yaw_PID);
+    _anglePid.run(dt, stream_throttle, 
+            stream_roll, stream_pitch, stream_yaw, 
+            stream_phi, stream_theta,
+            stream_dtheta, stream_dphi, stream_dpsi,
+            stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
 
-    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
-
-    // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
-            m1_command, m2_command, m3_command, m4_command);
-
-    // Rescale motor values for OneShot125
-    _m1_usec = scaleMotor(m1_command);
-    _m2_usec = scaleMotor(m2_command);
-    _m3_usec = scaleMotor(m3_command);
-    _m4_usec = scaleMotor(m4_command);
+    // Run Haskell code, which will call setMotors()
+    void copilot_step_core();
+    copilot_step_core();
 
     // Turn off motors under various conditions
     cutMotors(chan_5, _isArmed); 

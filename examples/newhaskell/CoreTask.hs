@@ -45,6 +45,7 @@ yaw_demand_pre_scale = 160 :: SFloat -- deg/sec
 
 -- Streams from C++ ----------------------------------------------------------
 
+{--
 throttle_stick :: SFloat
 throttle_stick = extern "stream_throttle" Nothing
 
@@ -74,9 +75,23 @@ state_psi = extern "stream_psi" Nothing
 
 state_dpsi :: SFloat
 state_dpsi = extern "stream_dpsi" Nothing
+--}
+
+thro_demand :: SFloat
+thro_demand= extern "stream_throttle" Nothing
+
+roll_PID :: SFloat
+roll_PID = extern "stream_roll_PID" Nothing
+
+pitch_PID :: SFloat
+pitch_PID = extern "stream_pitch_PID" Nothing
+
+yaw_PID :: SFloat
+yaw_PID = extern "stream_yaw_PID" Nothing
 
 step = motors where
 
+  {--
   state = State  0 
                  0 
                  0 
@@ -103,7 +118,9 @@ step = motors where
                                         (pitch_roll_demand_post_scale * (roll demands'))
                                         (pitch_roll_demand_post_scale * (pitch demands'))
                                         (yaw demands')
+  --}
 
+  motors = runBetaFlightQuadX $ Demands thro_demand roll_PID pitch_PID yaw_PID
 ------------------------------------------------------------------------------
  
 spec = do
