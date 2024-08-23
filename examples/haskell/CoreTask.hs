@@ -25,6 +25,7 @@ module CoreTask where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Angle2
 import Yaw
 import Demands
 import Mixers
@@ -35,7 +36,6 @@ import Utils
 
 dt :: SFloat
 dt = extern "stream_dt" Nothing
-
 
 reset :: SBool
 reset = extern "stream_reset" Nothing
@@ -67,21 +67,11 @@ gyroY = extern "stream_gyroY" Nothing
 gyroZ :: SFloat
 gyroZ = extern "stream_gyroZ" Nothing
 
-roll_PID :: SFloat
-roll_PID = extern "stream_roll_PID" Nothing
-
-pitch_PID :: SFloat
-pitch_PID = extern "stream_pitch_PID" Nothing
-
 ------------------------------------------------------------------------------
  
 spec = do
 
-    -- let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
-
-    --let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
-
-    --  let demands' = angleController dt state demands
+    let (roll_PID, pitch_PID) = angleController dt reset roll_demand pitch_demand phi' theta' gyroX gyroY
 
     let yaw_PID = yawController dt reset yaw_demand gyroZ
 

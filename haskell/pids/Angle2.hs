@@ -1,5 +1,5 @@
 {--
-  Yaw PID-control algorithm for real and simulated flight
+  Pitch/roll PID-control algorithm for real and simulated flight
   controllers
  
   Copyright (C) 2024 Simon D. Levy
@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module Yaw where
+module Angle2 where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -29,24 +29,31 @@ import Demands
 import State
 import Utils
 
+
 i_limit = 25.0 :: SFloat     
 
-kp = 0.003 :: SFloat           
-ki = 0.0005 :: SFloat          
-kd = 0.0000015 :: SFloat       
+kp = 0.002 :: SFloat    
+ki = 0.003 :: SFloat    
+kd = 0.0005 :: SFloat   
 
-yawController dt reset demand gyroZ = yaw_PID where
+runPitchRoll dt reset demand angle dangle integral =  (output, integral') where
 
-  error = demand - gyroZ
+    error = demand - angle
 
-  integral = constrain
-               (if reset then 0 else integral' + error * dt)
+    integral' = constrain
+               (if reset then 0 else integral + error * dt)
                (-i_limit) i_limit
 
-  derivative = (error - error') / dt
+    output = kp * error + ki * integral' - kd * dangle
 
-  yaw_PID = kp * error + ki * integral' - kd * derivative
 
-  integral' = [0] ++ integral
+angleController dt reset rollDemand pitchDemand phi' theta' dphi' dtheta' =
+  (rollDemand', pitchDemand') where
 
-  error' = [0] ++ error
+  (rollDemand', roll_integral) = runPitchRoll dt reset rollDemand phi' dphi' roll_integral'
+
+  roll_integral' = [0] ++ roll_integral
+
+  (pitchDemand', pitch_integral) = runPitchRoll dt reset pitchDemand theta' dtheta' pitch_integral'
+
+  pitch_integral' = [0] ++ pitch_integral
