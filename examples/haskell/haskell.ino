@@ -58,7 +58,6 @@ static MPU6050 _mpu6050;
 // PID control ---------------------------------------------------------------
 
 static hf::AnglePid _anglePid;
-static hf::YawPid _yawPid;
 
 // Das Blinkenlights ---------------------------------------------------------
 
@@ -266,6 +265,7 @@ static uint8_t scaleMotor(const float mval)
 // Shared with Haskell Copilot -----------------------------------------------
 
 float stream_dt;
+bool stream_reset;
 
 float stream_thro_demand;
 float stream_roll_demand;
@@ -378,12 +378,12 @@ void loop()
 
     // Run demands through PID controller
 
-    const auto reset = stream_thro_demand < 0.06;
+    stream_reset = stream_thro_demand < 0.06;
 
-    _anglePid.run(stream_dt, reset, stream_roll_demand, stream_pitch_demand, stream_phi, stream_theta,
+    _anglePid.run(stream_dt, stream_reset, stream_roll_demand, stream_pitch_demand, stream_phi, stream_theta,
             stream_gyroX, stream_gyroY, stream_roll_PID, stream_pitch_PID);
 
-    _yawPid.run(stream_dt, reset, stream_yaw_demand, stream_gyroZ, stream_yaw_PID);
+    //_yawPid.run(stream_dt, reset, stream_yaw_demand, stream_gyroZ, stream_yaw_PID);
  
     // Run Haskell Copilot, which will call setMotors() above
     void copilot_step_core();

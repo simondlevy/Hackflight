@@ -25,7 +25,7 @@ module CoreTask where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Angle
+import Yaw
 import Demands
 import Mixers
 import State
@@ -35,6 +35,10 @@ import Utils
 
 dt :: SFloat
 dt = extern "stream_dt" Nothing
+
+
+reset :: SBool
+reset = extern "stream_reset" Nothing
 
 thro_demand :: SFloat
 thro_demand = extern "stream_thro_demand" Nothing
@@ -69,18 +73,17 @@ roll_PID = extern "stream_roll_PID" Nothing
 pitch_PID :: SFloat
 pitch_PID = extern "stream_pitch_PID" Nothing
 
-yaw_PID :: SFloat
-yaw_PID = extern "stream_yaw_PID" Nothing
-
 ------------------------------------------------------------------------------
  
 spec = do
 
-    let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
+    -- let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
 
-    let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
+    --let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
 
-    let demands' = angleController dt state demands
+    --  let demands' = angleController dt state demands
+
+    let yaw_PID = yawController dt reset yaw_demand gyroZ
 
     let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands thro_demand 
                                                         roll_PID 

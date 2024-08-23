@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module Angle where
+module Yaw where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -36,19 +36,17 @@ kp = 0.003 :: SFloat
 ki = 0.0005 :: SFloat          
 kd = 0.0000015 :: SFloat       
 
-yawController dt reset state demands = demands' where
+yawController dt reset demand gyroZ = yaw_PID where
 
-  error' = (yaw demands) - (dpsi state)
+  error = demand - gyroZ
 
-  integral' = constrain
-               (if reset then 0 else integral + error' * dt)
+  integral = constrain
+               (if reset then 0 else integral' + error * dt)
                (-i_limit) i_limit
 
   derivative = (error - error') / dt
 
-  yaw' = kp * error + ki * integral' - kd * derivative
-
-  demands' = Demands (thrust demands) (roll demands) (pitch demands) yaw'
+  yaw_PID = kp * error + ki * integral' - kd * derivative
 
   integral' = [0] ++ integral
 
