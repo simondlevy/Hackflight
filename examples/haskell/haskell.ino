@@ -28,7 +28,6 @@
 
 #include <hackflight.hpp>
 #include <utils.hpp>
-#include <mixers.hpp>
 #include <tasks/blink.hpp>
 #include <pids/angle.hpp>
 
@@ -114,11 +113,11 @@ static void initImu()
 
 static void readImu(
         float & AccX, float & AccY, float & AccZ,
-        float & GyroX, float & GyroY, float & GyroZ
+        float & gyroX, float & gyroY, float & gyroZ
         ) 
 {
     static float AccX_prev, AccY_prev, AccZ_prev;
-    static float GyroX_prev, GyroY_prev, GyroZ_prev;
+    static float gyroX_prev, gyroY_prev, gyroZ_prev;
 
     int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
@@ -142,26 +141,26 @@ static void readImu(
     AccY_prev = AccY;
     AccZ_prev = AccZ;
 
-    // Gyro
-    GyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
-    GyroY = GyY / GYRO_SCALE_FACTOR;
-    GyroZ = GyZ / GYRO_SCALE_FACTOR;
+    // gyro
+    gyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
+    gyroY = GyY / GYRO_SCALE_FACTOR;
+    gyroZ = GyZ / GYRO_SCALE_FACTOR;
 
     // Correct the outputs with the calculated error values
-    GyroX = GyroX - GYRO_ERROR_X;
-    GyroY = GyroY - GYRO_ERROR_Y;
-    GyroZ = GyroZ - GYRO_ERROR_Z;
+    gyroX = gyroX - GYRO_ERROR_X;
+    gyroY = gyroY - GYRO_ERROR_Y;
+    gyroZ = gyroZ - GYRO_ERROR_Z;
 
     // LP filter gyro data
-    GyroX = (1.0 - B_gyro)*GyroX_prev + B_gyro*GyroX;
-    GyroY = (1.0 - B_gyro)*GyroY_prev + B_gyro*GyroY;
-    GyroZ = (1.0 - B_gyro)*GyroZ_prev + B_gyro*GyroZ;
-    GyroX_prev = GyroX;
-    GyroY_prev = GyroY;
-    GyroZ_prev = GyroZ;
+    gyroX = (1.0 - B_gyro)*gyroX_prev + B_gyro*gyroX;
+    gyroY = (1.0 - B_gyro)*gyroY_prev + B_gyro*gyroY;
+    gyroZ = (1.0 - B_gyro)*gyroZ_prev + B_gyro*gyroZ;
+    gyroX_prev = gyroX;
+    gyroY_prev = gyroY;
+    gyroZ_prev = gyroZ;
 
-    // Negate GyroZ for nose-right positive
-    GyroZ = -GyroZ;
+    // Negate gyroZ for nose-right positive
+    gyroZ = -gyroZ;
 }
 
 static void armMotor(uint8_t & m_usec)
@@ -266,9 +265,20 @@ static void blinkOnStartup(void)
 // Shared with Haskell Copilot -----------------------------------------------
 
 float stream_thro_demand;
+float stream_roll_demand;
+float stream_pitch_demand;
+float stream_yaw_demand;
+
 float stream_roll_PID;
 float stream_pitch_PID;
 float stream_yaw_PID;
+
+float stream_phi;
+float stream_theta;
+
+float stream_gyroX;
+float stream_gyroY;
+float stream_gyroZ;
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
@@ -343,36 +353,34 @@ void loop()
     //Get vehicle state
 
     float AccX = 0, AccY = 0, AccZ = 0;
-    float GyroX = 0, GyroY = 0, GyroZ = 0;
 
-    readImu(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
+    readImu(AccX, AccY, AccZ, stream_gyroX, stream_gyroY, stream_gyroZ); 
 
     // Get Euler angles from IMU (note negations)
-    float phi = 0, theta = 0, psi = 0;
-    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ, phi, theta, psi);
+    float psi=0; // unused
+    Madgwick6DOF(dt, 
+            stream_gyroX, -stream_gyroY, stream_gyroZ,
+            -AccX, AccY, AccZ,
+            stream_phi, stream_theta, psi);
 
     // Convert stick demands to appropriate intervals
     stream_thro_demand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    const float roll_demand = 
+    stream_roll_demand = 
         constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float pitch_demand =
+    stream_pitch_demand =
         constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float yaw_demand = 
+    stream_yaw_demand = 
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
     // Run demands through PID controller
     _anglePid.run(dt, stream_thro_demand, 
-            roll_demand, pitch_demand, yaw_demand, 
-            phi, theta,
-            GyroX, GyroY, GyroZ,
+            stream_roll_demand, stream_pitch_demand, stream_yaw_demand, 
+            stream_phi, stream_theta,
+            stream_gyroX, stream_gyroY, stream_gyroZ,
             stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
 
-    // Run motor mixer
-    //hf::Mixer::runBetaFlightQuadX(
-    //        stream_thro_demand, stream_roll_PID, stream_pitch_PID, stream_yaw_PID, 
-    //        _m1_command, _m2_command, _m3_command, _m4_command);
-
+    // Run Haskell Copilot, which will call setMotors() above
     void copilot_step_core();
     copilot_step_core();
 

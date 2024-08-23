@@ -34,6 +34,30 @@ import Utils
 thro_demand :: SFloat
 thro_demand = extern "stream_thro_demand" Nothing
 
+roll_demand :: SFloat
+roll_demand = extern "stream_roll_demand" Nothing
+
+pitch_demand :: SFloat
+pitch_demand = extern "stream_pitch_demand" Nothing
+
+yaw_demand :: SFloat
+yaw_demand = extern "stream_yaw_demand" Nothing
+
+phi :: SFloat
+phi = extern "stream_phi" Nothing
+
+theta :: SFloat
+theta = extern "stream_theta" Nothing
+
+gyroX :: SFloat
+gyroX = extern "stream_gyroX" Nothing
+
+gyroY :: SFloat
+gyroY = extern "stream_gyroY" Nothing
+
+gyroZ :: SFloat
+gyroZ = extern "stream_gyroZ" Nothing
+
 roll_PID :: SFloat
 roll_PID = extern "stream_roll_PID" Nothing
 

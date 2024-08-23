@@ -95,4 +95,3 @@ angleController dt state demands = demands' where
   yaw_error' = [0] ++ yaw_error
 
   demands' = Demands throttle roll' pitch' yaw'
-
