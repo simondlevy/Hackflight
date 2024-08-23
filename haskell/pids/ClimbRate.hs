@@ -24,7 +24,6 @@ module ClimbRate where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Constants
 import Pid
 import Demands
 import State

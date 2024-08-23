@@ -20,20 +20,17 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module CoreTask where
+module CoreTaskSim where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
 import Clock
-import Constants
 import Demands
 import Mixers
 import Sensors
 import State
 import Utils
-
-import Constants
 
 -- PID controllers
 import Angle
@@ -42,11 +39,13 @@ import Position
 
 -- Constants
 
-k_climbrate = 25 :: SFloat
+clock_rate = RATE_100_HZ
 
-thrust_takeoff = 56 :: SFloat
+tbase = 56 :: SFloat
 
-thrust_base = 55.385 :: SFloat
+tscale = 0.25 :: SFloat
+
+tmin = 0 :: SFloat
 
 pitch_roll_demand_post_scale = 30 :: SFloat -- deg
 

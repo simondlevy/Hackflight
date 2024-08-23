@@ -35,6 +35,7 @@ data ClockRate =
             | RATE_250_HZ
             | RATE_500_HZ
             | RATE_1000_HZ
+            | RATE_2000_HZ
 
 rateToPeriod :: ClockRate -> SFloat
 rateToPeriod rate = 1 / (rateToFloat rate)
@@ -48,3 +49,4 @@ rateToFloat RATE_100_HZ  = 100
 rateToFloat RATE_250_HZ  = 250
 rateToFloat RATE_500_HZ  = 500
 rateToFloat RATE_1000_HZ = 1000
+rateToFloat RATE_2000_HZ = 2000

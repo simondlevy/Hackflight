@@ -1,6 +1,5 @@
 CFLAGS = -Wno-unused-variable
 
-# Needed for datatypes.h
 CPPDIR = ../../../src
 INCLUDE = -I$(CPPDIR)
 
@@ -13,7 +12,7 @@ FILES_TO_REMOVE += copilot*
 all: haskell
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
-	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/CoreTask.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids CoreTaskSim.hs
 	mv copilot_core.c copilot_core.cpp
 
 size: copilot_core.cpp
