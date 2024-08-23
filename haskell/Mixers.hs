@@ -37,4 +37,3 @@ runBetaFlightQuadX demands = (m1, m2, m3, m4) where
    m2 = t - r - p  + y
    m3 = t + r + p  + y
    m4 = t + r - p  - y
- 

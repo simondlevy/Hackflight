@@ -73,6 +73,11 @@ static auto _motors = OneShot125(MOTOR_PINS);
 
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
+static float _m1_command, _m2_command, _m3_command, _m4_command;
+
+// ---------------------------------------------------------------------------
+
+
 //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
 static const float MAX_PITCH_ROLL_ANGLE = 30.0;    
 
@@ -267,6 +272,10 @@ float stream_yaw_PID;
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
+    //_m1_command = m1;
+    //_m2_command = m2;
+    //_m3_command = m3;
+    //_m4_command = m4;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -352,9 +361,6 @@ void loop()
     const float yaw_demand = 
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
-    void copilot_step_core();
-    copilot_step_core();
-
     // Run demands through PID controller
     _anglePid.run(dt, stream_thro_demand, 
             roll_demand, pitch_demand, yaw_demand, 
@@ -362,18 +368,19 @@ void loop()
             GyroX, GyroY, GyroZ,
             stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
 
-    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
-
     // Run motor mixer
     hf::Mixer::runBetaFlightQuadX(
             stream_thro_demand, stream_roll_PID, stream_pitch_PID, stream_yaw_PID, 
-            m1_command, m2_command, m3_command, m4_command);
+            _m1_command, _m2_command, _m3_command, _m4_command);
+
+    void copilot_step_core();
+    copilot_step_core();
 
     // Rescale motor values for OneShot125
-    _m1_usec = scaleMotor(m1_command);
-    _m2_usec = scaleMotor(m2_command);
-    _m3_usec = scaleMotor(m3_command);
-    _m4_usec = scaleMotor(m4_command);
+    _m1_usec = scaleMotor(_m1_command);
+    _m2_usec = scaleMotor(_m2_command);
+    _m3_usec = scaleMotor(_m3_command);
+    _m4_usec = scaleMotor(_m4_command);
 
     // Turn off motors under various conditions
     cutMotors(chan_5, _isArmed); 

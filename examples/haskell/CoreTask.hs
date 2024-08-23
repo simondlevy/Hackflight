@@ -44,19 +44,13 @@ yaw_PID :: SFloat
 yaw_PID = extern "stream_yaw_PID" Nothing
 
 ------------------------------------------------------------------------------
-
-step :: (SFloat, SFloat, SFloat, SFloat)
-
-step = motors where
-
-  motors = runBetaFlightQuadX $ Demands thro_demand roll_PID pitch_PID yaw_PID
-------------------------------------------------------------------------------
  
 spec = do
 
-    let motors = step
-
-    let (m1, m2, m3, m4) = motors
+    let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands thro_demand 
+                                                        roll_PID 
+                                                        pitch_PID 
+                                                        yaw_PID
 
     trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
 
