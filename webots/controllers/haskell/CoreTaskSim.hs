@@ -123,7 +123,7 @@ step = motors where
 
   pids = [climbRateController hitTakeoffButton completedTakeoff,
           positionController dt,
-          angleController dt throttle_stick]
+          angleController dt ]
 
   demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
