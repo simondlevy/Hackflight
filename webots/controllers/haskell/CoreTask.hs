@@ -101,9 +101,11 @@ state_psi = extern "stream_psi" Nothing
 state_dpsi :: SFloat
 state_dpsi = extern "stream_dpsi" Nothing
 
-step = motors where
+------------------------------------------------------------------------------
+ 
+spec = do
 
-  state = State  state_dx 
+    let state = State  state_dx 
                  state_dy 
                  state_z 
                  state_dz 
@@ -114,29 +116,24 @@ step = motors where
                  state_psi 
                  state_dpsi
 
-  stickDemands = Demands throttle_stick 
+    let stickDemands = Demands throttle_stick 
                  roll_stick 
                  pitch_stick 
                  (yaw_demand_pre_scale * yaw_stick)
 
-  dt = rateToPeriod clock_rate
+    let dt = rateToPeriod clock_rate
 
-  pids = [climbRateController hitTakeoffButton completedTakeoff,
+    let pids = [climbRateController hitTakeoffButton completedTakeoff,
           positionController dt,
           angleController dt ]
 
-  demands' = foldl (\demand pid -> pid state demand) stickDemands pids
+    let demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
-  motors = runBetaFlightQuadX $ Demands (thrust demands')
+    let motors = runBetaFlightQuadX $ Demands (thrust demands')
                                         (pitch_roll_demand_post_scale * (roll demands'))
                                         (pitch_roll_demand_post_scale * (pitch demands'))
                                         (yaw demands')
 
-------------------------------------------------------------------------------
- 
-spec = do
-
-    let motors = step
 
     let (m1, m2, m3, m4) = motors
 
