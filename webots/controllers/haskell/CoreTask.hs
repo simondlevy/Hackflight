@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module CoreTaskSim where
+module CoreTask where
 
 import Language.Copilot
 import Copilot.Compile.C99
