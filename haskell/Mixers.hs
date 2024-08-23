@@ -8,7 +8,7 @@
   the Free Software Foundation, in version 3.
  
   This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  but WITHOUT ANY WARRANTY without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   GNU General Public License for more details.
  
@@ -27,13 +27,14 @@ import Copilot.Compile.C99
 import Demands
 import Utils
 
-runQuadX :: Demands -> (SFloat, SFloat, SFloat, SFloat)
+runBetaFlightQuadX :: Demands -> (SFloat, SFloat, SFloat, SFloat)
 
-runQuadX demands = (nw, se, sw, ne) where 
+runBetaFlightQuadX demands = (m1, m2, m3, m4) where 
 
    (t, r, p, y) = getDemands demands
 
-   nw = t - r - p  + y
-   se = t - r + p  - y
-   sw = t + r + p  + y
-   ne = t + r - p  - y
+   m1 = t - r + p  - y
+   m2 = t - r - p  + y
+   m3 = t + r + p  + y
+   m4 = t + r - p  - y
+ 

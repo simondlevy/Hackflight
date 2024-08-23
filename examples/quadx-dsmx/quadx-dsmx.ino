@@ -67,11 +67,11 @@ static hf::BlinkTask _blinkTask;
 
 // Motors --------------------------------------------------------------------
 
-static const std::vector<uint8_t> MOTOR_PINS = { 5, 3, 2, 4 };
+static const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
 
 static auto _motors = OneShot125(MOTOR_PINS);
 
-static uint8_t _m_nw_usec, _m_ne_usec, _m_se_usec, _m_sw_usec;
+static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
 //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
 static const float MAX_PITCH_ROLL_ANGLE = 30.0;    
@@ -201,10 +201,10 @@ static void readReceiver(
 
 static void runMotors() 
 {
-    _motors.set(0, _m_nw_usec);
-    _motors.set(1, _m_ne_usec);
-    _motors.set(2, _m_se_usec);
-    _motors.set(3, _m_sw_usec);
+    _motors.set(0, _m1_usec);
+    _motors.set(1, _m2_usec);
+    _motors.set(2, _m3_usec);
+    _motors.set(3, _m4_usec);
 
     _motors.run();
 }
@@ -213,10 +213,10 @@ static void cutMotors(const uint32_t chan_5, bool & isArmed)
 {
     if (chan_5 < 1500 || !isArmed) {
         isArmed = false;
-        _m_nw_usec = 120;
-        _m_ne_usec = 120;
-        _m_se_usec = 120;
-        _m_sw_usec = 120;
+        _m1_usec = 120;
+        _m2_usec = 120;
+        _m3_usec = 120;
+        _m4_usec = 120;
 
     }
 }
@@ -281,10 +281,10 @@ void setup() {
     delay(5);
 
     // Arm OneShot125 motors
-    armMotor(_m_nw_usec);
-    armMotor(_m_ne_usec);
-    armMotor(_m_se_usec);
-    armMotor(_m_sw_usec);
+    armMotor(_m4_usec);
+    armMotor(_m2_usec);
+    armMotor(_m1_usec);
+    armMotor(_m3_usec);
     _motors.arm();
 
     // Indicate entering main loop with some quick blinks
@@ -349,17 +349,17 @@ void loop()
             GyroX, GyroY, GyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
-    float m_nw_command=0, m_ne_command=0, m_se_command=0, m_sw_command=0;
+    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
     // Run motor mixer
-    hf::Mixer::runDF(thro_demand, roll_PID, pitch_PID, yaw_PID, 
-            m_nw_command, m_ne_command, m_se_command, m_sw_command);
+    hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
+            m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125
-    _m_nw_usec = scaleMotor(m_nw_command);
-    _m_ne_usec = scaleMotor(m_ne_command);
-    _m_se_usec = scaleMotor(m_se_command);
-    _m_sw_usec = scaleMotor(m_sw_command);
+    _m1_usec = scaleMotor(m1_command);
+    _m2_usec = scaleMotor(m2_command);
+    _m3_usec = scaleMotor(m3_command);
+    _m4_usec = scaleMotor(m4_command);
 
     // Turn off motors under various conditions
     cutMotors(chan_5, _isArmed); 

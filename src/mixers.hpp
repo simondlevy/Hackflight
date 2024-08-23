@@ -26,34 +26,15 @@ namespace hf {
 
         public:
 
-            /*
-               dRehmFlight QuadX:
-
-               1     2
-                  x
-               4     3
-
-             */
-            static void runDF(
+            static void runBetaFlightQuadX(
                     const float t, const float r, const float p, const float y,
-                    float & nw, float & ne, float & se, float & sw)
+                    float & m1, float & m2, float & m3, float & m4)
             {
-                nw = t + r - p  - y;
-                ne = t - r - p  + y;
-                se = t - r + p  - y;
-                sw = t + r + p  + y;
+                m1 = t - r + p  - y;
+                m2 = t - r - p  + y;
+                m3 = t + r + p  + y;
+                m4 = t + r - p  - y;
             }
-
-            static void runQuadX(
-                    const float t, const float r, const float p, const float y,
-                    float & nw, float & se, float & sw, float & ne)
-            {
-                nw = t - r - p  + y;
-                se = t - r + p  - y;
-                sw = t + r + p  + y;
-                ne = t + r - p  - y;
-            }
-
      };
 
 }

@@ -51,9 +51,9 @@ void debug(float value)
 
 void copilot_step_core(void);
 
-void setMotors(float nw, float se, float sw, float ne)
+void setMotors(float m1, float m2, float m3, float m4)
 {
-    _sim.setMotors(nw, se, sw, ne);
+    _sim.setMotors(m1, m2, m3, m4);
 }
 
 // ---------------------------------------------------------------------------

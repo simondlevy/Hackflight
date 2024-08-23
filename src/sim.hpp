@@ -61,10 +61,10 @@ namespace hf {
                 wb_joystick_enable(_timestep);
                 wb_keyboard_enable(_timestep);
 
-                _motor_nw = _makeMotor("motor_nw");
-                _motor_se = _makeMotor("motor_se");
-                _motor_sw = _makeMotor("motor_sw");
-                _motor_ne = _makeMotor("motor_ne");
+                _motor1 = _makeMotor("motor1");
+                _motor2 = _makeMotor("motor2");
+                _motor3 = _makeMotor("motor3");
+                _motor4 = _makeMotor("motor4");
             }
 
             bool step()
@@ -221,15 +221,17 @@ namespace hf {
             }
 
             void setMotors(
-                    const float nw, 
-                    const float se, 
-                    const float sw, 
-                    const float ne)
+                    const float m1, 
+                    const float m2, 
+                    const float m3, 
+                    const float m4)
             {
-                wb_motor_set_velocity(_motor_nw, +nw);
-                wb_motor_set_velocity(_motor_se, -se);
-                wb_motor_set_velocity(_motor_sw, +sw);
-                wb_motor_set_velocity(_motor_ne, -ne);
+                // Negate expected direction to accommodate Webots
+                // counterclockwise positive
+                wb_motor_set_velocity(_motor1, -m1);
+                wb_motor_set_velocity(_motor2, +m2);
+                wb_motor_set_velocity(_motor3, +m3);
+                wb_motor_set_velocity(_motor4, -m4);
             }
 
             void close(void)
@@ -279,10 +281,10 @@ namespace hf {
 
             uint32_t _tick;
                 
-            WbDeviceTag _motor_nw;
-            WbDeviceTag _motor_se;
-            WbDeviceTag _motor_sw;
-            WbDeviceTag _motor_ne;
+            WbDeviceTag _motor1;
+            WbDeviceTag _motor2;
+            WbDeviceTag _motor3;
+            WbDeviceTag _motor4;
 
             WbDeviceTag _camera;
             WbDeviceTag _gps;

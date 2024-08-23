@@ -40,7 +40,8 @@ DEF ROBOT Robot {
         name "inertial_unit"
     }
 
-    DEF FASTHELIX_NORTH Shape {
+    # Motor blur for front motors
+    DEF FASTHELIX_FRONT Shape {
         appearance PBRAppearance {
             baseColor 0.1 0.1 0.1
                 baseColorMap ImageTexture {
@@ -56,7 +57,8 @@ DEF ROBOT Robot {
         }
     }
 
-    DEF FASTHELIX_SOUTH Shape {
+    # Motor blur for rear motors
+    DEF FASTHELIX_BACK Shape {
         appearance PBRAppearance {
             baseColor 0.4 0.0 0.0
                 baseColorMap ImageTexture {
@@ -72,41 +74,7 @@ DEF ROBOT Robot {
         }
     }
 
-    # Northeast prop/motor
-    Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust 0.031 -0.031 0.008  
-            thrustConstants 4e-05 0               
-            torqueConstants 2.4e-06 0            
-            fastHelixThreshold 50                 
-            device RotationalMotor {
-                name "motor_nw"
-                    maxVelocity 100                     
-                    maxTorque 30                        
-            }
-        fastHelix Solid {
-            translation 0.031 -0.031 0.008
-                children [ USE FASTHELIX_NORTH ]
-        }
-        slowHelix Solid {
-            translation 0.031 -0.031 0.008
-                children [
-                    Shape {
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0 0 0
-                                metalness 0.3
-                        }
-                        geometry Mesh {
-                            url [
-                                "../meshes/collada_files/ccw_prop.dae"
-                            ]
-                        }
-                    }
-                ]
-        }
-    }
-
-    # Southeast prop/motor
+    # Motor 1
     Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 -0.031 0.008
@@ -114,13 +82,13 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
             device RotationalMotor {
-                name "motor_se"
+                name "motor1"
                     maxVelocity 100
                     maxTorque 30
             }
         fastHelix Solid {
             translation -0.031 -0.031 0.008
-                children [ USE FASTHELIX_SOUTH ]
+                children [ USE FASTHELIX_BACK ]
         }
         slowHelix Solid {
             translation -0.031 -0.031 0.008
@@ -141,7 +109,41 @@ DEF ROBOT Robot {
         }
     }
 
-    # Southwest prop/motor
+    # Motor 2
+    Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust 0.031 -0.031 0.008  
+            thrustConstants 4e-05 0               
+            torqueConstants 2.4e-06 0            
+            fastHelixThreshold 50                 
+            device RotationalMotor {
+                name "motor2"
+                    maxVelocity 100                     
+                    maxTorque 30                        
+            }
+        fastHelix Solid {
+            translation 0.031 -0.031 0.008
+                children [ USE FASTHELIX_FRONT ]
+        }
+        slowHelix Solid {
+            translation 0.031 -0.031 0.008
+                children [
+                    Shape {
+                        appearance DEF PLASTIC PBRAppearance {
+                            baseColor 0 0 0
+                                metalness 0.3
+                        }
+                        geometry Mesh {
+                            url [
+                                "../meshes/collada_files/ccw_prop.dae"
+                            ]
+                        }
+                    }
+                ]
+        }
+    }
+
+    # Motor 3
     Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 0.031 0.008
@@ -149,13 +151,13 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
             device RotationalMotor {
-                name "motor_sw"
+                name "motor3"
                     maxVelocity 100
                     maxTorque 30
             }
         fastHelix Solid {
             translation -0.031 0.031 0.008
-                children [ USE FASTHELIX_SOUTH ]
+                children [ USE FASTHELIX_BACK ]
         }
         slowHelix Solid {
             translation -0.031 0.031 0.008
@@ -176,7 +178,7 @@ DEF ROBOT Robot {
         }
     }
 
-    # Northest prop/motor
+    # Motor 4
     Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 0.031 0.008
@@ -184,13 +186,13 @@ DEF ROBOT Robot {
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
             device RotationalMotor {
-                name "motor_ne"
+                name "motor4"
                     maxVelocity 100  # rad/sec
                     maxTorque 30
             }
         fastHelix Solid {
             translation 0.031 0.031 0.008
-                children [ USE FASTHELIX_NORTH ]
+                children [ USE FASTHELIX_FRONT ]
         }
         slowHelix DEF PROP Solid {
             translation 0.031 0.031 0.007
