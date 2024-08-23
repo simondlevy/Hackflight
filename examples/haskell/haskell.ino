@@ -256,7 +256,14 @@ static void blinkOnStartup(void)
     }
 }
 
+static uint8_t scaleMotor(const float mval)
+{
+    return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
+
+}
 // Shared with Haskell Copilot -----------------------------------------------
+
+float stream_dt;
 
 float stream_thro_demand;
 float stream_roll_demand;
@@ -274,11 +281,6 @@ float stream_gyroX;
 float stream_gyroY;
 float stream_gyroZ;
 
-static uint8_t scaleMotor(const float mval)
-{
-    return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
-
-}
 void setMotors(float m1, float m2, float m3, float m4)
 {
     _m1_usec = scaleMotor(m1);
@@ -331,7 +333,7 @@ void loop()
     // Keep track of what time it is and how much time has elapsed since the last loop
     const auto usec_curr = micros();      
     static uint32_t _usec_prev;
-    const float dt = (usec_curr - _usec_prev)/1000000.0;
+    stream_dt = (usec_curr - _usec_prev)/1000000.0;
     _usec_prev = usec_curr;      
 
     // Arm vehicle if safe
@@ -357,7 +359,7 @@ void loop()
 
     // Get Euler angles from IMU (note negations)
     float psi=0; // unused
-    Madgwick6DOF(dt, 
+    Madgwick6DOF(stream_dt, 
             stream_gyroX, -stream_gyroY, stream_gyroZ,
             -AccX, AccY, AccZ,
             stream_phi, stream_theta, psi);
@@ -373,7 +375,7 @@ void loop()
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
     // Run demands through PID controller
-    _anglePid.run(dt, stream_thro_demand, 
+    _anglePid.run(stream_dt, stream_thro_demand, 
             stream_roll_demand, stream_pitch_demand, stream_yaw_demand, 
             stream_phi, stream_theta,
             stream_gyroX, stream_gyroY, stream_gyroZ,

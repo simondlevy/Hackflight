@@ -32,6 +32,9 @@ import Utils
 
 -- Streams from C++ ----------------------------------------------------------
 
+dt :: SFloat
+dt = extern "stream_dt" Nothing
+
 thro_demand :: SFloat
 thro_demand = extern "stream_thro_demand" Nothing
 
