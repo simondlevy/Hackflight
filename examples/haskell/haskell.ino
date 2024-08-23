@@ -29,7 +29,8 @@
 #include <hackflight.hpp>
 #include <utils.hpp>
 #include <tasks/blink.hpp>
-#include <pids/angle.hpp>
+#include <pids/angle2.hpp>
+#include <pids/yaw.hpp>
 
 // Receiver -------------------------------------------------------------------
 
@@ -57,6 +58,7 @@ static MPU6050 _mpu6050;
 // PID control ---------------------------------------------------------------
 
 static hf::AnglePid _anglePid;
+static hf::YawPid _yawPid;
 
 // Das Blinkenlights ---------------------------------------------------------
 
@@ -375,12 +377,14 @@ void loop()
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
 
     // Run demands through PID controller
-    _anglePid.run(stream_dt, stream_thro_demand, 
-            stream_roll_demand, stream_pitch_demand, stream_yaw_demand,
-            stream_phi, stream_theta,
-            stream_gyroX, stream_gyroY, stream_gyroZ,
-            stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
 
+    const auto reset = stream_thro_demand < 0.06;
+
+    _anglePid.run(stream_dt, reset, stream_roll_demand, stream_pitch_demand, stream_phi, stream_theta,
+            stream_gyroX, stream_gyroY, stream_roll_PID, stream_pitch_PID);
+
+    _yawPid.run(stream_dt, reset, stream_yaw_demand, stream_gyroZ, stream_yaw_PID);
+ 
     // Run Haskell Copilot, which will call setMotors() above
     void copilot_step_core();
     copilot_step_core();
