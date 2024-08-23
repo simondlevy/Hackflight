@@ -272,10 +272,10 @@ float stream_yaw_PID;
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    //_m1_command = m1;
-    //_m2_command = m2;
-    //_m3_command = m3;
-    //_m4_command = m4;
+    _m1_command = m1;
+    _m2_command = m2;
+    _m3_command = m3;
+    _m4_command = m4;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -369,9 +369,9 @@ void loop()
             stream_roll_PID, stream_pitch_PID, stream_yaw_PID);
 
     // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(
-            stream_thro_demand, stream_roll_PID, stream_pitch_PID, stream_yaw_PID, 
-            _m1_command, _m2_command, _m3_command, _m4_command);
+    //hf::Mixer::runBetaFlightQuadX(
+    //        stream_thro_demand, stream_roll_PID, stream_pitch_PID, stream_yaw_PID, 
+    //        _m1_command, _m2_command, _m3_command, _m4_command);
 
     void copilot_step_core();
     copilot_step_core();
