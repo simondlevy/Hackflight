@@ -20,25 +20,15 @@
 
 #include <pids/angle.hpp>
 #include <pids/climbrate.hpp>
+#include <pids/position.hpp>
 
 static const float DT = 0.01;
-
-static const float K_PITCH_ROLL_ANGLE = 6;
-static const float K_PITCH_ROLL_RATE = 0.0125;
-
-static const float K_CLIMBRATE = 25;
-
-static const float K_POSITION = 10;
 
 static const float YAW_ANGLE_MAX = 200;
 
 static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
 
 static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
-
-static const float THRUST_TAKEOFF = 56;
-
-static const float THRUST_BASE = 55.385;
 
 int main(int argc, char ** argv)
 {
@@ -62,17 +52,11 @@ int main(int argc, char ** argv)
                 sim.throttle(),
                 sim.dz());
 
-        /*
-        const auto thrust_demand = 
-            sim.completedTakeoff() ? 
-            THRUST_BASE + K_CLIMBRATE *  (sim.throttle() - sim.dz()) :
-            sim.hitTakeoffButton() ? 
-            THRUST_TAKEOFF :
-            0;*/
+        float roll_demand = 0;
+        float pitch_demand = 0;
 
-        auto roll_demand = K_POSITION * (sim.roll() - sim.dy());
-
-        auto pitch_demand = K_POSITION * (sim.pitch() - sim.dx());
+        hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
+                roll_demand, pitch_demand);
 
         auto yaw_demand = sim.yaw() * YAW_DEMAND_PRE_SCALE;
 
