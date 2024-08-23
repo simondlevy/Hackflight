@@ -11,7 +11,7 @@ FILES_TO_REMOVE += copilot*
 
 all: haskell
 
-copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
+copilot_core.cpp : CoreTask.hs $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids CoreTask.hs
 	mv copilot_core.c copilot_core.cpp
 

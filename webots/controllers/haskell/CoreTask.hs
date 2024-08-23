@@ -129,13 +129,11 @@ spec = do
 
     let demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
-    let motors = runBetaFlightQuadX $ Demands (thrust demands')
+    let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands (thrust demands')
                                         (pitch_roll_demand_post_scale * (roll demands'))
                                         (pitch_roll_demand_post_scale * (pitch demands'))
                                         (yaw demands')
 
-
-    let (m1, m2, m3, m4) = motors
 
     trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
 
