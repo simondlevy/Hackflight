@@ -258,6 +258,12 @@ static void blinkOnStartup(void)
     }
 }
 
+// Shared with Haskell Copilot -----------------------------------------------
+
+void setMotors(float m1, float m2, float m3, float m4)
+{
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() {
@@ -340,6 +346,9 @@ void loop()
         constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
     const float yaw_demand = 
         constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
+
+    void copilot_step_core();
+    copilot_step_core();
 
     // Run demands through PID controller
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
