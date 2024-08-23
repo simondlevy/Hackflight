@@ -19,6 +19,7 @@
 #include <mixers.hpp>
 
 #include <pids/angle.hpp>
+#include <pids/climbrate.hpp>
 
 static const float DT = 0.01;
 
@@ -55,12 +56,19 @@ int main(int argc, char ** argv)
 
         hf::quad_motors_t motors = {};
 
+        const auto thrust_demand = hf::ClimbRatePid::run(
+                sim.hitTakeoffButton(),
+                sim.completedTakeoff(),
+                sim.throttle(),
+                sim.dz());
+
+        /*
         const auto thrust_demand = 
             sim.completedTakeoff() ? 
             THRUST_BASE + K_CLIMBRATE *  (sim.throttle() - sim.dz()) :
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
-            0;
+            0;*/
 
         auto roll_demand = K_POSITION * (sim.roll() - sim.dy());
 
