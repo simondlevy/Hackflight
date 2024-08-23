@@ -25,15 +25,31 @@ module CoreTask where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Demands
+import Mixers
 import Utils
 
 -- Streams from C++ ----------------------------------------------------------
+
+thro_demand :: SFloat
+thro_demand = extern "stream_thro_demand" Nothing
+
+roll_PID :: SFloat
+roll_PID = extern "stream_roll_PID" Nothing
+
+pitch_PID :: SFloat
+pitch_PID = extern "stream_pitch_PID" Nothing
+
+yaw_PID :: SFloat
+yaw_PID = extern "stream_yaw_PID" Nothing
+
+------------------------------------------------------------------------------
 
 step :: (SFloat, SFloat, SFloat, SFloat)
 
 step = motors where
 
-  motors = (0, 0, 0, 0)
+  motors = runBetaFlightQuadX $ Demands thro_demand roll_PID pitch_PID yaw_PID
 ------------------------------------------------------------------------------
  
 spec = do
