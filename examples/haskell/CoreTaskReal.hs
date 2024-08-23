@@ -95,7 +95,7 @@ step = motors where
 
   dt = rateToPeriod clock_rate
 
-  pids = [ angleController dt throttle_stick]
+  pids = [ angleController dt ]
 
   demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 

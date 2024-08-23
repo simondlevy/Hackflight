@@ -19,7 +19,7 @@ flash:
 	arduino-cli upload -p $(PORT) --fqbn $(BOARD) .
 
 clean:
-	rm -rf obj
+	rm -rf copilot*
 
 edit:
 	vim $(SKETCH).ino
