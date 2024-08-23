@@ -41,7 +41,7 @@ run kp dt target actual = demand where
 
 positionController dt state demands = demands'  where
 
-  kp = 25
+  kp = 10
     
   rollDemand = run kp dt (roll demands) (dy state)
 
