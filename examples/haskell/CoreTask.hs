@@ -76,13 +76,11 @@ yaw_PID = extern "stream_yaw_PID" Nothing
  
 spec = do
 
+    let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
+
     let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
 
-    let state = State 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
-
-    let pids = [angleController dt]
-
-    -- let demands' = foldl (\demand pid -> pid state demand) demands pids
+    let demands' = angleController dt state demands
 
     let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands thro_demand 
                                                         roll_PID 
