@@ -25,7 +25,7 @@ module CoreTask where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Angle2
+import Angle
 import Demands
 import Mixers
 import State

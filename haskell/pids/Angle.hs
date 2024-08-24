@@ -1,5 +1,5 @@
 {--
-  Pitch/roll/yaw PID-control algorithm for real and simulated flight
+  Pitch/roll PID-control algorithm for real and simulated flight
   controllers
  
   Copyright (C) 2024 Simon D. Levy
@@ -29,7 +29,6 @@ import Demands
 import State
 import Utils
 
-
 i_limit = 25.0 :: SFloat     
 
 kp_pitch_roll = 0.002 :: SFloat    
@@ -40,8 +39,6 @@ kp_yaw = 0.003 :: SFloat
 ki_yaw = 0.0005 :: SFloat          
 kd_yaw = 0.0000015 :: SFloat       
 
-throttle_down = 0.06 :: SFloat
-
 runPitchRoll dt reset demand angle dangle integral =  (output, integral') where
 
     error = demand - angle
@@ -50,48 +47,34 @@ runPitchRoll dt reset demand angle dangle integral =  (output, integral') where
                (if reset then 0 else integral + error * dt)
                (-i_limit) i_limit
 
-    output = kp_pitch_roll * error +
-             ki_pitch_roll * integral' - 
-             kd_pitch_roll * dangle
+    output = kp_pitch_roll * error + ki_pitch_roll * integral' - kd_pitch_roll * dangle
 
 
-runYaw dt reset demand angle dangle integral error =  
-  (output, integral', error') where
+runYaw dt reset demand dpsi' = yaw_PID where
 
-    error' = demand - dangle
+  error = demand - dpsi'
 
-    integral' = constrain
-               (if reset then 0 else integral + error' * dt)
+  integral = constrain
+               (if reset then 0 else integral' + error * dt)
                (-i_limit) i_limit
 
-    derivative = (error - error') / dt;
+  derivative = (error - error') / dt
 
-    output = kp_yaw * error + ki_yaw * integral' - kd_yaw * derivative
+  yaw_PID = kp_yaw * error + ki_yaw * integral' - kd_yaw * derivative
 
+  integral' = [0] ++ integral
 
-angleController dt state demands = demands' where
+  error' = [0] ++ error
 
-  throttle = thrust demands
+angleController dt reset rollDemand pitchDemand yawDemand phi' theta' dphi' dtheta' dpsi' =
+  (rollDemand', pitchDemand', yawDemand') where
 
-  reset = throttle < throttle_down
-
-  (roll', roll_integral) = 
-    runPitchRoll dt reset (roll demands) (phi state) (dphi state) 
-                 roll_integral'
+  (rollDemand', roll_integral) = runPitchRoll dt reset rollDemand phi' dphi' roll_integral'
 
   roll_integral' = [0] ++ roll_integral
 
-  (pitch', pitch_integral) = 
-    runPitchRoll dt reset (pitch demands) (theta state) (dtheta state) 
-                 pitch_integral'
+  (pitchDemand', pitch_integral) = runPitchRoll dt reset pitchDemand theta' dtheta' pitch_integral'
+
+  yawDemand' = runYaw dt reset yawDemand dpsi'
 
   pitch_integral' = [0] ++ pitch_integral
-
-  (yaw', yaw_integral, yaw_error) = 
-    runYaw dt reset (yaw demands) (psi state) (dpsi state) 
-      yaw_integral' yaw_error'
-
-  yaw_integral' = [0] ++ yaw_integral
-  yaw_error' = [0] ++ yaw_error
-
-  demands' = Demands throttle roll' pitch' yaw'
