@@ -69,12 +69,10 @@ spec = do
 
     let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
 
-    let (roll_PID, pitch_PID, yaw_PID) = angleController dt demands
-                                                         phi'
-                                                         theta'
-                                                         gyroX
-                                                         gyroY
-                                                         gyroZ
+    -- Unspecified: dz, dy, z, dz, psi
+    let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
+
+    let (roll_PID, pitch_PID, yaw_PID) = angleController dt demands state
 
     let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands thro_demand 
                                                         roll_PID 
