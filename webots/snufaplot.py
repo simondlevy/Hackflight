@@ -16,26 +16,27 @@ def main():
     dphi = data[:, 4]
     output = data[:, 5]
 
-    plt.subplot(3, 1, 1)
+    plt.subplot(4, 1, 1)
     plt.plot(time, setpoint)
     plt.plot(time, dy)
     plt.xticks([], [])
-    plt.ylabel('m/s')
+    plt.ylabel('Velocity (m/s)')
     plt.legend(['Target', 'Actual'])
 
-    '''
-    plt.subplot(3, 1, 2)
+    plt.subplot(4, 1, 2)
     plt.plot(time, phi)
     plt.xticks([], [])
     plt.ylabel('Angle (deg)')
-    plt.xlim([lotime, time[-1]])
 
-    plt.subplot(3, 1, 3)
+    plt.subplot(4, 1, 3)
     plt.plot(time, dphi)
+    plt.xticks([], [])
+    plt.ylabel('Ang. vel. (deg/s)')
+
+    plt.subplot(4, 1, 4)
+    plt.plot(time, output)
     plt.xlabel('Time (sec)')
-    plt.ylabel('Angular velocity (deg/sec)')
-    plt.xlim([lotime, time[-1]])
-    '''
+    plt.ylabel('Output')
 
     plt.show()
 
