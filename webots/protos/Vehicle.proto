@@ -45,10 +45,10 @@ DEF ROBOT Robot {
         name "inertial_unit"
     }
 
-    # Motor 1
+    # Motor 1 ----------------------------------------------------------------
     Propeller {
         shaftAxis 0 0 1
-            centerOfThrust -0.031 -0.031 0.008
+            centerOfThrust -0.031 -0.031 0.016
             thrustConstants -4e-05 0
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
@@ -59,7 +59,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
 
-            translation -0.031 -0.031 0.008
+            translation -0.031 -0.031 0.016
 
                 children [ 
 
@@ -82,7 +82,7 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation -0.031 -0.031 0.008
+            translation -0.031 -0.031 0.016
                 children [
                     Shape {
                         appearance DEF PLASTIC PBRAppearance {
@@ -100,10 +100,10 @@ DEF ROBOT Robot {
         }
     }
 
-    # Motor 2
+    # Motor 2 ----------------------------------------------------------------
     Propeller {
         shaftAxis 0 0 1
-            centerOfThrust 0.031 -0.031 0.008  
+            centerOfThrust 0.031 -0.031 0.016  
             thrustConstants 4e-05 0               
             torqueConstants 2.4e-06 0            
             fastHelixThreshold 50                 
@@ -113,7 +113,7 @@ DEF ROBOT Robot {
                     maxTorque 30                        
             }
         fastHelix Solid {
-            translation 0.031 -0.031 0.008
+            translation 0.031 -0.031 0.016
                 children [ 
 
                 Shape {
@@ -135,7 +135,7 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation 0.031 -0.031 0.008
+            translation 0.031 -0.031 0.016
                 children [
                     Shape {
                         appearance DEF PLASTIC PBRAppearance {
@@ -152,10 +152,10 @@ DEF ROBOT Robot {
         }
     }
 
-    # Motor 3
+    # Motor 3 ----------------------------------------------------------------
     Propeller {
         shaftAxis 0 0 1
-            centerOfThrust -0.031 0.031 0.008
+            centerOfThrust -0.031 0.031 0.016
             thrustConstants 4e-05 0
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
@@ -165,7 +165,7 @@ DEF ROBOT Robot {
                     maxTorque 30
             }
         fastHelix Solid {
-            translation -0.031 0.031 0.008
+            translation -0.031 0.031 0.016
                 children [ 
                   
                 Shape {
@@ -187,7 +187,7 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation -0.031 0.031 0.008
+            translation -0.031 0.031 0.016
                 children [
                     Shape {
                         appearance DEF PLASTIC PBRAppearance {
@@ -205,10 +205,10 @@ DEF ROBOT Robot {
         }
     }
 
-    # Motor 4
+    # Motor 4 ----------------------------------------------------------------
     Propeller {
         shaftAxis 0 0 1
-            centerOfThrust 0.031 0.031 0.008
+            centerOfThrust 0.031 0.031 0.016
             thrustConstants -4e-05 0
             torqueConstants 2.4e-06 0
             fastHelixThreshold 50
@@ -218,7 +218,7 @@ DEF ROBOT Robot {
                     maxTorque 30
             }
         fastHelix Solid {
-            translation 0.031 0.031 0.008
+            translation 0.031 0.031 0.016
                 children [
 
                 Shape {
@@ -241,7 +241,7 @@ DEF ROBOT Robot {
                 ] 
         }
         slowHelix DEF PROP Solid {
-            translation 0.031 0.031 0.007
+            translation 0.031 0.031 0.016
                 children [
                     Shape {
                         appearance DEF PLASTIC PBRAppearance {
