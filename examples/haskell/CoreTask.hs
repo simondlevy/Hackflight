@@ -67,11 +67,9 @@ gyroZ = extern "stream_gyroZ" Nothing
  
 spec = do
 
-    let (roll_PID, pitch_PID, yaw_PID) = angleController dt
-                                                         thro_demand
-                                                         roll_demand
-                                                         pitch_demand
-                                                         yaw_demand
+    let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
+
+    let (roll_PID, pitch_PID, yaw_PID) = angleController dt demands
                                                          phi'
                                                          theta'
                                                          gyroX

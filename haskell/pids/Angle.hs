@@ -68,10 +68,13 @@ runYaw dt reset demand dpsi' = yaw_PID where
 
   error' = [0] ++ error
 
-angleController dt 
-                throttle_demand roll_demand pitch_demand yaw_demand 
-                phi' theta' dphi' dtheta' dpsi' =
+angleController dt demands phi' theta' dphi' dtheta' dpsi' =
   (roll_demand', pitch_demand', yaw_demand') where
+
+  throttle_demand = thrust demands
+  roll_demand = roll demands
+  pitch_demand = pitch demands
+  yaw_demand = yaw demands
 
   reset = throttle_demand < throttle_down
 
