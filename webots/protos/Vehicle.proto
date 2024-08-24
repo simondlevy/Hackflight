@@ -17,7 +17,7 @@ DEF ROBOT Robot {
         children [
 
         DEF BODY Pose {
-            translation 0 0 -0.015
+            translation 0 0 0
                 children [
 
                 CadShape {
@@ -58,6 +58,7 @@ DEF ROBOT Robot {
                     maxTorque 30
             }
         fastHelix Solid {
+
             translation -0.031 -0.031 0.008
 
                 children [ 
