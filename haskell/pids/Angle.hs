@@ -1,5 +1,5 @@
 {--
-  Pitch/roll PID-control algorithm for real and simulated flight
+  Pitch/roll/yaw PID-control algorithm for real and simulated flight
   controllers
  
   Copyright (C) 2024 Simon D. Levy
@@ -68,7 +68,7 @@ runYaw dt reset demand dpsi' = yaw_PID where
 
   error' = [0] ++ error
 
-angleController dt demands state = (roll_demand', pitch_demand', yaw_demand') where
+angleController dt demands state = demands' where
 
   throttle_demand = thrust demands
 
@@ -85,3 +85,5 @@ angleController dt demands state = (roll_demand', pitch_demand', yaw_demand') wh
   yaw_demand' = runYaw dt reset (yaw demands) (dpsi state)
 
   pitch_integral' = [0] ++ pitch_integral
+
+  demands' = Demands throttle_demand roll_demand' pitch_demand' yaw_demand'

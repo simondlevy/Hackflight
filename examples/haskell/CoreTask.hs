@@ -72,12 +72,12 @@ spec = do
     -- Unspecified: dz, dy, z, dz, psi
     let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
 
-    let (roll_PID, pitch_PID, yaw_PID) = angleController dt demands state
+    let demands' = angleController dt demands state
 
-    let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands thro_demand 
-                                                        roll_PID 
-                                                        pitch_PID 
-                                                        yaw_PID
+    let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands (thrust demands')
+                                                        (roll demands') 
+                                                        (pitch demands') 
+                                                        (yaw demands')
 
     trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
 
