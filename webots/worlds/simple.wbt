@@ -3,14 +3,14 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
-EXTERNPROTO "../protos/Standard.proto"
+EXTERNPROTO "../protos/Vehicle.proto"
 
 WorldInfo {
 }
 Viewpoint {
   orientation 0 1 -1.0656348786755114e-16 0.749999999999997
   position -1.3067309323898773 -0.07692169747579411 1.2607778743833806
-  follow "Crazyflie"
+  follow "Vehicle"
 }
 TexturedBackground {
 }
@@ -18,5 +18,5 @@ TexturedBackgroundLight {
 }
 Floor {
 }
-DEF ROBOT Standard {
+DEF ROBOT Vehicle {
 }

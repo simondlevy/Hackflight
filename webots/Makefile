@@ -23,16 +23,16 @@ VIZ_PORT = 8100
 
 
 cplusplus:
-	webots worlds/standard.wbt &
+	webots worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
 
 haskell:
-	webots worlds/standard.wbt &
+	webots worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
 
 snn-takeoff:
 
-	@webots worlds/standard.wbt &
+	@webots worlds/simple.wbt &
 
 	@/usr/local/webots/webots-controller controllers/snn-takeoff/snn-takeoff $(TAKEOFF_NETWORK) & 
 	
@@ -44,7 +44,7 @@ snn-takeoff:
 
 snn-climbrate:
 
-	@webots worlds/standard.wbt &
+	@webots worlds/simple.wbt &
 
 	@/usr/local/webots/webots-controller controllers/snn-climbrate/snn-climbrate $(CLIMBRATE_NETWORK) &
 

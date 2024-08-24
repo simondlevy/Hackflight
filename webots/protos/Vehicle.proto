@@ -1,28 +1,33 @@
 #VRML_SIM R2023b utf8
 
-PROTO Standard [
+PROTO Vehicle [
 ]
 
 {
 
 DEF ROBOT Robot {
+
     translation  0 0 0.015
         rotation 0 0 0 0
         controller "<extern>"
         supervisor FALSE
-        name "Crazyflie"
+        name "Vehicle"
         model "Bitcraze's Crazyflie"
+
         children [
+
         DEF BODY Pose {
             translation 0 0 -0.015
                 children [
+
                 CadShape {
-                    url [
-                        "../meshes/collada_files/cf2_assembly.dae"
-                    ]
+                    url [ "../meshes/collada_files/cf2_assembly.dae" ]
+                    # url [ "../meshes/collada_files/diy.dae" ]
                 }
+
                 ]
-        }
+      }
+
     Camera {
         translation 0.03 0 0.01
             fieldOfView 0.87
