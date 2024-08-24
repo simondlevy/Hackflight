@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 4.2.1 LTS commit date:2024-08-19, commit time:11:21, hash:396f546c9d82</authoring_tool>
     </contributor>
-    <created>2024-08-23T21:32:23</created>
-    <modified>2024-08-23T21:32:23</modified>
+    <created>2024-08-23T22:02:56</created>
+    <modified>2024-08-23T22:02:56</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -105,7 +105,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="frame_bottom" name="frame_bottom" type="NODE">
-        <matrix sid="transform">2.96852e-4 0 0 0 0 2.96852e-4 0 0 0 0 2.96852e-4 0 0 0 0 1</matrix>
+        <matrix sid="transform">1.41978e-5 8.80476e-4 0 0.004328949 -8.80476e-4 1.41978e-5 0 -0.001158753 0 0 8.80591e-4 6.36456e-4 0 0 0 1</matrix>
         <instance_geometry url="#frame_bottom-mesh" name="frame_bottom"/>
       </node>
       <node id="Camera" name="Camera" type="NODE">

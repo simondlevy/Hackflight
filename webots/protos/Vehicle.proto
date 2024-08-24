@@ -7,12 +7,12 @@ PROTO Vehicle [
 
 DEF ROBOT Robot {
 
-    translation  0 0 0.015
+    translation  0 0 0.30 # 0.015
         rotation 0 0 0 0
         controller "<extern>"
         supervisor FALSE
         name "Vehicle"
-        model "Bitcraze's Crazyflie"
+        model "Custom MAV"
 
         children [
 
@@ -21,8 +21,8 @@ DEF ROBOT Robot {
                 children [
 
                 CadShape {
-                    url [ "../meshes/collada_files/cf2_assembly.dae" ]
-                    # url [ "../meshes/collada_files/diy.dae" ]
+                    # url [ "../meshes/collada_files/cf2_assembly.dae" ]
+                    url [ "../meshes/collada_files/custom.dae" ]
                 }
 
                 ]
