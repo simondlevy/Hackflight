@@ -38,6 +38,9 @@ int main(int argc, char ** argv)
 
     hf::AnglePid _anglePid = {};
 
+    FILE * logfp = fopen("snufa.csv", "w");
+    fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
+
     while (true) {
 
         if (!sim.step()) {
@@ -62,19 +65,18 @@ int main(int argc, char ** argv)
 
         _anglePid.run(DT,
                 1.0, // fake throttle to max for now, so no PID integral reset
-                roll_demand,
-                pitch_demand,
-                yaw_demand,
-                sim.phi(),
-                sim.theta(),
-                sim.dphi(),
-                sim.dtheta(),
-                sim.dpsi(),
-                roll_demand,
-                pitch_demand,
-                yaw_demand);
+                roll_demand, pitch_demand, yaw_demand,
+                sim.phi(), sim.theta(), sim.dphi(),
+                sim.dtheta(), sim.dpsi(),
+                roll_demand, pitch_demand, yaw_demand);
 
         roll_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
+
+        fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
+                sim.time(), sim.roll(), sim.dy(), sim.phi(), sim.dphi(),
+                roll_demand);
+
+        fflush(logfp);
 
         pitch_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
 

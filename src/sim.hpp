@@ -132,12 +132,16 @@ namespace hf {
 
                 _throttle *= THROTTLE_SCALE; 
 
-                const double time =
-                    _button_was_hit ? _tick++ * _timestep / 1000 : 0;
+                _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
 
-                _completedTakeoff = time > TAKEOFF_TIME;
+                _completedTakeoff = _time > TAKEOFF_TIME;
 
                 return true;
+            }
+
+            float time()
+            {
+                return _time;
             }
 
             float throttle()
@@ -258,6 +262,8 @@ namespace hf {
             } joystickStatus_e;
 
             double _timestep;
+
+            float  _time;
 
             float _throttle;
             float _roll;
