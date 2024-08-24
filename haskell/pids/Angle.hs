@@ -31,6 +31,8 @@ import Utils
 
 i_limit = 25.0 :: SFloat     
 
+throttle_down = 0.06 :: SFloat
+
 kp_pitch_roll = 0.002 :: SFloat    
 ki_pitch_roll = 0.003 :: SFloat    
 kd_pitch_roll = 0.0005 :: SFloat   
@@ -66,15 +68,19 @@ runYaw dt reset demand dpsi' = yaw_PID where
 
   error' = [0] ++ error
 
-angleController dt reset rollDemand pitchDemand yawDemand phi' theta' dphi' dtheta' dpsi' =
-  (rollDemand', pitchDemand', yawDemand') where
+angleController dt 
+                throttle_demand roll_demand pitch_demand yaw_demand 
+                phi' theta' dphi' dtheta' dpsi' =
+  (roll_demand', pitch_demand', yaw_demand') where
 
-  (rollDemand', roll_integral) = runPitchRoll dt reset rollDemand phi' dphi' roll_integral'
+  reset = throttle_demand < throttle_down
+
+  (roll_demand', roll_integral) = runPitchRoll dt reset roll_demand phi' dphi' roll_integral'
 
   roll_integral' = [0] ++ roll_integral
 
-  (pitchDemand', pitch_integral) = runPitchRoll dt reset pitchDemand theta' dtheta' pitch_integral'
+  (pitch_demand', pitch_integral) = runPitchRoll dt reset pitch_demand theta' dtheta' pitch_integral'
 
-  yawDemand' = runYaw dt reset yawDemand dpsi'
+  yaw_demand' = runYaw dt reset yaw_demand dpsi'
 
   pitch_integral' = [0] ++ pitch_integral

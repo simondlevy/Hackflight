@@ -36,9 +36,6 @@ import Utils
 dt :: SFloat
 dt = extern "stream_dt" Nothing
 
-reset :: SBool
-reset = extern "stream_reset" Nothing
-
 thro_demand :: SFloat
 thro_demand = extern "stream_thro_demand" Nothing
 
@@ -71,7 +68,7 @@ gyroZ = extern "stream_gyroZ" Nothing
 spec = do
 
     let (roll_PID, pitch_PID, yaw_PID) = angleController dt
-                                                         reset
+                                                         thro_demand
                                                          roll_demand
                                                          pitch_demand
                                                          yaw_demand
