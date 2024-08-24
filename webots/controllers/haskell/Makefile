@@ -7,7 +7,7 @@ HASKDIR = ../../../haskell
 
 CXX_SOURCES = haskell.cpp copilot_core.cpp
 
-FILES_TO_REMOVE += copilot*
+FILES_TO_REMOVE += copilot* dist*/
 
 all: haskell
 
