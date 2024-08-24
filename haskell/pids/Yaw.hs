@@ -31,13 +31,13 @@ import Utils
 
 i_limit = 25.0 :: SFloat     
 
-kp = 0.003 :: SFloat           
-ki = 0.0005 :: SFloat          
-kd = 0.0000015 :: SFloat       
+kp_yaw = 0.003 :: SFloat           
+ki_yaw = 0.0005 :: SFloat          
+kd_yaw = 0.0000015 :: SFloat       
 
-yawController dt reset demand gyroZ = yaw_PID where
+yawController dt reset demand dpsi' = yaw_PID where
 
-  error = demand - gyroZ
+  error = demand - dpsi'
 
   integral = constrain
                (if reset then 0 else integral' + error * dt)
@@ -45,7 +45,7 @@ yawController dt reset demand gyroZ = yaw_PID where
 
   derivative = (error - error') / dt
 
-  yaw_PID = kp * error + ki * integral' - kd * derivative
+  yaw_PID = kp_yaw * error + ki_yaw * integral' - kd_yaw * derivative
 
   integral' = [0] ++ integral
 

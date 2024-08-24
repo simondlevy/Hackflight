@@ -26,7 +26,6 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 import Angle2
-import Yaw
 import Demands
 import Mixers
 import State
@@ -71,9 +70,16 @@ gyroZ = extern "stream_gyroZ" Nothing
  
 spec = do
 
-    let (roll_PID, pitch_PID) = angleController dt reset roll_demand pitch_demand phi' theta' gyroX gyroY
-
-    let yaw_PID = yawController dt reset yaw_demand gyroZ
+    let (roll_PID, pitch_PID, yaw_PID) = angleController dt
+                                                         reset
+                                                         roll_demand
+                                                         pitch_demand
+                                                         yaw_demand
+                                                         phi'
+                                                         theta'
+                                                         gyroX
+                                                         gyroY
+                                                         gyroZ
 
     let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands thro_demand 
                                                         roll_PID 
