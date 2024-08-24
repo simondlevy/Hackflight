@@ -9,41 +9,21 @@ def main():
     data = np.loadtxt('controllers/cplusplus/snufa.csv',
             delimiter=',', skiprows=1)
 
-    print(data.shape)
-
-    exit(0)
-
-    demand = []
-    phi = []
-    dphi = []
-
-    while True:
-
-        words = []
-
-        try:
-            words = input().split()
-
-        except:
-            break
-
-        if len(words) == 3:
-
-            demand.append(float(words[0]))
-            phi.append(float(words[1]))
-            dphi.append(float(words[2]))
-
-    n = len(phi)
-    time = np.linspace(0, n/32, n)
-
-    lotime = 4
+    time = data[:, 0]
+    setpoint = data[:, 1]
+    dy = data[:, 2]
+    phi = data[:, 3]
+    dphi = data[:, 4]
+    output = data[:, 5]
 
     plt.subplot(3, 1, 1)
-    plt.plot(time, demand)
-    plt.xlim([lotime, time[-1]])
+    plt.plot(time, setpoint)
+    plt.plot(time, dy)
     plt.xticks([], [])
-    plt.ylabel('Demand (deg)')
+    plt.ylabel('m/s')
+    plt.legend(['Target', 'Actual'])
 
+    '''
     plt.subplot(3, 1, 2)
     plt.plot(time, phi)
     plt.xticks([], [])
@@ -55,18 +35,8 @@ def main():
     plt.xlabel('Time (sec)')
     plt.ylabel('Angular velocity (deg/sec)')
     plt.xlim([lotime, time[-1]])
+    '''
 
-    plt.show()
-
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.scatter(demand, phi, dphi)
-    ax.set_xlim([-15, 15])
-    ax.set_ylim([-10, 10])
-    ax.set_zlim([-40, 40])
-    ax.set_xlabel('Demand (deg)')
-    ax.set_ylabel('Angle (deg)')
-    ax.set_zlabel('Angular velocity (deg/sec)')
     plt.show()
 
 
