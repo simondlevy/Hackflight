@@ -45,40 +45,6 @@ DEF ROBOT Robot {
         name "inertial_unit"
     }
 
-    # Motor blur for front motors
-    DEF FASTHELIX_FRONT Shape {
-        appearance PBRAppearance {
-            baseColor 0.1 0.1 0.1
-                baseColorMap ImageTexture {
-                    url [
-                        "../meshes/textures/fast_helix.png"
-                    ]
-                }
-            metalness 0
-        }
-        geometry Cylinder {
-            height 0.001
-                radius 0.025
-        }
-    }
-
-    # Motor blur for rear motors
-    DEF FASTHELIX_BACK Shape {
-        appearance PBRAppearance {
-            baseColor 0.4 0.0 0.0
-                baseColorMap ImageTexture {
-                    url [
-                        "../meshes/textures/fast_helix.png"
-                    ]
-                }
-            metalness 0
-        }
-        geometry Cylinder {
-            height 0.001
-                radius 0.025
-        }
-    }
-
     # Motor 1
     Propeller {
         shaftAxis 0 0 1
@@ -93,7 +59,26 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation -0.031 -0.031 0.008
-                children [ USE FASTHELIX_BACK ]
+
+                children [ 
+
+                    Shape {
+                            appearance PBRAppearance {
+                                baseColor 0.4 0.0 0.0
+                                    baseColorMap ImageTexture {
+                                        url [
+                                            "../meshes/textures/fast_helix.png"
+                                        ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height 0.001
+                                    radius 0.025
+                            }
+                        }
+
+                ]
         }
         slowHelix Solid {
             translation -0.031 -0.031 0.008
@@ -128,7 +113,25 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation 0.031 -0.031 0.008
-                children [ USE FASTHELIX_FRONT ]
+                children [ 
+
+                Shape {
+                            appearance PBRAppearance {
+                                baseColor 0.1 0.1 0.1
+                                    baseColorMap ImageTexture {
+                                        url [
+                                            "../meshes/textures/fast_helix.png"
+                                        ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height 0.001
+                                    radius 0.025
+                            }
+                        }
+
+                ]
         }
         slowHelix Solid {
             translation 0.031 -0.031 0.008
@@ -162,7 +165,25 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation -0.031 0.031 0.008
-                children [ USE FASTHELIX_BACK ]
+                children [ 
+                  
+                Shape {
+                            appearance PBRAppearance {
+                                baseColor 0.4 0.0 0.0
+                                    baseColorMap ImageTexture {
+                                        url [
+                                            "../meshes/textures/fast_helix.png"
+                                        ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height 0.001
+                                    radius 0.025
+                            }
+                        }
+
+                ]
         }
         slowHelix Solid {
             translation -0.031 0.031 0.008
@@ -197,7 +218,26 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
             translation 0.031 0.031 0.008
-                children [ USE FASTHELIX_FRONT ]
+                children [
+
+                Shape {
+                            appearance PBRAppearance {
+                                baseColor 0.1 0.1 0.1
+                                    baseColorMap ImageTexture {
+                                        url [
+                                            "../meshes/textures/fast_helix.png"
+                                        ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height 0.001
+                                    radius 0.025
+                            }
+                        }
+
+              
+                ] 
         }
         slowHelix DEF PROP Solid {
             translation 0.031 0.031 0.007
