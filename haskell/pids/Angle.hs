@@ -71,24 +71,17 @@ runYaw dt reset demand dpsi' = yaw_PID where
 angleController dt demands state = (roll_demand', pitch_demand', yaw_demand') where
 
   throttle_demand = thrust demands
-  roll_demand = roll demands
-  pitch_demand = pitch demands
-  yaw_demand = yaw demands
-
-  phi' = phi state
-  dphi' = dphi state
-  theta' = theta state
-  dtheta' = dtheta state
-  dpsi' = dpsi state
 
   reset = throttle_demand < throttle_down
 
-  (roll_demand', roll_integral) = runPitchRoll dt reset roll_demand phi' dphi' roll_integral'
+  (roll_demand', roll_integral) =
+    runPitchRoll dt reset (roll demands) (phi state) (dphi state) roll_integral'
 
   roll_integral' = [0] ++ roll_integral
 
-  (pitch_demand', pitch_integral) = runPitchRoll dt reset pitch_demand theta' dtheta' pitch_integral'
+  (pitch_demand', pitch_integral) =
+    runPitchRoll dt reset (pitch demands) (theta state) (dtheta state) pitch_integral'
 
-  yaw_demand' = runYaw dt reset yaw_demand dpsi'
+  yaw_demand' = runYaw dt reset (yaw demands) (dpsi state)
 
   pitch_integral' = [0] ++ pitch_integral
