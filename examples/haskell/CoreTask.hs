@@ -72,7 +72,7 @@ spec = do
     -- Unspecified: dz, dy, z, dz, psi
     let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
 
-    let demands' = angleController dt demands state
+    let demands' = angleController dt state demands
 
     let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands (thrust demands')
                                                         (roll demands') 

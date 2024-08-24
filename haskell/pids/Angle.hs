@@ -68,7 +68,7 @@ runYaw dt reset demand dpsi' = yaw_PID where
 
   error' = [0] ++ error
 
-angleController dt demands state = demands' where
+angleController dt state demands = demands' where
 
   throttle_demand = thrust demands
 
