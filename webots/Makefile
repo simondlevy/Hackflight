@@ -58,7 +58,7 @@ snn-roll:
 
 	@webots worlds/simple.wbt &
 
-	@/usr/local/webots/webots-controller controllers/snn-roll/snn-roll $(CLIMBRATE_NETWORK) &
+	@/usr/local/webots/webots-controller controllers/snn-roll/snn-roll $(ROLL_NETWORK) &
 
 	@sleep 1
 

@@ -79,6 +79,12 @@ int main(int argc, char ** argv)
             break;
         }
 
+        vector<double> observations = {
+            sim.roll(), sim.dy(), sim.phi(), sim.dphi()
+        };
+        vector <double> actions;
+        snn->step(observations, actions);
+
         const auto thrust_demand = hf::ClimbRatePid::run(
                 sim.hitTakeoffButton(),
                 sim.completedTakeoff(),
@@ -112,8 +118,7 @@ int main(int argc, char ** argv)
  
         sim.setMotors(m1, m2, m3, m4);
 
-        // snn->send_counts_to_visualizer();
-
+        snn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();
