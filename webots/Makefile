@@ -15,8 +15,8 @@
 FDIR = $(HOME)/Desktop/framework
 
 TAKEOFF_NETWORK = $(FDIR)/cpp-apps/networks/takeoff_risp.txt
-
 CLIMBRATE_NETWORK = $(FDIR)/cpp-apps/networks/climbrate_risp.txt
+ROLL_NETWORK = $(FDIR)/cpp-apps/networks/roll_risp.txt
 
 VIZ_HOST = "localhost"
 VIZ_PORT = 8100
@@ -52,4 +52,16 @@ snn-climbrate:
 
 	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(CLIMBRATE_NETWORK) \
 		--use_name_neuron '{"0":"setpoint","1":"dz/dt","2":"motor"}' \
+		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 0 > /dev/null
+
+snn-roll:
+
+	@webots worlds/simple.wbt &
+
+	@/usr/local/webots/webots-controller controllers/snn-roll/snn-roll $(CLIMBRATE_NETWORK) &
+
+	@sleep 1
+
+	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(ROLL_NETWORK) \
+		--use_name_neuron '{"0":"setpoint","1":"dy","2":"phi", "3":"dphi", "4":"output"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 0 > /dev/null
