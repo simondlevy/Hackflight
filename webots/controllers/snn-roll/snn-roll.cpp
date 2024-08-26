@@ -19,6 +19,7 @@
 #include <hackflight.hpp>
 #include <mixers.hpp>
 #include <sim.hpp>
+#include <snn.hpp>
 
 #include <pids/angle.hpp>
 #include <pids/climbrate.hpp>
@@ -55,7 +56,6 @@ int main(int argc, char ** argv)
 
     // Load up the network specified in the command line
 
-    /*
     SNN * snn = NULL;
 
 
@@ -72,7 +72,6 @@ int main(int argc, char ** argv)
     }
 
     snn->serve_visualizer(VIZ_PORT);
-    */
 
     while (true) {
 
