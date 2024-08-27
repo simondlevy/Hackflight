@@ -110,6 +110,8 @@ int main(int argc, char ** argv)
 
         pitch_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
+        roll_demand = actions[0];
+
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(
                 thrust_demand, roll_demand, pitch_demand, yaw_demand,
