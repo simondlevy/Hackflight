@@ -35,17 +35,19 @@ namespace hf {
             static constexpr float RAD2DEG = 180.0f / M_PI;
             static constexpr float GS2MSS = 9.81;
 
-            static void quat2euler(const quat_t & q, float & phi, float & theta, float & psi)
+            static void quat2euler(
+                    const float qw, const float qx, const float qy, const float qz,
+                    float & phi, float & theta, float & psi)
             {
                 // We swap the X and Y axes and negate Y for nose-down positive.
-                phi = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
+                phi = RAD2DEG * asin((-2) * (qx*qz - qw*qy));
 
-                theta = -RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
-                        (q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z));
+                theta = -RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
+                        (qw*qw - qx*qx - qy*qy + qz*qz));
 
                 // Negate for nose-right positive
-                psi = -RAD2DEG * atan2((2 * (q.x*q.y + q.w*q.z)),
-                        (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
+                psi = -RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
+                        (qw*qw + qx*qx - qy*qy - qz*qz));
             }
 
             static float fmax(const float val, const float maxval)

@@ -132,24 +132,12 @@ static void readImu(
 
         _usfs.readQuaternion(qw, qx, qy, qz);
 
-        float A12 =   2.0f * (qx * qy + qw * qz);
-        float A22 =   qw * qw + qx * qx - qy * qy - qz * qz;
-        float A31 =   2.0f * (qw * qx + qy * qz);
-        float A32 =   2.0f * (qx * qz - qw * qy);
-        float A33 =   qw * qw - qx * qx - qy * qy + qz * qz;
-        _theta = -asinf(A32);
-        _phi  = atan2f(A31, A33);
-        _psi   = atan2f(A12, A22);
-        _theta *= 180.0f / M_PI;
-        _psi   *= 180.0f / M_PI;
-        _psi   += 13.8f; 
-        if (_psi < 0) _psi   += 360.0f ; 
-        _phi  *= 180.0f / M_PI;
+        hf::Utils::quat2euler(qw, qx, qy, qz, _phi, _theta, _psi);
     }
 
     phi = _phi;
-    theta = _theta;
-    psi = _psi;
+    theta = -_theta; // Negate for nose-down positive
+    psi = -_psi; // Negate for nose-righ positive
 
     gyroX = _gyroX;
     gyroY = _gyroY;
@@ -327,7 +315,7 @@ void loop()
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        printf("%+3.3f deg  %+3.3f deg/sec\n", psi, gyroZ);
+        printf("phi=%+3.3f  the=%+3.3f  psi=%+3.3f\n", phi, theta,psi);
         msec_prev = msec_curr;
     }
 
