@@ -1,30 +1,29 @@
 /*
-  Hackflight example sketch custom QuadX frame with Spektrum DSMX receiver
+   Hackflight example sketch custom QuadX frame with Spektrum DSMX receiver
 
-  Adapted from https://github.com/nickrehm/dRehmFlight
- 
-  Copyright (C) 2024 Simon D. Levy
- 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, in version 3.
- 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
- 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http:--www.gnu.org/licenses/>.
+   Adapted from https://github.com/nickrehm/dRehmFlight
+
+   Copyright (C) 2024 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
 #include <Wire.h>
 
-#include <dsmrx.hpp>
-#include <MPU6050.h>
-#include <oneshot125.hpp>
+#include <usfs.hpp>
 
-#include "madgwick.hpp"
+#include <dsmrx.hpp>
+#include <oneshot125.hpp>
 
 #include <hackflight.hpp>
 #include <utils.hpp>
@@ -47,13 +46,22 @@ static const uint8_t NUM_DSM_CHANNELS = 6;
 
 // IMU ------------------------------------------------------------------------
 
-static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
-static const float GYRO_SCALE_FACTOR = 131.0;
+static const uint8_t ACCEL_BANDWIDTH = 3;
+static const uint8_t GYRO_BANDWIDTH  = 3;
+static const uint8_t QUAT_DIVISOR    = 1;
+static const uint8_t MAG_RATE        = 100;
+static const uint8_t ACCEL_RATE      = 20; // Multiply by 10 to get actual rate
+static const uint8_t GYRO_RATE       = 100; // Multiply by 10 to get actual rate
+static const uint8_t BARO_RATE       = 50;
 
-static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
-static const float ACCEL_SCALE_FACTOR = 16384.0;
+static const uint8_t INTERRUPT_ENABLE = 
+Usfs::INTERRUPT_RESET_REQUIRED |
+Usfs::INTERRUPT_ERROR |
+Usfs::INTERRUPT_QUAT;
 
-static MPU6050 _mpu6050;
+static const bool VERBOSE = false;
+
+static Usfs _usfs;
 
 // PID control ---------------------------------------------------------------
 
@@ -78,85 +86,74 @@ static const float MAX_PITCH_ROLL_ANGLE = 30.0;
 
 static const float MAX_YAW_RATE = 160.0;     //Max yaw rate in deg/sec
 
-// IMU calibration parameters
-static float ACC_ERROR_X = 0.0;
-static float ACC_ERROR_Y = 0.0;
-static float ACC_ERROR_Z = 0.0;
-static float GYRO_ERROR_X = 0.0;
-static float GYRO_ERROR_Y= 0.0;
-static float GYRO_ERROR_Z = 0.0;
-
 static void initImu() 
 {
     Wire.begin();
-    Wire.setClock(1000000); //Note this is 2.5 times the spec sheet 400 kHz max...
+    Wire.setClock(400000); 
 
-    _mpu6050.initialize();
+    _usfs.loadFirmware(VERBOSE); 
 
-    if (!_mpu6050.testConnection()) {
-        Serial.println("MPU6050 initialization unsuccessful");
-        Serial.println("Check MPU6050 wiring or try cycling power");
-        while(true) {}
-    }
-
-    // From the reset state all registers should be 0x00, so we should be at
-    // max sample rate with digital low pass filter(s) off.  All we need to
-    // do is set the desired fullscale ranges
-    _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
-    _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-
+    _usfs.begin(
+            ACCEL_BANDWIDTH,
+            GYRO_BANDWIDTH,
+            QUAT_DIVISOR,
+            MAG_RATE,
+            ACCEL_RATE,
+            GYRO_RATE,
+            BARO_RATE,
+            INTERRUPT_ENABLE,
+            VERBOSE); 
 }
 
 static void readImu(
-        float & AccX, float & AccY, float & AccZ,
-        float & GyroX, float & GyroY, float & GyroZ
+        float & phi, float & theta, float & psi,
+        float & gyroX, float & gyroY, float gyroZ
         ) 
 {
-    static float AccX_prev, AccY_prev, AccZ_prev;
-    static float GyroX_prev, GyroY_prev, GyroZ_prev;
+    uint8_t eventStatus = Usfs::checkStatus(); 
 
-    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
+    // Keep these around between reads
+    static float _gyroX, _gyroY, _gyroZ;
+    static float _phi, _theta, _psi;
 
-    _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
+    if (Usfs::eventStatusIsError(eventStatus)) { 
 
-    //Accelerometer
-    AccX = AcX / ACCEL_SCALE_FACTOR; //G's
-    AccY = AcY / ACCEL_SCALE_FACTOR;
-    AccZ = AcZ / ACCEL_SCALE_FACTOR;
+        Usfs::reportError(eventStatus);
+    }
 
-    // Correct the outputs with the calculated error values
-    AccX = AccX - ACC_ERROR_X;
-    AccY = AccY - ACC_ERROR_Y;
-    AccZ = AccZ - ACC_ERROR_Z;
+    if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
 
-    // LP filter accelerometer data
-    AccX = (1.0 - B_accel)*AccX_prev + B_accel*AccX;
-    AccY = (1.0 - B_accel)*AccY_prev + B_accel*AccY;
-    AccZ = (1.0 - B_accel)*AccZ_prev + B_accel*AccZ;
-    AccX_prev = AccX;
-    AccY_prev = AccY;
-    AccZ_prev = AccZ;
+        _usfs.readGyrometerScaled(_gyroX, _gyroY, _gyroZ);
+    }
 
-    // Gyro
-    GyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
-    GyroY = GyY / GYRO_SCALE_FACTOR;
-    GyroZ = GyZ / GYRO_SCALE_FACTOR;
+    if (Usfs::eventStatusIsQuaternion(eventStatus)) { 
 
-    // Correct the outputs with the calculated error values
-    GyroX = GyroX - GYRO_ERROR_X;
-    GyroY = GyroY - GYRO_ERROR_Y;
-    GyroZ = GyroZ - GYRO_ERROR_Z;
+        float qw=0, qx=0, qy=0, qz=0;
 
-    // LP filter gyro data
-    GyroX = (1.0 - B_gyro)*GyroX_prev + B_gyro*GyroX;
-    GyroY = (1.0 - B_gyro)*GyroY_prev + B_gyro*GyroY;
-    GyroZ = (1.0 - B_gyro)*GyroZ_prev + B_gyro*GyroZ;
-    GyroX_prev = GyroX;
-    GyroY_prev = GyroY;
-    GyroZ_prev = GyroZ;
+        _usfs.readQuaternion(qw, qx, qy, qz);
 
-    // Negate GyroZ for nose-right positive
-    GyroZ = -GyroZ;
+        float A12 =   2.0f * (qx * qy + qw * qz);
+        float A22 =   qw * qw + qx * qx - qy * qy - qz * qz;
+        float A31 =   2.0f * (qw * qx + qy * qz);
+        float A32 =   2.0f * (qx * qz - qw * qy);
+        float A33 =   qw * qw - qx * qx - qy * qy + qz * qz;
+        _theta = -asinf(A32);
+        _phi  = atan2f(A31, A33);
+        _psi   = atan2f(A12, A22);
+        _theta *= 180.0f / M_PI;
+        _psi   *= 180.0f / M_PI;
+        _psi   += 13.8f; 
+        if (_psi < 0) _psi   += 360.0f ; 
+        _phi  *= 180.0f / M_PI;
+    }
+
+    phi = _phi;
+    theta = _theta;
+    psi = _psi;
+
+    gyroX = _gyroX;
+    gyroY = _gyroY;
+    gyroZ = _gyroZ;
 }
 
 static void armMotor(uint8_t & m_usec)
@@ -322,19 +319,15 @@ void loop()
 
     //Get vehicle state
 
-    float AccX = 0, AccY = 0, AccZ = 0;
-    float GyroX = 0, GyroY = 0, GyroZ = 0;
-
-    readImu(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
-
-    // Get Euler angles from IMU (note negations)
     float phi = 0, theta = 0, psi = 0;
-    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ, phi, theta, psi);
+    float gyroX = 0, gyroY = 0, gyroZ = 0;
+
+    readImu(phi, theta, psi, gyroX, gyroY, gyroZ); 
 
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        printf("%+3.3f deg  %+3.3f deg/sec\n", psi, GyroZ);
+        printf("%+3.3f deg  %+3.3f deg/sec\n", psi, gyroZ);
         msec_prev = msec_curr;
     }
 
@@ -353,7 +346,7 @@ void loop()
     _anglePid.run(dt, thro_demand, 
             roll_demand, pitch_demand, yaw_demand, 
             phi, theta,
-            GyroX, GyroY, GyroZ,
+            gyroX, gyroY, gyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
