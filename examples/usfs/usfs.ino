@@ -312,13 +312,6 @@ void loop()
 
     readImu(phi, theta, psi, gyroX, gyroY, gyroZ); 
 
-    static uint32_t msec_prev;
-    const auto msec_curr = millis();
-    if (msec_curr - msec_prev > 100) {
-        printf("phi=%+3.3f  the=%+3.3f  psi=%+3.3f\n", phi, theta,psi);
-        msec_prev = msec_curr;
-    }
-
     // Convert stick demands to appropriate intervals
     const float thro_demand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
