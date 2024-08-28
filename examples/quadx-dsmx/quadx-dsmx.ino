@@ -327,16 +327,17 @@ void loop()
 
     readImu(AccX, AccY, AccZ, gyroX, gyroY, gyroZ); 
 
-    static uint32_t msec_prev;
-    const auto msec_curr = millis();
-    if (msec_curr - msec_prev > 100) {
-        printf("%+3.3f deg/sec\n", gyroZ);
-        msec_prev = msec_curr;
-    }
-
     // Get Euler angles from IMU (note negations)
     float phi = 0, theta = 0, psi = 0;
     Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
+    psi = -psi;
+
+    static uint32_t msec_prev;
+    const auto msec_curr = millis();
+    if (msec_curr - msec_prev > 100) {
+        //printf("%+3.3f %+3.3f %+3.3f\n", phi, theta, psi);
+        msec_prev = msec_curr;
+    }
 
     // Convert stick demands to appropriate intervals
     const float thro_demand =
