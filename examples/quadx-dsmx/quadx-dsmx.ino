@@ -109,11 +109,11 @@ static void initImu()
 
 static void readImu(
         float & AccX, float & AccY, float & AccZ,
-        float & GyroX, float & GyroY, float & GyroZ
+        float & gyroX, float & gyroY, float & gyroZ
         ) 
 {
     static float AccX_prev, AccY_prev, AccZ_prev;
-    static float GyroX_prev, GyroY_prev, GyroZ_prev;
+    static float gyroX_prev, gyroY_prev, gyroZ_prev;
 
     int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
@@ -138,25 +138,25 @@ static void readImu(
     AccZ_prev = AccZ;
 
     // Gyro
-    GyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
-    GyroY = GyY / GYRO_SCALE_FACTOR;
-    GyroZ = GyZ / GYRO_SCALE_FACTOR;
+    gyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
+    gyroY = GyY / GYRO_SCALE_FACTOR;
+    gyroZ = GyZ / GYRO_SCALE_FACTOR;
 
     // Correct the outputs with the calculated error values
-    GyroX = GyroX - GYRO_ERROR_X;
-    GyroY = GyroY - GYRO_ERROR_Y;
-    GyroZ = GyroZ - GYRO_ERROR_Z;
+    gyroX = gyroX - GYRO_ERROR_X;
+    gyroY = gyroY - GYRO_ERROR_Y;
+    gyroZ = gyroZ - GYRO_ERROR_Z;
 
     // LP filter gyro data
-    GyroX = (1.0 - B_gyro)*GyroX_prev + B_gyro*GyroX;
-    GyroY = (1.0 - B_gyro)*GyroY_prev + B_gyro*GyroY;
-    GyroZ = (1.0 - B_gyro)*GyroZ_prev + B_gyro*GyroZ;
-    GyroX_prev = GyroX;
-    GyroY_prev = GyroY;
-    GyroZ_prev = GyroZ;
+    gyroX = (1.0 - B_gyro)*gyroX_prev + B_gyro*gyroX;
+    gyroY = (1.0 - B_gyro)*gyroY_prev + B_gyro*gyroY;
+    gyroZ = (1.0 - B_gyro)*gyroZ_prev + B_gyro*gyroZ;
+    gyroX_prev = gyroX;
+    gyroY_prev = gyroY;
+    gyroZ_prev = gyroZ;
 
-    // Negate GyroZ for nose-right positive
-    GyroZ = -GyroZ;
+    // Negate gyroZ for nose-right positive
+    gyroZ = -gyroZ;
 }
 
 static void armMotor(uint8_t & m_usec)
@@ -323,20 +323,20 @@ void loop()
     //Get vehicle state
 
     float AccX = 0, AccY = 0, AccZ = 0;
-    float GyroX = 0, GyroY = 0, GyroZ = 0;
+    float gyroX = 0, gyroY = 0, gyroZ = 0;
 
-    readImu(AccX, AccY, AccZ, GyroX, GyroY, GyroZ); 
-
-    // Get Euler angles from IMU (note negations)
-    float phi = 0, theta = 0, psi = 0;
-    Madgwick6DOF(dt, GyroX, -GyroY, GyroZ, -AccX, AccY, AccZ, phi, theta, psi);
+    readImu(AccX, AccY, AccZ, gyroX, gyroY, gyroZ); 
 
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        printf("%+3.3f deg  %+3.3f deg/sec\n", psi, GyroZ);
+        printf("%+3.3f deg/sec\n", gyroZ);
         msec_prev = msec_curr;
     }
+
+    // Get Euler angles from IMU (note negations)
+    float phi = 0, theta = 0, psi = 0;
+    Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
 
     // Convert stick demands to appropriate intervals
     const float thro_demand =
@@ -353,7 +353,7 @@ void loop()
     _anglePid.run(dt, thro_demand, 
             roll_demand, pitch_demand, yaw_demand, 
             phi, theta,
-            GyroX, GyroY, GyroZ,
+            gyroX, gyroY, gyroZ,
             roll_PID, pitch_PID, yaw_PID);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;

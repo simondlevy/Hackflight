@@ -107,7 +107,7 @@ static void initImu()
 
 static void readImu(
         float & phi, float & theta, float & psi,
-        float & gyroX, float & gyroY, float gyroZ
+        float & gyroX, float & gyroY, float & gyroZ
         ) 
 {
     uint8_t eventStatus = Usfs::checkStatus(); 
@@ -305,12 +305,19 @@ void loop()
         _blinkTask.run(usec_curr, BLINK_RATE_HZ);
     }
 
-    //Get vehicle state
+    // Get Euler angles and angular rates (gyro) from IMU
 
     float phi = 0, theta = 0, psi = 0;
     float gyroX = 0, gyroY = 0, gyroZ = 0;
 
     readImu(phi, theta, psi, gyroX, gyroY, gyroZ); 
+
+    static uint32_t msec_prev;
+    const auto msec_curr = millis();
+    if (msec_curr - msec_prev > 100) {
+        printf("%+3.3f deg/sec\n", gyroZ);
+        msec_prev = msec_curr;
+    }
 
     // Convert stick demands to appropriate intervals
     const float thro_demand =
