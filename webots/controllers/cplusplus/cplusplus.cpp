@@ -59,6 +59,8 @@ int main(int argc, char ** argv)
 
         hf::quad_motors_t motors = {};
 
+        float thrust_demand = 0;
+
         if (sim.completedTakeoff()) {
 
             if (altitudeTarget == 0) {
@@ -66,16 +68,16 @@ int main(int argc, char ** argv)
             }
 
             altitudeTarget += DT * sim.throttle();
+
+            const auto climbRateTarget = _altitudePid.run(DT, altitudeTarget, sim.z());
+
+            thrust_demand =
+                THRUST_BASE + _climbRatePid.run(DT, climbRateTarget, sim.dz());
         }
 
-
-        (void)_altitudePid;
-
-        const auto thrust_demand = sim.completedTakeoff() ? 
-            THRUST_BASE + _climbRatePid.run(DT, sim.throttle(), sim.dz()) :
-            sim.hitTakeoffButton() ?
-            THRUST_TAKEOFF :
-            0;
+        else if (sim.hitTakeoffButton ()) {
+            thrust_demand = THRUST_TAKEOFF;
+        }
 
         float roll_demand = 0;
         float pitch_demand = 0;
