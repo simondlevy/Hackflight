@@ -17,6 +17,7 @@
 #include <mixers.hpp>
 #include <sim.hpp>
 
+#include <pids/altitude.hpp>
 #include <pids/angle.hpp>
 #include <pids/climbrate.hpp>
 #include <pids/position.hpp>
@@ -43,8 +44,12 @@ int main(int argc, char ** argv)
 
     hf::ClimbRatePid _climbRatePid = {};
 
+    hf::AltitudePid _altitudePid = {};
+
     FILE * logfp = fopen("roll.csv", "w");
     fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
+
+    float altitudeTarget = 0;
 
     while (true) {
 
@@ -53,6 +58,16 @@ int main(int argc, char ** argv)
         }
 
         hf::quad_motors_t motors = {};
+
+        if (sim.completedTakeoff() && altitudeTarget == 0) {
+            altitudeTarget = sim.z();
+        }
+
+        altitudeTarget += DT * sim.throttle();
+
+        printf("%f\n", altitudeTarget);
+
+        (void)_altitudePid;
 
         const auto thrust_demand = sim.completedTakeoff() ? 
             THRUST_BASE + _climbRatePid.run(DT, sim.throttle(), sim.dz()) :

@@ -1,5 +1,5 @@
 /*
-  Climb-rate PID controller
+  Altitude PID controller
 
   Copyright (C) 2024 Simon D. Levy
  
@@ -20,21 +20,21 @@
 
 namespace hf {
 
-    class ClimbRatePid {
+    class AltitudePid {
 
         private:
 
-            static constexpr float KP = 25;
-            static constexpr float KI = 15;
+            static constexpr float KP = 2.0;
+            static constexpr float KI = 0.5;
             static constexpr float ILIMIT = 5000;
 
             float _integral;
 
         public:
 
-            float run(const float dt, float dz_target, const float dz_actual)
+            float run(const float dt, float z_target, const float z_actual)
             {
-                const auto error = dz_target - dz_actual;
+                const auto error = z_target - z_actual;
 
                 _integral = Utils::fconstrain(_integral + dt * error, ILIMIT);
 
