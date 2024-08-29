@@ -310,12 +310,13 @@ void loop()
     float phi = 0, theta = 0, psi = 0;
     float gyroX = 0, gyroY = 0, gyroZ = 0;
 
-    readImu(phi, theta, psi, gyroX, gyroY, gyroZ); 
+    // Note gyro X/Y swap
+    readImu(phi, theta, psi, gyroY, gyroX, gyroZ); 
 
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        printf("%+3.3f %+3.3f %+3.3f\n", phi, theta, psi);
+        //printf("gyroZ:%f\n", gyroZ);
         msec_prev = msec_curr;
     }
 

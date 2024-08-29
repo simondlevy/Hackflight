@@ -335,7 +335,7 @@ void loop()
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        //printf("%+3.3f %+3.3f %+3.3f\n", phi, theta, psi);
+        //printf("gyroZ:%f\n", gyroZ);
         msec_prev = msec_curr;
     }
 
