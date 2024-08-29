@@ -29,6 +29,10 @@ static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
 
 static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
 
+static const float THRUST_BASE = 55.385;
+
+static const float THRUST_TAKEOFF = 56;
+
 int main(int argc, char ** argv)
 {
     hf::Simulator sim = {};
@@ -37,7 +41,7 @@ int main(int argc, char ** argv)
 
     hf::AnglePid _anglePid = {};
 
-    FILE * logfp = fopen("snufa.csv", "w");
+    FILE * logfp = fopen("roll.csv", "w");
     fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
 
     while (true) {
@@ -48,11 +52,11 @@ int main(int argc, char ** argv)
 
         hf::quad_motors_t motors = {};
 
-        const auto thrust_demand = hf::ClimbRatePid::run(
-                sim.hitTakeoffButton(),
-                sim.completedTakeoff(),
-                sim.throttle(),
-                sim.dz());
+        const auto thrust_demand = sim.completedTakeoff() ? 
+            THRUST_BASE + hf::ClimbRatePid::run(sim.throttle(), sim.dz()) :
+            sim.hitTakeoffButton() ?
+            THRUST_TAKEOFF :
+            0;
 
         float roll_demand = 0;
         float pitch_demand = 0;
@@ -72,8 +76,8 @@ int main(int argc, char ** argv)
         roll_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
         fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
-                sim.time(), sim.roll(), sim.dy(), sim.phi(), sim.dphi(),
-                roll_demand);
+                sim.time(), 25*sim.roll(), 25*sim.dy(), 5*sim.phi(), sim.dphi(),
+                50 * roll_demand);
 
         fflush(logfp);
 

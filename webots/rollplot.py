@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    data = np.loadtxt('controllers/cplusplus/snufa.csv',
+    data = np.loadtxt('controllers/cplusplus/roll.csv',
             delimiter=',', skiprows=1)
 
     time = data[:, 0]

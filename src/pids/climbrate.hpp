@@ -26,24 +26,11 @@ namespace hf {
 
             static constexpr float KP = 25;
 
-            static constexpr float THRUST_TAKEOFF = 56;
-
-            static constexpr float THRUST_BASE = 55.385;
-
         public:
 
-            static float run(
-                    const bool hitTakeoffButton, 
-                    const bool completedTakeoff,
-                    const float throttle,
-                    const float dz)
+            static float run(const float throttle, const float dz)
             {
-                return
-                    completedTakeoff ? 
-                    THRUST_BASE + KP * (throttle - dz) :
-                    hitTakeoffButton ?
-                    THRUST_TAKEOFF :
-                    0;
+                return  KP * (throttle - dz);
             }
 
     };
