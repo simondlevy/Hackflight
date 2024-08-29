@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -3927,6 +3927,7 @@ part number 2062-2P from STA</description>
 <part name="GD" library="wirepad" deviceset="SMD2" device=""/>
 <part name="3V" library="wirepad" deviceset="SMD2" device=""/>
 <part name="RX" library="wirepad" deviceset="SMD2" device=""/>
+<part name="USFS1" library="SparkFun-Connectors" deviceset="CONN_05" device="NO_SILK"/>
 </parts>
 <sheets>
 <sheet>
@@ -3992,6 +3993,10 @@ part number 2062-2P from STA</description>
 </instance>
 <instance part="RX" gate="1" x="76.2" y="83.82" smashed="yes">
 <attribute name="VALUE" x="75.057" y="80.518" size="1.778" layer="96"/>
+</instance>
+<instance part="USFS1" gate="G$1" x="25.4" y="20.32" smashed="yes">
+<attribute name="VALUE" x="22.86" y="10.414" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="22.86" y="28.448" size="1.778" layer="95" font="vector"/>
 </instance>
 </instances>
 <busses>
@@ -4213,13 +4218,6 @@ part number 2062-2P from STA</description>
 <label x="5.08" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="INT" class="0">
-<segment>
-<pinref part="VL2" gate="J$1" pin="3"/>
-<wire x1="-33.02" y1="68.58" x2="-27.94" y2="68.58" width="0.1524" layer="91"/>
-<label x="-33.02" y="68.58" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="MOSI" class="0">
 <segment>
 <pinref part="PMW2" gate="J1" pin="2"/>
@@ -4242,27 +4240,6 @@ part number 2062-2P from STA</description>
 <pinref part="U$1" gate="G$1" pin="13/SCK"/>
 <wire x1="93.98" y1="30.48" x2="99.06" y2="30.48" width="0.1524" layer="91"/>
 <label x="93.98" y="30.48" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="EN" class="0">
-<segment>
-<pinref part="PMW1" gate="J1" pin="2"/>
-<wire x1="-53.34" y1="33.02" x2="-48.26" y2="33.02" width="0.1524" layer="91"/>
-<label x="-53.34" y="33.02" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="MOT" class="0">
-<segment>
-<pinref part="PMW1" gate="J1" pin="3"/>
-<wire x1="-53.34" y1="35.56" x2="-48.26" y2="35.56" width="0.1524" layer="91"/>
-<label x="-53.34" y="35.56" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="RST" class="0">
-<segment>
-<pinref part="PMW1" gate="J1" pin="4"/>
-<wire x1="-53.34" y1="38.1" x2="-48.26" y2="38.1" width="0.1524" layer="91"/>
-<label x="-53.34" y="38.1" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LED_R_OUT" class="0">
