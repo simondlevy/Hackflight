@@ -25,14 +25,21 @@ namespace hf {
         private:
 
             static constexpr float KP = 25;
+            static constexpr float KI = 15;
+            static constexpr float ILIMIT = 5000;
+
+            float _integral;
 
         public:
 
-            static float run(const float throttle, const float dz)
+            float run(const float dt, float throttle, const float dz)
             {
-                return  KP * (throttle - dz);
-            }
+                const auto error = throttle - dz;
 
+                _integral = Utils::fconstrain(_integral + dt * error, ILIMIT);
+
+                return  KP * error + KI * _integral;
+            }
     };
 
 }

@@ -41,6 +41,8 @@ int main(int argc, char ** argv)
 
     hf::AnglePid _anglePid = {};
 
+    hf::ClimbRatePid _climbRatePid = {};
+
     FILE * logfp = fopen("roll.csv", "w");
     fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
 
@@ -53,7 +55,7 @@ int main(int argc, char ** argv)
         hf::quad_motors_t motors = {};
 
         const auto thrust_demand = sim.completedTakeoff() ? 
-            THRUST_BASE + hf::ClimbRatePid::run(sim.throttle(), sim.dz()) :
+            THRUST_BASE + _climbRatePid.run(DT, sim.throttle(), sim.dz()) :
             sim.hitTakeoffButton() ?
             THRUST_TAKEOFF :
             0;
