@@ -59,13 +59,15 @@ int main(int argc, char ** argv)
 
         hf::quad_motors_t motors = {};
 
-        if (sim.completedTakeoff() && altitudeTarget == 0) {
-            altitudeTarget = sim.z();
+        if (sim.completedTakeoff()) {
+
+            if (altitudeTarget == 0) {
+                altitudeTarget = sim.z();
+            }
+
+            altitudeTarget += DT * sim.throttle();
         }
 
-        altitudeTarget += DT * sim.throttle();
-
-        printf("%f\n", altitudeTarget);
 
         (void)_altitudePid;
 
