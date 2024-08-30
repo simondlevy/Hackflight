@@ -64,39 +64,39 @@ int main(int argc, char ** argv)
         const auto climbRateTarget =
             _altitudePid.run(DT, altitudeTarget, sim.z());
 
-        const auto thrust_demand =
+        const auto thrustDemand =
             sim.hitTakeoffButton() ?
             THRUST_BASE + _climbRatePid.run(DT, climbRateTarget, sim.dz()) :
             0;
 
-        float roll_demand = 0;
-        float pitch_demand = 0;
+        float rollDemand = 0;
+        float pitchDemand = 0;
 
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
-                roll_demand, pitch_demand);
+                rollDemand, pitchDemand);
 
-        auto yaw_demand = sim.yaw() * YAW_DEMAND_PRE_SCALE;
+        auto yawDemand = sim.yaw() * YAW_DEMAND_PRE_SCALE;
 
         _anglePid.run(DT,
                 1.0, // fake throttle to max for now, so no PID integral reset
-                roll_demand, pitch_demand, yaw_demand,
+                rollDemand, pitchDemand, yawDemand,
                 sim.phi(), sim.theta(), sim.dphi(),
                 sim.dtheta(), sim.dpsi(),
-                roll_demand, pitch_demand, yaw_demand);
+                rollDemand, pitchDemand, yawDemand);
 
-        roll_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
+        rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
         fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
                 sim.time(), 25*sim.roll(), 25*sim.dy(), 5*sim.phi(), sim.dphi(),
-                50 * roll_demand);
+                50 * rollDemand);
 
         fflush(logfp);
 
-        pitch_demand *= PITCH_ROLL_DEMAND_POST_SCALE;
+        pitchDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(
-                thrust_demand, roll_demand, pitch_demand, yaw_demand,
+                thrustDemand, rollDemand, pitchDemand, yawDemand,
                 m1, m2, m3, m4);
 
         sim.setMotors(m1, m2, m3, m4);
