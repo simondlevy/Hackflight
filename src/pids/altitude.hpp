@@ -32,6 +32,16 @@ namespace hf {
 
             static constexpr float ILIMIT = 5000;
 
+            float run_pi(const float dt, const float kp, const float ki,
+                    const float target, const float actual, float & integral)
+            {
+                const auto error = target - actual;
+
+                integral = Utils::fconstrain(integral + dt * error, ILIMIT);
+
+                return  kp * error + ki * integral;
+            }
+
             class ClimbRatePid {
 
                 private:
@@ -66,11 +76,11 @@ namespace hf {
                     const float z_actual,
                     const float dz_actual)
             {
-                const auto error = z_target - z_actual;
+                const auto dz_target = run_pi(dt, KP_Z, KI_Z, z_target, z_actual, _integral);
 
-                _integral = Utils::fconstrain(_integral + dt * error, ILIMIT);
-
-                const auto dz_target =  KP_Z * error + KI_Z * _integral;
+                //const auto error = z_target - z_actual;
+                //_integral = Utils::fconstrain(_integral + dt * error, ILIMIT);
+                //const auto dz_target =  KP_Z * error + KI_Z * _integral;
 
                 return _climbRatePid.run(dt, dz_target, dz_actual);
             }
