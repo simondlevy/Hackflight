@@ -24,13 +24,17 @@ namespace hf {
 
         private:
 
+            static constexpr float KP_Z = 2.0;
+            static constexpr float KI_Z = 0.5;
+
+            static constexpr float KP_DZ = 25;
+            static constexpr float KI_DZ = 15;
+
+            static constexpr float ILIMIT = 5000;
+
             class ClimbRatePid {
 
                 private:
-
-                    static constexpr float KP = 25;
-                    static constexpr float KI = 15;
-                    static constexpr float ILIMIT = 5000;
 
                     float _integral;
 
@@ -46,13 +50,9 @@ namespace hf {
                         _integral =
                             Utils::fconstrain(_integral + dt * error, ILIMIT);
 
-                        return  KP * error + KI * _integral;
+                        return  KP_DZ * error + KI_DZ * _integral;
                     }
             };
-
-            static constexpr float KP = 2.0;
-            static constexpr float KI = 0.5;
-            static constexpr float ILIMIT = 5000;
 
             float _integral;
 
@@ -70,7 +70,7 @@ namespace hf {
 
                 _integral = Utils::fconstrain(_integral + dt * error, ILIMIT);
 
-                const auto dz_target =  KP * error + KI * _integral;
+                const auto dz_target =  KP_Z * error + KI_Z * _integral;
 
                 return _climbRatePid.run(dt, dz_target, dz_actual);
             }
