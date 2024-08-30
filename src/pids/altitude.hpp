@@ -73,16 +73,13 @@ namespace hf {
             float run(
                     const float dt,
                     const float z_target,
-                    const float z_actual,
-                    const float dz_actual)
+                    const float z,
+                    const float dz)
             {
-                const auto dz_target = run_pi(dt, KP_Z, KI_Z, z_target, z_actual, _integral);
+                const auto dz_target =
+                    run_pi(dt, KP_Z, KI_Z, z_target, z, _integral);
 
-                //const auto error = z_target - z_actual;
-                //_integral = Utils::fconstrain(_integral + dt * error, ILIMIT);
-                //const auto dz_target =  KP_Z * error + KI_Z * _integral;
-
-                return _climbRatePid.run(dt, dz_target, dz_actual);
+                return _climbRatePid.run(dt, dz_target, dz);
             }
     };
 
