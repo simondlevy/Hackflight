@@ -45,8 +45,8 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid _altitudePid = {};
 
-    FILE * logfp = fopen("roll.csv", "w");
-    fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
+    FILE * logfp = fopen("altitude.csv", "w");
+    fprintf(logfp, "time,setpoint,z,dz,output\n");
 
     float z_target = INITIAL_ALTITUDE_TARGET;
 
@@ -84,9 +84,8 @@ int main(int argc, char ** argv)
 
         rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
-        fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
-                sim.time(), 25*sim.roll(), 25*sim.dy(), 5*sim.phi(), sim.dphi(),
-                50 * rollDemand);
+        fprintf(logfp, "%f,%f,%f,%f,%f\n",
+                sim.time(), z_target, sim.z(), sim.dz(), thrustDemand);
 
         fflush(logfp);
 
