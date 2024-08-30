@@ -22,6 +22,20 @@ namespace hf {
 
     class AltitudePid {
 
+        public:
+
+            float run(
+                    const float dt,
+                    const float z_target,
+                    const float z,
+                    const float dz)
+            {
+                const auto dz_target =
+                    run_pi(dt, KP_Z, KI_Z, z_target, z, _z_integral);
+
+                return run_pi(dt, KP_DZ, KI_DZ, dz_target, dz, _dz_integral);
+            }
+
         private:
 
             static constexpr float KP_Z = 2.0;
@@ -43,20 +57,6 @@ namespace hf {
                 integral = Utils::fconstrain(integral + dt * error, ILIMIT);
 
                 return  kp * error + ki * integral;
-            }
-
-        public:
-
-            float run(
-                    const float dt,
-                    const float z_target,
-                    const float z,
-                    const float dz)
-            {
-                const auto dz_target =
-                    run_pi(dt, KP_Z, KI_Z, z_target, z, _z_integral);
-
-                return run_pi(dt, KP_DZ, KI_DZ, dz_target, dz, _dz_integral);
             }
     };
 }
