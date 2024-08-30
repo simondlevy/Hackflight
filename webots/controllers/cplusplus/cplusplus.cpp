@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
     FILE * logfp = fopen("roll.csv", "w");
     fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
 
-    float altitudeTarget = INITIAL_ALTITUDE_TARGET;
+    float z_target = INITIAL_ALTITUDE_TARGET;
 
     while (true) {
 
@@ -59,10 +59,10 @@ int main(int argc, char ** argv)
             break;
         }
 
-        altitudeTarget += CLIMB_RATE_SCALE * sim.throttle();
+        z_target += CLIMB_RATE_SCALE * sim.throttle();
 
         const auto climbRateTarget =
-            _altitudePid.run(DT, altitudeTarget, sim.z());
+            _altitudePid.run(DT, z_target, sim.z());
 
         const auto thrustDemand =
             sim.hitTakeoffButton() ?
