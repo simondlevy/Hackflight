@@ -34,7 +34,7 @@ namespace hf {
 
             float _z_integral;
 
-            float run_pi(const float dt, const float kp, const float ki,
+            static float run_pi(const float dt, const float kp, const float ki,
                     const float target, const float actual, float & integral)
             {
                 const auto error = target - actual;
@@ -57,6 +57,8 @@ namespace hf {
                             float dz_target, 
                             const float dz_actual)
                     {
+                        return run_pi(dt, KP_DZ, KI_DZ, dz_target, dz_actual, _integral);
+                        
                         const auto error = dz_target - dz_actual;
 
                         _integral =
