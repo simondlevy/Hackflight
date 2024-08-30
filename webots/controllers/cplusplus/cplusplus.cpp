@@ -62,9 +62,15 @@ int main(int argc, char ** argv)
 
         if (sim.hitTakeoffButton()) {
 
-            thrustDemand =
-                THRUST_BASE + _altitudePid.run(
+            const auto thrustOffset = _altitudePid.run(
                         DT, z_target, sim.z(), sim.dz());
+
+            thrustDemand = THRUST_BASE + thrustOffset;
+
+            fprintf(logfp, "%f,%f,%f,%f,%f\n",
+                    sim.time(), z_target, sim.z(), sim.dz(), thrustOffset);
+
+            fflush(logfp);
         }
 
         float rollDemand = 0;
@@ -83,11 +89,6 @@ int main(int argc, char ** argv)
                 rollDemand, pitchDemand, yawDemand);
 
         rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
-
-        fprintf(logfp, "%f,%f,%f,%f,%f\n",
-                sim.time(), z_target, sim.z(), sim.dz(), thrustDemand);
-
-        fflush(logfp);
 
         pitchDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 

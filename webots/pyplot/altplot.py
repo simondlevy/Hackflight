@@ -15,29 +15,21 @@ def main():
     dz = data[:, 3]
     output = data[:, 4]
 
-    plt.subplot(4, 1, 1)
+    plt.subplot(3, 1, 1)
     plt.plot(time, setpoint)
     plt.plot(time, z)
     plt.xticks([], [])
     plt.ylabel('Altitude (m)')
     plt.legend(['Target', 'Actual'])
 
-    '''
-    plt.subplot(4, 1, 2)
-    plt.plot(time, phi)
+    plt.subplot(3, 1, 2)
+    plt.plot(time, dz)
     plt.xticks([], [])
-    plt.ylabel('Angle (deg)')
+    plt.ylabel('Climb rate (m/s)')
 
-    plt.subplot(4, 1, 3)
-    plt.plot(time, dphi)
-    plt.xticks([], [])
-    plt.ylabel('Ang. vel. (deg/s)')
-
-    plt.subplot(4, 1, 4)
+    plt.subplot(3, 1, 3)
     plt.plot(time, output)
-    plt.xlabel('Time (sec)')
-    plt.ylabel('Output')
-    '''
+    plt.ylabel('Thrust')
 
     plt.show()
 
