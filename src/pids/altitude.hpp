@@ -32,6 +32,8 @@ namespace hf {
 
             static constexpr float ILIMIT = 5000;
 
+            float _z_integral;
+
             float run_pi(const float dt, const float kp, const float ki,
                     const float target, const float actual, float & integral)
             {
@@ -64,8 +66,6 @@ namespace hf {
                     }
             };
 
-            float _integral;
-
             ClimbRatePid _climbRatePid;
 
         public:
@@ -77,7 +77,7 @@ namespace hf {
                     const float dz)
             {
                 const auto dz_target =
-                    run_pi(dt, KP_Z, KI_Z, z_target, z, _integral);
+                    run_pi(dt, KP_Z, KI_Z, z_target, z, _z_integral);
 
                 return _climbRatePid.run(dt, dz_target, dz);
             }
