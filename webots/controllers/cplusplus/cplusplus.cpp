@@ -24,6 +24,10 @@
 
 static const float DT = 0.01;
 
+static const float INITIAL_ALTITUDE_TARGET = 0.2;
+
+static const float CLIMB_RATE_SCALE = 0.01;
+
 static const float YAW_ANGLE_MAX = 200;
 
 static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
@@ -31,8 +35,6 @@ static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
 static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
 
 static const float THRUST_BASE = 55.385;
-
-static const float THRUST_TAKEOFF = 56;
 
 int main(int argc, char ** argv)
 {
@@ -49,7 +51,7 @@ int main(int argc, char ** argv)
     FILE * logfp = fopen("roll.csv", "w");
     fprintf(logfp, "time,setpoint,dy,phi,dphi,output\n");
 
-    float altitudeTarget = 0;
+    float altitudeTarget = INITIAL_ALTITUDE_TARGET;
 
     while (true) {
 
@@ -57,27 +59,15 @@ int main(int argc, char ** argv)
             break;
         }
 
-        hf::quad_motors_t motors = {};
+        altitudeTarget += CLIMB_RATE_SCALE * sim.throttle();
 
-        float thrust_demand = 0;
+        const auto climbRateTarget =
+            _altitudePid.run(DT, altitudeTarget, sim.z());
 
-        if (sim.completedTakeoff()) {
-
-            if (altitudeTarget == 0) {
-                altitudeTarget = sim.z();
-            }
-
-            altitudeTarget += DT * sim.throttle();
-
-            const auto climbRateTarget = _altitudePid.run(DT, altitudeTarget, sim.z());
-
-            thrust_demand =
-                THRUST_BASE + _climbRatePid.run(DT, climbRateTarget, sim.dz());
-        }
-
-        else if (sim.hitTakeoffButton ()) {
-            thrust_demand = THRUST_TAKEOFF;
-        }
+        const auto thrust_demand =
+            sim.hitTakeoffButton() ?
+            THRUST_BASE + _climbRatePid.run(DT, climbRateTarget, sim.dz()) :
+            0;
 
         float roll_demand = 0;
         float pitch_demand = 0;

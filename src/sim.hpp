@@ -130,11 +130,7 @@ namespace hf {
                     _button_was_hit = true;
                 }
 
-                _throttle *= THROTTLE_SCALE; 
-
                 _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
-
-                _completedTakeoff = _time > TAKEOFF_TIME;
 
                 return true;
             }
@@ -219,11 +215,6 @@ namespace hf {
                 return _button_was_hit;
             }
 
-            bool completedTakeoff()
-            {
-                return _completedTakeoff;
-            }
-
             void setMotors(
                     const float m1, 
                     const float m2, 
@@ -244,14 +235,6 @@ namespace hf {
             }
 
         private:
-
-            static constexpr float THROTTLE_SCALE = 0.2;
-
-            static constexpr float THRUST_TAKEOFF = 56;
-
-            static constexpr float THRUST_BASE = 55.385;
-
-            static constexpr float TAKEOFF_TIME = 3;
 
             typedef enum {
 
@@ -280,8 +263,6 @@ namespace hf {
             float _dtheta;
             float _psi;
             float _dpsi;
-
-            bool _completedTakeoff;
 
             bool _button_was_hit;
 
