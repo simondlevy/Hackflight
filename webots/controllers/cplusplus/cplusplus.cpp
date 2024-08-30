@@ -19,7 +19,6 @@
 
 #include <pids/altitude.hpp>
 #include <pids/angle.hpp>
-#include <pids/climbrate.hpp>
 #include <pids/position.hpp>
 
 static const float DT = 0.01;
@@ -44,8 +43,6 @@ int main(int argc, char ** argv)
 
     hf::AnglePid _anglePid = {};
 
-    hf::ClimbRatePid _climbRatePid = {};
-
     hf::AltitudePid _altitudePid = {};
 
     FILE * logfp = fopen("roll.csv", "w");
@@ -61,13 +58,14 @@ int main(int argc, char ** argv)
 
         z_target += CLIMB_RATE_SCALE * sim.throttle();
 
-        const auto climbRateTarget =
-            _altitudePid.run(DT, z_target, sim.z());
+        float thrustDemand = 0;
 
-        const auto thrustDemand =
-            sim.hitTakeoffButton() ?
-            THRUST_BASE + _climbRatePid.run(DT, climbRateTarget, sim.dz()) :
-            0;
+        if (sim.hitTakeoffButton()) {
+
+            thrustDemand =
+                THRUST_BASE + _altitudePid.run(
+                        DT, z_target, sim.z(), sim.dz());
+        }
 
         float rollDemand = 0;
         float pitchDemand = 0;
