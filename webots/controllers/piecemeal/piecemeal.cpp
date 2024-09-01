@@ -21,8 +21,7 @@
 #include <pids/position.hpp>
 
 #include <oldpids/pitchroll.hpp>
-#include <oldpids/yaw_angle.hpp>
-#include <oldpids/yaw_rate.hpp>
+#include <oldpids/yaw.hpp>
 
 static const float DT = 0.01;
 
@@ -38,6 +37,8 @@ static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
 
 static const float THRUST_BASE = 55.385;
 
+static const float THROTTLE_DOWN = 0.06;
+
 int main(int argc, char ** argv)
 {
     hf::Simulator sim = {};
@@ -45,6 +46,8 @@ int main(int argc, char ** argv)
     sim.init();
 
     //hf::AnglePid _anglePid = {};
+
+    hf::YawPid _yawPid = {};
 
     hf::AltitudePid _altitudePid = {};
 
@@ -76,8 +79,17 @@ int main(int argc, char ** argv)
             fflush(logfp);
         }
 
+        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+
         float rollDemand = 0;
+
         float pitchDemand = 0;
+
+        auto yawDemand = _yawPid.run(DT, resetPids, sim.yaw(), sim.psi());
+
+        printf("%+3.3f\n", yawDemand);
+
+        yawDemand = 0;
 
         /*
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
@@ -98,11 +110,12 @@ int main(int argc, char ** argv)
         */
 
 
-        float yawDemand = 0;
-
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(
-                thrustDemand, rollDemand, pitchDemand, yawDemand,
+                thrustDemand,
+                rollDemand,
+                pitchDemand,
+                yawDemand,
                 m1, m2, m3, m4);
 
         sim.setMotors(m1, m2, m3, m4);

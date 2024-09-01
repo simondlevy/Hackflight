@@ -1,5 +1,5 @@
 /*
-  Angle PID controller
+  Pitch/roll PID controller
 
   Adapted from https://github.com/nickrehm/dRehmFlight
  
