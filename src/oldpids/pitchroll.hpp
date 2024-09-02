@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class AnglePid {
+    class PitchRollPid {
 
         private:
 
@@ -77,7 +77,7 @@ namespace hf {
 
             void run(
                     const float dt, 
-                    const float thro_demand, 
+                    const bool reset,
                     const float roll_demand, 
                     const float pitch_demand, 
                     const float phi,
@@ -87,8 +87,6 @@ namespace hf {
                     float & roll_out,
                     float & pitch_out)
             {
-                const auto reset = thro_demand < THROTTLE_DOWN;
-
                 roll_out = _rollPid.run(dt, reset, roll_demand, phi, dphi);
 
                 pitch_out = _pitchPid.run(dt, reset, pitch_demand, theta, dtheta);

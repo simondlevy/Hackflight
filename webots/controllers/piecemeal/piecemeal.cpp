@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    //hf::AnglePid _anglePid = {};
+    hf::PitchRollPid _pitchRollPid = {};
 
     hf::YawPid _yawPid = {};
 
@@ -85,27 +85,27 @@ int main(int argc, char ** argv)
 
         float pitchDemand = 0;
 
-        const auto yawDemand =
-            _yawPid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
-
-        /*
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
                 rollDemand, pitchDemand);
 
-        auto yawDemand = sim.yaw() * YAW_DEMAND_PRE_SCALE;
-
-        _anglePid.run(DT,
-                1.0, // fake throttle to max for now, so no PID integral reset
-                rollDemand, pitchDemand, yawDemand,
-                sim.phi(), sim.theta(), sim.dphi(),
-                sim.dtheta(), sim.dpsi(),
-                rollDemand, pitchDemand, yawDemand);
+        _pitchRollPid.run(
+                DT,
+                resetPids,
+                rollDemand,
+                pitchDemand,
+                sim.phi(),
+                sim.theta(),
+                sim.dphi(),
+                sim.dtheta(), 
+                rollDemand,
+                pitchDemand);
 
         rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
         pitchDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
-        */
 
+        const auto yawDemand =
+            _yawPid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(
