@@ -18,6 +18,7 @@ def main():
     plt.subplot(2, 1, 1)
     plt.plot(time, roll_stick)
     plt.plot(time, dy)
+    plt.ylim((-1.1,1.1))
     plt.ylabel('Velocity (m/s)')
     plt.legend(('Setpoint', 'Actual'))
     plt.xticks([], [])
@@ -25,6 +26,7 @@ def main():
     plt.subplot(2, 1, 2)
     plt.plot(time, angle_demand)
     plt.plot(time, phi)
+    plt.ylim((-15,15))
     plt.ylabel('Angle (deg)')
     plt.legend(['Target', 'Actual'])
 
