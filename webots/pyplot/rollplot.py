@@ -16,8 +16,9 @@ def main():
     phi = data[:, 4]
     rate_demand = data[:, 5]
     dphi = data[:, 6]
+    motor = data[:, 7]
 
-    plt.subplot(3, 1, 1)
+    plt.subplot(4, 1, 1)
     plt.plot(time, roll_stick)
     plt.plot(time, dy)
     plt.ylim((-1.1,1.1))
@@ -25,7 +26,7 @@ def main():
     plt.legend(('Target', 'Actual'))
     plt.xticks([], [])
 
-    plt.subplot(3, 1, 2)
+    plt.subplot(4, 1, 2)
     plt.plot(time, angle_demand)
     plt.plot(time, phi)
     plt.ylim((-15,15))
@@ -33,12 +34,18 @@ def main():
     plt.legend(['Target', 'Actual'])
     plt.xticks([], [])
 
-    plt.subplot(3, 1, 3)
+    plt.subplot(4, 1, 3)
     plt.plot(time, rate_demand)
     plt.plot(time, dphi)
     plt.ylim((-80,80))
     plt.ylabel('Angular velocity (deg/s)')
     plt.legend(['Target', 'Actual'])
+    plt.xticks([], [])
+
+    plt.subplot(4, 1, 4)
+    plt.plot(time, motor)
+    plt.ylabel('Motor')
+
     plt.show()
 
 
