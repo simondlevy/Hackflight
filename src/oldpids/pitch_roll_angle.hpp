@@ -17,41 +17,58 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
-run reset kp ki ilimit dt target actual integ = (demand, integ') where
+namespace hf {
 
-    error = target - actual
+    class PitchRollAnglePid {
 
-    demand = kp * error + ki * integ
+        private:
 
-    integ' = if reset then 0 else constrain (integ + error * dt) (-ilimit) ilimit
+            static constexpr float KP = 6;
+            static constexpr float KI = 3;
+            static constexpr float ILIMIT = 20;
 
-{--
 
-  Demand is input as angles in degrees and output as angular velocities in
-  degrees per second:
+        public:
 
-  roll: right-down positive
+            void run(
+                    const float dt, 
+                    const bool reset,
+                    const float rollDemand,
+                    const float pitchDemand,
+                    const float phi,
+                    const float theta,
+                    float & newRollDemand,
+                    float & newPitchDemand)
+            {
 
-  pitch: nose-up positive
+                runAxis(dt, reset, rollDemand, phi,
+                        _roll_integral, newRollDemand);
 
---}
+                runAxis(dt, reset, pitchDemand, theta,
+                        _pitch_integral, newPitchDemand);
+            }
 
-pitchRollAnglePid reset dt state demands = demands' where
+        private:
 
-  kp = 6
-  ki = 3
-  ilimit = 20
+            float _roll_integral;
+            float _pitch_integral;
 
-  (rollDemand, rollInteg) = 
-    run reset kp ki ilimit dt (roll demands) (phi state) rollInteg'
+            static void runAxis(
+                    const float dt,
+                    const bool reset,
+                    const float demand,
+                    const float angle, 
+                    float & integral,
+                    float & newDemand)
+            {
 
-  (pitchDemand, pitchInteg) = 
-    run reset kp ki ilimit dt (pitch demands) (theta state) pitchInteg'
+                const auto error = demand - angle;
 
-  rollInteg' = [0] ++ rollInteg
+                integral = reset ? 0 :
+                    Utils::fconstrain(integral + error * dt, ILIMIT);
 
-  pitchInteg' = [0] ++ pitchInteg
+                newDemand = KP * error + KI * integral;
+            }
+    };
 
-  demands' = Demands (thrust demands) rollDemand pitchDemand (yaw demands)
-*/
+}

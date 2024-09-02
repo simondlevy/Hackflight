@@ -17,59 +17,67 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
   */
 
-/*
-run nothrust reset kp ki kd ilimit dt target actual integ prev =
-  (demand, integ', prev') where
+namespace hf {
 
-    error = target - actual
+    class PitchRollRatePid {
 
-    demand = if nothrust 
-             then 0 else 
-             kp * error + ki * integ + kd * (error - prev) / dt
+        private:
 
-    integ' = if reset then 0 
-             else if nothrust then integ
-             else constrain (integ + error * dt) (-ilimit) ilimit
+            static constexpr float KP = 125;
+            static constexpr float KI = 250;
+            static constexpr float KD = 1.25;
+            static constexpr float ILIMIT = 33;
 
-    prev' = if reset then 0 
-            else if nothrust then prev
-            else error
 
-{--
+        public:
 
-  Demands are input as angular velocities in degrees per second and output as
-  as arbitrary values to be scaled according to motor characteristics:
+            void run(
+                    const float dt, 
+                    const bool reset,
+                    const float rollDemand,
+                    const float pitchDemand,
+                    const float dphi,
+                    const float dtheta,
+                    float & newRollDemand,
+                    float & newPitchDemand)
+            {
 
-  roll:  input roll-right positive => output positive
+                runAxis(dt, reset, rollDemand, dphi,
+                        _roll_integral, _roll_error, newRollDemand);
 
-  pitch: input nose-up positive => output positive
+                runAxis(dt, reset, pitchDemand, dtheta,
+                        _pitch_integral, _pitch_error, newPitchDemand);
+            }
 
---}
+        private:
 
-pitchRollRatePid reset dt state demands = demands' where
+            float _roll_integral;
+            float _roll_error;
 
-  kp = 125
-  ki = 250
-  kd = 1.25
-  ilimit = 33
+            float _pitch_integral;
+            float _pitch_error;
 
-  nothrust = (thrust demands) == 0
+            static void runAxis(
+                    const float dt,
+                    const bool reset,
+                    const float demand,
+                    const float dangle, 
+                    float & integral,
+                    float & errprev,
+                    float & newDemand)
+            {
 
-  (rollDemand, rollInteg, rollPrev) = 
-    run nothrust reset kp ki kd ilimit dt (roll demands) (dphi state)
-        rollInteg' rollPrev'
+                const auto error = demand - dangle;
 
-  rollInteg' = [0] ++ rollInteg
+                integral = reset ? 0 :
+                    Utils::fconstrain(integral + error * dt, ILIMIT);
 
-  rollPrev' = [0] ++ rollPrev
+                const auto derivative = (error - errprev) / dt;
 
-  (pitchDemand, pitchInteg, pitchPrev) = 
-    run nothrust reset kp ki kd ilimit dt (pitch demands) (dtheta state) 
-        pitchInteg' pitchPrev'
+                newDemand = KP * error + KI * integral + KD * derivative;
 
-  pitchInteg' = [0] ++ pitchInteg
+                errprev = error;
+            }
+    };
 
-  pitchPrev' = [0] ++ pitchPrev
-
-  demands' = Demands (thrust demands) rollDemand pitchDemand (yaw demands)
-  */
+}
