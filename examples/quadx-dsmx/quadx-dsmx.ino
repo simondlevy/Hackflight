@@ -30,7 +30,6 @@
 #include <utils.hpp>
 #include <mixers.hpp>
 #include <tasks/blink.hpp>
-#include <pids/pitch_roll.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
@@ -62,7 +61,6 @@ static MPU6050 _mpu6050;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
-static hf::PitchRollPid _pitchRollPid;
 static hf::YawRatePid _yawRatePid;
 
 static hf::PitchRollAnglePid _pitchRollAnglePid;
@@ -357,25 +355,19 @@ void loop()
 
     // Run demands through PID controllers
 
-    /*
     float roll_PID=0, pitch_PID=0;
-    _pitchRollPid.run(dt, resetPids, roll_demand, pitch_demand, 
-            phi, theta, gyroX, gyroY, roll_PID, pitch_PID);
-            */
-
-    float new_roll_PID=0, new_pitch_PID=0;
     _pitchRollAnglePid.run(dt, resetPids, roll_demand, pitch_demand, 
-            phi, theta, new_roll_PID, new_pitch_PID);
-    _pitchRollRatePid.run(dt, resetPids, new_roll_PID, new_pitch_PID,
-            gyroX, gyroY, new_roll_PID, new_pitch_PID);
+            phi, theta, roll_PID, pitch_PID);
+    _pitchRollRatePid.run(dt, resetPids, roll_PID, pitch_PID,
+            gyroX, gyroY, roll_PID, pitch_PID);
 
-    new_roll_PID *= PITCH_ROLL_POST_SCALE;
-    new_pitch_PID *= PITCH_ROLL_POST_SCALE;
+    roll_PID *= PITCH_ROLL_POST_SCALE;
+    pitch_PID *= PITCH_ROLL_POST_SCALE;
 
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        //printf("%f,%f\n", roll_PID, new_roll_PID*2e-6);
+        //printf("%f,%f\n", roll_PID, roll_PID*2e-6);
         msec_prev = msec_curr;
     }
 
@@ -384,7 +376,7 @@ void loop()
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
     // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(thro_demand, new_roll_PID, new_pitch_PID, yaw_PID, 
+    hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
             m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125
