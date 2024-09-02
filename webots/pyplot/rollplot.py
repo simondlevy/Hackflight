@@ -10,33 +10,23 @@ def main():
             delimiter=',', skiprows=1)
 
     time = data[:, 0]
-    setpoint = data[:, 1]
+    roll_stick = data[:, 1]
     dy = data[:, 2]
-    phi = data[:, 3]
-    dphi = data[:, 4]
-    output = data[:, 5]
+    angle_demand = data[:, 3]
+    phi = data[:, 4]
 
-    plt.subplot(4, 1, 1)
-    plt.plot(time, setpoint)
+    plt.subplot(2, 1, 1)
+    plt.plot(time, roll_stick)
     plt.plot(time, dy)
-    plt.xticks([], [])
     plt.ylabel('Velocity (m/s)')
-    plt.legend(['Target', 'Actual'])
+    plt.legend(('Setpoint', 'Actual'))
+    plt.xticks([], [])
 
-    plt.subplot(4, 1, 2)
+    plt.subplot(2, 1, 2)
+    plt.plot(time, angle_demand)
     plt.plot(time, phi)
-    plt.xticks([], [])
     plt.ylabel('Angle (deg)')
-
-    plt.subplot(4, 1, 3)
-    plt.plot(time, dphi)
-    plt.xticks([], [])
-    plt.ylabel('Ang. vel. (deg/s)')
-
-    plt.subplot(4, 1, 4)
-    plt.plot(time, output)
-    plt.xlabel('Time (sec)')
-    plt.ylabel('Output')
+    plt.legend(['Target', 'Actual'])
 
     plt.show()
 

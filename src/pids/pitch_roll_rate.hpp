@@ -20,8 +20,8 @@
 namespace hf {
 
     /**
-        Input is angular rate demands (deg/sec) and actual angular rates from gyro;
-        ouputput is arbitrary units to be scaled for motors
+        Input is angular rate demands (deg/sec) and actual angular rates from
+        gyro; ouputput is arbitrary units to be scaled for motors
      */
      class PitchRollRatePid {
 
@@ -31,7 +31,6 @@ namespace hf {
             static constexpr float KI = 250;
             static constexpr float KD = 1.25;
             static constexpr float ILIMIT = 33;
-
 
         public:
 

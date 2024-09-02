@@ -50,8 +50,8 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid altitudePid = {};
 
-    FILE * logfp = fopen("altitude.csv", "w");
-    fprintf(logfp, "time,setpoint,z,dz,output\n");
+    FILE * logfp = fopen("roll.csv", "w");
+    fprintf(logfp, "time,roll_stick,dy,roll_angle_demand\n");
 
     float z_target = INITIAL_ALTITUDE_TARGET;
 
@@ -65,6 +65,11 @@ int main(int argc, char ** argv)
 
         float thrustDemand = 0;
 
+        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+
+        float rollDemand = 0;
+        float pitchDemand = 0;
+
         if (sim.hitTakeoffButton()) {
 
             const auto thrustOffset = altitudePid.run(
@@ -72,19 +77,18 @@ int main(int argc, char ** argv)
 
             thrustDemand = THRUST_BASE + thrustOffset;
 
-            fprintf(logfp, "%f,%f,%f,%f,%f\n",
-                    sim.time(), z_target, sim.z(), sim.dz(), thrustOffset);
-
-            fflush(logfp);
         }
-
-        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
-
-        float rollDemand = 0;
-        float pitchDemand = 0;
 
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
                 rollDemand, pitchDemand);
+
+        if (sim.hitTakeoffButton()) {
+
+            fprintf(logfp, "%f,%f,%f,%f,%f\n",
+                    sim.time(), sim.roll(), sim.dy(), rollDemand, sim.phi());
+
+            fflush(logfp);
+        }
 
         pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
                 sim.phi(), sim.theta(), rollDemand, pitchDemand);
