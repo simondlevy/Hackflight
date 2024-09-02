@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
     hf::AltitudePid altitudePid = {};
 
     FILE * logfp = fopen("roll.csv", "w");
-    fprintf(logfp, "time,roll_stick,dy,roll_angle_demand\n");
+    fprintf(logfp, "time,roll_stick,dy,angle_demand,rate_demand,dangle\n");
 
     float z_target = INITIAL_ALTITUDE_TARGET;
 
@@ -84,7 +84,7 @@ int main(int argc, char ** argv)
 
         if (sim.hitTakeoffButton()) {
 
-            fprintf(logfp, "%f,%f,%f,%f,%f\n",
+            fprintf(logfp, "%f,%f,%f,%f,%f",
                     sim.time(), sim.roll(), sim.dy(), rollDemand, sim.phi());
 
             fflush(logfp);
@@ -92,6 +92,13 @@ int main(int argc, char ** argv)
 
         pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
                 sim.phi(), sim.theta(), rollDemand, pitchDemand);
+
+        if (sim.hitTakeoffButton()) {
+
+            fprintf(logfp, ",%f,%f\n", rollDemand, sim.dphi());
+
+            fflush(logfp);
+        }
 
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), rollDemand, pitchDemand);

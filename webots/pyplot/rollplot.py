@@ -14,22 +14,31 @@ def main():
     dy = data[:, 2]
     angle_demand = data[:, 3]
     phi = data[:, 4]
+    rate_demand = data[:, 5]
+    dphi = data[:, 6]
 
-    plt.subplot(2, 1, 1)
+    plt.subplot(3, 1, 1)
     plt.plot(time, roll_stick)
     plt.plot(time, dy)
     plt.ylim((-1.1,1.1))
     plt.ylabel('Velocity (m/s)')
-    plt.legend(('Setpoint', 'Actual'))
+    plt.legend(('Target', 'Actual'))
     plt.xticks([], [])
 
-    plt.subplot(2, 1, 2)
+    plt.subplot(3, 1, 2)
     plt.plot(time, angle_demand)
     plt.plot(time, phi)
     plt.ylim((-15,15))
     plt.ylabel('Angle (deg)')
     plt.legend(['Target', 'Actual'])
+    plt.xticks([], [])
 
+    plt.subplot(3, 1, 3)
+    plt.plot(time, rate_demand)
+    plt.plot(time, dphi)
+    plt.ylim((-80,80))
+    plt.ylabel('Angular velocity (deg/s)')
+    plt.legend(['Target', 'Actual'])
     plt.show()
 
 
