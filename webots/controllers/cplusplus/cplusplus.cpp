@@ -35,7 +35,7 @@ static const float THRUST_BASE = 55.385;
 
 static const float THROTTLE_DOWN = 0.06;
 
-static const float PITCH_ROLL_DEMAND_POST_SCALE = 1e-4;
+static const float PITCH_ROLL_POST_SCALE = 1e-4;
 
 int main(int argc, char ** argv)
 {
@@ -92,9 +92,9 @@ int main(int argc, char ** argv)
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), rollDemand, pitchDemand);
 
-        rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
+        rollDemand *= PITCH_ROLL_POST_SCALE;
 
-        pitchDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
+        pitchDemand *= PITCH_ROLL_POST_SCALE;
 
         const auto yawDemand =
             yawRatePid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
