@@ -21,10 +21,6 @@ ROLL_NETWORK = $(FDIR)/cpp-apps/networks/roll_risp.txt
 VIZ_HOST = "localhost"
 VIZ_PORT = 8100
 
-piecemeal:
-	webots worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/piecemeal/piecemeal
-
 cplusplus:
 	webots worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus

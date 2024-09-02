@@ -4,11 +4,11 @@ CFLAGS = -Wno-unused-variable
 CPPDIR = ../../../src
 INCLUDE = -I$(CPPDIR)
 
-HASKDIR = ../../../haskell
+NAME = cplusplus
 
-CXX_SOURCES = cplusplus.cpp
+CXX_SOURCES = $(NAME).cpp
 
-all: cplusplus
+all: $(NAME)
 
 #Un-comment if you want to try OpenCV
 #ifeq ($(OS),Windows_NT)
@@ -36,4 +36,4 @@ WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
 edit:
-	vim cplusplus.cpp
+	vim $(NAME).cpp

@@ -18,25 +18,24 @@
 #include <sim.hpp>
 
 #include <pids/altitude.hpp>
-#include <pids/pitch_roll.hpp>
 #include <pids/position.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 
 static const float DT = 0.01;
 
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
-static const float YAW_PRESCALE = 160; // deg/sec
-
 static const float CLIMB_RATE_SCALE = 0.01;
 
-static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
-
-static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
+static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float THRUST_BASE = 55.385;
 
 static const float THROTTLE_DOWN = 0.06;
+
+static const float PITCH_ROLL_DEMAND_POST_SCALE = 1e-4;
 
 int main(int argc, char ** argv)
 {
@@ -44,7 +43,8 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    hf::PitchRollPid pitchRollPid = {};
+    hf::PitchRollAnglePid pitchRollAnglePid = {};
+    hf::PitchRollRatePid pitchRollRatePid = {};
 
     hf::YawRatePid yawRatePid = {};
 
@@ -86,9 +86,11 @@ int main(int argc, char ** argv)
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
                 rollDemand, pitchDemand);
 
-        pitchRollPid.run(DT, resetPids, rollDemand, pitchDemand,
-                sim.phi(), sim.theta(), sim.dphi(), sim.dtheta(),
-                rollDemand, pitchDemand);
+        pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
+                sim.phi(), sim.theta(), rollDemand, pitchDemand);
+
+        pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
+                sim.dphi(), sim.dtheta(), rollDemand, pitchDemand);
 
         rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
@@ -99,7 +101,10 @@ int main(int argc, char ** argv)
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(
-                thrustDemand, rollDemand, pitchDemand, yawDemand,
+                thrustDemand,
+                rollDemand,
+                pitchDemand,
+                yawDemand,
                 m1, m2, m3, m4);
 
         sim.setMotors(m1, m2, m3, m4);
