@@ -19,7 +19,10 @@
 
 namespace hf {
 
-    class PitchRollAnglePid {
+    /**
+        Input is desired angles (deg); output is angular rates (deg/sec)
+     */
+     class PitchRollAnglePid {
 
         private:
 

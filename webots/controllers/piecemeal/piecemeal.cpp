@@ -86,25 +86,11 @@ int main(int argc, char ** argv)
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
                 rollDemand, pitchDemand);
 
-        pitchRollAnglePid.run(
-                DT,
-                resetPids,
-                rollDemand,
-                pitchDemand,
-                sim.phi(),
-                sim.theta(),
-                rollDemand,
-                pitchDemand);
+        pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
+                sim.phi(), sim.theta(), rollDemand, pitchDemand);
 
-        pitchRollRatePid.run(
-                DT,
-                resetPids,
-                rollDemand,
-                pitchDemand,
-                sim.dphi(),
-                sim.dtheta(),
-                rollDemand,
-                pitchDemand);
+        pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
+                sim.dphi(), sim.dtheta(), rollDemand, pitchDemand);
 
         rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 

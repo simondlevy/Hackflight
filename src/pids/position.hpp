@@ -20,6 +20,10 @@
 
 namespace hf {
 
+    /**
+        Input is meter/second demands and actual velocities; output is roll/pitch
+        angles
+     */
     class PositionPid {
 
         private:

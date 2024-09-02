@@ -19,7 +19,11 @@
 
 namespace hf {
 
-    class PitchRollRatePid {
+    /**
+        Input is angular rate demands (deg/sec) and actual angular rates from gyro;
+        ouputput is arbitrary units to be scaled for motors
+     */
+     class PitchRollRatePid {
 
         private:
 
