@@ -35,8 +35,6 @@ namespace hf {
             static constexpr float KI = 0.003;    
             static constexpr float KD = 0.0005;   
 
-            static constexpr float THROTTLE_DOWN = 0.06;
-
             class PitchRollPidController {
 
                 public:
@@ -58,8 +56,10 @@ namespace hf {
 
                         _integral = hf::Utils::fconstrain(_integral, I_LIMIT);
 
-                        const auto output =
-                            KP * error + KI * _integral - KD * dangle; 
+                        const auto output = 
+                            KP * error +
+                            KI * _integral - 
+                            KD * dangle; 
 
                         return output;
                     }
