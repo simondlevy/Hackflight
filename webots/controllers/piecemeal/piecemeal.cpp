@@ -33,7 +33,7 @@ static const float YAW_ANGLE_MAX = 200;
 
 static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
 
-static const float YAW_DEMAND_PRE_SCALE = 160; // deg/sec
+static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float THRUST_BASE = 55.385;
 
@@ -85,11 +85,8 @@ int main(int argc, char ** argv)
 
         float pitchDemand = 0;
 
-        auto yawDemand = _yawPid.run(DT, resetPids, sim.yaw(), sim.psi());
-
-        printf("%+3.3f\n", yawDemand);
-
-        yawDemand = 0;
+        const auto yawDemand =
+            _yawPid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
 
         /*
         hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
