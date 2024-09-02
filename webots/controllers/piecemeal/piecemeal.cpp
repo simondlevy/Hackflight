@@ -19,10 +19,9 @@
 
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
-
-#include <oldpids/pitch_roll_angle.hpp>
-#include <oldpids/pitch_roll_rate.hpp>
-#include <oldpids/yaw.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
+#include <pids/yaw_rate.hpp>
 
 static const float DT = 0.01;
 
@@ -30,17 +29,13 @@ static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
 static const float CLIMB_RATE_SCALE = 0.01;
 
-static const float YAW_ANGLE_MAX = 200;
-
-static const float PITCH_ROLL_DEMAND_POST_SCALE = 30; // deg
-
 static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float THRUST_BASE = 55.385;
 
 static const float THROTTLE_DOWN = 0.06;
 
-static const float OLD_PITCH_ROLL_DEMAND_POST_SCALE = 1e-4;
+static const float PITCH_ROLL_DEMAND_POST_SCALE = 1e-4;
 
 int main(int argc, char ** argv)
 {
@@ -51,7 +46,7 @@ int main(int argc, char ** argv)
     hf::PitchRollAnglePid pitchRollAnglePid = {};
     hf::PitchRollRatePid pitchRollRatePid = {};
 
-    hf::YawPid yawPid = {};
+    hf::YawRatePid yawRatePid = {};
 
     hf::AltitudePid altitudePid = {};
 
@@ -111,12 +106,12 @@ int main(int argc, char ** argv)
                 rollDemand,
                 pitchDemand);
 
-        rollDemand *= OLD_PITCH_ROLL_DEMAND_POST_SCALE;
+        rollDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
-        pitchDemand *= OLD_PITCH_ROLL_DEMAND_POST_SCALE;
+        pitchDemand *= PITCH_ROLL_DEMAND_POST_SCALE;
 
         const auto yawDemand =
-            yawPid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
+            yawRatePid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(

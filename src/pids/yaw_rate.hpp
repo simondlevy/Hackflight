@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class YawPid {
+    class YawRatePid {
 
         private:
 
