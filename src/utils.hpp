@@ -76,10 +76,9 @@ namespace hf {
                 return x * x;
             }
 
-            static float fconstrain(
-                    const float val, const float minval, const float maxval)
+            static float fconstrain(const float val, const float maxabs)
             {
-                return val < minval ? minval : val > maxval ? maxval : val;
+                return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
             }
 
             static uint8_t u8constrain(

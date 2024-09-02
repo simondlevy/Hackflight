@@ -79,8 +79,7 @@ namespace hf {
                             _integral = 0;
                         }
 
-                        _integral = hf::Utils::fconstrain(
-                                _integral, -I_LIMIT, I_LIMIT); 
+                        _integral = hf::Utils::fconstrain(_integral, I_LIMIT);
 
                         const auto output = 
                             KP_PITCH_ROLL * error +
@@ -113,8 +112,7 @@ namespace hf {
                             _integral = 0;
                         }
 
-                        _integral = hf::Utils::fconstrain(
-                                _integral, -I_LIMIT, I_LIMIT); 
+                        _integral = hf::Utils::fconstrain(_integral, I_LIMIT); 
 
                         const auto derivative = (error - _error_prev) / dt;
 

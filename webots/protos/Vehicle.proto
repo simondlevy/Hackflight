@@ -7,7 +7,7 @@ PROTO Vehicle [
 
 DEF ROBOT Robot {
 
-    translation  0 0 0.30 # 0.015
+    translation  0 0 0.30
         rotation 0 0 0 0
         controller "<extern>"
         supervisor FALSE
