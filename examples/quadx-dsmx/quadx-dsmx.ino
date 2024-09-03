@@ -66,8 +66,6 @@ static hf::YawRatePid _yawRatePid;
 static hf::PitchRollAnglePid _pitchRollAnglePid;
 static hf::PitchRollRatePid _pitchRollRatePid;
 
-static const float PITCH_ROLL_POST_SCALE = 2e-6;
-
 // Das Blinkenlights ---------------------------------------------------------
 
 static const float BLINK_RATE_HZ = 1.5;
@@ -360,10 +358,6 @@ void loop()
 
     _pitchRollRatePid.run(
             dt, resetPids, rollDemand, pitchDemand, gyroX, gyroY);
-
-    rollDemand *= PITCH_ROLL_POST_SCALE;
-
-    pitchDemand *= PITCH_ROLL_POST_SCALE;
 
     _yawRatePid.run(dt, resetPids, yawDemand, gyroZ);
 

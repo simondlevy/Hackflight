@@ -21,16 +21,16 @@ namespace hf {
 
     /**
         Input is angular rate demands (deg/sec) and actual angular rates from
-        gyro; ouputput is arbitrary units to be scaled for motors
+        gyro; ouputput is arbitrary units scaled for motors
      */
      class PitchRollRatePid {
 
         private:
 
-            static constexpr float KP = 125;
-            static constexpr float KI = 250;
-            static constexpr float KD = 1.25;
-            static constexpr float ILIMIT = 33;
+            static constexpr float KP = 125 * 2e-6;
+            static constexpr float KI = 250 * 2e-6;
+            static constexpr float KD = 1.25 * 2e-6;
+            static constexpr float ILIMIT = 33 * 2e-6;
 
         public:
 
@@ -40,14 +40,15 @@ namespace hf {
                     float & rollDemand,
                     float & pitchDemand,
                     const float dphi,
-                    const float dtheta)
+                    const float dtheta,
+                    const float postScale=1.0)
             {
 
                 runAxis(dt, reset, rollDemand, dphi, _roll_integral,
-                        _roll_error);
+                        _roll_error, postScale);
 
                 runAxis(dt, reset, pitchDemand, dtheta, _pitch_integral,
-                        _pitch_error); 
+                        _pitch_error, postScale); 
             }
 
         private:
@@ -64,7 +65,8 @@ namespace hf {
                     float & demand,
                     const float dangle, 
                     float & integral,
-                    float & errprev)
+                    float & errprev,
+                    const float postScale)
             {
 
                 const auto error = demand - dangle;
@@ -74,7 +76,8 @@ namespace hf {
 
                 const auto derivative = (error - errprev) / dt;
 
-                demand = KP * error + KI * integral + KD * derivative;
+                demand =
+                    postScale * (KP * error + KI * integral + KD * derivative);
 
                 errprev = error;
             }
