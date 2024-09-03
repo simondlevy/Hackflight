@@ -25,6 +25,8 @@ static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;
 
+static const float TAKEOFF_TIME = 3;
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -61,8 +63,10 @@ int main(int argc, char ** argv)
         vector <double> actions;
         snn->step(observations, actions);
 
+        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
+
         const auto motor =
-            sim.completedTakeoff() ? 
+            time > TAKEOFF_TIME ? 
             THRUST_BASE + actions[0] :
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
