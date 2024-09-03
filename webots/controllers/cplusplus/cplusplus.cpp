@@ -67,9 +67,6 @@ int main(int argc, char ** argv)
 
         const auto resetPids = sim.throttle() < THROTTLE_DOWN;
 
-        float rollDemand = 0;
-        float pitchDemand = 0;
-
         if (sim.hitTakeoffButton()) {
 
             const auto thrustOffset = altitudePid.run(
@@ -79,39 +76,25 @@ int main(int argc, char ** argv)
 
         }
 
-        hf::PositionPid::run(sim.roll(), sim.pitch(), sim.dx(), sim.dy(),
-                rollDemand, pitchDemand);
+        float rollDemand = sim.roll();
 
-        if (sim.hitTakeoffButton()) {
+        float pitchDemand  = sim.pitch();
 
-            fprintf(logfp, "%f,%f,%f,%f,%f",
-                    sim.time(), sim.roll(), sim.dy(), rollDemand, sim.phi());
-        }
+        float yawDemand = sim.yaw() * YAW_PRESCALE;
+
+        hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
 
         pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
-                sim.phi(), sim.theta(), rollDemand, pitchDemand);
-
-        if (sim.hitTakeoffButton()) {
-
-            fprintf(logfp, ",%f,%f", rollDemand, sim.dphi());
-        }
+                sim.phi(), sim.theta());
 
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
-                sim.dphi(), sim.dtheta(), rollDemand, pitchDemand);
-
-        if (sim.hitTakeoffButton()) {
-
-            fprintf(logfp, ",%f\n", rollDemand);
-
-            fflush(logfp);
-        }
+                sim.dphi(), sim.dtheta());
 
         rollDemand *= PITCH_ROLL_POST_SCALE;
 
         pitchDemand *= PITCH_ROLL_POST_SCALE;
 
-        const auto yawDemand =
-            yawRatePid.run(DT, resetPids, sim.yaw() * YAW_PRESCALE, sim.dpsi());
+        yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
 
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(

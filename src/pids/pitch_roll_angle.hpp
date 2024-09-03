@@ -36,19 +36,15 @@ namespace hf {
             void run(
                     const float dt, 
                     const bool reset,
-                    const float rollDemand,
-                    const float pitchDemand,
+                    float & rollDemand,
+                    float & pitchDemand,
                     const float phi,
-                    const float theta,
-                    float & newRollDemand,
-                    float & newPitchDemand)
+                    const float theta)
             {
 
-                runAxis(dt, reset, rollDemand, phi,
-                        _roll_integral, newRollDemand);
+                runAxis(dt, reset, rollDemand, phi, _roll_integral);
 
-                runAxis(dt, reset, pitchDemand, theta,
-                        _pitch_integral, newPitchDemand);
+                runAxis(dt, reset, pitchDemand, theta, _pitch_integral);
             }
 
         private:
@@ -59,10 +55,9 @@ namespace hf {
             static void runAxis(
                     const float dt,
                     const bool reset,
-                    const float demand,
+                    float & demand,
                     const float angle, 
-                    float & integral,
-                    float & newDemand)
+                    float & integral)
             {
 
                 const auto error = demand - angle;
@@ -70,7 +65,7 @@ namespace hf {
                 integral = reset ? 0 :
                     Utils::fconstrain(integral + error * dt, ILIMIT);
 
-                newDemand = KP * error + KI * integral;
+                demand = KP * error + KI * integral;
             }
     };
 

@@ -37,19 +37,17 @@ namespace hf {
             void run(
                     const float dt, 
                     const bool reset,
-                    const float rollDemand,
-                    const float pitchDemand,
+                    float & rollDemand,
+                    float & pitchDemand,
                     const float dphi,
-                    const float dtheta,
-                    float & newRollDemand,
-                    float & newPitchDemand)
+                    const float dtheta)
             {
 
-                runAxis(dt, reset, rollDemand, dphi,
-                        _roll_integral, _roll_error, newRollDemand);
+                runAxis(dt, reset, rollDemand, dphi, _roll_integral,
+                        _roll_error);
 
-                runAxis(dt, reset, pitchDemand, dtheta,
-                        _pitch_integral, _pitch_error, newPitchDemand);
+                runAxis(dt, reset, pitchDemand, dtheta, _pitch_integral,
+                        _pitch_error); 
             }
 
         private:
@@ -63,11 +61,10 @@ namespace hf {
             static void runAxis(
                     const float dt,
                     const bool reset,
-                    const float demand,
+                    float & demand,
                     const float dangle, 
                     float & integral,
-                    float & errprev,
-                    float & newDemand)
+                    float & errprev)
             {
 
                 const auto error = demand - dangle;
@@ -77,7 +74,7 @@ namespace hf {
 
                 const auto derivative = (error - errprev) / dt;
 
-                newDemand = KP * error + KI * integral + KD * derivative;
+                demand = KP * error + KI * integral + KD * derivative;
 
                 errprev = error;
             }

@@ -83,9 +83,9 @@ static auto _motors = OneShot125(MOTOR_PINS);
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
 //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-static const float MAX_PITCH_ROLL_ANGLE = 30.0;    
+static const float PITCH_ROLL_PRESCALE = 30.0;    
 
-static const float MAX_YAW_RATE = 160.0;     //Max yaw rate in deg/sec
+static const float YAW_PRESCALE = 160.0;     //Max yaw rate in deg/sec
 
 // IMU calibration parameters
 static float ACC_ERROR_X = 0.0;
@@ -342,42 +342,44 @@ void loop()
     psi = -psi;
 
     // Convert stick demands to appropriate intervals
-    const float thro_demand =
+    float thrustDemand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    const float roll_demand = 
-        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float pitch_demand =
-        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float yaw_demand = 
-        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
+    float rollDemand = 
+        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+    float pitchDemand =
+        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+    float yawDemand = 
+        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
 
-    const auto resetPids = thro_demand < THROTTLE_DOWN;
+    const auto resetPids = thrustDemand < THROTTLE_DOWN;
 
     // Run demands through PID controllers
 
-    float roll_PID=0, pitch_PID=0;
-    _pitchRollAnglePid.run(dt, resetPids, roll_demand, pitch_demand, 
-            phi, theta, roll_PID, pitch_PID);
-    _pitchRollRatePid.run(dt, resetPids, roll_PID, pitch_PID,
-            gyroX, gyroY, roll_PID, pitch_PID);
+    _pitchRollAnglePid.run(
+            dt, resetPids, rollDemand, pitchDemand, phi, theta);
 
-    roll_PID *= PITCH_ROLL_POST_SCALE;
-    pitch_PID *= PITCH_ROLL_POST_SCALE;
+    _pitchRollRatePid.run(
+            dt, resetPids, rollDemand, pitchDemand, gyroX, gyroY);
 
-    const auto yaw_PID = _yawRatePid.run(dt, resetPids, yaw_demand, gyroZ);
+    rollDemand *= PITCH_ROLL_POST_SCALE;
+
+    pitchDemand *= PITCH_ROLL_POST_SCALE;
+
+    _yawRatePid.run(dt, resetPids, yawDemand, gyroZ);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
+
+    // Run motor mixer
+    hf::Mixer::runBetaFlightQuadX(
+            thrustDemand, rollDemand, pitchDemand, yawDemand, 
+            m1_command, m2_command, m3_command, m4_command);
 
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-       // printf("%f  %f  %f\n", roll_PID, pitch_PID, yaw_PID);
+        // printf("
         msec_prev = msec_curr;
     }
-
-    // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
-            m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125
     _m1_usec = scaleMotor(m1_command);

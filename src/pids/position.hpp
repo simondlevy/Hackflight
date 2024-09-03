@@ -33,12 +33,11 @@ namespace hf {
         public:
 
             static void run(
-                    const float rollDemand, const float pitchDemand,
-                    const float dx, const float dy,
-                    float & newRollDemand, float & newPitchDemand)
+                    float & rollDemand, float & pitchDemand,
+                    const float dx, const float dy)
             {
-                newRollDemand = KP * (rollDemand - dy);
-                newPitchDemand = KP * (pitchDemand - dx);
+                rollDemand = KP * (rollDemand - dy);
+                pitchDemand = KP * (pitchDemand - dx);
             }
 
     };

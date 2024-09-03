@@ -25,7 +25,11 @@
 
 namespace hf {
 
-    class YawRatePid {
+    /**
+        Input is angular rate demand (deg/sec) and actual angular rate from
+        gyro; ouputput is arbitrary units scaled for motors
+     */
+     class YawRatePid {
 
         private:
 
@@ -37,10 +41,10 @@ namespace hf {
 
         public:
 
-            float run(
+            void run(
                     const float dt, 
                     const bool reset,
-                    const float demand, 
+                    float & demand, 
                     const float dangle)
             {
                 const auto error = demand - dangle;
@@ -50,12 +54,9 @@ namespace hf {
 
                 const auto derivative = (error - _error) / dt;
 
-                const auto output =
-                    KP * error + KI * _integral - KD * derivative; 
+                demand = KP * error + KI * _integral - KD * derivative; 
 
                 _error = error;
-
-                return output;
               }    
 
         private:
