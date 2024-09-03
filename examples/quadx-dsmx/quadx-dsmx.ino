@@ -364,16 +364,16 @@ void loop()
     roll_PID *= PITCH_ROLL_POST_SCALE;
     pitch_PID *= PITCH_ROLL_POST_SCALE;
 
-    static uint32_t msec_prev;
-    const auto msec_curr = millis();
-    if (msec_curr - msec_prev > 100) {
-        //printf("%f,%f\n", roll_PID, roll_PID*2e-6);
-        msec_prev = msec_curr;
-    }
-
     const auto yaw_PID = _yawRatePid.run(dt, resetPids, yaw_demand, gyroZ);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
+
+    static uint32_t msec_prev;
+    const auto msec_curr = millis();
+    if (msec_curr - msec_prev > 100) {
+       // printf("%f  %f  %f\n", roll_PID, pitch_PID, yaw_PID);
+        msec_prev = msec_curr;
+    }
 
     // Run motor mixer
     hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
