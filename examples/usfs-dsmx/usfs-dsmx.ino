@@ -29,7 +29,9 @@
 #include <utils.hpp>
 #include <mixers.hpp>
 #include <tasks/blink.hpp>
-#include <pids/angle.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
+#include <pids/yaw_rate.hpp>
 
 // Receiver -------------------------------------------------------------------
 
@@ -65,7 +67,12 @@ static Usfs _usfs;
 
 // PID control ---------------------------------------------------------------
 
-static hf::AnglePid _anglePid;
+static constexpr float THROTTLE_DOWN = 0.06;
+
+static hf::YawRatePid _yawRatePid;
+
+static hf::PitchRollAnglePid _pitchRollAnglePid;
+static hf::PitchRollRatePid _pitchRollRatePid;
 
 // Das Blinkenlights ---------------------------------------------------------
 
@@ -81,10 +88,11 @@ static auto _motors = OneShot125(MOTOR_PINS);
 
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
-//Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-static const float MAX_PITCH_ROLL_ANGLE = 30.0;    
+// Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+static const float PITCH_ROLL_PRESCALE = 30.0;    
 
-static const float MAX_YAW_RATE = 160.0;     //Max yaw rate in deg/sec
+// Max yaw rate in deg/sec
+static const float YAW_PRESCALE = 160.0;     
 
 static void initImu() 
 {
@@ -316,32 +324,37 @@ void loop()
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        //printf("gyroZ:%f\n", gyroZ);
+        printf("phi:%f\n", phi);
         msec_prev = msec_curr;
     }
 
     // Convert stick demands to appropriate intervals
-    const float thro_demand =
+    float thrustDemand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    const float roll_demand = 
-        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float pitch_demand =
-        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * MAX_PITCH_ROLL_ANGLE;
-    const float yaw_demand = 
-        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * MAX_YAW_RATE;
+    float rollDemand = 
+        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+    float pitchDemand =
+        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+    float yawDemand = 
+        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
+
+    const auto resetPids = thrustDemand < THROTTLE_DOWN;
 
     // Run demands through PID controllers
-    float roll_PID=0, pitch_PID=0, yaw_PID=0;
-    _anglePid.run(dt, thro_demand, 
-            roll_demand, pitch_demand, yaw_demand, 
-            phi, theta,
-            gyroX, gyroY, gyroZ,
-            roll_PID, pitch_PID, yaw_PID);
+
+    _pitchRollAnglePid.run(
+            dt, resetPids, rollDemand, pitchDemand, phi, theta);
+
+    _pitchRollRatePid.run(
+            dt, resetPids, rollDemand, pitchDemand, gyroX, gyroY);
+
+    _yawRatePid.run(dt, resetPids, yawDemand, gyroZ);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
     // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(thro_demand, roll_PID, pitch_PID, yaw_PID, 
+    hf::Mixer::runBetaFlightQuadX(
+            thrustDemand, rollDemand, pitchDemand, yawDemand, 
             m1_command, m2_command, m3_command, m4_command);
 
     // Rescale motor values for OneShot125

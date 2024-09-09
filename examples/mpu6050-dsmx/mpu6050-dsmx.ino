@@ -80,10 +80,11 @@ static auto _motors = OneShot125(MOTOR_PINS);
 
 static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
-//Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+// Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
 static const float PITCH_ROLL_PRESCALE = 30.0;    
 
-static const float YAW_PRESCALE = 160.0;     //Max yaw rate in deg/sec
+// Max yaw rate in deg/sec
+static const float YAW_PRESCALE = 160.0;     
 
 // IMU calibration parameters
 static float ACC_ERROR_X = 0.0;

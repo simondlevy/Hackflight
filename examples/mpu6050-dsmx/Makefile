@@ -1,4 +1,4 @@
-SKETCH = usfs
+SKETCH = mpu6050-dsmx
 
 BOARD = teensy:avr:teensy40
 

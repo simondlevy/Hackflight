@@ -1,4 +1,4 @@
-SKETCH = quadx-dsmx
+SKETCH = usfs-dsmx
 
 BOARD = teensy:avr:teensy40
 
