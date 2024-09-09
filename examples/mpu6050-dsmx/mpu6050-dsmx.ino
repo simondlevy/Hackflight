@@ -69,7 +69,7 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 // Das Blinkenlights ---------------------------------------------------------
 
 static const float BLINK_RATE_HZ = 1.5;
-static const uint8_t LED_PIN = 13;
+static const uint8_t LED_PIN = LED_BUILTIN;
 static hf::BlinkTask _blinkTask;
 
 // Motors --------------------------------------------------------------------
@@ -325,7 +325,7 @@ void loop()
 
     // Otherwise, blink LED as heartbeat
     else {
-        _blinkTask.run(usec_curr, BLINK_RATE_HZ);
+        _blinkTask.run(LED_PIN, usec_curr, BLINK_RATE_HZ);
     }
 
     //Get vehicle state

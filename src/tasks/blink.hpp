@@ -26,7 +26,10 @@ namespace hf {
 
         public:
 
-            void run(const uint32_t usec_curr, const float freq_hz)
+            void run(
+                    const uint8_t led_pin,
+                    const uint32_t usec_curr,
+                    const float freq_hz)
             {
                 static uint32_t _usec_prev;
 
@@ -38,7 +41,7 @@ namespace hf {
 
                     _usec_prev = usec_curr;
 
-                    digitalWrite(LED_BUILTIN, _alternate);
+                    digitalWrite(led_pin, _alternate);
 
                     if (_alternate) {
                         _alternate = false;

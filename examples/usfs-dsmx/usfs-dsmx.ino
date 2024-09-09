@@ -310,7 +310,7 @@ void loop()
 
     // Otherwise, blink LED as heartbeat
     else {
-        _blinkTask.run(usec_curr, BLINK_RATE_HZ);
+        _blinkTask.run(LED_PIN, usec_curr, BLINK_RATE_HZ);
     }
 
     // Get Euler angles and angular rates (gyro) from IMU
