@@ -324,7 +324,7 @@ void loop()
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
-        printf("phi:%f\n", phi);
+        //printf("phi:%f\n", phi);
         msec_prev = msec_curr;
     }
 
