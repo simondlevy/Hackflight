@@ -340,6 +340,13 @@ void loop()
     Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
     psi = -psi;
 
+    static uint32_t msec_prev;
+    const auto msec_curr = millis();
+    if (msec_curr - msec_prev > 100) {
+        printf("%+3.3f\n", gyroZ);
+        msec_prev = msec_curr;
+    }
+
     // Convert stick demands to appropriate intervals
     float thrustDemand =
         constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
@@ -368,13 +375,6 @@ void loop()
     hf::Mixer::runBetaFlightQuadX(
             thrustDemand, rollDemand, pitchDemand, yawDemand, 
             m1_command, m2_command, m3_command, m4_command);
-
-    static uint32_t msec_prev;
-    const auto msec_curr = millis();
-    if (msec_curr - msec_prev > 100) {
-        // printf("
-        msec_prev = msec_curr;
-    }
 
     // Rescale motor values for OneShot125
     _m1_usec = scaleMotor(m1_command);
