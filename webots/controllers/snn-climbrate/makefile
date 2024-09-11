@@ -12,7 +12,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
 
-INCLUDE = -I$(SRCDIR) -I$(FDIR)/include
+INCLUDE = -I$(SRCDIR) -I$(FDIR)/include -I$(FDIR)/include/utils
 
 LIBRARIES = $(FDIR)/lib/libframework.a \
 		    $(PDIR)/lib/libproc1.a \

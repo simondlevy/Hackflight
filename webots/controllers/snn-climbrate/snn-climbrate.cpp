@@ -17,7 +17,8 @@
 */
 
 #include <sim.hpp>
-#include <snn.hpp>
+
+#include <levy_snn_util.hpp>
 
 static const int VIZ_PORT = 8100;
 
