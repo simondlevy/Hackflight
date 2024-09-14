@@ -18,8 +18,7 @@ on your computer.
 ```
 cd webots/controllers/cplusplus
 make
-cd ../..
-make cplusplus
+make run
 ```
 
 If you have a game controller or R/C transmitter with adapter dongle, you can
@@ -33,11 +32,3 @@ are currently supported:
 * [FrSky XSR-SIM USB Dongle](https://www.amazon.com/gp/product/B07GD6ZLW7)
 * [Spektrum Ws2000 Wireless USB RC Flight Simulator Dongle](https://www.amazon.com/gp/product/B07ZK1R32H)
 * Nyko 83069 Playstation(R)3 Core Wired Controller
- 
-If you prefer to program in Python, there is also support for that; simply type ```make python```
-instead of ```make cplusplus```.   You can now fly the vehicle with your keyboard (I don't currrently
-support game controllers and R/C transmitters in Python).  The
-```webots/controllers/python``` directory has code you can look at and modify.
-
-
-

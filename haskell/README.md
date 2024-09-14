@@ -22,8 +22,7 @@ Finally, from the hackflight main directory, do the following:
 ```
 cd webots/controllers/haskell
 make
-cd ../..
-make haskell
+make run
 ```
 
 
