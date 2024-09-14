@@ -14,7 +14,8 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-CLIMBRATE_NETWORK = $(FDIR)/cpp-apps/networks/climbrate_risp.txt
+# DIFFERENCE_NETWORK = $(FDIR)/networks/difference_risp.txt
+DIFFERENCE_NETWORK = $(HOME)/Desktop/hackflight/webots/controllers/snn-climbrate/climbrate_risp.txt
 
 VIZ_HOST = "localhost"
 VIZ_PORT = 8100
@@ -28,13 +29,9 @@ haskell:
 	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
 
 snn-climbrate:
-
 	@webots worlds/simple.wbt &
-
-	@/usr/local/webots/webots-controller controllers/snn-climbrate/snn-climbrate $(CLIMBRATE_NETWORK) &
-
+	@/usr/local/webots/webots-controller controllers/snn-climbrate/snn-climbrate $(DIFFERENCE_NETWORK) &
 	@sleep 1
+	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(DIFFERENCE_NETWORK) \
 
-	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(CLIMBRATE_NETWORK) \
-		--use_name_neuron '{"0":"setpoint","1":"dz/dt","2":"motor"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 0 > /dev/null

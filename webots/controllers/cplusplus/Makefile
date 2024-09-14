@@ -1,6 +1,5 @@
 CFLAGS = -Wno-unused-variable
 
-# Needed for datatypes.h
 CPPDIR = ../../../src
 INCLUDE = -I$(CPPDIR)
 

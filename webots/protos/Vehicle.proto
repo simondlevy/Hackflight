@@ -21,7 +21,6 @@ DEF ROBOT Robot {
                 children [
 
                 CadShape {
-                    # url [ "../meshes/collada_files/cf2_assembly.dae" ]
                     url [ "../meshes/collada_files/custom.dae" ]
                 }
 
