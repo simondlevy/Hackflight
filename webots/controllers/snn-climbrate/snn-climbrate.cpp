@@ -69,7 +69,10 @@ int main(int argc, char ** argv)
         vector <double> actions;
         snn->step(observations, actions);
 
+        // XXX hack because we trained with flip=true
         actions[0] = -actions[0];
+
+        actions[0] *= 12.5;
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 

@@ -11,8 +11,8 @@
         }
       ],
       "divisor": 50,
-      "dmax": [ 25 ],
-      "dmin": [ -25 ]
+      "dmax": [  2 ],
+      "dmin": [ -2 ]
     },
 
     "encoder_array": {
