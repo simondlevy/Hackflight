@@ -40,6 +40,10 @@ USE_C_API = true
 
 VERBOSE = 1
 
+run:
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect haskell
+
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)

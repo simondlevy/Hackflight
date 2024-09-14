@@ -51,6 +51,8 @@ pitch_roll_demand_post_scale = 30 :: SFloat -- deg
 
 yaw_demand_pre_scale = 160 :: SFloat -- deg/sec
 
+takeoff_time = 3 :: SFloat
+
 -- Streams from C++ ----------------------------------------------------------
 
 throttle_stick :: SFloat
@@ -133,7 +135,6 @@ spec = do
                                         (pitch_roll_demand_post_scale * (roll demands'))
                                         (pitch_roll_demand_post_scale * (pitch demands'))
                                         (yaw demands')
-
 
     trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
 

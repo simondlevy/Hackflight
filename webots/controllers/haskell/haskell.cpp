@@ -69,7 +69,8 @@ int main(int argc, char ** argv)
         stream_yaw = _sim.yaw();
 
         stream_hitTakeoffButton = _sim.hitTakeoffButton();
-        stream_completedTakeoff = _sim.completedTakeoff();
+
+        stream_completedTakeoff = _sim.time() > 3;
 
         stream_dx = _sim.dx();
         stream_dy = _sim.dy();

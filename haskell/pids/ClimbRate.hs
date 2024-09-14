@@ -40,7 +40,7 @@ climbRateController hitTakeoffButton completedTakeoff state demands = demands'
 
   where
 
-    kp = 25
+    kp = 2
 
     thrust_takeoff = 56
 

@@ -1,3 +1,17 @@
+#  Copyright (C) 2024 Simon D. Levy
+ 
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, in version 3.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program. If not, see <http:--www.gnu.org/licenses/>.
+
 CFLAGS = -Wno-unused-variable
 
 CPPDIR = ../../../src
@@ -27,6 +41,10 @@ all: $(NAME)
 USE_C_API = true
 
 VERBOSE = 1
+
+run:
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect cplusplus
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
