@@ -1,36 +1,23 @@
 {
   "Associated_Data": {
-    "app_params": {
-      "kp": 25,
-      "max_samples": 1000,
-      "observation_limit": 0.5
-    },
+
     "decoder_array": {
       "decoders": [
         {
           "rate": {
             "discrete": false,
-            "flip": true
+            "flip": false
           }
         }
       ],
       "divisor": 50,
-      "dmax": [
-        25
-      ],
-      "dmin": [
-        -25
-      ]
+      "dmax": [ 25 ],
+      "dmin": [ -25 ]
     },
+
     "encoder_array": {
-      "dmax": [
-        0.5,
-        0.5
-      ],
-      "dmin": [
-        -0.5,
-        -0.5
-      ],
+      "dmax": [ 0.5, 0.5 ],
+      "dmin": [ -0.5, -0.5 ],
       "encoders": [
         {
           "spikes": {
@@ -40,6 +27,7 @@
       ],
       "interval": 50
     },
+
     "eons_params": {
       "crossover_rate": 0.9,
       "edge_mutations": {

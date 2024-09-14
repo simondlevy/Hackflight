@@ -69,6 +69,8 @@ int main(int argc, char ** argv)
         vector <double> actions;
         snn->step(observations, actions);
 
+        actions[0] = -actions[0];
+
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
         const auto motor =
