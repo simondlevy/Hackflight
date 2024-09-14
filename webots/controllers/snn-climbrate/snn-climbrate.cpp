@@ -38,6 +38,8 @@ int main(int argc, char ** argv)
 
     SNN * snn = NULL;
 
+    SNN * snn2 = NULL;
+
     // Load up the network specified in the command line
 
     if (argc < 2) {
@@ -46,7 +48,10 @@ int main(int argc, char ** argv)
     }
 
     try {
+
         snn = new SNN(argv[1], "risp");
+        snn2 = new SNN(argv[2], "risp");
+
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
