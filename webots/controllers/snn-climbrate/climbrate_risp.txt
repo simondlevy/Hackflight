@@ -16,8 +16,8 @@
     },
 
     "encoder_array": {
-      "dmax": [ 0.5, 0.5 ],
-      "dmin": [ -0.5, -0.5 ],
+      "dmax": [  1,  1 ],
+      "dmin": [ -1, -1 ],
       "encoders": [
         {
           "spikes": {

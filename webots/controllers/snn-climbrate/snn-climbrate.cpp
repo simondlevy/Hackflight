@@ -65,7 +65,7 @@ int main(int argc, char ** argv)
             break;
         }
 
-        vector<double> observations = {sim.throttle(), sim.dz()};
+        vector<double> observations = {0.5*sim.throttle(), 0.5*sim.dz()};
         vector <double> actions;
         snn->step(observations, actions);
 
