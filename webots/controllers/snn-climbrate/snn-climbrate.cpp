@@ -72,8 +72,9 @@ int main(int argc, char ** argv)
         vector <double> actions2;
         snn2->step(observations, actions2);
 
-        // XXX hack because we trained with flip=true
+        // XXX hack because we use flip=true
         actions[0] = -actions[0];
+        actions2[0] = -actions2[0];
 
         actions[0] *= 12.5;
 

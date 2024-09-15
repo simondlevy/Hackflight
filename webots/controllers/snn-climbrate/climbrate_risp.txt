@@ -1,6 +1,15 @@
 {
   "Associated_Data": {
 
+    "app_params": {
+        "action_high": 2,
+        "action_low": -2,
+        "function_name": "difference",
+        "max_samples": 1000,
+        "observation_highs": [ 1,  1 ],
+        "observation_lows": [ -1, -1 ]
+    },
+
     "decoder_array": {
       "decoders": [
         {
@@ -52,7 +61,7 @@
       "tournament_size_factor": 0.1
     },
     "other": {
-      "app_name": "pcontrol",
+      "app_name": "function",
       "proc_name": "risp",
       "sim_time": 50,
       "timeseries": "none"

@@ -16,8 +16,8 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-DIFFERENCE_NETWORK = $(HOME)/Desktop/hackflight/webots/controllers/snn-climbrate/climbrate_risp.txt
-DIFFERENCE_NETWORK2 = $(FDIR)/networks/difference_risp.txt
+CLIMBRATE_NETWORK = $(HOME)/Desktop/hackflight/webots/controllers/snn-climbrate/climbrate_risp.txt
+DIFFERENCE_NETWORK = $(FDIR)/networks/difference_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -52,12 +52,16 @@ edit:
 
 run:
 	@webots ../../worlds/simple.wbt &
-	@/usr/local/webots/webots-controller snn-climbrate $(DIFFERENCE_NETWORK) $(DIFFERENCE_NETWORK2) &
+	@/usr/local/webots/webots-controller snn-climbrate $(CLIMBRATE_NETWORK) $(DIFFERENCE_NETWORK) &
 	@sleep 1
 	@cd $(FDIR)/viz; \
 		love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
-		-n $(DIFFERENCE_NETWORK) --show_spike_count --remove_unnecessary_neuron \
+		-n $(CLIMBRATE_NETWORK) --show_spike_count --remove_unnecessary_neuron \
 		--set_num_screen_shot 0 > /dev/null
+
+show:
+	@$(FDIR)/cpp-apps/bin/function_risp -a test -n $(CLIMBRATE_NETWORK) \
+		--show_observations --show_actions | $(FDIR)/cpp-apps/pyplot/diffplot.py
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
