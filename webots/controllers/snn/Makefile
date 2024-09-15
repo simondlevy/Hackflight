@@ -16,7 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(HOME)/Desktop/hackflight/networks/eons_climbrate_risp.txt
+NETWORK = $(shell pwd)/networks/eons_climbrate_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
