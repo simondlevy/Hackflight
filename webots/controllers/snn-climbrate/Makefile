@@ -31,27 +31,26 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
 
+NAME = cplusplus
 INCLUDE = -I$(SRCDIR) -I$(FDIR)/include -I$(FDIR)/include/utils
-
 LIBRARIES = $(FDIR)/lib/libframework.a \
 		    $(PDIR)/lib/libproc1.a \
 		    $(PDIR)/lib/libproc2.a
 
-CXX_SOURCES = snn-climbrate.cpp
+NAME = snn-climbrate
 
-all: snn-climbrate
+CXX_SOURCES = $(NAME).cpp
+
+all: $(NAME)
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
 
 VERBOSE = 1
 
-edit:
-	vim snn-climbrate.cpp
-
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller snn-climbrate $(NETWORK) |tail +11 > log.csv &
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) |tail +11 > log.csv &
 	sleep 1
 	cd $(FDIR)/viz; \
 		love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
@@ -67,3 +66,7 @@ null :=
 space := $(null) $(null)
 WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
+
+edit:
+	vim $(name).cpp
+

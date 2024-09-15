@@ -14,8 +14,8 @@
 
 CFLAGS = -Wno-unused-variable
 
-CPPDIR = ../../../src
-INCLUDE = -I$(CPPDIR)
+SRCDIR = ../../../src
+INCLUDE = -I$(SRCDIR)
 
 NAME = cplusplus
 
