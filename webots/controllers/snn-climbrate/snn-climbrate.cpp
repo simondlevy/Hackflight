@@ -38,8 +38,6 @@ int main(int argc, char ** argv)
 
     SNN * snn = NULL;
 
-    SNN * snn2 = NULL;
-
     // Load up the network specified in the command line
 
     if (argc < 2) {
@@ -50,7 +48,6 @@ int main(int argc, char ** argv)
     try {
 
         snn = new SNN(argv[1], "risp");
-        snn2 = new SNN(argv[2], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -69,16 +66,10 @@ int main(int argc, char ** argv)
         vector <double> actions;
         snn->step(observations, actions);
 
-        vector <double> actions2;
-        snn2->step(observations, actions2);
-
         // XXX hack because we use flip=true
         actions[0] = -actions[0];
-        actions2[0] = -actions2[0];
 
         actions[0] *= 12.5;
-
-        actions2[0] *= 12.5;
 
         //printf("%f,%f\n", actions[0], actions2[0]);
 
