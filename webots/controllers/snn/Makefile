@@ -31,13 +31,12 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
 
-NAME = cplusplus
 INCLUDE = -I$(SRCDIR) -I$(FDIR)/include -I$(FDIR)/include/utils
 LIBRARIES = $(FDIR)/lib/libframework.a \
 		    $(PDIR)/lib/libproc1.a \
 		    $(PDIR)/lib/libproc2.a
 
-NAME = snn-climbrate
+NAME = snn
 
 CXX_SOURCES = $(NAME).cpp
 
