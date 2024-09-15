@@ -1,15 +1,31 @@
+#  Copyright (C) 2024 Simon D. Levy
+ 
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, in version 3.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program. If not, see <http:--www.gnu.org/licenses/>.
+
 CFLAGS = -Wno-unused-variable
 
 CPPDIR = ../../../src
 INCLUDE = -I$(CPPDIR)
 
+NAME = haskell
+
 HASKDIR = ../../../haskell
 
-CXX_SOURCES = haskell.cpp copilot_core.cpp
+CXX_SOURCES = $(NAME).cpp copilot_core.cpp
 
 FILES_TO_REMOVE += copilot* dist*/
 
-all: haskell
+all: $(NAME)
 
 copilot_core.cpp : CoreTask.hs $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids CoreTask.hs
@@ -42,7 +58,7 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect haskell
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
@@ -51,4 +67,4 @@ WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
 edit:
-	vim haskell.cpp
+	vim $(NAME).cpp

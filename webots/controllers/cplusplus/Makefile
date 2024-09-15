@@ -44,7 +44,7 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect cplusplus
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
