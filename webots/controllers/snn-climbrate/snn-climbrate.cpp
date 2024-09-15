@@ -82,15 +82,15 @@ int main(int argc, char ** argv)
         }
         ready = true;
 
-        // hack because we used flip=true
-        actions[0] = -actions[0];
-
         printf("%f,%f,%f,%f\n",
                 sim.throttle(),
                 sim.dz(),
                 sim.throttle() - sim.dz(),
                 actions[0]);
         fflush(stdout);
+
+        // Hack because we used flip=true
+        actions[0] = -actions[0];
 
         actions[0] *= ACTION_SCALEUP;
 
