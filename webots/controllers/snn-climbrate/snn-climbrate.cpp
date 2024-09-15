@@ -28,6 +28,8 @@ static const float THRUST_BASE = 55.385;
 
 static const float TAKEOFF_TIME = 3;
 
+static const float OBSERVATION_SCALEDOWN = 0.5;
+
 static const float ACTION_SCALEUP = 25;
 
 int main(int argc, char ** argv)
@@ -65,7 +67,10 @@ int main(int argc, char ** argv)
             break;
         }
 
-        vector<double> observations = {0.5*sim.throttle(), 0.5*sim.dz()};
+        vector<double> observations = {
+            OBSERVATION_SCALEDOWN*sim.throttle(),
+            OBSERVATION_SCALEDOWN*sim.dz()
+        };
 
         vector <double> actions;
         snn->step(observations, actions);
@@ -77,7 +82,7 @@ int main(int argc, char ** argv)
         }
         ready = true;
 
-        // XXX hack because we use flip=true
+        // hack because we used flip=true
         actions[0] = -actions[0];
 
         printf("%f,%f,%f,%f\n",
