@@ -28,6 +28,8 @@ static const float THRUST_BASE = 55.385;
 
 static const float TAKEOFF_TIME = 3;
 
+static const float ACTION_SCALEUP = 25;
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -37,6 +39,7 @@ int main(int argc, char ** argv)
     sim.init();
 
     SNN * snn = NULL;
+
 
     // Load up the network specified in the command line
 
@@ -63,15 +66,28 @@ int main(int argc, char ** argv)
         }
 
         vector<double> observations = {0.5*sim.throttle(), 0.5*sim.dz()};
+
         vector <double> actions;
         snn->step(observations, actions);
+
+        static bool ready;
+
+        if (!ready) {
+            printf("setpoint,actual,difference,action\n");
+        }
+        ready = true;
 
         // XXX hack because we use flip=true
         actions[0] = -actions[0];
 
-        actions[0] *= 12.5;
+        printf("%f,%f,%f,%f\n",
+                sim.throttle(),
+                sim.dz(),
+                sim.throttle() - sim.dz(),
+                actions[0]);
+        fflush(stdout);
 
-        //printf("%f,%f\n", actions[0], actions2[0]);
+        actions[0] *= ACTION_SCALEUP;
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 

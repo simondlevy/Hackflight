@@ -16,7 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(HOME)/Desktop/hackflight/webots/controllers/snn-climbrate/climbrate_risp.txt
+NETWORK = $(HOME)/Desktop/hackflight/networks/climbrate_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -51,7 +51,7 @@ edit:
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller snn-climbrate $(NETWORK) &
+	/usr/local/webots/webots-controller snn-climbrate $(NETWORK) |tail +11 > tmp.csv &
 	sleep 1
 	cd $(FDIR)/viz; \
 		love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
