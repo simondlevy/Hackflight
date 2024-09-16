@@ -40,6 +40,7 @@ static const float CLIMBRATE_SCALEUP = 25;
 
 static const float DT = 0.01;
 
+static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float THROTTLE_DOWN = 0.06;
@@ -62,9 +63,7 @@ static double getClimbrate(SNN * snn, hf::Simulator & sim)
 
 static float runYawRatePid(const float setpoint, const float actual)
 {
-    static const float KP = 0.003;           
-
-    return KP * (setpoint - actual);
+    return YAW_KP * YAW_PRESCALE * (setpoint - actual/YAW_PRESCALE);
 }
 
 int main(int argc, char ** argv)
@@ -126,8 +125,6 @@ int main(int argc, char ** argv)
 
         float pitchDemand  = sim.pitch();
 
-        float yawDemand = sim.yaw() * YAW_PRESCALE;
-
         hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
 
         const auto resetPids = sim.throttle() < THROTTLE_DOWN;
@@ -138,9 +135,7 @@ int main(int argc, char ** argv)
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
 
-        printf("%f,%f,%f", yawDemand, sim.dpsi(), yawDemand-sim.dpsi());
-
-        yawDemand = runYawRatePid(yawDemand, sim.dpsi());
+        const auto yawDemand = runYawRatePid(sim.yaw(), sim.dpsi());
 
         printf(",%f\n", yawDemand);
         fflush(stdout);
