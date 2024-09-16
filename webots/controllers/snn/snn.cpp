@@ -16,9 +16,16 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <sim.hpp>
-
+// TeNNLab framework
 #include <levy_snn_util.hpp>
+
+// Hackflight
+#include <mixers.hpp>
+#include <sim.hpp>
+#include <pids/position.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
+#include <pids/yaw_rate.hpp>
 
 static const int VIZ_PORT = 8100;
 
@@ -32,6 +39,14 @@ static const float OBSERVATION_SCALEDOWN = 0.5;
 
 static const float ACTION_SCALEUP = 25;
 
+static const float DT = 0.01;
+
+static const float YAW_PRESCALE = 160; // deg/sec
+
+static const float THROTTLE_DOWN = 0.06;
+
+static const float PITCH_ROLL_POST_SCALE = 50;
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -40,8 +55,13 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    SNN * snn = NULL;
+    hf::PitchRollAnglePid pitchRollAnglePid = {};
+    hf::PitchRollRatePid pitchRollRatePid = {};
 
+    hf::YawRatePid yawRatePid = {};
+
+
+    SNN * snn = NULL;
 
     // Load up the network specified in the command line
 
@@ -66,6 +86,8 @@ int main(int argc, char ** argv)
         if (!sim.step()) {
             break;
         }
+
+        // Get thrust from SNN -----------------------------------------------
 
         vector<double> observations = {
             OBSERVATION_SCALEDOWN*sim.throttle(),
@@ -96,16 +118,45 @@ int main(int argc, char ** argv)
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        const auto motor =
+        // Get roll, pitch, yaw from traditional PID controllers
+
+        float rollDemand = sim.roll();
+
+        float pitchDemand  = sim.pitch();
+
+        float yawDemand = sim.yaw() * YAW_PRESCALE;
+
+        hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
+
+        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+
+        pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
+                sim.phi(), sim.theta());
+
+        pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
+                sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
+
+        yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
+
+
+        const auto thrustDemand =
             time > TAKEOFF_TIME ? 
             THRUST_BASE + actions[0] :
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
 
-        snn->send_counts_to_visualizer();
+        float m1=0, m2=0, m3=0, m4=0;
+        hf::Mixer::runBetaFlightQuadX(
+                thrustDemand,
+                rollDemand,
+                pitchDemand,
+                yawDemand,
+                m1, m2, m3, m4);
 
-        sim.setMotors(motor, motor, motor, motor);
+        sim.setMotors(m1, m2, m3, m4);
+
+        snn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();
