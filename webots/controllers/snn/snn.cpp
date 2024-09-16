@@ -31,7 +31,7 @@ static const int VIZ_PORT = 8100;
 
 static const float THRUST_TAKEOFF = 56;
 
-static const float THRUST_BASE = 55.385;
+static const float THRUST_BASE = 55.5; // 55.385;
 
 static const float TAKEOFF_TIME = 3;
 
