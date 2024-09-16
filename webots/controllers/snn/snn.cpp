@@ -27,6 +27,7 @@
 #include <pids/pitch_roll_rate.hpp>
 
 static const int CLIMBRATE_VIZ_PORT = 8100;
+static const int YAWRATE_VIZ_PORT = 8200;
 
 static const float THRUST_TAKEOFF = 56;
 
@@ -111,6 +112,7 @@ int main(int argc, char ** argv)
     }
 
     climbrate_snn->serve_visualizer(CLIMBRATE_VIZ_PORT);
+    yawrate_snn->serve_visualizer(YAWRATE_VIZ_PORT);
 
     (void)yawrate_snn;
 
@@ -126,31 +128,24 @@ int main(int argc, char ** argv)
         }
         ready = true;
 
+        // Get thrust from SNN
         const auto thrustFromSnn =
             runClimbRateSnn(climbrate_snn, sim.throttle(), sim.dz());
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        // Get roll, pitch, yaw from traditional PID controllers
-
+        // Get roll, pitch from traditional PID controllers
         float rollDemand = sim.roll();
-
         float pitchDemand  = sim.pitch();
-
         hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
-
         const auto resetPids = sim.throttle() < THROTTLE_DOWN;
-
         pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
                 sim.phi(), sim.theta());
-
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
 
+        // Get yaw from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
-
-        printf(",%f\n", yawDemand);
-        fflush(stdout);
 
         const auto thrustDemand =
             time > TAKEOFF_TIME ? 
@@ -170,6 +165,7 @@ int main(int argc, char ** argv)
         sim.setMotors(m1, m2, m3, m4);
 
         climbrate_snn->send_counts_to_visualizer();
+        yawrate_snn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();

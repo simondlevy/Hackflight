@@ -24,7 +24,8 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 PDIR =  $(FDIR)/processors/risp
 
 VIZ_HOST = "localhost"
-VIZ_PORT = 8100
+CLIMBRATE_VIZ_PORT = 8100
+YAWRATE_VIZ_PORT = 8200
 
 # -------------------------------------------------------------------
 
@@ -53,9 +54,14 @@ run:
 	/usr/local/webots/webots-controller $(NAME) $(NETWORK) |tail +11 > log.csv &
 	sleep 1
 	cd $(FDIR)/viz; \
-		love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
+		love . -i '{"source":"request","port":$(CLIMBRATE_VIZ_PORT),"host":$(VIZ_HOST)}' \
 		-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
-		--set_num_screen_shot 0 > /dev/null
+		--set_num_screen_shot 0 > /dev/null &
+	cd $(FDIR)/viz; \
+		love . -i '{"source":"request","port":$(YAWRATE_VIZ_PORT),"host":$(VIZ_HOST)}' \
+		-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
+		--set_num_screen_shot 0 > /dev/null &
+
 
 show:
 	@$(FDIR)/cpp-apps/bin/function_risp -a test -n $(NETWORK) \
