@@ -25,7 +25,6 @@
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
-#include <pids/yaw_rate.hpp>
 
 static const int VIZ_PORT = 8100;
 
@@ -61,23 +60,12 @@ static double getClimbrate(SNN * snn, hf::Simulator & sim)
     return -actions[0] * CLIMBRATE_SCALEUP;
 }
 
-/*
-static void debug()
+static float runYawRatePid(const float setpoint, const float actual)
 {
-    static bool ready;
+    static const float KP = 0.003;           
 
-    if (!ready) {
-        printf("setpoint,actual,difference,action\n");
-    }
-    ready = true;
-
-    printf("%f,%f,%f,%f\n",
-            sim.throttle(),
-            sim.dz(),
-            sim.throttle() - sim.dz(),
-            actions[0]);
-    fflush(stdout);
-}*/
+    return KP * (setpoint - actual);
+}
 
 int main(int argc, char ** argv)
 {
@@ -89,9 +77,6 @@ int main(int argc, char ** argv)
 
     hf::PitchRollAnglePid pitchRollAnglePid = {};
     hf::PitchRollRatePid pitchRollRatePid = {};
-
-    hf::YawRatePid yawRatePid = {};
-
 
     SNN * climbrate_snn = NULL;
 
@@ -125,6 +110,12 @@ int main(int argc, char ** argv)
             break;
         }
 
+        static bool ready;
+        if (!ready) {
+            printf("setpoint,actual,difference,demand\n");
+        }
+        ready = true;
+
         const auto thrustFromSnn = getClimbrate(climbrate_snn, sim);
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
@@ -147,7 +138,12 @@ int main(int argc, char ** argv)
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
 
-        yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
+        printf("%f,%f,%f", yawDemand, sim.dpsi(), yawDemand-sim.dpsi());
+
+        yawDemand = runYawRatePid(yawDemand, sim.dpsi());
+
+        printf(",%f\n", yawDemand);
+        fflush(stdout);
 
         const auto thrustDemand =
             time > TAKEOFF_TIME ? 
