@@ -47,7 +47,7 @@ static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static double runClimbrateSnn(
+static double runClimbRateSnn(
         SNN * snn, const float setpoint, const float actual)
 {
     vector<double> observations = {
@@ -62,6 +62,20 @@ static double runClimbrateSnn(
     return -actions[0] * CLIMBRATE_SCALEUP;
 }
 
+static double runYawRateSnn(
+        SNN * snn, const float setpoint, const float actual)
+{
+    vector<double> observations = {
+        setpoint,
+        actual / YAW_PRESCALE
+    };
+
+    vector <double> actions;
+    snn->step(observations, actions);
+
+    // NEGATE because our SNN used flip=true
+    return -actions[0] * YAW_KP * YAW_PRESCALE;
+}
 
 int main(int argc, char ** argv)
 {
@@ -113,7 +127,7 @@ int main(int argc, char ** argv)
         ready = true;
 
         const auto thrustFromSnn =
-            runClimbrateSnn(climbrate_snn, sim.throttle(), sim.dz());
+            runClimbRateSnn(climbrate_snn, sim.throttle(), sim.dz());
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
@@ -133,7 +147,9 @@ int main(int argc, char ** argv)
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
 
-        const auto yawDemand = YAW_KP * YAW_PRESCALE * (sim.yaw() - sim.dpsi() / YAW_PRESCALE);
+        //const auto yawDemand = YAW_KP * YAW_PRESCALE * (sim.yaw() - sim.dpsi() / YAW_PRESCALE);
+
+        const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
         printf(",%f\n", yawDemand);
         fflush(stdout);
