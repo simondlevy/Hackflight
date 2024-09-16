@@ -35,9 +35,9 @@ static const float THRUST_BASE = 55.5; // 55.385;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float OBSERVATION_SCALEDOWN = 0.5;
+static const float CLIMBRATE_SCALEDOWN = 0.5;
 
-static const float ACTION_SCALEUP = 25;
+static const float CLIMBRATE_SCALEUP = 25;
 
 static const float DT = 0.01;
 
@@ -46,6 +46,20 @@ static const float YAW_PRESCALE = 160; // deg/sec
 static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
+
+static double getClimbrate(SNN * snn, hf::Simulator & sim)
+{
+    vector<double> observations = {
+        CLIMBRATE_SCALEDOWN*sim.throttle(),
+        CLIMBRATE_SCALEDOWN*sim.dz()
+    };
+
+    vector <double> actions;
+    snn->step(observations, actions);
+
+    // NEGATE because our SNN used flip=true
+    return -actions[0] * CLIMBRATE_SCALEUP;
+}
 
 int main(int argc, char ** argv)
 {
@@ -61,7 +75,7 @@ int main(int argc, char ** argv)
     hf::YawRatePid yawRatePid = {};
 
 
-    SNN * snn = NULL;
+    SNN * climbrate_snn = NULL;
 
     // Load up the network specified in the command line
 
@@ -72,14 +86,14 @@ int main(int argc, char ** argv)
 
     try {
 
-        snn = new SNN(argv[1], "risp");
+        climbrate_snn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
 
-    snn->serve_visualizer(VIZ_PORT);
+    climbrate_snn->serve_visualizer(VIZ_PORT);
 
     while (true) {
 
@@ -87,16 +101,7 @@ int main(int argc, char ** argv)
             break;
         }
 
-        // Get thrust from SNN -----------------------------------------------
-
-        vector<double> observations = {
-            OBSERVATION_SCALEDOWN*sim.throttle(),
-            OBSERVATION_SCALEDOWN*sim.dz()
-        };
-
-        vector <double> actions;
-        snn->step(observations, actions);
-
+        /*
         static bool ready;
 
         if (!ready) {
@@ -109,12 +114,9 @@ int main(int argc, char ** argv)
                 sim.dz(),
                 sim.throttle() - sim.dz(),
                 actions[0]);
-        fflush(stdout);
+        fflush(stdout);*/
 
-        // Hack because we used flip=true
-        actions[0] = -actions[0];
-
-        actions[0] *= ACTION_SCALEUP;
+        const auto thrustFromSnn = getClimbrate(climbrate_snn, sim);
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
@@ -138,10 +140,9 @@ int main(int argc, char ** argv)
 
         yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
 
-
         const auto thrustDemand =
             time > TAKEOFF_TIME ? 
-            THRUST_BASE + actions[0] :
+            THRUST_BASE + thrustFromSnn :
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
@@ -156,7 +157,7 @@ int main(int argc, char ** argv)
 
         sim.setMotors(m1, m2, m3, m4);
 
-        snn->send_counts_to_visualizer();
+        climbrate_snn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();
