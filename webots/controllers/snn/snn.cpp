@@ -47,11 +47,12 @@ static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static double getClimbrate(SNN * snn, hf::Simulator & sim)
+static double runClimbrateSnn(
+        SNN * snn, const float setpoint, const float actual)
 {
     vector<double> observations = {
-        CLIMBRATE_SCALEDOWN*sim.throttle(),
-        CLIMBRATE_SCALEDOWN*sim.dz()
+        CLIMBRATE_SCALEDOWN*setpoint,
+        CLIMBRATE_SCALEDOWN*actual
     };
 
     vector <double> actions;
@@ -111,7 +112,8 @@ int main(int argc, char ** argv)
         }
         ready = true;
 
-        const auto thrustFromSnn = getClimbrate(climbrate_snn, sim);
+        const auto thrustFromSnn =
+            runClimbrateSnn(climbrate_snn, sim.throttle(), sim.dz());
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
