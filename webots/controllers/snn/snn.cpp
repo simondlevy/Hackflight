@@ -61,6 +61,24 @@ static double getClimbrate(SNN * snn, hf::Simulator & sim)
     return -actions[0] * CLIMBRATE_SCALEUP;
 }
 
+/*
+static void debug()
+{
+    static bool ready;
+
+    if (!ready) {
+        printf("setpoint,actual,difference,action\n");
+    }
+    ready = true;
+
+    printf("%f,%f,%f,%f\n",
+            sim.throttle(),
+            sim.dz(),
+            sim.throttle() - sim.dz(),
+            actions[0]);
+    fflush(stdout);
+}*/
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -77,6 +95,8 @@ int main(int argc, char ** argv)
 
     SNN * climbrate_snn = NULL;
 
+    SNN * yawrate_snn = NULL;
+
     // Load up the network specified in the command line
 
     if (argc < 2) {
@@ -88,6 +108,8 @@ int main(int argc, char ** argv)
 
         climbrate_snn = new SNN(argv[1], "risp");
 
+        yawrate_snn = new SNN(argv[1], "risp");
+
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
@@ -95,26 +117,13 @@ int main(int argc, char ** argv)
 
     climbrate_snn->serve_visualizer(VIZ_PORT);
 
+    (void)yawrate_snn;
+
     while (true) {
 
         if (!sim.step()) {
             break;
         }
-
-        /*
-        static bool ready;
-
-        if (!ready) {
-            printf("setpoint,actual,difference,action\n");
-        }
-        ready = true;
-
-        printf("%f,%f,%f,%f\n",
-                sim.throttle(),
-                sim.dz(),
-                sim.throttle() - sim.dz(),
-                actions[0]);
-        fflush(stdout);*/
 
         const auto thrustFromSnn = getClimbrate(climbrate_snn, sim);
 
