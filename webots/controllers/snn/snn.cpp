@@ -26,11 +26,11 @@
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 
-static const int VIZ_PORT = 8100;
+static const int CLIMBRATE_VIZ_PORT = 8100;
 
 static const float THRUST_TAKEOFF = 56;
 
-static const float THRUST_BASE = 55.5; // 55.385;
+static const float THRUST_BASE = 55.5;
 
 static const float TAKEOFF_TIME = 3;
 
@@ -110,7 +110,7 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    climbrate_snn->serve_visualizer(VIZ_PORT);
+    climbrate_snn->serve_visualizer(CLIMBRATE_VIZ_PORT);
 
     (void)yawrate_snn;
 
@@ -146,8 +146,6 @@ int main(int argc, char ** argv)
 
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
-
-        //const auto yawDemand = YAW_KP * YAW_PRESCALE * (sim.yaw() - sim.dpsi() / YAW_PRESCALE);
 
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
