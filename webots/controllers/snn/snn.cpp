@@ -35,9 +35,8 @@ static const float THRUST_BASE = 55.5;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float CLIMBRATE_SCALEDOWN = 0.5;
-
-static const float CLIMBRATE_SCALEUP = 25;
+static const float CLIMBRATE_KP = 25;
+static const float CLIMBRATE_PRESCALE = 0.5;
 
 static const float DT = 0.01;
 
@@ -52,15 +51,15 @@ static double runClimbRateSnn(
         SNN * snn, const float setpoint, const float actual)
 {
     vector<double> observations = {
-        CLIMBRATE_SCALEDOWN*setpoint,
-        CLIMBRATE_SCALEDOWN*actual
+        CLIMBRATE_PRESCALE*setpoint,
+        CLIMBRATE_PRESCALE*actual
     };
 
     vector <double> actions;
     snn->step(observations, actions);
 
     // NEGATE because our SNN used flip=true
-    return -actions[0] * CLIMBRATE_SCALEUP;
+    return -actions[0] * CLIMBRATE_KP;
 }
 
 static double runYawRateSnn(
@@ -90,7 +89,6 @@ int main(int argc, char ** argv)
     hf::PitchRollRatePid pitchRollRatePid = {};
 
     SNN * climbrate_snn = NULL;
-
     SNN * yawrate_snn = NULL;
 
     // Load up the network specified in the command line
