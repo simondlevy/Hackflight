@@ -51,7 +51,7 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) |tail +11 > log.csv
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +9 > log.csv
 
 bigrun:
 	webots ../../worlds/simple.wbt &

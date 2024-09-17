@@ -38,10 +38,10 @@ static const float TAKEOFF_TIME = 3;
 static const float CLIMBRATE_KP = 25;
 static const float CLIMBRATE_PRESCALE = 0.5;
 
-static const float DT = 0.01;
-
 static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
+
+static const float DT = 0.01;
 
 static const float THROTTLE_DOWN = 0.06;
 
@@ -77,6 +77,18 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
+static double runRollRateSnn(
+        SNN * snn, const float setpoint, const float actual)
+{
+    vector<double> observations = { setpoint, actual };
+
+    vector <double> actions;
+    snn->step(observations, actions);
+
+    // NEGATE because our SNN used flip=true
+    return -actions[0] * PITCH_ROLL_POST_SCALE;
+}
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -90,6 +102,7 @@ int main(int argc, char ** argv)
 
     SNN * climbrate_snn = NULL;
     SNN * yawrate_snn = NULL;
+    SNN * roll_rate_snn = NULL;
 
     // Load up the network specified in the command line
 
@@ -101,8 +114,8 @@ int main(int argc, char ** argv)
     try {
 
         climbrate_snn = new SNN(argv[1], "risp");
-
         yawrate_snn = new SNN(argv[1], "risp");
+        roll_rate_snn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -120,29 +133,36 @@ int main(int argc, char ** argv)
 
         static bool ready;
         if (!ready) {
-            printf("setpoint,actual,difference,demand\n");
+            printf("PID,SNN\n");
         }
         ready = true;
 
-        // Get thrust from SNN
+        // Get thrust demand from SNN
         const auto thrustFromSnn =
             runClimbRateSnn(climbrate_snn, sim.throttle(), sim.dz());
 
-        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
+        // Get yaw demand from SNN
+        const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
-        // Get roll, pitch from traditional PID controllers
+        // Use position PID controller to convert stick demands into pitch,roll angles
         float rollDemand = sim.roll();
         float pitchDemand  = sim.pitch();
         hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
+
         const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+
+        // Use pitch,roll angle PID controllers to convert pitch,roll angles
+        // into angular rates
         pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
                 sim.phi(), sim.theta());
+
+        // Use pitch,roll angle rate controllers to convert pitch,roll rates
+        // into motor spins
         pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
 
-        // Get yaw from SNN
-        const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
-
+        // Ignore thrust demand until airborne, based on time from launch
+        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
         const auto thrustDemand =
             time > TAKEOFF_TIME ? 
             THRUST_BASE + thrustFromSnn :
@@ -150,6 +170,7 @@ int main(int argc, char ** argv)
             THRUST_TAKEOFF :
             0;
 
+        // Run the mixer to convert the demands into motor spins
         float m1=0, m2=0, m3=0, m4=0;
         hf::Mixer::runBetaFlightQuadX(
                 thrustDemand,
@@ -158,6 +179,7 @@ int main(int argc, char ** argv)
                 yawDemand,
                 m1, m2, m3, m4);
 
+        // Spin the motors
         sim.setMotors(m1, m2, m3, m4);
 
         //climbrate_snn->send_counts_to_visualizer();
