@@ -111,10 +111,8 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    climbrate_snn->serve_visualizer(CLIMBRATE_VIZ_PORT);
-    yawrate_snn->serve_visualizer(YAWRATE_VIZ_PORT);
-
-    (void)yawrate_snn;
+    //climbrate_snn->serve_visualizer(CLIMBRATE_VIZ_PORT);
+    //yawrate_snn->serve_visualizer(YAWRATE_VIZ_PORT);
 
     while (true) {
 
@@ -164,8 +162,8 @@ int main(int argc, char ** argv)
 
         sim.setMotors(m1, m2, m3, m4);
 
-        climbrate_snn->send_counts_to_visualizer();
-        yawrate_snn->send_counts_to_visualizer();
+        //climbrate_snn->send_counts_to_visualizer();
+        //yawrate_snn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();
