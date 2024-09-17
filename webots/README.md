@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="../media/webots.png" width=450>
+<img src="../media/webots2.png" width=450>
 </p>
 
 # Hackflight simulator instructions
