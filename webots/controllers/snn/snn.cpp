@@ -26,8 +26,8 @@
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 
-static const int CLIMBRATE_VIZ_PORT = 8100;
-static const int YAWRATE_VIZ_PORT = 8200;
+//static const int CLIMBRATE_VIZ_PORT = 8100;
+//static const int YAWRATE_VIZ_PORT = 8200;
 
 static const float THRUST_TAKEOFF = 56;
 
