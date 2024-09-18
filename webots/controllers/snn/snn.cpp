@@ -24,7 +24,6 @@
 #include <sim.hpp>
 
 #include <pids/position.hpp>
-#include <pids/pitch_roll_rate.hpp>
 
 //static const int CLIMBRATE_VIZ_PORT = 8100;
 //static const int YAWRATE_VIZ_PORT = 8200;
@@ -84,6 +83,42 @@ static float runPitchRollAnglePid(float setpoint, float actual)
     return PITCH_ROLL_ANGLE_KP * (setpoint - actual);
 }
 
+class PitchRollRatePid {
+
+    private:
+
+        static constexpr float KP = 0.00025;
+
+    public:
+
+        void run(
+                float & rollDemand,
+                float & pitchDemand,
+                const float dphi,
+                const float dtheta,
+                const float postScale=1.0)
+        {
+
+            runAxis(rollDemand, dphi, postScale);
+
+            runAxis(pitchDemand, dtheta, postScale); 
+        }
+
+    private:
+
+        static void runAxis(
+                float & demand,
+                const float dangle, 
+                const float postScale)
+        {
+
+            const auto error = demand - dangle;
+
+            demand = postScale * (KP * error);
+        }
+};
+
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -92,7 +127,7 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    hf::PitchRollRatePid pitchRollRatePid = {};
+    PitchRollRatePid pitchRollRatePid = {};
 
     SNN * climbrate_snn = NULL;
     SNN * yawrate_snn = NULL;
@@ -141,8 +176,6 @@ int main(int argc, char ** argv)
         float pitchDemand  = sim.pitch();
         hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
 
-        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
-
         // Use pitch,roll angle PID controllers to convert pitch,roll angles
         // into angular rates
         rollDemand = runPitchRollAnglePid(rollDemand, sim.phi());
@@ -150,7 +183,7 @@ int main(int argc, char ** argv)
 
         // Use pitch,roll angle rate controllers to convert pitch,roll rates
         // into motor spins
-        pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
+        pitchRollRatePid.run(rollDemand, pitchDemand,
                 sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
 
         // Ignore thrust demand until airborne, based on time from launch

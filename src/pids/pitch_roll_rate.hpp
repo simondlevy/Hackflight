@@ -28,8 +28,8 @@ namespace hf {
         private:
 
             static constexpr float KP = 0.00025;
-            static constexpr float KI = 0.0005;
-            static constexpr float KD = 2.5e-6;
+            static constexpr float KI = 0;//0.0005;
+            static constexpr float KD = 0;//2.5e-6;
 
             static constexpr float ILIMIT = 33;
 
