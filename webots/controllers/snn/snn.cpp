@@ -34,8 +34,8 @@ static const float TAKEOFF_TIME = 3;
 
 static const float PITCH_ROLL_ANGLE_KP = 6;
 
-static const float CLIMBRATE_KP = 25;
-static const float CLIMBRATE_PRESCALE = 0.5;
+static const float CLIMBRATE_KP = 4;
+static const float CLIMBRATE_PRESCALE = 1.0;
 
 static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
