@@ -84,34 +84,10 @@ static float runPitchRollAnglePid(float setpoint, float actual)
     return PITCH_ROLL_ANGLE_KP * (setpoint - actual);
 }
 
-class PitchRollRatePid {
-
-    private:
-
-    public:
-
-        void run(
-                float & rollDemand,
-                float & pitchDemand,
-                const float dphi,
-                const float dtheta)
-        {
-
-            runAxis(rollDemand, dphi);
-
-            runAxis(pitchDemand, dtheta); 
-        }
-
-    private:
-
-        static void runAxis( float & demand, const float dangle) 
-        {
-            const auto error = demand - dangle;
-
-            demand = PITCH_ROLL_RATE_KP * error;
-        }
-};
-
+static float runPitchRollRatePid(float setpoint, float actual)
+{
+    return PITCH_ROLL_RATE_KP * (setpoint - actual);
+}
 
 int main(int argc, char ** argv)
 {
@@ -120,8 +96,6 @@ int main(int argc, char ** argv)
     hf::Simulator sim = {};
 
     sim.init();
-
-    PitchRollRatePid pitchRollRatePid = {};
 
     SNN * climbrate_snn = NULL;
     SNN * yawrate_snn = NULL;
@@ -177,7 +151,8 @@ int main(int argc, char ** argv)
 
         // Use pitch,roll angle rate controllers to convert pitch,roll rates
         // into motor spins
-        pitchRollRatePid.run(rollDemand, pitchDemand, sim.dphi(), sim.dtheta());
+        rollDemand = runPitchRollRatePid(rollDemand, sim.dphi());
+        pitchDemand = runPitchRollRatePid(pitchDemand, sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
