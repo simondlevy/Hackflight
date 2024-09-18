@@ -46,7 +46,8 @@ static const float DT = 0.01;
 
 static const float THROTTLE_DOWN = 0.06;
 
-static const float PITCH_ROLL_POST_SCALE = 50;
+static const float PITCH_ROLL_RATE_KP = 0.0125;
+
 
 static double runClimbRateSnn(
         SNN * snn, const float setpoint, const float actual)
@@ -87,34 +88,27 @@ class PitchRollRatePid {
 
     private:
 
-        static constexpr float KP = 0.00025;
-
     public:
 
         void run(
                 float & rollDemand,
                 float & pitchDemand,
                 const float dphi,
-                const float dtheta,
-                const float postScale=1.0)
+                const float dtheta)
         {
 
-            runAxis(rollDemand, dphi, postScale);
+            runAxis(rollDemand, dphi);
 
-            runAxis(pitchDemand, dtheta, postScale); 
+            runAxis(pitchDemand, dtheta); 
         }
 
     private:
 
-        static void runAxis(
-                float & demand,
-                const float dangle, 
-                const float postScale)
+        static void runAxis( float & demand, const float dangle) 
         {
-
             const auto error = demand - dangle;
 
-            demand = postScale * (KP * error);
+            demand = PITCH_ROLL_RATE_KP * error;
         }
 };
 
@@ -183,8 +177,7 @@ int main(int argc, char ** argv)
 
         // Use pitch,roll angle rate controllers to convert pitch,roll rates
         // into motor spins
-        pitchRollRatePid.run(rollDemand, pitchDemand,
-                sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
+        pitchRollRatePid.run(rollDemand, pitchDemand, sim.dphi(), sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
