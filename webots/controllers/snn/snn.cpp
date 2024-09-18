@@ -78,21 +78,6 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
-static float runPositionPid(float setpoint, float actual)
-{
-    return POSITION_KP * (setpoint - actual);
-}
-
-static float runPitchRollAnglePid(float setpoint, float actual)
-{
-    return PITCH_ROLL_ANGLE_KP * (setpoint - actual);
-}
-
-static float runPitchRollRatePid(float setpoint, float actual)
-{
-    return PITCH_ROLL_RATE_KP * (setpoint - actual);
-}
-
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -130,12 +115,6 @@ int main(int argc, char ** argv)
             break;
         }
 
-        static bool ready;
-        if (!ready) {
-            printf("PID,SNN\n");
-        }
-        ready = true;
-
         // Get thrust demand from SNN
         const auto thrustFromSnn =
             runClimbRateSnn(climbrate_snn, sim.throttle(), sim.dz());
@@ -143,13 +122,13 @@ int main(int argc, char ** argv)
         // Get yaw demand from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
-        float rollDemand = runPositionPid(sim.roll(), sim.dy());
-        rollDemand = runPitchRollAnglePid(rollDemand, sim.phi());
-        rollDemand = runPitchRollRatePid(rollDemand, sim.dphi());
+        float rollDemand = POSITION_KP * (sim.roll() - sim.dy());
+        rollDemand = PITCH_ROLL_ANGLE_KP * (rollDemand - sim.phi());
+        rollDemand = PITCH_ROLL_RATE_KP * (rollDemand - sim.dphi());
 
-        float pitchDemand = runPositionPid(sim.pitch(), sim.dx());
-        pitchDemand = runPitchRollAnglePid(pitchDemand, sim.theta());
-        pitchDemand = runPitchRollRatePid(pitchDemand, sim.dtheta());
+        float pitchDemand = POSITION_KP * (sim.pitch() - sim.dx());
+        pitchDemand = PITCH_ROLL_ANGLE_KP * (pitchDemand - sim.theta());
+        pitchDemand = PITCH_ROLL_RATE_KP * (pitchDemand - sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
