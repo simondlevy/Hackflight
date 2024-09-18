@@ -22,8 +22,8 @@
 // Hackflight
 #include <mixers.hpp>
 #include <sim.hpp>
+
 #include <pids/position.hpp>
-#include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 
 //static const int CLIMBRATE_VIZ_PORT = 8100;
@@ -34,6 +34,8 @@ static const float THRUST_TAKEOFF = 56;
 static const float THRUST_BASE = 55.5;
 
 static const float TAKEOFF_TIME = 3;
+
+static const float PITCH_ROLL_ANGLE_KP = 6;
 
 static const float CLIMBRATE_KP = 25;
 static const float CLIMBRATE_PRESCALE = 0.5;
@@ -77,16 +79,9 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
-static double runRollRateSnn(
-        SNN * snn, const float setpoint, const float actual)
+static float runPitchRollAnglePid(float setpoint, float actual)
 {
-    vector<double> observations = { setpoint, actual };
-
-    vector <double> actions;
-    snn->step(observations, actions);
-
-    // NEGATE because our SNN used flip=true
-    return -actions[0] * PITCH_ROLL_POST_SCALE;
+    return PITCH_ROLL_ANGLE_KP * (setpoint - actual);
 }
 
 int main(int argc, char ** argv)
@@ -97,12 +92,10 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    hf::PitchRollAnglePid pitchRollAnglePid = {};
     hf::PitchRollRatePid pitchRollRatePid = {};
 
     SNN * climbrate_snn = NULL;
     SNN * yawrate_snn = NULL;
-    SNN * roll_rate_snn = NULL;
 
     // Load up the network specified in the command line
 
@@ -115,7 +108,6 @@ int main(int argc, char ** argv)
 
         climbrate_snn = new SNN(argv[1], "risp");
         yawrate_snn = new SNN(argv[1], "risp");
-        roll_rate_snn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -153,8 +145,8 @@ int main(int argc, char ** argv)
 
         // Use pitch,roll angle PID controllers to convert pitch,roll angles
         // into angular rates
-        pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
-                sim.phi(), sim.theta());
+        rollDemand = runPitchRollAnglePid(rollDemand, sim.phi());
+        pitchDemand = runPitchRollAnglePid(pitchDemand, sim.theta());
 
         // Use pitch,roll angle rate controllers to convert pitch,roll rates
         // into motor spins
