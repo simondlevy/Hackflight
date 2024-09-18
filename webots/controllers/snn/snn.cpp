@@ -23,8 +23,6 @@
 #include <mixers.hpp>
 #include <sim.hpp>
 
-#include <pids/position.hpp>
-
 //static const int CLIMBRATE_VIZ_PORT = 8100;
 //static const int YAWRATE_VIZ_PORT = 8200;
 
@@ -48,6 +46,7 @@ static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_RATE_KP = 0.0125;
 
+static const float POSITION_KP = 10;
 
 static double runClimbRateSnn(
         SNN * snn, const float setpoint, const float actual)
@@ -77,6 +76,11 @@ static double runYawRateSnn(
 
     // NEGATE because our SNN used flip=true
     return -actions[0] * YAW_KP * YAW_PRESCALE;
+}
+
+static float runPositionPid(float setpoint, float actual)
+{
+    return POSITION_KP * (setpoint - actual);
 }
 
 static float runPitchRollAnglePid(float setpoint, float actual)
@@ -140,9 +144,8 @@ int main(int argc, char ** argv)
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
         // Use position PID controller to convert stick demands into pitch,roll angles
-        float rollDemand = sim.roll();
-        float pitchDemand  = sim.pitch();
-        hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
+        float rollDemand = runPositionPid(sim.roll(), sim.dy());
+        float pitchDemand = runPositionPid(sim.pitch(), sim.dx());
 
         // Use pitch,roll angle PID controllers to convert pitch,roll angles
         // into angular rates
