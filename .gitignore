@@ -1,9 +1,2 @@
-obj/
-*#
-*.pro
-*.job
+__pycache__/
 *.swp
-.nfs*
-*~
-~*
-
