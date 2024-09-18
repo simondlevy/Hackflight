@@ -143,18 +143,12 @@ int main(int argc, char ** argv)
         // Get yaw demand from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
-        // Use position PID controller to convert stick demands into pitch,roll angles
         float rollDemand = runPositionPid(sim.roll(), sim.dy());
-        float pitchDemand = runPositionPid(sim.pitch(), sim.dx());
-
-        // Use pitch,roll angle PID controllers to convert pitch,roll angles
-        // into angular rates
         rollDemand = runPitchRollAnglePid(rollDemand, sim.phi());
-        pitchDemand = runPitchRollAnglePid(pitchDemand, sim.theta());
-
-        // Use pitch,roll angle rate controllers to convert pitch,roll rates
-        // into motor spins
         rollDemand = runPitchRollRatePid(rollDemand, sim.dphi());
+
+        float pitchDemand = runPositionPid(sim.pitch(), sim.dx());
+        pitchDemand = runPitchRollAnglePid(pitchDemand, sim.theta());
         pitchDemand = runPitchRollRatePid(pitchDemand, sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
