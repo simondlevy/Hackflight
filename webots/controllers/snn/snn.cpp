@@ -32,7 +32,7 @@ static const float THRUST_BASE = 55.5;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float PITCH_ROLL_ANGLE_KP = 6;
+static const float K2 = 6;
 
 static const float CLIMBRATE_KP = 4;
 static const float CLIMBRATE_PRESCALE = 1.0;
@@ -44,9 +44,9 @@ static const float DT = 0.01;
 
 static const float THROTTLE_DOWN = 0.06;
 
-static const float PITCH_ROLL_RATE_KP = 0.0125;
+static const float K1 = 0.0125;
 
-static const float POSITION_KP = 10;
+static const float K3 = 10;
 
 static double runClimbRateSnn(
         SNN * snn, const float setpoint, const float actual)
@@ -122,13 +122,12 @@ int main(int argc, char ** argv)
         // Get yaw demand from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
-        float rollDemand = POSITION_KP * (sim.roll() - sim.dy());
-        rollDemand = PITCH_ROLL_ANGLE_KP * (rollDemand - sim.phi());
-        rollDemand = PITCH_ROLL_RATE_KP * (rollDemand - sim.dphi());
+        const auto rollDemand = 
+            K1*K2*K3* (((sim.roll() - sim.dy()) - sim.phi()/K3) - sim.dphi()/(K2*K3));
 
-        float pitchDemand = POSITION_KP * (sim.pitch() - sim.dx());
-        pitchDemand = PITCH_ROLL_ANGLE_KP * (pitchDemand - sim.theta());
-        pitchDemand = PITCH_ROLL_RATE_KP * (pitchDemand - sim.dtheta());
+        float pitchDemand = K3 * (sim.pitch() - sim.dx());
+        pitchDemand = K2 * (pitchDemand - sim.theta());
+        pitchDemand = K1 * (pitchDemand - sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
