@@ -78,20 +78,10 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
-static float runRollSnn(
-        const float stick, const float dy, const float phi, const float dphi)
+static float runCascadeSnn(
+        const float stick, const float vel, const float angle, const float dangle)
 {
-    static bool started;
-
-    if (!started) {
-    printf("stick, dy, phi, dphi\n");
-    }
-    started = true;
-
-    printf("%f,%f,%f,%f\n", stick, dy, phi, dphi);
-    fflush(stdout);
-
-    return ((stick - dy) - phi) - dphi;
+    return ((stick - vel) - angle) - dangle;
 }
 
 int main(int argc, char ** argv)
@@ -139,12 +129,10 @@ int main(int argc, char ** argv)
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
         const auto rollDemand = K1*K2*K3 *
-            runRollSnn(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
+            runCascadeSnn(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
 
-
-        float pitchDemand = K3 * (sim.pitch() - sim.dx());
-        pitchDemand = K2 * (pitchDemand - sim.theta());
-        pitchDemand = K1 * (pitchDemand - sim.dtheta());
+        const auto pitchDemand = K1*K2*K3 *
+            runCascadeSnn(sim.pitch(), sim.dx(), sim.theta()/K3, sim.dtheta()/(K2*K3));
 
         // Ignore thrust demand until airborne, based on time from launch
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
