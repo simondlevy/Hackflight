@@ -78,8 +78,19 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
-static float runRollSnn(const float stick, const float dy, const float phi, const float dphi)
+static float runRollSnn(
+        const float stick, const float dy, const float phi, const float dphi)
 {
+    static bool started;
+
+    if (!started) {
+    printf("stick, dy, phi, dphi\n");
+    }
+    started = true;
+
+    printf("%f,%f,%f,%f\n", stick, dy, phi, dphi);
+    fflush(stdout);
+
     return ((stick - dy) - phi) - dphi;
 }
 
