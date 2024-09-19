@@ -161,10 +161,7 @@
     { "from": 37, "to": 36, "values": [ -0.9915645713898271, 4 ] }
   ],
 
-  "Inputs": [
-    0,
-    1
-  ],
+  "Inputs": [ 0, 1 ],
   "Network_Values": [],
 
   "Nodes": [
