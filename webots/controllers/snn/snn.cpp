@@ -78,6 +78,11 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
+static float runRollSnn(const float stick, const float dy, const float phi, const float dphi)
+{
+    return ((stick - dy) - phi) - dphi;
+}
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -122,8 +127,9 @@ int main(int argc, char ** argv)
         // Get yaw demand from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
-        const auto rollDemand = 
-            K1*K2*K3* (((sim.roll() - sim.dy()) - sim.phi()/K3) - sim.dphi()/(K2*K3));
+        const auto rollDemand = K1*K2*K3 *
+            runRollSnn(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
+
 
         float pitchDemand = K3 * (sim.pitch() - sim.dx());
         pitchDemand = K2 * (pitchDemand - sim.theta());
