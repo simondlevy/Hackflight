@@ -147,7 +147,9 @@ int main(int argc, char ** argv)
         //    runCascade(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
 
 
-        auto rollDemand = (sim.roll() - sim.dy()) - sim.phi()/K2;
+        auto rollDemand = sim.roll() - sim.dy();
+
+        rollDemand = rollDemand - sim.phi()/K2;
 
         rollDemand = runRollRateSnn(rollrate_snn, rollDemand, sim.dphi() / (K2 * K3));
 
