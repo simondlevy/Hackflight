@@ -77,6 +77,7 @@ int main(int argc, char ** argv)
 
     SNN * climbRateSnn = NULL;
     SNN * yawRateSnn = NULL;
+    SNN * positionYSnn = NULL;
     SNN * rollAngleSnn = NULL;
     SNN * rollRateSnn = NULL;
 
@@ -91,6 +92,7 @@ int main(int argc, char ** argv)
 
         climbRateSnn = new SNN(argv[1], "risp");
         yawRateSnn = new SNN(argv[1], "risp");
+        positionYSnn = new SNN(argv[1], "risp");
         rollAngleSnn = new SNN(argv[1], "risp");
         rollRateSnn = new SNN(argv[1], "risp");
 
@@ -121,12 +123,7 @@ int main(int argc, char ** argv)
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE);
 
-        //const auto rollDemand = K1*K2*K3 *
-        //    runCascade(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
-
-        auto rollDemand = sim.roll() - sim.dy();
-
-        // rollDemand = rollDemand - sim.phi()/K2;
+        auto rollDemand = runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
 
         rollDemand = runDifferenceSnn(rollAngleSnn, rollDemand, sim.phi()/K2);
 
