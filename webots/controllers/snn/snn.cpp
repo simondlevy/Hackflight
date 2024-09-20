@@ -48,21 +48,6 @@ static const float K1 = 0.0125;
 
 static const float K3 = 10;
 
-static double runYawRateSnn(
-        SNN * snn, const float setpoint, const float actual)
-{
-    vector<double> observations = {
-        setpoint,
-        actual / YAW_PRESCALE
-    };
-
-    vector <double> actions;
-    snn->step(observations, actions);
-
-    // NEGATE because our SNN used flip=true
-    return -actions[0] * YAW_KP * YAW_PRESCALE;
-}
-
 static float runDifferenceSnn(
         SNN * snn, const float setpoint, const float actual)
 {
@@ -131,7 +116,10 @@ int main(int argc, char ** argv)
                     CLIMBRATE_PRESCALE*sim.dz());
 
         // Get yaw demand from SNN
-        const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
+        const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+                yawrate_snn,
+                sim.yaw(),
+                sim.dpsi()/YAW_PRESCALE);
 
         //const auto rollDemand = K1*K2*K3 *
         //    runCascade(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
