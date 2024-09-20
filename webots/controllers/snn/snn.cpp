@@ -125,6 +125,14 @@ int main(int argc, char ** argv)
 
         auto rollDemand = runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
 
+        static bool wroteHeader;
+        if (!wroteHeader) {
+            printf("time,stick,dy/dt,output\n");
+        }
+        wroteHeader = true;
+        printf("%f,%f,%f,%f\n", sim.time(), sim.roll(), sim.dy(), rollDemand);
+        fflush(stdout);
+
         rollDemand = runDifferenceSnn(rollAngleSnn, rollDemand, sim.phi()/K2);
 
         rollDemand = runDifferenceSnn(rollRateSnn, rollDemand, sim.dphi() / (K2 * K3));

@@ -80,3 +80,7 @@ include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 edit:
 	vim $(NAME).cpp
 
+log:
+	libreoffice log.csv
+
+
