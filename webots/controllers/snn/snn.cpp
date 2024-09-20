@@ -151,13 +151,9 @@ int main(int argc, char ** argv)
 
         const auto dphi = sim.dphi() / (K2 * K3);
 
-        const auto rollDemandSnn = runRollRateSnn(rollrate_snn, rollDemand, dphi);
+        rollDemand = runRollRateSnn(rollrate_snn, rollDemand, dphi);
 
-        rollDemand = rollDemand - dphi;
-
-        printf("%f,%f\n", rollDemand, rollDemandSnn);
-
-        rollDemand = K1*K2*K3 * rollDemandSnn;
+        rollDemand = K1*K2*K3 * rollDemand;
 
         const auto pitchDemand = K1*K2*K3 *
             runCascade(sim.pitch(), sim.dx(), sim.theta()/K3, sim.dtheta()/(K2*K3));
