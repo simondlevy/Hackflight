@@ -78,6 +78,19 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
+static float runRollRateSnn(
+        SNN * snn, const float setpoint, const float actual)
+{
+    vector<double> observations = { setpoint, actual };
+
+    vector <double> actions;
+    snn->step(observations, actions);
+
+    // NEGATE because our SNN used flip=true
+    return -actions[0];
+}
+
+
 static float runCascade(
         const float stick, const float vel, const float angle, const float dangle)
 {
@@ -94,6 +107,7 @@ int main(int argc, char ** argv)
 
     SNN * climbrate_snn = NULL;
     SNN * yawrate_snn = NULL;
+    SNN * rollrate_snn = NULL;
 
     // Load up the network specified in the command line
 
@@ -106,6 +120,7 @@ int main(int argc, char ** argv)
 
         climbrate_snn = new SNN(argv[1], "risp");
         yawrate_snn = new SNN(argv[1], "risp");
+        rollrate_snn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -128,8 +143,21 @@ int main(int argc, char ** argv)
         // Get yaw demand from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
 
-        const auto rollDemand = K1*K2*K3 *
-            runCascade(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
+        //const auto rollDemand = K1*K2*K3 *
+        //    runCascade(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
+
+
+        auto rollDemand = (sim.roll() - sim.dy()) - sim.phi()/K2;
+
+        const auto dphi = sim.dphi() / (K2 * K3);
+
+        const auto rollDemandSnn = runRollRateSnn(rollrate_snn, rollDemand, dphi);
+
+        rollDemand = rollDemand - dphi;
+
+        printf("%f,%f\n", rollDemand, rollDemandSnn);
+
+        rollDemand = K1*K2*K3 * rollDemandSnn;
 
         const auto pitchDemand = K1*K2*K3 *
             runCascade(sim.pitch(), sim.dx(), sim.theta()/K3, sim.dtheta()/(K2*K3));
