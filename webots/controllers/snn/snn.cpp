@@ -149,9 +149,7 @@ int main(int argc, char ** argv)
 
         auto rollDemand = (sim.roll() - sim.dy()) - sim.phi()/K2;
 
-        const auto dphi = sim.dphi() / (K2 * K3);
-
-        rollDemand = runRollRateSnn(rollrate_snn, rollDemand, dphi);
+        rollDemand = runRollRateSnn(rollrate_snn, rollDemand, sim.dphi() / (K2 * K3));
 
         rollDemand = K1*K2*K3 * rollDemand;
 
