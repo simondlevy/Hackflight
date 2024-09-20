@@ -78,7 +78,7 @@ static double runYawRateSnn(
     return -actions[0] * YAW_KP * YAW_PRESCALE;
 }
 
-static float runRollRateSnn(
+static float runDifferenceSnn(
         SNN * snn, const float setpoint, const float actual)
 {
     vector<double> observations = { setpoint, actual };
@@ -107,6 +107,7 @@ int main(int argc, char ** argv)
 
     SNN * climbrate_snn = NULL;
     SNN * yawrate_snn = NULL;
+    SNN * rollangle_snn = NULL;
     SNN * rollrate_snn = NULL;
 
     // Load up the network specified in the command line
@@ -120,6 +121,7 @@ int main(int argc, char ** argv)
 
         climbrate_snn = new SNN(argv[1], "risp");
         yawrate_snn = new SNN(argv[1], "risp");
+        rollangle_snn = new SNN(argv[1], "risp");
         rollrate_snn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
@@ -146,12 +148,13 @@ int main(int argc, char ** argv)
         //const auto rollDemand = K1*K2*K3 *
         //    runCascade(sim.roll(), sim.dy(), sim.phi()/K3, sim.dphi()/(K2*K3));
 
-
         auto rollDemand = sim.roll() - sim.dy();
+
+        (void)rollangle_snn;
 
         rollDemand = rollDemand - sim.phi()/K2;
 
-        rollDemand = runRollRateSnn(rollrate_snn, rollDemand, sim.dphi() / (K2 * K3));
+        rollDemand = runDifferenceSnn(rollrate_snn, rollDemand, sim.dphi() / (K2 * K3));
 
         rollDemand = K1*K2*K3 * rollDemand;
 
