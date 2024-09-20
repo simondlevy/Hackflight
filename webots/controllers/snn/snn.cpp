@@ -75,10 +75,10 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    SNN * climbrate_snn = NULL;
-    SNN * yawrate_snn = NULL;
-    SNN * rollangle_snn = NULL;
-    SNN * rollrate_snn = NULL;
+    SNN * climbRateSnn = NULL;
+    SNN * yawRateSnn = NULL;
+    SNN * rollAngleSnn = NULL;
+    SNN * rollRateSnn = NULL;
 
     // Load up the network specified in the command line
 
@@ -89,18 +89,18 @@ int main(int argc, char ** argv)
 
     try {
 
-        climbrate_snn = new SNN(argv[1], "risp");
-        yawrate_snn = new SNN(argv[1], "risp");
-        rollangle_snn = new SNN(argv[1], "risp");
-        rollrate_snn = new SNN(argv[1], "risp");
+        climbRateSnn = new SNN(argv[1], "risp");
+        yawRateSnn = new SNN(argv[1], "risp");
+        rollAngleSnn = new SNN(argv[1], "risp");
+        rollRateSnn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
 
-    //climbrate_snn->serve_visualizer(CLIMBRATE_VIZ_PORT);
-    //yawrate_snn->serve_visualizer(YAWRATE_VIZ_PORT);
+    //climbRateSnn->serve_visualizer(CLIMBRATE_VIZ_PORT);
+    //yawRateSnn->serve_visualizer(YAWRATE_VIZ_PORT);
 
     while (true) {
 
@@ -111,13 +111,13 @@ int main(int argc, char ** argv)
         // Get thrust demand from SNN
         const auto thrustFromSnn =
             CLIMBRATE_KP * runDifferenceSnn(
-                    climbrate_snn,
+                    climbRateSnn,
                     CLIMBRATE_PRESCALE*sim.throttle(),
                     CLIMBRATE_PRESCALE*sim.dz());
 
         // Get yaw demand from SNN
         const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
-                yawrate_snn,
+                yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE);
 
@@ -126,11 +126,11 @@ int main(int argc, char ** argv)
 
         auto rollDemand = sim.roll() - sim.dy();
 
-        (void)rollangle_snn;
+        // rollDemand = rollDemand - sim.phi()/K2;
 
-        rollDemand = rollDemand - sim.phi()/K2;
+        rollDemand = runDifferenceSnn(rollAngleSnn, rollDemand, sim.phi()/K2);
 
-        rollDemand = runDifferenceSnn(rollrate_snn, rollDemand, sim.dphi() / (K2 * K3));
+        rollDemand = runDifferenceSnn(rollRateSnn, rollDemand, sim.dphi() / (K2 * K3));
 
         rollDemand = K1*K2*K3 * rollDemand;
 
@@ -158,8 +158,8 @@ int main(int argc, char ** argv)
         // Spin the motors
         sim.setMotors(m1, m2, m3, m4);
 
-        //climbrate_snn->send_counts_to_visualizer();
-        //yawrate_snn->send_counts_to_visualizer();
+        //climbRateSnn->send_counts_to_visualizer();
+        //yawRateSnn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();
