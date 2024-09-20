@@ -48,21 +48,6 @@ static const float K1 = 0.0125;
 
 static const float K3 = 10;
 
-static double runClimbRateSnn(
-        SNN * snn, const float setpoint, const float actual)
-{
-    vector<double> observations = {
-        CLIMBRATE_PRESCALE*setpoint,
-        CLIMBRATE_PRESCALE*actual
-    };
-
-    vector <double> actions;
-    snn->step(observations, actions);
-
-    // NEGATE because our SNN used flip=true
-    return -actions[0] * CLIMBRATE_KP;
-}
-
 static double runYawRateSnn(
         SNN * snn, const float setpoint, const float actual)
 {
@@ -140,7 +125,10 @@ int main(int argc, char ** argv)
 
         // Get thrust demand from SNN
         const auto thrustFromSnn =
-            runClimbRateSnn(climbrate_snn, sim.throttle(), sim.dz());
+            CLIMBRATE_KP * runDifferenceSnn(
+                    climbrate_snn,
+                    CLIMBRATE_PRESCALE*sim.throttle(),
+                    CLIMBRATE_PRESCALE*sim.dz());
 
         // Get yaw demand from SNN
         const auto yawDemand = runYawRateSnn(yawrate_snn, sim.yaw(), sim.dpsi());
