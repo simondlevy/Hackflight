@@ -1,20 +1,20 @@
 /*
-  C++ flight simulator takeoff example for Hackflight
- 
-  Copyright (C) 2024 Simon D. Levy
- 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, in version 3.
- 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
- 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http:--www.gnu.org/licenses/>.
-*/
+   C++ flight simulator takeoff example for Hackflight
+
+   Copyright (C) 2024 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
 
 // TeNNLab framework
 #include <levy_snn_util.hpp>
@@ -48,6 +48,10 @@ static const float K1 = 0.0125;
 
 static const float K3 = 10;
 
+static const float PITCH_ROLL_OFFSET = 0.075;
+
+static const float YAW_OFFSET = 0.01;
+
 static float runDifferenceSnn(
         SNN * snn, const float setpoint, const float actual)
 {
@@ -65,13 +69,6 @@ static float runCascade(
         const float stick, const float vel, const float angle, const float dangle)
 {
     return ((stick - vel) - angle) - dangle;
-}
-
-static float deadband(const float x)
-{
-    static const float DEADBAND = 0.10;
-
-    return x < -DEADBAND ? x : x > +DEADBAND ? x : 0;
 }
 
 int main(int argc, char ** argv)
@@ -130,34 +127,35 @@ int main(int argc, char ** argv)
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
         if (time > TAKEOFF_TIME) {
-        yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
-                yawRateSnn,
-                sim.yaw(),
-                sim.dpsi()/YAW_PRESCALE);
 
-        const auto rollDemand1 =
-            runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
+            yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+                    yawRateSnn,
+                    sim.yaw(),
+                    sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
 
-        const auto rollDemand2
-            = runDifferenceSnn(rollAngleSnn, rollDemand1, sim.phi()/K2);
+            const auto rollDemand1 =
+                runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
 
-        const auto rollDemand3 = runDifferenceSnn(rollRateSnn, rollDemand2,
-                sim.dphi() / (K2 * K3));
+            const auto rollDemand2
+                = runDifferenceSnn(rollAngleSnn, rollDemand1, sim.phi()/K2);
 
-        static bool wroteHeader;
-        if (!wroteHeader) {
-            printf("time,stick,dy/dt,demand3\n");
-        }
-        wroteHeader = true;
-        printf("%f,%f,%f,%f\n",
-                sim.time(), sim.roll(), sim.dy(), rollDemand3);
-        fflush(stdout);
+            const auto rollDemand3 = runDifferenceSnn(rollRateSnn, rollDemand2,
+                    sim.dphi() / (K2 * K3));
 
-        rollDemand = deadband(K1*K2*K3 * rollDemand3);
+            rollDemand = K1*K2*K3 * rollDemand3 + PITCH_ROLL_OFFSET;
 
-        pitchDemand = K1*K2*K3 *
-            runCascade(sim.pitch(), sim.dx(), sim.theta()/K3,
-                    sim.dtheta()/(K2*K3));
+            static bool wroteHeader;
+            if (!wroteHeader) {
+                printf("time,stick,dy/dt,output\n");
+            }
+            wroteHeader = true;
+            printf("%f,%f,%f,%f\n",
+                    sim.time(), sim.roll(), sim.dy(), rollDemand);
+            fflush(stdout);
+
+            pitchDemand = K1*K2*K3 *
+                runCascade(sim.pitch(), sim.dx(), sim.theta()/K3,
+                        sim.dtheta()/(K2*K3));
 
         }
 
