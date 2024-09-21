@@ -67,6 +67,13 @@ static float runCascade(
     return ((stick - vel) - angle) - dangle;
 }
 
+static float deadband(const float x)
+{
+    static const float DEADBAND = 0.10;
+
+    return x < -DEADBAND ? x : x > +DEADBAND ? x : 0;
+}
+
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
@@ -117,33 +124,44 @@ int main(int argc, char ** argv)
                     CLIMBRATE_PRESCALE*sim.throttle(),
                     CLIMBRATE_PRESCALE*sim.dz());
 
-        // Get yaw demand from SNN
-        const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+        float rollDemand = 0;
+        float pitchDemand = 0;
+        float yawDemand = 0;
+        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
+
+        if (time > TAKEOFF_TIME) {
+        yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
                 yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE);
 
-        auto rollDemand = runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
+        const auto rollDemand1 =
+            runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
+
+        const auto rollDemand2
+            = runDifferenceSnn(rollAngleSnn, rollDemand1, sim.phi()/K2);
+
+        const auto rollDemand3 = runDifferenceSnn(rollRateSnn, rollDemand2,
+                sim.dphi() / (K2 * K3));
 
         static bool wroteHeader;
         if (!wroteHeader) {
-            printf("time,stick,dy/dt,output\n");
+            printf("time,stick,dy/dt,demand3\n");
         }
         wroteHeader = true;
-        printf("%f,%f,%f,%f\n", sim.time(), sim.roll(), sim.dy(), rollDemand);
+        printf("%f,%f,%f,%f\n",
+                sim.time(), sim.roll(), sim.dy(), rollDemand3);
         fflush(stdout);
 
-        rollDemand = runDifferenceSnn(rollAngleSnn, rollDemand, sim.phi()/K2);
+        rollDemand = deadband(K1*K2*K3 * rollDemand3);
 
-        rollDemand = runDifferenceSnn(rollRateSnn, rollDemand, sim.dphi() / (K2 * K3));
+        pitchDemand = K1*K2*K3 *
+            runCascade(sim.pitch(), sim.dx(), sim.theta()/K3,
+                    sim.dtheta()/(K2*K3));
 
-        rollDemand = K1*K2*K3 * rollDemand;
-
-        const auto pitchDemand = K1*K2*K3 *
-            runCascade(sim.pitch(), sim.dx(), sim.theta()/K3, sim.dtheta()/(K2*K3));
+        }
 
         // Ignore thrust demand until airborne, based on time from launch
-        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
         const auto thrustDemand =
             time > TAKEOFF_TIME ? 
             THRUST_BASE + thrustFromSnn :
