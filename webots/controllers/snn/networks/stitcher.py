@@ -10,5 +10,11 @@ def main():
 
     parser = argparse.ArgumentParser(formatter_class=fmtr)
 
+    parser.add_argument('file1')
+
+    parser.add_argument('file2')
+
+    args = parser.parse_args()
+
 main()
 
