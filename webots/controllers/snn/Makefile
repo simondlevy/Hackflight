@@ -16,8 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/eons_climbrate_risp.txt
-# NETWORK = $(FDIR)/networks/difference_risp.txt
+NETWORK = $(shell pwd)/networks/difference_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
