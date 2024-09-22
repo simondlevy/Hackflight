@@ -33,9 +33,14 @@ def main():
 
     snn_out = snn1.copy() # XXX
 
-    nodes1 = sorted(snn_out['Nodes'], key = lambda node: node['id'])
+    nodes1_sorted = sorted(snn_out['Nodes'], key = lambda node: node['id'])
 
-    print(nodes1)
+    nodes1_renamed = [
+            {'id':snn1map[node['id']], 'values':node['values'] }
+            for node in nodes1_sorted
+            ]
+
+    print(nodes1_renamed)
 
     json_out = json.dumps(snn_out, sort_keys=True, indent=4)
 
