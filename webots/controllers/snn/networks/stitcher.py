@@ -31,10 +31,9 @@ def main():
             enumerate(sorted([int(node['id']) for node in snn1['Nodes']]))
             }
 
-
     snn_out = snn1.copy() # XXX
 
-    json_out = json.dumps(snn_out)
+    json_out = json.dumps(snn_out, sort_keys=True, indent=4)
 
     if args.output_file is not None:
 
