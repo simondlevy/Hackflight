@@ -25,6 +25,30 @@ def load_json(filename):
     return json.loads(open(filename).read())
 
 
+def renumber_snn(snn):
+
+    node_map = { i: j for  j, i in
+            enumerate(sorted([int(node['id']) for node in snn['Nodes']]))
+            }
+
+    nodes_sorted = sorted(snn['Nodes'], key = lambda node: node['id'])
+
+    nodes_renamed = [
+            {'id':node_map[node['id']], 'values':node['values'] }
+            for node in nodes_sorted
+            ]
+
+    edges_renamed = [
+            { 
+                'from':node_map[edge['from']], 
+                'to':node_map[edge['to']], 
+                'values':edge['values'] 
+                }
+            for edge in snn['Edges'] ]
+
+    return nodes_renamed, edges_renamed
+ 
+
 def main():
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
@@ -41,30 +65,11 @@ def main():
 
     snn1 = load_json(args.input_file1)
 
-    snn2 = load_json(args.input_file2)
-
-    snn1map = { i: j for  j, i in
-            enumerate(sorted([int(node['id']) for node in snn1['Nodes']]))
-            }
-
-    nodes1_sorted = sorted(snn1['Nodes'], key = lambda node: node['id'])
-
-    nodes1_renamed = [
-            {'id':snn1map[node['id']], 'values':node['values'] }
-            for node in nodes1_sorted
-            ]
-
-    edges1_renamed = [
-            { 
-                'from':snn1map[edge['from']], 
-                'to':snn1map[edge['to']], 
-                'values':edge['values'] 
-                }
-            for edge in snn1['Edges'] ]
+    snn1_nodes, snn1_edges = renumber_snn(snn1)
 
     snn_out = { 
-               'Edges': edges1_renamed,
-               'Nodes': nodes1_renamed,
+               'Edges': snn1_edges,
+               'Nodes': snn1_nodes,
                'Associated_Data': snn1['Associated_Data'],
                'Inputs': snn1['Inputs'],
                'Network_Values': snn1['Network_Values'],
