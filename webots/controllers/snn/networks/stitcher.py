@@ -40,7 +40,12 @@ def main():
             for node in nodes1_sorted
             ]
 
-    print(nodes1_renamed)
+    edges1_renamed = [
+            {'from':edge['from'], 'to':edge['to'], 'values':edge['values'] }
+            for edge in snn1['Edges'] 
+            ]
+
+    print(edges1_renamed)
 
     json_out = json.dumps(snn_out, sort_keys=True, indent=4)
 
