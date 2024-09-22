@@ -16,7 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/cascade_risp.txt
+NETWORK = $(shell pwd)/networks/new_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 

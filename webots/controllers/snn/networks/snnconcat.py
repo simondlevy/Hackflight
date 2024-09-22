@@ -47,9 +47,7 @@ def main():
             enumerate(sorted([int(node['id']) for node in snn1['Nodes']]))
             }
 
-    snn_out = snn1.copy() # XXX
-
-    nodes1_sorted = sorted(snn_out['Nodes'], key = lambda node: node['id'])
+    nodes1_sorted = sorted(snn1['Nodes'], key = lambda node: node['id'])
 
     nodes1_renamed = [
             {'id':snn1map[node['id']], 'values':node['values'] }
@@ -64,11 +62,15 @@ def main():
                 }
             for edge in snn1['Edges'] ]
 
-    # print(edges1_renamed)
-
-    print(snn1.keys())
-
-    exit(0)
+    snn_out = { 
+               'Edges': edges1_renamed,
+               'Nodes': nodes1_renamed,
+               'Associated_Data': snn1['Associated_Data'],
+               'Inputs': snn1['Inputs'],
+               'Network_Values': snn1['Network_Values'],
+               'Outputs': snn1['Outputs'],
+               'Properties': snn1['Properties']
+              }
 
     json_out = json.dumps(snn_out, sort_keys=True, indent=4)
 
