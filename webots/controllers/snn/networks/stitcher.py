@@ -27,13 +27,24 @@ def main():
 
     snn2 = load_json(args.input_file2)
 
-    snn1dict = { i: j for  j, i in
+    snn1map = { i: j for  j, i in
             enumerate(sorted([int(node['id']) for node in snn1['Nodes']]))
             }
 
-    print(snn1dict)
 
-    # print(json.dumps(snn1))
+    snn_out = snn1.copy() # XXX
+
+    json_out = json.dumps(snn_out)
+
+    if args.output_file is not None:
+
+        with open(args.output_file, 'w') as outfile:
+
+            outfile.write(json_out)
+
+    else:
+
+        print(json_out)
 
 main()
 
