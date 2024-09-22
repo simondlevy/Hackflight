@@ -41,9 +41,12 @@ def main():
             ]
 
     edges1_renamed = [
-            {'from':edge['from'], 'to':edge['to'], 'values':edge['values'] }
-            for edge in snn1['Edges'] 
-            ]
+            { 
+                'from':snn1map[edge['from']], 
+                'to':snn1map[edge['to']], 
+                'values':edge['values'] 
+            }
+            for edge in snn1['Edges'] ]
 
     print(edges1_renamed)
 
