@@ -33,6 +33,10 @@ def main():
 
     snn_out = snn1.copy() # XXX
 
+    nodes1 = sorted(snn_out['Nodes'], key = lambda node: node['id'])
+
+    print(nodes1)
+
     json_out = json.dumps(snn_out, sort_keys=True, indent=4)
 
     if args.output_file is not None:
