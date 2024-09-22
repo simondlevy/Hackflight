@@ -67,6 +67,10 @@ def main():
 
     snn1_nodes, snn1_edges = renumber_snn(snn1)
 
+    last_hidden_1  = snn1_nodes[-1]['id']
+
+    print(last_hidden_1)
+
     snn_out = { 
                'Edges': snn1_edges,
                'Nodes': snn1_nodes,
@@ -86,6 +90,8 @@ def main():
             outfile.write(json_out)
 
     else:
+
+        exit(0)
 
         print(json_out)
 
