@@ -16,7 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/difference2_risp.txt
+NETWORK = $(shell pwd)/networks/difference3_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
