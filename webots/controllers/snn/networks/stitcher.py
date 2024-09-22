@@ -27,7 +27,9 @@ def main():
 
     snn2 = load_json(args.input_file2)
 
-    snn1dict = {i: j for  j, i in enumerate(sorted([int(node['id']) for node in snn1['Nodes']]))}
+    snn1dict = { i: j for  j, i in
+            enumerate(sorted([int(node['id']) for node in snn1['Nodes']]))
+            }
 
     print(snn1dict)
 
