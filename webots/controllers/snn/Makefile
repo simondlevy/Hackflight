@@ -16,7 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/new_risp.txt
+NETWORK = $(shell pwd)/networks/difference_risp.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -51,6 +51,11 @@ VERBOSE = 1
 run:
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +9 > log.csv &
+	sleep 1
+	cd $(FDIR)/viz; \
+		love . -i '{"source":"request","port":$(CLIMBRATE_VIZ_PORT),"host":$(VIZ_HOST)}' \
+		-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
+		--set_num_screen_shot 0 > /dev/null
 
 bigrun:
 	webots ../../worlds/simple.wbt &

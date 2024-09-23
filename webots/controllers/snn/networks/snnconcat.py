@@ -73,17 +73,23 @@ def main():
 
     snn2 = load_json(args.input_file2)
 
-    snn2_nodes, snn2_edges = renumber_snn(snn2, snn1_max_node + 1)
+    new_snn2_input = snn1_max_node + 1
 
-    print(snn2_edges)
+    snn2_nodes, snn2_edges = renumber_snn(snn2, new_snn2_input)
+
+    snn1_outputs = snn1['Outputs']
+
+    print(snn1_outputs)
+    print(new_snn2_input)
+    exit(0)
 
     snn_out = { 
-               'Edges': snn1_edges,
-               'Nodes': snn1_nodes,
+               'Edges': snn1_edges + snn2_edges + [],
+               'Nodes': snn1_nodes + snn2_nodes,
                'Associated_Data': snn1['Associated_Data'],
                'Inputs': snn1['Inputs'],
                'Network_Values': snn1['Network_Values'],
-               'Outputs': snn1['Outputs'],
+               'Outputs': snn2['Outputs'],
                'Properties': snn1['Properties']
               }
 
@@ -96,8 +102,6 @@ def main():
             outfile.write(json_out)
 
     else:
-
-        exit(0)
 
         print(json_out)
 
