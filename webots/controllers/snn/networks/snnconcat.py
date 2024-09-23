@@ -81,6 +81,10 @@ def main():
 
     print(snn1_outputs)
     print(new_snn2_input)
+
+    new_edges = [{'from':node, 'to':new_snn2_input, 'values':[1, 0]}  for node in snn1_outputs]
+
+    print(new_edges)
     exit(0)
 
     snn_out = { 
