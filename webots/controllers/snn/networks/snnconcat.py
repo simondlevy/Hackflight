@@ -73,11 +73,10 @@ def main():
 
     snn2 = load_json(args.input_file2)
 
-    snn2_nodes, snn2_edges = renumber_snn(snn2, snn1_max_node)
+    snn2_nodes, snn2_edges = renumber_snn(snn2, snn1_max_node + 1)
 
     print(snn1_nodes)
     print(snn2_nodes)
-
 
     snn_out = { 
                'Edges': snn1_edges,
