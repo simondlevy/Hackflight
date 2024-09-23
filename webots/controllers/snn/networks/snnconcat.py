@@ -90,7 +90,7 @@ def main():
     snn_out = { 
                'Edges': snn1_edges + snn2_edges + new_edges,
                'Nodes': snn1_nodes + snn2_nodes,
-               'Inputs': snn1['Inputs'],
+               'Inputs': snn1['Inputs'] + snn2['Inputs'][1:],
                'Outputs': new_outputs,
                'Network_Values': snn1['Network_Values'],
                'Associated_Data': snn1['Associated_Data'],
