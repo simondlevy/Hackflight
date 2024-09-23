@@ -27,27 +27,29 @@ def load_json(filename):
 
 def renumber_snn(snn, offset=0):
 
-    node_map = { i: j for  j, i in
-            enumerate(sorted([int(node['id']) for node in snn['Nodes']]))
+    node_map = {
+                 i: j for j, i in enumerate(
+                     sorted([int(node['id']) for node in snn['Nodes']]))
             }
 
-    nodes_sorted = sorted(snn['Nodes'], key = lambda node: node['id'])
+    nodes_sorted = sorted(snn['Nodes'], key=lambda node: node['id'])
 
     nodes_renamed = [
-            {'id':(node_map[node['id']] + offset), 'values':node['values'] }
+            {'id': node_map[node['id']] + offset, 'values': node['values']}
             for node in nodes_sorted
             ]
 
     edges_renamed = [
-            { 
-                'from':(node_map[edge['from']] + offset), 
-                'to':(node_map[edge['to']] + offset), 
-                'values':edge['values'] 
+            {
+                'from': node_map[edge['from']] + offset,
+                'to': node_map[edge['to']] + offset,
+                'values': edge['values']
                 }
-            for edge in snn['Edges'] ]
+            for edge in snn['Edges']
+            ]
 
     return nodes_renamed, edges_renamed
- 
+
 
 def main():
 
@@ -80,14 +82,14 @@ def main():
     snn1_outputs = snn1['Outputs']
 
     new_edges = [
-            {'from':node,
-             'to':new_snn2_input,
-             'values':[1, 0]} 
+            {'from': node,
+             'to': new_snn2_input,
+             'values': [1, 0]}
             for node in snn1_outputs]
 
     new_outputs = [node + new_snn2_input for node in snn2['Outputs']]
 
-    snn_out = { 
+    snn_out = {
                'Edges': snn1_edges + snn2_edges + new_edges,
                'Nodes': snn1_nodes + snn2_nodes,
                'Inputs': snn1['Inputs'] + snn2['Inputs'][1:],
@@ -109,5 +111,5 @@ def main():
 
         print(json_out)
 
-main()
 
+main()
