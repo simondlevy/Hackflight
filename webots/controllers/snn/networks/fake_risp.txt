@@ -82,7 +82,7 @@
     { "from": 3, "to": 2, "values": [ 0.2834552459613082, 5 ] }
   ],
 
-  "Inputs": [ 0 ],
+  "Inputs": [ 0, 1 ],
   "Network_Values": [],
 
   "Nodes": [
@@ -92,7 +92,7 @@
     { "id": 3, "values": [ 0.8914545629852113 ] }
   ],
 
-  "Outputs": [ 1 ],
+  "Outputs": [ 2 ],
   "Properties": {
     "edge_properties": [
       {
