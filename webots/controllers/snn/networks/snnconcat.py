@@ -89,7 +89,7 @@ def main():
 
     new_outputs = [node + new_snn2_input for node in snn2['Outputs']]
 
-    new_inputs = snn2['Inputs'][1:]
+    new_inputs = list(map(lambda n: n+new_snn2_input, snn2['Inputs'][1:]))
 
     snn_out = {
                'Edges': snn1_edges + snn2_edges + new_edges,
