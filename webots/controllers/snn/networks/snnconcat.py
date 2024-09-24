@@ -25,32 +25,6 @@ def load_json(filename):
     return json.loads(open(filename).read())
 
 
-def renumber_snn(snn, offset=0):
-
-    node_map = {
-                 i: j for j, i in enumerate(
-                     sorted([int(node['id']) for node in snn['Nodes']]))
-            }
-
-    nodes_sorted = sorted(snn['Nodes'], key=lambda node: node['id'])
-
-    nodes_renamed = [
-            {'id': node_map[node['id']] + offset, 'values': node['values']}
-            for node in nodes_sorted
-            ]
-
-    edges_renamed = [
-            {
-                'from': node_map[edge['from']] + offset,
-                'to': node_map[edge['to']] + offset,
-                'values': edge['values']
-                }
-            for edge in snn['Edges']
-            ]
-
-    return nodes_renamed, edges_renamed
-
-
 def main():
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
@@ -66,35 +40,48 @@ def main():
     args = parser.parse_args()
 
     snn1 = load_json(args.input_file1)
+    snn1_nodes = snn1['Nodes']
+    snn1_edges = snn1['Edges']
 
-    snn1_nodes, snn1_edges = renumber_snn(snn1)
+    snn2 = load_json(args.input_file2)
+    snn2_nodes = snn2['Nodes']
+    snn2_edges = snn2['Edges']
 
-    snn1_max_node = [node['id'] for node in snn1_nodes][-1]
+    offset = max([node['id'] for node in snn1_nodes]) + 1
 
     snn2 = load_json(args.input_file2)
 
-    new_snn2_input = snn1_max_node + 1
+    snn2_nodes_renumbered = [
+            {'id': node['id'] + offset, 'values': node['values']}
+            for node in snn2_nodes
+            ]
 
-    snn2_nodes, snn2_edges = renumber_snn(snn2, new_snn2_input)
+    snn2_edges_renumbered = [
+            {
+                'from': edge['from'] + offset,
+                'to': edge['to'] + offset,
+                'values': edge['values']
+                }
+            for edge in snn2['Edges']
+            ]
+
+    snn2_inputs_renumbered = list(map(lambda n : n + offset, snn2['Inputs']))
+
+    snn2_outputs_renumbered = list(map(lambda n : n + offset, snn2['Outputs']))
 
     snn1_outputs = snn1['Outputs']
 
     new_edges = [
             {'from': node,
-             'to': new_snn2_input,
+             'to': snn2_inputs_renumbered[0],
              'values': [1, 0]}
             for node in snn1_outputs]
 
-    new_outputs = [node + new_snn2_input for node in snn2['Outputs']]
-
-    new_inputs = list(
-            map(lambda node: node + new_snn2_input, snn2['Inputs'][1:]))
-
     snn_out = {
-               'Edges': snn1_edges + snn2_edges + new_edges,
-               'Nodes': snn1_nodes + snn2_nodes,
-               'Inputs': snn1['Inputs'] + new_inputs,
-               'Outputs': new_outputs,
+               'Edges': snn1_edges + snn2_edges_renumbered + new_edges,
+               'Nodes': snn1_nodes + snn2_nodes_renumbered,
+               'Inputs': snn1['Inputs'] + snn2_inputs_renumbered[1:],
+               'Outputs': snn2_outputs_renumbered,
                'Network_Values': snn1['Network_Values'],
                'Associated_Data': snn1['Associated_Data'],
                'Properties': snn1['Properties']
