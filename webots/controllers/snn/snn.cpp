@@ -105,7 +105,7 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    climbRateSnn->serve_visualizer(CLIMBRATE_VIZ_PORT);
+    //climbRateSnn->serve_visualizer(CLIMBRATE_VIZ_PORT);
     //yawRateSnn->serve_visualizer(YAWRATE_VIZ_PORT);
 
     while (true) {
@@ -179,7 +179,7 @@ int main(int argc, char ** argv)
         // Spin the motors
         sim.setMotors(m1, m2, m3, m4);
 
-        climbRateSnn->send_counts_to_visualizer();
+        //climbRateSnn->send_counts_to_visualizer();
         //yawRateSnn->send_counts_to_visualizer();
     }
 
