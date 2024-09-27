@@ -16,7 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/difference_risp_train_flip.txt
+NETWORK = $(shell pwd)/networks/difference_risp_train.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 

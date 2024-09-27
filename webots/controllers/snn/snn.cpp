@@ -49,8 +49,7 @@ static float runDifferenceSnn(
     vector <double> actions;
     snn->step(observations, counts, actions);
 
-    // NEGATE because our SNN used flip=true
-    return -actions[0];
+    return actions[0];
 }
 
 int main(int argc, char ** argv)
