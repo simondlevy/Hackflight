@@ -52,16 +52,6 @@ static float runDifferenceSnn(
     return -actions[0];
 }
 
-/*
-static float runCascade(
-        const float stick,
-        const float vel,
-        const float angle,
-        const float dangle)
-{
-    return ((stick - vel) - angle) - dangle;
-}*/
-
 int main(int argc, char ** argv)
 {
     // Create a simulator object for Webots functionality 
