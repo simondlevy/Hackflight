@@ -41,13 +41,20 @@ static const float YAW_PRESCALE = 160; // deg/sec
 static const float YAW_OFFSET = 0.01;
 
 static float runDifferenceSnn(
-        SNN * snn, const float setpoint, const float actual)
+        SNN * snn,
+        const float setpoint,
+        const float actual,
+        const bool debug=false)
 {
     vector<double> observations = { setpoint, actual };
 
     vector <int> counts;
     vector <double> actions;
     snn->step(observations, counts, actions);
+
+    if (debug) {
+        printf("%d,%f\n", counts[0], actions[0]);
+    }
 
     return actions[0];
 }
@@ -100,7 +107,8 @@ int main(int argc, char ** argv)
             CLIMBRATE_KP * runDifferenceSnn(
                     climbRateSnn,
                     CLIMBRATE_PRESCALE*sim.throttle(),
-                    CLIMBRATE_PRESCALE*sim.dz());
+                    CLIMBRATE_PRESCALE*sim.dz(),
+                    true);
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
