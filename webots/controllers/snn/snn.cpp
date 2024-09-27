@@ -32,24 +32,11 @@ static const float THRUST_BASE = 55.5;
 
 static const float TAKEOFF_TIME = 3;
 
-
 static const float CLIMBRATE_KP = 4;
 static const float CLIMBRATE_PRESCALE = 1.0;
 
 static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
-
-static const float DT = 0.01;
-
-static const float THROTTLE_DOWN = 0.06;
-
-static const float K1 = 0.0125;
-static const float K2 = 6;
-static const float K3 = 10;
-
-static const float PITCH_ROLL_POST_SCALE = 50;
-
-static const float PITCH_ROLL_OFFSET = 0.075;
 
 static const float YAW_OFFSET = 0.01;
 
@@ -133,15 +120,11 @@ int main(int argc, char ** argv)
                 sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
 
         float rollDemand  = 10 * (sim.roll() - sim.dy());
-
         rollDemand = 6 * (rollDemand - sim.phi());
-
-        float pitchDemand  = 10 * (sim.pitch() - sim.dx());
-
-        pitchDemand = 6 * (pitchDemand - sim.theta());
-
         rollDemand = 0.0125 * (rollDemand - sim.dphi());
 
+        float pitchDemand  = 10 * (sim.pitch() - sim.dx());
+        pitchDemand = 6 * (pitchDemand - sim.theta());
         pitchDemand = 0.0125 * (pitchDemand - sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
