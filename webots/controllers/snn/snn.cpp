@@ -45,8 +45,9 @@ static float runDifferenceSnn(
 {
     vector<double> observations = { setpoint, actual };
 
+    vector <int> counts;
     vector <double> actions;
-    snn->step(observations, actions);
+    snn->step(observations, counts, actions);
 
     // NEGATE because our SNN used flip=true
     return -actions[0];
