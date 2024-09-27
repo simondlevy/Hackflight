@@ -109,8 +109,8 @@ int main(int argc, char ** argv)
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
 
-        float rollDemand  = 10 * (sim.roll() - sim.dy());
-        rollDemand = 6 * (rollDemand - sim.phi());
+        auto rollDemand = 6 * (10 * (sim.roll() - sim.dy()) - sim.phi());
+
         rollDemand = 0.0125 * (rollDemand - sim.dphi());
 
         float pitchDemand  = 10 * (sim.pitch() - sim.dx());
