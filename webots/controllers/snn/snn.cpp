@@ -32,7 +32,6 @@ static const float THRUST_BASE = 55.5;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float K2 = 6;
 
 static const float CLIMBRATE_KP = 4;
 static const float CLIMBRATE_PRESCALE = 1.0;
@@ -45,8 +44,10 @@ static const float DT = 0.01;
 static const float THROTTLE_DOWN = 0.06;
 
 static const float K1 = 0.0125;
-
+static const float K2 = 6;
 static const float K3 = 10;
+
+static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const float PITCH_ROLL_OFFSET = 0.075;
 
@@ -64,12 +65,15 @@ static float runDifferenceSnn(
     return -actions[0];
 }
 
-
+/*
 static float runCascade(
-        const float stick, const float vel, const float angle, const float dangle)
+        const float stick,
+        const float vel,
+        const float angle,
+        const float dangle)
 {
     return ((stick - vel) - angle) - dangle;
-}
+}*/
 
 int main(int argc, char ** argv)
 {
@@ -81,9 +85,9 @@ int main(int argc, char ** argv)
 
     SNN * climbRateSnn = NULL;
     SNN * yawRateSnn = NULL;
-    SNN * positionYSnn = NULL;
-    SNN * rollAngleSnn = NULL;
-    SNN * rollRateSnn = NULL;
+    //SNN * positionYSnn = NULL;
+    //SNN * rollAngleSnn = NULL;
+    //SNN * rollRateSnn = NULL;
 
     // Load up the network specified in the command line
 
@@ -96,9 +100,9 @@ int main(int argc, char ** argv)
 
         climbRateSnn = new SNN(argv[1], "risp");
         yawRateSnn = new SNN(argv[1], "risp");
-        positionYSnn = new SNN(argv[1], "risp");
-        rollAngleSnn = new SNN(argv[1], "risp");
-        rollRateSnn = new SNN(argv[1], "risp");
+        //positionYSnn = new SNN(argv[1], "risp");
+        //rollAngleSnn = new SNN(argv[1], "risp");
+        //rollRateSnn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -121,43 +125,24 @@ int main(int argc, char ** argv)
                     CLIMBRATE_PRESCALE*sim.throttle(),
                     CLIMBRATE_PRESCALE*sim.dz());
 
-        float rollDemand = 0;
-        float pitchDemand = 0;
-        float yawDemand = 0;
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        if (time > TAKEOFF_TIME) {
+        const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+                yawRateSnn,
+                sim.yaw(),
+                sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
 
-            yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
-                    yawRateSnn,
-                    sim.yaw(),
-                    sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
+        float rollDemand  = 10 * (sim.roll() - sim.dy());
 
-            const auto rollDemand1 =
-                runDifferenceSnn(positionYSnn, sim.roll(), sim.dy());
+        rollDemand = 6 * (rollDemand - sim.phi());
 
-            const auto rollDemand2
-                = runDifferenceSnn(rollAngleSnn, rollDemand1, sim.phi()/K2);
+        float pitchDemand  = 10 * (sim.pitch() - sim.dx());
 
-            const auto rollDemand3 = runDifferenceSnn(rollRateSnn, rollDemand2,
-                    sim.dphi() / (K2 * K3));
+        pitchDemand = 6 * (pitchDemand - sim.theta());
 
-            rollDemand = K1*K2*K3 * rollDemand3 + PITCH_ROLL_OFFSET;
+        rollDemand = 0.0125 * (rollDemand - sim.dphi());
 
-            static bool wroteHeader;
-            if (!wroteHeader) {
-                printf("time,stick,dy/dt,output\n");
-            }
-            wroteHeader = true;
-            printf("%f,%f,%f,%f\n",
-                    sim.time(), sim.roll(), sim.dy(), rollDemand);
-            fflush(stdout);
-
-            pitchDemand = K1*K2*K3 *
-                runCascade(sim.pitch(), sim.dx(), sim.theta()/K3,
-                        sim.dtheta()/(K2*K3));
-
-        }
+        pitchDemand = 0.0125 * (pitchDemand - sim.dtheta());
 
         // Ignore thrust demand until airborne, based on time from launch
         const auto thrustDemand =
