@@ -60,7 +60,7 @@ static float runYawrateSnn(
     vector <double> actions;
     snn->step(observations, counts, actions);
 
-    return actions[0];
+    return actions[0] + YAW_OFFSET;
 }
 
 int main(int argc, char ** argv)
@@ -115,9 +115,7 @@ int main(int argc, char ** argv)
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
         const auto yawDemand = YAW_KP * YAW_PRESCALE * runYawrateSnn(
-                yawRateSnn,
-                sim.yaw(),
-                sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
+                yawRateSnn, sim.yaw(), sim.dpsi()/YAW_PRESCALE);
 
         auto rollDemand = 6 * (10 * (sim.roll() - sim.dy()) - sim.phi());
 
