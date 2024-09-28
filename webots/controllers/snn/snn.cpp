@@ -35,7 +35,8 @@ static const float CLIMBRATE_PRESCALE = 1.0;
 static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
 
-static const float YAW_OFFSET = 0.01;
+static const float YAW_SNN_SCALE  = 12.5;
+static const float YAW_SNN_OFFSET = 1.99;
 
 static float runClimbrateSnn(
         SNN * snn, const float setpoint, const float actual)
@@ -56,23 +57,25 @@ static float runYawrateSnn(
     vector<double> observations = { setpoint, actual };
 
     vector <int> counts;
-    vector <double> actions;
-    snn->step(observations, counts, actions);
+    snn->step(observations, counts);
 
-    printf("%d,%f\n", counts[0], actions[0] + YAW_OFFSET);
+    return counts[0] / 12.5 - 1.99;
+}
+*/
 
-    return actions[0] + YAW_OFFSET;
-}*/
-
-static float runYawrateSnn(
-        SNN * snn, const float setpoint, const float actual)
+static float runDifferenceSnn(
+        SNN * snn,
+        const float setpoint,
+        const float actual,
+        const float scale,
+        const float offset)
 {
     vector<double> observations = { setpoint, actual };
 
     vector <int> counts;
     snn->step(observations, counts);
 
-    return counts[0] / 12.5 - 1.99;
+    return counts[0] / scale - offset;
 }
 
 int main(int argc, char ** argv)
@@ -130,8 +133,12 @@ int main(int argc, char ** argv)
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        const auto yawDemand = YAW_KP * YAW_PRESCALE * runYawrateSnn(
-                yawRateSnn, sim.yaw(), sim.dpsi()/YAW_PRESCALE);
+        const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+                yawRateSnn,
+                sim.yaw(),
+                sim.dpsi()/YAW_PRESCALE,
+                YAW_SNN_SCALE,
+                YAW_SNN_OFFSET);
 
         auto rollDemand = 6 * (10 * (sim.roll() - sim.dy()) - sim.phi());
 
