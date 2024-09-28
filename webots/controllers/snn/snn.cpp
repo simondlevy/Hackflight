@@ -58,6 +58,8 @@ static float runYawrateSnn(
     vector <double> actions;
     snn->step(observations, counts, actions);
 
+    printf("%d,%f\n", counts[0], actions[0] + YAW_OFFSET);
+
     return actions[0] + YAW_OFFSET;
 }
 
