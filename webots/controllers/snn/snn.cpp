@@ -39,20 +39,7 @@ static const float YAW_SNN_SCALE  = 12.5;
 static const float YAW_SNN_OFFSET = 1.99;
 
 static const float CLIMB_SNN_SCALE  = 12.0;
-static const float CLIMB_SNN_OFFSET = 2.065;
-
-/*
-static float runClimbrateSnn(
-        SNN * snn, const float setpoint, const float actual)
-{
-    vector<double> observations = { setpoint, actual };
-
-    vector <int> counts;
-    vector <double> actions;
-    snn->step(observations, counts);
-
-    return counts[0] / 12.0 - 2.0625;
-}*/
+static const float CLIMB_SNN_OFFSET = 2.07;
 
 static float runDifferenceSnn(
         SNN * snn,
