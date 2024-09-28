@@ -50,7 +50,11 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +11 > log.csv &
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +11 > log.csv
+
+runviz:
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(VIZ_PORT) | tail +11 > log.csv &
 	sleep 1
 	cd $(FDIR)/viz; \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \

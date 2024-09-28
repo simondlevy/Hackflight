@@ -23,8 +23,6 @@
 #include <mixers.hpp>
 #include <sim.hpp>
 
-static const int VIZ_PORT = 8100;
-
 static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.5;
@@ -80,7 +78,7 @@ int main(int argc, char ** argv)
     // Load up the network specified in the command line
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s RISP_NETWORK\n", argv[0]);
+        fprintf(stderr, "Usage: %s RISP_NETWORK VIZ_PORT]\n", argv[0]);
         exit(1);
     }
 
@@ -97,7 +95,11 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    climbRateSnn->serve_visualizer(VIZ_PORT);
+    const auto viz_port = argc > 2 ? atoi(argv[2]) : 0;
+
+    if (viz_port) {
+        climbRateSnn->serve_visualizer(viz_port);
+    }
 
     while (true) {
 
@@ -145,7 +147,9 @@ int main(int argc, char ** argv)
         // Spin the motors
         sim.setMotors(m1, m2, m3, m4);
 
-        climbRateSnn->send_counts_to_visualizer();
+        if (viz_port) {
+            climbRateSnn->send_counts_to_visualizer();
+        }
     }
 
     wb_robot_cleanup();
