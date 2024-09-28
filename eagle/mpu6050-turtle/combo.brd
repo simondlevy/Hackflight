@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -171,7 +171,6 @@
 <text x="22.154" y="40.4678" size="1.016" layer="25" rot="R180">GND</text>
 <text x="23.0834" y="11.3358" size="0.8128" layer="25">3V</text>
 <text x="23.0374" y="13.9358" size="0.8128" layer="25">RX</text>
-<text x="31.8074" y="45.6258" size="1.016" layer="26" rot="MR0">RX</text>
 <text x="19.2942" y="43.0508" size="1.016" layer="26" rot="MR180">3V3</text>
 <text x="19.0188" y="40.4678" size="1.016" layer="26" rot="MR180">GND</text>
 <text x="22.672" y="49.2" size="1.016" layer="25">CS</text>
@@ -239,6 +238,9 @@
 <hole x="15.2" y="23.9" drill="2.4"/>
 <hole x="53.7" y="24" drill="2.4"/>
 <hole x="53.5" y="64.4" drill="2.4"/>
+<text x="49.4472" y="49.6052" size="1.016" layer="25" rot="R315">GD</text>
+<wire x1="47.1" y1="58.1" x2="48.5" y2="56" width="0.1524" layer="21"/>
+<wire x1="47.1" y1="50.6" x2="48.5" y2="48.5" width="0.1524" layer="21"/>
 </plain>
 <libraries>
 <library name="TEENSY 4.0">
