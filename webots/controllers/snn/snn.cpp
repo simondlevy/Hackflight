@@ -49,6 +49,7 @@ static float runClimbrateSnn(
     return counts[0] / 12.0 - 2.0625;
 }
 
+/*
 static float runYawrateSnn(
         SNN * snn, const float setpoint, const float actual)
 {
@@ -61,6 +62,17 @@ static float runYawrateSnn(
     printf("%d,%f\n", counts[0], actions[0] + YAW_OFFSET);
 
     return actions[0] + YAW_OFFSET;
+}*/
+
+static float runYawrateSnn(
+        SNN * snn, const float setpoint, const float actual)
+{
+    vector<double> observations = { setpoint, actual };
+
+    vector <int> counts;
+    snn->step(observations, counts);
+
+    return counts[0] / 12.5 - 1.99;
 }
 
 int main(int argc, char ** argv)
