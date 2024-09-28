@@ -23,8 +23,7 @@
 #include <mixers.hpp>
 #include <sim.hpp>
 
-//static const int CLIMBRATE_VIZ_PORT = 8100;
-//static const int YAWRATE_VIZ_PORT = 8200;
+static const int VIZ_PORT = 8100;
 
 static const float THRUST_TAKEOFF = 56;
 
@@ -40,11 +39,8 @@ static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float YAW_OFFSET = 0.01;
 
-static float runDifferenceSnn(
-        SNN * snn,
-        const float setpoint,
-        const float actual,
-        const bool debug=false)
+static float runClimbrateSnn(
+        SNN * snn, const float setpoint, const float actual)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -52,9 +48,19 @@ static float runDifferenceSnn(
     vector <double> actions;
     snn->step(observations, counts, actions);
 
-    if (debug) {
-        printf("%d,%f\n", counts[0], actions[0]);
-    }
+    const auto count = counts[0];
+
+    return count / 12.0 - 2.0625;
+}
+
+static float runYawrateSnn(
+        SNN * snn, const float setpoint, const float actual)
+{
+    vector<double> observations = { setpoint, actual };
+
+    vector <int> counts;
+    vector <double> actions;
+    snn->step(observations, counts, actions);
 
     return actions[0];
 }
@@ -93,8 +99,7 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    //climbRateSnn->serve_visualizer(CLIMBRATE_VIZ_PORT);
-    //yawRateSnn->serve_visualizer(YAWRATE_VIZ_PORT);
+    climbRateSnn->serve_visualizer(VIZ_PORT);
 
     while (true) {
 
@@ -104,15 +109,14 @@ int main(int argc, char ** argv)
 
         // Get thrust demand from SNN
         const auto thrustFromSnn =
-            CLIMBRATE_KP * runDifferenceSnn(
+            CLIMBRATE_KP * runClimbrateSnn(
                     climbRateSnn,
                     CLIMBRATE_PRESCALE*sim.throttle(),
-                    CLIMBRATE_PRESCALE*sim.dz(),
-                    true);
+                    CLIMBRATE_PRESCALE*sim.dz());
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+        const auto yawDemand = YAW_KP * YAW_PRESCALE * runYawrateSnn(
                 yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE) + YAW_OFFSET;
@@ -145,8 +149,7 @@ int main(int argc, char ** argv)
         // Spin the motors
         sim.setMotors(m1, m2, m3, m4);
 
-        //climbRateSnn->send_counts_to_visualizer();
-        //yawRateSnn->send_counts_to_visualizer();
+        climbRateSnn->send_counts_to_visualizer();
     }
 
     wb_robot_cleanup();

@@ -16,15 +16,15 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/difference_risp_train.txt
+NETWORK = $(FDIR)/networks/difference_risp_train.txt
+# NETWORK = $(FDIR)/networks/difference_risp_byhand.txt
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 PDIR =  $(FDIR)/processors/risp
 
 VIZ_HOST = "localhost"
-CLIMBRATE_VIZ_PORT = 8100
-YAWRATE_VIZ_PORT = 8200
+VIZ_PORT = 8100
 
 # -------------------------------------------------------------------
 
@@ -50,30 +50,12 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +9 > log.csv &
-	# sleep 1
-	# cd $(FDIR)/viz; \
- 	# love . -i '{"source":"request","port":$(CLIMBRATE_VIZ_PORT),"host":$(VIZ_HOST)}' \
-    # 	-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
-    #		--set_num_screen_shot 0 > /dev/null
-
-bigrun:
-	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +11 > log.csv &
 	sleep 1
 	cd $(FDIR)/viz; \
-		love . -i '{"source":"request","port":$(CLIMBRATE_VIZ_PORT),"host":$(VIZ_HOST)}' \
-		-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
-		--set_num_screen_shot 0 > /dev/null &
-	cd $(FDIR)/viz; \
-		love . -i '{"source":"request","port":$(YAWRATE_VIZ_PORT),"host":$(VIZ_HOST)}' \
-		-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
-		--set_num_screen_shot 0 > /dev/null &
-
-
-show:
-	@$(FDIR)/cpp-apps/bin/function_risp -a test -n $(NETWORK) \
-		--show_observations --show_actions | $(FDIR)/cpp-apps/pyplot/diffplot.py
+ 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
+     	-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
+    		--set_num_screen_shot 0 > /dev/null
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
