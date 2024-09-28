@@ -38,6 +38,10 @@ static const float YAW_PRESCALE = 160; // deg/sec
 static const float YAW_SNN_SCALE  = 12.5;
 static const float YAW_SNN_OFFSET = 1.99;
 
+static const float CLIMB_SNN_SCALE  = 12.0;
+static const float CLIMB_SNN_OFFSET = 2.065;
+
+/*
 static float runClimbrateSnn(
         SNN * snn, const float setpoint, const float actual)
 {
@@ -48,20 +52,7 @@ static float runClimbrateSnn(
     snn->step(observations, counts);
 
     return counts[0] / 12.0 - 2.0625;
-}
-
-/*
-static float runYawrateSnn(
-        SNN * snn, const float setpoint, const float actual)
-{
-    vector<double> observations = { setpoint, actual };
-
-    vector <int> counts;
-    snn->step(observations, counts);
-
-    return counts[0] / 12.5 - 1.99;
-}
-*/
+}*/
 
 static float runDifferenceSnn(
         SNN * snn,
@@ -126,10 +117,12 @@ int main(int argc, char ** argv)
 
         // Get thrust demand from SNN
         const auto thrustFromSnn =
-            CLIMBRATE_KP * runClimbrateSnn(
+            CLIMBRATE_KP * runDifferenceSnn(
                     climbRateSnn,
                     CLIMBRATE_PRESCALE*sim.throttle(),
-                    CLIMBRATE_PRESCALE*sim.dz());
+                    CLIMBRATE_PRESCALE*sim.dz(),
+                    CLIMB_SNN_SCALE,
+                    CLIMB_SNN_OFFSET);
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
