@@ -46,11 +46,9 @@ static float runClimbrateSnn(
 
     vector <int> counts;
     vector <double> actions;
-    snn->step(observations, counts, actions);
+    snn->step(observations, counts);
 
-    const auto count = counts[0];
-
-    return count / 12.0 - 2.0625;
+    return counts[0] / 12.0 - 2.0625;
 }
 
 static float runYawrateSnn(
