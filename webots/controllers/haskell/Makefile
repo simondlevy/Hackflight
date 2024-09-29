@@ -21,7 +21,7 @@ NAME = haskell
 
 HASKDIR = ../../../haskell
 
-CXX_SOURCES = $(NAME).cpp copilot_core.cpp
+CXX_SOURCES = main.cpp copilot_core.cpp
 
 FILES_TO_REMOVE += copilot* dist*/
 
@@ -67,4 +67,4 @@ WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
 edit:
-	vim $(NAME).cpp
+	vim main.cpp

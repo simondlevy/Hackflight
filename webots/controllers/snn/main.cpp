@@ -32,14 +32,14 @@ static const float TAKEOFF_TIME = 3;
 static const float CLIMBRATE_KP = 4;
 static const float CLIMBRATE_PRESCALE = 1.0;
 
+static const float CLIMB_SNN_SCALE  = 12.0;
+static const float CLIMB_SNN_OFFSET = 2.07;
+
 static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float YAW_SNN_SCALE  = 12.5;
 static const float YAW_SNN_OFFSET = 1.99;
-
-static const float CLIMB_SNN_SCALE  = 12.0;
-static const float CLIMB_SNN_OFFSET = 2.07;
 
 static float runDifferenceSnn(
         SNN * snn,

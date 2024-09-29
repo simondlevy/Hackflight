@@ -19,7 +19,7 @@ INCLUDE = -I$(SRCDIR)
 
 NAME = cplusplus
 
-CXX_SOURCES = $(NAME).cpp
+CXX_SOURCES = main.cpp
 
 all: $(NAME)
 
@@ -53,4 +53,4 @@ WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
 edit:
-	vim $(NAME).cpp
+	vim main.cpp
