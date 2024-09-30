@@ -41,26 +41,44 @@ static const float YAW_PRESCALE = 160; // deg/sec
 static const float YAW_SNN_SCALE  = 12.5;
 static const float YAW_SNN_OFFSET = 1.99;
 
-static float runDifferenceSnn(
+static double runDifferenceSnn(
+        SNN * snn,
+        const float setpoint,
+        const float actual,
+        const float scale,
+        const float offset)
+{
+    vector<double> observations = { setpoint, actual };
+
+    vector <int> counts = {};
+    snn->step(observations, counts);
+
+    return counts[0] / scale - offset;
+}
+
+static float runClimbRateSnn(
         SNN * snn,
         const float setpoint,
         const float actual,
         const float scale,
         const float offset,
-        const bool debug=false)
+        int & count)
 {
     vector<double> observations = { setpoint, actual };
 
-    vector <int> counts;
+    vector <int> counts = {};
     snn->step(observations, counts);
 
-    const double action = counts[0] / scale - offset;
+    count = counts[0];
 
-    if (debug) {
-        printf("%f,%f,%d,%f\n", setpoint, actual, counts[0], action);
-    }
+    const double action = count / scale - offset;
 
     return action;
+}
+
+static double cap(const float val, const float max)
+{
+    return val < -max ? -max : val > max ? max : val;
 }
 
 int main(int argc, char ** argv)
@@ -71,7 +89,9 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    SNN * climbRateSnn = NULL;
+    SNN * climbRateSnn_trained = NULL;
+    SNN * climbRateSnn_byhand = NULL;
+
     SNN * yawRateSnn = NULL;
     //SNN * positionYSnn = NULL;
     //SNN * rollAngleSnn = NULL;
@@ -86,11 +106,15 @@ int main(int argc, char ** argv)
 
     try {
 
-        climbRateSnn = new SNN(argv[1], "risp");
+        climbRateSnn_trained = new SNN(argv[1], "risp");
         yawRateSnn = new SNN(argv[1], "risp");
         //positionYSnn = new SNN(argv[1], "risp");
         //rollAngleSnn = new SNN(argv[1], "risp");
         //rollRateSnn = new SNN(argv[1], "risp");
+
+        if (argc > 2) {
+            climbRateSnn_byhand = new SNN(argv[2], "risp");
+        }
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -100,7 +124,7 @@ int main(int argc, char ** argv)
     const auto viz_port = argc > 2 ? atoi(argv[2]) : 0;
 
     if (viz_port) {
-        climbRateSnn->serve_visualizer(viz_port);
+        climbRateSnn_trained->serve_visualizer(viz_port);
     }
 
     while (true) {
@@ -111,15 +135,49 @@ int main(int argc, char ** argv)
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        // Get thrust demand from SNN
-        const auto thrustFromSnn =
-            CLIMBRATE_KP * runDifferenceSnn(
-                    climbRateSnn,
-                    CLIMBRATE_PRESCALE*sim.throttle(),
-                    CLIMBRATE_PRESCALE*sim.dz(),
+        const auto airborne = time > TAKEOFF_TIME;
+
+        const auto throttleScaled = cap(CLIMBRATE_PRESCALE*sim.throttle(), 0.999);
+
+        const auto climbRateScaled = CLIMBRATE_PRESCALE*sim.dz();
+
+        int trained_counts = 0;
+
+        auto thrustFromSnn = runClimbRateSnn(
+                    climbRateSnn_trained,
+                    throttleScaled, 
+                    climbRateScaled,
                     CLIMB_SNN_SCALE,
                     CLIMB_SNN_OFFSET, 
-                    time>TAKEOFF_TIME);
+                    trained_counts);
+
+        if (airborne) {
+            printf("%f,%f,%f,%f,%d",
+                    time, throttleScaled, climbRateScaled, thrustFromSnn, trained_counts);
+        }
+
+        int byhand_counts = 0;
+
+        if (argc > 2) {
+            runClimbRateSnn(
+                    climbRateSnn_byhand,
+                    throttleScaled, 
+                    climbRateScaled,
+                    CLIMB_SNN_SCALE,
+                    CLIMB_SNN_OFFSET,
+                    byhand_counts);
+
+            if (airborne) {
+                printf(",%d", byhand_counts);
+            }
+        }
+
+        if (airborne) {
+            printf("\n");
+            fflush(stdout);
+        }
+
+        thrustFromSnn *= CLIMBRATE_KP;
 
         auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
                 yawRateSnn,
@@ -161,7 +219,7 @@ int main(int argc, char ** argv)
         sim.setMotors(m1, m2, m3, m4);
 
         if (viz_port) {
-            climbRateSnn->send_counts_to_visualizer();
+            climbRateSnn_trained->send_counts_to_visualizer();
         }
     }
 
