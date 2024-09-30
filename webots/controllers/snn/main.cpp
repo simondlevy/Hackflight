@@ -76,9 +76,7 @@ static float runClimbRateSnn(
 
     count = counts[0];
 
-    const double action = count / scale - offset;
-
-    return CLIMBRATE_KP * action + THRUST_BASE;
+    return CLIMBRATE_KP * (count / scale - offset) + THRUST_BASE;
 }
 
 static double cap(const float val, const float max)
