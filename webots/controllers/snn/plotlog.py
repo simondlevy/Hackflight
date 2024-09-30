@@ -20,20 +20,23 @@ trained_counts = data[:,4]
 byhand_output = data[:,5]
 byhand_counts = data[:,6]
 
-plt.subplot(2,1,1)
+plt.subplot(3,1,1)
 plt.plot(time, setpoint)
 plt.plot(time, dzdt)
-plt.plot(time, trained_output)
-plt.plot(time, byhand_output)
-plt.ylabel('scaled')
-plt.legend(['throttle', 'dz/dt', 'trained', 'byhand'])
+plt.legend(['throttle', 'dz/dt'])
 
-plt.subplot(2,1,2)
+plt.subplot(3,1,2)
 plt.plot(time, trained_counts)
 plt.plot(time, byhand_counts)
+plt.ylabel('counts')
+plt.legend(['trained', 'byhand'])
+
+plt.subplot(3,1,3)
+plt.plot(time, trained_output)
+plt.plot(time, byhand_output)
 plt.legend(('trained', 'byhand'))
 plt.xlabel('time (sec)')
-plt.ylabel('counts')
+plt.ylabel('outputs')
 
 plt.show()
 
