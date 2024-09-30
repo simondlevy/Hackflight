@@ -30,7 +30,7 @@ static const float TAKEOFF_TIME = 3;
 static const float CLIMBRATE_SCALE  = 0.3333;
 static const float CLIMBRATE_OFFSET = 47.22;
 
-static const float YAW_KP = 0.003;           
+static const float YAW_KP = 0.48;           
 static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float YAW_SNN_SCALE  = 12.5;
@@ -144,7 +144,7 @@ int main(int argc, char ** argv)
                     time, throttleCapped, sim.dz(), thrustFromSnn, thrust_counts);
         }
 
-        auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+        const auto yawDemand = 0.48 * runDifferenceSnn(
                 yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE,
@@ -169,7 +169,6 @@ int main(int argc, char ** argv)
 
         rollDemand = 0;
         pitchDemand = 0;
-        yawDemand = 0;
 
         // Run the mixer to convert the demands into motor spins
         float m1=0, m2=0, m3=0, m4=0;
