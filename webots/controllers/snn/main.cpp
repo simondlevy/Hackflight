@@ -46,14 +46,21 @@ static float runDifferenceSnn(
         const float setpoint,
         const float actual,
         const float scale,
-        const float offset)
+        const float offset,
+        const bool debug=false)
 {
     vector<double> observations = { setpoint, actual };
 
     vector <int> counts;
     snn->step(observations, counts);
 
-    return counts[0] / scale - offset;
+    const double action = counts[0] / scale - offset;
+
+    if (debug) {
+        printf("%f,%f,%d,%f\n", setpoint, actual, counts[0], action);
+    }
+
+    return action;
 }
 
 int main(int argc, char ** argv)
@@ -102,6 +109,8 @@ int main(int argc, char ** argv)
             break;
         }
 
+        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
+
         // Get thrust demand from SNN
         const auto thrustFromSnn =
             CLIMBRATE_KP * runDifferenceSnn(
@@ -109,11 +118,10 @@ int main(int argc, char ** argv)
                     CLIMBRATE_PRESCALE*sim.throttle(),
                     CLIMBRATE_PRESCALE*sim.dz(),
                     CLIMB_SNN_SCALE,
-                    CLIMB_SNN_OFFSET);
+                    CLIMB_SNN_OFFSET, 
+                    time>TAKEOFF_TIME);
 
-        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
-
-        const auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
+        auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
                 yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE,
@@ -135,6 +143,10 @@ int main(int argc, char ** argv)
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
+
+        rollDemand = 0;
+        pitchDemand = 0;
+        yawDemand = 0;
 
         // Run the mixer to convert the demands into motor spins
         float m1=0, m2=0, m3=0, m4=0;
