@@ -27,14 +27,13 @@ static const float THRUST_TAKEOFF = 56;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float CLIMBRATE_SCALE  = 0.3333;
-static const float CLIMBRATE_OFFSET = 47.22;
+static const float CLIMBRATE_SNN_SCALE  = 0.3333;
+static const float CLIMBRATE_SNN_OFFSET = 47.22;
 
-static const float YAW_KP = 0.48;           
 static const float YAW_PRESCALE = 160; // deg/sec
 
-static const float YAW_SNN_SCALE  = 12.5;
-static const float YAW_SNN_OFFSET = 1.99;
+static const float YAW_SNN_SCALE  = 0.0384;
+static const float YAW_SNN_OFFSET = -0.955;
 
 static const float STICK_EPSILON = 0.001;
 
@@ -50,7 +49,9 @@ static double runDifferenceSnn(
     vector <int> counts = {};
     snn->step(observations, counts);
 
-    return counts[0] / scale - offset;
+    const auto count = counts[0];
+
+    return scale * count + offset;
 }
 
 static float runClimbRateSnn(
@@ -133,8 +134,8 @@ int main(int argc, char ** argv)
                     climbRateSnn,
                     throttleCapped, 
                     sim.dz(),
-                    CLIMBRATE_SCALE,
-                    CLIMBRATE_OFFSET, 
+                    CLIMBRATE_SNN_SCALE,
+                    CLIMBRATE_SNN_OFFSET, 
                     thrust_counts);
 
         const auto airborne = time > TAKEOFF_TIME;
@@ -144,7 +145,7 @@ int main(int argc, char ** argv)
                     time, throttleCapped, sim.dz(), thrustFromSnn, thrust_counts);
         }
 
-        const auto yawDemand = YAW_KP * runDifferenceSnn(
+        const auto yawDemand = runDifferenceSnn(
                 yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE,
