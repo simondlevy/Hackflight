@@ -182,7 +182,7 @@ int main(int argc, char ** argv)
             fflush(stdout);
         }
 
-        const auto thrustFromSnn = thrust_trained_scaled * CLIMBRATE_KP;
+        const auto thrustFromSnn = thrust_trained_scaled * CLIMBRATE_KP + THRUST_BASE;
 
         auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
                 yawRateSnn,
@@ -202,7 +202,7 @@ int main(int argc, char ** argv)
         // Ignore thrust demand until airborne, based on time from launch
         const auto thrustDemand =
             time > TAKEOFF_TIME ? 
-            THRUST_BASE + thrustFromSnn :
+            thrustFromSnn :
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
