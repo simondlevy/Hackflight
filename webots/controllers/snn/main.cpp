@@ -27,14 +27,11 @@ static const float THRUST_TAKEOFF = 56;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float CLIMBRATE_KP = 4;
-static const float CLIMBRATE_PRESCALE = 1.0;
+static const float CLIMBRATE_SCALE_TRAINED  = 0.3333;
+static const float CLIMBRATE_OFFSET_TRAINED = 47.22;
 
-static const float CLIMBRATE_SNN_SCALE_TRAINED  = 12.0;
-static const float CLIMBRATE_SNN_OFFSET_TRAINED = 2.07;
-
-static const float CLIMBRATE_SNN_SCALE_BYHAND  = 12.0;
-static const float CLIMBRATE_SNN_OFFSET_BYHAND = 1.95;
+static const float CLIMBRATE_SCALE_BYHAND  = 0.3333;
+static const float CLIMBRATE_OFFSET_BYHAND = 47.22;
 
 static const float THRUST_BASE = 55.5;
 
@@ -76,7 +73,7 @@ static float runClimbRateSnn(
 
     count = counts[0];
 
-    return CLIMBRATE_KP * (count / scale - offset) + THRUST_BASE;
+    return scale * count + offset;
 }
 
 static double cap(const float val, const float max)
@@ -138,25 +135,23 @@ int main(int argc, char ** argv)
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        const auto airborne = time > TAKEOFF_TIME;
-
-        const auto throttleScaled = cap(CLIMBRATE_PRESCALE*sim.throttle(), 1-STICK_EPSILON);
-
-        const auto climbRateScaled = CLIMBRATE_PRESCALE*sim.dz();
+        const auto throttleCapped = cap(sim.throttle(), 1-STICK_EPSILON);
 
         int trained_counts = 0;
 
         const auto thrust_trained_scaled = runClimbRateSnn(
                     climbRateSnn_trained,
-                    throttleScaled, 
-                    climbRateScaled,
-                    CLIMBRATE_SNN_SCALE_TRAINED,
-                    CLIMBRATE_SNN_OFFSET_TRAINED, 
+                    throttleCapped, 
+                    sim.dz(),
+                    CLIMBRATE_SCALE_TRAINED,
+                    CLIMBRATE_OFFSET_TRAINED, 
                     trained_counts);
+
+        const auto airborne = time > TAKEOFF_TIME;
 
         if (airborne) {
             printf("%f,%f,%f,%f,%d",
-                    time, throttleScaled, climbRateScaled, thrust_trained_scaled, trained_counts);
+                    time, throttleCapped, sim.dz(), thrust_trained_scaled, trained_counts);
         }
 
         int byhand_counts = 0;
@@ -164,10 +159,10 @@ int main(int argc, char ** argv)
         if (argc > 2) {
             const auto thrust_byhand_scaled = runClimbRateSnn(
                     climbRateSnn_byhand,
-                    throttleScaled, 
-                    climbRateScaled,
-                    CLIMBRATE_SNN_SCALE_BYHAND,
-                    CLIMBRATE_SNN_OFFSET_BYHAND,
+                    throttleCapped, 
+                    sim.dz(),
+                    CLIMBRATE_SCALE_BYHAND,
+                    CLIMBRATE_OFFSET_BYHAND,
                     byhand_counts);
 
             if (airborne) {
