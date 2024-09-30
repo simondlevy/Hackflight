@@ -25,21 +25,26 @@
 
 static const float THRUST_TAKEOFF = 56;
 
-static const float THRUST_BASE = 55.5;
-
 static const float TAKEOFF_TIME = 3;
 
 static const float CLIMBRATE_KP = 4;
 static const float CLIMBRATE_PRESCALE = 1.0;
 
-static const float CLIMB_SNN_SCALE  = 12.0;
-static const float CLIMB_SNN_OFFSET = 2.07;
+static const float CLIMBRATE_SNN_SCALE_TRAINED  = 12.0;
+static const float CLIMBRATE_SNN_OFFSET_TRAINED = 2.07;
+
+static const float CLIMBRATE_SNN_SCALE_BYHAND  = 12.0;
+static const float CLIMBRATE_SNN_OFFSET_BYHAND = 1.95;
+
+static const float THRUST_BASE = 55.5;
 
 static const float YAW_KP = 0.003;           
 static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float YAW_SNN_SCALE  = 12.5;
 static const float YAW_SNN_OFFSET = 1.99;
+
+static const float STICK_EPSILON = 0.001;
 
 static double runDifferenceSnn(
         SNN * snn,
@@ -137,38 +142,38 @@ int main(int argc, char ** argv)
 
         const auto airborne = time > TAKEOFF_TIME;
 
-        const auto throttleScaled = cap(CLIMBRATE_PRESCALE*sim.throttle(), 0.999);
+        const auto throttleScaled = cap(CLIMBRATE_PRESCALE*sim.throttle(), 1-STICK_EPSILON);
 
         const auto climbRateScaled = CLIMBRATE_PRESCALE*sim.dz();
 
         int trained_counts = 0;
 
-        auto thrustFromSnn = runClimbRateSnn(
+        const auto thrust_trained_scaled = runClimbRateSnn(
                     climbRateSnn_trained,
                     throttleScaled, 
                     climbRateScaled,
-                    CLIMB_SNN_SCALE,
-                    CLIMB_SNN_OFFSET, 
+                    CLIMBRATE_SNN_SCALE_TRAINED,
+                    CLIMBRATE_SNN_OFFSET_TRAINED, 
                     trained_counts);
 
         if (airborne) {
             printf("%f,%f,%f,%f,%d",
-                    time, throttleScaled, climbRateScaled, thrustFromSnn, trained_counts);
+                    time, throttleScaled, climbRateScaled, thrust_trained_scaled, trained_counts);
         }
 
         int byhand_counts = 0;
 
         if (argc > 2) {
-            runClimbRateSnn(
+            const auto thrust_byhand_scaled = runClimbRateSnn(
                     climbRateSnn_byhand,
                     throttleScaled, 
                     climbRateScaled,
-                    CLIMB_SNN_SCALE,
-                    CLIMB_SNN_OFFSET,
+                    CLIMBRATE_SNN_SCALE_BYHAND,
+                    CLIMBRATE_SNN_OFFSET_BYHAND,
                     byhand_counts);
 
             if (airborne) {
-                printf(",%d", byhand_counts);
+                printf(",%f,%d", thrust_byhand_scaled, byhand_counts);
             }
         }
 
@@ -177,7 +182,7 @@ int main(int argc, char ** argv)
             fflush(stdout);
         }
 
-        thrustFromSnn *= CLIMBRATE_KP;
+        const auto thrustFromSnn = thrust_trained_scaled * CLIMBRATE_KP;
 
         auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
                 yawRateSnn,
