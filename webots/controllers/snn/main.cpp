@@ -35,8 +35,6 @@ static const float YAW_PRESCALE = 160; // deg/sec
 static const float YAW_SNN_SCALE  = 0.0384;
 static const float YAW_SNN_OFFSET = -0.955;
 
-static const float STICK_EPSILON = 0.001;
-
 static double runDifferenceSnn(
         SNN * snn,
         const float setpoint,
@@ -70,11 +68,6 @@ static float runClimbRateSnn(
     count = counts[0];
 
     return scale * count + offset;
-}
-
-static double cap(const float val, const float max)
-{
-    return val < -max ? -max : val > max ? max : val;
 }
 
 int main(int argc, char ** argv)
@@ -126,13 +119,11 @@ int main(int argc, char ** argv)
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        const auto throttleCapped = cap(sim.throttle(), 1-STICK_EPSILON);
-
         int thrust_counts = 0;
 
         const auto thrustFromSnn = runClimbRateSnn(
                     climbRateSnn,
-                    throttleCapped, 
+                    sim.throttle(), 
                     sim.dz(),
                     CLIMBRATE_SNN_SCALE,
                     CLIMBRATE_SNN_OFFSET, 
@@ -142,7 +133,7 @@ int main(int argc, char ** argv)
 
         if (airborne) {
             printf("%f,%f,%f,%f,%d\n",
-                    time, throttleCapped, sim.dz(), thrustFromSnn, thrust_counts);
+                    time, sim.throttle(), sim.dz(), thrustFromSnn, thrust_counts);
         }
 
         const auto yawDemand = runDifferenceSnn(
