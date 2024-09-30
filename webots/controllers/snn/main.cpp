@@ -45,29 +45,10 @@ static double runDifferenceSnn(
     vector<double> observations = { setpoint, actual };
 
     vector <int> counts = {};
+
     snn->step(observations, counts);
 
-    const auto count = counts[0];
-
-    return scale * count + offset;
-}
-
-static float runClimbRateSnn(
-        SNN * snn,
-        const float setpoint,
-        const float actual,
-        const float scale,
-        const float offset,
-        int & count)
-{
-    vector<double> observations = { setpoint, actual };
-
-    vector <int> counts = {};
-    snn->step(observations, counts);
-
-    count = counts[0];
-
-    return scale * count + offset;
+    return scale * counts[0] + offset;
 }
 
 int main(int argc, char ** argv)
@@ -119,21 +100,18 @@ int main(int argc, char ** argv)
 
         const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
 
-        int thrust_counts = 0;
-
-        const auto thrustFromSnn = runClimbRateSnn(
+        const auto thrustFromSnn = runDifferenceSnn(
                     climbRateSnn,
                     sim.throttle(), 
                     sim.dz(),
                     CLIMBRATE_SNN_SCALE,
-                    CLIMBRATE_SNN_OFFSET, 
-                    thrust_counts);
+                    CLIMBRATE_SNN_OFFSET) ;
 
         const auto airborne = time > TAKEOFF_TIME;
 
         if (airborne) {
-            printf("%f,%f,%f,%f,%d\n",
-                    time, sim.throttle(), sim.dz(), thrustFromSnn, thrust_counts);
+            printf("%f,%f,%f,%f\n",
+                    time, sim.throttle(), sim.dz(), thrustFromSnn);
         }
 
         const auto yawDemand = runDifferenceSnn(
