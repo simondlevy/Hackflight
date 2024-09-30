@@ -144,7 +144,7 @@ int main(int argc, char ** argv)
                     time, throttleCapped, sim.dz(), thrustFromSnn, thrust_counts);
         }
 
-        const auto yawDemand = 0.48 * runDifferenceSnn(
+        const auto yawDemand = YAW_KP * runDifferenceSnn(
                 yawRateSnn,
                 sim.yaw(),
                 sim.dpsi()/YAW_PRESCALE,
