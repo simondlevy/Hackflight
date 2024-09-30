@@ -78,7 +78,7 @@ static float runClimbRateSnn(
 
     const double action = count / scale - offset;
 
-    return action;
+    return CLIMBRATE_KP * action + THRUST_BASE;
 }
 
 static double cap(const float val, const float max)
@@ -182,7 +182,7 @@ int main(int argc, char ** argv)
             fflush(stdout);
         }
 
-        const auto thrustFromSnn = thrust_trained_scaled * CLIMBRATE_KP + THRUST_BASE;
+        const auto thrustFromSnn = thrust_trained_scaled;
 
         auto yawDemand = YAW_KP * YAW_PRESCALE * runDifferenceSnn(
                 yawRateSnn,
