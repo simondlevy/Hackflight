@@ -1,4 +1,4 @@
-SKETCH = mpu6050-dsmx
+SKETCH = cplusplus
 
 BOARD = teensy:avr:teensy40
 

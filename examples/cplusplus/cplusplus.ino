@@ -30,9 +30,12 @@
 #include <utils.hpp>
 #include <mixers.hpp>
 #include <tasks/blink.hpp>
+
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
+
+#include <mpu6050-dsmx.hpp>
 
 // Receiver -------------------------------------------------------------------
 
