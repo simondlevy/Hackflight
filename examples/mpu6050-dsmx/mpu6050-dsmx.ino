@@ -69,7 +69,7 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 // Das Blinkenlights ---------------------------------------------------------
 
 static const float BLINK_RATE_HZ = 1.5;
-static const uint8_t LED_PIN = LED_BUILTIN;
+static const uint8_t LED_PIN = 0;
 static hf::BlinkTask _blinkTask;
 
 // Motors --------------------------------------------------------------------
