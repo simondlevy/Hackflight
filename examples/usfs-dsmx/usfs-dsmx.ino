@@ -319,7 +319,7 @@ void loop()
     float gyroX = 0, gyroY = 0, gyroZ = 0;
 
     // Note gyro X/Y swap
-    //readImu(phi, theta, psi, gyroY, gyroX, gyroZ); 
+    readImu(phi, theta, psi, gyroY, gyroX, gyroZ); 
 
     static uint32_t msec_prev;
     const auto msec_curr = millis();
