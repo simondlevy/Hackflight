@@ -55,13 +55,14 @@ static MPU6050 _mpu6050;
 
 // Das Blinkenlights ---------------------------------------------------------
 
-static const float BLINK_RATE_HZ = 1.5;
-static const uint8_t LED_PIN = 13;
+static const float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+static const float FAILSAFE_BLINK_RATE_HZ = 0.25;
+static const uint8_t LED_PIN = 0;
 static hf::BlinkTask _blinkTask;
 
 // Motors --------------------------------------------------------------------
 
-static const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
+static const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
 
 static auto _motors = OneShot125(MOTOR_PINS);
 
@@ -342,9 +343,12 @@ void loop()
         digitalWrite(LED_PIN, HIGH);
     }
 
-    // Otherwise, blink LED as heartbeat
+    // Otherwise, blink LED as heartbeat or failsafe rate
     else {
-        _blinkTask.run(usec_curr, BLINK_RATE_HZ);
+        _blinkTask.run(LED_PIN, usec_curr,
+                _gotFailsafe ? 
+                FAILSAFE_BLINK_RATE_HZ : 
+                HEARTBEAT_BLINK_RATE_HZ);
     }
 
     //Get vehicle state
