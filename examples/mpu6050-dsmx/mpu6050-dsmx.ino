@@ -87,6 +87,9 @@ static const float PITCH_ROLL_PRESCALE = 30.0;
 // Max yaw rate in deg/sec
 static const float YAW_PRESCALE = 160.0;     
 
+// Failsafe
+static const uint32_t FAILSAFE_USEC_MICROS = 80000;
+
 // IMU calibration parameters
 static float ACC_ERROR_X = 0.0;
 static float ACC_ERROR_Y = 0.0;
@@ -190,7 +193,7 @@ static void readReceiver(
         bool & isArmed, 
         bool & gotFailsafe) 
 {
-    if (_rx.timedOut(micros())) {
+    if (_rx.timedOut(micros(), FAILSAFE_USEC_MICROS)) {
         isArmed = false;
         gotFailsafe = true;
     }
