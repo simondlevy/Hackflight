@@ -74,7 +74,7 @@ static hf::BlinkTask _blinkTask;
 
 // Motors --------------------------------------------------------------------
 
-static const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
+static const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
 
 static auto _motors = OneShot125(MOTOR_PINS);
 
@@ -340,12 +340,13 @@ void loop()
     Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
     psi = -psi;
 
+    /*
     static uint32_t msec_prev;
     const auto msec_curr = millis();
     if (msec_curr - msec_prev > 100) {
         printf("%+3.3f\n", gyroZ);
         msec_prev = msec_curr;
-    }
+    }*/
 
     // Convert stick demands to appropriate intervals
     float thrustDemand =
