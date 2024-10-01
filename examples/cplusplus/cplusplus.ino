@@ -18,24 +18,13 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <Wire.h>
-
-#include <dsmrx.hpp>
-#include <MPU6050.h>
-#include <oneshot125.hpp>
-
-#include "madgwick.hpp"
-
-#include <hackflight.hpp>
-#include <utils.hpp>
-#include <mixers.hpp>
-#include <tasks/blink.hpp>
+#include <turtle_board.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 
-#include <mpu6050-dsmx.hpp>
+static hf::TurtleBoard _board;
 
 // Receiver -------------------------------------------------------------------
 
@@ -277,18 +266,7 @@ static void blinkOnStartup(void)
 
 void setup() {
 
-    // Set up serial debugging
-    Serial.begin(500000);
-    delay(500);
-
-    // Set up receiver UART
-    Serial2.begin(115200);
-
-    // Initialize LED
-    pinMode(LED_PIN, OUTPUT); 
-    digitalWrite(LED_PIN, HIGH);
-
-    delay(5);
+    _board.init();
 
     // Initialize IMU communication
     initImu();
@@ -308,6 +286,10 @@ void setup() {
 
 void loop() 
 {
+    _board.readData();
+
+    _board.runMixer();
+
     // Safety
     static bool _isArmed;
     static bool _gotFailsafe;

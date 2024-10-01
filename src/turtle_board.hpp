@@ -1,6 +1,6 @@
 /*
 
-   Support for quadcopter using MPU6050 IMU and DSMX receiver
+   Support for "turtle board" quadcopter using MPU6050 IMU and DSMX receiver
 
    Adapted from https://github.com/nickrehm/dRehmFlight
 
@@ -27,12 +27,52 @@
 #include <MPU6050.h>
 #include <oneshot125.hpp>
 
-#include "madgwick.hpp"
-
 #include <hackflight.hpp>
-#include <utils.hpp>
+#include <madgwick.hpp>
 #include <mixers.hpp>
+#include <utils.hpp>
 #include <tasks/blink.hpp>
+
+namespace hf {
+
+    class TurtleBoard {
+
+        public:
+
+            void init()
+            {
+                // Set up serial debugging
+                Serial.begin(500000);
+                delay(500);
+
+                // Set up receiver UART
+                Serial2.begin(115200);
+
+                // Initialize LED
+                pinMode(LED_PIN, OUTPUT); 
+                digitalWrite(LED_PIN, HIGH);
+
+                delay(5);
+            }
+
+            void readData()
+            {
+            }
+
+            void runMixer()
+            {
+            }
+
+        private:
+
+            // Das Blinkenlights ---------------------------------------------------------
+            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
+            static const uint8_t LED_PIN = 0;
+            BlinkTask _blinkTask;
+    };
+
+}
 
 #if 0
 
