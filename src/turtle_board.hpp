@@ -234,8 +234,64 @@ namespace hf {
                 _motors.arm();
             }
 
-            void readData()
+            void readData(
+                    uint32_t & usec_curr, float & dt,
+                    const uint32_t chan_1, 
+                    const uint32_t chan_2, 
+                    const uint32_t chan_3, 
+                    const uint32_t chan_4, 
+                    const uint32_t chan_5, 
+                    const uint32_t chan_6, 
+                    bool & isArmed, bool & gotFailsafe,
+                    float & thrustDemand, float & rollDemand, float & pitchDemand, float & yawDemand,
+                    float & phi, float & theta, float & psi,
+                    float & gyroX, float & gyroY, float & gyroZ
+                    )
             {
+
+                // Keep track of what time it is and how much time has elapsed since the last loop
+                usec_curr = micros();      
+                static uint32_t _usec_prev;
+                dt = (usec_curr - _usec_prev)/1000000.0;
+                _usec_prev = usec_curr;      
+
+                // Arm vehicle if safe
+                if (!gotFailsafe && (chan_5 > 1500) && (chan_1 < 1050)) {
+                    isArmed = true;
+                }
+
+                // LED should be on when armed
+                if (isArmed) {
+                    digitalWrite(LED_PIN, HIGH);
+                }
+
+                // Otherwise, blink LED as heartbeat or failsafe rate
+                else {
+                    _blinkTask.run(LED_PIN, usec_curr,
+                            gotFailsafe ? 
+                            FAILSAFE_BLINK_RATE_HZ : 
+                            HEARTBEAT_BLINK_RATE_HZ);
+                }
+
+                //Get vehicle state
+
+                float AccX = 0, AccY = 0, AccZ = 0;
+
+                readImu(AccX, AccY, AccZ, gyroX, gyroY, gyroZ); 
+
+                // Get Euler angles from IMU (note negations)
+                Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
+                psi = -psi;
+
+                // Convert stick demands to appropriate intervals
+                thrustDemand =
+                    constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
+                rollDemand = 
+                    constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+                pitchDemand =
+                    constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+                yawDemand = 
+                    constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
             }
 
             void runMixer(const uint32_t usec_curr)
@@ -251,7 +307,6 @@ namespace hf {
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
             static const uint8_t LED_PIN = 0;
-            BlinkTask _blinkTask;
 
             static void runLoopDelay(const uint32_t usec_curr)
             {

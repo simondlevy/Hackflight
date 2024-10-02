@@ -43,59 +43,22 @@ void setup()
 
 void loop() 
 {
-    _board.readData();
+    uint32_t usec_curr=0;
+    float dt=0;
+    float thrustDemand=0, rollDemand=0, pitchDemand=0, yawDemand=0;
+    float phi=0, theta=0, psi=0, gyroX=0, gyroY=0, gyroZ=0;
+
+    static uint32_t _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6;
 
     // Safety
     static bool _isArmed;
     static bool _gotFailsafe;
 
-    static uint32_t chan_1, chan_2, chan_3, chan_4, chan_5, chan_6;
-
-    // Keep track of what time it is and how much time has elapsed since the last loop
-    const auto usec_curr = micros();      
-    static uint32_t _usec_prev;
-    const float dt = (usec_curr - _usec_prev)/1000000.0;
-    _usec_prev = usec_curr;      
-
-    // Arm vehicle if safe
-    if (!_gotFailsafe && (chan_5 > 1500) && (chan_1 < 1050)) {
-        _isArmed = true;
-    }
-
-    // LED should be on when armed
-    if (_isArmed) {
-        digitalWrite(LED_PIN, HIGH);
-    }
-
-    // Otherwise, blink LED as heartbeat or failsafe rate
-    else {
-        _blinkTask.run(LED_PIN, usec_curr,
-                _gotFailsafe ? 
-                FAILSAFE_BLINK_RATE_HZ : 
-                HEARTBEAT_BLINK_RATE_HZ);
-    }
-
-    //Get vehicle state
-
-    float AccX = 0, AccY = 0, AccZ = 0;
-    float gyroX = 0, gyroY = 0, gyroZ = 0;
-
-    readImu(AccX, AccY, AccZ, gyroX, gyroY, gyroZ); 
-
-    // Get Euler angles from IMU (note negations)
-    float phi = 0, theta = 0, psi = 0;
-    Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
-    psi = -psi;
-
-    // Convert stick demands to appropriate intervals
-    float thrustDemand =
-        constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    float rollDemand = 
-        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
-    float pitchDemand =
-        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
-    float yawDemand = 
-        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
+    _board.readData(usec_curr, dt, 
+            _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6,
+            _isArmed, _gotFailsafe,
+            thrustDemand, rollDemand, pitchDemand, yawDemand,
+            phi, theta, psi, gyroX, gyroY, gyroZ);
 
     const auto resetPids = thrustDemand < THROTTLE_DOWN;
 
@@ -123,13 +86,13 @@ void loop()
     _m4_usec = scaleMotor(m4_command);
 
     // Turn off motors under various conditions
-    cutMotors(chan_5, _isArmed); 
+    cutMotors(_chan_5, _isArmed); 
 
     // Run motors
     runMotors(); 
 
     // Get vehicle commands for next loop iteration
-    readReceiver(chan_1, chan_2, chan_3, chan_4, chan_5, chan_6,
+    readReceiver(_chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6,
             _isArmed, _gotFailsafe); 
 
     _board.runMixer(usec_curr);
