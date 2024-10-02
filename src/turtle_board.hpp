@@ -33,48 +33,23 @@
 #include <utils.hpp>
 #include <tasks/blink.hpp>
 
-namespace hf {
+// IMU ------------------------------------------------------------------------
 
-    class TurtleBoard {
+static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
+static const float GYRO_SCALE_FACTOR = 131.0;
 
-        public:
+static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
+static const float ACCEL_SCALE_FACTOR = 16384.0;
 
-            void init()
-            {
-                // Set up serial debugging
-                Serial.begin(500000);
-                delay(500);
+static MPU6050 _mpu6050;
 
-                // Set up receiver UART
-                Serial2.begin(115200);
+// Motors --------------------------------------------------------------------
 
-                // Initialize LED
-                pinMode(LED_PIN, OUTPUT); 
-                digitalWrite(LED_PIN, HIGH);
+static const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
 
-                delay(5);
-            }
+static auto _motors = OneShot125(MOTOR_PINS);
 
-            void readData()
-            {
-            }
-
-            void runMixer()
-            {
-            }
-
-        private:
-
-            // Das Blinkenlights ---------------------------------------------------------
-            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
-            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
-            static const uint8_t LED_PIN = 0;
-            BlinkTask _blinkTask;
-    };
-
-}
-
-#if 0
+static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
 // Receiver -------------------------------------------------------------------
 
@@ -89,30 +64,12 @@ void serialEvent2(void)
 
 static const uint8_t NUM_DSM_CHANNELS = 6;
 
-// IMU ------------------------------------------------------------------------
-
-static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
-static const float GYRO_SCALE_FACTOR = 131.0;
-
-static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
-static const float ACCEL_SCALE_FACTOR = 16384.0;
-
-static MPU6050 _mpu6050;
-
 // Das Blinkenlights ---------------------------------------------------------
 
 static const float HEARTBEAT_BLINK_RATE_HZ = 1.5;
 static const float FAILSAFE_BLINK_RATE_HZ = 0.25;
 static const uint8_t LED_PIN = 0;
 static hf::BlinkTask _blinkTask;
-
-// Motors --------------------------------------------------------------------
-
-static const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
-
-static auto _motors = OneShot125(MOTOR_PINS);
-
-static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
 // Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
 static const float PITCH_ROLL_PRESCALE = 30.0;    
@@ -130,27 +87,6 @@ static float ACC_ERROR_Z = 0.0;
 static float GYRO_ERROR_X = 0.0;
 static float GYRO_ERROR_Y= 0.0;
 static float GYRO_ERROR_Z = 0.0;
-
-static void initImu() 
-{
-    Wire.begin();
-    Wire.setClock(1000000); //Note this is 2.5 times the spec sheet 400 kHz max...
-
-    _mpu6050.initialize();
-
-    if (!_mpu6050.testConnection()) {
-        Serial.println("MPU6050 initialization unsuccessful");
-        Serial.println("Check MPU6050 wiring or try cycling power");
-        while(true) {}
-    }
-
-    // From the reset state all registers should be 0x00, so we should be at
-    // max sample rate with digital low pass filter(s) off.  All we need to
-    // do is set the desired fullscale ranges
-    _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
-    _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-
-}
 
 static void readImu(
         float & AccX, float & AccY, float & AccZ,
@@ -202,12 +138,6 @@ static void readImu(
 
     // Negate gyroZ for nose-right positive
     gyroZ = -gyroZ;
-}
-
-static void armMotor(uint8_t & m_usec)
-{
-    // OneShot125 range from 125 to 250 usec
-    m_usec = 125;
 }
 
 static uint8_t scaleMotor(const float mval)
@@ -266,176 +196,128 @@ static void cutMotors(const uint32_t chan_5, bool & isArmed)
     }
 }
 
-static void runLoopDelay(const uint32_t usec_curr, const uint32_t freq) 
-{
-    //DESCRIPTION: Regulate main loop rate to specified frequency in Hz
-    /*
-     * It's good to operate at a constant loop rate for filters to remain
-     * stable and whatnot. Interrupt routines running in the background cause
-     * the loop rate to fluctuate. This function basically just waits at the
-     * end of every loop iteration until the correct time has passed since the
-     * start of the current loop for the desired loop rate in Hz. 2kHz is a
-     * good rate to be at because the loop nominally will run between 2.8kHz -
-     * 4.2kHz. This lets us have a little room to add extra computations and
-     * remain above 2kHz, without needing to retune all of our filtering
-     * parameters.
-     */
-    float invFreq = 1.0/freq*1000000.0;
-    unsigned long checker = micros();
 
-    //Sit in loop until appropriate time has passed
-    while (invFreq > (checker - usec_curr)) {
-        checker = micros();
-    }
+namespace hf {
+
+    class TurtleBoard {
+
+        public:
+
+            void init()
+            {
+                // Set up serial debugging
+                Serial.begin(500000);
+                delay(500);
+
+                // Set up receiver UART
+                Serial2.begin(115200);
+
+                // Initialize LED
+                pinMode(LED_PIN, OUTPUT); 
+                digitalWrite(LED_PIN, HIGH);
+
+                delay(5);
+
+                // Indicate entering main loop with some quick blinks
+                blinkOnStartup(); 
+
+                // Initialize IMU communication
+                initImu();
+
+                delay(5);
+
+                // Arm OneShot125 motors
+                armMotor(_m4_usec);
+                armMotor(_m2_usec);
+                armMotor(_m1_usec);
+                armMotor(_m3_usec);
+                _motors.arm();
+            }
+
+            void readData()
+            {
+            }
+
+            void runMixer(const uint32_t usec_curr)
+            {
+                runLoopDelay(usec_curr);
+            }
+
+        private:
+
+            static const uint32_t LOOP_FREQ_HZ = 2000;
+
+            // Das Blinkenlights ---------------------------------------------------------
+            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
+            static const uint8_t LED_PIN = 0;
+            BlinkTask _blinkTask;
+
+            static void runLoopDelay(const uint32_t usec_curr)
+            {
+                //DESCRIPTION: Regulate main loop rate to specified frequency in Hz
+                /*
+                 * It's good to operate at a constant loop rate for filters to remain
+                 * stable and whatnot. Interrupt routines running in the background cause
+                 * the loop rate to fluctuate. This function basically just waits at the
+                 * end of every loop iteration until the correct time has passed since the
+                 * start of the current loop for the desired loop rate in Hz. 2kHz is a
+                 * good rate to be at because the loop nominally will run between 2.8kHz -
+                 * 4.2kHz. This lets us have a little room to add extra computations and
+                 * remain above 2kHz, without needing to retune all of our filtering
+                 * parameters.
+                 */
+                float invFreq = 1.0/LOOP_FREQ_HZ*1000000.0;
+
+                unsigned long checker = micros();
+
+                //Sit in loop until appropriate time has passed
+                while (invFreq > (checker - usec_curr)) {
+                    checker = micros();
+                }
+            }
+
+            static void blinkOnStartup(void)
+            {
+                // These constants are arbitrary, so we hide them here
+                static const uint8_t  BLINK_INIT_COUNT = 10;
+                static const uint32_t BLINK_INIT_TIME_MSEC = 100;
+
+                for (uint8_t j=0; j<BLINK_INIT_COUNT; j++) {
+                    digitalWrite(LED_PIN, LOW);
+                    delay(BLINK_INIT_TIME_MSEC);
+                    digitalWrite(LED_PIN, HIGH);
+                    delay(BLINK_INIT_TIME_MSEC);
+                }
+            }
+
+            static void initImu() 
+            {
+                Wire.begin();
+                Wire.setClock(1000000); //Note this is 2.5 times the spec sheet 400 kHz max...
+
+                _mpu6050.initialize();
+
+                if (!_mpu6050.testConnection()) {
+                    Serial.println("MPU6050 initialization unsuccessful");
+                    Serial.println("Check MPU6050 wiring or try cycling power");
+                    while(true) {}
+                }
+
+                // From the reset state all registers should be 0x00, so we should be at
+                // max sample rate with digital low pass filter(s) off.  All we need to
+                // do is set the desired fullscale ranges
+                _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
+                _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+
+            }
+
+            static void armMotor(uint8_t & m_usec)
+            {
+                // OneShot125 range from 125 to 250 usec
+                m_usec = 125;
+            }
+
+    };
+
 }
-
-static void blinkOnStartup(void)
-{
-    // These constants are arbitrary, so we hide them here
-    static const uint8_t  BLINK_INIT_COUNT = 10;
-    static const uint32_t BLINK_INIT_TIME_MSEC = 100;
-
-    for (uint8_t j=0; j<BLINK_INIT_COUNT; j++) {
-        digitalWrite(LED_PIN, LOW);
-        delay(BLINK_INIT_TIME_MSEC);
-        digitalWrite(LED_PIN, HIGH);
-        delay(BLINK_INIT_TIME_MSEC);
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-void setup() {
-
-    // Set up serial debugging
-    Serial.begin(500000);
-    delay(500);
-
-    // Set up receiver UART
-    Serial2.begin(115200);
-
-    // Initialize LED
-    pinMode(LED_PIN, OUTPUT); 
-    digitalWrite(LED_PIN, HIGH);
-
-    delay(5);
-
-    // Initialize IMU communication
-    initImu();
-
-    delay(5);
-
-    // Arm OneShot125 motors
-    armMotor(_m4_usec);
-    armMotor(_m2_usec);
-    armMotor(_m1_usec);
-    armMotor(_m3_usec);
-    _motors.arm();
-
-    // Indicate entering main loop with some quick blinks
-    blinkOnStartup(); 
-}
-
-void loop() 
-{
-    // Safety
-    static bool _isArmed;
-    static bool _gotFailsafe;
-
-    static uint32_t chan_1, chan_2, chan_3, chan_4, chan_5, chan_6;
-
-    // Keep track of what time it is and how much time has elapsed since the last loop
-    const auto usec_curr = micros();      
-    static uint32_t _usec_prev;
-    const float dt = (usec_curr - _usec_prev)/1000000.0;
-    _usec_prev = usec_curr;      
-
-    // Arm vehicle if safe
-    if (!_gotFailsafe && (chan_5 > 1500) && (chan_1 < 1050)) {
-        _isArmed = true;
-    }
-
-    // LED should be on when armed
-    if (_isArmed) {
-        digitalWrite(LED_PIN, HIGH);
-    }
-
-    // Otherwise, blink LED as heartbeat or failsafe rate
-    else {
-        _blinkTask.run(LED_PIN, usec_curr,
-                _gotFailsafe ? 
-                FAILSAFE_BLINK_RATE_HZ : 
-                HEARTBEAT_BLINK_RATE_HZ);
-    }
-
-    //Get vehicle state
-
-    float AccX = 0, AccY = 0, AccZ = 0;
-    float gyroX = 0, gyroY = 0, gyroZ = 0;
-
-    readImu(AccX, AccY, AccZ, gyroX, gyroY, gyroZ); 
-
-    // Get Euler angles from IMU (note negations)
-    float phi = 0, theta = 0, psi = 0;
-    Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
-    psi = -psi;
-
-    /*
-       static uint32_t msec_prev;
-       const auto msec_curr = millis();
-       if (msec_curr - msec_prev > 100) {
-       printf("%+3.3f\n", gyroZ);
-       msec_prev = msec_curr;
-       }*/
-
-    // Convert stick demands to appropriate intervals
-    float thrustDemand =
-        constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-    float rollDemand = 
-        constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
-    float pitchDemand =
-        constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
-    float yawDemand = 
-        constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
-
-    const auto resetPids = thrustDemand < THROTTLE_DOWN;
-
-    // Run demands through PID controllers
-
-    _pitchRollAnglePid.run(
-            dt, resetPids, rollDemand, pitchDemand, phi, theta);
-
-    _pitchRollRatePid.run(
-            dt, resetPids, rollDemand, pitchDemand, gyroX, gyroY);
-
-    _yawRatePid.run(dt, resetPids, yawDemand, gyroZ);
-
-    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
-
-    // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(
-            thrustDemand, rollDemand, pitchDemand, yawDemand, 
-            m1_command, m2_command, m3_command, m4_command);
-
-    // Rescale motor values for OneShot125
-    _m1_usec = scaleMotor(m1_command);
-    _m2_usec = scaleMotor(m2_command);
-    _m3_usec = scaleMotor(m3_command);
-    _m4_usec = scaleMotor(m4_command);
-
-    // Turn off motors under various conditions
-    cutMotors(chan_5, _isArmed); 
-
-    // Run motors
-    runMotors(); 
-
-    // Get vehicle commands for next loop iteration
-    readReceiver(chan_1, chan_2, chan_3, chan_4, chan_5, chan_6,
-            _isArmed, _gotFailsafe); 
-
-    // Regulate loop rate: Do not exceed 2000Hz, all filter parameters tuned to
-    // 2000Hz by default
-    runLoopDelay(usec_curr, 2000); 
-}
-
-#endif
