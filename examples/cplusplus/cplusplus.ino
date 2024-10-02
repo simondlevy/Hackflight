@@ -43,20 +43,11 @@ void setup()
 
 void loop() 
 {
-    uint32_t usec_curr=0;
     float dt=0;
     float thrustDemand=0, rollDemand=0, pitchDemand=0, yawDemand=0;
     float phi=0, theta=0, psi=0, gyroX=0, gyroY=0, gyroZ=0;
 
-    static uint32_t _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6;
-
-    // Safety
-    static bool _isArmed;
-    static bool _gotFailsafe;
-
-    _board.readData(usec_curr, dt, 
-            _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6,
-            _isArmed, _gotFailsafe,
+    _board.readData(dt, 
             thrustDemand, rollDemand, pitchDemand, yawDemand,
             phi, theta, psi, gyroX, gyroY, gyroZ);
 
@@ -72,28 +63,5 @@ void loop()
 
     _yawRatePid.run(dt, resetPids, yawDemand, gyroZ);
 
-    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
-
-    // Run motor mixer
-    hf::Mixer::runBetaFlightQuadX(
-            thrustDemand, rollDemand, pitchDemand, yawDemand, 
-            m1_command, m2_command, m3_command, m4_command);
-
-    // Rescale motor values for OneShot125
-    _m1_usec = scaleMotor(m1_command);
-    _m2_usec = scaleMotor(m2_command);
-    _m3_usec = scaleMotor(m3_command);
-    _m4_usec = scaleMotor(m4_command);
-
-    // Turn off motors under various conditions
-    cutMotors(_chan_5, _isArmed); 
-
-    // Run motors
-    runMotors(); 
-
-    // Get vehicle commands for next loop iteration
-    readReceiver(_chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6,
-            _isArmed, _gotFailsafe); 
-
-    _board.runMixer(usec_curr);
+    _board.runMixer( thrustDemand, rollDemand, pitchDemand, yawDemand);
 }

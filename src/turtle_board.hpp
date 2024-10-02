@@ -235,14 +235,7 @@ namespace hf {
             }
 
             void readData(
-                    uint32_t & usec_curr, float & dt,
-                    const uint32_t chan_1, 
-                    const uint32_t chan_2, 
-                    const uint32_t chan_3, 
-                    const uint32_t chan_4, 
-                    const uint32_t chan_5, 
-                    const uint32_t chan_6, 
-                    bool & isArmed, bool & gotFailsafe,
+                    float & dt,
                     float & thrustDemand, float & rollDemand, float & pitchDemand, float & yawDemand,
                     float & phi, float & theta, float & psi,
                     float & gyroX, float & gyroY, float & gyroZ
@@ -250,25 +243,25 @@ namespace hf {
             {
 
                 // Keep track of what time it is and how much time has elapsed since the last loop
-                usec_curr = micros();      
+                _usec_curr = micros();      
                 static uint32_t _usec_prev;
-                dt = (usec_curr - _usec_prev)/1000000.0;
-                _usec_prev = usec_curr;      
+                dt = (_usec_curr - _usec_prev)/1000000.0;
+                _usec_prev = _usec_curr;      
 
                 // Arm vehicle if safe
-                if (!gotFailsafe && (chan_5 > 1500) && (chan_1 < 1050)) {
-                    isArmed = true;
+                if (!_gotFailsafe && (_chan_5 > 1500) && (_chan_1 < 1050)) {
+                    _isArmed = true;
                 }
 
                 // LED should be on when armed
-                if (isArmed) {
+                if (_isArmed) {
                     digitalWrite(LED_PIN, HIGH);
                 }
 
                 // Otherwise, blink LED as heartbeat or failsafe rate
                 else {
-                    _blinkTask.run(LED_PIN, usec_curr,
-                            gotFailsafe ? 
+                    _blinkTask.run(LED_PIN, _usec_curr,
+                            _gotFailsafe ? 
                             FAILSAFE_BLINK_RATE_HZ : 
                             HEARTBEAT_BLINK_RATE_HZ);
                 }
@@ -285,18 +278,45 @@ namespace hf {
 
                 // Convert stick demands to appropriate intervals
                 thrustDemand =
-                    constrain((chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
+                    constrain((_chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
                 rollDemand = 
-                    constrain((chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+                    constrain((_chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
                 pitchDemand =
-                    constrain((chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
+                    constrain((_chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
                 yawDemand = 
-                    constrain((chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
+                    constrain((_chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
             }
 
-            void runMixer(const uint32_t usec_curr)
+            void runMixer(
+                    const float thrustDemand,
+                    const float rollDemand,
+                    const float pitchDemand,
+                    const float yawDemand)
             {
-                runLoopDelay(usec_curr);
+                float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
+
+                // Run motor mixer
+                hf::Mixer::runBetaFlightQuadX(
+                        thrustDemand, rollDemand, pitchDemand, yawDemand, 
+                        m1_command, m2_command, m3_command, m4_command);
+
+                // Rescale motor values for OneShot125
+                _m1_usec = scaleMotor(m1_command);
+                _m2_usec = scaleMotor(m2_command);
+                _m3_usec = scaleMotor(m3_command);
+                _m4_usec = scaleMotor(m4_command);
+
+                // Turn off motors under various conditions
+                cutMotors(_chan_5, _isArmed); 
+
+                // Run motors
+                runMotors(); 
+
+                // Get vehicle commands for next loop iteration
+                readReceiver(_chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6,
+                        _isArmed, _gotFailsafe); 
+
+                runLoopDelay(_usec_curr);
             }
 
         private:
@@ -307,6 +327,15 @@ namespace hf {
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
             static const uint8_t LED_PIN = 0;
+
+            uint32_t _usec_curr;
+
+
+            uint32_t _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6;
+
+            // Safety
+            bool _isArmed;
+            bool _gotFailsafe;
 
             static void runLoopDelay(const uint32_t usec_curr)
             {
