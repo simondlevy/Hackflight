@@ -54,14 +54,14 @@ phi' = extern "stream_phi" Nothing
 theta' :: SFloat
 theta' = extern "stream_theta" Nothing
 
-gyroX :: SFloat
-gyroX = extern "stream_gyroX" Nothing
+dphi' :: SFloat
+dphi' = extern "stream_dphi" Nothing
 
-gyroY :: SFloat
-gyroY = extern "stream_gyroY" Nothing
+dtheta' :: SFloat
+dtheta' = extern "stream_dtheta" Nothing
 
-gyroZ :: SFloat
-gyroZ = extern "stream_gyroZ" Nothing
+dpsi' :: SFloat
+dpsi' = extern "stream_dpsi" Nothing
 
 ------------------------------------------------------------------------------
  
@@ -70,7 +70,7 @@ spec = do
     let demands = Demands thro_demand roll_demand pitch_demand yaw_demand
 
     -- Unspecified: dz, dy, z, dz, psi
-    let state = State 0 0 0 0 phi' gyroX theta' gyroY 0 gyroZ
+    let state = State 0 0 0 0 phi' dphi' theta' dtheta' 0 dpsi'
 
     let demands' = angleController dt state demands
 
