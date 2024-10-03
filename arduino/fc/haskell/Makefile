@@ -4,7 +4,7 @@ BOARD = teensy:avr:teensy40
 
 PORT = /dev/ttyACM0
 
-HASKDIR = ../../haskell
+HASKDIR = ../../../haskell
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
