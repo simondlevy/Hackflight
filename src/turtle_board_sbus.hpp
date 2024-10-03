@@ -1,6 +1,6 @@
 /*
 
-   Support for "turtle board" quadcopter using MPU6050 IMU and DSMX receiver
+   Support for "turtle board" quadcopter using MPU6050 IMU and SBUS receiver
 
    Adapted from https://github.com/nickrehm/dRehmFlight
 
@@ -23,7 +23,7 @@
 
 #include <Wire.h>
 
-#include <dsmrx.hpp>
+#include <sbus.h>
 #include <MPU6050.h>
 #include <oneshot125.hpp>
 
@@ -34,18 +34,9 @@
 
 // Receiver -------------------------------------------------------------------
 
-static Dsm2048 _rx;
-
-void serialEvent2(void)
-{
-    while (Serial2.available()) {
-        _rx.parse(Serial2.read(), micros());
-    }
-}
-
 namespace hf {
 
-    class TurtleBoard {
+    class TurtleBoardSbus {
 
         public:
 
@@ -55,8 +46,8 @@ namespace hf {
                 Serial.begin(500000);
                 delay(500);
 
-                // Set up receiver UART
-                Serial2.begin(115200);
+                // Start receiver
+                _rx.Begin();
 
                 // Initialize LED
                 pinMode(LED_PIN, OUTPUT); 
@@ -123,14 +114,16 @@ namespace hf {
                 psi = -psi;
 
                 // Convert stick demands to appropriate intervals
-                thrustDemand =
-                    constrain((_chan_1 - 1000.0) / 1000.0, 0.0, 1.0);
-                rollDemand = 
-                    constrain((_chan_2 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
-                pitchDemand =
-                    constrain((_chan_3 - 1500.0) / 500.0, -1.0, 1.0) * PITCH_ROLL_PRESCALE;
-                yawDemand = 
-                    constrain((_chan_4 - 1500.0) / 500.0, -1.0, 1.0) * YAW_PRESCALE;
+                thrustDemand = sbusmap(_chan_1,  0.,  1.);
+                rollDemand   = sbusmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
+                pitchDemand  = sbusmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
+                yawDemand    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
+            }
+
+            static float sbusmap(
+                    const uint16_t val, const float min, const float max)
+            {
+                return min + (val - 172.) / (1811 - 172) * (max - min);
             }
 
             void runMotors(
@@ -152,8 +145,7 @@ namespace hf {
                 runMotors(); 
 
                 // Get vehicle commands for next loop iteration
-                readReceiver(_chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6,
-                        _isArmed, _gotFailsafe); 
+                readReceiver();
 
                 runLoopDelay(_usec_curr);
             }
@@ -175,6 +167,8 @@ namespace hf {
 
             MPU6050 _mpu6050;
 
+            bfs::SbusRx _rx = bfs::SbusRx(&Serial2);
+
             // Motors --------------------------------------------------------------------
 
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
@@ -194,9 +188,6 @@ namespace hf {
 
             // Max yaw rate in deg/sec
             static constexpr float YAW_PRESCALE = 160.0;     
-
-            // Failsafe
-            static const uint32_t FAILSAFE_USEC_MICROS = 80000;
 
             // IMU calibration parameters
             static constexpr float ACC_ERROR_X = 0.0;
@@ -313,8 +304,8 @@ namespace hf {
                 _mpu6050.initialize();
 
                 if (!_mpu6050.testConnection()) {
-                    Serial.println("MPU6050 initialization unsuccessful");
-                    Serial.println("Check MPU6050 wiring or try cycling power");
+                    printf("MPU6050 initialization unsuccessful\n");
+                    printf("Check MPU6050 wiring or try cycling power\n");
                     while(true) {}
                 }
 
@@ -348,31 +339,26 @@ namespace hf {
                 }
             }
 
-            static void readReceiver(
-                    uint32_t & chan_1,
-                    uint32_t & chan_2,
-                    uint32_t & chan_3,
-                    uint32_t & chan_4,
-                    uint32_t & chan_5,
-                    uint32_t & chan_6,
-                    bool & isArmed, 
-                    bool & gotFailsafe) 
+            void readReceiver() 
             {
-                if (_rx.timedOut(micros(), FAILSAFE_USEC_MICROS)) {
-                    isArmed = false;
-                    gotFailsafe = true;
-                }
+                if (_rx.Read()) {
 
-                else if (_rx.gotNewFrame()) {
-                    uint16_t values[NUM_DSM_CHANNELS];
-                    _rx.getChannelValues(values, NUM_DSM_CHANNELS);
+                    const auto data = _rx.data();
 
-                    chan_1 = values[0];
-                    chan_2 = values[1];
-                    chan_3 = values[2];
-                    chan_4 = values[3];
-                    chan_5 = values[4];
-                    chan_6 = values[5];
+                    if (data.lost_frame || data.failsafe) {
+
+                        _isArmed = false;
+                        _gotFailsafe = true;
+                    }
+
+                    else {
+                        _chan_1 = data.ch[0];
+                        _chan_2 = data.ch[1];
+                        _chan_3 = data.ch[2];
+                        _chan_4 = data.ch[3];
+                        _chan_5 = data.ch[4];
+                        _chan_6 = data.ch[5];
+                    }
                 }
             }
 

@@ -16,7 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <turtle_board.hpp>
+#include <turtle_board_sbus.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -24,7 +24,7 @@
 
 #include <mixers.hpp>
 
-static hf::TurtleBoard _board;
+static hf::TurtleBoardSbus _board;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
