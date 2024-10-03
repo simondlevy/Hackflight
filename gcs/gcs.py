@@ -18,27 +18,43 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
 from inputs import get_gamepad
+from threading import Thread
+
+
+def threadfun(axis_vals):
+
+    while axis_vals[0] != 9999:
+
+        print(axis_vals)
 
 
 def main():
 
-    axis_map = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
+    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
+
+    axis_vals = [0, 1024, 1024, 1024, 1024, 1024]
+
+    thread = Thread(target=threadfun, args=(axis_vals,))
+
+    thread.start()
 
     while True:
 
         try:
 
-            events = get_gamepad()
-
-            for event in events:
+            for event in get_gamepad():
 
                 code = str(event.code)
 
                 if 'ABS' in code:
 
-                    print(axis_map[code[4:]], event.state)
+                    axis = AXIS_MAP[code[4:]]
+
+                    axis_vals[axis] = event.state
 
         except KeyboardInterrupt:
+
+            axis_vals[0] = 9999
 
             break
 
