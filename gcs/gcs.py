@@ -19,7 +19,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 from inputs import get_gamepad
 
+
 def main():
+
+    axis_map = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
 
     while True:
 
@@ -28,7 +31,12 @@ def main():
             events = get_gamepad()
 
             for event in events:
-                print(event.ev_type, event.code, event.state)
+
+                code = str(event.code)
+
+                if 'ABS' in code:
+
+                    print(axis_map[code[4:]], event.state)
 
         except KeyboardInterrupt:
 
