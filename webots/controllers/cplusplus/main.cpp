@@ -58,31 +58,6 @@ int main(int argc, char ** argv)
             break;
         }
 
-        z_target += CLIMB_RATE_SCALE * sim.throttle();
-
-        float thrustDemand = 0;
-
-        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
-
-        if (sim.hitTakeoffButton()) {
-
-            const auto thrustOffset = altitudePid.run(
-                        DT, z_target, sim.z(), sim.dz());
-
-            thrustDemand = THRUST_BASE + thrustOffset;
-
-        }
-
-        float rollDemand = sim.roll();
-
-        float pitchDemand  = sim.pitch();
-
-        float yawDemand = sim.yaw() * YAW_PRESCALE;
-
-        hf::demands_t demands = {
-            thrustDemand, rollDemand, pitchDemand, yawDemand
-        };
-
         const hf::state_t state = {
             sim.dx(),
             sim.dy(),
@@ -95,6 +70,26 @@ int main(int argc, char ** argv)
             sim.psi(),
             sim.dpsi()
         };
+
+        z_target += CLIMB_RATE_SCALE * sim.throttle();
+
+        hf::demands_t demands = {
+            sim.throttle(), 
+            sim.roll(), 
+            sim.pitch(), 
+            YAW_PRESCALE * sim.yaw()
+        };
+
+        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+
+        if (sim.hitTakeoffButton()) {
+
+            const auto thrustOffset = altitudePid.run(
+                        DT, z_target, state.z, state.dz);
+
+            demands.thrust = THRUST_BASE + thrustOffset;
+
+        }
 
         hf::quad_motors_t motors= {};
 
