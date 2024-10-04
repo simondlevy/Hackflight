@@ -89,15 +89,11 @@ int main(int argc, char ** argv)
 
         yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
 
-        float m1=0, m2=0, m3=0, m4=0;
-        hf::Mixer::runBetaFlightQuadX(
-                thrustDemand,
-                rollDemand,
-                pitchDemand,
-                yawDemand,
-                m1, m2, m3, m4);
+        hf::demands_t demands = {thrustDemand, rollDemand, pitchDemand, yawDemand};
+        hf::quad_motors_t motors= {};
+        hf::Mixer::runBetaFlightQuadX(demands, motors);
 
-        sim.setMotors(m1, m2, m3, m4);
+        sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
     }
 
     sim.close();
