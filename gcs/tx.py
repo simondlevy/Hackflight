@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 '''
-Hackflight Ground Control Station
+Hackflight Ground Control Station transmitter
+
+Reads gamepad values and sends them to an ESP32 dongle over serial connection.
 
 This file is part of Hackflight.
 

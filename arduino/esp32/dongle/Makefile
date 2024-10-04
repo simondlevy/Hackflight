@@ -1,7 +1,8 @@
 SKETCH = dongle
 
 # For complete list run arduino-cli board listall
-BOARD = esp32:esp32:tinypico
+BOARD = esp32:esp32:m5stack_atom
+# BOARD = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyUSB0
 
