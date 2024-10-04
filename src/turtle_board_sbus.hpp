@@ -40,8 +40,10 @@ namespace hf {
 
         public:
 
-            void init()
+            void init(const uint8_t ledPin=LED_BUILTIN)
             {
+                _ledPin = ledPin;
+
                 // Set up serial debugging
                 Serial.begin(500000);
                 delay(500);
@@ -49,9 +51,12 @@ namespace hf {
                 // Start receiver
                 _rx.Begin();
 
+                // Star serial comms with ESP32 radio
+                Serial3.begin(115200);
+
                 // Initialize LED
-                pinMode(LED_PIN, OUTPUT); 
-                digitalWrite(LED_PIN, HIGH);
+                pinMode(_ledPin, OUTPUT); 
+                digitalWrite(_ledPin, HIGH);
 
                 delay(5);
 
@@ -92,12 +97,12 @@ namespace hf {
 
                 // LED should be on when armed
                 if (_isArmed) {
-                    digitalWrite(LED_PIN, HIGH);
+                    digitalWrite(_ledPin, HIGH);
                 }
 
                 // Otherwise, blink LED as heartbeat or failsafe rate
                 else {
-                    _blinkTask.run(LED_PIN, _usec_curr,
+                    _blinkTask.run(_ledPin, _usec_curr,
                             _gotFailsafe ? 
                             FAILSAFE_BLINK_RATE_HZ : 
                             HEARTBEAT_BLINK_RATE_HZ);
@@ -180,7 +185,7 @@ namespace hf {
             // Blinkenlights ---------------------------------------------------------
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
-            static const uint8_t LED_PIN = 0;
+            uint8_t _ledPin;
             hf::BlinkTask _blinkTask;
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
@@ -282,16 +287,16 @@ namespace hf {
                 }
             }
 
-            static void blinkOnStartup(void)
+            void blinkOnStartup(void)
             {
                 // These constants are arbitrary, so we hide them here
                 static const uint8_t  BLINK_INIT_COUNT = 10;
                 static const uint32_t BLINK_INIT_TIME_MSEC = 100;
 
                 for (uint8_t j=0; j<BLINK_INIT_COUNT; j++) {
-                    digitalWrite(LED_PIN, LOW);
+                    digitalWrite(_ledPin, LOW);
                     delay(BLINK_INIT_TIME_MSEC);
-                    digitalWrite(LED_PIN, HIGH);
+                    digitalWrite(_ledPin, HIGH);
                     delay(BLINK_INIT_TIME_MSEC);
                 }
             }
