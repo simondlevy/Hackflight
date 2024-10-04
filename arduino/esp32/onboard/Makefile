@@ -1,7 +1,7 @@
 SKETCH = onboard
 
 # For complete list run arduino-cli board listall
-FQBN = esp32:esp32:tinypico
+FQBN = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyUSB0
 

@@ -16,13 +16,46 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-void setup() 
+#include <esp_now.h>
+#include <WiFi.h>
+
+
+static void onDataRecv(
+        const esp_now_recv_info * info,
+        const uint8_t *incomingData,
+        int len)
+{
+    (void)info;
+
+    for (auto k=0; k<len; ++k) {
+
+        Serial.println(incomingData[k]);
+    }
+}
+
+static void reportForever(const char * msg)
+{
+    while (true) {
+        Serial.println(msg);
+        delay(500);
+    }
+}
+
+void setup(void)
 {
     Serial.begin(115200);
+
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+
+        reportForever("Error initializing ESP-NOW");
+    }
+
+    esp_now_register_recv_cb(onDataRecv);
 }
 
-void loop() 
+
+void loop(void)
 {
-    Serial.println(millis());
 }
-
