@@ -186,7 +186,9 @@ namespace hf {
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
             uint8_t _ledPin;
-            hf::BlinkTask _blinkTask;
+            BlinkTask _blinkTask;
+
+            // Comms -----------------------------------------------------------------
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
@@ -375,7 +377,7 @@ namespace hf {
 
             static uint8_t scaleMotor(const float mval)
             {
-                return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
+                return Utils::u8constrain(mval*125 + 125, 125, 250);
 
             }
     };
