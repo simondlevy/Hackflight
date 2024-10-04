@@ -1,18 +1,18 @@
 SKETCH = dongle
 
 # For complete list run arduino-cli board listall
-BOARD = esp32:esp32:m5stack_atom
-# BOARD = esp32:esp32:um_tinypico
+FQBN = esp32:esp32:m5stack_atom
+# FQBN = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyUSB0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
 build: $(SKETCH).ino
-	arduino-cli compile --libraries $(LIBS) --fqbn $(BOARD) $(SKETCH).ino
+	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) $(SKETCH).ino
 
 flash:
-	arduino-cli upload -p $(PORT) --fqbn $(BOARD) .
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
 edit:
 	vim $(SKETCH).ino
