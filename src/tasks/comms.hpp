@@ -31,6 +31,11 @@ namespace hf {
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
 
+                    static uint8_t count;
+
+                    Serial3.write(count);
+
+                    count = (count + 1) % 100;
                 }
             }
 

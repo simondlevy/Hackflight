@@ -53,13 +53,17 @@ void setup()
 {
     Serial.begin(115200);
 
+    Serial1.begin(115200, SERIAL_8N1, 4, 14);
+
     startEspNow();
 }
 
 void loop()
 {
-    const uint8_t s[1] = {99};
+    while (Serial1.available()) {
 
-    esp_now_send(ESP_RECEIVER_ADDRESS, s, 1);
+        const uint8_t s[1] = {Serial1.read()};
+
+        esp_now_send(ESP_RECEIVER_ADDRESS, s, 1);
+    }
 }
-
