@@ -84,7 +84,6 @@ namespace hf {
                     float & gyroX, float & gyroY, float & gyroZ
                     )
             {
-
                 // Keep track of what time it is and how much time has elapsed since the last loop
                 _usec_curr = micros();      
                 static uint32_t _usec_prev;
@@ -129,10 +128,49 @@ namespace hf {
                 _commsTask.run(_usec_curr, COMMS_RATE_HZ);
             }
 
-            static float sbusmap(
-                    const uint16_t val, const float min, const float max)
+            void readData(float & dt, demands_t & demands, state_t & state)
             {
-                return min + (val - 172.) / (1811 - 172) * (max - min);
+                // Keep track of what time it is and how much time has elapsed since the last loop
+                _usec_curr = micros();      
+                static uint32_t _usec_prev;
+                dt = (_usec_curr - _usec_prev)/1000000.0;
+                _usec_prev = _usec_curr;      
+
+                // Arm vehicle if safe
+                if (!_gotFailsafe && (_chan_5 > 1500) && (_chan_1 < 1050)) {
+                    _isArmed = true;
+                }
+
+                // LED should be on when armed
+                if (_isArmed) {
+                    digitalWrite(_ledPin, HIGH);
+                }
+
+                // Otherwise, blink LED as heartbeat or failsafe rate
+                else {
+                    _blinkTask.run(_ledPin, _usec_curr,
+                            _gotFailsafe ? 
+                            FAILSAFE_BLINK_RATE_HZ : 
+                            HEARTBEAT_BLINK_RATE_HZ);
+                }
+
+                // Read IMU
+                float AccX = 0, AccY = 0, AccZ = 0;
+                readImu(AccX, AccY, AccZ, state.dphi, state.dtheta, state.dpsi); 
+
+                // Get Euler angles from IMU (note negations)
+                Madgwick6DOF(dt, state.dphi, -state.dtheta, state.dpsi, -AccX, AccY, AccZ,
+                        state.phi, state.theta, state.psi);
+                state.psi = -state.psi;
+
+                // Convert stick demands to appropriate intervals
+                demands.thrust = sbusmap(_chan_1,  0.,  1.);
+                demands.roll   = sbusmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
+                demands.pitch  = sbusmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
+                demands.yaw    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
+
+                // Run comms
+                _commsTask.run(_usec_curr, COMMS_RATE_HZ);
             }
 
             void runMotors(
@@ -161,12 +199,10 @@ namespace hf {
 
         private:
 
-            // FAFO
+            // FAFO -----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            static const uint8_t NUM_DSM_CHANNELS = 6;
-
-            // IMU ------------------------------------------------------------------------
+            // IMU ------------------------------------------------------------
 
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
             static constexpr float GYRO_SCALE_FACTOR = 131.0;
@@ -176,27 +212,27 @@ namespace hf {
 
             MPU6050 _mpu6050;
 
+            // Radio ---------------------------------------------------------
+            static const uint8_t NUM_DSM_CHANNELS = 6;
             bfs::SbusRx _rx = bfs::SbusRx(&Serial2);
 
-            // Motors --------------------------------------------------------------------
-
+            // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
-
             OneShot125 _motors = OneShot125(MOTOR_PINS);
-
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
-            // Blinkenlights ---------------------------------------------------------
+            // Blinkenlights --------------------------------------------------
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
             uint8_t _ledPin;
             BlinkTask _blinkTask;
 
-            // Comms -----------------------------------------------------------------
+            // Comms ----------------------------------------------------------
             static constexpr float COMMS_RATE_HZ = 100;
             CommsTask _commsTask;
 
-            // Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+            // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
+            // deg/sec for rate mode
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
 
             // Max yaw rate in deg/sec
@@ -386,6 +422,13 @@ namespace hf {
                 return Utils::u8constrain(mval*125 + 125, 125, 250);
 
             }
+
+            static float sbusmap(
+                    const uint16_t val, const float min, const float max)
+            {
+                return min + (val - 172.) / (1811 - 172) * (max - min);
+            }
+
     };
 
 }

@@ -41,27 +41,25 @@ void setup()
 void loop() 
 {
     float dt=0;
-    float thrustDemand=0, rollDemand=0, pitchDemand=0, yawDemand=0;
-    float phi=0, theta=0, psi=0, dphi=0, dtheta=0, dpsi=0;
+    hf::demands_t demands = {};
+    hf::state_t state = {};
 
-    _board.readData(dt, 
-            thrustDemand, rollDemand, pitchDemand, yawDemand,
-            phi, theta, psi, dphi, dtheta, dpsi);
+    _board.readData(dt, demands, state);
 
-    const auto resetPids = thrustDemand < THROTTLE_DOWN;
+    const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
     _pitchRollAnglePid.run(
-            dt, resetPids, rollDemand, pitchDemand, phi, theta);
+            dt, resetPids, demands.roll, demands.pitch, state.phi, state.theta);
 
     _pitchRollRatePid.run(
-            dt, resetPids, rollDemand, pitchDemand, dphi, dtheta);
+            dt, resetPids, demands.roll, demands.pitch, state.dphi, state.dtheta);
 
-    _yawRatePid.run(dt, resetPids, yawDemand, dpsi);
+    _yawRatePid.run(dt, resetPids, demands.yaw, state.dpsi);
 
     float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
 
     hf::Mixer::runBetaFlightQuadX(
-            thrustDemand, rollDemand, pitchDemand, yawDemand, 
+            demands.thrust, demands.roll, demands.pitch, demands.yaw, 
             m1_command, m2_command, m3_command, m4_command);
 
     _board.runMotors(m1_command, m2_command, m3_command, m4_command);

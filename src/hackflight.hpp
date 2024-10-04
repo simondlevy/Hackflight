@@ -22,41 +22,39 @@
 
 namespace hf {
 
+    /**
+     * State vector as defined in Bouabdallah, Murrieri, and Siegwart (2004), with the following
+     * modifications:
+     *    
+     * We don't encode absolute position X, Y
+     * 
+     * Linear velocities dX/dt, dY/dt are in body coordinates
+     */ 
     typedef struct {
 
-        float x;
-        float y;
+        float dx;
+        float dy;
         float z;
+        float dz;
+        float phi;
+        float dphi;
+        float theta;
+        float dtheta;
+        float psi;
+        float dpsi;
 
-    } axis3_t;
+    } state_t;
 
+    /**
+      * Axis demands
+      */
     typedef struct {
 
-        uint32_t c1;
-        uint32_t c2;
-        uint32_t c3;
-        uint32_t c4;
-        uint32_t c5;
-        uint32_t c6;
+        float thrust;
+        float roll;
+        float pitch;
+        float yaw;
 
-    } channels_t;
-
-    typedef struct {
-
-        float m1;
-        float m2;
-        float m3;
-        float m4;
-
-    } quad_motors_t;
-
-    typedef struct {
-
-        float w;
-        float x;
-        float y;
-        float z;
-
-    } quat_t;
+    } demands_t;
 
 }

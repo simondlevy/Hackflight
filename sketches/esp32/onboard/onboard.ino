@@ -1,6 +1,9 @@
 /*
    ESP32 on-board sketch
 
+   Relays serial comms data from Teensy flight-control board to a remote ESP32
+   dongle
+
    Copyright (C) 2024 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify

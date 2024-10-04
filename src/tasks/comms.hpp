@@ -27,7 +27,7 @@ namespace hf {
 
         public:
 
-            void run( const uint32_t usec_curr, const float freq_hz)
+            void run(const uint32_t usec_curr, const float freq_hz)
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
 
