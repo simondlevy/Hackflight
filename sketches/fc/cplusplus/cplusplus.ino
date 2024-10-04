@@ -56,11 +56,9 @@ void loop()
 
     _yawRatePid.run(dt, resetPids, demands.yaw, state.dpsi);
 
-    float m1_command=0, m2_command=0, m3_command=0, m4_command=0;
+    hf::quad_motors_t motors = {};
 
-    hf::Mixer::runBetaFlightQuadX(
-            demands.thrust, demands.roll, demands.pitch, demands.yaw, 
-            m1_command, m2_command, m3_command, m4_command);
+    hf::Mixer::runBetaFlightQuadX(demands, motors);
 
-    _board.runMotors(m1_command, m2_command, m3_command, m4_command);
+    _board.runMotors(motors);
 }

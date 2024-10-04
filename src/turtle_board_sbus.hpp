@@ -173,17 +173,13 @@ namespace hf {
                 _commsTask.run(_usec_curr, COMMS_RATE_HZ);
             }
 
-            void runMotors(
-                    const float m1_command,
-                    const float m2_command,
-                    const float m3_command,
-                    const float m4_command)
+            void runMotors(const quad_motors_t & motors)
             {
                 // Rescale motor values for OneShot125
-                _m1_usec = scaleMotor(m1_command);
-                _m2_usec = scaleMotor(m2_command);
-                _m3_usec = scaleMotor(m3_command);
-                _m4_usec = scaleMotor(m4_command);
+                _m1_usec = scaleMotor(motors.m1);
+                _m2_usec = scaleMotor(motors.m2);
+                _m3_usec = scaleMotor(motors.m3);
+                _m4_usec = scaleMotor(motors.m4);
 
                 // Turn off motors under various conditions
                 cutMotors(_chan_5, _isArmed); 

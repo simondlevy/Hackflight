@@ -57,4 +57,16 @@ namespace hf {
 
     } demands_t;
 
+    /**
+     * Quad motors
+     */
+    typedef struct {
+
+        float m1;
+        float m2;
+        float m3;
+        float m4;
+
+    } quad_motors_t;
+
 }
