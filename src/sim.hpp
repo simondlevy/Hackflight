@@ -67,7 +67,7 @@ namespace hf {
                 _motor4 = _makeMotor("motor4");
             }
 
-            bool step(state_t & state)
+            bool step(state_t & state, demands_t & demands)
             {
                 if (wb_robot_step((int)_timestep) == -1) {
                     return false;
@@ -75,7 +75,12 @@ namespace hf {
 
                 bool button = false;
 
-                _readSticks(_throttle, _roll, _pitch, _yaw, button);
+                _readSticks(
+                        demands.thrust,
+                        demands.roll,
+                        demands.pitch,
+                        demands.yaw,
+                        button);
 
                 // Track previous time and position for calculating motion
                 static float tprev;
@@ -140,77 +145,7 @@ namespace hf {
                 return _time;
             }
 
-            float throttle()
-            {
-                return _throttle;
-            }
-
-            float roll()
-            {
-                return _roll;
-            }
-
-            float pitch()
-            {
-                return _pitch;
-            }
-
-            float yaw()
-            {
-                return _yaw;
-            }
-
-            float z()
-            {
-                return _z;
-            }
-
-            float dx()
-            {
-                return _dx;
-            }
-
-            float dy()
-            {
-                return _dy;
-            }
-
-            float dz()
-            {
-                return _dz;
-            }
-
-            float phi()
-            {
-                return _phi;
-            }
-
-            float dphi()
-            {
-                return _dphi;
-            }
-
-            float theta()
-            {
-                return _theta;
-            }
-
-            float dtheta()
-            {
-                return _dtheta;
-            }
-
-            float psi()
-            {
-                return _psi;
-            }
-
-            float dpsi()
-            {
-                return _dpsi;
-            }
-
-            bool hitTakeoffButton()
+           bool hitTakeoffButton()
             {
                 return _button_was_hit;
             }

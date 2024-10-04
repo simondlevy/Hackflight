@@ -54,22 +54,18 @@ int main(int argc, char ** argv)
 
     while (true) {
 
+        hf::demands_t demands = {};
         hf::state_t state = {};
 
-        if (!sim.step(state)) {
+        if (!sim.step(state, demands)) {
             break;
         }
 
-        z_target += CLIMB_RATE_SCALE * sim.throttle();
+        demands.yaw *= YAW_PRESCALE;
 
-        hf::demands_t demands = {
-            sim.throttle(), 
-            sim.roll(), 
-            sim.pitch(), 
-            YAW_PRESCALE * sim.yaw()
-        };
+        z_target += CLIMB_RATE_SCALE * demands.thrust;
 
-        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+        const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
         if (sim.hitTakeoffButton()) {
 
