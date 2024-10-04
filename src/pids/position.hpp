@@ -32,12 +32,10 @@ namespace hf {
 
         public:
 
-            static void run(
-                    float & rollDemand, float & pitchDemand,
-                    const float dx, const float dy)
+            static void run(const state_t & state, demands_t & demands)
             {
-                rollDemand = KP * (rollDemand - dy);
-                pitchDemand = KP * (pitchDemand - dx);
+                demands.roll = KP * (demands.roll - state.dy);
+                demands.pitch = KP * (demands.pitch - state.dx);
             }
 
     };

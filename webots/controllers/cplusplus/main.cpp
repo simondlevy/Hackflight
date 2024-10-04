@@ -79,18 +79,35 @@ int main(int argc, char ** argv)
 
         float yawDemand = sim.yaw() * YAW_PRESCALE;
 
-        hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
+        hf::demands_t demands = {
+            thrustDemand, rollDemand, pitchDemand, yawDemand
+        };
 
-        pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
-                sim.phi(), sim.theta());
+        const hf::state_t state = {
+            sim.dx(),
+            sim.dy(),
+            sim.z(),
+            sim.dz(),
+            sim.phi(),
+            sim.dphi(),
+            sim.theta(),
+            sim.dtheta(),
+            sim.psi(),
+            sim.dpsi()
+        };
 
-        pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
-                sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
-
-        yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
-
-        hf::demands_t demands = {thrustDemand, rollDemand, pitchDemand, yawDemand};
         hf::quad_motors_t motors= {};
+
+        hf::PositionPid::run(state, demands);
+
+        pitchRollAnglePid.run(DT, resetPids, demands.roll, demands.pitch,
+                state.phi, state.theta);
+
+        pitchRollRatePid.run( DT, resetPids, demands.roll, demands.pitch,
+                state.dphi, state.dtheta, PITCH_ROLL_POST_SCALE);
+
+        yawRatePid.run(DT, resetPids, demands.yaw, state.dpsi);
+
         hf::Mixer::runBetaFlightQuadX(demands, motors);
 
         sim.setMotors(motors);
