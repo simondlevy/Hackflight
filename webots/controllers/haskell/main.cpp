@@ -52,7 +52,9 @@ void copilot_step_core(void);
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    _sim.setMotors(m1, m2, m3, m4);
+    hf::quad_motors_t motors = {m1, m2, m3, m4};
+
+    _sim.setMotors(motors);
 }
 
 // ---------------------------------------------------------------------------
@@ -61,27 +63,34 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    while (_sim.step()) {
+    while (true) {
 
-        stream_throttle = _sim.throttle();
-        stream_roll = _sim.roll();
-        stream_pitch = _sim.pitch();
-        stream_yaw = _sim.yaw();
+        hf::demands_t demands = {};
+        hf::state_t state = {};
+
+        if (!_sim.step(state, demands)) {
+            break;
+        }
+
+        stream_throttle = demands.thrust;
+        stream_roll = demands.roll;
+        stream_pitch = demands.pitch;
+        stream_yaw = demands.yaw;
 
         stream_hitTakeoffButton = _sim.hitTakeoffButton();
 
         stream_completedTakeoff = _sim.time() > 3;
 
-        stream_dx = _sim.dx();
-        stream_dy = _sim.dy();
-        stream_z = _sim.z();
-        stream_dz = _sim.dz();
-        stream_phi = _sim.phi();
-        stream_dphi = _sim.dphi();
-        stream_theta = _sim.theta();
-        stream_dtheta = _sim.dtheta();
-        stream_psi = _sim.psi();
-        stream_dpsi = _sim.dpsi();
+        stream_dx = state.dx;
+        stream_dy = state.dy;
+        stream_z = state.z;
+        stream_dz = state.dz;
+        stream_phi = state.phi;
+        stream_dphi = state.dphi;
+        stream_theta = state.theta;
+        stream_dtheta = state.dtheta;
+        stream_psi = state.psi;
+        stream_dpsi = state.dpsi;
 
         copilot_step_core();
     }

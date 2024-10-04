@@ -179,22 +179,6 @@ namespace hf {
 
             float  _time;
 
-            float _throttle;
-            float _roll;
-            float _pitch;
-            float _yaw;
-
-            float _dx;
-            float _dy;
-            float _z;
-            float _dz;
-            float _phi;
-            float _dphi;
-            float _theta;
-            float _dtheta;
-            float _psi;
-            float _dpsi;
-
             bool _button_was_hit;
 
             uint32_t _tick;
