@@ -1,6 +1,9 @@
 /*
    ESP32 dongle sketch
 
+   For now we just read data from onboard ESP32 and send it out over
+   USB serial for use by GCS program
+
    Copyright (C) 2024 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -29,7 +32,7 @@ static void onDataRecv(
 
     for (auto k=0; k<len; ++k) {
 
-        Serial.println(incomingData[k]);
+        Serial.write(incomingData[k]);
     }
 }
 

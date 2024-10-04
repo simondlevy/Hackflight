@@ -4,7 +4,7 @@ SKETCH = dongle
 FQBN = esp32:esp32:m5stack_atom
 # FQBN = esp32:esp32:um_tinypico
 
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
