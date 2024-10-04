@@ -215,18 +215,14 @@ namespace hf {
                 return _button_was_hit;
             }
 
-            void setMotors(
-                    const float m1, 
-                    const float m2, 
-                    const float m3, 
-                    const float m4)
+            void setMotors(const quad_motors_t & motors)
             {
                 // Negate expected direction to accommodate Webots
                 // counterclockwise positive
-                wb_motor_set_velocity(_motor1, -m1);
-                wb_motor_set_velocity(_motor2, +m2);
-                wb_motor_set_velocity(_motor3, +m3);
-                wb_motor_set_velocity(_motor4, -m4);
+                wb_motor_set_velocity(_motor1, -motors.m1);
+                wb_motor_set_velocity(_motor2, +motors.m2);
+                wb_motor_set_velocity(_motor3, +motors.m3);
+                wb_motor_set_velocity(_motor4, -motors.m4);
             }
 
             void close(void)

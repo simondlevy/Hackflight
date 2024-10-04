@@ -93,7 +93,7 @@ int main(int argc, char ** argv)
         hf::quad_motors_t motors= {};
         hf::Mixer::runBetaFlightQuadX(demands, motors);
 
-        sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
+        sim.setMotors(motors);
     }
 
     sim.close();
