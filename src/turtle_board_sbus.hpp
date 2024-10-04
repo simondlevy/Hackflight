@@ -31,6 +31,7 @@
 #include <madgwick.hpp>
 #include <utils.hpp>
 #include <tasks/blink.hpp>
+#include <tasks/comms.hpp>
 
 // Receiver -------------------------------------------------------------------
 
@@ -123,6 +124,9 @@ namespace hf {
                 rollDemand   = sbusmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
                 pitchDemand  = sbusmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
                 yawDemand    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
+
+                // Run comms
+                _commsTask.run(_usec_curr, COMMS_RATE_HZ);
             }
 
             static float sbusmap(
@@ -189,6 +193,8 @@ namespace hf {
             BlinkTask _blinkTask;
 
             // Comms -----------------------------------------------------------------
+            static constexpr float COMMS_RATE_HZ = 100;
+            CommsTask _commsTask;
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    

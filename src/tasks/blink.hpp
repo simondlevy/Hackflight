@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <timer.hpp>
-
 namespace hf {
 
     class BlinkTask {
