@@ -67,7 +67,7 @@ namespace hf {
                 _motor4 = _makeMotor("motor4");
             }
 
-            bool step()
+            bool step(state_t & state)
             {
                 if (wb_robot_step((int)_timestep) == -1) {
                     return false;
@@ -89,22 +89,22 @@ namespace hf {
 
                 auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
-                _z = wb_gps_get_values(_gps)[2];
+                state.z = wb_gps_get_values(_gps)[2];
 
-                _phi = Utils::RAD2DEG*(
+                state.phi = Utils::RAD2DEG*(
                         wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
 
-                _dphi = Utils::RAD2DEG*(
+                state.dphi = Utils::RAD2DEG*(
                         wb_gyro_get_values(_gyro)[0]);
 
-                _theta = Utils::RAD2DEG*(
+                state.theta = Utils::RAD2DEG*(
                         wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
 
-                _dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
+                state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
 
-                _psi  =  -Utils::RAD2DEG*(psi); 
+                state.psi  =  -Utils::RAD2DEG*(psi); 
 
-                _dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
+                state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
 
                 // Use temporal first difference to get world-cooredinate
                 // velocities
@@ -112,19 +112,19 @@ namespace hf {
                 auto y = wb_gps_get_values(_gps)[1];
                 auto dx = (x - xprev) / dt;
                 auto dy = (y - yprev) / dt;
-                _dz = (_z - zprev) / dt;
+                state.dz = (state.z - zprev) / dt;
 
                 // Rotate X,Y world velocities into body frame to simulate
                 // optical-flow sensor
                 auto cospsi = cos(psi);
                 auto sinpsi = sin(psi);
-                _dx = dx * cospsi + dy * sinpsi;
-                _dy = dx * sinpsi - dy * cospsi;
+                state.dx = dx * cospsi + dy * sinpsi;
+                state.dy = dx * sinpsi - dy * cospsi;
 
                 // Save past time and position for next time step
                 xprev = x;
                 yprev = y;
-                zprev = _z;
+                zprev = state.z;
 
                 if (button) {
                     _button_was_hit = true;

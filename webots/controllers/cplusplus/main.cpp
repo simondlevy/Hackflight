@@ -54,22 +54,11 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!sim.step()) {
+        hf::state_t state = {};
+
+        if (!sim.step(state)) {
             break;
         }
-
-        const hf::state_t state = {
-            sim.dx(),
-            sim.dy(),
-            sim.z(),
-            sim.dz(),
-            sim.phi(),
-            sim.dphi(),
-            sim.theta(),
-            sim.dtheta(),
-            sim.psi(),
-            sim.dpsi()
-        };
 
         z_target += CLIMB_RATE_SCALE * sim.throttle();
 
