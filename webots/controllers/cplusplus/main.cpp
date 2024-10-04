@@ -76,8 +76,6 @@ int main(int argc, char ** argv)
 
         }
 
-        hf::quad_motors_t motors= {};
-
         hf::PositionPid::run(state, demands);
 
         pitchRollAnglePid.run(DT, resetPids, demands.roll, demands.pitch,
@@ -87,6 +85,8 @@ int main(int argc, char ** argv)
                 state.dphi, state.dtheta, PITCH_ROLL_POST_SCALE);
 
         yawRatePid.run(DT, resetPids, demands.yaw, state.dpsi);
+
+        hf::quad_motors_t motors= {};
 
         hf::Mixer::runBetaFlightQuadX(demands, motors);
 
