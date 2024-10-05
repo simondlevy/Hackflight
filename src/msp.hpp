@@ -1,4 +1,6 @@
 /*
+   Multiwii Serial Protocol support for Hackflight
+
    Copyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
@@ -41,6 +43,14 @@ class Msp {
 
         uint8_t m_payloadChecksum;
         uint8_t m_payloadIndex;
+
+        void serialize32(const int32_t a)
+        {
+            serialize8(a & 0xFF);
+            serialize8((a >> 8) & 0xFF);
+            serialize8((a >> 16) & 0xFF);
+            serialize8((a >> 24) & 0xFF);
+        }
 
         void serialize16(const int16_t a)
         {
@@ -104,6 +114,13 @@ class Msp {
             m_payloadIndex = 0;
         }
 
+        void serializeFloat(const float src)
+        {
+            uint32_t a;
+            memcpy(&a, &src, 4);
+            serialize32(a);
+        }
+
         void serializeShort(const uint16_t src)
         {
             uint16_t a;
@@ -112,6 +129,10 @@ class Msp {
         }
 
     public:
+
+        enum {
+            MSG_STATE = 121
+        };
 
         uint8_t payload[BUF_SIZE];
         uint8_t payloadSize;
@@ -185,6 +206,18 @@ class Msp {
             memcpy(&s,  &payload[2*index], sizeof(int16_t));
             return s;
 
+        }
+
+        void serializeFloats(
+                const uint8_t messageType, const float src[], const uint8_t count)
+        {
+            prepareToSerializeFloats(messageType, count);
+
+            for (auto k=0; k<count; ++k) {
+                serializeFloat(src[k]);
+            }
+
+            completeSerialize();
         }
 
         void serializeShorts(

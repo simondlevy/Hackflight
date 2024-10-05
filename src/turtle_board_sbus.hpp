@@ -119,7 +119,7 @@ namespace hf {
                 demands.yaw    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
 
                 // Run comms
-                _commsTask.run(_usec_curr, COMMS_RATE_HZ);
+                _commsTask.run(state, _usec_curr, COMMS_RATE_HZ);
             }
 
             void runMotors(const quad_motors_t & motors)

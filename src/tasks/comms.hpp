@@ -20,6 +20,7 @@
 
 #include <hackflight.hpp>
 #include <timer.hpp>
+#include <msp.hpp>
 
 namespace hf {
 
@@ -27,21 +28,31 @@ namespace hf {
 
         public:
 
-            void run(const uint32_t usec_curr, const float freq_hz)
+            void run(
+                    const state_t & state,
+                    const uint32_t usec_curr,
+                    const float freq_hz)
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
 
-                    static uint8_t count;
+                    const float vals[12] = {
+                        state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+                        state.theta, state.dtheta, state.psi, state.dpsi
+                    };
 
-                    Serial3.write(count);
+                    _msp.serializeFloats(Msp::MSG_STATE, vals, 12);
 
-                    count = (count + 1) % 100;
+                    while (_msp.available()) {
+                        Serial3.write(_msp.read());
+                    }
                 }
             }
 
         private:
 
             Timer _timer;
+
+            Msp _msp;
     };
 
 }

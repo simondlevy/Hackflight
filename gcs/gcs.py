@@ -21,7 +21,7 @@ import serial
 
 def main():
 
-    port = serial.Serial('/dev/ttyUSB0', 115200)
+    port = serial.Serial('/dev/ttyUSB1', 115200)
 
     while True:
 
