@@ -74,18 +74,16 @@ int main(int argc, char ** argv)
             altitudePid.run(DT, state, demands);
 
             demands.thrust += THRUST_BASE;
-
         }
 
         hf::PositionPid::run(state, demands);
 
-        pitchRollAnglePid.run(DT, resetPids, demands.roll, demands.pitch,
-                state.phi, state.theta);
+        pitchRollAnglePid.run(DT, resetPids, state, demands);
 
-        pitchRollRatePid.run( DT, resetPids, demands.roll, demands.pitch,
-                state.dphi, state.dtheta, PITCH_ROLL_POST_SCALE);
+        pitchRollRatePid.run(DT, resetPids, state, demands,
+                PITCH_ROLL_POST_SCALE);
 
-        yawRatePid.run(DT, resetPids, demands.yaw, state.dpsi);
+        yawRatePid.run(DT, resetPids, state, demands);
 
         hf::quad_motors_t motors= {};
 
