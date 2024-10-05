@@ -69,10 +69,11 @@ int main(int argc, char ** argv)
 
         if (sim.hitTakeoffButton()) {
 
-            const auto thrustOffset = altitudePid.run(
-                        DT, z_target, state.z, state.dz);
+            demands.thrust = z_target;
 
-            demands.thrust = THRUST_BASE + thrustOffset;
+            altitudePid.run(DT, state, demands);
+
+            demands.thrust += THRUST_BASE;
 
         }
 
