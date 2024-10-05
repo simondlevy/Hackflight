@@ -44,17 +44,17 @@ namespace hf {
             void run(
                     const float dt, 
                     const bool reset,
-                    float & demand, 
-                    const float dangle)
+                    const state_t & state,
+                    demands_t & demands) 
             {
-                const auto error = demand - dangle;
+                const auto error = demands.yaw - state.dpsi;
 
                 _integral = reset ? 0 :
                     hf::Utils::fconstrain(_integral + error * dt, I_LIMIT);
 
                 const auto derivative = (error - _error) / dt;
 
-                demand = KP * error + KI * _integral - KD * derivative; 
+                demands.yaw = KP * error + KI * _integral - KD * derivative; 
 
                 _error = error;
               }    

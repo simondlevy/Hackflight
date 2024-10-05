@@ -36,15 +36,14 @@ namespace hf {
             void run(
                     const float dt, 
                     const bool reset,
-                    float & rollDemand,
-                    float & pitchDemand,
-                    const float phi,
-                    const float theta)
+                    const state_t & state,
+                    demands_t & demands)
             {
+                runAxis(dt, reset, demands.roll,
+                        state.phi, _roll_integral);
 
-                runAxis(dt, reset, rollDemand, phi, _roll_integral);
-
-                runAxis(dt, reset, pitchDemand, theta, _pitch_integral);
+                runAxis(dt, reset, demands.pitch,
+                        state.theta, _pitch_integral);
             }
 
         private:

@@ -54,46 +54,42 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!sim.step()) {
+        hf::demands_t demands = {};
+        hf::state_t state = {};
+
+        if (!sim.step(state, demands)) {
             break;
         }
 
-        z_target += CLIMB_RATE_SCALE * sim.throttle();
+        demands.yaw *= YAW_PRESCALE;
 
-        float thrustDemand = 0;
+        z_target += CLIMB_RATE_SCALE * demands.thrust;
 
-        const auto resetPids = sim.throttle() < THROTTLE_DOWN;
+        const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
         if (sim.hitTakeoffButton()) {
 
-            const auto thrustOffset = altitudePid.run(
-                        DT, z_target, sim.z(), sim.dz());
+            demands.thrust = z_target;
 
-            thrustDemand = THRUST_BASE + thrustOffset;
+            altitudePid.run(DT, state, demands);
 
+            demands.thrust += THRUST_BASE;
         }
 
-        float rollDemand = sim.roll();
+        hf::PositionPid::run(state, demands);
 
-        float pitchDemand  = sim.pitch();
+        pitchRollAnglePid.run(DT, resetPids, state, demands);
 
-        float yawDemand = sim.yaw() * YAW_PRESCALE;
+        pitchRollRatePid.run(DT, resetPids, state, demands,
+                PITCH_ROLL_POST_SCALE);
 
-        hf::PositionPid::run(rollDemand, pitchDemand, sim.dx(), sim.dy());
+        yawRatePid.run(DT, resetPids, state, demands);
 
-        pitchRollAnglePid.run(DT, resetPids, rollDemand, pitchDemand,
-                sim.phi(), sim.theta());
-
-        pitchRollRatePid.run( DT, resetPids, rollDemand, pitchDemand,
-                sim.dphi(), sim.dtheta(), PITCH_ROLL_POST_SCALE);
-
-        yawRatePid.run(DT, resetPids, yawDemand, sim.dpsi());
-
-        hf::demands_t demands = {thrustDemand, rollDemand, pitchDemand, yawDemand};
         hf::quad_motors_t motors= {};
+
         hf::Mixer::runBetaFlightQuadX(demands, motors);
 
-        sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
+        sim.setMotors(motors);
     }
 
     sim.close();

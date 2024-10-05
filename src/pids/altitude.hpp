@@ -24,16 +24,14 @@ namespace hf {
 
         public:
 
-            float run(
-                    const float dt,
-                    const float z_target,
-                    const float z,
-                    const float dz)
+            void run(
+                    const float dt, const state_t & state, demands_t & demands)
             {
-                const auto dz_target =
-                    run_pi(dt, KP_Z, KI_Z, z_target, z, _z_integral);
+                demands.thrust = run_pi(dt, KP_Z, KI_Z,
+                        demands.thrust, state.z, _z_integral);
 
-                return run_pi(dt, KP_DZ, KI_DZ, dz_target, dz, _dz_integral);
+                demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
+                        demands.thrust, state.dz, _dz_integral);
             }
 
         private:

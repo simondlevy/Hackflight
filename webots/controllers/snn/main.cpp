@@ -94,7 +94,10 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!sim.step()) {
+        hf::demands_t demands = {};
+        hf::state_t state = {};
+
+        if (!sim.step(state, demands)) {
             break;
         }
 
@@ -102,8 +105,8 @@ int main(int argc, char ** argv)
 
         const auto thrustFromSnn = runDifferenceSnn(
                     climbRateSnn,
-                    sim.throttle(), 
-                    sim.dz(),
+                    demands.thrust, 
+                    state.dz,
                     CLIMBRATE_SNN_SCALE,
                     CLIMBRATE_SNN_OFFSET) ;
 
@@ -111,46 +114,40 @@ int main(int argc, char ** argv)
 
         if (airborne) {
             printf("%f,%f,%f,%f\n",
-                    time, sim.throttle(), sim.dz(), thrustFromSnn);
+                    time, demands.thrust, state.dz, thrustFromSnn);
         }
 
-        const auto yawDemand = runDifferenceSnn(
+        demands.yaw = runDifferenceSnn(
                 yawRateSnn,
-                sim.yaw(),
-                sim.dpsi()/YAW_PRESCALE,
+                demands.yaw,
+                state.dpsi/YAW_PRESCALE,
                 YAW_SNN_SCALE,
                 YAW_SNN_OFFSET);
 
-        auto rollDemand = 6 * (10 * (sim.roll() - sim.dy()) - sim.phi());
+        auto rollDemand = 6 * (10 * (demands.roll - state.dy) - state.phi);
 
-        rollDemand = 0.0125 * (rollDemand - sim.dphi());
+        rollDemand = 0.0125 * (rollDemand - state.dphi);
 
-        float pitchDemand  = 10 * (sim.pitch() - sim.dx());
-        pitchDemand = 6 * (pitchDemand - sim.theta());
-        pitchDemand = 0.0125 * (pitchDemand - sim.dtheta());
+        float pitchDemand  = 10 * (demands.pitch - state.dx);
+        pitchDemand = 6 * (pitchDemand - state.theta);
+        pitchDemand = 0.0125 * (pitchDemand - state.dtheta);
 
         // Ignore thrust demand until airborne, based on time from launch
-        const auto thrustDemand =
+        demands.thrust =
             time > TAKEOFF_TIME ? 
             thrustFromSnn :
             sim.hitTakeoffButton() ? 
             THRUST_TAKEOFF :
             0;
 
-        rollDemand = 0;
-        pitchDemand = 0;
+        demands.pitch = 0;
+        demands.roll = 0;
 
-        // Run the mixer to convert the demands into motor spins
-        float m1=0, m2=0, m3=0, m4=0;
-        hf::Mixer::runBetaFlightQuadX(
-                thrustDemand,
-                rollDemand,
-                pitchDemand,
-                yawDemand,
-                m1, m2, m3, m4);
+        hf::quad_motors_t motors= {};
 
-        // Spin the motors
-        sim.setMotors(m1, m2, m3, m4);
+        hf::Mixer::runBetaFlightQuadX(demands, motors);
+
+        sim.setMotors(motors);
 
         if (viz_port) {
             climbRateSnn->send_counts_to_visualizer();

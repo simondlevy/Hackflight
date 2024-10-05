@@ -46,7 +46,9 @@ float stream_dpsi;
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    _board.runMotors(m1, m2, m3, m4);
+    const hf::quad_motors_t motors = {m1, m2, m3, m4};
+
+    _board.runMotors(motors);
 }
 
 // ---------------------------------------------------------------------------
