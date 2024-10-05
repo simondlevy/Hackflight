@@ -13,20 +13,11 @@ existing [Msp](https://github.com/simondlevy/Hackflight/blob/master/src/msp.h) c
 
 Running **msppg.py** in a directory that contains a file **messages.json** will produce the following files:
 
-* **mspparser.py**, a Python module containing a **Parser** class that you can subclass to implement your
+* **mspp.py**, a Python module containing a **Parser** class that you can subclass to implement your
 message-handling methods
 
 * **MspParser.java**, a Java module containing a **Parser** class that you can subclass to implement your
 message-handling methods
-
-To use the Python class, you should also install the support code for the **Parser** class:
-
-```
-% cd python
-% python3 setup.py install
-```
-
-(On Unix systems you will probably have to run the setup command as sudo.)
 
 ## Example
 

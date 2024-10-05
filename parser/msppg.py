@@ -93,7 +93,7 @@ class Python_Emitter(CodeEmitter):
     def emit(self):
 
         # Open output file
-        self.output = self._openw('mspparser.py')
+        self.output = self._openw('msp.py')
 
         # Emit header
         self.output.write('#  MSP Parser subclass and message builders')
@@ -102,7 +102,7 @@ class Python_Emitter(CodeEmitter):
         self.output.write('\n\n#  Gnu Public License')
         self._write('\n\nimport struct')
         self._write('\n\nimport abc')
-        self._write('\n\n\nclass MspParser(metaclass=abc.ABCMeta):')
+        self._write('\n\n\nclass Parser(metaclass=abc.ABCMeta):')
 
         # Emit __init__() method
         self._write('\n\n    def __init__(self):')
@@ -226,7 +226,7 @@ class Python_Emitter(CodeEmitter):
                 self._write(('        msg = [len(message_buffer), %s] + ' +
                             'list(message_buffer)\n') % msgid)
                 self._write('        return bytes([ord(\'$\'), ord(\'M\'), ' +
-                            'ord(\'<\')] + msg + [MspParser.crc8(msg)])')
+                            'ord(\'<\')] + msg + [Parser.crc8(msg)])')
         self._write('\n')
 
     def _write(self, s):
