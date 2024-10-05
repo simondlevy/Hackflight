@@ -48,13 +48,11 @@ void loop()
 
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-    _pitchRollAnglePid.run(
-            dt, resetPids, demands.roll, demands.pitch, state.phi, state.theta);
+    _pitchRollAnglePid.run(dt, resetPids, state, demands);
 
-    _pitchRollRatePid.run(
-            dt, resetPids, demands.roll, demands.pitch, state.dphi, state.dtheta);
+    _pitchRollRatePid.run(dt, resetPids, state, demands);
 
-    _yawRatePid.run(dt, resetPids, demands.yaw, state.dpsi);
+    _yawRatePid.run(dt, resetPids, state, demands);
 
     hf::quad_motors_t motors = {};
 
