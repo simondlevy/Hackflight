@@ -77,57 +77,6 @@ namespace hf {
                 _motors.arm();
             }
 
-            void readData(
-                    float & dt,
-                    float & thrustDemand, float & rollDemand, float & pitchDemand, float & yawDemand,
-                    float & phi, float & theta, float & psi,
-                    float & gyroX, float & gyroY, float & gyroZ
-                    )
-            {
-                // Keep track of what time it is and how much time has elapsed since the last loop
-                _usec_curr = micros();      
-                static uint32_t _usec_prev;
-                dt = (_usec_curr - _usec_prev)/1000000.0;
-                _usec_prev = _usec_curr;      
-
-                // Arm vehicle if safe
-                if (!_gotFailsafe && (_chan_5 > 1500) && (_chan_1 < 1050)) {
-                    _isArmed = true;
-                }
-
-                // LED should be on when armed
-                if (_isArmed) {
-                    digitalWrite(_ledPin, HIGH);
-                }
-
-                // Otherwise, blink LED as heartbeat or failsafe rate
-                else {
-                    _blinkTask.run(_ledPin, _usec_curr,
-                            _gotFailsafe ? 
-                            FAILSAFE_BLINK_RATE_HZ : 
-                            HEARTBEAT_BLINK_RATE_HZ);
-                }
-
-                //Get vehicle state
-
-                float AccX = 0, AccY = 0, AccZ = 0;
-
-                readImu(AccX, AccY, AccZ, gyroX, gyroY, gyroZ); 
-
-                // Get Euler angles from IMU (note negations)
-                Madgwick6DOF(dt, gyroX, -gyroY, gyroZ, -AccX, AccY, AccZ, phi, theta, psi);
-                psi = -psi;
-
-                // Convert stick demands to appropriate intervals
-                thrustDemand = sbusmap(_chan_1,  0.,  1.);
-                rollDemand   = sbusmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
-                pitchDemand  = sbusmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
-                yawDemand    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
-
-                // Run comms
-                _commsTask.run(_usec_curr, COMMS_RATE_HZ);
-            }
-
             void readData(float & dt, demands_t & demands, state_t & state)
             {
                 // Keep track of what time it is and how much time has elapsed since the last loop
