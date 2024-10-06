@@ -37,7 +37,7 @@
 
 namespace hf {
 
-    class TurtleBoardSbus {
+    class BoardSbus {
 
         public:
 
@@ -52,8 +52,8 @@ namespace hf {
                 // Start receiver
                 _rx.Begin();
 
-                // Star serial comms with ESP32 radio
-                Serial3.begin(115200);
+                // Star comms with ESP32 radio
+                _commsTask.begin();
 
                 // Initialize LED
                 pinMode(_ledPin, OUTPUT); 

@@ -1,6 +1,5 @@
-SKETCH = onboard
+SKETCH = master
 
-# For complete list run arduino-cli board listall
 FQBN = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyUSB0
@@ -12,6 +11,9 @@ build: $(SKETCH).ino
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
+
+clean:
+	rm -rf obj
 
 edit:
 	vim $(SKETCH).ino

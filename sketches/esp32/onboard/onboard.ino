@@ -21,12 +21,16 @@
 
 #include <esp_now.h>
 #include <WiFi.h>
+#include <Wire.h>
 
 #include <hackflight.hpp>
 #include <msp.hpp>
 
 // Replace with the MAC Address of your ESPNOW receiver
 static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+
+// Arbitrary I^C address for receiving data from Teensy
+static const uint8_t I2C_ADDR = 0x55;
 
 static void reportForever(const char * msg)
 {
@@ -55,30 +59,53 @@ void startEspNow(void)
     }
 }
 
+void onI2cRequest() 
+{
+    static uint32_t i;
+    Wire.print(i++);
+    Wire.print(" Packets.");
+    Serial.println("onRequest");
+    Serial.println();
+}
+
+
+void onI2cReceive(int len) 
+{
+    Serial.printf("onReceive[%d]:\n", len);
+    while (Wire.available()) {
+        Serial.write(Wire.read());
+    }
+    Serial.println();
+}
+
 void setup()
 {
     Serial.begin(115200);
 
-    Serial1.begin(115200, SERIAL_8N1, 4, 14);
+    // Serial1.begin(115200, SERIAL_8N1, 4, 14);
 
-    startEspNow();
+    //startEspNow();
+
+    Wire.onReceive(onI2cReceive);
+    Wire.onRequest(onI2cRequest);
+    Wire.begin(I2C_ADDR);
 }
 
 void loop()
 {
-    static Msp _msp;
-
-    const float vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
-
-    _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
-
-    esp_now_send(ESP_RECEIVER_ADDRESS, _msp.payload, _msp.payloadSize);
-
     /*
-    while (Serial1.available()) {
+       static Msp _msp;
 
-        const uint8_t s[1] = {Serial1.read()};
+       const float vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
 
-        esp_now_send(ESP_RECEIVER_ADDRESS, s, 1);
-    }*/
+       _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
+
+       esp_now_send(ESP_RECEIVER_ADDRESS, _msp.payload, _msp.payloadSize);
+
+       while (Serial1.available()) {
+
+       const uint8_t s[1] = {Serial1.read()};
+
+       esp_now_send(ESP_RECEIVER_ADDRESS, s, 1);
+       }*/
 }

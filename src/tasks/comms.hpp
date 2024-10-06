@@ -28,6 +28,11 @@ namespace hf {
 
         public:
 
+            void begin()
+            {
+                Wire1.begin();
+            }
+
             void run(
                     const state_t & state,
                     const uint32_t usec_curr,
@@ -35,28 +40,36 @@ namespace hf {
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
 
+                    Wire1.beginTransmission(I2C_ADDR);
+                    Wire1.printf("Hello World!");
+                    const uint8_t error = Wire.endTransmission(true);
+                    Serial.printf("%d\n", error);
+
+
                     /*
-                    const float vals[10] = {
-                        state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
-                        state.theta, state.dtheta, state.psi, state.dpsi
-                    };
+                       const float vals[10] = {
+                       state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+                       state.theta, state.dtheta, state.psi, state.dpsi
+                       };
 
-                    _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
+                       _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
 
-                    const int16_t vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
+                       const int16_t vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
 
-                    _msp.serializeShorts(Msp::MSG_STATE, vals, 10);
+                       _msp.serializeShorts(Msp::MSG_STATE, vals, 10);
 
-                    Serial3.write(_msp.payload, _msp.payloadSize);
+                       Serial3.write(_msp.payload, _msp.payloadSize);
 
                     //while (_msp.available()) {
                     //    Serial3.write(_msp.read());
                     //}
-                    */
+                     */
                 }
             }
 
         private:
+
+            static const uint8_t I2C_ADDR = 0x55;
 
             Timer _timer;
 

@@ -1,9 +1,8 @@
-SKETCH = onboard
+SKETCH = slave
 
-# For complete list run arduino-cli board listall
-FQBN = esp32:esp32:um_tinypico
+FQBN = teensy:avr:teensy40
 
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 

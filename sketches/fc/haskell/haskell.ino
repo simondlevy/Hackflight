@@ -18,9 +18,9 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <turtle_board_sbus.hpp>
+#include <board_sbus.hpp>
 
-static hf::TurtleBoardSbus _board;
+static hf::BoardSbus _board;
 
 // Shared with Haskell Copilot -----------------------------------------------
 
