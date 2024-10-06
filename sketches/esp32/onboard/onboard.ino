@@ -22,6 +22,9 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+#include <hackflight.hpp>
+#include <msp.hpp>
+
 // Replace with the MAC Address of your ESPNOW receiver
 static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
@@ -63,10 +66,19 @@ void setup()
 
 void loop()
 {
+    static Msp _msp;
+
+    const int16_t vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
+
+    _msp.serializeShorts(Msp::MSG_STATE, vals, 10);
+
+    esp_now_send(ESP_RECEIVER_ADDRESS, _msp.payload, _msp.payloadSize);
+
+    /*
     while (Serial1.available()) {
 
         const uint8_t s[1] = {Serial1.read()};
 
         esp_now_send(ESP_RECEIVER_ADDRESS, s, 1);
-    }
+    }*/
 }

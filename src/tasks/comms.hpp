@@ -42,15 +42,17 @@ namespace hf {
                     };
 
                     _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
-                    */
 
                     const int16_t vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
 
                     _msp.serializeShorts(Msp::MSG_STATE, vals, 10);
 
-                    while (_msp.available()) {
-                        Serial3.write(_msp.read());
-                    }
+                    Serial3.write(_msp.payload, _msp.payloadSize);
+
+                    //while (_msp.available()) {
+                    //    Serial3.write(_msp.read());
+                    //}
+                    */
                 }
             }
 
