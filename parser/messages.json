@@ -2,6 +2,15 @@
   "STATE": 
   [{"ID": 121},
    {"comment": "Ad-hoc for vehicle state"},
-   {"foo":     "short"}
+   {"dx":     "short"},
+   {"dy":     "short"},
+   {"z":     "short"},
+   {"dz":     "short"},
+   {"phi":     "short"},
+   {"dphi":     "short"},
+   {"theta":     "short"},
+   {"dtheta":     "short"},
+   {"psi":     "short"},
+   {"dpsi":     "short"}
   ]
 }

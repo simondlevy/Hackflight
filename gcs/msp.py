@@ -84,12 +84,12 @@ class Parser(metaclass=abc.ABCMeta):
     def dispatchMessage(self):
 
         if self.message_id == 121:
-            self.handle_STATE(*struct.unpack('=h', self.message_buffer))
+            self.handle_STATE(*struct.unpack('=hhhhhhhhhh', self.message_buffer))
 
         return
 
     @abc.abstractmethod
-    def handle_STATE(self, foo):
+    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
         return
 
     @staticmethod

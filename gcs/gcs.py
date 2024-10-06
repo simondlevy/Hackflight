@@ -23,9 +23,9 @@ from msp import Parser
 
 class MyParser(Parser):
 
-    def handle_STATE(self, foo):
+    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        print('Got: ', foo)
+        print('Got: ', (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
 
 def main():
@@ -39,8 +39,6 @@ def main():
         try:
 
             c = port.read(1)
-
-            print(ord(c))
 
             parser.parse(c)
 
