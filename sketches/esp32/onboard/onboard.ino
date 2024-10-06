@@ -68,9 +68,9 @@ void loop()
 {
     static Msp _msp;
 
-    const int16_t vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
+    const float vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
 
-    _msp.serializeShorts(Msp::MSG_STATE, vals, 10);
+    _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
 
     esp_now_send(ESP_RECEIVER_ADDRESS, _msp.payload, _msp.payloadSize);
 
