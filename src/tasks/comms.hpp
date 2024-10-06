@@ -35,12 +35,18 @@ namespace hf {
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
 
+                    /*
                     const float vals[10] = {
                         state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
                         state.theta, state.dtheta, state.psi, state.dpsi
                     };
 
                     _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
+                    */
+
+                    const int16_t vals[1] = { 0 };
+
+                    _msp.serializeShorts(Msp::MSG_STATE, vals, 1);
 
                     while (_msp.available()) {
                         Serial3.write(_msp.read());

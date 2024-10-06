@@ -58,6 +58,12 @@ class Msp {
             serialize8((a >> 8) & 0xFF);
         }
 
+        void serialize8(const uint8_t a)
+        {
+            addToOutBuf(a);
+            m_payloadChecksum ^= a;
+        }
+
         void prepareToSerialize(
                 const uint8_t type, const uint8_t count, const uint8_t size)
         {
@@ -77,12 +83,6 @@ class Msp {
             payload[payloadSize++] = a;
         }
 
-        void serialize8(const uint8_t a)
-        {
-            addToOutBuf(a);
-            m_payloadChecksum ^= a;
-        }
-
         void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
         {
             prepareToSerialize(type, count, 1);
@@ -93,19 +93,19 @@ class Msp {
             serialize8(src);
         }
 
-        void prepareToSerializeInts(const uint8_t type, const uint8_t count)
+        void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
         {
-            prepareToSerialize(type, count, 4);
+            prepareToSerialize(msgtype, count, 4);
         }
 
-        void prepareToSerializeFloats(const uint8_t type, const uint8_t count)
+        void prepareToSerializeFloats(const uint8_t msgtype, const uint8_t count)
         {
-            prepareToSerialize(type, count, 4);
+            prepareToSerialize(msgtype, count, 4);
         }
 
-        void prepareToSerializeShorts(const uint8_t messageType, const uint8_t count)
+        void prepareToSerializeShorts(const uint8_t msgtype, const uint8_t count)
         {
-            prepareToSerialize(messageType, count, 2);
+            prepareToSerialize(msgtype, count, 2);
         }
 
         void completeSerialize(void)

@@ -17,17 +17,32 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
-import serial
+from serial import Serial
+
+from msp import Parser
+
+class MyParser(Parser):
+
+    def handle_STATE(self, foo):
+
+        print('Got: ', foo)
+
 
 def main():
 
-    port = serial.Serial('/dev/ttyUSB1', 115200)
+    port = Serial('/dev/ttyUSB0', 115200)
+
+    parser = MyParser()
 
     while True:
 
         try:
 
-            print('%d' % ord(port.read(1)))
+            c = port.read(1)
+
+            print(ord(c))
+
+            parser.parse(c)
 
         except KeyboardInterrupt:
 

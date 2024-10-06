@@ -30,10 +30,7 @@ static void onDataRecv(
 {
     (void)info;
 
-    for (auto k=0; k<len; ++k) {
-
-        Serial.write(incomingData[k]);
-    }
+    Serial.write(incomingData, len);
 }
 
 static void reportForever(const char * msg)

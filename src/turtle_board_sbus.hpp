@@ -173,7 +173,7 @@ namespace hf {
             BlinkTask _blinkTask;
 
             // Comms ----------------------------------------------------------
-            static constexpr float COMMS_RATE_HZ = 100;
+            static constexpr float COMMS_RATE_HZ = 10;//100;
             CommsTask _commsTask;
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),

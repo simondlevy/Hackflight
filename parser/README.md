@@ -22,12 +22,7 @@ message-handling methods
 ## Example
 
 The sample [messages.json](https://github.com/simondlevy/Hackflight/blob/master/parser/messages.json)
-file specifies three message types (get normalized R/C channel values; get vehicle attitude in radians;
-set motor values) that were used to generate the MSP code in the
-[firmware](https://github.com/simondlevy/Hackflight/blob/master/src/task/msp/usb.h)
-and
-[Desktop Visualizer](https://github.com/simondlevy/Hackflight/blob/master/viz)
-of the Hackflight project.
+file specifies 
 
 ## Extending
 
