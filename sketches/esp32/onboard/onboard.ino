@@ -71,12 +71,18 @@ void loop()
 {
     delay(100);
 
-    uint8_t bytesReceived = Wire.requestFrom(hf::CommsTask::I2C_DEV_ADDR, 16);
+    uint8_t bytesReceived = Wire.requestFrom(hf::CommsTask::I2C_DEV_ADDR, 46);
 
-    if (bytesReceived > 0) {  
-        uint8_t temp[bytesReceived];
-        Wire.readBytes(temp, bytesReceived);
-        Serial.printf("%s\n", (char *)temp);
+    if (bytesReceived == 46) {  
+
+        uint8_t msg[bytesReceived];
+
+        Wire.readBytes(msg, bytesReceived);
+
+        for (uint8_t k=0; k<46; ++k) {
+            printf("%02X ", msg[k]);
+        }
+        printf("\n");
     }
 
     /*

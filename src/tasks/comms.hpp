@@ -26,7 +26,21 @@
 
 namespace hf {
 
+    static uint8_t msg[100];
+    static uint8_t msgsize;
+
     class CommsTask {
+
+        private:
+
+            static void onRequest() 
+            {
+                Wire1.write(msg, msgsize);
+            }
+
+            Timer _timer;
+
+            Msp _msp;
 
         public:
 
@@ -47,38 +61,18 @@ namespace hf {
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
 
-                    /*
-                       const float vals[10] = {
-                       state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
-                       state.theta, state.dtheta, state.psi, state.dpsi
-                       };
+                    const float vals[10] = {
+                        state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+                        state.theta, state.dtheta, state.psi, state.dpsi
+                    };
 
-                       _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
+                    _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
 
-                       const int16_t vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
+                    memcpy(msg, _msp.payload, _msp.payloadSize);
 
-                       _msp.serializeShorts(Msp::MSG_STATE, vals, 10);
-
-                       Serial3.write(_msp.payload, _msp.payloadSize);
-
-                    //while (_msp.available()) {
-                    //    Serial3.write(_msp.read());
-                    //}
-                     */
+                    msgsize = _msp.payloadSize;
                 }
             }
-
-        private:
-
-            static void onRequest() 
-            {
-                static uint32_t count;
-                Wire1.printf(" Packets: %u", count++);
-            }
-
-            Timer _timer;
-
-            Msp _msp;
     };
 
 }
