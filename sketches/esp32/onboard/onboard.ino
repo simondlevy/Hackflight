@@ -29,8 +29,8 @@
 // Replace with the MAC Address of your ESPNOW receiver
 static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
-// Arbitrary I^C address for receiving data from Teensy
-static const uint8_t I2C_ADDR = 0x55;
+// Arbitrary I^C address for requesting data from Teensy
+static const uint8_t I2C_DEV_ADDR = 0x55;
 
 static void reportForever(const char * msg)
 {
@@ -59,40 +59,28 @@ void startEspNow(void)
     }
 }
 
-void onI2cRequest() 
-{
-    static uint32_t i;
-    Wire.print(i++);
-    Wire.print(" Packets.");
-    Serial.println("onRequest");
-    Serial.println();
-}
-
-
-void onI2cReceive(int len) 
-{
-    Serial.printf("onReceive[%d]:\n", len);
-    while (Wire.available()) {
-        Serial.write(Wire.read());
-    }
-    Serial.println();
-}
-
 void setup()
 {
     Serial.begin(115200);
 
-    // Serial1.begin(115200, SERIAL_8N1, 4, 14);
-
     //startEspNow();
 
-    Wire.onReceive(onI2cReceive);
-    Wire.onRequest(onI2cRequest);
-    Wire.begin(I2C_ADDR);
+    // Act as an I^2C master device
+    Wire.begin();
 }
 
 void loop()
 {
+    delay(100);
+
+    uint8_t bytesReceived = Wire.requestFrom(I2C_DEV_ADDR, 16);
+
+    if (bytesReceived > 0) {  
+        uint8_t temp[bytesReceived];
+        Wire.readBytes(temp, bytesReceived);
+        Serial.printf("%s\n", (char *)temp);
+    }
+
     /*
        static Msp _msp;
 

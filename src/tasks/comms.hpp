@@ -18,11 +18,19 @@
 
 #pragma once
 
+#include <Wire.h>
+
 #include <hackflight.hpp>
 #include <timer.hpp>
 #include <msp.hpp>
 
 namespace hf {
+
+    void onRequest() 
+    {
+        static uint32_t count;
+        Wire1.printf(" Packets: %u", count++);
+    }
 
     class CommsTask {
 
@@ -30,7 +38,10 @@ namespace hf {
 
             void begin()
             {
-                Wire1.begin();
+                Wire1.onRequest(onRequest);
+
+                // Join the I^2C bus as a peripheral device
+                Wire1.begin(I2C_DEV_ADDR);
             }
 
             void run(
@@ -39,12 +50,6 @@ namespace hf {
                     const float freq_hz)
             {
                 if (_timer.isReady(usec_curr, freq_hz)) {
-
-                    Wire1.beginTransmission(I2C_ADDR);
-                    Wire1.printf("Hello World!");
-                    const uint8_t error = Wire.endTransmission(true);
-                    Serial.printf("%d\n", error);
-
 
                     /*
                        const float vals[10] = {
@@ -69,7 +74,7 @@ namespace hf {
 
         private:
 
-            static const uint8_t I2C_ADDR = 0x55;
+            static const uint8_t I2C_DEV_ADDR = 0x55;
 
             Timer _timer;
 
