@@ -25,12 +25,13 @@ class MyParser(Parser):
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        print('Got: ', (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+        print('dx=%+3.3f dy=%+3.3f z=%+3.3f dz=%+3.3f phi=%+3.3f dphi=%+3.3f theta=%+3.3f dtheta=%+3.3f psi=%+3.3f dpsi=%+3.3f ' %
+              (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
 
 def main():
 
-    port = Serial('/dev/ttyUSB0', 115200)
+    port = Serial('/dev/ttyUSB1', 115200)
 
     parser = MyParser()
 

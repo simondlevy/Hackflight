@@ -24,7 +24,6 @@
 #include <Wire.h>
 
 #include <hackflight.hpp>
-#include <msp.hpp>
 #include <tasks/comms.hpp>
 
 // Replace with the MAC Address of your ESPNOW receiver
@@ -61,45 +60,24 @@ void setup()
 {
     Serial.begin(115200);
 
-    //startEspNow();
+    startEspNow();
 
-    // Act as an I^2C master device
+    // Act as an I^2C host device
     Wire.begin();
 }
 
 void loop()
 {
-    delay(10);
-
-    uint8_t bytesReceived = Wire.requestFrom(
+    const auto bytesReceived = Wire.requestFrom(
             hf::CommsTask::I2C_DEV_ADDR, 
             hf::MSP_STATE_MESSAGE_SIZE);
 
     if (bytesReceived == hf::MSP_STATE_MESSAGE_SIZE) {
 
-        uint8_t msg[bytesReceived];
+        uint8_t msg[bytesReceived] = {};
 
         Wire.readBytes(msg, bytesReceived);
 
-        for (uint8_t k=0; k<46; ++k) {
-            printf("%02X ", msg[k]);
-        }
-        printf("\n");
+        esp_now_send(ESP_RECEIVER_ADDRESS, msg, hf::MSP_STATE_MESSAGE_SIZE);
     }
-
-    /*
-       static Msp _msp;
-
-       const float vals[10] = { 99, 100, 101, 102, 103, 104, 105, 106, 107, 108 };
-
-       _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
-
-       esp_now_send(ESP_RECEIVER_ADDRESS, _msp.payload, _msp.payloadSize);
-
-       while (Serial1.available()) {
-
-       const uint8_t s[1] = {Serial1.read()};
-
-       esp_now_send(ESP_RECEIVER_ADDRESS, s, 1);
-       }*/
 }
