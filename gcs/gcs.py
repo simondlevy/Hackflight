@@ -18,22 +18,34 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
 from serial import Serial
+import argparse
 
 from msp import Parser
 
-class MyParser(Parser):
+
+class MyMspParser(Parser):
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        print('dx=%+3.3f dy=%+3.3f z=%+3.3f dz=%+3.3f phi=%+3.3f dphi=%+3.3f theta=%+3.3f dtheta=%+3.3f psi=%+3.3f dpsi=%+3.3f ' %
+        print(('dx=%+3.3f dy=%+3.3f z=%+3.3f dz=%+3.3f phi=%+3.3f ' +
+               'dphi=%+3.3f theta=%+3.3f dtheta=%+3.3f psi=%+3.3f ' +
+               ' dpsi=%+3.3f ') %
               (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
 
 def main():
 
-    port = Serial('/dev/ttyUSB1', 115200)
+    fmtr = argparse.ArgumentDefaultsHelpFormatter
 
-    parser = MyParser()
+    arg_parser = argparse.ArgumentParser(formatter_class=fmtr)
+
+    arg_parser.add_argument('-p', '--port', default='/dev/ttyUSB0')
+
+    args = arg_parser.parse_args()
+
+    port = Serial(args.port, 115200)
+
+    msp_parser = MyMspParser()
 
     while True:
 
@@ -41,10 +53,11 @@ def main():
 
             c = port.read(1)
 
-            parser.parse(c)
+            msp_parser.parse(c)
 
         except KeyboardInterrupt:
 
             break
+
 
 main()
