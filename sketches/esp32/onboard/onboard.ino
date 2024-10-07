@@ -25,12 +25,10 @@
 
 #include <hackflight.hpp>
 #include <msp.hpp>
+#include <tasks/comms.hpp>
 
 // Replace with the MAC Address of your ESPNOW receiver
 static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
-
-// Arbitrary I^C address for requesting data from Teensy
-static const uint8_t I2C_DEV_ADDR = 0x55;
 
 static void reportForever(const char * msg)
 {
@@ -73,7 +71,7 @@ void loop()
 {
     delay(100);
 
-    uint8_t bytesReceived = Wire.requestFrom(I2C_DEV_ADDR, 16);
+    uint8_t bytesReceived = Wire.requestFrom(hf::CommsTask::I2C_DEV_ADDR, 16);
 
     if (bytesReceived > 0) {  
         uint8_t temp[bytesReceived];

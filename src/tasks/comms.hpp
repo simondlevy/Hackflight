@@ -36,6 +36,8 @@ namespace hf {
 
         public:
 
+            static const uint8_t I2C_DEV_ADDR = 0x55;
+
             void begin()
             {
                 Wire1.onRequest(onRequest);
@@ -73,8 +75,6 @@ namespace hf {
             }
 
         private:
-
-            static const uint8_t I2C_DEV_ADDR = 0x55;
 
             Timer _timer;
 
