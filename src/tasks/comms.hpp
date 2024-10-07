@@ -26,12 +26,6 @@
 
 namespace hf {
 
-    void onRequest() 
-    {
-        static uint32_t count;
-        Wire1.printf(" Packets: %u", count++);
-    }
-
     class CommsTask {
 
         public:
@@ -75,6 +69,12 @@ namespace hf {
             }
 
         private:
+
+            static void onRequest() 
+            {
+                static uint32_t count;
+                Wire1.printf(" Packets: %u", count++);
+            }
 
             Timer _timer;
 
