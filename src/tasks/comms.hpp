@@ -26,8 +26,9 @@
 
 namespace hf {
 
-    static uint8_t msg[100];
-    static uint8_t msgsize;
+    static const uint8_t MSP_STATE_MESSAGE_SIZE = 46;
+
+    static uint8_t msg[MSP_STATE_MESSAGE_SIZE];
 
     class CommsTask {
 
@@ -35,7 +36,7 @@ namespace hf {
 
             static void onRequest() 
             {
-                Wire1.write(msg, msgsize);
+                Wire1.write(msg, MSP_STATE_MESSAGE_SIZE);
             }
 
             Timer _timer;
@@ -68,9 +69,7 @@ namespace hf {
 
                     _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
 
-                    memcpy(msg, _msp.payload, _msp.payloadSize);
-
-                    msgsize = _msp.payloadSize;
+                    memcpy(msg, _msp.payload, MSP_STATE_MESSAGE_SIZE);
                 }
             }
     };
