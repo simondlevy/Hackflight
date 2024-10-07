@@ -69,13 +69,13 @@ void setup()
 
 void loop()
 {
-    delay(100);
+    delay(10);
 
     uint8_t bytesReceived = Wire.requestFrom(
             hf::CommsTask::I2C_DEV_ADDR, 
-            hf::CommsTask::MSP_STATE_MESSAGE_SIZE);
+            hf::MSP_STATE_MESSAGE_SIZE);
 
-    if (bytesReceived == hf::MSP_STATE_MESSAGE_SIZE);
+    if (bytesReceived == hf::MSP_STATE_MESSAGE_SIZE) {
 
         uint8_t msg[bytesReceived];
 
