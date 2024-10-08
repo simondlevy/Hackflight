@@ -140,12 +140,19 @@ namespace hf {
                 return true;
             }
 
+            bool isSpringy()
+            {
+                return haveJoystick() == JOYSTICK_RECOGNIZED ?
+                    getJoystickInfo().springy :
+                    true; // keyboard
+            }
+
             float time()
             {
                 return _time;
             }
 
-           bool hitTakeoffButton()
+            bool hitTakeoffButton()
             {
                 return _button_was_hit;
             }
@@ -182,7 +189,7 @@ namespace hf {
             bool _button_was_hit;
 
             uint32_t _tick;
-                
+
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;
             WbDeviceTag _motor3;
@@ -196,31 +203,6 @@ namespace hf {
             // Handles bogus nonzero throttle stick values at startup
             bool ready;
 
-            static bool button_stick(const uint8_t axis)
-            {
-                return wb_joystick_get_pressed_button() == axis;
-            }
-
-            static bool button_stick_0()
-            {
-                return button_stick(0);
-            }
-
-            static bool button_stick_5()
-            {
-                return button_stick(5);
-            }
-
-            static bool button_frsky()
-            {
-                return readJoystickRaw(5) > 0;
-            }
-
-            static bool button_spektrum()
-            {
-                return readJoystickRaw(5) < 0;
-            }
-
             typedef struct {
 
                 int8_t throttle;
@@ -228,24 +210,25 @@ namespace hf {
                 int8_t pitch;
                 int8_t yaw;
 
-                bool (* button_fun)();
+                bool springy;                
 
             } joystick_t;
 
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
                 { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystick_t {-2,  3, -4, 1, button_stick_5} },
+                    joystick_t {-2,  3, -4, 1, true } },
                 { "SHANWAN Android Gamepad",             // PS3
-                    joystick_t {-2,  3, -4, 1, button_stick_5} },
+                    joystick_t {-2,  3, -4, 1, true } },
                 { "Logitech Gamepad F310",
-                    joystick_t {-2,  4, -5, 1, button_stick_5} },
+                    joystick_t {-2,  4, -5, 1, true } },
+
                 { "Logitech Logitech Extreme 3D",
-                    joystick_t {-4,  1, -2, 3, button_stick_0}  },
+                    joystick_t {-4,  1, -2, 3, false}  },
                 { "FrSky FrSky Simulator",
-                    joystick_t { 1,  2,  3, 4, button_frsky } },
+                    joystick_t { 1,  2,  3, 4, false } },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystick_t { 2,  -3,  4, -1, button_spektrum } }
+                    joystick_t { 2,  -3,  4, -1, false } }
             };
 
             static float normalizeJoystickAxis(const int32_t rawval)
@@ -265,6 +248,11 @@ namespace hf {
                 return normalizeJoystickAxis(readJoystickRaw(index));
             }
 
+            joystick_t getJoystickInfo() 
+            {
+                return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
+            }
+
             void readJoystick(
                     float & throttle,
                     float & roll,
@@ -272,9 +260,7 @@ namespace hf {
                     float & yaw,
                     bool & button)
             {
-                auto joyname = wb_joystick_get_model();
-
-                auto axes = JOYSTICK_AXIS_MAP[joyname];
+                auto axes = getJoystickInfo();
 
                 throttle = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
 
@@ -282,7 +268,9 @@ namespace hf {
                 pitch = readJoystickAxis(axes.pitch); 
                 yaw = readJoystickAxis(axes.yaw);
 
-                button = axes.button_fun();
+                button = axes.springy? 
+                    wb_joystick_get_pressed_button() == 5 :
+                    false;
 
                 // Run throttle stick through deadband
                 throttle = fabs(throttle) < 0.05 ? 0 : throttle;
@@ -411,14 +399,14 @@ namespace hf {
                     float & yaw,
                     bool & button)
             {
-                auto joystickStatus = haveJoystick();
-
                 throttle = 0;
                 roll = 0;
                 pitch = 0;
                 yaw = 0;
 
                 button = false;
+
+                auto joystickStatus = haveJoystick();
 
                 if (joystickStatus == JOYSTICK_RECOGNIZED) {
                     readJoystick(throttle, roll, pitch, yaw, button);

@@ -56,6 +56,7 @@ int main(int argc, char ** argv)
 
         hf::demands_t demands = {};
         hf::state_t state = {};
+        bool button = false;
 
         if (!sim.step(state, demands)) {
             break;
@@ -63,17 +64,22 @@ int main(int argc, char ** argv)
 
         demands.yaw *= YAW_PRESCALE;
 
-        z_target += CLIMB_RATE_SCALE * demands.thrust;
-
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-        if (sim.hitTakeoffButton()) {
+        printf("%d\n", sim.isSpringy());
 
-            demands.thrust = z_target;
+        if (sim.isSpringy()) {
 
-            altitudePid.run(DT, state, demands);
+            if (sim.hitTakeoffButton()) {
 
-            demands.thrust += THRUST_BASE;
+                z_target += CLIMB_RATE_SCALE * demands.thrust;
+
+                demands.thrust = z_target;
+
+                altitudePid.run(DT, state, demands);
+
+                demands.thrust += THRUST_BASE;
+            }
         }
 
         hf::PositionPid::run(state, demands);
