@@ -61,8 +61,6 @@ int main(int argc, char ** argv)
             break;
         }
 
-        printf("%d\n", didTakeoff);
-
         demands.yaw *= YAW_PRESCALE;
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
