@@ -73,14 +73,103 @@ namespace hf {
                     return false;
                 }
 
-                bool button = false;
+                demands.thrust = 0;
+                demands.roll = 0;
+                demands.pitch = 0;
+                demands.yaw = 0;
 
-                _readSticks(
-                        demands.thrust,
-                        demands.roll,
-                        demands.pitch,
-                        demands.yaw,
-                        button);
+                auto joystickStatus = haveJoystick();
+
+                if (joystickStatus == JOYSTICK_RECOGNIZED) {
+
+                    auto axes = getJoystickInfo();
+
+                    demands.thrust = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+
+                    // Springy throttle stick; keep in interval [-1,+1]
+                    if (axes.springy) {
+
+                        static bool button_was_hit;
+
+                        if (wb_joystick_get_pressed_button() == 5) {
+                            button_was_hit = true;
+                        }
+
+                        didTakeoff = button_was_hit;
+
+                        // Run throttle stick through deadband
+                        demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
+                    }
+
+                    else {
+
+                        static float throttle_prev;
+                        static bool throttle_was_moved;
+
+                        // Handle bogus throttle values on startup
+                        if (throttle_prev != demands.thrust) {
+                            throttle_was_moved = true;
+                        }
+
+                        didTakeoff = throttle_was_moved;
+
+                        throttle_prev = demands.thrust;
+                    }
+
+                    demands.roll = readJoystickAxis(axes.roll);
+                    demands.pitch = readJoystickAxis(axes.pitch); 
+                    demands.yaw = readJoystickAxis(axes.yaw);
+                }
+
+                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+                    reportJoystick();
+                }
+
+                else { // keyboard
+
+                    static bool spacebar_was_hit;
+
+                    switch (wb_keyboard_get_key()) {
+
+                        case WB_KEYBOARD_UP:
+                            demands.pitch = +1.0;
+                            break;
+
+                        case WB_KEYBOARD_DOWN:
+                            demands.pitch = -1.0;
+                            break;
+
+                        case WB_KEYBOARD_RIGHT:
+                            demands.roll = +1.0;
+                            break;
+
+                        case WB_KEYBOARD_LEFT:
+                            demands.roll = -1.0;
+                            break;
+
+                        case 'Q':
+                            demands.yaw = -1.0;
+                            break;
+
+                        case 'E':
+                            demands.yaw = +1.0;
+                            break;
+
+                        case 'W':
+                            demands.thrust = +1.0;
+                            break;
+
+                        case 'S':
+                            demands.thrust = -1.0;
+                            break;
+
+                        case 32:
+                            spacebar_was_hit = true;
+                            break;
+                    }
+
+                    didTakeoff = spacebar_was_hit;
+                }
 
                 // Track previous time and position for calculating motion
                 static float tprev;
@@ -131,16 +220,6 @@ namespace hf {
                 yprev = y;
                 zprev = state.z;
 
-                static bool _did_takeoff;
-
-                if (button) {
-                    _did_takeoff = true;
-                }
-
-                _time = _did_takeoff ? _tick++ * _timestep / 1000 : 0;
-
-                didTakeoff = _did_takeoff;
-
                 return true;
             }
 
@@ -184,8 +263,6 @@ namespace hf {
             double _timestep;
 
             float  _time;
-
-            bool _button_was_hit;
 
             uint32_t _tick;
 
@@ -251,102 +328,6 @@ namespace hf {
             joystick_t getJoystickInfo() 
             {
                 return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-            }
-
-            void readJoystick(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw,
-                    bool & button)
-            {
-                button = false;
-
-                // Handles bogus nonzero throttle stick values at startup
-                static bool _ready;
-                static float _throttle_prev;
-
-                auto axes = getJoystickInfo();
-
-                throttle = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                // Handle bogus throttle values on startup
-                if (_throttle_prev != throttle) {
-                    _ready = true;
-                }
-
-                if (!axes.springy) {
-                    button = _ready;
-                }
-
-                _throttle_prev = throttle;
-
-                roll = readJoystickAxis(axes.roll);
-                pitch = readJoystickAxis(axes.pitch); 
-                yaw = readJoystickAxis(axes.yaw);
-
-                if (_ready) {
-
-                    // Springy throttle stick; keep in interval [-1,+1]
-                    if (axes.springy) {
-
-                        button = wb_joystick_get_pressed_button() == 5;
-
-                        // Run throttle stick through deadband
-                        throttle = fabs(throttle) < 0.05 ? 0 : throttle;
-                    }
-                }
-
-                else {
-                    throttle = 0;
-                }
-            }
-
-            static void readKeyboard(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw,
-                    bool & button)
-            {
-                switch (wb_keyboard_get_key()) {
-
-                    case WB_KEYBOARD_UP:
-                        pitch = +1.0;
-                        break;
-
-                    case WB_KEYBOARD_DOWN:
-                        pitch = -1.0;
-                        break;
-
-                    case WB_KEYBOARD_RIGHT:
-                        roll = +1.0;
-                        break;
-
-                    case WB_KEYBOARD_LEFT:
-                        roll = -1.0;
-                        break;
-
-                    case 'Q':
-                        yaw = -1.0;
-                        break;
-
-                    case 'E':
-                        yaw = +1.0;
-                        break;
-
-                    case 'W':
-                        throttle = +1.0;
-                        break;
-
-                    case 'S':
-                        throttle = -1.0;
-                        break;
-
-                    case 32: // spacebar
-                        button = true;
-                        break;
-                }
             }
 
             joystickStatus_e haveJoystick(void)
@@ -415,29 +396,8 @@ namespace hf {
                     float & throttle,
                     float & roll,
                     float & pitch,
-                    float & yaw,
-                    bool & button)
+                    float & yaw)
             {
-                throttle = 0;
-                roll = 0;
-                pitch = 0;
-                yaw = 0;
-
-                button = false;
-
-                auto joystickStatus = haveJoystick();
-
-                if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                    readJoystick(throttle, roll, pitch, yaw, button);
-                }
-
-                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                    reportJoystick();
-                }
-
-                else {
-                    readKeyboard(throttle, roll, pitch, yaw, button);
-                }
             }
     };
 

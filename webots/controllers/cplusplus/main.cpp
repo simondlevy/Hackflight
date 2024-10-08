@@ -50,11 +50,12 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid2 altitudePid2 = {};
 
+    bool didTakeoff = false;
+
     while (true) {
 
         hf::demands_t demands = {};
         hf::state_t state = {};
-        bool didTakeoff = false;
 
         if (!sim.step(state, demands, didTakeoff)) {
             break;
