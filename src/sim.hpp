@@ -251,6 +251,52 @@ namespace hf {
                 return sensor;
             }
 
+            void getDemandsFromKeyboard(demands_t & demands, bool & requestedTakeoff)
+            {
+                static bool spacebar_was_hit;
+
+                switch (wb_keyboard_get_key()) {
+
+                    case WB_KEYBOARD_UP:
+                        demands.pitch = +1.0;
+                        break;
+
+                    case WB_KEYBOARD_DOWN:
+                        demands.pitch = -1.0;
+                        break;
+
+                    case WB_KEYBOARD_RIGHT:
+                        demands.roll = +1.0;
+                        break;
+
+                    case WB_KEYBOARD_LEFT:
+                        demands.roll = -1.0;
+                        break;
+
+                    case 'Q':
+                        demands.yaw = -1.0;
+                        break;
+
+                    case 'E':
+                        demands.yaw = +1.0;
+                        break;
+
+                    case 'W':
+                        demands.thrust = +1.0;
+                        break;
+
+                    case 'S':
+                        demands.thrust = -1.0;
+                        break;
+
+                    case 32:
+                        spacebar_was_hit = true;
+                        break;
+                }
+
+                requestedTakeoff = spacebar_was_hit;
+            }
+
             void getDemands(demands_t & demands, bool & requestedTakeoff)
             {
                 demands.thrust = 0;
@@ -305,50 +351,10 @@ namespace hf {
                     reportJoystick();
                 }
 
-                else { // keyboard
+                else { 
 
-                    static bool spacebar_was_hit;
+                    getDemandsFromKeyboard(demands, requestedTakeoff);
 
-                    switch (wb_keyboard_get_key()) {
-
-                        case WB_KEYBOARD_UP:
-                            demands.pitch = +1.0;
-                            break;
-
-                        case WB_KEYBOARD_DOWN:
-                            demands.pitch = -1.0;
-                            break;
-
-                        case WB_KEYBOARD_RIGHT:
-                            demands.roll = +1.0;
-                            break;
-
-                        case WB_KEYBOARD_LEFT:
-                            demands.roll = -1.0;
-                            break;
-
-                        case 'Q':
-                            demands.yaw = -1.0;
-                            break;
-
-                        case 'E':
-                            demands.yaw = +1.0;
-                            break;
-
-                        case 'W':
-                            demands.thrust = +1.0;
-                            break;
-
-                        case 'S':
-                            demands.thrust = -1.0;
-                            break;
-
-                        case 32:
-                            spacebar_was_hit = true;
-                            break;
-                    }
-
-                    requestedTakeoff = spacebar_was_hit;
                 }
             }
 
