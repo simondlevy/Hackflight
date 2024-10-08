@@ -67,8 +67,9 @@ int main(int argc, char ** argv)
 
         hf::demands_t demands = {};
         hf::state_t state = {};
+        bool requestedTakeoff = false;
 
-        if (!_sim.step(state, demands)) {
+        if (!_sim.step(state, demands, requestedTakeoff)) {
             break;
         }
 
@@ -77,7 +78,7 @@ int main(int argc, char ** argv)
         stream_pitch = demands.pitch;
         stream_yaw = demands.yaw;
 
-        stream_requestedTakeoff = _sim.hitTakeoffButton();
+        stream_requestedTakeoff = requestedTakeoff;
 
         stream_completedTakeoff = _sim.time() > 3;
 

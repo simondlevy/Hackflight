@@ -96,12 +96,13 @@ int main(int argc, char ** argv)
 
         hf::demands_t demands = {};
         hf::state_t state = {};
+        bool requestedTakeoff = false;
 
-        if (!sim.step(state, demands)) {
+        if (!sim.step(state, demands, requestedTakeoff)) {
             break;
         }
 
-        const auto time = sim.hitTakeoffButton() ? sim.time() : 0;
+        const auto time = requestedTakeoff ? sim.time() : 0;
 
         const auto thrustFromSnn = runDifferenceSnn(
                     climbRateSnn,
@@ -136,7 +137,7 @@ int main(int argc, char ** argv)
         demands.thrust =
             time > TAKEOFF_TIME ? 
             thrustFromSnn :
-            sim.hitTakeoffButton() ? 
+            requestedTakeoff ? 
             THRUST_TAKEOFF :
             0;
 

@@ -67,7 +67,7 @@ namespace hf {
                 _motor4 = _makeMotor("motor4");
             }
 
-            bool step(state_t & state, demands_t & demands)
+            bool step(state_t & state, demands_t & demands, bool & requestedTakeoff)
             {
                 if (wb_robot_step((int)_timestep) == -1) {
                     return false;
@@ -137,17 +137,14 @@ namespace hf {
 
                 _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
 
+                requestedTakeoff = _button_was_hit;
+
                 return true;
             }
 
             float time()
             {
                 return _time;
-            }
-
-           bool hitTakeoffButton()
-            {
-                return _button_was_hit;
             }
 
             void setMotors(const quad_motors_t & motors)
