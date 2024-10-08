@@ -308,7 +308,6 @@ namespace hf {
                 // do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-
             }
 
             void runMotors() 

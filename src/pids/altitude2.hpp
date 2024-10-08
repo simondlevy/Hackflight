@@ -28,13 +28,29 @@ namespace hf {
             void run(
                     const float dt, const state_t & state, demands_t & demands)
             {
-                printf("%+3.3f\n", demands.thrust);
+                if (fabs(demands.thrust) < DEADBAND) {
 
-                demands.thrust = run_pi(dt, KP_Z, KI_Z,
-                        demands.thrust, state.z, _z_integral);
+                    if (!_in_deadband) {
+                        _z_target = state.z;
+                    }
 
-                demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
+                    _in_deadband = true;
+
+                    demands.thrust = run_pi(dt, KP_Z, KI_Z,
+                            _z_target, state.z, _z_integral);
+
+                    demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
                         demands.thrust, state.dz, _dz_integral);
+                }
+
+                else {
+
+                    demands.thrust = (demands.thrust + 1) / 2;
+
+                    demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
+                        demands.thrust, state.dz, _dz_integral);
+
+                }
             }
 
         private:
@@ -49,6 +65,7 @@ namespace hf {
 
             static constexpr float DEADBAND = 0.2;
 
+            bool  _in_deadband;
             float _z_target;
             float _z_integral;
             float _dz_integral;

@@ -200,9 +200,6 @@ namespace hf {
             WbDeviceTag _gyro;
             WbDeviceTag _imu;
 
-            // Handles bogus nonzero throttle stick values at startup
-            bool ready;
-
             typedef struct {
 
                 int8_t throttle;
@@ -216,6 +213,7 @@ namespace hf {
 
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
+                // Springy throttle
                 { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
                     joystick_t {-2,  3, -4, 1, true } },
                 { "SHANWAN Android Gamepad",             // PS3
@@ -223,6 +221,7 @@ namespace hf {
                 { "Logitech Gamepad F310",
                     joystick_t {-2,  4, -5, 1, true } },
 
+                // Classic throttle
                 { "Logitech Logitech Extreme 3D",
                     joystick_t {-4,  1, -2, 3, false}  },
                 { "OpenTX FrSky Taranis Joystick",  // USB cable
@@ -262,27 +261,46 @@ namespace hf {
                     float & yaw,
                     bool & button)
             {
+                // Handles bogus nonzero throttle stick values at startup
+                static bool _ready;
+                static float _throttle_prev;
+
                 auto axes = getJoystickInfo();
 
                 throttle = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+
+                // Handle bogus throttle values on startup
+                if (_throttle_prev != throttle) {
+                    _ready = true;
+                }
+
+                _throttle_prev = throttle;
 
                 roll = readJoystickAxis(axes.roll);
                 pitch = readJoystickAxis(axes.pitch); 
                 yaw = readJoystickAxis(axes.yaw);
 
-                button = axes.springy? 
-                    wb_joystick_get_pressed_button() == 5 :
-                    false;
+                button = false;
 
-                // Run throttle stick through deadband
-                throttle = fabs(throttle) < 0.05 ? 0 : throttle;
+                if (_ready) {
 
-                // Handle bogus large throttle values on startup
-                if (!ready && throttle > -1.0) {
-                    ready = true;
+                    // Springy throttle stick; keep in interval [-1,+1]
+                    if (axes.springy) {
+
+                        button = wb_joystick_get_pressed_button() == 5;
+
+                        // Run throttle stick through deadband
+                        throttle = fabs(throttle) < 0.05 ? 0 : throttle;
+                    }
+
+                    // Tradtitional throttle stick; renormalize to interval [0,1]
+                    else {
+                        //throttle = (throttle + 1) / 2;
+                    }
                 }
-
-                throttle = ready ? throttle : 0;
+                else {
+                    throttle = 0;
+                }
             }
 
             static void readKeyboard(

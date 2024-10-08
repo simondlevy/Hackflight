@@ -18,7 +18,6 @@
 #include <sim.hpp>
 
 #include <pids/altitude1.hpp>
-#include <pids/altitude2.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -48,8 +47,6 @@ int main(int argc, char ** argv)
     hf::AltitudePid1 altitudePid1 = {};
     altitudePid1.init();
 
-    hf::AltitudePid2 altitudePid2 = {};
-
     while (true) {
 
         hf::demands_t demands = {};
@@ -75,7 +72,8 @@ int main(int argc, char ** argv)
         }
 
         else {
-            altitudePid2.run(DT, state, demands);
+
+            demands.thrust += THRUST_BASE;
         }
 
         hf::PositionPid::run(state, demands);
