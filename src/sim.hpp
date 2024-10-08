@@ -77,6 +77,8 @@ namespace hf {
 
                 getState(state);
 
+                _time = requestedTakeoff ? _tick++ * _timestep / 1000 : 0;
+
                return true;
             }
 
