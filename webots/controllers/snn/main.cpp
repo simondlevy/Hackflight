@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
 
     hf::Simulator sim = {};
 
-    sim.init();
+    sim.init(false);
 
     SNN * climbRateSnn = NULL;
 

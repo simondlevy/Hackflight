@@ -43,7 +43,7 @@ namespace hf {
 
         public:
 
-            void init(void)
+            void init(const bool tryJoystick=true)
             {
                 wb_robot_init();
 
@@ -58,7 +58,10 @@ namespace hf {
                 _camera = _makeSensor("camera",
                         _timestep, wb_camera_enable);
 
-                wb_joystick_enable(_timestep);
+                if (tryJoystick) {
+                    wb_joystick_enable(_timestep);
+                }
+
                 wb_keyboard_enable(_timestep);
 
                 _motor1 = _makeMotor("motor1");
