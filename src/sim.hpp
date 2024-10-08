@@ -73,154 +73,11 @@ namespace hf {
                     return false;
                 }
 
-                demands.thrust = 0;
-                demands.roll = 0;
-                demands.pitch = 0;
-                demands.yaw = 0;
+                getDemands(demands, didTakeoff);
 
-                auto joystickStatus = haveJoystick();
+                getState(state);
 
-                if (joystickStatus == JOYSTICK_RECOGNIZED) {
-
-                    auto axes = getJoystickInfo();
-
-                    demands.thrust = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                    // Springy throttle stick; keep in interval [-1,+1]
-                    if (axes.springy) {
-
-                        static bool button_was_hit;
-
-                        if (wb_joystick_get_pressed_button() == 5) {
-                            button_was_hit = true;
-                        }
-
-                        didTakeoff = button_was_hit;
-
-                        // Run throttle stick through deadband
-                        demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
-                    }
-
-                    else {
-
-                        static float throttle_prev;
-                        static bool throttle_was_moved;
-
-                        // Handle bogus throttle values on startup
-                        if (throttle_prev != demands.thrust) {
-                            throttle_was_moved = true;
-                        }
-
-                        didTakeoff = throttle_was_moved;
-
-                        throttle_prev = demands.thrust;
-                    }
-
-                    demands.roll = readJoystickAxis(axes.roll);
-                    demands.pitch = readJoystickAxis(axes.pitch); 
-                    demands.yaw = readJoystickAxis(axes.yaw);
-                }
-
-                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                    reportJoystick();
-                }
-
-                else { // keyboard
-
-                    static bool spacebar_was_hit;
-
-                    switch (wb_keyboard_get_key()) {
-
-                        case WB_KEYBOARD_UP:
-                            demands.pitch = +1.0;
-                            break;
-
-                        case WB_KEYBOARD_DOWN:
-                            demands.pitch = -1.0;
-                            break;
-
-                        case WB_KEYBOARD_RIGHT:
-                            demands.roll = +1.0;
-                            break;
-
-                        case WB_KEYBOARD_LEFT:
-                            demands.roll = -1.0;
-                            break;
-
-                        case 'Q':
-                            demands.yaw = -1.0;
-                            break;
-
-                        case 'E':
-                            demands.yaw = +1.0;
-                            break;
-
-                        case 'W':
-                            demands.thrust = +1.0;
-                            break;
-
-                        case 'S':
-                            demands.thrust = -1.0;
-                            break;
-
-                        case 32:
-                            spacebar_was_hit = true;
-                            break;
-                    }
-
-                    didTakeoff = spacebar_was_hit;
-                }
-
-                // Track previous time and position for calculating motion
-                static float tprev;
-                static float xprev;
-                static float yprev;
-                static float zprev;
-
-                const auto tcurr = wb_robot_get_time();
-                const auto dt =  tcurr - tprev;
-                tprev = tcurr;
-
-                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
-
-                state.z = wb_gps_get_values(_gps)[2];
-
-                state.phi = Utils::RAD2DEG*(
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
-
-                state.dphi = Utils::RAD2DEG*(
-                        wb_gyro_get_values(_gyro)[0]);
-
-                state.theta = Utils::RAD2DEG*(
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
-
-                state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
-
-                state.psi  =  -Utils::RAD2DEG*(psi); 
-
-                state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
-
-                // Use temporal first difference to get world-cooredinate
-                // velocities
-                auto x = wb_gps_get_values(_gps)[0];
-                auto y = wb_gps_get_values(_gps)[1];
-                auto dx = (x - xprev) / dt;
-                auto dy = (y - yprev) / dt;
-                state.dz = (state.z - zprev) / dt;
-
-                // Rotate X,Y world velocities into body frame to simulate
-                // optical-flow sensor
-                auto cospsi = cos(psi);
-                auto sinpsi = sin(psi);
-                state.dx = dx * cospsi + dy * sinpsi;
-                state.dy = dx * sinpsi - dy * cospsi;
-
-                // Save past time and position for next time step
-                xprev = x;
-                yprev = y;
-                zprev = state.z;
-
-                return true;
+               return true;
             }
 
             bool isSpringy()
@@ -392,13 +249,158 @@ namespace hf {
                 return sensor;
             }
 
-            void _readSticks(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw)
+            void getDemands(demands_t & demands, bool & didTakeoff)
             {
+                demands.thrust = 0;
+                demands.roll = 0;
+                demands.pitch = 0;
+                demands.yaw = 0;
+
+                auto joystickStatus = haveJoystick();
+
+                if (joystickStatus == JOYSTICK_RECOGNIZED) {
+
+                    auto axes = getJoystickInfo();
+
+                    demands.thrust = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+
+                    // Springy throttle stick; keep in interval [-1,+1]
+                    if (axes.springy) {
+
+                        static bool button_was_hit;
+
+                        if (wb_joystick_get_pressed_button() == 5) {
+                            button_was_hit = true;
+                        }
+
+                        didTakeoff = button_was_hit;
+
+                        // Run throttle stick through deadband
+                        demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
+                    }
+
+                    else {
+
+                        static float throttle_prev;
+                        static bool throttle_was_moved;
+
+                        // Handle bogus throttle values on startup
+                        if (throttle_prev != demands.thrust) {
+                            throttle_was_moved = true;
+                        }
+
+                        didTakeoff = throttle_was_moved;
+
+                        throttle_prev = demands.thrust;
+                    }
+
+                    demands.roll = readJoystickAxis(axes.roll);
+                    demands.pitch = readJoystickAxis(axes.pitch); 
+                    demands.yaw = readJoystickAxis(axes.yaw);
+                }
+
+                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+                    reportJoystick();
+                }
+
+                else { // keyboard
+
+                    static bool spacebar_was_hit;
+
+                    switch (wb_keyboard_get_key()) {
+
+                        case WB_KEYBOARD_UP:
+                            demands.pitch = +1.0;
+                            break;
+
+                        case WB_KEYBOARD_DOWN:
+                            demands.pitch = -1.0;
+                            break;
+
+                        case WB_KEYBOARD_RIGHT:
+                            demands.roll = +1.0;
+                            break;
+
+                        case WB_KEYBOARD_LEFT:
+                            demands.roll = -1.0;
+                            break;
+
+                        case 'Q':
+                            demands.yaw = -1.0;
+                            break;
+
+                        case 'E':
+                            demands.yaw = +1.0;
+                            break;
+
+                        case 'W':
+                            demands.thrust = +1.0;
+                            break;
+
+                        case 'S':
+                            demands.thrust = -1.0;
+                            break;
+
+                        case 32:
+                            spacebar_was_hit = true;
+                            break;
+                    }
+
+                    didTakeoff = spacebar_was_hit;
+                }
             }
+
+            void getState(state_t & state)
+            {
+                // Track previous time and position for calculating motion
+                static float tprev;
+                static float xprev;
+                static float yprev;
+                static float zprev;
+
+                const auto tcurr = wb_robot_get_time();
+                const auto dt =  tcurr - tprev;
+                tprev = tcurr;
+
+                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
+
+                state.z = wb_gps_get_values(_gps)[2];
+
+                state.phi = Utils::RAD2DEG*(
+                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
+
+                state.dphi = Utils::RAD2DEG*(
+                        wb_gyro_get_values(_gyro)[0]);
+
+                state.theta = Utils::RAD2DEG*(
+                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
+
+                state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
+
+                state.psi  =  -Utils::RAD2DEG*(psi); 
+
+                state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
+
+                // Use temporal first difference to get world-cooredinate
+                // velocities
+                auto x = wb_gps_get_values(_gps)[0];
+                auto y = wb_gps_get_values(_gps)[1];
+                auto dx = (x - xprev) / dt;
+                auto dy = (y - yprev) / dt;
+                state.dz = (state.z - zprev) / dt;
+
+                // Rotate X,Y world velocities into body frame to simulate
+                // optical-flow sensor
+                auto cospsi = cos(psi);
+                auto sinpsi = sin(psi);
+                state.dx = dx * cospsi + dy * sinpsi;
+                state.dy = dx * sinpsi - dy * cospsi;
+
+                // Save past time and position for next time step
+                xprev = x;
+                yprev = y;
+                zprev = state.z;
+             }
     };
 
 }
