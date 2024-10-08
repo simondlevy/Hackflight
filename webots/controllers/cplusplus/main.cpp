@@ -18,7 +18,6 @@
 #include <sim.hpp>
 
 #include <pids/altitude.hpp>
-#include <pids/altitude1.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -36,6 +35,10 @@ static const float THROTTLE_DEADBAND = 0.2;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
+// For springy-throttle gamepads / keyboard
+static const float INITIAL_ALTITUDE_TARGET = 0.2;
+static const float CLIMB_RATE_SCALE = 0.01;
+
 int main(int argc, char ** argv)
 {
     hf::Simulator sim = {};
@@ -47,14 +50,13 @@ int main(int argc, char ** argv)
 
     hf::YawRatePid yawRatePid = {};
 
-    hf::AltitudePid1 altitudePid1 = {};
-    altitudePid1.init();
-
     hf::AltitudePid altitudePid = {};
 
     bool didTakeoff = false;
 
-    float z_target = 0;
+    // This initial value will be ignored for traditional (non-springy)
+    // throttle
+    float z_target = INITIAL_ALTITUDE_TARGET;
 
     while (true) {
 
@@ -73,7 +75,11 @@ int main(int argc, char ** argv)
 
             if (didTakeoff) {
 
-                altitudePid1.run(DT, state, demands);
+                z_target += CLIMB_RATE_SCALE * demands.thrust;
+
+                demands.thrust = z_target;
+
+                altitudePid.run(DT, state, demands);
 
                 demands.thrust += THRUST_BASE;
             }
