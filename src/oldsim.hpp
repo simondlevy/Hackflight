@@ -32,7 +32,6 @@
 #include <webots/gps.h>
 #include <webots/gyro.h>
 #include <webots/inertial_unit.h>
-#include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
@@ -58,7 +57,6 @@ namespace hf {
                 _camera = _makeSensor("camera",
                         _timestep, wb_camera_enable);
 
-                wb_joystick_enable(_timestep);
                 wb_keyboard_enable(_timestep);
 
                 _motor1 = _makeMotor("motor1");
@@ -78,13 +76,6 @@ namespace hf {
                 getState(state);
 
                 return true;
-            }
-
-            bool isSpringy()
-            {
-                return haveJoystick() == JOYSTICK_RECOGNIZED ?
-                    true /*getJoystickInfo().springy*/ :
-                    true; // keyboard
             }
 
             float time()
@@ -109,14 +100,6 @@ namespace hf {
 
         private:
 
-            typedef enum {
-
-                JOYSTICK_NONE,
-                JOYSTICK_UNRECOGNIZED,
-                JOYSTICK_RECOGNIZED
-
-            } joystickStatus_e;
-
             double _timestep;
 
             float  _time;
@@ -134,33 +117,6 @@ namespace hf {
             WbDeviceTag _gps;
             WbDeviceTag _gyro;
             WbDeviceTag _imu;
-
-            typedef struct {
-
-                int8_t throttle;
-                int8_t roll;
-                int8_t pitch;
-                int8_t yaw;
-
-                bool (* button_fun)();
-
-            } joystick_t;
-
-            std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-                { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystick_t {-2,  3, -4, 1, button_stick_5} },
-                { "SHANWAN Android Gamepad",             // PS3
-                    joystick_t {-2,  3, -4, 1, button_stick_5} },
-                { "Logitech Gamepad F310",
-                    joystick_t {-2,  4, -5, 1, button_stick_5} },
-                { "Logitech Logitech Extreme 3D",
-                    joystick_t {-4,  1, -2, 3, button_stick_0}  },
-                { "FrSky FrSky Simulator",
-                    joystick_t { 1,  2,  3, 4, button_frsky } },
-                { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystick_t { 2,  -3,  4, -1, button_spektrum } }
-            };
 
             // Handles bogus nonzero throttle stick values at startup
             bool ready;
@@ -276,127 +232,7 @@ namespace hf {
                 zprev = state.z;
             }
 
-            static bool button_stick(const uint8_t axis)
-            {
-                return wb_joystick_get_pressed_button() == axis;
-            }
-
-            static bool button_stick_0()
-            {
-                return button_stick(0);
-            }
-
-            static bool button_stick_5()
-            {
-                return button_stick(5);
-            }
-
-            static bool button_frsky()
-            {
-                return readJoystickRaw(5) > 0;
-            }
-
-            static bool button_spektrum()
-            {
-                return readJoystickRaw(5) < 0;
-            }
-
-            static float normalizeJoystickAxis(const int32_t rawval)
-            {
-                return 2.0f * rawval / UINT16_MAX; 
-            }
-
-            static int32_t readJoystickRaw(const int8_t index)
-            {
-                const auto axis = abs(index) - 1;
-                const auto sign = index < 0 ? -1 : +1;
-                return sign * wb_joystick_get_axis_value(axis);
-            }
-
-            static float readJoystickAxis(const int8_t index)
-            {
-                return normalizeJoystickAxis(readJoystickRaw(index));
-            }
-
-            void readJoystick(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw,
-                    bool & button)
-            {
-                auto joyname = wb_joystick_get_model();
-
-                auto axes = JOYSTICK_AXIS_MAP[joyname];
-
-                throttle = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                roll = readJoystickAxis(axes.roll);
-                pitch = readJoystickAxis(axes.pitch); 
-                yaw = readJoystickAxis(axes.yaw);
-
-                button = axes.button_fun();
-
-                // Run throttle stick through deadband
-                throttle = fabs(throttle) < 0.05 ? 0 : throttle;
-
-                // Handle bogus large throttle values on startup
-                if (!ready && throttle > -1.0) {
-                    ready = true;
-                }
-
-                throttle = ready ? throttle : 0;
-            }
-
-            joystick_t getJoystickInfo() 
-            {
-                return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-            }
-
-            joystickStatus_e haveJoystick(void)
-            {
-                auto status = JOYSTICK_RECOGNIZED;
-
-                auto joyname = wb_joystick_get_model();
-
-                // No joystick
-                if (joyname == NULL) {
-
-                    static bool _didWarn;
-
-                    if (!_didWarn) {
-                        puts("Using keyboard instead:\n");
-                        puts("- Use W and S to go up and down\n");
-                        puts("- Use arrow keys to move in the horizontal plane\n");
-                        puts("- Use Q and E to rotate around yaw\n");
-                    }
-
-                    _didWarn = true;
-
-                    status = JOYSTICK_NONE;
-                }
-
-                // Joystick unrecognized
-                else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
-
-                    status = JOYSTICK_UNRECOGNIZED;
-                }
-
-                return status;
-            }
-
-            static void reportJoystick(void)
-            {
-                printf("Unrecognized joystick '%s' with axes ",
-                        wb_joystick_get_model()); 
-
-                for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
-
-                    printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
-                }
-            }
-
-            static WbDeviceTag _makeMotor(const char * name)
+           static WbDeviceTag _makeMotor(const char * name)
             {
                 auto motor = wb_robot_get_device(name);
 
