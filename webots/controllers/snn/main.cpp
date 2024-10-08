@@ -94,15 +94,15 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        hf::demands_t demands = {};
-        hf::state_t state = {};
-        bool requestedTakeoff = false;
-
-        if (!sim.step(state, demands, requestedTakeoff)) {
+        if (!sim.step()) {
             break;
         }
 
-        const auto time = requestedTakeoff ? sim.time() : 0;
+        hf::state_t state = {};
+        sim.getState(state);
+
+        hf::demands_t demands = {};
+        sim.getDemandsFromKeyboard(demands);
 
         const auto thrustFromSnn = runDifferenceSnn(
                     climbRateSnn,
@@ -110,13 +110,6 @@ int main(int argc, char ** argv)
                     state.dz,
                     CLIMBRATE_SNN_SCALE,
                     CLIMBRATE_SNN_OFFSET) ;
-
-        const auto airborne = time > TAKEOFF_TIME;
-
-        if (airborne) {
-            printf("%f,%f,%f,%f\n",
-                    time, demands.thrust, state.dz, thrustFromSnn);
-        }
 
         demands.yaw = runDifferenceSnn(
                 yawRateSnn,
@@ -135,9 +128,9 @@ int main(int argc, char ** argv)
 
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
-            time > TAKEOFF_TIME ? 
+            sim.time() > TAKEOFF_TIME ? 
             thrustFromSnn :
-            requestedTakeoff ? 
+            sim.requestedTakeoff() ? 
             THRUST_TAKEOFF :
             0;
 

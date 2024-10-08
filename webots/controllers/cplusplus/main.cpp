@@ -60,12 +60,15 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        hf::demands_t demands = {};
-        hf::state_t state = {};
-
-        if (!sim.step(state, demands, requestedTakeoff)) {
+        if (!sim.step()) {
             break;
         }
+
+        hf::demands_t demands = {};
+        sim.getDemands(demands);
+
+        hf::state_t state = {};
+        sim.getState(state);
 
         demands.yaw *= YAW_PRESCALE;
 
@@ -74,7 +77,7 @@ int main(int argc, char ** argv)
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
         // raising the non-self-centering throttle stick
-        if (requestedTakeoff) {
+        if (sim.requestedTakeoff()) {
 
             // "Springy" (self-centering) throttle or keyboard: accumulate 
             // altitude target based on stick deflection, and attempt

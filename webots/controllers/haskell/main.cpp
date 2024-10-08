@@ -65,20 +65,23 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        hf::demands_t demands = {};
-        hf::state_t state = {};
-        bool requestedTakeoff = false;
 
-        if (!_sim.step(state, demands, requestedTakeoff)) {
+        if (!_sim.step()) {
             break;
         }
+
+        hf::state_t state = {};
+        _sim.getState(state);
+
+        hf::demands_t demands = {};
+        _sim.getDemandsFromKeyboard(demands);
 
         stream_throttle = demands.thrust;
         stream_roll = demands.roll;
         stream_pitch = demands.pitch;
         stream_yaw = demands.yaw;
 
-        stream_requestedTakeoff = requestedTakeoff;
+        stream_requestedTakeoff = _sim.requestedTakeoff();
 
         stream_completedTakeoff = _sim.time() > 3;
 
