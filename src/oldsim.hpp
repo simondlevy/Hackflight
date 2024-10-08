@@ -176,7 +176,44 @@ namespace hf {
 
                 button = false;
 
-                readKeyboard(demands.thrust, demands.roll, demands.pitch, demands.yaw, button);
+                switch (wb_keyboard_get_key()) {
+
+                    case WB_KEYBOARD_UP:
+                        demands.pitch = +1.0;
+                        break;
+
+                    case WB_KEYBOARD_DOWN:
+                        demands.pitch = -1.0;
+                        break;
+
+                    case WB_KEYBOARD_RIGHT:
+                        demands.roll = +1.0;
+                        break;
+
+                    case WB_KEYBOARD_LEFT:
+                        demands.roll = -1.0;
+                        break;
+
+                    case 'Q':
+                        demands.yaw = -1.0;
+                        break;
+
+                    case 'E':
+                        demands.yaw = +1.0;
+                        break;
+
+                    case 'W':
+                        demands.thrust = +1.0;
+                        break;
+
+                    case 'S':
+                        demands.thrust = -1.0;
+                        break;
+
+                    case 32: // spacebar
+                        button = true;
+                        break;
+                }
 
                 if (button) {
                     _button_was_hit = true;
@@ -309,53 +346,6 @@ namespace hf {
                 }
 
                 throttle = ready ? throttle : 0;
-            }
-
-            static void readKeyboard(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw,
-                    bool & button)
-            {
-                switch (wb_keyboard_get_key()) {
-
-                    case WB_KEYBOARD_UP:
-                        pitch = +1.0;
-                        break;
-
-                    case WB_KEYBOARD_DOWN:
-                        pitch = -1.0;
-                        break;
-
-                    case WB_KEYBOARD_RIGHT:
-                        roll = +1.0;
-                        break;
-
-                    case WB_KEYBOARD_LEFT:
-                        roll = -1.0;
-                        break;
-
-                    case 'Q':
-                        yaw = -1.0;
-                        break;
-
-                    case 'E':
-                        yaw = +1.0;
-                        break;
-
-                    case 'W':
-                        throttle = +1.0;
-                        break;
-
-                    case 'S':
-                        throttle = -1.0;
-                        break;
-
-                    case 32: // spacebar
-                        button = true;
-                        break;
-                }
             }
 
             joystick_t getJoystickInfo() 
