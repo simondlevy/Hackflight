@@ -18,6 +18,7 @@
 #include <sim.hpp>
 
 #include <pids/altitude1.hpp>
+#include <pids/altitude2.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -47,15 +48,19 @@ int main(int argc, char ** argv)
     hf::AltitudePid1 altitudePid1 = {};
     altitudePid1.init();
 
+    hf::AltitudePid2 altitudePid2 = {};
+
     while (true) {
 
         hf::demands_t demands = {};
         hf::state_t state = {};
-        bool button = false;
+        bool didTakeoff = false;
 
-        if (!sim.step(state, demands)) {
+        if (!sim.step(state, demands, didTakeoff)) {
             break;
         }
+
+        printf("%d\n", didTakeoff);
 
         demands.yaw *= YAW_PRESCALE;
 
@@ -63,7 +68,7 @@ int main(int argc, char ** argv)
 
         if (sim.isSpringy()) {
 
-            if (sim.hitTakeoffButton()) {
+            if (didTakeoff) {
 
                 altitudePid1.run(DT, state, demands);
 
@@ -71,7 +76,9 @@ int main(int argc, char ** argv)
             }
         }
 
-        else {
+        else if (didTakeoff) {
+
+            altitudePid2.run(DT, state, demands);
 
             demands.thrust += THRUST_BASE;
         }

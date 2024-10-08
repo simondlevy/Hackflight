@@ -28,56 +28,7 @@ namespace hf {
             void run(
                     const float dt, const state_t & state, demands_t & demands)
             {
-                if (fabs(demands.thrust) < DEADBAND) {
-
-                    if (!_in_deadband) {
-                        _z_target = state.z;
-                    }
-
-                    _in_deadband = true;
-
-                    demands.thrust = run_pi(dt, KP_Z, KI_Z,
-                            _z_target, state.z, _z_integral);
-
-                    demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
-                        demands.thrust, state.dz, _dz_integral);
-                }
-
-                else {
-
-                    demands.thrust = (demands.thrust + 1) / 2;
-
-                    demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
-                        demands.thrust, state.dz, _dz_integral);
-
-                }
-            }
-
-        private:
-
-            static constexpr float KP_Z = 2.0;
-            static constexpr float KI_Z = 0.5;
-
-            static constexpr float KP_DZ = 25;
-            static constexpr float KI_DZ = 15;
-
-            static constexpr float ILIMIT = 5000;
-
-            static constexpr float DEADBAND = 0.2;
-
-            bool  _in_deadband;
-            float _z_target;
-            float _z_integral;
-            float _dz_integral;
-
-            static float run_pi(const float dt, const float kp, const float ki,
-                    const float target, const float actual, float & integral)
-            {
-                const auto error = target - actual;
-
-                integral = Utils::fconstrain(integral + dt * error, ILIMIT);
-
-                return  kp * error + ki * integral;
             }
     };
+
 }

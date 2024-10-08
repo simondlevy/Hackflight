@@ -67,7 +67,7 @@ namespace hf {
                 _motor4 = _makeMotor("motor4");
             }
 
-            bool step(state_t & state, demands_t & demands)
+            bool step(state_t & state, demands_t & demands, bool & didTakeoff)
             {
                 if (wb_robot_step((int)_timestep) == -1) {
                     return false;
@@ -131,11 +131,15 @@ namespace hf {
                 yprev = y;
                 zprev = state.z;
 
+                static bool _did_takeoff;
+
                 if (button) {
-                    _button_was_hit = true;
+                    _did_takeoff = true;
                 }
 
-                _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
+                _time = _did_takeoff ? _tick++ * _timestep / 1000 : 0;
+
+                didTakeoff = _did_takeoff;
 
                 return true;
             }
@@ -150,11 +154,6 @@ namespace hf {
             float time()
             {
                 return _time;
-            }
-
-            bool hitTakeoffButton()
-            {
-                return _button_was_hit;
             }
 
             void setMotors(const quad_motors_t & motors)
@@ -261,6 +260,8 @@ namespace hf {
                     float & yaw,
                     bool & button)
             {
+                button = false;
+
                 // Handles bogus nonzero throttle stick values at startup
                 static bool _ready;
                 static float _throttle_prev;
@@ -274,13 +275,15 @@ namespace hf {
                     _ready = true;
                 }
 
+                if (!axes.springy) {
+                    button = _ready;
+                }
+
                 _throttle_prev = throttle;
 
                 roll = readJoystickAxis(axes.roll);
                 pitch = readJoystickAxis(axes.pitch); 
                 yaw = readJoystickAxis(axes.yaw);
-
-                button = false;
 
                 if (_ready) {
 
@@ -292,12 +295,8 @@ namespace hf {
                         // Run throttle stick through deadband
                         throttle = fabs(throttle) < 0.05 ? 0 : throttle;
                     }
-
-                    // Tradtitional throttle stick; renormalize to interval [0,1]
-                    else {
-                        //throttle = (throttle + 1) / 2;
-                    }
                 }
+
                 else {
                     throttle = 0;
                 }
