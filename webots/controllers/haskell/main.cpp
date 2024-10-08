@@ -70,11 +70,9 @@ int main(int argc, char ** argv)
             break;
         }
 
-        hf::state_t state = {};
-        _sim.getState(state);
+        const auto state = _sim.getState();
 
-        hf::demands_t demands = {};
-        _sim.getDemandsFromKeyboard(demands);
+        const auto demands = _sim.getDemandsFromKeyboard();
 
         stream_throttle = demands.thrust;
         stream_roll = demands.roll;

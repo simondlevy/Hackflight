@@ -73,9 +73,11 @@ namespace hf {
                 return wb_robot_step((int)_timestep) != -1;
             }
 
-            void getDemandsFromKeyboard(demands_t & demands)
+            demands_t getDemandsFromKeyboard()
             {
                 static bool spacebar_was_hit;
+
+                demands_t demands = {};
 
                 switch (wb_keyboard_get_key()) {
 
@@ -119,6 +121,8 @@ namespace hf {
                 _requested_takeoff = spacebar_was_hit;
 
                 _time = _requested_takeoff ? _tick++ * _timestep / 1000 : 0;
+
+                return demands;
             }
 
             bool requestedTakeoff(void)
@@ -126,12 +130,9 @@ namespace hf {
                 return _requested_takeoff;
             }
 
-            void getDemands(demands_t & demands)
+            demands_t getDemands()
             {
-                demands.thrust = 0;
-                demands.roll = 0;
-                demands.pitch = 0;
-                demands.yaw = 0;
+                demands_t demands = {};
 
                 auto joystickStatus = haveJoystick();
 
@@ -182,13 +183,15 @@ namespace hf {
 
                 else { 
 
-                    getDemandsFromKeyboard(demands);
+                    demands = getDemandsFromKeyboard();
 
                 }
+
+                return demands;
             }
 
 
-            void getState(state_t & state)
+            state_t getState()
             {
                 // Track previous time and position for calculating motion
                 static float tprev;
@@ -201,6 +204,8 @@ namespace hf {
                 tprev = tcurr;
 
                 auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
+
+                state_t state = {};
 
                 state.z = wb_gps_get_values(_gps)[2];
 
@@ -238,6 +243,8 @@ namespace hf {
                 xprev = x;
                 yprev = y;
                 zprev = state.z;
+
+                return state;
              }
 
             bool isSpringy()

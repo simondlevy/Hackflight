@@ -1,4 +1,5 @@
-/* C++ flight simulator support for Hackflight Copyright (C) 2024 Simon D. Levy
+/* 
+   C++ flight simulator support for Hackflight Copyright (C) 2024 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -64,11 +65,9 @@ int main(int argc, char ** argv)
             break;
         }
 
-        hf::demands_t demands = {};
-        sim.getDemands(demands);
+        auto demands = sim.getDemands();
 
-        hf::state_t state = {};
-        sim.getState(state);
+        const auto state = sim.getState();
 
         demands.yaw *= YAW_PRESCALE;
 

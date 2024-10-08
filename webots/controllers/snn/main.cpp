@@ -98,11 +98,9 @@ int main(int argc, char ** argv)
             break;
         }
 
-        hf::state_t state = {};
-        sim.getState(state);
+        const auto state = sim.getState();
 
-        hf::demands_t demands = {};
-        sim.getDemandsFromKeyboard(demands);
+        auto demands = sim.getDemandsFromKeyboard();
 
         const auto thrustFromSnn = runDifferenceSnn(
                     climbRateSnn,
