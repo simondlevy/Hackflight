@@ -46,8 +46,9 @@ int main(int argc, char ** argv)
     hf::YawRatePid yawRatePid = {};
 
     hf::AltitudePid1 altitudePid1 = {};
-
     altitudePid1.init();
+
+    hf::AltitudePid2 altitudePid2 = {};
 
     while (true) {
 
@@ -74,7 +75,7 @@ int main(int argc, char ** argv)
         }
 
         else {
-            printf("%+3.3f\n", demands.thrust);
+            altitudePid2.run(DT, state, demands);
         }
 
         hf::PositionPid::run(state, demands);

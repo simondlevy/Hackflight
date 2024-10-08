@@ -1,5 +1,6 @@
 /*
-   Altitude PID controller
+   Altitude PID controller, version 2: update altitude target inside deabdand;
+   outside deadband, move proportional to stick throw.
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -27,6 +28,8 @@ namespace hf {
             void run(
                     const float dt, const state_t & state, demands_t & demands)
             {
+                printf("%+3.3f\n", demands.thrust);
+
                 demands.thrust = run_pi(dt, KP_Z, KI_Z,
                         demands.thrust, state.z, _z_integral);
 
@@ -44,6 +47,9 @@ namespace hf {
 
             static constexpr float ILIMIT = 5000;
 
+            static constexpr float DEADBAND = 0.2;
+
+            float _z_target;
             float _z_integral;
             float _dz_integral;
 

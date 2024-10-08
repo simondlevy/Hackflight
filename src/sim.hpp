@@ -225,7 +225,9 @@ namespace hf {
 
                 { "Logitech Logitech Extreme 3D",
                     joystick_t {-4,  1, -2, 3, false}  },
-                { "FrSky FrSky Simulator",
+                { "OpenTX FrSky Taranis Joystick",  // USB cable
+                    joystick_t { 1,  2,  3, 4, false } },
+                { "FrSky FrSky Simulator",          // radio dongle
                     joystick_t { 1,  2,  3, 4, false } },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
                     joystick_t { 2,  -3,  4, -1, false } }
