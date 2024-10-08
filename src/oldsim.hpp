@@ -73,26 +73,18 @@ namespace hf {
                     return false;
                 }
 
-                bool button = false;
-
-                _readSticks(
-                        demands.thrust,
-                        demands.roll,
-                        demands.pitch,
-                        demands.yaw,
-                        button);
+                getDemands(demands, requestedTakeoff);
 
                 getState(state);
 
-                if (button) {
-                    _button_was_hit = true;
-                }
-
-                _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
-
-                requestedTakeoff = _button_was_hit;
-
                 return true;
+            }
+
+            bool isSpringy()
+            {
+                return haveJoystick() == JOYSTICK_RECOGNIZED ?
+                    true /*getJoystickInfo().springy*/ :
+                    true; // keyboard
             }
 
             float time()
@@ -143,9 +135,58 @@ namespace hf {
             WbDeviceTag _gyro;
             WbDeviceTag _imu;
 
+            typedef struct {
+
+                int8_t throttle;
+                int8_t roll;
+                int8_t pitch;
+                int8_t yaw;
+
+                bool (* button_fun)();
+
+            } joystick_t;
+
+            std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
+
+                { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
+                    joystick_t {-2,  3, -4, 1, button_stick_5} },
+                { "SHANWAN Android Gamepad",             // PS3
+                    joystick_t {-2,  3, -4, 1, button_stick_5} },
+                { "Logitech Gamepad F310",
+                    joystick_t {-2,  4, -5, 1, button_stick_5} },
+                { "Logitech Logitech Extreme 3D",
+                    joystick_t {-4,  1, -2, 3, button_stick_0}  },
+                { "FrSky FrSky Simulator",
+                    joystick_t { 1,  2,  3, 4, button_frsky } },
+                { "Horizon Hobby SPEKTRUM RECEIVER",
+                    joystick_t { 2,  -3,  4, -1, button_spektrum } }
+            };
+
             // Handles bogus nonzero throttle stick values at startup
             bool ready;
-            
+
+            void getDemands(demands_t & demands, bool & requestedTakeoff)
+            {
+                bool button = false;
+
+                demands.thrust = 0;
+                demands.roll = 0;
+                demands.pitch = 0;
+                demands.yaw = 0;
+
+                button = false;
+
+                readKeyboard(demands.thrust, demands.roll, demands.pitch, demands.yaw, button);
+
+                if (button) {
+                    _button_was_hit = true;
+                }
+
+                _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
+
+                requestedTakeoff = _button_was_hit;
+            }
+
             void getState(state_t & state)
             {
                 // Track previous time and position for calculating motion
@@ -222,33 +263,6 @@ namespace hf {
             {
                 return readJoystickRaw(5) < 0;
             }
-
-            typedef struct {
-
-                int8_t throttle;
-                int8_t roll;
-                int8_t pitch;
-                int8_t yaw;
-
-                bool (* button_fun)();
-
-            } joystick_t;
-
-            std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-                { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystick_t {-2,  3, -4, 1, button_stick_5} },
-                { "SHANWAN Android Gamepad",             // PS3
-                    joystick_t {-2,  3, -4, 1, button_stick_5} },
-                { "Logitech Gamepad F310",
-                    joystick_t {-2,  4, -5, 1, button_stick_5} },
-                { "Logitech Logitech Extreme 3D",
-                    joystick_t {-4,  1, -2, 3, button_stick_0}  },
-                { "FrSky FrSky Simulator",
-                    joystick_t { 1,  2,  3, 4, button_frsky } },
-                { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystick_t { 2,  -3,  4, -1, button_spektrum } }
-            };
 
             static float normalizeJoystickAxis(const int32_t rawval)
             {
@@ -344,6 +358,11 @@ namespace hf {
                 }
             }
 
+            joystick_t getJoystickInfo() 
+            {
+                return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
+            }
+
             joystickStatus_e haveJoystick(void)
             {
                 auto status = JOYSTICK_RECOGNIZED;
@@ -404,35 +423,6 @@ namespace hf {
                 auto sensor = wb_robot_get_device(name);
                 f(sensor, timestep);
                 return sensor;
-            }
-
-            void _readSticks(
-                    float & throttle,
-                    float & roll,
-                    float & pitch,
-                    float & yaw,
-                    bool & button)
-            {
-                auto joystickStatus = haveJoystick();
-
-                throttle = 0;
-                roll = 0;
-                pitch = 0;
-                yaw = 0;
-
-                button = false;
-
-                if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                    readJoystick(throttle, roll, pitch, yaw, button);
-                }
-
-                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                    reportJoystick();
-                }
-
-                else {
-                    readKeyboard(throttle, roll, pitch, yaw, button);
-                }
             }
     };
 
