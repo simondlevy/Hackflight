@@ -26,10 +26,6 @@
 
 static const float DT = 0.01;
 
-static const float INITIAL_ALTITUDE_TARGET = 0.2;
-
-static const float CLIMB_RATE_SCALE = 0.01;
-
 static const float YAW_PRESCALE = 160; // deg/sec
 
 static const float THRUST_BASE = 55.385;
@@ -51,7 +47,7 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid1 altitudePid1 = {};
 
-    float z_target = INITIAL_ALTITUDE_TARGET;
+    altitudePid1.init();
 
     while (true) {
 
@@ -70,10 +66,6 @@ int main(int argc, char ** argv)
         if (sim.isSpringy()) {
 
             if (sim.hitTakeoffButton()) {
-
-                z_target += CLIMB_RATE_SCALE * demands.thrust;
-
-                demands.thrust = z_target;
 
                 altitudePid1.run(DT, state, demands);
 

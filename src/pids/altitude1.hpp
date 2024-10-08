@@ -1,5 +1,6 @@
 /*
-   Altitude PID controller
+   Altitude PID controller, version 1: takeoff to fixed initial altitude
+   on button / keyboard press
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -24,9 +25,18 @@ namespace hf {
 
         public:
 
+            void init()
+            {
+                _z_target = INITIAL_ALTITUDE_TARGET;
+            }
+
             void run(
                     const float dt, const state_t & state, demands_t & demands)
             {
+                _z_target += CLIMB_RATE_SCALE * demands.thrust;
+
+                demands.thrust = _z_target;
+
                 demands.thrust = run_pi(dt, KP_Z, KI_Z,
                         demands.thrust, state.z, _z_integral);
 
@@ -36,6 +46,9 @@ namespace hf {
 
         private:
 
+            static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
+            static constexpr float CLIMB_RATE_SCALE = 0.01;
+
             static constexpr float KP_Z = 2.0;
             static constexpr float KI_Z = 0.5;
 
@@ -44,6 +57,7 @@ namespace hf {
 
             static constexpr float ILIMIT = 5000;
 
+            float _z_target;
             float _z_integral;
             float _dz_integral;
 
