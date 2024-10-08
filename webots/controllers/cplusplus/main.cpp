@@ -71,38 +71,41 @@ int main(int argc, char ** argv)
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-        if (sim.isSpringy()) {
+        // Throttle control begins when once takeoff is requested, either by
+        // hitting a button or key ("springy", self-centering throttle) or by
+        // raising the non-self-centering throttle stick
+        if (didTakeoff) {
 
-            if (didTakeoff) {
+            // "Springy" (self-centering) throttle or keyboard: accumulate 
+            // altitude target based on stick deflection, and attempt
+            // to maintain target via PID control
+            if (sim.isSpringy()) {
 
                 z_target += CLIMB_RATE_SCALE * demands.thrust;
-
                 demands.thrust = z_target;
-
                 altitudePid.run(DT, state, demands);
-
                 demands.thrust += THRUST_BASE;
             }
-        }
 
-        else if (didTakeoff) {
+            // Traditional (non-self-centering) throttle: 
+            //
+            //   (1) In throttle deadband (mid position), fix an altitude target
+            //       and attempt to maintain it via PID control
+            //
+            //   (2) Outside throttle deadband, get thrust from stick deflection
+            else {
 
-            static bool _was_in_deadband;
-
-            const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
-
-            z_target = in_deadband && !_was_in_deadband ? state.z : z_target;
-
-            _was_in_deadband = in_deadband;
-
-            if (in_deadband) {
-
-                demands.thrust = z_target;
-
-                altitudePid.run(DT, state, demands);
+                static bool _was_in_deadband;
+                const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
+                z_target = in_deadband && !_was_in_deadband ? state.z : z_target;
+                _was_in_deadband = in_deadband;
+                if (in_deadband) {
+                    demands.thrust = z_target;
+                    altitudePid.run(DT, state, demands);
+                }
+                demands.thrust += THRUST_BASE;
             }
 
-            demands.thrust += THRUST_BASE;
         }
 
         hf::PositionPid::run(state, demands);
