@@ -130,7 +130,7 @@ namespace hf {
                 demands.pitch = 0;
                 demands.yaw = 0;
 
-                button = false;
+                static bool spacebar_was_hit;
 
                 switch (wb_keyboard_get_key()) {
 
@@ -167,6 +167,7 @@ namespace hf {
                         break;
 
                     case 32: // spacebar
+                        spacebar_was_hit = true;
                         button = true;
                         break;
                 }
@@ -177,7 +178,7 @@ namespace hf {
 
                 _time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
 
-                requestedTakeoff = _button_was_hit;
+                requestedTakeoff = spacebar_was_hit;
             }
 
             void getState(state_t & state)
