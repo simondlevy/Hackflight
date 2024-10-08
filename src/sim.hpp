@@ -59,7 +59,13 @@ namespace hf {
                         _timestep, wb_camera_enable);
 
                 if (tryJoystick) {
+
                     wb_joystick_enable(_timestep);
+                }
+
+                else {
+
+                    printKeyboardInstructions();
                 }
 
                 wb_keyboard_enable(_timestep);
@@ -372,9 +378,7 @@ namespace hf {
 
                     if (!_didWarn) {
                         puts("Using keyboard instead:\n");
-                        puts("- Use W and S to go up and down\n");
-                        puts("- Use arrow keys to move in the horizontal plane\n");
-                        puts("- Use Q and E to rotate around yaw\n");
+                        printKeyboardInstructions();
                     }
 
                     _didWarn = true;
@@ -421,6 +425,13 @@ namespace hf {
                 return sensor;
             }
 
+            static void printKeyboardInstructions()
+            {
+                puts("- Use spacebar to take off\n");
+                puts("- Use W and S to go up and down\n");
+                puts("- Use arrow keys to move horizontally\n");
+                puts("- Use Q and E to change heading\n");
+            }
     };
 
 }

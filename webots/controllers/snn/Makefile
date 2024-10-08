@@ -50,7 +50,7 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK_TRAINED) | tail +11 > log.csv
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(NETWORK_TRAINED)
 
 runboth:
 	webots ../../worlds/simple.wbt &
