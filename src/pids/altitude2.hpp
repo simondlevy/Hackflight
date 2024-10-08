@@ -38,13 +38,40 @@ namespace hf {
                 _was_in_deadband = in_deadband;
 
                 if (in_deadband) {
-                    printf("%f\n", _z_target);
+
+                    demands.thrust = _z_target;
+
+                    demands.thrust = run_pi(dt, KP_Z, KI_Z,
+                            demands.thrust, state.z, _z_integral);
+
+                    demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
+                            demands.thrust, state.dz, _dz_integral);
                 }
             }
 
         private:
 
-            static constexpr float DEADBAND = 0.2;
-    };
+            static constexpr float KP_Z = 2.0;
+            static constexpr float KI_Z = 0.5;
 
+            static constexpr float KP_DZ = 25;
+            static constexpr float KI_DZ = 15;
+
+            static constexpr float ILIMIT = 5000;
+
+            static constexpr float DEADBAND = 0.2;
+
+            float _z_integral;
+            float _dz_integral;
+
+            static float run_pi(const float dt, const float kp, const float ki,
+                    const float target, const float actual, float & integral)
+            {
+                const auto error = target - actual;
+
+                integral = Utils::fconstrain(integral + dt * error, ILIMIT);
+
+                return  kp * error + ki * integral;
+            }
+    };
 }
