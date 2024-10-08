@@ -17,7 +17,8 @@
 #include <mixers.hpp>
 #include <sim.hpp>
 
-#include <pids/altitude.hpp>
+#include <pids/altitude1.hpp>
+#include <pids/altitude2.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -48,7 +49,7 @@ int main(int argc, char ** argv)
 
     hf::YawRatePid yawRatePid = {};
 
-    hf::AltitudePid altitudePid = {};
+    hf::AltitudePid1 altitudePid1 = {};
 
     float z_target = INITIAL_ALTITUDE_TARGET;
 
@@ -66,8 +67,6 @@ int main(int argc, char ** argv)
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-        printf("%d\n", sim.isSpringy());
-
         if (sim.isSpringy()) {
 
             if (sim.hitTakeoffButton()) {
@@ -76,10 +75,14 @@ int main(int argc, char ** argv)
 
                 demands.thrust = z_target;
 
-                altitudePid.run(DT, state, demands);
+                altitudePid1.run(DT, state, demands);
 
                 demands.thrust += THRUST_BASE;
             }
+        }
+
+        else {
+            printf("%+3.3f\n", demands.thrust);
         }
 
         hf::PositionPid::run(state, demands);

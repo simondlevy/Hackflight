@@ -20,7 +20,7 @@
 
 namespace hf {
 
-    class AltitudePid {
+    class AltitudePid2 {
 
         public:
 
