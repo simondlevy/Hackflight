@@ -21,7 +21,7 @@
 
 // Hackflight
 #include <mixers.hpp>
-#include <sim.hpp>
+#include <oldsim.hpp>
 
 static const float THRUST_TAKEOFF = 56;
 

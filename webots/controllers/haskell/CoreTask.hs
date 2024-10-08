@@ -67,8 +67,8 @@ pitch_stick = extern "stream_pitch" Nothing
 yaw_stick :: SFloat
 yaw_stick = extern "stream_yaw" Nothing
 
-hitTakeoffButton :: SBool
-hitTakeoffButton = extern "stream_hitTakeoffButton" Nothing
+requestedTakeoff :: SBool
+requestedTakeoff = extern "stream_requestedTakeoff" Nothing
 
 completedTakeoff :: SBool
 completedTakeoff = extern "stream_completedTakeoff" Nothing
@@ -125,7 +125,7 @@ spec = do
 
     let dt = rateToPeriod clock_rate
 
-    let pids = [climbRateController hitTakeoffButton completedTakeoff,
+    let pids = [climbRateController requestedTakeoff completedTakeoff,
           positionController dt,
           angleController dt ]
 

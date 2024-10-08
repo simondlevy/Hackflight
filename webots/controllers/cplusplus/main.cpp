@@ -52,7 +52,7 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid altitudePid = {};
 
-    bool didTakeoff = false;
+    bool requestedTakeoff = false;
 
     // This initial value will be ignored for traditional (non-springy)
     // throttle
@@ -63,7 +63,7 @@ int main(int argc, char ** argv)
         hf::demands_t demands = {};
         hf::state_t state = {};
 
-        if (!sim.step(state, demands, didTakeoff)) {
+        if (!sim.step(state, demands, requestedTakeoff)) {
             break;
         }
 
@@ -74,7 +74,7 @@ int main(int argc, char ** argv)
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
         // raising the non-self-centering throttle stick
-        if (didTakeoff) {
+        if (requestedTakeoff) {
 
             // "Springy" (self-centering) throttle or keyboard: accumulate 
             // altitude target based on stick deflection, and attempt

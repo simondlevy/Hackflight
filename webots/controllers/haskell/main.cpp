@@ -16,7 +16,7 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <sim.hpp>
+#include <oldsim.hpp>
 
 // Webots simulator class
 static hf::Simulator _sim;
@@ -39,7 +39,7 @@ float stream_dtheta;
 float stream_psi;
 float stream_dpsi;
 
-bool stream_hitTakeoffButton;
+bool stream_requestedTakeoff;
 
 bool stream_completedTakeoff;
 
@@ -77,7 +77,7 @@ int main(int argc, char ** argv)
         stream_pitch = demands.pitch;
         stream_yaw = demands.yaw;
 
-        stream_hitTakeoffButton = _sim.hitTakeoffButton();
+        stream_requestedTakeoff = _sim.hitTakeoffButton();
 
         stream_completedTakeoff = _sim.time() > 3;
 
