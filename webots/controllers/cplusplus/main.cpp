@@ -17,8 +17,8 @@
 #include <mixers.hpp>
 #include <sim.hpp>
 
+#include <pids/altitude.hpp>
 #include <pids/altitude1.hpp>
-#include <pids/altitude2.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -31,6 +31,8 @@ static const float YAW_PRESCALE = 160; // deg/sec
 static const float THRUST_BASE = 55.385;
 
 static const float THROTTLE_DOWN = 0.06;
+
+static const float THROTTLE_DEADBAND = 0.2;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
@@ -48,9 +50,11 @@ int main(int argc, char ** argv)
     hf::AltitudePid1 altitudePid1 = {};
     altitudePid1.init();
 
-    hf::AltitudePid2 altitudePid2 = {};
+    hf::AltitudePid altitudePid = {};
 
     bool didTakeoff = false;
+
+    float z_target = 0;
 
     while (true) {
 
@@ -77,7 +81,20 @@ int main(int argc, char ** argv)
 
         else if (didTakeoff) {
 
-            altitudePid2.run(DT, state, demands);
+            static bool _was_in_deadband;
+
+            const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
+
+            z_target = in_deadband && !_was_in_deadband ? state.z : z_target;
+
+            _was_in_deadband = in_deadband;
+
+            if (in_deadband) {
+
+                demands.thrust = z_target;
+
+                altitudePid.run(DT, state, demands);
+            }
 
             demands.thrust += THRUST_BASE;
         }

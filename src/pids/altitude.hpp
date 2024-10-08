@@ -1,6 +1,5 @@
 /*
-   Altitude PID controller, version 2: update altitude target inside deadbdand;
-   outside deadband, move proportional to stick throw.
+   Altitude PID controller
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -21,32 +20,18 @@
 
 namespace hf {
 
-    class AltitudePid2 {
+    class AltitudePid {
 
         public:
 
             void run(
                     const float dt, const state_t & state, demands_t & demands)
             {
-                static float _z_target;
-                static bool _was_in_deadband;
+                demands.thrust = run_pi(dt, KP_Z, KI_Z,
+                        demands.thrust, state.z, _z_integral);
 
-                const auto in_deadband = fabs(demands.thrust) < DEADBAND;
-
-                _z_target = in_deadband && !_was_in_deadband ? state.z : _z_target;
-
-                _was_in_deadband = in_deadband;
-
-                if (in_deadband) {
-
-                    demands.thrust = _z_target;
-
-                    demands.thrust = run_pi(dt, KP_Z, KI_Z,
-                            demands.thrust, state.z, _z_integral);
-
-                    demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
-                            demands.thrust, state.dz, _dz_integral);
-                }
+                demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
+                        demands.thrust, state.dz, _dz_integral);
             }
 
         private:
@@ -58,8 +43,6 @@ namespace hf {
             static constexpr float KI_DZ = 15;
 
             static constexpr float ILIMIT = 5000;
-
-            static constexpr float DEADBAND = 0.2;
 
             float _z_integral;
             float _dz_integral;
