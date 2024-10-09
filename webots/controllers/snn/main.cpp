@@ -27,19 +27,19 @@ static const float THRUST_TAKEOFF = 56;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float CLIMBRATE_SNN_SCALE  = 0.3333;
-static const float CLIMBRATE_SNN_OFFSET = 47.22;
+static const float YAW_PREDIVISOR = 160; // deg/sec
 
-static const float YAW_PRESCALE = 160; // deg/sec
-
-static const float YAW_SNN_SCALE  = 0.0384;
+static const float YAW_SNN_DIVISOR  = 26;
 static const float YAW_SNN_OFFSET = -0.955;
+
+static const float CLIMBRATE_SNN_DIVISOR  = 3;
+static const float CLIMBRATE_SNN_OFFSET = 47.22;
 
 static double runDifferenceSnn(
         SNN * snn,
         const float setpoint,
         const float actual,
-        const float scale,
+        const float divisor,
         const float offset)
 {
     vector<double> observations = { setpoint, actual };
@@ -48,7 +48,7 @@ static double runDifferenceSnn(
 
     snn->step(observations, counts);
 
-    return scale * counts[0] + offset;
+    return counts[0] / divisor + offset;
 }
 
 int main(int argc, char ** argv)
@@ -62,9 +62,6 @@ int main(int argc, char ** argv)
     SNN * climbRateSnn = NULL;
 
     SNN * yawRateSnn = NULL;
-    //SNN * positionYSnn = NULL;
-    //SNN * rollAngleSnn = NULL;
-    //SNN * rollRateSnn = NULL;
 
     // Load up the network specified in the command line
 
@@ -77,9 +74,6 @@ int main(int argc, char ** argv)
 
         climbRateSnn = new SNN(argv[1], "risp");
         yawRateSnn = new SNN(argv[1], "risp");
-        //positionYSnn = new SNN(argv[1], "risp");
-        //rollAngleSnn = new SNN(argv[1], "risp");
-        //rollRateSnn = new SNN(argv[1], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -106,14 +100,14 @@ int main(int argc, char ** argv)
                     climbRateSnn,
                     demands.thrust, 
                     state.dz,
-                    CLIMBRATE_SNN_SCALE,
+                    CLIMBRATE_SNN_DIVISOR,
                     CLIMBRATE_SNN_OFFSET) ;
 
         demands.yaw = runDifferenceSnn(
                 yawRateSnn,
                 demands.yaw,
-                state.dpsi/YAW_PRESCALE,
-                YAW_SNN_SCALE,
+                state.dpsi/YAW_PREDIVISOR,
+                YAW_SNN_DIVISOR,
                 YAW_SNN_OFFSET);
 
         auto rollDemand = 6 * (10 * (demands.roll - state.dy) - state.phi);
