@@ -29,18 +29,14 @@ static const float TAKEOFF_TIME = 3;
 
 static const float YAW_PREDIVISOR = 160; // deg/sec
 
-static const float YAW_SNN_DIVISOR  = 26;
-static const float YAW_SNN_OFFSET = -0.955;
+static const float YAW_DIVISOR  = 26;
+static const float YAW_OFFSET = -0.955;
 
-static const float CLIMBRATE_SNN_DIVISOR  = 3;
-static const float CLIMBRATE_SNN_OFFSET = 47.22;
+static const float CLIMBRATE_DIVISOR  = 3;
+static const float CLIMBRATE_OFFSET = 47.22;
 
-static double runDifferenceSnn(
-        SNN * snn,
-        const float setpoint,
-        const float actual,
-        const float divisor,
-        const float offset)
+static double runClimbrateSnn(
+        SNN * snn, const float setpoint, const float actual)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -48,7 +44,19 @@ static double runDifferenceSnn(
 
     snn->step(observations, counts);
 
-    return counts[0] / divisor + offset;
+    return counts[0] / CLIMBRATE_DIVISOR + CLIMBRATE_OFFSET;
+}
+
+static double runYawSnn(
+        SNN * snn, const float setpoint, const float actual)
+{
+    vector<double> observations = { setpoint, actual };
+
+    vector <int> counts = {};
+
+    snn->step(observations, counts);
+
+    return counts[0] / YAW_DIVISOR + YAW_OFFSET;
 }
 
 int main(int argc, char ** argv)
@@ -96,19 +104,11 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemandsFromKeyboard();
 
-        const auto thrustFromSnn = runDifferenceSnn(
-                    climbRateSnn,
-                    demands.thrust, 
-                    state.dz,
-                    CLIMBRATE_SNN_DIVISOR,
-                    CLIMBRATE_SNN_OFFSET) ;
+        const auto thrustFromSnn = runClimbrateSnn(
+                climbRateSnn, demands.thrust, state.dz);
 
-        demands.yaw = runDifferenceSnn(
-                yawRateSnn,
-                demands.yaw,
-                state.dpsi/YAW_PREDIVISOR,
-                YAW_SNN_DIVISOR,
-                YAW_SNN_OFFSET);
+        demands.yaw = runYawSnn(
+                yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR);
 
         auto rollDemand = 6 * (10 * (demands.roll - state.dy) - state.phi);
 
