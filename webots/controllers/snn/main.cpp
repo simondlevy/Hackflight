@@ -41,7 +41,8 @@ static double runSnn(
         const float setpoint,
         const float actual,
         const float divisor,
-        const float offset)
+        const float offset,
+        bool debug=false)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -49,7 +50,13 @@ static double runSnn(
 
     snn->step(observations, counts);
 
-    return counts[0] / divisor - offset;
+    const float action = counts[0] / divisor - offset;
+
+    if (debug) {
+        printf("%d,%f\n", counts[0], action);
+    }
+
+    return action;
 }
 
 int main(int argc, char ** argv)
@@ -103,7 +110,7 @@ int main(int argc, char ** argv)
 
         demands.yaw = runSnn(
                 yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR,
-                YAW_DIVISOR, YAW_OFFSET);
+                YAW_DIVISOR, YAW_OFFSET, true);
 
         auto rollDemand = 6 * (10 * (demands.roll - state.dy) - state.phi);
 

@@ -52,9 +52,9 @@ run:
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(NETWORK_TRAINED)
 
-runboth:
+runcsv:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK_TRAINED) $(NETWORK_BYHAND) | tail +11 > log.csv
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK_TRAINED) | tail +11 > log.csv
 
 runviz:
 	webots ../../worlds/simple.wbt &
