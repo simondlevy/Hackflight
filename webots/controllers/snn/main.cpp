@@ -24,16 +24,17 @@
 #include <sim.hpp>
 
 static const float THRUST_TAKEOFF = 56;
+static const float THRUST_BASE = 55.385;
 
 static const float TAKEOFF_TIME = 3;
 
 static const float YAW_PREDIVISOR = 160; // deg/sec
 
 static const float YAW_DIVISOR  = 26;
-static const float YAW_OFFSET = -0.955;
+static const float YAW_OFFSET = 0.955;
 
 static const float CLIMBRATE_DIVISOR  = 3;
-static const float CLIMBRATE_OFFSET = 47.22;
+static const float CLIMBRATE_OFFSET = 8.165;
 
 static double runClimbrateSnn(
         SNN * snn, const float setpoint, const float actual)
@@ -44,7 +45,7 @@ static double runClimbrateSnn(
 
     snn->step(observations, counts);
 
-    return counts[0] / CLIMBRATE_DIVISOR + CLIMBRATE_OFFSET;
+    return counts[0] / CLIMBRATE_DIVISOR - CLIMBRATE_OFFSET;
 }
 
 static double runYawSnn(
@@ -56,7 +57,7 @@ static double runYawSnn(
 
     snn->step(observations, counts);
 
-    return counts[0] / YAW_DIVISOR + YAW_OFFSET;
+    return counts[0] / YAW_DIVISOR - YAW_OFFSET;
 }
 
 int main(int argc, char ** argv)
@@ -121,7 +122,7 @@ int main(int argc, char ** argv)
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
             sim.time() > TAKEOFF_TIME ? 
-            thrustFromSnn :
+            thrustFromSnn + THRUST_BASE:
             sim.requestedTakeoff() ? 
             THRUST_TAKEOFF :
             0;
