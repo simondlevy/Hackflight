@@ -36,8 +36,12 @@ static const float YAW_OFFSET = 0.955;
 static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
-static double runClimbrateSnn(
-        SNN * snn, const float setpoint, const float actual)
+static double runSnn(
+        SNN * snn,
+        const float setpoint,
+        const float actual,
+        const float divisor,
+        const float offset)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -45,19 +49,7 @@ static double runClimbrateSnn(
 
     snn->step(observations, counts);
 
-    return counts[0] / CLIMBRATE_DIVISOR - CLIMBRATE_OFFSET;
-}
-
-static double runYawSnn(
-        SNN * snn, const float setpoint, const float actual)
-{
-    vector<double> observations = { setpoint, actual };
-
-    vector <int> counts = {};
-
-    snn->step(observations, counts);
-
-    return counts[0] / YAW_DIVISOR - YAW_OFFSET;
+    return counts[0] / divisor - offset;
 }
 
 int main(int argc, char ** argv)
@@ -105,11 +97,13 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemandsFromKeyboard();
 
-        const auto thrustFromSnn = runClimbrateSnn(
-                climbRateSnn, demands.thrust, state.dz);
+        const auto thrustFromSnn = runSnn(
+                climbRateSnn, demands.thrust, state.dz,
+                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
 
-        demands.yaw = runYawSnn(
-                yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR);
+        demands.yaw = runSnn(
+                yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR,
+                YAW_DIVISOR, YAW_OFFSET);
 
         auto rollDemand = 6 * (10 * (demands.roll - state.dy) - state.phi);
 
