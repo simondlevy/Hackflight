@@ -37,7 +37,8 @@ static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
 static const float CASCADE_DIVISOR  = 15;
-static const float CASCADE_OFFSET = 0.95;
+static const float CASCADE_OFFSET = 0.936; //0.95;
+static const float CASCADE_POST_SCALE = 120;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
@@ -132,6 +133,7 @@ int main(int argc, char ** argv)
 
         printf("%f,%f\n", diff, snn_diff);
 
+        // demands.roll = CASCADE_POST_SCALE * snn_diff;
         demands.roll = 60 * snn_diff;
         demands.roll = 0.0125 * (demands.roll - state.dphi);
 
