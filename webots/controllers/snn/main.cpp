@@ -109,7 +109,7 @@ int main(int argc, char ** argv)
 
         printf("%f,%f,%f\n", demands.roll, state.dy, state.phi);
 
-        demands.roll = 6 * (10 * (demands.roll - state.dy) - state.phi);
+        demands.roll = 60 * ((demands.roll - state.dy) - state.phi/10);
         demands.roll = 0.0125 * (demands.roll - state.dphi);
 
         demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
