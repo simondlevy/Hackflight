@@ -1,5 +1,5 @@
 /*
-   C++ flight simulator takeoff example for Hackflight
+   Spiking Neural Net controller for Hackflight
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -36,13 +36,14 @@ static const float YAW_OFFSET = 0.955;
 static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
+static const float PITCH_ROLL_POST_SCALE = 50;
+
 static double runSnn(
         SNN * snn,
         const float setpoint,
         const float actual,
         const float divisor,
-        const float offset,
-        bool debug=false)
+        const float offset)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -52,17 +53,11 @@ static double runSnn(
 
     const float action = counts[0] / divisor - offset;
 
-    if (debug) {
-        printf("%d,%f\n", counts[0], action);
-    }
-
     return action;
 }
 
 int main(int argc, char ** argv)
 {
-    // Create a simulator object for Webots functionality 
-
     hf::Simulator sim = {};
 
     sim.init(false);
@@ -110,15 +105,15 @@ int main(int argc, char ** argv)
 
         demands.yaw = runSnn(
                 yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR,
-                YAW_DIVISOR, YAW_OFFSET, true);
+                YAW_DIVISOR, YAW_OFFSET);
 
-        auto rollDemand = 6 * (10 * (demands.roll - state.dy) - state.phi);
+        printf("%f,%f,%f\n", demands.roll, state.dy, state.phi);
 
-        rollDemand = 0.0125 * (rollDemand - state.dphi);
+        demands.roll = 6 * (10 * (demands.roll - state.dy) - state.phi);
+        demands.roll = 0.0125 * (demands.roll - state.dphi);
 
-        float pitchDemand  = 10 * (demands.pitch - state.dx);
-        pitchDemand = 6 * (pitchDemand - state.theta);
-        pitchDemand = 0.0125 * (pitchDemand - state.dtheta);
+        demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
+        demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
 
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
@@ -127,9 +122,6 @@ int main(int argc, char ** argv)
             sim.requestedTakeoff() ? 
             THRUST_TAKEOFF :
             0;
-
-        demands.pitch = 0;
-        demands.roll = 0;
 
         hf::quad_motors_t motors= {};
 

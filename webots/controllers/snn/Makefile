@@ -51,7 +51,7 @@ run:
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(NETWORK)
 
-runcsv:
+runlog:
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +11 > log.csv
 
@@ -73,7 +73,8 @@ include $(WEBOTS_HOME_PATH)/resources/Makefile.include
 edit:
 	vim main.cpp
 
+plot:
+	./plotlog.py
+
 log:
 	libreoffice log.csv
-
-
