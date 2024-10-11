@@ -107,7 +107,10 @@ int main(int argc, char ** argv)
                 yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR,
                 YAW_DIVISOR, YAW_OFFSET);
 
-        printf("%f,%f,%f\n", demands.roll, state.dy, state.phi);
+        printf("%f,%f,%f\n",
+                (demands.roll - state.dy),
+                state.phi/10,
+                (demands.roll - state.dy) - state.phi/10);
 
         demands.roll = 60 * ((demands.roll - state.dy) - state.phi/10);
         demands.roll = 0.0125 * (demands.roll - state.dphi);
