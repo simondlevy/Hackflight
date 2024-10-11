@@ -18,6 +18,8 @@ FDIR = $(HOME)/Desktop/framework
 
 NETWORK = $(shell pwd)/networks/difference_risp_train.txt
 
+NETWORK3 = $(shell pwd)/networks/difference3_risp.txt
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 PDIR =  $(FDIR)/processors/risp
@@ -49,19 +51,19 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(NETWORK)
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(NETWORK) $(NETWORK3)
 
 runlog:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) | tail +11 > log.csv
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(NETWORK3) | tail +11 > log.csv
 
 runviz:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(VIZ_PORT) | tail +11 > log.csv &
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(NETWORK3) $(VIZ_PORT) | tail +11 > log.csv &
 	sleep 1
 	cd $(FDIR)/viz; \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
-     	-n $(NETWORK) --show_spike_count --remove_unnecessary_neuron \
+     	-n $(NETWORK) $(NETWORK3) --show_spike_count --remove_unnecessary_neuron \
     		--set_num_screen_shot 0 > /dev/null
 
 ### Do not modify: this includes Webots global Makefile.include

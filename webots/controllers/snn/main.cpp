@@ -36,6 +36,9 @@ static const float YAW_OFFSET = 0.955;
 static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
+static const float CASCADE_DIVISOR  = 15;
+static const float CASCADE_OFFSET = 0.95;
+
 static const float PITCH_ROLL_POST_SCALE = 50;
 
 static double runSnn(
@@ -51,9 +54,19 @@ static double runSnn(
 
     snn->step(observations, counts);
 
-    const float action = counts[0] / divisor - offset;
+    return counts[0] / divisor - offset;
+}
 
-    return action;
+static float runCascadeSnn(
+        SNN * snn, const float inp1, const float inp2, const float inp3)
+{
+    vector<double> observations = { inp1, inp2, inp3 };
+
+    vector <int> counts = {};
+
+    snn->step(observations, counts);
+
+    return counts[0] / CASCADE_DIVISOR - CASCADE_OFFSET;
 }
 
 int main(int argc, char ** argv)
@@ -66,6 +79,8 @@ int main(int argc, char ** argv)
 
     SNN * yawRateSnn = NULL;
 
+    SNN * cascadeSnn = NULL;
+
     // Load up the network specified in the command line
 
     if (argc < 2) {
@@ -77,6 +92,7 @@ int main(int argc, char ** argv)
 
         climbRateSnn = new SNN(argv[1], "risp");
         yawRateSnn = new SNN(argv[1], "risp");
+        cascadeSnn = new SNN(argv[2], "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -107,12 +123,16 @@ int main(int argc, char ** argv)
                 yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR,
                 YAW_DIVISOR, YAW_OFFSET);
 
-        printf("%f,%f,%f\n",
-                (demands.roll - state.dy),
-                state.phi/10,
-                (demands.roll - state.dy) - state.phi/10);
+        const auto phi = state.phi / 10;
 
-        demands.roll = 60 * ((demands.roll - state.dy) - state.phi/10);
+        const auto snn_diff = 
+            runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
+
+        const auto diff = (demands.roll - state.dy) - phi;
+
+        printf("%f,%f\n", diff, snn_diff);
+
+        demands.roll = 60 * snn_diff;
         demands.roll = 0.0125 * (demands.roll - state.dphi);
 
         demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
