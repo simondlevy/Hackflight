@@ -16,14 +16,11 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(shell pwd)/networks/difference_risp_train.txt
-
-NETWORK3 = $(shell pwd)/networks/difference3_risp.txt
-
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 PDIR =  $(FDIR)/processors/risp
 
+VIZ_NET = $(shell pwd)/networks/difference3_risp.txt
 VIZ_HOST = "localhost"
 VIZ_PORT = 8100
 
@@ -59,11 +56,11 @@ runlog:
 
 runviz:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(VIZ_PORT) &
+	/usr/local/webots/webots-controller --stdout_redirect $(NAME) $(VIZ_PORT) &
 	sleep 1
 	cd $(FDIR)/viz; \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
-     	-n $(NETWORK3) --show_spike_count --remove_unnecessary_neuron \
+     	-n $(VIZ_NET) --show_spike_count --remove_unnecessary_neuron \
     		--set_num_screen_shot 0 > /dev/null
 
 ### Do not modify: this includes Webots global Makefile.include

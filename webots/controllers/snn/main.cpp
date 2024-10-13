@@ -46,6 +46,8 @@ static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const char * NETWORK = "networks/difference_risp_train.txt";
 
+static const char * DYDT_NETWORK = "networks/dydt_risp.txt";
+
 static const char * NETWORK3 = "networks/difference3_risp.txt";
 
 static double runSnn(
@@ -53,7 +55,8 @@ static double runSnn(
         const float setpoint,
         const float actual,
         const float divisor,
-        const float offset)
+        const float offset,
+        const bool debug=false)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -61,7 +64,13 @@ static double runSnn(
 
     snn->step(observations, counts);
 
-    return counts[0] / divisor - offset;
+    const double action = counts[0] / divisor - offset;
+
+    if (debug) {
+        printf("%f,%f\n", setpoint - actual, action);
+    }
+
+    return action;
 }
 
 static float runCascadeSnn(
@@ -86,7 +95,7 @@ int main(int argc, char ** argv)
 
     SNN * yawRateSnn = NULL;
 
-    SNN * yposSnn = NULL;
+    SNN * dydtSnn = NULL;
 
     SNN * cascadeSnn = NULL;
 
@@ -96,7 +105,7 @@ int main(int argc, char ** argv)
 
         climbRateSnn = new SNN(NETWORK, "risp");
         yawRateSnn = new SNN(NETWORK, "risp");
-        yposSnn = new SNN(NETWORK, "risp");
+        dydtSnn = new SNN(DYDT_NETWORK, "risp");
         cascadeSnn = new SNN(NETWORK3, "risp");
 
     } catch (const SRE &e) {
@@ -130,14 +139,12 @@ int main(int argc, char ** argv)
 
         const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
 
-        const auto rollAngleDemand = runSnn(
-                yposSnn, demands.roll, state.dy,
-                25, 1);
+        /*const auto rollAngleDemand = */runSnn(
+                dydtSnn, demands.roll, state.dy,
+                25, 1, true);
 
         const auto snn_diff = 
             runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
-
-        printf("%f,%f\n", demands.roll, rollAngleDemand);
 
         demands.roll = 60 * snn_diff;
         demands.roll = 0.0125 * (demands.roll - state.dphi);
