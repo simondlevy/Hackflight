@@ -1,13 +1,5 @@
 {
     "Associated_Data": {
-        "app_params": {
-            "action_high": 2,
-            "action_low": -2,
-            "function_name": "difference",
-            "max_samples": 1000,
-            "observation_highs": [ 1,  1 ],
-            "observation_lows": [ -1, -1 ]
-        },
         "decoder_array": {
             "decoders": [
                 {
@@ -21,8 +13,8 @@
             "dmin": [ -2.0 ]
         },
         "encoder_array": {
-            "dmax": [ 1.0, 1.0 ],
-            "dmin": [ -1.0, -1.0 ],
+            "dmax": [  1.0,  1.0 ],
+            "dmin": [ -1.0, -1.5 ],
             "encoders": [
                 {
                     "spikes": {

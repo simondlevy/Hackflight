@@ -141,7 +141,7 @@ int main(int argc, char ** argv)
 
         /*const auto rollAngleDemand = */runSnn(
                 dydtSnn, demands.roll, state.dy,
-                25, 1, true);
+                25, 0.9, true);
 
         const auto snn_diff = 
             runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
