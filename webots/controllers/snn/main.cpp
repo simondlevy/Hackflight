@@ -99,6 +99,8 @@ int main(int argc, char ** argv)
 
     SNN * cascadeSnn = NULL;
 
+    SNN * vizSnn = NULL;
+
     // Load up the network specified in the command line
 
     try {
@@ -113,10 +115,11 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    const auto viz_port = argc > 2 ? atoi(argv[1]) : 0;
+    const auto viz_port = argc > 1 ? atoi(argv[1]) : 0;
 
     if (viz_port) {
-        cascadeSnn->serve_visualizer(viz_port);
+        vizSnn = yawRateSnn;
+        vizSnn->serve_visualizer(viz_port);
     }
 
     while (true) {
@@ -167,7 +170,7 @@ int main(int argc, char ** argv)
         sim.setMotors(motors);
 
         if (viz_port) {
-            cascadeSnn->send_counts_to_visualizer();
+            vizSnn->send_counts_to_visualizer();
         }
     }
 
