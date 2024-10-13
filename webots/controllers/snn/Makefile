@@ -51,15 +51,15 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(NETWORK) $(NETWORK3)
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runlog:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(NETWORK3) | tail +11 > log.csv
+	/usr/local/webots/webots-controller $(NAME) | tail +11 > log.csv
 
 runviz:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(NETWORK3) $(VIZ_PORT) &
+	/usr/local/webots/webots-controller $(NAME) $(VIZ_PORT) &
 	sleep 1
 	cd $(FDIR)/viz; \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \

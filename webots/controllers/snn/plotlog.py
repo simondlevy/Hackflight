@@ -8,5 +8,7 @@ data = np.loadtxt('log.csv', delimiter=',')
 plt.plot(data[:,0])
 plt.plot(data[:,1])
 
+plt.grid()
+
 plt.show()
 

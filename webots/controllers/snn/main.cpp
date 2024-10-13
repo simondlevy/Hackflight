@@ -44,6 +44,10 @@ static const float CASCADE_POST_SCALE = 120;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
+static const char * NETWORK = "networks/difference_risp_train.txt";
+
+static const char * NETWORK3 = "networks/difference3_risp.txt";
+
 static double runSnn(
         SNN * snn,
         const float setpoint,
@@ -82,27 +86,25 @@ int main(int argc, char ** argv)
 
     SNN * yawRateSnn = NULL;
 
+    SNN * yposSnn = NULL;
+
     SNN * cascadeSnn = NULL;
 
     // Load up the network specified in the command line
 
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s RISP_NETWORK VIZ_PORT]\n", argv[0]);
-        exit(1);
-    }
-
     try {
 
-        climbRateSnn = new SNN(argv[1], "risp");
-        yawRateSnn = new SNN(argv[1], "risp");
-        cascadeSnn = new SNN(argv[2], "risp");
+        climbRateSnn = new SNN(NETWORK, "risp");
+        yawRateSnn = new SNN(NETWORK, "risp");
+        yposSnn = new SNN(NETWORK, "risp");
+        cascadeSnn = new SNN(NETWORK3, "risp");
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
 
-    const auto viz_port = argc > 3 ? atoi(argv[3]) : 0;
+    const auto viz_port = argc > 2 ? atoi(argv[1]) : 0;
 
     if (viz_port) {
         cascadeSnn->serve_visualizer(viz_port);
@@ -128,8 +130,14 @@ int main(int argc, char ** argv)
 
         const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
 
+        const auto rollAngleDemand = runSnn(
+                yposSnn, demands.roll, state.dy,
+                25, 1);
+
         const auto snn_diff = 
             runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
+
+        printf("%f,%f\n", demands.roll, rollAngleDemand);
 
         demands.roll = 60 * snn_diff;
         demands.roll = 0.0125 * (demands.roll - state.dphi);
