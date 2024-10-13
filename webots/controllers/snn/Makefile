@@ -59,11 +59,11 @@ runlog:
 
 runviz:
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(NETWORK3) $(VIZ_PORT) | tail +11 > log.csv &
+	/usr/local/webots/webots-controller $(NAME) $(NETWORK) $(NETWORK3) $(VIZ_PORT) &
 	sleep 1
 	cd $(FDIR)/viz; \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
-     	-n $(NETWORK) $(NETWORK3) --show_spike_count --remove_unnecessary_neuron \
+     	-n $(NETWORK3) --show_spike_count --remove_unnecessary_neuron \
     		--set_num_screen_shot 0 > /dev/null
 
 ### Do not modify: this includes Webots global Makefile.include

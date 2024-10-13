@@ -28,7 +28,9 @@ static const float THRUST_BASE = 55.385;
 
 static const float TAKEOFF_TIME = 3;
 
-static const float YAW_PREDIVISOR = 160; // deg/sec
+static const float YAW_PRE_DIVISOR = 160; // deg/sec
+
+static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
 static const float YAW_DIVISOR  = 26;
 static const float YAW_OFFSET = 0.955;
@@ -37,7 +39,7 @@ static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
 static const float CASCADE_DIVISOR  = 15;
-static const float CASCADE_OFFSET = 0.936; //0.95;
+static const float CASCADE_OFFSET = 0.936;
 static const float CASCADE_POST_SCALE = 120;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
@@ -100,10 +102,10 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    const auto viz_port = argc > 2 ? atoi(argv[2]) : 0;
+    const auto viz_port = argc > 3 ? atoi(argv[3]) : 0;
 
     if (viz_port) {
-        climbRateSnn->serve_visualizer(viz_port);
+        cascadeSnn->serve_visualizer(viz_port);
     }
 
     while (true) {
@@ -121,19 +123,14 @@ int main(int argc, char ** argv)
                 CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
 
         demands.yaw = runSnn(
-                yawRateSnn, demands.yaw, state.dpsi/YAW_PREDIVISOR,
+                yawRateSnn, demands.yaw, state.dpsi/YAW_PRE_DIVISOR,
                 YAW_DIVISOR, YAW_OFFSET);
 
-        const auto phi = state.phi / 10;
+        const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
 
         const auto snn_diff = 
             runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
 
-        const auto diff = (demands.roll - state.dy) - phi;
-
-        printf("%f,%f\n", diff, snn_diff);
-
-        // demands.roll = CASCADE_POST_SCALE * snn_diff;
         demands.roll = 60 * snn_diff;
         demands.roll = 0.0125 * (demands.roll - state.dphi);
 
@@ -155,7 +152,7 @@ int main(int argc, char ** argv)
         sim.setMotors(motors);
 
         if (viz_port) {
-            climbRateSnn->send_counts_to_visualizer();
+            cascadeSnn->send_counts_to_visualizer();
         }
     }
 
