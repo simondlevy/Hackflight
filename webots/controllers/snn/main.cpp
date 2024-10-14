@@ -45,9 +45,6 @@ static const float CASCADE_POST_SCALE = 120;
 static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const char * NETWORK = "networks/difference_risp_train.txt";
-
-static const char * DYDT_NETWORK = "networks/dydt_risp.txt";
-
 static const char * NETWORK3 = "networks/difference3_risp.txt";
 
 static double runSnn(
@@ -67,7 +64,8 @@ static double runSnn(
     const double action = counts[0] / divisor - offset;
 
     if (debug) {
-        printf("%f,%f\n", setpoint - actual, action);
+        printf("%d", counts[0]);
+        //printf("%f,%f\n", setpoint - actual, action);
     }
 
     return action;
@@ -85,6 +83,11 @@ static float runCascadeSnn(
     return counts[0] / CASCADE_DIVISOR - CASCADE_OFFSET;
 }
 
+static SNN * makeSnn(const char * filename)
+{
+    return new SNN(filename, "risp");
+}
+
 int main(int argc, char ** argv)
 {
     hf::Simulator sim = {};
@@ -92,23 +95,17 @@ int main(int argc, char ** argv)
     sim.init(false);
 
     SNN * climbRateSnn = NULL;
-
     SNN * yawRateSnn = NULL;
-
-    SNN * dydtSnn = NULL;
-
     SNN * cascadeSnn = NULL;
-
     SNN * vizSnn = NULL;
 
     // Load up the network specified in the command line
 
     try {
 
-        climbRateSnn = new SNN(NETWORK, "risp");
-        yawRateSnn = new SNN(NETWORK, "risp");
-        dydtSnn = new SNN(DYDT_NETWORK, "risp");
-        cascadeSnn = new SNN(NETWORK3, "risp");
+        climbRateSnn = makeSnn(NETWORK);
+        yawRateSnn = makeSnn(NETWORK);
+        cascadeSnn = makeSnn(NETWORK3);
 
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -134,17 +131,13 @@ int main(int argc, char ** argv)
 
         const auto thrustFromSnn = runSnn(
                 climbRateSnn, demands.thrust, state.dz,
-                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
+                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET, true);
 
         demands.yaw = runSnn(
                 yawRateSnn, demands.yaw, state.dpsi/YAW_PRE_DIVISOR,
                 YAW_DIVISOR, YAW_OFFSET);
 
         const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
-
-        /*const auto rollAngleDemand = */runSnn(
-                dydtSnn, demands.roll, state.dy,
-                25, 0.9, true);
 
         const auto snn_diff = 
             runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
