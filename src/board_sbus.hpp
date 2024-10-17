@@ -211,7 +211,7 @@ namespace hf {
 
                 _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
-                //Accelerometer
+                // Accelerometer
                 AccX = AcX / ACCEL_SCALE_FACTOR; //G's
                 AccY = AcY / ACCEL_SCALE_FACTOR;
                 AccZ = AcZ / ACCEL_SCALE_FACTOR;
@@ -270,7 +270,7 @@ namespace hf {
 
                 unsigned long checker = micros();
 
-                //Sit in loop until appropriate time has passed
+                // Sit in loop until appropriate time has passed
                 while (invFreq > (checker - usec_curr)) {
                     checker = micros();
                 }
