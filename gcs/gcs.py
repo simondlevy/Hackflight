@@ -19,18 +19,42 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 from serial import Serial
 import argparse
+from inputs import get_gamepad
+from threading import Thread
+from time import time, sleep
 
 from msp import Parser
 
-
 class MyMspParser(Parser):
+
+    def __init__(self, gamepad_vals):
+
+        Parser.__init__(self)
+
+        self.gamepad_vals = gamepad_vals
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        print(('dx=%+3.3f dy=%+3.3f z=%+3.3f dz=%+3.3f phi=%+3.3f ' +
-               'dphi=%+3.3f theta=%+3.3f dtheta=%+3.3f psi=%+3.3f ' +
-               ' dpsi=%+3.3f ') %
-              (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+        c = self.gamepad_vals
+
+        print('phi=%+3.3f theta=%+3.3f psi=%+3.3f | c1=%d c2=%d c3=%d c4=%d c5=%d c6=%d' %
+              (phi, theta, psi, c[0], c[1], c[2], c[3], c[4], c[5]))
+
+def gamepad_threadfun(gamepad_vals, running):
+
+    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
+
+    while running[0]:
+
+        for event in get_gamepad():
+
+            code = str(event.code)
+
+            if 'ABS' in code:
+
+                axis = AXIS_MAP[code[4:]]
+
+                gamepad_vals[axis] = event.state
 
 
 def main():
@@ -41,11 +65,25 @@ def main():
 
     arg_parser.add_argument('-p', '--port', default='/dev/ttyUSB0')
 
+    arg_parser.add_argument('-g', '--gamepad', action='store_true')
+
     args = arg_parser.parse_args()
 
     port = Serial(args.port, 115200)
 
-    msp_parser = MyMspParser()
+    gamepad_vals = [0, 0, 0, 0, 0, 0]
+
+    msp_parser = MyMspParser(gamepad_vals)
+
+    running = [True]
+
+    gamepad_thread = Thread(target=gamepad_threadfun, args=(gamepad_vals, running))
+
+    prev = time()
+
+    if args.gamepad:
+
+        gamepad_thread.start()
 
     while True:
 
@@ -56,6 +94,8 @@ def main():
             msp_parser.parse(c)
 
         except KeyboardInterrupt:
+
+            running = [False]
 
             break
 
