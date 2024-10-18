@@ -21,9 +21,9 @@ from serial import Serial
 import argparse
 from inputs import get_gamepad
 from threading import Thread
-from time import time, sleep
 
 from msp import Parser
+
 
 class MyMspParser(Parser):
 
@@ -41,6 +41,7 @@ class MyMspParser(Parser):
                'c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d') %
               (phi, theta, psi, c[0], c[1], c[2], c[3], c[4], c[5]))
 
+
 def telemetry_threadfun(port, msp, running):
 
     while running[0]:
@@ -49,9 +50,10 @@ def telemetry_threadfun(port, msp, running):
 
         msp.parse(c)
 
+
 def main():
 
-    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
+    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ': 5}
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
 
@@ -69,7 +71,8 @@ def main():
 
     running = [True]
 
-    telemetry_thread = Thread(target=telemetry_threadfun, args=(port, msp, running))
+    telemetry_thread = Thread(target=telemetry_threadfun,
+                              args=(port, msp, running))
 
     telemetry_thread.start()
 
@@ -92,7 +95,6 @@ def main():
             running[0] = False
 
             break
-
 
 
 main()
