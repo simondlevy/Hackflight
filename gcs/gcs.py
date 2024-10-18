@@ -41,24 +41,17 @@ class MyMspParser(Parser):
                'c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d') %
               (phi, theta, psi, c[0], c[1], c[2], c[3], c[4], c[5]))
 
-def gamepad_threadfun(gamepad_vals, running):
-
-    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
+def telemetry_threadfun(port, msp, running):
 
     while running[0]:
 
-        for event in get_gamepad():
+        c = port.read(1)
 
-            code = str(event.code)
-
-            if 'ABS' in code:
-
-                axis = AXIS_MAP[code[4:]]
-
-                gamepad_vals[axis] = event.state
-
+        msp.parse(c)
 
 def main():
+
+    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ':5}
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
 
@@ -72,29 +65,34 @@ def main():
 
     gamepad_vals = [0, 0, 0, 0, 0, 0]
 
-    msp_parser = MyMspParser(gamepad_vals)
+    msp = MyMspParser(gamepad_vals)
 
     running = [True]
 
-    gamepad_thread = Thread(target=gamepad_threadfun, args=(gamepad_vals, running))
+    telemetry_thread = Thread(target=telemetry_threadfun, args=(port, msp, running))
 
-    prev = time()
-
-    gamepad_thread.start()
+    telemetry_thread.start()
 
     while True:
 
         try:
 
-            c = port.read(1)
+            for event in get_gamepad():
 
-            msp_parser.parse(c)
+                code = str(event.code)
+
+                if 'ABS' in code:
+
+                    axis = AXIS_MAP[code[4:]]
+
+                    gamepad_vals[axis] = event.state
 
         except KeyboardInterrupt:
 
-            running = [False]
+            running[0] = False
 
             break
+
 
 
 main()
