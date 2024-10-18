@@ -37,7 +37,8 @@ class MyMspParser(Parser):
 
         c = self.gamepad_vals
 
-        print('phi=%+3.3f theta=%+3.3f psi=%+3.3f | c1=%d c2=%d c3=%d c4=%d c5=%d c6=%d' %
+        print(('phi=%+03.0f theta=%+03.0f psi=%+03.0f | ' +
+               'c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d') %
               (phi, theta, psi, c[0], c[1], c[2], c[3], c[4], c[5]))
 
 def gamepad_threadfun(gamepad_vals, running):
@@ -65,8 +66,6 @@ def main():
 
     arg_parser.add_argument('-p', '--port', default='/dev/ttyUSB0')
 
-    arg_parser.add_argument('-g', '--gamepad', action='store_true')
-
     args = arg_parser.parse_args()
 
     port = Serial(args.port, 115200)
@@ -81,9 +80,7 @@ def main():
 
     prev = time()
 
-    if args.gamepad:
-
-        gamepad_thread.start()
+    gamepad_thread.start()
 
     while True:
 
