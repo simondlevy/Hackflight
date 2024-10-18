@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.1.1">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -1040,7 +1040,7 @@ design rules under a new name.</description>
 <wire x1="25.420790625" y1="17.212209375" x2="25.493984375" y2="17.139015625" width="0.3048" layer="16"/>
 <wire x1="25.372034375" y1="19.29338125" x2="25.420790625" y2="19.244625" width="0.3048" layer="16"/>
 <wire x1="25.420790625" y1="19.244625" x2="25.420790625" y2="17.212209375" width="0.3048" layer="16"/>
-<wire x1="24.24979375" y1="17.02509375" x2="25.420790625" y2="17.212209375" width="0" layer="19" extent="16-16"/>
+<wire x1="24.24979375" y1="17.02509375" x2="25.493984375" y2="17.139015625" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="RX">
 <contactref element="U$1" pad="7"/>
@@ -1110,7 +1110,9 @@ design rules under a new name.</description>
 <signal name="LED_R_OUT">
 <contactref element="U$4" pad="1"/>
 <contactref element="U$6" pad="1"/>
-<wire x1="45.5" y1="68.35" x2="43.25" y2="73.65" width="0" layer="19" extent="1-1"/>
+<wire x1="43.25" y1="73.65" x2="44.528434375" y2="72.371565625" width="0.254" layer="1"/>
+<wire x1="44.528434375" y1="69.321565625" x2="45.5" y2="68.35" width="0.254" layer="1"/>
+<wire x1="44.528434375" y1="72.371565625" x2="44.528434375" y2="69.321565625" width="0.254" layer="1"/>
 </signal>
 <signal name="LED_R_IN">
 <contactref element="U$3" pad="1"/>

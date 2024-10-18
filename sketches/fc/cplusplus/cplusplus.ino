@@ -24,6 +24,8 @@
 
 #include <mixers.hpp>
 
+static const uint8_t LED_PIN = 0;
+
 static hf::BoardSbus _board;
 
 static constexpr float THROTTLE_DOWN = 0.06;
@@ -35,7 +37,7 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 
 void setup() 
 {
-    _board.init();
+    _board.init(LED_PIN);
 }
 
 void loop() 
