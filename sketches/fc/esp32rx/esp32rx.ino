@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <boards/board_sbus.hpp>
+#include <boards/board_esp32rx.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -26,7 +26,7 @@
 
 #include <mixers.hpp>
 
-static const uint8_t LED_PIN = 0;
+static const uint8_t LED_PIN = LED_BUILTIN;
 
 static hf::BoardSbus _board;
 
