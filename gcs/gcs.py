@@ -57,6 +57,11 @@ def gamepad_threadfun(port, msp, vals, running):
 
     while running[0]:
 
+        msg = msp.serialize_SET_RAW_RC(
+                vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]) 
+
+        print(msg)
+
         sleep(0)
 
 
@@ -80,10 +85,10 @@ def main():
 
     running = [True]
 
-    Thread(target=telemetry_threadfun,
+    t1 = Thread(target=telemetry_threadfun,
            args=(port, msp, running)).start()
 
-    Thread(target=gamepad_threadfun,
+    t2 = Thread(target=gamepad_threadfun,
            args=(port, msp, gamepad_vals, running)).start()
 
     while True:
