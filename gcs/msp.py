@@ -96,3 +96,9 @@ class Parser(metaclass=abc.ABCMeta):
     def serialize_STATE_Request():
         msg = '$M<' + chr(0) + chr(121) + chr(121)
         return bytes(msg, 'utf-8')
+
+    @staticmethod
+    def serialize_SET_RAW_RC(c1, c2, c3, c4, c5, c6):
+        message_buffer = struct.pack('hhhhhh', c1, c2, c3, c4, c5, c6)
+        msg = [len(message_buffer), 200] + list(message_buffer)
+        return bytes([ord('$'), ord('M'), ord('<')] + msg + [Parser.crc8(msg)])
