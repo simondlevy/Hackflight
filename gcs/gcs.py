@@ -21,6 +21,7 @@ from serial import Serial
 import argparse
 from inputs import get_gamepad
 from threading import Thread
+from time import sleep
 
 from msp import Parser
 
@@ -50,11 +51,13 @@ def telemetry_threadfun(port, msp, running):
 
         msp.parse(c)
 
+        sleep(0)
+
 def gamepad_threadfun(port, msp, running):
 
     while running[0]:
 
-        pass
+        sleep(0)
 
 
 def main():
@@ -78,6 +81,9 @@ def main():
     running = [True]
 
     Thread(target=telemetry_threadfun,
+           args=(port, msp, running)).start()
+
+    Thread(target=gamepad_threadfun,
            args=(port, msp, running)).start()
 
     while True:
