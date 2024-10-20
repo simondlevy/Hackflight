@@ -50,6 +50,12 @@ def telemetry_threadfun(port, msp, running):
 
         msp.parse(c)
 
+def gamepad_threadfun(port, msp, running):
+
+    while running[0]:
+
+        pass
+
 
 def main():
 
@@ -71,10 +77,8 @@ def main():
 
     running = [True]
 
-    telemetry_thread = Thread(target=telemetry_threadfun,
-                              args=(port, msp, running))
-
-    telemetry_thread.start()
+    Thread(target=telemetry_threadfun,
+           args=(port, msp, running)).start()
 
     while True:
 
