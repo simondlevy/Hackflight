@@ -14,10 +14,15 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
     for (int k=0; k<len; ++k) {
 
-        const auto mtype = _msp.parse(incomingData[k]);
+        const auto msgtype = _msp.parse(incomingData[k]);
 
-        if (mtype != 0) {
-            Serial.println(mtype);
+        if (msgtype == 200) { // SET_RC message
+
+            for (uint8_t k=0; k<6; ++k) {
+                Serial.printf("%04d ", _msp.parseShort(k));
+            }
+
+            Serial.printf("\n");
         }
     }
 }

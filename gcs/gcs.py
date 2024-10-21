@@ -25,6 +25,8 @@ from time import sleep
 
 from msp import Parser
 
+from memory_profiler import profile
+@profile
 
 class MyMspParser(Parser):
 
@@ -65,7 +67,7 @@ def gamepad_threadfun(port, msp, vals, running):
 
         port.write(msg)
 
-        print([('x%02X ' % c) for c in msg])
+        #print([('x%02X ' % c) for c in msg])
 
         sleep(0)
 
