@@ -16,8 +16,9 @@ class Parser(metaclass=abc.ABCMeta):
     def __init__(self):
         self.state = 0
 
-    def parse(self, char):
-        byte = ord(char)
+    def parse(self, byte):
+
+        # byte = ord(char)
 
         if self.state == 0:  # sync char 1
             if byte == 36:  # $
