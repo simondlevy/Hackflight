@@ -104,13 +104,19 @@ class Python_Emitter(CodeEmitter):
         self._write('\n\nimport abc')
         self._write('\n\n\nclass Parser(metaclass=abc.ABCMeta):')
 
+        # Emit error codes
+        self._write('\n\n    ERROR_NONE  = 0')
+        self._write('\n    ERROR_CRC   = 1')
+        self._write('\n    ERROR_STATE = 2')
+
         # Emit __init__() method
         self._write('\n\n    def __init__(self):')
         self._write('\n        self.state = 0')
 
         # Emit parse() method
         self._write('\n\n    def parse(self, char):')
-        self._write('\n        byte = ord(char)\n')
+        self._write('\n\n        byte = ord(char)')
+        self._write('\n\n        error = self.ERROR_NONE\n')
         self._write('\n        if self.state == 0:  # sync char 1')
         self._write('\n            if byte == 36:  # $')
         self._write('\n                self.state += 1\n')
@@ -152,12 +158,13 @@ class Python_Emitter(CodeEmitter):
         self._write('\n                # message received, process')
         self._write('\n                self.dispatchMessage()')
         self._write('\n            else:')
-        self._write('\n                print("code: " + str(self.message_id) + " - crc failed")')
+        self._write('\n                error = self.ERROR_CRC')
         self._write('\n            # Reset variables')
         self._write('\n            self.message_length_received = 0')
         self._write('\n            self.state = 0\n')
         self._write('\n        else:')
-        self._write('\n            print("Unknown state detected: %d" % self.state)')
+        self._write('\n            error = self.ERROR_STATE')
+        self._write('\n\n        return error')
 
         # Emit crc8() method
         self._write('\n\n    @staticmethod')

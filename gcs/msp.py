@@ -13,12 +13,18 @@ import abc
 
 class Parser(metaclass=abc.ABCMeta):
 
+    ERROR_NONE  = 0
+    ERROR_CRC   = 1
+    ERROR_STATE = 2
+
     def __init__(self):
         self.state = 0
 
     def parse(self, char):
 
         byte = ord(char)
+
+        error = self.ERROR_NONE
 
         if self.state == 0:  # sync char 1
             if byte == 36:  # $
@@ -67,13 +73,15 @@ class Parser(metaclass=abc.ABCMeta):
                 # message received, process
                 self.dispatchMessage()
             else:
-                print("code: " + str(self.message_id) + " - crc failed")
+                error = self.ERROR_CRC
             # Reset variables
             self.message_length_received = 0
             self.state = 0
 
         else:
-            print("Unknown state detected: %d" % self.state)
+            error = self.ERROR_STATE
+
+        return error
 
     @staticmethod
     def crc8(data):
