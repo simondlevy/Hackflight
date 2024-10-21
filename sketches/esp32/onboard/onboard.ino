@@ -1,17 +1,11 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <Wire.h>
-
 static uint8_t broadcastAddress[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static float temperature;
 static float humidity;
 static float pressure;
-
-static float incomingTemp;
-static float incomingHum;
-static float incomingPres;
 
 static String success;
 
@@ -30,12 +24,8 @@ static esp_now_peer_info_t peerInfo;
 
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
-  memcpy(&incomingReadings, incomingData, sizeof(incomingReadings));
   Serial.print("Bytes received: ");
   Serial.println(len);
-  incomingTemp = incomingReadings.temp;
-  incomingHum = incomingReadings.hum;
-  incomingPres = incomingReadings.pres;
 }
  
 static void getReadings()
@@ -43,21 +33,6 @@ static void getReadings()
   temperature = 99;
   humidity = 100;
   pressure = 101;
-}
-
-static void updateDisplay()
-{
-  Serial.println("INCOMING READINGS");
-  Serial.print("Temperature: ");
-  Serial.print(incomingReadings.temp);
-  Serial.println(" ºC");
-  Serial.print("Humidity: ");
-  Serial.print(incomingReadings.hum);
-  Serial.println(" %");
-  Serial.print("Pressure: ");
-  Serial.print(incomingReadings.pres);
-  Serial.println(" hPa");
-  Serial.println();
 }
 
 void setup() 
@@ -93,13 +68,10 @@ void loop()
 
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &BME280Readings, sizeof(BME280Readings));
    
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
+  if (result != ESP_OK) {
     Serial.println("Error sending the data");
   }
-  updateDisplay();
+
   delay(100);
 }
 

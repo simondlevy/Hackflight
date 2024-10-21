@@ -55,6 +55,7 @@ def telemetry_threadfun(port, msp, running):
 
         sleep(0)
 
+
 def gamepad_threadfun(port, msp, vals, running):
 
     while running[0]:
@@ -89,8 +90,8 @@ def main():
 
     running = [True]
 
-    t1 = Thread(target=telemetry_threadfun,
-           args=(port, msp, running)).start()
+    #t1 = Thread(target=telemetry_threadfun,
+    #       args=(port, msp, running)).start()
 
     t2 = Thread(target=gamepad_threadfun,
            args=(port, msp, gamepad_vals, running)).start()
