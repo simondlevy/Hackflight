@@ -61,6 +61,6 @@ void loop()
         Serial.println("Error sending the data");
     }
 
-    delay(100);
+    delay(10);
 }
 

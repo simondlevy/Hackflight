@@ -25,8 +25,6 @@ from time import sleep
 
 from msp import Parser
 
-from memory_profiler import profile
-@profile
 
 class MyMspParser(Parser):
 

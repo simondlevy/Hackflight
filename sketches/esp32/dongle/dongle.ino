@@ -36,8 +36,9 @@ void setup()
  
 void loop() 
 {
-  const uint8_t bytes[18] =
-    {0x24,0x4D,0x3C,0x0C,0xC8,0x00,0x00,0x00,0x04,0x00,0x04,0xFA,0x03,0x00,0x00,0x00,0x00,0x3D};
+  uint8_t bytes[18] = {};
+
+  Serial.readBytes(bytes, 18);
 
   esp_err_t result = esp_now_send(broadcastAddress, bytes, 18);
    
@@ -45,6 +46,6 @@ void loop()
     Serial.println("Error sending the data");
   }
 
-  delay(100);
+  delay(10);
 }
 
