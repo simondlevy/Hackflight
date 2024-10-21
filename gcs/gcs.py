@@ -38,9 +38,11 @@ class MyMspParser(Parser):
 
         c = self.gamepad_vals
 
+        '''
         print(('phi=%+03.0f theta=%+03.0f psi=%+03.0f | ' +
                'c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d') %
               (phi, theta, psi, c[0], c[1], c[2], c[3], c[4], c[5]))
+        '''
 
 
 def telemetry_threadfun(port, msp, running):
@@ -62,7 +64,9 @@ def gamepad_threadfun(port, msp, vals, running):
 
         port.write(msg)
 
-        sleep(0.05)
+        print([('x%02X ' % c) for c in msg])
+
+        sleep(0)
 
 
 def main():

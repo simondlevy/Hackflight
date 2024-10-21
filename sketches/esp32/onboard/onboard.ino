@@ -26,7 +26,6 @@
 #include <hackflight.hpp>
 #include <tasks/comms.hpp>
 
-// Replace with the MAC Address of your ESPNOW receiver
 static const uint8_t ESP_DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static void reportForever(const char * msg)
@@ -37,7 +36,23 @@ static void reportForever(const char * msg)
     }
 }
 
-void startEspNow(void)
+// Handles incoming stick demands from ESP32 dongle
+static void onDataRecv(
+        const esp_now_recv_info * info,
+        const uint8_t *incomingData,
+        int len)
+{
+    (void)info;
+
+    for (int k=0; k<len; ++k) {
+        Serial.printf("x%02x\n", incomingData[k]);
+    }
+
+    //delay(10);
+}
+
+
+static void startEspNow(void)
 {
     WiFi.mode(WIFI_STA);
 
@@ -54,6 +69,8 @@ void startEspNow(void)
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
         reportForever("Failed to add peer");
     }
+
+    esp_now_register_recv_cb(onDataRecv);
 }
 
 void setup()

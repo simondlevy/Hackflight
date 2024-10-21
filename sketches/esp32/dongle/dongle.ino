@@ -22,6 +22,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+static const uint8_t ESP_ONBOARD_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 
 // Handles incoming telemetry from onboard ESP32
 static void onDataRecv(
@@ -34,7 +35,7 @@ static void onDataRecv(
     // Send data to GCS
     Serial.write(incomingData, len);
 
-    delay(10);
+    //delay(10);
 }
 
 static void reportForever(const char * msg)
@@ -45,10 +46,35 @@ static void reportForever(const char * msg)
     }
 }
 
+static void startEspNow(void)
+{
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+        reportForever("Error initializing ESP-NOW");
+    }
+
+    static esp_now_peer_info_t peerInfo;
+
+    memcpy(peerInfo.peer_addr, ESP_ONBOARD_ADDRESS, 6);
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+        reportForever("Failed to add peer");
+    }
+
+    esp_now_register_recv_cb(onDataRecv);
+}
+
+
 void setup(void)
 {
     Serial.begin(115200);
 
+    startEspNow();
+
+    /*
     WiFi.mode(WIFI_STA);
 
     if (esp_now_init() != ESP_OK) {
@@ -56,17 +82,19 @@ void setup(void)
         reportForever("Error initializing ESP-NOW");
     }
 
-    esp_now_register_recv_cb(onDataRecv);
+    esp_now_register_recv_cb(onDataRecv);*/
+
 }
 
 
 void loop(void)
 {
     // Read incoming stick demands from GCS
-    while (Serial.available()) {
-        Serial.read();
+    while (Serial.available() > 0) {
+        const uint8_t b[1] = { Serial.read() };
+        esp_now_send(ESP_ONBOARD_ADDRESS, b, 1);
     }
 
     // A little delay here will minimize read/write contention
-    delay(10);
+    //delay(10);
 }
