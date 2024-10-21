@@ -60,7 +60,9 @@ def gamepad_threadfun(port, msp, vals, running):
         msg = msp.serialize_SET_RAW_RC(
                 vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]) 
 
-        sleep(0)
+        port.write(msg)
+
+        sleep(0.05)
 
 
 def main():
@@ -77,7 +79,7 @@ def main():
 
     port = Serial(args.port, 115200)
 
-    gamepad_vals = [0, 0, 0, 0, 0, 0]
+    gamepad_vals = [0, 1024, 1024, 1024, 0, 0]
 
     msp = MyMspParser(gamepad_vals)
 

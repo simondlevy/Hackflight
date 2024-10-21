@@ -23,6 +23,7 @@
 #include <WiFi.h>
 
 
+// Handles incoming telemetry from onboard ESP32
 static void onDataRecv(
         const esp_now_recv_info * info,
         const uint8_t *incomingData,
@@ -30,7 +31,10 @@ static void onDataRecv(
 {
     (void)info;
 
+    // Send data to GCS
     Serial.write(incomingData, len);
+
+    delay(10);
 }
 
 static void reportForever(const char * msg)
@@ -58,4 +62,11 @@ void setup(void)
 
 void loop(void)
 {
+    // Read incoming stick demands from GCS
+    while (Serial.available()) {
+        Serial.read();
+    }
+
+    // A little delay here will minimize read/write contention
+    delay(10);
 }

@@ -27,7 +27,7 @@
 #include <tasks/comms.hpp>
 
 // Replace with the MAC Address of your ESPNOW receiver
-static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+static const uint8_t ESP_DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static void reportForever(const char * msg)
 {
@@ -47,7 +47,7 @@ void startEspNow(void)
 
     static esp_now_peer_info_t peerInfo;
 
-    memcpy(peerInfo.peer_addr, ESP_RECEIVER_ADDRESS, 6);
+    memcpy(peerInfo.peer_addr, ESP_DONGLE_ADDRESS, 6);
     peerInfo.channel = 0;
     peerInfo.encrypt = false;
 
@@ -78,6 +78,6 @@ void loop()
 
         Wire.readBytes(msg, bytesReceived);
 
-        esp_now_send(ESP_RECEIVER_ADDRESS, msg, hf::MSP_STATE_MESSAGE_SIZE);
+        esp_now_send(ESP_DONGLE_ADDRESS, msg, hf::MSP_STATE_MESSAGE_SIZE);
     }
 }
