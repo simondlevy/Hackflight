@@ -158,7 +158,6 @@ namespace hf {
             MPU6050 _mpu6050;
 
             // Radio ---------------------------------------------------------
-            static const uint8_t NUM_DSM_CHANNELS = 6;
             bfs::SbusRx _rx = bfs::SbusRx(&Serial2);
 
             // Motors ---------------------------------------------------------

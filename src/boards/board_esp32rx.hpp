@@ -1,6 +1,7 @@
 /*
 
-   Support for "turtle board" quadcopter using MPU6050 IMU and SBUS receiver
+   Support for "turtle board" quadcopter using MPU6050 IMU and ESP32-NOW
+   receiver
 
    Adapted from https://github.com/nickrehm/dRehmFlight
 
@@ -23,21 +24,21 @@
 
 #include <Wire.h>
 
-#include <sbus.h>
 #include <MPU6050.h>
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
 #include <madgwick.hpp>
-#include <utils.hpp>
+#include <msp.hpp>
 #include <tasks/blink.hpp>
 #include <tasks/comms.hpp>
+#include <utils.hpp>
 
 // Receiver -------------------------------------------------------------------
 
 namespace hf {
 
-    class BoardSbus {
+    class BoardEsp32Rx {
 
         public:
 
@@ -113,10 +114,10 @@ namespace hf {
                 state.psi = -state.psi;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = sbusmap(_chan_1,  0.,  1.);
-                demands.roll   = sbusmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
-                demands.pitch  = sbusmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
-                demands.yaw    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
+                demands.thrust = chanmap(_chan_1,  0.,  1.);
+                demands.roll   = chanmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
+                demands.pitch  = chanmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
+                demands.yaw    = chanmap(_chan_4, -1,  +1) * YAW_PRESCALE;
 
                 // Run comms
                 _commsTask.run(state, _usec_curr, COMMS_RATE_HZ);
@@ -158,7 +159,6 @@ namespace hf {
             MPU6050 _mpu6050;
 
             // Radio ---------------------------------------------------------
-            static const uint8_t NUM_DSM_CHANNELS = 6;
             bfs::SbusRx _rx = bfs::SbusRx(&Serial2);
 
             // Motors ---------------------------------------------------------
@@ -367,10 +367,10 @@ namespace hf {
 
             }
 
-            static float sbusmap(
+            static float chanmap(
                     const uint16_t val, const float min, const float max)
             {
-                return min + (val - 172.) / (1811 - 172) * (max - min);
+                return min + val / 2047. * (max - min);
             }
 
     };
