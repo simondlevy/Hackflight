@@ -36,7 +36,11 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
     for (int k=0; k<len; ++k) {
 
-        const auto msgtype = _msp.parse(incomingData[k]);
+        const auto c = incomingData[k];
+
+        Serial1.write(c);
+
+        const auto msgtype = _msp.parse(c);
 
         if (msgtype == 200) { // SET_RC message
 
@@ -57,6 +61,8 @@ void setup()
     Serial.begin(115200);
 
     Esp32Now::init(DONGLE_ADDRESS, OnDataRecv);
+
+    Serial1.begin(115200, SERIAL_8N1, 4, 14 );
 }
 
 void loop() 

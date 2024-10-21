@@ -51,7 +51,7 @@ namespace hf {
                 delay(500);
 
                 // Start receiver
-                _rx.Begin();
+                Serial2.begin(115200);
 
                 // Star comms with ESP32 radio
                 _commsTask.begin();
@@ -158,9 +158,6 @@ namespace hf {
 
             MPU6050 _mpu6050;
 
-            // Radio ---------------------------------------------------------
-            bfs::SbusRx _rx = bfs::SbusRx(&Serial2);
-
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
@@ -193,7 +190,7 @@ namespace hf {
 
             uint32_t _usec_curr;
 
-            uint32_t _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6;
+            uint16_t _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6;
 
             // Safety
             bool _isArmed;
@@ -334,25 +331,24 @@ namespace hf {
 
             void readReceiver() 
             {
-                if (_rx.Read()) {
+                static Msp _msp;
 
-                    const auto data = _rx.data();
+                while (Serial2.available() > 0) {
 
-                    if (data.lost_frame || data.failsafe) {
+                    const auto msgtype = _msp.parse(Serial2.read());
 
-                        _isArmed = false;
-                        _gotFailsafe = true;
-                    }
+                    if (msgtype == 200) { // SET_RC message
 
-                    else {
-                        _chan_1 = data.ch[0];
-                        _chan_2 = data.ch[1];
-                        _chan_3 = data.ch[2];
-                        _chan_4 = data.ch[3];
-                        _chan_5 = data.ch[4];
-                        _chan_6 = data.ch[5];
+                        _chan_1 = _msp.parseShort(0);
+                        _chan_2 = _msp.parseShort(1);
+                        _chan_3 = _msp.parseShort(2);
+                        _chan_4 = _msp.parseShort(3);
+                        _chan_5 = _msp.parseShort(4);
+                        _chan_6 = _msp.parseShort(5);
                     }
                 }
+
+                printf("%d\n", _chan_1);
             }
 
             static void armMotor(uint8_t & m_usec)

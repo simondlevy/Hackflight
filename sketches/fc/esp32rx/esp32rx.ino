@@ -28,7 +28,7 @@
 
 static const uint8_t LED_PIN = LED_BUILTIN;
 
-static hf::BoardSbus _board;
+static hf::BoardEsp32Rx _board;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
