@@ -9,7 +9,7 @@ PORT = /dev/ttyUSB0
 LIBS = $(HOME)/Documents/Arduino/libraries
 
 build: $(SKETCH).ino
-	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) $(SKETCH).ino
+	arduino-cli compile --libraries $(LIBS) --libraries ../../.. --fqbn $(FQBN) $(SKETCH).ino
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .

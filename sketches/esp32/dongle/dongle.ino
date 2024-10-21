@@ -1,5 +1,29 @@
+/*
+   ESP32 dongl3 sketch
+
+   Relays SET_RC messages from GCS program to onboard ESP32; receives telemetry
+   from onboard ESP32 and relays to GCS.
+
+   Copyright (C) 2024 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
 #include <esp_now.h>
 #include <WiFi.h>
+
+#include <hackflight.hpp>
+#include <esp32now_helper.hpp>
 
 static uint8_t ONBOARD_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 
@@ -12,24 +36,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-        //Serial.println("Error initializing ESP-NOW");
-        //return;
-    }
-
-    esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, ONBOARD_ADDRESS, 6);
-    peerInfo.channel = 0;  
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        //Serial.println("Failed to add peer");
-        return;
-    }
-
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    Esp32Now::init(ONBOARD_ADDRESS, OnDataRecv);
 }
 
 void loop() 
