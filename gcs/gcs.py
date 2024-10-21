@@ -47,9 +47,7 @@ def telemetry_threadfun(port, msp, running):
 
     while running[0]:
 
-        for c in port.read(1):
-            print('x%02X' % c)
-            # msp.parse(c)
+        msp.parse(port.read())
 
         sleep(0)
 
