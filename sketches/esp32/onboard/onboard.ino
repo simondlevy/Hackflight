@@ -24,6 +24,7 @@
 #include <Wire.h>
 
 #include <hackflight.hpp>
+#include <esp32now_helper.hpp>
 #include <msp.hpp>
 #include <tasks/comms.hpp>
 
@@ -55,24 +56,7 @@ void setup()
 
     Serial.begin(115200);
 
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-        Serial.println("Error initializing ESP-NOW");
-        return;
-    }
-
-    esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, DONGLE_ADDRESS, 6);
-    peerInfo.channel = 0;  
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        Serial.println("Failed to add peer");
-        return;
-    }
-
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    Esp32Now::init(DONGLE_ADDRESS, OnDataRecv);
 }
 
 void loop() 
