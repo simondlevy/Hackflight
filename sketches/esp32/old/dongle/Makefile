@@ -1,9 +1,10 @@
-SKETCH = onboard
+SKETCH = dongle
 
 # For complete list run arduino-cli board listall
-FQBN = esp32:esp32:um_tinypico
+FQBN = esp32:esp32:m5stack_atom
+# FQBN = esp32:esp32:um_tinypico
 
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 

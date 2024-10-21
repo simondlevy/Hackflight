@@ -1,100 +1,137 @@
-/*
-   ESP32 on-board sketch
-
-   Relays serial comms data from Teensy flight-control board to a remote ESP32
-   dongle
-
-   Copyright (C) 2024 Simon D. Levy
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, in version 3.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program. If not, see <http:--www.gnu.org/licenses/>.
- */
-
 #include <esp_now.h>
 #include <WiFi.h>
+
 #include <Wire.h>
 
-#include <hackflight.hpp>
-#include <tasks/comms.hpp>
+static uint8_t broadcastAddress[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
-static const uint8_t ESP_DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+// Define variables to store BME280 readings to be sent
+static float temperature;
+static float humidity;
+static float pressure;
 
-static void reportForever(const char * msg)
+// Define variables to store incoming readings
+static float incomingTemp;
+static float incomingHum;
+static float incomingPres;
+
+// Variable to store if sending data was successful
+static String success;
+
+//Structure example to send data
+//Must match the receiver structure
+typedef struct struct_message 
 {
-    while (true) {
-        Serial.println(msg);
-        delay(500);
-    }
+    float temp;
+    float hum;
+    float pres;
+} struct_message;
+
+// Create a struct_message called BME280Readings to hold sensor readings
+static struct_message BME280Readings;
+
+// Create a struct_message to hold incoming sensor readings
+static struct_message incomingReadings;
+
+static esp_now_peer_info_t peerInfo;
+
+// Callback when data is sent
+static void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) 
+{
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  if (status ==0){
+    success = "Delivery Success :)";
+  }
+  else{
+    success = "Delivery Fail :(";
+  }
 }
 
-// Handles incoming stick demands from ESP32 dongle
-static void onDataRecv(
-        const esp_now_recv_info * info,
-        const uint8_t *incomingData,
-        int len)
+// Callback when data is received
+static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
-    (void)info;
-
-    for (int k=0; k<len; ++k) {
-        Serial.printf("x%02x\n", incomingData[k]);
-    }
-
-    //delay(10);
+  memcpy(&incomingReadings, incomingData, sizeof(incomingReadings));
+  Serial.print("Bytes received: ");
+  Serial.println(len);
+  incomingTemp = incomingReadings.temp;
+  incomingHum = incomingReadings.hum;
+  incomingPres = incomingReadings.pres;
+}
+ 
+static void getReadings()
+{
+  temperature = 99;
+  humidity = 100;
+  pressure = 101;
 }
 
-
-static void startEspNow(void)
+static void updateDisplay()
 {
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-        reportForever("Error initializing ESP-NOW");
-    }
-
-    static esp_now_peer_info_t peerInfo;
-
-    memcpy(peerInfo.peer_addr, ESP_DONGLE_ADDRESS, 6);
-    peerInfo.channel = 0;
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-        reportForever("Failed to add peer");
-    }
-
-    esp_now_register_recv_cb(onDataRecv);
+  Serial.println("INCOMING READINGS");
+  Serial.print("Temperature: ");
+  Serial.print(incomingReadings.temp);
+  Serial.println(" ºC");
+  Serial.print("Humidity: ");
+  Serial.print(incomingReadings.hum);
+  Serial.println(" %");
+  Serial.print("Pressure: ");
+  Serial.print(incomingReadings.pres);
+  Serial.println(" hPa");
+  Serial.println();
 }
 
-void setup()
+void setup() 
 {
-    Serial.begin(115200);
+  // Init Serial Monitor
+  Serial.begin(115200);
 
-    startEspNow();
+  // Set device as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
 
-    // Act as an I^2C host device
-    Wire.begin();
+  // Init ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Once ESPNow is successfully Init, we will register for Send CB to
+  // get the status of Trasnmitted packet
+  esp_now_register_send_cb(OnDataSent);
+  
+  // Register peer
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+  
+  // Add peer        
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+  // Register for a callback function that will be called when data is received
+  esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+}
+ 
+void loop() 
+{
+  getReadings();
+ 
+  // Set values to send
+  BME280Readings.temp = temperature;
+  BME280Readings.hum = humidity;
+  BME280Readings.pres = pressure;
+
+  // Send message via ESP-NOW
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &BME280Readings, sizeof(BME280Readings));
+   
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  }
+  else {
+    Serial.println("Error sending the data");
+  }
+  updateDisplay();
+  delay(1000);
 }
 
-void loop()
-{
-    const auto bytesReceived = Wire.requestFrom(
-            hf::CommsTask::I2C_DEV_ADDR, 
-            hf::MSP_STATE_MESSAGE_SIZE);
-
-    if (bytesReceived == hf::MSP_STATE_MESSAGE_SIZE) {
-
-        uint8_t msg[bytesReceived] = {};
-
-        Wire.readBytes(msg, bytesReceived);
-
-        esp_now_send(ESP_DONGLE_ADDRESS, msg, hf::MSP_STATE_MESSAGE_SIZE);
-    }
-}
