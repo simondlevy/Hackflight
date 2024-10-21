@@ -45,7 +45,5 @@ void loop()
   if (result != ESP_OK) {
     Serial.println("Error sending the data");
   }
-
-  delay(10);
 }
 
