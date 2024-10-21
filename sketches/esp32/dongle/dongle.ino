@@ -23,7 +23,7 @@
 #include <WiFi.h>
 
 #include <hackflight.hpp>
-#include <esp32now_helper.hpp>
+#include <esp32.hpp>
 
 static uint8_t ONBOARD_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 

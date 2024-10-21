@@ -24,7 +24,7 @@
 #include <Wire.h>
 
 #include <hackflight.hpp>
-#include <esp32now_helper.hpp>
+#include <esp32.hpp>
 #include <msp.hpp>
 #include <tasks/comms.hpp>
 
