@@ -29,8 +29,6 @@
 
 static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
-static esp_now_peer_info_t peerInfo;
-
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
     static Msp _msp;
@@ -64,6 +62,7 @@ void setup()
         return;
     }
 
+    esp_now_peer_info_t peerInfo = {};
     memcpy(peerInfo.peer_addr, DONGLE_ADDRESS, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;

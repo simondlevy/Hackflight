@@ -3,8 +3,6 @@
 
 static uint8_t ONBOARD_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 
-static esp_now_peer_info_t peerInfo;
-
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
     Serial.write(incomingData, len);
@@ -21,6 +19,7 @@ void setup()
         //return;
     }
 
+    esp_now_peer_info_t peerInfo = {};
     memcpy(peerInfo.peer_addr, ONBOARD_ADDRESS, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
