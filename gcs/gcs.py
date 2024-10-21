@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 from serial import Serial
 import argparse
-from inputs import get_gamepad
+import inputs
 from threading import Thread
 from time import sleep
 
@@ -60,8 +60,6 @@ def gamepad_threadfun(port, msp, vals, running):
         msg = msp.serialize_SET_RAW_RC(
                 vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]) 
 
-        print(msg)
-
         sleep(0)
 
 
@@ -95,7 +93,7 @@ def main():
 
         try:
 
-            for event in get_gamepad():
+            for event in inputs.get_gamepad():
 
                 code = str(event.code)
 
@@ -105,11 +103,17 @@ def main():
 
                     gamepad_vals[axis] = event.state
 
-        except KeyboardInterrupt:
+        except inputs.UnpluggedError:
 
-            running[0] = False
+            print('No gamepad detected')
 
             break
 
+        except KeyboardInterrupt:
+
+
+            break
+
+    running[0] = False
 
 main()

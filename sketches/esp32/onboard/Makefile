@@ -3,7 +3,7 @@ SKETCH = onboard
 # For complete list run arduino-cli board listall
 FQBN = esp32:esp32:um_tinypico
 
-PORT = /dev/ttyACM0
+PORT = /dev/ttyUSB1 # /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
