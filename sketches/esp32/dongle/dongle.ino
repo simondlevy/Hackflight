@@ -1,7 +1,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-static uint8_t broadcastAddress[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
+static uint8_t ONBOARD_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 
 static esp_now_peer_info_t peerInfo;
 
@@ -22,7 +22,7 @@ void setup()
     return;
   }
 
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  memcpy(peerInfo.peer_addr, ONBOARD_ADDRESS, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
@@ -40,7 +40,7 @@ void loop()
 
   Serial.readBytes(bytes, 18);
 
-  esp_err_t result = esp_now_send(broadcastAddress, bytes, 18);
+  esp_err_t result = esp_now_send(ONBOARD_ADDRESS, bytes, 18);
    
   if (result != ESP_OK) {
     Serial.println("Error sending the data");

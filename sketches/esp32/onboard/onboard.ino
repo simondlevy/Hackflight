@@ -4,7 +4,7 @@
 #include <hackflight.hpp>
 #include <msp.hpp>
 
-static uint8_t broadcastAddress[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static esp_now_peer_info_t peerInfo;
 
@@ -38,7 +38,7 @@ void setup()
         return;
     }
 
-    memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+    memcpy(peerInfo.peer_addr, DONGLE_ADDRESS, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
 
@@ -55,7 +55,7 @@ void loop()
     const uint8_t bytes[20] =
     {0x24,0x4D,0x3C,0x0C,0xC8,0x00,0x00,0x00,0x04,0x00,0x04,0xFA,0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x3D};
 
-    esp_err_t result = esp_now_send(broadcastAddress, bytes, 20);
+    esp_err_t result = esp_now_send(DONGLE_ADDRESS, bytes, 20);
 
     if (result != ESP_OK) {
         Serial.println("Error sending the data");
