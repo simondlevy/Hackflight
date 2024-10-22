@@ -38,7 +38,7 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
         const auto c = incomingData[k];
 
-        Serial1.write(c);
+        //Serial1.write(c);
 
         const auto msgtype = _msp.parse(c);
 
@@ -62,7 +62,7 @@ void setup()
 
     Esp32Now::init(DONGLE_ADDRESS, OnDataRecv);
 
-    Serial1.begin(115200, SERIAL_8N1, 4, 14 );
+    Serial1.begin(115200, SERIAL_8N1, 4, 14);
 }
 
 void loop() 
@@ -83,6 +83,10 @@ void loop()
             Serial.printf("Error sending the data\n");
         }
     }
+
+    static uint8_t val;
+    Serial1.write(val);
+    val = (val + 1) % 100;
 
     delay(10);
 }

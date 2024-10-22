@@ -138,7 +138,11 @@ namespace hf {
                 runMotors(); 
 
                 // Get vehicle commands for next loop iteration
-                readReceiver();
+                //readReceiver();
+
+                while (Serial2.available()) {
+                    printf("%d\n", Serial2.read());
+                }
 
                 runLoopDelay(_usec_curr);
             }
