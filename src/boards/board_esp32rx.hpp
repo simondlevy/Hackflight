@@ -348,7 +348,8 @@ namespace hf {
                     }
                 }
 
-                printf("%d\n", _chan_1);
+                printf("c1=%04d  c2=%04d  c3=%04d  c=%04d  c5=%04d  c6=%04d\n", 
+                        _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6);
             }
 
             static void armMotor(uint8_t & m_usec)

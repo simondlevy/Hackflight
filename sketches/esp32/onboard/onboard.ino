@@ -36,9 +36,7 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
     for (int k=0; k<len; ++k) {
 
-        const auto c = incomingData[k];
-
-        Serial1.write(c);
+        Serial1.write(incomingData[k]);
     }
 }
 
@@ -72,10 +70,6 @@ void loop()
             Serial.printf("Error sending the data\n");
         }
     }
-
-    //static uint8_t val;
-    //Serial1.write(val);
-    //val = (val + 1) % 100;
 
     delay(10);
 }
