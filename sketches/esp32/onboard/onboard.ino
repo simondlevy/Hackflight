@@ -38,18 +38,7 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
         const auto c = incomingData[k];
 
-        //Serial1.write(c);
-
-        const auto msgtype = _msp.parse(c);
-
-        if (msgtype == 200) { // SET_RC message
-
-            for (uint8_t k=0; k<6; ++k) {
-                Serial.printf("%04d ", _msp.parseShort(k));
-            }
-
-            Serial.printf("\n");
-        }
+        Serial1.write(c);
     }
 }
 
@@ -84,9 +73,9 @@ void loop()
         }
     }
 
-    static uint8_t val;
-    Serial1.write(val);
-    val = (val + 1) % 100;
+    //static uint8_t val;
+    //Serial1.write(val);
+    //val = (val + 1) % 100;
 
     delay(10);
 }
