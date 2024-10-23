@@ -52,7 +52,8 @@ def telemetry_threadfun(port, msp, running):
         if port.in_waiting > 0:
             msp.parse(port.read())
 
-        elif msp.last_received_time > 0 and (time() - msp.last_received_time) > 1.0:
+        elif (msp.last_received_time > 0 and
+              (time() - msp.last_received_time) > 1.0):
             print('Lost connection to vehicle')
             os._exit(1)
             running[0] = False
@@ -65,7 +66,7 @@ def gamepad_threadfun(port, msp, vals, running):
     while running[0]:
 
         msg = msp.serialize_SET_RAW_RC(
-                vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]) 
+                vals[0], vals[1], vals[2], vals[3], vals[4], vals[5])
 
         port.write(msg)
 
@@ -93,10 +94,14 @@ def main():
     running = [True]
 
     t1 = Thread(target=telemetry_threadfun,
-           args=(port, msp, running)).start()
+                args=(port, msp, running))
+
+    t1.start()
 
     t2 = Thread(target=gamepad_threadfun,
-           args=(port, msp, gamepad_vals, running)).start()
+                args=(port, msp, gamepad_vals, running))
+
+    t2.start()
 
     print('Waiting for vehicle to connect ...', end='')
     stdout.flush()
@@ -131,6 +136,7 @@ def main():
 
             break
 
-
     running[0] = False
+
+
 main()
