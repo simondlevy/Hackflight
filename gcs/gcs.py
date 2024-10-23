@@ -131,4 +131,6 @@ def main():
 
             break
 
+
+    running[0] = False
 main()
