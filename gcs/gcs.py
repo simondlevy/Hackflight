@@ -36,6 +36,7 @@ class MyMspParser(Parser):
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
+        return
         print('phi=%+03.0f theta=%+03.0f psi=%+03.0f' % (phi, theta, psi))
 
 
@@ -107,6 +108,12 @@ def main():
             break
 
         except KeyboardInterrupt:
+
+            break
+
+        except OSError:
+
+            print('Gamepad unplugged')
 
             break
 
