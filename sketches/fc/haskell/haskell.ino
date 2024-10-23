@@ -18,7 +18,9 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <board_sbus.hpp>
+#include <hackflight.hpp>
+
+#include <boards/board_sbus.hpp>
 
 static hf::BoardSbus _board;
 
@@ -55,20 +57,26 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 void setup() 
 {
-    _board.init();
+    _board.init(0);
 }
 
 void loop() 
 {
-    float psi = 0; // unused
+    float dt=0;
+    hf::demands_t demands = {};
+    hf::state_t state = {};
 
-    _board.readData(stream_dt, 
-            stream_thro_demand,
-            stream_roll_demand,
-            stream_pitch_demand,
-            stream_yaw_demand,
-            stream_phi, stream_theta, psi, 
-            stream_dphi, stream_dtheta, stream_dpsi);
+    _board.readData(dt, demands, state);
+
+    stream_thro_demand = demands.thrust;
+    stream_roll_demand = demands.roll;
+    stream_pitch_demand = demands.pitch;
+    stream_yaw_demand = demands.yaw;
+
+    stream_phi = state.phi;
+    stream_theta = state.theta;
+    stream_dphi = state.dphi;
+    stream_dtheta = state.dtheta;
 
     stream_reset = stream_thro_demand < 0.06;
 
