@@ -148,6 +148,9 @@ namespace hf {
             // FAFO -----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
+            // Failsafe
+            static const uint32_t RX_TIMEOUT_MSEC = 20;
+
             // IMU ------------------------------------------------------------
 
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -333,11 +336,15 @@ namespace hf {
             {
                 static Msp _msp;
 
+                static uint32_t _last_received_msec;
+
                 while (Serial2.available() > 0) {
 
                     const auto msgtype = _msp.parse(Serial2.read());
 
                     if (msgtype == 200) { // SET_RC message
+
+                        _last_received_msec = millis();
 
                         _chan_1 = _msp.parseShort(0);
                         _chan_2 = _msp.parseShort(1);
@@ -348,8 +355,10 @@ namespace hf {
                     }
                 }
 
-                printf("c1=%04d  c2=%04d  c3=%04d  c=%04d  c5=%04d  c6=%04d\n", 
-                        _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6);
+                printf("%d\n", (int)(millis() - _last_received_msec));
+
+                //printf("c1=%04d  c2=%04d  c3=%04d  c=%04d  c5=%04d  c6=%04d\n", 
+                //        _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6);
             }
 
             static void armMotor(uint8_t & m_usec)
