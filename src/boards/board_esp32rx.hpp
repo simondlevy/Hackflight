@@ -149,7 +149,7 @@ namespace hf {
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
             // Failsafe
-            static const uint32_t RX_TIMEOUT_MSEC = 20;
+            static const uint32_t RX_TIMEOUT_MSEC = 100;
 
             // IMU ------------------------------------------------------------
 
@@ -355,10 +355,18 @@ namespace hf {
                     }
                 }
 
-                printf("%d\n", (int)(millis() - _last_received_msec));
+                if ((millis() - _last_received_msec) > RX_TIMEOUT_MSEC) {
+                    _gotFailsafe = true;
+                }
 
-                //printf("c1=%04d  c2=%04d  c3=%04d  c=%04d  c5=%04d  c6=%04d\n", 
-                //        _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6);
+
+                if (_gotFailsafe) {
+                    printf("FAILSAFE!!!\n");
+                }
+                else {
+                    printf("c1=%04d  c2=%04d  c3=%04d  c=%04d  c5=%04d  c6=%04d\n", 
+                            _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6);
+                }
             }
 
             static void armMotor(uint8_t & m_usec)
