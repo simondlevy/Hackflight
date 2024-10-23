@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
+import os
 from sys import stdout
 from serial import Serial
 import argparse
@@ -52,7 +53,9 @@ def telemetry_threadfun(port, msp, running):
             msp.parse(port.read())
 
         elif msp.last_received_time > 0 and (time() - msp.last_received_time) > 1.0:
-            print('lost connection')
+            print('Lost connection to vehicle')
+            os._exit(1)
+            running[0] = False
 
         sleep(0)
 
@@ -98,7 +101,7 @@ def main():
     print('Waiting for vehicle to connect ...', end='')
     stdout.flush()
 
-    while True:
+    while running[0]:
 
         try:
 
@@ -127,7 +130,5 @@ def main():
             print('Gamepad unplugged')
 
             break
-
-    running[0] = False
 
 main()
