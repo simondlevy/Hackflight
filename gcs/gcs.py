@@ -48,11 +48,11 @@ def telemetry_threadfun(port, msp, running):
 
     while running[0]:
 
-        #if msp.last_received_time > 0 and port.in_waiting == 0:
-        #    print((time() - msp.last_received_time))
-
         if port.in_waiting > 0:
             msp.parse(port.read())
+
+        elif msp.last_received_time > 0 and (time() - msp.last_received_time) > 1.0:
+            print('lost connection')
 
         sleep(0)
 
