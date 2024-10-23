@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-Hackflight Ground Control Station main program
+Hackflight Ground Control Station program
 
 This file is part of Hackflight.
 
@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
+from sys import stdout
 from serial import Serial
 import argparse
 import inputs
 from threading import Thread
-from time import sleep
+from time import time, sleep
 
 from msp import Parser
 
@@ -34,16 +35,24 @@ class MyMspParser(Parser):
 
         self.gamepad_vals = gamepad_vals
 
+        self.last_received_time = 0
+
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         print('phi=%+03.0f theta=%+03.0f psi=%+03.0f' % (phi, theta, psi))
+
+        self.last_received_time = time()
 
 
 def telemetry_threadfun(port, msp, running):
 
     while running[0]:
 
-        msp.parse(port.read())
+        #if msp.last_received_time > 0 and port.in_waiting == 0:
+        #    print((time() - msp.last_received_time))
+
+        if port.in_waiting > 0:
+            msp.parse(port.read())
 
         sleep(0)
 
@@ -85,6 +94,9 @@ def main():
 
     t2 = Thread(target=gamepad_threadfun,
            args=(port, msp, gamepad_vals, running)).start()
+
+    print('Waiting for vehicle to connect ...', end='')
+    stdout.flush()
 
     while True:
 
