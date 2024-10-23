@@ -30,8 +30,14 @@
 
 static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
+static const uint32_t WIFI_TIMEOUT_MSEC = 20;
+
+static uint32_t _last_wifi_received_msec;
+
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
+    _last_wifi_received_msec = millis();
+
     static Msp _msp;
 
     for (int k=0; k<len; ++k) {
@@ -54,6 +60,8 @@ void setup()
 
 void loop() 
 {
+    static bool _lost_wifi;
+
     const auto bytesReceived = Wire.requestFrom(
             hf::CommsTask::I2C_DEV_ADDR, 
             hf::MSP_STATE_MESSAGE_SIZE);
@@ -70,6 +78,12 @@ void loop()
             Serial.printf("Error sending the data\n");
         }
     }
+
+    if ((millis() - _last_wifi_received_msec) > WIFI_TIMEOUT_MSEC) {
+        _lost_wifi = true;
+    }
+
+    Serial.printf("%d\n", _lost_wifi);
 
     delay(10);
 }
