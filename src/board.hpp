@@ -27,9 +27,12 @@
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-#include <madgwick.hpp>
+
+#include <estimators/madgwick.hpp>
+
 #include <rx.hpp>
 #include <utils.hpp>
+
 #include <tasks/blink.hpp>
 #include <tasks/comms.hpp>
 
