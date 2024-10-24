@@ -79,14 +79,16 @@ namespace hf {
 
             void readData(float & dt, demands_t & demands, state_t & state)
             {
-                // Keep track of what time it is and how much time has elapsed since the last loop
+                // Keep track of what time it is and how much time has elapsed
+                // since the last loop
                 _usec_curr = micros();      
                 static uint32_t _usec_prev;
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
                 // Arm vehicle if safe
-                if (!_gotFailsafe && (_chan_5 > 1500) && (_chan_1 < 1050)) {
+                if (!_gotFailsafe && (_channels[4] > 1500) &&
+                        (_channels[0] < 1050)) {
                     _isArmed = true;
                 }
 
@@ -108,15 +110,18 @@ namespace hf {
                 readImu(AccX, AccY, AccZ, state.dphi, state.dtheta, state.dpsi); 
 
                 // Get Euler angles from IMU (note negations)
-                Madgwick6DOF(dt, state.dphi, -state.dtheta, state.dpsi, -AccX, AccY, AccZ,
-                        state.phi, state.theta, state.psi);
+                Madgwick6DOF(dt, state.dphi, -state.dtheta, state.dpsi,
+                        -AccX, AccY, AccZ, state.phi, state.theta, state.psi);
                 state.psi = -state.psi;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = sbusmap(_chan_1,  0.,  1.);
-                demands.roll   = sbusmap(_chan_2, -1,  +1) * PITCH_ROLL_PRESCALE;
-                demands.pitch  = sbusmap(_chan_3, -1,  +1) * PITCH_ROLL_PRESCALE;
-                demands.yaw    = sbusmap(_chan_4, -1,  +1) * YAW_PRESCALE;
+                demands.thrust = sbusmap(_channels[0],  0.,  1.);
+                demands.roll   = sbusmap(_channels[1], -1,  +1) *
+                    PITCH_ROLL_PRESCALE;
+                demands.pitch  = sbusmap(_channels[2], -1,  +1) *
+                    PITCH_ROLL_PRESCALE;
+                demands.yaw    = sbusmap(_channels[3], -1,  +1) *
+                    YAW_PRESCALE;
 
                 // Run comms
                 _commsTask.run(state, _usec_curr, COMMS_RATE_HZ);
@@ -131,13 +136,18 @@ namespace hf {
                 _m4_usec = scaleMotor(motors.m4);
 
                 // Turn off motors under various conditions
-                cutMotors(_chan_5, _isArmed); 
+                cutMotors(_channels[4], _isArmed); 
 
                 // Run motors
                 runMotors(); 
 
                 // Get vehicle commands for next loop iteration
-                readReceiver();
+                readReceiver(_channels, _gotFailsafe);
+
+                // Disarm immiedately on failsafe
+                if (_gotFailsafe) {
+                    _isArmed = false;
+                }
 
                 runLoopDelay(_usec_curr);
             }
@@ -192,7 +202,7 @@ namespace hf {
 
             uint32_t _usec_curr;
 
-            uint32_t _chan_1, _chan_2, _chan_3, _chan_4, _chan_5, _chan_6;
+            uint16_t _channels[6];
 
             // Safety
             bool _isArmed;
@@ -253,17 +263,19 @@ namespace hf {
 
             static void runLoopDelay(const uint32_t usec_curr)
             {
-                //DESCRIPTION: Regulate main loop rate to specified frequency in Hz
+                //DESCRIPTION: Regulate main loop rate to specified frequency
+                //in Hz
                 /*
-                 * It's good to operate at a constant loop rate for filters to remain
-                 * stable and whatnot. Interrupt routines running in the background cause
-                 * the loop rate to fluctuate. This function basically just waits at the
-                 * end of every loop iteration until the correct time has passed since the
-                 * start of the current loop for the desired loop rate in Hz. 2kHz is a
-                 * good rate to be at because the loop nominally will run between 2.8kHz -
-                 * 4.2kHz. This lets us have a little room to add extra computations and
-                 * remain above 2kHz, without needing to retune all of our filtering
-                 * parameters.
+                 * It's good to operate at a constant loop rate for filters to
+                 * remain stable and whatnot. Interrupt routines running in the
+                 * background cause the loop rate to fluctuate. This function
+                 * basically just waits at the end of every loop iteration
+                 * until the correct time has passed since the start of the
+                 * current loop for the desired loop rate in Hz. 2kHz is a good
+                 * rate to be at because the loop nominally will run between
+                 * 2.8kHz - 4.2kHz. This lets us have a little room to add
+                 * extra computations and remain above 2kHz, without needing to
+                 * retune all of our filtering parameters.
                  */
                 float invFreq = 1.0/LOOP_FREQ_HZ*1000000.0;
 
@@ -292,7 +304,9 @@ namespace hf {
             void initImu() 
             {
                 Wire.begin();
-                Wire.setClock(1000000); //Note this is 2.5 times the spec sheet 400 kHz max...
+
+                //Note this is 2.5 times the spec sheet 400 kHz max...
+                Wire.setClock(1000000); 
 
                 _mpu6050.initialize();
 
@@ -302,9 +316,9 @@ namespace hf {
                     while(true) {}
                 }
 
-                // From the reset state all registers should be 0x00, so we should be at
-                // max sample rate with digital low pass filter(s) off.  All we need to
-                // do is set the desired fullscale ranges
+                // From the reset state all registers should be 0x00, so we
+                // should be at max sample rate with digital low pass filter(s)
+                // off.  All we need to do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
             }
@@ -331,7 +345,7 @@ namespace hf {
                 }
             }
 
-            void readReceiver() 
+            void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
             {
                 if (_rx.Read()) {
 
@@ -339,17 +353,16 @@ namespace hf {
 
                     if (data.lost_frame || data.failsafe) {
 
-                        _isArmed = false;
-                        _gotFailsafe = true;
+                        gotFailsafe = true;
                     }
 
                     else {
-                        _chan_1 = data.ch[0];
-                        _chan_2 = data.ch[1];
-                        _chan_3 = data.ch[2];
-                        _chan_4 = data.ch[3];
-                        _chan_5 = data.ch[4];
-                        _chan_6 = data.ch[5];
+                        channels[0] = data.ch[0];
+                        channels[1] = data.ch[1];
+                        channels[2] = data.ch[2];
+                        channels[3] = data.ch[3];
+                        channels[4] = data.ch[4];
+                        channels[5] = data.ch[5];
                     }
                 }
             }
