@@ -27,16 +27,13 @@ static hf::BoardSbus _board;
 // Shared with Haskell Copilot -----------------------------------------------
 
 float stream_dt;
+
 bool stream_reset;
 
 float stream_thro_demand;
 float stream_roll_demand;
 float stream_pitch_demand;
 float stream_yaw_demand;
-
-float stream_roll_PID;
-float stream_pitch_PID;
-float stream_yaw_PID;
 
 float stream_phi;
 float stream_theta;
@@ -62,11 +59,10 @@ void setup()
 
 void loop() 
 {
-    float dt=0;
     hf::demands_t demands = {};
     hf::state_t state = {};
 
-    _board.readData(dt, demands, state);
+    _board.readData(stream_dt, demands, state);
 
     stream_thro_demand = demands.thrust;
     stream_roll_demand = demands.roll;
@@ -77,6 +73,7 @@ void loop()
     stream_theta = state.theta;
     stream_dphi = state.dphi;
     stream_dtheta = state.dtheta;
+    stream_dpsi = state.dpsi;
 
     stream_reset = stream_thro_demand < 0.06;
 
