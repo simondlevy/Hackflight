@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <boards/board_esp32rx.hpp>
+#include <board.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -26,9 +26,13 @@
 
 #include <mixers.hpp>
 
+#include <receivers/esp32.hpp>
+
 static const uint8_t LED_PIN = LED_BUILTIN;
 
-static hf::BoardEsp32Rx _board;
+static hf::Board _board;
+
+static hf::Esp32Receiver _rx;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
@@ -39,7 +43,7 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 
 void setup() 
 {
-    _board.init(LED_PIN);
+    _board.init(_rx, LED_PIN);
 }
 
 void loop() 
@@ -48,7 +52,7 @@ void loop()
     hf::demands_t demands = {};
     hf::state_t state = {};
 
-    _board.readData(dt, demands, state);
+    _board.readData(dt, _rx, demands, state);
 
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
@@ -62,5 +66,5 @@ void loop()
 
     hf::Mixer::runBetaFlightQuadX(demands, motors);
 
-    _board.runMotors(motors);
+    _board.runMotors(_rx, motors);
 }
