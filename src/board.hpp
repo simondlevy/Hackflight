@@ -1,6 +1,6 @@
 /*
 
-   Support for "turtle board" quadcopter using MPU6050 IMU and SBUS receiver
+   Support for "turtle board" quadcopter
 
    Adapted from https://github.com/nickrehm/dRehmFlight
 
@@ -23,25 +23,23 @@
 
 #include <Wire.h>
 
-#include <sbus.h>
 #include <MPU6050.h>
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
 #include <madgwick.hpp>
+#include <rx.hpp>
 #include <utils.hpp>
 #include <tasks/blink.hpp>
 #include <tasks/comms.hpp>
 
-// Receiver -------------------------------------------------------------------
-
 namespace hf {
 
-    class BoardSbus {
+    class Board {
 
         public:
 
-            void init(const uint8_t ledPin=LED_BUILTIN)
+            void init(Receiver & rx, const uint8_t ledPin=LED_BUILTIN)
             {
                 _ledPin = ledPin;
 
@@ -50,7 +48,7 @@ namespace hf {
                 delay(500);
 
                 // Start receiver
-                _rx.Begin();
+                rx.begin();
 
                 // Star comms with ESP32 radio
                 _commsTask.begin();
@@ -77,7 +75,11 @@ namespace hf {
                 _motors.arm();
             }
 
-            void readData(float & dt, demands_t & demands, state_t & state)
+            void readData(
+                    float & dt,
+                    Receiver & rx,
+                    demands_t & demands,
+                    state_t & state)
             {
                 // Keep track of what time it is and how much time has elapsed
                 // since the last loop
@@ -115,19 +117,19 @@ namespace hf {
                 state.psi = -state.psi;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = sbusmap(_channels[0],  0.,  1.);
-                demands.roll   = sbusmap(_channels[1], -1,  +1) *
+                demands.thrust = rx.map(_channels[0],  0.,  1.);
+                demands.roll   = rx.map(_channels[1], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.pitch  = sbusmap(_channels[2], -1,  +1) *
+                demands.pitch  = rx.map(_channels[2], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.yaw    = sbusmap(_channels[3], -1,  +1) *
+                demands.yaw    = rx.map(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
                 // Run comms
                 _commsTask.run(state, _usec_curr, COMMS_RATE_HZ);
             }
 
-            void runMotors(const quad_motors_t & motors)
+            void runMotors(Receiver & rx, const quad_motors_t & motors)
             {
                 // Rescale motor values for OneShot125
                 _m1_usec = scaleMotor(motors.m1);
@@ -142,7 +144,7 @@ namespace hf {
                 runMotors(); 
 
                 // Get vehicle commands for next loop iteration
-                readReceiver(_channels, _gotFailsafe);
+                rx.read(_channels, _gotFailsafe);
 
                 // Disarm immiedately on failsafe
                 if (_gotFailsafe) {
@@ -166,9 +168,6 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             MPU6050 _mpu6050;
-
-            // Radio ---------------------------------------------------------
-            bfs::SbusRx _rx = bfs::SbusRx(&Serial2);
 
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
@@ -345,28 +344,6 @@ namespace hf {
                 }
             }
 
-            void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
-            {
-                if (_rx.Read()) {
-
-                    const auto data = _rx.data();
-
-                    if (data.lost_frame || data.failsafe) {
-
-                        gotFailsafe = true;
-                    }
-
-                    else {
-                        channels[0] = data.ch[0];
-                        channels[1] = data.ch[1];
-                        channels[2] = data.ch[2];
-                        channels[3] = data.ch[3];
-                        channels[4] = data.ch[4];
-                        channels[5] = data.ch[5];
-                    }
-                }
-            }
-
             static void armMotor(uint8_t & m_usec)
             {
                 // OneShot125 range from 125 to 250 usec
@@ -379,11 +356,6 @@ namespace hf {
 
             }
 
-            static float sbusmap(
-                    const uint16_t val, const float min, const float max)
-            {
-                return min + (val - 172.) / (1811 - 172) * (max - min);
-            }
 
     };
 
