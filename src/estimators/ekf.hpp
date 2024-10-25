@@ -341,10 +341,13 @@ namespace hf {
 
             } // finalize
 
-            void get_vehicle_state(quat_t & quat, axis3_t & pos, axis3_t & dpos)
+            void get_quaternion(quat_t & quat)
             {
                 memcpy(&quat, &_quat, sizeof (quat_t));
+            }
 
+            void get_position(axis3_t & pos, axis3_t & dpos)
+            {
                 const auto x = _ekf.x;
 
                 dpos.x = x[STATE_DX];
