@@ -69,6 +69,10 @@ namespace hf {
                 // Initialize IMU communication
                 initImu();
 
+                // Initialize the state estimator
+                _madgwick.initialize();
+                _ekf.initialize();
+
                 delay(5);
 
                 // Arm OneShot125 motors
@@ -112,24 +116,33 @@ namespace hf {
                 }
 
                 // Read IMU
-                float AccX = 0, AccY = 0, AccZ = 0;
-                readImu(AccX, AccY, AccZ, state.dphi, state.dtheta, state.dpsi); 
+                float accelX = 0, accelY = 0, accelZ = 0;
+                readImu(accelX, accelY, accelZ, state.dphi, state.dtheta, state.dpsi); 
 
                 // Run state estimator to get quaternion from IMU values
-                quaternion_t quat = {};
-                Madgwick6DOF(dt, state.dphi, -state.dtheta, state.dpsi,
-                        -AccX, AccY, AccZ, quat);
+                quaternion_t q = {};
+                _madgwick.getQuaternion(dt, state.dphi, -state.dtheta, state.dpsi,
+                        -accelX, accelY, accelZ, q);
+
+                const axis3_t gyro = {state.dphi, state.dtheta, state.dpsi};
+                _ekf.accumulate_gyro(gyro);
+
+                const axis3_t accel = {accelX, accelY, accelZ};
+                _ekf.accumulate_accel(accel);
+
+                _ekf.predict(_usec_curr);
+
+                _ekf.finalize();
 
                 // Compute Euler angles from quaternion
-                state.phi = atan2(q0*q1 + q2*q3, 0.5f - q1*q1 - q2*q2) * 
+                state.phi = atan2(q.w*q.x + q.y*q.z, 0.5f - q.x*q.x - q.y*q.y) * 
                     57.29577951;
-                state.theta = -asin(constrain(-2.0f * (q1*q3 - q0*q2),
+                state.theta = -asin(constrain(-2.0f * (q.x*q.z - q.w*q.y),
                             -0.999999,0.999999))*57.29577951;
-                state.psi = atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3) *
+                state.psi = atan2(q.x*q.y + q.w*q.z, 0.5f - q.y*q.y - q.z*q.z) *
                     57.29577951; 
 
-                //printf("%+3.3f  %+3.3f  %+3.3f\n", 
-                //        state.phi, state.theta, state.psi);
+                // printf("%+3.3f  %+3.3f  %+3.3f\n", state.phi, state.theta, state.psi);
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);
@@ -222,35 +235,28 @@ namespace hf {
             bool _isArmed;
             bool _gotFailsafe;
 
+            // State estimation
+            EKF  _ekf;
+            Madgwick _madgwick;
+
             void readImu(
-                    float & AccX, float & AccY, float & AccZ,
+                    float & accelX, float & accelY, float & accelZ,
                     float & gyroX, float & gyroY, float & gyroZ
                     ) 
             {
-                static float AccX_prev, AccY_prev, AccZ_prev;
-                static float gyroX_prev, gyroY_prev, gyroZ_prev;
-
-                int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
+                int16_t AcX=0, AcY=0, AcZ=0, GyX=0, GyY=0, GyZ=0;
 
                 _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
                 // Accelerometer
-                AccX = AcX / ACCEL_SCALE_FACTOR; //G's
-                AccY = AcY / ACCEL_SCALE_FACTOR;
-                AccZ = AcZ / ACCEL_SCALE_FACTOR;
+                accelX = AcX / ACCEL_SCALE_FACTOR; //G's
+                accelY = AcY / ACCEL_SCALE_FACTOR;
+                accelZ = AcZ / ACCEL_SCALE_FACTOR;
 
                 // Correct the outputs with the calculated error values
-                AccX = AccX - ACC_ERROR_X;
-                AccY = AccY - ACC_ERROR_Y;
-                AccZ = AccZ - ACC_ERROR_Z;
-
-                // LP filter accelerometer data
-                AccX = (1.0 - B_accel)*AccX_prev + B_accel*AccX;
-                AccY = (1.0 - B_accel)*AccY_prev + B_accel*AccY;
-                AccZ = (1.0 - B_accel)*AccZ_prev + B_accel*AccZ;
-                AccX_prev = AccX;
-                AccY_prev = AccY;
-                AccZ_prev = AccZ;
+                accelX -= ACC_ERROR_X;
+                accelY -= ACC_ERROR_Y;
+                accelZ -= ACC_ERROR_Z;
 
                 // Gyro
                 gyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
@@ -261,14 +267,6 @@ namespace hf {
                 gyroX = gyroX - GYRO_ERROR_X;
                 gyroY = gyroY - GYRO_ERROR_Y;
                 gyroZ = gyroZ - GYRO_ERROR_Z;
-
-                // LP filter gyro data
-                gyroX = (1.0 - B_gyro)*gyroX_prev + B_gyro*gyroX;
-                gyroY = (1.0 - B_gyro)*gyroY_prev + B_gyro*gyroY;
-                gyroZ = (1.0 - B_gyro)*gyroZ_prev + B_gyro*gyroZ;
-                gyroX_prev = gyroX;
-                gyroY_prev = gyroY;
-                gyroZ_prev = gyroZ;
 
                 // Negate gyroZ for nose-right positive
                 gyroZ = -gyroZ;

@@ -22,112 +22,143 @@
 
 #include <hackflight.hpp>
 
-//Filter parameters - Defaults tuned for 2kHz loop rate; Do not touch unless
-//you know what you are doing:
-static const float B_madgwick = 0.04;  //Madgwick filter parameter
-static const float B_accel = 0.14;     //Accelerometer LP filter paramter
-static const float B_gyro = 0.1;       //Gyro LP filter paramter
+class Madgwick {
 
-//Initialize quaternion for madgwick filter
-static float q0 = 1.0f; 
-static float q1 = 0.0f;
-static float q2 = 0.0f;
-static float q3 = 0.0f;
+    public:
 
-static float invSqrt(float x) 
-{
-    return 1.0/sqrtf(x);
-}
+        void initialize()
+        {
+            _q0 = 1;
+            _q1 = 0;
+            _q2 = 0;
+            _q3 = 0;
+        }
 
-static void Madgwick6DOF(
-        const float dt, 
-        float gx, float gy, float gz, 
-        float ax, float ay, float az,
-        hf::quaternion_t & quat)
-{
-    float recipNorm;
-    float qDot1, qDot2, qDot3, qDot4;
-    float _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2 ,_8q1, _8q2, q0q0, q1q1,
-          q2q2, q3q3;
+        void getQuaternion(
+                const float dt, 
+                float gx, float gy, float gz, 
+                float ax, float ay, float az,
+                hf::quaternion_t & quat)
+        {
+            // LP filter gyro data
+            gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gx;
+            gy = (1 - B_GYRO) * _gy_prev + B_GYRO * gy;
+            gz = (1 - B_GYRO) * _gz_prev + B_GYRO * gz;
+            _gx_prev = gx;
+            _gy_prev = gy;
+            _gz_prev = gz;
 
-    //Convert gyroscope degrees/sec to radians/sec
-    gx *= 0.0174533f;
-    gy *= 0.0174533f;
-    gz *= 0.0174533f;
+            // LP filter accelerometer data
+            ax = (1 - B_ACCEL) * _ax_prev + B_ACCEL * ax;
+            ay = (1 - B_ACCEL) * _ay_prev + B_ACCEL * ay;
+            az = (1 - B_ACCEL) * _az_prev + B_ACCEL * az;
+            _ax_prev = ax;
+            _ay_prev = ay;
+            _az_prev = az;
 
-    //Rate of change of quaternion from gyroscope
-    qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
-    qDot2 = 0.5f * (q0 * gx + q2 * gz - q3 * gy);
-    qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx);
-    qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
+            // Convert gyroscope degrees/sec to radians/sec
+            gx *= 0.0174533f;
+            gy *= 0.0174533f;
+            gz *= 0.0174533f;
 
-    //Compute feedback only if accelerometer measurement valid (avoids NaN in
-    //accelerometer normalisation)
-    if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
-        //Normalise accelerometer measurement
-        recipNorm = invSqrt(ax * ax + ay * ay + az * az);
-        ax *= recipNorm;
-        ay *= recipNorm;
-        az *= recipNorm;
+            // Compute rate of change of quaternion from gyroscope
+            auto qDot1 = 0.5f * (-_q1 * gx - _q2 * gy - _q3 * gz);
+            auto qDot2 = 0.5f * (_q0 * gx + _q2 * gz - _q3 * gy);
+            auto qDot3 = 0.5f * (_q0 * gy - _q1 * gz + _q3 * gx);
+            auto qDot4 = 0.5f * (_q0 * gz + _q1 * gy - _q2 * gx);
 
-        //Auxiliary variables to avoid repeated arithmetic
-        _2q0 = 2.0f * q0;
-        _2q1 = 2.0f * q1;
-        _2q2 = 2.0f * q2;
-        _2q3 = 2.0f * q3;
-        _4q0 = 4.0f * q0;
-        _4q1 = 4.0f * q1;
-        _4q2 = 4.0f * q2;
-        _8q1 = 8.0f * q1;
-        _8q2 = 8.0f * q2;
-        q0q0 = q0 * q0;
-        q1q1 = q1 * q1;
-        q2q2 = q2 * q2;
-        q3q3 = q3 * q3;
+            // Compute feedback only if accelerometer measurement valid (avoids NaN in
+            // accelerometer normalisation)
+            if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
 
-        //Gradient decent algorithm corrective step
+                // Normalise accelerometer measurement
+                auto recipNorm = invSqrt(ax * ax + ay * ay + az * az);
+                ax *= recipNorm;
+                ay *= recipNorm;
+                az *= recipNorm;
 
-        auto s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
+                // Auxiliary variables to avoid repeated arithmetic
+                const auto _2q0 = 2.0f * _q0;
+                const auto _2q1 = 2.0f * _q1;
+                const auto _2q2 = 2.0f * _q2;
+                const auto _2q3 = 2.0f * _q3;
+                const auto _4q0 = 4.0f * _q0;
+                const auto _4q1 = 4.0f * _q1;
+                const auto _4q2 = 4.0f * _q2;
+                const auto _8q1 = 8.0f * _q1;
+                const auto _8q2 = 8.0f * _q2;
+                const auto q0q0 = _q0 * _q0;
+                const auto q1q1 = _q1 * _q1;
+                const auto q2q2 = _q2 * _q2;
+                const auto q3q3 = _q3 * _q3;
 
-        auto s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - 
-            _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
+                // Gradient decent algorithm corrective step
 
-        auto s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - 
-            _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
+                auto s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
 
-        auto s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
+                auto s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * _q1 - _2q0 * ay - 
+                    _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
 
-        // Normalize step magnitude
-        recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); 
+                auto s2 = 4.0f * q0q0 * _q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - 
+                    _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
 
-        s0 *= recipNorm;
-        s1 *= recipNorm;
-        s2 *= recipNorm;
-        s3 *= recipNorm;
+                auto s3 = 4.0f * q1q1 * _q3 - _2q1 * ax + 4.0f * q2q2 * _q3 - _2q2 * ay;
 
-        //Apply feedback step
-        qDot1 -= B_madgwick * s0;
-        qDot2 -= B_madgwick * s1;
-        qDot3 -= B_madgwick * s2;
-        qDot4 -= B_madgwick * s3;
-    }
+                // Normalize step magnitude
+                recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); 
 
-    //Integrate rate of change of quaternion to yield quaternion
-    q0 += qDot1 * dt;
-    q1 += qDot2 * dt;
-    q2 += qDot3 * dt;
-    q3 += qDot4 * dt;
+                s0 *= recipNorm;
+                s1 *= recipNorm;
+                s2 *= recipNorm;
+                s3 *= recipNorm;
 
-    //Normalise quaternion
-    recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
-    q0 *= recipNorm;
-    q1 *= recipNorm;
-    q2 *= recipNorm;
-    q3 *= recipNorm;
+                // Apply feedback step
+                qDot1 -= B_MADGWICK * s0;
+                qDot2 -= B_MADGWICK * s1;
+                qDot3 -= B_MADGWICK * s2;
+                qDot4 -= B_MADGWICK * s3;
+            }
 
-    // Output quaternion
-    quat.w = q0;
-    quat.x = q1;
-    quat.y = q2;
-    quat.z = q3;
-}
+            // Integrate rate of change of quaternion to yield quaternion
+            _q0 += qDot1 * dt;
+            _q1 += qDot2 * dt;
+            _q2 += qDot3 * dt;
+            _q3 += qDot4 * dt;
+
+            // Normalise quaternion
+            const auto recipNorm = invSqrt(_q0 * _q0 + _q1 * _q1 + _q2 * _q2 + _q3 * _q3);
+            _q0 *= recipNorm;
+            _q1 *= recipNorm;
+            _q2 *= recipNorm;
+            _q3 *= recipNorm;
+
+            // Output quaternion
+            quat.w = _q0;
+            quat.x = _q1;
+            quat.y = _q2;
+            quat.z = _q3;
+        }
+
+    private:
+
+        // Filter parameters - tuned for 2kHz loop rate; Do not touch unless
+        // you know what you are doing:
+        static constexpr float B_MADGWICK = 0.04;  // Madgwick filter parameter
+        static constexpr float B_ACCEL = 0.14;     // Accelerometer LPF
+        static constexpr float B_GYRO = 0.1;       // Gyro LPF
+
+        // Initialize quaternion for madgwick filter
+        float _q0; 
+        float _q1;
+        float _q2;
+        float _q3;
+
+        // Previous IMU values for LPF
+        float _ax_prev, _ay_prev, _az_prev;
+        float _gx_prev, _gy_prev, _gz_prev;
+
+        static float invSqrt(float x) 
+        {
+            return 1.0/sqrtf(x);
+        }
+};

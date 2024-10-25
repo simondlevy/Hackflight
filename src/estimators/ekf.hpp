@@ -33,7 +33,7 @@
 
 namespace hf {
 
-    class Ekf {
+    class EKF {
 
         public:
 

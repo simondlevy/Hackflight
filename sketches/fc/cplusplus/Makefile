@@ -19,4 +19,4 @@ edit:
 	vim $(SKETCH).ino
 
 listen:
-	miniterm $(PORT) 115200
+	miniterm.py $(PORT) 115200
