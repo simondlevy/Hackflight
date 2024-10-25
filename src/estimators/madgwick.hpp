@@ -20,12 +20,16 @@
 
 #pragma once
 
-//Filter parameters - Defaults tuned for 2kHz loop rate; Do not touch unless you know what you are doing:
+#include <hackflight.hpp>
+
+//Filter parameters - Defaults tuned for 2kHz loop rate; Do not touch unless
+//you know what you are doing:
 static const float B_madgwick = 0.04;  //Madgwick filter parameter
 static const float B_accel = 0.14;     //Accelerometer LP filter paramter
 static const float B_gyro = 0.1;       //Gyro LP filter paramter
 
-static float q0 = 1.0f; //Initialize quaternion for madgwick filter
+//Initialize quaternion for madgwick filter
+static float q0 = 1.0f; 
 static float q1 = 0.0f;
 static float q2 = 0.0f;
 static float q3 = 0.0f;
@@ -39,11 +43,12 @@ static void Madgwick6DOF(
         const float dt, 
         float gx, float gy, float gz, 
         float ax, float ay, float az,
-        float & roll_IMU, float & pitch_IMU, float & yaw_IMU)
+        hf::quaternion_t & quat)
 {
     float recipNorm;
     float qDot1, qDot2, qDot3, qDot4;
-    float _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2 ,_8q1, _8q2, q0q0, q1q1, q2q2, q3q3;
+    float _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2 ,_8q1, _8q2, q0q0, q1q1,
+          q2q2, q3q3;
 
     //Convert gyroscope degrees/sec to radians/sec
     gx *= 0.0174533f;
@@ -56,7 +61,8 @@ static void Madgwick6DOF(
     qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx);
     qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
 
-    //Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
+    //Compute feedback only if accelerometer measurement valid (avoids NaN in
+    //accelerometer normalisation)
     if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
         //Normalise accelerometer measurement
         recipNorm = invSqrt(ax * ax + ay * ay + az * az);
@@ -91,7 +97,8 @@ static void Madgwick6DOF(
 
         auto s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
 
-        recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); //normalise step magnitude
+        // Normalize step magnitude
+        recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); 
 
         s0 *= recipNorm;
         s1 *= recipNorm;
@@ -118,8 +125,9 @@ static void Madgwick6DOF(
     q2 *= recipNorm;
     q3 *= recipNorm;
 
-    //Compute angles
-    roll_IMU = atan2(q0*q1 + q2*q3, 0.5f - q1*q1 - q2*q2)*57.29577951; //degrees
-    pitch_IMU = -asin(constrain(-2.0f * (q1*q3 - q0*q2),-0.999999,0.999999))*57.29577951; //degrees
-    yaw_IMU = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3)*57.29577951; //degrees
+    // Output quaternion
+    quat.w = q0;
+    quat.x = q1;
+    quat.y = q2;
+    quat.z = q3;
 }

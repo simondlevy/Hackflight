@@ -96,8 +96,9 @@ namespace hf {
                 axis3_t accel = {};
                 imuTakeMean(_accelSum, Utils::GS2MSS, accel);
 
-                // Position updates in the body frame (will be rotated to inertial frame);
-                // thrust can only be produced in the body's Z direction
+                // Position updates in the body frame (will be rotated to
+                // inertial frame); thrust can only be produced in the body's Z
+                // direction
                 const auto dx = _ekf.x[STATE_DX] * dt + accel.x * dt2 / 2;
                 const auto dy = _ekf.x[STATE_DY] * dt + accel.y * dt2 / 2;
                 const auto dz = _ekf.x[STATE_DZ] * dt + accel.z * dt2 / 2; 
@@ -105,9 +106,10 @@ namespace hf {
                 // Process noise is added after the return from the prediction step
 
                 // ====== PREDICTION STEP ======
-                // The prediction depends on whether we're on the ground, or in flight.
-                // When flying, the accelerometer directly measures thrust
-                // (hence is useless to estimate body angle while flying)
+                // The prediction depends on whether we're on the ground, or in
+                // flight.  When flying, the accelerometer directly measures
+                // thrust (hence is useless to estimate body angle while
+                // flying)
 
                 const auto tmpSDX = _ekf.x[STATE_DX];
                 const auto tmpSDY = _ekf.x[STATE_DY];
@@ -138,9 +140,12 @@ namespace hf {
                 setMatrixElement(F, STATE_Z, STATE_DY, _r.y*dt);
                 setMatrixElement(F, STATE_Z, STATE_DZ, _r.z*dt);
 
-                setMatrixElement(F, STATE_Z, STATE_E0, (new_dy*_r.z - new_dz*_r.y)*dt);
-                setMatrixElement(F, STATE_Z, STATE_E1, (-new_dx*_r.z + new_dz*_r.x)*dt);
-                setMatrixElement(F, STATE_Z, STATE_E2, (new_dx*_r.y - new_dy*_r.x)*dt);
+                setMatrixElement(F, STATE_Z, STATE_E0,
+                        (new_dy*_r.z - new_dz*_r.y)*dt);
+                setMatrixElement(F, STATE_Z, STATE_E1,
+                        (-new_dx*_r.z + new_dz*_r.x)*dt);
+                setMatrixElement(F, STATE_Z, STATE_E2,
+                        (new_dx*_r.y - new_dy*_r.x)*dt);
 
                 setMatrixElement(F, STATE_DX, STATE_DY, gyro.z*dt);
                 setMatrixElement(F, STATE_DX, STATE_DZ, gyro.y*dt);
@@ -223,7 +228,8 @@ namespace hf {
 
             void update_with_flow(const float dt, const float dx, const float dy)
             {
-                // Inclusion of flow measurements in the EKF done by two scalar updates
+                // Inclusion of flow measurements in the EKF done by two scalar
+                // updates
 
                 //~~~ Body rates ~~~
                 const auto omegay_b = _gyroLatest.y * Utils::DEG2RAD;
@@ -232,7 +238,8 @@ namespace hf {
 
                 const auto dx_g = x[STATE_DX];
 
-                // Saturate elevation in prediction and correction to avoid singularities
+                // Saturate elevation in prediction and correction to avoid
+                // singularities
                 const auto z_g = x[STATE_Z] < 0.1f ? 0.1f : x[STATE_Z];
 
                 // ~~~ X velocity prediction and update ~~~
@@ -243,10 +250,12 @@ namespace hf {
 
                 // derive measurement equation with respect to dx (and z?)
                 float hx[EKF_N] = {};
-                hx[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * ((_r.z * dx_g) / (-z_g * z_g));
+                hx[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * 
+                    ((_r.z * dx_g) / (-z_g * z_g));
                 hx[1] = (FLOW_NPIX * dt / FLOW_THETAPIX) * (_r.z / z_g);
 
-                // Inclusion of flow measurements in the EKF done by two scalar updates
+                // Inclusion of flow measurements in the EKF done by two scalar
+                // updates
 
                 //~~~ Body rates ~~~
                 const auto omegax_b = _gyroLatest.x * Utils::DEG2RAD;
@@ -260,7 +269,8 @@ namespace hf {
 
                 // derive measurement equation with respect to dy (and z?)
                 float hy[EKF_N] = {};
-                hy[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * ((_r.z * dy_g) / (-z_g * z_g));
+                hy[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * 
+                    ((_r.z * dy_g) / (-z_g * z_g));
                 hy[2] = (FLOW_NPIX * dt / FLOW_THETAPIX) * (_r.z / z_g);
 
                 const auto r = Utils::square(FLOW_STD_FIXED * FLOW_RESOLUTION);
@@ -272,14 +282,16 @@ namespace hf {
 
             bool finalize(void)
             {
-                // Incorporate the attitude error (Kalman filter state) with the attitude
+                // Incorporate the attitude error (Kalman filter state) with
+                // the attitude
                 const auto e0 = _ekf.x[STATE_E0];
                 const auto e1 = _ekf.x[STATE_E1];
                 const auto e2 = _ekf.x[STATE_E2];
 
                 const auto isErrorSufficient  = 
-                    (isErrorLarge(e0) || isErrorLarge(e1) || isErrorLarge(e2)) &&
-                    isErrorInBounds(e0) && isErrorInBounds(e1) && isErrorInBounds(e2);
+                    (isErrorLarge(e0) || isErrorLarge(e1) || 
+                     isErrorLarge(e2)) && isErrorInBounds(e0) &&
+                    isErrorInBounds(e1) && isErrorInBounds(e2);
 
                 // Update quaternion iff attitude error is sufficient
                 if (isErrorSufficient) {
@@ -298,7 +310,8 @@ namespace hf {
 
                 _r.x = 2 * _quat.x * _quat.z - 2 * _quat.w * _quat.y;
                 _r.y = 2 * _quat.y * _quat.z + 2 * _quat.w * _quat.x; 
-                _r.z = _quat.w*_quat.w-_quat.x*_quat.x-_quat.y*_quat.y+_quat.z*_quat.z;
+                _r.z = _quat.w*_quat.w-_quat.x*_quat.x-_quat.y*_quat.y +
+                    _quat.z*_quat.z;
 
                 if (_isUpdated) {
 
@@ -356,7 +369,8 @@ namespace hf {
             static constexpr float STDEV_INITIAL_ATTITUDE_ROLL_PITCH = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
 
-            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
+            // The bounds on the covariance, these shouldn't be hit, but
+            // sometimes are... why?
             static constexpr float MAX_COVARIANCE = 100;
             static constexpr float MIN_COVARIANCE = 1e-6;
 
@@ -375,7 +389,8 @@ namespace hf {
             // corresponding ground length
             static constexpr float FLOW_THETAPIX = 0.71674;
 
-            // We do get the measurements in 10x the motion pixels (experimentally measured)
+            // We do get the measurements in 10x the motion pixels
+            // (experimentally measured)
             static constexpr float FLOW_RESOLUTION = 0.1;
 
             // The bounds on states, these shouldn't be hit...
@@ -436,7 +451,8 @@ namespace hf {
 
             void cleanupCovariance(void)
             {
-                ekf_custom_cleanup_covariance(&_ekf, MIN_COVARIANCE, MAX_COVARIANCE);
+                ekf_custom_cleanup_covariance(
+                        &_ekf, MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
             static void imuAccum(const axis3_t values, imu_t & imu)
@@ -456,9 +472,12 @@ namespace hf {
 
                 const auto isCountNonzero = count > 0;
 
-                mean.x = isCountNonzero ? imu.sum.x * conversionFactor / count : mean.x;
-                mean.y = isCountNonzero ? imu.sum.y * conversionFactor / count : mean.y;
-                mean.z = isCountNonzero ? imu.sum.z * conversionFactor / count : mean.z;
+                mean.x =isCountNonzero ? 
+                    imu.sum.x * conversionFactor / count : mean.x;
+                mean.y = isCountNonzero ? 
+                    imu.sum.y * conversionFactor / count : mean.y;
+                mean.z = isCountNonzero ? 
+                    imu.sum.z * conversionFactor / count : mean.z;
             }
 
             void update_with_scalar(

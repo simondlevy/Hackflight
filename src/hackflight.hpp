@@ -57,6 +57,15 @@ namespace hf {
 
     } demands_t;
 
+    typedef struct {
+
+        float w;
+        float x;
+        float y;
+        float z;
+
+    } quaternion_t;
+
     /**
      * Quad motors
      */

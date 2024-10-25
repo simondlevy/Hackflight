@@ -114,10 +114,21 @@ namespace hf {
                 float AccX = 0, AccY = 0, AccZ = 0;
                 readImu(AccX, AccY, AccZ, state.dphi, state.dtheta, state.dpsi); 
 
-                // Get Euler angles from IMU (note negations)
+                // Run state estimator to get quaternion from IMU values
+                quaternion_t quat = {};
                 Madgwick6DOF(dt, state.dphi, -state.dtheta, state.dpsi,
-                        -AccX, AccY, AccZ, state.phi, state.theta, state.psi);
-                state.psi = -state.psi;
+                        -AccX, AccY, AccZ, quat);
+
+                // Compute Euler angles from quaternion
+                state.phi = atan2(q0*q1 + q2*q3, 0.5f - q1*q1 - q2*q2) * 
+                    57.29577951;
+                state.theta = -asin(constrain(-2.0f * (q1*q3 - q0*q2),
+                            -0.999999,0.999999))*57.29577951;
+                state.psi = atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3) *
+                    57.29577951; 
+
+                //printf("%+3.3f  %+3.3f  %+3.3f\n", 
+                //        state.phi, state.theta, state.psi);
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);
