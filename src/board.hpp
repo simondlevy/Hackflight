@@ -121,28 +121,20 @@ namespace hf {
                 float gyroX = 0, gyroY = 0, gyroZ = 0;    // deg / sec
                 readImu(accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
 
-                // Run state estimator to get quaternion from IMU values
-                quaternion_t q = {};
-                _madgwick.getQuaternion(
-                        dt, gyroX, -gyroY, gyroZ, -accelX, accelY, accelZ, q);
+                // Run state estimator to get Euler angles from IMU values
+                _madgwick.getAngles(
+                        dt, gyroX, -gyroY, gyroZ, -accelX, accelY, accelZ, 
+                        state.phi, state.theta, state.psi);
+
+                //printf("%+3.3f  %+3.3f  %+3.3f\n", state.phi, state.theta, state.psi);
 
                 const axis3_t gyro = {gyroX, gyroY, gyroZ};
                 _ekf.accumulate_gyro(gyro);
-
                 const axis3_t accel = {accelX, accelY, accelZ};
                 _ekf.accumulate_accel(accel);
-
-                _ekf.predict(_usec_curr);
-
+                _ekf.predict(_usec_curr/1000);
                 _ekf.finalize();
-
-                // Compute Euler angles from quaternion
-                state.phi = atan2(q.w*q.x + q.y*q.z, 0.5f - q.x*q.x - q.y*q.y) * 
-                    57.29577951;
-                state.theta = -asin(constrain(-2.0f * (q.x*q.z - q.w*q.y),
-                            -0.999999,0.999999))*57.29577951;
-                state.psi = atan2(q.x*q.y + q.w*q.z, 0.5f - q.y*q.y - q.z*q.z) *
-                    57.29577951; 
+                _ekf.get_vehicle_state();
 
                 // Get angular velocities directly from gyro
                 state.dphi = gyroX;

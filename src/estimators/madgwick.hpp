@@ -21,6 +21,7 @@
 #pragma once
 
 #include <hackflight.hpp>
+#include <utils.hpp>
 
 class Madgwick {
 
@@ -34,11 +35,11 @@ class Madgwick {
             _q3 = 0;
         }
 
-        void getQuaternion(
+        void getAngles(
                 const float dt, 
                 float gx, float gy, float gz, 
                 float ax, float ay, float az,
-                hf::quaternion_t & quat)
+                float & phi, float & theta, float & psi)
         {
             // LP filter gyro data
             gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gx;
@@ -132,11 +133,11 @@ class Madgwick {
             _q2 *= recipNorm;
             _q3 *= recipNorm;
 
-            // Output quaternion
-            quat.w = _q0;
-            quat.x = _q1;
-            quat.y = _q2;
-            quat.z = _q3;
+            // Compute Euler angles from quaternion
+            phi = hf::Utils::RAD2DEG * atan2(_q0*_q1 + _q2*_q3, 0.5f - _q1*_q1 - _q2*_q2);
+            theta = -hf::Utils::RAD2DEG * asin(-2 * (_q1*_q3 - _q0*_q2));
+            psi = hf::Utils::RAD2DEG * atan2(_q1*_q2 + _q0*_q3, 0.5f - _q2*_q2 - _q3*_q3);
+
         }
 
     private:
