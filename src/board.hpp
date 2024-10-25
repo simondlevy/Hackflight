@@ -29,6 +29,7 @@
 #include <hackflight.hpp>
 
 #include <estimators/madgwick.hpp>
+#include <estimators/ekf.hpp>
 
 #include <rx.hpp>
 #include <utils.hpp>

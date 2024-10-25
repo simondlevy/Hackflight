@@ -23,6 +23,8 @@
 
 #include <utils.hpp>
 
+#include <hackflight.hpp>
+
 #define EKF_CUSTOM
 #define EKF_M 3 // range, flowx, flowy
 #define EKF_N 7 // z, dx, dy, dz, e0, e1, e2
@@ -341,9 +343,9 @@ namespace hf {
 
             } // finalize
 
-            void get_quaternion(quat_t & quat)
+            void get_quaternion(quaternion_t & quat)
             {
-                memcpy(&quat, &_quat, sizeof (quat_t));
+                memcpy(&quat, &_quat, sizeof (quaternion_t));
             }
 
             void get_position(axis3_t & pos, axis3_t & dpos)
@@ -448,7 +450,7 @@ namespace hf {
             imu_t _gyroSum;
             imu_t _accelSum;
 
-            quat_t _quat;
+            quaternion_t _quat;
 
             axis3_t _gyroLatest;
 

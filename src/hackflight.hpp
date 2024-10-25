@@ -59,6 +59,14 @@ namespace hf {
 
     typedef struct {
 
+        float x;
+        float y;
+        float z;
+
+    } axis3_t;
+
+    typedef struct {
+
         float w;
         float x;
         float y;
