@@ -244,29 +244,19 @@ namespace hf {
                     float & gyroX, float & gyroY, float & gyroZ
                     ) 
             {
-                int16_t AcX=0, AcY=0, AcZ=0, GyX=0, GyY=0, GyZ=0;
+                int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
 
-                _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
+                _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-                // Accelerometer
-                accelX = AcX / ACCEL_SCALE_FACTOR; //G's
-                accelY = AcY / ACCEL_SCALE_FACTOR;
-                accelZ = AcZ / ACCEL_SCALE_FACTOR;
+                // Accelerometer degrees
+                accelX = ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X;
+                accelY = ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y;
+                accelZ = az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z;
 
-                // Correct the outputs with the calculated error values
-                accelX -= ACC_ERROR_X;
-                accelY -= ACC_ERROR_Y;
-                accelZ -= ACC_ERROR_Z;
-
-                // Gyro
-                gyroX = GyX / GYRO_SCALE_FACTOR; //deg/sec
-                gyroY = GyY / GYRO_SCALE_FACTOR;
-                gyroZ = GyZ / GYRO_SCALE_FACTOR;
-
-                // Correct the outputs with the calculated error values
-                gyroX = gyroX - GYRO_ERROR_X;
-                gyroY = gyroY - GYRO_ERROR_Y;
-                gyroZ = gyroZ - GYRO_ERROR_Z;
+                // Gyro deg /sec
+                gyroX = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
+                gyroY = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
+                gyroZ = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
 
                 // Negate gyroZ for nose-right positive
                 gyroZ = -gyroZ;
