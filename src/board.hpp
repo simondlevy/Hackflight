@@ -115,16 +115,18 @@ namespace hf {
                             HEARTBEAT_BLINK_RATE_HZ);
                 }
 
+
                 // Read IMU
-                float accelX = 0, accelY = 0, accelZ = 0;
-                readImu(accelX, accelY, accelZ, state.dphi, state.dtheta, state.dpsi); 
+                float accelX = 0, accelY = 0, accelZ = 0; // Gs
+                float gyroX = 0, gyroY = 0, gyroZ = 0;    // deg / sec
+                readImu(accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
 
                 // Run state estimator to get quaternion from IMU values
                 quaternion_t q = {};
-                _madgwick.getQuaternion(dt, state.dphi, -state.dtheta, state.dpsi,
-                        -accelX, accelY, accelZ, q);
+                _madgwick.getQuaternion(
+                        dt, gyroX, -gyroY, gyroZ, -accelX, accelY, accelZ, q);
 
-                const axis3_t gyro = {state.dphi, state.dtheta, state.dpsi};
+                const axis3_t gyro = {gyroX, gyroY, gyroZ};
                 _ekf.accumulate_gyro(gyro);
 
                 const axis3_t accel = {accelX, accelY, accelZ};
@@ -142,7 +144,12 @@ namespace hf {
                 state.psi = atan2(q.x*q.y + q.w*q.z, 0.5f - q.y*q.y - q.z*q.z) *
                     57.29577951; 
 
-                // printf("%+3.3f  %+3.3f  %+3.3f\n", state.phi, state.theta, state.psi);
+                // Get angular velocities directly from gyro
+                state.dphi = gyroX;
+                state.dtheta = gyroY;
+                state.dpsi = gyroZ;
+
+                //printf("%+3.3f  %+3.3f  %+3.3f\n", state.dphi, state.dtheta, state.dpsi);
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);
