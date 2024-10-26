@@ -27,12 +27,9 @@
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-
 #include <ekf.hpp>
-
 #include <rx.hpp>
 #include <utils.hpp>
-
 #include <tasks/blink.hpp>
 #include <tasks/comms.hpp>
 
@@ -115,23 +112,37 @@ namespace hf {
 
 
                 // Read IMU
-                float accelX = 0, accelY = 0, accelZ = 0; // Gs
-                float gyroX = 0, gyroY = 0, gyroZ = 0;    // deg / sec
-                readImu(accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
+                int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+                _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+                // Convert accelerometer to Gs, with offset
+                const axis3_t accel =  {
+                    ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
+                    ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
+                    az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+                };
+
+                // Convert gryo to deg/sec, with offset, negating Z for
+                // nose-right positive
+                const axis3_t gyro = {
+                    gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
+                    gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
+                    -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
+                };
 
                 // Run state estimator to get Euler angles from IMU values
-                const axis3_t gyro = {gyroX, gyroY, gyroZ};
                 _ekf.accumulate_gyro(gyro);
-                const axis3_t accel = {accelX, accelY, accelZ};
                 _ekf.accumulate_accel(accel);
                 _ekf.predict(_usec_curr/1000);
                 _ekf.finalize();
                 _ekf.get_vehicle_state(state.phi, state.theta, state.psi);
 
                 // Get angular velocities directly from gyro
-                state.dphi = gyroX;
-                state.dtheta = gyroY;
-                state.dpsi = gyroZ;
+                state.dphi = gyro.x;
+                state.dtheta = gyro.y;
+                state.dpsi = gyro.z;
+
+                //printf("%+3.3f  %+3.3f  %+3.3f\n", state.dphi, state.dtheta, state.dpsi);
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);
@@ -226,30 +237,6 @@ namespace hf {
 
             // State estimation
             EKF  _ekf;
-
-            void readImu(
-                    float & accelX, float & accelY, float & accelZ,
-                    float & gyroX, float & gyroY, float & gyroZ
-                    ) 
-            {
-                int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
-
-                _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
-                // Accelerometer degrees
-                accelX = ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X;
-                accelY = ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y;
-                accelZ = az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z;
-
-                // Gyro deg /sec
-                gyroX = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
-                gyroY = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
-                gyroZ = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
-
-                // Negate gyroZ for nose-right positive
-                gyroZ = -gyroZ;
-            }
-
 
             static void runLoopDelay(const uint32_t usec_curr)
             {
