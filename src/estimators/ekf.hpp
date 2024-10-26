@@ -451,7 +451,7 @@ namespace hf {
                     isVelocityWithinBounds(newx[STATE_DZ]);
             }
 
-            void get_vehicle_state()
+            void get_vehicle_state(float & phi, float & theta, float & psi)
             {
                 /*
                 const auto x = _ekf.x;
@@ -474,17 +474,13 @@ namespace hf {
                 const auto qy = _quat.y;
                 const auto qz = _quat.z;
 
-                const auto phi = Utils::RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
+                phi = Utils::RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
                         (qw*qw - qx*qx - qy*qy + qz*qz));
 
-                const auto theta = Utils::RAD2DEG * asin(-2 * (qx*qz - qw*qy));
+                theta = Utils::RAD2DEG * asin(-2 * (qx*qz - qw*qy));
 
-                const auto psi = Utils::RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
+                psi = Utils::RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
                         (qw*qw + qx*qx - qy*qy - qz*qz));
-
-                (void)phi;
-                (void)theta;
-                (void)psi;
             }
 
         private:
