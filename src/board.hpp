@@ -28,8 +28,7 @@
 
 #include <hackflight.hpp>
 
-#include <estimators/madgwick.hpp>
-#include <estimators/ekf.hpp>
+#include <ekf.hpp>
 
 #include <rx.hpp>
 #include <utils.hpp>
@@ -70,7 +69,6 @@ namespace hf {
                 initImu();
 
                 // Initialize the state estimator
-                _madgwick.initialize();
                 _ekf.initialize();
 
                 delay(5);
@@ -120,13 +118,6 @@ namespace hf {
                 float accelX = 0, accelY = 0, accelZ = 0; // Gs
                 float gyroX = 0, gyroY = 0, gyroZ = 0;    // deg / sec
                 readImu(accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
-
-                // Run state estimator to get Euler angles from IMU values
-                /*
-                _madgwick.getAngles(
-                        dt, gyroX, -gyroY, gyroZ, -accelX, accelY, accelZ, 
-                        state.phi, state.theta, state.psi);
-                        */
 
                 // Run state estimator to get Euler angles from IMU values
                 const axis3_t gyro = {gyroX, gyroY, gyroZ};
@@ -235,7 +226,6 @@ namespace hf {
 
             // State estimation
             EKF  _ekf;
-            Madgwick _madgwick;
 
             void readImu(
                     float & accelX, float & accelY, float & accelZ,
