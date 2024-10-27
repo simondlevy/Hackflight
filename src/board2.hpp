@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Wire.h>
+#include <SPI.h>
 
 #include <MPU6050.h>
 #include <pmw3901.hpp>
@@ -64,11 +65,14 @@ namespace hf {
                 // Indicate entering main loop with some quick blinks
                 blinkOnStartup(); 
 
-                // Initialize IMU communication
-                initImu();
+                // Initialize the sensor buses
+                Wire.begin();
+                SPI.begin();
 
-                // Initialize rangefinder
+                // Initialize the sensors
+                initImu();
                 initRangefinder();
+                initOpticalFlow();
 
                 // Initialize the state estimator
                 _ekf.initialize();
@@ -305,8 +309,6 @@ namespace hf {
 
             void initImu() 
             {
-                Wire.begin();
-
                 //Note this is 2.5 times the spec sheet 400 kHz max...
                 Wire.setClock(1000000); 
 
@@ -345,6 +347,13 @@ namespace hf {
                 _vl53l1.startContinuous(50);
             }
 
+            void initOpticalFlow()
+            {
+                if (!_pmw3901.begin()) {
+                    reportForever("PMW3901 initialization unsuccessful");
+                }
+            }
+
             void runMotors() 
             {
                 _motors.set(0, _m1_usec);
@@ -378,8 +387,6 @@ namespace hf {
                 return Utils::u8constrain(mval*125 + 125, 125, 250);
 
             }
-
-
     };
 
 }
