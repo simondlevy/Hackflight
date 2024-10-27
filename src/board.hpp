@@ -33,9 +33,15 @@
 #include <ekf.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
-#include <tasks/comms.hpp>
+#include <i2c_comms.h>
+#include <timer.hpp>
+#include <msp.hpp>
+
 
 namespace hf {
+
+    static const uint8_t MSP_STATE_MESSAGE_SIZE = 46;
+    static uint8_t msg[MSP_STATE_MESSAGE_SIZE];
 
     class Board {
 
@@ -55,9 +61,6 @@ namespace hf {
                 // Start receiver
                 rx.begin();
 
-                // Star comms with ESP32 radio
-                _commsTask.begin();
-
                 // Initialize LED
                 pinMode(_ledPin, OUTPUT); 
                 digitalWrite(_ledPin, HIGH);
@@ -65,6 +68,11 @@ namespace hf {
                 // Initialize the sensor buses
                 Wire.begin();
                 SPI.begin();
+
+                Wire1.onRequest(onRequest);
+
+                // Join the I^2C bus as a peripheral device
+                Wire1.begin(I2C_DEV_ADDR);
 
                 delay(5);
 
@@ -182,7 +190,7 @@ namespace hf {
                     YAW_PRESCALE;
 
                 // Run comms
-                _commsTask.run(state, _usec_curr, COMMS_RATE_HZ);
+                runComms(state);
             }
 
             void runMotors(Receiver & rx, const quad_motors_t & motors)
@@ -245,7 +253,6 @@ namespace hf {
 
             // Comms ----------------------------------------------------------
             static constexpr float COMMS_RATE_HZ = 20;//100;
-            CommsTask _commsTask;
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
             // deg/sec for rate mode
@@ -434,6 +441,29 @@ namespace hf {
 
             }
 
+            static void onRequest() 
+            {
+                Wire1.write(msg, MSP_STATE_MESSAGE_SIZE);
+            }
+
+            Timer _timer;
+
+            Msp _msp;
+
+            void runComms(const state_t & state)
+            {
+                if (_timer.isReady(_usec_curr, COMMS_RATE_HZ)) {
+
+                    const float vals[10] = {
+                        state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+                        state.theta, state.dtheta, state.psi, state.dpsi
+                    };
+
+                    _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
+
+                    memcpy(msg, _msp.payload, MSP_STATE_MESSAGE_SIZE);
+                }
+            }
     };
 
 }
