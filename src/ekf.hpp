@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include <hackflight.hpp>
+#include <timer.hpp>
 #include <utils.hpp>
 
 #define EKF_CUSTOM
@@ -69,8 +70,14 @@ namespace hf {
                 imuAccum(accel, _accelSum);
             }
 
-            void predict(const uint32_t nowMsec)
+            void predict(const uint32_t nowUsec)
             {
+                if (!_predictionTimer.isReady(nowUsec, PREDICTION_FREQUENCY)) {
+                    return;
+                }
+
+                const uint32_t nowMsec = nowUsec / 1000;
+
                 // Compute DT
                 static uint32_t _lastPredictionMsec;
                 const float dt = (nowMsec - _lastPredictionMsec) / 1000.0f;
@@ -485,6 +492,10 @@ namespace hf {
 
         private:
 
+            // For now we make prediction frequency fast enough to happen on
+            // every iteration
+            static const uint32_t PREDICTION_FREQUENCY = 10'000;
+
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
             static constexpr float STDEV_INITIAL_POSITION_Z = 1;
@@ -584,6 +595,8 @@ namespace hf {
 
             imu_t _gyroSum;
             imu_t _accelSum;
+
+            Timer _predictionTimer;
 
             // Indexes to access the state
             enum {

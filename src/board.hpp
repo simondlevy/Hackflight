@@ -133,12 +133,12 @@ namespace hf {
                 // Run state estimator to get Euler angles from IMU values
                 _ekf.accumulate_gyro(gyro);
                 _ekf.accumulate_accel(accel);
-                _ekf.predict(_usec_curr/1000);
+                _ekf.predict(_usec_curr);
                 _ekf.finalize();
                 _ekf.get_vehicle_state(state.phi, state.theta, state.psi);
 
-                printf("%+3.3f  %+3.3f  %+3.3f\n",
-                        state.phi, state.theta, state.psi);
+                //printf("%+3.3f  %+3.3f  %+3.3f\n",
+                //        state.phi, state.theta, state.psi);
 
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
