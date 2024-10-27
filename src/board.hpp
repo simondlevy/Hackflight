@@ -22,15 +22,17 @@
 #pragma once
 
 #include <Wire.h>
+#include <SPI.h>
 
 #include <MPU6050.h>
+#include <pmw3901.hpp>
+#include <VL53L1X.h>
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
 #include <ekf.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
-#include <tasks/blink.hpp>
 #include <tasks/comms.hpp>
 
 namespace hf {
@@ -39,7 +41,10 @@ namespace hf {
 
         public:
 
-            void init(Receiver & rx, const uint8_t ledPin=LED_BUILTIN)
+            void init(
+                    Receiver & rx,
+                    const uint8_t ledPin=LED_BUILTIN,
+                    const bool fullMonty=false)
             {
                 _ledPin = ledPin;
 
@@ -57,13 +62,21 @@ namespace hf {
                 pinMode(_ledPin, OUTPUT); 
                 digitalWrite(_ledPin, HIGH);
 
+                // Initialize the sensor buses
+                Wire.begin();
+                SPI.begin();
+
                 delay(5);
 
                 // Indicate entering main loop with some quick blinks
                 blinkOnStartup(); 
 
-                // Initialize IMU communication
+                // Initialize the sensors
                 initImu();
+                if (fullMonty) {
+                    initRangefinder();
+                    initOpticalFlow();
+                }
 
                 // Initialize the state estimator
                 _ekf.initialize();
@@ -82,7 +95,8 @@ namespace hf {
                     float & dt,
                     Receiver & rx,
                     demands_t & demands,
-                    state_t & state)
+                    state_t & state,
+                    const bool fullMonty=false)
             {
                 // Keep track of what time it is and how much time has elapsed
                 // since the last loop
@@ -104,12 +118,8 @@ namespace hf {
 
                 // Otherwise, blink LED as heartbeat or failsafe rate
                 else {
-                    _blinkTask.run(_ledPin, _usec_curr,
-                            _gotFailsafe ? 
-                            FAILSAFE_BLINK_RATE_HZ : 
-                            HEARTBEAT_BLINK_RATE_HZ);
+                    blinkLed();
                 }
-
 
                 // Read IMU
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
@@ -129,6 +139,21 @@ namespace hf {
                     gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
+
+                if (fullMonty) {
+
+                    // Read rangefinder
+                    printf("range: %d\n", _vl53l1.read());
+
+                    // Read optical flow sensor
+                    int16_t flowDx = 0;
+                    int16_t flowDy = 0;
+                    bool gotFlow = false;
+                    _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
+                    if (gotFlow) {
+                        printf("flow: %+03d  %+03d\n", flowDx, flowDy);
+                    }
+                }
 
                 // Run state estimator to get Euler angles from IMU values
                 _ekf.accumulate_gyro(gyro);
@@ -200,6 +225,14 @@ namespace hf {
 
             MPU6050 _mpu6050;
 
+            // Rangefinder ----------------------------------------------------
+
+            VL53L1X _vl53l1;
+
+            // Optical flow sensor --------------------------------------------
+
+            PMW3901 _pmw3901;
+
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
@@ -209,7 +242,6 @@ namespace hf {
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
             uint8_t _ledPin;
-            BlinkTask _blinkTask;
 
             // Comms ----------------------------------------------------------
             static constexpr float COMMS_RATE_HZ = 20;//100;
@@ -283,17 +315,13 @@ namespace hf {
 
             void initImu() 
             {
-                Wire.begin();
-
                 //Note this is 2.5 times the spec sheet 400 kHz max...
                 Wire.setClock(1000000); 
 
                 _mpu6050.initialize();
 
                 if (!_mpu6050.testConnection()) {
-                    printf("MPU6050 initialization unsuccessful\n");
-                    printf("Check MPU6050 wiring or try cycling power\n");
-                    while(true) {}
+                    reportForever("MPU6050 initialization unsuccessful\n");
                 }
 
                 // From the reset state all registers should be 0x00, so we
@@ -301,6 +329,36 @@ namespace hf {
                 // off.  All we need to do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+            }
+
+            void initRangefinder()
+            {
+                _vl53l1.setTimeout(500);
+
+                if (!_vl53l1.init()) {
+                    reportForever("VL53L1 initialization unsuccessful");
+                }
+
+                // Use long distance mode and allow up to 50000 us (50 ms) for
+                // a measurement.  You can change these settings to adjust the
+                // performance of the _vl53l1, but the minimum timing budget is
+                // 20 ms for short distance mode and 33 ms for medium and long
+                // distance modes. See the VL53L1X datasheet for more
+                // information on range and timing limits.
+                _vl53l1.setDistanceMode(VL53L1X::Long);
+                _vl53l1.setMeasurementTimingBudget(50000);
+
+                // Start continuous readings at a rate of one measurement every
+                // 50 ms (the inter-measurement period). This period should be
+                // at least as long as the timing budget.
+                _vl53l1.startContinuous(50);
+            }
+
+            void initOpticalFlow()
+            {
+                if (!_pmw3901.begin()) {
+                    reportForever("PMW3901 initialization unsuccessful");
+                }
             }
 
             void runMotors() 
@@ -337,6 +395,44 @@ namespace hf {
 
             }
 
+            void blinkLed()
+            {
+                const auto freq_hz =
+                    _gotFailsafe ?
+                    FAILSAFE_BLINK_RATE_HZ :
+                    HEARTBEAT_BLINK_RATE_HZ;
+
+                static uint32_t _usec_prev;
+
+                static uint32_t _delay_usec;
+
+                if (_usec_curr - _usec_prev > _delay_usec) {
+
+                    static bool _alternate;
+
+                    _usec_prev = _usec_curr;
+
+                    digitalWrite(_ledPin, _alternate);
+
+                    if (_alternate) {
+                        _alternate = false;
+                        _delay_usec = 100'100;
+                    }
+                    else {
+                        _alternate = true;
+                        _delay_usec = freq_hz * 1e6;
+                    }
+                }
+            }
+
+            static void reportForever(const char * message)
+            {
+                while (true) {
+                    printf("%s\n", message);
+                    delay(500);
+                }
+
+            }
 
     };
 

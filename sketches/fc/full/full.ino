@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <board2.hpp>
+#include <board.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -29,6 +29,8 @@
 #include <receivers/sbus.hpp>
 
 static const uint8_t LED_PIN = 0;
+
+static const bool FULL_MONTY = true;
 
 static hf::Board _board;
 
@@ -43,7 +45,7 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 
 void setup() 
 {
-    _board.init(_rx, LED_PIN);
+    _board.init(_rx, LED_PIN, FULL_MONTY);
 }
 
 void loop() 
@@ -52,7 +54,7 @@ void loop()
     hf::demands_t demands = {};
     hf::state_t state = {};
 
-    _board.readData(dt, _rx, demands, state);
+    _board.readData(dt, _rx, demands, state, FULL_MONTY);
 
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
