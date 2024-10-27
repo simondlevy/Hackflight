@@ -21,6 +21,7 @@
 #include <Wire.h>
 
 #include <hackflight.hpp>
+#include <i2c_comms.h>
 #include <timer.hpp>
 #include <msp.hpp>
 
@@ -44,8 +45,6 @@ namespace hf {
             Msp _msp;
 
         public:
-
-            static const uint8_t I2C_DEV_ADDR = 0x55;
 
             void begin()
             {

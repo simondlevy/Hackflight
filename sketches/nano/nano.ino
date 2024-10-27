@@ -27,8 +27,10 @@
 #include <esp32.hpp>
 #include <msp.hpp>
 #include <tasks/comms.hpp>
+#include <i2c_comms.h>
 
-static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+//static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x97, 0x90};
 
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
@@ -57,7 +59,7 @@ void loop()
     static bool _lost_wifi;
 
     const auto bytesReceived = Wire.requestFrom(
-            hf::CommsTask::I2C_DEV_ADDR, 
+            hf::I2C_DEV_ADDR, 
             hf::MSP_STATE_MESSAGE_SIZE);
 
     if (bytesReceived == hf::MSP_STATE_MESSAGE_SIZE) {
