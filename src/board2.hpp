@@ -138,7 +138,17 @@ namespace hf {
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
-                printf("%d\n", _vl53l1.read());
+                //printf("%d\n", _vl53l1.read());
+
+                int16_t flowDx = 0;
+                int16_t flowDy = 0;
+                bool gotFlow = false;
+                _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
+
+                if (gotFlow) {
+                    printf("%+03d  %+03d\n", flowDx, flowDy);
+                }
+
 
                 // Run state estimator to get Euler angles from IMU values
                 _ekf.accumulate_gyro(gyro);
