@@ -24,6 +24,8 @@
 #include <Wire.h>
 
 #include <MPU6050.h>
+#include <pmw3901.hpp>
+#include <VL53L1X.h>
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
@@ -64,6 +66,9 @@ namespace hf {
 
                 // Initialize IMU communication
                 initImu();
+
+                // Initialize rangefinder
+                initRangefinder();
 
                 // Initialize the state estimator
                 _ekf.initialize();
@@ -110,7 +115,6 @@ namespace hf {
                             HEARTBEAT_BLINK_RATE_HZ);
                 }
 
-
                 // Read IMU
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
                 _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -130,6 +134,8 @@ namespace hf {
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
+                printf("%d\n", _vl53l1.read());
+
                 // Run state estimator to get Euler angles from IMU values
                 _ekf.accumulate_gyro(gyro);
                 _ekf.accumulate_accel(accel);
@@ -137,8 +143,7 @@ namespace hf {
                 _ekf.finalize();
                 _ekf.get_vehicle_state(state.phi, state.theta, state.psi);
 
-                printf("%+3.3f  %+3.3f  %+3.3f\n",
-                        state.phi, state.theta, state.psi);
+                // printf("%+3.3f  %+3.3f  %+3.3f\n", state.phi, state.theta, state.psi);
 
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
@@ -199,6 +204,14 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             MPU6050 _mpu6050;
+
+            // Rangefinder ----------------------------------------------------
+
+            VL53L1X _vl53l1;
+
+            // Optical flow sensor --------------------------------------------
+
+            PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
@@ -281,6 +294,15 @@ namespace hf {
                 }
             }
 
+            static void reportForever(const char * message)
+            {
+                while (true) {
+                    printf("%s\n", message);
+                    delay(500);
+                }
+
+            }
+
             void initImu() 
             {
                 Wire.begin();
@@ -291,9 +313,7 @@ namespace hf {
                 _mpu6050.initialize();
 
                 if (!_mpu6050.testConnection()) {
-                    printf("MPU6050 initialization unsuccessful\n");
-                    printf("Check MPU6050 wiring or try cycling power\n");
-                    while(true) {}
+                    reportForever("MPU6050 initialization unsuccessful");
                 }
 
                 // From the reset state all registers should be 0x00, so we
@@ -301,6 +321,28 @@ namespace hf {
                 // off.  All we need to do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+            }
+
+            void initRangefinder()
+            {
+                _vl53l1.setTimeout(500);
+
+                if (!_vl53l1.init()) {
+                    reportForever("VL53L1 initialization unsuccessful");
+                }
+
+                // Use long distance mode and allow up to 50000 us (50 ms) for a measurement.
+                // You can change these settings to adjust the performance of the _vl53l1, but
+                // the minimum timing budget is 20 ms for short distance mode and 33 ms for
+                // medium and long distance modes. See the VL53L1X datasheet for more
+                // information on range and timing limits.
+                _vl53l1.setDistanceMode(VL53L1X::Long);
+                _vl53l1.setMeasurementTimingBudget(50000);
+
+                // Start continuous readings at a rate of one measurement every 50 ms (the
+                // inter-measurement period). This period should be at least as long as the
+                // timing budget.
+                _vl53l1.startContinuous(50);
             }
 
             void runMotors() 
