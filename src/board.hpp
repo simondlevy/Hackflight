@@ -40,6 +40,7 @@
 
 namespace hf {
 
+    // These must be global to support static handleI2CRequest()
     static const uint8_t MSP_STATE_MESSAGE_SIZE = 46;
     static uint8_t msg[MSP_STATE_MESSAGE_SIZE];
 
@@ -69,10 +70,9 @@ namespace hf {
                 Wire.begin();
                 SPI.begin();
 
-                Wire1.onRequest(onRequest);
-
-                // Join the I^2C bus as a peripheral device
-                Wire1.begin(I2C_DEV_ADDR);
+                // Initialize handling of I2C requests from TinyPICO Nano
+                Wire1.onRequest(handleI2CRequest);
+                Wire1.begin(I2C_DEV_ADDR); // join I^2C bus peripheral
 
                 delay(5);
 
@@ -254,6 +254,12 @@ namespace hf {
             // Comms ----------------------------------------------------------
             static constexpr float COMMS_RATE_HZ = 20;//100;
 
+            Timer _commsTimer;
+
+            Msp _msp;
+
+            // Demand pres-caling --------------------------------------------
+
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
             // deg/sec for rate mode
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
@@ -261,7 +267,8 @@ namespace hf {
             // Max yaw rate in deg/sec
             static constexpr float YAW_PRESCALE = 160.0;     
 
-            // IMU calibration parameters
+            // IMU calibration parameters -------------------------------------
+
             static constexpr float ACC_ERROR_X = 0.0;
             static constexpr float ACC_ERROR_Y = 0.0;
             static constexpr float ACC_ERROR_Z = 0.0;
@@ -441,18 +448,14 @@ namespace hf {
 
             }
 
-            static void onRequest() 
+            static void handleI2CRequest() 
             {
                 Wire1.write(msg, MSP_STATE_MESSAGE_SIZE);
             }
 
-            Timer _timer;
-
-            Msp _msp;
-
             void runComms(const state_t & state)
             {
-                if (_timer.isReady(_usec_curr, COMMS_RATE_HZ)) {
+                if (_commsTimer.isReady(_usec_curr, COMMS_RATE_HZ)) {
 
                     const float vals[10] = {
                         state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
