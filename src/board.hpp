@@ -149,10 +149,11 @@ namespace hf {
                 };
 
                 // Run state estimator to get Euler angles from IMU values
-                _ekf.accumulate_gyro(gyro);
-                _ekf.accumulate_accel(accel);
-                _ekf.predict(_usec_curr);
+                _ekf.accumulate_gyro(_usec_curr/1000, gyro);
+                _ekf.accumulate_accel(_usec_curr/1000, accel);
+                _ekf.predict(_usec_curr/1000);
 
+                /*
                 if (fullMonty) {
 
                     // Read rangefinder, non-blocking
@@ -167,23 +168,20 @@ namespace hf {
                         //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }
 
-                }
+                }*/
 
                 _ekf.finalize();
 
                 _ekf.get_vehicle_state(state);
 
-                /*
-                printf("dx=%+3.3f|dy=%+3.3f|z=%+3.3f|dz=%+3.3f|phi=%+3.3f|theta=%+3.3f|psi=%+3.3f\n", 
-                        state.dx, state.dy, state.z, state.dz, state.phi, state.theta, state.psi);
-                        */
+                printf("%+3.3f  %+3.3f  %+3.3f\n", state.phi, state.theta, state.psi);
+
+                //printf("%+3.3f  %+3.3f\n", state.z, state.dz);
 
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
-
-                //printf("%+3.3f  %+3.3f  %+3.3f\n", state.dphi, state.dtheta, state.dpsi);
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);

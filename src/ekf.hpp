@@ -17,12 +17,11 @@
 #include <string.h>
 
 #include <hackflight.hpp>
-#include <timer.hpp>
 #include <utils.hpp>
 
 #define EKF_CUSTOM
-#define EKF_M 1 // range
-#define EKF_N 5 // z, dz, e0, e1, e2
+#define EKF_M 3 // range, flowx, flowy
+#define EKF_N 7 // z, dx, dy, dz, e0, e1, e2
 #include <tinyekf.h>
 #include <tinyekf_custom.h>
 
@@ -34,8 +33,10 @@ namespace hf {
 
             void initialize(void)
             {
-                const float pdiag[5] = {
+                const float pdiag[7] = {
                     square(STDEV_INITIAL_POSITION_Z),
+                    square(STDEV_INITIAL_VELOCITY),
+                    square(STDEV_INITIAL_VELOCITY),
                     square(STDEV_INITIAL_VELOCITY),
                     square(STDEV_INITIAL_ATTITUDE_ROLL_PITCH),
                     square(STDEV_INITIAL_ATTITUDE_ROLL_PITCH),
@@ -56,26 +57,20 @@ namespace hf {
                 _r.z = 0;
             }
 
-            void accumulate_gyro(const axis3_t & gyro) 
+            void accumulate_gyro(const uint32_t nowMsec, const axis3_t & gyro) 
             {
                 imuAccum(gyro, _gyroSum);
 
                 memcpy(&_gyroLatest, &gyro, sizeof(axis3_t));
             }
 
-            void accumulate_accel(const axis3_t & accel) 
+            void accumulate_accel(const uint32_t nowMsec, const axis3_t & accel) 
             {
                 imuAccum(accel, _accelSum);
             }
 
-            void predict(const uint32_t nowUsec)
+            void predict(const uint32_t nowMsec)
             {
-                if (!_predictionTimer.isReady(nowUsec, PREDICTION_FREQUENCY)) {
-                    return;
-                }
-
-                const uint32_t nowMsec = nowUsec / 1000;
-
                 // Compute DT
                 static uint32_t _lastPredictionMsec;
                 const float dt = (nowMsec - _lastPredictionMsec) / 1000.0f;
@@ -93,9 +88,12 @@ namespace hf {
 
                 // Position updates in the body frame (will be rotated to inertial frame);
                 // thrust can only be produced in the body's Z direction
-                const auto dx = 0;
-                const auto dy = 0;
+                const auto dx = xold[STATE_DX] * dt + _accel.x * dt2 / 2;
+                const auto dy = xold[STATE_DY] * dt + _accel.y * dt2 / 2;
                 const auto dz = xold[STATE_DZ] * dt + _accel.z * dt2 / 2; 
+
+                const auto accx = _accel.x;
+                const auto accy = _accel.y;
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
@@ -141,20 +139,26 @@ namespace hf {
                 // When flying, the accelerometer directly measures thrust
                 // (hence is useless to estimate body angle while flying)
 
-                const auto tmpSDX = 0;
-                const auto tmpSDY = 0;
+                const auto tmpSDX = xold[STATE_DX];
+                const auto tmpSDY = xold[STATE_DY];
+                const auto tmpSDZ = xold[STATE_DZ];
 
                 const auto new_z = xold[STATE_Z] + 
                     _r.x * dx + _r.y * dy + _r.z * dz - GS_TO_MSS * dt2 / 2;
 
-                const auto new_dx = 0;
-                const auto new_dy = 0;
+                const auto new_dx = xold[STATE_DX] +
+                    dt * (accx + _gyro.z * tmpSDY - _gyro.y * tmpSDZ -
+                            GS_TO_MSS * _r.x);
+
+                const auto new_dy = xold[STATE_DY] + 
+                    dt * (accy - _gyro.z * tmpSDX + _gyro.x * tmpSDZ - 
+                            GS_TO_MSS * _r.y);
 
                 const auto new_dz = xold[STATE_DZ] +
                     dt * (_accel.z + _gyro.y * tmpSDX - _gyro.x * tmpSDY - 
                             GS_TO_MSS * _r.z); 
 
-                quaternion_t quat_predicted = {};
+                new_quat_t quat_predicted = {};
 
                 quat_predicted.w = tmpq0/norm;
                 quat_predicted.x = tmpq1/norm; 
@@ -166,6 +170,8 @@ namespace hf {
                 const auto e2 = _gyro.z*dt/2;
 
                 // altitude from body-frame velocity
+                const auto z_dx = _r.x*dt;
+                const auto z_dy = _r.y*dt;
                 const auto z_dz = _r.z*dt;
 
                 // altitude from attitude error
@@ -173,6 +179,23 @@ namespace hf {
                 const auto z_e1 = (-new_dx*_r.z + new_dz*_r.x)*dt;
                 const auto z_e2 = (new_dx*_r.y - new_dy*_r.x)*dt;
 
+                // body-frame velocity from body-frame velocity
+                const auto dx_dx = 1; //drag negligible
+                const auto dx_dy = _gyro.z*dt;
+                const auto dx_dz = _gyro.y*dt;
+                const auto dx_e0 = 0;
+                const auto dx_e2 = -GS_TO_MSS*_r.y*dt;
+                const auto dx_e1 = GS_TO_MSS*_r.z*dt;
+
+                const auto dy_dx =  -_gyro.z*dt;
+                const auto dy_dy = 1; //drag negligible
+                const auto dy_dz = _gyro.x*dt;
+                const auto dy_e0 = -GS_TO_MSS*_r.z*dt;
+                const auto dy_e1 = 0;
+                const auto dy_e2 = GS_TO_MSS*_r.x*dt;
+
+                const auto dz_dx = _gyro.y*dt;
+                const auto dz_dy = _gyro.x*dt;
                 const auto dz_dz = 1; //drag negligible
                 const auto dz_e0 = GS_TO_MSS*_r.y*dt;
                 const auto dz_e1 = -GS_TO_MSS*_r.x*dt;
@@ -193,17 +216,21 @@ namespace hf {
                 // Jacobian of state-transition function
                 const float F[EKF_N*EKF_N] = {
 
-                    0, z_dz,  z_e0,  z_e1,  z_e2, 
-                    0, dz_dz, dz_e0, dz_e1, dz_e2,
-                    0,     0,     e0_e0, e0_e1, e0_e2,
-                    0,     0,     e1_e0, e1_e1, e1_e2,
-                    0,     0,     e2_e0, e2_e1, e2_e2
+                    0, z_dx,  z_dy,  z_dz,  z_e0,  z_e1,  z_e2, 
+                    0, dx_dx, dx_dy, dx_dz, dx_e0, dx_e1, dx_e2, 
+                    0, dy_dx, dy_dy, dy_dz, dy_e0, dy_e1, dy_e2,
+                    0, dz_dx, dz_dy, dz_dz, dz_e0, dz_e1, dz_e2,
+                    0, 0,     0,     0,     e0_e0, e0_e1, e0_e2,
+                    0, 0,     0,     0,     e1_e0, e1_e1, e1_e2,
+                    0, 0,     0,     0,     e2_e0, e2_e1, e2_e2
                 };
 
 
                 float fx[EKF_N] = {
 
                     xold[STATE_Z] ,
+                    xold[STATE_DX],
+                    xold[STATE_DY],
                     xold[STATE_DZ],
                     xold[STATE_E0],
                     xold[STATE_E1],
@@ -217,6 +244,8 @@ namespace hf {
                     _lastProcessNoiseUpdateMsec = nowMsec;
 
                     fx[STATE_Z]  = new_z;
+                    fx[STATE_DX] = new_dx;
+                    fx[STATE_DY] = new_dy;
                     fx[STATE_DZ] = new_dz;
 
                     _quat.w = quat_predicted.w;
@@ -236,7 +265,7 @@ namespace hf {
                 cleanupCovariance();
             }
 
-            void update_with_range(const uint16_t distance_mm)
+            void update_with_range(const float distance)
             {
                 const auto x = _ekf.x;
 
@@ -246,8 +275,8 @@ namespace hf {
 
                 const auto predictedDistance = x[STATE_Z] / cosf(angle);
 
-                const auto measuredDistance = distance_mm / 1000.f; // mm => m
-                float h[EKF_N] = {};
+                const auto measuredDistance = distance / 1000.f; // mm => m
+                float h[7] = {};
 
                 h[0] = 1/cosf(angle);
 
@@ -256,10 +285,59 @@ namespace hf {
                                   (measuredDistance - RANGEFINDER_EXP_POINT_A))));
 
                 if (fabs(_r.z) > 0.1f && _r.z > 0 && 
-                        distance_mm < RANGEFINDER_OUTLIER_LIMIT_MM) {
+                        distance < RANGEFINDER_OUTLIER_LIMIT_MM) {
 
                     update_with_scalar(measuredDistance, predictedDistance, h, r);
                 }
+            }
+
+            void update_with_flow(const float dt, const float dx, const float dy)
+            {
+                // Inclusion of flow measurements in the EKF done by two scalar updates
+
+                //~~~ Body rates ~~~
+                const auto omegay_b = _gyroLatest.y * Utils::DEG2RAD;
+
+                const auto x = _ekf.x;
+
+                const auto dx_g = x[STATE_DX];
+
+                // Saturate elevation in prediction and correction to avoid singularities
+                const auto z_g = x[STATE_Z] < 0.1f ? 0.1f : x[STATE_Z];
+
+                // ~~~ X velocity prediction and update ~~~
+                // predicts the number of accumulated pixels in the x-direction
+                auto predictedNX = (dt * FLOW_NPIX / FLOW_THETAPIX ) * 
+                    ((dx_g * _r.z / z_g) - omegay_b);
+                auto measuredNX = dx*FLOW_RESOLUTION;
+
+                // derive measurement equation with respect to dx (and z?)
+                float hx[EKF_N] = {};
+                hx[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * ((_r.z * dx_g) / (-z_g * z_g));
+                hx[1] = (FLOW_NPIX * dt / FLOW_THETAPIX) * (_r.z / z_g);
+
+                // Inclusion of flow measurements in the EKF done by two scalar updates
+
+                //~~~ Body rates ~~~
+                const auto omegax_b = _gyroLatest.x * Utils::DEG2RAD;
+
+                const auto dy_g = x[STATE_DY];
+
+                // ~~~ Y velocity prediction and update ~~~
+                auto predictedNY = (dt * FLOW_NPIX / FLOW_THETAPIX ) * 
+                    ((dy_g * _r.z / z_g) + omegax_b);
+                auto measuredNY = dy*FLOW_RESOLUTION;
+
+                // derive measurement equation with respect to dy (and z?)
+                float hy[EKF_N] = {};
+                hy[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * ((_r.z * dy_g) / (-z_g * z_g));
+                hy[2] = (FLOW_NPIX * dt / FLOW_THETAPIX) * (_r.z / z_g);
+
+                const auto r = square(FLOW_STD_FIXED * FLOW_RESOLUTION);
+
+                update_with_scalar(measuredNX, predictedNX, hx, r);
+
+                update_with_scalar(measuredNY, predictedNY, hy, r);
             }
 
             bool finalize(void)
@@ -296,19 +374,9 @@ namespace hf {
                 const auto norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                         tmpq3 * tmpq3) + EPS;
 
-                const auto isErrorSufficient  =  
+                const auto isErrorSufficient  = 
                     (isErrorLarge(v0) || isErrorLarge(v1) || isErrorLarge(v2)) &&
                     isErrorInBounds(v0) && isErrorInBounds(v1) && isErrorInBounds(v2);
-
-                /*
-                static uint32_t _count;
-                if (_count++ < 10) {
-                    printf("%+3.3f(%+3.3f) %+3.3f(%+3.3f) %+3.3f(%+3.3f) %+3.3f(%+3.3f)\n",
-                            _quat.w, tmpq0/norm, 
-                            _quat.x, tmpq1/norm, 
-                            _quat.y, tmpq2/norm, 
-                            _quat.z, tmpq3/norm);
-                }*/
 
                 _quat.w = isErrorSufficient ? tmpq0 / norm : _quat.w;
                 _quat.x = isErrorSufficient ? tmpq1 / norm : _quat.x;
@@ -317,6 +385,8 @@ namespace hf {
 
                 const float newx[EKF_N] = {
                     x[STATE_Z],
+                    x[STATE_DX],
+                    x[STATE_DY],
                     x[STATE_DZ],
                     0, // E0
                     0, // E1
@@ -333,6 +403,8 @@ namespace hf {
                 const auto e1 = v1 / 2; 
                 const auto e2 = v2 / 2;
 
+                const auto dx_dx = 1;
+                const auto dy_dy = 1;
                 const auto dz_dz = 1;
 
                 const auto e0_e0 =  1 - e1*e1/2 - e2*e2/2;
@@ -348,11 +420,13 @@ namespace hf {
                 const auto e2_e2 = 1 - e0*e0/2 - e1*e1/2;
 
                 const float A[EKF_N*EKF_N] = {
-                    0,     0,     0,     0,     0,
-                    0,     dz_dz, 0,     0,     0,
-                    0,     0,     e0_e0, e0_e1, e0_e2,
-                    0,     0,     e1_e0, e1_e1, e1_e2,
-                    0,     0,     e2_e0, e2_e1, e2_e2
+                    0, 0,     0,     0,     0,     0,     0,
+                    0, dx_dx, 0,     0,     0,     0,     0,
+                    0, 0,     dy_dy, 0,     0,     0,     0,
+                    0, 0,     0,     dz_dz, 0,     0,     0,
+                    0, 0,     0,     0,     e0_e0, e0_e1, e0_e2,
+                    0, 0,     0,     0,     e1_e0, e1_e1, e1_e2,
+                    0, 0,     0,     0,     e2_e0, e2_e1, e2_e2
                 };
 
                 if (_isUpdated) {
@@ -372,26 +446,25 @@ namespace hf {
                 }
                 return
                     isPositionWithinBounds(newx[STATE_Z]) &&
+                    isVelocityWithinBounds(newx[STATE_DX]) &&
+                    isVelocityWithinBounds(newx[STATE_DY]) &&
                     isVelocityWithinBounds(newx[STATE_DZ]);
             }
 
             void get_vehicle_state(state_t & state)
             {
-                /*
                 const auto x = _ekf.x;
 
                 state.dx = x[STATE_DX];
+
                 state.dy = x[STATE_DY];
+
                 state.z = x[STATE_Z];
+
                 state.z = min(0, state.z);
+
                 state.dz = _r.x * x[STATE_DX] + _r.y * x[STATE_DY] + 
                     _r.z * x[STATE_DZ];
-
-                // Pack Z and DZ into a single float for transmission to client
-                const int8_t sgn = state.dz < 0 ? -1 : +1;
-                const float s = 1000;
-                state.z_dz = (int)(state.dz * s) + sgn * state.z / s;
-                    */
 
                 const auto qw = _quat.w;
                 const auto qx = _quat.x;
@@ -401,17 +474,19 @@ namespace hf {
                 state.phi = Utils::RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
                         (qw*qw - qx*qx - qy*qy + qz*qz));
 
-                state.theta = Utils::RAD2DEG * asin(-2 * (qx*qz - qw*qy));
+                // Negate for ENU
+                state.theta = -Utils::RAD2DEG * asin((-2) * (qx*qz - qw*qy));
 
                 state.psi = Utils::RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
                         (qw*qw + qx*qx - qy*qy - qz*qz));
+
+                // Get angular velocities directly from gyro
+                state.dphi =    _gyroLatest.x;
+                state.dtheta = -_gyroLatest.y; // negate for ENU
+                state.dpsi =    _gyroLatest.z;
             }
 
         private:
-
-            // For now we make prediction frequency fast enough to happen on
-            // every iteration
-            static const uint32_t PREDICTION_FREQUENCY = 10'000;
 
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
@@ -486,6 +561,15 @@ namespace hf {
 
             typedef struct {
 
+                float w;
+                float x;
+                float y;
+                float z;
+
+            } new_quat_t;
+
+            typedef struct {
+
                 axis3_t sum;
                 uint32_t count;
 
@@ -493,7 +577,7 @@ namespace hf {
 
             axis3_t _gyroLatest;
 
-            quaternion_t _quat;
+            new_quat_t _quat;
 
             bool _isUpdated;
 
@@ -504,12 +588,12 @@ namespace hf {
             imu_t _gyroSum;
             imu_t _accelSum;
 
-            Timer _predictionTimer;
-
             // Indexes to access the state
             enum {
 
                 STATE_Z,
+                STATE_DX,
+                STATE_DY,
                 STATE_DZ,
                 STATE_E0,
                 STATE_E1,
@@ -584,5 +668,6 @@ namespace hf {
                 return x * x;
             }
     };
+
 
 }
