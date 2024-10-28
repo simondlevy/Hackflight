@@ -30,7 +30,7 @@
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-#include <ekf.hpp>
+#include <old_ekf.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <i2c_comms.h>
@@ -148,10 +148,15 @@ namespace hf {
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
+                // Run state estimator to get Euler angles from IMU values
+                _ekf.accumulate_gyro(gyro);
+                _ekf.accumulate_accel(accel);
+                _ekf.predict(_usec_curr);
+
                 if (fullMonty) {
 
-                    // Read rangefinder
-                    printf("range: %d\n", _vl53l1.read());
+                    // Read rangefinder, non-blocking
+                    _ekf.update_with_range(_vl53l1.read(false));
 
                     // Read optical flow sensor
                     int16_t flowDx = 0;
@@ -159,19 +164,19 @@ namespace hf {
                     bool gotFlow = false;
                     _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
-                        printf("flow: %+03d  %+03d\n", flowDx, flowDy);
+                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }
+
                 }
 
-                // Run state estimator to get Euler angles from IMU values
-                _ekf.accumulate_gyro(gyro);
-                _ekf.accumulate_accel(accel);
-                _ekf.predict(_usec_curr);
                 _ekf.finalize();
-                _ekf.get_vehicle_state(state.phi, state.theta, state.psi);
 
-                //printf("%+3.3f  %+3.3f  %+3.3f\n",
-                //        state.phi, state.theta, state.psi);
+                _ekf.get_vehicle_state(state);
+
+                /*
+                printf("dx=%+3.3f|dy=%+3.3f|z=%+3.3f|dz=%+3.3f|phi=%+3.3f|theta=%+3.3f|psi=%+3.3f\n", 
+                        state.dx, state.dy, state.z, state.dz, state.phi, state.theta, state.psi);
+                        */
 
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
