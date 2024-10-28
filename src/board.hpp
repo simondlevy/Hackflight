@@ -30,7 +30,7 @@
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-#include <old_ekf.hpp>
+#include <ekf.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <i2c_comms.h>

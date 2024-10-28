@@ -54,6 +54,8 @@ void loop()
 
     _board.readData(dt, _rx, demands, state);
 
+    printf("%+3.3f %+3.f %+3.3f\n", state.phi, state.theta, state.psi);
+
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
     _pitchRollAnglePid.run(dt, resetPids, state, demands);
