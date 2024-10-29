@@ -30,7 +30,7 @@
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-#include <ekf.hpp>
+#include <madgwick.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <i2c_comms.h>
@@ -86,8 +86,8 @@ namespace hf {
                     initOpticalFlow();
                 }
 
-                // Initialize the state estimator
-                _ekf.initialize();
+                // Initialize the Madgwick filter
+                _madgwick.initialize();
 
                 delay(5);
 
@@ -133,31 +133,30 @@ namespace hf {
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
                 _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-                // Convert accelerometer to Gs, with offset
-                const axis3_t accel =  {
-                    ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
-                    ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
-                    az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
-                };
+                // Accelerometer degrees
+                float accelX = ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X;
+                float accelY = ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y;
+                float accelZ = az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z;
 
-                // Convert gryo to deg/sec, with offset, negating Z for
-                // nose-right positive
-                const axis3_t gyro = {
-                    gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
-                    gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
-                    -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
-                };
+                // Gyro deg /sec
+                float gyroX = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
+                float gyroY = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
+                float gyroZ = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
 
-                // Run state estimator to get Euler angles from IMU values
-                _ekf.accumulate_gyro(_usec_curr/1000, gyro);
-                _ekf.accumulate_accel(_usec_curr/1000, accel);
-                _ekf.predict(_usec_curr/1000);
+                // Negate gyroZ for nose-right positive
+                gyroZ = -gyroZ;
+
+                // Run Madgwick filter to get get Euler angles from IMU values
+                // (note negations)
+                _madgwick.getAngles(
+                        dt, gyroX, -gyroY, gyroZ, -accelX, accelY, accelZ, 
+                        state.phi, state.theta, state.psi);
 
                 /*
                 if (fullMonty) {
 
                     // Read rangefinder, non-blocking
-                    _ekf.update_with_range(_vl53l1.read(false));
+                    _vl53l1.read(false);
 
                     // Read optical flow sensor
                     int16_t flowDx = 0;
@@ -165,23 +164,15 @@ namespace hf {
                     bool gotFlow = false;
                     _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
-                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
+                        printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }
 
                 }*/
 
-                _ekf.finalize();
-
-                _ekf.get_vehicle_state(state);
-
-                printf("%+3.3f  %+3.3f  %+3.3f\n", state.phi, state.theta, state.psi);
-
-                //printf("%+3.3f  %+3.3f\n", state.z, state.dz);
-
                 // Get angular velocities directly from gyro
-                state.dphi = gyro.x;
-                state.dtheta = gyro.y;
-                state.dpsi = gyro.z;
+                state.dphi = gyroX;
+                state.dtheta = gyroY;
+                state.dpsi = gyroZ;
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);
@@ -288,7 +279,7 @@ namespace hf {
             bool _gotFailsafe;
 
             // State estimation
-            EKF  _ekf;
+            Madgwick  _madgwick;
 
             static void runLoopDelay(const uint32_t usec_curr)
             {
