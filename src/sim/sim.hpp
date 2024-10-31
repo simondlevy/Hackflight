@@ -30,6 +30,7 @@
 #include <string>
 
 #include <utils.hpp>
+#include <sim/vehicles/tinyquad.hpp>
 
 #include <webots/camera.h>
 #include <webots/gps.h>

@@ -1,5 +1,5 @@
 /*
-    Vehicle constants for Bitcraze Crazyflie
+    Vehicle constants tiny quadcopter
 
     Copyright (C) 2024 Simon D. Levy
 
@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <dynamics.hpp>
+#include <sim/dynamics.hpp>
 
-vehicle_params_t crazyflie_vehicle_params = {
+vehicle_params_t tinyquad_params = {
 
     // Estimated
     4.0e-5, // force constant B [F=b*w^2]

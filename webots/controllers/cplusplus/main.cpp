@@ -16,7 +16,7 @@
 
 #include <hackflight.hpp>
 #include <mixers.hpp>
-#include <sim.hpp>
+#include <sim/sim.hpp>
 
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
