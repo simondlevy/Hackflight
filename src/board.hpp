@@ -76,9 +76,6 @@ namespace hf {
 
                 delay(5);
 
-                // Indicate entering main loop with some quick blinks
-                blinkOnStartup(); 
-
                 // Initialize the sensors
                 initImu();
                 if (fullMonty) {
