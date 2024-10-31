@@ -14,9 +14,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <pthread.h>
-#include <sys/time.h>
-
 #include <hackflight.hpp>
 #include <mixers.hpp>
 #include <sim.hpp>
@@ -43,29 +40,6 @@ static const float PITCH_ROLL_POST_SCALE = 50;
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 static const float CLIMB_RATE_SCALE = 0.01;
 
-static void * myThreadFun(void* vargp)
-{
-    uint32_t sec_prev = 0;
-    uint32_t count = 0;
-
-    while (true) {
-
-        struct timeval tv = {};
-        gettimeofday (&tv, NULL);
-        const auto sec_curr = tv.tv_sec;
-
-        if (sec_curr - sec_prev >= 1) {
-            printf("%d\n", (int)count);
-            sec_prev = sec_curr;
-            count = 0;
-        }
-
-        count++;
-    }
-
-    return NULL;
-}
-
 
 int main(int argc, char ** argv)
 {
@@ -85,10 +59,6 @@ int main(int argc, char ** argv)
     // This initial value will be ignored for traditional (non-springy)
     // throttle
     float z_target = INITIAL_ALTITUDE_TARGET;
-
-    pthread_t thread_id;
-    printf("Before Thread\n");
-    pthread_create(&thread_id, NULL, myThreadFun, NULL);
 
     while (true) {
 
@@ -158,9 +128,6 @@ int main(int argc, char ** argv)
     }
 
     sim.close();
-
-    pthread_join(thread_id, NULL);
-    printf("After Thread\n");
 
     return 0;
 }

@@ -19,10 +19,13 @@
 
 #pragma once
 
+#include <pthread.h>
+#include <sys/time.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <unistd.h>
 #include <map>
 #include <string>
 
@@ -74,6 +77,8 @@ namespace hf {
                 _motor2 = _makeMotor("motor2");
                 _motor3 = _makeMotor("motor3");
                 _motor4 = _makeMotor("motor4");
+
+                pthread_create(&_thread_id, NULL, thread_fun, NULL);
             }
 
             bool step(void)
@@ -281,6 +286,8 @@ namespace hf {
             void close(void)
             {
                 wb_robot_cleanup();
+
+                pthread_join(_thread_id, NULL);
             }
 
         private:
@@ -292,6 +299,8 @@ namespace hf {
                 JOYSTICK_RECOGNIZED
 
             } joystickStatus_e;
+
+            pthread_t _thread_id;
 
             double _timestep;
 
@@ -432,6 +441,38 @@ namespace hf {
                 puts("- Use arrow keys to move horizontally\n");
                 puts("- Use Q and E to change heading\n");
             }
+
+            static void * thread_fun(void* vargp)
+            {
+                uint32_t sec_prev = 0;
+                uint32_t count = 0;
+
+                bool ready = false;
+
+                while (true) {
+
+                    struct timeval tv = {};
+                    gettimeofday (&tv, NULL);
+                    const auto sec_curr = tv.tv_sec;
+
+                    if (sec_curr - sec_prev >= 1) {
+
+                        if (ready) {
+
+                            printf("%3.3e Hz\n", (float)count);
+                            sec_prev = sec_curr;
+                            count = 0;
+                        }
+
+                        ready  = true;
+                    }
+
+                    count++;
+                }
+
+                return NULL;
+            }
+
     };
 
 }
