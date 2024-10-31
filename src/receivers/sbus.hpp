@@ -41,7 +41,7 @@ namespace hf {
 
                     const auto data = _sbus.data();
 
-                    if (data.lost_frame || data.failsafe) {
+                    if (/*data.lost_frame ||*/ data.failsafe) {
 
                         gotFailsafe = true;
                     }
