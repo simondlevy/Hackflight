@@ -45,7 +45,9 @@ int main(int argc, char ** argv)
 
     hf::demands_t demands = {INITIAL_ALTITUDE_TARGET, 0, 0, 0};
 
-    float motor = 0;
+    float motor = 60;
+
+    const auto start = usec();
 
     while (true) {
 
@@ -56,8 +58,15 @@ int main(int argc, char ** argv)
             dynamics.setMotors(motor, motor, motor, motor);
 
             state.z = dynamics.x[Dynamics::STATE_Z];
+
+            printf("%3.3f: %3.3f => %3.3f\n", (usec()-start)/1e6, motor, state.z);
+
+            if (state.z > INITIAL_ALTITUDE_TARGET) {
+                break;
+            }
         }
 
+        /*
         if (pid_timer.isReady(usec(), PID_FREQ)) {
 
             altitudePid.run(1./PID_FREQ, state, demands);
@@ -66,9 +75,7 @@ int main(int argc, char ** argv)
         }
 
         if (report_timer.isReady(usec(), REPORT_FREQ)) {
-
-            printf("%3.3f\n", state.z);
-        }
+        }*/
     }
 
     return 0;
