@@ -6,6 +6,8 @@
 
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
+static const float THRUST_BASE = 55.385;
+
 static const float DT = 1e-3;
 
 static const float MOTOR_MAX = 60;
@@ -27,7 +29,7 @@ int main(int argc, char ** argv)
 
     hf::demands_t demands = {};
 
-    for (uint64_t k=0; ; k++) {
+    for (long k=0; ; k++) {
 
         const auto time = k * DT;
 
@@ -39,7 +41,7 @@ int main(int argc, char ** argv)
 
         altitudePid.run(DT, state, demands);
 
-        const auto motor = min(demands.thrust, MOTOR_MAX);
+        const auto motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
         dynamics.setMotors(motor, motor, motor, motor);
 
