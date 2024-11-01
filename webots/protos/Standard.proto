@@ -1,6 +1,6 @@
 #VRML_SIM R2023b utf8
 
-PROTO Vehicle [
+PROTO Standard [
 ]
 
 {
@@ -11,7 +11,7 @@ DEF ROBOT Robot {
         rotation 0 0 0 0
         controller "<extern>"
         supervisor FALSE
-        name "Vehicle"
+        name "Standard"
         model "Custom MAV"
 
         children [
