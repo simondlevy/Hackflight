@@ -43,6 +43,9 @@ static const float CLIMB_RATE_SCALE = 0.01;
 
 int main(int argc, char ** argv)
 {
+    (void)argc;
+    (void)argv;
+
     hf::Simulator sim = {};
 
     sim.init();
@@ -53,8 +56,6 @@ int main(int argc, char ** argv)
     hf::YawRatePid yawRatePid = {};
 
     hf::AltitudePid altitudePid = {};
-
-    bool requestedTakeoff = false;
 
     // This initial value will be ignored for traditional (non-springy)
     // throttle

@@ -61,6 +61,9 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 int main(int argc, char ** argv)
 {
+    (void)argc;
+    (void)argv;
+
     _sim.init(false);
 
     while (true) {
