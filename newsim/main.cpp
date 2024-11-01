@@ -1,10 +1,14 @@
+#include <stdio.h>
 #include <sys/time.h>
 
 #include <hackflight.hpp>
+#include <timer.hpp>
 #include <pids/altitude.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
-static constexpr float DYNAMICS_DT = 1e-5;
+static constexpr float DYNAMICS_FREQ = 100'000;
+
+static constexpr float PID_FREQ = 1000;
 
 static const float THRUST_BASE = 55.385;
 
@@ -14,34 +18,33 @@ static const float THROTTLE_DEADBAND = 0.2;
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 static const float CLIMB_RATE_SCALE = 0.01;
 
-static double timesec()
+static uint32_t usec()
 {
     struct timeval tv = {};
     gettimeofday(&tv, NULL);
-    return tv.tv_sec + tv.tv_usec / 1e6;
-
+    return tv.tv_sec * 1'000'000 + tv.tv_usec;
 }
 
 int main(int argc, char ** argv)
 {
 
-    double time_prev = 0;
+    uint32_t time_prev = 0;
     bool ready = false;
 
-    Dynamics _dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
+    Dynamics dynamics = Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
+
+    hf::Timer dynamics_timer;
+
+    hf::Timer pid_timer;
 
     while (true) {
 
-        const auto time_curr = timesec();
+        const auto time_curr = usec();
 
-        if (time_curr - time_prev > DYNAMICS_DT) {
+        if (dynamics_timer.isReady(usec(), DYNAMICS_FREQ)) {
+        }
 
-            if (ready) {
-
-                time_prev = time_curr;
-            }
-
-            ready  = true;
+        if (pid_timer.isReady(usec(), PID_FREQ)) {
         }
     }
 
