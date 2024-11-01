@@ -78,8 +78,8 @@ def main():
 
         rotation_field.setSFRotation(angles_to_rotation(phi, theta, psi))
 
-        m1.setVelocity(+m1val)
-        m2.setVelocity(-m2val)
+        m1.setVelocity(-m1val)
+        m2.setVelocity(+m2val)
         m3.setVelocity(+m3val)
         m4.setVelocity(-m4val)
 
