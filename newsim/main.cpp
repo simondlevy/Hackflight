@@ -10,6 +10,8 @@ static constexpr float DYNAMICS_FREQ = 100'000;
 
 static constexpr float PID_FREQ = 1000;
 
+static constexpr float REPORT_FREQ = 100;
+
 static const float THRUST_BASE = 55.385;
 
 static const float THROTTLE_DEADBAND = 0.2;
@@ -34,8 +36,8 @@ int main(int argc, char ** argv)
     Dynamics dynamics = Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
 
     hf::Timer dynamics_timer;
-
     hf::Timer pid_timer;
+    hf::Timer report_timer;
 
     while (true) {
 
@@ -45,6 +47,11 @@ int main(int argc, char ** argv)
         }
 
         if (pid_timer.isReady(usec(), PID_FREQ)) {
+        }
+
+        if (report_timer.isReady(usec(), REPORT_FREQ)) {
+
+            printf("%3.3f\n", dynamics.x[Dynamics::STATE_Z]);
         }
     }
 
