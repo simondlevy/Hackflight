@@ -10,8 +10,6 @@ static const float THRUST_BASE = 55.385;
 
 static const float DYNAMICS_DT = 1e-5;
 
-static const uint32_t REPORT_PERIOD = 1000;
-
 static const uint32_t PID_PERIOD = 1000;
 
 static const float MOTOR_MAX = 60;
@@ -58,10 +56,8 @@ int main(int argc, char ** argv)
         state.z = dynamics.x[Dynamics::STATE_Z];
         state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
 
-        if (k % REPORT_PERIOD == 0) {
-            printf("%3.3f,%3.3f,%3.3f,%3.3f\n",
-                    time, motor, state.z, state.dz);
-        }
+        printf("%3.3f,%3.3f,%3.3f,%3.3f\n",
+                time, motor, state.z, state.dz);
     }
 
     return 0;
