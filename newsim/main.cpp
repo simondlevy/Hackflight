@@ -12,7 +12,7 @@ static const float DT = 1e-3;
 
 static const float MOTOR_MAX = 60;
 
-static const float TIME_MAX = 30;
+static const float TIME_MAX = 5;
 
 static float min(const float val, const float maxval)
 {
