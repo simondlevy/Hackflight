@@ -9,5 +9,9 @@ newsim: main.cpp
 edit:
 	vim main.cpp
 
+csv:
+	./newsim > log.csv
+	libreoffice log.csv
+
 clean:
 	rm -rf newsim

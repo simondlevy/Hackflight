@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
 
         state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
 
-        printf("t=%3.3f m=%3.3f z=%3.3f dz=%3.3f\n",
+        printf("%3.3f,%3.3f,%3.3f,%3.3f\n",
                 time, motor, state.z, state.dz);
     }
 
