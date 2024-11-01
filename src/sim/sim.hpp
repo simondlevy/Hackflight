@@ -80,12 +80,18 @@ namespace hf {
                 _motor3 = _makeMotor("motor3");
                 _motor4 = _makeMotor("motor4");
 
+                const auto pos = wb_gps_get_values(_gps);
+
+                // Step simulator once to get initial position
+                step();
+
+                _dynamics.setPosition(pos[0], pos[1], pos[2]);
+
                 pthread_create(&_thread_id, NULL, thread_fun, NULL);
             }
 
             bool step(void)
             {
-
                 return wb_robot_step((int)_timestep) != -1;
             }
 
@@ -262,6 +268,9 @@ namespace hf {
                 yprev = y;
                 zprev = state.z;
 
+                printf("%3.3f (%3.3f)\n",
+                        _dynamics.x[Dynamics::STATE_Z], state.z);
+
                 return state;
              }
 
@@ -279,8 +288,8 @@ namespace hf {
 
             void setMotors(const quad_motors_t & motors)
             {
-                _dynamics.setMotors(
-                        motors.m1, motors.m2, motors.m3, motors.m4);
+                //_dynamics.setMotors(
+                //        motors.m1, motors.m2, motors.m3, motors.m4);
 
                 // Negate expected direction to accommodate Webots
                 // counterclockwise positive
@@ -299,7 +308,7 @@ namespace hf {
 
         private:
 
-            const uint32_t DYNAMICS_DT = 1e-5;
+            static constexpr float DYNAMICS_DT = 1 / 30.f;
 
             Dynamics _dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
@@ -471,11 +480,11 @@ namespace hf {
 
                     const auto time_curr = timesec();
 
-                    if (time_curr - time_prev >= 1) {
+                    if (time_curr - time_prev > DYNAMICS_DT) {
 
                         if (ready) {
 
-                            printf("%3.3e Hz\n", (float)count);
+                            //printf("%3.3f: %3.3e\n", time_curr, (double)count);
                             time_prev = time_curr;
                             count = 0;
                         }
