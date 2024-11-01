@@ -59,8 +59,6 @@ int main(int argc, char ** argv)
 
             state.z = dynamics.x[Dynamics::STATE_Z];
 
-            printf("%3.3f: %3.3f => %3.3f\n", (usec()-start)/1e6, motor, state.z);
-
             if (state.z > INITIAL_ALTITUDE_TARGET) {
                 break;
             }
@@ -73,9 +71,12 @@ int main(int argc, char ** argv)
 
             motor = demands.thrust;
         }
+        */
 
         if (report_timer.isReady(usec(), REPORT_FREQ)) {
-        }*/
+            printf("%3.3f: %3.3f => %3.3f\n", (usec()-start)/1e6, motor, state.z);
+
+        }
     }
 
     return 0;
