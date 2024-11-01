@@ -12,34 +12,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-cplusplus:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
-
-cpptakeoff:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/cpptakeoff/cpptakeoff
-
-haskell:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
-
-python:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/python/python.py
-
-pytakeoff:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/pytakeoff/pytakeoff.py
-
-playback-motors:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/playback-motors/playback-motors.py
-
-playback-demands:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/playback-demands/playback-demands.py
-
-playback-pose:
+playback:
 	webots worlds/supervised.wbt &
-	/usr/local/webots/webots-controller controllers/playback-pose/playback-pose.py
+	/usr/local/webots/webots-controller controllers/playback/playback.py
