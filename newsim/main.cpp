@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
 
         state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
 
-        printf("m=%3.3f z=%3.3f dz=%3.3f\n\n", motor, state.z, state.dz);
+        printf("m=%3.3f z=%3.3f dz=%3.3f\n", motor, state.z, state.dz);
 
         if (motor > 1000) {
             break;
