@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <utils.hpp>
+
 namespace hf {
 
     class AltitudePid {
