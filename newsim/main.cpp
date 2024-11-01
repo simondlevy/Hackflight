@@ -10,7 +10,7 @@ static constexpr float DYNAMICS_FREQ = 100'000;
 
 static constexpr float PID_FREQ = 1000;
 
-static constexpr float REPORT_FREQ = 100;
+static constexpr float REPORT_FREQ = 30;
 
 static const float THRUST_BASE = 55.385;
 
@@ -39,11 +39,21 @@ int main(int argc, char ** argv)
     hf::Timer pid_timer;
     hf::Timer report_timer;
 
+    hf::AltitudePid altitudePid = {};
+
+    float motor = 0;
+
+    float z = 0;
+
     while (true) {
 
         const auto time_curr = usec();
 
         if (dynamics_timer.isReady(usec(), DYNAMICS_FREQ)) {
+
+            dynamics.setMotors(motor, motor, motor, motor);
+
+            z = dynamics.x[Dynamics::STATE_Z];
         }
 
         if (pid_timer.isReady(usec(), PID_FREQ)) {
@@ -51,7 +61,7 @@ int main(int argc, char ** argv)
 
         if (report_timer.isReady(usec(), REPORT_FREQ)) {
 
-            printf("%3.3f\n", dynamics.x[Dynamics::STATE_Z]);
+            printf("%3.3f\n", z);
         }
     }
 
