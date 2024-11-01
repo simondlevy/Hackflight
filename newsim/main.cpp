@@ -8,7 +8,9 @@ static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
 static const float THRUST_BASE = 55.385;
 
-static const uint32_t DYNAMICS_FREQ = 100'000;
+static const float DYNAMICS_DT = 1e-5;
+
+static const uint32_t REPORT_PERIOD = 1000;
 
 static const float MOTOR_MAX = 60;
 
@@ -21,9 +23,7 @@ static float min(const float val, const float maxval)
 
 int main(int argc, char ** argv)
 {
-    const float dynamics_dt = 1. / DYNAMICS_FREQ;
-
-    Dynamics dynamics = Dynamics(tinyquad_params, dynamics_dt);
+    Dynamics dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
     hf::AltitudePid altitudePid = {};
 
@@ -33,7 +33,7 @@ int main(int argc, char ** argv)
 
     for (long k=0; ; k++) {
 
-        const auto time = k / (float)DYNAMICS_FREQ;
+        const auto time = k * DYNAMICS_DT;
 
         float motor = 0;
 
@@ -47,17 +47,15 @@ int main(int argc, char ** argv)
             demands.thrust = INITIAL_ALTITUDE_TARGET;
 
             // Altitude PID controller converts target to thrust demand
-            altitudePid.run(dynamics_dt, state, demands);
-
+            altitudePid.run(DYNAMICS_DT, state, demands);
             motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
-
         }
 
         dynamics.setMotors(motor, motor, motor, motor);
         state.z = dynamics.x[Dynamics::STATE_Z];
         state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
 
-        if (k % 100 == 0) {
+        if (k % REPORT_PERIOD == 0) {
             printf("%3.3f,%3.3f,%3.3f,%3.3f\n",
                     time, motor, state.z, state.dz);
         }
