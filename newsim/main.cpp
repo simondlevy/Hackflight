@@ -75,7 +75,8 @@ int main(int argc, char ** argv)
 
         }
 
-        if (state.z > INITIAL_ALTITUDE_TARGET) {
+        if (state.z >= INITIAL_ALTITUDE_TARGET) {
+            printf("%3.3f: %3.3f => %3.3f\n", (usec()-start)/1e6, motor, state.z);
             break;
         }
     }
