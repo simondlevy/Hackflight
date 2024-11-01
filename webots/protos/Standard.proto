@@ -5,6 +5,8 @@ PROTO Standard [
 
 {
 
+
+
 DEF ROBOT Robot {
 
     translation  0 0 0.30
@@ -13,9 +15,7 @@ DEF ROBOT Robot {
         supervisor FALSE
         name "Standard"
         model "Custom MAV"
-
         children [
-
         DEF BODY Pose {
             translation 0 0 0
                 children [

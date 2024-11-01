@@ -12,32 +12,40 @@ DEF ROBOT Robot {
         rotation IS rotation
         controller "<extern>"
         supervisor TRUE
-        name "Crazyflie"
-        model "Bitcraze's Crazyflie"
+        name "Supervised"
+        model "Custom MAV"
         children [
         DEF BODY Pose {
             translation 0 0 -0.015
                 children [
                 CadShape {
                     url [
-                        "../meshes/collada_files/cf2_assembly.dae"
+                        "../meshes/collada_files/custom.dae"
                     ]
                 }
                 ]
         }
+
     Camera {
         translation 0.03 0 0.01
             fieldOfView 0.87
             width 324
             height 324
     }
+
     GPS {
     }
+
     Gyro {
     }
+
     InertialUnit {
         name "inertial_unit"
     }
+
+
+    # Motor 1 ----------------------------------------------------------------
+
     DEF M1 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 -0.031 0.008  
@@ -54,7 +62,7 @@ DEF ROBOT Robot {
                 children [
                 DEF FASTHELIX Shape {
                     appearance PBRAppearance {
-                        baseColor 0.1 0.1 0.1
+                        baseColor 0.4 0.0 0.0
                             baseColorMap ImageTexture {
                                 url [
                                     "../meshes/textures/fast_helix.png"
@@ -74,7 +82,7 @@ DEF ROBOT Robot {
                 children [
                 DEF PROP_SHAPE Shape {
                     appearance DEF PLASTIC PBRAppearance {
-                        baseColor 0 0 0
+                        baseColor 1 0 0
                             metalness 0.3
                     }
                     geometry Mesh {
@@ -86,6 +94,9 @@ DEF ROBOT Robot {
                 ]
         }
     }
+
+    # Motor 2 ----------------------------------------------------------------
+
     DEF M2 Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 -0.031 0.008
@@ -110,6 +121,9 @@ DEF ROBOT Robot {
                 ]
         }
     }
+
+    # Motor 3 ----------------------------------------------------------------
+
     DEF M3 Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 0.031 0.008
@@ -134,6 +148,9 @@ DEF ROBOT Robot {
                 ]
         }
     }
+
+    # Motor 4 ----------------------------------------------------------------
+
     DEF M4 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 0.031 0.008
