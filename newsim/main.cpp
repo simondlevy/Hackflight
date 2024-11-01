@@ -41,9 +41,11 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid altitudePid = {};
 
-    float motor = 0;
+    hf::state_t state  = {};
 
-    float z = 0;
+    hf::demands_t demands = {INITIAL_ALTITUDE_TARGET, 0, 0, 0};
+
+    float motor = 0;
 
     while (true) {
 
@@ -53,15 +55,19 @@ int main(int argc, char ** argv)
 
             dynamics.setMotors(motor, motor, motor, motor);
 
-            z = dynamics.x[Dynamics::STATE_Z];
+            state.z = dynamics.x[Dynamics::STATE_Z];
         }
 
         if (pid_timer.isReady(usec(), PID_FREQ)) {
+
+            altitudePid.run(1./PID_FREQ, state, demands);
+
+            motor = demands.thrust;
         }
 
         if (report_timer.isReady(usec(), REPORT_FREQ)) {
 
-            printf("%3.3f\n", z);
+            printf("%3.3f\n", state.z);
         }
     }
 
