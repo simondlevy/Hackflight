@@ -1,16 +1,16 @@
 #VRML_SIM R2023b utf8
 
 PROTO Standard [
+  field SFVec3f translation     0 0 0.015
+  field SFRotation rotation     0 0 0 0
 ]
 
 {
 
-
-
 DEF ROBOT Robot {
 
-    translation  0 0 0.30
-        rotation 0 0 0 0
+    translation  IS translation
+        rotation IS rotation
         controller "<extern>"
         supervisor FALSE
         name "Standard"
@@ -46,7 +46,7 @@ DEF ROBOT Robot {
 
     # Motor 1 ----------------------------------------------------------------
 
-    Propeller {
+    DEF M1 Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 -0.031 0.016
             thrustConstants -4e-05 0
@@ -63,7 +63,7 @@ DEF ROBOT Robot {
 
                 children [ 
 
-                    Shape {
+                    DEF FASTHELIX Shape {
                             appearance PBRAppearance {
                                 baseColor 0.4 0.0 0.0
                                     baseColorMap ImageTexture {
@@ -84,7 +84,7 @@ DEF ROBOT Robot {
         slowHelix Solid {
             translation -0.031 -0.031 0.016
                 children [
-                    Shape {
+                    DEF PROP_SHAPE Shape {
                         appearance DEF PLASTIC PBRAppearance {
                             baseColor 1 0 0
                                 metalness 0.3
@@ -102,7 +102,7 @@ DEF ROBOT Robot {
 
     # Motor 2 ----------------------------------------------------------------
 
-    Propeller {
+    DEF M2 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 -0.031 0.016  
             thrustConstants 4e-05 0               
@@ -155,7 +155,7 @@ DEF ROBOT Robot {
 
     # Motor 3 ----------------------------------------------------------------
 
-    Propeller {
+    DEF M3 Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 0.031 0.016
             thrustConstants 4e-05 0
@@ -209,7 +209,7 @@ DEF ROBOT Robot {
 
     # Motor 4 ----------------------------------------------------------------
 
-    Propeller {
+    DEF M4 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 0.031 0.016
             thrustConstants -4e-05 0
