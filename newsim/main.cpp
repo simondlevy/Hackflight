@@ -12,6 +12,8 @@ static const float DYNAMICS_DT = 1e-5;
 
 static const uint32_t REPORT_PERIOD = 1000;
 
+static const uint32_t PID_PERIOD = 1000;
+
 static const float MOTOR_MAX = 60;
 
 static const float TIME_MAX = 5;
@@ -41,15 +43,16 @@ int main(int argc, char ** argv)
             break;
         }
 
-        if (true) {
+        if (k % PID_PERIOD == 0) {
 
             // Reset thrust demand to altitude target
             demands.thrust = INITIAL_ALTITUDE_TARGET;
 
             // Altitude PID controller converts target to thrust demand
             altitudePid.run(DYNAMICS_DT, state, demands);
-            motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
         }
+
+        motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
         dynamics.setMotors(motor, motor, motor, motor);
         state.z = dynamics.x[Dynamics::STATE_Z];
