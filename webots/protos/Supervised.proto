@@ -1,0 +1,172 @@
+#VRML_SIM R2023b utf8
+
+PROTO Supervised [
+  field SFVec3f translation     0 0 0.015
+  field SFRotation rotation     0 0 0 0
+]
+
+{
+
+DEF ROBOT Robot {
+    translation IS translation 
+        rotation IS rotation
+        controller "<extern>"
+        supervisor TRUE
+        name "Crazyflie"
+        model "Bitcraze's Crazyflie"
+        children [
+        DEF BODY Pose {
+            translation 0 0 -0.015
+                children [
+                CadShape {
+                    url [
+                        "../meshes/collada_files/cf2_assembly.dae"
+                    ]
+                }
+                ]
+        }
+    Camera {
+        translation 0.03 0 0.01
+            fieldOfView 0.87
+            width 324
+            height 324
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    InertialUnit {
+        name "inertial_unit"
+    }
+    DEF M1 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust 0.031 -0.031 0.008  
+            thrustConstants 0 0
+            torqueConstants 0 0
+            fastHelixThreshold 50                 
+            device RotationalMotor {
+                name "motor1"
+                    maxVelocity 100
+                    maxTorque 30                        
+            }
+        fastHelix Solid {
+            translation 0.031 -0.031 0.008
+                children [
+                DEF FASTHELIX Shape {
+                    appearance PBRAppearance {
+                        baseColor 0.1 0.1 0.1
+                            baseColorMap ImageTexture {
+                                url [
+                                    "../meshes/textures/fast_helix.png"
+                                ]
+                            }
+                        metalness 0
+                    }
+                    geometry Cylinder {
+                        height 0.001
+                            radius 0.025
+                    }
+                }
+                ]
+        }
+        slowHelix Solid {
+            translation 0.031 -0.031 0.008
+                children [
+                DEF PROP_SHAPE Shape {
+                    appearance DEF PLASTIC PBRAppearance {
+                        baseColor 0 0 0
+                            metalness 0.3
+                    }
+                    geometry Mesh {
+                        url [
+                            "../meshes/collada_files/ccw_prop.dae"
+                        ]
+                    }
+                }
+                ]
+        }
+    }
+    DEF M2 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust -0.031 -0.031 0.008
+            thrustConstants 0 0
+            torqueConstants 0 0
+            fastHelixThreshold 50
+            device RotationalMotor {
+                name "motor2"
+                    maxVelocity 100
+                    maxTorque 30
+            }
+        fastHelix Solid {
+            translation -0.031 -0.031 0.008
+                children [
+                USE FASTHELIX
+                ]
+        }
+        slowHelix Solid {
+            translation -0.031 -0.031 0.008
+                children [
+                USE PROP_SHAPE
+                ]
+        }
+    }
+    DEF M3 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust -0.031 0.031 0.008
+            thrustConstants 0 0
+            torqueConstants 0 0
+            fastHelixThreshold 50
+            device RotationalMotor {
+                name "motor3"
+                    maxVelocity 100
+                    maxTorque 30
+            }
+        fastHelix Solid {
+            translation -0.031 0.031 0.008
+                children [
+                USE FASTHELIX
+                ]
+        }
+        slowHelix Solid {
+            translation -0.031 0.031 0.008
+                children [
+                USE PROP_SHAPE
+                ]
+        }
+    }
+    DEF M4 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust 0.031 0.031 0.008
+            thrustConstants 0 0
+            torqueConstants  0 0
+            fastHelixThreshold 50
+            device RotationalMotor {
+                name "motor4"
+                    maxVelocity 100  # rad/sec
+                    maxTorque 30
+            }
+        fastHelix Solid {
+            translation 0.031 0.031 0.008
+                children [
+                USE FASTHELIX
+                ]
+        }
+        slowHelix DEF PROP Solid {
+            translation 0.031 0.031 0.007
+                children [
+                USE PROP_SHAPE
+                ]
+        }
+    }
+    ]
+        boundingObject Cylinder {
+            height 0.03
+                radius 0.05
+        }
+    physics Physics {
+        density -1
+            mass 0.05
+    }
+}
+
+}
