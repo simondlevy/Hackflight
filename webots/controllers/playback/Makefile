@@ -12,6 +12,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-playback:
-	webots worlds/supervised.wbt &
-	/usr/local/webots/webots-controller controllers/playback/playback.py
+run:
+	webots ../../worlds/supervised.wbt &
+	/usr/local/webots/webots-controller playback.py
