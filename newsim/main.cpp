@@ -1,82 +1,47 @@
 #include <stdio.h>
-#include <sys/time.h>
 
 #include <hackflight.hpp>
-#include <timer.hpp>
 #include <pids/altitude.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
-static constexpr float DYNAMICS_FREQ = 100'000;
-
-static constexpr float PID_FREQ = 1000;
-
-static constexpr float REPORT_FREQ = 30;
-
-static const float THRUST_BASE = 55.385;
-
-static const float THROTTLE_DEADBAND = 0.2;
-
-// For springy-throttle gamepads / keyboard
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
-static const float CLIMB_RATE_SCALE = 0.01;
 
-static uint32_t usec()
+static const float DT = 1e-3;
+
+static const float MOTOR_MAX = 60;
+
+static float min(const float val, const float maxval)
 {
-    struct timeval tv = {};
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec * 1'000'000 + tv.tv_usec;
+    return val > maxval ? maxval : val;
 }
 
 int main(int argc, char ** argv)
 {
-
-    uint32_t time_prev = 0;
-    bool ready = false;
-
-    Dynamics dynamics = Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
-
-    hf::Timer dynamics_timer;
-    hf::Timer pid_timer;
-    hf::Timer report_timer;
+    Dynamics dynamics = Dynamics(tinyquad_params, DT);
 
     hf::AltitudePid altitudePid = {};
 
     hf::state_t state  = {};
 
-    hf::demands_t demands = {INITIAL_ALTITUDE_TARGET, 0, 0, 0};
+    hf::demands_t demands = {};
 
-    float motor = 60;
+    for (uint64_t k=0; /*k<100000*/; k++) {
 
-    const auto start = usec();
+        demands.thrust = INITIAL_ALTITUDE_TARGET;
 
-    while (true) {
+        altitudePid.run(DT, state, demands);
 
-        const auto time_curr = usec();
+        const auto motor = min(demands.thrust, MOTOR_MAX);
 
-        if (dynamics_timer.isReady(usec(), DYNAMICS_FREQ)) {
+        dynamics.setMotors(motor, motor, motor, motor);
 
-            dynamics.setMotors(motor, motor, motor, motor);
+        state.z = dynamics.x[Dynamics::STATE_Z];
 
-            state.z = dynamics.x[Dynamics::STATE_Z];
+        state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
 
-        }
+        printf("m=%3.3f z=%3.3f dz=%3.3f\n\n", motor, state.z, state.dz);
 
-        /*
-        if (pid_timer.isReady(usec(), PID_FREQ)) {
-
-            altitudePid.run(1./PID_FREQ, state, demands);
-
-            motor = demands.thrust;
-        }
-        */
-
-        if (report_timer.isReady(usec(), REPORT_FREQ)) {
-            printf("%3.3f: %3.3f => %3.3f\n", (usec()-start)/1e6, motor, state.z);
-
-        }
-
-        if (state.z >= INITIAL_ALTITUDE_TARGET) {
-            printf("%3.3f: %3.3f => %3.3f\n", (usec()-start)/1e6, motor, state.z);
+        if (motor > 1000) {
             break;
         }
     }

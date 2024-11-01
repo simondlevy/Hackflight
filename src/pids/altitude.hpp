@@ -30,10 +30,10 @@ namespace hf {
                     const float dt, const state_t & state, demands_t & demands)
             {
                 demands.thrust = run_pi(dt, KP_Z, KI_Z,
-                        demands.thrust, state.z, _z_integral);
+                        demands.thrust, state.z, _z_integral, "z");
 
                 demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
-                        demands.thrust, state.dz, _dz_integral);
+                        demands.thrust, state.dz, _dz_integral, "dz");
             }
 
         private:
@@ -50,13 +50,19 @@ namespace hf {
             float _dz_integral;
 
             static float run_pi(const float dt, const float kp, const float ki,
-                    const float target, const float actual, float & integral)
+                    const float target, const float actual, float & integral,
+                    const char * label)
             {
                 const auto error = target - actual;
 
                 integral = Utils::fconstrain(integral + dt * error, ILIMIT);
 
-                return  kp * error + ki * integral;
+                const auto output = kp * error + ki * integral;
+
+                printf("%s:  target=%+3.3f  actual=%+3.3f  error=%+3.3f  output=%+3.3f\n",
+                        label, target, actual, error, output);
+
+                return output;
             }
     };
 }
