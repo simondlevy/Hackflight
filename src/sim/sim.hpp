@@ -26,6 +26,7 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+
 #include <map>
 #include <string>
 
@@ -155,7 +156,8 @@ namespace hf {
 
                     auto axes = getJoystickInfo();
 
-                    demands.thrust = normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+                    demands.thrust =
+                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
 
                     // Springy throttle stick; keep in interval [-1,+1]
                     if (axes.springy) {
@@ -169,7 +171,8 @@ namespace hf {
                         _requested_takeoff = button_was_hit;
 
                         // Run throttle stick through deadband
-                        demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
+                        demands.thrust =
+                            fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
                     }
 
                     else {
@@ -276,6 +279,9 @@ namespace hf {
 
             void setMotors(const quad_motors_t & motors)
             {
+                _dynamics.setMotors(
+                        motors.m1, motors.m2, motors.m3, motors.m4);
+
                 // Negate expected direction to accommodate Webots
                 // counterclockwise positive
                 wb_motor_set_velocity(_motor1, -motors.m1);
@@ -292,6 +298,10 @@ namespace hf {
             }
 
         private:
+
+            const uint32_t DYNAMICS_DT = 1e-5;
+
+            Dynamics _dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
             typedef enum {
 
@@ -443,25 +453,30 @@ namespace hf {
                 puts("- Use Q and E to change heading\n");
             }
 
+            static double timesec()
+            {
+                struct timeval tv = {};
+                gettimeofday(&tv, NULL);
+                return tv.tv_sec + tv.tv_usec / 1e6;
+
+            }
+
             static void * thread_fun(void* vargp)
             {
-                uint32_t sec_prev = 0;
+                double time_prev = 0;
                 uint32_t count = 0;
-
                 bool ready = false;
 
                 while (true) {
 
-                    struct timeval tv = {};
-                    gettimeofday (&tv, NULL);
-                    const auto sec_curr = tv.tv_sec;
+                    const auto time_curr = timesec();
 
-                    if (sec_curr - sec_prev >= 1) {
+                    if (time_curr - time_prev >= 1) {
 
                         if (ready) {
 
                             printf("%3.3e Hz\n", (float)count);
-                            sec_prev = sec_curr;
+                            time_prev = time_curr;
                             count = 0;
                         }
 

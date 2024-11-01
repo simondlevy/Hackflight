@@ -1,30 +1,40 @@
 /*
-Multirotor Dynamics class
+   Multirotor Dynamics class
 
-Should work for any simulator, vehicle, or operating system
+   Based on:
 
-Based on:
+   @inproceedings{DBLP:conf/icra/BouabdallahMS04,
+   author    = {Samir Bouabdallah and Pierpaolo Murrieri and
+   Roland Siegwart},
+   title     = {Design and Control of an Indoor Micro Quadrotor},
+   booktitle = {Proceedings of the 2004 {IEEE} International Conference on
+   Robotics and Automation, {ICRA} 2004, April 26 - May 1, 2004,
+   New Orleans, LA, {USA}},
+   pages     = {4393--4398},
+   year      = {2004},
+   crossref  = {DBLP:conf/icra/2004},
+   url       = {https://doi.org/10.1109/ROBOT.2004.1302409},
+   doi       = {10.1109/ROBOT.2004.1302409},
+   timestamp = {Sun, 04 Jun 2017 01:00:00 +0200},
+   biburl    = {https://dblp.org/rec/bib/conf/icra/BouabdallahMS04},
+   bibsource = {dblp computer science bibliography, https://dblp.org}
+   }
 
-    @inproceedings{DBLP:conf/icra/BouabdallahMS04,
-      author    = {Samir Bouabdallah and Pierpaolo Murrieri and
-                   Roland Siegwart},
-      title     = {Design and Control of an Indoor Micro Quadrotor},
-      booktitle = {Proceedings of the 2004 {IEEE} International Conference on
-                  Robotics and Automation, {ICRA} 2004, April 26 - May 1, 2004,
-                  New Orleans, LA, {USA}},
-      pages     = {4393--4398},
-      year      = {2004},
-      crossref  = {DBLP:conf/icra/2004},
-      url       = {https://doi.org/10.1109/ROBOT.2004.1302409},
-      doi       = {10.1109/ROBOT.2004.1302409},
-      timestamp = {Sun, 04 Jun 2017 01:00:00 +0200},
-      biburl    = {https://dblp.org/rec/bib/conf/icra/BouabdallahMS04},
-      bibsource = {dblp computer science bibliography, https://dblp.org}
-    }
+   Copyright (C) 2024 Simon D. Levy
 
-Copyright (C) 2021 Simon D. Levy, Alex Sender
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
 
-*/
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+
+ */
 
 #pragma once
 
@@ -53,14 +63,14 @@ typedef struct {
 class Dynamics {
 
     /*
-    Dynamics class for quad-X frames using Crazyflie motor layout
+       Dynamics class for quad-X frames using Crazyflie motor layout
 
-    4cw   1ccw
+       4cw   1ccw
 
-        ^
+       ^
 
-    3ccw  2cw
-    */ 
+       3ccw  2cw
+     */ 
 
     private:
 
@@ -187,16 +197,16 @@ class Dynamics {
             // Once airborne, we can update dynamics
             else if (_status == STATUS_AIRBORNE) {
 
-                 // If we've descended to the ground
+                // If we've descended to the ground
                 if (x[STATE_Z] <= 0 and x[STATE_Z_DOT] <= 0) {
-                
+
                     // Big angles indicate a crash
                     const auto phi = x[STATE_PHI];
                     const auto velx = x[STATE_Y_DOT];
                     const auto vely = x[STATE_Z_DOT];
                     if ((vely > LANDING_VEL_Y ||
-                       fabs(velx) > LANDING_VEL_X ||
-                       fabs(phi) > LANDING_ANGLE)) {
+                                fabs(velx) > LANDING_VEL_X ||
+                                fabs(phi) > LANDING_ANGLE)) {
                         _status = STATUS_CRASHED;
                     }
                     else {
@@ -219,12 +229,12 @@ class Dynamics {
                 // Once airborne, inertial-frame acceleration is same as NED
                 // acceleration
                 memcpy(_inertialAccel, accelENU, sizeof(accelENU));
+            }
         }
-    }
 
         /*
-        Sets the vehicle position to the values specified in a sequence
-        */
+           Sets the vehicle position to the values specified in a sequence
+         */
         void setPosition(const float x, const float y, const float z)
         {
             memset(this->x, 0, sizeof(x));
