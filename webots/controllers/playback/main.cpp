@@ -33,6 +33,13 @@ static WbDeviceTag makeMotor(const char * name)
     return motor;
 }
 
+static float parse(char ** pch)
+{
+    const auto val = atof(*pch);
+    *pch = strtok(NULL, ",");
+    return val;
+}
+
 int main(int argc, char ** argv)
 {
     (void)argc;
@@ -61,11 +68,23 @@ int main(int argc, char ** argv)
 
         auto pch = strtok (line, ",");
 
-        while (pch != NULL) {
-            printf ("%s|",pch);
-            pch = strtok (NULL, ",");
-        }
-        printf("\n");
+        auto x = parse(&pch);
+        auto y = parse(&pch);
+        auto z = parse(&pch);
+        auto phi = parse(&pch);
+        auto theta = parse(&pch);
+        auto psi = parse(&pch);
+        auto m1 = parse(&pch);
+        auto m2 = parse(&pch);
+        auto m3 = parse(&pch);
+        auto m4 = parse(&pch);
+
+        // Negate expected direction to accommodate Webots
+        // counterclockwise positive
+        wb_motor_set_velocity(motor1, -m1);
+        wb_motor_set_velocity(motor2, +m2);
+        wb_motor_set_velocity(motor3, +m3);
+        wb_motor_set_velocity(motor4, -m4);
 
         if (wb_robot_step((int)timestep) == -1) {
             break;
