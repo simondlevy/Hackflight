@@ -29,11 +29,20 @@
 #include <pids/altitude.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
+static const float INITIAL_ALTITUDE_TARGET = 0.2;
+
+static const float THRUST_BASE = 55.385;
+
 static const float DYNAMICS_DT = 1e-5;
+
+static const uint32_t PID_PERIOD = 1000;
+
+static const float MOTOR_MAX = 60;
 
 typedef struct {
 
     float posevals[6];
+
     bool running;
 
 } thread_data_t;
@@ -96,15 +105,48 @@ static void angles_to_rotation(
     }
 }
 
+static float min(const float val, const float maxval)
+{
+    return val > maxval ? maxval : val;
+}
+
 static void * thread_fun(void *ptr)
 {
     auto thread_data = (thread_data_t *)ptr;
 
     auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
-    (void)dynamics;
+    hf::AltitudePid altitudePid = {};
+    hf::state_t state  = {};
+    hf::demands_t demands = {};
 
-    while (thread_data->running) {
+    float motor = 0;
+
+    for (long k=0; thread_data->running; k++) {
+
+        if (k % PID_PERIOD == 0) {
+
+            // Reset thrust demand to altitude target
+            demands.thrust = INITIAL_ALTITUDE_TARGET;
+
+            // Altitude PID controller converts target to thrust demand
+            altitudePid.run(DYNAMICS_DT, state, demands);
+        }
+
+        motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
+
+        dynamics.setMotors(motor, motor, motor, motor);
+        state.z = dynamics.x[Dynamics::STATE_Z];
+        state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
+
+        auto posevals = thread_data->posevals;
+
+        posevals[0] = dynamics.x[Dynamics::STATE_X];
+        posevals[1] = dynamics.x[Dynamics::STATE_Y];
+        posevals[2] = dynamics.x[Dynamics::STATE_Z];
+        posevals[3] = dynamics.x[Dynamics::STATE_PHI];
+        posevals[4] = dynamics.x[Dynamics::STATE_THETA];
+        posevals[5] = dynamics.x[Dynamics::STATE_PSI];
 
         usleep(DYNAMICS_DT / 1e-6);
     }
