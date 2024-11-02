@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <webots/motor.h>
 #include <webots/robot.h>
@@ -56,11 +57,19 @@ int main(int argc, char ** argv)
             break;
         }
 
+        line[strlen(line) - 1] = 0;
+
+        auto pch = strtok (line, ",");
+
+        while (pch != NULL) {
+            printf ("%s|",pch);
+            pch = strtok (NULL, ",");
+        }
+        printf("\n");
+
         if (wb_robot_step((int)timestep) == -1) {
             break;
         } 
-
-        printf("%s\n", line);
     }
 
     return 0;
