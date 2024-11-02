@@ -91,11 +91,11 @@ static void angles_to_rotation(
 
 static void * thread_fun(void *ptr)
 {
-    auto state = (hf::state_t *)ptr;
+    auto statevals = (float *)ptr;
 
     auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
-    (void)state;
+    (void)statevals;
     (void)dynamics;
 
     while (true) {
@@ -128,11 +128,11 @@ int main(int argc, char ** argv)
     auto motor3 = makeMotor("motor3");
     auto motor4 = makeMotor("motor4");
 
-    hf::state_t state = {};
+    float statevals[6] = {};
 
     pthread_t thread = {};
 
-    pthread_create(&thread, NULL, *thread_fun, (void *)&state);
+    pthread_create(&thread, NULL, *thread_fun, (void *)statevals);
 
     while (true) {
 
@@ -140,21 +140,24 @@ int main(int argc, char ** argv)
             break;
         } 
 
-        float vals[10] = {};
-
-        const double pos[3] = {vals[0], vals[1], vals[2]};
+        const double pos[3] = {statevals[0], statevals[1], statevals[2]};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
         double rot[4] = {};
-        angles_to_rotation(vals[3], vals[4], vals[5], rot);
+        angles_to_rotation(statevals[3], statevals[4], statevals[5], rot);
         wb_supervisor_field_set_sf_rotation(rotation_field, rot);
+
+        const float m1 = 0;
+        const float m2 = 0;
+        const float m3 = 0;
+        const float m4 = 0;
 
         // Negate expected direction to accommodate Webots
         // counterclockwise positive
-        wb_motor_set_velocity(motor1, -vals[6]);
-        wb_motor_set_velocity(motor2, +vals[7]);
-        wb_motor_set_velocity(motor3, +vals[8]);
-        wb_motor_set_velocity(motor4, -vals[9]);
+        wb_motor_set_velocity(motor1, -m1);
+        wb_motor_set_velocity(motor2, +m2);
+        wb_motor_set_velocity(motor3, +m3);
+        wb_motor_set_velocity(motor4, -m4);
     }
 
     pthread_join(thread, NULL);
