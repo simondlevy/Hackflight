@@ -42,7 +42,7 @@ static const float MOTOR_MAX = 60;
 typedef struct {
 
     float posevals[6];
-
+    float motorvals[4];
     bool running;
 
 } thread_data_t;
@@ -148,6 +148,13 @@ static void * thread_fun(void *ptr)
         posevals[4] = dynamics.x[Dynamics::STATE_THETA];
         posevals[5] = dynamics.x[Dynamics::STATE_PSI];
 
+        auto motorvals = thread_data->motorvals;
+
+        motorvals[0] = motor;
+        motorvals[1] = motor;
+        motorvals[2] = motor;
+        motorvals[3] = motor;
+
         usleep(DYNAMICS_DT / 1e-6);
     }
 
@@ -199,17 +206,14 @@ int main(int argc, char ** argv)
         angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
         wb_supervisor_field_set_sf_rotation(rotation_field, rot);
 
-        const float m1 = 0;
-        const float m2 = 0;
-        const float m3 = 0;
-        const float m4 = 0;
+        auto motorvals = thread_data.motorvals;
 
         // Negate expected direction to accommodate Webots
         // counterclockwise positive
-        wb_motor_set_velocity(motor1, -m1);
-        wb_motor_set_velocity(motor2, +m2);
-        wb_motor_set_velocity(motor3, +m3);
-        wb_motor_set_velocity(motor4, -m4);
+        wb_motor_set_velocity(motor1, -motorvals[0]);
+        wb_motor_set_velocity(motor2, +motorvals[1]);
+        wb_motor_set_velocity(motor3, +motorvals[2]);
+        wb_motor_set_velocity(motor4, -motorvals[3]);
     }
 
     thread_data.running = false;
