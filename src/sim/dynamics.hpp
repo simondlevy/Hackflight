@@ -250,7 +250,7 @@ class Dynamics {
 
         /*
            Implements Equation 12 computing temporal first derivative of state.
-           Should fill _dxdx[0..11] with appropriate values.
+           Should fill _dxdt[0..11] with appropriate values.
          */
         void computeStateDerivative(
                 const float accelENU[3],
