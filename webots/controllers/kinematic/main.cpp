@@ -49,7 +49,7 @@ typedef struct {
 
 } thread_data_t;
 
-static WbDeviceTag makeMotor(const char * name)
+static WbDeviceTag make_motor(const char * name)
 {
     auto motor = wb_robot_get_device(name);
 
@@ -163,6 +163,18 @@ static void * thread_fun(void *ptr)
     return  ptr;
 }
 
+static void spin_motors(
+        WbDeviceTag m1, WbDeviceTag m2, WbDeviceTag m3, WbDeviceTag m4,
+        const float motorvals[4])
+{
+    // Negate expected direction to accommodate Webots
+    // counterclockwise positive
+    wb_motor_set_velocity(m1, -motorvals[0]);
+    wb_motor_set_velocity(m2, +motorvals[1]);
+    wb_motor_set_velocity(m3, +motorvals[2]);
+    wb_motor_set_velocity(m4, -motorvals[3]);
+}
+
 int main(int argc, char ** argv)
 {
     (void)argc;
@@ -174,16 +186,16 @@ int main(int argc, char ** argv)
 
     const auto translation_field =
         wb_supervisor_node_get_field(copter_node, "translation");
-        
+
     const auto rotation_field =
         wb_supervisor_node_get_field(copter_node, "rotation");
 
     const auto timestep = wb_robot_get_basic_time_step();
 
-    auto motor1 = makeMotor("motor1");
-    auto motor2 = makeMotor("motor2");
-    auto motor3 = makeMotor("motor3");
-    auto motor4 = makeMotor("motor4");
+    auto motor1 = make_motor("motor1");
+    auto motor2 = make_motor("motor2");
+    auto motor3 = make_motor("motor3");
+    auto motor4 = make_motor("motor4");
 
     // Spin up the motors for a second before starting dynamics
     for (long k=0; k < SPINUP_TIME * timestep; ++k) {
@@ -196,12 +208,7 @@ int main(int argc, char ** argv)
             MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
         };
 
-        // Negate expected direction to accommodate Webots
-        // counterclockwise positive
-        wb_motor_set_velocity(motor1, -motorvals[0]);
-        wb_motor_set_velocity(motor2, +motorvals[1]);
-        wb_motor_set_velocity(motor3, +motorvals[2]);
-        wb_motor_set_velocity(motor4, -motorvals[3]);
+        spin_motors(motor1, motor2, motor3, motor4, motorvals);
 
         const double pos[3] = {};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
@@ -220,7 +227,7 @@ int main(int argc, char ** argv)
 
     pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
 
-    for (long k=0; ; k++) {
+    while (true) {
 
         if (wb_robot_step((int)timestep) == -1) {
             break;
@@ -237,12 +244,7 @@ int main(int argc, char ** argv)
         angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
         wb_supervisor_field_set_sf_rotation(rotation_field, rot);
 
-        // Negate expected direction to accommodate Webots
-        // counterclockwise positive
-        wb_motor_set_velocity(motor1, -motorvals[0]);
-        wb_motor_set_velocity(motor2, +motorvals[1]);
-        wb_motor_set_velocity(motor3, +motorvals[2]);
-        wb_motor_set_velocity(motor4, -motorvals[3]);
+        spin_motors(motor1, motor2, motor3, motor4, motorvals);
     }
 
     thread_data.running = false;
