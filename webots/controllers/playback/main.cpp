@@ -79,16 +79,16 @@ int main(int argc, char ** argv)
         auto m3 = parse(&pch);
         auto m4 = parse(&pch);
 
+        if (wb_robot_step((int)timestep) == -1) {
+            break;
+        } 
+
         // Negate expected direction to accommodate Webots
         // counterclockwise positive
         wb_motor_set_velocity(motor1, -m1);
         wb_motor_set_velocity(motor2, +m2);
         wb_motor_set_velocity(motor3, +m3);
         wb_motor_set_velocity(motor4, -m4);
-
-        if (wb_robot_step((int)timestep) == -1) {
-            break;
-        } 
     }
 
     return 0;
