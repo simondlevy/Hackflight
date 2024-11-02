@@ -41,6 +41,30 @@ static float parse(char ** pch)
     return val;
 }
 
+static void angles_to_rotation(
+        const float phi, const float theta, const float psi,
+        double rs[4])
+{
+    /*
+    angs = np.radians((phi, theta, psi))
+
+    maxang = np.max(np.abs(angs))
+
+    if maxang == 0:
+
+        return [0, 0, 1, 0]
+
+    signs = np.array(list(-1 if ang < 0 else +1 for ang in angs))
+
+    fracs = np.sqrt(np.abs(angs) / maxang)
+
+    rs = signs * fracs
+
+    return [rs[0], rs[1], rs[2], maxang]
+    */
+}
+
+
 int main(int argc, char ** argv)
 {
     (void)argc;
@@ -94,6 +118,10 @@ int main(int argc, char ** argv)
 
         const double pos[3] = {x, y, z};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+
+        double rot[4] = {1, 0, 0, 0};
+        angles_to_rotation(phi, theta, psi, rot);
+        wb_supervisor_field_set_sf_rotation(rotation_field, rot);
 
         // Negate expected direction to accommodate Webots
         // counterclockwise positive
