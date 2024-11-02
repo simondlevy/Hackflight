@@ -31,6 +31,13 @@
 
 static const float DYNAMICS_DT = 1e-5;
 
+typedef struct {
+
+    float posevals[6];
+    bool running;
+
+} thread_data_t;
+
 static WbDeviceTag makeMotor(const char * name)
 {
     auto motor = wb_robot_get_device(name);
@@ -91,14 +98,13 @@ static void angles_to_rotation(
 
 static void * thread_fun(void *ptr)
 {
-    auto statevals = (float *)ptr;
+    auto thread_data = (thread_data_t *)ptr;
 
     auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
-    (void)statevals;
     (void)dynamics;
 
-    while (true) {
+    while (thread_data->running) {
 
         usleep(DYNAMICS_DT / 1e-6);
     }
@@ -128,11 +134,13 @@ int main(int argc, char ** argv)
     auto motor3 = makeMotor("motor3");
     auto motor4 = makeMotor("motor4");
 
-    float statevals[6] = {};
+    thread_data_t thread_data = {};
+
+    thread_data.running = true;
 
     pthread_t thread = {};
 
-    pthread_create(&thread, NULL, *thread_fun, (void *)statevals);
+    pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
 
     while (true) {
 
@@ -140,11 +148,13 @@ int main(int argc, char ** argv)
             break;
         } 
 
-        const double pos[3] = {statevals[0], statevals[1], statevals[2]};
+        auto posevals = thread_data.posevals;
+
+        const double pos[3] = {posevals[0], posevals[1], posevals[2]};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
         double rot[4] = {};
-        angles_to_rotation(statevals[3], statevals[4], statevals[5], rot);
+        angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
         wb_supervisor_field_set_sf_rotation(rotation_field, rot);
 
         const float m1 = 0;
@@ -159,6 +169,8 @@ int main(int argc, char ** argv)
         wb_motor_set_velocity(motor3, +m3);
         wb_motor_set_velocity(motor4, -m4);
     }
+
+    thread_data.running = false;
 
     pthread_join(thread, NULL);
 
