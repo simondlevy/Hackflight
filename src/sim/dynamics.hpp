@@ -283,6 +283,13 @@ class Dynamics {
                     _params.Ix-_params.Jr /
                     _params.Ix*thedot*Omega + U2 / _params.Ix);
 
+            _dxdt[STATE_THETA] = thedot;
+
+            _dxdt[STATE_THETA_DOT] =
+                -(psidot * phidot * (_params.Iz - _params.Ix) /
+                        _params.Iy + _params.Jr / 
+                        _params.Iy * phidot * Omega + U3 / _params.Iy);
+
             _dxdt[STATE_PSI] = psidot;
 
             _dxdt[STATE_PSI_DOT] = (
