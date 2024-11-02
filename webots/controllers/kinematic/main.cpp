@@ -210,21 +210,15 @@ int main(int argc, char ** argv)
 
         spin_motors(motor1, motor2, motor3, motor4, motorvals);
 
+        // Keep the vehicle on the ground
         const double pos[3] = {};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
-
-        const float posevals[6] = {};
-        double rot[4] = {};
-        angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
-        wb_supervisor_field_set_sf_rotation(rotation_field, rot);
     }
 
+    // Start the dynamics thread
     thread_data_t thread_data = {};
-
     thread_data.running = true;
-
     pthread_t thread = {};
-
     pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
 
     while (true) {
