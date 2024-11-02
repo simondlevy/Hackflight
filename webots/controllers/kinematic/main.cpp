@@ -18,11 +18,15 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+#include <unistd.h>
 
 #include <webots/motor.h>
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
+#include <hackflight.hpp>
+#include <pids/altitude.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
 static const float DYNAMICS_DT = 1e-5;
@@ -85,6 +89,22 @@ static void angles_to_rotation(
     }
 }
 
+static void * thread_fun(void *ptr)
+{
+    auto state = (hf::state_t *)ptr;
+
+    auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
+
+    (void)state;
+    (void)dynamics;
+
+    while (true) {
+
+        usleep(DYNAMICS_DT / 1e-6);
+    }
+
+    return  ptr;
+}
 
 int main(int argc, char ** argv)
 {
@@ -108,19 +128,21 @@ int main(int argc, char ** argv)
     auto motor3 = makeMotor("motor3");
     auto motor4 = makeMotor("motor4");
 
-    auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
+    hf::state_t state = {};
 
-    (void)dynamics;
+    pthread_t thread = {};
+
+    pthread_create(&thread, NULL, *thread_fun, (void *)&state);
 
     while (true) {
-
-        float vals[10] = {};
 
         if (wb_robot_step((int)timestep) == -1) {
             break;
         } 
 
-        const double pos[3] = {vals[0], vals[1], vals[2] - 0.015};
+        float vals[10] = {};
+
+        const double pos[3] = {vals[0], vals[1], vals[2]};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
         double rot[4] = {};
@@ -134,6 +156,8 @@ int main(int argc, char ** argv)
         wb_motor_set_velocity(motor3, +vals[8]);
         wb_motor_set_velocity(motor4, -vals[9]);
     }
+
+    pthread_join(thread, NULL);
 
     return 0;
 }
