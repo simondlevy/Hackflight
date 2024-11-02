@@ -77,17 +77,10 @@ static void angles_to_rotation(
     }
 
     else {
-        const auto phisgn = sign(phi);
-        const auto thesgn = sign(theta);
-        const auto psisgn = sign(psi);
 
-        const auto phifrac = sqrt(fabs(phi) / maxang);
-        const auto thefrac = sqrt(fabs(theta) / maxang);
-        const auto psifrac = sqrt(fabs(psi) / maxang);
-
-        rs[0] = phisgn * phifrac;
-        rs[1] = thesgn * thefrac;
-        rs[2] = psisgn * psifrac;
+        rs[0] = sign(phi) * sqrt(fabs(phi) / maxang);
+        rs[1] = sign(theta) * sqrt(fabs(theta) / maxang);
+        rs[2] = sign(psi) * sqrt(fabs(psi) / maxang);
         rs[3] = maxang;
     }
 }
