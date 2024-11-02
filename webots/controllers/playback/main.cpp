@@ -41,27 +41,55 @@ static float parse(char ** pch)
     return val;
 }
 
+static float deg2rad(const float deg)
+{
+    return M_PI * deg / 180;
+}
+
+static float max3(const float a, const float b, const float c)
+{
+    return
+        a > b && a > c ? a :
+        b > a && b > c ? b :
+        c;
+}
+
+static float sign(const float val)
+{
+    return val < 0 ? -1 : +1;
+}
+
 static void angles_to_rotation(
         const float phi, const float theta, const float psi,
         double rs[4])
 {
-    /*
-    angs = np.radians((phi, theta, psi))
+    const auto phirad = deg2rad(phi);
+    const auto therad = deg2rad(theta);
+    const auto psirad = deg2rad(psi);
 
-    maxang = np.max(np.abs(angs))
+    const auto maxang = max3(fabs(phirad), fabs(therad), fabs(psirad));
 
-    if maxang == 0:
+    if (maxang == 0) {
+        rs[0] = 0;
+        rs[1] = 0;
+        rs[2] = 1;
+        rs[3] = 0;
+    }
 
-        return [0, 0, 1, 0]
+    else {
+        const auto phisgn = sign(phi);
+        const auto thesgn = sign(theta);
+        const auto psisgn = sign(psi);
 
-    signs = np.array(list(-1 if ang < 0 else +1 for ang in angs))
+        const auto phifrac = sqrt(fabs(phi) / maxang);
+        const auto thefrac = sqrt(fabs(theta) / maxang);
+        const auto psifrac = sqrt(fabs(psi) / maxang);
 
-    fracs = np.sqrt(np.abs(angs) / maxang)
-
-    rs = signs * fracs
-
-    return [rs[0], rs[1], rs[2], maxang]
-    */
+        rs[0] = phisgn * phifrac;
+        rs[1] = thesgn * thefrac;
+        rs[2] = psisgn * psifrac;
+        rs[3] = maxang;
+    }
 }
 
 
@@ -119,7 +147,7 @@ int main(int argc, char ** argv)
         const double pos[3] = {x, y, z};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
-        double rot[4] = {1, 0, 0, 0};
+        double rot[4] = {};
         angles_to_rotation(phi, theta, psi, rot);
         wb_supervisor_field_set_sf_rotation(rotation_field, rot);
 
