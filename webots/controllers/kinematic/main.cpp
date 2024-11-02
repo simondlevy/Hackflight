@@ -33,7 +33,7 @@ static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
 static const float THRUST_BASE = 55.385;
 
-static const float DYNAMICS_DT = 1e-5;
+static const float DYNAMICS_DT = 1e-4;
 
 static const uint32_t PID_PERIOD = 1000;
 
