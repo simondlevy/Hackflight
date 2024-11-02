@@ -21,6 +21,7 @@
 
 #include <webots/motor.h>
 #include <webots/robot.h>
+#include <webots/supervisor.h>
 
 static const char * LOGFILE = "pose.csv";
 
@@ -47,12 +48,20 @@ int main(int argc, char ** argv)
 
     wb_robot_init();
 
+    const auto copter_node = wb_supervisor_node_get_from_def("ROBOT");
+
+    const auto translation_field =
+        wb_supervisor_node_get_field(copter_node, "translation");
+        
+    const auto rotation_field =
+        wb_supervisor_node_get_field(copter_node, "rotation");
+
+    const auto timestep = wb_robot_get_basic_time_step();
+
     auto motor1 = makeMotor("motor1");
     auto motor2 = makeMotor("motor2");
     auto motor3 = makeMotor("motor3");
     auto motor4 = makeMotor("motor4");
-
-    const auto timestep = wb_robot_get_basic_time_step();
 
     auto fp = fopen(LOGFILE, "r");
 
@@ -82,6 +91,9 @@ int main(int argc, char ** argv)
         if (wb_robot_step((int)timestep) == -1) {
             break;
         } 
+
+        const double pos[3] = {x, y, z};
+        wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
         // Negate expected direction to accommodate Webots
         // counterclockwise positive
