@@ -39,6 +39,8 @@ static const uint32_t PID_PERIOD = 1000;
 
 static const float MOTOR_MAX = 60;
 
+static const float SPINUP_TIME = 2;
+
 typedef struct {
 
     float posevals[6];
@@ -183,6 +185,33 @@ int main(int argc, char ** argv)
     auto motor3 = makeMotor("motor3");
     auto motor4 = makeMotor("motor4");
 
+    // Spin up the motors for a second before starting dynamics
+    for (long k=0; k < SPINUP_TIME * timestep; ++k) {
+
+        if (wb_robot_step((int)timestep) == -1) {
+            break;
+        } 
+
+        const float motorvals[4] = {
+            MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
+        };
+
+        // Negate expected direction to accommodate Webots
+        // counterclockwise positive
+        wb_motor_set_velocity(motor1, -motorvals[0]);
+        wb_motor_set_velocity(motor2, +motorvals[1]);
+        wb_motor_set_velocity(motor3, +motorvals[2]);
+        wb_motor_set_velocity(motor4, -motorvals[3]);
+
+        const double pos[3] = {};
+        wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+
+        const float posevals[6] = {};
+        double rot[4] = {};
+        angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
+        wb_supervisor_field_set_sf_rotation(rotation_field, rot);
+    }
+
     thread_data_t thread_data = {};
 
     thread_data.running = true;
@@ -191,11 +220,13 @@ int main(int argc, char ** argv)
 
     pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
 
-    while (true) {
+    for (long k=0; ; k++) {
 
         if (wb_robot_step((int)timestep) == -1) {
             break;
         } 
+
+        auto motorvals = thread_data.motorvals;
 
         auto posevals = thread_data.posevals;
 
@@ -205,8 +236,6 @@ int main(int argc, char ** argv)
         double rot[4] = {};
         angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
         wb_supervisor_field_set_sf_rotation(rotation_field, rot);
-
-        auto motorvals = thread_data.motorvals;
 
         // Negate expected direction to accommodate Webots
         // counterclockwise positive
