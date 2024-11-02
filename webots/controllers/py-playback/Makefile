@@ -15,3 +15,6 @@
 run:
 	webots ../../worlds/supervised.wbt &
 	/usr/local/webots/webots-controller py-playback.py
+
+edit:
+	vim py-playback.py
