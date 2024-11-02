@@ -34,13 +34,6 @@ static WbDeviceTag makeMotor(const char * name)
     return motor;
 }
 
-static float parse(char ** pch)
-{
-    const auto val = atof(*pch);
-    *pch = strtok(NULL, ",");
-    return val;
-}
-
 static float deg2rad(const float deg)
 {
     return M_PI * deg / 180;
@@ -125,36 +118,36 @@ int main(int argc, char ** argv)
 
         line[strlen(line) - 1] = 0;
 
-        auto pch = strtok (line, ",");
+        if (strlen(line) > 0) {
 
-        auto x = parse(&pch);
-        auto y = parse(&pch);
-        auto z = parse(&pch);
-        auto phi = parse(&pch);
-        auto theta = parse(&pch);
-        auto psi = parse(&pch);
-        auto m1 = parse(&pch);
-        auto m2 = parse(&pch);
-        auto m3 = parse(&pch);
-        auto m4 = parse(&pch);
+            float vals[10] = {};
 
-        if (wb_robot_step((int)timestep) == -1) {
-            break;
-        } 
+            int k = 0;
+            auto tp = strtok(line, ",");
+            while (tp!=NULL) {
+                vals[k] = atof(tp);
+                tp = strtok(NULL,",");
+                k++;
+            }
 
-        const double pos[3] = {x, y, z};
-        wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+            if (wb_robot_step((int)timestep) == -1) {
+                break;
+            } 
 
-        double rot[4] = {};
-        angles_to_rotation(phi, theta, psi, rot);
-        wb_supervisor_field_set_sf_rotation(rotation_field, rot);
+            const double pos[3] = {vals[0], vals[1], vals[2]};
+            wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
-        // Negate expected direction to accommodate Webots
-        // counterclockwise positive
-        wb_motor_set_velocity(motor1, -m1);
-        wb_motor_set_velocity(motor2, +m2);
-        wb_motor_set_velocity(motor3, +m3);
-        wb_motor_set_velocity(motor4, -m4);
+            double rot[4] = {};
+            angles_to_rotation(vals[3], vals[4], vals[5], rot);
+            wb_supervisor_field_set_sf_rotation(rotation_field, rot);
+
+            // Negate expected direction to accommodate Webots
+            // counterclockwise positive
+            wb_motor_set_velocity(motor1, -vals[6]);
+            wb_motor_set_velocity(motor2, +vals[7]);
+            wb_motor_set_velocity(motor3, +vals[8]);
+            wb_motor_set_velocity(motor4, -vals[9]);
+        }
     }
 
     return 0;
