@@ -134,7 +134,7 @@ int main(int argc, char ** argv)
                 break;
             } 
 
-            const double pos[3] = {vals[0], vals[1], vals[2]};
+            const double pos[3] = {vals[0], vals[1], vals[2] - 0.015};
             wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
             double rot[4] = {};
