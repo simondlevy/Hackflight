@@ -59,6 +59,11 @@ static float sign(const float val)
     return val < 0 ? -1 : +1;
 }
 
+static float scale(const float angle, const float maxang)
+{
+    return sign(angle) * sqrt(fabs(angle) / maxang);
+}
+
 static void angles_to_rotation(
         const float phi, const float theta, const float psi,
         double rs[4])
@@ -78,9 +83,9 @@ static void angles_to_rotation(
 
     else {
 
-        rs[0] = sign(phi) * sqrt(fabs(phi) / maxang);
-        rs[1] = sign(theta) * sqrt(fabs(theta) / maxang);
-        rs[2] = sign(psi) * sqrt(fabs(psi) / maxang);
+        rs[0] = scale(phi, maxang);
+        rs[1] = scale(theta, maxang);
+        rs[2] = scale(psi, maxang);
         rs[3] = maxang;
     }
 }
