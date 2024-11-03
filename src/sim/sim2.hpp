@@ -370,18 +370,25 @@ namespace hf {
 
                             run_closed_loop_controllers(
                                     1.f/PID_FREQ, state, demands);
+
+                            printf("%+3.3f\n", demands.yaw);
                         }
 
                         const auto thrust =
                             min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
                         const demands_t new_demands = {
-                            thrust, 0, 0, 0
+                            thrust, 0, 0, demands.yaw
                         };
 
                         hf::Mixer::runBetaFlightQuadX(new_demands, motors);
 
-                        dynamics->setMotors(thrust, thrust, thrust, thrust);
+                        dynamics->setMotors(
+                                motors.m1, 
+                                motors.m2, 
+                                motors.m3, 
+                                motors.m4);
+
                         state.z = dynamics->x[Dynamics::STATE_Z];
                         state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
 
@@ -399,6 +406,7 @@ namespace hf {
                             dynamics->x[Dynamics::STATE_PSI];
                     }
 
+                    // Set motor spins for animation
                     thread_data->motorvals[0] = motors.m1;
                     thread_data->motorvals[1] = motors.m2;
                     thread_data->motorvals[2] = motors.m3;

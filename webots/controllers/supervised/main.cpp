@@ -18,6 +18,7 @@
 
 #include <sim/sim2.hpp>
 #include <pids/altitude.hpp>
+#include <pids/yaw_rate.hpp>
 
 static const float YAW_PRESCALE = 160; // deg/sec
 
@@ -35,9 +36,13 @@ static const float CLIMB_RATE_SCALE = 0.01;
 
 static bool _run_altitude_pid;
 
+static bool _reset_pids;
+
 namespace hf {
 
     static AltitudePid _altitudePid;
+
+    static YawRatePid _yawRatePid;
 
     void run_closed_loop_controllers(
             const float dt, const state_t & state, demands_t & demands)
@@ -45,6 +50,8 @@ namespace hf {
         if (_run_altitude_pid) {
             _altitudePid.run(dt, state, demands);
         }
+
+        _yawRatePid.run(dt, _reset_pids, state, demands);
     }
 }
 
@@ -71,13 +78,13 @@ int main(int argc, char ** argv)
             break;
         }
 
-        const auto open_loop_demands = sim.getDemands();
+        auto open_loop_demands = sim.getDemands();
 
         const auto state = sim.getState();
 
-        demands.yaw *= YAW_PRESCALE;
+        demands.yaw = open_loop_demands.yaw * YAW_PRESCALE;
 
-        // const auto resetPids = demands.thrust < THROTTLE_DOWN;
+        _reset_pids = demands.thrust < THROTTLE_DOWN;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
