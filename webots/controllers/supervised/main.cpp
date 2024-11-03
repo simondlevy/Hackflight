@@ -29,5 +29,7 @@ int main(int argc, char ** argv)
 
     sim.run();
 
+    sim.close();
+
     return 0;
 }

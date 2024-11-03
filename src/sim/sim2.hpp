@@ -78,6 +78,9 @@ namespace hf {
                 _motor3 = make_motor("motor3");
                 _motor4 = make_motor("motor4");
 
+                // Start the dynamics thread
+                _thread_data.running = true;
+                pthread_create(&_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
 
             void run()
@@ -101,21 +104,15 @@ namespace hf {
                     wb_supervisor_field_set_sf_vec3f(translation_field, pos);
                 }*/
 
-                // Start the dynamics thread
-                thread_data_t thread_data = {};
-                thread_data.running = true;
-                pthread_t thread = {};
-                pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
-
                 // This initial value will be ignored for traditional (non-springy)
                 // throttle
                 float z_target = INITIAL_ALTITUDE_TARGET;
 
                 while (true) {
 
-                    demands_t * demands = &thread_data.demands;
+                    demands_t * demands = &_thread_data.demands;
 
-                    auto posevals = thread_data.posevals;
+                    auto posevals = _thread_data.posevals;
 
                     if (wb_robot_step((int)_timestep) == -1) {
                         break;
@@ -135,7 +132,7 @@ namespace hf {
                         // to maintain target via PID control
                         if (isSpringy()) {
 
-                            thread_data.run_altitude_pid = true;
+                            _thread_data.run_altitude_pid = true;
 
                             z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
 
@@ -152,19 +149,19 @@ namespace hf {
 
                             if (fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND) {
 
-                                thread_data.run_altitude_pid = true;
+                                _thread_data.run_altitude_pid = true;
                                 demands->thrust = posevals[2];
                             }
 
                             else {
 
-                                thread_data.run_altitude_pid = false;
+                                _thread_data.run_altitude_pid = false;
                                 demands->thrust = open_loop_demands.thrust;
                             }
                         }
                     }
 
-                    auto motorvals = thread_data.motorvals;
+                    auto motorvals = _thread_data.motorvals;
 
                     const double pos[3] = {posevals[0], posevals[1], posevals[2]};
                     wb_supervisor_field_set_sf_vec3f(_translation_field, pos);
@@ -176,9 +173,12 @@ namespace hf {
                     spin_motors(motorvals);
                 }
 
-                thread_data.running = false;
+            }
 
-                pthread_join(thread, NULL);
+            void close(void)
+            {
+                _thread_data.running = false;
+                pthread_join(_thread, NULL);
             }
 
         private:
@@ -240,6 +240,9 @@ namespace hf {
             WbNodeRef _copter_node;
             WbFieldRef _translation_field;
             WbFieldRef _rotation_field;
+
+            thread_data_t _thread_data; 
+            pthread_t _thread; 
 
             static WbDeviceTag make_motor(const char * name)
             {
