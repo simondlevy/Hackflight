@@ -106,7 +106,7 @@ namespace hf {
             // Flight status
             status_e _status;
 
-            float _inertialAccel[3];
+            axis3_t _inertialAccel;
 
         public:
 
@@ -164,13 +164,13 @@ namespace hf {
 
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame.  
-                float accelENU[3] = {};
+                axis3_t accelENU = {};
                 bodyZToInertial(U1 / _params.M,
                         state.phi, state.theta, state.psi,
                         accelENU);
 
                 // Compute net vertical acceleration by subtracting gravity
-                const auto netz = accelENU[2] - G;
+                const auto netz = accelENU.z - G;
 
                 // If we're not airborne, we become airborne when upward
                 // acceleration has become positive
@@ -224,7 +224,7 @@ namespace hf {
 
                     // Once airborne, inertial-frame acceleration is same as NED
                     // acceleration
-                    memcpy(_inertialAccel, accelENU, sizeof(accelENU));
+                    memcpy(&_inertialAccel, &accelENU, sizeof(axis3_t));
                 }
             }
 
@@ -249,7 +249,7 @@ namespace hf {
                state.  Should fill _dxdt[0..11] with appropriate values.
              */
             void computeStateDerivative(
-                    const float accelENU[3],
+                    const axis3_t accelENU,
                     const float netz,
                     const float U2,
                     const float U3,
@@ -262,11 +262,11 @@ namespace hf {
 
                 _dstate.x = state.dx;
 
-                _dstate.dx = accelENU[0];
+                _dstate.dx = accelENU.x;
 
                 _dstate.y = state.dy;
 
-                _dstate.dy = accelENU[1];
+                _dstate.dy = accelENU.y;
 
                 _dstate.z = state.dz;
 
@@ -347,7 +347,7 @@ namespace hf {
                     const float phi,
                     const float theta,
                     const float psi,
-                    float inertial[3])
+                    axis3_t & inertial)
             {
 
                 float cph=0;
@@ -359,9 +359,9 @@ namespace hf {
 
                 sincos(phi, theta, psi, cph, cth, cps, sph, sth, sps);
 
-                inertial[0] = bodyZ * sph*sps+cph*cps*sth;
-                inertial[1] = bodyZ * cph*sps*sth-cps*sph;
-                inertial[2] = bodyZ * cph*cth;
+                inertial.x = bodyZ * sph*sps+cph*cps*sth;
+                inertial.y = bodyZ * cph*sps*sth-cps*sph;
+                inertial.z = bodyZ * cph*cth;
             }
 
             void sincos(const float phi, const float theta, const float psi,
