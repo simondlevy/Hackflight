@@ -375,10 +375,11 @@ namespace hf {
                         const auto thrust =
                             min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
-                        motors.m1 = thrust;
-                        motors.m2 = thrust;
-                        motors.m3 = thrust;
-                        motors.m4 = thrust;
+                        const demands_t new_demands = {
+                            thrust, 0, 0, 0
+                        };
+
+                        hf::Mixer::runBetaFlightQuadX(new_demands, motors);
 
                         dynamics->setMotors(thrust, thrust, thrust, thrust);
                         state.z = dynamics->x[Dynamics::STATE_Z];
