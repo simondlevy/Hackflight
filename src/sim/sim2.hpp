@@ -47,9 +47,23 @@ namespace hf {
 
         public:
 
-            void run()
+            void run(const bool tryJoystick=true)
             {
                 wb_robot_init();
+
+                const auto timestep = wb_robot_get_basic_time_step();
+
+                if (tryJoystick) {
+
+                    wb_joystick_enable(timestep);
+                }
+
+                else {
+
+                    printKeyboardInstructions();
+                }
+
+                wb_keyboard_enable(timestep);
 
                 const auto copter_node = wb_supervisor_node_get_from_def("ROBOT");
 
@@ -59,7 +73,6 @@ namespace hf {
                 const auto rotation_field =
                     wb_supervisor_node_get_field(copter_node, "rotation");
 
-                const auto timestep = wb_robot_get_basic_time_step();
 
                 auto motor1 = make_motor("motor1");
                 auto motor2 = make_motor("motor2");
@@ -95,6 +108,9 @@ namespace hf {
                     if (wb_robot_step((int)timestep) == -1) {
                         break;
                     } 
+
+                    // Reset thrust demand to altitude target
+                    thread_data.demands.thrust = INITIAL_ALTITUDE_TARGET;
 
                     auto motorvals = thread_data.motorvals;
 
@@ -148,13 +164,16 @@ namespace hf {
 
             } joystick_t;
 
-             typedef struct {
+            typedef struct {
 
+                demands_t demands;
                 float posevals[6];
                 float motorvals[4];
                 bool running;
 
             } thread_data_t;
+
+            bool _requested_takeoff;
 
             static WbDeviceTag make_motor(const char * name)
             {
@@ -226,7 +245,9 @@ namespace hf {
                 auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
                 AltitudePid altitudePid = {};
+
                 state_t state  = {};
+
                 demands_t demands = {};
 
                 float motor = 0;
@@ -235,8 +256,12 @@ namespace hf {
 
                     if (k % PID_PERIOD == 0) {
 
-                        // Reset thrust demand to altitude target
-                        demands.thrust = INITIAL_ALTITUDE_TARGET;
+                        // Start with open-loop demands from main thread
+                        demands_t open_loop_demands = thread_data->demands;
+                        demands.thrust = open_loop_demands.thrust; 
+                        demands.roll = open_loop_demands.roll; 
+                        demands.pitch = open_loop_demands.pitch; 
+                        demands.yaw = open_loop_demands.yaw;
 
                         // Altitude PID controller converts target to thrust demand
                         altitudePid.run(DYNAMICS_DT, state, demands);
@@ -320,8 +345,6 @@ namespace hf {
                 return normalizeJoystickAxis(readJoystickRaw(index));
             }
 
-            bool _requested_takeoff;
-
             joystick_t getJoystickInfo() 
             {
                 return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
@@ -376,6 +399,118 @@ namespace hf {
                 puts("- Use Q and E to change heading\n");
             }
 
-     };
+            demands_t getDemands()
+            {
+                demands_t demands = {};
+
+                auto joystickStatus = haveJoystick();
+
+                if (joystickStatus == JOYSTICK_RECOGNIZED) {
+
+                    auto axes = getJoystickInfo();
+
+                    demands.thrust =
+                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+
+                    // Springy throttle stick; keep in interval [-1,+1]
+                    if (axes.springy) {
+
+                        static bool button_was_hit;
+
+                        if (wb_joystick_get_pressed_button() == 5) {
+                            button_was_hit = true;
+                        }
+
+                        _requested_takeoff = button_was_hit;
+
+                        // Run throttle stick through deadband
+                        demands.thrust =
+                            fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
+                    }
+
+                    else {
+
+                        static float throttle_prev;
+                        static bool throttle_was_moved;
+
+                        // Handle bogus throttle values on startup
+                        if (throttle_prev != demands.thrust) {
+                            throttle_was_moved = true;
+                        }
+
+                        _requested_takeoff = throttle_was_moved;
+
+                        throttle_prev = demands.thrust;
+                    }
+
+                    demands.roll = readJoystickAxis(axes.roll);
+                    demands.pitch = readJoystickAxis(axes.pitch); 
+                    demands.yaw = readJoystickAxis(axes.yaw);
+                }
+
+                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+                    reportJoystick();
+                }
+
+                else { 
+
+                    demands = getDemandsFromKeyboard();
+
+                }
+
+                return demands;
+            }
+
+            demands_t getDemandsFromKeyboard()
+            {
+                static bool spacebar_was_hit;
+
+                demands_t demands = {};
+
+                switch (wb_keyboard_get_key()) {
+
+                    case WB_KEYBOARD_UP:
+                        demands.pitch = +1.0;
+                        break;
+
+                    case WB_KEYBOARD_DOWN:
+                        demands.pitch = -1.0;
+                        break;
+
+                    case WB_KEYBOARD_RIGHT:
+                        demands.roll = +1.0;
+                        break;
+
+                    case WB_KEYBOARD_LEFT:
+                        demands.roll = -1.0;
+                        break;
+
+                    case 'Q':
+                        demands.yaw = -1.0;
+                        break;
+
+                    case 'E':
+                        demands.yaw = +1.0;
+                        break;
+
+                    case 'W':
+                        demands.thrust = +1.0;
+                        break;
+
+                    case 'S':
+                        demands.thrust = -1.0;
+                        break;
+
+                    case 32:
+                        spacebar_was_hit = true;
+                        break;
+                }
+
+                _requested_takeoff = spacebar_was_hit;
+
+                return demands;
+            }
+
+    };
 
 }
