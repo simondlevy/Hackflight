@@ -131,6 +131,8 @@ namespace hf {
                         // to maintain target via PID control
                         if (isSpringy()) {
 
+                            thread_data.run_altitude_pid = true;
+
                             z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
 
                             demands->thrust = z_target;
@@ -148,15 +150,17 @@ namespace hf {
 
                             const auto in_deadband = fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND;
 
-                            z_target =
-                                in_deadband && !_was_in_deadband ?
-                                posevals[2] :
-                                open_loop_demands.thrust;
-
-                            _was_in_deadband = in_deadband;
-
                             if (in_deadband) {
-                                demands->thrust = z_target;
+
+                                thread_data.run_altitude_pid = true;
+                                demands->thrust = posevals[2];
+                                printf("%f\n", demands->thrust);
+                            }
+
+                            else {
+
+                                thread_data.run_altitude_pid = false;
+                                demands->thrust = open_loop_demands.thrust;
                             }
                         }
                     }
@@ -217,6 +221,7 @@ namespace hf {
 
             typedef struct {
 
+                bool run_altitude_pid;
                 demands_t demands;
                 float posevals[6];
                 float motorvals[4];
@@ -315,7 +320,9 @@ namespace hf {
                         demands.yaw = open_loop_demands.yaw;
 
                         // Altitude PID controller converts target to thrust demand
-                        altitudePid.run(DYNAMICS_DT, state, demands);
+                        if (thread_data->run_altitude_pid) {
+                            altitudePid.run(DYNAMICS_DT, state, demands);
+                        }
                     }
 
                     motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
