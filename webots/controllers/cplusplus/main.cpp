@@ -18,7 +18,7 @@
 #include <mixers.hpp>
 #include <sim/sim.hpp>
 
-#include <pids/altitude.hpp>
+#include <pids/altitude2.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -57,10 +57,6 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid altitudePid = {};
 
-    // This initial value will be ignored for traditional (non-springy)
-    // throttle
-    float z_target = INITIAL_ALTITUDE_TARGET;
-
     while (true) {
 
         if (!sim.step()) {
@@ -80,33 +76,7 @@ int main(int argc, char ** argv)
         // raising the non-self-centering throttle stick
         if (sim.requestedTakeoff()) {
 
-            // "Springy" (self-centering) throttle or keyboard: accumulate 
-            // altitude target based on stick deflection, and attempt
-            // to maintain target via PID control
-            if (sim.isSpringy()) {
-
-                z_target += CLIMB_RATE_SCALE * demands.thrust;
-                demands.thrust = z_target;
-                altitudePid.run(DT, state, demands);
-            }
-
-            // Traditional (non-self-centering) throttle: 
-            //
-            //   (1) In throttle deadband (mid position), fix an altitude target
-            //       and attempt to maintain it via PID control
-            //
-            //   (2) Outside throttle deadband, get thrust from stick deflection
-            else {
-
-                static bool _was_in_deadband;
-                const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
-                z_target = in_deadband && !_was_in_deadband ? state.z : z_target;
-                _was_in_deadband = in_deadband;
-                if (in_deadband) {
-                    demands.thrust = z_target;
-                    altitudePid.run(DT, state, demands);
-                }
-            }
+            altitudePid.run(sim.isSpringy(), DT, state, demands);
 
             demands.thrust += THRUST_BASE;
         }
@@ -123,9 +93,6 @@ int main(int argc, char ** argv)
         hf::quad_motors_t motors= {};
 
         hf::Mixer::runBetaFlightQuadX(demands, motors);
-
-        printf("%f,%f,%f,%f,%+f\n",
-                motors.m1, motors.m2,motors.m3, motors.m4, state.psi);
 
         sim.setMotors(motors);
     }
