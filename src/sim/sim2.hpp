@@ -111,13 +111,15 @@ namespace hf {
 
                 auto posevals = thread_data.posevals;
 
+                demands_t open_loop_demands = {};
+
                 while (true) {
 
                     if (wb_robot_step((int)timestep) == -1) {
                         break;
                     } 
 
-                    getDemands(*demands);
+                    getDemands(open_loop_demands);
 
                     // Throttle control begins when once takeoff is requested, either by
                     // hitting a button or key ("springy", self-centering throttle) or by
@@ -129,8 +131,9 @@ namespace hf {
                         // to maintain target via PID control
                         if (isSpringy()) {
 
-                            //z_target += CLIMB_RATE_SCALE * demands->thrust;
-                            demands->thrust = z_target;
+                            z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
+                            printf("%f\n", z_target);
+                            //demands->thrust = z_target;
                         }
 
                         // Traditional (non-self-centering) throttle: 
