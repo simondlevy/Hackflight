@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
     (void)argc;
     (void)argv;
 
-    Simulator sim = {};
+    hf::Simulator sim = {};
 
     sim.run();
 
