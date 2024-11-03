@@ -73,12 +73,12 @@ namespace hf {
                 const auto rotation_field =
                     wb_supervisor_node_get_field(copter_node, "rotation");
 
-
                 auto motor1 = make_motor("motor1");
                 auto motor2 = make_motor("motor2");
                 auto motor3 = make_motor("motor3");
                 auto motor4 = make_motor("motor4");
 
+                /*
                 // Spin up the motors for a second before starting dynamics
                 for (long k=0; k < SPINUP_TIME * timestep; ++k) {
 
@@ -95,7 +95,7 @@ namespace hf {
                     // Keep the vehicle on the ground
                     const double pos[3] = {};
                     wb_supervisor_field_set_sf_vec3f(translation_field, pos);
-                }
+                }*/
 
                 // Start the dynamics thread
                 thread_data_t thread_data = {};
@@ -103,18 +103,62 @@ namespace hf {
                 pthread_t thread = {};
                 pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
 
+                // This initial value will be ignored for traditional (non-springy)
+                // throttle
+                float z_target = INITIAL_ALTITUDE_TARGET;
+
+                demands_t * demands = &thread_data.demands;
+
+                auto posevals = thread_data.posevals;
+
                 while (true) {
 
                     if (wb_robot_step((int)timestep) == -1) {
                         break;
                     } 
 
-                    // Reset thrust demand to altitude target
-                    thread_data.demands.thrust = INITIAL_ALTITUDE_TARGET;
+                    getDemands(*demands);
+
+                    // Throttle control begins when once takeoff is requested, either by
+                    // hitting a button or key ("springy", self-centering throttle) or by
+                    // raising the non-self-centering throttle stick
+                    if (_requested_takeoff) {
+
+                        // "Springy" (self-centering) throttle or keyboard: accumulate 
+                        // altitude target based on stick deflection, and attempt
+                        // to maintain target via PID control
+                        if (isSpringy()) {
+
+                            //z_target += CLIMB_RATE_SCALE * demands->thrust;
+                            demands->thrust = z_target;
+                        }
+
+                        // Traditional (non-self-centering) throttle: 
+                        //
+                        //   (1) In throttle deadband (mid position), fix an altitude target
+                        //       and attempt to maintain it via PID control
+                        //
+                        //   (2) Outside throttle deadband, get thrust from stick deflection
+                        else {
+
+                            static bool _was_in_deadband;
+
+                            const auto in_deadband = fabs(demands->thrust) < THROTTLE_DEADBAND;
+
+                            z_target =
+                                in_deadband && !_was_in_deadband ?
+                                posevals[2] :
+                                z_target;
+
+                            _was_in_deadband = in_deadband;
+
+                            if (in_deadband) {
+                                demands->thrust = z_target;
+                            }
+                        }
+                    }
 
                     auto motorvals = thread_data.motorvals;
-
-                    auto posevals = thread_data.posevals;
 
                     const double pos[3] = {posevals[0], posevals[1], posevals[2]};
                     wb_supervisor_field_set_sf_vec3f(translation_field, pos);
@@ -133,7 +177,11 @@ namespace hf {
 
         private:
 
+            // For springy-throttle gamepads / keyboard
             static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
+            static constexpr float CLIMB_RATE_SCALE = 0.01;
+
+            static constexpr float THROTTLE_DEADBAND = 0.2;
 
             static constexpr float THRUST_BASE = 55.385;
 
@@ -265,6 +313,8 @@ namespace hf {
 
                         // Altitude PID controller converts target to thrust demand
                         altitudePid.run(DYNAMICS_DT, state, demands);
+
+                        //demands.thrust += THRUST_BASE;
                     }
 
                     motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
@@ -399,10 +449,8 @@ namespace hf {
                 puts("- Use Q and E to change heading\n");
             }
 
-            demands_t getDemands()
+            void getDemands(demands_t & demands)
             {
-                demands_t demands = {};
-
                 auto joystickStatus = haveJoystick();
 
                 if (joystickStatus == JOYSTICK_RECOGNIZED) {
@@ -449,23 +497,20 @@ namespace hf {
                 }
 
                 else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+
                     reportJoystick();
                 }
 
                 else { 
 
-                    demands = getDemandsFromKeyboard();
+                    getDemandsFromKeyboard(demands);
 
                 }
-
-                return demands;
             }
 
-            demands_t getDemandsFromKeyboard()
+            void getDemandsFromKeyboard(demands_t & demands)
             {
                 static bool spacebar_was_hit;
-
-                demands_t demands = {};
 
                 switch (wb_keyboard_get_key()) {
 
@@ -507,8 +552,13 @@ namespace hf {
                 }
 
                 _requested_takeoff = spacebar_was_hit;
+            }
 
-                return demands;
+            bool isSpringy()
+            {
+                return haveJoystick() == JOYSTICK_RECOGNIZED ?
+                    getJoystickInfo().springy :
+                    true; // keyboard
             }
 
     };
