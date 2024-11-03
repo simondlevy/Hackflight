@@ -386,7 +386,7 @@ namespace hf {
                     thread_data->motorvals[2] = motor;
                     thread_data->motorvals[3] = motor;
 
-                    usleep((1.f / DYNAMICS_FREQ) / 1e-6);
+                    usleep(1 / (DYNAMICS_FREQ * 1e-6));
                 }
 
                 return  ptr;
