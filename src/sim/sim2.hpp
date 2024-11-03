@@ -214,7 +214,7 @@ namespace hf {
 
             static const uint32_t DYNAMICS_FREQ = 10000;
 
-            static const uint32_t PID_FREQ = 100;
+            static const uint32_t PID_FREQ = 500;
 
             static constexpr float MOTOR_MAX = 60;
 
