@@ -84,8 +84,10 @@ namespace hf {
                 pthread_create(&_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
 
-            bool step()
+            bool step(demands_t & open_loop_demands, bool run_altitude_pid)
             {
+                _thread_data.run_altitude_pid = run_altitude_pid;
+
                 /*
                 // Spin up the motors for a second before starting dynamics
                 for (long k=0; k < SPINUP_TIME * timestep; ++k) {
@@ -105,15 +107,7 @@ namespace hf {
                 wb_supervisor_field_set_sf_vec3f(translation_field, pos);
                 }*/
 
-                // This initial value will be ignored for traditional (non-springy)
-                // throttle
-                static float _z_target;
-
-                if (_z_target == 0) {
-                    _z_target = INITIAL_ALTITUDE_TARGET;
-                }
-
-                demands_t * demands = &_thread_data.demands;
+                memcpy(&_thread_data.demands, &open_loop_demands, sizeof(demands_t));
 
                 auto posevals = _thread_data.posevals;
 
@@ -121,49 +115,6 @@ namespace hf {
 
                     return false;
                 } 
-
-                demands_t open_loop_demands = {};
-
-                getDemands(open_loop_demands);
-
-                // Throttle control begins when once takeoff is requested, either by
-                // hitting a button or key ("springy", self-centering throttle) or by
-                // raising the non-self-centering throttle stick
-                if (_requested_takeoff) {
-
-                    // "Springy" (self-centering) throttle or keyboard: accumulate 
-                    // altitude target based on stick deflection, and attempt
-                    // to maintain target via PID control
-                    if (isSpringy()) {
-
-                        _thread_data.run_altitude_pid = true;
-
-                        _z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
-
-                        demands->thrust = _z_target;
-                    }
-
-                    // Traditional (non-self-centering) throttle: 
-                    //
-                    //   (1) In throttle deadband (mid position), fix an altitude target
-                    //       and attempt to maintain it via PID control
-                    //
-                    //   (2) Outside throttle deadband, get thrust from stick deflection
-                    else {
-
-                        if (fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND) {
-
-                            _thread_data.run_altitude_pid = true;
-                            demands->thrust = posevals[2];
-                        }
-
-                        else {
-
-                            _thread_data.run_altitude_pid = false;
-                            demands->thrust = open_loop_demands.thrust;
-                        }
-                    }
-                }
 
                 auto motorvals = _thread_data.motorvals;
 
@@ -183,6 +134,34 @@ namespace hf {
             {
                 _thread_data.running = false;
                 pthread_join(_thread, NULL);
+            }
+
+            state_t getState()
+            {
+                return state_t {
+                    _dynamics.x[Dynamics::STATE_X_DOT],
+                    _dynamics.x[Dynamics::STATE_Y_DOT],
+                    _dynamics.x[Dynamics::STATE_Z],
+                    _dynamics.x[Dynamics::STATE_Z_DOT],
+                    _dynamics.x[Dynamics::STATE_PHI],
+                    _dynamics.x[Dynamics::STATE_PHI_DOT],
+                    _dynamics.x[Dynamics::STATE_THETA],
+                    _dynamics.x[Dynamics::STATE_THETA_DOT],
+                    _dynamics.x[Dynamics::STATE_PSI],
+                    _dynamics.x[Dynamics::STATE_PSI_DOT]
+                };
+            }
+
+            bool requestedTakeoff()
+            {
+                return _requested_takeoff;
+            }
+
+            bool isSpringy()
+            {
+                return haveJoystick() == JOYSTICK_RECOGNIZED ?
+                    getJoystickInfo().springy :
+                    true; // keyboard
             }
 
             demands_t getDemands()
@@ -248,22 +227,7 @@ namespace hf {
                 return demands;
             }
 
-            state_t getState()
-            {
-                return state_t {
-                    _dynamics.x[Dynamics::STATE_X_DOT],
-                    _dynamics.x[Dynamics::STATE_Y_DOT],
-                    _dynamics.x[Dynamics::STATE_Z],
-                    _dynamics.x[Dynamics::STATE_Z_DOT],
-                    _dynamics.x[Dynamics::STATE_PHI],
-                    _dynamics.x[Dynamics::STATE_PHI_DOT],
-                    _dynamics.x[Dynamics::STATE_THETA],
-                    _dynamics.x[Dynamics::STATE_THETA_DOT],
-                    _dynamics.x[Dynamics::STATE_PSI],
-                    _dynamics.x[Dynamics::STATE_PSI_DOT]
-                };
-            }
-
+ 
         private:
 
             // For springy-throttle gamepads / keyboard
@@ -554,66 +518,7 @@ namespace hf {
                 puts("- Use Q and E to change heading\n");
             }
 
-            void getDemands(demands_t & demands)
-            {
-                auto joystickStatus = haveJoystick();
-
-                if (joystickStatus == JOYSTICK_RECOGNIZED) {
-
-                    auto axes = getJoystickInfo();
-
-                    demands.thrust =
-                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                    // Springy throttle stick; keep in interval [-1,+1]
-                    if (axes.springy) {
-
-                        static bool button_was_hit;
-
-                        if (wb_joystick_get_pressed_button() == 5) {
-                            button_was_hit = true;
-                        }
-
-                        _requested_takeoff = button_was_hit;
-
-                        // Run throttle stick through deadband
-                        demands.thrust =
-                            fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
-                    }
-
-                    else {
-
-                        static float throttle_prev;
-                        static bool throttle_was_moved;
-
-                        // Handle bogus throttle values on startup
-                        if (throttle_prev != demands.thrust) {
-                            throttle_was_moved = true;
-                        }
-
-                        _requested_takeoff = throttle_was_moved;
-
-                        throttle_prev = demands.thrust;
-                    }
-
-                    demands.roll = readJoystickAxis(axes.roll);
-                    demands.pitch = readJoystickAxis(axes.pitch); 
-                    demands.yaw = readJoystickAxis(axes.yaw);
-                }
-
-                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-
-                    reportJoystick();
-                }
-
-                else { 
-
-                    getDemandsFromKeyboard(demands);
-
-                }
-            }
-
-            void getDemandsFromKeyboard(demands_t & demands)
+           void getDemandsFromKeyboard(demands_t & demands)
             {
                 static bool spacebar_was_hit;
 
@@ -657,13 +562,6 @@ namespace hf {
                 }
 
                 _requested_takeoff = spacebar_was_hit;
-            }
-
-            bool isSpringy()
-            {
-                return haveJoystick() == JOYSTICK_RECOGNIZED ?
-                    getJoystickInfo().springy :
-                    true; // keyboard
             }
 
     };

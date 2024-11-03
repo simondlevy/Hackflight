@@ -18,6 +18,20 @@
 
 #include <sim/sim2.hpp>
 
+static const float YAW_PRESCALE = 160; // deg/sec
+
+static const float THRUST_BASE = 55.385;
+
+static const float THROTTLE_DOWN = 0.06;
+
+static const float THROTTLE_DEADBAND = 0.2;
+
+static const float PITCH_ROLL_POST_SCALE = 50;
+
+// For springy-throttle gamepads / keyboard
+static const float INITIAL_ALTITUDE_TARGET = 0.2;
+static const float CLIMB_RATE_SCALE = 0.01;
+
 int main(int argc, char ** argv)
 {
     (void)argc;
@@ -27,62 +41,68 @@ int main(int argc, char ** argv)
 
     sim.init();
 
+    // This initial value will be ignored for traditional (non-springy)
+    // throttle
+    float z_target = INITIAL_ALTITUDE_TARGET;
+
+    bool run_altitude_pid = true;
+
+    hf::demands_t demands = {};
+
     while (true) {
 
-        if (!sim.step()) {
+        if (!sim.step(demands, run_altitude_pid)) {
             break;
         }
 
-        auto demands = sim.getDemands();
+        const auto open_loop_demands = sim.getDemands();
 
         const auto state = sim.getState();
 
-        (void)demands;
-        (void)state;
+        demands.yaw *= YAW_PRESCALE;
 
-        /*
-
-
-           demands.yaw *= YAW_PRESCALE;
-
-           const auto resetPids = demands.thrust < THROTTLE_DOWN;
+        // const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
         // raising the non-self-centering throttle stick
         if (sim.requestedTakeoff()) {
 
-        // "Springy" (self-centering) throttle or keyboard: accumulate 
-        // altitude target based on stick deflection, and attempt
-        // to maintain target via PID control
-        if (sim.isSpringy()) {
+            // "Springy" (self-centering) throttle or keyboard: accumulate 
+            // altitude target based on stick deflection, and attempt
+            // to maintain target via PID control
+            if (sim.isSpringy()) {
 
-        z_target += CLIMB_RATE_SCALE * demands.thrust;
-        demands.thrust = z_target;
-        altitudePid.run(DT, state, demands);
-        }
+                z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
 
-        // Traditional (non-self-centering) throttle: 
-        //
-        //   (1) In throttle deadband (mid position), fix an altitude target
-        //       and attempt to maintain it via PID control
-        //
-        //   (2) Outside throttle deadband, get thrust from stick deflection
-        else {
+                demands.thrust = z_target;
+            }
 
-        static bool _was_in_deadband;
-        const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
-        z_target = in_deadband && !_was_in_deadband ? state.z : z_target;
-        _was_in_deadband = in_deadband;
-        if (in_deadband) {
-        demands.thrust = z_target;
-        altitudePid.run(DT, state, demands);
-        }
-        }
+            // Traditional (non-self-centering) throttle: 
+            //
+            //   (1) In throttle deadband (mid position), fix an altitude target
+            //       and attempt to maintain it via PID control
+            //
+            //   (2) Outside throttle deadband, get thrust from stick deflection
+            else {
 
-        demands.thrust += THRUST_BASE;
+                if (fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND) {
+
+                    demands.thrust = state.z;
+
+                    run_altitude_pid = true;
+                }
+
+                else {
+
+                    demands.thrust = open_loop_demands.thrust;
+
+                    run_altitude_pid = false;
+                }
+
+            }
+
         }    
-         */
     }
 
     sim.close();
