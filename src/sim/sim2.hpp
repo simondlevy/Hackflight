@@ -127,7 +127,9 @@ namespace hf {
             state_t getState()
             {
                 return state_t {
+                    _dynamics.x[Dynamics::STATE_X],
                     _dynamics.x[Dynamics::STATE_DX],
+                    _dynamics.x[Dynamics::STATE_Y],
                     _dynamics.x[Dynamics::STATE_DY],
                     _dynamics.x[Dynamics::STATE_Z],
                     _dynamics.x[Dynamics::STATE_DZ],
