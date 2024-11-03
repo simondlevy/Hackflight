@@ -101,7 +101,7 @@ namespace hf {
             float _dt;
 
             // First deriviative of state vector
-            float _dxdt[12];
+            state_t _dstate;
 
             // Flight status
             status_e _status;
@@ -110,26 +110,7 @@ namespace hf {
 
         public:
 
-            // Indices into state vector
-            enum {
-
-                STATE_X, 
-                STATE_DX, 
-                STATE_Y, 
-                STATE_DY, 
-                STATE_Z, 
-                STATE_DZ,         
-                STATE_PHI, 
-                STATE_DPHI, 
-                STATE_THETA, 
-                STATE_DTHETA, 
-                STATE_PSI, 
-                STATE_DPSI
-
-            } state_e;
-
-            // State vector
-            float x[12];
+            state_t state;
 
             Dynamics(const vehicle_params_t & params, const float dt)
             {
@@ -138,8 +119,8 @@ namespace hf {
                 _dt = dt;
 
                 // Always start at location (0,0,0) with zero velocities
-                memset(x, 0, sizeof(x)); 
-                memset(_dxdt, 0, sizeof(_dxdt));
+                memset(&state, 0, sizeof(state_t)); 
+                memset(&_dstate, 0, sizeof(state_t));
 
                 // Start on ground
                 _status = STATUS_LANDED;
@@ -184,13 +165,15 @@ namespace hf {
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame.  
                 float accelENU[3] = {};
-                bodyZToInertial(U1 / _params.M, x[6], x[8], x[10], accelENU);
+                bodyZToInertial(U1 / _params.M,
+                        state.phi, state.theta, state.psi,
+                        accelENU);
 
                 // Compute net vertical acceleration by subtracting gravity
                 const auto netz = accelENU[2] - G;
 
-                // If we're not airborne, we become airborne when upward acceleration
-                // has become positive
+                // If we're not airborne, we become airborne when upward
+                // acceleration has become positive
                 if (_status == STATUS_LANDED) {
 
                     if (netz > 0) {
@@ -202,12 +185,12 @@ namespace hf {
                 else if (_status == STATUS_AIRBORNE) {
 
                     // If we've descended to the ground
-                    if (x[STATE_Z] <= 0 and x[STATE_DZ] <= 0) {
+                    if (state.z <= 0 and state.dz <= 0) {
 
                         // Big angles indicate a crash
-                        const auto phi = x[STATE_PHI];
-                        const auto velx = x[STATE_DY];
-                        const auto vely = x[STATE_DZ];
+                        const auto phi = state.phi;
+                        const auto velx = state.dy;
+                        const auto vely = state.dz;
                         if ((vely > LANDING_VEL_Y ||
                                     fabs(velx) > LANDING_VEL_X ||
                                     fabs(phi) > LANDING_ANGLE)) {
@@ -217,8 +200,8 @@ namespace hf {
                             _status = STATUS_LANDED;
                         }
 
-                        x[STATE_Z] = 0;
-                        x[STATE_DZ] = 0;
+                        state.z = 0;
+                        state.dz = 0;
                     }
 
                     // Compute the state derivatives using Equation 12
@@ -226,9 +209,18 @@ namespace hf {
 
                     // Compute state as first temporal integral of first temporal
                     // derivative
-                    for (int k=0; k<12; ++k) {
-                        x[k] += _dt * _dxdt[k];
-                    }
+                    state.x      += _dt * _dstate.x;
+                    state.dx     += _dt * _dstate.dx;
+                    state.y      += _dt * _dstate.y;
+                    state.dy     += _dt * _dstate.dy;
+                    state.z      += _dt * _dstate.z;
+                    state.dz     += _dt * _dstate.dz;
+                    state.phi    += _dt * _dstate.phi;
+                    state.dphi   += _dt * _dstate.dphi;
+                    state.theta  += _dt * _dstate.theta;
+                    state.dtheta += _dt * _dstate.dtheta;
+                    state.psi    += _dt * _dstate.psi;
+                    state.dpsi   += _dt * _dstate.dpsi;
 
                     // Once airborne, inertial-frame acceleration is same as NED
                     // acceleration
@@ -241,11 +233,11 @@ namespace hf {
              */
             void setPosition(const float x, const float y, const float z)
             {
-                memset(this->x, 0, sizeof(x));
+                memset(&state, 0, sizeof(state_t));
 
-                this->x[STATE_X] = x;
-                this->x[STATE_Y] = y;
-                this->x[STATE_Z] = z;
+                state.x = x;
+                state.y = y;
+                state.z = z;
 
                 _status = z > 0 ? STATUS_AIRBORNE : STATUS_LANDED;
             }
@@ -253,8 +245,8 @@ namespace hf {
         private:
 
             /*
-               Implements Equation 12 computing temporal first derivative of state.
-               Should fill _dxdt[0..11] with appropriate values.
+               Implements Equation 12 computing temporal first derivative of
+               state.  Should fill _dxdt[0..11] with appropriate values.
              */
             void computeStateDerivative(
                     const float accelENU[3],
@@ -264,45 +256,48 @@ namespace hf {
                     const float U4,
                     const float Omega)
             {
-                const auto phidot = x[STATE_DPHI];
-                const auto thedot = x[STATE_DTHETA];
-                const auto psidot = x[STATE_DPSI];
+                const auto phidot = state.dphi;
+                const auto thedot = state.dtheta;
+                const auto psidot = state.dpsi;
 
-                _dxdt[STATE_X] = x[STATE_DX];
+                _dstate.x = state.dx;
 
-                _dxdt[STATE_DX] = accelENU[0];
+                _dstate.dx = accelENU[0];
 
-                _dxdt[STATE_Y] = x[STATE_DY];
+                _dstate.y = state.dy;
 
-                _dxdt[STATE_DY] = accelENU[1];
+                _dstate.dy = accelENU[1];
 
-                _dxdt[STATE_Z] = x[STATE_DZ];
+                _dstate.z = state.dz;
 
-                _dxdt[STATE_DZ] = netz;
+                _dstate.dz = netz;
 
-                _dxdt[STATE_PHI] = phidot;
+                _dstate.phi = phidot;
 
-                _dxdt[STATE_DPHI] = (
+                _dstate.dphi = (
                         psidot*thedot*(_params.Iy-_params.Iz) /
                         _params.Ix-_params.Jr /
                         _params.Ix*thedot*Omega + U2 / _params.Ix);
 
-                _dxdt[STATE_THETA] = thedot;
+                _dstate.theta = thedot;
 
-                _dxdt[STATE_DTHETA] =
+                _dstate.dtheta =
                     -(psidot * phidot * (_params.Iz - _params.Ix) /
                             _params.Iy + _params.Jr / 
                             _params.Iy * phidot * Omega + U3 / _params.Iy);
 
-                _dxdt[STATE_PSI] = psidot;
+                _dstate.psi = psidot;
 
-                _dxdt[STATE_DPSI] = (
+                _dstate.dpsi = (
                         thedot*phidot*(_params.Ix-_params.Iy)/_params.Iz +
                         U4/_params.Iz);
             }
 
             static float u2(
-                    const float o0, const float o1, const float o2, const float o3)
+                    const float o0,
+                    const float o1,
+                    const float o2,
+                    const float o3)
             {
                 /*
                    roll right
@@ -312,7 +307,10 @@ namespace hf {
             }
 
             static float u3(
-                    const float o0, const float o1, const float o2, const float o3)
+                    const float o0,
+                    const float o1,
+                    const float o2,
+                    const float o3)
             {
                 /*
                    pitch forward
@@ -322,7 +320,10 @@ namespace hf {
             }
 
             static float u4(
-                    const float o0, const float o1, const float o2, const float o3)
+                    const float o0,
+                    const float o1,
+                    const float o2,
+                    const float o3)
             {
                 /*
                    yaw cw
