@@ -39,7 +39,7 @@ namespace hf {
 
     static AltitudePid _altitudePid;
 
-    void run_pid_controllers(
+    void run_closed_loop_controllers(
             const float dt, const state_t & state, demands_t & demands)
     {
         if (_run_altitude_pid) {
@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!sim.step(demands, _run_altitude_pid)) {
+        if (!sim.step(demands)) {
             break;
         }
 

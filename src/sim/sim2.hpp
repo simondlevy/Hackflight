@@ -1,5 +1,5 @@
 /*
-   Webots-based flight simulator support for Hackflight
+   Webots-based flight simulator support for Hackflight using custom physics
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -38,7 +38,6 @@
 
 // Hackflight
 #include <hackflight.hpp>
-#include <pids/altitude.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
 namespace hf {
@@ -84,10 +83,8 @@ namespace hf {
                 pthread_create(&_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
 
-            bool step(demands_t & open_loop_demands, bool run_altitude_pid)
+            bool step(demands_t & open_loop_demands)
             {
-                _thread_data.run_altitude_pid = run_altitude_pid;
-
                 _thread_data.requested_takeoff = _requested_takeoff;
 
                 memcpy(&_thread_data.demands, &open_loop_demands, sizeof(demands_t));
@@ -213,12 +210,6 @@ namespace hf {
  
         private:
 
-            // For springy-throttle gamepads / keyboard
-            static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
-            static constexpr float CLIMB_RATE_SCALE = 0.01;
-
-            static constexpr float THROTTLE_DEADBAND = 0.2;
-
             static constexpr float THRUST_BASE = 55.385;
 
             static constexpr float DYNAMICS_DT = 1e-4;
@@ -226,8 +217,6 @@ namespace hf {
             static const uint32_t PID_PERIOD = 1000;
 
             static constexpr float MOTOR_MAX = 60;
-
-            static constexpr float SPINUP_TIME = 2;
 
             typedef enum {
 
@@ -251,7 +240,6 @@ namespace hf {
             typedef struct {
 
                 Dynamics * dynamics;
-                bool run_altitude_pid;
                 bool requested_takeoff;
                 demands_t demands;
                 float posevals[6];
@@ -366,12 +354,12 @@ namespace hf {
                             demands.pitch = open_loop_demands.pitch; 
                             demands.yaw = open_loop_demands.yaw;
 
-                            extern void run_pid_controllers(
+                            extern void run_closed_loop_controllers(
                                     const float dt,
                                     const state_t & state, 
                                     demands_t & demands);
 
-                            run_pid_controllers(DYNAMICS_DT, state, demands);
+                            run_closed_loop_controllers(DYNAMICS_DT, state, demands);
                         }
 
                         motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
