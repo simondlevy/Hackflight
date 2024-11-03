@@ -212,7 +212,7 @@ namespace hf {
 
             static constexpr float THRUST_BASE = 55.385;
 
-            static constexpr float DYNAMICS_DT = 1e-4;
+            static constexpr float DYNAMICS_FREQ = 1e4;
 
             static const uint32_t PID_PERIOD = 1000;
 
@@ -248,7 +248,7 @@ namespace hf {
 
             } thread_data_t;
 
-             Dynamics _dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
+             Dynamics _dynamics = Dynamics(tinyquad_params, 1/DYNAMICS_FREQ);
 
             bool _requested_takeoff;
 
@@ -343,6 +343,8 @@ namespace hf {
 
                 for (long k=0; thread_data->running; k++) {
 
+                    const float dynamics_dt = 1 / DYNAMICS_FREQ;
+
                     if (thread_data->requested_takeoff) {
 
                         if (k % PID_PERIOD == 0) {
@@ -359,7 +361,7 @@ namespace hf {
                                     const state_t & state, 
                                     demands_t & demands);
 
-                            run_closed_loop_controllers(DYNAMICS_DT, state, demands);
+                            run_closed_loop_controllers(dynamics_dt, state, demands);
                         }
 
                         motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
@@ -381,7 +383,7 @@ namespace hf {
                     thread_data->motorvals[2] = motor;
                     thread_data->motorvals[3] = motor;
 
-                    usleep(DYNAMICS_DT / 1e-6);
+                    usleep(dynamics_dt / 1e-6);
                 }
 
                 return  ptr;
