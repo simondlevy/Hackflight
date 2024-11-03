@@ -347,7 +347,9 @@ namespace hf {
 
                 // We'll animate motors at full speed on startup, but won't run
                 // dynamics
-                float motor = MOTOR_MAX;
+                quad_motors_t motors = {
+                    MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX 
+                };
 
                 for (long k=0; thread_data->running; k++) {
 
@@ -367,7 +369,12 @@ namespace hf {
                             run_closed_loop_controllers(1.f/PID_FREQ, state, demands);
                         }
 
-                        motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
+                        const auto motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
+
+                        motors.m1 = motor;
+                        motors.m2 = motor;
+                        motors.m3 = motor;
+                        motors.m4 = motor;
 
                         dynamics->setMotors(motor, motor, motor, motor);
                         state.z = dynamics->x[Dynamics::STATE_Z];
@@ -381,10 +388,10 @@ namespace hf {
                         thread_data->posevals[5] = dynamics->x[Dynamics::STATE_PSI];
                     }
 
-                    thread_data->motorvals[0] = motor;
-                    thread_data->motorvals[1] = motor;
-                    thread_data->motorvals[2] = motor;
-                    thread_data->motorvals[3] = motor;
+                    thread_data->motorvals[0] = motors.m1;
+                    thread_data->motorvals[1] = motors.m2;
+                    thread_data->motorvals[2] = motors.m3;
+                    thread_data->motorvals[3] = motors.m4;
 
                     usleep(1 / (DYNAMICS_FREQ * 1e-6));
                 }
