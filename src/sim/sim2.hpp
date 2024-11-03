@@ -126,18 +126,7 @@ namespace hf {
 
             state_t getState()
             {
-                return state_t {
-                    _dynamics.x[Dynamics::STATE_DX],
-                    _dynamics.x[Dynamics::STATE_DY],
-                    _dynamics.x[Dynamics::STATE_Z],
-                    _dynamics.x[Dynamics::STATE_DZ],
-                    _dynamics.x[Dynamics::STATE_PHI],
-                    _dynamics.x[Dynamics::STATE_DPHI],
-                    _dynamics.x[Dynamics::STATE_THETA],
-                    _dynamics.x[Dynamics::STATE_DTHETA],
-                    _dynamics.x[Dynamics::STATE_PSI],
-                    _dynamics.x[Dynamics::STATE_DPSI]
-                };
+                return _dynamics.state;
             }
 
             quad_motors_t getMotors() 
@@ -354,8 +343,6 @@ namespace hf {
 
                 auto dynamics = thread_data->dynamics;
 
-                state_t state  = {};
-
                 demands_t demands = {};
 
                 // We'll animate motors at full speed on startup, but won't run
@@ -380,7 +367,7 @@ namespace hf {
                                     demands_t & demands);
 
                             run_closed_loop_controllers(
-                                    1.f/PID_FREQ, state, demands);
+                                    1.f/PID_FREQ, dynamics->state, demands);
 
                         }
 
@@ -399,29 +386,14 @@ namespace hf {
                                 motors.m3, 
                                 motors.m4);
 
-                        state.dx = dynamics->x[Dynamics::STATE_DX];
-                        state.dy = dynamics->x[Dynamics::STATE_DY];
-                        state.z = dynamics->x[Dynamics::STATE_Z];
-                        state.dz = dynamics->x[Dynamics::STATE_DZ];
-                        state.phi = dynamics->x[Dynamics::STATE_PHI];
-                        state.dphi = dynamics->x[Dynamics::STATE_DPHI];
-                        state.theta = dynamics->x[Dynamics::STATE_THETA];
-                        state.dtheta = dynamics->x[Dynamics::STATE_DTHETA];
-                        state.psi = dynamics->x[Dynamics::STATE_PSI];
-                        state.dpsi = dynamics->x[Dynamics::STATE_DPSI];
+                        const auto state = dynamics->state;
 
-                        thread_data->posevals[0] =
-                            dynamics->x[Dynamics::STATE_X];
-                        thread_data->posevals[1] =
-                            dynamics->x[Dynamics::STATE_Y];
-                        thread_data->posevals[2] =
-                            dynamics->x[Dynamics::STATE_Z];
-                        thread_data->posevals[3] =
-                            dynamics->x[Dynamics::STATE_PHI];
-                        thread_data->posevals[4] =
-                            dynamics->x[Dynamics::STATE_THETA];
-                        thread_data->posevals[5] =
-                            dynamics->x[Dynamics::STATE_PSI];
+                        thread_data->posevals[0] = state.x;
+                        thread_data->posevals[1] = state.y;
+                        thread_data->posevals[2] = state.z;
+                        thread_data->posevals[3] = state.phi;
+                        thread_data->posevals[4] = state.theta;
+                        thread_data->posevals[5] = state.psi;
                     }
 
                     // Set motor spins for animation

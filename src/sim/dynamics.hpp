@@ -41,334 +41,341 @@
 #include <math.h>
 #include <string.h>
 
-typedef struct {
+#include <hackflight.hpp>
 
-    // Estimated
-    float B; // force constant [F=b*w^2]
-    float D; // torque constant [T=d*w^2]
+namespace hf {
 
-    // These agree with values in .proto file
-    float M;  // mass [kg]
-    float L;  // arm length [m]
+    typedef struct {
 
-    // Estimated
-    float Ix; // [kg*m^2]
-    float Iy; // [kg*m^2]
-    float Iz; // [kg*m^2]
-    float Jr; // prop inertial [kg*m^2]
+        // Estimated
+        float B; // force constant [F=b*w^2]
+        float D; // torque constant [T=d*w^2]
 
-} vehicle_params_t;
+        // These agree with values in .proto file
+        float M;  // mass [kg]
+        float L;  // arm length [m]
+
+        // Estimated
+        float Ix; // [kg*m^2]
+        float Iy; // [kg*m^2]
+        float Iz; // [kg*m^2]
+        float Jr; // prop inertial [kg*m^2]
+
+    } vehicle_params_t;
 
 
-class Dynamics {
-
-    /*
-       Dynamics class for quad-X frames using Crazyflie motor layout
-
-       4cw   1ccw
-
-       ^
-
-       3ccw  2cw
-     */ 
-
-    private:
-
-        typedef enum {
-
-            STATUS_CRASHED,
-            STATUS_LANDED,
-            STATUS_AIRBORNE
-
-        } status_e;
-
-        // Safe landing criteria
-        static constexpr float LANDING_VEL_X = 2.0;
-        static constexpr float LANDING_VEL_Y = 1.0;
-        static constexpr float LANDING_ANGLE = M_PI/4;
-
-        // Graviational constant
-        static constexpr float G = 9.80665;
-
-        // Vehicle parameters [see Bouabdallah et al. 2004]
-        vehicle_params_t _params;
-
-        // Time constant
-        float _dt;
-
-        // First deriviative of state vector
-        float _dxdt[12];
-
-        // Flight status
-        status_e _status;
-
-        float _inertialAccel[3];
-
-    public:
-
-        // Indices into state vector
-        enum {
-
-            STATE_X, 
-            STATE_DX, 
-            STATE_Y, 
-            STATE_DY, 
-            STATE_Z, 
-            STATE_DZ,         
-            STATE_PHI, 
-            STATE_DPHI, 
-            STATE_THETA, 
-            STATE_DTHETA, 
-            STATE_PSI, 
-            STATE_DPSI
-
-        } state_e;
-
-        // State vector
-        float x[12];
-
-        Dynamics(const vehicle_params_t & params, const float dt)
-        {
-            memcpy(&_params, &params, sizeof(vehicle_params_t));
-
-            _dt = dt;
-
-            // Always start at location (0,0,0) with zero velocities
-            memset(x, 0, sizeof(x)); 
-            memset(_dxdt, 0, sizeof(_dxdt));
-
-            // Start on ground
-            _status = STATUS_LANDED;
-
-            // Initialize inertial frame acceleration in NED coordinates
-            bodyZToInertial(-G, 0, 0, 0, _inertialAccel);
-        }
+    class Dynamics {
 
         /*
-           Implements Equations 6 and 12 from Bouabdallah et al. (2004)
-           @param omegas motor speeds in radians per second
-         */
+           Dynamics class for quad-X frames using Crazyflie motor layout
 
-        void setMotors(
-                const float omega0,
-                const float omega1,
-                const float omega2,
-                const float omega3)
-        {
-            // Compute individual motor thrusts as air density times square of
-            // motor speed
-            const float omega0_2 = sqr(omega0);
-            const float omega1_2 = sqr(omega1);
-            const float omega2_2 = sqr(omega2);
-            const float omega3_2 = sqr(omega3);
+           4cw   1ccw
 
-            // Compute overall thrust, plus roll and pitch
-            const auto U1 =
-                _params.B * (omega0_2 + omega1_2 + omega2_2 + omega3_2);
-            const auto U2 = _params.L * _params.B * 
-                u2(omega0_2, omega1_2, omega2_2, omega3_2);
-            const auto U3 = _params.L * _params.B * 
-                u3(omega0_2, omega1_2, omega2_2, omega3_2);
+           ^
 
-            // Compute yaw torque
-            const auto U4 = _params.D * 
-                u4(omega0_2, omega1_2, omega2_2, omega3_2);
+           3ccw  2cw
+         */ 
 
-            // Ignore Omega ("disturbance") part of Equation 6 for now
-            const float Omega = 0;
+        private:
 
-            // Use the current Euler angles to rotate the orthogonal thrust
-            // vector into the inertial frame.  
-            float accelENU[3] = {};
-            bodyZToInertial(U1 / _params.M, x[6], x[8], x[10], accelENU);
+            typedef enum {
 
-            // Compute net vertical acceleration by subtracting gravity
-            const auto netz = accelENU[2] - G;
+                STATUS_CRASHED,
+                STATUS_LANDED,
+                STATUS_AIRBORNE
 
-            // If we're not airborne, we become airborne when upward acceleration
-            // has become positive
-            if (_status == STATUS_LANDED) {
+            } status_e;
 
-                if (netz > 0) {
-                    _status = STATUS_AIRBORNE;
+            // Safe landing criteria
+            static constexpr float LANDING_VEL_X = 2.0;
+            static constexpr float LANDING_VEL_Y = 1.0;
+            static constexpr float LANDING_ANGLE = M_PI/4;
+
+            // Graviational constant
+            static constexpr float G = 9.80665;
+
+            // Vehicle parameters [see Bouabdallah et al. 2004]
+            vehicle_params_t _params;
+
+            // Time constant
+            float _dt;
+
+            // First deriviative of state vector
+            state_t _dstate;
+
+            // Flight status
+            status_e _status;
+
+            axis3_t _inertialAccel;
+
+        public:
+
+            state_t state;
+
+            Dynamics(const vehicle_params_t & params, const float dt)
+            {
+                memcpy(&_params, &params, sizeof(vehicle_params_t));
+
+                _dt = dt;
+
+                // Always start at location (0,0,0) with zero velocities
+                memset(&state, 0, sizeof(state_t)); 
+                memset(&_dstate, 0, sizeof(state_t));
+
+                // Start on ground
+                _status = STATUS_LANDED;
+
+                // Initialize inertial frame acceleration in NED coordinates
+                bodyZToInertial(-G, 0, 0, 0, _inertialAccel);
+            }
+
+            /*
+               Implements Equations 6 and 12 from Bouabdallah et al. (2004)
+               @param omegas motor speeds in radians per second
+             */
+
+            void setMotors(
+                    const float omega0,
+                    const float omega1,
+                    const float omega2,
+                    const float omega3)
+            {
+                // Compute individual motor thrusts as air density times square of
+                // motor speed
+                const float omega0_2 = sqr(omega0);
+                const float omega1_2 = sqr(omega1);
+                const float omega2_2 = sqr(omega2);
+                const float omega3_2 = sqr(omega3);
+
+                // Compute overall thrust, plus roll and pitch
+                const auto U1 =
+                    _params.B * (omega0_2 + omega1_2 + omega2_2 + omega3_2);
+                const auto U2 = _params.L * _params.B * 
+                    u2(omega0_2, omega1_2, omega2_2, omega3_2);
+                const auto U3 = _params.L * _params.B * 
+                    u3(omega0_2, omega1_2, omega2_2, omega3_2);
+
+                // Compute yaw torque
+                const auto U4 = _params.D * 
+                    u4(omega0_2, omega1_2, omega2_2, omega3_2);
+
+                // Ignore Omega ("disturbance") part of Equation 6 for now
+                const float Omega = 0;
+
+                // Use the current Euler angles to rotate the orthogonal thrust
+                // vector into the inertial frame.  
+                axis3_t accelENU = {};
+                bodyZToInertial(U1 / _params.M,
+                        state.phi, state.theta, state.psi,
+                        accelENU);
+
+                // Compute net vertical acceleration by subtracting gravity
+                const auto netz = accelENU.z - G;
+
+                // If we're not airborne, we become airborne when upward
+                // acceleration has become positive
+                if (_status == STATUS_LANDED) {
+
+                    if (netz > 0) {
+                        _status = STATUS_AIRBORNE;
+                    }
+                }
+
+                // Once airborne, we can update dynamics
+                else if (_status == STATUS_AIRBORNE) {
+
+                    // If we've descended to the ground
+                    if (state.z <= 0 and state.dz <= 0) {
+
+                        // Big angles indicate a crash
+                        const auto phi = state.phi;
+                        const auto velx = state.dy;
+                        const auto vely = state.dz;
+                        if ((vely > LANDING_VEL_Y ||
+                                    fabs(velx) > LANDING_VEL_X ||
+                                    fabs(phi) > LANDING_ANGLE)) {
+                            _status = STATUS_CRASHED;
+                        }
+                        else {
+                            _status = STATUS_LANDED;
+                        }
+
+                        state.z = 0;
+                        state.dz = 0;
+                    }
+
+                    // Compute the state derivatives using Equation 12
+                    computeStateDerivative(accelENU, netz, U2, U3, U4, Omega);
+
+                    // Compute state as first temporal integral of first temporal
+                    // derivative
+                    state.x      += _dt * _dstate.x;
+                    state.dx     += _dt * _dstate.dx;
+                    state.y      += _dt * _dstate.y;
+                    state.dy     += _dt * _dstate.dy;
+                    state.z      += _dt * _dstate.z;
+                    state.dz     += _dt * _dstate.dz;
+                    state.phi    += _dt * _dstate.phi;
+                    state.dphi   += _dt * _dstate.dphi;
+                    state.theta  += _dt * _dstate.theta;
+                    state.dtheta += _dt * _dstate.dtheta;
+                    state.psi    += _dt * _dstate.psi;
+                    state.dpsi   += _dt * _dstate.dpsi;
+
+                    // Once airborne, inertial-frame acceleration is same as NED
+                    // acceleration
+                    memcpy(&_inertialAccel, &accelENU, sizeof(axis3_t));
                 }
             }
 
-            // Once airborne, we can update dynamics
-            else if (_status == STATUS_AIRBORNE) {
+            /*
+               Sets the vehicle position to the values specified in a sequence
+             */
+            void setPosition(const float x, const float y, const float z)
+            {
+                memset(&state, 0, sizeof(state_t));
 
-                // If we've descended to the ground
-                if (x[STATE_Z] <= 0 and x[STATE_DZ] <= 0) {
+                state.x = x;
+                state.y = y;
+                state.z = z;
 
-                    // Big angles indicate a crash
-                    const auto phi = x[STATE_PHI];
-                    const auto velx = x[STATE_DY];
-                    const auto vely = x[STATE_DZ];
-                    if ((vely > LANDING_VEL_Y ||
-                                fabs(velx) > LANDING_VEL_X ||
-                                fabs(phi) > LANDING_ANGLE)) {
-                        _status = STATUS_CRASHED;
-                    }
-                    else {
-                        _status = STATUS_LANDED;
-                    }
-
-                    x[STATE_Z] = 0;
-                    x[STATE_DZ] = 0;
-                }
-
-                // Compute the state derivatives using Equation 12
-                computeStateDerivative(accelENU, netz, U2, U3, U4, Omega);
-
-                // Compute state as first temporal integral of first temporal
-                // derivative
-                for (int k=0; k<12; ++k) {
-                    x[k] += _dt * _dxdt[k];
-                }
-
-                // Once airborne, inertial-frame acceleration is same as NED
-                // acceleration
-                memcpy(_inertialAccel, accelENU, sizeof(accelENU));
+                _status = z > 0 ? STATUS_AIRBORNE : STATUS_LANDED;
             }
-        }
 
-        /*
-           Sets the vehicle position to the values specified in a sequence
-         */
-        void setPosition(const float x, const float y, const float z)
-        {
-            memset(this->x, 0, sizeof(x));
+        private:
 
-            this->x[STATE_X] = x;
-            this->x[STATE_Y] = y;
-            this->x[STATE_Z] = z;
-
-            _status = z > 0 ? STATUS_AIRBORNE : STATUS_LANDED;
-        }
-
-    private:
-
-        /*
-           Implements Equation 12 computing temporal first derivative of state.
-           Should fill _dxdt[0..11] with appropriate values.
-         */
-        void computeStateDerivative(
-                const float accelENU[3],
-                const float netz,
-                const float U2,
-                const float U3,
-                const float U4,
-                const float Omega)
-        {
-            const auto phidot = x[STATE_DPHI];
-            const auto thedot = x[STATE_DTHETA];
-            const auto psidot = x[STATE_DPSI];
-
-            _dxdt[STATE_X] = x[STATE_DX];
-
-            _dxdt[STATE_DX] = accelENU[0];
-
-            _dxdt[STATE_Y] = x[STATE_DY];
-
-            _dxdt[STATE_DY] = accelENU[1];
-
-            _dxdt[STATE_Z] = x[STATE_DZ];
-
-            _dxdt[STATE_DZ] = netz;
-
-            _dxdt[STATE_PHI] = phidot;
-
-            _dxdt[STATE_DPHI] = (
-                    psidot*thedot*(_params.Iy-_params.Iz) /
-                    _params.Ix-_params.Jr /
-                    _params.Ix*thedot*Omega + U2 / _params.Ix);
-
-            _dxdt[STATE_THETA] = thedot;
-
-            _dxdt[STATE_DTHETA] =
-                -(psidot * phidot * (_params.Iz - _params.Ix) /
-                        _params.Iy + _params.Jr / 
-                        _params.Iy * phidot * Omega + U3 / _params.Iy);
-
-            _dxdt[STATE_PSI] = psidot;
-
-            _dxdt[STATE_DPSI] = (
-                    thedot*phidot*(_params.Ix-_params.Iy)/_params.Iz +
-                    U4/_params.Iz);
-        }
-
-        static float u2(
-                const float o0, const float o1, const float o2, const float o3)
-        {
             /*
-               roll right
+               Implements Equation 12 computing temporal first derivative of
+               state.  Should fill _dxdt[0..11] with appropriate values.
              */
+            void computeStateDerivative(
+                    const axis3_t accelENU,
+                    const float netz,
+                    const float U2,
+                    const float U3,
+                    const float U4,
+                    const float Omega)
+            {
+                const auto phidot = state.dphi;
+                const auto thedot = state.dtheta;
+                const auto psidot = state.dpsi;
 
-            return (o2 + o3) - (o0 + o1);
-        }
+                _dstate.x = state.dx;
 
-        static float u3(
-                const float o0, const float o1, const float o2, const float o3)
-        {
+                _dstate.dx = accelENU.x;
+
+                _dstate.y = state.dy;
+
+                _dstate.dy = accelENU.y;
+
+                _dstate.z = state.dz;
+
+                _dstate.dz = netz;
+
+                _dstate.phi = phidot;
+
+                _dstate.dphi = (
+                        psidot*thedot*(_params.Iy-_params.Iz) /
+                        _params.Ix-_params.Jr /
+                        _params.Ix*thedot*Omega + U2 / _params.Ix);
+
+                _dstate.theta = thedot;
+
+                _dstate.dtheta =
+                    -(psidot * phidot * (_params.Iz - _params.Ix) /
+                            _params.Iy + _params.Jr / 
+                            _params.Iy * phidot * Omega + U3 / _params.Iy);
+
+                _dstate.psi = psidot;
+
+                _dstate.dpsi = (
+                        thedot*phidot*(_params.Ix-_params.Iy)/_params.Iz +
+                        U4/_params.Iz);
+            }
+
+            static float u2(
+                    const float o0,
+                    const float o1,
+                    const float o2,
+                    const float o3)
+            {
+                /*
+                   roll right
+                 */
+
+                return (o2 + o3) - (o0 + o1);
+            }
+
+            static float u3(
+                    const float o0,
+                    const float o1,
+                    const float o2,
+                    const float o3)
+            {
+                /*
+                   pitch forward
+                 */
+
+                return (o1 + o2) - (o0 + o3);
+            }
+
+            static float u4(
+                    const float o0,
+                    const float o1,
+                    const float o2,
+                    const float o3)
+            {
+                /*
+                   yaw cw
+                 */
+
+                return (o0 + o2) - (o1 + o3);
+            }
+
+
+
+            static float sqr(const float x)
+            {
+                return x * x;
+            }
+
             /*
-               pitch forward
+               bodyToInertial method optimized for body X=Y=0
              */
+            void bodyZToInertial(
+                    const float bodyZ, 
+                    const float phi,
+                    const float theta,
+                    const float psi,
+                    axis3_t & inertial)
+            {
 
-            return (o1 + o2) - (o0 + o3);
-        }
+                float cph=0;
+                float cth=0;
+                float cps=0;
+                float sph=0;
+                float sth=0;
+                float sps=0;
 
-        static float u4(
-                const float o0, const float o1, const float o2, const float o3)
-        {
-            /*
-               yaw cw
-             */
+                sincos(phi, theta, psi, cph, cth, cps, sph, sth, sps);
 
-            return (o0 + o2) - (o1 + o3);
-        }
+                inertial.x = bodyZ * sph*sps+cph*cps*sth;
+                inertial.y = bodyZ * cph*sps*sth-cps*sph;
+                inertial.z = bodyZ * cph*cth;
+            }
 
+            void sincos(const float phi, const float theta, const float psi,
+                    float & cph, float & cth, float & cps,
+                    float & sph, float & sth, float & sps)
+            {
+                cph = cos(phi);
+                cth = cos(theta);
+                cps = cos(psi);
+                sph = sin(phi);
+                sth = sin(theta);
+                sps = sin(psi);
 
+            }
+    }; 
 
-        static float sqr(const float x)
-        {
-            return x * x;
-        }
-
-        /*
-           bodyToInertial method optimized for body X=Y=0
-         */
-        void bodyZToInertial(
-                const float bodyZ, 
-                const float phi,
-                const float theta,
-                const float psi,
-                float inertial[3])
-        {
-
-            float cph=0;
-            float cth=0;
-            float cps=0;
-            float sph=0;
-            float sth=0;
-            float sps=0;
-
-            sincos(phi, theta, psi, cph, cth, cps, sph, sth, sps);
-
-            inertial[0] = bodyZ * sph*sps+cph*cps*sth;
-            inertial[1] = bodyZ * cph*sps*sth-cps*sph;
-            inertial[2] = bodyZ * cph*cth;
-        }
-
-        void sincos(const float phi, const float theta, const float psi,
-                float & cph, float & cth, float & cps,
-                float & sph, float & sth, float & sps)
-        {
-            cph = cos(phi);
-            cth = cos(theta);
-            cps = cos(psi);
-            sph = sin(phi);
-            sth = sin(theta);
-            sps = sin(psi);
-
-        }
-}; 
+}
