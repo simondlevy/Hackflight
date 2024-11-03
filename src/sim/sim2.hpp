@@ -185,6 +185,85 @@ namespace hf {
                 pthread_join(_thread, NULL);
             }
 
+            demands_t getDemands()
+            {
+                demands_t demands = {};
+
+                auto joystickStatus = haveJoystick();
+
+                if (joystickStatus == JOYSTICK_RECOGNIZED) {
+
+                    auto axes = getJoystickInfo();
+
+                    demands.thrust =
+                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+
+                    // Springy throttle stick; keep in interval [-1,+1]
+                    if (axes.springy) {
+
+                        static bool button_was_hit;
+
+                        if (wb_joystick_get_pressed_button() == 5) {
+                            button_was_hit = true;
+                        }
+
+                        _requested_takeoff = button_was_hit;
+
+                        // Run throttle stick through deadband
+                        demands.thrust =
+                            fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
+                    }
+
+                    else {
+
+                        static float throttle_prev;
+                        static bool throttle_was_moved;
+
+                        // Handle bogus throttle values on startup
+                        if (throttle_prev != demands.thrust) {
+                            throttle_was_moved = true;
+                        }
+
+                        _requested_takeoff = throttle_was_moved;
+
+                        throttle_prev = demands.thrust;
+                    }
+
+                    demands.roll = readJoystickAxis(axes.roll);
+                    demands.pitch = readJoystickAxis(axes.pitch); 
+                    demands.yaw = readJoystickAxis(axes.yaw);
+                }
+
+                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+
+                    reportJoystick();
+                }
+
+                else { 
+
+                    getDemandsFromKeyboard(demands);
+
+                }
+
+                return demands;
+            }
+
+            state_t getState()
+            {
+                return state_t {
+                    _dynamics.x[Dynamics::STATE_X_DOT],
+                    _dynamics.x[Dynamics::STATE_Y_DOT],
+                    _dynamics.x[Dynamics::STATE_Z],
+                    _dynamics.x[Dynamics::STATE_Z_DOT],
+                    _dynamics.x[Dynamics::STATE_PHI],
+                    _dynamics.x[Dynamics::STATE_PHI_DOT],
+                    _dynamics.x[Dynamics::STATE_THETA],
+                    _dynamics.x[Dynamics::STATE_THETA_DOT],
+                    _dynamics.x[Dynamics::STATE_PSI],
+                    _dynamics.x[Dynamics::STATE_PSI_DOT]
+                };
+            }
+
         private:
 
             // For springy-throttle gamepads / keyboard
