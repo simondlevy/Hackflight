@@ -90,25 +90,6 @@ namespace hf {
 
                 _thread_data.requested_takeoff = _requested_takeoff;
 
-                /*
-                // Spin up the motors for a second before starting dynamics
-                for (long k=0; k < SPINUP_TIME * timestep; ++k) {
-
-                if (wb_robot_step((int)timestep) == -1) {
-                break;
-                } 
-
-                const float motorvals[4] = {
-                MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
-                };
-
-                spin_motors(motor1, motor2, motor3, motor4, motorvals);
-
-                // Keep the vehicle on the ground
-                const double pos[3] = {};
-                wb_supervisor_field_set_sf_vec3f(translation_field, pos);
-                }*/
-
                 memcpy(&_thread_data.demands, &open_loop_demands, sizeof(demands_t));
 
                 if (wb_robot_step((int)_timestep) == -1) {
@@ -372,7 +353,7 @@ namespace hf {
 
                 demands_t demands = {};
 
-                float motor = 0;
+                float motor = MOTOR_MAX;
 
                 for (long k=0; thread_data->running; k++) {
 
