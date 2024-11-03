@@ -81,6 +81,7 @@ namespace hf {
                 // Start the dynamics thread
                 _thread_data.running = true;
                 pthread_create(&_thread, NULL, *thread_fun, (void *)&_thread_data);
+
             }
 
             void run()
@@ -104,11 +105,15 @@ namespace hf {
                     wb_supervisor_field_set_sf_vec3f(translation_field, pos);
                 }*/
 
-                // This initial value will be ignored for traditional (non-springy)
-                // throttle
-                float z_target = INITIAL_ALTITUDE_TARGET;
-
                 while (true) {
+
+                    // This initial value will be ignored for traditional (non-springy)
+                    // throttle
+                    static float _z_target;
+
+                    if (_z_target == 0) {
+                        _z_target = INITIAL_ALTITUDE_TARGET;
+                    }
 
                     demands_t * demands = &_thread_data.demands;
 
@@ -134,9 +139,9 @@ namespace hf {
 
                             _thread_data.run_altitude_pid = true;
 
-                            z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
+                            _z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
 
-                            demands->thrust = z_target;
+                            demands->thrust = _z_target;
                         }
 
                         // Traditional (non-self-centering) throttle: 
