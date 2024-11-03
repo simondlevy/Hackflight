@@ -87,7 +87,8 @@ namespace hf {
             {
                 _thread_data.requested_takeoff = _requested_takeoff;
 
-                memcpy(&_thread_data.demands, &open_loop_demands, sizeof(demands_t));
+                memcpy(&_thread_data.open_loop_demands, &open_loop_demands,
+                        sizeof(demands_t));
 
                 if (wb_robot_step((int)_timestep) == -1) {
 
@@ -105,7 +106,12 @@ namespace hf {
 
                 const auto motorvals = _thread_data.motorvals;
 
-                spin_motors(motorvals);
+                // Negate expected direction to accommodate Webots
+                // counterclockwise positive
+                wb_motor_set_velocity(_motor1, -motorvals[0]);
+                wb_motor_set_velocity(_motor2, +motorvals[1]);
+                wb_motor_set_velocity(_motor3, +motorvals[2]);
+                wb_motor_set_velocity(_motor4, -motorvals[3]);
 
                 return true;
             }
@@ -241,7 +247,7 @@ namespace hf {
 
                 Dynamics * dynamics;
                 bool requested_takeoff;
-                demands_t demands;
+                demands_t open_loop_demands;
                 float posevals[6];
                 float motorvals[4];
                 bool running;
@@ -339,6 +345,8 @@ namespace hf {
 
                 demands_t demands = {};
 
+                // We'll animate motors at full speed on startup, but won't run
+                // dynamics
                 float motor = MOTOR_MAX;
 
                 for (long k=0; thread_data->running; k++) {
@@ -347,16 +355,11 @@ namespace hf {
 
                     if (thread_data->requested_takeoff) {
 
-                        const uint32_t pid_period = DYNAMICS_FREQ / PID_FREQ;
-
-                        if (k % pid_period == 0) {
+                        if (k % (DYNAMICS_FREQ / PID_FREQ) == 0) {
 
                             // Start with open-loop demands from main thread
-                            demands_t open_loop_demands = thread_data->demands;
-                            demands.thrust = open_loop_demands.thrust; 
-                            demands.roll = open_loop_demands.roll; 
-                            demands.pitch = open_loop_demands.pitch; 
-                            demands.yaw = open_loop_demands.yaw;
+                            memcpy(&demands, &thread_data->open_loop_demands,
+                                    sizeof(demands_t));
 
                             extern void run_closed_loop_controllers(
                                     const float dt,
@@ -389,16 +392,6 @@ namespace hf {
                 }
 
                 return  ptr;
-            }
-
-            void spin_motors(const float motorvals[4])
-            {
-                // Negate expected direction to accommodate Webots
-                // counterclockwise positive
-                wb_motor_set_velocity(_motor1, -motorvals[0]);
-                wb_motor_set_velocity(_motor2, +motorvals[1]);
-                wb_motor_set_velocity(_motor3, +motorvals[2]);
-                wb_motor_set_velocity(_motor4, -motorvals[3]);
             }
 
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
