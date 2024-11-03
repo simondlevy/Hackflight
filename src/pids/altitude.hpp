@@ -27,13 +27,44 @@ namespace hf {
         public:
 
             void run(
-                    const float dt, const state_t & state, demands_t & demands)
+                    const bool throttleIsSpringy,
+                    const float dt,
+                    const state_t & state,
+                    const demands_t & open_loop_demands,
+                    demands_t & demands)
             {
-                demands.thrust = run_pi(dt, KP_Z, KI_Z,
-                        demands.thrust, state.z, _z_integral);
+                // "Springy" (self-centering) throttle or keyboard: accumulate 
+                // altitude target based on stick deflection, and attempt
+                // to maintain target via PID control
+                if (throttleIsSpringy) {
 
-                demands.thrust = run_pi(dt, KP_DZ, KI_DZ,
-                        demands.thrust, state.dz, _dz_integral);
+                    _z_target += dt * open_loop_demands.thrust;
+                    demands.thrust = _z_target;
+                    _run(dt, state, demands);
+                }
+
+                // Traditional (non-self-centering) throttle: 
+                //
+                //   (1) In throttle deadband (mid position), fix an altitude target
+                //       and attempt to maintain it via PID control
+                //
+                //   (2) Outside throttle deadband, get thrust from stick deflection
+                else {
+
+                    static bool _was_in_deadband;
+                    const auto in_deadband = fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND;
+                    _z_target = in_deadband && !_was_in_deadband ? state.z : _z_target;
+
+                    _was_in_deadband = in_deadband;
+
+                    if (in_deadband) {
+                        demands.thrust = _z_target;
+                        _run(dt, state, demands);
+                    }
+                    else {
+                        demands.thrust = open_loop_demands.thrust;
+                    }
+                }
             }
 
         private:
@@ -46,10 +77,28 @@ namespace hf {
 
             static constexpr float ILIMIT = 5000;
 
+            // For springy-throttle in gamepads / keyboard
+            static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
+
+            // For tradtional (non-springy) throttle in R/C transmitter
+            static constexpr float THROTTLE_DEADBAND = 0.2;
+
+            float _z_target = INITIAL_ALTITUDE_TARGET;
+
             float _z_integral;
             float _dz_integral;
 
-            static float run_pi(const float dt, const float kp, const float ki,
+            void _run(
+                    const float dt, const state_t & state, demands_t & demands)
+            {
+                demands.thrust = _run_pi(dt, KP_Z, KI_Z,
+                        demands.thrust, state.z, _z_integral);
+
+                demands.thrust = _run_pi(dt, KP_DZ, KI_DZ,
+                        demands.thrust, state.dz, _dz_integral);
+            }
+
+            static float _run_pi(const float dt, const float kp, const float ki,
                     const float target, const float actual, float & integral)
             {
                 const auto error = target - actual;

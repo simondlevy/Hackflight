@@ -17,7 +17,7 @@
  */
 
 #include <sim/sim2.hpp>
-#include <pids/altitude2.hpp>
+#include <pids/altitude.hpp>
 #include <pids/yaw_rate.hpp>
 
 static const float YAW_PRESCALE = 160; // deg/sec
@@ -69,8 +69,6 @@ int main(int argc, char ** argv)
         }
 
         _open_loop_demands = _sim.getDemands();
-
-        const auto state = _sim.getState();
 
         demands.yaw = _open_loop_demands.yaw * YAW_PRESCALE;
 

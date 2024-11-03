@@ -18,7 +18,7 @@
 #include <mixers.hpp>
 #include <sim/sim.hpp>
 
-#include <pids/altitude2.hpp>
+#include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
