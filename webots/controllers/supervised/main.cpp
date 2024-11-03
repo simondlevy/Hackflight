@@ -27,7 +27,12 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    sim.run();
+    while (true) {
+
+        if (!sim.step()) {
+            break;
+        }
+    }
 
     sim.close();
 

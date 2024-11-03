@@ -84,100 +84,99 @@ namespace hf {
 
             }
 
-            void run()
+            bool step()
             {
                 /*
                 // Spin up the motors for a second before starting dynamics
                 for (long k=0; k < SPINUP_TIME * timestep; ++k) {
 
-                    if (wb_robot_step((int)timestep) == -1) {
-                        break;
-                    } 
+                if (wb_robot_step((int)timestep) == -1) {
+                break;
+                } 
 
-                    const float motorvals[4] = {
-                        MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
-                    };
+                const float motorvals[4] = {
+                MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
+                };
 
-                    spin_motors(motor1, motor2, motor3, motor4, motorvals);
+                spin_motors(motor1, motor2, motor3, motor4, motorvals);
 
-                    // Keep the vehicle on the ground
-                    const double pos[3] = {};
-                    wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+                // Keep the vehicle on the ground
+                const double pos[3] = {};
+                wb_supervisor_field_set_sf_vec3f(translation_field, pos);
                 }*/
 
-                while (true) {
+                // This initial value will be ignored for traditional (non-springy)
+                // throttle
+                static float _z_target;
 
-                    // This initial value will be ignored for traditional (non-springy)
-                    // throttle
-                    static float _z_target;
-
-                    if (_z_target == 0) {
-                        _z_target = INITIAL_ALTITUDE_TARGET;
-                    }
-
-                    demands_t * demands = &_thread_data.demands;
-
-                    auto posevals = _thread_data.posevals;
-
-                    if (wb_robot_step((int)_timestep) == -1) {
-                        break;
-                    } 
-
-                    demands_t open_loop_demands = {};
-
-                    getDemands(open_loop_demands);
-
-                    // Throttle control begins when once takeoff is requested, either by
-                    // hitting a button or key ("springy", self-centering throttle) or by
-                    // raising the non-self-centering throttle stick
-                    if (_requested_takeoff) {
-
-                        // "Springy" (self-centering) throttle or keyboard: accumulate 
-                        // altitude target based on stick deflection, and attempt
-                        // to maintain target via PID control
-                        if (isSpringy()) {
-
-                            _thread_data.run_altitude_pid = true;
-
-                            _z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
-
-                            demands->thrust = _z_target;
-                        }
-
-                        // Traditional (non-self-centering) throttle: 
-                        //
-                        //   (1) In throttle deadband (mid position), fix an altitude target
-                        //       and attempt to maintain it via PID control
-                        //
-                        //   (2) Outside throttle deadband, get thrust from stick deflection
-                        else {
-
-                            if (fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND) {
-
-                                _thread_data.run_altitude_pid = true;
-                                demands->thrust = posevals[2];
-                            }
-
-                            else {
-
-                                _thread_data.run_altitude_pid = false;
-                                demands->thrust = open_loop_demands.thrust;
-                            }
-                        }
-                    }
-
-                    auto motorvals = _thread_data.motorvals;
-
-                    const double pos[3] = {posevals[0], posevals[1], posevals[2]};
-                    wb_supervisor_field_set_sf_vec3f(_translation_field, pos);
-
-                    double rot[4] = {};
-                    angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
-                    wb_supervisor_field_set_sf_rotation(_rotation_field, rot);
-
-                    spin_motors(motorvals);
+                if (_z_target == 0) {
+                    _z_target = INITIAL_ALTITUDE_TARGET;
                 }
 
+                demands_t * demands = &_thread_data.demands;
+
+                auto posevals = _thread_data.posevals;
+
+                if (wb_robot_step((int)_timestep) == -1) {
+
+                    return false;
+                } 
+
+                demands_t open_loop_demands = {};
+
+                getDemands(open_loop_demands);
+
+                // Throttle control begins when once takeoff is requested, either by
+                // hitting a button or key ("springy", self-centering throttle) or by
+                // raising the non-self-centering throttle stick
+                if (_requested_takeoff) {
+
+                    // "Springy" (self-centering) throttle or keyboard: accumulate 
+                    // altitude target based on stick deflection, and attempt
+                    // to maintain target via PID control
+                    if (isSpringy()) {
+
+                        _thread_data.run_altitude_pid = true;
+
+                        _z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
+
+                        demands->thrust = _z_target;
+                    }
+
+                    // Traditional (non-self-centering) throttle: 
+                    //
+                    //   (1) In throttle deadband (mid position), fix an altitude target
+                    //       and attempt to maintain it via PID control
+                    //
+                    //   (2) Outside throttle deadband, get thrust from stick deflection
+                    else {
+
+                        if (fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND) {
+
+                            _thread_data.run_altitude_pid = true;
+                            demands->thrust = posevals[2];
+                        }
+
+                        else {
+
+                            _thread_data.run_altitude_pid = false;
+                            demands->thrust = open_loop_demands.thrust;
+                        }
+                    }
+                }
+
+                auto motorvals = _thread_data.motorvals;
+
+                const double pos[3] = {posevals[0], posevals[1], posevals[2]};
+                wb_supervisor_field_set_sf_vec3f(_translation_field, pos);
+
+                double rot[4] = {};
+                angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
+                wb_supervisor_field_set_sf_rotation(_rotation_field, rot);
+
+                spin_motors(motorvals);
+
+                return true;
             }
 
             void close(void)
