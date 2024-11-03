@@ -38,6 +38,7 @@
 
 // Hackflight
 #include <hackflight.hpp>
+#include <mixers.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
 namespace hf {
@@ -366,10 +367,12 @@ namespace hf {
                                     const state_t & state, 
                                     demands_t & demands);
 
-                            run_closed_loop_controllers(1.f/PID_FREQ, state, demands);
+                            run_closed_loop_controllers(
+                                    1.f/PID_FREQ, state, demands);
                         }
 
-                        const auto motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
+                        const auto motor =
+                            min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
                         motors.m1 = motor;
                         motors.m2 = motor;
@@ -380,12 +383,18 @@ namespace hf {
                         state.z = dynamics->x[Dynamics::STATE_Z];
                         state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
 
-                        thread_data->posevals[0] = dynamics->x[Dynamics::STATE_X];
-                        thread_data->posevals[1] = dynamics->x[Dynamics::STATE_Y];
-                        thread_data->posevals[2] = dynamics->x[Dynamics::STATE_Z];
-                        thread_data->posevals[3] = dynamics->x[Dynamics::STATE_PHI];
-                        thread_data->posevals[4] = dynamics->x[Dynamics::STATE_THETA];
-                        thread_data->posevals[5] = dynamics->x[Dynamics::STATE_PSI];
+                        thread_data->posevals[0] =
+                            dynamics->x[Dynamics::STATE_X];
+                        thread_data->posevals[1] =
+                            dynamics->x[Dynamics::STATE_Y];
+                        thread_data->posevals[2] =
+                            dynamics->x[Dynamics::STATE_Z];
+                        thread_data->posevals[3] =
+                            dynamics->x[Dynamics::STATE_PHI];
+                        thread_data->posevals[4] =
+                            dynamics->x[Dynamics::STATE_THETA];
+                        thread_data->posevals[5] =
+                            dynamics->x[Dynamics::STATE_PSI];
                     }
 
                     thread_data->motorvals[0] = motors.m1;
