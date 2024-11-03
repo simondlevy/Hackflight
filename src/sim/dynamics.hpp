@@ -110,17 +110,17 @@ class Dynamics {
         enum {
 
             STATE_X, 
-            STATE_X_DOT, 
+            STATE_DX, 
             STATE_Y, 
-            STATE_Y_DOT, 
+            STATE_DY, 
             STATE_Z, 
-            STATE_Z_DOT,         
+            STATE_DZ,         
             STATE_PHI, 
-            STATE_PHI_DOT, 
+            STATE_DPHI, 
             STATE_THETA, 
-            STATE_THETA_DOT, 
+            STATE_DTHETA, 
             STATE_PSI, 
-            STATE_PSI_DOT
+            STATE_DPSI
 
         } state_e;
 
@@ -198,12 +198,12 @@ class Dynamics {
             else if (_status == STATUS_AIRBORNE) {
 
                 // If we've descended to the ground
-                if (x[STATE_Z] <= 0 and x[STATE_Z_DOT] <= 0) {
+                if (x[STATE_Z] <= 0 and x[STATE_DZ] <= 0) {
 
                     // Big angles indicate a crash
                     const auto phi = x[STATE_PHI];
-                    const auto velx = x[STATE_Y_DOT];
-                    const auto vely = x[STATE_Z_DOT];
+                    const auto velx = x[STATE_DY];
+                    const auto vely = x[STATE_DZ];
                     if ((vely > LANDING_VEL_Y ||
                                 fabs(velx) > LANDING_VEL_X ||
                                 fabs(phi) > LANDING_ANGLE)) {
@@ -214,7 +214,7 @@ class Dynamics {
                     }
 
                     x[STATE_Z] = 0;
-                    x[STATE_Z_DOT] = 0;
+                    x[STATE_DZ] = 0;
                 }
 
                 // Compute the state derivatives using Equation 12
@@ -260,39 +260,39 @@ class Dynamics {
                 const float U4,
                 const float Omega)
         {
-            const auto phidot = x[STATE_PHI_DOT];
-            const auto thedot = x[STATE_THETA_DOT];
-            const auto psidot = x[STATE_PSI_DOT];
+            const auto phidot = x[STATE_DPHI];
+            const auto thedot = x[STATE_DTHETA];
+            const auto psidot = x[STATE_DPSI];
 
-            _dxdt[STATE_X] = x[STATE_X_DOT];
+            _dxdt[STATE_X] = x[STATE_DX];
 
-            _dxdt[STATE_X_DOT] = accelENU[0];
+            _dxdt[STATE_DX] = accelENU[0];
 
-            _dxdt[STATE_Y] = x[STATE_Y_DOT];
+            _dxdt[STATE_Y] = x[STATE_DY];
 
-            _dxdt[STATE_Y_DOT] = accelENU[1];
+            _dxdt[STATE_DY] = accelENU[1];
 
-            _dxdt[STATE_Z] = x[STATE_Z_DOT];
+            _dxdt[STATE_Z] = x[STATE_DZ];
 
-            _dxdt[STATE_Z_DOT] = netz;
+            _dxdt[STATE_DZ] = netz;
 
             _dxdt[STATE_PHI] = phidot;
 
-            _dxdt[STATE_PHI_DOT] = (
+            _dxdt[STATE_DPHI] = (
                     psidot*thedot*(_params.Iy-_params.Iz) /
                     _params.Ix-_params.Jr /
                     _params.Ix*thedot*Omega + U2 / _params.Ix);
 
             _dxdt[STATE_THETA] = thedot;
 
-            _dxdt[STATE_THETA_DOT] =
+            _dxdt[STATE_DTHETA] =
                 -(psidot * phidot * (_params.Iz - _params.Ix) /
                         _params.Iy + _params.Jr / 
                         _params.Iy * phidot * Omega + U3 / _params.Iy);
 
             _dxdt[STATE_PSI] = psidot;
 
-            _dxdt[STATE_PSI_DOT] = (
+            _dxdt[STATE_DPSI] = (
                     thedot*phidot*(_params.Ix-_params.Iy)/_params.Iz +
                     U4/_params.Iz);
         }

@@ -127,16 +127,26 @@ namespace hf {
             state_t getState()
             {
                 return state_t {
-                    _dynamics.x[Dynamics::STATE_X_DOT],
-                    _dynamics.x[Dynamics::STATE_Y_DOT],
+                    _dynamics.x[Dynamics::STATE_DX],
+                    _dynamics.x[Dynamics::STATE_DY],
                     _dynamics.x[Dynamics::STATE_Z],
-                    _dynamics.x[Dynamics::STATE_Z_DOT],
+                    _dynamics.x[Dynamics::STATE_DZ],
                     _dynamics.x[Dynamics::STATE_PHI],
-                    _dynamics.x[Dynamics::STATE_PHI_DOT],
+                    _dynamics.x[Dynamics::STATE_DPHI],
                     _dynamics.x[Dynamics::STATE_THETA],
-                    _dynamics.x[Dynamics::STATE_THETA_DOT],
+                    _dynamics.x[Dynamics::STATE_DTHETA],
                     _dynamics.x[Dynamics::STATE_PSI],
-                    _dynamics.x[Dynamics::STATE_PSI_DOT]
+                    _dynamics.x[Dynamics::STATE_DPSI]
+                };
+            }
+
+            quad_motors_t getMotors() 
+            {
+                return quad_motors_t {
+                    _thread_data.motorvals[0],
+                    _thread_data.motorvals[1],
+                    _thread_data.motorvals[2],
+                    _thread_data.motorvals[3]
                 };
             }
 
@@ -314,7 +324,8 @@ namespace hf {
                 const auto therad = deg2rad(theta);
                 const auto psirad = deg2rad(psi);
 
-                const auto maxang = max3(fabs(phirad), fabs(therad), fabs(psirad));
+                const auto maxang =
+                    max3(fabs(phirad), fabs(therad), fabs(psirad));
 
                 if (maxang == 0) {
                     rs[0] = 0;
@@ -371,7 +382,6 @@ namespace hf {
                             run_closed_loop_controllers(
                                     1.f/PID_FREQ, state, demands);
 
-                            printf("%+3.3f\n", demands.yaw);
                         }
 
                         const auto thrust =
@@ -389,8 +399,16 @@ namespace hf {
                                 motors.m3, 
                                 motors.m4);
 
+                        state.dx = dynamics->x[Dynamics::STATE_DX];
+                        state.dy = dynamics->x[Dynamics::STATE_DY];
                         state.z = dynamics->x[Dynamics::STATE_Z];
-                        state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
+                        state.dz = dynamics->x[Dynamics::STATE_DZ];
+                        state.phi = dynamics->x[Dynamics::STATE_PHI];
+                        state.dphi = dynamics->x[Dynamics::STATE_DPHI];
+                        state.theta = dynamics->x[Dynamics::STATE_THETA];
+                        state.dtheta = dynamics->x[Dynamics::STATE_DTHETA];
+                        state.psi = dynamics->x[Dynamics::STATE_PSI];
+                        state.dpsi = dynamics->x[Dynamics::STATE_DPSI];
 
                         thread_data->posevals[0] =
                             dynamics->x[Dynamics::STATE_X];
@@ -412,6 +430,7 @@ namespace hf {
                     thread_data->motorvals[2] = motors.m3;
                     thread_data->motorvals[3] = motors.m4;
 
+                    // Throw in a delay to sync with the animation
                     usleep(1 / (DYNAMICS_FREQ * 1e-6));
                 }
 

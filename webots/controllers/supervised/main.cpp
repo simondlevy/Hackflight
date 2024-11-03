@@ -57,6 +57,8 @@ namespace hf {
 
 int main(int argc, char ** argv)
 {
+    auto * logfp = fopen("log.csv", "w");
+
     (void)argc;
     (void)argv;
 
@@ -123,6 +125,11 @@ int main(int argc, char ** argv)
                     _run_altitude_pid = false;
                 }
             }
+
+            const auto motors = sim.getMotors();
+
+            fprintf(logfp, "%f,%f,%f,%f,%+f\n",
+                    motors.m1, motors.m2,motors.m3, motors.m4, state.psi);
 
         }    
     }

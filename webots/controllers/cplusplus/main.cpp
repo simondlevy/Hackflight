@@ -124,6 +124,9 @@ int main(int argc, char ** argv)
 
         hf::Mixer::runBetaFlightQuadX(demands, motors);
 
+        printf("%f,%f,%f,%f,%+f\n",
+                motors.m1, motors.m2,motors.m3, motors.m4, state.psi);
+
         sim.setMotors(motors);
     }
 
