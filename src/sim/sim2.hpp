@@ -47,15 +47,15 @@ namespace hf {
 
         public:
 
-            void run(const bool tryJoystick=true)
+            void init(const bool tryJoystick=true)
             {
                 wb_robot_init();
 
-                const auto timestep = wb_robot_get_basic_time_step();
+                _timestep = wb_robot_get_basic_time_step();
 
                 if (tryJoystick) {
 
-                    wb_joystick_enable(timestep);
+                    wb_joystick_enable(_timestep);
                 }
 
                 else {
@@ -63,21 +63,25 @@ namespace hf {
                     printKeyboardInstructions();
                 }
 
-                wb_keyboard_enable(timestep);
+                wb_keyboard_enable(_timestep);
 
-                const auto copter_node = wb_supervisor_node_get_from_def("ROBOT");
+                _copter_node = wb_supervisor_node_get_from_def("ROBOT");
 
-                const auto translation_field =
-                    wb_supervisor_node_get_field(copter_node, "translation");
+                _translation_field =
+                    wb_supervisor_node_get_field(_copter_node, "translation");
 
-                const auto rotation_field =
-                    wb_supervisor_node_get_field(copter_node, "rotation");
+                _rotation_field =
+                    wb_supervisor_node_get_field(_copter_node, "rotation");
 
-                auto motor1 = make_motor("motor1");
-                auto motor2 = make_motor("motor2");
-                auto motor3 = make_motor("motor3");
-                auto motor4 = make_motor("motor4");
+                _motor1 = make_motor("motor1");
+                _motor2 = make_motor("motor2");
+                _motor3 = make_motor("motor3");
+                _motor4 = make_motor("motor4");
 
+            }
+
+            void run()
+            {
                 /*
                 // Spin up the motors for a second before starting dynamics
                 for (long k=0; k < SPINUP_TIME * timestep; ++k) {
@@ -113,7 +117,7 @@ namespace hf {
 
                 while (true) {
 
-                    if (wb_robot_step((int)timestep) == -1) {
+                    if (wb_robot_step((int)_timestep) == -1) {
                         break;
                     } 
 
@@ -163,13 +167,13 @@ namespace hf {
                     auto motorvals = thread_data.motorvals;
 
                     const double pos[3] = {posevals[0], posevals[1], posevals[2]};
-                    wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+                    wb_supervisor_field_set_sf_vec3f(_translation_field, pos);
 
                     double rot[4] = {};
                     angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
-                    wb_supervisor_field_set_sf_rotation(rotation_field, rot);
+                    wb_supervisor_field_set_sf_rotation(_rotation_field, rot);
 
-                    spin_motors(motor1, motor2, motor3, motor4, motorvals);
+                    spin_motors(motorvals);
                 }
 
                 thread_data.running = false;
@@ -225,6 +229,17 @@ namespace hf {
             } thread_data_t;
 
             bool _requested_takeoff;
+
+            double _timestep;
+
+            WbDeviceTag _motor1;
+            WbDeviceTag _motor2;
+            WbDeviceTag _motor3;
+            WbDeviceTag _motor4;
+
+            WbNodeRef _copter_node;
+            WbFieldRef _translation_field;
+            WbFieldRef _rotation_field;
 
             static WbDeviceTag make_motor(const char * name)
             {
@@ -348,16 +363,14 @@ namespace hf {
                 return  ptr;
             }
 
-            static void spin_motors(
-                    WbDeviceTag m1, WbDeviceTag m2, WbDeviceTag m3, WbDeviceTag m4,
-                    const float motorvals[4])
+            void spin_motors(const float motorvals[4])
             {
                 // Negate expected direction to accommodate Webots
                 // counterclockwise positive
-                wb_motor_set_velocity(m1, -motorvals[0]);
-                wb_motor_set_velocity(m2, +motorvals[1]);
-                wb_motor_set_velocity(m3, +motorvals[2]);
-                wb_motor_set_velocity(m4, -motorvals[3]);
+                wb_motor_set_velocity(_motor1, -motorvals[0]);
+                wb_motor_set_velocity(_motor2, +motorvals[1]);
+                wb_motor_set_velocity(_motor3, +motorvals[2]);
+                wb_motor_set_velocity(_motor4, -motorvals[3]);
             }
 
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {

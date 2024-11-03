@@ -25,6 +25,8 @@ int main(int argc, char ** argv)
 
     hf::Simulator sim = {};
 
+    sim.init();
+
     sim.run();
 
     return 0;
