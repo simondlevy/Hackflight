@@ -26,13 +26,13 @@ namespace hf {
      * State vector as defined in Bouabdallah, Murrieri, and Siegwart (2004), with the following
      * modifications:
      *    
-     * We don't encode absolute position X, Y
-     * 
      * Linear velocities dX/dt, dY/dt are in body coordinates
      */ 
     typedef struct {
 
+        float x;
         float dx;
+        float y;
         float dy;
         float z;
         float dz;

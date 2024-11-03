@@ -151,6 +151,7 @@ namespace hf {
 
                 if (fullMonty) {
 
+                    /*
                     // Read rangefinder, non-blocking
                     const uint16_t range = _vl53l1.read(false);
 
@@ -161,8 +162,7 @@ namespace hf {
                     _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
                         //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
-                    }
-
+                    }*/
                 }
 
                 // Get angular velocities directly from gyro
