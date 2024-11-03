@@ -111,13 +111,13 @@ namespace hf {
 
                 auto posevals = thread_data.posevals;
 
-                demands_t open_loop_demands = {};
-
                 while (true) {
 
                     if (wb_robot_step((int)timestep) == -1) {
                         break;
                     } 
+
+                    demands_t open_loop_demands = {};
 
                     getDemands(open_loop_demands);
 
@@ -132,8 +132,8 @@ namespace hf {
                         if (isSpringy()) {
 
                             z_target += CLIMB_RATE_SCALE * open_loop_demands.thrust;
-                            printf("%f\n", z_target);
-                            //demands->thrust = z_target;
+
+                            demands->thrust = z_target;
                         }
 
                         // Traditional (non-self-centering) throttle: 
