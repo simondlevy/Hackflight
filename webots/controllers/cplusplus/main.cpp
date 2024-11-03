@@ -88,7 +88,6 @@ int main(int argc, char ** argv)
                 z_target += CLIMB_RATE_SCALE * demands.thrust;
                 demands.thrust = z_target;
                 altitudePid.run(DT, state, demands);
-                demands.thrust += THRUST_BASE;
             }
 
             // Traditional (non-self-centering) throttle: 
@@ -107,9 +106,9 @@ int main(int argc, char ** argv)
                     demands.thrust = z_target;
                     altitudePid.run(DT, state, demands);
                 }
-                demands.thrust += THRUST_BASE;
             }
 
+            demands.thrust += THRUST_BASE;
         }
 
         hf::PositionPid::run(state, demands);

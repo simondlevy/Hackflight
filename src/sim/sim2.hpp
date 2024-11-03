@@ -146,12 +146,12 @@ namespace hf {
 
                             static bool _was_in_deadband;
 
-                            const auto in_deadband = fabs(demands->thrust) < THROTTLE_DEADBAND;
+                            const auto in_deadband = fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND;
 
                             z_target =
                                 in_deadband && !_was_in_deadband ?
                                 posevals[2] :
-                                z_target;
+                                open_loop_demands.thrust;
 
                             _was_in_deadband = in_deadband;
 
@@ -316,8 +316,6 @@ namespace hf {
 
                         // Altitude PID controller converts target to thrust demand
                         altitudePid.run(DYNAMICS_DT, state, demands);
-
-                        //demands.thrust += THRUST_BASE;
                     }
 
                     motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
