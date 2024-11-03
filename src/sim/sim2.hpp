@@ -347,8 +347,6 @@ namespace hf {
 
                 auto dynamics = thread_data->dynamics;
 
-                AltitudePid altitudePid = {};
-
                 state_t state  = {};
 
                 demands_t demands = {};
@@ -368,10 +366,12 @@ namespace hf {
                             demands.pitch = open_loop_demands.pitch; 
                             demands.yaw = open_loop_demands.yaw;
 
-                            // Altitude PID controller converts target to thrust demand
-                            if (thread_data->run_altitude_pid) {
-                                altitudePid.run(DYNAMICS_DT, state, demands);
-                            }
+                            extern void run_pid_controllers(
+                                    const float dt,
+                                    const state_t & state, 
+                                    demands_t & demands);
+
+                            run_pid_controllers(DYNAMICS_DT, state, demands);
                         }
 
                         motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);

@@ -17,6 +17,7 @@
  */
 
 #include <sim/sim2.hpp>
+#include <pids/altitude.hpp>
 
 static const float YAW_PRESCALE = 160; // deg/sec
 
@@ -32,6 +33,21 @@ static const float PITCH_ROLL_POST_SCALE = 50;
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 static const float CLIMB_RATE_SCALE = 0.01;
 
+static bool _run_altitude_pid;
+
+namespace hf {
+
+    static AltitudePid _altitudePid;
+
+    void run_pid_controllers(
+            const float dt, const state_t & state, demands_t & demands)
+    {
+        if (_run_altitude_pid) {
+            _altitudePid.run(dt, state, demands);
+        }
+    }
+}
+
 int main(int argc, char ** argv)
 {
     (void)argc;
@@ -45,13 +61,13 @@ int main(int argc, char ** argv)
     // throttle
     float z_target = INITIAL_ALTITUDE_TARGET;
 
-    bool run_altitude_pid = true;
+    _run_altitude_pid = true;
 
     hf::demands_t demands = {};
 
     while (true) {
 
-        if (!sim.step(demands, run_altitude_pid)) {
+        if (!sim.step(demands, _run_altitude_pid)) {
             break;
         }
 
@@ -90,14 +106,14 @@ int main(int argc, char ** argv)
 
                     demands.thrust = state.z;
 
-                    run_altitude_pid = true;
+                    _run_altitude_pid = true;
                 }
 
                 else {
 
                     demands.thrust = open_loop_demands.thrust;
 
-                    run_altitude_pid = false;
+                    _run_altitude_pid = false;
                 }
             }
 
