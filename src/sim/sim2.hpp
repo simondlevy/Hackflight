@@ -146,15 +146,10 @@ namespace hf {
                         //   (2) Outside throttle deadband, get thrust from stick deflection
                         else {
 
-                            static bool _was_in_deadband;
-
-                            const auto in_deadband = fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND;
-
-                            if (in_deadband) {
+                            if (fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND) {
 
                                 thread_data.run_altitude_pid = true;
                                 demands->thrust = posevals[2];
-                                printf("%f\n", demands->thrust);
                             }
 
                             else {
