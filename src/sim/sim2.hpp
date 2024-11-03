@@ -351,8 +351,6 @@ namespace hf {
 
                 for (long k=0; thread_data->running; k++) {
 
-                    const float dynamics_dt = 1.f / DYNAMICS_FREQ;
-
                     if (thread_data->requested_takeoff) {
 
                         if (k % (DYNAMICS_FREQ / PID_FREQ) == 0) {
@@ -366,7 +364,7 @@ namespace hf {
                                     const state_t & state, 
                                     demands_t & demands);
 
-                            run_closed_loop_controllers(dynamics_dt, state, demands);
+                            run_closed_loop_controllers(1.f/PID_FREQ, state, demands);
                         }
 
                         motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
@@ -388,7 +386,7 @@ namespace hf {
                     thread_data->motorvals[2] = motor;
                     thread_data->motorvals[3] = motor;
 
-                    usleep(dynamics_dt / 1e-6);
+                    usleep((1.f / DYNAMICS_FREQ) / 1e-6);
                 }
 
                 return  ptr;
