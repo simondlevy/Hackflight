@@ -212,9 +212,9 @@ namespace hf {
 
             static constexpr float THRUST_BASE = 55.385;
 
-            static constexpr float DYNAMICS_FREQ = 1e4;
+            static const uint32_t DYNAMICS_FREQ = 10000;
 
-            static const uint32_t PID_PERIOD = 1000;
+            static const uint32_t PID_FREQ = 10;
 
             static constexpr float MOTOR_MAX = 60;
 
@@ -248,7 +248,7 @@ namespace hf {
 
             } thread_data_t;
 
-             Dynamics _dynamics = Dynamics(tinyquad_params, 1/DYNAMICS_FREQ);
+             Dynamics _dynamics = Dynamics(tinyquad_params, 1.f/DYNAMICS_FREQ);
 
             bool _requested_takeoff;
 
@@ -343,11 +343,13 @@ namespace hf {
 
                 for (long k=0; thread_data->running; k++) {
 
-                    const float dynamics_dt = 1 / DYNAMICS_FREQ;
+                    const float dynamics_dt = 1.f / DYNAMICS_FREQ;
 
                     if (thread_data->requested_takeoff) {
 
-                        if (k % PID_PERIOD == 0) {
+                        const uint32_t pid_period = DYNAMICS_FREQ / PID_FREQ;
+
+                        if (k % pid_period == 0) {
 
                             // Start with open-loop demands from main thread
                             demands_t open_loop_demands = thread_data->demands;
