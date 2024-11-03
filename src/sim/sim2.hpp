@@ -88,6 +88,8 @@ namespace hf {
             {
                 _thread_data.run_altitude_pid = run_altitude_pid;
 
+                _thread_data.requested_takeoff = _requested_takeoff;
+
                 /*
                 // Spin up the motors for a second before starting dynamics
                 for (long k=0; k < SPINUP_TIME * timestep; ++k) {
@@ -109,14 +111,12 @@ namespace hf {
 
                 memcpy(&_thread_data.demands, &open_loop_demands, sizeof(demands_t));
 
-                auto posevals = _thread_data.posevals;
-
                 if (wb_robot_step((int)_timestep) == -1) {
 
                     return false;
                 } 
 
-                auto motorvals = _thread_data.motorvals;
+                auto posevals = _thread_data.posevals;
 
                 const double pos[3] = {posevals[0], posevals[1], posevals[2]};
                 wb_supervisor_field_set_sf_vec3f(_translation_field, pos);
@@ -124,6 +124,8 @@ namespace hf {
                 double rot[4] = {};
                 angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
                 wb_supervisor_field_set_sf_rotation(_rotation_field, rot);
+
+                const auto motorvals = _thread_data.motorvals;
 
                 spin_motors(motorvals);
 
@@ -269,6 +271,7 @@ namespace hf {
 
                 Dynamics * dynamics;
                 bool run_altitude_pid;
+                bool requested_takeoff;
                 demands_t demands;
                 float posevals[6];
                 float motorvals[4];
@@ -373,42 +376,41 @@ namespace hf {
 
                 for (long k=0; thread_data->running; k++) {
 
-                    if (k % PID_PERIOD == 0) {
+                    if (thread_data->requested_takeoff) {
 
-                        // Start with open-loop demands from main thread
-                        demands_t open_loop_demands = thread_data->demands;
-                        demands.thrust = open_loop_demands.thrust; 
-                        demands.roll = open_loop_demands.roll; 
-                        demands.pitch = open_loop_demands.pitch; 
-                        demands.yaw = open_loop_demands.yaw;
+                        if (k % PID_PERIOD == 0) {
 
-                        // Altitude PID controller converts target to thrust demand
-                        if (thread_data->run_altitude_pid) {
-                            altitudePid.run(DYNAMICS_DT, state, demands);
+                            // Start with open-loop demands from main thread
+                            demands_t open_loop_demands = thread_data->demands;
+                            demands.thrust = open_loop_demands.thrust; 
+                            demands.roll = open_loop_demands.roll; 
+                            demands.pitch = open_loop_demands.pitch; 
+                            demands.yaw = open_loop_demands.yaw;
+
+                            // Altitude PID controller converts target to thrust demand
+                            if (thread_data->run_altitude_pid) {
+                                altitudePid.run(DYNAMICS_DT, state, demands);
+                            }
                         }
+
+                        motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
+
+                        dynamics->setMotors(motor, motor, motor, motor);
+                        state.z = dynamics->x[Dynamics::STATE_Z];
+                        state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
+
+                        thread_data->posevals[0] = dynamics->x[Dynamics::STATE_X];
+                        thread_data->posevals[1] = dynamics->x[Dynamics::STATE_Y];
+                        thread_data->posevals[2] = dynamics->x[Dynamics::STATE_Z];
+                        thread_data->posevals[3] = dynamics->x[Dynamics::STATE_PHI];
+                        thread_data->posevals[4] = dynamics->x[Dynamics::STATE_THETA];
+                        thread_data->posevals[5] = dynamics->x[Dynamics::STATE_PSI];
                     }
 
-                    motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
-
-                    dynamics->setMotors(motor, motor, motor, motor);
-                    state.z = dynamics->x[Dynamics::STATE_Z];
-                    state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
-
-                    auto posevals = thread_data->posevals;
-
-                    posevals[0] = dynamics->x[Dynamics::STATE_X];
-                    posevals[1] = dynamics->x[Dynamics::STATE_Y];
-                    posevals[2] = dynamics->x[Dynamics::STATE_Z];
-                    posevals[3] = dynamics->x[Dynamics::STATE_PHI];
-                    posevals[4] = dynamics->x[Dynamics::STATE_THETA];
-                    posevals[5] = dynamics->x[Dynamics::STATE_PSI];
-
-                    auto motorvals = thread_data->motorvals;
-
-                    motorvals[0] = motor;
-                    motorvals[1] = motor;
-                    motorvals[2] = motor;
-                    motorvals[3] = motor;
+                    thread_data->motorvals[0] = motor;
+                    thread_data->motorvals[1] = motor;
+                    thread_data->motorvals[2] = motor;
+                    thread_data->motorvals[3] = motor;
 
                     usleep(DYNAMICS_DT / 1e-6);
                 }
