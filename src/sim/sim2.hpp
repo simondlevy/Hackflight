@@ -111,11 +111,11 @@ namespace hf {
                 // throttle
                 float z_target = INITIAL_ALTITUDE_TARGET;
 
-                demands_t * demands = &thread_data.demands;
-
-                auto posevals = thread_data.posevals;
-
                 while (true) {
+
+                    demands_t * demands = &thread_data.demands;
+
+                    auto posevals = thread_data.posevals;
 
                     if (wb_robot_step((int)_timestep) == -1) {
                         break;
