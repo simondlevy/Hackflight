@@ -81,7 +81,8 @@ namespace hf {
                 // Start the dynamics thread
                 _thread_data.running = true;
                 _thread_data.dynamics = &_dynamics;
-                pthread_create(&_thread, NULL, *thread_fun, (void *)&_thread_data);
+                pthread_create(
+                        &_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
 
             bool step(demands_t & open_loop_demands)
@@ -371,15 +372,15 @@ namespace hf {
                                     1.f/PID_FREQ, state, demands);
                         }
 
-                        const auto motor =
+                        const auto thrust =
                             min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
-                        motors.m1 = motor;
-                        motors.m2 = motor;
-                        motors.m3 = motor;
-                        motors.m4 = motor;
+                        motors.m1 = thrust;
+                        motors.m2 = thrust;
+                        motors.m3 = thrust;
+                        motors.m4 = thrust;
 
-                        dynamics->setMotors(motor, motor, motor, motor);
+                        dynamics->setMotors(thrust, thrust, thrust, thrust);
                         state.z = dynamics->x[Dynamics::STATE_Z];
                         state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
 
