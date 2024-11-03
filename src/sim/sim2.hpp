@@ -19,22 +19,11 @@
 
 #pragma once
 
-#include <sys/time.h>
-#include <math.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
-#include <strings.h>
+#include <pthread.h>
 #include <unistd.h>
 
-#include <map>
-#include <string>
-
-#include <utils.hpp>
-
-#include <webots/camera.h>
-#include <webots/joystick.h>
-#include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
 #include <webots/supervisor.h>
@@ -43,355 +32,227 @@
 #include <pids/altitude.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
-namespace hf {
 
-    class Simulator {
+class Simulator {
 
-        public:
 
-            void init(const bool tryJoystick=true)
-            {
-                wb_robot_init();
+    public:
 
-                _timestep = wb_robot_get_basic_time_step();
+        void run()
+        {
+            wb_robot_init();
 
-                _camera = _makeSensor("camera",
-                        _timestep, wb_camera_enable);
+            const auto copter_node = wb_supervisor_node_get_from_def("ROBOT");
 
-                if (tryJoystick) {
+            const auto translation_field =
+                wb_supervisor_node_get_field(copter_node, "translation");
 
-                    wb_joystick_enable(_timestep);
+            const auto rotation_field =
+                wb_supervisor_node_get_field(copter_node, "rotation");
+
+            const auto timestep = wb_robot_get_basic_time_step();
+
+            auto motor1 = make_motor("motor1");
+            auto motor2 = make_motor("motor2");
+            auto motor3 = make_motor("motor3");
+            auto motor4 = make_motor("motor4");
+
+            // Spin up the motors for a second before starting dynamics
+            for (long k=0; k < SPINUP_TIME * timestep; ++k) {
+
+                if (wb_robot_step((int)timestep) == -1) {
+                    break;
+                } 
+
+                const float motorvals[4] = {
+                    MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
+                };
+
+                spin_motors(motor1, motor2, motor3, motor4, motorvals);
+
+                // Keep the vehicle on the ground
+                const double pos[3] = {};
+                wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+            }
+
+            // Start the dynamics thread
+            thread_data_t thread_data = {};
+            thread_data.running = true;
+            pthread_t thread = {};
+            pthread_create(&thread, NULL, *thread_fun, (void *)&thread_data);
+
+            while (true) {
+
+                if (wb_robot_step((int)timestep) == -1) {
+                    break;
+                } 
+
+                auto motorvals = thread_data.motorvals;
+
+                auto posevals = thread_data.posevals;
+
+                const double pos[3] = {posevals[0], posevals[1], posevals[2]};
+                wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+
+                double rot[4] = {};
+                angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
+                wb_supervisor_field_set_sf_rotation(rotation_field, rot);
+
+                spin_motors(motor1, motor2, motor3, motor4, motorvals);
+            }
+
+            thread_data.running = false;
+
+            pthread_join(thread, NULL);
+        }
+
+    private:
+
+        static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
+
+        static constexpr float THRUST_BASE = 55.385;
+
+        static constexpr float DYNAMICS_DT = 1e-4;
+
+        static const uint32_t PID_PERIOD = 1000;
+
+        static constexpr float MOTOR_MAX = 60;
+
+        static constexpr float SPINUP_TIME = 2;
+
+        typedef struct {
+
+            float posevals[6];
+            float motorvals[4];
+            bool running;
+
+        } thread_data_t;
+
+        static WbDeviceTag make_motor(const char * name)
+        {
+            auto motor = wb_robot_get_device(name);
+
+            wb_motor_set_position(motor, INFINITY);
+
+            return motor;
+        }
+
+        static float deg2rad(const float deg)
+        {
+            return M_PI * deg / 180;
+        }
+
+        static float max3(const float a, const float b, const float c)
+        {
+            return
+                a > b && a > c ? a :
+                b > a && b > c ? b :
+                c;
+        }
+
+        static float sign(const float val)
+        {
+            return val < 0 ? -1 : +1;
+        }
+
+        static float scale(const float angle, const float maxang)
+        {
+            return sign(angle) * sqrt(fabs(angle) / maxang);
+        }
+
+        static void angles_to_rotation(
+                const float phi, const float theta, const float psi,
+                double rs[4])
+        {
+            const auto phirad = deg2rad(phi);
+            const auto therad = deg2rad(theta);
+            const auto psirad = deg2rad(psi);
+
+            const auto maxang = max3(fabs(phirad), fabs(therad), fabs(psirad));
+
+            if (maxang == 0) {
+                rs[0] = 0;
+                rs[1] = 0;
+                rs[2] = 1;
+                rs[3] = 0;
+            }
+
+            else {
+
+                rs[0] = scale(phi, maxang);
+                rs[1] = scale(theta, maxang);
+                rs[2] = scale(psi, maxang);
+                rs[3] = maxang;
+            }
+        }
+
+        static float min(const float val, const float maxval)
+        {
+            return val > maxval ? maxval : val;
+        }
+
+        static void * thread_fun(void *ptr)
+        {
+            auto thread_data = (thread_data_t *)ptr;
+
+            auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
+
+            hf::AltitudePid altitudePid = {};
+            hf::state_t state  = {};
+            hf::demands_t demands = {};
+
+            float motor = 0;
+
+            for (long k=0; thread_data->running; k++) {
+
+                if (k % PID_PERIOD == 0) {
+
+                    // Reset thrust demand to altitude target
+                    demands.thrust = INITIAL_ALTITUDE_TARGET;
+
+                    // Altitude PID controller converts target to thrust demand
+                    altitudePid.run(DYNAMICS_DT, state, demands);
                 }
 
-                else {
+                motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
-                    printKeyboardInstructions();
-                }
+                dynamics.setMotors(motor, motor, motor, motor);
+                state.z = dynamics.x[Dynamics::STATE_Z];
+                state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
 
-                wb_keyboard_enable(_timestep);
+                auto posevals = thread_data->posevals;
 
-                _motor1 = _makeMotor("motor1");
-                _motor2 = _makeMotor("motor2");
-                _motor3 = _makeMotor("motor3");
-                _motor4 = _makeMotor("motor4");
+                posevals[0] = dynamics.x[Dynamics::STATE_X];
+                posevals[1] = dynamics.x[Dynamics::STATE_Y];
+                posevals[2] = dynamics.x[Dynamics::STATE_Z];
+                posevals[3] = dynamics.x[Dynamics::STATE_PHI];
+                posevals[4] = dynamics.x[Dynamics::STATE_THETA];
+                posevals[5] = dynamics.x[Dynamics::STATE_PSI];
 
-                // Step simulator once to get initial position
-                step();
+                auto motorvals = thread_data->motorvals;
+
+                motorvals[0] = motor;
+                motorvals[1] = motor;
+                motorvals[2] = motor;
+                motorvals[3] = motor;
+
+                usleep(DYNAMICS_DT / 1e-6);
             }
 
-            bool step(void)
-            {
-                return wb_robot_step((int)_timestep) != -1;
-            }
+            return  ptr;
+        }
+
+        static void spin_motors(
+                WbDeviceTag m1, WbDeviceTag m2, WbDeviceTag m3, WbDeviceTag m4,
+                const float motorvals[4])
+        {
+            // Negate expected direction to accommodate Webots
+            // counterclockwise positive
+            wb_motor_set_velocity(m1, -motorvals[0]);
+            wb_motor_set_velocity(m2, +motorvals[1]);
+            wb_motor_set_velocity(m3, +motorvals[2]);
+            wb_motor_set_velocity(m4, -motorvals[3]);
+        }
+};
 
-            demands_t getDemandsFromKeyboard()
-            {
-                static bool spacebar_was_hit;
 
-                demands_t demands = {};
-
-                switch (wb_keyboard_get_key()) {
-
-                    case WB_KEYBOARD_UP:
-                        demands.pitch = +1.0;
-                        break;
-
-                    case WB_KEYBOARD_DOWN:
-                        demands.pitch = -1.0;
-                        break;
-
-                    case WB_KEYBOARD_RIGHT:
-                        demands.roll = +1.0;
-                        break;
-
-                    case WB_KEYBOARD_LEFT:
-                        demands.roll = -1.0;
-                        break;
-
-                    case 'Q':
-                        demands.yaw = -1.0;
-                        break;
-
-                    case 'E':
-                        demands.yaw = +1.0;
-                        break;
-
-                    case 'W':
-                        demands.thrust = +1.0;
-                        break;
-
-                    case 'S':
-                        demands.thrust = -1.0;
-                        break;
-
-                    case 32:
-                        spacebar_was_hit = true;
-                        break;
-                }
-
-                _requested_takeoff = spacebar_was_hit;
-
-                _time = _requested_takeoff ? _tick++ * _timestep / 1000 : 0;
-
-                return demands;
-            }
-
-            bool requestedTakeoff(void)
-            {
-                return _requested_takeoff;
-            }
-
-            demands_t getDemands()
-            {
-                demands_t demands = {};
-
-                auto joystickStatus = haveJoystick();
-
-                if (joystickStatus == JOYSTICK_RECOGNIZED) {
-
-                    auto axes = getJoystickInfo();
-
-                    demands.thrust =
-                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                    // Springy throttle stick; keep in interval [-1,+1]
-                    if (axes.springy) {
-
-                        static bool button_was_hit;
-
-                        if (wb_joystick_get_pressed_button() == 5) {
-                            button_was_hit = true;
-                        }
-
-                        _requested_takeoff = button_was_hit;
-
-                        // Run throttle stick through deadband
-                        demands.thrust =
-                            fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
-                    }
-
-                    else {
-
-                        static float throttle_prev;
-                        static bool throttle_was_moved;
-
-                        // Handle bogus throttle values on startup
-                        if (throttle_prev != demands.thrust) {
-                            throttle_was_moved = true;
-                        }
-
-                        _requested_takeoff = throttle_was_moved;
-
-                        throttle_prev = demands.thrust;
-                    }
-
-                    demands.roll = readJoystickAxis(axes.roll);
-                    demands.pitch = readJoystickAxis(axes.pitch); 
-                    demands.yaw = readJoystickAxis(axes.yaw);
-                }
-
-                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                    reportJoystick();
-                }
-
-                else { 
-
-                    demands = getDemandsFromKeyboard();
-
-                }
-
-                return demands;
-            }
-
-
-            state_t getState()
-            {
-                state_t state = {};
-
-                return state;
-             }
-
-            bool isSpringy()
-            {
-                return haveJoystick() == JOYSTICK_RECOGNIZED ?
-                    getJoystickInfo().springy :
-                    true; // keyboard
-            }
-
-            float time()
-            {
-                return _time;
-            }
-
-            void setMotors(const quad_motors_t & motors)
-            {
-                // Negate expected direction to accommodate Webots
-                // counterclockwise positive
-                wb_motor_set_velocity(_motor1, -motors.m1);
-                wb_motor_set_velocity(_motor2, +motors.m2);
-                wb_motor_set_velocity(_motor3, +motors.m3);
-                wb_motor_set_velocity(_motor4, -motors.m4);
-            }
-
-            void close(void)
-            {
-                wb_robot_cleanup();
-            }
-
-        private:
-
-            typedef enum {
-
-                JOYSTICK_NONE,
-                JOYSTICK_UNRECOGNIZED,
-                JOYSTICK_RECOGNIZED
-
-            } joystickStatus_e;
-
-            double _timestep;
-
-            float  _time;
-
-            uint32_t _tick;
-
-            WbDeviceTag _motor1;
-            WbDeviceTag _motor2;
-            WbDeviceTag _motor3;
-            WbDeviceTag _motor4;
-
-            WbDeviceTag _camera;
-
-            typedef struct {
-
-                int8_t throttle;
-                int8_t roll;
-                int8_t pitch;
-                int8_t yaw;
-
-                bool springy;                
-
-            } joystick_t;
-
-            std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-                // Springy throttle
-                { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystick_t {-2,  3, -4, 1, true } },
-                { "SHANWAN Android Gamepad",             // PS3
-                    joystick_t {-2,  3, -4, 1, true } },
-                { "Logitech Gamepad F310",
-                    joystick_t {-2,  4, -5, 1, true } },
-
-                // Classic throttle
-                { "Logitech Logitech Extreme 3D",
-                    joystick_t {-4,  1, -2, 3, false}  },
-                { "OpenTX FrSky Taranis Joystick",  // USB cable
-                    joystick_t { 1,  2,  3, 4, false } },
-                { "FrSky FrSky Simulator",          // radio dongle
-                    joystick_t { 1,  2,  3, 4, false } },
-                { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystick_t { 2,  -3,  4, -1, false } }
-            };
-
-            static float normalizeJoystickAxis(const int32_t rawval)
-            {
-                return 2.0f * rawval / UINT16_MAX; 
-            }
-
-            static int32_t readJoystickRaw(const int8_t index)
-            {
-                const auto axis = abs(index) - 1;
-                const auto sign = index < 0 ? -1 : +1;
-                return sign * wb_joystick_get_axis_value(axis);
-            }
-
-            static float readJoystickAxis(const int8_t index)
-            {
-                return normalizeJoystickAxis(readJoystickRaw(index));
-            }
-
-            bool _requested_takeoff;
-
-            joystick_t getJoystickInfo() 
-            {
-                return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-            }
-
-            joystickStatus_e haveJoystick(void)
-            {
-                auto status = JOYSTICK_RECOGNIZED;
-
-                auto joyname = wb_joystick_get_model();
-
-                // No joystick
-                if (joyname == NULL) {
-
-                    static bool _didWarn;
-
-                    if (!_didWarn) {
-                        puts("Using keyboard instead:\n");
-                        printKeyboardInstructions();
-                    }
-
-                    _didWarn = true;
-
-                    status = JOYSTICK_NONE;
-                }
-
-                // Joystick unrecognized
-                else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
-
-                    status = JOYSTICK_UNRECOGNIZED;
-                }
-
-                return status;
-            }
-
-            static void reportJoystick(void)
-            {
-                printf("Unrecognized joystick '%s' with axes ",
-                        wb_joystick_get_model()); 
-
-                for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
-
-                    printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
-                }
-            }
-
-            static WbDeviceTag _makeMotor(const char * name)
-            {
-                auto motor = wb_robot_get_device(name);
-
-                wb_motor_set_position(motor, INFINITY);
-
-                return motor;
-            }
-
-            static WbDeviceTag _makeSensor(
-                    const char * name, 
-                    const uint32_t timestep,
-                    void (*f)(WbDeviceTag tag, int sampling_period))
-            {
-                auto sensor = wb_robot_get_device(name);
-                f(sensor, timestep);
-                return sensor;
-            }
-
-            static void printKeyboardInstructions()
-            {
-                puts("- Use spacebar to take off\n");
-                puts("- Use W and S to go up and down\n");
-                puts("- Use arrow keys to move horizontally\n");
-                puts("- Use Q and E to change heading\n");
-            }
-
-            static double timesec()
-            {
-                struct timeval tv = {};
-                gettimeofday(&tv, NULL);
-                return tv.tv_sec + tv.tv_usec / 1e6;
-
-            }
-    };
-
-}

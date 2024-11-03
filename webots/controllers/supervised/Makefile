@@ -17,7 +17,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I$(SRCDIR)
 
-NAME = kinematic
+NAME = supervised
 
 CXX_SOURCES = main.cpp
 
