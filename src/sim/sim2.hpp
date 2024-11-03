@@ -80,8 +80,8 @@ namespace hf {
 
                 // Start the dynamics thread
                 _thread_data.running = true;
+                _thread_data.dynamics = &_dynamics;
                 pthread_create(&_thread, NULL, *thread_fun, (void *)&_thread_data);
-
             }
 
             bool step()
@@ -224,6 +224,7 @@ namespace hf {
 
             typedef struct {
 
+                Dynamics * dynamics;
                 bool run_altitude_pid;
                 demands_t demands;
                 float posevals[6];
@@ -231,6 +232,8 @@ namespace hf {
                 bool running;
 
             } thread_data_t;
+
+             Dynamics _dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
 
             bool _requested_takeoff;
 
@@ -315,7 +318,7 @@ namespace hf {
             {
                 auto thread_data = (thread_data_t *)ptr;
 
-                auto dynamics = Dynamics(tinyquad_params, DYNAMICS_DT);
+                auto dynamics = thread_data->dynamics;
 
                 AltitudePid altitudePid = {};
 
@@ -344,18 +347,18 @@ namespace hf {
 
                     motor = min(demands.thrust + THRUST_BASE, MOTOR_MAX);
 
-                    dynamics.setMotors(motor, motor, motor, motor);
-                    state.z = dynamics.x[Dynamics::STATE_Z];
-                    state.dz = dynamics.x[Dynamics::STATE_Z_DOT];
+                    dynamics->setMotors(motor, motor, motor, motor);
+                    state.z = dynamics->x[Dynamics::STATE_Z];
+                    state.dz = dynamics->x[Dynamics::STATE_Z_DOT];
 
                     auto posevals = thread_data->posevals;
 
-                    posevals[0] = dynamics.x[Dynamics::STATE_X];
-                    posevals[1] = dynamics.x[Dynamics::STATE_Y];
-                    posevals[2] = dynamics.x[Dynamics::STATE_Z];
-                    posevals[3] = dynamics.x[Dynamics::STATE_PHI];
-                    posevals[4] = dynamics.x[Dynamics::STATE_THETA];
-                    posevals[5] = dynamics.x[Dynamics::STATE_PSI];
+                    posevals[0] = dynamics->x[Dynamics::STATE_X];
+                    posevals[1] = dynamics->x[Dynamics::STATE_Y];
+                    posevals[2] = dynamics->x[Dynamics::STATE_Z];
+                    posevals[3] = dynamics->x[Dynamics::STATE_PHI];
+                    posevals[4] = dynamics->x[Dynamics::STATE_THETA];
+                    posevals[5] = dynamics->x[Dynamics::STATE_PSI];
 
                     auto motorvals = thread_data->motorvals;
 
