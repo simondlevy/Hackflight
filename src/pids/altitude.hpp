@@ -30,7 +30,6 @@ namespace hf {
                     const bool throttleIsSpringy,
                     const float dt,
                     const state_t & state,
-                    const demands_t & open_loop_demands,
                     demands_t & demands)
             {
                 // "Springy" (self-centering) throttle or keyboard: accumulate 
@@ -38,7 +37,7 @@ namespace hf {
                 // to maintain target via PID control
                 if (throttleIsSpringy) {
 
-                    _z_target += dt * open_loop_demands.thrust;
+                    _z_target += dt * demands.thrust;
                     demands.thrust = _z_target;
                     _run(dt, state, demands);
                 }
@@ -52,7 +51,7 @@ namespace hf {
                 else {
 
                     static bool _was_in_deadband;
-                    const auto in_deadband = fabs(open_loop_demands.thrust) < THROTTLE_DEADBAND;
+                    const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
                     _z_target = in_deadband && !_was_in_deadband ? state.z : _z_target;
 
                     _was_in_deadband = in_deadband;
@@ -62,7 +61,7 @@ namespace hf {
                         _run(dt, state, demands);
                     }
                     else {
-                        demands.thrust = open_loop_demands.thrust;
+                        demands.thrust = demands.thrust;
                     }
                 }
             }

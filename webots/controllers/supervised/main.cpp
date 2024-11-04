@@ -32,7 +32,7 @@ namespace hf {
     void run_closed_loop_controllers(
             const float dt, const state_t & state, demands_t & demands)
     {
-        _altitudePid.run(_sim.isSpringy(), dt, state, demands, demands);
+        _altitudePid.run(_sim.isSpringy(), dt, state, demands);
 
         _yawRatePid.run(dt, false, state, demands);
     }

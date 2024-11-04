@@ -77,7 +77,7 @@ int main(int argc, char ** argv)
         // raising the non-self-centering throttle stick
         if (sim.requestedTakeoff()) {
 
-            altitudePid.run(sim.isSpringy(), DT, state, demands, demands);
+            altitudePid.run(sim.isSpringy(), DT, state, demands);
 
             demands.thrust += THRUST_BASE;
         }
