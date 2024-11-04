@@ -309,7 +309,7 @@ namespace hf {
 
                     rs[0] = scale(phi, maxang);
                     rs[1] = scale(theta, maxang);
-                    rs[2] = scale(psi, maxang);
+                    rs[2] = scale(-psi, maxang); // negate for nose-right positive
                     rs[3] = maxang;
                 }
             }

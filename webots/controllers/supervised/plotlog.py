@@ -34,7 +34,7 @@ plt.plot(time, data[:,6])
 plt.ylabel('dpsi/dt (deg / sec)')
 
 plt.subplot(4, 1, 4)
-plt.plot(time, data[:,6])
+plt.plot(time, data[:,7])
 plt.ylabel('psi (deg)')
 
 
