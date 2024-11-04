@@ -31,9 +31,6 @@ static const float DT = 0.01;
 
 static const float THROTTLE_DOWN = 0.06;
 
-static const float THROTTLE_DEADBAND = 0.2;
-
-
 int main(int argc, char ** argv)
 {
     (void)argc;

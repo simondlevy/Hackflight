@@ -44,7 +44,7 @@ thrust_base = 55.385 :: SFloat
 
 dt = 0.01 :: SFloat
 
-pitch_roll_post_scale = 30 :: SFloat -- deg
+pitch_roll_post_scale = 50 :: SFloat -- deg
 
 -- Streams from C++ ----------------------------------------------------------
 
