@@ -23,21 +23,15 @@
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 
+
+
+static const float PITCH_ROLL_POST_SCALE = 50;
+
 static const float DT = 0.01;
-
-static const float YAW_PRESCALE = 160; // deg/sec
-
-static const float THRUST_BASE = 55.385;
 
 static const float THROTTLE_DOWN = 0.06;
 
 static const float THROTTLE_DEADBAND = 0.2;
-
-static const float PITCH_ROLL_POST_SCALE = 50;
-
-// For springy-throttle gamepads / keyboard
-static const float INITIAL_ALTITUDE_TARGET = 0.2;
-static const float CLIMB_RATE_SCALE = 0.01;
 
 
 int main(int argc, char ** argv)
@@ -68,7 +62,7 @@ int main(int argc, char ** argv)
 
         const auto state = sim.getState();
 
-        demands.yaw *= YAW_PRESCALE;
+        demands.yaw *= hf::Simulator::YAW_SCALE;
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
@@ -79,7 +73,7 @@ int main(int argc, char ** argv)
 
             altitudePid.run(sim.isSpringy(), DT, state, demands);
 
-            demands.thrust += THRUST_BASE;
+            demands.thrust += hf::Simulator::THRUST_BASE;
         }
 
         hf::PositionPid::run(state, demands);

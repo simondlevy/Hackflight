@@ -24,14 +24,11 @@
 #include <mixers/bfquadx.hpp>
 #include <sim/sim.hpp>
 
+static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
+
 static const float THRUST_TAKEOFF = 56;
-static const float THRUST_BASE = 55.385;
 
 static const float TAKEOFF_TIME = 3;
-
-static const float YAW_PRE_DIVISOR = 160; // deg/sec
-
-static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
 static const float YAW_DIVISOR  = 26;
 static const float YAW_OFFSET = 0.955;
@@ -137,7 +134,7 @@ int main(int argc, char ** argv)
                 CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET, true);
 
         demands.yaw = runSnn(
-                yawRateSnn, demands.yaw, state.dpsi/YAW_PRE_DIVISOR,
+                yawRateSnn, demands.yaw, state.dpsi / hf::Simulator::YAW_SCALE,
                 YAW_DIVISOR, YAW_OFFSET);
 
         const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
@@ -154,7 +151,7 @@ int main(int argc, char ** argv)
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
             sim.time() > TAKEOFF_TIME ? 
-            thrustFromSnn + THRUST_BASE:
+            thrustFromSnn + hf::Simulator::THRUST_BASE:
             sim.requestedTakeoff() ? 
             THRUST_TAKEOFF :
             0;

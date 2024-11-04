@@ -46,6 +46,10 @@ namespace hf {
 
         public:
 
+            static constexpr float YAW_SCALE = 160; // deg/sec
+
+            static constexpr float THRUST_BASE = 55.385; // rad/sec
+
             void init(const bool tryJoystick=true)
             {
                 wb_robot_init();
