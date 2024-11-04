@@ -25,7 +25,6 @@ module CoreTask where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Clock
 import Demands
 import Mixers
 import Sensors
@@ -39,19 +38,13 @@ import Position
 
 -- Constants
 
-clock_rate = RATE_100_HZ
+yaw_scale = 160 :: SFloat -- deg/sec
 
-tbase = 56 :: SFloat
+thrust_base = 55.385 :: SFloat
 
-tscale = 0.25 :: SFloat
+dt = 0.01 :: SFloat
 
-tmin = 0 :: SFloat
-
-pitch_roll_demand_post_scale = 30 :: SFloat -- deg
-
-yaw_demand_pre_scale = 160 :: SFloat -- deg/sec
-
-takeoff_time = 3 :: SFloat
+pitch_roll_post_scale = 30 :: SFloat -- deg
 
 -- Streams from C++ ----------------------------------------------------------
 
@@ -121,9 +114,7 @@ spec = do
     let stickDemands = Demands throttle_stick 
                  roll_stick 
                  pitch_stick 
-                 (yaw_demand_pre_scale * yaw_stick)
-
-    let dt = rateToPeriod clock_rate
+                 (yaw_scale * yaw_stick)
 
     let pids = [climbRateController requestedTakeoff completedTakeoff,
           positionController dt,
@@ -132,8 +123,8 @@ spec = do
     let demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
     let (m1, m2, m3, m4) = runBetaFlightQuadX $ Demands (thrust demands')
-                                        (pitch_roll_demand_post_scale * (roll demands'))
-                                        (pitch_roll_demand_post_scale * (pitch demands'))
+                                        (pitch_roll_post_scale * (roll demands'))
+                                        (pitch_roll_post_scale * (pitch demands'))
                                         (yaw demands')
 
     trigger "setMotors" true [arg $ m1, arg $ m2, arg $ m3, arg $ m4] 
