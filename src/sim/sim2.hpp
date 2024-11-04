@@ -145,7 +145,7 @@ namespace hf {
 
                     open_loop_demands.roll = readJoystickAxis(axes.roll);
                     open_loop_demands.pitch = readJoystickAxis(axes.pitch); 
-                    open_loop_demands.yaw = readJoystickAxis(axes.yaw);
+                    open_loop_demands.yaw = readJoystickAxis(axes.yaw) * YAW_SCALE;
                 }
 
                 else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
@@ -502,11 +502,11 @@ namespace hf {
                         break;
 
                     case 'Q':
-                        demands.yaw = -1.0;
+                        demands.yaw = -YAW_SCALE;
                         break;
 
                     case 'E':
-                        demands.yaw = +1.0;
+                        demands.yaw = +YAW_SCALE;
                         break;
 
                     case 'W':
