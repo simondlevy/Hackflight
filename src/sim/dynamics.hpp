@@ -134,18 +134,14 @@ namespace hf {
                @param omegas motor speeds in radians per second
              */
 
-            void setMotors(
-                    const float omega0,
-                    const float omega1,
-                    const float omega2,
-                    const float omega3)
+            void setMotors(const float * motors)
             {
                 // Compute individual motor thrusts as air density times square of
                 // motor speed
-                const float omega0_2 = sqr(omega0);
-                const float omega1_2 = sqr(omega1);
-                const float omega2_2 = sqr(omega2);
-                const float omega3_2 = sqr(omega3);
+                const float omega0_2 = sqr(motors[0]);
+                const float omega1_2 = sqr(motors[1]);
+                const float omega2_2 = sqr(motors[2]);
+                const float omega3_2 = sqr(motors[3]);
 
                 // Compute overall thrust, plus roll and pitch
                 const auto U1 =

@@ -275,16 +275,6 @@ namespace hf {
                 return _time;
             }
 
-            void setMotors(const quad_motors_t & motors)
-            {
-                // Negate expected direction to accommodate Webots
-                // counterclockwise positive
-                wb_motor_set_velocity(_motor1, -motors.m1);
-                wb_motor_set_velocity(_motor2, +motors.m2);
-                wb_motor_set_velocity(_motor3, +motors.m3);
-                wb_motor_set_velocity(_motor4, -motors.m4);
-            }
-
             void setMotors(const float motors[4])
             {
                 // Negate expected direction to accommodate Webots

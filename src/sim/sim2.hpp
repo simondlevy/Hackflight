@@ -38,7 +38,7 @@
 
 // Hackflight
 #include <hackflight.hpp>
-#include <mixers.hpp>
+#include <mixer.hpp>
 #include <sim/vehicles/tinyquad.hpp>
 
 namespace hf {
@@ -47,7 +47,7 @@ namespace hf {
 
         public:
 
-            void init(const bool tryJoystick=true)
+            void init(Mixer & mixer, const bool tryJoystick=true)
             {
                 wb_robot_init();
 
@@ -81,6 +81,7 @@ namespace hf {
                 // Start the dynamics thread
                 _thread_data.running = true;
                 _thread_data.dynamics = &_dynamics;
+                _thread_data.mixer = &mixer;
                 pthread_create(
                         &_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
@@ -122,21 +123,6 @@ namespace hf {
             {
                 _thread_data.running = false;
                 pthread_join(_thread, NULL);
-            }
-
-            state_t getState()
-            {
-                return _dynamics.state;
-            }
-
-            quad_motors_t getMotors() 
-            {
-                return quad_motors_t {
-                    _thread_data.motorvals[0],
-                    _thread_data.motorvals[1],
-                    _thread_data.motorvals[2],
-                    _thread_data.motorvals[3]
-                };
             }
 
             bool requestedTakeoff()
@@ -247,6 +233,7 @@ namespace hf {
             typedef struct {
 
                 Dynamics * dynamics;
+                Mixer * mixer;
                 bool requested_takeoff;
                 demands_t open_loop_demands;
                 float posevals[6];
@@ -347,8 +334,8 @@ namespace hf {
 
                 // We'll animate motors at full speed on startup, but won't run
                 // dynamics
-                quad_motors_t motors = {
-                    MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX 
+                float motors[4] = {
+                    MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
                 };
 
                 for (long k=0; thread_data->running; k++) {
@@ -378,13 +365,11 @@ namespace hf {
                             thrust, 0, 0, demands.yaw
                         };
 
-                        hf::Mixer::runBetaFlightQuadX(new_demands, motors);
+                        float motors[4] = {};
 
-                        dynamics->setMotors(
-                                motors.m1, 
-                                motors.m2, 
-                                motors.m3, 
-                                motors.m4);
+                        thread_data->mixer->run(new_demands, motors);
+
+                        dynamics->setMotors(motors);
 
                         const auto state = dynamics->state;
 
@@ -397,10 +382,10 @@ namespace hf {
                     }
 
                     // Set motor spins for animation
-                    thread_data->motorvals[0] = motors.m1;
-                    thread_data->motorvals[1] = motors.m2;
-                    thread_data->motorvals[2] = motors.m3;
-                    thread_data->motorvals[3] = motors.m4;
+                    thread_data->motorvals[0] = motors[0];
+                    thread_data->motorvals[1] = motors[1];
+                    thread_data->motorvals[2] = motors[2];
+                    thread_data->motorvals[3] = motors[3];
 
                     // Throw in a delay to sync with the animation
                     usleep(1 / (DYNAMICS_FREQ * 1e-6));

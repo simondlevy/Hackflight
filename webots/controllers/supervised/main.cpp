@@ -19,6 +19,7 @@
 #include <sim/sim2.hpp>
 #include <pids/altitude.hpp>
 #include <pids/yaw_rate.hpp>
+#include <mixers/bfquadx.hpp>
 
 static const float YAW_PRESCALE = 160; // deg/sec
 
@@ -58,7 +59,9 @@ int main(int argc, char ** argv)
     (void)argc;
     (void)argv;
 
-    _sim.init();
+    hf::BfQuadXMixer mixer = {};
+
+    _sim.init(mixer);
 
     hf::demands_t demands = {};
 
