@@ -47,6 +47,8 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
+    FILE * logfp = fopen("log.csv", "w");
+
     while (true) {
 
         if (!sim.step()) {
@@ -81,6 +83,9 @@ int main(int argc, char ** argv)
         float motors[4] = {};
 
         mixer.run(demands, motors);
+
+        fprintf(logfp, "%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f\n",
+                demands.yaw, motors[0], motors[1], motors[2], motors[3]);
 
         sim.setMotors(motors);
     }

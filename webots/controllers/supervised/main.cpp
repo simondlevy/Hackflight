@@ -32,8 +32,6 @@ namespace hf {
     void run_closed_loop_controllers(
             const float dt, const state_t & state, demands_t & demands)
     {
-        printf("%+3.3f\n", demands.yaw);
-
         _altitudePid.run(_sim.isSpringy(), dt, state, demands);
 
         _yawRatePid.run(dt, false, state, demands);

@@ -362,6 +362,13 @@ namespace hf {
 
                         thread_data->mixer->run(new_demands, motors);
 
+                        static long count;
+                        if (count++ % 100 == 0) {
+                            printf("yaw=%+3.3f | m1=%3.3f  m2=%3.3f  m3=%3.3f  m4=%3.3f\n",
+                                    demands.yaw,
+                                    motors[0], motors[1], motors[2], motors[3]);
+                        }
+
                         dynamics->setMotors(*thread_data->mixer, motors);
 
                         const auto state = dynamics->state;
