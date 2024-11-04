@@ -125,11 +125,6 @@ namespace hf {
                 pthread_join(_thread, NULL);
             }
 
-            bool requestedTakeoff()
-            {
-                return _requested_takeoff;
-            }
-
             bool isSpringy()
             {
                 return haveJoystick() == JOYSTICK_RECOGNIZED ?

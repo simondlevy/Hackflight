@@ -44,7 +44,6 @@ namespace hf {
 
     static YawRatePid _yawRatePid;
 
-
     void run_closed_loop_controllers(
             const float dt, const state_t & state, demands_t & demands)
     {
@@ -76,13 +75,6 @@ int main(int argc, char ** argv)
         demands.yaw = _open_loop_demands.yaw * YAW_PRESCALE;
 
         _reset_pids = demands.thrust < THROTTLE_DOWN;
-
-        // Throttle control begins when once takeoff is requested, either by
-        // hitting a button or key ("springy", self-centering throttle) or by
-        // raising the non-self-centering throttle stick
-        if (_sim.requestedTakeoff()) {
-
-        }    
     }
 
     _sim.close();
