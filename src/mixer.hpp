@@ -27,6 +27,12 @@ namespace hf {
         public:
 
             virtual void run(const demands_t & demands, float * motors) = 0;
+
+            virtual float roll(const float * motors) = 0;
+
+            virtual float pitch(const float * motors) = 0;
+
+            virtual float yaw(const float * motors) = 0;
      };
 
 }

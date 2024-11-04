@@ -45,6 +45,21 @@ namespace hf {
                 motors[2] = t + r + p  + y;
                 motors[3] = t + r - p  - y;
             }
+
+            float roll(const float * motors)
+            {
+                return (motors[2] + motors[3]) - (motors[0] + motors[1]);
+            }
+
+            float pitch(const float * motors)
+            {
+                return (motors[0] + motors[1]) - (motors[2] + motors[3]);
+            }
+
+            float yaw(const float * motors)
+            {
+                return (motors[1] + motors[2]) - (motors[0] + motors[3]);
+            }
     };
 
 }

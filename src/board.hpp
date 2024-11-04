@@ -183,13 +183,13 @@ namespace hf {
                 runComms(state);
             }
 
-            void runMotors(Receiver & rx, const quad_motors_t & motors)
+            void runMotors(Receiver & rx, const float * motors)
             {
                 // Rescale motor values for OneShot125
-                _m1_usec = scaleMotor(motors.m1);
-                _m2_usec = scaleMotor(motors.m2);
-                _m3_usec = scaleMotor(motors.m3);
-                _m4_usec = scaleMotor(motors.m4);
+                _m1_usec = scaleMotor(motors[0]);
+                _m2_usec = scaleMotor(motors[1]);
+                _m3_usec = scaleMotor(motors[2]);
+                _m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
                 cutMotors(_channels[4], _isArmed); 
