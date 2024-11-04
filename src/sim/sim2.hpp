@@ -319,6 +319,8 @@ namespace hf {
 
             static void * thread_fun(void *ptr)
             {
+                FILE * logfp = fopen("log.csv", "w");
+
                 auto thread_data = (thread_data_t *)ptr;
 
                 auto dynamics = thread_data->dynamics;
@@ -364,9 +366,8 @@ namespace hf {
 
                         static long count;
                         if (count++ % 100 == 0) {
-                            printf("yaw=%+3.3f | m1=%3.3f  m2=%3.3f  m3=%3.3f  m4=%3.3f\n",
-                                    demands.yaw,
-                                    motors[0], motors[1], motors[2], motors[3]);
+                            fprintf(logfp, "%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f\n",
+                                    demands.yaw, motors[0], motors[1], motors[2], motors[3]);
                         }
 
                         dynamics->setMotors(*thread_data->mixer, motors);

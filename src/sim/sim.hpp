@@ -90,9 +90,14 @@ namespace hf {
                 step();
             }
 
-            bool step(void)
+            bool step()
             {
                 return wb_robot_step((int)_timestep) != -1;
+            }
+
+            float getTime()
+            {
+                return _time;
             }
 
             demands_t getDemandsFromKeyboard()
