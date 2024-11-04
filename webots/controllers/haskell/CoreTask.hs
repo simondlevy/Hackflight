@@ -38,8 +38,6 @@ import Position
 
 -- Constants
 
-yaw_scale = 160 :: SFloat -- deg/sec
-
 thrust_base = 55.385 :: SFloat
 
 dt = 0.01 :: SFloat
@@ -111,10 +109,7 @@ spec = do
                  state_psi 
                  state_dpsi
 
-    let stickDemands = Demands throttle_stick 
-                 roll_stick 
-                 pitch_stick 
-                 (yaw_scale * yaw_stick)
+    let stickDemands = Demands throttle_stick roll_stick pitch_stick yaw_stick
 
     let pids = [climbRateController requestedTakeoff completedTakeoff,
           positionController dt,

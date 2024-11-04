@@ -116,11 +116,11 @@ namespace hf {
                         break;
 
                     case 'Q':
-                        demands.yaw = -1.0;
+                        demands.yaw = -YAW_SCALE;
                         break;
 
                     case 'E':
-                        demands.yaw = +1.0;
+                        demands.yaw = +YAW_SCALE;
                         break;
 
                     case 'W':
@@ -194,7 +194,7 @@ namespace hf {
 
                     demands.roll = readJoystickAxis(axes.roll);
                     demands.pitch = readJoystickAxis(axes.pitch); 
-                    demands.yaw = readJoystickAxis(axes.yaw);
+                    demands.yaw = readJoystickAxis(axes.yaw) * YAW_SCALE;
                 }
 
                 else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {

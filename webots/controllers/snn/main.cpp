@@ -134,7 +134,9 @@ int main(int argc, char ** argv)
                 CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET, true);
 
         demands.yaw = runSnn(
-                yawRateSnn, demands.yaw, state.dpsi / hf::Simulator::YAW_SCALE,
+                yawRateSnn,
+                demands.yaw / hf::Simulator::YAW_SCALE,
+                state.dpsi / hf::Simulator::YAW_SCALE,
                 YAW_DIVISOR, YAW_OFFSET);
 
         const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;

@@ -59,8 +59,6 @@ int main(int argc, char ** argv)
 
         const auto state = sim.getState();
 
-        demands.yaw *= hf::Simulator::YAW_SCALE;
-
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
         // Throttle control begins when once takeoff is requested, either by
