@@ -141,7 +141,7 @@ namespace hf {
                     (omegasqr[0] + omegasqr[1] + omegasqr[2] + omegasqr[3]);
 
                 // Compute angular forces
-                const auto u2 = 0;//_params.L * _params.B * mixer.roll(omegasqr);
+                const auto u2 = _params.L * _params.B * mixer.roll(omegasqr);
                 const auto u3 = 0;//_params.L * _params.B * mixer.pitch(omegasqr);
                 const auto u4 = _params.D * mixer.yaw(omegasqr);
 
@@ -212,7 +212,7 @@ namespace hf {
                     if (count++ % 100 == 0) {
                         fprintf(logfp, "%3.3f,%3.3f,%3.3f,%3.3f,%3.3f,%+3.3f,%+3.3f,%+3.3f\n",
                                 time, motors[0], motors[1], motors[2], motors[3],
-                                u4, state.dpsi, state.psi);
+                                u2, state.dphi, state.phi);
                     }
 
                     // Once airborne, inertial-frame acceleration is same as NED
