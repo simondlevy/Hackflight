@@ -125,7 +125,7 @@ namespace hf {
                @param omegas motor speeds in radians per second
              */
 
-            void setMotors(Mixer & mixer, const float * motors)
+            void setMotors(FILE * logfp, double time, Mixer & mixer, const float * motors)
             {
                 // Compute individual motor thrusts as air density times square of
                 // motor speed
@@ -207,6 +207,13 @@ namespace hf {
                     state.dtheta += _dt * _dstate.dtheta;
                     state.psi    += _dt * _dstate.psi;
                     state.dpsi   += _dt * _dstate.dpsi;
+
+                    static long count;
+                    if (count++ % 100 == 0) {
+                        fprintf(logfp, "%3.3f,%3.3f,%3.3f,%3.3f,%3.3f,%+3.3f,%+3.3f,%+3.3f\n",
+                                time, motors[0], motors[1], motors[2], motors[3],
+                                u4, state.dpsi, state.psi);
+                    }
 
                     // Once airborne, inertial-frame acceleration is same as NED
                     // acceleration

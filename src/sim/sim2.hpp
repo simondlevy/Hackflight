@@ -321,11 +321,11 @@ namespace hf {
 
             static void * thread_fun(void *ptr)
             {
-                FILE * logfp = fopen("log.csv", "w");
-
                 auto thread_data = (thread_data_t *)ptr;
 
                 auto dynamics = thread_data->dynamics;
+
+                auto logfp = fopen("log.csv", "w");
 
                 demands_t demands = {};
 
@@ -368,14 +368,7 @@ namespace hf {
 
                         thread_data->mixer->run(new_demands, motors);
 
-                        static long count;
-                        if (count++ % 100 == 0) {
-                            fprintf(logfp, "%3.3f,%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f\n",
-                                    time, demands.yaw,
-                                    motors[0], motors[1], motors[2], motors[3]);
-                        }
-
-                        dynamics->setMotors(*thread_data->mixer, motors);
+                        dynamics->setMotors(logfp, time, *thread_data->mixer, motors);
 
                         const auto state = dynamics->state;
 

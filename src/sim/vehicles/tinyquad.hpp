@@ -15,7 +15,7 @@ namespace hf {
 
         // Estimated
         4.0e-5, // force constant B [F=b*w^2]
-        2.0e-2, // torque constant D [T=d*w^2]
+        2.0e-1, // torque constant D [T=d*w^2]
 
         // These agree with values in .proto file
         0.050,  // mass M [kg]
