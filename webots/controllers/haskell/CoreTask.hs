@@ -38,7 +38,7 @@ import Position
 
 -- Constants
 
-thrust_base = 55.385 :: SFloat
+motor_hover = 55.385 :: SFloat -- rad /sec
 
 dt = 0.01 :: SFloat
 

@@ -23,8 +23,6 @@
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 
-
-
 static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const float DT = 0.01;
@@ -68,7 +66,7 @@ int main(int argc, char ** argv)
 
             altitudePid.run(sim.isSpringy(), DT, state, demands);
 
-            demands.thrust += hf::Simulator::THRUST_BASE;
+            demands.thrust += hf::Simulator::MOTOR_HOVER;
         }
 
         hf::PositionPid::run(state, demands);

@@ -47,6 +47,10 @@ namespace hf {
 
         public:
 
+            static constexpr float YAW_SCALE = 160; // deg/sec
+
+            static constexpr float MOTOR_HOVER = 55.385; // rad/sec
+
             void init(Mixer & mixer, const bool tryJoystick=true)
             {
                 wb_robot_init();
@@ -191,8 +195,6 @@ namespace hf {
             }
  
         private:
-
-            static constexpr float THRUST_BASE = 55.385;
 
             static const uint32_t DYNAMICS_FREQ = 10000;
 
@@ -348,7 +350,7 @@ namespace hf {
                         }
 
                         const auto thrust =
-                            min(demands.thrust + THRUST_BASE, MOTOR_MAX);
+                            min(demands.thrust + MOTOR_HOVER, MOTOR_MAX);
 
                         const demands_t new_demands = {
                             thrust, 0, 0, demands.yaw

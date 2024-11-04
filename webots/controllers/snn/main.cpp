@@ -26,7 +26,7 @@
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
-static const float THRUST_TAKEOFF = 56;
+static const float MOTOR_TAKEOFF = 56; // rad / sec
 
 static const float TAKEOFF_TIME = 3;
 
@@ -131,7 +131,7 @@ int main(int argc, char ** argv)
 
         const auto thrustFromSnn = runSnn(
                 climbRateSnn, demands.thrust, state.dz,
-                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET, true);
+                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
 
         demands.yaw = runSnn(
                 yawRateSnn,
@@ -153,9 +153,9 @@ int main(int argc, char ** argv)
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
             sim.time() > TAKEOFF_TIME ? 
-            thrustFromSnn + hf::Simulator::THRUST_BASE:
+            thrustFromSnn + hf::Simulator::MOTOR_HOVER:
             sim.requestedTakeoff() ? 
-            THRUST_TAKEOFF :
+            MOTOR_TAKEOFF :
             0;
 
         float motors[4] = {};
