@@ -95,7 +95,7 @@ namespace hf {
                 return wb_robot_step((int)_timestep) != -1;
             }
 
-            float getTime()
+            double getTime()
             {
                 return _time;
             }

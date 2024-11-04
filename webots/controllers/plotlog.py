@@ -20,7 +20,12 @@ plt.plot(time, data[:,3], '*')
 plt.plot(time, data[:,4])
 plt.plot(time, data[:,5])
 
-plt.ylim([54.5, 56])
+mid = 55.375
+mar = 0.6
+
+plt.plot(time, mid * np.ones(time.shape))
+
+plt.ylim([mid-mar, mid+mar])
 
 plt.legend(['m1', 'm2', 'm3', 'm4'])
 

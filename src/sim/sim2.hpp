@@ -59,11 +59,11 @@ namespace hf {
             {
                 wb_robot_init();
 
-                _timestep = wb_robot_get_basic_time_step();
+                _wb_timestep = wb_robot_get_basic_time_step();
 
                 if (tryJoystick) {
 
-                    wb_joystick_enable(_timestep);
+                    wb_joystick_enable(_wb_timestep);
                 }
 
                 else {
@@ -71,7 +71,7 @@ namespace hf {
                     printKeyboardInstructions();
                 }
 
-                wb_keyboard_enable(_timestep);
+                wb_keyboard_enable(_wb_timestep);
 
                 _copter_node = wb_supervisor_node_get_from_def("ROBOT");
 
@@ -96,7 +96,7 @@ namespace hf {
 
             bool step()
             {
-                if (wb_robot_step((int)_timestep) == -1) {
+                if (wb_robot_step((int)_wb_timestep) == -1) {
 
                     return false;
                 } 
@@ -239,7 +239,7 @@ namespace hf {
 
             bool _requested_takeoff;
 
-            double _timestep;
+            double _wb_timestep;
 
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;
@@ -252,6 +252,8 @@ namespace hf {
 
             thread_data_t _thread_data; 
             pthread_t _thread; 
+
+            float _time;
 
             static WbDeviceTag make_motor(const char * name)
             {
@@ -335,6 +337,8 @@ namespace hf {
 
                 for (long k=0; thread_data->running; k++) {
 
+                    const double time = (double)k / DYNAMICS_FREQ;
+
                     if (thread_data->requested_takeoff) {
 
                         if (k % (DYNAMICS_FREQ / PID_FREQ) == 0) {
@@ -366,8 +370,9 @@ namespace hf {
 
                         static long count;
                         if (count++ % 100 == 0) {
-                            fprintf(logfp, "%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f\n",
-                                    demands.yaw, motors[0], motors[1], motors[2], motors[3]);
+                            fprintf(logfp, "%3.3f,%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f\n",
+                                    time, demands.yaw,
+                                    motors[0], motors[1], motors[2], motors[3]);
                         }
 
                         dynamics->setMotors(*thread_data->mixer, motors);
