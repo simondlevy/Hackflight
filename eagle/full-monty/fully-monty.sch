@@ -202,6 +202,7 @@
 <pad name="3V3_LO" x="-11.43" y="7.62" drill="0.9652"/>
 <pad name="GND" x="-16.51" y="-7.62" drill="0.9652"/>
 <pad name="VIN" x="-16.51" y="7.62" drill="0.9652"/>
+<pad name="GND2" x="-13.97" y="7.62" drill="0.9652"/>
 <wire x1="-17.78" y1="8.89" x2="17.78" y2="8.89" width="0.3048" layer="21"/>
 <wire x1="17.78" y1="-8.89" x2="-17.78" y2="-8.89" width="0.3048" layer="21"/>
 <wire x1="4.826" y1="-5.08" x2="-4.826" y2="-5.08" width="0.3048" layer="21"/>
@@ -396,6 +397,7 @@
 <pin name="15/A1/RX3" x="20.32" y="-15.24" visible="pin" length="middle" rot="R180"/>
 <pin name="14/A0/TX3" x="20.32" y="-17.78" visible="pin" length="middle" rot="R180"/>
 <pin name="13/SCK" x="20.32" y="-20.32" visible="pin" length="middle" rot="R180"/>
+<pin name="GND2" x="20.32" y="10.16" visible="pin" length="middle" rot="R180"/>
 <text x="-14.478" y="25.146" size="1.778" layer="94">Teensy 4.0</text>
 <pin name="VBAT" x="-10.16" y="-40.64" visible="pin" length="middle" rot="R90"/>
 <pin name="3V3_LN" x="-5.08" y="-40.64" length="middle" rot="R90"/>
@@ -439,6 +441,7 @@
 <connect gate="G$1" pin="8/TX2" pad="8"/>
 <connect gate="G$1" pin="9" pad="9/CS"/>
 <connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="GND2" pad="GND2"/>
 <connect gate="G$1" pin="GND3" pad="GND3"/>
 <connect gate="G$1" pin="ON/OFF" pad="ON/OFF"/>
 <connect gate="G$1" pin="PROG" pad="PROG"/>
@@ -4186,10 +4189,6 @@ Part Number: HA-522</description>
 </net>
 <net name="GND" class="0">
 <segment>
-<wire x1="93.98" y1="60.96" x2="99.06" y2="60.96" width="0.1524" layer="91"/>
-<label x="93.98" y="60.96" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="REG" gate="J1" pin="2"/>
 <wire x1="12.7" y1="50.8" x2="17.78" y2="50.8" width="0.1524" layer="91"/>
 <label x="15.24" y="50.8" size="1.778" layer="95"/>
@@ -4233,6 +4232,11 @@ Part Number: HA-522</description>
 <pinref part="PMW3901_PWR" gate="G$1" pin="1"/>
 <wire x1="213.36" y1="50.8" x2="218.44" y2="50.8" width="0.1524" layer="91"/>
 <label x="213.36" y="50.8" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="GND2"/>
+<wire x1="93.98" y1="60.96" x2="99.06" y2="60.96" width="0.1524" layer="91"/>
+<label x="93.98" y="60.96" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SDA" class="0">
