@@ -21,22 +21,7 @@
 #include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
 
-static const float YAW_PRESCALE = 160; // deg/sec
-
-static const float THRUST_BASE = 55.385;
-
-static const float THROTTLE_DOWN = 0.06;
-
-static const float THROTTLE_DEADBAND = 0.2;
-
-static const float PITCH_ROLL_POST_SCALE = 50;
-
-static bool _reset_pids;
-
-static hf::demands_t _open_loop_demands;
-
 static hf::Simulator _sim;
-
 
 namespace hf {
 
@@ -47,9 +32,9 @@ namespace hf {
     void run_closed_loop_controllers(
             const float dt, const state_t & state, demands_t & demands)
     {
-        _altitudePid.run(_sim.isSpringy(), dt, state, _open_loop_demands, demands);
+        _altitudePid.run(_sim.isSpringy(), dt, state, demands, demands);
 
-        _yawRatePid.run(dt, _reset_pids, state, demands);
+        _yawRatePid.run(dt, false, state, demands);
     }
 }
 
@@ -62,19 +47,11 @@ int main(int argc, char ** argv)
 
     _sim.init(mixer);
 
-    hf::demands_t demands = {};
-
     while (true) {
 
-        if (!_sim.step(demands)) {
+        if (!_sim.step()) {
             break;
         }
-
-        _open_loop_demands = _sim.getDemands();
-
-        demands.yaw = _open_loop_demands.yaw * YAW_PRESCALE;
-
-        _reset_pids = demands.thrust < THROTTLE_DOWN;
     }
 
     _sim.close();

@@ -86,17 +86,75 @@ namespace hf {
                         &_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
 
-            bool step(demands_t & open_loop_demands)
+            bool step()
             {
-                _thread_data.requested_takeoff = _requested_takeoff;
-
-                memcpy(&_thread_data.open_loop_demands, &open_loop_demands,
-                        sizeof(demands_t));
-
                 if (wb_robot_step((int)_timestep) == -1) {
 
                     return false;
                 } 
+
+                demands_t open_loop_demands = {};
+
+                auto joystickStatus = haveJoystick();
+
+                if (joystickStatus == JOYSTICK_RECOGNIZED) {
+
+                    auto axes = getJoystickInfo();
+
+                    open_loop_demands.thrust =
+                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
+
+                    // Springy throttle stick; keep in interval [-1,+1]
+                    if (axes.springy) {
+
+                        static bool button_was_hit;
+
+                        if (wb_joystick_get_pressed_button() == 5) {
+                            button_was_hit = true;
+                        }
+
+                        _requested_takeoff = button_was_hit;
+
+                        // Run throttle stick through deadband
+                        open_loop_demands.thrust =
+                            fabs(open_loop_demands.thrust) < 0.05 ? 0 : open_loop_demands.thrust;
+                    }
+
+                    else {
+
+                        static float throttle_prev;
+                        static bool throttle_was_moved;
+
+                        // Handle bogus throttle values on startup
+                        if (throttle_prev != open_loop_demands.thrust) {
+                            throttle_was_moved = true;
+                        }
+
+                        _requested_takeoff = throttle_was_moved;
+
+                        throttle_prev = open_loop_demands.thrust;
+                    }
+
+                    open_loop_demands.roll = readJoystickAxis(axes.roll);
+                    open_loop_demands.pitch = readJoystickAxis(axes.pitch); 
+                    open_loop_demands.yaw = readJoystickAxis(axes.yaw);
+                }
+
+                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
+
+                    reportJoystick();
+                }
+
+                else { 
+
+                    getDemandsFromKeyboard(open_loop_demands);
+
+                }
+
+                _thread_data.requested_takeoff = _requested_takeoff;
+
+                memcpy(&_thread_data.open_loop_demands, &open_loop_demands,
+                        sizeof(demands_t));
 
                 auto posevals = _thread_data.posevals;
 
@@ -131,70 +189,6 @@ namespace hf {
                     getJoystickInfo().springy :
                     true; // keyboard
             }
-
-            demands_t getDemands()
-            {
-                demands_t demands = {};
-
-                auto joystickStatus = haveJoystick();
-
-                if (joystickStatus == JOYSTICK_RECOGNIZED) {
-
-                    auto axes = getJoystickInfo();
-
-                    demands.thrust =
-                        normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                    // Springy throttle stick; keep in interval [-1,+1]
-                    if (axes.springy) {
-
-                        static bool button_was_hit;
-
-                        if (wb_joystick_get_pressed_button() == 5) {
-                            button_was_hit = true;
-                        }
-
-                        _requested_takeoff = button_was_hit;
-
-                        // Run throttle stick through deadband
-                        demands.thrust =
-                            fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
-                    }
-
-                    else {
-
-                        static float throttle_prev;
-                        static bool throttle_was_moved;
-
-                        // Handle bogus throttle values on startup
-                        if (throttle_prev != demands.thrust) {
-                            throttle_was_moved = true;
-                        }
-
-                        _requested_takeoff = throttle_was_moved;
-
-                        throttle_prev = demands.thrust;
-                    }
-
-                    demands.roll = readJoystickAxis(axes.roll);
-                    demands.pitch = readJoystickAxis(axes.pitch); 
-                    demands.yaw = readJoystickAxis(axes.yaw);
-                }
-
-                else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-
-                    reportJoystick();
-                }
-
-                else { 
-
-                    getDemandsFromKeyboard(demands);
-
-                }
-
-                return demands;
-            }
-
  
         private:
 
