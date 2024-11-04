@@ -24,7 +24,7 @@
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 
-#include <mixers.hpp>
+#include <mixers/bfquadx.hpp>
 
 #include <receivers/sbus.hpp>
 
@@ -42,6 +42,8 @@ static hf::YawRatePid _yawRatePid;
 
 static hf::PitchRollAnglePid _pitchRollAnglePid;
 static hf::PitchRollRatePid _pitchRollRatePid;
+
+static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
@@ -64,9 +66,9 @@ void loop()
 
     _yawRatePid.run(dt, resetPids, state, demands);
 
-    hf::quad_motors_t motors = {};
+    float motors[4] = {};
 
-    hf::Mixer::runBetaFlightQuadX(demands, motors);
+    _mixer.run(demands, motors);
 
     _board.runMotors(_rx, motors);
 }

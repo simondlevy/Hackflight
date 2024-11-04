@@ -19,10 +19,14 @@
  */
 
 #include <hackflight.hpp>
+#include <board.hpp>
+#include <receivers/sbus.hpp>
 
-#include <boards/board_sbus.hpp>
+static const uint8_t LED_PIN = 0;
 
-static hf::BoardSbus _board;
+static hf::Board _board;
+
+static hf::SbusReceiver _rx;
 
 // Shared with Haskell Copilot -----------------------------------------------
 
@@ -45,16 +49,16 @@ float stream_dpsi;
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    const hf::quad_motors_t motors = {m1, m2, m3, m4};
+    const float motors[4] = {m1, m2, m3, m4};
 
-    _board.runMotors(motors);
+    _board.runMotors(_rx, motors);
 }
 
 // ---------------------------------------------------------------------------
 
 void setup() 
 {
-    _board.init(0);
+    _board.init(_rx, LED_PIN);
 }
 
 void loop() 
@@ -62,7 +66,7 @@ void loop()
     hf::demands_t demands = {};
     hf::state_t state = {};
 
-    _board.readData(stream_dt, demands, state);
+    _board.readData(stream_dt, _rx, demands, state);
 
     stream_thro_demand = demands.thrust;
     stream_roll_demand = demands.roll;
