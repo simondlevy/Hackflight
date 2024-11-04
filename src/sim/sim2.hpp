@@ -369,7 +369,7 @@ namespace hf {
 
                         thread_data->mixer->run(new_demands, motors);
 
-                        dynamics->setMotors(motors);
+                        dynamics->setMotors(*thread_data->mixer, motors);
 
                         const auto state = dynamics->state;
 

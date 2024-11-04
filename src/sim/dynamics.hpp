@@ -42,6 +42,7 @@
 #include <string.h>
 
 #include <hackflight.hpp>
+#include <mixer.hpp>
 
 namespace hf {
 
@@ -134,26 +135,25 @@ namespace hf {
                @param omegas motor speeds in radians per second
              */
 
-            void setMotors(const float * motors)
+            void setMotors(Mixer & mixer, const float * motors)
             {
                 // Compute individual motor thrusts as air density times square of
                 // motor speed
-                const float omega0_2 = sqr(motors[0]);
-                const float omega1_2 = sqr(motors[1]);
-                const float omega2_2 = sqr(motors[2]);
-                const float omega3_2 = sqr(motors[3]);
+                const float omegasqr[4] = {
+                    sqr(motors[0]),
+                    sqr(motors[1]),
+                    sqr(motors[2]),
+                    sqr(motors[3])
+                };
 
-                // Compute overall thrust, plus roll and pitch
-                const auto U1 =
-                    _params.B * (omega0_2 + omega1_2 + omega2_2 + omega3_2);
-                const auto U2 = _params.L * _params.B * 
-                    u2(omega0_2, omega1_2, omega2_2, omega3_2);
-                const auto U3 = _params.L * _params.B * 
-                    u3(omega0_2, omega1_2, omega2_2, omega3_2);
+                // Compute thrust
+                const auto u1 = _params.B *
+                    (omegasqr[0] + omegasqr[1] + omegasqr[2] + omegasqr[3]);
 
-                // Compute yaw torque
-                const auto U4 = _params.D * 
-                    u4(omega0_2, omega1_2, omega2_2, omega3_2);
+                // Compute angular forces
+                const auto u2 = _params.L * _params.B * mixer.roll(omegasqr);
+                const auto u3 = _params.L * _params.B * mixer.pitch(omegasqr);
+                const auto u4 = _params.D * mixer.yaw(omegasqr);
 
                 // Ignore Omega ("disturbance") part of Equation 6 for now
                 const float Omega = 0;
@@ -161,7 +161,7 @@ namespace hf {
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame.  
                 axis3_t accelENU = {};
-                bodyZToInertial(U1 / _params.M,
+                bodyZToInertial(u1 / _params.M,
                         state.phi, state.theta, state.psi,
                         accelENU);
 
@@ -201,7 +201,7 @@ namespace hf {
                     }
 
                     // Compute the state derivatives using Equation 12
-                    computeStateDerivative(accelENU, netz, U2, U3, U4, Omega);
+                    computeStateDerivative(accelENU, netz, u2, u3, u4, Omega);
 
                     // Compute state as first temporal integral of first temporal
                     // derivative
@@ -247,9 +247,9 @@ namespace hf {
             void computeStateDerivative(
                     const axis3_t accelENU,
                     const float netz,
-                    const float U2,
-                    const float U3,
-                    const float U4,
+                    const float u2,
+                    const float u3,
+                    const float u4,
                     const float Omega)
             {
                 const auto phidot = state.dphi;
@@ -273,62 +273,21 @@ namespace hf {
                 _dstate.dphi = (
                         psidot*thedot*(_params.Iy-_params.Iz) /
                         _params.Ix-_params.Jr /
-                        _params.Ix*thedot*Omega + U2 / _params.Ix);
+                        _params.Ix*thedot*Omega + u2 / _params.Ix);
 
                 _dstate.theta = thedot;
 
                 _dstate.dtheta =
                     -(psidot * phidot * (_params.Iz - _params.Ix) /
                             _params.Iy + _params.Jr / 
-                            _params.Iy * phidot * Omega + U3 / _params.Iy);
+                            _params.Iy * phidot * Omega + u3 / _params.Iy);
 
                 _dstate.psi = psidot;
 
                 _dstate.dpsi = (
                         thedot*phidot*(_params.Ix-_params.Iy)/_params.Iz +
-                        U4/_params.Iz);
+                        u4/_params.Iz);
             }
-
-            static float u2(
-                    const float o0,
-                    const float o1,
-                    const float o2,
-                    const float o3)
-            {
-                /*
-                   roll right
-                 */
-
-                return (o2 + o3) - (o0 + o1);
-            }
-
-            static float u3(
-                    const float o0,
-                    const float o1,
-                    const float o2,
-                    const float o3)
-            {
-                /*
-                   pitch forward
-                 */
-
-                return (o1 + o2) - (o0 + o3);
-            }
-
-            static float u4(
-                    const float m1,
-                    const float m2,
-                    const float m3,
-                    const float m4)
-            {
-                /*
-                   yaw cw
-                 */
-
-                return (m2 + m3) - (m1 + m4);
-            }
-
-
 
             static float sqr(const float x)
             {
