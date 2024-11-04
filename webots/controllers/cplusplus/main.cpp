@@ -85,8 +85,8 @@ int main(int argc, char ** argv)
         mixer.run(demands, motors);
 
         fprintf(logfp, "%3.3f,%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f,%+3.3f,%+3.3f\n",
-                sim.getTime(), demands.yaw,
-                motors[0], motors[1], motors[2], motors[3], state.dpsi,state.psi);
+                sim.getTime(), demands.roll,
+                motors[0], motors[1], motors[2], motors[3], state.dphi,state.phi);
 
         sim.setMotors(motors);
     }
