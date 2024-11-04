@@ -15,9 +15,8 @@
  */
 
 #include <hackflight.hpp>
-#include <mixers.hpp>
+#include <mixers/bfquadx.hpp>
 #include <sim/sim.hpp>
-
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
@@ -57,6 +56,8 @@ int main(int argc, char ** argv)
 
     hf::AltitudePid altitudePid = {};
 
+    hf::BfQuadXMixer mixer = {};
+
     while (true) {
 
         if (!sim.step()) {
@@ -90,9 +91,9 @@ int main(int argc, char ** argv)
 
         yawRatePid.run(DT, resetPids, state, demands);
 
-        hf::quad_motors_t motors= {};
+        float motors[4] = {};
 
-        hf::Mixer::runBetaFlightQuadX(demands, motors);
+        mixer.run(demands, motors);
 
         sim.setMotors(motors);
     }

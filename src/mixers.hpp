@@ -26,6 +26,12 @@ namespace hf {
 
         public:
 
+            /* 
+             *    4   2
+             *      X 
+             *    3   1
+             */
+
             static void runBetaFlightQuadX(
                     const demands_t & demands, quad_motors_t & motors)
             {
@@ -38,6 +44,20 @@ namespace hf {
                 motors.m2 = t - r - p  + y;
                 motors.m3 = t + r + p  + y;
                 motors.m4 = t + r - p  - y;
+            }
+
+            static void runBetaFlightQuadX(
+                    const demands_t & demands, float * motors)
+            {
+                const auto t = demands.thrust;
+                const auto r = demands.roll;
+                const auto p = demands.pitch;
+                const auto y = demands.yaw;
+
+                motors[0] = t - r + p  - y;
+                motors[1] = t - r - p  + y;
+                motors[2] = t + r + p  + y;
+                motors[3] = t + r - p  - y;
             }
      };
 

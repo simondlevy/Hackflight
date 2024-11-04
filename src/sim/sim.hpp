@@ -285,6 +285,16 @@ namespace hf {
                 wb_motor_set_velocity(_motor4, -motors.m4);
             }
 
+            void setMotors(const float motors[4])
+            {
+                // Negate expected direction to accommodate Webots
+                // counterclockwise positive
+                wb_motor_set_velocity(_motor1, -motors[0]);
+                wb_motor_set_velocity(_motor2, +motors[1]);
+                wb_motor_set_velocity(_motor3, +motors[2]);
+                wb_motor_set_velocity(_motor4, -motors[3]);
+            }
+
             void close(void)
             {
                 wb_robot_cleanup();

@@ -320,16 +320,16 @@ namespace hf {
             }
 
             static float u4(
-                    const float o0,
-                    const float o1,
-                    const float o2,
-                    const float o3)
+                    const float m1,
+                    const float m2,
+                    const float m3,
+                    const float m4)
             {
                 /*
                    yaw cw
                  */
 
-                return (o0 + o2) - (o1 + o3);
+                return (m2 + m3) - (m1 + m4);
             }
 
 
