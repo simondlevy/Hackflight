@@ -202,7 +202,6 @@
 <pad name="3V3_LO" x="-11.43" y="7.62" drill="0.9652"/>
 <pad name="GND" x="-16.51" y="-7.62" drill="0.9652"/>
 <pad name="VIN" x="-16.51" y="7.62" drill="0.9652"/>
-<pad name="GND2" x="-13.97" y="7.62" drill="0.9652"/>
 <wire x1="-17.78" y1="8.89" x2="17.78" y2="8.89" width="0.3048" layer="21"/>
 <wire x1="17.78" y1="-8.89" x2="-17.78" y2="-8.89" width="0.3048" layer="21"/>
 <wire x1="4.826" y1="-5.08" x2="-4.826" y2="-5.08" width="0.3048" layer="21"/>
@@ -397,7 +396,6 @@
 <pin name="15/A1/RX3" x="20.32" y="-15.24" visible="pin" length="middle" rot="R180"/>
 <pin name="14/A0/TX3" x="20.32" y="-17.78" visible="pin" length="middle" rot="R180"/>
 <pin name="13/SCK" x="20.32" y="-20.32" visible="pin" length="middle" rot="R180"/>
-<pin name="GND2" x="20.32" y="10.16" visible="pin" length="middle" rot="R180"/>
 <text x="-14.478" y="25.146" size="1.778" layer="94">Teensy 4.0</text>
 <pin name="VBAT" x="-10.16" y="-40.64" visible="pin" length="middle" rot="R90"/>
 <pin name="3V3_LN" x="-5.08" y="-40.64" length="middle" rot="R90"/>
@@ -441,7 +439,6 @@
 <connect gate="G$1" pin="8/TX2" pad="8"/>
 <connect gate="G$1" pin="9" pad="9/CS"/>
 <connect gate="G$1" pin="GND" pad="GND"/>
-<connect gate="G$1" pin="GND2" pad="GND2"/>
 <connect gate="G$1" pin="GND3" pad="GND3"/>
 <connect gate="G$1" pin="ON/OFF" pad="ON/OFF"/>
 <connect gate="G$1" pin="PROG" pad="PROG"/>
@@ -3924,7 +3921,6 @@ Part Number: HA-522</description>
 <library name="TinyPICO_NANO_Eagle">
 <packages>
 <package name="TINYPICO-NANO-CONNECTOR">
-<smd name="GND$4" x="17.9705" y="6.4135" dx="2.54" dy="2.54" layer="1" rot="R45" cream="no"/>
 <rectangle x1="16.383" y1="6.6548" x2="17.145" y2="7.4168" layer="31" rot="R45"/>
 <wire x1="0" y1="0" x2="0" y2="12.54" width="0.127" layer="51"/>
 <wire x1="0" y1="12.54" x2="26.9875" y2="12.54" width="0.127" layer="51"/>
@@ -3967,8 +3963,6 @@ Part Number: HA-522</description>
 <smd name="RESET" x="0.1" y="4.375" dx="1" dy="1.2" layer="1" rot="R270"/>
 <smd name="GND$1" x="0.1" y="3.105" dx="1" dy="1.2" layer="1" rot="R270"/>
 <smd name="STAT" x="0.1" y="1.835" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="GND$2" x="17.642840625" y="7.08151875" dx="3" dy="3" layer="1" rot="R45" cream="no"/>
-<smd name="GND$3" x="19.43608125" y="6.746240625" dx="0.6604" dy="0.670559375" layer="1" cream="no"/>
 <rectangle x1="17.3228" y1="7.62" x2="18.0848" y2="8.382" layer="31" rot="R45"/>
 <rectangle x1="17.4244" y1="5.5372" x2="18.1864" y2="6.2992" layer="31" rot="R45"/>
 <rectangle x1="18.4404" y1="6.5532" x2="19.2024" y2="7.3152" layer="31" rot="R45"/>
@@ -4045,7 +4039,7 @@ Part Number: HA-522</description>
 <connect gate="G$1" pin="D+" pad="D+"/>
 <connect gate="G$1" pin="D-" pad="D-"/>
 <connect gate="G$1" pin="EN" pad="EN"/>
-<connect gate="G$1" pin="GND" pad="GND$1 GND$2 GND$3 GND$4"/>
+<connect gate="G$1" pin="GND" pad="GND$1"/>
 <connect gate="G$1" pin="GPIO36" pad="IO36"/>
 <connect gate="G$1" pin="GPIO37" pad="IO37"/>
 <connect gate="G$1" pin="GPIO38" pad="IO38"/>
@@ -4192,7 +4186,6 @@ Part Number: HA-522</description>
 </net>
 <net name="GND" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="GND2"/>
 <wire x1="93.98" y1="60.96" x2="99.06" y2="60.96" width="0.1524" layer="91"/>
 <label x="93.98" y="60.96" size="1.778" layer="95"/>
 </segment>
