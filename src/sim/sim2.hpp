@@ -51,6 +51,10 @@ namespace hf {
 
             static constexpr float MOTOR_HOVER = 55.385; // rad/sec
 
+            static constexpr float MOTOR_TAKEOFF = 56; // rad/sec
+
+            static constexpr float TAKEOFF_TIME = 3; // sec
+
             void init(Mixer & mixer, const bool tryJoystick=true)
             {
                 wb_robot_init();
@@ -200,8 +204,6 @@ namespace hf {
 
             static const uint32_t PID_FREQ = 500;
 
-            static constexpr float MOTOR_MAX = 60;
-
             typedef enum {
 
                 JOYSTICK_NONE,
@@ -326,7 +328,7 @@ namespace hf {
                 // We'll animate motors at full speed on startup, but won't run
                 // dynamics
                 float motors[4] = {
-                    MOTOR_MAX, MOTOR_MAX, MOTOR_MAX, MOTOR_MAX
+                    MOTOR_TAKEOFF, MOTOR_TAKEOFF, MOTOR_TAKEOFF, MOTOR_TAKEOFF
                 };
 
                 for (long k=0; thread_data->running; k++) {
@@ -350,7 +352,7 @@ namespace hf {
                         }
 
                         const auto thrust =
-                            min(demands.thrust + MOTOR_HOVER, MOTOR_MAX);
+                            min(demands.thrust + MOTOR_HOVER, MOTOR_TAKEOFF);
 
                         const demands_t new_demands = {
                             thrust, 0, 0, demands.yaw

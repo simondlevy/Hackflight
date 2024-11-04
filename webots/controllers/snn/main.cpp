@@ -26,10 +26,6 @@
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
-static const float MOTOR_TAKEOFF = 56; // rad / sec
-
-static const float TAKEOFF_TIME = 3;
-
 static const float YAW_DIVISOR  = 26;
 static const float YAW_OFFSET = 0.955;
 
@@ -39,8 +35,6 @@ static const float CLIMBRATE_OFFSET = 8.165;
 static const float CASCADE_DIVISOR  = 15;
 static const float CASCADE_OFFSET = 0.936;
 static const float CASCADE_POST_SCALE = 120;
-
-static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const char * NETWORK = "networks/difference_risp_train.txt";
 static const char * NETWORK3 = "networks/difference3_risp.txt";
@@ -152,10 +146,10 @@ int main(int argc, char ** argv)
 
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
-            sim.time() > TAKEOFF_TIME ? 
+            sim.time() > hf::Simulator::TAKEOFF_TIME ? 
             thrustFromSnn + hf::Simulator::MOTOR_HOVER:
             sim.requestedTakeoff() ? 
-            MOTOR_TAKEOFF :
+            hf::Simulator::MOTOR_TAKEOFF :
             0;
 
         float motors[4] = {};
