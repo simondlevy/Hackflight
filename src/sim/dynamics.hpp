@@ -67,16 +67,6 @@ namespace hf {
 
     class Dynamics {
 
-        /*
-           Dynamics class for quad-X frames using Crazyflie motor layout
-
-           4cw   1ccw
-
-           ^
-
-           3ccw  2cw
-         */ 
-
         private:
 
             typedef enum {
@@ -151,8 +141,8 @@ namespace hf {
                     (omegasqr[0] + omegasqr[1] + omegasqr[2] + omegasqr[3]);
 
                 // Compute angular forces
-                const auto u2 = _params.L * _params.B * mixer.roll(omegasqr);
-                const auto u3 = _params.L * _params.B * mixer.pitch(omegasqr);
+                const auto u2 = 0;//_params.L * _params.B * mixer.roll(omegasqr);
+                const auto u3 = 0;//_params.L * _params.B * mixer.pitch(omegasqr);
                 const auto u4 = _params.D * mixer.yaw(omegasqr);
 
                 // Ignore Omega ("disturbance") part of Equation 6 for now

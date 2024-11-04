@@ -52,7 +52,7 @@ void copilot_step_core(void);
 
 void setMotors(float m1, float m2, float m3, float m4)
 {
-    hf::quad_motors_t motors = {m1, m2, m3, m4};
+    const float motors[4] = {m1, m2, m3, m4};
 
     _sim.setMotors(motors);
 }

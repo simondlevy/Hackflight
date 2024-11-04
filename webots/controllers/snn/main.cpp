@@ -20,7 +20,8 @@
 #include <levy_snn_util.hpp>
 
 // Hackflight
-#include <mixers.hpp>
+#include <hackflight.hpp>
+#include <mixers/bfquadx.hpp>
 #include <sim/sim.hpp>
 
 static const float THRUST_TAKEOFF = 56;
@@ -119,6 +120,8 @@ int main(int argc, char ** argv)
         vizSnn->serve_visualizer(viz_port);
     }
 
+    hf::BfQuadXMixer mixer = {};
+
     while (true) {
 
         if (!sim.step()) {
@@ -156,9 +159,9 @@ int main(int argc, char ** argv)
             THRUST_TAKEOFF :
             0;
 
-        hf::quad_motors_t motors= {};
+        float motors[4] = {};
 
-        hf::Mixer::runBetaFlightQuadX(demands, motors);
+        mixer.run(demands, motors);
 
         sim.setMotors(motors);
 

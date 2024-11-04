@@ -2,9 +2,9 @@
  *  BetaFlight QuadX motor mixer for Hackflight
  *
  *               4:cw   2:ccw
- *
+ *                   \ /
  *                    X 
- *
+ *                   / \
  *               3:ccw   1:cw
  *
  * Copyright (C) 2024 Simon D. Levy
