@@ -4112,6 +4112,10 @@ Part Number: HA-522</description>
 <part name="PWM3901_LFT" library="SparkFun-Connectors" deviceset="CONN_03" device="1X03_NO_SILK"/>
 <part name="PMW3901_RGT" library="SparkFun-Connectors" deviceset="CONN_03" device="1X03_NO_SILK"/>
 <part name="PMW3901_PWR" library="SparkFun-Connectors" deviceset="CONN_02" device="1X02_NO_SILK"/>
+<part name="RX" library="wirepad" deviceset="SMD2" device=""/>
+<part name="5V" library="wirepad" deviceset="SMD2" device=""/>
+<part name="3V3" library="wirepad" deviceset="SMD2" device=""/>
+<part name="GD" library="wirepad" deviceset="SMD2" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -4156,6 +4160,10 @@ Part Number: HA-522</description>
 <instance part="PWM3901_LFT" gate="J$1" x="182.88" y="35.56"/>
 <instance part="PMW3901_RGT" gate="J$1" x="223.52" y="35.56"/>
 <instance part="PMW3901_PWR" gate="G$1" x="205.74" y="50.8"/>
+<instance part="RX" gate="1" x="187.96" y="10.16"/>
+<instance part="5V" gate="1" x="187.96" y="2.54"/>
+<instance part="3V3" gate="1" x="187.96" y="-5.08"/>
+<instance part="GD" gate="1" x="187.96" y="-12.7"/>
 </instances>
 <busses>
 </busses>
@@ -4185,6 +4193,11 @@ Part Number: HA-522</description>
 <pinref part="PMW3901_PWR" gate="G$1" pin="2"/>
 <wire x1="213.36" y1="53.34" x2="218.44" y2="53.34" width="0.1524" layer="91"/>
 <label x="213.36" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="3V3" gate="1" pin="P"/>
+<wire x1="190.5" y1="-5.08" x2="198.12" y2="-5.08" width="0.1524" layer="91"/>
+<label x="193.04" y="-5.08" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -4237,6 +4250,16 @@ Part Number: HA-522</description>
 <pinref part="U$1" gate="G$1" pin="GND2"/>
 <wire x1="93.98" y1="60.96" x2="99.06" y2="60.96" width="0.1524" layer="91"/>
 <label x="93.98" y="60.96" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="GND"/>
+<wire x1="53.34" y1="63.5" x2="48.26" y2="63.5" width="0.1524" layer="91"/>
+<label x="48.26" y="63.5" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="GD" gate="1" pin="P"/>
+<wire x1="190.5" y1="-12.7" x2="198.12" y2="-12.7" width="0.1524" layer="91"/>
+<label x="193.04" y="-12.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SDA" class="0">
@@ -4294,6 +4317,11 @@ Part Number: HA-522</description>
 <wire x1="75.946" y1="-54.864" x2="68.58" y2="-54.864" width="0.1524" layer="91"/>
 <label x="71.12" y="-55.88" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="5V" gate="1" pin="P"/>
+<wire x1="190.5" y1="2.54" x2="198.12" y2="2.54" width="0.1524" layer="91"/>
+<label x="193.04" y="2.54" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="CS" class="0">
 <segment>
@@ -4317,19 +4345,6 @@ Part Number: HA-522</description>
 <pinref part="PWM3901_LFT" gate="J$1" pin="3"/>
 <wire x1="190.5" y1="38.1" x2="198.12" y2="38.1" width="0.1524" layer="91"/>
 <label x="190.5" y="38.1" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="RX" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="7/RX2"/>
-<wire x1="53.34" y1="43.18" x2="48.26" y2="43.18" width="0.1524" layer="91"/>
-<label x="48.26" y="43.18" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$2" gate="G$1" pin="TX"/>
-<wire x1="114.046" y1="-75.184" x2="114.046" y2="-83.82" width="0.1524" layer="91"/>
-<wire x1="114.046" y1="-83.82" x2="109.22" y2="-83.82" width="0.1524" layer="91"/>
-<label x="109.22" y="-83.82" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M4" class="0">
@@ -4428,13 +4443,6 @@ Part Number: HA-522</description>
 <label x="40.64" y="60.96" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="G2" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="GND"/>
-<wire x1="53.34" y1="63.5" x2="48.26" y2="63.5" width="0.1524" layer="91"/>
-<label x="48.26" y="63.5" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="D+" class="0">
 <segment>
 <pinref part="J2" gate="J1" pin="4"/>
@@ -4495,6 +4503,31 @@ Part Number: HA-522</description>
 <pinref part="VBAT" gate="1" pin="P"/>
 <wire x1="5.08" y1="109.22" x2="10.16" y2="109.22" width="0.1524" layer="91"/>
 <label x="5.08" y="109.22" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="ESP_RX" class="0">
+<segment>
+<pinref part="U$2" gate="G$1" pin="TX"/>
+<wire x1="114.046" y1="-75.184" x2="114.046" y2="-83.82" width="0.1524" layer="91"/>
+<wire x1="114.046" y1="-83.82" x2="109.22" y2="-83.82" width="0.1524" layer="91"/>
+<label x="109.22" y="-83.82" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="7/RX2"/>
+<wire x1="53.34" y1="43.18" x2="48.26" y2="43.18" width="0.1524" layer="91"/>
+<label x="43.18" y="43.18" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="RX" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="21/A7/RX5"/>
+<wire x1="93.98" y1="50.8" x2="99.06" y2="50.8" width="0.1524" layer="91"/>
+<label x="93.98" y="50.8" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="RX" gate="1" pin="P"/>
+<wire x1="190.5" y1="10.16" x2="198.12" y2="10.16" width="0.1524" layer="91"/>
+<label x="193.04" y="10.16" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
