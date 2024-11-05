@@ -16,7 +16,7 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <sim/sim.hpp>
+#include <sim.hpp>
 
 // Webots simulator class
 static hf::Simulator _sim;

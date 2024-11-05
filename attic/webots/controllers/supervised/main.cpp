@@ -18,8 +18,13 @@
 
 #include <sim/sim2.hpp>
 #include <pids/altitude.hpp>
+#include <pids/position.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
+
+static const float PITCH_ROLL_POST_SCALE = 50;
 
 static hf::Simulator _sim;
 
@@ -29,10 +34,23 @@ namespace hf {
 
     static YawRatePid _yawRatePid;
 
+    static PitchRollAnglePid _pitchRollAnglePid;
+
+    static PitchRollRatePid _pitchRollRatePid;
+
     void run_closed_loop_controllers(
-            const float dt, const state_t & state, demands_t & demands)
+            float dt, const state_t & state, demands_t & demands)
     {
+        dt = 0.01;
+
         _altitudePid.run(_sim.isSpringy(), dt, state, demands);
+
+        PositionPid::run(state, demands);
+
+        _pitchRollAnglePid.run(dt, false, state, demands);
+
+        _pitchRollRatePid.run(dt, false, state, demands,
+                PITCH_ROLL_POST_SCALE);
 
         _yawRatePid.run(dt, false, state, demands);
     }

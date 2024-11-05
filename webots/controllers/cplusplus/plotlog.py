@@ -11,10 +11,10 @@ time = data[:,0]
 
 plt.subplot(3, 1, 1)
 
-plt.plot(time, data[:,2], '-+')
-plt.plot(time, data[:,3])
-plt.plot(time, data[:,4], '-o')
-plt.plot(time, data[:,5])
+plt.plot(time, data[:,2], '-+')     # m1
+plt.plot(time, data[:,3])           # m2
+plt.plot(time, data[:,4], '-o')     # m3
+plt.plot(time, data[:,5])           # m4
 
 mid = 55.375
 mar = 1.6

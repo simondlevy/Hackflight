@@ -354,14 +354,13 @@ namespace hf {
 
                             run_closed_loop_controllers(
                                     1.f/PID_FREQ, dynamics->state, demands);
-
                         }
 
                         const auto thrust =
                             min(demands.thrust + MOTOR_HOVER, MOTOR_TAKEOFF);
 
                         const demands_t new_demands = {
-                            thrust, 0, 0, demands.yaw
+                            thrust, demands.roll, 0, demands.yaw
                         };
 
                         float motors[4] = {};

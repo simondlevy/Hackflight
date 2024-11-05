@@ -22,7 +22,7 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <mixers/bfquadx.hpp>
-#include <sim/sim.hpp>
+#include <sim.hpp>
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
@@ -107,7 +107,7 @@ int main(int argc, char ** argv)
     const auto viz_port = argc > 1 ? atoi(argv[1]) : 0;
 
     if (viz_port) {
-        vizSnn = yawRateSnn;
+        vizSnn = climbRateSnn;
         vizSnn->serve_visualizer(viz_port);
     }
 
