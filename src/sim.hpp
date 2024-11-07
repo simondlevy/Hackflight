@@ -229,22 +229,25 @@ namespace hf {
             axis3_t readGyro()
             {
                 return axis3_t {
-                    (float)wb_gyro_get_values(_gyro)[0],
-                    (float)wb_gyro_get_values(_gyro)[1],
-                    (float)wb_gyro_get_values(_gyro)[2]
+                    readGyroAxis(0), -readGyroAxis(1), -readGyroAxis(2)
                 };
             }
 
             axis3_t readAccel()
             {
                 return axis3_t {
-                    readAccelAxis(0), readAccelAxis(1), readAccelAxis(2)
+                    -readAccelAxis(0), readAccelAxis(1), readAccelAxis(2)
                 };
             }
 
             float readAccelAxis(const uint8_t axis)
             {
                 return (float)wb_accelerometer_get_values(_accel)[axis] / 9.81;
+            }
+
+            float readGyroAxis(const uint8_t axis)
+            {
+                return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
             }
 
             state_t getState()

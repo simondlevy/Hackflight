@@ -47,8 +47,6 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
-    FILE * logfp = fopen("log.csv", "w");
-
     while (true) {
 
         if (!sim.step()) {
@@ -57,11 +55,20 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
-        const auto state = sim.getState();
+        auto state = sim.getState();
+
+        const auto gyro = sim.readGyro();
 
         const auto accel = sim.readAccel();
 
-        printf("%f\n", accel.z); 
+        printf("%+3.3f | %+3.3f\n", gyro.z, state.dpsi);
+
+        (void)accel;
+
+        // Get angular velocities directly from gyro
+        state.dphi = gyro.x;
+        state.dtheta = -gyro.y;
+        state.dpsi = gyro.z;
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
@@ -87,10 +94,6 @@ int main(int argc, char ** argv)
         float motors[4] = {};
 
         mixer.run(demands, motors);
-
-        fprintf(logfp, "%3.3f,%+3.3f,%3.3f,%3.3f,%3.3f,%3.3f,%+3.3f,%+3.3f\n",
-                sim.getTime(), demands.roll,
-                motors[0], motors[1], motors[2], motors[3], state.dphi,state.phi);
 
         sim.setMotors(motors);
     }
