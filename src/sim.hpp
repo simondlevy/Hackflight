@@ -238,10 +238,13 @@ namespace hf {
             axis3_t readAccel()
             {
                 return axis3_t {
-                    (float)wb_accelerometer_get_values(_accel)[0],
-                    (float)wb_accelerometer_get_values(_accel)[1],
-                    (float)wb_accelerometer_get_values(_accel)[2]
+                    readAccelAxis(0), readAccelAxis(1), readAccelAxis(2)
                 };
+            }
+
+            float readAccelAxis(const uint8_t axis)
+            {
+                return (float)wb_accelerometer_get_values(_accel)[axis] / 9.81;
             }
 
             state_t getState()
