@@ -39,8 +39,8 @@ namespace hf {
 
             void getAngles(
                     const float dt, 
-                    const float gyrox, const float gyroy, const float gyroz, 
-                    const float accelx, const float accely, const float accelz,
+                    const float gyrox, const float gyroy, const float gyroz,
+                    const axis3_t accel,
                     float & phi, float & theta, float & psi)
             {
                 // LP filter gyro data
@@ -52,9 +52,9 @@ namespace hf {
                 _gz_prev = gz;
 
                 // LP filter accelerometer data
-                auto ax = (1 - B_ACCEL) * _ax_prev + B_ACCEL * accelx;
-                auto ay = (1 - B_ACCEL) * _ay_prev + B_ACCEL * accely;
-                auto az = (1 - B_ACCEL) * _az_prev + B_ACCEL * accelz;
+                auto ax = (1 - B_ACCEL) * _ax_prev + B_ACCEL * accel.x;
+                auto ay = (1 - B_ACCEL) * _ay_prev + B_ACCEL * accel.y;
+                auto az = (1 - B_ACCEL) * _az_prev + B_ACCEL * accel.z;
                 _ax_prev = ax;
                 _ay_prev = ay;
                 _az_prev = az;
