@@ -140,10 +140,7 @@ namespace hf {
                 // Gyro deg /sec
                 float gyroX = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
                 float gyroY = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
-                float gyroZ = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
-
-                // Negate gyroZ for nose-right positive
-                gyroZ = -gyroZ;
+                float gyroZ = -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
 
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
