@@ -139,13 +139,13 @@ namespace hf {
 
                 // Gyro deg /sec
                 float gyroX = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
-                float gyroY = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
+                float gyroY = -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
                 float gyroZ = -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
 
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
                 _madgwick.getAngles(
-                        dt, gyroX, -gyroY, gyroZ, accel,
+                        dt, gyroX, gyroY, gyroZ, accel,
                         state.phi, state.theta, state.psi);
 
                 if (fullMonty) {
@@ -166,7 +166,7 @@ namespace hf {
 
                 // Get angular velocities directly from gyro
                 state.dphi = gyroX;
-                state.dtheta = gyroY;
+                state.dtheta = -gyroY;
                 state.dpsi = gyroZ;
 
                 // Convert stick demands to appropriate intervals
