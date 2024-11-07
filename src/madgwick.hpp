@@ -38,15 +38,13 @@ namespace hf {
             }
 
             void getAngles(
-                    const float dt, 
-                    const float gyrox, const float gyroy, const float gyroz,
-                    const axis3_t accel,
+                    const float dt, const axis3_t & gyro, const axis3_t & accel,
                     float & phi, float & theta, float & psi)
             {
                 // LP filter gyro data
-                auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyrox;
-                auto gy = (1 - B_GYRO) * _gy_prev + B_GYRO * gyroy;
-                auto gz = (1 - B_GYRO) * _gz_prev + B_GYRO * gyroz;
+                auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyro.x;
+                auto gy = (1 - B_GYRO) * _gy_prev + B_GYRO * gyro.y;
+                auto gz = (1 - B_GYRO) * _gz_prev + B_GYRO * gyro.z;
                 _gx_prev = gx;
                 _gy_prev = gy;
                 _gz_prev = gz;
