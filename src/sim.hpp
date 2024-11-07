@@ -219,7 +219,6 @@ namespace hf {
                 return demands;
             }
 
-
             state_t getState()
             {
                 // Track previous time and position for calculating motion
@@ -274,7 +273,18 @@ namespace hf {
                 zprev = state.z;
 
                 return state;
-             }
+            }
+
+            void readImu(axis3_t & gyro, axis3_t & accel)
+            {
+                gyro.x = 0;
+                gyro.y = 0;
+                gyro.z = 0;
+
+                accel.x = 0;
+                accel.y = 0;
+                accel.z = 0;
+            }
 
             bool isSpringy()
             {
