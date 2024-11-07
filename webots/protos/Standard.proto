@@ -37,7 +37,10 @@ DEF ROBOT Robot {
     GPS {
     }
 
-    Gyro {
+    Accelerometer {
+    }
+
+     Gyro {
     }
 
     InertialUnit {

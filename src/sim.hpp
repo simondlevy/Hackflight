@@ -35,6 +35,7 @@
 #include <webots/gps.h>
 #include <webots/gyro.h>
 #include <webots/inertial_unit.h>
+#include <webots/accelerometer.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
@@ -62,10 +63,16 @@ namespace hf {
 
                 _imu = _makeSensor("inertial_unit",
                         _timestep, wb_inertial_unit_enable);
+
                 _gyro = _makeSensor("gyro",
                         _timestep, wb_gyro_enable);
+
+                _accel = _makeSensor("accelerometer",
+                        _timestep, wb_accelerometer_enable);
+
                 _gps = _makeSensor("gps",
                         _timestep, wb_gps_enable);
+
                 _camera = _makeSensor("camera",
                         _timestep, wb_camera_enable);
 
@@ -219,6 +226,24 @@ namespace hf {
                 return demands;
             }
 
+            axis3_t readGyro()
+            {
+                return axis3_t {
+                    (float)wb_gyro_get_values(_gyro)[0],
+                    (float)wb_gyro_get_values(_gyro)[1],
+                    (float)wb_gyro_get_values(_gyro)[2]
+                };
+            }
+
+            axis3_t readAccel()
+            {
+                return axis3_t {
+                    (float)wb_accelerometer_get_values(_accel)[0],
+                    (float)wb_accelerometer_get_values(_accel)[1],
+                    (float)wb_accelerometer_get_values(_accel)[2]
+                };
+            }
+
             state_t getState()
             {
                 // Track previous time and position for calculating motion
@@ -337,6 +362,7 @@ namespace hf {
             WbDeviceTag _camera;
             WbDeviceTag _gps;
             WbDeviceTag _gyro;
+            WbDeviceTag _accel;
             WbDeviceTag _imu;
 
             typedef struct {
