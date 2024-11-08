@@ -19,6 +19,7 @@
 #pragma once
 
 #include <hackflight.hpp>
+#include <utils.hpp>
 
 namespace hf {
 
@@ -27,11 +28,18 @@ namespace hf {
         public:
 
             void getValues(
+                    const float dt,
                     const axis3_t & accel,
                     const float zrange,
                     const axis3_t & angles,
-                    float & z, float dz)
+                    float & z,float & dz)
             {
+                (void)dt;
+                (void)accel;
+                (void)zrange;
+                (void)angles;
+                (void)z;
+                (void)dz;
             }
     };
 

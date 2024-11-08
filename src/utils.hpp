@@ -91,6 +91,24 @@ namespace hf {
             {
                 return fabs(val) < band;
             }
+
+            // https://en.wikipedia.org/wiki/Rotation_matrix
+            static void angles2rotation(const axis3_t & a, float r[3][3]) 
+            {
+                const auto alpha = a.z;
+                const auto beta = a.y;
+                const auto gamma = a.x;
+
+                r[0][0] = cos(beta) * cos(gamma);
+                r[0][1] = sin(alpha) * sin(beta) * cos(gamma) - cos(alpha) * sin(gamma);
+                r[0][2] = cos(alpha) * sin(beta) + sin(alpha) * sin(gamma);
+                r[1][0] = cos(beta) * sin(gamma);
+                r[1][1] = sin(alpha) * sin(beta) * sin(gamma) + cos(alpha) * cos(gamma);
+                r[1][2] = cos(alpha) * sin(beta) - sin(alpha) * cos(gamma);
+                r[2][0] = -sin(beta);
+                r[2][1] = sin(alpha) * cos(beta);
+                r[2][2] = cos(alpha) * cos(beta);
+            }
     };
 
 }
