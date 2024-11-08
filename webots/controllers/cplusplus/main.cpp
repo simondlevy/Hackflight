@@ -61,6 +61,8 @@ int main(int argc, char ** argv)
 
         const auto angles = sim.getEulerAngles();
 
+        sim.getHorizontalVelocity(state.dx, state.dy);
+
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
         state.phi = angles.x;

@@ -240,16 +240,6 @@ namespace hf {
                 };
             }
 
-            float readAccelAxis(const uint8_t axis)
-            {
-                return (float)wb_accelerometer_get_values(_accel)[axis] / 9.81;
-            }
-
-            float readGyroAxis(const uint8_t axis)
-            {
-                return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
-            }
-
             state_t getState()
             {
                 // Track previous time and position for calculating motion
@@ -314,11 +304,37 @@ namespace hf {
                 };
             }
 
-            float getEulerAngle(const uint8_t axis)
-            {        
-                return Utils::RAD2DEG * (
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[axis]);
-            }
+            void getHorizontalVelocity(float & dx, float & dy)
+            {
+                // Track previous time and position for calculating motion
+                static float tprev;
+                static float xprev;
+                static float yprev;
+
+                const auto tcurr = wb_robot_get_time();
+                const auto dt =  tcurr - tprev;
+                tprev = tcurr;
+
+                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
+
+                // Use temporal first difference to get world-cooredinate
+                // velocities
+                auto x = wb_gps_get_values(_gps)[0];
+                auto y = wb_gps_get_values(_gps)[1];
+                dx = (x - xprev) / dt;
+                dy = (y - yprev) / dt;
+
+                // Rotate X,Y world velocities into body frame to simulate
+                // optical-flow sensor
+                auto cospsi = cos(psi);
+                auto sinpsi = sin(psi);
+                dx = dx * cospsi + dy * sinpsi;
+                dy = dx * sinpsi - dy * cospsi;
+
+                // Save past time and position for next time step
+                xprev = x;
+                yprev = y;
+             }
 
             void getMiniState(float & dx, float & dy, float & z, float & dz)
             {
@@ -553,6 +569,23 @@ namespace hf {
                 return tv.tv_sec + tv.tv_usec / 1e6;
 
             }
+
+            float getEulerAngle(const uint8_t axis)
+            {        
+                return Utils::RAD2DEG * (
+                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[axis]);
+            }
+
+            float readAccelAxis(const uint8_t axis)
+            {
+                return (float)wb_accelerometer_get_values(_accel)[axis] / 9.81;
+            }
+
+            float readGyroAxis(const uint8_t axis)
+            {
+                return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
+            }
+
     };
 
 }
