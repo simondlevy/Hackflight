@@ -57,11 +57,19 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
-        auto state = sim.getState();
+        hf::state_t state = {};
+
+        const auto gyro = sim.readGyro();
+
+        state.dphi = gyro.x;
+        state.dtheta = gyro.y;
+        state.dpsi = gyro.z;
 
         const auto angles = sim.getEulerAngles();
 
         sim.getHorizontalVelocity(state.dx, state.dy);
+
+        sim.getVerticalData(state.z, state.dz);
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 

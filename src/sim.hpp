@@ -229,7 +229,7 @@ namespace hf {
             axis3_t readGyro()
             {
                 return axis3_t {
-                    readGyroAxis(0), -readGyroAxis(1), -readGyroAxis(2)
+                    readGyroAxis(0), readGyroAxis(1), -readGyroAxis(2)
                 };
             }
 
@@ -334,7 +334,27 @@ namespace hf {
                 // Save past time and position for next time step
                 xprev = x;
                 yprev = y;
-             }
+            }
+
+            void getVerticalData(float & z, float & dz)
+            {
+                // Track previous time and position for calculating motion
+                static float tprev;
+                static float zprev;
+
+                const auto tcurr = wb_robot_get_time();
+                const auto dt =  tcurr - tprev;
+                tprev = tcurr;
+
+                z = wb_gps_get_values(_gps)[2];
+
+                // Use temporal first difference to get world-cooredinate
+                // velocities
+                dz = (z - zprev) / dt;
+
+                // Save past time and position for next time step
+                zprev = z;
+            }
 
             void getMiniState(float & dx, float & dy, float & z, float & dz)
             {
