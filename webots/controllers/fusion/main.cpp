@@ -26,7 +26,9 @@
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static const float DT = 0.01;
+static const float DT_PID = 0.01;
+
+static const float DT_ESTIMATOR = 0.033;
 
 static const float THROTTLE_DOWN = 0.06;
 
@@ -52,8 +54,6 @@ int main(int argc, char ** argv)
 
     madgwick.initialize();
 
-    auto * logfp = fopen("log.csv", "w");
-
     while (true) {
 
         if (!sim.step()) {
@@ -62,19 +62,16 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
-        auto state = sim.getState();
-
         const auto gyro = sim.readGyro();
 
         const auto accel = sim.readAccel();
 
-        float phi=0, theta=0, psi=0;
+        hf::state_t state = { };
 
-        madgwick.getAngles(DT, gyro, accel, phi, theta, psi);
+        sim.getMiniState(state.dx, state.dy, state.z, state.dz);
 
-        fprintf(logfp, "%+3.3f, %+3.3f\n", psi, state.psi);
-
-        (void)accel;
+        madgwick.getAngles(
+                DT_ESTIMATOR, gyro, accel, state.phi, state.theta, state.psi);
 
         // Get angular velocities directly from gyro
         state.dphi = gyro.x;
@@ -88,19 +85,19 @@ int main(int argc, char ** argv)
         // raising the non-self-centering throttle stick
         if (sim.requestedTakeoff()) {
 
-            altitudePid.run(sim.isSpringy(), DT, state, demands);
+            altitudePid.run(sim.isSpringy(), DT_PID, state, demands);
 
             demands.thrust += hf::Simulator::MOTOR_HOVER;
         }
 
         hf::PositionPid::run(state, demands);
 
-        pitchRollAnglePid.run(DT, resetPids, state, demands);
+        pitchRollAnglePid.run(DT_PID, resetPids, state, demands);
 
-        pitchRollRatePid.run(DT, resetPids, state, demands,
+        pitchRollRatePid.run(DT_PID, resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
 
-        yawRatePid.run(DT, resetPids, state, demands);
+        yawRatePid.run(DT_PID, resetPids, state, demands);
 
         float motors[4] = {};
 

@@ -306,7 +306,44 @@ namespace hf {
                 return state;
             }
 
-            void readImu(axis3_t & gyro, axis3_t & accel)
+            void getMiniState(float & dx, float & dy, float & z, float & dz)
+            {
+                // Track previous time and position for calculating motion
+                static float tprev;
+                static float xprev;
+                static float yprev;
+                static float zprev;
+
+                const auto tcurr = wb_robot_get_time();
+                const auto dt =  tcurr - tprev;
+                tprev = tcurr;
+
+                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
+
+                z = wb_gps_get_values(_gps)[2];
+
+                // Use temporal first difference to get world-cooredinate
+                // velocities
+                auto x = wb_gps_get_values(_gps)[0];
+                auto y = wb_gps_get_values(_gps)[1];
+                dx = (x - xprev) / dt;
+                dy = (y - yprev) / dt;
+                dz = (z - zprev) / dt;
+
+                // Rotate X,Y world velocities into body frame to simulate
+                // optical-flow sensor
+                auto cospsi = cos(psi);
+                auto sinpsi = sin(psi);
+                dx = dx * cospsi + dy * sinpsi;
+                dy = dx * sinpsi - dy * cospsi;
+
+                // Save past time and position for next time step
+                xprev = x;
+                yprev = y;
+                zprev = z;
+            }
+
+             void readImu(axis3_t & gyro, axis3_t & accel)
             {
                 gyro.x = 0;
                 gyro.y = 0;
