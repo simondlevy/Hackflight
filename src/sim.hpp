@@ -240,62 +240,6 @@ namespace hf {
                 };
             }
 
-            state_t getState()
-            {
-                // Track previous time and position for calculating motion
-                static float tprev;
-                static float xprev;
-                static float yprev;
-                static float zprev;
-
-                const auto tcurr = wb_robot_get_time();
-                const auto dt =  tcurr - tprev;
-                tprev = tcurr;
-
-                auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
-
-                state_t state = {};
-
-                state.z = wb_gps_get_values(_gps)[2];
-
-                state.phi = Utils::RAD2DEG*(
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[0]);
-
-                state.dphi = Utils::RAD2DEG*(
-                        wb_gyro_get_values(_gyro)[0]);
-
-                state.theta = Utils::RAD2DEG*(
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[1]);
-
-                state.dtheta =  Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[1]); 
-
-                state.psi  =  -Utils::RAD2DEG*(psi); 
-
-                state.dpsi =  -Utils::RAD2DEG*(wb_gyro_get_values(_gyro)[2]);
-
-                // Use temporal first difference to get world-cooredinate
-                // velocities
-                auto x = wb_gps_get_values(_gps)[0];
-                auto y = wb_gps_get_values(_gps)[1];
-                auto dx = (x - xprev) / dt;
-                auto dy = (y - yprev) / dt;
-                state.dz = (state.z - zprev) / dt;
-
-                // Rotate X,Y world velocities into body frame to simulate
-                // optical-flow sensor
-                auto cospsi = cos(psi);
-                auto sinpsi = sin(psi);
-                state.dx = dx * cospsi + dy * sinpsi;
-                state.dy = dx * sinpsi - dy * cospsi;
-
-                // Save past time and position for next time step
-                xprev = x;
-                yprev = y;
-                zprev = state.z;
-
-                return state;
-            }
-
             axis3_t getEulerAngles()
             {
                 return axis3_t {
