@@ -57,9 +57,15 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
-        const auto state = sim.getState();
+        auto state = sim.getState();
+
+        const auto angles = sim.getEulerAngles();
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
+
+        state.phi = angles.x;
+        state.theta = angles.y;
+        state.psi = angles.z;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by

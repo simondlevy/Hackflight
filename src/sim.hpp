@@ -306,6 +306,20 @@ namespace hf {
                 return state;
             }
 
+            axis3_t getEulerAngles()
+            {
+                return axis3_t {
+
+                    getEulerAngle(0), getEulerAngle(1), -getEulerAngle(2)
+                };
+            }
+
+            float getEulerAngle(const uint8_t axis)
+            {        
+                return Utils::RAD2DEG * (
+                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[axis]);
+            }
+
             void getMiniState(float & dx, float & dy, float & z, float & dz)
             {
                 // Track previous time and position for calculating motion
@@ -343,7 +357,7 @@ namespace hf {
                 zprev = z;
             }
 
-             void readImu(axis3_t & gyro, axis3_t & accel)
+            void readImu(axis3_t & gyro, axis3_t & accel)
             {
                 gyro.x = 0;
                 gyro.y = 0;
