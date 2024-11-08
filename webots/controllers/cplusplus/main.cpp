@@ -15,6 +15,7 @@
  */
 
 #include <hackflight.hpp>
+#include <estimators/vertical.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim.hpp>
 #include <pids/altitude.hpp>
