@@ -15,6 +15,7 @@
  */
 
 #include <hackflight.hpp>
+#include <madgwick.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim.hpp>
 #include <pids/altitude.hpp>
@@ -47,6 +48,12 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
+    hf::Madgwick madgwick = {};
+
+    madgwick.initialize();
+
+    auto * logfp = fopen("log.csv", "w");
+
     while (true) {
 
         if (!sim.step()) {
@@ -61,7 +68,11 @@ int main(int argc, char ** argv)
 
         const auto accel = sim.readAccel();
 
-        printf("%+3.3f | %+3.3f\n", gyro.z, state.dpsi);
+        float phi=0, theta=0, psi=0;
+
+        madgwick.getAngles(DT, gyro, accel, phi, theta, psi);
+
+        fprintf(logfp, "%+3.3f, %+3.3f\n", psi, state.psi);
 
         (void)accel;
 
