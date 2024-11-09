@@ -64,8 +64,11 @@ int main(int argc, char ** argv)
 
         const auto quat = sim.getQuaternion();
 
+        printf("qw=%+3.3f qx=%+3.3f qy=%+3.3f qz=%+3.3f\n",
+               quat.w, quat.x, quat.y, quat.z); 
+
         hf::axis3_t euler = {};
-        hf::Utils::quat2euler(quat, euler);
+        hf::Utils::quat2euler_sim(quat, euler);
 
         state.dphi = gyro.x;
         state.dtheta = gyro.y;

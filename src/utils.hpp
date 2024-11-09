@@ -35,7 +35,7 @@ namespace hf {
             static constexpr float RAD2DEG = 180.0f / M_PI;
             static constexpr float GS2MSS = 9.81;
 
-            static void quat2euler(const quaternion_t q, axis3_t & a)
+            static void quat2euler_sim(const quaternion_t q, axis3_t & a)
             {
                 a.x = RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
                         (q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z));
@@ -47,15 +47,14 @@ namespace hf {
                         (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
             }
 
-            static void quat2euler(const quaternion_t q,
-                    float & phi, float & theta, float & psi)
+            static void quat2euler_board(const quaternion_t q, axis3_t &a)
             {
-                phi = hf::Utils::RAD2DEG *atan2(q.w*q.x + q.y*q.z,
+                a.x = hf::Utils::RAD2DEG * atan2(q.w*q.x + q.y*q.z,
                         0.5f - q.x*q.x - q.y*q.y);
 
-                theta = -hf::Utils::RAD2DEG * asin(-2 * (q.x*q.z - q.w*q.y));
+                a.y = -hf::Utils::RAD2DEG * asin(-2 * (q.x*q.z - q.w*q.y));
 
-                psi = hf::Utils::RAD2DEG * atan2(q.x*q.y + q.w*q.z,
+                a.z = hf::Utils::RAD2DEG * atan2(q.x*q.y + q.w*q.z,
                         0.5f - q.y*q.y - q.z*q.z);
             }
 
