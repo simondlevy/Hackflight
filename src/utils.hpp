@@ -35,26 +35,14 @@ namespace hf {
             static constexpr float RAD2DEG = 180.0f / M_PI;
             static constexpr float GS2MSS = 9.81;
 
-            static void quat2euler_sim(const quaternion_t q, axis3_t & a)
+            static void quat2euler(const quaternion_t q, axis3_t &a)
             {
-                a.x = hf::Utils::RAD2DEG * atan2(q.w*q.x + q.y*q.z,
+                a.x = RAD2DEG * atan2(q.w*q.x + q.y*q.z,
                         0.5f - q.x*q.x - q.y*q.y);
 
-                a.y = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
+                a.y = RAD2DEG * asin(2 * (q.x*q.z - q.w*q.y));
 
-                // Negate for nose-right positive
-                a.z = -RAD2DEG * atan2((2 * (q.x*q.y + q.w*q.z)),
-                        (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
-            }
-
-            static void quat2euler_board(const quaternion_t q, axis3_t &a)
-            {
-                a.x = hf::Utils::RAD2DEG * atan2(q.w*q.x + q.y*q.z,
-                        0.5f - q.x*q.x - q.y*q.y);
-
-                a.y = -hf::Utils::RAD2DEG * asin(-2 * (q.x*q.z - q.w*q.y));
-
-                a.z = hf::Utils::RAD2DEG * atan2(q.x*q.y + q.w*q.z,
+                a.z = RAD2DEG * atan2(q.x*q.y + q.w*q.z,
                         0.5f - q.y*q.y - q.z*q.z);
             }
 

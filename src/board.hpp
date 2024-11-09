@@ -151,21 +151,11 @@ namespace hf {
 
                 // Compute Euler angles from quaternion
                 axis3_t angles = {};
-                Utils::quat2euler_board(quat, angles);
+                Utils::quat2euler(quat, angles);
 
                 state.phi = angles.x;
                 state.theta = angles.y;
                 state.psi = angles.z;
-
-                /*
-                axis3_t angles = {};
-                Utils::quat2euler_sim(quat, angles);
-                static uint32_t usec_prev;
-                if (_usec_curr - usec_prev > 10'000) {
-                    printf("phi=%+3.3f (%+3.3f)  theta=%+3.3f (%+3.3f)  psi=%+3.3f (%+3.3f)\n",
-                          angles.x, state.phi, angles.y, state.theta, angles.z, state.psi)  ;
-                    usec_prev = _usec_curr;
-                }*/
 
                 if (fullMonty) {
 

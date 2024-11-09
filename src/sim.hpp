@@ -264,10 +264,7 @@ namespace hf {
                 // For order see https://cyberbotics.com/doc/reference/
                 //   inertialunit#wb_inertial_unit_get_quaternion
                 return quaternion_t { 
-                    (float)q[3], 
-                        (float)q[0], 
-                        (float)q[1], 
-                        (float)q[2] 
+                    (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
                 };
             }
 
