@@ -66,13 +66,13 @@ int main(int argc, char ** argv)
         state.dtheta = gyro.y;
         state.dpsi = gyro.z;
 
-        const auto distance = sim.getRangefinderDistance();
-
         const auto angles = sim.getEulerAngles();
 
         sim.getHorizontalVelocity(state.dx, state.dy);
 
         sim.getVerticalData(state.z, state.dz);
+
+        const auto distance = sim.getRangefinderDistance() / 1000;
 
         const auto accel = sim.readAccel();
 
@@ -105,7 +105,7 @@ int main(int argc, char ** argv)
 
         mixer.run(demands, motors);
 
-        fprintf(logfp, "%f,%f,%f\n", sim.getTime(), accel.z, state.dz);
+        fprintf(logfp, "%f,%f\n", distance, state.z);
 
         sim.setMotors(motors);
     }
