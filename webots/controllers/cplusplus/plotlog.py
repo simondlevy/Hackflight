@@ -8,9 +8,5 @@ data = np.loadtxt('log.csv', delimiter=',')
 plt.plot(data[:,0])
 plt.plot(data[:,1])
 
-plt.legend(['rangefinder', 'ground-truth'])
-
-plt.ylabel('meters')
-
 plt.show()
 

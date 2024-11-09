@@ -257,6 +257,20 @@ namespace hf {
                 };
             }
 
+            quaternion_t getQuaternion()
+            {
+                const auto  q = wb_inertial_unit_get_quaternion(_imu);
+
+                // For order see https://cyberbotics.com/doc/reference/
+                //   inertialunit#wb_inertial_unit_get_quaternion
+                return quaternion_t { 
+                    (float)q[3], 
+                        (float)q[0], 
+                        (float)q[1], 
+                        (float)q[2] 
+                };
+            }
+
             void getHorizontalVelocity(float & dx, float & dy)
             {
                 // Track previous time and position for calculating motion

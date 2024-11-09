@@ -48,7 +48,7 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
-    FILE * logfp = fopen("log.csv", "w");
+    auto * logfp = fopen("log.csv", "w");
 
     while (true) {
 
@@ -62,11 +62,14 @@ int main(int argc, char ** argv)
 
         const auto gyro = sim.readGyro();
 
+        const auto quat = sim.getQuaternion();
+
+        hf::axis3_t euler = {};
+        hf::Utils::quat2euler(quat, euler);
+
         state.dphi = gyro.x;
         state.dtheta = gyro.y;
         state.dpsi = gyro.z;
-
-        const auto angles = sim.getEulerAngles();
 
         sim.getHorizontalVelocity(state.dx, state.dy);
 
@@ -74,13 +77,21 @@ int main(int argc, char ** argv)
 
         const auto distance = sim.getRangefinderDistance() / 1000;
 
-        const auto accel = sim.readAccel();
+        // Adapted from 
+        // https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
+        //   modules/src/kalman_core/kalman_core.c#L715
+        const auto rz = quat.w * quat.w - quat.x * quat.x -
+            quat.y * quat.y + quat.z*quat.z;
+
+        fprintf(logfp, "%f,%f\n", distance*rz, state.z);
+
+        //const auto accel = sim.readAccel();
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-        state.phi = angles.x;
-        state.theta = angles.y;
-        state.psi = angles.z;
+        state.phi = euler.x;
+        state.theta = euler.y;
+        state.psi = euler.z;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
@@ -104,8 +115,6 @@ int main(int argc, char ** argv)
         float motors[4] = {};
 
         mixer.run(demands, motors);
-
-        fprintf(logfp, "%f,%f\n", distance, state.z);
 
         sim.setMotors(motors);
     }

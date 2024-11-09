@@ -50,6 +50,18 @@ namespace hf {
                         (qw*qw + qx*qx - qy*qy - qz*qz));
             }
 
+            static void quat2euler(const quaternion_t q, axis3_t & a)
+            {
+                a.x = RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
+                        (q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z));
+
+                a.y = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
+
+                // Negate for nose-right positive
+                a.z = -RAD2DEG * atan2((2 * (q.x*q.y + q.w*q.z)),
+                        (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
+            }
+
             static float fmax(const float val, const float maxval)
             {
                 return val > maxval ? maxval : val;
