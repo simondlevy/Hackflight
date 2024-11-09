@@ -144,17 +144,13 @@ namespace hf {
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
-                /*
-                static uint32_t usec_prev;
-                if (_usec_curr - usec_prev > 10'000) {
-                    printf("%+3.3f\n", gyro.z);
-                    usec_prev = _usec_curr;
-                }*/
-
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
-                _madgwick.getAngles(dt, gyro, accel,
-                        state.phi, state.theta, state.psi);
+                quaternion_t quat = {};
+                _madgwick.getQuaternion(dt, gyro, accel, quat);
+
+                // Compute Euler angles from quaternion
+                Utils::quat2euler(quat, state.phi, state.theta, state.psi);
 
                 if (fullMonty) {
 
