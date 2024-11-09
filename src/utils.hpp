@@ -37,8 +37,8 @@ namespace hf {
 
             static void quat2euler_sim(const quaternion_t q, axis3_t & a)
             {
-                a.x = RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
-                        (q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z));
+                a.x = hf::Utils::RAD2DEG * atan2(q.w*q.x + q.y*q.z,
+                        0.5f - q.x*q.x - q.y*q.y);
 
                 a.y = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
 
