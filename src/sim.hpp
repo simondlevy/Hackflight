@@ -32,6 +32,7 @@
 #include <utils.hpp>
 
 #include <webots/camera.h>
+#include <webots/distance_sensor.h>
 #include <webots/gps.h>
 #include <webots/gyro.h>
 #include <webots/inertial_unit.h>
@@ -76,6 +77,9 @@ namespace hf {
                 _camera = _makeSensor("camera",
                         _timestep, wb_camera_enable);
 
+                _rangefinder = _makeSensor("rangefinder",
+                        _timestep, wb_distance_sensor_enable);
+
                 if (tryJoystick) {
 
                     wb_joystick_enable(_timestep);
@@ -105,6 +109,11 @@ namespace hf {
             double getTime()
             {
                 return _time;
+            }
+
+            double getRangefinderDistance()
+            {
+                return wb_distance_sensor_get_value(_rangefinder);
             }
 
             demands_t getDemandsFromKeyboard()
@@ -349,6 +358,7 @@ namespace hf {
             WbDeviceTag _motor4;
 
             WbDeviceTag _camera;
+            WbDeviceTag _rangefinder;
             WbDeviceTag _gps;
             WbDeviceTag _gyro;
             WbDeviceTag _accel;

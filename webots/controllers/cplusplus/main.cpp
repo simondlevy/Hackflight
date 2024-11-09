@@ -66,6 +66,8 @@ int main(int argc, char ** argv)
         state.dtheta = gyro.y;
         state.dpsi = gyro.z;
 
+        const auto distance = sim.getRangefinderDistance();
+
         const auto angles = sim.getEulerAngles();
 
         sim.getHorizontalVelocity(state.dx, state.dy);

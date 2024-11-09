@@ -34,6 +34,15 @@ DEF ROBOT Robot {
             height 324
     }
 
+    DistanceSensor {
+      rotation 0 0 1 -1.57
+      name "rangefinder"
+      lookupTable [
+        0 0 0
+        2 2000 0
+      ]
+  }
+
     GPS {
     }
 
