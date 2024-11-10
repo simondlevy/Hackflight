@@ -88,9 +88,9 @@ int main(int argc, char ** argv)
 
         stream_completedTakeoff = _sim.time() > 3;
 
-        _sim.getHorizontalVelocity(stream_dx, stream_dy);
+        _sim.getGroundTruthHorizontalVelocity(stream_dx, stream_dy);
 
-        _sim.getVerticalData(stream_z, stream_dz);
+        _sim.getGroundTruthVerticalData(stream_z, stream_dz);
 
         stream_phi = angles.x;
         stream_dphi = gyro.x;

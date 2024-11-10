@@ -30,17 +30,26 @@ namespace hf {
             void getValues(
                     const float dt,
                     const axis3_t & accel,
-                    const float zrange,
-                    const axis3_t & angles,
+                    const quaternion_t & quat,
+                    const float h,
                     float & z,float & dz)
             {
-                (void)dt;
-                (void)accel;
-                (void)zrange;
-                (void)angles;
-                (void)z;
-                (void)dz;
+                // Rotation matrix adapted from 
+                //   https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
+                //     modules/src/kalman_core/kalman_core.c#L715
+                const auto rz = quat.w * quat.w - quat.x * quat.x -
+                    quat.y * quat.y + quat.z*quat.z;
+
+                _integral += dt * (accel.z - 1) * rz;
+
+                dz = _integral;
+
+                z = h * rz;
             }
+
+        private:
+
+            float _integral;
     };
 
 }

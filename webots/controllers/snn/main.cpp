@@ -122,7 +122,7 @@ int main(int argc, char ** argv)
         auto demands = sim.getDemandsFromKeyboard();
 
         float z=0, dz=0;
-        sim.getVerticalData(z, dz);
+        sim.getGroundTruthVerticalData(z, dz);
 
         const auto thrustFromSnn = runSnn(
                 climbRateSnn, demands.thrust, dz,
@@ -142,7 +142,7 @@ int main(int argc, char ** argv)
 
         float dx=0, dy=0;
 
-        sim.getHorizontalVelocity(dx, dy);
+        sim.getGroundTruthHorizontalVelocity(dx, dy);
 
         const auto snn_diff = runCascadeSnn(cascadeSnn, demands.roll, dy, phi);
 

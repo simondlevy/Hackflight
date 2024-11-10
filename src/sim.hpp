@@ -268,7 +268,7 @@ namespace hf {
                 };
             }
 
-            void getHorizontalVelocity(float & dx, float & dy)
+            void getGroundTruthHorizontalVelocity(float & dx, float & dy)
             {
                 // Track previous time and position for calculating motion
                 static float tprev;
@@ -300,7 +300,7 @@ namespace hf {
                 yprev = y;
             }
 
-            void getVerticalData(float & z, float & dz)
+            void getGroundTruthVerticalData(float & z, float & dz)
             {
                 // Track previous time and position for calculating motion
                 static float tprev;

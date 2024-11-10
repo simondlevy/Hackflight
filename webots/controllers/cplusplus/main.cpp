@@ -48,6 +48,8 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
+    hf::ComplementaryVertical vert = {};
+
     auto * logfp = fopen("log.csv", "w");
 
     while (true) {
@@ -58,34 +60,31 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
-        hf::state_t state = {};
-
         const auto gyro = sim.readGyro();
+
+        const auto accel = sim.readAccel();
 
         const auto quat = sim.getQuaternion();
 
+        const auto zrange = sim.getRangefinderDistance() / 1000;
+
         hf::axis3_t euler = {};
         hf::Utils::quat2euler(quat, euler);
+
+        hf::state_t state = {};
 
         state.dphi = gyro.x;
         state.dtheta = gyro.y;
         state.dpsi = gyro.z;
 
-        sim.getHorizontalVelocity(state.dx, state.dy);
+        float z=0, dz=0;
+        vert.getValues(DT, accel, quat, zrange, z, dz);
 
-        sim.getVerticalData(state.z, state.dz);
+        sim.getGroundTruthVerticalData(state.z, state.dz);
 
-        const auto distance = sim.getRangefinderDistance() / 1000;
+        fprintf(logfp, "%f,%f,%f,%f\n", z, state.z, dz, state.dz);
 
-        // Adapted from 
-        // https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
-        //   modules/src/kalman_core/kalman_core.c#L715
-        const auto rz = quat.w * quat.w - quat.x * quat.x -
-            quat.y * quat.y + quat.z*quat.z;
-
-        fprintf(logfp, "%f,%f\n", distance*rz, state.z);
-
-        //const auto accel = sim.readAccel();
+        sim.getGroundTruthHorizontalVelocity(state.dx, state.dy);
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
