@@ -53,16 +53,16 @@ namespace hf {
 
                 dz_ranger = (z - _zprev) / dt;
 
-                dz = K1/2 * _integral + K2/2 * dz_ranger;
+                dz = ALPHA * _integral +  BETA * dz_ranger;
 
                 _zprev = z;
             }
 
         private:
 
-            static constexpr float K1 = 3;
+            static constexpr float ALPHA = 1.50;
 
-            static constexpr float K2 = 0.31;
+            static constexpr float BETA = 0.155;
 
             float _integral;
 
