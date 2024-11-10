@@ -37,7 +37,8 @@ namespace hf {
                     float & z,
                     float & dz_accel,
                     float & dz_ranger,
-                    float & dz)
+                    float & dz, 
+                    float & dz_new)
             {
                 // Rotation matrix adapted from 
                 //   https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
@@ -53,16 +54,20 @@ namespace hf {
 
                 dz_ranger = (z - _zprev) / dt;
 
-                dz = ALPHA * _integral +  BETA * dz_ranger;
+                dz = K1 * _integral +  K2 * dz_ranger;
+
+                dz_new = ALPHA * _integral + (1 - ALPHA) * dz_ranger;
 
                 _zprev = z;
             }
 
         private:
+            
+            static constexpr float ALPHA = 0.765;
 
-            static constexpr float ALPHA = 1.50;
+            static constexpr float K1 = 1.50;
 
-            static constexpr float BETA = 0.155;
+            static constexpr float K2 = 0.155;
 
             float _integral;
 
