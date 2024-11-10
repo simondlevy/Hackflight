@@ -45,15 +45,15 @@ namespace hf {
                 const auto rz = quat.w * quat.w - quat.x * quat.x -
                     quat.y * quat.y + quat.z*quat.z;
 
-                _integral += K1 * Utils::GS2MSS * dt * (accel.z - 1) * rz;
+                _integral += Utils::GS2MSS * dt * (accel.z - 1) * rz;
 
                 dz_accel = _integral;
 
                 z = h * rz;
 
-                dz_ranger = K2 * (z - _zprev) / dt;
+                dz_ranger = (z - _zprev) / dt;
 
-                dz = (dz_accel + dz_ranger) / 2;
+                dz = (K1 * _integral + K2 * dz_ranger) / 2;
 
                 _zprev = z;
             }
