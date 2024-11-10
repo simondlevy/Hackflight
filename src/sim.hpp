@@ -285,15 +285,15 @@ namespace hf {
                 // velocities
                 auto x = wb_gps_get_values(_gps)[0];
                 auto y = wb_gps_get_values(_gps)[1];
-                dx = (x - xprev) / dt;
-                dy = (y - yprev) / dt;
+                const auto dx_ = (x - xprev) / dt;
+                const auto dy_ = (y - yprev) / dt;
 
                 // Rotate X,Y world velocities into body frame to simulate
                 // optical-flow sensor
                 auto cospsi = cos(psi);
                 auto sinpsi = sin(psi);
-                dx = dx * cospsi + dy * sinpsi;
-                dy = dx * sinpsi - dy * cospsi;
+                dx = dx_ * cospsi + dy_ * sinpsi;
+                dy = dx_ * sinpsi - dy_ * cospsi;
 
                 // Save past time and position for next time step
                 xprev = x;
