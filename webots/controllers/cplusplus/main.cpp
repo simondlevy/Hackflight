@@ -77,13 +77,13 @@ int main(int argc, char ** argv)
         state.dtheta = gyro.y;
         state.dpsi = gyro.z;
 
-        float z=0, dz_accel, dz_ranger=0;
-        vert.getValues(DT, accel, quat, zrange, z, dz_accel, dz_ranger);
+        float z=0, dz_accel, dz_ranger=0, dz=0;
+        vert.getValues(DT, accel, quat, zrange, z, dz_accel, dz_ranger, dz);
 
         sim.getGroundTruthVerticalData(state.z, state.dz);
 
-        fprintf(logfp, "%f,%f,%f,%f,%f\n",
-                z, state.z, dz_accel, dz_ranger, state.dz);
+        fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
+                z, state.z, dz_accel, dz_ranger, dz, state.dz);
 
         sim.getGroundTruthHorizontalVelocity(state.dx, state.dy);
 
