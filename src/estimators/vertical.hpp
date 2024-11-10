@@ -34,7 +34,9 @@ namespace hf {
                     const axis3_t & accel,
                     const quaternion_t & quat,
                     const float h,
-                    float & z,float & dz)
+                    float & z,
+                    float & dz_accel,
+                    float & dz_ranger)
             {
                 // Rotation matrix adapted from 
                 //   https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
@@ -44,16 +46,24 @@ namespace hf {
 
                 _integral += ACCEL_SCALE * Utils::GS2MSS * dt * (accel.z - 1) * rz;
 
-                dz = _integral;
+                dz_accel = _integral;
 
                 z = h * rz;
+
+                dz_ranger = RANGER_SCALE * (z - _zprev) / dt;
+
+                _zprev = z;
             }
 
         private:
 
             static constexpr float ACCEL_SCALE = 3;
 
+            static constexpr float RANGER_SCALE = 0.3125;
+
             float _integral;
+
+            float _zprev;
     };
 
 }
