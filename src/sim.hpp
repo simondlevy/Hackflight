@@ -281,14 +281,6 @@ namespace hf {
                 };
             }
 
-            axis3_t getEulerAngles()
-            {
-                return axis3_t {
-
-                    getEulerAngle(0), getEulerAngle(1), -getEulerAngle(2)
-                };
-            }
-
             quaternion_t getQuaternion()
             {
                 const auto  q = wb_inertial_unit_get_quaternion(_imu);
@@ -539,12 +531,6 @@ namespace hf {
                 gettimeofday(&tv, NULL);
                 return tv.tv_sec + tv.tv_usec / 1e6;
 
-            }
-
-            float getEulerAngle(const uint8_t axis)
-            {        
-                return Utils::RAD2DEG * (
-                        wb_inertial_unit_get_roll_pitch_yaw(_imu)[axis]);
             }
 
             float readAccelAxis(const uint8_t axis)
