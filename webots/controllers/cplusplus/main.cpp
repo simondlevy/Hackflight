@@ -50,7 +50,7 @@ int main(int argc, char ** argv)
 
     hf::ComplementaryVertical vert = {};
 
-    auto * logfp = fopen("log.csv", "w");
+    //auto * logfp = fopen("log.csv", "w");
 
     while (true) {
 
@@ -77,12 +77,7 @@ int main(int argc, char ** argv)
         state.dtheta = gyro.y;
         state.dpsi = gyro.z;
 
-        float z=0, dz=0;
-        vert.getValues(DT, accel, quat, zrange, z, dz);
-
-        sim.getGroundTruthVerticalData(state.z, state.dz);
-
-        fprintf(logfp, "%f,%f,%f,%f\n", z, state.z, dz, state.dz);
+        vert.getValues(DT, accel, quat, zrange, state.z, state.dz);
 
         sim.getGroundTruthHorizontalVelocity(state.dx, state.dy);
 

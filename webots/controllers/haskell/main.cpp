@@ -16,7 +16,9 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
+#include <hackflight.hpp>
 #include <sim.hpp>
+#include <estimators/vertical.hpp>
 
 // Webots simulator class
 static hf::Simulator _sim;
