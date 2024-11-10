@@ -29,6 +29,8 @@
 #include <map>
 #include <string>
 
+#include <hackflight.hpp>
+#include <estimators/vertical.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -104,6 +106,36 @@ namespace hf {
             bool step()
             {
                 return wb_robot_step((int)_timestep) != -1;
+            }
+
+            state_t getState(const float dt)
+            {
+                state_t state = {};
+
+                const auto gyro = readGyro();
+
+                const auto accel = readAccel();
+
+                const auto quat = getQuaternion();
+
+                const auto zrange = getRangefinderDistance();
+
+                hf::axis3_t euler = {};
+                hf::Utils::quat2euler(quat, euler);
+
+                state.dphi = gyro.x;
+                state.dtheta = gyro.y;
+                state.dpsi = gyro.z;
+
+                _vert.getValues(dt, accel, quat, zrange, state.z, state.dz);
+
+                getGroundTruthHorizontalVelocity(state.dx, state.dy);
+
+                state.phi = euler.x;
+                state.theta = euler.y;
+                state.psi = euler.z;
+
+                return state;
             }
 
             double getTime()
@@ -362,6 +394,8 @@ namespace hf {
             float  _time;
 
             uint32_t _tick;
+
+            ComplementaryVertical _vert;
 
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;

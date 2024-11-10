@@ -48,7 +48,7 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
-    hf::ComplementaryVertical vert = {};
+    //hf::ComplementaryVertical vert = {};
 
     //auto * logfp = fopen("log.csv", "w");
 
@@ -60,6 +60,9 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
+        const auto state = sim.getState(DT);
+
+        /*
         const auto gyro = sim.readGyro();
 
         const auto accel = sim.readAccel();
@@ -80,12 +83,13 @@ int main(int argc, char ** argv)
         vert.getValues(DT, accel, quat, zrange, state.z, state.dz);
 
         sim.getGroundTruthHorizontalVelocity(state.dx, state.dy);
+        */
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-        state.phi = euler.x;
-        state.theta = euler.y;
-        state.psi = euler.z;
+        //state.phi = euler.x;
+        //state.theta = euler.y;
+        //state.psi = euler.z;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
