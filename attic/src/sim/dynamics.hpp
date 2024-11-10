@@ -136,11 +136,11 @@ namespace hf {
                     sqr(motors[3])
                 };
 
-                // Compute thrust
+                // Compute thrust in a general way
                 const auto u1 = _params.B *
                     (omegasqr[0] + omegasqr[1] + omegasqr[2] + omegasqr[3]);
 
-                // Compute angular forces
+                // Compute angular forces based on mixer configuration
                 const auto u2 = _params.L * _params.B * mixer.roll(omegasqr);
                 const auto u3 = 0;//_params.L * _params.B * mixer.pitch(omegasqr);
                 const auto u4 = _params.D * mixer.yaw(omegasqr);

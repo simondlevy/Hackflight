@@ -35,19 +35,15 @@ namespace hf {
             static constexpr float RAD2DEG = 180.0f / M_PI;
             static constexpr float GS2MSS = 9.81;
 
-            static void quat2euler(
-                    const float qw, const float qx, const float qy, const float qz,
-                    float & phi, float & theta, float & psi)
+            static void quat2euler(const quaternion_t q, axis3_t &a)
             {
-                // We swap the X and Y axes and negate Y for nose-down positive.
-                phi = RAD2DEG * asin((-2) * (qx*qz - qw*qy));
+                a.x = RAD2DEG * atan2(q.w*q.x + q.y*q.z,
+                        0.5f - q.x*q.x - q.y*q.y);
 
-                theta = -RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
-                        (qw*qw - qx*qx - qy*qy + qz*qz));
+                a.y = RAD2DEG * asin(2 * (q.x*q.z - q.w*q.y));
 
-                // Negate for nose-right positive
-                psi = -RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
-                        (qw*qw + qx*qx - qy*qy - qz*qz));
+                a.z = RAD2DEG * atan2(q.x*q.y + q.w*q.z,
+                        0.5f - q.y*q.y - q.z*q.z);
             }
 
             static float fmax(const float val, const float maxval)
@@ -90,6 +86,24 @@ namespace hf {
             static bool in_deadband(const float val, const float band)
             {
                 return fabs(val) < band;
+            }
+
+            // https://en.wikipedia.org/wiki/Rotation_matrix
+            static void angles2rotation(const axis3_t & a, float r[3][3]) 
+            {
+                const auto alpha = a.z;
+                const auto beta = a.y;
+                const auto gamma = a.x;
+
+                r[0][0] = cos(beta) * cos(gamma);
+                r[0][1] = sin(alpha) * sin(beta) * cos(gamma) - cos(alpha) * sin(gamma);
+                r[0][2] = cos(alpha) * sin(beta) + sin(alpha) * sin(gamma);
+                r[1][0] = cos(beta) * sin(gamma);
+                r[1][1] = sin(alpha) * sin(beta) * sin(gamma) + cos(alpha) * cos(gamma);
+                r[1][2] = cos(alpha) * sin(beta) - sin(alpha) * cos(gamma);
+                r[2][0] = -sin(beta);
+                r[2][1] = sin(alpha) * cos(beta);
+                r[2][2] = cos(alpha) * cos(beta);
             }
     };
 

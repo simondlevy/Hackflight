@@ -15,7 +15,7 @@
  */
 
 #include <hackflight.hpp>
-#include <estimators/vertical.hpp>
+#include <madgwick.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim.hpp>
 #include <pids/altitude.hpp>
@@ -26,7 +26,9 @@
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static const float DT = 0.01;
+static const float DT_PID = 0.01;
+
+static const float DT_ESTIMATOR = 0.033;
 
 static const float THROTTLE_DOWN = 0.06;
 
@@ -48,9 +50,9 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
-    hf::ComplementaryVertical vert = {};
+    hf::Madgwick madgwick = {};
 
-    //auto * logfp = fopen("log.csv", "w");
+    madgwick.initialize();
 
     while (true) {
 
@@ -64,47 +66,38 @@ int main(int argc, char ** argv)
 
         const auto accel = sim.readAccel();
 
-        const auto quat = sim.getQuaternion();
+        hf::state_t state = { };
 
-        const auto zrange = sim.getRangefinderDistance();
+        sim.getMiniState(state.dx, state.dy, state.z, state.dz);
 
-        hf::axis3_t euler = {};
-        hf::Utils::quat2euler(quat, euler);
+        madgwick.getAngles(
+                DT_ESTIMATOR, gyro, accel, state.phi, state.theta, state.psi);
 
-        hf::state_t state = {};
-
+        // Get angular velocities directly from gyro
         state.dphi = gyro.x;
-        state.dtheta = gyro.y;
+        state.dtheta = -gyro.y;
         state.dpsi = gyro.z;
 
-        vert.getValues(DT, accel, quat, zrange, state.z, state.dz);
-
-        sim.getGroundTruthHorizontalVelocity(state.dx, state.dy);
-
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
-
-        state.phi = euler.x;
-        state.theta = euler.y;
-        state.psi = euler.z;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
         // raising the non-self-centering throttle stick
         if (sim.requestedTakeoff()) {
 
-            altitudePid.run(sim.isSpringy(), DT, state, demands);
+            altitudePid.run(sim.isSpringy(), DT_PID, state, demands);
 
             demands.thrust += hf::Simulator::MOTOR_HOVER;
         }
 
         hf::PositionPid::run(state, demands);
 
-        pitchRollAnglePid.run(DT, resetPids, state, demands);
+        pitchRollAnglePid.run(DT_PID, resetPids, state, demands);
 
-        pitchRollRatePid.run(DT, resetPids, state, demands,
+        pitchRollRatePid.run(DT_PID, resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
 
-        yawRatePid.run(DT, resetPids, state, demands);
+        yawRatePid.run(DT_PID, resetPids, state, demands);
 
         float motors[4] = {};
 

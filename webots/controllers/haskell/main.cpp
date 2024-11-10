@@ -16,7 +16,9 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <sim/sim.hpp>
+#include <hackflight.hpp>
+#include <sim.hpp>
+#include <estimators/vertical.hpp>
 
 // Webots simulator class
 static hf::Simulator _sim;
@@ -73,7 +75,9 @@ int main(int argc, char ** argv)
             break;
         }
 
-        const auto state = _sim.getState();
+        const auto angles = _sim.getEulerAngles();
+
+        const auto gyro = _sim.readGyro();
 
         const auto demands = _sim.getDemandsFromKeyboard();
 
@@ -86,16 +90,16 @@ int main(int argc, char ** argv)
 
         stream_completedTakeoff = _sim.time() > 3;
 
-        stream_dx = state.dx;
-        stream_dy = state.dy;
-        stream_z = state.z;
-        stream_dz = state.dz;
-        stream_phi = state.phi;
-        stream_dphi = state.dphi;
-        stream_theta = state.theta;
-        stream_dtheta = state.dtheta;
-        stream_psi = state.psi;
-        stream_dpsi = state.dpsi;
+        _sim.getGroundTruthHorizontalVelocity(stream_dx, stream_dy);
+
+        _sim.getGroundTruthVerticalData(stream_z, stream_dz);
+
+        stream_phi = angles.x;
+        stream_dphi = gyro.x;
+        stream_theta = angles.y;
+        stream_dtheta = gyro.y;
+        stream_psi = angles.z;
+        stream_dpsi = gyro.z;
 
         copilot_step_core();
     }
@@ -104,4 +108,3 @@ int main(int argc, char ** argv)
 
     return 0;
 }
-

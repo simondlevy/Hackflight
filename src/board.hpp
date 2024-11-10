@@ -30,7 +30,7 @@
 #include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-#include <madgwick.hpp>
+#include <estimators/madgwick.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <i2c_comms.h>
@@ -131,23 +131,31 @@ namespace hf {
                 _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
                 // Accelerometer degrees
-                float accelX = ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X;
-                float accelY = ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y;
-                float accelZ = az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z;
+                const axis3_t accel = {
+                    -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
+                    ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
+                    az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+                };
 
                 // Gyro deg /sec
-                float gyroX = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
-                float gyroY = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
-                float gyroZ = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
-
-                // Negate gyroZ for nose-right positive
-                gyroZ = -gyroZ;
+                const axis3_t gyro = {
+                    gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
+                    -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
+                    -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
+                };
 
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
-                _madgwick.getAngles(
-                        dt, gyroX, -gyroY, gyroZ, -accelX, accelY, accelZ, 
-                        state.phi, state.theta, state.psi);
+                quaternion_t quat = {};
+                _madgwick.getQuaternion(dt, gyro, accel, quat);
+
+                // Compute Euler angles from quaternion
+                axis3_t angles = {};
+                Utils::quat2euler(quat, angles);
+
+                state.phi = angles.x;
+                state.theta = angles.y;
+                state.psi = angles.z;
 
                 if (fullMonty) {
 
@@ -166,9 +174,9 @@ namespace hf {
                 }
 
                 // Get angular velocities directly from gyro
-                state.dphi = gyroX;
-                state.dtheta = gyroY;
-                state.dpsi = gyroZ;
+                state.dphi = gyro.x;
+                state.dtheta = -gyro.y;
+                state.dpsi = gyro.z;
 
                 // Convert stick demands to appropriate intervals
                 demands.thrust = rx.map(_channels[0],  0.,  1.);

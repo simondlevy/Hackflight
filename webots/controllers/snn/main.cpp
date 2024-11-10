@@ -22,7 +22,7 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <mixers/bfquadx.hpp>
-#include <sim/sim.hpp>
+#include <sim.hpp>
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
@@ -107,7 +107,7 @@ int main(int argc, char ** argv)
     const auto viz_port = argc > 1 ? atoi(argv[1]) : 0;
 
     if (viz_port) {
-        vizSnn = yawRateSnn;
+        vizSnn = climbRateSnn;
         vizSnn->serve_visualizer(viz_port);
     }
 
@@ -119,30 +119,38 @@ int main(int argc, char ** argv)
             break;
         }
 
-        const auto state = sim.getState();
-
         auto demands = sim.getDemandsFromKeyboard();
 
+        float z=0, dz=0;
+        sim.getGroundTruthVerticalData(z, dz);
+
         const auto thrustFromSnn = runSnn(
-                climbRateSnn, demands.thrust, state.dz,
+                climbRateSnn, demands.thrust, dz,
                 CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
+
+        const auto gyro = sim.readGyro();
 
         demands.yaw = runSnn(
                 yawRateSnn,
                 demands.yaw / hf::Simulator::YAW_SCALE,
-                state.dpsi / hf::Simulator::YAW_SCALE,
+                gyro.z / hf::Simulator::YAW_SCALE,
                 YAW_DIVISOR, YAW_OFFSET);
 
-        const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
+        const auto angles = sim.getEulerAngles();
 
-        const auto snn_diff = 
-            runCascadeSnn(cascadeSnn, demands.roll, state.dy, phi);
+        const auto phi = angles.x / PITCH_ROLL_PRE_DIVISOR;
+
+        float dx=0, dy=0;
+
+        sim.getGroundTruthHorizontalVelocity(dx, dy);
+
+        const auto snn_diff = runCascadeSnn(cascadeSnn, demands.roll, dy, phi);
 
         demands.roll = 60 * snn_diff;
-        demands.roll = 0.0125 * (demands.roll - state.dphi);
+        demands.roll = 0.0125 * (demands.roll - gyro.x);
 
-        demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
-        demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
+        demands.pitch = 6 * (10 * (demands.pitch - dx) - angles.y);
+        demands.pitch = 0.0125 * (demands.pitch - gyro.y);
 
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =

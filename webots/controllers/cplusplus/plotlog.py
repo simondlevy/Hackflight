@@ -5,46 +5,16 @@ import matplotlib.pyplot as plt
 
 data = np.loadtxt('log.csv', delimiter=',')
 
-time = data[:,0]
+plt.subplot(2, 1, 1)
+plt.plot(data[:,0], '-x')
+plt.plot(data[:,1], '-+')
+plt.legend(('est', 'true'))
+plt.ylabel('z (m)')
 
-# Motors ------------------------------------
+plt.subplot(2, 1, 2)
+plt.plot(data[:,2], '-x')
+plt.plot(data[:,3], '-+')
+plt.ylabel('dz/dt (m/s)')
 
-plt.subplot(3, 1, 1)
-
-plt.plot(time, data[:,2], '-+')
-plt.plot(time, data[:,3])
-plt.plot(time, data[:,4], '-o')
-plt.plot(time, data[:,5])
-
-mid = 55.375
-mar = 1.6
-
-plt.plot(time, mid * np.ones(time.shape))
-
-plt.ylim([mid-mar, mid+mar])
-
-plt.legend(['m1', 'm2', 'm3', 'm4'])
-
-plt.ylabel('motors (rad / sec)')
-
-# Roll rate ----------------------------------
-
-rng = 50
-
-plt.subplot(3, 1, 2)
-plt.plot(time, data[:,6])
-plt.ylim((-rng, +rng))
-plt.ylabel('dphi/dt (deg / sec)')
-
-# Roll angle ----------------------------------
-
-rng = 10
-
-plt.subplot(3, 1, 3)
-plt.plot(time, data[:,7])
-plt.ylim((-rng, +rng))
-plt.ylabel('phi (deg)')
-
-plt.xlabel('time (sec)')
 plt.show()
 
