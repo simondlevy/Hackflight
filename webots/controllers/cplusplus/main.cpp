@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 
         const auto quat = sim.getQuaternion();
 
-        const auto zrange = sim.getRangefinderDistance() / 1000;
+        const auto zrange = sim.getRangefinderDistance();
 
         hf::axis3_t euler = {};
         hf::Utils::quat2euler(quat, euler);

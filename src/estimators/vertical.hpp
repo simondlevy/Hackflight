@@ -42,7 +42,7 @@ namespace hf {
 
                 _integral += Utils::GS2MSS * dt * (accel.z - 1) * rz;
 
-                z = h * rz;
+                z = h / 1000 * rz;  // Convert mm => m, then rotate
 
                 dz = (ALPHA * _integral) + ((1 - ALPHA) * (z - _zprev) / dt);
 
