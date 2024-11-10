@@ -128,7 +128,7 @@ namespace hf {
                     (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
                 };
 
-                const auto zrange = getRangefinderDistance();
+                const auto zrange = wb_distance_sensor_get_value(_rangefinder);
 
                 hf::axis3_t euler = {};
                 hf::Utils::quat2euler(quat, euler);
@@ -151,11 +151,6 @@ namespace hf {
             double getTime()
             {
                 return _time;
-            }
-
-            double getRangefinderDistance()
-            {
-                return wb_distance_sensor_get_value(_rangefinder);
             }
 
             demands_t getDemandsFromKeyboard()
@@ -307,26 +302,6 @@ namespace hf {
                 // Save past time and position for next time step
                 xprev = x;
                 yprev = y;
-            }
-
-            void getGroundTruthVerticalData(float & z, float & dz)
-            {
-                // Track previous time and position for calculating motion
-                static float tprev;
-                static float zprev;
-
-                const auto tcurr = wb_robot_get_time();
-                const auto dt =  tcurr - tprev;
-                tprev = tcurr;
-
-                z = wb_gps_get_values(_gps)[2];
-
-                // Use temporal first difference to get world-cooredinate
-                // velocities
-                dz = (z - zprev) / dt;
-
-                // Save past time and position for next time step
-                zprev = z;
             }
 
             bool isSpringy()
