@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <hackflight.hpp>
 #include <utils.hpp>
 
@@ -40,7 +42,7 @@ namespace hf {
                 const auto rz = quat.w * quat.w - quat.x * quat.x -
                     quat.y * quat.y + quat.z*quat.z;
 
-                _integral += dt * (accel.z - 1) * rz;
+                _integral += ACCEL_SCALE * Utils::GS2MSS * dt * (accel.z - 1) * rz;
 
                 dz = _integral;
 
@@ -48,6 +50,8 @@ namespace hf {
             }
 
         private:
+
+            static constexpr float ACCEL_SCALE = 3;
 
             float _integral;
     };
