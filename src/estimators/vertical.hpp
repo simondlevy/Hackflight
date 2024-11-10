@@ -29,16 +29,10 @@ namespace hf {
 
         public:
 
-            void getValues(
-                    const float dt,
-                    const axis3_t & accel,
-                    const quaternion_t & quat,
-                    const float h,
-                    float & z,
-                    float & dz_accel,
-                    float & dz_ranger,
-                    float & dz, 
-                    float & dz_new)
+            void getValues(const float dt, const axis3_t & accel,
+                    const quaternion_t & quat, const float h,
+                    float & z, float & dz,
+                    const float ALPHA=0.765)
             {
                 // Rotation matrix adapted from 
                 //   https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
@@ -48,27 +42,15 @@ namespace hf {
 
                 _integral += Utils::GS2MSS * dt * (accel.z - 1) * rz;
 
-                dz_accel = _integral;
-
                 z = h * rz;
 
-                dz_ranger = (z - _zprev) / dt;
-
-                dz = K1 * _integral +  K2 * dz_ranger;
-
-                dz_new = ALPHA * _integral + (1 - ALPHA) * dz_ranger;
+                dz = (ALPHA * _integral) + ((1 - ALPHA) * (z - _zprev) / dt);
 
                 _zprev = z;
             }
 
         private:
             
-            static constexpr float ALPHA = 0.765;
-
-            static constexpr float K1 = 1.50;
-
-            static constexpr float K2 = 0.155;
-
             float _integral;
 
             float _zprev;
