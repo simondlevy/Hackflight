@@ -15,7 +15,6 @@
  */
 
 #include <hackflight.hpp>
-#include <estimators/vertical.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim.hpp>
 #include <pids/altitude.hpp>
@@ -48,10 +47,6 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
-    //hf::ComplementaryVertical vert = {};
-
-    //auto * logfp = fopen("log.csv", "w");
-
     while (true) {
 
         if (!sim.step()) {
@@ -62,34 +57,7 @@ int main(int argc, char ** argv)
 
         const auto state = sim.getState(DT);
 
-        /*
-        const auto gyro = sim.readGyro();
-
-        const auto accel = sim.readAccel();
-
-        const auto quat = sim.getQuaternion();
-
-        const auto zrange = sim.getRangefinderDistance();
-
-        hf::axis3_t euler = {};
-        hf::Utils::quat2euler(quat, euler);
-
-        hf::state_t state = {};
-
-        state.dphi = gyro.x;
-        state.dtheta = gyro.y;
-        state.dpsi = gyro.z;
-
-        vert.getValues(DT, accel, quat, zrange, state.z, state.dz);
-
-        sim.getGroundTruthHorizontalVelocity(state.dx, state.dy);
-        */
-
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
-
-        //state.phi = euler.x;
-        //state.theta = euler.y;
-        //state.psi = euler.z;
 
         // Throttle control begins when once takeoff is requested, either by
         // hitting a button or key ("springy", self-centering throttle) or by
