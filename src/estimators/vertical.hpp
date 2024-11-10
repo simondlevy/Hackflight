@@ -53,7 +53,7 @@ namespace hf {
 
                 dz_ranger = (z - _zprev) / dt;
 
-                dz = (K1 * _integral + K2 * dz_ranger) / 2;
+                dz = K1/2 * _integral + K2/2 * dz_ranger;
 
                 _zprev = z;
             }
