@@ -112,11 +112,21 @@ namespace hf {
             {
                 state_t state = {};
 
-                const auto gyro = readGyro();
+                const axis3_t gyro = {
+                    readGyroAxis(0), readGyroAxis(1), -readGyroAxis(2)
+                };
 
-                const auto accel = readAccel();
+                const axis3_t accel = {
+                    -readAccelAxis(0), readAccelAxis(1), readAccelAxis(2)
+                };
 
-                const auto quat = getQuaternion();
+                const auto  q = wb_inertial_unit_get_quaternion(_imu);
+
+                // For order see https://cyberbotics.com/doc/reference/
+                //   inertialunit#wb_inertial_unit_get_quaternion
+                const quaternion_t quat = { 
+                    (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
+                };
 
                 const auto zrange = getRangefinderDistance();
 
@@ -265,31 +275,6 @@ namespace hf {
                 }
 
                 return demands;
-            }
-
-            axis3_t readGyro()
-            {
-                return axis3_t {
-                    readGyroAxis(0), readGyroAxis(1), -readGyroAxis(2)
-                };
-            }
-
-            axis3_t readAccel()
-            {
-                return axis3_t {
-                    -readAccelAxis(0), readAccelAxis(1), readAccelAxis(2)
-                };
-            }
-
-            quaternion_t getQuaternion()
-            {
-                const auto  q = wb_inertial_unit_get_quaternion(_imu);
-
-                // For order see https://cyberbotics.com/doc/reference/
-                //   inertialunit#wb_inertial_unit_get_quaternion
-                return quaternion_t { 
-                    (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
-                };
             }
 
             void getGroundTruthHorizontalVelocity(float & dx, float & dy)
