@@ -61,6 +61,13 @@ namespace hf {
 
         float x;
         float y;
+
+    } axis2_t;
+
+    typedef struct {
+
+        float x;
+        float y;
         float z;
 
     } axis3_t;

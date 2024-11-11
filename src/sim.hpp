@@ -139,7 +139,11 @@ namespace hf {
 
                 _vert.getValues(dt, accel, quat, zrange, state.z, state.dz);
 
-                getGroundTruthHorizontalVelocity(state.dx, state.dy);
+                const auto dxy = getGroundTruthHorizontalVelocity();
+
+
+                state.dx = dxy.x;
+                state.dy = dxy.y;
 
                 state.phi = euler.x;
                 state.theta = euler.y;
@@ -272,7 +276,7 @@ namespace hf {
                 return demands;
             }
 
-            void getGroundTruthHorizontalVelocity(float & dx, float & dy)
+            axis2_t getGroundTruthHorizontalVelocity()
             {
                 // Track previous time and position for calculating motion
                 static float tprev;
@@ -296,12 +300,14 @@ namespace hf {
                 // optical-flow sensor
                 auto cospsi = cos(psi);
                 auto sinpsi = sin(psi);
-                dx = dx_ * cospsi + dy_ * sinpsi;
-                dy = dx_ * sinpsi - dy_ * cospsi;
+                const float dx = dx_ * cospsi + dy_ * sinpsi;
+                const float dy = dx_ * sinpsi - dy_ * cospsi;
 
                 // Save past time and position for next time step
                 xprev = x;
                 yprev = y;
+
+                return axis2_t {dx, dy};
             }
 
             bool isSpringy()
@@ -501,6 +507,14 @@ namespace hf {
             float readGyroAxis(const uint8_t axis)
             {
                 return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
+            }
+
+            axis2_t readOpticalFlowSensor( const float dt, const float h)
+            {
+                (void)dt;
+                (void)h;
+
+                return axis2_t {0, 0};
             }
 
     };
