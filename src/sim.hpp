@@ -60,6 +60,8 @@ namespace hf {
 
             void init(const bool tryJoystick=true)
             {
+                _logfp = fopen("log.csv", "w");
+
                 wb_robot_init();
 
                 _timestep = wb_robot_get_basic_time_step();
@@ -347,6 +349,8 @@ namespace hf {
                 JOYSTICK_RECOGNIZED
 
             } joystickStatus_e;
+
+            FILE * _logfp;
 
             double _timestep;
 
