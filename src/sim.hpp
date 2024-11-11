@@ -31,6 +31,7 @@
 
 #include <hackflight.hpp>
 #include <estimators/vertical.hpp>
+#include <estimators/flow.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -143,12 +144,16 @@ namespace hf {
 
                 const auto dxy_true = getGroundTruthHorizontalVelocity();
 
-                const auto flow_raw = readOpticalFlowSensor(h);
+                const auto flow_raw = opticalFlowFromGroundTruth(dxy_true);
+
+                const auto dxy_flow = OpticalFlowFilter::run(
+                        flow_raw, gyro, h, getDt());
 
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
 
-                fprintf(_logfp, "%f,%f\n", flow_raw.y, dxy_true.y);
+                fprintf(_logfp, "%f,%f,%f\n",
+                        flow_raw.y, dxy_true.y, dxy_flow.y);
 
                 state.phi = euler.x;
                 state.theta = euler.y;
@@ -522,10 +527,9 @@ namespace hf {
                 return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
             }
 
-            axis2_t readOpticalFlowSensor(const float h)
+            static axis2_t opticalFlowFromGroundTruth(const axis2_t dxy_true)
             {
-                const auto dxy = getGroundTruthHorizontalVelocity();
-
+                /*
                 const auto omegab_x = readGyroAxis(0);
                 const auto omegab_y = readGyroAxis(1);
 
@@ -538,6 +542,10 @@ namespace hf {
 
                 const auto flow_dy =
                     dt * FLOW_NPIX * (h * omegab_x + dxy.y) / (h * theta);
+                    */
+
+                const auto flow_dx = dxy_true.x;
+                const auto flow_dy = dxy_true.y;
 
                 return axis2_t {flow_dx, flow_dy};
             }
