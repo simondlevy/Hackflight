@@ -121,7 +121,7 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemandsFromKeyboard();
 
-        const auto state = sim.getState(.001);
+        const auto state = sim.getState();
 
         const auto thrustFromSnn = runSnn(
                 climbRateSnn, demands.thrust, state.dz,

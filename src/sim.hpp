@@ -137,7 +137,7 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                _vert.getValues(0.032, accel, quat, zrange, state.z, state.dz);
+                _vert.getValues(getDt(), accel, quat, zrange, state.z, state.dz);
 
                 const auto dxy = getGroundTruthHorizontalVelocity();
 
@@ -275,16 +275,18 @@ namespace hf {
                 return demands;
             }
 
+            float getDt(void)
+            {
+                return 1 / _timestep;
+            }
+
             axis2_t getGroundTruthHorizontalVelocity()
             {
                 // Track previous time and position for calculating motion
-                static float tprev;
                 static float xprev;
                 static float yprev;
 
-                const auto tcurr = wb_robot_get_time();
-                const auto dt =  tcurr - tprev;
-                tprev = tcurr;
+                const auto dt =  getDt();
 
                 auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
