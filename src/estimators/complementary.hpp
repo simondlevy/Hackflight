@@ -1,5 +1,6 @@
 /*
-   Complementary filter for altitude/climb-rate sensor fusion
+   Complementary filter for altitude/climb-rate/horizontal velocity sensor
+   fusion
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -25,7 +26,7 @@
 
 namespace hf {
 
-    class ComplementaryVertical {
+    class ComplementaryFilter {
 
         public:
 

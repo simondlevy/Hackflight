@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class Madgwick {
+    class MadgwickFilter {
 
         public:
 

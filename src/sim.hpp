@@ -30,7 +30,7 @@
 #include <string>
 
 #include <hackflight.hpp>
-#include <estimators/vertical.hpp>
+#include <estimators/complementary.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -137,7 +137,7 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                _vert.getValues(dt, accel, quat, zrange, state.z, state.dz);
+                _filter.getValues(dt, accel, quat, zrange, state.z, state.dz);
 
                 getGroundTruthHorizontalVelocity(state.dx, state.dy);
 
@@ -347,7 +347,7 @@ namespace hf {
 
             uint32_t _tick;
 
-            ComplementaryVertical _vert;
+            ComplementaryFilter _filter;
 
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;

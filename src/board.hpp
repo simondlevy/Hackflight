@@ -283,7 +283,7 @@ namespace hf {
             bool _gotFailsafe;
 
             // State estimation
-            Madgwick  _madgwick;
+            MadgwickFilter  _madgwick;
 
             static void runLoopDelay(const uint32_t usec_curr)
             {
