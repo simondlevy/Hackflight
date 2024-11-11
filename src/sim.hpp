@@ -30,7 +30,7 @@
 #include <string>
 
 #include <hackflight.hpp>
-#include <estimators/vertical.hpp>
+#include <estimators/complementary.hpp>
 #include <estimators/flow.hpp>
 #include <utils.hpp>
 
@@ -140,7 +140,7 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                _vert.getValues(getDt(), accel, quat, h, state.z, state.dz);
+                _filter.getValues(getDt(), accel, quat, h, state.z, state.dz);
 
                 const auto dxy_true = getGroundTruthHorizontalVelocity();
 
@@ -372,7 +372,7 @@ namespace hf {
 
             uint32_t _tick;
 
-            ComplementaryVertical _vert;
+            ComplementaryFilter _filter;
 
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;
