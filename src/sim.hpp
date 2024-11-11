@@ -144,7 +144,8 @@ namespace hf {
 
                 const auto dxy_true = getGroundTruthHorizontalVelocity();
 
-                const auto flow_raw = opticalFlowFromGroundTruth(dxy_true);
+                const auto flow_raw = opticalFlowFromGroundTruth(
+                        dxy_true, gyro, h, getDt());
 
                 const auto dxy_flow = OpticalFlowFilter::run(
                         flow_raw, gyro, h, getDt());
@@ -527,25 +528,19 @@ namespace hf {
                 return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
             }
 
-            static axis2_t opticalFlowFromGroundTruth(const axis2_t dxy_true)
+            static axis2_t opticalFlowFromGroundTruth(
+                    const axis2_t dxy_true,
+                    const axis3_t gyro,
+                    const float h,
+                    const float dt)
             {
-                /*
-                const auto omegab_x = readGyroAxis(0);
-                const auto omegab_y = readGyroAxis(1);
-
-                const auto dt = getDt();
-
                 const auto theta = 2 * sin(Utils::DEG2RAD * FLOW_ANGLE / 2);
 
                 const auto flow_dx =
-                    dt * FLOW_NPIX * (h * omegab_y + dxy.x) / (h * theta);
+                    dt * FLOW_NPIX * (h * gyro.y + dxy_true.x) / (h * theta);
 
                 const auto flow_dy =
-                    dt * FLOW_NPIX * (h * omegab_x + dxy.y) / (h * theta);
-                    */
-
-                const auto flow_dx = dxy_true.x;
-                const auto flow_dy = dxy_true.y;
+                    dt * FLOW_NPIX * (h * gyro.x + dxy_true.y) / (h * theta);
 
                 return axis2_t {flow_dx, flow_dy};
             }

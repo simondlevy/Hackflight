@@ -33,11 +33,6 @@ namespace hf {
                     const float h,
                     const float dt)
             {
-                (void)gyro;
-                (void)h;
-                (void)dt;
-
-                /*
                 const auto theta = 2 * sin(Utils::DEG2RAD * ANGLE / 2);
 
                 const auto dx = (h * theta * flow.x) / (dt * NPIX) -
@@ -45,10 +40,6 @@ namespace hf {
 
                 const auto dy = (h * theta * flow.y) / (dt * NPIX) -
                     h * gyro.x;
-                    */
-
-                const auto dx = flow.x;
-                const auto dy = flow.y;
 
                 return axis2_t { dx, dy };
             }
