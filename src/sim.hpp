@@ -167,7 +167,7 @@ namespace hf {
                 state.dy = dxy_true.y;
 
                 fprintf(_logfp, "%f,%f,%f,%f,%f,%f\n",
-                        state.dy, state_ekf.dy,
+                        state.dx, state_ekf.dx,
                         state.z, state_ekf.z,
                         state.dz, state_ekf.dz);
 

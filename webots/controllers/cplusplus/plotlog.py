@@ -8,7 +8,7 @@ data = np.loadtxt('log.csv', delimiter=',')
 plt.subplot(3, 1, 1)
 plt.plot(data[:,0])
 plt.plot(data[:,1])
-plt.ylabel('dy/dt (m/s)')
+plt.ylabel('dx/dt (m/s)')
 plt.legend(('comp', 'ekf'))
 
 plt.subplot(3, 1, 2)
