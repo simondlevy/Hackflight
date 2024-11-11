@@ -31,7 +31,6 @@
 
 #include <hackflight.hpp>
 #include <estimators/complementary.hpp>
-#include <estimators/flow.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -126,7 +125,9 @@ namespace hf {
                 const auto  q = wb_inertial_unit_get_quaternion(_imu);
 
                 // For order see https://cyberbotics.com/doc/reference/
-                //   inertialunit#wb_inertial_unit_get_quaternion
+                //   inertialunit#wb_inertial_unit_get_quaternion.
+                // Negations are done for consistency with output of
+                // Madgwick filter.
                 const axis4_t quat = { 
                     (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
                 };
@@ -140,15 +141,15 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                _filter.getValues(getDt(), accel, quat, h, state.z, state.dz);
-
                 const auto dxy_true = getGroundTruthHorizontalVelocity();
 
                 const auto flow_raw = opticalFlowFromGroundTruth(
                         dxy_true, gyro, h, getDt());
 
-                const auto dxy_flow = OpticalFlowFilter::run(
-                        flow_raw, gyro, h, getDt());
+                axis2_t dxy_flow = {};
+
+                _filter.getValues(getDt(), flow_raw, gyro, accel, quat, h,
+                        dxy_flow, state.z, state.dz);
 
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;

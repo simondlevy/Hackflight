@@ -30,12 +30,24 @@ namespace hf {
 
         public:
 
-            void getValues(const float dt, const axis3_t & accel,
-                    const axis4_t & quat, const float h,
-                    float & z, float & dz,
-                    const float ALPHA=0.765)
+            void getValues(
+                    const float dt,
+                    const axis2_t flow,
+                    const axis3_t gyro,
+                    const axis3_t & accel,
+                    const axis4_t & quat,
+                    const float h,
+                    axis2_t & dxy,
+                    float & z,
+                    float & dz)
             {
-                // Rotation matrix adapted from 
+                const auto theta = 2 * sin(Utils::DEG2RAD * FLOW_ANGLE / 2);
+
+                dxy.x = (h * theta * flow.x) / (dt * FLOW_NPIX) - h * gyro.y;
+
+                dxy.y = (h * theta * flow.y) / (dt * FLOW_NPIX) - h * gyro.x;
+
+                 // Rotation matrix adapted from 
                 //   https://github.com/bitcraze/crazyflie-firmware/blob/master/src/
                 //     modules/src/kalman_core/kalman_core.c#L715
                 const auto rz = quat.w * quat.w - quat.x * quat.x -
@@ -51,7 +63,14 @@ namespace hf {
             }
 
         private:
-            
+
+            // Filter coefficient
+            const float ALPHA=0.765;
+
+            // For PMW3901 optiacal flow sensor
+            static constexpr float FLOW_NPIX = 35;
+            static constexpr float FLOW_ANGLE = 42;
+
             float _integral;
 
             float _zprev;

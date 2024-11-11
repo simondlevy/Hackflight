@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
             demands.thrust += hf::Simulator::MOTOR_HOVER;
         }
 
-        //hf::PositionPid::run(state, demands);
+        hf::PositionPid::run(state, demands);
 
         pitchRollAnglePid.run(PID_DT, resetPids, state, demands);
 

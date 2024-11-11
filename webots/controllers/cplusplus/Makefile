@@ -46,9 +46,8 @@ run:
 	webots ../../worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
-log:
-	webots ../../worlds/standard.wbt &
-	/usr/local/webots/webots-controller $(NAME) | tail +11 > log.csv
+plot:
+	./plotlog.py
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
