@@ -153,8 +153,8 @@ namespace hf {
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
 
-                fprintf(_logfp, "%f,%f,%f\n",
-                        flow_raw.y, dxy_true.y, dxy_flow.y);
+                fprintf(_logfp, "%f,%f,%f,%f,%f\n",
+                        flow_raw.y, h, gyro.x, dxy_true.y, dxy_flow.y);
 
                 state.phi = euler.x;
                 state.theta = euler.y;
