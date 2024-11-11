@@ -31,6 +31,7 @@
 
 #include <hackflight.hpp>
 #include <estimators/complementary.hpp>
+#include <estimators/ekf.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -134,8 +135,8 @@ namespace hf {
 
                 const auto h = wb_distance_sensor_get_value(_rangefinder);
 
-                hf::axis3_t euler = {};
-                hf::Utils::quat2euler(quat, euler);
+                axis3_t euler = {};
+                Utils::quat2euler(quat, euler);
 
                 state.dphi = gyro.x;
                 state.dtheta = gyro.y;

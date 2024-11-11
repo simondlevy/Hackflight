@@ -15,7 +15,7 @@
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
-INCLUDE = -I$(SRCDIR)
+INCLUDE = -I$(SRCDIR) -I$(HOME)/Documents/Arduino/libraries/TinyEKF/src
 
 NAME = cplusplus
 

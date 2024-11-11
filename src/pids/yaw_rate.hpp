@@ -50,7 +50,7 @@ namespace hf {
                 const auto error = demands.yaw - state.dpsi;
 
                 _integral = reset ? 0 :
-                    hf::Utils::fconstrain(_integral + error * dt, I_LIMIT);
+                    Utils::fconstrain(_integral + error * dt, I_LIMIT);
 
                 const auto derivative = (error - _error) / dt;
 
