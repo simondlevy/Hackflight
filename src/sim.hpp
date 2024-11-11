@@ -31,6 +31,7 @@
 
 #include <hackflight.hpp>
 #include <estimators/complementary.hpp>
+#include <estimators/flow.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -60,6 +61,8 @@ namespace hf {
 
             void init(const bool tryJoystick=true)
             {
+                _logfp = fopen("log.csv", "w");
+
                 wb_robot_init();
 
                 _timestep = wb_robot_get_basic_time_step();
@@ -108,7 +111,7 @@ namespace hf {
                 return wb_robot_step((int)_timestep) != -1;
             }
 
-            state_t getState(const float dt)
+            state_t getState()
             {
                 state_t state = {};
 
@@ -124,11 +127,11 @@ namespace hf {
 
                 // For order see https://cyberbotics.com/doc/reference/
                 //   inertialunit#wb_inertial_unit_get_quaternion
-                const quaternion_t quat = { 
+                const axis4_t quat = { 
                     (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
                 };
 
-                const auto zrange = wb_distance_sensor_get_value(_rangefinder);
+                const auto h = wb_distance_sensor_get_value(_rangefinder);
 
                 hf::axis3_t euler = {};
                 hf::Utils::quat2euler(quat, euler);
@@ -137,9 +140,21 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                _filter.getValues(dt, accel, quat, zrange, state.z, state.dz);
+                _filter.getValues(getDt(), accel, quat, h, state.z, state.dz);
 
-                getGroundTruthHorizontalVelocity(state.dx, state.dy);
+                const auto dxy_true = getGroundTruthHorizontalVelocity();
+
+                const auto flow_raw = opticalFlowFromGroundTruth(
+                        dxy_true, gyro, h, getDt());
+
+                const auto dxy_flow = OpticalFlowFilter::run(
+                        flow_raw, gyro, h, getDt());
+
+                state.dx = dxy_true.x;
+                state.dy = dxy_true.y;
+
+                fprintf(_logfp, "%f,%f,%f,%f,%f\n",
+                        flow_raw.y, h, gyro.x, dxy_true.y, dxy_flow.y);
 
                 state.phi = euler.x;
                 state.theta = euler.y;
@@ -272,16 +287,18 @@ namespace hf {
                 return demands;
             }
 
-            void getGroundTruthHorizontalVelocity(float & dx, float & dy)
+            float getDt(void)
+            {
+                return 1 / _timestep;
+            }
+
+            axis2_t getGroundTruthHorizontalVelocity()
             {
                 // Track previous time and position for calculating motion
-                static float tprev;
                 static float xprev;
                 static float yprev;
 
-                const auto tcurr = wb_robot_get_time();
-                const auto dt =  tcurr - tprev;
-                tprev = tcurr;
+                const auto dt =  getDt();
 
                 auto psi = wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 
@@ -296,12 +313,14 @@ namespace hf {
                 // optical-flow sensor
                 auto cospsi = cos(psi);
                 auto sinpsi = sin(psi);
-                dx = dx_ * cospsi + dy_ * sinpsi;
-                dy = dx_ * sinpsi - dy_ * cospsi;
+                const float dx = dx_ * cospsi + dy_ * sinpsi;
+                const float dy = dx_ * sinpsi - dy_ * cospsi;
 
                 // Save past time and position for next time step
                 xprev = x;
                 yprev = y;
+
+                return axis2_t {dx, dy};
             }
 
             bool isSpringy()
@@ -340,6 +359,12 @@ namespace hf {
                 JOYSTICK_RECOGNIZED
 
             } joystickStatus_e;
+
+            // For PMW3901 optiacal flow sensor
+            static constexpr float FLOW_NPIX = 35;
+            static constexpr float FLOW_ANGLE = 42;
+
+            FILE * _logfp;
 
             double _timestep;
 
@@ -503,6 +528,21 @@ namespace hf {
                 return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
             }
 
-    };
+            static axis2_t opticalFlowFromGroundTruth(
+                    const axis2_t dxy_true,
+                    const axis3_t gyro,
+                    const float h,
+                    const float dt)
+            {
+                const auto theta = 2 * sin(Utils::DEG2RAD * FLOW_ANGLE / 2);
 
+                const auto flow_dx =
+                    dt * FLOW_NPIX * (h * gyro.y + dxy_true.x) / (h * theta);
+
+                const auto flow_dy =
+                    dt * FLOW_NPIX * (h * gyro.x + dxy_true.y) / (h * theta);
+
+                return axis2_t {flow_dx, flow_dy};
+            }
+    };
 }

@@ -35,7 +35,7 @@ namespace hf {
             static constexpr float RAD2DEG = 180.0f / M_PI;
             static constexpr float GS2MSS = 9.81;
 
-            static void quat2euler(const quaternion_t q, axis3_t &a)
+            static void quat2euler(const axis4_t q, axis3_t &a)
             {
                 a.x = RAD2DEG * atan2(q.w*q.x + q.y*q.z,
                         0.5f - q.x*q.x - q.y*q.y);
