@@ -108,7 +108,7 @@ namespace hf {
                 return wb_robot_step((int)_timestep) != -1;
             }
 
-            state_t getState(const float dt)
+            state_t getState()
             {
                 state_t state = {};
 
@@ -137,8 +137,7 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                // _vert.getValues(0.032, accel, quat, zrange, state.z, state.dz);
-                _vert.getValues(dt, accel, quat, zrange, state.z, state.dz);
+                _vert.getValues(0.032, accel, quat, zrange, state.z, state.dz);
 
                 const auto dxy = getGroundTruthHorizontalVelocity();
 

@@ -25,7 +25,7 @@
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static const float DT = 0.01;
+static const float PID_DT = 0.01;
 
 static const float THROTTLE_DOWN = 0.06;
 
@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
 
         auto demands = sim.getDemands();
 
-        const auto state = sim.getState(DT);
+        const auto state = sim.getState();
 
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
@@ -64,19 +64,19 @@ int main(int argc, char ** argv)
         // raising the non-self-centering throttle stick
         if (sim.requestedTakeoff()) {
 
-            altitudePid.run(sim.isSpringy(), DT, state, demands);
+            altitudePid.run(sim.isSpringy(), PID_DT, state, demands);
 
             demands.thrust += hf::Simulator::MOTOR_HOVER;
         }
 
         hf::PositionPid::run(state, demands);
 
-        pitchRollAnglePid.run(DT, resetPids, state, demands);
+        pitchRollAnglePid.run(PID_DT, resetPids, state, demands);
 
-        pitchRollRatePid.run(DT, resetPids, state, demands,
+        pitchRollRatePid.run(PID_DT, resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
 
-        yawRatePid.run(DT, resetPids, state, demands);
+        yawRatePid.run(PID_DT, resetPids, state, demands);
 
         float motors[4] = {};
 

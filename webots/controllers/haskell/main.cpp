@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
 
         stream_completedTakeoff = _sim.time() > 3;
 
-        const auto state = _sim.getState(0.01);
+        const auto state = _sim.getState();
 
         stream_dx = state.dx;
         stream_dy = state.dy;
