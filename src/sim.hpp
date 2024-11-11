@@ -130,7 +130,7 @@ namespace hf {
                     (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
                 };
 
-                const auto zrange = wb_distance_sensor_get_value(_rangefinder);
+                const auto h = wb_distance_sensor_get_value(_rangefinder);
 
                 hf::axis3_t euler = {};
                 hf::Utils::quat2euler(quat, euler);
@@ -139,12 +139,16 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                _vert.getValues(getDt(), accel, quat, zrange, state.z, state.dz);
+                _vert.getValues(getDt(), accel, quat, h, state.z, state.dz);
 
-                const auto dxy = getGroundTruthHorizontalVelocity();
+                const auto dxy_true = getGroundTruthHorizontalVelocity();
 
-                state.dx = dxy.x;
-                state.dy = dxy.y;
+                const auto flow_raw = readOpticalFlowSensor(h);
+
+                state.dx = dxy_true.x;
+                state.dy = dxy_true.y;
+
+                fprintf(_logfp, "%f,%f\n", flow_raw.y, dxy_true.y);
 
                 state.phi = euler.x;
                 state.theta = euler.y;
@@ -350,6 +354,10 @@ namespace hf {
 
             } joystickStatus_e;
 
+            // For PMW3901 optiacal flow sensor
+            static constexpr float FLOW_NPIX = 35;
+            static constexpr float FLOW_ANGLE = 42;
+
             FILE * _logfp;
 
             double _timestep;
@@ -514,14 +522,24 @@ namespace hf {
                 return Utils::RAD2DEG * wb_gyro_get_values(_gyro)[axis];
             }
 
-            axis2_t readOpticalFlowSensor( const float dt, const float h)
+            axis2_t readOpticalFlowSensor(const float h)
             {
-                (void)dt;
-                (void)h;
+                const auto dxy = getGroundTruthHorizontalVelocity();
 
-                return axis2_t {0, 0};
+                const auto omegab_x = readGyroAxis(0);
+                const auto omegab_y = readGyroAxis(1);
+
+                const auto dt = getDt();
+
+                const auto theta = 2 * sin(Utils::DEG2RAD * FLOW_ANGLE / 2);
+
+                const auto flow_dx =
+                    dt * FLOW_NPIX * (h * omegab_y + dxy.x) / (h * theta);
+
+                const auto flow_dy =
+                    dt * FLOW_NPIX * (h * omegab_x + dxy.y) / (h * theta);
+
+                return axis2_t {flow_dx, flow_dy};
             }
-
     };
-
 }
