@@ -124,7 +124,7 @@ namespace hf {
 
                 // For order see https://cyberbotics.com/doc/reference/
                 //   inertialunit#wb_inertial_unit_get_quaternion
-                const quaternion_t quat = { 
+                const axis4_t quat = { 
                     (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
                 };
 

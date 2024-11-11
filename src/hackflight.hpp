@@ -72,5 +72,5 @@ namespace hf {
         float y;
         float z;
 
-    } quaternion_t;
+    } axis4_t;
 }

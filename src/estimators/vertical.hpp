@@ -30,7 +30,7 @@ namespace hf {
         public:
 
             void getValues(const float dt, const axis3_t & accel,
-                    const quaternion_t & quat, const float h,
+                    const axis4_t & quat, const float h,
                     float & z, float & dz,
                     const float ALPHA=0.765)
             {

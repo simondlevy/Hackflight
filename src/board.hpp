@@ -146,7 +146,7 @@ namespace hf {
 
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
-                quaternion_t quat = {};
+                axis4_t quat = {};
                 _madgwick.getQuaternion(dt, gyro, accel, quat);
 
                 // Compute Euler angles from quaternion

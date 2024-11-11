@@ -39,7 +39,7 @@ namespace hf {
 
             void getQuaternion(
                     const float dt, const axis3_t & gyro, const axis3_t & accel,
-                    quaternion_t & quat)
+                    axis4_t & quat)
             {
                 // LP filter gyro data
                 auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyro.x;
