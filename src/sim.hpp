@@ -137,10 +137,10 @@ namespace hf {
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
+                // _vert.getValues(0.032, accel, quat, zrange, state.z, state.dz);
                 _vert.getValues(dt, accel, quat, zrange, state.z, state.dz);
 
                 const auto dxy = getGroundTruthHorizontalVelocity();
-
 
                 state.dx = dxy.x;
                 state.dy = dxy.y;
