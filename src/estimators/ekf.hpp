@@ -463,7 +463,8 @@ namespace hf {
 
                 state.dx = x[STATE_DX];
 
-                state.dy = x[STATE_DY];
+                // Negate for rightward positive
+                state.dy = -x[STATE_DY];
 
                 state.z = x[STATE_Z];
 
