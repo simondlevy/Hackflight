@@ -166,7 +166,9 @@ namespace hf {
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
 
-                fprintf(_logfp, "%f,%f\n", state.z, state_ekf.z);
+                fprintf(_logfp, "%f,%f,%f,%f\n",
+                        state.z, state_ekf.z,
+                        state.dz, state_ekf.dz);
 
                 state.phi = euler.x;
                 state.theta = euler.y;
