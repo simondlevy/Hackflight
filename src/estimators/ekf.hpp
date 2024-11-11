@@ -23,9 +23,7 @@
 #include <tinyekf_custom.h>
 
 #include <hackflight.hpp>
-
-static constexpr float DEGREES_TO_RADIANS = M_PI / 180.0f;
-static constexpr float RADIANS_TO_DEGREES = 180.0f / M_PI;
+#include <utils.hpp>
 
 namespace hf {
 
@@ -72,19 +70,14 @@ namespace hf {
                 imuAccum(accel, _accelSum);
             }
 
-            void predict(const uint32_t nowMsec)
+            void predict(const float dt)
             {
-                // Compute DT
-                static uint32_t _lastPredictionMsec;
-                const float dt = (nowMsec - _lastPredictionMsec) / 1000.0f;
-                _lastPredictionMsec = nowMsec;
-
                 static axis3_t _gyro;
                 static axis3_t _accel;
 
                 const auto dt2 = dt * dt;
 
-                imuTakeMean(_gyroSum, DEGREES_TO_RADIANS, _gyro);
+                imuTakeMean(_gyroSum, Utils::DEG2RAD, _gyro);
                 imuTakeMean(_accelSum, GS_TO_MSS, _accel);
 
                 const auto xold = _ekf.x;
@@ -242,10 +235,10 @@ namespace hf {
                 };
 
                 // Avoid multiple updates within 1 msec of each other
-                static uint32_t _lastProcessNoiseUpdateMsec;
-                if (nowMsec - _lastProcessNoiseUpdateMsec > 0) {
+                //static uint32_t _lastProcessNoiseUpdateMsec;
+                if (true /*nowMsec - _lastProcessNoiseUpdateMsec > 0*/) {
 
-                    _lastProcessNoiseUpdateMsec = nowMsec;
+                    //_lastProcessNoiseUpdateMsec = nowMsec;
 
                     fx[STATE_Z]  = new_z;
                     fx[STATE_DX] = new_dx;
@@ -275,7 +268,7 @@ namespace hf {
 
                 const auto angle = max(0, 
                         fabsf(acosf(_r.z)) - 
-                        DEGREES_TO_RADIANS * (15.0f / 2.0f));
+                        Utils::DEG2RAD * (15.0f / 2.0f));
 
                 const auto predictedDistance = x[STATE_Z] / cosf(angle);
 
@@ -295,15 +288,13 @@ namespace hf {
                 }
             }
 
-            void update_with_flow(const float dt, const float dx, const float dy)
+            void update_with_flow(const float dt, const axis3_t & flow)
             {
-                return;
-
                 // Inclusion of flow measurements in the EKF done by two scalar
                 // updates
 
                 //~~~ Body rates ~~~
-                const auto omegay_b = _gyroLatest.y * DEGREES_TO_RADIANS;
+                const auto omegay_b = _gyroLatest.y * Utils::DEG2RAD;
 
                 const auto x = _ekf.x;
 
@@ -317,7 +308,7 @@ namespace hf {
                 // predicts the number of accumulated pixels in the x-direction
                 auto predictedNX = (dt * FLOW_NPIX / FLOW_THETAPIX ) * 
                     ((dx_g * _r.z / z_g) - omegay_b);
-                auto measuredNX = dx*FLOW_RESOLUTION;
+                auto measuredNX = flow.x*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dx (and z?)
                 float hx[EKF_N] = {};
@@ -329,14 +320,14 @@ namespace hf {
                 // updates
 
                 //~~~ Body rates ~~~
-                const auto omegax_b = _gyroLatest.x * DEGREES_TO_RADIANS;
+                const auto omegax_b = _gyroLatest.x * Utils::DEG2RAD;
 
                 const auto dy_g = x[STATE_DY];
 
                 // ~~~ Y velocity prediction and update ~~~
                 auto predictedNY = (dt * FLOW_NPIX / FLOW_THETAPIX ) * 
                     ((dy_g * _r.z / z_g) + omegax_b);
-                auto measuredNY = dy*FLOW_RESOLUTION;
+                auto measuredNY = flow.y*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dy (and z?)
                 float hy[EKF_N] = {};
@@ -486,13 +477,13 @@ namespace hf {
                 const auto qy = _quat.y;
                 const auto qz = _quat.z;
 
-                state.phi = RADIANS_TO_DEGREES * atan2((2 * (qy*qz + qw*qx)),
+                state.phi = Utils::RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
                         (qw*qw - qx*qx - qy*qy + qz*qz));
 
                 // Negate for ENU
-                state.theta = -RADIANS_TO_DEGREES * asin((-2) * (qx*qz - qw*qy));
+                state.theta = -Utils::RAD2DEG * asin((-2) * (qx*qz - qw*qy));
 
-                state.psi = RADIANS_TO_DEGREES * atan2((2 * (qx*qy + qw*qz)),
+                state.psi = Utils::RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
                         (qw*qw + qx*qx - qy*qy - qz*qz));
 
                 // Get angular velocities directly from gyro
@@ -501,6 +492,7 @@ namespace hf {
                 state.dpsi =    _gyroLatest.z;
 
             }
+
         private:
 
             // Initial variances, uncertain of position, but know we're

@@ -63,6 +63,8 @@ namespace hf {
             {
                 _logfp = fopen("log.csv", "w");
 
+                _ekf.initialize();
+
                 wb_robot_init();
 
                 _timestep = wb_robot_get_basic_time_step();
@@ -149,14 +151,22 @@ namespace hf {
 
                 axis2_t dxy_flow = {};
 
-                _filter.getValues(getDt(), flow_raw, gyro, accel, quat, h,
+                _complementary.getValues(getDt(), flow_raw, gyro, accel, quat, h,
                         dxy_flow, state.z, state.dz);
+
+                state_t state_ekf = {};
+
+                _ekf.accumulate_gyro(gyro);
+                _ekf.accumulate_accel(accel);
+                _ekf.predict(getDt());
+                _ekf.update_with_range(h);
+                _ekf.finalize();
+                _ekf.get_vehicle_state(state_ekf);
 
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
 
-                fprintf(_logfp, "%f,%f,%f,%f,%f\n",
-                        flow_raw.y, h, gyro.x, dxy_true.y, dxy_flow.y);
+                fprintf(_logfp, "%f,%f\n", state.z, state_ekf.z);
 
                 state.phi = euler.x;
                 state.theta = euler.y;
@@ -374,7 +384,9 @@ namespace hf {
 
             uint32_t _tick;
 
-            ComplementaryFilter _filter;
+            ComplementaryFilter _complementary;
+
+            EKF _ekf;
 
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;
