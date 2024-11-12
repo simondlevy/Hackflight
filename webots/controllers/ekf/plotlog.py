@@ -15,9 +15,10 @@ def plot(index, label):
 plot(0, 'dx/dt (m/s)')
 plot(1, 'dy/dt (m/s)')
 plot(2, 'z (m)')
-plot(3, 'phi (deg)')
-plot(4, 'theta (deg)')
-plot(5, 'psi (deg)')
+plot(3, 'dz/dt (m/s)')
+plot(4, 'phi (deg)')
+plot(5, 'theta (deg)')
+plot(6, 'psi (deg)')
 
 plt.show()
 
