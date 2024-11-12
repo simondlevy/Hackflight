@@ -61,7 +61,7 @@ namespace hf {
 
             Dynamics(
                     const vehicle_params_t & vparams,
-                    const double gravity = 9.80665,
+                    const double gravity = 9.80665e0,
                     const double air_density = 1.225)
             {
                 memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
@@ -94,6 +94,8 @@ namespace hf {
 
                 // We usuall start on ground, but can start in air for testing
                 _airborne = airborne;
+
+                _time_prev = getTime();
             }
 
             /**
@@ -101,8 +103,18 @@ namespace hf {
              *
              * @param motor spins in radians per second
              */
-            void update(const float * fomegas, const double dt) 
+            void update(const float * fomegas) 
             {
+                const auto time_curr = getTime();
+
+                const auto dt = time_curr - _time_prev;
+
+                _time_prev = time_curr;
+
+                if (dt == 0) {
+                    return;
+                }
+
                 double omegas[MAX_ROTORS] = {};
 
                 // Convert motor values to double-precision for consistency
@@ -196,6 +208,24 @@ namespace hf {
                 };
             }
 
+            double getTime()
+            {
+                struct timeval tv = {};
+                gettimeofday(&tv, NULL);
+                double time_curr = tv.tv_sec + tv.tv_usec / 1e6;
+
+                static double _time_start;
+
+                const double time = _time_start == 0 ? 0 : time_curr - _time_start;
+
+                if (_time_start == 0) {
+                    _time_start = time_curr;
+                }
+
+                return time;
+            }
+
+
         private:
 
             // arbitrary; avoids dynamic allocation
@@ -205,6 +235,7 @@ namespace hf {
 
             state_t _state;
 
+            double _time_prev;
 
             double _g; // gravitational constant
             double _rho; // air density

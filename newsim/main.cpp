@@ -5,21 +5,19 @@
 
 #include "dynamics.hpp"
 
-static const double DYNAMICS_FREQ = 3.75e6;
-
 // Vehicle constants
 
 static const hf::Dynamics::vehicle_params_t vparams = {
 
-    3.275e-5, // b thrust coefficient [F=b*w^2]
-    0.03,   // l arm length [m]
+    3.264065e-5, // b thrust coefficient [F=b*w^2]
+    0.03,        // l arm length [m]
 
-    2.e-06,  // drag coefficient [T=d*w^2]
-    0.05,    // m mass [kg]
-    2,       // Ix [kg*m^2] 
-    2,       // Iy [kg*m^2] 
-    3,       // Iz [kg*m^2] 
-    3.8e-03  // Jr prop inertial [kg*m^2] 
+    2.e-06,      // drag coefficient [T=d*w^2]
+    0.05,        // m mass [kg]
+    2,           // Ix [kg*m^2] 
+    2,           // Iy [kg*m^2] 
+    3,           // Iz [kg*m^2] 
+    3.8e-03      // Jr prop inertial [kg*m^2] 
 };
 
 int main(int argc, char ** argv)
@@ -31,39 +29,36 @@ int main(int argc, char ** argv)
     double rotation[3] = {0,0,0};
     dynamics.init(rotation);
 
-    time_t sec_prev = 0;
+    double time_prev = 0;
 
-    const auto dynamics_dt = 1 / DYNAMICS_FREQ;
-
-    // Loop forever, communicating with server
-    for (uint64_t k=0; ; ++k) {
-
-        const double time = k * dynamics_dt;
+    // Loop forever
+    while (true) {
 
         const float MOTOR = 55.385; // rad/sec
         float motorvals[4] = {MOTOR, MOTOR, MOTOR, MOTOR};
 
-        struct timeval tv = {};
-        gettimeofday(&tv, NULL);
-        time_t sec_curr = tv.tv_sec;
+        // Update dynamics with motor values
+        dynamics.update(motorvals);
 
-        if (sec_curr - sec_prev > 0) {
+        const auto time_curr = dynamics.getTime();
 
-            sec_prev = sec_curr;
+        if (time_curr - time_prev >= 1) {
+
+            time_prev = time_curr;
 
             const auto state = dynamics.getState();
 
-            printf("t=%05f   m=%f %f %f %f  z=%+3.3f\n", 
-                    time,
-                    motorvals[0],
-                    motorvals[1],
-                    motorvals[2],
-                    motorvals[3],
-                    state.z);
-        }
+            if (time_curr > 0) {
 
-        // Update dynamics with motor values
-        dynamics.update(motorvals, dynamics_dt);
+                printf("t=%05f   m=%f %f %f %f  z=%+3.3f\n", 
+                        time_curr,
+                        motorvals[0],
+                        motorvals[1],
+                        motorvals[2],
+                        motorvals[3],
+                        state.z);
+            }
+        }
     }
 
     return 0;
