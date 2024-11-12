@@ -25,10 +25,7 @@
 #include <stdint.h>
 #include <sys/time.h>
 
-#include <pid.h>
-#include <pids/angle.h>
-#include <pids/setpoints/althold.h>
-#include <mixers/fixedpitch/quadxbf.h>
+#include <hackflight.hpp>
 
 #include "../sockets/UdpClientSocket.hpp"
 #include "../sockets/UdpServerSocket.hpp"
@@ -38,32 +35,32 @@ static const char * HOST = "127.0.0.1"; // localhost
 static uint16_t  MOTOR_PORT = 5000;
 static uint16_t  TELEM_PORT = 5001;
 
-static VehicleState state_from_telemetry(const double telemetry[])
+static hf::state_t state_from_telemetry(const double telemetry[])
 {
-    return VehicleState( 
-            telemetry[1],   // x
-            telemetry[2],   // dx
-            telemetry[3],   // y
-            telemetry[4],   // dy
-            telemetry[5],   // z  
-            telemetry[6],   // dz 
-            telemetry[7],   // phi
-            telemetry[8],   // dphi
-            -telemetry[9],  // theta  Make nose-down positive
-            -telemetry[10], // dtheta  for PID controller
-            telemetry[11],  // psi
-            telemetry[12]   // dpsi
-            );
+    return hf::state_t {
+            (float)telemetry[1],   // x
+            (float)telemetry[2],   // dx
+            (float)telemetry[3],   // y
+            (float)telemetry[4],   // dy
+            (float)telemetry[5],   // z  
+            (float)telemetry[6],   // dz 
+            (float)telemetry[7],   // phi
+            (float)telemetry[8],   // dphi
+            -(float)telemetry[9],  // theta  Make nose-down positive
+            -(float)telemetry[10], // dtheta  for PID controller
+            (float)telemetry[11],  // psi
+            (float)telemetry[12]   // dpsi
+            };
 }
 
-static Demands demands_from_telemetry(const double telemetry[])
+static hf::demands_t demands_from_telemetry(const double telemetry[])
 {
-    return Demands(
+    return hf::demands_t {
             (float)telemetry[13], 
             (float)telemetry[14],
             (float)telemetry[15],
             (float)telemetry[16]
-            );
+            };
 }
 
 int main(int argc, char ** argv)
@@ -72,24 +69,8 @@ int main(int argc, char ** argv)
     UdpServerSocket telemServer = UdpServerSocket(TELEM_PORT);
     UdpClientSocket motorClient = UdpClientSocket(HOST, MOTOR_PORT);
 
-    // Create Hackflight objects
-
-    static AnglePidController anglePid = 
-        AnglePidController(
-                10, // K_rate_p
-                10, // K_rate_i
-                1,  // K_rate_d
-                0,  // K_rate_f
-                4); // K_level_p
-
-    static AltHoldPidController altHoldPid;
-
-    static Mixer mixer = QuadXbfMixer::make();
-
     printf("Hit the Play button ... ");
     fflush(stdout);
-
-    std::vector<PidController *> pids = { &anglePid, &altHoldPid };
 
     auto connected = false;
 
@@ -112,23 +93,21 @@ int main(int argc, char ** argv)
         }
 
         // Convert simulator time to microseconds
-        const auto usec = (uint32_t)(time * 1e6);
+        //const auto usec = (uint32_t)(time * 1e6);
 
         // Build vehicle state 
-        auto vstate = state_from_telemetry(telemetry);
+        auto state = state_from_telemetry(telemetry);
 
         // Build stick demands
-        auto demands = demands_from_telemetry(telemetry);
+        const hf::demands_t demands = {0, 0, 0, 0};
 
-        // Reset PID controllers on zero throttle
-        auto pidReset = demands.throttle < .05;
-
-        // Run stick demands through PID controllers to get final demands
-        PidController::run(pids, demands, vstate, usec, pidReset);
+        (void)state;
+        (void)demands;
+        (void)demands_from_telemetry;
 
         // Run final demands through mixer to get motor values
         float mvals[4] = {};
-        mixer.getMotors(demands, mvals);
+        //mixer.getMotors(demands, mvals);
 
         // Send back motor values
         motorClient.sendData(mvals, sizeof(mvals));

@@ -1,5 +1,5 @@
 #
-# Makefile for C++ / Haskell-bbased MultiSim flight controller
+# Makefile for C++ / Haskell-based MultiSim flight controller
 #
 # Copyright (C) 2022 Simon D. Levy
 # 
@@ -19,7 +19,7 @@
 #  SimFlightControl. If not, see <https://www.gnu.org/licenses/>.
 
 
-HF_SRC = hfsrc/
+HF_SRC = ../../src
 
 ALL = hackflight
 
@@ -32,11 +32,7 @@ all: $(ALL)
 hackflight: hackflight.o 
 	g++ -o hackflight hackflight.o 
 
-hackflight.o: hackflight.cpp \
-	$(HF_SRC)/*.h \
-	$(HF_SRC)/*/*.h \
-	$(HF_SRC)/mixers/*.h \
-	$(HF_SRC)/mixers/fixedpitch/*.h
+hackflight.o: hackflight.cpp
 	g++ $(CFLAGS) -I$(HF_SRC) -Isockets -c hackflight.cpp
 
 run: hackflight
