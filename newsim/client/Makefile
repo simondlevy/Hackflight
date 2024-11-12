@@ -17,7 +17,7 @@ all: $(ALL)
 simproxy: simproxy.o 
 	g++ -o simproxy simproxy.o 
 
-simproxy.o: simproxy.cpp Dynamics.hpp
+simproxy.o: simproxy.cpp dynamics.hpp
 	g++ $(CFLAGS) -c simproxy.cpp
 
 run: simproxy
@@ -26,7 +26,7 @@ run: simproxy
 cfproxy: cfproxy.o 
 	g++ -o cfproxy cfproxy.o 
 
-cfproxy.o: cfproxy.cpp Dynamics.hpp
+cfproxy.o: cfproxy.cpp dynamics.hpp
 	g++ $(CFLAGS) -c cfproxy.cpp
 
 cfrun: cfproxy

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../Dynamics.hpp"
+#include "../dynamics.hpp"
 
 class FixedPitchDynamics : public Dynamics {
 

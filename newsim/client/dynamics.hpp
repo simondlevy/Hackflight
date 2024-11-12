@@ -33,10 +33,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define WIN32_LEAN_AND_MEAN
-
-#define _USE_MATH_DEFINES
 #include <math.h>
 
 class Dynamics {

@@ -106,7 +106,8 @@ int main(int argc, char ** argv)
         (void)demands_from_telemetry;
 
         // Run final demands through mixer to get motor values
-        float mvals[4] = {};
+        const float MOTOR = 0.5;
+        float mvals[4] = {MOTOR, MOTOR, MOTOR, MOTOR};
         //mixer.getMotors(demands, mvals);
 
         // Send back motor values
