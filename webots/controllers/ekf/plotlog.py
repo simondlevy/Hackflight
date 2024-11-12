@@ -26,5 +26,7 @@ plot(4, 'phi (deg)', -ANG_LIM, +ANG_LIM)
 plot(5, 'theta (deg)', -ANG_LIM, +ANG_LIM)
 plot(6, 'psi (deg)', -180, +180)
 
+plt.xlabel('time (s)')
+
 plt.show()
 
