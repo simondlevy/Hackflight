@@ -5,29 +5,19 @@ import matplotlib.pyplot as plt
 
 data = np.loadtxt('log.csv', delimiter=',')
 
-plt.subplot(4, 1, 1)
-plt.plot(data[:,0])
-plt.plot(data[:,1])
-plt.ylabel('dx/dt (m/s)')
-plt.legend(('comp', 'ekf'))
+def plot(index, label):
+    plt.subplot(7, 1, index+1)
+    plt.plot(data[:,2*index])
+    plt.plot(data[:,2*index+1])
+    plt.ylabel(label)
+    plt.legend(('comp', 'ekf'))
 
-plt.subplot(4, 1, 2)
-plt.plot(data[:,2])
-plt.plot(data[:,3])
-plt.ylabel('z (m)')
-plt.legend(('comp', 'ekf'))
-
-plt.subplot(4, 1, 3)
-plt.plot(data[:,4])
-plt.plot(data[:,5])
-plt.ylabel('dz/dt (m/s)')
-plt.legend(('comp', 'ekf'))
-
-plt.subplot(4, 1, 4)
-plt.plot(data[:,6])
-plt.plot(data[:,7])
-plt.ylabel('theta (deg)')
-plt.legend(('true', 'ekf'))
+plot(0, 'dx/dt (m/s)')
+plot(1, 'dy/dt (m/s)')
+plot(2, 'z (m)')
+plot(3, 'phi (deg)')
+plot(4, 'theta (deg)')
+plot(5, 'psi (deg)')
 
 plt.show()
 
