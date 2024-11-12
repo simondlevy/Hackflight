@@ -105,6 +105,8 @@ namespace hf {
 
             bool step()
             {
+                _time = _tick++ * _timestep / 1000;
+
                 return wb_robot_step((int)_timestep) != -1;
             }
 
@@ -211,8 +213,6 @@ namespace hf {
                 }
 
                 _requested_takeoff = spacebar_was_hit;
-
-                _time = _requested_takeoff ? _tick++ * _timestep / 1000 : 0;
 
                 return demands;
             }

@@ -202,9 +202,9 @@ class Dynamics {
         // quad, hexa, octo, etc.
         uint8_t _rotorCount = 0;
 
-        // For coaxials we have five actuators: two rotors, plus collective
+        // For coaxials we have five omegas: two rotors, plus collective
         // pitch, cyclic roll, and cyclic pitch.  For thrust vectoring, we have
-        // four actuators: two rotors and two servos.
+        // four omegas: two rotors and two servos.
         // For standard multirotors (e.g., quadcopter), actuatorCount =
         // rotorCount.
         uint8_t _actuatorCount = 0;
@@ -317,9 +317,9 @@ class Dynamics {
 
         virtual int8_t getRotorDirection(const uint8_t i) = 0;
 
-        virtual double getThrustCoefficient(double * actuators) = 0;
+        virtual double getThrustCoefficient(double * omegas) = 0;
 
-        virtual void computeRollAndPitch(double * actuators,
+        virtual void computeRollAndPitch(double * omegas,
                                          double * omegas2,
                                          double & roll,
                                          double & pitch) = 0;
@@ -355,38 +355,33 @@ class Dynamics {
         /**
          * Updates state.
          *
-         * @param actuators values in interval [0,1] (rotors) or [-0.5,+0.5]
+         * @param omegas values in interval [0,1] (rotors) or [-0.5,+0.5]
                   (servos)
          * @param dt time in seconds since previous update
          */
-        void update(const float * factuators, const double dt) 
+        void update(const float * fomegas, const double dt) 
         {
-            // Convert actuator values to double-precision for consistency
-            double actuators[10];
+            double omegas[MAX_ROTORS] = {};
+
+            // Convert motor values to double-precision for consistency
             for (auto k=0; k<_rotorCount; ++k) {
-                actuators[k] = factuators[k];
+                omegas[k] = fomegas[k];
             }
 
             // Implement Equation 6 -------------------------------------------
 
             // Radians per second of rotors, and squared radians per second
-            double omegas[MAX_ROTORS] = {};
             double omegas2[MAX_ROTORS] = {};
 
             double u1 = 0, u4 = 0, omega = 0;
             for (unsigned int i = 0; i < _rotorCount; ++i) {
-
-                // Convert fractional speed to radians per second
-                omegas[i] = actuators[i] * _vparams.maxrpm * M_PI / 30;  
-
-                printf("%f\n", omegas[0]);
 
                 // Thrust is squared rad/sec scaled by air density
                 omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
 
                 // Thrust coefficient is constant for fixed-pitch rotors,
                 // variable for collective-pitch
-                u1 += getThrustCoefficient(actuators) * omegas2[i];                  
+                u1 += getThrustCoefficient(omegas) * omegas2[i];                  
 
                 // Newton's Third Law (action/reaction) tells us that yaw is
                 // opposite to net rotor spin
@@ -397,7 +392,7 @@ class Dynamics {
             // Compute roll, pitch, yaw forces (different method for
             // fixed-pitch blades vs. variable-pitch)
             double u2 = 0, u3 = 0;
-            computeRollAndPitch(actuators, omegas2, u2, u3);
+            computeRollAndPitch(omegas, omegas2, u2, u3);
 
             // ----------------------------------------------------------------
 

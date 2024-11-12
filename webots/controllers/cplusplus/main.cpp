@@ -47,8 +47,6 @@ int main(int argc, char ** argv)
 
     hf::BfQuadXMixer mixer = {};
 
-    auto logfp = fopen("log.csv", "w");
-
     float motors[4] = {};
 
     while (true) {
@@ -71,8 +69,6 @@ int main(int argc, char ** argv)
             altitudePid.run(sim.isSpringy(), PID_DT, state, demands);
 
             demands.thrust += hf::Simulator::MOTOR_HOVER;
-
-            fprintf(logfp, "%f,%f,%f\n", sim.getTime(), motors[0], state.z);
         }
 
         hf::PositionPid::run(state, demands);
