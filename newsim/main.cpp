@@ -51,13 +51,15 @@ int main(int argc, char ** argv)
 
             sec_prev = sec_curr;
 
+            const auto state = dynamics.getState();
+
             printf("t=%05f   m=%f %f %f %f  z=%+3.3f\n", 
                     time,
                     motorvals[0],
                     motorvals[1],
                     motorvals[2],
                     motorvals[3],
-                    dynamics.state.z);
+                    state.z);
         }
 
         // Update dynamics with motor values

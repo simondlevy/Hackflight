@@ -42,8 +42,6 @@ namespace hf {
 
         public:
 
-            state_t state;
-
             /**
              *  Vehicle parameters
              */
@@ -83,11 +81,11 @@ namespace hf {
             void init(const double rotation[3], const bool airborne = false)
             {
                 // Always start at location (0,0,0)
-                memset(&state, 0, sizeof(state));
+                memset(&_state, 0, sizeof(state_t));
 
-                state.phi   = rotation[0];
-                state.theta = rotation[1];
-                state.psi   = rotation[2];
+                _state.phi   = rotation[0];
+                _state.theta = rotation[1];
+                _state.psi   = rotation[2];
 
                 _airborne = airborne;
 
@@ -141,7 +139,7 @@ namespace hf {
 
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame
-                double euler[3] = {state.phi, state.theta, state.psi};
+                double euler[3] = {_state.phi, _state.theta, _state.psi};
                 double accelNED[3] = {};
                 bodyZToInertial(u1 / _vparams.m, euler, accelNED);
 
@@ -158,18 +156,18 @@ namespace hf {
 
                     // Compute state as first temporal integral of first temporal
                     // derivative
-                    state.x += dt * state_deriv.x;
-                    state.dx += dt * state_deriv.dx;
-                    state.y += dt * state_deriv.y;
-                    state.dy += dt * state_deriv.dy;
-                    state.z += dt * state_deriv.z;
-                    state.dz += dt * state_deriv.dz;
-                    state.phi += dt * state_deriv.phi;
-                    state.dphi += dt * state_deriv.dphi;
-                    state.theta += dt * state_deriv.theta;
-                    state.dtheta += dt * state_deriv.dtheta;
-                    state.psi += dt * state_deriv.psi;
-                    state.dpsi += dt * state_deriv.dpsi;
+                    _state.x += dt * state_deriv.x;
+                    _state.dx += dt * state_deriv.dx;
+                    _state.y += dt * state_deriv.y;
+                    _state.dy += dt * state_deriv.dy;
+                    _state.z += dt * state_deriv.z;
+                    _state.dz += dt * state_deriv.dz;
+                    _state.phi += dt * state_deriv.phi;
+                    _state.dphi += dt * state_deriv.dphi;
+                    _state.theta += dt * state_deriv.theta;
+                    _state.dtheta += dt * state_deriv.dtheta;
+                    _state.psi += dt * state_deriv.psi;
+                    _state.dpsi += dt * state_deriv.dpsi;
 
                     // Once airborne, inertial-frame acceleration is same as NED
                     // acceleration
@@ -180,12 +178,33 @@ namespace hf {
 
             } // update
 
+            state_t getState() 
+            {
+                return state_t {
+                    _state.x,
+                    _state.dx,
+                    _state.y,
+                    _state.dy,
+                    _state.z,
+                    _state.dz,
+                    _state.phi,
+                    _state.dphi,
+                    _state.theta,
+                    _state.dtheta,
+                    _state.psi,
+                    _state.dpsi
+                };
+            }
+
         private:
 
             // arbitrary; avoids dynamic allocation
             static const uint8_t MAX_ROTORS = 20; 
 
             vehicle_params_t _vparams;
+
+            state_t _state;
+
 
             double _g; // gravitational constant
             double _rho; // air density
@@ -241,7 +260,7 @@ namespace hf {
             uint8_t _rotorCount = 4;
 
             /**
-             * Implements Equation 12 computing temporal first derivative of state.
+             * Implements Equation 12 computing temporal first derivative of _state.
              * Should fill _dxdx[0..11] with appropriate values.
              * @param accelNED acceleration in NED inertial frame
              * @param netz accelNED[2] with gravitational constant added in
@@ -257,9 +276,9 @@ namespace hf {
                     double u3,
                     double u4)
             {
-                double phidot = state.dphi;
-                double thedot = state.dtheta;
-                double psidot = state.dpsi;
+                double phidot = _state.dphi;
+                double thedot = _state.dtheta;
+                double psidot = _state.dpsi;
 
                 double Ix = _vparams.Ix;
                 double Iy = _vparams.Iy;
@@ -267,19 +286,19 @@ namespace hf {
                 double Jr = _vparams.Jr;
 
                 // x'
-                state_deriv.x = state.dx;
+                state_deriv.x = _state.dx;
 
                 // x''
                 state_deriv.dx = accelNED[0];
 
                 // y'
-                state_deriv.y = state.dy;
+                state_deriv.y = _state.dy;
 
                 // y''
                 state_deriv.dy = accelNED[1];
 
                 // z'
-                state_deriv.z = state.dz;
+                state_deriv.z = _state.dz;
 
                 // z''
                 state_deriv.dz = netz;
