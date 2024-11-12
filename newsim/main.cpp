@@ -3,13 +3,16 @@
 #include <stdint.h>
 #include <sys/time.h>
 
-#include "dynamics/fixedpitch/QuadXBF.hpp"
+#include "dynamics.hpp"
 
 static const double DYNAMICS_FREQ = 3.75e6;
 
 // Vehicle constants
 
 static Dynamics::vehicle_params_t vparams = {
+
+    3.275e-5, // b thrust coefficient [F=b*w^2]
+    0.03,   // l arm length [m]
 
     2.e-06,  // drag coefficient [T=d*w^2]
     0.05,    // m mass [kg]
@@ -19,18 +22,10 @@ static Dynamics::vehicle_params_t vparams = {
     3.8e-03  // Jr prop inertial [kg*m^2] 
 };
 
-static FixedPitchDynamics::fixed_pitch_params_t fparams = {
-
-    // Estimated
-    3.275e-5, // b force constatnt [F=b*w^2]
-    0.03    // l arm length [m]
-};
-
 int main(int argc, char ** argv)
 {
     // Create quadcopter dynamics model
-    QuadXBFDynamics dynamics =
-        QuadXBFDynamics(vparams, fparams, false); // no auto-land
+    auto dynamics = Dynamics(vparams); 
 
     // Set up initial conditions
     double rotation[3] = {0,0,0};

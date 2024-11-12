@@ -1,7 +1,5 @@
 /*
- * Header-only code for platform-independent flight dynamics
- *
- * Should work for any simulator, vehicle, or operating system
+ * Header-only code for flight dynamics
  *
  * Based on:
  *
@@ -22,7 +20,7 @@
  *     bibsource = {dblp computer science bibliography, https://dblp.org}
  *   }
  *
- * Copyright (C) 2019 Simon D. Levy
+ * Copyright (C) 2024 Simon D. Levy
  *
  * MIT License
  */
@@ -34,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/time.h>
 
 class Dynamics {
 
@@ -41,9 +40,6 @@ class Dynamics {
 
         // arbitrary; avoids dynamic allocation
         static const uint8_t MAX_ROTORS = 20; 
-
-    // private:
-    public:
 
         static constexpr double DT_MIN = 1e-4;
 
@@ -79,14 +75,13 @@ class Dynamics {
             1.225 // rho air density 
         };
 
-        bool _autoland; // support fly-to-zero-AGL
-
-    public:
-
         /**
          *  Vehicle parameters
          */
         typedef struct {
+
+            double b;  // thrust coefficient [F=b*w^2]
+            double l;  // arm length [m]
 
             double d;  // drag coefficient [T=d*w^2]
             double m;  // mass [kg]
@@ -116,25 +111,13 @@ class Dynamics {
             STATE_SIZE
         };
 
-    protected:
-
         vehicle_params_t _vparams;
         world_params_t _wparams;
 
         vehicle_state_t state_deriv;
 
-        Dynamics(
-                const uint8_t actuatorCount,
-                const vehicle_params_t & vparams,
-                const bool autoland=true)
+        Dynamics(const vehicle_params_t & vparams)
         {
-            _autoland = autoland; 
-
-            _actuatorCount = actuatorCount;
-
-            // can be overridden for thrust-vectoring
-            _rotorCount = actuatorCount; 
-
             memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
             // Default to Earth params (can be overridden by setWorldParams())
@@ -189,14 +172,7 @@ class Dynamics {
         }
 
         // quad, hexa, octo, etc.
-        uint8_t _rotorCount = 0;
-
-        // For coaxials we have five omegas: two rotors, plus collective
-        // pitch, cyclic roll, and cyclic pitch.  For thrust vectoring, we have
-        // four omegas: two rotors and two servos.
-        // For standard multirotors (e.g., quadcopter), actuatorCount =
-        // rotorCount.
-        uint8_t _actuatorCount = 0;
+        uint8_t _rotorCount = 4;
 
         /**
          * Implements Equation 12 computing temporal first derivative of state.
@@ -264,8 +240,6 @@ class Dynamics {
         }
 
 
-    public:
-
         /**
          * Initializes kinematic pose, with flag for whether we're airbone
          * (helps with testing gravity).
@@ -292,17 +266,6 @@ class Dynamics {
             _airborne = airborne;
         }
 
-        // Different for each vehicle
-
-        virtual int8_t getRotorDirection(const uint8_t i) = 0;
-
-        virtual double getThrustCoefficient(double * omegas) = 0;
-
-        virtual void computeRollAndPitch(double * omegas,
-                                         double * omegas2,
-                                         double & roll,
-                                         double & pitch) = 0;
-
         /**
           * Sets world parameters (currently just gravity and air density)
           */
@@ -313,7 +276,7 @@ class Dynamics {
         }
 
         /**
-         * Updates state.
+         * Sets motor spins
          *
          * @param motor spins in radians per second
          */
@@ -337,20 +300,19 @@ class Dynamics {
                 // Thrust is squared rad/sec scaled by air density
                 omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
 
-                // Thrust coefficient is constant for fixed-pitch rotors,
-                // variable for collective-pitch
-                u1 += getThrustCoefficient(omegas) * omegas2[i];                  
+                // Multiply by thrust coefficient
+                u1 += _vparams.b * omegas2[i];                  
 
                 // Newton's Third Law (action/reaction) tells us that yaw is
                 // opposite to net rotor spin
-                u4 += _vparams.d * omegas2[i] * -getRotorDirection(i);
-                omega += omegas[i] * -getRotorDirection(i);
+                //u4 += _vparams.d * omegas2[i] * -getRotorDirection(i);
+                //omega += omegas[i] * -getRotorDirection(i);
             }
             
             // Compute roll, pitch, yaw forces (different method for
             // fixed-pitch blades vs. variable-pitch)
             double u2 = 0, u3 = 0;
-            computeRollAndPitch(omegas, omegas2, u2, u3);
+            //computeRollAndPitch(omegas, omegas2, u2, u3);
 
             // ----------------------------------------------------------------
 
