@@ -5,7 +5,7 @@
 
 #include "dynamics/fixedpitch/QuadXBF.hpp"
 
-static const double DYNAMICS_FREQ = 5.0e6;
+static const double DYNAMICS_FREQ = 3.75e6;
 
 // Vehicle constants
 

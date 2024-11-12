@@ -304,25 +304,6 @@ class Dynamics {
                                          double & pitch) = 0;
 
         /**
-         * Gets actuator count set by constructor.
-         * @return actuator count
-         */
-        uint8_t actuatorCount(void)
-        {
-            return _actuatorCount;
-        }
-
-        /**
-         * Gets rotor count set by constructor.
-         * @return rotor count
-         */
-        uint8_t rotorCount(void)
-        {
-            return _rotorCount;
-        }
-
-
-        /**
           * Sets world parameters (currently just gravity and air density)
           */
         void setWorldParams(const double g, const double rho)
