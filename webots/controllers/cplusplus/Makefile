@@ -47,7 +47,7 @@ run:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 plot:
-	./plotlog.py
+	./plot.py
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

@@ -156,6 +156,7 @@ namespace hf {
                 state.theta = euler.y;
                 state.psi = euler.z;
 
+
                 return state;
             }
 
@@ -359,8 +360,6 @@ namespace hf {
             // For PMW3901 optiacal flow sensor
             static constexpr float FLOW_NPIX = 35;
             static constexpr float FLOW_ANGLE = 42;
-
-            FILE * _logfp;
 
             double _timestep;
 
