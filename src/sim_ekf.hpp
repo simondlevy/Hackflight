@@ -176,7 +176,8 @@ namespace hf {
                 axis3_t euler_ekf = {};
                 Utils::quat2euler_ekf(quat_ekf, euler_ekf);
 
-                fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                        _time,
                         state.dx, dxdy_ekf.x,
                         state.dy, dxdy_ekf.y,
                         state.z, z_ekf,
