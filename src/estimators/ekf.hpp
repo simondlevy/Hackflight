@@ -462,7 +462,7 @@ namespace hf {
             {
                 const auto x = _ekf.x;
 
-                dxdy.x = -x[STATE_DX];
+                dxdy.x = x[STATE_DX];
 
                 dxdy.y = -x[STATE_DY];
 

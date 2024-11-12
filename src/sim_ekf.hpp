@@ -154,7 +154,12 @@ namespace hf {
                 _ekf.accumulate_accel(accel);
                 _ekf.predict(getDt());
                 _ekf.update_with_range(h);
-                _ekf.update_with_flow(getDt(), flow);
+
+                static uint32_t _count;
+                if (_count++ % 100 == 0) {
+                    _ekf.update_with_flow(getDt(), flow);
+                }
+
                 _ekf.finalize();
 
                 axis4_t quat_ekf = {};
