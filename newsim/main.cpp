@@ -9,7 +9,7 @@ static const double DYNAMICS_FREQ = 3.75e6;
 
 // Vehicle constants
 
-static Dynamics::vehicle_params_t vparams = {
+static const hf::Dynamics::vehicle_params_t vparams = {
 
     3.275e-5, // b thrust coefficient [F=b*w^2]
     0.03,   // l arm length [m]
@@ -25,7 +25,7 @@ static Dynamics::vehicle_params_t vparams = {
 int main(int argc, char ** argv)
 {
     // Create quadcopter dynamics model
-    auto dynamics = Dynamics(vparams); 
+    auto dynamics = hf::Dynamics(vparams); 
 
     // Set up initial conditions
     double rotation[3] = {0,0,0};

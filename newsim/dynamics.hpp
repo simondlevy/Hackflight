@@ -5,11 +5,11 @@
  *
  *   @inproceedings{DBLP:conf/icra/BouabdallahMS04,
  *     author    = {Samir Bouabdallah and Pierpaolo Murrieri and Roland
-                    Siegwart},
+ Siegwart},
  *     title     = {Design and Control of an Indoor Micro Quadrotor},
  *     booktitle = {Proceedings of the 2004 {IEEE} International Conference on
-                    Robotics and Automation, {ICRA} 2004, April 26 - May 1,
-                    2004, New Orleans, LA, {USA}},
+ Robotics and Automation, {ICRA} 2004, April 26 - May 1,
+ 2004, New Orleans, LA, {USA}},
  *     pages     = {4393--4398},
  *     year      = {2004},
  *     crossref  = {DBLP:conf/icra/2004},
@@ -34,327 +34,313 @@
 #include <math.h>
 #include <sys/time.h>
 
-class Dynamics {
+#include <hackflight.hpp>
 
-    public:
+namespace hf {
 
-        // arbitrary; avoids dynamic allocation
-        static const uint8_t MAX_ROTORS = 20; 
+    class Dynamics {
 
-        static constexpr double DT_MIN = 1e-4;
+        public:
 
-        // state vector (see Eqn. 11)
-        typedef struct {
+            // arbitrary; avoids dynamic allocation
+            static const uint8_t MAX_ROTORS = 20; 
 
-            float x;
-            float dx;
-            float y;
-            float dy;
-            float z;
-            float dz;
-            float phi;
-            float dphi;
-            float theta;
-            float dtheta;
-            float psi;
-            float dpsi;
+            state_t state;
 
-        } vehicle_state_t;
+            typedef struct {
 
-        vehicle_state_t state;
+                double g;  // gravitational constant
+                double rho;  // air density
 
-        typedef struct {
+            } world_params_t; 
 
-            double g;  // gravitational constant
-            double rho;  // air density
+            world_params_t EARTH_PARAMS = { 
+                9.80665,  // g graviational constant
+                1.225 // rho air density 
+            };
 
-        } world_params_t; 
+            /**
+             *  Vehicle parameters
+             */
+            typedef struct {
 
-        world_params_t EARTH_PARAMS = { 
-            9.80665,  // g graviational constant
-            1.225 // rho air density 
-        };
+                double b;  // thrust coefficient [F=b*w^2]
+                double l;  // arm length [m]
 
-        /**
-         *  Vehicle parameters
-         */
-        typedef struct {
+                double d;  // drag coefficient [T=d*w^2]
+                double m;  // mass [kg]
+                double Ix; // [kg*m^2] 
+                double Iy; // [kg*m^2] 
+                double Iz; // [kg*m^2] 
+                double Jr; // rotor inertial [kg*m^2] 
 
-            double b;  // thrust coefficient [F=b*w^2]
-            double l;  // arm length [m]
+            } vehicle_params_t; 
 
-            double d;  // drag coefficient [T=d*w^2]
-            double m;  // mass [kg]
-            double Ix; // [kg*m^2] 
-            double Iy; // [kg*m^2] 
-            double Iz; // [kg*m^2] 
-            double Jr; // rotor inertial [kg*m^2] 
+            /**
+             * Position map for state vector
+             */
+            enum {
+                STATE_X,
+                STATE_DX,
+                STATE_Y,
+                STATE_DY,
+                STATE_Z,
+                STATE_DZ,
+                STATE_PHI,
+                STATE_DPHI,
+                STATE_THETA,
+                STATE_DTHETA,
+                STATE_PSI,
+                STATE_DPSI,
+                STATE_SIZE
+            };
 
-        } vehicle_params_t; 
+            vehicle_params_t _vparams;
+            world_params_t _wparams;
 
-        /**
-         * Position map for state vector
-         */
-        enum {
-            STATE_X,
-            STATE_DX,
-            STATE_Y,
-            STATE_DY,
-            STATE_Z,
-            STATE_DZ,
-            STATE_PHI,
-            STATE_DPHI,
-            STATE_THETA,
-            STATE_DTHETA,
-            STATE_PSI,
-            STATE_DPSI,
-            STATE_SIZE
-        };
+            state_t state_deriv;
 
-        vehicle_params_t _vparams;
-        world_params_t _wparams;
+            Dynamics(const vehicle_params_t & vparams)
+            {
+                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
-        vehicle_state_t state_deriv;
+                // Default to Earth params (can be overridden by setWorldParams())
+                memcpy(&_wparams, &EARTH_PARAMS, sizeof(world_params_t));
 
-        Dynamics(const vehicle_params_t & vparams)
-        {
-            memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
+                memset(&state, 0, sizeof(state));
+            }        
 
-            // Default to Earth params (can be overridden by setWorldParams())
-            memcpy(&_wparams, &EARTH_PARAMS, sizeof(world_params_t));
+            // Flag for whether we're airborne and can update dynamics
+            bool _airborne = false;
 
-            memset(&state, 0, sizeof(state));
-        }        
+            // Inertial-frame acceleration
+            double _inertialAccel[3] = {};
 
-        // Flag for whether we're airborne and can update dynamics
-        bool _airborne = false;
-
-        // Inertial-frame acceleration
-        double _inertialAccel[3] = {};
-
-        // y = Ax + b helper for frame-of-reference conversion methods
-        static void dot(double A[3][3], double x[3], double y[3])
-        {
-            for (uint8_t j = 0; j < 3; ++j) {
-                y[j] = 0;
-                for (uint8_t k = 0; k < 3; ++k) {
-                    y[j] += A[j][k] * x[k];
+            // y = Ax + b helper for frame-of-reference conversion methods
+            static void dot(double A[3][3], double x[3], double y[3])
+            {
+                for (uint8_t j = 0; j < 3; ++j) {
+                    y[j] = 0;
+                    for (uint8_t k = 0; k < 3; ++k) {
+                        y[j] += A[j][k] * x[k];
+                    }
                 }
             }
-        }
 
-        // bodyToInertial method optimized for body X=Y=0
-        static void bodyZToInertial(
-                const double bodyZ,
-                const double rotation[3],
-                double inertial[3])
-        {
-            double phi = rotation[0];
-            double theta = rotation[1];
-            double psi = rotation[2];
+            // bodyToInertial method optimized for body X=Y=0
+            static void bodyZToInertial(
+                    const double bodyZ,
+                    const double rotation[3],
+                    double inertial[3])
+            {
+                double phi = rotation[0];
+                double theta = rotation[1];
+                double psi = rotation[2];
 
-            double cph = cos(phi);
-            double sph = sin(phi);
-            double cth = cos(theta);
-            double sth = sin(theta);
-            double cps = cos(psi);
-            double sps = sin(psi);
+                double cph = cos(phi);
+                double sph = sin(phi);
+                double cth = cos(theta);
+                double sth = sin(theta);
+                double cps = cos(psi);
+                double sps = sin(psi);
 
-            // This is the rightmost column of the body-to-inertial rotation
-            // matrix
-            double R[3] = { sph * sps + cph * cps * sth,
-                cph * sps * sth - cps * sph,
-                cph * cth };
+                // This is the rightmost column of the body-to-inertial rotation
+                // matrix
+                double R[3] = { sph * sps + cph * cps * sth,
+                    cph * sps * sth - cps * sph,
+                    cph * cth };
 
-            for (uint8_t i = 0; i < 3; ++i) {
-                inertial[i] = bodyZ * R[i];
-            }
-        }
-
-        // quad, hexa, octo, etc.
-        uint8_t _rotorCount = 4;
-
-        /**
-         * Implements Equation 12 computing temporal first derivative of state.
-         * Should fill _dxdx[0..11] with appropriate values.
-         * @param accelNED acceleration in NED inertial frame
-         * @param netz accelNED[2] with gravitational constant added in
-         * @param omega net torque from rotors
-         * @param u2 roll force
-         * @param u3 pitch force
-         * @param u4 yaw force
-         */
-        void computeStateDerivative(double accelNED[3],
-                                    double netz,
-                                    double omega,
-                                    double u2,
-                                    double u3,
-                                    double u4)
-        {
-            double phidot = state.dphi;
-            double thedot = state.dtheta;
-            double psidot = state.dpsi;
-
-            double Ix = _vparams.Ix;
-            double Iy = _vparams.Iy;
-            double Iz = _vparams.Iz;
-            double Jr = _vparams.Jr;
-
-            // x'
-            state_deriv.x = state.dx;
-            
-            // x''
-            state_deriv.dx = accelNED[0];
-
-            // y'
-            state_deriv.y = state.dy;
-
-            // y''
-            state_deriv.dy = accelNED[1];
-
-            // z'
-            state_deriv.z = state.dz;
-
-            // z''
-            state_deriv.dz = netz;
-
-            // phi'
-            state_deriv.phi = phidot;
-
-            // phi''
-            state_deriv.dphi = psidot * thedot * (Iy - Iz) / Ix - Jr / 
-                Ix * thedot * omega + u2 / Ix;
-
-            // theta'
-            state_deriv.theta = thedot;
-
-            // theta''
-            state_deriv.dtheta = -(psidot * phidot * (Iz - Ix) / Iy + Jr / 
-                    Iy * phidot * omega + u3 / Iy);
-
-            // psi'
-            state_deriv.psi = psidot;
-
-            // psi''
-            state_deriv.dpsi = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz;
-        }
-
-
-        /**
-         * Initializes kinematic pose, with flag for whether we're airbone
-         * (helps with testing gravity).
-         *
-         * @param rotation initial rotation
-         * @param airborne allows us to start on the ground (default) or in the
-         * air (e.g., gravity test)
-         */
-        void init(const double rotation[3], const bool airborne = false)
-        {
-            // Always start at location (0,0,0)
-            memset(&state, 0, sizeof(state));
-
-            state.phi   = rotation[0];
-            state.theta = rotation[1];
-            state.psi   = rotation[2];
-
-            _airborne = airborne;
-
-            // Initialize inertial frame acceleration in NED coordinates
-            bodyZToInertial(-_wparams.g, rotation, _inertialAccel);
-
-            // We usuall start on ground, but can start in air for testing
-            _airborne = airborne;
-        }
-
-        /**
-          * Sets world parameters (currently just gravity and air density)
-          */
-        void setWorldParams(const double g, const double rho)
-        {
-            _wparams.g = g;
-            _wparams.rho = rho;
-        }
-
-        /**
-         * Sets motor spins
-         *
-         * @param motor spins in radians per second
-         */
-        void update(const float * fomegas, const double dt) 
-        {
-            double omegas[MAX_ROTORS] = {};
-
-            // Convert motor values to double-precision for consistency
-            for (auto k=0; k<_rotorCount; ++k) {
-                omegas[k] = fomegas[k];
+                for (uint8_t i = 0; i < 3; ++i) {
+                    inertial[i] = bodyZ * R[i];
+                }
             }
 
-            // Implement Equation 6 -------------------------------------------
+            // quad, hexa, octo, etc.
+            uint8_t _rotorCount = 4;
 
-            // Radians per second of rotors, and squared radians per second
-            double omegas2[MAX_ROTORS] = {};
+            /**
+             * Implements Equation 12 computing temporal first derivative of state.
+             * Should fill _dxdx[0..11] with appropriate values.
+             * @param accelNED acceleration in NED inertial frame
+             * @param netz accelNED[2] with gravitational constant added in
+             * @param omega net torque from rotors
+             * @param u2 roll force
+             * @param u3 pitch force
+             * @param u4 yaw force
+             */
+            void computeStateDerivative(double accelNED[3],
+                    double netz,
+                    double omega,
+                    double u2,
+                    double u3,
+                    double u4)
+            {
+                double phidot = state.dphi;
+                double thedot = state.dtheta;
+                double psidot = state.dpsi;
 
-            double u1 = 0, u4 = 0, omega = 0;
-            for (unsigned int i = 0; i < _rotorCount; ++i) {
+                double Ix = _vparams.Ix;
+                double Iy = _vparams.Iy;
+                double Iz = _vparams.Iz;
+                double Jr = _vparams.Jr;
 
-                // Thrust is squared rad/sec scaled by air density
-                omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
+                // x'
+                state_deriv.x = state.dx;
 
-                // Multiply by thrust coefficient
-                u1 += _vparams.b * omegas2[i];                  
+                // x''
+                state_deriv.dx = accelNED[0];
 
-                // Newton's Third Law (action/reaction) tells us that yaw is
-                // opposite to net rotor spin
-                //u4 += _vparams.d * omegas2[i] * -getRotorDirection(i);
-                //omega += omegas[i] * -getRotorDirection(i);
+                // y'
+                state_deriv.y = state.dy;
+
+                // y''
+                state_deriv.dy = accelNED[1];
+
+                // z'
+                state_deriv.z = state.dz;
+
+                // z''
+                state_deriv.dz = netz;
+
+                // phi'
+                state_deriv.phi = phidot;
+
+                // phi''
+                state_deriv.dphi = psidot * thedot * (Iy - Iz) / Ix - Jr / 
+                    Ix * thedot * omega + u2 / Ix;
+
+                // theta'
+                state_deriv.theta = thedot;
+
+                // theta''
+                state_deriv.dtheta = -(psidot * phidot * (Iz - Ix) / Iy + Jr / 
+                        Iy * phidot * omega + u3 / Iy);
+
+                // psi'
+                state_deriv.psi = psidot;
+
+                // psi''
+                state_deriv.dpsi = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz;
             }
-            
-            // Compute roll, pitch, yaw forces (different method for
-            // fixed-pitch blades vs. variable-pitch)
-            double u2 = 0, u3 = 0;
-            //computeRollAndPitch(omegas, omegas2, u2, u3);
 
-            // ----------------------------------------------------------------
 
-            // Use the current Euler angles to rotate the orthogonal thrust
-            // vector into the inertial frame
-            double euler[3] = {state.phi, state.theta, state.psi};
-            double accelNED[3] = {};
-            bodyZToInertial(u1 / _vparams.m, euler, accelNED);
+            /**
+             * Initializes kinematic pose, with flag for whether we're airbone
+             * (helps with testing gravity).
+             *
+             * @param rotation initial rotation
+             * @param airborne allows us to start on the ground (default) or in the
+             * air (e.g., gravity test)
+             */
+            void init(const double rotation[3], const bool airborne = false)
+            {
+                // Always start at location (0,0,0)
+                memset(&state, 0, sizeof(state));
 
-            // Subtact gravity from thrust to get net vertical acceleration
-            double netz = accelNED[2] - _wparams.g;
+                state.phi   = rotation[0];
+                state.theta = rotation[1];
+                state.psi   = rotation[2];
 
-            _airborne = netz > 0;
+                _airborne = airborne;
 
-            // Once airborne, we can update dynamics
-            if (_airborne) {
+                // Initialize inertial frame acceleration in NED coordinates
+                bodyZToInertial(-_wparams.g, rotation, _inertialAccel);
 
-                // Compute the state derivatives using Equation 12
-                computeStateDerivative(accelNED, netz, omega, u2, u3, u4);
-
-                // Compute state as first temporal integral of first temporal
-                // derivative
-                state.x += dt * state_deriv.x;
-                state.dx += dt * state_deriv.dx;
-                state.y += dt * state_deriv.y;
-                state.dy += dt * state_deriv.dy;
-                state.z += dt * state_deriv.z;
-                state.dz += dt * state_deriv.dz;
-                state.phi += dt * state_deriv.phi;
-                state.dphi += dt * state_deriv.dphi;
-                state.theta += dt * state_deriv.theta;
-                state.dtheta += dt * state_deriv.dtheta;
-                state.psi += dt * state_deriv.psi;
-                state.dpsi += dt * state_deriv.dpsi;
-
-                // Once airborne, inertial-frame acceleration is same as NED
-                // acceleration
-                _inertialAccel[0] = accelNED[0];
-                _inertialAccel[1] = accelNED[1];
-                _inertialAccel[2] = accelNED[2];
+                // We usuall start on ground, but can start in air for testing
+                _airborne = airborne;
             }
 
-        } // update
+            /**
+             * Sets world parameters (currently just gravity and air density)
+             */
+            void setWorldParams(const double g, const double rho)
+            {
+                _wparams.g = g;
+                _wparams.rho = rho;
+            }
 
-}; // class Dynamics
+            /**
+             * Sets motor spins
+             *
+             * @param motor spins in radians per second
+             */
+            void update(const float * fomegas, const double dt) 
+            {
+                double omegas[MAX_ROTORS] = {};
+
+                // Convert motor values to double-precision for consistency
+                for (auto k=0; k<_rotorCount; ++k) {
+                    omegas[k] = fomegas[k];
+                }
+
+                // Implement Equation 6 -------------------------------------------
+
+                // Radians per second of rotors, and squared radians per second
+                double omegas2[MAX_ROTORS] = {};
+
+                double u1 = 0, u4 = 0, omega = 0;
+                for (unsigned int i = 0; i < _rotorCount; ++i) {
+
+                    // Thrust is squared rad/sec scaled by air density
+                    omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
+
+                    // Multiply by thrust coefficient
+                    u1 += _vparams.b * omegas2[i];                  
+
+                    // Newton's Third Law (action/reaction) tells us that yaw is
+                    // opposite to net rotor spin
+                    //u4 += _vparams.d * omegas2[i] * -getRotorDirection(i);
+                    //omega += omegas[i] * -getRotorDirection(i);
+                }
+
+                // Compute roll, pitch, yaw forces (different method for
+                // fixed-pitch blades vs. variable-pitch)
+                double u2 = 0, u3 = 0;
+                //computeRollAndPitch(omegas, omegas2, u2, u3);
+
+                // ----------------------------------------------------------------
+
+                // Use the current Euler angles to rotate the orthogonal thrust
+                // vector into the inertial frame
+                double euler[3] = {state.phi, state.theta, state.psi};
+                double accelNED[3] = {};
+                bodyZToInertial(u1 / _vparams.m, euler, accelNED);
+
+                // Subtact gravity from thrust to get net vertical acceleration
+                double netz = accelNED[2] - _wparams.g;
+
+                _airborne = netz > 0;
+
+                // Once airborne, we can update dynamics
+                if (_airborne) {
+
+                    // Compute the state derivatives using Equation 12
+                    computeStateDerivative(accelNED, netz, omega, u2, u3, u4);
+
+                    // Compute state as first temporal integral of first temporal
+                    // derivative
+                    state.x += dt * state_deriv.x;
+                    state.dx += dt * state_deriv.dx;
+                    state.y += dt * state_deriv.y;
+                    state.dy += dt * state_deriv.dy;
+                    state.z += dt * state_deriv.z;
+                    state.dz += dt * state_deriv.dz;
+                    state.phi += dt * state_deriv.phi;
+                    state.dphi += dt * state_deriv.dphi;
+                    state.theta += dt * state_deriv.theta;
+                    state.dtheta += dt * state_deriv.dtheta;
+                    state.psi += dt * state_deriv.psi;
+                    state.dpsi += dt * state_deriv.dpsi;
+
+                    // Once airborne, inertial-frame acceleration is same as NED
+                    // acceleration
+                    _inertialAccel[0] = accelNED[0];
+                    _inertialAccel[1] = accelNED[1];
+                    _inertialAccel[2] = accelNED[2];
+                }
+
+            } // update
+
+    }; // class Dynamics
+
+} // namespace hf

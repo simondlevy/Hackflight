@@ -10,7 +10,7 @@ newsim: newsim.o
 	g++ -o newsim newsim.o 
 
 newsim.o: main.cpp dynamics.hpp
-	g++ $(CFLAGS) -o newsim.o -c main.cpp
+	g++ $(CFLAGS) -I../src -o newsim.o -c main.cpp
 
 run: newsim
 	./newsim
