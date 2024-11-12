@@ -171,10 +171,10 @@ namespace hf {
                 state.psi = euler.z;
 
                 fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f\n",
-                        state.dy, state_ekf.dy,
+                        state.dx, state_ekf.dx,
                         state.z, state_ekf.z,
                         state.dz, state_ekf.dz,
-                        state.phi, state_ekf.phi);
+                        state.theta, state_ekf.theta);
 
                 return state;
             }

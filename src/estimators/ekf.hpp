@@ -481,8 +481,7 @@ namespace hf {
                 state.phi = Utils::RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
                         (qw*qw - qx*qx - qy*qy + qz*qz));
 
-                // Negate for ENU
-                state.theta = -Utils::RAD2DEG * asin((-2) * (qx*qz - qw*qy));
+                state.theta = Utils::RAD2DEG * asin((-2) * (qx*qz - qw*qy));
 
                 state.psi = Utils::RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
                         (qw*qw + qx*qx - qy*qy - qz*qz));
