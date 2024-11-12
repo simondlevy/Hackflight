@@ -129,16 +129,14 @@ namespace hf {
 
                 // For order see https://cyberbotics.com/doc/reference/
                 //   inertialunit#wb_inertial_unit_get_quaternion.
-                // Negations are done for consistency with output of
-                // Madgwick filter.
                 const axis4_t quat = { 
-                    (float)q[3], (float)q[0], -(float)q[1], -(float)q[2] 
+                    (float)q[3], (float)q[0], (float)q[1], (float)q[2] 
                 };
 
                 const auto h = wb_distance_sensor_get_value(_rangefinder);
 
                 axis3_t euler = {};
-                Utils::quat2euler(quat, euler);
+                Utils::quat2euler(quat, euler, -1, -1);
 
                 state.dphi = gyro.x;
                 state.dtheta = gyro.y;
@@ -174,7 +172,7 @@ namespace hf {
                 state.psi = euler.z;
 
                 axis3_t euler_ekf = {};
-                Utils::quat2euler_ekf(quat_ekf, euler_ekf);
+                Utils::quat2euler(quat_ekf, euler_ekf, -1);
 
                 fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
                         _time,

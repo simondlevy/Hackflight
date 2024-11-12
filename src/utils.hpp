@@ -35,26 +35,16 @@ namespace hf {
             static constexpr float RAD2DEG = 180.0f / M_PI;
             static constexpr float GS2MSS = 9.81;
 
-            static void quat2euler(const axis4_t & q, axis3_t &a)
+            static void quat2euler(const axis4_t & q, axis3_t &a,
+                    const float ysign=+1, const float zsign=+1)
             {
                 a.x = RAD2DEG * atan2(q.w*q.x + q.y*q.z,
                         0.5f - q.x*q.x - q.y*q.y);
 
-                a.y = RAD2DEG * asin(2 * (q.x*q.z - q.w*q.y));
+                a.y = ysign * RAD2DEG * asin(2 * (q.x*q.z - q.w*q.y));
 
-                a.z = RAD2DEG * atan2(q.x*q.y + q.w*q.z,
+                a.z = zsign * RAD2DEG * atan2(q.x*q.y + q.w*q.z,
                         0.5f - q.y*q.y - q.z*q.z);
-            }
-
-            static void quat2euler_ekf(const axis4_t & q, axis3_t &a)
-            {
-                a.x = RAD2DEG * atan2((2 * (q.y*q.z + q.w*q.x)),
-                        (q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z));
-
-                a.y = RAD2DEG * asin((-2) * (q.x*q.z - q.w*q.y));
-
-                a.z = RAD2DEG * atan2((2 * (q.x*q.y + q.w*q.z)),
-                        (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
             }
 
             static float fmax(const float val, const float maxval)
