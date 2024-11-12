@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/time.h>
 
 class Dynamics {
 
@@ -63,7 +64,7 @@ class Dynamics {
 
         } vehicle_state_t;
 
-        vehicle_state_t _vstate;
+        vehicle_state_t state;
 
         typedef struct {
 
@@ -72,7 +73,7 @@ class Dynamics {
 
         } world_params_t; 
 
-        /* XXX static constexpr*/ world_params_t EARTH_PARAMS = { 
+        world_params_t EARTH_PARAMS = { 
             9.80665,  // g graviational constant
             1.225 // rho air density 
         };
@@ -119,7 +120,7 @@ class Dynamics {
         vehicle_params_t _vparams;
         world_params_t _wparams;
 
-        vehicle_state_t _vstate_deriv;
+        vehicle_state_t state_deriv;
 
         Dynamics(
                 const uint8_t actuatorCount,
@@ -138,7 +139,7 @@ class Dynamics {
             // Default to Earth params (can be overridden by setWorldParams())
             memcpy(&_wparams, &EARTH_PARAMS, sizeof(world_params_t));
 
-            memset(&_vstate, 0, sizeof(_vstate));
+            memset(&state, 0, sizeof(state));
         }        
 
         // Flag for whether we're airborne and can update dynamics
@@ -217,9 +218,9 @@ class Dynamics {
                                     double u3,
                                     double u4)
         {
-            double phidot = _vstate.dphi;
-            double thedot = _vstate.dtheta;
-            double psidot = _vstate.dpsi;
+            double phidot = state.dphi;
+            double thedot = state.dtheta;
+            double psidot = state.dpsi;
 
             double Ix = _vparams.Ix;
             double Iy = _vparams.Iy;
@@ -227,42 +228,42 @@ class Dynamics {
             double Jr = _vparams.Jr;
 
             // x'
-            _vstate_deriv.x = _vstate.dx;
+            state_deriv.x = state.dx;
             
             // x''
-            _vstate_deriv.dx = accelNED[0];
+            state_deriv.dx = accelNED[0];
 
             // y'
-            _vstate_deriv.y = _vstate.dy;
+            state_deriv.y = state.dy;
 
             // y''
-            _vstate_deriv.dy = accelNED[1];
+            state_deriv.dy = accelNED[1];
 
             // z'
-            _vstate_deriv.z = _vstate.dz;
+            state_deriv.z = state.dz;
 
             // z''
-            _vstate_deriv.dz = netz;
+            state_deriv.dz = netz;
 
             // phi'
-            _vstate_deriv.phi = phidot;
+            state_deriv.phi = phidot;
 
             // phi''
-            _vstate_deriv.dphi = psidot * thedot * (Iy - Iz) / Ix - Jr / 
+            state_deriv.dphi = psidot * thedot * (Iy - Iz) / Ix - Jr / 
                 Ix * thedot * omega + u2 / Ix;
 
             // theta'
-            _vstate_deriv.theta = thedot;
+            state_deriv.theta = thedot;
 
             // theta''
-            _vstate_deriv.dtheta = -(psidot * phidot * (Iz - Ix) / Iy + Jr / 
+            state_deriv.dtheta = -(psidot * phidot * (Iz - Ix) / Iy + Jr / 
                     Iy * phidot * omega + u3 / Iy);
 
             // psi'
-            _vstate_deriv.psi = psidot;
+            state_deriv.psi = psidot;
 
             // psi''
-            _vstate_deriv.dpsi = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz;
+            state_deriv.dpsi = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz;
         }
 
 
@@ -279,11 +280,11 @@ class Dynamics {
         void init(const double rotation[3], const bool airborne = false)
         {
             // Always start at location (0,0,0)
-            memset(&_vstate, 0, sizeof(_vstate));
+            memset(&state, 0, sizeof(state));
 
-            _vstate.phi   = rotation[0];
-            _vstate.theta = rotation[1];
-            _vstate.psi   = rotation[2];
+            state.phi   = rotation[0];
+            state.theta = rotation[1];
+            state.psi   = rotation[2];
 
             _airborne = airborne;
 
@@ -346,12 +347,23 @@ class Dynamics {
         /**
          * Updates state.
          *
-         * @param omegas values in interval [0,1] (rotors) or [-0.5,+0.5]
-                  (servos)
-         * @param dt time in seconds since previous update
+         * @param motor spins in radians per second
          */
-        void update(const float * fomegas, const double dt) 
+        void update(const float * fomegas) 
         {
+            // Get deltaT from clock time
+            static double _time_prev;
+            struct timeval timeval = {};
+            gettimeofday(&timeval, NULL);
+            const double time_curr = timeval.tv_sec + (double)timeval.tv_usec / 1e6;
+            const auto dt = time_curr - _time_prev;
+            _time_prev = time_curr;
+
+            static uint64_t count;
+            if (count++ % 10000 == 0) {
+                printf("dt = %f\n", dt);
+            }
+
             double omegas[MAX_ROTORS] = {};
 
             // Convert motor values to double-precision for consistency
@@ -388,13 +400,15 @@ class Dynamics {
             // ----------------------------------------------------------------
 
             // Use the current Euler angles to rotate the orthogonal thrust
-            // vector into the inertial frame.  Negate to use NED.
-            double euler[3] = {_vstate.phi, _vstate.theta, _vstate.psi};
+            // vector into the inertial frame
+            double euler[3] = {state.phi, state.theta, state.psi};
             double accelNED[3] = {};
-            bodyZToInertial(-u1 / _vparams.m, euler, accelNED);
+            bodyZToInertial(u1 / _vparams.m, euler, accelNED);
 
             // We're airborne once net downward acceleration goes below zero
             double netz = accelNED[2] + _wparams.g;
+
+            netz = 1e-10;
 
             // If we're airborne, check for low AGL on descent
             if (_airborne) {
@@ -403,23 +417,23 @@ class Dynamics {
 
                     _airborne = false;
 
-                    _vstate.dx = 0;
-                    _vstate.dy = 0;
-                    _vstate.dz = 0;
-                    _vstate.phi = 0;
-                    _vstate.dphi = 0;
-                    _vstate.theta = 0;
-                    _vstate.dtheta = 0;
-                    _vstate.dpsi = 0;
+                    state.dx = 0;
+                    state.dy = 0;
+                    state.dz = 0;
+                    state.phi = 0;
+                    state.dphi = 0;
+                    state.theta = 0;
+                    state.dtheta = 0;
+                    state.dpsi = 0;
 
-                    _vstate.z += _agl;
+                    state.z += _agl;
                 }
             }
 
-            // If we're not airborne, we become airborne when downward
-            // acceleration has become negative
+            // If we're not airborne, we become airborne when upward
+            // acceleration has become positive
             else {
-                _airborne = netz < 0;
+                _airborne = netz > 0;
             }
 
             // Once airborne, we can update dynamics
@@ -430,18 +444,18 @@ class Dynamics {
 
                 // Compute state as first temporal integral of first temporal
                 // derivative
-                _vstate.x += dt * _vstate_deriv.x;
-                _vstate.dx += dt * _vstate_deriv.dx;
-                _vstate.y += dt * _vstate_deriv.y;
-                _vstate.dy += dt * _vstate_deriv.dy;
-                _vstate.z += dt * _vstate_deriv.z;
-                _vstate.dz += dt * _vstate_deriv.dz;
-                _vstate.phi += dt * _vstate_deriv.phi;
-                _vstate.dphi += dt * _vstate_deriv.dphi;
-                _vstate.theta += dt * _vstate_deriv.theta;
-                _vstate.dtheta += dt * _vstate_deriv.dtheta;
-                _vstate.psi += dt * _vstate_deriv.psi;
-                _vstate.dpsi += dt * _vstate_deriv.dpsi;
+                state.x += dt * state_deriv.x;
+                state.dx += dt * state_deriv.dx;
+                state.y += dt * state_deriv.y;
+                state.dy += dt * state_deriv.dy;
+                state.z += dt * state_deriv.z;
+                state.dz += dt * state_deriv.dz;
+                state.phi += dt * state_deriv.phi;
+                state.dphi += dt * state_deriv.dphi;
+                state.theta += dt * state_deriv.theta;
+                state.dtheta += dt * state_deriv.dtheta;
+                state.psi += dt * state_deriv.psi;
+                state.dpsi += dt * state_deriv.dpsi;
 
                 // Once airborne, inertial-frame acceleration is same as NED
                 // acceleration
@@ -451,7 +465,7 @@ class Dynamics {
             }
             else if (_autoland) {
                 //"fly" to agl=0
-                _vstate.z += 5 * _agl * dt;
+                state.z += 5 * _agl * dt;
             }
 
             // XXX
@@ -461,62 +475,62 @@ class Dynamics {
 
         double getStateX(void)
         {
-            return _vstate.x;
+            return state.x;
         }
 
         double getStateDx(void)
         {
-            return _vstate.dx;
+            return state.dx;
         }
 
         double getStateY(void)
         {
-            return _vstate.y;
+            return state.y;
         }
 
         double getStateDy(void)
         {
-            return _vstate.dy;
+            return state.dy;
         }
 
         double getStateZ(void)
         {
-            return -_vstate.z; // NED => ENU
+            return -state.z; // NED => ENU
         }
 
         double getStateDz(void)
         {
-            return -_vstate.dz; // NED => ENU
+            return -state.dz; // NED => ENU
         }
 
         double getStatePhi(void)
         {
-            return _vstate.phi;
+            return state.phi;
         }
 
         double getStateDphi(void)
         {
-            return _vstate.dphi;
+            return state.dphi;
         }
 
         double getStateTheta(void)
         {
-            return _vstate.theta;
+            return state.theta;
         }
 
         double getStateDtheta(void)
         {
-            return _vstate.dtheta;
+            return state.dtheta;
         }
 
         double getStatePsi(void)
         {
-            return _vstate.psi;
+            return state.psi;
         }
 
         double getStateDpsi(void)
         {
-            return _vstate.dpsi;
+            return state.dpsi;
         }
 
 }; // class Dynamics
