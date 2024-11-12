@@ -1,11 +1,3 @@
-/*
-   UDP proxy for testing MulticopterSim socket comms
-
-   Copyright(C) 2019 Simon D.Levy
-
-   MIT License
- */
-
 #include <stdio.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -40,9 +32,7 @@ static Dynamics::vehicle_params_t vparams = {
     2,      // Ix [kg*m^2] 
     2,      // Iy [kg*m^2] 
     3,      // Iz [kg*m^2] 
-    38E-04, // Jr prop inertial [kg*m^2] 
-
-    15000 // maxrpm
+    38E-04  // Jr prop inertial [kg*m^2] 
 };
 
 static FixedPitchDynamics::fixed_pitch_params_t fparams = {

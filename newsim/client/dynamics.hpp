@@ -79,13 +79,6 @@ class Dynamics {
 
         bool _autoland; // support fly-to-zero-AGL
 
-        double _capSpeed(const double speed)
-        {
-            const auto cap = _vparams.maxspeed;
-
-            return speed < -cap ? -cap : speed > cap ? cap : speed;
-        }
-
     public:
 
         /**
@@ -99,8 +92,6 @@ class Dynamics {
             double Iy; // [kg*m^2] 
             double Iz; // [kg*m^2] 
             double Jr; // rotor inertial [kg*m^2] 
-            uint16_t maxrpm; // maxrpm
-            double maxspeed; // [m/s]
 
         } vehicle_params_t; 
 
@@ -451,10 +442,6 @@ class Dynamics {
                 _vstate.dtheta += dt * _vstate_deriv.dtheta;
                 _vstate.psi += dt * _vstate_deriv.psi;
                 _vstate.dpsi += dt * _vstate_deriv.dpsi;
-
-                // Cap dx, dy by maximum speed
-                _vstate.dx = _capSpeed(_vstate.dx);
-                _vstate.dy = _capSpeed(_vstate.dy);
 
                 // Once airborne, inertial-frame acceleration is same as NED
                 // acceleration

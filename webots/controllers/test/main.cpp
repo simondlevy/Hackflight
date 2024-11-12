@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
 
         const auto state = sim.getState();
 
-        const float MOTOR = 56;
+        const float MOTOR = 55.385; // rad/sec
 
         motors[0] = MOTOR;
         motors[1] = MOTOR;

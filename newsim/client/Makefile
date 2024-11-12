@@ -1,12 +1,4 @@
-#
-# Makefile for simulator proxy
-#
-# Copyright (C) 2019 Simon D. Levy
-# 
-# MIT License
-# 
-
-ALL = simproxy
+ALL = client
 
 all: $(ALL)
 
@@ -14,17 +6,17 @@ CFLAGS = -Wall -std=c++11
 
 all: $(ALL)
 
-simproxy: simproxy.o 
-	g++ -o simproxy simproxy.o 
+client: client.o 
+	g++ -o client client.o 
 
-simproxy.o: simproxy.cpp dynamics.hpp
-	g++ $(CFLAGS) -c simproxy.cpp
+client.o: client.cpp dynamics.hpp
+	g++ $(CFLAGS) -c client.cpp
 
-run: simproxy
-	./simproxy
+run: client
+	./client
 
 edit:
-	vim simproxy.cpp
+	vim client.cpp
 
 clean:
 	rm -rf $(ALL) *.o *~
