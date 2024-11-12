@@ -13,6 +13,10 @@ static uint16_t  MOTOR_PORT = 5000;
 static uint16_t  TELEM_PORT = 5001;
 
 // Time constant
+static const double DT = 2.0e-5;
+
+// Vehicle constants
+
 static Dynamics::vehicle_params_t vparams = {
 
     2.e-06,  // drag coefficient [T=d*w^2]
@@ -26,7 +30,7 @@ static Dynamics::vehicle_params_t vparams = {
 static FixedPitchDynamics::fixed_pitch_params_t fparams = {
 
     // Estimated
-    3.75e-05, // b force constatnt [F=b*w^2]
+    3.275e-5, // b force constatnt [F=b*w^2]
     0.03    // l arm length [m]
 };
 
@@ -43,15 +47,16 @@ int main(int argc, char ** argv)
         QuadXBFDynamics(vparams, fparams, false); // no auto-land
 
     // Set up initial conditions
-    double time = 0;
     double rotation[3] = {0,0,0};
     dynamics.init(rotation);
 
     // Loop forever, communicating with server
-    while (true) {
+    for (uint64_t k=0; ; ++k) {
 
         // To be sent to client
         double telemetry[17] = {0};
+
+        const double time = k * DT;
 
         // First value is time
         telemetry[0] = time;
@@ -92,7 +97,7 @@ int main(int argc, char ** argv)
                 dynamics.state.z);
 
         // Update dynamics with motor values
-        dynamics.update(motorvals);
+        dynamics.update(motorvals, DT);
 
         // Set AGL to arbitrary positive value to avoid kinematic trick
         dynamics.setAgl(1);

@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <sys/time.h>
 
 class Dynamics {
 
@@ -351,21 +350,8 @@ class Dynamics {
          *
          * @param motor spins in radians per second
          */
-        void update(const float * fomegas) 
+        void update(const float * fomegas, const double dt) 
         {
-            // Get deltaT from clock time
-            static double _time_prev;
-            struct timeval timeval = {};
-            gettimeofday(&timeval, NULL);
-            const double time_curr = timeval.tv_sec + (double)timeval.tv_usec / 1e6;
-            const auto dt = time_curr - _time_prev;
-            _time_prev = time_curr;
-
-            // Ignore startup transient
-            if (dt > DT_MIN) {
-                return;
-            }
-
             double omegas[MAX_ROTORS] = {};
 
             // Convert motor values to double-precision for consistency
@@ -407,10 +393,8 @@ class Dynamics {
             double accelNED[3] = {};
             bodyZToInertial(u1 / _vparams.m, euler, accelNED);
 
-            // We're airborne once net downward acceleration goes below zero
-            double netz = accelNED[2] + _wparams.g;
-
-            // netz = 1e-10;
+            // Subtact gravity from thrust to get net vertical acceleration
+            double netz = accelNED[2] - _wparams.g;
 
             // If we're airborne, check for low AGL on descent
             if (_airborne) {
