@@ -457,41 +457,25 @@ namespace hf {
                     isVelocityWithinBounds(newx[STATE_DZ]);
             }
 
-            void get_vehicle_state(state_t & state)
+            void get_vehicle_state(
+                    axis4_t & quat, axis2_t & dxdy, float & z, float & dz)
             {
                 const auto x = _ekf.x;
 
-                state.dx = x[STATE_DX];
+                dxdy.x = x[STATE_DX];
 
                 // Negate for rightward positive
-                state.dy = -x[STATE_DY];
+                dxdy.y = -x[STATE_DY];
 
-                state.z = x[STATE_Z];
+                z = x[STATE_Z];
 
-                state.z = min(0, state.z);
+                z = min(0, z);
 
-                state.dz = _r.x * x[STATE_DX] + _r.y * x[STATE_DY] + 
+                dz = _r.x * x[STATE_DX] + _r.y * x[STATE_DY] + 
                     _r.z * x[STATE_DZ];
 
-                const auto qw = _quat.w;
-                const auto qx = _quat.x;
-                const auto qy = _quat.y;
-                const auto qz = _quat.z;
-
-                state.phi = Utils::RAD2DEG * atan2((2 * (qy*qz + qw*qx)),
-                        (qw*qw - qx*qx - qy*qy + qz*qz));
-
-                state.theta = Utils::RAD2DEG * asin((-2) * (qx*qz - qw*qy));
-
-                state.psi = Utils::RAD2DEG * atan2((2 * (qx*qy + qw*qz)),
-                        (qw*qw + qx*qx - qy*qy - qz*qz));
-
-                // Get angular velocities directly from gyro
-                state.dphi =    _gyroLatest.x;
-                state.dtheta = -_gyroLatest.y; // negate for ENU
-                state.dpsi =    _gyroLatest.z;
-
-            }
+                memcpy(&quat, &_quat, sizeof(axis4_t));
+           }
 
         private:
 

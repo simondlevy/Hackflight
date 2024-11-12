@@ -31,6 +31,7 @@
 
 #include <hackflight.hpp>
 #include <estimators/complementary.hpp>
+#include <estimators/ekf.hpp>
 #include <utils.hpp>
 
 #include <webots/camera.h>
@@ -60,6 +61,10 @@ namespace hf {
 
             void init(const bool tryJoystick=true)
             {
+                _logfp = fopen("log.csv", "w");
+
+                _ekf.initialize();
+
                 wb_robot_init();
 
                 _timestep = wb_robot_get_basic_time_step();
@@ -149,12 +154,33 @@ namespace hf {
                 _complementary.getValues(getDt(), flow_raw, gyro, accel, quat, h,
                         dxy_flow, state.z, state.dz);
 
+                _ekf.accumulate_gyro(gyro);
+                _ekf.accumulate_accel(accel);
+                _ekf.predict(getDt());
+                _ekf.update_with_range(h);
+                _ekf.finalize();
+
+                axis4_t quat_ekf = {};
+                axis2_t dxdy_ekf = {};
+                float z_ekf = 0;
+                float dz_ekf = 0;
+                _ekf.get_vehicle_state(quat_ekf, dxdy_ekf, z_ekf, dz_ekf);
+
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
 
                 state.phi = euler.x;
                 state.theta = euler.y;
                 state.psi = euler.z;
+
+                axis3_t euler_ekf = {};
+                Utils::quat2euler_ekf(quat_ekf, euler_ekf);
+
+                fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f\n",
+                        state.dx, dxdy_ekf.x,
+                        state.z, z_ekf,
+                        state.dz, dz_ekf,
+                        state.theta, euler_ekf.y);
 
                 return state;
             }
@@ -369,6 +395,8 @@ namespace hf {
             uint32_t _tick;
 
             ComplementaryFilter _complementary;
+
+            EKF _ekf;
 
             WbDeviceTag _motor1;
             WbDeviceTag _motor2;
