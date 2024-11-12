@@ -46,6 +46,8 @@ class Dynamics {
     // private:
     public:
 
+        static constexpr double DT_MIN = 1e-4;
+
         // state vector (see Eqn. 11)
         typedef struct {
 
@@ -359,9 +361,9 @@ class Dynamics {
             const auto dt = time_curr - _time_prev;
             _time_prev = time_curr;
 
-            static uint64_t count;
-            if (count++ % 10000 == 0) {
-                printf("dt = %f\n", dt);
+            // Ignore startup transient
+            if (dt > DT_MIN) {
+                return;
             }
 
             double omegas[MAX_ROTORS] = {};
@@ -408,7 +410,7 @@ class Dynamics {
             // We're airborne once net downward acceleration goes below zero
             double netz = accelNED[2] + _wparams.g;
 
-            netz = 1e-10;
+            // netz = 1e-10;
 
             // If we're airborne, check for low AGL on descent
             if (_airborne) {
@@ -468,69 +470,6 @@ class Dynamics {
                 state.z += 5 * _agl * dt;
             }
 
-            // XXX
-            //vstate.z = -1;
-
         } // update
-
-        double getStateX(void)
-        {
-            return state.x;
-        }
-
-        double getStateDx(void)
-        {
-            return state.dx;
-        }
-
-        double getStateY(void)
-        {
-            return state.y;
-        }
-
-        double getStateDy(void)
-        {
-            return state.dy;
-        }
-
-        double getStateZ(void)
-        {
-            return -state.z; // NED => ENU
-        }
-
-        double getStateDz(void)
-        {
-            return -state.dz; // NED => ENU
-        }
-
-        double getStatePhi(void)
-        {
-            return state.phi;
-        }
-
-        double getStateDphi(void)
-        {
-            return state.dphi;
-        }
-
-        double getStateTheta(void)
-        {
-            return state.theta;
-        }
-
-        double getStateDtheta(void)
-        {
-            return state.dtheta;
-        }
-
-        double getStatePsi(void)
-        {
-            return state.psi;
-        }
-
-        double getStateDpsi(void)
-        {
-            return state.dpsi;
-        }
 
 }; // class Dynamics
