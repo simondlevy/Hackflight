@@ -91,12 +91,19 @@ int main(int argc, char ** argv)
 
     std::vector<PidController *> pids = { &anglePid, &altHoldPid };
 
-    // Loop forever, waiting for clients
+    auto connected = false;
+
+    // Loop forever, communicating with client
     while (true) {
 
         // Get incoming telemetry values
         double telemetry[17] = {};
         telemServer.receiveData(telemetry, sizeof(telemetry));
+
+        if (!connected) {
+            printf("Client connected\n");
+            connected = true;
+        }
 
         // Sim sends negative time value on halt
         double time = telemetry[0];
