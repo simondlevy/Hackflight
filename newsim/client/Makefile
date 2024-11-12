@@ -6,7 +6,7 @@
 # MIT License
 # 
 
-ALL = simproxy cfproxy
+ALL = simproxy
 
 all: $(ALL)
 
@@ -23,20 +23,8 @@ simproxy.o: simproxy.cpp dynamics.hpp
 run: simproxy
 	./simproxy
 
-cfproxy: cfproxy.o 
-	g++ -o cfproxy cfproxy.o 
-
-cfproxy.o: cfproxy.cpp dynamics.hpp
-	g++ $(CFLAGS) -c cfproxy.cpp
-
-cfrun: cfproxy
-	./cfproxy
-
 edit:
 	vim simproxy.cpp
-
-cfedit:
-	vim cfproxy.cpp
 
 clean:
 	rm -rf $(ALL) *.o *~

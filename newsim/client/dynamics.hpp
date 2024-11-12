@@ -379,6 +379,8 @@ class Dynamics {
                 // Convert fractional speed to radians per second
                 omegas[i] = actuators[i] * _vparams.maxrpm * M_PI / 30;  
 
+                printf("%f\n", omegas[0]);
+
                 // Thrust is squared rad/sec scaled by air density
                 omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
 
