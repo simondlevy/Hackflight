@@ -129,60 +129,66 @@ namespace hf {
 
                 // For order see https://cyberbotics.com/doc/reference/
                 //   inertialunit#wb_inertial_unit_get_quaternion.
-                const axis4_t quat = { 
+                const axis4_t quat_true = { 
                     (float)q[3], (float)q[0], (float)q[1], (float)q[2] 
                 };
 
                 const auto h = wb_distance_sensor_get_value(_rangefinder);
 
-                axis3_t euler = {};
-                Utils::quat2euler(quat, euler, -1, -1);
+                axis3_t euler_true = {};
+                Utils::quat2euler(quat_true, euler_true, -1, -1);
 
                 state.dphi = gyro.x;
                 state.dtheta = gyro.y;
                 state.dpsi = gyro.z;
 
-                const auto dxy_true = getGroundTruthHorizontalVelocity();
+                axis2_t dxy_true = {};
+                float z_true = 0;
+                float dz_true = 0;
+                getGroundTruth(dxy_true, z_true, dz_true);
 
-                const auto flow_raw = opticalFlowFromGroundTruth(
-                        dxy_true, gyro, h, getDt());
+                const auto flow =
+                    opticalFlowFromGroundTruth(dxy_true, gyro, h, getDt());
 
-                axis2_t dxy_flow = {};
-
-                _complementary.getValues(getDt(), flow_raw, gyro, accel, quat, h,
-                        dxy_flow, state.z, state.dz);
+                axis2_t dxy_comp = {};
+                float z_comp = 0;
+                float dz_comp = 0;
+                _complementary.getValues(getDt(), flow, gyro, accel, quat_true, h,
+                        dxy_comp, z_comp, dz_comp);
 
                 _ekf.accumulate_gyro(gyro);
                 _ekf.accumulate_accel(accel);
                 _ekf.predict(getDt());
                 _ekf.update_with_range(h);
+                _ekf.update_with_flow(getDt(), flow);
                 _ekf.finalize();
 
                 axis4_t quat_ekf = {};
-                axis2_t dxdy_ekf = {};
+                axis2_t dxy_ekf = {};
                 float z_ekf = 0;
                 float dz_ekf = 0;
-                _ekf.get_vehicle_state(quat_ekf, dxdy_ekf, z_ekf, dz_ekf);
+                _ekf.get_vehicle_state(quat_ekf, dxy_ekf, z_ekf, dz_ekf);
 
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
-
-                state.phi = euler.x;
-                state.theta = euler.y;
-                state.psi = euler.z;
+                state.z = z_true;
+                state.dz = dz_true;
+                state.phi = euler_true.x;
+                state.theta = euler_true.y;
+                state.psi = euler_true.z;
 
                 axis3_t euler_ekf = {};
                 Utils::quat2euler(quat_ekf, euler_ekf, -1);
 
-                fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                fprintf(_logfp, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
                         _time,
-                        state.dx, dxdy_ekf.x,
-                        state.dy, dxdy_ekf.y,
-                        state.z, z_ekf,
-                        state.dz, dz_ekf,
-                        state.phi, euler_ekf.x,
-                        state.theta, euler_ekf.y,
-                        state.psi, euler_ekf.z);
+                        dxy_true.x, dxy_comp.x, dxy_ekf.x,
+                        dxy_true.y, dxy_comp.y, dxy_ekf.y,
+                        z_true, z_comp, z_ekf,
+                        dz_true, dz_comp, dz_ekf,
+                        euler_true.x, euler_ekf.x,
+                        euler_true.y, euler_ekf.y,
+                        euler_true.z, euler_ekf.z);
 
                 return state;
             }
@@ -316,11 +322,12 @@ namespace hf {
                 return 1 / _timestep;
             }
 
-            axis2_t getGroundTruthHorizontalVelocity()
+            void getGroundTruth(axis2_t & dxy, float &z, float & dz)
             {
                 // Track previous time and position for calculating motion
                 static float xprev;
                 static float yprev;
+                static float zprev;
 
                 const auto dt =  getDt();
 
@@ -340,11 +347,16 @@ namespace hf {
                 const float dx = dx_ * cospsi + dy_ * sinpsi;
                 const float dy = dx_ * sinpsi - dy_ * cospsi;
 
+                z = wb_gps_get_values(_gps)[2];
+                dz = (z - zprev) / dt;
+
                 // Save past time and position for next time step
                 xprev = x;
                 yprev = y;
+                zprev = z;
 
-                return axis2_t {dx, dy};
+                dxy.x = dx;
+                dxy.y = dy;
             }
 
             bool isSpringy()

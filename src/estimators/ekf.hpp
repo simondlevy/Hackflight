@@ -288,7 +288,7 @@ namespace hf {
                 }
             }
 
-            void update_with_flow(const float dt, const axis3_t & flow)
+            void update_with_flow(const float dt, const axis2_t & flow)
             {
                 // Inclusion of flow measurements in the EKF done by two scalar
                 // updates
