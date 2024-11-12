@@ -67,9 +67,6 @@ int main(int argc, char ** argv)
 
         // Update dynamics with motor values
         dynamics.update(motorvals, dynamics_dt);
-
-        // Set AGL to arbitrary positive value to avoid kinematic trick
-        dynamics.setAgl(1);
     }
 
     return 0;

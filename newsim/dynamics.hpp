@@ -188,10 +188,6 @@ class Dynamics {
             }
         }
 
-        // Height above ground, set by kinematics
-        double _agl = 0;
-
-
         // quad, hexa, octo, etc.
         uint8_t _rotorCount = 0;
 
@@ -296,16 +292,6 @@ class Dynamics {
             _airborne = airborne;
         }
 
-
-        /**
-         * Sets height above ground level (AGL).
-         * This method can be called by the kinematic visualization.
-         */
-        void setAgl(const double agl)
-        {
-            _agl = agl;
-        }
-
         // Different for each vehicle
 
         virtual int8_t getRotorDirection(const uint8_t i) = 0;
@@ -396,31 +382,7 @@ class Dynamics {
             // Subtact gravity from thrust to get net vertical acceleration
             double netz = accelNED[2] - _wparams.g;
 
-            // If we're airborne, check for low AGL on descent
-            if (_airborne) {
-
-                if (_agl <= 0 && netz >= 0) {
-
-                    _airborne = false;
-
-                    state.dx = 0;
-                    state.dy = 0;
-                    state.dz = 0;
-                    state.phi = 0;
-                    state.dphi = 0;
-                    state.theta = 0;
-                    state.dtheta = 0;
-                    state.dpsi = 0;
-
-                    state.z += _agl;
-                }
-            }
-
-            // If we're not airborne, we become airborne when upward
-            // acceleration has become positive
-            else {
-                _airborne = netz > 0;
-            }
+            _airborne = netz > 0;
 
             // Once airborne, we can update dynamics
             if (_airborne) {
@@ -448,10 +410,6 @@ class Dynamics {
                 _inertialAccel[0] = accelNED[0];
                 _inertialAccel[1] = accelNED[1];
                 _inertialAccel[2] = accelNED[2];
-            }
-            else if (_autoland) {
-                //"fly" to agl=0
-                state.z += 5 * _agl * dt;
             }
 
         } // update
