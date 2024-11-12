@@ -185,25 +185,6 @@ namespace hf {
             // arbitrary; avoids dynamic allocation
             static const uint8_t MAX_ROTORS = 20; 
 
-            /**
-             * Position map for state vector
-             */
-            enum {
-                STATE_X,
-                STATE_DX,
-                STATE_Y,
-                STATE_DY,
-                STATE_Z,
-                STATE_DZ,
-                STATE_PHI,
-                STATE_DPHI,
-                STATE_THETA,
-                STATE_DTHETA,
-                STATE_PSI,
-                STATE_DPSI,
-                STATE_SIZE
-            };
-
             vehicle_params_t _vparams;
 
             double _g; // gravitational constant
