@@ -44,13 +44,6 @@ namespace hf {
 
             state_t state;
 
-            typedef struct {
-
-                double g;  // gravitational constant
-                double rho;  // air density
-
-            } world_params_t; 
-
             /**
              *  Vehicle parameters
              */
@@ -68,14 +61,15 @@ namespace hf {
 
             } vehicle_params_t; 
 
-            Dynamics(const vehicle_params_t & vparams)
+            Dynamics(
+                    const vehicle_params_t & vparams,
+                    const double gravity = 9.80665,
+                    const double air_density = 1.225)
             {
                 memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
-                // Default to Earth params (can be overridden by setWorldParams())
-                memcpy(&_wparams, &EARTH_PARAMS, sizeof(world_params_t));
-
-                memset(&state, 0, sizeof(state));
+                _rho = air_density;
+                _g = gravity;
             }        
 
             /**
@@ -98,19 +92,10 @@ namespace hf {
                 _airborne = airborne;
 
                 // Initialize inertial frame acceleration in NED coordinates
-                bodyZToInertial(-_wparams.g, rotation, _inertialAccel);
+                bodyZToInertial(-_g, rotation, _inertialAccel);
 
                 // We usuall start on ground, but can start in air for testing
                 _airborne = airborne;
-            }
-
-            /**
-             * Sets world parameters (currently just gravity and air density)
-             */
-            void setWorldParams(const double g, const double rho)
-            {
-                _wparams.g = g;
-                _wparams.rho = rho;
             }
 
             /**
@@ -136,7 +121,7 @@ namespace hf {
                 for (unsigned int i = 0; i < _rotorCount; ++i) {
 
                     // Thrust is squared rad/sec scaled by air density
-                    omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
+                    omegas2[i] = _rho * omegas[i] * omegas[i]; 
 
                     // Multiply by thrust coefficient
                     u1 += _vparams.b * omegas2[i];                  
@@ -161,7 +146,7 @@ namespace hf {
                 bodyZToInertial(u1 / _vparams.m, euler, accelNED);
 
                 // Subtact gravity from thrust to get net vertical acceleration
-                double netz = accelNED[2] - _wparams.g;
+                double netz = accelNED[2] - _g;
 
                 _airborne = netz > 0;
 
@@ -219,14 +204,10 @@ namespace hf {
                 STATE_SIZE
             };
 
-            world_params_t EARTH_PARAMS = { 
-                9.80665,  // g graviational constant
-                1.225 // rho air density 
-            };
-
             vehicle_params_t _vparams;
 
-            world_params_t _wparams;
+            double _g; // gravitational constant
+            double _rho; // air density
 
             state_t state_deriv;
 
