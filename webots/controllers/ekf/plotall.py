@@ -17,7 +17,7 @@ def plot2(j, k, label, lo, hi):
 
 def plot3(j, k, label, lo, hi):
     plt.subplot(7, 1, j)
-    plt.plot(time, data[:, k])
+    plt.plot(time, data[:, k], '-o')
     plt.plot(time, data[:, k+1], '-x')
     plt.plot(time, data[:, k+2])
     plt.ylim((lo, hi))

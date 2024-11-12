@@ -115,8 +115,6 @@ namespace hf {
 
             state_t getState()
             {
-                state_t state = {};
-
                 const axis3_t gyro = {
                     readGyroAxis(0), readGyroAxis(1), -readGyroAxis(2)
                 };
@@ -137,10 +135,6 @@ namespace hf {
 
                 axis3_t euler_true = {};
                 Utils::quat2euler(quat_true, euler_true, -1, -1);
-
-                state.dphi = gyro.x;
-                state.dtheta = gyro.y;
-                state.dpsi = gyro.z;
 
                 axis2_t dxy_true = {};
                 float z_true = 0;
@@ -169,14 +163,6 @@ namespace hf {
                 float dz_ekf = 0;
                 _ekf.get_vehicle_state(quat_ekf, dxy_ekf, z_ekf, dz_ekf);
 
-                state.dx = dxy_true.x;
-                state.dy = dxy_true.y;
-                state.z = z_true;
-                state.dz = dz_true;
-                state.phi = euler_true.x;
-                state.theta = euler_true.y;
-                state.psi = euler_true.z;
-
                 axis3_t euler_ekf = {};
                 Utils::quat2euler(quat_ekf, euler_ekf, -1);
 
@@ -190,7 +176,20 @@ namespace hf {
                         euler_true.y, euler_ekf.y,
                         euler_true.z, euler_ekf.z);
 
-                return state;
+                return state_t {
+                        0,
+                        dxy_comp.x,
+                        0,
+                        dxy_comp.y,
+                        z_ekf,
+                        dz_ekf,
+                        euler_ekf.x,
+                        gyro.x,
+                        euler_ekf.y,
+                        gyro.y,
+                        euler_ekf.z,
+                        gyro.z
+                        };
             }
 
             double getTime()
