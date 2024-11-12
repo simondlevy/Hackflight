@@ -181,13 +181,13 @@ namespace hf {
                         dxy_comp.x,
                         0,
                         dxy_comp.y,
-                        z_ekf,
-                        dz_ekf,
-                        euler_ekf.x,
+                        z_comp,
+                        dz_comp,
+                        euler_true.x,
                         gyro.x,
-                        euler_ekf.y,
+                        euler_true.y,
                         gyro.y,
-                        euler_ekf.z,
+                        euler_true.z,
                         gyro.z
                         };
             }
