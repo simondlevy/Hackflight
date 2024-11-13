@@ -24,6 +24,7 @@
 
 // Hackflight
 #include <sim/dynamics.hpp>
+#include <pids/altitude.hpp>
 
 // Webots
 #include <webots/robot.h>
@@ -44,13 +45,16 @@ static const hf::Dynamics::vehicle_params_t vparams = {
     3.8e-03      // Jr prop inertial [kg*m^2] 
 };
 
-static const float MOTOR = 55.385; // rad/sec
+static const float MOTOR_HOVER = 55.385; // rad/sec
 
 static const double SPINUP_TIME = 2.5;
+
+static const float PID_DT = 0.01;
 
 typedef struct {
 
     hf::Dynamics * dynamics;
+    float motor;
     float z;
     bool running;
 
@@ -63,9 +67,11 @@ static void * thread_fun(void *ptr)
 
     auto dynamics = thread_data->dynamics;
 
-    const float motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
-
     while (thread_data->running) {
+
+        const auto motor = thread_data->motor;
+
+        const float motors[4] = { motor, motor, motor, motor };
 
         dynamics->update(motors);
 
@@ -115,11 +121,7 @@ int main(int argc, char ** argv)
         wb_supervisor_node_get_field(copter_node, "translation");
 
     // Start the dynamics thread
-    thread_data_t thread_data = {
-        &dynamics,
-        0,
-        true
-    };
+    thread_data_t thread_data = { &dynamics, 0, 0, true };
 
     pthread_t thread = {}; 
 
@@ -130,12 +132,14 @@ int main(int argc, char ** argv)
 
     // Negate expected direction to accommodate Webots
     // counterclockwise positive
-    wb_motor_set_velocity(motor1, -MOTOR);
-    wb_motor_set_velocity(motor2, +MOTOR);
-    wb_motor_set_velocity(motor3, +MOTOR);
-    wb_motor_set_velocity(motor4, -MOTOR);
+    wb_motor_set_velocity(motor1, -MOTOR_HOVER);
+    wb_motor_set_velocity(motor2, +MOTOR_HOVER);
+    wb_motor_set_velocity(motor3, +MOTOR_HOVER);
+    wb_motor_set_velocity(motor4, -MOTOR_HOVER);
 
     auto gps = makeSensor("gps", timestep, wb_gps_enable);
+
+    hf::AltitudePid altitudePid = {};
 
     // Spin up motors in animation
     for (int k=0; k<(int)(SPINUP_TIME*timestep); ++k) {
@@ -163,16 +167,21 @@ int main(int argc, char ** argv)
         const double pos[3] = {0, 0, thread_data.z};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
 
-        const auto time_curr = dynamics.getTime();
+        const auto time = dynamics.getTime();
 
         const auto state = dynamics.getState();
 
-        if (time_curr > 0) {
+        hf::demands_t demands = {0, 0, 0, 0};
 
-            printf("t=%05f  z=%3.3f (%3.3f)\n",
-                    time_curr, (double)state.z, wb_gps_get_values(gps)[2]);
+        altitudePid.run(true, PID_DT, state, demands);
 
-        }
+        demands.thrust += MOTOR_HOVER;
+
+        thread_data.motor = MOTOR_HOVER;
+
+        printf("t=%05f  z=%3.3f (%3.3f) %f\n",
+                time, (double)state.z, wb_gps_get_values(gps)[2], demands.thrust);
+
 
     }
 
