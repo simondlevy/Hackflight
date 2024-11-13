@@ -17,7 +17,7 @@
 # You may add some variable definitions hereafter to customize the build process
 # See documentation in $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
-C_SOURCES = blimp_physics.c blimpmodel.c blimp2b.c utils.c
+C_SOURCES = quadrotor_physics.c quadrotormodel.c quadrotor2b.c utils.c
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
