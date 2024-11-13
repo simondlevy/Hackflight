@@ -9,7 +9,7 @@ all: $(ALL)
 newsim: newsim.o 
 	g++ -o newsim newsim.o 
 
-newsim.o: main.cpp dynamics.hpp
+newsim.o: main.cpp 
 	g++ $(CFLAGS) -I../src -o newsim.o -c main.cpp
 
 run: newsim

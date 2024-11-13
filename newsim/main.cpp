@@ -3,7 +3,8 @@
 #include <stdint.h>
 #include <sys/time.h>
 
-#include "dynamics.hpp"
+#include <hackflight.hpp>
+#include <sim/dynamics.hpp>
 
 // Vehicle constants
 

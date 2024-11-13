@@ -16,7 +16,7 @@
 
 #include <hackflight.hpp>
 #include <mixers/bfquadx.hpp>
-#include <sim_ekf.hpp>
+#include <sim/sim_ekf.hpp>
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
