@@ -29,6 +29,7 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 #include <webots/motor.h>
+#include <webots/gps.h>
 
 static const hf::Dynamics::vehicle_params_t vparams = {
 
@@ -71,8 +72,6 @@ static void * thread_fun(void *ptr)
         const auto state = dynamics->getState();
 
         thread_data->z = state.z;
-
-        usleep(1);
     }
 
     return  ptr;
@@ -86,6 +85,17 @@ static WbDeviceTag make_motor(const char * name)
 
     return motor;
 }
+
+static WbDeviceTag makeSensor(
+        const char * name, 
+        const uint32_t timestep,
+        void (*f)(WbDeviceTag tag, int sampling_period))
+{
+    auto sensor = wb_robot_get_device(name);
+    f(sensor, timestep);
+    return sensor;
+}
+
 
 int main(int argc, char ** argv)
 {
@@ -125,12 +135,14 @@ int main(int argc, char ** argv)
     wb_motor_set_velocity(motor3, +MOTOR);
     wb_motor_set_velocity(motor4, -MOTOR);
 
+    auto gps = makeSensor("gps", timestep, wb_gps_enable);
+
     // Spin up motors in animation
     for (int k=0; k<(int)(SPINUP_TIME*timestep); ++k) {
 
         const double pos[3] = {0, 0, 0};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
-    
+
         wb_robot_step((int)timestep);
     }
 
@@ -157,7 +169,9 @@ int main(int argc, char ** argv)
 
         if (time_curr > 0) {
 
-            printf("t=%05f  z=%3.3f\n", time_curr, (double)state.z);
+            printf("t=%05f  z=%3.3f (%3.3f)\n",
+                    time_curr, (double)state.z, wb_gps_get_values(gps)[2]);
+
         }
 
     }
