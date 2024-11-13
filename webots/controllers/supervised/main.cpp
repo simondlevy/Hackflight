@@ -177,7 +177,7 @@ int main(int argc, char ** argv)
 
         demands.thrust += MOTOR_HOVER;
 
-        thread_data.motor = MOTOR_HOVER;
+        thread_data.motor = demands.thrust;
 
         printf("t=%05f  z=%3.3f (%3.3f) %f\n",
                 time, (double)state.z, wb_gps_get_values(gps)[2], demands.thrust);
