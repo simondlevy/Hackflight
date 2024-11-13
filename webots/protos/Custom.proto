@@ -1,6 +1,6 @@
 #VRML_SIM R2023b utf8
 
-PROTO Quadrotor [
+PROTO Custom [
   field SFVec3f    translation     0 0 0.4     # Is `Pose.translation`.
   field SFRotation rotation        0 0 1 0     # Is `Pose.rotation`.
   field SFString   name            "Quadrotor"     # Is `Solid.name`.
