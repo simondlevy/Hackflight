@@ -4,7 +4,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/epfl/lis/protos/Blimp.proto"
+EXTERNPROTO "../protos/Quadrotor.proto"
 
 WorldInfo {
   info [
@@ -28,7 +28,7 @@ Viewpoint {
   bloomThreshold 100
 }
 
-DEF quadrotor Blimp {
+DEF quadrotor Quadrotor {
   translation -3.5905 -1.2767 1.196
   rotation 0.008908834396613568 -0.023760697188772353 0.9996779791206752 2.4247010340014534
 }
