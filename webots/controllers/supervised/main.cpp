@@ -31,6 +31,8 @@
 #include <webots/supervisor.h>
 #include <webots/motor.h>
 
+static bool reading;
+
 static const hf::Dynamics::vehicle_params_t vparams = {
 
     3.264065e-5, // b thrust coefficient [F=b*w^2]
@@ -79,7 +81,9 @@ static void * thread_fun(void *ptr)
 
         const auto state = dynamics->getState();
 
-        thread_data->z = state.z;
+        if (!reading) {
+            thread_data->z = state.z;
+        }
     }
 
     return  ptr;
@@ -144,8 +148,10 @@ int main(int argc, char ** argv)
             break;
         }
 
+        reading = true;
         const double pos[3] = {0, 0, thread_data.z};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+        reading = false;
 
         const auto time = dynamics.getTime();
 

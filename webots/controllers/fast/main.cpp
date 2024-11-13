@@ -15,7 +15,8 @@
  */
 
 #include <hackflight.hpp>
-#include <sim.hpp>
+
+#include <sim/sim.hpp>
 
 int main(int argc, char ** argv)
 {
@@ -26,10 +27,6 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    auto logfp = fopen("log.csv", "w");
-
-    float motors[4] = {};
-
     while (true) {
 
         if (!sim.step()) {
@@ -37,17 +34,13 @@ int main(int argc, char ** argv)
         }
 
         sim.getDemands();
+        sim.getState();
 
-        const auto state = sim.getState();
+        const float motor = sim.requestedTakeoff() ? 60 : 0;
 
-        const float MOTOR = 55.385; // rad/sec
+        const float motors[4] = { motor, motor, motor, motor };
 
-        motors[0] = MOTOR;
-        motors[1] = MOTOR;
-        motors[2] = MOTOR;
-        motors[3] = MOTOR;
-
-        fprintf(logfp, "%f,%f,%f\n", sim.getTime(), motors[0], state.z);
+        printf("%f\n", motors[0]);
 
         sim.setMotors(motors);
     }

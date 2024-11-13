@@ -81,7 +81,7 @@ namespace hf {
             static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
 
             // For tradtional (non-springy) throttle in R/C transmitter
-            static constexpr float THROTTLE_DEADBAND = 0.2;
+            static constexpr float THROTTLE_DEADBAND = 0.5;
 
             float _z_target = INITIAL_ALTITUDE_TARGET;
 

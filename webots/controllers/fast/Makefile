@@ -17,7 +17,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I$(SRCDIR)
 
-NAME = test
+NAME = fast
 
 CXX_SOURCES = main.cpp
 
@@ -43,7 +43,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/standard.wbt &
+	webots ../../worlds/fast.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 plot:
