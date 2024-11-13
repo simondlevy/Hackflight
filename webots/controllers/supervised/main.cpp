@@ -28,6 +28,7 @@
 // Webots
 #include <webots/robot.h>
 #include <webots/supervisor.h>
+#include <webots/motor.h>
 
 static const hf::Dynamics::vehicle_params_t vparams = {
 
@@ -41,6 +42,8 @@ static const hf::Dynamics::vehicle_params_t vparams = {
     3,           // Iz [kg*m^2] 
     3.8e-03      // Jr prop inertial [kg*m^2] 
 };
+
+static const float MOTOR = 55.385; // rad/sec
 
 typedef struct {
 
@@ -57,8 +60,6 @@ static void * thread_fun(void *ptr)
 
     auto dynamics = thread_data->dynamics;
 
-    const float MOTOR = 55.385; // rad/sec
-
     const float motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
 
     while (thread_data->running) {
@@ -71,6 +72,15 @@ static void * thread_fun(void *ptr)
     }
 
     return  ptr;
+}
+
+static WbDeviceTag make_motor(const char * name)
+{
+    auto motor = wb_robot_get_device(name);
+
+    wb_motor_set_position(motor, INFINITY);
+
+    return motor;
 }
 
 int main(int argc, char ** argv)
@@ -107,7 +117,19 @@ int main(int argc, char ** argv)
     pthread_create(
             &thread, NULL, *thread_fun, (void *)&thread_data);
 
+    auto motor1 = make_motor("motor1");
+    auto motor2 = make_motor("motor2");
+    auto motor3 = make_motor("motor3");
+    auto motor4 = make_motor("motor4");
+
     while (true) {
+
+        // Negate expected direction to accommodate Webots
+        // counterclockwise positive
+        wb_motor_set_velocity(motor1, -MOTOR);
+        wb_motor_set_velocity(motor2, +MOTOR);
+        wb_motor_set_velocity(motor3, +MOTOR);
+        wb_motor_set_velocity(motor4, -MOTOR);
 
         if (wb_robot_step((int)wb_timestep) == -1) {
 
@@ -115,9 +137,9 @@ int main(int argc, char ** argv)
             break;
         } 
 
-        (void)translation_field;
+        const double pos[3] = {0, 0, thread_data.z};
 
-        printf("%f\n", thread_data.z);
+        wb_supervisor_field_set_sf_vec3f(translation_field, pos);
     }
 
     return 0;
