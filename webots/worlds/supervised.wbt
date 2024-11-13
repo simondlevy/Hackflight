@@ -8,6 +8,7 @@ EXTERNPROTO "../protos/Supervised.proto"
 
 WorldInfo {
   gravity 0
+  basicTimeStep 1
 }
 
 Viewpoint {
