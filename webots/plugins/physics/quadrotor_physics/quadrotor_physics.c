@@ -5,7 +5,7 @@
 #include "utils.h"
 
 // constants
-const char kRobotName[] = "blimp_lis";
+const char kRobotName[] = "quadrotor";
 
 // globals
 static dBodyID gRobotBody = NULL;
