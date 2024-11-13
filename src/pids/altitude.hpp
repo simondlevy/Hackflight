@@ -38,6 +38,7 @@ namespace hf {
                 if (throttleIsSpringy) {
 
                     _z_target += dt * demands.thrust;
+            
                     demands.thrust = _z_target;
                     _run(dt, state, demands);
                 }

@@ -48,6 +48,9 @@ static const float MOTOR_HOVER = 55.385; // rad/sec
 
 static const double SPINUP_TIME = 3;
 
+static const double CLIMB_START = 6;
+static const double CLIMB_END = 7;
+
 static const float PID_DT = 0.01;
 
 typedef struct {
@@ -148,7 +151,9 @@ int main(int argc, char ** argv)
 
         const auto state = dynamics.getState();
 
-        hf::demands_t demands = {0, 0, 0, 0};
+        const float throttle = time > CLIMB_START && time < CLIMB_END ? 5e-2 : 0;
+
+        hf::demands_t demands = {throttle, 0, 0, 0};
 
         if (time > SPINUP_TIME) {
 
@@ -159,8 +164,8 @@ int main(int argc, char ** argv)
 
         thread_data.motor = demands.thrust;
 
-        printf("t=%3.3f z=%3.3f %f\n", time, (double)state.z, demands.thrust);
-
+        printf("t=%3.3f thr=%3.3f z=%3.3f %f\n",
+                time, throttle, (double)state.z, demands.thrust);
     }
 
     thread_data.running = false;
