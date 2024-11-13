@@ -22,7 +22,7 @@ DLLEXPORT void webots_physics_init()
   gRobotBody = dWebotsGetBodyFromDEF(kRobotName);
 
   if (gRobotBody == NULL)
-    dWebotsConsolePrintf("!!! blimp_physics :: webots_physics_init :: error : could not get body of robot.\r\n");
+    dWebotsConsolePrintf("!!! quadrotor_physics :: webots_physics_init :: error : could not get body of robot.\r\n");
   else {
 
     dBodySetGravityMode(gRobotBody, 0);
