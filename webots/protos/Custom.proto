@@ -3,7 +3,7 @@
 PROTO Custom [
   field SFVec3f    translation     0 0 0.4     # Is `Pose.translation`.
   field SFRotation rotation        0 0 1 0     # Is `Pose.rotation`.
-  field SFString   name            "Quadrotor"     # Is `Solid.name`.
+  field SFString   name            "Custom"     # Is `Solid.name`.
   field SFString   controller      "blimp"     # Is `Robot.controller`.
   field MFString   controllerArgs  []          # Is `Robot.controllerArgs`.
   field SFString   window          "<generic>" # Is `Robot.window`.
@@ -375,8 +375,7 @@ PROTO Custom [
       }
     ]
     name IS name
-    model "Quadrotor"
-    contactMaterial "blimp"
+    model "Custom"
     boundingObject Group {
       children [
         DEF ForwardSphere Pose {
