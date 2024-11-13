@@ -65,7 +65,13 @@ int main() {
   if (!gEmitter)
     printf("!!! blimp_joystick :: reset :: emitter is not available.\n");
 
+  long count = 0;
+
   while (wb_robot_step(TIMESTEP) != -1) {
+
+
+      printf("%ld\n", count++);
+
     // Send joystick value.
     if (gEmitter) {
       // read joystick.

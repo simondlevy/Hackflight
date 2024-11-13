@@ -54,7 +54,8 @@ static dBodyID gRobotBody = NULL;
 //-----------------------------------------------------------------
 // Physics plug-in implementation
 
-DLLEXPORT void webots_physics_init() {
+DLLEXPORT void webots_physics_init() 
+{
   // init global variables
   gRobotBody = dWebotsGetBodyFromDEF(kRobotName);
   if (gRobotBody == NULL)
@@ -65,7 +66,8 @@ DLLEXPORT void webots_physics_init() {
   }
 }
 
-DLLEXPORT void webots_physics_step() {
+DLLEXPORT void webots_physics_step() 
+{
   Matrix33 rotBodyToFrame;
   Matrix33 rotFrameToBody;
   Matrix33 rotFrameToAeroBody;
@@ -131,7 +133,8 @@ DLLEXPORT void webots_physics_step() {
   dBodyAddRelTorque(gRobotBody, genForce[3], genForce[4], genForce[5]);
 }
 
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) {
+DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
+{
   // We don't want to handle collisions
   return 0;
 }

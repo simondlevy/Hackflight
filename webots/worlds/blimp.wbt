@@ -11,12 +11,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 
 WorldInfo {
   info [
-    "A blimp robot model demonstrating custom physics."
-    "If you wish you can control the robot with the keyboard:"
-    "The control keys are: up, down, right, left, page up, page down and space (reset)."
-    "Authors: Jean-Christophe Zufferey, Alexis Guanella, Antoine Beyeler"
-    "Laboratory of Intelligent Systems (LIS)"
-    "Swiss Federal Institute of Technology (EPFL), Lausanne"
   ]
   title "LIS-EPFL Blimp"
   physics "blimp_physics"
