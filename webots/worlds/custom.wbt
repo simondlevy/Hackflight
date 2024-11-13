@@ -13,7 +13,6 @@ WorldInfo {
   physics "quadrotor_physics"
   contactProperties [
     ContactProperties {
-      material1 "blimp"
       coulombFriction [
         0.6
       ]
