@@ -30,7 +30,6 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 #include <webots/motor.h>
-#include <webots/gps.h>
 
 static const hf::Dynamics::vehicle_params_t vparams = {
 
@@ -92,17 +91,6 @@ static WbDeviceTag make_motor(const char * name)
     return motor;
 }
 
-static WbDeviceTag makeSensor(
-        const char * name, 
-        const uint32_t timestep,
-        void (*f)(WbDeviceTag tag, int sampling_period))
-{
-    auto sensor = wb_robot_get_device(name);
-    f(sensor, timestep);
-    return sensor;
-}
-
-
 int main(int argc, char ** argv)
 {
     (void)argc;
@@ -129,8 +117,6 @@ int main(int argc, char ** argv)
     auto motor2 = make_motor("motor2");
     auto motor3 = make_motor("motor3");
     auto motor4 = make_motor("motor4");
-
-    auto gps = makeSensor("gps", timestep, wb_gps_enable);
 
     hf::AltitudePid altitudePid = {};
 
@@ -173,8 +159,7 @@ int main(int argc, char ** argv)
 
         thread_data.motor = demands.thrust;
 
-        printf("t=%05f z=%3.3f (%3.3f) %f\n",
-                time, (double)state.z, wb_gps_get_values(gps)[2], demands.thrust);
+        printf("t=%3.3f z=%3.3f %f\n", time, (double)state.z, demands.thrust);
 
     }
 
