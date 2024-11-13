@@ -71,6 +71,8 @@ static void * thread_fun(void *ptr)
         const auto state = dynamics->getState();
 
         thread_data->z = state.z;
+
+        usleep(1);
     }
 
     return  ptr;
@@ -92,10 +94,6 @@ int main(int argc, char ** argv)
 
     // Create quadcopter dynamics model
     auto dynamics = hf::Dynamics(vparams); 
-
-    // Set up initial conditions
-    double rotation[3] = {0,0,0};
-    dynamics.init(rotation);
 
     wb_robot_init();
 
@@ -127,6 +125,7 @@ int main(int argc, char ** argv)
     wb_motor_set_velocity(motor3, +MOTOR);
     wb_motor_set_velocity(motor4, -MOTOR);
 
+    // Spin up motors in animation
     for (int k=0; k<(int)(SPINUP_TIME*timestep); ++k) {
 
         const double pos[3] = {0, 0, 0};
@@ -135,20 +134,37 @@ int main(int argc, char ** argv)
         wb_robot_step((int)timestep);
     }
 
-    pthread_create(
-            &thread, NULL, *thread_fun, (void *)&thread_data);
+    // Set up initial conditions
+    double rotation[3] = {0,0,0};
+    dynamics.init(rotation);
 
+    // Start dynamics thread
+    pthread_create( &thread, NULL, *thread_fun, (void *)&thread_data);
+
+    // Run to completion
     while (true) {
 
         if (wb_robot_step((int)timestep) == -1) {
-
-            thread_data.running = false;
             break;
-        } 
+        }
 
         const double pos[3] = {0, 0, thread_data.z};
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+
+        const auto time_curr = dynamics.getTime();
+
+        const auto state = dynamics.getState();
+
+        if (time_curr > 0) {
+
+            printf("t=%05f  z=%3.3f\n", time_curr, (double)state.z);
+        }
+
     }
+
+    thread_data.running = false;
+
+    pthread_join(thread, NULL);
 
     return 0;
 }
