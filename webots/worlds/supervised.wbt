@@ -3,22 +3,26 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+
 EXTERNPROTO "../protos/Supervised.proto"
 
 WorldInfo {
   gravity 0
 }
+
 Viewpoint {
-  orientation 1.5826242693178514e-15 1 -6.264587092827826e-15 0.560000000000014
-  position -1.9674054140545192 -0.09639436521066248 1.2544076804827764
+  orientation 0 1 -1.0656348786755114e-16 0.749999999999997
+  position -2.2514255022356466 -0.07692169747579403 2.140851991380082
 }
+
 TexturedBackground {
 }
+
 TexturedBackgroundLight {
 }
+
 Floor {
 }
-DEF ROBOT Supervised {
-  translation 0 0 0
-  rotation 0 0 1 0
+
+Supervised {
 }
