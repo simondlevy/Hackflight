@@ -1,6 +1,9 @@
 #VRML_SIM R2023b utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/epfl/lis/protos/Blimp.proto"
 
 WorldInfo {
@@ -29,6 +32,11 @@ Viewpoint {
 TexturedBackground {
 }
 
+TexturedBackgroundLight {
+}
+
+Floor {
+}
 DEF blimp_lis Blimp {
   translation -3.5905 -1.2767 1.196
   rotation 0.008908834396613568 -0.023760697188772353 0.9996779791206752 2.4247010340014534
