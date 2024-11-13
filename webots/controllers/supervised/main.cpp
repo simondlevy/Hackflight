@@ -45,6 +45,8 @@ static const hf::Dynamics::vehicle_params_t vparams = {
 
 static const float MOTOR = 55.385; // rad/sec
 
+static const double SPINUP_TIME = 2.5;
+
 typedef struct {
 
     hf::Dynamics * dynamics;
@@ -88,7 +90,6 @@ int main(int argc, char ** argv)
     (void)argc;
     (void)argv;
 
-
     // Create quadcopter dynamics model
     auto dynamics = hf::Dynamics(vparams); 
 
@@ -98,7 +99,7 @@ int main(int argc, char ** argv)
 
     wb_robot_init();
 
-    const auto wb_timestep = wb_robot_get_basic_time_step();
+    const auto timestep = wb_robot_get_basic_time_step();
 
     auto copter_node = wb_supervisor_node_get_from_def("ROBOT");
 
@@ -114,31 +115,38 @@ int main(int argc, char ** argv)
 
     pthread_t thread = {}; 
 
-    pthread_create(
-            &thread, NULL, *thread_fun, (void *)&thread_data);
-
     auto motor1 = make_motor("motor1");
     auto motor2 = make_motor("motor2");
     auto motor3 = make_motor("motor3");
     auto motor4 = make_motor("motor4");
 
+    // Negate expected direction to accommodate Webots
+    // counterclockwise positive
+    wb_motor_set_velocity(motor1, -MOTOR);
+    wb_motor_set_velocity(motor2, +MOTOR);
+    wb_motor_set_velocity(motor3, +MOTOR);
+    wb_motor_set_velocity(motor4, -MOTOR);
+
+    for (int k=0; k<(int)(SPINUP_TIME*timestep); ++k) {
+
+        const double pos[3] = {0, 0, 0};
+        wb_supervisor_field_set_sf_vec3f(translation_field, pos);
+    
+        wb_robot_step((int)timestep);
+    }
+
+    pthread_create(
+            &thread, NULL, *thread_fun, (void *)&thread_data);
+
     while (true) {
 
-        // Negate expected direction to accommodate Webots
-        // counterclockwise positive
-        wb_motor_set_velocity(motor1, -MOTOR);
-        wb_motor_set_velocity(motor2, +MOTOR);
-        wb_motor_set_velocity(motor3, +MOTOR);
-        wb_motor_set_velocity(motor4, -MOTOR);
-
-        if (wb_robot_step((int)wb_timestep) == -1) {
+        if (wb_robot_step((int)timestep) == -1) {
 
             thread_data.running = false;
             break;
         } 
 
         const double pos[3] = {0, 0, thread_data.z};
-
         wb_supervisor_field_set_sf_vec3f(translation_field, pos);
     }
 
