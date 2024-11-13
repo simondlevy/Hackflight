@@ -47,7 +47,7 @@ static const hf::Dynamics::vehicle_params_t vparams = {
 
 static const float MOTOR_HOVER = 55.385; // rad/sec
 
-static const double SPINUP_TIME = 2.5;
+static const double SPINUP_TIME = 3;
 
 static const float PID_DT = 0.01;
 
@@ -130,25 +130,16 @@ int main(int argc, char ** argv)
     auto motor3 = make_motor("motor3");
     auto motor4 = make_motor("motor4");
 
-    // Negate expected direction to accommodate Webots
-    // counterclockwise positive
-    wb_motor_set_velocity(motor1, -MOTOR_HOVER);
-    wb_motor_set_velocity(motor2, +MOTOR_HOVER);
-    wb_motor_set_velocity(motor3, +MOTOR_HOVER);
-    wb_motor_set_velocity(motor4, -MOTOR_HOVER);
-
     auto gps = makeSensor("gps", timestep, wb_gps_enable);
 
     hf::AltitudePid altitudePid = {};
 
-    // Spin up motors in animation
-    for (int k=0; k<(int)(SPINUP_TIME*timestep); ++k) {
-
-        const double pos[3] = {0, 0, 0};
-        wb_supervisor_field_set_sf_vec3f(translation_field, pos);
-
-        wb_robot_step((int)timestep);
-    }
+    // Negate expected direction to accommodate Webots
+    // counterclockwise positive
+    wb_motor_set_velocity(motor1, -60);
+    wb_motor_set_velocity(motor2, +60);
+    wb_motor_set_velocity(motor3, +60);
+    wb_motor_set_velocity(motor4, -60);
 
     // Set up initial conditions
     double rotation[3] = {0,0,0};
@@ -158,7 +149,7 @@ int main(int argc, char ** argv)
     pthread_create( &thread, NULL, *thread_fun, (void *)&thread_data);
 
     // Run to completion
-    while (true) {
+    for (long k=0; ; ++k) {
 
         if (wb_robot_step((int)timestep) == -1) {
             break;
@@ -173,15 +164,17 @@ int main(int argc, char ** argv)
 
         hf::demands_t demands = {0, 0, 0, 0};
 
-        altitudePid.run(true, PID_DT, state, demands);
+        if (time > SPINUP_TIME) {
 
-        demands.thrust += MOTOR_HOVER;
+            altitudePid.run(true, PID_DT, state, demands);
+
+            demands.thrust += MOTOR_HOVER;
+        }
 
         thread_data.motor = demands.thrust;
 
-        printf("t=%05f  z=%3.3f (%3.3f) %f\n",
+        printf("t=%05f z=%3.3f (%3.3f) %f\n",
                 time, (double)state.z, wb_gps_get_values(gps)[2], demands.thrust);
-
 
     }
 
