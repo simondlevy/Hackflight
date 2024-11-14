@@ -3,12 +3,9 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
-
 EXTERNPROTO "../protos/Custom.proto"
 
 WorldInfo {
-  info [
-  ]
   title "Hackflight"
   physics "quadrotor_physics"
   contactProperties [
@@ -23,14 +20,16 @@ WorldInfo {
 }
 
 Viewpoint {
-  orientation 0.12886696059458586 0.060173610492208145 -0.9898345533812433 1.921830125849391
-  position -0.7158540273007847 5.211143316155065 2.1781063902672084
+  orientation 0 1 -1.0656348786755114e-16 0.749999999999997
+  position -1.3067309323898773 -0.07692169747579411 1.2607778743833806
+  #orientation 0.20261561065857936 0.17709885091853844 -0.9631110586639445 1.5167682754525003
+  #position -0.42334844306527175 10.588053280370081 3.7814351940631292
   bloomThreshold 100
 }
 
 DEF quadrotor Custom {
-  translation -3.5905 -1.2767 1.196
-  rotation 0.008908834396613568 -0.023760697188772353 0.9996779791206752 2.4247010340014534
+  translation 0 0 0.2
+  rotation -0.4178418387468682 0.4328412150893267 -0.7987845017979702 -2.399143583874832
 }
 
 TexturedBackground {
@@ -38,8 +37,5 @@ TexturedBackground {
 
 TexturedBackgroundLight {
 }
-
 Floor {
-
 }
-

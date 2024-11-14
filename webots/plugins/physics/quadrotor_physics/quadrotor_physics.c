@@ -10,11 +10,10 @@ const char kRobotName[] = "quadrotor";
 // globals
 static dBodyID gRobotBody = NULL;
 
-static dReal x = -3.6;
-static dReal y = -1.3;
-static dReal z = 1.2;
+static dReal x = 0;
+static dReal y = 0;
+static dReal z = 0.2;
 static dReal inc = 1;
-
 
 DLLEXPORT void webots_physics_init() 
 {
