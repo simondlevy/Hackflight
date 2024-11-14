@@ -39,10 +39,10 @@ DLLEXPORT void webots_physics_step()
     
     z += inc * .01;
     
-    if (z > 2) { 
+    if (z > 1) { 
         inc = -1;
     }
-    if (z < 1) {
+    if (z < 0.2) {
         inc = +1;
     }
 
