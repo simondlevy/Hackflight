@@ -3,22 +3,14 @@
 PROTO Custom [
   field SFVec3f    translation     0 0 0.4     # Is `Pose.translation`.
   field SFRotation rotation        0 0 1 0     # Is `Pose.rotation`.
-  field SFString   name            "Custom"    # Is `Solid.name`.
-  field SFString   controller      "custom"    # Is `Robot.controller`.
-  field MFString   controllerArgs  []          # Is `Robot.controllerArgs`.
-  field SFString   window          "<generic>" # Is `Robot.window`.
-  field SFString   customData      ""          # Is `Robot.customData`.
-  field SFBool     supervisor      FALSE       # Is `Robot.supervisor`.
-  field SFBool     synchronization TRUE        # Is `Robot.synchronization`.
-  field MFNode     extensionSlot   []          # Extends the robot with new nodes in the extension slot.
 ]
+
 {
   Robot {
     translation IS translation
     rotation IS rotation
     children [
       Group {
-        children IS extensionSlot
       }
       DEF emitter Emitter {
         model "radio"
@@ -374,7 +366,6 @@ PROTO Custom [
         ]
       }
     ]
-    name IS name
     model "Custom"
     boundingObject Group {
       children [
@@ -430,11 +421,5 @@ PROTO Custom [
         0 0 0
       ]
     }
-    controller IS controller
-    controllerArgs IS controllerArgs
-    window IS window
-    customData IS customData
-    supervisor IS supervisor
-    synchronization IS synchronization
   }
 }
