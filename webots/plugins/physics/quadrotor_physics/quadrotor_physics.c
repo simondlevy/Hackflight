@@ -12,7 +12,7 @@ static dBodyID gRobotBody = NULL;
 
 static dReal x = 0;
 static dReal y = 0;
-static dReal z = 0.2;
+static dReal z = 0.015;
 static dReal inc = 1;
 
 DLLEXPORT void webots_physics_init() 
@@ -37,12 +37,12 @@ DLLEXPORT void webots_physics_step()
     
     dBodySetPosition(gRobotBody, x, y, z);
     
-    z += inc * .01;
+    z += inc * .005;
     
-    if (z > 1) { 
+    if (z > 0.2) { 
         inc = -1;
     }
-    if (z < 0.2) {
+    if (z < 0.015) {
         inc = +1;
     }
 
