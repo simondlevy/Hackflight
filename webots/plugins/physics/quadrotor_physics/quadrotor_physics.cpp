@@ -20,6 +20,8 @@
 
 #include "dynamics.hpp"
 
+static const uint32_t DYNAMICS_FREQ = 10000;
+
 // constants
 const char kRobotName[] = "quadrotor";
 
@@ -28,6 +30,25 @@ static dBodyID gRobotBody = NULL;
 
 static dReal z = 0.015;
 static dReal inc = 1;
+
+static hf::Dynamics::vehicle_params_t tinyquad_params = {
+
+    // Estimated
+    4.0e-5, // force constant B [F=b*w^2]
+    4.0e0, // torque constant D [T=d*w^2]
+
+    // These agree with values in .proto file
+    0.050,  // mass M [kg]
+    0.031,  // arm length L [m]
+
+    // Estimated
+    2,      // Ix [kg*m^2]
+    2,      // Iy [kg*m^2]
+    3,      // Iz [kg*m^2]
+    3.8e-3  // Jr prop inertial [kg*m^2]
+};
+
+static auto dynamics = hf::Dynamics(tinyquad_params, 1.f/DYNAMICS_FREQ);
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -69,6 +90,7 @@ DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2)
 {
     (void)g1;
     (void)g2;
+
     return 0;
 }
 
