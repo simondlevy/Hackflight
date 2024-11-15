@@ -25,9 +25,11 @@
 
 #include "dynamics.hpp"
 
-static const uint32_t DYNAMICS_FREQ = 100000;
+static const uint32_t DYNAMICS_FREQ = 100000; // Hz
 
-static const uint32_t PID_FREQ = 1000;
+static const uint32_t PID_FREQ = 1000; // Hz
+
+static const float MOTOR_HOVER = 55.385; // rad/sec
 
 // XXX can we get this automatically?
 static const double ROBOT_TIMESTEP = 32;
@@ -89,7 +91,9 @@ DLLEXPORT void webots_physics_step()
 
         _altitudePid.run(true, 1./PID_FREQ, state, demands);
 
-        const double thrust = demands.thrust;
+        const double thrust = demands.thrust + MOTOR_HOVER;
+
+        dWebotsConsolePrintf("%3.3f\n", thrust);
 
         const double motors[4] = { thrust, thrust, thrust, thrust };
 
