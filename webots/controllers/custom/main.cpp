@@ -24,9 +24,6 @@
 
 #include "js.h"
 
-#define TIMESTEP 32  // ms
-#define KEY_INCREMENT 0.05
-
 int main() 
 {
   double command[3] = {0.0, 0.0, 0.0};
@@ -35,7 +32,9 @@ int main()
 
   WbDeviceTag camera = wb_robot_get_device("camera");
 
-  wb_camera_enable(camera, TIMESTEP * 2);
+  const auto timestep = wb_robot_get_basic_time_step();
+
+  wb_camera_enable(camera, timestep * 2);
 
   // Handle joystick
   jsJoystick *gJoystick = new jsJoystick();
@@ -44,7 +43,7 @@ int main()
     delete gJoystick, gJoystick = NULL;
     printf("No joystick available, ...\n");
     printf("Available control keys: ...\n");
-    wb_keyboard_enable(TIMESTEP);
+    wb_keyboard_enable(timestep);
   }
 
   // Handle emitter
@@ -54,7 +53,7 @@ int main()
     printf("!!! joystick :: reset :: emitter is not available.\n");
   }
 
-  while (wb_robot_step(TIMESTEP) != -1) {
+  while (wb_robot_step(timestep) != -1) {
 
     // Send joystick value.
     if (gEmitter) {
@@ -73,24 +72,6 @@ int main()
       else {
 
         switch (wb_keyboard_get_key()) {
-          case WB_KEYBOARD_DOWN:
-            command[0] -= KEY_INCREMENT;
-            break;
-          case WB_KEYBOARD_UP:
-            command[0] += KEY_INCREMENT;
-            break;
-          case WB_KEYBOARD_LEFT:
-            command[1] += KEY_INCREMENT;
-            break;
-          case WB_KEYBOARD_RIGHT:
-            command[1] -= KEY_INCREMENT;
-            break;
-          case WB_KEYBOARD_PAGEUP:
-            command[2] += KEY_INCREMENT;
-            break;
-          case WB_KEYBOARD_PAGEDOWN:
-            command[2] -= KEY_INCREMENT;
-            break;
           case ' ':  // space -> reset
             command[0] = 0.0;
             command[1] = 0.0;
