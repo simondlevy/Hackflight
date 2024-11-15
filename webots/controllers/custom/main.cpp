@@ -20,73 +20,88 @@
 #include <webots/camera.h>
 #include <webots/emitter.h>
 #include <webots/keyboard.h>
+#include <webots/motor.h>
 #include <webots/robot.h>
 
 #include "js.h"
 
+static WbDeviceTag _makeMotor(const char * name)
+{
+    auto motor = wb_robot_get_device(name);
+
+    wb_motor_set_position(motor, INFINITY);
+
+    return motor;
+}
+
 int main() 
 {
-  double command[3] = {0.0, 0.0, 0.0};
+    double command[3] = {0.0, 0.0, 0.0};
 
-  wb_robot_init();
+    wb_robot_init();
 
-  WbDeviceTag camera = wb_robot_get_device("camera");
+    WbDeviceTag camera = wb_robot_get_device("camera");
 
-  const auto timestep = wb_robot_get_basic_time_step();
+    const auto timestep = wb_robot_get_basic_time_step();
 
-  wb_camera_enable(camera, timestep * 2);
+    wb_camera_enable(camera, timestep * 2);
 
-  // Handle joystick
-  jsJoystick *gJoystick = new jsJoystick();
+    // Handle joystick
+    jsJoystick *gJoystick = new jsJoystick();
 
-  if (gJoystick->notWorking()) {
-    delete gJoystick, gJoystick = NULL;
-    printf("No joystick available, ...\n");
-    printf("Available control keys: ...\n");
-    wb_keyboard_enable(timestep);
-  }
-
-  // Handle emitter
-  const auto gEmitter = wb_robot_get_device("emitter");
-
-  if (!gEmitter) {
-    printf("!!! joystick :: reset :: emitter is not available.\n");
-  }
-
-  while (wb_robot_step(timestep) != -1) {
-
-    // Send joystick value.
-    if (gEmitter) {
-
-      // read joystick.
-      if (gJoystick) {
-
-        float axes[12];
-        int buttons[12];
-        gJoystick->read(buttons, axes);
-        command[0] = (double)-axes[1];
-        command[1] = (double)axes[3];
-        command[2] = (double)axes[2];
-      } 
-      
-      else {
-
-        switch (wb_keyboard_get_key()) {
-          case ' ':  // space -> reset
-            command[0] = 0.0;
-            command[1] = 0.0;
-            command[2] = 0.0;
-        }
-      }
-      // setup emitter buffer
-      if (command[0] || command[1] || command[2]) {
-        printf("command = ( %g , %g , %g )\n", command[0], command[1], command[2]);
-      }
-      wb_emitter_send(gEmitter, command, sizeof(command));
+    if (gJoystick->notWorking()) {
+        delete gJoystick, gJoystick = NULL;
+        printf("No joystick available, ...\n");
+        printf("Available control keys: ...\n");
+        wb_keyboard_enable(timestep);
     }
-  }
 
-  wb_robot_cleanup();
+    // Handle emitter
+    const auto gEmitter = wb_robot_get_device("emitter");
 
-  return 0;
+    if (!gEmitter) {
+        printf("!!! joystick :: reset :: emitter is not available.\n");
+    }
+
+    auto motor1 = _makeMotor("motor1");
+    auto motor2 = _makeMotor("motor2");
+    auto motor3 = _makeMotor("motor3");
+    auto motor4 = _makeMotor("motor4");
+
+    while (wb_robot_step(timestep) != -1) {
+
+        // Send joystick value.
+        if (gEmitter) {
+
+            // read joystick.
+            if (gJoystick) {
+
+                float axes[12];
+                int buttons[12];
+                gJoystick->read(buttons, axes);
+                command[0] = (double)-axes[1];
+                command[1] = (double)axes[3];
+                command[2] = (double)axes[2];
+            } 
+
+            else {
+
+                switch (wb_keyboard_get_key()) {
+                    case ' ':  // space -> reset
+                        command[0] = 0.0;
+                        command[1] = 0.0;
+                        command[2] = 0.0;
+                }
+            }
+            // setup emitter buffer
+            if (command[0] || command[1] || command[2]) {
+                printf("command = ( %g , %g , %g )\n", command[0], command[1], command[2]);
+            }
+            wb_emitter_send(gEmitter, command, sizeof(command));
+        }
+    }
+
+    wb_robot_cleanup();
+
+    return 0;
 }

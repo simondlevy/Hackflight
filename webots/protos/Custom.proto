@@ -61,8 +61,8 @@ DEF ROBOT Robot {
     DEF M1 Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 -0.031 0.016
-            thrustConstants -4e-05 0
-            torqueConstants 2.4e-06 0
+            thrustConstants 0 0
+            torqueConstants 0 0
             fastHelixThreshold 50
             device RotationalMotor {
                 name "motor1"
@@ -117,8 +117,8 @@ DEF ROBOT Robot {
     DEF M2 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 -0.031 0.016  
-            thrustConstants 4e-05 0               
-            torqueConstants 2.4e-06 0            
+            thrustConstants 0 0
+            torqueConstants 0 0
             fastHelixThreshold 50                 
             device RotationalMotor {
                 name "motor2"
@@ -170,8 +170,8 @@ DEF ROBOT Robot {
     DEF M3 Propeller {
         shaftAxis 0 0 1
             centerOfThrust -0.031 0.031 0.016
-            thrustConstants 4e-05 0
-            torqueConstants 2.4e-06 0
+            thrustConstants 0 0
+            torqueConstants  0 0
             fastHelixThreshold 50
             device RotationalMotor {
                 name "motor3"
@@ -224,8 +224,8 @@ DEF ROBOT Robot {
     DEF M4 Propeller {
         shaftAxis 0 0 1
             centerOfThrust 0.031 0.031 0.016
-            thrustConstants -4e-05 0
-            torqueConstants 2.4e-06 0
+            thrustConstants 0 0
+            torqueConstants 0 0
             fastHelixThreshold 50
             device RotationalMotor {
                 name "motor4"
