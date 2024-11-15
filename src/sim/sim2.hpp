@@ -29,17 +29,14 @@
 #include <map>
 #include <string>
 
+// Hackflight
+#include <hackflight.hpp>
+
 // Webots
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-#include <webots/supervisor.h>
-
-// Hackflight
-#include <hackflight.hpp>
-#include <mixer.hpp>
-#include <sim/vehicles/tinyquad.hpp>
 
 namespace hf {
 
@@ -47,15 +44,9 @@ namespace hf {
 
         public:
 
-            static constexpr float YAW_SCALE = 160; // deg/sec
-
             static constexpr float MOTOR_HOVER = 55.385; // rad/sec
 
-            static constexpr float MOTOR_TAKEOFF = 56; // rad/sec
-
-            static constexpr float TAKEOFF_TIME = 3; // sec
-
-            void init(Mixer & mixer, const bool tryJoystick=true)
+            void init(const bool tryJoystick=true)
             {
                 wb_robot_init();
 
@@ -73,25 +64,10 @@ namespace hf {
 
                 wb_keyboard_enable(_wb_timestep);
 
-                _copter_node = wb_supervisor_node_get_from_def("ROBOT");
-
-                _translation_field =
-                    wb_supervisor_node_get_field(_copter_node, "translation");
-
-                _rotation_field =
-                    wb_supervisor_node_get_field(_copter_node, "rotation");
-
                 _motor1 = make_motor("motor1");
                 _motor2 = make_motor("motor2");
                 _motor3 = make_motor("motor3");
                 _motor4 = make_motor("motor4");
-
-                // Start the dynamics thread
-                _thread_data.running = true;
-                _thread_data.dynamics = &_dynamics;
-                _thread_data.mixer = &mixer;
-                pthread_create(
-                        &_thread, NULL, *thread_fun, (void *)&_thread_data);
             }
 
             bool step()
@@ -159,36 +135,14 @@ namespace hf {
 
                 }
 
-                _thread_data.requested_takeoff = _requested_takeoff;
-
-                memcpy(&_thread_data.open_loop_demands, &open_loop_demands,
-                        sizeof(demands_t));
-
-                auto posevals = _thread_data.posevals;
-
-                const double pos[3] = {posevals[0], posevals[1], posevals[2]};
-                wb_supervisor_field_set_sf_vec3f(_translation_field, pos);
-
-                double rot[4] = {};
-                angles_to_rotation(posevals[3], posevals[4], posevals[5], rot);
-                wb_supervisor_field_set_sf_rotation(_rotation_field, rot);
-
-                const auto motorvals = _thread_data.motorvals;
-
                 // Negate expected direction to accommodate Webots
                 // counterclockwise positive
-                wb_motor_set_velocity(_motor1, -motorvals[0]);
-                wb_motor_set_velocity(_motor2, +motorvals[1]);
-                wb_motor_set_velocity(_motor3, +motorvals[2]);
-                wb_motor_set_velocity(_motor4, -motorvals[3]);
+                //wb_motor_set_velocity(_motor1, -motorvals[0]);
+                //wb_motor_set_velocity(_motor2, +motorvals[1]);
+                //wb_motor_set_velocity(_motor3, +motorvals[2]);
+                //wb_motor_set_velocity(_motor4, -motorvals[3]);
 
                 return true;
-            }
-
-            void close(void)
-            {
-                _thread_data.running = false;
-                pthread_join(_thread, NULL);
             }
 
             bool isSpringy()
@@ -200,10 +154,8 @@ namespace hf {
  
         private:
 
-            static const uint32_t DYNAMICS_FREQ = 10000;
-
-            static const uint32_t PID_FREQ = 500;
-
+            static constexpr float YAW_SCALE = 160;
+            
             typedef enum {
 
                 JOYSTICK_NONE,
@@ -223,20 +175,6 @@ namespace hf {
 
             } joystick_t;
 
-            typedef struct {
-
-                Dynamics * dynamics;
-                Mixer * mixer;
-                bool requested_takeoff;
-                demands_t open_loop_demands;
-                float posevals[6];
-                float motorvals[4];
-                bool running;
-
-            } thread_data_t;
-
-             Dynamics _dynamics = Dynamics(tinyquad_params, 1.f/DYNAMICS_FREQ);
-
             bool _requested_takeoff;
 
             double _wb_timestep;
@@ -245,13 +183,6 @@ namespace hf {
             WbDeviceTag _motor2;
             WbDeviceTag _motor3;
             WbDeviceTag _motor4;
-
-            WbNodeRef _copter_node;
-            WbFieldRef _translation_field;
-            WbFieldRef _rotation_field;
-
-            thread_data_t _thread_data; 
-            pthread_t _thread; 
 
             float _time;
 
@@ -317,79 +248,6 @@ namespace hf {
             static float min(const float val, const float maxval)
             {
                 return val > maxval ? maxval : val;
-            }
-
-            static void * thread_fun(void *ptr)
-            {
-                auto thread_data = (thread_data_t *)ptr;
-
-                auto dynamics = thread_data->dynamics;
-
-                auto logfp = fopen("log.csv", "w");
-
-                demands_t demands = {};
-
-                // We'll animate motors at full speed on startup, but won't run
-                // dynamics
-                float motors[4] = {
-                    MOTOR_TAKEOFF, MOTOR_TAKEOFF, MOTOR_TAKEOFF, MOTOR_TAKEOFF
-                };
-
-                for (long k=0; thread_data->running; k++) {
-
-                    const double time = (double)k / DYNAMICS_FREQ;
-
-                    if (thread_data->requested_takeoff) {
-
-                        if (k % (DYNAMICS_FREQ / PID_FREQ) == 0) {
-
-                            // Start with open-loop demands from main thread
-                            memcpy(&demands, &thread_data->open_loop_demands,
-                                    sizeof(demands_t));
-
-                            extern void run_closed_loop_controllers(
-                                    const float dt,
-                                    const state_t & state, 
-                                    demands_t & demands);
-
-                            run_closed_loop_controllers(
-                                    1.f/PID_FREQ, dynamics->state, demands);
-                        }
-
-                        const auto thrust =
-                            min(demands.thrust + MOTOR_HOVER, MOTOR_TAKEOFF);
-
-                        const demands_t new_demands = {
-                            thrust, demands.roll, 0, demands.yaw
-                        };
-
-                        float motors[4] = {};
-
-                        thread_data->mixer->run(new_demands, motors);
-
-                        dynamics->setMotors(logfp, time, *thread_data->mixer, motors);
-
-                        const auto state = dynamics->state;
-
-                        thread_data->posevals[0] = state.x;
-                        thread_data->posevals[1] = state.y;
-                        thread_data->posevals[2] = state.z;
-                        thread_data->posevals[3] = state.phi;
-                        thread_data->posevals[4] = state.theta;
-                        thread_data->posevals[5] = state.psi;
-                    }
-
-                    // Set motor spins for animation
-                    thread_data->motorvals[0] = motors[0];
-                    thread_data->motorvals[1] = motors[1];
-                    thread_data->motorvals[2] = motors[2];
-                    thread_data->motorvals[3] = motors[3];
-
-                    // Throw in a delay to sync with the animation
-                    usleep(1 / (DYNAMICS_FREQ * 1e-6));
-                }
-
-                return  ptr;
             }
 
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {

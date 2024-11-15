@@ -24,6 +24,8 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
+#include <sim/sim2.hpp>
+
 static void animateMotor(const char * name, const float direction)
 {
     auto motor = wb_robot_get_device(name);
