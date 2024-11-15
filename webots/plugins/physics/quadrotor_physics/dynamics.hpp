@@ -90,9 +90,9 @@ namespace hf {
             /**
              * Sets motor spins
              *
-             * @param motor spins in radians per second
+             * @param omegas motor spins in radians per second
              */
-            void update(const float * fomegas) 
+            void update(const float * omegas) 
             {
                 const auto time_curr = getTime();
 
@@ -104,11 +104,9 @@ namespace hf {
                     return;
                 }
 
-                double omegas[MAX_ROTORS] = {};
-
-                // Convert motor values to double-precision for consistency
-                for (auto k=0; k<_rotorCount; ++k) {
-                    omegas[k] = fomegas[k];
+                static long count;
+                if (count++ % 1000 == 0) {
+                    printf("%e\n", 1/dt);
                 }
 
                 // Implement Equation 6 -------------------------------------------
