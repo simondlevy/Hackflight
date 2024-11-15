@@ -20,6 +20,7 @@
 #include <plugins/physics.h>
 
 // Hackflight
+#include <hackflight.hpp>
 #include <pids/altitude.hpp>
 
 #include "dynamics.hpp"
@@ -34,6 +35,8 @@ static const double ROBOT_TIMESTEP = 32;
 static const char ROBOT_NAME[] = "quadrotor";
 
 static dBodyID _robotBody;
+
+hf::AltitudePid _altitudePid;
 
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
@@ -77,12 +80,18 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    const double MOTOR = 60;
-
-    const double motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
-
     // Run PID control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP * PID_FREQ / 1000; ++j) {
+
+        const auto state = dynamics.getState();
+
+        hf::demands_t demands = {0, 0, 0, 0};
+
+        _altitudePid.run(true, 1./PID_FREQ, state, demands);
+
+        const double thrust = demands.thrust;
+
+        const double motors[4] = { thrust, thrust, thrust, thrust };
 
         // Run dynamics in inner loop
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
