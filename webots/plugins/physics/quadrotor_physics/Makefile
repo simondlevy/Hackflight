@@ -17,7 +17,8 @@
 # You may add some variable definitions hereafter to customize the build process
 # See documentation in $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
-C_SOURCES = quadrotor_physics.c quadrotormodel.c quadrotor2b.c utils.c
+C_SOURCES = quadrotormodel.c quadrotor2b.c utils.c
+CXX_SOURCES = quadrotor_physics.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

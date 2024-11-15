@@ -20,8 +20,10 @@ DLLEXPORT void webots_physics_init()
   // init global variables
   gRobotBody = dWebotsGetBodyFromDEF(kRobotName);
 
-  if (gRobotBody == NULL)
-    dWebotsConsolePrintf("!!! quadrotor_physics :: webots_physics_init :: error : could not get body of robot.\r\n");
+  if (gRobotBody == NULL) {
+    dWebotsConsolePrintf("!!! quadrotor_physics :: webots_physics_init :: ");
+    dWebotsConsolePrintf("error : could not get body of robot.\r\n");
+  }
   else {
 
     dBodySetGravityMode(gRobotBody, 0);
