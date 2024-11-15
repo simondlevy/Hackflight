@@ -16,7 +16,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#
 #include <webots/camera.h>
 #include <webots/emitter.h>
 #include <webots/keyboard.h>
@@ -25,13 +24,13 @@
 
 #include "js.h"
 
-static WbDeviceTag _makeMotor(const char * name)
+static void animateMotor(const char * name, const float direction)
 {
     auto motor = wb_robot_get_device(name);
 
     wb_motor_set_position(motor, INFINITY);
 
-    return motor;
+    wb_motor_set_velocity(motor, direction * 60);
 }
 
 int main() 
@@ -63,10 +62,10 @@ int main()
         printf("!!! joystick :: reset :: emitter is not available.\n");
     }
 
-    auto motor1 = _makeMotor("motor1");
-    auto motor2 = _makeMotor("motor2");
-    auto motor3 = _makeMotor("motor3");
-    auto motor4 = _makeMotor("motor4");
+    animateMotor("motor1", -1);
+    animateMotor("motor2", +1);
+    animateMotor("motor3", +1);
+    animateMotor("motor4", -1);
 
     while (wb_robot_step(timestep) != -1) {
 
