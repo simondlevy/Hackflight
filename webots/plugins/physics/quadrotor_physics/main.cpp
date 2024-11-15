@@ -77,9 +77,9 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    const float MOTOR = 60;
+    const double MOTOR = 60;
 
-    const float motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
+    const double motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
 
     // Run PID control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP * PID_FREQ / 1000; ++j) {

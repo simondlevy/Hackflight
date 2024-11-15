@@ -91,8 +91,9 @@ namespace hf {
              * Sets motor spins
              *
              * @param omegas motor spins in radians per second
+             * @param dt deltaT in seconds
              */
-            void update(const float * omegas) 
+            void update(const double * omegas) 
             {
                 const auto time_curr = getTime();
 
@@ -102,11 +103,6 @@ namespace hf {
 
                 if (dt == 0) {
                     return;
-                }
-
-                static long count;
-                if (count++ % 1000 == 0) {
-                    printf("%e\n", 1/dt);
                 }
 
                 // Implement Equation 6 -------------------------------------------
