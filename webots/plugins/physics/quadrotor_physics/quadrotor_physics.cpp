@@ -22,11 +22,12 @@
 
 static const uint32_t DYNAMICS_FREQ = 10000;
 
-// constants
-const char kRobotName[] = "quadrotor";
+// XXX can we get this automatically?
+static const double ROBOT_TIMESTEP = 32;
 
-// globals
-static dBodyID gRobotBody = NULL;
+static const char ROBOT_NAME[] = "quadrotor";
+
+static dBodyID _robotBody;
 
 static dReal z = 0.015;
 static dReal inc = 1;
@@ -48,32 +49,36 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
 
-static auto dynamics = hf::Dynamics(tinyquad_params, 1.f/DYNAMICS_FREQ);
+static auto dynamics = hf::Dynamics(tinyquad_params, 1/DYNAMICS_FREQ);
 
 DLLEXPORT void webots_physics_init() 
 {
     // init global variables
-    gRobotBody = dWebotsGetBodyFromDEF(kRobotName);
+    _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-    if (gRobotBody == NULL) {
+    if (_robotBody == NULL) {
 
         dWebotsConsolePrintf("!!! quadrotor_physics :: webots_physics_init :: ");
         dWebotsConsolePrintf("error : could not get body of robot.\r\n");
     }
     else {
 
-        dBodySetGravityMode(gRobotBody, 0);
+        dBodySetGravityMode(_robotBody, 0);
     }
 }
 
 DLLEXPORT void webots_physics_step() 
 {
     // we return if we have no robot to actuate.
-    if (gRobotBody == NULL) {
+    if (_robotBody == NULL) {
         return;
     }
 
-    dBodySetPosition(gRobotBody, 0, 0, z);
+    const uint32_t cycles = ROBOT_TIMESTEP * DYNAMICS_FREQ / 1000;
+
+    dWebotsConsolePrintf("%d\n", cycles);
+
+    dBodySetPosition(_robotBody, 0, 0, z);
 
     z += inc * .005;
 

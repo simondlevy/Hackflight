@@ -41,7 +41,7 @@ int main()
 
     WbDeviceTag camera = wb_robot_get_device("camera");
 
-    const auto timestep = wb_robot_get_basic_time_step();
+    const double timestep = wb_robot_get_basic_time_step();
 
     wb_camera_enable(camera, timestep * 2);
 
