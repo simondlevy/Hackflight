@@ -5,11 +5,11 @@
  *
  *   @inproceedings{DBLP:conf/icra/BouabdallahMS04,
  *     author    = {Samir Bouabdallah and Pierpaolo Murrieri and Roland
- Siegwart},
+ *                  Siegwart},
  *     title     = {Design and Control of an Indoor Micro Quadrotor},
  *     booktitle = {Proceedings of the 2004 {IEEE} International Conference on
- Robotics and Automation, {ICRA} 2004, April 26 - May 1,
- 2004, New Orleans, LA, {USA}},
+ *                  Robotics and Automation, {ICRA} 2004, April 26 - May 1,
+ *                  2004, New Orleans, LA, {USA}},
  *     pages     = {4393--4398},
  *     year      = {2004},
  *     crossref  = {DBLP:conf/icra/2004},
@@ -20,9 +20,19 @@
  *     bibsource = {dblp computer science bibliography, https://dblp.org}
  *   }
  *
- * Copyright (C) 2024 Simon D. Levy
+ *   Copyright (C) 2024 Simon D. Levy
  *
- * MIT License
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, in version 3.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -68,25 +78,11 @@ namespace hf {
 
                 _rho = air_density;
                 _g = gravity;
-            }        
 
-            /**
-             * Initializes kinematic pose, with flag for whether we're airbone
-             * (helps with testing gravity).
-             *
-             * @param rotation initial rotation
-             * @param airborne allows us to start on the ground (default) or in the
-             * air (e.g., gravity test)
-             */
-            void init()
-            {
                 // Always start at location (0,0,0)
                 memset(&_state, 0, sizeof(state_t));
 
                 _airborne = false;
-
-                // Initialize inertial frame acceleration in NED coordinates
-                //bodyZToInertial(-_g, rotation, _inertialAccel);
 
                 _time_prev = getTime();
             }
@@ -187,17 +183,17 @@ namespace hf {
             {
                 return state_t {
                     _state.x,
-                    _state.dx,
-                    _state.y,
-                    _state.dy,
-                    _state.z,
-                    _state.dz,
-                    _state.phi,
-                    _state.dphi,
-                    _state.theta,
-                    _state.dtheta,
-                    _state.psi,
-                    _state.dpsi
+                        _state.dx,
+                        _state.y,
+                        _state.dy,
+                        _state.z,
+                        _state.dz,
+                        _state.phi,
+                        _state.dphi,
+                        _state.theta,
+                        _state.dtheta,
+                        _state.psi,
+                        _state.dpsi
                 };
             }
 
