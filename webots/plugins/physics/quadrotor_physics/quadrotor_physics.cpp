@@ -20,7 +20,7 @@
 
 #include "dynamics.hpp"
 
-static const uint32_t DYNAMICS_FREQ = 10000;
+static const uint32_t DYNAMICS_FREQ = 100000;
 
 // XXX can we get this automatically?
 static const double ROBOT_TIMESTEP = 32;
@@ -32,7 +32,7 @@ static dBodyID _robotBody;
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     // Estimated
-    4.0e-5, // force constant B [F=b*w^2]
+    4.0e-8, // force constant B [F=b*w^2]
     4.0e0, // torque constant D [T=d*w^2]
 
     // These agree with values in .proto file
@@ -75,7 +75,7 @@ DLLEXPORT void webots_physics_step()
 
     const uint32_t cycles = ROBOT_TIMESTEP * DYNAMICS_FREQ / 1000;
 
-    const float MOTOR = 6;
+    const float MOTOR = 60;
 
     const float motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
 
