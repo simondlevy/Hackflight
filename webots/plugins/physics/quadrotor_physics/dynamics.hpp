@@ -71,10 +71,13 @@ namespace hf {
 
             Dynamics(
                     const vehicle_params_t & vparams,
+                    const double dt,
                     const double gravity = 9.80665e0,
                     const double air_density = 1.225)
             {
                 memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
+
+                _dt = dt;
 
                 _rho = air_density;
                 _g = gravity;
@@ -91,7 +94,7 @@ namespace hf {
              * @param omegas motor spins in radians per second
              * @param dt deltaT in seconds
              */
-            void update(const double * omegas, const double dt) 
+            void update(const double * omegas) 
             {
                 // Implement Equation 6 -------------------------------------------
 
@@ -139,18 +142,18 @@ namespace hf {
 
                     // Compute state as first temporal integral of first temporal
                     // derivative
-                    _state.x += dt * state_deriv.x;
-                    _state.dx += dt * state_deriv.dx;
-                    _state.y += dt * state_deriv.y;
-                    _state.dy += dt * state_deriv.dy;
-                    _state.z += dt * state_deriv.z;
-                    _state.dz += dt * state_deriv.dz;
-                    _state.phi += dt * state_deriv.phi;
-                    _state.dphi += dt * state_deriv.dphi;
-                    _state.theta += dt * state_deriv.theta;
-                    _state.dtheta += dt * state_deriv.dtheta;
-                    _state.psi += dt * state_deriv.psi;
-                    _state.dpsi += dt * state_deriv.dpsi;
+                    _state.x += _dt * state_deriv.x;
+                    _state.dx += _dt * state_deriv.dx;
+                    _state.y += _dt * state_deriv.y;
+                    _state.dy += _dt * state_deriv.dy;
+                    _state.z += _dt * state_deriv.z;
+                    _state.dz += _dt * state_deriv.dz;
+                    _state.phi += _dt * state_deriv.phi;
+                    _state.dphi += _dt * state_deriv.dphi;
+                    _state.theta += _dt * state_deriv.theta;
+                    _state.dtheta += _dt * state_deriv.dtheta;
+                    _state.psi += _dt * state_deriv.psi;
+                    _state.dpsi += _dt * state_deriv.dpsi;
 
                     // Once airborne, inertial-frame acceleration is same as NED
                     // acceleration
@@ -179,27 +182,12 @@ namespace hf {
                 };
             }
 
-            double getTime()
-            {
-                struct timeval tv = {};
-                gettimeofday(&tv, NULL);
-                double time_curr = tv.tv_sec + tv.tv_usec / 1e6;
-
-                static double _time_start;
-
-                const double time = _time_start == 0 ? 0 : time_curr - _time_start;
-
-                if (_time_start == 0) {
-                    _time_start = time_curr;
-                }
-
-                return time;
-            }
-
         private:
 
             // arbitrary; avoids dynamic allocation
             static const uint8_t MAX_ROTORS = 20; 
+
+            double _dt;
 
             vehicle_params_t _vparams;
 

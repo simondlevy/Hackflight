@@ -38,7 +38,7 @@ static dBodyID _robotBody;
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     // Estimated
-    4.0e-8, // force constant B [F=b*w^2]
+    1.8e-5, // force constant B [F=b*w^2]
     4.0e0, // torque constant D [T=d*w^2]
 
     // These agree with values in .proto file
@@ -52,7 +52,7 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
 
-static auto dynamics = hf::Dynamics(tinyquad_params, 1/DYNAMICS_FREQ);
+static auto dynamics = hf::Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -87,7 +87,7 @@ DLLEXPORT void webots_physics_step()
         // Run dynamics in inner loop
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
 
-            dynamics.update(motors, 1./DYNAMICS_FREQ);
+            dynamics.update(motors);
         }
 
     }
