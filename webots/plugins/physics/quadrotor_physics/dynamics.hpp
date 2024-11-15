@@ -78,22 +78,15 @@ namespace hf {
              * @param airborne allows us to start on the ground (default) or in the
              * air (e.g., gravity test)
              */
-            void init(const double rotation[3], const bool airborne = false)
+            void init()
             {
                 // Always start at location (0,0,0)
                 memset(&_state, 0, sizeof(state_t));
 
-                _state.phi   = rotation[0];
-                _state.theta = rotation[1];
-                _state.psi   = rotation[2];
-
-                _airborne = airborne;
+                _airborne = false;
 
                 // Initialize inertial frame acceleration in NED coordinates
-                bodyZToInertial(-_g, rotation, _inertialAccel);
-
-                // We usuall start on ground, but can start in air for testing
-                _airborne = airborne;
+                //bodyZToInertial(-_g, rotation, _inertialAccel);
 
                 _time_prev = getTime();
             }

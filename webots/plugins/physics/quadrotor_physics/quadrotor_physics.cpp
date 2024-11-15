@@ -29,9 +29,6 @@ static const char ROBOT_NAME[] = "quadrotor";
 
 static dBodyID _robotBody;
 
-static dReal z = 0.015;
-static dReal inc = 1;
-
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     // Estimated
@@ -65,6 +62,8 @@ DLLEXPORT void webots_physics_init()
 
         dBodySetGravityMode(_robotBody, 0);
     }
+
+    dynamics.init();
 }
 
 DLLEXPORT void webots_physics_step() 
@@ -76,18 +75,17 @@ DLLEXPORT void webots_physics_step()
 
     const uint32_t cycles = ROBOT_TIMESTEP * DYNAMICS_FREQ / 1000;
 
-    dWebotsConsolePrintf("%d\n", cycles);
+    const float MOTOR = 6;
 
-    dBodySetPosition(_robotBody, 0, 0, z);
+    const float motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
 
-    z += inc * .005;
-
-    if (z > 0.2) { 
-        inc = -1;
+    for (uint32_t k=0; k<cycles; ++k) {
+        dynamics.update(motors);
     }
-    if (z < 0.015) {
-        inc = +1;
-    }
+
+    const auto state = dynamics.getState();
+
+    dBodySetPosition(_robotBody, 0, 0, state.z);
 
 }
 
