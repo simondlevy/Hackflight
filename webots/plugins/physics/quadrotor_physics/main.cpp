@@ -16,11 +16,17 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Webots
 #include <plugins/physics.h>
+
+// Hackflight
+#include <pids/altitude.hpp>
 
 #include "dynamics.hpp"
 
 static const uint32_t DYNAMICS_FREQ = 100000;
+
+static const uint32_t PID_FREQ = 1000;
 
 // XXX can we get this automatically?
 static const double ROBOT_TIMESTEP = 32;
@@ -73,14 +79,19 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    const uint32_t cycles = ROBOT_TIMESTEP * DYNAMICS_FREQ / 1000;
-
     const float MOTOR = 60;
 
     const float motors[4] = { MOTOR, MOTOR, MOTOR, MOTOR };
 
-    for (uint32_t k=0; k<cycles; ++k) {
-        dynamics.update(motors);
+    // Run PID control in outer loop
+    for (uint32_t j=0; j< ROBOT_TIMESTEP * PID_FREQ / 1000; ++j) {
+
+        // Run dynamics in inner loop
+        for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
+
+            dynamics.update(motors);
+        }
+
     }
 
     const auto state = dynamics.getState();
