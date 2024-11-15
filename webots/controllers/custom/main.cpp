@@ -16,13 +16,13 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <webots/camera.h>
 #include <webots/emitter.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-
-#include "js.h"
 
 static void animateMotor(const char * name, const float direction)
 {
@@ -35,8 +35,6 @@ static void animateMotor(const char * name, const float direction)
 
 int main() 
 {
-    double command[3] = {0.0, 0.0, 0.0};
-
     wb_robot_init();
 
     WbDeviceTag camera = wb_robot_get_device("camera");
@@ -44,16 +42,6 @@ int main()
     const double timestep = wb_robot_get_basic_time_step();
 
     wb_camera_enable(camera, timestep * 2);
-
-    // Handle joystick
-    jsJoystick *gJoystick = new jsJoystick();
-
-    if (gJoystick->notWorking()) {
-        delete gJoystick, gJoystick = NULL;
-        printf("No joystick available, ...\n");
-        printf("Available control keys: ...\n");
-        wb_keyboard_enable(timestep);
-    }
 
     // Handle emitter
     const auto gEmitter = wb_robot_get_device("emitter");
@@ -72,27 +60,8 @@ int main()
         // Send joystick value.
         if (gEmitter) {
 
-            // read joystick.
-            if (gJoystick) {
+            double command[3] = {0.0, 0.0, 0.0};
 
-                float axes[12];
-                int buttons[12];
-                gJoystick->read(buttons, axes);
-                command[0] = (double)-axes[1];
-                command[1] = (double)axes[3];
-                command[2] = (double)axes[2];
-            } 
-
-            else {
-
-                switch (wb_keyboard_get_key()) {
-                    case ' ':  // space -> reset
-                        command[0] = 0.0;
-                        command[1] = 0.0;
-                        command[2] = 0.0;
-                }
-            }
-            // setup emitter buffer
             if (command[0] || command[1] || command[2]) {
                 printf("command = ( %g , %g , %g )\n", command[0], command[1], command[2]);
             }
