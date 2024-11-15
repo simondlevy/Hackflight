@@ -83,8 +83,6 @@ namespace hf {
                 memset(&_state, 0, sizeof(state_t));
 
                 _airborne = false;
-
-                _time_prev = getTime();
             }
 
             /**
@@ -93,18 +91,8 @@ namespace hf {
              * @param omegas motor spins in radians per second
              * @param dt deltaT in seconds
              */
-            void update(const double * omegas) 
+            void update(const double * omegas, const double dt) 
             {
-                const auto time_curr = getTime();
-
-                const auto dt = time_curr - _time_prev;
-
-                _time_prev = time_curr;
-
-                if (dt == 0) {
-                    return;
-                }
-
                 // Implement Equation 6 -------------------------------------------
 
                 // Radians per second of rotors, and squared radians per second
@@ -208,7 +196,6 @@ namespace hf {
                 return time;
             }
 
-
         private:
 
             // arbitrary; avoids dynamic allocation
@@ -217,8 +204,6 @@ namespace hf {
             vehicle_params_t _vparams;
 
             state_t _state;
-
-            double _time_prev;
 
             double _g; // gravitational constant
             double _rho; // air density

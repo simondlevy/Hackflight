@@ -87,7 +87,7 @@ DLLEXPORT void webots_physics_step()
         // Run dynamics in inner loop
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
 
-            dynamics.update(motors);
+            dynamics.update(motors, 1./DYNAMICS_FREQ);
         }
 
     }
