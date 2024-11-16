@@ -37,6 +37,10 @@ static void animateMotor(const char * name, const float direction)
 
 int main() 
 {
+    hf::Simulator sim = {};
+
+    (void)sim;
+
     wb_robot_init();
 
     WbDeviceTag camera = wb_robot_get_device("camera");
@@ -46,9 +50,9 @@ int main()
     wb_camera_enable(camera, timestep * 2);
 
     // Handle emitter
-    const auto gEmitter = wb_robot_get_device("emitter");
+    const auto emitter = wb_robot_get_device("emitter");
 
-    if (!gEmitter) {
+    if (!emitter) {
         printf("!!! joystick :: reset :: emitter is not available.\n");
     }
 
@@ -60,14 +64,15 @@ int main()
     while (wb_robot_step(timestep) != -1) {
 
         // Send joystick value.
-        if (gEmitter) {
+        if (emitter) {
 
             double command[3] = {0.0, 0.0, 0.0};
 
             if (command[0] || command[1] || command[2]) {
-                printf("command = ( %g , %g , %g )\n", command[0], command[1], command[2]);
+                printf("command = ( %g , %g , %g )\n",
+                        command[0], command[1], command[2]);
             }
-            wb_emitter_send(gEmitter, command, sizeof(command));
+            wb_emitter_send(emitter, command, sizeof(command));
         }
     }
 
