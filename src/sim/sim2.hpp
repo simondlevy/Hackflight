@@ -137,11 +137,11 @@ namespace hf {
                 }
 
 
-                double command[3] = {1.0, 2.0, 3.0};
+                double command[4] = {1.0, 2.0, 3.0, 4.0};
 
                 if (command[0] || command[1] || command[2]) {
-                    printf("command = ( %g , %g , %g )\n",
-                            command[0], command[1], command[2]);
+                    printf("command = ( %g , %g , %g %f)\n",
+                            command[0], command[1], command[2], command[3]);
                 }
 
                 wb_emitter_send(_emitter, command, sizeof(command));

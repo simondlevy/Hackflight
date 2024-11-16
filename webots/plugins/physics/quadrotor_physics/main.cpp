@@ -91,8 +91,9 @@ DLLEXPORT void webots_physics_step()
 
         const auto controls = (double *)dWebotsReceive(&size);
 
-        if (size == 3 * sizeof(double)) {
-            printf("%f %f %f\n", controls[0], controls[1], controls[2]);
+        if (size == 4 * sizeof(double)) {
+            printf("%f %f %f %f\n",
+                    controls[0], controls[1], controls[2], controls[3]);
         }
 
         hf::demands_t demands = {0, 0, 0, 0};
