@@ -93,8 +93,6 @@ DLLEXPORT void webots_physics_step()
 
         const double thrust = demands.thrust + MOTOR_HOVER;
 
-        dWebotsConsolePrintf("%3.3f\n", thrust);
-
         const double motors[4] = { thrust, thrust, thrust, thrust };
 
         // Run dynamics in inner loop

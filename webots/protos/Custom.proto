@@ -27,6 +27,14 @@ DEF ROBOT Robot {
                 ]
       }
 
+      DEF emitter Emitter {
+        model "radio"
+        bufferSize 1000
+      }
+      Receiver {
+        bufferSize 1000
+      }
+
     Camera {
         translation 0.03 0 0.01
             fieldOfView 0.87
