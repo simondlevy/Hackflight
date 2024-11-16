@@ -87,6 +87,14 @@ DLLEXPORT void webots_physics_step()
 
         const auto state = dynamics.getState();
 
+        int size = 0;
+
+        const auto controls = (double *)dWebotsReceive(&size);
+
+        if (size == 3 * sizeof(double)) {
+            printf("%f %f %f\n", controls[0], controls[1], controls[2]);
+        }
+
         hf::demands_t demands = {0, 0, 0, 0};
 
         _altitudePid.run(true, 1./PID_FREQ, state, demands);
