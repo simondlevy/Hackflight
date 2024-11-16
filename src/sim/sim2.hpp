@@ -21,9 +21,6 @@
 
 // C
 #include <stdio.h>
-#include <string.h>
-#include <pthread.h>
-#include <unistd.h>
 
 // C++
 #include <map>
@@ -33,6 +30,8 @@
 #include <hackflight.hpp>
 
 // Webots
+#include <webots/camera.h>
+#include <webots/emitter.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
