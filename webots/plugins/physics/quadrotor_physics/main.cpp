@@ -35,8 +35,6 @@ static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
 
 static const uint32_t PID_FREQ = 1e3; // Hz
 
-static const float MOTOR_HOVER = 55.385; // rad/sec
-
 static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
@@ -121,7 +119,7 @@ DLLEXPORT void webots_physics_step()
         hf::demands_t demands = {
             open_loop_demands.thrust,
             open_loop_demands.roll,
-            open_loop_demands.pitch,
+            0,
             open_loop_demands.yaw
         };
 
@@ -135,20 +133,26 @@ DLLEXPORT void webots_physics_step()
 
         hf::PositionPid::run(state, demands);
 
+        //printf("r=%+3.3f => ", demands.roll);
+
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
+
+        //printf("%+3.3f => ", demands.roll);
 
         _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
 
-        _yawRatePid.run(pid_dt, resetPids, state, demands);
+        //printf("%+3.3f\n", demands.roll);
 
-        // Add hover level to thrust
-        demands.thrust += MOTOR_HOVER;
+        _yawRatePid.run(pid_dt, resetPids, state, demands);
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};
         float motors[4] = {};
         mixer.run(demands, motors);
+
+        printf("m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n",
+               motors[0], motors[1], motors[2], motors[3]);
 
         // Run dynamics in inner loop to update state with motors
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
