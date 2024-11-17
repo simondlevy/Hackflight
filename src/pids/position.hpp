@@ -34,6 +34,8 @@ namespace hf {
 
             static void run(const state_t & state, demands_t & demands)
             {
+                printf("roll=%+3.3f  dy=%+3.3f\n", demands.roll, state.dy);
+
                 demands.roll = KP * (demands.roll - state.dy);
                 demands.pitch = KP * (demands.pitch - state.dx);
             }

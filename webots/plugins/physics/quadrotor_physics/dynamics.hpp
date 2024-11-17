@@ -125,11 +125,16 @@ namespace hf {
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame
                 double euler[3] = {_state.phi, _state.theta, _state.psi};
-                double accelNED[3] = {};
-                bodyZToInertial(u1 / _vparams.m, euler, accelNED);
+                double accelENU[3] = {};
+                bodyZToInertial(u1 / _vparams.m, euler, accelENU);
+
+                static long count;
+                if (count++ % 100 == 0) {
+                    //printf("accelENU[1 = %+3.3f\n", accelENU[1]);
+                }
 
                 // Subtact gravity from thrust to get net vertical acceleration
-                double netz = accelNED[2] - _g;
+                double netz = accelENU[2] - _g;
 
                 // We're airborne once net Z acceleration becomes positive
                 if (netz > 0) {
@@ -140,7 +145,7 @@ namespace hf {
                 if (_airborne) {
 
                     // Compute the state derivatives using Equation 12
-                    computeStateDerivative(accelNED, netz, omega, u2, u3, u4);
+                    computeStateDerivative(accelENU, netz, omega, u2, u3, u4);
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
@@ -157,11 +162,11 @@ namespace hf {
                     _state.psi += _dt * state_deriv.psi;
                     _state.dpsi += _dt * state_deriv.dpsi;
 
-                    // Once airborne, inertial-frame acceleration is same as NED
+                    // Once airborne, inertial-frame acceleration is same as ENU
                     // acceleration
-                    _inertialAccel[0] = accelNED[0];
-                    _inertialAccel[1] = accelNED[1];
-                    _inertialAccel[2] = accelNED[2];
+                    _inertialAccel[0] = accelENU[0];
+                    _inertialAccel[1] = accelENU[1];
+                    _inertialAccel[2] = accelENU[2];
                 }
 
             } // update
@@ -172,7 +177,7 @@ namespace hf {
                     _state.x,
                         _state.dx,
                         _state.y,
-                        _state.dy,
+                        -_state.dy, // negate for rightward positive
                         _state.z,
                         _state.dz,
                         _state.phi,
@@ -236,7 +241,8 @@ namespace hf {
 
                 // This is the rightmost column of the body-to-inertial rotation
                 // matrix
-                double R[3] = { sph * sps + cph * cps * sth,
+                double R[3] = {
+                    sph * sps + cph * cps * sth,
                     cph * sps * sth - cps * sph,
                     cph * cth };
 
@@ -252,15 +258,15 @@ namespace hf {
              * Implements Equation 12 computing temporal first derivative of
              * state.  Should fill _dxdx[0..11] with appropriate values.
              *
-             * @param accelNED acceleration in NED inertial frame
-             * @param netz accelNED[2] with gravitational constant added in
+             * @param accelENU acceleration in ENU inertial frame
+             * @param netz accelENU[2] with gravitational constant added in
              * @param omega net torque from rotors
              * @param u2 roll force
              * @param u3 pitch force
              * @param u4 yaw force
              */
             void computeStateDerivative(
-                    double accelNED[3],
+                    double accelENU[3],
                     double netz,
                     double omega,
                     double u2,
@@ -276,18 +282,17 @@ namespace hf {
                 double Iz = _vparams.Iz;
                 double Jr = _vparams.Jr;
 
-
                 // x'
                 state_deriv.x = _state.dx;
 
                 // x''
-                state_deriv.dx = accelNED[0];
+                state_deriv.dx = accelENU[0];
 
                 // y'
                 state_deriv.y = _state.dy;
 
                 // y''
-                state_deriv.dy = accelNED[1];
+                state_deriv.dy = accelENU[1];
 
                 // z'
                 state_deriv.z = _state.dz;

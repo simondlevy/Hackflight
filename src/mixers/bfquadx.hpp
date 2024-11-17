@@ -48,14 +48,14 @@ namespace hf {
 
             virtual int8_t roll(const uint8_t index) override
             {
-                static constexpr int8_t r[4] = {0, 0, 0, 0};
+                static constexpr int8_t r[4] = {-1, -1, +1, +1};
 
                 return r[index];
             }
 
             virtual int8_t pitch(const uint8_t index) override
             {
-                static constexpr int8_t p[4] = {0, 0, 0, 0};
+                static constexpr int8_t p[4] = {+1, -1, +1, -1};
 
                 return p[index];
             }

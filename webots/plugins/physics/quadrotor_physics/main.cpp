@@ -57,13 +57,13 @@ static hf::YawRatePid _yawRatePid;
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     1.8e-5, // force constant B [F=b*w^2]
-    0.031,  // arm length L [m]
+    3.1e-2, // arm length L [m]
 
     2.0e0 , // torque constant D [T=d*w^2]
     0.050,  // mass M [kg]
-    2,      // Ix [kg*m^2]
-    2,      // Iy [kg*m^2]
-    3,      // Iz [kg*m^2]
+    2.0e0,  // Ix [kg*m^2]
+    2.0e0,  // Iy [kg*m^2]
+    3.0e0,  // Iz [kg*m^2]
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
 
@@ -133,16 +133,10 @@ DLLEXPORT void webots_physics_step()
 
         hf::PositionPid::run(state, demands);
 
-        //printf("r=%+3.3f => ", demands.roll);
-
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
-
-        //printf("%+3.3f => ", demands.roll);
 
         _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
-
-        //printf("%+3.3f\n", demands.roll);
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
@@ -151,8 +145,8 @@ DLLEXPORT void webots_physics_step()
         float motors[4] = {};
         mixer.run(demands, motors);
 
-        printf("m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n",
-               motors[0], motors[1], motors[2], motors[3]);
+        //printf("m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f | ",
+        //       motors[0], motors[1], motors[2], motors[3]);
 
         // Run dynamics in inner loop to update state with motors
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
@@ -175,7 +169,7 @@ DLLEXPORT void webots_physics_step()
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
 
     // Set robot posed based on state
-    dBodySetPosition(_robotBody, 0, 0, state.z);
+    dBodySetPosition(_robotBody, state.x, state.y, state.z);
     dBodySetQuaternion(_robotBody, q);
 }
 
