@@ -28,9 +28,9 @@
 
 #include "dynamics.hpp"
 
-static const uint32_t DYNAMICS_FREQ = 100000; // Hz
+static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
 
-static const uint32_t PID_FREQ = 1000; // Hz
+static const uint32_t PID_FREQ = 1e3; // Hz
 
 static const float MOTOR_HOVER = 55.385; // rad/sec
 
