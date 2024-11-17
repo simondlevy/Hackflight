@@ -74,10 +74,12 @@ namespace hf {
                 const auto gamma = a.x;
 
                 r[0][0] = cos(beta) * cos(gamma);
-                r[0][1] = sin(alpha) * sin(beta) * cos(gamma) - cos(alpha) * sin(gamma);
+                r[0][1] = sin(alpha) * sin(beta) * cos(gamma) -
+                    cos(alpha) * sin(gamma);
                 r[0][2] = cos(alpha) * sin(beta) + sin(alpha) * sin(gamma);
                 r[1][0] = cos(beta) * sin(gamma);
-                r[1][1] = sin(alpha) * sin(beta) * sin(gamma) + cos(alpha) * cos(gamma);
+                r[1][1] = sin(alpha) * sin(beta) * sin(gamma) +
+                    cos(alpha) * cos(gamma);
                 r[1][2] = cos(alpha) * sin(beta) - sin(alpha) * cos(gamma);
                 r[2][0] = -sin(beta);
                 r[2][1] = sin(alpha) * cos(beta);

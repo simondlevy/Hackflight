@@ -96,9 +96,6 @@ namespace hf {
              */
             void update(const float * omegas, Mixer * mixer) 
             {
-
-                (void)mixer;
-
                 // Implement Equation 6 ---------------------------------------
                 // Radians per second of rotors, and squared radians per second
                 double omegas2[MAX_ROTORS] = {};
@@ -114,13 +111,7 @@ namespace hf {
 
                     // Newton's Third Law (action/reaction) tells us that yaw is
                     // opposite to net rotor spin
-                    u4 += _vparams.d * omegas2[i] * mixer->yaw(i);
-                }
-
-                static uint32_t count;
-                if (count++ % 100 == 0) {
-                    printf("%+3.3f %+3.3f %+3.3f %+3.3f => u4: %+3.3f\n", 
-                            omegas2[0], omegas2[1], omegas2[2], omegas2[3], u4);
+                    u4 -= _vparams.d * omegas2[i] * mixer->yaw(i);
                 }
 
                 // Compute roll, pitch, yaw forces (different method for
@@ -150,8 +141,8 @@ namespace hf {
                     // Compute the state derivatives using Equation 12
                     computeStateDerivative(accelNED, netz, omega, u2, u3, u4);
 
-                    // Compute state as first temporal integral of first temporal
-                    // derivative
+                    // Compute state as first temporal integral of first
+                    // temporal derivative
                     _state.x += _dt * state_deriv.x;
                     _state.dx += _dt * state_deriv.dx;
                     _state.y += _dt * state_deriv.y;

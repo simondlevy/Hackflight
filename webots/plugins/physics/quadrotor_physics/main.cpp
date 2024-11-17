@@ -135,9 +135,6 @@ DLLEXPORT void webots_physics_step()
 
         mixer.run(demands, motors);
 
-        //printf("m1=%3.3f  m2=%3.3f  m3=%3.3f  m4=%3.3f\n",
-        //        motors[0], motors[1], motors[2], motors[3]);
-
         // Run dynamics in inner loop
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
 
@@ -147,21 +144,24 @@ DLLEXPORT void webots_physics_step()
 
     const auto state = dynamics.getState();
 
-    const hf::axis3_t euler = {state.phi, state.theta, state.psi};
+    // Negate psi for nose-right positive
+    const hf::axis3_t euler = {state.phi, state.theta, -state.psi};
 
-    //printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n",
-    //      euler.x, euler.y, euler.z);
+    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n",
+          euler.x, euler.y, euler.z);
 
     hf::axis4_t quat = {};
 
     hf::Utils::euler2quat(euler, quat);
 
-    //printf("qw=%+3.3f  qw=%+3.3f  qw=%+3.3f  qw=%+3.3f\n",
-    //      quat.w, quat.x, quat.y, quat.z);  
+    printf("qw=%+3.3f  qw=%+3.3f  qw=%+3.3f  qw=%+3.3f\n\n",
+          quat.w, quat.x, quat.y, quat.z);  
 
-    //const dQuaternion q = {q.w, q.x, q.y, q.z};
+    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
 
     dBodySetPosition(_robotBody, 0, 0, state.z);
+
+    dBodySetQuaternion(_robotBody, q);
 
 }
 

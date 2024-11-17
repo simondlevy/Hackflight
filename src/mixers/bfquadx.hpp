@@ -46,14 +46,27 @@ namespace hf {
                 motors[3] = t + r - p  - y;
             }
 
+            virtual int8_t roll(const uint8_t index) override
+            {
+                static constexpr int8_t r[4] = {0, 0, 0, 0};
+
+                return r[index];
+            }
+
+            virtual int8_t pitch(const uint8_t index) override
+            {
+                static constexpr int8_t p[4] = {0, 0, 0, 0};
+
+                return p[index];
+            }
+
             virtual int8_t yaw(const uint8_t index) override
             {
-                static constexpr int8_t y[4] = {-1, +1, +1, -1}; 
+                static constexpr int8_t y[4] = {+1, -1, -1, +1}; 
 
                 return y[index];
             }
 
            
     };
-
 }

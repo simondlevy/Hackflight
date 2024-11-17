@@ -26,7 +26,19 @@ namespace hf {
 
         public:
 
+            /**
+              * Converts demands to motor values
+              */
             virtual void run(const demands_t & demands, float * motors) = 0;
+
+            /**
+              * Returns positive (clockwise) or negative (counter-clockwise)
+              * spin on motor for simulation dynamics
+              */
+
+            virtual int8_t roll(const uint8_t index) = 0;
+
+            virtual int8_t pitch(const uint8_t index) = 0;
 
             virtual int8_t yaw(const uint8_t index) = 0;
      };
