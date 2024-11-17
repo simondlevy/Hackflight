@@ -155,7 +155,9 @@ namespace hf {
 
         private:
 
-            static constexpr float YAW_SCALE = 160; // deg/sec
+            static constexpr float THROTTLE_SCALE = 0.5; // m/s
+
+            static constexpr float YAW_SCALE = 160; // deg/s
 
             typedef enum {
 
@@ -319,11 +321,11 @@ namespace hf {
                         break;
 
                     case 'W':
-                        demands.thrust = +1.0;
+                        demands.thrust = +THROTTLE_SCALE;
                         break;
 
                     case 'S':
-                        demands.thrust = -1.0;
+                        demands.thrust = -THROTTLE_SCALE;
                         break;
 
                     case 32:

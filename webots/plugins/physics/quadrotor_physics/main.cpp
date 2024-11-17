@@ -37,7 +37,7 @@ static const float MOTOR_HOVER = 55.385; // rad/sec
 static const float THROTTLE_DOWN = 0.06;
 
 // XXX can we get this automatically?
-static const double ROBOT_TIMESTEP = 32;
+static const double ROBOT_TIMESTEP_MSEC = 32;
 
 static const char ROBOT_NAME[] = "quadrotor";
 
@@ -103,7 +103,7 @@ DLLEXPORT void webots_physics_step()
     const auto open_loop_demands = getOpenLoopDemands();
 
     // Run control in outer loop
-    for (uint32_t j=0; j< ROBOT_TIMESTEP * PID_FREQ / 1000; ++j) {
+    for (uint32_t j=0; j< ROBOT_TIMESTEP_MSEC * PID_FREQ / 1000; ++j) {
 
         // Get vehicle state
         const auto state = dynamics.getState();
@@ -121,7 +121,6 @@ DLLEXPORT void webots_physics_step()
         const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
         static const float pid_dt  = 1. / PID_FREQ;
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
-        // _yawRatePid.run(pid_dt, resetPids, state, demands);
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
         // Add hover level to thrust
