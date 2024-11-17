@@ -22,6 +22,7 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <pids/altitude.hpp>
+#include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
 
 #include "dynamics.hpp"
@@ -39,7 +40,9 @@ static const char ROBOT_NAME[] = "quadrotor";
 
 static dBodyID _robotBody;
 
-hf::AltitudePid _altitudePid;
+static hf::AltitudePid _altitudePid;
+
+static hf::YawRatePid _yawRatePid;
 
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
@@ -64,13 +67,10 @@ static hf::demands_t getOpenLoopDemands()
 
     int size = 0;
 
-    const auto controls = (double *)dWebotsReceive(&size);
+    const auto buffer = (hf::demands_t *)dWebotsReceive(&size);
 
-    if (size == 4 * sizeof(double)) {
-        _demands.thrust = controls[0];
-        _demands.roll = controls[1];
-        _demands.pitch = controls[2];
-        _demands.yaw = controls[3];
+    if (size == sizeof(hf::demands_t)) {
+        memcpy(&_demands, buffer, sizeof(hf::demands_t));
     }
 
     return _demands;
@@ -119,7 +119,11 @@ DLLEXPORT void webots_physics_step()
 
         // Run PID controllers to get final demands
 
-        _altitudePid.run(true, 1./PID_FREQ, state, demands);
+        static const float pid_dt  = 1. / PID_FREQ;
+
+        _altitudePid.run(true, pid_dt, state, demands);
+
+        _yawRatePid.run(pid_dt, false, state, demands);
 
         demands.thrust += MOTOR_HOVER;
 

@@ -136,15 +136,7 @@ namespace hf {
 
                 }
 
-
-                double command[4] = {
-                    demands.thrust,
-                    demands.roll,
-                    demands.pitch,
-                    demands.yaw
-                };
-
-                wb_emitter_send(_emitter, command, sizeof(command));
+                wb_emitter_send(_emitter, &demands, sizeof(demands_t));
 
                 return true;
             }
