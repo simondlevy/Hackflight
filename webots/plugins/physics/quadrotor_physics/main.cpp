@@ -52,7 +52,7 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
     1.8e-5, // force constant B [F=b*w^2]
     0.031,  // arm length L [m]
 
-    1.0e0 , // torque constant D [T=d*w^2]
+    2.0e0 , // torque constant D [T=d*w^2]
     0.050,  // mass M [kg]
     2,      // Ix [kg*m^2]
     2,      // Iy [kg*m^2]
