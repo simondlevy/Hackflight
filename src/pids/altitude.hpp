@@ -41,9 +41,6 @@ namespace hf {
 
                     demands.thrust = _z_target;
 
-                    printf("target: %3.3f actual = %3.3f => ",
-                            _z_target, state.z);
-            
                     _run(dt, state, demands);
                 }
 
@@ -101,12 +98,8 @@ namespace hf {
                 demands.thrust = _run_pi(dt, KP_Z, KI_Z,
                         demands.thrust, state.z, _z_integral);
 
-                printf("thrust: %3.3f => ", demands.thrust);
-
                 demands.thrust = _run_pi(dt, KP_DZ, KI_DZ,
                         demands.thrust, state.dz, _dz_integral);
-
-                printf("thrust: %3.3f => ", demands.thrust);
             }
 
             static float _run_pi(const float dt, const float kp, const float ki,
