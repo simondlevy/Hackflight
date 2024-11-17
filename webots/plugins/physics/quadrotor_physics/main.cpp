@@ -49,15 +49,11 @@ static hf::YawRatePid _yawRatePid;
 
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
-    // Estimated
     1.8e-5, // force constant B [F=b*w^2]
-    4.0e3, // torque constant D [T=d*w^2]
-
-    // These agree with values in .proto file
-    0.050,  // mass M [kg]
     0.031,  // arm length L [m]
 
-    // Estimated
+    1.0e0 , // torque constant D [T=d*w^2]
+    0.050,  // mass M [kg]
     2,      // Ix [kg*m^2]
     2,      // Iy [kg*m^2]
     3,      // Iz [kg*m^2]
@@ -125,6 +121,7 @@ DLLEXPORT void webots_physics_step()
         const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
         static const float pid_dt  = 1. / PID_FREQ;
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
+        // _yawRatePid.run(pid_dt, resetPids, state, demands);
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
         // Add hover level to thrust
