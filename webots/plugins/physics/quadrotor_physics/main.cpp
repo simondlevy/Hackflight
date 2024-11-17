@@ -22,6 +22,9 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <pids/altitude.hpp>
+#include <pids/position.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
 #include <utils.hpp>
@@ -36,6 +39,8 @@ static const float MOTOR_HOVER = 55.385; // rad/sec
 
 static const float THROTTLE_DOWN = 0.06;
 
+static const float PITCH_ROLL_POST_SCALE = 50;
+
 // XXX can we get this automatically?
 static const double ROBOT_TIMESTEP_MSEC = 32;
 
@@ -44,6 +49,10 @@ static const char ROBOT_NAME[] = "quadrotor";
 static dBodyID _robotBody;
 
 static hf::AltitudePid _altitudePid;
+
+static hf::PitchRollAnglePid _pitchRollAnglePid;
+
+static hf::PitchRollRatePid _pitchRollRatePid;
 
 static hf::YawRatePid _yawRatePid;
 
@@ -111,16 +120,26 @@ DLLEXPORT void webots_physics_step()
         // Start with open-loop demands
         hf::demands_t demands = {
             open_loop_demands.thrust,
-            0,
-            0,
+            open_loop_demands.roll,
+            open_loop_demands.pitch,
             open_loop_demands.yaw
         };
 
         // Run PID controllers to get final demands
+
         const auto springyThrottle = true; // XXX
         const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
         static const float pid_dt  = 1. / PID_FREQ;
+
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
+
+        hf::PositionPid::run(state, demands);
+
+        _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
+
+        _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
+                PITCH_ROLL_POST_SCALE);
+
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
         // Add hover level to thrust

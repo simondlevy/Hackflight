@@ -100,7 +100,7 @@ namespace hf {
                 // Radians per second of rotors, and squared radians per second
                 double omegas2[MAX_ROTORS] = {};
 
-                double u1 = 0, u4 = 0, omega = 0;
+                double u1 = 0, u2 = 0, u3 = 0, u4 = 0, omega = 0;
                 for (unsigned int i = 0; i < _rotorCount; ++i) {
 
                     // Thrust is squared rad/sec scaled by air density
@@ -109,15 +109,16 @@ namespace hf {
                     // Multiply by thrust coefficient
                     u1 += _vparams.b * omegas2[i];                  
 
-                    // Newton's Third Law (action/reaction) tells us that yaw is
-                    // opposite to net rotor spin
+                    u2 += _vparams.l * _vparams.b * omegas2[i] *
+                        mixer->roll(i);
+
+                    u3 += _vparams.l * _vparams.b * omegas2[i] *
+                        mixer->pitch(i);
+
+                    // Newton's Third Law (action/reaction) tells us that yaw
+                    // is opposite to net rotor spin
                     u4 -= _vparams.d * omegas2[i] * mixer->yaw(i);
                 }
-
-                // Compute roll, pitch, yaw forces (different method for
-                // fixed-pitch blades vs. variable-pitch)
-                double u2 = 0, u3 = 0;
-                //computeRollAndPitch(omegas, omegas2, u2, u3);
 
                 // ------------------------------------------------------------
 
