@@ -38,22 +38,29 @@ namespace hf {
                 if (throttleIsSpringy) {
 
                     _z_target += dt * demands.thrust;
-            
+
                     demands.thrust = _z_target;
+
+                    printf("target: %3.3f actual = %3.3f => ",
+                            _z_target, state.z);
+            
                     _run(dt, state, demands);
                 }
 
                 // Traditional (non-self-centering) throttle: 
                 //
-                //   (1) In throttle deadband (mid position), fix an altitude target
-                //       and attempt to maintain it via PID control
+                //   (1) In throttle deadband (mid position), fix an altitude
+                //   target and attempt to maintain it via PID control
                 //
-                //   (2) Outside throttle deadband, get thrust from stick deflection
+                //   (2) Outside throttle deadband, get thrust from stick
+                //   deflection
                 else {
 
                     static bool _was_in_deadband;
-                    const auto in_deadband = fabs(demands.thrust) < THROTTLE_DEADBAND;
-                    _z_target = in_deadband && !_was_in_deadband ? state.z : _z_target;
+                    const auto in_deadband = fabs(demands.thrust)
+                        < THROTTLE_DEADBAND;
+                    _z_target = in_deadband && !_was_in_deadband ?
+                        state.z : _z_target;
 
                     _was_in_deadband = in_deadband;
 
@@ -78,7 +85,7 @@ namespace hf {
             static constexpr float ILIMIT = 5000;
 
             // For springy-throttle in gamepads / keyboard
-            static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
+            static constexpr float INITIAL_ALTITUDE_TARGET = 0.3;
 
             // For tradtional (non-springy) throttle in R/C transmitter
             static constexpr float THROTTLE_DEADBAND = 0.5;
@@ -94,8 +101,12 @@ namespace hf {
                 demands.thrust = _run_pi(dt, KP_Z, KI_Z,
                         demands.thrust, state.z, _z_integral);
 
+                printf("thrust: %3.3f => ", demands.thrust);
+
                 demands.thrust = _run_pi(dt, KP_DZ, KI_DZ,
                         demands.thrust, state.dz, _dz_integral);
+
+                printf("thrust: %3.3f => ", demands.thrust);
             }
 
             static float _run_pi(const float dt, const float kp, const float ki,

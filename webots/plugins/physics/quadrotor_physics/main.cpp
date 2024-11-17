@@ -57,6 +57,24 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
 
+static hf::demands_t getOpenLoopDemands()
+{
+    static hf::demands_t _demands;
+
+    int size = 0;
+
+    const auto controls = (double *)dWebotsReceive(&size);
+
+    if (size == 4 * sizeof(double)) {
+        _demands.thrust = controls[0];
+        _demands.roll = controls[1];
+        _demands.pitch = controls[2];
+        _demands.yaw = controls[3];
+    }
+
+    return _demands;
+}
+
 static auto dynamics = hf::Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
 
 DLLEXPORT void webots_physics_init() 
@@ -66,7 +84,7 @@ DLLEXPORT void webots_physics_init()
 
     if (_robotBody == NULL) {
 
-        dWebotsConsolePrintf("!!! quadrotor_physics :: webots_physics_init :: ");
+        dWebotsConsolePrintf("quadrotor_physics :: webots_physics_init :: ");
         dWebotsConsolePrintf("error : could not get body of robot.\r\n");
     }
     else {
@@ -82,25 +100,22 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    // Run PID control in outer loop
+    const auto open_loop_demands = getOpenLoopDemands();
+
+    // Run control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP * PID_FREQ / 1000; ++j) {
 
         const auto state = dynamics.getState();
 
-        int size = 0;
-
-        const auto controls = (double *)dWebotsReceive(&size);
-
-        if (size == 4 * sizeof(double)) {
-            printf("%f %f %f %f\n",
-                    controls[0], controls[1], controls[2], controls[3]);
-        }
-
-        hf::demands_t demands = {0, 0, 0, 0};
+        hf::demands_t demands = {
+            open_loop_demands.thrust,
+            0,
+            0,
+            0 };
 
         _altitudePid.run(true, 1./PID_FREQ, state, demands);
 
-        const double thrust = demands.thrust + MOTOR_HOVER;
+        const auto thrust = demands.thrust + MOTOR_HOVER;
 
         const double motors[4] = { thrust, thrust, thrust, thrust };
 
@@ -109,7 +124,6 @@ DLLEXPORT void webots_physics_step()
 
             dynamics.update(motors);
         }
-
     }
 
     const auto state = dynamics.getState();

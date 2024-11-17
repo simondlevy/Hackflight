@@ -132,7 +132,14 @@ namespace hf {
                 // Subtact gravity from thrust to get net vertical acceleration
                 double netz = accelNED[2] - _g;
 
-                _airborne = netz > 0;
+                static long _count;
+                if (_count++ % 100 == 0) {
+                    printf("U1=%3.3f  netz=%+3.3f\n", u1, netz);
+                }
+
+                if (netz > 0) {
+                    _airborne = true;
+                }
 
                 // Once airborne, we can update dynamics
                 if (_airborne) {
