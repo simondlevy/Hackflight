@@ -34,6 +34,8 @@ static const uint32_t PID_FREQ = 1000; // Hz
 
 static const float MOTOR_HOVER = 55.385; // rad/sec
 
+static const float THROTTLE_DOWN = 0.06;
+
 // XXX can we get this automatically?
 static const double ROBOT_TIMESTEP = 32;
 
@@ -119,50 +121,43 @@ DLLEXPORT void webots_physics_step()
         };
 
         // Run PID controllers to get final demands
-
+        const auto springyThrottle = true; // XXX
+        const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
         static const float pid_dt  = 1. / PID_FREQ;
+        _altitudePid.run(springyThrottle, pid_dt, state, demands);
+        _yawRatePid.run(pid_dt, resetPids, state, demands);
 
-        _altitudePid.run(true, pid_dt, state, demands);
-
-        _yawRatePid.run(pid_dt, false, state, demands);
-
+        // Add hover level to thrust
         demands.thrust += MOTOR_HOVER;
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};
-
         float motors[4] = {};
-
         mixer.run(demands, motors);
 
-        // Run dynamics in inner loop
+        // Run dynamics in inner loop to update state with motors
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
-
             dynamics.update(motors, &mixer);
         }
     }
 
+    // Get current state from dynamics
     const auto state = dynamics.getState();
 
-    // Negate psi for nose-right positive
-    const hf::axis3_t euler = {state.phi, state.theta, -state.psi};
+    // Convert Euler angles to radians, negating psi for nose-right positive
+    const hf::axis3_t euler = {
+        hf::Utils::DEG2RAD * state.phi, 
+        hf::Utils::DEG2RAD * state.theta,
+        -hf::Utils::DEG2RAD * state.psi};
 
-    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n",
-          euler.x, euler.y, euler.z);
-
+    // Turn Euler angles into quaternion
     hf::axis4_t quat = {};
-
     hf::Utils::euler2quat(euler, quat);
-
-    printf("qw=%+3.3f  qw=%+3.3f  qw=%+3.3f  qw=%+3.3f\n\n",
-          quat.w, quat.x, quat.y, quat.z);  
-
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
 
+    // Set robot posed based on state
     dBodySetPosition(_robotBody, 0, 0, state.z);
-
     dBodySetQuaternion(_robotBody, q);
-
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 

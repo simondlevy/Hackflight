@@ -141,6 +141,13 @@ namespace hf {
                 return true;
             }
 
+            bool isSpringy()
+            {
+                return haveJoystick() == JOYSTICK_RECOGNIZED ?
+                    getJoystickInfo().springy :
+                    true; // keyboard
+            }
+
             void close()
             {
                 wb_robot_cleanup();
