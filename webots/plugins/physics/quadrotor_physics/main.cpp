@@ -22,6 +22,7 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <pids/altitude.hpp>
+#include <mixers/bfquadx.hpp>
 
 #include "dynamics.hpp"
 
@@ -105,19 +106,29 @@ DLLEXPORT void webots_physics_step()
     // Run control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP * PID_FREQ / 1000; ++j) {
 
+        // Get vehicle state
         const auto state = dynamics.getState();
 
+        // Start with open-loop demands
         hf::demands_t demands = {
             open_loop_demands.thrust,
             0,
             0,
-            0 };
+            open_loop_demands.yaw
+        };
+
+        // Run PID controllers to get final demands
 
         _altitudePid.run(true, 1./PID_FREQ, state, demands);
 
-        const auto thrust = demands.thrust + MOTOR_HOVER;
+        demands.thrust += MOTOR_HOVER;
 
-        const double motors[4] = { thrust, thrust, thrust, thrust };
+        // Run mixer to get motors spins from demands
+        hf::BfQuadXMixer mixer = {};
+
+        float motors[4] = {};
+
+        mixer.run(demands, motors);
 
         // Run dynamics in inner loop
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {

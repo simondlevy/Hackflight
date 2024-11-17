@@ -94,7 +94,7 @@ namespace hf {
              * @param omegas motor spins in radians per second
              * @param dt deltaT in seconds
              */
-            void update(const double * omegas) 
+            void update(const float * omegas) 
             {
                 // Implement Equation 6 -------------------------------------------
 
