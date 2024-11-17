@@ -47,7 +47,43 @@ namespace hf {
                         0.5f - q.y*q.y - q.z*q.z);
             }
 
-            static float fmax(const float val, const float maxval)
+            // https://en.wikipedia.org/wiki/
+            //  Conversion_between_quaternions_and_Euler_angles
+            static void euler2quat(const axis3_t & a, axis4_t & q)
+            {
+                // Abbreviations for the various angular functions
+
+                double cr = cos(a.x * 0.5);
+                double sr = sin(a.x * 0.5);
+                double cp = cos(a.y * 0.5);
+                double sp = sin(a.y * 0.5);
+                double cy = cos(a.z * 0.5);
+                double sy = sin(a.z * 0.5);
+
+                q.w = cr * cp * cy + sr * sp * sy;
+                q.x = sr * cp * cy - cr * sp * sy;
+                q.y = cr * sp * cy + sr * cp * sy;
+                q.z = cr * cp * sy - sr * sp * cy;
+            }
+
+            // https://en.wikipedia.org/wiki/Rotation_matrix
+            static void angles2rotation(const axis3_t & a, float r[3][3]) 
+            {
+                const auto alpha = a.z;
+                const auto beta = a.y;
+                const auto gamma = a.x;
+
+                r[0][0] = cos(beta) * cos(gamma);
+                r[0][1] = sin(alpha) * sin(beta) * cos(gamma) - cos(alpha) * sin(gamma);
+                r[0][2] = cos(alpha) * sin(beta) + sin(alpha) * sin(gamma);
+                r[1][0] = cos(beta) * sin(gamma);
+                r[1][1] = sin(alpha) * sin(beta) * sin(gamma) + cos(alpha) * cos(gamma);
+                r[1][2] = cos(alpha) * sin(beta) - sin(alpha) * cos(gamma);
+                r[2][0] = -sin(beta);
+                r[2][1] = sin(alpha) * cos(beta);
+                r[2][2] = cos(alpha) * cos(beta);
+            }
+             static float fmax(const float val, const float maxval)
             {
                 return val > maxval ? maxval : val;
             }
@@ -89,23 +125,6 @@ namespace hf {
                 return fabs(val) < band;
             }
 
-            // https://en.wikipedia.org/wiki/Rotation_matrix
-            static void angles2rotation(const axis3_t & a, float r[3][3]) 
-            {
-                const auto alpha = a.z;
-                const auto beta = a.y;
-                const auto gamma = a.x;
-
-                r[0][0] = cos(beta) * cos(gamma);
-                r[0][1] = sin(alpha) * sin(beta) * cos(gamma) - cos(alpha) * sin(gamma);
-                r[0][2] = cos(alpha) * sin(beta) + sin(alpha) * sin(gamma);
-                r[1][0] = cos(beta) * sin(gamma);
-                r[1][1] = sin(alpha) * sin(beta) * sin(gamma) + cos(alpha) * cos(gamma);
-                r[1][2] = cos(alpha) * sin(beta) - sin(alpha) * cos(gamma);
-                r[2][0] = -sin(beta);
-                r[2][1] = sin(alpha) * cos(beta);
-                r[2][2] = cos(alpha) * cos(beta);
-            }
-    };
+   };
 
 }

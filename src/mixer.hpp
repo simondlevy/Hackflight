@@ -28,11 +28,7 @@ namespace hf {
 
             virtual void run(const demands_t & demands, float * motors) = 0;
 
-            virtual float roll(const float * motors) = 0;
-
-            virtual float pitch(const float * motors) = 0;
-
-            virtual float yaw(const float * motors) = 0;
+            virtual int8_t yaw(const uint8_t index) = 0;
      };
 
 }

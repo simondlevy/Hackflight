@@ -94,10 +94,12 @@ namespace hf {
              * @param omegas motor spins in radians per second
              * @param dt deltaT in seconds
              */
-            void update(const float * omegas) 
+            void update(const float * omegas, Mixer * mixer) 
             {
-                // Implement Equation 6 -------------------------------------------
 
+                (void)mixer;
+
+                // Implement Equation 6 ---------------------------------------
                 // Radians per second of rotors, and squared radians per second
                 double omegas2[MAX_ROTORS] = {};
 
@@ -112,8 +114,13 @@ namespace hf {
 
                     // Newton's Third Law (action/reaction) tells us that yaw is
                     // opposite to net rotor spin
-                    //u4 += _vparams.d * omegas2[i] * -getRotorDirection(i);
-                    //omega += omegas[i] * -getRotorDirection(i);
+                    u4 += _vparams.d * omegas2[i] * mixer->yaw(i);
+                }
+
+                static uint32_t count;
+                if (count++ % 100 == 0) {
+                    printf("%+3.3f %+3.3f %+3.3f %+3.3f => u4: %+3.3f\n", 
+                            omegas2[0], omegas2[1], omegas2[2], omegas2[3], u4);
                 }
 
                 // Compute roll, pitch, yaw forces (different method for
@@ -121,7 +128,7 @@ namespace hf {
                 double u2 = 0, u3 = 0;
                 //computeRollAndPitch(omegas, omegas2, u2, u3);
 
-                // ----------------------------------------------------------------
+                // ------------------------------------------------------------
 
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame
@@ -250,8 +257,9 @@ namespace hf {
             uint8_t _rotorCount = 4;
 
             /**
-             * Implements Equation 12 computing temporal first derivative of _state.
-             * Should fill _dxdx[0..11] with appropriate values.
+             * Implements Equation 12 computing temporal first derivative of
+             * state.  Should fill _dxdx[0..11] with appropriate values.
+             *
              * @param accelNED acceleration in NED inertial frame
              * @param netz accelNED[2] with gravitational constant added in
              * @param omega net torque from rotors
@@ -259,7 +267,8 @@ namespace hf {
              * @param u3 pitch force
              * @param u4 yaw force
              */
-            void computeStateDerivative(double accelNED[3],
+            void computeStateDerivative(
+                    double accelNED[3],
                     double netz,
                     double omega,
                     double u2,
@@ -274,6 +283,7 @@ namespace hf {
                 double Iy = _vparams.Iy;
                 double Iz = _vparams.Iz;
                 double Jr = _vparams.Jr;
+
 
                 // x'
                 state_deriv.x = _state.dx;
@@ -313,7 +323,6 @@ namespace hf {
                 // psi''
                 state_deriv.dpsi = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz;
             }
-
 
     }; // class Dynamics
 

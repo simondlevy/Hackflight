@@ -46,20 +46,14 @@ namespace hf {
                 motors[3] = t + r - p  - y;
             }
 
-            float roll(const float * motors)
+            virtual int8_t yaw(const uint8_t index) override
             {
-                return (motors[2] + motors[3]) - (motors[0] + motors[1]);
+                static constexpr int8_t y[4] = {-1, +1, +1, -1}; 
+
+                return y[index];
             }
 
-            float pitch(const float * motors)
-            {
-                return (motors[0] + motors[1]) - (motors[2] + motors[3]);
-            }
-
-            float yaw(const float * motors)
-            {
-                return (motors[1] + motors[2]) - (motors[0] + motors[3]);
-            }
+           
     };
 
 }

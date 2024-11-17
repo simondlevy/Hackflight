@@ -24,6 +24,7 @@
 #include <pids/altitude.hpp>
 #include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
+#include <utils.hpp>
 
 #include "dynamics.hpp"
 
@@ -48,7 +49,7 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     // Estimated
     1.8e-5, // force constant B [F=b*w^2]
-    4.0e0, // torque constant D [T=d*w^2]
+    4.0e3, // torque constant D [T=d*w^2]
 
     // These agree with values in .proto file
     0.050,  // mass M [kg]
@@ -134,14 +135,31 @@ DLLEXPORT void webots_physics_step()
 
         mixer.run(demands, motors);
 
+        //printf("m1=%3.3f  m2=%3.3f  m3=%3.3f  m4=%3.3f\n",
+        //        motors[0], motors[1], motors[2], motors[3]);
+
         // Run dynamics in inner loop
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
 
-            dynamics.update(motors);
+            dynamics.update(motors, &mixer);
         }
     }
 
     const auto state = dynamics.getState();
+
+    const hf::axis3_t euler = {state.phi, state.theta, state.psi};
+
+    //printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n",
+    //      euler.x, euler.y, euler.z);
+
+    hf::axis4_t quat = {};
+
+    hf::Utils::euler2quat(euler, quat);
+
+    //printf("qw=%+3.3f  qw=%+3.3f  qw=%+3.3f  qw=%+3.3f\n",
+    //      quat.w, quat.x, quat.y, quat.z);  
+
+    //const dQuaternion q = {q.w, q.x, q.y, q.z};
 
     dBodySetPosition(_robotBody, 0, 0, state.z);
 
