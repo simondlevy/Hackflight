@@ -112,7 +112,7 @@ DLLEXPORT void webots_physics_step()
     for (uint32_t j=0; j< ROBOT_TIMESTEP_MSEC * PID_FREQ / 1000; ++j) {
 
         // Get vehicle state
-        const auto state = dynamics.getState();
+        auto state = dynamics.getState();
 
         // Start with open-loop demands
         hf::demands_t demands = {
@@ -130,7 +130,7 @@ DLLEXPORT void webots_physics_step()
 
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
 
-        hf::PositionPid::run(state, demands);
+        //hf::PositionPid::run(state, demands);
 
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 
@@ -140,8 +140,8 @@ DLLEXPORT void webots_physics_step()
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
         //demands.roll = 0;
-        demands.pitch = 0;
-        demands.yaw = 0;
+        //demands.pitch = 0;
+        //demands.yaw = 0;
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};
