@@ -96,28 +96,25 @@ namespace hf {
              */
             void update(const float * omegas, Mixer * mixer) 
             {
-                // Implement Equation 6 ---------------------------------------
-                // Radians per second of rotors, and squared radians per second
-                double omegas2[MAX_ROTORS] = {};
+                // Equation 6 ---------------------------------------
 
                 double u1 = 0, u2 = 0, u3 = 0, u4 = 0, omega = 0;
+
                 for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
                     // Thrust is squared rad/sec scaled by air density
-                    omegas2[i] = _rho * omegas[i] * omegas[i]; 
+                    const auto omega2 = _rho * omegas[i] * omegas[i]; 
 
                     // Multiply by thrust coefficient
-                    u1 += _vparams.b * omegas2[i];                  
+                    u1 += _vparams.b * omega2;                  
 
-                    u2 += _vparams.l * _vparams.b * omegas2[i] *
-                        mixer->roll(i);
+                    u2 += _vparams.l * _vparams.b * omega2 * mixer->roll(i);
 
-                    u3 += _vparams.l * _vparams.b * omegas2[i] *
-                        mixer->pitch(i);
+                    u3 += _vparams.l * _vparams.b * omega2 * mixer->pitch(i);
 
                     // Newton's Third Law (action/reaction) tells us that yaw
                     // is opposite to net rotor spin
-                    u4 -= _vparams.d * omegas2[i] * mixer->yaw(i);
+                    u4 -= _vparams.d * omega2 * mixer->yaw(i);
                 }
 
                 // ------------------------------------------------------------
@@ -190,9 +187,6 @@ namespace hf {
             }
 
         private:
-
-            // arbitrary; avoids dynamic allocation
-            static const uint8_t MAX_ROTORS = 20; 
 
             double _dt;
 
