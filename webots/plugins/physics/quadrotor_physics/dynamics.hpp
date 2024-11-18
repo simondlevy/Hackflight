@@ -57,11 +57,13 @@ namespace hf {
              */
             typedef struct {
 
-                double b;  // thrust coefficient [F=b*w^2]
+                // These can be measured directly
+                double m;  // mass [kg]
                 double l;  // arm length [m]
 
+                // These should be estimated to get realistic behavior
+                double b;  // thrust coefficient [F=b*w^2]
                 double d;  // drag coefficient [T=d*w^2]
-                double m;  // mass [kg]
                 double Ix; // [kg*m^2] 
                 double Iy; // [kg*m^2] 
                 double Iz; // [kg*m^2] 

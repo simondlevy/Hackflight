@@ -56,13 +56,13 @@ static hf::YawRatePid _yawRatePid;
 
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
-    1.8e-5, // force constant B [F=b*w^2]
-    1.0e1, // arm length L [m]
-
-    3.5e-2, // torque constant D [T=d*w^2]
     0.050,  // mass M [kg]
-    2.0e-2,  // Ix [kg*m^2]
-    2.0e-2,  // Iy [kg*m^2]
+    1.0e-2, // arm length L [m]
+
+    1.8e-5, // force constant B [F=b*w^2]
+    3.5e-2, // torque constant D [T=d*w^2]
+    2.0e-5,  // Ix [kg*m^2]
+    2.0e-5,  // Iy [kg*m^2]
     3.0e0,  // Iz [kg*m^2]
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
