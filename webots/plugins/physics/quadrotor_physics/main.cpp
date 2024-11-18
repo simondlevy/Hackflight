@@ -58,12 +58,10 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     1.0e-1, // mass [kg]
     5.0e-2, // arm length L [m]
+
     3.6e-5, // force coefficient B [F=b*w^2]
-    3.5e-2, // drag coefficient D [T=d*w^2]
-
-    2.0e0,                // yaw
-    //2.0e-5, // I [kg*m^2]   // pitch, roll
-
+    3.5e-7, // drag coefficient D [T=d*w^2]
+    2.0e-5, // I [kg*m^2]   // pitch, roll
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
 
@@ -141,9 +139,9 @@ DLLEXPORT void webots_physics_step()
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
-        demands.roll = 0;
+        //demands.roll = 0;
         demands.pitch = 0;
-        // demands.yaw = 0;
+        demands.yaw = 0;
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};

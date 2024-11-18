@@ -302,13 +302,13 @@ namespace hf {
                 state_deriv.phi = phidot;
 
                 // phi''
-                state_deriv.dphi =  - Jr / I * thedot * omega + u2 / I;
+                state_deriv.dphi =  (-Jr * thedot * omega  + u2) / I;
 
                 // theta'
                 state_deriv.theta = thedot;
 
                 // theta''
-                state_deriv.dtheta = -(Jr / I * phidot * omega + u3 / I);
+                state_deriv.dtheta = (-Jr * phidot * omega + u3) / I;
 
                 // psi'
                 state_deriv.psi = psidot;
