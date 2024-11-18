@@ -170,8 +170,10 @@ DLLEXPORT void webots_physics_step()
     hf::Utils::euler2quat(euler, quat);
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
 
-    // Set robot posed based on state
-    dBodySetPosition(_robotBody, state.x, state.y, state.z);
+    printf("y=%+3.3f  dy=%+3.3f\n", state.y, state.dy);
+
+    // Set robot posed based on state, negating for rightward negative
+    dBodySetPosition(_robotBody, state.x, -state.y, state.z);
     dBodySetQuaternion(_robotBody, q);
 }
 

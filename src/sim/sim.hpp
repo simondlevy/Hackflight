@@ -154,8 +154,6 @@ namespace hf {
                 state.dx = dxy_true.x;
                 state.dy = dxy_true.y;
 
-                printf("dy=%+3.3f\n", state.dy);
-
                 state.phi = euler.x;
                 state.theta = euler.y;
                 state.psi = euler.z;

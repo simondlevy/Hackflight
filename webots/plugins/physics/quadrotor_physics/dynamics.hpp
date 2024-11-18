@@ -176,7 +176,7 @@ namespace hf {
                 return state_t {
                     _state.x,
                         _state.dx,
-                        _state.y,
+                        -_state.y,
                         -_state.dy, // negate for rightward positive
                         _state.z,
                         _state.dz,
