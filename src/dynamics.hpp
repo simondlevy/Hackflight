@@ -101,7 +101,7 @@ namespace hf {
                 double omegas2[MAX_ROTORS] = {};
 
                 double u1 = 0, u2 = 0, u3 = 0, u4 = 0, omega = 0;
-                for (unsigned int i = 0; i < _rotorCount; ++i) {
+                for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
                     // Thrust is squared rad/sec scaled by air density
                     omegas2[i] = _rho * omegas[i] * omegas[i]; 
@@ -250,9 +250,6 @@ namespace hf {
                     inertial[i] = bodyZ * R[i];
                 }
             }
-
-            // quad, hexa, octo, etc.
-            uint8_t _rotorCount = 4;
 
             /**
              * Implements Equation 12 computing temporal first derivative of

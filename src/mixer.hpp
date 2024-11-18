@@ -31,6 +31,8 @@ namespace hf {
               */
             virtual void run(const demands_t & demands, float * motors) = 0;
 
+            virtual uint8_t rotorCount() = 0;
+
             /**
               * Returns positive (clockwise) or negative (counter-clockwise)
               * spin on motor for simulation dynamics

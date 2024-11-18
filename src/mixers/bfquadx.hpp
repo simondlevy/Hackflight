@@ -46,6 +46,11 @@ namespace hf {
                 motors[3] = t + r - p  - y;
             }
 
+            virtual uint8_t rotorCount() override
+            {
+                return 4;
+            }
+
             virtual int8_t roll(const uint8_t index) override
             {
                 static constexpr int8_t r[4] = {-1, -1, +1, +1};
