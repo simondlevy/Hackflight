@@ -56,16 +56,23 @@ static hf::YawRatePid _yawRatePid;
 
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
-    0.050,  // mass M [kg]
-    1.0e-2, // arm length L [m]
+    1.0e-1, // mass [kg]
+    5.0e-2, // arm length L [m]
+    3.6e-5, // force coefficient B [F=b*w^2]
+    3.5e-2, // drag coefficient D [T=d*w^2]
 
-    1.8e-5, // force constant B [F=b*w^2]
-    3.5e-2, // torque constant D [T=d*w^2]
-    2.0e-5,  // Ix [kg*m^2]
-    2.0e-5,  // Iy [kg*m^2]
-    3.0e0,  // Iz [kg*m^2]
+    //2.0e0,                     // yaw
+    2.0e-5, // Ix [kg*m^2]   // pitch, roll
+
+    // 2.0e0,                    // yaw
+    2.0e-5, // Iy [kg*m^2]  // pitch, roll
+
+    //2.0e0,                    // yaw
+    2.0e-5, // Iz [kg*m^2]  // pitch, roll
+
     3.8e-3  // Jr prop inertial [kg*m^2]
 };
+
 
 static hf::demands_t getOpenLoopDemands()
 {
@@ -140,8 +147,9 @@ DLLEXPORT void webots_physics_step()
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
+        //demands.roll = 0;
         demands.pitch = 0;
-        demands.yaw = 0;
+        //demands.yaw = 0;
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};
