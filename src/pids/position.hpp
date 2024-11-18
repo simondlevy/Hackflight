@@ -34,10 +34,12 @@ namespace hf {
 
             static void run(const state_t & state, demands_t & demands)
             {
-                printf("roll=%+3.3f  dy=%+3.3f\n", demands.roll, state.dy);
+                //printf("dy=%+3.3f  | roll=%+3.3f => ", state.dy, demands.roll);
 
                 demands.roll = KP * (demands.roll - state.dy);
                 demands.pitch = KP * (demands.pitch - state.dx);
+
+                //printf("%+3.3f => ", demands.roll);
             }
 
     };

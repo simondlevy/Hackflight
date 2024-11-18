@@ -30,7 +30,6 @@ namespace hf {
             static constexpr float KI = 3;
             static constexpr float ILIMIT = 20;
 
-
         public:
 
             void run(
@@ -41,6 +40,8 @@ namespace hf {
             {
                 runAxis(dt, reset, demands.roll,
                         state.phi, _roll_integral);
+
+                //printf("%+3.3f => ", demands.roll);
 
                 runAxis(dt, reset, demands.pitch,
                         state.theta, _pitch_integral);

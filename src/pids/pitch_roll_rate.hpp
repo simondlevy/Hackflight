@@ -46,6 +46,8 @@ namespace hf {
                 runAxis(dt, reset, demands.roll, state.dphi, _roll_integral,
                         _roll_error, postScale);
 
+                //printf("%+3.3f\n", demands.roll);
+
                 runAxis(dt, reset, demands.pitch, state.dtheta, _pitch_integral,
                         _pitch_error, postScale); 
             }

@@ -82,7 +82,7 @@ namespace hf {
             static constexpr float ILIMIT = 5000;
 
             // For springy-throttle in gamepads / keyboard
-            static constexpr float INITIAL_ALTITUDE_TARGET = 0.3;
+            static constexpr float INITIAL_ALTITUDE_TARGET = 0.2;
 
             // For tradtional (non-springy) throttle in R/C transmitter
             static constexpr float THROTTLE_DEADBAND = 0.5;

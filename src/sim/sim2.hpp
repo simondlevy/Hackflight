@@ -133,7 +133,6 @@ namespace hf {
                 else { 
 
                     demands = getDemandsFromKeyboard();
-
                 }
 
                 wb_emitter_send(_emitter, &demands, sizeof(demands_t));
@@ -339,5 +338,4 @@ namespace hf {
             }
 
     };
-
 }

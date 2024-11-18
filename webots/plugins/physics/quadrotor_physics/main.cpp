@@ -115,6 +115,8 @@ DLLEXPORT void webots_physics_step()
         // Get vehicle state
         const auto state = dynamics.getState();
 
+        dWebotsConsolePrintf("new: %+3.3f\n", state.dy);
+
         // Start with open-loop demands
         hf::demands_t demands = {
             open_loop_demands.thrust,
@@ -145,7 +147,7 @@ DLLEXPORT void webots_physics_step()
         float motors[4] = {};
         mixer.run(demands, motors);
 
-        //printf("m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f | ",
+        //printf("m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n\n",
         //       motors[0], motors[1], motors[2], motors[3]);
 
         // Run dynamics in inner loop to update state with motors
