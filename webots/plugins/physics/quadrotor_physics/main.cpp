@@ -59,7 +59,7 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
     1.8e-5, // force constant B [F=b*w^2]
     3.1e-2, // arm length L [m]
 
-    2.0e0 , // torque constant D [T=d*w^2]
+    3.5e-2, // torque constant D [T=d*w^2]
     0.050,  // mass M [kg]
     2.0e0,  // Ix [kg*m^2]
     2.0e0,  // Iy [kg*m^2]
@@ -115,13 +115,11 @@ DLLEXPORT void webots_physics_step()
         // Get vehicle state
         const auto state = dynamics.getState();
 
-        dWebotsConsolePrintf("new: %+3.3f\n", state.dy);
-
         // Start with open-loop demands
         hf::demands_t demands = {
             open_loop_demands.thrust,
             open_loop_demands.roll,
-            0,
+            open_loop_demands.pitch,
             open_loop_demands.yaw
         };
 
@@ -141,6 +139,9 @@ DLLEXPORT void webots_physics_step()
                 PITCH_ROLL_POST_SCALE);
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
+
+        demands.roll = 0;
+        demands.pitch = 0;
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};
@@ -169,8 +170,6 @@ DLLEXPORT void webots_physics_step()
     hf::axis4_t quat = {};
     hf::Utils::euler2quat(euler, quat);
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-
-    printf("y=%+3.3f  dy=%+3.3f\n", state.y, state.dy);
 
     // Set robot posed based on state, negating for rightward negative
     dBodySetPosition(_robotBody, state.x, -state.y, state.z);

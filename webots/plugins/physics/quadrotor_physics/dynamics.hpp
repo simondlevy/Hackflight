@@ -180,12 +180,12 @@ namespace hf {
                         -_state.dy, // negate for rightward positive
                         _state.z,
                         _state.dz,
-                        _state.phi,
-                        _state.dphi,
-                        _state.theta,
-                        _state.dtheta,
-                        _state.psi,
-                        _state.dpsi
+                        Utils::RAD2DEG *_state.phi,
+                        Utils::RAD2DEG *_state.dphi,
+                        Utils::RAD2DEG *_state.theta,
+                        Utils::RAD2DEG *_state.dtheta,
+                        Utils::RAD2DEG *_state.psi,
+                        Utils::RAD2DEG *_state.dpsi
                 };
             }
 
