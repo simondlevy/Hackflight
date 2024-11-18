@@ -64,10 +64,8 @@ namespace hf {
                 // These should be estimated to get realistic behavior
                 double b;  // thrust coefficient [F=b*w^2]
                 double d;  // drag coefficient [T=d*w^2]
-                double Ix; // [kg*m^2] 
-                double Iy; // [kg*m^2] 
-                double Iz; // [kg*m^2] 
-                double Jr; // rotor inertial [kg*m^2] 
+                double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
+                double Jr; // rotor inertia [kg*m^2] 
 
             } vehicle_params_t; 
 
@@ -279,9 +277,7 @@ namespace hf {
                 double thedot = _state.dtheta;
                 double psidot = _state.dpsi;
 
-                double Ix = _vparams.Ix;
-                double Iy = _vparams.Iy;
-                double Iz = _vparams.Iz;
+                double I = _vparams.I;
                 double Jr = _vparams.Jr;
 
                 // x'
@@ -306,21 +302,19 @@ namespace hf {
                 state_deriv.phi = phidot;
 
                 // phi''
-                state_deriv.dphi = psidot * thedot * (Iy - Iz) / Ix - Jr / 
-                    Ix * thedot * omega + u2 / Ix;
+                state_deriv.dphi =  - Jr / I * thedot * omega + u2 / I;
 
                 // theta'
                 state_deriv.theta = thedot;
 
                 // theta''
-                state_deriv.dtheta = -(psidot * phidot * (Iz - Ix) / Iy + Jr / 
-                        Iy * phidot * omega + u3 / Iy);
+                state_deriv.dtheta = -(Jr / I * phidot * omega + u3 / I);
 
                 // psi'
                 state_deriv.psi = psidot;
 
                 // psi''
-                state_deriv.dpsi = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz;
+                state_deriv.dpsi = u4 / I;
             }
 
     }; // class Dynamics
