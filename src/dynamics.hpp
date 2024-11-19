@@ -81,9 +81,6 @@ namespace hf {
                 _rho = air_density;
                 _g = gravity;
 
-                // Always start at location (0,0,0)
-                memset(&_state, 0, sizeof(state_t));
-
                 _airborne = false;
             }
 
@@ -119,7 +116,7 @@ namespace hf {
 
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame
-                double euler[3] = {_state.phi, _state.theta, _state.psi};
+                double euler[3] = {_x7, _x9, _x11};
                 double accelENU[3] = {};
                 bodyZToInertial(u1 / _vparams.m, euler, accelENU);
 
@@ -134,78 +131,28 @@ namespace hf {
                 // Once airborne, we can update dynamics
                 if (_airborne) {
 
-                    const auto phidot = _state.dphi;
-                    const auto thedot = _state.dtheta;
-                    const auto psidot = _state.dpsi;
-
                     const auto I = _vparams.I;
                     const auto l = _vparams.l;
 
                     // Equation 12 --------------------------------------------
 
-                    // x'
-                    state_deriv.x = _state.dx;
                     const auto dx1 = _x2;
-
-                    // x''
-                    state_deriv.dx = accelENU[0];
                     const auto dx2 = accelENU[0];
-
-                    // y'
-                    state_deriv.y = _state.dy;
                     const auto dx3 = _x4;
-
-                    // y''
-                    state_deriv.dy = accelENU[1];
                     const auto dx4 = accelENU[1];
-
-                    // z'
-                    state_deriv.z = _state.dz;
                     const auto dx5 = _x6;
-
-                    // z''
-                    state_deriv.dz = netz;
                     const auto dx6 = netz;
-
-                    // phi'
-                    state_deriv.phi = phidot;
                     const auto dx7 = _x8;
-
-                    // phi''
-                    state_deriv.dphi =  l / I * u2;
                     const auto dx8 = l / I * u2;
-
-                    // theta'
-                    state_deriv.theta = thedot;
                     const auto dx9 = _x10;
-
-                    // theta''
-                    state_deriv.dtheta = l / I * u3;
                     const auto dx10 = l / I * u3;
-
-                    // psi'
-                    state_deriv.psi = psidot;
                     const auto dx11 = _x12;
-
-                    // psi''
-                    state_deriv.dpsi = l / I * u4;
                     const auto dx12 = l / I * u4;
+
+                    // -------------------------------------------------------
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
-                    _state.x += _dt * state_deriv.x;
-                    _state.dx += _dt * state_deriv.dx;
-                    _state.y += _dt * state_deriv.y;
-                    _state.dy += _dt * state_deriv.dy;
-                    _state.z += _dt * state_deriv.z;
-                    _state.dz += _dt * state_deriv.dz;
-                    _state.phi += _dt * state_deriv.phi;
-                    _state.dphi += _dt * state_deriv.dphi;
-                    _state.theta += _dt * state_deriv.theta;
-                    _state.dtheta += _dt * state_deriv.dtheta;
-                    _state.psi += _dt * state_deriv.psi;
-                    _state.dpsi += _dt * state_deriv.dpsi;
-
                     _x1 += _dt * dx1;
                     _x2 += _dt * dx2;
                     _x3 += _dt * dx3;
@@ -238,22 +185,6 @@ namespace hf {
                         Utils::RAD2DEG *(float)_x11,
                         Utils::RAD2DEG *(float)_x12
                 };
-
-                /*
-                 return state_t {
-                    _state.x,
-                        _state.dx,
-                        -_state.y,
-                        -_state.dy, // negate for rightward positive
-                        _state.z,
-                        _state.dz,
-                        Utils::RAD2DEG *_state.phi,
-                        Utils::RAD2DEG *_state.dphi,
-                        Utils::RAD2DEG *_state.theta,
-                        Utils::RAD2DEG *_state.dtheta,
-                        Utils::RAD2DEG *_state.psi,
-                        Utils::RAD2DEG *_state.dpsi
-                };*/
             }
 
         private:
@@ -262,25 +193,21 @@ namespace hf {
 
             vehicle_params_t _vparams;
 
-            state_t _state;
-
-            double _x1;
-            double _x2;
-            double _x3;
-            double _x4;
-            double _x5;
-            double _x6;
-            double _x7;
-            double _x8;
-            double _x9;
-            double _x10;
-            double _x11;
-            double _x12;
+            double _x1;  // x
+            double _x2;  // dx/dt
+            double _x3;  // y
+            double _x4;  // dy/dt
+            double _x5;  // z
+            double _x6;  // dz/dt
+            double _x7;  // phi
+            double _x8;  // dphi/dt
+            double _x9;  // theta
+            double _x10; // dtheta/dt
+            double _x11; // psi
+            double _x12; // dpsi/dt
 
             double _g; // gravitational constant
             double _rho; // air density
-
-            state_t state_deriv;
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
