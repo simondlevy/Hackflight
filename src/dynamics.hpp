@@ -133,20 +133,34 @@ namespace hf {
 
                     const auto I = _vparams.I;
                     const auto l = _vparams.l;
+                    const auto m = _vparams.m;
 
                     // Equation 12 --------------------------------------------
 
                     const auto dx1 = _x2;
-                    const auto dx2 = accelENU[0];
+
+                    const auto dx2 =
+                        (cos(_x7)*sin(_x9)*cos(_x11) + sin(_x7)*sin(_x11)) * u1 / m;
+
                     const auto dx3 = _x4;
-                    const auto dx4 = accelENU[1];
+
+                    const auto dx4 = 
+                        (cos(_x7)*sin(_x9)*sin(_x11) - sin(_x7)*cos(_x11)) * u1 / m;
+
                     const auto dx5 = _x6;
-                    const auto dx6 = netz;
+
+                    const auto dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
+
                     const auto dx7 = _x8;
+
                     const auto dx8 = l / I * u2;
+                    
                     const auto dx9 = _x10;
+
                     const auto dx10 = l / I * u3;
+
                     const auto dx11 = _x12;
+
                     const auto dx12 = l / I * u4;
 
                     // -------------------------------------------------------
@@ -193,6 +207,7 @@ namespace hf {
 
             vehicle_params_t _vparams;
 
+            // Vehicle state (Equation 11)
             double _x1;  // x
             double _x2;  // dx/dt
             double _x3;  // y
