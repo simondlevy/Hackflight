@@ -158,12 +158,6 @@ namespace hf {
                     _state.dtheta += _dt * state_deriv.dtheta;
                     _state.psi += _dt * state_deriv.psi;
                     _state.dpsi += _dt * state_deriv.dpsi;
-
-                    // Once airborne, inertial-frame acceleration is same as ENU
-                    // acceleration
-                    _inertialAccel[0] = accelENU[0];
-                    _inertialAccel[1] = accelENU[1];
-                    _inertialAccel[2] = accelENU[2];
                 }
 
             } // update
@@ -201,9 +195,6 @@ namespace hf {
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
-
-            // Inertial-frame acceleration
-            double _inertialAccel[3] = {};
 
             // y = Ax + b helper for frame-of-reference conversion methods
             static void dot(double A[3][3], double x[3], double y[3])
