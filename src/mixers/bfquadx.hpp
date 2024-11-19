@@ -46,6 +46,8 @@ namespace hf {
                 motors[3] = t + r - p  - y;
             }
 
+            // Methods below are used by simulator ---------------------------
+
             virtual uint8_t rotorCount() override
             {
                 return 4;

@@ -110,9 +110,6 @@ DLLEXPORT void webots_physics_step()
     // Run control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP_MSEC * PID_FREQ / 1000; ++j) {
 
-        // Get vehicle state
-        auto state = dynamics.getState();
-
         // Start with open-loop demands
         hf::demands_t demands = {
             open_loop_demands.thrust,
@@ -120,6 +117,9 @@ DLLEXPORT void webots_physics_step()
             open_loop_demands.pitch,
             open_loop_demands.yaw
         };
+
+        // Get vehicle state
+        const auto state = dynamics.getState();
 
         // Run PID controllers to get final demands
 
@@ -129,7 +129,10 @@ DLLEXPORT void webots_physics_step()
 
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
 
-        hf::PositionPid::run(state, demands);
+        //hf::PositionPid::run(state, demands);
+
+        demands.roll *= 10;
+        demands.pitch *= 10;
 
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 
@@ -152,23 +155,18 @@ DLLEXPORT void webots_physics_step()
         }
     }
 
-    // Get current state from dynamics
-    const auto state = dynamics.getState();
+    // Get current pose from dynamics
+    const auto pose = dynamics.getPose();
 
-    // Convert Euler angles to radians, negating psi for nose-right positive
-    const hf::axis3_t euler = {
-        hf::Utils::DEG2RAD * state.phi, 
-        hf::Utils::DEG2RAD * state.theta,
-        -hf::Utils::DEG2RAD * state.psi};
-
-    // Turn Euler angles into quaternion
+    // Turn Euler angles into quaternion, negating psi for nose-right positive 
+    const hf::axis3_t euler = { pose.phi, pose.theta, -pose.psi };
     hf::axis4_t quat = {};
     hf::Utils::euler2quat(euler, quat);
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
     dBodySetQuaternion(_robotBody, q);
 
     // Set robot posed based on state, negating for rightward negative
-    dBodySetPosition(_robotBody, state.x, -state.y, state.z);
+    dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 

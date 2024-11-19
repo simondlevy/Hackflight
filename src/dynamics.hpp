@@ -52,6 +52,17 @@ namespace hf {
 
         public:
 
+            typedef struct {
+
+                float x;
+                float y;
+                float z;
+                float phi;
+                float theta;
+                float psi;
+
+            } pose_t;
+
             /**
              *  Vehicle parameters
              */
@@ -114,9 +125,7 @@ namespace hf {
 
                     u3 += b * omega2 * mixer->pitch(i);
 
-                    // Newton's Third Law (action/reaction) tells us that yaw
-                    // is opposite to net rotor spin
-                    u4 -= d * omega2 * mixer->yaw(i);
+                    u4 += d * omega2 * mixer->yaw(i);
                 }
 
                 // Equation 12 line 6
@@ -135,12 +144,12 @@ namespace hf {
                     const auto dx1 = _x2;
 
                     const auto dx2 =
-                        (cos(_x7)*sin(_x9)*cos(_x11) + sin(_x7)*sin(_x11)) * u1 / m;
+                        (cos(-_x7)*sin(_x9)*cos(_x11) + sin(-_x7)*sin(_x11)) * u1 / m;
 
                     const auto dx3 = _x4;
 
-                    const auto dx4 = 
-                        (cos(_x7)*sin(_x9)*sin(_x11) - sin(_x7)*cos(_x11)) * u1 / m;
+                    const auto dx4 = // negate for rightward positive
+                        -(cos(-_x7)*sin(_x9)*sin(_x11) - sin(-_x7)*cos(_x11)) * u1 / m;
 
                     const auto dx5 = _x6;
 
@@ -154,7 +163,7 @@ namespace hf {
 
                     const auto dx11 = _x12;
 
-                    const auto dx12 = l / I * u4;
+                    const auto dx12 = -l / I * u4; // negate for nose-right positive
 
                     // -------------------------------------------------------
 
@@ -179,19 +188,24 @@ namespace hf {
             state_t getState() 
             {
                 return state_t {
-                    (float)_x1,
-                        (float)_x2,
-                        -(float)_x3,
-                        -(float)_x4, // negate for rightward positive
-                        (float)_x5,
-                        (float)_x6,
-                        Utils::RAD2DEG *(float)_x7,
-                        Utils::RAD2DEG *(float)_x8,
-                        Utils::RAD2DEG *(float)_x9,
-                        Utils::RAD2DEG *(float)_x10,
-                        Utils::RAD2DEG *(float)_x11,
-                        Utils::RAD2DEG *(float)_x12
+                    _x1,
+                        _x2,
+                        _x3,
+                        _x4, 
+                        _x5,
+                        _x6,
+                        Utils::RAD2DEG *_x7,
+                        Utils::RAD2DEG *_x8,
+                        Utils::RAD2DEG *_x9,
+                        Utils::RAD2DEG *_x10,
+                        Utils::RAD2DEG *_x11,
+                        Utils::RAD2DEG *_x12
                 };
+            }
+
+            pose_t getPose()
+            {
+                return pose_t {_x1, -_x3, _x5, _x7, _x9, _x11 };
             }
 
         private:
