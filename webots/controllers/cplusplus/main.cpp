@@ -18,12 +18,13 @@
 
 #include <hackflight.hpp>
 #include <mixers/bfquadx.hpp>
-#include <sim/sim.hpp>
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
+
+#include "../sim.hpp"
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
