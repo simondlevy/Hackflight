@@ -220,46 +220,6 @@ namespace hf {
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
 
-            // y = Ax + b helper for frame-of-reference conversion methods
-            static void dot(double A[3][3], double x[3], double y[3])
-            {
-                for (uint8_t j = 0; j < 3; ++j) {
-                    y[j] = 0;
-                    for (uint8_t k = 0; k < 3; ++k) {
-                        y[j] += A[j][k] * x[k];
-                    }
-                }
-            }
-
-            // bodyToInertial method optimized for body X=Y=0
-            static void bodyZToInertial(
-                    const double bodyZ,
-                    const double rotation[3],
-                    double inertial[3])
-            {
-                double phi = rotation[0];
-                double theta = rotation[1];
-                double psi = rotation[2];
-
-                double cph = cos(phi);
-                double sph = sin(phi);
-                double cth = cos(theta);
-                double sth = sin(theta);
-                double cps = cos(psi);
-                double sps = sin(psi);
-
-                // This is the rightmost column of the body-to-inertial rotation
-                // matrix
-                double R[3] = {
-                    sph * sps + cph * cps * sth,
-                    cph * sps * sth - cps * sph,
-                    cph * cth };
-
-                for (uint8_t i = 0; i < 3; ++i) {
-                    inertial[i] = bodyZ * R[i];
-                }
-            }
-
     }; // class Dynamics
 
 } // namespace hf
