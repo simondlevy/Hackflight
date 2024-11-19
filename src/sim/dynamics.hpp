@@ -139,7 +139,8 @@ namespace hf {
                 // Once airborne, we can update dynamics
                 if (_airborne) {
 
-                    // Equation 12 --------------------------------------------
+                    // Equation 12 : Note negations to support nose-right,
+                    // roll-right positive
 
                     const auto dx1 = _x2;
 
@@ -148,7 +149,7 @@ namespace hf {
 
                     const auto dx3 = _x4;
 
-                    const auto dx4 = // negate for rightward positive
+                    const auto dx4 = 
                         -(cos(-_x7)*sin(_x9)*sin(_x11) - sin(-_x7)*cos(_x11)) * u1 / m;
 
                     const auto dx5 = _x6;
@@ -163,7 +164,7 @@ namespace hf {
 
                     const auto dx11 = _x12;
 
-                    const auto dx12 = -l / I * u4; // negate for nose-right positive
+                    const auto dx12 = -l / I * u4; 
 
                     // -------------------------------------------------------
 
@@ -205,6 +206,7 @@ namespace hf {
 
             pose_t getPose()
             {
+                // Negate y coordinate for rightward positive
                 return pose_t {_x1, -_x3, _x5, _x7, _x9, _x11 };
             }
 

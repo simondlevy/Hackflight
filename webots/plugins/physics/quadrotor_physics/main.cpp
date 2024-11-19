@@ -28,8 +28,7 @@
 #include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
 #include <utils.hpp>
-
-#include "dynamics.hpp"
+#include <sim/dynamics.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
 
