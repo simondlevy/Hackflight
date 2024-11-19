@@ -60,7 +60,7 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
     5.0e-2, // arm length L [m]
 
     3.6e-5, // force coefficient B [F=b*w^2]
-    3.5e-7, // drag coefficient D [T=d*w^2]
+    7.0e-6, // drag coefficient D [T=d*w^2]
     2.0e-5  // I [kg*m^2]   // pitch, roll
 };
 

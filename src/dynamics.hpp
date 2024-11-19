@@ -294,7 +294,7 @@ namespace hf {
                 state_deriv.psi = psidot;
 
                 // psi''
-                state_deriv.dpsi = 1 / I * u4;
+                state_deriv.dpsi = l / I * u4;
             }
 
     }; // class Dynamics
