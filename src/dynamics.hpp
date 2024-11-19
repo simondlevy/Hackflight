@@ -281,19 +281,19 @@ namespace hf {
                 state_deriv.phi = phidot;
 
                 // phi''
-                state_deriv.dphi =  u2 / I;
+                state_deriv.dphi =  1 / I * u2;
 
                 // theta'
                 state_deriv.theta = thedot;
 
                 // theta''
-                state_deriv.dtheta = u3 /  I;
+                state_deriv.dtheta = 1 / I * u3;
 
                 // psi'
                 state_deriv.psi = psidot;
 
                 // psi''
-                state_deriv.dpsi = u4 / I;
+                state_deriv.dpsi = 1 / I * u4;
             }
 
     }; // class Dynamics
