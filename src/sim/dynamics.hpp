@@ -159,6 +159,7 @@ namespace hf {
 
                     // -------------------------------------------------------
 
+
                     // Compute state as first temporal integral of first
                     // temporal derivative
                     _x1 += _dt * dx1;
@@ -192,11 +193,14 @@ namespace hf {
                 return axis3_t { r *_x8, r*_x10, r *_x12 };
             }
 
-            void getGroundTruthVelocities(float & dx, float & dy, float & dz)
+            axis2_t getGroundTruthHorizontalVelocities()
             {
-                dx = 0;
-                dy = 0;
-                dz = _x6;
+                return axis2_t {0, 0};
+            }
+
+            float getGroundTruthVerticalVelocity()
+            {
+                return _x6;
             }
 
              // ---------------------------------------------------------------

@@ -122,11 +122,11 @@ DLLEXPORT void webots_physics_step()
 
         // XXX Cheat on remaining sensors for now
         const auto pose = dynamics.getPose();
-        float dx=0, dy=0, dz=0;
-        dynamics.getGroundTruthVelocities(dx, dy, dz);
+        const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
+        const auto dz = dynamics.getGroundTruthVerticalVelocity();
 
         const auto state = hf::state_t {
-            pose.x, dx, pose.y, dy, pose.z, dz,
+            pose.x, dxdy.x, pose.y, dxdy.y, pose.z, dz,
                 pose.phi, gyro.x, pose.theta, gyro.y, pose.psi, gyro.z
         };
 
@@ -140,8 +140,8 @@ DLLEXPORT void webots_physics_step()
 
         //hf::PositionPid::run(state, demands);
 
-        demands.roll *= 10;
-        demands.pitch *= 10;
+        demands.roll *= 5;
+        demands.pitch *= 5;
 
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 
