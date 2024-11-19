@@ -107,9 +107,9 @@ namespace hf {
                     // Multiply by thrust coefficient
                     u1 += _vparams.b * omega2;                  
 
-                    u2 += _vparams.l * _vparams.b * omega2 * mixer->roll(i);
+                    u2 += _vparams.b * omega2 * mixer->roll(i);
 
-                    u3 += _vparams.l * _vparams.b * omega2 * mixer->pitch(i);
+                    u3 += _vparams.b * omega2 * mixer->pitch(i);
 
                     // Newton's Third Law (action/reaction) tells us that yaw
                     // is opposite to net rotor spin
@@ -253,11 +253,12 @@ namespace hf {
                     const double u3,
                     const double u4)
             {
-                double phidot = _state.dphi;
-                double thedot = _state.dtheta;
-                double psidot = _state.dpsi;
+                const auto phidot = _state.dphi;
+                const auto thedot = _state.dtheta;
+                const auto psidot = _state.dpsi;
 
-                double I = _vparams.I;
+                const auto I = _vparams.I;
+                const auto l = _vparams.l;
 
                 // x'
                 state_deriv.x = _state.dx;
@@ -281,13 +282,13 @@ namespace hf {
                 state_deriv.phi = phidot;
 
                 // phi''
-                state_deriv.dphi =  1 / I * u2;
+                state_deriv.dphi =  l / I * u2;
 
                 // theta'
                 state_deriv.theta = thedot;
 
                 // theta''
-                state_deriv.dtheta = 1 / I * u3;
+                state_deriv.dtheta = l / I * u3;
 
                 // psi'
                 state_deriv.psi = psidot;
