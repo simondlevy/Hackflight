@@ -116,18 +116,12 @@ namespace hf {
                     u4 -= _vparams.d * omega2 * mixer->yaw(i);
                 }
 
-                // ------------------------------------------------------------
 
                 // Use the current Euler angles to rotate the orthogonal thrust
                 // vector into the inertial frame
                 double euler[3] = {_state.phi, _state.theta, _state.psi};
                 double accelENU[3] = {};
                 bodyZToInertial(u1 / _vparams.m, euler, accelENU);
-
-                static long count;
-                if (count++ % 100 == 0) {
-                    //printf("accelENU[1 = %+3.3f\n", accelENU[1]);
-                }
 
                 // Subtact gravity from thrust to get net vertical acceleration
                 double netz = accelENU[2] - _g;
@@ -140,8 +134,55 @@ namespace hf {
                 // Once airborne, we can update dynamics
                 if (_airborne) {
 
-                    // Compute the state derivatives using Equation 12
-                    computeStateDerivative(accelENU, netz, u2, u3, u4);
+                    const auto phidot = _state.dphi;
+                    const auto thedot = _state.dtheta;
+                    const auto psidot = _state.dpsi;
+
+                    const auto I = _vparams.I;
+                    const auto l = _vparams.l;
+
+                    // Equation 12 --------------------------------------------
+
+                    // x'
+                    state_deriv.x = _state.dx;
+
+                    // x''
+                    state_deriv.dx = accelENU[0];
+
+                    static long count;
+                    if (count++ % 100 == 0) {
+                        printf("dx=%+3.3f\n", state_deriv.dx);
+                    }
+
+                    // y'
+                    state_deriv.y = _state.dy;
+
+                    // y''
+                    state_deriv.dy = accelENU[1];
+
+                    // z'
+                    state_deriv.z = _state.dz;
+
+                    // z''
+                    state_deriv.dz = netz;
+
+                    // phi'
+                    state_deriv.phi = phidot;
+
+                    // phi''
+                    state_deriv.dphi =  l / I * u2;
+
+                    // theta'
+                    state_deriv.theta = thedot;
+
+                    // theta''
+                    state_deriv.dtheta = l / I * u3;
+
+                    // psi'
+                    state_deriv.psi = psidot;
+
+                    // psi''
+                    state_deriv.dpsi = l / I * u4;
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
@@ -186,6 +227,19 @@ namespace hf {
             vehicle_params_t _vparams;
 
             state_t _state;
+
+            double _x1;
+            double _x2;
+            double _x3;
+            double _x4;
+            double _x5;
+            double _x6;
+            double _x7;
+            double _x8;
+            double _x9;
+            double _x10;
+            double _x11;
+            double _x12;
 
             double _g; // gravitational constant
             double _rho; // air density
@@ -233,68 +287,6 @@ namespace hf {
                 for (uint8_t i = 0; i < 3; ++i) {
                     inertial[i] = bodyZ * R[i];
                 }
-            }
-
-            /**
-             * Implements Equation 12 computing temporal first derivative of
-             * state.  Should fill _dxdx[0..11] with appropriate values.
-             *
-             * @param accelENU acceleration in ENU inertial frame
-             * @param netz accelENU[2] with gravitational constant added in
-             * @param omega net torque from rotors
-             * @param u2 roll force
-             * @param u3 pitch force
-             * @param u4 yaw force
-             */
-            void computeStateDerivative(
-                    const double accelENU[3],
-                    const double netz,
-                    const double u2,
-                    const double u3,
-                    const double u4)
-            {
-                const auto phidot = _state.dphi;
-                const auto thedot = _state.dtheta;
-                const auto psidot = _state.dpsi;
-
-                const auto I = _vparams.I;
-                const auto l = _vparams.l;
-
-                // x'
-                state_deriv.x = _state.dx;
-
-                // x''
-                state_deriv.dx = accelENU[0];
-
-                // y'
-                state_deriv.y = _state.dy;
-
-                // y''
-                state_deriv.dy = accelENU[1];
-
-                // z'
-                state_deriv.z = _state.dz;
-
-                // z''
-                state_deriv.dz = netz;
-
-                // phi'
-                state_deriv.phi = phidot;
-
-                // phi''
-                state_deriv.dphi =  l / I * u2;
-
-                // theta'
-                state_deriv.theta = thedot;
-
-                // theta''
-                state_deriv.dtheta = l / I * u3;
-
-                // psi'
-                state_deriv.psi = psidot;
-
-                // psi''
-                state_deriv.dpsi = l / I * u4;
             }
 
     }; // class Dynamics
