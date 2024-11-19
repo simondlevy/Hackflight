@@ -130,7 +130,7 @@ namespace hf {
                 // Once airborne, we can update dynamics
                 if (_airborne) {
 
-                    // Equation 12 : Note negations to support nose-right,
+                    // Equation 12 : Note negations to support ---------------
                     // roll-right positive
 
                     const auto dx1 = _x2;
@@ -177,29 +177,29 @@ namespace hf {
 
             } // update
 
-            state_t getState() 
-            {
-                return state_t {
-                    _x1,
-                        _x2,
-                        _x3,
-                        _x4, 
-                        _x5,
-                        _x6,
-                        Utils::RAD2DEG *_x7,
-                        Utils::RAD2DEG *_x8,
-                        Utils::RAD2DEG *_x9,
-                        Utils::RAD2DEG *_x10,
-                        Utils::RAD2DEG *_x11,
-                        Utils::RAD2DEG *_x12
-                };
-            }
-
             pose_t getPose()
             {
                 // Negate y coordinate for rightward positive
                 return pose_t {_x1, -_x3, _x5, _x7, _x9, _x11 };
             }
+
+            // Support for simulated sensors ---------------------------------
+
+            axis3_t readGyro()
+            {
+                const auto r = Utils::RAD2DEG;
+
+                return axis3_t { r *_x8, r*_x10, r *_x12 };
+            }
+
+            void getGroundTruthVelocities(float & dx, float & dy, float & dz)
+            {
+                dx = 0;
+                dy = 0;
+                dz = _x6;
+            }
+
+             // ---------------------------------------------------------------
 
         private:
 

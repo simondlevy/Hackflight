@@ -117,8 +117,18 @@ DLLEXPORT void webots_physics_step()
             open_loop_demands.yaw
         };
 
-        // Get vehicle state
-        const auto state = dynamics.getState();
+        // Get simulated gyro
+        const auto gyro = dynamics.readGyro();
+
+        // XXX Cheat on remaining sensors for now
+        const auto pose = dynamics.getPose();
+        float dx=0, dy=0, dz=0;
+        dynamics.getGroundTruthVelocities(dx, dy, dz);
+
+        const auto state = hf::state_t {
+            pose.x, dx, pose.y, dy, pose.z, dz,
+                pose.phi, gyro.x, pose.theta, gyro.y, pose.psi, gyro.z
+        };
 
         // Run PID controllers to get final demands
 
