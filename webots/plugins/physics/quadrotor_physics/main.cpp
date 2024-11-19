@@ -129,7 +129,7 @@ DLLEXPORT void webots_physics_step()
 
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
 
-        //hf::PositionPid::run(state, demands);
+        hf::PositionPid::run(state, demands);
 
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 

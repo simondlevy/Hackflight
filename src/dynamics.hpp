@@ -58,21 +58,21 @@ namespace hf {
             typedef struct {
 
                 // These can be measured directly
-                double m;  // mass [kg]
-                double l;  // arm length [m]
+                float m;  // mass [kg]
+                float l;  // arm length [m]
 
                 // These should be estimated to get realistic behavior
-                double b;  // thrust coefficient [F=b*w^2]
-                double d;  // drag coefficient [T=d*w^2]
-                double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
+                float b;  // thrust coefficient [F=b*w^2]
+                float d;  // drag coefficient [T=d*w^2]
+                float I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
 
             } vehicle_params_t; 
 
             Dynamics(
                     const vehicle_params_t & vparams,
-                    const double dt,
-                    const double gravity = 9.80665e0,
-                    const double air_density = 1.225)
+                    const float dt,
+                    const float gravity = 9.80665e0,
+                    const float air_density = 1.225)
             {
                 memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
@@ -100,7 +100,7 @@ namespace hf {
 
                 // Equation 6 ---------------------------------------
 
-                double u1 = 0, u2 = 0, u3 = 0, u4 = 0;
+                float u1 = 0, u2 = 0, u3 = 0, u4 = 0;
 
                 for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
@@ -196,26 +196,26 @@ namespace hf {
 
         private:
 
-            double _dt;
+            float _dt;
 
             vehicle_params_t _vparams;
 
             // Vehicle state (Equation 11)
-            double _x1;  // x
-            double _x2;  // dx/dt
-            double _x3;  // y
-            double _x4;  // dy/dt
-            double _x5;  // z
-            double _x6;  // dz/dt
-            double _x7;  // phi
-            double _x8;  // dphi/dt
-            double _x9;  // theta
-            double _x10; // dtheta/dt
-            double _x11; // psi
-            double _x12; // dpsi/dt
+            float _x1;  // x
+            float _x2;  // dx/dt
+            float _x3;  // y
+            float _x4;  // dy/dt
+            float _x5;  // z
+            float _x6;  // dz/dt
+            float _x7;  // phi
+            float _x8;  // dphi/dt
+            float _x9;  // theta
+            float _x10; // dtheta/dt
+            float _x11; // psi
+            float _x12; // dpsi/dt
 
-            double _g; // gravitational constant
-            double _rho; // air density
+            float _g; // gravitational constant
+            float _rho; // air density
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
