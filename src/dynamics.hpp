@@ -92,6 +92,12 @@ namespace hf {
              */
             void update(const float * omegas, Mixer * mixer) 
             {
+                const auto b = _vparams.b;
+                const auto d = _vparams.d;
+                const auto I = _vparams.I;
+                const auto l = _vparams.l;
+                const auto m = _vparams.m;
+
                 // Equation 6 ---------------------------------------
 
                 double u1 = 0, u2 = 0, u3 = 0, u4 = 0;
@@ -102,38 +108,27 @@ namespace hf {
                     const auto omega2 = _rho * omegas[i] * omegas[i]; 
 
                     // Multiply by thrust coefficient
-                    u1 += _vparams.b * omega2;                  
+                    u1 += b * omega2;                  
 
-                    u2 += _vparams.b * omega2 * mixer->roll(i);
+                    u2 += b * omega2 * mixer->roll(i);
 
-                    u3 += _vparams.b * omega2 * mixer->pitch(i);
+                    u3 += b * omega2 * mixer->pitch(i);
 
                     // Newton's Third Law (action/reaction) tells us that yaw
                     // is opposite to net rotor spin
-                    u4 -= _vparams.d * omega2 * mixer->yaw(i);
+                    u4 -= d * omega2 * mixer->yaw(i);
                 }
 
-
-                // Use the current Euler angles to rotate the orthogonal thrust
-                // vector into the inertial frame
-                double euler[3] = {_x7, _x9, _x11};
-                double accelENU[3] = {};
-                bodyZToInertial(u1 / _vparams.m, euler, accelENU);
-
-                // Subtact gravity from thrust to get net vertical acceleration
-                double netz = accelENU[2] - _g;
+                // Equation 12 line 6
+                const auto dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
-                if (netz > 0) {
+                if (dx6 > 0) {
                     _airborne = true;
                 }
 
                 // Once airborne, we can update dynamics
                 if (_airborne) {
-
-                    const auto I = _vparams.I;
-                    const auto l = _vparams.l;
-                    const auto m = _vparams.m;
 
                     // Equation 12 --------------------------------------------
 
@@ -149,12 +144,10 @@ namespace hf {
 
                     const auto dx5 = _x6;
 
-                    const auto dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
-
                     const auto dx7 = _x8;
 
                     const auto dx8 = l / I * u2;
-                    
+
                     const auto dx9 = _x10;
 
                     const auto dx10 = l / I * u3;
