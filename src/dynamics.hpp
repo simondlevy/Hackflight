@@ -145,44 +145,51 @@ namespace hf {
 
                     // x'
                     state_deriv.x = _state.dx;
+                    const auto dx1 = _x2;
 
                     // x''
                     state_deriv.dx = accelENU[0];
-
-                    static long count;
-                    if (count++ % 100 == 0) {
-                        printf("dx=%+3.3f\n", state_deriv.dx);
-                    }
+                    const auto dx2 = accelENU[0];
 
                     // y'
                     state_deriv.y = _state.dy;
+                    const auto dx3 = _x4;
 
                     // y''
                     state_deriv.dy = accelENU[1];
+                    const auto dx4 = accelENU[1];
 
                     // z'
                     state_deriv.z = _state.dz;
+                    const auto dx5 = _x6;
 
                     // z''
                     state_deriv.dz = netz;
+                    const auto dx6 = netz;
 
                     // phi'
                     state_deriv.phi = phidot;
+                    const auto dx7 = _x8;
 
                     // phi''
                     state_deriv.dphi =  l / I * u2;
+                    const auto dx8 = l / I * u2;
 
                     // theta'
                     state_deriv.theta = thedot;
+                    const auto dx9 = _x10;
 
                     // theta''
                     state_deriv.dtheta = l / I * u3;
+                    const auto dx10 = l / I * u3;
 
                     // psi'
                     state_deriv.psi = psidot;
+                    const auto dx11 = _x12;
 
                     // psi''
                     state_deriv.dpsi = l / I * u4;
+                    const auto dx12 = l / I * u4;
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
@@ -198,6 +205,19 @@ namespace hf {
                     _state.dtheta += _dt * state_deriv.dtheta;
                     _state.psi += _dt * state_deriv.psi;
                     _state.dpsi += _dt * state_deriv.dpsi;
+
+                    _x1 += _dt * dx1;
+                    _x2 += _dt * dx2;
+                    _x3 += _dt * dx3;
+                    _x4 += _dt * dx4;
+                    _x5 += _dt * dx5;
+                    _x6 += _dt * dx6;
+                    _x7 += _dt * dx7;
+                    _x8 += _dt * dx8;
+                    _x9 += _dt * dx9;
+                    _x10 += _dt * dx10;
+                    _x11 += _dt * dx11;
+                    _x12 += _dt * dx12;
                 }
 
             } // update
@@ -205,6 +225,22 @@ namespace hf {
             state_t getState() 
             {
                 return state_t {
+                    (float)_x1,
+                        (float)_x2,
+                        -(float)_x3,
+                        -(float)_x4, // negate for rightward positive
+                        (float)_x5,
+                        (float)_x6,
+                        Utils::RAD2DEG *(float)_x7,
+                        Utils::RAD2DEG *(float)_x8,
+                        Utils::RAD2DEG *(float)_x9,
+                        Utils::RAD2DEG *(float)_x10,
+                        Utils::RAD2DEG *(float)_x11,
+                        Utils::RAD2DEG *(float)_x12
+                };
+
+                /*
+                 return state_t {
                     _state.x,
                         _state.dx,
                         -_state.y,
@@ -217,7 +253,7 @@ namespace hf {
                         Utils::RAD2DEG *_state.dtheta,
                         Utils::RAD2DEG *_state.psi,
                         Utils::RAD2DEG *_state.dpsi
-                };
+                };*/
             }
 
         private:
