@@ -61,8 +61,7 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
     3.6e-5, // force coefficient B [F=b*w^2]
     3.5e-7, // drag coefficient D [T=d*w^2]
-    2.0e-5, // I [kg*m^2]   // pitch, roll
-    3.8e-3  // Jr prop inertial [kg*m^2]
+    2.0e-5  // I [kg*m^2]   // pitch, roll
 };
 
 
@@ -139,10 +138,6 @@ DLLEXPORT void webots_physics_step()
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
-        //demands.roll = 0;
-        //demands.pitch = 0;
-        //demands.yaw = 0;
-
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};
         float motors[4] = {};
@@ -170,10 +165,10 @@ DLLEXPORT void webots_physics_step()
     hf::axis4_t quat = {};
     hf::Utils::euler2quat(euler, quat);
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
+    dBodySetQuaternion(_robotBody, q);
 
     // Set robot posed based on state, negating for rightward negative
     dBodySetPosition(_robotBody, state.x, -state.y, state.z);
-    dBodySetQuaternion(_robotBody, q);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 

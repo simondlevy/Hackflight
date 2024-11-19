@@ -65,7 +65,6 @@ namespace hf {
                 double b;  // thrust coefficient [F=b*w^2]
                 double d;  // drag coefficient [T=d*w^2]
                 double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
-                double Jr; // rotor inertia [kg*m^2] 
 
             } vehicle_params_t; 
 
@@ -98,7 +97,7 @@ namespace hf {
             {
                 // Equation 6 ---------------------------------------
 
-                double u1 = 0, u2 = 0, u3 = 0, u4 = 0, omega = 0;
+                double u1 = 0, u2 = 0, u3 = 0, u4 = 0;
 
                 for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
@@ -142,7 +141,7 @@ namespace hf {
                 if (_airborne) {
 
                     // Compute the state derivatives using Equation 12
-                    computeStateDerivative(accelENU, netz, omega, u2, u3, u4);
+                    computeStateDerivative(accelENU, netz, u2, u3, u4);
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
@@ -248,19 +247,17 @@ namespace hf {
              * @param u4 yaw force
              */
             void computeStateDerivative(
-                    double accelENU[3],
-                    double netz,
-                    double omega,
-                    double u2,
-                    double u3,
-                    double u4)
+                    const double accelENU[3],
+                    const double netz,
+                    const double u2,
+                    const double u3,
+                    const double u4)
             {
                 double phidot = _state.dphi;
                 double thedot = _state.dtheta;
                 double psidot = _state.dpsi;
 
                 double I = _vparams.I;
-                double Jr = _vparams.Jr;
 
                 // x'
                 state_deriv.x = _state.dx;
@@ -284,13 +281,13 @@ namespace hf {
                 state_deriv.phi = phidot;
 
                 // phi''
-                state_deriv.dphi =  (-Jr * thedot * omega  + u2) / I;
+                state_deriv.dphi =  u2 / I;
 
                 // theta'
                 state_deriv.theta = thedot;
 
                 // theta''
-                state_deriv.dtheta = (-Jr * phidot * omega + u3) / I;
+                state_deriv.dtheta = u3 /  I;
 
                 // psi'
                 state_deriv.psi = psidot;
