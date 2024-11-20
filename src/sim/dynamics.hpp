@@ -195,7 +195,10 @@ namespace hf {
 
             axis2_t getGroundTruthHorizontalVelocities()
             {
-                return axis2_t {0, 0};
+                const auto dx = _x2 * cos(_x11) + _x4 * sin(_x11);
+                const auto dy = _x2 * sin(_x11) - _x4 * cos(_x11);
+
+                return axis2_t { dx, dy };
             }
 
             float getGroundTruthVerticalVelocity()
@@ -203,7 +206,7 @@ namespace hf {
                 return _x6;
             }
 
-             // ---------------------------------------------------------------
+            // ---------------------------------------------------------------
 
         private:
 

@@ -125,9 +125,21 @@ DLLEXPORT void webots_physics_step()
         const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
         const auto dz = dynamics.getGroundTruthVerticalVelocity();
 
+        const auto r = hf::Utils::RAD2DEG;
+
         const auto state = hf::state_t {
-            pose.x, dxdy.x, pose.y, dxdy.y, pose.z, dz,
-                pose.phi, gyro.x, pose.theta, gyro.y, pose.psi, gyro.z
+                0,
+                dxdy.x,
+                0,
+                dxdy.y,
+                pose.z,
+                dz,
+                r * pose.phi,
+                gyro.x,
+                r * pose.theta,
+                gyro.y,
+                0,
+                gyro.z
         };
 
         // Run PID controllers to get final demands
@@ -138,10 +150,7 @@ DLLEXPORT void webots_physics_step()
 
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
 
-        //hf::PositionPid::run(state, demands);
-
-        demands.roll *= 5;
-        demands.pitch *= 5;
+        hf::PositionPid::run(state, demands);
 
         _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 
