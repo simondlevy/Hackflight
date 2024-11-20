@@ -42,9 +42,9 @@ Webots is 32 milliseonds, which translates to an update rate of around 31 Hz
 in the control code (e.g., PID control).  Although adequate for many robot
 applications, this rate is much slower than the typical rate of 500 - 1000 Hz
 used in actual flight controllers.  Although it is possible to decrease the
-timestep in order to increase the update rate, there is a 
+timestep in order to increase the update rate, there is as usual a
 [tradeoff](https://robotics.stackexchange.com/questions/24086/how-can-i-speed-up-my-webots-simulation),
-this can slow down the simulation.  Fortunately, Webots supports 
+in which a faster update rate can slow down the simulation.  Fortunately, Webots supports 
 [custom physics plugins](https://cyberbotics.com/doc/reference/physics-plugin),
 in which you can replace Webots' built-in physics with a physics model
 of your own.   The Hackflight simulator exploits this feature of Webots,
