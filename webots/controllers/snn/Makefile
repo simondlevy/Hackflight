@@ -47,15 +47,15 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/standard.wbt &
+	webots ../../worlds/old.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runlog:
-	webots ../../worlds/standard.wbt &
+	webots ../../worlds/old.wbt &
 	/usr/local/webots/webots-controller $(NAME) | tail +11 > log.csv
 
 runviz:
-	webots ../../worlds/standard.wbt &
+	webots ../../worlds/old.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) $(VIZ_PORT) &
 	sleep 1
 	cd $(FDIR)/viz; \

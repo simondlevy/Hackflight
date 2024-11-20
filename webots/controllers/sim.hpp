@@ -54,6 +54,8 @@ namespace hf {
 
             static constexpr float MOTOR_HOVER = 55.385; // rad/sec
 
+            static constexpr float TAKEOFF_TIME = 3.0; // sec
+
             static constexpr float MOTOR_TAKEOFF = 56; // rad/sec
 
             void init(const bool tryJoystick=true)

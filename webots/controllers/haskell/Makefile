@@ -57,7 +57,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/standard.wbt &
+	webots ../../worlds/old.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 ### Do not modify: this includes Webots global Makefile.include
