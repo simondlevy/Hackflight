@@ -43,6 +43,8 @@ static const double ROBOT_TIMESTEP_MSEC = 32;
 
 static const char ROBOT_NAME[] = "quadrotor";
 
+static const float MOTOR_HOVER = 55.385; // rad/sec
+
 static dBodyID _robotBody;
 
 static hf::AltitudePid _altitudePid;
@@ -149,6 +151,8 @@ DLLEXPORT void webots_physics_step()
         static const float pid_dt  = 1. / PID_FREQ;
 
         _altitudePid.run(springyThrottle, pid_dt, state, demands);
+
+        demands.thrust += MOTOR_HOVER;
 
         hf::PositionPid::run(state, demands);
 
