@@ -36,7 +36,7 @@ class Simulator {
 
     public:
 
-        void init(const bool tryJoystick=true)
+        void init()
         {
             wb_robot_init();
 
@@ -51,15 +51,28 @@ class Simulator {
             animateMotor("motor3", +1);
             animateMotor("motor4", -1);
 
-            if (tryJoystick) {
+            wb_joystick_enable(_timestep);
 
-                wb_joystick_enable(_timestep);
-            }
+            wb_keyboard_enable(_timestep);
 
-            else {
+        }
 
-                printKeyboardInstructions();
-            }
+        void initKeyboard()
+        {
+            wb_robot_init();
+
+            _timestep = wb_robot_get_basic_time_step();
+
+            _emitter = wb_robot_get_device("emitter");
+
+            wb_keyboard_enable(_timestep);
+
+            animateMotor("motor1", -1);
+            animateMotor("motor2", +1);
+            animateMotor("motor3", +1);
+            animateMotor("motor4", -1);
+
+            printKeyboardInstructions();
 
             wb_keyboard_enable(_timestep);
 
@@ -72,6 +85,21 @@ class Simulator {
             }
 
             auto siminfo = getSimInfo();
+
+            siminfo.framerate = 1000 / _timestep;
+
+            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+
+            return true;
+        }
+
+        bool stepKeyboard()
+        {
+            if (wb_robot_step(_timestep) == -1) {
+                return false;
+            }
+
+            auto siminfo = getSimInfoFromKeyboard();
 
             siminfo.framerate = 1000 / _timestep;
 
@@ -113,7 +141,7 @@ class Simulator {
         WbDeviceTag _emitter;
 
         double _timestep;
-        
+
         std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
             // Springy throttle
