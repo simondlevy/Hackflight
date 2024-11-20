@@ -308,7 +308,9 @@ int main()
             break;
         }
 
-        const auto siminfo = getSimInfo();
+        auto siminfo = getSimInfo();
+
+        siminfo.framerate = 1000 / timestep;
 
         wb_emitter_send(emitter, &siminfo, sizeof(siminfo));
     }

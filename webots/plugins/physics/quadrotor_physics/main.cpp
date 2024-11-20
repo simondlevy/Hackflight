@@ -38,9 +38,6 @@ static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-// XXX can we get this automatically?
-static const double ROBOT_TIMESTEP_MSEC = 32;
-
 static const char ROBOT_NAME[] = "quadrotor";
 
 static const float MOTOR_HOVER = 74.565; // 55.385; // rad/sec
@@ -101,16 +98,20 @@ DLLEXPORT void webots_physics_init()
 
 DLLEXPORT void webots_physics_step() 
 {
-    // we return if we have no robot to actuate.
     if (_robotBody == NULL) {
         return;
     }
 
-    // Run control in outer loop
-    for (uint32_t j=0; j< ROBOT_TIMESTEP_MSEC * PID_FREQ / 1000; ++j) {
-        
-        const auto siminfo = getSimInfo();
+    const auto siminfo = getSimInfo();
 
+    // This happens at startup
+    if (siminfo.framerate == 0) {
+        return;
+    }
+
+    // Run control in outer loop
+    for (uint32_t j=0; j < (1 / siminfo.framerate * PID_FREQ); ++j) {
+        
         // Start with open-loop demands
         hf::demands_t demands = {
             siminfo.demands.thrust,

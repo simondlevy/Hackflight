@@ -84,6 +84,7 @@ namespace hf {
     typedef struct {
 
         demands_t demands;
+        float framerate;
         bool is_springy;
         bool requested_takeoff;
 
