@@ -142,8 +142,6 @@ DLLEXPORT void webots_physics_step()
                 gyro.z
         };
 
-        //dWebotsConsolePrintf("psi=%+3.3f  dx=%+3.3f  dy=%+3.3f\n", state.psi, state.dx, state.dy);
-
         // Run PID controllers to get final demands
 
         const auto springyThrottle = true; // XXX
