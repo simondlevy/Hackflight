@@ -2,7 +2,7 @@
 <img src="../media/webots2.png" width=450>
 </p>
 
-# Hackflight simulator instructions
+## Hackflight simulator instructions
 
 1. [Install Webots](https://cyberbotics.com/doc/guide/installation-procedure#installation-on-linux)
 on your computer.  
@@ -16,7 +16,9 @@ on your computer.
 3. From the hackflight main directory, do the following:
 
 ```
-cd webots/controllers/cplusplus
+cd webots/plugins/physics/standard
+make
+cd ../../../controllers/standard
 make
 make run
 ```
@@ -32,3 +34,8 @@ are currently supported:
 * [FrSky XSR-SIM USB Dongle](https://www.amazon.com/gp/product/B07GD6ZLW7)
 * [Spektrum Ws2000 Wireless USB RC Flight Simulator Dongle](https://www.amazon.com/gp/product/B07ZK1R32H)
 * Nyko 83069 Playstation(R)3 Core Wired Controller
+
+## Design principles
+
+
+<img src="../media/simp.png" width=450>

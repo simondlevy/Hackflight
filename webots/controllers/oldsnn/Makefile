@@ -35,7 +35,7 @@ LIBRARIES = $(FDIR)/lib/libframework.a \
 		    $(PDIR)/lib/libproc1.a \
 		    $(PDIR)/lib/libproc2.a
 
-NAME = snn
+NAME = oldsnn
 
 CXX_SOURCES = main.cpp
 
