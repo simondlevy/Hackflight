@@ -104,10 +104,10 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    const auto open_loop_demands = getOpenLoopDemands();
-
     // Run control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP_MSEC * PID_FREQ / 1000; ++j) {
+        
+        const auto open_loop_demands = getOpenLoopDemands();
 
         // Start with open-loop demands
         hf::demands_t demands = {
@@ -128,9 +128,9 @@ DLLEXPORT void webots_physics_step()
         const auto r = hf::Utils::RAD2DEG;
 
         const auto state = hf::state_t {
-                0,
+                pose.x,
                 dxdy.x,
-                0,
+                pose.y,
                 dxdy.y,
                 pose.z,
                 dz,
@@ -138,9 +138,11 @@ DLLEXPORT void webots_physics_step()
                 gyro.x,
                 r * pose.theta,
                 gyro.y,
-                0,
+                r * pose.psi,
                 gyro.z
         };
+
+        //dWebotsConsolePrintf("psi=%+3.3f  dx=%+3.3f  dy=%+3.3f\n", state.psi, state.dx, state.dy);
 
         // Run PID controllers to get final demands
 
@@ -163,9 +165,6 @@ DLLEXPORT void webots_physics_step()
         hf::BfQuadXMixer mixer = {};
         float motors[4] = {};
         mixer.run(demands, motors);
-
-        //printf("m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n\n",
-        //       motors[0], motors[1], motors[2], motors[3]);
 
         // Run dynamics in inner loop to update state with motors
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {

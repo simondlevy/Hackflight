@@ -24,7 +24,6 @@
 #include <hackflight.hpp>
 
 // Webots
-#include <webots/camera.h>
 #include <webots/emitter.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
@@ -100,11 +99,7 @@ int main()
 {
     wb_robot_init();
 
-    auto camera = wb_robot_get_device("camera");
-
     auto timestep = wb_robot_get_basic_time_step();
-
-    wb_camera_enable(camera, timestep * 2);
 
     auto emitter = wb_robot_get_device("emitter");
 

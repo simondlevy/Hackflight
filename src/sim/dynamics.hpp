@@ -195,8 +195,11 @@ namespace hf {
 
             axis2_t getGroundTruthHorizontalVelocities()
             {
-                const auto dx = _x2 * cos(_x11) + _x4 * sin(_x11);
-                const auto dy = _x2 * sin(_x11) - _x4 * cos(_x11);
+                const auto dx =   _x2 * cos(_x11) - _x4 * sin(_x11);
+                const auto dy = -(_x2 * sin(_x11) + _x4 * cos(_x11));
+
+                printf("_x2=%+3.3f  _x4=%+3.3f  _x11=%+3.3f => dy=%+3.3f\n",
+                        _x2, _x4, _x11, dy);
 
                 return axis2_t { dx, dy };
             }
