@@ -66,19 +66,19 @@ static hf::Dynamics::vehicle_params_t tinyquad_params = {
 };
 
 
-static hf::demands_t getOpenLoopDemands()
+static hf::siminfo_t getSimInfo()
 {
-    static hf::demands_t _demands;
+    static hf::siminfo_t _siminfo;
 
     int size = 0;
 
-    const auto buffer = (hf::demands_t *)dWebotsReceive(&size);
+    const auto buffer = (hf::siminfo_t *)dWebotsReceive(&size);
 
-    if (size == sizeof(hf::demands_t)) {
-        memcpy(&_demands, buffer, sizeof(hf::demands_t));
+    if (size == sizeof(hf::siminfo_t)) {
+        memcpy(&_siminfo, buffer, sizeof(_siminfo));
     }
 
-    return _demands;
+    return _siminfo;
 }
 
 static auto dynamics = hf::Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
@@ -109,15 +109,18 @@ DLLEXPORT void webots_physics_step()
     // Run control in outer loop
     for (uint32_t j=0; j< ROBOT_TIMESTEP_MSEC * PID_FREQ / 1000; ++j) {
         
-        const auto open_loop_demands = getOpenLoopDemands();
+        const auto siminfo = getSimInfo();
 
         // Start with open-loop demands
         hf::demands_t demands = {
-            open_loop_demands.thrust,
-            open_loop_demands.roll,
-            open_loop_demands.pitch,
-            open_loop_demands.yaw
+            siminfo.demands.thrust,
+            siminfo.demands.roll,
+            siminfo.demands.pitch,
+            siminfo.demands.yaw
         };
+
+        // Throttle-down should reset pids
+        const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
         // Get simulated gyro
         const auto gyro = dynamics.readGyro();
@@ -128,7 +131,6 @@ DLLEXPORT void webots_physics_step()
         const auto dz = dynamics.getGroundTruthVerticalVelocity();
 
         const auto r = hf::Utils::RAD2DEG;
-
         const auto state = hf::state_t {
                 pose.x,
                 dxdy.x,
@@ -145,14 +147,18 @@ DLLEXPORT void webots_physics_step()
         };
 
         // Run PID controllers to get final demands
-
-        const auto springyThrottle = true; // XXX
-        const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
+        
         static const float pid_dt  = 1. / PID_FREQ;
 
-        _altitudePid.run(springyThrottle, pid_dt, state, demands);
+        dWebotsConsolePrintf("takeoff=%d  springy=%d\n",
+               siminfo.requested_takeoff, siminfo.is_springy); 
+        
+        if (siminfo.requested_takeoff) {
 
-        demands.thrust += MOTOR_HOVER;
+            _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
+
+            demands.thrust += MOTOR_HOVER;
+        }
 
         hf::PositionPid::run(state, demands);
 

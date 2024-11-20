@@ -33,8 +33,6 @@ static constexpr float THROTTLE_SCALE = 0.5; // m/s
 
 static constexpr float YAW_SCALE = 160; // deg/s
 
-static bool _requested_takeoff;
-
 static void animateMotor(const char * name, const float direction)
 {
     auto motor = wb_robot_get_device(name);
@@ -44,54 +42,56 @@ static void animateMotor(const char * name, const float direction)
     wb_motor_set_velocity(motor, direction * 60);
 }
 
-static hf::demands_t getDemandsFromKeyboard()
+static hf::siminfo_t getSimInfoFromKeyboard()
 {
-    static bool spacebar_was_hit;
+    static bool _spacebar_was_hit;
 
-    hf::demands_t demands = {};
+    hf::siminfo_t siminfo = {};
+
+    siminfo.is_springy = true;
 
     switch (wb_keyboard_get_key()) {
 
         case WB_KEYBOARD_UP:
-            demands.pitch = +1.0;
+            siminfo.demands.pitch = +1.0;
             break;
 
         case WB_KEYBOARD_DOWN:
-            demands.pitch = -1.0;
+            siminfo.demands.pitch = -1.0;
             break;
 
         case WB_KEYBOARD_RIGHT:
-            demands.roll = +1.0;
+            siminfo.demands.roll = +1.0;
             break;
 
         case WB_KEYBOARD_LEFT:
-            demands.roll = -1.0;
+            siminfo.demands.roll = -1.0;
             break;
 
         case 'Q':
-            demands.yaw = -YAW_SCALE;
+            siminfo.demands.yaw = -YAW_SCALE;
             break;
 
         case 'E':
-            demands.yaw = +YAW_SCALE;
+            siminfo.demands.yaw = +YAW_SCALE;
             break;
 
         case 'W':
-            demands.thrust = +THROTTLE_SCALE;
+            siminfo.demands.thrust = +THROTTLE_SCALE;
             break;
 
         case 'S':
-            demands.thrust = -THROTTLE_SCALE;
+            siminfo.demands.thrust = -THROTTLE_SCALE;
             break;
 
         case 32:
-            spacebar_was_hit = true;
+            _spacebar_was_hit = true;
             break;
     }
 
-    _requested_takeoff = spacebar_was_hit;
+    siminfo.requested_takeoff = _spacebar_was_hit;
 
-    return demands;
+    return siminfo;
 }
 
 
@@ -116,9 +116,9 @@ int main()
             break;
         }
 
-        const auto demands = getDemandsFromKeyboard();
+        const auto siminfo = getSimInfoFromKeyboard();
 
-        wb_emitter_send(emitter, &demands, sizeof(demands));
+        wb_emitter_send(emitter, &siminfo, sizeof(siminfo));
     }
 
     wb_robot_cleanup();

@@ -80,4 +80,13 @@ namespace hf {
         float z;
 
     } axis4_t;
+
+    typedef struct {
+
+        demands_t demands;
+        bool is_springy;
+        bool requested_takeoff;
+
+    } siminfo_t;
+
 }
