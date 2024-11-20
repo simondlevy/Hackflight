@@ -16,6 +16,34 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Global data and routines shared with Haskell Copilot ----------------------
+
+float stream_throttle;
+float stream_roll;
+float stream_pitch;
+float stream_yaw;
+
+float stream_dx;
+float stream_dy;
+float stream_z;
+float stream_dz;
+float stream_phi;
+float stream_dphi;
+float stream_theta;
+float stream_dtheta;
+float stream_psi;
+float stream_dpsi;
+
+bool stream_requestedTakeoff;
+
+bool stream_completedTakeoff;
+
+void runMotors(float m1, float m2, float m3, float m4)
+{
+}
+
+// ---------------------------------------------------------------------------
+
 // Webots
 #include <plugins/physics.h>
 
