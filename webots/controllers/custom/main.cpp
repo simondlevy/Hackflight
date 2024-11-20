@@ -37,7 +37,7 @@ static constexpr float YAW_SCALE = 160; // deg/s
 
 static bool _requested_takeoff;
 
-static bool _try_joystick;
+static bool _try_joystick = true;
 
 typedef enum {
 
