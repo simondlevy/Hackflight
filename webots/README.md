@@ -56,7 +56,7 @@ The webots update step represents a slow, outer loop, in which is embeded
 a faster control loop, which in turn embeds an even faster dynamics loop.
 The following figure illustrates this arrangement, using a traditional
 [cascade-control](https://controlguru.com/the-cascade-control-architecture/)
-(slow outer loop / fast inner loop) diagram:
+diagram:
 
-<img src="../media/sim.png" width=450>
+<img src="../media/sim.png" width=700>
 
