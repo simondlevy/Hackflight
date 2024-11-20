@@ -38,4 +38,4 @@ are currently supported:
 ## Design principles
 
 
-<img src="../media/simp.png" width=450>
+<img src="../media/sim.png" width=450>
