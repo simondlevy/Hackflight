@@ -16,6 +16,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 // C++
 #include <map>
 #include <string>
@@ -30,7 +32,11 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
-#include "../sim.hpp"
+class Simulator {
+
+};
+
+#if 0
 
 static constexpr float THROTTLE_SCALE = 0.5; // m/s
 
@@ -321,3 +327,5 @@ int main()
 
     return 0;
 }
+
+#endif
