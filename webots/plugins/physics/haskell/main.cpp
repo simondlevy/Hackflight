@@ -52,9 +52,6 @@ static float motors[4];
 
 void runMotors(float m1, float m2, float m3, float m4)
 {
-    dWebotsConsolePrintf("m1=%3.3f  m2=%3.3f  m3=%3.3f  m4=%3.3f\n",
-            m1, m2, m3, m4);
-
     motors[0] = m1;
     motors[1] = m2;
     motors[2] = m3;
@@ -136,15 +133,15 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
+    // Count elapsed time since takeoff, for climb-rate PID control
     static uint32_t _frame_count;
-    stream_time = siminfo.requested_takeoff ? _frame_count++ / siminfo.framerate : 0;
+    stream_time = siminfo.requested_takeoff ?
+        _frame_count++ / siminfo.framerate : 0;
 
     // Run control in outer loop
     for (uint32_t j=0; j < (1 / siminfo.framerate * PID_FREQ); ++j) {
 
         stream_requestedTakeoff = siminfo.requested_takeoff;
-
-        dWebotsConsolePrintf("time=%3.3f\n", stream_time);
 
         stream_throttle = siminfo.demands.thrust;
         stream_roll = siminfo.demands.roll;
