@@ -26,7 +26,6 @@
 // Webots
 #include <webots/camera.h>
 #include <webots/emitter.h>
-#include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
@@ -37,99 +36,6 @@ static constexpr float YAW_SCALE = 160; // deg/s
 
 static bool _requested_takeoff;
 
-static bool _try_joystick = true;
-
-typedef enum {
-
-    JOYSTICK_NONE,
-    JOYSTICK_UNRECOGNIZED,
-    JOYSTICK_RECOGNIZED
-
-} joystickStatus_e;
-
-typedef struct {
-
-    int8_t throttle;
-    int8_t roll;
-    int8_t pitch;
-    int8_t yaw;
-
-    bool springy;                
-
-} joystick_t;
-
-static std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-    // Springy throttle
-    { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-        joystick_t {-2,  3, -4, 1, true } },
-    { "SHANWAN Android Gamepad",             // PS3
-        joystick_t {-2,  3, -4, 1, true } },
-    { "Logitech Gamepad F310",
-        joystick_t {-2,  4, -5, 1, true } },
-
-    // Classic throttle
-    { "Logitech Logitech Extreme 3D",
-        joystick_t {-4,  1, -2, 3, false}  },
-    { "OpenTX FrSky Taranis Joystick",  // USB cable
-        joystick_t { 1,  2,  3, 4, false } },
-    { "FrSky FrSky Simulator",          // radio dongle
-        joystick_t { 1,  2,  3, 4, false } },
-    { "Horizon Hobby SPEKTRUM RECEIVER",
-        joystick_t { 2,  -3,  4, -1, false } }
-};
-
-static void printKeyboardInstructions()
-{
-    puts("- Use spacebar to take off\n");
-    puts("- Use W and S to go up and down\n");
-    puts("- Use arrow keys to move horizontally\n");
-    puts("- Use Q and E to change heading\n");
-}
-
-static joystickStatus_e haveJoystick(void)
-{
-    auto status = JOYSTICK_RECOGNIZED;
-
-    auto joyname = wb_joystick_get_model();
-
-    // No joystick
-    if (joyname == NULL) {
-
-        static bool _didWarn;
-
-        if (!_didWarn) {
-            puts("Using keyboard instead:\n");
-            printKeyboardInstructions();
-        }
-
-        _didWarn = true;
-
-        status = JOYSTICK_NONE;
-    }
-
-    // Joystick unrecognized
-    else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
-
-        status = JOYSTICK_UNRECOGNIZED;
-    }
-
-    return status;
-}
-
-static joystick_t getJoystickInfo() 
-{
-    return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-}
-
-/*
-static bool isSpringy()
-{
-    return haveJoystick() == JOYSTICK_RECOGNIZED ?
-        getJoystickInfo().springy :
-        true; // keyboard
-}*/
-
 static void animateMotor(const char * name, const float direction)
 {
     auto motor = wb_robot_get_device(name);
@@ -137,34 +43,6 @@ static void animateMotor(const char * name, const float direction)
     wb_motor_set_position(motor, INFINITY);
 
     wb_motor_set_velocity(motor, direction * 60);
-}
-
-static float normalizeJoystickAxis(const int32_t rawval)
-{
-    return 2.0f * rawval / UINT16_MAX; 
-}
-
-static int32_t readJoystickRaw(const int8_t index)
-{
-    const auto axis = abs(index) - 1;
-    const auto sign = index < 0 ? -1 : +1;
-    return sign * wb_joystick_get_axis_value(axis);
-}
-
-static float readJoystickAxis(const int8_t index)
-{
-    return normalizeJoystickAxis(readJoystickRaw(index));
-}
-
-static void reportJoystick(void)
-{
-    printf("Unrecognized joystick '%s' with axes ",
-            wb_joystick_get_model()); 
-
-    for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
-
-        printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
-    }
 }
 
 static hf::demands_t getDemandsFromKeyboard()
@@ -230,16 +108,6 @@ int main()
 
     auto emitter = wb_robot_get_device("emitter");
 
-    if (_try_joystick) {
-
-        wb_joystick_enable(timestep);
-    }
-
-    else {
-
-        printKeyboardInstructions();
-    }
-
     wb_keyboard_enable(timestep);
 
     animateMotor("motor1", -1);
@@ -253,66 +121,11 @@ int main()
             break;
         }
 
-        hf::demands_t demands = {};
-
-        auto joystickStatus = haveJoystick();
-
-        if (joystickStatus == JOYSTICK_RECOGNIZED) {
-
-            auto axes = getJoystickInfo();
-
-            demands.thrust =
-                normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-            // Springy throttle stick; keep in interval [-1,+1]
-            if (axes.springy) {
-
-                static bool button_was_hit;
-
-                if (wb_joystick_get_pressed_button() == 5) {
-                    button_was_hit = true;
-                }
-
-                _requested_takeoff = button_was_hit;
-
-                // Run throttle stick through deadband
-                demands.thrust =
-                    fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
-            }
-
-            else {
-
-                static float throttle_prev;
-                static bool throttle_was_moved;
-
-                // Handle bogus throttle values on startup
-                if (throttle_prev != demands.thrust) {
-                    throttle_was_moved = true;
-                }
-
-                _requested_takeoff = throttle_was_moved;
-
-                throttle_prev = demands.thrust;
-            }
-
-            demands.roll = readJoystickAxis(axes.roll);
-            demands.pitch = readJoystickAxis(axes.pitch); 
-            demands.yaw = readJoystickAxis(axes.yaw) * YAW_SCALE;
-        }
-
-        else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-            reportJoystick();
-        }
-
-        else { 
-
-            demands = getDemandsFromKeyboard();
-        }
+        const auto demands = getDemandsFromKeyboard();
 
         wb_emitter_send(emitter, &demands, sizeof(demands));
-
-
     }
+
     wb_robot_cleanup();
 
     return 0;
