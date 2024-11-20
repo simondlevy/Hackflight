@@ -22,12 +22,6 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
-
-#include <pids/altitude.hpp>
-#include <pids/position.hpp>
-#include <pids/pitch_roll_angle.hpp>
-#include <pids/pitch_roll_rate.hpp>
-#include <pids/yaw_rate.hpp>
 #include <mixers/bfquadx.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
@@ -43,14 +37,6 @@ static const char ROBOT_NAME[] = "quadrotor";
 static const float MOTOR_HOVER = 74.565; // 55.385; // rad/sec
 
 static dBodyID _robotBody;
-
-static hf::AltitudePid _altitudePid;
-
-static hf::PitchRollAnglePid _pitchRollAnglePid;
-
-static hf::PitchRollRatePid _pitchRollRatePid;
-
-static hf::YawRatePid _yawRatePid;
 
 static hf::Dynamics::vehicle_params_t tinyquad_params = {
 
@@ -150,22 +136,6 @@ DLLEXPORT void webots_physics_step()
         // Run PID controllers to get final demands
         
         static const float pid_dt  = 1. / PID_FREQ;
-
-        if (siminfo.requested_takeoff) {
-
-            _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
-
-            demands.thrust += MOTOR_HOVER;
-        }
-
-        hf::PositionPid::run(state, demands);
-
-        _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
-
-        _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
-                PITCH_ROLL_POST_SCALE);
-
-        _yawRatePid.run(pid_dt, resetPids, state, demands);
 
         // Run mixer to get motors spins from demands
         hf::BfQuadXMixer mixer = {};

@@ -37,6 +37,9 @@
 
 #pragma once
 
+#include <mixer.hpp>
+#include <utils.hpp>
+
 namespace hf {
 
     class Dynamics {
