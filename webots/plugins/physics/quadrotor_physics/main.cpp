@@ -43,7 +43,7 @@ static const double ROBOT_TIMESTEP_MSEC = 32;
 
 static const char ROBOT_NAME[] = "quadrotor";
 
-static const float MOTOR_HOVER = 55.385; // rad/sec
+static const float MOTOR_HOVER = 74.565; // 55.385; // rad/sec
 
 static dBodyID _robotBody;
 
@@ -152,8 +152,6 @@ DLLEXPORT void webots_physics_step()
 
         if (siminfo.requested_takeoff) {
 
-            dWebotsConsolePrintf("springy=%d\n", siminfo.is_springy); 
-        
             _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
 
             demands.thrust += MOTOR_HOVER;

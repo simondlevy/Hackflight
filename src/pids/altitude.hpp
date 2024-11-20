@@ -65,9 +65,6 @@ namespace hf {
                         demands.thrust = _z_target;
                         _run(dt, state, demands);
                     }
-                    else {
-                        demands.thrust = demands.thrust;
-                    }
                 }
             }
 
