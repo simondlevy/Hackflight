@@ -7,7 +7,7 @@ EXTERNPROTO "../protos/New.proto"
 
 WorldInfo {
   title "Hackflight"
-  physics "quadrotor_physics"
+  physics "standard"
   contactProperties [
     ContactProperties {
       coulombFriction [

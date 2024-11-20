@@ -43,7 +43,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/new.wbt &
+	webots ../../worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 plot:
