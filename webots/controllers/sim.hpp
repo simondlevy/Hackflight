@@ -38,74 +38,39 @@ class Simulator {
 
         void init()
         {
-            wb_robot_init();
-
-            _timestep = wb_robot_get_basic_time_step();
-
-            _emitter = wb_robot_get_device("emitter");
-
-            wb_keyboard_enable(_timestep);
-
-            animateMotor("motor1", -1);
-            animateMotor("motor2", +1);
-            animateMotor("motor3", +1);
-            animateMotor("motor4", -1);
+            _init();
 
             wb_joystick_enable(_timestep);
-
-            wb_keyboard_enable(_timestep);
 
         }
 
         void initKeyboard()
         {
-            wb_robot_init();
-
-            _timestep = wb_robot_get_basic_time_step();
-
-            _emitter = wb_robot_get_device("emitter");
-
-            wb_keyboard_enable(_timestep);
-
-            animateMotor("motor1", -1);
-            animateMotor("motor2", +1);
-            animateMotor("motor3", +1);
-            animateMotor("motor4", -1);
+            _init();
 
             printKeyboardInstructions();
-
-            wb_keyboard_enable(_timestep);
-
         }
 
         bool step()
         {
-            if (wb_robot_step(_timestep) == -1) {
+            if (!_step()) {
                 return false;
             }
 
             auto siminfo = getSimInfo();
 
-            siminfo.framerate = 1000 / _timestep;
-
-            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
-
-            return true;
+            return dispatchSimInfo(siminfo);
         }
 
         bool stepKeyboard()
         {
-            if (wb_robot_step(_timestep) == -1) {
+            if (!_step()) {
                 return false;
             }
 
             auto siminfo = getSimInfoFromKeyboard();
 
-            siminfo.framerate = 1000 / _timestep;
-
-            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
-
-            return true;
+            return dispatchSimInfo(siminfo);
         }
 
         void close()
@@ -189,6 +154,36 @@ class Simulator {
         }
 
         bool _requested_takeoff;
+
+        void _init()
+        {
+            wb_robot_init();
+
+            _timestep = wb_robot_get_basic_time_step();
+
+            _emitter = wb_robot_get_device("emitter");
+
+            wb_keyboard_enable(_timestep);
+
+            animateMotor("motor1", -1);
+            animateMotor("motor2", +1);
+            animateMotor("motor3", +1);
+            animateMotor("motor4", -1);
+        }
+
+        bool _step()
+        {
+            return wb_robot_step(_timestep) != -1;
+        }
+
+        bool dispatchSimInfo(hf::siminfo_t & siminfo)
+        {
+            siminfo.framerate = 1000 / _timestep;
+
+            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+
+            return true;
+        }
 
         joystick_t getJoystickInfo() 
         {
