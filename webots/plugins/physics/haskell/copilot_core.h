@@ -1,10 +1,11 @@
-extern bool stream_completedTakeoff;
+extern float stream_time;
 extern float stream_throttle;
 extern float stream_dz;
 extern bool stream_requestedTakeoff;
 extern float stream_roll;
 extern float stream_dy;
 extern float stream_phi;
+extern float stream_dt;
 extern float stream_pitch;
 extern float stream_dx;
 extern float stream_theta;

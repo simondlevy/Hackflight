@@ -38,13 +38,12 @@ import Position
 
 -- Constants
 
-motor_hover = 55.385 :: SFloat -- rad /sec
-
-dt = 0.01 :: SFloat
-
 pitch_roll_post_scale = 50 :: SFloat -- deg
 
 -- Streams from C++ ----------------------------------------------------------
+
+dt :: SFloat
+dt = extern "stream_dt" Nothing
 
 throttle_stick :: SFloat
 throttle_stick = extern "stream_throttle" Nothing
@@ -61,8 +60,8 @@ yaw_stick = extern "stream_yaw" Nothing
 requestedTakeoff :: SBool
 requestedTakeoff = extern "stream_requestedTakeoff" Nothing
 
-completedTakeoff :: SBool
-completedTakeoff = extern "stream_completedTakeoff" Nothing
+time :: SFloat
+time = extern "stream_time" Nothing
 
 state_dx :: SFloat
 state_dx = extern "stream_dx" Nothing
@@ -111,7 +110,7 @@ spec = do
 
     let stickDemands = Demands throttle_stick roll_stick pitch_stick yaw_stick
 
-    let pids = [climbRateController requestedTakeoff completedTakeoff,
+    let pids = [climbRateController requestedTakeoff time,
           positionController dt,
           angleController dt ]
 

@@ -16,7 +16,19 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Webots
+#include <plugins/physics.h>
+
+// Hackflight
+#include <hackflight.hpp>
+#include <sim/dynamics.hpp>
+#include <mixers/bfquadx.hpp>
+
 // Global data and routines shared with Haskell Copilot ----------------------
+
+float stream_time;
+
+float stream_dt;
 
 float stream_throttle;
 float stream_roll;
@@ -36,21 +48,22 @@ float stream_dpsi;
 
 bool stream_requestedTakeoff;
 
-bool stream_completedTakeoff;
+static float motors[4];
 
 void runMotors(float m1, float m2, float m3, float m4)
 {
+    dWebotsConsolePrintf("m1=%3.3f  m2=%3.3f  m3=%3.3f  m4=%3.3f\n",
+            m1, m2, m3, m4);
+
+    motors[0] = m1;
+    motors[1] = m2;
+    motors[2] = m3;
+    motors[3] = m4;
 }
 
+void copilot_step_core();
+
 // ---------------------------------------------------------------------------
-
-// Webots
-#include <plugins/physics.h>
-
-// Hackflight
-#include <hackflight.hpp>
-#include <sim/dynamics.hpp>
-#include <mixers/bfquadx.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
 
@@ -123,19 +136,20 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
+    static uint32_t _frame_count;
+    stream_time = siminfo.requested_takeoff ? _frame_count++ / siminfo.framerate : 0;
+
     // Run control in outer loop
     for (uint32_t j=0; j < (1 / siminfo.framerate * PID_FREQ); ++j) {
-        
-        // Start with open-loop demands
-        hf::demands_t demands = {
-            siminfo.demands.thrust,
-            siminfo.demands.roll,
-            siminfo.demands.pitch,
-            siminfo.demands.yaw
-        };
 
-        // Throttle-down should reset pids
-        const auto resetPids = demands.thrust < THROTTLE_DOWN;
+        stream_requestedTakeoff = siminfo.requested_takeoff;
+
+        dWebotsConsolePrintf("time=%3.3f\n", stream_time);
+
+        stream_throttle = siminfo.demands.thrust;
+        stream_roll = siminfo.demands.roll;
+        stream_pitch = siminfo.demands.pitch;
+        stream_yaw = siminfo.demands.yaw;
 
         // Get simulated gyro
         const auto gyro = dynamics.readGyro();
@@ -143,37 +157,38 @@ DLLEXPORT void webots_physics_step()
         // XXX Cheat on remaining sensors for now
         const auto pose = dynamics.getPose();
         const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
-        const auto dz = dynamics.getGroundTruthVerticalVelocity();
 
         const auto r = hf::Utils::RAD2DEG;
-        const auto state = hf::state_t {
-                pose.x,
-                dxdy.x,
-                pose.y,
-                dxdy.y,
-                pose.z,
-                dz,
-                r * pose.phi,
-                gyro.x,
-                r * pose.theta,
-                gyro.y,
-                r * pose.psi,
-                gyro.z
-        };
 
-        // Run PID controllers to get final demands
-        
-        static const float pid_dt  = 1. / PID_FREQ;
+        stream_dx = dxdy.x;
 
-        // Run mixer to get motors spins from demands
-        hf::BfQuadXMixer mixer = {};
-        float motors[4] = {};
-        mixer.run(demands, motors);
+        stream_dy = dxdy.y;
+
+        stream_z = pose.z;
+
+        stream_dz = dynamics.getGroundTruthVerticalVelocity();
+
+        stream_phi = r * pose.phi;
+
+        stream_dphi = gyro.x;
+
+        stream_theta = r * pose.theta;
+
+        stream_dtheta = gyro.y;
+
+        stream_psi = r * pose.psi;
+
+        stream_dpsi = gyro.z;
+
+        stream_dt  = 1. / PID_FREQ;
 
         // Run dynamics in inner loop to update state with motors
+        hf::BfQuadXMixer mixer = {};
         for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
             dynamics.update(motors, &mixer);
         }
+
+        copilot_step_core();
     }
 
     // Get current pose from dynamics

@@ -1,5 +1,5 @@
 {--
-  Climb-rate algorithm for real and simulated flight controllers
+  Climb-rate algorithm simulated flight controllers
  
   Copyright (C) 2024 Simon D. Levy
  
@@ -36,17 +36,19 @@ import Utils
 
 --}
 
-climbRateController hitTakeoffButton completedTakeoff state demands = demands'
+climbRateController hitTakeoffButton time state demands = demands'
 
   where
 
     kp = 2
 
-    thrust_takeoff = 56
+    thrust_takeoff = 75 :: SFloat -- rad /sec
 
-    thrust_base = 55.385
+    thrust_base = 74.565 :: SFloat -- rad /sec
 
-    thrust' = if completedTakeoff
+    takeoff_time = 1.0 :: SFloat -- sec
+
+    thrust' = if time > takeoff_time
               then thrust_base + kp * ((thrust demands) - (dz state))
               else if hitTakeoffButton 
               then thrust_takeoff
