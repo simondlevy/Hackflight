@@ -1,6 +1,6 @@
 #VRML_SIM R2023b utf8
 
-PROTO Standard [
+PROTO Old [
   field SFVec3f translation     0 0 0.015
   field SFRotation rotation     0 0 0 0
 ]
@@ -13,8 +13,8 @@ DEF ROBOT Robot {
         rotation IS rotation
         controller "<extern>"
         supervisor FALSE
-        name "Standard"
-        model "Standard MAV"
+        name "Old"
+        model "Old MAV"
         children [
         DEF BODY Pose {
             translation 0 0 0
