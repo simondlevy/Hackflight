@@ -16,8 +16,6 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
 PDIR =  $(FDIR)/processors/risp
 
 VIZ_NET = $(shell pwd)/networks/difference_risp_train.txt

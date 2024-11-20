@@ -40,7 +40,7 @@ static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const char ROBOT_NAME[] = "quadrotor";
 
-static const float MOTOR_HOVER = 74.565; // 55.385; // rad/sec
+static const float MOTOR_HOVER = 74.565; // rad/sec
 
 static dBodyID _robotBody;
 

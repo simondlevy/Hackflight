@@ -19,7 +19,7 @@ INCLUDE = -I$(SRCDIR)
 
 NAME = standard
 
-CXX_SOURCES = ../main.cpp
+CXX_SOURCES = main.cpp
 
 all: $(NAME)
 

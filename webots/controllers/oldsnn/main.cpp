@@ -23,7 +23,7 @@
 #include <hackflight.hpp>
 #include <mixers/bfquadx.hpp>
 
-#include "../sim.hpp"
+#include "sim.hpp"
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 

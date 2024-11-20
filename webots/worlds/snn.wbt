@@ -1,0 +1,39 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "../protos/New.proto"
+
+WorldInfo {
+  title "Hackflight"
+  physics "snn"
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+
+Viewpoint {
+  orientation 0 1 -1.0656348786755114e-16 0.749999999999997
+  position -1.3067309323898773 -0.07692169747579411 1.2607778743833806
+  bloomThreshold 100
+}
+
+DEF quadrotor New {
+  translation 0 0 0.015
+  rotation 0 0 -1 0
+}
+
+TexturedBackground {
+}
+
+TexturedBackgroundLight {
+}
+Floor {
+}

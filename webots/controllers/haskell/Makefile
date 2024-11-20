@@ -19,7 +19,7 @@ INCLUDE = -I$(SRCDIR)
 
 NAME = haskell
 
-CXX_SOURCES = ../main.cpp
+CXX_SOURCES = main.cpp
 
 all: $(NAME)
 
