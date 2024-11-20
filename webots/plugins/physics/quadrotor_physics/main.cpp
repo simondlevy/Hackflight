@@ -150,11 +150,10 @@ DLLEXPORT void webots_physics_step()
         
         static const float pid_dt  = 1. / PID_FREQ;
 
-        dWebotsConsolePrintf("takeoff=%d  springy=%d\n",
-               siminfo.requested_takeoff, siminfo.is_springy); 
-        
         if (siminfo.requested_takeoff) {
 
+            dWebotsConsolePrintf("springy=%d\n", siminfo.is_springy); 
+        
             _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
 
             demands.thrust += MOTOR_HOVER;

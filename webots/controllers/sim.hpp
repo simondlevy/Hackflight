@@ -56,8 +56,6 @@ namespace hf {
 
             static constexpr float MOTOR_TAKEOFF = 56; // rad/sec
 
-            static constexpr float TAKEOFF_TIME = 3; // sec
-
             void init(const bool tryJoystick=true)
             {
                 wb_robot_init();
