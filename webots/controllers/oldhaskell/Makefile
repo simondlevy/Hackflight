@@ -17,7 +17,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I$(SRCDIR)
 
-NAME = haskell
+NAME = oldhaskell
 
 HASKDIR = ../../../haskell
 
