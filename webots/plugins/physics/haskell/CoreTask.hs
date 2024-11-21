@@ -26,8 +26,6 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 import Demands
-import Mixers
-import Sensors
 import State
 import Utils
 

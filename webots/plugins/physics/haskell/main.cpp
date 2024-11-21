@@ -19,8 +19,6 @@
 
 #include "../support.hpp"
 
-static hf::BfQuadXMixer mixer; 
-
 // Global data and routines shared with Haskell Copilot ----------------------
 
 float stream_time;
