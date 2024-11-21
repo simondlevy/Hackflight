@@ -30,11 +30,11 @@ static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
 
 static const uint32_t PID_FREQ = 1e3; // Hz
 
-static const char ROBOT_NAME[] = "quadrotor";
+static const char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robotBody;
 
-static hf::Dynamics::vehicle_params_t tinyquad_params = {
+static hf::Dynamics::vehicle_params_t diyquad_params = {
 
     1.0e-1, // mass [kg]
     5.0e-2, // arm length L [m]
@@ -60,7 +60,7 @@ static hf::siminfo_t getSimInfo()
     return _siminfo;
 }
 
-static auto dynamics = hf::Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
+static auto dynamics = hf::Dynamics(diyquad_params, 1./DYNAMICS_FREQ);
 
 static void setPose(hf::Dynamics & dynamics)
 {

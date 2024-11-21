@@ -25,7 +25,7 @@ Viewpoint {
   bloomThreshold 100
 }
 
-DEF quadrotor DiyQuad {
+DEF diyquad DiyQuad {
   translation 0 0 0.015
   rotation 0 0 -1 0
 }
