@@ -1,5 +1,5 @@
 /* 
- * Custom physics plugin for Hackflight simulator
+ * Custom physics plugin for Hackflight simulator using C++ PID controllers
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -16,33 +16,19 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Webots
-#include <plugins/physics.h>
-
-// Hackflight
-#include <hackflight.hpp>
-#include <sim/dynamics.hpp>
+#include "../support.hpp"
 
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
-#include <mixers/bfquadx.hpp>
-
-static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
-
-static const uint32_t PID_FREQ = 1e3; // Hz
 
 static const float THROTTLE_DOWN = 0.06;
 
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static const char ROBOT_NAME[] = "quadrotor";
-
 static const float MOTOR_HOVER = 74.565; // rad/sec
-
-static dBodyID _robotBody;
 
 static hf::AltitudePid _altitudePid;
 
@@ -52,49 +38,6 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 
 static hf::YawRatePid _yawRatePid;
 
-static hf::Dynamics::vehicle_params_t tinyquad_params = {
-
-    1.0e-1, // mass [kg]
-    5.0e-2, // arm length L [m]
-
-    3.6e-5, // force coefficient B [F=b*w^2]
-    7.0e-6, // drag coefficient D [T=d*w^2]
-    2.0e-5  // I [kg*m^2]   // pitch, roll
-};
-
-
-static hf::siminfo_t getSimInfo()
-{
-    static hf::siminfo_t _siminfo;
-
-    int size = 0;
-
-    const auto buffer = (hf::siminfo_t *)dWebotsReceive(&size);
-
-    if (size == sizeof(hf::siminfo_t)) {
-        memcpy(&_siminfo, buffer, sizeof(_siminfo));
-    }
-
-    return _siminfo;
-}
-
-static auto dynamics = hf::Dynamics(tinyquad_params, 1./DYNAMICS_FREQ);
-
-DLLEXPORT void webots_physics_init() 
-{
-    // init global variables
-    _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
-
-    if (_robotBody == NULL) {
-
-        dWebotsConsolePrintf("quadrotor_physics :: webots_physics_init :: ");
-        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
-    }
-    else {
-
-        dBodySetGravityMode(_robotBody, 0);
-    }
-}
 
 DLLEXPORT void webots_physics_step() 
 {
@@ -178,28 +121,5 @@ DLLEXPORT void webots_physics_step()
         }
     }
 
-    // Get current pose from dynamics
-    const auto pose = dynamics.getPose();
-
-    // Turn Euler angles into quaternion, negating psi for nose-right positive 
-    const hf::axis3_t euler = { pose.phi, pose.theta, -pose.psi };
-    hf::axis4_t quat = {};
-    hf::Utils::euler2quat(euler, quat);
-    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-    dBodySetQuaternion(_robotBody, q);
-
-    // Set robot posed based on state, negating for rightward negative
-    dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
-}
-
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
-{
-    (void)g1;
-    (void)g2;
-
-    return 0;
-}
-
-DLLEXPORT void webots_physics_cleanup() 
-{
+    setPose(dynamics);
 }

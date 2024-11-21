@@ -1,5 +1,6 @@
 /* 
- * Custom physics plugin for Hackflight simulator
+ * Custom physics plugin for Hackflight simulator using Haskell Copilot for
+ * control
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -15,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
-
 
 #include "../support.hpp"
 
@@ -56,12 +56,6 @@ void runMotors(float m1, float m2, float m3, float m4)
 void copilot_step_core();
 
 // ---------------------------------------------------------------------------
-
-static const float THROTTLE_DOWN = 0.06;
-
-static const float PITCH_ROLL_POST_SCALE = 50;
-
-static const float MOTOR_HOVER = 74.565; // 55.385; // rad/sec
 
 DLLEXPORT void webots_physics_step() 
 {
