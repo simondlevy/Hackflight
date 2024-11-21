@@ -110,12 +110,7 @@ DLLEXPORT void webots_physics_step()
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
-        // Run mixer to get motors spins from demands
-        hf::BfQuadXMixer mixer = {};
-        float motors[4] = {};
-        mixer.run(demands, motors);
-
-        updateDynamics(motors, mixer);
+        updateDynamics(demands);
     }
 
     setPose(dynamics);

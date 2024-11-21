@@ -19,6 +19,8 @@
 
 #include "../support.hpp"
 
+static hf::BfQuadXMixer mixer; 
+
 // Global data and routines shared with Haskell Copilot ----------------------
 
 float stream_time;
@@ -43,14 +45,11 @@ float stream_dpsi;
 
 bool stream_requestedTakeoff;
 
-static float motors[4];
-
-void runMotors(float m1, float m2, float m3, float m4)
+void runMixer(float t, float r, float p, float y)
 {
-    motors[0] = m1;
-    motors[1] = m2;
-    motors[2] = m3;
-    motors[3] = m4;
+    hf::demands_t demands = {t, r, p, y};
+
+    updateDynamics(demands);
 }
 
 void copilot_step_core();
@@ -116,9 +115,7 @@ DLLEXPORT void webots_physics_step()
 
         stream_dt  = 1. / PID_FREQ;
 
-        hf::BfQuadXMixer mixer = {};
-        updateDynamics(motors, mixer);
-
+        // This will call runMixer() defined above
         copilot_step_core();
     }
 

@@ -78,10 +78,16 @@ static void setPose(hf::Dynamics & dynamics)
     dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
 }
 
-static void updateDynamics(const float * motors, hf::Mixer & mixer)
+static void updateDynamics(const hf::demands_t & demands)
 {
-    // Run dynamics in inner loop to update state with motors
+    hf::BfQuadXMixer mixer = {};
+
+    float motors[4] = {};
+
+    mixer.run(demands, motors);
+
     for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
+
         dynamics.update(motors, &mixer);
     }
 }

@@ -13,5 +13,5 @@ extern float stream_yaw;
 extern float stream_dpsi;
 extern float stream_dphi;
 extern float stream_dtheta;
-void runMotors(float runMotors_arg0, float runMotors_arg1, float runMotors_arg2, float runMotors_arg3);
+void runMixer(float runMixer_arg0, float runMixer_arg1, float runMixer_arg2, float runMixer_arg3);
 void copilot_step_core(void);
