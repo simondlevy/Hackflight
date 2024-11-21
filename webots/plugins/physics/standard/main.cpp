@@ -49,7 +49,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Run control in outer loop
-    for (uint32_t j=0; j < (1 / siminfo.framerate * PID_FREQ); ++j) {
+    for (uint32_t j=0; j <outerLoopCount(siminfo);  ++j) {
         
         // Start with open-loop demands
         hf::demands_t demands = {

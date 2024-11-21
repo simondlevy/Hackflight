@@ -100,6 +100,11 @@ static bool getSimInfo(hf::siminfo_t & siminfo)
     return true;
 }
 
+static uint32_t outerLoopCount(const hf::siminfo_t & siminfo)
+{
+    return (uint32_t)(1 / siminfo.framerate * PID_FREQ);
+}
+
 DLLEXPORT void webots_physics_init() 
 {
     // init global variables

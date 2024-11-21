@@ -68,7 +68,7 @@ DLLEXPORT void webots_physics_step()
         _frame_count++ / siminfo.framerate : 0;
 
     // Run control in outer loop
-    for (uint32_t j=0; j < (1 / siminfo.framerate * PID_FREQ); ++j) {
+    for (uint32_t j=0; j <outerLoopCount(siminfo);  ++j) {
 
         stream_requestedTakeoff = siminfo.requested_takeoff;
 
