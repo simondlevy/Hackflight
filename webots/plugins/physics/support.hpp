@@ -78,6 +78,14 @@ static void setPose(hf::Dynamics & dynamics)
     dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
 }
 
+static void updateDynamics(const float * motors, hf::Mixer & mixer)
+{
+    // Run dynamics in inner loop to update state with motors
+    for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
+        dynamics.update(motors, &mixer);
+    }
+}
+
 DLLEXPORT void webots_physics_init() 
 {
     // init global variables

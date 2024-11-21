@@ -115,10 +115,7 @@ DLLEXPORT void webots_physics_step()
         float motors[4] = {};
         mixer.run(demands, motors);
 
-        // Run dynamics in inner loop to update state with motors
-        for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
-            dynamics.update(motors, &mixer);
-        }
+        updateDynamics(motors, mixer);
     }
 
     setPose(dynamics);

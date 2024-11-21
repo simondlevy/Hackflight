@@ -116,11 +116,8 @@ DLLEXPORT void webots_physics_step()
 
         stream_dt  = 1. / PID_FREQ;
 
-        // Run dynamics in inner loop to update state with motors
         hf::BfQuadXMixer mixer = {};
-        for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
-            dynamics.update(motors, &mixer);
-        }
+        updateDynamics(motors, mixer);
 
         copilot_step_core();
     }
