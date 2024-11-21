@@ -1,0 +1,17 @@
+extern float stream_time;
+extern float stream_throttle;
+extern float stream_dz;
+extern bool stream_requestedTakeoff;
+extern float stream_roll;
+extern float stream_dy;
+extern float stream_phi;
+extern float stream_dt;
+extern float stream_pitch;
+extern float stream_dx;
+extern float stream_theta;
+extern float stream_yaw;
+extern float stream_dpsi;
+extern float stream_dphi;
+extern float stream_dtheta;
+void runMotors(float runMotors_arg0, float runMotors_arg1, float runMotors_arg2, float runMotors_arg3);
+void copilot_step_core(void);
