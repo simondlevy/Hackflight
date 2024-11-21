@@ -105,6 +105,23 @@ static uint32_t outerLoopCount(const hf::siminfo_t & siminfo)
     return (uint32_t)(1 / siminfo.framerate * PID_FREQ);
 }
 
+static hf::state_t getState()
+{
+    // Get simulated gyro
+    const auto gyro = dynamics.readGyro();
+
+    // XXX Cheat on remaining sensors for now
+    const auto pose = dynamics.getPose();
+    const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
+    const auto dz = dynamics.getGroundTruthVerticalVelocity();
+    const auto r = hf::Utils::RAD2DEG;
+
+    return hf::state_t { pose.x, dxdy.x, pose.y, dxdy.y, pose.z, dz,
+            r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
+    };
+}
+
+
 DLLEXPORT void webots_physics_init() 
 {
     // init global variables

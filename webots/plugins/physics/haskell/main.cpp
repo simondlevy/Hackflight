@@ -77,34 +77,18 @@ DLLEXPORT void webots_physics_step()
         stream_pitch = siminfo.demands.pitch;
         stream_yaw = siminfo.demands.yaw;
 
-        // Get simulated gyro
-        const auto gyro = dynamics.readGyro();
+        const auto state = getState();
 
-        // XXX Cheat on remaining sensors for now
-        const auto pose = dynamics.getPose();
-        const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
-
-        const auto r = hf::Utils::RAD2DEG;
-
-        stream_dx = dxdy.x;
-
-        stream_dy = dxdy.y;
-
-        stream_z = pose.z;
-
-        stream_dz = dynamics.getGroundTruthVerticalVelocity();
-
-        stream_phi = r * pose.phi;
-
-        stream_dphi = gyro.x;
-
-        stream_theta = r * pose.theta;
-
-        stream_dtheta = gyro.y;
-
-        stream_psi = r * pose.psi;
-
-        stream_dpsi = gyro.z;
+        stream_dx = state.dx;
+        stream_dy = state.dy;
+        stream_z = state.z;
+        stream_dz = state.dz;
+        stream_phi = state.phi;
+        stream_dphi = state.dphi;
+        stream_theta = state.theta;
+        stream_dtheta = state.dtheta;
+        stream_psi = state.psi;
+        stream_dpsi = state.dpsi;
 
         stream_dt  = 1. / PID_FREQ;
 
@@ -114,3 +98,6 @@ DLLEXPORT void webots_physics_step()
 
     setPose(dynamics);
 }
+
+
+
