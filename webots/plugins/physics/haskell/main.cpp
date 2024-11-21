@@ -56,14 +56,9 @@ void copilot_step_core();
 
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robotBody == NULL) {
-        return;
-    }
+    hf::siminfo_t siminfo = {};
 
-    const auto siminfo = getSimInfo();
-
-    // This happens at startup
-    if (siminfo.framerate == 0) {
+    if (!getSimInfo(siminfo)) {
         return;
     }
 

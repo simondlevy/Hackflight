@@ -45,21 +45,6 @@ static hf::Dynamics::vehicle_params_t diyquad_params = {
 };
 
 
-static hf::siminfo_t getSimInfo()
-{
-    static hf::siminfo_t _siminfo;
-
-    int size = 0;
-
-    const auto buffer = (hf::siminfo_t *)dWebotsReceive(&size);
-
-    if (size == sizeof(hf::siminfo_t)) {
-        memcpy(&_siminfo, buffer, sizeof(_siminfo));
-    }
-
-    return _siminfo;
-}
-
 static auto dynamics = hf::Dynamics(diyquad_params, 1./DYNAMICS_FREQ);
 
 static void setPose(hf::Dynamics & dynamics)
@@ -90,6 +75,29 @@ static void updateDynamics(const hf::demands_t & demands)
 
         dynamics.update(motors, &mixer);
     }
+}
+
+static bool getSimInfo(hf::siminfo_t & siminfo)
+{
+    if (_robotBody == NULL) {
+        return false;
+    }
+
+    int size = 0;
+
+    const auto buffer = (hf::siminfo_t *)dWebotsReceive(&size);
+
+    if (size == sizeof(hf::siminfo_t)) {
+        memcpy(&siminfo, buffer, sizeof(siminfo));
+    }
+
+
+    // This happens at startup
+    if (siminfo.framerate == 0) {
+        return false;
+    }
+
+    return true;
 }
 
 DLLEXPORT void webots_physics_init() 

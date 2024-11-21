@@ -41,14 +41,10 @@ static hf::YawRatePid _yawRatePid;
 
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robotBody == NULL) {
-        return;
-    }
 
-    const auto siminfo = getSimInfo();
+    hf::siminfo_t siminfo = {};
 
-    // This happens at startup
-    if (siminfo.framerate == 0) {
+    if (!getSimInfo(siminfo)) {
         return;
     }
 
