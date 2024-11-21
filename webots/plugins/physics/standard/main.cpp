@@ -65,23 +65,21 @@ DLLEXPORT void webots_physics_step()
 
         // Run PID controllers to get final demands
         
-        static const float pid_dt  = 1. / PID_FREQ;
-
         if (siminfo.requested_takeoff) {
 
-            _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
+            _altitudePid.run(siminfo.is_springy, pidDt(), state, demands);
 
             demands.thrust += MOTOR_HOVER;
         }
 
         hf::PositionPid::run(state, demands);
 
-        _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
+        _pitchRollAnglePid.run(pidDt(), resetPids, state, demands);
 
-        _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
+        _pitchRollRatePid.run(pidDt(), resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
 
-        _yawRatePid.run(pid_dt, resetPids, state, demands);
+        _yawRatePid.run(pidDt(), resetPids, state, demands);
 
         updateDynamics(demands);
     }

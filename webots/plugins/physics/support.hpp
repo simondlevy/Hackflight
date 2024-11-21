@@ -105,6 +105,11 @@ static uint32_t outerLoopCount(const hf::siminfo_t & siminfo)
     return (uint32_t)(1 / siminfo.framerate * PID_FREQ);
 }
 
+static float pidDt()
+{
+    return 1. / PID_FREQ;
+}
+
 static hf::state_t getState()
 {
     // Get simulated gyro

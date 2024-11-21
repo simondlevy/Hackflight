@@ -90,7 +90,7 @@ DLLEXPORT void webots_physics_step()
         stream_psi = state.psi;
         stream_dpsi = state.dpsi;
 
-        stream_dt  = 1. / PID_FREQ;
+        stream_dt = pidDt();
 
         // This will call runMixer() defined above
         copilot_step_core();
