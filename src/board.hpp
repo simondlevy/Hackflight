@@ -37,7 +37,6 @@
 #include <timer.hpp>
 #include <msp.hpp>
 
-
 namespace hf {
 
     // These must be global to support static handleI2CRequest()
@@ -136,6 +135,11 @@ namespace hf {
                     ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
                     az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
                 };
+
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    /*printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
+                            accel.x, accel.y, accel.z);*/
+                }
 
                 // Gyro deg /sec
                 const axis3_t gyro = {
@@ -249,6 +253,10 @@ namespace hf {
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
             uint8_t _ledPin;
 
+            // Debugging ------------------------------------------------------
+            static constexpr float DEBUG_RATE_HZ = 100;
+            Timer _debugTimer;
+
             // Comms ----------------------------------------------------------
             static constexpr float COMMS_RATE_HZ = 20;//100;
 
@@ -308,20 +316,6 @@ namespace hf {
                 // Sit in loop until appropriate time has passed
                 while (invFreq > (checker - usec_curr)) {
                     checker = micros();
-                }
-            }
-
-            void blinkOnStartup(void)
-            {
-                // These constants are arbitrary, so we hide them here
-                static const uint8_t  BLINK_INIT_COUNT = 10;
-                static const uint32_t BLINK_INIT_TIME_MSEC = 100;
-
-                for (uint8_t j=0; j<BLINK_INIT_COUNT; j++) {
-                    digitalWrite(_ledPin, LOW);
-                    delay(BLINK_INIT_TIME_MSEC);
-                    digitalWrite(_ledPin, HIGH);
-                    delay(BLINK_INIT_TIME_MSEC);
                 }
             }
 
