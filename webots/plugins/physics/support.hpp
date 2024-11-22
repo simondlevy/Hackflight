@@ -120,7 +120,7 @@ static hf::state_t getState()
     // Get simulated rangefinder distance
     const auto h = hf::Ranger::read(dynamics);
 
-    dWebotsConsolePrintf("h=%3.3f (est)\n", h);
+    dWebotsConsolePrintf("h=%3.3f\n", h);
 
     // XXX Cheat on remaining sensors for now
     const auto pose = dynamics.getPose();

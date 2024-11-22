@@ -20,13 +20,13 @@ WorldInfo {
 }
 
 Viewpoint {
-  orientation 0 1 -1.0656348786755114e-16 0.749999999999997
-  position -1.3067309323898773 -0.07692169747579411 1.2607778743833806
+  orientation 0 1 0 0.75
+  position -1.3 -0.08 1.3
   bloomThreshold 100
 }
 
 DEF diyquad DiyQuad {
-  translation 0 0 0.015
+  translation 0 0 0
   rotation 0 0 -1 0
 }
 
@@ -35,5 +35,6 @@ TexturedBackground {
 
 TexturedBackgroundLight {
 }
+
 Floor {
 }

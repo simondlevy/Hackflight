@@ -43,26 +43,18 @@ DEF ROBOT Robot {
             height 324
     }
 
-    DistanceSensor {
-      rotation 0 1 0 1.57
-      name "rangefinder"
-      lookupTable [
-        0 0 0
-        2 2000 0
-      ]
-  }
+    # Use these for ground-truthing simulated sensors -------------------------
 
     GPS {
+        name "gps"
     }
 
     Accelerometer {
-    }
-
-     Gyro {
+        name "accel"
     }
 
     InertialUnit {
-        name "inertial_unit"
+        name "imu"
     }
 
     # Motor 1 ----------------------------------------------------------------
