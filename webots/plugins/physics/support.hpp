@@ -24,9 +24,9 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
-#include <sim/sensors/flow.hpp>
-#include <sim/sensors/gyro.hpp>
-#include <sim/sensors/ranger.hpp>
+#include <sim/sensors/optical_flow.hpp>
+#include <sim/sensors/gyrometer.hpp>
+#include <sim/sensors/rangefinder.hpp>
 #include <mixers/bfquadx.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
@@ -121,21 +121,27 @@ static hf::state_t estimateState()
     // Get simulated rangefinder distance
     const auto h = hf::Rangefinder::read(dynamics);
 
-    // XXX Cheat on Euler angles for now (should get them by fusing gyro and accel)
+    // Get simulated optical flow
+    const auto flow = hf::OpticalFlow::read(dynamics, h);
+
+    // Cheat on Euler angles for now (should get them by fusing gyro and accel)
     const auto pose = dynamics.getPose();
 
-    // Turn rangefinder distance directly into altitude (XXX should fuse with
-    // accelerometer)
+    // Turn rangefinder distance directly into altitude 
     const auto z = h * (cos(pose.phi) * cos(pose.theta)) / 1000; // mm => m
-
-    dWebotsConsolePrintf("z=%3.3f\n", z);
 
     // XXX Cheat on remaining sensors for now
     const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
     const auto dz = dynamics.getGroundTruthVerticalVelocity();
     const auto r = hf::Utils::RAD2DEG;
 
-    return hf::state_t { pose.x, dxdy.x, pose.y, dxdy.y, z, dz,
+     // https://www.bitcraze.io/documentation/repository/crazyflie-firmware/                                      //  master/images/flowdeck_velocity.png
+
+    const float dy = flow.y;
+
+    dWebotsConsolePrintf("dy=%+3.3e (%+3.3e)\n", dxdy.y, dy);
+
+    return hf::state_t {pose.x, dxdy.x, pose.y, dxdy.y, z, dz,
             r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
     };
 }
