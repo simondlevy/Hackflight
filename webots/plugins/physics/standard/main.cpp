@@ -47,7 +47,7 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    // Run control in outer loop
+    // Run control in middle loop
     for (uint32_t j=0; j <outerLoopCount(siminfo);  ++j) {
         
         // Start with open-loop demands
@@ -81,8 +81,10 @@ DLLEXPORT void webots_physics_step()
 
         _yawRatePid.run(pidDt(), resetPids, state, demands);
 
+        // Update dynamics in innermost loop
         updateDynamics(demands);
     }
 
+    // Set pose in outermost loop
     setPose(dynamics);
 }

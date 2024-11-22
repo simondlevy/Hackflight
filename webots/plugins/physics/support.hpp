@@ -115,6 +115,9 @@ static float pidDt()
 
 static hf::state_t estimateState()
 {
+    // For now we run the state estimator at the same rate as the control loop
+    static auto dt = 1 / (float)PID_FREQ;
+
     // Get simulated gyro values
     const auto gyro = hf::Gyro::read(dynamics);
 
@@ -130,6 +133,9 @@ static hf::state_t estimateState()
     // Turn rangefinder distance directly into altitude 
     const auto z = h * (cos(pose.phi) * cos(pose.theta)) / 1000; // mm => m
 
+    // Fuse gyro, flow, and rangefinder to estimate lateral velocity
+    //const auto dx  = h * hf::OpticalFlow::thetapix() * flow.x / ();
+
     // XXX Cheat on remaining sensors for now
     const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
     const auto dz = dynamics.getGroundTruthVerticalVelocity();
@@ -138,7 +144,7 @@ static hf::state_t estimateState()
      // https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
      //   master/images/flowdeck_velocity.png
 
-    dWebotsConsolePrintf("flow_y=%+3.3f  dy=%+3.3f\n", flow.y, dxdy.y);
+    dWebotsConsolePrintf("dt=%f  flow_y=%+3.3f  dy=%+3.3f\n", dt, flow.y, dxdy.y);
 
     return hf::state_t {pose.x, dxdy.x, pose.y, dxdy.y, z, dz,
             r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
