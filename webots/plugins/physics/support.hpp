@@ -113,7 +113,7 @@ static float pidDt()
     return 1. / PID_FREQ;
 }
 
-static hf::state_t getState()
+static hf::state_t estimateState()
 {
     // Get simulated gyro values
     const auto gyro = hf::Gyro::read(dynamics);
@@ -121,15 +121,21 @@ static hf::state_t getState()
     // Get simulated rangefinder distance
     const auto h = hf::Rangefinder::read(dynamics);
 
-    dWebotsConsolePrintf("h=%3.3f\n", h);
+    // XXX Cheat on Euler angles for now (should get them by fusing gyro and accel)
+    const auto pose = dynamics.getPose();
+
+    // Turn rangefinder distance directly into altitude (XXX should fuse with
+    // accelerometer)
+    const auto z = h * (cos(pose.phi) * cos(pose.theta)) / 1000; // mm => m
+
+    dWebotsConsolePrintf("z=%3.3f\n", z);
 
     // XXX Cheat on remaining sensors for now
-    const auto pose = dynamics.getPose();
     const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
     const auto dz = dynamics.getGroundTruthVerticalVelocity();
     const auto r = hf::Utils::RAD2DEG;
 
-    return hf::state_t { pose.x, dxdy.x, pose.y, dxdy.y, pose.z, dz,
+    return hf::state_t { pose.x, dxdy.x, pose.y, dxdy.y, z, dz,
             r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
     };
 }

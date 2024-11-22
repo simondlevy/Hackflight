@@ -77,7 +77,7 @@ DLLEXPORT void webots_physics_step()
         stream_pitch = siminfo.demands.pitch;
         stream_yaw = siminfo.demands.yaw;
 
-        const auto state = getState();
+        const auto state = estimateState();
 
         stream_dx = state.dx;
         stream_dy = state.dy;

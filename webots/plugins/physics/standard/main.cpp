@@ -61,7 +61,7 @@ DLLEXPORT void webots_physics_step()
         // Throttle-down should reset pids
         const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-        const auto state = getState();
+        const auto state = estimateState();
 
         // Run PID controllers to get final demands
         
