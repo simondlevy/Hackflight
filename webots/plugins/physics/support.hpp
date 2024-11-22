@@ -122,7 +122,7 @@ static hf::state_t estimateState()
     const auto h = hf::Rangefinder::read(dynamics);
 
     // Get simulated optical flow
-    const auto flow = hf::OpticalFlow::read(dynamics, h);
+    const auto flow = hf::OpticalFlow::read(dynamics);
 
     // Cheat on Euler angles for now (should get them by fusing gyro and accel)
     const auto pose = dynamics.getPose();
@@ -135,11 +135,10 @@ static hf::state_t estimateState()
     const auto dz = dynamics.getGroundTruthVerticalVelocity();
     const auto r = hf::Utils::RAD2DEG;
 
-     // https://www.bitcraze.io/documentation/repository/crazyflie-firmware/                                      //  master/images/flowdeck_velocity.png
+     // https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
+     //   master/images/flowdeck_velocity.png
 
-    const float dy = flow.y;
-
-    dWebotsConsolePrintf("dy=%+3.3e (%+3.3e)\n", dxdy.y, dy);
+    dWebotsConsolePrintf("flow_y=%+3.3f  dy=%+3.3f\n", flow.y, dxdy.y);
 
     return hf::state_t {pose.x, dxdy.x, pose.y, dxdy.y, z, dz,
             r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z

@@ -2,11 +2,6 @@
  *   Simulated optical flow sensor
  *
  *
- *   For equations see
- *
- *     https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
- *      master/images/flowdeck_velocity.png
- *
  *   Copyright (C) 2024 Simon D. Levy
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -31,28 +26,46 @@ namespace hf {
 
         public:
 
+            // https://github.com/bitcraze/Bitcraze_PMW3901
+            static constexpr float NPIX = 35;
+
+            static float thetapix()
+            {
+                return 2 * sin(Utils::DEG2RAD * FIELD_OF_VIEW / 2);
+            }
+
+            static axis2_t read(const Dynamics & d)
+            {
+                // Rotate inertial-frame horizontal velocity into body frame
+                const auto dx =   d._x2 * cos(d._x11) - d._x4 * sin(d._x11);
+                const auto dy = -(d._x2 * sin(d._x11) + d._x4 * cos(d._x11));
+
+                // Simulate optical flow based on
+                //    https://github.com/bitcraze/crazyflie-firmware/blob/master/
+                //    src/modules/src/kalman_core/mm_flow.c
+
+                const auto z = max(d._x5, ZMIN);
+
+                const auto scale = d._dt * NPIX / thetapix(); 
+
+                const auto flow_dx = scale * ((dx / z) - d._x9);
+
+                const auto flow_dy = scale * ((dy / z) - d._x7);
+
+                return axis2_t {flow_dx, flow_dy};
+            }
+
+        private:
+
             // https://wiki.bitcraze.io/_media/projects:crazyflie2:
             //    expansionboards:pot0189-pmw3901mb-txqt-ds-r1.40-280119.pdf
             static constexpr float FIELD_OF_VIEW = 42;
 
-            // https://github.com/bitcraze/Bitcraze_PMW3901
-            static constexpr float NPIX = 35;
+            static constexpr float ZMIN = 0.1;
 
-            static axis2_t read(const Dynamics & d, const float h)
+            static float max(const float a, const float b)
             {
-                const auto dx =   d._x2 * cos(d._x11) - d._x4 * sin(d._x11);
-
-                const auto dy = -(d._x2 * sin(d._x11) + d._x4 * cos(d._x11));
-
-                const auto theta = 2 * sin(Utils::DEG2RAD * FIELD_OF_VIEW / 2);
-
-                const auto flow_dx = h > 0 ? 
-                    d._dt * NPIX * (h * d._x10 + dx) / (h * theta) : 0;
-
-                const auto flow_dy = h > 0 ? 
-                    d._dt * NPIX * (h * d._x8 + dy) / (h * theta) : 0;
-
-                return axis2_t {flow_dx, flow_dy};
+                return a > b ? a : b;
             }
     };
 
