@@ -1,5 +1,11 @@
 /*
- *   Optical flow simulator
+ *   Simulated optical flow sensor
+ *
+ *
+ *   For and equation see
+ *
+ *     https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
+ *      master/images/flowdeck_velocity.png
  *
  *   Copyright (C) 2024 Simon D. Levy
  *
@@ -17,28 +23,38 @@
  */
 
 #include <hackflight.hpp>
+#include <utils.hpp>
 
 namespace hf {
 
     class OpticalFlow {
 
-        static axis2_t read(
-                const axis2_t dxy_true,
-                const axis3_t gyro,
-                const float h,
-                const float dt)
-        {
-            const auto theta = 2 * sin(Utils::DEG2RAD * FLOW_ANGLE / 2);
+        public:
 
-            const auto flow_dx =
-                dt * FLOW_NPIX * (h * gyro.y + dxy_true.x) / (h * theta);
+            static axis2_t read(
+                    const Dynamics & d,
+                    const float h,
+                    const float dt)
+            {
+                const auto theta = 2 * sin(Utils::DEG2RAD * FIELD_OF_VIEW / 2);
 
-            const auto flow_dy =
-                dt * FLOW_NPIX * (h * gyro.x + dxy_true.y) / (h * theta);
+                const auto flow_dx =
+                    dt * NPIX * (h * d._x10 + dxy_true.x) / (h * theta);
 
-            return axis2_t {flow_dx, flow_dy};
-        }
+                const auto flow_dy =
+                    dt * NPIX * (h * d._x8 + dxy_true.y) / (h * theta);
 
+                return axis2_t {flow_dx, flow_dy};
+            }
+
+        private:
+
+            // https://wiki.bitcraze.io/_media/projects:crazyflie2:
+            //    expansionboards:pot0189-pmw3901mb-txqt-ds-r1.40-280119.pdf
+            static constexpr float FIELD_OF_VIEW = 42;
+
+            // https://github.com/bitcraze/Bitcraze_PMW3901
+            static constexpr float NPIX = 35;
     };
 
 }

@@ -1,5 +1,5 @@
 /*
- *   Laser rangefinder (Time-Of-Flight) simulator
+ *   Simulted laser rangefinder (Time-Of-Flight sensor)
  *
  *   For equation see
  *
