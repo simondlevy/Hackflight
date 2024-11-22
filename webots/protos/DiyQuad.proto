@@ -43,20 +43,6 @@ DEF ROBOT Robot {
             height 324
     }
 
-    # Use these for ground-truthing simulated sensors -------------------------
-
-    GPS {
-        name "gps"
-    }
-
-    Accelerometer {
-        name "accel"
-    }
-
-    InertialUnit {
-        name "imu"
-    }
-
     # Motor 1 ----------------------------------------------------------------
 
     DEF M1 Propeller {

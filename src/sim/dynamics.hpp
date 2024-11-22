@@ -128,60 +128,47 @@ namespace hf {
                 }
 
                 // Equation 12 line 6
-                const auto dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
+                _dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
-                if (dx6 > 0) {
+                if (_dx6 > 0) {
                     _airborne = true;
                 }
 
                 // Once airborne, we can update dynamics
                 if (_airborne) {
 
-                    // Equation 12 : Note negations to support ---------------
-                    // roll-right positive
+                    // Equation 12 : Note negations to support roll-right
+                    // positive
 
-                    const auto dx1 = _x2;
-
-                    const auto dx2 =
-                        (cos(-_x7)*sin(_x9)*cos(_x11) + sin(-_x7)*sin(_x11)) * u1 / m;
-
-                    const auto dx3 = _x4;
-
-                    const auto dx4 = 
-                        -(cos(-_x7)*sin(_x9)*sin(_x11) - sin(-_x7)*cos(_x11)) * u1 / m;
-
-                    const auto dx5 = _x6;
-
-                    const auto dx7 = _x8;
-
-                    const auto dx8 = l / I * u2;
-
-                    const auto dx9 = _x10;
-
-                    const auto dx10 = l / I * u3;
-
-                    const auto dx11 = _x12;
-
-                    const auto dx12 = -l / I * u4; 
-
-                    // -------------------------------------------------------
-
+                    _dx1 = _x2;
+                    _dx2 =(cos(-_x7)*sin(_x9)*cos(_x11) +
+                            sin(-_x7)*sin(_x11)) * u1 / m;
+                    _dx3 = _x4;
+                    _dx4 = -(cos(-_x7)*sin(_x9)*sin(_x11) -
+                            sin(-_x7)*cos(_x11)) * u1 / m;
+                    _dx5 = _x6;
+                    _dx7 = _x8;
+                    _dx8 = l / I * u2;
+                    _dx9 = _x10;
+                    _dx10 = l / I * u3;
+                    _dx11 = _x12;
+                    _dx12 = -l / I * u4; 
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
-                    _x1 += _dt * dx1;
-                    _x2 += _dt * dx2;
-                    _x3 += _dt * dx3;
-                    _x4 += _dt * dx4;
-                    _x5 += _dt * dx5;
-                    _x6 += _dt * dx6;
-                    _x7 += _dt * dx7;
-                    _x8 += _dt * dx8;
-                    _x9 += _dt * dx9;
-                    _x10 += _dt * dx10;
-                    _x11 += _dt * dx11;
-                    _x12 += _dt * dx12;
+                    _x1 += _dt * _dx1;
+                    _x2 += _dt * _dx2;
+                    _x3 += _dt * _dx3;
+                    _x4 += _dt * _dx4;
+                    _x5 += _dt * _dx5;
+                    _x6 += _dt * _dx6;
+                    _x7 += _dt * _dx7;
+                    _x8 += _dt * _dx8;
+                    _x9 += _dt * _dx9;
+                    _x10 += _dt * _dx10;
+                    _x11 += _dt * _dx11;
+                    _x12 += _dt * _dx12;
                 }
 
             } // update
@@ -228,6 +215,20 @@ namespace hf {
             float _x10; // dtheta/dt
             float _x11; // psi
             float _x12; // dpsi/dt
+
+            // Vehicle state first derivative (Equation 12)
+            float _dx1;  // x
+            float _dx2;  // dx/dt
+            float _dx3;  // y
+            float _dx4;  // dy/dt
+            float _dx5;  // z
+            float _dx6;  // dz/dt
+            float _dx7;  // phi
+            float _dx8;  // dphi/dt
+            float _dx9;  // theta
+            float _dx10; // dtheta/dt
+            float _dx11; // psi
+            float _dx12; // dpsi/dt
 
             float _g; // gravitational constant
             float _rho; // air density

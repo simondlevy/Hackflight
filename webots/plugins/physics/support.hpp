@@ -66,7 +66,8 @@ static void setPose(hf::Dynamics & dynamics)
     dBodySetQuaternion(_robotBody, q);
 
     // Set robot posed based on state, negating for rightward negative
-    dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
+    // dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
+    dBodySetPosition(_robotBody, 0, 0, pose.z);
 }
 
 static void updateDynamics(const hf::demands_t & demands)
@@ -127,7 +128,8 @@ static hf::state_t estimateState()
      // Get simulated accelerometer values
     const auto accel = hf::Accelerometer::read(dynamics);
 
-    (void)accel;
+    dWebotsConsolePrintf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
+            accel.x, accel.y, accel.z);
 
    // Get simulated rangefinder distance
     const auto h = hf::Rangefinder::read(dynamics);
@@ -146,7 +148,8 @@ static hf::state_t estimateState()
     const auto dz = dynamics.getGroundTruthVerticalVelocity();
     const auto r = hf::Utils::RAD2DEG;
 
-    return hf::state_t {pose.x, dxdy_tru.x, pose.y, dxdy_tru.y, z, dz,
+    return hf::state_t {
+        pose.x,dxdy_tru.x, pose.y, dxdy_tru.y, z, dz,
             r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
     };
 }

@@ -29,9 +29,9 @@ namespace hf {
 
             static axis3_t read(Dynamics & d)
             {
-                (void)d;
+                const auto s = Utils::GS2MSS;
 
-                return axis3_t { 0, 0, 0 };
+                return axis3_t { d._dx2 / s, d._dx4 / s, (d._dx6 + d._g) / s };
             }
     };
 }

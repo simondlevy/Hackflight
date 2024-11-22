@@ -31,7 +31,7 @@ namespace hf {
             {
                 const auto r = Utils::RAD2DEG;
 
-                return axis3_t { r *d._x8, r*d._x10, r *d._x12 };
+                return axis3_t { r * d._x8, r * d._x10, r * d._x12 };
             }
     };
 }

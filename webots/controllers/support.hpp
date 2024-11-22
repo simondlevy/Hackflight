@@ -32,6 +32,8 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
+#include <webots/accelerometer.h>
+
 class Simulator {
 
     public:
@@ -152,8 +154,6 @@ class Simulator {
         {
             return normalizeJoystickAxis(readJoystickRaw(index));
         }
-
-        bool _requested_takeoff;
 
         void _init()
         {
@@ -350,7 +350,6 @@ class Simulator {
             else { 
 
                 siminfo = getSimInfoFromKeyboard();
-
             }
 
             return siminfo;
