@@ -39,6 +39,7 @@ static hf::PitchRollRatePid _pitchRollRatePid;
 static hf::YawRatePid _yawRatePid;
 
 
+// This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
     hf::siminfo_t siminfo = {};

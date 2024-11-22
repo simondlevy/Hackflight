@@ -44,7 +44,8 @@ namespace hf {
 
     class Dynamics {
 
-        friend class Gyro;
+        friend class Gyrometer;
+        friend class Accelerometer;
         friend class OpticalFlow;
         friend class Rangefinder;
 
@@ -97,7 +98,7 @@ namespace hf {
              * Sets motor spins
              *
              * @param omegas motor spins in radians per second
-             * @param dt deltaT in seconds
+             * @param mixer, used for rotor directions
              */
             void update(const float * omegas, Mixer * mixer) 
             {

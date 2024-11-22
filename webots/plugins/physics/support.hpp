@@ -18,14 +18,17 @@
 
 #pragma once
 
+#include <stdio.h>
+
 // Webots
 #include <plugins/physics.h>
 
 // Hackflight
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
-#include <sim/sensors/optical_flow.hpp>
+#include <sim/sensors/accelerometer.hpp>
 #include <sim/sensors/gyrometer.hpp>
+#include <sim/sensors/optical_flow.hpp>
 #include <sim/sensors/rangefinder.hpp>
 #include <mixers/bfquadx.hpp>
 
@@ -116,16 +119,21 @@ static float pidDt()
 static hf::state_t estimateState()
 {
     // For now we run the state estimator at the same rate as the control loop
-    static auto dt = 1 / (float)PID_FREQ;
+    //static auto dt = 1 / (float)PID_FREQ;
 
-    // Get simulated gyro values
-    const auto gyro = hf::Gyro::read(dynamics);
+    // Get simulated gyrometer values
+    const auto gyro = hf::Gyrometer::read(dynamics);
 
-    // Get simulated rangefinder distance
+     // Get simulated accelerometer values
+    const auto accel = hf::Accelerometer::read(dynamics);
+
+    (void)accel;
+
+   // Get simulated rangefinder distance
     const auto h = hf::Rangefinder::read(dynamics);
 
     // Get simulated optical flow
-    const auto flow = hf::OpticalFlow::read(dynamics);
+    //const auto flow = hf::OpticalFlow::read(dynamics);
 
     // Cheat on Euler angles for now (should get them by fusing gyro and accel)
     const auto pose = dynamics.getPose();
@@ -133,20 +141,12 @@ static hf::state_t estimateState()
     // Turn rangefinder distance directly into altitude 
     const auto z = h * (cos(pose.phi) * cos(pose.theta)) / 1000; // mm => m
 
-    // Fuse gyro, flow, and rangefinder to estimate lateral velocity
-    //const auto dx  = h * hf::OpticalFlow::thetapix() * flow.x / ();
-
     // XXX Cheat on remaining sensors for now
-    const auto dxdy = dynamics.getGroundTruthHorizontalVelocities();
+    const auto dxdy_tru = dynamics.getGroundTruthHorizontalVelocities();
     const auto dz = dynamics.getGroundTruthVerticalVelocity();
     const auto r = hf::Utils::RAD2DEG;
 
-     // https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
-     //   master/images/flowdeck_velocity.png
-
-    dWebotsConsolePrintf("dt=%f  flow_y=%+3.3f  dy=%+3.3f\n", dt, flow.y, dxdy.y);
-
-    return hf::state_t {pose.x, dxdy.x, pose.y, dxdy.y, z, dz,
+    return hf::state_t {pose.x, dxdy_tru.x, pose.y, dxdy_tru.y, z, dz,
             r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
     };
 }
@@ -154,7 +154,6 @@ static hf::state_t estimateState()
 
 DLLEXPORT void webots_physics_init() 
 {
-    // init global variables
     _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
     if (_robotBody == NULL) {

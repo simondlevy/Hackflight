@@ -1,5 +1,5 @@
 /*
- *   Gyro simulator
+ *   Accelerometer simulator
  *
  *   Copyright (C) 2024 Simon D. Levy
  *
@@ -23,15 +23,15 @@
 
 namespace hf {
 
-    class Gyrometer {
+    class Accelerometer {
 
         public:
 
             static axis3_t read(Dynamics & d)
             {
-                const auto r = Utils::RAD2DEG;
+                (void)d;
 
-                return axis3_t { r *d._x8, r*d._x10, r *d._x12 };
+                return axis3_t { 0, 0, 0 };
             }
     };
 }
