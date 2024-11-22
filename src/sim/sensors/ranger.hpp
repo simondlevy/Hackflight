@@ -25,7 +25,7 @@
 
 namespace hf {
 
-    class Ranger {
+    class Rangefinder {
 
         public:
 

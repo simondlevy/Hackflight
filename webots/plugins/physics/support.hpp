@@ -24,6 +24,7 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
+#include <sim/sensors/flow.hpp>
 #include <sim/sensors/gyro.hpp>
 #include <sim/sensors/ranger.hpp>
 #include <mixers/bfquadx.hpp>
@@ -118,7 +119,7 @@ static hf::state_t getState()
     const auto gyro = hf::Gyro::read(dynamics);
 
     // Get simulated rangefinder distance
-    const auto h = hf::Ranger::read(dynamics);
+    const auto h = hf::Rangefinder::read(dynamics);
 
     dWebotsConsolePrintf("h=%3.3f\n", h);
 

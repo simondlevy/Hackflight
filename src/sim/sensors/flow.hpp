@@ -32,17 +32,19 @@ namespace hf {
         public:
 
             static axis2_t read(
-                    const Dynamics & d,
-                    const float h,
-                    const float dt)
+                    const Dynamics & d, const float h, const float dt)
             {
+                const auto dx =   d._x2 * cos(d._x11) - d._x4 * sin(d._x11);
+
+                const auto dy = -(d._x2 * sin(d._x11) + d._x4 * cos(d._x11));
+
                 const auto theta = 2 * sin(Utils::DEG2RAD * FIELD_OF_VIEW / 2);
 
                 const auto flow_dx =
-                    dt * NPIX * (h * d._x10 + dxy_true.x) / (h * theta);
+                    dt * NPIX * (h * d._x10 + dx) / (h * theta);
 
                 const auto flow_dy =
-                    dt * NPIX * (h * d._x8 + dxy_true.y) / (h * theta);
+                    dt * NPIX * (h * d._x8 + dy) / (h * theta);
 
                 return axis2_t {flow_dx, flow_dy};
             }
