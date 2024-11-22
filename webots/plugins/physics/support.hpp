@@ -25,6 +25,7 @@
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/sensors/gyro.hpp>
+#include <sim/sensors/ranger.hpp>
 #include <mixers/bfquadx.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
@@ -115,6 +116,11 @@ static hf::state_t getState()
 {
     // Get simulated gyro values
     const auto gyro = hf::Gyro::read(dynamics);
+
+    // Get simulated rangefinder distance
+    const auto h = hf::Ranger::read(dynamics);
+
+    dWebotsConsolePrintf("h=%3.3f\n", h);
 
     // XXX Cheat on remaining sensors for now
     const auto pose = dynamics.getPose();

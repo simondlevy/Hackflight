@@ -45,6 +45,8 @@ namespace hf {
     class Dynamics {
 
         friend class Gyro;
+        friend class Flow;
+        friend class Ranger;
 
         public:
 
