@@ -24,6 +24,7 @@
 // Hackflight
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
+#include <sim/sensors/gyro.hpp>
 #include <mixers/bfquadx.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
@@ -33,6 +34,8 @@ static const uint32_t PID_FREQ = 1e3; // Hz
 static const char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robotBody;
+
+static hf::Gyro _gyro;
 
 static hf::Dynamics::vehicle_params_t diyquad_params = {
 
@@ -112,8 +115,8 @@ static float pidDt()
 
 static hf::state_t getState()
 {
-    // Get simulated gyro
-    const auto gyro = dynamics.readGyro();
+    // Get simulated gyro values
+    const auto gyro = _gyro.read(dynamics);
 
     // XXX Cheat on remaining sensors for now
     const auto pose = dynamics.getPose();

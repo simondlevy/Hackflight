@@ -44,6 +44,8 @@ namespace hf {
 
     class Dynamics {
 
+        friend class Gyro;
+
         public:
 
             typedef struct {
@@ -181,19 +183,12 @@ namespace hf {
 
             } // update
 
+            // Sensors : fake it til you make it! ----------------------------
+
             pose_t getPose()
             {
                 // Negate y coordinate for rightward positive
                 return pose_t {_x1, -_x3, _x5, _x7, _x9, _x11 };
-            }
-
-            // Support for simulated sensors ---------------------------------
-
-            axis3_t readGyro()
-            {
-                const auto r = Utils::RAD2DEG;
-
-                return axis3_t { r *_x8, r*_x10, r *_x12 };
             }
 
             axis2_t getGroundTruthHorizontalVelocities()
