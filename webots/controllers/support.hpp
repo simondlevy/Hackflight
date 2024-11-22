@@ -32,6 +32,9 @@
 #include <webots/motor.h>
 #include <webots/robot.h>
 
+#include <webots/distance_sensor.h>
+
+
 class Simulator {
 
     public:
@@ -105,6 +108,8 @@ class Simulator {
 
         WbDeviceTag _emitter;
 
+        WbDeviceTag _rangefinder;
+
         double _timestep;
 
         std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
@@ -163,6 +168,10 @@ class Simulator {
 
             _emitter = wb_robot_get_device("emitter");
 
+            _rangefinder = wb_robot_get_device("rangefinder");
+
+            wb_distance_sensor_enable(_rangefinder, _timestep);
+
             wb_keyboard_enable(_timestep);
 
             animateMotor("motor1", -1);
@@ -173,7 +182,11 @@ class Simulator {
 
         bool _step()
         {
-            return wb_robot_step(_timestep) != -1;
+            const auto result = wb_robot_step(_timestep) != -1;
+
+            printf("h=%3.3f\n", wb_distance_sensor_get_value(_rangefinder));
+
+            return result;
         }
 
         bool dispatchSimInfo(hf::siminfo_t & siminfo)

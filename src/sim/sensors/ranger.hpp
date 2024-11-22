@@ -1,6 +1,11 @@
 /*
  *   Laser rangefinder (Time-Of-Flight) simulator
  *
+ *   For equation see
+ *
+ *     https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
+ *      master/images/flowdeck_velocity.png
+ *
  *   Copyright (C) 2024 Simon D. Levy
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,9 +31,8 @@ namespace hf {
 
             static float read(Dynamics & d)
             {
-                // See https://www.bitcraze.io/documentation/repository/crazyflie-firmware/
-                //   master/images/flowdeck_velocity.png
-                return d._x5 / (cos(d._x7) * cos(d._x9));
+                // m => mm
+                return 1000 * d._x5 / (cos(d._x7) * cos(d._x9));
             }
     };
 }
