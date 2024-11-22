@@ -27,7 +27,7 @@ namespace hf {
 
         public:
 
-            axis3_t read(Dynamics & d)
+            static axis3_t read(Dynamics & d)
             {
                 const auto r = Utils::RAD2DEG;
 

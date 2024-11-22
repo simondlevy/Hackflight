@@ -35,8 +35,6 @@ static const char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robotBody;
 
-static hf::Gyro _gyro;
-
 static hf::Dynamics::vehicle_params_t diyquad_params = {
 
     1.0e-1, // mass [kg]
@@ -116,7 +114,7 @@ static float pidDt()
 static hf::state_t getState()
 {
     // Get simulated gyro values
-    const auto gyro = _gyro.read(dynamics);
+    const auto gyro = hf::Gyro::read(dynamics);
 
     // XXX Cheat on remaining sensors for now
     const auto pose = dynamics.getPose();
