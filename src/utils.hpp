@@ -31,9 +31,8 @@ namespace hf {
 
         public:
 
-            static constexpr float DEG2RAD = M_PI / 180.0f;
             static constexpr float RAD2DEG = 180.0f / M_PI;
-            static constexpr float GS2MSS = 9.81;
+            static constexpr float G2MSS = 9.81;
 
             static void quat2euler(const axis4_t & q, axis3_t &a,
                     const float ysign=+1, const float zsign=+1)

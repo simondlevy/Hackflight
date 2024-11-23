@@ -31,7 +31,7 @@ namespace hf {
 
             static float thetapix()
             {
-                return 2 * sin(Utils::DEG2RAD * FIELD_OF_VIEW / 2);
+                return 2 * sin(FIELD_OF_VIEW / Utils::RAD2DEG / 2);
             }
 
             static axis2_t read(const Dynamics & d)

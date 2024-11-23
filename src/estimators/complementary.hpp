@@ -41,7 +41,7 @@ namespace hf {
                     float & z,
                     float & dz)
             {
-                const auto theta = 2 * sin(Utils::DEG2RAD * FLOW_ANGLE / 2);
+                const auto theta = 2 * sin(FLOW_ANGLE / Utils::RAD2DEG / 2);
 
                 dxy.x = (h * theta * flow.x) / (dt * FLOW_NPIX) - h * gyro.y;
 
@@ -53,7 +53,7 @@ namespace hf {
                 const auto rz = quat.w * quat.w - quat.x * quat.x -
                     quat.y * quat.y + quat.z*quat.z;
 
-                _integral += Utils::GS2MSS * dt * (accel.z - 1) * rz;
+                _integral += Utils::G2MSS * dt * (accel.z - 1) * rz;
 
                 z = h / 1000 * rz;  // Convert mm => m, then rotate
 

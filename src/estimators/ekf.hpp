@@ -77,8 +77,8 @@ namespace hf {
 
                 const auto dt2 = dt * dt;
 
-                imuTakeMean(_gyroSum, Utils::DEG2RAD, _gyro);
-                imuTakeMean(_accelSum, GS_TO_MSS, _accel);
+                imuTakeMean(_gyroSum, 1/Utils::RAD2DEG, _gyro);
+                imuTakeMean(_accelSum, Utils::G2MSS, _accel);
 
                 const auto xold = _ekf.x;
 
@@ -141,19 +141,19 @@ namespace hf {
                 const auto tmpSDZ = xold[STATE_DZ];
 
                 const auto new_z = xold[STATE_Z] + 
-                    _r.x * dx + _r.y * dy + _r.z * dz - GS_TO_MSS * dt2 / 2;
+                    _r.x * dx + _r.y * dy + _r.z * dz - Utils::G2MSS * dt2 / 2;
 
                 const auto new_dx = xold[STATE_DX] +
                     dt * (accx + _gyro.z * tmpSDY - _gyro.y * tmpSDZ -
-                            GS_TO_MSS * _r.x);
+                            Utils::G2MSS * _r.x);
 
                 const auto new_dy = xold[STATE_DY] + 
                     dt * (accy - _gyro.z * tmpSDX + _gyro.x * tmpSDZ - 
-                            GS_TO_MSS * _r.y);
+                            Utils::G2MSS * _r.y);
 
                 const auto new_dz = xold[STATE_DZ] +
                     dt * (_accel.z + _gyro.y * tmpSDX - _gyro.x * tmpSDY - 
-                            GS_TO_MSS * _r.z); 
+                            Utils::G2MSS * _r.z); 
 
                 new_quat_t quat_predicted = {};
 
@@ -181,21 +181,21 @@ namespace hf {
                 const auto dx_dy = _gyro.z*dt;
                 const auto dx_dz = _gyro.y*dt;
                 const auto dx_e0 = 0;
-                const auto dx_e2 = -GS_TO_MSS*_r.y*dt;
-                const auto dx_e1 = GS_TO_MSS*_r.z*dt;
+                const auto dx_e2 = -Utils::G2MSS*_r.y*dt;
+                const auto dx_e1 = Utils::G2MSS*_r.z*dt;
 
                 const auto dy_dx =  -_gyro.z*dt;
                 const auto dy_dy = 1; //drag negligible
                 const auto dy_dz = _gyro.x*dt;
-                const auto dy_e0 = -GS_TO_MSS*_r.z*dt;
+                const auto dy_e0 = -Utils::G2MSS*_r.z*dt;
                 const auto dy_e1 = 0;
-                const auto dy_e2 = GS_TO_MSS*_r.x*dt;
+                const auto dy_e2 = Utils::G2MSS*_r.x*dt;
 
                 const auto dz_dx = _gyro.y*dt;
                 const auto dz_dy = _gyro.x*dt;
                 const auto dz_dz = 1; //drag negligible
-                const auto dz_e0 = GS_TO_MSS*_r.y*dt;
-                const auto dz_e1 = -GS_TO_MSS*_r.x*dt;
+                const auto dz_e0 = Utils::G2MSS*_r.y*dt;
+                const auto dz_e1 = -Utils::G2MSS*_r.x*dt;
                 const auto dz_e2 = 0;
 
                 const auto e0_e0 =  1 - e1*e1/2 - e2*e2/2;
@@ -268,7 +268,7 @@ namespace hf {
 
                 const auto angle = max(0, 
                         fabsf(acosf(_r.z)) - 
-                        Utils::DEG2RAD * (15.0f / 2.0f));
+                        (15.0f / 2.0f) / Utils::RAD2DEG);
 
                 const auto predictedDistance = x[STATE_Z] / cosf(angle);
 
@@ -294,7 +294,7 @@ namespace hf {
                 // updates
 
                 //~~~ Body rates ~~~
-                const auto omegay_b = _gyroLatest.y * Utils::DEG2RAD;
+                const auto omegay_b = _gyroLatest.y / Utils::RAD2DEG;
 
                 const auto x = _ekf.x;
 
@@ -320,7 +320,7 @@ namespace hf {
                 // updates
 
                 //~~~ Body rates ~~~
-                const auto omegax_b = _gyroLatest.x * Utils::DEG2RAD;
+                const auto omegax_b = _gyroLatest.x / Utils::RAD2DEG;
 
                 const auto dy_g = x[STATE_DY];
 
@@ -505,8 +505,6 @@ namespace hf {
             // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
             // corresponding ground length
             static constexpr float FLOW_THETAPIX = 0.71674;
-
-            static constexpr float GS_TO_MSS = 9.81;
 
             //We do get the measurements in 10x the motion pixels (experimentally
             //measured)
