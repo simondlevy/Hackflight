@@ -21,7 +21,7 @@ DEF ROBOT Robot {
                 children [
 
                 CadShape {
-                    url [ "../meshes/collada_files/custom.dae" ]
+                    url [ "../meshes/collada_files/diyquad.dae" ]
                 }
 
                 ]
