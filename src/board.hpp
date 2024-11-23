@@ -137,8 +137,8 @@ namespace hf {
                 };
 
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    /*printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
-                            accel.x, accel.y, accel.z);*/
+                    //printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
+                    //        accel.x, accel.y, accel.z);
                 }
 
                 // Gyro deg /sec

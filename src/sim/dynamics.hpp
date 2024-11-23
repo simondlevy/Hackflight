@@ -110,7 +110,7 @@ namespace hf {
 
                 // Equation 6 ---------------------------------------
 
-                float u1 = 0, u2 = 0, u3 = 0, u4 = 0;
+                float u1=0, u2=0, u3=0, u4=0;
 
                 for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
@@ -127,7 +127,7 @@ namespace hf {
                     u4 += d * omega2 * mixer->yaw(i);
                 }
 
-                // Equation 12 line 6
+                // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 _dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
@@ -141,19 +141,19 @@ namespace hf {
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dx1 = _x2;
-                    _dx2 =(cos(-_x7)*sin(_x9)*cos(_x11) +
+                    _dx1 = _x2;                                 // x
+                    _dx2 =(cos(-_x7)*sin(_x9)*cos(_x11) +       // dx, inertial frame
                             sin(-_x7)*sin(_x11)) * u1 / m;
-                    _dx3 = _x4;
-                    _dx4 = -(cos(-_x7)*sin(_x9)*sin(_x11) -
+                    _dx3 = _x4;                                 // y
+                    _dx4 = -(cos(-_x7)*sin(_x9)*sin(_x11) -     // dy, inertial frame
                             sin(-_x7)*cos(_x11)) * u1 / m;
-                    _dx5 = _x6;
-                    _dx7 = _x8;
-                    _dx8 = l / I * u2;
-                    _dx9 = _x10;
-                    _dx10 = l / I * u3;
-                    _dx11 = _x12;
-                    _dx12 = -l / I * u4; 
+                    _dx5 = _x6;                                 // z
+                    _dx7 = _x8;                                 // phi
+                    _dx8 = l / I * u2;                          // dphi
+                    _dx9 = _x10;                                // theta
+                    _dx10 = l / I * u3;                         // dtheta
+                    _dx11 = _x12;                               // psi
+                    _dx12 = -l / I * u4;                        // dpsi
 
                     // Compute state as first temporal integral of first
                     // temporal derivative

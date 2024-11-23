@@ -31,7 +31,7 @@ namespace hf {
             {
                 const auto s = Utils::GS2MSS;
 
-                return axis3_t { d._dx2 / s, d._dx4 / s, (d._dx6 + d._g) / s };
+                return axis3_t { d._x7 / s, d._x9 / s, (d._dx6 + d._g) / s };
             }
     };
 }

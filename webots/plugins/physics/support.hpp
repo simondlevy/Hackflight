@@ -98,7 +98,6 @@ static bool getSimInfo(hf::siminfo_t & siminfo)
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 
-
     // This happens at startup
     if (siminfo.framerate == 0) {
         return false;
@@ -128,7 +127,7 @@ static hf::state_t estimateState()
      // Get simulated accelerometer values
     const auto accel = hf::Accelerometer::read(dynamics);
 
-    dWebotsConsolePrintf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
+    dWebotsConsolePrintf("ax=%+3.3e  ay=%+3.3e  az=%+3.3e\n",
             accel.x, accel.y, accel.z);
 
    // Get simulated rangefinder distance
