@@ -1,4 +1,4 @@
-SKETCH = cplusplus
+SKETCH = standard
 
 FQBN = teensy:avr:teensy40
 
