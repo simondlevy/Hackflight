@@ -4,8 +4,11 @@ PROTO DiyQuad [
   field SFVec3f translation      0 0 0.015
   field SFColor rear_prop_color  0.5 0 0.5
   field SFColor front_prop_color 0.1 0.1 0.1
-  field SFFloat fast_helix_radius 0.025
-  field SFFloat fast_helix_height 0.001
+  field SFFloat prop_fast_helix_radius 0.025
+  field SFFloat prop_fast_helix_height 0.001
+  field SFFloat prop_fast_helix_threshold 50
+  field SFFloat motor_max_velocity 100
+  field SFFloat motor_max_torque 30
   field SFRotation rotation      0 0 0 0
 ]
 
@@ -54,11 +57,11 @@ DEF ROBOT Robot {
             centerOfThrust -0.031 -0.031 0.016
             thrustConstants 0 0
             torqueConstants 0 0
-            fastHelixThreshold 50
+            fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
                 name "motor1"
-                    maxVelocity 100
-                    maxTorque 30
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
             }
         fastHelix Solid {
 
@@ -70,15 +73,13 @@ DEF ROBOT Robot {
                             appearance PBRAppearance {
                                 baseColor IS rear_prop_color
                                     baseColorMap ImageTexture {
-                                        url [
-                                            "../meshes/textures/fast_helix.png"
-                                        ]
+                                        url [ "../meshes/textures/fast_helix.png" ]
                                     }
                                 metalness 0
                             }
                             geometry Cylinder {
-                                height IS fast_helix_height
-                                radius IS fast_helix_radius
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
                             }
                         }
 
@@ -113,11 +114,11 @@ DEF ROBOT Robot {
             centerOfThrust 0.031 -0.031 0.016  
             thrustConstants 0 0
             torqueConstants 0 0
-            fastHelixThreshold 50                 
+            fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
                 name "motor2"
-                    maxVelocity 100                     
-                    maxTorque 30                        
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
             }
         fastHelix Solid {
 
@@ -129,15 +130,13 @@ DEF ROBOT Robot {
                             appearance PBRAppearance {
                                 baseColor IS front_prop_color
                                     baseColorMap ImageTexture {
-                                        url [
-                                            "../meshes/textures/fast_helix.png"
-                                        ]
+                                        url [ "../meshes/textures/fast_helix.png" ]
                                     }
                                 metalness 0
                             }
                             geometry Cylinder {
-                                height IS fast_helix_height
-                                radius IS fast_helix_radius
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
                             }
                         }
 
@@ -172,11 +171,11 @@ DEF ROBOT Robot {
             centerOfThrust -0.031 0.031 0.016
             thrustConstants 0 0
             torqueConstants  0 0
-            fastHelixThreshold 50
+            fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
                 name "motor3"
-                    maxVelocity 100
-                    maxTorque 30
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
             }
         fastHelix Solid {
             translation -0.031 0.031 0.016
@@ -193,8 +192,8 @@ DEF ROBOT Robot {
                                 metalness 0
                             }
                             geometry Cylinder {
-                                height IS fast_helix_height
-                                radius IS fast_helix_radius
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
                             }
                         }
 
@@ -227,11 +226,11 @@ DEF ROBOT Robot {
             centerOfThrust 0.031 0.031 0.016
             thrustConstants 0 0
             torqueConstants 0 0
-            fastHelixThreshold 50
+            fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
                 name "motor4"
-                    maxVelocity 100  # rad/sec
-                    maxTorque 30
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
             }
         fastHelix Solid {
             translation 0.031 0.031 0.016
@@ -248,8 +247,8 @@ DEF ROBOT Robot {
                                 metalness 0
                             }
                             geometry Cylinder {
-                                height IS fast_helix_height
-                                radius IS fast_helix_radius
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
                             }
                         }
 
