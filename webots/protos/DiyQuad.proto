@@ -81,18 +81,21 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
+
             translation -0.031 -0.031 0.016
+
                 children [
-                    DEF PROP_SHAPE Shape {
+
+                    Shape {
+
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 1 0 0
-                                metalness 0.3
+                            baseColor 1 0 0.1
+                                metalness 0
                         }
-                        geometry Mesh {
-                            url [
-                                "../meshes/collada_files/cw_prop.dae"
-                            ]
-                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files/prop_cw.stl" ]
+                      }
                     }
 
                 ]
@@ -113,7 +116,9 @@ DEF ROBOT Robot {
                     maxTorque 30                        
             }
         fastHelix Solid {
+
             translation 0.031 -0.031 0.016
+
                 children [ 
 
                 Shape {
@@ -136,18 +141,22 @@ DEF ROBOT Robot {
         }
         slowHelix Solid {
             translation 0.031 -0.031 0.016
+
                 children [
+
                     Shape {
+
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0 0 0
-                                metalness 0.3
+                            baseColor 0.1 0.1 0.1
+                                metalness 0
                         }
-                        geometry Mesh {
-                            url [
-                                "../meshes/collada_files/ccw_prop.dae"
-                            ]
-                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files/prop_ccw.stl" ]
+                      }
                     }
+
+
                 ]
         }
     }
@@ -190,16 +199,17 @@ DEF ROBOT Robot {
         slowHelix Solid {
             translation -0.031 0.031 0.016
                 children [
+
                     Shape {
+
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 1 0 0
-                                metalness 0.3
+                            baseColor 1 0 0.1
+                                metalness 0
                         }
-                        geometry Mesh {
-                            url [
-                                "../meshes/collada_files/ccw_prop.dae"
-                            ]
-                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files/prop_ccw.stl" ]
+                      }
                     }
 
                 ]
@@ -245,16 +255,17 @@ DEF ROBOT Robot {
         slowHelix DEF PROP Solid {
             translation 0.031 0.031 0.016
                 children [
+
                     Shape {
+
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0 0 0
-                                metalness 0.3
+                            baseColor 0.1 0.1 0.1
+                                metalness 0
                         }
-                        geometry Mesh {
-                            url [
-                                "../meshes/collada_files/cw_prop.dae"
-                            ]
-                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files/prop_cw.stl" ]
+                      }
                     }
 
                 ]

@@ -127,8 +127,7 @@ static hf::state_t estimateState()
      // Get simulated accelerometer values
     const auto accel = hf::Accelerometer::read(dynamics);
 
-    dWebotsConsolePrintf("ax=%+3.3e  ay=%+3.3e  az=%+3.3e\n",
-            accel.x, accel.y, accel.z);
+    (void)accel;
 
    // Get simulated rangefinder distance
     const auto h = hf::Rangefinder::read(dynamics);
