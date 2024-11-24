@@ -1,8 +1,10 @@
 #VRML_SIM R2023b utf8
 
 PROTO DiyQuad [
-  field SFVec3f translation     0 0 0.015
-  field SFRotation rotation     0 0 0 0
+  field SFVec3f translation      0 0 0.015
+  field SFColor rear_prop_color  0.5 0 0.5
+  field SFColor front_prop_color 0.1 0.1 0.1
+  field SFRotation rotation      0 0 0 0
 ]
 
 {
@@ -62,9 +64,9 @@ DEF ROBOT Robot {
 
                 children [ 
 
-                    DEF FASTHELIX Shape {
+                    Shape {
                             appearance PBRAppearance {
-                                baseColor 0.4 0.0 0.0
+                                baseColor IS rear_prop_color
                                     baseColorMap ImageTexture {
                                         url [
                                             "../meshes/textures/fast_helix.png"
@@ -89,8 +91,8 @@ DEF ROBOT Robot {
                     Shape {
 
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 1 0 0.1
-                                metalness 0
+                            baseColor IS rear_prop_color
+                            metalness 0
                         }
 
                       geometry Mesh {
@@ -123,7 +125,7 @@ DEF ROBOT Robot {
 
                 Shape {
                             appearance PBRAppearance {
-                                baseColor 0.1 0.1 0.1
+                                baseColor IS front_prop_color
                                     baseColorMap ImageTexture {
                                         url [
                                             "../meshes/textures/fast_helix.png"
@@ -147,7 +149,7 @@ DEF ROBOT Robot {
                     Shape {
 
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0.1 0.1 0.1
+                            baseColor IS front_prop_color
                                 metalness 0
                         }
 
@@ -180,7 +182,7 @@ DEF ROBOT Robot {
                   
                 Shape {
                             appearance PBRAppearance {
-                                baseColor 0.4 0.0 0.0
+                                baseColor IS rear_prop_color
                                     baseColorMap ImageTexture {
                                         url [
                                             "../meshes/textures/fast_helix.png"
@@ -203,7 +205,7 @@ DEF ROBOT Robot {
                     Shape {
 
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 1 0 0.1
+                            baseColor IS rear_prop_color
                                 metalness 0
                         }
 
@@ -235,7 +237,7 @@ DEF ROBOT Robot {
 
                 Shape {
                             appearance PBRAppearance {
-                                baseColor 0.1 0.1 0.1
+                                baseColor IS front_prop_color
                                     baseColorMap ImageTexture {
                                         url [
                                             "../meshes/textures/fast_helix.png"
@@ -259,7 +261,7 @@ DEF ROBOT Robot {
                     Shape {
 
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor 0.1 0.1 0.1
+                            baseColor IS front_prop_color
                                 metalness 0
                         }
 

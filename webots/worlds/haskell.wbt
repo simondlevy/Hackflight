@@ -18,23 +18,18 @@ WorldInfo {
     }
   ]
 }
-
 Viewpoint {
   orientation 0 1 0 0.75
-  position -1.3 -0.08 1.3
+  position -1.6665689157816106 -0.08 1.6414943042676853
   bloomThreshold 100
 }
-
 DEF diyquad DiyQuad {
   translation 0 0 0
   rotation 0 0 -1 0
 }
-
 TexturedBackground {
 }
-
 TexturedBackgroundLight {
 }
-
 Floor {
 }
