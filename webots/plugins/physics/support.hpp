@@ -118,7 +118,7 @@ static float pidDt()
 static hf::state_t estimateState()
 {
     // For now we run the state estimator at the same rate as the control loop
-    //static auto dt = 1 / (float)PID_FREQ;
+    static auto dt = 1 / (float)PID_FREQ;
 
     // Get simulated gyrometer values
     const auto gyro = hf::Gyrometer::read(dynamics);
@@ -126,30 +126,35 @@ static hf::state_t estimateState()
      // Get simulated accelerometer values
     const auto accel = hf::Accelerometer::read(dynamics);
 
-    (void)accel;
-
    // Get simulated rangefinder distance
-    const auto h = hf::Rangefinder::read(dynamics);
+    const auto range = hf::Rangefinder::read(dynamics);
 
     // Get simulated optical flow
     const auto flow = hf::OpticalFlow::read(dynamics);
 
+    (void)accel;
+    (void)gyro;
+    (void)flow;
+    (void)range;
+    (void)dt;
     (void)flow;
 
-    // Get vehicle pose
-    const auto pose = dynamics.getPose();
-
-    // Turn rangefinder distance directly into altitude 
-    const auto z = h * (cos(pose.phi) * cos(pose.theta)) / 1000; // mm => m
-
-    // XXX Cheat on remaining sensors for now
-    const auto dxdy_tru = dynamics.getGroundTruthHorizontalVelocities();
-    const auto dz = dynamics.getGroundTruthVerticalVelocity();
-    const auto r = hf::Utils::RAD2DEG;
-
+    // XXX Cheat and use ground-truth state for now
     return hf::state_t {
-        pose.x,dxdy_tru.x, pose.y, dxdy_tru.y, z, dz,
-            r * pose.phi, gyro.x, r * pose.theta, gyro.y, r * pose.psi, gyro.z
+        dynamics._x1,
+            dynamics._x2 * cos(dynamics._x11) -
+                dynamics._x4 * sin(dynamics._x11),
+        dynamics._x3,
+        -(dynamics._x2 * sin(dynamics._x11) +
+                    dynamics._x4 * cos(dynamics._x11)),
+        dynamics._x5,
+        dynamics._x6,
+            hf::Utils::RAD2DEG* dynamics._x7,
+            hf::Utils::RAD2DEG* dynamics._x8,
+            hf::Utils::RAD2DEG* dynamics._x9,
+            hf::Utils::RAD2DEG* dynamics._x10,
+            hf::Utils::RAD2DEG* dynamics._x11,
+            hf::Utils::RAD2DEG* dynamics._x12,
     };
 }
 

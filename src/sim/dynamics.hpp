@@ -179,30 +179,9 @@ namespace hf {
                 return pose_t {_x1, -_x3, _x5, _x7, _x9, _x11 };
             }
 
-            // Sensors : fake it til you make it! ----------------------------
-
-            axis2_t getGroundTruthHorizontalVelocities()
-            {
-                const auto dx =   _x2 * cos(_x11) - _x4 * sin(_x11);
-                const auto dy = -(_x2 * sin(_x11) + _x4 * cos(_x11));
-
-                return axis2_t { dx, dy };
-            }
-
-            float getGroundTruthVerticalVelocity()
-            {
-                return _x6;
-            }
-
-            // ---------------------------------------------------------------
-
-        private:
-
-            float _dt;
-
-            vehicle_params_t _vparams;
-
             // Vehicle state (Equation 11)
+            // Should be private, but we need it in for control loop until
+            // we get sensor fusion working
             float _x1;  // x
             float _x2;  // dx/dt
             float _x3;  // y
@@ -215,6 +194,14 @@ namespace hf {
             float _x10; // dtheta/dt
             float _x11; // psi
             float _x12; // dpsi/dt
+
+            // ---------------------------------------------------------------
+
+        private:
+
+            float _dt;
+
+            vehicle_params_t _vparams;
 
             // Vehicle state first derivative (Equation 12)
             float _dx1;  // x
