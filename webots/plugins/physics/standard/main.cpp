@@ -73,10 +73,7 @@ DLLEXPORT void webots_physics_step()
             demands.thrust += MOTOR_HOVER;
         }
 
-        //hf::PositionPid::run(state, demands);
-
-        demands.roll *= 30;
-        demands.pitch *= 30;
+        hf::PositionPid::run(state, demands);
 
         _pitchRollAnglePid.run(pidDt(), resetPids, state, demands);
 

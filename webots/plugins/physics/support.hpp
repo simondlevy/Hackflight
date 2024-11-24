@@ -66,8 +66,7 @@ static void setPose(hf::Dynamics & dynamics)
     dBodySetQuaternion(_robotBody, q);
 
     // Set robot posed based on state, negating for rightward negative
-    // dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
-    dBodySetPosition(_robotBody, 0, 0, pose.z);
+    dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
 }
 
 static void updateDynamics(const hf::demands_t & demands)

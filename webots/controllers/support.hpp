@@ -165,10 +165,10 @@ class Simulator {
 
             wb_keyboard_enable(_timestep);
 
-            //animateMotor("motor1", -1);
-            //animateMotor("motor2", +1);
-            //animateMotor("motor3", +1);
-            //animateMotor("motor4", -1);
+            animateMotor("motor1", -1);
+            animateMotor("motor2", +1);
+            animateMotor("motor3", +1);
+            animateMotor("motor4", -1);
         }
 
         bool _step()
