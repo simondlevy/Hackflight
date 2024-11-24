@@ -132,9 +132,11 @@ static hf::state_t estimateState()
     const auto h = hf::Rangefinder::read(dynamics);
 
     // Get simulated optical flow
-    //const auto flow = hf::OpticalFlow::read(dynamics);
+    const auto flow = hf::OpticalFlow::read(dynamics);
 
-    // Cheat on Euler angles for now (should get them by fusing gyro and accel)
+    (void)flow;
+
+    // Get vehicle pose
     const auto pose = dynamics.getPose();
 
     // Turn rangefinder distance directly into altitude 
