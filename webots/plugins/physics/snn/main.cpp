@@ -22,6 +22,8 @@
 // TeNNLab framework
 #include <levy_snn_util.hpp>
 
+static const uint16_t VIZ_PORT = 8100;
+
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
 static const float YAW_DIVISOR  = 26;
@@ -46,6 +48,9 @@ static const float YAW_SCALE = 160; // deg/s
 static SNN * climbRateSnn;
 static SNN * yawRateSnn;
 static SNN * cascadeSnn;
+
+// Choose from one of the three networks above to visualize
+static auto vizSnn = &climbRateSnn;
 
 static SNN * makeSnn(const char * filename)
 {
@@ -151,10 +156,14 @@ DLLEXPORT void webots_physics_step()
 
         // Update dynamics in innermost loop
         updateDynamics(demands);
+
     }
 
     // Set pose in outermost loop
     setPose(dynamics);
+
+    // Send spikes to visualizer
+    (*vizSnn)->send_counts_to_visualizer();
 }
 
 // Called by webots_physics_init()
@@ -170,4 +179,6 @@ void setup_controllers()
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
+
+    (*vizSnn)->serve_visualizer(VIZ_PORT);
 }

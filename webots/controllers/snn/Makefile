@@ -12,6 +12,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
+# TeNNLab framework stuff ----------------------------------------------------
+
+FDIR = $(HOME)/Desktop/framework
+
+
+
+VIZ_NET = $(shell pwd)/../../plugins/physics/snn/networks/difference_risp_train.txt
+VIZ_HOST = "localhost"
+VIZ_PORT = 8100
+
+# -----------------------------------------------------------------------------
+
 HFDIR = $(HOME)/Desktop/hackflight
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
@@ -31,7 +43,12 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/snn.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
+	sleep 1
+	cd $(FDIR)/viz; \
+ 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
+     	-n $(VIZ_NET) --show_spike_count --remove_unnecessary_neuron \
+    		--set_num_screen_shot 0 > /dev/null
 
 plot:
 	./plot.py
