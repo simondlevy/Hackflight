@@ -37,9 +37,9 @@ static const float CASCADE_POST_SCALE = 120;
 static const char * NETWORK = "networks/difference_risp_train.txt";
 static const char * NETWORK3 = "networks/difference3_risp.txt";
 
-static const float TAKEOFF_TIME = 3; // sec
+static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
-static const float MOTOR_HOVER = 55.385; // rad/sec
+static const float MOTOR_HOVER = 74.375; // rad/sec
 
 static const float YAW_SCALE = 160; // deg/s
 
@@ -101,11 +101,6 @@ DLLEXPORT void webots_physics_step()
     // Run control in middle loop
     for (uint32_t j=0; j <outerLoopCount(siminfo);  ++j) {
 
-        static uint32_t _count;
-        _count = siminfo.requested_takeoff ? (_count + 1) : 0;
-        const float time = _count * pidDt();
-        dWebotsConsolePrintf("time=%f\n", time);
-
         // Start with open-loop demands
         hf::demands_t demands = {
             siminfo.demands.thrust,
@@ -139,6 +134,12 @@ DLLEXPORT void webots_physics_step()
 
         demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
         demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
+
+        // Once takeoff has been requested, we compute time using the 
+        // deltaT from the middle (control) loop
+        static uint32_t _count;
+        _count = siminfo.requested_takeoff ? (_count + 1) : 0;
+        const float time = _count * pidDt();
 
         // Ignore thrust demand until airborne, based on time from launch
         demands.thrust =
