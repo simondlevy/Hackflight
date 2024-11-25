@@ -42,7 +42,6 @@ CXX_SOURCES = main.cpp
 CXX_SOURCES += $(FDIR)/src/io_stream.cpp
 CXX_SOURCES += $(FDIR)/src/jspace.cpp
 CXX_SOURCES += $(FDIR)/src/network.cpp
-CXX_SOURCES += $(FDIR)/src/pipe.cpp
 CXX_SOURCES += $(FDIR)/src/processor_help.cpp
 CXX_SOURCES += $(FDIR)/src/properties.cpp
 CXX_SOURCES += $(FDIR)/src/spike_encoding.cpp
