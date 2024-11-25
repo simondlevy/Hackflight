@@ -17,38 +17,38 @@
 # You may add some variable definitions hereafter to customize the build process
 # See documentation in $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
+CFLAGS = -O3 -std=c++11 -Wall -Wextra
+
+CXX_SOURCES = main.cpp 
+
+# Hackflight stuff -----------------------------------------------------------
+
 HFSRC_DIR = $(HOME)/Desktop/hackflight/src
 
-# TeNNLab framework stuff ------------------------------------------
+INCLUDE = -I$(HFSRC_DIR) 
+
+# TeNNLab framework stuff ----------------------------------------------------
 
 FDIR = $(HOME)/Desktop/framework
 
 PDIR =  $(FDIR)/processors/risp
 
-VIZ_NET = $(shell pwd)/networks/difference_risp_train.txt
-VIZ_HOST = "localhost"
-VIZ_PORT = 8100
-
-# -------------------------------------------------------------------
-
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
-INCLUDE = -I$(HFSRC_DIR) -I$(FDIR)/include -I$(FDIR)/include/utils \
-		  -I$(FDIR)/cpp-apps/include
-
-CXX_SOURCES = main.cpp 
-
-# framework
+INCLUDE += -I$(FDIR)/include -I$(FDIR)/include/utils -I$(FDIR)/cpp-apps/include
 CXX_SOURCES += $(FDIR)/src/io_stream.cpp
 CXX_SOURCES += $(FDIR)/src/jspace.cpp
 CXX_SOURCES += $(FDIR)/src/network.cpp
 CXX_SOURCES += $(FDIR)/src/properties.cpp
 CXX_SOURCES += $(FDIR)/src/spike_encoding.cpp
 
-# processors/risp
-INCLUDE += -I$(FDIR)/processors/risp/include
-CXX_SOURCES += $(FDIR)/processors/risp/src/processor.cpp
-CXX_SOURCES += $(FDIR)/processors/risp/src/static_proc.cpp
+INCLUDE += -I$(PDIR)/include
+CXX_SOURCES += $(PDIR)/src/processor.cpp
+CXX_SOURCES += $(PDIR)/src/static_proc.cpp
+
+VIZ_NET = $(shell pwd)/networks/difference_risp_train.txt
+VIZ_HOST = "localhost"
+VIZ_PORT = 8100
+
+# ----------------------------------------------------------------------------
 
 all: libsnn.so
 
