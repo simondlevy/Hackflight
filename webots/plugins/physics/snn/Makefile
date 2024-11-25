@@ -38,7 +38,19 @@ INCLUDE = -I$(HFSRC_DIR) -I$(FDIR)/include -I$(FDIR)/include/utils \
 
 CXX_SOURCES = main.cpp 
 
-include $(FDIR)/webots-makefile.include
+# framework
+CXX_SOURCES += $(FDIR)/src/io_stream.cpp
+CXX_SOURCES += $(FDIR)/src/jspace.cpp
+CXX_SOURCES += $(FDIR)/src/network.cpp
+CXX_SOURCES += $(FDIR)/src/pipe.cpp
+CXX_SOURCES += $(FDIR)/src/processor_help.cpp
+CXX_SOURCES += $(FDIR)/src/properties.cpp
+CXX_SOURCES += $(FDIR)/src/spike_encoding.cpp
+
+# processors/risp
+INCLUDE += -I$(FDIR)/processors/risp/include
+CXX_SOURCES += $(FDIR)/processors/risp/src/processor.cpp
+CXX_SOURCES += $(FDIR)/processors/risp/src/static_proc.cpp
 
 all: libsnn.so
 
