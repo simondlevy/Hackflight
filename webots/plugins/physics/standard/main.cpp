@@ -89,3 +89,8 @@ DLLEXPORT void webots_physics_step()
     // Set pose in outermost loop
     setPose(dynamics);
 }
+    
+// Called by webots_physics_init(); unneeded here
+void setup_controllers()
+{
+}

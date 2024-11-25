@@ -1,5 +1,6 @@
 /* 
- * Custom physics plugin for Hackflight simulator using C++ PID controllers
+ * Custom physics plugin for Hackflight simulator using Spiking Neural Net
+ * controllers
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -18,25 +19,74 @@
 
 #include "../support.hpp"
 
-#include <pids/altitude.hpp>
-#include <pids/position.hpp>
-#include <pids/pitch_roll_angle.hpp>
-#include <pids/pitch_roll_rate.hpp>
-#include <pids/yaw_rate.hpp>
+// TeNNLab framework
+#include <levy_snn_util.hpp>
 
-static const float THROTTLE_DOWN = 0.06;
+static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
-static const float PITCH_ROLL_POST_SCALE = 50;
+static const float YAW_DIVISOR  = 26;
+static const float YAW_OFFSET = 0.955;
 
+static const float CLIMBRATE_DIVISOR  = 3;
+static const float CLIMBRATE_OFFSET = 8.165;
+
+static const float CASCADE_DIVISOR  = 15;
+static const float CASCADE_OFFSET = 0.936;
+static const float CASCADE_POST_SCALE = 120;
+
+static const char * NETWORK = "networks/difference_risp_train.txt";
+static const char * NETWORK3 = "networks/difference3_risp.txt";
+
+static const float TAKEOFF_TIME = 3; // sec
+static const float MOTOR_TAKEOFF = 75; // rad/sec
 static const float MOTOR_HOVER = 74.565; // rad/sec
 
-static hf::AltitudePid _altitudePid;
+static const float YAW_SCALE = 160; // deg/s
 
-static hf::PitchRollAnglePid _pitchRollAnglePid;
+static SNN * climbRateSnn;
+static SNN * yawRateSnn;
+static SNN * cascadeSnn;
 
-static hf::PitchRollRatePid _pitchRollRatePid;
+static SNN * makeSnn(const char * filename)
+{
+    return new SNN(filename, "risp");
+}
+ 
+static double runSnn(
+        SNN * snn,
+        const float setpoint,
+        const float actual,
+        const float divisor,
+        const float offset,
+        const bool debug=false)
+{
+    vector<double> observations = { setpoint, actual };
 
-static hf::YawRatePid _yawRatePid;
+    vector <int> counts = {};
+
+    snn->step(observations, counts);
+
+    const double action = counts[0] / divisor - offset;
+
+    if (debug) {
+        printf("%d", counts[0]);
+        //printf("%f,%f\n", setpoint - actual, action);
+    }
+
+    return action;
+}
+
+static float runCascadeSnn(
+        SNN * snn, const float inp1, const float inp2, const float inp3)
+{
+    vector<double> observations = { inp1, inp2, inp3 };
+
+    vector <int> counts = {};
+
+    snn->step(observations, counts);
+
+    return counts[0] / CASCADE_DIVISOR - CASCADE_OFFSET;
+}
 
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -50,7 +100,7 @@ DLLEXPORT void webots_physics_step()
 
     // Run control in middle loop
     for (uint32_t j=0; j <outerLoopCount(siminfo);  ++j) {
-        
+
         // Start with open-loop demands
         hf::demands_t demands = {
             siminfo.demands.thrust,
@@ -59,28 +109,39 @@ DLLEXPORT void webots_physics_step()
             siminfo.demands.yaw
         };
 
-        // Throttle-down should reset pids
-        const auto resetPids = demands.thrust < THROTTLE_DOWN;
-
+        // Get current state from dynamics model
         const auto state = estimateState();
 
         // Run PID controllers to get final demands
+
+        const auto thrustFromSnn = runSnn(
+                climbRateSnn, demands.thrust, state.dz,
+                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
+
+        demands.yaw = runSnn(
+                yawRateSnn,
+                demands.yaw / YAW_SCALE,
+                state.dpsi / YAW_SCALE,
+                YAW_DIVISOR, YAW_OFFSET);
+
+        const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
         
-        if (siminfo.requested_takeoff) {
+        const auto snn_diff = runCascadeSnn(
+                cascadeSnn, demands.roll, state.dy, phi);
 
-            _altitudePid.run(siminfo.is_springy, pidDt(), state, demands);
+        demands.roll = 60 * snn_diff;
+        demands.roll = 0.0125 * (demands.roll - state.dphi);
 
-            demands.thrust += MOTOR_HOVER;
-        }
+        demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
+        demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
 
-        hf::PositionPid::run(state, demands);
-
-        _pitchRollAnglePid.run(pidDt(), resetPids, state, demands);
-
-        _pitchRollRatePid.run(pidDt(), resetPids, state, demands,
-                PITCH_ROLL_POST_SCALE);
-
-        _yawRatePid.run(pidDt(), resetPids, state, demands);
+        // Ignore thrust demand until airborne, based on time from launch
+        demands.thrust =
+            j * pidDt() > TAKEOFF_TIME ? 
+            thrustFromSnn + MOTOR_HOVER:
+            siminfo.requested_takeoff ? 
+            MOTOR_TAKEOFF :
+            0;
 
         // Update dynamics in innermost loop
         updateDynamics(demands);
@@ -88,4 +149,19 @@ DLLEXPORT void webots_physics_step()
 
     // Set pose in outermost loop
     setPose(dynamics);
+}
+
+// Called by webots_physics_init()
+void setup_controllers()
+{
+    try {
+
+        climbRateSnn = makeSnn(NETWORK);
+        yawRateSnn = makeSnn(NETWORK);
+        cascadeSnn = makeSnn(NETWORK3);
+
+    } catch (const SRE &e) {
+        fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
+        exit(1);
+    }
 }

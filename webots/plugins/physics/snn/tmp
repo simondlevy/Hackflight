@@ -1,8 +1,0 @@
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/io_stream.cpp -o obj/io_stream.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/jspace.cpp -o obj/jspace.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/lidar.cpp -o obj/lidar.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/network.cpp -o obj/network.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/pipe.cpp -o obj/pipe.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/processor_help.cpp -o obj/processor_help.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/properties.cpp -o obj/properties.o
-g++ -std=c++11 -flto=auto  -Wall -Wextra -Iinclude -Iinclude/utils -Icpp-apps/include  -c src/spike_encoding.cpp -o obj/spike_encoding.o

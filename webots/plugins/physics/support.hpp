@@ -172,6 +172,10 @@ DLLEXPORT void webots_physics_init()
 
         dBodySetGravityMode(_robotBody, 0);
     }
+
+    // Implementation goes in your main
+    void setup_controllers();
+    setup_controllers();
 }
 
 

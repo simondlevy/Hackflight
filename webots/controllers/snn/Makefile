@@ -18,7 +18,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(HFDIR)/src -I$(HFDIR)/webots/controllers
 
-NAME = new
+NAME = snn
 
 CXX_SOURCES = main.cpp
 
@@ -30,7 +30,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/new.wbt &
+	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 plot:

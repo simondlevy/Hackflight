@@ -33,9 +33,12 @@ VIZ_PORT = 8100
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I$(HFSRC_DIR) -I$(FDIR)/include -I$(FDIR)/include/utils -I$(FDIR)/cpp-apps/include
+INCLUDE = -I$(HFSRC_DIR) -I$(FDIR)/include -I$(FDIR)/include/utils \
+		  -I$(FDIR)/cpp-apps/include
 
 CXX_SOURCES = main.cpp 
+
+include $(FDIR)/webots-makefile.include
 
 all: libsnn.so
 
