@@ -41,7 +41,7 @@ static const char * NETWORK3 = "networks/difference3_risp.txt";
 
 static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
-static const float MOTOR_HOVER = 74.375; // rad/sec
+//static const float MOTOR_HOVER = 74.375; // rad/sec
 
 static const float YAW_SCALE = 160; // deg/s
 

@@ -21,7 +21,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I../../../../src
 
-CXX_SOURCES = main.cpp
+CXX_SOURCES = standard.cpp ../support.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

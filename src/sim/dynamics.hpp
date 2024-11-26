@@ -37,6 +37,8 @@
 
 #pragma once
 
+#include <string.h>
+
 #include <mixer.hpp>
 #include <utils.hpp>
 

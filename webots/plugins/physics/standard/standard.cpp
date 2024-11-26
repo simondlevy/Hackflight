@@ -16,8 +16,10 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "../support.hpp"
+#include <stdio.h>
 
+#include <hackflight.hpp>
+#include <sim/dynamics.hpp>
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
@@ -25,20 +27,20 @@
 #include <pids/yaw_rate.hpp>
 
 static const float THROTTLE_DOWN = 0.06;
-
 static const float PITCH_ROLL_POST_SCALE = 50;
-
 static const float MOTOR_HOVER = 74.565; // rad/sec
 
 static hf::AltitudePid _altitudePid;
-
 static hf::PitchRollAnglePid _pitchRollAnglePid;
-
 static hf::PitchRollRatePid _pitchRollRatePid;
-
 static hf::YawRatePid _yawRatePid;
 
-static hf::state_t estimateState()
+// Called by webots_physics_init(); unneeded here
+void setup_controllers()
+{
+}
+
+hf::state_t estimate_state(const hf::Dynamics & dynamics)
 {
     return hf::state_t {
         dynamics._x1,
@@ -58,58 +60,47 @@ static hf::state_t estimateState()
     };
 }
 
-// This is called by Webots in the outer (display, kinematics) loop
-DLLEXPORT void webots_physics_step() 
+hf::demands_t run_controllers(
+        const float pid_dt,
+        const hf::siminfo_t & siminfo,
+        const hf::state_t & state,
+        const hf::demands_t & open_loop_demands)
 {
-    hf::siminfo_t siminfo = {};
+        // Throttle-down should reset pids
+        const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
 
-    if (!getSimInfo(siminfo)) {
-        return;
-    }
-
-    // Run control in middle loop
-    for (uint32_t j=0; j <outerLoopCount(siminfo);  ++j) {
-        
         // Start with open-loop demands
         hf::demands_t demands = {
-            siminfo.demands.thrust,
-            siminfo.demands.roll,
-            siminfo.demands.pitch,
-            siminfo.demands.yaw
+            open_loop_demands.thrust,
+            open_loop_demands.roll,
+            open_loop_demands.pitch,
+            open_loop_demands.yaw
         };
 
-        // Throttle-down should reset pids
-        const auto resetPids = demands.thrust < THROTTLE_DOWN;
-
-        const auto state = estimateState();
-
-        // Run PID controllers to get final demands
-        
         if (siminfo.requested_takeoff) {
 
-            _altitudePid.run(siminfo.is_springy, pidDt(), state, demands);
+            _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
 
             demands.thrust += MOTOR_HOVER;
         }
 
         hf::PositionPid::run(state, demands);
 
-        _pitchRollAnglePid.run(pidDt(), resetPids, state, demands);
+        _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 
-        _pitchRollRatePid.run(pidDt(), resetPids, state, demands,
+        _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
                 PITCH_ROLL_POST_SCALE);
 
-        _yawRatePid.run(pidDt(), resetPids, state, demands);
+        _yawRatePid.run(pid_dt, resetPids, state, demands);
 
-        // Update dynamics in innermost loop
-        updateDynamics(demands);
-    }
+        printf("dt=%f  | t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n",
+                pid_dt,
+                demands.thrust,
+                demands.roll,
+                demands.pitch,
+                demands.yaw);
 
-    // Set pose in outermost loop
-    setPose(dynamics);
+        return demands;
 }
     
-// Called by webots_physics_init(); unneeded here
-void setup_controllers()
-{
-}
+

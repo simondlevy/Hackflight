@@ -25,17 +25,12 @@
 #include <pids/yaw_rate.hpp>
 
 static const float THROTTLE_DOWN = 0.06;
-
 static const float PITCH_ROLL_POST_SCALE = 50;
-
-static const float MOTOR_HOVER = 74.565; // rad/sec
+//static const float MOTOR_HOVER = 74.565; // rad/sec
 
 static hf::AltitudePid _altitudePid;
-
 static hf::PitchRollAnglePid _pitchRollAnglePid;
-
 static hf::PitchRollRatePid _pitchRollRatePid;
-
 static hf::YawRatePid _yawRatePid;
 
 static hf::state_t estimateState()
