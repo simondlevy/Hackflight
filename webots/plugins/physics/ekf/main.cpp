@@ -56,13 +56,11 @@ static hf::state_t estimateState()
     const auto flow = hf::OpticalFlow::read(dynamics);
 
     (void)accel;
-    (void)gyro;
     (void)flow;
     (void)range;
     (void)dt;
     (void)flow;
 
-    // XXX Cheat and use ground-truth state for now
     return hf::state_t {
 
         dynamics._x1, // x
@@ -81,15 +79,15 @@ static hf::state_t estimateState()
 
             hf::Utils::RAD2DEG* dynamics._x7, // phi
 
-            hf::Utils::RAD2DEG* dynamics._x8, // dphi
+            gyro.x, // dphi
 
             hf::Utils::RAD2DEG* dynamics._x9, // theta
 
-            hf::Utils::RAD2DEG* dynamics._x10, // dtheta
+            gyro.y, // dtheta
 
             hf::Utils::RAD2DEG* dynamics._x11, // psi
 
-            hf::Utils::RAD2DEG* dynamics._x12, // dpsi
+            gyro.z  // dpsi
     };
 }
 
