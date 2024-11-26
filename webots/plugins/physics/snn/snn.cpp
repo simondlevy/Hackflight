@@ -22,6 +22,7 @@
 // TeNNLab framework
 #include <levy_snn_util.hpp>
 
+static const float VIZ_FREQ = 100; // Hz
 static const uint16_t VIZ_PORT = 8100;
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
@@ -178,13 +179,16 @@ DLLEXPORT void webots_physics_step()
         // Update dynamics in innermost loop
         updateDynamics(demands);
 
+        static uint32_t _vizcount;
+        if (_vizcount++ % 100 == 0) {
+            // Send spikes to visualizer
+            (*vizSnn)->send_counts_to_visualizer();
+        }
     }
 
     // Set pose in outermost loop
     setPose(dynamics);
 
-    // Send spikes to visualizer
-    (*vizSnn)->send_counts_to_visualizer();
 }
 
 // Called by webots_physics_init()
