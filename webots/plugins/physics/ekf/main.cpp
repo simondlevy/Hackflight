@@ -64,20 +64,32 @@ static hf::state_t estimateState()
 
     // XXX Cheat and use ground-truth state for now
     return hf::state_t {
-        dynamics._x1,
-            dynamics._x2 * cos(dynamics._x11) -
+
+        dynamics._x1, // x
+
+            dynamics._x2 * cos(dynamics._x11) - // dx
                 dynamics._x4 * sin(dynamics._x11),
-        dynamics._x3,
-        -(dynamics._x2 * sin(dynamics._x11) +
+
+        dynamics._x3, // y
+
+        -(dynamics._x2 * sin(dynamics._x11) + // dy
                     dynamics._x4 * cos(dynamics._x11)),
-        dynamics._x5,
-        dynamics._x6,
-            hf::Utils::RAD2DEG* dynamics._x7,
-            hf::Utils::RAD2DEG* dynamics._x8,
-            hf::Utils::RAD2DEG* dynamics._x9,
-            hf::Utils::RAD2DEG* dynamics._x10,
-            hf::Utils::RAD2DEG* dynamics._x11,
-            hf::Utils::RAD2DEG* dynamics._x12,
+
+        dynamics._x5, // z
+
+        dynamics._x6, // dz
+
+            hf::Utils::RAD2DEG* dynamics._x7, // phi
+
+            hf::Utils::RAD2DEG* dynamics._x8, // dphi
+
+            hf::Utils::RAD2DEG* dynamics._x9, // theta
+
+            hf::Utils::RAD2DEG* dynamics._x10, // dtheta
+
+            hf::Utils::RAD2DEG* dynamics._x11, // psi
+
+            hf::Utils::RAD2DEG* dynamics._x12, // dpsi
     };
 }
 

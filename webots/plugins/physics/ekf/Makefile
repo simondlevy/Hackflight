@@ -21,7 +21,7 @@ TINYEKF_DIR = $(HOME)/Documents/Arduino/libraries/TinyEKF/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I../../../../src
+INCLUDE = -I../../../../src -I$(TINYEKF_DIR)
 
 CXX_SOURCES = main.cpp
 
