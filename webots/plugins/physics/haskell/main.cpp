@@ -54,6 +54,27 @@ void copilot_step_core();
 
 // ---------------------------------------------------------------------------
 
+static hf::state_t estimateState()
+{
+    return hf::state_t {
+        dynamics._x1,
+            dynamics._x2 * cos(dynamics._x11) -
+                dynamics._x4 * sin(dynamics._x11),
+        dynamics._x3,
+        -(dynamics._x2 * sin(dynamics._x11) +
+                    dynamics._x4 * cos(dynamics._x11)),
+        dynamics._x5,
+        dynamics._x6,
+            hf::Utils::RAD2DEG* dynamics._x7,
+            hf::Utils::RAD2DEG* dynamics._x8,
+            hf::Utils::RAD2DEG* dynamics._x9,
+            hf::Utils::RAD2DEG* dynamics._x10,
+            hf::Utils::RAD2DEG* dynamics._x11,
+            hf::Utils::RAD2DEG* dynamics._x12,
+    };
+}
+
+
 DLLEXPORT void webots_physics_step() 
 {
     hf::siminfo_t siminfo = {};

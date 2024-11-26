@@ -40,6 +40,29 @@ static hf::YawRatePid _yawRatePid;
 
 static hf::state_t estimateState()
 {
+    // For now we run the state estimator at the same rate as the control loop
+    static auto dt = 1 / (float)PID_FREQ;
+
+    // Get simulated gyrometer values
+    const auto gyro = hf::Gyrometer::read(dynamics);
+
+     // Get simulated accelerometer values
+    const auto accel = hf::Accelerometer::read(dynamics);
+
+   // Get simulated rangefinder distance
+    const auto range = hf::Rangefinder::read(dynamics);
+
+    // Get simulated optical flow
+    const auto flow = hf::OpticalFlow::read(dynamics);
+
+    (void)accel;
+    (void)gyro;
+    (void)flow;
+    (void)range;
+    (void)dt;
+    (void)flow;
+
+    // XXX Cheat and use ground-truth state for now
     return hf::state_t {
         dynamics._x1,
             dynamics._x2 * cos(dynamics._x11) -
@@ -57,6 +80,7 @@ static hf::state_t estimateState()
             hf::Utils::RAD2DEG* dynamics._x12,
     };
 }
+
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 

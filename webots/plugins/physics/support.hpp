@@ -25,12 +25,12 @@
 
 // Hackflight
 #include <hackflight.hpp>
+#include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/sensors/accelerometer.hpp>
 #include <sim/sensors/gyrometer.hpp>
 #include <sim/sensors/optical_flow.hpp>
 #include <sim/sensors/rangefinder.hpp>
-#include <mixers/bfquadx.hpp>
 
 static const uint32_t DYNAMICS_FREQ = 1e5; // Hz
 
@@ -49,7 +49,6 @@ static hf::Dynamics::vehicle_params_t diyquad_params = {
     7.0e-6, // drag coefficient D [T=d*w^2]
     2.0e-5  // I [kg*m^2]   // pitch, roll
 };
-
 
 static auto dynamics = hf::Dynamics(diyquad_params, 1./DYNAMICS_FREQ);
 
@@ -115,48 +114,6 @@ static float pidDt()
     return 1. / PID_FREQ;
 }
 
-static hf::state_t estimateState()
-{
-    // For now we run the state estimator at the same rate as the control loop
-    static auto dt = 1 / (float)PID_FREQ;
-
-    // Get simulated gyrometer values
-    const auto gyro = hf::Gyrometer::read(dynamics);
-
-     // Get simulated accelerometer values
-    const auto accel = hf::Accelerometer::read(dynamics);
-
-   // Get simulated rangefinder distance
-    const auto range = hf::Rangefinder::read(dynamics);
-
-    // Get simulated optical flow
-    const auto flow = hf::OpticalFlow::read(dynamics);
-
-    (void)accel;
-    (void)gyro;
-    (void)flow;
-    (void)range;
-    (void)dt;
-    (void)flow;
-
-    // XXX Cheat and use ground-truth state for now
-    return hf::state_t {
-        dynamics._x1,
-            dynamics._x2 * cos(dynamics._x11) -
-                dynamics._x4 * sin(dynamics._x11),
-        dynamics._x3,
-        -(dynamics._x2 * sin(dynamics._x11) +
-                    dynamics._x4 * cos(dynamics._x11)),
-        dynamics._x5,
-        dynamics._x6,
-            hf::Utils::RAD2DEG* dynamics._x7,
-            hf::Utils::RAD2DEG* dynamics._x8,
-            hf::Utils::RAD2DEG* dynamics._x9,
-            hf::Utils::RAD2DEG* dynamics._x10,
-            hf::Utils::RAD2DEG* dynamics._x11,
-            hf::Utils::RAD2DEG* dynamics._x12,
-    };
-}
 
 
 DLLEXPORT void webots_physics_init() 
@@ -165,7 +122,7 @@ DLLEXPORT void webots_physics_init()
 
     if (_robotBody == NULL) {
 
-        dWebotsConsolePrintf("quadrotor_physics :: webots_physics_init :: ");
+        dWebotsConsolePrintf("webots_physics_init :: ");
         dWebotsConsolePrintf("error : could not get body of robot.\r\n");
     }
     else {

@@ -31,6 +31,9 @@ namespace hf {
 
         public:
 
+            /**
+              * --------------------------------------------------------------
+              */
             void initialize(void)
             {
                 const float pdiag[EKF_N] = {
@@ -57,6 +60,9 @@ namespace hf {
                 _r.z = 0;
             }
 
+            /**
+              * --------------------------------------------------------------
+              */
             void accumulate_gyro(const axis3_t & gyro) 
             {
                 imuAccum(gyro, _gyroSum);
@@ -262,6 +268,9 @@ namespace hf {
                 cleanupCovariance();
             }
 
+            /**
+              * --------------------------------------------------------------
+              */
             void update_with_range(const float distance)
             {
                 const auto x = _ekf.x;
@@ -288,6 +297,9 @@ namespace hf {
                 }
             }
 
+            /**
+              * --------------------------------------------------------------
+              */
             void update_with_flow(const float dt, const axis2_t & flow)
             {
                 // Inclusion of flow measurements in the EKF done by two scalar
@@ -342,7 +354,7 @@ namespace hf {
             }
 
             /**
-             * Returns false if state is OOB, true otherwise
+             * Returns false if state is OOB, true otherwise -----------------
              */
             bool finalize()
             {
@@ -457,6 +469,9 @@ namespace hf {
                     isVelocityWithinBounds(newx[STATE_DZ]);
             }
 
+            /**
+              * --------------------------------------------------------------
+              */
             void get_vehicle_state(
                     axis4_t & quat, axis2_t & dxdy, float & z, float & dz)
             {
