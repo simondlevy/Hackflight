@@ -93,13 +93,6 @@ hf::demands_t run_controllers(
 
         _yawRatePid.run(pid_dt, resetPids, state, demands);
 
-        printf("dt=%f  | t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n",
-                pid_dt,
-                demands.thrust,
-                demands.roll,
-                demands.pitch,
-                demands.yaw);
-
         return demands;
 }
     
