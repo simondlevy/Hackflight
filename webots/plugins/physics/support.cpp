@@ -39,8 +39,7 @@ hf::state_t estimate_state(const hf::Dynamics & dynamics);
 hf::demands_t run_controllers(
         const float pid_dt,
         const hf::siminfo_t & siminfo,
-        const hf::state_t & state,
-        const hf::demands_t & open_loop_demands);
+        const hf::state_t & state);
 
 // ---------------------------------------------------------------------------
 
@@ -105,8 +104,7 @@ DLLEXPORT void webots_physics_step()
 
         const auto state = estimate_state(_dynamics);
 
-        const auto demands =
-            run_controllers(1 / PID_FREQ, siminfo, state, siminfo.demands);
+        const auto demands = run_controllers(1 / PID_FREQ, siminfo, state);
 
         hf::BfQuadXMixer mixer = {};
 

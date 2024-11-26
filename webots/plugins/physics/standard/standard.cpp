@@ -63,37 +63,38 @@ hf::state_t estimate_state(const hf::Dynamics & dynamics)
 hf::demands_t run_controllers(
         const float pid_dt,
         const hf::siminfo_t & siminfo,
-        const hf::state_t & state,
-        const hf::demands_t & open_loop_demands)
+        const hf::state_t & state)
 {
-        // Throttle-down should reset pids
-        const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
+    const auto open_loop_demands = siminfo.demands;
 
-        // Start with open-loop demands
-        hf::demands_t demands = {
-            open_loop_demands.thrust,
-            open_loop_demands.roll,
-            open_loop_demands.pitch,
-            open_loop_demands.yaw
-        };
+    // Throttle-down should reset pids
+    const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
 
-        if (siminfo.requested_takeoff) {
+    // Start with open-loop demands
+    hf::demands_t demands = {
+        open_loop_demands.thrust,
+        open_loop_demands.roll,
+        open_loop_demands.pitch,
+        open_loop_demands.yaw
+    };
 
-            _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
+    if (siminfo.requested_takeoff) {
 
-            demands.thrust += MOTOR_HOVER;
-        }
+        _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
 
-        hf::PositionPid::run(state, demands);
+        demands.thrust += MOTOR_HOVER;
+    }
 
-        _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
+    hf::PositionPid::run(state, demands);
 
-        _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
-                PITCH_ROLL_POST_SCALE);
+    _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 
-        _yawRatePid.run(pid_dt, resetPids, state, demands);
+    _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
+            PITCH_ROLL_POST_SCALE);
 
-        return demands;
+    _yawRatePid.run(pid_dt, resetPids, state, demands);
+
+    return demands;
 }
-    
+
 
