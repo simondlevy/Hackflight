@@ -19,6 +19,14 @@
 
 
 #include <sim/standard_controllers.hpp>
+#include <estimators/ekf.hpp>
+#include <sim/sensors/accelerometer.hpp>
+#include <sim/sensors/gyrometer.hpp>
+#include <sim/sensors/optical_flow.hpp>
+#include <sim/sensors/rangefinder.hpp>
+
+// predict=100 finalize=1010 tof=23 flow=96 gyro=1010 accel=1010
+
 
 hf::state_t estimate_state(const hf::Dynamics & dynamics)
 {
