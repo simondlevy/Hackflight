@@ -19,7 +19,7 @@
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-CXX_SOURCES = snn.cpp 
+CXX_SOURCES = snn.cpp  ../support.cpp
 
 # Hackflight stuff -----------------------------------------------------------
 
