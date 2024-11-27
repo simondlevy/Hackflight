@@ -34,36 +34,57 @@ static const float FINALIZE_RATE = 1000;
 static const float GYRO_RATE = 1000;
 static const float ACCEL_RATE = 1000;
 
+static hf::EKF _ekf;
+
+void setup_controllers()
+{
+    _ekf.initialize();
+}
+
+// Called by webots_physics_step()
 hf::state_t estimate_state(const hf::Dynamics & dynamics)
 {
     const auto gyro = hf::Gyrometer::read(dynamics);
 
-    return hf::state_t {
+    const auto accel = hf::Accelerometer::read(dynamics);
 
-            0,                                  // inertial frame x, unused
+    _ekf.accumulate_gyro(gyro);
 
-            dynamics._x2 * cos(dynamics._x11) -        // body frame dx
-                dynamics._x4 * sin(dynamics._x11),
+    _ekf.accumulate_accel(accel);
 
-            0,                              // inertial frame y, unused
+    static hf::state_t _state;
 
-            -(dynamics._x2 * sin(dynamics._x11) +     // body frame dy
-                    dynamics._x4 * cos(dynamics._x11)),
+    // dx/dt, body frame
+    _state.dx = dynamics._x2 * cos(dynamics._x11) -        
+        dynamics._x4 * sin(dynamics._x11);
 
-            dynamics._x5,                             // inertial frame z
+    // dx/dt, body frame
+    _state.dy  = -(dynamics._x2 * sin(dynamics._x11) +    
+            dynamics._x4 * cos(dynamics._x11));
 
-            dynamics._x6,                             // inertial frame dz
+    // z, inertial frame
+    _state.z = dynamics._x5;
 
-            hf::Utils::RAD2DEG* dynamics._x7,         // phi
+    // dz/dt, inertial frame
+    _state.dz = dynamics._x6;
 
-            gyro.x,         // dphi
+    // phi
+    _state.phi = hf::Utils::RAD2DEG* dynamics._x7;         
 
-            hf::Utils::RAD2DEG* dynamics._x9,         // theta
+    // dphi/dt
+    _state.dphi = gyro.x;
 
-            gyro.y,        // dtheta
+    // theta
+    _state.theta = hf::Utils::RAD2DEG* dynamics._x9;
 
-            hf::Utils::RAD2DEG* dynamics._x11,        // psi
+    // dtheta/dt
+    _state.dtheta = gyro.y;
 
-            gyro.z         // dpsi
-    };
+    // psi
+    _state.psi = hf::Utils::RAD2DEG* dynamics._x11;
+
+    // dpsi/dt
+    _state.dpsi = gyro.z;
+
+    return _state;
 }

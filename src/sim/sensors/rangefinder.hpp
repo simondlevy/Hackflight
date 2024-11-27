@@ -29,7 +29,7 @@ namespace hf {
 
         public:
 
-            static float read(Dynamics & d)
+            static float read(const Dynamics & d)
             {
                 // m => mm
                 return 1000 * d._x5 / (cos(d._x7) * cos(d._x9));

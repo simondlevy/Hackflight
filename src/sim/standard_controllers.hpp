@@ -33,11 +33,6 @@ static hf::PitchRollAnglePid _pitchRollAnglePid;
 static hf::PitchRollRatePid _pitchRollRatePid;
 static hf::YawRatePid _yawRatePid;
 
-// Called by webots_physics_init(); unneeded here
-void setup_controllers()
-{
-}
-
 hf::demands_t run_controllers(
         const float pid_dt,
         const hf::siminfo_t & siminfo,

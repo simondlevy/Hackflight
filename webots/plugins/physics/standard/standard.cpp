@@ -19,3 +19,8 @@
 
 #include <sim/standard_controllers.hpp>
 #include <sim/state_from_dynamics.hpp>
+
+// Called by webots_physics_init(); unneeded here
+void setup_controllers()
+{
+}

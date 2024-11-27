@@ -27,7 +27,7 @@ namespace hf {
 
         public:
 
-            static axis3_t read(Dynamics & d)
+            static axis3_t read(const Dynamics & d)
             {
                 const auto s = Utils::G2MSS;
 

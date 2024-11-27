@@ -71,12 +71,18 @@ namespace hf {
 
             }
 
-            void accumulate_accel(const axis3_t & accel) 
+            /**
+              * --------------------------------------------------------------
+              */
+             void accumulate_accel(const axis3_t & accel) 
             {
                 imuAccum(accel, _accelSum);
             }
 
-            void predict(const float dt)
+            /**
+              * --------------------------------------------------------------
+              */
+             void predict(const float dt)
             {
                 static axis3_t _gyro;
                 static axis3_t _accel;
@@ -135,12 +141,14 @@ namespace hf {
                     sqrt(tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + 
                     EPS;
 
-                // Process noise is added after the return from the prediction step
+                // Process noise is added after the return from the prediction
+                // step
 
                 // ====== PREDICTION STEP ======
                 // The prediction depends on whether we're on the ground, or in
-                // flight.  When flying, the accelerometer directly measures thrust
-                // (hence is useless to estimate body angle while flying)
+                // flight.  When flying, the accelerometer directly measures
+                // thrust (hence is useless to estimate body angle while
+                // flying)
 
                 const auto tmpSDX = xold[STATE_DX];
                 const auto tmpSDY = xold[STATE_DY];
@@ -288,12 +296,14 @@ namespace hf {
 
                 const auto r = square(RANGEFINDER_EXP_STD_A * 
                         (1 + expf(RANGEFINDER_EXP_COEFF * 
-                                  (measuredDistance - RANGEFINDER_EXP_POINT_A))));
+                                  (measuredDistance -
+                                   RANGEFINDER_EXP_POINT_A))));
 
-                if (fabs(_r.z) > 0.1f && _r.z > 0 && distance < RANGEFINDER_OUTLIER_LIMIT_MM) {
+                if (fabs(_r.z) > 0.1f && _r.z > 0 &&
+                        distance < RANGEFINDER_OUTLIER_LIMIT_MM) {
 
-                    update_with_scalar(measuredDistance, predictedDistance, h, r);
-
+                    update_with_scalar(
+                            measuredDistance, predictedDistance, h, r);
                 }
             }
 
@@ -343,7 +353,9 @@ namespace hf {
 
                 // derive measurement equation with respect to dy (and z?)
                 float hy[EKF_N] = {};
-                hy[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * ((_r.z * dy_g) / (-z_g * z_g));
+                hy[0] = (FLOW_NPIX * dt / FLOW_THETAPIX) * ((_r.z * dy_g) /
+                        (-z_g * z_g));
+
                 hy[2] = (FLOW_NPIX * dt / FLOW_THETAPIX) * (_r.z / z_g);
 
                 const auto r = square(FLOW_STD_FIXED * FLOW_RESOLUTION);
@@ -388,12 +400,13 @@ namespace hf {
                 const auto tmpq3 = dqz * qw + dqy * qx - dqx * qy + dqw * qz;
 
                 // normalize and store the result
-                const auto norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                        tmpq3 * tmpq3) + EPS;
+                const auto norm =sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 +
+                        tmpq2 * tmpq2 + tmpq3 * tmpq3) + EPS;
 
                 const auto isErrorSufficient  = 
-                    (isErrorLarge(v0) || isErrorLarge(v1) || isErrorLarge(v2)) &&
-                    isErrorInBounds(v0) && isErrorInBounds(v1) && isErrorInBounds(v2);
+                    (isErrorLarge(v0) || isErrorLarge(v1) || isErrorLarge(v2))
+                    && isErrorInBounds(v0) && isErrorInBounds(v1) &&
+                    isErrorInBounds(v2);
 
                 _quat.w = isErrorSufficient ? tmpq0 / norm : _quat.w;
                 _quat.x = isErrorSufficient ? tmpq1 / norm : _quat.x;
@@ -412,7 +425,8 @@ namespace hf {
 
                 _r.x = 2 * _quat.x * _quat.z - 2 * _quat.w * _quat.y;
                 _r.y = 2 * _quat.y * _quat.z + 2 * _quat.w * _quat.x; 
-                _r.z = _quat.w*_quat.w-_quat.x*_quat.x-_quat.y*_quat.y+_quat.z*_quat.z;
+                _r.z = _quat.w*_quat.w-_quat.x*_quat.x-_quat.y*_quat.y + 
+                    _quat.z*_quat.z;
 
                 // the attitude error vector (v0,v1,v2) is small,
                 // so we use a first order approximation to e0 = tan(|v0|/2)*v0/|v0|
@@ -607,7 +621,8 @@ namespace hf {
 
             void cleanupCovariance(void)
             {
-                ekf_custom_cleanup_covariance(&_ekf, MIN_COVARIANCE, MAX_COVARIANCE);
+                ekf_custom_cleanup_covariance(
+                        &_ekf, MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
             static void imuAccum(const axis3_t vals, imu_t & imu)
@@ -628,11 +643,19 @@ namespace hf {
                 const auto isCountNonzero = count > 0;
 
                 mean.x =
-                    isCountNonzero ? imu.sum.x * conversionFactor / count : mean.x;
+                    isCountNonzero ?
+                    imu.sum.x * conversionFactor / count :
+                    mean.x;
+
                 mean.y =
-                    isCountNonzero ? imu.sum.y * conversionFactor / count : mean.y;
+                    isCountNonzero ?
+                    imu.sum.y * conversionFactor / count :
+                    mean.y;
+
                 mean.z =
-                    isCountNonzero ? imu.sum.z * conversionFactor / count : mean.z;
+                    isCountNonzero ?
+                    imu.sum.z * conversionFactor / count :
+                    mean.z;
             }
 
             static float max(const float val, const float maxval)
