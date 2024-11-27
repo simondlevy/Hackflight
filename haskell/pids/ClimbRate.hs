@@ -42,11 +42,11 @@ climbRateController hitTakeoffButton time state demands = demands'
 
     kp = 2
 
-    thrust_takeoff = 75 :: SFloat -- rad /sec
+    thrust_takeoff = 80 :: SFloat -- rad /sec
 
     thrust_base = 74.565 :: SFloat -- rad /sec
 
-    takeoff_time = 1.0 :: SFloat -- sec
+    takeoff_time = 3.0 :: SFloat -- sec
 
     thrust' = if time > takeoff_time
               then thrust_base + kp * ((thrust demands) - (dz state))
