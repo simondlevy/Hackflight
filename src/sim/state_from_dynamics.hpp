@@ -1,5 +1,5 @@
 /* 
- *  A temporary hack to get vehicle state directly from Dynamics object
+ *  Get vehicle state directly from Dynamics object
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -19,8 +19,12 @@
 #include <hackflight.hpp>
 #include <sim/dynamics.hpp>
 
-hf::state_t estimate_state(const hf::Dynamics & dynamics)
+hf::state_t estimate_state(
+        const hf::Dynamics & dynamics,
+        const float pid_rate)
 {
+    (void)pid_rate;
+
     return hf::state_t {
 
             0,                                  // inertial frame x, unused

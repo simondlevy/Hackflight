@@ -34,7 +34,8 @@ static constexpr char ROBOT_NAME[] = "diyquad";
 
 void setup_controllers();
 
-hf::state_t estimate_state(const hf::Dynamics & dynamics);
+hf::state_t estimate_state(
+        const hf::Dynamics & dynamics, const float pid_rate);
 
 hf::demands_t run_controllers(
         const float pid_dt,
@@ -56,8 +57,8 @@ static hf::Dynamics::vehicle_params_t _diyquad_params = {
 };
 
 
-static hf::Dynamics _dynamics = hf::Dynamics(_diyquad_params, 1./DYNAMICS_RATE);
-
+static hf::Dynamics _dynamics =hf::Dynamics(
+        _diyquad_params, 1./DYNAMICS_RATE);
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -102,7 +103,7 @@ DLLEXPORT void webots_physics_step()
     // Run control in middle loop
     for (uint32_t j=0; j < (uint32_t)(1 / siminfo.framerate * PID_RATE);  ++j) {
 
-        const auto state = estimate_state(_dynamics);
+        const auto state = estimate_state(_dynamics, PID_RATE);
 
         const auto demands = run_controllers(1 / PID_RATE, siminfo, state);
 

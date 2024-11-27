@@ -42,8 +42,11 @@ void setup_controllers()
 }
 
 // Called by webots_physics_step()
-hf::state_t estimate_state(const hf::Dynamics & dynamics)
+hf::state_t estimate_state(
+        const hf::Dynamics & dynamics, const float pid_rate)
 {
+    (void)pid_rate;
+
     const auto gyro = hf::Gyrometer::read(dynamics);
 
     const auto accel = hf::Accelerometer::read(dynamics);
