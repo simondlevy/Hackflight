@@ -17,13 +17,11 @@
 # You may add some variable definitions hereafter to customize the build process
 # See documentation in $(WEBOTS_HOME_PATH)/resources/Makefile.include
 
-TINYEKF_DIR = $(HOME)/Documents/Arduino/libraries/TinyEKF/src
-
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I../../../../src -I$(TINYEKF_DIR)
+INCLUDE = -I../../../../src
 
-CXX_SOURCES = main.cpp
+CXX_SOURCES = ekf.cpp ../support.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
