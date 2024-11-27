@@ -1,6 +1,6 @@
 /* 
- * Custom physics plugin for Hackflight simulator using Estimated Kalman Filter for
- * state and standard C++ PID controllers
+ * Custom physics plugin for Hackflight simulator using Estimated Kalman Filter
+ * for state and standard C++ PID controllers
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -17,9 +17,11 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 
-#include <sim/standard_controllers.hpp>
+#include <hackflight.hpp>
 #include <estimators/ekf.hpp>
+#include <sim/standard_controllers.hpp>
 #include <sim/sensors/accelerometer.hpp>
 #include <sim/sensors/gyrometer.hpp>
 #include <sim/sensors/optical_flow.hpp>
@@ -54,6 +56,34 @@ hf::state_t estimate_state(
     _ekf.accumulate_gyro(gyro);
 
     _ekf.accumulate_accel(accel);
+
+    static uint32_t _prediction_count;
+    if (_prediction_count++ == (uint32_t)(pid_rate/PREDICTION_RATE)) {
+        _ekf.predict(1 / PREDICTION_RATE);
+        _prediction_count = 0;
+    }
+
+    static uint32_t _flow_count;
+    if (_flow_count++ == (uint32_t)(pid_rate/OPTICAL_FLOW_RATE)) {
+        _ekf.update_with_flow(1/OPTICAL_FLOW_RATE,
+                hf::OpticalFlow::read(dynamics));
+        _flow_count = 0;
+    }
+
+    static uint32_t _range_count;
+    if (_range_count++ == (uint32_t)(pid_rate/RANGEFINDER_RATE)) {
+        _ekf.update_with_range(1/RANGEFINDER_RATE);
+        _range_count = 0;
+    }
+
+    _ekf.finalize();
+
+    hf::axis4_t quat = {};
+    hf::axis2_t dxdy = {};
+    float z = 0;
+    float dz = 0;
+
+    _ekf.get_vehicle_state(quat, dxdy, z, dz);
 
     static hf::state_t _state;
 
