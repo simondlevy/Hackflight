@@ -22,19 +22,31 @@
 hf::state_t estimate_state(const hf::Dynamics & dynamics)
 {
     return hf::state_t {
-        dynamics._x1,
-            dynamics._x2 * cos(dynamics._x11) -
+
+            0,                                  // inertial frame x, unused
+
+            dynamics._x2 * cos(dynamics._x11) -        // body frame dx
                 dynamics._x4 * sin(dynamics._x11),
-        dynamics._x3,
-        -(dynamics._x2 * sin(dynamics._x11) +
+
+            0,                              // inertial frame y, unused
+
+            -(dynamics._x2 * sin(dynamics._x11) +     // body frame dy
                     dynamics._x4 * cos(dynamics._x11)),
-        dynamics._x5,
-        dynamics._x6,
-            hf::Utils::RAD2DEG* dynamics._x7,
-            hf::Utils::RAD2DEG* dynamics._x8,
-            hf::Utils::RAD2DEG* dynamics._x9,
-            hf::Utils::RAD2DEG* dynamics._x10,
-            hf::Utils::RAD2DEG* dynamics._x11,
-            hf::Utils::RAD2DEG* dynamics._x12,
+
+            dynamics._x5,                             // inertial frame z
+
+            dynamics._x6,                             // inertial frame dz
+
+            hf::Utils::RAD2DEG* dynamics._x7,         // phi
+
+            hf::Utils::RAD2DEG* dynamics._x8,         // dphi
+
+            hf::Utils::RAD2DEG* dynamics._x9,         // theta
+
+            hf::Utils::RAD2DEG* dynamics._x10,        // dtheta
+
+            hf::Utils::RAD2DEG* dynamics._x11,        // psi
+
+            hf::Utils::RAD2DEG* dynamics._x12         // dpsi
     };
 }

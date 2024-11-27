@@ -25,25 +25,45 @@
 #include <sim/sensors/optical_flow.hpp>
 #include <sim/sensors/rangefinder.hpp>
 
-// predict=100 finalize=1010 tof=23 flow=96 gyro=1010 accel=1010
+// All rates in Hz
+static const float PREDICTION_RATE = 100;
+static const float OPTICAL_FLOW_RATE = 100;
+static const float RANGEFINDER_RATE = 25;
 
+static const float FINALIZE_RATE = 1000;
+static const float GYRO_RATE = 1000;
+static const float ACCEL_RATE = 1000;
 
 hf::state_t estimate_state(const hf::Dynamics & dynamics)
 {
+    const auto gyro = hf::Gyrometer::read(dynamics);
+
     return hf::state_t {
-        dynamics._x1,
-            dynamics._x2 * cos(dynamics._x11) -
+
+            0,                                  // inertial frame x, unused
+
+            dynamics._x2 * cos(dynamics._x11) -        // body frame dx
                 dynamics._x4 * sin(dynamics._x11),
-        dynamics._x3,
-        -(dynamics._x2 * sin(dynamics._x11) +
+
+            0,                              // inertial frame y, unused
+
+            -(dynamics._x2 * sin(dynamics._x11) +     // body frame dy
                     dynamics._x4 * cos(dynamics._x11)),
-        dynamics._x5,
-        dynamics._x6,
-            hf::Utils::RAD2DEG* dynamics._x7,
-            hf::Utils::RAD2DEG* dynamics._x8,
-            hf::Utils::RAD2DEG* dynamics._x9,
-            hf::Utils::RAD2DEG* dynamics._x10,
-            hf::Utils::RAD2DEG* dynamics._x11,
-            hf::Utils::RAD2DEG* dynamics._x12,
+
+            dynamics._x5,                             // inertial frame z
+
+            dynamics._x6,                             // inertial frame dz
+
+            hf::Utils::RAD2DEG* dynamics._x7,         // phi
+
+            gyro.x,         // dphi
+
+            hf::Utils::RAD2DEG* dynamics._x9,         // theta
+
+            gyro.y,        // dtheta
+
+            hf::Utils::RAD2DEG* dynamics._x11,        // psi
+
+            gyro.z         // dpsi
     };
 }

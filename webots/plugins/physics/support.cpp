@@ -24,9 +24,9 @@
 #include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 
-static const float DYNAMICS_FREQ = 1e5; // Hz
+static const float DYNAMICS_RATE = 100000; // Hz
 
-static const float PID_FREQ = 1e3; // Hz
+static const float PID_RATE = 1000; // Hz
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
@@ -56,7 +56,7 @@ static hf::Dynamics::vehicle_params_t _diyquad_params = {
 };
 
 
-static hf::Dynamics _dynamics = hf::Dynamics(_diyquad_params, 1./DYNAMICS_FREQ);
+static hf::Dynamics _dynamics = hf::Dynamics(_diyquad_params, 1./DYNAMICS_RATE);
 
 
 DLLEXPORT void webots_physics_init() 
@@ -100,11 +100,11 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Run control in middle loop
-    for (uint32_t j=0; j < (uint32_t)(1 / siminfo.framerate * PID_FREQ);  ++j) {
+    for (uint32_t j=0; j < (uint32_t)(1 / siminfo.framerate * PID_RATE);  ++j) {
 
         const auto state = estimate_state(_dynamics);
 
-        const auto demands = run_controllers(1 / PID_FREQ, siminfo, state);
+        const auto demands = run_controllers(1 / PID_RATE, siminfo, state);
 
         hf::BfQuadXMixer mixer = {};
 
@@ -113,7 +113,7 @@ DLLEXPORT void webots_physics_step()
         mixer.run(demands, motors);
 
         // Update dynamics in innermost loop
-        for (uint32_t k=0; k<DYNAMICS_FREQ / PID_FREQ; ++k) {
+        for (uint32_t k=0; k<DYNAMICS_RATE / PID_RATE; ++k) {
 
             _dynamics.update(motors, &mixer);
         }
