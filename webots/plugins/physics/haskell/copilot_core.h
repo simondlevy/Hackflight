@@ -13,5 +13,5 @@ extern float stream_yaw;
 extern float stream_dpsi;
 extern float stream_dphi;
 extern float stream_dtheta;
-void runMixer(float runMixer_arg0, float runMixer_arg1, float runMixer_arg2, float runMixer_arg3);
+void setDemands(float setDemands_arg0, float setDemands_arg1, float setDemands_arg2, float setDemands_arg3);
 void copilot_step_core(void);

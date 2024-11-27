@@ -63,23 +63,23 @@ static float s3_gen(void) {
   return (stream_yaw_cpy) - (stream_dpsi_cpy);
 }
 
-static bool runMixer_guard(void) {
+static bool setDemands_guard(void) {
   return true;
 }
 
-static float runMixer_arg0(void) {
+static float setDemands_arg0(void) {
   return ((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)));
 }
 
-static float runMixer_arg1(void) {
+static float setDemands_arg1(void) {
   return ((float)(50.0f)) * (((((float)(2.0e-3f)) * ((((float)(10.0f)) * ((stream_roll_cpy) - (stream_dy_cpy))) - (stream_phi_cpy))) + (((float)(3.0e-3f)) * (((((((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)))) < ((float)(6.0e-2f))) ? (float)(0.0f) : (((s0_get)((0))) + (((((float)(10.0f)) * ((stream_roll_cpy) - (stream_dy_cpy))) - (stream_phi_cpy)) * (stream_dt_cpy)))) < ((float)(-25.0f))) ? (float)(-25.0f) : (((((((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)))) < ((float)(6.0e-2f))) ? (float)(0.0f) : (((s0_get)((0))) + (((((float)(10.0f)) * ((stream_roll_cpy) - (stream_dy_cpy))) - (stream_phi_cpy)) * (stream_dt_cpy)))) > ((float)(25.0f))) ? (float)(25.0f) : (((((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)))) < ((float)(6.0e-2f))) ? (float)(0.0f) : (((s0_get)((0))) + (((((float)(10.0f)) * ((stream_roll_cpy) - (stream_dy_cpy))) - (stream_phi_cpy)) * (stream_dt_cpy)))))))) - (((float)(5.0e-4f)) * (stream_dphi_cpy)));
 }
 
-static float runMixer_arg2(void) {
+static float setDemands_arg2(void) {
   return ((float)(50.0f)) * (((((float)(2.0e-3f)) * ((((float)(10.0f)) * ((stream_pitch_cpy) - (stream_dx_cpy))) - (stream_theta_cpy))) + (((float)(3.0e-3f)) * (((((((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)))) < ((float)(6.0e-2f))) ? (float)(0.0f) : (((s1_get)((0))) + (((((float)(10.0f)) * ((stream_pitch_cpy) - (stream_dx_cpy))) - (stream_theta_cpy)) * (stream_dt_cpy)))) < ((float)(-25.0f))) ? (float)(-25.0f) : (((((((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)))) < ((float)(6.0e-2f))) ? (float)(0.0f) : (((s1_get)((0))) + (((((float)(10.0f)) * ((stream_pitch_cpy) - (stream_dx_cpy))) - (stream_theta_cpy)) * (stream_dt_cpy)))) > ((float)(25.0f))) ? (float)(25.0f) : (((((stream_time_cpy) > ((float)(1.0f))) ? ((float)(74.565f)) + (((float)(2.0f)) * ((stream_throttle_cpy) - (stream_dz_cpy))) : ((stream_requestedTakeoff_cpy) ? (float)(75.0f) : ((float)(0.0f)))) < ((float)(6.0e-2f))) ? (float)(0.0f) : (((s1_get)((0))) + (((((float)(10.0f)) * ((stream_pitch_cpy) - (stream_dx_cpy))) - (stream_theta_cpy)) * (stream_dt_cpy)))))))) - (((float)(5.0e-4f)) * (stream_dtheta_cpy)));
 }
 
-static float runMixer_arg3(void) {
+static float setDemands_arg3(void) {
   return ((((float)(3.0e-3f)) * ((stream_yaw_cpy) - (stream_dpsi_cpy))) + (((float)(5.0e-4f)) * ((s2_get)((0))))) - (((float)(1.5e-6f)) * ((((stream_yaw_cpy) - (stream_dpsi_cpy)) - ((s3_get)((0)))) / (stream_dt_cpy)));
 }
 
@@ -88,10 +88,10 @@ void copilot_step_core(void) {
   float s1_tmp;
   float s2_tmp;
   float s3_tmp;
-  float runMixer_arg_temp0;
-  float runMixer_arg_temp1;
-  float runMixer_arg_temp2;
-  float runMixer_arg_temp3;
+  float setDemands_arg_temp0;
+  float setDemands_arg_temp1;
+  float setDemands_arg_temp2;
+  float setDemands_arg_temp3;
   (stream_time_cpy) = (stream_time);
   (stream_throttle_cpy) = (stream_throttle);
   (stream_dz_cpy) = (stream_dz);
@@ -107,12 +107,12 @@ void copilot_step_core(void) {
   (stream_dpsi_cpy) = (stream_dpsi);
   (stream_dphi_cpy) = (stream_dphi);
   (stream_dtheta_cpy) = (stream_dtheta);
-  if ((runMixer_guard)()) {
-    {(runMixer_arg_temp0) = ((runMixer_arg0)());
-     (runMixer_arg_temp1) = ((runMixer_arg1)());
-     (runMixer_arg_temp2) = ((runMixer_arg2)());
-     (runMixer_arg_temp3) = ((runMixer_arg3)());
-     (runMixer)((runMixer_arg_temp0), (runMixer_arg_temp1), (runMixer_arg_temp2), (runMixer_arg_temp3));}
+  if ((setDemands_guard)()) {
+    {(setDemands_arg_temp0) = ((setDemands_arg0)());
+     (setDemands_arg_temp1) = ((setDemands_arg1)());
+     (setDemands_arg_temp2) = ((setDemands_arg2)());
+     (setDemands_arg_temp3) = ((setDemands_arg3)());
+     (setDemands)((setDemands_arg_temp0), (setDemands_arg_temp1), (setDemands_arg_temp2), (setDemands_arg_temp3));}
   };
   (s0_tmp) = ((s0_gen)());
   (s1_tmp) = ((s1_gen)());

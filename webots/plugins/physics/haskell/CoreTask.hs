@@ -114,7 +114,7 @@ spec = do
 
     let demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
-    trigger "runMixer" true [
+    trigger "setDemands" true [
                               arg $ thrust demands',
                               arg $ pitch_roll_post_scale * (roll demands'),
                               arg $ pitch_roll_post_scale * (pitch demands'),
