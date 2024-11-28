@@ -37,20 +37,20 @@ namespace hf {
             static axis2_t read(const Dynamics & d)
             {
                 // Rotate inertial-frame horizontal velocity into body frame
-                const auto dx =   d._x2 * cos(d._x11) - d._x4 * sin(d._x11);
-                const auto dy = -(d._x2 * sin(d._x11) + d._x4 * cos(d._x11));
+                const auto dx =   d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
+                const auto dy = -(d.x2 * sin(d.x11) + d.x4 * cos(d.x11));
 
                 // Simulate optical flow based on
                 //    https://github.com/bitcraze/crazyflie-firmware/blob/master/
                 //    src/modules/src/kalman_core/mm_flow.c
 
-                const auto z = max(d._x5, ZMIN);
+                const auto z = max(d.x5, ZMIN);
 
                 const auto scale = d._dt * NPIX / thetapix(); 
 
-                const auto flow_dx = scale * ((dx / z) - d._x9);
+                const auto flow_dx = scale * ((dx / z) - d.x9);
 
-                const auto flow_dy = scale * ((dy / z) - d._x7);
+                const auto flow_dy = scale * ((dy / z) - d.x7);
 
                 return axis2_t {flow_dx, flow_dy};
             }

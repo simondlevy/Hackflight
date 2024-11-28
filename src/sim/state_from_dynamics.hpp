@@ -29,28 +29,28 @@ hf::state_t estimate_state(
 
             0,                                  // inertial frame x, unused
 
-            dynamics._x2 * cos(dynamics._x11) -        // body frame dx
-                dynamics._x4 * sin(dynamics._x11),
+            dynamics.x2 * cos(dynamics.x11) -        // body frame dx
+                dynamics.x4 * sin(dynamics.x11),
 
             0,                              // inertial frame y, unused
 
-            -(dynamics._x2 * sin(dynamics._x11) +     // body frame dy
-                    dynamics._x4 * cos(dynamics._x11)),
+            -(dynamics.x2 * sin(dynamics.x11) +     // body frame dy
+                    dynamics.x4 * cos(dynamics.x11)),
 
-            dynamics._x5,                             // inertial frame z
+            dynamics.x5,                             // inertial frame z
 
-            dynamics._x6,                             // inertial frame dz
+            dynamics.x6,                             // inertial frame dz
 
-            hf::Utils::RAD2DEG* dynamics._x7,         // phi
+            hf::Utils::RAD2DEG* dynamics.x7,         // phi
 
-            hf::Utils::RAD2DEG* dynamics._x8,         // dphi
+            hf::Utils::RAD2DEG* dynamics.x8,         // dphi
 
-            hf::Utils::RAD2DEG* dynamics._x9,         // theta
+            hf::Utils::RAD2DEG* dynamics.x9,         // theta
 
-            hf::Utils::RAD2DEG* dynamics._x10,        // dtheta
+            hf::Utils::RAD2DEG* dynamics.x10,        // dtheta
 
-            hf::Utils::RAD2DEG* dynamics._x11,        // psi
+            hf::Utils::RAD2DEG* dynamics.x11,        // psi
 
-            hf::Utils::RAD2DEG* dynamics._x12         // dpsi
+            hf::Utils::RAD2DEG* dynamics.x12         // dpsi
     };
 }

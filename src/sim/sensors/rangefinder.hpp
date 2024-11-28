@@ -32,7 +32,7 @@ namespace hf {
             static float read(const Dynamics & d)
             {
                 // m => mm
-                return 1000 * d._x5 / (cos(d._x7) * cos(d._x9));
+                return 1000 * d.x5 / (cos(d.x7) * cos(d.x9));
             }
     };
 }

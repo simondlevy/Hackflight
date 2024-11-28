@@ -53,6 +53,8 @@ hf::state_t estimate_state(
 
     const auto accel = hf::Accelerometer::read(dynamics);
 
+    printf("accel_z=%+3.3f\n", accel.z);
+
     _ekf.accumulate_gyro(gyro);
 
     _ekf.accumulate_accel(accel);
@@ -85,36 +87,38 @@ hf::state_t estimate_state(
 
     _ekf.get_vehicle_state(quat, dxdy, z, dz);
 
+    //printf("z=%+3.3f (%+3.3f)  dz=%+3.3f (%+3.3f)\n", z, dynamics.x5, dz, dynamics.x6);
+
     static hf::state_t _state;
 
     // dx/dt, body frame
-    _state.dx = dynamics._x2 * cos(dynamics._x11) -        
-        dynamics._x4 * sin(dynamics._x11);
+    _state.dx = dynamics.x2 * cos(dynamics.x11) -        
+        dynamics.x4 * sin(dynamics.x11);
 
     // dx/dt, body frame
-    _state.dy  = -(dynamics._x2 * sin(dynamics._x11) +    
-            dynamics._x4 * cos(dynamics._x11));
+    _state.dy  = -(dynamics.x2 * sin(dynamics.x11) +    
+            dynamics.x4 * cos(dynamics.x11));
 
     // z, inertial frame
-    _state.z = dynamics._x5;
+    _state.z = dynamics.x5;
 
     // dz/dt, inertial frame
-    _state.dz = dynamics._x6;
+    _state.dz = dynamics.x6;
 
     // phi
-    _state.phi = hf::Utils::RAD2DEG* dynamics._x7;         
+    _state.phi = hf::Utils::RAD2DEG* dynamics.x7;         
 
     // dphi/dt
     _state.dphi = gyro.x;
 
     // theta
-    _state.theta = hf::Utils::RAD2DEG* dynamics._x9;
+    _state.theta = hf::Utils::RAD2DEG* dynamics.x9;
 
     // dtheta/dt
     _state.dtheta = gyro.y;
 
     // psi
-    _state.psi = hf::Utils::RAD2DEG* dynamics._x11;
+    _state.psi = hf::Utils::RAD2DEG* dynamics.x11;
 
     // dpsi/dt
     _state.dpsi = gyro.z;

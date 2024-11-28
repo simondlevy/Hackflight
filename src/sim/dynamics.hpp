@@ -53,6 +53,20 @@ namespace hf {
 
         public:
 
+            // Vehicle state (Equation 11)
+            float x1;  // x
+            float x2;  // dx/dt
+            float x3;  // y
+            float x4;  // dy/dt
+            float x5;  // z
+            float x6;  // dz/dt
+            float x7;  // phi
+            float x8;  // dphi/dt
+            float x9;  // theta
+            float x10; // dtheta/dt
+            float x11; // psi
+            float x12; // dpsi/dt
+
             typedef struct {
 
                 float x;
@@ -130,7 +144,7 @@ namespace hf {
                 }
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
-                _dx6 = -_g + (cos(_x7)*cos(_x9)) * 1 / m * u1;
+                _dx6 = -_g + (cos(x7)*cos(x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
                 if (_dx6 > 0) {
@@ -143,34 +157,34 @@ namespace hf {
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dx1 = _x2;                                 // x
-                    _dx2 =(cos(-_x7)*sin(_x9)*cos(_x11) +       // dx, inertial frame
-                            sin(-_x7)*sin(_x11)) * u1 / m;
-                    _dx3 = _x4;                                 // y
-                    _dx4 = -(cos(-_x7)*sin(_x9)*sin(_x11) -     // dy, inertial frame
-                            sin(-_x7)*cos(_x11)) * u1 / m;
-                    _dx5 = _x6;                                 // z
-                    _dx7 = _x8;                                 // phi
+                    _dx1 = x2;                                 // x
+                    _dx2 =(cos(-x7)*sin(x9)*cos(x11) +       // dx, inertial frame
+                            sin(-x7)*sin(x11)) * u1 / m;
+                    _dx3 = x4;                                 // y
+                    _dx4 = -(cos(-x7)*sin(x9)*sin(x11) -     // dy, inertial frame
+                            sin(-x7)*cos(x11)) * u1 / m;
+                    _dx5 = x6;                                 // z
+                    _dx7 = x8;                                 // phi
                     _dx8 = l / I * u2;                          // dphi
-                    _dx9 = _x10;                                // theta
+                    _dx9 = x10;                                // theta
                     _dx10 = l / I * u3;                         // dtheta
-                    _dx11 = _x12;                               // psi
+                    _dx11 = x12;                               // psi
                     _dx12 = -l / I * u4;                        // dpsi
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
-                    _x1 += _dt * _dx1;
-                    _x2 += _dt * _dx2;
-                    _x3 += _dt * _dx3;
-                    _x4 += _dt * _dx4;
-                    _x5 += _dt * _dx5;
-                    _x6 += _dt * _dx6;
-                    _x7 += _dt * _dx7;
-                    _x8 += _dt * _dx8;
-                    _x9 += _dt * _dx9;
-                    _x10 += _dt * _dx10;
-                    _x11 += _dt * _dx11;
-                    _x12 += _dt * _dx12;
+                    x1 += _dt * _dx1;
+                    x2 += _dt * _dx2;
+                    x3 += _dt * _dx3;
+                    x4 += _dt * _dx4;
+                    x5 += _dt * _dx5;
+                    x6 += _dt * _dx6;
+                    x7 += _dt * _dx7;
+                    x8 += _dt * _dx8;
+                    x9 += _dt * _dx9;
+                    x10 += _dt * _dx10;
+                    x11 += _dt * _dx11;
+                    x12 += _dt * _dx12;
                 }
 
             } // update
@@ -178,24 +192,8 @@ namespace hf {
             pose_t getPose()
             {
                 // Negate y coordinate for rightward positive
-                return pose_t {_x1, -_x3, _x5, _x7, _x9, _x11 };
+                return pose_t {x1, -x3, x5, x7, x9, x11 };
             }
-
-            // Vehicle state (Equation 11)
-            // Should be private, but we need it in for control loop until
-            // we get sensor fusion working
-            float _x1;  // x
-            float _x2;  // dx/dt
-            float _x3;  // y
-            float _x4;  // dy/dt
-            float _x5;  // z
-            float _x6;  // dz/dt
-            float _x7;  // phi
-            float _x8;  // dphi/dt
-            float _x9;  // theta
-            float _x10; // dtheta/dt
-            float _x11; // psi
-            float _x12; // dpsi/dt
 
             // ---------------------------------------------------------------
 
