@@ -18,6 +18,7 @@
  */
 
 #include <hackflight.hpp>
+#include <sim/sensors/rangefinder.hpp>
 #include <utils.hpp>
 
 namespace hf {
@@ -34,21 +35,18 @@ namespace hf {
                 return 2 * sin(FIELD_OF_VIEW / Utils::RAD2DEG / 2);
             }
 
-            static axis2_t read(
-                    const Dynamics & d, const float h, const float dt) 
+            static axis2_t read(const Dynamics & d, const float dt) 
             {
                 // Rotate inertial-frame horizontal velocity into body frame
-                const auto dx =   d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
-                const auto dy = -(d.x2 * sin(d.x11) + d.x4 * cos(d.x11));
+                const auto dx = d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
+                const auto dy = d.x2 * sin(d.x11) + d.x4 * cos(d.x11);
 
-                // https://www.bitcraze.io/documentation/repository/
-                //  crazyflie-firmware/master/images/flowdeck_velocity.png
+                (void)dt;
+                const float scale = 22.5;
 
-                const auto flow_dx =
-                    dt * NPIX * (h * d.x8 + dx) / (h * thetapix());
+                const auto flow_dx = dx * scale;
 
-                const auto flow_dy =
-                    dt * NPIX * (h * d.x10 + dy) / (h * thetapix());
+                const auto flow_dy = dy * scale;
 
                 return axis2_t {flow_dx, flow_dy};
             }
