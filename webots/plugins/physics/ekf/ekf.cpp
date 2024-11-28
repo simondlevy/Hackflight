@@ -27,14 +27,10 @@
 #include <sim/sensors/optical_flow.hpp>
 #include <sim/sensors/rangefinder.hpp>
 
-// All rates in Hz
+// All rates in Hz, as measured in Crazyflie state estimator
 static const float PREDICTION_RATE = 100;
 static const float OPTICAL_FLOW_RATE = 100;
 static const float RANGEFINDER_RATE = 25;
-
-static const float FINALIZE_RATE = 1000;
-static const float GYRO_RATE = 1000;
-static const float ACCEL_RATE = 1000;
 
 static hf::EKF _ekf;
 
@@ -47,13 +43,10 @@ void setup_controllers()
 hf::state_t estimate_state(
         const hf::Dynamics & dynamics, const float pid_rate)
 {
+    // Gyro and accel accumulation run at same 1000Hz rate as control loop
     const auto gyro = hf::Gyrometer::read(dynamics);
-
-    const auto accel = hf::Accelerometer::read(dynamics);
-
     _ekf.accumulate_gyro(gyro);
-
-    _ekf.accumulate_accel(accel);
+    _ekf.accumulate_accel(hf::Accelerometer::read(dynamics));
 
     static uint32_t _prediction_count;
     if (_prediction_count++ == (uint32_t)(pid_rate/PREDICTION_RATE)) {
@@ -76,15 +69,12 @@ hf::state_t estimate_state(
 
     _ekf.finalize();
 
-    hf::axis4_t quat = {};
-    hf::axis2_t dxdy = {};
-    float z = 0;
-    float dz = 0;
+    hf::axis4_t quat_est = {};
+    hf::axis2_t dxdy_est = {};
+    float z_est = 0;
+    float dz_est = 0;
 
-    _ekf.get_vehicle_state(quat, dxdy, z, dz);
-
-    printf("z=%+3.3f (%+3.3f)  dz=%+3.3f (%+3.3f)\n",
-            z, dynamics.x5, dz, dynamics.x6);
+    _ekf.get_vehicle_state(quat_est, dxdy_est, z_est, dz_est);
 
     static hf::state_t _state;
 
@@ -97,24 +87,24 @@ hf::state_t estimate_state(
             dynamics.x4 * cos(dynamics.x11));
 
     // z, inertial frame
-    _state.z = dynamics.x5;
+    _state.z = z_est;
 
     // dz/dt, inertial frame
-    _state.dz = dynamics.x6;
+    _state.dz = dz_est;
 
     // phi
     _state.phi = hf::Utils::RAD2DEG* dynamics.x7;         
 
-    // dphi/dt
+    // dphi/dt, directly from gyro
     _state.dphi = gyro.x;
 
     // theta
     _state.theta = hf::Utils::RAD2DEG* dynamics.x9;
 
-    // dtheta/dt
+    // dtheta/dt, directly from gyro
     _state.dtheta = gyro.y;
 
-    // psi
+    // psi, directly from gyro
     _state.psi = hf::Utils::RAD2DEG* dynamics.x11;
 
     // dpsi/dt
