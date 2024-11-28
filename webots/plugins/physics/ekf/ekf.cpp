@@ -83,7 +83,6 @@ hf::state_t estimate_state(
 
     hf::axis3_t euler_est = {};
     hf::Utils::quat2euler(quat_est, euler_est);
-    // fprintf(_logfp, "%f,%f\n", -euler_est.y, _state.theta);
 
     static hf::state_t _state;
 
