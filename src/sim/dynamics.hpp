@@ -157,19 +157,19 @@ namespace hf {
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dx1 = x2;                                 // x
+                    _dx1 = x2;                               // x
                     _dx2 =(cos(-x7)*sin(x9)*cos(x11) +       // dx, inertial frame
                             sin(-x7)*sin(x11)) * u1 / m;
-                    _dx3 = x4;                                 // y
+                    _dx3 = x4;                               // y
                     _dx4 = -(cos(-x7)*sin(x9)*sin(x11) -     // dy, inertial frame
                             sin(-x7)*cos(x11)) * u1 / m;
-                    _dx5 = x6;                                 // z
-                    _dx7 = x8;                                 // phi
-                    _dx8 = l / I * u2;                          // dphi
-                    _dx9 = x10;                                // theta
-                    _dx10 = l / I * u3;                         // dtheta
-                    _dx11 = x12;                               // psi
-                    _dx12 = -l / I * u4;                        // dpsi
+                    _dx5 = x6;                               // z
+                    _dx7 = x8;                               // phi
+                    _dx8 = l / I * u2;                       // dphi
+                    _dx9 = x10;                              // theta
+                    _dx10 = l / I * u3;                      // dtheta
+                    _dx11 = x12;                             // psi
+                    _dx12 = -l / I * u4;                     // dpsi
 
                     // Compute state as first temporal integral of first
                     // temporal derivative

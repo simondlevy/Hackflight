@@ -529,14 +529,14 @@ namespace hf {
             // The angle of aperture is guessed from the raw data register and
             // thankfully look to be symmetric
 
-            static constexpr float FLOW_NPIX = 35.0;   // [pixels] (same in x and y)
+            static constexpr float FLOW_NPIX = 35; //(same in x and y)
 
             // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
             // corresponding ground length
             static constexpr float FLOW_THETAPIX = 0.71674;
 
-            //We do get the measurements in 10x the motion pixels (experimentally
-            //measured)
+            // We get the measurements in 10x the motion pixels (experimentally
+            // measured)
             static constexpr float FLOW_RESOLUTION = 0.1;
 
             // The bounds on states, these shouldn't be hit...

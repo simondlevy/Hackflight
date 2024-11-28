@@ -59,17 +59,26 @@ hf::state_t estimate_state(
         _prediction_count = 0;
     }
 
-    static uint32_t _flow_count;
-    if (_flow_count++ == (uint32_t)(pid_rate/OPTICAL_FLOW_RATE)) {
-        _ekf.update_with_flow(1/OPTICAL_FLOW_RATE,
-                hf::OpticalFlow::read(dynamics));
-        _flow_count = 0;
+    static uint32_t _range_count;
+    static float _h;
+    if (_range_count++ == (uint32_t)(pid_rate/RANGEFINDER_RATE)) {
+        _h = hf::Rangefinder::read(dynamics);
+        _ekf.update_with_range(_h);
+        _range_count = 0;
     }
 
-    static uint32_t _range_count;
-    if (_range_count++ == (uint32_t)(pid_rate/RANGEFINDER_RATE)) {
-        _ekf.update_with_range(hf::Rangefinder::read(dynamics));
-        _range_count = 0;
+    static hf::axis2_t _flow;
+
+    if (_h > 0) {
+        static uint32_t _flow_count;
+        if (_flow_count++ == (uint32_t)(pid_rate/OPTICAL_FLOW_RATE)) {
+            const auto flow = hf::OpticalFlow::read(
+                    dynamics, _h, 1/OPTICAL_FLOW_RATE);
+            _flow.x = flow.x;
+            _flow.y = flow.y;
+            _ekf.update_with_flow(1/OPTICAL_FLOW_RATE, flow);
+            _flow_count = 0;
+        }
     }
 
     _ekf.finalize();
@@ -117,6 +126,8 @@ hf::state_t estimate_state(
 
     // dpsi/dt
     _state.dpsi = gyro.z;
+
+    fprintf(_logfp, "%f,%f,%f\n", _flow.y, dxdy_est.y, _state.dy);
 
     return _state;
 }
