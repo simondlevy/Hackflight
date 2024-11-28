@@ -81,6 +81,10 @@ hf::state_t estimate_state(
 
     _ekf.get_vehicle_state(quat_est, dxdy_est, z_est, dz_est);
 
+    hf::axis3_t euler_est = {};
+    hf::Utils::quat2euler(quat_est, euler_est);
+    // fprintf(_logfp, "%f,%f\n", -euler_est.y, _state.theta);
+
     static hf::state_t _state;
 
     // dx/dt, body frame
@@ -98,26 +102,22 @@ hf::state_t estimate_state(
     _state.dz = dz_est;
 
     // phi
-    _state.phi = hf::Utils::RAD2DEG * dynamics.x7;         
+    _state.phi = euler_est.x;
 
     // dphi/dt, directly from gyro
     _state.dphi = gyro.x;
 
-    // theta
-    _state.theta = hf::Utils::RAD2DEG* dynamics.x9;
+    // theta (note negation)
+    _state.theta = -euler_est.y;
 
     // dtheta/dt, directly from gyro
     _state.dtheta = gyro.y;
 
     // psi, directly from gyro
-    _state.psi = hf::Utils::RAD2DEG* dynamics.x11;
+    _state.psi = euler_est.z;
 
     // dpsi/dt
     _state.dpsi = gyro.z;
-
-    hf::axis3_t euler_est = {};
-    hf::Utils::quat2euler(quat_est, euler_est);
-    fprintf(_logfp, "%f,%f\n", euler_est.x, _state.phi);
 
     return _state;
 }
