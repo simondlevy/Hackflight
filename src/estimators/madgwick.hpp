@@ -68,8 +68,8 @@ namespace hf {
                 auto qDot3 = 0.5f * (_q0 * gy - _q1 * gz + _q3 * gx);
                 auto qDot4 = 0.5f * (_q0 * gz + _q1 * gy - _q2 * gx);
 
-                // Compute feedback only if accelerometer measurement valid (avoids NaN in
-                // accelerometer normalisation)
+                // Compute feedback only if accelerometer measurement valid
+                // (avoids NaN in accelerometer normalisation)
                 if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
 
                     // Normalise accelerometer measurement
@@ -97,13 +97,16 @@ namespace hf {
 
                     auto s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
 
-                    auto s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * _q1 - _2q0 * ay - 
+                    auto s1 = _4q1 * q3q3 - _2q3 * ax +
+                        4.0f * q0q0 * _q1 - _2q0 * ay - 
                         _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
 
-                    auto s2 = 4.0f * q0q0 * _q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - 
+                    auto s2 = 4.0f * q0q0 * _q2 + _2q0 * ax +
+                        _4q2 * q3q3 - _2q3 * ay - 
                         _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
 
-                    auto s3 = 4.0f * q1q1 * _q3 - _2q1 * ax + 4.0f * q2q2 * _q3 - _2q2 * ay;
+                    auto s3 = 4.0f * q1q1 * _q3 - _2q1 * ax +
+                        4.0f * q2q2 * _q3 - _2q2 * ay;
 
                     // Normalize step magnitude
                     recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); 
@@ -127,7 +130,8 @@ namespace hf {
                 _q3 += qDot4 * dt;
 
                 // Normalise quaternion
-                const auto recipNorm = invSqrt(_q0 * _q0 + _q1 * _q1 + _q2 * _q2 + _q3 * _q3);
+                const auto recipNorm = invSqrt(
+                        _q0 * _q0 + _q1 * _q1 + _q2 * _q2 + _q3 * _q3);
                 _q0 *= recipNorm;
                 _q1 *= recipNorm;
                 _q2 *= recipNorm;
@@ -143,9 +147,9 @@ namespace hf {
 
             // Filter parameters - tuned for 2kHz loop rate; Do not touch unless
             // you know what you are doing:
-            static constexpr float B_MADGWICK = 0.04;  // Madgwick filter parameter
-            static constexpr float B_ACCEL = 0.14;     // Accelerometer LPF
-            static constexpr float B_GYRO = 0.1;       // Gyro LPF
+            static constexpr float B_MADGWICK = 0.04; // Madgwick filter param
+            static constexpr float B_ACCEL = 0.14;    // Accelerometer LPF
+            static constexpr float B_GYRO = 0.1;      // Gyro LPF
 
             // Initialize quaternion for madgwick filter
             float _q0; 

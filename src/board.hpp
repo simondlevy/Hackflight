@@ -129,17 +129,12 @@ namespace hf {
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
                 _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-                // Accelerometer degrees
+                // Accelerometer Gs
                 const axis3_t accel = {
                     -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
                     ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
                     az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
                 };
-
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    //printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
-                    //        accel.x, accel.y, accel.z);
-                }
 
                 // Gyro deg /sec
                 const axis3_t gyro = {
@@ -147,6 +142,11 @@ namespace hf {
                     -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
+
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    //printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
+                    //        accel.x, accel.y, accel.z);
+                }
 
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)

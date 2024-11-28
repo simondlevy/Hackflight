@@ -1,6 +1,6 @@
 /* 
- * Custom physics plugin for Hackflight simulator using Estimated Kalman Filter
- * for state and standard C++ PID controllers
+ * Custom physics plugin for Hackflight simulator using Madgwick filter for
+ * state and standard C++ PID controllers
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -20,26 +20,19 @@
 #include <stdio.h>
 
 #include <hackflight.hpp>
-#include <estimators/ekf.hpp>
+#include <estimators/madgwick.hpp>
 #include <sim/standard_controllers.hpp>
 #include <sim/sensors/accelerometer.hpp>
 #include <sim/sensors/gyrometer.hpp>
-#include <sim/sensors/optical_flow.hpp>
-#include <sim/sensors/rangefinder.hpp>
 #include <utils.hpp>
 
-// All rates in Hz, as measured in Crazyflie state estimator
-static const float PREDICTION_RATE = 100;
-static const float OPTICAL_FLOW_RATE = 100;
-static const float RANGEFINDER_RATE = 25;
-
-static hf::EKF _ekf;
+static hf::MadgwickFilter _madgwick;
 
 static FILE * _logfp;
 
 void setup_controllers()
 {
-    _ekf.initialize();
+    _madgwick.initialize();
 
     _logfp = fopen("log.csv", "w");
 }
@@ -48,38 +41,8 @@ void setup_controllers()
 hf::state_t estimate_state(
         const hf::Dynamics & dynamics, const float pid_rate)
 {
-    // Gyro and accel accumulation run at same 1000Hz rate as control loop
     const auto gyro = hf::Gyrometer::read(dynamics);
-    _ekf.accumulate_gyro(gyro);
-    _ekf.accumulate_accel(hf::Accelerometer::read(dynamics));
-
-    static uint32_t _prediction_count;
-    if (_prediction_count++ == (uint32_t)(pid_rate/PREDICTION_RATE)) {
-        _ekf.predict(1 / PREDICTION_RATE);
-        _prediction_count = 0;
-    }
-
-    static uint32_t _flow_count;
-    if (_flow_count++ == (uint32_t)(pid_rate/OPTICAL_FLOW_RATE)) {
-        _ekf.update_with_flow(1/OPTICAL_FLOW_RATE,
-                hf::OpticalFlow::read(dynamics));
-        _flow_count = 0;
-    }
-
-    static uint32_t _range_count;
-    if (_range_count++ == (uint32_t)(pid_rate/RANGEFINDER_RATE)) {
-        _ekf.update_with_range(hf::Rangefinder::read(dynamics));
-        _range_count = 0;
-    }
-
-    _ekf.finalize();
-
-    hf::axis4_t quat_est = {};
-    hf::axis2_t dxdy_est = {};
-    float z_est = 0;
-    float dz_est = 0;
-
-    _ekf.get_vehicle_state(quat_est, dxdy_est, z_est, dz_est);
+    const auto accel = hf::Accelerometer::read(dynamics);
 
     static hf::state_t _state;
 
@@ -92,10 +55,10 @@ hf::state_t estimate_state(
             dynamics.x4 * cos(dynamics.x11));
 
     // z, inertial frame
-    _state.z = z_est;
+    _state.z = dynamics.x5;
 
     // dz/dt, inertial frame
-    _state.dz = dz_est;
+    _state.dz = dynamics.x6;
 
     // phi
     _state.phi = hf::Utils::RAD2DEG * dynamics.x7;         
@@ -115,9 +78,13 @@ hf::state_t estimate_state(
     // dpsi/dt
     _state.dpsi = gyro.z;
 
-    hf::axis3_t euler_est = {};
-    hf::Utils::quat2euler(quat_est, euler_est);
-    fprintf(_logfp, "%f,%f\n", hf::Utils::RAD2DEG * euler_est.z, _state.psi);
+    hf::axis4_t quat = {};
+    _madgwick.getQuaternion(1 / pid_rate, gyro, accel, quat);
+    //printf("qw=%+3.3f  qx=%+3.3f  qy=%+3.3f  qz=%+3.3f\n",
+    //        quat.w, quat.x, quat.y, quat.z);
+    //hf::axis3_t euler = {};
+    //hf::Utils::quat2euler(quat, euler);
+    //fprintf(_logfp, "%f,%f\n", hf::Utils::RAD2DEG * euler.x, _state.phi);
 
     return _state;
 }

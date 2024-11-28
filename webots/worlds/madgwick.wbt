@@ -1,0 +1,37 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "../protos/DiyQuad.proto"
+
+WorldInfo {
+  title "Madgwick"
+  physics "madgwick"
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.02958266537290491 0.9979323923866861 -0.05705967170270157 0.9533711402318593
+  position -1.060743654360278 0.08074912051688324 1.4081895528007025
+  bloomThreshold 100
+}
+DEF diyquad DiyQuad {
+  hidden linearVelocity_0 1.1840714082130835e-18 1.4153318748712773e-18 0.093713393205779
+  hidden angularVelocity_0 -1.385774624347475e-32 -4.1447827396307855e-17 -2.805419841743553e-17
+  translation 3.7890285062818673e-20 4.5290619995880873e-20 0.002998828582584928
+  rotation -2.7688037103805507e-16 -0.8281353711188624 -0.5605281501421888 1.6015865556978885e-18
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Floor {
+}
