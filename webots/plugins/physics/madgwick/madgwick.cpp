@@ -82,9 +82,9 @@ hf::state_t estimate_state(
     _madgwick.getQuaternion(1 / pid_rate, gyro, accel, quat);
     //printf("qw=%+3.3f  qx=%+3.3f  qy=%+3.3f  qz=%+3.3f\n",
     //        quat.w, quat.x, quat.y, quat.z);
-    //hf::axis3_t euler = {};
-    //hf::Utils::quat2euler(quat, euler);
-    //fprintf(_logfp, "%f,%f\n", hf::Utils::RAD2DEG * euler.x, _state.phi);
+    hf::axis3_t euler = {};
+    hf::Utils::quat2euler(quat, euler);
+    fprintf(_logfp, "%f,%f\n", euler.x, _state.phi);
 
     return _state;
 }
