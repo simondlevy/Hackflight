@@ -61,7 +61,7 @@ hf::demands_t run_controllers(
     //hf::PositionPid::run(state, demands);
 
     demands.roll *= 10;
-    demands.pitch = 0;
+    demands.pitch *= 10;
 
     _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 

@@ -27,41 +27,29 @@ namespace hf {
 
         public:
 
-            // https://github.com/bitcraze/Bitcraze_PMW3901
-            static constexpr float NPIX = 35;
-
-            static float thetapix()
-            {
-                return 2 * sin(FIELD_OF_VIEW / Utils::RAD2DEG / 2);
-            }
-
-            static axis2_t read(const Dynamics & d, const float dt) 
+            static axis2_t read(const Dynamics & d) 
             {
                 // Rotate inertial-frame horizontal velocity into body frame
                 const auto dx = d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
                 const auto dy = d.x2 * sin(d.x11) + d.x4 * cos(d.x11);
 
-                (void)dt;
-                const float scale = 22.5;
+                const auto z = d.x5;
 
-                const auto flow_dx = dx * scale;
+                const auto flow_dx = convert(dx, z);
 
-                const auto flow_dy = dy * scale;
+                const auto flow_dy = convert(dy, z);
 
                 return axis2_t {flow_dx, flow_dy};
             }
 
         private:
 
-            // https://wiki.bitcraze.io/_media/projects:crazyflie2:
-            //    expansionboards:pot0189-pmw3901mb-txqt-ds-r1.40-280119.pdf
-            static constexpr float FIELD_OF_VIEW = 42;
+            // A fudge factor that works with our EKF
+            static constexpr float SCALE = 5; 
 
-            static constexpr float ZMIN = 0.1;
-
-            static float max(const float a, const float b)
+            static float convert(const float d, const float z)
             {
-                return a > b ? a : b;
+                return z == 0 ? 0 : d / z * SCALE;
             }
     };
 

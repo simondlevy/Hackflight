@@ -70,7 +70,7 @@ hf::state_t estimate_state(
     static hf::axis2_t _flow;
     static uint32_t _flow_count;
     if (_flow_count++ == (uint32_t)(pid_rate/OPTICAL_FLOW_RATE)) {
-        const auto flow = hf::OpticalFlow::read(dynamics, 1/OPTICAL_FLOW_RATE);
+        const auto flow = hf::OpticalFlow::read(dynamics);
         _flow.x = flow.x;
         _flow.y = flow.y;
         _ekf.update_with_flow(1/OPTICAL_FLOW_RATE, flow);

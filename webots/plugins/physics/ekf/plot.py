@@ -13,7 +13,7 @@ plt.subplot(2, 1, 2)
 plt.plot(data[:,1])
 plt.plot(data[:,2])
 plt.ylabel('dy/dt')
-plt.ylim((-1,+1))
+#plt.ylim((-1,+1))
 plt.legend(('est', 'true'))
 
 plt.show()
