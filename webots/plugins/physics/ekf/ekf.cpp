@@ -47,13 +47,9 @@ void setup_controllers()
 hf::state_t estimate_state(
         const hf::Dynamics & dynamics, const float pid_rate)
 {
-    (void)pid_rate;
-
     const auto gyro = hf::Gyrometer::read(dynamics);
 
     const auto accel = hf::Accelerometer::read(dynamics);
-
-    printf("accel_z=%+3.3f\n", accel.z);
 
     _ekf.accumulate_gyro(gyro);
 
@@ -74,7 +70,7 @@ hf::state_t estimate_state(
 
     static uint32_t _range_count;
     if (_range_count++ == (uint32_t)(pid_rate/RANGEFINDER_RATE)) {
-        _ekf.update_with_range(1/RANGEFINDER_RATE);
+        _ekf.update_with_range(hf::Rangefinder::read(dynamics));
         _range_count = 0;
     }
 
@@ -87,7 +83,8 @@ hf::state_t estimate_state(
 
     _ekf.get_vehicle_state(quat, dxdy, z, dz);
 
-    //printf("z=%+3.3f (%+3.3f)  dz=%+3.3f (%+3.3f)\n", z, dynamics.x5, dz, dynamics.x6);
+    printf("z=%+3.3f (%+3.3f)  dz=%+3.3f (%+3.3f)\n",
+            z, dynamics.x5, dz, dynamics.x6);
 
     static hf::state_t _state;
 
