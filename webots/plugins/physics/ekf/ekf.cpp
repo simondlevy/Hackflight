@@ -117,7 +117,7 @@ hf::state_t estimate_state(
 
     hf::axis3_t euler_est = {};
     hf::Utils::quat2euler(quat_est, euler_est);
-    fprintf(_logfp, "%f,%f\n", hf::Utils::RAD2DEG * euler_est.z, _state.psi);
+    fprintf(_logfp, "%f,%f\n", euler_est.x, _state.phi);
 
     return _state;
 }
