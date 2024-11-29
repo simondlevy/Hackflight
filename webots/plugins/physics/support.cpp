@@ -20,34 +20,11 @@
 #include <plugins/physics.h>
 
 // Hackflight
-#include <hackflight.hpp>
-#include <mixers/bfquadx.hpp>
-#include <sim/dynamics.hpp>
-#include <sim/vehicles/diyquad.hpp>
-
-static const float DYNAMICS_RATE = 100000; // Hz
-
-static const float PID_RATE = 1000; // Hz
+#include <sim/support.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
-// Write these for each paradigm (standard, snn, haskell, ekf) ---------------
-
-void setup_controllers();
-
-hf::state_t estimate_state(
-        const hf::Dynamics & dynamics, const float pid_rate);
-
-hf::demands_t run_controllers(
-        const float pid_dt,
-        const hf::siminfo_t & siminfo,
-        const hf::state_t & state);
-
-// ---------------------------------------------------------------------------
-
 static dBodyID _robotBody;
-
-static hf::Dynamics _dynamics = hf::Dynamics(hf::VPARAMS, 1./DYNAMICS_RATE);
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -64,7 +41,7 @@ DLLEXPORT void webots_physics_init()
     }
 
     // Implementation goes in your main
-    setup_controllers();
+    hf::setup_controllers();
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -89,28 +66,8 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    // Run control in middle loop
-    for (uint32_t j=0; j < (uint32_t)(1 / siminfo.framerate * PID_RATE);  ++j) {
-
-        const auto state = estimate_state(_dynamics, PID_RATE);
-
-        const auto demands = run_controllers(1 / PID_RATE, siminfo, state);
-
-        hf::BfQuadXMixer mixer = {};
-
-        float motors[4] = {};
-
-        mixer.run(demands, motors);
-
-        // Update dynamics in innermost loop
-        for (uint32_t k=0; k<DYNAMICS_RATE / PID_RATE; ++k) {
-
-            _dynamics.update(motors, &mixer);
-        }
-    }
-
-    // Get current pose from dynamics
-    const auto pose = _dynamics.getPose();
+    // Run controllers in middle loop, dynamics inside that
+    const auto pose = run_sim_middle_loop(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const hf::axis3_t euler = { pose.phi, pose.theta, -pose.psi };

@@ -18,19 +18,22 @@
  */
 
 
-#include <sim/standard_controllers.hpp>
+#include <sim/controllers/standard.hpp>
 #include <sim/sensors/groundtruth.hpp>
 
-// Called by webots_physics_init(); unneeded here
-void setup_controllers()
-{
-}
+namespace hf {
 
-// Called by webots_physics_step()
-hf::state_t estimate_state(
-        const hf::Dynamics & dynamics, const float pid_rate)
-{
-    (void)pid_rate;
+    // Called by webots_physics_init(); unneeded here
+    void setup_controllers()
+    {
+    }
 
-    return hf::GroundTruth::read(dynamics);
+    // Called by webots_physics_step()
+    state_t estimate_state(
+            const Dynamics & dynamics, const float pid_rate)
+    {
+        (void)pid_rate;
+
+        return GroundTruth::read(dynamics);
+    }
 }

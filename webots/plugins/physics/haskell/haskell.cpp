@@ -57,53 +57,57 @@ void copilot_step_core();
 
 // ---------------------------------------------------------------------------
 
-// Called by webots_physics_init(); unneeded here
-void setup_controllers()
-{
-}
+namespace hf {
 
-hf::demands_t run_controllers(
-        const float pid_dt,
-        const hf::siminfo_t & siminfo,
-        const hf::state_t & state)
-{    
+    // Called by webots_physics_init(); unneeded here
+    void setup_controllers()
+    {
+    }
 
-    // Count elapsed time since takeoff, for climb-rate PID control
-    static uint32_t _frame_count;
-    stream_time = siminfo.requested_takeoff ?
-        _frame_count++ / siminfo.framerate : 0;
+    demands_t run_controllers(
+            const float pid_dt,
+            const siminfo_t & siminfo,
+            const state_t & state)
+    {    
 
-    stream_requestedTakeoff = siminfo.requested_takeoff;
+        // Count elapsed time since takeoff, for climb-rate PID control
+        static uint32_t _frame_count;
+        stream_time = siminfo.requested_takeoff ?
+            _frame_count++ / siminfo.framerate : 0;
 
-    stream_throttle = siminfo.demands.thrust;
-    stream_roll = siminfo.demands.roll;
-    stream_pitch = siminfo.demands.pitch;
-    stream_yaw = siminfo.demands.yaw;
+        stream_requestedTakeoff = siminfo.requested_takeoff;
 
-    stream_dx = state.dx;
-    stream_dy = state.dy;
-    stream_z = state.z;
-    stream_dz = state.dz;
-    stream_phi = state.phi;
-    stream_dphi = state.dphi;
-    stream_theta = state.theta;
-    stream_dtheta = state.dtheta;
-    stream_psi = state.psi;
-    stream_dpsi = state.dpsi;
+        stream_throttle = siminfo.demands.thrust;
+        stream_roll = siminfo.demands.roll;
+        stream_pitch = siminfo.demands.pitch;
+        stream_yaw = siminfo.demands.yaw;
 
-    stream_dt = pid_dt;
+        stream_dx = state.dx;
+        stream_dy = state.dy;
+        stream_z = state.z;
+        stream_dz = state.dz;
+        stream_phi = state.phi;
+        stream_dphi = state.dphi;
+        stream_theta = state.theta;
+        stream_dtheta = state.dtheta;
+        stream_psi = state.psi;
+        stream_dpsi = state.dpsi;
 
-    // This will call setDemands() defined above
-    copilot_step_core();
+        stream_dt = pid_dt;
 
-    return _demands;
-}
+        // This will call setDemands() defined above
+        copilot_step_core();
 
-// Called by webots_physics_step()
-hf::state_t estimate_state(
-        const hf::Dynamics & dynamics, const float pid_rate)
-{
-    (void)pid_rate;
+        return _demands;
+    }
 
-    return hf::GroundTruth::read(dynamics);
+    // Called by webots_physics_step()
+    state_t estimate_state(
+            const Dynamics & dynamics, const float pid_rate)
+    {
+        (void)pid_rate;
+
+        return GroundTruth::read(dynamics);
+    }
+
 }

@@ -97,90 +97,94 @@ static float runCascadeSnn(
 
 // ---------------------------------------------------------------------------
 
-// Called by webots_physics_init()
-void setup_controllers()
-{
-    try {
+namespace hf {
 
-        climbRateSnn = makeSnn(NETWORK);
-        yawRateSnn = makeSnn(NETWORK);
-        cascadeSnn = makeSnn(NETWORK3);
+    // Called by webots_physics_init()
+    void setup_controllers()
+    {
+        try {
 
-    } catch (const SRE &e) {
-        fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
-        exit(1);
+            climbRateSnn = makeSnn(NETWORK);
+            yawRateSnn = makeSnn(NETWORK);
+            cascadeSnn = makeSnn(NETWORK3);
+
+        } catch (const SRE &e) {
+            fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
+            exit(1);
+        }
+
+        (*vizSnn)->serve_visualizer(VIZ_PORT);
     }
 
-    (*vizSnn)->serve_visualizer(VIZ_PORT);
-}
+    // Called by webots_physics_step()
+    demands_t run_controllers(
+            const float pid_dt,
+            const siminfo_t & siminfo,
+            const state_t & state)
+    {
+        const auto open_loop_demands = siminfo.demands;
 
-// Called by webots_physics_step()
-hf::demands_t run_controllers(
-        const float pid_dt,
-        const hf::siminfo_t & siminfo,
-        const hf::state_t & state)
-{
-    const auto open_loop_demands = siminfo.demands;
+        // Start with open-loop demands
+        demands_t demands = {
+            open_loop_demands.thrust,
+            open_loop_demands.roll,
+            open_loop_demands.pitch,
+            open_loop_demands.yaw
+        };
 
-    // Start with open-loop demands
-    hf::demands_t demands = {
-        open_loop_demands.thrust,
-        open_loop_demands.roll,
-        open_loop_demands.pitch,
-        open_loop_demands.yaw
-    };
+        // Run PID controllers to get final demands
 
-    // Run PID controllers to get final demands
+        const auto thrustFromSnn = runSnn(
+                climbRateSnn, demands.thrust, state.dz,
+                CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
 
-    const auto thrustFromSnn = runSnn(
-            climbRateSnn, demands.thrust, state.dz,
-            CLIMBRATE_DIVISOR, CLIMBRATE_OFFSET);
+        demands.yaw = runSnn(
+                yawRateSnn,
+                demands.yaw / YAW_SCALE,
+                state.dpsi / YAW_SCALE,
+                YAW_DIVISOR, YAW_OFFSET);
 
-    demands.yaw = runSnn(
-            yawRateSnn,
-            demands.yaw / YAW_SCALE,
-            state.dpsi / YAW_SCALE,
-            YAW_DIVISOR, YAW_OFFSET);
+        const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
 
-    const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
+        const auto snn_diff = runCascadeSnn(
+                cascadeSnn, demands.roll, state.dy, phi);
 
-    const auto snn_diff = runCascadeSnn(
-            cascadeSnn, demands.roll, state.dy, phi);
+        demands.roll = 60 * snn_diff;
+        demands.roll = 0.0125 * (demands.roll - state.dphi);
 
-    demands.roll = 60 * snn_diff;
-    demands.roll = 0.0125 * (demands.roll - state.dphi);
+        demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
+        demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
 
-    demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
-    demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
+        // Once takeoff has been requested, we compute time using the 
+        // deltaT from the middle (control) loop
+        static uint32_t _count;
+        _count = siminfo.requested_takeoff ? (_count + 1) : 0;
+        const float time = _count * pid_dt;
 
-    // Once takeoff has been requested, we compute time using the 
-    // deltaT from the middle (control) loop
-    static uint32_t _count;
-    _count = siminfo.requested_takeoff ? (_count + 1) : 0;
-    const float time = _count * pid_dt;
+        // Ignore thrust demand until airborne, based on time from launch
+        demands.thrust =
+            time > TAKEOFF_TIME ? 
+            thrustFromSnn + MOTOR_HOVER:
+            siminfo.requested_takeoff ? 
+            MOTOR_TAKEOFF :
+            0;
 
-    // Ignore thrust demand until airborne, based on time from launch
-    demands.thrust =
-        time > TAKEOFF_TIME ? 
-        thrustFromSnn + hf::MOTOR_HOVER:
-        siminfo.requested_takeoff ? 
-        MOTOR_TAKEOFF :
-        0;
+        static uint32_t _vizcount;
+        if (_vizcount++ % 100 == 0) {
+            // Send spikes to visualizer
+            (*vizSnn)->send_counts_to_visualizer();
+        }
 
-    static uint32_t _vizcount;
-    if (_vizcount++ % 100 == 0) {
-        // Send spikes to visualizer
-        (*vizSnn)->send_counts_to_visualizer();
+        return demands;
     }
 
-    return demands;
-}
+    // Called by webots_physics_step()
+    state_t estimate_state(
+            const Dynamics & dynamics, const float pid_rate)
+    {
+        (void)pid_rate;
 
-// Called by webots_physics_step()
-hf::state_t estimate_state(
-        const hf::Dynamics & dynamics, const float pid_rate)
-{
-    (void)pid_rate;
+        return GroundTruth::read(dynamics);
+    }
 
-    return hf::GroundTruth::read(dynamics);
 }
