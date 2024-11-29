@@ -1,5 +1,5 @@
 {--
-  LambdaFlight core algorithm: reads open-loop demands and
+  LambdaFlight simulator core algorithm: reads open-loop demands and
   state as streams; runs PID controllers and motor mixers
  
   Copyright (C) 2024 Simon D. Levy
@@ -20,7 +20,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module CoreTask where
+module Sim where
 
 import Language.Copilot
 import Copilot.Compile.C99

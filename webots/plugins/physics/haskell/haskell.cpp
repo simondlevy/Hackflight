@@ -17,5 +17,5 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/controllers/haskell/haskell.hpp>
+#include <sim/controllers/haskell.hpp>
 #include <sim/estimators/groundtruth.hpp>

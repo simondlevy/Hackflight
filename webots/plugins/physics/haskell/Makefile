@@ -21,7 +21,7 @@ INCLUDE = -I../../../../src
 
 HASKDIR = ../../../../haskell
 
-CORE_TASK = ../../../../src/sim/controllers/haskell/CoreTask.hs
+CORE_TASK = ../../../../haskell/Sim.hs
 
 CXX_SOURCES = haskell.cpp copilot_core.cpp ../support.cpp
 
