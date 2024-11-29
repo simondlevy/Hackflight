@@ -57,11 +57,11 @@ namespace hf {
             static float convert(
                     const float d, const float z, const float dt)
             {
-                (void)dt;
+                return z == 0 ?  0 :  // Avoid division by zero
 
-                return z == 
-                    0 ?
-                    0 : 
+                    // This formula inverts the one in
+                    //   https://www.bitcraze.io/documentation/repository/
+                    //   crazyflie-firmware/master/images/flowdeck_velocity.png
                     (d / z) * (dt * NPIX / thetapix()) / RESOLUTION;
             }
     };
