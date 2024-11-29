@@ -33,6 +33,10 @@ namespace hf {
     static PitchRollRatePid _pitchRollRatePid;
     static YawRatePid _yawRatePid;
 
+    void setup_controllers()
+    {
+    }
+
     demands_t run_controllers(
             const float pid_dt,
             const siminfo_t & siminfo,

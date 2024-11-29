@@ -1,5 +1,5 @@
 /* 
- * Custom physics plugin for Hackflight simulator using C++ PID controllers
+ * Custom physics plugin for Hackflight Webots-based simulator
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -40,7 +40,8 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robotBody, 0);
     }
 
-    // Implementation goes in your main
+    // Implementation-dependent 
+    hf::setup_estimator();
     hf::setup_controllers();
 }
 

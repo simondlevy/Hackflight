@@ -37,7 +37,7 @@ namespace hf {
 
     static EKF _ekf;
 
-    void setup_controllers()
+    void setup_estimator()
     {
         _ekf.initialize();
 

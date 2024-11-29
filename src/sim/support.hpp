@@ -35,6 +35,8 @@ namespace hf {
 
     void setup_controllers();
 
+    void setup_estimator();
+
     state_t estimate_state(
             const Dynamics & dynamics, const float pid_rate);
 

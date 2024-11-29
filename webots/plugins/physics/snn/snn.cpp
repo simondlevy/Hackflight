@@ -1,6 +1,6 @@
 /* 
- * Custom physics plugin for Hackflight simulator using Spiking Neural Net
- * controllers
+ * Custom physics plugin for Hackflight simulator using ground-truth state 
+ * and Spiking Neural Net controllers
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -17,5 +17,5 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/controllers/snn.hpp>
 #include <sim/estimators/groundtruth.hpp>
+#include <sim/controllers/snn.hpp>

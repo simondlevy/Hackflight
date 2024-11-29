@@ -17,23 +17,5 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-
+#include <sim/estimators/groundtruth.hpp>
 #include <sim/controllers/standard.hpp>
-#include <sim/sensors/groundtruth.hpp>
-
-namespace hf {
-
-    // Called by webots_physics_init(); unneeded here
-    void setup_controllers()
-    {
-    }
-
-    // Called by webots_physics_step()
-    state_t estimate_state(
-            const Dynamics & dynamics, const float pid_rate)
-    {
-        (void)pid_rate;
-
-        return GroundTruth::read(dynamics);
-    }
-}

@@ -22,6 +22,12 @@
 
 namespace hf {
 
+    void setup_estimator()
+    {
+    }
+
+    // Called by webots_physics_init(); unneeded here
+    // Called by webots_physics_step()
     state_t estimate_state(
             const Dynamics & dynamics, const float pid_rate)
     {
