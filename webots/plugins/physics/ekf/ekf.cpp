@@ -67,13 +67,10 @@ hf::state_t estimate_state(
         _range_count = 0;
     }
 
-    static hf::axis2_t _flow;
     static uint32_t _flow_count;
     if (_flow_count++ == (uint32_t)(pid_rate/OPTICAL_FLOW_RATE)) {
         const auto flow_dt = 1 / OPTICAL_FLOW_RATE;
         const auto flow = hf::OpticalFlow::read(dynamics, flow_dt);
-        _flow.x = flow.x;
-        _flow.y = flow.y;
         _ekf.update_with_flow(flow_dt, flow);
         _flow_count = 0;
     }
@@ -93,12 +90,10 @@ hf::state_t estimate_state(
     static hf::state_t _state;
 
     // dx/dt, body frame
-    _state.dx = dynamics.x2 * cos(dynamics.x11) -        
-        dynamics.x4 * sin(dynamics.x11);
+    _state.dx = dxdy_est.x;
 
     // dx/dt, body frame
-    _state.dy  = -(dynamics.x2 * sin(dynamics.x11) +    
-            dynamics.x4 * cos(dynamics.x11));
+    _state.dy = dxdy_est.y;
 
     // z, inertial frame
     _state.z = z_est;
@@ -123,8 +118,6 @@ hf::state_t estimate_state(
 
     // dpsi/dt
     _state.dpsi = gyro.z;
-
-    fprintf(_logfp, "%f,%f,%f\n", _flow.y, dxdy_est.y, _state.dy);
 
     return _state;
 }

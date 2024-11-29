@@ -58,10 +58,7 @@ hf::demands_t run_controllers(
         demands.thrust += MOTOR_HOVER;
     }
 
-    //hf::PositionPid::run(state, demands);
-
-    demands.roll *= 10;
-    demands.pitch *= 10;
+    hf::PositionPid::run(state, demands);
 
     _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
 

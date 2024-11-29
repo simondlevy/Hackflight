@@ -35,9 +35,9 @@ namespace hf {
 
                 const auto z = d.x5;
 
-                const auto flow_dx = convert(dx, z, dt);
+                const auto flow_dx = convert(dx, z, -d.x10, dt);
 
-                const auto flow_dy = convert(dy, z, dt);
+                const auto flow_dy = convert(dy, z, d.x8, dt);
 
                 return axis2_t {flow_dx, flow_dy};
             }
@@ -55,14 +55,17 @@ namespace hf {
             }
 
             static float convert(
-                    const float d, const float z, const float dt)
+                    const float d,
+                    const float z,
+                    const float omega,
+                    const float dt)
             {
                 return z == 0 ?  0 :  // Avoid division by zero
 
                     // This formula inverts the one in
                     //   https://www.bitcraze.io/documentation/repository/
                     //   crazyflie-firmware/master/images/flowdeck_velocity.png
-                    (d / z) * (dt * NPIX / thetapix()) / RESOLUTION;
+                    (d / z + omega) * (dt * NPIX / thetapix()) / RESOLUTION;
             }
     };
 
