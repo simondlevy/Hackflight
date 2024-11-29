@@ -90,4 +90,14 @@ namespace hf {
 
     } siminfo_t;
 
+    typedef struct {
+
+        float x;
+        float y;
+        float z;
+        float phi;
+        float theta;
+        float psi;
+
+    } pose_t;
 }
