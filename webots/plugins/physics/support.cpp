@@ -23,6 +23,7 @@
 #include <hackflight.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
+#include <sim/vehicles/diyquad.hpp>
 
 static const float DYNAMICS_RATE = 100000; // Hz
 
@@ -46,19 +47,7 @@ hf::demands_t run_controllers(
 
 static dBodyID _robotBody;
 
-static hf::Dynamics::vehicle_params_t _diyquad_params = {
-
-    1.0e-1, // mass [kg]
-    5.0e-2, // arm length L [m]
-
-    3.6e-5, // force coefficient B [F=b*w^2]
-    7.0e-6, // drag coefficient D [T=d*w^2]
-    2.0e-5  // I [kg*m^2]   // pitch, roll
-};
-
-
-static hf::Dynamics _dynamics =hf::Dynamics(
-        _diyquad_params, 1./DYNAMICS_RATE);
+static hf::Dynamics _dynamics = hf::Dynamics(hf::VPARAMS, 1./DYNAMICS_RATE);
 
 DLLEXPORT void webots_physics_init() 
 {

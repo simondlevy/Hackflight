@@ -19,6 +19,7 @@
 
 // Hackflight
 #include <sim/sensors/groundtruth.hpp>
+#include <sim/vehicles/diyquad.hpp>
 
 // TeNNLab framework
 #include <levy_snn_util.hpp>
@@ -43,7 +44,6 @@ static const char * NETWORK3 = "networks/difference3_risp.txt";
 
 static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
-static const float MOTOR_HOVER = 74.565; // rad/sec
 
 static const float YAW_SCALE = 160; // deg/s
 
@@ -162,7 +162,7 @@ hf::demands_t run_controllers(
     // Ignore thrust demand until airborne, based on time from launch
     demands.thrust =
         time > TAKEOFF_TIME ? 
-        thrustFromSnn + MOTOR_HOVER:
+        thrustFromSnn + hf::MOTOR_HOVER:
         siminfo.requested_takeoff ? 
         MOTOR_TAKEOFF :
         0;

@@ -21,10 +21,10 @@
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
+#include <sim/vehicles/diyquad.hpp>
 
 static const float THROTTLE_DOWN = 0.06;
 static const float PITCH_ROLL_POST_SCALE = 50;
-static const float MOTOR_HOVER = 74.565; // rad/sec
 
 static hf::AltitudePid _altitudePid;
 static hf::PitchRollAnglePid _pitchRollAnglePid;
@@ -53,7 +53,7 @@ hf::demands_t run_controllers(
 
         _altitudePid.run(siminfo.is_springy, pid_dt, state, demands);
 
-        demands.thrust += MOTOR_HOVER;
+        demands.thrust += hf::MOTOR_HOVER;
     }
 
     hf::PositionPid::run(state, demands);
