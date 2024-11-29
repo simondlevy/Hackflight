@@ -17,9 +17,7 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <hackflight.hpp>
-#include <sim/dynamics.hpp>
-#include <sim/state_from_dynamics.hpp>
+#include <sim/sensors/groundtruth.hpp>
 
 // Global data and routines shared with Haskell Copilot ----------------------
 
@@ -99,4 +97,13 @@ hf::demands_t run_controllers(
     copilot_step_core();
 
     return _demands;
+}
+
+// Called by webots_physics_step()
+hf::state_t estimate_state(
+        const hf::Dynamics & dynamics, const float pid_rate)
+{
+    (void)pid_rate;
+
+    return hf::GroundTruth::read(dynamics);
 }

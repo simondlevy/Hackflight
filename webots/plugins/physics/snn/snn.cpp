@@ -17,10 +17,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Hackflight stuff
-#include <hackflight.hpp>
-#include <sim/dynamics.hpp>
-#include <sim/state_from_dynamics.hpp>
+// Hackflight
+#include <sim/sensors/groundtruth.hpp>
 
 // TeNNLab framework
 #include <levy_snn_util.hpp>
@@ -178,4 +176,11 @@ hf::demands_t run_controllers(
     return demands;
 }
 
+// Called by webots_physics_step()
+hf::state_t estimate_state(
+        const hf::Dynamics & dynamics, const float pid_rate)
+{
+    (void)pid_rate;
 
+    return hf::GroundTruth::read(dynamics);
+}

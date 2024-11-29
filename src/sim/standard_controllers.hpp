@@ -16,8 +16,6 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <hackflight.hpp>
-#include <sim/dynamics.hpp>
 #include <pids/altitude.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
@@ -69,5 +67,3 @@ hf::demands_t run_controllers(
 
     return demands;
 }
-
-
