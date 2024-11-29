@@ -46,6 +46,7 @@ namespace hf {
 
     class Dynamics {
 
+        friend class GroundTruth;
         friend class Gyrometer;
         friend class Accelerometer;
         friend class OpticalFlow;
