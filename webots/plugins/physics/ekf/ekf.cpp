@@ -75,8 +75,6 @@ hf::state_t estimate_state(
         _flow_count = 0;
     }
 
-    _ekf.finalize();
-
     hf::axis4_t quat_est = {};
     hf::axis2_t dxdy_est = {};
     float z_est = 0;

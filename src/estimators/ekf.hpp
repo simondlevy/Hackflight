@@ -68,7 +68,6 @@ namespace hf {
                 imuAccum(gyro, _gyroSum);
 
                 memcpy(&_gyroLatest, &gyro, sizeof(axis3_t));
-
             }
 
             /**
@@ -368,12 +367,13 @@ namespace hf {
             /**
              * Returns false if state is OOB, true otherwise -----------------
              */
-            bool finalize()
+            bool get_vehicle_state(
+                    axis4_t & quat, axis2_t & dxdy, float & z, float & dz)
             {
                 const auto x = _ekf.x;
 
-                // Incorporate the attitude error (Kalman filter state) with the
-                // attitude
+                // Incorporate the attitude error (Kalman filter state) with
+                // the attitude
                 const auto v0 = x[STATE_E0];
                 const auto v1 = x[STATE_E1];
                 const auto v2 = x[STATE_E2];
@@ -428,8 +428,8 @@ namespace hf {
                 _r.z = _quat.w*_quat.w-_quat.x*_quat.x-_quat.y*_quat.y + 
                     _quat.z*_quat.z;
 
-                // the attitude error vector (v0,v1,v2) is small,
-                // so we use a first order approximation to e0 = tan(|v0|/2)*v0/|v0|
+                // The attitude error vector (v0,v1,v2) is small, so we use a
+                // first order approximation to e0 = tan(|v0|/2)*v0/|v0|
                 const auto e0 = v0 / 2; 
                 const auto e1 = v1 / 2; 
                 const auto e2 = v2 / 2;
@@ -476,21 +476,6 @@ namespace hf {
                     _isUpdated = false;
                 }
 
-                return
-                    isPositionWithinBounds(newx[STATE_Z]) &&
-                    isVelocityWithinBounds(newx[STATE_DX]) &&
-                    isVelocityWithinBounds(newx[STATE_DY]) &&
-                    isVelocityWithinBounds(newx[STATE_DZ]);
-            }
-
-            /**
-              * --------------------------------------------------------------
-              */
-            void get_vehicle_state(
-                    axis4_t & quat, axis2_t & dxdy, float & z, float & dz)
-            {
-                const auto x = _ekf.x;
-
                 dxdy.x = x[STATE_DX];
 
                 dxdy.y = -x[STATE_DY];
@@ -503,7 +488,14 @@ namespace hf {
                     _r.z * x[STATE_DZ];
 
                 memcpy(&quat, &_quat, sizeof(axis4_t));
-           }
+
+                return
+                    isPositionWithinBounds(newx[STATE_Z]) &&
+                    isVelocityWithinBounds(newx[STATE_DX]) &&
+                    isVelocityWithinBounds(newx[STATE_DY]) &&
+                    isVelocityWithinBounds(newx[STATE_DZ]);
+
+            }
 
         private:
 
