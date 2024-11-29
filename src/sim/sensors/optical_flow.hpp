@@ -33,11 +33,11 @@ namespace hf {
                 const auto dx = d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
                 const auto dy = d.x2 * sin(d.x11) + d.x4 * cos(d.x11);
 
-                const auto z = d.x5;
+                const auto h = d.x5 / (cos(d.x7) * cos(d.x9));
 
-                const auto flow_dx = convert(dx, z, -d.x10, dt);
+                const auto flow_dx = convert(dx, h, -d.x10, dt);
 
-                const auto flow_dy = convert(dy, z, d.x8, dt);
+                const auto flow_dy = convert(dy, h, d.x8, dt);
 
                 return axis2_t {flow_dx, flow_dy};
             }
@@ -56,16 +56,16 @@ namespace hf {
 
             static float convert(
                     const float d,
-                    const float z,
+                    const float h,
                     const float omega,
                     const float dt)
             {
-                return z == 0 ?  0 :  // Avoid division by zero
+                return h == 0 ?  0 :  // Avoid division by zero
 
                     // This formula inverts the one in
                     //   https://www.bitcraze.io/documentation/repository/
                     //   crazyflie-firmware/master/images/flowdeck_velocity.png
-                    (d / z + omega) * (dt * NPIX / thetapix()) / RESOLUTION;
+                    (d / h + omega) * (dt * NPIX / thetapix()) / RESOLUTION;
             }
     };
 
