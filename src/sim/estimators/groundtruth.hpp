@@ -1,10 +1,9 @@
 /* 
- * Custom physics plugin for Hackflight simulator using Haskell Copilot for
- * control
+ * Ground-truth state estimation for Hackflight simulator
  *
- *  Copyright (C) 2024 Simon D. Levy
+ * Copyright (C) 2024 Simon D. Levy
  *
- *  This program is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, in version 3.
  *
@@ -17,5 +16,17 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/controllers/haskell/haskell.hpp>
-#include <sim/estimators/groundtruth.hpp>
+#pragma once
+
+#include <sim/sensors/groundtruth.hpp>
+
+namespace hf {
+
+    state_t estimate_state(
+            const Dynamics & dynamics, const float pid_rate)
+    {
+        (void)pid_rate;
+
+        return GroundTruth::read(dynamics);
+    }
+}
