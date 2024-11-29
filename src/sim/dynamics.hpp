@@ -83,19 +83,18 @@ namespace hf {
 
             Dynamics(
                     const vehicle_params_t & vparams,
-                    const float dt,
-                    const float gravity = 9.80665e0,
-                    const float air_density = 1.225)
+                    const world_params_t & wparams,
+                    const float dt)
             {
-                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
-
-                _wparams.g = gravity;
-                _wparams.rho = air_density;
-
-                _dt = dt;
-
-                _airborne = false;
+                init(vparams, wparams, dt);
             }
+
+            Dynamics(const vehicle_params_t & vparams, const float dt)
+            {
+                const world_params_t wparams = { 9.807, 1.225 };
+
+                init(vparams, wparams, dt);
+             }
 
             /**
              * Sets motor spins
@@ -222,6 +221,20 @@ namespace hf {
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
+
+            void init(
+                    const vehicle_params_t & vparams,
+                    const world_params_t & wparams,
+                    const float dt)
+            {
+                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
+
+                memcpy(&_wparams, &wparams, sizeof(world_params_t));
+
+                _dt = dt;
+
+                _airborne = false;
+            }
 
     }; // class Dynamics
 
