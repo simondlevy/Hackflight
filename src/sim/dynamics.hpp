@@ -70,6 +70,17 @@ namespace hf {
 
             } vehicle_params_t; 
 
+            /**
+             *  World parameters
+             */
+            typedef struct {
+
+                // These can be measured directly
+                float g;   // gravitational constant [m/s/s]
+                float rho; // air density [kg/m^3]
+
+            } world_params_t; 
+
             Dynamics(
                     const vehicle_params_t & vparams,
                     const float dt,
@@ -78,10 +89,10 @@ namespace hf {
             {
                 memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
-                _dt = dt;
+                _wparams.g = gravity;
+                _wparams.rho = air_density;
 
-                _rho = air_density;
-                _g = gravity;
+                _dt = dt;
 
                 _airborne = false;
             }
@@ -107,7 +118,7 @@ namespace hf {
                 for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
                     // Thrust is squared rad/sec scaled by air density
-                    const auto omega2 = _rho * omegas[i] * omegas[i]; 
+                    const auto omega2 = _wparams.rho * omegas[i] * omegas[i]; 
 
                     // Multiply by thrust coefficient
                     u1 += b * omega2;                  
@@ -120,7 +131,7 @@ namespace hf {
                 }
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
-                _dx6 = -_g + (cos(x7)*cos(x9)) * 1 / m * u1;
+                _dx6 = -_wparams.g + (cos(x7)*cos(x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
                 if (_dx6 > 0) {
@@ -189,10 +200,6 @@ namespace hf {
             float x11; // psi
             float x12; // dpsi/dt
 
-            float _dt;
-
-            vehicle_params_t _vparams;
-
             // Vehicle state first derivative (Equation 12)
             float _dx1;  // x
             float _dx2;  // dx/dt
@@ -207,8 +214,11 @@ namespace hf {
             float _dx11; // psi
             float _dx12; // dpsi/dt
 
-            float _g; // gravitational constant
-            float _rho; // air density
+            float _dt;
+
+            vehicle_params_t _vparams;
+
+            world_params_t _wparams;
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
