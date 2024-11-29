@@ -27,7 +27,7 @@ namespace hf {
 
         public:
 
-            static axis2_t read(const Dynamics & d) 
+            static axis2_t read(const Dynamics & d, const float dt) 
             {
                 // Rotate inertial-frame horizontal velocity into body frame
                 const auto dx = d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
@@ -35,21 +35,34 @@ namespace hf {
 
                 const auto z = d.x5;
 
-                const auto flow_dx = convert(dx, z);
+                const auto flow_dx = convert(dx, z, dt);
 
-                const auto flow_dy = convert(dy, z);
+                const auto flow_dy = convert(dy, z, dt);
 
                 return axis2_t {flow_dx, flow_dy};
             }
 
         private:
 
-            // A fudge factor that works with our EKF
-            static constexpr float SCALE = 5; 
+            // See ekf.hpp for these constants
+            static constexpr float NPIX = 35;
+            static constexpr float FIELD_OF_VIEW = 42;
+            static constexpr float RESOLUTION = 0.1;
 
-            static float convert(const float d, const float z)
+            static float thetapix()
             {
-                return z == 0 ? 0 : d / z * SCALE;
+                return 2 * sin(FIELD_OF_VIEW / 2 / Utils::RAD2DEG);
+            }
+
+            static float convert(
+                    const float d, const float z, const float dt)
+            {
+                (void)dt;
+
+                return z == 
+                    0 ?
+                    0 : 
+                    (d / z) * (dt * NPIX / thetapix()) / RESOLUTION;
             }
     };
 
