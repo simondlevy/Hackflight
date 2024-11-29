@@ -53,21 +53,7 @@ namespace hf {
 
         public:
 
-            // Vehicle state (Equation 11)
-            float x1;  // x
-            float x2;  // dx/dt
-            float x3;  // y
-            float x4;  // dy/dt
-            float x5;  // z
-            float x6;  // dz/dt
-            float x7;  // phi
-            float x8;  // dphi/dt
-            float x9;  // theta
-            float x10; // dtheta/dt
-            float x11; // psi
-            float x12; // dpsi/dt
-
-            typedef struct {
+             typedef struct {
 
                 float x;
                 float y;
@@ -198,6 +184,20 @@ namespace hf {
             // ---------------------------------------------------------------
 
         private:
+
+            // Vehicle state (Equation 11)
+            float x1;  // x
+            float x2;  // dx/dt
+            float x3;  // y
+            float x4;  // dy/dt
+            float x5;  // z
+            float x6;  // dz/dt
+            float x7;  // phi
+            float x8;  // dphi/dt
+            float x9;  // theta
+            float x10; // dtheta/dt
+            float x11; // psi
+            float x12; // dpsi/dt
 
             float _dt;
 
