@@ -60,10 +60,8 @@ namespace hf {
         }
 
         static uint32_t _range_count;
-        static float _h;
         if (_range_count++ == (uint32_t)(pid_rate/RANGEFINDER_RATE)) {
-            _h = Rangefinder::read(dynamics);
-            _ekf.update_with_range(_h);
+            _ekf.update_with_range(Rangefinder::read(dynamics));
             _range_count = 0;
         }
 
