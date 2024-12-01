@@ -52,7 +52,7 @@ static SNN * yawRateSnn;
 static SNN * cascadeSnn;
 
 // Choose from one of the three networks above to visualize
-static auto vizSnn = &climbRateSnn;
+//static auto vizSnn = &climbRateSnn;
 
 static SNN * makeSnn(const char * filename)
 {
@@ -113,7 +113,7 @@ namespace hf {
             exit(1);
         }
 
-        (*vizSnn)->serve_visualizer(VIZ_PORT);
+        //(*vizSnn)->serve_visualizer(VIZ_PORT);
     }
 
     // Called by webots_physics_step()
@@ -169,11 +169,11 @@ namespace hf {
             MOTOR_TAKEOFF :
             0;
 
-        static uint32_t _vizcount;
-        if (_vizcount++ % 100 == 0) {
-            // Send spikes to visualizer
-            (*vizSnn)->send_counts_to_visualizer();
-        }
+        //static uint32_t _vizcount;
+        //if (_vizcount++ % 100 == 0) {
+        //    // Send spikes to visualizer
+        //    (*vizSnn)->send_counts_to_visualizer();
+        //}
 
         return demands;
     }
