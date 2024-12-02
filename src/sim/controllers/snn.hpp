@@ -56,7 +56,7 @@ static SNN * cascadeSnn;
 
 static SNN * makeSnn(const char * filename)
 {
-    return new SNN(filename, "risp");
+    return new SNN(filename);
 }
  
 static double runSnn(
