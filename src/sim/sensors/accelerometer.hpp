@@ -18,7 +18,12 @@
 
 #pragma once
 
+#include <iostream>
+#include <random>
+#include <vector>
+
 #include <hackflight.hpp>
+#include <sim/dynamics.hpp>
 #include <utils.hpp>
 
 namespace hf {
@@ -27,13 +32,24 @@ namespace hf {
 
         public:
 
-            static axis3_t read(const Dynamics & d)
+            static axis3_t read(const Dynamics & d, const float noise=1e-6)
             {
                 const auto s = Utils::G2MSS;
 
-                return d._airborne ?
-                    axis3_t { d.x7 / s, d.x9 / s, (d._dx6 + d._g) / s }  :
-                    axis3_t { 0, 0, +1 };
+                std::random_device rd{};
+                std::mt19937 gen{rd()};
+                std::normal_distribution<float> dist{0, noise}; 
+
+                const auto accel =
+                    d._airborne ? 
+                    axis3_t { d.x7/s, d.x9/s, (d._dx6 + d._wparams.g) / s }  :
+                    axis3_t {0, 0, +1};
+
+                return axis3_t {
+                    accel.x + dist(gen),
+                    accel.y + dist(gen),
+                    accel.z + dist(gen)
+                };
             }
     };
 }

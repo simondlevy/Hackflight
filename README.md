@@ -7,7 +7,11 @@
 Hackflight is a minimalist software toolkit for building multirotor flight
 controllers and simulators.  It is geared toward people like me who want to
 tinker with flight-control firmware, and use it to teach students about ideas
-like inertial measurement and PID tuning.  <b>If you are in the 99% percent of
+like
+[state estimation](https://simondlevy.github.io/ekf-tutorial)
+and
+[PID control](https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller).
+<b>If you are in the 99% percent of
 users who just want to get your vehicle flying without getting into firmware
 hacking, I recommend [Betaflight](http://betaflight.com/)</b> (great for
 getting started when you're on a budget)

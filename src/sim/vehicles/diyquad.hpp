@@ -1,6 +1,5 @@
 /* 
- * Custom physics plugin for Hackflight simulator using Haskell Copilot for
- * control
+ * Vehicle parameters for simulated DIY quadcopter
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -17,5 +16,20 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/estimators/groundtruth.hpp>
-#include <sim/controllers/haskell.hpp>
+#include <sim/dynamics.hpp>
+
+namespace hf {
+
+    static constexpr Dynamics::vehicle_params_t VPARAMS = {
+
+        1.0e-1, // mass [kg]
+        5.0e-2, // arm length L [m]
+
+        3.6e-5, // force coefficient B [F=b*w^2]
+        7.0e-6, // drag coefficient D [T=d*w^2]
+        2.0e-5  // I [kg*m^2]   // pitch, roll
+    };
+
+    // Might be derivable from above
+    static constexpr float MOTOR_HOVER = 74.565; // rad/sec
+}

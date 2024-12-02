@@ -58,9 +58,9 @@ namespace hf {
                 _az_prev = az;
 
                 // Convert gyroscope degrees/sec to radians/sec
-                gx *= 0.0174533f;
-                gy *= 0.0174533f;
-                gz *= 0.0174533f;
+                gx /= Utils::RAD2DEG;
+                gy /= Utils::RAD2DEG;
+                gz /= Utils::RAD2DEG;
 
                 // Compute rate of change of quaternion from gyroscope
                 auto qDot1 = 0.5f * (-_q1 * gx - _q2 * gy - _q3 * gz);
@@ -132,6 +132,7 @@ namespace hf {
                 // Normalise quaternion
                 const auto recipNorm = invSqrt(
                         _q0 * _q0 + _q1 * _q1 + _q2 * _q2 + _q3 * _q3);
+
                 _q0 *= recipNorm;
                 _q1 *= recipNorm;
                 _q2 *= recipNorm;

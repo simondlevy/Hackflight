@@ -46,37 +46,13 @@ namespace hf {
 
     class Dynamics {
 
+        friend class GroundTruth;
         friend class Gyrometer;
         friend class Accelerometer;
         friend class OpticalFlow;
         friend class Rangefinder;
 
         public:
-
-            // Vehicle state (Equation 11)
-            float x1;  // x
-            float x2;  // dx/dt
-            float x3;  // y
-            float x4;  // dy/dt
-            float x5;  // z
-            float x6;  // dz/dt
-            float x7;  // phi
-            float x8;  // dphi/dt
-            float x9;  // theta
-            float x10; // dtheta/dt
-            float x11; // psi
-            float x12; // dpsi/dt
-
-            typedef struct {
-
-                float x;
-                float y;
-                float z;
-                float phi;
-                float theta;
-                float psi;
-
-            } pose_t;
 
             /**
              *  Vehicle parameters
@@ -94,21 +70,31 @@ namespace hf {
 
             } vehicle_params_t; 
 
+            /**
+             *  World parameters
+             */
+            typedef struct {
+
+                // These can be measured directly
+                float g;   // gravitational constant [m/s/s]
+                float rho; // air density [kg/m^3]
+
+            } world_params_t; 
+
             Dynamics(
                     const vehicle_params_t & vparams,
-                    const float dt,
-                    const float gravity = 9.80665e0,
-                    const float air_density = 1.225)
+                    const world_params_t & wparams,
+                    const float dt)
             {
-                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
-
-                _dt = dt;
-
-                _rho = air_density;
-                _g = gravity;
-
-                _airborne = false;
+                init(vparams, wparams, dt);
             }
+
+            Dynamics(const vehicle_params_t & vparams, const float dt)
+            {
+                const world_params_t wparams = { 9.807, 1.225 };
+
+                init(vparams, wparams, dt);
+             }
 
             /**
              * Sets motor spins
@@ -131,7 +117,7 @@ namespace hf {
                 for (unsigned int i = 0; i < mixer->rotorCount(); ++i) {
 
                     // Thrust is squared rad/sec scaled by air density
-                    const auto omega2 = _rho * omegas[i] * omegas[i]; 
+                    const auto omega2 = _wparams.rho * omegas[i] * omegas[i]; 
 
                     // Multiply by thrust coefficient
                     u1 += b * omega2;                  
@@ -144,7 +130,7 @@ namespace hf {
                 }
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
-                _dx6 = -_g + (cos(x7)*cos(x9)) * 1 / m * u1;
+                _dx6 = -_wparams.g + (cos(x7)*cos(x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
                 if (_dx6 > 0) {
@@ -157,19 +143,19 @@ namespace hf {
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dx1 = x2;                                 // x
+                    _dx1 = x2;                               // x
                     _dx2 =(cos(-x7)*sin(x9)*cos(x11) +       // dx, inertial frame
                             sin(-x7)*sin(x11)) * u1 / m;
-                    _dx3 = x4;                                 // y
+                    _dx3 = x4;                               // y
                     _dx4 = -(cos(-x7)*sin(x9)*sin(x11) -     // dy, inertial frame
                             sin(-x7)*cos(x11)) * u1 / m;
-                    _dx5 = x6;                                 // z
-                    _dx7 = x8;                                 // phi
-                    _dx8 = l / I * u2;                          // dphi
-                    _dx9 = x10;                                // theta
-                    _dx10 = l / I * u3;                         // dtheta
-                    _dx11 = x12;                               // psi
-                    _dx12 = -l / I * u4;                        // dpsi
+                    _dx5 = x6;                               // z
+                    _dx7 = x8;                               // phi
+                    _dx8 = l / I * u2;                       // dphi
+                    _dx9 = x10;                              // theta
+                    _dx10 = l / I * u3;                      // dtheta
+                    _dx11 = x12;                             // psi
+                    _dx12 = -l / I * u4;                     // dpsi
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
@@ -199,9 +185,19 @@ namespace hf {
 
         private:
 
-            float _dt;
-
-            vehicle_params_t _vparams;
+            // Vehicle state (Equation 11)
+            float x1;  // x
+            float x2;  // dx/dt
+            float x3;  // y
+            float x4;  // dy/dt
+            float x5;  // z
+            float x6;  // dz/dt
+            float x7;  // phi
+            float x8;  // dphi/dt
+            float x9;  // theta
+            float x10; // dtheta/dt
+            float x11; // psi
+            float x12; // dpsi/dt
 
             // Vehicle state first derivative (Equation 12)
             float _dx1;  // x
@@ -217,11 +213,28 @@ namespace hf {
             float _dx11; // psi
             float _dx12; // dpsi/dt
 
-            float _g; // gravitational constant
-            float _rho; // air density
+            float _dt;
+
+            vehicle_params_t _vparams;
+
+            world_params_t _wparams;
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
+
+            void init(
+                    const vehicle_params_t & vparams,
+                    const world_params_t & wparams,
+                    const float dt)
+            {
+                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
+
+                memcpy(&_wparams, &wparams, sizeof(world_params_t));
+
+                _dt = dt;
+
+                _airborne = false;
+            }
 
     }; // class Dynamics
 

@@ -21,14 +21,16 @@ INCLUDE = -I../../../../src
 
 HASKDIR = ../../../../haskell
 
+CORE_TASK = ../../../../haskell/Sim.hs
+
 CXX_SOURCES = haskell.cpp copilot_core.cpp ../support.cpp
 
 FILES_TO_REMOVE += copilot*
 
 all: libhaskell.so
 
-copilot_core.cpp : CoreTask.hs $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
-	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids CoreTask.hs
+copilot_core.cpp : $(CORE_TASK) $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(CORE_TASK)
 	mv copilot_core.c copilot_core.cpp
 
 ### Do not modify: this includes Webots global Makefile.include

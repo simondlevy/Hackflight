@@ -44,6 +44,12 @@ hf::state_t estimate_state(
     const auto gyro = hf::Gyrometer::read(dynamics);
     const auto accel = hf::Accelerometer::read(dynamics);
 
+    hf::axis4_t quat = {};
+    _madgwick.getQuaternion(1 / pid_rate, gyro, accel, quat);
+
+    hf::axis3_t euler = {};
+    hf::Utils::quat2euler(quat, euler, -1);
+
     static hf::state_t _state;
 
     // dx/dt, body frame
@@ -61,30 +67,22 @@ hf::state_t estimate_state(
     _state.dz = dynamics.x6;
 
     // phi
-    _state.phi = hf::Utils::RAD2DEG * dynamics.x7;         
+    _state.phi = euler.x;
 
     // dphi/dt, directly from gyro
     _state.dphi = gyro.x;
 
     // theta
-    _state.theta = hf::Utils::RAD2DEG* dynamics.x9;
+    _state.theta = euler.y;
 
     // dtheta/dt, directly from gyro
     _state.dtheta = gyro.y;
 
     // psi, directly from gyro
-    _state.psi = hf::Utils::RAD2DEG* dynamics.x11;
+    _state.psi = euler.z;
 
     // dpsi/dt
     _state.dpsi = gyro.z;
-
-    hf::axis4_t quat = {};
-    _madgwick.getQuaternion(1 / pid_rate, gyro, accel, quat);
-    //printf("qw=%+3.3f  qx=%+3.3f  qy=%+3.3f  qz=%+3.3f\n",
-    //        quat.w, quat.x, quat.y, quat.z);
-    //hf::axis3_t euler = {};
-    //hf::Utils::quat2euler(quat, euler);
-    //fprintf(_logfp, "%f,%f\n", hf::Utils::RAD2DEG * euler.x, _state.phi);
 
     return _state;
 }

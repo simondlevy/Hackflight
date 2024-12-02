@@ -18,6 +18,7 @@
  */
 
 #include <hackflight.hpp>
+#include <sim/sensors/rangefinder.hpp>
 #include <utils.hpp>
 
 namespace hf {
@@ -26,46 +27,45 @@ namespace hf {
 
         public:
 
-            // https://github.com/bitcraze/Bitcraze_PMW3901
-            static constexpr float NPIX = 35;
-
-            static float thetapix()
-            {
-                return 2 * sin(FIELD_OF_VIEW / Utils::RAD2DEG / 2);
-            }
-
-            static axis2_t read(const Dynamics & d)
+            static axis2_t read(const Dynamics & d, const float dt) 
             {
                 // Rotate inertial-frame horizontal velocity into body frame
-                const auto dx =   d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
-                const auto dy = -(d.x2 * sin(d.x11) + d.x4 * cos(d.x11));
+                const auto dx = d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
+                const auto dy = d.x2 * sin(d.x11) + d.x4 * cos(d.x11);
 
-                // Simulate optical flow based on
-                //    https://github.com/bitcraze/crazyflie-firmware/blob/master/
-                //    src/modules/src/kalman_core/mm_flow.c
+                const auto h = d.x5 / (cos(d.x7) * cos(d.x9));
 
-                const auto z = max(d.x5, ZMIN);
+                const auto flow_dx = convert(dx, h, -d.x10, dt);
 
-                const auto scale = d._dt * NPIX / thetapix(); 
-
-                const auto flow_dx = scale * ((dx / z) - d.x9);
-
-                const auto flow_dy = scale * ((dy / z) - d.x7);
+                const auto flow_dy = convert(dy, h, d.x8, dt);
 
                 return axis2_t {flow_dx, flow_dy};
             }
 
         private:
 
-            // https://wiki.bitcraze.io/_media/projects:crazyflie2:
-            //    expansionboards:pot0189-pmw3901mb-txqt-ds-r1.40-280119.pdf
+            // See ekf.hpp for these constants
+            static constexpr float NPIX = 35;
             static constexpr float FIELD_OF_VIEW = 42;
+            static constexpr float RESOLUTION = 0.1;
 
-            static constexpr float ZMIN = 0.1;
-
-            static float max(const float a, const float b)
+            static float thetapix()
             {
-                return a > b ? a : b;
+                return 2 * sin(FIELD_OF_VIEW / 2 / Utils::RAD2DEG);
+            }
+
+            static float convert(
+                    const float d,
+                    const float h,
+                    const float omega,
+                    const float dt)
+            {
+                return h == 0 ?  0 :  // Avoid division by zero
+
+                    // This formula inverts the one in
+                    //   https://www.bitcraze.io/documentation/repository/
+                    //   crazyflie-firmware/master/images/flowdeck_velocity.png
+                    (d / h + omega) * (dt * NPIX / thetapix()) / RESOLUTION;
             }
     };
 

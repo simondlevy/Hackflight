@@ -1,5 +1,6 @@
 /* 
- * Custom physics plugin for Hackflight simulator using C++ PID controllers
+ * Custom physics plugin for Hackflight simulator using ground-truth 
+ * state and standard C++ PID controllers
  *
  *  Copyright (C) 2024 Simon D. Levy
  *
@@ -16,11 +17,5 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-
-#include <sim/standard_controllers.hpp>
-#include <sim/state_from_dynamics.hpp>
-
-// Called by webots_physics_init(); unneeded here
-void setup_controllers()
-{
-}
+#include <sim/estimators/groundtruth.hpp>
+#include <sim/controllers/standard.hpp>
