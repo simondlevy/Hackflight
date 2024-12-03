@@ -39,7 +39,6 @@ CXX_SOURCES += $(FDIR)/src/spike_encoding.cpp
 
 INCLUDE += -I$(PDIR)/include
 CXX_SOURCES += $(PDIR)/src/processor.cpp
-CXX_SOURCES += $(PDIR)/src/static_proc.cpp
 
 VIZ_NET = $(shell pwd)/networks/difference_risp_train.txt
 VIZ_HOST = "localhost"
