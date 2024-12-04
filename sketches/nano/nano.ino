@@ -1,5 +1,5 @@
 /*
-   ESP32 on-board sketch
+   ESP32 TinyPICO Nano sketch
 
    Relays serial comms data from Teensy flight-control board to a remote ESP32
    dongle; accepts SET_RC messages from dongle to set RC channel values.
@@ -26,15 +26,15 @@
 #include <hackflight.hpp>
 #include <esp32.hpp>
 #include <msp.hpp>
-#include <tasks/comms.hpp>
 #include <i2c_comms.h>
 
 //static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x97, 0x90};
 
+// Callback for data received from ESP32 dongle
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
-    static Msp _msp;
+    static hf::Msp _msp;
 
     for (int k=0; k<len; ++k) {
 
@@ -60,18 +60,22 @@ void loop()
 
     const auto bytesReceived = Wire.requestFrom(
             hf::I2C_DEV_ADDR, 
-            hf::MSP_STATE_MESSAGE_SIZE);
+            hf::Msp::STATE_MESSAGE_SIZE);
 
-    if (bytesReceived == hf::MSP_STATE_MESSAGE_SIZE) {
+    if (bytesReceived == hf::Msp::STATE_MESSAGE_SIZE) {
 
         uint8_t msg[bytesReceived] = {};
 
         Wire.readBytes(msg, bytesReceived);
 
-        const auto result = esp_now_send(DONGLE_ADDRESS, msg, hf::MSP_STATE_MESSAGE_SIZE);
+        const auto result = esp_now_send(DONGLE_ADDRESS, msg, hf::Msp::STATE_MESSAGE_SIZE);
 
         if (result != ESP_OK) {
             Serial.printf("Error sending the data\n");
+        }
+        else {
+            static uint32_t _count;
+            Serial.printf("%ld\n", _count++);
         }
     }
 

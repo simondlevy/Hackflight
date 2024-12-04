@@ -21,7 +21,6 @@ import os
 from sys import stdout
 from serial import Serial
 import argparse
-import inputs
 from threading import Thread
 from time import time, sleep
 
@@ -30,11 +29,9 @@ from msp import Parser
 
 class MyMspParser(Parser):
 
-    def __init__(self, gamepad_vals):
+    def __init__(self):
 
         Parser.__init__(self)
-
-        self.gamepad_vals = gamepad_vals
 
         self.last_received_time = 0
 
@@ -61,21 +58,7 @@ def telemetry_threadfun(port, msp, running):
         sleep(0)
 
 
-def gamepad_threadfun(port, msp, vals, running):
-
-    while running[0]:
-
-        msg = msp.serialize_SET_RAW_RC(
-                vals[0], vals[1], vals[2], vals[3], vals[4], vals[5])
-
-        port.write(msg)
-
-        sleep(0)
-
-
 def main():
-
-    AXIS_MAP = {'X': 0, 'Y': 1, 'Z': 2, 'RX': 3, 'RY': 4, 'RZ': 5}
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
 
@@ -87,9 +70,7 @@ def main():
 
     port = Serial(args.port, 115200)
 
-    gamepad_vals = [0, 1024, 1024, 1024, 0, 0]
-
-    msp = MyMspParser(gamepad_vals)
+    msp = MyMspParser()
 
     running = [True]
 
@@ -98,11 +79,6 @@ def main():
 
     t1.start()
 
-    t2 = Thread(target=gamepad_threadfun,
-                args=(port, msp, gamepad_vals, running))
-
-    t2.start()
-
     print('Waiting for vehicle to connect ...', end='')
     stdout.flush()
 
@@ -110,31 +86,9 @@ def main():
 
         try:
 
-            for event in inputs.get_gamepad():
-
-                code = str(event.code)
-
-                if 'ABS' in code:
-
-                    print(code)
-
-                    axis = AXIS_MAP[code[4:]]
-
-                    gamepad_vals[axis] = event.state
-
-        except inputs.UnpluggedError:
-
-            print('No gamepad detected')
-
-            break
+            pass
 
         except KeyboardInterrupt:
-
-            break
-
-        except OSError:
-
-            print('Gamepad unplugged')
 
             break
 

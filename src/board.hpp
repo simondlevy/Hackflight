@@ -40,8 +40,7 @@
 namespace hf {
 
     // These must be global to support static handleI2CRequest()
-    static const uint8_t MSP_STATE_MESSAGE_SIZE = 46;
-    static uint8_t msg[MSP_STATE_MESSAGE_SIZE];
+    static uint8_t msg[Msp::STATE_MESSAGE_SIZE];
 
     class Board {
 
@@ -144,8 +143,6 @@ namespace hf {
                 };
 
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    //printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n",
-                    //        accel.x, accel.y, accel.z);
                 }
 
                 // Run Madgwick filter to get get Euler angles from IMU values
@@ -442,7 +439,7 @@ namespace hf {
 
             static void handleI2CRequest() 
             {
-                Wire1.write(msg, MSP_STATE_MESSAGE_SIZE);
+                Wire1.write(msg, Msp::STATE_MESSAGE_SIZE);
             }
 
             void runComms(const state_t & state)
@@ -456,7 +453,7 @@ namespace hf {
 
                     _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
 
-                    memcpy(msg, _msp.payload, MSP_STATE_MESSAGE_SIZE);
+                    memcpy(msg, _msp.payload, Msp::STATE_MESSAGE_SIZE);
                 }
             }
     };

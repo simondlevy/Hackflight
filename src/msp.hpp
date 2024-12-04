@@ -23,224 +23,230 @@
 
 #include <stdint.h>
 
-class Msp {
+namespace hf {
 
-    private:
+    class Msp {
 
-        static const uint8_t BUF_SIZE = 128;
+        private:
 
-        typedef enum {
-            IDLE,
-            GOT_START,
-            GOT_M,
-            GOT_ARROW,
-            GOT_SIZE,
-            IN_PAYLOAD,
-            GOT_CRC
-        } parserState_t; 
+            static const uint8_t BUF_SIZE = 128;
 
-        parserState_t m_parserState;
+            typedef enum {
+                IDLE,
+                GOT_START,
+                GOT_M,
+                GOT_ARROW,
+                GOT_SIZE,
+                IN_PAYLOAD,
+                GOT_CRC
+            } parserState_t; 
 
-        uint8_t m_payloadChecksum;
-        uint8_t m_payloadIndex;
+            parserState_t m_parserState;
 
-        void serialize32(const int32_t a)
-        {
-            serialize8(a & 0xFF);
-            serialize8((a >> 8) & 0xFF);
-            serialize8((a >> 16) & 0xFF);
-            serialize8((a >> 24) & 0xFF);
-        }
+            uint8_t m_payloadChecksum;
+            uint8_t m_payloadIndex;
 
-        void serialize16(const int16_t a)
-        {
-            serialize8(a & 0xFF);
-            serialize8((a >> 8) & 0xFF);
-        }
-
-        void serialize8(const uint8_t a)
-        {
-            addToOutBuf(a);
-            m_payloadChecksum ^= a;
-        }
-
-        void prepareToSerialize(
-                const uint8_t type, const uint8_t count, const uint8_t size)
-        {
-            payloadSize = 0;
-            m_payloadIndex = 0;
-            m_payloadChecksum = 0;
-
-            addToOutBuf('$');
-            addToOutBuf('M');
-            addToOutBuf('>');
-            serialize8(count*size);
-            serialize8(type);
-        }
-
-        void addToOutBuf(const uint8_t a)
-        {
-            payload[payloadSize++] = a;
-        }
-
-        void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
-        {
-            prepareToSerialize(type, count, 1);
-        }
-
-        void serializeByte(const uint8_t src)
-        {
-            serialize8(src);
-        }
-
-        void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
-        {
-            prepareToSerialize(msgtype, count, 4);
-        }
-
-        void prepareToSerializeFloats(const uint8_t msgtype, const uint8_t count)
-        {
-            prepareToSerialize(msgtype, count, 4);
-        }
-
-        void prepareToSerializeShorts(const uint8_t msgtype, const uint8_t count)
-        {
-            prepareToSerialize(msgtype, count, 2);
-        }
-
-        void completeSerialize(void)
-        {
-            serialize8(m_payloadChecksum);
-            m_payloadIndex = 0;
-        }
-
-        void serializeFloat(const float src)
-        {
-            uint32_t a;
-            memcpy(&a, &src, 4);
-            serialize32(a);
-        }
-
-        void serializeShort(const uint16_t src)
-        {
-            uint16_t a;
-            memcpy(&a, &src, 2);
-            serialize16(a);
-        }
-
-    public:
-
-        enum {
-            MSG_STATE = 121
-        };
-
-        uint8_t payload[BUF_SIZE];
-        uint8_t payloadSize;
-
-        /**
-          * Returns message type or 0 for not  ready
-          */
-        uint8_t parse(const uint8_t c)
-        {
-            uint8_t messageType = 0;
-
-            static uint8_t _type;
-            static uint8_t _crc;
-            static uint8_t _size;
-            static uint8_t _index;
-
-            // Payload transition functions
-            _size = m_parserState == GOT_ARROW ? c : _size;
-            _index = m_parserState == IN_PAYLOAD ? _index + 1 : 0;
-            const bool isCommand = _type >= 200;
-            const bool inPayload = isCommand && m_parserState == IN_PAYLOAD;
-
-            // Message-type transition function
-            _type = m_parserState == GOT_SIZE ? c : _type;
-
-            // Parser state transition function (final transition below)
-            m_parserState
-                = m_parserState == IDLE && c == '$' ? GOT_START
-                : m_parserState == GOT_START && c == 'M' ? GOT_M
-                : m_parserState == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-                : m_parserState == GOT_ARROW ? GOT_SIZE
-                : m_parserState == GOT_SIZE ? IN_PAYLOAD
-                : m_parserState == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
-                : m_parserState == IN_PAYLOAD ? GOT_CRC
-                : m_parserState;
-
-            // Checksum transition function
-            _crc 
-                = m_parserState == GOT_SIZE ?  c
-                : m_parserState == IN_PAYLOAD ? _crc ^ c
-                : m_parserState == GOT_CRC ? _crc 
-                : 0;
-
-            // Payload accumulation
-            if (inPayload) {
-                payload[_index-1] = c;
+            void serialize32(const int32_t a)
+            {
+                serialize8(a & 0xFF);
+                serialize8((a >> 8) & 0xFF);
+                serialize8((a >> 16) & 0xFF);
+                serialize8((a >> 24) & 0xFF);
             }
 
-            if (m_parserState == GOT_CRC) {
+            void serialize16(const int16_t a)
+            {
+                serialize8(a & 0xFF);
+                serialize8((a >> 8) & 0xFF);
+            }
 
-                // Message dispatch
-                if (_crc == c) {
-                    messageType = _type;
+            void serialize8(const uint8_t a)
+            {
+                addToOutBuf(a);
+                m_payloadChecksum ^= a;
+            }
+
+            void prepareToSerialize(
+                    const uint8_t type, const uint8_t count, const uint8_t size)
+            {
+                payloadSize = 0;
+                m_payloadIndex = 0;
+                m_payloadChecksum = 0;
+
+                addToOutBuf('$');
+                addToOutBuf('M');
+                addToOutBuf('>');
+                serialize8(count*size);
+                serialize8(type);
+            }
+
+            void addToOutBuf(const uint8_t a)
+            {
+                payload[payloadSize++] = a;
+            }
+
+            void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
+            {
+                prepareToSerialize(type, count, 1);
+            }
+
+            void serializeByte(const uint8_t src)
+            {
+                serialize8(src);
+            }
+
+            void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
+            {
+                prepareToSerialize(msgtype, count, 4);
+            }
+
+            void prepareToSerializeFloats(const uint8_t msgtype, const uint8_t count)
+            {
+                prepareToSerialize(msgtype, count, 4);
+            }
+
+            void prepareToSerializeShorts(const uint8_t msgtype, const uint8_t count)
+            {
+                prepareToSerialize(msgtype, count, 2);
+            }
+
+            void completeSerialize(void)
+            {
+                serialize8(m_payloadChecksum);
+                m_payloadIndex = 0;
+            }
+
+            void serializeFloat(const float src)
+            {
+                uint32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
+            }
+
+            void serializeShort(const uint16_t src)
+            {
+                uint16_t a;
+                memcpy(&a, &src, 2);
+                serialize16(a);
+            }
+
+        public:
+    
+            static const uint8_t STATE_MESSAGE_SIZE = 46;
+
+            enum {
+                MSG_STATE = 121
+            };
+
+            uint8_t payload[BUF_SIZE];
+            uint8_t payloadSize;
+
+            /**
+             * Returns message type or 0 for not  ready
+             */
+            uint8_t parse(const uint8_t c)
+            {
+                uint8_t messageType = 0;
+
+                static uint8_t _type;
+                static uint8_t _crc;
+                static uint8_t _size;
+                static uint8_t _index;
+
+                // Payload transition functions
+                _size = m_parserState == GOT_ARROW ? c : _size;
+                _index = m_parserState == IN_PAYLOAD ? _index + 1 : 0;
+                const bool isCommand = _type >= 200;
+                const bool inPayload = isCommand && m_parserState == IN_PAYLOAD;
+
+                // Message-type transition function
+                _type = m_parserState == GOT_SIZE ? c : _type;
+
+                // Parser state transition function (final transition below)
+                m_parserState
+                    = m_parserState == IDLE && c == '$' ? GOT_START
+                    : m_parserState == GOT_START && c == 'M' ? GOT_M
+                    : m_parserState == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
+                    : m_parserState == GOT_ARROW ? GOT_SIZE
+                    : m_parserState == GOT_SIZE ? IN_PAYLOAD
+                    : m_parserState == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
+                    : m_parserState == IN_PAYLOAD ? GOT_CRC
+                    : m_parserState;
+
+                // Checksum transition function
+                _crc 
+                    = m_parserState == GOT_SIZE ?  c
+                    : m_parserState == IN_PAYLOAD ? _crc ^ c
+                    : m_parserState == GOT_CRC ? _crc 
+                    : 0;
+
+                // Payload accumulation
+                if (inPayload) {
+                    payload[_index-1] = c;
                 }
 
-                m_parserState = IDLE;
+                if (m_parserState == GOT_CRC) {
+
+                    // Message dispatch
+                    if (_crc == c) {
+                        messageType = _type;
+                    }
+
+                    m_parserState = IDLE;
+                }
+
+                return messageType;
+
+            } // parse
+
+            bool isIdle(void)
+            {
+                return m_parserState == IDLE;
             }
 
-            return messageType;
+            int16_t parseShort(const uint8_t index)
+            {
+                int16_t s = 0;
+                memcpy(&s,  &payload[2*index], sizeof(int16_t));
+                return s;
 
-        } // parse
-
-        bool isIdle(void)
-        {
-            return m_parserState == IDLE;
-        }
-
-        int16_t parseShort(const uint8_t index)
-        {
-            int16_t s = 0;
-            memcpy(&s,  &payload[2*index], sizeof(int16_t));
-            return s;
-
-        }
-
-        void serializeFloats(
-                const uint8_t messageType, const float src[], const uint8_t count)
-        {
-            prepareToSerializeFloats(messageType, count);
-
-            for (auto k=0; k<count; ++k) {
-                serializeFloat(src[k]);
             }
 
-            completeSerialize();
-        }
+            void serializeFloats(
+                    const uint8_t messageType, const float src[], const uint8_t count)
+            {
+                prepareToSerializeFloats(messageType, count);
 
-        void serializeShorts(
-                const uint8_t messageType, const int16_t src[], const uint8_t count)
-        {
-            prepareToSerializeShorts(messageType, count);
+                for (auto k=0; k<count; ++k) {
+                    serializeFloat(src[k]);
+                }
 
-            for (auto k=0; k<count; ++k) {
-                serializeShort(src[k]);
+                completeSerialize();
             }
 
-            completeSerialize();
-        }
+            void serializeShorts(
+                    const uint8_t messageType, const int16_t src[], const uint8_t count)
+            {
+                prepareToSerializeShorts(messageType, count);
 
-        uint8_t available(void)
-        {
-            return payloadSize;
-        }
+                for (auto k=0; k<count; ++k) {
+                    serializeShort(src[k]);
+                }
 
-        uint8_t read(void)
-        {
-            payloadSize--;
-            return payload[m_payloadIndex++];
-        }
+                completeSerialize();
+            }
 
-}; // class Msp
+            uint8_t available(void)
+            {
+                return payloadSize;
+            }
+
+            uint8_t read(void)
+            {
+                payloadSize--;
+                return payload[m_payloadIndex++];
+            }
+
+    };
+
+}
