@@ -142,9 +142,6 @@ namespace hf {
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                }
-
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
                 axis4_t quat = {};
@@ -187,6 +184,14 @@ namespace hf {
                     PITCH_ROLL_PRESCALE;
                 demands.yaw    = rx.map(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
+
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    printf("t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n", 
+                            demands.thrust,
+                            demands.roll,
+                            demands.pitch,
+                            demands.yaw);
+                }
 
                 // Run comms
                 runComms(state);
@@ -241,7 +246,7 @@ namespace hf {
             PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
+            const std::vector<uint8_t> MOTOR_PINS = { 23, 4, 15, 6 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 

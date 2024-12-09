@@ -26,13 +26,13 @@
 
 #include <mixers/bfquadx.hpp>
 
-#include <receivers/sbus.hpp>
+#include <receivers/dsmx.hpp>
 
 static const uint8_t LED_PIN = 0;
 
 static hf::Board _board;
 
-static hf::SbusReceiver _rx;
+static hf::DsmxReceiver _rx;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
