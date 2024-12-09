@@ -31,8 +31,9 @@ namespace hf {
 
             virtual void read(uint16_t chanvals[6], bool & failsafe) = 0;
 
-            virtual float map(
-                    const uint16_t val, const float min, const float max) = 0;
+            virtual uint16_t minval() = 0;
+
+            virtual uint16_t maxval() = 0;
     };
 
 }

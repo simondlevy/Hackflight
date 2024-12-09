@@ -177,12 +177,12 @@ namespace hf {
                 state.dpsi = gyro.z;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = rx.map(_channels[0],  0.,  1.);
-                demands.roll   = rx.map(_channels[1], -1,  +1) *
+                demands.thrust = mapchan(rx, _channels[0],  0.,  1.);
+                demands.roll   = mapchan(rx, _channels[1], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.pitch  = rx.map(_channels[2], -1,  +1) *
+                demands.pitch  = mapchan(rx, _channels[2], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.yaw    = rx.map(_channels[3], -1,  +1) *
+                demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
@@ -195,6 +195,16 @@ namespace hf {
 
                 // Run comms
                 runComms(state);
+            }
+
+            static float mapchan(
+                    Receiver & rx,
+                    const uint16_t rawval,
+                    const float newmin,
+                    const float newmax)
+            {
+                return newmin + (rawval - (float)rx.minval()) / 
+                    (rx.maxval() - (float)rx.minval()) * (newmax - newmin);
             }
 
             void runMotors(Receiver & rx, const float * motors)

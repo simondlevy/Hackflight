@@ -61,9 +61,14 @@ namespace hf {
                 }
             }
 
-            float map(const uint16_t val, const float min, const float max)
+            uint16_t minval() 
             {
-                return min + (val - 988.) / (2011 - 988) * (max - min);
+                return 988;
+            }
+
+            uint16_t maxval() 
+            {
+                return 2011;
             }
 
     };
