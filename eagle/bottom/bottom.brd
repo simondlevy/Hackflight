@@ -147,18 +147,18 @@
 </layers>
 <board>
 <plain>
-<wire x1="0.5" y1="1.25" x2="19.5" y2="1.25" width="0" layer="20"/>
-<wire x1="19.5" y1="1.25" x2="19.5" y2="26.62" width="0" layer="20"/>
-<wire x1="19.5" y1="26.62" x2="0.5" y2="26.62" width="0" layer="20"/>
-<wire x1="0.5" y1="26.62" x2="0.5" y2="1.25" width="0" layer="20"/>
-<text x="6" y="23" size="1.016" layer="25">CS</text>
-<text x="8.75" y="23" size="1.016" layer="25">SK</text>
-<text x="11.5" y="23" size="1.016" layer="25">SI</text>
-<text x="14" y="23" size="1.016" layer="25">SO</text>
+<wire x1="0.75" y1="1.25" x2="19.25" y2="1.25" width="0" layer="20"/>
+<wire x1="19.25" y1="1.25" x2="19.25" y2="26.62" width="0" layer="20"/>
+<wire x1="19.25" y1="26.62" x2="0.75" y2="26.62" width="0" layer="20"/>
+<wire x1="0.75" y1="26.62" x2="0.75" y2="1.25" width="0" layer="20"/>
+<text x="5.25" y="22.75" size="1.016" layer="25">CS</text>
+<text x="8" y="22.75" size="1.016" layer="25">SK</text>
+<text x="10.75" y="22.75" size="1.016" layer="25">SI</text>
+<text x="13" y="22.75" size="1.016" layer="25">SO</text>
 <text x="6.75" y="15.25" size="1.016" layer="25">3V</text>
 <text x="9.25" y="15.25" size="1.016" layer="25">GD</text>
 <text x="3.75" y="18.5" size="1.016" layer="25">CS</text>
-<text x="4" y="16" size="1.016" layer="25">SI</text>
+<text x="3.75" y="16" size="1.016" layer="25">SI</text>
 <text x="3.75" y="13.5" size="1.016" layer="25">SO</text>
 <text x="3.75" y="11" size="1.016" layer="25">3V</text>
 <text x="3.75" y="8.25" size="1.016" layer="25">GD</text>
@@ -489,10 +489,10 @@ design rules under a new name.</description>
 <wire x1="2.5" y1="8.75" x2="2.5" y2="7.13" width="0.3048" layer="1"/>
 <wire x1="2.5" y1="7.13" x2="6.38" y2="3" width="0.3048" layer="1"/>
 <polygon width="0.3048" layer="1">
-<vertex x="0.5" y="26.5"/>
-<vertex x="19.75" y="26.5"/>
-<vertex x="19.75" y="1"/>
-<vertex x="0.5" y="1"/>
+<vertex x="0.75" y="26.5"/>
+<vertex x="19.25" y="26.5"/>
+<vertex x="19.25" y="1.25"/>
+<vertex x="0.75" y="1.25"/>
 </polygon>
 </signal>
 <signal name="SCL">
