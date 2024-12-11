@@ -155,17 +155,31 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
+                // Debug as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n", 
-                            demands.thrust,
-                            demands.roll,
-                            demands.pitch,
-                            demands.yaw);
                 }
 
                 // Log data if indicated
                 if (_logFile && _loggingTimer.isReady(_usec_curr, LOGGING_RATE_HZ)) {
 
+                    const float buf[] = {
+                        _usec_curr / 1e6f,
+                        state.dx,
+                        state.dy,
+                        state.z,
+                        state.dz,
+                        state.phi,
+                        state.dphi,
+                        state.dphi,
+                        state.theta,
+                        state.dtheta,
+                        state.psi,
+                        state.dpsi
+                    };
+
+                    _logFile.write(buf, sizeof(buf));
+
+                    _logFile.flush();
                 }
             }
 

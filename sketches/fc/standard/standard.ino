@@ -43,7 +43,7 @@ static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
-    _board.init(_rx);
+    _board.initWithLogging(_rx);
 }
 
 void loop() 
