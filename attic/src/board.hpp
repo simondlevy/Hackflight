@@ -37,9 +37,14 @@
 #include <estimators/madgwick.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
+#include <i2c_comms.h>
 #include <timer.hpp>
+#include <msp.hpp>
 
 namespace hf {
+
+    // These must be global to support static handleI2CRequest()
+    static uint8_t msg[Msp::STATE_MESSAGE_SIZE];
 
     class Board {
 
@@ -163,10 +168,8 @@ namespace hf {
                             demands.yaw);
                 }
 
-                // Log data if indicated
-                if (_logFile && _loggingTimer.isReady(_usec_curr, LOGGING_RATE_HZ)) {
-
-                }
+                // Run comms
+                runComms(state);
             }
 
             void runMotors(Receiver & rx, const float * motors)
@@ -233,9 +236,16 @@ namespace hf {
             static constexpr float DEBUG_RATE_HZ = 100;
             Timer _debugTimer;
 
+            // Comms ----------------------------------------------------------
+            static constexpr float COMMS_RATE_HZ = 20;//100;
+
+            Timer _commsTimer;
+
+            Msp _msp;
+
             // SD card data logging ------------------------------------------
-            static constexpr float LOGGING_RATE_HZ = 20;
-            Timer _loggingTimer;
+            static constexpr float LOGGING_RATE_HZ = 20;//100;
+
             File _logFile;
 
             // Demand pres-caling --------------------------------------------
@@ -293,6 +303,10 @@ namespace hf {
                 if (flow) {
                     SPI.begin();
                 }
+
+                // Initialize handling of I2C requests from TinyPICO Nano
+                Wire1.onRequest(handleI2CRequest);
+                Wire1.begin(I2C_DEV_ADDR); // join I^2C bus peripheral
 
                 delay(5);
 
@@ -483,6 +497,26 @@ namespace hf {
                     delay(500);
                 }
 
+            }
+
+            static void handleI2CRequest() 
+            {
+                Wire1.write(msg, Msp::STATE_MESSAGE_SIZE);
+            }
+
+            void runComms(const state_t & state)
+            {
+                if (_commsTimer.isReady(_usec_curr, COMMS_RATE_HZ)) {
+
+                    const float vals[10] = {
+                        state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+                        state.theta, state.dtheta, state.psi, state.dpsi
+                    };
+
+                    _msp.serializeFloats(Msp::MSG_STATE, vals, 10);
+
+                    memcpy(msg, _msp.payload, Msp::STATE_MESSAGE_SIZE);
+                }
             }
     };
 
