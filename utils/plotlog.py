@@ -16,6 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
 import argparse
+import struct
 
 
 def main():
@@ -28,16 +29,20 @@ def main():
 
     args = arg_parser.parse_args()
 
+    fmt = 'ffffffffffff'
+
+    bufsize = 4 * len(fmt)
+
     with open(args.file, 'rb') as file:
 
         while True:
 
-            buf = file.read(48)  # 12 floats
+            buf = file.read(bufsize)  # 12 floats
 
-            if len(buf) < 48:
+            if len(buf) < bufsize:
 
                 break
 
-            print('okay')
+            print(struct.unpack(fmt, buf))
 
 main()
