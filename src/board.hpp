@@ -21,14 +21,17 @@
 
 #pragma once
 
+// Standard Arduino libraries
 #include <Wire.h>
 #include <SPI.h>
 
+// Third-party libraries
 #include <MPU6050.h>
 #include <pmw3901.hpp>
 #include <VL53L1X.h>
 #include <oneshot125.hpp>
 
+// Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
 #include <rx.hpp>
@@ -46,60 +49,31 @@ namespace hf {
 
         public:
 
-            void init(
-                    Receiver & rx,
-                    const uint8_t ledPin=LED_BUILTIN,
-                    const bool fullMonty=false)
+            void initWithFlowAndLogging(Receiver & rx)
             {
-                _ledPin = ledPin;
+                init(rx, true, true);
+            }
 
-                // Set up serial debugging
-                Serial.begin(500000);
-                delay(500);
+            void initWithLogging(Receiver & rx)
+            {
+                init(rx, false, true);
+            }
 
-                // Start receiver
-                rx.begin();
+            void initWithFlow(Receiver & rx)
+            {
+                init(rx, true, false);
+            }
 
-                // Initialize LED
-                pinMode(_ledPin, OUTPUT); 
-                digitalWrite(_ledPin, HIGH);
-
-                // Initialize the sensor buses
-                Wire.begin();
-                SPI.begin();
-
-                // Initialize handling of I2C requests from TinyPICO Nano
-                Wire1.onRequest(handleI2CRequest);
-                Wire1.begin(I2C_DEV_ADDR); // join I^2C bus peripheral
-
-                delay(5);
-
-                // Initialize the sensors
-                initImu();
-                if (fullMonty) {
-                    initRangefinder();
-                    initOpticalFlow();
-                }
-
-                // Initialize the Madgwick filter
-                _madgwick.initialize();
-
-                delay(5);
-
-                // Arm OneShot125 motors
-                armMotor(_m4_usec);
-                armMotor(_m2_usec);
-                armMotor(_m1_usec);
-                armMotor(_m3_usec);
-                _motors.arm();
+            void init(Receiver & rx)
+            {
+                init(rx, false, false);
             }
 
             void readData(
                     float & dt,
                     Receiver & rx,
                     demands_t & demands,
-                    state_t & state,
-                    const bool fullMonty=false)
+                    state_t & state)
             {
                 // Keep track of what time it is and how much time has elapsed
                 // since the last loop
@@ -155,7 +129,7 @@ namespace hf {
                 state.theta = angles.y;
                 state.psi = angles.z;
 
-                if (fullMonty) {
+                if (_flow) {
 
                     /*
                     // Read rangefinder, non-blocking
@@ -195,16 +169,6 @@ namespace hf {
 
                 // Run comms
                 runComms(state);
-            }
-
-            static float mapchan(
-                    Receiver & rx,
-                    const uint16_t rawval,
-                    const float newmin,
-                    const float newmax)
-            {
-                return newmin + (rawval - (float)rx.minval()) / 
-                    (rx.maxval() - (float)rx.minval()) * (newmax - newmin);
             }
 
             void runMotors(Receiver & rx, const float * motors)
@@ -276,6 +240,8 @@ namespace hf {
 
             Msp _msp;
 
+            bool _flow;
+
             // Demand pres-caling --------------------------------------------
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
@@ -304,6 +270,72 @@ namespace hf {
 
             // State estimation
             MadgwickFilter  _madgwick;
+
+            // Private methods -----------------------------------------------
+
+            void init(Receiver & rx, bool flow, bool logging)
+            {
+                _ledPin = flow ? 0 :LED_BUILTIN;
+
+                _flow = flow;
+
+                // Set up serial debugging
+                Serial.begin(500000);
+                delay(500);
+
+                // Start receiver
+                rx.begin();
+
+                // Initialize LED
+                pinMode(_ledPin, OUTPUT); 
+                digitalWrite(_ledPin, HIGH);
+
+                // Initialize the I^2C bus
+                Wire.begin();
+
+                // Initialize the SPI bus if we're doing optical flow
+                if (flow) {
+                    SPI.begin();
+                }
+
+                // Initialize handling of I2C requests from TinyPICO Nano
+                Wire1.onRequest(handleI2CRequest);
+                Wire1.begin(I2C_DEV_ADDR); // join I^2C bus peripheral
+
+                delay(5);
+
+                // Initialize the sensors
+                initImu();
+
+                // Initial flow and rangefinder if indicated
+                if (_flow) {
+                    initRangefinder();
+                    initOpticalFlow();
+                }
+
+                // Initialize the Madgwick filter
+                _madgwick.initialize();
+
+                delay(5);
+
+                // Arm OneShot125 motors
+                armMotor(_m4_usec);
+                armMotor(_m2_usec);
+                armMotor(_m1_usec);
+                armMotor(_m3_usec);
+                _motors.arm();
+            }
+
+
+            static float mapchan(
+                    Receiver & rx,
+                    const uint16_t rawval,
+                    const float newmin,
+                    const float newmax)
+            {
+                return newmin + (rawval - (float)rx.minval()) / 
+                    (rx.maxval() - (float)rx.minval()) * (newmax - newmin);
+            }
 
             static void runLoopDelay(const uint32_t usec_curr)
             {

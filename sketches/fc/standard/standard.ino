@@ -28,8 +28,6 @@
 
 #include <receivers/dsmx.hpp>
 
-static const uint8_t LED_PIN = 0;
-
 static hf::Board _board;
 
 static hf::DsmxReceiver _rx;
@@ -45,7 +43,7 @@ static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
-    _board.init(_rx, LED_PIN);
+    _board.init(_rx);
 }
 
 void loop() 
