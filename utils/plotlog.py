@@ -17,7 +17,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
 import struct
-
+import numpy as np
+import matplotlib
 
 def main():
 
@@ -33,6 +34,8 @@ def main():
 
     bufsize = 4 * len(fmt)
 
+    data = []
+
     with open(args.file, 'rb') as file:
 
         while True:
@@ -40,9 +43,8 @@ def main():
             buf = file.read(bufsize)  # 12 floats
 
             if len(buf) < bufsize:
-
                 break
 
-            print(struct.unpack(fmt, buf))
+            print(struct.unpack(fmt, buf)[0])
 
 main()

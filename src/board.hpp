@@ -249,10 +249,11 @@ namespace hf {
 
             // SD card data logging ------------------------------------------
             static constexpr float LOGGING_RATE_HZ = 20;
+            static constexpr char * LOG_FILE_NAME = (char *)"log.dat";
             Timer _loggingTimer;
             File _logFile;
 
-            // Demand pres-caling --------------------------------------------
+            // Demand prescaling --------------------------------------------
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
             // deg/sec for rate mode
@@ -316,7 +317,7 @@ namespace hf {
                         reportForever("SD card initialization failed");
                     }
 
-                    _logFile = SD.open("log.dat", FILE_WRITE);
+                    _logFile = SD.open(LOG_FILE_NAME, FILE_WRITE);
                 }
 
                 // Initialize the sensors
