@@ -18,7 +18,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 import argparse
 import struct
 import numpy as np
-import matplotlib
+import matplotlib.pyplot as plt
 
 def main():
 
@@ -45,6 +45,21 @@ def main():
             if len(buf) < bufsize:
                 break
 
-            print(struct.unpack(fmt, buf)[0])
+            data.append(list(struct.unpack(fmt, buf)))
+
+    data = np.array(data)
+
+    t = data[:, 0]
+
+    phi = data[:, 5]
+    theta = data[:, 7]
+
+    plt.plot(t, phi)
+    plt.plot(t, theta)
+    plt.legend(('phi', 'theta'))
+    #plt.show()
+
+    for (tt,pp) in zip(t, phi):
+        print(tt, pp)
 
 main()

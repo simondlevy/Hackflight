@@ -31,6 +31,7 @@
 #include <pmw3901.hpp>
 #include <VL53L1X.h>
 #include <oneshot125.hpp>
+#include <usfs.hpp>
 
 // Hackflight library
 #include <hackflight.hpp>
@@ -100,16 +101,16 @@ namespace hf {
 
                 // Accelerometer Gs
                 const axis3_t accel = {
-                    -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
-                    ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
-                    az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+                    -ax / MPU6050_ACCEL_SCALE_FACTOR - ACC_ERROR_X,
+                    ay / MPU6050_ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
+                    az / MPU6050_ACCEL_SCALE_FACTOR - ACC_ERROR_Z
                 };
 
                 // Gyro deg /sec
                 const axis3_t gyro = {
-                    gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
-                    -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
-                    -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
+                    gx / MPU6050_GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
+                    -gy / MPU6050_GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
+                    -gz / MPU6050_GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
                 // Run Madgwick filter to get get Euler angles from IMU values
@@ -125,6 +126,26 @@ namespace hf {
                 state.theta = angles.y;
                 state.psi = angles.z;
 
+                const auto eventStatus = Usfs::checkStatus(); 
+
+                if (Usfs::eventStatusIsError(eventStatus)) { 
+
+                    Usfs::reportError(eventStatus);
+                }
+
+                static state_t _usfs_state = {};
+
+                if (Usfs::eventStatusIsQuaternion(eventStatus)) { 
+                    float qw=0, qx=0, qy=0, qz=0;
+                    _usfs.readQuaternion(qw, qx, qy, qz);
+                    const axis4_t quat = {qw, qx, qy, qz};
+                    axis3_t angles = {};
+                    Utils::quat2euler(quat, angles);
+                    _usfs_state.phi = angles.x;
+                    _usfs_state.theta = angles.y;
+                    _usfs_state.psi = angles.z;
+                }
+
                 if (_flow) {
 
                     /*
@@ -137,7 +158,7 @@ namespace hf {
                     bool gotFlow = false;
                     _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
-                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
+                    //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }*/
                 }
 
@@ -157,32 +178,15 @@ namespace hf {
 
                 // Debug as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("%3.3f,%3.3f\n", _usec_curr / 1e6f, state.phi);
+                    printf("phi=%+3.3f(%+3.3f)  theta=%+3.3f(%+3.3f)  psi=%+3.3f(%+3.3f)\n", 
+                            _usfs_state.phi, state.phi, 
+                            _usfs_state.theta, state.theta, 
+                            _usfs_state.psi, state.psi);
                 }
 
                 // Log data if indicated
                 if (_logFile && _loggingTimer.isReady(_usec_curr, LOGGING_RATE_HZ)) {
 
-                    const float buf[] = {
-                        _usec_curr / 1e6f,
-                        state.dx,
-                        state.dy,
-                        state.z,
-                        state.dz,
-                        state.phi,
-                        state.dphi,
-                        state.dphi,
-                        state.theta,
-                        state.dtheta,
-                        state.psi,
-                        state.dpsi
-                    };
-
-                    //_logFile.write(buf, sizeof(buf));
-
-                    _logFile.printf("%3.3f,%3.3f\n", _usec_curr / 1e6f, state.phi);
-
-                    _logFile.flush();
                 }
             }
 
@@ -216,13 +220,31 @@ namespace hf {
             // FAFO -----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            // IMU ------------------------------------------------------------
+            // USFS IMU ------------------------------------------------------
 
-            static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
-            static constexpr float GYRO_SCALE_FACTOR = 131.0;
+            static const uint8_t USFS_ACCEL_BANDWIDTH = 3;
+            static const uint8_t USFS_GYRO_BANDWIDTH  = 3;
+            static const uint8_t USFS_QUAT_DIVISOR    = 1;
+            static const uint8_t USFS_MAG_RATE        = 100;
+            static const uint8_t USFS_ACCEL_RATE      = 20; // Multiply by 10 to get actual rate
+            static const uint8_t USFS_GYRO_RATE       = 100; // Multiply by 10 to get actual rate
+            static const uint8_t USFS_BARO_RATE       = 50;
 
-            static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
-            static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
+            static const bool USFS_VERBOSE = true;
+
+            static const uint8_t USFS_INTERRUPT_ENABLE = Usfs::INTERRUPT_RESET_REQUIRED |
+                Usfs::INTERRUPT_ERROR |
+                Usfs::INTERRUPT_QUAT;
+
+            Usfs _usfs;
+
+            // MPU6050 IMU ------------------------------------------------------------
+
+            static const uint8_t MPU6050_GYRO_SCALE = MPU6050_GYRO_FS_250;
+            static constexpr float MPU6050_GYRO_SCALE_FACTOR = 131.0;
+
+            static const uint8_t MPU6050_ACCEL_SCALE = MPU6050_ACCEL_FS_2;
+            static constexpr float MPU6050_ACCEL_SCALE_FACTOR = 16384.0;
 
             MPU6050 _mpu6050;
 
@@ -306,6 +328,7 @@ namespace hf {
 
                 // Initialize the I^2C bus
                 Wire.begin();
+                Wire.setClock(400000); 
 
                 // Initialize the SPI bus if we're doing optical flow
                 if (flow) {
@@ -388,7 +411,7 @@ namespace hf {
 
             void initImu() 
             {
-                //Note this is 2.5 times the spec sheet 400 kHz max...
+                // Note this is 2.5 times the spec sheet 400 kHz max...
                 Wire.setClock(1000000); 
 
                 _mpu6050.initialize();
@@ -400,8 +423,26 @@ namespace hf {
                 // From the reset state all registers should be 0x00, so we
                 // should be at max sample rate with digital low pass filter(s)
                 // off.  All we need to do is set the desired fullscale ranges
-                _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
-                _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+                _mpu6050.setFullScaleGyroRange(MPU6050_GYRO_SCALE);
+                _mpu6050.setFullScaleAccelRange(MPU6050_ACCEL_SCALE);
+
+                _usfs.reportChipId();        
+
+                _usfs.loadFirmware(USFS_VERBOSE); 
+
+                _usfs.begin(
+                        USFS_ACCEL_BANDWIDTH,
+                        USFS_GYRO_BANDWIDTH,
+                        USFS_QUAT_DIVISOR,
+                        USFS_MAG_RATE,
+                        USFS_ACCEL_RATE,
+                        USFS_GYRO_RATE,
+                        USFS_BARO_RATE,
+                        USFS_INTERRUPT_ENABLE,
+                        USFS_VERBOSE); 
+
+                // Clear interrupts
+                Usfs::checkStatus();
             }
 
             void initRangefinder()
