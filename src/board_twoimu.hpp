@@ -146,6 +146,15 @@ namespace hf {
                     _usfs_state.psi = angles.z;
                 }
 
+                if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
+
+                    float gx=0, gy=0, gz=0;
+                    _usfs.readGyrometerScaled(gx, gy, gz);
+                    _usfs_state.dphi = gx;
+                    _usfs_state.dtheta = -gy;
+                    _usfs_state.dpsi = gz;
+                }
+
                 if (_flow) {
 
                     /*
@@ -178,10 +187,10 @@ namespace hf {
 
                 // Debug as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("phi=%+3.3f(%+3.3f)  theta=%+3.3f(%+3.3f)  psi=%+3.3f(%+3.3f)\n", 
-                            _usfs_state.phi, state.phi, 
-                            _usfs_state.theta, state.theta, 
-                            _usfs_state.psi, state.psi);
+                    printf("dphi=%+3.3f(%+3.3f)  theta=%+3.3f(%+3.3f)  dpsi=%+3.3f(%+3.3f)\n", 
+                            _usfs_state.dphi, state.dphi, 
+                            _usfs_state.dtheta, state.dtheta, 
+                            _usfs_state.dpsi, state.dpsi);
                 }
 
                 // Log data if indicated
