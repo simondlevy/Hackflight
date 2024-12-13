@@ -20,3 +20,7 @@ edit:
 
 listen:
 	miniterm.py $(PORT) 115200
+
+plot:
+	miniterm.py $(PORT) 115200 > log.csv
+	python3 plotlog.py

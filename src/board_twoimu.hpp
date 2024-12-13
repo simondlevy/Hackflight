@@ -167,7 +167,6 @@ namespace hf {
                     bool gotFlow = false;
                     _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
-                    //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }*/
                 }
 
@@ -187,7 +186,9 @@ namespace hf {
 
                 // Debug as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("dphi=%+3.3f(%+3.3f)  theta=%+3.3f(%+3.3f)  dpsi=%+3.3f(%+3.3f)\n", 
+                    printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                            _usfs_state.phi, state.phi, 
+                            _usfs_state.theta, state.theta, 
                             _usfs_state.dphi, state.dphi, 
                             _usfs_state.dtheta, state.dtheta, 
                             _usfs_state.dpsi, state.dpsi);
@@ -239,7 +240,7 @@ namespace hf {
             static const uint8_t USFS_GYRO_RATE       = 100; // Multiply by 10 to get actual rate
             static const uint8_t USFS_BARO_RATE       = 50;
 
-            static const bool USFS_VERBOSE = true;
+            static const bool USFS_VERBOSE = false;
 
             static const uint8_t USFS_INTERRUPT_ENABLE = Usfs::INTERRUPT_RESET_REQUIRED |
                 Usfs::INTERRUPT_ERROR |
