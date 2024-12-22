@@ -172,7 +172,7 @@ namespace hf {
         static uint32_t _vizcount;
         if (_vizcount++ % 100 == 0) {
             // Send spikes to visualizer
-            climbRateSnn->send_counts_to_visualizer();
+            //climbRateSnn->send_counts_to_visualizer();
         }
 
         return demands;
