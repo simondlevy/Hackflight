@@ -48,7 +48,10 @@ DLLEXPORT void webots_physics_init()
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robotBody == NULL) {
+    static uint64_t _count;
+    dWebotsConsolePrintf("step%d\n", _count++);
+
+   if (_robotBody == NULL) {
         return;
     }
 
@@ -67,7 +70,7 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    // Run controllers in middle loop, dynamics inside that
+     // Run controllers in middle loop, dynamics inside that
     const auto pose = run_sim_middle_loop(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 

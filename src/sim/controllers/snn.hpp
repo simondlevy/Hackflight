@@ -56,7 +56,7 @@ static SNN * cascadeSnn;
 
 static SNN * makeSnn(const char * filename)
 {
-    return new SNN(filename);
+    return new SNN(filename, "risp");
 }
  
 static double runSnn(
@@ -76,7 +76,7 @@ static double runSnn(
     const double action = counts[0] / divisor - offset;
 
     if (debug) {
-        printf("%d", counts[0]);
+        //printf("%d", counts[0]);
         //printf("%f,%f\n", setpoint - actual, action);
     }
 
@@ -169,11 +169,11 @@ namespace hf {
             MOTOR_TAKEOFF :
             0;
 
-        //static uint32_t _vizcount;
-        //if (_vizcount++ % 100 == 0) {
-        //    // Send spikes to visualizer
-        //    (*vizSnn)->send_counts_to_visualizer();
-        //}
+        static uint32_t _vizcount;
+        if (_vizcount++ % 100 == 0) {
+            // Send spikes to visualizer
+            climbRateSnn->send_counts_to_visualizer();
+        }
 
         return demands;
     }

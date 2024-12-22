@@ -19,7 +19,7 @@ INCLUDE = -I$(SRCDIR)
 
 NAME = ekf
 
-CXX_SOURCES = ekf.cpp
+CXX_SOURCES = main.cpp
 
 all: $(NAME)
 

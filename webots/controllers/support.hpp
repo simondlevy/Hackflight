@@ -320,7 +320,8 @@ class Simulator {
 
                     // Run throttle stick through deadband
                     siminfo.demands.thrust =
-                        fabs(siminfo.demands.thrust) < 0.05 ? 0 : siminfo.demands.thrust;
+                        fabs(siminfo.demands.thrust) < 0.05 ? 0 : 
+                        siminfo.demands.thrust;
                 }
 
                 else {
@@ -355,3 +356,21 @@ class Simulator {
             return siminfo;
         }
 };
+
+int main() 
+{
+    Simulator sim = {};
+
+    sim.init();
+
+    while (true) {
+
+        if (!sim.step()) {
+            break;
+        }
+    }
+
+    sim.close();
+
+    return 0;
+}

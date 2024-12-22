@@ -16,22 +16,5 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "../support.hpp"
+#include "../support.hpp"  // contains main()
 
-int main() 
-{
-    Simulator sim = {};
-
-    sim.init();
-
-    while (true) {
-
-        if (!sim.step()) {
-            break;
-        }
-    }
-
-    sim.close();
-
-    return 0;
-}

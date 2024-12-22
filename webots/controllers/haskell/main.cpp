@@ -16,22 +16,4 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "../support.hpp"
-
-int main() 
-{
-    Simulator sim = {};
-
-    sim.initKeyboard(); // no joystick support
-
-    while (true) {
-
-        if (!sim.stepKeyboard()) {
-            break;
-        }
-    }
-
-    sim.close();
-
-    return 0;
-}
+#include "../support.hpp" // contains main()

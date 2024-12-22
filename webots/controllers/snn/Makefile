@@ -43,16 +43,16 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/snn.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
+viz:
+	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
 	sleep 1
 	cd $(FDIR)/viz; \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
      	-n $(VIZ_NET) --show_spike_count --remove_unnecessary_neuron \
     		--set_num_screen_shot 0 > /dev/null
-min:
-	webots ../../worlds/snn.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
-
 plot:
 	./plot.py
 
