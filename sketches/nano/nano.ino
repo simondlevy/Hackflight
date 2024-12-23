@@ -28,8 +28,10 @@
 #include <msp.hpp>
 #include <i2c_comms.h>
 
-//static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
-static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x97, 0x90};
+static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
+//static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x97, 0x90};
+
+static const uint32_t UPDATE_FREQ = 50;
 
 // Callback for data received from ESP32 dongle
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
@@ -79,6 +81,6 @@ void loop()
         }
     }
 
-    delay(10);
+    delay(1000/UPDATE_FREQ);
 }
 
