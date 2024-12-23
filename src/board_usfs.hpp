@@ -150,6 +150,7 @@ namespace hf {
 
                 // Debug as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    printf("%+3.3f\n", _state.phi);
                 }
 
                 // Log data if indicated

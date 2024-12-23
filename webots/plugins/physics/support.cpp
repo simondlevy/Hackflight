@@ -48,9 +48,6 @@ DLLEXPORT void webots_physics_init()
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    static uint64_t _count;
-    dWebotsConsolePrintf("step%d\n", _count++);
-
    if (_robotBody == NULL) {
         return;
     }
