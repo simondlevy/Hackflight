@@ -61,17 +61,12 @@ def main():
     while True:
 
         try:
-
-            print(port.read())
-
-            '''
             if port.in_waiting > 0:
                 msp.parse(port.read())
 
             elif (msp.last_received_time > 0 and
                   (time() - msp.last_received_time) > 1.0):
                 print('Lost connection to vehicle')
-            '''
 
         except KeyboardInterrupt:
 
