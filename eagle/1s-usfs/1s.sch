@@ -3120,6 +3120,7 @@ Part Number: HA-522</description>
 <part name="U$4" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="U$6" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="U$7" library="headers(2mm)" deviceset="1X1" device=""/>
+<part name="MPU6050" library="SparkFun-Connectors" deviceset="CONN_05" device="NO_SILK"/>
 <part name="RX" library="wirepad" deviceset="SMD2" device=""/>
 <part name="5V" library="wirepad" deviceset="SMD2" device=""/>
 <part name="3V3" library="wirepad" deviceset="SMD2" device=""/>
@@ -3145,6 +3146,10 @@ Part Number: HA-522</description>
 <instance part="U$4" gate="G$1" x="-27.94" y="17.78" smashed="yes"/>
 <instance part="U$6" gate="G$1" x="-27.94" y="-2.54" smashed="yes"/>
 <instance part="U$7" gate="G$1" x="-27.94" y="-10.16" smashed="yes"/>
+<instance part="MPU6050" gate="G$1" x="12.7" y="2.54" smashed="yes">
+<attribute name="VALUE" x="10.16" y="-7.366" size="1.778" layer="96" font="vector"/>
+<attribute name="NAME" x="10.16" y="10.668" size="1.778" layer="95" font="vector"/>
+</instance>
 <instance part="RX" gate="1" x="71.12" y="-17.78"/>
 <instance part="5V" gate="1" x="71.12" y="-25.4"/>
 <instance part="3V3" gate="1" x="71.12" y="-33.02"/>
@@ -3181,6 +3186,11 @@ Part Number: HA-522</description>
 <label x="93.98" y="58.42" size="1.778" layer="95"/>
 </segment>
 <segment>
+<pinref part="MPU6050" gate="G$1" pin="1"/>
+<wire x1="20.32" y1="-2.54" x2="25.4" y2="-2.54" width="0.1524" layer="91"/>
+<label x="20.32" y="-2.54" size="1.778" layer="95"/>
+</segment>
+<segment>
 <pinref part="U$1" gate="G$1" pin="3V3_LN"/>
 <wire x1="68.58" y1="10.16" x2="68.58" y2="2.54" width="0.1524" layer="91"/>
 <label x="63.5" y="2.54" size="1.778" layer="95"/>
@@ -3206,6 +3216,11 @@ Part Number: HA-522</description>
 <pinref part="U$1" gate="G$1" pin="GND3"/>
 <wire x1="73.66" y1="10.16" x2="73.66" y2="2.54" width="0.1524" layer="91"/>
 <label x="73.66" y="2.54" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="MPU6050" gate="G$1" pin="2"/>
+<wire x1="20.32" y1="0" x2="25.4" y2="0" width="0.1524" layer="91"/>
+<label x="20.32" y="0" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$7" gate="G$1" pin="1"/>
@@ -3275,6 +3290,11 @@ Part Number: HA-522</description>
 <label x="93.98" y="43.18" size="1.778" layer="95"/>
 </segment>
 <segment>
+<pinref part="MPU6050" gate="G$1" pin="3"/>
+<wire x1="20.32" y1="2.54" x2="25.4" y2="2.54" width="0.1524" layer="91"/>
+<label x="20.32" y="2.54" size="1.778" layer="95"/>
+</segment>
+<segment>
 <pinref part="J1" gate="J1" pin="1"/>
 <wire x1="-48.26" y1="-63.5" x2="-43.18" y2="-63.5" width="0.1524" layer="91"/>
 <label x="-48.26" y="-63.5" size="1.778" layer="95"/>
@@ -3290,6 +3310,11 @@ Part Number: HA-522</description>
 <pinref part="U$1" gate="G$1" pin="19/A5/SCL"/>
 <wire x1="93.98" y1="45.72" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
 <label x="93.98" y="45.72" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="MPU6050" gate="G$1" pin="4"/>
+<wire x1="20.32" y1="5.08" x2="25.4" y2="5.08" width="0.1524" layer="91"/>
+<label x="20.32" y="5.08" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="J1" gate="J1" pin="2"/>
