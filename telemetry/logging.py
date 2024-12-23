@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-Hackflight Ground Control Station program
+Hackflight logging program
 
 This file is part of Hackflight.
 
@@ -21,7 +21,6 @@ import os
 from sys import stdout
 from serial import Serial
 import argparse
-from threading import Thread
 from time import time, sleep
 
 from msp import Parser
@@ -42,22 +41,6 @@ class MyMspParser(Parser):
         self.last_received_time = time()
 
 
-def telemetry_threadfun(port, msp, running):
-
-    while running[0]:
-
-        if port.in_waiting > 0:
-            msp.parse(port.read())
-
-        elif (msp.last_received_time > 0 and
-              (time() - msp.last_received_time) > 1.0):
-            print('Lost connection to vehicle')
-            os._exit(1)
-            running[0] = False
-
-        sleep(0)
-
-
 def main():
 
     fmtr = argparse.ArgumentDefaultsHelpFormatter
@@ -72,27 +55,27 @@ def main():
 
     msp = MyMspParser()
 
-    running = [True]
-
-    t1 = Thread(target=telemetry_threadfun,
-                args=(port, msp, running))
-
-    t1.start()
-
     print('Waiting for vehicle to connect ...', end='')
     stdout.flush()
 
-    while running[0]:
+    while True:
 
         try:
 
-            pass
+            print(port.read())
+
+            '''
+            if port.in_waiting > 0:
+                msp.parse(port.read())
+
+            elif (msp.last_received_time > 0 and
+                  (time() - msp.last_received_time) > 1.0):
+                print('Lost connection to vehicle')
+            '''
 
         except KeyboardInterrupt:
 
             break
-
-    running[0] = False
 
 
 main()
