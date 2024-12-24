@@ -45,24 +45,14 @@ namespace hf {
 
         public:
 
-            void initWithFlowAndLogging(Receiver & rx)
-            {
-                init(rx, true, true);
-            }
-
-            void initWithLogging(Receiver & rx)
-            {
-                init(rx, false, true);
-            }
-
             void initWithFlow(Receiver & rx)
             {
-                init(rx, true, false);
+                init(rx, true);
             }
 
             void init(Receiver & rx)
             {
-                init(rx, false, false);
+                init(rx, false);
             }
 
             void readData(
@@ -159,31 +149,6 @@ namespace hf {
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
                     printf("%3.3f,%3.3f\n", _usec_curr / 1e6f, state.phi);
                 }
-
-                // Log data if indicated
-                if (_logFile && _loggingTimer.isReady(_usec_curr, LOGGING_RATE_HZ)) {
-
-                    const float buf[] = {
-                        _usec_curr / 1e6f,
-                        state.dx,
-                        state.dy,
-                        state.z,
-                        state.dz,
-                        state.phi,
-                        state.dphi,
-                        state.dphi,
-                        state.theta,
-                        state.dtheta,
-                        state.psi,
-                        state.dpsi
-                    };
-
-                    //_logFile.write(buf, sizeof(buf));
-
-                    _logFile.printf("%3.3f,%3.3f\n", _usec_curr / 1e6f, state.phi);
-
-                    _logFile.flush();
-                }
             }
 
             void runMotors(Receiver & rx, const float * motors)
@@ -250,12 +215,6 @@ namespace hf {
             static constexpr float DEBUG_RATE_HZ = 100;
             Timer _debugTimer;
 
-            // SD card data logging ------------------------------------------
-            static constexpr float LOGGING_RATE_HZ = 20;
-            static constexpr char * LOG_FILE_NAME = (char *)"log.dat";
-            Timer _loggingTimer;
-            File _logFile;
-
             // Demand prescaling --------------------------------------------
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
@@ -287,7 +246,7 @@ namespace hf {
 
             // Private methods -----------------------------------------------
 
-            void init(Receiver & rx, bool flow, bool logging)
+            void init(Receiver & rx, bool flow)
             {
                 _ledPin = flow ? 0 :LED_BUILTIN;
 
@@ -313,19 +272,6 @@ namespace hf {
                 }
 
                 delay(5);
-
-                if (logging) {
-
-                    if (!SD.begin(BUILTIN_SDCARD)) {
-                        reportForever("SD card initialization failed");
-                    }
-
-                    if (SD.exists(LOG_FILE_NAME)) {
-                        SD.remove(LOG_FILE_NAME);
-                    }
-
-                    _logFile = SD.open(LOG_FILE_NAME, FILE_WRITE);
-                }
 
                 // Initialize the sensors
                 initImu();

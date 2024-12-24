@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <board.hpp>
+#include <board_mpu.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -43,7 +43,7 @@ static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
-    _board.initWithLogging(_rx);
+    _board.init(_rx);
 }
 
 void loop() 

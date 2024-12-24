@@ -32,16 +32,9 @@ static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 static const uint32_t UPDATE_FREQ = 50;
 
 // Callback for data received from transmitter
-static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
+static void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {
-    Serial.printf("%d\n", len);
-
-    static hf::Msp _msp;
-
-    for (int k=0; k<len; ++k) {
-
-        Serial1.write(incomingData[k]);
-    }
+    Serial1.write(data, len);
 }
 
 void setup() 

@@ -19,7 +19,7 @@
  */
 
 #include <hackflight.hpp>
-#include <board.hpp>
+#include <board_mpu.hpp>
 #include <receivers/sbus.hpp>
 
 static const uint8_t LED_PIN = 0;
@@ -58,7 +58,7 @@ void setMotors(float m1, float m2, float m3, float m4)
 
 void setup() 
 {
-    _board.init(_rx, LED_PIN);
+    _board.init(_rx);
 }
 
 void loop() 
