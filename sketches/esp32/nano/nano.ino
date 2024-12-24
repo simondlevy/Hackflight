@@ -19,8 +19,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <esp_now.h>
-#include <WiFi.h>
 #include <Wire.h>
 
 #include <hackflight.hpp>
