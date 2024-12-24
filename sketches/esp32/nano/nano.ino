@@ -78,6 +78,7 @@ void setup()
     }
 
     addEspNowPeer(DONGLE_ADDRESS);
+    addEspNowPeer(TX_ADDRESS);
 
     // esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
