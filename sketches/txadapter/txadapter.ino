@@ -86,7 +86,10 @@ void loop()
 
         const auto data = _sbus.data();
 
-        Serial.printf("%d\n", data.ch[0]);
+        Serial.printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
+                data.ch[0], data.ch[1], data.ch[2],
+                data.ch[3], data.ch[4], data.ch[5]);
+
 
         //_serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
 
