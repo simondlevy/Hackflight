@@ -3,7 +3,7 @@ SKETCH = txadapter
 # For complete list run arduino-cli board listall
 FQBN = esp32:esp32:um_tinypico
 
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyUSB1
 
 LIBS = $(HOME)/Documents/Arduino/libraries 
 

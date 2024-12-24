@@ -32,9 +32,13 @@ static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static const uint32_t UPDATE_FREQ = 50;
 
+static uint32_t _count;
+
 // Callback for data received from transmitter
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
+    _count++;
+
     static hf::Msp _msp;
 
     for (int k=0; k<len; ++k) {
@@ -80,7 +84,7 @@ void setup()
     addEspNowPeer(DONGLE_ADDRESS);
     addEspNowPeer(TX_ADDRESS);
 
-    // esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
     // Set up serial connection for sending RX messages to Teensy
     Serial1.begin(115200, SERIAL_8N1, 4, 14);
@@ -109,5 +113,7 @@ void loop()
 
     // Wait a little to avoid overwhelming the dongle with messages
     delay(1000/UPDATE_FREQ);
+
+    Serial.printf("%ld\n", _count);
 }
 

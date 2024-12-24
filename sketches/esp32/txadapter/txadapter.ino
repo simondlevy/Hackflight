@@ -21,46 +21,33 @@
 // Bolderflight's SBUS library
 #include <sbus.h>
 
-static const uint8_t RX_PIN = 25;
-static const uint8_t TX_PIN = 26; // unused
+// ESP-NOW support
+#include <esp_now.h>
+#include <WiFi.h>
 
-static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, RX_PIN, TX_PIN, true);
+static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0xD4, 0x40};
 
-/*
-#include <hackflight.h>
-#include <msp/serializer.h>
-#include <task/receiver/sbus.h>
-#include <espnow.h>
+// Support for SBUS from FrSky transmitter
+static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);
 
-static SbusReceiver _rx;
-
-static MspSerializer _serializer;
-
-// Replace with the MAC Address of your receiver 
-static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0);
-
-static uint16_t convert(uint16_t chanval)
+static void reportForever(const char * funname)
 {
-    return (uint16_t)SbusReceiver::convert(chanval);
+    while (true) {
+        Serial.printf("Nano: esp_now_%s() failed\n", funname);
+        delay(500);
+    }
 }
 
-   void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
-   {
-   Serial.print("\r\nLast Packet Send Status:\t");
-
-   Serial.println(
-   status == ESP_NOW_SEND_SUCCESS ?
-   "Delivery Success" :
-   "Delivery Fail");
-   }
-*/
-
-static void report(
-        const uint16_t value, const char * label, const char * delim="   ")
+static void addEspNowPeer(const uint8_t addr[6])
 {
-    Serial.print(label);
-    Serial.print(value);
-    Serial.print(delim);
+    esp_now_peer_info_t peerInfo = {};
+    memcpy(peerInfo.peer_addr, addr, 6);
+    peerInfo.channel = 0;  
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        reportForever("add_pier");
+    }
 }
 
 
@@ -72,12 +59,13 @@ void setup()
     // Start incoming SBUS connection from TX
     _sbus.Begin();
 
-    // Start ESP-NOW
-    //_esp.begin();
+    WiFi.mode(WIFI_STA);
 
-    // Once ESPNow is successfully Init, we will register for Send CB to
-    // get the status of Trasnmitted packet
-    //esp_now_register_send_cb(onDataSent);
+    if (esp_now_init() != ESP_OK) {
+        reportForever("init");
+    }
+
+    addEspNowPeer(RX_ADDRESS);
 }
 
 void loop()
@@ -90,11 +78,12 @@ void loop()
                 data.ch[0], data.ch[1], data.ch[2],
                 data.ch[3], data.ch[4], data.ch[5]);
 
+        // Send the message bytes to the receiver
+        const uint8_t msg[1] = {0};
+        const auto result = esp_now_send(RX_ADDRESS, msg, 1);
+        if (result != ESP_OK) {
+            Serial.printf("txadapter: error sending the data\n");
+        }
 
-        //_serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
-
-        //_esp.send(_serializer.outBuf, _serializer.outBufSize);
     }
-
-    // delay(5);
 }
