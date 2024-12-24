@@ -73,7 +73,7 @@ void setup()
         reportForever("add_pier");
     }
 
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    // esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
     // Set up serial connection for sending RX messages to Teensy
     Serial1.begin(115200, SERIAL_8N1, 4, 14);
