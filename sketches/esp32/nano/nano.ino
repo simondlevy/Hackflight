@@ -31,12 +31,10 @@ static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static const uint32_t UPDATE_FREQ = 50;
 
-static uint32_t _count;
-
 // Callback for data received from transmitter
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
-    _count++;
+    Serial.printf("%d\n", len);
 
     static hf::Msp _msp;
 
@@ -89,7 +87,5 @@ void loop()
 
     // Wait a little to avoid overwhelming the dongle with messages
     delay(1000/UPDATE_FREQ);
-
-    Serial.printf("%ld\n", _count);
 }
 
