@@ -27,11 +27,12 @@
 #include <msp.hpp>
 #include <i2c_comms.h>
 
+static uint8_t TX_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
 static const uint32_t UPDATE_FREQ = 50;
 
-// Callback for data received from ESP32 dongle
+// Callback for data received from transmitter
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
     static hf::Msp _msp;
@@ -50,6 +51,18 @@ static void reportForever(const char * funname)
     }
 }
 
+static void addEspNowPeer(const uint8_t addr[6])
+{
+    esp_now_peer_info_t peerInfo = {};
+    memcpy(peerInfo.peer_addr, addr, 6);
+    peerInfo.channel = 0;  
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        reportForever("add_pier");
+    }
+}
+
 void setup() 
 {
     // Act as an I^2C host device for Teensy
@@ -64,14 +77,7 @@ void setup()
         reportForever("init");
     }
 
-    esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, DONGLE_ADDRESS, 6);
-    peerInfo.channel = 0;  
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        reportForever("add_pier");
-    }
+    addEspNowPeer(DONGLE_ADDRESS);
 
     // esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
