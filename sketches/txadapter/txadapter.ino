@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2024 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -18,13 +18,19 @@
 
 //   Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
+// Bolderflight's SBUS library
+#include <sbus.h>
+
+static const uint8_t RX_PIN = 25;
+static const uint8_t TX_PIN = 26; // unused
+
+static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, RX_PIN, TX_PIN, true);
+
+/*
 #include <hackflight.h>
 #include <msp/serializer.h>
 #include <task/receiver/sbus.h>
 #include <espnow.h>
-
-static const uint8_t RX_PIN = 25;
-static const uint8_t TX_PIN = 26; // unused
 
 static SbusReceiver _rx;
 
@@ -38,15 +44,6 @@ static uint16_t convert(uint16_t chanval)
     return (uint16_t)SbusReceiver::convert(chanval);
 }
 
-static void report(
-        const uint16_t value, const char * label, const char * delim="   ")
-{
-    Serial.print(label);
-    Serial.print(value);
-    Serial.print(delim);
-}
-
-/*
    void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
    {
    Serial.print("\r\nLast Packet Send Status:\t");
@@ -55,17 +52,28 @@ static void report(
    status == ESP_NOW_SEND_SUCCESS ?
    "Delivery Success" :
    "Delivery Fail");
-   }*/
+   }
+*/
+
+static void report(
+        const uint16_t value, const char * label, const char * delim="   ")
+{
+    Serial.print(label);
+    Serial.print(value);
+    Serial.print(delim);
+}
+
 
 void setup()
 {
+    // Set up serial debugging
     Serial.begin(115200);
 
     // Start incoming SBUS connection from TX
-    Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
+    _sbus.Begin();
 
     // Start ESP-NOW
-    _esp.begin();
+    //_esp.begin();
 
     // Once ESPNow is successfully Init, we will register for Send CB to
     // get the status of Trasnmitted packet
@@ -74,29 +82,15 @@ void setup()
 
 void loop()
 {
-    _rx.read(Serial1);
+    if (_sbus.Read()) {
 
-    if (_rx.ready()) {
+        const auto data = _sbus.data();
 
-        const uint16_t c1 = convert(_rx.readChannel1());
-        const uint16_t c2 = convert(_rx.readChannel2());
-        const uint16_t c3 = convert(_rx.readChannel3());
-        const uint16_t c4 = convert(_rx.readChannel4());
-        const uint16_t c5 = convert(_rx.readChannel5());
-        const uint16_t c6 = convert(_rx.readChannel6());
+        Serial.printf("%d\n", data.ch[0]);
 
-        /*
-           report(c1, "C1=");
-           report(c2, "C2=");
-           report(c3, "C3=");
-           report(c4, "C4=");
-           report(c5, "C5=");
-           report(c6, "C6=", "\n");
-         */
+        //_serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
 
-        _serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
-
-        _esp.send(_serializer.outBuf, _serializer.outBufSize);
+        //_esp.send(_serializer.outBuf, _serializer.outBufSize);
     }
 
     // delay(5);
