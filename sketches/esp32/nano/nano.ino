@@ -43,35 +43,40 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
 void setup() 
 {
-    // Act as an I^2C host device
+    // Act as an I^2C host device for Teensy
     Wire.begin();
 
+    // Enable serial debugging
     Serial.begin(115200);
 
     Esp32Now::init(DONGLE_ADDRESS, OnDataRecv);
 
+    // Set up serial connection for sending RX messages to Teensy
     Serial1.begin(115200, SERIAL_8N1, 4, 14);
 }
 
 void loop() 
 {
+    // Request state-message bytes from Teensy
     const auto bytesReceived = Wire.requestFrom(
             hf::I2C_DEV_ADDR, 
             hf::Msp::STATE_MESSAGE_SIZE);
 
+    // Once state-message bytes are avaialble
     if (bytesReceived == hf::Msp::STATE_MESSAGE_SIZE) {
 
+        // Read the message bytes from the Teensy
         uint8_t msg[bytesReceived] = {};
-
         Wire.readBytes(msg, bytesReceived);
 
+        // Send the message bytes to the dongle
         const auto result = esp_now_send(DONGLE_ADDRESS, msg, hf::Msp::STATE_MESSAGE_SIZE);
-
         if (result != ESP_OK) {
             Serial.printf("Error sending the data\n");
         }
     }
 
+    // Wait a little to avoid overwhelming the dongle with messages
     delay(1000/UPDATE_FREQ);
 }
 
