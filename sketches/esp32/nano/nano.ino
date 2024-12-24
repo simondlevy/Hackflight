@@ -20,9 +20,10 @@
  */
 
 #include <Wire.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
 #include <hackflight.hpp>
-#include <esp32.hpp>
 #include <msp.hpp>
 #include <i2c_comms.h>
 
@@ -41,6 +42,14 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
     }
 }
 
+static void reportForever(const char * funname)
+{
+    while (true) {
+        Serial.printf("Nano: esp_now_%s() failed\n", funname);
+        delay(500);
+    }
+}
+
 void setup() 
 {
     // Act as an I^2C host device for Teensy
@@ -49,7 +58,22 @@ void setup()
     // Enable serial debugging
     Serial.begin(115200);
 
-    Esp32Now::init(DONGLE_ADDRESS, OnDataRecv);
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+        reportForever("init");
+    }
+
+    esp_now_peer_info_t peerInfo = {};
+    memcpy(peerInfo.peer_addr, DONGLE_ADDRESS, 6);
+    peerInfo.channel = 0;  
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        reportForever("add_pier");
+    }
+
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
     // Set up serial connection for sending RX messages to Teensy
     Serial1.begin(115200, SERIAL_8N1, 4, 14);

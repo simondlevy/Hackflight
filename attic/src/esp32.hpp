@@ -20,8 +20,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <esp_now.h>
-#include <WiFi.h>
 
 class Esp32Now {
 
