@@ -29,7 +29,6 @@
 #include <i2c_comms.h>
 
 static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
-//static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x97, 0x90};
 
 static const uint32_t UPDATE_FREQ = 50;
 
@@ -58,8 +57,6 @@ void setup()
 
 void loop() 
 {
-    static bool _lost_wifi;
-
     const auto bytesReceived = Wire.requestFrom(
             hf::I2C_DEV_ADDR, 
             hf::Msp::STATE_MESSAGE_SIZE);
@@ -74,10 +71,6 @@ void loop()
 
         if (result != ESP_OK) {
             Serial.printf("Error sending the data\n");
-        }
-        else {
-            static uint32_t _count;
-            Serial.printf("%ld\n", _count++);
         }
     }
 
