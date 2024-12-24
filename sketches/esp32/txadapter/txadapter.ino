@@ -22,34 +22,12 @@
 #include <sbus.h>
 
 // ESP-NOW support
-#include <esp_now.h>
-#include <WiFi.h>
+#include <espnow_utils.hpp>
 
 static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0xD4, 0x40};
 
 // Support for SBUS from FrSky transmitter
 static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);
-
-static void reportForever(const char * funname)
-{
-    while (true) {
-        Serial.printf("Nano: esp_now_%s() failed\n", funname);
-        delay(500);
-    }
-}
-
-static void addEspNowPeer(const uint8_t addr[6])
-{
-    esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, addr, 6);
-    peerInfo.channel = 0;  
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        reportForever("add_pier");
-    }
-}
-
 
 void setup()
 {
@@ -59,13 +37,9 @@ void setup()
     // Start incoming SBUS connection from TX
     _sbus.Begin();
 
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-        reportForever("init");
-    }
-
-    addEspNowPeer(RX_ADDRESS);
+    // Start ESP now comms and add receiver as peer
+    hf::EspNowUtils::init();
+    hf::EspNowUtils::addPeer(RX_ADDRESS);
 }
 
 void loop()

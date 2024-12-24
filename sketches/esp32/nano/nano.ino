@@ -20,10 +20,9 @@
  */
 
 #include <Wire.h>
-#include <esp_now.h>
-#include <WiFi.h>
 
 #include <hackflight.hpp>
+#include <espnow_utils.hpp>
 #include <msp.hpp>
 #include <i2c_comms.h>
 
@@ -47,26 +46,6 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
     }
 }
 
-static void reportForever(const char * funname)
-{
-    while (true) {
-        Serial.printf("Nano: esp_now_%s() failed\n", funname);
-        delay(500);
-    }
-}
-
-static void addEspNowPeer(const uint8_t addr[6])
-{
-    esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, addr, 6);
-    peerInfo.channel = 0;  
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        reportForever("add_pier");
-    }
-}
-
 void setup() 
 {
     // Act as an I^2C host device for Teensy
@@ -75,14 +54,11 @@ void setup()
     // Enable serial debugging
     Serial.begin(115200);
 
-    WiFi.mode(WIFI_STA);
+    hf::EspNowUtils::init();
 
-    if (esp_now_init() != ESP_OK) {
-        reportForever("init");
-    }
+    hf::EspNowUtils::addPeer(DONGLE_ADDRESS);
 
-    addEspNowPeer(DONGLE_ADDRESS);
-    addEspNowPeer(TX_ADDRESS);
+    hf::EspNowUtils::addPeer(TX_ADDRESS);
 
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
