@@ -206,7 +206,20 @@ void loop()
     // Read receiver
     readReceiver(_channels, _gotFailsafe);
 
-    printf("%d\n", _channels[0]);
+    // Disarm immiedately on failsafe
+    if (_gotFailsafe) {
+        _isArmed = false;
+    }
+
+    printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n",
+            _channels(0), _channels(1), _channels(2), _channels(3), _channels(4), _channels(5));
+
+
+    // Arm vehicle if safe
+    //if (!_gotFailsafe && (_channels[4] > 1500) && (_channels[0] < 1050)) {
+    //    _isArmed = true;
+    //}
+
 
     // Run PID controllers
     //const auto resetPids = demands.thrust < THROTTLE_DOWN;
