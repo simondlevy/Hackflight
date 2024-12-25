@@ -17,5 +17,5 @@ void loop()
 
     _rx.read(chan, failsafe);
 
-    printf("%ld\n", chan[0]);
+    printf("%d\n", chan[0]);
 }

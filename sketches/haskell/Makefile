@@ -4,12 +4,12 @@ FQBN = teensy:avr:teensy40
 
 PORT = /dev/ttyACM0
 
-HASKDIR = ../../../haskell
+HASKDIR = ../../haskell
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
 build: $(SKETCH).ino copilot_core.cpp
-	arduino-cli compile --libraries $(LIBS) --libraries ../../.. --fqbn $(FQBN) $(SKETCH).ino
+	arduino-cli compile --libraries $(LIBS) --libraries ../.. --fqbn $(FQBN) $(SKETCH).ino
 
 copilot_core.cpp : CoreTask.hs $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids CoreTask.hs
