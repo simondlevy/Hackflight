@@ -132,12 +132,6 @@ namespace hf {
 
         public:
     
-            static const uint8_t STATE_MESSAGE_SIZE = 46;
-
-            enum {
-                MSG_STATE = 121
-            };
-
             uint8_t payload[BUF_SIZE];
             uint8_t payloadSize;
 

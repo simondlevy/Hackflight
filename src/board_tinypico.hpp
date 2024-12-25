@@ -36,6 +36,8 @@
 #include <timer.hpp>
 #include <estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
+#include <espnow_utils.hpp>
+#include <msp.hpp>
 
 #include <sbus.h>
 
@@ -79,7 +81,15 @@ namespace hf {
             static constexpr float GYRO_ERROR_Z = 0.0;
             MPU6050 _mpu6050;
 
-            // Control axis prescaling ---------------------------------------
+            // Telemetry -----------------------------------------------------
+            static constexpr float TELEMETRY_RATE_HZ = 60;
+            static constexpr uint8_t DONGLE_ADDRESS[6] = {
+                0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
+            };
+            Timer _telemetryTimer;
+            Msp _msp;
+
+            // Prescaling for controx axes ------------------------------------
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
             static constexpr float YAW_PRESCALE = 160.0;     
 
@@ -227,8 +237,16 @@ namespace hf {
 
             void init() 
             {
+                // Start serial debugging
                 Serial.begin(115200);
 
+                // Start ESP-NOW
+                EspNowUtils::init();
+
+                // Add the telemetry dongle as a perr
+                EspNowUtils::addPeer(DONGLE_ADDRESS);
+
+                // Start I^2
                 Wire.begin();
 
                 // Note this is 2.5 times the spec sheet 400 kHz max...
@@ -339,13 +357,9 @@ namespace hf {
                     mapchan(_channels[3], -1,  +1) * YAW_PRESCALE
                 };
 
+                // Debug periodically as needed
                 if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
 
-                    printf("t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n",
-                            demands.thrust,
-                            demands.roll,
-                            demands.pitch,
-                            demands.yaw);
                 }
 
                 // Run closed-loop control
@@ -377,6 +391,22 @@ namespace hf {
                     blinkLed(usec_curr, _gotFailsafe);
                 }
 
+                // Runn telemetry
+                if (_telemetryTimer.isReady(usec_curr, TELEMETRY_RATE_HZ)) {
+
+                    const float vals[10] = {
+                        _state.dx, _state.dy, _state.z, _state.dz, _state.phi,
+                        _state.dphi, _state.theta, _state.dtheta, _state.psi,
+                        _state.dpsi
+                    };
+
+                    _msp.serializeFloats(121, vals, 10);
+
+                    EspNowUtils::sendToPeer(
+                            DONGLE_ADDRESS, _msp.payload, _msp.payloadSize,
+                            "fc", "dongle");
+                }
+ 
                 // Run dRehmFlight loop delay
                 runLoopDelay(usec_curr);
             }

@@ -47,6 +47,18 @@ namespace hf {
                 }
             }
 
+            static void sendToPeer(
+                    const uint8_t address[6], 
+                    const uint8_t * data,
+                    const size_t len,
+                    const char * src,
+                    const char * dst)
+            {
+                if (esp_now_send(address, data, len) != ESP_OK) {
+                    printf("ESP32-NOW: error sending data from %s to %s\n", src, dst);
+                }
+            }
+
         private:
 
             static void reportForever(const char * funname)

@@ -38,7 +38,6 @@ void setup()
     // Start ESP-NOW
     hf::EspNowUtils::init();
 
-
     // Once ESPNow is successfully Init, we will register for recv CB to
     // get recv packer info
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));

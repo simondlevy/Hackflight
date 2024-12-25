@@ -55,9 +55,6 @@ def main():
 
     msp = MyMspParser()
 
-    print('Waiting for vehicle to connect ...', end='')
-    stdout.flush()
-
     while True:
 
         try:
