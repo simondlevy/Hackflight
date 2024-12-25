@@ -1,4 +1,4 @@
-SKETCH = new
+SKETCH = teensy
 
 FQBN = teensy:avr:teensy40
 

@@ -66,6 +66,7 @@ void setup()
 
 void loop() 
 {
+    /*
     // Request state-message bytes from Teensy
     const auto bytesReceived = Wire.requestFrom(
             hf::I2C_DEV_ADDR, 
@@ -83,6 +84,10 @@ void loop()
         if (result != ESP_OK) {
             Serial.printf("Error sending the data\n");
         }
+    }*/
+
+    while (Serial1.available()) {
+        Serial.print(Serial1.read());
     }
 
     // Wait a little to avoid overwhelming the dongle with messages
