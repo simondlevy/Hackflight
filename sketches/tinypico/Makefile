@@ -1,17 +1,19 @@
-SKETCH = tx
+SKETCH = tinypico
 
-# For complete list run arduino-cli board listall
-FQBN = esp32:esp32:um_tinypico
+FQBN =esp32:esp32:um_tinypico
 
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyACM0
 
-LIBS = $(HOME)/Documents/Arduino/libraries 
+LIBS = $(HOME)/Documents/Arduino/libraries
 
 build: $(SKETCH).ino
 	arduino-cli compile --libraries $(LIBS) --libraries ../.. --fqbn $(FQBN) $(SKETCH).ino
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
+
+clean:
+	rm -rf obj
 
 edit:
 	vim $(SKETCH).ino

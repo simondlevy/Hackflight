@@ -24,7 +24,6 @@
 // Standard Arduino libraries
 #include <Wire.h>
 #include <SPI.h>
-#include <SD.h>
 
 // Third-party libraries
 #include <MPU6050.h>
