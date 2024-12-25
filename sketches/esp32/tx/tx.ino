@@ -28,7 +28,8 @@
 #include <msp.hpp>
 
 // Address of TinyPICO Nano receiver 
-static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0xD4, 0x40};
+//static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0xD4, 0x40};
+static uint8_t RX_ADDRESS[] = {0xDC, 0x54, 0x75, 0xCA, 0xFE, 0x3C};
 
 // Support for SBUS from FrSky transmitter
 static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);
@@ -65,7 +66,7 @@ void loop()
         _msp.serializeShorts(200, data.ch, 6);
 
         // Send the message bytes to the receiver
-        const auto result = esp_now_send(RX_ADDRESS, _msp.payload, 12);
+        const auto result = esp_now_send(RX_ADDRESS, _msp.payload, _msp.payloadSize);
         if (result != ESP_OK) {
             Serial.printf("txadapter: error sending the data\n");
         }

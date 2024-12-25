@@ -29,6 +29,9 @@
 static uint8_t TX_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4};
 static uint8_t DONGLE_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4};
 
+static uint8_t RX_PIN = 6; // unused
+static uint8_t TX_PIN = 7;
+
 static const uint32_t UPDATE_FREQ = 50;
 
 // Callback for data received from transmitter
@@ -45,16 +48,20 @@ void setup()
     // Enable serial debugging
     Serial.begin(115200);
 
+    // Start ESP-NOW
     hf::EspNowUtils::init();
 
+    // Add the telemetry dongle as a perr
     hf::EspNowUtils::addPeer(DONGLE_ADDRESS);
 
+    // Add the transmitter as a peer
     hf::EspNowUtils::addPeer(TX_ADDRESS);
 
+    // Set up to receive messages from the transmitter
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 
     // Set up serial connection for sending RX messages to Teensy
-    Serial1.begin(115200, SERIAL_8N1, 4, 14);
+    Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
 }
 
 void loop() 

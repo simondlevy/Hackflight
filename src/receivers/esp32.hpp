@@ -30,7 +30,7 @@ namespace hf {
 
             void begin()
             {
-                Serial2.begin(115200);
+                Serial1.begin(115200);
             }
 
             void read(uint16_t channels[6], bool & gotFailsafe) 
@@ -39,9 +39,9 @@ namespace hf {
 
                 static uint32_t _last_received_msec;
 
-                while (Serial2.available() > 0) {
+                while (Serial1.available() > 0) {
 
-                    const auto msgtype = _msp.parse(Serial2.read());
+                    const auto msgtype = _msp.parse(Serial1.read());
 
                     if (msgtype == 200) { // SET_RC message
 
@@ -57,24 +57,27 @@ namespace hf {
                 }
 
                 if ((millis() - _last_received_msec) > RX_TIMEOUT_MSEC) {
-                    gotFailsafe = true;
+                    //gotFailsafe = true;
                 }
-
 
                 if (gotFailsafe) {
                     printf("FAILSAFE!!!\n");
                 }
-                else {
-                    printf("c1=%04d c2=%04d c3=%04d c=%04d c5=%04d c6=%04d\n", 
-                            channels[0], channels[1], channels[2],
-                            channels[3], channels[4], channels[5]);
-                }
             }
 
-            float map(const uint16_t val, const float min, const float max)
+            // These values are based on the SBUS protcol
+
+            uint16_t minval() 
             {
-                return 0; // XXX
+                return 172;
             }
+
+            uint16_t maxval() 
+            {
+                return 1811;
+            }
+
+ 
 
         private:
 
