@@ -41,6 +41,8 @@ static hf::MadgwickFilter _madgwick;
 // Blinkenlights -------------------------------------------------------------
 #include <TinyPICO.h>
 static TinyPICO _tinypico;
+static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
+static const uint32_t LED_NORMAL_COLOR = 0x00FF00;
 static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
 static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 
@@ -111,6 +113,8 @@ static void blinkLed(const uint32_t usec_curr, const bool gotFailsafe)
         FAILSAFE_BLINK_RATE_HZ :
         HEARTBEAT_BLINK_RATE_HZ;
 
+    const auto color = gotFailsafe ? LED_FAILSAFE_COLOR : LED_NORMAL_COLOR;
+
     static uint32_t _usec_prev;
 
     static uint32_t _delay_usec;
@@ -121,7 +125,7 @@ static void blinkLed(const uint32_t usec_curr, const bool gotFailsafe)
 
         _usec_prev = usec_curr;
 
-        _tinypico.DotStar_SetPixelColor(_alternate ? 0xFF0000 : 0x000000);
+        _tinypico.DotStar_SetPixelColor(_alternate ? color : 0x000000);
 
         if (_alternate) {
             _alternate = false;
@@ -143,8 +147,6 @@ void setup()
     Serial.begin(115200);
 
     Wire.begin();
-
-    _tinypico.DotStar_SetPixelColor(255, 0, 0);
 
     // Note this is 2.5 times the spec sheet 400 kHz max...
     Wire.setClock(1000000); 
