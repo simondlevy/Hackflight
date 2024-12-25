@@ -22,14 +22,13 @@
 #include <sbus.h>
 
 // ESP-NOW support
-#include <espnow_utils.hpp>
+#include <espnow_helper.hpp>
 
 // MSP support
 #include <msp.hpp>
 
-// Address of TinyPICO Nano receiver 
-//static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0xD4, 0x40};
-static uint8_t RX_ADDRESS[] = {0xDC, 0x54, 0x75, 0xCA, 0xFE, 0x3C};
+// Address of TinyPICO flight controller
+static uint8_t FC_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x84, 0xDC, 0xB4};
 
 // Support for SBUS from FrSky transmitter
 static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);
@@ -46,10 +45,10 @@ void setup()
     _sbus.Begin();
 
     // Start ESP now comms
-    hf::EspNowUtils::init();
+    hf::EspNowHelper::init();
 
     // Add receiver as peer
-    hf::EspNowUtils::addPeer(RX_ADDRESS);
+    hf::EspNowHelper::addPeer(FC_ADDRESS);
 }
 
 void loop()
@@ -58,18 +57,16 @@ void loop()
 
         const auto data = _sbus.data();
 
+        /*
         Serial.printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
                 data.ch[0], data.ch[1], data.ch[2],
-                data.ch[3], data.ch[4], data.ch[5]);
+                data.ch[3], data.ch[4], data.ch[5]);*/
 
         // Create an MSP message from the channel values
         _msp.serializeShorts(200, data.ch, 6);
 
         // Send the message bytes to the receiver
-        const auto result = esp_now_send(RX_ADDRESS, _msp.payload, _msp.payloadSize);
-        if (result != ESP_OK) {
-            Serial.printf("txadapter: error sending the data\n");
-        }
-
+        hf::EspNowHelper::sendToPeer(
+                FC_ADDRESS, _msp.payload, _msp.payloadSize, "tx", "fc");
     }
 }

@@ -36,7 +36,7 @@
 #include <timer.hpp>
 #include <estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <espnow_utils.hpp>
+#include <espnow_helper.hpp>
 #include <msp.hpp>
 
 #include <sbus.h>
@@ -81,9 +81,14 @@ namespace hf {
             static constexpr float GYRO_ERROR_Z = 0.0;
             MPU6050 _mpu6050;
 
+            // -----------------------------------------------------
+            static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
+                0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
+            };
+
             // Telemetry -----------------------------------------------------
             static constexpr float TELEMETRY_RATE_HZ = 60;
-            static constexpr uint8_t DONGLE_ADDRESS[6] = {
+            static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
                 0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
             };
             Timer _telemetryTimer;
@@ -233,6 +238,13 @@ namespace hf {
 
             }
 
+            static void on_espnow_data_receive(
+                    const uint8_t * mac, const uint8_t * data, int len)
+            {
+                (void)mac;
+
+            }
+
         public: // -----------------------------------------------------------
 
             void init() 
@@ -241,10 +253,17 @@ namespace hf {
                 Serial.begin(115200);
 
                 // Start ESP-NOW
-                EspNowUtils::init();
+                EspNowHelper::init();
 
-                // Add the telemetry dongle as a perr
-                EspNowUtils::addPeer(DONGLE_ADDRESS);
+                // Add the telemetry dongle as a peer
+                EspNowHelper::addPeer(TELEMETRY_DONGLE_ADDRESS);
+
+                // Add the transmitter as a peer
+                EspNowHelper::addPeer(TRANSMITTER_ADDRESS);
+
+                // Register an ESP-NOW callback for data sent by the
+                // transmitter
+                esp_now_register_recv_cb(esp_now_recv_cb_t(on_espnow_data_receive));
 
                 // Start I^2
                 Wire.begin();
@@ -402,9 +421,11 @@ namespace hf {
 
                     _msp.serializeFloats(121, vals, 10);
 
-                    EspNowUtils::sendToPeer(
-                            DONGLE_ADDRESS, _msp.payload, _msp.payloadSize,
-                            "fc", "dongle");
+                    EspNowHelper::sendToPeer(
+                            TELEMETRY_DONGLE_ADDRESS,
+                            _msp.payload,_msp.payloadSize,
+                            "fc",
+                            "dongle");
                 }
  
                 // Run dRehmFlight loop delay

@@ -22,7 +22,7 @@
 #include <Wire.h>
 
 #include <hackflight.hpp>
-#include <espnow_utils.hpp>
+#include <espnow_helper.hpp>
 #include <msp.hpp>
 #include <i2c_comms.h>
 
@@ -49,13 +49,13 @@ void setup()
     Serial.begin(115200);
 
     // Start ESP-NOW
-    hf::EspNowUtils::init();
+    hf::EspNowHelper::init();
 
     // Add the telemetry dongle as a perr
-    hf::EspNowUtils::addPeer(DONGLE_ADDRESS);
+    hf::EspNowHelper::addPeer(DONGLE_ADDRESS);
 
     // Add the transmitter as a peer
-    hf::EspNowUtils::addPeer(TX_ADDRESS);
+    hf::EspNowHelper::addPeer(TX_ADDRESS);
 
     // Set up to receive messages from the transmitter
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));

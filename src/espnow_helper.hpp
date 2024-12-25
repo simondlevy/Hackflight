@@ -21,7 +21,7 @@
 
 namespace hf {
 
-    class EspNowUtils {
+    class EspNowHelper {
 
         public:
 

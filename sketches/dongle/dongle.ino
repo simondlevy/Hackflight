@@ -19,7 +19,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <espnow_utils.hpp>
+#include <espnow_helper.hpp>
 
 void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {
@@ -36,7 +36,7 @@ void setup()
     Serial.begin(115200);
 
     // Start ESP-NOW
-    hf::EspNowUtils::init();
+    hf::EspNowHelper::init();
 
     // Once ESPNow is successfully Init, we will register for recv CB to
     // get recv packer info
