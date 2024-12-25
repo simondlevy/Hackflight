@@ -57,7 +57,8 @@ namespace hf {
             TinyPICO _tinypico;
 
             // Motors --------------------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 23, 26, 7, 15 };
+            const std::vector<uint8_t> MOTOR_PINS = { 23, 26, 27, 15 };
+            OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
             // Receiver ------------------------------------------------------------------
@@ -78,20 +79,17 @@ namespace hf {
             static constexpr float GYRO_ERROR_Z = 0.0;
             MPU6050 _mpu6050;
 
-            // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
-            // deg/sec for rate mode
+            // Control axis prescaling ---------------------------------------
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
-
-            // Max yaw rate in deg/sec
             static constexpr float YAW_PRESCALE = 160.0;     
 
-            // Debugging
+            // Debugging -----------------------------------------------------
             static constexpr float DEBUG_RATE_HZ = 100;
 
-            // FAFO -----------------------------------------------------------
+            // FAFO ----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            // Helpers --------------------------------------------------------------------
+            // Helpers -------------------------------------------------------
 
             static void reportForever(const char * message)
             {
@@ -191,8 +189,41 @@ namespace hf {
                     (1811 - (float)172) * (newmax - newmin);
             }
 
+            void runMotors() 
+            {
+                _motors.set(0, _m1_usec);
+                _motors.set(1, _m2_usec);
+                _motors.set(2, _m3_usec);
+                _motors.set(3, _m4_usec);
 
-        public:
+                _motors.run();
+            }
+
+            void cutMotors(const uint32_t chan_5, bool & isArmed) 
+            {
+                if (chan_5 < 1500 || !isArmed) {
+                    isArmed = false;
+                    _m1_usec = 120;
+                    _m2_usec = 120;
+                    _m3_usec = 120;
+                    _m4_usec = 120;
+
+                }
+            }
+
+            static void armMotor(uint8_t & m_usec)
+            {
+                // OneShot125 range from 125 to 250 usec
+                m_usec = 125;
+            }
+
+            static uint8_t scaleMotor(const float mval)
+            {
+                return Utils::u8constrain(mval*125 + 125, 125, 250);
+
+            }
+
+        public: // -----------------------------------------------------------
 
             void init() 
             {
@@ -203,6 +234,7 @@ namespace hf {
                 // Note this is 2.5 times the spec sheet 400 kHz max...
                 Wire.setClock(1000000); 
 
+                // Start the IMU
                 _mpu6050.initialize();
 
                 if (!_mpu6050.testConnection()) {
@@ -215,10 +247,18 @@ namespace hf {
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 
+                // Start the receiver
                 _rx.Begin();
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
+
+                // Arm motors
+                armMotor(_m4_usec);
+                armMotor(_m2_usec);
+                armMotor(_m1_usec);
+                armMotor(_m3_usec);
+                _motors.arm();
             }
 
             void step(Control * control) 
@@ -315,6 +355,18 @@ namespace hf {
                 float motors[4] = {};
                 _mixer.run(demands, motors);
 
+                // Rescale motor values for OneShot125
+                _m1_usec = scaleMotor(motors[0]);
+                _m2_usec = scaleMotor(motors[1]);
+                _m3_usec = scaleMotor(motors[2]);
+                _m4_usec = scaleMotor(motors[3]);
+
+                // Turn off motors under various conditions
+                cutMotors(_channels[4], _isArmed); 
+
+                // Run motors
+                runMotors(); 
+
                 // LED should be on when armed
                 if (_isArmed) {
                     _tinypico.DotStar_SetPixelColor(LED_ARMED_COLOR);
@@ -325,6 +377,7 @@ namespace hf {
                     blinkLed(usec_curr, _gotFailsafe);
                 }
 
+                // Run dRehmFlight loop delay
                 runLoopDelay(usec_curr);
             }
 
