@@ -1,6 +1,8 @@
 /*
    Copyright (C) 2024 Simon D. Levy
 
+   Based in part on https://github.com/nickrehm/dRehmFlight
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, in version 3.
@@ -29,6 +31,7 @@
 
 // Hackflight library
 #include <hackflight.hpp>
+#include <control.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
 #include <estimators/madgwick.hpp>
@@ -43,7 +46,7 @@ namespace hf {
         private:
 
             // Sensor fusion -------------------------------------------------------------
-            hf::MadgwickFilter _madgwick;
+            MadgwickFilter _madgwick;
 
             // Blinkenlights -------------------------------------------------------------
             static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
@@ -75,8 +78,12 @@ namespace hf {
             static constexpr float GYRO_ERROR_Z = 0.0;
             MPU6050 _mpu6050;
 
-            // Mixing
-            hf::BfQuadXMixer _mixer;
+            // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
+            // deg/sec for rate mode
+            static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
+
+            // Max yaw rate in deg/sec
+            static constexpr float YAW_PRESCALE = 160.0;     
 
             // Debugging
             static constexpr float DEBUG_RATE_HZ = 100;
@@ -153,6 +160,38 @@ namespace hf {
                 }
             }
 
+            void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
+            {
+                if (_rx.Read()) {
+
+                    const auto data = _rx.data();
+
+                    if (data.failsafe) {
+
+                        gotFailsafe = true;
+                    }
+
+                    else {
+                        channels[0] = data.ch[0];
+                        channels[1] = data.ch[1];
+                        channels[2] = data.ch[2];
+                        channels[3] = data.ch[3];
+                        channels[4] = data.ch[4];
+                        channels[5] = data.ch[5];
+                    }
+                }
+            }
+
+            static float mapchan(
+                    const uint16_t rawval,
+                    const float newmin,
+                    const float newmax)
+            {
+                return newmin + (rawval - (float)172) / 
+                    (1811 - (float)172) * (newmax - newmin);
+            }
+
+
         public:
 
             void init() 
@@ -182,35 +221,15 @@ namespace hf {
                 _madgwick.initialize();
             }
 
-            void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
-            {
-                if (_rx.Read()) {
-
-                    const auto data = _rx.data();
-
-                    if (data.failsafe) {
-
-                        gotFailsafe = true;
-                    }
-
-                    else {
-                        channels[0] = data.ch[0];
-                        channels[1] = data.ch[1];
-                        channels[2] = data.ch[2];
-                        channels[3] = data.ch[3];
-                        channels[4] = data.ch[4];
-                        channels[5] = data.ch[5];
-                    }
-                }
-            }
-
-            void step() 
+            void step(Control * control) 
             {
                 static uint16_t _channels[6];
                 static bool _isArmed;
                 static bool _gotFailsafe;
                 static uint32_t _usec_prev;
-                static hf::Timer _debugTimer;
+                static Timer _debugTimer;
+                static BfQuadXMixer _mixer;
+                static state_t _state;
 
                 const auto usec_curr = micros();      
 
@@ -225,7 +244,6 @@ namespace hf {
                 if (_gotFailsafe) {
                     _isArmed = false;
                 }
-
 
                 // Arm vehicle if safe
                 if (!_gotFailsafe &&
@@ -243,14 +261,14 @@ namespace hf {
                 _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
                 // Accelerometer Gs
-                const hf::axis3_t accel = {
+                const axis3_t accel = {
                     -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
                     ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
                     az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
                 };
 
                 // Gyro deg /sec
-                const hf::axis3_t gyro = {
+                const axis3_t gyro = {
                     gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
                     -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
@@ -258,28 +276,44 @@ namespace hf {
 
                 // Run Madgwick filter to get get Euler angles from IMU values
                 // (note negations)
-                hf::axis4_t quat = {};
+                axis4_t quat = {};
                 _madgwick.getQuaternion(dt, gyro, accel, quat);
 
                 // Compute Euler angles from quaternion
-                hf::axis3_t angles = {};
-                hf::Utils::quat2euler(quat, angles);
+                axis3_t angles = {};
+                Utils::quat2euler(quat, angles);
+
+                // Populate vehicle state with Euler angles and gyro values
+                _state.phi = angles.x;
+                _state.theta = angles.y;
+                _state.psi = angles.z;
+                _state.dphi = gyro.x;
+                _state.dtheta = -gyro.y;
+                _state.dpsi = gyro.z;
+
+                // Convert stick demands to appropriate intervals
+                demands_t demands = {
+                    mapchan(_channels[0],  0.,  1.),
+                    mapchan(_channels[1], -1,  +1) * PITCH_ROLL_PRESCALE,
+                    mapchan(_channels[2], -1,  +1) * PITCH_ROLL_PRESCALE,
+                    mapchan(_channels[3], -1,  +1) * YAW_PRESCALE
+                };
 
                 if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
-                    /*
-                       printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n",
-                       _channels[0], _channels[1], _channels[2], _channels[3], _channels[4], _channels[5]); */
-                    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n", angles.x, angles.y, angles.z);
-                    //printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n", accel.x, accel.y, accel.z);
 
+                    printf("t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n",
+                            demands.thrust,
+                            demands.roll,
+                            demands.pitch,
+                            demands.yaw);
                 }
 
-                //state.phi = angles.x;
-                //state.theta = angles.y;
-                //state.psi = angles.z;
+                // Run closed-loop control
+                control->run(dt, _state, demands);
 
                 // Mix motors
-                //_mixer.run(demands, motors);
+                float motors[4] = {};
+                _mixer.run(demands, motors);
 
                 // LED should be on when armed
                 if (_isArmed) {
