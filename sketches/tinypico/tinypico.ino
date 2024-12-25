@@ -170,14 +170,43 @@ void setup()
     _madgwick.initialize();
 }
 
+static void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
+{
+    if (_rx.Read()) {
+
+        const auto data = _rx.data();
+
+        if (data.failsafe) {
+
+            gotFailsafe = true;
+        }
+
+        else {
+            channels[0] = data.ch[0];
+            channels[1] = data.ch[1];
+            channels[2] = data.ch[2];
+            channels[3] = data.ch[3];
+            channels[4] = data.ch[4];
+            channels[5] = data.ch[5];
+        }
+    }
+}
+
+
 // Loop ----------------------------------------------------------------------
 
 void loop() 
 {
+    static uint16_t _channels[6];
     static bool _isArmed;
     static bool _gotFailsafe;
 
     const auto usec_curr = micros();      
+
+    // Read receiver
+    readReceiver(_channels, _gotFailsafe);
+
+    printf("%d\n", _channels[0]);
 
     // Run PID controllers
     //const auto resetPids = demands.thrust < THROTTLE_DOWN;
