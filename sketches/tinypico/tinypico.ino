@@ -42,7 +42,8 @@ static hf::MadgwickFilter _madgwick;
 #include <TinyPICO.h>
 static TinyPICO _tinypico;
 static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
-static const uint32_t LED_NORMAL_COLOR = 0x00FF00;
+static const uint32_t LED_HEARTBEAT_COLOR = 0x00FF00;
+static const uint32_t LED_ARMED_COLOR = 0xFF0000;
 static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
 static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 
@@ -113,7 +114,7 @@ static void blinkLed(const uint32_t usec_curr, const bool gotFailsafe)
         FAILSAFE_BLINK_RATE_HZ :
         HEARTBEAT_BLINK_RATE_HZ;
 
-    const auto color = gotFailsafe ? LED_FAILSAFE_COLOR : LED_NORMAL_COLOR;
+    const auto color = gotFailsafe ? LED_FAILSAFE_COLOR : LED_HEARTBEAT_COLOR;
 
     static uint32_t _usec_prev;
 
@@ -190,7 +191,7 @@ void loop()
 
     // LED should be on when armed
     if (_isArmed) {
-        _tinypico.DotStar_SetBrightness(255);
+        _tinypico.DotStar_SetPixelColor(LED_ARMED_COLOR);
     }
 
     // Otherwise, blink LED as heartbeat or failsafe rate
