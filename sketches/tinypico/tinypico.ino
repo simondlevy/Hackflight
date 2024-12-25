@@ -64,11 +64,20 @@ static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
 static constexpr float GYRO_SCALE_FACTOR = 131.0;
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
+static constexpr float ACC_ERROR_X = 0.0;
+static constexpr float ACC_ERROR_Y = 0.0;
+static constexpr float ACC_ERROR_Z = 0.0;
+static constexpr float GYRO_ERROR_X = 0.0;
+static constexpr float GYRO_ERROR_Y= 0.0;
+static constexpr float GYRO_ERROR_Z = 0.0;
 static MPU6050 _mpu6050;
 
 // Mixing
 #include <mixers/bfquadx.hpp>
 static hf::BfQuadXMixer _mixer;
+
+// Debugging
+static constexpr float DEBUG_RATE_HZ = 100;
 
 // FAFO -----------------------------------------------------------
 static const uint32_t LOOP_FREQ_HZ = 2000;
@@ -202,8 +211,14 @@ void loop()
     static uint16_t _channels[6];
     static bool _isArmed;
     static bool _gotFailsafe;
+    static uint32_t _usec_prev;
+    static hf::Timer _debugTimer;
 
     const auto usec_curr = micros();      
+
+    const float dt = (usec_curr - _usec_prev)/1000000.0;
+
+    _usec_prev = usec_curr;
 
     // Read receiver
     readReceiver(_channels, _gotFailsafe);
@@ -212,9 +227,6 @@ void loop()
     if (_gotFailsafe) {
         _isArmed = false;
     }
-
-    printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n",
-            _channels[0], _channels[1], _channels[2], _channels[3], _channels[4], _channels[5]);
 
 
     // Arm vehicle if safe
@@ -227,6 +239,47 @@ void loop()
     if (_channels[4] < CHAN5_ARM_MIN) {
         _isArmed = false;
     }
+
+    // Read IMU
+    int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+    _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+    // Accelerometer Gs
+    const hf::axis3_t accel = {
+        -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
+        ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
+        az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+    };
+
+    // Gyro deg /sec
+    const hf::axis3_t gyro = {
+        gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
+        -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
+        -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
+    };
+
+    // Run Madgwick filter to get get Euler angles from IMU values
+    // (note negations)
+    hf::axis4_t quat = {};
+    _madgwick.getQuaternion(dt, gyro, accel, quat);
+
+    // Compute Euler angles from quaternion
+    hf::axis3_t angles = {};
+    hf::Utils::quat2euler(quat, angles);
+
+    if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
+        /*
+           printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n",
+           _channels[0], _channels[1], _channels[2], _channels[3], _channels[4], _channels[5]); */
+        printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n", angles.x, angles.y, angles.z);
+        //printf("ax=%+3.3f  ay=%+3.3f  az=%+3.3f\n", accel.x, accel.y, accel.z);
+
+    }
+
+
+    //state.phi = angles.x;
+    //state.theta = angles.y;
+    //state.psi = angles.z;
 
     // Run PID controllers
     //const auto resetPids = demands.thrust < THROTTLE_DOWN;
