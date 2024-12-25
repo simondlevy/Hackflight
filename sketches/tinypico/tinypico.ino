@@ -55,6 +55,8 @@ static uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 // Receiver ------------------------------------------------------------------
 #include <sbus.h>
 static bfs::SbusRx _rx = bfs::SbusRx(&Serial1, 4, 14, true);
+static const uint16_t CHAN5_ARM_MIN = 1000;
+static const uint16_t CHAN1_ARM_MAX = 180;
 
 // IMU -----------------------------------------------------------------------
 #include <MPU6050.h>
@@ -212,14 +214,19 @@ void loop()
     }
 
     printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n",
-            _channels(0), _channels(1), _channels(2), _channels(3), _channels(4), _channels(5));
+            _channels[0], _channels[1], _channels[2], _channels[3], _channels[4], _channels[5]);
 
 
     // Arm vehicle if safe
-    //if (!_gotFailsafe && (_channels[4] > 1500) && (_channels[0] < 1050)) {
-    //    _isArmed = true;
-    //}
+    if (!_gotFailsafe &&
+            (_channels[4] > CHAN5_ARM_MIN) && (_channels[0] < CHAN1_ARM_MAX)) {
+        _isArmed = true;
+    }
 
+    // Disarm when requested
+    if (_channels[4] < CHAN5_ARM_MIN) {
+        _isArmed = false;
+    }
 
     // Run PID controllers
     //const auto resetPids = demands.thrust < THROTTLE_DOWN;
