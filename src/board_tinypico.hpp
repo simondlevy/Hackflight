@@ -65,6 +65,8 @@ namespace hf {
             // Receiver ------------------------------------------------------------------
             static const uint16_t CHAN5_ARM_MIN = 1000;
             static const uint16_t CHAN1_ARM_MAX = 180;
+            uint16_t _channels[6];
+            uint8_t _message[256];
 
             // IMU -----------------------------------------------------------------------
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -170,29 +172,6 @@ namespace hf {
                 }
             }
 
-            void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
-            {
-                /*
-                if (_rx.Read()) {
-
-                    const auto data = _rx.data();
-
-                    if (data.failsafe) {
-
-                        gotFailsafe = true;
-                    }
-
-                    else {
-                        channels[0] = data.ch[0];
-                        channels[1] = data.ch[1];
-                        channels[2] = data.ch[2];
-                        channels[3] = data.ch[3];
-                        channels[4] = data.ch[4];
-                        channels[5] = data.ch[5];
-                    }
-                }*/
-            }
-
             static float mapchan(
                     const uint16_t rawval,
                     const float newmin,
@@ -241,8 +220,6 @@ namespace hf {
             {
                 (void)mac;
             }
-
-            uint32_t _rx_count;
 
         public: // -----------------------------------------------------------
 
@@ -310,9 +287,6 @@ namespace hf {
 
                 _usec_prev = usec_curr;
 
-                // Read receiver
-                readReceiver(_channels, _gotFailsafe);
-
                 // Disarm immiedately on failsafe
                 if (_gotFailsafe) {
                     _isArmed = false;
@@ -374,7 +348,10 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
-                    printf("%d\n", _rx_count);
+                    for (uint8_t k=0; k<12; ++k) {
+                        printf("x%02x ", _message[k]);
+                    }
+                    printf("\n");
                 }
 
                 // Run closed-loop control
@@ -435,8 +412,10 @@ namespace hf {
                 static Msp _msp;
 
                 for (uint8_t k=0; k<len; ++k) {
-                    if (_msp.parse(data[k])) {
-                        _rx_count++;
+                    if (_msp.parse(data[k]) == 200) {
+                        for (uint8_t k=0; k<12; ++k) {
+                            _message[k] = _msp.payload[k];
+                        }
                     }
                 }
             }
