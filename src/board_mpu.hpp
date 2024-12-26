@@ -144,9 +144,8 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-                // Debug as needed
+                // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("%3.3f,%3.3f\n", _usec_curr / 1e6f, state.phi);
                 }
             }
 

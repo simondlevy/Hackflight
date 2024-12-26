@@ -46,9 +46,6 @@ namespace hf {
 
         private:
 
-            // Sensor fusion -------------------------------------------------------------
-            MadgwickFilter _madgwick;
-
             // Blinkenlights -------------------------------------------------------------
             static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
             static const uint32_t LED_HEARTBEAT_COLOR = 0x00FF00;
@@ -85,7 +82,7 @@ namespace hf {
                 0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
             };
 
-            // Telemetry -----------------------------------------------------
+            // Telemetry ------------------------------------------------------
             static constexpr float TELEMETRY_RATE_HZ = 60;
             static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
                 0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
@@ -102,7 +99,14 @@ namespace hf {
             // FAFO ----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            // Utils -------------------------------------------------------
+            // Failsafe -------------------------------------------------------
+            static const uint32_t FAILSAFE_TIMEOUT_USEC = 100000;
+            uint32_t _last_received_usec;
+
+            // Sensor fusion --------------------------------------------------
+            MadgwickFilter _madgwick;
+
+            // Utils ---------------------------------------------------------
 
             static void reportForever(const char * message)
             {
@@ -285,6 +289,11 @@ namespace hf {
 
                 _usec_prev = usec_curr;
 
+                // Check failsafe
+                if (usec_curr - _last_received_usec > FAILSAFE_TIMEOUT_USEC) {
+                    _gotFailsafe = true;
+                }
+
                 // Disarm immiedately on failsafe
                 if (_gotFailsafe) {
                     _isArmed = false;
@@ -346,11 +355,6 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
-
-                    printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n", 
-                            _channels[0], _channels[1], _channels[2],
-                            _channels[3], _channels[4], _channels[5]);
-
                 }
 
                 // Run closed-loop control
@@ -413,6 +417,8 @@ namespace hf {
                 for (uint8_t k=0; k<len; ++k) {
 
                     if (_msp.parse(data[k]) == 200) {
+
+                        _last_received_usec = micros();
 
                         readChannel(_msp, 0);
                         readChannel(_msp, 1);

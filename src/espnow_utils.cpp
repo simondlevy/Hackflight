@@ -1,5 +1,6 @@
 /*
-   ESP-NOW listener implementation
+   ESP-NOW listener implementation.  Allows us to hide the listener object from
+   the rest of the code.
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -15,6 +16,8 @@
    You should have received a copy of the GNU General Public License
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
+
+#if defined(ESP32)
 
 #include <hackflight.hpp>
 #include <espnow/listener.hpp>
@@ -33,3 +36,5 @@ void hf::EspNowUtils::set_listener_callback(hf::EspNowListener * listener)
 
     esp_now_register_recv_cb(esp_now_recv_cb_t(_callback));
 }
+
+#endif
