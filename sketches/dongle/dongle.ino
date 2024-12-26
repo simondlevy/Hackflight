@@ -20,7 +20,7 @@
  */
 
 #include <hackflight.hpp>
-#include <espnow/helper.hpp>
+#include <espnow/utils.hpp>
 
 void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {
@@ -37,7 +37,7 @@ void setup()
     Serial.begin(115200);
 
     // Start ESP-NOW
-    hf::EspNowHelper::init();
+    hf::EspNowUtils::init();
 
     // Once ESPNow is successfully Init, we will register for recv CB to
     // get recv packer info

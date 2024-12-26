@@ -16,12 +16,16 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <esp_now.h>
 #include <WiFi.h>
 
+#include <espnow/listener.hpp>
+
 namespace hf {
 
-    class EspNowHelper {
+    class EspNowUtils {
 
         public:
 
@@ -58,6 +62,8 @@ namespace hf {
                     printf("ESP32-NOW: error sending data from %s to %s\n", src, dst);
                 }
             }
+
+            static void set_listener_callback(hf::EspNowListener * listener);
 
         private:
 

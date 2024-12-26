@@ -36,14 +36,15 @@
 #include <timer.hpp>
 #include <estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <espnow/helper.hpp>
+#include <espnow/listener.hpp>
+#include <espnow/utils.hpp>
 #include <msp.hpp>
 
 #include <sbus.h>
 
 namespace hf {
 
-    class Board {
+    class Board : public EspNowListener {
 
         private:
 
@@ -104,7 +105,7 @@ namespace hf {
             // FAFO ----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            // Helpers -------------------------------------------------------
+            // Utilss -------------------------------------------------------
 
             static void reportForever(const char * message)
             {
@@ -244,6 +245,8 @@ namespace hf {
                 (void)mac;
             }
 
+            uint32_t _rx_count;
+
         public: // -----------------------------------------------------------
 
             void init() 
@@ -252,17 +255,17 @@ namespace hf {
                 Serial.begin(115200);
 
                 // Start ESP-NOW
-                EspNowHelper::init();
+                EspNowUtils::init();
 
                 // Add the telemetry dongle as a peer
-                EspNowHelper::addPeer(TELEMETRY_DONGLE_ADDRESS);
+                EspNowUtils::addPeer(TELEMETRY_DONGLE_ADDRESS);
 
                 // Add the transmitter as a peer
-                EspNowHelper::addPeer(TRANSMITTER_ADDRESS);
+                EspNowUtils::addPeer(TRANSMITTER_ADDRESS);
 
                 // Register an ESP-NOW callback for data sent by the
                 // transmitter
-                esp_now_register_recv_cb(esp_now_recv_cb_t(on_espnow_data_receive));
+                EspNowUtils::set_listener_callback(this);
 
                 // Start I^2
                 Wire.begin();
@@ -377,7 +380,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
-
+                    printf("%d\n", _rx_count);
                 }
 
                 // Run closed-loop control
@@ -420,7 +423,7 @@ namespace hf {
 
                     _msp.serializeFloats(121, vals, 10);
 
-                    EspNowHelper::sendToPeer(
+                    EspNowUtils::sendToPeer(
                             TELEMETRY_DONGLE_ADDRESS,
                             _msp.payload,_msp.payloadSize,
                             "fc",
@@ -429,6 +432,15 @@ namespace hf {
  
                 // Run dRehmFlight loop delay
                 runLoopDelay(usec_curr);
+            }
+
+            void espnow_listener_callback(const uint8_t * data, const uint8_t len)
+            {
+                for (uint8_t k=0; k<len; ++k) {
+                    //printf("x%02X\n", data[k]);
+                }
+
+                _rx_count++;
             }
 
     }; // class Board

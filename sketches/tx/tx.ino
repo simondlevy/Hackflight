@@ -23,7 +23,7 @@
 
 // ESP-NOW support
 #include <hackflight.hpp>
-#include <espnow/helper.hpp>
+#include <espnow/utils.hpp>
 
 // MSP support
 #include <msp.hpp>
@@ -46,10 +46,10 @@ void setup()
     _sbus.Begin();
 
     // Start ESP now comms
-    hf::EspNowHelper::init();
+    hf::EspNowUtils::init();
 
     // Add receiver as peer
-    hf::EspNowHelper::addPeer(FC_ADDRESS);
+    hf::EspNowUtils::addPeer(FC_ADDRESS);
 }
 
 void loop()
@@ -67,7 +67,7 @@ void loop()
         _msp.serializeShorts(200, data.ch, 6);
 
         // Send the message bytes to the receiver
-        hf::EspNowHelper::sendToPeer(
+        hf::EspNowUtils::sendToPeer(
                 FC_ADDRESS, _msp.payload, _msp.payloadSize, "tx", "fc");
     }
 }
