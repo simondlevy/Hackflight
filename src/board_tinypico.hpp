@@ -40,8 +40,6 @@
 #include <espnow/utils.hpp>
 #include <msp.hpp>
 
-#include <sbus.h>
-
 namespace hf {
 
     class Board : public EspNowListener {
@@ -67,7 +65,6 @@ namespace hf {
             // Receiver ------------------------------------------------------------------
             static const uint16_t CHAN5_ARM_MIN = 1000;
             static const uint16_t CHAN1_ARM_MAX = 180;
-            bfs::SbusRx _rx = bfs::SbusRx(&Serial1, 4, 14, true);
 
             // IMU -----------------------------------------------------------------------
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -176,6 +173,7 @@ namespace hf {
 
             void readReceiver(uint16_t channels[6], bool & gotFailsafe) 
             {
+                /*
                 if (_rx.Read()) {
 
                     const auto data = _rx.data();
@@ -193,7 +191,7 @@ namespace hf {
                         channels[4] = data.ch[4];
                         channels[5] = data.ch[5];
                     }
-                }
+                }*/
             }
 
             static float mapchan(
@@ -285,9 +283,6 @@ namespace hf {
                 // off.  All we need to do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-
-                // Start the receiver
-                _rx.Begin();
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
