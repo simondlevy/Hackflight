@@ -19,7 +19,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <espnow_helper.hpp>
+#include <hackflight.hpp>
+#include <espnow/helper.hpp>
 
 void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {

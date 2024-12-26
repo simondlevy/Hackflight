@@ -36,7 +36,7 @@
 #include <timer.hpp>
 #include <estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <espnow_helper.hpp>
+#include <espnow/helper.hpp>
 #include <msp.hpp>
 
 #include <sbus.h>
@@ -242,7 +242,6 @@ namespace hf {
                     const uint8_t * mac, const uint8_t * data, int len)
             {
                 (void)mac;
-
             }
 
         public: // -----------------------------------------------------------

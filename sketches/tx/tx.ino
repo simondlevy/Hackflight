@@ -22,7 +22,8 @@
 #include <sbus.h>
 
 // ESP-NOW support
-#include <espnow_helper.hpp>
+#include <hackflight.hpp>
+#include <espnow/helper.hpp>
 
 // MSP support
 #include <msp.hpp>

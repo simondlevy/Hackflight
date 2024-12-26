@@ -1,5 +1,5 @@
 /*
-   ESP-NOW uititlies
+   ESP-NOW helper class
 
    Copyright (C) 2024 Simon D. Levy
 
