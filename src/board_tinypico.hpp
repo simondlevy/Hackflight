@@ -100,7 +100,7 @@ namespace hf {
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
             // Failsafe -------------------------------------------------------
-            static const int32_t FAILSAFE_TIMEOUT_MSEC = 1000;
+            static const int32_t FAILSAFE_TIMEOUT_MSEC = 500;
             uint32_t _last_received_msec;
 
             // Sensor fusion --------------------------------------------------
