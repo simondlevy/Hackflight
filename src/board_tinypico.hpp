@@ -289,8 +289,8 @@ namespace hf {
 
                 _usec_prev = usec_curr;
 
-                const auto msec_curr = (int32_t)millis();
-                if (msec_curr - _last_received_msec > FAILSAFE_TIMEOUT_MSEC) {
+                if ((int32_t)millis() -_last_received_msec >
+                        FAILSAFE_TIMEOUT_MSEC) {
                     _gotFailsafe = true;
                 }
 
