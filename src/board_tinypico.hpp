@@ -432,11 +432,13 @@ namespace hf {
 
             void espnow_listener_callback(const uint8_t * data, const uint8_t len)
             {
-                for (uint8_t k=0; k<len; ++k) {
-                    //printf("x%02X\n", data[k]);
-                }
+                static Msp _msp;
 
-                _rx_count++;
+                for (uint8_t k=0; k<len; ++k) {
+                    if (_msp.parse(data[k])) {
+                        _rx_count++;
+                    }
+                }
             }
 
     }; // class Board
