@@ -2026,6 +2026,10 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <part name="VBAT" library="wirepad" deviceset="SMD2" device=""/>
 <part name="SBUS" library="wirepad" deviceset="SMD2" device=""/>
 <part name="PAD1" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD2" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD3" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD4" library="wirepad" deviceset="SMD2" device=""/>
+<part name="PAD5" library="wirepad" deviceset="SMD2" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2047,14 +2051,26 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <instance part="GND" gate="1" x="-60.96" y="73.66" smashed="yes">
 <attribute name="VALUE" x="-62.103" y="70.358" size="1.778" layer="96"/>
 </instance>
-<instance part="VBAT" gate="1" x="-60.96" y="63.5" smashed="yes">
+<instance part="VBAT" gate="1" x="-60.96" y="68.58" smashed="yes">
+<attribute name="VALUE" x="-62.103" y="65.278" size="1.778" layer="96"/>
+</instance>
+<instance part="SBUS" gate="1" x="-60.96" y="58.42" smashed="yes">
+<attribute name="VALUE" x="-62.103" y="55.118" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD1" gate="1" x="-60.96" y="63.5" smashed="yes">
 <attribute name="VALUE" x="-62.103" y="60.198" size="1.778" layer="96"/>
 </instance>
-<instance part="SBUS" gate="1" x="-60.96" y="50.8" smashed="yes">
-<attribute name="VALUE" x="-62.103" y="47.498" size="1.778" layer="96"/>
+<instance part="PAD2" gate="1" x="-60.96" y="78.74" smashed="yes">
+<attribute name="VALUE" x="-62.103" y="75.438" size="1.778" layer="96"/>
 </instance>
-<instance part="PAD1" gate="1" x="-60.96" y="58.42" smashed="yes">
-<attribute name="VALUE" x="-62.103" y="55.118" size="1.778" layer="96"/>
+<instance part="PAD3" gate="1" x="-60.96" y="53.34" smashed="yes">
+<attribute name="VALUE" x="-62.103" y="50.038" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD4" gate="1" x="-60.96" y="48.26" smashed="yes">
+<attribute name="VALUE" x="-62.103" y="44.958" size="1.778" layer="96"/>
+</instance>
+<instance part="PAD5" gate="1" x="-60.96" y="43.18" smashed="yes">
+<attribute name="VALUE" x="-62.103" y="39.878" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -2120,15 +2136,15 @@ This footprint was designed to help hold the alignment of a through-hole compone
 </segment>
 <segment>
 <pinref part="VBAT" gate="1" pin="P"/>
-<wire x1="-58.42" y1="63.5" x2="-50.8" y2="63.5" width="0.1524" layer="91"/>
-<label x="-58.42" y="63.5" size="1.778" layer="95"/>
+<wire x1="-58.42" y1="68.58" x2="-50.8" y2="68.58" width="0.1524" layer="91"/>
+<label x="-58.42" y="68.58" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SBUS" class="0">
 <segment>
 <pinref part="SBUS" gate="1" pin="P"/>
-<wire x1="-58.42" y1="50.8" x2="-50.8" y2="50.8" width="0.1524" layer="91"/>
-<label x="-58.42" y="50.8" size="1.778" layer="95"/>
+<wire x1="-58.42" y1="58.42" x2="-50.8" y2="58.42" width="0.1524" layer="91"/>
+<label x="-58.42" y="58.42" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="J2" gate="J1" pin="1"/>
