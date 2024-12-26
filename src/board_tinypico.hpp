@@ -90,7 +90,6 @@ namespace hf {
                 0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
             };
             Timer _telemetryTimer;
-            Msp _msp;
 
             // Prescaling for controx axes ------------------------------------
             static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
@@ -415,6 +414,8 @@ namespace hf {
                         _state.dphi, _state.theta, _state.dtheta, _state.psi,
                         _state.dpsi
                     };
+
+                    static Msp _msp;
 
                     _msp.serializeFloats(121, vals, 10);
 
