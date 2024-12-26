@@ -66,7 +66,6 @@ namespace hf {
             static const uint16_t CHAN5_ARM_MIN = 1000;
             static const uint16_t CHAN1_ARM_MAX = 180;
             uint16_t _channels[6];
-            uint8_t _message[256];
 
             // IMU -----------------------------------------------------------------------
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -103,7 +102,7 @@ namespace hf {
             // FAFO ----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            // Utilss -------------------------------------------------------
+            // Utils -------------------------------------------------------
 
             static void reportForever(const char * message)
             {
@@ -273,7 +272,6 @@ namespace hf {
 
             void step(Control * control) 
             {
-                static uint16_t _channels[6];
                 static bool _isArmed;
                 static bool _gotFailsafe;
                 static uint32_t _usec_prev;
@@ -348,10 +346,11 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
-                    for (uint8_t k=0; k<12; ++k) {
-                        printf("x%02x ", _message[k]);
-                    }
-                    printf("\n");
+
+                    printf("c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d c6=%04d\n", 
+                            _channels[0], _channels[1], _channels[2],
+                            _channels[3], _channels[4], _channels[5]);
+
                 }
 
                 // Run closed-loop control
@@ -412,12 +411,22 @@ namespace hf {
                 static Msp _msp;
 
                 for (uint8_t k=0; k<len; ++k) {
+
                     if (_msp.parse(data[k]) == 200) {
-                        for (uint8_t k=0; k<12; ++k) {
-                            _message[k] = _msp.payload[k];
-                        }
+
+                        readChannel(_msp, 0);
+                        readChannel(_msp, 1);
+                        readChannel(_msp, 2);
+                        readChannel(_msp, 3);
+                        readChannel(_msp, 4);
+                        readChannel(_msp, 5);
                     }
                 }
+            }
+
+            void readChannel(const Msp & msp, const uint8_t j)
+            {
+                _channels[j] = msp.payload[2*j+1] << 8 | msp.payload[2*j];
             }
 
     }; // class Board
