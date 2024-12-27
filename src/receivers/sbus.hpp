@@ -69,6 +69,6 @@ namespace hf {
 
         private:
 
-            bfs::SbusRx _sbus = bfs::SbusRx(&Serial5);
+            bfs::SbusRx _sbus = bfs::SbusRx(&Serial2);
     };
 }

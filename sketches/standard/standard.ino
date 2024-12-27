@@ -26,11 +26,11 @@
 
 #include <mixers/bfquadx.hpp>
 
-#include <receivers/dsmx.hpp>
+#include <receivers/sbus.hpp>
 
 static hf::Board _board;
 
-static hf::DsmxReceiver _rx;
+static hf::SbusReceiver _rx;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 

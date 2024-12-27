@@ -146,6 +146,8 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    printf("failsafe=%d  switch=%d  throttle=%d\n",
+                            _gotFailsafe, _channels[4], _channels[0]);
                 }
             }
 
