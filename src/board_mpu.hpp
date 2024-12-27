@@ -67,15 +67,6 @@ namespace hf {
 
                 const auto isArmingSwitchOn = _channels[4] > 1500;
 
-                /*
-                if (isArmingSwitchOn && !_wasArmingSwitchOn) {
-                    printf("Switched on\n");
-                }
-
-                if (!isArmingSwitchOn && _wasArmingSwitchOn) {
-                    printf("Switched off\n");
-                }*/
-
                 // Arm vehicle if safe
                 if (
                         !_gotFailsafe &&

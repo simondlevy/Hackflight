@@ -105,6 +105,7 @@ namespace hf {
             bool _isArmed;
             bool _gotFailsafe;
             uint32_t _lastReceivedMsec;
+            bool _wasArmingSwitchOn;
 
             // Timing --------------------------------------------------------
             uint32_t _usec_curr;
@@ -280,6 +281,8 @@ namespace hf {
                 armMotor(_m1_usec);
                 armMotor(_m3_usec);
                 _motors.arm();
+
+                _wasArmingSwitchOn = true;
             }
 
             void readData(float & dt, demands_t & demands, state_t & state)
@@ -303,11 +306,18 @@ namespace hf {
                     _isArmed = false;
                 }
 
+                const auto isArmingSwitchOn = _channels[4] > 1500;
+
                 // Arm vehicle if safe
-                if (!_gotFailsafe &&
-                        (_channels[4] > CHAN5_ARM_MIN) && (_channels[0] < CHAN1_ARM_MAX)) {
+                if (
+                        !_gotFailsafe &&
+                        isArmingSwitchOn &&
+                        !_wasArmingSwitchOn &&
+                        _channels[0] < 1050) {
                     _isArmed = true;
                 }
+
+                _wasArmingSwitchOn = isArmingSwitchOn;
 
                 // Disarm when requested
                 if (_channels[4] < CHAN5_ARM_MIN) {
