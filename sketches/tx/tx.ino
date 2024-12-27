@@ -29,7 +29,7 @@
 #include <msp.hpp>
 
 // Address of TinyPICO flight controller
-static uint8_t FC_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x84, 0xDC, 0xB4};
+static uint8_t FC_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x84, 0xD5, 0x0C};
 
 // Support for SBUS from FrSky transmitter
 static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);

@@ -55,7 +55,7 @@ namespace hf {
             TinyPICO _tinypico;
 
             // Motors --------------------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 23, 26, 27, 15 };
+            const std::vector<uint8_t> MOTOR_PINS = { 25, 26, 27, 15 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 

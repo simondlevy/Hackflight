@@ -66,5 +66,5 @@ void loop()
 
     _mixer.run(demands, motors);
 
-    _board.runMotors(_rx, motors);
+    _board.runMotors(motors);
 }

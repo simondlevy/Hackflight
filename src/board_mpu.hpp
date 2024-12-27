@@ -44,11 +44,6 @@ namespace hf {
 
         public:
 
-            void initWithFlow(Receiver & rx)
-            {
-                init(rx, true);
-            }
-
             void init(Receiver & rx)
             {
                 init(rx, false);
@@ -67,11 +62,30 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
+                // Get vehicle commands for next loop iteration
+                rx.read(_channels, _gotFailsafe);
+
+                const auto isArmingSwitchOn = _channels[4] > 1500;
+
+                /*
+                if (isArmingSwitchOn && !_wasArmingSwitchOn) {
+                    printf("Switched on\n");
+                }
+
+                if (!isArmingSwitchOn && _wasArmingSwitchOn) {
+                    printf("Switched off\n");
+                }*/
+
                 // Arm vehicle if safe
-                if (!_gotFailsafe && (_channels[4] > 1500) &&
-                        (_channels[0] < 1050)) {
+                if (
+                        !_gotFailsafe &&
+                        isArmingSwitchOn &&
+                        !_wasArmingSwitchOn &&
+                        _channels[0] < 1050) {
                     _isArmed = true;
                 }
+
+                _wasArmingSwitchOn = isArmingSwitchOn;
 
                 // LED should be on when armed
                 if (_isArmed) {
@@ -144,12 +158,9 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-                // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                }
             }
 
-            void runMotors(Receiver & rx, const float * motors)
+            void runMotors(const float * motors)
             {
                 // Rescale motor values for OneShot125
                 _m1_usec = scaleMotor(motors[0]);
@@ -162,9 +173,6 @@ namespace hf {
 
                 // Run motors
                 runMotors(); 
-
-                // Get vehicle commands for next loop iteration
-                rx.read(_channels, _gotFailsafe);
 
                 // Disarm immiedately on failsafe
                 if (_gotFailsafe) {
@@ -238,6 +246,7 @@ namespace hf {
             // Safety
             bool _isArmed;
             bool _gotFailsafe;
+            bool _wasArmingSwitchOn;
 
             // State estimation
             MadgwickFilter  _madgwick;
@@ -291,8 +300,11 @@ namespace hf {
                 armMotor(_m1_usec);
                 armMotor(_m3_usec);
                 _motors.arm();
-            }
 
+                _wasArmingSwitchOn = true;
+
+                delay(1000);
+            }
 
             static float mapchan(
                     Receiver & rx,
