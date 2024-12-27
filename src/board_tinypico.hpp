@@ -230,6 +230,8 @@ namespace hf {
                 (void)mac;
             }
 
+            uint32_t _rx_count;
+
         public: // -----------------------------------------------------------
 
             void init() 
@@ -366,6 +368,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    printf("%d\n", _rx_count);
                 }
             }
 
@@ -393,6 +396,8 @@ namespace hf {
 
             void espnow_listener_callback(const uint8_t * data, const uint8_t len)
             {
+                _rx_count++;
+
                 static Msp _msp;
 
                 for (uint8_t k=0; k<len; ++k) {

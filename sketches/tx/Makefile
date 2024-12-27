@@ -1,7 +1,7 @@
 SKETCH = tx
 
-FQBN =esp32:esp32:um_tinypico
 
+FQBN = esp32:esp32:um_tinypico
 PORT = /dev/ttyUSB1
 
 LIBS = $(HOME)/Documents/Arduino/libraries
