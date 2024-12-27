@@ -146,8 +146,6 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("failsafe=%d  switch=%d  throttle=%d\n",
-                            _gotFailsafe, _channels[4], _channels[0]);
                 }
             }
 
@@ -202,7 +200,7 @@ namespace hf {
             PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 23, 4, 15, 6 };
+            const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
