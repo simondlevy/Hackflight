@@ -95,14 +95,20 @@ namespace hf {
 
             // Debugging -----------------------------------------------------
             static constexpr float DEBUG_RATE_HZ = 100;
+            Timer _debugTimer;
 
             // FAFO ----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
-            // Failsafe -------------------------------------------------------
+            // Safety --------------------------------------------------------
             static const int32_t FAILSAFE_TIMEOUT_MSEC = 125;
-            uint32_t _last_received_msec;
+            bool _isArmed;
+            bool _gotFailsafe;
+            uint32_t _lastReceivedMsec;
 
+            // Timing --------------------------------------------------------
+            uint32_t _usec_curr;
+            
             // Sensor fusion --------------------------------------------------
             MadgwickFilter _madgwick;
 
@@ -142,7 +148,7 @@ namespace hf {
                 }
             }
 
-            void blinkLed(const uint32_t usec_curr, const bool gotFailsafe)
+            void blinkLed(const bool gotFailsafe)
             {
                 const auto freq_hz =
                     gotFailsafe ?
@@ -155,11 +161,11 @@ namespace hf {
 
                 static uint32_t _delay_usec;
 
-                if (usec_curr - _usec_prev > _delay_usec) {
+                if (_usec_curr - _usec_prev > _delay_usec) {
 
                     static bool _alternate;
 
-                    _usec_prev = usec_curr;
+                    _usec_prev = _usec_curr;
 
                     _tinypico.DotStar_SetPixelColor(_alternate ? color : 0x000000);
 
@@ -274,22 +280,18 @@ namespace hf {
                 _motors.arm();
             }
 
-            void step(Control * control) 
+            void readData(float & dt, demands_t & demands, state_t & state)
             {
-                static bool _isArmed;
-                static bool _gotFailsafe;
                 static uint32_t _usec_prev;
-                static Timer _debugTimer;
-                static BfQuadXMixer _mixer;
-                static state_t _state;
 
-                const auto usec_curr = micros();      
+                 // Keep track of what time it is and how much time has elapsed
+                // since the last loop
+                _usec_curr = micros();      
+                dt = (_usec_curr - _usec_prev)/1000000.0;
+                _usec_prev = _usec_curr;      
 
-                const float dt = (usec_curr - _usec_prev)/1000000.0;
-
-                _usec_prev = usec_curr;
-
-                if ((int32_t)millis() -_last_received_msec >
+                // Check failsafe
+                if ((int32_t)millis() -_lastReceivedMsec >
                         FAILSAFE_TIMEOUT_MSEC) {
                     _gotFailsafe = true;
                 }
@@ -337,33 +339,38 @@ namespace hf {
                 axis3_t angles = {};
                 Utils::quat2euler(quat, angles);
 
-                // Populate vehicle state with Euler angles and gyro values
-                _state.phi = angles.x;
-                _state.theta = angles.y;
-                _state.psi = angles.z;
-                _state.dphi = gyro.x;
-                _state.dtheta = -gyro.y;
-                _state.dpsi = gyro.z;
+                state.phi = angles.x;
+                state.theta = angles.y;
+                state.psi = angles.z;
+
+                // Get angular velocities directly from gyro
+                state.dphi = gyro.x;
+                state.dtheta = -gyro.y;
+                state.dpsi = gyro.z;
 
                 // Convert stick demands to appropriate intervals
-                demands_t demands = {
-                    mapchan(_channels[0],  0.,  1.),
-                    mapchan(_channels[1], -1,  +1) * PITCH_ROLL_PRESCALE,
-                    mapchan(_channels[2], -1,  +1) * PITCH_ROLL_PRESCALE,
-                    mapchan(_channels[3], -1,  +1) * YAW_PRESCALE
-                };
+                demands.thrust = mapchan(_channels[0],  0.,  1.);
+                demands.roll =  mapchan(_channels[1], -1,  +1) * PITCH_ROLL_PRESCALE;
+                demands.pitch =  mapchan(_channels[2], -1,  +1) * PITCH_ROLL_PRESCALE;
+                demands.yaw = mapchan(_channels[3], -1,  +1) * YAW_PRESCALE;
 
-                // Debug periodically as needed
-                if (_debugTimer.isReady(usec_curr, DEBUG_RATE_HZ)) {
+                // LED should be on when armed
+                if (_isArmed) {
+                    _tinypico.DotStar_SetPixelColor(LED_ARMED_COLOR);
                 }
 
-                // Run closed-loop control
-                control->run(dt, _state, demands);
+                // Otherwise, blink LED as heartbeat or failsafe rate
+                else {
+                    blinkLed(_gotFailsafe);
+                }
 
-                // Mix motors
-                float motors[4] = {};
-                _mixer.run(demands, motors);
+                // Debug periodically as needed
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                }
+            }
 
+            void runMotors(const float * motors)
+            {
                 // Rescale motor values for OneShot125
                 _m1_usec = scaleMotor(motors[0]);
                 _m2_usec = scaleMotor(motors[1]);
@@ -376,38 +383,12 @@ namespace hf {
                 // Run motors
                 runMotors(); 
 
-                // LED should be on when armed
-                if (_isArmed) {
-                    _tinypico.DotStar_SetPixelColor(LED_ARMED_COLOR);
+                // Disarm immiedately on failsafe
+                if (_gotFailsafe) {
+                    _isArmed = false;
                 }
 
-                // Otherwise, blink LED as heartbeat or failsafe rate
-                else {
-                    blinkLed(usec_curr, _gotFailsafe);
-                }
-
-                // Runn telemetry
-                if (_telemetryTimer.isReady(usec_curr, TELEMETRY_RATE_HZ)) {
-
-                    const float vals[10] = {
-                        _state.dx, _state.dy, _state.z, _state.dz, _state.phi,
-                        _state.dphi, _state.theta, _state.dtheta, _state.psi,
-                        _state.dpsi
-                    };
-
-                    static Msp _msp;
-
-                    _msp.serializeFloats(121, vals, 10);
-
-                    EspNowUtils::sendToPeer(
-                            TELEMETRY_DONGLE_ADDRESS,
-                            _msp.payload,_msp.payloadSize,
-                            "fc",
-                            "dongle");
-                }
- 
-                // Run dRehmFlight loop delay
-                runLoopDelay(usec_curr);
+                runLoopDelay(_usec_curr);
             }
 
             void espnow_listener_callback(const uint8_t * data, const uint8_t len)
@@ -418,7 +399,7 @@ namespace hf {
 
                     if (_msp.parse(data[k]) == 200) {
 
-                        _last_received_msec = millis();
+                        _lastReceivedMsec = millis();
 
                         readChannel(_msp, 0);
                         readChannel(_msp, 1);

@@ -28,31 +28,14 @@
 
 static hf::Board _board;
 
-class MinimalControl : public hf::Control {
+static constexpr float THROTTLE_DOWN = 0.06;
 
-    public:
+static hf::YawRatePid _yawRatePid;
 
-        void run(const float dt, const hf::state_t & state, hf::demands_t & demands) 
-        {
-            const auto resetPids = demands.thrust < THROTTLE_DOWN;
+static hf::PitchRollAnglePid _pitchRollAnglePid;
+static hf::PitchRollRatePid _pitchRollRatePid;
 
-            _pitchRollAnglePid.run(dt, resetPids, state, demands);
-
-            _pitchRollRatePid.run(dt, resetPids, state, demands);
-
-            _yawRatePid.run(dt, resetPids, state, demands);
-        }
-
-    private:
-
-        static constexpr float THROTTLE_DOWN = 0.06;
-
-        hf::YawRatePid _yawRatePid;
-
-        hf::PitchRollAnglePid _pitchRollAnglePid;
-
-        hf::PitchRollRatePid _pitchRollRatePid;
-};
+static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
@@ -61,7 +44,23 @@ void setup()
 
 void loop() 
 {
-    static MinimalControl _control;
+    float dt=0;
+    hf::demands_t demands = {};
+    hf::state_t state = {};
 
-    _board.step(&_control);
+    _board.readData(dt, demands, state);
+
+    const auto resetPids = demands.thrust < THROTTLE_DOWN;
+
+    _pitchRollAnglePid.run(dt, resetPids, state, demands);
+
+    _pitchRollRatePid.run(dt, resetPids, state, demands);
+
+    _yawRatePid.run(dt, resetPids, state, demands);
+
+    float motors[4] = {};
+
+    _mixer.run(demands, motors);
+
+    _board.runMotors(motors);
 }
