@@ -55,7 +55,7 @@ namespace hf {
             TinyPICO _tinypico;
 
             // Motors --------------------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 15, 27, 26, 25 };
+            const std::vector<uint8_t> MOTOR_PINS = { 15, 25, 26, 27 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
@@ -257,7 +257,8 @@ namespace hf {
                 Wire.begin();
 
                 // Note this is 2.5 times the spec sheet 400 kHz max...
-                Wire.setClock(1000000); 
+                // Wire.setClock(1000000); 
+                Wire.setClock(400000); 
 
                 // Start the IMU
                 _mpu6050.initialize();
@@ -378,8 +379,6 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("phi%+3.3f  theta=%+3.3f  psi=%+3.3f\n", 
-                            state.phi, state.theta, state.psi);
                 }
             }
 
@@ -403,6 +402,10 @@ namespace hf {
                 }
 
                 runLoopDelay(_usec_curr);
+            }
+
+            void calibriateMotors()
+            {
             }
 
             void espnow_listener_callback(const uint8_t * data, const uint8_t len)

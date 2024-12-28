@@ -151,6 +151,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    printf("gx=%+3.3f  gy=%+3.3f  gz=%+3.3f\n", gyro.x, gyro.y, gyro.z);
                 }
              }
 
