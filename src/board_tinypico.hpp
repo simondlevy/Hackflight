@@ -227,14 +227,6 @@ namespace hf {
 
             }
 
-            static void on_espnow_data_receive(
-                    const uint8_t * mac, const uint8_t * data, int len)
-            {
-                (void)mac;
-            }
-
-            uint32_t _rx_count;
-
         public: // -----------------------------------------------------------
 
             void init() 
@@ -406,13 +398,31 @@ namespace hf {
                 runLoopDelay(_usec_curr);
             }
 
-            void calibriateMotors()
+            void calibrateMotors()
             {
+                const auto throttle = _channels[0];
+
+                if (throttle < THROTTLE_ARMING_MAX) {
+                    //digitalWrite(LED_BUILTIN, LOW);
+                    _m1_usec = 125;
+                    _m2_usec = 125;
+                    _m3_usec = 125;
+                    _m4_usec = 125;
+                }
+
+                else if (throttle > (1-THROTTLE_ARMING_MAX)) {
+                    //digitalWrite(LED_BUILTIN, HIGH);
+                    _m1_usec = 250;
+                    _m2_usec = 250;
+                    _m3_usec = 250;
+                    _m4_usec = 250;
+                }
+
+                runMotors();
             }
 
             void espnow_listener_callback(const uint8_t * data, const uint8_t len)
             {
-                _rx_count++;
 
                 static Msp _msp;
 
