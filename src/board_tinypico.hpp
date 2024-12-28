@@ -102,6 +102,8 @@ namespace hf {
 
             // Safety --------------------------------------------------------
             static const int32_t FAILSAFE_TIMEOUT_MSEC = 125;
+            static const uint16_t ARMING_SWITCH_MIN = 1500;
+            static const uint16_t THROTTLE_ARMING_MAX = 1000;
             bool _isArmed;
             bool _gotFailsafe;
             uint32_t _lastReceivedMsec;
@@ -307,14 +309,14 @@ namespace hf {
                     _isArmed = false;
                 }
 
-                const auto isArmingSwitchOn = _channels[4] > 1500;
+                const auto isArmingSwitchOn = _channels[4] > ARMING_SWITCH_MIN;
 
                 // Arm vehicle if safe
                 if (
                         !_gotFailsafe &&
                         isArmingSwitchOn &&
                         !_wasArmingSwitchOn &&
-                        _channels[0] < 1050) {
+                        _channels[0] < THROTTLE_ARMING_MAX) {
                     _isArmed = true;
                 }
 
