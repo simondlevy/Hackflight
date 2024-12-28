@@ -255,7 +255,6 @@ namespace hf {
 
                 // Set up serial debugging
                 Serial.begin(115200);
-                delay(500);
 
                 // Start receiver
                 rx.begin();
