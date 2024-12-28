@@ -149,7 +149,10 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-            }
+                // Debug periodically as needed
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                }
+             }
 
             void runMotors(const float * motors)
             {
@@ -251,7 +254,7 @@ namespace hf {
                 _flow = flow;
 
                 // Set up serial debugging
-                Serial.begin(500000);
+                Serial.begin(115200);
                 delay(500);
 
                 // Start receiver
@@ -269,8 +272,6 @@ namespace hf {
                     SPI.begin();
                 }
 
-                delay(5);
-
                 // Initialize the sensors
                 initImu();
 
@@ -283,8 +284,6 @@ namespace hf {
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
 
-                delay(5);
-
                 // Arm OneShot125 motors
                 armMotor(_m4_usec);
                 armMotor(_m2_usec);
@@ -293,8 +292,6 @@ namespace hf {
                 _motors.arm();
 
                 _wasArmingSwitchOn = true;
-
-                delay(1000);
             }
 
             static float mapchan(

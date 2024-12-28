@@ -55,7 +55,7 @@ namespace hf {
             TinyPICO _tinypico;
 
             // Motors --------------------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 25, 26, 27, 15 };
+            const std::vector<uint8_t> MOTOR_PINS = { 15, 27, 26, 25 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
@@ -378,7 +378,8 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("%d\n", _rx_count);
+                    printf("phi%+3.3f  theta=%+3.3f  psi=%+3.3f\n", 
+                            state.phi, state.theta, state.psi);
                 }
             }
 
