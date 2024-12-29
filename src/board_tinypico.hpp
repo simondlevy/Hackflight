@@ -403,7 +403,7 @@ namespace hf {
                 const auto throttle = _channels[0];
 
                 if (throttle < THROTTLE_ARMING_MAX) {
-                    //digitalWrite(LED_BUILTIN, LOW);
+                    _tinypico.DotStar_SetPixelColor(0x000000);
                     _m1_usec = 125;
                     _m2_usec = 125;
                     _m3_usec = 125;
@@ -411,7 +411,7 @@ namespace hf {
                 }
 
                 else if (throttle > (1-THROTTLE_ARMING_MAX)) {
-                    //digitalWrite(LED_BUILTIN, HIGH);
+                    _tinypico.DotStar_SetPixelColor(LED_ARMED_COLOR);
                     _m1_usec = 250;
                     _m2_usec = 250;
                     _m3_usec = 250;
