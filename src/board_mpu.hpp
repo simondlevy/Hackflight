@@ -164,7 +164,13 @@ namespace hf {
                 _m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
-                cutMotors(_channels[4], _isArmed); 
+                if (_channels[4] < 1500 || !_isArmed || _gotFailsafe) {
+                    _isArmed = false;
+                    _m1_usec = 120;
+                    _m2_usec = 120;
+                    _m3_usec = 120;
+                    _m4_usec = 120;
+                }
 
                 // Run motors
                 _motors.set(0, _m1_usec);
@@ -284,11 +290,6 @@ namespace hf {
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
 
-                //armMotor(_m4_usec);
-                //armMotor(_m2_usec);
-                //armMotor(_m1_usec);
-                //armMotor(_m3_usec);
-
                 // Arm OneShot125 motors
                 _motors.arm();
 
@@ -377,24 +378,6 @@ namespace hf {
                 if (!_pmw3901.begin()) {
                     reportForever("PMW3901 initialization unsuccessful");
                 }
-            }
-
-            void cutMotors(const uint32_t chan_5, bool & isArmed) 
-            {
-                if (chan_5 < 1500 || !isArmed) {
-                    isArmed = false;
-                    _m1_usec = 120;
-                    _m2_usec = 120;
-                    _m3_usec = 120;
-                    _m4_usec = 120;
-
-                }
-            }
-
-            static void armMotor(uint8_t & m_usec)
-            {
-                // OneShot125 range from 125 to 250 usec
-                m_usec = 125;
             }
 
             static uint8_t scaleMotor(const float mval)
