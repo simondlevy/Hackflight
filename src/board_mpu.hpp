@@ -167,7 +167,12 @@ namespace hf {
                 cutMotors(_channels[4], _isArmed); 
 
                 // Run motors
-                runMotors(); 
+                _motors.set(0, _m1_usec);
+                _motors.set(1, _m2_usec);
+                _motors.set(2, _m3_usec);
+                _motors.set(3, _m4_usec);
+
+                _motors.run();
 
                 runLoopDelay(_usec_curr);
             }
@@ -372,16 +377,6 @@ namespace hf {
                 if (!_pmw3901.begin()) {
                     reportForever("PMW3901 initialization unsuccessful");
                 }
-            }
-
-            void runMotors() 
-            {
-                _motors.set(0, _m1_usec);
-                _motors.set(1, _m2_usec);
-                _motors.set(2, _m3_usec);
-                _motors.set(3, _m4_usec);
-
-                _motors.run();
             }
 
             void cutMotors(const uint32_t chan_5, bool & isArmed) 
