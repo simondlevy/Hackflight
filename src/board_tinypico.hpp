@@ -18,7 +18,6 @@
 
 // Standard Arduino libraries
 #include <Wire.h>
-#include <SPI.h>
 
 // DotStar LED support
 #include <TinyPICO.h>
@@ -55,7 +54,7 @@ namespace hf {
             TinyPICO _tinypico;
 
             // Motors --------------------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 15, 25, 26, 27 };
+            const std::vector<uint8_t> MOTOR_PINS = { 15, 27, 26, 25 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
