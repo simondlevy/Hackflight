@@ -158,25 +158,25 @@ namespace hf {
             void runMotors(const float * motors)
             {
                 // Rescale motor values for OneShot125
-                _m1_usec = scaleMotor(motors[0]);
-                _m2_usec = scaleMotor(motors[1]);
-                _m3_usec = scaleMotor(motors[2]);
-                _m4_usec = scaleMotor(motors[3]);
+                auto m1_usec = scaleMotor(motors[0]);
+                auto m2_usec = scaleMotor(motors[1]);
+                auto m3_usec = scaleMotor(motors[2]);
+                auto m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
                 if (_channels[4] < 1500 || !_isArmed || _gotFailsafe) {
                     _isArmed = false;
-                    _m1_usec = 120;
-                    _m2_usec = 120;
-                    _m3_usec = 120;
-                    _m4_usec = 120;
+                    m1_usec = 120;
+                    m2_usec = 120;
+                    m3_usec = 120;
+                    m4_usec = 120;
                 }
 
                 // Run motors
-                _motors.set(0, _m1_usec);
-                _motors.set(1, _m2_usec);
-                _motors.set(2, _m3_usec);
-                _motors.set(3, _m4_usec);
+                _motors.set(0, m1_usec);
+                _motors.set(1, m2_usec);
+                _motors.set(2, m3_usec);
+                _motors.set(3, m4_usec);
 
                 _motors.run();
 
@@ -211,7 +211,6 @@ namespace hf {
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 3, 4, 5, 6 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
-            uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
             // Blinkenlights --------------------------------------------------
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
