@@ -58,6 +58,17 @@ void loop()
 
     _yawRatePid.run(dt, resetPids, state, demands);
 
+    static uint32_t _msec_prev;
+    const auto msec_curr = millis();
+    if (msec_curr - _msec_prev > 20) {
+        printf("t=%3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f\n",
+                demands.thrust,
+                demands.roll,
+                demands.pitch,
+                demands.yaw);
+        _msec_prev = msec_curr;
+    }
+
     float motors[4] = {};
 
     _mixer.run(demands, motors);

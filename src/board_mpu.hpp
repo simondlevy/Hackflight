@@ -149,14 +149,16 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-                // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("gx=%+3.3f  gy=%+3.3f  gz=%+3.3f\n", gyro.x, gyro.y, gyro.z);
-                }
              }
 
             void runMotors(const float * motors)
             {
+                // Debug periodically as needed
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    //printf("m1=%3.3f  m2=%+3.3f  m3=%+3.3f  m4=%+3.3f\n",
+                    //        motors[0], motors[1], motors[2], motors[3]);
+                }
+
                 // Rescale motor values for OneShot125
                 _m1_usec = scaleMotor(motors[0]);
                 _m2_usec = scaleMotor(motors[1]);
@@ -168,11 +170,6 @@ namespace hf {
 
                 // Run motors
                 runMotors(); 
-
-                // Disarm immiedately on failsafe
-                if (_gotFailsafe) {
-                    _isArmed = false;
-                }
 
                 runLoopDelay(_usec_curr);
             }

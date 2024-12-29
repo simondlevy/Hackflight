@@ -371,9 +371,6 @@ namespace hf {
                     blinkLed(_gotFailsafe);
                 }
 
-                // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                }
             }
 
             void runMotors(const float * motors)
