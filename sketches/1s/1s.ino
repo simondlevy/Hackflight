@@ -18,15 +18,19 @@
 
 #include <hackflight.hpp>
 
-#include <board_tinypico.hpp>
-
-#include <control.hpp>
+#include <board_1s.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
 #include <pids/yaw_rate.hpp>
 
+#include <mixers/bfquadx.hpp>
+
+#include <receivers/dsmx.hpp>
+
 static hf::Board _board;
+
+static hf::DsmxReceiver _rx;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
@@ -39,7 +43,7 @@ static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
-    _board.init();
+    _board.init(_rx);
 }
 
 void loop() 
@@ -48,7 +52,7 @@ void loop()
     hf::demands_t demands = {};
     hf::state_t state = {};
 
-    _board.readData(dt, demands, state);
+    _board.readData(dt, _rx, demands, state);
 
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 

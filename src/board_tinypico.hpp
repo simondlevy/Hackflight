@@ -375,6 +375,10 @@ namespace hf {
 
             void runMotors(const float * motors)
             {
+                // Debug periodically as needed
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                }
+
                 // Rescale motor values for OneShot125
                 _m1_usec = scaleMotor(motors[0]);
                 _m2_usec = scaleMotor(motors[1]);
