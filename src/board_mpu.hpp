@@ -279,11 +279,12 @@ namespace hf {
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
 
+                //armMotor(_m4_usec);
+                //armMotor(_m2_usec);
+                //armMotor(_m1_usec);
+                //armMotor(_m3_usec);
+
                 // Arm OneShot125 motors
-                armMotor(_m4_usec);
-                armMotor(_m2_usec);
-                armMotor(_m1_usec);
-                armMotor(_m3_usec);
                 _motors.arm();
 
                 _wasArmingSwitchOn = true;

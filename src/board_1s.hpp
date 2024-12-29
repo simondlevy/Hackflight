@@ -27,8 +27,6 @@
 
 // Third-party libraries
 #include <MPU6050.h>
-#include <pmw3901.hpp>
-#include <VL53L1X.h>
 #include <oneshot125.hpp>
 
 // Hackflight library
@@ -46,8 +44,38 @@ namespace hf {
 
             void init(Receiver & rx)
             {
-                init(rx, false);
+                _ledPin = LED_BUILTIN;
+
+                // Set up serial debugging
+                Serial.begin(115200);
+
+                // Start receiver
+                rx.begin();
+
+                // Initialize LED
+                pinMode(_ledPin, OUTPUT); 
+                digitalWrite(_ledPin, HIGH);
+
+                // Initialize the I^2C bus
+                Wire.begin();
+
+                // Initialize the sensors
+                initImu();
+
+                // Initialize the Madgwick filter
+                _madgwick.initialize();
+
+                armMotor(_m4_usec);
+                armMotor(_m2_usec);
+                armMotor(_m1_usec);
+                armMotor(_m3_usec);
+
+                // Arm OneShot125 motors
+                _motors.arm();
+
+                _wasArmingSwitchOn = true;
             }
+
 
             void readData(
                     float & dt,
@@ -119,22 +147,6 @@ namespace hf {
                 state.theta = angles.y;
                 state.psi = angles.z;
 
-                if (_flow) {
-
-                    /*
-                    // Read rangefinder, non-blocking
-                    const uint16_t range = _vl53l1.read(false);
-
-                    // Read optical flow sensor
-                    int16_t flowDx = 0;
-                    int16_t flowDy = 0;
-                    bool gotFlow = false;
-                    _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
-                    if (gotFlow) {
-                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
-                    }*/
-                }
-
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
                 state.dtheta = -gyro.y;
@@ -150,11 +162,7 @@ namespace hf {
                     YAW_PRESCALE;
 
 
-                // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-
-                }
-             }
+            }
 
             void runMotors(const float * motors)
             {
@@ -187,16 +195,6 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             MPU6050 _mpu6050;
-
-            // Rangefinder ----------------------------------------------------
-
-            VL53L1X _vl53l1;
-
-            // Optical flow sensor --------------------------------------------
-
-            bool _flow;
-
-            PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 23, 4, 15, 6 };
@@ -243,52 +241,6 @@ namespace hf {
             MadgwickFilter  _madgwick;
 
             // Private methods -----------------------------------------------
-
-            void init(Receiver & rx, bool flow)
-            {
-                _ledPin = flow ? 0 :LED_BUILTIN;
-
-                _flow = flow;
-
-                // Set up serial debugging
-                Serial.begin(115200);
-
-                // Start receiver
-                rx.begin();
-
-                // Initialize LED
-                pinMode(_ledPin, OUTPUT); 
-                digitalWrite(_ledPin, HIGH);
-
-                // Initialize the I^2C bus
-                Wire.begin();
-
-                // Initialize the SPI bus if we're doing optical flow
-                if (flow) {
-                    SPI.begin();
-                }
-
-                // Initialize the sensors
-                initImu();
-
-                // Initial flow and rangefinder if indicated
-                if (_flow) {
-                    initRangefinder();
-                    initOpticalFlow();
-                }
-
-                // Initialize the Madgwick filter
-                _madgwick.initialize();
-
-                // Arm OneShot125 motors
-                armMotor(_m4_usec);
-                armMotor(_m2_usec);
-                armMotor(_m1_usec);
-                armMotor(_m3_usec);
-                _motors.arm();
-
-                _wasArmingSwitchOn = true;
-            }
 
             static float mapchan(
                     Receiver & rx,
@@ -342,36 +294,6 @@ namespace hf {
                 // off.  All we need to do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-            }
-
-            void initRangefinder()
-            {
-                _vl53l1.setTimeout(500);
-
-                if (!_vl53l1.init()) {
-                    reportForever("VL53L1 initialization unsuccessful");
-                }
-
-                // Use long distance mode and allow up to 50000 us (50 ms) for
-                // a measurement.  You can change these settings to adjust the
-                // performance of the _vl53l1, but the minimum timing budget is
-                // 20 ms for short distance mode and 33 ms for medium and long
-                // distance modes. See the VL53L1X datasheet for more
-                // information on range and timing limits.
-                _vl53l1.setDistanceMode(VL53L1X::Long);
-                _vl53l1.setMeasurementTimingBudget(50000);
-
-                // Start continuous readings at a rate of one measurement every
-                // 50 ms (the inter-measurement period). This period should be
-                // at least as long as the timing budget.
-                _vl53l1.startContinuous(50);
-            }
-
-            void initOpticalFlow()
-            {
-                if (!_pmw3901.begin()) {
-                    reportForever("PMW3901 initialization unsuccessful");
-                }
             }
 
             void runMotors() 
