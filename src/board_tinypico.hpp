@@ -390,11 +390,6 @@ namespace hf {
                 // Run motors
                 runMotors(); 
 
-                // Disarm immiedately on failsafe
-                if (_gotFailsafe) {
-                    _isArmed = false;
-                }
-
                 runLoopDelay(_usec_curr);
             }
 
