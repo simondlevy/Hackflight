@@ -354,6 +354,24 @@ namespace hf {
                 state.dtheta = -gyro.y;
                 state.dpsi = gyro.z;
 
+                // Send telemetry periodically
+                if (_telemetryTimer.isReady(_usec_curr, TELEMETRY_RATE_HZ)) {
+
+                    const float vals[10] = {
+                        state.dx, state.dy, state.z, state.dz, state.phi,
+                        state.dphi, state.theta, state.dtheta, state.psi,
+                        state.dpsi
+                    };
+
+                    static Msp _msp;
+
+                    _msp.serializeFloats(121, vals, 10);
+
+                    EspNowUtils::sendToPeer(
+                            TELEMETRY_DONGLE_ADDRESS, _msp.payload, _msp.payloadSize,
+                            "fc", "dongle");
+                }
+
                 // Convert stick demands to appropriate intervals
                 demands.thrust = mapchan(_channels[0],  0.,  1.);
                 demands.roll =  mapchan(_channels[1], -1,  +1) * PITCH_ROLL_PRESCALE;
@@ -374,10 +392,6 @@ namespace hf {
 
             void runMotors(const float * motors)
             {
-                // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                }
-
                 // Rescale motor values for OneShot125
                 _m1_usec = scaleMotor(motors[0]);
                 _m2_usec = scaleMotor(motors[1]);
