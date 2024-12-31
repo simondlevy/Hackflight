@@ -32,25 +32,25 @@ namespace hf {
             {
                 state_t state = {};
 
-                state.dx = d.x2 * cos(d.x11) - d.x4 * sin(d.x11);
+                state.dx = d.state.dx * cos(d.state.psi) - d.state.dy * sin(d.state.psi);
 
-                state.dy = -(d.x2 * sin(d.x11) + d.x4 * cos(d.x11));
+                state.dy = -(d.state.dx * sin(d.state.psi) + d.state.dy * cos(d.state.psi));
 
-                state.z = d.x5;                     
+                state.z = d.state.z;                     
 
-                state.dz = d.x6;                   
+                state.dz = d.state.dz;                   
 
-                state.phi = hf::Utils::RAD2DEG* d.x7; 
+                state.phi = hf::Utils::RAD2DEG* d.state.phi; 
 
-                state.dphi = hf::Utils::RAD2DEG* d.x8; 
+                state.dphi = hf::Utils::RAD2DEG* d.state.dphi; 
 
-                state.theta = hf::Utils::RAD2DEG* d.x9; 
+                state.theta = hf::Utils::RAD2DEG* d.state.theta; 
 
-                state.dtheta = hf::Utils::RAD2DEG* d.x10;
+                state.dtheta = hf::Utils::RAD2DEG* d.state.dtheta;
 
-                state.psi = hf::Utils::RAD2DEG* d.x11;   
+                state.psi = hf::Utils::RAD2DEG* d.state.psi;   
 
-                state.dpsi = hf::Utils::RAD2DEG* d.x12;   
+                state.dpsi = hf::Utils::RAD2DEG* d.state.dpsi;   
 
                 return state;
             }

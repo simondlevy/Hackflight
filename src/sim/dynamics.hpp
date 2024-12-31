@@ -130,7 +130,7 @@ namespace hf {
                 }
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
-                _dstate.dz = -_wparams.g + (cos(x7)*cos(x9)) * 1 / m * u1;
+                _dstate.dz = -_wparams.g + (cos(state.phi)*cos(state.theta)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
                 if (_dstate.dz > 0) {
@@ -143,34 +143,34 @@ namespace hf {
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dstate.x = x2;                               // x
-                    _dstate.dx =(cos(-x7)*sin(x9)*cos(x11) +       // dx, inertial frame
-                            sin(-x7)*sin(x11)) * u1 / m;
-                    _dstate.y = x4;                               // y
-                    _dstate.dy = -(cos(-x7)*sin(x9)*sin(x11) -     // dy, inertial frame
-                            sin(-x7)*cos(x11)) * u1 / m;
-                    _dstate.z = x6;                               // z
-                    _dstate.phi = x8;                               // phi
+                    _dstate.x = state.dx;                               // x
+                    _dstate.dx =(cos(-state.phi)*sin(state.theta)*cos(state.psi) +       // dx, inertial frame
+                            sin(-state.phi)*sin(state.psi)) * u1 / m;
+                    _dstate.y = state.dy;                               // y
+                    _dstate.dy = -(cos(-state.phi)*sin(state.theta)*sin(state.psi) -     // dy, inertial frame
+                            sin(-state.phi)*cos(state.psi)) * u1 / m;
+                    _dstate.z = state.dz;                               // z
+                    _dstate.phi = state.dphi;                               // phi
                     _dstate.dphi = l / I * u2;                       // dphi
-                    _dstate.theta = x10;                              // theta
+                    _dstate.theta = state.dtheta;                              // theta
                     _dstate.dtheta = l / I * u3;                      // dtheta
-                    _dstate.psi = x12;                             // psi
+                    _dstate.psi = state.dpsi;                             // psi
                     _dstate.dpsi = -l / I * u4;                     // dpsi
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
-                    x1 += _dt * _dstate.x;
-                    x2 += _dt * _dstate.dx;
-                    x3 += _dt * _dstate.y;
-                    x4 += _dt * _dstate.dy;
-                    x5 += _dt * _dstate.z;
-                    x6 += _dt * _dstate.dz;
-                    x7 += _dt * _dstate.phi;
-                    x8 += _dt * _dstate.dphi;
-                    x9 += _dt * _dstate.theta;
-                    x10 += _dt * _dstate.dtheta;
-                    x11 += _dt * _dstate.psi;
-                    x12 += _dt * _dstate.dpsi;
+                    state.x += _dt * _dstate.x;
+                    state.dx += _dt * _dstate.dx;
+                    state.y += _dt * _dstate.y;
+                    state.dy += _dt * _dstate.dy;
+                    state.z += _dt * _dstate.z;
+                    state.dz += _dt * _dstate.dz;
+                    state.phi += _dt * _dstate.phi;
+                    state.dphi += _dt * _dstate.dphi;
+                    state.theta += _dt * _dstate.theta;
+                    state.dtheta += _dt * _dstate.dtheta;
+                    state.psi += _dt * _dstate.psi;
+                    state.dpsi += _dt * _dstate.dpsi;
                 }
 
             } // update
@@ -178,7 +178,7 @@ namespace hf {
             pose_t getPose()
             {
                 // Negate y coordinate for rightward positive
-                return pose_t {x1, -x3, x5, x7, x9, x11 };
+                return pose_t {state.x, -state.y, state.z, state.phi, state.theta, state.psi };
             }
 
             // ---------------------------------------------------------------
@@ -186,18 +186,7 @@ namespace hf {
         private:
 
             // Vehicle state (Equation 11)
-            float x1;  // x
-            float x2;  // dx/dt
-            float x3;  // y
-            float x4;  // dy/dt
-            float x5;  // z
-            float x6;  // dz/dt
-            float x7;  // phi
-            float x8;  // dphi/dt
-            float x9;  // theta
-            float x10; // dtheta/dt
-            float x11; // psi
-            float x12; // dpsi/dt
+            state_t state;
 
             // Vehicle state first derivative (Equation 12)
             state_t _dstate;
