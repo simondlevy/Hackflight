@@ -277,6 +277,7 @@ namespace hf {
                 _motors.arm();
 
                 _wasArmingSwitchOn = true;
+
             }
 
             void readData(float & dt, demands_t & demands, state_t & state)
@@ -386,6 +387,10 @@ namespace hf {
                 // Otherwise, blink LED as heartbeat or failsafe rate
                 else {
                     blinkLed(_gotFailsafe);
+                }
+
+                // Debug periodically
+                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
                 }
 
             }
