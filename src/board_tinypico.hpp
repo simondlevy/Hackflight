@@ -412,7 +412,7 @@ namespace hf {
                 runLoopDelay(_usec_curr);
             }
 
-            void calibrateMotors()
+            void calibrateEscs()
             {
                 const auto throttle = _channels[0];
 

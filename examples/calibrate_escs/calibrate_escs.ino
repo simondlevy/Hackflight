@@ -30,11 +30,5 @@ void setup()
 
 void loop() 
 {
-    float dt=0;
-    hf::demands_t demands = {};
-    hf::state_t state = {};
-
-    _board.readData(dt, demands, state);
-
-    _board.calibrateMotors();
+    _board.calibrateEscs();
 }
