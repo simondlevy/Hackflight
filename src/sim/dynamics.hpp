@@ -130,10 +130,10 @@ namespace hf {
                 }
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
-                _dx6 = -_wparams.g + (cos(x7)*cos(x9)) * 1 / m * u1;
+                _dstate.dz = -_wparams.g + (cos(x7)*cos(x9)) * 1 / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
-                if (_dx6 > 0) {
+                if (_dstate.dz > 0) {
                     _airborne = true;
                 }
 
@@ -143,34 +143,34 @@ namespace hf {
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dx1 = x2;                               // x
-                    _dx2 =(cos(-x7)*sin(x9)*cos(x11) +       // dx, inertial frame
+                    _dstate.x = x2;                               // x
+                    _dstate.dx =(cos(-x7)*sin(x9)*cos(x11) +       // dx, inertial frame
                             sin(-x7)*sin(x11)) * u1 / m;
-                    _dx3 = x4;                               // y
-                    _dx4 = -(cos(-x7)*sin(x9)*sin(x11) -     // dy, inertial frame
+                    _dstate.y = x4;                               // y
+                    _dstate.dy = -(cos(-x7)*sin(x9)*sin(x11) -     // dy, inertial frame
                             sin(-x7)*cos(x11)) * u1 / m;
-                    _dx5 = x6;                               // z
-                    _dx7 = x8;                               // phi
-                    _dx8 = l / I * u2;                       // dphi
-                    _dx9 = x10;                              // theta
-                    _dx10 = l / I * u3;                      // dtheta
-                    _dx11 = x12;                             // psi
-                    _dx12 = -l / I * u4;                     // dpsi
+                    _dstate.z = x6;                               // z
+                    _dstate.phi = x8;                               // phi
+                    _dstate.dphi = l / I * u2;                       // dphi
+                    _dstate.theta = x10;                              // theta
+                    _dstate.dtheta = l / I * u3;                      // dtheta
+                    _dstate.psi = x12;                             // psi
+                    _dstate.dpsi = -l / I * u4;                     // dpsi
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
-                    x1 += _dt * _dx1;
-                    x2 += _dt * _dx2;
-                    x3 += _dt * _dx3;
-                    x4 += _dt * _dx4;
-                    x5 += _dt * _dx5;
-                    x6 += _dt * _dx6;
-                    x7 += _dt * _dx7;
-                    x8 += _dt * _dx8;
-                    x9 += _dt * _dx9;
-                    x10 += _dt * _dx10;
-                    x11 += _dt * _dx11;
-                    x12 += _dt * _dx12;
+                    x1 += _dt * _dstate.x;
+                    x2 += _dt * _dstate.dx;
+                    x3 += _dt * _dstate.y;
+                    x4 += _dt * _dstate.dy;
+                    x5 += _dt * _dstate.z;
+                    x6 += _dt * _dstate.dz;
+                    x7 += _dt * _dstate.phi;
+                    x8 += _dt * _dstate.dphi;
+                    x9 += _dt * _dstate.theta;
+                    x10 += _dt * _dstate.dtheta;
+                    x11 += _dt * _dstate.psi;
+                    x12 += _dt * _dstate.dpsi;
                 }
 
             } // update
@@ -200,18 +200,7 @@ namespace hf {
             float x12; // dpsi/dt
 
             // Vehicle state first derivative (Equation 12)
-            float _dx1;  // x
-            float _dx2;  // dx/dt
-            float _dx3;  // y
-            float _dx4;  // dy/dt
-            float _dx5;  // z
-            float _dx6;  // dz/dt
-            float _dx7;  // phi
-            float _dx8;  // dphi/dt
-            float _dx9;  // theta
-            float _dx10; // dtheta/dt
-            float _dx11; // psi
-            float _dx12; // dpsi/dt
+            state_t _dstate;
 
             float _dt;
 
