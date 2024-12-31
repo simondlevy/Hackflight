@@ -140,22 +140,26 @@ namespace hf {
                 // Once airborne, we can update dynamics
                 if (_airborne) {
 
+                    const auto phi = state.phi;
+                    const auto theta = state.theta;
+                    const auto psi = state.psi;
+
                     // Equation 12 : Note negations to support roll-right
                     // positive
 
-                    _dstate.x = state.dx;                               // x
-                    _dstate.dx =(cos(-state.phi)*sin(state.theta)*cos(state.psi) +       // dx, inertial frame
-                            sin(-state.phi)*sin(state.psi)) * u1 / m;
-                    _dstate.y = state.dy;                               // y
-                    _dstate.dy = -(cos(-state.phi)*sin(state.theta)*sin(state.psi) -     // dy, inertial frame
-                            sin(-state.phi)*cos(state.psi)) * u1 / m;
-                    _dstate.z = state.dz;                               // z
-                    _dstate.phi = state.dphi;                               // phi
-                    _dstate.dphi = l / I * u2;                       // dphi
-                    _dstate.theta = state.dtheta;                              // theta
-                    _dstate.dtheta = l / I * u3;                      // dtheta
-                    _dstate.psi = state.dpsi;                             // psi
-                    _dstate.dpsi = -l / I * u4;                     // dpsi
+                    _dstate.x = state.dx;
+                    _dstate.dx =(cos(-phi)*sin(theta)*cos(psi) +    // inertial frame
+                            sin(-phi)*sin(psi)) * u1 / m;
+                    _dstate.y = state.dy;                              
+                    _dstate.dy = -(cos(-phi)*sin(theta)*sin(psi) -  // inertial frame
+                            sin(-phi)*cos(psi)) * u1 / m;
+                    _dstate.z = state.dz;                             
+                    _dstate.phi = state.dphi;                              
+                    _dstate.dphi = l / I * u2;                      
+                    _dstate.theta = state.dtheta;                  
+                    _dstate.dtheta = l / I * u3;                  
+                    _dstate.psi = state.dpsi;                   
+                    _dstate.dpsi = -l / I * u4;                  
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
