@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <boards/tinypico_usfs.hpp>
+#include <boards/tinypico_mpu.hpp>
 
 #include <control.hpp>
 

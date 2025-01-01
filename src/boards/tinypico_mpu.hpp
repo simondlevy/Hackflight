@@ -59,11 +59,9 @@ namespace hf {
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
             // Receiver ------------------------------------------------------------------
-            static const uint16_t CHAN5_ARM_MIN = 1000;
-            static const uint16_t CHAN1_ARM_MAX = 180;
             uint16_t _channels[6];
 
-            // IMU -----------------------------------------------------------------------
+            // MPU6050 IMU ----------------------------------------------------
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
             static constexpr float GYRO_SCALE_FACTOR = 131.0;
             static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
@@ -101,8 +99,8 @@ namespace hf {
 
             // Safety --------------------------------------------------------
             static const int32_t FAILSAFE_TIMEOUT_MSEC = 125;
-            static const uint16_t ARMING_SWITCH_MIN = 1500;
-            static const uint16_t THROTTLE_ARMING_MAX = 1000;
+            static const uint16_t ARMING_SWITCH_MIN = 1000;
+            static const uint16_t THROTTLE_ARMING_MAX = 180;
             bool _isArmed;
             bool _gotFailsafe;
             uint32_t _lastReceivedMsec;
@@ -282,10 +280,12 @@ namespace hf {
 
             void readData(float & dt, demands_t & demands, state_t & state)
             {
-                static uint32_t _usec_prev;
+                // Maintain state over loop iterations
+                static state_t _state;
 
                  // Keep track of what time it is and how much time has elapsed
                 // since the last loop
+                static uint32_t _usec_prev;
                 _usec_curr = micros();      
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
@@ -315,7 +315,7 @@ namespace hf {
                 _wasArmingSwitchOn = isArmingSwitchOn;
 
                 // Disarm when requested
-                if (_channels[4] < CHAN5_ARM_MIN) {
+                if (_channels[4] < ARMING_SWITCH_MIN) {
                     _isArmed = false;
                 }
 

@@ -370,9 +370,6 @@ namespace hf {
                     EspNowUtils::sendToPeer(
                             TELEMETRY_DONGLE_ADDRESS, _msp.payload, _msp.payloadSize,
                             "fc", "dongle");
-
-                    // Output current state
-                    memcpy(&state, &_state, sizeof(state_t));
                 }
 
                 // Convert stick demands to appropriate intervals
@@ -391,9 +388,11 @@ namespace hf {
                     blinkLed(_gotFailsafe);
                 }
 
+                // Output current state
+                memcpy(&state, &_state, sizeof(state_t));
+
                 // Debug periodically
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("c1=%d\n", _channels[0]);
                 }
             }
 
