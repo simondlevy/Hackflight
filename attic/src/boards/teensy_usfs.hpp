@@ -24,17 +24,15 @@
 // Standard Arduino libraries
 #include <Wire.h>
 #include <SPI.h>
-#include <SD.h>
 
 // Third-party libraries
+#include <usfs.hpp>
 #include <pmw3901.hpp>
 #include <VL53L1X.h>
 #include <oneshot125.hpp>
-#include <usfs.hpp>
 
 // Hackflight library
 #include <hackflight.hpp>
-#include <estimators/madgwick.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
@@ -45,24 +43,9 @@ namespace hf {
 
         public:
 
-            void initWithFlowAndLogging(Receiver & rx)
-            {
-                init(rx, true, true);
-            }
-
-            void initWithLogging(Receiver & rx)
-            {
-                init(rx, false, true);
-            }
-
-            void initWithFlow(Receiver & rx)
-            {
-                init(rx, true, false);
-            }
-
             void init(Receiver & rx)
             {
-                init(rx, false, false);
+                init(rx, false);
             }
 
             void readData(
@@ -71,7 +54,6 @@ namespace hf {
                     demands_t & demands,
                     state_t & state)
             {
-                // Maintain state over loop iterations
                 static state_t _state;
 
                 // Keep track of what time it is and how much time has elapsed
@@ -81,11 +63,21 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
+                // Get vehicle commands for next loop iteration
+                rx.read(_channels, _gotFailsafe);
+
+                const auto isArmingSwitchOn = _channels[4] > 1500;
+
                 // Arm vehicle if safe
-                if (!_gotFailsafe && (_channels[4] > 1500) &&
-                        (_channels[0] < 1050)) {
+                if (
+                        !_gotFailsafe &&
+                        isArmingSwitchOn &&
+                        !_wasArmingSwitchOn &&
+                        _channels[0] < 1050) {
                     _isArmed = true;
                 }
+
+                _wasArmingSwitchOn = isArmingSwitchOn;
 
                 // LED should be on when armed
                 if (_isArmed) {
@@ -96,6 +88,8 @@ namespace hf {
                 else {
                     blinkLed();
                 }
+
+                // Read IMU --------------------------------------------------
 
                 const auto eventStatus = Usfs::checkStatus(); 
 
@@ -124,6 +118,8 @@ namespace hf {
                     _state.dpsi = gz;
                 }
 
+                // -----------------------------------------------------------
+
                 if (_flow) {
 
                     /*
@@ -136,6 +132,7 @@ namespace hf {
                     bool gotFlow = false;
                     _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
+                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }*/
                 }
 
@@ -148,40 +145,38 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-                // Debug as needed
+                // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
-                    printf("%+3.3f\n", _state.phi);
-                }
-
-                // Log data if indicated
-                if (_logFile && _loggingTimer.isReady(_usec_curr, LOGGING_RATE_HZ)) {
                 }
 
                 // Output current state
                 memcpy(&state, &_state, sizeof(state_t));
-            }
+             }
 
-            void runMotors(Receiver & rx, const float * motors)
+            void runMotors(const float * motors)
             {
                 // Rescale motor values for OneShot125
-                _m1_usec = scaleMotor(motors[0]);
-                _m2_usec = scaleMotor(motors[1]);
-                _m3_usec = scaleMotor(motors[2]);
-                _m4_usec = scaleMotor(motors[3]);
+                auto m1_usec = scaleMotor(motors[0]);
+                auto m2_usec = scaleMotor(motors[1]);
+                auto m3_usec = scaleMotor(motors[2]);
+                auto m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
-                cutMotors(_channels[4], _isArmed); 
+                if (_channels[4] < 1500 || !_isArmed || _gotFailsafe) {
+                    _isArmed = false;
+                    m1_usec = 120;
+                    m2_usec = 120;
+                    m3_usec = 120;
+                    m4_usec = 120;
+                }
 
                 // Run motors
-                runMotors(); 
+                _motors.set(0, m1_usec);
+                _motors.set(1, m2_usec);
+                _motors.set(2, m3_usec);
+                _motors.set(3, m4_usec);
 
-                // Get vehicle commands for next loop iteration
-                rx.read(_channels, _gotFailsafe);
-
-                // Disarm immiedately on failsafe
-                if (_gotFailsafe) {
-                    _isArmed = false;
-                }
+                _motors.run();
 
                 runLoopDelay(_usec_curr);
             }
@@ -220,9 +215,8 @@ namespace hf {
             PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 23, 4, 15, 6 };
+            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
-            uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
             // Blinkenlights --------------------------------------------------
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
@@ -232,12 +226,6 @@ namespace hf {
             // Debugging ------------------------------------------------------
             static constexpr float DEBUG_RATE_HZ = 100;
             Timer _debugTimer;
-
-            // SD card data logging ------------------------------------------
-            static constexpr float LOGGING_RATE_HZ = 20;
-            static constexpr char * LOG_FILE_NAME = (char *)"log.dat";
-            Timer _loggingTimer;
-            File _logFile;
 
             // Demand prescaling --------------------------------------------
 
@@ -264,21 +252,18 @@ namespace hf {
             // Safety
             bool _isArmed;
             bool _gotFailsafe;
-
-            // State estimation
-            MadgwickFilter  _madgwick;
+            bool _wasArmingSwitchOn;
 
             // Private methods -----------------------------------------------
 
-            void init(Receiver & rx, bool flow, bool logging)
+            void init(Receiver & rx, bool flow)
             {
                 _ledPin = flow ? 0 :LED_BUILTIN;
 
                 _flow = flow;
 
                 // Set up serial debugging
-                Serial.begin(500000);
-                delay(500);
+                Serial.begin(115200);
 
                 // Start receiver
                 rx.begin();
@@ -289,26 +274,10 @@ namespace hf {
 
                 // Initialize the I^2C bus
                 Wire.begin();
-                Wire.setClock(400000); 
 
                 // Initialize the SPI bus if we're doing optical flow
                 if (flow) {
                     SPI.begin();
-                }
-
-                delay(5);
-
-                if (logging) {
-
-                    if (!SD.begin(BUILTIN_SDCARD)) {
-                        reportForever("SD card initialization failed");
-                    }
-
-                    if (SD.exists(LOG_FILE_NAME)) {
-                        SD.remove(LOG_FILE_NAME);
-                    }
-
-                    _logFile = SD.open(LOG_FILE_NAME, FILE_WRITE);
                 }
 
                 // Initialize the sensors
@@ -320,19 +289,11 @@ namespace hf {
                     initOpticalFlow();
                 }
 
-                // Initialize the Madgwick filter
-                _madgwick.initialize();
-
-                delay(5);
-
                 // Arm OneShot125 motors
-                armMotor(_m4_usec);
-                armMotor(_m2_usec);
-                armMotor(_m1_usec);
-                armMotor(_m3_usec);
                 _motors.arm();
-            }
 
+                _wasArmingSwitchOn = true;
+            }
 
             static float mapchan(
                     Receiver & rx,
@@ -422,34 +383,6 @@ namespace hf {
                 if (!_pmw3901.begin()) {
                     reportForever("PMW3901 initialization unsuccessful");
                 }
-            }
-
-            void runMotors() 
-            {
-                _motors.set(0, _m1_usec);
-                _motors.set(1, _m2_usec);
-                _motors.set(2, _m3_usec);
-                _motors.set(3, _m4_usec);
-
-                _motors.run();
-            }
-
-            void cutMotors(const uint32_t chan_5, bool & isArmed) 
-            {
-                if (chan_5 < 1500 || !isArmed) {
-                    isArmed = false;
-                    _m1_usec = 120;
-                    _m2_usec = 120;
-                    _m3_usec = 120;
-                    _m4_usec = 120;
-
-                }
-            }
-
-            static void armMotor(uint8_t & m_usec)
-            {
-                // OneShot125 range from 125 to 250 usec
-                m_usec = 125;
             }
 
             static uint8_t scaleMotor(const float mval)

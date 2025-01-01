@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <boards/teensy_mpu.hpp>
+#include <board.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
