@@ -46,9 +46,42 @@ namespace hf {
 
             void init(Receiver & rx)
             {
-                init(rx, false);
-            }
+                // Set up serial debugging
+                Serial.begin(115200);
 
+                // Start receiver
+                rx.begin();
+
+                // Initialize LED
+                pinMode(LED_BUILTIN, OUTPUT); 
+                digitalWrite(LED_BUILTIN, HIGH);
+
+                // Initialize the I^2C bus
+                Wire.begin();
+
+                // Initialize the SPI bus if we're doing optical flow
+                if (false) {
+                    SPI.begin();
+                }
+
+                // Initialize the sensors
+                initImu();
+                initRangefinder();
+
+                // Initial flow and rangefinder if indicated
+                if (false) {
+                    initOpticalFlow();
+                }
+
+                // Initialize the Madgwick filter
+                _madgwick.initialize();
+
+                // Arm OneShot125 motors
+                _motors.arm();
+
+                _wasArmingSwitchOn = true;
+            }
+ 
             void readData(
                     float & dt,
                     Receiver & rx,
@@ -80,7 +113,7 @@ namespace hf {
 
                 // LED should be on when armed
                 if (_isArmed) {
-                    digitalWrite(_ledPin, HIGH);
+                    digitalWrite(LED_BUILTIN, HIGH);
                 }
 
                 // Otherwise, blink LED as heartbeat or failsafe rate
@@ -119,7 +152,7 @@ namespace hf {
                 state.theta = angles.y;
                 state.psi = angles.z;
 
-                if (_flow) {
+                if (false) {
 
                     /*
                     // Read rangefinder, non-blocking
@@ -204,8 +237,6 @@ namespace hf {
 
             // Optical flow sensor --------------------------------------------
 
-            bool _flow;
-
             PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
@@ -215,7 +246,6 @@ namespace hf {
             // Blinkenlights --------------------------------------------------
             static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
-            uint8_t _ledPin;
 
             // Debugging ------------------------------------------------------
             static constexpr float DEBUG_RATE_HZ = 100;
@@ -253,49 +283,7 @@ namespace hf {
 
             // Private methods -----------------------------------------------
 
-            void init(Receiver & rx, bool flow)
-            {
-                _ledPin = flow ? 0 :LED_BUILTIN;
-
-                _flow = flow;
-
-                // Set up serial debugging
-                Serial.begin(115200);
-
-                // Start receiver
-                rx.begin();
-
-                // Initialize LED
-                pinMode(_ledPin, OUTPUT); 
-                digitalWrite(_ledPin, HIGH);
-
-                // Initialize the I^2C bus
-                Wire.begin();
-
-                // Initialize the SPI bus if we're doing optical flow
-                if (flow) {
-                    SPI.begin();
-                }
-
-                // Initialize the sensors
-                initImu();
-
-                // Initial flow and rangefinder if indicated
-                if (_flow) {
-                    initRangefinder();
-                    initOpticalFlow();
-                }
-
-                // Initialize the Madgwick filter
-                _madgwick.initialize();
-
-                // Arm OneShot125 motors
-                _motors.arm();
-
-                _wasArmingSwitchOn = true;
-            }
-
-            static float mapchan(
+           static float mapchan(
                     Receiver & rx,
                     const uint16_t rawval,
                     const float newmin,
@@ -402,7 +390,7 @@ namespace hf {
 
                     _usec_prev = _usec_curr;
 
-                    digitalWrite(_ledPin, _alternate);
+                    digitalWrite(LED_BUILTIN, _alternate);
 
                     if (_alternate) {
                         _alternate = false;
