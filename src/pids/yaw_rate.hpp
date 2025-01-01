@@ -35,11 +35,9 @@ namespace hf {
 
             static constexpr float I_LIMIT = 25.0;     
 
-            static constexpr float SCALE = 5e-1;
-
-            static constexpr float KP = SCALE * 0.003;           
-            static constexpr float KI = SCALE * 0.0005;          
-            static constexpr float KD = SCALE * 0.0000015;       
+            static constexpr float KP = 0.003;           
+            static constexpr float KI = 0.0005;          
+            static constexpr float KD = 0.0000015;       
 
         public:
 

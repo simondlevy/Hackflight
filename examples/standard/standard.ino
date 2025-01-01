@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <board_mpu.hpp>
+#include <boards/teensy_mpu.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
@@ -26,11 +26,11 @@
 
 #include <mixers/bfquadx.hpp>
 
-#include <receivers/sbus.hpp>
+#include <receivers/dsmx.hpp>
 
 static hf::Board _board;
 
-static hf::SbusReceiver _rx;
+static hf::DsmxReceiver _rx;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 

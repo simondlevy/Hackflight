@@ -27,10 +27,10 @@
 
 static Dsm2048 _dsm2048;
 
-void serialEvent5(void)
+void serialEvent2(void)
 {
-    while (Serial5.available()) {
-        _dsm2048.parse(Serial5.read(), micros());
+    while (Serial2.available()) {
+        _dsm2048.parse(Serial2.read(), micros());
     }
 }
 
@@ -43,7 +43,7 @@ namespace hf {
 
             void begin()
             {
-                Serial5.begin(115000);
+                Serial2.begin(115000);
             }
 
             void read(uint16_t channels[6], bool & gotFailsafe) 
