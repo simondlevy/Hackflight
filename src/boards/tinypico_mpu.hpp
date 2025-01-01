@@ -87,7 +87,7 @@ namespace hf {
             Timer _telemetryTimer;
 
             // Prescaling for controx axes ------------------------------------
-            static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
+            static constexpr float PITCH_ROLL_PRESCALE = 60.0;    
             static constexpr float YAW_PRESCALE = 160.0;     
 
             // Debugging -----------------------------------------------------
@@ -204,10 +204,10 @@ namespace hf {
             {
                 if (chan_5 < 1500 || !isArmed) {
                     isArmed = false;
-                    _m1_usec = 120;
-                    _m2_usec = 120;
-                    _m3_usec = 120;
-                    _m4_usec = 120;
+                    _m1_usec = 125;
+                    _m2_usec = 125;
+                    _m3_usec = 125;
+                    _m4_usec = 125;
 
                 }
             }
@@ -346,22 +346,22 @@ namespace hf {
                 axis3_t angles = {};
                 Utils::quat2euler(quat, angles);
 
-                state.phi = angles.x;
-                state.theta = angles.y;
-                state.psi = angles.z;
+                _state.phi = angles.x;
+                _state.theta = angles.y;
+                _state.psi = angles.z;
 
                 // Get angular velocities directly from gyro
-                state.dphi = gyro.x;
-                state.dtheta = -gyro.y;
-                state.dpsi = gyro.z;
+                _state.dphi = gyro.x;
+                _state.dtheta = -gyro.y;
+                _state.dpsi = gyro.z;
 
                 // Send telemetry periodically
                 if (_telemetryTimer.isReady(_usec_curr, TELEMETRY_RATE_HZ)) {
 
                     const float vals[10] = {
-                        state.dx, state.dy, state.z, state.dz, state.phi,
-                        state.dphi, state.theta, state.dtheta, state.psi,
-                        state.dpsi
+                        _state.dx, _state.dy, _state.z, _state.dz, _state.phi,
+                        _state.dphi, _state.theta, _state.dtheta, _state.psi,
+                        _state.dpsi
                     };
 
                     static Msp _msp;
@@ -389,10 +389,12 @@ namespace hf {
                     blinkLed(_gotFailsafe);
                 }
 
+                // Output current state
+                memcpy(&state, &_state, sizeof(state_t));
+
                 // Debug periodically
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
                 }
-
             }
 
             void runMotors(const float * motors)
