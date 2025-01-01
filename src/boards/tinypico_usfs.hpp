@@ -59,10 +59,7 @@ namespace hf {
             uint8_t _m1_usec, _m2_usec, _m3_usec, _m4_usec;
 
             // Receiver ------------------------------------------------------------------
-            static const uint16_t CHAN5_ARM_MIN = 1000;
-            static const uint16_t CHAN1_ARM_MAX = 180;
             uint16_t _channels[6];
-
 
             // USFS IMU ------------------------------------------------------
 
@@ -107,8 +104,8 @@ namespace hf {
 
             // Safety --------------------------------------------------------
             static const int32_t FAILSAFE_TIMEOUT_MSEC = 125;
-            static const uint16_t ARMING_SWITCH_MIN = 1500;
-            static const uint16_t THROTTLE_ARMING_MAX = 1000;
+            static const uint16_t ARMING_SWITCH_MIN = 1000;
+            static const uint16_t THROTTLE_ARMING_MAX = 180;
             bool _isArmed;
             bool _gotFailsafe;
             uint32_t _lastReceivedMsec;
@@ -326,7 +323,7 @@ namespace hf {
                 _wasArmingSwitchOn = isArmingSwitchOn;
 
                 // Disarm when requested
-                if (_channels[4] < CHAN5_ARM_MIN) {
+                if (_channels[4] < ARMING_SWITCH_MIN) {
                     _isArmed = false;
                 }
 
@@ -396,8 +393,8 @@ namespace hf {
 
                 // Debug periodically
                 if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                    printf("c1=%d\n", _channels[0]);
                 }
-
             }
 
             void runMotors(const float * motors)
