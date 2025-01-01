@@ -54,24 +54,14 @@ namespace hf {
 
                 // Initialize LED
                 pinMode(LED_BUILTIN, OUTPUT); 
-                digitalWrite(LED_BUILTIN, HIGH);
 
                 // Initialize the I^2C bus
                 Wire.begin();
 
-                // Initialize the SPI bus if we're doing optical flow
-                if (false) {
-                    SPI.begin();
-                }
 
-                // Initialize the sensors
+                // Initialize the I^2C sensors
                 initImu();
                 initRangefinder();
-
-                // Initial flow and rangefinder if indicated
-                if (false) {
-                    initOpticalFlow();
-                }
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
@@ -154,15 +144,16 @@ namespace hf {
 
                 if (false) {
 
+                    int16_t flowDx = 0;
+                    int16_t flowDy = 0;
+                    bool gotFlow = false;
+                    _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
+
                     /*
                     // Read rangefinder, non-blocking
                     const uint16_t range = _vl53l1.read(false);
 
                     // Read optical flow sensor
-                    int16_t flowDx = 0;
-                    int16_t flowDy = 0;
-                    bool gotFlow = false;
-                    _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
                     if (gotFlow) {
                         //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }*/
