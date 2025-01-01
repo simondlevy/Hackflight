@@ -182,6 +182,12 @@ namespace hf {
                 return pose_t {state.x, -state.y, state.z, state.phi, state.theta, state.psi };
             }
 
+            void reset()
+            {
+                memset(&state, 0, sizeof(state_t));
+                memset(&_dstate, 0, sizeof(state_t));
+            }
+
             // ---------------------------------------------------------------
 
         private:

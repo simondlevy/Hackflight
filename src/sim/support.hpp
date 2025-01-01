@@ -78,7 +78,7 @@ namespace hf {
         }
 
         if (landed) {
-            printf("landed\n");
+            _dynamics.reset();
         }
 
         // Get current pose from dynamics
