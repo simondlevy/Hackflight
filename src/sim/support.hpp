@@ -49,6 +49,8 @@ namespace hf {
 
     static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
     {
+        bool landed = false;
+
         // Run control in middle loop
         for (uint32_t j=0;
                 j < (uint32_t)(1 / siminfo.framerate * PID_RATE);  ++j) {
@@ -67,7 +69,16 @@ namespace hf {
             for (uint32_t k=0; k<DYNAMICS_RATE / PID_RATE; ++k) {
 
                 _dynamics.update(motors, &mixer);
+
+                if (_dynamics.state.z < 0) {
+                    landed = true;
+                    break;
+                }
             }
+        }
+
+        if (landed) {
+            printf("landed\n");
         }
 
         // Get current pose from dynamics

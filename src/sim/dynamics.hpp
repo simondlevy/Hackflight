@@ -46,13 +46,10 @@ namespace hf {
 
     class Dynamics {
 
-        friend class GroundTruth;
-        friend class Gyrometer;
-        friend class Accelerometer;
-        friend class OpticalFlow;
-        friend class Rangefinder;
-
         public:
+
+            // Vehicle state (Equation 11)
+            state_t state;
 
             /**
              *  Vehicle parameters
@@ -188,9 +185,6 @@ namespace hf {
             // ---------------------------------------------------------------
 
         private:
-
-            // Vehicle state (Equation 11)
-            state_t state;
 
             // Vehicle state first derivative (Equation 12)
             state_t _dstate;
