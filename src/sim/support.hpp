@@ -77,6 +77,7 @@ namespace hf {
             }
         }
 
+        // Reset dynamics if landed
         if (landed) {
             _dynamics.reset();
         }
