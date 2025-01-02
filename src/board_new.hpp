@@ -39,7 +39,8 @@
 #include <utils.hpp>
 #include <timer.hpp>
 
-static uint32_t _msgcount;
+static uint8_t _msg[256];
+static uint8_t _msgcount;
 
 void serialEvent1()
 {
@@ -49,12 +50,18 @@ void serialEvent1()
 
         const auto c = Serial1.read();
 
+        _msg[_msgcount++] = c;
+
         if (_msp.parse(c)) {
 
-            _msgcount++;
+            for (uint8_t k=0; k<_msgcount; ++k) {
+                printf("%02x ", _msg[k]);
+            }
+            printf("\n");
+
+            _msgcount = 0;
         }
     }
-
 }
 
 namespace hf {
@@ -176,7 +183,7 @@ namespace hf {
 
                     // Read optical flow sensor
                     if (gotFlow) {
-                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
+                    //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
                     }*/
                 }
 
@@ -221,9 +228,8 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("%ld\n", _msgcount);
                 }
-             }
+            }
 
             void runMotors(const float * motors)
             {
@@ -259,7 +265,7 @@ namespace hf {
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
             // Telemetry ------------------------------------------------------
-           Timer _telemetryTimer = Timer(60); // Hz
+            Timer _telemetryTimer = Timer(60); // Hz
 
             // IMU ------------------------------------------------------------
 
@@ -322,7 +328,7 @@ namespace hf {
 
             // Private methods -----------------------------------------------
 
-           static float mapchan(
+            static float mapchan(
                     Receiver & rx,
                     const uint16_t rawval,
                     const float newmin,
