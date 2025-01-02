@@ -34,7 +34,8 @@
 // Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
-#include <msp.hpp>
+#include <msp/parser.hpp>
+#include <msp/serializer.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
 
@@ -42,18 +43,18 @@ static uint16_t _channels[6];
 
 void serialEvent1()
 {
-    static hf::Msp _msp;
+    static hf::MspParser _parser;
 
     while (Serial1.available()) {
 
-        if (_msp.parse(Serial1.read())) {
+        if (_parser.parse(Serial1.read())) {
 
-            _channels[0] = _msp.getUshort(0);
-            _channels[1] = _msp.getUshort(1);
-            _channels[2] = _msp.getUshort(2);
-            _channels[3] = _msp.getUshort(3);
-            _channels[4] = _msp.getUshort(4);
-            _channels[5] = _msp.getUshort(5);
+            _channels[0] = _parser.getUshort(0);
+            _channels[1] = _parser.getUshort(1);
+            _channels[2] = _parser.getUshort(2);
+            _channels[3] = _parser.getUshort(3);
+            _channels[4] = _parser.getUshort(4);
+            _channels[5] = _parser.getUshort(5);
         }
     }
 }
@@ -201,11 +202,12 @@ namespace hf {
                         state.dpsi
                     };
 
-                    static Msp _msp;
+                    static MspSerializer _serializer;
 
-                    _msp.serializeFloats(121, vals, 10);
+                    _serializer.serializeFloats(121, vals, 10);
 
-                    Serial1.write(_msp.payload, _msp.payloadSize);
+                    Serial1.write(
+                            _serializer.payload, _serializer.payloadSize); 
                 }
 
                 // Debug periodically as needed

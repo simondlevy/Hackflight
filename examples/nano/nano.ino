@@ -21,7 +21,7 @@
 
 #include <hackflight.hpp>
 #include <espnow/utils.hpp>
-#include <msp.hpp>
+#include <msp/parser.hpp>
 
 static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
     0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
@@ -45,7 +45,7 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
 // to Teensy.
 void serialEvent1()
 {
-    static hf::Msp _msp;
+    static hf::MspParser _parser;
 
     static uint8_t _msg[256];
     static uint8_t _msgcount;
@@ -56,7 +56,7 @@ void serialEvent1()
 
         _msg[_msgcount++] = c;
 
-        if (_msp.parse(c)) {
+        if (_parser.parse(c)) {
 
             hf::EspNowUtils::sendToPeer(
                     TELEMETRY_DONGLE_ADDRESS, _msg, _msgcount, "nano", "dongle");

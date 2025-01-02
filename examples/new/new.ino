@@ -18,7 +18,7 @@
 
 #include <hackflight.hpp>
 
-#include <board_new.hpp>
+#include <newboard.hpp>
 
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
