@@ -60,11 +60,21 @@ void setup()
 
 void loop() 
 {
-    while (Serial1.available()) {
+    static hf::Msp _msp;
 
-        const uint8_t msg[1] = { Serial1.read() };
+    const float vals[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-        hf::EspNowUtils::sendToPeer(
-                TELEMETRY_DONGLE_ADDRESS, msg, 1, "nano", "dongle");
+    _msp.serializeFloats(121, vals, 10);
+
+    uint8_t msg[256] = {};
+    uint8_t msgcount = 0;
+
+    while (_msp.available()) {
+        msg[msgcount++] = _msp.read();
     }
+
+    hf::EspNowUtils::sendToPeer(
+            TELEMETRY_DONGLE_ADDRESS, msg, msgcount, "nano", "dongle");
+
+    delay(10);
 }
