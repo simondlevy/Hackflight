@@ -127,7 +127,7 @@ namespace hf {
             }
 
         public:
-    
+
             uint8_t payload[BUF_SIZE];
 
             uint8_t payloadSize;
@@ -135,66 +135,69 @@ namespace hf {
             /**
              * Returns message ID or 0 for not  ready
              */
-             uint8_t parse(const uint8_t byte)
+            uint8_t parse(const uint8_t byte)
             {
                 uint8_t result = 0;
 
-                if (_state == 0) { // sync char 1
-                    if (byte == 36) {  // $
-                        _state++;
-                    }
-                }
+                switch (_state) {
 
-                else if (_state == 1)  { // sync char 2
-                    if (byte == 77) { // M
+                    case 0:
+                        if (byte == 36) {  // $
+                            _state++;
+                        }
+                        break;
+
+                    case 1:
+                        if (byte == 77) { // M
+                            _state++;
+                        }
+                        else {  // restart and try again
+                            _state = 0;
+                        }
+                        break;
+
+                    case 2:
                         _state++;
-                    }
-                    else {  // restart and try again
+                        break;
+
+                    case 3:
+                        _message_length_expected = byte;
+                        _message_checksum = byte;
+                        _message_index = 0;
+                        _state++;
+                        break;
+
+                    case 4:
+                        _message_id = byte;
+                        _message_length_received = 0;
+                        _message_checksum ^= byte;
+                        if (_message_length_expected > 0) {
+                            // process payload
+                            _state++;
+                        }
+                        else {
+                            // no payload
+                            _state += 2;
+                        }
+                        break;
+
+                    case 5:
+                        _message_buffer[_message_index++] = byte;
+                        _message_checksum ^= byte;
+                        _message_length_received++;
+                        if (_message_length_received >= _message_length_expected) {
+                            _state++;
+                        }
+                        break;
+
+                    case 6:
+                        if (_message_checksum == byte) {
+                            result = _message_id;
+                        }
+                        // Reset variables
+                        _message_length_received = 0;
                         _state = 0;
-                    }
-                }
-
-                else if (_state == 2)  { // direction
-                    _state++;
-                }
-
-                else if (_state == 3) {
-                    _message_length_expected = byte;
-                    _message_checksum = byte;
-                    _message_index = 0;
-                    _state++;
-                }
-
-                else if (_state == 4) {
-                    _message_id = byte;
-                    _message_length_received = 0;
-                    _message_checksum ^= byte;
-                    if (_message_length_expected > 0) {
-                        // process payload
-                        _state++;
-                    }
-                    else {
-                        // no payload
-                        _state += 2;
-                    }
-                 }
-
-                else if (_state == 5)  { // payload
-                    _message_buffer[_message_index++] = byte;
-                    _message_checksum ^= byte;
-                    _message_length_received++;
-                    if (_message_length_received >= _message_length_expected) {
-                        _state++;
-                    }
-                }
-
-                else if (_state == 6) {
-                    if (_message_checksum == byte) {
-                        result = _message_id;
-                    }
-                    // Reset variables
-                    _message_length_received = 0;
-                    _state = 0;
+                        break;
                 }
 
                 return result;
