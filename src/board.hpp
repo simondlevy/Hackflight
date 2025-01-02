@@ -174,7 +174,7 @@ namespace hf {
                     YAW_PRESCALE;
 
                 // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                if (_debugTimer.isReady(_usec_curr)) {
                 }
 
              }
@@ -239,8 +239,7 @@ namespace hf {
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 
             // Debugging ------------------------------------------------------
-            static constexpr float DEBUG_RATE_HZ = 100;
-            Timer _debugTimer;
+            Timer _debugTimer = Timer(100); // Hz
 
             // Demand prescaling --------------------------------------------
 
