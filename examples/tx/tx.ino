@@ -28,8 +28,8 @@
 // MSP support
 #include <msp.hpp>
 
-// Address of TinyPICO flight controller
-static uint8_t FC_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0xAA, 0x2E, 0xF0};
+// Address of TinyPICO Nano receiver
+static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0xAA, 0x31, 0xDC};
 
 // Support for SBUS from FrSky transmitter
 static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);
@@ -49,7 +49,7 @@ void setup()
     hf::EspNowUtils::init();
 
     // Add receiver as peer
-    hf::EspNowUtils::addPeer(FC_ADDRESS);
+    hf::EspNowUtils::addPeer(RX_ADDRESS);
 }
 
 void loop()
@@ -63,6 +63,6 @@ void loop()
 
         // Send the message bytes to the receiver
         hf::EspNowUtils::sendToPeer(
-                FC_ADDRESS, _msp.payload, _msp.payloadSize, "tx", "fc");
+                RX_ADDRESS, _msp.payload, _msp.payloadSize, "tx", "fc");
     }
 }
