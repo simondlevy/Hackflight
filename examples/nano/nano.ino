@@ -37,6 +37,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len)
     }
 }*/
 
+// Handles streaming telemetry messages from Teensy:  collects message bytes, and when a complete
+// message is received, sends all the message bytes to Teensy.
 void serialEvent1()
 {
     static hf::Msp _msp;
@@ -50,11 +52,7 @@ void serialEvent1()
 
         _msg[_msgcount++] = c;
 
-        printf("%02X ", c);
-
         if (_msp.parse(c)) {
-
-            printf("\n");
 
             hf::EspNowUtils::sendToPeer(
                     TELEMETRY_DONGLE_ADDRESS, _msg, _msgcount, "nano", "dongle");

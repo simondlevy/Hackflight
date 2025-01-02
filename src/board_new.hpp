@@ -197,12 +197,8 @@ namespace hf {
                     _msp.serializeFloats(121, vals, 10);
 
                     while (_msp.available()) {
-                        const auto c = _msp.read();
-                        printf("%02X ", c);
-                        Serial1.write(c);
+                        Serial1.write(_msp.read());
                     }
-                    printf("\n");
-
                 }
 
                 // Debug periodically as needed

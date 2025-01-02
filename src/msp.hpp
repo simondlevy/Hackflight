@@ -193,33 +193,6 @@ namespace hf {
 
             } // parse
 
-            bool isIdle(void)
-            {
-                return m_parserState == IDLE;
-            }
-
-            int16_t parseShort(const uint8_t index)
-            {
-                int16_t val = 0;
-                memcpy(&val,  &payload[2*index], sizeof(int16_t));
-                return val;
-
-            }
-
-            float parseFloat(const uint8_t index)
-            {
-                printf(" | %02X %02X %02X %02X ",
-                        payload[4*index],
-                        payload[4*index+1],
-                        payload[4*index+2],
-                        payload[4*index+3]);
-
-                float val = 0;
-                memcpy(&val,  &payload[4*index], sizeof(float));
-                return val;
-
-            }
-
             void serializeFloats(
                     const uint8_t messageType, const float src[], const uint8_t count)
             {
