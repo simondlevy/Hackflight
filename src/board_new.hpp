@@ -46,14 +46,14 @@ void serialEvent1()
 
     while (Serial1.available()) {
 
-        if (_msp.newparse(Serial1.read())) {
+        if (_msp.parse(Serial1.read())) {
 
-            _channels[0] = _msp.parseUshort(0);
-            _channels[1] = _msp.parseUshort(1);
-            _channels[2] = _msp.parseUshort(2);
-            _channels[3] = _msp.parseUshort(3);
-            _channels[4] = _msp.parseUshort(4);
-            _channels[5] = _msp.parseUshort(5);
+            _channels[0] = _msp.getUshort(0);
+            _channels[1] = _msp.getUshort(1);
+            _channels[2] = _msp.getUshort(2);
+            _channels[3] = _msp.getUshort(3);
+            _channels[4] = _msp.getUshort(4);
+            _channels[5] = _msp.getUshort(5);
         }
     }
 }

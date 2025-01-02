@@ -31,22 +31,10 @@ namespace hf {
 
             static const uint8_t BUF_SIZE = 128;
 
-            typedef enum {
-                IDLE,
-                GOT_START,
-                GOT_M,
-                GOT_ARROW,
-                GOT_SIZE,
-                IN_PAYLOAD,
-                GOT_CRC
-            } parserState_t; 
-
-            parserState_t _state;
-
             uint8_t _payloadChecksum;
             uint8_t _payloadIndex;
 
-            uint8_t _newstate;
+            uint8_t _state;
             uint8_t _message_buffer[256];
             uint8_t _message_length_expected;
             uint8_t _message_length_received;
@@ -147,149 +135,75 @@ namespace hf {
             /**
              * Returns message ID or 0 for not  ready
              */
-             uint8_t newparse(const uint8_t byte)
+             uint8_t parse(const uint8_t byte)
             {
                 uint8_t result = 0;
 
-                if (_newstate == 0) { // sync char 1
+                if (_state == 0) { // sync char 1
                     if (byte == 36) {  // $
-                        _newstate++;
+                        _state++;
                     }
                 }
 
-                else if (_newstate == 1)  { // sync char 2
+                else if (_state == 1)  { // sync char 2
                     if (byte == 77) { // M
-                        _newstate++;
+                        _state++;
                     }
                     else {  // restart and try again
-                        _newstate = 0;
+                        _state = 0;
                     }
                 }
 
-                else if (_newstate == 2)  { // direction
-                    _newstate++;
+                else if (_state == 2)  { // direction
+                    _state++;
                 }
 
-                else if (_newstate == 3) {
+                else if (_state == 3) {
                     _message_length_expected = byte;
                     _message_checksum = byte;
                     _message_index = 0;
-                    _newstate++;
+                    _state++;
                 }
 
-                else if (_newstate == 4) {
+                else if (_state == 4) {
                     _message_id = byte;
                     _message_length_received = 0;
                     _message_checksum ^= byte;
                     if (_message_length_expected > 0) {
                         // process payload
-                        _newstate++;
+                        _state++;
                     }
                     else {
                         // no payload
-                        _newstate += 2;
+                        _state += 2;
                     }
                  }
 
-                else if (_newstate == 5)  { // payload
+                else if (_state == 5)  { // payload
                     _message_buffer[_message_index++] = byte;
                     _message_checksum ^= byte;
                     _message_length_received++;
                     if (_message_length_received >= _message_length_expected) {
-                        _newstate++;
+                        _state++;
                     }
                 }
 
-                else if (_newstate == 6) {
+                else if (_state == 6) {
                     if (_message_checksum == byte) {
                         result = _message_id;
                     }
                     // Reset variables
                     _message_length_received = 0;
-                    _newstate = 0;
+                    _state = 0;
                 }
 
                 return result;
             }
 
-            /**
-             * Returns message type or 0 for not  ready
-             */
-            uint8_t parse(const uint8_t c)
-            {
-                uint8_t messageType = 0;
-
-                static uint8_t _type;
-                static uint8_t _crc;
-                static uint8_t _size;
-                static uint8_t _index;
-
-                // Payload transition functions
-                _size = _state == GOT_ARROW ? c : _size;
-                _index = _state == IN_PAYLOAD ? _index + 1 : 0;
-                const bool isCommand = _type >= 200;
-                const bool inPayload = isCommand && _state == IN_PAYLOAD;
-
-                // Message-type transition function
-                _type = _state == GOT_SIZE ? c : _type;
-
-                // Parser state transition function (final transition below)
-                _state
-                    = _state == IDLE && c == '$' ? GOT_START
-                    : _state == GOT_START && c == 'M' ? GOT_M
-                    : _state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-                    : _state == GOT_ARROW ? GOT_SIZE
-                    : _state == GOT_SIZE ? IN_PAYLOAD
-                    : _state == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
-                    : _state == IN_PAYLOAD ? GOT_CRC
-                    : _state;
-
-                // Checksum transition function
-                _crc 
-                    = _state == GOT_SIZE ?  c
-                    : _state == IN_PAYLOAD ? _crc ^ c
-                    : _state == GOT_CRC ? _crc 
-                    : 0;
-
-                // Payload accumulation
-                if (inPayload) {
-                    payload[_index-1] = c;
-                }
-
-                if (_state == GOT_CRC) {
-
-                    // Message dispatch
-                    if (_crc == c) {
-                        messageType = _type;
-                    }
-
-                    _state = IDLE;
-                }
-
-                return messageType;
-
-            } // parse
-
-            uint16_t parseUshort(const uint8_t index)
+            uint16_t getUshort(const uint8_t index)
             {
                 const uint8_t offset = 2 * index;
                 uint16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
-
-                /*
-                for (uint8_t k=0; k<_message_length_expected; ++k) {
-                    printf("%02X ", _message_buffer[k]);
-                }
-                printf("\n");*/
-
-                return value;
-            }
-
-            static uint16_t parseUshort(const uint8_t msg[256], const uint8_t index)
-            {
-                const uint8_t offset = 2 * index + 5;
-
-                uint16_t value = (msg[offset+1] << 8) | msg[offset];
-
                 return value;
             }
 
