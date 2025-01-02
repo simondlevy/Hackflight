@@ -41,7 +41,7 @@ namespace hf {
                 GOT_CRC
             } parserState_t; 
 
-            parserState_t m_parserState;
+            parserState_t _state;
 
             uint8_t _payloadChecksum;
             uint8_t _payloadIndex;
@@ -149,30 +149,30 @@ namespace hf {
                 static uint8_t _index;
 
                 // Payload transition functions
-                _size = m_parserState == GOT_ARROW ? c : _size;
-                _index = m_parserState == IN_PAYLOAD ? _index + 1 : 0;
+                _size = _state == GOT_ARROW ? c : _size;
+                _index = _state == IN_PAYLOAD ? _index + 1 : 0;
                 const bool isCommand = _type >= 200;
-                const bool inPayload = isCommand && m_parserState == IN_PAYLOAD;
+                const bool inPayload = isCommand && _state == IN_PAYLOAD;
 
                 // Message-type transition function
-                _type = m_parserState == GOT_SIZE ? c : _type;
+                _type = _state == GOT_SIZE ? c : _type;
 
                 // Parser state transition function (final transition below)
-                m_parserState
-                    = m_parserState == IDLE && c == '$' ? GOT_START
-                    : m_parserState == GOT_START && c == 'M' ? GOT_M
-                    : m_parserState == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-                    : m_parserState == GOT_ARROW ? GOT_SIZE
-                    : m_parserState == GOT_SIZE ? IN_PAYLOAD
-                    : m_parserState == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
-                    : m_parserState == IN_PAYLOAD ? GOT_CRC
-                    : m_parserState;
+                _state
+                    = _state == IDLE && c == '$' ? GOT_START
+                    : _state == GOT_START && c == 'M' ? GOT_M
+                    : _state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
+                    : _state == GOT_ARROW ? GOT_SIZE
+                    : _state == GOT_SIZE ? IN_PAYLOAD
+                    : _state == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
+                    : _state == IN_PAYLOAD ? GOT_CRC
+                    : _state;
 
                 // Checksum transition function
                 _crc 
-                    = m_parserState == GOT_SIZE ?  c
-                    : m_parserState == IN_PAYLOAD ? _crc ^ c
-                    : m_parserState == GOT_CRC ? _crc 
+                    = _state == GOT_SIZE ?  c
+                    : _state == IN_PAYLOAD ? _crc ^ c
+                    : _state == GOT_CRC ? _crc 
                     : 0;
 
                 // Payload accumulation
@@ -180,14 +180,14 @@ namespace hf {
                     payload[_index-1] = c;
                 }
 
-                if (m_parserState == GOT_CRC) {
+                if (_state == GOT_CRC) {
 
                     // Message dispatch
                     if (_crc == c) {
                         messageType = _type;
                     }
 
-                    m_parserState = IDLE;
+                    _state = IDLE;
                 }
 
                 return messageType;
