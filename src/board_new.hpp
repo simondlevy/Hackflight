@@ -189,9 +189,9 @@ namespace hf {
                     static Msp _msp;
 
 
-                    const float vals[1] = {state.phi};
+                    const float vals[2] = {state.phi, state.theta};
 
-                    _msp.serializeFloats(121, vals, 1);
+                    _msp.serializeFloats(121, vals, 2);
 
                     while (_msp.available()) {
 
