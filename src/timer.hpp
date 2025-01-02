@@ -31,8 +31,6 @@ namespace hf {
 
             bool isReady(const uint32_t usec_curr)
             {
-                static uint32_t _usec_prev;
-
                 const auto is_ready = (usec_curr - _usec_prev) > (1e6 / _freq_hz);
 
                 _usec_prev = is_ready ? usec_curr : _usec_prev;
@@ -41,6 +39,8 @@ namespace hf {
             }
 
         private:
+
+            uint32_t _usec_prev;
 
             float _freq_hz;
     };

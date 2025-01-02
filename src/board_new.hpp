@@ -34,6 +34,7 @@
 // Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
+#include <msp.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
@@ -49,6 +50,9 @@ namespace hf {
                 // Set up serial debugging
                 Serial.begin(115200);
 
+                // Set up serial telemetry connection to ESP32
+                Serial1.begin(115200);
+
                 // Start receiver
                 rx.begin();
 
@@ -58,10 +62,9 @@ namespace hf {
                 // Initialize the I^2C bus
                 Wire.begin();
 
-
                 // Initialize the I^2C sensors
                 initImu();
-                initRangefinder();
+                //initRangefinder();
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
@@ -173,8 +176,27 @@ namespace hf {
                 demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
+                // Send telemetry to TinyPICO Nano periodically
+                if (_telemetryTimer.isReady(_usec_curr)) {
+
+                    const float vals[10] = {
+                        state.dx, state.dy, state.z, state.dz, state.phi,
+                        state.dphi, state.theta, state.dtheta, state.psi,
+                        state.dpsi
+                    };
+
+                    static Msp _msp;
+
+                    _msp.serializeFloats(121, vals, 10);
+
+                    for (uint8_t k=0; k<_msp.payloadSize; ++k) {
+                        printf("x%02X\n", _msp.payload[k]);
+                        Serial1.write(_msp.payload[k]);
+                    }
+                }
+
                 // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr, DEBUG_RATE_HZ)) {
+                if (_debugTimer.isReady(_usec_curr)) {
                 }
 
              }
@@ -212,6 +234,9 @@ namespace hf {
             // FAFO -----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
+            // Telemetry ------------------------------------------------------
+           Timer _telemetryTimer = Timer(60); // Hz
+
             // IMU ------------------------------------------------------------
 
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -239,8 +264,7 @@ namespace hf {
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 
             // Debugging ------------------------------------------------------
-            static constexpr float DEBUG_RATE_HZ = 100;
-            Timer _debugTimer;
+            Timer _debugTimer = Timer(100); // Hz
 
             // Demand prescaling --------------------------------------------
 
