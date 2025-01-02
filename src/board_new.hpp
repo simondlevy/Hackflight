@@ -44,22 +44,16 @@ void serialEvent1()
 {
     static hf::Msp _msp;
 
-    static uint8_t _msg[256];
-
-    static uint8_t _msgcount;
-
     while (Serial1.available()) {
 
-        const auto c = Serial1.read();
+        if (_msp.newparse(Serial1.read())) {
 
-        _msg[_msgcount++] = c;
-
-        if (_msp.parse(c)) {
-
-            _channels[0] = hf::Msp::parseUshort(_msg, 0);
-            _channels[1] = hf::Msp::parseUshort(_msg, 1);
-
-            _msgcount = 0;
+            _channels[0] = _msp.parseUshort(0);
+            _channels[1] = _msp.parseUshort(1);
+            _channels[2] = _msp.parseUshort(2);
+            _channels[3] = _msp.parseUshort(3);
+            _channels[4] = _msp.parseUshort(4);
+            _channels[5] = _msp.parseUshort(5);
         }
     }
 }
@@ -218,7 +212,9 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("c1=%04d  c2=%04d\n", _channels[0], _channels[1]);
+                    printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
+                            _channels[0], _channels[1], _channels[2],
+                            _channels[3], _channels[4], _channels[5]);
                 }
             }
 

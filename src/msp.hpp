@@ -46,6 +46,14 @@ namespace hf {
             uint8_t _payloadChecksum;
             uint8_t _payloadIndex;
 
+            uint8_t _newstate;
+            uint8_t _message_buffer[256];
+            uint8_t _message_length_expected;
+            uint8_t _message_length_received;
+            uint8_t _message_checksum;
+            uint8_t _message_index;
+            uint8_t _message_id;
+
             void serialize32(const int32_t a)
             {
                 serialize8(a & 0xFF);
@@ -137,6 +145,74 @@ namespace hf {
             uint8_t payloadSize;
 
             /**
+             * Returns message ID or 0 for not  ready
+             */
+             uint8_t newparse(const uint8_t byte)
+            {
+                uint8_t result = 0;
+
+                if (_newstate == 0) { // sync char 1
+                    if (byte == 36) {  // $
+                        _newstate++;
+                    }
+                }
+
+                else if (_newstate == 1)  { // sync char 2
+                    if (byte == 77) { // M
+                        _newstate++;
+                    }
+                    else {  // restart and try again
+                        _newstate = 0;
+                    }
+                }
+
+                else if (_newstate == 2)  { // direction
+                    _newstate++;
+                }
+
+                else if (_newstate == 3) {
+                    _message_length_expected = byte;
+                    _message_checksum = byte;
+                    _message_index = 0;
+                    _newstate++;
+                }
+
+                else if (_newstate == 4) {
+                    _message_id = byte;
+                    _message_length_received = 0;
+                    _message_checksum ^= byte;
+                    if (_message_length_expected > 0) {
+                        // process payload
+                        _newstate++;
+                    }
+                    else {
+                        // no payload
+                        _newstate += 2;
+                    }
+                 }
+
+                else if (_newstate == 5)  { // payload
+                    _message_buffer[_message_index++] = byte;
+                    _message_checksum ^= byte;
+                    _message_length_received++;
+                    if (_message_length_received >= _message_length_expected) {
+                        _newstate++;
+                    }
+                }
+
+                else if (_newstate == 6) {
+                    if (_message_checksum == byte) {
+                        result = _message_id;
+                    }
+                    // Reset variables
+                    _message_length_received = 0;
+                    _newstate = 0;
+                }
+
+                return result;
+            }
+
+            /**
              * Returns message type or 0 for not  ready
              */
             uint8_t parse(const uint8_t c)
@@ -193,6 +269,20 @@ namespace hf {
                 return messageType;
 
             } // parse
+
+            uint16_t parseUshort(const uint8_t index)
+            {
+                const uint8_t offset = 2 * index;
+                uint16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+
+                /*
+                for (uint8_t k=0; k<_message_length_expected; ++k) {
+                    printf("%02X ", _message_buffer[k]);
+                }
+                printf("\n");*/
+
+                return value;
+            }
 
             static uint16_t parseUshort(const uint8_t msg[256], const uint8_t index)
             {
