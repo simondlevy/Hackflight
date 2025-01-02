@@ -58,7 +58,7 @@ void serialEvent1()
 
             for (uint8_t k=0; k<_msgcount; ++k) {
                 _channels[0] = (_msg[6] << 8) | _msg[5];
-                printf("c1=%04d\n", _channels[0]);
+                _channels[1] = (_msg[8] << 8) | _msg[7];
             }
 
             _msgcount = 0;
@@ -220,6 +220,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
+                    printf("c1=%04d  c2=%04d\n", _channels[0], _channels[1]);
                 }
             }
 
@@ -323,8 +324,9 @@ namespace hf {
                     const float newmin,
                     const float newmax)
             {
-                return newmin + (rawval - (float)0) / 
-                    (2048 - (float)0) * (newmax - newmin);
+                // TX sends SBUS values
+                return newmin + (rawval - (float)173) / 
+                    (1811 - (float)173) * (newmax - newmin);
             }
 
             static void runLoopDelay(const uint32_t usec_curr)
