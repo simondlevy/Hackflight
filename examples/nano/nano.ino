@@ -21,7 +21,6 @@
 
 #include <hackflight.hpp>
 #include <espnow/utils.hpp>
-
 #include <msp.hpp>
 
 static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
@@ -32,20 +31,17 @@ static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
     0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
 };
 
-static uint32_t _count;
-
+// Handles EPS-NOW SET_RC messages from transmitter
 void espnowEvent(const uint8_t * mac, const uint8_t * data, int len) 
 {
     (void)mac;
 
-    _count++;
-
-    for (int k=0; k<len; ++k) {
-    }
+    Serial1.write(data, len);
 }
 
-// Handles streaming telemetry messages from Teensy:  collects message bytes, and when a complete
-// message is received, sends all the message bytes to Teensy.
+// Handles streaming STATE telemetry messages from Teensy:  collects message
+// bytes, and when a complete message is received, sends all the message bytes
+// to Teensy.
 void serialEvent1()
 {
     static hf::Msp _msp;
@@ -93,7 +89,4 @@ void setup()
 
 void loop() 
 {
-    printf("%ld\n", _count);
-
-    delay(10);
 }

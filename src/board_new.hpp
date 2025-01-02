@@ -43,7 +43,18 @@ static uint32_t _msgcount;
 
 void serialEvent1()
 {
-    _msgcount++;
+    static hf::Msp _msp;
+
+    while (Serial1.available()) {
+
+        const auto c = Serial1.read();
+
+        if (_msp.parse(c)) {
+
+            _msgcount++;
+        }
+    }
+
 }
 
 namespace hf {
@@ -81,7 +92,7 @@ namespace hf {
 
                 _wasArmingSwitchOn = true;
             }
- 
+
             void readData(
                     float & dt,
                     Receiver & rx,
