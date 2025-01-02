@@ -179,24 +179,29 @@ namespace hf {
                 // Send telemetry to TinyPICO Nano periodically
                 if (_telemetryTimer.isReady(_usec_curr)) {
 
-                    /*
                     const float vals[10] = {
-                        state.dx, state.dy, state.z, state.dz, state.phi,
-                        state.dphi, state.theta, state.dtheta, state.psi,
+                        state.dx,
+                        state.dy,
+                        state.z,
+                        state.dz,
+                        state.phi,
+                        state.dphi,
+                        state.theta,
+                        state.dtheta,
+                        state.psi,
                         state.dpsi
-                    };*/
+                    };
 
                     static Msp _msp;
 
-
-                    const float vals[2] = {state.phi, state.theta};
-
-                    _msp.serializeFloats(121, vals, 2);
+                    _msp.serializeFloats(121, vals, 10);
 
                     while (_msp.available()) {
-
-                        Serial1.write(_msp.read());
+                        const auto c = _msp.read();
+                        printf("%02X ", c);
+                        Serial1.write(c);
                     }
+                    printf("\n");
 
                 }
 

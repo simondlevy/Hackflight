@@ -28,8 +28,6 @@ static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
     0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
 };
 
-static hf::Msp _parser;
-
 /*
 void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {
@@ -38,6 +36,33 @@ void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len)
     for (int k=0; k<len; ++k) {
     }
 }*/
+
+void serialEvent1()
+{
+    static hf::Msp _msp;
+
+    static uint8_t _msg[256];
+    static uint8_t _msgcount;
+
+    while (Serial1.available()) {
+
+        const auto c = Serial1.read();
+
+        _msg[_msgcount++] = c;
+
+        printf("%02X ", c);
+
+        if (_msp.parse(c)) {
+
+            printf("\n");
+
+            hf::EspNowUtils::sendToPeer(
+                    TELEMETRY_DONGLE_ADDRESS, _msg, _msgcount, "nano", "dongle");
+
+            _msgcount = 0;
+        }
+    }
+}
 
 void setup() 
 {
@@ -60,21 +85,23 @@ void setup()
 
 void loop() 
 {
-    static hf::Msp _msp;
+    /*
+       static hf::Msp _msp;
 
-    const float vals[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+       const float vals[10] = {1, 2, 3, 4, _phi, 6, 7, 8, 9, 10};
 
-    _msp.serializeFloats(121, vals, 10);
+       _msp.serializeFloats(121, vals, 10);
 
-    uint8_t msg[256] = {};
-    uint8_t msgcount = 0;
+       uint8_t msg[256] = {};
+       uint8_t msgcount = 0;
 
-    while (_msp.available()) {
-        msg[msgcount++] = _msp.read();
-    }
+       while (_msp.available()) {
+       msg[msgcount++] = _msp.read();
+       }
 
-    hf::EspNowUtils::sendToPeer(
-            TELEMETRY_DONGLE_ADDRESS, msg, msgcount, "nano", "dongle");
+       hf::EspNowUtils::sendToPeer(
+       TELEMETRY_DONGLE_ADDRESS, msg, msgcount, "nano", "dongle");
 
-    delay(10);
+       delay(10);
+     */
 }

@@ -208,6 +208,12 @@ namespace hf {
 
             float parseFloat(const uint8_t index)
             {
+                printf(" | %02X %02X %02X %02X ",
+                        payload[4*index],
+                        payload[4*index+1],
+                        payload[4*index+2],
+                        payload[4*index+3]);
+
                 float val = 0;
                 memcpy(&val,  &payload[4*index], sizeof(float));
                 return val;
