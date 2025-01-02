@@ -58,10 +58,7 @@ void loop()
 
         const auto data = _sbus.data();
 
-        /*
-        Serial.printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
-                data.ch[0], data.ch[1], data.ch[2],
-                data.ch[3], data.ch[4], data.ch[5]);*/
+        Serial.printf("c1=%04d\n", data.ch[0]);
 
         // Create an MSP message from the channel values
         _msp.serializeShorts(200, data.ch, 6);
