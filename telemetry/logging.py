@@ -34,11 +34,19 @@ class MyMspParser(Parser):
 
         self.last_received_time = 0
 
+    def handle_STATE(self, phi):
+
+        print('phi=%+03.0f' % phi)
+
+        self.last_received_time = time()
+
+    '''
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         print('phi=%+03.0f theta=%+03.0f psi=%+03.0f' % (phi, theta, psi))
 
         self.last_received_time = time()
+    '''
 
 
 def main():

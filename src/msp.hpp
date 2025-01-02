@@ -200,9 +200,17 @@ namespace hf {
 
             int16_t parseShort(const uint8_t index)
             {
-                int16_t s = 0;
-                memcpy(&s,  &payload[2*index], sizeof(int16_t));
-                return s;
+                int16_t val = 0;
+                memcpy(&val,  &payload[2*index], sizeof(int16_t));
+                return val;
+
+            }
+
+            float parseFloat(const uint8_t index)
+            {
+                float val = 0;
+                memcpy(&val,  &payload[4*index], sizeof(float));
+                return val;
 
             }
 

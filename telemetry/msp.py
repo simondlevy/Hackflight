@@ -93,7 +93,8 @@ class Parser(metaclass=abc.ABCMeta):
     def dispatchMessage(self):
 
         if self.message_id == 121:
-            self.handle_STATE(*struct.unpack('=ffffffffff', self.message_buffer))
+            # self.handle_STATE(*struct.unpack('=ffffffffff', self.message_buffer))
+            self.handle_STATE(*struct.unpack('=f', self.message_buffer))
 
         return
 

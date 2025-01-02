@@ -26,9 +26,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
-    for (int k=0; k<len; ++k) {
-        Serial.write(data[k]);
-    }
+    Serial.write(data, len);
 }
 
 void setup() 

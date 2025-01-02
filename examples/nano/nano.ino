@@ -22,17 +22,22 @@
 #include <hackflight.hpp>
 #include <espnow/utils.hpp>
 
+#include <msp.hpp>
+
 static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
     0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
 };
 
+static hf::Msp _parser;
+
+/*
 void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {
     (void)mac;
 
     for (int k=0; k<len; ++k) {
     }
-}
+}*/
 
 void setup() 
 {
@@ -45,14 +50,21 @@ void setup()
     // Start ESP-NOW
     hf::EspNowUtils::init();
 
+    // Add the telemetry dongle as a peer
+    hf::EspNowUtils::addPeer(TELEMETRY_DONGLE_ADDRESS);
+
     // Once ESPNow is successfully Init, we will register for recv CB to
     // get recv packer info
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    //esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 }
 
 void loop() 
 {
     while (Serial1.available()) {
-        printf("x%02X\n", Serial1.read());
+
+        const uint8_t msg[1] = { Serial1.read() };
+
+        hf::EspNowUtils::sendToPeer(
+                TELEMETRY_DONGLE_ADDRESS, msg, 1, "nano", "dongle");
     }
 }
