@@ -31,7 +31,8 @@ static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
     0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
 };
 
-// Handles EPS-NOW SET_RC messages from transmitter
+// Handles EPS-NOW SET_RC messages from transmitter, sending them to Teensy
+// over UART.
 void espnowEvent(const uint8_t * mac, const uint8_t * data, int len) 
 {
     (void)mac;

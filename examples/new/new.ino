@@ -26,11 +26,7 @@
 
 #include <mixers/bfquadx.hpp>
 
-#include <receivers/dsmx.hpp>
-
 static hf::Board _board;
-
-static hf::DsmxReceiver _rx;
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
@@ -43,7 +39,7 @@ static hf::BfQuadXMixer _mixer;
 
 void setup() 
 {
-    _board.init(_rx);
+    _board.init();
 }
 
 void loop() 
@@ -52,7 +48,7 @@ void loop()
     hf::demands_t demands = {};
     hf::state_t state = {};
 
-    _board.readData(dt, _rx, demands, state);
+    _board.readData(dt, demands, state);
 
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 

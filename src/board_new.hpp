@@ -35,16 +35,18 @@
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
 #include <msp.hpp>
-#include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
 
-static uint8_t _msg[256];
-static uint8_t _msgcount;
+static uint16_t _channels[6];
 
 void serialEvent1()
 {
     static hf::Msp _msp;
+
+    static uint8_t _msg[256];
+
+    static uint8_t _msgcount;
 
     while (Serial1.available()) {
 
@@ -55,9 +57,8 @@ void serialEvent1()
         if (_msp.parse(c)) {
 
             for (uint8_t k=0; k<_msgcount; ++k) {
-                printf("%02x ", _msg[k]);
+                _channels[0] = (_msg[6] << 8) | _msg[7];
             }
-            printf("\n");
 
             _msgcount = 0;
         }
@@ -70,16 +71,13 @@ namespace hf {
 
         public:
 
-            void init(Receiver & rx)
+            void init()
             {
                 // Set up serial debugging
                 Serial.begin(115200);
 
                 // Set up serial telemetry connection to ESP32
                 Serial1.begin(115200);
-
-                // Start receiver
-                rx.begin();
 
                 // Initialize LED
                 pinMode(LED_BUILTIN, OUTPUT); 
@@ -100,11 +98,7 @@ namespace hf {
                 _wasArmingSwitchOn = true;
             }
 
-            void readData(
-                    float & dt,
-                    Receiver & rx,
-                    demands_t & demands,
-                    state_t & state)
+            void readData(float & dt, demands_t & demands, state_t & state)
             {
                 // Keep track of what time it is and how much time has elapsed
                 // since the last loop
@@ -112,9 +106,6 @@ namespace hf {
                 static uint32_t _usec_prev;
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
-
-                // Get vehicle commands for next loop iteration
-                rx.read(_channels, _gotFailsafe);
 
                 const auto isArmingSwitchOn = _channels[4] > 1500;
 
@@ -193,12 +184,12 @@ namespace hf {
                 state.dpsi = gyro.z;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = mapchan(rx, _channels[0],  0.,  1.);
-                demands.roll   = mapchan(rx, _channels[1], -1,  +1) *
+                demands.thrust = mapchan(_channels[0],  0.,  1.);
+                demands.roll   = mapchan(_channels[1], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.pitch  = mapchan(rx, _channels[2], -1,  +1) *
+                demands.pitch  = mapchan(_channels[2], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
+                demands.yaw    = mapchan(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
                 // Send telemetry to TinyPICO Nano periodically
@@ -228,6 +219,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
+                    printf("c1=%04d\n", _channels[0]);
                 }
             }
 
@@ -316,8 +308,6 @@ namespace hf {
 
             uint32_t _usec_curr;
 
-            uint16_t _channels[6];
-
             // Safety
             bool _isArmed;
             bool _gotFailsafe;
@@ -329,13 +319,12 @@ namespace hf {
             // Private methods -----------------------------------------------
 
             static float mapchan(
-                    Receiver & rx,
                     const uint16_t rawval,
                     const float newmin,
                     const float newmax)
             {
-                return newmin + (rawval - (float)rx.minval()) / 
-                    (rx.maxval() - (float)rx.minval()) * (newmax - newmin);
+                return newmin + (rawval - (float)0) / 
+                    (2048 - (float)0) * (newmax - newmin);
             }
 
             static void runLoopDelay(const uint32_t usec_curr)
