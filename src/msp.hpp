@@ -45,8 +45,6 @@ namespace hf {
 
             uint8_t _payloadChecksum;
             uint8_t _payloadIndex;
-            uint8_t _payload[BUF_SIZE];
-            uint8_t _payloadSize;
 
             void serialize32(const int32_t a)
             {
@@ -71,7 +69,7 @@ namespace hf {
             void prepareToSerialize(
                     const uint8_t type, const uint8_t count, const uint8_t size)
             {
-                _payloadSize = 0;
+                payloadSize = 0;
                 _payloadIndex = 0;
                 _payloadChecksum = 0;
 
@@ -84,7 +82,7 @@ namespace hf {
 
             void addToOutBuf(const uint8_t a)
             {
-                _payload[_payloadSize++] = a;
+                payload[payloadSize++] = a;
             }
 
             void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
@@ -134,6 +132,10 @@ namespace hf {
 
         public:
     
+            uint8_t payload[BUF_SIZE];
+
+            uint8_t payloadSize;
+
             /**
              * Returns message type or 0 for not  ready
              */
@@ -175,7 +177,7 @@ namespace hf {
 
                 // Payload accumulation
                 if (inPayload) {
-                    _payload[_index-1] = c;
+                    payload[_index-1] = c;
                 }
 
                 if (m_parserState == GOT_CRC) {
@@ -218,13 +220,13 @@ namespace hf {
 
             uint8_t available(void)
             {
-                return _payloadSize;
+                return payloadSize;
             }
 
             uint8_t read(void)
             {
-                _payloadSize--;
-                return _payload[_payloadIndex++];
+                payloadSize--;
+                return payload[_payloadIndex++];
             }
 
     };

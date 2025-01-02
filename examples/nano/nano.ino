@@ -28,14 +28,21 @@ static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
     0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
 };
 
-/*
-void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
+static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
+    0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
+};
+
+static uint32_t _count;
+
+void espnowEvent(const uint8_t * mac, const uint8_t * data, int len) 
 {
     (void)mac;
 
+    _count++;
+
     for (int k=0; k<len; ++k) {
     }
-}*/
+}
 
 // Handles streaming telemetry messages from Teensy:  collects message bytes, and when a complete
 // message is received, sends all the message bytes to Teensy.
@@ -76,30 +83,17 @@ void setup()
     // Add the telemetry dongle as a peer
     hf::EspNowUtils::addPeer(TELEMETRY_DONGLE_ADDRESS);
 
+    // Add the transmitter as a peer
+    hf::EspNowUtils::addPeer(TRANSMITTER_ADDRESS);
+
     // Once ESPNow is successfully Init, we will register for recv CB to
     // get recv packer info
-    //esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    esp_now_register_recv_cb(esp_now_recv_cb_t(espnowEvent));
 }
 
 void loop() 
 {
-    /*
-       static hf::Msp _msp;
+    printf("%ld\n", _count);
 
-       const float vals[10] = {1, 2, 3, 4, _phi, 6, 7, 8, 9, 10};
-
-       _msp.serializeFloats(121, vals, 10);
-
-       uint8_t msg[256] = {};
-       uint8_t msgcount = 0;
-
-       while (_msp.available()) {
-       msg[msgcount++] = _msp.read();
-       }
-
-       hf::EspNowUtils::sendToPeer(
-       TELEMETRY_DONGLE_ADDRESS, msg, msgcount, "nano", "dongle");
-
-       delay(10);
-     */
+    delay(10);
 }

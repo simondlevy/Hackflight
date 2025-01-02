@@ -39,6 +39,13 @@
 #include <utils.hpp>
 #include <timer.hpp>
 
+static uint32_t _msgcount;
+
+void serialEvent1()
+{
+    _msgcount++;
+}
+
 namespace hf {
 
     class Board {
@@ -203,8 +210,8 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
+                    printf("%ld\n", _msgcount);
                 }
-
              }
 
             void runMotors(const float * motors)
