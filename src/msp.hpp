@@ -43,8 +43,10 @@ namespace hf {
 
             parserState_t m_parserState;
 
-            uint8_t m_payloadChecksum;
-            uint8_t m_payloadIndex;
+            uint8_t _payloadChecksum;
+            uint8_t _payloadIndex;
+            uint8_t _payload[BUF_SIZE];
+            uint8_t _payloadSize;
 
             void serialize32(const int32_t a)
             {
@@ -63,15 +65,15 @@ namespace hf {
             void serialize8(const uint8_t a)
             {
                 addToOutBuf(a);
-                m_payloadChecksum ^= a;
+                _payloadChecksum ^= a;
             }
 
             void prepareToSerialize(
                     const uint8_t type, const uint8_t count, const uint8_t size)
             {
-                payloadSize = 0;
-                m_payloadIndex = 0;
-                m_payloadChecksum = 0;
+                _payloadSize = 0;
+                _payloadIndex = 0;
+                _payloadChecksum = 0;
 
                 addToOutBuf('$');
                 addToOutBuf('M');
@@ -82,7 +84,7 @@ namespace hf {
 
             void addToOutBuf(const uint8_t a)
             {
-                payload[payloadSize++] = a;
+                _payload[_payloadSize++] = a;
             }
 
             void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
@@ -112,8 +114,8 @@ namespace hf {
 
             void completeSerialize(void)
             {
-                serialize8(m_payloadChecksum);
-                m_payloadIndex = 0;
+                serialize8(_payloadChecksum);
+                _payloadIndex = 0;
             }
 
             void serializeFloat(const float src)
@@ -132,9 +134,6 @@ namespace hf {
 
         public:
     
-            uint8_t payload[BUF_SIZE];
-            uint8_t payloadSize;
-
             /**
              * Returns message type or 0 for not  ready
              */
@@ -176,7 +175,7 @@ namespace hf {
 
                 // Payload accumulation
                 if (inPayload) {
-                    payload[_index-1] = c;
+                    _payload[_index-1] = c;
                 }
 
                 if (m_parserState == GOT_CRC) {
@@ -219,13 +218,13 @@ namespace hf {
 
             uint8_t available(void)
             {
-                return payloadSize;
+                return _payloadSize;
             }
 
             uint8_t read(void)
             {
-                payloadSize--;
-                return payload[m_payloadIndex++];
+                _payloadSize--;
+                return _payload[_payloadIndex++];
             }
 
     };
