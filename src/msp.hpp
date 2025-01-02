@@ -230,18 +230,6 @@ namespace hf {
 
                 completeSerialize();
             }
-
-            uint8_t available(void)
-            {
-                return payloadSize;
-            }
-
-            uint8_t read(void)
-            {
-                payloadSize--;
-                return payload[_payloadIndex++];
-            }
-
     };
 
 }

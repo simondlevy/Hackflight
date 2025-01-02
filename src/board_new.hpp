@@ -205,9 +205,7 @@ namespace hf {
 
                     _msp.serializeFloats(121, vals, 10);
 
-                    while (_msp.available()) {
-                        Serial1.write(_msp.read());
-                    }
+                    Serial1.write(_msp.payload, _msp.payloadSize);
                 }
 
                 // Debug periodically as needed
