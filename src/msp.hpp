@@ -194,6 +194,15 @@ namespace hf {
 
             } // parse
 
+            static uint16_t parseUshort(const uint8_t msg[256], const uint8_t index)
+            {
+                const uint8_t offset = 2 * index + 5;
+
+                uint16_t value = (msg[offset+1] << 8) | msg[offset];
+
+                return value;
+            }
+
             void serializeFloats(
                     const uint8_t messageType, const float src[], const uint8_t count)
             {

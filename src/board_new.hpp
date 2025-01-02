@@ -56,10 +56,8 @@ void serialEvent1()
 
         if (_msp.parse(c)) {
 
-            for (uint8_t k=0; k<_msgcount; ++k) {
-                _channels[0] = (_msg[6] << 8) | _msg[5];
-                _channels[1] = (_msg[8] << 8) | _msg[7];
-            }
+            _channels[0] = hf::Msp::parseUshort(_msg, 0);
+            _channels[1] = hf::Msp::parseUshort(_msg, 1);
 
             _msgcount = 0;
         }
