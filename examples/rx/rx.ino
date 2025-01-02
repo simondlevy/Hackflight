@@ -38,6 +38,7 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
     (void)mac;
 
     Serial1.write(data, len);
+
 }
 
 // Handles streaming STATE telemetry messages from Teensy:  collects message

@@ -22,6 +22,8 @@
 #include <hackflight.hpp>
 #include <espnow/utils.hpp>
 
+static uint32_t _count;
+
 void OnDataRecv(const uint8_t * mac, const uint8_t * data, int len) 
 {
     (void)mac;
