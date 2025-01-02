@@ -226,11 +226,11 @@
 <hole x="19.9" y="15.9" drill="2.4"/>
 <wire x1="23" y1="15.6" x2="15.3" y2="23.7" width="0.1524" layer="20" curve="-275.323414"/>
 <wire x1="91.2" y1="23.7" x2="83.7" y2="15.7" width="0.1524" layer="20" curve="-278.537787"/>
-<text x="50.195503125" y="30.193903125" size="1.778" layer="25" rot="R270">USFS</text>
-<text x="47.6" y="31.5" size="1.016" layer="25">GD</text>
-<text x="47.6" y="29.2" size="1.016" layer="25">3V</text>
-<text x="47.3" y="21.6" size="1.016" layer="25">DA</text>
-<text x="47.4" y="24.3" size="1.016" layer="25">CL</text>
+<text x="51.095503125" y="32.993903125" size="1.778" layer="25" rot="R270">MPU6050</text>
+<text x="47.3" y="24.1" size="1.016" layer="25">GD</text>
+<text x="47.4" y="21.5" size="1.016" layer="25">3V</text>
+<text x="47.6" y="26.8" size="1.016" layer="25">DA</text>
+<text x="47.5" y="29.2" size="1.016" layer="25">CL</text>
 <text x="60.4326" y="68.2508" size="1.016" layer="25" rot="R180">5V</text>
 <text x="57.695503125" y="70.193903125" size="1.778" layer="26" rot="SMR0">Reg</text>
 <text x="60.4326" y="70.9508" size="1.016" layer="25" rot="R180">GD</text>
