@@ -86,7 +86,7 @@ namespace hf {
                 // Arm OneShot125 motors
                 _motors.arm();
 
-                _wasArmingSwitchOn = true;
+                _was_arming_switch_on = true;
             }
 
             void readData(float & dt, demands_t & demands, state_t & state)
@@ -98,16 +98,16 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
-                const auto isArmingSwitchOn = _channels[4] > 1500;
+                const auto is_arming_switch_on = _channels[4] > 1500;
 
                 // Arm vehicle if safe
-                if ( isArmingSwitchOn &&
-                        !_wasArmingSwitchOn &&
+                if ( is_arming_switch_on &&
+                        !_was_arming_switch_on &&
                         _channels[0] < 1050) {
-                    _isArmed = true;
+                    _is_armed = true;
                 }
 
-                _wasArmingSwitchOn = isArmingSwitchOn;
+                _was_arming_switch_on = is_arming_switch_on;
 
                 // Read IMU
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
@@ -212,8 +212,8 @@ namespace hf {
                 auto m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
-                if (_channels[4] < 1500 || !_isArmed) {
-                    _isArmed = false;
+                if (_channels[4] < 1500 || !_is_armed) {
+                    _is_armed = false;
                     m1_usec = 120;
                     m2_usec = 120;
                     m3_usec = 120;
@@ -285,8 +285,8 @@ namespace hf {
             uint32_t _usec_curr;
 
             // Safety
-            bool _isArmed;
-            bool _wasArmingSwitchOn;
+            bool _is_armed;
+            bool _was_arming_switch_on;
 
             // State estimation
             MadgwickFilter  _madgwick;
