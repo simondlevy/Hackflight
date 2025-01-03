@@ -19,9 +19,15 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// DotStar LED support
+#include <TinyPICO.h>
+
+// Hackflight support
 #include <hackflight.hpp>
 #include <espnow/utils.hpp>
 #include <msp/parser.hpp>
+
+// ESP-NOW comms -------------------------------------------------------------
 
 static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
     0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
@@ -30,6 +36,51 @@ static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
 static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
     0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
 };
+
+// Blinkenlights -------------------------------------------------------------
+
+static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
+static const uint32_t LED_HEARTBEAT_COLOR = 0x00FF00;
+static const uint32_t LED_ARMED_COLOR = 0xFF0000;
+static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
+TinyPICO _tinypico;
+
+static void blinkLed(const bool gotFailsafe)
+{
+    const auto freq_hz =
+        gotFailsafe ?
+        FAILSAFE_BLINK_RATE_HZ :
+        HEARTBEAT_BLINK_RATE_HZ;
+
+    const auto color = gotFailsafe ? LED_FAILSAFE_COLOR : LED_HEARTBEAT_COLOR;
+
+    static uint32_t _usec_prev;
+
+    static uint32_t _delay_usec;
+
+    const auto usec_curr = micros();
+
+    if (usec_curr - _usec_prev > _delay_usec) {
+
+        static bool _alternate;
+
+        _usec_prev = usec_curr;
+
+        _tinypico.DotStar_SetPixelColor(_alternate ? color : 0x000000);
+
+        if (_alternate) {
+            _alternate = false;
+            _delay_usec = 100'100;
+        }
+
+        else {
+            _alternate = true;
+            _delay_usec = freq_hz * 1e6;
+        }
+    }
+}
+
 
 // Handles EPS-NOW SET_RC messages from transmitter, sending them to Teensy
 // over UART.
@@ -41,8 +92,8 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
 
 }
 
-// Handles streaming STATE telemetry messages from Teensy:  collects message
-// bytes, and when a complete message is received, sends all the message bytes
+// Handles streaming messages from Teensy:  collects message bytes, and when a
+// complete message is received, sends all the message bytes
 // to Teensy.
 void serialEvent1()
 {
@@ -57,7 +108,7 @@ void serialEvent1()
 
         _msg[_msgcount++] = c;
 
-        if (_parser.parse(c)) {
+        if (_parser.parse(c) == 121) { // STATE
 
             hf::EspNowUtils::sendToPeer(
                     TELEMETRY_DONGLE_ADDRESS, _msg, _msgcount, "nano", "dongle");
