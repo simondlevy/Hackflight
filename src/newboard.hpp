@@ -73,9 +73,6 @@ namespace hf {
                 // Set up serial telemetry connection to ESP32
                 Serial1.begin(115200);
 
-                // Initialize LED
-                pinMode(LED_BUILTIN, OUTPUT); 
-
                 // Initialize the I^2C bus
                 Wire.begin();
 
@@ -104,25 +101,13 @@ namespace hf {
                 const auto isArmingSwitchOn = _channels[4] > 1500;
 
                 // Arm vehicle if safe
-                if (
-                        !_gotFailsafe &&
-                        isArmingSwitchOn &&
+                if ( isArmingSwitchOn &&
                         !_wasArmingSwitchOn &&
                         _channels[0] < 1050) {
                     _isArmed = true;
                 }
 
                 _wasArmingSwitchOn = isArmingSwitchOn;
-
-                // LED should be on when armed
-                if (_isArmed) {
-                    digitalWrite(LED_BUILTIN, HIGH);
-                }
-
-                // Otherwise, blink LED as heartbeat or failsafe rate
-                else {
-                    blinkLed();
-                }
 
                 // Read IMU
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
@@ -227,7 +212,7 @@ namespace hf {
                 auto m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
-                if (_channels[4] < 1500 || !_isArmed || _gotFailsafe) {
+                if (_channels[4] < 1500 || !_isArmed) {
                     _isArmed = false;
                     m1_usec = 120;
                     m2_usec = 120;
@@ -276,10 +261,6 @@ namespace hf {
             const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
 
-            // Blinkenlights --------------------------------------------------
-            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
-            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
-
             // Debugging ------------------------------------------------------
             Timer _debugTimer = Timer(100); // Hz
 
@@ -305,7 +286,6 @@ namespace hf {
 
             // Safety
             bool _isArmed;
-            bool _gotFailsafe;
             bool _wasArmingSwitchOn;
 
             // State estimation
@@ -401,36 +381,6 @@ namespace hf {
             {
                 return Utils::u8constrain(mval*125 + 125, 125, 250);
 
-            }
-
-            void blinkLed()
-            {
-                const auto freq_hz =
-                    _gotFailsafe ?
-                    FAILSAFE_BLINK_RATE_HZ :
-                    HEARTBEAT_BLINK_RATE_HZ;
-
-                static uint32_t _usec_prev;
-
-                static uint32_t _delay_usec;
-
-                if (_usec_curr - _usec_prev > _delay_usec) {
-
-                    static bool _alternate;
-
-                    _usec_prev = _usec_curr;
-
-                    digitalWrite(LED_BUILTIN, _alternate);
-
-                    if (_alternate) {
-                        _alternate = false;
-                        _delay_usec = 100'100;
-                    }
-                    else {
-                        _alternate = true;
-                        _delay_usec = freq_hz * 1e6;
-                    }
-                }
             }
 
             static void reportForever(const char * message)
