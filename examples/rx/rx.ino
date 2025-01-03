@@ -78,11 +78,14 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
             const auto is_arming_switch_on = c5 > 1500;
 
             // Arm vehicle if safe
-            if (is_arming_switch_on && !_was_arming_switch_on && c1 < 1050) {
-                _is_armed = true;
+            if (is_arming_switch_on) {
+                if (!_was_arming_switch_on && c1 < 1050) {
+                    _is_armed = true;
+                }
             }
 
-            if (!is_arming_switch_on) {
+            // Disarm
+            else {
                 _is_armed = false;
             }
 
