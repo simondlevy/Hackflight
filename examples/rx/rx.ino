@@ -69,11 +69,7 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
         if (_parser.parse(data[k])) {
 
             const auto c1 = _parser.getUshort(0);
-            const auto c2 = _parser.getUshort(1);
-            const auto c3 = _parser.getUshort(2);
-            const auto c4 = _parser.getUshort(3);
             const auto c5 = _parser.getUshort(4);
-            const auto c6 = _parser.getUshort(6);
 
             const auto is_arming_switch_on = c5 > 1500;
 
@@ -90,12 +86,10 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
             }
 
             _was_arming_switch_on = is_arming_switch_on;
-
-            printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d c6=%04d\n",
-                    c1, c2, c3, c4, c5, c6);
         }
     }
 
+    // Send message along to Teensy
     Serial1.write(data, len);
 
 }
