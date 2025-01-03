@@ -1,8 +1,5 @@
 /*
-   ESP32 dongle sketch
-
-   Relays SET_RC messages from GCS program to onboard ESP32; receives telemetry
-   from onboard ESP32 and relays to GCS.
+   Arming protocol
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -19,37 +16,9 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// DotStar LED support
-#include <TinyPICO.h>
-
-// Hackflight support
-#include <hackflight.hpp>
-#include <espnow/utils.hpp>
-#include <msp/parser.hpp>
-
-// ESP-NOW comms -------------------------------------------------------------
-
-static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
-    0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
-};
-
-static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
-    0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
-};
-
-// Blinkenlights -------------------------------------------------------------
-
-static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
-static const uint32_t LED_HEARTBEAT_COLOR = 0x00FF00;
-static const uint32_t LED_ARMED_COLOR = 0xFF0000;
-static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
-static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
-TinyPICO _tinypico;
-
 // Failsafe ------------------------------------------------------------------
 static uint32_t FAILSAFE_MSEC = 100;
 static uint32_t _last_received_msec;
-static bool _failsafe;
 
 // Arming  -------------------------------------------------------------------
 static bool _was_arming_switch_on;
@@ -87,11 +56,10 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
             }
 
             _was_arming_switch_on = is_arming_switch_on;
-
         }
     }
 
-    // Send SET_RC message to Teensy
+    // Send message along to Teensy
     Serial1.write(data, len);
 
 }
@@ -146,6 +114,8 @@ void setup()
 
 void loop() 
 {
+    static bool _failsafe;
+
     // Show steady red LED if armed
     if (_is_armed) {
         _tinypico.DotStar_SetPixelColor(LED_ARMED_COLOR);
