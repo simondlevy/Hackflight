@@ -148,8 +148,11 @@ void setup()
 
 void loop() 
 {
-    blinkLed(false);
+    static bool _failsafe;
+
+    blinkLed(_failsafe);
 
     if (millis() - _last_received_msec > FAILSAFE_MSEC) {
+        _failsafe = true;
     }
 }
