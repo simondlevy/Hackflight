@@ -46,6 +46,10 @@ static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
 static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 TinyPICO _tinypico;
 
+// Failsafe ------------------------------------------------------------------
+static uint32_t FAILSAFE_MSEC = 100;
+static uint32_t _last_received_msec;
+
 static void blinkLed(const bool gotFailsafe)
 {
     const auto freq_hz =
@@ -87,6 +91,8 @@ static void blinkLed(const bool gotFailsafe)
 void espnowEvent(const uint8_t * mac, const uint8_t * data, int len) 
 {
     (void)mac;
+
+    _last_received_msec = millis();
 
     Serial1.write(data, len);
 
@@ -142,4 +148,8 @@ void setup()
 
 void loop() 
 {
+    blinkLed(false);
+
+    if (millis() - _last_received_msec > FAILSAFE_MSEC) {
+    }
 }
