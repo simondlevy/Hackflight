@@ -101,11 +101,11 @@ namespace hf {
 
     } pose_t;
 
-    typedef enum status_e {
+    enum {
 
         STATUS_READY,
         STATUS_ARMED,
         STATUS_FAILSAFE
 
-    } status_e;
+    };
 }

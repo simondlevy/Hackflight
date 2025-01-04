@@ -53,6 +53,8 @@ void espnowEvent(const uint8_t * mac, const uint8_t * data, int len)
     Serial1.write(data, len);
 }
 
+static uint8_t _status;
+
 // Handles streaming messages from Teensy:  collects message bytes, and when a
 // complete message is received, sends all the message bytes
 // to Teensy.
@@ -73,13 +75,15 @@ void serialEvent1()
 
         if (msgid) {
 
-            // Send telemetry to dongle
-            if (msgid == 121) {
-                hf::EspNowUtils::sendToPeer(TELEMETRY_DONGLE_ADDRESS,
-                        _msg, _msgcount, "nano", "dongle");
+            // Handle status messag
+            if (msgid == 122) {
+                _status = _msg[5];
             }
 
+            // Send telemetry to dongle
             else {
+                hf::EspNowUtils::sendToPeer(TELEMETRY_DONGLE_ADDRESS,
+                        _msg, _msgcount, "nano", "dongle");
             }
 
             _msgcount = 0;
@@ -112,4 +116,6 @@ void setup()
 
 void loop() 
 {
+    printf("%d\n", _status);
+    delay(10);
 }

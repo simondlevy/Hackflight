@@ -203,6 +203,13 @@ namespace hf {
 
                     Serial1.write(
                             _serializer.payload, _serializer.payloadSize); 
+
+
+                    _serializer.serializeBytes(122, &_status, 1);
+
+                    Serial1.write(
+                            _serializer.payload, _serializer.payloadSize); 
+
                 }
 
                 // Debug periodically as needed
@@ -297,7 +304,7 @@ namespace hf {
             // Safety ---------------------------------------------------------
             static constexpr uint32_t FAILSAFE_USEC = 100000;
             bool _was_arming_switch_on;
-            status_e _status;
+            uint8_t _status;
 
             // State estimation
             MadgwickFilter  _madgwick;
