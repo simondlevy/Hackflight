@@ -176,7 +176,6 @@ namespace hf {
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
                 }
-
              }
 
             void runMotors(const float * motors)
@@ -231,7 +230,7 @@ namespace hf {
             PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
+            const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
 
             // Blinkenlights --------------------------------------------------
