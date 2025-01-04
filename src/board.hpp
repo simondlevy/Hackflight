@@ -61,7 +61,7 @@ namespace hf {
 
                 // Initialize the I^2C sensors
                 initImu();
-                initRangefinder();
+                //initRangefinder();
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();

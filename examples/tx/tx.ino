@@ -26,16 +26,16 @@
 #include <espnow/utils.hpp>
 
 // MSP support
-#include <msp.hpp>
+#include <msp/serializer.hpp>
 
 // Address of TinyPICO Nano receiver
-static uint8_t RX_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0xAA, 0x31, 0xDC};
+static uint8_t RX_ADDRESS[] = {0xE8, 0x6B, 0xEA, 0x24, 0xF6, 0xD0};
 
 // Support for SBUS from FrSky transmitter
 static bfs::SbusRx _sbus = bfs::SbusRx(&Serial1, 25, 26, true);
 
 // Support for serializing messages
-static hf::Msp _msp;
+static hf::MspSerializer _serializer;
 
 void setup()
 {
@@ -59,10 +59,10 @@ void loop()
         const auto data = _sbus.data();
 
         // Create an MSP message from the channel values
-        _msp.serializeShorts(200, data.ch, 6);
+        _serializer.serializeShorts(200, data.ch, 6);
 
         // Send the message bytes to the receiver
-        hf::EspNowUtils::sendToPeer(
-                RX_ADDRESS, _msp.payload, _msp.payloadSize, "tx", "fc");
+        hf::EspNowUtils::sendToPeer(RX_ADDRESS,
+                _serializer.payload, _serializer.payloadSize, "tx", "fc");
     }
 }

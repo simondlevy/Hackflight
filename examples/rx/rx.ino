@@ -55,7 +55,6 @@ static bool _failsafe;
 static bool _was_arming_switch_on;
 static bool _is_armed;
 
-
 // Handles EPS-NOW SET_RC messages from transmitter
 void espnowEvent(const uint8_t * mac, const uint8_t * data, int len) 
 {
