@@ -214,7 +214,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("%d\n", _status);
+
                 }
             }
 

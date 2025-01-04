@@ -1,8 +1,13 @@
 /*
-   ESP32 dongle sketch
+   ESP32 receiver sketch
 
-   Relays SET_RC messages from GCS program to onboard ESP32; receives telemetry
-   from onboard ESP32 and relays to GCS.
+   Does the following:
+
+       - Relays SET_RC messages from transmitter to Teensy
+
+       - Relays telemetry from Teensy to dongle
+
+       - Sets LED color and blink rate based on status messages from Teensy
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -155,5 +160,4 @@ void loop()
         }
 
     }
-
 }
