@@ -69,7 +69,7 @@ namespace hf {
                 // Arm OneShot125 motors
                 _motors.arm();
 
-                _wasArmingSwitchOn = true;
+                _was_arming_switch_on = true;
             }
  
             void readData(
@@ -86,23 +86,23 @@ namespace hf {
                 _usec_prev = _usec_curr;      
 
                 // Get vehicle commands for next loop iteration
-                rx.read(_channels, _gotFailsafe);
+                rx.read(_channels, _got_failsafe);
 
                 const auto isArmingSwitchOn = _channels[4] > 1500;
 
                 // Arm vehicle if safe
                 if (
-                        !_gotFailsafe &&
+                        !_got_failsafe &&
                         isArmingSwitchOn &&
-                        !_wasArmingSwitchOn &&
+                        !_was_arming_switch_on &&
                         _channels[0] < 1050) {
-                    _isArmed = true;
+                    _is_armed = true;
                 }
 
-                _wasArmingSwitchOn = isArmingSwitchOn;
+                _was_arming_switch_on = isArmingSwitchOn;
 
                 // LED should be on when armed
-                if (_isArmed) {
+                if (_is_armed) {
                     digitalWrite(LED_BUILTIN, HIGH);
                 }
 
@@ -187,8 +187,8 @@ namespace hf {
                 auto m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
-                if (_channels[4] < 1500 || !_isArmed || _gotFailsafe) {
-                    _isArmed = false;
+                if (_channels[4] < 1500 || !_is_armed || _got_failsafe) {
+                    _is_armed = false;
                     m1_usec = 120;
                     m2_usec = 120;
                     m3_usec = 120;
@@ -263,9 +263,9 @@ namespace hf {
             uint16_t _channels[6];
 
             // Safety
-            bool _isArmed;
-            bool _gotFailsafe;
-            bool _wasArmingSwitchOn;
+            bool _is_armed;
+            bool _got_failsafe;
+            bool _was_arming_switch_on;
 
             // State estimation
             MadgwickFilter  _madgwick;
@@ -365,7 +365,7 @@ namespace hf {
             void blinkLed()
             {
                 const auto freq_hz =
-                    _gotFailsafe ?
+                    _got_failsafe ?
                     FAILSAFE_BLINK_RATE_HZ :
                     HEARTBEAT_BLINK_RATE_HZ;
 

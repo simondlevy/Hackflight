@@ -41,6 +41,8 @@
 
 static uint16_t _channels[6];
 
+static uint32_t _last_rx_received_usec;
+
 void serialEvent1()
 {
     static hf::MspParser _parser;
@@ -48,6 +50,8 @@ void serialEvent1()
     while (Serial1.available()) {
 
         if (_parser.parse(Serial1.read())) {
+
+            _last_rx_received_usec = micros();
 
             _channels[0] = _parser.getUshort(0);
             _channels[1] = _parser.getUshort(1);
@@ -98,13 +102,19 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
+                // Trigger failsafe after sufficient lapse in RX signal
+                if (_usec_curr - _last_rx_received_usec > FAILSAFE_USEC) {
+                    _status = STATUS_FAILSAFE;
+                }
+
                 const auto is_arming_switch_on = _channels[4] > 1500;
 
                 // Arm vehicle if safe
-                if ( is_arming_switch_on &&
-                        !_was_arming_switch_on &&
-                        _channels[0] < 1050) {
-                    _is_armed = true;
+                if (is_arming_switch_on &&
+                    !_was_arming_switch_on &&
+                    _status == STATUS_READY &&
+                    _channels[0] < 1050) {
+                    _status = STATUS_ARMED;
                 }
 
                 _was_arming_switch_on = is_arming_switch_on;
@@ -171,7 +181,7 @@ namespace hf {
                 demands.yaw    = mapchan(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-                // Send telemetry to TinyPICO Nano periodically
+                // Send telemetry and status to TinyPICO Nano periodically
                 if (_telemetryTimer.isReady(_usec_curr)) {
 
                     const float vals[10] = {
@@ -197,9 +207,7 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
-                            _channels[0], _channels[1], _channels[2],
-                            _channels[3], _channels[4], _channels[5]);
+                    printf("%d\n", _status);
                 }
             }
 
@@ -211,9 +219,11 @@ namespace hf {
                 auto m3_usec = scaleMotor(motors[2]);
                 auto m4_usec = scaleMotor(motors[3]);
 
-                // Turn off motors under various conditions
-                if (_channels[4] < 1500 || !_is_armed) {
-                    _is_armed = false;
+                // Turn off motors when arming switch goes low
+                if (_channels[4] < 1500) {
+                    if (_status == STATUS_ARMED) {
+                        _status = STATUS_READY;
+                    }
                     m1_usec = 120;
                     m2_usec = 120;
                     m3_usec = 120;
@@ -258,7 +268,7 @@ namespace hf {
             PMW3901 _pmw3901;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
+            const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
             OneShot125 _motors = OneShot125(MOTOR_PINS);
 
             // Debugging ------------------------------------------------------
@@ -284,9 +294,10 @@ namespace hf {
 
             uint32_t _usec_curr;
 
-            // Safety
-            bool _is_armed;
+            // Safety ---------------------------------------------------------
+            static constexpr uint32_t FAILSAFE_USEC = 100000;
             bool _was_arming_switch_on;
+            status_e _status;
 
             // State estimation
             MadgwickFilter  _madgwick;

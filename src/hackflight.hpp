@@ -100,4 +100,12 @@ namespace hf {
         float psi;
 
     } pose_t;
+
+    typedef enum status_e {
+
+        STATUS_READY,
+        STATUS_ARMED,
+        STATUS_FAILSAFE
+
+    } status_e;
 }

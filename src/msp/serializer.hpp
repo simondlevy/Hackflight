@@ -33,6 +33,18 @@ namespace hf {
 
             uint8_t payloadSize;
 
+            void serializeBytes(
+                    const uint8_t messageType, const uint8_t src[], const uint8_t count)
+            {
+                prepareToSerializeBytes(messageType, count);
+
+                for (auto k=0; k<count; ++k) {
+                    serializeByte(src[k]);
+                }
+
+                completeSerialize();
+            }
+
             void serializeFloats(
                     const uint8_t messageType, const float src[], const uint8_t count)
             {

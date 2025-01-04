@@ -2,7 +2,7 @@ SKETCH = standard
 
 FQBN = teensy:avr:teensy40
 
-PORT = /dev/ttyACM0
+PORT = /dev/ttyACM1
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
