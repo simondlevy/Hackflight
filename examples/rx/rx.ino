@@ -39,9 +39,9 @@ static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
 
 // Blinkenlights -------------------------------------------------------------
 
-static const uint32_t LED_FAILSAFE_COLOR = 0xFF0000;
-static const uint32_t LED_HEARTBEAT_COLOR = 0x00FF00;
-static const uint32_t LED_ARMED_COLOR = 0xFF0000;
+static const uint32_t LED_COLOR_FAILSAFE = 0xFF0000;
+static const uint32_t LED_COLOR_HEARTBEAT = 0x00FF00;
+static const uint32_t LED_COLOR_ARMED = 0xFF0000;
 static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
 static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 TinyPICO _tinypico;
@@ -116,6 +116,44 @@ void setup()
 
 void loop() 
 {
-    printf("%d\n", _status);
-    delay(10);
+    if (_status == hf::STATUS_ARMED) {
+        _tinypico.DotStar_SetPixelColor(LED_COLOR_ARMED);
+    }
+
+    else {
+
+        const auto failsafe = _status == hf::STATUS_FAILSAFE;
+
+        const auto blink_freq =
+            failsafe ?  FAILSAFE_BLINK_RATE_HZ : HEARTBEAT_BLINK_RATE_HZ;
+
+        const auto color = failsafe ? LED_COLOR_FAILSAFE : LED_COLOR_HEARTBEAT;
+
+        static uint32_t _msec_prev;
+
+        static uint32_t _delay_msec;
+
+        const auto msec_curr = millis();
+
+        if (msec_curr - _msec_prev > _delay_msec) {
+
+            static bool _alternate;
+
+            _msec_prev = msec_curr;
+
+            _tinypico.DotStar_SetPixelColor(_alternate ? color : 0x000000);
+
+            if (_alternate) {
+                _alternate = false;
+                _delay_msec = 100;
+            }
+
+            else {
+                _alternate = true;
+                _delay_msec = blink_freq * 1000;
+            }
+        }
+
+    }
+
 }
