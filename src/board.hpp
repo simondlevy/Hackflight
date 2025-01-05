@@ -69,7 +69,7 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
+            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
 
             // Telemetry ------------------------------------------------------
             Timer _telemetryTimer = Timer(60); // Hz
@@ -246,8 +246,6 @@ namespace hf {
  
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n", 
-                            state.phi, state.theta, state.psi);
                 }
              }
 
