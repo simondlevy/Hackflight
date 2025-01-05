@@ -1,4 +1,4 @@
-SKETCH = rx
+SKETCH = onboard
 
 # For complete list run arduino-cli board listall
 FQBN = esp32:esp32:um_tinypico

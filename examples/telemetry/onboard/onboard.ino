@@ -24,6 +24,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#if 0
 // DotStar LED support
 #include <TinyPICO.h>
 
@@ -160,4 +161,13 @@ void loop()
         }
 
     }
+}
+#endif
+
+void setup()
+{
+}
+
+void loop()
+{
 }

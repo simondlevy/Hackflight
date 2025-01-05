@@ -19,20 +19,10 @@
 
 #pragma once
 
-// General Arduino DSMRX library
-#include <dsmrx.hpp>
-
 // Hackflight Receiver interface
 #include <rx.hpp>
 
 static Dsm2048 _dsm2048;
-
-void serialEvent2(void)
-{
-    while (Serial2.available()) {
-        _dsm2048.parse(Serial2.read(), micros());
-    }
-}
 
 
 namespace hf {
@@ -50,16 +40,7 @@ namespace hf {
             {
                 gotFailsafe = false;
 
-                if (_dsm2048.timedOut(micros())) {
-
-                    gotFailsafe = true;
-                }
-
-                else if (_dsm2048.gotNewFrame()) {
-
-                    _dsm2048.getChannelValues(channels, 6);
-                }
-            }
+           }
 
             uint16_t minval() 
             {

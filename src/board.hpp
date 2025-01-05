@@ -30,6 +30,7 @@
 #include <pmw3901.hpp>
 #include <VL53L1X.h>
 #include <oneshot125.hpp>
+#include <dsmrx.hpp>
 
 // Hackflight library
 #include <hackflight.hpp>
@@ -38,19 +39,71 @@
 #include <utils.hpp>
 #include <timer.hpp>
 
+static Dsm2048 _dsm2048;
+
+// DSMX receiver callback
+void serialEvent2(void)
+{
+    while (Serial2.available()) {
+        _dsm2048.parse(Serial2.read(), micros());
+    }
+}
+
 namespace hf {
 
     class Board {
 
+        // Settings we may want to adjust
+        private:
+
+            // FAFO -----------------------------------------------------------
+            static const uint32_t LOOP_FREQ_HZ = 2000;
+
+            // IMU ------------------------------------------------------------
+
+            static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
+            static constexpr float GYRO_SCALE_FACTOR = 131.0;
+
+            static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
+            static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
+
+            // Motors ---------------------------------------------------------
+            const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
+
+            // Blinkenlights --------------------------------------------------
+            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
+
+            // Debugging ------------------------------------------------------
+            Timer _debugTimer = Timer(100); // Hz
+
+            // Demand prescaling --------------------------------------------
+
+            // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
+            // deg/sec for rate mode
+            static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
+
+            // Max yaw rate in deg/sec
+            static constexpr float YAW_PRESCALE = 160.0;     
+
+            // IMU calibration parameters -------------------------------------
+
+            static constexpr float ACC_ERROR_X = 0.0;
+            static constexpr float ACC_ERROR_Y = 0.0;
+            static constexpr float ACC_ERROR_Z = 0.0;
+            static constexpr float GYRO_ERROR_X = 0.0;
+            static constexpr float GYRO_ERROR_Y= 0.0;
+            static constexpr float GYRO_ERROR_Z = 0.0;
+
         public:
 
-            void init(Receiver & rx)
+            void init()
             {
                 // Set up serial debugging
                 Serial.begin(115200);
 
-                // Start receiver
-                rx.begin();
+                // Set up DSMX receiver
+                Serial2.begin(115200);
 
                 // Initialize LED
                 pinMode(LED_BUILTIN, OUTPUT); 
@@ -72,11 +125,7 @@ namespace hf {
                 _was_arming_switch_on = true;
             }
  
-            void readData(
-                    float & dt,
-                    Receiver & rx,
-                    demands_t & demands,
-                    state_t & state)
+            void readData( float & dt, demands_t & demands, state_t & state)
             {
                 // Keep track of what time it is and how much time has elapsed
                 // since the last loop
@@ -85,9 +134,16 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
-                // Get vehicle commands for next loop iteration
-                rx.read(_channels, _got_failsafe);
+                // Read channels values from receiver
+                if (_dsm2048.timedOut(micros())) {
 
+                    _got_failsafe = true;
+                }
+                else if (_dsm2048.gotNewFrame()) {
+
+                    _dsm2048.getChannelValues(_channels, 6);
+                }
+ 
                 const auto isArmingSwitchOn = _channels[4] > 1500;
 
                 // Arm vehicle if safe
@@ -165,12 +221,12 @@ namespace hf {
                 state.dpsi = gyro.z;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = mapchan(rx, _channels[0],  0.,  1.);
-                demands.roll   = mapchan(rx, _channels[1], -1,  +1) *
+                demands.thrust = mapchan(_channels[0],  0.,  1.);
+                demands.roll   = mapchan(_channels[1], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.pitch  = mapchan(rx, _channels[2], -1,  +1) *
+                demands.pitch  = mapchan(_channels[2], -1,  +1) *
                     PITCH_ROLL_PRESCALE;
-                demands.yaw    = mapchan(rx, _channels[3], -1,  +1) *
+                demands.yaw    = mapchan(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
                 // Debug periodically as needed
@@ -208,58 +264,18 @@ namespace hf {
 
         private:
 
-            // FAFO -----------------------------------------------------------
-            static const uint32_t LOOP_FREQ_HZ = 2000;
-
-            // IMU ------------------------------------------------------------
-
-            static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
-            static constexpr float GYRO_SCALE_FACTOR = 131.0;
-
-            static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
-            static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
-
+            // Sensors
             MPU6050 _mpu6050;
-
-            // Rangefinder ----------------------------------------------------
-
             VL53L1X _vl53l1;
-
-            // Optical flow sensor --------------------------------------------
-
             PMW3901 _pmw3901;
 
-            // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
+            // Motors
             OneShot125 _motors = OneShot125(MOTOR_PINS);
 
-            // Blinkenlights --------------------------------------------------
-            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
-            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
-
-            // Debugging ------------------------------------------------------
-            Timer _debugTimer = Timer(100); // Hz
-
-            // Demand prescaling --------------------------------------------
-
-            // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
-            // deg/sec for rate mode
-            static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
-
-            // Max yaw rate in deg/sec
-            static constexpr float YAW_PRESCALE = 160.0;     
-
-            // IMU calibration parameters -------------------------------------
-
-            static constexpr float ACC_ERROR_X = 0.0;
-            static constexpr float ACC_ERROR_Y = 0.0;
-            static constexpr float ACC_ERROR_Z = 0.0;
-            static constexpr float GYRO_ERROR_X = 0.0;
-            static constexpr float GYRO_ERROR_Y= 0.0;
-            static constexpr float GYRO_ERROR_Z = 0.0;
-
+            // Timing
             uint32_t _usec_curr;
 
+            // Receiver
             uint16_t _channels[6];
 
             // Safety
@@ -273,13 +289,11 @@ namespace hf {
             // Private methods -----------------------------------------------
 
            static float mapchan(
-                    Receiver & rx,
                     const uint16_t rawval,
                     const float newmin,
                     const float newmax)
             {
-                return newmin + (rawval - (float)rx.minval()) / 
-                    (rx.maxval() - (float)rx.minval()) * (newmax - newmin);
+                return newmin + (rawval - 988.f) / 1023 * (newmax - newmin);
             }
 
             static void runLoopDelay(const uint32_t usec_curr)
