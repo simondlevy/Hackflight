@@ -35,6 +35,7 @@
 // Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
+#include <msp/serializer.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
@@ -70,9 +71,8 @@ namespace hf {
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 2, 3, 4, 5 };
 
-            // Blinkenlights --------------------------------------------------
-            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
-            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
+            // Telemetry ------------------------------------------------------
+            Timer _telemetryTimer = Timer(60); // Hz
 
             // Debugging ------------------------------------------------------
             Timer _debugTimer = Timer(100); // Hz
@@ -99,22 +99,18 @@ namespace hf {
 
             void init()
             {
-                // Set up serial debugging
-                Serial.begin(115200);
-
-                // Set up DSMX receiver
-                Serial2.begin(115200);
-
-                // Initialize LED
-                pinMode(LED_BUILTIN, OUTPUT); 
-
                 // Initialize the I^2C bus
                 Wire.begin();
-
 
                 // Initialize the I^2C sensors
                 initImu();
                 //initRangefinder();
+
+                // Set up serial debugging
+                Serial.begin(115200);
+
+                // Set up serial connection from DSMX receiver
+                Serial2.begin(115200);
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
@@ -137,35 +133,25 @@ namespace hf {
                 // Read channels values from receiver
                 if (_dsm2048.timedOut(micros())) {
 
-                    _got_failsafe = true;
+                    _status = STATUS_FAILSAFE;
                 }
                 else if (_dsm2048.gotNewFrame()) {
 
                     _dsm2048.getChannelValues(_channels, 6);
                 }
  
-                const auto isArmingSwitchOn = _channels[4] > 1500;
+                const auto is_arming_switch_on = _channels[4] > 1500;
 
                 // Arm vehicle if safe
                 if (
-                        !_got_failsafe &&
-                        isArmingSwitchOn &&
+                        is_arming_switch_on &&
                         !_was_arming_switch_on &&
                         _channels[0] < 1050) {
-                    _is_armed = true;
+
+                    _status = STATUS_ARMED;
                 }
 
-                _was_arming_switch_on = isArmingSwitchOn;
-
-                // LED should be on when armed
-                if (_is_armed) {
-                    digitalWrite(LED_BUILTIN, HIGH);
-                }
-
-                // Otherwise, blink LED as heartbeat or failsafe rate
-                else {
-                    blinkLed();
-                }
+                _was_arming_switch_on = is_arming_switch_on;
 
                 // Read IMU
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
@@ -229,8 +215,39 @@ namespace hf {
                 demands.yaw    = mapchan(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
+                // Send telemetry and status to TinyPICO Nano periodically
+                if (_telemetryTimer.isReady(_usec_curr)) {
+
+                    const float vals[10] = {
+                        state.dx,
+                        state.dy,
+                        state.z,
+                        state.dz,
+                        state.phi,
+                        state.dphi,
+                        state.theta,
+                        state.dtheta,
+                        state.psi,
+                        state.dpsi
+                    };
+
+                    static MspSerializer _serializer;
+
+                    _serializer.serializeFloats(121, vals, 10);
+
+                    Serial2.write(
+                            _serializer.payload, _serializer.payloadSize); 
+
+                    _serializer.serializeBytes(122, &_status, 1);
+
+                    Serial2.write(
+                            _serializer.payload, _serializer.payloadSize); 
+                }
+ 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
+                    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n", 
+                            state.phi, state.theta, state.psi);
                 }
              }
 
@@ -243,8 +260,11 @@ namespace hf {
                 auto m4_usec = scaleMotor(motors[3]);
 
                 // Turn off motors under various conditions
-                if (_channels[4] < 1500 || !_is_armed || _got_failsafe) {
-                    _is_armed = false;
+                if (_channels[4] < 1500) {
+
+                    if (_status == STATUS_ARMED) {
+                        _status = STATUS_READY;
+                    }
                     m1_usec = 120;
                     m2_usec = 120;
                     m3_usec = 120;
@@ -279,8 +299,7 @@ namespace hf {
             uint16_t _channels[6];
 
             // Safety
-            bool _is_armed;
-            bool _got_failsafe;
+            uint8_t _status;
             bool _was_arming_switch_on;
 
             // State estimation
@@ -374,36 +393,6 @@ namespace hf {
             {
                 return Utils::u8constrain(mval*125 + 125, 125, 250);
 
-            }
-
-            void blinkLed()
-            {
-                const auto freq_hz =
-                    _got_failsafe ?
-                    FAILSAFE_BLINK_RATE_HZ :
-                    HEARTBEAT_BLINK_RATE_HZ;
-
-                static uint32_t _usec_prev;
-
-                static uint32_t _delay_usec;
-
-                if (_usec_curr - _usec_prev > _delay_usec) {
-
-                    static bool _alternate;
-
-                    _usec_prev = _usec_curr;
-
-                    digitalWrite(LED_BUILTIN, _alternate);
-
-                    if (_alternate) {
-                        _alternate = false;
-                        _delay_usec = 100'100;
-                    }
-                    else {
-                        _alternate = true;
-                        _delay_usec = freq_hz * 1e6;
-                    }
-                }
             }
 
             static void reportForever(const char * message)

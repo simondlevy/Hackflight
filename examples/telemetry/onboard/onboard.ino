@@ -24,7 +24,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#if 0
 // DotStar LED support
 #include <TinyPICO.h>
 
@@ -39,10 +38,6 @@ static constexpr uint8_t TELEMETRY_DONGLE_ADDRESS[6] = {
     0xD4, 0xD4, 0xDA, 0x83, 0x9B, 0xA4
 };
 
-static constexpr uint8_t TRANSMITTER_ADDRESS[6] = {
-    0xAC, 0x0B, 0xFB, 0x6F, 0x6A, 0xD4
-};
-
 // Blinkenlights -------------------------------------------------------------
 
 static const uint32_t LED_COLOR_FAILSAFE = 0xFF0000;
@@ -52,18 +47,10 @@ static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
 static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
 TinyPICO _tinypico;
 
-// Handles EPS-NOW SET_RC messages from transmitter
-void espnowEvent(const uint8_t * mac, const uint8_t * data, int len) 
-{
-    // Send SET_RC message to Teensy
-    Serial1.write(data, len);
-}
-
 static uint8_t _status;
 
 // Handles streaming messages from Teensy:  collects message bytes, and when a
-// complete message is received, sends all the message bytes
-// to Teensy.
+// complete message is received, sends all the message bytes to dongle.
 void serialEvent1()
 {
     static hf::MspParser _parser;
@@ -111,15 +98,10 @@ void setup()
 
     // Add the telemetry dongle as a peer
     hf::EspNowUtils::addPeer(TELEMETRY_DONGLE_ADDRESS);
-
-    // Add the transmitter as a peer
-    hf::EspNowUtils::addPeer(TRANSMITTER_ADDRESS);
-
-    // Once ESPNow is successfully Init, we will register for recv CB to
-    // get recv packer info
-    esp_now_register_recv_cb(esp_now_recv_cb_t(espnowEvent));
 }
 
+// Loop's sole job is to set LED appropriately based on status messages from
+// Teensy
 void loop() 
 {
     if (_status == hf::STATUS_ARMED) {
@@ -161,13 +143,4 @@ void loop()
         }
 
     }
-}
-#endif
-
-void setup()
-{
-}
-
-void loop()
-{
 }
