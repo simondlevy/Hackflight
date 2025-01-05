@@ -1979,45 +1979,6 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 </deviceset>
 </devicesets>
 </library>
-<library name="headers(2mm)">
-<packages>
-<package name="1X1">
-<rectangle x1="-0.254" y1="-0.254" x2="0.254" y2="0.254" layer="21"/>
-<pad name="1" x="0" y="0" drill="0.8" diameter="1.4224"/>
-</package>
-</packages>
-<symbols>
-<symbol name="1X1_HEADER">
-<wire x1="-2.54" y1="2.54" x2="2.54" y2="2.54" width="0.254" layer="94"/>
-<wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.254" layer="94"/>
-<wire x1="-2.54" y1="2.54" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="-2.54" y1="-2.54" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="2.54" y1="-2.54" x2="2.54" y2="0" width="0.254" layer="94"/>
-<text x="0" y="0" size="1.016" layer="94" font="vector" rot="MR0" align="center">01</text>
-<text x="-2.54" y="3.175" size="1.27" layer="95" font="vector">&gt;NAME</text>
-<text x="-2.54" y="-4.445" size="1.27" layer="96" font="vector">&gt;VALUE</text>
-<pin name="1" x="2.54" y="0" visible="off" length="point" rot="R180"/>
-<wire x1="2.54" y1="0" x2="2.54" y2="2.54" width="0.254" layer="94"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="1X1">
-<gates>
-<gate name="G$1" symbol="1X1_HEADER" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="1X1">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="wirepad">
 <description>&lt;b&gt;Single Pads&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
@@ -2057,167 +2018,108 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 </deviceset>
 </devicesets>
 </library>
-<library name="TinyPICO_NANO_Eagle">
+<library name="con-JST-SH">
 <packages>
-<package name="TINYPICO-NANO-CONNECTOR">
-<smd name="GND$4" x="17.9705" y="6.4135" dx="2.54" dy="2.54" layer="1" rot="R45" cream="no"/>
-<rectangle x1="16.383" y1="6.6548" x2="17.145" y2="7.4168" layer="31" rot="R45"/>
-<wire x1="0" y1="0" x2="0" y2="12.54" width="0.127" layer="51"/>
-<wire x1="0" y1="12.54" x2="26.9875" y2="12.54" width="0.127" layer="51"/>
-<wire x1="26.9875" y1="12.54" x2="26.9875" y2="0" width="0.127" layer="51"/>
-<wire x1="26.9875" y1="0" x2="0" y2="0" width="0.127" layer="51"/>
-<rectangle x1="23.495" y1="0.381" x2="26.67" y2="7.366" layer="51"/>
-<smd name="IO23" x="4.7752" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO19" x="6.0452" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO18" x="7.3152" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO5" x="8.5852" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO22" x="9.8552" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO21" x="11.1252" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO0" x="12.3952" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO9" x="13.6652" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="RX" x="14.9352" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="TX" x="16.2052" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO39" x="17.4752" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO38" x="18.7452" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO37" x="20.0152" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO36" x="21.2852" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="VBAT" x="4.7639" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO2" x="6.0339" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO4" x="7.3039" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO12" x="8.5739" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO13" x="9.8439" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO14" x="11.1139" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO15" x="12.3839" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO27" x="13.6539" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO26" x="14.9239" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO25" x="16.1939" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO32" x="17.4639" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO33" x="18.7339" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO34" x="20.0039" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="IO35" x="21.2739" y="12.44" dx="1" dy="1.2" layer="1"/>
-<smd name="3V3" x="0.1" y="10.725" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="EN" x="0.1" y="9.455" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="D+" x="0.1" y="8.185" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="D-" x="0.1" y="6.915" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="5V" x="0.1" y="5.645" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="RESET" x="0.1" y="4.375" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="GND$1" x="0.1" y="3.105" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="STAT" x="0.1" y="1.835" dx="1" dy="1.2" layer="1" rot="R270"/>
-<smd name="GND$2" x="17.642840625" y="7.08151875" dx="3" dy="3" layer="1" rot="R45" cream="no"/>
-<smd name="GND$3" x="19.43608125" y="6.746240625" dx="0.6604" dy="0.670559375" layer="1" cream="no"/>
-<rectangle x1="17.3228" y1="7.62" x2="18.0848" y2="8.382" layer="31" rot="R45"/>
-<rectangle x1="17.4244" y1="5.5372" x2="18.1864" y2="6.2992" layer="31" rot="R45"/>
-<rectangle x1="18.4404" y1="6.5532" x2="19.2024" y2="7.3152" layer="31" rot="R45"/>
-<wire x1="22.225" y1="8.89" x2="28.067" y2="8.89" width="0.127" layer="51"/>
-<wire x1="28.067" y1="8.89" x2="28.067" y2="-1.27" width="0.127" layer="51"/>
-<wire x1="28.067" y1="-1.27" x2="22.225" y2="-1.27" width="0.127" layer="51"/>
-<wire x1="22.225" y1="-1.27" x2="22.225" y2="8.89" width="0.127" layer="51"/>
-<text x="28.575" y="-1.27" size="0.762" layer="51">Antenna
-                    GND
-                        Clearance</text>
+<package name="SM08B-SRSS-TB">
+<description>JST-SH (1.25mm) 8-pin surface-mount right-angle Wire-Board Connector</description>
+<smd name="M1" x="4.8" y="0" dx="1.2" dy="1.8" layer="1"/>
+<smd name="M2" x="-4.8" y="0" dx="1.2" dy="1.8" layer="1"/>
+<smd name="1" x="-3.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="2" x="-2.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="3" x="-1.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="4" x="-0.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="5" x="0.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="6" x="1.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="7" x="2.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<smd name="8" x="3.5" y="4.675" dx="0.6" dy="1.55" layer="1"/>
+<wire x1="-5" y1="-0.5" x2="5" y2="-0.5" width="0.127" layer="21"/>
+<wire x1="5" y1="-0.5" x2="5" y2="4.25" width="0.127" layer="21"/>
+<wire x1="5" y1="4.25" x2="-5" y2="4.25" width="0.127" layer="21"/>
+<wire x1="-5" y1="4.25" x2="-5" y2="-0.5" width="0.127" layer="21"/>
+<text x="0" y="6" size="0.6" layer="25" font="vector" ratio="15" align="center">&gt;NAME</text>
+<rectangle x1="-5.75" y1="-1" x2="5.75" y2="4.5" layer="39"/>
+<rectangle x1="-4" y1="4.5" x2="4" y2="5.75" layer="39"/>
+<rectangle x1="-5.5" y1="-6" x2="5.5" y2="-1" layer="39"/>
+</package>
+<package name="BM08B-SRSS-TB">
+<description>JST-SH (1.25mm) 8-pin surface-mount right-angle Wire-Board Connector</description>
+<smd name="M1" x="-4.8" y="1.2" dx="1.2" dy="1.8" layer="1"/>
+<smd name="M2" x="4.8" y="1.2" dx="1.2" dy="1.8" layer="1"/>
+<smd name="1" x="-3.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="2" x="-2.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="3" x="-1.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="4" x="-0.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="5" x="0.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="6" x="1.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="7" x="2.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<smd name="8" x="3.5" y="-1.325" dx="0.6" dy="1.55" layer="1"/>
+<wire x1="-5" y1="-1" x2="5" y2="-1" width="0.127" layer="21"/>
+<wire x1="5" y1="-1" x2="5" y2="1.9" width="0.127" layer="21"/>
+<wire x1="5" y1="1.9" x2="-5" y2="1.9" width="0.127" layer="21"/>
+<wire x1="-5" y1="1.9" x2="-5" y2="-1" width="0.127" layer="21"/>
+<text x="0" y="3" size="0.6" layer="25" font="vector" ratio="15" align="center">&gt;NAME</text>
+<rectangle x1="-5.5" y1="-1.25" x2="5.5" y2="2.25" layer="39"/>
+<rectangle x1="-4" y1="-2.25" x2="4" y2="-1.25" layer="39"/>
+<text x="0" y="0.5" size="0.6" layer="27" ratio="15" align="center">&gt;VALUE</text>
 </package>
 </packages>
 <symbols>
-<symbol name="TINYPICO-NANO-CONNECTOR">
-<description>TinyPICO NANO Device Symbol&lt;br&gt;
-                        https://www.tinypico.com/tinypico-nano</description>
-<pin name="IO23" x="-18.034" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO19" x="-15.494" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO18" x="-12.954" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO5" x="-10.414" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO22" x="-7.874" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO21" x="-5.334" y="-21.844" length="middle" rot="R90"/>
-<pin name="RX" x="2.286" y="-21.844" length="middle" rot="R90"/>
-<pin name="TX" x="4.826" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO0" x="-2.794" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO32" x="7.366" y="21.336" length="middle" rot="R270"/>
-<pin name="IO33" x="9.906" y="21.336" length="middle" rot="R270"/>
-<pin name="RESET" x="-33.274" y="-4.064" length="middle"/>
-<pin name="GND" x="-33.274" y="-6.604" length="middle" direction="pwr"/>
-<pin name="5V" x="-33.274" y="-1.524" length="middle" direction="pwr"/>
-<pin name="D-" x="-33.274" y="1.016" length="middle"/>
-<pin name="D+" x="-33.274" y="3.556" length="middle"/>
-<pin name="3V3" x="-33.274" y="8.636" length="middle" direction="pwr"/>
-<pin name="VBAT" x="-18.034" y="21.336" length="middle" direction="pwr" rot="R270"/>
-<pin name="IO2" x="-15.494" y="21.336" length="middle" rot="R270"/>
-<pin name="IO4" x="-12.954" y="21.336" length="middle" rot="R270"/>
-<pin name="IO12" x="-10.414" y="21.336" length="middle" rot="R270"/>
-<pin name="IO13" x="-7.874" y="21.336" length="middle" rot="R270"/>
-<pin name="IO14" x="-5.334" y="21.336" length="middle" rot="R270"/>
-<pin name="IO15" x="-2.794" y="21.336" length="middle" rot="R270"/>
-<pin name="IO27" x="-0.254" y="21.336" length="middle" rot="R270"/>
-<pin name="IO26" x="2.286" y="21.336" length="middle" rot="R270"/>
-<pin name="IO25" x="4.826" y="21.336" length="middle" rot="R270"/>
-<wire x1="-28.194" y1="16.256" x2="-28.194" y2="-16.764" width="0.254" layer="94"/>
-<wire x1="-28.194" y1="-16.764" x2="30.226" y2="-16.764" width="0.254" layer="94"/>
-<wire x1="30.226" y1="-16.764" x2="30.226" y2="16.256" width="0.254" layer="94"/>
-<wire x1="30.226" y1="16.256" x2="-28.194" y2="16.256" width="0.254" layer="94"/>
-<text x="0" y="0" size="2.54" layer="94" align="center">TinyPICO NANO
-                        CONNECTOR</text>
-<pin name="IO34" x="12.446" y="21.336" length="middle" rot="R270"/>
-<pin name="IO35" x="14.986" y="21.336" length="middle" rot="R270"/>
-<pin name="GPIO9" x="-0.254" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO39" x="7.366" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO38" x="9.906" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO37" x="12.446" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO36" x="14.986" y="-21.844" length="middle" rot="R90"/>
-<pin name="EN" x="-33.274" y="6.096" length="middle" direction="in"/>
-<pin name="STAT" x="-33.274" y="-9.144" length="middle" direction="out"/>
-<wire x1="20.066" y1="3.556" x2="20.066" y2="-14.224" width="0.254" layer="94"/>
-<wire x1="20.066" y1="-14.224" x2="27.686" y2="-14.224" width="0.254" layer="94"/>
-<wire x1="27.686" y1="-14.224" x2="27.686" y2="3.556" width="0.254" layer="94"/>
-<wire x1="27.686" y1="3.556" x2="20.066" y2="3.556" width="0.254" layer="94"/>
+<symbol name="PIN">
+<pin name="P" x="2.54" y="0" visible="pad" length="short" rot="R180"/>
+<text x="0" y="-0.635" size="1.016" layer="95" rot="R180" align="center-left">&gt;NAME</text>
+<wire x1="0" y1="0" x2="1.905" y2="0" width="0.508" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="TINYPICO-NANO-CONNECTOR">
-<description>TinyPICO NANO Footprint&lt;br&gt;
-                        https://www.tinypico.com/tinypico-nano</description>
+<deviceset name="JST-SH-8" prefix="J">
 <gates>
-<gate name="G$1" symbol="TINYPICO-NANO-CONNECTOR" x="2.54" y="-7.62"/>
+<gate name="-1" symbol="PIN" x="0" y="10.16" addlevel="always" swaplevel="1"/>
+<gate name="-2" symbol="PIN" x="0" y="7.62" addlevel="always" swaplevel="1"/>
+<gate name="-3" symbol="PIN" x="0" y="5.08" addlevel="always" swaplevel="1"/>
+<gate name="-4" symbol="PIN" x="0" y="2.54" addlevel="always" swaplevel="1"/>
+<gate name="-5" symbol="PIN" x="0" y="0" addlevel="always" swaplevel="1"/>
+<gate name="-6" symbol="PIN" x="0" y="-2.54" addlevel="always" swaplevel="1"/>
+<gate name="-7" symbol="PIN" x="0" y="-5.08" addlevel="always" swaplevel="1"/>
+<gate name="-8" symbol="PIN" x="0" y="-7.62" addlevel="always" swaplevel="1"/>
+<gate name="M" symbol="PIN" x="0" y="-12.7" addlevel="can"/>
 </gates>
 <devices>
-<device name="" package="TINYPICO-NANO-CONNECTOR">
+<device name="_RA" package="SM08B-SRSS-TB">
 <connects>
-<connect gate="G$1" pin="3V3" pad="3V3"/>
-<connect gate="G$1" pin="5V" pad="5V"/>
-<connect gate="G$1" pin="D+" pad="D+"/>
-<connect gate="G$1" pin="D-" pad="D-"/>
-<connect gate="G$1" pin="EN" pad="EN"/>
-<connect gate="G$1" pin="GND" pad="GND$1 GND$2 GND$3 GND$4"/>
-<connect gate="G$1" pin="GPIO36" pad="IO36"/>
-<connect gate="G$1" pin="GPIO37" pad="IO37"/>
-<connect gate="G$1" pin="GPIO38" pad="IO38"/>
-<connect gate="G$1" pin="GPIO39" pad="IO39"/>
-<connect gate="G$1" pin="GPIO9" pad="IO9"/>
-<connect gate="G$1" pin="IO0" pad="IO0"/>
-<connect gate="G$1" pin="IO12" pad="IO12"/>
-<connect gate="G$1" pin="IO13" pad="IO13"/>
-<connect gate="G$1" pin="IO14" pad="IO14"/>
-<connect gate="G$1" pin="IO15" pad="IO15"/>
-<connect gate="G$1" pin="IO18" pad="IO18"/>
-<connect gate="G$1" pin="IO19" pad="IO19"/>
-<connect gate="G$1" pin="IO2" pad="IO2"/>
-<connect gate="G$1" pin="IO21" pad="IO21"/>
-<connect gate="G$1" pin="IO22" pad="IO22"/>
-<connect gate="G$1" pin="IO23" pad="IO23"/>
-<connect gate="G$1" pin="IO25" pad="IO25"/>
-<connect gate="G$1" pin="IO26" pad="IO26"/>
-<connect gate="G$1" pin="IO27" pad="IO27"/>
-<connect gate="G$1" pin="IO32" pad="IO32"/>
-<connect gate="G$1" pin="IO33" pad="IO33"/>
-<connect gate="G$1" pin="IO34" pad="IO34"/>
-<connect gate="G$1" pin="IO35" pad="IO35"/>
-<connect gate="G$1" pin="IO4" pad="IO4"/>
-<connect gate="G$1" pin="IO5" pad="IO5"/>
-<connect gate="G$1" pin="RESET" pad="RESET"/>
-<connect gate="G$1" pin="RX" pad="RX"/>
-<connect gate="G$1" pin="STAT" pad="STAT"/>
-<connect gate="G$1" pin="TX" pad="TX"/>
-<connect gate="G$1" pin="VBAT" pad="VBAT"/>
+<connect gate="-1" pin="P" pad="1"/>
+<connect gate="-2" pin="P" pad="2"/>
+<connect gate="-3" pin="P" pad="3"/>
+<connect gate="-4" pin="P" pad="4"/>
+<connect gate="-5" pin="P" pad="5"/>
+<connect gate="-6" pin="P" pad="6"/>
+<connect gate="-7" pin="P" pad="7"/>
+<connect gate="-8" pin="P" pad="8"/>
+<connect gate="M" pin="P" pad="M1 M2"/>
 </connects>
 <technologies>
-<technology name=""/>
+<technology name="">
+<attribute name="MF" value="JST"/>
+<attribute name="MPN" value="SM08B-SRSS-TB"/>
+</technology>
+</technologies>
+</device>
+<device name="_V" package="BM08B-SRSS-TB">
+<connects>
+<connect gate="-1" pin="P" pad="1"/>
+<connect gate="-2" pin="P" pad="2"/>
+<connect gate="-3" pin="P" pad="3"/>
+<connect gate="-4" pin="P" pad="4"/>
+<connect gate="-5" pin="P" pad="5"/>
+<connect gate="-6" pin="P" pad="6"/>
+<connect gate="-7" pin="P" pad="7"/>
+<connect gate="-8" pin="P" pad="8"/>
+<connect gate="M" pin="P" pad="M1 M2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="MF" value="JST"/>
+<attribute name="MPN" value="BM08B-SRSS-TB"/>
+</technology>
 </technologies>
 </device>
 </devices>
@@ -2236,10 +2138,6 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <parts>
 <part name="U$1" library="TEENSY 4.0" deviceset="TEENSY_4.0" device=""/>
 <part name="REG" library="SparkFun-Connectors" deviceset="CONN_04" device="1X04_NO_SILK"/>
-<part name="U$3" library="headers(2mm)" deviceset="1X1" device=""/>
-<part name="U$4" library="headers(2mm)" deviceset="1X1" device=""/>
-<part name="U$6" library="headers(2mm)" deviceset="1X1" device=""/>
-<part name="U$7" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="GND" library="wirepad" deviceset="SMD2" device=""/>
 <part name="VBAT" library="wirepad" deviceset="SMD2" device=""/>
 <part name="M4" library="wirepad" deviceset="SMD2" device=""/>
@@ -2247,16 +2145,8 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <part name="M2" library="wirepad" deviceset="SMD2" device=""/>
 <part name="M1" library="wirepad" deviceset="SMD2" device=""/>
 <part name="J1" library="SparkFun-Connectors" deviceset="CONN_05" device="NO_SILK"/>
-<part name="J2" library="SparkFun-Connectors" deviceset="CONN_04" device="1X04_NO_SILK"/>
-<part name="U$2" library="TinyPICO_NANO_Eagle" deviceset="TINYPICO-NANO-CONNECTOR" device=""/>
-<part name="GD1" library="wirepad" deviceset="SMD2" device=""/>
-<part name="3V2" library="wirepad" deviceset="SMD2" device=""/>
-<part name="RX1" library="wirepad" deviceset="SMD2" device=""/>
-<part name="GD2" library="wirepad" deviceset="SMD2" device=""/>
-<part name="3V3" library="wirepad" deviceset="SMD2" device=""/>
-<part name="RX2" library="wirepad" deviceset="SMD2" device=""/>
-<part name="SCK" library="wirepad" deviceset="SMD2" device=""/>
-<part name="CS" library="wirepad" deviceset="SMD2" device=""/>
+<part name="TINY_PICO" library="SparkFun-Connectors" deviceset="CONN_05" device="NO_SILK"/>
+<part name="J2" library="con-JST-SH" deviceset="JST-SH-8" device="_RA"/>
 </parts>
 <sheets>
 <sheet>
@@ -2268,10 +2158,6 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <attribute name="VALUE" x="2.54" y="43.434" size="1.778" layer="96" font="vector"/>
 <attribute name="NAME" x="2.54" y="58.928" size="1.778" layer="95" font="vector"/>
 </instance>
-<instance part="U$3" gate="G$1" x="-27.94" y="25.4" smashed="yes"/>
-<instance part="U$4" gate="G$1" x="-27.94" y="17.78" smashed="yes"/>
-<instance part="U$6" gate="G$1" x="-27.94" y="-2.54" smashed="yes"/>
-<instance part="U$7" gate="G$1" x="-27.94" y="-10.16" smashed="yes"/>
 <instance part="GND" gate="1" x="2.54" y="114.3" smashed="yes">
 <attribute name="VALUE" x="1.397" y="110.998" size="1.778" layer="96"/>
 </instance>
@@ -2294,32 +2180,15 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <attribute name="VALUE" x="10.16" y="-7.366" size="1.778" layer="96" font="vector"/>
 <attribute name="NAME" x="10.16" y="10.668" size="1.778" layer="95" font="vector"/>
 </instance>
-<instance part="J2" gate="J1" x="2.54" y="-45.72"/>
-<instance part="U$2" gate="G$1" x="109.22" y="-53.34" smashed="yes"/>
-<instance part="GD1" gate="1" x="40.64" y="124.46" smashed="yes">
-<attribute name="VALUE" x="39.497" y="121.158" size="1.778" layer="96"/>
-</instance>
-<instance part="3V2" gate="1" x="40.64" y="119.38" smashed="yes">
-<attribute name="VALUE" x="39.497" y="116.078" size="1.778" layer="96"/>
-</instance>
-<instance part="RX1" gate="1" x="40.64" y="114.3" smashed="yes">
-<attribute name="VALUE" x="39.497" y="110.998" size="1.778" layer="96"/>
-</instance>
-<instance part="GD2" gate="1" x="40.64" y="109.22" smashed="yes">
-<attribute name="VALUE" x="39.497" y="105.918" size="1.778" layer="96"/>
-</instance>
-<instance part="3V3" gate="1" x="40.64" y="104.14" smashed="yes">
-<attribute name="VALUE" x="39.497" y="100.838" size="1.778" layer="96"/>
-</instance>
-<instance part="RX2" gate="1" x="40.64" y="99.06" smashed="yes">
-<attribute name="VALUE" x="39.497" y="95.758" size="1.778" layer="96"/>
-</instance>
-<instance part="SCK" gate="1" x="40.64" y="93.98" smashed="yes">
-<attribute name="VALUE" x="39.497" y="90.678" size="1.778" layer="96"/>
-</instance>
-<instance part="CS" gate="1" x="40.64" y="88.9" smashed="yes">
-<attribute name="VALUE" x="39.497" y="85.598" size="1.778" layer="96"/>
-</instance>
+<instance part="TINY_PICO" gate="G$1" x="83.82" y="-53.34"/>
+<instance part="J2" gate="-1" x="88.9" y="116.84"/>
+<instance part="J2" gate="-2" x="88.9" y="114.3"/>
+<instance part="J2" gate="-3" x="88.9" y="111.76"/>
+<instance part="J2" gate="-4" x="88.9" y="109.22"/>
+<instance part="J2" gate="-5" x="88.9" y="106.68"/>
+<instance part="J2" gate="-6" x="88.9" y="104.14"/>
+<instance part="J2" gate="-7" x="88.9" y="101.6"/>
+<instance part="J2" gate="-8" x="88.9" y="99.06"/>
 </instances>
 <busses>
 </busses>
@@ -2336,9 +2205,9 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="20.32" y="-2.54" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="3V2" gate="1" pin="P"/>
-<wire x1="43.18" y1="119.38" x2="48.26" y2="119.38" width="0.1524" layer="91"/>
-<label x="43.18" y="119.38" size="1.778" layer="95"/>
+<pinref part="J2" gate="-2" pin="P"/>
+<wire x1="91.44" y1="114.3" x2="96.52" y2="114.3" width="0.1524" layer="91"/>
+<label x="91.44" y="114.3" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -2368,24 +2237,19 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="20.32" y="0" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J2" gate="J1" pin="1"/>
-<wire x1="7.62" y1="-48.26" x2="12.7" y2="-48.26" width="0.1524" layer="91"/>
-<label x="7.62" y="-48.26" size="1.778" layer="95"/>
+<pinref part="U$1" gate="G$1" pin="GND"/>
+<wire x1="53.34" y1="63.5" x2="48.26" y2="63.5" width="0.1524" layer="91"/>
+<label x="48.26" y="63.5" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="GND"/>
-<wire x1="75.946" y1="-59.944" x2="68.58" y2="-59.944" width="0.1524" layer="91"/>
-<label x="68.58" y="-60.96" size="1.778" layer="95"/>
+<pinref part="TINY_PICO" gate="G$1" pin="5"/>
+<wire x1="91.44" y1="-48.26" x2="96.52" y2="-48.26" width="0.1524" layer="91"/>
+<label x="91.44" y="-48.26" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$7" gate="G$1" pin="1"/>
-<wire x1="-25.4" y1="-10.16" x2="-17.78" y2="-10.16" width="0.1524" layer="91"/>
-<label x="-22.86" y="-10.16" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="GD1" gate="1" pin="P"/>
-<wire x1="43.18" y1="124.46" x2="48.26" y2="124.46" width="0.1524" layer="91"/>
-<label x="43.18" y="124.46" size="1.778" layer="95"/>
+<pinref part="J2" gate="-1" pin="P"/>
+<wire x1="91.44" y1="116.84" x2="96.52" y2="116.84" width="0.1524" layer="91"/>
+<label x="91.44" y="116.84" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SDA" class="0">
@@ -2400,9 +2264,9 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="20.32" y="2.54" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="RX1" gate="1" pin="P"/>
-<wire x1="43.18" y1="114.3" x2="48.26" y2="114.3" width="0.1524" layer="91"/>
-<label x="43.18" y="114.3" size="1.778" layer="95"/>
+<pinref part="J2" gate="-3" pin="P"/>
+<wire x1="91.44" y1="111.76" x2="96.52" y2="111.76" width="0.1524" layer="91"/>
+<label x="91.44" y="111.76" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SCL" class="0">
@@ -2417,9 +2281,9 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="20.32" y="5.08" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="GD2" gate="1" pin="P"/>
-<wire x1="43.18" y1="109.22" x2="48.26" y2="109.22" width="0.1524" layer="91"/>
-<label x="43.18" y="109.22" size="1.778" layer="95"/>
+<pinref part="J2" gate="-4" pin="P"/>
+<wire x1="91.44" y1="109.22" x2="96.52" y2="109.22" width="0.1524" layer="91"/>
+<label x="91.44" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="5V" class="0">
@@ -2434,14 +2298,9 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="15.24" y="48.26" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J2" gate="J1" pin="2"/>
-<wire x1="7.62" y1="-45.72" x2="12.7" y2="-45.72" width="0.1524" layer="91"/>
-<label x="7.62" y="-45.72" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$2" gate="G$1" pin="5V"/>
-<wire x1="75.946" y1="-54.864" x2="68.58" y2="-54.864" width="0.1524" layer="91"/>
-<label x="71.12" y="-55.88" size="1.778" layer="95"/>
+<pinref part="TINY_PICO" gate="G$1" pin="4"/>
+<wire x1="91.44" y1="-50.8" x2="96.52" y2="-50.8" width="0.1524" layer="91"/>
+<label x="91.44" y="-50.8" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="CS" class="0">
@@ -2451,9 +2310,9 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="48.26" y="35.56" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="CS" gate="1" pin="P"/>
-<wire x1="43.18" y1="88.9" x2="48.26" y2="88.9" width="0.1524" layer="91"/>
-<label x="43.18" y="88.9" size="1.778" layer="95"/>
+<pinref part="J2" gate="-8" pin="P"/>
+<wire x1="91.44" y1="99.06" x2="96.52" y2="99.06" width="0.1524" layer="91"/>
+<label x="91.44" y="99.06" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="MISO" class="0">
@@ -2463,70 +2322,57 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="48.26" y="30.48" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="3V3" gate="1" pin="P"/>
-<wire x1="43.18" y1="104.14" x2="48.26" y2="104.14" width="0.1524" layer="91"/>
-<label x="43.18" y="104.14" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="RX" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="7/RX2"/>
-<wire x1="53.34" y1="43.18" x2="48.26" y2="43.18" width="0.1524" layer="91"/>
-<label x="48.26" y="43.18" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$2" gate="G$1" pin="TX"/>
-<wire x1="114.046" y1="-75.184" x2="114.046" y2="-83.82" width="0.1524" layer="91"/>
-<wire x1="114.046" y1="-83.82" x2="109.22" y2="-83.82" width="0.1524" layer="91"/>
-<label x="109.22" y="-83.82" size="1.778" layer="95"/>
+<pinref part="J2" gate="-5" pin="P"/>
+<wire x1="91.44" y1="106.68" x2="96.52" y2="106.68" width="0.1524" layer="91"/>
+<label x="91.44" y="106.68" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="M4" class="0">
-<segment>
-<pinref part="M4" gate="1" pin="P"/>
-<wire x1="5.08" y1="104.14" x2="10.16" y2="104.14" width="0.1524" layer="91"/>
-<label x="5.08" y="104.14" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="3"/>
 <wire x1="53.34" y1="53.34" x2="48.26" y2="53.34" width="0.1524" layer="91"/>
 <label x="48.26" y="53.34" size="1.778" layer="95"/>
 </segment>
-</net>
-<net name="M1" class="0">
 <segment>
 <pinref part="M1" gate="1" pin="P"/>
 <wire x1="5.08" y1="88.9" x2="10.16" y2="88.9" width="0.1524" layer="91"/>
 <label x="5.08" y="88.9" size="1.778" layer="95"/>
 </segment>
+</net>
+<net name="M1" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="6"/>
 <wire x1="53.34" y1="45.72" x2="48.26" y2="45.72" width="0.1524" layer="91"/>
 <label x="48.26" y="45.72" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="M4" gate="1" pin="P"/>
+<wire x1="5.08" y1="104.14" x2="10.16" y2="104.14" width="0.1524" layer="91"/>
+<label x="5.08" y="104.14" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="M2" class="0">
-<segment>
-<pinref part="M2" gate="1" pin="P"/>
-<wire x1="5.08" y1="93.98" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
-<label x="5.08" y="93.98" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="5"/>
 <wire x1="53.34" y1="48.26" x2="48.26" y2="48.26" width="0.1524" layer="91"/>
 <label x="48.26" y="48.26" size="1.778" layer="95"/>
 </segment>
-</net>
-<net name="M3" class="0">
 <segment>
 <pinref part="M3" gate="1" pin="P"/>
 <wire x1="5.08" y1="99.06" x2="10.16" y2="99.06" width="0.1524" layer="91"/>
 <label x="5.08" y="99.06" size="1.778" layer="95"/>
 </segment>
+</net>
+<net name="M3" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="4"/>
 <wire x1="53.34" y1="50.8" x2="48.26" y2="50.8" width="0.1524" layer="91"/>
 <label x="48.26" y="50.8" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="M2" gate="1" pin="P"/>
+<wire x1="5.08" y1="93.98" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
+<label x="5.08" y="93.98" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
@@ -2536,9 +2382,9 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="48.26" y="33.02" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="RX2" gate="1" pin="P"/>
-<wire x1="43.18" y1="99.06" x2="48.26" y2="99.06" width="0.1524" layer="91"/>
-<label x="43.18" y="99.06" size="1.778" layer="95"/>
+<pinref part="J2" gate="-6" pin="P"/>
+<wire x1="91.44" y1="104.14" x2="96.52" y2="104.14" width="0.1524" layer="91"/>
+<label x="91.44" y="104.14" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SCK" class="0">
@@ -2548,73 +2394,12 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <label x="93.98" y="30.48" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="SCK" gate="1" pin="P"/>
-<wire x1="43.18" y1="93.98" x2="48.26" y2="93.98" width="0.1524" layer="91"/>
-<label x="43.18" y="93.98" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="LED_R_OUT" class="0">
-<segment>
-<pinref part="U$4" gate="G$1" pin="1"/>
-<wire x1="-25.4" y1="17.78" x2="-17.78" y2="17.78" width="0.1524" layer="91"/>
-<label x="-22.86" y="17.78" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$6" gate="G$1" pin="1"/>
-<wire x1="-25.4" y1="-2.54" x2="-17.78" y2="-2.54" width="0.1524" layer="91"/>
-<label x="-22.86" y="-2.54" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="LED_R_IN" class="0">
-<segment>
-<pinref part="U$3" gate="G$1" pin="1"/>
-<wire x1="-25.4" y1="25.4" x2="-17.78" y2="25.4" width="0.1524" layer="91"/>
-<label x="-22.86" y="25.4" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$1" gate="G$1" pin="0/RX1"/>
-<wire x1="53.34" y1="60.96" x2="48.26" y2="60.96" width="0.1524" layer="91"/>
-<label x="40.64" y="60.96" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="G2" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="GND"/>
-<wire x1="53.34" y1="63.5" x2="48.26" y2="63.5" width="0.1524" layer="91"/>
-<label x="48.26" y="63.5" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="D+" class="0">
-<segment>
-<pinref part="J2" gate="J1" pin="4"/>
-<wire x1="7.62" y1="-40.64" x2="12.7" y2="-40.64" width="0.1524" layer="91"/>
-<label x="7.62" y="-40.64" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$2" gate="G$1" pin="D+"/>
-<wire x1="75.946" y1="-49.784" x2="68.58" y2="-49.784" width="0.1524" layer="91"/>
-<label x="71.12" y="-50.8" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="D-" class="0">
-<segment>
-<pinref part="J2" gate="J1" pin="3"/>
-<wire x1="7.62" y1="-43.18" x2="12.7" y2="-43.18" width="0.1524" layer="91"/>
-<label x="7.62" y="-43.18" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U$2" gate="G$1" pin="D-"/>
-<wire x1="75.946" y1="-52.324" x2="68.58" y2="-52.324" width="0.1524" layer="91"/>
-<label x="71.12" y="-53.34" size="1.778" layer="95"/>
+<pinref part="J2" gate="-7" pin="P"/>
+<wire x1="91.44" y1="101.6" x2="96.52" y2="101.6" width="0.1524" layer="91"/>
+<label x="91.44" y="101.6" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SCL1" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="IO22"/>
-<wire x1="101.346" y1="-75.184" x2="101.346" y2="-81.28" width="0.1524" layer="91"/>
-<wire x1="101.346" y1="-81.28" x2="96.52" y2="-81.28" width="0.1524" layer="91"/>
-<label x="93.98" y="-81.28" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="16/A2/RX4"/>
 <wire x1="93.98" y1="38.1" x2="99.06" y2="38.1" width="0.1524" layer="91"/>
@@ -2622,12 +2407,6 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 </segment>
 </net>
 <net name="SDA1" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="IO21"/>
-<wire x1="103.886" y1="-75.184" x2="103.886" y2="-83.82" width="0.1524" layer="91"/>
-<wire x1="103.886" y1="-83.82" x2="99.06" y2="-83.82" width="0.1524" layer="91"/>
-<label x="96.52" y="-83.82" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="17/A3/TX4"/>
 <wire x1="93.98" y1="40.64" x2="99.06" y2="40.64" width="0.1524" layer="91"/>
@@ -2644,6 +2423,30 @@ Holes are offset 0.005" from center, locking pins in place during soldering.
 <pinref part="VBAT" gate="1" pin="P"/>
 <wire x1="5.08" y1="109.22" x2="10.16" y2="109.22" width="0.1524" layer="91"/>
 <label x="5.08" y="109.22" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="RX" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="0/RX1"/>
+<wire x1="53.34" y1="60.96" x2="48.26" y2="60.96" width="0.1524" layer="91"/>
+<label x="48.26" y="60.96" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="TINY_PICO" gate="G$1" pin="1"/>
+<wire x1="91.44" y1="-58.42" x2="96.52" y2="-58.42" width="0.1524" layer="91"/>
+<label x="91.44" y="-58.42" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="TX" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="1/TX1"/>
+<wire x1="53.34" y1="58.42" x2="48.26" y2="58.42" width="0.1524" layer="91"/>
+<label x="48.26" y="58.42" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="TINY_PICO" gate="G$1" pin="2"/>
+<wire x1="91.44" y1="-55.88" x2="96.52" y2="-55.88" width="0.1524" layer="91"/>
+<label x="91.44" y="-55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

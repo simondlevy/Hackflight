@@ -173,26 +173,26 @@
 <board>
 <plain>
 <text x="60.3326" y="73.4508" size="1.016" layer="25" rot="R180">VB</text>
-<hole x="48.1" y="88.1" drill="2.4"/>
-<hole x="58.6" y="88.1" drill="2.4"/>
+<hole x="43.3" y="41.8" drill="2.4"/>
+<hole x="63.3" y="62.2" drill="2.4"/>
 <polygon width="0.254" layer="21">
 <vertex x="50.56389375" y="85.19500625"/>
 <vertex x="53.152403125" y="89.854321875"/>
 <vertex x="55.827196875" y="85.19500625"/>
 </polygon>
-<hole x="48.6" y="15.9" drill="2.4"/>
-<hole x="58.9" y="16" drill="2.4"/>
+<hole x="43.3" y="61.8" drill="2.4"/>
+<hole x="63.3" y="41.8" drill="2.4"/>
 <wire x1="71.3" y1="63.3" x2="71.2" y2="41.2" width="0.1524" layer="20"/>
-<wire x1="43.6" y1="90.3" x2="63" y2="90.3" width="0.1524" layer="20"/>
-<wire x1="43.5" y1="13.8" x2="62.9" y2="13.8" width="0.1524" layer="20"/>
-<wire x1="40.8" y1="31.2" x2="43.4" y2="13.9" width="0.1524" layer="20"/>
-<wire x1="65.6" y1="31.1" x2="63" y2="13.8" width="0.1524" layer="20"/>
-<wire x1="43.6" y1="90.3" x2="40.9" y2="72.8" width="0.1524" layer="20"/>
-<wire x1="63" y1="90.2" x2="65.8" y2="72.8" width="0.1524" layer="20"/>
-<text x="35.9" y="40.7" size="1.016" layer="25">SO</text>
-<text x="38.9" y="40.9" size="1.016" layer="25">SI</text>
-<text x="36.1" y="60.5" size="1.016" layer="25">SK</text>
-<text x="41.1" y="41" size="1.016" layer="25">CS</text>
+<wire x1="44.2" y1="99.8" x2="62.2" y2="99.8" width="0.1524" layer="20"/>
+<wire x1="43.8" y1="3.9" x2="63.2" y2="3.9" width="0.1524" layer="20"/>
+<wire x1="40.8" y1="31.2" x2="43.7" y2="3.9" width="0.1524" layer="20"/>
+<wire x1="65.6" y1="31.1" x2="63.2" y2="4" width="0.1524" layer="20"/>
+<wire x1="44.2" y1="99.8" x2="40.9" y2="72.8" width="0.1524" layer="20"/>
+<wire x1="62.2" y1="99.8" x2="65.8" y2="72.8" width="0.1524" layer="20"/>
+<text x="119" y="44.9" size="1.016" layer="25">SO</text>
+<text x="118.8" y="49.9" size="1.016" layer="25">SI</text>
+<text x="113.1" y="56.2" size="1.016" layer="25">SK</text>
+<text x="119.2" y="54.2" size="1.016" layer="25">CS</text>
 <wire x1="65.8" y1="72.8" x2="83.1" y2="87.3" width="0.1524" layer="20"/>
 <wire x1="71.3" y1="63.3" x2="89.5" y2="79" width="0.1524" layer="20"/>
 <wire x1="35.5" y1="63.3" x2="35.5" y2="41" width="0.1524" layer="20"/>
@@ -226,19 +226,20 @@
 <hole x="19.9" y="15.9" drill="2.4"/>
 <wire x1="23" y1="15.6" x2="15.3" y2="23.7" width="0.1524" layer="20" curve="-275.323414"/>
 <wire x1="91.2" y1="23.7" x2="83.7" y2="15.7" width="0.1524" layer="20" curve="-278.537787"/>
-<text x="51.095503125" y="32.993903125" size="1.778" layer="25" rot="R270">MPU6050</text>
-<text x="47.3" y="24.1" size="1.016" layer="25">GD</text>
-<text x="47.4" y="21.5" size="1.016" layer="25">3V</text>
-<text x="47.6" y="26.8" size="1.016" layer="25">DA</text>
-<text x="47.5" y="29.2" size="1.016" layer="25">CL</text>
+<text x="65.295503125" y="56.393903125" size="1.778" layer="25" rot="R270">MPU6050</text>
+<text x="81.4" y="60" size="1.016" layer="25">GD</text>
+<text x="76.4" y="56.7" size="1.016" layer="25">3V</text>
+<text x="78.2" y="60" size="1.016" layer="25">DA</text>
+<text x="78.7" y="57.7" size="1.016" layer="25">CL</text>
 <text x="60.4326" y="68.2508" size="1.016" layer="25" rot="R180">5V</text>
-<text x="57.695503125" y="70.193903125" size="1.778" layer="26" rot="SMR0">Reg</text>
+<text x="50.495503125" y="81.493903125" size="1.778" layer="25">Reg</text>
 <text x="60.4326" y="70.9508" size="1.016" layer="25" rot="R180">GD</text>
-<text x="66.6" y="60.7" size="1.016" layer="25">GD</text>
-<text x="63.8" y="60.6" size="1.016" layer="25">3V</text>
-<text x="69.1" y="60.7" size="1.016" layer="25">5V</text>
-<text x="48.5" y="60.5" size="1.016" layer="25">DA</text>
-<text x="51.5" y="60.5" size="1.016" layer="25">CL</text>
+<text x="112.9" y="50.4" size="1.016" layer="25">GD</text>
+<text x="112.6" y="45.2" size="1.016" layer="25">3V</text>
+<text x="114.8" y="53.3" size="1.016" layer="25">5V</text>
+<text x="112.8" y="36.1" size="1.016" layer="25">DA</text>
+<text x="113.2" y="41.2" size="1.016" layer="25">CL</text>
+<rectangle x1="44" y1="3.9" x2="62" y2="38.2" layer="21"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -292,6 +293,24 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <pad name="3" x="5.08" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
 <pad name="4" x="7.62" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
 <rectangle x1="7.366" y1="-0.254" x2="7.874" y2="0.254" layer="51"/>
+<rectangle x1="4.826" y1="-0.254" x2="5.334" y2="0.254" layer="51"/>
+<rectangle x1="2.286" y1="-0.254" x2="2.794" y2="0.254" layer="51"/>
+<rectangle x1="-0.254" y1="-0.254" x2="0.254" y2="0.254" layer="51"/>
+<text x="-1.27" y="1.397" size="0.6096" layer="25" font="vector" ratio="20">&gt;NAME</text>
+<text x="-1.27" y="-2.032" size="0.6096" layer="27" font="vector" ratio="20">&gt;VALUE</text>
+</package>
+<package name="1X03_NO_SILK">
+<description>&lt;h3&gt;Plated Through Hole - 3 Pin No Silk Outline&lt;/h3&gt;
+&lt;p&gt;Specifications:
+&lt;ul&gt;&lt;li&gt;Pin count:3&lt;/li&gt;
+&lt;li&gt;Pin pitch:0.1"&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;
+&lt;p&gt;Example device(s):
+&lt;ul&gt;&lt;li&gt;CONN_03&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</description>
+<pad name="1" x="0" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
+<pad name="2" x="2.54" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
+<pad name="3" x="5.08" y="0" drill="1.016" diameter="1.8796" rot="R90"/>
 <rectangle x1="4.826" y1="-0.254" x2="5.334" y2="0.254" layer="51"/>
 <rectangle x1="2.286" y1="-0.254" x2="2.794" y2="0.254" layer="51"/>
 <rectangle x1="-0.254" y1="-0.254" x2="0.254" y2="0.254" layer="51"/>
@@ -698,37 +717,56 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="MPU6050" library="SparkFun-Connectors" package="1X05_NO_SILK" value="" x="46" y="22" smashed="yes" rot="R90">
-<attribute name="VALUE" x="48.032" y="20.73" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
+<element name="REG" library="SparkFun-Connectors" package="1X04_NO_SILK" value="" x="56.8" y="79.3" smashed="yes" rot="R180">
+<attribute name="PROD_ID" value="CONN-09696" x="56.8" y="79.3" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="58.07" y="81.332" size="0.6096" layer="27" font="vector" ratio="20" rot="R180"/>
 </element>
-<element name="REG" library="SparkFun-Connectors" package="1X04_NO_SILK" value="" x="61.8" y="68" smashed="yes" rot="R90">
-<attribute name="PROD_ID" value="CONN-09696" x="61.8" y="68" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="63.832" y="66.73" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
+<element name="GD" library="wirepad" package="SMD1,27-2,54" value="" x="47.2" y="74.8" rot="R180"/>
+<element name="VB" library="wirepad" package="SMD1,27-2,54" value="" x="49" y="74.8" rot="R180"/>
+<element name="M1" library="wirepad" package="SMD1,27-2,54" value="" x="50.9" y="74.8" rot="R180"/>
+<element name="M2" library="wirepad" package="SMD1,27-2,54" value="" x="52.9" y="74.8" rot="R180"/>
+<element name="M3" library="wirepad" package="SMD1,27-2,54" value="" x="54.7" y="74.8" rot="R180"/>
+<element name="M4" library="wirepad" package="SMD1,27-2,54" value="" x="56.8" y="74.9" rot="R180"/>
+<element name="U$1" library="TEENSY 4.0" package="TEENSY_4.0" value="TEENSY_4.0" x="53.2" y="82.3" rot="SMR270"/>
+<element name="TINYPICO" library="SparkFun-Connectors" package="1X05_NO_SILK" value="" x="45.7" y="18.2" rot="R270"/>
+<element name="GND" library="wirepad" package="SMD1,27-2,54" value="" x="55.6" y="90"/>
+<element name="5V" library="wirepad" package="SMD1,27-2,54" value="" x="53.1" y="90"/>
+<element name="3V" library="wirepad" package="SMD1,27-2,54" value="" x="51" y="90"/>
+<element name="RX2" library="wirepad" package="SMD1,27-2,54" value="" x="49.1" y="90"/>
+<element name="VL53L1_1" library="SparkFun-Connectors" package="1X03_NO_SILK" value="" x="60.9" y="54.6" rot="R90"/>
+<element name="VL53L1_2" library="SparkFun-Connectors" package="1X03_NO_SILK" value="" x="45.8" y="54.4" rot="R90"/>
+<element name="PAA3095_1" library="SparkFun-Connectors" package="1X04_NO_SILK" value="" x="61" y="44.1" rot="R90">
+<attribute name="PROD_ID" value="CONN-09696" x="61" y="44.1" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="GD" library="wirepad" package="SMD1,27-2,54" value="" x="46.9" y="81.6" rot="R180"/>
-<element name="VB" library="wirepad" package="SMD1,27-2,54" value="" x="49.4" y="81.6" rot="R180"/>
-<element name="M1" library="wirepad" package="SMD1,27-2,54" value="" x="51.9" y="81.6" rot="R180"/>
-<element name="M2" library="wirepad" package="SMD1,27-2,54" value="" x="54.4" y="81.6" rot="R180"/>
-<element name="M3" library="wirepad" package="SMD1,27-2,54" value="" x="56.9" y="81.6" rot="R180"/>
-<element name="M4" library="wirepad" package="SMD1,27-2,54" value="" x="59.4" y="81.6" rot="R180"/>
-<element name="U$1" library="TEENSY 4.0" package="TEENSY_4.0" value="TEENSY_4.0" x="53.4" y="51.1" rot="SMR0"/>
+<element name="PAA3095_2" library="SparkFun-Connectors" package="1X04_NO_SILK" value="" x="45.8" y="44" rot="R90">
+<attribute name="PROD_ID" value="CONN-09696" x="45.8" y="44" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
+<element name="MPU6050" library="SparkFun-Connectors" package="1X04_NO_SILK" value="" x="58.3" y="44.9" rot="R90">
+<attribute name="PROD_ID" value="CONN-09696" x="58.3" y="44.9" size="1.778" layer="27" rot="R90" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="3V3">
+<contactref element="3V" pad="1"/>
 <contactref element="MPU6050" pad="1"/>
+<wire x1="58.3" y1="44.9" x2="51" y2="90" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="GND">
 <polygon width="0.3048" layer="1">
-<vertex x="71.15" y="90.456"/>
-<vertex x="71.15" y="13.65"/>
-<vertex x="35.5" y="13.65"/>
-<vertex x="35.5" y="90.456"/>
+<vertex x="71.15" y="99.456"/>
+<vertex x="71.15" y="3.45"/>
+<vertex x="35.5" y="3.45"/>
+<vertex x="35.5" y="99.456"/>
 </polygon>
 <contactref element="REG" pad="2"/>
 <contactref element="GD" pad="1"/>
+<contactref element="TINYPICO" pad="5"/>
+<contactref element="GND" pad="1"/>
 <contactref element="MPU6050" pad="2"/>
-<wire x1="46.9" y1="81.6" x2="61.8" y2="70.54" width="0" layer="19" extent="1-1"/>
-<wire x1="46" y1="24.54" x2="61.8" y2="70.54" width="0" layer="19" extent="1-1"/>
+<wire x1="47.2" y1="74.8" x2="55.6" y2="90" width="0" layer="19" extent="1-1"/>
+<wire x1="54.26" y1="79.3" x2="47.2" y2="74.8" width="0" layer="19" extent="1-1"/>
+<wire x1="58.3" y1="47.44" x2="47.2" y2="74.8" width="0" layer="19" extent="1-1"/>
+<wire x1="45.7" y1="8.04" x2="58.3" y2="47.44" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SDA">
 <contactref element="MPU6050" pad="3"/>
@@ -738,11 +776,15 @@ design rules under a new name.</description>
 </signal>
 <signal name="5V">
 <contactref element="REG" pad="1"/>
+<contactref element="TINYPICO" pad="4"/>
+<contactref element="5V" pad="1"/>
+<wire x1="56.8" y1="79.3" x2="45.7" y2="10.58" width="0" layer="19" extent="1-1"/>
+<wire x1="53.1" y1="90" x2="56.8" y2="79.3" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VBAT">
 <contactref element="REG" pad="3"/>
 <contactref element="VB" pad="1"/>
-<wire x1="49.4" y1="81.6" x2="61.8" y2="73.08" width="0" layer="19" extent="1-1"/>
+<wire x1="49" y1="74.8" x2="51.72" y2="79.3" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1">
 <contactref element="M1" pad="1"/>
@@ -755,6 +797,15 @@ design rules under a new name.</description>
 </signal>
 <signal name="M4">
 <contactref element="M4" pad="1"/>
+</signal>
+<signal name="RX2">
+<contactref element="RX2" pad="1"/>
+</signal>
+<signal name="RX1">
+<contactref element="TINYPICO" pad="2"/>
+</signal>
+<signal name="TX1">
+<contactref element="TINYPICO" pad="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
