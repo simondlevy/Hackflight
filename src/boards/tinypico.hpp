@@ -27,28 +27,17 @@
 
 // Third-party libraries
 #include <MPU6050.h>
-#include <pmw3901.hpp>
 #include <VL53L1X.h>
 #include <oneshot125.hpp>
-#include <dsmrx.hpp>
+#include <sbus.h>
+#include <TinyPICO.h>
 
 // Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
 #include <msp/serializer.hpp>
-#include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
-
-static Dsm2048 _dsm2048;
-
-// DSMX receiver callback
-void serialEvent2(void)
-{
-    while (Serial2.available()) {
-        _dsm2048.parse(Serial2.read(), micros());
-    }
-}
 
 namespace hf {
 
@@ -60,6 +49,13 @@ namespace hf {
             // FAFO -----------------------------------------------------------
             static const uint32_t LOOP_FREQ_HZ = 2000;
 
+            // Blinkenlights --------------------------------------------------
+            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+            static constexpr float FAILSAFE_BLINK_RATE_HZ = 0.25;
+            static const uint32_t LED_COLOR_FAILSAFE = 0xFF0000;
+            static const uint32_t LED_COLOR_HEARTBEAT = 0x00FF00;
+            static const uint32_t LED_COLOR_ARMED = 0xFF0000;
+
             // IMU ------------------------------------------------------------
 
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -69,10 +65,7 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
-
-            // Telemetry ------------------------------------------------------
-            Timer _telemetryTimer = Timer(60); // Hz
+            const std::vector<uint8_t> MOTOR_PINS = { 15, 27, 26, 25 };
 
             // Debugging ------------------------------------------------------
             Timer _debugTimer = Timer(100); // Hz
@@ -85,6 +78,9 @@ namespace hf {
 
             // Max yaw rate in deg/sec
             static constexpr float YAW_PRESCALE = 160.0;     
+
+            // Failsafe timeout
+            static const uint32_t FAILSAFE_TIMEOUT_MSEC = 500;
 
             // IMU calibration parameters -------------------------------------
 
@@ -102,15 +98,26 @@ namespace hf {
                 // Initialize the I^2C bus
                 Wire.begin();
 
-                // Initialize the I^2C sensors
-                initImu();
-                //initRangefinder();
+                //Note this is 2.5 times the spec sheet 400 kHz max...
+                Wire.setClock(1000000); 
+
+                _mpu6050.initialize();
+
+                if (!_mpu6050.testConnection()) {
+                    reportForever("MPU6050 initialization unsuccessful\n");
+                }
+
+                // From the reset state all registers should be 0x00, so we
+                // should be at max sample rate with digital low pass filter(s)
+                // off.  All we need to do is set the desired fullscale ranges
+                _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
+                _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 
                 // Set up serial debugging
                 Serial.begin(115200);
 
-                // Set up serial connection from DSMX receiver
-                Serial2.begin(115200);
+                // Set up serial connection to receiver
+                _rx.Begin();
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
@@ -120,7 +127,7 @@ namespace hf {
 
                 _was_arming_switch_on = true;
             }
- 
+
             void readData( float & dt, demands_t & demands, state_t & state)
             {
                 // Keep track of what time it is and how much time has elapsed
@@ -130,16 +137,12 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
-                // Read channels values from receiver
-                if (_dsm2048.timedOut(micros())) {
+                // Read receiver
+                if (_rx.Read()) {
 
-                    _status = STATUS_FAILSAFE;
+                    memcpy(_channels, _rx.data().ch, 12);
                 }
-                else if (_dsm2048.gotNewFrame()) {
 
-                    _dsm2048.getChannelValues(_channels, 6);
-                }
- 
                 const auto is_arming_switch_on = _channels[4] > 1500;
 
                 // Arm vehicle if safe
@@ -184,23 +187,6 @@ namespace hf {
                 state.theta = angles.y;
                 state.psi = angles.z;
 
-                if (false) {
-
-                    int16_t flowDx = 0;
-                    int16_t flowDy = 0;
-                    bool gotFlow = false;
-                    _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
-
-                    /*
-                    // Read rangefinder, non-blocking
-                    const uint16_t range = _vl53l1.read(false);
-
-                    // Read optical flow sensor
-                    if (gotFlow) {
-                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
-                    }*/
-                }
-
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
                 state.dtheta = -gyro.y;
@@ -215,39 +201,57 @@ namespace hf {
                 demands.yaw    = mapchan(_channels[3], -1,  +1) *
                     YAW_PRESCALE;
 
-                // Send telemetry and status to TinyPICO Nano periodically
-                if (_telemetryTimer.isReady(_usec_curr)) {
-
-                    const float vals[10] = {
-                        state.dx,
-                        state.dy,
-                        state.z,
-                        state.dz,
-                        state.phi,
-                        state.dphi,
-                        state.theta,
-                        state.dtheta,
-                        state.psi,
-                        state.dpsi
-                    };
-
-                    static MspSerializer _serializer;
-
-                    _serializer.serializeFloats(121, vals, 10);
-
-                    Serial2.write(
-                            _serializer.payload, _serializer.payloadSize); 
-
-                    _serializer.serializeBytes(122, &_status, 1);
-
-                    Serial2.write(
-                            _serializer.payload, _serializer.payloadSize); 
+                // Show status on LED
+                if (_status == hf::STATUS_ARMED) {
+                    _tinypico.DotStar_SetPixelColor(LED_COLOR_ARMED);
                 }
- 
+
+                else {
+
+                    const auto failsafe = _status == hf::STATUS_FAILSAFE;
+
+                    const auto blink_freq =
+                        failsafe ?  FAILSAFE_BLINK_RATE_HZ :
+                        HEARTBEAT_BLINK_RATE_HZ;
+
+                    const auto color = failsafe ? LED_COLOR_FAILSAFE :
+                        LED_COLOR_HEARTBEAT;
+
+                    static uint32_t _delay_msec;
+
+                    const auto msec_curr = millis();
+
+                    static uint32_t _msec_prev;
+
+                    if (msec_curr - _msec_prev > _delay_msec) {
+
+                        static bool _alternate;
+
+                        _msec_prev = msec_curr;
+
+                        _tinypico.DotStar_SetPixelColor(
+                                _alternate ? color : 0x000000);
+
+                        if (_alternate) {
+                            _alternate = false;
+                            _delay_msec = 100;
+                        }
+
+                        else {
+                            _alternate = true;
+                            _delay_msec = blink_freq * 1000;
+                        }
+                    }
+
+                }
+
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
+                       printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
+                       _channels[0], _channels[1], _channels[2],
+                       _channels[3], _channels[4], _channels[5]);
                 }
-             }
+            }
 
             void runMotors(const float * motors)
             {
@@ -282,19 +286,21 @@ namespace hf {
 
         private:
 
+            // Receiver
+            bfs::SbusRx _rx = bfs::SbusRx(&Serial1, 4, 14, true);
+            uint16_t _channels[6];
+
+            // RGB LED support
+            TinyPICO _tinypico;
+
             // Sensors
             MPU6050 _mpu6050;
-            VL53L1X _vl53l1;
-            PMW3901 _pmw3901;
 
             // Motors
             OneShot125 _motors = OneShot125(MOTOR_PINS);
 
             // Timing
             uint32_t _usec_curr;
-
-            // Receiver
-            uint16_t _channels[6];
 
             // Safety
             uint8_t _status;
@@ -305,7 +311,7 @@ namespace hf {
 
             // Private methods -----------------------------------------------
 
-           static float mapchan(
+            static float mapchan(
                     const uint16_t rawval,
                     const float newmin,
                     const float newmax)
@@ -336,54 +342,6 @@ namespace hf {
                 // Sit in loop until appropriate time has passed
                 while (invFreq > (checker - usec_curr)) {
                     checker = micros();
-                }
-            }
-
-            void initImu() 
-            {
-                //Note this is 2.5 times the spec sheet 400 kHz max...
-                Wire.setClock(1000000); 
-
-                _mpu6050.initialize();
-
-                if (!_mpu6050.testConnection()) {
-                    reportForever("MPU6050 initialization unsuccessful\n");
-                }
-
-                // From the reset state all registers should be 0x00, so we
-                // should be at max sample rate with digital low pass filter(s)
-                // off.  All we need to do is set the desired fullscale ranges
-                _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
-                _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-            }
-
-            void initRangefinder()
-            {
-                _vl53l1.setTimeout(500);
-
-                if (!_vl53l1.init()) {
-                    reportForever("VL53L1 initialization unsuccessful");
-                }
-
-                // Use long distance mode and allow up to 50000 us (50 ms) for
-                // a measurement.  You can change these settings to adjust the
-                // performance of the _vl53l1, but the minimum timing budget is
-                // 20 ms for short distance mode and 33 ms for medium and long
-                // distance modes. See the VL53L1X datasheet for more
-                // information on range and timing limits.
-                _vl53l1.setDistanceMode(VL53L1X::Long);
-                _vl53l1.setMeasurementTimingBudget(50000);
-
-                // Start continuous readings at a rate of one measurement every
-                // 50 ms (the inter-measurement period). This period should be
-                // at least as long as the timing budget.
-                _vl53l1.startContinuous(50);
-            }
-
-            void initOpticalFlow()
-            {
-                if (!_pmw3901.begin()) {
-                    reportForever("PMW3901 initialization unsuccessful");
                 }
             }
 
