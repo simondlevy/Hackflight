@@ -247,9 +247,8 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                       printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
-                       _channels[0], _channels[1], _channels[2],
-                       _channels[3], _channels[4], _channels[5]);
+                    printf("phi=%3.3f  theta=%+3.3f  psi=%+3.3f\n",
+                            state.phi, state.theta, state.psi);
                 }
             }
 
@@ -316,7 +315,7 @@ namespace hf {
                     const float newmin,
                     const float newmax)
             {
-                return newmin + (rawval - 988.f) / 1023 * (newmax - newmin);
+                return newmin + (rawval - 173.f) / 1638 * (newmax - newmin);
             }
 
             static void runLoopDelay(const uint32_t usec_curr)
