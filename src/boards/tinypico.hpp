@@ -143,6 +143,12 @@ namespace hf {
                     memcpy(_channels, _rx.data().ch, 12);
                 }
 
+                // Check receiver failsafe
+                if (_rx.data().failsafe) {
+
+                    _status = STATUS_FAILSAFE;
+                }
+
                 const auto is_arming_switch_on = _channels[4] > 1500;
 
                 // Arm vehicle if safe
@@ -247,8 +253,6 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("phi=%3.3f  theta=%+3.3f  psi=%+3.3f\n",
-                            state.phi, state.theta, state.psi);
                 }
             }
 
@@ -266,6 +270,7 @@ namespace hf {
                     if (_status == STATUS_ARMED) {
                         _status = STATUS_READY;
                     }
+
                     m1_usec = 120;
                     m2_usec = 120;
                     m3_usec = 120;
