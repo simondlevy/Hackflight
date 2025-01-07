@@ -76,6 +76,9 @@ namespace hf {
             static const uint16_t CHAN_MIN = 1158;
             static const uint16_t CHAN_MAX = 1840;
 
+            // Throttle-down margin of safety for arming
+            static constexpr uint16_t THROTTLE_SAFETY_MARGIN = 20;
+
             // Motors ---------------------------------------------------------
             const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
 
@@ -148,9 +151,10 @@ namespace hf {
                     _dsm2048.getChannelValues(_channels, 6);
                 }
 
-                // Toggle arming on switch press/release
+                // When throttle is down, toggle arming on switch press/release
                 const auto is_arming_switch_on = _channels[5] > 1500;
-                if (!is_arming_switch_on && _was_arming_switch_on) {
+                if (_channels[0] < (CHAN_MIN + THROTTLE_SAFETY_MARGIN) &&
+                        !is_arming_switch_on && _was_arming_switch_on) {
                     _status = 
                         _status == STATUS_READY ? STATUS_ARMED :
                         _status == STATUS_ARMED ? STATUS_READY :
