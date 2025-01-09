@@ -3384,14 +3384,12 @@ https://www.tinypico.com/tinypico-nano</description>
 <pin name="5V" x="-33.274" y="-1.524" length="middle" direction="pwr"/>
 <pin name="D-" x="-33.274" y="1.016" length="middle"/>
 <pin name="D+" x="-33.274" y="3.556" length="middle"/>
-<pin name="VBAT" x="-18.034" y="21.336" length="middle" direction="pwr" rot="R270"/>
 <wire x1="-28.194" y1="16.256" x2="-28.194" y2="-16.764" width="0.254" layer="94"/>
 <wire x1="-28.194" y1="-16.764" x2="30.226" y2="-16.764" width="0.254" layer="94"/>
 <wire x1="30.226" y1="-16.764" x2="30.226" y2="16.256" width="0.254" layer="94"/>
 <wire x1="30.226" y1="16.256" x2="-28.194" y2="16.256" width="0.254" layer="94"/>
 <text x="0" y="0" size="2.54" layer="94" align="center">TinyPICO NANO
 CONNECTOR</text>
-<pin name="GPIO9" x="-0.254" y="-21.844" length="middle" rot="R90"/>
 <wire x1="20.066" y1="3.556" x2="20.066" y2="-14.224" width="0.254" layer="94"/>
 <wire x1="20.066" y1="-14.224" x2="27.686" y2="-14.224" width="0.254" layer="94"/>
 <wire x1="27.686" y1="-14.224" x2="27.686" y2="3.556" width="0.254" layer="94"/>
