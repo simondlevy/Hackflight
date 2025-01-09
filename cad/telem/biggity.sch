@@ -3361,20 +3361,7 @@ Part Number: HA-522</description>
 <wire x1="26.9875" y1="12.54" x2="26.9875" y2="0" width="0.127" layer="51"/>
 <wire x1="26.9875" y1="0" x2="0" y2="0" width="0.127" layer="51"/>
 <rectangle x1="23.495" y1="0.381" x2="26.67" y2="7.366" layer="51"/>
-<smd name="IO23" x="4.7752" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO19" x="6.0452" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO18" x="7.3152" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO5" x="8.5852" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO22" x="9.8552" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO21" x="11.1252" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO0" x="12.3952" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO9" x="13.6652" y="0.1" dx="1" dy="1.2" layer="1"/>
 <smd name="RX" x="14.9352" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="TX" x="16.2052" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO39" x="17.4752" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO38" x="18.7452" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO37" x="20.0152" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO36" x="21.2852" y="0.1" dx="1" dy="1.2" layer="1"/>
 <smd name="D+" x="0.1" y="8.185" dx="1" dy="1.2" layer="1" rot="R270"/>
 <smd name="D-" x="0.1" y="6.915" dx="1" dy="1.2" layer="1" rot="R270"/>
 <smd name="5V" x="0.1" y="5.645" dx="1" dy="1.2" layer="1" rot="R270"/>
@@ -3392,15 +3379,7 @@ Part Number: HA-522</description>
 <symbol name="TINYPICO-NANO-CONNECTOR">
 <description>TinyPICO NANO Device Symbol&lt;br&gt;
 https://www.tinypico.com/tinypico-nano</description>
-<pin name="IO23" x="-18.034" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO19" x="-15.494" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO18" x="-12.954" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO5" x="-10.414" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO22" x="-7.874" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO21" x="-5.334" y="-21.844" length="middle" rot="R90"/>
 <pin name="RX" x="2.286" y="-21.844" length="middle" rot="R90"/>
-<pin name="TX" x="4.826" y="-21.844" length="middle" rot="R90"/>
-<pin name="IO0" x="-2.794" y="-21.844" length="middle" rot="R90"/>
 <pin name="GND" x="-33.274" y="-6.604" length="middle" direction="pwr"/>
 <pin name="5V" x="-33.274" y="-1.524" length="middle" direction="pwr"/>
 <pin name="D-" x="-33.274" y="1.016" length="middle"/>
@@ -3413,10 +3392,6 @@ https://www.tinypico.com/tinypico-nano</description>
 <text x="0" y="0" size="2.54" layer="94" align="center">TinyPICO NANO
 CONNECTOR</text>
 <pin name="GPIO9" x="-0.254" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO39" x="7.366" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO38" x="9.906" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO37" x="12.446" y="-21.844" length="middle" rot="R90"/>
-<pin name="GPIO36" x="14.986" y="-21.844" length="middle" rot="R90"/>
 <wire x1="20.066" y1="3.556" x2="20.066" y2="-14.224" width="0.254" layer="94"/>
 <wire x1="20.066" y1="-14.224" x2="27.686" y2="-14.224" width="0.254" layer="94"/>
 <wire x1="27.686" y1="-14.224" x2="27.686" y2="3.556" width="0.254" layer="94"/>
@@ -3437,20 +3412,7 @@ https://www.tinypico.com/tinypico-nano</description>
 <connect gate="G$1" pin="D+" pad="D+"/>
 <connect gate="G$1" pin="D-" pad="D-"/>
 <connect gate="G$1" pin="GND" pad="GND$1"/>
-<connect gate="G$1" pin="GPIO36" pad="IO36"/>
-<connect gate="G$1" pin="GPIO37" pad="IO37"/>
-<connect gate="G$1" pin="GPIO38" pad="IO38"/>
-<connect gate="G$1" pin="GPIO39" pad="IO39"/>
-<connect gate="G$1" pin="GPIO9" pad="IO9"/>
-<connect gate="G$1" pin="IO0" pad="IO0"/>
-<connect gate="G$1" pin="IO18" pad="IO18"/>
-<connect gate="G$1" pin="IO19" pad="IO19"/>
-<connect gate="G$1" pin="IO21" pad="IO21"/>
-<connect gate="G$1" pin="IO22" pad="IO22"/>
-<connect gate="G$1" pin="IO23" pad="IO23"/>
-<connect gate="G$1" pin="IO5" pad="IO5"/>
 <connect gate="G$1" pin="RX" pad="RX"/>
-<connect gate="G$1" pin="TX" pad="TX"/>
 </connects>
 <technologies>
 <technology name=""/>

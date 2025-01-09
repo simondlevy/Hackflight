@@ -588,20 +588,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="26.9875" y1="12.54" x2="26.9875" y2="0" width="0.127" layer="51"/>
 <wire x1="26.9875" y1="0" x2="0" y2="0" width="0.127" layer="51"/>
 <rectangle x1="23.495" y1="0.381" x2="26.67" y2="7.366" layer="51"/>
-<smd name="IO23" x="4.7752" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO19" x="6.0452" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO18" x="7.3152" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO5" x="8.5852" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO22" x="9.8552" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO21" x="11.1252" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO0" x="12.3952" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO9" x="13.6652" y="0.1" dx="1" dy="1.2" layer="1"/>
 <smd name="RX" x="14.9352" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="TX" x="16.2052" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO39" x="17.4752" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO38" x="18.7452" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO37" x="20.0152" y="0.1" dx="1" dy="1.2" layer="1"/>
-<smd name="IO36" x="21.2852" y="0.1" dx="1" dy="1.2" layer="1"/>
 <smd name="D+" x="0.1" y="8.185" dx="1" dy="1.2" layer="1" rot="R270"/>
 <smd name="D-" x="0.1" y="6.915" dx="1" dy="1.2" layer="1" rot="R270"/>
 <smd name="5V" x="0.1" y="5.645" dx="1" dy="1.2" layer="1" rot="R270"/>
