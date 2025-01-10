@@ -173,13 +173,11 @@
 <board>
 <plain>
 <hole x="45.5" y="14" drill="2.4"/>
-<hole x="60.5" y="90" drill="2.4"/>
 <polygon width="0.254" layer="21">
 <vertex x="50.56389375" y="85.19500625"/>
 <vertex x="53.152403125" y="89.854321875"/>
 <vertex x="55.827196875" y="85.19500625"/>
 </polygon>
-<hole x="45.5" y="90" drill="2.4"/>
 <hole x="60.5" y="14" drill="2.4"/>
 <wire x1="71.3" y1="63.3" x2="71.2" y2="41.2" width="0.1524" layer="20"/>
 <wire x1="43.5" y1="91.9" x2="62.2" y2="91.9" width="0.1524" layer="20"/>
@@ -277,6 +275,8 @@
 <text x="52.2" y="66.5" size="1.016" layer="25">GD</text>
 <text x="49.6" y="66.5" size="1.016" layer="25">VB</text>
 <text x="64.1" y="41" size="1.016" layer="26" rot="SMR0">3V</text>
+<hole x="45.5" y="89.6" drill="2.4"/>
+<hole x="60.5" y="89.6" drill="2.4"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
