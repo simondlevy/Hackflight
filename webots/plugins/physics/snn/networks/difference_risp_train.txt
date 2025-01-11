@@ -1,4 +1,38 @@
 {
+    "Properties": {
+        "node_properties": [
+
+            {
+                "name": "Threshold",
+                "type": 68,
+                "index": 0,
+                "size": 1,
+                "max_value": 1.0,
+                "min_value": -1.0
+            }
+
+        ],
+        "edge_properties": [
+            {
+                "name": "Delay",
+                "type": 73,
+                "index": 1,
+                "size": 1,
+                "max_value": 5.0,
+                "min_value": 1.0
+            },
+            {
+                "name": "Weight",
+                "type": 68,
+                "index": 0,
+                "size": 1,
+                "min_value": -1.0,
+                "max_value": 1.0
+            }
+        ],
+        "network_properties": []
+    },
+
     "Associated_Data": {
         "app_params": {
             "action_high": 2,
@@ -160,36 +194,7 @@
         { "id": 230, "values": [ 0.4600254975864724 ] },
         { "id": 12, "values": [ 0.161333309291241 ] },
         { "id": 150, "values": [ 0.9436812423969809 ] }
-    ], "Outputs": [ 2 ],
-    "Properties": {
-        "edge_properties": [
-            {
-                "index": 1,
-                "max_value": 5.0,
-                "min_value": 1.0,
-                "name": "Delay",
-                "size": 1,
-                "type": 73
-            },
-            {
-                "index": 0,
-                "max_value": 1.0,
-                "min_value": -1.0,
-                "name": "Weight",
-                "size": 1,
-                "type": 68
-            }
-        ],
-        "network_properties": [],
-        "node_properties": [
-            {
-                "index": 0,
-                "max_value": 1.0,
-                "min_value": -1.0,
-                "name": "Threshold",
-                "size": 1,
-                "type": 68
-            }
-        ]
-    }
+    ], 
+    "Outputs": [ 2 ]
+
 }
