@@ -27,8 +27,6 @@
 
 // Third-party libraries
 #include <MPU6050.h>
-#include <pmw3901.hpp>
-#include <VL53L1X.h>
 #include <oneshot125.hpp>
 #include <dsmrx.hpp>
 
@@ -115,7 +113,6 @@ namespace hf {
 
                 // Initialize the I^2C sensors
                 initImu();
-                //initRangefinder();
 
                 // Set up serial debugging
                 Serial.begin(115200);
@@ -193,23 +190,6 @@ namespace hf {
                 state.theta = angles.y;
                 state.psi = angles.z;
 
-                if (false) {
-
-                    int16_t flowDx = 0;
-                    int16_t flowDy = 0;
-                    bool gotFlow = false;
-                    _pmw3901.readMotion(flowDx, flowDy, gotFlow); 
-
-                    /*
-                    // Read rangefinder, non-blocking
-                    const uint16_t range = _vl53l1.read(false);
-
-                    // Read optical flow sensor
-                    if (gotFlow) {
-                        //printf("flow: %+03d  %+03d\n", flowDx, flowDy);
-                    }*/
-                }
-
                 // Get angular velocities directly from gyro
                 state.dphi = gyro.x;
                 state.dtheta = -gyro.y;
@@ -243,6 +223,9 @@ namespace hf {
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
+                    printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
+                          _channels[0],  _channels[1],  _channels[2],  
+                          _channels[3],  _channels[4],  _channels[5]);
                 }
             }
 
@@ -281,8 +264,6 @@ namespace hf {
 
             // Sensors
             MPU6050 _mpu6050;
-            VL53L1X _vl53l1;
-            PMW3901 _pmw3901;
 
             // Motors
             OneShot125 _motors = OneShot125(MOTOR_PINS);
@@ -378,36 +359,6 @@ namespace hf {
                         _alternate = true;
                         _delay_usec = BLINK_RATE_HZ * 1e6;
                     }
-                }
-            }
-
-            void initRangefinder()
-            {
-                _vl53l1.setTimeout(500);
-
-                if (!_vl53l1.init()) {
-                    reportForever("VL53L1 initialization unsuccessful");
-                }
-
-                // Use long distance mode and allow up to 50000 us (50 ms) for
-                // a measurement.  You can change these settings to adjust the
-                // performance of the _vl53l1, but the minimum timing budget is
-                // 20 ms for short distance mode and 33 ms for medium and long
-                // distance modes. See the VL53L1X datasheet for more
-                // information on range and timing limits.
-                _vl53l1.setDistanceMode(VL53L1X::Long);
-                _vl53l1.setMeasurementTimingBudget(50000);
-
-                // Start continuous readings at a rate of one measurement every
-                // 50 ms (the inter-measurement period). This period should be
-                // at least as long as the timing budget.
-                _vl53l1.startContinuous(50);
-            }
-
-            void initOpticalFlow()
-            {
-                if (!_pmw3901.begin()) {
-                    reportForever("PMW3901 initialization unsuccessful");
                 }
             }
 
