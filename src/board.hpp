@@ -210,18 +210,7 @@ namespace hf {
                     YAW_PRESCALE;
 
                 // Use LED to indicate safety status
-                if (_status == STATUS_ARMED) {
-                    digitalWrite(LED_PIN, HIGH);
-                }
-
-                else {
-
-                    digitalWrite(LED_PIN, LOW);
-                    /*
-                    blinkLed(_status == STATUS_FAILSAFE ? 
-                            FAILSAFE_BLINK_RATE_HZ :
-                            HEARTBEAT_BLINK_RATE_HZ); */
-                }
+                digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
@@ -330,31 +319,6 @@ namespace hf {
                 // off.  All we need to do is set the desired fullscale ranges
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-            }
-
-            void blinkLed(const float freq_hz)
-            {
-                static uint32_t _usec_prev;
-
-                static uint32_t _delay_usec;
-
-                if (_usec_curr - _usec_prev > _delay_usec) {
-
-                    static bool _alternate;
-
-                    _usec_prev = _usec_curr;
-
-                    digitalWrite(LED_PIN, _alternate);
-
-                    if (_alternate) {
-                        _alternate = false;
-                        _delay_usec = 100'100;
-                    }
-                    else {
-                        _alternate = true;
-                        _delay_usec = freq_hz * 1e6;
-                    }
-                }
             }
 
             static uint8_t scaleMotor(const float mval)
