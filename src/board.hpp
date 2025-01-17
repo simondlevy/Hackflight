@@ -67,8 +67,9 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             // LED
-            static const uint8_t LED_PIN = LED_BUILTIN; // 22;
-            static constexpr float BLINK_RATE_HZ = 1.5;
+            static const uint8_t LED_PIN = 22;
+            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+            static constexpr float FAILSAFE_BLINK_RATE_HZ = 3;
 
             // Receiver ranges for MLP6DSM transmitter
             static const uint16_t CHAN_MIN = 1158;
@@ -131,6 +132,9 @@ namespace hf {
  
             void readData(float & dt, demands_t & demands, state_t & state)
             {
+                // Safety
+                static bool _was_arming_switch_on;
+
                 // Keep track of what time it is and how much time has elapsed
                 // since the last loop
                 _usec_curr = micros();      
@@ -150,6 +154,7 @@ namespace hf {
 
                 // When throttle is down, toggle arming on switch press/release
                 const auto is_arming_switch_on = _channels[5] > 1500;
+
                 if (_channels[0] < (CHAN_MIN + THROTTLE_SAFETY_MARGIN) &&
                         !is_arming_switch_on && _was_arming_switch_on) {
                     _status = 
@@ -204,28 +209,22 @@ namespace hf {
                 demands.yaw    = mapchan(_channels[3], -1,  +1, -1) *
                     YAW_PRESCALE;
 
-                // Use LED to indicate arming status
-                switch (_status) {
+                // Use LED to indicate safety status
+                if (_status == STATUS_ARMED) {
+                    digitalWrite(LED_PIN, HIGH);
+                }
 
-                    case STATUS_ARMED:
-                        digitalWrite(LED_PIN, HIGH);
-                        break;
+                else {
 
-                    case STATUS_FAILSAFE:
-                        digitalWrite(LED_PIN, LOW);
-                        break;
-
-                    default:
-                        blinkLed(); // heartbeat
-                        break;
-
+                    digitalWrite(LED_PIN, LOW);
+                    /*
+                    blinkLed(_status == STATUS_FAILSAFE ? 
+                            FAILSAFE_BLINK_RATE_HZ :
+                            HEARTBEAT_BLINK_RATE_HZ); */
                 }
 
                 // Debug periodically as needed
                 if (_debugTimer.isReady(_usec_curr)) {
-                    printf("c1=%04d  c2=%04d  c3=%04d  c4=%04d  c5=%04d  c6=%04d\n",
-                          _channels[0],  _channels[1],  _channels[2],  
-                          _channels[3],  _channels[4],  _channels[5]);
                 }
             }
 
@@ -240,9 +239,6 @@ namespace hf {
                 // Turn off motors under various conditions
                 if (_channels[4] < 1500) {
 
-                    if (_status == STATUS_ARMED) {
-                        _status = STATUS_READY;
-                    }
                     m1_usec = 120;
                     m2_usec = 120;
                     m3_usec = 120;
@@ -274,12 +270,11 @@ namespace hf {
             // Receiver
             uint16_t _channels[6];
 
-            // Safety
-            uint8_t _status;
-            bool _was_arming_switch_on;
-
             // State estimation
             MadgwickFilter  _madgwick;
+
+            // Safety
+            uint8_t _status;
 
             // Private methods -----------------------------------------------
 
@@ -290,7 +285,7 @@ namespace hf {
                     const float sign)
             {
                 return sign * (newmin + (rawval - (float)CHAN_MIN) /
-                    (CHAN_MAX - CHAN_MIN) * (newmax - newmin));
+                        (CHAN_MAX - CHAN_MIN) * (newmax - newmin));
             }
 
             static void runLoopDelay(const uint32_t usec_curr)
@@ -337,7 +332,7 @@ namespace hf {
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
             }
 
-            void blinkLed()
+            void blinkLed(const float freq_hz)
             {
                 static uint32_t _usec_prev;
 
@@ -357,7 +352,7 @@ namespace hf {
                     }
                     else {
                         _alternate = true;
-                        _delay_usec = BLINK_RATE_HZ * 1e6;
+                        _delay_usec = freq_hz * 1e6;
                     }
                 }
             }
