@@ -212,10 +212,7 @@ namespace hf {
                 // Use LED to indicate safety status
                 digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
 
-                // Debug periodically as needed
-                if (_debugTimer.isReady(_usec_curr)) {
-                }
-            }
+           }
 
             void runMotors(const float * motors, const bool safeMode=true)
             {
@@ -243,6 +240,11 @@ namespace hf {
                 _motors.run();
 
                 runLoopDelay(_usec_curr);
+            }
+
+            bool debugReady()
+            {
+                return _debugTimer.isReady(_usec_curr);
             }
 
         private:
