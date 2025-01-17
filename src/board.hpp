@@ -79,7 +79,7 @@ namespace hf {
             static constexpr uint16_t THROTTLE_SAFETY_MARGIN = 20;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
+            const std::vector<uint8_t> MOTOR_PINS = { 4, 3, 6, 5 };
 
             // Telemetry ------------------------------------------------------
             Timer _telemetryTimer = Timer(60); // Hz
@@ -220,13 +220,13 @@ namespace hf {
             void runMotors(const float * motors)
             {
                 // Rescale motor values for OneShot125
-                auto m1_usec = scaleMotor(motors[0]);
-                auto m2_usec = scaleMotor(motors[1]);
-                auto m3_usec = scaleMotor(motors[2]);
+                auto m1_usec = scaleMotor(0);//motors[0]);
+                auto m2_usec = scaleMotor(0);//motors[1]);
+                auto m3_usec = scaleMotor(0);//motors[2]);
                 auto m4_usec = scaleMotor(motors[3]);
 
-                // Turn off motors under various conditions
-                if (_channels[4] < 1500) {
+                // Shut motors down when not armed
+                if (_status != STATUS_ARMED) {
 
                     m1_usec = 120;
                     m2_usec = 120;
