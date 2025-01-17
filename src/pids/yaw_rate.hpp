@@ -33,13 +33,11 @@ namespace hf {
 
         private:
 
-            static constexpr float I_LIMIT = 25.0;     
+            static constexpr float I_LIMIT = 2.5e+1;     
 
-            static constexpr float S = 1e-1;
-
-            static constexpr float KP = S * 0.003;           
-            static constexpr float KI = S * 0.0005;          
-            static constexpr float KD = S * 0.0000015;       
+            static constexpr float KP = 1.5e-3;
+            static constexpr float KI = 2.5e-4;          
+            static constexpr float KD = 7.5e-7;
 
         public:
 
