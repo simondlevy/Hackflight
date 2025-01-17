@@ -243,10 +243,9 @@
 <text x="66.7" y="45.7" size="1.016" layer="25">RX</text>
 <text x="60.3" y="65.6" size="1.016" layer="25">D22</text>
 <text x="62.5" y="74.4" size="1.6764" layer="25">+</text>
-<text x="66.3" y="71.1" size="1.6764" layer="25">+</text>
 <text x="63.102703125" y="67.906703125" size="1.4224" layer="26" rot="SMR90">RES</text>
 <text x="50.495503125" y="69.693903125" size="1.778" layer="25">REG</text>
-<text x="65.495503125" y="69.793903125" size="1.27" layer="25" rot="R290">LED</text>
+<text x="67.095503125" y="67.293903125" size="1.27" layer="25" rot="R90">LED</text>
 <text x="58.8" y="45.7" size="1.016" layer="25">M4</text>
 <text x="56.1" y="45.7" size="1.016" layer="25">M3</text>
 <text x="53.8" y="45.7" size="1.016" layer="25">M2</text>
@@ -277,6 +276,8 @@
 <text x="64.1" y="41" size="1.016" layer="26" rot="SMR0">3V</text>
 <hole x="45.5" y="89.6" drill="2.4"/>
 <hole x="60.5" y="89.6" drill="2.4"/>
+<text x="69.5" y="67.3" size="1.016" layer="25">GD</text>
+<text x="67.5" y="71.3" size="1.6764" layer="25">+</text>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -805,8 +806,6 @@ design rules under a new name.</description>
 </element>
 <element name="LED_R_IN" library="headers(2mm)" package="1X1" value="1X1" x="64" y="66.1"/>
 <element name="LED_R_OUT" library="headers(2mm)" package="1X1" value="1X1" x="64" y="74.1312"/>
-<element name="LED_R_OUT2" library="headers(2mm)" package="1X1" value="1X1" x="66" y="70.9"/>
-<element name="GD2" library="headers(2mm)" package="1X1" value="1X1" x="67.1" y="66.1"/>
 <element name="PMW3901_3" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="50.8" y="34.5" smashed="yes">
 <attribute name="VALUE" x="49.53" y="32.468" size="0.6096" layer="27" font="vector" ratio="20"/>
 </element>
@@ -846,6 +845,9 @@ design rules under a new name.</description>
 <element name="XIAO_ESP32C6" library="SparkFun-Connectors" package="1X07_NO_SILK" value="" x="44.8" y="70.8" smashed="yes" rot="R90">
 <attribute name="VALUE" x="46.832" y="69.53" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
 </element>
+<element name="LED" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="68.3" y="67.9" smashed="yes" rot="R90">
+<attribute name="VALUE" x="70.332" y="66.63" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
+</element>
 </elements>
 <signals>
 <signal name="3V3">
@@ -878,7 +880,6 @@ design rules under a new name.</description>
 </polygon>
 <contactref element="GND" pad="1"/>
 <contactref element="MPU6050" pad="2"/>
-<contactref element="GD2" pad="1"/>
 <contactref element="PMW3901_3" pad="2"/>
 <contactref element="U$1" pad="GND"/>
 <contactref element="U$1" pad="GND2"/>
@@ -909,7 +910,6 @@ design rules under a new name.</description>
 <wire x1="55.8" y1="36" x2="53.34" y2="34.5" width="0.254" layer="1"/>
 <wire x1="44.8" y1="83.5" x2="47.3" y2="81" width="0.254" layer="1"/>
 <wire x1="47.3" y1="81" x2="49" y2="81" width="0.254" layer="1"/>
-<wire x1="67.1" y1="66.1" x2="67.1" y2="60.19" width="0.254" layer="1"/>
 <wire x1="67.1" y1="60.19" x2="67.37" y2="59.92" width="0.254" layer="1"/>
 <wire x1="52.96" y1="65.3" x2="52.96" y2="74.64" width="0.254" layer="16"/>
 <wire x1="52.96" y1="74.64" x2="44.8" y2="82.8" width="0.254" layer="16"/>
@@ -927,6 +927,10 @@ design rules under a new name.</description>
 <wire x1="60.696" y1="58.904" x2="59.22915625" y2="58.904" width="0.254" layer="16"/>
 <wire x1="58.534" y1="59.59915625" x2="58.534" y2="60.5417875" width="0.254" layer="16"/>
 <wire x1="58.534" y1="60.5417875" x2="53.7757875" y2="65.3" width="0.254" layer="16"/>
+<contactref element="LED" pad="1"/>
+<wire x1="68.3" y1="67.9" x2="67.37" y2="66.97" width="0.254" layer="1"/>
+<wire x1="67.37" y1="66.97" x2="67.37" y2="59.92" width="0.254" layer="1"/>
+<wire x1="69.998440625" y1="45.101559375" x2="69.91" y2="44.68" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SDA">
 <contactref element="MPU6050" pad="3"/>
@@ -1051,9 +1055,10 @@ design rules under a new name.</description>
 </signal>
 <signal name="LED_R_OUT">
 <contactref element="LED_R_OUT" pad="1"/>
-<contactref element="LED_R_OUT2" pad="1"/>
-<wire x1="64" y1="74.1312" x2="64" y2="72.9" width="0.254" layer="1"/>
-<wire x1="64" y1="72.9" x2="66" y2="70.9" width="0.254" layer="1"/>
+<contactref element="LED" pad="2"/>
+<wire x1="64" y1="74.1312" x2="64" y2="72.6" width="0.254" layer="1"/>
+<wire x1="64" y1="72.6" x2="66.16" y2="70.44" width="0.254" layer="1"/>
+<wire x1="66.16" y1="70.44" x2="68.3" y2="70.44" width="0.254" layer="1"/>
 </signal>
 <signal name="MOSI">
 <contactref element="U$1" pad="11/MOSI"/>

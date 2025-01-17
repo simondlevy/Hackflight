@@ -3857,8 +3857,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <part name="MPU6050" library="SparkFun-Connectors" deviceset="CONN_04" device="1X04_NO_SILK"/>
 <part name="LED_R_IN" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="LED_R_OUT" library="headers(2mm)" deviceset="1X1" device=""/>
-<part name="LED_R_OUT2" library="headers(2mm)" deviceset="1X1" device=""/>
-<part name="GD2" library="headers(2mm)" deviceset="1X1" device=""/>
 <part name="PMW3901_3" library="SparkFun-Connectors" deviceset="CONN_02" device="1X02_NO_SILK"/>
 <part name="VL53L1_1" library="SparkFun-Connectors" deviceset="CONN_02" device="1X02_NO_SILK"/>
 <part name="VL53L1_2" library="SparkFun-Connectors" deviceset="CONN_02" device="1X02_NO_SILK"/>
@@ -3872,6 +3870,7 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <part name="PAD5" library="wirepad" deviceset="SMD2" device=""/>
 <part name="PAD6" library="wirepad" deviceset="SMD2" device=""/>
 <part name="XIAO_ESP32C6" library="SparkFun-Connectors" deviceset="CONN_07" device="NO_SILK"/>
+<part name="LED" library="SparkFun-Connectors" deviceset="CONN_02" device="1X02_NO_SILK"/>
 </parts>
 <sheets>
 <sheet>
@@ -3886,8 +3885,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <instance part="MPU6050" gate="J1" x="12.7" y="-2.54"/>
 <instance part="LED_R_IN" gate="G$1" x="111.76" y="-22.86"/>
 <instance part="LED_R_OUT" gate="G$1" x="111.76" y="-33.02"/>
-<instance part="LED_R_OUT2" gate="G$1" x="111.76" y="-48.26"/>
-<instance part="GD2" gate="G$1" x="111.76" y="-60.96"/>
 <instance part="PMW3901_3" gate="G$1" x="73.66" y="0"/>
 <instance part="VL53L1_1" gate="G$1" x="106.68" y="-86.36"/>
 <instance part="VL53L1_2" gate="G$1" x="106.68" y="-104.14"/>
@@ -3901,6 +3898,7 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <instance part="PAD5" gate="1" x="10.16" y="-78.74"/>
 <instance part="PAD6" gate="1" x="10.16" y="-86.36"/>
 <instance part="XIAO_ESP32C6" gate="J1" x="30.48" y="-109.22"/>
+<instance part="LED" gate="G$1" x="147.32" y="-35.56"/>
 </instances>
 <busses>
 </busses>
@@ -3944,7 +3942,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <label x="17.78" y="-2.54" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="GD2" gate="G$1" pin="1"/>
 <wire x1="114.3" y1="-60.96" x2="121.92" y2="-60.96" width="0.1524" layer="91"/>
 <label x="116.84" y="-60.96" size="1.778" layer="95"/>
 </segment>
@@ -3982,6 +3979,11 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <pinref part="XIAO_ESP32C6" gate="J1" pin="6"/>
 <wire x1="35.56" y1="-101.6" x2="40.64" y2="-101.6" width="0.1524" layer="91"/>
 <label x="35.56" y="-101.6" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="LED" gate="G$1" pin="1"/>
+<wire x1="154.94" y1="-35.56" x2="160.02" y2="-35.56" width="0.1524" layer="91"/>
+<label x="154.94" y="-35.56" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SDA" class="0">
@@ -4119,9 +4121,9 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <label x="116.84" y="-33.02" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="LED_R_OUT2" gate="G$1" pin="1"/>
-<wire x1="114.3" y1="-48.26" x2="121.92" y2="-48.26" width="0.1524" layer="91"/>
-<label x="116.84" y="-48.26" size="1.778" layer="95"/>
+<pinref part="LED" gate="G$1" pin="2"/>
+<wire x1="154.94" y1="-33.02" x2="160.02" y2="-33.02" width="0.1524" layer="91"/>
+<label x="154.94" y="-33.02" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
