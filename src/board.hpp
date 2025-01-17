@@ -217,16 +217,16 @@ namespace hf {
                 }
             }
 
-            void runMotors(const float * motors)
+            void runMotors(const float * motors, const bool safeMode=true)
             {
                 // Rescale motor values for OneShot125
-                auto m1_usec = scaleMotor(0);//motors[0]);
-                auto m2_usec = scaleMotor(0);//motors[1]);
-                auto m3_usec = scaleMotor(0);//motors[2]);
+                auto m1_usec = scaleMotor(motors[0]);
+                auto m2_usec = scaleMotor(motors[1]);
+                auto m3_usec = scaleMotor(motors[2]);
                 auto m4_usec = scaleMotor(motors[3]);
 
                 // Shut motors down when not armed
-                if (_status != STATUS_ARMED) {
+                if (safeMode && _status != STATUS_ARMED) {
 
                     m1_usec = 120;
                     m2_usec = 120;
