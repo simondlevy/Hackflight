@@ -16,9 +16,7 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-
-
-VIZ_NET = $(shell pwd)/../../plugins/physics/snn/networks/difference_risp_train.txt
+VIZ_NET = $(FDIR)/networks/difference_risp_train.txt
 VIZ_HOST = "localhost"
 VIZ_PORT = 8100
 
