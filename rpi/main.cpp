@@ -41,14 +41,12 @@ int main(int argc, char ** argv)
 
         vector<double> observations = { randval(), randval() };
 
-        vector <int> counts = {};
+        vector <double> actions = {};
 
-        snn->step(observations, counts);
-
-        const double action = counts[0] / divisor - offset;
+        snn->step(observations, actions);
 
         printf("%+3.3f - %+3.3f = %+3.3f\n", 
-                observations[0], observations[1], action);
+                observations[0], observations[1], actions[0]);
     }
 
 }
