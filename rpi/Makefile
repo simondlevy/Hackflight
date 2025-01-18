@@ -29,13 +29,15 @@ INCLUDE += -I$(FDIR)/include -I$(FDIR)/include/utils -I$(FDIR)/cpp-apps/include 
 FSRC = $(FDIR)/src
 PSRC = $(PDIR)/src
 
+OBJS = main.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
+	processor.o static_proc.o
+
 # ----------------------------------------------------------------------------
 
 all: snn
 
-snn: main.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
-	processor.o static_proc.o
-	g++ -o snn main.o
+snn: $(OBJS)
+	g++ -o snn $(OBJS)
 
 main.o: main.cpp
 	g++ $(CFLAGS) $(INCLUDE) -c main.cpp
@@ -66,3 +68,6 @@ edit:
 
 clean:
 	rm -f *.o snn
+
+run: snn
+	./snn
