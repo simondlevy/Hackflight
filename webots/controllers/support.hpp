@@ -118,6 +118,8 @@ class Simulator {
                 joystick_t {-2,  3, -4, 1, true } },
             { "Logitech Gamepad F310",
                 joystick_t {-2,  4, -5, 1, true } },
+            { "Microsoft Xbox Series S|X Controller",
+                joystick_t {-2,  4, -5, 1, true } },
 
             // Classic throttle
             { "Logitech Logitech Extreme 3D",
