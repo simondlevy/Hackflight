@@ -39,8 +39,8 @@ static const float CASCADE_DIVISOR  = 15;
 static const float CASCADE_OFFSET = 0.936;
 static const float CASCADE_POST_SCALE = 120;
 
-static const char * NETWORK = "networks/difference_risp_train.txt";
-static const char * NETWORK3 = "networks/difference3_risp.txt";
+static const char * NETWORK = "/home/levys/Desktop/framework/networks/difference_risp_train.txt";
+static const char * NETWORK3 = "/home/levys/Desktop/framework/networks/difference3_risp.txt";
 
 static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
