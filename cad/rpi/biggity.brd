@@ -172,19 +172,16 @@
 </layers>
 <board>
 <plain>
-<hole x="45.5" y="16" drill="2.4"/>
 <polygon width="0.254" layer="21">
-<vertex x="50.36389375" y="85.59500625"/>
-<vertex x="52.952403125" y="90.254321875"/>
-<vertex x="55.627196875" y="85.59500625"/>
+<vertex x="51.06389375" y="72.69500625"/>
+<vertex x="53.652403125" y="77.354321875"/>
+<vertex x="56.327196875" y="72.69500625"/>
 </polygon>
-<hole x="60.5" y="16" drill="2.4"/>
 <wire x1="71.3" y1="63.3" x2="71.2" y2="41.2" width="0.1524" layer="20"/>
-<wire x1="43.5" y1="91.9" x2="62.2" y2="91.9" width="0.1524" layer="20"/>
-<wire x1="43.3" y1="11.9" x2="62.7" y2="11.9" width="0.1524" layer="20"/>
-<wire x1="37.2" y1="28.4" x2="43.3" y2="11.9" width="0.1524" layer="20"/>
-<wire x1="69.1" y1="28.4" x2="62.7" y2="11.9" width="0.1524" layer="20"/>
-<wire x1="43.5" y1="91.9" x2="37.5" y2="76.7" width="0.1524" layer="20"/>
+<wire x1="41.2" y1="16.7" x2="64.6" y2="16.7" width="0.1524" layer="20"/>
+<wire x1="37.2" y1="28.4" x2="41.2" y2="16.7" width="0.1524" layer="20"/>
+<wire x1="69.1" y1="28.4" x2="64.6" y2="16.7" width="0.1524" layer="20"/>
+<wire x1="40.9" y1="86" x2="37.5" y2="76.7" width="0.1524" layer="20"/>
 <wire x1="68.5" y1="76.6" x2="83.1" y2="87.3" width="0.1524" layer="20"/>
 <wire x1="71.3" y1="63.3" x2="89.5" y2="79" width="0.1524" layer="20"/>
 <wire x1="35.5" y1="63.3" x2="35.5" y2="41" width="0.1524" layer="20"/>
@@ -250,12 +247,12 @@
 <text x="56.1" y="45.7" size="1.016" layer="25">M3</text>
 <text x="53.8" y="45.7" size="1.016" layer="25">M2</text>
 <text x="51.2" y="45.7" size="1.016" layer="25">M1</text>
-<text x="59.5" y="83.1" size="1.016" layer="25" rot="R90">M4</text>
-<text x="57.5" y="83.1" size="1.016" layer="25" rot="R90">M3</text>
-<text x="55.3" y="83.1" size="1.016" layer="25" rot="R90">M2</text>
-<text x="53.5" y="83.1" size="1.016" layer="25" rot="R90">M1</text>
-<text x="51.6" y="83.1" size="1.016" layer="25" rot="R90">VB</text>
-<text x="49.6" y="83.1" size="1.016" layer="25" rot="R90">GD</text>
+<text x="59.5" y="78" size="1.016" layer="25" rot="R90">M4</text>
+<text x="57.5" y="78" size="1.016" layer="25" rot="R90">M3</text>
+<text x="55.3" y="78" size="1.016" layer="25" rot="R90">M2</text>
+<text x="53.5" y="78" size="1.016" layer="25" rot="R90">M1</text>
+<text x="51.6" y="78" size="1.016" layer="25" rot="R90">VB</text>
+<text x="49.6" y="78" size="1.016" layer="25" rot="R90">GD</text>
 <text x="68.9" y="61.5" size="1.016" layer="25">5V</text>
 <text x="68.8" y="45.7" size="1.016" layer="25">GD</text>
 <text x="62.4" y="41" size="1.016" layer="25">3V</text>
@@ -271,19 +268,18 @@
 <text x="53.8" y="65.1" size="1.016" layer="26" rot="SMR0">GD</text>
 <text x="51.1" y="65.1" size="1.016" layer="26" rot="SMR0">5V</text>
 <text x="64.1" y="41" size="1.016" layer="26" rot="SMR0">3V</text>
-<hole x="45.5" y="89.6" drill="2.4"/>
-<hole x="60.5" y="89.6" drill="2.4"/>
 <text x="44.7" y="65.8" size="1.016" layer="25">GD</text>
 <text x="44.6" y="71.8" size="1.6764" layer="25">+</text>
 <hole x="41.5" y="81" drill="3"/>
 <hole x="64.5" y="81" drill="3"/>
 <hole x="41.5" y="23" drill="3"/>
 <hole x="64.5" y="23" drill="3"/>
-<wire x1="62.2" y1="91.9" x2="68.5" y2="76.6" width="0.1524" layer="20"/>
+<wire x1="65.3" y1="86" x2="68.5" y2="76.6" width="0.1524" layer="20"/>
 <text x="42.6" y="61.5" size="1.016" layer="25">RX4</text>
 <text x="66" y="69.4" size="1.016" layer="25">RX4</text>
 <text x="62.2" y="71.793903125" size="1.27" layer="25" rot="R90">RPi</text>
 <text x="38.7" y="61.6" size="1.016" layer="25">D14</text>
+<wire x1="40.9" y1="86" x2="65.3" y2="86" width="0.1524" layer="20"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -853,10 +849,10 @@ design rules under a new name.</description>
 </signal>
 <signal name="GND">
 <polygon width="0.3048" layer="1">
-<vertex x="71.15" y="91.856"/>
+<vertex x="71.15" y="95.756"/>
 <vertex x="71.15" y="11.75"/>
 <vertex x="35.5" y="11.75"/>
-<vertex x="35.5" y="91.856"/>
+<vertex x="35.5" y="95.756"/>
 </polygon>
 <contactref element="GND" pad="1"/>
 <contactref element="MPU6050" pad="2"/>
