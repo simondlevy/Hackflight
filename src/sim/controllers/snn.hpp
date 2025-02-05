@@ -25,7 +25,7 @@
 #include <pids/pitch_roll_rate.hpp>
 
 // TeNNLab framework
-#include <levy_snn_util.hpp>
+#include <levy/snn_util.hpp>
 
 static const float VIZ_FREQ = 100; // Hz
 static const uint16_t VIZ_PORT = 8100;
