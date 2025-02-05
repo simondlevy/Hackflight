@@ -18,7 +18,7 @@
 
 #pragma once
 
-#// Hackflight
+// Hackflight
 #include <sim/vehicles/diyquad.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
@@ -51,7 +51,7 @@ static SNN * climbRateSnn;
 static SNN * yawRateSnn;
 
 // Choose from one of the three networks above to visualize
-//static auto vizSnn = &climbRateSnn;
+static auto vizSnn = &climbRateSnn;
 
 static SNN * makeSnn(const char * filename)
 {
@@ -102,7 +102,7 @@ namespace hf {
             exit(1);
         }
 
-        //(*vizSnn)->serve_visualizer(VIZ_PORT);
+        (*vizSnn)->serve_visualizer(VIZ_PORT);
     }
 
     // Called by webots_physics_step()
@@ -160,7 +160,7 @@ namespace hf {
         static uint32_t _vizcount;
         if (_vizcount++ % 100 == 0) {
             // Send spikes to visualizer
-            //climbRateSnn->send_counts_to_visualizer();
+            climbRateSnn->send_counts_to_visualizer();
         }
 
         return demands;

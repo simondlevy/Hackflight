@@ -41,10 +41,6 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/snn.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
-
-viz:
-	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
 	sleep 1
 	cd $(FDIR)/viz; \
