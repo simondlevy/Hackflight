@@ -31,7 +31,7 @@ FDIR = $(HOME)/Desktop/framework
 
 PDIR =  $(FDIR)/processors/risp
 
-INCLUDE += -I$(FDIR)/include -I$(FDIR)/include/utils -I$(FDIR)/cpp-apps/include
+INCLUDE += -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include
 CXX_SOURCES += $(FDIR)/src/io_stream.cpp
 CXX_SOURCES += $(FDIR)/src/jspace.cpp
 CXX_SOURCES += $(FDIR)/src/network.cpp
