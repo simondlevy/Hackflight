@@ -33,19 +33,14 @@ static const uint16_t VIZ_PORT = 8100;
 static const float THROTTLE_DOWN = 0.06;
 static const float PITCH_ROLL_POST_SCALE = 50;
 
-static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
-
 static const float YAW_DIVISOR  = 26;
 static const float YAW_OFFSET = 0.955;
 
 static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
-static const float CASCADE_DIVISOR  = 15;
-static const float CASCADE_OFFSET = 0.936;
-static const float CASCADE_POST_SCALE = 120;
-
-static const char * NETWORK = "/home/levys@ad.wlu.edu/Desktop/framework/networks/difference_risp_train.txt";
+static const char * NETWORK = ("/home/levys@ad.wlu.edu/Desktop/framework/" 
+        "networks/difference_risp_train.txt");
 
 static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
@@ -62,7 +57,7 @@ static SNN * makeSnn(const char * filename)
 {
     return new SNN(filename, "risp");
 }
- 
+
 static double runSnn(
         SNN * snn,
         const float setpoint,
