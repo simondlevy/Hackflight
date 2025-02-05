@@ -18,14 +18,20 @@
 
 #pragma once
 
-// Hackflight
+#// Hackflight
 #include <sim/vehicles/diyquad.hpp>
+#include <pids/position.hpp>
+#include <pids/pitch_roll_angle.hpp>
+#include <pids/pitch_roll_rate.hpp>
 
 // TeNNLab framework
 #include <levy_snn_util.hpp>
 
 static const float VIZ_FREQ = 100; // Hz
 static const uint16_t VIZ_PORT = 8100;
+
+static const float THROTTLE_DOWN = 0.06;
+static const float PITCH_ROLL_POST_SCALE = 50;
 
 static const float PITCH_ROLL_PRE_DIVISOR = 10; // deg
 
@@ -39,8 +45,7 @@ static const float CASCADE_DIVISOR  = 15;
 static const float CASCADE_OFFSET = 0.936;
 static const float CASCADE_POST_SCALE = 120;
 
-static const char * NETWORK = "/home/levys/Desktop/framework/networks/difference_risp_train.txt";
-static const char * NETWORK3 = "/home/levys/Desktop/framework/networks/difference3_risp.txt";
+static const char * NETWORK = "/home/levys@ad.wlu.edu/Desktop/framework/networks/difference_risp_train.txt";
 
 static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
@@ -49,7 +54,6 @@ static const float YAW_SCALE = 160; // deg/s
 
 static SNN * climbRateSnn;
 static SNN * yawRateSnn;
-static SNN * cascadeSnn;
 
 // Choose from one of the three networks above to visualize
 //static auto vizSnn = &climbRateSnn;
@@ -83,21 +87,12 @@ static double runSnn(
     return action;
 }
 
-static float runCascadeSnn(
-        SNN * snn, const float inp1, const float inp2, const float inp3)
-{
-    vector<double> observations = { inp1, inp2, inp3 };
-
-    vector <int> counts = {};
-
-    snn->step(observations, counts);
-
-    return counts[0] / CASCADE_DIVISOR - CASCADE_OFFSET;
-}
-
 // ---------------------------------------------------------------------------
 
 namespace hf {
+
+    static PitchRollAnglePid _pitchRollAnglePid;
+    static PitchRollRatePid _pitchRollRatePid;
 
     // Called by webots_physics_init()
     void setup_controllers()
@@ -106,7 +101,6 @@ namespace hf {
 
             climbRateSnn = makeSnn(NETWORK);
             yawRateSnn = makeSnn(NETWORK);
-            cascadeSnn = makeSnn(NETWORK3);
 
         } catch (const SRE &e) {
             fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -124,6 +118,9 @@ namespace hf {
     {
         const auto open_loop_demands = siminfo.demands;
 
+        // Throttle-down should reset pids
+        const auto resetPids = open_loop_demands.thrust < THROTTLE_DOWN;
+
         // Start with open-loop demands
         demands_t demands = {
             open_loop_demands.thrust,
@@ -131,6 +128,13 @@ namespace hf {
             open_loop_demands.pitch,
             open_loop_demands.yaw
         };
+
+        PositionPid::run(state, demands);
+
+        _pitchRollAnglePid.run(pid_dt, resetPids, state, demands);
+
+        _pitchRollRatePid.run(pid_dt, resetPids, state, demands,
+                PITCH_ROLL_POST_SCALE);
 
         // Run PID controllers to get final demands
 
@@ -143,17 +147,6 @@ namespace hf {
                 demands.yaw / YAW_SCALE,
                 state.dpsi / YAW_SCALE,
                 YAW_DIVISOR, YAW_OFFSET);
-
-        const auto phi = state.phi / PITCH_ROLL_PRE_DIVISOR;
-
-        const auto snn_diff = runCascadeSnn(
-                cascadeSnn, demands.roll, state.dy, phi);
-
-        demands.roll = 60 * snn_diff;
-        demands.roll = 0.0125 * (demands.roll - state.dphi);
-
-        demands.pitch = 6 * (10 * (demands.pitch - state.dx) - state.theta);
-        demands.pitch = 0.0125 * (demands.pitch - state.dtheta);
 
         // Once takeoff has been requested, we compute time using the 
         // deltaT from the middle (control) loop
