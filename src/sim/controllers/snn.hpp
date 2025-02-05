@@ -27,7 +27,6 @@
 // TeNNLab framework
 #include <snn_util.hpp>
 
-static const float VIZ_FREQ = 100; // Hz
 static const uint16_t VIZ_PORT = 8100;
 
 static const float THROTTLE_DOWN = 0.06;
