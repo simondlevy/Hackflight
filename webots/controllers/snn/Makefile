@@ -40,13 +40,10 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
+	$(FDIR)/spike_client/spike_client.py localhost &
 	webots ../../worlds/snn.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
-	sleep 1
-	cd $(FDIR)/viz; \
- 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}' \
-     	-n $(VIZ_NET) --show_spike_count --remove_unnecessary_neuron \
-    		--set_num_screen_shot 0 > /dev/null
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
 plot:
 	./plot.py
 
