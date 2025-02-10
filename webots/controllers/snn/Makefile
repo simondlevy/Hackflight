@@ -18,7 +18,6 @@ FDIR = $(HOME)/Desktop/framework
 
 VIZ_NET = $(FDIR)/networks/difference_risp_train.txt
 VIZ_HOST = "localhost"
-VIZ_PORT = 8100
 
 # -----------------------------------------------------------------------------
 
@@ -44,7 +43,7 @@ run:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 viz:
-	$(FDIR)/spike_client/spike_client.py localhost &
+	$(FDIR)/spike_client/spike_client.py  $(VIZ_HOST) $(VIZ_NET)&
 	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
