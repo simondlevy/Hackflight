@@ -40,6 +40,10 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
+	webots ../../worlds/snn.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
+viz:
 	$(FDIR)/spike_client/spike_client.py localhost &
 	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)

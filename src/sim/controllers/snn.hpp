@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdlib.h>
+
 // Hackflight
 #include <sim/vehicles/diyquad.hpp>
 #include <pids/position.hpp>
@@ -38,22 +40,25 @@ static const float YAW_OFFSET = 0.955;
 static const float CLIMBRATE_DIVISOR  = 3;
 static const float CLIMBRATE_OFFSET = 8.165;
 
-static const char * NETWORK = ("/home/levys@ad.wlu.edu/Desktop/framework/" 
-        "networks/difference_risp_train.txt");
-
 static const float TAKEOFF_TIME = 2; // sec
 static const float MOTOR_TAKEOFF = 75; // rad/sec
 
 static const float YAW_SCALE = 160; // deg/s
 
+static const char * NETWORK = "difference_risp_train";
+
 static SNN * climbRateSnn;
 static SNN * yawRateSnn;
 
-// Choose from one of the three networks above to visualize
 static auto vizSnn = &climbRateSnn;
 
-static SNN * makeSnn(const char * filename)
+static SNN * makeSnn()
 {
+    char filename[100] = {};
+
+    sprintf(filename, "%s/Desktop/framework/networks/%s.txt",
+            getenv("HOME"), NETWORK);
+
     return new SNN(filename, "risp");
 }
 
@@ -93,8 +98,8 @@ namespace hf {
     {
         try {
 
-            climbRateSnn = makeSnn(NETWORK);
-            yawRateSnn = makeSnn(NETWORK);
+            climbRateSnn = makeSnn();
+            yawRateSnn = makeSnn();
 
         } catch (const SRE &e) {
             fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
@@ -159,7 +164,7 @@ namespace hf {
         static uint32_t _vizcount;
         if (_vizcount++ % 100 == 0) {
             // Send spikes to visualizer
-            climbRateSnn->send_counts_to_visualizer();
+            (*vizSnn)->send_counts_to_visualizer();
         }
 
         return demands;
