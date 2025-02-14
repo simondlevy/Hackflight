@@ -17,7 +17,6 @@
 FDIR = $(HOME)/Desktop/framework
 
 VIZ_NET = $(FDIR)/networks/difference_risp_train.txt
-VIZ_HOST = "localhost"
 
 # -----------------------------------------------------------------------------
 
@@ -39,7 +38,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	$(FDIR)/spike_client/spike_client.py  $(VIZ_HOST) $(VIZ_NET)&
+	$(FDIR)/spikeplot/spikeplot.py  $(VIZ_NET) --ids '0,1,758'  &
 	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
