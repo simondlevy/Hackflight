@@ -38,7 +38,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	$(FDIR)/spikeplot/spikeplot.py  $(VIZ_NET) --ids '0,1,758'  &
+	$(FDIR)/spikeplot/spikeplot.py  $(VIZ_NET) --ids '0,1,2'  &
 	webots ../../worlds/snn.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
