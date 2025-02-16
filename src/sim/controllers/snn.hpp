@@ -45,6 +45,8 @@ static const float MOTOR_TAKEOFF = 75; // rad/sec
 
 static const float YAW_SCALE = 160; // deg/s
 
+static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
+
 static const char * NETWORK = "difference_risp_train";
 
 static SNN * climbRateSnn;
@@ -162,7 +164,7 @@ namespace hf {
             0;
 
         static uint32_t _vizcount;
-        if (_vizcount++ % 100 == 0) {
+        if (_vizcount++ % VIZ_SEND_PERIOD == 0) {
             // Send spikes to visualizer
             (*vizSnn)->send_counts_to_visualizer();
         }
