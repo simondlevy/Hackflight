@@ -259,9 +259,9 @@
 <text x="67.9" y="47.8" size="1.016" layer="25">CL</text>
 <text x="70.6" y="70.7" size="1.016" layer="25">TX4</text>
 <text x="87.3" y="44.7" size="1.016" layer="25">SK</text>
-<text x="67.9" y="44.6" size="1.016" layer="25">SO</text>
-<text x="67.9" y="42.2" size="1.016" layer="25">SI</text>
-<text x="67.9" y="40" size="1.016" layer="25">CS</text>
+<text x="72.1" y="43.3" size="1.016" layer="25">SO</text>
+<text x="72.1" y="40.8" size="1.016" layer="25">SI</text>
+<text x="72.1" y="38.2" size="1.016" layer="25">CS</text>
 <text x="81.1" y="74.3" size="1.016" layer="26" rot="SMR0">VB</text>
 <text x="78.7" y="74.3" size="1.016" layer="26" rot="SMR0">GD</text>
 <text x="76" y="74.3" size="1.016" layer="26" rot="SMR0">5V</text>
@@ -280,6 +280,11 @@
 <wire x1="65.8" y1="95.2" x2="90.2" y2="95.2" width="0.1524" layer="20"/>
 <hole x="36.6" y="99.6" drill="4.5"/>
 <hole x="119" y="21.7" drill="4.5"/>
+<text x="74.8" y="44.8" size="1.016" layer="25">3V</text>
+<text x="77.4" y="44.8" size="1.016" layer="25">GD</text>
+<text x="73.4" y="74.3" size="1.016" layer="25">5V</text>
+<text x="76.1" y="74.3" size="1.016" layer="25">GD</text>
+<text x="78.6" y="74.3" size="1.016" layer="25">VB</text>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -765,7 +770,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="65.9" y="36.2" size="0.0254" layer="27" rot="R90"/>
 </element>
 <element name="3V" library="wirepad" package="SMD1,27-2,54" value="" x="65.9" y="38.2" smashed="yes" rot="R90">
-<attribute name="NAME" x="68.9" y="39.4" size="1.016" layer="25" rot="R180"/>
+<attribute name="NAME" x="64.5" y="38.5" size="1.016" layer="25" rot="R180"/>
 <attribute name="VALUE" x="65.9" y="38.2" size="0.0254" layer="27" rot="R90"/>
 </element>
 <element name="RX" library="wirepad" package="SMD1,27-2,54" value="" x="65.9" y="40.2" smashed="yes" rot="R90">
