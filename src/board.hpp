@@ -1,10 +1,10 @@
 /*
 
-   Support for "turtle board" quadcopter
+   Main firmware support: IMU, receiver, motors
 
    Adapted from https://github.com/nickrehm/dRehmFlight
 
-   Copyright (C) 2024 Simon D. Levy
+   Copyright (C) 2025 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

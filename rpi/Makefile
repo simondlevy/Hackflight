@@ -1,5 +1,4 @@
 FDIR = $(HOME)/Desktop/framework
-# FDIR = $(HOME)/framework
 
 NETWORK = difference_risp_train.txt
 
