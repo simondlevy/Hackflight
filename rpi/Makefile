@@ -1,73 +1,58 @@
-# 
-#  Copyright (C) 2025 Simon D. Levy
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, in version 3.
-#
-#  This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http:--www.gnu.org/licenses/>.
-
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
-CXX_SOURCES = snn.cpp  
-
-# TeNNLab framework stuff ----------------------------------------------------
-
 FDIR = $(HOME)/Desktop/framework
+# FDIR = $(HOME)/framework
+
+NETWORK = difference_risp_train.txt
 
 PDIR =  $(FDIR)/processors/risp
 
-INCLUDE += -I$(FDIR)/include -I$(FDIR)/include/utils -I$(FDIR)/cpp-apps/include \
-    -I$(PDIR)/include
+LEVY_UTILS = $(FDIR)/include/utils/levy
+
+INCLUDE = -I$(FDIR)/include -I$(LEVY_UTILS) -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
 
 FSRC = $(FDIR)/src
+
 PSRC = $(PDIR)/src
 
-OBJS = main.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
-	processor.o static_proc.o
+OBJS = io_stream.o jspace.o network.o properties.o processor.o static_proc.o
 
-# ----------------------------------------------------------------------------
+ALL = rpi
 
-all: snn
+all: $(ALL)
 
-snn: $(OBJS)
-	g++ -o snn $(OBJS)
+rpi: main.o $(OBJS)
+	g++ -O3 -o rpi main.o $(OBJS)
 
-main.o: main.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c main.cpp
+main.o: main.cpp $(LEVY_UTILS)/*.hpp
+	g++ $(INCLUDE) -I../src -O3 -Wall -c main.cpp
 
 io_stream.o: $(FSRC)/io_stream.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(FSRC)/io_stream.cpp
+	g++ $(INCLUDE) -O3 -Wall -c $(FSRC)/io_stream.cpp
 
 jspace.o: $(FSRC)/jspace.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(FSRC)/jspace.cpp
+	g++ $(INCLUDE) -O3 -Wall -c $(FSRC)/jspace.cpp
 
 network.o: $(FSRC)/network.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(FSRC)/network.cpp
+	g++ $(INCLUDE) -O3 -Wall -c $(FSRC)/network.cpp
 
 properties.o: $(FSRC)/properties.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(FSRC)/properties.cpp
-
-spike_encoding.o: $(FSRC)/spike_encoding.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(FSRC)/spike_encoding.cpp
+	g++ $(INCLUDE) -O3 -Wall -c $(FSRC)/properties.cpp
 
 processor.o: $(PSRC)/processor.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(PSRC)/processor.cpp
+	g++ $(INCLUDE) -O3 -Wall -c $(PSRC)/processor.cpp
 
 static_proc.o: $(PSRC)/static_proc.cpp
-	g++ $(CFLAGS) $(INCLUDE) -c $(PSRC)/static_proc.cpp
+	g++ $(INCLUDE) -O3 -Wall -c $(PSRC)/static_proc.cpp
+
+run: rpi
+	./rpi $(FDIR)/networks/$(NETWORK)
+
+# Run this on the desktop/host
+plot:
+	$(HOME)/Desktop/spikeplotter/spikeplot.py -f $(HOME)/Desktop/framework/networks/$(NETWORK) \
+		--server 137.113.118.30 --ids 0,1,2 --display-counts
+
+clean:
+	rm -f $(ALL) *.o *.hpp
 
 edit:
 	vim main.cpp
-
-clean:
-	rm -f *.o snn
-
-run: snn
-	./snn
