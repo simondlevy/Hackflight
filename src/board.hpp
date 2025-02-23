@@ -67,8 +67,7 @@ namespace hf {
             static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
             // LED
-            static const uint8_t LED_PIN = 22;
-            static constexpr float HEARTBEAT_BLINK_RATE_HZ = 1.5;
+            static const uint8_t LED_PIN = 14;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 3;
 
             // Receiver ranges for MLP6DSM transmitter
