@@ -210,7 +210,6 @@ namespace hf {
 
                 // Use LED to indicate safety status
                 digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
-
            }
 
             void runMotors(const float * motors, const bool safeMode=true)
