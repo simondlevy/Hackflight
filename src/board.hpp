@@ -70,15 +70,12 @@ namespace hf {
             static const uint8_t LED_PIN = 14;
             static constexpr float FAILSAFE_BLINK_RATE_HZ = 3;
 
-            // Receiver ranges for MLP6DSM transmitter
-            static const uint16_t CHAN_MIN = 1158;
-            static const uint16_t CHAN_MAX = 1840;
-
-            // Throttle-down margin of safety for arming
-            static constexpr uint16_t THROTTLE_SAFETY_MARGIN = 20;
+            // Margins of safety for arming
+            static constexpr float THROTTLE_ARMING_MAX = -0.9;
+            static constexpr float ARMING_SWITCH_MIN = 0.9;
 
             // Motors ---------------------------------------------------------
-            const std::vector<uint8_t> MOTOR_PINS = { 4, 3, 6, 5 };
+            const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
 
             // Telemetry ------------------------------------------------------
             Timer _telemetryTimer = Timer(60); // Hz
@@ -148,13 +145,13 @@ namespace hf {
                 }
                 else if (_dsm2048.gotNewFrame()) {
 
-                    _dsm2048.getChannelValues(_channels, 6);
+                    _dsm2048.getChannelValuesMlp6Dsm(_channels);
                 }
 
                 // When throttle is down, toggle arming on switch press/release
-                const auto is_arming_switch_on = _channels[5] > 1500;
+                const auto is_arming_switch_on = _channels[5] > ARMING_SWITCH_MIN;
 
-                if (_channels[0] < (CHAN_MIN + THROTTLE_SAFETY_MARGIN) &&
+                if (_channels[0] < THROTTLE_ARMING_MAX &&
                         !is_arming_switch_on && _was_arming_switch_on) {
                     _status = 
                         _status == STATUS_READY ? STATUS_ARMED :
@@ -200,13 +197,10 @@ namespace hf {
                 state.dpsi = gyro.z;
 
                 // Convert stick demands to appropriate intervals
-                demands.thrust = mapchan(_channels[0],  0.,  1., +1);
-                demands.roll   = mapchan(_channels[1], -1,  +1, -1) *
-                    PITCH_ROLL_PRESCALE;
-                demands.pitch  = mapchan(_channels[2], -1,  +1, +1) *
-                    PITCH_ROLL_PRESCALE;
-                demands.yaw    = mapchan(_channels[3], -1,  +1, -1) *
-                    YAW_PRESCALE;
+                demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
+                demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
+                demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
+                demands.yaw   = _channels[3] * YAW_PRESCALE;
 
                 // Use LED to indicate safety status
                 digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
@@ -257,7 +251,7 @@ namespace hf {
             uint32_t _usec_curr;
 
             // Receiver
-            uint16_t _channels[6];
+            float _channels[6];
 
             // State estimation
             MadgwickFilter  _madgwick;
@@ -266,16 +260,6 @@ namespace hf {
             uint8_t _status;
 
             // Private methods -----------------------------------------------
-
-            static float mapchan(
-                    const uint16_t rawval,
-                    const float newmin,
-                    const float newmax,
-                    const float sign)
-            {
-                return sign * (newmin + (rawval - (float)CHAN_MIN) /
-                        (CHAN_MAX - CHAN_MIN) * (newmax - newmin));
-            }
 
             static void runLoopDelay(const uint32_t usec_curr)
             {
