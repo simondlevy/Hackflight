@@ -224,7 +224,7 @@
 <hole x="27.7" y="23.2" drill="2.6"/>
 <text x="56.595503125" y="34.593903125" size="1.778" layer="26" rot="SMR0">VL53l1</text>
 <text x="58.395503125" y="26.793903125" size="1.778" layer="26" rot="SMR0">PMW3901</text>
-<text x="66.8" y="64.6" size="1.016" layer="25">TX4</text>
+<text x="66.8" y="64.6" size="1.016" layer="25">RX4</text>
 <text x="63.6" y="57.7" size="1.016" layer="25">3V</text>
 <text x="65.8" y="57.7" size="1.016" layer="25">GD</text>
 <text x="66.8" y="67.2" size="1.016" layer="25">GD</text>
@@ -271,7 +271,7 @@
 <hole x="64.2" y="19.2" drill="2.6"/>
 <wire x1="65" y1="85.1" x2="68.2" y2="72.8" width="0.1524" layer="20"/>
 <text x="44.6" y="57.8" size="1.016" layer="25" rot="R90">RX4</text>
-<text x="66.8" y="62.1" size="1.016" layer="25">RX4</text>
+<text x="66.8" y="62.1" size="1.016" layer="25">TX4</text>
 <text x="63.9" y="64.793903125" size="1.27" layer="25" rot="R90">RPi</text>
 <text x="54.9" y="52.5" size="1.016" layer="25" rot="R90">D20</text>
 <wire x1="40.6" y1="85.1" x2="65" y2="85.1" width="0.1524" layer="20"/>
@@ -900,8 +900,6 @@ design rules under a new name.</description>
 <wire x1="61.057" y1="19.597" x2="59.7" y2="18.24" width="0.254" layer="1"/>
 <wire x1="61.057" y1="20.857" x2="61.057" y2="19.597" width="0.254" layer="1"/>
 <contactref element="RPI" pad="3"/>
-<wire x1="44.2" y1="66" x2="47.64" y2="64.1" width="0.254" layer="1"/>
-<wire x1="47.64" y1="64.1" x2="51.54" y2="60.2" width="0.254" layer="1"/>
 <wire x1="58.234" y1="56.5417875" x2="55.7949875" y2="58.9808" width="0.254" layer="16"/>
 <wire x1="52.3557875" y1="60.2" x2="51.54" y2="60.2" width="0.254" layer="16"/>
 <wire x1="55.7949875" y1="58.9808" x2="53.5749875" y2="58.9808" width="0.254" layer="16"/>
@@ -914,6 +912,12 @@ design rules under a new name.</description>
 <wire x1="68.5" y1="66" x2="65.5" y2="67.58" width="0.3048" layer="1"/>
 <wire x1="63.1" y1="70" x2="63.11758125" y2="69.96241875" width="0.3048" layer="1"/>
 <wire x1="63.11758125" y1="69.96241875" x2="65.5" y2="67.58" width="0.3048" layer="1"/>
+<wire x1="44.2" y1="66" x2="47.2" y2="63" width="0.3048" layer="1"/>
+<wire x1="47.2" y1="63" x2="49.5" y2="63" width="0.3048" layer="1"/>
+<wire x1="49.5" y1="63" x2="51.54" y2="60.96" width="0.3048" layer="1"/>
+<wire x1="51.54" y1="60.96" x2="51.54" y2="60.2" width="0.3048" layer="1"/>
+<wire x1="69.61" y1="40.88" x2="69.698440625" y2="41.301559375" width="0" layer="19" extent="1-1"/>
+<wire x1="40.7" y1="23.2" x2="41.4" y2="23.3" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SDA">
 <contactref element="MPU6050" pad="3"/>
@@ -959,8 +963,8 @@ design rules under a new name.</description>
 <contactref element="U$1" pad="VIN"/>
 <contactref element="REG" pad="1"/>
 <contactref element="RPI" pad="4"/>
-<wire x1="49" y1="60.2" x2="51.2" y2="62.4" width="0.254" layer="16"/>
-<wire x1="51.2" y1="62.4" x2="63.7192" y2="62.4" width="0.254" layer="16"/>
+<wire x1="49" y1="60.2" x2="51.2" y2="62.4" width="0.3048" layer="16"/>
+<wire x1="51.2" y1="62.4" x2="63.7192" y2="62.4" width="0.3048" layer="16"/>
 <wire x1="65.5" y1="70.12" x2="67" y2="68.84013125" width="0.3048" layer="1"/>
 <wire x1="67" y1="68.84013125" x2="69.69365" y2="66.14648125" width="0.3048" layer="1"/>
 <wire x1="69.69365" y1="66.14648125" x2="69.69365" y2="56.20365" width="0.3048" layer="1"/>
@@ -1101,21 +1105,22 @@ design rules under a new name.</description>
 </signal>
 <signal name="TX4">
 <contactref element="U$1" pad="17/A3"/>
-<contactref element="RPI" pad="2"/>
-<wire x1="65.5" y1="65.04" x2="60.36" y2="64.6" width="0.254" layer="16"/>
-<wire x1="60.36" y1="64.6" x2="49.2" y2="64.6" width="0.254" layer="16"/>
-<wire x1="49.2" y1="64.6" x2="46.75" y2="62.15" width="0.254" layer="16"/>
-<wire x1="46.75" y1="62.15" x2="46.75" y2="56.12" width="0.254" layer="16"/>
+<contactref element="RPI" pad="1"/>
+<wire x1="65.5" y1="62.5" x2="58.4" y2="69.6" width="0.254" layer="16"/>
+<wire x1="58.4" y1="69.6" x2="53.3" y2="69.6" width="0.254" layer="16"/>
+<wire x1="53.3" y1="69.6" x2="46.75" y2="63.05" width="0.254" layer="16"/>
+<wire x1="46.75" y1="63.05" x2="46.75" y2="56.12" width="0.254" layer="16"/>
 </signal>
 <signal name="RX4">
 <contactref element="U$1" pad="16/A2"/>
-<contactref element="RPI" pad="1"/>
-<via x="60.3" y="66.2" extent="1-16" drill="0.35"/>
-<wire x1="46.3436" y1="58.2536" x2="44.21" y2="56.12" width="0.254" layer="16"/>
-<wire x1="46.3436" y1="62.3183375" x2="46.3436" y2="58.2536" width="0.254" layer="16"/>
-<wire x1="60.3" y1="66.2" x2="50.2252625" y2="66.2" width="0.254" layer="16"/>
-<wire x1="50.2252625" y1="66.2" x2="46.3436" y2="62.3183375" width="0.254" layer="16"/>
-<wire x1="60.3" y1="66.2" x2="65.5" y2="62.5" width="0.3048" layer="1"/>
+<contactref element="RPI" pad="2"/>
+<wire x1="46.1" y1="58.1" x2="46.1" y2="64.2" width="0.254" layer="16"/>
+<wire x1="46.1" y1="58.1" x2="44.4" y2="56.4" width="0.254" layer="16"/>
+<wire x1="53.4" y1="71.5" x2="58.9" y2="71.5" width="0.254" layer="16"/>
+<wire x1="58.9" y1="71.5" x2="65.36" y2="65.04" width="0.254" layer="16"/>
+<wire x1="65.36" y1="65.04" x2="65.5" y2="65.04" width="0.254" layer="16"/>
+<wire x1="46.1" y1="64.2" x2="53.4" y2="71.5" width="0.254" layer="16"/>
+<wire x1="44.4" y1="56.4" x2="44.21" y2="56.12" width="0" layer="19" extent="16-16"/>
 </signal>
 </signals>
 <mfgpreviewcolors>

@@ -3699,9 +3699,9 @@ Part Number: HA-522</description>
 <label x="83.82" y="-63.5" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="RPI" gate="J1" pin="2"/>
-<wire x1="154.94" y1="-63.5" x2="160.02" y2="-63.5" width="0.1524" layer="91"/>
-<label x="154.94" y="-63.5" size="1.778" layer="95"/>
+<pinref part="RPI" gate="J1" pin="1"/>
+<wire x1="154.94" y1="-66.04" x2="160.02" y2="-66.04" width="0.1524" layer="91"/>
+<label x="154.94" y="-66.04" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="RX4" class="0">
@@ -3711,9 +3711,9 @@ Part Number: HA-522</description>
 <label x="83.82" y="-66.04" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="RPI" gate="J1" pin="1"/>
-<wire x1="154.94" y1="-66.04" x2="160.02" y2="-66.04" width="0.1524" layer="91"/>
-<label x="154.94" y="-66.04" size="1.778" layer="95"/>
+<pinref part="RPI" gate="J1" pin="2"/>
+<wire x1="154.94" y1="-63.5" x2="160.02" y2="-63.5" width="0.1524" layer="91"/>
+<label x="154.94" y="-63.5" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
