@@ -218,10 +218,10 @@
 <text x="60.9" y="20.4" size="1.016" layer="25">DA</text>
 <text x="61" y="23" size="1.016" layer="25">CL</text>
 <text x="61" y="15.2" size="1.016" layer="25">3V</text>
-<hole x="27.7" y="72.2" drill="3.4"/>
-<hole x="76.7" y="72.2" drill="3.4"/>
-<hole x="76.7" y="23.2" drill="3.4"/>
-<hole x="27.7" y="23.2" drill="3.4"/>
+<hole x="27.7" y="72.2" drill="2.6"/>
+<hole x="76.7" y="72.2" drill="2.6"/>
+<hole x="76.7" y="23.2" drill="2.6"/>
+<hole x="27.7" y="23.2" drill="2.6"/>
 <text x="56.595503125" y="34.593903125" size="1.778" layer="26" rot="SMR0">VL53l1</text>
 <text x="58.395503125" y="26.793903125" size="1.778" layer="26" rot="SMR0">PMW3901</text>
 <text x="65.8" y="68" size="1.016" layer="25">TX4</text>
@@ -265,10 +265,10 @@
 <text x="63.8" y="37.2" size="1.016" layer="26" rot="SMR0">3V</text>
 <text x="43.1" y="63.8" size="1.016" layer="25">GD</text>
 <text x="44.4" y="69" size="1.6764" layer="25">+</text>
-<hole x="41.2" y="77.2" drill="3"/>
-<hole x="64.2" y="77.2" drill="3"/>
-<hole x="41.2" y="19.2" drill="3"/>
-<hole x="64.2" y="19.2" drill="3"/>
+<hole x="41.2" y="77.2" drill="2.6"/>
+<hole x="64.2" y="77.2" drill="2.6"/>
+<hole x="41.2" y="19.2" drill="2.6"/>
+<hole x="64.2" y="19.2" drill="2.6"/>
 <wire x1="65" y1="85.1" x2="68.2" y2="72.8" width="0.1524" layer="20"/>
 <text x="44.6" y="57.8" size="1.016" layer="25" rot="R90">RX4</text>
 <text x="65.7" y="65.6" size="1.016" layer="25">RX4</text>
