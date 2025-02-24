@@ -4,11 +4,6 @@
 
 #include "difference_risp_train.hpp"
 
-// Constant for MLP6DSM DSMX transmitter
-static const uint8_t CHANNELS = 6;
-static const uint16_t CHAN_MIN = 1158;
-static const uint16_t CHAN_MAX = 1840;
-
 static EncoderHelper encoder_helper;
 static DecoderHelper decoder_helper;
 
@@ -22,11 +17,6 @@ static void dump_decoder()
         printf("%+3.3f ", acts[k]);
     }
     printf("\n");
-}
-
-static float normalize_chanval(const uint16_t rawval, const int8_t sign)
-{
-    return sign * (-1 + (rawval - (float)CHAN_MIN) / (CHAN_MAX - CHAN_MIN) * 2);
 }
 
 // Handles incoming spikes from Raspberry Pi
@@ -80,20 +70,15 @@ void setup()
 
 void loop()
 {
-    static float chan1;
-    static float chan2;
+
+    static float chanvals[6];
 
     if (rx.gotNewFrame()) {
 
-        uint16_t ch[CHANNELS];
-
-        rx.getChannelValues(ch, CHANNELS);
-
-        chan1 = normalize_chanval(ch[1], -1);
-        chan2 = normalize_chanval(ch[2], +1);
+        rx.getChannelValuesMlp6Dsm(chanvals);
     }
 
-    float obs[2] = {chan1, chan2};
+    float obs[2] = {-chanvals[1], chanvals[2]};
 
     encoder_helper.get_spikes(obs);
 
