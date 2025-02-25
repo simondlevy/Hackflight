@@ -2,9 +2,6 @@ FDIR = $(HOME)/Desktop/framework
 
 NETWORK = difference_risp_train.txt
 
-IPADDR = 137.113.118.30
-# IPADDR = 10.42.0.1
-
 PDIR =  $(FDIR)/processors/risp
 
 LEVY_UTILS = $(FDIR)/include/utils/levy
@@ -47,11 +44,6 @@ static_proc.o: $(PSRC)/static_proc.cpp
 
 run: rpi
 	./rpi $(FDIR)/networks/$(NETWORK)
-
-# Run this on the desktop/host
-plot:
-	$(HOME)/Desktop/spikeplotter/spikeplot.py -f $(HOME)/Desktop/framework/networks/$(NETWORK) \
-		--server $(IPADDR) --ids 0,1,2 --display-counts
 
 clean:
 	rm -f $(ALL) *.o *.hpp
