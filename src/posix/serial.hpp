@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <fcntl.h>
 #include <termios.h>
 
 static int openSerialPort(const char* portname, int speed)

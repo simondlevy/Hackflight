@@ -24,6 +24,7 @@
 
 // Hackflight
 #include <posix/serial.hpp>
+#include <posix/sockets.hpp>
 #include <msp/parser.hpp>
 #include <msp/serializer.hpp>
 
@@ -37,13 +38,13 @@ static ProcNet proc_net;
 
 static bool spike_client_connected;
 
+static ServerSocket server_socket;
+
 static void * spike_thread_fun(void * arg)
 {
-    proc_net.serve_visualizer(SPIKE_CLIENT_PORT);
-
     while (true) {
 
-        proc_net.accept_client();
+        server_socket.acceptClient();
 
         spike_client_connected = true;
 
@@ -57,29 +58,6 @@ static void * spike_thread_fun(void * arg)
     return NULL;
 }
 
-/*
-static bool logging_client_connected;
-
-static void * logging_thread_fun(void * arg)
-{
-    proc_net.serve_visualizer(LOGGING_CLIENT_PORT);
-
-    while (true) {
-
-        proc_net.accept_client();
-
-        logging_client_connected = true;
-
-        while (logging_client_connected) {
-
-            // Yield to other threads
-            usleep(1000); 
-        }
-    }
-
-    return NULL;
-}*/
-
 int main(int argc, char ** argv)
 {
     if (argc < 2) {
@@ -90,6 +68,8 @@ int main(int argc, char ** argv)
     proc_net.load(argv[1], "risp");
 
     proc_net.clear();
+
+    server_socket.open(SPIKE_CLIENT_PORT);
 
     // Open a serial connection to the Teensy
     auto fd = openSerialPort("/dev/ttyS0", B115200);
@@ -144,7 +124,9 @@ int main(int argc, char ** argv)
                 if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
 
                     // Check for spike client disconnect
-                    if (spike_client_connected && !proc_net.send_counts_to_visualizer()) {
+                    uint8_t counts[256] = {};
+                    const auto ncounts = proc_net.get_counts(counts);
+                    if (spike_client_connected && !server_socket.sendData(counts, ncounts)) {
                         spike_client_connected = false;
                     }
 
