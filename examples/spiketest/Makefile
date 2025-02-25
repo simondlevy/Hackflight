@@ -14,7 +14,7 @@ PORT = /dev/ttyACM0
 LIBS = $(HOME)/Documents/Arduino/libraries
 
 build: $(SKETCH).ino $(NETWORK).hpp 
-	arduino-cli compile --libraries $(LIBS) --libraries $(EDIR) --libraries ../../..
+	arduino-cli compile --libraries $(LIBS) --libraries $(EDIR) --libraries ../../.. \
 		--fqbn $(FQBN) $(SKETCH).ino
 
 $(NETWORK).hpp:

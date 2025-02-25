@@ -5,6 +5,8 @@
 #include "difference_risp_train.hpp"
 
 #include <hackflight.hpp>
+#include <msp/parser.hpp>
+#include <msp/serializer.hpp>
 
 static EncoderHelper encoder_helper;
 static DecoderHelper decoder_helper;
@@ -29,7 +31,13 @@ void serialEvent4()
 
     while (Serial4.available()) {
 
+        static hf::MspParser parser;
+        (void)parser;
+
         const uint8_t val = Serial4.read();
+
+        if (parser.parse(val) == 121) {
+        }
 
         if (got_spike) {
             decoder_helper.times[spike_count] = val;
@@ -85,6 +93,9 @@ void loop()
     encoder_helper.get_spikes(obs);
 
     const auto spikes = encoder_helper.spikes;
+
+    static hf::MspSerializer serializer;
+    (void)serializer;
 
     for (size_t k=0; k<encoder_helper.nspikes; ++k) {
         const auto spike = spikes[k];
