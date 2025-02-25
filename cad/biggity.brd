@@ -240,7 +240,7 @@
 <text x="39.7" y="70.6" size="1.6764" layer="25">+</text>
 <text x="39.7" y="64.106703125" size="1.4224" layer="26" rot="SMR90">RES</text>
 <text x="55.795503125" y="65.893903125" size="1.778" layer="26" rot="SMR0">REG</text>
-<text x="46.8" y="65.193903125" size="1.27" layer="25" rot="R90">LED</text>
+<text x="34.1" y="66.993903125" size="1.27" layer="25" rot="R90">LED</text>
 <text x="42.3" y="57.8" size="1.016" layer="25" rot="R90">M3</text>
 <text x="58" y="78" size="1.016" layer="25" rot="R90">GD</text>
 <text x="55.9" y="78.2" size="1.016" layer="25" rot="R90">VB</text>
@@ -263,8 +263,8 @@
 <text x="53.5" y="61.3" size="1.016" layer="26" rot="SMR0">GD</text>
 <text x="50.8" y="61.3" size="1.016" layer="26" rot="SMR0">5V</text>
 <text x="63.8" y="37.2" size="1.016" layer="26" rot="SMR0">3V</text>
-<text x="43.1" y="63.8" size="1.016" layer="25">GD</text>
-<text x="44.4" y="69" size="1.6764" layer="25">+</text>
+<text x="30.5" y="65.7" size="1.016" layer="25">GD</text>
+<text x="31.8" y="70.9" size="1.6764" layer="25">+</text>
 <hole x="41.2" y="77.2" drill="2.6"/>
 <hole x="64.2" y="77.2" drill="2.6"/>
 <hole x="41.2" y="19.2" drill="2.6"/>
@@ -819,8 +819,8 @@ design rules under a new name.</description>
 <element name="PAD6" library="wirepad" package="SMD1,27-2,54" value="" x="47.7" y="81.6" smashed="yes">
 <attribute name="VALUE" x="47.7" y="81.6" size="0.0254" layer="27"/>
 </element>
-<element name="LED" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="44.2" y="66" smashed="yes" rot="R90">
-<attribute name="VALUE" x="46.232" y="64.73" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
+<element name="LED" library="SparkFun-Connectors" package="1X02_NO_SILK" value="" x="31.6" y="67.9" smashed="yes" rot="R90">
+<attribute name="VALUE" x="33.632" y="66.63" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
 </element>
 <element name="RPI" library="SparkFun-Connectors" package="1X04_NO_SILK" value="" x="65.5" y="62.5" smashed="yes" rot="R90">
 <attribute name="PROD_ID" value="CONN-09696" x="65.5" y="62.5" size="1.778" layer="27" rot="R90" display="off"/>
@@ -912,10 +912,11 @@ design rules under a new name.</description>
 <wire x1="68.5" y1="66" x2="65.5" y2="67.58" width="0.3048" layer="1"/>
 <wire x1="63.1" y1="70" x2="63.11758125" y2="69.96241875" width="0.3048" layer="1"/>
 <wire x1="63.11758125" y1="69.96241875" x2="65.5" y2="67.58" width="0.3048" layer="1"/>
-<wire x1="44.2" y1="66" x2="47.2" y2="63" width="0.3048" layer="1"/>
-<wire x1="47.2" y1="63" x2="49.5" y2="63" width="0.3048" layer="1"/>
-<wire x1="49.5" y1="63" x2="51.54" y2="60.96" width="0.3048" layer="1"/>
+<wire x1="51.54" y1="60.96" x2="49.5" y2="63" width="0.3048" layer="1"/>
 <wire x1="51.54" y1="60.96" x2="51.54" y2="60.2" width="0.3048" layer="1"/>
+<wire x1="49.5" y1="63" x2="44.6" y2="67.9" width="0.3048" layer="1"/>
+<via x="44.6" y="67.9" extent="1-16" drill="0.35"/>
+<wire x1="44.6" y1="67.9" x2="31.6" y2="67.9" width="0.3048" layer="16"/>
 <wire x1="69.61" y1="40.88" x2="69.698440625" y2="41.301559375" width="0" layer="19" extent="1-1"/>
 <wire x1="40.7" y1="23.2" x2="41.4" y2="23.3" width="0" layer="19" extent="1-1"/>
 </signal>
@@ -1036,10 +1037,10 @@ design rules under a new name.</description>
 <signal name="LED_R_OUT">
 <contactref element="LED_R_OUT" pad="1"/>
 <contactref element="LED" pad="2"/>
-<wire x1="42.4" y1="70.3312" x2="44.0912" y2="68.64" width="0.3048" layer="16"/>
-<wire x1="44.0912" y1="68.64" x2="44.106521875" y2="68.633478125" width="0.3048" layer="16"/>
-<wire x1="44.2" y1="68.54" x2="44.106521875" y2="68.633478125" width="0.3048" layer="16"/>
-<wire x1="39.7" y1="70.3312" x2="42.4" y2="70.3312" width="0.3048" layer="16"/>
+<wire x1="31.4912" y1="70.54" x2="31.506521875" y2="70.533478125" width="0.3048" layer="16"/>
+<wire x1="31.6" y1="70.44" x2="31.506521875" y2="70.533478125" width="0.3048" layer="16"/>
+<wire x1="39.7" y1="70.3312" x2="39.4912" y2="70.54" width="0.254" layer="16"/>
+<wire x1="39.4912" y1="70.54" x2="31.4912" y2="70.54" width="0.254" layer="16"/>
 </signal>
 <signal name="MOSI">
 <contactref element="U$1" pad="11/MOSI"/>
