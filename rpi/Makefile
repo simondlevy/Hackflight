@@ -2,8 +2,8 @@ FDIR = $(HOME)/Desktop/framework
 
 NETWORK = difference_risp_train.txt
 
-# IPADDR = 137.113.118.30
-IPADDR = 10.42.0.1
+IPADDR = 137.113.118.30
+# IPADDR = 10.42.0.1
 
 PDIR =  $(FDIR)/processors/risp
 

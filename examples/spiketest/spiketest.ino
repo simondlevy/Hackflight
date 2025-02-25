@@ -4,6 +4,8 @@
 
 #include "difference_risp_train.hpp"
 
+#include <hackflight.hpp>
+
 static EncoderHelper encoder_helper;
 static DecoderHelper decoder_helper;
 
