@@ -25,6 +25,7 @@
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
+#include <posix/sockets.hpp>
 
 // TeNNLab framework
 #include <snn_util.hpp>
@@ -88,6 +89,8 @@ static double runSnn(
     return action;
 }
 
+static ServerSocket serverSocket;
+
 // ---------------------------------------------------------------------------
 
 namespace hf {
@@ -108,7 +111,10 @@ namespace hf {
             exit(1);
         }
 
-        (*vizSnn)->serve_visualizer(VIZ_PORT);
+        // Listen for and accept connections from vizualization client
+        (void)serverSocket;
+        serverSocket.open(VIZ_PORT);
+        serverSocket.acceptClient();
     }
 
     // Called by webots_physics_step()
@@ -166,7 +172,9 @@ namespace hf {
         static uint32_t _vizcount;
         if (_vizcount++ % VIZ_SEND_PERIOD == 0) {
             // Send spikes to visualizer
-            (*vizSnn)->send_counts_to_visualizer();
+            uint8_t counts[256] = {};
+            const auto ncounts = (*vizSnn)->get_counts(counts);
+            serverSocket.sendData(counts, ncounts);
         }
 
         return demands;
