@@ -29,8 +29,11 @@
 
 using namespace std;
 
+// Framework
 #include <proc_net.hpp>
 
+// Hackflight
+#include <linux_serial.hpp>
 #include <msp/parser.hpp>
 #include <msp/serializer.hpp>
 
@@ -38,55 +41,61 @@ static const uint16_t VIZ_PORT = 8100;
 
 static const uint32_t CLIENT_FREQ_HZ = 100;
 
-// Adapted from https://www.geeksforgeeks.org/serial-port-connection-in-cpp,
-//   https://stackoverflow.com/questions/8070632
-static int openSerialPort(const char* portname, int speed)
-{
-    int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
-
-    if (fd < 0) {
-        cerr << "Error opening " << portname << ": "
-             << strerror(errno) << endl;
-        return -1;
-    }
-
-    struct termios tty;
-    if (tcgetattr(fd, &tty) != 0) {
-        cerr << "Error from tcgetattr: " << strerror(errno) << endl;
-        return -1;
-    }
-
-    cfsetospeed(&tty, speed);
-    cfsetispeed(&tty, speed);
-
-    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
-            | INLCR | IGNCR | ICRNL | IXON);
-    tty.c_oflag &= ~OPOST;
-    tty.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    tty.c_cflag &= ~(CSIZE | PARENB);
-    tty.c_cflag |= CS8;
-
-    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
-        cerr << "Error from tcsetattr: " << strerror(errno) << endl;
-        return -1;
-    }
-
-    return fd;
-}
-
 static ProcNet proc_net;
-
-static int fd;
 
 static bool connected;
 
-static void * threadfun(void * arg)
+static void * telemfun(void * arg)
 {
-    long msec_prev = 0;
+    proc_net.serve_visualizer(VIZ_PORT);
 
+    while (true) {
+
+        proc_net.accept_client();
+
+        connected = true;
+
+        while (connected) {
+
+            // Yield to other thread
+            usleep(1000); 
+        }
+    }
+
+    return NULL;
+}
+
+
+int main(int argc, char ** argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s NETWORK\n", argv[0]);
+        exit(1);
+    }
+
+    proc_net.load(argv[1], "risp");
+
+    proc_net.clear();
+
+    // Open a serial connection to the Teensy
+    auto fd = openSerialPort("/dev/ttyS0", B115200);
+
+    if (fd < 0) {
+        return 1;
+    }
+
+    // Start a thread for telemetry
+    pthread_t thread = {};
+    pthread_create(&thread, NULL, telemfun, NULL);
+
+    //proc_net.serve_visualizer(VIZ_PORT);
+    //proc_net.accept_client();
+ 
     hf::MspParser parser = {};
 
     hf::MspSerializer serializer = {};
+
+    long msec_prev = 0;
 
     while (true) {
 
@@ -129,53 +138,12 @@ static void * threadfun(void * arg)
                     msec_prev = msec_curr;
                 }
 
+
                 // Reset for next time
                 proc_net.clear();
             }
         }
     }
-
-    return NULL;
-}
-
-
-int main(int argc, char ** argv)
-{
-    if (argc < 2) {
-        printf("Usage: %s NETWORK\n", argv[0]);
-        exit(1);
-    }
-
-    proc_net.load(argv[1], "risp");
-
-    proc_net.clear();
-
-    proc_net.serve_visualizer(VIZ_PORT);
-
-    // Open a serial connection to the Teensy
-    fd = openSerialPort("/dev/ttyS0", B115200);
-
-    if (fd < 0) {
-        return 1;
-    }
-
-    // Start a thread for serial connection with Teensy
-    pthread_t thread = {};
-    pthread_create(&thread, NULL, threadfun, &proc_net);
-
-    while (true) {
-
-        proc_net.accept_client();
-
-        connected = true;
-
-        while (connected) {
-
-            // Yield to other thread
-            usleep(1000); 
-        }
-    }
-
 
     return 0;
 }
