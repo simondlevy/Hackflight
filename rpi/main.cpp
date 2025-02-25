@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <pthread.h>
 
-using namespace std;
-
 // Framework
 #include <proc_net.hpp>
 

@@ -19,6 +19,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <termios.h>
 
 static int openSerialPort(const char* portname, int speed)
@@ -26,14 +27,13 @@ static int openSerialPort(const char* portname, int speed)
     int fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
 
     if (fd < 0) {
-        cerr << "Error opening " << portname << ": "
-             << strerror(errno) << endl;
+        fprintf(stderr, "Error opening %s: %d\n",  portname, errno);
         return -1;
     }
 
     struct termios tty;
     if (tcgetattr(fd, &tty) != 0) {
-        cerr << "Error from tcgetattr: " << strerror(errno) << endl;
+        fprintf(stderr, "Error from tcgetattr: %d\n", errno);
         return -1;
     }
 
@@ -48,7 +48,7 @@ static int openSerialPort(const char* portname, int speed)
     tty.c_cflag |= CS8;
 
     if (tcsetattr(fd, TCSANOW, &tty) != 0) {
-        cerr << "Error from tcsetattr: " << strerror(errno) << endl;
+        fprintf(stderr, "Error from tcsetattr: %d\n", errno);
         return -1;
     }
 
