@@ -18,14 +18,6 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <time.h>
-#include <cstring>
-#include <errno.h>
-#include <fcntl.h>
-#include <iostream>
-#include <termios.h>
-#include <unistd.h>
-#include <sys/time.h>
 
 using namespace std;
 
@@ -65,7 +57,6 @@ static void * telemfun(void * arg)
     return NULL;
 }
 
-
 int main(int argc, char ** argv)
 {
     if (argc < 2) {
@@ -88,11 +79,10 @@ int main(int argc, char ** argv)
     pthread_t thread = {};
     pthread_create(&thread, NULL, telemfun, NULL);
 
-    //proc_net.serve_visualizer(VIZ_PORT);
-    //proc_net.accept_client();
- 
+    // Parser accepts messages from Teensy
     hf::MspParser parser = {};
 
+    // Serializer sends messages back to Teensy
     hf::MspSerializer serializer = {};
 
     long msec_prev = 0;
@@ -137,7 +127,6 @@ int main(int argc, char ** argv)
 
                     msec_prev = msec_curr;
                 }
-
 
                 // Reset for next time
                 proc_net.clear();

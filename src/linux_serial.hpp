@@ -19,16 +19,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <pthread.h>
-#include <time.h>
-#include <cstring>
-#include <errno.h>
-#include <fcntl.h>
-#include <iostream>
 #include <termios.h>
-#include <unistd.h>
-#include <sys/time.h>
 
 static int openSerialPort(const char* portname, int speed)
 {

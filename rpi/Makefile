@@ -24,7 +24,7 @@ all: $(ALL)
 rpi: main.o $(OBJS)
 	g++ -O3 -o rpi main.o $(OBJS)
 
-main.o: main.cpp $(LEVY_UTILS)/*.hpp
+main.o: main.cpp $(LEVY_UTILS)/*.hpp ../src/linux_serial.hpp
 	g++ $(INCLUDE) -I../src -O3 -Wall -c main.cpp
 
 io_stream.o: $(FSRC)/io_stream.cpp
