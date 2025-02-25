@@ -1,5 +1,5 @@
 /*
-   Linux serial support
+   POSIX serial support
 
    Adapted from https://www.geeksforgeeks.org/serial-port-connection-in-cpp,
      https://stackoverflow.com/questions/8070632

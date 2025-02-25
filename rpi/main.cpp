@@ -23,37 +23,62 @@
 #include <proc_net.hpp>
 
 // Hackflight
-#include <linux_serial.hpp>
+#include <posix/serial.hpp>
 #include <msp/parser.hpp>
 #include <msp/serializer.hpp>
 
-static const uint16_t VIZ_PORT = 8100;
+static const uint16_t LOGGING_CLIENT_PORT = 9000;
+
+static const uint16_t SPIKE_CLIENT_PORT = 8100;
 
 static const uint32_t CLIENT_FREQ_HZ = 100;
 
 static ProcNet proc_net;
 
-static bool connected;
+static bool spike_client_connected;
 
-static void * telemfun(void * arg)
+static void * spike_thread_fun(void * arg)
 {
-    proc_net.serve_visualizer(VIZ_PORT);
+    proc_net.serve_visualizer(SPIKE_CLIENT_PORT);
 
     while (true) {
 
         proc_net.accept_client();
 
-        connected = true;
+        spike_client_connected = true;
 
-        while (connected) {
+        while (spike_client_connected) {
 
-            // Yield to other thread
+            // Yield to other threads
             usleep(1000); 
         }
     }
 
     return NULL;
 }
+
+/*
+static bool logging_client_connected;
+
+static void * logging_thread_fun(void * arg)
+{
+    proc_net.serve_visualizer(LOGGING_CLIENT_PORT);
+
+    while (true) {
+
+        proc_net.accept_client();
+
+        logging_client_connected = true;
+
+        while (logging_client_connected) {
+
+            // Yield to other threads
+            usleep(1000); 
+        }
+    }
+
+    return NULL;
+}*/
 
 int main(int argc, char ** argv)
 {
@@ -73,9 +98,9 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    // Start a thread for telemetry
-    pthread_t thread = {};
-    pthread_create(&thread, NULL, telemfun, NULL);
+    // Start a thread for spike telemetry
+    pthread_t spike_thread = {};
+    pthread_create(&spike_thread, NULL, spike_thread_fun, NULL);
 
     // Parser accepts messages from Teensy
     hf::MspParser parser = {};
@@ -118,9 +143,9 @@ int main(int argc, char ** argv)
                 // Periodically send the spike counts to the client
                 if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
 
-                    // Check for client disconnect
-                    if (connected && !proc_net.send_counts_to_visualizer()) {
-                        connected = false;
+                    // Check for spike client disconnect
+                    if (spike_client_connected && !proc_net.send_counts_to_visualizer()) {
+                        spike_client_connected = false;
                     }
 
                     msec_prev = msec_curr;
