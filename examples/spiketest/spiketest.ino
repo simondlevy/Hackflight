@@ -13,44 +13,21 @@ static DecoderHelper decoder_helper;
 
 static Dsm2048 rx;
 
-static void dump_decoder()
-{
-    float acts[decoder_helper.nout] = {};
-    decoder_helper.get_actions(acts);
-    for (size_t k=0; k<decoder_helper.nout; ++k) {
-        printf("%+3.3f ", acts[k]);
-    }
-    printf("\n");
-}
-
 // Handles incoming spikes from Raspberry Pi
 void serialEvent4()
 {
-    static bool got_spike;
-    static uint8_t spike_count;
-
     while (Serial4.available()) {
 
         static hf::MspParser parser;
-        (void)parser;
 
-        const uint8_t val = Serial4.read();
+        if (parser.parse(Serial4.read()) == 121) {
 
-        if (parser.parse(val) == 121) {
+            decoder_helper.counts[0] = parser.getByte(1);
+            decoder_helper.times[0] = parser.getByte(2);
+            float acts[decoder_helper.nout] = {};
+            decoder_helper.get_actions(acts);
+            printf("%f\n", acts[0]);
         }
-
-        if (got_spike) {
-            decoder_helper.times[spike_count] = val;
-            spike_count++;
-            if (spike_count == decoder_helper.nout) {
-                dump_decoder();
-                spike_count = 0;
-            }
-        }
-        else {
-            decoder_helper.counts[spike_count] = val;
-        }
-        got_spike = !got_spike;
     }
 }
 
@@ -80,7 +57,6 @@ void setup()
 
 void loop()
 {
-
     static float chanvals[6];
 
     if (rx.gotNewFrame()) {
@@ -94,16 +70,18 @@ void loop()
 
     const auto spikes = encoder_helper.spikes;
 
-    static hf::MspSerializer serializer;
-    (void)serializer;
+    uint8_t msg[256];
+    msg[0] = encoder_helper.nspikes;
 
     for (size_t k=0; k<encoder_helper.nspikes; ++k) {
         const auto spike = spikes[k];
-        const uint8_t id = spike.id;
-        const uint8_t time = spike.time;
-        Serial4.write(id);
-        Serial4.write(time);
+        msg[2*k+1] = spike.id;
+        msg[2*k+2] = spike.time;
     }
 
-    Serial4.write(0xFF); // sentinel byte
+    static hf::MspSerializer serializer;
+
+    serializer.serializeBytes(121, msg, 2 * encoder_helper.nspikes + 1);
+
+    Serial4.write(serializer.payload, serializer.payloadSize);
 }

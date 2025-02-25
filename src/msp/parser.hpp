@@ -107,6 +107,11 @@ namespace hf {
                 return value;
             }
 
+            uint8_t getByte(const uint8_t index)
+            {
+                return _message_buffer[index];
+            }
+
         private:
 
             uint8_t _state;
