@@ -31,6 +31,9 @@ using namespace std;
 
 #include <proc_net.hpp>
 
+#include <msp/parser.hpp>
+#include <msp/serializer.hpp>
+
 static const uint16_t VIZ_PORT = 8100;
 
 static const uint32_t CLIENT_FREQ_HZ = 100;
@@ -79,10 +82,11 @@ static bool connected;
 
 static void * threadfun(void * arg)
 {
-    // Support a little state machine for parsing incoming spikes
-    uint8_t state = 0;
-
     long msec_prev = 0;
+
+    hf::MspParser parser = {};
+
+    hf::MspSerializer serializer = {};
 
     while (true) {
 
@@ -96,61 +100,37 @@ static void * threadfun(void * arg)
 
         if (read(fd, &byte, 1) == 1) {
 
-            static uint8_t neuron_id;
+            if (parser.parse(byte) == 121) {
 
-            switch (state) {
+                // Add spikes to network
+                for (uint8_t k=0; k<parser.getByte(0); ++k) {
+                    proc_net.add_spike(parser.getByte(2*k+1), parser.getByte(2*k+2));
 
-                // Startup
-                case 0:
+                }
 
-                    if (byte == 0xFF) {
-                        state = 1;
-                    }
-                    break;
+                // Run the spikes through the processor/network
+                vector<int> counts;
+                vector<double> times;
+                proc_net.get_counts_and_times(counts, times);
 
-                case 1:
+                // Send the network output back to the Teensy for decoding
+                uint8_t msg[3] = {1, (uint8_t)counts[0], (uint8_t)times[0]};
+                serializer.serializeBytes(121, msg, 3);
+                write(fd, serializer.payload, serializer.payloadSize);
 
-                    // Got an entire spike-train message
-                    if (byte == 0xFF) {
+                // Periodically send the spike counts to the client
+                if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
 
-                        // Run the spikes through the processor/network
-                        vector<int> counts;
-                        vector<double> times;
-                        proc_net.get_counts_and_times(counts, times);
-
-                        // Send the network output back to the Teensy for decoding
-                        uint8_t out[2] = {(uint8_t)counts[0], (uint8_t)times[0]};
-                        auto tmp = write(fd, out, 2);
-                        (void)tmp;
-
-                        // Periodically send the spike counts to the client
-                        if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
-
-                            // Check for client disconnect
-                            if (connected && !proc_net.send_counts_to_visualizer()) {
-                                connected = false;
-                            }
-
-                            msec_prev = msec_curr;
-                        }
-
-                        // Reset for next time
-                        proc_net.clear();
+                    // Check for client disconnect
+                    if (connected && !proc_net.send_counts_to_visualizer()) {
+                        connected = false;
                     }
 
-                    // Still just parsing the neuron ID part
-                    else {
-                        neuron_id = byte;
-                        state = 2;
-                    }
-                    break;
+                    msec_prev = msec_curr;
+                }
 
-                case 2:
-
-                    // Got an ID and a time; add a spike and keep parsing
-                    proc_net.add_spike(neuron_id, byte);
-                    state = 1;
-                    break;
+                // Reset for next time
+                proc_net.clear();
             }
         }
     }
