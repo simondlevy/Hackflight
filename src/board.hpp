@@ -196,13 +196,14 @@ namespace hf {
                 state.dtheta = -gyro.y;
                 state.dpsi = gyro.z;
 
-                // Convert stick demands to appropriate intervals
+                // Convert stick demands to appropriate intervals with
+                // appropriate signs
                 demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
-                demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
+                demands.roll  = -_channels[1] * PITCH_ROLL_PRESCALE;
                 demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
-                demands.yaw   = _channels[3] * YAW_PRESCALE;
+                demands.yaw   = -_channels[3] * YAW_PRESCALE;
 
-                // Use LED to indicate safety status
+                // Use LED to indicate arming status
                 digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
            }
 
