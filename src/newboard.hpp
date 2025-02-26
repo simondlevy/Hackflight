@@ -83,6 +83,9 @@ namespace hf {
             // Debugging ------------------------------------------------------
             Timer _debugTimer = Timer(100); // Hz
 
+            // Raspberry Pi comms ---------------------------------------------
+            Timer _rpiTimer = Timer(100); // Hz
+
             // Demand prescaling --------------------------------------------
 
             // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
@@ -116,6 +119,9 @@ namespace hf {
 
                 // Set up serial connection from DSMX receiver
                 Serial1.begin(115200);
+
+                // Set up serial connection with Raspberry Pi
+                Serial4.begin(115200);
 
                 // Initialize the Madgwick filter
                 _madgwick.initialize();
@@ -205,6 +211,13 @@ namespace hf {
 
                 // Use LED to indicate arming status
                 digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
+
+                // Send state vector to Raspberry Pi periodically
+                if (_rpiTimer.isReady(_usec_curr)) {
+                    static MspSerializer _serializer;
+                    _serializer.serializeFloats(122, (const float *)&state, 12);
+                    Serial4.write(_serializer.payload, _serializer.payloadSize);
+                }
            }
 
             void runMotors(const float * motors, const bool safeMode=true)
