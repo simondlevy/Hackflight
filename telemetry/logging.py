@@ -1,73 +1,53 @@
 #!/usr/bin/python3
+
 '''
-Hackflight logging program
+Hackflight logigng program
 
-This file is part of Hackflight.
+Copyright (C) 2025 Simon D. Levy
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, in version 3.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os
-from sys import stdout
-from serial import Serial
+import socket
 import argparse
-from time import time, sleep
+from time import sleep
 
-from msp import Parser
-
-
-class MyMspParser(Parser):
-
-    def __init__(self):
-
-        Parser.__init__(self)
-
-        self.last_received_time = 0
-
-    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
-
-        print('phi=%+03.0f theta=%+03.0f psi=%+03.0f' % (phi, theta, psi))
-
-        self.last_received_time = time()
+'''
+from sys import stdout
+import numpy as np
+'''
 
 
 def main():
 
-    fmtr = argparse.ArgumentDefaultsHelpFormatter
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-s', '--server', help='server', default='localhost')
+    parser.add_argument('-p', '--port', help='port', type=int, default=9000)
+    args = parser.parse_args()
 
-    arg_parser = argparse.ArgumentParser(formatter_class=fmtr)
-
-    arg_parser.add_argument('-p', '--port', default='/dev/ttyUSB0')
-
-    args = arg_parser.parse_args()
-
-    port = Serial(args.port, 115200)
-
-    msp = MyMspParser()
-
+    # Attempt to connect to the server until connection is made
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
-
         try:
-            if port.in_waiting > 0:
-                msp.parse(port.read())
-
-            elif (msp.last_received_time > 0 and
-                  (time() - msp.last_received_time) > 1.0):
-                print('Lost connection to vehicle')
-
-        except KeyboardInterrupt:
-
+            client.connect((args.server, args.port))
+            print('Connected to server')
             break
+        except Exception:
+            print('Waiting for server %s:%d to start' %
+                  (args.server, args.port))
+            sleep(1)
 
 
 main()
