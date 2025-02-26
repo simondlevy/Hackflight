@@ -5,6 +5,6 @@ IPADDR = 137.113.118.30
 
 PDIR =  $(FDIR)/processors/risp
 
-plot:
+spikeplot:
 	$(HOME)/Desktop/spikeplotter/spikeplot.py -f $(HOME)/Desktop/framework/networks/$(NETWORK) \
 		--server $(IPADDR) --ids 0,1,2 --display-counts
