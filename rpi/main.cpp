@@ -22,9 +22,10 @@
 // Framework
 #include <proc_net.hpp>
 
+#include <posix-utils/serial.hpp>
+#include <posix-utils/server.hpp>
+
 // Hackflight
-#include <posix/serial.hpp>
-#include <posix/server.hpp>
 #include <msp/parser.hpp>
 #include <msp/serializer.hpp>
 

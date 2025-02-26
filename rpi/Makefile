@@ -1,4 +1,6 @@
-FDIR = $(HOME)/Desktop/framework
+ROOT = $(HOME)/Desktop
+
+FDIR = $(ROOT)/framework
 
 NETWORK = difference_risp_train.txt
 
@@ -6,7 +8,7 @@ PDIR =  $(FDIR)/processors/risp
 
 LEVY_UTILS = $(FDIR)/include/utils/levy
 
-INCLUDE = -I$(FDIR)/include -I$(LEVY_UTILS) -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
+INCLUDE = -I$(ROOT) -I$(FDIR)/include -I$(LEVY_UTILS) -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
 
 FSRC = $(FDIR)/src
 
@@ -21,7 +23,7 @@ all: $(ALL)
 rpi: main.o $(OBJS)
 	g++ -O3 -o rpi main.o $(OBJS)
 
-main.o: main.cpp $(LEVY_UTILS)/*.hpp ../src/posix/*.hpp
+main.o: main.cpp $(LEVY_UTILS)/*.hpp $(ROOT)/posix-utils/*.hpp
 	g++ $(INCLUDE) -I../src -O3 -Wall -c main.cpp
 
 io_stream.o: $(FSRC)/io_stream.cpp
