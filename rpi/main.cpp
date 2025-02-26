@@ -105,7 +105,8 @@ int main(int argc, char ** argv)
 
                     spikeServer.sendData(counts, ncounts);
 
-                    (void)loggingServer;
+                    float tmp = 99;
+                    loggingServer.sendData((uint8_t *)&tmp, 4);
 
                     msec_prev = msec_curr;
                 }
