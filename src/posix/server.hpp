@@ -27,13 +27,14 @@
 #include <unistd.h>
 #include <signal.h>
 
-
 class Server {
 
     public:
 
-        void init(const uint16_t port)
+        void init(const uint16_t port, const char * name="")
         {
+            strcpy(this->name, name);
+
             signal(SIGPIPE, sigpipe_handler);
 
             sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -68,6 +69,8 @@ class Server {
 
     private:
 
+        char name[256];
+
         pthread_t thread;
 
         bool connected;
@@ -83,13 +86,13 @@ class Server {
             while (true) {
 
                 // Serve up a socket for the visualizer
-                printf("Listening for client...");
+                printf("%s server listening for client... ", server->name);
                 fflush(stdout);
 
                 server->clientfd =
                     accept(server->sockfd, (struct sockaddr*)NULL, NULL);
 
-                printf("\nClient connected\n");
+                printf("%s client connected\n", server->name);
 
                 server->connected = true;
 
