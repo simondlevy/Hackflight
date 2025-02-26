@@ -20,12 +20,12 @@
 
 #include <stdlib.h>
 
-// Hackflight
+#include <posix-utils/socket.hpp>
+
 #include <sim/vehicles/diyquad.hpp>
 #include <pids/position.hpp>
 #include <pids/pitch_roll_angle.hpp>
 #include <pids/pitch_roll_rate.hpp>
-#include <posix/sockets.hpp>
 
 // TeNNLab framework
 #include <snn_util.hpp>
