@@ -16,10 +16,17 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdio.h>
 #include <pthread.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
 
-#include <posix/sockets.hpp>
 
 class Server {
 
@@ -27,17 +34,47 @@ class Server {
 
         void init(const uint16_t port)
         {
-            socket.open(port);
+            signal(SIGPIPE, sigpipe_handler);
+
+            sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+            const int reuse = 1;
+            if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse,
+                        sizeof(int)) < 0) {
+                fprintf(stderr, "setsockopt(SO_REUSEADDR) failed");
+                exit(1);
+            }
+
+            struct sockaddr_in serv_addr = {};
+
+            serv_addr.sin_family = AF_INET;
+
+            serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+            serv_addr.sin_port = htons(port);
+
+            bind(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+            listen(sockfd, 1);
 
             pthread_create(&thread, NULL, thread_fun, this);
         }
 
         void sendData(const uint8_t * data, const size_t size)
         {
-            connected = connected && socket.sendData(data, size);
+            connected = connected && 
+                (write(clientfd, data, size) == (ssize_t)size);
         }
 
     private:
+
+        pthread_t thread;
+
+        bool connected;
+
+        int sockfd;
+
+        int clientfd;
 
         static void * thread_fun(void * arg)
         {
@@ -45,7 +82,14 @@ class Server {
 
             while (true) {
 
-                server->socket.acceptClient();
+                // Serve up a socket for the visualizer
+                printf("Listening for client...");
+                fflush(stdout);
+
+                server->clientfd =
+                    accept(server->sockfd, (struct sockaddr*)NULL, NULL);
+
+                printf("\nClient connected\n");
 
                 server->connected = true;
 
@@ -57,9 +101,8 @@ class Server {
             return NULL;
         }
 
-        pthread_t thread;
-
-        ServerSocket socket;
-
-        bool connected;
+        static void sigpipe_handler(int arg)
+        {
+            (void)arg;
+        }
 };
