@@ -53,8 +53,7 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    Server spikeServer = {};
-    spikeServer.init(SPIKE_CLIENT_PORT, "spike");
+    auto spikeServer = Server(SPIKE_CLIENT_PORT, "spike");
 
     // Parser accepts messages from Teensy
     hf::MspParser parser = {};
