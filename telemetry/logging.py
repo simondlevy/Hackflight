@@ -49,5 +49,12 @@ def main():
                   (args.server, args.port))
             sleep(1)
 
+    # Loop until server quits
+    while True:
+
+        print(client.recv(4))
+
+
+
 
 main()
