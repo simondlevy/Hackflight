@@ -112,7 +112,6 @@ namespace hf {
         }
 
         // Listen for and accept connections from vizualization client
-        (void)serverSocket;
         serverSocket.open(VIZ_PORT);
         serverSocket.acceptClient();
     }

@@ -19,9 +19,11 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 CXX_SOURCES = snn.cpp  ../support.cpp
 
+ROOT = $(HOME)/Desktop
+
 # Hackflight stuff -----------------------------------------------------------
 
-HFSRC_DIR = $(HOME)/Desktop/hackflight/src
+HFSRC_DIR = $(ROOT)/hackflight/src
 
 INCLUDE = -I$(HFSRC_DIR) 
 
@@ -31,7 +33,7 @@ FDIR = $(HOME)/Desktop/framework
 
 PDIR =  $(FDIR)/processors/risp
 
-INCLUDE += -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include
+INCLUDE += -I$(ROOT) -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include
 CXX_SOURCES += $(FDIR)/src/io_stream.cpp
 CXX_SOURCES += $(FDIR)/src/jspace.cpp
 CXX_SOURCES += $(FDIR)/src/network.cpp
