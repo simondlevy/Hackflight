@@ -53,6 +53,8 @@ int main(int argc, char ** argv)
         return 1;
     }
 
+    auto loggingServer = Server(LOGGING_CLIENT_PORT, "logging");
+
     auto spikeServer = Server(SPIKE_CLIENT_PORT, "spike");
 
     // Parser accepts messages from Teensy
@@ -102,6 +104,8 @@ int main(int argc, char ** argv)
                     const auto ncounts = proc_net.get_counts(counts);
 
                     spikeServer.sendData(counts, ncounts);
+
+                    (void)loggingServer;
 
                     msec_prev = msec_curr;
                 }
