@@ -24,7 +24,7 @@
 
 // Hackflight
 #include <posix/serial.hpp>
-#include <posix/sockets.hpp>
+#include <posix/server.hpp>
 #include <msp/parser.hpp>
 #include <msp/serializer.hpp>
 
@@ -35,76 +35,6 @@ static const uint16_t SPIKE_CLIENT_PORT = 8100;
 static const uint32_t CLIENT_FREQ_HZ = 100;
 
 static ProcNet proc_net;
-
-//#define OLD
-
-#ifdef OLD
-
-static bool spike_client_connected;
-
-static ServerSocket server_socket;
-
-static void * spike_thread_fun(void * arg)
-{
-    while (true) {
-
-        server_socket.acceptClient();
-
-        spike_client_connected = true;
-
-        while (spike_client_connected) {
-
-            // Yield to other threads
-            usleep(1000); 
-        }
-    }
-
-    return NULL;
-}
-#endif
-
-class ThreadedServer {
-
-    public:
-
-        void init(const uint16_t port)
-        {
-            socket.open(port);
-
-            pthread_create(&thread, NULL, thread_fun, this);
-        }
-
-        void sendData(const uint8_t * data, const size_t size)
-        {
-            connected = connected && socket.sendData(data, size);
-        }
-
-    private:
-
-        static void * thread_fun(void * arg)
-        {
-            auto server = (ThreadedServer *)arg;
-
-            while (true) {
-
-                server->socket.acceptClient();
-
-                server->connected = true;
-
-                while (server->connected) {
-                    usleep(1000); // yield
-                }
-            }
-
-            return NULL;
-        }
-
-        pthread_t thread;
-
-        ServerSocket socket;
-
-        bool connected;
-};
 
 int main(int argc, char ** argv)
 {
@@ -117,10 +47,6 @@ int main(int argc, char ** argv)
 
     proc_net.clear();
 
-#ifdef OLD
-    server_socket.open(SPIKE_CLIENT_PORT);
-#endif
-
     // Open a serial connection to the Teensy
     auto fd = openSerialPort("/dev/ttyS0", B115200);
 
@@ -128,16 +54,8 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-
-
-#ifdef OLD
-    // Start a thread for spike telemetry
-    pthread_t spike_thread = {};
-    pthread_create(&spike_thread, NULL, spike_thread_fun, NULL);
-#else
-    ThreadedServer spikeServer = {};
+    Server spikeServer = {};
     spikeServer.init(SPIKE_CLIENT_PORT);
-#endif
 
     // Parser accepts messages from Teensy
     hf::MspParser parser = {};
@@ -185,14 +103,7 @@ int main(int argc, char ** argv)
                     uint8_t counts[256] = {};
                     const auto ncounts = proc_net.get_counts(counts);
 
-#ifdef OLD
-                    if (spike_client_connected &&
-                            !server_socket.sendData(counts, ncounts)) {
-                        spike_client_connected = false;
-                    }
-#else
                     spikeServer.sendData(counts, ncounts);
-#endif
 
                     msec_prev = msec_curr;
                 }
