@@ -25,9 +25,8 @@
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
 
-// Hackflight
-#include <msp/parser.hpp>
-#include <msp/serializer.hpp>
+#include <hackflight/src/msp/parser.hpp>
+#include <hackflight/src/msp/serializer.hpp>
 
 static const uint16_t LOGGING_CLIENT_PORT = 9000;
 
