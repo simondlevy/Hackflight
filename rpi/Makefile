@@ -1,8 +1,8 @@
+NETWORK = difference_risp_train.txt
+
 ROOT = $(HOME)/Desktop
 
 FDIR = $(ROOT)/framework
-
-NETWORK = difference_risp_train.txt
 
 PDIR =  $(FDIR)/processors/risp
 

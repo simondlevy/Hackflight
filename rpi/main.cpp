@@ -19,8 +19,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-// Framework
-#include <proc_net.hpp>
+#include <framework/include/utils/levy/proc_net.hpp>
 
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
