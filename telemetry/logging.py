@@ -48,7 +48,11 @@ def main():
     # Loop until server quits
     while True:
 
-        print(unpack('ffffffffffff', (client.recv(48))))
+        try:
+            print(unpack('ffffffffffff', (client.recv(48))))
+
+        except KeyboardInterrupt:
+            break
 
 
 
