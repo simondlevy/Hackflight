@@ -80,10 +80,24 @@ static void handleSpikes(
 
 }
 
-static void handleState(const long msec_curr, Server & spikeServer)
+static void handleState(const long msec_curr, Server & stateServer)
 {
-    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n",
-            parser.getFloat(6), parser.getFloat(8), parser.getFloat(10));
+    const float state[12] = {
+        parser.getFloat(0),
+        parser.getFloat(1),
+        parser.getFloat(2),
+        parser.getFloat(3),
+        parser.getFloat(4),
+        parser.getFloat(5),
+        parser.getFloat(6),
+        parser.getFloat(7),
+        parser.getFloat(8),
+        parser.getFloat(9),
+        parser.getFloat(10),
+        parser.getFloat(11)
+    };
+
+    stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
 }
 
 int main(int argc, char ** argv)
