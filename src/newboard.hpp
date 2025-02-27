@@ -34,6 +34,7 @@
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
 #include <msp/serializer.hpp>
+#include <msp/messages.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
@@ -215,7 +216,7 @@ namespace hf {
                 // Send state vector to Raspberry Pi periodically
                 if (_rpiTimer.isReady(_usec_curr)) {
                     static MspSerializer _serializer;
-                    _serializer.serializeFloats(122, (const float *)&state, 12);
+                    _serializer.serializeFloats(MSP_STATE, (const float *)&state, 12);
                    Serial4.write(_serializer.payload, _serializer.payloadSize);
                 }
            }
