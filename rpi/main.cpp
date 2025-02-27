@@ -34,6 +34,49 @@ static const uint16_t SPIKE_CLIENT_PORT = 8100;
 static const uint32_t CLIENT_FREQ_HZ = 100;
 
 static ProcNet proc_net;
+//
+// Parser accepts messages from Teensy
+static hf::MspParser parser;
+
+// Serializer sends messages back to Teensy
+static hf::MspSerializer serializer;
+
+static void handleSpikes(
+        const int fd, const long msec_curr, Server & spikeServer)
+{
+    static long msec_prev;
+
+    // Add spikes to network
+    for (uint8_t k=0; k<parser.getByte(0); ++k) {
+        proc_net.add_spike(
+                parser.getByte(2*k+1), parser.getByte(2*k+2));
+
+    }
+
+    // Run the spikes through the processor/network
+    vector<int> counts;
+    vector<double> times;
+    proc_net.get_counts_and_times(counts, times);
+
+    // Send the network output back to the Teensy for decoding
+    uint8_t msg[3] = {1, (uint8_t)counts[0], (uint8_t)times[0]};
+    serializer.serializeBytes(121, msg, 3);
+    write(fd, serializer.payload, serializer.payloadSize);
+
+    // Periodically send the spike counts to the client
+    if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
+
+        // Check for spike client disconnect
+        uint8_t counts[256] = {};
+        const auto ncounts = proc_net.get_counts(counts);
+        spikeServer.sendData(counts, ncounts);
+        msec_prev = msec_curr;
+    }
+
+    // Reset for next time
+    proc_net.clear();
+
+}
 
 int main(int argc, char ** argv)
 {
@@ -53,17 +96,11 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    auto loggingServer = Server(LOGGING_CLIENT_PORT, "logging");
+    //auto loggingServer = Server(LOGGING_CLIENT_PORT, "logging");
 
     auto spikeServer = Server(SPIKE_CLIENT_PORT, "spike");
 
-    // Parser accepts messages from Teensy
-    hf::MspParser parser = {};
-
-    // Serializer sends messages back to Teensy
-    hf::MspSerializer serializer = {};
-
-    long msec_prev = 0;
+    long count = 0;
 
     while (true) {
 
@@ -77,42 +114,19 @@ int main(int argc, char ** argv)
 
         if (read(fd, &byte, 1) == 1) {
 
-            if (parser.parse(byte) == 121) {
+            switch (parser.parse(byte)) {
 
-                // Add spikes to network
-                for (uint8_t k=0; k<parser.getByte(0); ++k) {
-                    proc_net.add_spike(
-                            parser.getByte(2*k+1), parser.getByte(2*k+2));
+                case 121:
+                    handleSpikes(fd, msec_curr, spikeServer);
+                    break;
 
-                }
+                case 122:
+                    printf("%ld\n", count++);
+                    break;
 
-                // Run the spikes through the processor/network
-                vector<int> counts;
-                vector<double> times;
-                proc_net.get_counts_and_times(counts, times);
+                default:
+                    break;
 
-                // Send the network output back to the Teensy for decoding
-                uint8_t msg[3] = {1, (uint8_t)counts[0], (uint8_t)times[0]};
-                serializer.serializeBytes(121, msg, 3);
-                write(fd, serializer.payload, serializer.payloadSize);
-
-                // Periodically send the spike counts to the client
-                if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
-
-                    // Check for spike client disconnect
-                    uint8_t counts[256] = {};
-                    const auto ncounts = proc_net.get_counts(counts);
-
-                    spikeServer.sendData(counts, ncounts);
-
-                    float tmp = 99;
-                    loggingServer.sendData((uint8_t *)&tmp, 4);
-
-                    msec_prev = msec_curr;
-                }
-
-                // Reset for next time
-                proc_net.clear();
             }
         }
     }
