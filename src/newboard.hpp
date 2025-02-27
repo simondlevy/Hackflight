@@ -216,7 +216,7 @@ namespace hf {
                 if (_rpiTimer.isReady(_usec_curr)) {
                     static MspSerializer _serializer;
                     _serializer.serializeFloats(122, (const float *)&state, 12);
-                    Serial4.write(_serializer.payload, _serializer.payloadSize);
+                   Serial4.write(_serializer.payload, _serializer.payloadSize);
                 }
            }
 
