@@ -20,12 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import socket
 import argparse
+from struct import unpack
 from time import sleep
-
-'''
-from sys import stdout
-import numpy as np
-'''
 
 
 def main():
@@ -52,8 +48,7 @@ def main():
     # Loop until server quits
     while True:
 
-        print(client.recv(4))
-
+        print(unpack('ffffffffffff', (client.recv(48))))
 
 
 
