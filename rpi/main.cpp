@@ -26,6 +26,7 @@
 
 #include <hackflight/src/msp/parser.hpp>
 #include <hackflight/src/msp/serializer.hpp>
+#include <hackflight/src/msp/messages.hpp>
 
 static const uint16_t LOGGING_CLIENT_PORT = 9000;
 
@@ -116,11 +117,11 @@ int main(int argc, char ** argv)
 
             switch (parser.parse(byte)) {
 
-                case 121:
+                case hf::MSP_SPIKES:
                     handleSpikes(fd, msec_curr, spikeServer);
                     break;
 
-                case 122:
+                case hf::MSP_STATE:
                     printf("%ld\n", count++);
                     break;
 
