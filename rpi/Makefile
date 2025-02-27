@@ -23,7 +23,8 @@ all: $(ALL)
 rpi: main.o $(OBJS)
 	g++ -O3 -o rpi main.o $(OBJS)
 
-main.o: main.cpp $(LEVY_UTILS)/*.hpp $(ROOT)/posix-utils/*.hpp
+main.o: main.cpp $(LEVY_UTILS)/*.hpp $(ROOT)/posix-utils/*.hpp \
+	../src/msp/parser.hpp ../src/msp/serializer.hpp 
 	g++ $(INCLUDE) -I../src -O3 -Wall -c main.cpp
 
 io_stream.o: $(FSRC)/io_stream.cpp

@@ -42,6 +42,7 @@ static hf::MspParser parser;
 // Serializer sends messages back to Teensy
 static hf::MspSerializer serializer;
 
+
 static void handleSpikes(
         const int fd, const long msec_curr, Server & spikeServer)
 {
@@ -79,6 +80,12 @@ static void handleSpikes(
 
 }
 
+static void handleState(const long msec_curr, Server & spikeServer)
+{
+    printf("phi=%+3.3f  theta=%+3.3f  psi=%+3.3f\n",
+            parser.getFloat(6), parser.getFloat(8), parser.getFloat(10));
+}
+
 int main(int argc, char ** argv)
 {
     if (argc < 2) {
@@ -97,11 +104,9 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    //auto loggingServer = Server(LOGGING_CLIENT_PORT, "logging");
+    auto loggingServer = Server(LOGGING_CLIENT_PORT, "logging");
 
     auto spikeServer = Server(SPIKE_CLIENT_PORT, "spike");
-
-    long count = 0;
 
     while (true) {
 
@@ -122,7 +127,7 @@ int main(int argc, char ** argv)
                     break;
 
                 case hf::MSP_STATE:
-                    printf("%ld\n", count++);
+                    handleState(msec_curr, loggingServer);
                     break;
 
                 default:
