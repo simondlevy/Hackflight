@@ -38,7 +38,6 @@ def main():
     while True:
         try:
             client.connect((args.server, args.port))
-            print('Connected to server')
             break
         except Exception:
             print('Waiting for server %s:%d to start' %
@@ -49,7 +48,9 @@ def main():
     while True:
 
         try:
-            print(unpack('ffffffffffff', (client.recv(48))))
+            for val in unpack('ffffffffffff', (client.recv(48))):
+                print('%+3.3f' % val, end=' ')
+            print()
 
         except KeyboardInterrupt:
             break
