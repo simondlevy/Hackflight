@@ -118,9 +118,9 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    auto loggingServer = Server(LOGGING_CLIENT_PORT, "logging");
+    auto loggingServer = Server(LOGGING_CLIENT_PORT);
 
-    auto spikeServer = Server(SPIKE_CLIENT_PORT, "spike");
+    auto spikeServer = Server(SPIKE_CLIENT_PORT);
 
     while (true) {
 
