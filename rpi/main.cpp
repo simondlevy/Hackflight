@@ -28,7 +28,7 @@
 #include <hackflight/src/msp/serializer.hpp>
 #include <hackflight/src/msp/messages.hpp>
 
-static const uint16_t LOGGING_CLIENT_PORT = 9000;
+static const uint16_t LOGGING_CLIENT_PORT = 1;//9000;
 
 static const uint16_t SPIKE_CLIENT_PORT = 8100;
 
@@ -117,9 +117,9 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    auto loggingServer = Server(LOGGING_CLIENT_PORT);
+    auto loggingServer = Server(LOGGING_CLIENT_PORT, true);
 
-    auto spikeServer = Server(SPIKE_CLIENT_PORT);
+    // auto spikeServer = Server(SPIKE_CLIENT_PORT);
 
     while (true) {
 
@@ -136,7 +136,8 @@ int main(int argc, char ** argv)
             switch (parser.parse(byte)) {
 
                 case hf::MSP_SPIKES:
-                    handleSpikes(fd, msec_curr, spikeServer);
+                    //handleSpikes(fd, msec_curr, spikeServer);
+                    (void)handleSpikes;
                     break;
 
                 case hf::MSP_STATE:
