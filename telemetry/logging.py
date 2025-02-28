@@ -34,8 +34,13 @@ def main():
     parser.add_argument('-p', '--port', help='port', type=int, default=9000)
     args = parser.parse_args()
 
+    # Create a Bluetooth or IP socket depending on address format
+    client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
+                    socket.BTPROTO_RFCOMM)
+              if ':' in args.address 
+              else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+
     # Attempt to connect to the server until connection is made
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
             client.connect((args.address, args.port))
