@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-Hackflight logigng program
+Hackflight logging program
 
 Copyright (C) 2025 Simon D. Levy
 
@@ -29,9 +29,8 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-a', '--address', help='server address (IP or MAC)',
-                        default='localhost')
-    parser.add_argument('-p', '--port', help='port', type=int, default=9000)
+    parser.add_argument('-a', '--address', help='server address (IP or MAC)')
+    parser.add_argument('-p', '--port', help='port', type=int)
     args = parser.parse_args()
 
     # Create a Bluetooth or IP socket depending on address format
