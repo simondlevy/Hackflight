@@ -28,9 +28,9 @@
 #include <hackflight/src/msp/serializer.hpp>
 #include <hackflight/src/msp/messages.hpp>
 
-static const uint16_t LOGGING_CLIENT_PORT = 1;//9000;
-
-static const uint16_t SPIKE_CLIENT_PORT = 8100;
+// NB, Bluetooth
+static const uint16_t LOGGING_CLIENT_PORT = 1;
+static const uint16_t SPIKE_CLIENT_PORT = 2;
 
 static const uint32_t CLIENT_FREQ_HZ = 100;
 
@@ -117,9 +117,9 @@ int main(int argc, char ** argv)
         return 1;
     }
 
+    // true = Bluetooth
     auto loggingServer = Server(LOGGING_CLIENT_PORT, true);
-
-    // auto spikeServer = Server(SPIKE_CLIENT_PORT);
+    auto spikeServer = Server(SPIKE_CLIENT_PORT, true);
 
     while (true) {
 
@@ -136,8 +136,7 @@ int main(int argc, char ** argv)
             switch (parser.parse(byte)) {
 
                 case hf::MSP_SPIKES:
-                    //handleSpikes(fd, msec_curr, spikeServer);
-                    (void)handleSpikes;
+                    handleSpikes(fd, msec_curr, spikeServer);
                     break;
 
                 case hf::MSP_STATE:
