@@ -3453,10 +3453,6 @@ Part Number: HA-522</description>
 <label x="17.78" y="-2.54" size="1.778" layer="95"/>
 </segment>
 <segment>
-<wire x1="114.3" y1="-60.96" x2="121.92" y2="-60.96" width="0.1524" layer="91"/>
-<label x="116.84" y="-60.96" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="PMW3901_3" gate="G$1" pin="2"/>
 <wire x1="81.28" y1="2.54" x2="86.36" y2="2.54" width="0.1524" layer="91"/>
 <label x="81.28" y="2.54" size="1.778" layer="95"/>
