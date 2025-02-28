@@ -29,7 +29,8 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-s', '--server', help='server', default='localhost')
+    parser.add_argument('-a', '--address', help='server address (IP or MAC)',
+                        default='localhost')
     parser.add_argument('-p', '--port', help='port', type=int, default=9000)
     args = parser.parse_args()
 
@@ -37,11 +38,11 @@ def main():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
-            client.connect((args.server, args.port))
+            client.connect((args.address, args.port))
             break
         except Exception:
             print('Waiting for server %s:%d to start' %
-                  (args.server, args.port))
+                  (args.address, args.port))
             sleep(1)
 
     # Loop until server quits
