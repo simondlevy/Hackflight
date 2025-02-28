@@ -42,7 +42,6 @@ static hf::MspParser parser;
 // Serializer sends messages back to Teensy
 static hf::MspSerializer serializer;
 
-
 static void handleSpikes(
         const int fd, const long msec_curr, Server & spikeServer)
 {
