@@ -32,13 +32,12 @@
 
 // Hackflight library
 #include <hackflight.hpp>
-#include <estimators/madgwick.hpp>
+#include <estimators/ekf.hpp>
 #include <msp/serializer.hpp>
 #include <msp/messages.hpp>
 #include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
-
 
 static Dsm2048 _dsm2048;
 
@@ -85,6 +84,8 @@ namespace hf {
             // Debugging ------------------------------------------------------
             Timer _debugTimer = Timer(100); // Hz
 
+            Timer _ekfTimer = Timer(500); // Hz
+
             // Raspberry Pi comms ---------------------------------------------
             Timer _rpiTimer = Timer(100); // Hz
 
@@ -126,7 +127,7 @@ namespace hf {
                 Serial4.begin(115200);
 
                 // Initialize state estimator
-                _madgwick.initialize();
+                _ekf.initialize();
 
                 // Arm OneShot125 motors
                 _motors.arm();
@@ -186,10 +187,16 @@ namespace hf {
                     -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
                 };
 
-                axis4_t quat = {};
+                static axis4_t quat;
+                static axis2_t dxdy;
+                static float z;
+                static float dz;
 
-                // Run state estimator
-                _madgwick.getQuaternion(dt, gyro, accel, quat);
+                // Update state estimator with IMU readings
+                _ekf.accumulate_gyro(gyro);
+                _ekf.accumulate_accel(accel);
+                _ekf.predict(dt);
+                _ekf.get_vehicle_state(quat, dxdy, z, dz);
 
                 // Compute Euler angles from quaternion
                 axis3_t angles = {};
@@ -200,8 +207,8 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
-                    printf("phi=%+3.3f  the=%+3.3f  psi=%+3.3f\n",
-                            state.phi, state.theta, state.psi);
+                    //printf("phi=%+3.3f  the=%+3.3f  psi=%+3.3f\n",
+                    //        state.phi, state.theta, state.psi);
                 }
 
                 // Get angular velocities directly from gyro
@@ -275,7 +282,7 @@ namespace hf {
             float _channels[6];
 
             // State estimation
-            MadgwickFilter  _madgwick;
+            EKF _ekf;
 
             // Safety
             uint8_t _status;
