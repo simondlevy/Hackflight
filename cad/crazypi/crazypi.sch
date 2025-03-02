@@ -1218,7 +1218,8 @@ Part Number: HA-522</description>
 <part name="M1+" library="wirepad" deviceset="SMD2" device=""/>
 <part name="M2+" library="wirepad" deviceset="SMD2" device=""/>
 <part name="M3+" library="wirepad" deviceset="SMD2" device=""/>
-<part name="M4+" library="wirepad" deviceset="SMD2" device=""/>
+<part name="VB" library="wirepad" deviceset="SMD2" device=""/>
+<part name="5V" library="wirepad" deviceset="SMD2" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -1231,7 +1232,8 @@ Part Number: HA-522</description>
 <instance part="M1+" gate="1" x="60.96" y="58.42"/>
 <instance part="M2+" gate="1" x="60.96" y="50.8"/>
 <instance part="M3+" gate="1" x="60.96" y="43.18"/>
-<instance part="M4+" gate="1" x="60.96" y="35.56"/>
+<instance part="VB" gate="1" x="60.96" y="35.56"/>
+<instance part="5V" gate="1" x="60.96" y="27.94"/>
 </instances>
 <busses>
 </busses>
@@ -1247,11 +1249,16 @@ Part Number: HA-522</description>
 <wire x1="33.02" y1="25.4" x2="38.1" y2="25.4" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="VOUT" class="0">
+<net name="5V" class="0">
 <segment>
 <pinref part="REG" gate="J$1" pin="3"/>
 <wire x1="35.56" y1="53.34" x2="40.64" y2="53.34" width="0.1524" layer="91"/>
 <label x="35.56" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="5V" gate="1" pin="P"/>
+<wire x1="63.5" y1="27.94" x2="68.58" y2="27.94" width="0.1524" layer="91"/>
+<label x="63.5" y="27.94" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VBAT" class="0">
@@ -1281,7 +1288,7 @@ Part Number: HA-522</description>
 <label x="63.5" y="43.18" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="M4+" gate="1" pin="P"/>
+<pinref part="VB" gate="1" pin="P"/>
 <wire x1="63.5" y1="35.56" x2="68.58" y2="35.56" width="0.1524" layer="91"/>
 <label x="63.5" y="35.56" size="1.778" layer="95"/>
 </segment>
