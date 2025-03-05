@@ -1,6 +1,6 @@
 SKETCH = test
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX
+FQBN = STMicroelectronics:stm32:GenF4:pnum=CF2_F405
 
 PORT = /dev/ttyACM0
 
