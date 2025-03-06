@@ -1,15 +1,12 @@
 #include <STM32FreeRTOS.h>
 
 static const uint8_t LED_RED_L = PC0;
-/*
-    PIN_LED_BLUE_L,
-    PIN_LED_GREEN_L,
-    PIN_LED_GREEN_R,
-    PIN_LED_RED_R,
-    */
+static const uint8_t LED_GREEN_L = PC1;
+static const uint8_t LED_GREEN_R = PC2;
+static const uint8_t LED_RED_R = PC3;
+static const uint8_t LED_BLUE_L = PD2;
 
-
-static const uint8_t LED_PIN = LED_RED_L;
+static const uint8_t LED_PIN = LED_GREEN_L;
 
 static SemaphoreHandle_t sem;
 
