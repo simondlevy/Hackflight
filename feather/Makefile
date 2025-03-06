@@ -12,13 +12,10 @@ $(BIN): $(SKETCH).ino
 	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) --output-dir=./build $(SKETCH).ino
 
 flash: $(BIN)
-	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
-
-unbrick: $(BIN)
-	sh $(HOME)/.arduino15/packages/STMicroelectronics/tools/STM32Tools/2.2.1/stm32CubeProg.sh 2 $(BIN) 0x0
+	dfu-util -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
-	rm -rf obj
+	rm -rf build
 
 edit:
 	vim $(SKETCH).ino
