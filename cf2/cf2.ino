@@ -1,6 +1,15 @@
 #include <STM32FreeRTOS.h>
 
-static const uint8_t LED_PIN = LED_BUILTIN;
+static const uint8_t LED_RED_L = PC0;
+/*
+    PIN_LED_BLUE_L,
+    PIN_LED_GREEN_L,
+    PIN_LED_GREEN_R,
+    PIN_LED_RED_R,
+    */
+
+
+static const uint8_t LED_PIN = LED_RED_L;
 
 static SemaphoreHandle_t sem;
 
@@ -14,7 +23,7 @@ static void Thread1(void* arg)
         xSemaphoreTake(sem, portMAX_DELAY);
 
         // Turn LED off.
-        //digitalWrite(LED_PIN, LOW);
+        digitalWrite(LED_PIN, LOW);
     }
 }
 
@@ -24,11 +33,11 @@ static void Thread2(void* arg)
 
     (void)arg;
 
-    //pinMode(LED_PIN, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
 
     while (true) {
 
-        //digitalWrite(LED_PIN, HIGH);
+        digitalWrite(LED_PIN, HIGH);
 
         // Sleep for 200 milliseconds.
         vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
