@@ -38,17 +38,35 @@ void serialEvent3(void)
     }
 }
 
+static void blinkLed()
+{
+    static uint32_t msec_prev;
+    const auto msec_curr = millis();
+    static bool on;
+
+    if (msec_curr - msec_prev > 500) {
+        digitalWrite(LED_BUILTIN, on);
+        on = !on;
+        msec_prev = msec_curr;
+    }
+}
+
+
 void setup(void)
 {
     Serial.begin(115000);
 
     Serial3.begin(115000);
 
+    pinMode(LED_BUILTIN, OUTPUT);
+
     motors.arm(); 
 }
 
 void loop(void)
 {
+    blinkLed();
+
     static float throttle;
 
     if (rx.timedOut(micros())) {
