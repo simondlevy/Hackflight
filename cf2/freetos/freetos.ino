@@ -6,7 +6,7 @@ static const uint8_t LED_GREEN_R = PC2;
 static const uint8_t LED_RED_R = PC3;
 static const uint8_t LED_BLUE_L = PD2;
 
-static const uint8_t LED_PIN = LED_GREEN_L;
+static const uint8_t LED_PIN = LED_GREEN_R;
 
 static SemaphoreHandle_t sem;
 

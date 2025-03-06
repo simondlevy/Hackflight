@@ -1,4 +1,4 @@
-SKETCH = cf2
+SKETCH = freetos
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
