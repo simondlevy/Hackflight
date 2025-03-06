@@ -1,6 +1,6 @@
-SKETCH = freertos
+SKETCH = cf2
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=FEATHER_F405,usb=CDCgen
+FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 
@@ -12,7 +12,7 @@ $(BIN): $(SKETCH).ino
 	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) --output-dir=./build $(SKETCH).ino
 
 flash: $(BIN)
-	dfu-util -a 0 -s 0x08000000:leave -D $(BIN)
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
 	rm -rf build
