@@ -12,7 +12,7 @@ $(BIN): $(SKETCH).ino
 	arduino-cli compile --libraries $(LIBS) \
 	--output-dir=./build --fqbn $(FQBN) $(SKETCH).ino
 
-flash:
+flash: $(BIN)
 	dfu-util -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:

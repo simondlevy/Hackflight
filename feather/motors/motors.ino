@@ -20,12 +20,16 @@
    along with DSMRX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <oneshot125.hpp>
 #include <dsmrx.hpp>
 
 static const uint8_t CHANNELS = 6;
 
-Dsm2048 rx;
+static const std::vector<uint8_t> PINS = {5};
 
+static Dsm2048 rx;
+
+static auto motors = OneShot125(PINS);
 
 void serialEvent3(void)
 {
@@ -39,10 +43,14 @@ void setup(void)
     Serial.begin(115000);
 
     Serial3.begin(115000);
+
+    motors.arm(); 
 }
 
 void loop(void)
 {
+    static float throttle;
+
     if (rx.timedOut(micros())) {
         Serial.println("*** TIMED OUT ***");
     }
@@ -53,19 +61,8 @@ void loop(void)
 
         rx.getChannelValuesMlp6Dsm(values);
 
-        for (int k=0; k<CHANNELS; ++k) {
-            Serial.print("Ch. ");
-            Serial.print(k+1);
-            Serial.print(": ");
-            Serial.print(values[k]>=0 ? "+" : "");
-            Serial.print(values[k]);
-            Serial.print("    ");
-        }
-
-        Serial.print("Fade count = ");
-        Serial.println(rx.getFadeCount());
+        throttle = values[0];
     }
 
-    // Need a little loop delay
-    delay(5);
+    Serial.println(throttle);
 }
