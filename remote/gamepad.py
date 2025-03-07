@@ -4,11 +4,11 @@ import inputs
 from threading import Thread
 from time import sleep
 
-def gamepad_threadfun(vals, running):
+def gamepad_threadfun(vals, status):
 
-    while running[0]:
+    while status['running']:
 
-        print(vals)
+        print(status['armed'])
 
         sleep(0)  # yield
 
@@ -19,11 +19,13 @@ def main():
         
     gamepad_vals = [0, 1024, 1024, 1024, 0, 0]
 
-    running = [True]
+    status = {'running': True, 'armed': False}
 
-    #Thread(target=gamepad_threadfun, args=(gamepad_vals, running)).start()
+    button_state_prev = 0
 
-    while running[0]:
+    Thread(target=gamepad_threadfun, args=(gamepad_vals, status)).start()
+
+    while status['running']:
 
         try:
 
@@ -39,22 +41,22 @@ def main():
 
                 elif code in {'BTN_TR', 'BTN_PINKIE'} :
 
-                    print(event.state)
+                    if not event.state and button_state_prev:
+
+                        status['armed'] = not status['armed']
+
+                    button_state_prev = event.state
 
         except inputs.UnpluggedError:
             print('No gamepad detected')
-            running[0] = False
+            status['running'] = False
 
         except KeyboardInterrupt:
-            running[0] = False
+            status['running'] = False
 
         except OSError:
             print('Gamepad unplugged')
-            running[0] = False
+            status['running'] = False
 
 
 main()
-
-
-
-
