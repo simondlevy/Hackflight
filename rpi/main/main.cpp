@@ -37,32 +37,11 @@ static const uint16_t LOGGING_CLIENT_PORT = 1;
 
 static const uint32_t CLIENT_FREQ_HZ = 100;
 
-//
-// Parser accepts messages from Teensy
+// Parser accepts messages from flight controller (FC)
 static hf::MspParser parser;
 
-// Serializer sends messages back to Teensy
+// Serializer sends RC command messages to FC
 //static hf::MspSerializer serializer;
-
-static void handleState(const long msec_curr, Server & stateServer)
-{
-    const float state[12] = {
-        parser.getFloat(0),
-        parser.getFloat(1),
-        parser.getFloat(2),
-        parser.getFloat(3),
-        parser.getFloat(4),
-        parser.getFloat(5),
-        parser.getFloat(6),
-        parser.getFloat(7),
-        parser.getFloat(8),
-        parser.getFloat(9),
-        parser.getFloat(10),
-        parser.getFloat(11)
-    };
-
-    stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
-}
 
 int main(int argc, char ** argv)
 {
@@ -76,6 +55,7 @@ int main(int argc, char ** argv)
     // true = Bluetooth
     auto loggingServer = Server(LOGGING_CLIENT_PORT, true);
 
+    // Loop forever, reading state messages from FC
     while (true) {
 
         char byte = 0;
@@ -84,20 +64,16 @@ int main(int argc, char ** argv)
 
         gettimeofday(&time, NULL);
 
-        long msec_curr = 1000 * time.tv_sec + time.tv_usec / 1000;
+        if (read(fd, &byte, 1) == 1 && parser.parse(byte) == hf::MSP_STATE) {
 
-        if (read(fd, &byte, 1) == 1) {
+            const float state[12] = { 
+                parser.getFloat(0), parser.getFloat(1), parser.getFloat(2),
+                parser.getFloat(3), parser.getFloat(4), parser.getFloat(5),
+                parser.getFloat(6), parser.getFloat(7), parser.getFloat(8),
+                parser.getFloat(9), parser.getFloat(10), parser.getFloat(11)
+            };
 
-            switch (parser.parse(byte)) {
-
-                case hf::MSP_STATE:
-                    handleState(msec_curr, loggingServer);
-                    break;
-
-                default:
-                    break;
-
-            }
+            loggingServer.sendData((uint8_t *)state, 12 * sizeof(float));
         }
     }
 
