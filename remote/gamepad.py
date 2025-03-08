@@ -14,9 +14,23 @@ def gamepad_threadfun(vals, status):
 
 
 def main():
-    
+
+    SUPPORTED = { 'Microsoft X-Box 360 pad',  'Logitech Gamepad F310' }
+
     AXIS_MAP = {'X': 3, 'Y': 0, 'Z': 1, 'RX': 1, 'RY': 2, 'RZ': 2}
+
+    gamepads = inputs.devices.gamepads
+
+    if len(gamepads) == 0:
+        print('No gamepad detected')
+        exit(0)
         
+    devname = inputs.devices.gamepads[0].name 
+
+    if not devname in SUPPORTED:
+        print(devname + ' not supported')
+        exit(0)
+
     gamepad_vals = [0, 0, 0, 0]
 
     status = {'running': True, 'armed': False}
