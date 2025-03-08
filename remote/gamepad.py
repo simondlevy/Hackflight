@@ -11,7 +11,9 @@ def gamepad_threadfun(vals, status):
         scaled = tuple(map(lambda x : x/32768,
                           (-vals[0], vals[1], -vals[2], vals[3])))
 
-        print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f' % scaled)
+        print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f' % scaled, end=' ')
+
+        print('Armed: %d' % status['armed'])
 
         sleep(0)  # yield
 
