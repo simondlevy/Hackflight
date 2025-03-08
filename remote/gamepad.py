@@ -8,7 +8,7 @@ def gamepad_threadfun(vals, status):
 
     while status['running']:
 
-        # print(vals)
+        print(vals)
 
         sleep(0)  # yield
 
@@ -17,7 +17,7 @@ def main():
     
     AXIS_MAP = {'X': 3, 'Y': 0, 'Z': 1, 'RX': 1, 'RY': 2, 'RZ': 2}
         
-    gamepad_vals = [0, 1024, 1024, 1024, 0, 0]
+    gamepad_vals = [0, 0, 0, 0]
 
     status = {'running': True, 'armed': False}
 
@@ -40,8 +40,6 @@ def main():
                     if subcode in AXIS_MAP:
 
                         axis = AXIS_MAP[subcode]
-
-                        print(subcode, axis)
 
                         gamepad_vals[axis] = event.state
 
