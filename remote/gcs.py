@@ -25,22 +25,35 @@ from threading import Thread
 from struct import unpack
 from time import sleep
 from sys import stdout
+import inputs
 
 SUPPORTED_GAMEPADS = { 'Microsoft X-Box 360 pad',  'Logitech Gamepad F310' }
 
 
 def gamepad_threadfun(vals, status):
 
+    was_armed = False
+
     while status['running']:
 
         scaled = tuple(map(lambda x : x/32768,
                           (-vals[0], vals[1], -vals[2], vals[3])))
 
-        print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f' % scaled, end=' ')
+        # print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f' % scaled, end=' ')
+        # print('Armed: %d' % status['armed'])
 
-        print('Armed: %d' % status['armed'])
+        armed = status['armed']
+
+        if armed and not was_armed:
+            print('Armed')
+
+        if not armed and was_armed:
+            print('Disarmed')
+
+        was_armed = armed
 
         sleep(0)  # yield
+
 
 def logging_threadfun(client, status):
 
@@ -65,26 +78,6 @@ def main():
     parser.add_argument('-p', '--port', help='port', type=int, default=1)
     args = parser.parse_args()
 
-    # Open a connection to the gamepad
-    gamepads = inputs.devices.gamepads
-
-    if len(gamepads) == 0:
-        print('No gamepad detected')
-        exit(0)
-        
-    gamepad_name = inputs.devices.gamepads[0].name 
-
-    if not gamepad_name in SUPPORTED_GAMEPADS:
-        print(gamepad_name + ' not supported')
-        exit(0)
-
-    gamepad_vals = [0, 0, 0, 0]
-
-    status = {'running': True, 'armed': False}
-
-    button_state_prev = 0
-
-    print('Using gamepad ' + gamepad_name)
     print('Connecting to server %s:%d ...' % (args.address, args.port), end='')
     stdout.flush()
 
@@ -103,11 +96,64 @@ def main():
 
     print(' connected')
 
+    status = {'running': True, 'armed': False}
+
     Thread(target=logging_threadfun, args=(client, status)).start()
 
+    gamepads = inputs.devices.gamepads
+
+    if len(gamepads) == 0:
+        print('No gamepad detected')
+        exit(0)
+        
+    devname = inputs.devices.gamepads[0].name 
+
+    if not devname in SUPPORTED_GAMEPADS:
+        print(devname + ' not supported')
+        exit(0)
+
+    gamepad_vals = [0, 0, 0, 0]
+
+    button_state_prev = 0
+
+    Thread(target=gamepad_threadfun, args=(gamepad_vals, status)).start()
 
     while status['running']:
 
-        pass
+        try:
+
+            for event in inputs.get_gamepad():
+
+                code = str(event.code)
+
+                if 'ABS' in code:
+
+                    subcode = code[4:]
+
+                    if subcode in GAMEPAD_AXIS_MAP:
+
+                        axis = GAMEPAD_AXIS_MAP[subcode]
+
+                        gamepad_vals[axis] = event.state
+
+                elif code in {'BTN_TR', 'BTN_PINKIE'} :
+
+                    if not event.state and button_state_prev:
+
+                        status['armed'] = not status['armed']
+
+                    button_state_prev = event.state
+
+        except inputs.UnpluggedError:
+            print('No gamepad detected')
+            status['running'] = False
+
+        except KeyboardInterrupt:
+            status['running'] = False
+
+        except OSError:
+            print('Gamepad unplugged')
+            status['running'] = False
+
 
 main()
