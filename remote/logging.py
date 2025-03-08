@@ -29,8 +29,9 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-a', '--address', help='server address (IP or MAC)')
-    parser.add_argument('-p', '--port', help='port', type=int)
+    parser.add_argument('-a', '--address', default='B8:27:EB:3F:AB:47',
+                        help='server address (IP or MAC)')
+    parser.add_argument('-p', '--port', help='port', type=int, default=1)
     args = parser.parse_args()
 
     # Create a Bluetooth or IP socket depending on address format

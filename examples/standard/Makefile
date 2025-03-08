@@ -1,6 +1,7 @@
 SKETCH = standard
 
-FQBN = teensy:avr:teensy40
+# FQBN = teensy:avr:teensy40
+FQBN = teensy:avr:teensy41
 
 PORT = /dev/ttyACM0
 
