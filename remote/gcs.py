@@ -42,6 +42,16 @@ def gamepad_threadfun(vals, status):
 
         sleep(0)  # yield
 
+def logging_threadfun(client, status):
+
+    while status['running']:
+
+        for val in unpack('ffffffffffff', (client.recv(48))):
+            print('%+3.3f' % val, end=' ')
+        print()
+
+        sleep(0)  # yield
+
 
 def main():
 
@@ -93,17 +103,11 @@ def main():
 
     print(' connected')
 
-    # Loop until server quits
-    while True:
-
-        try:
-            for val in unpack('ffffffffffff', (client.recv(48))):
-                pass # print('%+3.3f' % val, end=' ')
-            # print()
-
-        except KeyboardInterrupt:
-            break
+    Thread(target=logging_threadfun, args=(client, status)).start()
 
 
+    while status['running']:
+
+        pass
 
 main()
