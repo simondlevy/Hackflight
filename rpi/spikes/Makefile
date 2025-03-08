@@ -16,15 +16,15 @@ PSRC = $(PDIR)/src
 
 OBJS = io_stream.o jspace.o network.o properties.o processor.o static_proc.o
 
-ALL = rpi
+ALL = spikes
 
 all: $(ALL)
 
-rpi: main.o $(OBJS)
-	g++ -O3 -o rpi main.o $(OBJS)
+spikes: main.o $(OBJS)
+	g++ -O3 -o spikes main.o $(OBJS)
 
 main.o: main.cpp $(LEVY_UTILS)/*.hpp $(ROOT)/posix-utils/*.hpp \
-	../src/msp/parser.hpp ../src/msp/serializer.hpp 
+	../../src/msp/parser.hpp ../../src/msp/serializer.hpp 
 	g++ $(INCLUDE) -I../src -O3 -Wall -c main.cpp
 
 io_stream.o: $(FSRC)/io_stream.cpp
@@ -45,8 +45,8 @@ processor.o: $(PSRC)/processor.cpp
 static_proc.o: $(PSRC)/static_proc.cpp
 	g++ $(INCLUDE) -O3 -Wall -c $(PSRC)/static_proc.cpp
 
-run: rpi
-	./rpi $(FDIR)/networks/$(NETWORK)
+run: spikes
+	./spikes $(FDIR)/networks/$(NETWORK)
 
 clean:
 	rm -f $(ALL) *.o *.hpp
