@@ -118,7 +118,7 @@ int main(int argc, char ** argv)
     proc_net.clear();
 
     // Open a serial connection to the Teensy
-    auto fd = Serial::open("/dev/ttyS0", B115200);
+    auto fd = Serial::open_port("/dev/ttyS0", B115200);
 
     if (fd < 0) {
         return 1;
@@ -126,7 +126,7 @@ int main(int argc, char ** argv)
 
     // true = Bluetooth
     auto loggingServer = Server(LOGGING_CLIENT_PORT, true);
-    auto spikeServer = Server(SPIKE_CLIENT_PORT, true);
+    //auto spikeServer = Server(SPIKE_CLIENT_PORT, true);
 
     while (true) {
 
@@ -143,7 +143,8 @@ int main(int argc, char ** argv)
             switch (parser.parse(byte)) {
 
                 case hf::MSP_SPIKES:
-                    handleSpikes(fd, msec_curr, spikeServer);
+                    //handleSpikes(fd, msec_curr, spikeServer);
+                    (void)handleSpikes;
                     break;
 
                 case hf::MSP_STATE:
