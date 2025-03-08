@@ -1,6 +1,12 @@
 /*
    RaspberryPi code for Hackflight
 
+   Additional installs required:
+
+     Clone https://github.com/simondlevy/posix-utils to ~/Desktop
+
+     sudo apt install libbluetooth-dev
+
    Copyright (C) 2025 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -17,7 +23,7 @@
  */
 
 #include <stdio.h>
-#include <pthread.h>
+#include <sys/ioctl.h>
 
 #include <framework/include/utils/levy/proc_net.hpp>
 
@@ -62,7 +68,8 @@ static void handleSpikes(
     // Send the network output back to the Teensy for decoding
     uint8_t msg[3] = {1, (uint8_t)counts[0], (uint8_t)times[0]};
     serializer.serializeBytes(121, msg, 3);
-    write(fd, serializer.payload, serializer.payloadSize);
+    const auto tmp = write(fd, serializer.payload, serializer.payloadSize);
+    (void)tmp;
 
     // Periodically send the spike counts to the client
     if (msec_curr - msec_prev > 1000/CLIENT_FREQ_HZ) {
@@ -111,7 +118,7 @@ int main(int argc, char ** argv)
     proc_net.clear();
 
     // Open a serial connection to the Teensy
-    auto fd = openSerialPort("/dev/ttyS0", B115200);
+    auto fd = Serial::open("/dev/ttyS0", B115200);
 
     if (fd < 0) {
         return 1;
