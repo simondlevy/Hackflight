@@ -26,10 +26,6 @@ def main():
     roll, pitch = ((2, 3) if devname == 'MY-POWER CO.,LTD. 2In1 USB Joystick'
                    else (3, 4))
 
-    print(roll, pitch)
-
-    exit(0)
-
     button_state_prev = 0
 
     Thread(target=gamepad_threadfun, args=(gamepad_vals, status)).start()
@@ -45,9 +41,15 @@ def main():
 
                 if 'ABS' in code:
 
-                    axis = AXIS_MAP[code[4:]]
+                    subcode = code[4:]
 
-                    gamepad_vals[axis] = event.state
+                    if subcode in AXIS_MAP:
+
+                        print(subcode)
+
+                        axis = AXIS_MAP[subcode]
+
+                        gamepad_vals[axis] = event.state
 
                 elif code in {'BTN_TR', 'BTN_PINKIE'} :
 
