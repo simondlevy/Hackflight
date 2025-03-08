@@ -21,11 +21,6 @@ def main():
 
     status = {'running': True, 'armed': False}
 
-    devname = inputs.devices.gamepads[0].name 
-
-    roll, pitch = ((2, 3) if devname == 'MY-POWER CO.,LTD. 2In1 USB Joystick'
-                   else (3, 4))
-
     button_state_prev = 0
 
     Thread(target=gamepad_threadfun, args=(gamepad_vals, status)).start()
