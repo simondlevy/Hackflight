@@ -45,10 +45,10 @@ def gamepad_threadfun(vals, status):
         armed = status['armed']
 
         if armed and not was_armed:
-            print('Armed')
+            print('*********************************** Armed ***********************************')
 
         if not armed and was_armed:
-            print('Disarmed')
+            print('********************************* Disarmed **********************************')
 
         was_armed = armed
 
