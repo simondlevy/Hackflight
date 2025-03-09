@@ -68,25 +68,25 @@ def logging_threadfun(client, status):
         sleep(0)  # yield
 
 
-def connect_to_server(port, status):
+def connect_to_server(port, threadfun, status):
 
     print('Connecting to server %s:%d ... ' % (RPI_ADDRESS, port), end='')
     stdout.flush()
 
     # Create a Bluetooth or IP socket depending on address format
-    logging_client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
-                      socket.BTPROTO_RFCOMM)
-                      if ':' in RPI_ADDRESS
-                      else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+    client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
+              socket.BTPROTO_RFCOMM)
+              if ':' in RPI_ADDRESS
+              else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 
     try:
-        logging_client.connect((RPI_ADDRESS, port))
+        client.connect((RPI_ADDRESS, port))
 
     except Exception as e:
         print(str(e) + ': is server running?')
         exit(0)
 
-    Thread(target=logging_threadfun, args=(logging_client, status)).start()
+    Thread(target=threadfun, args=(client, status)).start()
 
     print(' connected')
 
@@ -97,9 +97,9 @@ def main():
 
     status = {'running': True, 'armed': False}
 
-    connect_to_server(RPI_RADIO_PORT, status)
+    # connect_to_server(RPI_RADIO_PORT, , status)
 
-    connect_to_server(RPI_LOGGING_PORT, status)
+    connect_to_server(RPI_LOGGING_PORT, logging_threadfun, status)
 
     gamepads = inputs.devices.gamepads
 
