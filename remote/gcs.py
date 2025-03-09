@@ -68,7 +68,7 @@ def logging_threadfun(client, status):
         sleep(0)  # yield
 
 
-def connect_to_server(port, threadfun, status):
+def connect_to_server(port, status):
 
     print('Connecting to server %s:%d ... ' % (RPI_ADDRESS, port), end='')
     stdout.flush()
@@ -97,10 +97,9 @@ def main():
 
     status = {'running': True, 'armed': False}
 
-    # connect_to_server(RPI_RADIO_PORT, radio_threadfun, status)
+    # connect_to_server(RPI_RADIO_PORT, status)
 
-    logging_client = connect_to_server(
-            RPI_LOGGING_PORT, logging_threadfun, status)
+    logging_client = connect_to_server(RPI_LOGGING_PORT, status)
 
     Thread(target=logging_threadfun, args=(logging_client, status)).start()
 
