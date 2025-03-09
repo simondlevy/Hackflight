@@ -34,27 +34,20 @@ RPI_LOGGING_PORT = 2
 
 def radio_threadfun(client, status, gamepad_vals):
 
-    was_armed = False
-
     while status['running']:
-
-        armed = status['armed']
-
-        scaled = tuple(map(lambda x: x/32768,
-                       (-gamepad_vals[0],
-                        gamepad_vals[1],
-                        -gamepad_vals[2],
-                        gamepad_vals[3])))
 
         client.send('abc'.encode())
 
-        if armed and not was_armed:
-            print('************************* Armed *************************')
+        print(gamepad_vals)
 
-        if not armed and was_armed:
-            print('*********************** Disarmed ************************')
-
-        was_armed = armed
+        '''
+        client.send(struct.pack('ffffB',
+            scaled[0],
+            scaled[1],
+            scaled[2],
+            scaled[3],
+            status['armed'])
+        '''
 
         sleep(0)  # yield
 
@@ -64,8 +57,6 @@ def logging_threadfun(client, status):
     while status['running']:
 
         state = struct.unpack('ffffffffffff', client.recv(48))
-
-        print(state)
 
         sleep(0)  # yield
 
@@ -139,7 +130,9 @@ def main():
 
                         axis = GAMEPAD_AXIS_MAP[subcode]
 
-                        gamepad_vals[axis] = event.state
+                        sign = -1 if axis in (0, 2) else +1
+
+                        gamepad_vals[axis] = sign * event.state / 32768
 
                 elif code in {'BTN_TR', 'BTN_PINKIE'}:
 
