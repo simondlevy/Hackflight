@@ -97,7 +97,7 @@ int main(int argc, char ** argv)
 
         radioServer.receiveData(tmp, 3);
 
-        //printf("%d,%d,%d\n", tmp[0], tmp[1], tmp[2]);
+        printf("%d,%d,%d\n", tmp[0], tmp[1], tmp[2]);
     }
 
     return 0;
