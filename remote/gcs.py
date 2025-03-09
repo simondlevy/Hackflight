@@ -86,9 +86,9 @@ def connect_to_server(port, threadfun, status):
         print(str(e) + ': is server running?')
         exit(0)
 
-    Thread(target=threadfun, args=(client, status)).start()
-
     print(' connected')
+
+    return client
 
 
 def main():
@@ -97,9 +97,12 @@ def main():
 
     status = {'running': True, 'armed': False}
 
-    # connect_to_server(RPI_RADIO_PORT, , status)
+    # connect_to_server(RPI_RADIO_PORT, radio_threadfun, status)
 
-    connect_to_server(RPI_LOGGING_PORT, logging_threadfun, status)
+    logging_client = connect_to_server(
+            RPI_LOGGING_PORT, logging_threadfun, status)
+
+    Thread(target=logging_threadfun, args=(logging_client, status)).start()
 
     gamepads = inputs.devices.gamepads
 
