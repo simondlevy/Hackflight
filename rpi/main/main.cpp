@@ -34,17 +34,17 @@
 #include <hackflight/src/msp/messages.hpp>
 
 // NB, Bluetooth
-static const uint16_t LOGGING_CLIENT_PORT = 1;
+static const uint16_t RADIO_CLIENT_PORT = 1;
+static const uint16_t LOGGING_CLIENT_PORT = 2;
 
-static const uint32_t CLIENT_FREQ_HZ = 100;
+// Serial connection to FC
+static int serialfd;
 
 // Parser accepts messages from flight controller (FC)
 static hf::MspParser parser;
 
 // Serializer sends RC command messages to FC
 //static hf::MspSerializer serializer;
-
-static int serialfd;
 
 static void * logging_fun(void * arg)
 {
