@@ -32,19 +32,23 @@ RPI_RADIO_PORT = 1
 RPI_LOGGING_PORT = 2
 
 
-def gamepad_threadfun(vals, status):
+def radio_threadfun(client, status, gamepad_vals):
 
     was_armed = False
 
     while status['running']:
 
-        # scaled = tuple(map(lambda x: x/32768,
-        #                (-vals[0], vals[1], -vals[2], vals[3])))
-
-        # print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f' % scaled, end=' ')
-        # print('Armed: %d' % status['armed'])
-
         armed = status['armed']
+
+        scaled = tuple(map(lambda x: x/32768,
+                       (-gamepad_vals[0],
+                        gamepad_vals[1],
+                        -gamepad_vals[2],
+                        gamepad_vals[3])))
+
+        print(scaled)
+
+        client.send('abc'.encode())
 
         if armed and not was_armed:
             print('************************* Armed *************************')
@@ -57,22 +61,17 @@ def gamepad_threadfun(vals, status):
         sleep(0)  # yield
 
 
-def radio_threadfun(client, status, gamepad_vals):
-
-    while status['running']:
-
-        client.send('abc'.encode())
-
-        sleep(0)  # yield
-
-
 def logging_threadfun(client, status):
 
     while status['running']:
 
-        for val in unpack('ffffffffffff', (client.recv(48))):
+        msg = client.recv(48)
+
+        '''
+        for val in unpack('ffffffffffff', msg):
             print('%+3.3f' % val, end=' ')
         print()
+        '''
 
         sleep(0)  # yield
 
@@ -128,8 +127,6 @@ def main():
         exit(0)
 
     button_state_prev = 0
-
-    Thread(target=gamepad_threadfun, args=(gamepad_vals, status)).start()
 
     # Gamepad reading blocks, so run it on main thread
     while status['running']:
