@@ -61,6 +61,8 @@ def radio_threadfun(client, status, gamepad_vals):
 
     while status['running']:
 
+        client.send('abc'.encode())
+
         sleep(0)  # yield
 
 
