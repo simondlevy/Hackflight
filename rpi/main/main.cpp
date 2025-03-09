@@ -93,12 +93,12 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        uint8_t tmp[3] = {};
+        uint8_t tmp[17] = {}; // 4 floats and a byte
 
-        radioServer.receiveData(tmp, 3);
+        radioServer.receiveData(tmp, 17);
 
         if (radioServer.isConnected()) {
-            printf("%d,%d,%d\n", tmp[0], tmp[1], tmp[2]);
+            printf("Armed: %d\n", tmp[16]);
         }
 
 
