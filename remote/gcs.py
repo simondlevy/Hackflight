@@ -57,6 +57,13 @@ def gamepad_threadfun(vals, status):
         sleep(0)  # yield
 
 
+def radio_threadfun(client, status, gamepad_vals):
+
+    while status['running']:
+
+        sleep(0)  # yield
+
+
 def logging_threadfun(client, status):
 
     while status['running']:
@@ -97,11 +104,14 @@ def main():
 
     status = {'running': True, 'armed': False}
 
-    # connect_to_server(RPI_RADIO_PORT, status)
+    gamepad_vals = [0, 0, 0, 0]
 
     logging_client = connect_to_server(RPI_LOGGING_PORT)
-
     Thread(target=logging_threadfun, args=(logging_client, status)).start()
+
+    radio_client = connect_to_server(RPI_RADIO_PORT)
+    Thread(target=radio_threadfun,
+           args=(radio_client, status, gamepad_vals)).start()
 
     gamepads = inputs.devices.gamepads
 
@@ -114,8 +124,6 @@ def main():
     if devname not in SUPPORTED_GAMEPADS:
         print(devname + ' not supported')
         exit(0)
-
-    gamepad_vals = [0, 0, 0, 0]
 
     button_state_prev = 0
 
