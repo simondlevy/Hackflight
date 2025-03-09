@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import socket
 import inputs
 from threading import Thread
-from struct import unpack
+import struct
 from time import sleep
 from sys import stdout
 
@@ -46,8 +46,6 @@ def radio_threadfun(client, status, gamepad_vals):
                         -gamepad_vals[2],
                         gamepad_vals[3])))
 
-        print(scaled)
-
         client.send('abc'.encode())
 
         if armed and not was_armed:
@@ -65,13 +63,9 @@ def logging_threadfun(client, status):
 
     while status['running']:
 
-        msg = client.recv(48)
+        state = struct.unpack('ffffffffffff', client.recv(48))
 
-        '''
-        for val in unpack('ffffffffffff', msg):
-            print('%+3.3f' % val, end=' ')
-        print()
-        '''
+        print(state)
 
         sleep(0)  # yield
 
