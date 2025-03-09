@@ -97,6 +97,8 @@ def main():
 
     status = {'running': True, 'armed': False}
 
+    connect_to_server(RPI_RADIO_PORT, status)
+
     connect_to_server(RPI_LOGGING_PORT, status)
 
     gamepads = inputs.devices.gamepads
