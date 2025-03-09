@@ -34,8 +34,8 @@
 #include <hackflight/src/msp/messages.hpp>
 
 // NB, Bluetooth
-static const uint16_t RADIO_CLIENT_PORT = 1;
-static const uint16_t LOGGING_CLIENT_PORT = 2;
+static const uint16_t RADIO_PORT = 1;
+static const uint16_t LOGGING_PORT = 2;
 
 // Serial connection to FC
 static int serialfd;
@@ -49,7 +49,7 @@ static hf::MspParser parser;
 static void * logging_fun(void * arg)
 {
     // true = Bluetooth
-    auto loggingServer = Server(LOGGING_CLIENT_PORT, true);
+    auto loggingServer = Server(LOGGING_PORT, true);
 
     // Loop forever, reading state messages from FC
     while (true) {
@@ -87,6 +87,9 @@ int main(int argc, char ** argv)
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
+
+    // true = Bluetooth
+    auto radioServer = Server(RADIO_PORT, true);
 
     while (true) {
     }
