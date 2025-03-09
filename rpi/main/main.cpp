@@ -49,7 +49,7 @@ static hf::MspParser parser;
 static void * logging_fun(void * arg)
 {
     // true = Bluetooth
-    auto loggingServer = Server(LOGGING_PORT, true);
+    auto loggingServer = Server(LOGGING_PORT, "logging", true);
 
     // Loop forever, reading state messages from FC
     while (true) {
@@ -89,9 +89,15 @@ int main(int argc, char ** argv)
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
 
     // true = Bluetooth
-    auto radioServer = Server(RADIO_PORT, true);
+    auto radioServer = Server(RADIO_PORT, "radio", true);
 
     while (true) {
+
+        uint8_t tmp[3] = {};
+
+        radioServer.receiveData(tmp, 3);
+
+        //printf("%d,%d,%d\n", tmp[0], tmp[1], tmp[2]);
     }
 
     return 0;
