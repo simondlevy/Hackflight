@@ -97,7 +97,12 @@ int main(int argc, char ** argv)
 
         radioServer.receiveData(tmp, 3);
 
-        printf("%d,%d,%d\n", tmp[0], tmp[1], tmp[2]);
+        if (radioServer.isConnected()) {
+            printf("%d,%d,%d\n", tmp[0], tmp[1], tmp[2]);
+        }
+
+
+        fflush(stdout);
     }
 
     return 0;
