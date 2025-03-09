@@ -32,22 +32,18 @@ RPI_RADIO_PORT = 1
 RPI_LOGGING_PORT = 2
 
 
-def radio_threadfun(client, status, gamepad_vals):
+def radio_threadfun(client, status, chanvals):
 
     while status['running']:
 
-        client.send('abc'.encode())
-
-        print(gamepad_vals)
-
-        '''
-        client.send(struct.pack('ffffB',
-            scaled[0],
-            scaled[1],
-            scaled[2],
-            scaled[3],
-            status['armed'])
-        '''
+        client.send(
+                struct.pack(
+                    'ffffB',
+                    chanvals[0],
+                    chanvals[1],
+                    chanvals[2],
+                    chanvals[3],
+                    status['armed']))
 
         sleep(0)  # yield
 
