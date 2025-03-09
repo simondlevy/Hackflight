@@ -29,6 +29,7 @@
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
 
+#include <hackflight/src/hackflight.hpp>
 #include <hackflight/src/msp/parser.hpp>
 #include <hackflight/src/msp/serializer.hpp>
 #include <hackflight/src/msp/messages.hpp>
@@ -98,7 +99,16 @@ int main(int argc, char ** argv)
         radioServer.receiveData(tmp, 17);
 
         if (radioServer.isConnected()) {
-            printf("Armed: %d\n", tmp[16]);
+        
+            hf::demands_t demands = {};
+
+            memcpy(&demands, tmp, 16);
+
+            const auto armed = (bool)tmp[16];
+
+            printf("t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f | armed=%d\n", 
+                    demands.thrust, demands.roll, demands.pitch, demands.yaw,
+                    armed);
         }
 
 
