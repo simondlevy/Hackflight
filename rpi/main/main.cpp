@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <sys/ioctl.h>
+#include <pthread.h>
 
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
@@ -43,15 +44,10 @@ static hf::MspParser parser;
 // Serializer sends RC command messages to FC
 //static hf::MspSerializer serializer;
 
-int main(int argc, char ** argv)
+static int serialfd;
+
+static void * logging_fun(void * arg)
 {
-    // Open a serial connection to the Teensy
-    auto fd = Serial::open_port("/dev/ttyS0", B115200);
-
-    if (fd < 0) {
-        return 1;
-    }
-
     // true = Bluetooth
     auto loggingServer = Server(LOGGING_CLIENT_PORT, true);
 
@@ -64,7 +60,7 @@ int main(int argc, char ** argv)
 
         gettimeofday(&time, NULL);
 
-        if (read(fd, &byte, 1) == 1 && parser.parse(byte) == hf::MSP_STATE) {
+        if (read(serialfd, &byte, 1) == 1 && parser.parse(byte) == hf::MSP_STATE) {
 
             const float state[12] = { 
                 parser.getFloat(0), parser.getFloat(1), parser.getFloat(2),
@@ -75,6 +71,24 @@ int main(int argc, char ** argv)
 
             loggingServer.sendData((uint8_t *)state, 12 * sizeof(float));
         }
+    }
+
+    return NULL;
+}
+
+int main(int argc, char ** argv)
+{
+    // Open a serial connection to the Teensy
+    serialfd = Serial::open_port("/dev/ttyS0", B115200);
+
+    if (serialfd < 0) {
+        return 1;
+    }
+
+    pthread_t logging_thread = {};
+    pthread_create(&logging_thread, NULL, logging_fun, NULL);
+
+    while (true) {
     }
 
     return 0;
