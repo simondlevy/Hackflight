@@ -40,13 +40,19 @@
 
 static hf::MspParser _parser;
 
-static uint32_t _count;
+static int16_t _chanvals[5];
 
 void serialEvent4(void)
 {
     while (Serial4.available()) {
+
         if (_parser.parse(Serial4.read()) == hf::MSP_SET_RC) {
-            _count++;
+
+            _chanvals[0] = _parser.getShort(0);
+            _chanvals[1] = _parser.getShort(1);
+            _chanvals[2] = _parser.getShort(2);
+            _chanvals[3] = _parser.getShort(3);
+            _chanvals[4] = _parser.getShort(4);
         }
     }
 }
@@ -188,7 +194,7 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
-                    printf("%ld\n", _count);
+                    printf("ch1=%d\n", _chanvals[0]);
                 }
 
                 // Get angular velocities directly from gyro
