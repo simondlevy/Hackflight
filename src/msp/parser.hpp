@@ -113,6 +113,13 @@ namespace hf {
                 return value;
             }
 
+            uint16_t getShort(const uint8_t index)
+            {
+                const uint8_t offset = 2 * index;
+                int16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+                return value;
+            }
+
             uint16_t getUshort(const uint8_t index)
             {
                 const uint8_t offset = 2 * index;
