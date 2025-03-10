@@ -137,6 +137,12 @@ def connect_to_server(port):
 
 def main():
 
+    gamepads = inputs.devices.gamepads
+
+    if len(gamepads) == 0:
+        print('No gamepad detected')
+        exit(0)
+
     status = {'running': True, 'armed': False}
 
     gamepad_vals = [0, 0, 0, 0]
@@ -147,12 +153,6 @@ def main():
     radio_client = connect_to_server(RPI_RADIO_PORT)
     Thread(target=radio_threadfun,
            args=(radio_client, status, gamepad_vals)).start()
-
-    gamepads = inputs.devices.gamepads
-
-    if len(gamepads) == 0:
-        print('No gamepad detected')
-        exit(0)
 
     devname = inputs.devices.gamepads[0].name
 
