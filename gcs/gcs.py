@@ -169,7 +169,11 @@ def main():
 
     while status['running']:
 
-        sleep(0)
+        try:
+            sleep(0)
+
+        except KeyboardInterrupt:
+            status['running'] = False
 
 
 main()

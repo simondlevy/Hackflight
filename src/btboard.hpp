@@ -194,7 +194,9 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
-                    printf("ch1=%d\n", _chanvals[0]);
+                    printf("ch1=%d  armed=%d\n",
+                            _chanvals[0],
+                            _chanvals[4] != 0);
                 }
 
                 // Get angular velocities directly from gyro
