@@ -104,6 +104,9 @@ int main(int argc, char ** argv)
 
             printf("t=%+06d  r=%+06d  p=%+06d  y=%+06d | armed=%1d\n", 
                     chanvals[0], chanvals[1], chanvals[2], chanvals[3], armed);
+
+            uint8_t tmp = 0;
+            write(serialfd, &tmp, 1);
         }
 
 
