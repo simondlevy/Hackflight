@@ -167,5 +167,7 @@ def main():
 
         sleep(0)
 
+    print('Server quit!')
+
 
 main()
