@@ -32,18 +32,22 @@
 // Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
+#include <msp/parser.hpp>
 #include <msp/serializer.hpp>
 #include <msp/messages.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
 
-static uint32_t count;
+static hf::MspParser _parser;
+
+static uint32_t _count;
 
 void serialEvent4(void)
 {
     while (Serial4.available()) {
-        count++;
-        Serial4.read();
+        if (_parser.parse(Serial4.read()) == hf::MSP_SET_RC) {
+            _count++;
+        }
     }
 }
 
@@ -184,7 +188,7 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
-                    printf("%ld\n", count);
+                    printf("%ld\n", _count);
                 }
 
                 // Get angular velocities directly from gyro
