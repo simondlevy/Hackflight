@@ -105,8 +105,7 @@ int main(int argc, char ** argv)
             write(serialfd, serializer.payload, serializer.payloadSize);
         }
 
-
-        fflush(stdout);
+        sleep(0); // yield
     }
 
     return 0;
