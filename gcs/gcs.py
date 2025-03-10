@@ -38,7 +38,7 @@ def radio_threadfun(client, status, chanvals):
 
         client.send(
                 struct.pack(
-                    'ffffB',
+                    'hhhhB',
                     chanvals[0],
                     chanvals[1],
                     chanvals[2],
@@ -126,9 +126,7 @@ def main():
 
                         axis = GAMEPAD_AXIS_MAP[subcode]
 
-                        sign = -1 if axis in (0, 2) else +1
-
-                        gamepad_vals[axis] = sign * event.state / 32768
+                        gamepad_vals[axis] = event.state
 
                 elif code in {'BTN_TR', 'BTN_PINKIE'}:
 
