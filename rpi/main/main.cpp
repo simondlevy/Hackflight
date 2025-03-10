@@ -94,21 +94,20 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        uint8_t tmp[17] = {}; // 4 floats and a byte
+        uint8_t tmp[9] = {}; // 4 shorts and a byte
 
-        radioServer.receiveData(tmp, 17);
+        radioServer.receiveData(tmp, 9);
 
         if (radioServer.isConnected()) {
         
-            hf::demands_t demands = {};
+            int16_t chanvals[4] = {};
 
-            memcpy(&demands, tmp, 16);
+            memcpy(chanvals, tmp, 8);
 
-            const auto armed = (bool)tmp[16];
+            const auto armed = (bool)tmp[8];
 
-            printf("t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f | armed=%d\n", 
-                    demands.thrust, demands.roll, demands.pitch, demands.yaw,
-                    armed);
+            printf("t=%+d  r=%+d  p=%+d  y=%+d | armed=%d\n", 
+                    chanvals[0], chanvals[1], chanvals[2], chanvals[3], armed);
         }
 
 
