@@ -41,9 +41,6 @@ static const uint16_t LOGGING_PORT = 2;
 // Serial connection to FC
 static int serialfd;
 
-// Parser accepts messages from flight controller (FC)
-static hf::MspParser parser;
-
 // Serializer sends RC command messages to FC
 //static hf::MspSerializer serializer;
 
@@ -51,6 +48,9 @@ static void * logging_fun(void * arg)
 {
     // true = Bluetooth
     auto loggingServer = Server(LOGGING_PORT, "logging", true);
+
+    // Parser accepts messages from flight controller (FC)
+    hf::MspParser parser = {};
 
     // Loop forever, reading state messages from FC
     while (true) {
