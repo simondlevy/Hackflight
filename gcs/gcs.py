@@ -38,7 +38,7 @@ def radio_threadfun(client, status, chanvals):
 
         client.send(
                 struct.pack(
-                    'hhhhB',
+                    'hhhhh',
                     chanvals[0],
                     chanvals[1],
                     chanvals[2],

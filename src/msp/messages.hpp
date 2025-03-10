@@ -27,5 +27,5 @@ namespace hf {
 
     static const uint8_t MSP_SPIKES = 121;
     static const uint8_t MSP_STATE = 122;
-
+    static const uint8_t MSP_SET_RC = 200;
 }
