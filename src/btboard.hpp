@@ -28,25 +28,20 @@
 // Third-party libraries
 #include <MPU6050.h>
 #include <oneshot125.hpp>
-#include <dsmrx.hpp>
 
 // Hackflight library
 #include <hackflight.hpp>
 #include <estimators/madgwick.hpp>
 #include <msp/serializer.hpp>
 #include <msp/messages.hpp>
-#include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
 
 
-static Dsm2048 _dsm2048;
-
-// DSMX receiver callback
-void serialEvent1(void)
+void serialEvent4(void)
 {
-    while (Serial1.available()) {
-        _dsm2048.parse(Serial1.read(), micros());
+    while (Serial4.available()) {
+        Serial4.read();
     }
 }
 
@@ -118,9 +113,6 @@ namespace hf {
 
                 // Set up serial debugging
                 Serial.begin(115200);
-
-                // Set up serial connection from DSMX receiver
-                Serial1.begin(115200);
 
                 // Set up serial connection with Raspberry Pi
                 Serial4.begin(115200);

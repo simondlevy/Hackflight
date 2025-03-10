@@ -35,7 +35,6 @@
 #include <estimators/madgwick.hpp>
 #include <msp/serializer.hpp>
 #include <msp/messages.hpp>
-#include <rx.hpp>
 #include <utils.hpp>
 #include <timer.hpp>
 
