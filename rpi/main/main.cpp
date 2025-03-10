@@ -94,7 +94,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        uint16_t chanvals[5] = {};
+        int16_t chanvals[5] = {};
 
         radioServer.receiveData((uint8_t *)chanvals, sizeof(chanvals));
 
@@ -102,7 +102,7 @@ int main(int argc, char ** argv)
         
             const auto armed = (bool)chanvals[4];
 
-            printf("t=%+d  r=%+d  p=%+d  y=%+d | armed=%d\n", 
+            printf("t=%+06d  r=%+06d  p=%+06d  y=%+06d | armed=%1d\n", 
                     chanvals[0], chanvals[1], chanvals[2], chanvals[3], armed);
         }
 
