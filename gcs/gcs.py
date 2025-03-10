@@ -54,6 +54,9 @@ def logging_threadfun(client, status):
 
         state = struct.unpack('ffffffffffff', client.recv(48))
 
+        print('phi=%+03.3f  theta=%+03.3f  psi=%+03.3f' %
+              (state[6], state[8], state[10]), end='\r')
+
         sleep(0)  # yield
 
 
