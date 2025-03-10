@@ -37,10 +37,12 @@
 #include <utils.hpp>
 #include <timer.hpp>
 
+static uint32_t count;
 
 void serialEvent4(void)
 {
     while (Serial4.available()) {
+        count++;
         Serial4.read();
     }
 }
@@ -138,16 +140,6 @@ namespace hf {
                 dt = (_usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = _usec_curr;      
 
-                // Read channels values from receiver
-                if (_dsm2048.timedOut(micros())) {
-
-                    _status = STATUS_FAILSAFE;
-                }
-                else if (_dsm2048.gotNewFrame()) {
-
-                    _dsm2048.getChannelValuesMlp6Dsm(_channels);
-                }
-
                 // When throttle is down, toggle arming on switch press/release
                 const auto is_arming_switch_on = _channels[5] > ARMING_SWITCH_MIN;
 
@@ -192,8 +184,7 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
-                    printf("phi=%+3.3f  the=%+3.3f  psi=%+3.3f\n",
-                            state.phi, state.theta, state.psi);
+                    printf("%ld\n", count);
                 }
 
                 // Get angular velocities directly from gyro
