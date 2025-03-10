@@ -94,17 +94,13 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        uint8_t tmp[9] = {}; // 4 shorts and a byte
+        uint16_t chanvals[5] = {};
 
-        radioServer.receiveData(tmp, 9);
+        radioServer.receiveData((uint8_t *)chanvals, sizeof(chanvals));
 
         if (radioServer.isConnected()) {
         
-            int16_t chanvals[4] = {};
-
-            memcpy(chanvals, tmp, 8);
-
-            const auto armed = (bool)tmp[8];
+            const auto armed = (bool)chanvals[4];
 
             printf("t=%+d  r=%+d  p=%+d  y=%+d | armed=%d\n", 
                     chanvals[0], chanvals[1], chanvals[2], chanvals[3], armed);
