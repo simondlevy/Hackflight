@@ -100,6 +100,8 @@ int main(int argc, char ** argv)
 
         if (radioServer.isConnected()) {
 
+            printf("%d\n", chanvals[0]);
+
             serializer.serializeShorts(hf::MSP_SET_RC, chanvals, 5);
         
             write(serialfd, serializer.payload, serializer.payloadSize);

@@ -153,7 +153,7 @@ namespace hf {
 
             void serializeShort(const uint16_t src)
             {
-                uint16_t a;
+                int16_t a;
                 memcpy(&a, &src, 2);
                 serialize16(a);
             }
