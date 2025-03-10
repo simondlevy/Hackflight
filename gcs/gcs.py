@@ -32,18 +32,56 @@ RPI_RADIO_PORT = 1
 RPI_LOGGING_PORT = 2
 
 
+def gamepad_threadfun(vals, status):
+
+    GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'Z': 1, 'RX': 1, 'RY': 2, 'RZ': 2}
+
+    button_state_prev = 0
+
+    while status['running']:
+
+        try:
+
+            for event in inputs.get_gamepad():
+
+                code = str(event.code)
+
+                if 'ABS' in code:
+
+                    subcode = code[4:]
+
+                    if subcode in GAMEPAD_AXIS_MAP:
+
+                        axis = GAMEPAD_AXIS_MAP[subcode]
+
+                        vals[axis] = event.state
+
+                elif code in {'BTN_TR', 'BTN_PINKIE'}:
+
+                    if not event.state and button_state_prev:
+
+                        status['armed'] = not status['armed']
+
+                    button_state_prev = event.state
+
+        except inputs.UnpluggedError:
+            print('No gamepad detected')
+            status['running'] = False
+
+        except OSError:
+            print('Gamepad unplugged')
+            status['running'] = False
+
+
 def radio_threadfun(client, status, chanvals):
 
     while status['running']:
 
-        client.send(
-                struct.pack(
-                    'hhhhh',
-                    chanvals[0],
-                    chanvals[1],
-                    chanvals[2],
-                    chanvals[3],
-                    status['armed']))
+        msg = struct.pack('hhhhh',
+                          chanvals[0], chanvals[1], chanvals[2], chanvals[3],
+                          status['armed'])
+
+        client.send(msg)
 
         sleep(0)  # yield
 
@@ -52,7 +90,9 @@ def logging_threadfun(client, status):
 
     while status['running']:
 
-        state = struct.unpack('ffffffffffff', client.recv(48))
+        msg = client.recv(48)
+
+        state = struct.unpack('ffffffffffff', msg)
 
         print('phi=%+03.3f  theta=%+03.3f  psi=%+03.3f' %
               (state[6], state[8], state[10]), end='\r')
@@ -85,8 +125,6 @@ def connect_to_server(port):
 
 def main():
 
-    GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'Z': 1, 'RX': 1, 'RY': 2, 'RZ': 2}
-
     status = {'running': True, 'armed': False}
 
     gamepad_vals = [0, 0, 0, 0]
@@ -110,45 +148,16 @@ def main():
         print(devname + ' not supported')
         exit(0)
 
-    button_state_prev = 0
+    gamepad_thread = Thread(target=gamepad_threadfun,
+                            args=(gamepad_vals, status))
 
-    # Gamepad reading blocks, so run it on main thread
+    gamepad_thread.daemon = True
+
+    gamepad_thread.start()
+
     while status['running']:
 
-        try:
-
-            for event in inputs.get_gamepad():
-
-                code = str(event.code)
-
-                if 'ABS' in code:
-
-                    subcode = code[4:]
-
-                    if subcode in GAMEPAD_AXIS_MAP:
-
-                        axis = GAMEPAD_AXIS_MAP[subcode]
-
-                        gamepad_vals[axis] = event.state
-
-                elif code in {'BTN_TR', 'BTN_PINKIE'}:
-
-                    if not event.state and button_state_prev:
-
-                        status['armed'] = not status['armed']
-
-                    button_state_prev = event.state
-
-        except inputs.UnpluggedError:
-            print('No gamepad detected')
-            status['running'] = False
-
-        except KeyboardInterrupt:
-            status['running'] = False
-
-        except OSError:
-            print('Gamepad unplugged')
-            status['running'] = False
+        sleep(0)
 
 
 main()
