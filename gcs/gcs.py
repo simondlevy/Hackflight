@@ -83,7 +83,9 @@ def radio_threadfun(client, status, chanvals):
 
         try:
             client.send(msg)
-        except:
+
+        except Exception as e:
+            print('Failed to send radio data: ' + str(e))
             status['running'] = False
             return
 
@@ -96,7 +98,9 @@ def logging_threadfun(client, status):
 
         try:
             msg = client.recv(48)
-        except:
+
+        except Exception as e:
+            print('Failed to receiving logging data: ' + str(e))
             status['running'] = False
             return
 
@@ -166,8 +170,6 @@ def main():
     while status['running']:
 
         sleep(0)
-
-    print('Server quit!')
 
 
 main()
