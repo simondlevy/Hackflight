@@ -81,7 +81,11 @@ def radio_threadfun(client, status, chanvals):
                           chanvals[0], chanvals[1], chanvals[2], chanvals[3],
                           status['armed'])
 
-        client.send(msg)
+        try:
+            client.send(msg)
+        except:
+            status['running'] = False
+            return
 
         sleep(0)  # yield
 
@@ -90,7 +94,11 @@ def logging_threadfun(client, status):
 
     while status['running']:
 
-        msg = client.recv(48)
+        try:
+            msg = client.recv(48)
+        except:
+            status['running'] = False
+            return
 
         state = struct.unpack('ffffffffffff', msg)
 
