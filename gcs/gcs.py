@@ -77,6 +77,8 @@ def radio_threadfun(client, status, chanvals):
 
     while status['running']:
 
+        print(chanvals[0])
+
         msg = struct.pack('hhhhh',
                           chanvals[0], chanvals[1], chanvals[2], chanvals[3],
                           status['armed'])
@@ -106,8 +108,7 @@ def logging_threadfun(client, status):
 
         state = struct.unpack('ffffffffffff', msg)
 
-        print('phi=%+03.3f  theta=%+03.3f  psi=%+03.3f' %
-              (state[6], state[8], state[10]), end='\r')
+        # print('phi=%+03.3f  theta=%+03.3f  psi=%+03.3f' % (state[6], state[8], state[10]), end='\r')
 
         sleep(0)  # yield
 
