@@ -9,9 +9,9 @@
 void setup() 
 {
   Serial.begin(115200);
-  Serial.println("Starting BLE work!");
 
   BLEDevice::init("XIAO_ESP32C6");
+
   BLEServer *pServer = BLEDevice::createServer();
   BLEService *pService = pServer->createService(SERVICE_UUID);
   BLECharacteristic *pCharacteristic = pService->createCharacteristic(

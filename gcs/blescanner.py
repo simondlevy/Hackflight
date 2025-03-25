@@ -2,6 +2,7 @@
 
 import asyncio
 from bleak import BleakScanner
+from time import sleep
 
 async def main():
     stop_event = asyncio.Event()
@@ -10,7 +11,12 @@ async def main():
 
     def callback(device, advertising_data):
 
-        print(advertising_data)
+        try:
+            print(advertising_data)
+            sleep(0.5)
+
+        except KeyboardInterrupt:
+            exit(0)
 
     async with BleakScanner(callback) as scanner:
 
