@@ -13,6 +13,7 @@ void setup()
 {
     for (uint8_t k=0; k<5; ++k) {
         pinMode(pins[k], OUTPUT);
+        digitalWrite(pins[k], 1-polarities[k]);
     }
 
     active = 0;
