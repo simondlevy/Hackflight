@@ -98,12 +98,12 @@ namespace hf {
 
             // IMU calibration parameters -------------------------------------
 
-            static constexpr float ACC_ERROR_X = -0.030;
-            static constexpr float ACC_ERROR_Y = +0.025;
-            static constexpr float ACC_ERROR_Z = -0.11;
+            static constexpr float ACC_ERROR_X  = -0.030;
+            static constexpr float ACC_ERROR_Y  = +0.025;
+            static constexpr float ACC_ERROR_Z  = -0.11;
             static constexpr float GYRO_ERROR_X = -3.3;
-            static constexpr float GYRO_ERROR_Y= -0.50;
-            static constexpr float GYRO_ERROR_Z = -0.60;
+            static constexpr float GYRO_ERROR_Y = -0.50;
+            static constexpr float GYRO_ERROR_Z = +0.6875;
 
         public:
 
@@ -199,6 +199,7 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
+                    //printf("roll:%f,pitch:%f,yaw:%f\n", state.phi, state.theta, state.psi);
                 }
 
                 // Get angular velocities directly from gyro
