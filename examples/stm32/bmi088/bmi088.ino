@@ -22,9 +22,11 @@
 
 #include <BMI088.h>
 
-//Bmi088Accel accel(SPI, PB1);
+static Bmi088Accel accel(Wire, 0x18);
+static Bmi088Gyro gyro(Wire, 0x69);
 
-Bmi088Gyro gyro(SPI, PB0);
+// static Bmi088Accel accel(SPI, PB1);
+// static Bmi088Gyro gyro(SPI, PB0);
 
 void setup() 
 {
@@ -32,35 +34,34 @@ void setup()
 
     Serial.begin(115200);
 
-    /*
     status = accel.begin();
 
     while (status < 0) {
         Serial.println("Accel Initialization Error");
         Serial.println(status);
+        delay(500);
     }
-    */
 
     status = gyro.begin();
     while (status < 0) {
         Serial.println("Gyro Initialization Error");
         Serial.println(status);
-        while (1) {}
+        delay(500);
     }
 }
 
 void loop() 
 {
-    //accel.readSensor();
+    accel.readSensor();
 
     gyro.readSensor();
 
-    //Serial.print(accel.getAccelX_mss());
-    //Serial.print("\t");
-    //Serial.print(accel.getAccelY_mss());
-    //Serial.print("\t");
-    //Serial.print(accel.getAccelZ_mss());
-    //Serial.print("\t");
+    Serial.print(accel.getAccelX_mss());
+    Serial.print("\t");
+    Serial.print(accel.getAccelY_mss());
+    Serial.print("\t");
+    Serial.print(accel.getAccelZ_mss());
+    Serial.print("\t");
 
     Serial.print(gyro.getGyroX_rads());
     Serial.print("\t");
@@ -69,7 +70,7 @@ void loop()
     Serial.print(gyro.getGyroZ_rads());
     Serial.print("\t");
 
-    //Serial.print(accel.getTemperature_C());
+    Serial.print(accel.getTemperature_C());
 
     Serial.print("\n");
 
