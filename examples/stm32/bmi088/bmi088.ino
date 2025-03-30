@@ -22,11 +22,15 @@
 
 #include <BMI088.h>
 
-static Bmi088Accel accel(Wire, 0x18);
-static Bmi088Gyro gyro(Wire, 0x69);
+//static Bmi088Accel accel(Wire, 0x18);
+//static Bmi088Gyro gyro(Wire, 0x69);
 
-// static Bmi088Accel accel(SPI, PB1);
-// static Bmi088Gyro gyro(SPI, PB0);
+// MOSI, MISO, SCLK
+static SPIClass myspi = SPIClass (PB15, PB14, PB13);
+
+// CS
+static Bmi088Accel accel(myspi, PB1);
+static Bmi088Gyro gyro(myspi, PB0);
 
 void setup() 
 {
