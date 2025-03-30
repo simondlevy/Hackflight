@@ -1,4 +1,4 @@
-SKETCH = leds
+SKETCH = imu
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 

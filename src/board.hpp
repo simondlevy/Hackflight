@@ -199,8 +199,6 @@ namespace hf {
                 state.psi = angles.z;
 
                 if (debugReady()) {
-                    printf("phi=%+3.3f  the=%+3.3f  psi=%+3.3f\n",
-                            state.phi, state.theta, state.psi);
                 }
 
                 // Get angular velocities directly from gyro
