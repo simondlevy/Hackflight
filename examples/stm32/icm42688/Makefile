@@ -1,6 +1,6 @@
-SKETCH = leds
+SKETCH = icm42688
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
+FQBN = STMicroelectronics:stm32:GenF7:pnum=GENERIC_F722RETX,usb=CDCgen#   STMicroelectronics:stm32:GenF7:pnum=GENERIC_F722RETX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 
