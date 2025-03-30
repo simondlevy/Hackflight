@@ -1,4 +1,4 @@
-SKETCH = leds
+SKETCH = icm42688
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F415RGTX,usb=CDCgen
 
@@ -8,7 +8,7 @@ LIBS = $(HOME)/Documents/Arduino/libraries
 
 BIN = build/$(SKETCH).ino.bin
 
-$(BIN): $(SKETCH).ino Makefile
+$(BIN): $(SKETCH).ino
 	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) --output-dir=./build $(SKETCH).ino
 
 flash: $(BIN)

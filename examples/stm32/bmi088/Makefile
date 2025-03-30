@@ -1,4 +1,4 @@
-SKETCH = imu
+SKETCH = bmi088
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
@@ -8,7 +8,7 @@ LIBS = $(HOME)/Documents/Arduino/libraries
 
 BIN = build/$(SKETCH).ino.bin
 
-$(BIN): $(SKETCH).ino
+$(BIN): $(SKETCH).ino Makefile
 	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) --output-dir=./build $(SKETCH).ino
 
 flash: $(BIN)
