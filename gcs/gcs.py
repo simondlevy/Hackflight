@@ -27,7 +27,7 @@ from sys import stdout
 
 SUPPORTED_GAMEPADS = {'Microsoft X-Box 360 pad',  'Logitech Gamepad F310'}
 
-RPI_ADDRESS = 'B8:27:EB:3F:AB:47'
+RPI_ADDRESS = 'B8:27:EB:E0:1D:07' # 'B8:27:EB:3F:AB:47' 
 RPI_RADIO_PORT = 1
 RPI_LOGGING_PORT = 2
 
@@ -77,8 +77,6 @@ def radio_threadfun(client, status, chanvals):
 
     while status['running']:
 
-        print(chanvals[0])
-
         msg = struct.pack('hhhhh',
                           chanvals[0], chanvals[1], chanvals[2], chanvals[3],
                           status['armed'])
@@ -106,9 +104,12 @@ def logging_threadfun(client, status):
             status['running'] = False
             return
 
+        print(msg)
+
         state = struct.unpack('ffffffffffff', msg)
 
-        # print('phi=%+03.3f  theta=%+03.3f  psi=%+03.3f' % (state[6], state[8], state[10]), end='\r')
+        print('phi=%+03.3f  theta=%+03.3f  psi=%+03.3f' %
+              (state[6], state[8], state[10]), end='\r')
 
         sleep(0)  # yield
 
