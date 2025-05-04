@@ -46,13 +46,6 @@ class Simulator {
 
         }
 
-        void initKeyboard()
-        {
-            _init();
-
-            printKeyboardInstructions();
-        }
-
         bool step()
         {
             if (!_step()) {
