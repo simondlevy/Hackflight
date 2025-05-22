@@ -1,0 +1,11 @@
+obj-y += bosch/
+obj-y += hal/
+obj-y += stm32f4/
+
+obj-y += imu_bmi088.o
+obj-y += platform_bolt.o
+obj-y += system.o
+obj-y += vapplication.o
+
+obj-y += control_haskell.o
+obj-y += copilot_core.o

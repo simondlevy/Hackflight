@@ -1,0 +1,13 @@
+*.bin
+*.elf
+*.hex
+*.map
+.firmware.cmd
+copilot*
+include
+arduino
+Makefile
+scripts
+source
+src
+vendor

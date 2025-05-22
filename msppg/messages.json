@@ -1,0 +1,55 @@
+{
+  "STATE": 
+  [{"ID": 100},
+   {"comment": "Vehicle state per Bouabdallah et al. 2004"},
+   {"x":      "float"},
+   {"dx":     "float"},
+   {"y":      "float"},
+   {"dy":     "float"},
+   {"z":      "float"},
+   {"dz":     "float"},
+   {"phi":    "float"},
+   {"dphi":   "float"},
+   {"theta":  "float"},
+   {"dtheta": "float"},
+   {"psi":    "float"},
+   {"dpsi":   "float"}
+  ],
+
+  "SPIKES": 
+  [{"ID": 101},
+   {"comment": "Current spikes, eight per byte"},
+   {"byte1": "float"},
+   {"byte2": "float"},
+   {"byte3": "float"},
+   {"byte4": "float"},
+   {"byte5": "float"},
+   {"byte6": "float"},
+   {"byte7": "float"},
+   {"byte8": "float"}
+  ],
+
+  "SET_ARMING": 
+  [{"ID": 200},
+   {"comment": "Dis/arm"},
+   {"arm":    "byte"}
+  ],
+
+  "SET_SETPOINT_RPYT": 
+  [{"ID": 201},
+   {"comment": "Thrust is ushort in original"},
+   {"roll":    "float"},
+   {"pitch":   "float"},
+   {"yaw":     "float"},
+   {"thrust":  "float"}
+  ],
+
+  "SET_SETPOINT_HOVER": 
+  [{"ID": 202},
+   {"comment": "Hover mode"},
+   {"vx":        "float"},
+   {"vy":        "float"},
+   {"yawrate":   "float"},
+   {"zdistance": "float"}
+  ]
+}

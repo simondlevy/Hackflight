@@ -23,139 +23,136 @@
 
 #include <stdint.h>
 
-namespace hf {
+class MspSerializer {
 
-    class MspSerializer {
+    public:
 
-       public:
+        uint8_t payload[256];
 
-            uint8_t payload[256];
+        uint8_t payloadSize;
 
-            uint8_t payloadSize;
+        void serializeBytes(
+                const uint8_t messageType, const uint8_t src[], const uint8_t count)
+        {
+            prepareToSerializeBytes(messageType, count);
 
-            void serializeBytes(
-                    const uint8_t messageType, const uint8_t src[], const uint8_t count)
-            {
-                prepareToSerializeBytes(messageType, count);
-
-                for (auto k=0; k<count; ++k) {
-                    serializeByte(src[k]);
-                }
-
-                completeSerialize();
+            for (auto k=0; k<count; ++k) {
+                serializeByte(src[k]);
             }
 
-            void serializeFloats(
-                    const uint8_t messageType, const float src[], const uint8_t count)
-            {
-                prepareToSerializeFloats(messageType, count);
+            completeSerialize();
+        }
 
-                for (auto k=0; k<count; ++k) {
-                    serializeFloat(src[k]);
-                }
+        void serializeFloats(
+                const uint8_t messageType, const float src[], const uint8_t count)
+        {
+            prepareToSerializeFloats(messageType, count);
 
-                completeSerialize();
+            for (auto k=0; k<count; ++k) {
+                serializeFloat(src[k]);
             }
 
-            void serializeShorts(
-                    const uint8_t messageType, const int16_t src[], const uint8_t count)
-            {
-                prepareToSerializeShorts(messageType, count);
+            completeSerialize();
+        }
 
-                for (auto k=0; k<count; ++k) {
-                    serializeShort(src[k]);
-                }
+        void serializeShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
+        {
+            prepareToSerializeShorts(messageType, count);
 
-                completeSerialize();
+            for (auto k=0; k<count; ++k) {
+                serializeShort(src[k]);
             }
 
-        private:
+            completeSerialize();
+        }
 
-            uint8_t _payloadChecksum;
-            uint8_t _payloadIndex;
+    private:
 
-            void serialize32(const int32_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-                serialize8((a >> 16) & 0xFF);
-                serialize8((a >> 24) & 0xFF);
-            }
+        uint8_t _payloadChecksum;
+        uint8_t _payloadIndex;
 
-            void serialize16(const int16_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-            }
+        void serialize32(const int32_t a)
+        {
+            serialize8(a & 0xFF);
+            serialize8((a >> 8) & 0xFF);
+            serialize8((a >> 16) & 0xFF);
+            serialize8((a >> 24) & 0xFF);
+        }
 
-            void serialize8(const uint8_t a)
-            {
-                addToOutBuf(a);
-                _payloadChecksum ^= a;
-            }
+        void serialize16(const int16_t a)
+        {
+            serialize8(a & 0xFF);
+            serialize8((a >> 8) & 0xFF);
+        }
 
-            void prepareToSerialize(
-                    const uint8_t type, const uint8_t count, const uint8_t size)
-            {
-                payloadSize = 0;
-                _payloadIndex = 0;
-                _payloadChecksum = 0;
+        void serialize8(const uint8_t a)
+        {
+            addToOutBuf(a);
+            _payloadChecksum ^= a;
+        }
 
-                addToOutBuf('$');
-                addToOutBuf('M');
-                addToOutBuf('>');
-                serialize8(count*size);
-                serialize8(type);
-            }
+        void prepareToSerialize(
+                const uint8_t type, const uint8_t count, const uint8_t size)
+        {
+            payloadSize = 0;
+            _payloadIndex = 0;
+            _payloadChecksum = 0;
 
-            void addToOutBuf(const uint8_t a)
-            {
-                payload[payloadSize++] = a;
-            }
+            addToOutBuf('$');
+            addToOutBuf('M');
+            addToOutBuf('>');
+            serialize8(count*size);
+            serialize8(type);
+        }
 
-            void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
-            {
-                prepareToSerialize(type, count, 1);
-            }
+        void addToOutBuf(const uint8_t a)
+        {
+            payload[payloadSize++] = a;
+        }
 
-            void serializeByte(const uint8_t src)
-            {
-                serialize8(src);
-            }
+        void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
+        {
+            prepareToSerialize(type, count, 1);
+        }
 
-            void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
-            {
-                prepareToSerialize(msgtype, count, 4);
-            }
+        void serializeByte(const uint8_t src)
+        {
+            serialize8(src);
+        }
 
-            void prepareToSerializeFloats(const uint8_t msgtype, const uint8_t count)
-            {
-                prepareToSerialize(msgtype, count, 4);
-            }
+        void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
+        {
+            prepareToSerialize(msgtype, count, 4);
+        }
 
-            void prepareToSerializeShorts(const uint8_t msgtype, const uint8_t count)
-            {
-                prepareToSerialize(msgtype, count, 2);
-            }
+        void prepareToSerializeFloats(const uint8_t msgtype, const uint8_t count)
+        {
+            prepareToSerialize(msgtype, count, 4);
+        }
 
-            void completeSerialize(void)
-            {
-                serialize8(_payloadChecksum);
-                _payloadIndex = 0;
-            }
+        void prepareToSerializeShorts(const uint8_t msgtype, const uint8_t count)
+        {
+            prepareToSerialize(msgtype, count, 2);
+        }
 
-            void serializeFloat(const float src)
-            {
-                uint32_t a;
-                memcpy(&a, &src, 4);
-                serialize32(a);
-            }
+        void completeSerialize(void)
+        {
+            serialize8(_payloadChecksum);
+            _payloadIndex = 0;
+        }
 
-            void serializeShort(const uint16_t src)
-            {
-                int16_t a;
-                memcpy(&a, &src, 2);
-                serialize16(a);
-            }
-     };
-}
+        void serializeFloat(const float src)
+        {
+            uint32_t a;
+            memcpy(&a, &src, 4);
+            serialize32(a);
+        }
+
+        void serializeShort(const uint16_t src)
+        {
+            int16_t a;
+            memcpy(&a, &src, 2);
+            serialize16(a);
+        }
+};

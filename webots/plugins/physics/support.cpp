@@ -16,11 +16,92 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Webots
+#include <stdio.h>
+
 #include <plugins/physics.h>
 
-// Hackflight
-#include <sim/support.hpp>
+#include <clock.hpp>
+#include <control.hpp>
+#include <num.hpp>
+#include <mixers/crazyflie.hpp>
+#include <dynamics.hpp>
+#include <vehicles/diyquad.hpp>
+
+static const float LANDING_ALTITUDE_M = 0.01;
+
+static const float DYNAMICS_RATE = 100000; // Hz
+
+static const auto PID_UPDATE_RATE = Clock::RATE_1000_HZ;
+
+static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
+
+static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
+{
+    bool landed = false;
+
+    // Run control in middle loop
+    for (uint32_t j=0;
+            j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
+
+        const auto d = _dynamics;
+
+        const vehicleState_t state =  {
+            0, // x
+            d.state.dx,
+            0, // y
+            d.state.dy,
+            d.state.z,                     
+            d.state.dz,                   
+            Num::RAD2DEG* d.state.phi, 
+            Num::RAD2DEG* d.state.dphi, 
+            Num::RAD2DEG* d.state.theta, 
+            Num::RAD2DEG* d.state.dtheta,
+            Num::RAD2DEG* d.state.psi,   
+            Num::RAD2DEG* d.state.dpsi
+        };
+
+        demands_t demands = {};
+
+        runClosedLoopControl(
+                1 / (float)PID_UPDATE_RATE,
+                siminfo.hovering,
+                state,
+                siminfo.demands,
+                LANDING_ALTITUDE_M,
+                demands);
+
+        demands.roll *= Num::DEG2RAD;
+        demands.pitch *= Num::DEG2RAD;
+        demands.yaw *= Num::DEG2RAD;
+
+        float motors[4] = {};
+
+        Mixer::mix(demands, motors);
+
+        // Run dynamics in innermost loop
+        for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
+
+            _dynamics.update(motors,
+                    Mixer::rotorCount,
+                    Mixer::roll,
+                    Mixer::pitch,
+                    Mixer::yaw);
+
+            if (_dynamics.state.z < 0) {
+                landed = true;
+                break;
+            }
+        }
+    }
+
+    // Reset dynamics if landed
+    if (landed) {
+        _dynamics.reset();
+    }
+
+    // Get current pose from dynamics
+    return _dynamics.getPose();
+}
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
@@ -39,26 +120,22 @@ DLLEXPORT void webots_physics_init()
 
         dBodySetGravityMode(_robotBody, 0);
     }
-
-    // Implementation-dependent 
-    hf::setup_estimator();
-    hf::setup_controllers();
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-   if (_robotBody == NULL) {
+    if (_robotBody == NULL) {
         return;
     }
 
     int size = 0;
 
-    hf::siminfo_t siminfo = {};
+    siminfo_t siminfo = {};
 
-    const auto buffer = (hf::siminfo_t *)dWebotsReceive(&size);
+    const auto buffer = (siminfo_t *)dWebotsReceive(&size);
 
-    if (size == sizeof(hf::siminfo_t)) {
+    if (size == sizeof(siminfo_t)) {
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 
@@ -67,13 +144,13 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-     // Run controllers in middle loop, dynamics inside that
+    // Run controllers in middle loop, dynamics inside that
     const auto pose = run_sim_middle_loop(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
-    const hf::axis3_t euler = { pose.phi, pose.theta, -pose.psi };
-    hf::axis4_t quat = {};
-    hf::Utils::euler2quat(euler, quat);
+    const axis3_t euler = { pose.phi, pose.theta, -pose.psi };
+    axis4_t quat = {};
+    Num::euler2quat(euler, quat);
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
     dBodySetQuaternion(_robotBody, q);
 

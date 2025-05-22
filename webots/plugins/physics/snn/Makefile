@@ -17,17 +17,13 @@
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-CXX_SOURCES = snn.cpp  ../support.cpp
+INCLUDE = -I../../../simsrc -I../../../../src
 
-ROOT = $(HOME)/Desktop
-
-# Hackflight stuff -----------------------------------------------------------
-
-HFSRC_DIR = $(ROOT)/hackflight/src
-
-INCLUDE = -I$(HFSRC_DIR) 
+CXX_SOURCES = snn.cpp ../support.cpp
 
 # TeNNLab framework stuff ----------------------------------------------------
+
+ROOT = $(HOME)/Desktop
 
 FDIR = $(HOME)/Desktop/framework
 

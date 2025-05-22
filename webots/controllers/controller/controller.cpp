@@ -1,6 +1,6 @@
 /* 
    C++ flight simulator support for Hackflight with custom physics plugin
-   
+
    Copyright (C) 2024 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #include <string>
 
 // Hackflight
-#include <hackflight.hpp>
+#include <datatypes.h>
 
 // Webots
 #include <webots/emitter.h>
@@ -29,8 +29,6 @@
 #include <webots/keyboard.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-
-#include <webots/accelerometer.h>
 
 class Simulator {
 
@@ -42,28 +40,34 @@ class Simulator {
 
             wb_joystick_enable(_timestep);
 
+            _zdist = ZDIST_INIT_M;
         }
 
         bool step()
         {
-            if (!_step()) {
+            if (wb_robot_step(_timestep) == -1) {
                 return false;
             }
 
-            auto siminfo = getSimInfo();
+            siminfo_t siminfo = {};
 
-            return dispatchSimInfo(siminfo);
-        }
+            switch (getJoystickStatus()) {
 
-        bool stepKeyboard()
-        {
-            if (!_step()) {
-                return false;
+                case JOYSTICK_RECOGNIZED:
+                    getSimInfoFromJoystick(siminfo);
+                    sendSimInfo(siminfo);
+                    break;
+
+                case JOYSTICK_UNRECOGNIZED:
+                    reportJoystick();
+                    break;
+
+                default:
+                    getSimInfoFromKeyboard(siminfo);
+                    sendSimInfo(siminfo);
             }
 
-            auto siminfo = getSimInfoFromKeyboard();
-
-            return dispatchSimInfo(siminfo);
+            return true;
         }
 
         void close()
@@ -73,9 +77,10 @@ class Simulator {
 
     private:
 
-        static constexpr float THROTTLE_SCALE = 0.5; // m/s
-
-        static constexpr float YAW_SCALE = 160; // deg/s
+        static constexpr float ZDIST_INIT_M = 0.4;
+        static constexpr float ZDIST_MAX_M = 1.0;
+        static constexpr float ZDIST_MIN_M = 0.2;
+        static constexpr float ZDIST_INC_MPS = 0.2;
 
         typedef enum {
 
@@ -92,44 +97,20 @@ class Simulator {
             int8_t pitch;
             int8_t yaw;
 
-            bool springy;                
-
         } joystick_t;
 
         WbDeviceTag _emitter;
 
         double _timestep;
 
+        float _zdist;
+
         std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
-            // Springy throttle
-            { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                joystick_t {-2,  3, -4, 1, true } },
-            { "SHANWAN Android Gamepad",             // PS3
-                joystick_t {-2,  3, -4, 1, true } },
-            { "Logitech Gamepad F310",
-                joystick_t {-2,  4, -5, 1, true } },
-            { "Microsoft Xbox Series S|X Controller",
-                joystick_t {-2,  4, -5, 1, true } },
+            {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
 
-            // Classic throttle
-            { "Logitech Logitech Extreme 3D",
-                joystick_t {-4,  1, -2, 3, false}  },
-            { "OpenTX FrSky Taranis Joystick",  // USB cable
-                joystick_t { 1,  2,  3, 4, false } },
-            { "FrSky FrSky Simulator",          // radio dongle
-                joystick_t { 1,  2,  3, 4, false } },
-            { "Horizon Hobby SPEKTRUM RECEIVER",
-                joystick_t { 2,  -3,  4, -1, false } }
+            {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
         };
-
-        static void printKeyboardInstructions()
-        {
-            puts("- Use spacebar to take off\n");
-            puts("- Use W and S to go up and down\n");
-            puts("- Use arrow keys to move horizontally\n");
-            puts("- Use Q and E to change heading\n");
-        }
 
         static float normalizeJoystickAxis(const int32_t rawval)
         {
@@ -164,26 +145,21 @@ class Simulator {
             animateMotor("motor4", -1);
         }
 
-        bool _step()
-        {
-            return wb_robot_step(_timestep) != -1;
-        }
-
-        bool dispatchSimInfo(hf::siminfo_t & siminfo)
-        {
-            siminfo.framerate = 1000 / _timestep;
-
-            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
-
-            return true;
-        }
-
         joystick_t getJoystickInfo() 
         {
             return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
         }
 
-        joystickStatus_e haveJoystick(void)
+        void sendSimInfo(siminfo_t & siminfo)
+        {
+            siminfo.demands.thrust = _zdist;
+
+            siminfo.framerate = 1000 / _timestep;
+
+            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+        }
+
+        joystickStatus_e getJoystickStatus(void)
         {
             auto status = JOYSTICK_RECOGNIZED;
 
@@ -196,7 +172,10 @@ class Simulator {
 
                 if (!_didWarn) {
                     puts("Using keyboard instead:\n");
-                    printKeyboardInstructions();
+                    puts("- Use spacebar to take off\n");
+                    puts("- Use W and S to go up and down\n");
+                    puts("- Use arrow keys to move horizontally\n");
+                    puts("- Use Q and E to change heading\n");
                 }
 
                 _didWarn = true;
@@ -233,13 +212,56 @@ class Simulator {
             wb_motor_set_velocity(motor, direction * 60);
         }
 
-        static hf::siminfo_t getSimInfoFromKeyboard()
+        void getSimInfoFromJoystick(siminfo_t & siminfo)
         {
-            static bool _spacebar_was_hit;
+            static bool _hover_button_was_down;
+            static bool _hovering;
 
-            hf::siminfo_t siminfo = {};
+            static bool _arming_button_was_down;
+            static bool _armed;
 
-            siminfo.is_springy = true;
+            auto axes = getJoystickInfo();
+
+            const auto button = wb_joystick_get_pressed_button();
+
+            if (button == 3) {
+                _arming_button_was_down = true;
+            }
+            else {
+                if (_arming_button_was_down) {
+                    _armed = !_armed;
+                }
+                _arming_button_was_down = false;
+            }
+
+            if (button == 5) {
+                _hover_button_was_down = true;
+            }
+            else {
+                if (_hover_button_was_down) {
+                    _hovering = !_hovering;
+                }
+                _hover_button_was_down = false;
+            }
+
+            siminfo.hovering = _hovering;
+
+            siminfo.armed = _armed;
+
+            if (siminfo.hovering) {
+
+                siminfo.demands.pitch = readJoystickAxis(axes.pitch);
+                siminfo.demands.roll = readJoystickAxis(axes.roll);
+                siminfo.demands.yaw = readJoystickAxis(axes.yaw);
+
+                climb(readJoystickAxis(axes.throttle));
+            }
+        }
+
+        void getSimInfoFromKeyboard(siminfo_t & siminfo)
+        {
+            static bool _spacebar_was_down;
+            static bool _hovering;
 
             switch (wb_keyboard_get_key()) {
 
@@ -260,93 +282,48 @@ class Simulator {
                     break;
 
                 case 'Q':
-                    siminfo.demands.yaw = -YAW_SCALE;
+                    siminfo.demands.yaw = -0.5;
                     break;
 
                 case 'E':
-                    siminfo.demands.yaw = +YAW_SCALE;
+                    siminfo.demands.yaw = +0.5;
                     break;
 
                 case 'W':
-                    siminfo.demands.thrust = +THROTTLE_SCALE;
+                    climb(+1);
                     break;
 
                 case 'S':
-                    siminfo.demands.thrust = -THROTTLE_SCALE;
+                    climb(-1);
                     break;
 
                 case 32:
-                    _spacebar_was_hit = true;
+                    if (!_spacebar_was_down) {
+                        _hovering = !_hovering;
+                        _spacebar_was_down = true;
+                    }
                     break;
+
+                default:
+                    _spacebar_was_down = false;
             }
 
-            siminfo.requested_takeoff = _spacebar_was_hit;
-
-            return siminfo;
+            siminfo.hovering = _hovering;
         }
 
-        hf::siminfo_t getSimInfo()
+        void climb(const float rate)
         {
-            hf::siminfo_t siminfo = {};
+            const float time_curr = wb_robot_get_time();
 
-            auto joystickStatus = haveJoystick();
+            static float _time_prev;
 
-            if (joystickStatus == JOYSTICK_RECOGNIZED) {
+            float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
 
-                auto axes = getJoystickInfo();
+            _time_prev = time_curr;
 
-                siminfo.demands.thrust =
-                    normalizeJoystickAxis(readJoystickRaw(axes.throttle));
-
-                // Springy throttle stick; keep in interval [-1,+1]
-                if (axes.springy) {
-
-                    siminfo.is_springy = true;
-
-                    static bool button_was_hit;
-
-                    if (wb_joystick_get_pressed_button() == 5) {
-                        button_was_hit = true;
-                    }
-
-                    siminfo.requested_takeoff = button_was_hit;
-
-                    // Run throttle stick through deadband
-                    siminfo.demands.thrust =
-                        fabs(siminfo.demands.thrust) < 0.05 ? 0 : 
-                        siminfo.demands.thrust;
-                }
-
-                else {
-
-                    static float throttle_prev;
-                    static bool throttle_was_moved;
-
-                    // Handle bogus throttle values on startup
-                    if (throttle_prev != siminfo.demands.thrust) {
-                        throttle_was_moved = true;
-                    }
-
-                    siminfo.requested_takeoff = throttle_was_moved;
-
-                    throttle_prev = siminfo.demands.thrust;
-                }
-
-                siminfo.demands.roll = readJoystickAxis(axes.roll);
-                siminfo.demands.pitch = readJoystickAxis(axes.pitch); 
-                siminfo.demands.yaw = readJoystickAxis(axes.yaw) * YAW_SCALE;
-            }
-
-            else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
-                reportJoystick();
-            }
-
-            else { 
-
-                siminfo = getSimInfoFromKeyboard();
-            }
-
-            return siminfo;
+            _zdist = std::min(std::max(
+                        _zdist + rate * ZDIST_INC_MPS * dt,
+                        ZDIST_MIN_M), ZDIST_MAX_M);
         }
 };
 

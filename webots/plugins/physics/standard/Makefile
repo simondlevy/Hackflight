@@ -14,11 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
+SRC = ../../../../src
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I../../../../src
+INCLUDE = -I$(SRC)
 
-CXX_SOURCES = standard.cpp ../support.cpp
+CXX_SOURCES = ../support.cpp  $(SRC)/control/standard.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

@@ -22,126 +22,142 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
-namespace hf {
+class MspParser {
 
-    class MspParser {
+    public:
 
-        public:
+        /**
+         * Returns message ID or 0 for not  ready
+         */
+        uint8_t parse(const uint8_t byte)
+        {
+            uint8_t result = 0;
 
-            /**
-             * Returns message ID or 0 for not  ready
-             */
-            uint8_t parse(const uint8_t byte)
-            {
-                uint8_t result = 0;
+            switch (_state) {
 
-                switch (_state) {
-
-                    case 0:
-                        if (byte == 36) {  // $
-                            _state++;
-                        }
-                        break;
-
-                    case 1:
-                        if (byte == 77) { // M
-                            _state++;
-                        }
-                        else {  // restart and try again
-                            _state = 0;
-                        }
-                        break;
-
-                    case 2:
+                case 0:
+                    if (byte == 36) {  // $
                         _state++;
-                        break;
+                    }
+                    break;
 
-                    case 3:
-                        _message_length_expected = byte;
-                        _message_checksum = byte;
-                        _message_index = 0;
+                case 1:
+                    if (byte == 77) { // M
                         _state++;
-                        break;
-
-                    case 4:
-                        _message_id = byte;
-                        _message_length_received = 0;
-                        _message_checksum ^= byte;
-                        if (_message_length_expected > 0) {
-                            // process payload
-                            _state++;
-                        }
-                        else {
-                            // no payload
-                            _state += 2;
-                        }
-                        break;
-
-                    case 5:
-                        _message_buffer[_message_index++] = byte;
-                        _message_checksum ^= byte;
-                        _message_length_received++;
-                        if (_message_length_received >= _message_length_expected) {
-                            _state++;
-                        }
-                        break;
-
-                    case 6:
-                        if (_message_checksum == byte) {
-                            result = _message_id;
-                        }
-                        // Reset variables
-                        _message_length_received = 0;
+                    }
+                    else {  // restart and try again
                         _state = 0;
-                        break;
-                }
+                    }
+                    break;
 
-                return result;
+                case 2:
+                    _state++;
+                    break;
+
+                case 3:
+                    _message_length_expected = byte;
+                    _message_checksum = byte;
+                    _message_index = 0;
+                    _state++;
+                    break;
+
+                case 4:
+                    _message_id = byte;
+                    _message_length_received = 0;
+                    _message_checksum ^= byte;
+                    if (_message_length_expected > 0) {
+                        // process payload
+                        _state++;
+                    }
+                    else {
+                        // no payload
+                        _state += 2;
+                    }
+                    break;
+
+                case 5:
+                    _message_buffer[_message_index++] = byte;
+                    _message_checksum ^= byte;
+                    _message_length_received++;
+                    if (_message_length_received >= _message_length_expected) {
+                        _state++;
+                    }
+                    break;
+
+                case 6:
+
+                    if (_message_checksum == byte) {
+
+                        result = _message_id;
+                    }
+
+                    _state = 0;
+
+                    break;
             }
 
-            float getFloat(const uint8_t index)
-            {
-                const uint8_t offset = 4 * index;
-                uint32_t tmp = (uint32_t) (
-                        _message_buffer[offset+3] << 24 |
-                        _message_buffer[offset+2] << 16 |
-                        _message_buffer[offset+1] << 8 |
-                        _message_buffer[offset]);
-                float value = 0;
-                memcpy(&value, &tmp, 4);
-                return value;
+            return result;
+        }
+
+        float getFloat(const uint8_t index)
+        {
+            const uint8_t offset = 4 * index;
+            uint32_t tmp = (uint32_t) (
+                    _message_buffer[offset+3] << 24 |
+                    _message_buffer[offset+2] << 16 |
+                    _message_buffer[offset+1] << 8 |
+                    _message_buffer[offset]);
+            float value = 0;
+            memcpy(&value, &tmp, 4);
+            return value;
+        }
+
+        uint16_t getShort(const uint8_t index)
+        {
+            const uint8_t offset = 2 * index;
+            int16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+            return value;
+        }
+
+        uint16_t getUshort(const uint8_t index)
+        {
+            const uint8_t offset = 2 * index;
+            uint16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+            return value;
+        }
+
+        uint8_t getByte(const uint8_t index)
+        {
+            return _message_buffer[index];
+        }
+
+        uint8_t getPayload(uint8_t * payload)
+        {
+            payload[0] = 36;
+            payload[1] = 77;
+            payload[2] = 62;
+            payload[3] = _message_length_expected;
+            payload[4] = _message_id;
+
+            for (uint8_t k=0; k<_message_length_expected; ++k) {
+                payload[k+5] = _message_buffer[k];
             }
 
-            uint16_t getShort(const uint8_t index)
-            {
-                const uint8_t offset = 2 * index;
-                int16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
-                return value;
-            }
+            payload[5 + _message_length_expected] = _message_checksum;
 
-            uint16_t getUshort(const uint8_t index)
-            {
-                const uint8_t offset = 2 * index;
-                uint16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
-                return value;
-            }
+            return _message_length_expected + 6;
+        }
 
-            uint8_t getByte(const uint8_t index)
-            {
-                return _message_buffer[index];
-            }
+    private:
 
-        private:
+        uint8_t _state;
+        uint8_t _message_buffer[256];
+        uint8_t _message_length_expected;
+        uint8_t _message_length_received;
+        uint8_t _message_checksum;
+        uint8_t _message_index;
+        uint8_t _message_id;
 
-            uint8_t _state;
-            uint8_t _message_buffer[256];
-            uint8_t _message_length_expected;
-            uint8_t _message_length_received;
-            uint8_t _message_checksum;
-            uint8_t _message_index;
-            uint8_t _message_id;
-
-    };
-
-}
+};

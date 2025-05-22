@@ -3,11 +3,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-standard = np.loadtxt('standard.csv', skiprows=3)
-haskell = np.loadtxt('haskell.csv', skiprows=3)
+standard = np.loadtxt('standard.csv', skiprows=6 )
+snn = np.loadtxt('snn.csv', skiprows=6)
 plt.plot(standard)
-plt.plot(haskell)
-plt.legend(('standard', 'haskell'))
+plt.plot(snn)
+plt.legend(('standard', 'snn'))
 plt.show()
 
 
