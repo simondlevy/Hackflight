@@ -16,8 +16,6 @@
 
 #pragma once
 
-#define _main
-
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
