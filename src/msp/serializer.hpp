@@ -1,7 +1,7 @@
 /*
    Multiwii Serial Protocol serialization support for Hackflight
 
-   Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2025 Simon D. Levy
 
    This file is part of Hackflight.
 

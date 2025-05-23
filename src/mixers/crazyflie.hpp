@@ -7,7 +7,7 @@
  *                   / \
  *               3:ccw  2:cw
  *
- * Copyright (C) 2024 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

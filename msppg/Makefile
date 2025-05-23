@@ -6,5 +6,8 @@ install: messages.json msppg.py
 edit:
 	vim msppg.py
 
+clean:
+	rm -f msp.py messages.h MspParser.java
+
 flake:
 	flake8 msppg.py
