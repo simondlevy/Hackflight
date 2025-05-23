@@ -20,9 +20,11 @@ Next, follow these [directions](../webots) for installing Webots and flying a si
 Finally, from the hackflight main directory, do the following:
 
 ```
-cd webots/controllers/haskell
+cd webots/plugins/physics/haskell
 make
-make run
+cd ../../../controllers/controller
+make
+make runhaskell
 ```
 
 
