@@ -1,6 +1,4 @@
 /**
- * A superclass for FreeRTOS tasks
- *
  * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
