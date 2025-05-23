@@ -25,21 +25,19 @@
 
 #include <debug.h>
 
-class RpiLoggerTask : public FreeRTOSTask {
+class RpiLoggerTask {
 
     public:
 
         void begin(EstimatorTask * estimatorTask)
         {
-            if (didInit){
+            if (_task.didInit()){
                 return;
             }
 
             _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::begin(runRpiLoggerTask, "rpilogger", this, 3);
-
-            didInit = true;
+            _task.init(runRpiLoggerTask, "rpilogger", this, 3);
         }
 
     private:
@@ -50,6 +48,8 @@ class RpiLoggerTask : public FreeRTOSTask {
         {
             ((RpiLoggerTask *)obj)->run();
         }
+
+        FreeRtosTask _task;
 
         EstimatorTask * _estimatorTask;
 

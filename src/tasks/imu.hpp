@@ -27,7 +27,7 @@
 #include <m_pi.h>
 #include <datatypes.h>
 
-class ImuTask : public FreeRTOSTask {
+class ImuTask {
 
     public:
 
@@ -37,7 +37,7 @@ class ImuTask : public FreeRTOSTask {
                 const float calibRoll,
                 const float calibPitch)
         {
-            if (didInit) {
+            if (_task.didInit()) {
                 return;
             }
 
@@ -46,15 +46,16 @@ class ImuTask : public FreeRTOSTask {
             // Wait for sensors to startup
             vTaskDelay(M2T(STARTUP_TIME_MS));
 
-            gyroBiasRunning.isBufferFilled = false;
-            gyroBiasRunning.bufHead = gyroBiasRunning.buffer;
+            _gyroBiasRunning.isBufferFilled = false;
+            _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
             // Create a semaphore to protect data-ready interrupts from IMU
             interruptCallbackSemaphore = xSemaphoreCreateBinaryStatic(
                     &interruptCallbackSemaphoreBuffer);
 
             // Create a semaphore to protect waitDataReady() calls from core task
-            coreTaskSemaphore = xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
+            coreTaskSemaphore =
+                xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
             // Start our IMU (e.g. BMI088)
             deviceInit();
@@ -69,13 +70,11 @@ class ImuTask : public FreeRTOSTask {
             _cosRoll = cosf(calibRoll * (float) M_PI / 180);
             _sinRoll = sinf(calibRoll * (float) M_PI / 180);
 
-            accelQueue = makeImuQueue(accelQueueStorage, &accelQueueBuffer);
+            _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
 
-            gyroQueue = makeImuQueue(gyroQueueStorage, &gyroQueueBuffer);
+            _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
 
-            FreeRTOSTask::begin(runImuTask, "imu", this, 3);
-
-            didInit = true;
+            _task.init(runImuTask, "imu", this, 3);
         }
 
         // Called by platform-specific IMU interrupt
@@ -83,7 +82,8 @@ class ImuTask : public FreeRTOSTask {
         {
             portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
             interruptTimestamp = micros();
-            xSemaphoreGiveFromISR(interruptCallbackSemaphore, &xHigherPriorityTaskWoken);
+            xSemaphoreGiveFromISR(
+                    interruptCallbackSemaphore, &xHigherPriorityTaskWoken);
 
             if (xHigherPriorityTaskWoken) {
                 portYIELD();
@@ -95,7 +95,7 @@ class ImuTask : public FreeRTOSTask {
         {
             bool testStatus = true;
 
-            if (!didInit) {
+            if (!_task.didInit()) {
                 testStatus = false;
             }
 
@@ -172,9 +172,12 @@ class ImuTask : public FreeRTOSTask {
             meanOut->y = (float) sum[1] / NBR_OF_BIAS_SAMPLES;
             meanOut->z = (float) sum[2] / NBR_OF_BIAS_SAMPLES;
 
-            varOut->x = sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut->x * meanOut->x;
-            varOut->y = sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut->y * meanOut->y;
-            varOut->z = sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
+            varOut->x =
+                sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut->x * meanOut->x;
+            varOut->y =
+                sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut->y * meanOut->y;
+            varOut->z =
+                sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
         }
 
         static const uint8_t QUEUE_LENGTH = 1;
@@ -183,17 +186,19 @@ class ImuTask : public FreeRTOSTask {
 
         static const auto IMU_QUEUE_LENGTH = QUEUE_LENGTH * IMU_ITEM_SIZE;
 
-        uint8_t accelQueueStorage[IMU_QUEUE_LENGTH];
-        StaticQueue_t accelQueueBuffer;
-        xQueueHandle accelQueue;
+        uint8_t _accelQueueStorage[IMU_QUEUE_LENGTH];
+        StaticQueue_t _accelQueueBuffer;
+        xQueueHandle _accelQueue;
 
-        uint8_t gyroQueueStorage[IMU_QUEUE_LENGTH];
-        StaticQueue_t gyroQueueBuffer;
-        xQueueHandle gyroQueue;
+        uint8_t _gyroQueueStorage[IMU_QUEUE_LENGTH];
+        StaticQueue_t _gyroQueueBuffer;
+        xQueueHandle _gyroQueue;
 
-        bias_t gyroBiasRunning;
+        bias_t _gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
+
+        FreeRtosTask _task;
 
         /**
          * Checks if the variances is below the predefined thresholds.
@@ -205,22 +210,22 @@ class ImuTask : public FreeRTOSTask {
             static int32_t varianceSampleTime;
             bool foundBias = false;
 
-            if (gyroBiasRunning.isBufferFilled)
+            if (_gyroBiasRunning.isBufferFilled)
             {
-                calculateVarianceAndMean( &gyroBiasRunning,
-                        &gyroBiasRunning.variance, &gyroBiasRunning.mean);
+                calculateVarianceAndMean( &_gyroBiasRunning,
+                        &_gyroBiasRunning.variance, &_gyroBiasRunning.mean);
 
-                if (gyroBiasRunning.variance.x < rawGyroVarianceBase() &&
-                        gyroBiasRunning.variance.y < rawGyroVarianceBase() &&
-                        gyroBiasRunning.variance.z < rawGyroVarianceBase() &&
+                if (_gyroBiasRunning.variance.x < rawGyroVarianceBase() &&
+                   _gyroBiasRunning.variance.y < rawGyroVarianceBase() &&
+                   _gyroBiasRunning.variance.z < rawGyroVarianceBase() &&
                         (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                 {
                     varianceSampleTime = ticks;
-                    gyroBiasRunning.bias.x = gyroBiasRunning.mean.x;
-                    gyroBiasRunning.bias.y = gyroBiasRunning.mean.y;
-                    gyroBiasRunning.bias.z = gyroBiasRunning.mean.z;
+                    _gyroBiasRunning.bias.x = _gyroBiasRunning.mean.x;
+                    _gyroBiasRunning.bias.y = _gyroBiasRunning.mean.y;
+                    _gyroBiasRunning.bias.z = _gyroBiasRunning.mean.z;
                     foundBias = true;
-                    gyroBiasRunning.isBiasValueFound = true;
+                    _gyroBiasRunning.isBiasValueFound = true;
                 }
             }
 
@@ -330,27 +335,27 @@ class ImuTask : public FreeRTOSTask {
         bool processGyroBias(const uint32_t tickCount,
                 const Axis3i16 gyroRaw, Axis3f *gyroBiasOut)
         {
-            gyroBiasRunning.bufHead->x = gyroRaw.x;
-            gyroBiasRunning.bufHead->y = gyroRaw.y;
-            gyroBiasRunning.bufHead->z = gyroRaw.z;
-            gyroBiasRunning.bufHead++;
+            _gyroBiasRunning.bufHead->x = gyroRaw.x;
+            _gyroBiasRunning.bufHead->y = gyroRaw.y;
+            _gyroBiasRunning.bufHead->z = gyroRaw.z;
+            _gyroBiasRunning.bufHead++;
 
-            if (gyroBiasRunning.bufHead >= 
-                    &gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
+            if (_gyroBiasRunning.bufHead >= 
+                    &_gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
 
-                gyroBiasRunning.bufHead = gyroBiasRunning.buffer;
-                gyroBiasRunning.isBufferFilled = true;
+                _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
+                _gyroBiasRunning.isBufferFilled = true;
             }
 
-            if (!gyroBiasRunning.isBiasValueFound) {
+            if (!_gyroBiasRunning.isBiasValueFound) {
                 findBiasValue(tickCount);
             }
 
-            gyroBiasOut->x = gyroBiasRunning.bias.x;
-            gyroBiasOut->y = gyroBiasRunning.bias.y;
-            gyroBiasOut->z = gyroBiasRunning.bias.z;
+            gyroBiasOut->x = _gyroBiasRunning.bias.x;
+            gyroBiasOut->y = _gyroBiasRunning.bias.y;
+            gyroBiasOut->z = _gyroBiasRunning.bias.z;
 
-            return gyroBiasRunning.isBiasValueFound;
+            return _gyroBiasRunning.isBiasValueFound;
         }
 
         static void runImuTask(void *obj)
@@ -398,7 +403,8 @@ class ImuTask : public FreeRTOSTask {
                     // LPF gyro
                     applyLpf(_gyroLpf, &data.gyro);
 
-                    _estimatorTask->enqueueGyro(&data.gyro, xPortIsInsideInterrupt());
+                    _estimatorTask->enqueueGyro(
+                            &data.gyro, xPortIsInsideInterrupt());
 
                     Axis3f accScaled = {};
                     alignToAirframe(&accel, &accScaled);
@@ -407,11 +413,12 @@ class ImuTask : public FreeRTOSTask {
 
                     applyLpf(_accLpf, &data.acc);
 
-                    _estimatorTask->enqueueAccel(&data.acc, xPortIsInsideInterrupt());
+                    _estimatorTask->enqueueAccel(
+                            &data.acc, xPortIsInsideInterrupt());
                 }
 
-                xQueueOverwrite(accelQueue, &data.acc);
-                xQueueOverwrite(gyroQueue, &data.gyro);
+                xQueueOverwrite(_accelQueue, &data.acc);
+                xQueueOverwrite(_gyroQueue, &data.gyro);
 
                 xSemaphoreGive(coreTaskSemaphore);
             }

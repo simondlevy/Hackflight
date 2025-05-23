@@ -19,26 +19,25 @@
 #include <stdint.h>
 
 #include <safety.hpp>
+#include <task.hpp>
 
-class LedTask : public FreeRTOSTask {
+class LedTask {
 
     public:
 
         void begin(Safety * safety)
         {
-            if (didInit){
+            if (_task.didInit()){
                 return;
             }
 
-            FreeRTOSTask::begin(runBtCommsTask, "led", this, 2);
+            _task.init(runBtCommsTask, "led", this, 2);
 
             pinMode(PIN, OUTPUT);
 
             set(LOW);
 
             _safety = safety;
-
-            didInit = true;
         }
 
     private:
@@ -48,6 +47,8 @@ class LedTask : public FreeRTOSTask {
         static constexpr uint32_t PULSE_MSEC = 50;
 
         static const uint8_t PIN = 4; // Red LED 1
+
+        FreeRtosTask _task;
 
         Safety * _safety;
 

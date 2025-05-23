@@ -30,13 +30,13 @@
 
 #include <debug.h>
 
-class RpiSetpointTask : public FreeRTOSTask {
+class RpiSetpointTask {
 
     public:
 
         void begin(Safety * safety)
         {
-            if (didInit){
+            if (_task.didInit()){
                 return;
             }
 
@@ -58,9 +58,7 @@ class RpiSetpointTask : public FreeRTOSTask {
 
             xQueueSend(priorityQueue, &priorityDisable, 0);
 
-            FreeRTOSTask::begin(runRpiSetpointTask, "rpisetpoint", this, 3);
-
-            didInit = true;
+            _task.init(runRpiSetpointTask, "rpisetpoint", this, 3);
         }
 
         void getSetpoint(setpoint_t & setpoint)
@@ -97,6 +95,7 @@ class RpiSetpointTask : public FreeRTOSTask {
         StaticQueue_t priorityQueueBuffer;
         xQueueHandle priorityQueue;
 
+        FreeRtosTask _task;
 
         Safety * _safety;
 

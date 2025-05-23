@@ -222,9 +222,6 @@ void ImuTask::deviceInit(void)
         rslt |= bmi088_get_gyro_data(&gyr, &bmi088Dev);
     }
 
-    else {
-        didInit = false;
-    }
 
     rslt |= bmi088_accel_switch_control(&bmi088Dev, BMI088_ACCEL_POWER_ENABLE);
 
@@ -246,12 +243,6 @@ void ImuTask::deviceInit(void)
         struct bmi088_sensor_data acc;
         rslt |= bmi088_get_accel_data(&acc, &bmi088Dev);
     }
-
-    else {
-        didInit = false;
-    }
-
-    didInit = true;
 
     GPIO_InitTypeDef GPIO_InitStructure;
     EXTI_InitTypeDef EXTI_InitStructure;

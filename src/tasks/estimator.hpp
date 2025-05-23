@@ -23,7 +23,7 @@
 #include <safety.hpp>
 #include <task.hpp>
 
-class EstimatorTask : public FreeRTOSTask {
+class EstimatorTask {
 
     public:
 
@@ -31,8 +31,9 @@ class EstimatorTask : public FreeRTOSTask {
         {
             _safety = safety;
 
-            // Created in the 'empty' state, meaning the semaphore must first be given,
-            // that is it will block in the task until released by the stabilizer loop
+            // Created in the 'empty' state, meaning the semaphore must first
+            // be given, that is it will block in the task until released by
+            // the stabilizer loop
             _runTaskSemaphore = xSemaphoreCreateBinary();
 
             _dataMutex = xSemaphoreCreateMutexStatic(&_dataMutexBuffer);
@@ -43,9 +44,9 @@ class EstimatorTask : public FreeRTOSTask {
                     QUEUE_LENGTH, 
                     QUEUE_ITEM_SIZE,
                     measurementsQueueStorage,
-                    &measurementsQueueBuffer);
+                    &_measurementsQueueBuffer);
 
-            FreeRTOSTask::begin(runEstimatorTask, "estimator", this, 4);
+            _task.init(runEstimatorTask, "estimator", this, 4);
 
             _kalmanFilter.init(msec());
         }
@@ -57,8 +58,9 @@ class EstimatorTask : public FreeRTOSTask {
 
         void getVehicleState(vehicleState_t * state)
         {
-            // This function is called from the stabilizer loop. It is important that
-            // this call returns as quickly as possible. The dataMutex must only be
+            // This function is called from the stabilizer loop. It is
+            // important that this call returns as quickly as possible. The
+            // dataMutex must only be
             // locked short periods by the task.
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
 
@@ -144,10 +146,12 @@ class EstimatorTask : public FreeRTOSTask {
         static const size_t QUEUE_LENGTH = 20;
         static const auto QUEUE_ITEM_SIZE = sizeof(KalmanFilter::measurement_t);
         uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
-        StaticQueue_t measurementsQueueBuffer;
+        StaticQueue_t _measurementsQueueBuffer;
         xQueueHandle _measurementsQueue;
 
-        bool didResetEstimation;
+        FreeRtosTask _task;
+
+        bool _didResetEstimation;
 
         RateSupervisor _rateSupervisor;
 
@@ -156,7 +160,8 @@ class EstimatorTask : public FreeRTOSTask {
         SemaphoreHandle_t _dataMutex;
         StaticSemaphore_t _dataMutexBuffer;
 
-        // Semaphore to signal that we got data from the stabilizer loop to process
+        // Semaphore to signal that we got data from the stabilizer loop to
+        // process
         SemaphoreHandle_t _runTaskSemaphore;
 
         uint32_t _warningBlockTimeMs;
@@ -165,8 +170,9 @@ class EstimatorTask : public FreeRTOSTask {
 
         KalmanFilter _kalmanFilter;
 
-        // Data used to enable the task and stabilizer loop to run with minimal locking
-        // The estimator state produced by the task, copied to the stabilizer when needed.
+        // Data used to enable the task and stabilizer loop to run with minimal
+        // locking The estimator state produced by the task, copied to the
+        // stabilizer when needed.
         vehicleState_t _state;
 
         static uint32_t msec(void)
@@ -178,9 +184,9 @@ class EstimatorTask : public FreeRTOSTask {
         {
             xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
 
-            if (didResetEstimation) {
+            if (_didResetEstimation) {
                 _kalmanFilter.init(nowMs);
-                didResetEstimation = false;
+               _didResetEstimation = false;
             }
 
             // Run the system dynamics to predict the state forward.
@@ -215,7 +221,7 @@ class EstimatorTask : public FreeRTOSTask {
 
             if (!_kalmanFilter.isStateWithinBounds()) {
 
-                didResetEstimation = true;
+                _didResetEstimation = true;
 
                 if (nowMs > _warningBlockTimeMs) {
                     _warningBlockTimeMs = nowMs + WARNING_HOLD_BACK_TIME_MS;

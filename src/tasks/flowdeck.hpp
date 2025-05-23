@@ -26,13 +26,13 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-class FlowDeckTask : public FreeRTOSTask {
+class FlowDeckTask {
 
     public:
 
         void begin(EstimatorTask * estimatorTask)
         {
-            if (didInit) {
+            if (_task.didInit()) {
                 return;
             }
 
@@ -41,9 +41,7 @@ class FlowDeckTask : public FreeRTOSTask {
             const uint8_t get_flowdeck_cs_pin();
             if (_pmw3901.begin(get_flowdeck_cs_pin())) {
 
-                FreeRTOSTask::begin(runFlowdeckTask, "flow", this, 3);
-
-                didInit = true;
+                _task.init(runFlowdeckTask, "flow", this, 3);
             }
         }
 
@@ -61,6 +59,8 @@ class FlowDeckTask : public FreeRTOSTask {
         {
             ((FlowDeckTask *)obj)->run();
         }
+
+        FreeRtosTask _task;
 
         PMW3901 _pmw3901;
 

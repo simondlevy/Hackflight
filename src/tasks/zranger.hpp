@@ -22,13 +22,13 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-class ZRangerTask : public FreeRTOSTask {
+class ZRangerTask {
 
     public:
 
         void begin(EstimatorTask * estimatorTask)
         {
-            if (didInit){
+            if (_task.didInit()){
                 return;
             }
 
@@ -37,12 +37,10 @@ class ZRangerTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::begin(runZrangerTask, "zranger2", this, 2);
+            _task.init(runZrangerTask, "zranger2", this, 2);
 
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
-
-            didInit = true;
         }
 
     private:
@@ -59,6 +57,8 @@ class ZRangerTask : public FreeRTOSTask {
         {
             ((ZRangerTask *)obj)->run();
         }
+
+        FreeRtosTask _task;
 
         float _expCoeff;
 

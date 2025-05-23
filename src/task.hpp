@@ -23,7 +23,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-class FreeRTOSTask {
+class FreeRtosTask {
 
     private:
 
@@ -35,11 +35,11 @@ class FreeRTOSTask {
 
         StaticTask_t _taskTaskBuffer;
 
-    protected:
+        bool _didInit;
 
-        bool didInit;
+    public:
 
-        void begin(
+        void init(
                 const taskfun_t fun,
                 const char * name,
                 void * obj,
@@ -54,5 +54,12 @@ class FreeRTOSTask {
                     priority, 
                     _taskStackBuffer,
                     &_taskTaskBuffer);
+
+            _didInit = true;
+        }
+
+        bool didInit()
+        {
+            return _didInit;
         }
 };

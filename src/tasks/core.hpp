@@ -32,7 +32,7 @@
 #include <tasks/rpisetpoint.hpp>
 #include <vehicles/diyquad.hpp>
 
-class CoreTask : public FreeRTOSTask {
+class CoreTask {
 
     public:
 
@@ -44,7 +44,7 @@ class CoreTask : public FreeRTOSTask {
                 const uint8_t rotorCount,
                 const mixFun_t mixFun)
         {
-            if (didInit) {
+            if (_task.didInit()) {
                 return true;
             }
 
@@ -62,7 +62,7 @@ class CoreTask : public FreeRTOSTask {
 
             motorsInit();
 
-            FreeRTOSTask::begin(runCoreTask, "core", this, 5);
+            _task.init(runCoreTask, "core", this, 5);
 
             auto pass = true;
 
@@ -84,6 +84,8 @@ class CoreTask : public FreeRTOSTask {
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
 
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+
+        FreeRtosTask _task;
 
         uint8_t _rotorCount;
 
