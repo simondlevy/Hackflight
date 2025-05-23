@@ -17,7 +17,7 @@ hacking, I recommend [Betaflight](http://betaflight.com/)</b> (great for
 getting started when you're on a budget)
 <b>the [Ardupilot](http://copter.ardupilot.org) system</b> (for
 sophisticated mission planning with waypoint navigation and the like), or
-the [Crazyflie](https://www.bitcraze.io/products/old-products/crazyflie-2-1/)
+the <b>[Crazyflie](https://www.bitcraze.io/products/old-products/crazyflie-2-1/)</b>
 platform, for a safe, inexpensive introduction to quadcopters as a research
 platform.   In addition to big user communities and loads of great features,
 these platforms have safety mechanisms that Hackflight lacks, which will help
