@@ -1,14 +1,3 @@
-#obj-y += vl53l1x-arduino/VL53L1X.o
-
-obj-y += free_rtos/src/event_groups.o
-obj-y += free_rtos/src/list.o
-obj-y += free_rtos/src/port_system_dependent.o
-obj-y += free_rtos/src/heap_4.o
-obj-y += free_rtos/src/queue.o
-obj-y += free_rtos/src/tasks.o
-obj-y += free_rtos/src/timers.o
-obj-y += free_rtos/src/stream_buffer.o
-
 obj-y += STMicroelectronics/tools/CMSIS/5.9.0/CMSIS/DSP.orig/Source/BasicMathFunctions/arm_abs_f32.o
 obj-y += STMicroelectronics/tools/CMSIS/5.9.0/CMSIS/DSP.orig/Source/BasicMathFunctions/arm_abs_q15.o
 obj-y += STMicroelectronics/tools/CMSIS/5.9.0/CMSIS/DSP.orig/Source/BasicMathFunctions/arm_abs_q31.o

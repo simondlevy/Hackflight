@@ -55,8 +55,10 @@
 
 #if defined(ARDUINO)
 uint32_t micros();
+#define FREERTOS_MCU_CLOCK_HZ   600000000
 #define usecTimerInit()
 #else
+#define FREERTOS_MCU_CLOCK_HZ   168000000
 #include <hal/time.h>
 #endif
 
@@ -74,7 +76,6 @@ uint32_t micros();
 
 #define FREERTOS_HEAP_SIZE      30000
 #define FREERTOS_MIN_STACK_SIZE 150       
-#define FREERTOS_MCU_CLOCK_HZ   168000000
 
 /*-----------------------------------------------------------
  * Application specific definitions.

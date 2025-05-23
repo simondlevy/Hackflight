@@ -2,7 +2,6 @@ Additional Arduino libraries needed:
 
 * https://github.com/simondlevy/Arduino\_CMSIS-DSP
 * https://github.com/simondlevy/BoschSensors
-* https://github.com/simondlevy/free\_rtos
 * https://github.com/simondlevy/PMW3901
 * https://github.com/simondlevy/VL53L1
 

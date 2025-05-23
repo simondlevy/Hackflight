@@ -37,7 +37,7 @@ VL53L1 = $(ARDUINO_LIBS)/VL53L1/src
 
 INCLUDES += -I$(VL53L1)/st
 
-INCLUDES += -I$(srctree)/vendor/free_rtos/src
+INCLUDES += -I$(srctree)/src/free_rtos/
 
 INCLUDES += -I$(srctree)/src/stm32f4
 
@@ -105,7 +105,6 @@ unbrick:
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	ln -sf $(ARDUINO_LIBS)/free_rtos vendor
 	cp $(MINIFLIE)/src/control/standard.cpp $(MINIFLIE)/bolt/src/control_standard.cpp
 	cp $(MINIFLIE)/bolt/src/Kbuild.standard $(MINIFLIE)/bolt/src/Kbuild
 	cd $(MINIFLIE)/msppg; make install; cd ..
@@ -113,7 +112,6 @@ standard_config:
 haskell_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	ln -sf $(ARDUINO_LIBS)/free_rtos vendor
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c $(MINIFLIE)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(MINIFLIE)/bolt/src/
@@ -125,7 +123,6 @@ clean:
 	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ \
 		src/copilot* build/.firmware.cmd build/Makefile build/scripts build/vendor \
 		src/Kbuild build/src build/source $(PROG).bin *.elf  *.hex *.map *.dfu copilot* \
-	    vendor/free_rtos vendor/STMicroelectronics \
-		vendor/vl53l1x-arduino src/control.cpp
+	    vendor/STMicroelectronics  vendor/vl53l1x-arduino src/control.cpp
 	find . -name "*.o" -type f -delete
 	find . -name ".*.o*" -type f -delete

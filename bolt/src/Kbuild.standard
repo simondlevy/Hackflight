@@ -1,5 +1,6 @@
 obj-y += bosch/
 obj-y += hal/
+obj-y += free_rtos/
 obj-y += stm32f4/
 
 obj-y += main.o
