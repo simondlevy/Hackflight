@@ -6,21 +6,16 @@ PORT = /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
-BIN = build/$(SKETCH).ino.bin
+build:
+	arduino-cli compile  --libraries ../../.. --libraries $(HOME)/Documents/Arduino/libraries \
+		--fqbn $(FQBN) $(SKETCH).ino
 
-$(BIN): $(SKETCH).ino Makefile
-	arduino-cli compile --libraries $(LIBS) --libraries ../../.. \
-		--fqbn $(FQBN) --output-dir=./build $(SKETCH).ino
-
-flash: $(BIN)
-	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
-
-clean:
-	rm -rf build/
+flash:
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
 edit:
 	vim $(SKETCH).ino
 
 listen:
-	miniterm $(PORT) 115200
+	miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
 
