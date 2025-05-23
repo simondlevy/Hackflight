@@ -15,7 +15,7 @@ and
 users who just want to get your vehicle flying without getting into firmware
 hacking, I recommend [Betaflight](http://betaflight.com/)</b> (great for
 getting started when you're on a budget)
-<b>or the [Ardupilot](http://copter.ardupilot.org) system</b> (for
+<b>the [Ardupilot](http://copter.ardupilot.org) system</b> (for
 sophisticated mission planning with waypoint navigation and the like), or
 the [Crazyflie](https://www.bitcraze.io/products/old-products/crazyflie-2-1/)
 platform, for a safe, inexpensive introduction to quadcopters as a research
@@ -35,12 +35,8 @@ example, the maintenance of an error integral in a PID controller:
 <img src="media/dataflow.png" width=700>
 </p>
 
-By using header-only C++ classes whenever possible, avoiding C-style macros and 
+By using header-only C++ classes whenever possible and avoiding C-style macros and 
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
-and leveraging existing Arduino libraries for 
-[receivers](https://github.com/bolderflight/sbus),
-[ESCs](https://github.com/simondlevy/Teensy4OneShot125), and
-[IMUs](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050),
 Hackflight supports a [composable](https://www.progress.com/blogs/what-composability-why-should-you-care) 
 approach to taming the complexity of flight control. The Hackflight codebase is
 under 5,000 lines of code.
