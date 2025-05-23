@@ -18,9 +18,9 @@ on your computer.
 ```
 cd webots/plugins/physics/standard
 make
-cd ../../../controllers/standard
+cd ../../../controllers/controller
 make
-make run
+make runstandard
 ```
 
 If you have a game controller or R/C transmitter with adapter dongle, you can
@@ -32,9 +32,6 @@ are currently supported:
 * [Logitech Gamepad F310](https://www.amazon.com/gp/product/B003VAHYQY)
 * [Logitech Extreme 3D Pro](https://www.amazon.com/gp/product/B00009OY9U)
 * [Xbox Series S|X Controller](https://a.co/d/7QbSZaZ)
-* [FrSky XSR-SIM USB Dongle](https://www.amazon.com/gp/product/B07GD6ZLW7)
-* [Spektrum Ws2000 Wireless USB RC Flight Simulator Dongle](https://www.amazon.com/gp/product/B07ZK1R32H)
-* Nyko 83069 Playstation(R)3 Core Wired Controller
 
 ## Design principles
 
@@ -50,7 +47,7 @@ in which a faster update rate can slow down the simulation.  Fortunately, Webots
 in which you can replace Webots' built-in physics with a physics model
 of your own.   The Hackflight simulator exploits this feature of Webots,
 using a
-[dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/sim/dynamics.hpp)
+[dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/dynamics.hpp)
 based on the equestions
 presented in this [paper](https://infoscience.epfl.ch/record/97532/files/325.pdf).
 The webots update step represents a slow, outer loop, in which is embeded
