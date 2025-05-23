@@ -32,6 +32,7 @@ represent the need for functions that have state (instance variables); for
 example, the maintenance of an error integral in a PID controller:
 
 <img src="media/dataflow.png" width=700>
+
 By using header-only C++ classes whenever possible and avoiding C-style macros and 
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
 Hackflight supports a [composable](https://www.progress.com/blogs/what-composability-why-should-you-care) 
