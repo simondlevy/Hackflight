@@ -80,22 +80,23 @@ class ZRangerTask : public FreeRTOSTask {
                 float vl53l1_read();
                 float range = vl53l1_read();
 
-                // check if range is feasible and push into the estimator
-                // the sensor should not be able to measure >5 [m], and outliers typically
-                // occur as >8 [m] measurements
+                // check if range is feasible and push into the estimator the
+                // sensor should not be able to measure >5 [m], and outliers
+                // typically occur as >8 [m] measurements
                 if (range < OUTLIER_LIMIT_MM) {
 
                     float distance = range / 1000; // Scale from [mm] to [m]
 
-                    float stdDev =
-                        EXP_STD_A * (1 + expf(_expCoeff * (distance - EXP_POINT_A)));
+                    float stdDev = EXP_STD_A * (
+                            1 + expf(_expCoeff * (distance - EXP_POINT_A)));
 
                     tofMeasurement_t tofData;
                     tofData.timestamp = xTaskGetTickCount();
                     tofData.distance = distance;
                     tofData.stdDev = stdDev;
 
-                    _estimatorTask->enqueueRange(&tofData, xPortIsInsideInterrupt());
+                    _estimatorTask->enqueueRange(
+                            &tofData, xPortIsInsideInterrupt());
                 }
             }
         }

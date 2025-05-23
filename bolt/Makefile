@@ -2,7 +2,7 @@ PYTHON            ?= python3
 
 DFU_UTIL          ?= dfu-util
 
-MINIFLIE = $(HOME)/Desktop/miniflie
+MINIFLIE = $(HOME)/Desktop/hackflight
 
 HASKDIR = $(MINIFLIE)/haskell
 
