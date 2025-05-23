@@ -31,9 +31,7 @@ Boxes represent data, ovals represent functions, and feedback arrows
 represent the need for functions that have state (instance variables); for
 example, the maintenance of an error integral in a PID controller:
 
-<p align="center"> 
 <img src="media/dataflow.png" width=700>
-</p>
 
 By using header-only C++ classes whenever possible and avoiding C-style macros and 
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
