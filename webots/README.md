@@ -24,9 +24,9 @@ make runstandard
 ```
 
 If you have a game controller or R/C transmitter with adapter dongle, you can
-use that to fly;  otherwise, the simulator will advise you that no such device
-was found and instruct you on how to fly with the keyboard.  The following devices
-are currently supported:
+use that to fly (right shoulder button to takeoff and land);  otherwise, the
+simulator will advise you that no such device was found and instruct you on how
+to fly with the keyboard.  The following devices are currently supported:
 
 * [MGEAR Wired Controller for PS3](https://www.officedepot.com/a/products/7123231/Gear-Wired-Controller-For-PS3-Black/)
 * [Logitech Gamepad F310](https://www.amazon.com/gp/product/B003VAHYQY)
