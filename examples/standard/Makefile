@@ -14,6 +14,9 @@ $(BIN): $(SKETCH).ino Makefile
 flash: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
+clean:
+	rm -rf build/
+
 edit:
 	vim $(SKETCH).ino
 

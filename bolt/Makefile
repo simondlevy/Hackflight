@@ -106,7 +106,6 @@ standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
 	ln -sf $(ARDUINO_LIBS)/free_rtos vendor
-	cp $(MINIFLIE)/src/system.cpp $(MINIFLIE)/bolt/src/
 	cp $(MINIFLIE)/src/control/standard.cpp $(MINIFLIE)/bolt/src/control_standard.cpp
 	cp $(MINIFLIE)/bolt/src/Kbuild.standard $(MINIFLIE)/bolt/src/Kbuild
 	cd $(MINIFLIE)/msppg; make install; cd ..
@@ -118,13 +117,12 @@ haskell_config:
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c $(MINIFLIE)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(MINIFLIE)/bolt/src/
-	cp $(MINIFLIE)/src/system.cpp $(MINIFLIE)/bolt/src/
 	cp $(MINIFLIE)/src/control/haskell.cpp $(MINIFLIE)/bolt/src/control_haskell.cpp
 	cp $(MINIFLIE)/bolt/src/Kbuild.haskell $(MINIFLIE)/bolt/src/Kbuild
 	cd $(MINIFLIE)/msppg; make install; cd ..
 
 clean:
-	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ src/system.cpp \
+	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ \
 		src/copilot* build/.firmware.cmd build/Makefile build/scripts build/vendor \
 		src/Kbuild build/src build/source $(PROG).bin *.elf  *.hex *.map *.dfu copilot* \
 	    vendor/free_rtos vendor/STMicroelectronics \

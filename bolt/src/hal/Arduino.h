@@ -4,6 +4,8 @@
 
 // NB: Putting #pragma once here will cause errors
 
+#pragma once
+
 #include <hal/digital.h>
 #include <hal/SPI.h>
 
