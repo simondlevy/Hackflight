@@ -1,0 +1,22 @@
+SKETCH = standard
+
+FQBN = teensy:avr:teensy40
+
+PORT = /dev/ttyACM0
+
+LIBS = $(HOME)/Documents/Arduino/libraries
+
+BIN = build/$(SKETCH).ino.bin
+
+$(BIN): $(SKETCH).ino Makefile
+	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) --output-dir=./build $(SKETCH).ino
+
+flash: $(BIN)
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
+
+edit:
+	vim $(SKETCH).ino
+
+listen:
+	miniterm $(PORT) 115200
+
