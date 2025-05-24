@@ -21,9 +21,9 @@
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 
-#if 0
-
 #include <safety.hpp>
+
+#if 0
 
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>

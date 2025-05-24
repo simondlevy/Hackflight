@@ -217,4 +217,6 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #include "freertos_config_override.h"
 #endif
 
+#define M2T(X) ((unsigned int)(X))
+
 #endif /* FREERTOS_CONFIG_H */
