@@ -57,7 +57,7 @@
 #define FREERTOS_MCU_CLOCK_HZ   600000000
 #define usecTimerInit()
 #else
-uint32_t micros();
+//uint32_t micros();
 #define FREERTOS_MCU_CLOCK_HZ   168000000
 #include <hal/time.h>
 #endif
