@@ -2,9 +2,9 @@ PYTHON            ?= python3
 
 DFU_UTIL          ?= dfu-util
 
-MINIFLIE = $(HOME)/Desktop/hackflight
+HACKFLIGHT = $(HOME)/Desktop/hackflight
 
-HASKDIR = $(MINIFLIE)/haskell
+HASKDIR = $(HACKFLIGHT)/haskell
 
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
@@ -105,19 +105,19 @@ unbrick:
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	cp $(MINIFLIE)/src/control/standard.cpp $(MINIFLIE)/bolt/src/control_standard.cpp
-	cp $(MINIFLIE)/bolt/src/Kbuild.standard $(MINIFLIE)/bolt/src/Kbuild
-	cd $(MINIFLIE)/msppg; make install; cd ..
+	cp $(HACKFLIGHT)/src/control/standard.cpp $(HACKFLIGHT)/bolt/src/control_standard.cpp
+	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
+	cd $(HACKFLIGHT)/msppg; make install; cd ..
 
 haskell_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
-	mv copilot_core.c $(MINIFLIE)/bolt/src/copilot_core.cpp
-	mv copilot*.h $(MINIFLIE)/bolt/src/
-	cp $(MINIFLIE)/src/control/haskell.cpp $(MINIFLIE)/bolt/src/control_haskell.cpp
-	cp $(MINIFLIE)/bolt/src/Kbuild.haskell $(MINIFLIE)/bolt/src/Kbuild
-	cd $(MINIFLIE)/msppg; make install; cd ..
+	mv copilot_core.c $(HACKFLIGHT)/bolt/src/copilot_core.cpp
+	mv copilot*.h $(HACKFLIGHT)/bolt/src/
+	cp $(HACKFLIGHT)/src/control/haskell.cpp $(HACKFLIGHT)/bolt/src/control_haskell.cpp
+	cp $(HACKFLIGHT)/bolt/src/Kbuild.haskell $(HACKFLIGHT)/bolt/src/Kbuild
+	cd $(HACKFLIGHT)/msppg; make install; cd ..
 
 clean:
 	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ \
