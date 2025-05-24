@@ -8,5 +8,4 @@ obj-y += imu_bmi088.o
 obj-y += system.o
 obj-y += vapplication.o
 
-obj-y += control_haskell.o
 obj-y += copilot_core.o

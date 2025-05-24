@@ -14,6 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <math.h>
 #include <stdio.h>
 
@@ -29,7 +31,7 @@
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
 
-void runClosedLoopControl(
+static void runClosedLoopControl(
         const float dt,
         const bool hovering,
         const vehicleState_t & vehicleState,
