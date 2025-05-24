@@ -25,6 +25,8 @@
 
 #include <arduino_freertos.h>
 
+#include <system.hpp>
+
 static void task1(void*) {
     pinMode(arduino::LED_BUILTIN, arduino::OUTPUT);
     while (true) {
