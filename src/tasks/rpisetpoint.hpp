@@ -88,12 +88,12 @@ class RpiSetpointTask {
         static const auto SETPOINT_ITEM_SIZE = sizeof(setpoint_t);
         uint8_t setpointQueueStorage[QUEUE_LENGTH * SETPOINT_ITEM_SIZE];
         StaticQueue_t setpointQueueBuffer;
-        xQueueHandle setpointQueue;
+        QueueHandle_t setpointQueue;
 
         static const auto PRIORITY_ITEM_SIZE = sizeof(int);
         uint8_t priorityQueueStorage[QUEUE_LENGTH * PRIORITY_ITEM_SIZE];
         StaticQueue_t priorityQueueBuffer;
-        xQueueHandle priorityQueue;
+        QueueHandle_t priorityQueue;
 
         FreeRtosTask _task;
 

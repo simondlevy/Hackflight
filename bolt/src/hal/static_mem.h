@@ -71,7 +71,7 @@
  * using the previously defined variables.
  *
  * Example:
- * static xQueueHandle myQueue;
+ * static QueueHandle_t myQueue;
  * STATIC_MEM_QUEUE_ALLOC(myQueue, 5, sizeof(int));
  * // ...
  * void init() {
@@ -100,7 +100,7 @@
  * Note: the memory is allocated in CCM RAM. Read/write to the queue is done by copy
  * and the special properties of CCM RAM should not have any impact on the behaviour.
  *
- * @param NAME - the name of the queue handle (xQueueHandle). The name is also used as
+ * @param NAME - the name of the queue handle (QueueHandle_t). The name is also used as
  * base name for the other variables that are required.
  * @param LENGTH - the length of the queue (in items)
  * @param ITEM_SIZE - the size of the items in the queue

@@ -89,12 +89,12 @@ static const auto QUEUE_ITEM_SIZE = sizeof(USBPacket);
 
 uint8_t rxQueueStorage[5 * QUEUE_ITEM_SIZE];
 StaticQueue_t rxQueueBuffer;
-xQueueHandle rxQueue;
+QueueHandle_t rxQueue;
 
 
 uint8_t txQueueStorage[1 * QUEUE_ITEM_SIZE];
 StaticQueue_t txQueueBuffer;
-xQueueHandle txQueue;
+QueueHandle_t txQueue;
 
 #define BL_STATE_PTR                ((uint64_t *) SRAM2_BASE)  
 #define BL_STATE_KEY                (0x5a5) 

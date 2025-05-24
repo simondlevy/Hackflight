@@ -964,13 +964,6 @@
     #define configMIN( a, b )    ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif
 
-#if configENABLE_BACKWARD_COMPATIBILITY == 1
-    #define portTickType                  TickType_t
-    #define xQueueHandle                  QueueHandle_t
-    #define xSemaphoreHandle              SemaphoreHandle_t
-    #define portTICK_RATE_MS              portTICK_PERIOD_MS
-#endif /* configENABLE_BACKWARD_COMPATIBILITY */
-
 #if ( configUSE_ALTERNATIVE_API != 0 )
     #error The alternative API was deprecated some time ago, and was removed in FreeRTOS V9.0 0
 #endif

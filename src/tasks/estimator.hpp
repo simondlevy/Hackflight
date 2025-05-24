@@ -147,7 +147,7 @@ class EstimatorTask {
         static const auto QUEUE_ITEM_SIZE = sizeof(KalmanFilter::measurement_t);
         uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
         StaticQueue_t _measurementsQueueBuffer;
-        xQueueHandle _measurementsQueue;
+        QueueHandle_t _measurementsQueue;
 
         FreeRtosTask _task;
 

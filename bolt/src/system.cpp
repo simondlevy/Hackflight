@@ -53,7 +53,7 @@ static Safety safety;
 static bool selftestPassed;
 static bool didInit;
 
-static xSemaphoreHandle canStartMutex;
+static SemaphoreHandle_t canStartMutex;
 static StaticSemaphore_t canStartMutexBuffer;
 
 static void start()

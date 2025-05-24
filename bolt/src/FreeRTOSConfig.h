@@ -94,7 +94,7 @@
 #define configUSE_TICK_HOOK			0
 #define configCPU_CLOCK_HZ			( ( unsigned long ) FREERTOS_MCU_CLOCK_HZ )
 #define configTICK_RATE_HZ_RAW  1000
-#define configTICK_RATE_HZ			( ( portTickType ) configTICK_RATE_HZ_RAW )
+#define configTICK_RATE_HZ			( ( TickType_t ) configTICK_RATE_HZ_RAW )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) FREERTOS_MIN_STACK_SIZE )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( FREERTOS_HEAP_SIZE ) )
 #define configMAX_TASK_NAME_LEN		( 10 )
@@ -146,7 +146,7 @@ to exclude the API function. */
 #endif
 
 // Seconds to OS ticks
-#define S2T(X) ((portTickType)((X) * configTICK_RATE_HZ))
+#define S2T(X) ((TickType_t)((X) * configTICK_RATE_HZ))
 #define T2S(X) ((X) / (float)configTICK_RATE_HZ)
 
 

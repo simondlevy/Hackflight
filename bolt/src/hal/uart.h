@@ -30,7 +30,7 @@
 #include "../../../build/include/generated/autoconf.h"
 
 #define UART2_DATA_TIMEOUT_MS    1000
-#define UART2_DATA_TIMEOUT_TICKS (UART2_DATA_TIMEOUT_MS / portTICK_RATE_MS)
+#define UART2_DATA_TIMEOUT_TICKS (UART2_DATA_TIMEOUT_MS / portTICK_PERIOD_MS)
 
 #define UART2_TYPE             USART2
 #define UART2_PERIF            RCC_APB1Periph_USART2

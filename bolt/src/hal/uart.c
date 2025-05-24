@@ -42,9 +42,9 @@
 #include "nvic.h"
 #include "uart.h"
 
-static xSemaphoreHandle uartBusy;
+static SemaphoreHandle_t uartBusy;
 static StaticSemaphore_t uartBusyBuffer;
-static xSemaphoreHandle waitUntilSendDone;
+static SemaphoreHandle_t waitUntilSendDone;
 static StaticSemaphore_t waitUntilSendDoneBuffer;
 
 static bool didInit = false;

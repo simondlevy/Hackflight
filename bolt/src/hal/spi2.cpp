@@ -47,9 +47,9 @@
 static uint8_t spiTxBuffer[SPI_MAX_DMA_TRANSACTION_SIZE + 1];
 static uint8_t spiRxBuffer[SPI_MAX_DMA_TRANSACTION_SIZE + 1];
 
-static xSemaphoreHandle spiTxDMAComplete;
+static SemaphoreHandle_t spiTxDMAComplete;
 static StaticSemaphore_t spiTxDMACompleteBuffer;
-static xSemaphoreHandle spiRxDMAComplete;
+static SemaphoreHandle_t spiRxDMAComplete;
 static StaticSemaphore_t spiRxDMACompleteBuffer;
 
 void spi2_begin(void)

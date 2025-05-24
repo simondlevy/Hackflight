@@ -188,11 +188,11 @@ class ImuTask {
 
         uint8_t _accelQueueStorage[IMU_QUEUE_LENGTH];
         StaticQueue_t _accelQueueBuffer;
-        xQueueHandle _accelQueue;
+        QueueHandle_t _accelQueue;
 
         uint8_t _gyroQueueStorage[IMU_QUEUE_LENGTH];
         StaticQueue_t _gyroQueueBuffer;
-        xQueueHandle _gyroQueue;
+        QueueHandle_t _gyroQueue;
 
         bias_t _gyroBiasRunning;
 
@@ -249,14 +249,14 @@ class ImuTask {
         float _cosRoll;
         float _sinRoll;
 
-        static xQueueHandle makeImuQueue(
+        static QueueHandle_t makeImuQueue(
                 uint8_t storage[], StaticQueue_t * buffer)
         {
             return makeQueue(IMU_ITEM_SIZE, storage, buffer);
 
         }
 
-        static xQueueHandle makeQueue(
+        static QueueHandle_t makeQueue(
                 const uint8_t itemSize, uint8_t storage[], StaticQueue_t * buffer)
         {
             return xQueueCreateStatic(QUEUE_LENGTH, itemSize, storage, buffer);
@@ -297,10 +297,10 @@ class ImuTask {
         Axis3f gyroBias;
         volatile uint64_t interruptTimestamp;
 
-        xSemaphoreHandle interruptCallbackSemaphore;
+        SemaphoreHandle_t interruptCallbackSemaphore;
         StaticSemaphore_t interruptCallbackSemaphoreBuffer;
 
-        xSemaphoreHandle coreTaskSemaphore;
+        SemaphoreHandle_t coreTaskSemaphore;
         StaticSemaphore_t coreTaskSemaphoreBuffer;
 
         /**

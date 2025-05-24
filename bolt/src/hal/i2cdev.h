@@ -29,7 +29,7 @@ typedef struct _I2cMessage
     uint8_t          nbrOfRetries;      
     I2cDirection     direction;      
     I2cStatus        status;          
-    xQueueHandle     clientQueue;     
+    QueueHandle_t     clientQueue;     
     bool             isInternal16bit; 
     uint16_t         internalAddress; 
     uint8_t          *buffer;         
