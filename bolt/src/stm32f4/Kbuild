@@ -1,0 +1,28 @@
+obj-y += startup_stm32f40xx.o
+obj-y += system_stm32f4xx.o
+
+# STM32F4xx_StdPeriph_Driver
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_adc.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dbgmcu.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_exti.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_flash.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_i2c.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_iwdg.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_misc.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_spi.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_syscfg.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_tim.o
+obj-y += STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.o
+
+# STM32_USB_Device_Library
+obj-y += STM32_USB_Device_Library/Core/src/usbd_core.o
+obj-y += STM32_USB_Device_Library/Core/src/usbd_ioreq.o
+obj-y += STM32_USB_Device_Library/Core/src/usbd_req.o
+
+# STM32_USB_OTG_Driver
+obj-y += STM32_USB_OTG_Driver/src/usb_core.o
+obj-y += STM32_USB_OTG_Driver/src/usb_dcd_int.o
+obj-y += STM32_USB_OTG_Driver/src/usb_dcd.o

@@ -1,0 +1,12 @@
+obj-y += digital.o
+obj-y += exti.o
+obj-y += i2cdev.o
+obj-y += motors.o
+obj-y += nvic.o
+obj-y += SPI.o
+obj-y += spi2.o
+obj-y += time.o
+obj-y += uart.o
+obj-y += usb.o
+obj-y += usb_bsp.o
+obj-y += usbd_desc.o
