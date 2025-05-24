@@ -18,9 +18,10 @@
 #include <semphr.h>
 #include <task.h>
 
-#if 0
-
+#include <hackflight.h>
 #include <mixers/crazyflie.hpp>
+
+#if 0
 
 #include <safety.hpp>
 
