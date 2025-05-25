@@ -20,9 +20,8 @@
 
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
-
+#include "pins.h"
 #include <safety.hpp>
-
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
@@ -34,10 +33,6 @@
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
-
-static const uint8_t FLOWDECK_CS_PIN = 13;
-
-// ---------------------------------------------------------------------------
 
 static RpiSetpointTask rpiSetpointTask;
 static RpiLoggerTask rpiLoggerTask;
