@@ -77,7 +77,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(25));
 
-                float vl53l1_read();
+                float vl53l1_read(void);
                 float range = vl53l1_read();
 
                 // check if range is feasible and push into the estimator the
