@@ -99,11 +99,6 @@ int main()
     return 0;
 }
 
-const uint8_t get_flowdeck_cs_pin()
-{
-    return 11;
-}
-
 static bstdr_ret_t spi_burst_read(uint8_t dev_id, uint8_t reg_addr,
         uint8_t *reg_data, uint16_t len)
 {

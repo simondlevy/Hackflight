@@ -37,6 +37,8 @@
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
+static const uint8_t FLOWDECK_CS_PIN = 11;
+
 // ---------------------------------------------------------------------------
 
 static RpiSetpointTask rpiSetpointTask;
@@ -76,7 +78,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask);
+    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN);
 
     estimatorTask.begin(&safety);
 
