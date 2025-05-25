@@ -66,4 +66,6 @@ FLASHMEM __attribute__((noinline)) void setup() {
     vTaskStartScheduler();
 }
 
-void loop() {}
+void loop()
+{
+}

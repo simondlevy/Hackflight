@@ -3,10 +3,6 @@
 
 #include <stm32fxxx.h>
 
-#include <FreeRTOS.h>
-
-#include <debug.h>
-
 #include <hal/digital.h>
 #include <hal/exti.h>
 #include <hal/i2cdev.h>
@@ -277,7 +273,8 @@ extern "C" {
     VL53L1_Error VL53L1_WriteMulti(VL53L1_Dev_t *pdev, uint16_t index, 
             uint8_t * pdata, uint32_t count)
     {
-        return i2cdevWriteReg16((I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
+        return i2cdevWriteReg16(
+                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
             VL53L1_ERROR_NONE : 
             VL53L1_ERROR_CONTROL_INTERFACE;
     }
@@ -285,7 +282,8 @@ extern "C" {
     VL53L1_Error VL53L1_ReadMulti(VL53L1_Dev_t *pdev, uint16_t index, 
             uint8_t * pdata, uint32_t   count)
     {
-        return i2cdevReadReg16((I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
+        return i2cdevReadReg16(
+                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
             VL53L1_ERROR_NONE : 
             VL53L1_ERROR_CONTROL_INTERFACE;
     }
