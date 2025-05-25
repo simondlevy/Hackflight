@@ -32,10 +32,10 @@
 #include <tasks/rpilogger.hpp>
 #include <tasks/zranger.hpp>
 
-#if 0
-
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
+
+static const uint8_t FLOWDECK_CS_PIN = 13;
 
 // ---------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ static Safety safety;
 static bool selftestPassed;
 static bool didInit;
 
-static xSemaphoreHandle canStartMutex;
+static SemaphoreHandle_t canStartMutex;
 static StaticSemaphore_t canStartMutexBuffer;
 
 static void start()
@@ -76,7 +76,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask);
+    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN);
 
     estimatorTask.begin(&safety);
 
@@ -172,4 +172,3 @@ void systemInit()
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
 }
-#endif
