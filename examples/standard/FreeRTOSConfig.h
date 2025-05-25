@@ -71,7 +71,7 @@ extern "C" {
 #define configUSE_NEWLIB_REENTRANT                  1
 #define configENABLE_BACKWARD_COMPATIBILITY         0
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS     4
-#define configUSE_APPLICATION_TASK_TAG              0
+#define configUSE_APPLICATION_TASK_TAG              1
 
 /* Tasks.c additions (e.g. Thread Aware Debug capability) */
 #define configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H   1
@@ -218,5 +218,9 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #endif
 
 #define M2T(X) ((unsigned int)(X))
+#define T2M(X) ((unsigned int)(X))
+#define F2T(X) ((unsigned int)((configTICK_RATE_HZ/(X))))
+
+uint32_t micros();
 
 #endif /* FREERTOS_CONFIG_H */

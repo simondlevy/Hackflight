@@ -16,8 +16,14 @@
 
 #pragma once
 
+// System
 #include <math.h>
 
+// FreeRTOS
+#include <FreeRTOS.h>
+#include <task.h>
+
+// Hackflight
 #include <clock.hpp>
 #include <control.hpp>
 #include <kalman.hpp>

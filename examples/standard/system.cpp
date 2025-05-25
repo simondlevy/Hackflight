@@ -23,9 +23,8 @@
 
 #include <safety.hpp>
 
-#if 0
-
 #include <tasks/core.hpp>
+#if 0
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
