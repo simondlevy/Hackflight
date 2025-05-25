@@ -27,6 +27,8 @@
 
 #include <st/vl53l1_api.h>
 
+static const uint8_t FLOWDECK_CS_PIN = 11;
+
 static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
 
 static VL53L1 _vl53l1;
@@ -90,8 +92,8 @@ float vl53l1_read()
 
 int main() 
 {
-    void systemInit();
-    systemInit();
+    void systemInit(const uint8_t flowdeck_cs_pin);
+    systemInit(FLOWDECK_CS_PIN);
 
     while(true) {
     }

@@ -18,9 +18,8 @@
 #include <semphr.h>
 #include <task.h>
 
-#include <debug.h>
+#include <hackflight.h>
 #include <mixers/crazyflie.hpp>
-#include "pins.h"
 #include <safety.hpp>
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
@@ -51,6 +50,8 @@ static bool didInit;
 static SemaphoreHandle_t canStartMutex;
 static StaticSemaphore_t canStartMutexBuffer;
 
+static uint8_t _flowdeck_cs_pin;
+
 static void start()
 {
     xSemaphoreGive(canStartMutex);
@@ -71,7 +72,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN);
+    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
 
     estimatorTask.begin(&safety);
 
@@ -149,8 +150,9 @@ void systemWaitStart(void)
     xSemaphoreGive(canStartMutex);
 }
 
-void systemInit()
+void systemInit(const uint8_t flowdeck_cs_pin)
 {
+    _flowdeck_cs_pin = flowdeck_cs_pin;
 
     void init_platform_specific();
     init_platform_specific();
