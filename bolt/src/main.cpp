@@ -19,6 +19,8 @@
 #include <bosch/bmi088.h>
 #include <bosch/bstdr_types.h>
 
+#include <system.h>
+
 #include <tasks/imu.hpp>
 
 #include <vl53l1.hpp>
@@ -92,7 +94,6 @@ float vl53l1_read()
 
 int main() 
 {
-    void systemInit(const uint8_t flowdeck_cs_pin);
     systemInit(FLOWDECK_CS_PIN);
 
     while(true) {

@@ -21,6 +21,7 @@
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
+#include <system.h>
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
