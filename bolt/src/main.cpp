@@ -66,23 +66,6 @@ void assertFail(char *exp, char *file, int line)
     NVIC_SystemReset();
 }
 
-void init_platform_specific()
-{
-    nvicInit();
-
-    extiInit();
-
-    usecTimerInit();
-
-    i2cdevInit();
-
-    usbInit();
-
-    uartInit(115200); // RaspberryPi comms
-
-    SPI.begin();
-}
-
 void vl53l1_init()
 {
     static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
@@ -107,6 +90,13 @@ float vl53l1_read()
 
 int main() 
 {
+    nvicInit();
+    extiInit();
+    usecTimerInit();
+    i2cdevInit();
+    usbInit();
+    uartInit(115200); // RaspberryPi comms
+    SPI.begin();
     systemInit(FLOWDECK_CS_PIN);
 
     while(true) {

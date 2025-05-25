@@ -155,8 +155,6 @@ void systemInit(const uint8_t flowdeck_cs_pin)
 {
     _flowdeck_cs_pin = flowdeck_cs_pin;
 
-    init_platform_specific();
-
     // Launch the system task that will initialize and start everything
     xTaskCreate(
             systemTask, 

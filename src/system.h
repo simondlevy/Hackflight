@@ -15,5 +15,3 @@
  */
 
 void systemInit(const uint8_t flowdeck_cs_pin);
-    
-void init_platform_specific();
