@@ -56,8 +56,6 @@ INCLUDES += -I$(srctree)/src
 
 INCLUDES += -I$(KBUILD_OUTPUT)/include/generated
 
-# Here we tell Kbuild where to look for Kbuild files which will tell the
-# buildsystem which sources to build
 objs-y += src
 objs-y += $(VENDOR)
 objs-y += $(VL53L1)
@@ -107,7 +105,6 @@ standard_config:
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
 	cp $(HACKFLIGHT)/src/control/standard.hpp $(HACKFLIGHT)/src/control.hpp
 	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
-	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
 	cd $(HACKFLIGHT)/msppg; make install; cd ..
 
 haskell_config:
@@ -116,7 +113,6 @@ haskell_config:
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c $(HACKFLIGHT)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(HACKFLIGHT)/bolt/src/
-	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
 	cp $(HACKFLIGHT)/src/control/haskell.hpp $(HACKFLIGHT)/src/control.hpp
 	cp $(HACKFLIGHT)/bolt/src/Kbuild.haskell $(HACKFLIGHT)/bolt/src/Kbuild
 	cd $(HACKFLIGHT)/msppg; make install; cd ..
@@ -125,6 +121,5 @@ clean:
 	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ \
 		src/copilot* build/.firmware.cmd build/Makefile build/scripts build/vendor \
 		src/Kbuild build/src build/source $(PROG).bin *.elf  *.hex *.map *.dfu copilot* \
-		src/system.cpp vendor/STMicroelectronics  vendor/vl53l1x-arduino src/control.hpp
 	find . -name "*.o" -type f -delete
 	find . -name ".*.o*" -type f -delete
