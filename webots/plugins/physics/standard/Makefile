@@ -20,7 +20,16 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(SRC)
 
-CXX_SOURCES = ../support.cpp  $(SRC)/control/standard.cpp
+CXX_SOURCES = ../support.cpp
+
+FILES_TO_REMOVE += control.hpp
+
+all: libstandard.so
+
+../support.cpp: ./control.hpp
+
+./control.hpp:
+	cp $(SRC)/control/standard.hpp ./control.hpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

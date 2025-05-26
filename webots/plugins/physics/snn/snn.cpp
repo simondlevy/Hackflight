@@ -113,7 +113,7 @@ void runClosedLoopControl(
     demands.thrust = inHoverMode ?
 
         runSnn(climbRateSnn, climbrate, vehicleState.dz,
-                CLIMBRATE_SCALE, CLIMBRATE_OFFSET) :
+                CLIMBRATE_SCALE, CLIMBRATE_OFFSET, true) :
 
             ClimbRateController::run(
                     inHoverMode,

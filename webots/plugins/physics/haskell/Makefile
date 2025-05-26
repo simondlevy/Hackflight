@@ -23,13 +23,14 @@ INCLUDE = -I$(SRC)
 
 HASKDIR = ../../../../haskell
 
-CXX_SOURCES = ../support.cpp $(SRC)/control/haskell.cpp copilot_core.cpp 
+CXX_SOURCES = ../support.cpp copilot_core.cpp 
 
-FILES_TO_REMOVE += copilot*
+FILES_TO_REMOVE += copilot* control.hpp
 
 all: libhaskell.so
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
+	cp $(SRC)/control/haskell.hpp ./control.hpp
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c copilot_core.cpp
 
