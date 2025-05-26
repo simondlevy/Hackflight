@@ -56,6 +56,8 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
+    Serial1.begin(115200);
+
     pinMode(GYRO_INTERRUPT_PIN, arduino::INPUT);
     attachInterrupt(GYRO_INTERRUPT_PIN, gyro_interrupt_handler,
             arduino::RISING);  
@@ -77,18 +79,23 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
 
 bool uartReadByte(uint8_t * byte)
 {
-    (void)byte;
-    return false;
+    const bool avail = Serial1.available() > 0;
+
+    if (avail) {
+        *byte = Serial1.read();
+    }
+
+    return avail;
 }
 
 void uartWriteByte(const uint8_t byte)
 {
-    (void)byte;
+    Serial1.write(byte);
 }
  
 void ImuTask::deviceInit(void)
 {
     _imuTask = this;
+
+    (void)report_forever;
 }
-
-
