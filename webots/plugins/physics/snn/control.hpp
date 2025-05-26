@@ -43,7 +43,7 @@ static const char * NETWORK = "difference_risp_train";
 
 static SNN * climbRateSnn;
 
-//static auto vizSnn = &climbRateSnn;
+static auto vizSnn = &climbRateSnn;
 
 static SNN * makeSnn()
 {
@@ -79,7 +79,7 @@ static double runSnn(
     return action;
 }
 
-//static ServerSocket serverSocket;
+static ServerSocket serverSocket;
 
 void runClosedLoopControl(
         const float dt,
@@ -101,8 +101,8 @@ void runClosedLoopControl(
         }
 
         // Listen for and accept connections from vizualization client
-        //serverSocket.open(VIZ_PORT);
-        //serverSocket.acceptClient();
+        serverSocket.open(VIZ_PORT);
+        serverSocket.acceptClient();
     }
 
     const auto climbrate = AltitudeController::run(inHoverMode,
@@ -152,12 +152,11 @@ void runClosedLoopControl(
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    /*
     static uint32_t _vizcount;
     if (_vizcount++ % VIZ_SEND_PERIOD == 0) {
         // Send spikes to visualizer
         uint8_t counts[256] = {};
         const auto ncounts = (*vizSnn)->get_counts(counts);
         serverSocket.sendData(counts, ncounts);
-    }*/
+    }
 }
