@@ -1,2 +1,1 @@
-build/
-*.so
+control.hpp

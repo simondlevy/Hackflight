@@ -19,7 +19,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I../../../simsrc -I../../../../src
 
-CXX_SOURCES = snn.cpp ../support.cpp
+CXX_SOURCES = ../support.cpp
 
 # TeNNLab framework stuff ----------------------------------------------------
 
