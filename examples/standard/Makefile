@@ -6,8 +6,11 @@ PORT = /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
+SRC = ../../src/
+
 build:
-	cp FreeRTOSConfig.h ../../src
+	cp FreeRTOSConfig.h $(SRC)
+	cp $(SRC)/control/standard.hpp $(SRC)/control.hpp
 	arduino-cli compile  --libraries ../../.. --libraries $(HOME)/Documents/Arduino/libraries \
 		--fqbn $(FQBN) $(SKETCH).ino
 	rm ../../src/FreeRTOSConfig.h
