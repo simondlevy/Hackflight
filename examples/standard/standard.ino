@@ -58,9 +58,6 @@ FLASHMEM __attribute__((noinline)) void setup()
 
     Serial1.begin(115200);
 
-    pinMode(GYRO_INTERRUPT_PIN, arduino::INPUT);
-    attachInterrupt(GYRO_INTERRUPT_PIN, gyro_interrupt_handler,
-            arduino::RISING);  
 }
 
 void loop()
@@ -97,5 +94,27 @@ void ImuTask::deviceInit(void)
 {
     _imuTask = this;
 
-    (void)report_forever;
+    int status = _accel.begin();
+
+    if (status < 0) {
+        report_forever("Accel Initialization Error");
+    }
+
+    status = _accel.setOdr(Bmi088Accel::ODR_12_5HZ_BW_1HZ/*ODR_100HZ_BW_19HZ*/);
+    status = _accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
+
+    status = _gyro.begin();
+
+    if (status < 0) {
+        report_forever("Gyro Initialization Error");
+    }
+
+    status = _gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
+    status = _gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
+    status = _gyro.mapDrdyInt3(true);
+
+    pinMode(GYRO_INTERRUPT_PIN, arduino::INPUT);
+
+    attachInterrupt(GYRO_INTERRUPT_PIN, gyro_interrupt_handler,
+            arduino::RISING);  
 }
