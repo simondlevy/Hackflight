@@ -114,6 +114,8 @@ class ImuTask {
 
     private:
 
+        static constexpr float RAW_GYRO_VARIANCE_BASE = 100;
+
         static const uint32_t STARTUP_TIME_MS = 1000;
         static const uint32_t ACC_SCALE_SAMPLES = 200;
 
@@ -215,9 +217,9 @@ class ImuTask {
                 calculateVarianceAndMean( &_gyroBiasRunning,
                         &_gyroBiasRunning.variance, &_gyroBiasRunning.mean);
 
-                if (_gyroBiasRunning.variance.x < rawGyroVarianceBase() &&
-                   _gyroBiasRunning.variance.y < rawGyroVarianceBase() &&
-                   _gyroBiasRunning.variance.z < rawGyroVarianceBase() &&
+                if (_gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
+                   _gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
+                   _gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
                         (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                 {
                     varianceSampleTime = ticks;
@@ -424,11 +426,18 @@ class ImuTask {
             }
         }
 
+        static float gyroRaw2Dps(const int16_t raw)
+        {
+            return (float)raw * 2 * 2000 / 65536.f;
+        }
+
+        static float accelRaw2Gs(const int16_t raw)
+        {
+            return (float)raw * 2 * 24 / 65536.f;
+        }
+
         // Hardware-dependent
         void deviceInit(void); 
         void readGyroRaw(Axis3i16 * dataOut);
         void readAccelRaw(Axis3i16 * dataOut);
-        float gyroRaw2Dps(const int16_t raw);
-        float accelRaw2Gs(const int16_t raw);
-        const float rawGyroVarianceBase();
 };
