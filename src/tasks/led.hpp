@@ -66,7 +66,6 @@ class LedTask {
 
             TickType_t lastWakeTime = xTaskGetTickCount();
 
-
             while (true) {
 
                 if (_safety->isArmed()) { 

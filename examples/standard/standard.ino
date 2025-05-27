@@ -19,7 +19,13 @@
 
 static const uint8_t LED_PIN = 5;
 
-static void task1(void*) 
+static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
+
+static StackType_t  taskStackBuffer[STACKSIZE]; 
+
+static StaticTask_t taskTaskBuffer;
+
+static void led_task(void*) 
 {
     pinMode(LED_PIN, arduino::OUTPUT);
 
@@ -45,7 +51,14 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
-    xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
+    xTaskCreateStatic(
+            led_task,
+            "led_task",
+            STACKSIZE,
+            nullptr,
+            2,
+            taskStackBuffer,
+            &taskTaskBuffer);
 
     vTaskStartScheduler();
 }
