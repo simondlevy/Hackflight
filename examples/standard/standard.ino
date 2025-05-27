@@ -15,65 +15,54 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// External libraries
 #include <arduino_freertos.h>
-#include <BMI088.h>
 
-namespace arduino {
+static const uint8_t LED_PIN = 5;
 
-    // Hackflight
-    //#include <system.h>
-#include <tasks/led.hpp>
-#include <safety.hpp>
+static void task1(void*) 
+{
+    pinMode(LED_PIN, arduino::OUTPUT);
 
-    static const uint8_t LED_PIN = 5;
+    while (true) {
+        digitalWriteFast(LED_PIN, arduino::LOW);
+        vTaskDelay(pdMS_TO_TICKS(500));
 
-    static Safety _safety;
+        digitalWriteFast(LED_PIN, arduino::HIGH);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
 
-    static LedTask _ledTask;
+static void task2(void*) 
+{
+    Serial.begin(0);
+    while (true) {
+        Serial.println("TICK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
 
-    /*
-       static const uint8_t FLOWDECK_CS_PIN = 13;
+        Serial.println("TOCK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
+    }
+}
 
-       static const uint8_t GYRO_INTERRUPT_PIN = 4;
+FLASHMEM __attribute__((noinline)) void setup() {
+    Serial.begin(0);
+    delay(2'000);
 
-       static Bmi088Accel _accel(Wire, 0x19);
-       static Bmi088Gyro _gyro(Wire, 0x69);
-
-       static ImuTask * _imuTask;
-
-       static volatile bool got_gyro_interrupt;
-
-       static void gyro_interrupt_handler()
-       {
-       got_gyro_interrupt = true;
-       }
-
-       static void report_forever(const char * msg)
-       {
-       printf("%s\n", msg);
-       delay(500);
-       }
-     */
-
-    FLASHMEM __attribute__((noinline)) void setup()
-    {
-        Serial.begin(0);
-        delay(2'000);
-
-        if (CrashReport) {
-            Serial.print(CrashReport);
-            Serial.println();
-            Serial.flush();
-        }
-
-        _ledTask.begin(&_safety, LED_PIN);
-
-        vTaskStartScheduler();
+    if (CrashReport) {
+        Serial.print(CrashReport);
+        Serial.println();
+        Serial.flush();
     }
 
-    void loop()
-    {
-    }
+    xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
+    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
 
+    Serial.println("setup(): starting scheduler...");
+    Serial.flush();
+
+    vTaskStartScheduler();
+}
+
+void loop() 
+{
 }
