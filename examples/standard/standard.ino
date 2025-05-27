@@ -20,11 +20,7 @@
 
 static const uint8_t LED_PIN = 5;
 
-static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
-
-static StackType_t  taskStackBuffer[STACKSIZE]; 
-
-static StaticTask_t taskTaskBuffer;
+static FreeRtosTask _task;
 
 static void led_task(void*) 
 {
@@ -52,14 +48,7 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
-    xTaskCreateStatic(
-            led_task,
-            "led_task",
-            STACKSIZE,
-            nullptr,
-            2,
-            taskStackBuffer,
-            &taskTaskBuffer);
+    _task.init( led_task, "led_task", nullptr, 2);
 
     vTaskStartScheduler();
 }
