@@ -16,6 +16,7 @@
  */
 
 #include <arduino_freertos.h>
+#include <task.hpp>
 
 static const uint8_t LED_PIN = 5;
 
