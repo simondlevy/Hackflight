@@ -48,6 +48,8 @@ class LedTask {
 
         static constexpr uint32_t PULSE_MSEC = 50;
 
+        uint8_t _pin;
+
         FreeRtosTask _task;
 
         Safety * _safety;
@@ -80,7 +82,7 @@ class LedTask {
             }
         }
 
-        static void set(const bool on)
+        void set(const bool on)
         {
             digitalWrite(_pin, !on);  // LED is active-low
         }

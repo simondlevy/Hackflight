@@ -42,6 +42,7 @@
 
 #include <st/vl53l1_api.h>
 
+static const uint8_t LED_PIN = 4;
 static const uint8_t FLOWDECK_CS_PIN = 11;
 
 static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
@@ -97,7 +98,7 @@ int main()
     usbInit();
     uartInit(115200); // RaspberryPi comms
     SPI.begin();
-    systemInit(FLOWDECK_CS_PIN);
+    systemInit(LED_PIN, FLOWDECK_CS_PIN);
 
     while(true) {
     }
