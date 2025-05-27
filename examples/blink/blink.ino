@@ -25,13 +25,15 @@
 
 #include <arduino_freertos.h>
 
+static const uint8_t LED_PIN = 5;
+
 static void task1(void*) {
-    pinMode(arduino::LED_BUILTIN, arduino::OUTPUT);
+    pinMode(LED_PIN, arduino::OUTPUT);
     while (true) {
-        digitalWriteFast(arduino::LED_BUILTIN, arduino::LOW);
+        digitalWriteFast(LED_PIN, arduino::LOW);
         vTaskDelay(pdMS_TO_TICKS(500));
 
-        digitalWriteFast(arduino::LED_BUILTIN, arduino::HIGH);
+        digitalWriteFast(LED_PIN, arduino::HIGH);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
