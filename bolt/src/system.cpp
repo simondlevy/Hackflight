@@ -51,6 +51,7 @@ static bool didInit;
 static SemaphoreHandle_t canStartMutex;
 static StaticSemaphore_t canStartMutexBuffer;
 
+static uint8_t _led_pin;
 static uint8_t _flowdeck_cs_pin;
 
 static void start()
@@ -81,7 +82,7 @@ static void systemTask(void *arg)
 
     rpiLoggerTask.begin(&estimatorTask);
 
-    ledTask.begin(&safety);
+    ledTask.begin(&safety, _led_pin);
 
     imuTask.begin(
             &estimatorTask, 
@@ -151,8 +152,10 @@ void systemWaitStart(void)
     xSemaphoreGive(canStartMutex);
 }
 
-void systemInit(const uint8_t flowdeck_cs_pin)
+void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
 {
+    _led_pin led_pin;
+
     _flowdeck_cs_pin = flowdeck_cs_pin;
 
     // Launch the system task that will initialize and start everything

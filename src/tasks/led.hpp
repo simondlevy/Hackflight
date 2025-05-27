@@ -25,15 +25,17 @@ class LedTask {
 
     public:
 
-        void begin(Safety * safety)
+        void begin(Safety * safety, const uint8_t pin)
         {
             if (_task.didInit()){
                 return;
             }
 
+            _pin = pin;
+
             _task.init(runBtCommsTask, "led", this, 2);
 
-            pinMode(PIN, OUTPUT);
+            pinMode(_pin, OUTPUT);
 
             set(LOW);
 
@@ -45,8 +47,6 @@ class LedTask {
         static constexpr float HEARTBEAT_HZ = 1;
 
         static constexpr uint32_t PULSE_MSEC = 50;
-
-        static const uint8_t PIN = 4; // Red LED 1
 
         FreeRtosTask _task;
 
@@ -82,6 +82,6 @@ class LedTask {
 
         static void set(const bool on)
         {
-            digitalWrite(PIN, !on);  // LED is active-low
+            digitalWrite(_pin, !on);  // LED is active-low
         }
 };
