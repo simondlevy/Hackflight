@@ -24,27 +24,18 @@ static void task1(void*)
     pinMode(LED_PIN, arduino::OUTPUT);
 
     while (true) {
+        Serial.println("TICK");
         digitalWriteFast(LED_PIN, arduino::LOW);
         vTaskDelay(pdMS_TO_TICKS(500));
 
+        Serial.println("TOCK");
         digitalWriteFast(LED_PIN, arduino::HIGH);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
-static void task2(void*) 
+FLASHMEM __attribute__((noinline)) void setup() 
 {
-    Serial.begin(0);
-    while (true) {
-        Serial.println("TICK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
-
-        Serial.println("TOCK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
-    }
-}
-
-FLASHMEM __attribute__((noinline)) void setup() {
     Serial.begin(0);
     delay(2'000);
 
@@ -55,10 +46,6 @@ FLASHMEM __attribute__((noinline)) void setup() {
     }
 
     xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
-    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
-
-    Serial.println("setup(): starting scheduler...");
-    Serial.flush();
 
     vTaskStartScheduler();
 }
