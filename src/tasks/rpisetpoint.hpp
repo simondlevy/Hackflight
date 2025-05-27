@@ -25,6 +25,7 @@
 #include <msp/messages.h>
 #include <msp/parser.hpp>
 #include <safety.hpp>
+#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
@@ -101,7 +102,6 @@ class RpiSetpointTask {
 
         void run(void)
         {
-            void systemWaitStart(void);
             systemWaitStart();
 
             MspParser parser = {};

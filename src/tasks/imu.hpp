@@ -21,11 +21,12 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-#include <time.h>
-#include <lpf.hpp>
-#include <num.hpp>
-#include <m_pi.h>
 #include <datatypes.h>
+#include <lpf.hpp>
+#include <m_pi.h>
+#include <num.hpp>
+#include <system.h>
+#include <time.h>
 
 class ImuTask {
 
@@ -367,7 +368,6 @@ class ImuTask {
 
         void run(void)
         {
-            void systemWaitStart(void);
             systemWaitStart();
 
             while (true) {

@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include <safety.hpp>
+#include <system.h>
 #include <task.hpp>
 
 class LedTask {
@@ -61,7 +62,6 @@ class LedTask {
 
         void run(void)
         {
-            void systemWaitStart(void);
             systemWaitStart();
 
             TickType_t lastWakeTime = xTaskGetTickCount();

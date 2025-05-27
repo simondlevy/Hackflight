@@ -18,12 +18,12 @@
 
 #include <stdint.h>
 
+#include <debug.h>
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
+#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
-
-#include <debug.h>
 
 class RpiLoggerTask {
 
@@ -55,7 +55,6 @@ class RpiLoggerTask {
 
         void run(void)
         {
-            void systemWaitStart(void);
             systemWaitStart();
 
             TickType_t lastWakeTime = xTaskGetTickCount();

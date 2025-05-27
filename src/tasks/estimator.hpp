@@ -21,6 +21,7 @@
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
+#include <system.h>
 #include <task.hpp>
 
 class EstimatorTask {
@@ -243,7 +244,6 @@ class EstimatorTask {
 
         void run(void)
         {
-            extern void systemWaitStart();
             systemWaitStart();
 
             auto nextPredictionMs = msec();

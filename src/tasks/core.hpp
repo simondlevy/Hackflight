@@ -32,6 +32,7 @@
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
+#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
@@ -170,7 +171,6 @@ class CoreTask {
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
             //Wait for the system to be fully started to start core loop
-            extern void systemWaitStart();
             systemWaitStart();
 
             debug("CORE: Wait for sensor calibration...");

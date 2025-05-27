@@ -15,3 +15,5 @@
  */
 
 void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin);
+            
+void systemWaitStart(void);

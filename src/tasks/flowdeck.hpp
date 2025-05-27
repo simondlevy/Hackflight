@@ -22,7 +22,7 @@
 #include <pmw3901.hpp>
 
 #include <datatypes.h>
-
+#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
@@ -67,7 +67,6 @@ class FlowDeckTask {
 
         void run(void)
         {
-            void systemWaitStart(void);
             systemWaitStart();
 
             auto lastTime  = micros();

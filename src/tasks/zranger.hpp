@@ -19,6 +19,7 @@
 #include <stdint.h>
 
 #include <linalg.h>
+#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
@@ -68,7 +69,6 @@ class ZRangerTask {
         {
             TickType_t lastWakeTime;
 
-            void systemWaitStart(void);
             systemWaitStart();
 
             lastWakeTime = xTaskGetTickCount();
