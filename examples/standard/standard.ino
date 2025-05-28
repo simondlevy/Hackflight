@@ -20,16 +20,9 @@
 
 #include <task.hpp>
 
-static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; 
-
 static const uint8_t LED_PIN = 5;
 
 static FreeRtosTask _ledTask;
-
-/*
-static StackType_t  _taskStackBuffer1[STACKSIZE]; 
-static StaticTask_t _taskTaskBuffer1;
-*/
 
 static void task1(void*) {
     pinMode(LED_PIN, arduino::OUTPUT);
@@ -42,21 +35,6 @@ static void task1(void*) {
     }
 }
 
-/*
-static StackType_t  _taskStackBuffer2[STACKSIZE]; 
-static StaticTask_t _taskTaskBuffer2;
-static void task2(void*) {
-    Serial.begin(0);
-    while (true) {
-        Serial.println("TICK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
-
-        Serial.println("TOCK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
-    }
-}
-*/
-
 FLASHMEM __attribute__((noinline)) void setup() 
 {
     Serial.begin(0);
@@ -68,26 +46,6 @@ FLASHMEM __attribute__((noinline)) void setup()
     }
 
     _ledTask.init(task1, "task1", nullptr, 2);
-
-    /*
-    xTaskCreateStatic(
-        task1, 
-        "task1", 
-        STACKSIZE, 
-        nullptr, 
-        2, 
-        _taskStackBuffer1,
-        &_taskTaskBuffer1);
-
-    xTaskCreateStatic(
-        task2, 
-        "task2", 
-        STACKSIZE, 
-        nullptr, 
-        2, 
-        _taskStackBuffer2,
-        &_taskTaskBuffer2);
-        */
 
     vTaskStartScheduler();
 }
