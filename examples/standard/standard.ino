@@ -31,20 +31,6 @@ static Safety _safety;
 
 static arduino::LedTask _ledTask;
 
-/*
-static FreeRtosTask _ledTask;
-
-static void task1(void*) {
-    pinMode(LED_PIN, arduino::OUTPUT);
-    while (true) {
-        digitalWriteFast(LED_PIN, arduino::LOW);
-        vTaskDelay(pdMS_TO_TICKS(500));
-
-        digitalWriteFast(LED_PIN, arduino::HIGH);
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
-}*/
-
 FLASHMEM __attribute__((noinline)) void setup() 
 {
     Serial.begin(0);
