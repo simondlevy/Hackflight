@@ -22,7 +22,7 @@
 #include <task.hpp>
 
 namespace arduino {
-#include "led2.hpp"
+#include "tasks/led2.hpp"
 }
 
 static const uint8_t LED_PIN = 5;

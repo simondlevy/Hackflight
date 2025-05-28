@@ -26,7 +26,7 @@
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/led.hpp>
+#include "tasks/led2.hpp"
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
 #include <tasks/zranger.hpp>
