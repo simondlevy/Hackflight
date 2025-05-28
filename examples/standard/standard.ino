@@ -1,44 +1,60 @@
-/**
+/*
+ * This file is part of the FreeRTOS port to Teensy boards.
+ * Copyright (c) 2020-2024 Timo Sandmann
  *
- * Copyright (C) 2025 Simon D. Levy
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <arduino_freertos.h>
-#include <task.hpp>
+/**
+ * @file    main.cpp
+ * @brief   FreeRTOS example for Teensy boards
+ * @author  Timo Sandmann
+ * @date    17.05.2020
+ */
 
-static const uint8_t LED_PIN = 5;
+#include "arduino_freertos.h"
+#include "avr/pgmspace.h"
 
-static FreeRtosTask _task;
+static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; 
 
-static void led_task(void*) 
-{
-    pinMode(LED_PIN, arduino::OUTPUT);
-
+static StackType_t  _taskStackBuffer1[STACKSIZE]; 
+static StaticTask_t _taskTaskBuffer1;
+static void task1(void*) {
+    pinMode(arduino::LED_BUILTIN, arduino::OUTPUT);
     while (true) {
-        Serial.println("TICK");
-        digitalWriteFast(LED_PIN, arduino::LOW);
+        digitalWriteFast(arduino::LED_BUILTIN, arduino::LOW);
         vTaskDelay(pdMS_TO_TICKS(500));
 
-        Serial.println("TOCK");
-        digitalWriteFast(LED_PIN, arduino::HIGH);
+        digitalWriteFast(arduino::LED_BUILTIN, arduino::HIGH);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
-FLASHMEM __attribute__((noinline)) void setup() 
-{
+static StackType_t  _taskStackBuffer2[STACKSIZE]; 
+static StaticTask_t _taskTaskBuffer2;
+static void task2(void*) {
+    Serial.begin(0);
+    while (true) {
+        Serial.println("TICK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
+
+        Serial.println("TOCK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
+    }
+}
+
+FLASHMEM __attribute__((noinline)) void setup() {
     Serial.begin(0);
     delay(2'000);
 
@@ -48,11 +64,28 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
-    _task.init( led_task, "led_task", nullptr, 2);
+    xTaskCreateStatic(
+        task1, 
+        "task1", 
+        STACKSIZE, 
+        nullptr, 
+        2, 
+        _taskStackBuffer1,
+        &_taskTaskBuffer1);
+
+    xTaskCreateStatic(
+        task2, 
+        "task2", 
+        STACKSIZE, 
+        nullptr, 
+        2, 
+        _taskStackBuffer2,
+        &_taskTaskBuffer2);
+
+    Serial.println("setup(): starting scheduler...");
+    Serial.flush();
 
     vTaskStartScheduler();
 }
 
-void loop() 
-{
-}
+void loop() {}
