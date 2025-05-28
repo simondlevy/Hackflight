@@ -45,7 +45,7 @@ static LedTask ledTask;
 
 static Safety safety;
 
-//static bool selftestPassed;
+static bool selftestPassed;
 static bool didInit;
 
 static SemaphoreHandle_t canStartMutex;
@@ -54,11 +54,10 @@ static StaticSemaphore_t canStartMutexBuffer;
 static uint8_t _led_pin;
 static uint8_t _flowdeck_cs_pin;
 
-/*
 static void start()
 {
     xSemaphoreGive(canStartMutex);
-}*/
+}
 
 static void systemTask(void *arg)
 {
@@ -66,7 +65,7 @@ static void systemTask(void *arg)
         return;
     }
 
-    //bool pass = true;
+    bool pass = true;
 
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
@@ -86,6 +85,7 @@ static void systemTask(void *arg)
     */
 
     ledTask.begin(&safety, _led_pin);
+
     /*
 
     imuTask.begin(
@@ -105,15 +105,16 @@ static void systemTask(void *arg)
         pass = false;
         error("SYSTEM: core task [FAIL]");
     }
+	*/
 
     if (pass) {
-        selftestPassed = 1;
+        selftestPassed = true;
         start();
     }
 
     else {
 
-        selftestPassed = 0;
+        selftestPassed = false;
 
         if (didInit) {
 
@@ -130,7 +131,7 @@ static void systemTask(void *arg)
                 }
             }
         }
-    }*/
+    }
 
     // Should never reach this point!
     while (true) {
@@ -151,10 +152,8 @@ void systemWaitStart(void)
         delay(2);
     }
 
-	/*
-    xSemaphoreTake(canStartMutex, portMAX_DELAY);
-    xSemaphoreGive(canStartMutex);
-	*/
+    //xSemaphoreTake(canStartMutex, portMAX_DELAY);
+    //xSemaphoreGive(canStartMutex);
 }
 
 void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
