@@ -18,12 +18,19 @@
 #include "arduino_freertos.h"
 #include "avr/pgmspace.h"
 
+#include <task.hpp>
+
 static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; 
 
 static const uint8_t LED_PIN = 5;
 
+static FreeRtosTask _ledTask;
+
+/*
 static StackType_t  _taskStackBuffer1[STACKSIZE]; 
 static StaticTask_t _taskTaskBuffer1;
+*/
+
 static void task1(void*) {
     pinMode(LED_PIN, arduino::OUTPUT);
     while (true) {
@@ -35,6 +42,7 @@ static void task1(void*) {
     }
 }
 
+/*
 static StackType_t  _taskStackBuffer2[STACKSIZE]; 
 static StaticTask_t _taskTaskBuffer2;
 static void task2(void*) {
@@ -47,6 +55,7 @@ static void task2(void*) {
         vTaskDelay(pdMS_TO_TICKS(1'000));
     }
 }
+*/
 
 FLASHMEM __attribute__((noinline)) void setup() 
 {
@@ -58,6 +67,9 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
+    _ledTask.init(task1, "task1", nullptr, 2);
+
+    /*
     xTaskCreateStatic(
         task1, 
         "task1", 
@@ -75,9 +87,7 @@ FLASHMEM __attribute__((noinline)) void setup()
         2, 
         _taskStackBuffer2,
         &_taskTaskBuffer2);
-
-    Serial.println("setup(): starting scheduler...");
-    Serial.flush();
+        */
 
     vTaskStartScheduler();
 }
