@@ -14,7 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
@@ -31,8 +30,6 @@
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
 #include <tasks/zranger.hpp>
-
-#if 0
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
@@ -173,5 +170,3 @@ void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
 }
-
-#endif
