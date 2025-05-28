@@ -19,8 +19,6 @@
 #include <semphr.h>
 #include <task.h>
 
-#if 0
-
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
@@ -33,6 +31,8 @@
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
 #include <tasks/zranger.hpp>
+
+#if 0
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
