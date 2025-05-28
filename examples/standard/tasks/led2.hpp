@@ -67,7 +67,7 @@ class LedTask {
 
         void run(void)
         {
-            //systemWaitStart();
+            systemWaitStart();
 
             TickType_t lastWakeTime = xTaskGetTickCount();
 

@@ -151,8 +151,10 @@ void systemWaitStart(void)
         delay(2);
     }
 
+	/*
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
     xSemaphoreGive(canStartMutex);
+	*/
 }
 
 void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
