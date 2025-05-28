@@ -15,6 +15,10 @@ build:
 		--fqbn $(FQBN) $(SKETCH).ino
 	rm ../../src/FreeRTOSConfig.h
 
+config:
+	cp $(SRC)/control/standard.hpp $(SRC)/control.hpp
+	cd ../../msppg; make install; cd ..
+
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
