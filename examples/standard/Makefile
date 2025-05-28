@@ -2,7 +2,8 @@ SKETCH = standard
 
 FQBN = teensy:avr:teensy40
 
-PORT = /dev/ttyACM0
+#PORT = /dev/ttyACM0
+PORT = COM3
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
@@ -21,6 +22,6 @@ flash:
 edit:
 	vim $(SKETCH).ino
 
-listen:
-	miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
+#listen:
+#	miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
 
