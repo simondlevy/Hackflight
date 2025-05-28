@@ -18,18 +18,14 @@
 #include "arduino_freertos.h"
 #include "avr/pgmspace.h"
 
-#include <safety.hpp>
-#include <task.hpp>
-
-namespace arduino {
-#include "tasks/led2.hpp"
-}
+#include <system.h>
 
 static const uint8_t LED_PIN = 5;
+static const uint8_t FLOWDECK_CS_PIN = 10;
 
-static Safety _safety;
+//static Safety _safety;
 
-static arduino::LedTask _ledTask;
+//static arduino::LedTask _ledTask;
 
 FLASHMEM __attribute__((noinline)) void setup() 
 {
@@ -41,9 +37,7 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
-    _ledTask.begin(&_safety, LED_PIN);
-
-    vTaskStartScheduler();
+    systemInit(LED_PIN, FLOWDECK_CS_PIN);
 }
 
 void loop() {}

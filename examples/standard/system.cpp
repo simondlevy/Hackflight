@@ -34,18 +34,18 @@
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
-static RpiSetpointTask rpiSetpointTask;
-static RpiLoggerTask rpiLoggerTask;
-static CoreTask coreTask;
-static EstimatorTask estimatorTask;
-static FlowDeckTask flowDeckTask;
-static ImuTask imuTask;
+//static RpiSetpointTask rpiSetpointTask;
+//static RpiLoggerTask rpiLoggerTask;
+//static CoreTask coreTask;
+//static EstimatorTask estimatorTask;
+//static FlowDeckTask flowDeckTask;
+//static ImuTask imuTask;
 static LedTask ledTask;
-static ZRangerTask zrangerTask;
+//static ZRangerTask zrangerTask;
 
 static Safety safety;
 
-static bool selftestPassed;
+//static bool selftestPassed;
 static bool didInit;
 
 static SemaphoreHandle_t canStartMutex;
@@ -54,10 +54,11 @@ static StaticSemaphore_t canStartMutexBuffer;
 static uint8_t _led_pin;
 static uint8_t _flowdeck_cs_pin;
 
+/*
 static void start()
 {
     xSemaphoreGive(canStartMutex);
-}
+}*/
 
 static void systemTask(void *arg)
 {
@@ -65,13 +66,14 @@ static void systemTask(void *arg)
         return;
     }
 
-    bool pass = true;
+    //bool pass = true;
 
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
     didInit = true;
     
+    /*
     zrangerTask.begin(&estimatorTask);
 
     flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
@@ -81,8 +83,10 @@ static void systemTask(void *arg)
     rpiSetpointTask.begin(&safety);
 
     rpiLoggerTask.begin(&estimatorTask);
+    */
 
     ledTask.begin(&safety, _led_pin);
+    /*
 
     imuTask.begin(
             &estimatorTask, 
@@ -102,7 +106,6 @@ static void systemTask(void *arg)
         error("SYSTEM: core task [FAIL]");
     }
 
-    //Start the firmware
     if (pass) {
         selftestPassed = 1;
         start();
@@ -127,7 +130,7 @@ static void systemTask(void *arg)
                 }
             }
         }
-    }
+    }*/
 
     // Should never reach this point!
     while (true) {
