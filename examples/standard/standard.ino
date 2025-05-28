@@ -41,7 +41,6 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
-    //_ledTask.init(task1, "task1", nullptr, 2);
     _ledTask.begin(&_safety, LED_PIN);
 
     vTaskStartScheduler();
