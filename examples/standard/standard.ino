@@ -18,10 +18,20 @@
 #include "arduino_freertos.h"
 #include "avr/pgmspace.h"
 
+#include <safety.hpp>
 #include <task.hpp>
+
+namespace arduino {
+#include "led2.hpp"
+}
 
 static const uint8_t LED_PIN = 5;
 
+static Safety _safety;
+
+static arduino::LedTask _ledTask;
+
+/*
 static FreeRtosTask _ledTask;
 
 static void task1(void*) {
@@ -33,7 +43,7 @@ static void task1(void*) {
         digitalWriteFast(LED_PIN, arduino::HIGH);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
-}
+}*/
 
 FLASHMEM __attribute__((noinline)) void setup() 
 {
@@ -45,7 +55,8 @@ FLASHMEM __attribute__((noinline)) void setup()
         Serial.flush();
     }
 
-    _ledTask.init(task1, "task1", nullptr, 2);
+    //_ledTask.init(task1, "task1", nullptr, 2);
+    _ledTask.begin(&_safety, LED_PIN);
 
     vTaskStartScheduler();
 }
