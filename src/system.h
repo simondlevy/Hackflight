@@ -16,6 +16,6 @@
 
 void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin);
 
-void systemReportForever(const char * msg);
+void systemReportForever(const char * fmt, ...);
             
 void systemWaitStart(void);

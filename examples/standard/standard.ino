@@ -38,11 +38,15 @@ static VL53L1X _rangefinder;
 
 static ImuTask * _imuTask;
 
+static volatile uint32_t _gyro_count;
+
 static void gyro_drdy()
 {
     if (_imuTask) {
         _imuTask->dataAvailableCallback();
     }
+
+    _gyro_count++;
 }
 
 FLASHMEM __attribute__((noinline)) void setup() 
@@ -97,6 +101,8 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
     dataOut->x = _accel.getAccelX_raw();
     dataOut->y = _accel.getAccelY_raw();
     dataOut->z = _accel.getAccelZ_raw();
+
+    systemReportForever("%lu\n", _gyro_count);
 }
 
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)

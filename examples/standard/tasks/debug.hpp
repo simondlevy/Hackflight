@@ -55,13 +55,9 @@ class DebugTask {
         {
             systemWaitStart();
 
-			uint32_t count = 0;
-
             while (true) {
 
-		        Serial.println(count++);
-
-			    //Serial.println(_msg);
+			    Serial.println(_msg);
 
                 vTaskDelay(M2T(1000/REPORT_FREQ));
             }

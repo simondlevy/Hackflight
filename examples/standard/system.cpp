@@ -14,6 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdarg.h>
+
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
@@ -178,6 +180,21 @@ void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
     vTaskStartScheduler();
 }
 
-void systemReportForever(const char * msg)
+void systemReportForever(const char * format, ...)
 {
+    va_list args = {};
+
+    char buffer[256] = {};
+
+	va_start(args, format);
+
+	const auto vsErr = vsprintf(buffer, format, args);
+
+	if (vsErr >= 0) { 
+		debugTask.reportForever(buffer);
+	}
+
+	va_end(args);
+
+
 }
