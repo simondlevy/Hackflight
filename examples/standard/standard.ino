@@ -79,6 +79,10 @@ void ImuTask::deviceInit(void)
     if (!accel.begin()) {
         reportForever("Unable to start accel");
     }
+
+    if (!gyro.begin()) {
+        reportForever("Unable to start accel");
+    }
 }
 
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)
