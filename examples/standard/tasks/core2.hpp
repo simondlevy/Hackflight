@@ -175,13 +175,14 @@ class CoreTask {
             static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
-            uint32_t setpoint_timestamp = 0;
-            bool lost_contact = false;
+            //uint32_t setpoint_timestamp = 0;
+            //bool lost_contact = false;
 
             for (uint32_t step=1; ; step++) {
 
-				(void)setpoint_timestamp;
-				(void)lost_contact;
+				//
+                // The IMU should unlock at 1kHz
+                _imuTask->waitDataReady();
 
 				debug("CORE: looping");
 
