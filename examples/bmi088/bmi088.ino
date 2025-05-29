@@ -37,18 +37,14 @@ void setup()
     gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
 
-
     pinMode(4,INPUT);
     attachInterrupt(GYRO_INTERRUPT_PIN,gyro_drdy,RISING);  
 }
 
 void loop() 
 {
-    //printf("accel:%lu  gyro:%lu\n", accel_count, gyro_count);
+    //if (gyro_flag) {
 
-    if (/*accel_flag &&*/ gyro_flag) {
-
-        //accel_flag = false;
         gyro_flag = false;
 
         accel.readSensor();
@@ -68,5 +64,5 @@ void loop()
         Serial.print("\t");
         Serial.print(accel.getTemperature_C());
         Serial.print("\n");
-    }
+    //}
 }
