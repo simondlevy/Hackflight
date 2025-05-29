@@ -67,11 +67,9 @@ class CoreTask {
 
             _rotorCount = rotorCount;
 
-			return true;
-
             motorsInit();
 
-            _task.init(runCoreTask, "core", this, 5);
+            //_task.init(runCoreTask, "core", this, 5);
 
             auto pass = true;
 
