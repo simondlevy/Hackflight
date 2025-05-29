@@ -37,7 +37,7 @@ static const float IMU_CALIBRATION_ROLL = 0;
 //static RpiSetpointTask rpiSetpointTask;
 //static RpiLoggerTask rpiLoggerTask;
 //static CoreTask coreTask;
-//static EstimatorTask estimatorTask;
+static EstimatorTask estimatorTask;
 //static FlowDeckTask flowDeckTask;
 //static ImuTask imuTask;
 static LedTask ledTask;
@@ -72,17 +72,15 @@ static void systemTask(void *arg)
 
     didInit = true;
     
-    /*
-    zrangerTask.begin(&estimatorTask);
+    //zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
+    //flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
 
     estimatorTask.begin(&safety);
 
-    rpiSetpointTask.begin(&safety);
+    //rpiSetpointTask.begin(&safety);
 
-    rpiLoggerTask.begin(&estimatorTask);
-    */
+    //rpiLoggerTask.begin(&estimatorTask);
 
     ledTask.begin(&safety, _led_pin);
 

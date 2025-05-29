@@ -23,10 +23,6 @@
 static const uint8_t LED_PIN = 5;
 static const uint8_t FLOWDECK_CS_PIN = 10;
 
-//static Safety _safety;
-
-//static arduino::LedTask _ledTask;
-
 FLASHMEM __attribute__((noinline)) void setup() 
 {
     Serial.begin(0);
@@ -41,3 +37,8 @@ FLASHMEM __attribute__((noinline)) void setup()
 }
 
 void loop() {}
+
+void debug(const char * msg)
+{
+  printf("%s\n", msg);
+}
