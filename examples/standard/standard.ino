@@ -57,11 +57,6 @@ FLASHMEM __attribute__((noinline)) void setup()
 
 void loop() {}
 
-void debug(const char * msg)
-{
-  printf("%s\n", msg);
-}
-
 void ZRangerTask::hardware_init()
 { 
     if (!_vl53l1x.init()) {
@@ -75,7 +70,9 @@ void ZRangerTask::hardware_init()
 
 float ZRangerTask::hardware_read()
 {
-    return (float)_vl53l1x.read();
+    const auto d = _vl53l1x.read();
+    Serial.printf("%d\n", d);
+    return (float)d;
 }
 
 

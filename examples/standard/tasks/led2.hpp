@@ -35,9 +35,9 @@ class LedTask {
 
             _pin = pin;
 
-	    _inverted = inverted;
+   	        _inverted = inverted;
 
-            _task.init(runBtCommsTask, "led", this, 2);
+            _task.init(runLedCommsTask, "led", this, 2);
 
             pinMode(_pin, OUTPUT);
 
@@ -60,7 +60,7 @@ class LedTask {
 
         Safety * _safety;
 
-        static void runBtCommsTask(void * obj)
+        static void runLedCommsTask(void * obj)
         {
             ((LedTask *)obj)->run();
         }
