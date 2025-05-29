@@ -69,7 +69,7 @@ class CoreTask {
 
             motorsInit();
 
-            //_task.init(runCoreTask, "core", this, 5);
+            _task.init(runCoreTask, "core", this, 5);
 
             auto pass = true;
 
@@ -156,8 +156,16 @@ class CoreTask {
 
         static void runCoreTask(void* obj)
         {
-            ((CoreTask *)obj)->run();
+            ((CoreTask *)obj)->run2();
         }
+
+        void run2(void)
+		{
+            while (true) {
+
+                 vTaskDelay(1000);
+             }
+ 		}
 
         /* The core loop runs at 1kHz. It is the responsibility of the
          * different functions to run slower by skipping call (ie. returning
