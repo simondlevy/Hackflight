@@ -108,8 +108,6 @@ void ImuTask::readGyroRaw(Axis3i16 * dataOut)
     dataOut->x = _gyro.getGyroX_raw();
     dataOut->y = _gyro.getGyroY_raw();
     dataOut->z = _gyro.getGyroZ_raw();
-
-    Serial.println(dataOut->z);
 }
 
 // ZRangerTask ---------------------------------------------------------------
@@ -130,9 +128,41 @@ float ZRangerTask::hardware_read()
     return (float)_rangefinder.read();
 }
 
+// Motors ------------------------------------------------------------------
+
+int motorsGetRatio(uint32_t id)
+{
+  (void)id;
+  return 0;
+}
+
+void  motorsInit(void)
+{
+}
+
+bool  motorsTest(void)
+{
+  return true;
+}
+
+void  motorsSetRatios(const uint16_t ratios[])
+{
+  (void)ratios;
+}
+
+void  motorsStop()
+{
+}
+
+
 // Debugging  ---------------------------------------------------------------
 
 void debug(const char * msg)
 {
-    Serial.println(msg);
+    Serial.printf("DEBUG: %s\n", msg);
+}
+
+void error(const char * msg)
+{
+    Serial.printf("ERROR: %s\n", msg);
 }

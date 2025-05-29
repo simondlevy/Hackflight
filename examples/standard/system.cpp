@@ -24,13 +24,13 @@
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
 #include <system.h>
-//#include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
 
+#include "tasks/core2.hpp"
 #include "tasks/debug.hpp"
 #include "tasks/led2.hpp"
 #include "tasks/zranger2.hpp"
@@ -38,9 +38,9 @@
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
-//static RpiSetpointTask rpiSetpointTask;
+static RpiSetpointTask rpiSetpointTask;
 //static RpiLoggerTask rpiLoggerTask;
-//static CoreTask coreTask;
+static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 //static FlowDeckTask flowDeckTask;
@@ -96,8 +96,6 @@ static void systemTask(void *arg)
             IMU_CALIBRATION_ROLL,
             IMU_CALIBRATION_PITCH);
 
-    /*
-
     auto coreTaskReady = coreTask.begin(
             &safety,
             &estimatorTask,
@@ -110,7 +108,6 @@ static void systemTask(void *arg)
         pass = false;
         error("SYSTEM: core task [FAIL]");
     }
-	*/
 
     if (pass) {
         selftestPassed = true;
@@ -195,6 +192,4 @@ void systemReportForever(const char * format, ...)
 	}
 
 	va_end(args);
-
-
 }

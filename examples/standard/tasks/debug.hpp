@@ -57,7 +57,9 @@ class DebugTask {
 
             while (true) {
 
-			    Serial.println(_msg);
+				if (*_msg) {
+			    	Serial.println(_msg);
+				}
 
                 vTaskDelay(M2T(1000/REPORT_FREQ));
             }
