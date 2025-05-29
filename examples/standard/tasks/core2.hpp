@@ -51,8 +51,6 @@ class CoreTask {
                 const uint8_t rotorCount,
                 const mixFun_t mixFun)
         {
-			return true;
-
             if (_task.didInit()) {
                 return true;
             }
@@ -68,6 +66,8 @@ class CoreTask {
             _mixFun = mixFun;
 
             _rotorCount = rotorCount;
+
+			return true;
 
             motorsInit();
 
