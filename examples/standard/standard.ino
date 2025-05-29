@@ -19,6 +19,7 @@
 #include "avr/pgmspace.h"
 
 #include <system.h>
+#include "tasks/zranger2.hpp"
 
 static const uint8_t LED_PIN = 5;
 static const uint8_t FLOWDECK_CS_PIN = 10;
@@ -42,3 +43,14 @@ void debug(const char * msg)
 {
   printf("%s\n", msg);
 }
+
+void ZRangerTask::hardware_init()
+{
+}
+
+float ZRangerTask::hardware_read()
+{
+    return 0;
+}
+
+

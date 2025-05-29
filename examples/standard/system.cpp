@@ -29,7 +29,7 @@
 #include "tasks/led2.hpp"
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
-#include <tasks/zranger.hpp>
+#include "tasks/zranger2.hpp"
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
@@ -41,7 +41,7 @@ static EstimatorTask estimatorTask;
 //static FlowDeckTask flowDeckTask;
 //static ImuTask imuTask;
 static LedTask ledTask;
-//static ZRangerTask zrangerTask;
+static ZRangerTask zrangerTask;
 
 static Safety safety;
 
@@ -72,7 +72,7 @@ static void systemTask(void *arg)
 
     didInit = true;
     
-    //zrangerTask.begin(&estimatorTask);
+    zrangerTask.begin(&estimatorTask);
 
     //flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
 
