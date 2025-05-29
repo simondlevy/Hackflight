@@ -22,7 +22,7 @@
 
 #include "BMI088.h"
 
-static const uint8_t ACCEL_INTERRUPT_PIN = 3;
+//static const uint8_t ACCEL_INTERRUPT_PIN = 3;
 static const uint8_t GYRO_INTERRUPT_PIN = 4;
 
 static Bmi088Accel accel(Wire,0x19);
@@ -31,18 +31,20 @@ static Bmi088Gyro gyro(Wire,0x69);
 
 static volatile bool accel_flag, gyro_flag;
 
-static uint32_t accel_count, gyro_count;
+//static uint32_t accel_count, gyro_count;
 
+/*
 void accel_drdy()
 {
     accel_flag = true;
     accel_count++;
 }
+*/
 
 void gyro_drdy()
 {
     gyro_flag = true;
-    gyro_count++;
+    //gyro_count++;
 }
 
 void setup() 
@@ -59,8 +61,8 @@ void setup()
         while (1) {}
     }
     status = accel.setOdr(Bmi088Accel::ODR_12_5HZ_BW_1HZ/*ODR_100HZ_BW_19HZ*/);
-    status = accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
-    status = accel.mapDrdyInt1(true);
+    //status = accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
+    //status = accel.mapDrdyInt1(true);
 
     status = gyro.begin();
     if (status < 0) {
@@ -73,23 +75,23 @@ void setup()
     status = gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     status = gyro.mapDrdyInt3(true);
 
-    pinMode(3,INPUT);
-    attachInterrupt(ACCEL_INTERRUPT_PIN,accel_drdy,RISING);
+    //pinMode(3,INPUT);
+    //attachInterrupt(ACCEL_INTERRUPT_PIN,accel_drdy,RISING);
+
     pinMode(4,INPUT);
     attachInterrupt(GYRO_INTERRUPT_PIN,gyro_drdy,RISING);  
 }
 
 void loop() 
 {
-    printf("accel:%lu  gyro:%lu\n", accel_count, gyro_count);
+    //printf("accel:%lu  gyro:%lu\n", accel_count, gyro_count);
 
-    /*
-    if (accel_flag && gyro_flag) {
-        accel_flag = false;
+    if (/*accel_flag &&*/ gyro_flag) {
+
+        //accel_flag = false;
         gyro_flag = false;
 
         accel.readSensor();
-
         gyro.readSensor();
 
         Serial.print(accel.getAccelX_mss());
@@ -106,5 +108,5 @@ void loop()
         Serial.print("\t");
         Serial.print(accel.getTemperature_C());
         Serial.print("\n");
-    }*/
+    }
 }
