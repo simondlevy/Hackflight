@@ -20,16 +20,28 @@
 #include <arduino_freertos.h>
 #include <avr/pgmspace.h>
 
+#include <BMI088.h>
 #include <VL53L1X.h>
 
 #include <system.h>
 #include <tasks/imu.hpp>
 #include "tasks/zranger2.hpp"
 
+static const uint8_t GYRO_INTERRUPT_PIN = 4;
 static const uint8_t LED_PIN = 5;
 static const uint8_t FLOWDECK_CS_PIN = 10;
 
-static VL53L1X _vl53l1x;
+static Bmi088Accel accel(Wire, 0x19);
+static Bmi088Gyro gyro(Wire, 0x69);
+
+static VL53L1X _rangefinder;
+
+static volatile bool gyro_flag;
+
+static void gyro_drdy()
+{
+    gyro_flag = true;
+}
 
 static void reportForever(const char *msg)
 {
@@ -45,7 +57,7 @@ FLASHMEM __attribute__((noinline)) void setup()
 
     Wire1.begin();
     Wire1.setClock(400000);
-    _vl53l1x.setBus(&Wire1);
+    _rangefinder.setBus(&Wire1);
 
     if (CrashReport) {
         Serial.print(CrashReport);
@@ -56,12 +68,17 @@ FLASHMEM __attribute__((noinline)) void setup()
     systemInit(LED_PIN, FLOWDECK_CS_PIN);
 }
 
-void loop() {}
+void loop()
+{
+}
 
 // ImuTask -------------------------------------------------------------------
 
 void ImuTask::deviceInit(void)
 {
+    if (!accel.begin()) {
+        reportForever("Unable to start accel");
+    }
 }
 
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)
@@ -79,18 +96,18 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
 
 void ZRangerTask::hardware_init()
 { 
-    if (!_vl53l1x.init()) {
+    if (!_rangefinder.init()) {
         reportForever("VL53L1X::init() failed");
     }
 
-    _vl53l1x.setDistanceMode(VL53L1X::Long);
-    _vl53l1x.setMeasurementTimingBudget(50000);
-    _vl53l1x.startContinuous(50);
+    _rangefinder.setDistanceMode(VL53L1X::Long);
+    _rangefinder.setMeasurementTimingBudget(50000);
+    _rangefinder.startContinuous(50);
 }
 
 float ZRangerTask::hardware_read()
 {
-    return (float)_vl53l1x.read();
+    return (float)_rangefinder.read();
 }
 
 // Debugging  ---------------------------------------------------------------
