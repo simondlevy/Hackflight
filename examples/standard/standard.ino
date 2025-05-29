@@ -101,11 +101,15 @@ void ImuTask::deviceInit(void)
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)
 {
     dataOut->x = _accel.getAccelX_raw();
+    dataOut->y = _accel.getAccelY_raw();
+    dataOut->z = _accel.getAccelZ_raw();
 }
 
 void ImuTask::readAccelRaw(Axis3i16 * dataOut)
 {
-    (void)dataOut;
+    dataOut->x = _gyro.getGyroX_raw();
+    dataOut->y = _gyro.getGyroY_raw();
+    dataOut->z = _gyro.getGyroZ_raw();
 }
 
 
