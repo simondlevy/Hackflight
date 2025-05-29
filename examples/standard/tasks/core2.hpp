@@ -36,8 +36,9 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/rpisetpoint.hpp>
 #include <vehicles/diyquad.hpp>
+
+#include "rpisetpoint2.hpp"
 
 class CoreTask {
 
@@ -189,8 +190,6 @@ class CoreTask {
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
 					debug("CORE: looping");
-
-                	//vTaskDelay(1000);
 				}
              }
  		}

@@ -154,6 +154,14 @@ void  motorsStop()
 {
 }
 
+// Serial comms  ------------------------------------------------------------
+
+bool uartReadByte(uint8_t * byte)
+{
+    (void)byte;
+    return false;
+}
+
 
 // Debugging  ---------------------------------------------------------------
 

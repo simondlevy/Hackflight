@@ -27,12 +27,12 @@
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
 
 #include "tasks/core2.hpp"
 #include "tasks/debug.hpp"
 #include "tasks/led2.hpp"
+#include "tasks/rpisetpoint2.hpp"
 #include "tasks/zranger2.hpp"
 
 static const float IMU_CALIBRATION_PITCH = 0;
@@ -85,7 +85,7 @@ static void systemTask(void *arg)
 
     estimatorTask.begin(&safety);
 
-    //rpiSetpointTask.begin(&safety);
+    rpiSetpointTask.begin(&safety);
 
     //rpiLoggerTask.begin(&estimatorTask);
 
