@@ -39,7 +39,7 @@ static const float IMU_CALIBRATION_ROLL = 0;
 //static CoreTask coreTask;
 static EstimatorTask estimatorTask;
 //static FlowDeckTask flowDeckTask;
-//static ImuTask imuTask;
+static ImuTask imuTask;
 static LedTask ledTask;
 static ZRangerTask zrangerTask;
 
@@ -84,12 +84,12 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, _led_pin);
 
-    /*
-
     imuTask.begin(
             &estimatorTask, 
             IMU_CALIBRATION_ROLL,
             IMU_CALIBRATION_PITCH);
+
+    /*
 
     auto coreTaskReady = coreTask.begin(
             &safety,

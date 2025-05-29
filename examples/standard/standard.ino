@@ -23,6 +23,7 @@
 #include <VL53L1X.h>
 
 #include <system.h>
+#include <tasks/imu.hpp>
 #include "tasks/zranger2.hpp"
 
 static const uint8_t LED_PIN = 5;
@@ -57,6 +58,25 @@ FLASHMEM __attribute__((noinline)) void setup()
 
 void loop() {}
 
+// ImuTask -------------------------------------------------------------------
+
+void ImuTask::deviceInit(void)
+{
+}
+
+void ImuTask::readGyroRaw(Axis3i16 * dataOut)
+{
+    (void)dataOut;
+}
+
+void ImuTask::readAccelRaw(Axis3i16 * dataOut)
+{
+    (void)dataOut;
+}
+
+
+// ZRangerTask ---------------------------------------------------------------
+
 void ZRangerTask::hardware_init()
 { 
     if (!_vl53l1x.init()) {
@@ -70,10 +90,10 @@ void ZRangerTask::hardware_init()
 
 float ZRangerTask::hardware_read()
 {
-    const auto d = _vl53l1x.read();
-    Serial.printf("%d\n", d);
-    return (float)d;
+    return (float)_vl53l1x.read();
 }
+
+// Debugging  ---------------------------------------------------------------
 
 void debug(const char * msg)
 {
