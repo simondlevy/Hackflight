@@ -26,9 +26,11 @@
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
-#include "tasks/led2.hpp"
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
+
+#include "tasks/debug.hpp"
+#include "tasks/led2.hpp"
 #include "tasks/zranger2.hpp"
 
 static const float IMU_CALIBRATION_PITCH = 0;
@@ -37,6 +39,7 @@ static const float IMU_CALIBRATION_ROLL = 0;
 //static RpiSetpointTask rpiSetpointTask;
 //static RpiLoggerTask rpiLoggerTask;
 //static CoreTask coreTask;
+static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 //static FlowDeckTask flowDeckTask;
 static ImuTask imuTask;
@@ -71,6 +74,8 @@ static void systemTask(void *arg)
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
     didInit = true;
+
+	debugTask.begin();
     
     zrangerTask.begin(&estimatorTask);
 
@@ -171,4 +176,8 @@ void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
 
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
+}
+
+void systemReportForever(const char * msg)
+{
 }

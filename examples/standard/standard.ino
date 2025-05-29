@@ -40,14 +40,8 @@ static ImuTask * _imuTask;
 
 static void gyro_drdy()
 {
-    _imuTask->dataAvailableCallback();
-}
-
-static void reportForever(const char *msg)
-{
-    while (true) {
-        printf("%s\n", msg);
-        delay(500);
+    if (_imuTask) {
+        _imuTask->dataAvailableCallback();
     }
 }
 
@@ -79,11 +73,11 @@ void ImuTask::deviceInit(void)
     _imuTask = this;
 
     if (!_accel.begin()) {
-        reportForever("Unable to start accel");
+        systemReportForever("Unable to start accel");
     }
 
     if (!_gyro.begin()) {
-        reportForever("Unable to start accel");
+        systemReportForever("Unable to start accel");
     }
 
     _accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_280HZ);
@@ -110,14 +104,12 @@ void ImuTask::readGyroRaw(Axis3i16 * dataOut)
 }
 
 
-
-
 // ZRangerTask ---------------------------------------------------------------
 
 void ZRangerTask::hardware_init()
 { 
     if (!_rangefinder.init()) {
-        reportForever("VL53L1X::init() failed");
+        systemReportForever("VL53L1X::init() failed");
     }
 
     _rangefinder.setDistanceMode(VL53L1X::Long);
