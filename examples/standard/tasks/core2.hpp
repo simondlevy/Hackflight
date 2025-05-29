@@ -161,9 +161,10 @@ class CoreTask {
 
         void run2(void)
 		{
-            static RateSupervisor rateSupervisor;
-
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
+
+            // Wait for the system to be fully started to start core loop
+            systemWaitStart();
 
             while (true) {
 
@@ -178,11 +179,9 @@ class CoreTask {
 
         void run(void)
         {
-            static RateSupervisor rateSupervisor;
-
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
-            //Wait for the system to be fully started to start core loop
+            // Wait for the system to be fully started to start core loop
             systemWaitStart();
 
             debug("CORE: Wait for sensor calibration...");
@@ -192,7 +191,9 @@ class CoreTask {
             while(!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
+
             debug("CORE: Starting loop");
+            static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
             uint32_t setpoint_timestamp = 0;
