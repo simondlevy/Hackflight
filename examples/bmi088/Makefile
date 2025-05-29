@@ -8,6 +8,15 @@ PORT = COM3
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
+SRC = ../../src/
+
+build:
+	cp FreeRTOSConfig.h $(SRC)
+	arduino-cli compile  --libraries ../../.. --libraries $(HOME)/Documents/Arduino/libraries \
+		--fqbn $(FQBN) $(SKETCH).ino
+	rm ../../src/FreeRTOSConfig.h
+
+
 flash:
 	#dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN)

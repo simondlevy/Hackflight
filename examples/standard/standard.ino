@@ -94,6 +94,8 @@ void ImuTask::deviceInit(void)
 
 void ImuTask::readAccelRaw(Axis3i16 * dataOut)
 {
+    _accel.readSensor();
+
     dataOut->x = _accel.getAccelX_raw();
     dataOut->y = _accel.getAccelY_raw();
     dataOut->z = _accel.getAccelZ_raw();
