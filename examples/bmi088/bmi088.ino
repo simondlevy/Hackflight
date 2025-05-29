@@ -26,13 +26,11 @@ void setup()
     Serial.begin(0);
 
     if (accel.begin() < 0) {
-        Serial.println("Accel Initialization Error");
-        while (1) {}
+        reportForever("Accel Initialization Error");
     }
 
     if (gyro.begin() < 0) {
-        Serial.println("Gyro Initialization Error");
-        while (1) {}
+        reportForever("Gyro Initialization Error");
     }
 
     gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
