@@ -102,7 +102,7 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
     dataOut->y = _accel.getAccelY_raw();
     dataOut->z = _accel.getAccelZ_raw();
 
-    systemReportForever("%lu\n", _gyro_count);
+    Serial.println(_gyro_count);
 }
 
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)
