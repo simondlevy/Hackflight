@@ -175,6 +175,9 @@ class CoreTask {
             }
 
             debug("CORE: Starting loop");
+            static RateSupervisor rateSupervisor;
+            rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
+
             while (true) {
 
 				debug("looping");
