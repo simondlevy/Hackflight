@@ -167,20 +167,17 @@ class CoreTask {
             systemWaitStart();
 
             // Wait for sensors to be calibrated
-            debug("CORE: Wait for sensor calibration...");
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->areCalibrated()) {
-				debug("calibrating");
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
 
-            debug("CORE: Starting loop");
             static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
             while (true) {
 
-				debug("looping");
+				debug("CORE: looping");
 
                 vTaskDelay(1000);
              }
