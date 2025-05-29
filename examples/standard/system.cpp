@@ -76,7 +76,7 @@ static void systemTask(void *arg)
 
     //flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
 
-    //estimatorTask.begin(&safety);
+    estimatorTask.begin(&safety);
 
     //rpiSetpointTask.begin(&safety);
 

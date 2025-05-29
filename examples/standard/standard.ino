@@ -75,4 +75,7 @@ float ZRangerTask::hardware_read()
     return (float)d;
 }
 
-
+void debug(const char * msg)
+{
+    Serial.println(msg);
+}
