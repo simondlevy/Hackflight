@@ -40,6 +40,8 @@ class DebugTask {
 
     private:
 
+		static constexpr float REPORT_FREQ = 2;
+
         FreeRtosTask _task;
 
 		char _msg[100];
@@ -61,7 +63,7 @@ class DebugTask {
 
 			    //Serial.println(_msg);
 
-                vTaskDelay(M2T(500));
+                vTaskDelay(M2T(1000/REPORT_FREQ));
             }
         }
 };
