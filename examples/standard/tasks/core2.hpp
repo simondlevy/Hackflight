@@ -186,9 +186,12 @@ class CoreTask {
                 // Get state from estimator
                 _estimatorTask->getVehicleState(&vehicleState);
 
-				debug("CORE: looping");
+                if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
-                vTaskDelay(1000);
+					debug("CORE: looping");
+
+                	//vTaskDelay(1000);
+				}
              }
  		}
 
