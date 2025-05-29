@@ -27,11 +27,11 @@
 //#include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
+#include <tasks/imu.hpp>
 #include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
 
 #include "tasks/debug.hpp"
-#include "tasks/imu2.hpp"
 #include "tasks/led2.hpp"
 #include "tasks/zranger2.hpp"
 
