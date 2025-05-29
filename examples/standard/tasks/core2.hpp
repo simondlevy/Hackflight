@@ -166,9 +166,20 @@ class CoreTask {
             // Wait for the system to be fully started to start core loop
             systemWaitStart();
 
+            // Wait for sensors to be calibrated
+            debug("CORE: Wait for sensor calibration...");
+            auto lastWakeTime = xTaskGetTickCount();
+            while (!_imuTask->areCalibrated()) {
+				debug("calibrating");
+                vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
+            }
+
+            debug("CORE: Starting loop");
             while (true) {
 
-                 vTaskDelay(1000);
+				debug("looping");
+
+                vTaskDelay(1000);
              }
  		}
 
@@ -188,7 +199,7 @@ class CoreTask {
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
-            while(!_imuTask->areCalibrated()) {
+            while (!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
 
