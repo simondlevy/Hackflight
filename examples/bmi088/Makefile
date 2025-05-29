@@ -8,15 +8,9 @@ PORT = COM3
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
-build: $(SKETCH).ino Makefile
-	arduino-cli compile --libraries $(LIBS) --fqbn $(FQBN) $(SKETCH).ino
-
-flash: $(BIN)
+flash:
 	#dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN)
-
-clean:
-	rm -rf build
 
 edit:
 	vim $(SKETCH).ino
