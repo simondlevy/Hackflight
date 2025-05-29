@@ -99,14 +99,18 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
     dataOut->x = _accel.getAccelX_raw();
     dataOut->y = _accel.getAccelY_raw();
     dataOut->z = _accel.getAccelZ_raw();
-
-    Serial.println(dataOut->x);
 }
 
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)
 {
-}
+    _gyro.readSensor();
 
+    dataOut->x = _gyro.getGyroX_raw();
+    dataOut->y = _gyro.getGyroY_raw();
+    dataOut->z = _gyro.getGyroZ_raw();
+
+    Serial.println(dataOut->z);
+}
 
 // ZRangerTask ---------------------------------------------------------------
 
