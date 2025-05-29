@@ -161,6 +161,10 @@ class CoreTask {
 
         void run2(void)
 		{
+            static RateSupervisor rateSupervisor;
+
+            vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
+
             while (true) {
 
                  vTaskDelay(1000);
