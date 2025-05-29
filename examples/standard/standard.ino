@@ -31,8 +31,8 @@ static const uint8_t GYRO_INTERRUPT_PIN = 4;
 static const uint8_t LED_PIN = 5;
 static const uint8_t FLOWDECK_CS_PIN = 10;
 
-static Bmi088Accel accel(Wire, 0x19);
-static Bmi088Gyro gyro(Wire, 0x69);
+static Bmi088Accel _accel(Wire, 0x19);
+static Bmi088Gyro _gyro(Wire, 0x69);
 
 static VL53L1X _rangefinder;
 
@@ -78,21 +78,21 @@ void ImuTask::deviceInit(void)
 {
     _imuTask = this;
 
-    if (!accel.begin()) {
+    if (!_accel.begin()) {
         reportForever("Unable to start accel");
     }
 
-    if (!gyro.begin()) {
+    if (!_gyro.begin()) {
         reportForever("Unable to start accel");
     }
 
-    accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_280HZ);
-    accel.setRange(Bmi088Accel::RANGE_24G);
+    _accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_280HZ);
+    _accel.setRange(Bmi088Accel::RANGE_24G);
 
-    gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ);
-    gyro.setRange(Bmi088Gyro::RANGE_2000DPS);
-    gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
-    gyro.mapDrdyInt3(true);
+    _gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ);
+    _gyro.setRange(Bmi088Gyro::RANGE_2000DPS);
+    _gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
+    _gyro.mapDrdyInt3(true);
 
     pinMode(4, arduino::INPUT);
     attachInterrupt(GYRO_INTERRUPT_PIN, gyro_drdy,  arduino::RISING);  
@@ -100,7 +100,7 @@ void ImuTask::deviceInit(void)
 
 void ImuTask::readGyroRaw(Axis3i16 * dataOut)
 {
-    (void)dataOut;
+    dataOut->x = _accel.getAccelX_raw();
 }
 
 void ImuTask::readAccelRaw(Axis3i16 * dataOut)
