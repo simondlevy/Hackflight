@@ -180,9 +180,11 @@ class CoreTask {
 
             for (uint32_t step=1; ; step++) {
 
-				//
                 // The IMU should unlock at 1kHz
                 _imuTask->waitDataReady();
+
+                // Get state from estimator
+                _estimatorTask->getVehicleState(&vehicleState);
 
 				debug("CORE: looping");
 
