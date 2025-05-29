@@ -36,11 +36,11 @@ static Bmi088Gyro gyro(Wire, 0x69);
 
 static VL53L1X _rangefinder;
 
-static volatile bool gyro_flag;
+static ImuTask * _imuTask;
 
 static void gyro_drdy()
 {
-    gyro_flag = true;
+    _imuTask->dataAvailableCallback();
 }
 
 static void reportForever(const char *msg)
@@ -76,6 +76,8 @@ void loop()
 
 void ImuTask::deviceInit(void)
 {
+    _imuTask = this;
+
     if (!accel.begin()) {
         reportForever("Unable to start accel");
     }
