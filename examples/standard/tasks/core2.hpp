@@ -189,7 +189,6 @@ class CoreTask {
 
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
-					debug("CORE: looping");
 				}
              }
  		}
