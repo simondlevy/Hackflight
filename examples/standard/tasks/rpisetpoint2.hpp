@@ -104,9 +104,9 @@ class RpiSetpointTask {
         {
             systemWaitStart();
 
-            MspParser parser = {};
+            //MspParser parser = {};
 
-            setpoint_t setpoint = {};
+            //setpoint_t setpoint = {};
 
             while (true) {
 

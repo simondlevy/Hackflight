@@ -49,6 +49,8 @@ FLASHMEM __attribute__((noinline)) void setup()
 {
     Serial.begin(0);
 
+    Serial1.begin(115200);
+
     Wire1.begin();
     Wire1.setClock(400000);
     _rangefinder.setBus(&Wire1);
