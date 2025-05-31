@@ -160,8 +160,13 @@ void  motorsStop()
 
 bool uartReadByte(uint8_t * byte)
 {
-    (void)byte;
-    return false;
+    const auto avail = Serial1.available() > 0;
+
+    if (avail) {
+      *byte = Serial1.read();
+    }
+
+    return avail;
 }
 
 
