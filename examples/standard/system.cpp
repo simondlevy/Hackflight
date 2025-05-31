@@ -39,7 +39,7 @@ static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
 static RpiSetpointTask rpiSetpointTask;
-//static RpiLoggerTask rpiLoggerTask;
+static RpiLoggerTask rpiLoggerTask;
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
@@ -87,7 +87,7 @@ static void systemTask(void *arg)
 
     rpiSetpointTask.begin(&safety);
 
-    //rpiLoggerTask.begin(&estimatorTask);
+    rpiLoggerTask.begin(&estimatorTask);
 
     ledTask.begin(&safety, _led_pin);
 

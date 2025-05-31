@@ -169,6 +169,11 @@ bool uartReadByte(uint8_t * byte)
     return avail;
 }
 
+void uartWriteByte(const uint8_t byte)
+{
+    Serial1.write(byte);
+}
+
 
 // Debugging  ---------------------------------------------------------------
 
