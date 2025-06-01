@@ -25,12 +25,12 @@
 #include <safety.hpp>
 #include <system.h>
 #include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/rpilogger.hpp>
 
 #include "tasks/core2.hpp"
 #include "tasks/debug.hpp"
+#include "tasks/flowdeck2.hpp"
 #include "tasks/led2.hpp"
 #include "tasks/rpisetpoint2.hpp"
 #include "tasks/zranger2.hpp"
@@ -43,7 +43,7 @@ static RpiLoggerTask rpiLoggerTask;
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
-//static FlowDeckTask flowDeckTask;
+static FlowDeckTask flowDeckTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static ZRangerTask zrangerTask;
@@ -81,7 +81,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    //flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
+    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
 
     estimatorTask.begin(&safety);
 
