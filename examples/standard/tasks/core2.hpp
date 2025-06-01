@@ -176,8 +176,8 @@ class CoreTask {
             static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
-            //uint32_t setpoint_timestamp = 0;
-            //bool lost_contact = false;
+            uint32_t setpoint_timestamp = 0;
+            bool lost_contact = false;
 
             for (uint32_t step=1; ; step++) {
 
@@ -187,9 +187,71 @@ class CoreTask {
                 // Get state from estimator
                 _estimatorTask->getVehicleState(&vehicleState);
 
+                static float _motorvals[4];
+
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
+                    setpoint_t setpoint = {};
+
+                    _setpointTask->getSetpoint(setpoint);
+
+                    setpoint_timestamp = setpoint.timestamp;
+
+                    if (setpoint.hovering) {
+
+                        setpoint.demands.thrust = Num::rescale(
+                                setpoint.demands.thrust, 0.2, 2.0, -1, +1);
+                    }
+
+                    // Use safety algorithm to modify demands based on sensor
+                    // data and open-loop info
+                    _safety->update(step, setpoint.timestamp, vehicleState);
+
+                    if (setpoint.hovering) {
+
+                        // In hover mode, thrust demand comes in as [-1,+1], so
+                        // we convert it to a target altitude in meters
+                        setpoint.demands.thrust = Num::rescale(
+                                setpoint.demands.thrust, -1, +1, 0.2, 2.0);
+                    }
+
+                    demands_t closedLoopDemands = {};
+
+                    runClosedLoopControl(
+                            1.f / PID_UPDATE_RATE,
+                            setpoint.hovering,
+                            vehicleState,
+                            setpoint.demands,
+                            LANDING_ALTITUDE_M,
+                            closedLoopDemands);
+
+                    runMixer(_mixFun, closedLoopDemands, _motorvals);
 				}
+
+                const auto timestamp = xTaskGetTickCount();
+
+                if (setpoint_timestamp > 0 &&
+                        timestamp - setpoint_timestamp >
+                        SETPOINT_TIMEOUT_TICKS) {
+                    lost_contact = true;
+                    motorsStop();
+                }
+
+                else if (!lost_contact && _safety->isArmed()) {
+                    runMotors(_motorvals);
+                } 
+                
+                else {
+                    motorsStop();
+                }
+
+                if (!rateSupervisor.validate(timestamp)) {
+                    static bool rateWarningDisplayed;
+                    if (!rateWarningDisplayed) {
+                        debug("CORE: WARNING: loop rate is off");
+                        rateWarningDisplayed = true;
+                    }
+                }
              }
  		}
 
