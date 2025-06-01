@@ -16,8 +16,9 @@
 
 #pragma once
 
-// System
 #include <math.h>
+
+#include <Arduino.h>
 
 // FreeRTOS
 #include <FreeRTOS.h>
@@ -221,6 +222,8 @@ class CoreTask {
                     }
 
                     demands_t closedLoopDemands = {};
+
+					Serial.println(vehicleState.phi);
 
                     runClosedLoopControl(
                             1.f / PID_UPDATE_RATE,
