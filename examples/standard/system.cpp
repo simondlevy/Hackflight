@@ -101,6 +101,7 @@ static void systemTask(void *arg)
             &estimatorTask,
             &imuTask,
             &rpiSetpointTask,
+			&debugTask,
             Mixer::rotorCount,
             Mixer::mix);
 
@@ -177,19 +178,7 @@ void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
     vTaskStartScheduler();
 }
 
-void systemReportForever(const char * format, ...)
+void systemReportForever(const char * msg)
 {
-    va_list args = {};
-
-    char buffer[256] = {};
-
-	va_start(args, format);
-
-	const auto vsErr = vsprintf(buffer, format, args);
-
-	if (vsErr >= 0) { 
-		debugTask.reportForever(buffer);
-	}
-
-	va_end(args);
+	debugTask.setMessage(msg);
 }

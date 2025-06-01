@@ -39,6 +39,7 @@
 #include <tasks/imu.hpp>
 #include <vehicles/diyquad.hpp>
 
+#include "debug.hpp"
 #include "rpisetpoint2.hpp"
 
 class CoreTask {
@@ -50,6 +51,7 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 RpiSetpointTask * setpointTask,
+				DebugTask * debugTask,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun)
         {
@@ -64,6 +66,8 @@ class CoreTask {
             _imuTask = imuTask;
 
             _setpointTask = setpointTask;
+
+            _debugTask = debugTask;
 
             _mixFun = mixFun;
 
@@ -139,6 +143,8 @@ class CoreTask {
         EstimatorTask * _estimatorTask;
 
         ImuTask * _imuTask;
+
+        DebugTask * _debugTask;
 
         Safety * _safety;
 
@@ -223,7 +229,7 @@ class CoreTask {
 
                     demands_t closedLoopDemands = {};
 
-					Serial.println(vehicleState.phi);
+					_debugTask->setMessage("phi=%f\n", vehicleState.phi);
 
                     runClosedLoopControl(
                             1.f / PID_UPDATE_RATE,

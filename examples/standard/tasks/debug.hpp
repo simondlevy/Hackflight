@@ -31,37 +31,49 @@ class DebugTask {
             }
 
             _task.init(runDebugCommsTask, "debug", this, 2);
-        }
-
-		void reportForever(const char * msg)
-		{
-			strcpy(_msg, msg);
 		}
 
-    private:
+		void setMessage(const char * format, ...)
+		{
+			va_list args = {};
+
+			char buffer[256] = {};
+
+			va_start(args, format);
+
+			const auto vsErr = vsprintf(buffer, format, args);
+
+			if (vsErr >= 0) { 
+				strcpy(_msg, buffer);
+			}
+
+			va_end(args);
+		}
+
+	private:
 
 		static constexpr float REPORT_FREQ = 2;
 
-        FreeRtosTask _task;
+		FreeRtosTask _task;
 
 		char _msg[100];
 
-        static void runDebugCommsTask(void * obj)
-        {
-            ((DebugTask *)obj)->run();
-        }
+		static void runDebugCommsTask(void * obj)
+		{
+			((DebugTask *)obj)->run();
+		}
 
-        void run(void)
-        {
-            systemWaitStart();
+		void run(void)
+		{
+			systemWaitStart();
 
-            while (true) {
+			while (true) {
 
 				if (*_msg) {
-			    	Serial.println(_msg);
+					Serial.println(_msg);
 				}
 
-                vTaskDelay(M2T(1000/REPORT_FREQ));
-            }
-        }
+				vTaskDelay(M2T(1000/REPORT_FREQ));
+			}
+		}
 };
