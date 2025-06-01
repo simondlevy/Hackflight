@@ -52,7 +52,7 @@ class DebugTask {
 
 	private:
 
-		static constexpr float REPORT_FREQ = 2;
+		static constexpr float REPORT_FREQ = 100;
 
 		FreeRtosTask _task;
 
