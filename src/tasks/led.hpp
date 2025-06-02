@@ -18,6 +18,8 @@
 
 #include <stdint.h>
 
+#include <Arduino.h>
+
 #include <safety.hpp>
 #include <system.h>
 #include <task.hpp>
@@ -26,7 +28,8 @@ class LedTask {
 
     public:
 
-        void begin(Safety * safety, const uint8_t pin)
+        void begin(Safety * safety, const uint8_t pin, 
+			const bool inverted=false)
         {
             if (_task.didInit()){
                 return;
@@ -34,7 +37,9 @@ class LedTask {
 
             _pin = pin;
 
-            _task.init(runBtCommsTask, "led", this, 2);
+   	        _inverted = inverted;
+
+            _task.init(runLedCommsTask, "led", this, 2);
 
             pinMode(_pin, OUTPUT);
 
@@ -51,11 +56,13 @@ class LedTask {
 
         uint8_t _pin;
 
+	bool _inverted;
+
         FreeRtosTask _task;
 
         Safety * _safety;
 
-        static void runBtCommsTask(void * obj)
+        static void runLedCommsTask(void * obj)
         {
             ((LedTask *)obj)->run();
         }
@@ -83,6 +90,6 @@ class LedTask {
 
         void set(const bool on)
         {
-            digitalWrite(_pin, !on);  // LED is active-low
+            digitalWrite(_pin, _inverted ? !on : on);
         }
 };

@@ -82,7 +82,7 @@ static void systemTask(void *arg)
 
     rpiLoggerTask.begin(&estimatorTask);
 
-    ledTask.begin(&safety, _led_pin);
+    ledTask.begin(&safety, _led_pin, true); // inverted
 
     imuTask.begin(
             &estimatorTask, 
