@@ -28,12 +28,12 @@
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/rpilogger.hpp>
+#include <tasks/zranger.hpp>
 
 #include "tasks/core2.hpp"
 #include "tasks/debug.hpp"
 #include "tasks/flowdeck2.hpp"
 #include "tasks/rpisetpoint2.hpp"
-#include "tasks/zranger2.hpp"
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;

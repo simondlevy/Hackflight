@@ -35,6 +35,7 @@
 #include <system.h>
 
 #include <tasks/imu.hpp>
+#include <tasks/zranger.hpp>
 
 #include <vl53l1.hpp>
 
@@ -67,7 +68,9 @@ void assertFail(char *exp, char *file, int line)
     NVIC_SystemReset();
 }
 
-void vl53l1_init()
+// ZRangerTask ---------------------------------------------------------------
+
+void ZRangerTask::hardware_init()
 {
     static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
 
@@ -84,10 +87,12 @@ void vl53l1_init()
     _vl53l1.setTimingBudgetMsec(25);
 }
 
-float vl53l1_read()
+float ZRangerTask::hardware_read()
 {
     return _vl53l1.readDistance();
 }
+
+// ---------------------------------------------------------------------------
 
 int main() 
 {

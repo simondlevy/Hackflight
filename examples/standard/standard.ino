@@ -25,7 +25,7 @@
 
 #include <system.h>
 #include <tasks/imu.hpp>
-#include "tasks/zranger2.hpp"
+#include <tasks/zranger.hpp>
 
 static const uint8_t GYRO_INTERRUPT_PIN = 4;
 static const uint8_t LED_PIN = 5;

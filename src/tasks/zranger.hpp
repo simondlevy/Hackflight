@@ -33,15 +33,15 @@ class ZRangerTask {
                 return;
             }
 
-            void vl53l1_init();
-            vl53l1_init();
+            hardware_init();
 
             _estimatorTask = estimatorTask;
 
             _task.init(runZrangerTask, "zranger2", this, 2);
 
             // pre-compute constant in the measurement noise model for kalman
-            _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+            _expCoeff =
+				logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
         }
 
     private:
@@ -65,6 +65,10 @@ class ZRangerTask {
 
         EstimatorTask * _estimatorTask;
 
+		void hardware_init();
+
+		float hardware_read();
+
         void run(void)
         {
             TickType_t lastWakeTime;
@@ -77,8 +81,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(25));
 
-                float vl53l1_read(void);
-                float range = vl53l1_read();
+                float range = hardware_read();
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers
