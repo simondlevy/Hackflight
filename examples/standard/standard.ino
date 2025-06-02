@@ -55,6 +55,8 @@ FLASHMEM __attribute__((noinline)) void setup()
     Wire1.setClock(400000);
     _rangefinder.setBus(&Wire1);
 
+    SPI.begin();
+
     if (CrashReport) {
         Serial.print(CrashReport);
         Serial.println();

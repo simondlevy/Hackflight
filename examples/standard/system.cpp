@@ -81,7 +81,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
+    flowDeckTask.begin(&estimatorTask, &debugTask, _flowdeck_cs_pin);
 
     estimatorTask.begin(&safety);
 

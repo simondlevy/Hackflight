@@ -23,14 +23,18 @@
 
 #include <datatypes.h>
 #include <system.h>
-#include <task.hpp>
 #include <tasks/estimator.hpp>
+
+#include "debug.hpp"
 
 class FlowDeckTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, const uint8_t CS_PIN)
+        void begin(
+                EstimatorTask * estimatorTask,
+                DebugTask * debugTask,
+                const uint8_t CS_PIN)
         {
             if (_task.didInit()) {
                 return;
@@ -38,7 +42,9 @@ class FlowDeckTask {
 
             _estimatorTask = estimatorTask;
 
-            if (true /*_pmw3901.begin(CS_PIN)*/) {
+            _debugTask = debugTask;
+
+            if (_pmw3901.begin(SPI, CS_PIN)) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
@@ -65,6 +71,8 @@ class FlowDeckTask {
 
         EstimatorTask * _estimatorTask;
 
+        DebugTask * _debugTask;
+
         void run(void)
         {
             systemWaitStart();
@@ -75,13 +83,13 @@ class FlowDeckTask {
 
                 vTaskDelay(10);
 
-				continue;
-
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;
                 bool gotMotion = false;
 
                 _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+
+                _debugTask->setMessage("dx=%+02d dy=%+02d", deltaX, deltaY);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
