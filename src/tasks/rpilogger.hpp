@@ -18,7 +18,6 @@
 
 #include <stdint.h>
 
-#include <debug.h>
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
 #include <system.h>

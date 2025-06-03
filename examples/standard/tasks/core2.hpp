@@ -265,7 +265,6 @@ class CoreTask {
                 if (!rateSupervisor.validate(timestamp)) {
                     static bool rateWarningDisplayed;
                     if (!rateWarningDisplayed) {
-                        debug("CORE: WARNING: loop rate is off");
                         rateWarningDisplayed = true;
                     }
                 }

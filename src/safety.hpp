@@ -20,7 +20,6 @@
 #include <math.h>
 
 #include <clock.hpp>
-#include <debug.h>
 #include <motors.h>
 #include <datatypes.h>
 

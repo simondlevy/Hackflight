@@ -173,14 +173,11 @@ class CoreTask {
             //Wait for the system to be fully started to start core loop
             systemWaitStart();
 
-            debug("CORE: Wait for sensor calibration...");
-
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
             while(!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
-            debug("CORE: Starting loop");
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
             uint32_t setpoint_timestamp = 0;
@@ -255,7 +252,6 @@ class CoreTask {
                 if (!rateSupervisor.validate(timestamp)) {
                     static bool rateWarningDisplayed;
                     if (!rateWarningDisplayed) {
-                        debug("CORE: WARNING: loop rate is off");
                         rateWarningDisplayed = true;
                     }
                 }

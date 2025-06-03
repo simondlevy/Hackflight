@@ -29,8 +29,6 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-#include <debug.h>
-
 class RpiSetpointTask {
 
     public:

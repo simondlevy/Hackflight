@@ -99,7 +99,6 @@ static void systemTask(void *arg)
 
     if (!coreTaskReady) {
         pass = false;
-        error("SYSTEM: core task [FAIL]");
     }
 
     //Start the firmware
@@ -121,7 +120,6 @@ static void systemTask(void *arg)
 
                 if (selftestPassed)
                 {
-                    debug("SYSTEM: Start forced");
                     start();
                     break;
                 }

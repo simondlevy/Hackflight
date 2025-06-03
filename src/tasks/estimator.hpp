@@ -196,10 +196,6 @@ class EstimatorTask {
                 _kalmanFilter.predict(nowMs, _safety->isFlying()); 
 
                 nextPredictionMs = nowMs + PREDICTION_UPDATE_INTERVAL_MS;
-
-                if (!_rateSupervisor.validate(nowMs)) {
-                    debug("ESTIMATOR: WARNING: Kalman prediction rate off");
-                }
             }
 
             // Add process noise every loop, rather than every prediction
@@ -226,7 +222,6 @@ class EstimatorTask {
 
                 if (nowMs > _warningBlockTimeMs) {
                     _warningBlockTimeMs = nowMs + WARNING_HOLD_BACK_TIME_MS;
-                    debug("ESTIMATOR: State out of bounds, resetting");
                 }
             }
 
