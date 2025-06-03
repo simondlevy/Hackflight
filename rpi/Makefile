@@ -1,6 +1,6 @@
 NETWORK = difference_risp_train.txt
 
-ROOT = $(HOME)/Desktop
+ROOT = $(HOME)
 
 INCLUDE = -I$(ROOT)
 
