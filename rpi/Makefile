@@ -19,8 +19,11 @@ all: $(ALL)
 btserver: btserver.o
 	g++ -O3 -o btserver btserver.o
 
-btserver.o: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp
+btserver.o: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ $(INCLUDE) -I../src -O3 -Wall -c btserver.cpp
+
+../src/msp/messages.h: ../msppg/messages.json
+	cd ../msppg; make install; cd ../rpi
 
 run: btserver
 	./btserver
