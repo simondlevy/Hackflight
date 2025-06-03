@@ -14,8 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdarg.h>
-
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
@@ -37,14 +35,14 @@
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
-static RpiSetpointTask rpiSetpointTask;
-static RpiLoggerTask rpiLoggerTask;
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static FlowDeckTask flowDeckTask;
 static ImuTask imuTask;
 static LedTask ledTask;
+static RpiLoggerTask rpiLoggerTask;
+static RpiSetpointTask rpiSetpointTask;
 static ZRangerTask zrangerTask;
 
 static Safety safety;
@@ -100,7 +98,7 @@ static void systemTask(void *arg)
             &estimatorTask,
             &imuTask,
             &rpiSetpointTask,
-			&debugTask,
+            &debugTask,
             Mixer::rotorCount,
             Mixer::mix);
 

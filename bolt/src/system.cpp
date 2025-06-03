@@ -28,15 +28,15 @@
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
-#include <tasks/rpisetpoint.hpp>
 #include <tasks/rpilogger.hpp>
+#include <tasks/rpisetpoint.hpp>
 #include <tasks/zranger.hpp>
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
 static CoreTask coreTask;
-static DebugTask debugTask; // unused
+static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static FlowDeckTask flowDeckTask;
 static ImuTask imuTask;
@@ -74,6 +74,8 @@ static void systemTask(void *arg)
 
     didInit = true;
     
+	debugTask.begin();
+    
     zrangerTask.begin(&estimatorTask);
 
     flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
@@ -84,7 +86,7 @@ static void systemTask(void *arg)
 
     rpiLoggerTask.begin(&estimatorTask);
 
-    ledTask.begin(&safety, _led_pin, true); // inverted
+    ledTask.begin(&safety, _led_pin);
 
     imuTask.begin(
             &estimatorTask, 
@@ -104,15 +106,14 @@ static void systemTask(void *arg)
         pass = false;
     }
 
-    //Start the firmware
     if (pass) {
-        selftestPassed = 1;
+        selftestPassed = true;
         start();
     }
 
     else {
 
-        selftestPassed = 0;
+        selftestPassed = false;
 
         if (didInit) {
 
@@ -170,4 +171,9 @@ void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
 
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
+}
+
+void systemReportForever(const char * msg)
+{
+	debugTask.setMessage(msg);
 }

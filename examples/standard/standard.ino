@@ -158,7 +158,12 @@ void  motorsStop()
 {
 }
 
-// Serial comms  ------------------------------------------------------------
+// Misc. system --------------------------------------------------------------
+
+const bool systemIsLedInverted()
+{
+    return false;
+}
 
 bool systemUartReadByte(uint8_t * byte)
 {

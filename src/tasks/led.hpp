@@ -28,16 +28,13 @@ class LedTask {
 
     public:
 
-        void begin(Safety * safety, const uint8_t pin, 
-			const bool inverted=false)
+        void begin(Safety * safety, const uint8_t pin) 
         {
             if (_task.didInit()){
                 return;
             }
 
             _pin = pin;
-
-   	        _inverted = inverted;
 
             _task.init(runLedCommsTask, "led", this, 2);
 
@@ -55,8 +52,6 @@ class LedTask {
         static constexpr uint32_t PULSE_MSEC = 50;
 
         uint8_t _pin;
-
-	bool _inverted;
 
         FreeRtosTask _task;
 
@@ -90,6 +85,6 @@ class LedTask {
 
         void set(const bool on)
         {
-            digitalWrite(_pin, _inverted ? !on : on);
+            digitalWrite(_pin, systemIsLedInverted() ? !on : on);
         }
 };

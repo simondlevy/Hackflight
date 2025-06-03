@@ -182,6 +182,11 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
     bmi088_get_accel_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
 }
 
+const bool systemIsLedInverted() 
+{
+    return true;
+}
+
 bool systemUartReadByte(uint8_t * byte)
 {
     return uartGetData(1, byte);
