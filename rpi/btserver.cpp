@@ -104,7 +104,7 @@ static void * logging_fun(void * arg)
 
 int main(int argc, char ** argv)
 {
-    // Open a serial connection to the Teensy
+    // Open a serial connection to the microcontroller
     serialfd = Serial::open_port("/dev/ttyS0", B115200);
 
     if (serialfd < 0) {
