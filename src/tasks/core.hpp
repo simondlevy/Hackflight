@@ -33,6 +33,7 @@
 #include <safety.hpp>
 #include <system.h>
 #include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/rpisetpoint.hpp>

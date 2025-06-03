@@ -27,13 +27,13 @@
 #include <control.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
-#include <tasks/debug.hpp>
 #include <motors.h>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
 #include <system.h>
 #include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <vehicles/diyquad.hpp>

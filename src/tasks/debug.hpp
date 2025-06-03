@@ -16,6 +16,8 @@
 
 #pragma once
 
+#if defined(CORE_TEENSY)
+
 #include <Arduino.h>
 #include <string.h>
 #include <task.hpp>
@@ -77,3 +79,5 @@ class DebugTask {
 			}
 		}
 };
+
+#endif
