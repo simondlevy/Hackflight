@@ -36,9 +36,8 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
+#include <tasks/rpisetpoint.hpp>
 #include <vehicles/diyquad.hpp>
-
-#include "rpisetpoint2.hpp"
 
 class CoreTask {
 

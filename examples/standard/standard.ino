@@ -162,6 +162,8 @@ void  motorsStop()
 
 bool uartReadByte(uint8_t * byte)
 {
+    vTaskDelay(1); // not sure why this is necessary
+
     const auto avail = Serial1.available() > 0;
 
     if (avail) {

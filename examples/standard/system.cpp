@@ -24,16 +24,16 @@
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
 #include <system.h>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/rpilogger.hpp>
+#include <tasks/rpisetpoint.hpp>
 #include <tasks/zranger.hpp>
 
 #include "tasks/core2.hpp"
-#include "tasks/debug.hpp"
-#include "tasks/rpisetpoint2.hpp"
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;

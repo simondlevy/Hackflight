@@ -16,7 +16,7 @@
 
 #pragma once
 
-#if defined(CORE_TEENSY)
+#if defined(ARDUINO)
 
 #include <Arduino.h>
 #include <string.h>
