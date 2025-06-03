@@ -30,7 +30,7 @@ class FlowDeckTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, const uint8_t CS_PIN)
+        void begin(EstimatorTask * estimatorTask, const uint8_t cs_pin)
         {
             if (_task.didInit()) {
                 return;
@@ -38,7 +38,7 @@ class FlowDeckTask {
 
             _estimatorTask = estimatorTask;
 
-            if (_pmw3901.begin(CS_PIN)) {
+            if (_pmw3901.begin(cs_pin)) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }

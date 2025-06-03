@@ -25,6 +25,7 @@
 #include <safety.hpp>
 #include <system.h>
 #include <tasks/estimator.hpp>
+#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/rpilogger.hpp>
@@ -32,7 +33,6 @@
 
 #include "tasks/core2.hpp"
 #include "tasks/debug.hpp"
-#include "tasks/flowdeck2.hpp"
 #include "tasks/rpisetpoint2.hpp"
 
 static const float IMU_CALIBRATION_PITCH = 0;
@@ -81,7 +81,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, &debugTask, _flowdeck_cs_pin);
+    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
 
     estimatorTask.begin(&safety);
 
