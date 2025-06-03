@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <Arduino.h>
 
 // FreeRTOS
