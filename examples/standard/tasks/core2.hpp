@@ -27,6 +27,7 @@
 #include <control.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
+#include <tasks/debug.hpp>
 #include <motors.h>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
@@ -37,7 +38,6 @@
 #include <tasks/imu.hpp>
 #include <vehicles/diyquad.hpp>
 
-#include "debug.hpp"
 #include "rpisetpoint2.hpp"
 
 class CoreTask {
