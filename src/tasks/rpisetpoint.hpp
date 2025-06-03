@@ -110,9 +110,7 @@ class RpiSetpointTask {
 
                 uint8_t byte = 0;
 
-                bool uartReadByte(uint8_t *);
-
-                if (uartReadByte(&byte)) {
+                if (systemUartReadByte(&byte)) {
 
                     switch (parser.parse(byte)) {
 

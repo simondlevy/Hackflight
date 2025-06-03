@@ -182,12 +182,12 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
     bmi088_get_accel_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
 }
 
-bool uartReadByte(uint8_t * byte)
+bool systemUartReadByte(uint8_t * byte)
 {
     return uartGetData(1, byte);
 }
 
-void uartWriteByte(const uint8_t byte)
+void systemUartWriteByte(const uint8_t byte)
 {
     uartSendDataDmaBlocking(1, (uint8_t *)&byte);
 }

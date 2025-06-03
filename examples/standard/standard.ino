@@ -160,7 +160,7 @@ void  motorsStop()
 
 // Serial comms  ------------------------------------------------------------
 
-bool uartReadByte(uint8_t * byte)
+bool systemUartReadByte(uint8_t * byte)
 {
     vTaskDelay(1); // not sure why this is necessary
 
@@ -173,20 +173,8 @@ bool uartReadByte(uint8_t * byte)
     return avail;
 }
 
-void uartWriteByte(const uint8_t byte)
+void systemUartWriteByte(const uint8_t byte)
 {
     Serial1.write(byte);
 }
 
-
-// Debugging  ---------------------------------------------------------------
-
-void debug(const char * msg)
-{
-    Serial.printf("DEBUG: %s\n", msg);
-}
-
-void error(const char * msg)
-{
-    Serial.printf("ERROR: %s\n", msg);
-}

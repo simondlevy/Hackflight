@@ -69,8 +69,7 @@ class RpiLoggerTask {
                 serializer.serializeFloats(MSP_STATE, (float *)&state, 12);
 
                 for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                    void uartWriteByte(const uint8_t);
-                    uartWriteByte(serializer.payload[k]);
+                    systemUartWriteByte(serializer.payload[k]);
                 }
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
