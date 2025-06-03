@@ -22,9 +22,13 @@ from time import sleep
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 
-from msp import Parser as MspParser
-
 from btsupport import connect_to_server
+
+try:
+    from msp import Parser as MspParser
+except Exception as e:
+    print('Install msp: cd ../msppg; make install')
+    exit(0)
 
 RPI_SETPOINT_PORT = 1
 
