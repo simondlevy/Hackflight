@@ -48,6 +48,7 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 RpiSetpointTask * setpointTask,
+				DebugTask * debugTask,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun)
         {
@@ -62,6 +63,8 @@ class CoreTask {
             _imuTask = imuTask;
 
             _setpointTask = setpointTask;
+
+            _debugTask = debugTask;
 
             _mixFun = mixFun;
 
@@ -138,6 +141,8 @@ class CoreTask {
 
         ImuTask * _imuTask;
 
+        DebugTask * _debugTask;
+
         Safety * _safety;
 
         mixFun_t _mixFun;
@@ -166,18 +171,18 @@ class CoreTask {
 
         void run(void)
         {
-            static RateSupervisor rateSupervisor;
-
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
-            //Wait for the system to be fully started to start core loop
+            // Wait for the system to be fully started to start core loop
             systemWaitStart();
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
-            while(!_imuTask->areCalibrated()) {
+            while (!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
+
+            static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
             uint32_t setpoint_timestamp = 0;
@@ -220,6 +225,13 @@ class CoreTask {
                     }
 
                     demands_t closedLoopDemands = {};
+
+                    _debugTask->setMessage(
+                            "z=%+3.3f phi=%+3.1f theta=%+3.f psi=%+3.1f",
+                            (double)vehicleState.z,
+                            (double)vehicleState.phi,
+                            (double)vehicleState.theta,
+                            (double)vehicleState.psi);
 
                     runClosedLoopControl(
                             1.f / PID_UPDATE_RATE,

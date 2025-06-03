@@ -23,6 +23,7 @@
 #include <safety.hpp>
 #include <system.h>
 #include <tasks/core.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
@@ -34,13 +35,14 @@
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
 
-static RpiSetpointTask rpiSetpointTask;
-static RpiLoggerTask rpiLoggerTask;
 static CoreTask coreTask;
+static DebugTask debugTask; // unused
 static EstimatorTask estimatorTask;
 static FlowDeckTask flowDeckTask;
 static ImuTask imuTask;
 static LedTask ledTask;
+static RpiLoggerTask rpiLoggerTask;
+static RpiSetpointTask rpiSetpointTask;
 static ZRangerTask zrangerTask;
 
 static Safety safety;
@@ -94,6 +96,7 @@ static void systemTask(void *arg)
             &estimatorTask,
             &imuTask,
             &rpiSetpointTask,
+            &debugTask,
             Mixer::rotorCount,
             Mixer::mix);
 

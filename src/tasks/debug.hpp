@@ -16,13 +16,13 @@
 
 #pragma once
 
-#if defined(ARDUINO)
-
 #include <Arduino.h>
 #include <string.h>
 #include <task.hpp>
 
 class DebugTask {
+
+#if defined(ARDUINO)
 
     public:
 
@@ -78,6 +78,18 @@ class DebugTask {
 				vTaskDelay(M2T(1000/REPORT_FREQ));
 			}
 		}
+
+#else
+    public:
+
+        void begin()
+        {
+        }
+
+ 		void setMessage(const char * format, ...)
+        {
+            (void)format;
+        }
+#endif
 };
 
-#endif
