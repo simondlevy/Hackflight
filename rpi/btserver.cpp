@@ -69,7 +69,7 @@ static void * logging_fun(void * arg)
 
                 case MSP_STATE:
 
-                    if (stateServer.isConnected()) {
+                    {
 
                         const float state[12] = { 
                             parser.getFloat(0),
@@ -86,18 +86,24 @@ static void * logging_fun(void * arg)
                             parser.getFloat(11)
                         };
 
-                        stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
+                        if (stateServer.isConnected()) {
 
-                        // For now, we use the Raspberry Pi to encode the
-                        // spikes, then send them to the client
-                        const float obs[2] = {0, 0};
-                        encoder_helper.get_spikes(obs);
-                        const auto spikes = encoder_helper.spikes;
-                        for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                            printf("%d ", spikes[k].id);
+                            stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
                         }
-                        printf("\n");
 
+#if _SNN
+                        if (spikeServer.isConnected()) {
+                            // For now, we use the Raspberry Pi to encode the
+                            // spikes, then send them to the client
+                            const float obs[2] = {0, 0};
+                            encoder_helper.get_spikes(obs);
+                            const auto spikes = encoder_helper.spikes;
+                            for (size_t k=0; k<encoder_helper.nspikes; ++k) {
+                                printf("%d ", spikes[k].id);
+                            }
+                            printf("\n");
+                        }
+#endif
                     }
 
                     break;
@@ -106,8 +112,6 @@ static void * logging_fun(void * arg)
                     // Eventually we should get spikes from flight controller,
                     // run the spikes through the neuroprocessor, and send them
                     // back to the flight controller
-                    if (spikeServer.isConnected()) {
-                    }
                     break;
 
             }
