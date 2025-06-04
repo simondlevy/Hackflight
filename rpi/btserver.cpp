@@ -46,9 +46,6 @@ static const uint16_t SPIKE_PORT = 3;
 // Serial connection to FC
 static int serialfd;
 
-// Processor network
-//static ProcNet proc_net;
-
 static void * logging_fun(void * arg)
 {
     // true = Bluetooth
@@ -95,13 +92,13 @@ static void * logging_fun(void * arg)
                         if (spikeServer.isConnected()) {
                             // For now, we use the Raspberry Pi to encode the
                             // spikes, then send them to the client
-                            const float obs[2] = {0, 0};
+                            const float obs[2] = {-10, 0};
                             encoder_helper.get_spikes(obs);
-                            const auto spikes = encoder_helper.spikes;
+                            bool did_spike[2] = {};
                             for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                                printf("%d ", spikes[k].id);
+                                did_spike[encoder_helper.spikes[k].id] = true;
                             }
-                            printf("\n");
+                            printf("%d %d\n", did_spike[0], did_spike[1]);
                         }
 #endif
                     }
