@@ -119,6 +119,8 @@ int main(int argc, char ** argv)
 
     MspParser parser = {};
 
+    // Loop forever, retreiving setpoint messages from the client and sending
+    // them to the flight controller
     while (true) {
 
         uint8_t byte = 0;
