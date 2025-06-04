@@ -27,7 +27,9 @@
 #include <pthread.h>
 #include <time.h>
 
-//#include <framework/include/utils/levy/proc_net.hpp>
+#ifdef _SNN
+#include <framework/include/utils/levy/proc_net.hpp>
+#endif
 
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>

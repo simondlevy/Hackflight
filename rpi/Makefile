@@ -16,7 +16,7 @@ standard: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/mes
 	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
 
 snn: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
+	g++ $(INCLUDE) -D_SNN -I../src -O3 -Wall btserver.cpp -o btserver
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi
