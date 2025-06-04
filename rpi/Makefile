@@ -16,33 +16,25 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-ROOT = $(HOME)/Desktop
-
-FDIR = $(HOME)/Desktop/framework
-
-PDIR =  $(FDIR)/processors/risp
-
-NETWORK = difference_risp_train.txt
-
 ROOT = $(HOME)
 
-INCLUDE = -I$(ROOT)
+EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
 
 FDIR = $(ROOT)/framework
 
-PDIR =  $(FDIR)/processors/risp
+NETWORK = difference_risp_train.txt
 
-INCLUDE = -I$(ROOT) -I$(FDIR)/include -I$(LEVY_UTILS) -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
+INCLUDE = -I$(ROOT) -I../src
 
 standard: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
+	g++ $(INCLUDE) -O3 -Wall btserver.cpp -o btserver
 
-snn: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ $(INCLUDE) -D_SNN -I../src -O3 -Wall btserver.cpp $(FDIR)/lib/libframework.a -o btserver
+# Just encoder for now (full monty would use libframework.a)
+snn: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
+	g++ $(INCLUDE) -I$(EDIR)/src -D_SNN -I../src -O3 -Wall btserver.cpp -o btserver
 
-io_stream.o:
-	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
-
+difference_risp_train.hpp: 
+	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi
@@ -51,7 +43,7 @@ run: btserver
 	./btserver
 
 clean:
-	rm -f btserver *.o
+	rm -f btserver *.o *.hpp
 
 edit:
 	vim btserver.cpp

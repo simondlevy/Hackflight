@@ -28,8 +28,7 @@
 #include <time.h>
 
 #ifdef _SNN
-#include <framework/include/utils/levy/proc_net.hpp>
-static ProcNet proc_net;
+#include "difference_risp_train.hpp"
 #endif
 
 #include <posix-utils/serial.hpp>
