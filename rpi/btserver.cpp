@@ -1,5 +1,5 @@
 /*
-   RaspberryPi code for Hackflight
+   RaspberryPi Bluetooth server code for Hackflight
 
    Additional installs required:
 
