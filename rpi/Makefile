@@ -12,15 +12,11 @@ INCLUDE = -I$(ROOT) -I$(FDIR)/include -I$(LEVY_UTILS) -I$(FDIR)/cpp-apps/include
 
 LEVY_UTILS = $(FDIR)/include/utils/levy
 
-ALL = btserver
+standard: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
+	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
 
-all: $(ALL)
-
-btserver: btserver.o
-	g++ -O3 -o btserver btserver.o
-
-btserver.o: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ $(INCLUDE) -I../src -O3 -Wall -c btserver.cpp
+snn: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
+	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi
