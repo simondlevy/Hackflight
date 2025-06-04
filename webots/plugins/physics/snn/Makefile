@@ -21,8 +21,6 @@ INCLUDE = -I../../../simsrc -I../../../../src
 
 CXX_SOURCES = ../support.cpp
 
-FILES_TO_REMOVE += sim_control.hpp
-
 # TeNNLab framework stuff ----------------------------------------------------
 
 ROOT = $(HOME)/Desktop
