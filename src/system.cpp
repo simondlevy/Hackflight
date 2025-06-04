@@ -28,8 +28,8 @@
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
-#include <tasks/rpilogger.hpp>
-#include <tasks/rpisetpoint.hpp>
+#include <tasks/logger.hpp>
+#include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
 static const float IMU_CALIBRATION_PITCH = 0;
@@ -41,8 +41,8 @@ static EstimatorTask estimatorTask;
 static FlowDeckTask flowDeckTask;
 static ImuTask imuTask;
 static LedTask ledTask;
-static RpiLoggerTask rpiLoggerTask;
-static RpiSetpointTask rpiSetpointTask;
+static LoggerTask loggerTask;
+static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
 static Safety safety;
@@ -82,9 +82,9 @@ static void systemTask(void *arg)
 
     estimatorTask.begin(&safety);
 
-    rpiSetpointTask.begin(&safety);
+    setpointTask.begin(&safety);
 
-    rpiLoggerTask.begin(&estimatorTask);
+    loggerTask.begin(&estimatorTask);
 
     ledTask.begin(&safety, _led_pin);
 
@@ -97,7 +97,7 @@ static void systemTask(void *arg)
             &safety,
             &estimatorTask,
             &imuTask,
-            &rpiSetpointTask,
+            &setpointTask,
             &debugTask,
             Mixer::rotorCount,
             Mixer::mix);

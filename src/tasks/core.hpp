@@ -36,7 +36,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/rpisetpoint.hpp>
+#include <tasks/setpoint.hpp>
 #include <vehicles/diyquad.hpp>
 
 class CoreTask {
@@ -47,7 +47,7 @@ class CoreTask {
                 Safety * safety,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
-                RpiSetpointTask * setpointTask,
+                SetpointTask * setpointTask,
 				DebugTask * debugTask,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun)
@@ -135,7 +135,7 @@ class CoreTask {
 
         demands_t _demands;
 
-        RpiSetpointTask * _setpointTask;
+        SetpointTask * _setpointTask;
 
         EstimatorTask * _estimatorTask;
 

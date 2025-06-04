@@ -24,7 +24,7 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-class RpiLoggerTask {
+class LoggerTask {
 
     public:
 
@@ -36,16 +36,16 @@ class RpiLoggerTask {
 
             _estimatorTask = estimatorTask;
 
-            _task.init(runRpiLoggerTask, "rpilogger", this, 3);
+            _task.init(runLoggerTask, "logger", this, 3);
         }
 
     private:
         
         static constexpr float FREQ_HZ = 100;
 
-        static void runRpiLoggerTask(void * obj)
+        static void runLoggerTask(void * obj)
         {
-            ((RpiLoggerTask *)obj)->run();
+            ((LoggerTask *)obj)->run();
         }
 
         FreeRtosTask _task;

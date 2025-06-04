@@ -29,7 +29,7 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-class RpiSetpointTask {
+class SetpointTask {
 
     public:
 
@@ -57,7 +57,7 @@ class RpiSetpointTask {
 
             xQueueSend(priorityQueue, &priorityDisable, 0);
 
-            _task.init(runRpiSetpointTask, "rpisetpoint", this, 3);
+            _task.init(runSetpointTask, "setpoint", this, 3);
         }
 
         void getSetpoint(setpoint_t & setpoint)
@@ -73,9 +73,9 @@ class RpiSetpointTask {
         static const uint16_t MIN_THRUST = 1000;
         static const uint16_t MAX_THRUST = 60000;
  
-        static void runRpiSetpointTask(void * obj)
+        static void runSetpointTask(void * obj)
         {
-            ((RpiSetpointTask *)obj)->run();
+            ((SetpointTask *)obj)->run();
         }
 
         const setpoint_t nullSetpoint = {};
