@@ -21,7 +21,7 @@
 #include <plugins/physics.h>
 
 #include <clock.hpp>
-#include <control.hpp>
+#include <sim_control.hpp>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
 #include <dynamics.hpp>

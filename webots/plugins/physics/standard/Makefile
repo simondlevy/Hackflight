@@ -22,14 +22,14 @@ INCLUDE = -I$(SRC)
 
 CXX_SOURCES = ../support.cpp
 
-FILES_TO_REMOVE += control.hpp
+FILES_TO_REMOVE += sim_control.hpp
 
 all: libstandard.so
 
 ../support.cpp: ./control.hpp
 
 ./control.hpp:
-	cp $(SRC)/control/standard.hpp ./control.hpp
+	cp $(SRC)/control/standard.hpp ./sim_control.hpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
