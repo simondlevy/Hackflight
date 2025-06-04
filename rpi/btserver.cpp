@@ -50,7 +50,10 @@ static void * logging_fun(void * arg)
 {
     // true = Bluetooth
     auto stateServer = Server(STATE_PORT, "state", true);
+
+#if _SNN
     auto spikeServer = Server(SPIKE_PORT, "spike", true);
+#endif
 
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
@@ -67,7 +70,6 @@ static void * logging_fun(void * arg)
                 case MSP_STATE:
 
                     {
-
                         const float state[12] = { 
                             parser.getFloat(0),
                             parser.getFloat(1),
@@ -90,15 +92,19 @@ static void * logging_fun(void * arg)
 
 #if _SNN
                         if (spikeServer.isConnected()) {
-                            // For now, we use the Raspberry Pi to encode the
-                            // spikes, then send them to the client
-                            const float obs[2] = {-10, 0};
+
+                            // For now, we use the Raspberry Pi to encode just
+                            // the spikes corresponding to the climb rate, then
+                            // send them to the client
+                            const float obs[2] = {0, parser.getFloat(5)};
                             encoder_helper.get_spikes(obs);
-                            bool did_spike[2] = {};
+                            uint32_t count = 0;
                             for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                                did_spike[encoder_helper.spikes[k].id] = true;
+                                if (encoder_helper.spikes[k].id == 1) {
+                                    count++;
+                                }
                             }
-                            printf("%d %d\n", did_spike[0], did_spike[1]);
+                            printf("%d\n", count);
                         }
 #endif
                     }
