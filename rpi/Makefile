@@ -22,14 +22,6 @@ FDIR = $(HOME)/Desktop/framework
 
 PDIR =  $(FDIR)/processors/risp
 
-CXX_SOURCES += $(FDIR)/src/io_stream.cpp
-CXX_SOURCES += $(FDIR)/src/jspace.cpp
-CXX_SOURCES += $(FDIR)/src/network.cpp
-CXX_SOURCES += $(FDIR)/src/properties.cpp
-CXX_SOURCES += $(FDIR)/src/spike_encoding.cpp
-CXX_SOURCES += $(PDIR)/src/processor.cpp
-CXX_SOURCES += $(PDIR)/src/static_proc.cpp
-
 NETWORK = difference_risp_train.txt
 
 ROOT = $(HOME)
@@ -42,13 +34,15 @@ PDIR =  $(FDIR)/processors/risp
 
 INCLUDE = -I$(ROOT) -I$(FDIR)/include -I$(LEVY_UTILS) -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
 
-LEVY_UTILS = $(FDIR)/include/utils/levy
-
 standard: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
 
 snn: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ $(INCLUDE) -D_SNN -I../src -O3 -Wall btserver.cpp -o btserver
+	g++ $(INCLUDE) -D_SNN -I../src -O3 -Wall btserver.cpp $(FDIR)/lib/libframework.a -o btserver
+
+io_stream.o:
+	g++ $(INCLUDE) -I../src -O3 -Wall btserver.cpp -o btserver
+
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi
