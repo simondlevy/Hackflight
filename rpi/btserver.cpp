@@ -98,13 +98,13 @@ static void * logging_fun(void * arg)
                             // send them to the client
                             const float obs[2] = {0, parser.getFloat(5)};
                             encoder_helper.get_spikes(obs);
-                            uint32_t count = 0;
+                            uint32_t counts[1] = {};
                             for (size_t k=0; k<encoder_helper.nspikes; ++k) {
                                 if (encoder_helper.spikes[k].id == 1) {
-                                    count++;
+                                    counts[0]++;
                                 }
                             }
-                            printf("%d\n", count);
+                            printf("%d\n", counts[0]);
                         }
 #endif
                     }
