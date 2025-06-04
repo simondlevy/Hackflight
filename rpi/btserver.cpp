@@ -29,6 +29,7 @@
 
 #ifdef _SNN
 #include <framework/include/utils/levy/proc_net.hpp>
+static ProcNet proc_net;
 #endif
 
 #include <posix-utils/serial.hpp>

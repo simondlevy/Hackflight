@@ -102,7 +102,6 @@ int main(int argc, char ** argv)
     }
 
     proc_net.load(argv[1], "risp");
-
     proc_net.clear();
 
     // Open a serial connection to the Teensy
