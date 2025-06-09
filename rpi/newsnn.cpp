@@ -3,9 +3,9 @@
 
    Additional installs required:
 
-     Clone https://github.com/simondlevy/posix-utils to ~/Desktop
+   Clone https://github.com/simondlevy/posix-utils to ~/Desktop
 
-     sudo apt install libbluetooth-dev
+   sudo apt install libbluetooth-dev
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -53,6 +53,7 @@ static void * logging_fun(void * arg)
 {
     // true = Bluetooth
     auto stateServer = Server(STATE_PORT, "state", true);
+    auto spikeServer = Server(SPIKE_PORT, "spike", true);
 
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
@@ -70,18 +71,10 @@ static void * logging_fun(void * arg)
 
                     {
                         const float state[12] = { 
-                            parser.getFloat(0),
-                            parser.getFloat(1),
-                            parser.getFloat(2),
-                            parser.getFloat(3),
-                            parser.getFloat(4),
-                            parser.getFloat(5),
-                            parser.getFloat(6),
-                            parser.getFloat(7),
-                            parser.getFloat(8),
-                            parser.getFloat(9),
-                            parser.getFloat(10),
-                            parser.getFloat(11)
+                            parser.getFloat(0), parser.getFloat(1), parser.getFloat(2),
+                            parser.getFloat(3), parser.getFloat(4), parser.getFloat(5),
+                            parser.getFloat(6), parser.getFloat(7), parser.getFloat(8),
+                            parser.getFloat(9), parser.getFloat(10), parser.getFloat(11)
                         };
 
                         if (stateServer.isConnected()) {
@@ -89,6 +82,16 @@ static void * logging_fun(void * arg)
                             stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
                         }
 
+                        if (spikeServer.isConnected()) {
+
+                            vector<double> observations = { 0, parser.getFloat(5)};
+
+                            vector <int> counts = {};
+
+                            _snn->step(observations, counts);
+
+                            //spikeServer.sendData(counts, 1);
+                        }
                     }
 
                     break;
