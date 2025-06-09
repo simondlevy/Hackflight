@@ -14,17 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# TeNNLab framework stuff ----------------------------------------------------
-
 ROOT = $(HOME)
 
 EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
 
 FDIR = $(ROOT)/framework
 
+PDIR =  $(FDIR)/processors/risp
+
 NETWORK = difference_risp_train.txt
 
-INCLUDE = -I$(ROOT) -I../src
+INCLUDE = -I$(ROOT) -I../src -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include
 
 standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
@@ -32,6 +32,9 @@ standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/mes
 # Just encoder for now (full monty would use libframework.a)
 snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
 	g++ -Wall $(INCLUDE) -I$(EDIR)/src -D_SNN -I../src -O3 -Wall snn.cpp -o btserver
+
+new: newsnn.cpp
+	g++ -Wall $(INCLUDE) -O3 newsnn.cpp $(FDIR)/lib/libframework.a -o btserver
 
 difference_risp_train.hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
