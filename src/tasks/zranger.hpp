@@ -46,6 +46,8 @@ class ZRangerTask {
 
     private:
 
+        static constexpr float FREQ_HZ = 40;
+
         static const uint16_t OUTLIER_LIMIT_MM = 5000;
 
         // Measurement noise model
@@ -79,7 +81,7 @@ class ZRangerTask {
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, M2T(25));
+                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
                 float range = hardware_read();
 

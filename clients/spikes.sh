@@ -1,1 +1,1 @@
-~/Desktop/spikeplotter/spikeplot.py -n 2 -a B8:27:EB:3F:AB:47 -p 3
+~/Desktop/spikeplotter/spikeplot.py -n 1 -a B8:27:EB:E0:1D:07 -p 3

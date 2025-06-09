@@ -19,8 +19,8 @@ import sys
 import time
 
 
-#RPI_ADDRESS = 'B8:27:EB:E0:1D:07'  # Onboard
-RPI_ADDRESS = 'B8:27:EB:3F:AB:47' # PiHat
+RPI_ADDRESS = 'B8:27:EB:E0:1D:07'  # Onboard
+#RPI_ADDRESS = 'B8:27:EB:3F:AB:47' # PiHat
 
 def connect_to_server(port):
 
