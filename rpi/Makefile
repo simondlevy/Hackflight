@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ROOT = $(HOME)/Desktop
+ROOT = $(HOME)
 
 EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
 
@@ -33,17 +33,16 @@ standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/mes
 snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
 	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
 
-new: newsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
-	processor.o static_proc.o
-	g++ -Wall $(INCLUDE) -o btserver -O3 newsnn.o io_stream.o jspace.o \
-		network.o properties.o spike_encoding.o processor.o static_proc.o
-
-test: testsnn.o 
-	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
+new: newsnn.o 
+	g++ -Wall $(INCLUDE) -o btserver -O3 newsnn.o $(FDIR)/obj/io_stream.o \
 		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
 
 newsnn.o: newsnn.cpp
 	g++ -Wall $(INCLUDE) -c -O3 newsnn.cpp
+
+test: testsnn.o 
+	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
+		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
 
 testsnn.o: testsnn.cpp
 	g++ -Wall $(INCLUDE) -c -O3 testsnn.cpp

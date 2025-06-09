@@ -44,7 +44,10 @@ static const float CLIMBRATE_SCALE  = 500;
 static const float CLIMBRATE_OFFSET = 26000;
 
 // Serial connection to FC
-static int serialfd;
+static int _serialfd;
+
+// Spiking neural net
+static SNN * _snn;
 
 static void * logging_fun(void * arg)
 {
@@ -59,7 +62,7 @@ static void * logging_fun(void * arg)
 
         char byte = 0;
 
-        if (read(serialfd, &byte, 1) == 1) {
+        if (read(_serialfd, &byte, 1) == 1) {
 
             switch (parser.parse(byte)) {
 
@@ -103,12 +106,12 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    auto snn = SNN(argv[1], "risp");
+    _snn = new SNN(argv[1], "risp");
 
     // Open a serial connection to the microcontroller
-    serialfd = Serial::open_port("/dev/ttyS0", B115200);
+    _serialfd = Serial::open_port("/dev/ttyS0", B115200);
 
-    if (serialfd < 0) {
+    if (_serialfd < 0) {
         return 1;
     }
 
@@ -134,7 +137,7 @@ int main(int argc, char ** argv)
 
             const auto payloadSize = parser.getPayload(payload);
 
-            write(serialfd, payload, payloadSize);
+            write(_serialfd, payload, payloadSize);
         }
 
 
