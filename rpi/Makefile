@@ -38,10 +38,14 @@ new: newsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
 	g++ -Wall $(INCLUDE) -o btserver -O3 newsnn.o io_stream.o jspace.o \
 		network.o properties.o spike_encoding.o processor.o static_proc.o
 
-test: testsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
-	processor.o static_proc.o
-	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o io_stream.o jspace.o \
-		network.o properties.o spike_encoding.o processor.o static_proc.o
+#test: testsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
+#	processor.o static_proc.o
+#	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o io_stream.o jspace.o \
+#		network.o properties.o spike_encoding.o processor.o static_proc.o
+
+test: testsnn.o 
+	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
+		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
 
 newsnn.o: newsnn.cpp
 	g++ -Wall $(INCLUDE) -c -O3 newsnn.cpp
@@ -80,4 +84,4 @@ run: btserver
 	./btserver
 
 clean:
-	rm -f btserver *.o *.hpp
+	rm -f btserver *.o
