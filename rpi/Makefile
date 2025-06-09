@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ROOT = $(HOME)
+ROOT = $(HOME)/Desktop
 
 EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
 
@@ -24,17 +24,43 @@ PDIR =  $(FDIR)/processors/risp
 
 NETWORK = difference_risp_train.txt
 
-INCLUDE = -I$(ROOT) -I../src -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include
+INCLUDE = -I$(ROOT) -I../src -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include \
+		  -I$(PDIR)/include
 
 standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
 
-# Just encoder for now (full monty would use libframework.a)
 snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
 	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
 
-new: newsnn.cpp
-	g++ -Wall $(INCLUDE) -O3 newsnn.cpp $(FDIR)/lib/libframework.a -o btserver
+new: newsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
+	processor.o static_proc.o
+	g++ -Wall $(INCLUDE) -o btserver -O3 newsnn.o io_stream.o jspace.o \
+		network.o properties.o spike_encoding.o processor.o static_proc.o
+
+newsnn.o: newsnn.cpp
+	g++ -Wall $(INCLUDE) -c -O3 newsnn.cpp
+
+io_stream.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/io_stream.cpp
+
+jspace.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/jspace.cpp
+
+network.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/network.cpp
+
+properties.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/properties.cpp
+
+spike_encoding.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/spike_encoding.cpp
+
+processor.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(PDIR)/src/processor.cpp
+
+static_proc.o:
+	g++ -Wall $(INCLUDE) -c -O3 $(PDIR)/src/static_proc.cpp
 
 difference_risp_train.hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
