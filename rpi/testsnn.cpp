@@ -24,9 +24,6 @@
 
 #include <snn_util.hpp>
 
-static const float CLIMBRATE_SCALE  = 500;
-static const float CLIMBRATE_OFFSET = 26000;
-
 int main(int argc, char ** argv)
 {
     if (argc < 2) {
@@ -35,6 +32,24 @@ int main(int argc, char ** argv)
     }
 
     auto snn = SNN(argv[1], "risp");
+
+    for (int j=-10; j<=10; ++j) {
+
+        for (int k=-10; k<=10; ++k) {
+
+            vector<double> observations = { (double)j/10, (double)k/10 };
+
+            vector <int> counts = {};
+
+            snn.step(observations, counts);
+
+            //const double action = counts[0] * scale + offset;
+
+            printf("%+3.3f - %+3.3f = %d\n",
+                    observations[0], observations[1], counts[0]);
+
+        }
+    }
 
     (void)snn;
 
