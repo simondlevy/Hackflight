@@ -110,13 +110,6 @@ static void * logging_fun(void * arg)
                     }
 
                     break;
-
-                case MSP_SPIKES:
-                    // Eventually we should get spikes from flight controller,
-                    // run the spikes through the neuroprocessor, and send them
-                    // back to the flight controller
-                    break;
-
             }
         }
     }

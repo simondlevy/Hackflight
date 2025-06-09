@@ -16,19 +16,6 @@
    {"dpsi":   "float"}
   ],
 
-  "SPIKES": 
-  [{"ID": 101},
-   {"comment": "Current spikes, eight per byte"},
-   {"byte1": "float"},
-   {"byte2": "float"},
-   {"byte3": "float"},
-   {"byte4": "float"},
-   {"byte5": "float"},
-   {"byte6": "float"},
-   {"byte7": "float"},
-   {"byte8": "float"}
-  ],
-
   "SET_ARMING": 
   [{"ID": 200},
    {"comment": "Dis/arm"},
