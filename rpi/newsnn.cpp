@@ -103,7 +103,7 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    //auto snn = new SNN(argv[1], "risp");
+    auto snn = SNN(argv[1], "risp");
 
     // Open a serial connection to the microcontroller
     serialfd = Serial::open_port("/dev/ttyS0", B115200);
