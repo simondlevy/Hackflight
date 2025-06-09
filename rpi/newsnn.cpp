@@ -90,7 +90,7 @@ static void * logging_fun(void * arg)
 
                             _snn->step(observations, counts);
 
-                            //spikeServer.sendData(counts, 1);
+                            spikeServer.sendData((const uint8_t *)counts.data(), counts.size()*sizeof(int));
                         }
                     }
 
