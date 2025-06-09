@@ -27,11 +27,6 @@
 #include <pthread.h>
 #include <time.h>
 
-#ifdef _SNN
-#include "difference_risp_train.hpp"
-static EncoderHelper encoder_helper;
-#endif
-
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
 
@@ -50,10 +45,6 @@ static void * logging_fun(void * arg)
 {
     // true = Bluetooth
     auto stateServer = Server(STATE_PORT, "state", true);
-
-#if _SNN
-    auto spikeServer = Server(SPIKE_PORT, "spike", true);
-#endif
 
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
@@ -90,23 +81,6 @@ static void * logging_fun(void * arg)
                             stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
                         }
 
-#if _SNN
-                        if (spikeServer.isConnected()) {
-
-                            // For now, we use the Raspberry Pi to encode just
-                            // the spikes corresponding to the climb rate, then
-                            // send them to the client
-                            const float obs[2] = {0, parser.getFloat(5)};
-                            encoder_helper.get_spikes(obs);
-                            uint8_t counts[1] = {};
-                            for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                                if (encoder_helper.spikes[k].id == 1) {
-                                    counts[0]++;
-                                }
-                            }
-                            spikeServer.sendData(counts, 1);
-                        }
-#endif
                     }
 
                     break;
@@ -125,10 +99,6 @@ int main(int argc, char ** argv)
     if (serialfd < 0) {
         return 1;
     }
-
-#ifdef _SNN
-    encoder_helper.init();
-#endif
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);

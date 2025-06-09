@@ -26,12 +26,12 @@ NETWORK = difference_risp_train.txt
 
 INCLUDE = -I$(ROOT) -I../src
 
-standard: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall btserver.cpp -o btserver
+standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
 
 # Just encoder for now (full monty would use libframework.a)
-snn: btserver.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
-	g++ -Wall $(INCLUDE) -I$(EDIR)/src -D_SNN -I../src -O3 -Wall btserver.cpp -o btserver
+snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
+	g++ -Wall $(INCLUDE) -I$(EDIR)/src -D_SNN -I../src -O3 -Wall snn.cpp -o btserver
 
 difference_risp_train.hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
@@ -44,6 +44,3 @@ run: btserver
 
 clean:
 	rm -f btserver *.o *.hpp
-
-edit:
-	vim btserver.cpp
