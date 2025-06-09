@@ -24,9 +24,9 @@
 
 #include <snn_util.hpp>
 
-static const double SCALE = 0.1;
+static const double SCALE = 0.09;
 
-static const double OFFSET = 0;
+static const double OFFSET = -2.16;
 
 int main(int argc, char ** argv)
 {
@@ -47,10 +47,10 @@ int main(int argc, char ** argv)
 
             snn.step(observations, counts);
 
-            //const double action = counts[0] * SCALE + OFFSET;
+            const double action = counts[0] * SCALE + OFFSET;
 
-            printf("%+3.3f - %+3.3f = %d\n",
-                    observations[0], observations[1], counts[0]);
+            printf("%+3.3f - %+3.3f = %+3.3f\n",
+                    observations[0], observations[1], action);
 
         }
     }
