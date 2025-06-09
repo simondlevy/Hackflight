@@ -31,7 +31,7 @@ standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/mes
 
 # Just encoder for now (full monty would use libframework.a)
 snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
-	g++ -Wall $(INCLUDE) -I$(EDIR)/src -D_SNN -I../src -O3 -Wall snn.cpp -o btserver
+	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
 
 new: newsnn.cpp
 	g++ -Wall $(INCLUDE) -O3 newsnn.cpp $(FDIR)/lib/libframework.a -o btserver

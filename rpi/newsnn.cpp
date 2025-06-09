@@ -33,6 +33,8 @@
 #include <msp/parser.hpp>
 #include <msp/messages.h>
 
+#include <snn_util.hpp>
+
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
 static const uint16_t STATE_PORT = 2;
