@@ -38,11 +38,6 @@ new: newsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
 	g++ -Wall $(INCLUDE) -o btserver -O3 newsnn.o io_stream.o jspace.o \
 		network.o properties.o spike_encoding.o processor.o static_proc.o
 
-#test: testsnn.o io_stream.o jspace.o network.o properties.o spike_encoding.o \
-#	processor.o static_proc.o
-#	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o io_stream.o jspace.o \
-#		network.o properties.o spike_encoding.o processor.o static_proc.o
-
 test: testsnn.o 
 	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
 		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
@@ -52,27 +47,6 @@ newsnn.o: newsnn.cpp
 
 testsnn.o: testsnn.cpp
 	g++ -Wall $(INCLUDE) -c -O3 testsnn.cpp
-
-io_stream.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/io_stream.cpp
-
-jspace.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/jspace.cpp
-
-network.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/network.cpp
-
-properties.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/properties.cpp
-
-spike_encoding.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(FDIR)/src/spike_encoding.cpp
-
-processor.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(PDIR)/src/processor.cpp
-
-static_proc.o:
-	g++ -Wall $(INCLUDE) -c -O3 $(PDIR)/src/static_proc.cpp
 
 difference_risp_train.hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
