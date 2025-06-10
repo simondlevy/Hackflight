@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ROOT = $(HOME)
+ROOT = $(HOME)/Desktop
 
 EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
 
@@ -24,8 +24,9 @@ PDIR =  $(FDIR)/processors/risp
 
 NETWORK = difference_risp_train.txt
 
-INCLUDE = -I$(ROOT) -I../src -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include \
-		  -I$(PDIR)/include
+INCLUDE = -I$(ROOT) -I../src
+
+FINCLUDE = -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
 
 standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
@@ -34,18 +35,18 @@ snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h di
 	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
 
 new: newsnn.o 
-	g++ -Wall $(INCLUDE) -o btserver -O3 newsnn.o $(FDIR)/obj/io_stream.o \
+	g++ -Wall -o btserver -O3 newsnn.o $(FDIR)/obj/io_stream.o \
 		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
 
 newsnn.o: newsnn.cpp
-	g++ -Wall $(INCLUDE) -c -O3 newsnn.cpp
+	g++ -Wall $(INCLUDE) $(FINCLUDE) -c -O3 newsnn.cpp
 
 test: testsnn.o 
-	g++ -Wall $(INCLUDE) -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
+	g++ -Wall -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
 		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
 
 testsnn.o: testsnn.cpp
-	g++ -Wall $(INCLUDE) -c -O3 testsnn.cpp
+	g++ -Wall $(INCLUDE) $(FINCLUDE) -c -O3 testsnn.cpp
 
 difference_risp_train.hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
