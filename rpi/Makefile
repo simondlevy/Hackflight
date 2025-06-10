@@ -51,4 +51,4 @@ run: btserver
 	./btserver
 
 clean:
-	rm -f btserver *.o
+	rm -f btserver *.o difference_risp_train.hpp
