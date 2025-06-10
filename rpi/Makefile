@@ -41,13 +41,6 @@ new: newsnn.o
 newsnn.o: newsnn.cpp
 	g++ -Wall $(INCLUDE) $(FINCLUDE) -c -O3 newsnn.cpp
 
-test: testsnn.o 
-	g++ -Wall -o btserver -O3 testsnn.o $(FDIR)/obj/io_stream.o \
-		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
-
-testsnn.o: testsnn.cpp
-	g++ -Wall $(INCLUDE) $(FINCLUDE) -c -O3 testsnn.cpp
-
 difference_risp_train.hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
 
