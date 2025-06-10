@@ -48,7 +48,7 @@ $(NETWORK).hpp:
 	cd ../msppg; make install; cd ../rpi
 
 run: btserver
-	./btserver
+	./btserver $(FDIR)/networks/$(NETWORK).txt
 
 clean:
 	rm -f btserver *.o $(NETWORK).hpp
