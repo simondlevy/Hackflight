@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ROOT = $(HOME)/Desktop
+ROOT = $(HOME)
 
 EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
 
@@ -31,7 +31,7 @@ FINCLUDE = -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/inc
 standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
 
-snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h difference_risp_train.hpp
+snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h $(NETWORK).hpp
 	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
 
 new: newsnn.o 
@@ -41,7 +41,7 @@ new: newsnn.o
 newsnn.o: newsnn.cpp
 	g++ -Wall $(INCLUDE) $(FINCLUDE) -c -O3 newsnn.cpp
 
-difference_risp_train.hpp: 
+$(NETWORK).hpp: 
 	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK)
 
 ../src/msp/messages.h: ../msppg/messages.json
@@ -51,4 +51,4 @@ run: btserver
 	./btserver
 
 clean:
-	rm -f btserver *.o difference_risp_train.hpp
+	rm -f btserver *.o $(NETWORK).hpp
