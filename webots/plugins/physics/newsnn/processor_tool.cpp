@@ -246,32 +246,28 @@ int main(int argc, char **argv)
 
                 if (network_processor_validation(net, p)) {
 
-                    if (sv.size() == 1) {
-
-                        try {
-                            const auto all_output_times = p->output_vectors();
+                    try {
+                        const auto all_output_times = p->output_vectors();
 
 
-                            for (size_t i = 0; i < (size_t)net->num_outputs();
-                                    i++) {
+                        for (size_t i = 0; i < (size_t)net->num_outputs();
+                                i++) {
 
-                                auto node = net->get_output(i);
-                                printf("node %s spike times:",
-                                        node_name(node).c_str());
+                            auto node = net->get_output(i);
+                            printf("node %s spike times:",
+                                    node_name(node).c_str());
 
-                                for (size_t j=0; j<all_output_times[i].size();
-                                        j++) {
-                                    printf(" %.1lf", all_output_times[i][j]);
-                                }
-                                printf("\n");
+                            for (size_t j=0; j<all_output_times[i].size();
+                                    j++) {
+                                printf(" %.1lf", all_output_times[i][j]);
                             }
-                        } catch (const SRE &e) {
-                            printf("%s\n",e.what());
-                        } catch (...) {
+                            printf("\n");
                         }
-
-                    } else {
+                    } catch (const SRE &e) {
+                        printf("%s\n",e.what());
+                    } catch (...) {
                     }
+
                 }
             } 
 
