@@ -162,6 +162,37 @@ int main(int argc, char **argv)
         prompt += " ";
     }
 
+    json network_json = {};
+
+    if (!read_json(NETWORK_FILENAME, network_json)) {
+
+        printf("usage: ML network_json. Bad json\n");
+    } else {
+
+        try {
+
+            if (p != nullptr) { delete p; p = nullptr; }
+            if (net != nullptr) { delete net; net = nullptr; }
+
+            net = load_network(&p, network_json);
+
+        } catch (const SRE &e) {
+            printf("%s\n",e.what());
+            if (net != nullptr) { delete net; net = nullptr; }
+            if (p != nullptr) { delete p; p = nullptr; }
+            net = nullptr;
+            p = nullptr;
+        } catch (...) {
+            printf("Unknown error when making processor\n");
+            if (net != nullptr) { delete net; net = nullptr; }
+            if (p != nullptr) { delete p; p = nullptr; }
+            net = nullptr;
+            p = nullptr;
+
+        }
+    }
+
+
     while(true) {
 
         try {
@@ -177,39 +208,7 @@ int main(int argc, char **argv)
             string s = {};
             while (ss >> s) sv.push_back(s);
 
-
             if (sv[0] == "ML") { 
-
-                json network_json = {};
-
-                if (!read_json(NETWORK_FILENAME, network_json)) {
-
-                    printf("usage: ML network_json. Bad json\n");
-                } else {
-
-                    try {
-
-                        if (p != nullptr) { delete p; p = nullptr; }
-                        if (net != nullptr) { delete net; net = nullptr; }
-
-                        net = load_network(&p, network_json);
-
-                    } catch (const SRE &e) {
-                        printf("%s\n",e.what());
-                        if (net != nullptr) { delete net; net = nullptr; }
-                        if (p != nullptr) { delete p; p = nullptr; }
-                        net = nullptr;
-                        p = nullptr;
-                    } catch (...) {
-                        printf("Unknown error when making processor\n");
-                        if (net != nullptr) { delete net; net = nullptr; }
-                        if (p != nullptr) { delete p; p = nullptr; }
-                        net = nullptr;
-                        p = nullptr;
-
-                    }
-                }
-
 
             } 
 
@@ -217,7 +216,6 @@ int main(int argc, char **argv)
 
                 if (network_processor_validation(net, p)) {
                     if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
-                        printf("usage: %s node_id spike_time spike_value node_id1 spike_time1 spike_value1 ...\n", sv[0].c_str());
                     } else {
 
                         const auto normalize = (sv[0].size() == 2);
