@@ -108,7 +108,11 @@ static Network *load_network(Processor **pp, const json &network_json)
     return net;
 }
 
-static void apply_spike(Network * net, Processor *p, vector<string> & sv,
+static void apply_spike(
+        Network * net,
+        Processor *p,
+        const int spike_id,
+        const double spike_time,
         vector<Spike> & spikes_array) 
 {
     static const double SPIKE_VAL = 1;
@@ -117,29 +121,17 @@ static void apply_spike(Network * net, Processor *p, vector<string> & sv,
 
     if (network_processor_validation(net, p)) {
 
-        //for (size_t i = 0; i < (sv.size() - 1) / 3; i++) {
+        try {
 
-        //    fprintf(stderr, "i=%lu\n", i);
+            spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, NORMALIZE);
 
-            try {
+            p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
 
-                int spike_id = 0;
-                double spike_time = 0;
+            spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
 
-                sscanf(sv[1].c_str(),"%d", &spike_id);
-                sscanf(sv[2].c_str(), "%lf", &spike_time);
-
-                spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, NORMALIZE);
-
-                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
-
-                spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
-
-            } catch (const SRE &e) {
-                printf("%s\n",e.what());
-            }   
-
-        //}
+        } catch (const SRE &e) {
+            printf("%s\n",e.what());
+        }   
     }
 }
 
@@ -203,6 +195,7 @@ int main(int argc, char **argv)
         }
     }
 
+    /*
     while(true) {
 
         try {
@@ -225,7 +218,13 @@ int main(int argc, char **argv)
         } catch (const SRE &e) {
             printf("%s\n", e.what());
         }
-    }  
+    }  */
+
+    // Apply spikes ----------------------------------------------------------
+
+    apply_spike(net, p, 0, 50, spikes_array);
+    apply_spike(net, p, 1, 325, spikes_array);
+    apply_spike(net, p, 2, 0, spikes_array);
 
     // Run -------------------------------------------------------------------
 
