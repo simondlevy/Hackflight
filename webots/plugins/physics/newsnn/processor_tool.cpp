@@ -16,70 +16,6 @@ using nlohmann::json;
 
 typedef runtime_error SRE;
 
-static void print_commands(FILE *f) 
-{ 
-
-    fprintf(f, "This is a processor tool program. The commands listed below are case-insensitive,\n");
-    fprintf(f, "For commands that take a json either put a filename on the same line,\n");
-    fprintf(f, "or the json can be multiple lines, starting on the next line.\n\n");
-
-
-    fprintf(f, "Action commands --\n");
-
-    fprintf(f, "MAKE/M proc_name proc_param_json    - Make a new processor with no network\n");
-    fprintf(f, "LOAD/L network_json                 - Load a network on the processor\n");
-    fprintf(f, "ML network_json                     - Make a new processor from the network & load the network.\n");
-
-    fprintf(f, "AS node_id spike_time spike_val ... - Apply normalized spikes to the network (note: node_id, not input_id)\n");
-    fprintf(f, "ASV node_id spike_time spike_val .. - Apply unnormalized spikes to the network (note: node_id, not input_id)\n");
-    fprintf(f, "ASR node_id spike_raster_string     - Apply spike raster to the network (note: node_id, not input_id)\n");
-    fprintf(f, "RUN simulation_time                 - Run the network for \"simulation_time\" cycles\n");
-    fprintf(f, "RSC/RUN_SR_CH sim_time [node] [...] - Run, and then print spike raster and charge information in columns\n");
-    fprintf(f, "CLEAR-A/CA                          - Clear the network's internal state \n");
-    fprintf(f, "CLEAR/C                             - Remove the network from processor\n");
-
-
-    fprintf(f, "\nOutput tracking info commands --\n");
-    fprintf(f, "OLF [node_id] [...]                 - Output the last fire time for the given output or all outputs\n");
-    fprintf(f, "OC [node_id] [...]                  - Output the spike count for the given output or all outputs\n");
-    fprintf(f, "OT/OV [node_id] [...]               - Output the spike times for the given output or all outputs\n");
-    fprintf(f, "TRACK_O [node_id] [...]             - Track output events for given outputs (empty=all)\n");
-    fprintf(f, "UNTRACK_O [node_id] [...]           - Untrack output events for given output (empty=all)\n");
-
-
-    fprintf(f, "\nNeuron / synapse tracking info commands --\n");
-
-    fprintf(f, "NLF show_nonfiring(T/F)             - Last fire times for neurons.\n");
-    fprintf(f, "NC show_nonfiring(T/F)              - Fire counts for neurons.\n");
-    fprintf(f, "TNC                                 - Total fire count for all neurons.\n");
-    fprintf(f, "TNA                                 - Total accumulates for all neurons.\n");
-    fprintf(f, "NT/NV show_nonfiring(T/F)           - All firing times for tracked neurons.\n");
-    fprintf(f, "GSR [T/F]] [node] [...]             - Print spike raster info for tracked neurons.\n");
-    fprintf(f, "NCH [node_id] [...]                 - Print the charges (action potentials) of the neurons (empty=all).\n");
-    fprintf(f, "NLFJ                                - Print the neuron last fire json\n");
-    fprintf(f, "NCJ                                 - Print the neuron count json\n");
-    fprintf(f, "NVJ type(V/S)                       - Print the neuron vector json\n");
-    fprintf(f, "NCHJ                                - Print the neuron charge json\n");
-
-    fprintf(f, "TRACK_N [node_id] [...]             - Track neuron events for specified neurons (empty=all)\n");
-    fprintf(f, "UNTRACK_N [node_id] [...]           - Untrack neuron events for specified neurons (empty=all)\n");
-    fprintf(f, "SW [from to]                        - Show synapse weights (or just one synapse).\n");
-    fprintf(f, "PULL_NETWORK file                   - Pull the network off the processor and store in  file.\n");
-    fprintf(f, "\n");
-
-    fprintf(f, "Other info commands --\n");
-    fprintf(f, "PARAMS [file]                       - Print the JSON that can recreate the processor\n");
-    fprintf(f, "NP/PPACK                            - Print the PropertyPack that networks use with the processor.\n");
-    fprintf(f, "NAME                                - Print the processor's name\n");
-    fprintf(f, "EMPTYNET [file]                     - Create an empty network for this processor\n");
-    fprintf(f, "PP                                  - Print processor's properties - (not a universal feature).\n");
-    fprintf(f, "INFO                                - Print the network's node ids and output tracking info\n");
-    fprintf(f, "PS                                  - Print the spikes we have applied\n");
-    fprintf(f, "?                                   - Print commands\n");
-    fprintf(f, "Q                                   - Quit\n");
-}
-
-
 static string node_name(Node *n) {
     if (n->name == "") return std::to_string(n->id);
     return (std::to_string(n->id)) + "(" + n->name + ")";
@@ -293,7 +229,6 @@ int main(int argc, char **argv)
     if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         fprintf(stderr, "usage: processor_tool [prompt]\n");
         fprintf(stderr, "\n");
-        print_commands(stderr);
         exit(1);
     }
 
@@ -322,7 +257,6 @@ int main(int argc, char **argv)
             if (sv.size() == 0 || sv[0][0] == '#') {
             } 
             else if (sv[0] == "?") {
-                print_commands(stdout);
             } 
             else if (sv[0] == "Q") {
                 safe_exit(p, net);
