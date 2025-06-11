@@ -111,6 +111,8 @@ static Network *load_network(Processor **pp, const json &network_json)
 static void apply_spike(Network * net, Processor *p, vector<string> & sv,
         vector<Spike> & spikes_array) 
 {
+    static const double SPIKE_VAL = 1;
+
     if (network_processor_validation(net, p)) {
 
         const auto normalize = (sv[0].size() == 2);
@@ -119,22 +121,19 @@ static void apply_spike(Network * net, Processor *p, vector<string> & sv,
 
             try {
 
-                double spike_time = 0;
-                double spike_val = 0;
-
                 int spike_id = 0;
+                double spike_time = 0;
+                double ignore = 0;
 
-                if (sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id) != 1 ||
-                        sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
-                        sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
+                sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id);
+                sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time);
+                sscanf(sv[i*3 + 3].c_str(), "%lf", &ignore); 
 
-                    throw SRE((string) "Invalid spike [ " + sv[i*3 + 1] + "," + sv[i*3 + 2] + "," +
-                            sv[i*3 + 3] + "]\n");
-                } 
-                spike_validation(Spike(spike_id, spike_time, spike_val), net, normalize);
+                spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, normalize);
 
-                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, spike_val), normalize);
-                spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
+                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), normalize);
+
+                spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
 
             } catch (const SRE &e) {
                 printf("%s\n",e.what());
