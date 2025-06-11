@@ -1,3 +1,26 @@
+/**
+ * Custom physics plugin for Hackflight simulator using ground-truth state 
+ * and Spiking Neural Net controllers
+ *
+ * Adapted from
+ * https://github.com/TENNLab-UTK/framework-open/blob/main/src/processor_tool.cpp
+ *
+ * Copyright (C) 2025 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ *
+ */
+
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -38,63 +61,63 @@ string node_name(Node *n);
 int max_node_name_len(Network *net);
 
 string node_name(Node *n) {
-  if (n->name == "") return std::to_string(n->id);
-  return (std::to_string(n->id)) + "(" + n->name + ")";
+    if (n->name == "") return std::to_string(n->id);
+    return (std::to_string(n->id)) + "(" + n->name + ")";
 }
 
 int max_node_name_len(Network *net) 
 {
-  size_t i;
-  Node *n;
-  int max_name_len = 0;
-  for (i = 0; i < net->sorted_node_vector.size(); i++) {
-    n = net->sorted_node_vector[i];
-    max_name_len = std::max(max_name_len, (int) node_name(n).size());
-  }
+    size_t i;
+    Node *n;
+    int max_name_len = 0;
+    for (i = 0; i < net->sorted_node_vector.size(); i++) {
+        n = net->sorted_node_vector[i];
+        max_name_len = std::max(max_name_len, (int) node_name(n).size());
+    }
 
-  return max_name_len;
- 
+    return max_name_len;
+
 }
 
 void to_uppercase(string &s) 
 {
-  size_t i;
-  for (i = 0; i < s.size(); i++) {
-    if (s[i] >= 'a' && s[i] <= 'z') {
-      s[i] = s[i] + 'A' -'a';
+    size_t i;
+    for (i = 0; i < s.size(); i++) {
+        if (s[i] >= 'a' && s[i] <= 'z') {
+            s[i] = s[i] + 'A' -'a';
+        }
     }
-  }
 }
 
 int node_validation(const Network *n, const string &node_id)
 {
-  uint32_t nid;
+    uint32_t nid;
 
-  if (sscanf(node_id.c_str(), "%u", &nid) == 0) {
-    throw SRE((string) "Bad node specification - " + node_id);
-  }
-  if (!n->is_node(nid)) throw SRE(node_id + " is not a node in the network");
-  return nid;
+    if (sscanf(node_id.c_str(), "%u", &nid) == 0) {
+        throw SRE((string) "Bad node specification - " + node_id);
+    }
+    if (!n->is_node(nid)) throw SRE(node_id + " is not a node in the network");
+    return nid;
 }
 
 void spike_validation(const Spike &s, const Network *n, bool normalize) 
 {
-  Node *node;
-  char buf[20];
+    Node *node;
+    char buf[20];
 
-  try {
-    if (normalize) {
-      if (s.value < -1 || s.value > 1) throw "spike val must be >= -1 and <= 1";
-    }
-    if (s.time < 0) throw "spike time must be > 0";
-    node = n->get_node(s.id);
-    if (!node->is_input()) {
-      snprintf(buf, 20, "%d", s.id);
-      throw (string) "node " + buf + " is not an input node";
-    }
+    try {
+        if (normalize) {
+            if (s.value < -1 || s.value > 1) throw "spike val must be >= -1 and <= 1";
+        }
+        if (s.time < 0) throw "spike time must be > 0";
+        node = n->get_node(s.id);
+        if (!node->is_input()) {
+            snprintf(buf, 20, "%d", s.id);
+            throw (string) "node " + buf + " is not an input node";
+        }
 
-  } catch (const string &s) {
-    throw SRE(s);
+    } catch (const string &s) {
+        throw SRE(s);
   } catch (const char *s) {
     throw SRE(s);
   }
