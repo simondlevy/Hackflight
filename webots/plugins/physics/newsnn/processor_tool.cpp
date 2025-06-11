@@ -191,8 +191,7 @@ int main(int argc, char **argv)
 
     size_t i, j;
     int k;
-    int node_id, output_id, spike_id, from, to;
-    int max_name_len;
+    int node_id, output_id, spike_id, from;
     double spike_time, spike_val;
     double sim_time;
     double val;
@@ -238,7 +237,6 @@ int main(int argc, char **argv)
 
     p = nullptr;
     net = nullptr;
-    max_name_len = 0;
 
     while(1) {
         try {
@@ -264,7 +262,6 @@ int main(int argc, char **argv)
                         if (net != nullptr) { delete net; net = nullptr; }
 
                         net = load_network(&p, network_json);
-                        max_name_len = max_node_name_len(net);
 
                     } catch (const SRE &e) {
                         printf("%s\n",e.what());
