@@ -146,15 +146,14 @@ int main(int argc, char **argv)
 {
     static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
 
-    static const double MAX = 1000;
-
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s INP1 INP2\n", argv[0]);
+    if (argc < 4) {
+        fprintf(stderr, "Usage: %s INP1 INP2 MAX\n", argv[0]);
         exit(1);
     }
 
-    const double spike_time_1 = get_input(argv[1], MAX);
-    const double spike_time_2 = get_input(argv[2], MAX);
+    const double max = atof(argv[3]);
+    const double spike_time_1 = get_input(argv[1], max);
+    const double spike_time_2 = get_input(argv[2], max);
 
     vector <Spike> spikes_array = {};
 
@@ -204,7 +203,7 @@ int main(int argc, char **argv)
 
     if (network_processor_validation(net, p)) {
 
-        const auto sim_time = 3 * MAX + 2;
+        const auto sim_time = 3 * max + 2;
 
         p->run(sim_time);
 
