@@ -308,6 +308,7 @@ int main(int argc, char **argv)
                     }
                 }
 
+
                 else if (sv[0] == "AS" || sv[0] == "ASV") { // apply_spike()
 
                     if (network_processor_validation(net, p)) {
@@ -338,202 +339,70 @@ int main(int argc, char **argv)
                             }
                         }
                     }
-                } else if (sv[0] == "ASR") { // apply_spike_raster()
+                } 
 
-                    if (network_processor_validation(net, p)) {
-                        if (sv.size() != 3) {
-                            printf("usage: ASR node_id spike_raster_string\n");
-                        } else {
+                /////////////////////////////////////////////
 
-                            try {
-                                sr.clear();
-                                for (i = 0; i < sv[2].size(); i++) {
-                                    if (sv[2][i] != '0' && sv[2][i] != '1') {
-                                        throw SRE("ASR -- Spike raster string must be only 0's and 1's.");
-                                    }
-                                    sr.push_back(sv[2][i]-'0');
-                                }
-                                if (sscanf(sv[1].c_str(), "%d", &spike_id) != 1) {
-                                    throw SRE((string) "Bad neuron id: " + sv[1]);
-                                }
-                                spike_validation(Spike(spike_id, 0, 0), net, true);
-                                apply_spike_raster(p, net->get_node(spike_id)->input_id, sr);
+            } 
+            else if (sv[0] == "OT" || sv[0] == "OV") {  
+                //  output_vector(int output_id, int network_id = 0)
+                if (network_processor_validation(net, p)) {
 
-                            } catch (const SRE &e) {
-                                printf("%s\n",e.what());
-                            }   
-                        }
-                    }
+                    /* if OT doesn't take any node_ids, do all outputs */
 
-                } else if (sv[0] == "PS") {
-                    for (i = 0; i < spikes_array.size(); i++){
-                        printf("Spike: [%d,%lg,%lg]\n", spikes_array[i].id, spikes_array[i].time, spikes_array[i].value);
-                    }
+                    if (sv.size() == 1) {
+                        try {
+                            all_output_times = p->output_vectors();
+                            if (all_output_times.size() == 0) {
+                                throw SRE("Processor error -- p->output_vectors returned a vector of size zero");
+                            } 
+                            for (i = 0; i < (size_t)net->num_outputs(); i++) {
 
-                } else if (sv[0] == "RUN") {
-
-                    if (network_processor_validation(net, p)) {
-                        if (sv.size() != 2 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
-                            printf("usage: RUN sim_time. sim_time >= 0\n");
-                        } else {
-
-                            p->run(sim_time);
-                            spikes_array.clear();
-
-                        }
-                    }
-
-                } else if (sv[0] == "RUN_SR_CH" || sv[0] == "RSC") {
-
-                    if (network_processor_validation(net, p)) {
-                        if (sv.size() == 1 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
-                            printf("usage: RSC/RUN_SR_CH sim_time [node] [...]\n");
-                        } else {
-                            spikes_array.clear();
-                            net->make_sorted_node_vector();
-                            gsr_nodes.clear();
-                            for (i = 2 ; i < sv.size(); i++) gsr_nodes.insert(atoi(sv[i].c_str()));
-                            if (gsr_nodes.empty()) {
-                                for (i = 0; i < net->sorted_node_vector.size(); i++) {
-                                    gsr_nodes.insert(net->sorted_node_vector[i]->id);
-                                }
-                            }
-
-                            j1 = run_and_track(sim_time, p);
-
-                            // Print the names of the nodes, twice.
-                            printf("Time");
-                            for (i = 0; i < net->sorted_node_vector.size(); i++) {
-                                n = net->sorted_node_vector[i];
-                                if (gsr_nodes.find(n->id) != gsr_nodes.end()) {
-                                    printf(" %*s", max_name_len, node_name(n).c_str());
-                                }
-                            }
-                            printf(" |");
-                            for (i = 0; i < net->sorted_node_vector.size(); i++) {
-                                n = net->sorted_node_vector[i];
-                                if (gsr_nodes.find(n->id) != gsr_nodes.end()) {
-                                    printf(" %*s", max_name_len, node_name(n).c_str());
-                                }
-                            }
-                            printf("\n");
-
-                            // Print spike raster and charge information for each timestep
-
-                            for (i = 0; i < j1["spike_raster"].size(); i++) {
-                                printf("%4d", (int) i);
-                                for (j = 0; j < j1["spike_raster"][i].size(); j++) {
-                                    n = net->sorted_node_vector[j];
-                                    if (gsr_nodes.find(n->id) != gsr_nodes.end()) {
-                                        k = j1["spike_raster"][i][j];
-                                        printf(" %*c", max_name_len, (k == 1) ? '*' : '-');
-                                    }
-                                }
-                                printf(" |");
-                                for (j = 0; j < j1["charges"][i].size(); j++) {
-                                    n = net->sorted_node_vector[j];
-                                    if (gsr_nodes.find(n->id) != gsr_nodes.end()) {
-                                        val = j1["charges"][i][j];
-                                        printf(" %*lg", max_name_len, val);
-                                    }
+                                node = net->get_output(i);
+                                printf("node %s spike times:", node_name(node).c_str());
+                                for (j = 0; j < all_output_times[i].size(); j++) {
+                                    printf(" %.1lf", all_output_times[i][j]);
                                 }
                                 printf("\n");
                             }
+                        } catch (const SRE &e) {
+                            printf("%s\n",e.what());
+                        } catch (...) {
+                            printf("Unknown error\n");
                         }
-                    }
+                    } else {
 
-                } else if (sv[0] == "GT") { // get_time()
-
-                    /* the behavior of Caspian and GNP is different. 
-                       Caspian will get the sum to running time. GNP will get the simulation time
-                     */
-                    if (network_processor_validation(net, p)) 
-                        printf("time: %.1lf\n", p->get_time());
-
-                } else if (sv[0] == "NLF") { // test neuron_last_fires
-
-                    if (sv.size() == 1 || (sv[1] != "T" && sv[1] != "F")) {
-                        printf("usage: NLF show_nonfiring - Last fire times for all neurons. show_nonfiring=T/F\n");
-                    } else if (network_processor_validation(net, p)) {
-                        net->make_sorted_node_vector();
-                        output_times = p->neuron_last_fires();
-                        if (output_times.size() == 0) {
-                            printf("Recording last fire times for neurons is not implemented by %s.\n",
-                                    p->get_name().c_str());
-                        }
-
-                        for (i = 0; i < output_times.size(); i++) {
-                            node = net->sorted_node_vector[i];
-                            node_id = node->id;
-                            if (output_times[i] != -1.0 || sv[1][0] == 'T') {
-                                printf("Node %*s last fire: %.1lf\n", max_name_len, node_name(node).c_str(), output_times[i]);
-                            }
-                        }
-                    }
-
-                } 
-                
-                /////////////////////////////////////////////
-
-                } else if (sv[0] == "OT" || sv[0] == "OV") {  
-                    //  output_vector(int output_id, int network_id = 0)
-                    if (network_processor_validation(net, p)) {
-
-                        /* if OT doesn't take any node_ids, do all outputs */
-
-                        if (sv.size() == 1) {
+                        for (i = 1; i < sv.size(); i++) {
                             try {
-                                all_output_times = p->output_vectors();
-                                if (all_output_times.size() == 0) {
-                                    throw SRE("Processor error -- p->output_vectors returned a vector of size zero");
-                                } 
-                                for (i = 0; i < (size_t)net->num_outputs(); i++) {
 
-                                    node = net->get_output(i);
-                                    printf("node %s spike times:", node_name(node).c_str());
-                                    for (j = 0; j < all_output_times[i].size(); j++) {
-                                        printf(" %.1lf", all_output_times[i][j]);
-                                    }
-                                    printf("\n");
+                                if (sscanf(sv[i].c_str(), "%d", &node_id) != 1) {
+                                    throw SRE(sv[i] + " is not a valid node id");
                                 }
+                                output_node_id_validation(node_id, net);
+                                output_id = net->get_node(node_id)->output_id;
+
+                                output_times = p->output_vector(output_id);
+                                node = net->get_node(node_id);
+                                printf("node %s spike times: ", node_name(node).c_str());
+                                for (j = 0; j < output_times.size(); j++) {
+                                    printf("%.1lf ",output_times[j]);
+                                }
+                                printf("\n");
+
                             } catch (const SRE &e) {
                                 printf("%s\n",e.what());
                             } catch (...) {
                                 printf("Unknown error\n");
                             }
-                        } else {
-
-                            for (i = 1; i < sv.size(); i++) {
-                                try {
-
-                                    if (sscanf(sv[i].c_str(), "%d", &node_id) != 1) {
-                                        throw SRE(sv[i] + " is not a valid node id");
-                                    }
-                                    output_node_id_validation(node_id, net);
-                                    output_id = net->get_node(node_id)->output_id;
-
-                                    output_times = p->output_vector(output_id);
-                                    node = net->get_node(node_id);
-                                    printf("node %s spike times: ", node_name(node).c_str());
-                                    for (j = 0; j < output_times.size(); j++) {
-                                        printf("%.1lf ",output_times[j]);
-                                    }
-                                    printf("\n");
-
-                                } catch (const SRE &e) {
-                                    printf("%s\n",e.what());
-                                } catch (...) {
-                                    printf("Unknown error\n");
-                                }
-                            }
                         }
                     }
+                }
 
 
-                } 
-                
-            } catch (const SRE &e) {
-                printf("%s\n", e.what());
-            }
-        }  // end of while loop
-    }
+            } 
+
+        } catch (const SRE &e) {
+            printf("%s\n", e.what());
+        }
+    }  // end of while loop
+}
