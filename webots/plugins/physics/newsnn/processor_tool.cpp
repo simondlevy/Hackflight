@@ -3,7 +3,7 @@
  * and Spiking Neural Net controllers
  *
  * Adapted from
- * https://github.com/TENNLab-UTK/framework-open/blob/main/src/processor_tool.cpp
+ * https:
  *
  * Copyright (C) 2025 Simon D. Levy
  *
@@ -223,14 +223,14 @@ int main(int argc, char **argv)
     double val;
     string alias, id;
 
-    vector <string> sv; // read inputs
+    vector <string> sv; 
     vector <Node *> node_vector;
     vector <Spike> spikes_array;
     vector <Spike> spikes;
-    vector <double> output_times; // hold return value of output_vector()
-    vector < vector <double> > all_output_times; // hold return value of output_vectors()
-    vector < vector< double> > neuron_times;     // hold the return value of neuron_times();
-    vector <string> spike_strings;              // hold spike strings from neuron_vectors_to_json()
+    vector <double> output_times; 
+    vector < vector <double> > all_output_times; 
+    vector < vector< double> > neuron_times;     
+    vector <string> spike_strings;              
     vector <int> v;
     vector <int> neuron_alias;
     vector <int> event_counts;
@@ -240,7 +240,7 @@ int main(int argc, char **argv)
     vector <double> data;
     vector <char> sr;
     map <int, double>::iterator mit;
-    map <int, string> aliases; // Aliases for input/output nodes.
+    map <int, string> aliases; 
     map <int, string>::iterator ait;
     bool gsr_hidden_nodes;
     bool normalize;
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 
             while (ss >> s) sv.push_back(s);
 
-            if (sv[0] == "ML") { // make() and load_network()
+            if (sv[0] == "ML") { 
 
                 if (!read_json(sv, 1, network_json)) {
                 } else {
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
                 }
 
 
-                else if (sv[0] == "AS") { // apply_spike()
+                else if (sv[0] == "AS") { 
 
                     if (network_processor_validation(net, p)) {
                         if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
@@ -401,5 +401,5 @@ int main(int argc, char **argv)
         } catch (const SRE &e) {
             printf("%s\n", e.what());
         }
-    }  // end of while loop
+    }  
 }
