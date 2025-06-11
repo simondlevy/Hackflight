@@ -35,6 +35,6 @@ edit:
 	vim processor_tool.cpp
 
 clean:
-	rm -f obj/*
+	rm -f processor_tool_risp obj/*
 
 
