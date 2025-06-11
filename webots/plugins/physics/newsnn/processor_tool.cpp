@@ -267,6 +267,7 @@ int main(int argc, char **argv)
   max_name_len = 0;
 
   while(1) {
+
     try {
       if (prompt != "") printf("%s", prompt.c_str());
       if (!getline(cin, l)) safe_exit(p, net);
@@ -307,153 +308,107 @@ int main(int argc, char **argv)
           }
         }
         
-  
-      } else if (sv[0] == "MAKE" || sv[0] == "M") { // make
-  
-        if (sv.size() < 2) {
-          printf("usage: MAKE proc_name processor_params_json\n");
-        } else {
-          if (p != nullptr) { delete p; p = nullptr; }
-          
-          proc_name = sv[1];
-          proc_params = json::object();
-          if (!read_json(sv, 2, proc_params)) {
-            printf("usage: MAKE proc_name processor_params_json. Bad json\n");
-          } else {
-            try {
-              p = Processor::make(proc_name, proc_params);
-  
-            } catch (const SRE &e) {
-              printf("%s\n",e.what());
-            } catch (...) {
-              printf("Unknown error when making processor\n");
-            }
-          }
-        }
-  
-      } else if (sv[0] == "LOAD" || sv[0] == "L") { // load_network()
-        
-        if (p == nullptr) {
-          printf("Must make a processor first\n"); 
-        } else if (!read_json(sv, 1, network_json)){  
-          printf("usage: LOAD/L network_json. Bad json\n");
-        } else {
-          if (net != nullptr) { delete net; net = nullptr; }
-          
-          try {
-            net = load_network(&p, network_json);
-            max_name_len = max_node_name_len(net);
+        else if (sv[0] == "AS" || sv[0] == "ASV") { // apply_spike()
 
-          } catch (const SRE &e) {
-            printf("%s\n",e.what());
-            if (net != nullptr) { delete net; net = nullptr; }
-          } catch (...) {
-            printf("Unknown error when loading a network\n");
-            if (net != nullptr) { delete net; net = nullptr; }
-          }
-        }
-  
-      } else if (sv[0] == "AS" || sv[0] == "ASV") { // apply_spike()
-       
-        if (network_processor_validation(net, p)) {
-          if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
-            printf("usage: %s node_id spike_time spike_value node_id1 spike_time1 spike_value1 ...\n", sv[0].c_str());
-          } else {
-  
-            normalize = (sv[0].size() == 2);
-            for (i = 0; i < (sv.size() - 1) / 3; i++) {
-              try {
-  
-                if (sscanf(sv[i*3 + 1].c_str(), "%d", &spike_id) != 1 ||
-                    sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
-                    sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
-  
-                  throw SRE((string) "Invalid spike [ " + sv[i*3 + 1] + "," + sv[i*3 + 2] + "," +
-                                       sv[i*3 + 3] + "]\n");
-                } 
-                spike_validation(Spike(spike_id, spike_time, spike_val), net, normalize);
-                
-                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, spike_val), normalize);
-                spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
-  
-              } catch (const SRE &e) {
-                printf("%s\n",e.what());
-              }   
-                
-            }
-          }
-        }
-      } else if (sv[0] == "ASR") { // apply_spike_raster()
-       
-        if (network_processor_validation(net, p)) {
-          if (sv.size() != 3) {
-            printf("usage: ASR node_id spike_raster_string\n");
-          } else {
-  
-            try {
-              sr.clear();
-              for (i = 0; i < sv[2].size(); i++) {
-                if (sv[2][i] != '0' && sv[2][i] != '1') {
-                  throw SRE("ASR -- Spike raster string must be only 0's and 1's.");
+            if (network_processor_validation(net, p)) {
+                if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
+                    printf("usage: %s node_id spike_time spike_value node_id1 spike_time1 spike_value1 ...\n", sv[0].c_str());
+                } else {
+
+                    normalize = (sv[0].size() == 2);
+                    for (i = 0; i < (sv.size() - 1) / 3; i++) {
+                        try {
+
+                            if (sscanf(sv[i*3 + 1].c_str(), "%d", &spike_id) != 1 ||
+                                    sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
+                                    sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
+
+                                throw SRE((string) "Invalid spike [ " + sv[i*3 + 1] + "," + sv[i*3 + 2] + "," +
+                                        sv[i*3 + 3] + "]\n");
+                            } 
+                            spike_validation(Spike(spike_id, spike_time, spike_val), net, normalize);
+
+                            p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, spike_val), normalize);
+                            spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
+
+                        } catch (const SRE &e) {
+                            printf("%s\n",e.what());
+                        }   
+
+                    }
                 }
-                sr.push_back(sv[2][i]-'0');
-              }
-              if (sscanf(sv[1].c_str(), "%d", &spike_id) != 1) {
-                throw SRE((string) "Bad neuron id: " + sv[1]);
-              }
-              spike_validation(Spike(spike_id, 0, 0), net, true);
-              apply_spike_raster(p, net->get_node(spike_id)->input_id, sr);
-  
-            } catch (const SRE &e) {
-              printf("%s\n",e.what());
-            }   
-          }
-        }
+            }
+        } else if (sv[0] == "ASR") { // apply_spike_raster()
 
-      } else if (sv[0] == "PS") {
-        for (i = 0; i < spikes_array.size(); i++){
-           printf("Spike: [%d,%lg,%lg]\n", spikes_array[i].id, spikes_array[i].time, spikes_array[i].value);
-        }
-  
-      } else if (sv[0] == "RUN") {
-        
-        if (network_processor_validation(net, p)) {
-          if (sv.size() != 2 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
-            printf("usage: RUN sim_time. sim_time >= 0\n");
-          } else {
-            
-            p->run(sim_time);
-            spikes_array.clear();
-            
-          }
-        }
-  
-      } else if (sv[0] == "RUN_SR_CH" || sv[0] == "RSC") {
-        
-        if (network_processor_validation(net, p)) {
-          if (sv.size() == 1 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
-            printf("usage: RSC/RUN_SR_CH sim_time [node] [...]\n");
-          } else {
-            spikes_array.clear();
-            net->make_sorted_node_vector();
-            gsr_nodes.clear();
-            for (i = 2 ; i < sv.size(); i++) gsr_nodes.insert(atoi(sv[i].c_str()));
-            if (gsr_nodes.empty()) {
-              for (i = 0; i < net->sorted_node_vector.size(); i++) {
-                gsr_nodes.insert(net->sorted_node_vector[i]->id);
-              }
+            if (network_processor_validation(net, p)) {
+                if (sv.size() != 3) {
+                    printf("usage: ASR node_id spike_raster_string\n");
+                } else {
+
+                    try {
+                        sr.clear();
+                        for (i = 0; i < sv[2].size(); i++) {
+                            if (sv[2][i] != '0' && sv[2][i] != '1') {
+                                throw SRE("ASR -- Spike raster string must be only 0's and 1's.");
+                            }
+                            sr.push_back(sv[2][i]-'0');
+                        }
+                        if (sscanf(sv[1].c_str(), "%d", &spike_id) != 1) {
+                            throw SRE((string) "Bad neuron id: " + sv[1]);
+                        }
+                        spike_validation(Spike(spike_id, 0, 0), net, true);
+                        apply_spike_raster(p, net->get_node(spike_id)->input_id, sr);
+
+                    } catch (const SRE &e) {
+                        printf("%s\n",e.what());
+                    }   
+                }
             }
 
-            j1 = run_and_track(sim_time, p);
-
-            // Print the names of the nodes, twice.
-            printf("Time");
-            for (i = 0; i < net->sorted_node_vector.size(); i++) {
-              n = net->sorted_node_vector[i];
-              if (gsr_nodes.find(n->id) != gsr_nodes.end()) {
-                printf(" %*s", max_name_len, node_name(n).c_str());
-              }
+        } else if (sv[0] == "PS") {
+            for (i = 0; i < spikes_array.size(); i++){
+                printf("Spike: [%d,%lg,%lg]\n", spikes_array[i].id, spikes_array[i].time, spikes_array[i].value);
             }
+
+        } else if (sv[0] == "RUN") {
+
+            if (network_processor_validation(net, p)) {
+                if (sv.size() != 2 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
+                    printf("usage: RUN sim_time. sim_time >= 0\n");
+                } else {
+
+                    p->run(sim_time);
+                    spikes_array.clear();
+
+                }
+            }
+
+        } else if (sv[0] == "RUN_SR_CH" || sv[0] == "RSC") {
+
+            if (network_processor_validation(net, p)) {
+                if (sv.size() == 1 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
+                    printf("usage: RSC/RUN_SR_CH sim_time [node] [...]\n");
+                } else {
+                    spikes_array.clear();
+                    net->make_sorted_node_vector();
+                    gsr_nodes.clear();
+                    for (i = 2 ; i < sv.size(); i++) gsr_nodes.insert(atoi(sv[i].c_str()));
+                    if (gsr_nodes.empty()) {
+                        for (i = 0; i < net->sorted_node_vector.size(); i++) {
+                            gsr_nodes.insert(net->sorted_node_vector[i]->id);
+                        }
+                    }
+
+                    j1 = run_and_track(sim_time, p);
+
+                    // Print the names of the nodes, twice.
+                    printf("Time");
+                    for (i = 0; i < net->sorted_node_vector.size(); i++) {
+                        n = net->sorted_node_vector[i];
+                        if (gsr_nodes.find(n->id) != gsr_nodes.end()) {
+                            printf(" %*s", max_name_len, node_name(n).c_str());
+                        }
+                    }
             printf(" |");
             for (i = 0; i < net->sorted_node_vector.size(); i++) {
               n = net->sorted_node_vector[i];
