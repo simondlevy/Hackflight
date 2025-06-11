@@ -7,6 +7,8 @@
 #include <map>
 #include <unordered_set>
 #include <unistd.h>
+#include <math.h>
+
 #include "framework.hpp"
 #include "utils/json_helpers.hpp"
 
@@ -135,14 +137,24 @@ static void apply_spike(
     }
 }
 
+static double get_input(const char * arg, const double max)
+{
+    return round(max * (1 - atof(arg)) / 2);
+}
+
 int main(int argc, char **argv) 
 {
     static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
 
     static const double MAX = 1000;
 
-    (void)argc;
-    (void)argv;
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s INP1 INP2\n", argv[0]);
+        exit(1);
+    }
+
+    const double spike_time_1 = get_input(argv[1], MAX);
+    const double spike_time_2 = get_input(argv[2], MAX);
 
     vector <Spike> spikes_array = {};
 
@@ -184,8 +196,8 @@ int main(int argc, char **argv)
 
     // Apply spikes ----------------------------------------------------------
 
-    apply_spike(net, p, 0, 50, spikes_array);
-    apply_spike(net, p, 1, 325, spikes_array);
+    apply_spike(net, p, 0, spike_time_1, spikes_array);
+    apply_spike(net, p, 1, spike_time_2, spikes_array);
     apply_spike(net, p, 2, 0, spikes_array);
 
     // Run -------------------------------------------------------------------
