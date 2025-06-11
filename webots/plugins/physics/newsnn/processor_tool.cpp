@@ -208,11 +208,7 @@ int main(int argc, char **argv)
             string s = {};
             while (ss >> s) sv.push_back(s);
 
-            if (sv[0] == "ML") { 
-
-            } 
-
-            else if (sv[0] == "AS" || sv[0] == "ASV") { 
+            if (sv[0] == "AS" || sv[0] == "ASV") { 
 
                 if (network_processor_validation(net, p)) {
                     if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
