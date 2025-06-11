@@ -920,63 +920,8 @@ int main(int argc, char **argv)
                     }
 
 
-                } else if (sv[0] == "INFO") { // print input,hidden and output nodes id.
-
-                    if (network_processor_validation(net, p)) {
-
-                        printf("Input nodes:  ");
-                        for (i = 0; i < (size_t)net->num_inputs(); i++) {
-                            printf("%s ",node_name(net->get_input(i)).c_str());
-                        }
-                        printf("\n");
-
-                        printf("Hidden nodes: ");
-                        for (nit = net->begin(); nit != net->end(); nit++) {
-                            node = nit->second.get();
-                            if (node->is_hidden()) {
-                                printf("%s ", node_name(node).c_str());
-                            }
-                        }
-                        printf("\n");
-
-                        printf("Output nodes: ");
-                        for (i = 0; i < (size_t)net->num_outputs(); i++) {
-                            printf("%s ",node_name(net->get_output(i)).c_str());
-                        }
-                        printf("\n\n");
-
-                    }
-
-                } else if (sv[0] == "NCJ") { // test neuron_counts_to_json()
-
-                    if (network_processor_validation(net, p)) {
-                        cout << neuron_counts_to_json(p->neuron_counts(), net) << endl;
-                    }
-
-                } else if (sv[0] == "NCHJ") { // test neuron_charges_to_json()
-
-                    if (network_processor_validation(net, p)) {
-                        cout << neuron_charges_to_json(p->neuron_charges(), net) << endl;
-                    }
-
-                } else if (sv[0] == "NVJ") { // test neuron_vectors_to_json()
-
-                    if (sv.size() != 2 || (sv[1] != "V" && sv[1] != "S")) {
-                        fprintf(stderr, "NVJ type=V/S - Print the neuron vector json\n");
-                        fprintf(stderr, "  V means \"Events\" key with vector of vector values.\n");
-                        fprintf(stderr, "  S means \"Spikes\" key with vector of spike strings.\n");
-                    } else if (network_processor_validation(net, p)) {
-
-                        try {
-                            cout << neuron_vectors_to_json(p->neuron_vectors(), sv[1], net) << endl;
-                        } catch (const SRE &e) {
-                            printf("%s\n",e.what());
-                        } catch (...) {
-                            printf("Unknown error");
-                        }
-                    }
-
                 } 
+
             } catch (const SRE &e) {
                 printf("%s\n", e.what());
             }
