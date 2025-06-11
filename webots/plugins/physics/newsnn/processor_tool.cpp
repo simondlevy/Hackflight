@@ -113,9 +113,9 @@ static void apply_spike(Network * net, Processor *p, vector<string> & sv,
 {
     static const double SPIKE_VAL = 1;
 
-    if (network_processor_validation(net, p)) {
+    static const bool NORMALIZE = true;
 
-        const auto normalize = (sv[0].size() == 2);
+    if (network_processor_validation(net, p)) {
 
         for (size_t i = 0; i < (sv.size() - 1) / 3; i++) {
 
@@ -127,9 +127,9 @@ static void apply_spike(Network * net, Processor *p, vector<string> & sv,
                 sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id);
                 sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time);
 
-                spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, normalize);
+                spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, NORMALIZE);
 
-                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), normalize);
+                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
 
                 spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
 
