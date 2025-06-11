@@ -141,19 +141,15 @@ static void safe_exit(Processor *p, Network *n)
 
 int main(int argc, char **argv) 
 {
-    Processor *p;
-    Network *net; 
-    NodeMap::iterator nit;
-    Node *node;
-
-    string proc_name, prompt;
-    string cmd;
-
     istringstream ss = {};
 
     vector <string> sv = {}; 
 
     vector <Spike> spikes_array = {};
+
+    Network * net = nullptr;
+
+    Processor * p = nullptr;
 
     if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         fprintf(stderr, "usage: processor_tool [prompt]\n");
@@ -161,17 +157,19 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    string prompt = {};
+
     if (argc == 2) {
         prompt = argv[1];
         prompt += " ";
     }
 
-    p = nullptr;
-    net = nullptr;
+    while(true) {
 
-    while(1) {
         try {
+
             if (prompt != "") printf("%s", prompt.c_str());
+
             string l = {};
             if (!getline(cin, l)) safe_exit(p, net);
             sv.clear();
@@ -283,7 +281,7 @@ int main(int argc, char **argv)
                             } 
                             for (size_t i = 0; i < (size_t)net->num_outputs(); i++) {
 
-                                node = net->get_output(i);
+                                auto node = net->get_output(i);
                                 printf("node %s spike times:", node_name(node).c_str());
                                 for (size_t j = 0; j < all_output_times[i].size(); j++) {
                                     printf(" %.1lf", all_output_times[i][j]);
@@ -309,7 +307,7 @@ int main(int argc, char **argv)
                                 const auto output_id = net->get_node(node_id)->output_id;
 
                                 const auto output_times = p->output_vector(output_id);
-                                node = net->get_node(node_id);
+                                auto node = net->get_node(node_id);
                                 printf("node %s spike times: ", node_name(node).c_str());
                                 for (size_t j = 0; j < output_times.size(); j++) {
                                     printf("%.1lf ",output_times[j]);
