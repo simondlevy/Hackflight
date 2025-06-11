@@ -300,20 +300,34 @@ int main(int argc, char **argv)
                         } else {
 
                             normalize = (sv[0].size() == 2);
+
                             for (i = 0; i < (sv.size() - 1) / 3; i++) {
+
                                 try {
 
-                                    if (sscanf(sv[i*3 + 1].c_str(), "%d", &spike_id) != 1 ||
-                                            sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
-                                            sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
+                                    if (sscanf(sv[i*3 + 1].c_str(), "%d",
+                                                &spike_id) != 1 ||
+                                            sscanf(sv[i*3 + 2].c_str(), "%lf",
+                                                &spike_time) != 1 || 
+                                            sscanf(sv[i*3 + 3].c_str(), "%lf",
+                                                &spike_val) != 1 ) {
 
-                                        throw SRE((string) "Invalid spike [ " + sv[i*3 + 1] + "," + sv[i*3 + 2] + "," +
-                                                sv[i*3 + 3] + "]\n");
                                     } 
-                                    spike_validation(Spike(spike_id, spike_time, spike_val), net, normalize);
 
-                                    p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, spike_val), normalize);
-                                    spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
+                                    spike_validation(
+                                            Spike(spike_id,
+                                                spike_time, spike_val),
+                                            net, normalize);
+
+                                    p->apply_spike(Spike(
+                                                net->get_node(
+                                                    spike_id)->input_id,
+                                                spike_time, spike_val),
+                                            normalize);
+
+                                    spikes_array.push_back(
+                                            Spike(spike_id,
+                                                spike_time, spike_val));
 
                                 } catch (const SRE &e) {
                                     printf("%s\n",e.what());
@@ -358,14 +372,15 @@ int main(int argc, char **argv)
                             try {
 
                                 if (sscanf(sv[i].c_str(), "%d", &node_id) != 1) {
-                                    throw SRE(sv[i] + " is not a valid node id");
                                 }
+
                                 output_node_id_validation(node_id, net);
                                 output_id = net->get_node(node_id)->output_id;
 
                                 output_times = p->output_vector(output_id);
                                 node = net->get_node(node_id);
-                                printf("node %s spike times: ", node_name(node).c_str());
+                                printf("node %s spike times: ",
+                                        node_name(node).c_str());
                                 for (j = 0; j < output_times.size(); j++) {
                                     printf("%.1lf ",output_times[j]);
                                 }
