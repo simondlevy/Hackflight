@@ -217,27 +217,23 @@ int main(int argc, char **argv)
                 }
             } 
 
-
-            else if (sv[0] == "RUN") {
-
-                if (network_processor_validation(net, p)) {
-                    double sim_time = 0;
-                    if (sv.size() != 2 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
-                        printf("usage: RUN sim_time. sim_time >= 0\n");
-                    } else {
-
-                        p->run(sim_time);
-                        spikes_array.clear();
-
-                    }
-                }
-
-            } 
-
         } catch (const SRE &e) {
             printf("%s\n", e.what());
         }
     }  
+
+    if (network_processor_validation(net, p)) {
+        double sim_time = 0;
+        if (sv.size() != 2 || sscanf(sv[1].c_str(),
+                    "%lf", &sim_time) != 1 || sim_time < 0) {
+            printf("usage: RUN sim_time. sim_time >= 0\n");
+        } else {
+
+            p->run(sim_time);
+            spikes_array.clear();
+
+        }
+    }
 
     const auto all_output_times = p->output_vectors();
 
