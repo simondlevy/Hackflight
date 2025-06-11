@@ -14,7 +14,7 @@ RISP_OBJ = obj/risp.o obj/risp_static.o
 all: processor_tool_risp
 
 processor_tool_risp: processor_tool.cpp $(FR_INC) $(RISP_INC) $(RISP_OBJ) $(FR_OBJ)
-	$(CXX) $(FR_CFLAGS) -o processor_tool_risp $(FRO)/src/processor_tool.cpp $(RISP_OBJ) $(FR_OBJ)
+	$(CXX) $(FR_CFLAGS) -o processor_tool_risp processor_tool.cpp $(RISP_OBJ) $(FR_OBJ)
 
 obj/risp.o: $(FRO)/src/risp.cpp $(FR_INC) $(RISP_INC)
 	$(CXX) -c $(FR_CFLAGS) -o obj/risp.o $(FRO)/src/risp.cpp
