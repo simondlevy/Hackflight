@@ -266,6 +266,9 @@ int main(int argc, char **argv)
                 if (network_processor_validation(net, p)) {
 
                     if (sv.size() == 1) {
+
+                        cerr << "***************************************************\n";
+
                         try {
                             const auto all_output_times = p->output_vectors();
 
@@ -287,38 +290,8 @@ int main(int argc, char **argv)
                             printf("%s\n",e.what());
                         } catch (...) {
                         }
+
                     } else {
-
-                        for (size_t i = 1; i < sv.size(); i++) {
-                            try {
-
-                                int node_id = 0;
-
-                                if (sscanf(sv[i].c_str(), "%d", &node_id) != 1) {
-                                }
-
-                                output_node_id_validation(node_id, net);
-
-                                const auto output_id =
-                                    net->get_node(node_id)->output_id;
-
-                                const auto output_times =
-                                    p->output_vector(output_id);
-                                auto node = net->get_node(node_id);
-
-                                printf("node %s spike times: ",
-                                        node_name(node).c_str());
-                                for (size_t j=0; j<output_times.size(); j++) {
-                                    printf("%.1lf ",output_times[j]);
-                                }
-                                printf("\n");
-
-                            } catch (const SRE &e) {
-                                printf("%s\n",e.what());
-                            } catch (...) {
-                                printf("Unknown error\n");
-                            }
-                        }
                     }
                 }
             } 
