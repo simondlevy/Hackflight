@@ -109,13 +109,6 @@ static Network *load_network(Processor **pp, const json &network_json)
 }
 
 
-static void safe_exit(Processor *p, Network *n)
-{
-    if (p != nullptr) delete p;
-    if (n != nullptr) delete n;
-    exit(0);
-}
-
 int main(int argc, char **argv) 
 {
     static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
@@ -181,7 +174,7 @@ int main(int argc, char **argv)
             if (prompt != "") printf("%s", prompt.c_str());
 
             string l = {};
-            if (!getline(cin, l)) safe_exit(p, net);
+            if (!getline(cin, l)) break; 
             sv.clear();
             ss.clear();
             ss.str(l);
@@ -204,7 +197,7 @@ int main(int argc, char **argv)
 
                                 int spike_id = 0;
 
-                                if (sscanf(sv[i*3 + 1].c_str(), "%d", &spike_id) != 1 ||
+                                if (sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id) != 1 ||
                                         sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
                                         sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
 
@@ -263,5 +256,7 @@ int main(int argc, char **argv)
         } catch (const SRE &e) {
             printf("%s\n", e.what());
         }
+
     }  
+
 }
