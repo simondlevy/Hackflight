@@ -175,12 +175,6 @@ int main(int argc, char **argv)
     vector <double> weights;
     vector <double> charges;
     vector <double> data;
-    vector <char> sr;
-    map <int, double>::iterator mit;
-    map <int, string> aliases; 
-    map <int, string>::iterator ait;
-    bool normalize;
-    unordered_set <int> gsr_nodes;
 
     if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         fprintf(stderr, "usage: processor_tool [prompt]\n");
@@ -251,7 +245,7 @@ int main(int argc, char **argv)
                         printf("usage: %s node_id spike_time spike_value node_id1 spike_time1 spike_value1 ...\n", sv[0].c_str());
                     } else {
 
-                        normalize = (sv[0].size() == 2);
+                        const auto normalize = (sv[0].size() == 2);
                         for (i = 0; i < (sv.size() - 1) / 3; i++) {
                             try {
 
