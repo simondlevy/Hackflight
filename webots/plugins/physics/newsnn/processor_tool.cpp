@@ -154,27 +154,17 @@ int main(int argc, char **argv)
 
     istringstream ss;
 
+    /*
     size_t i, j;
     int node_id, output_id, spike_id;
     double spike_time, spike_val;
-    double sim_time;
     string alias, id;
+    */
 
     vector <string> sv; 
-    vector <Node *> node_vector;
     vector <Spike> spikes_array;
-    vector <Spike> spikes;
-    vector <double> output_times; 
     vector < vector <double> > all_output_times; 
-    vector < vector< double> > neuron_times;     
-    vector <string> spike_strings;              
-    vector <int> v;
-    vector <int> neuron_alias;
-    vector <int> event_counts;
-    vector <uint32_t> pres, posts;
-    vector <double> weights;
-    vector <double> charges;
-    vector <double> data;
+    vector <double> output_times; 
 
     if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         fprintf(stderr, "usage: processor_tool [prompt]\n");
@@ -246,8 +236,13 @@ int main(int argc, char **argv)
                     } else {
 
                         const auto normalize = (sv[0].size() == 2);
-                        for (i = 0; i < (sv.size() - 1) / 3; i++) {
+                        for (size_t i = 0; i < (sv.size() - 1) / 3; i++) {
                             try {
+
+                                double spike_time = 0;
+                                double spike_val = 0;
+
+                                int spike_id = 0;
 
                                 if (sscanf(sv[i*3 + 1].c_str(), "%d", &spike_id) != 1 ||
                                         sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
@@ -274,6 +269,7 @@ int main(int argc, char **argv)
             else if (sv[0] == "RUN") {
 
                 if (network_processor_validation(net, p)) {
+                    double sim_time = 0;
                     if (sv.size() != 2 || sscanf(sv[1].c_str(), "%lf", &sim_time) != 1 || sim_time < 0) {
                         printf("usage: RUN sim_time. sim_time >= 0\n");
                     } else {
@@ -290,19 +286,17 @@ int main(int argc, char **argv)
             else if (sv[0] == "OT" || sv[0] == "OV") {  
                 if (network_processor_validation(net, p)) {
 
-                    /* if OT doesn't take any node_ids, do all outputs */
-
                     if (sv.size() == 1) {
                         try {
                             all_output_times = p->output_vectors();
                             if (all_output_times.size() == 0) {
                                 throw SRE("Processor error -- p->output_vectors returned a vector of size zero");
                             } 
-                            for (i = 0; i < (size_t)net->num_outputs(); i++) {
+                            for (size_t i = 0; i < (size_t)net->num_outputs(); i++) {
 
                                 node = net->get_output(i);
                                 printf("node %s spike times:", node_name(node).c_str());
-                                for (j = 0; j < all_output_times[i].size(); j++) {
+                                for (size_t j = 0; j < all_output_times[i].size(); j++) {
                                     printf(" %.1lf", all_output_times[i][j]);
                                 }
                                 printf("\n");
@@ -314,19 +308,21 @@ int main(int argc, char **argv)
                         }
                     } else {
 
-                        for (i = 1; i < sv.size(); i++) {
+                        for (size_t i = 1; i < sv.size(); i++) {
                             try {
+
+                                int node_id = 0;
 
                                 if (sscanf(sv[i].c_str(), "%d", &node_id) != 1) {
                                     throw SRE(sv[i] + " is not a valid node id");
                                 }
                                 output_node_id_validation(node_id, net);
-                                output_id = net->get_node(node_id)->output_id;
+                                const auto output_id = net->get_node(node_id)->output_id;
 
                                 output_times = p->output_vector(output_id);
                                 node = net->get_node(node_id);
                                 printf("node %s spike times: ", node_name(node).c_str());
-                                for (j = 0; j < output_times.size(); j++) {
+                                for (size_t j = 0; j < output_times.size(); j++) {
                                     printf("%.1lf ",output_times[j]);
                                 }
                                 printf("\n");
