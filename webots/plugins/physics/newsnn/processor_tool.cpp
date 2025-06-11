@@ -208,5 +208,9 @@ int main(int argc, char **argv)
 
     const auto out = p->output_vectors()[0][0];
 
-    printf("%.1lf\n", out == max + 1 ? -2 : out);
+    const auto time = out == max + 1 ? -2 : out;
+
+    printf("%f\n", (time-(max))*4/(2*max)-2);
+
+    //printf("%.1lf\n", time);
 }
