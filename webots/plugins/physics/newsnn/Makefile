@@ -2,6 +2,8 @@ FRO = $(HOME)/Desktop/framework-open
 
 CXX ?= g++
 
+CFLAGS = -O3 -std=c++11 -Wall -Wextra
+
 FR_INC = $(FRO)/include/framework.hpp
 FR_CFLAGS = -std=c++11 -Wall -Wextra -I$(FRO)/include -I$(FRO)/include/utils $(CFLAGS)
 FR_OBJ = obj/framework.o obj/processor_help.o obj/properties.o
@@ -28,6 +30,9 @@ obj/processor_help.o: $(FRO)/src/processor_help.cpp $(FR_INC)
 
 obj/properties.o: $(FRO)/src/properties.cpp $(FR_INC)
 	$(CXX) -c $(FR_CFLAGS) -o obj/properties.o $(FRO)/src/properties.cpp
+
+edit:
+	vim processor_tool.cpp
 
 clean:
 	rm -f obj/*
