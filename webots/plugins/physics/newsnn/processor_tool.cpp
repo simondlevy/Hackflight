@@ -40,32 +40,12 @@ using nlohmann::json;
 
 typedef runtime_error SRE;
 
-/** Convert a string to uppercase */
-void to_uppercase(string &s);
-
-/** Make sure the spike has the legal id, time, and value. **/
-void spike_validation(const Spike &s, const Network *n, bool normalized);
-
-/** Make sure the node "node_id" is an output node in the network */
-void output_node_id_validation(const int node_id, const Network *n);
-
-/** Make sure network and processor have been created */
-bool network_processor_validation(const Network *n, const Processor *p);
-
-/** Read a json object from file or stdin */
-bool read_json(const vector <string> &sv, size_t starting_field, json &rv);
-
-
-string node_name(Node *n);
-
-int max_node_name_len(Network *net);
-
-string node_name(Node *n) {
+static string node_name(Node *n) {
     if (n->name == "") return std::to_string(n->id);
     return (std::to_string(n->id)) + "(" + n->name + ")";
 }
 
-int max_node_name_len(Network *net) 
+static int max_node_name_len(Network *net) 
 {
     size_t i;
     Node *n;
@@ -79,7 +59,7 @@ int max_node_name_len(Network *net)
 
 }
 
-void to_uppercase(string &s) 
+static void to_uppercase(string &s) 
 {
     size_t i;
     for (i = 0; i < s.size(); i++) {
@@ -89,7 +69,7 @@ void to_uppercase(string &s)
     }
 }
 
-int node_validation(const Network *n, const string &node_id)
+static int node_validation(const Network *n, const string &node_id)
 {
     uint32_t nid;
 
@@ -100,7 +80,7 @@ int node_validation(const Network *n, const string &node_id)
     return nid;
 }
 
-void spike_validation(const Spike &s, const Network *n, bool normalize) 
+static void spike_validation(const Spike &s, const Network *n, bool normalize) 
 {
     Node *node;
     char buf[20];
@@ -124,7 +104,7 @@ void spike_validation(const Spike &s, const Network *n, bool normalize)
 
 }
 
-void output_node_id_validation(const int node_id, const Network *n) 
+static void output_node_id_validation(const int node_id, const Network *n) 
 {
   Node *node;
   char buf[20];
@@ -143,7 +123,7 @@ void output_node_id_validation(const int node_id, const Network *n)
   }
 }
 
-bool network_processor_validation(const Network *n, const Processor *p) {
+static bool network_processor_validation(const Network *n, const Processor *p) {
   bool success = (n != nullptr && p != nullptr);
 
   if (!success) {
@@ -152,7 +132,7 @@ bool network_processor_validation(const Network *n, const Processor *p) {
   return success;
 }
 
-bool read_json(const vector <string> &sv, size_t starting_field, json &rv)
+static bool read_json(const vector <string> &sv, size_t starting_field, json &rv)
 {
   bool success;
   string s;
@@ -181,7 +161,7 @@ bool read_json(const vector <string> &sv, size_t starting_field, json &rv)
   }
 }
 
-Network *load_network(Processor **pp,
+static Network *load_network(Processor **pp,
                       const json &network_json)
 {
   Network *net;
@@ -211,7 +191,7 @@ Network *load_network(Processor **pp,
 }
 
 
-void safe_exit(Processor *p, Network *n)
+static void safe_exit(Processor *p, Network *n)
 {
   if (p != nullptr) delete p;
   if (n != nullptr) delete n;
