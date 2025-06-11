@@ -16,44 +16,10 @@ using nlohmann::json;
 
 typedef runtime_error SRE;
 
-static string node_name(Node *n) {
+static string node_name(Node *n) 
+{
     if (n->name == "") return std::to_string(n->id);
     return (std::to_string(n->id)) + "(" + n->name + ")";
-}
-
-static int max_node_name_len(Network *net) 
-{
-    size_t i;
-    Node *n;
-    int max_name_len = 0;
-    for (i = 0; i < net->sorted_node_vector.size(); i++) {
-        n = net->sorted_node_vector[i];
-        max_name_len = std::max(max_name_len, (int) node_name(n).size());
-    }
-
-    return max_name_len;
-
-}
-
-static void to_uppercase(string &s) 
-{
-    size_t i;
-    for (i = 0; i < s.size(); i++) {
-        if (s[i] >= 'a' && s[i] <= 'z') {
-            s[i] = s[i] + 'A' -'a';
-        }
-    }
-}
-
-static int node_validation(const Network *n, const string &node_id)
-{
-    uint32_t nid;
-
-    if (sscanf(node_id.c_str(), "%u", &nid) == 0) {
-        throw SRE((string) "Bad node specification - " + node_id);
-    }
-    if (!n->is_node(nid)) throw SRE(node_id + " is not a node in the network");
-    return nid;
 }
 
 static void spike_validation(const Spike &s, const Network *n, bool normalize) 
@@ -177,9 +143,9 @@ static void safe_exit(Processor *p, Network *n)
 int main(int argc, char **argv) 
 {
     Processor *p;
-    Network *net, *pulled; 
+    Network *net; 
     NodeMap::iterator nit;
-    Node *node, *n;
+    Node *node;
 
     string proc_name, prompt;
     string cmd;
@@ -190,11 +156,9 @@ int main(int argc, char **argv)
     istringstream ss;
 
     size_t i, j;
-    int k;
-    int node_id, output_id, spike_id, from;
+    int node_id, output_id, spike_id;
     double spike_time, spike_val;
     double sim_time;
-    double val;
     string alias, id;
 
     vector <string> sv; 
