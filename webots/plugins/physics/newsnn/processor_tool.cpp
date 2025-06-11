@@ -74,21 +74,26 @@ static bool network_processor_validation(const Network *n, const Processor *p) {
     return success;
 }
 
-static bool read_json(const vector <string> &sv, size_t starting_field, json &rv)
+static bool read_json(const vector <string> &sv, json &rv)
 {
     bool success = true;
-    string s;
-    ifstream fin;
+
+    string s = {};
+
+    ifstream fin = {};
 
     rv.clear();
 
     fin.clear();
-    fin.open(sv[starting_field].c_str());
-    if (fin.fail()) { 
-        perror(sv[starting_field].c_str());
-        return false;
-    } 
-    try { fin >> rv; success = true; } catch(...) { success = false; }
+
+    fin.open(sv[1].c_str());
+
+    try {
+        fin >> rv; success = true;
+    } catch(...) {
+        success = false;
+    }
+
     fin.close();
 
     return success;
@@ -175,7 +180,7 @@ int main(int argc, char **argv)
 
                 json network_json = {};
 
-                if (!read_json(sv, 1, network_json)) {
+                if (!read_json(sv, network_json)) {
 
                     printf("usage: ML network_json. Bad json\n");
                 } else {
