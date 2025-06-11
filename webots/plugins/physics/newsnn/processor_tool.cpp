@@ -216,13 +216,6 @@ int main(int argc, char **argv)
 
     auto node = net->get_output(0);
 
-    printf("node %s spike times:", node_name(node).c_str());
-
-    printf(" %.1lf", all_output_times[0][0]);
-
-    /*
-    for (size_t j=0; j<all_output_times[0].size(); j++) {
-        printf(" %.1lf", all_output_times[0][j]);
-    }
-    printf("\n");*/
+    printf("node %s spike times: %.1lf\n",
+            node_name(node).c_str(), all_output_times[0][0]);
 }
