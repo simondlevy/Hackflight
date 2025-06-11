@@ -111,6 +111,7 @@ static Network *load_network(Processor **pp, const json &network_json)
 int main(int argc, char **argv) 
 {
     static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
+    static const double MAX = 1000;
 
     istringstream ss = {};
 
@@ -222,18 +223,18 @@ int main(int argc, char **argv)
         }
     }  
 
+    // Run -------------------------------------------------------------------
+
     if (network_processor_validation(net, p)) {
-        double sim_time = 0;
-        if (sv.size() != 2 || sscanf(sv[1].c_str(),
-                    "%lf", &sim_time) != 1 || sim_time < 0) {
-            printf("usage: RUN sim_time. sim_time >= 0\n");
-        } else {
 
-            p->run(sim_time);
-            spikes_array.clear();
+        const auto sim_time = 3 * MAX + 2;
 
-        }
+        p->run(sim_time);
+
+        spikes_array.clear();
     }
+
+    // Output -----------------------------------------------------------------
 
     const auto all_output_times = p->output_vectors();
 
