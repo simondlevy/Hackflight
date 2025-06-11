@@ -206,5 +206,7 @@ int main(int argc, char **argv)
 
     // Output -----------------------------------------------------------------
 
-    printf("%.1lf\n",  p->output_vectors()[0][0]);
+    const auto out = p->output_vectors()[0][0];
+
+    printf("%.1lf\n", out == max + 1 ? -2 : out);
 }
