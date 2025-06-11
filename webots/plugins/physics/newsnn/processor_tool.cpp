@@ -103,8 +103,7 @@ static bool read_json(const vector <string> &sv, size_t starting_field, json &rv
     }
 }
 
-static Network *load_network(Processor **pp,
-        const json &network_json)
+static Network *load_network(Processor **pp, const json &network_json)
 {
     Network *net;
     json proc_params;
@@ -183,11 +182,6 @@ int main(int argc, char **argv)
     bool normalize;
     unordered_set <int> gsr_nodes;
 
-    json proc_params, network_json;
-    json spike_counts, spike_raster;
-    json associated_data;
-    json j1, j2;
-
     if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         fprintf(stderr, "usage: processor_tool [prompt]\n");
         fprintf(stderr, "\n");
@@ -214,6 +208,8 @@ int main(int argc, char **argv)
 
 
             if (sv[0] == "ML") { 
+
+                json network_json = {};
 
                 if (!read_json(sv, 1, network_json)) {
 
