@@ -208,7 +208,7 @@ int main(int argc, char **argv)
             string s = {};
             while (ss >> s) sv.push_back(s);
 
-            if (sv[0] == "AS" || sv[0] == "ASV") { 
+            if (sv[0] == "AS") { 
 
                 if (network_processor_validation(net, p)) {
                     if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
@@ -261,15 +261,14 @@ int main(int argc, char **argv)
 
             } 
 
+            else if (sv[0] == "OT") {  
 
-            else if (sv[0] == "OT" || sv[0] == "OV") {  
                 if (network_processor_validation(net, p)) {
 
                     if (sv.size() == 1) {
                         try {
                             const auto all_output_times = p->output_vectors();
                             if (all_output_times.size() == 0) {
-                                throw SRE("Processor error -- p->output_vectors returned a vector of size zero");
                             } 
                             for (size_t i = 0; i < (size_t)net->num_outputs(); i++) {
 
@@ -283,7 +282,6 @@ int main(int argc, char **argv)
                         } catch (const SRE &e) {
                             printf("%s\n",e.what());
                         } catch (...) {
-                            printf("Unknown error\n");
                         }
                     } else {
 
