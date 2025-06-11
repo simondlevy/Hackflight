@@ -251,12 +251,6 @@ int main(int argc, char **argv)
     json associated_data;
     json j1, j2;
 
-    if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
-        fprintf(stderr, "usage: processor_tool [prompt]\n");
-        fprintf(stderr, "\n");
-        exit(1);
-    }
-
     if (argc == 2) {
         prompt = argv[1];
         prompt += " ";
@@ -313,7 +307,6 @@ int main(int argc, char **argv)
 
                     if (network_processor_validation(net, p)) {
                         if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
-                            printf("usage: %s node_id spike_time spike_value node_id1 spike_time1 spike_value1 ...\n", sv[0].c_str());
                         } else {
 
                             normalize = (sv[0].size() == 2);
@@ -341,11 +334,10 @@ int main(int argc, char **argv)
                     }
                 } 
 
-                /////////////////////////////////////////////
-
             } 
-            else if (sv[0] == "OT" || sv[0] == "OV") {  
-                //  output_vector(int output_id, int network_id = 0)
+
+            else if (sv[0] == "OT") {  
+
                 if (network_processor_validation(net, p)) {
 
                     /* if OT doesn't take any node_ids, do all outputs */
@@ -354,12 +346,12 @@ int main(int argc, char **argv)
                         try {
                             all_output_times = p->output_vectors();
                             if (all_output_times.size() == 0) {
-                                throw SRE("Processor error -- p->output_vectors returned a vector of size zero");
                             } 
                             for (i = 0; i < (size_t)net->num_outputs(); i++) {
 
                                 node = net->get_output(i);
-                                printf("node %s spike times:", node_name(node).c_str());
+                                printf("node %s spike times:",
+                                        node_name(node).c_str());
                                 for (j = 0; j < all_output_times[i].size(); j++) {
                                     printf(" %.1lf", all_output_times[i][j]);
                                 }
