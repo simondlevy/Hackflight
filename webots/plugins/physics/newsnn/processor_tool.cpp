@@ -18,12 +18,6 @@ using nlohmann::json;
 
 typedef runtime_error SRE;
 
-static string node_name(Node *n) 
-{
-    if (n->name == "") return std::to_string(n->id);
-    return (std::to_string(n->id)) + "(" + n->name + ")";
-}
-
 static void spike_validation(const Spike &s, const Network *n, bool normalize) 
 {
     Node *node;
@@ -212,10 +206,5 @@ int main(int argc, char **argv)
 
     // Output -----------------------------------------------------------------
 
-    const auto all_output_times = p->output_vectors();
-
-    auto node = net->get_output(0);
-
-    printf("node %s spike times: %.1lf\n",
-            node_name(node).c_str(), all_output_times[0][0]);
+    printf("%.1lf\n",  p->output_vectors()[0][0]);
 }
