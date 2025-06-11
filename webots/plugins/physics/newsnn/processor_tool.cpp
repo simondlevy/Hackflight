@@ -263,8 +263,11 @@ int main(int argc, char **argv)
     while(1) {
 
         try {
+
             if (prompt != "") printf("%s", prompt.c_str());
+
             if (!getline(cin, l)) safe_exit(p, net);
+
             sv.clear();
             ss.clear();
             ss.str(l);
@@ -274,8 +277,6 @@ int main(int argc, char **argv)
             if (sv[0] == "ML") { // make() and load_network()
 
                 if (!read_json(sv, 1, network_json)) {
-
-                    printf("usage: ML network_json. Bad json\n");
                 } else {
 
                     try {
@@ -287,23 +288,12 @@ int main(int argc, char **argv)
                         max_name_len = max_node_name_len(net);
 
                     } catch (const SRE &e) {
-                        printf("%s\n",e.what());
-                        if (net != nullptr) { delete net; net = nullptr; }
-                        if (p != nullptr) { delete p; p = nullptr; }
-                        net = nullptr;
-                        p = nullptr;
                     } catch (...) {
-                        printf("Unknown error when making processor\n");
-                        if (net != nullptr) { delete net; net = nullptr; }
-                        if (p != nullptr) { delete p; p = nullptr; }
-                        net = nullptr;
-                        p = nullptr;
-
                     }
                 }
 
 
-                else if (sv[0] == "AS" || sv[0] == "ASV") { // apply_spike()
+                else if (sv[0] == "AS") { // apply_spike()
 
                     if (network_processor_validation(net, p)) {
                         if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
