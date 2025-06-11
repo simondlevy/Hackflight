@@ -74,7 +74,7 @@ static bool network_processor_validation(const Network *n, const Processor *p) {
     return success;
 }
 
-static bool read_json(const vector <string> &sv, json &rv)
+static bool read_json(const char * filename, json &rv)
 {
     bool success = true;
 
@@ -86,7 +86,7 @@ static bool read_json(const vector <string> &sv, json &rv)
 
     fin.clear();
 
-    fin.open(sv[1].c_str());
+    fin.open(filename);
 
     try {
         fin >> rv; success = true;
@@ -137,6 +137,8 @@ static void safe_exit(Processor *p, Network *n)
 
 int main(int argc, char **argv) 
 {
+    static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
+
     istringstream ss = {};
 
     vector <string> sv = {}; 
@@ -180,7 +182,7 @@ int main(int argc, char **argv)
 
                 json network_json = {};
 
-                if (!read_json(sv, network_json)) {
+                if (!read_json(NETWORK_FILENAME, network_json)) {
 
                     printf("usage: ML network_json. Bad json\n");
                 } else {
