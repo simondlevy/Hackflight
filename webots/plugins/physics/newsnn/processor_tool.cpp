@@ -76,31 +76,22 @@ static bool network_processor_validation(const Network *n, const Processor *p) {
 
 static bool read_json(const vector <string> &sv, size_t starting_field, json &rv)
 {
-    bool success;
+    bool success = true;
     string s;
     ifstream fin;
 
     rv.clear();
-    if (starting_field < sv.size()) {
-        fin.clear();
-        fin.open(sv[starting_field].c_str());
-        if (fin.fail()) { 
-            perror(sv[starting_field].c_str());
-            return false;
-        } 
-        try { fin >> rv; success = true; } catch(...) { success = false; }
-        fin.close();
-        return success;
 
-    } else {
-        try {
-            cin >> rv;
-            getline(cin, s);
-            return true;
-        } catch (...) {
-            return false;
-        }
-    }
+    fin.clear();
+    fin.open(sv[starting_field].c_str());
+    if (fin.fail()) { 
+        perror(sv[starting_field].c_str());
+        return false;
+    } 
+    try { fin >> rv; success = true; } catch(...) { success = false; }
+    fin.close();
+
+    return success;
 }
 
 static Network *load_network(Processor **pp, const json &network_json)
