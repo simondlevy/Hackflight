@@ -138,30 +138,17 @@ static void apply_spike(
 int main(int argc, char **argv) 
 {
     static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
+
     static const double MAX = 1000;
 
-    istringstream ss = {};
-
-    vector <string> sv = {}; 
+    (void)argc;
+    (void)argv;
 
     vector <Spike> spikes_array = {};
 
     Network * net = nullptr;
 
     Processor * p = nullptr;
-
-    if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
-        fprintf(stderr, "usage: processor_tool [prompt]\n");
-        fprintf(stderr, "\n");
-        exit(1);
-    }
-
-    string prompt = {};
-
-    if (argc == 2) {
-        prompt = argv[1];
-        prompt += " ";
-    }
 
     // Load network ----------------------------------------------------------
 
@@ -194,31 +181,6 @@ int main(int argc, char **argv)
 
         }
     }
-
-    /*
-    while(true) {
-
-        try {
-
-            if (prompt != "") printf("%s", prompt.c_str());
-
-            string l = {};
-            if (!getline(cin, l)) break; 
-            sv.clear();
-            ss.clear();
-            ss.str(l);
-
-            string s = {};
-            while (ss >> s) sv.push_back(s);
-
-            if (sv[0] == "AS") { 
-                apply_spike(net, p, sv, spikes_array);
-            } 
-
-        } catch (const SRE &e) {
-            printf("%s\n", e.what());
-        }
-    }  */
 
     // Apply spikes ----------------------------------------------------------
 
