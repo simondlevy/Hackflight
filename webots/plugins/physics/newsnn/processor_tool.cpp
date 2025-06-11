@@ -108,6 +108,43 @@ static Network *load_network(Processor **pp, const json &network_json)
     return net;
 }
 
+static void apply_spike(Network * net, Processor *p, vector<string> & sv,
+        vector<Spike> & spikes_array) 
+{
+    if (network_processor_validation(net, p)) {
+        if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
+        } else {
+
+            const auto normalize = (sv[0].size() == 2);
+            for (size_t i = 0; i < (sv.size() - 1) / 3; i++) {
+                try {
+
+                    double spike_time = 0;
+                    double spike_val = 0;
+
+                    int spike_id = 0;
+
+                    if (sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id) != 1 ||
+                            sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
+                            sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
+
+                        throw SRE((string) "Invalid spike [ " + sv[i*3 + 1] + "," + sv[i*3 + 2] + "," +
+                                sv[i*3 + 3] + "]\n");
+                    } 
+                    spike_validation(Spike(spike_id, spike_time, spike_val), net, normalize);
+
+                    p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, spike_val), normalize);
+                    spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
+
+                } catch (const SRE &e) {
+                    printf("%s\n",e.what());
+                }   
+
+            }
+        }
+    }
+}
+
 int main(int argc, char **argv) 
 {
     static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
@@ -168,7 +205,6 @@ int main(int argc, char **argv)
         }
     }
 
-
     while(true) {
 
         try {
@@ -185,39 +221,7 @@ int main(int argc, char **argv)
             while (ss >> s) sv.push_back(s);
 
             if (sv[0] == "AS") { 
-
-                if (network_processor_validation(net, p)) {
-                    if (sv.size() < 2 || (sv.size() - 1) % 3 != 0) {
-                    } else {
-
-                        const auto normalize = (sv[0].size() == 2);
-                        for (size_t i = 0; i < (sv.size() - 1) / 3; i++) {
-                            try {
-
-                                double spike_time = 0;
-                                double spike_val = 0;
-
-                                int spike_id = 0;
-
-                                if (sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id) != 1 ||
-                                        sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time) != 1 || 
-                                        sscanf(sv[i*3 + 3].c_str(), "%lf", &spike_val) != 1 ) {
-
-                                    throw SRE((string) "Invalid spike [ " + sv[i*3 + 1] + "," + sv[i*3 + 2] + "," +
-                                            sv[i*3 + 3] + "]\n");
-                                } 
-                                spike_validation(Spike(spike_id, spike_time, spike_val), net, normalize);
-
-                                p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, spike_val), normalize);
-                                spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
-
-                            } catch (const SRE &e) {
-                                printf("%s\n",e.what());
-                            }   
-
-                        }
-                    }
-                }
+                apply_spike(net, p, sv, spikes_array);
             } 
 
         } catch (const SRE &e) {
