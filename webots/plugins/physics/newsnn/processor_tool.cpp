@@ -123,11 +123,9 @@ static void apply_spike(Network * net, Processor *p, vector<string> & sv,
 
                 int spike_id = 0;
                 double spike_time = 0;
-                double ignore = 0;
 
                 sscanf(sv[i*3 + 1].c_str(),"%d", &spike_id);
                 sscanf(sv[i*3 + 2].c_str(), "%lf", &spike_time);
-                sscanf(sv[i*3 + 3].c_str(), "%lf", &ignore); 
 
                 spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, normalize);
 
