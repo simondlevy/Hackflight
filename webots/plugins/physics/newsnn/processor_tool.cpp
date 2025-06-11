@@ -148,23 +148,12 @@ int main(int argc, char **argv)
 
     string proc_name, prompt;
     string cmd;
-    string l,s;
 
-    ofstream fout;
+    istringstream ss = {};
 
-    istringstream ss;
+    vector <string> sv = {}; 
 
-    /*
-    size_t i, j;
-    int node_id, output_id, spike_id;
-    double spike_time, spike_val;
-    string alias, id;
-    */
-
-    vector <string> sv; 
-    vector <Spike> spikes_array;
-    vector < vector <double> > all_output_times; 
-    vector <double> output_times; 
+    vector <Spike> spikes_array = {};
 
     if (argc > 2 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         fprintf(stderr, "usage: processor_tool [prompt]\n");
@@ -183,11 +172,13 @@ int main(int argc, char **argv)
     while(1) {
         try {
             if (prompt != "") printf("%s", prompt.c_str());
+            string l = {};
             if (!getline(cin, l)) safe_exit(p, net);
             sv.clear();
             ss.clear();
             ss.str(l);
 
+            string s = {};
             while (ss >> s) sv.push_back(s);
 
 
@@ -225,8 +216,6 @@ int main(int argc, char **argv)
 
 
             } 
-
-            ///////////////////////////////////////////////////////////////
 
             else if (sv[0] == "AS" || sv[0] == "ASV") { 
 
@@ -288,7 +277,7 @@ int main(int argc, char **argv)
 
                     if (sv.size() == 1) {
                         try {
-                            all_output_times = p->output_vectors();
+                            const auto all_output_times = p->output_vectors();
                             if (all_output_times.size() == 0) {
                                 throw SRE("Processor error -- p->output_vectors returned a vector of size zero");
                             } 
@@ -319,7 +308,7 @@ int main(int argc, char **argv)
                                 output_node_id_validation(node_id, net);
                                 const auto output_id = net->get_node(node_id)->output_id;
 
-                                output_times = p->output_vector(output_id);
+                                const auto output_times = p->output_vector(output_id);
                                 node = net->get_node(node_id);
                                 printf("node %s spike times: ", node_name(node).c_str());
                                 for (size_t j = 0; j < output_times.size(); j++) {
