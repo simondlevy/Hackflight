@@ -46,25 +46,6 @@ static void spike_validation(const Spike &s, const Network *n, bool normalize)
 
 }
 
-static void output_node_id_validation(const int node_id, const Network *n) 
-{
-    Node *node;
-    char buf[20];
-
-    try {
-        if (node_id < 0) throw "node_id must > 0";
-        node = n->get_node(node_id);
-        if (!node->is_output()) {
-            snprintf(buf, 20, "%d", node_id);
-            throw (string) "node " + buf + " is not an input node";
-        }
-    } catch (const string &s) {
-        throw SRE(s);
-    } catch (const char *s) {
-        throw SRE(s);
-    }
-}
-
 static bool network_processor_validation(const Network *n, const Processor *p) {
     bool success = (n != nullptr && p != nullptr);
 
@@ -266,8 +247,6 @@ int main(int argc, char **argv)
                 if (network_processor_validation(net, p)) {
 
                     if (sv.size() == 1) {
-
-                        cerr << "***************************************************\n";
 
                         try {
                             const auto all_output_times = p->output_vectors();
