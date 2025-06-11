@@ -136,6 +136,8 @@ int main(int argc, char **argv)
         prompt += " ";
     }
 
+    // Load network ----------------------------------------------------------
+
     json network_json = {};
 
     if (!read_json(NETWORK_FILENAME, network_json)) {
