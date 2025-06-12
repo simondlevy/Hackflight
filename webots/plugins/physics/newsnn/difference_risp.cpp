@@ -18,30 +18,6 @@ using nlohmann::json;
 
 typedef runtime_error SRE;
 
-static void spike_validation(const Spike &s, const Network *n, bool normalize) 
-{
-    Node *node;
-    char buf[20];
-
-    try {
-        if (normalize) {
-            if (s.value < -1 || s.value > 1) throw "spike val must be >= -1 and <= 1";
-        }
-        if (s.time < 0) throw "spike time must be > 0";
-        node = n->get_node(s.id);
-        if (!node->is_input()) {
-            snprintf(buf, 20, "%d", s.id);
-            throw (string) "node " + buf + " is not an input node";
-        }
-
-    } catch (const string &s) {
-        throw SRE(s);
-    } catch (const char *s) {
-        throw SRE(s);
-    }
-
-}
-
 static bool network_processor_validation(const Network *n, const Processor *p) {
     bool success = (n != nullptr && p != nullptr);
 
@@ -118,8 +94,6 @@ static void apply_spike(
     if (network_processor_validation(net, p)) {
 
         try {
-
-            spike_validation(Spike(spike_id, spike_time, SPIKE_VAL), net, NORMALIZE);
 
             p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
 
