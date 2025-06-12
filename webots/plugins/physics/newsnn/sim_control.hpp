@@ -30,25 +30,30 @@
 #include <datatypes.h>
 #include <num.hpp>
 
-#include <framework.hpp>
-#include <utils/json_helpers.hpp>
+#include "framework_utils.hpp"
 
-using namespace std;
-using namespace neuro;
-using nlohmann::json;
+static const char * NETWORK_FILENAME =
+"/home/levys/Desktop/diffnet/difference_risp_plank.txt";
 
-typedef runtime_error SRE;
+static const double MAX = 1000;
 
 static float runSnn(const float dz, const float demand)
 {
     static constexpr float KP = 25;
+
+    static Network * net;
+    static Processor * proc;
+
+    if (!net) {
+        FrameworkUtils::load(NETWORK_FILENAME, &proc);
+    }
 
     const auto error = demand - dz;
 
     const auto thrust = KP * error;
 
     return Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
-                THRUST_MIN, THRUST_MAX); 
+            THRUST_MIN, THRUST_MAX); 
 }
 
 static void runClosedLoopControl(
