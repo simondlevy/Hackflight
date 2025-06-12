@@ -7,7 +7,6 @@ CXX ?= g++ -O3 -std=c++11 -Wall -Wextra
 FR_INC = -I$(FRO)/include -I$(FRO)/include/utils $(CFLAGS)
 FR_OBJ = obj/framework.o obj/processor_help.o obj/properties.o
 
-RISP_INC = $(FRO)/include/risp.hpp
 RISP_OBJ = obj/risp.o obj/risp_static.o
 
 all: difference_risp

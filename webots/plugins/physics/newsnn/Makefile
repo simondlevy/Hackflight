@@ -22,6 +22,12 @@ INCLUDE = -I$(SRC)
 
 CXX_SOURCES = ../support.cpp
 
+# TeNNLab framework stuff ------------------------------ ----------------------
+
+FRO = $(HOME)/Desktop/framework-open
+
+# -----------------------------------------------------------------------------
+
 all: libnewsnn.so
 
 ### Do not modify: this includes Webots global Makefile.include
