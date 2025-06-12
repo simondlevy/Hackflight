@@ -45,34 +45,35 @@ static float runSnn(const float dz, const float demand)
 
     static Processor * proc;
 
+    // Load the network the first time around
     if (!net) {
         net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
     }
 
+    // Turn the demand and climb-rate into spikes
     const double spike_time_1 = FrameworkUtils::get_spike_time(demand, MAX);
     const double spike_time_2 = FrameworkUtils::get_spike_time(dz, MAX);
 
+    // Enter the spikes into the network
     vector <Spike> spikes_array = {};
-
     FrameworkUtils::apply_spike(net, proc, 0, spike_time_1, spikes_array);
     FrameworkUtils::apply_spike(net, proc, 1, spike_time_2, spikes_array);
     FrameworkUtils::apply_spike(net, proc, 2, 0, spikes_array);
 
+    // Run the network
     const auto sim_time = 3 * MAX + 2;
-
     proc->run(sim_time);
-
     spikes_array.clear();
 
+    // Get the output network's firing time
     const auto out = proc->output_vectors()[0][0];
-
     const auto time = out == MAX + 1 ? -2 : out;
 
+    // Convert the firing time to a difference in [-2,+2]
     const auto diff = (time-(MAX))*4/(2*MAX)-2;
 
-    const auto thrust = KP * diff;
-
-    return Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+    // Convert the difference into a thrust, constrained by motor limits
+    return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
             THRUST_MIN, THRUST_MAX); 
 }
 
