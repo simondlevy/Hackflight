@@ -50,7 +50,7 @@ static bool read_json(const char * filename, json &rv)
     return success;
 }
 
-static Network *load_network(Processor **pp, const json &network_json)
+static Network * load_network(Processor **pp, const json &network_json)
 {
     Network *net;
     json proc_params;

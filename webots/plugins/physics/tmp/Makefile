@@ -11,8 +11,8 @@ RISP_OBJ = obj/risp.o obj/risp_static.o
 
 all: difference_risp
 
-$(NAME): $(NAME).cpp framework_utils.hpp $(RISP_OBJ) $(FR_OBJ)
-	$(CXX) $(FR_INC) -o $(NAME) $(NAME).cpp $(RISP_OBJ) $(FR_OBJ)
+$(NAME): $(NAME).cpp ../newsnn/framework_utils.hpp $(RISP_OBJ) $(FR_OBJ)
+	$(CXX) -I../newsnn $(FR_INC) -o $(NAME) $(NAME).cpp $(RISP_OBJ) $(FR_OBJ)
 
 obj/risp.o:
 	$(CXX) -c $(FR_INC) -o obj/risp.o $(FRO)/src/risp.cpp
