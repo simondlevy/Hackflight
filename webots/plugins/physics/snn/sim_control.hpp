@@ -60,8 +60,7 @@ static double runSnn(
         const float setpoint,
         const float actual,
         const float scale,
-        const float offset,
-        const bool debug=false)
+        const float offset)
 {
     vector<double> observations = { setpoint, actual };
 
@@ -71,10 +70,7 @@ static double runSnn(
 
     const double action = counts[0] * scale + offset;
 
-    if (debug) {
-        printf("%d", counts[0]);
-        printf("%f,%f\n", setpoint - actual, action);
-    }
+    printf("%f,%f\n", (setpoint - actual) * scale + offset, action);
 
     return action;
 }
