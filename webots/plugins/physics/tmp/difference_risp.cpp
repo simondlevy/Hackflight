@@ -1,95 +1,9 @@
-#include <framework.hpp>
-#include <utils/json_helpers.hpp>
-
-using namespace std;
-using namespace neuro;
-using nlohmann::json;
-
-typedef runtime_error SRE;
-
-static bool read_json(const char * filename, json &rv)
-{
-    bool success = true;
-
-    string s = {};
-
-    ifstream fin = {};
-
-    rv.clear();
-
-    fin.clear();
-
-    fin.open(filename);
-
-    try {
-        fin >> rv; success = true;
-    } catch(...) {
-        success = false;
-    }
-
-    fin.close();
-
-    return success;
-}
-
-static Network *load_network(Processor **pp, const json &network_json)
-{
-    Network *net;
-    json proc_params;
-    string proc_name;
-    Processor *p;
-
-    net = new Network();
-    net->from_json(network_json);
-
-    p = *pp;
-    if (p == nullptr) {
-        proc_params = net->get_data("proc_params");
-        proc_name = net->get_data("other")["proc_name"];
-        p = Processor::make(proc_name, proc_params);
-        *pp = p;
-    } 
-
-    if (p->get_network_properties().as_json() != net->get_properties().as_json()) {
-        throw SRE("network and processor properties do not match.");
-    }
-
-    if (!p->load_network(net)) throw SRE("load_network() failed");
-    track_all_neuron_events(p, net);
-
-    return net;
-}
-
-static void apply_spike(
-        Network * net,
-        Processor *p,
-        const int spike_id,
-        const double spike_time,
-        vector<Spike> & spikes_array) 
-{
-    static const double SPIKE_VAL = 1;
-
-    static const bool NORMALIZE = true;
-
-    try {
-
-        p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
-
-        spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
-
-    } catch (const SRE &e) {
-        printf("%s\n",e.what());
-    }   
-}
-
-static double get_spike_time(const float inp, const double max)
-{
-    return round(max * (1 - inp) / 2);
-}
+#include "framework_utils.hpp"
 
 int main() 
 {
-    static const char * NETWORK_FILENAME = "/home/levys/Desktop/diffnet/difference_risp_plank.txt";
+    static const char * NETWORK_FILENAME =
+        "/home/levys/Desktop/diffnet/difference_risp_plank.txt";
 
     static const double MAX = 1000;
 
