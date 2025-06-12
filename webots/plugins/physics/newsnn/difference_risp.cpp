@@ -18,15 +18,6 @@ using nlohmann::json;
 
 typedef runtime_error SRE;
 
-static bool network_processor_validation(const Network *n, const Processor *p) {
-    bool success = (n != nullptr && p != nullptr);
-
-    if (!success) {
-        printf("Processor or network is not loaded\n");
-    }
-    return success;
-}
-
 static bool read_json(const char * filename, json &rv)
 {
     bool success = true;
@@ -91,18 +82,15 @@ static void apply_spike(
 
     static const bool NORMALIZE = true;
 
-    if (network_processor_validation(net, p)) {
+    try {
 
-        try {
+        p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
 
-            p->apply_spike(Spike(net->get_node(spike_id)->input_id, spike_time, SPIKE_VAL), NORMALIZE);
+        spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
 
-            spikes_array.push_back(Spike(spike_id, spike_time, SPIKE_VAL));
-
-        } catch (const SRE &e) {
-            printf("%s\n",e.what());
-        }   
-    }
+    } catch (const SRE &e) {
+        printf("%s\n",e.what());
+    }   
 }
 
 static double get_spike_time(const float inp, const double max)
@@ -160,14 +148,11 @@ int main()
             apply_spike(net, proc, 1, spike_time_2, spikes_array);
             apply_spike(net, proc, 2, 0, spikes_array);
 
-            if (network_processor_validation(net, proc)) {
+            const auto sim_time = 3 * MAX + 2;
 
-                const auto sim_time = 3 * MAX + 2;
+            proc->run(sim_time);
 
-                proc->run(sim_time);
-
-                spikes_array.clear();
-            }
+            spikes_array.clear();
 
             const auto out = proc->output_vectors()[0][0];
 
