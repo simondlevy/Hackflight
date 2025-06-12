@@ -26,6 +26,12 @@ CXX_SOURCES = ../support.cpp
 
 FRO = $(HOME)/Desktop/framework-open
 
+FR_INC = -I$(FRO)/include -I$(FRO)/include/utils $(CFLAGS)
+FR_OBJ = obj/framework.o obj/processor_help.o obj/properties.o
+
+RISP_OBJ = obj/risp.o obj/risp_static.o
+
+
 # -----------------------------------------------------------------------------
 
 all: libnewsnn.so
