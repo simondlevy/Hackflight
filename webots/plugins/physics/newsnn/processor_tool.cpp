@@ -131,9 +131,9 @@ static void apply_spike(
     }
 }
 
-static double get_input(const char * arg, const double max)
+static double get_spike_time(const float inp, const double max)
 {
-    return round(max * (1 - atof(arg)) / 2);
+    return round(max * (1 - inp) / 2);
 }
 
 int main(int argc, char **argv) 
@@ -145,9 +145,12 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    const double inp1 = atof(argv[1]);
+    const double inp2 = atof(argv[2]);
     const double max = atof(argv[3]);
-    const double spike_time_1 = get_input(argv[1], max);
-    const double spike_time_2 = get_input(argv[2], max);
+
+    const double spike_time_1 = get_spike_time(inp1, max);
+    const double spike_time_2 = get_spike_time(inp2, max);
 
     vector <Spike> spikes_array = {};
 
@@ -210,7 +213,7 @@ int main(int argc, char **argv)
 
     const auto time = out == max + 1 ? -2 : out;
 
-    printf("%f\n", (time-(max))*4/(2*max)-2);
+    const auto diff = (time-(max))*4/(2*max)-2;
 
-    //printf("%.1lf\n", time);
+    printf("%3.3f -%3.3f = %3.3f\n", inp1, inp2, diff);
 }
