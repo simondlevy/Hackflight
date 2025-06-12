@@ -20,9 +20,6 @@
 #include <stdio.h>
 
 #include <clock.hpp>
-#include <datatypes.h>
-#include <num.hpp>
-
 #include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
@@ -30,6 +27,17 @@
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
+#include <datatypes.h>
+#include <num.hpp>
+
+#include <framework.hpp>
+#include <utils/json_helpers.hpp>
+
+using namespace std;
+using namespace neuro;
+using nlohmann::json;
+
+typedef runtime_error SRE;
 
 static float runSnn(const float dz, const float demand)
 {
