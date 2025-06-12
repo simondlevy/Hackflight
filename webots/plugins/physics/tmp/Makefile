@@ -2,9 +2,7 @@ NAME = difference_risp
 
 FRO = $(HOME)/Desktop/framework-open
 
-CXX ?= g++
-
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+CXX ?= g++ -O3 -std=c++11 -Wall -Wextra
 
 FR_INC = -I$(FRO)/include -I$(FRO)/include/utils $(CFLAGS)
 FR_OBJ = obj/framework.o obj/processor_help.o obj/properties.o
