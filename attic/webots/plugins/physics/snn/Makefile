@@ -1,4 +1,5 @@
-# Custom physics plugin for Hackflight simulator 
+# Custom physics plugin for Hackflight simulator using TeNNLab Spiking Neural
+# networks for control
 #
 #  Copyright (C) 2025 Simon D. Levy
 #
@@ -14,31 +15,38 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-SRC = ../../../../src
-
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
-INCLUDE = -I$(SRC)
-
-CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src
 
-# TeNNLab framework stuff ------------------------------ ----------------------
+CXX_SOURCES = ../support.cpp
 
-FRO = $(HOME)/Desktop/framework-open
+# TeNNLab framework stuff ----------------------------------------------------
 
-INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
+ROOT = $(HOME)/Desktop
 
-CXX_SOURCES += $(FRO)/src/risp.cpp
-CXX_SOURCES += $(FRO)/src/risp_static.cpp
-CXX_SOURCES += $(FRO)/src/framework.cpp
-CXX_SOURCES += $(FRO)/src/processor_help.cpp
-CXX_SOURCES += $(FRO)/src/properties.cpp
+FDIR = $(HOME)/Desktop/framework
 
-# -----------------------------------------------------------------------------
+PDIR =  $(FDIR)/processors/risp
 
-all: libnewsnn.so
+INCLUDE += -I$(ROOT) -I$(FDIR)/include -I$(FDIR)/include/utils/levy
+CXX_SOURCES += $(FDIR)/src/io_stream.cpp
+CXX_SOURCES += $(FDIR)/src/jspace.cpp
+CXX_SOURCES += $(FDIR)/src/network.cpp
+CXX_SOURCES += $(FDIR)/src/properties.cpp
+CXX_SOURCES += $(FDIR)/src/spike_encoding.cpp
+
+INCLUDE += -I$(PDIR)/include
+CXX_SOURCES += $(PDIR)/src/processor.cpp
+CXX_SOURCES += $(PDIR)/src/static_proc.cpp
+
+VIZ_NET = $(shell pwd)/networks/difference_risp_train.txt
+VIZ_HOST = "localhost"
+VIZ_PORT = 8100
+
+# ----------------------------------------------------------------------------
+
+all: libsnn.so
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

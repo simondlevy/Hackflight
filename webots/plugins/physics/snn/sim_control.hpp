@@ -1,26 +1,25 @@
-/* 
- * Custom physics plugin for Hackflight simulator using ground-truth state 
- * and Spiking Neural Net controllers
- *
- *  Copyright (C) 2025 Simon D. Levy
+/**
+ * Copyright 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, in version 3.
  *
- *  This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY without even the implied warranty of
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
+#pragma once
 
-#include <posix-utils/socket.hpp>
+#include <math.h>
+#include <stdio.h>
 
+#include <clock.hpp>
 #include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
@@ -28,95 +27,85 @@
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
+#include <datatypes.h>
+#include <num.hpp>
 
-#include <vehicles/diyquad.hpp>
+#include "framework_utils.hpp"
 
-#include <snn_util.hpp>
+static const char * NETWORK_FILENAME =
+"/home/levys/Desktop/diffnet/difference_risp_plank.txt";
 
-static const uint16_t VIZ_PORT = 8100;
-static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
+static const double MAX = 1000;
 
-static const float CLIMBRATE_SCALE  = 500;
-static const float CLIMBRATE_OFFSET = 26000;
+static Network * net;
 
-static const char * NETWORK = "difference_risp_train";
+static Processor * proc;
 
-static SNN * climbRateSnn;
-
-static auto vizSnn = &climbRateSnn;
-
-static SNN * makeSnn()
+static float runSnn(const float dz, const float demand)
 {
-    char filename[100] = {};
+    static constexpr float KP = 25;
 
-    sprintf(filename, "%s/Desktop/framework/networks/%s.txt",
-            getenv("HOME"), NETWORK);
+    if (!net) {
+        net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
+    }
 
-    return new SNN(filename, "risp");
+    const double spike_time_1 = FrameworkUtils::get_spike_time(demand, MAX);
+
+    const double spike_time_2 = FrameworkUtils::get_spike_time(dz, MAX);
+
+    vector <Spike> spikes_array = {};
+
+    FrameworkUtils::apply_spike(net, proc, 0, spike_time_1,
+            spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 1, spike_time_2,
+            spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 2, 0,
+            spikes_array);
+
+    const auto sim_time = 3 * MAX + 2;
+
+    proc->run(sim_time);
+
+    spikes_array.clear();
+
+    const auto out = proc->output_vectors()[0][0];
+
+    const auto time = out == MAX + 1 ? -2 : out;
+
+    const auto diff = (time-(MAX))*4/(2*MAX)-2;
+
+    const auto thrust = KP * diff;
+
+    return Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+            THRUST_MIN, THRUST_MAX); 
 }
 
-static double runSnn(
-        SNN * snn,
-        const float setpoint,
-        const float actual,
-        const float scale,
-        const float offset)
-{
-    vector<double> observations = { setpoint, actual };
-
-    vector <int> counts = {};
-
-    snn->step(observations, counts);
-
-    const double action = counts[0] * scale + offset;
-
-    printf("%f,%f\n", (setpoint - actual) * scale + offset, action);
-
-    return action;
-}
-
-static ServerSocket serverSocket;
-
-void runClosedLoopControl(
+static void runClosedLoopControl(
         const float dt,
-        const bool inHoverMode,
+        const bool hovering,
         const vehicleState_t & vehicleState,
         const demands_t & openLoopDemands,
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    if (!climbRateSnn) {
-
-        try {
-
-            climbRateSnn = makeSnn();
-
-        } catch (const SRE &e) {
-            fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
-            exit(1);
-        }
-
-        // Listen for and accept connections from vizualization client
-        serverSocket.open(VIZ_PORT);
-        serverSocket.acceptClient();
-    }
-
-    const auto climbrate = AltitudeController::run(inHoverMode,
+    const auto climbrate = AltitudeController::run(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
-    // Run SNN in hover mode only; otherwise, use standard PID controller
-    demands.thrust = inHoverMode ?
+    demands.thrust =
 
-        runSnn(climbRateSnn, climbrate, vehicleState.dz,
-                CLIMBRATE_SCALE, CLIMBRATE_OFFSET) :
+        hovering ? 
 
-            ClimbRateController::run(
-                    inHoverMode,
-                    landingAltitudeMeters,
-                    dt,
-                    vehicleState.z,
-                    vehicleState.dz,
-                    climbrate);
+        runSnn(vehicleState.dz, climbrate)
+
+        : ClimbRateController::run(
+                hovering,
+                landingAltitudeMeters,
+                dt,
+                vehicleState.z,
+                vehicleState.dz,
+                climbrate);
+
+
 
     const auto airborne = demands.thrust > 0;
 
@@ -130,8 +119,8 @@ void runClosedLoopControl(
             airborne,
             dt,
             vehicleState.dx, vehicleState.dy, vehicleState.psi,
-            inHoverMode ? openLoopDemands.pitch : 0,
-            inHoverMode ? openLoopDemands.roll : 0,
+            hovering ? openLoopDemands.pitch : 0,
+            hovering ? openLoopDemands.roll : 0,
             demands.roll, demands.pitch);
 
     PitchRollAngleController::run(
@@ -147,12 +136,4 @@ void runClosedLoopControl(
             vehicleState.dphi, vehicleState.dtheta,
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
-
-    static uint32_t _vizcount;
-    if (_vizcount++ % VIZ_SEND_PERIOD == 0) {
-        // Send spikes to visualizer
-        uint8_t counts[256] = {};
-        const auto ncounts = (*vizSnn)->get_counts(counts);
-        serverSocket.sendData(counts, ncounts);
-    }
 }
