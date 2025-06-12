@@ -160,6 +160,7 @@ int main(int argc, char **argv)
     if (!read_json(NETWORK_FILENAME, network_json)) {
 
         printf("usage: ML network_json. Bad json\n");
+        exit(1);
     } else {
 
         try {
