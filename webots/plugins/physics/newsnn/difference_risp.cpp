@@ -140,17 +140,12 @@ int main(int argc, char **argv)
 {
     static const char * NETWORK_FILENAME = "/home/levys/Desktop/diffnet/difference_risp_plank.txt";
 
-    if (argc < 4) {
-        fprintf(stderr, "Usage: %s INP1 INP2 MAX\n", argv[0]);
+    static const double MAX = 1000;
+
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s INP1 INP2\n", argv[0]);
         exit(1);
     }
-
-    const double inp1 = atof(argv[1]);
-    const double inp2 = atof(argv[2]);
-    const double max = atof(argv[3]);
-
-    const double spike_time_1 = get_spike_time(inp1, max);
-    const double spike_time_2 = get_spike_time(inp2, max);
 
     vector <Spike> spikes_array = {};
 
@@ -192,6 +187,12 @@ int main(int argc, char **argv)
 
     // Apply spikes ----------------------------------------------------------
 
+    const double inp1 = atof(argv[1]);
+    const double inp2 = atof(argv[2]);
+
+    const double spike_time_1 = get_spike_time(inp1, MAX);
+    const double spike_time_2 = get_spike_time(inp2, MAX);
+
     apply_spike(net, p, 0, spike_time_1, spikes_array);
     apply_spike(net, p, 1, spike_time_2, spikes_array);
     apply_spike(net, p, 2, 0, spikes_array);
@@ -200,7 +201,7 @@ int main(int argc, char **argv)
 
     if (network_processor_validation(net, p)) {
 
-        const auto sim_time = 3 * max + 2;
+        const auto sim_time = 3 * MAX + 2;
 
         p->run(sim_time);
 
@@ -211,9 +212,9 @@ int main(int argc, char **argv)
 
     const auto out = p->output_vectors()[0][0];
 
-    const auto time = out == max + 1 ? -2 : out;
+    const auto time = out == MAX + 1 ? -2 : out;
 
-    const auto diff = (time-(max))*4/(2*max)-2;
+    const auto diff = (time-(MAX))*4/(2*MAX)-2;
 
     printf("%3.3f -%3.3f = %3.3f\n", inp1, inp2, diff);
 }

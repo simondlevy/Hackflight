@@ -34,7 +34,7 @@ obj/properties.o: $(FRO)/src/properties.cpp $(FR_INC)
 	$(CXX) -c $(FR_CFLAGS) -o obj/properties.o $(FRO)/src/properties.cpp
 
 run:
-	./$(NAME) 1 0.55 1000
+	./$(NAME) 1 0.55
 
 edit:
 	vim $(NAME).cpp
