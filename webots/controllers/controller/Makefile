@@ -56,6 +56,11 @@ runsnn:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 
+runnewsnn:
+	cp ../../plugins/physics/newsnn/libnewsnn.so ../../plugins/physics/custom/libcustom.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
