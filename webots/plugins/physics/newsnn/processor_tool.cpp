@@ -138,7 +138,7 @@ static double get_spike_time(const float inp, const double max)
 
 int main(int argc, char **argv) 
 {
-    static const char * NETWORK_FILENAME = "difference_risp_plank.txt";
+    static const char * NETWORK_FILENAME = "/home/levys/Desktop/diffnet/difference_risp_plank.txt";
 
     if (argc < 4) {
         fprintf(stderr, "Usage: %s INP1 INP2 MAX\n", argv[0]);
