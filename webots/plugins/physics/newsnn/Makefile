@@ -22,15 +22,19 @@ INCLUDE = -I$(SRC)
 
 CXX_SOURCES = ../support.cpp
 
+INCLUDE = -I../../../simsrc -I../../../../src
+
 # TeNNLab framework stuff ------------------------------ ----------------------
 
 FRO = $(HOME)/Desktop/framework-open
 
-FR_INC = -I$(FRO)/include -I$(FRO)/include/utils $(CFLAGS)
-FR_OBJ = obj/framework.o obj/processor_help.o obj/properties.o
+INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
 
-RISP_OBJ = obj/risp.o obj/risp_static.o
-
+CXX_SOURCES += $(FRO)/src/risp.cpp
+CXX_SOURCES += $(FRO)/src/risp_static.cpp
+CXX_SOURCES += $(FRO)/src/framework.cpp
+CXX_SOURCES += $(FRO)/src/processor_help.cpp
+CXX_SOURCES += $(FRO)/src/properties.cpp
 
 # -----------------------------------------------------------------------------
 

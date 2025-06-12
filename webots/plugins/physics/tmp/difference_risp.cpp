@@ -1,16 +1,5 @@
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <cstdlib>
-#include <cstdio>
-#include <map>
-#include <unordered_set>
-#include <unistd.h>
-#include <math.h>
-
-#include "framework.hpp"
-#include "utils/json_helpers.hpp"
+#include <framework.hpp>
+#include <utils/json_helpers.hpp>
 
 using namespace std;
 using namespace neuro;
