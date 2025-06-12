@@ -21,7 +21,6 @@
 
 #include <clock.hpp>
 #include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
@@ -29,6 +28,7 @@
 #include <control/pids/yaw_rate.hpp>
 #include <datatypes.h>
 #include <num.hpp>
+#include <vehicles/diyquad.hpp>
 
 #include "framework_utils.hpp"
 
@@ -37,13 +37,13 @@ static const char * NETWORK_FILENAME =
 
 static const double MAX = 1000;
 
-static Network * net;
-
-static Processor * proc;
-
 static float runSnn(const float dz, const float demand)
 {
     static constexpr float KP = 25;
+
+    static Network * net;
+
+    static Processor * proc;
 
     if (!net) {
         net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
@@ -88,24 +88,12 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
+    (void)landingAltitudeMeters;
+
     const auto climbrate = AltitudeController::run(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
-    demands.thrust =
-
-        hovering ? 
-
-        runSnn(vehicleState.dz, climbrate)
-
-        : ClimbRateController::run(
-                hovering,
-                landingAltitudeMeters,
-                dt,
-                vehicleState.z,
-                vehicleState.dz,
-                climbrate);
-
-
+    demands.thrust =runSnn(vehicleState.dz, climbrate);
 
     const auto airborne = demands.thrust > 0;
 
