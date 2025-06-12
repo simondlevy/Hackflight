@@ -78,7 +78,7 @@ static float runSnn(const float dz, const float demand)
 
     printf("%f(%f)\n", diff, error);
 
-    const auto thrust = KP * error;
+    const auto thrust = KP * diff;
 
     return Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
             THRUST_MIN, THRUST_MAX); 
