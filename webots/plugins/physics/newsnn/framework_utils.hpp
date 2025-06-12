@@ -23,112 +23,121 @@ using namespace std;
 using namespace neuro;
 using nlohmann::json;
 
-typedef runtime_error SRE;
+class FrameworkUtils {
 
-static bool read_json(const char * filename, json &rv)
-{
-    bool success = true;
+    private:
 
-    string s = {};
+        typedef runtime_error SRE;
 
-    ifstream fin = {};
+        static bool read_json(const char * filename, json &rv)
+        {
+            bool success = true;
 
-    rv.clear();
+            string s = {};
 
-    fin.clear();
+            ifstream fin = {};
 
-    fin.open(filename);
+            rv.clear();
 
-    try {
-        fin >> rv; success = true;
-    } catch(...) {
-        success = false;
-    }
+            fin.clear();
 
-    fin.close();
+            fin.open(filename);
 
-    return success;
-}
+            try {
+                fin >> rv; success = true;
+            } catch(...) {
+                success = false;
+            }
 
-static Network * load_network(Processor **pp, const json &network_json)
-{
-    Network *net;
-    json proc_params;
-    string proc_name;
-    Processor *p;
+            fin.close();
 
-    net = new Network();
-    net->from_json(network_json);
-
-    p = *pp;
-    if (p == nullptr) {
-        proc_params = net->get_data("proc_params");
-        proc_name = net->get_data("other")["proc_name"];
-        p = Processor::make(proc_name, proc_params);
-        *pp = p;
-    } 
-
-    if (p->get_network_properties().as_json() !=
-            net->get_properties().as_json()) {
-        throw SRE("network and processor properties do not match.");
-    }
-
-    if (!p->load_network(net)) {
-        throw SRE("load_network() failed");
-    }
-    track_all_neuron_events(p, net);
-
-    return net;
-}
-
-static void apply_spike(
-        Network * net,
-        Processor *p,
-        const int spike_id,
-        const double spike_time,
-        vector<Spike> & spikes_array,
-        const double spike_val=1,
-        const bool normalize=true) 
-{
-    try {
-
-        p->apply_spike(Spike(net->get_node(spike_id)->input_id,
-                    spike_time, spike_val), normalize);
-
-        spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
-
-    } catch (const SRE &e) {
-        printf("%s\n",e.what());
-    }   
-}
-
-static double get_spike_time(const float inp, const double max)
-{
-    return round(max * (1 - inp) / 2);
-}
-
-static Network * load_json(const char * network_filename, Processor ** proc)
-{
-    Network * net = nullptr;
-
-    json network_json = {};
-
-    if (!read_json(network_filename, network_json)) {
-
-        printf("usage: ML network_json. Bad json\n");
-
-    } else {
-
-        try {
-
-            net = load_network(proc, network_json);
-
-        } catch (const SRE &e) {
-            printf("%s\n",e.what());
-        } catch (...) {
-            printf("Unknown error when making processor\n");
+            return success;
         }
-    }
 
-    return net;
-}
+        static Network * load_network(Processor **pp, const json &network_json)
+        {
+            Network *net;
+            json proc_params;
+            string proc_name;
+            Processor *p;
+
+            net = new Network();
+            net->from_json(network_json);
+
+            p = *pp;
+            if (p == nullptr) {
+                proc_params = net->get_data("proc_params");
+                proc_name = net->get_data("other")["proc_name"];
+                p = Processor::make(proc_name, proc_params);
+                *pp = p;
+            } 
+
+            if (p->get_network_properties().as_json() !=
+                    net->get_properties().as_json()) {
+                throw SRE("network and processor properties do not match.");
+            }
+
+            if (!p->load_network(net)) {
+                throw SRE("load_network() failed");
+            }
+            track_all_neuron_events(p, net);
+
+            return net;
+        }
+
+
+    public:
+
+        static Network * load(const char * network_filename, Processor ** proc)
+        {
+            Network * net = nullptr;
+
+            json network_json = {};
+
+            if (!read_json(network_filename, network_json)) {
+
+                printf("usage: ML network_json. Bad json\n");
+
+            } else {
+
+                try {
+
+                    net = load_network(proc, network_json);
+
+                } catch (const SRE &e) {
+                    printf("%s\n",e.what());
+                } catch (...) {
+                    printf("Unknown error when making processor\n");
+                }
+            }
+
+            return net;
+        }
+
+        static double get_spike_time(const float inp, const double max)
+        {
+            return round(max * (1 - inp) / 2);
+        }
+
+        static void apply_spike(
+                Network * net,
+                Processor *p,
+                const int spike_id,
+                const double spike_time,
+                vector<Spike> & spikes_array,
+                const double spike_val=1,
+                const bool normalize=true) 
+        {
+            try {
+
+                p->apply_spike(Spike(net->get_node(spike_id)->input_id,
+                            spike_time, spike_val), normalize);
+
+                spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
+
+            } catch (const SRE &e) {
+                printf("%s\n",e.what());
+            }   
+        }
+
+};

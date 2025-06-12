@@ -9,7 +9,7 @@ int main()
 
     Processor * proc = nullptr;
 
-    Network * net = load_json(NETWORK_FILENAME, &proc);
+    Network * net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
 
     if (!net) {
         exit(1);
@@ -22,14 +22,20 @@ int main()
             const double inp1 = (double)j / 10;
             const double inp2 = (double)k / 10;
 
-            const double spike_time_1 = get_spike_time(inp1, MAX);
-            const double spike_time_2 = get_spike_time(inp2, MAX);
+            const double spike_time_1 =
+                FrameworkUtils::get_spike_time(inp1, MAX);
+
+            const double spike_time_2 =
+                FrameworkUtils::get_spike_time(inp2, MAX);
 
             vector <Spike> spikes_array = {};
 
-            apply_spike(net, proc, 0, spike_time_1, spikes_array);
-            apply_spike(net, proc, 1, spike_time_2, spikes_array);
-            apply_spike(net, proc, 2, 0, spikes_array);
+            FrameworkUtils::apply_spike(net, proc, 0, spike_time_1,
+                    spikes_array);
+            FrameworkUtils::apply_spike(net, proc, 1, spike_time_2,
+                    spikes_array);
+            FrameworkUtils::apply_spike(net, proc, 2, 0,
+                    spikes_array);
 
             const auto sim_time = 3 * MAX + 2;
 
