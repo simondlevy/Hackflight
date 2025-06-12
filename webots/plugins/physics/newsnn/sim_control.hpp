@@ -37,18 +37,46 @@ static const char * NETWORK_FILENAME =
 
 static const double MAX = 1000;
 
+static Network * net;
+
+static Processor * proc;
+
 static float runSnn(const float dz, const float demand)
 {
     static constexpr float KP = 25;
 
-    static Network * net;
-    static Processor * proc;
-
     if (!net) {
-        FrameworkUtils::load(NETWORK_FILENAME, &proc);
+        net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
     }
 
+    const double spike_time_1 = FrameworkUtils::get_spike_time(demand, MAX);
+
+    const double spike_time_2 = FrameworkUtils::get_spike_time(dz, MAX);
+
+    vector <Spike> spikes_array = {};
+
+    FrameworkUtils::apply_spike(net, proc, 0, spike_time_1,
+            spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 1, spike_time_2,
+            spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 2, 0,
+            spikes_array);
+
+    const auto sim_time = 3 * MAX + 2;
+
+    proc->run(sim_time);
+
+    spikes_array.clear();
+
+    const auto out = proc->output_vectors()[0][0];
+
+    const auto time = out == MAX + 1 ? -2 : out;
+
+    const auto diff = (time-(MAX))*4/(2*MAX)-2;
+
     const auto error = demand - dz;
+
+    printf("%f(%f)\n", diff, error);
 
     const auto thrust = KP * error;
 
