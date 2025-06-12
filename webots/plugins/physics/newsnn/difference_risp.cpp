@@ -142,11 +142,6 @@ int main(int argc, char **argv)
 
     static const double MAX = 1000;
 
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s INP1 INP2\n", argv[0]);
-        exit(1);
-    }
-
     Network * net = nullptr;
 
     Processor * proc = nullptr;
@@ -176,6 +171,11 @@ int main(int argc, char **argv)
     }
 
     // Apply spikes ----------------------------------------------------------
+
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s INP1 INP2\n", argv[0]);
+        exit(1);
+    }
 
     const double inp1 = atof(argv[1]);
     const double inp2 = atof(argv[2]);
