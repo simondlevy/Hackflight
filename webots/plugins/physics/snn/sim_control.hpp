@@ -50,17 +50,13 @@ static float runSnn(const float dz, const float demand)
     }
 
     const double spike_time_1 = FrameworkUtils::get_spike_time(demand, MAX);
-
     const double spike_time_2 = FrameworkUtils::get_spike_time(dz, MAX);
 
     vector <Spike> spikes_array = {};
 
-    FrameworkUtils::apply_spike(net, proc, 0, spike_time_1,
-            spikes_array);
-    FrameworkUtils::apply_spike(net, proc, 1, spike_time_2,
-            spikes_array);
-    FrameworkUtils::apply_spike(net, proc, 2, 0,
-            spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 0, spike_time_1, spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 1, spike_time_2, spikes_array);
+    FrameworkUtils::apply_spike(net, proc, 2, 0, spikes_array);
 
     const auto sim_time = 3 * MAX + 2;
 
