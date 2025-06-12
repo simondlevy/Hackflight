@@ -33,7 +33,7 @@ obj/processor_help.o: $(FRO)/src/processor_help.cpp $(FR_INC)
 obj/properties.o: $(FRO)/src/properties.cpp $(FR_INC)
 	$(CXX) -c $(FR_CFLAGS) -o obj/properties.o $(FRO)/src/properties.cpp
 
-run:
+run: $(NAME)
 	./$(NAME) 1 0.55
 
 edit:

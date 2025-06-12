@@ -147,11 +147,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    vector <Spike> spikes_array = {};
-
     Network * net = nullptr;
 
-    Processor * p = nullptr;
+    Processor * proc = nullptr;
 
     // Load network ----------------------------------------------------------
 
@@ -161,28 +159,19 @@ int main(int argc, char **argv)
 
         printf("usage: ML network_json. Bad json\n");
         exit(1);
+
     } else {
 
         try {
 
-            if (p != nullptr) { delete p; p = nullptr; }
-            if (net != nullptr) { delete net; net = nullptr; }
-
-            net = load_network(&p, network_json);
+            net = load_network(&proc, network_json);
 
         } catch (const SRE &e) {
             printf("%s\n",e.what());
-            if (net != nullptr) { delete net; net = nullptr; }
-            if (p != nullptr) { delete p; p = nullptr; }
-            net = nullptr;
-            p = nullptr;
+            exit(1);
         } catch (...) {
             printf("Unknown error when making processor\n");
-            if (net != nullptr) { delete net; net = nullptr; }
-            if (p != nullptr) { delete p; p = nullptr; }
-            net = nullptr;
-            p = nullptr;
-
+            exit(1);
         }
     }
 
@@ -194,24 +183,26 @@ int main(int argc, char **argv)
     const double spike_time_1 = get_spike_time(inp1, MAX);
     const double spike_time_2 = get_spike_time(inp2, MAX);
 
-    apply_spike(net, p, 0, spike_time_1, spikes_array);
-    apply_spike(net, p, 1, spike_time_2, spikes_array);
-    apply_spike(net, p, 2, 0, spikes_array);
+    vector <Spike> spikes_array = {};
+
+    apply_spike(net, proc, 0, spike_time_1, spikes_array);
+    apply_spike(net, proc, 1, spike_time_2, spikes_array);
+    apply_spike(net, proc, 2, 0, spikes_array);
 
     // Run -------------------------------------------------------------------
 
-    if (network_processor_validation(net, p)) {
+    if (network_processor_validation(net, proc)) {
 
         const auto sim_time = 3 * MAX + 2;
 
-        p->run(sim_time);
+        proc->run(sim_time);
 
         spikes_array.clear();
     }
 
     // Output -----------------------------------------------------------------
 
-    const auto out = p->output_vectors()[0][0];
+    const auto out = proc->output_vectors()[0][0];
 
     const auto time = out == MAX + 1 ? -2 : out;
 
