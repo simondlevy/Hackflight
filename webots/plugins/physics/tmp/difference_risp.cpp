@@ -7,32 +7,12 @@ int main()
 
     static const double MAX = 1000;
 
-    Network * net = nullptr;
-
     Processor * proc = nullptr;
 
-    // Load network ----------------------------------------------------------
+    Network * net = load_json(NETWORK_FILENAME, &proc);
 
-    json network_json = {};
-
-    if (!read_json(NETWORK_FILENAME, network_json)) {
-
-        printf("usage: ML network_json. Bad json\n");
+    if (!net) {
         exit(1);
-
-    } else {
-
-        try {
-
-            net = load_network(&proc, network_json);
-
-        } catch (const SRE &e) {
-            printf("%s\n",e.what());
-            exit(1);
-        } catch (...) {
-            printf("Unknown error when making processor\n");
-            exit(1);
-        }
     }
 
     for (int j=-10; j<=+10; ++j) {
