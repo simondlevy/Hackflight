@@ -24,11 +24,6 @@ CXX_SOURCES = ../support.cpp
 
 all: libnewsnn.so
 
-../support.cpp: ./control.hpp
-
-./control.hpp:
-	cp $(SRC)/control/standard.hpp ./sim_control.hpp
-
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)

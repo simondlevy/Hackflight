@@ -31,6 +31,18 @@
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
 
+static float runSnn(const float dz, const float demand)
+{
+    static constexpr float KP = 25;
+
+    const auto error = demand - dz;
+
+    const auto thrust = KP * error;
+
+    return Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                THRUST_MIN, THRUST_MAX); 
+}
+
 static void runClosedLoopControl(
         const float dt,
         const bool hovering,
@@ -43,13 +55,20 @@ static void runClosedLoopControl(
             dt, vehicleState.z, openLoopDemands.thrust);
 
     demands.thrust =
-        ClimbRateController::run(
+
+        hovering ? 
+
+        runSnn(vehicleState.dz, climbrate)
+
+        : ClimbRateController::run(
                 hovering,
                 landingAltitudeMeters,
                 dt,
                 vehicleState.z,
                 vehicleState.dz,
                 climbrate);
+
+
 
     const auto airborne = demands.thrust > 0;
 
