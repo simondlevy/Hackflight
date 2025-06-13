@@ -33,7 +33,7 @@
 #include "framework_utils.hpp"
 
 static const char * NETWORK_FILENAME =
-"/home/levys/Desktop/diffnet/difference_risp_plank.txt";
+"/home/levys/Desktop/2025-diff-network/diff_network.txt";
 
 static const double MAX = 1000;
 
