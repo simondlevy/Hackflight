@@ -14,9 +14,11 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-FDIR = $(HOME)/Desktop/framework
+FDIR = $(HOME)/Desktop/framework-open
 
-VIZ_NET = $(FDIR)/networks/difference_risp_train.txt
+DDIR = $(HOME)/Desktop/2025-diff-network
+
+NET = $(DDIR)/diff_net.txt
 
 VIZ_PORT = 8100
 
@@ -39,19 +41,22 @@ USE_C_API = true
 VERBOSE = 1
 
 runstandard:
-	cp ../../plugins/physics/standard/libstandard.so ../../plugins/physics/custom/libcustom.so
+	cp ../../plugins/physics/standard/libstandard.so \
+		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runhaskell:
-	cp ../../plugins/physics/haskell/libhaskell.so ../../plugins/physics/custom/libcustom.so
+	cp ../../plugins/physics/haskell/libhaskell.so \
+		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runsnn:
-	sh ~/Desktop/2025-diff-network/scripts/diff_network.sh 1000 ~/Desktop/framework-open/ > ~/Desktop/2025-diff-network/diff_net.txt
-	cp ../../plugins/physics/snn/libsnn.so ../../plugins/physics/custom/libcustom.so
-	#$(HOME)/Desktop/spikeplotter/spikeplot.py  -f $(VIZ_NET)  -a localhost \
+	sh $(DDIR)/scripts/diff_network.sh 1000 $(FDIR) > $(NET)
+	cp ../../plugins/physics/snn/libsnn.so \
+		../../plugins/physics/custom/libcustom.so
+	#$(HOME)/Desktop/spikeplotter/spikeplot.py  -f $(NET)  -a localhost \
 	#	-p $(VIZ_PORT) --ids '0,1,2,3,4,10,11,20' --display-counts &
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
