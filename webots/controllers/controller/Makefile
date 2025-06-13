@@ -49,6 +49,7 @@ runhaskell:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runsnn:
+	sh ~/Desktop/2025-diff-network/scripts/diff_network.sh 1000 ~/Desktop/framework-open/ > ~/Desktop/2025-diff-network/diff_net.txt
 	cp ../../plugins/physics/snn/libsnn.so ../../plugins/physics/custom/libcustom.so
 	#$(HOME)/Desktop/spikeplotter/spikeplot.py  -f $(VIZ_NET)  -a localhost \
 	#	-p $(VIZ_PORT) --ids '0,1,2,3,4,10,11,20' --display-counts &
