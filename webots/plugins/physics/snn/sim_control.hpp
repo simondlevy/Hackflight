@@ -77,7 +77,7 @@ static float runSnn(const float dz, const float demand)
     printf("\n");
 
     // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-(MAX))*4/(2*MAX)-2;
+    const double diff = (time-MAX)*2 / MAX - 2;
 
     // Convert the difference into a thrust, constrained by motor limits
     return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
