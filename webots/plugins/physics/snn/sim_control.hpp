@@ -31,10 +31,12 @@
 
 #include "framework_utils.hpp"
 
+static const uint16_t VIZ_PORT = 8100;
+
 static const char * NETWORK_FILENAME =
 "/home/levys/Desktop/2025-diff-network/diff_network.txt";
 
-static const double MAX = 1000;
+static const double SPIKE_TIME_MAX = 1000;
 
 static float runSnn(const float dz, const float demand)
 {
@@ -44,14 +46,21 @@ static float runSnn(const float dz, const float demand)
 
     static Processor * proc;
 
-    // Load the network the first time around
+    static ServerSocket serverSocket;
+
+    // Initialize the first time around
     if (!net) {
+
+        // Load the network
         net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
+
+        // Listen for and accept connections from vizualization client
+        serverSocket.open(VIZ_PORT);
     }
 
     // Turn the demand and climb-rate into spikes
-    const double spike_time_1 = FrameworkUtils::get_spike_time(demand, MAX);
-    const double spike_time_2 = FrameworkUtils::get_spike_time(dz, MAX);
+    const double spike_time_1 = FrameworkUtils::get_spike_time(demand, SPIKE_TIME_MAX);
+    const double spike_time_2 = FrameworkUtils::get_spike_time(dz, SPIKE_TIME_MAX);
 
     // Apply the spikes to the network
     vector <Spike> spikes_array = {};
@@ -60,17 +69,17 @@ static float runSnn(const float dz, const float demand)
     FrameworkUtils::apply_spike(net, proc, 2, 0, spikes_array);
 
     // Run the network
-    const double sim_time = 3 * MAX + 2;
+    const double sim_time = 3 * SPIKE_TIME_MAX + 2;
     proc->run(sim_time);
     spikes_array.clear();
 
     // Get the output network's firing time
     const double out = proc->output_vectors()[0][0];
-    const double time = out == MAX + 1 ? -2 : out;
+    const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
    
     // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-MAX)*2 / MAX - 2;
+    const double diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
 
     // Get the counts for display
     vector <int> counts = proc->neuron_counts(0);
