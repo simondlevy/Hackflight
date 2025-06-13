@@ -16,13 +16,15 @@
 
 SRC = ../../../../src
 
+ROOT = $(HOME)/Desktop
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(SRC)
 
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
 # TeNNLab framework stuff ------------------------------ ----------------------
 

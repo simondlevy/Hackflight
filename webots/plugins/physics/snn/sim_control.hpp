@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <math.h>
-#include <stdio.h>
-
 #include <clock.hpp>
 #include <control/pids/altitude.hpp>
 #include <control/pids/position.hpp>
@@ -29,6 +26,8 @@
 #include <datatypes.h>
 #include <num.hpp>
 #include <vehicles/diyquad.hpp>
+
+#include <posix-utils/socket.hpp>
 
 #include "framework_utils.hpp"
 
@@ -54,7 +53,7 @@ static float runSnn(const float dz, const float demand)
     const double spike_time_1 = FrameworkUtils::get_spike_time(demand, MAX);
     const double spike_time_2 = FrameworkUtils::get_spike_time(dz, MAX);
 
-    // Enter the spikes into the network
+    // Apply the spikes to the network
     vector <Spike> spikes_array = {};
     FrameworkUtils::apply_spike(net, proc, 0, spike_time_1, spikes_array);
     FrameworkUtils::apply_spike(net, proc, 1, spike_time_2, spikes_array);
@@ -69,23 +68,20 @@ static float runSnn(const float dz, const float demand)
     const double out = proc->output_vectors()[0][0];
     const double time = out == MAX + 1 ? -2 : out;
 
-    vector <double> last_fires = proc->neuron_last_fires(0);
-
-    printf("I1:%d ", (int)last_fires[0]);
-    printf("I2:%d ", (int)last_fires[1]);
-    printf("S:%d ", (int)last_fires[2]);
-    printf("D1:%d ", (int)last_fires[3]);
-    printf("D2:%d ", (int)last_fires[4]);
-    printf("O:%d ", (int)last_fires[5]);
-    printf("S2:%d\n", (int)last_fires[6]);
-
+   
     // Convert the firing time to a difference in [-2,+2]
     const double diff = (time-MAX)*2 / MAX - 2;
+
+    // Get the counts for display
+    vector <int> counts = proc->neuron_counts(0);
+    printf("D1:%d ", counts[3]);
+    printf("D2:%d ", counts[4]);
+    printf("S:%d\n", counts[6]);
 
     // Convert the difference into a thrust, constrained by motor limits
     return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
             THRUST_MIN, THRUST_MAX); 
-}
+ }
 
 static void runClosedLoopControl(
         const float dt,
