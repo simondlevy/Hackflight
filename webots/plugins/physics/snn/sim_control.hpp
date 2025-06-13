@@ -71,10 +71,13 @@ static float runSnn(const float dz, const float demand)
 
     vector <double> last_fires = proc->neuron_last_fires(0);
 
-    for (size_t k=0; k<last_fires.size(); ++k) {
-        printf("%lu:%d ", k, (int)last_fires[k]);
-    }
-    printf("\n");
+    printf("I1:%d ", (int)last_fires[0]);
+    printf("I2:%d ", (int)last_fires[1]);
+    printf("S:%d ", (int)last_fires[2]);
+    printf("D1:%d ", (int)last_fires[3]);
+    printf("D2:%d ", (int)last_fires[4]);
+    printf("O:%d ", (int)last_fires[5]);
+    printf("S2:%d\n", (int)last_fires[6]);
 
     // Convert the firing time to a difference in [-2,+2]
     const double diff = (time-MAX)*2 / MAX - 2;

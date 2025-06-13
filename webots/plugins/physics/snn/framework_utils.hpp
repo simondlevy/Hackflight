@@ -114,7 +114,7 @@ class FrameworkUtils {
             return net;
         }
 
-        static double get_spike_time(const float inp, const double max)
+        static double get_spike_time(const double inp, const double max)
         {
             return round(max * (1 - inp) / 2);
         }
