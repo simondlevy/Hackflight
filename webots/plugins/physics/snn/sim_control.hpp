@@ -69,8 +69,12 @@ static float runSnn(const float dz, const float demand)
     const double out = proc->output_vectors()[0][0];
     const double time = out == MAX + 1 ? -2 : out;
 
-    printf("i1=%d i2=%d out=%d\n",
-            (int)spike_time_1, (int)spike_time_2, (int)out);
+    vector <double> last_fires = proc->neuron_last_fires(0);
+
+    for (size_t k=0; k<last_fires.size(); ++k) {
+        printf("%lu:%d ", k, (int)last_fires[k]);
+    }
+    printf("\n");
 
     // Convert the firing time to a difference in [-2,+2]
     const double diff = (time-(MAX))*4/(2*MAX)-2;
