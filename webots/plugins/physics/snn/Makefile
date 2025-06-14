@@ -26,6 +26,8 @@ CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
+#CFLAGS += -D_VIZ
+
 # TeNNLab framework stuff ------------------------------ ----------------------
 
 FRO = $(HOME)/Desktop/framework-open
