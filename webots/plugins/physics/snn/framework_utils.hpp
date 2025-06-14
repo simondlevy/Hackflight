@@ -54,7 +54,7 @@ class FrameworkUtils {
             return success;
         }
 
-        static Network * load_network(Processor **pp, const json &network_json)
+        static Network * loadnetwork(Processor **pp, const json &network_json)
         {
             Network *net;
             json proc_params;
@@ -78,7 +78,7 @@ class FrameworkUtils {
             }
 
             if (!p->load_network(net)) {
-                throw SRE("load_network() failed");
+                throw SRE("loadnetwork() failed");
             }
             track_all_neuron_events(p, net);
 
@@ -102,7 +102,7 @@ class FrameworkUtils {
 
                 try {
 
-                    net = load_network(proc, network_json);
+                    net = loadnetwork(proc, network_json);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());
@@ -139,5 +139,35 @@ class FrameworkUtils {
                 printf(">>>>>>>> %s\n", e.what());
                 exit(0);
             }   
+        }
+
+        static string make_viz_message(
+                const Network * net,
+                Processor * proc)
+        {
+            vector<int> counts = proc->neuron_counts(0);
+
+            string msg = "{\"Event Counts\":[";
+
+            char tmp[100];
+
+            const auto n1 = counts.size() - 1;
+
+            for (size_t i=0; i<n1; ++i) {
+                sprintf(tmp, "%d,", counts[i]);
+                msg += tmp;
+            }
+
+            sprintf(tmp, "%d],\"Neuron Alias\":[", counts[n1]);
+            msg += tmp;
+
+            for (size_t i=0; i<n1; ++i) {
+                sprintf(tmp, "%d,", net->sorted_node_vector[i]->id);
+                msg += tmp;
+            }
+
+            sprintf(tmp, "%d]}\n", net->sorted_node_vector[n1]->id);
+
+            return msg + tmp;
         }
 };

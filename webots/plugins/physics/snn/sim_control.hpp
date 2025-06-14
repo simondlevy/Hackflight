@@ -97,11 +97,9 @@ static float runSnn(float demand, float actual)
     // Periodically send the spike counts to the visualizer
     static uint32_t _vizcount;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        vector<int> counts = _proc->neuron_counts(0);
-        const int tmp[3] = {counts[3], counts[4], counts[6]};
+        const string msg = FrameworkUtils::make_viz_message(_net, _proc);
+        printf("%s\n", msg.c_str());
 #ifdef _VIZ
-        // _serverSocket.sendData((uint8_t *)tmp, 3*sizeof(int));
-        _serverSocket.sendData((uint8_t *)tmp, 3*sizeof(int));
 #endif
         _vizcount = 0;
     }

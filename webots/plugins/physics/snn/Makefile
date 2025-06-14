@@ -26,7 +26,7 @@ CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
-# CFLAGS += -D_VIZ
+CFLAGS += -D_VIZ
 
 # TeNNLab framework stuff ------------------------------ ----------------------
 
