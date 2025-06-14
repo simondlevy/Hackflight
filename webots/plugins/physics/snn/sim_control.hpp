@@ -44,7 +44,12 @@ static double cap(const double val)
     return val > +1 ? +1 : val < -1 ? -1 : val;
 }
 
-static float runSnn(float dz, float demand)
+static double value_to_spike_time(const double val)
+{
+    return FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
+}
+
+static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
 
@@ -64,25 +69,15 @@ static float runSnn(float dz, float demand)
         //_serverSocket.acceptClient();
     }
 
-    demand = cap(demand);
-    dz = cap(dz);
-
     // Turn the demand and climb-rate into spikes
-    const double spike_time_1 =
-        FrameworkUtils::get_spike_time(demand, SPIKE_TIME_MAX);
-    const double spike_time_2 =
-        FrameworkUtils::get_spike_time(dz, SPIKE_TIME_MAX);
-
+    const double spike_time_1 = value_to_spike_time(demand);
+    const double spike_time_2 = value_to_spike_time(actual);
 
     // Apply the spikes to the network
     vector <Spike> spikes_array = {};
-    printf("A: %f %f\n", demand, spike_time_1); fflush(stdout);
     FrameworkUtils::apply_spike(_net, _proc, 0, spike_time_1, spikes_array);
-    //printf("B: %f\n", spike_time_2); fflush(stdout);
     FrameworkUtils::apply_spike(_net, _proc, 1, spike_time_2, spikes_array);
-    //printf("C: 0\n"); fflush(stdout);
     FrameworkUtils::apply_spike(_net, _proc, 2, 0, spikes_array);
-    //printf("D:\n");fflush(stdout);
 
     // Run the network
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
@@ -124,7 +119,7 @@ static void runClosedLoopControl(
     const auto climbrate = AltitudeController::run(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
-    demands.thrust = runSnn(vehicleState.dz, climbrate);
+    demands.thrust = runSnn(climbrate, vehicleState.dz);
 
     const auto airborne = demands.thrust > 0;
 
