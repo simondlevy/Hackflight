@@ -56,8 +56,8 @@ runsnn:
 	sh $(DDIR)/scripts/diff_network.sh 1000 $(FDIR) > $(NET)
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/custom/libcustom.so
-	#$(HOME)/Desktop/spikeplotter/spikeplot.py  -f $(NET)  -a localhost \
-	#	-p $(VIZ_PORT) --ids '0,1,2,3,4,10,11,20' --display-counts &
+	$(HOME)/Desktop/spikeplotter/spikeplot.py  -f $(NET) -a localhost \
+		-p $(VIZ_PORT) --display-counts &
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 

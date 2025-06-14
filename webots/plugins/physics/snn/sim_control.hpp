@@ -32,6 +32,7 @@
 #include "framework_utils.hpp"
 
 static const uint16_t VIZ_PORT = 8100;
+static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
 static const char * NETWORK_FILENAME =
 "/home/levys/Desktop/2025-diff-network/diff_network.txt";
@@ -42,55 +43,58 @@ static float runSnn(const float dz, const float demand)
 {
     static constexpr float KP = 25;
 
-    static Network * net;
-
-    static Processor * proc;
-
-    static ServerSocket serverSocket;
+    static Network * _net;
+    static Processor * _proc;
+    static ServerSocket _serverSocket;
+    static uint32_t _vizcount;
 
     // Initialize the first time around
-    if (!net) {
+    if (!_net) {
 
         // Load the network
-        net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
+        _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
 
         // Listen for and accept connections from vizualization client
-        serverSocket.open(VIZ_PORT);
+        _serverSocket.open(VIZ_PORT);
+        _serverSocket.acceptClient();
     }
 
     // Turn the demand and climb-rate into spikes
-    const double spike_time_1 = FrameworkUtils::get_spike_time(demand, SPIKE_TIME_MAX);
-    const double spike_time_2 = FrameworkUtils::get_spike_time(dz, SPIKE_TIME_MAX);
+    const double spike_time_1 =
+        FrameworkUtils::get_spike_time(demand, SPIKE_TIME_MAX);
+    const double spike_time_2 =
+        FrameworkUtils::get_spike_time(dz, SPIKE_TIME_MAX);
 
     // Apply the spikes to the network
     vector <Spike> spikes_array = {};
-    FrameworkUtils::apply_spike(net, proc, 0, spike_time_1, spikes_array);
-    FrameworkUtils::apply_spike(net, proc, 1, spike_time_2, spikes_array);
-    FrameworkUtils::apply_spike(net, proc, 2, 0, spikes_array);
+    FrameworkUtils::apply_spike(_net, _proc, 0, spike_time_1, spikes_array);
+    FrameworkUtils::apply_spike(_net, _proc, 1, spike_time_2, spikes_array);
+    FrameworkUtils::apply_spike(_net, _proc, 2, 0, spikes_array);
 
     // Run the network
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
-    proc->run(sim_time);
+    _proc->run(sim_time);
     spikes_array.clear();
 
     // Get the output network's firing time
-    const double out = proc->output_vectors()[0][0];
+    const double out = _proc->output_vectors()[0][0];
     const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
-   
     // Convert the firing time to a difference in [-2,+2]
     const double diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
 
-    // Get the counts for display
-    vector <int> counts = proc->neuron_counts(0);
-    printf("D1:%d ", counts[3]);
-    printf("D2:%d ", counts[4]);
-    printf("S:%d\n", counts[6]);
+    // Periodically send the spike counts to the visualizer
+    if (_vizcount++ == VIZ_SEND_PERIOD) {
+        vector <int> counts = _proc->neuron_counts(0);
+        _serverSocket.sendData((uint8_t *)counts.data(),
+                counts.size() * sizeof(int));
+        _vizcount = 0;
+    }
 
     // Convert the difference into a thrust, constrained by motor limits
     return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
             THRUST_MIN, THRUST_MAX); 
- }
+}
 
 static void runClosedLoopControl(
         const float dt,
