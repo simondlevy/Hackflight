@@ -172,7 +172,7 @@ class Simulator {
 
                 if (!_didWarn) {
                     puts("Using keyboard instead:\n");
-                    puts("- Use spacebar to take off\n");
+                    puts("- Use spacebar to take off and land\n");
                     puts("- Use W and S to go up and down\n");
                     puts("- Use arrow keys to move horizontally\n");
                     puts("- Use Q and E to change heading\n");

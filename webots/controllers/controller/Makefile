@@ -58,7 +58,7 @@ runsnn:
 		../../plugins/physics/custom/libcustom.so
 	$(HOME)/Desktop/spikeplotter/spikeplot.py  --filename $(NET) \
 	--ids 'D1,D2,S2' --address localhost --port $(VIZ_PORT) \
-	--display-counts --time 500 &
+	--display-counts --time 100 &
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
