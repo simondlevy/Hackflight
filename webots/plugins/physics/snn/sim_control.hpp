@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <math.h>
+
 #include <clock.hpp>
 #include <control/pids/altitude.hpp>
 #include <control/pids/position.hpp>
@@ -55,10 +57,7 @@ static float runSnn(float demand, float actual)
 
     static Network * _net;
     static Processor * _proc;
-#ifdef _VIZ
     static ServerSocket _serverSocket;
-    static uint32_t _vizcount;
-#endif
 
     // Initialize the first time around
     if (!_net) {
@@ -67,8 +66,8 @@ static float runSnn(float demand, float actual)
         _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
 
         // Listen for and accept connections from vizualization client
-#ifdef _VIZ
         _serverSocket.open(VIZ_PORT);
+#ifdef _VIZ
         _serverSocket.acceptClient();
 #endif
     }
@@ -96,14 +95,16 @@ static float runSnn(float demand, float actual)
     const double diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
 
     // Periodically send the spike counts to the visualizer
-#ifdef _VIZ
+    static uint32_t _vizcount;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         vector<int> counts = _proc->neuron_counts(0);
         const int tmp[3] = {counts[3], counts[4], counts[6]};
+#ifdef _VIZ
+        // _serverSocket.sendData((uint8_t *)tmp, 3*sizeof(int));
         _serverSocket.sendData((uint8_t *)tmp, 3*sizeof(int));
+#endif
         _vizcount = 0;
     }
-#endif
 
     // Convert the difference into a thrust, constrained by motor limits
     return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,

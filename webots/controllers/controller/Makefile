@@ -14,11 +14,13 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-FDIR = $(HOME)/Desktop/framework-open
+FRO = $(HOME)/Desktop/framework-open
 
 DDIR = $(HOME)/Desktop/2025-diff-network
 
 NET = $(DDIR)/diff_net.txt
+
+VIZ_DIR = $(HOME)/Desktop/framework/viz
 
 VIZ_PORT = 8100
 
@@ -53,20 +55,23 @@ runhaskell:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runsnn:
-	sh $(DDIR)/scripts/diff_network.sh 1000 $(FDIR) > $(NET)
+	sh $(DDIR)/scripts/diff_network.sh 1000 $(FRO) > $(NET)
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runsnnviz:
-	sh $(DDIR)/scripts/diff_network.sh 1000 $(FDIR) > $(NET)
+	sh $(DDIR)/scripts/diff_network.sh 1000 $(FRO) > $(NET)
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/custom/libcustom.so
-	$(HOME)/Desktop/spikeplotter/spikeplot.py  --ids 'D1,D2,S2' --time 50 \
-		--address localhost --port $(VIZ_PORT) --display-counts &
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
+	sleep 1
+	cd $(VIZ_DIR); \
+ 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":"localhost"}' \
+     	-n $(NET) --show_spike_count --remove_unnecessary_neuron \
+    		--set_num_screen_shot 0 > /dev/null
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
