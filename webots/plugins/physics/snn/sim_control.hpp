@@ -55,7 +55,7 @@ static float runSnn(float demand, float actual)
 
     static Network * _net;
     static Processor * _proc;
-    //static ServerSocket _serverSocket;
+    static ServerSocket _serverSocket;
     static uint32_t _vizcount;
 
     // Initialize the first time around
@@ -65,8 +65,8 @@ static float runSnn(float demand, float actual)
         _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
 
         // Listen for and accept connections from vizualization client
-        //_serverSocket.open(VIZ_PORT);
-        //_serverSocket.acceptClient();
+        _serverSocket.open(VIZ_PORT);
+        _serverSocket.acceptClient();
     }
 
     // Turn the demand and climb-rate into spikes
@@ -93,10 +93,10 @@ static float runSnn(float demand, float actual)
 
     // Periodically send the spike counts to the visualizer
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        //vector <int> counts = _proc->neuron_counts(0);
-        //printf("D1=%d D2=%d S2=%d\n", counts[3], counts[4], counts[6]);
-        //const uint8_t counts[3] = {10, 20, 200};
-        //_serverSocket.sendData(counts, 3);
+        vector <int> counts = _proc->neuron_counts(0);
+        printf("D1=%d D2=%d S2=%d\n", counts[3], counts[4], counts[6]);
+        const uint8_t tmp[3] = {10, 20, 40};
+        _serverSocket.sendData(tmp, 3);
         
         _vizcount = 0;
     }
