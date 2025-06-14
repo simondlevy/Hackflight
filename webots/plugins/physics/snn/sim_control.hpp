@@ -39,13 +39,18 @@ static const char * NETWORK_FILENAME =
 
 static const double SPIKE_TIME_MAX = 1000;
 
-static float runSnn(const float dz, const float demand)
+static double cap(const double val)
+{
+    return val > +1 ? +1 : val < -1 ? -1 : val;
+}
+
+static float runSnn(float dz, float demand)
 {
     static constexpr float KP = 25;
 
     static Network * _net;
     static Processor * _proc;
-    static ServerSocket _serverSocket;
+    //static ServerSocket _serverSocket;
     static uint32_t _vizcount;
 
     // Initialize the first time around
@@ -55,9 +60,12 @@ static float runSnn(const float dz, const float demand)
         _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
 
         // Listen for and accept connections from vizualization client
-        _serverSocket.open(VIZ_PORT);
-        _serverSocket.acceptClient();
+        //_serverSocket.open(VIZ_PORT);
+        //_serverSocket.acceptClient();
     }
+
+    demand = cap(demand);
+    dz = cap(dz);
 
     // Turn the demand and climb-rate into spikes
     const double spike_time_1 =
@@ -65,11 +73,16 @@ static float runSnn(const float dz, const float demand)
     const double spike_time_2 =
         FrameworkUtils::get_spike_time(dz, SPIKE_TIME_MAX);
 
+
     // Apply the spikes to the network
     vector <Spike> spikes_array = {};
+    printf("A: %f %f\n", demand, spike_time_1); fflush(stdout);
     FrameworkUtils::apply_spike(_net, _proc, 0, spike_time_1, spikes_array);
+    //printf("B: %f\n", spike_time_2); fflush(stdout);
     FrameworkUtils::apply_spike(_net, _proc, 1, spike_time_2, spikes_array);
+    //printf("C: 0\n"); fflush(stdout);
     FrameworkUtils::apply_spike(_net, _proc, 2, 0, spikes_array);
+    //printf("D:\n");fflush(stdout);
 
     // Run the network
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
@@ -85,8 +98,11 @@ static float runSnn(const float dz, const float demand)
 
     // Periodically send the spike counts to the visualizer
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        vector <int> counts = _proc->neuron_counts(0);
-        _serverSocket.sendData((const uint8_t *)counts.data(), counts.size() * sizeof(int));
+        //vector <int> counts = _proc->neuron_counts(0);
+        //printf("D1=%d D2=%d S2=%d\n", counts[3], counts[4], counts[6]);
+        //const uint8_t counts[3] = {10, 20, 200};
+        //_serverSocket.sendData(counts, 3);
+        
         _vizcount = 0;
     }
 
@@ -108,7 +124,7 @@ static void runClosedLoopControl(
     const auto climbrate = AltitudeController::run(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
-    demands.thrust =runSnn(vehicleState.dz, climbrate);
+    demands.thrust = runSnn(vehicleState.dz, climbrate);
 
     const auto airborne = demands.thrust > 0;
 

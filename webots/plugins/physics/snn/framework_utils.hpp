@@ -136,7 +136,8 @@ class FrameworkUtils {
                 spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
 
             } catch (const SRE &e) {
-                printf("%s\n",e.what());
+                printf(">>>>>>>> %s\n", e.what());
+                exit(0);
             }   
         }
 };
