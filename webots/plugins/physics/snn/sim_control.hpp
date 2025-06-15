@@ -96,14 +96,16 @@ static float runSnn(float demand, float actual)
 
     // Periodically send the spike counts to the visualizer
     static uint32_t _vizcount;
+    const double I_SCALE = 0.05;
+    const double D_SCALE = 0.25;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const vector<int> tmp = _proc->neuron_counts(0);
         const vector<int> counts = {
-                (int)(spike_time_1 / 10),
-                (int)(spike_time_2 / 10),
-                0,//(int)tmp[2],
-                0,//(int)tmp[3],
-                0,//(int)tmp[4],
+                (int)(spike_time_1 * I_SCALE),
+                (int)(spike_time_2 * I_SCALE),
+                1,
+                (int)(tmp[3] * D_SCALE),
+                (int)(tmp[4] * D_SCALE),
                 0,//(int)(int)out,
                 0,//(int)tmp[6]
         };
