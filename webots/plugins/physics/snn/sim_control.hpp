@@ -98,6 +98,7 @@ static float runSnn(float demand, float actual)
     static uint32_t _vizcount;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const string msg = FrameworkUtils::make_viz_message(_net, _proc);
+        cout << msg;
 #ifdef _VIZ
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
 #endif

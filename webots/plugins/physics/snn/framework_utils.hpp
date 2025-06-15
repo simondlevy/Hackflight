@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #include <framework.hpp>
 #include <utils/json_helpers.hpp>
 
@@ -85,7 +87,6 @@ class FrameworkUtils {
             return net;
         }
 
-
     public:
 
         static Network * load(const char * network_filename, Processor ** proc)
@@ -145,29 +146,31 @@ class FrameworkUtils {
                 const Network * net,
                 Processor * proc)
         {
+
             vector<int> counts = proc->neuron_counts(0);
+
+            const size_t n = counts.size();
 
             string msg = "{\"Event Counts\":[";
 
-            char tmp[100];
-
-            const auto n1 = counts.size() - 1;
-
-            for (size_t i=0; i<n1; ++i) {
-                sprintf(tmp, "%d,", counts[i]);
+            for (size_t i=0; i<n; ++i) {
+                char tmp[100] = {};
+                const int count = counts[i];
+                sprintf(tmp, "%d%s",
+                        i==n-1 ? count - 900 : count,
+                        i==n-1 ? "]"  : ", ");
                 msg += tmp;
             }
 
-            sprintf(tmp, "%d],\"Neuron Alias\":[", counts[n1]);
-            msg += tmp;
+            msg += ", \"Neuron Alias\":[";
 
-            for (size_t i=0; i<n1; ++i) {
-                sprintf(tmp, "%d,", net->sorted_node_vector[i]->id);
+            for (size_t i=0; i<n; ++i) {
+                char tmp[100] = {};
+                sprintf(tmp, "%d%s", 
+                        net->sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
                 msg += tmp;
             }
 
-            sprintf(tmp, "%d]}\n", net->sorted_node_vector[n1]->id);
-
-            return msg + tmp;
+            return msg + "}\n"; 
         }
 };
