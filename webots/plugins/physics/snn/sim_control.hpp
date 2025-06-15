@@ -98,6 +98,8 @@ static float runSnn(float demand, float actual)
     static uint32_t _vizcount;
     const double I_SCALE = 0.05;
     const double D_SCALE = 0.25;
+    const double O_BIAS = 1000;
+    const double O_SCALE = 0.025;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const vector<int> tmp = _proc->neuron_counts(0);
         const vector<int> counts = {
@@ -106,7 +108,7 @@ static float runSnn(float demand, float actual)
                 1,
                 (int)(tmp[3] * D_SCALE),
                 (int)(tmp[4] * D_SCALE),
-                0,//(int)(int)out,
+                (int)((out - O_BIAS) * O_SCALE),
                 0,//(int)tmp[6]
         };
 
