@@ -144,11 +144,8 @@ class FrameworkUtils {
 
         static string make_viz_message(
                 const Network * net,
-                Processor * proc)
+                const vector<int> counts)
         {
-
-            vector<int> counts = proc->neuron_counts(0);
-
             const size_t n = counts.size();
 
             string msg = "{\"Event Counts\":[";
@@ -156,9 +153,7 @@ class FrameworkUtils {
             for (size_t i=0; i<n; ++i) {
                 char tmp[100] = {};
                 const int count = counts[i];
-                sprintf(tmp, "%d%s",
-                        i==n-1 ? count - 900 : count,
-                        i==n-1 ? "]"  : ", ");
+                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
                 msg += tmp;
             }
 
