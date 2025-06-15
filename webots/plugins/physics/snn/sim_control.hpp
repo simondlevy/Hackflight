@@ -100,6 +100,8 @@ static float runSnn(float demand, float actual)
     const double D_SCALE = 0.25;
     const double O_BIAS = 1000;
     const double O_SCALE = 0.025;
+    const double S_BIAS = 800;
+    const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const vector<int> tmp = _proc->neuron_counts(0);
         const vector<int> counts = {
@@ -109,11 +111,10 @@ static float runSnn(float demand, float actual)
                 (int)(tmp[3] * D_SCALE),
                 (int)(tmp[4] * D_SCALE),
                 (int)((out - O_BIAS) * O_SCALE),
-                0,//(int)tmp[6]
+                (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
         const string msg = FrameworkUtils::make_viz_message(_net, counts);
-        cout << msg;
 #ifdef _VIZ
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
 #endif
