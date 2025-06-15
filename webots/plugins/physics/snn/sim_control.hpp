@@ -99,13 +99,13 @@ static float runSnn(float demand, float actual)
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const vector<int> tmp = _proc->neuron_counts(0);
         const vector<int> counts = {
-                (int)spike_time_1,
-                (int)spike_time_2,
-                (int)tmp[2],
-                (int)tmp[3],
-                (int)tmp[4],
-                (int)(int)out,
-                (int)tmp[6]
+                (int)(spike_time_1 / 10),
+                (int)(spike_time_2 / 10),
+                0,//(int)tmp[2],
+                0,//(int)tmp[3],
+                0,//(int)tmp[4],
+                0,//(int)(int)out,
+                0,//(int)tmp[6]
         };
 
         const string msg = FrameworkUtils::make_viz_message(_net, counts);
