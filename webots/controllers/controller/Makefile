@@ -59,13 +59,6 @@ runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
-
-runsnnviz:
-	sh $(DDIR)/scripts/diff_network.sh 1000 $(FRO) > $(NET)
-	cp ../../plugins/physics/snn/libsnn.so \
-		../../plugins/physics/custom/libcustom.so
-	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
 	sleep 1
 	cd $(VIZ_DIR); \
