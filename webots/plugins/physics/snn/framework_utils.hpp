@@ -56,43 +56,41 @@ class FrameworkUtils {
             return success;
         }
 
-        static Network * loadnetwork(Processor **pp, const json &network_json)
+        static void load_network(
+                const json &network_json, Network & net, Processor **pp)
         {
-            Network *net;
             json proc_params;
             string proc_name;
             Processor *p;
 
-            net = new Network();
-            net->from_json(network_json);
+            net.from_json(network_json);
 
             p = *pp;
             if (p == nullptr) {
-                proc_params = net->get_data("proc_params");
-                proc_name = net->get_data("other")["proc_name"];
+                proc_params = net.get_data("proc_params");
+                proc_name = net.get_data("other")["proc_name"];
                 p = Processor::make(proc_name, proc_params);
                 *pp = p;
             } 
 
             if (p->get_network_properties().as_json() !=
-                    net->get_properties().as_json()) {
+                    net.get_properties().as_json()) {
                 throw SRE("network and processor properties do not match.");
             }
 
-            if (!p->load_network(net)) {
+            if (!p->load_network(&net)) {
                 throw SRE("loadnetwork() failed");
             }
-            track_all_neuron_events(p, net);
-
-            return net;
+            track_all_neuron_events(p, &net);
         }
 
     public:
 
-        static Network * load(const char * network_filename, Processor ** proc)
+        static void load(
+                const char * network_filename,
+                Network & net,
+                Processor ** proc)
         {
-            Network * net = nullptr;
-
             json network_json = {};
 
             if (!read_json(network_filename, network_json)) {
@@ -103,7 +101,7 @@ class FrameworkUtils {
 
                 try {
 
-                    net = loadnetwork(proc, network_json);
+                    load_network(network_json, net, proc);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());
@@ -111,8 +109,6 @@ class FrameworkUtils {
                     printf("Unknown error when making processor\n");
                 }
             }
-
-            return net;
         }
 
         static double get_spike_time(const double inp, const double max)
@@ -121,7 +117,7 @@ class FrameworkUtils {
         }
 
         static void apply_spike(
-                Network * net,
+                Network & net,
                 Processor *p,
                 const int spike_id,
                 const double spike_time,
@@ -131,7 +127,7 @@ class FrameworkUtils {
         {
             try {
 
-                p->apply_spike(Spike(net->get_node(spike_id)->input_id,
+                p->apply_spike(Spike(net.get_node(spike_id)->input_id,
                             spike_time, spike_val), normalize);
 
                 spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
@@ -143,7 +139,7 @@ class FrameworkUtils {
         }
 
         static string make_viz_message(
-                const Network * net,
+                const Network & net,
                 const vector<int> counts)
         {
             const size_t n = counts.size();
@@ -162,7 +158,7 @@ class FrameworkUtils {
             for (size_t i=0; i<n; ++i) {
                 char tmp[100] = {};
                 sprintf(tmp, "%d%s", 
-                        net->sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
+                        net.sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
                 msg += tmp;
             }
 

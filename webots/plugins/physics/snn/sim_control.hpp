@@ -55,19 +55,22 @@ static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
 
-    static Network * _net;
+    static bool _initialized;
+    static Network  _net;
     static Processor * _proc;
     static ServerSocket _serverSocket;
 
     // Initialize the first time around
-    if (!_net) {
+    if (!_initialized) {
 
         // Load the network
-        _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
+        FrameworkUtils::load(NETWORK_FILENAME, _net, &_proc);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
         _serverSocket.acceptClient();
+
+        _initialized = true;
     }
 
     // Turn the demand and climb-rate into spikes
