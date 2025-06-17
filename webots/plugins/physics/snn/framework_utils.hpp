@@ -66,8 +66,6 @@ class FrameworkUtils {
 
             json proc_params = net.get_data("proc_params");
 
-            const string proc_name = net.get_data("other")["proc_name"];
-
             risp.init(proc_params);
 
             if (!risp.load_network(&net)) {
