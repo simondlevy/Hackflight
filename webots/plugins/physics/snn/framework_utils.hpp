@@ -19,6 +19,7 @@
 #include <math.h>
 
 #include <framework.hpp>
+#include <risp.hpp>
 #include <utils/json_helpers.hpp>
 
 using namespace std;

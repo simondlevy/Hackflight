@@ -58,6 +58,7 @@ static float runSnn(float demand, float actual)
     static bool _initialized;
     static Network  _net;
     static Processor * _proc;
+    static risp::Processor _risp;
     static ServerSocket _serverSocket;
 
     // Initialize the first time around
