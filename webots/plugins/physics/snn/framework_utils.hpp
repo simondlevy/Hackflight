@@ -75,6 +75,10 @@ class FrameworkUtils {
 
             risp.init(proc_params);
 
+            if (!risp.load_network(&net)) {
+                throw SRE("loadnetwork() failed");
+            }
+
             if (!p->load_network(&net)) {
                 throw SRE("loadnetwork() failed");
             }
