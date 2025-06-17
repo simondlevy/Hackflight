@@ -36,7 +36,6 @@ CXX_SOURCES += $(FRO)/src/framework.cpp
 CXX_SOURCES += $(FRO)/src/processor_help.cpp
 CXX_SOURCES += $(FRO)/src/properties.cpp
 CXX_SOURCES += $(FRO)/src/risp.cpp
-CXX_SOURCES += $(FRO)/src/risp_static.cpp
 
 # -----------------------------------------------------------------------------
 
