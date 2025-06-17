@@ -83,6 +83,8 @@ class FrameworkUtils {
                 throw SRE("loadnetwork() failed");
             }
 
+            track_all_neuron_events(&risp, &net);
+
             track_all_neuron_events(p, &net);
 
             *pp = p;
