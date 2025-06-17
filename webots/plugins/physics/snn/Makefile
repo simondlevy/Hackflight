@@ -30,7 +30,7 @@ INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
 FRO = $(HOME)/Desktop/framework-open
 
-INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
+INCLUDE += -I$(FRO)/src -I$(FRO)/src/utils
 
 CXX_SOURCES += $(FRO)/src/framework.cpp
 CXX_SOURCES += $(FRO)/src/processor_help.cpp
