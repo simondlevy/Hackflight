@@ -65,22 +65,21 @@ class FrameworkUtils {
         {
             (void)risp;
 
-            json proc_params;
-            string proc_name;
-            Processor *p;
-
             net.from_json(network_json);
 
-            p = *pp;
-            proc_params = net.get_data("proc_params");
-            proc_name = net.get_data("other")["proc_name"];
-            p = Processor::make(proc_name, proc_params);
-            *pp = p;
+            json proc_params = net.get_data("proc_params");
+
+            const string proc_name = net.get_data("other")["proc_name"];
+
+            Processor * p = Processor::make(proc_name, proc_params);
 
             if (!p->load_network(&net)) {
                 throw SRE("loadnetwork() failed");
             }
+
             track_all_neuron_events(p, &net);
+
+            *pp = p;
         }
 
     public:
