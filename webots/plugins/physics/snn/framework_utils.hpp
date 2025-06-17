@@ -60,18 +60,13 @@ class FrameworkUtils {
         static void load_network(
                 const json &network_json,
                 Network & net,
-                Processor **pp,
                 risp::Processor & risp)
         {
-            (void)risp;
-
             net.from_json(network_json);
 
             json proc_params = net.get_data("proc_params");
 
             const string proc_name = net.get_data("other")["proc_name"];
-
-            Processor * p = Processor::make(proc_name, proc_params);
 
             risp.init(proc_params);
 
@@ -79,15 +74,7 @@ class FrameworkUtils {
                 throw SRE("loadnetwork() failed");
             }
 
-            if (!p->load_network(&net)) {
-                throw SRE("loadnetwork() failed");
-            }
-
             track_all_neuron_events(&risp, &net);
-
-            track_all_neuron_events(p, &net);
-
-            *pp = p;
         }
 
     public:
@@ -95,7 +82,6 @@ class FrameworkUtils {
         static void load(
                 const char * network_filename,
                 Network & net,
-                Processor ** proc,
                 risp::Processor & risp)
         {
             json network_json = {};
@@ -108,7 +94,7 @@ class FrameworkUtils {
 
                 try {
 
-                    load_network(network_json, net, proc, risp);
+                    load_network(network_json, net, risp);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());

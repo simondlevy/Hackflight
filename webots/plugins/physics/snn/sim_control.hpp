@@ -57,7 +57,6 @@ static float runSnn(float demand, float actual)
 
     static bool _initialized;
     static Network  _net;
-    static Processor * _proc;
     static risp::Processor _risp;
     static ServerSocket _serverSocket;
 
@@ -65,7 +64,7 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        FrameworkUtils::load(NETWORK_FILENAME, _net, &_proc, _risp);
+        FrameworkUtils::load(NETWORK_FILENAME, _net, _risp);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
@@ -80,17 +79,17 @@ static float runSnn(float demand, float actual)
 
     // Apply the spikes to the network
     vector <Spike> spikes_array = {};
-    FrameworkUtils::apply_spike(_net, _proc, 0, spike_time_1, spikes_array);
-    FrameworkUtils::apply_spike(_net, _proc, 1, spike_time_2, spikes_array);
-    FrameworkUtils::apply_spike(_net, _proc, 2, 0, spikes_array);
+    FrameworkUtils::apply_spike(_net, &_risp, 0, spike_time_1, spikes_array);
+    FrameworkUtils::apply_spike(_net, &_risp, 1, spike_time_2, spikes_array);
+    FrameworkUtils::apply_spike(_net, &_risp, 2, 0, spikes_array);
 
     // Run the network
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
-    _proc->run(sim_time);
+    _risp.run(sim_time);
     spikes_array.clear();
 
     // Get the output network's firing time
-    const double out = _proc->output_vectors()[0][0];
+    const double out = _risp.output_vectors()[0][0];
     const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
     // Convert the firing time to a difference in [-2,+2]
@@ -105,7 +104,7 @@ static float runSnn(float demand, float actual)
     const double S_BIAS = 800;
     const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        const vector<int> tmp = _proc->neuron_counts(0);
+        const vector<int> tmp = _risp.neuron_counts(0);
         const vector<int> counts = {
                 (int)(spike_time_1 * I_SCALE),
                 (int)(spike_time_2 * I_SCALE),
