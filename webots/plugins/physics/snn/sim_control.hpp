@@ -65,7 +65,7 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        FrameworkUtils::load(NETWORK_FILENAME, _net, &_proc);
+        FrameworkUtils::load(NETWORK_FILENAME, _net, &_proc, _risp);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);

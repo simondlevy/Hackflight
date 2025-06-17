@@ -58,8 +58,13 @@ class FrameworkUtils {
         }
 
         static void load_network(
-                const json &network_json, Network & net, Processor **pp)
+                const json &network_json,
+                Network & net,
+                Processor **pp,
+                risp::Processor & risp)
         {
+            (void)risp;
+
             json proc_params;
             string proc_name;
             Processor *p;
@@ -67,17 +72,10 @@ class FrameworkUtils {
             net.from_json(network_json);
 
             p = *pp;
-            if (p == nullptr) {
-                proc_params = net.get_data("proc_params");
-                proc_name = net.get_data("other")["proc_name"];
-                p = Processor::make(proc_name, proc_params);
-                *pp = p;
-            } 
-
-            if (p->get_network_properties().as_json() !=
-                    net.get_properties().as_json()) {
-                throw SRE("network and processor properties do not match.");
-            }
+            proc_params = net.get_data("proc_params");
+            proc_name = net.get_data("other")["proc_name"];
+            p = Processor::make(proc_name, proc_params);
+            *pp = p;
 
             if (!p->load_network(&net)) {
                 throw SRE("loadnetwork() failed");
@@ -90,7 +88,8 @@ class FrameworkUtils {
         static void load(
                 const char * network_filename,
                 Network & net,
-                Processor ** proc)
+                Processor ** proc,
+                risp::Processor & risp)
         {
             json network_json = {};
 
@@ -102,7 +101,7 @@ class FrameworkUtils {
 
                 try {
 
-                    load_network(network_json, net, proc);
+                    load_network(network_json, net, proc, risp);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());
