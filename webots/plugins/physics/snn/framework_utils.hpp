@@ -73,6 +73,8 @@ class FrameworkUtils {
 
             Processor * p = Processor::make(proc_name, proc_params);
 
+            risp.init(proc_params);
+
             if (!p->load_network(&net)) {
                 throw SRE("loadnetwork() failed");
             }
