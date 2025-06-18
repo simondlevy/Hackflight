@@ -78,15 +78,13 @@ static float runSnn(float demand, float actual)
     const double spike_time_2 = value_to_spike_time(actual);
 
     // Apply the spikes to the network
-    vector <Spike> spikes_array = {};
-    FrameworkUtils::apply_spike(_net, &_proc, 0, spike_time_1, spikes_array);
-    FrameworkUtils::apply_spike(_net, &_proc, 1, spike_time_2, spikes_array);
-    FrameworkUtils::apply_spike(_net, &_proc, 2, 0, spikes_array);
+    FrameworkUtils::apply_spike(_net, &_proc, 0, spike_time_1);
+    FrameworkUtils::apply_spike(_net, &_proc, 1, spike_time_2);
+    FrameworkUtils::apply_spike(_net, &_proc, 2, 0);
 
     // Run the network
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
     _proc.run(sim_time);
-    spikes_array.clear();
 
     // Get the output network's firing time
     const double out = _proc.output_vectors()[0][0];
