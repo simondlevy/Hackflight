@@ -24,7 +24,11 @@ CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(HOME)/Desktop
 
-# TeNNLab framework stuff ------------------------------ ----------------------
+# Embedded Template Library --------------------------------------------------
+
+INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
+
+# TeNNLab framework stuff ----------------------------------------------------
 
 FRO = $(HOME)/Desktop/framework-open
 
