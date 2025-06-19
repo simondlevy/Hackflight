@@ -107,11 +107,11 @@ class FrameworkUtils {
                 params.run_time_inclusive = jparams["run_time_inclusive"];
             }
 
+            if (jparams.contains("fire_like_ravens")) {
+                params.fire_like_ravens = jparams["fire_like_ravens"];
+            }
 #if 0
 
-            if (params.contains("fire_like_ravens")) {
-                fire_like_ravens = params["fire_like_ravens"];
-            }
 
             if (params.contains("noisy_seed")) {
                 noisy_seed = params["noisy_seed"];
