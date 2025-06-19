@@ -87,10 +87,10 @@ class FrameworkUtils {
                 params.inputs_from_weights = jparams["inputs_from_weights"];
             }
 
-#if 0
-            if (params.contains("threshold_inclusive")) {
-                threshold_inclusive = params["threshold_inclusive"];
+            if (jparams.contains("threshold_inclusive")) {
+                params.threshold_inclusive = jparams["threshold_inclusive"];
             }
+#if 0
 
             if (params.contains("spike_value_factor")) {
                 spike_value_factor = params["spike_value_factor"];
