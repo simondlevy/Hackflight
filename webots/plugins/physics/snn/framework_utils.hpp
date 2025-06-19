@@ -93,7 +93,7 @@ class FrameworkUtils {
             } else {
                 params.spike_value_factor = 0; // max_weight;
 
-           } 
+            } 
 
             if (jparams.contains("run_time_inclusive")) {
                 params.run_time_inclusive = jparams["run_time_inclusive"];
