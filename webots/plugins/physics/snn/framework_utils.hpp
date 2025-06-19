@@ -74,9 +74,11 @@ class FrameworkUtils {
 
             track_all_neuron_events(&proc, &net);
 
-#if 0
+            risp::Params params = {};
 
-            min_potential = params["min_potential"];
+            params.min_potential = jparams["min_potential"];
+
+#if 0
 
             discrete = params["discrete"];
 
