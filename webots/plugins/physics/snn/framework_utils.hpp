@@ -110,12 +110,13 @@ class FrameworkUtils {
             if (jparams.contains("fire_like_ravens")) {
                 params.fire_like_ravens = jparams["fire_like_ravens"];
             }
+
+            if (jparams.contains("noisy_seed")) {
+                params.noisy_seed = jparams["noisy_seed"];
+            }
+
 #if 0
 
-
-            if (params.contains("noisy_seed")) {
-                noisy_seed = params["noisy_seed"];
-            }
 
             if (params.contains("leak_mode")) {
                 const auto mode_string = params["leak_mode"];
