@@ -60,22 +60,84 @@ class FrameworkUtils {
         static void load_network(
                 const json &network_json,
                 Network & net,
-                risp::Processor & risp)
+                risp::Processor & proc)
         {
             net.from_json(network_json);
 
             json proc_params = net.get_data("proc_params");
 
-            risp.init(proc_params);
+            proc.init(proc_params);
 
-            if (!risp.load_network(&net)) {
+            if (!proc.load_network(&net)) {
                 throw SRE("loadnetwork() failed");
             }
 
-            track_all_neuron_events(&risp, &net);
+            track_all_neuron_events(&proc, &net);
+
+#if 0
+
+            min_potential = params["min_potential"];
+
+            discrete = params["discrete"];
+
+            if (params.contains("weights") && params["weights"].size() > 0) {
+
+                weights = params["weights"].get< std::vector<double> >(); 
+                inputs_from_weights = params["inputs_from_weights"];
+            }
+
+            if (params.contains("threshold_inclusive")) {
+                threshold_inclusive = params["threshold_inclusive"];
+            }
+
+            if (params.contains("spike_value_factor")) {
+                spike_value_factor = params["spike_value_factor"];
+
+
+            } else if (weights.size() > 0) {
+                spike_value_factor = -99999999.99;
+
+            } else {
+                spike_value_factor = max_weight;
+            } 
+
+            if (params.contains("run_time_inclusive")) {
+                run_time_inclusive = params["run_time_inclusive"];
+            }
+
+            if (params.contains("fire_like_ravens")) {
+                fire_like_ravens = params["fire_like_ravens"];
+            }
+
+            if (params.contains("noisy_seed")) {
+                noisy_seed = params["noisy_seed"];
+            }
+
+            if (params.contains("leak_mode")) {
+                const auto mode_string = params["leak_mode"];
+                if (mode_string == "all") {
+                    leak_mode = LEAK_ALL;
+                }
+                if (mode_string == "configurable") {
+                    leak_mode = LEAK_CONFIG;
+                }
+            }
+
+            if (params.contains("stds")) {
+                stds = params["stds"].get< std::vector<double> >(); 
+            }
+
+            if (params.contains("noisy_stddev")) {
+                noisy_stddev = params["noisy_stddev"]; 
+            }
+#endif
         }
 
     public:
+
+        void foo()
+        {
+        }
 
         static void load(
                 const char * network_filename,
