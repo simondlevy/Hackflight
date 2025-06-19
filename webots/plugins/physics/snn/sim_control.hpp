@@ -102,7 +102,7 @@ static float runSnn(float demand, float actual)
     const double S_BIAS = 800;
     const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        const vector<int> tmp = _proc.neuron_counts();
+        const auto tmp = _proc.neuron_counts();
         const vector<int> counts = {
                 (int)(spike_time_1 * I_SCALE),
                 (int)(spike_time_2 * I_SCALE),
