@@ -102,11 +102,12 @@ class FrameworkUtils {
                 params.spike_value_factor = 0; // max_weight;
 
            } 
- #if 0
 
-            if (params.contains("run_time_inclusive")) {
-                run_time_inclusive = params["run_time_inclusive"];
+            if (jparams.contains("run_time_inclusive")) {
+                params.run_time_inclusive = jparams["run_time_inclusive"];
             }
+
+#if 0
 
             if (params.contains("fire_like_ravens")) {
                 fire_like_ravens = params["fire_like_ravens"];
