@@ -18,7 +18,7 @@
 
 #include <math.h>
 
-#include <framework.hpp>
+#include <framework_json.hpp>
 #include <risp.hpp>
 #include <utils/json_helpers.hpp>
 
@@ -132,6 +132,8 @@ class FrameworkUtils {
             }
 
             track_all_neuron_events(&proc, &net);
+
+            (void)network_from_json;
         }
 
     public:
