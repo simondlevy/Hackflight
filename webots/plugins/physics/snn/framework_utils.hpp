@@ -64,9 +64,9 @@ class FrameworkUtils {
         {
             net.from_json(network_json);
 
-            json proc_params = net.get_data("proc_params");
+            json jparams = net.get_data("proc_params");
 
-            proc.init(proc_params);
+            proc.init(jparams);
 
             if (!proc.load_network(&net)) {
                 throw SRE("loadnetwork() failed");
