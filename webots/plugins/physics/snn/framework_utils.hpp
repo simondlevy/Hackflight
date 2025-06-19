@@ -80,14 +80,14 @@ class FrameworkUtils {
 
             params.discrete = jparams["discrete"];
 
-#if 0
+            if (jparams.contains("weights") && jparams["weights"].size() > 0) {
 
-            if (params.contains("weights") && params["weights"].size() > 0) {
-
-                weights = params["weights"].get< std::vector<double> >(); 
-                inputs_from_weights = params["inputs_from_weights"];
+                params.weights =
+                    jparams["weights"].get< std::vector<double> >(); 
+                params.inputs_from_weights = jparams["inputs_from_weights"];
             }
 
+#if 0
             if (params.contains("threshold_inclusive")) {
                 threshold_inclusive = params["threshold_inclusive"];
             }
