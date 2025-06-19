@@ -132,8 +132,6 @@ class FrameworkUtils {
             }
 
             track_all_neuron_events(&proc, &net);
-
-            (void)network_from_json;
         }
 
     public:
