@@ -127,7 +127,6 @@ class FrameworkUtils {
 
 #if 0
 
-
             if (params.contains("stds")) {
                 stds = params["stds"].get< std::vector<double> >(); 
             }
