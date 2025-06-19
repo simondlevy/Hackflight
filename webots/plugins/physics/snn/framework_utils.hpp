@@ -137,10 +137,6 @@ class FrameworkUtils {
 
     public:
 
-        void foo()
-        {
-        }
-
         static void load(
                 const char * network_filename,
                 Network & net,
