@@ -129,11 +129,9 @@ class FrameworkUtils {
                 params.stds = jparams["stds"].get< std::vector<double> >(); 
             }
 
-#if 0
-            if (params.contains("noisy_stddev")) {
-                noisy_stddev = params["noisy_stddev"]; 
+            if (jparams.contains("noisy_stddev")) {
+                params.noisy_stddev = jparams["noisy_stddev"]; 
             }
-#endif
         }
 
     public:
