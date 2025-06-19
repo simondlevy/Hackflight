@@ -90,18 +90,19 @@ class FrameworkUtils {
             if (jparams.contains("threshold_inclusive")) {
                 params.threshold_inclusive = jparams["threshold_inclusive"];
             }
-#if 0
 
-            if (params.contains("spike_value_factor")) {
-                spike_value_factor = params["spike_value_factor"];
+            if (jparams.contains("spike_value_factor")) {
+                params.spike_value_factor = jparams["spike_value_factor"];
 
 
-            } else if (weights.size() > 0) {
-                spike_value_factor = -99999999.99;
+            } else if (params.weights.size() > 0) {
+                params.spike_value_factor = -99999999.99;
 
             } else {
-                spike_value_factor = max_weight;
-            } 
+                params.spike_value_factor = 0; // max_weight;
+
+           } 
+ #if 0
 
             if (params.contains("run_time_inclusive")) {
                 run_time_inclusive = params["run_time_inclusive"];
