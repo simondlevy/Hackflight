@@ -132,7 +132,6 @@ class FrameworkUtils {
             }
 
             track_all_neuron_events(&proc, &net);
-
         }
 
     public:
