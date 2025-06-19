@@ -36,7 +36,6 @@ INCLUDE += -I$(FRO)/src -I$(FRO)/src/utils
 
 CXX_SOURCES += $(FRO)/src/framework.cpp
 CXX_SOURCES += $(FRO)/src/properties.cpp
-CXX_SOURCES += $(FRO)/src/risp.cpp
 
 # -----------------------------------------------------------------------------
 
