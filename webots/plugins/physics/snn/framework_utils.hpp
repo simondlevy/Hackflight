@@ -78,9 +78,9 @@ class FrameworkUtils {
 
             params.min_potential = jparams["min_potential"];
 
-#if 0
+            params.discrete = jparams["discrete"];
 
-            discrete = params["discrete"];
+#if 0
 
             if (params.contains("weights") && params["weights"].size() > 0) {
 
