@@ -86,8 +86,8 @@ static float runSnn(float demand, float actual)
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
     _proc.run(sim_time);
 
-    // Get the output network's firing time
-    const double out = _proc.output_vector(0)[0];
+    // Get the output node's firing time
+    const double out = _proc.last_output_fire_time(0);
     const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
     // Convert the firing time to a difference in [-2,+2]
