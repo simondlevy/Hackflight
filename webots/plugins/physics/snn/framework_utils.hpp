@@ -115,18 +115,18 @@ class FrameworkUtils {
                 params.noisy_seed = jparams["noisy_seed"];
             }
 
-#if 0
-
-
-            if (params.contains("leak_mode")) {
-                const auto mode_string = params["leak_mode"];
+            if (jparams.contains("leak_mode")) {
+                const auto mode_string = jparams["leak_mode"];
                 if (mode_string == "all") {
-                    leak_mode = LEAK_ALL;
+                    params.leak_mode = risp::LEAK_ALL;
                 }
                 if (mode_string == "configurable") {
-                    leak_mode = LEAK_CONFIG;
+                    params.leak_mode = risp::LEAK_CONFIG;
                 }
             }
+
+#if 0
+
 
             if (params.contains("stds")) {
                 stds = params["stds"].get< std::vector<double> >(); 
