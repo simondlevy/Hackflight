@@ -66,14 +66,6 @@ class FrameworkUtils {
 
             json jparams = net.get_data("proc_params");
 
-            proc.init(jparams);
-
-            if (!proc.load_network(&net)) {
-                throw SRE("loadnetwork() failed");
-            }
-
-            track_all_neuron_events(&proc, &net);
-
             risp::Params params = {};
 
             params.min_potential = jparams["min_potential"];
@@ -132,6 +124,15 @@ class FrameworkUtils {
             if (jparams.contains("noisy_stddev")) {
                 params.noisy_stddev = jparams["noisy_stddev"]; 
             }
+
+            proc.init(jparams);
+
+            if (!proc.load_network(&net)) {
+                throw SRE("loadnetwork() failed");
+            }
+
+            track_all_neuron_events(&proc, &net);
+
         }
 
     public:
