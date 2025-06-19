@@ -125,7 +125,7 @@ class FrameworkUtils {
                 params.noisy_stddev = jparams["noisy_stddev"]; 
             }
 
-            proc.init(jparams);
+            proc.init(jparams, params);
 
             if (!proc.load_network(&net)) {
                 throw SRE("loadnetwork() failed");
