@@ -62,7 +62,10 @@ class FrameworkUtils {
                 Network & net,
                 risp::Processor & proc)
         {
-            net.from_json(network_json);
+            //net.from_json(network_json);
+
+            //Network new_net = {};
+            NetworkLoader::load(network_json, &net);
 
             json jparams = net.get_data("proc_params");
 
@@ -139,7 +142,7 @@ class FrameworkUtils {
         static void load(
                 const char * network_filename,
                 Network & net,
-                risp::Processor & risp)
+                risp::Processor & proc)
         {
             json network_json = {};
 
@@ -151,7 +154,7 @@ class FrameworkUtils {
 
                 try {
 
-                    load_network(network_json, net, risp);
+                    load_network(network_json, net, proc);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());
