@@ -131,7 +131,7 @@ class FrameworkUtils {
                 throw SRE("loadnetwork() failed");
             }
 
-            track_all_neuron_events(&proc, &net);
+            EventTracker::track_all_neuron_events(&proc, &net);
         }
 
     public:
