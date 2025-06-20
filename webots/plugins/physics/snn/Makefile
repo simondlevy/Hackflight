@@ -30,7 +30,8 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-FRO = $(HOME)/Desktop/framework-open
+# FRO = $(HOME)/Desktop/framework-open
+FRO = $(HOME)/Desktop/tennlab-framework
 
 INCLUDE += -I$(FRO)/src -I$(FRO)/src/utils
 
