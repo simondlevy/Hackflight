@@ -79,10 +79,9 @@ class FrameworkUtils {
                 params.spike_value_factor = jparams["spike_value_factor"];
 
 
-            } else if (params.weights.size() > 0) {
-                params.spike_value_factor = -99999999.99;
-
-            } else {
+            } 
+            
+            else {
                 params.spike_value_factor = 0; // max_weight;
 
             } 
