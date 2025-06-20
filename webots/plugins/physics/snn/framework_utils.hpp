@@ -71,13 +71,6 @@ class FrameworkUtils {
 
             params.discrete = jparams["discrete"];
 
-            if (jparams.contains("weights") && jparams["weights"].size() > 0) {
-
-                params.weights =
-                    jparams["weights"].get< std::vector<double> >(); 
-                params.inputs_from_weights = jparams["inputs_from_weights"];
-            }
-
             if (jparams.contains("threshold_inclusive")) {
                 params.threshold_inclusive = jparams["threshold_inclusive"];
             }
@@ -114,10 +107,6 @@ class FrameworkUtils {
                 if (mode_string == "configurable") {
                     params.leak_mode = risp::LEAK_CONFIG;
                 }
-            }
-
-            if (jparams.contains("stds")) {
-                params.stds = jparams["stds"].get< std::vector<double> >(); 
             }
 
             if (jparams.contains("noisy_stddev")) {
