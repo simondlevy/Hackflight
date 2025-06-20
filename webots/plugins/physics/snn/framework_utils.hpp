@@ -62,12 +62,9 @@ class FrameworkUtils {
                 Network & net,
                 risp::Processor & proc)
         {
-            //net.from_json(network_json);
-
-            //Network new_net = {};
             NetworkLoader::load(network_json, &net);
 
-            json jparams = net.get_data("proc_params");
+            json jparams = network_json["Associated_Data"]["proc_params"];
 
             risp::Params params = {};
 
