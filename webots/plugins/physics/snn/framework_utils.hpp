@@ -77,8 +77,6 @@ class FrameworkUtils {
 
             if (jparams.contains("spike_value_factor")) {
                 params.spike_value_factor = jparams["spike_value_factor"];
-
-
             } 
             
             else {
@@ -104,7 +102,7 @@ class FrameworkUtils {
                     params.leak_mode = risp::LEAK_ALL;
                 }
                 if (mode_string == "configurable") {
-                    params.leak_mode = risp::LEAK_CONFIG;
+                    params.leak_mode = risp::LEAK_CONFIGURABLE;
                 }
             }
 
@@ -115,7 +113,7 @@ class FrameworkUtils {
             proc.init(params);
 
             if (!proc.load_network(&net)) {
-                throw SRE("loadnetwork() failed");
+                printf("loadnetwork() failed");
             }
 
             EventTracker::track_all_neuron_events(&proc, &net);

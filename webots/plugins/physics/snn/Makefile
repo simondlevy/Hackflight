@@ -28,12 +28,11 @@ INCLUDE = -I../../../simsrc -I../../../../src -I$(HOME)/Desktop
 
 INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
-# TeNNLab framework stuff ----------------------------------------------------
+# TeNNLab embedded neuromorphic stuff -----------------------------------------
 
-# FRO = $(HOME)/Desktop/framework-open
-FRO = $(HOME)/Desktop/tennlab-framework
+EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
 
-INCLUDE += -I$(FRO)/src -I$(FRO)/src/utils
+INCLUDE += -I$(EMB)/src -I$(EMB)/src/utils
 
 # -----------------------------------------------------------------------------
 
