@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <math.h>
+#include <fstream>
 
 #include <framework_json.hpp>
 #include <risp.hpp>
