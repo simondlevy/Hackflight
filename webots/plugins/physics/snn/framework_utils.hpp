@@ -54,15 +54,6 @@ class FrameworkUtils {
             return success;
         }
 
-        static void load_network(
-                const json &j,
-                Network & net,
-                risp::Processor & proc)
-        {
-            NetworkLoader::load(j, &net, proc);
-
-        }
-
     public:
 
         static void load(
@@ -80,7 +71,7 @@ class FrameworkUtils {
 
                 try {
 
-                    load_network(j, net, proc);
+                    NetworkLoader::load(j, &net, proc);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());
