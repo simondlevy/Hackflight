@@ -170,30 +170,4 @@ class FrameworkUtils {
             }   
         }
 
-        static string make_viz_message(
-                const Network & net,
-                const vector<int> counts)
-        {
-            const size_t n = counts.size();
-
-            string msg = "{\"Event Counts\":[";
-
-            for (size_t i=0; i<n; ++i) {
-                char tmp[100] = {};
-                const int count = counts[i];
-                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-                msg += tmp;
-            }
-
-            msg += ", \"Neuron Alias\":[";
-
-            for (size_t i=0; i<n; ++i) {
-                char tmp[100] = {};
-                sprintf(tmp, "%d%s", 
-                        net.sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
-                msg += tmp;
-            }
-
-            return msg + "}\n"; 
-        }
 };

@@ -52,33 +52,6 @@ static double value_to_spike_time(const double val)
     return FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
 }
 
-static string make_viz_message(
-        const Network & net,
-        const vector<int> counts)
-{
-    const size_t n = counts.size();
-
-    string msg = "{\"Event Counts\":[";
-
-    for (size_t i=0; i<n; ++i) {
-        char tmp[100] = {};
-        const int count = counts[i];
-        sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-        msg += tmp;
-    }
-
-    msg += ", \"Neuron Alias\":[";
-
-    for (size_t i=0; i<n; ++i) {
-        char tmp[100] = {};
-        sprintf(tmp, "%d%s", 
-                net.sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
-        msg += tmp;
-    }
-
-    return msg + "}\n"; 
-}
-
 static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
@@ -132,16 +105,16 @@ static float runSnn(float demand, float actual)
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const auto tmp = _proc.get_neuron_counts();
         const vector<int> counts = {
-            (int)(spike_time_1 * I_SCALE),
-            (int)(spike_time_2 * I_SCALE),
-            1,
-            (int)(tmp[3] * D_SCALE),
-            (int)(tmp[4] * D_SCALE),
-            (int)((out - O_BIAS) * O_SCALE),
-            (int)((tmp[6] - S_BIAS) * S_SCALE)
+                (int)(spike_time_1 * I_SCALE),
+                (int)(spike_time_2 * I_SCALE),
+                1,
+                (int)(tmp[3] * D_SCALE),
+                (int)(tmp[4] * D_SCALE),
+                (int)((out - O_BIAS) * O_SCALE),
+                (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
-        const string msg = make_viz_message(_net, counts);
+        const string msg = FrameworkUtils::make_viz_message(_net, counts);
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
         _vizcount = 0;
     }
