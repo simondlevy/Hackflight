@@ -31,8 +31,7 @@
 
 #include <posix-utils/socket.hpp>
 
-#include "framework_utils.hpp"
-//#include "difference_plank.hpp"
+#include <framework_json.hpp>
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
@@ -47,9 +46,14 @@ static double cap(const double val)
     return val > +1 ? +1 : val < -1 ? -1 : val;
 }
 
+static double get_spike_time(const double inp, const double max)
+{
+    return round(max * (1 - inp) / 2);
+}
+
 static double value_to_spike_time(const double val)
 {
-    return FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
+    return get_spike_time(cap(val), SPIKE_TIME_MAX);
 }
 
 static string make_viz_message(
@@ -79,6 +83,25 @@ static string make_viz_message(
     return msg + "}\n"; 
 }
 
+static void apply_spike(
+        Network & net,
+        Processor *p,
+        const int spike_id,
+        const double spike_time,
+        const double spike_val=1,
+        const bool normalize=true) 
+{
+    try {
+
+        p->apply_spike(Spike(net.get_node(spike_id)->input_id,
+                    spike_time, spike_val), normalize);
+
+    } catch (const SRE &e) {
+        printf(">>>>>>>> %s\n", e.what());
+        exit(0);
+    }   
+}
+
 static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
@@ -92,7 +115,7 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        FrameworkUtils::load(NETWORK_FILENAME, _net, _proc);
+        NetworkLoader::load(NETWORK_FILENAME, _net, _proc);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
@@ -106,9 +129,9 @@ static float runSnn(float demand, float actual)
     const double spike_time_2 = value_to_spike_time(actual);
 
     // Apply the spikes to the network
-    FrameworkUtils::apply_spike(_net, &_proc, 0, spike_time_1);
-    FrameworkUtils::apply_spike(_net, &_proc, 1, spike_time_2);
-    FrameworkUtils::apply_spike(_net, &_proc, 2, 0);
+    apply_spike(_net, &_proc, 0, spike_time_1);
+    apply_spike(_net, &_proc, 1, spike_time_2);
+    apply_spike(_net, &_proc, 2, 0);
 
     // Run the network
     const double sim_time = 3 * SPIKE_TIME_MAX + 2;
