@@ -32,6 +32,7 @@
 #include <posix-utils/socket.hpp>
 
 #include "framework_utils.hpp"
+//#include "difference_plank.hpp"
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
@@ -87,7 +88,7 @@ static float runSnn(float demand, float actual)
     _proc.run(sim_time);
 
     // Get the output node's firing time
-    const double out = _proc.last_output_fire_time(0);
+    const double out = _proc.get_output_fire_times()[0];
     const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
     // Convert the firing time to a difference in [-2,+2]
@@ -102,7 +103,7 @@ static float runSnn(float demand, float actual)
     const double S_BIAS = 800;
     const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        const auto tmp = _proc.neuron_counts();
+        const auto tmp = _proc.get_neuron_counts();
         const vector<int> counts = {
                 (int)(spike_time_1 * I_SCALE),
                 (int)(spike_time_2 * I_SCALE),
