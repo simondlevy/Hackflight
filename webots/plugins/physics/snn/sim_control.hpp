@@ -31,7 +31,9 @@
 
 #include <posix-utils/socket.hpp>
 
+#include <framework.hpp>
 #include <framework_json.hpp>
+#include <risp.hpp>
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
@@ -56,13 +58,13 @@ static double value_to_spike_time(const double val)
     return get_spike_time(cap(val), SPIKE_TIME_MAX);
 }
 
-static string make_viz_message(
+static std::string make_viz_message(
         const Network & net,
-        const vector<int> counts)
+        const std::vector<int> counts)
 {
     const size_t n = counts.size();
 
-    string msg = "{\"Event Counts\":[";
+    std::string msg = "{\"Event Counts\":[";
 
     for (size_t i=0; i<n; ++i) {
         char tmp[100] = {};
@@ -91,15 +93,9 @@ static void apply_spike(
         const double spike_val=1,
         const bool normalize=true) 
 {
-    try {
+    p->apply_spike(Spike(net.get_node(spike_id)->input_id,
+                spike_time, spike_val), normalize);
 
-        p->apply_spike(Spike(net.get_node(spike_id)->input_id,
-                    spike_time, spike_val), normalize);
-
-    } catch (const SRE &e) {
-        printf(">>>>>>>> %s\n", e.what());
-        exit(0);
-    }   
 }
 
 static float runSnn(float demand, float actual)
@@ -115,7 +111,7 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        NetworkLoader::load(NETWORK_FILENAME, _net, _proc);
+        neuro::NetworkLoader::load(NETWORK_FILENAME, _net, _proc);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
@@ -154,7 +150,7 @@ static float runSnn(float demand, float actual)
     const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const auto tmp = _proc.get_neuron_counts();
-        const vector<int> counts = {
+        const std::vector<int> counts = {
             (int)(spike_time_1 * I_SCALE),
             (int)(spike_time_2 * I_SCALE),
             1,
@@ -164,7 +160,7 @@ static float runSnn(float demand, float actual)
             (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
-        const string msg = make_viz_message(_net, counts);
+        const std::string msg = make_viz_message(_net, counts);
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
         _vizcount = 0;
     }
