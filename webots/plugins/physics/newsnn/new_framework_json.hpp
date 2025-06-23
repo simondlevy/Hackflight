@@ -33,6 +33,7 @@ namespace neuro
                 max_value(dmax),
                 name(dname) { }
 
+            /*
             Property(const json& j)
             {
                 from_json(j);
@@ -53,6 +54,7 @@ namespace neuro
                 min_value(p.min_value), 
                 max_value(p.max_value),
                 name(std::move(p.name)) { }
+                */
 
             void from_json(const json &j)
             {
