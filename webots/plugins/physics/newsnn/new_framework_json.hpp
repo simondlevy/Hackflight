@@ -15,153 +15,6 @@ typedef runtime_error SRE;
 
 namespace neuro
 {
-    static json property_pack_specs = {
-        { "node_properties", "A" },
-        { "edge_properties", "A" },
-        { "network_properties", "A" },
-        { "Necessary",
-            { "node_properties", "edge_properties", "network_properties" } } };
-
-
-    static json property_specs = {
-        { "min_value", "D" },
-        { "max_value", "D" },
-        { "size", "I" },
-        { "index", "I" },
-        { "type", "C" },
-        { "name", "S" },
-        { "Necessary",
-            { "min_value", "max_value", "size", "index", "type", "name" } } };
-
-    static json network_specs = {
-        { "Properties", "J" },
-        { "Associated_Data", "J" },
-        { "Nodes", "A" },
-        { "Edges", "A" },
-        { "Inputs", "A" },
-        { "Outputs", "A" },
-        { "Network_Values", "A" },
-        { "Necessary", { "Properties", 
-                           "Associated_Data", 
-                           "Nodes", 
-                           "Edges", 
-                           "Inputs", 
-                           "Outputs", 
-                           "Network_Values" } } };
-
-    static json node_specs = {
-        { "id", "I" },
-        { "values", "A" },
-        { "name", "S" },
-        { "coords", "A" },
-        { "Necessary", { "id", "values", } } };
-
-    static json edge_specs = {
-        { "from", "I" },
-        { "to", "I" },
-        { "values", "A" },
-        { "control_point", "A" },
-        { "Necessary", { "from", "to", "values", } } };
-
-
-    /* Parameter_Check_Json_T works like Parameter_Check_Json, but gives an
-       error instead of always returning a string 
-
-       Specs should be a json object that has key/value pairs that are
-       string/string.  The keys are legal json parameters and vals are:
-
-       "B" - Boolean
-       "L" - Number (Json doesn't differentiate)
-       "I" - Number (Json doesn't differentiate)
-       "D" - Number (Json doesn't differentiate)
-       "C" - Char
-       "S" - String
-       "J" - JSON object
-       "A" - JSON array
-       "U" - Unspecified.
-
-       Optionally, you can have a key "Necessary", whose val is a JSON array of strings.
-
-       Parameter_Check_Json() will:
-
-       - Go through params, and check that each key is in specs, and of the correct time.
-       - If a key is not in params, it is an error.
-       - If params doesn't have a "Necessary" key, it will return an error.
-
-       It returns an error string.  If the string is empty, then all is fine.
-     */
-
-    inline static void Parameter_Check_Json_T (const json &params, const json &specs)
-    {
-        json::const_iterator pit;
-        size_t i;
-        std::ostringstream oss;
-        std::string val;
-        std::string estring;
-        bool problem;
-
-        oss.str("");
-
-        if (params.size() > 0 && !params.is_object()) {
-            printf("JSON is not an object.\n");
-        }
-
-        if (specs.contains("Necessary") && !specs["Necessary"].is_array()) {
-            printf("Parameter_Check_Json: specs['Necessary'] needs to be a JSON array.");
-        }
-
-        for (pit = params.begin(); pit != params.end(); pit++) {
-            // std::cout << pit.key() << std::endl; /* HERE */
-            if (!specs.contains(pit.key())) {
-                oss << "Illegal parameter: " << pit.key() << std::endl;
-                printf("%s\n", oss.str().c_str());
-            } else if (!specs[pit.key()].is_string()) {
-                oss << "Bad json for Json_Parameter_Check() - val needs to be a string: " 
-                    << pit.key() << std::endl;
-                estring = oss.str();
-                printf("%s\n", estring.c_str());
-            } else {
-                val = specs[pit.key()];
-                switch (val[0]) {
-                    case 'B': if (!pit->is_boolean()) printf("must be a boolean."); break;
-                    case 'L': 
-                    case 'D': 
-                    case 'C': 
-                    case 'I': if (!pit->is_number()) printf( "must be a number."); break;
-                    case 'S': if (!pit->is_string()) printf( "must be a string."); break;
-                    case 'J': if (!pit->is_object()) printf( "must be a json object."); break;
-                    case 'A': if (!pit->is_array()) printf( "must be a json array."); break;
-                    case 'U': break;
-                    default: 
-                              printf("Parameter_Check_Json_T: Unknown key '%c'\n", val[0]);
-                }
-            }
-        }
-
-        problem = false;
-
-        if (specs.contains("Necessary")) {
-            for (i = 0; i < specs["Necessary"].size(); i++) {
-                if (!params.is_object() || !params.contains(specs["Necessary"][i])) {
-                    oss << "Missing parameter " << specs["Necessary"][i] << std::endl;
-                    problem = true;
-                }
-            }
-        }
-
-        if (problem) {
-            printf("%s\n", oss.str().c_str());
-        }
-    }
-
-
-    inline static std::string Parameter_Check_Json (const json &params, 
-            const json &specs)
-    {
-        Parameter_Check_Json_T(params, specs);
-        return "";
-    }
-
     class Property {
 
         public:
@@ -217,8 +70,6 @@ namespace neuro
                 std::string e;
                 Property::Type t;
 
-                e = Parameter_Check_Json(j, property_specs);
-                if (e != "") printf("%s\n", e.c_str());
                 t = j["type"]; 
                 if (t != Property::Type::BOOLEAN && 
                         t != Property::Type::INTEGER && 
@@ -362,8 +213,6 @@ namespace neuro
                 std::vector <std::string> ptypes;
                 std::string json_key;
 
-                Parameter_Check_Json_T(j, property_pack_specs);
-
                 clear();
 
                 ptypes.push_back("node");
@@ -452,8 +301,6 @@ namespace neuro
             static void load(const json &j, Network * net, 
                     risp::Processor & proc)
             {
-                Parameter_Check_Json_T(j, network_specs);
-
                 net->clear();
 
                 PropertyPack properties;
@@ -475,8 +322,6 @@ namespace neuro
                 // we may need to modify jn
 
                 for(auto jn : j["Nodes"]) {   
-
-                    Parameter_Check_Json_T(jn, node_specs);
 
                     const auto jnid = jn["id"];
 
@@ -501,8 +346,6 @@ namespace neuro
 
                 // Add edges /w values
                 for(auto& je : j["Edges"]) {
-
-                    Parameter_Check_Json_T(je, edge_specs);
 
                     const auto values = je["values"].get<std::vector<double>>();
 
