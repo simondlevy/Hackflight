@@ -88,6 +88,28 @@ namespace neuro
 
             void init()
             {
+                add_node(0, 1.000000);
+                add_node(1, 1.000000);
+                add_node(2, 1.000000);
+                add_node(3, 1.000000);
+                add_node(4, 1.000000);
+                add_node(5, 1000.000000);
+                add_node(6, 1.000000);
+
+                add_edge(0, 3, 1.000000, 1.000000);
+                add_edge(0, 4, -1.000000, 1.000000);
+                add_edge(1, 3, -1.000000, 1.000000);
+                add_edge(1, 4, 1.000000, 1.000000);
+                add_edge(2, 6, 1.000000, 1000.000000);
+                add_edge(3, 3, 1.000000, 1.000000);
+                add_edge(3, 5, -1.000000, 1.000000);
+                add_edge(4, 4, 1.000000, 1.000000);
+                add_edge(4, 5, 1.000000, 1.000000);
+                add_edge(5, 5, -1.000000, 1.000000);
+                add_edge(5, 6, -1.000000, 1.000000);
+                add_edge(6, 5, 1.000000, 1.000000);
+                add_edge(6, 6, 1.000000, 1.000000);
+
             }
 
             void clear()
@@ -120,20 +142,20 @@ namespace neuro
 
                 Edge * edge = nullptr;
 
-                    Node * from_node = get_node(fr);
-                    Node * to_node = get_node(to);
+                Node * from_node = get_node(fr);
+                Node * to_node = get_node(to);
 
-                    edge = &edges[n_edges];
+                edge = &edges[n_edges];
 
-                    edge->from = from_node;
-                    edge->to = to_node;
-                    edge->weight = weight;
-                    edge->delay = delay;
+                edge->from = from_node;
+                edge->to = to_node;
+                edge->weight = weight;
+                edge->delay = delay;
 
-                    from_node->outgoing.push_back(edge);
-                    to_node->incoming.push_back(edge);
+                from_node->outgoing.push_back(edge);
+                to_node->incoming.push_back(edge);
 
-                    n_edges++;
+                n_edges++;
 
                 return edge;
             }
