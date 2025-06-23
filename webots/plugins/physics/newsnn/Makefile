@@ -30,9 +30,9 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 # TeNNLab embedded neuromorphic stuff -----------------------------------------
 
-EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor/newsrc
+EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
 
-INCLUDE += -I$(EMB) -I$(EMB)/utils
+INCLUDE += -I$(EMB)/src -I$(EMB)/src/utils
 
 # -----------------------------------------------------------------------------
 
