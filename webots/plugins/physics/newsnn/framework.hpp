@@ -5,6 +5,12 @@
 #include <Embedded_Template_Library.h>
 #include <etl/vector.h>
 
+static void dump(const char * s)
+{
+    printf("----------------------------------- %s\n", s);
+    fflush(stdout);
+}
+
 namespace neuro
 {
     typedef etl::pair<int,int> Coords;
@@ -171,6 +177,8 @@ namespace neuro
             {
                 Node * node = nullptr;
 
+                printf("++++++++++++++++ n_nodes: %lu\n", n_nodes);
+
                 for (size_t k=0; k<n_nodes; ++k) {
                     if (idx == nodes[k].id) {
                         node = &nodes[k];
@@ -246,18 +254,12 @@ namespace neuro
             friend class Edge;
     };
 
-    class EventTracker {
-
-        public:
-
-            static void track_all_neuron_events(Processor * proc,
-                    Network * net)
-            {
-                for (size_t k=0; k<net->n_nodes; ++k) {
-                    proc->track_neuron_events(net->nodes[k].id, true);
-                }
-            }
-    };
+    static void track_all_neuron_events(Processor * proc, Network * net)
+    {
+        for (size_t k=0; k<net->n_nodes; ++k) {
+            proc->track_neuron_events(net->nodes[k].id, true);
+        }
+    }
 
     static void apply_spike(
             Network * net,
@@ -267,6 +269,10 @@ namespace neuro
             const double spike_val=1,
             const bool normalize=true) 
     {
+        printf(">>>>>>>>>>>>>>>>> %d: %p\n",
+                spike_id, net->get_node(spike_id));
+        fflush(stdout);
+
         p->apply_spike(Spike(net->get_node(spike_id)->input_id,
                     spike_time, spike_val), normalize);
 

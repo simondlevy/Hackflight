@@ -7,6 +7,8 @@
 
 using namespace neuro;
 
+
+
 namespace risp
 {
 
@@ -532,13 +534,21 @@ namespace risp
                             const float input2_spike_time,
                             const float input3_spike_time)
                     {
+                        dump("A");
+
                         neuro::apply_spike(net, this, 0, input1_spike_time);
                         neuro::apply_spike(net, this, 1, input2_spike_time);
                         neuro::apply_spike(net, this, 2, input3_spike_time);
 
+                        dump("B");
+
                         run(sim_time);
 
-                        return get_output_fire_times();
+                        const auto fire_times = get_output_fire_times();
+
+                        dump("C");
+
+                        return fire_times;
                     }
 
             };
