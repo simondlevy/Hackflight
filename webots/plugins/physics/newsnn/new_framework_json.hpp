@@ -88,117 +88,6 @@ namespace neuro
                 return std::tuple<PropertyMap&, PropertyMap&,
                        PropertyMap&>{nodes, edges, networks};
             }
-
-            static void add_property(
-                    PropertyMap &props, int prop_id, const std::string& name,
-                    double dmin, double dmax, Property::Type type, int count) 
-            {
-                return;
-                props.insert({name, Property(name, prop_id, count, dmin,
-                            dmax, type)});
-            }
-
-            int add_node_property( const std::string& name, double dmin, double
-                    dmax, Property::Type type, int cnt) 
-            {
-                // starting index
-                int start_idx = node_vec_size;
-
-                node_vec_size += cnt;
-
-                // insert property to PropertyMap
-                add_property(nodes, start_idx, name, dmin, dmax, type, cnt);
-
-                // return starting index for the property
-                return start_idx;
-            }
-
-            int add_edge_property(const std::string& name, double dmin, double
-                    dmax, Property::Type type, int cnt) 
-            {
-                // starting index
-                int start_idx = edge_vec_size;
-
-                edge_vec_size += cnt;
-
-                // insert property to PropertyMap
-                add_property(edges, start_idx, name, dmin, dmax, type, cnt);
-
-                // return starting index for the property
-                return start_idx;
-            }
-
-            int add_network_property(const std::string& name, double dmin,
-                    double dmax, Property::Type type, int cnt)
-            {
-                // starting index
-                int start_idx = net_vec_size;
-
-                net_vec_size += cnt;
-
-                // insert property to PropertyMap
-                add_property(networks, start_idx, name, dmin, dmax, type, cnt);
-
-                // return starting index for the property
-                return start_idx;
-            }
-
-            void from_json(const json &j)
-            {
-                int index = 0;
-                size_t i, k;
-                std::map <int, Property> by_index;
-                std::map <int, Property>::iterator bit;
-                std::vector <std::string> ptypes;
-                std::string json_key;
-
-                clear();
-
-                ptypes.push_back("node");
-                ptypes.push_back("edge");
-                ptypes.push_back("network");
-
-                for (k = 0; k < ptypes.size(); k++) {
-                    json_key = ptypes[k] + "_properties";
-                    by_index.clear();
-                    for (i = 0; i < j[json_key].size(); i++) {
-                        static Property p;
-                        p.from_json(j[json_key][i]);
-                        by_index.insert(std::make_pair(p.index, p));
-                    }
-                    for (bit = by_index.begin(); bit != by_index.end(); bit++) {
-                        switch(k) {
-                            case 0:
-                                index = add_node_property(bit->second.name,
-                                        bit->second.min_value,
-                                        bit->second.max_value,
-                                        bit->second.type,
-                                        bit->second.size);
-                                break;
-                            case 1:
-                                index = add_edge_property(bit->second.name,
-                                        bit->second.min_value,
-                                        bit->second.max_value,
-                                        bit->second.type,
-                                        bit->second.size);
-                                break;
-                            case 2:
-                                index = add_network_property(bit->second.name,
-                                        bit->second.min_value,
-                                        bit->second.max_value,
-                                        bit->second.type,
-                                        bit->second.size);
-                                break;
-                            default: 
-                                break;
-                        }
-                        if ((int)index != (int)bit->second.index) {
-                            clear();
-                        }
-                    }
-                }
-            }
-
     };
 
     bool operator==(const PropertyPack &lhs, const PropertyPack &rhs);
@@ -226,10 +115,6 @@ namespace neuro
                     risp::Processor & proc)
             {
                 net->init();
-
-                PropertyPack properties;
-
-                properties.from_json(j["Properties"]);
 
                 json jparams = j["Associated_Data"]["proc_params"];
 
