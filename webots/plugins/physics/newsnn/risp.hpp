@@ -124,16 +124,6 @@ namespace risp
 
             void apply_spike(const Spike& s, bool normalized) 
             {
-                if (normalized && (s.value < 0 || s.value > 1)) {
-                    printf("risp::Network::apply_spike() - value (%lg) must be "
-                            "in [-1,1].\n", s.value);
-                }
-
-                if (!is_valid_input_id(s.id)) {
-                    printf("risp::Network::apply_spike() - input_id %d "
-                            "is not valid\n", s.id);
-                }
-
                 if (s.time >= events.size()) {
                     events.resize(s.time + 1);
                 }
@@ -158,10 +148,6 @@ namespace risp
 
             void run(double duration) 
             {
-                if (duration < 0) {
-                    printf("risp::Network::run() - duration < 0\n");
-                }
-
                 if (overall_run_time != 0) {
                     clear_tracking_info();
                 }
@@ -265,31 +251,19 @@ namespace risp
             {
                 Neuron * n = nullptr;
 
-                if (is_neuron(node_id)) {
-                    printf("risp::Neuron::add_neuron() - %d is already "
-                            "in the neuron map\n", (int)node_id);
+
+                neurons[n_neurons].init(node_id, threshold, leak);
+
+                n = &neurons[n_neurons];
+
+                n_neurons++;
+
+                if (!true) {
+                    n->threshold = (true) ?
+                        (n->threshold+1) :(n->threshold + 0.0000001);
                 }
 
-                if (n_neurons+1 == 7) {
-                    printf("Network::add_neuron: max of %d neurons exceeded\n", 
-                            (int)7);
-                }
-
-                else {
-
-                    neurons[n_neurons].init(node_id, threshold, leak);
-
-                    n = &neurons[n_neurons];
-
-                    n_neurons++;
-
-                    if (!true) {
-                        n->threshold = (true) ?
-                            (n->threshold+1) :(n->threshold + 0.0000001);
-                    }
-
-                    neuron_map[node_id] = n;
-                }
+                neuron_map[node_id] = n;
 
                 return n;
             }
@@ -298,10 +272,6 @@ namespace risp
             {
                 auto it = neuron_map.find(node_id);
 
-                if (it == neuron_map.end()) {
-                    printf("risp::Network::get_neuron() - %d is not in the "
-                            "neuron map\n", (int)node_id);
-                }
                 return it->second;
             }
 
@@ -326,31 +296,14 @@ namespace risp
             {
                 Synapse * syn = nullptr;
 
-                if (!is_neuron(from_id)) {
-                    printf("risp::Network::add_synpase() - "
-                            "node %d does not exist", (int)from_id);
-                }
-
-                if (!is_neuron(to_id)) {
-                    printf("risp::Network::add_synpase() - "
-                            "node %d does not exist", (int)to_id);
-                }
-
                 Neuron * from = get_neuron(from_id);
                 Neuron * to = get_neuron(to_id);
 
-                if (n_synapses+1 == MAX_SYNAPSES) {
-                    printf("Network::add_synapse: max of %d synapses "
-                            "exceeded\n", (int)MAX_SYNAPSES);
-                }
 
-                else {
-
-                    synapses[n_synapses].init(weight, delay, to);
-                    syn = &synapses[n_synapses];
-                    from->synapses[from->n_synapses++] = syn;
-                    n_synapses++;
-                }
+                synapses[n_synapses].init(weight, delay, to);
+                syn = &synapses[n_synapses];
+                from->synapses[from->n_synapses++] = syn;
+                n_synapses++;
 
                 return syn;
             }
@@ -358,13 +311,6 @@ namespace risp
 
             void add_input(uint32_t node_id, int input_id) 
             {
-                if (!is_neuron(node_id)) {
-                    printf("risp::Network::add_input() - node %d "
-                            "does not exist", (int)node_id);
-                }
-                if (input_id < 0) {
-                    printf("risp::Network::add_input() - input_id < 0");
-                }
                 if (input_id >= (int) n_inputs) {
                     n_inputs = input_id + 1;
                 }
@@ -373,18 +319,7 @@ namespace risp
 
             void add_output(uint32_t node_id, int output_id) 
             {
-                if (!is_neuron(node_id)) {
-                    printf("risp::Network::add_output() - node %d "
-                            "does not exist", (int)node_id);
-                }
-
-                else if (output_id < 0) {
-                    printf("risp::Network::add_output() - output_id < 0");
-                }
-
-                else if (output_id >= (int) n_outputs) {
-                    n_outputs++;
-                }
+                n_outputs++;
 
                 outputs[output_id] = node_id;
             }

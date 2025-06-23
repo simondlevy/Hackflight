@@ -82,8 +82,6 @@ namespace neuro
 
     class Network {
 
-        friend class NetworkLoader;
-
         public:
 
             Network() = default;
@@ -100,21 +98,15 @@ namespace neuro
 
             Node* add_node(const uint32_t idx, const double threshold)
             {
-                Node * node = nullptr;
+                dump("add node");
 
-                if (n_nodes+1 == 7) {
-                    printf("Network::add_node: would excede maximum of 7");
-                }
 
-                else {
+                Node * node = &nodes[n_nodes];
 
-                    node = &nodes[n_nodes];
+                node->id = idx;
+                node->threshold = threshold;
 
-                    node->id = idx;
-                    node->threshold = threshold;
-
-                    n_nodes++;
-                }
+                n_nodes++;
 
                 return node;
             }
@@ -124,16 +116,6 @@ namespace neuro
             {
 
                 Edge * edge = nullptr;
-
-                if (is_edge(fr, to)) {
-                    printf("Edge %d -> %d already exists.", (int)fr, (int)to);
-                }
-
-                else if (n_edges+1 == 13) {
-                    printf("Network::add_edge: would excede maximum of 13\n");
-                }
-
-                else {
 
                     Node * from_node = get_node(fr);
                     Node * to_node = get_node(to);
@@ -149,7 +131,6 @@ namespace neuro
                     to_node->incoming.push_back(edge);
 
                     n_edges++;
-                }
 
                 return edge;
             }
@@ -192,11 +173,6 @@ namespace neuro
             {
                 Node *n = get_node(idx);
 
-                if (n->input_id >= 0) {
-                    printf("Node %d was already set as an input (%d).",
-                            (int)idx, (int)n->input_id);
-                }
-
                 n->input_id = inputs.size();
                 inputs.push_back(idx);
                 return n->input_id;
@@ -205,10 +181,6 @@ namespace neuro
             int add_output(uint32_t idx)
             {
                 Node *n = get_node(idx);
-                if (n->output_id >= 0) {
-                    printf("Node %d was already set as an output (%d).\n",
-                            (int)idx, (int)n->output_id);
-                }
                 n->output_id = outputs.size();
                 outputs.push_back(idx);
                 return n->output_id;
