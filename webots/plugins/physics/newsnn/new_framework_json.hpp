@@ -58,13 +58,6 @@ namespace neuro
                 max_value(p.max_value),
                 name(std::move(p.name)) { }
 
-            json as_json() const
-            {
-                json j = json::object();
-                to_json(j);
-                return j;
-            }
-
             void from_json(const json &j)
             {
                 std::string e;
@@ -78,17 +71,6 @@ namespace neuro
                 max_value = j["max_value"]; 
                 name = j["name"]; 
             }
-
-            void to_json(json &j) const
-            {
-                j["type"] = type;
-                j["index"] = index;
-                j["size"] = size;
-                j["min_value"] = min_value;
-                j["max_value"] = max_value;
-                j["name"] = name;
-            }
-
 
             Type type;                       
             int index;                       
@@ -106,10 +88,6 @@ namespace neuro
     class PropertyPack {
 
         public:
-
-            void to_json(json &j) const;     
-
-            json as_json() const;            
 
             void clear()
             {
