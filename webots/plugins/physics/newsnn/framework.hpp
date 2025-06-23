@@ -86,6 +86,10 @@ namespace neuro
 
             Network() = default;
 
+            void init()
+            {
+            }
+
             void clear()
             {
                 inputs.clear();
@@ -99,7 +103,6 @@ namespace neuro
             Node* add_node(const uint32_t idx, const double threshold)
             {
                 dump("add node");
-
 
                 Node * node = &nodes[n_nodes];
 

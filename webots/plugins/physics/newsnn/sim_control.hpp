@@ -66,6 +66,8 @@ static float runSnn(float demand, float actual)
     // Initialize the first time around
     if (!_initialized) {
 
+        _net.init();
+
         neuro::track_all_neuron_events(&_proc, & _net);
 
         // Listen for and accept connections from vizualization client
