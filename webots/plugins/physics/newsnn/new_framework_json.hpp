@@ -251,24 +251,6 @@ namespace neuro
 
                 properties.from_json(j["Properties"]);
 
-                // Add the Network values
-
-                const auto values =
-                    j["Network_Values"].get<std::vector <double>>();
-
-                for(auto jn : j["Nodes"]) {   
-
-                    const auto jnid = jn["id"];
-
-                    const auto values = jn["values"].get<std::vector<double>>();
-
-                    const double threshold = values[0];
-
-                    const auto nsize = values.size();
-
-                    const auto psize = properties.node_vec_size;
-                }
-
                 // Add edges /w values
                 for(auto& je : j["Edges"]) {
 
