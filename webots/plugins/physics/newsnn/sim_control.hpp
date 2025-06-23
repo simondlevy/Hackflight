@@ -31,9 +31,9 @@
 
 #include <posix-utils/socket.hpp>
 
-#include <framework.hpp>
-#include <framework_json.hpp>
-#include <risp.hpp>
+#include "new_framework_json.hpp"
+#include "new_framework.hpp"
+#include "new_risp.hpp"
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks

@@ -32,7 +32,7 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
 
-INCLUDE += -I$(EMB)/src -I$(EMB)/src/utils
+INCLUDE += -I$(EMB)/src/
 
 # -----------------------------------------------------------------------------
 
