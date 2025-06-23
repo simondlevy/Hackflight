@@ -33,29 +33,6 @@ namespace neuro
                 max_value(dmax),
                 name(dname) { }
 
-            /*
-            Property(const json& j)
-            {
-                from_json(j);
-            }
-
-            Property(const Property& p) :
-                type(p.type), 
-                index(p.index),
-                size(p.size),
-                min_value(p.min_value),
-                max_value(p.max_value),
-                name(p.name) { }
-
-            Property(Property &&p) noexcept :
-                type(p.type), 
-                index(p.index),
-                size(p.size),
-                min_value(p.min_value), 
-                max_value(p.max_value),
-                name(std::move(p.name)) { }
-                */
-
             void from_json(const json &j)
             {
                 std::string e;
@@ -116,6 +93,7 @@ namespace neuro
                     PropertyMap &props, int prop_id, const std::string& name,
                     double dmin, double dmax, Property::Type type, int count) 
             {
+                return;
                 props.insert({name, Property(name, prop_id, count, dmin,
                             dmax, type)});
             }
