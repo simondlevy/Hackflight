@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <sstream>
 
 #include "new_framework.hpp"
 #include "new_risp.hpp"
@@ -229,10 +228,8 @@ namespace neuro
 
         private:
 
-            static bool read_json(const char * filename, json &rv)
+            static void read_json(const char * filename, json &rv)
             {
-                bool success = true;
-
                 std::string s = {};
 
                 std::ifstream fin = {};
@@ -243,15 +240,9 @@ namespace neuro
 
                 fin.open(filename);
 
-                try {
-                    fin >> rv; success = true;
-                } catch(...) {
-                    success = false;
-                }
+                fin >> rv; 
 
                 fin.close();
-
-                return success;
             }
 
         public:
@@ -382,15 +373,8 @@ namespace neuro
                     risp::Processor & proc)
             {
                 json j = {};
-
-                if (!read_json(network_filename, j)) {
-
-
-                } else {
-
-                        NetworkLoader::load(j, &net, proc);
-
-                }
+                read_json(network_filename, j);
+                NetworkLoader::load(j, &net, proc);
             }
 
     };
