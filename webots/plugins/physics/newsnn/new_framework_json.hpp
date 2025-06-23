@@ -8,10 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
-using namespace std;
 using namespace nlohmann;
-
-typedef runtime_error SRE;
 
 namespace neuro
 {
@@ -236,9 +233,9 @@ namespace neuro
             {
                 bool success = true;
 
-                string s = {};
+                std::string s = {};
 
-                ifstream fin = {};
+                std::ifstream fin = {};
 
                 rv.clear();
 
@@ -256,6 +253,7 @@ namespace neuro
 
                 return success;
             }
+
         public:
 
             static void load(const json &j, Network * net, 
@@ -390,15 +388,8 @@ namespace neuro
 
                 } else {
 
-                    try {
-
                         NetworkLoader::load(j, &net, proc);
 
-                    } catch (const SRE &e) {
-                        printf("%s\n",e.what());
-                    } catch (...) {
-                        printf("Unknown error when making processor\n");
-                    }
                 }
             }
 
