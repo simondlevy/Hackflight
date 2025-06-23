@@ -251,19 +251,6 @@ namespace neuro
 
                 properties.from_json(j["Properties"]);
 
-                // Add the inputs & outputs
-
-                for (size_t i = 0; i < j["Inputs"].size(); i++) {
-                    printf("add_input(%u);\n",
-                            j["Inputs"][i].get<uint32_t>());
-                    net->add_input(j["Inputs"][i].get<uint32_t>());
-                }
-
-                for (size_t i = 0; i < j["Outputs"].size(); i++) {
-                    net->add_output(j["Outputs"][i].get<uint32_t>());
-                    printf("add_output(%u\n", j["Outputs"][i].get<uint32_t>());
-                }
-
                 json jparams = j["Associated_Data"]["proc_params"];
 
                 risp::Params params = {};

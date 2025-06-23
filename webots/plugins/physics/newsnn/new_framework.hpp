@@ -114,7 +114,10 @@ namespace neuro
                 add_edge(5, 6, -1.000000, 1.000000);
                 add_edge(6, 5, 1.000000, 1.000000);
                 add_edge(6, 6, 1.000000, 1.000000);
-
+                add_input(0);
+                add_input(1);
+                add_input(2);
+                add_output(5);
             }
 
             Node* add_node(const uint32_t idx, const double threshold)
@@ -122,94 +125,94 @@ namespace neuro
                 Node * node = nullptr;
 
                 if (n_nodes+1 == MAX_NODES) {
-                    printf("Network::add_node: would excede maximum of %d\n",
-                            (int)MAX_NODES);
-                }
+                        printf("Network::add_node: would excede maximum of %d\n",
+                                (int)MAX_NODES);
+                        }
 
-                else {
+                        else {
 
-                    node = &nodes[n_nodes];
+                        node = &nodes[n_nodes];
 
-                    node->id = idx;
-                    node->threshold = threshold;
+                        node->id = idx;
+                        node->threshold = threshold;
 
-                    n_nodes++;
-                }
+                        n_nodes++;
+                        }
 
-                return node;
-            }
+                        return node;
+                        }
 
-            Edge* add_edge(uint32_t fr, uint32_t to,
-                    double weight, double delay)
-            {
+                Edge* add_edge(uint32_t fr, uint32_t to,
+                        double weight, double delay)
+                {
 
-                Edge * edge = nullptr;
+                    Edge * edge = nullptr;
 
-                if (is_edge(fr, to)) {
-                    printf("Edge %d -> %d already exists.", (int)fr, (int)to);
-                }
-
-                else if (n_edges+1 == MAX_EDGES) {
-                    printf("Network::add_edge: would excede maximum of %d\n",
-                            (int)MAX_EDGES);
-                }
-
-                else {
-
-                    Node * from_node = get_node(fr);
-                    Node * to_node = get_node(to);
-
-                    edge = &edges[n_edges];
-
-                    edge->from = from_node;
-                    edge->to = to_node;
-                    edge->weight = weight;
-                    edge->delay = delay;
-
-                    from_node->outgoing.push_back(edge);
-                    to_node->incoming.push_back(edge);
-
-                    n_edges++;
-                }
-
-                return edge;
-            }
-
-            bool is_edge(uint32_t fr, uint32_t to)
-            {
-                return get_edge(fr, to) != nullptr;
-            }
-
-            Edge * get_edge(uint32_t fr, uint32_t to) 
-            {
-                Edge * edge = nullptr;
-
-                for (size_t k=0; k<n_edges; ++k) {
-                    Edge * e = &edges[k];
-                    if (e->from->id == fr && e->to->id == to) {
-                        edge = e;
+                    if (is_edge(fr, to)) {
+                        printf("Edge %d -> %d already exists.", (int)fr, (int)to);
                     }
-                }
 
-                return edge;
-            }
-
-            Node* get_node(uint32_t idx)
-            {
-                Node * node = nullptr;
-
-                for (size_t k=0; k<n_nodes; ++k) {
-                    if (idx == nodes[k].id) {
-                        node = &nodes[k];
+                    else if (n_edges+1 == MAX_EDGES) {
+                        printf("Network::add_edge: would excede maximum of %d\n",
+                                (int)MAX_EDGES);
                     }
+
+                    else {
+
+                        Node * from_node = get_node(fr);
+                        Node * to_node = get_node(to);
+
+                        edge = &edges[n_edges];
+
+                        edge->from = from_node;
+                        edge->to = to_node;
+                        edge->weight = weight;
+                        edge->delay = delay;
+
+                        from_node->outgoing.push_back(edge);
+                        to_node->incoming.push_back(edge);
+
+                        n_edges++;
+                    }
+
+                    return edge;
                 }
 
-                return node;
-            }
+                bool is_edge(uint32_t fr, uint32_t to)
+                {
+                    return get_edge(fr, to) != nullptr;
+                }
 
-            int add_input(uint32_t idx)
-            {
-                Node *n = get_node(idx);
+                Edge * get_edge(uint32_t fr, uint32_t to) 
+                {
+                    Edge * edge = nullptr;
+
+                    for (size_t k=0; k<n_edges; ++k) {
+                        Edge * e = &edges[k];
+                        if (e->from->id == fr && e->to->id == to) {
+                            edge = e;
+                        }
+                    }
+
+                    return edge;
+                }
+
+                Node* get_node(uint32_t idx)
+                {
+                    Node * node = nullptr;
+
+                    for (size_t k=0; k<n_nodes; ++k) {
+                        if (idx == nodes[k].id) {
+                            node = &nodes[k];
+                        }
+                    }
+
+                    return node;
+                }
+
+                int add_input(uint32_t idx)
+                {
+                    Node *n = get_node(idx);
 
                 if (n->input_id >= 0) {
                     printf("Node %d was already set as an input (%d).",
