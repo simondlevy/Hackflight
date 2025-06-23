@@ -105,7 +105,7 @@ static float runSnn(float demand, float actual)
     static bool _initialized;
     static Network  _net;
     static risp::Processor _proc;
-    static ServerSocket _serverSocket;
+    //static ServerSocket _serverSocket;
 
     // Initialize the first time around
     if (!_initialized) {
@@ -114,8 +114,8 @@ static float runSnn(float demand, float actual)
         neuro::NetworkLoader::load(NETWORK_FILENAME, _net, _proc);
 
         // Listen for and accept connections from vizualization client
-        _serverSocket.open(VIZ_PORT);
-        _serverSocket.acceptClient();
+        //_serverSocket.open(VIZ_PORT);
+        //_serverSocket.acceptClient();
 
         _initialized = true;
     }
@@ -161,7 +161,7 @@ static float runSnn(float demand, float actual)
         };
 
         const std::string msg = make_viz_message(_net, counts);
-        _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
+        //_serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
         _vizcount = 0;
     }
 
