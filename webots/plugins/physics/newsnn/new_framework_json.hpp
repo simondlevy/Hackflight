@@ -71,12 +71,6 @@ namespace neuro
                 Property::Type t;
 
                 t = j["type"]; 
-                if (t != Property::Type::BOOLEAN && 
-                        t != Property::Type::INTEGER && 
-                        t != Property::Type::DOUBLE) {
-                    printf("Bad Property JSON - Type must be D (%d), I (%d) "
-                            "or B (%d).\n", 'D', 'I', 'B');
-                }
                 type = t;
                 index = j["index"]; 
                 size = j["size"]; 
@@ -146,12 +140,6 @@ namespace neuro
                     PropertyMap &props, int prop_id, const std::string& name,
                     double dmin, double dmax, Property::Type type, int count) 
             {
-                if(count <= 0) printf("Property count must be > 0.");
-                if(name.empty()) printf("Property name must not be empty.");
-                if(props.find(name) != props.end()) {
-                    printf("Property name %s already exists.\n", name.c_str());
-                }
-
                 props.insert({name, Property(name, prop_id, count, dmin,
                             dmax, type)});
             }
@@ -161,7 +149,6 @@ namespace neuro
             {
                 // starting index
                 int start_idx = node_vec_size;
-                if(cnt < 1) printf("Count must be > 0.\n");
 
                 node_vec_size += cnt;
 
@@ -177,7 +164,6 @@ namespace neuro
             {
                 // starting index
                 int start_idx = edge_vec_size;
-                if(cnt < 1) printf("Count must be > 0.\n");
 
                 edge_vec_size += cnt;
 
@@ -193,7 +179,6 @@ namespace neuro
             {
                 // starting index
                 int start_idx = net_vec_size;
-                if(cnt < 1) printf("Count must be > 0.\n");
 
                 net_vec_size += cnt;
 
@@ -251,13 +236,10 @@ namespace neuro
                                         bit->second.size);
                                 break;
                             default: 
-                                printf("Switch in PropertyPack::from_json\n");
+                                break;
                         }
                         if ((int)index != (int)bit->second.index) {
                             clear();
-                            printf("Property Pack: non-matching index in %s "
-                                    "json: %s\n", ptypes[k].c_str(),
-                                    bit->second.as_json().dump().c_str()); 
                         }
                     }
                 }
@@ -311,12 +293,6 @@ namespace neuro
 
                 const auto values =
                     j["Network_Values"].get<std::vector <double>>();
-                if (values.size() != properties.net_vec_size) {
-                    printf("Error in network JSON: "
-                            "Network_Value's array's size doesn't match the "
-                            "network Propery Pack\n");
-                    return;
-                }
 
                 // Add nodes /w values CHZ I didn't pass as reference because
                 // we may need to modify jn
@@ -337,9 +313,6 @@ namespace neuro
 
                     const auto psize = properties.node_vec_size;
                     if (nsize != psize) {
-                        printf("Error in network JSON: Node %s array size %d "
-                                "does not match node PropertyPack size %d\n",
-                                jnid.dump().c_str(), (int)nsize, (int)psize);
                         return;
                     }
                 }
@@ -357,44 +330,16 @@ namespace neuro
                             values[0],
                             values[1]);
 
-                    if (values.size() != properties.edge_vec_size) {
-                        std::string estring =
-                            "Error in the network JSON: Edge " +
-                            je["from"].dump() +
-                            "->" + je["to"].dump() + 
-                            "'s value array's size does not match the edge "
-                            "PropertyPack";
-                        printf("%s\n", estring.c_str());
-                        return;
-                    }
                 }
 
                 // Add the inputs & outputs
 
                 for (size_t i = 0; i < j["Inputs"].size(); i++) {
-                    if (j["Inputs"][i].get<double>() < 0) {
-                        char buf[128];
-                        snprintf(buf, 128, "%d", (int) i);
-                        std::string estring =
-                            (std::string) "Bad Network JSON - Input[" +
-                            (std::string) buf + "] is < 0.";
-                        printf("%s\n", estring.c_str());
-                        return;
-                    }
                     printf("add_input(%u\n", j["Inputs"][i].get<uint32_t>());
                     net->add_input(j["Inputs"][i].get<uint32_t>());
                 }
 
                 for (size_t i = 0; i < j["Outputs"].size(); i++) {
-                    if (j["Outputs"][i].get<double>() < 0) {
-                        char buf[128];
-                        snprintf(buf, 128, "%d", (int) i);
-                        std::string estring =
-                            (std::string) "Bad Network JSON - Output[" +
-                            (std::string) buf + "] is < 0.";
-                        printf("%s ", estring.c_str());
-                        return;
-                    }
                     net->add_output(j["Outputs"][i].get<uint32_t>());
                     printf("add_output(%u\n", j["Outputs"][i].get<uint32_t>());
                 }
@@ -464,7 +409,6 @@ namespace neuro
 
                 if (!read_json(network_filename, j)) {
 
-                    printf("usage: ML j. Bad json\n");
 
                 } else {
 
