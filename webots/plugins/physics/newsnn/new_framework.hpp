@@ -84,7 +84,7 @@ namespace neuro
 
             Network() = default;
 
-            void clear()
+            void init()
             {
                 inputs.clear();
                 outputs.clear();
@@ -92,6 +92,16 @@ namespace neuro
 
                 n_edges = 0;
                 n_nodes = 0;
+
+                // XXX from compiler
+                add_node(0, 1.000000);
+                add_node(1, 1.000000);
+                add_node(2, 1.000000);
+                add_node(3, 1.000000);
+                add_node(4, 1.000000);
+                add_node(5, 1000.000000);
+                add_node(6, 1.000000);
+
             }
 
             Node* add_node(const uint32_t idx, const double threshold)

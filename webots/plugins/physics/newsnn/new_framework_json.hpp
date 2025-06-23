@@ -230,27 +230,22 @@ namespace neuro
 
             static void read_json(const char * filename, json &rv)
             {
-                std::string s = {};
-
                 std::ifstream fin = {};
-
                 rv.clear();
-
                 fin.clear();
-
                 fin.open(filename);
-
                 fin >> rv; 
-
                 fin.close();
             }
 
         public:
 
-            static void load(const json &j, Network * net, 
+            static void load(
+                    const json &j,
+                    Network * net, 
                     risp::Processor & proc)
             {
-                net->clear();
+                net->init();
 
                 PropertyPack properties;
 
@@ -261,9 +256,6 @@ namespace neuro
                 const auto values =
                     j["Network_Values"].get<std::vector <double>>();
 
-                // Add nodes /w values CHZ I didn't pass as reference because
-                // we may need to modify jn
-
                 for(auto jn : j["Nodes"]) {   
 
                     const auto jnid = jn["id"];
@@ -272,16 +264,9 @@ namespace neuro
 
                     const double threshold = values[0];
 
-                    printf("Add node: %s %f\n",
-                            jnid.dump().c_str(), threshold);
-                    net->add_node(jnid, threshold);
-
                     const auto nsize = values.size();
 
                     const auto psize = properties.node_vec_size;
-                    if (nsize != psize) {
-                        return;
-                    }
                 }
 
                 // Add edges /w values
@@ -302,7 +287,8 @@ namespace neuro
                 // Add the inputs & outputs
 
                 for (size_t i = 0; i < j["Inputs"].size(); i++) {
-                    printf("add_input(%u\n", j["Inputs"][i].get<uint32_t>());
+                    printf("add_input(%u);\n",
+                            j["Inputs"][i].get<uint32_t>());
                     net->add_input(j["Inputs"][i].get<uint32_t>());
                 }
 
