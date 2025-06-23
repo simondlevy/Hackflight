@@ -251,21 +251,6 @@ namespace neuro
 
                 properties.from_json(j["Properties"]);
 
-                // Add edges /w values
-                for(auto& je : j["Edges"]) {
-
-                    const auto values = je["values"].get<std::vector<double>>();
-
-                    net->add_edge(je["from"], je["to"], values[0], values[1]);
-
-                    printf("add_edge(%s, %s, %f %f);\n", 
-                            je["from"].dump().c_str(),
-                            je["to"].dump().c_str(),
-                            values[0],
-                            values[1]);
-
-                }
-
                 // Add the inputs & outputs
 
                 for (size_t i = 0; i < j["Inputs"].size(); i++) {
