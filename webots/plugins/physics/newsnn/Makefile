@@ -30,13 +30,13 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 # TeNNLab embedded neuromorphic stuff -----------------------------------------
 
-EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
+EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor/newsrc
 
-INCLUDE += -I$(EMB)/src -I$(EMB)/src/utils
+INCLUDE += -I$(EMB) -I$(EMB)/utils
 
 # -----------------------------------------------------------------------------
 
-all: libsnn.so
+all: libnewsnn.so
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

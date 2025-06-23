@@ -31,8 +31,8 @@
 
 #include <posix-utils/socket.hpp>
 
-#include "framework_utils.hpp"
-//#include "difference_plank.hpp"
+#include "framework.hpp"
+#include "risp.hpp"
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
@@ -49,11 +49,14 @@ static double cap(const double val)
 
 static double value_to_spike_time(const double val)
 {
-    return FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
+    (void)val;
+    (void)cap;
+    return 0;//FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
 }
 
 static float runSnn(float demand, float actual)
 {
+    /*
     static constexpr float KP = 25;
 
     static bool _initialized;
@@ -122,6 +125,9 @@ static float runSnn(float demand, float actual)
     // Convert the difference into a thrust, constrained by motor limits
     return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
             THRUST_MIN, THRUST_MAX); 
+            */
+
+    return 0;
 }
 
 static void runClosedLoopControl(
