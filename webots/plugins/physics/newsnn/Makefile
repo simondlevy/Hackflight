@@ -20,7 +20,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(SRC)
 
-CXX_SOURCES = ../support.cpp framework_params.cpp risp_params.cpp
+CXX_SOURCES = ../support.cpp framework.cpp risp.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(HOME)/Desktop
 
@@ -34,7 +34,7 @@ EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
 
 INCLUDE += -I$(EMB)/newsrc/
 
-FILES_TO_REMOVE += risp_params.cpp framework_params.cpp vector_sizes.h
+FILES_TO_REMOVE += risp.cpp framework.cpp vectors.h
 
 # -----------------------------------------------------------------------------
 
