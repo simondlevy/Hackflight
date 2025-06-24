@@ -7,23 +7,23 @@
 
 namespace neuro
 {
-    // Arbitrary array limits
-    static const size_t N_INCOMING = 20; 
-    static const size_t N_OUTGOING = 20; 
-
     typedef etl::pair<int,int> Coords;
 
     class Node {
 
         public:
 
+            // Arbitrary array limits
+            static const size_t MAX_INCOMING = 20; 
+            static const size_t MAX_OUTGOING = 20; 
+
             Node() = default;
 
             uint32_t id = 0;                
             int input_id = -1;              
             int output_id = -1;             
-            etl::vector<class Edge*, N_INCOMING> incoming;         
-            etl::vector<class Edge*, N_OUTGOING> outgoing;         
+            etl::vector<class Edge*, MAX_INCOMING> incoming;         
+            etl::vector<class Edge*, MAX_OUTGOING> outgoing;         
 
             double threshold;
 
@@ -79,38 +79,38 @@ namespace neuro
 
         public:
 
-            Network() = default;
+        Network() = default;
 
-            void init()
-            {
-                inputs.clear();
-                outputs.clear();
-                sorted_node_vector.clear();
+        void init()
+        {
+            inputs.clear();
+            outputs.clear();
+            sorted_node_vector.clear();
 
-                n_edges = 0;
-                n_nodes = 0;
+            n_edges = 0;
+            n_nodes = 0;
 
-                init_params();
+            init_params();
+        }
+
+        Node* add_node(const uint32_t idx, const double threshold)
+        {
+            Node * node = nullptr;
+
+            if (n_nodes+1 == N_NODES) {
+                printf("Network::add_node: would excede maximum of %d\n",
+                        (int)N_NODES);
             }
 
-            Node* add_node(const uint32_t idx, const double threshold)
-            {
-                Node * node = nullptr;
+            else {
 
-                if (n_nodes+1 == N_NODES) {
-                        printf("Network::add_node: would excede maximum of %d\n",
-                                (int)N_NODES);
-                        }
+                node = &nodes[n_nodes];
 
-                        else {
+                node->id = idx;
+                node->threshold = threshold;
 
-                        node = &nodes[n_nodes];
-
-                        node->id = idx;
-                        node->threshold = threshold;
-
-                        n_nodes++;
-                        }
+                n_nodes++;
+            }
 
                         return node;
                         }
