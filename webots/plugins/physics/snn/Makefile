@@ -30,15 +30,12 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 # TeNNLab embedded neuromorphic stuff -----------------------------------------
 
-EMB = $(HOME)/Desktop/embedded-neuromorphic/
+FRO = $(HOME)/Desktop/tennlab-framework/src
 
-EMBPROC = $(EMB)/levy/processor
-
-EMBSRC = $(EMBPROC)/src
-
+# NB: these muse be compiled using tennlab-framework/compile.py
 CXX_SOURCES += framework.cpp risp.cpp
 
-INCLUDE += -I$(EMBSRC)
+INCLUDE += -I$(FRO)
 
 # -----------------------------------------------------------------------------
 
