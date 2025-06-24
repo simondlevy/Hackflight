@@ -31,7 +31,6 @@
 
 #include <posix-utils/socket.hpp>
 
-#include "new_framework_json.hpp"
 #include "new_framework.hpp"
 #include "new_risp.hpp"
 
@@ -108,7 +107,6 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        //neuro::NetworkLoader::load(&_net, _proc);
         _net.init();
         _proc.load_network(&_net);
         EventTracker::track_all_neuron_events(&_proc, &_net);
