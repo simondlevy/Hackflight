@@ -20,7 +20,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(SRC)
 
-CXX_SOURCES = ../support.cpp framework_init.cpp
+CXX_SOURCES = ../support.cpp framework_params.cpp risp_params.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(HOME)/Desktop
 

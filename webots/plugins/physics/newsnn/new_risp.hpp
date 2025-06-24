@@ -86,16 +86,7 @@ namespace risp
 
             void init(neuro::Network *net)
             {
-                // XXX should come from compiler
-                spike_value_factor=1000.000000;
-                min_potential=-1000.000000;
-                leak_mode=LEAK_NONE;
-                run_time_inclusive=0;
-                threshold_inclusive=1;
-                fire_like_ravens=0;
-                discrete=1;
-                noisy_seed=0;
-                noisy_stddev=0.000000;
+                init_params();
 
                 n_neurons = 0;
                 n_synapses = 0;
@@ -258,6 +249,7 @@ namespace risp
             uint32_t noisy_seed;
             double noisy_stddev;
 
+            void init_params();
 
             size_t n_neurons;
             Neuron neurons[MAX_NODES];
