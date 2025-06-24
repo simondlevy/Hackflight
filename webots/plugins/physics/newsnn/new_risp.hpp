@@ -13,6 +13,7 @@ namespace risp
     // Arbitrary array limits
     static const size_t MAX_EVENT_TIMES = 4000;
     static const size_t MAX_EVENTS_PER_TIME = 10;
+    static const size_t MAX_SYNAPSES = 20; 
 
     typedef enum {
 
@@ -215,9 +216,9 @@ namespace risp
                 return true;
             }
 
-            etl::vector<double, MAX_NODES> get_output_fire_times()
+            etl::vector<double, N_NODES> get_output_fire_times()
             {
-                etl::vector<double, MAX_NODES> times;
+                etl::vector<double, N_NODES> times;
 
                 for (size_t k=0; k<n_outputs; ++k) {
                    times.push_back(neuron_map[outputs[k]]->last_fire);
@@ -226,9 +227,9 @@ namespace risp
                 return times;
             }
 
-            etl::vector<int, MAX_NODES> get_neuron_counts() 
+            etl::vector<int, N_NODES> get_neuron_counts() 
             {
-                etl::vector<int, MAX_NODES> counts;
+                etl::vector<int, N_NODES> counts;
 
                 for (auto neuron : sorted_neuron_vector) {
                     counts.push_back(neuron->fire_counts);
@@ -252,20 +253,20 @@ namespace risp
             void init_params();
 
             size_t n_neurons;
-            Neuron neurons[MAX_NODES];
+            Neuron neurons[N_NODES];
 
             size_t n_synapses;
             Synapse synapses[MAX_SYNAPSES];
 
-            int inputs[MAX_INPUTS];
+            int inputs[N_INPUTS];
             size_t n_inputs;
 
-            int outputs[MAX_OUTPUTS];
+            int outputs[N_OUTPUTS];
             size_t n_outputs;
 
-            etl::vector<Neuron *, MAX_NODES> sorted_neuron_vector;         
+            etl::vector<Neuron *, N_NODES> sorted_neuron_vector;         
 
-            etl::unordered_map <uint32_t, Neuron *, MAX_NODES> neuron_map;   
+            etl::unordered_map <uint32_t, Neuron *, N_NODES> neuron_map;   
 
             etl::vector<
                 etl::vector<
@@ -278,7 +279,7 @@ namespace risp
             long long neuron_accum_counter; 
             int overall_run_time;     
             MOA rng;
-            etl::vector<Neuron *, MAX_NODES> to_fire;   
+            etl::vector<Neuron *, N_NODES> to_fire;   
 
             Neuron * add_neuron(uint32_t node_id, double threshold, bool leak) 
             {
@@ -289,9 +290,9 @@ namespace risp
                             "in the neuron map\n", (int)node_id);
                 }
 
-                if (n_neurons+1 == MAX_NODES) {
+                if (n_neurons+1 == N_NODES) {
                     printf("Network::add_neuron: max of %d neurons exceeded\n", 
-                            (int)MAX_NODES);
+                            (int)N_NODES);
                 }
 
                 else {
@@ -529,12 +530,12 @@ namespace risp
                                 node_id, track);
                     }
 
-                    etl::vector<int, MAX_NODES> get_neuron_counts()
+                    etl::vector<int, N_NODES> get_neuron_counts()
                     {
                         return get_risp_network()->get_neuron_counts();
                     }
 
-                    etl::vector<double, MAX_NODES> get_output_fire_times()
+                    etl::vector<double, N_NODES> get_output_fire_times()
                     {
                         return get_risp_network()->get_output_fire_times();
                     }

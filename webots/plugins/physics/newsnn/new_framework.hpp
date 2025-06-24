@@ -6,13 +6,13 @@
 namespace neuro
 {
     // Arbitrary array limits
-    static const size_t MAX_NODES = 20;
-    static const size_t MAX_EDGES = 20;
-    static const size_t MAX_INPUTS = 20;
-    static const size_t MAX_OUTPUTS = 20;
-    static const size_t MAX_SYNAPSES = 20; 
-    static const size_t MAX_INCOMING = 20; 
-    static const size_t MAX_OUTGOING = 20; 
+    static const size_t N_INCOMING = 20; 
+    static const size_t N_OUTGOING = 20; 
+
+    static const size_t N_NODES = 20;
+    static const size_t N_EDGES = 20;
+    static const size_t N_INPUTS = 20;
+    static const size_t N_OUTPUTS = 20;
 
     typedef etl::pair<int,int> Coords;
 
@@ -25,8 +25,8 @@ namespace neuro
             uint32_t id = 0;                
             int input_id = -1;              
             int output_id = -1;             
-            etl::vector<class Edge*, MAX_INCOMING> incoming;         
-            etl::vector<class Edge*, MAX_OUTGOING> outgoing;         
+            etl::vector<class Edge*, N_INCOMING> incoming;         
+            etl::vector<class Edge*, N_OUTGOING> outgoing;         
 
             double threshold;
 
@@ -73,7 +73,7 @@ namespace neuro
 
             virtual void run(double duration) = 0;
 
-            virtual etl::vector <int, MAX_NODES> get_neuron_counts() = 0;
+            virtual etl::vector <int, N_NODES> get_neuron_counts() = 0;
     };
 
     class Network {
@@ -100,9 +100,9 @@ namespace neuro
             {
                 Node * node = nullptr;
 
-                if (n_nodes+1 == MAX_NODES) {
+                if (n_nodes+1 == N_NODES) {
                         printf("Network::add_node: would excede maximum of %d\n",
-                                (int)MAX_NODES);
+                                (int)N_NODES);
                         }
 
                         else {
@@ -128,9 +128,9 @@ namespace neuro
                         printf("Edge %d -> %d already exists.", (int)fr, (int)to);
                     }
 
-                    else if (n_edges+1 == MAX_EDGES) {
+                    else if (n_edges+1 == N_EDGES) {
                         printf("Network::add_edge: would excede maximum of %d\n",
-                                (int)MAX_EDGES);
+                                (int)N_EDGES);
                     }
 
                     else {
@@ -235,20 +235,20 @@ namespace neuro
                 }
             }
 
-            etl::vector <Node *, MAX_NODES> sorted_node_vector;   
+            etl::vector <Node *, N_NODES> sorted_node_vector;   
 
-            Node nodes[MAX_NODES];
+            Node nodes[N_NODES];
             size_t n_nodes;
 
-            Edge edges[MAX_EDGES];
+            Edge edges[N_EDGES];
             size_t n_edges;
 
         private:
 
             void init_params();
 
-            etl::vector<uint32_t, MAX_INPUTS> inputs;
-            etl::vector<uint32_t, MAX_OUTPUTS> outputs;
+            etl::vector<uint32_t, N_INPUTS> inputs;
+            etl::vector<uint32_t, N_OUTPUTS> outputs;
 
             friend class Node;
             friend class Edge;
