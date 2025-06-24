@@ -27,28 +27,6 @@ namespace risp
 
             Params() = default;
 
-            Params(
-                    double _spike_value_factor, 
-                    double _min_potential,
-                    leak_mode_t _leak_mode,
-                    bool _run_time_inclusive,
-                    bool _threshold_inclusive,
-                    bool _fire_like_ravens,
-                    bool _discrete,
-                    uint32_t _noisy_seed,
-                    double _noisy_stddev)
-                : 
-                    spike_value_factor(_spike_value_factor),
-                    min_potential(_min_potential),
-                    leak_mode(_leak_mode),
-                    run_time_inclusive(_run_time_inclusive),
-                    threshold_inclusive(_threshold_inclusive),
-                    fire_like_ravens(_fire_like_ravens),
-                    discrete(_discrete),
-                    noisy_seed(_noisy_seed),
-                    noisy_stddev(_noisy_stddev) {}
-
-
             double spike_value_factor; 
             double min_potential;
             leak_mode_t leak_mode;
