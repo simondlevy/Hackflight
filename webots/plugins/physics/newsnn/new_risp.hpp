@@ -21,21 +21,6 @@ namespace risp
         LEAK_CONFIGURABLE
     } leak_mode_t;
 
-    class Params {
-
-        public:
-
-            double spike_value_factor; 
-            double min_potential;
-            leak_mode_t leak_mode;
-            bool run_time_inclusive;
-            bool threshold_inclusive;
-            bool fire_like_ravens;
-            bool discrete;
-            uint32_t noisy_seed;
-            double noisy_stddev;
-    };
-
     class Neuron {
 
         public:
@@ -102,15 +87,15 @@ namespace risp
             void init(neuro::Network *net)
             {
                 // XXX should come from compiler
-                params.spike_value_factor=1000.000000;
-                params.min_potential=-1000.000000;
-                params.leak_mode=LEAK_NONE;
-                params.run_time_inclusive=0;
-                params.threshold_inclusive=1;
-                params.fire_like_ravens=0;
-                params.discrete=1;
-                params.noisy_seed=0;
-                params.noisy_stddev=0.000000;
+                spike_value_factor=1000.000000;
+                min_potential=-1000.000000;
+                leak_mode=LEAK_NONE;
+                run_time_inclusive=0;
+                threshold_inclusive=1;
+                fire_like_ravens=0;
+                discrete=1;
+                noisy_seed=0;
+                noisy_stddev=0.000000;
 
                 n_neurons = 0;
                 n_synapses = 0;
@@ -119,7 +104,7 @@ namespace risp
                 neuron_fire_counter = 0;
                 neuron_accum_counter = 0;
 
-                rng.Seed(params.noisy_seed, "noisy_risp");
+                rng.Seed(noisy_seed, "noisy_risp");
 
                 net->make_sorted_node_vector();
 
@@ -171,15 +156,15 @@ namespace risp
                 double v = 0;
 
                 if (normalized) {
-                    v = params.discrete ?
-                        floor(s.value * params.spike_value_factor) :
-                        s.value * params.spike_value_factor;
+                    v = discrete ?
+                        floor(s.value * spike_value_factor) :
+                        s.value * spike_value_factor;
                 } else {
                     v = s.value;
                 }
 
-                if (params.noisy_stddev != 0) {
-                    v = rng.Random_Normal(v, params.noisy_stddev);
+                if (noisy_stddev != 0) {
+                    v = rng.Random_Normal(v, noisy_stddev);
                 }
 
                 auto n = get_neuron(inputs[s.id]);
@@ -197,7 +182,7 @@ namespace risp
                 }
 
                 int run_time =
-                    (params.run_time_inclusive) ?  duration : duration-1;
+                    (run_time_inclusive) ?  duration : duration-1;
 
                 overall_run_time += (run_time+1);
 
@@ -223,8 +208,8 @@ namespace risp
 
                 for (auto neuron : sorted_neuron_vector) {
                     if (neuron->leak) neuron->charge = 0;
-                    if (neuron->charge < params.min_potential) {
-                        neuron->charge = params.min_potential;
+                    if (neuron->charge < min_potential) {
+                        neuron->charge = min_potential;
                     }
                 }
             }
@@ -261,9 +246,18 @@ namespace risp
                 return counts;
             }
 
-                protected:
+        protected:
 
-            Params params;
+            double spike_value_factor; 
+            double min_potential;
+            leak_mode_t leak_mode;
+            bool run_time_inclusive;
+            bool threshold_inclusive;
+            bool fire_like_ravens;
+            bool discrete;
+            uint32_t noisy_seed;
+            double noisy_stddev;
+
 
             size_t n_neurons;
             Neuron neurons[MAX_NODES];
@@ -319,8 +313,8 @@ namespace risp
                     /* JSP: I'm not a big fan of this hack, 
                        but I'd rather do this than put an if
                        statement before every threshold check.  */
-                    if (!params.threshold_inclusive) {
-                        n->threshold = (params.discrete) ?
+                    if (!threshold_inclusive) {
+                        n->threshold = (discrete) ?
                             (n->threshold+1) :(n->threshold + 0.0000001);
                     }
 
@@ -443,8 +437,8 @@ namespace risp
                     if (n->leak) {
                         n->charge = 0;
                     }
-                    if (n->charge < params.min_potential) {
-                        n->charge = params.min_potential;
+                    if (n->charge < min_potential) {
+                        n->charge = min_potential;
                     }
                 }
 
@@ -480,9 +474,9 @@ namespace risp
 
                                 double weight = syn->weight;
 
-                                if (params.noisy_stddev != 0) {
+                                if (noisy_stddev != 0) {
                                     weight = rng.Random_Normal(
-                                            weight, params.noisy_stddev);
+                                            weight, noisy_stddev);
                                 }
 
                                 events[to_time].push_back(
@@ -490,7 +484,7 @@ namespace risp
 
                             }
 
-                            if (params.fire_like_ravens) {
+                            if (fire_like_ravens) {
                                 to_fire.push_back(n);
                             } else {
                                 neuron_fire_counter++;
@@ -568,8 +562,6 @@ namespace risp
                     }
 
                     risp::Network risp_net;
-
-                    risp::Params params;
             };
 
     }
