@@ -18,7 +18,7 @@ ROOT = $(HOME)/Desktop
 
 FRO = $(ROOT)/framework-open
 
-NET = $(ROOT)/embedded-neuromorphic/networks/risp/difference_plank.txt
+NET = $(ROOT)/framework/networks/difference_risp_plank.txt
 
 VIZ_DIR = $(ROOT)/framework/viz
 
