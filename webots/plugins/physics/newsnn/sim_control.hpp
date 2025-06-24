@@ -108,7 +108,6 @@ static float runSnn(float demand, float actual)
 
         // Load the network
         _proc.load_network(&_net);
-        EventTracker::track_all_neuron_events(&_proc, &_net);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
