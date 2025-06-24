@@ -1,4 +1,4 @@
-#include "new_framework.hpp"
+#include <framework.hpp>
 
 void neuro::Network::init_params()
 {

@@ -1,4 +1,4 @@
-#include "new_risp.hpp"
+#include <risp.hpp>
 
 void risp::Network::init_params()
 {
