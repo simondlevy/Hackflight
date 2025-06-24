@@ -108,7 +108,10 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        neuro::NetworkLoader::load(&_net, _proc);
+        //neuro::NetworkLoader::load(&_net, _proc);
+        _net.init();
+        _proc.load_network(&_net);
+        EventTracker::track_all_neuron_events(&_proc, &_net);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
