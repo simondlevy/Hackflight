@@ -36,56 +36,7 @@ namespace neuro
 
                 json jparams = j["Associated_Data"]["proc_params"];
 
-                risp::Params params = {};
-
-                params.min_potential = jparams["min_potential"];
-
-                params.discrete = jparams["discrete"];
-
-                if (jparams.contains("threshold_inclusive")) {
-                    params.threshold_inclusive = jparams["threshold_inclusive"];
-                }
-
-                if (jparams.contains("spike_value_factor")) {
-                    params.spike_value_factor = jparams["spike_value_factor"];
-                } 
-
-                else {
-                    params.spike_value_factor = 0; // max_weight;
-
-                } 
-
-                if (jparams.contains("run_time_inclusive")) {
-                    params.run_time_inclusive = jparams["run_time_inclusive"];
-                }
-
-                if (jparams.contains("fire_like_ravens")) {
-                    params.fire_like_ravens = jparams["fire_like_ravens"];
-                }
-
-                if (jparams.contains("noisy_seed")) {
-                    params.noisy_seed = jparams["noisy_seed"];
-                }
-
-                if (jparams.contains("leak_mode")) {
-                    const auto mode_string = jparams["leak_mode"];
-                    if (mode_string == "all") {
-                        params.leak_mode = risp::LEAK_ALL;
-                    }
-                    if (mode_string == "configurable") {
-                        params.leak_mode = risp::LEAK_CONFIGURABLE;
-                    }
-                }
-
-                if (jparams.contains("noisy_stddev")) {
-                    params.noisy_stddev = jparams["noisy_stddev"]; 
-                }
-
-                proc.init(params);
-
-                if (!proc.load_network(net)) {
-                    printf("loadnetwork() failed");
-                }
+                proc.load_network(net);
 
                 EventTracker::track_all_neuron_events(&proc, net);
             }

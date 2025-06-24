@@ -537,12 +537,7 @@ namespace risp
 
                     Processor() = default;
 
-                    void init(Params & _params) 
-                    {
-                        params = Params(_params);
-                    }
-
-                    bool load_network(neuro::Network* net) 
+                    void load_network(neuro::Network* net) 
                     {
                         // XXX should come from compiler
                         params.spike_value_factor=1000.000000;
@@ -556,8 +551,6 @@ namespace risp
                         params.noisy_stddev=0.000000;
 
                         risp_net.init(net, params);
-
-                        return true;
                     }
 
                     void apply_spike(const Spike& s, bool normalize)
