@@ -34,6 +34,8 @@ EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
 
 INCLUDE += -I$(EMB)/newsrc/
 
+FILES_TO_REMOVE += risp_params.cpp framework_params.cpp vector_sizes.h
+
 # -----------------------------------------------------------------------------
 
 all: libnewsnn.so
