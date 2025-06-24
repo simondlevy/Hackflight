@@ -38,9 +38,6 @@
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
-static const char * NETWORK_FILENAME =
-"/home/levys/Desktop/2025-diff-network/diff_network.txt";
-
 static const double SPIKE_TIME_MAX = 1000;
 
 static double cap(const double val)
@@ -111,7 +108,7 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        neuro::NetworkLoader::load(NETWORK_FILENAME, _net, _proc);
+        neuro::NetworkLoader::load(&_net, _proc);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
