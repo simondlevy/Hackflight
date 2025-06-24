@@ -20,7 +20,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(SRC)
 
-CXX_SOURCES = ../support.cpp
+CXX_SOURCES = ../support.cpp 
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(HOME)/Desktop
 
@@ -30,9 +30,15 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 # TeNNLab embedded neuromorphic stuff -----------------------------------------
 
-EMB = $(HOME)/Desktop/embedded-neuromorphic/levy/processor
+EMB = $(HOME)/Desktop/embedded-neuromorphic/
 
-INCLUDE += -I$(EMB)/src -I$(EMB)/src/utils
+EMBPROC = $(EMB)/levy/processor
+
+EMBSRC = $(EMBPROC)/newsrc
+
+CXX_SOURCES += framework.cpp risp.cpp
+
+INCLUDE += -I$(EMBSRC)
 
 # -----------------------------------------------------------------------------
 

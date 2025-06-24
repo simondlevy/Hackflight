@@ -32,14 +32,10 @@
 #include <posix-utils/socket.hpp>
 
 #include <framework.hpp>
-#include <framework_json.hpp>
 #include <risp.hpp>
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
-
-static const char * NETWORK_FILENAME =
-"/home/levys/Desktop/2025-diff-network/diff_network.txt";
 
 static const double SPIKE_TIME_MAX = 1000;
 
@@ -111,7 +107,7 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        neuro::NetworkLoader::load(NETWORK_FILENAME, _net, _proc);
+        _proc.load_network(&_net);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
