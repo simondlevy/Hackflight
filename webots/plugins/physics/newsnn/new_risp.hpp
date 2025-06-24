@@ -25,8 +25,6 @@ namespace risp
 
         public:
 
-            Params() = default;
-
             double spike_value_factor; 
             double min_potential;
             leak_mode_t leak_mode;
@@ -101,9 +99,18 @@ namespace risp
 
             Network() = default;
 
-            void init(neuro::Network *net, const Params &_params)
+            void init(neuro::Network *net)
             {
-                params = _params;
+                // XXX should come from compiler
+                params.spike_value_factor=1000.000000;
+                params.min_potential=-1000.000000;
+                params.leak_mode=LEAK_NONE;
+                params.run_time_inclusive=0;
+                params.threshold_inclusive=1;
+                params.fire_like_ravens=0;
+                params.discrete=1;
+                params.noisy_seed=0;
+                params.noisy_stddev=0.000000;
 
                 n_neurons = 0;
                 n_synapses = 0;
@@ -517,18 +524,7 @@ namespace risp
 
                     void load_network(neuro::Network* net) 
                     {
-                        // XXX should come from compiler
-                        params.spike_value_factor=1000.000000;
-                        params.min_potential=-1000.000000;
-                        params.leak_mode=LEAK_NONE;
-                        params.run_time_inclusive=0;
-                        params.threshold_inclusive=1;
-                        params.fire_like_ravens=0;
-                        params.discrete=1;
-                        params.noisy_seed=0;
-                        params.noisy_stddev=0.000000;
-
-                        risp_net.init(net, params);
+                        risp_net.init(net);
                     }
 
                     void apply_spike(const Spike& s, bool normalize)
