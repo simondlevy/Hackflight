@@ -37,19 +37,19 @@
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
-static const double SPIKE_TIME_MAX = 1000;
+static const float SPIKE_TIME_MAX = 1000;
 
-static double cap(const double val)
+static float cap(const float val)
 {
     return val > +1 ? +1 : val < -1 ? -1 : val;
 }
 
-static double get_spike_time(const double inp, const double max)
+static float get_spike_time(const float inp, const float max)
 {
     return round(max * (1 - inp) / 2);
 }
 
-static double value_to_spike_time(const double val)
+static float value_to_spike_time(const float val)
 {
     return get_spike_time(cap(val), SPIKE_TIME_MAX);
 }
@@ -85,8 +85,8 @@ static void apply_spike(
         Network & net,
         Processor *p,
         const int spike_id,
-        const double spike_time,
-        const double spike_val=1,
+        const float spike_time,
+        const float spike_val=1,
         const bool normalize=true) 
 {
     p->apply_spike(Spike(net.get_node(spike_id)->input_id,
@@ -126,24 +126,24 @@ static float runSnn(float demand, float actual)
     apply_spike(_net, &_proc, 2, 0);
 
     // Run the network
-    const double sim_time = 3 * SPIKE_TIME_MAX + 2;
+    const float sim_time = 3 * SPIKE_TIME_MAX + 2;
     _proc.run(sim_time);
 
     // Get the output node's firing time
-    const double out = _proc.get_output_fire_times()[0];
-    const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
+    const float out = _proc.get_output_fire_times()[0];
+    const float time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
     // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
+    const float diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
 
     // Periodically send the spike counts to the visualizer
     static uint32_t _vizcount;
-    const double I_SCALE = 0.05;
-    const double D_SCALE = 0.25;
-    const double O_BIAS = 1000;
-    const double O_SCALE = 0.025;
-    const double S_BIAS = 800;
-    const double S_SCALE = 0.125;
+    const float I_SCALE = 0.05;
+    const float D_SCALE = 0.25;
+    const float O_BIAS = 1000;
+    const float O_SCALE = 0.025;
+    const float S_BIAS = 800;
+    const float S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const auto tmp = _proc.get_neuron_counts();
         const std::vector<int> counts = {
