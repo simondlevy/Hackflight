@@ -237,7 +237,7 @@ namespace risp
                 return counts;
             }
 
-        protected:
+        private:
 
             double spike_value_factor; 
             double min_potential;

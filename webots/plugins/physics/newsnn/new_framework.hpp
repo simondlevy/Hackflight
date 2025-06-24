@@ -243,7 +243,7 @@ namespace neuro
             Edge edges[MAX_EDGES];
             size_t n_edges;
 
-        protected:
+        private:
 
             void init_params();
 
