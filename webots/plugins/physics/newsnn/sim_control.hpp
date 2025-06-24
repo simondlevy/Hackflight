@@ -107,7 +107,6 @@ static float runSnn(float demand, float actual)
     if (!_initialized) {
 
         // Load the network
-        _net.init();
         _proc.load_network(&_net);
         EventTracker::track_all_neuron_events(&_proc, &_net);
 
