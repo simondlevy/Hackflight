@@ -93,7 +93,7 @@ namespace neuro
                 n_edges = 0;
                 n_nodes = 0;
 
-                // XXX from compiler
+                // XXX should come from compiler
                 add_node(0, 1.000000);
                 add_node(1, 1.000000);
                 add_node(2, 1.000000);

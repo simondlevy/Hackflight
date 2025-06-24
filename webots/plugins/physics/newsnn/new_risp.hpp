@@ -544,7 +544,18 @@ namespace risp
 
                     bool load_network(neuro::Network* net) 
                     {
-                        risp_net.init( net, params);
+                        // XXX should come from compiler
+                        params.spike_value_factor=1000.000000;
+                        params.min_potential=-1000.000000;
+                        params.leak_mode=LEAK_NONE;
+                        params.run_time_inclusive=0;
+                        params.threshold_inclusive=1;
+                        params.fire_like_ravens=0;
+                        params.discrete=1;
+                        params.noisy_seed=0;
+                        params.noisy_stddev=0.000000;
+
+                        risp_net.init(net, params);
 
                         return true;
                     }
