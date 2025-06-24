@@ -3,16 +3,13 @@
 #include <Embedded_Template_Library.h>
 #include <etl/vector.h>
 
+#include "vector_sizes.h"
+
 namespace neuro
 {
     // Arbitrary array limits
     static const size_t N_INCOMING = 20; 
     static const size_t N_OUTGOING = 20; 
-
-    static const size_t N_NODES = 20;
-    static const size_t N_EDGES = 20;
-    static const size_t N_INPUTS = 20;
-    static const size_t N_OUTPUTS = 20;
 
     typedef etl::pair<int,int> Coords;
 
