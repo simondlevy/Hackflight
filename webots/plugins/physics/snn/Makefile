@@ -34,7 +34,7 @@ EMB = $(HOME)/Desktop/embedded-neuromorphic/
 
 EMBPROC = $(EMB)/levy/processor
 
-EMBSRC = $(EMBPROC)/newsrc
+EMBSRC = $(EMBPROC)/src
 
 CXX_SOURCES += framework.cpp risp.cpp
 
