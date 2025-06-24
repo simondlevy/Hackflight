@@ -93,31 +93,7 @@ namespace neuro
                 n_edges = 0;
                 n_nodes = 0;
 
-                // XXX should come from compiler
-                add_node(0, 1.000000);
-                add_node(1, 1.000000);
-                add_node(2, 1.000000);
-                add_node(3, 1.000000);
-                add_node(4, 1.000000);
-                add_node(5, 1000.000000);
-                add_node(6, 1.000000);
-                add_edge(0, 3, 1.000000, 1.000000);
-                add_edge(0, 4, -1.000000, 1.000000);
-                add_edge(1, 3, -1.000000, 1.000000);
-                add_edge(1, 4, 1.000000, 1.000000);
-                add_edge(2, 6, 1.000000, 1000.000000);
-                add_edge(3, 3, 1.000000, 1.000000);
-                add_edge(3, 5, -1.000000, 1.000000);
-                add_edge(4, 4, 1.000000, 1.000000);
-                add_edge(4, 5, 1.000000, 1.000000);
-                add_edge(5, 5, -1.000000, 1.000000);
-                add_edge(5, 6, -1.000000, 1.000000);
-                add_edge(6, 5, 1.000000, 1.000000);
-                add_edge(6, 6, 1.000000, 1.000000);
-                add_input(0);
-                add_input(1);
-                add_input(2);
-                add_output(5);
+                init_params();
             }
 
             Node* add_node(const uint32_t idx, const double threshold)
@@ -268,6 +244,8 @@ namespace neuro
             size_t n_edges;
 
         protected:
+
+            void init_params();
 
             etl::vector<uint32_t, MAX_INPUTS> inputs;
             etl::vector<uint32_t, MAX_OUTPUTS> outputs;
