@@ -86,11 +86,10 @@ static void apply_spike(
         Processor *p,
         const int spike_id,
         const float spike_time,
-        const float spike_val=1,
-        const bool normalize=true) 
+        const float spike_val=1)
 {
     p->apply_spike(Spike(net.get_node(spike_id)->input_id,
-                spike_time, spike_val), normalize);
+                spike_time, spike_val));
 
 }
 

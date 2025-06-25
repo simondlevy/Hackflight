@@ -32,9 +32,6 @@ INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
 
 FRO = $(HOME)/Desktop/tennlab-framework/src
 
-# NB: these muse be compiled using tennlab-framework/compile.py
-CXX_SOURCES += framework.cpp risp.cpp
-
 INCLUDE += -I$(FRO)
 
 # -----------------------------------------------------------------------------
