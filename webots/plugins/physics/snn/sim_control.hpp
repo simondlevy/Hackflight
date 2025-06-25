@@ -67,9 +67,7 @@ static float runSnn(float demand, float actual)
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
-#ifdef _VIZ
         _serverSocket.acceptClient();
-#endif
     }
 
     // Turn the demand and climb-rate into spikes
@@ -115,9 +113,7 @@ static float runSnn(float demand, float actual)
         };
 
         const string msg = FrameworkUtils::make_viz_message(_net, counts);
-#ifdef _VIZ
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
-#endif
         _vizcount = 0;
     }
 
