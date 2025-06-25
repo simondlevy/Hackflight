@@ -28,7 +28,7 @@ INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
 # TeNNLab framework stuff ------------------------------ ----------------------
 
-# CFLAGS += -D_VIZ
+CFLAGS += -D_VIZ
 
 FRO = $(HOME)/Desktop/framework-open
 
