@@ -14,15 +14,12 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-ROOT = $(HOME)/Desktop
+#FRO = $(HOME)/Desktop/framework-open
 
-FRO = $(ROOT)/framework-open
-
-NET = $(ROOT)/framework/networks/difference_risp_plank.txt
-
-VIZ_DIR = $(ROOT)/framework/viz
-
-VIZ_PORT = 8100
+#DDIR = $(HOME)/Desktop/2025-diff-network
+#NET = $(DDIR)/diff_net.txt
+#VIZ_DIR = $(HOME)/Desktop/framework/viz
+#VIZ_PORT = 8100
 
 # -----------------------------------------------------------------------------
 
@@ -55,6 +52,12 @@ runhaskell:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runsnn:
+	cp ../../plugins/physics/snn/libsnn.so \
+		../../plugins/physics/custom/libcustom.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
+runsnnviz:
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &

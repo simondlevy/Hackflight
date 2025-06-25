@@ -16,23 +16,29 @@
 
 SRC = ../../../../src
 
+ROOT = $(HOME)/Desktop
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I$(SRC)
 
-CXX_SOURCES = ../support.cpp 
+CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(HOME)/Desktop
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
-# Embedded Template Library --------------------------------------------------
+# TeNNLab framework stuff ------------------------------ ----------------------
 
-INCLUDE += -I $(HOME)/Documents/Arduino/libraries/etl-arduino/src
+# CFLAGS += -D_VIZ
 
-# TeNNLab embedded neuromorphic stuff -----------------------------------------
+FRO = $(HOME)/Desktop/framework-open
 
-FRO = $(HOME)/Desktop/tennlab-framework/src
+INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
 
-INCLUDE += -I$(FRO)
+CXX_SOURCES += $(FRO)/src/risp.cpp
+CXX_SOURCES += $(FRO)/src/risp_static.cpp
+CXX_SOURCES += $(FRO)/src/framework.cpp
+CXX_SOURCES += $(FRO)/src/processor_help.cpp
+CXX_SOURCES += $(FRO)/src/properties.cpp
 
 # -----------------------------------------------------------------------------
 

@@ -31,88 +31,45 @@
 
 #include <posix-utils/socket.hpp>
 
-#include <framework.hpp>
-#include <risp.hpp>
+#include "framework_utils.hpp"
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
-static const float SPIKE_TIME_MAX = 1000;
+static const char * NETWORK_FILENAME =
+"/home/levys/Desktop/framework/networks/difference_risp_plank.txt";
 
-static float cap(const float val)
+static const double SPIKE_TIME_MAX = 1000;
+
+static double cap(const double val)
 {
     return val > +1 ? +1 : val < -1 ? -1 : val;
 }
 
-static float get_spike_time(const float inp, const float max)
+static double value_to_spike_time(const double val)
 {
-    return round(max * (1 - inp) / 2);
-}
-
-static float value_to_spike_time(const float val)
-{
-    return get_spike_time(cap(val), SPIKE_TIME_MAX);
-}
-
-static std::string make_viz_message(
-        const Network & net,
-        const std::vector<int> counts)
-{
-    const size_t n = counts.size();
-
-    std::string msg = "{\"Event Counts\":[";
-
-    for (size_t i=0; i<n; ++i) {
-        char tmp[100] = {};
-        const int count = counts[i];
-        sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-        msg += tmp;
-    }
-
-    msg += ", \"Neuron Alias\":[";
-
-    for (size_t i=0; i<n; ++i) {
-        char tmp[100] = {};
-        sprintf(tmp, "%d%s", 
-                net.sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
-        msg += tmp;
-    }
-
-    return msg + "}\n"; 
-}
-
-static void apply_spike(
-        Network & net,
-        Processor * proc,
-        const int spike_id,
-        const float spike_time,
-        const float spike_val=1)
-{
-    proc->apply_spike(Spike(net.get_node(spike_id)->input_id,
-                spike_time, spike_val));
-
+    return FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
 }
 
 static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
 
-    static bool _initialized;
-    static Network  _net;
-    static risp::Processor _proc;
+    static Network * _net;
+    static Processor * _proc;
     static ServerSocket _serverSocket;
 
     // Initialize the first time around
-    if (!_initialized) {
+    if (!_net) {
 
         // Load the network
-        _proc.load_network(&_net);
+        _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
+#ifdef _VIZ
         _serverSocket.acceptClient();
-
-        _initialized = true;
+#endif
     }
 
     // Turn the demand and climb-rate into spikes
@@ -120,43 +77,47 @@ static float runSnn(float demand, float actual)
     const double spike_time_2 = value_to_spike_time(actual);
 
     // Apply the spikes to the network
-    apply_spike(_net, &_proc, 0, spike_time_1);
-    apply_spike(_net, &_proc, 1, spike_time_2);
-    apply_spike(_net, &_proc, 2, 0);
+    vector <Spike> spikes_array = {};
+    FrameworkUtils::apply_spike(_net, _proc, 0, spike_time_1, spikes_array);
+    FrameworkUtils::apply_spike(_net, _proc, 1, spike_time_2, spikes_array);
+    FrameworkUtils::apply_spike(_net, _proc, 2, 0, spikes_array);
 
     // Run the network
-    const float sim_time = 3 * SPIKE_TIME_MAX + 2;
-    _proc.run(sim_time);
+    const double sim_time = 3 * SPIKE_TIME_MAX + 2;
+    _proc->run(sim_time);
+    spikes_array.clear();
 
-    // Get the output node's firing time
-    const float out = _proc.get_output_fire_times()[0];
-    const float time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
+    // Get the output network's firing time
+    const double out = _proc->output_vectors()[0][0];
+    const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
 
     // Convert the firing time to a difference in [-2,+2]
-    const float diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
+    const double diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
 
     // Periodically send the spike counts to the visualizer
     static uint32_t _vizcount;
-    const float I_SCALE = 0.05;
-    const float D_SCALE = 0.25;
-    const float O_BIAS = 1000;
-    const float O_SCALE = 0.025;
-    const float S_BIAS = 800;
-    const float S_SCALE = 0.125;
+    const double I_SCALE = 0.05;
+    const double D_SCALE = 0.25;
+    const double O_BIAS = 1000;
+    const double O_SCALE = 0.025;
+    const double S_BIAS = 800;
+    const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        const auto tmp = _proc.get_neuron_counts();
-        const std::vector<int> counts = {
-            (int)(spike_time_1 * I_SCALE),
-            (int)(spike_time_2 * I_SCALE),
-            1,
-            (int)(tmp[3] * D_SCALE),
-            (int)(tmp[4] * D_SCALE),
-            (int)((out - O_BIAS) * O_SCALE),
-            (int)((tmp[6] - S_BIAS) * S_SCALE)
+        const vector<int> tmp = _proc->neuron_counts(0);
+        const vector<int> counts = {
+                (int)(spike_time_1 * I_SCALE),
+                (int)(spike_time_2 * I_SCALE),
+                1,
+                (int)(tmp[3] * D_SCALE),
+                (int)(tmp[4] * D_SCALE),
+                (int)((out - O_BIAS) * O_SCALE),
+                (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
-        const std::string msg = make_viz_message(_net, counts);
+        const string msg = FrameworkUtils::make_viz_message(_net, counts);
+#ifdef _VIZ
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
+#endif
         _vizcount = 0;
     }
 
