@@ -83,12 +83,12 @@ static std::string make_viz_message(
 
 static void apply_spike(
         Network & net,
-        Processor *p,
+        Processor * proc,
         const int spike_id,
         const float spike_time,
         const float spike_val=1)
 {
-    p->apply_spike(Spike(net.get_node(spike_id)->input_id,
+    proc->apply_spike(Spike(net.get_node(spike_id)->input_id,
                 spike_time, spike_val));
 
 }
