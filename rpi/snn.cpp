@@ -33,7 +33,7 @@
 #include <msp/parser.hpp>
 #include <msp/messages.h>
 
-#include <tennlab_utils.hpp>
+#include <tennlab_framework.hpp>
 
 static const char * NETWORK_FILENAME =
 "/home/levys/tennlab-networks/difference_risp_plank.txt";
@@ -46,8 +46,8 @@ static const uint16_t SPIKE_PORT = 3;
 static int serialfd;
 
 // TeNNLab framework
-static Network * net;
-static Processor * proc;
+static const double MAX_SPIKE_TIME = 1000;
+static Framework framework(MAX_SPIKE_TIME);
 
 static void * logging_fun(void * arg)
 {
@@ -108,7 +108,7 @@ int main(int argc, char ** argv)
     }
 
     // Load the network
-    net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
+    framework.load(NETWORK_FILENAME);
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
