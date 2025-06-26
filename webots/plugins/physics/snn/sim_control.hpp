@@ -43,11 +43,6 @@ static const double MAX_SPIKE_TIME = 1000;
 
 static Framework framework(MAX_SPIKE_TIME);
 
-static double value_to_spike_time(const double value)
-{
-    return framework.value_to_spike_time(value);
-}
-
 static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
@@ -70,8 +65,8 @@ static float runSnn(float demand, float actual)
     }
 
     // Turn the demand and climb-rate into spikes
-    const double spike_time_1 = value_to_spike_time(demand);
-    const double spike_time_2 = value_to_spike_time(actual);
+    const double spike_time_1 = framework.value_to_spike_time(demand);
+    const double spike_time_2 = framework.value_to_spike_time(actual);
 
     // Apply the spikes to the network
     framework.apply_spike(0, spike_time_1);
