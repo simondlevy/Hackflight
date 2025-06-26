@@ -125,7 +125,6 @@ class FrameworkUtils {
                 Processor *p,
                 const int spike_id,
                 const double spike_time,
-                vector<Spike> & spikes_array,
                 const double spike_val=1,
                 const bool normalize=true) 
         {
@@ -133,8 +132,6 @@ class FrameworkUtils {
 
                 p->apply_spike(Spike(net->get_node(spike_id)->input_id,
                             spike_time, spike_val), normalize);
-
-                spikes_array.push_back(Spike(spike_id, spike_time, spike_val));
 
             } catch (const SRE &e) {
                 printf(">>>>>>>> %s\n", e.what());
