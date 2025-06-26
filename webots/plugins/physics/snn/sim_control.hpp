@@ -45,7 +45,7 @@ static Framework framework(MAX_SPIKE_TIME);
 
 static double value_to_spike_time(const double value)
 {
-    return Framework::value_to_spike_time(value, MAX_SPIKE_TIME);
+    return framework.value_to_spike_time(value);
 }
 
 static float runSnn(float demand, float actual)

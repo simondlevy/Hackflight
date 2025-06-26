@@ -163,12 +163,12 @@ class Framework {
             return msg + "}\n"; 
         }
 
-        //////////////////////////////////////////////////////////////////////
-
-        static double value_to_spike_time(const double val, const double max)
+        double value_to_spike_time(const double val)
         {
-            return Framework::get_spike_time(cap(val), max);
+            return Framework::get_spike_time(cap(val), _max_spike_time);
         }
+
+        //////////////////////////////////////////////////////////////////////
 
         static Network * load(const char * network_filename, Processor ** proc)
         {
