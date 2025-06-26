@@ -14,23 +14,45 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
+FRO = $(HOME)/framework-open
+FROINC = -I$(FRO)/include -I$(FRO)/include/utils
+FROSRC = $(FRO)/src
+
+CXX_SOURCES += $(FRO)/src/risp_static.cpp
+CXX_SOURCES += $(FRO)/src/framework.cpp
+CXX_SOURCES += $(FRO)/src/processor_help.cpp
+CXX_SOURCES += $(FRO)/src/properties.cpp
+
 ROOT = $(HOME)
-
-EDIR = $(ROOT)/embedded-neuromorphic/levy/encoder-decoder
-
-FDIR = $(ROOT)/framework
-
-PDIR =  $(FDIR)/processors/risp
 
 INCLUDE = -I$(ROOT) -I../src
 
-FINCLUDE = -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
+standard: standard.o 
+	g++ -O3 -o btserver standard.o 
 
-standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
+standard.o: standard.cpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -O3 -Wall -c standard.cpp
 
-snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
+snn: snn.o risp.o risp_static.o framework.o processor_help.o properties.o
+	g++ -O3 -o btserver snn.o risp.o risp_static.o framework.o processor_help.o properties.o
+
+snn.o: snn.cpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -O3 -Wall -c snn.cpp
+
+risp.o: 
+	g++ -O3 -Wall $(FROINC) $(FROSRC)/risp.cpp
+
+risp_static.o: 
+	g++ -O3 -Wall $(FROINC) $(FROSRC)/risp_static.cpp
+
+framework.o: 
+	g++ -O3 -Wall $(FROINC) $(FROSRC)/framework.cpp
+
+processor_help.o: 
+	g++ -O3 -Wall $(FROINC) $(FROSRC)/processor_help.cpp
+
+properties.o: 
+	g++ -O3 -Wall $(FROINC) $(FROSRC)/properties.cpp
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi
