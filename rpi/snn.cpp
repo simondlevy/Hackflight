@@ -120,7 +120,8 @@ int main(int argc, char ** argv)
 
             const auto payloadSize = parser.getPayload(payload);
 
-            write(serialfd, payload, payloadSize);
+            const auto ignore = write(serialfd, payload, payloadSize);
+            (void)ignore;
         }
 
 
