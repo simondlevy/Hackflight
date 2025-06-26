@@ -41,14 +41,9 @@ static const char * NETWORK_FILENAME =
 
 static const double SPIKE_TIME_MAX = 1000;
 
-static double cap(const double val)
+static double value_to_spike_time(const double value)
 {
-    return val > +1 ? +1 : val < -1 ? -1 : val;
-}
-
-static double value_to_spike_time(const double val)
-{
-    return FrameworkUtils::get_spike_time(cap(val), SPIKE_TIME_MAX);
+    return FrameworkUtils::value_to_spike_time(value, SPIKE_TIME_MAX);
 }
 
 static float runSnn(float demand, float actual)

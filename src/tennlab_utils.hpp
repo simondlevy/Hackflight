@@ -87,7 +87,17 @@ class FrameworkUtils {
             return net;
         }
 
+        static double cap(const double val)
+        {
+            return val > +1 ? +1 : val < -1 ? -1 : val;
+        }
+
     public:
+
+        static double value_to_spike_time(const double val, const double max)
+        {
+            return FrameworkUtils::get_spike_time(cap(val), max);
+        }
 
         static Network * load(const char * network_filename, Processor ** proc)
         {
