@@ -51,6 +51,7 @@
       "diff_pair_dimensions": [],
       "drc_exclusions": [],
       "meta": {
+        "filename": "board_design_settings.json",
         "version": 2
       },
       "rule_severities": {
@@ -97,15 +98,15 @@
         "allow_blind_buried_vias": false,
         "allow_microvias": false,
         "max_error": 0.005,
-        "min_clearance": 0.0,
-        "min_copper_edge_clearance": 0.01,
+        "min_clearance": 0.15239999999999998,
+        "min_copper_edge_clearance": 0.0,
         "min_hole_clearance": 0.25,
         "min_hole_to_hole": 0.25,
         "min_microvia_diameter": 0.19999999999999998,
         "min_microvia_drill": 0.09999999999999999,
         "min_silk_clearance": 0.0,
         "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.19999999999999998,
+        "min_track_width": 0.0,
         "min_via_annular_width": 0.049999999999999996,
         "min_via_diameter": 0.39999999999999997,
         "use_height_for_length_calcs": true
@@ -317,7 +318,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "unannotated": "error",
@@ -331,14 +332,14 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "teensypi.kicad_pro",
+    "filename": "teensypi_v91.kicad_pro",
     "version": 1
   },
   "net_settings": {
     "classes": [
       {
         "bus_width": 12.0,
-        "clearance": 0.2,
+        "clearance": 0.1524,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -365,7 +366,7 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "teensypi.step",
+      "step": "",
       "vrml": ""
     },
     "page_layout_descr_file": ""
@@ -392,6 +393,15 @@
       "version": 1
     },
     "net_format_name": "",
+    "ngspice": {
+      "fix_include_paths": true,
+      "fix_passive_vals": false,
+      "meta": {
+        "version": 0
+      },
+      "model_mode": 0,
+      "workbook_filename": ""
+    },
     "page_layout_descr_file": "empty.kicad_wks",
     "plot_directory": "",
     "spice_adjust_passive_values": false,
@@ -401,8 +411,8 @@
   },
   "sheets": [
     [
-      "712d6a7d-2b62-464f-b745-fd2a6b0187f6",
-      "teensypi_0"
+      "afb8e687-4a13-41a1-b8c0-89a749e897fe",
+      "teensypi v39_0"
     ]
   ],
   "text_variables": {}
