@@ -47,7 +47,7 @@ static int serialfd;
 
 // TeNNLab framework
 static Network net;
-//static risp::Processor proc;
+static Processor * proc;
 
 static void * logging_fun(void * arg)
 {
@@ -108,7 +108,7 @@ int main(int argc, char ** argv)
     }
 
     (void)net;
-    //(void)proc;
+    (void)proc;
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
