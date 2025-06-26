@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ROOT = $(HOME)/Desktop
+# ROOT = $(HOME)/Desktop
+ROOT = $(HOME)
 
 FRO = $(ROOT)/framework-open
 FROINC = -I$(FRO)/include -I$(FRO)/include/utils
