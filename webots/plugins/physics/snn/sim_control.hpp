@@ -75,8 +75,7 @@ static float runSnn(float demand, float actual)
 
 
     // Run the network
-    const double sim_time = 3 * MAX_SPIKE_TIME + 2;
-    framework.run(sim_time);
+    framework.run(3 * MAX_SPIKE_TIME + 2);
 
     // Get the output network's firing time
     const double out = framework.get_output_vector()[0];
