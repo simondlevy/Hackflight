@@ -46,7 +46,7 @@ static const uint16_t SPIKE_PORT = 3;
 static int serialfd;
 
 // TeNNLab framework
-static Network net;
+static Network * net;
 static Processor * proc;
 
 static void * logging_fun(void * arg)
@@ -107,8 +107,8 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    (void)net;
-    (void)proc;
+    // Load the network
+    net = FrameworkUtils::load(NETWORK_FILENAME, &proc);
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
