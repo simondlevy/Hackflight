@@ -37,7 +37,7 @@ static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
 static const char * NETWORK_FILENAME =
-"/home/levys/Desktop/framework/networks/difference_risp_plank.txt";
+"/home/levys/Desktop/tennlab-networks/difference_risp_plank.txt";
 
 static const double SPIKE_TIME_MAX = 1000;
 
