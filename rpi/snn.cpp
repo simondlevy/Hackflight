@@ -35,12 +35,19 @@
 
 #include <tennlab_utils.hpp>
 
+static const char * NETWORK_FILENAME =
+"/home/levys/tennlab-networks/difference_risp_plank.txt";
+
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
 static const uint16_t SPIKE_PORT = 3;
 
 // Serial connection to FC
 static int serialfd;
+
+// TeNNLab framework
+static Network net;
+//static risp::Processor proc;
 
 static void * logging_fun(void * arg)
 {
@@ -99,6 +106,9 @@ int main(int argc, char ** argv)
     if (serialfd < 0) {
         return 1;
     }
+
+    (void)net;
+    //(void)proc;
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);

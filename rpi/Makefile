@@ -21,11 +21,6 @@ FRO = $(ROOT)/framework-open
 FROINC = -I$(FRO)/include -I$(FRO)/include/utils
 FROSRC = $(FRO)/src
 
-CXX_SOURCES += $(FRO)/src/risp_static.cpp
-CXX_SOURCES += $(FRO)/src/framework.cpp
-CXX_SOURCES += $(FRO)/src/processor_help.cpp
-CXX_SOURCES += $(FRO)/src/properties.cpp
-
 INCLUDE = -I$(ROOT) -I../src
 
 standard: standard.o 
@@ -38,7 +33,7 @@ snn: snn.o risp.o risp_static.o framework.o processor_help.o properties.o
 	g++ -O3 -o btserver snn.o risp.o risp_static.o framework.o processor_help.o properties.o
 
 snn.o: snn.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall -c snn.cpp
+	g++ -Wall $(INCLUDE) $(FROINC) -O3 -Wall -c snn.cpp
 
 risp.o: 
 	g++ -c -O3 -Wall $(FROINC) $(FROSRC)/risp.cpp
