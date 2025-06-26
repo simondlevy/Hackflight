@@ -31,7 +31,7 @@
 
 #include <posix-utils/socket.hpp>
 
-#include "framework_utils.hpp"
+#include <tennlab_utils.hpp>
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
