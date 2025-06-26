@@ -179,15 +179,8 @@ class Framework {
             return msg + "}\n"; 
         }
 
-        double value_to_spike_time(const double val)
+        double value_to_spike_time(const double value)
         {
-            return Framework::get_spike_time(cap(val), _max_spike_time);
-        }
-
-        //////////////////////////////////////////////////////////////////////
-
-        static double get_spike_time(const double inp, const double max)
-        {
-            return round(max * (1 - inp) / 2);
+            return round(_max_spike_time * (1 - value) / 2);
         }
 };
