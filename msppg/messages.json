@@ -16,6 +16,13 @@
    {"dpsi":   "float"}
   ],
 
+  "STATE_DZ": 
+  [{"ID": 100},
+   {"comment": "Minimal proof-of-concept for SNN"},
+   {"dz":     "float"},
+   {"phi":    "float"}
+  ],
+
   "SET_ARMING": 
   [{"ID": 200},
    {"comment": "Dis/arm"},

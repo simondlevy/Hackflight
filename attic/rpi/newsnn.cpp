@@ -3,9 +3,9 @@
 
    Additional installs required:
 
-     Clone https://github.com/simondlevy/posix-utils to ~/Desktop
+   Clone https://github.com/simondlevy/posix-utils to ~/Desktop
 
-     sudo apt install libbluetooth-dev
+   sudo apt install libbluetooth-dev
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -33,17 +33,27 @@
 #include <msp/parser.hpp>
 #include <msp/messages.h>
 
+#include <snn_util.hpp>
+
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
+static const uint16_t STATE_PORT = 2;
 static const uint16_t SPIKE_PORT = 3;
 
+static const float CLIMBRATE_SCALE  = 500;
+static const float CLIMBRATE_OFFSET = 26000;
+
 // Serial connection to FC
-static int serialfd;
+static int _serialfd;
+
+// Spiking neural net
+static SNN * _snn;
 
 static void * logging_fun(void * arg)
 {
     // true = Bluetooth
-    //auto spikeServer = Server(SPIKE_PORT, "spike", true);
+    auto stateServer = Server(STATE_PORT, "state", true);
+    auto spikeServer = Server(SPIKE_PORT, "spike", true);
 
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
@@ -53,32 +63,35 @@ static void * logging_fun(void * arg)
 
         char byte = 0;
 
-        if (read(serialfd, &byte, 1) == 1) {
+        if (read(_serialfd, &byte, 1) == 1) {
 
             switch (parser.parse(byte)) {
 
-                case MSP_STATE_DZ:
+                case MSP_STATE:
 
                     {
-                        const float dz = parser.getFloat(0);
-                        (void)dz;
+                        const float state[12] = { 
+                            parser.getFloat(0), parser.getFloat(1), parser.getFloat(2),
+                            parser.getFloat(3), parser.getFloat(4), parser.getFloat(5),
+                            parser.getFloat(6), parser.getFloat(7), parser.getFloat(8),
+                            parser.getFloat(9), parser.getFloat(10), parser.getFloat(11)
+                        };
 
-                        /*
+                        if (stateServer.isConnected()) {
+
+                            stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
+                        }
+
                         if (spikeServer.isConnected()) {
 
-                            // For now, we use the Raspberry Pi to encode just
-                            // the spikes corresponding to the climb rate, then
-                            // send them to the client
-                            const float obs[2] = {0, parser.getFloat(5)};
-                            encoder_helper.get_spikes(obs);
-                            uint8_t counts[1] = {};
-                            for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                                if (encoder_helper.spikes[k].id == 1) {
-                                    counts[0]++;
-                                }
-                            }
-                            spikeServer.sendData(counts, 1);
-                        }*/
+                            vector<double> observations = { 0, parser.getFloat(5)};
+
+                            vector <int> counts = {};
+
+                            _snn->step(observations, counts);
+
+                            spikeServer.sendData((const uint8_t *)counts.data(), counts.size()*sizeof(int));
+                        }
                     }
 
                     break;
@@ -91,10 +104,17 @@ static void * logging_fun(void * arg)
 
 int main(int argc, char ** argv)
 {
-    // Open a serial connection to the microcontroller
-    serialfd = Serial::open_port("/dev/ttyS0", B115200);
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s NETWORK\n", argv[0]);
+        exit(1);
+    }
 
-    if (serialfd < 0) {
+    _snn = new SNN(argv[1], "risp");
+
+    // Open a serial connection to the microcontroller
+    _serialfd = Serial::open_port("/dev/ttyS0", B115200);
+
+    if (_serialfd < 0) {
         return 1;
     }
 
@@ -120,7 +140,7 @@ int main(int argc, char ** argv)
 
             const auto payloadSize = parser.getPayload(payload);
 
-            write(serialfd, payload, payloadSize);
+            write(_serialfd, payload, payloadSize);
         }
 
 

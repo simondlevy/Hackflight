@@ -22,8 +22,6 @@ FDIR = $(ROOT)/framework
 
 PDIR =  $(FDIR)/processors/risp
 
-NETWORK = difference_risp_train
-
 INCLUDE = -I$(ROOT) -I../src
 
 FINCLUDE = -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/include -I$(PDIR)/include
@@ -31,18 +29,8 @@ FINCLUDE = -I$(FDIR)/include -I$(FDIR)/include/utils/levy -I$(FDIR)/cpp-apps/inc
 standard: standard.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall standard.cpp -o btserver
 
-snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h $(NETWORK).hpp
+snn: snn.cpp $(ROOT)/posix-utils/*.hpp ../src/msp/*.hpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -I$(EDIR)/src -I../src -O3 -Wall snn.cpp -o btserver
-
-newsnn: newsnn.o 
-	g++ -Wall -o btserver -O3 newsnn.o $(FDIR)/obj/io_stream.o \
-		$(FDIR)/lib/libframework.a $(PDIR)/lib/libproc1.a $(PDIR)/lib/libproc2.a
-
-newsnn.o: newsnn.cpp
-	g++ -Wall $(INCLUDE) $(FINCLUDE) -c -O3 newsnn.cpp
-
-$(NETWORK).hpp: 
-	$(EDIR)/compiler.py $(FDIR)/networks/$(NETWORK).txt
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi

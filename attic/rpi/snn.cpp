@@ -27,6 +27,9 @@
 #include <pthread.h>
 #include <time.h>
 
+#include "difference_risp_train.hpp"
+static EncoderHelper encoder_helper;
+
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
 
@@ -35,6 +38,7 @@
 
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
+static const uint16_t STATE_PORT = 2;
 static const uint16_t SPIKE_PORT = 3;
 
 // Serial connection to FC
@@ -43,7 +47,8 @@ static int serialfd;
 static void * logging_fun(void * arg)
 {
     // true = Bluetooth
-    //auto spikeServer = Server(SPIKE_PORT, "spike", true);
+    auto stateServer = Server(STATE_PORT, "state", true);
+    auto spikeServer = Server(SPIKE_PORT, "spike", true);
 
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
@@ -57,13 +62,29 @@ static void * logging_fun(void * arg)
 
             switch (parser.parse(byte)) {
 
-                case MSP_STATE_DZ:
+                case MSP_STATE:
 
                     {
-                        const float dz = parser.getFloat(0);
-                        (void)dz;
+                        const float state[12] = { 
+                            parser.getFloat(0),
+                            parser.getFloat(1),
+                            parser.getFloat(2),
+                            parser.getFloat(3),
+                            parser.getFloat(4),
+                            parser.getFloat(5),
+                            parser.getFloat(6),
+                            parser.getFloat(7),
+                            parser.getFloat(8),
+                            parser.getFloat(9),
+                            parser.getFloat(10),
+                            parser.getFloat(11)
+                        };
 
-                        /*
+                        if (stateServer.isConnected()) {
+
+                            stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
+                        }
+
                         if (spikeServer.isConnected()) {
 
                             // For now, we use the Raspberry Pi to encode just
@@ -78,7 +99,7 @@ static void * logging_fun(void * arg)
                                 }
                             }
                             spikeServer.sendData(counts, 1);
-                        }*/
+                        }
                     }
 
                     break;
@@ -97,6 +118,8 @@ int main(int argc, char ** argv)
     if (serialfd < 0) {
         return 1;
     }
+
+    encoder_helper.init();
 
     pthread_t logging_thread = {};
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
