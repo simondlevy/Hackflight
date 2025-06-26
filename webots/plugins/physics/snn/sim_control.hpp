@@ -39,30 +39,34 @@ static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 static const char * NETWORK_FILENAME =
 "/home/levys/Desktop/tennlab-networks/difference_risp_plank.txt";
 
-static const double SPIKE_TIME_MAX = 1000;
+static const double MAX_SPIKE_TIME = 1000;
+
+static Framework framework(MAX_SPIKE_TIME);
 
 static double value_to_spike_time(const double value)
 {
-    return FrameworkUtils::value_to_spike_time(value, SPIKE_TIME_MAX);
+    return Framework::value_to_spike_time(value, MAX_SPIKE_TIME);
 }
 
 static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
 
-    static Network * _net;
-    static Processor * _proc;
     static ServerSocket _serverSocket;
 
+    static bool _initialized;
+
     // Initialize the first time around
-    if (!_net) {
+    if (!_initialized) {
 
         // Load the network
-        _net = FrameworkUtils::load(NETWORK_FILENAME, &_proc);
+        framework.load(NETWORK_FILENAME);
 
         // Listen for and accept connections from vizualization client
         _serverSocket.open(VIZ_PORT);
         _serverSocket.acceptClient();
+
+        _initialized = true;
     }
 
     // Turn the demand and climb-rate into spikes
@@ -70,20 +74,21 @@ static float runSnn(float demand, float actual)
     const double spike_time_2 = value_to_spike_time(actual);
 
     // Apply the spikes to the network
-    FrameworkUtils::apply_spike(_net, _proc, 0, spike_time_1);
-    FrameworkUtils::apply_spike(_net, _proc, 1, spike_time_2);
-    FrameworkUtils::apply_spike(_net, _proc, 2, 0);
+    framework.apply_spike(0, spike_time_1);
+    framework.apply_spike(1, spike_time_2);
+    framework.apply_spike(2, 0);
+
 
     // Run the network
-    const double sim_time = 3 * SPIKE_TIME_MAX + 2;
-    _proc->run(sim_time);
+    const double sim_time = 3 * MAX_SPIKE_TIME + 2;
+    framework.run(sim_time);
 
     // Get the output network's firing time
-    const double out = _proc->output_vectors()[0][0];
-    const double time = out == SPIKE_TIME_MAX + 1 ? -2 : out;
+    const double out = framework.get_output_vector()[0];
+    const double time = out == MAX_SPIKE_TIME + 1 ? -2 : out;
 
     // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-SPIKE_TIME_MAX)*2 / SPIKE_TIME_MAX - 2;
+    const double diff = (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
 
     // Periodically send the spike counts to the visualizer
     static uint32_t _vizcount;
@@ -94,7 +99,7 @@ static float runSnn(float demand, float actual)
     const double S_BIAS = 800;
     const double S_SCALE = 0.125;
     if (_vizcount++ == VIZ_SEND_PERIOD) {
-        const vector<int> tmp = _proc->neuron_counts(0);
+        const vector<int> tmp = framework.get_neuron_counts();
         const vector<int> counts = {
                 (int)(spike_time_1 * I_SCALE),
                 (int)(spike_time_2 * I_SCALE),
@@ -105,7 +110,7 @@ static float runSnn(float demand, float actual)
                 (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
-        const string msg = FrameworkUtils::make_viz_message(_net, counts);
+        const string msg = framework.make_viz_message(counts);
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
         _vizcount = 0;
     }

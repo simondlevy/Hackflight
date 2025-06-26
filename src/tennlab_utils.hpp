@@ -25,7 +25,7 @@ using namespace std;
 using namespace neuro;
 using nlohmann::json;
 
-class FrameworkUtils {
+class Framework {
 
     private:
 
@@ -92,11 +92,82 @@ class FrameworkUtils {
             return val > +1 ? +1 : val < -1 ? -1 : val;
         }
 
+        double _max_spike_time;
+        Network * _net;
+        Processor * _proc;
+
     public:
+
+        Framework(const double max_spike_time)
+            : _max_spike_time(max_spike_time)
+        {
+        }
+
+        void load(const char * network_filename)
+        {
+            _net = Framework::load(network_filename, &_proc);
+        }
+
+
+        void apply_spike( const int spike_id, const double spike_time,
+                const double spike_val=1, const bool normalize=true) 
+        {
+            try {
+
+                _proc->apply_spike(Spike(_net->get_node(spike_id)->input_id,
+                            spike_time, spike_val), normalize);
+
+            } catch (const SRE &e) {
+                printf(">>>>>>>> %s\n", e.what());
+                exit(0);
+            }   
+        }
+
+        void run(const double time)
+        {
+            _proc->run(time);
+        }
+
+        vector<double> get_output_vector()
+        {
+            return _proc->output_vectors()[0];
+        }
+
+        vector<int> get_neuron_counts()
+        {
+            return _proc->neuron_counts(0);
+        }
+
+        string make_viz_message(const vector<int> counts)
+        {
+            const size_t n = counts.size();
+
+            string msg = "{\"Event Counts\":[";
+
+            for (size_t i=0; i<n; ++i) {
+                char tmp[100] = {};
+                const int count = counts[i];
+                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
+                msg += tmp;
+            }
+
+            msg += ", \"Neuron Alias\":[";
+
+            for (size_t i=0; i<n; ++i) {
+                char tmp[100] = {};
+                sprintf(tmp, "%d%s", 
+                        _net->sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
+                msg += tmp;
+            }
+
+            return msg + "}\n"; 
+        }
+
+        //////////////////////////////////////////////////////////////////////
 
         static double value_to_spike_time(const double val, const double max)
         {
-            return FrameworkUtils::get_spike_time(cap(val), max);
+            return Framework::get_spike_time(cap(val), max);
         }
 
         static Network * load(const char * network_filename, Processor ** proc)
@@ -149,30 +220,5 @@ class FrameworkUtils {
             }   
         }
 
-        static string make_viz_message(
-                const Network * net,
-                const vector<int> counts)
-        {
-            const size_t n = counts.size();
 
-            string msg = "{\"Event Counts\":[";
-
-            for (size_t i=0; i<n; ++i) {
-                char tmp[100] = {};
-                const int count = counts[i];
-                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-                msg += tmp;
-            }
-
-            msg += ", \"Neuron Alias\":[";
-
-            for (size_t i=0; i<n; ++i) {
-                char tmp[100] = {};
-                sprintf(tmp, "%d%s", 
-                        net->sorted_node_vector[i]->id, i==n-1 ? "]" : ", ");
-                msg += tmp;
-            }
-
-            return msg + "}\n"; 
-        }
 };
