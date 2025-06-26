@@ -105,9 +105,25 @@ class Framework {
 
         void load(const char * network_filename)
         {
-            _net = Framework::load(network_filename, &_proc);
-        }
+            json network_json = {};
 
+            if (!read_json(network_filename, network_json)) {
+
+                printf("usage: ML network_json. Bad json\n");
+
+            } else {
+
+                try {
+
+                    _net = loadnetwork(&_proc, network_json);
+
+                } catch (const SRE &e) {
+                    printf("%s\n",e.what());
+                } catch (...) {
+                    printf("Unknown error when making processor\n");
+                }
+            }
+        }
 
         void apply_spike( const int spike_id, const double spike_time,
                 const double spike_val=1, const bool normalize=true) 
@@ -170,55 +186,8 @@ class Framework {
 
         //////////////////////////////////////////////////////////////////////
 
-        static Network * load(const char * network_filename, Processor ** proc)
-        {
-            Network * net = nullptr;
-
-            json network_json = {};
-
-            if (!read_json(network_filename, network_json)) {
-
-                printf("usage: ML network_json. Bad json\n");
-
-            } else {
-
-                try {
-
-                    net = loadnetwork(proc, network_json);
-
-                } catch (const SRE &e) {
-                    printf("%s\n",e.what());
-                } catch (...) {
-                    printf("Unknown error when making processor\n");
-                }
-            }
-
-            return net;
-        }
-
         static double get_spike_time(const double inp, const double max)
         {
             return round(max * (1 - inp) / 2);
         }
-
-        static void apply_spike(
-                Network * net,
-                Processor *p,
-                const int spike_id,
-                const double spike_time,
-                const double spike_val=1,
-                const bool normalize=true) 
-        {
-            try {
-
-                p->apply_spike(Spike(net->get_node(spike_id)->input_id,
-                            spike_time, spike_val), normalize);
-
-            } catch (const SRE &e) {
-                printf(">>>>>>>> %s\n", e.what());
-                exit(0);
-            }   
-        }
-
-
 };
