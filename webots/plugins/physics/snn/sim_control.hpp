@@ -27,11 +27,11 @@
 #include <control/pids/yaw_rate.hpp>
 #include <datatypes.h>
 #include <num.hpp>
+#include <tennlab_framework.hpp>
 #include <vehicles/diyquad.hpp>
 
 #include <posix-utils/socket.hpp>
 
-#include <tennlab_utils.hpp>
 
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
