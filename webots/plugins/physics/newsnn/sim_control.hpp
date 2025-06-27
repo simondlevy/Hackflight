@@ -44,7 +44,7 @@ static Framework framework(MAX_SPIKE_TIME);
 
 static float runDifferenceSnn(const float demand, const float actual)
 {
-    static constexpr float KP = 25;
+    //static constexpr float KP = 25;
 
     static ServerSocket _serverSocket;
 
@@ -84,7 +84,9 @@ static float runDifferenceSnn(const float demand, const float actual)
 
     const double cheat = demand - actual;
 
-    return cheat;
+    printf("%f (%f)\n", diff, cheat);
+
+    return diff;
 
     /*
     // Periodically send the spike counts to the visualizer
