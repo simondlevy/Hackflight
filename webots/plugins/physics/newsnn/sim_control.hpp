@@ -20,6 +20,7 @@
 
 #include <clock.hpp>
 #include <control/pids/altitude.hpp>
+#include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
@@ -126,7 +127,17 @@ static void runClosedLoopControl(
     const auto climbrate = AltitudeController::run(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
-    demands.thrust = runSnn(climbrate, vehicleState.dz);
+    //demands.thrust = runSnn(climbrate, vehicleState.dz);
+    (void)runSnn;
+
+    demands.thrust =
+        ClimbRateController::run(
+                hovering,
+                landingAltitudeMeters,
+                dt,
+                vehicleState.z,
+                vehicleState.dz,
+                climbrate);
 
     const auto airborne = demands.thrust > 0;
 
