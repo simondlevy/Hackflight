@@ -44,8 +44,6 @@ static Framework framework(MAX_SPIKE_TIME);
 
 static float runDifferenceSnn(const float demand, const float actual)
 {
-    //static constexpr float KP = 25;
-
     static ServerSocket _serverSocket;
 
     static bool _initialized;
@@ -82,14 +80,8 @@ static float runDifferenceSnn(const float demand, const float actual)
     // Convert the firing time to a difference in [-2,+2]
     const double diff = (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
 
-    const double cheat = demand - actual;
-
-    printf("%f (%f)\n", diff, cheat);
-
-    return diff;
-
-    /*
     // Periodically send the spike counts to the visualizer
+    /*
     static uint32_t _vizcount;
     const double I_SCALE = 0.05;
     const double D_SCALE = 0.25;
@@ -112,12 +104,9 @@ static float runDifferenceSnn(const float demand, const float actual)
         const string msg = framework.make_viz_message(counts);
         _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
         _vizcount = 0;
-    }
+    }*/
 
-    // Convert the difference into a thrust, constrained by motor limits
-    return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
-            THRUST_MIN, THRUST_MAX); 
-            */
+    return diff;
 }
 
 static float runAltitudeController(
