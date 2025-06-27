@@ -44,6 +44,33 @@ static const double MAX_SPIKE_TIME = 1000;
 
 static Framework framework(MAX_SPIKE_TIME);
 
+static float runSnnProxy(
+        const bool hovering,
+        const float dt,
+        const float z,
+        const float thrust)
+{
+    static constexpr float KP = 2;
+    static constexpr float KI = 0.5;
+    static constexpr float ILIMIT = 5000;
+    static constexpr float VEL_MAX = 1;
+    static constexpr float VEL_MAX_OVERHEAD = 1.10;
+    static constexpr float LANDING_SPEED_MPS = 0.15;
+
+    static float _integral;
+
+    const auto error = thrust - z;
+
+    _integral = hovering ?
+        Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+
+    return hovering ? 
+        Num::fconstrain(KP * error + KI * _integral,
+                fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
+        -LANDING_SPEED_MPS;
+}
+
+
 static float runSnn(float demand, float actual)
 {
     static constexpr float KP = 25;
@@ -95,13 +122,13 @@ static float runSnn(float demand, float actual)
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const vector<int> tmp = framework.get_neuron_counts();
         const vector<int> counts = {
-                (int)(spike_time_1 * I_SCALE),
-                (int)(spike_time_2 * I_SCALE),
-                1,
-                (int)(tmp[3] * D_SCALE),
-                (int)(tmp[4] * D_SCALE),
-                (int)((out - O_BIAS) * O_SCALE),
-                (int)((tmp[6] - S_BIAS) * S_SCALE)
+            (int)(spike_time_1 * I_SCALE),
+            (int)(spike_time_2 * I_SCALE),
+            1,
+            (int)(tmp[3] * D_SCALE),
+            (int)(tmp[4] * D_SCALE),
+            (int)((out - O_BIAS) * O_SCALE),
+            (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
         const string msg = framework.make_viz_message(counts);
@@ -124,8 +151,11 @@ static void runClosedLoopControl(
 {
     (void)landingAltitudeMeters;
 
-    const auto climbrate = AltitudeController::run(hovering,
+    const auto climbrate = runSnnProxy(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
+
+    /*const auto climbrate = AltitudeController::run(hovering,
+            dt, vehicleState.z, openLoopDemands.thrust);*/
 
     //demands.thrust = runSnn(climbrate, vehicleState.dz);
     (void)runSnn;
