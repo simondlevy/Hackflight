@@ -32,7 +32,6 @@
 
 #include <posix-utils/socket.hpp>
 
-
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
@@ -43,7 +42,12 @@ static const double MAX_SPIKE_TIME = 1000;
 
 static Framework framework(MAX_SPIKE_TIME);
 
-static float runSnnProxy(
+static float runDifferenceSnn(const float demand, const float actual)
+{
+    return demand - actual;
+}
+
+static float runAltitudeController(
         const bool hovering,
         const float dt,
         const float z,
@@ -58,7 +62,7 @@ static float runSnnProxy(
 
     static float _integral;
 
-    const auto error = thrust - z;
+    const auto error = runDifferenceSnn(thrust, z);
 
     _integral = hovering ?
         Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -150,7 +154,7 @@ static void runClosedLoopControl(
 {
     (void)landingAltitudeMeters;
 
-    const auto climbrate = runSnnProxy(hovering,
+    const auto climbrate = runAltitudeController(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
     //demands.thrust = runSnn(climbrate, vehicleState.dz);
