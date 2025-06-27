@@ -77,9 +77,6 @@ static float runDifferenceSnn(const float demand, const float actual)
     const double out = framework.get_output_vector()[0];
     const double time = out == MAX_SPIKE_TIME + 1 ? -2 : out;
 
-    // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
-
     // Periodically send the spike counts to the visualizer
     /*
     static uint32_t _vizcount;
@@ -106,7 +103,9 @@ static float runDifferenceSnn(const float demand, const float actual)
         _vizcount = 0;
     }*/
 
-    return diff;
+    // Convert the firing time to a difference in [-2,+2]
+    return (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
+
 }
 
 static float runAltitudeController(
