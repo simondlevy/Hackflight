@@ -44,7 +44,78 @@ static Framework framework(MAX_SPIKE_TIME);
 
 static float runDifferenceSnn(const float demand, const float actual)
 {
-    return demand - actual;
+    static constexpr float KP = 25;
+
+    static ServerSocket _serverSocket;
+
+    static bool _initialized;
+
+    // Initialize the first time around
+    if (!_initialized) {
+
+        // Load the network
+        framework.load(NETWORK_FILENAME);
+
+        // Listen for and accept connections from vizualization client
+        _serverSocket.open(VIZ_PORT);
+        //_serverSocket.acceptClient();
+
+        _initialized = true;
+    }
+
+    // Turn the demand and climb-rate into spikes
+    const double spike_time_1 = framework.value_to_spike_time(demand);
+    const double spike_time_2 = framework.value_to_spike_time(actual);
+
+    // Apply the spikes to the network
+    framework.apply_spike(0, spike_time_1);
+    framework.apply_spike(1, spike_time_2);
+    framework.apply_spike(2, 0);
+
+    // Run the network
+    framework.run(3 * MAX_SPIKE_TIME + 2);
+
+    // Get the output network's firing time
+    const double out = framework.get_output_vector()[0];
+    const double time = out == MAX_SPIKE_TIME + 1 ? -2 : out;
+
+    // Convert the firing time to a difference in [-2,+2]
+    const double diff = (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
+
+    const double cheat = demand - actual;
+
+    return cheat;
+
+    /*
+    // Periodically send the spike counts to the visualizer
+    static uint32_t _vizcount;
+    const double I_SCALE = 0.05;
+    const double D_SCALE = 0.25;
+    const double O_BIAS = 1000;
+    const double O_SCALE = 0.025;
+    const double S_BIAS = 800;
+    const double S_SCALE = 0.125;
+    if (_vizcount++ == VIZ_SEND_PERIOD) {
+        const vector<int> tmp = framework.get_neuron_counts();
+        const vector<int> counts = {
+            (int)(spike_time_1 * I_SCALE),
+            (int)(spike_time_2 * I_SCALE),
+            1,
+            (int)(tmp[3] * D_SCALE),
+            (int)(tmp[4] * D_SCALE),
+            (int)((out - O_BIAS) * O_SCALE),
+            (int)((tmp[6] - S_BIAS) * S_SCALE)
+        };
+
+        const string msg = framework.make_viz_message(counts);
+        _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
+        _vizcount = 0;
+    }
+
+    // Convert the difference into a thrust, constrained by motor limits
+    return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
+            THRUST_MIN, THRUST_MAX); 
+            */
 }
 
 static float runAltitudeController(
@@ -74,75 +145,6 @@ static float runAltitudeController(
 }
 
 
-static float runSnn(float demand, float actual)
-{
-    static constexpr float KP = 25;
-
-    static ServerSocket _serverSocket;
-
-    static bool _initialized;
-
-    // Initialize the first time around
-    if (!_initialized) {
-
-        // Load the network
-        framework.load(NETWORK_FILENAME);
-
-        // Listen for and accept connections from vizualization client
-        _serverSocket.open(VIZ_PORT);
-        _serverSocket.acceptClient();
-
-        _initialized = true;
-    }
-
-    // Turn the demand and climb-rate into spikes
-    const double spike_time_1 = framework.value_to_spike_time(demand);
-    const double spike_time_2 = framework.value_to_spike_time(actual);
-
-    // Apply the spikes to the network
-    framework.apply_spike(0, spike_time_1);
-    framework.apply_spike(1, spike_time_2);
-    framework.apply_spike(2, 0);
-
-    // Run the network
-    framework.run(3 * MAX_SPIKE_TIME + 2);
-
-    // Get the output network's firing time
-    const double out = framework.get_output_vector()[0];
-    const double time = out == MAX_SPIKE_TIME + 1 ? -2 : out;
-
-    // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
-
-    // Periodically send the spike counts to the visualizer
-    static uint32_t _vizcount;
-    const double I_SCALE = 0.05;
-    const double D_SCALE = 0.25;
-    const double O_BIAS = 1000;
-    const double O_SCALE = 0.025;
-    const double S_BIAS = 800;
-    const double S_SCALE = 0.125;
-    if (_vizcount++ == VIZ_SEND_PERIOD) {
-        const vector<int> tmp = framework.get_neuron_counts();
-        const vector<int> counts = {
-            (int)(spike_time_1 * I_SCALE),
-            (int)(spike_time_2 * I_SCALE),
-            1,
-            (int)(tmp[3] * D_SCALE),
-            (int)(tmp[4] * D_SCALE),
-            (int)((out - O_BIAS) * O_SCALE),
-            (int)((tmp[6] - S_BIAS) * S_SCALE)
-        };
-
-        const string msg = framework.make_viz_message(counts);
-        _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
-        _vizcount = 0;
-    }
-
-    // Convert the difference into a thrust, constrained by motor limits
-    return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
-            THRUST_MIN, THRUST_MAX); 
-}
 
 static void runClosedLoopControl(
         const float dt,
@@ -156,9 +158,6 @@ static void runClosedLoopControl(
 
     const auto climbrate = runAltitudeController(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
-
-    //demands.thrust = runSnn(climbrate, vehicleState.dz);
-    (void)runSnn;
 
     demands.thrust =
         ClimbRateController::run(
