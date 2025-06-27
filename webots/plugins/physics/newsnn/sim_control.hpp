@@ -19,7 +19,6 @@
 #include <math.h>
 
 #include <clock.hpp>
-#include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
@@ -153,9 +152,6 @@ static void runClosedLoopControl(
 
     const auto climbrate = runSnnProxy(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
-
-    /*const auto climbrate = AltitudeController::run(hovering,
-            dt, vehicleState.z, openLoopDemands.thrust);*/
 
     //demands.thrust = runSnn(climbrate, vehicleState.dz);
     (void)runSnn;
