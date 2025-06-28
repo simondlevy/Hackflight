@@ -28,6 +28,12 @@ standard: standard.o
 standard.o: standard.cpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall -c standard.cpp
 
+simplediff: simplediff.o 
+	g++ -O3 -o btserver simplediff.o 
+
+simplediff.o: simplediff.cpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -O3 -Wall -c simplediff.cpp
+
 snn: snn.o risp.o risp_static.o framework.o processor_help.o properties.o
 	g++ -O3 -o btserver snn.o risp.o risp_static.o framework.o processor_help.o properties.o
 
