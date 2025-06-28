@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <time.h>
-
 #include <clock.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
@@ -27,7 +25,7 @@
 #include <control/pids/yaw_rate.hpp>
 #include <datatypes.h>
 #include <num.hpp>
-#include <tennlab/utils.hpp>
+#include <tennlab/differencer.hpp>
 #include <vehicles/diyquad.hpp>
 
 #include <posix-utils/socket.hpp>
