@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <clock.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
