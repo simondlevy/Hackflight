@@ -30,9 +30,9 @@
 #include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
 
+#include <datatypes.h>
 #include <msp/parser.hpp>
 #include <msp/messages.h>
-
 #include <tennlab_framework.hpp>
 
 static const char * NETWORK_FILENAME =
@@ -48,6 +48,8 @@ static int serialfd;
 // TeNNLab framework
 static const double MAX_SPIKE_TIME = 1000;
 static Framework framework(MAX_SPIKE_TIME);
+
+static demands_t hover_demands;
 
 static void * logging_fun(void * arg)
 {
@@ -126,16 +128,25 @@ int main(int argc, char ** argv)
 
         setpointServer.receiveData(&byte, 1);
 
-        if (parser.parse(byte)) {
+        const uint8_t msgid = parser.parse(byte);
 
+        // If we've got a new message
+        if (msgid) {
+
+            // Get the message payload and send it to the flight controller
             uint8_t payload[256] = {};
-
             const auto payloadSize = parser.getPayload(payload);
-
             const auto ignore = write(serialfd, payload, payloadSize);
             (void)ignore;
-        }
 
+            // If the message is a hover setpoint, store the demands
+            if (msgid == MSP_SET_SETPOINT_HOVER) {
+                hover_demands.thrust = parser.getFloat(0);
+                hover_demands.roll = parser.getFloat(1);
+                hover_demands.pitch = parser.getFloat(2);
+                hover_demands.yaw = parser.getFloat(3);
+            }
+        }
 
         sleep(0); // yield
     }
