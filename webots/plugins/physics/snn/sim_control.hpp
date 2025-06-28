@@ -19,7 +19,7 @@
 #include <math.h>
 
 #include <clock.hpp>
-#include <control/pids/altitude.hpp>
+#include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
@@ -32,7 +32,6 @@
 
 #include <posix-utils/socket.hpp>
 
-
 static const uint16_t VIZ_PORT = 8100;
 static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
@@ -43,11 +42,9 @@ static const double MAX_SPIKE_TIME = 1000;
 
 static Framework framework(MAX_SPIKE_TIME);
 
-static float runSnn(float demand, float actual)
+static float runDifferenceSnn(const float demand, const float actual)
 {
-    static constexpr float KP = 25;
-
-    static ServerSocket _serverSocket;
+    static ServerSocket _spikeServer;
 
     static bool _initialized;
 
@@ -58,8 +55,8 @@ static float runSnn(float demand, float actual)
         framework.load(NETWORK_FILENAME);
 
         // Listen for and accept connections from vizualization client
-        _serverSocket.open(VIZ_PORT);
-        _serverSocket.acceptClient();
+        _spikeServer.open(VIZ_PORT);
+        _spikeServer.acceptClient();
 
         _initialized = true;
     }
@@ -80,9 +77,6 @@ static float runSnn(float demand, float actual)
     const double out = framework.get_output_vector()[0];
     const double time = out == MAX_SPIKE_TIME + 1 ? -2 : out;
 
-    // Convert the firing time to a difference in [-2,+2]
-    const double diff = (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
-
     // Periodically send the spike counts to the visualizer
     static uint32_t _vizcount;
     const double I_SCALE = 0.05;
@@ -94,24 +88,52 @@ static float runSnn(float demand, float actual)
     if (_vizcount++ == VIZ_SEND_PERIOD) {
         const vector<int> tmp = framework.get_neuron_counts();
         const vector<int> counts = {
-                (int)(spike_time_1 * I_SCALE),
-                (int)(spike_time_2 * I_SCALE),
-                1,
-                (int)(tmp[3] * D_SCALE),
-                (int)(tmp[4] * D_SCALE),
-                (int)((out - O_BIAS) * O_SCALE),
-                (int)((tmp[6] - S_BIAS) * S_SCALE)
+            (int)(spike_time_1 * I_SCALE),
+            (int)(spike_time_2 * I_SCALE),
+            1,
+            (int)(tmp[3] * D_SCALE),
+            (int)(tmp[4] * D_SCALE),
+            (int)((out - O_BIAS) * O_SCALE),
+            (int)((tmp[6] - S_BIAS) * S_SCALE)
         };
 
         const string msg = framework.make_viz_message(counts);
-        _serverSocket.sendData((uint8_t *)msg.c_str(), msg.length());
+        _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
         _vizcount = 0;
     }
 
-    // Convert the difference into a thrust, constrained by motor limits
-    return Num::fconstrain(KP * diff * THRUST_SCALE + THRUST_BASE,
-            THRUST_MIN, THRUST_MAX); 
+    // Convert the firing time to a difference in [-2,+2]
+    return (time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
+
 }
+
+static float runAltitudeController(
+        const bool hovering,
+        const float dt,
+        const float z,
+        const float thrust)
+{
+    static constexpr float KP = 2;
+    static constexpr float KI = 0.5;
+    static constexpr float ILIMIT = 5000;
+    static constexpr float VEL_MAX = 1;
+    static constexpr float VEL_MAX_OVERHEAD = 1.10;
+    static constexpr float LANDING_SPEED_MPS = 0.15;
+
+    static float _integral;
+
+    const auto error = runDifferenceSnn(thrust, z);
+
+    _integral = hovering ?
+        Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+
+    return hovering ? 
+        Num::fconstrain(KP * error + KI * _integral,
+                fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
+        -LANDING_SPEED_MPS;
+}
+
+
 
 static void runClosedLoopControl(
         const float dt,
@@ -123,10 +145,17 @@ static void runClosedLoopControl(
 {
     (void)landingAltitudeMeters;
 
-    const auto climbrate = AltitudeController::run(hovering,
+    const auto climbrate = runAltitudeController(hovering,
             dt, vehicleState.z, openLoopDemands.thrust);
 
-    demands.thrust = runSnn(climbrate, vehicleState.dz);
+    demands.thrust =
+        ClimbRateController::run(
+                hovering,
+                landingAltitudeMeters,
+                dt,
+                vehicleState.z,
+                vehicleState.dz,
+                climbrate);
 
     const auto airborne = demands.thrust > 0;
 

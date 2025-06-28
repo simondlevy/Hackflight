@@ -40,7 +40,7 @@ CXX_SOURCES += $(FRO)/src/properties.cpp
 
 # -----------------------------------------------------------------------------
 
-all: libnewsnn.so
+all: libsnn.so
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
