@@ -27,35 +27,25 @@
 #include <pthread.h>
 #include <time.h>
 
-#include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
+#include <posix-utils/serial.hpp>
 
 #include <datatypes.h>
 #include <msp/parser.hpp>
 #include <msp/messages.h>
-#include <tennlab_framework.hpp>
-
-static const char * NETWORK_FILENAME =
-"/home/levys/tennlab-networks/difference_risp_plank.txt";
+#include <tennlab/differencer.hpp>
 
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
-static const uint16_t SPIKE_PORT = 3;
+//static const uint16_t SPIKE_PORT = 3;
 
 // Serial connection to FC
 static int serialfd;
 
-// TeNNLab framework
-static const double MAX_SPIKE_TIME = 1000;
-static Framework framework(MAX_SPIKE_TIME);
-
 static demands_t hover_demands;
 
-static void * logging_fun(void * arg)
+static void * control_fun(void * arg)
 {
-    // true = Bluetooth
-    //auto spikeServer = Server(SPIKE_PORT, "spike", true);
-
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
 
@@ -64,36 +54,10 @@ static void * logging_fun(void * arg)
 
         char byte = 0;
 
-        if (read(serialfd, &byte, 1) == 1) {
-
-            switch (parser.parse(byte)) {
-
-                case MSP_STATE_DZ:
-
-                    {
-                        const float dz = parser.getFloat(0);
-                        (void)dz;
-
-                        /*
-                        if (spikeServer.isConnected()) {
-
-                            // For now, we use the Raspberry Pi to encode just
-                            // the spikes corresponding to the climb rate, then
-                            // send them to the client
-                            const float obs[2] = {0, parser.getFloat(5)};
-                            encoder_helper.get_spikes(obs);
-                            uint8_t counts[1] = {};
-                            for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                                if (encoder_helper.spikes[k].id == 1) {
-                                    counts[0]++;
-                                }
-                            }
-                            spikeServer.sendData(counts, 1);
-                        }*/
-                    }
-
-                    break;
-            }
+        if (read(serialfd, &byte, 1) == 1 && 
+                parser.parse(byte) == MSP_STATE_Z) {
+            const float z = parser.getFloat(0);
+            printf("z=%3.3f\n", z);
         }
     }
 
@@ -109,11 +73,8 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    // Load the network
-    framework.load(NETWORK_FILENAME);
-
-    pthread_t logging_thread = {};
-    pthread_create(&logging_thread, NULL, logging_fun, NULL);
+    pthread_t control_thread = {};
+    pthread_create(&control_thread, NULL, control_fun, NULL);
 
     // true = Bluetooth
     auto setpointServer = Server(RADIO_PORT, "setpoint", true);

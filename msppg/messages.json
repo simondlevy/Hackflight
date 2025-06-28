@@ -16,11 +16,10 @@
    {"dpsi":   "float"}
   ],
 
-  "STATE_DZ": 
-  [{"ID": 100},
+  "STATE_Z": 
+  [{"ID": 101},
    {"comment": "Minimal proof-of-concept for SNN"},
-   {"dz":     "float"},
-   {"phi":    "float"}
+   {"z":     "float"}
   ],
 
   "SET_ARMING": 

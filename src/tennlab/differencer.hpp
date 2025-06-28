@@ -27,6 +27,7 @@ class DifferenceNetwork {
     private:
 
         static const uint16_t VIZ_PORT = 8100;
+
         static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
         const char * NETWORK_FILENAME =
