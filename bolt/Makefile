@@ -100,6 +100,7 @@ unbrick:
 -include tools/kbuild/Makefile.kbuild
 
 
+# Closed- loop control from C++ classes
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
@@ -108,6 +109,16 @@ standard_config:
 	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
 	cd $(HACKFLIGHT)/msppg; make install; cd ..
 
+# Closed- loop control from Raspberry Pi
+external_config:
+	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
+	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
+	cp $(HACKFLIGHT)/src/control/external.hpp $(HACKFLIGHT)/src/control.hpp
+	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
+	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
+	cd $(HACKFLIGHT)/msppg; make install; cd ..
+
+# Closed- loop control from NASA Copilot
 haskell_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
