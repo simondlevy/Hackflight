@@ -84,8 +84,7 @@ def gamepad_threadfun(vals, status):
                 # Hover button
                 elif code == 'BTN_TR':
 
-                    if (status['armed'] and not event.state and
-                        hover_button_state_prev):
+                    if (status['armed'] and not event.state and hover_button_state_prev):
 
                         status['hovering'] = not status['hovering']
 
@@ -110,11 +109,13 @@ def main():
     argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
+    argparser.add_argument('-s', '--server',
+                           choices=['onboard', 'pihat', 'none'],
+                           default='onboard',
+                           help='RaspberryPi Bluetooth server')
+
     argparser.add_argument('-d', '--debug', action='store_true',
                            help='debug controller')
-
-    argparser.add_argument('-n', '--no-connect', action='store_true',
-                           help='do not connect to server')
 
     args = argparser.parse_args()
 
@@ -145,8 +146,8 @@ def main():
 
     descend_countdown = 0
 
-    if not args.no_connect:
-        client = connect_to_server(RPI_SETPOINT_PORT)
+    if args.server != 'none':
+        client = connect_to_server(args.server, RPI_SETPOINT_PORT)
 
     zdist = ZDIST_INIT
 
@@ -157,7 +158,7 @@ def main():
             armed = status['armed']
 
             if armed != was_armed:
-                if not args.no_connect:
+                if args.server != 'none':
                     client.send(MspParser.serialize_SET_ARMING(armed))
                 was_armed = armed
 
@@ -170,16 +171,16 @@ def main():
                 descend_countdown = THRUST_DESCEND_MAX
 
                 vx = -scale(gamepad_vals[2])  # negate for forward positive
-                vy =  scale(gamepad_vals[1])
+                vy = scale(gamepad_vals[1])
                 yawrate = scale(gamepad_vals[3])
 
                 t = -scale(gamepad_vals[0]) * ZDIST_INC
 
                 zdist = min(max(zdist + t, ZDIST_MIN), ZDIST_MAX)
 
-                if not args.no_connect:
+                if args.server != 'none':
                     client.send(MspParser.serialize_SET_SETPOINT_HOVER(
-                    vx, vy, yawrate, zdist))
+                        vx, vy, yawrate, zdist))
 
                 if args.debug:
                     print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
@@ -201,8 +202,9 @@ def main():
 
                 zdist = ZDIST_INIT
 
-                if not args.no_connect:
-                    client.send(MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
+                if args.server != 'none':
+                    client.send(
+                            MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
 
                 if args.debug:
                     print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d' %
