@@ -53,10 +53,12 @@ static float runAltitudeController(
 static void runControlWithZError(
         const bool hovering,
         const float dt,
-        const float zerror,
         const float landingAltitudeMeters,
         const vehicleState_t & vehicleState,
-        const demands_t & openLoopDemands,
+        const float zerror,
+        const float rollDemand,
+        const float pitchDemand,
+        const float yawDemand,
         demands_t & demands)
 {
     const auto climbrate = runAltitudeController(hovering, dt, zerror);
@@ -73,7 +75,7 @@ static void runControlWithZError(
     const auto airborne = demands.thrust > 0;
 
     const auto yaw = YawAngleController::run(
-            airborne, dt, vehicleState.psi, openLoopDemands.yaw);
+            airborne, dt, vehicleState.psi, yawDemand);
 
     demands.yaw =
         YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
@@ -82,9 +84,10 @@ static void runControlWithZError(
             airborne,
             dt,
             vehicleState.dx, vehicleState.dy, vehicleState.psi,
-            hovering ? openLoopDemands.pitch : 0,
-            hovering ? openLoopDemands.roll : 0,
-            demands.roll, demands.pitch);
+            hovering ? pitchDemand : 0,
+            hovering ? rollDemand : 0,
+            demands.roll, 
+            demands.pitch);
 
     PitchRollAngleController::run(
             airborne,

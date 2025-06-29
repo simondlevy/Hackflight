@@ -28,6 +28,14 @@ static void runClosedLoopControl(
 {
     const auto zerror = openLoopDemands.thrust;
 
-    runControlWithZError(hovering, dt, zerror, landingAltitudeMeters,
-        vehicleState, openLoopDemands, demands);
+    runControlWithZError(
+            hovering,
+            dt,
+            landingAltitudeMeters,
+            vehicleState,
+            zerror,
+            openLoopDemands.roll,
+            openLoopDemands.pitch,
+            openLoopDemands.yaw,
+            demands);
 }

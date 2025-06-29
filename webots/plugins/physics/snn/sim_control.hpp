@@ -40,8 +40,16 @@ static void runClosedLoopControl(
         _initialized = true;
     }
 
-    const auto zerror = _network.run(openLoopDemands.thrust, vehicleState.z);
+    const float zerror = _network.run(openLoopDemands.thrust, vehicleState.z);
 
-    runControlWithZError(hovering, dt, zerror, landingAltitudeMeters,
-        vehicleState, openLoopDemands, demands);
+    runControlWithZError(
+            hovering,
+            dt,
+            landingAltitudeMeters,
+            vehicleState,
+            zerror,
+            openLoopDemands.roll,
+            openLoopDemands.pitch,
+            openLoopDemands.yaw,
+            demands);
 }
