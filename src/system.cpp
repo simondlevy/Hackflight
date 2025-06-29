@@ -28,8 +28,8 @@
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
-#include <tasks/logger.hpp>
-#include <tasks/setpoint.hpp>
+#include <tasks/rpicomms/setpoint.hpp>
+#include <tasks/rpicomms/state.hpp>
 #include <tasks/zranger.hpp>
 
 static const float IMU_CALIBRATION_PITCH = 0;
