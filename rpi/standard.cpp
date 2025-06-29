@@ -61,7 +61,7 @@ static void * logging_fun(void * arg)
                 case MSP_STATE:
 
                     {
-                        const float state[12] = { 
+                        const float state[10] = { 
                             parser.getFloat(0),
                             parser.getFloat(1),
                             parser.getFloat(2),
@@ -71,14 +71,12 @@ static void * logging_fun(void * arg)
                             parser.getFloat(6),
                             parser.getFloat(7),
                             parser.getFloat(8),
-                            parser.getFloat(9),
-                            parser.getFloat(10),
-                            parser.getFloat(11)
+                            parser.getFloat(9)
                         };
 
                         if (stateServer.isConnected()) {
 
-                            stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
+                            stateServer.sendData((uint8_t *)state, 10 * sizeof(float));
                         }
 
                     }

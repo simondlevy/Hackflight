@@ -1,10 +1,8 @@
 {
   "STATE": 
   [{"ID": 100},
-   {"comment": "Vehicle state per Bouabdallah et al. 2004"},
-   {"x":      "float"},
+   {"comment": "Vehicle state sans X,Y"},
    {"dx":     "float"},
-   {"y":      "float"},
    {"dy":     "float"},
    {"z":      "float"},
    {"dz":     "float"},
