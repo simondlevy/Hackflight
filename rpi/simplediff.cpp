@@ -101,13 +101,15 @@ int main(int argc, char ** argv)
             // Special handling for hover setpoint messages
             if (msgid == MSP_SET_SETPOINT_HOVER) {
 
+                const float zerror = parser.getFloat(3) - state_z;
+
                 // Grab the setpoint values and replace the altitude setpoint
                 // with its error
                 const float setpoint[4] = {
                     parser.getFloat(0),
                     parser.getFloat(1),
                     parser.getFloat(2),
-                    parser.getFloat(3) - state_z
+                    zerror
                 };
 
                 // Send the modified setpoint to the flight controller

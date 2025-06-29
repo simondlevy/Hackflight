@@ -86,6 +86,10 @@ int main(int argc, char ** argv)
 
     MspParser parser = {};
 
+    DifferenceNetwork _network = {};
+
+    _network.init();
+
     // Loop forever, retreiving setpoint messages from the client and sending
     // them to the flight controller
     while (true) {
@@ -102,13 +106,15 @@ int main(int argc, char ** argv)
             // Special handling for hover setpoint messages
             if (msgid == MSP_SET_SETPOINT_HOVER) {
 
+                const float zerror = _network.run(parser.getFloat(3), state_z);
+
                 // Grab the setpoint values and replace the altitude setpoint
                 // with its error
                 const float setpoint[4] = {
                     parser.getFloat(0),
                     parser.getFloat(1),
                     parser.getFloat(2),
-                    parser.getFloat(3) - state_z
+                    zerror
                 };
 
                 // Send the modified setpoint to the flight controller
