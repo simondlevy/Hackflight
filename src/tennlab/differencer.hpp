@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include <posix-utils/socket.hpp>
-
 #include <tennlab/framework.hpp>
 
 class DifferenceNetwork {
@@ -30,8 +30,8 @@ class DifferenceNetwork {
 
         static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
-        const char * NETWORK_FILENAME =
-            "/home/levys/Desktop/tennlab-networks/difference_risp_plank.txt";
+        const char * NETWORK_PATH =
+            "%s/Desktop/tennlab-networks/difference_risp_plank.txt";
 
         static constexpr double MAX_SPIKE_TIME = 1000;
 
@@ -79,7 +79,9 @@ class DifferenceNetwork {
         void init(const bool visualize=false)
         {
             // Load the network
-            _framework.load(NETWORK_FILENAME);
+            char path[256] = {};
+            sprintf(path, NETWORK_PATH, getenv("HOME"));
+            _framework.load(path);
 
             // Listen for and accept connections from vizualization client
             if (visualize) {
