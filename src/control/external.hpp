@@ -26,7 +26,7 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    const auto zerror = openLoopDemands.thrust - vehicleState.z;
+    const auto zerror = openLoopDemands.thrust;
 
     runControlWithZError(hovering, dt, zerror, landingAltitudeMeters,
         vehicleState, openLoopDemands, demands);
