@@ -66,7 +66,7 @@ class LoggerTask {
 
                 _estimatorTask->getVehicleState(&state);
 
-                const float statvals[10] = {
+                const float statevals[10] = {
                     state.dx,
                     state.dy,
                     state.z,
@@ -77,7 +77,7 @@ class LoggerTask {
                     state.dtheta,
                     state.psi,
                     state.dpsi
-                }
+                };
 
                 serializer.serializeFloats(MSP_STATE, statevals, 10);
 

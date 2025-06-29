@@ -32,15 +32,15 @@ def logging_fun(client, status):
     while status['running']:
 
         try:
-            msg = client.recv(48)
+            msg = client.recv(40)
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
             status['running'] = False
             return
 
-        x, dx, y, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi = (
-                struct.unpack('ffffffffffff', msg))
+        dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi = (
+                struct.unpack('ffffffffff', msg))
 
         print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
                'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
