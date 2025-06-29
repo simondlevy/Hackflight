@@ -17,6 +17,7 @@
 #pragma once
 
 #include <clock.hpp>
+//#include <control/external.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
@@ -51,8 +52,7 @@ static float runDifferenceSnn(const float demand, const float actual)
 static float runAltitudeController(
         const bool hovering,
         const float dt,
-        const float z,
-        const float thrust)
+        const float error)
 {
     static constexpr float KP = 2;
     static constexpr float KI = 0.5;
@@ -62,8 +62,6 @@ static float runAltitudeController(
     static constexpr float LANDING_SPEED_MPS = 0.15;
 
     static float _integral;
-
-    const auto error = runDifferenceSnn(thrust, z);
 
     _integral = hovering ?
         Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -86,8 +84,10 @@ static void runClosedLoopControl(
 {
     (void)landingAltitudeMeters;
 
-    const auto climbrate = runAltitudeController(hovering,
-            dt, vehicleState.z, openLoopDemands.thrust);
+    const auto zerror = runDifferenceSnn(
+            openLoopDemands.thrust, vehicleState.z);
+
+    const auto climbrate = runAltitudeController(hovering, dt, zerror);
 
     demands.thrust =
         ClimbRateController::run(
