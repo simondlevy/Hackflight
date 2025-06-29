@@ -19,26 +19,27 @@ import sys
 import time
 
 
-RPI_ADDRESS = 'B8:27:EB:E0:1D:07'  # Onboard
-#RPI_ADDRESS = 'B8:27:EB:3F:AB:47' # PiHat
+def connect_to_server(name, port):
 
-def connect_to_server(port):
+    servers = {'onboard': 'B8:27:EB:E0:1D:07', 'pihat': 'B8:27:EB:3F:AB:47'}
+
+    addr = servers[name]
 
     while True:
 
         try:
 
-            print('Connecting to server %s:%d ... ' % (RPI_ADDRESS, port), end='')
+            print('Connecting to server %s:%d ... ' % (addr, port), end='')
             sys.stdout.flush()
 
             # Create a Bluetooth or IP socket depending on address format
             client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
                       socket.BTPROTO_RFCOMM)
-                      if ':' in RPI_ADDRESS
+                      if ':' in addr
                       else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 
             try:
-                client.connect((RPI_ADDRESS, port))
+                client.connect((addr, port))
                 print(' connected')
                 break
 
