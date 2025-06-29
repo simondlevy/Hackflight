@@ -41,6 +41,9 @@ static const uint16_t RADIO_PORT = 1;
 // Serial connection to FC
 static int serialfd;
 
+// Current altitude (m)
+static float state_z;
+
 static void * control_fun(void * arg)
 {
     // Parser accepts messages from flight controller (FC)
@@ -53,8 +56,7 @@ static void * control_fun(void * arg)
 
         if (read(serialfd, &byte, 1) == 1 && 
                 parser.parse(byte) == MSP_STATE_Z) {
-            const float z = parser.getFloat(0);
-            (void)z;
+            state_z = parser.getFloat(0);
         }
     }
 
@@ -101,17 +103,19 @@ int main(int argc, char ** argv)
             // Special handling for hover setpoint messages
             if (msgid == MSP_SET_SETPOINT_HOVER) {
 
-                // Grab the demands
-                const float demands[4] = {
+                // Grab the setpoint values
+                const float setpoint[4] = {
                     parser.getFloat(0),
                     parser.getFloat(1),
                     parser.getFloat(2),
                     parser.getFloat(3)
                 };
 
-                // Send the modified demands to the flight controller
+                printf("demand=%3.3f acutal=%+3.3f\n", setpoint[3], state_z);
+
+                // Send the modified setpoint to the flight controller
                 MspSerializer serializer = {};
-                serializer.serializeFloats(MSP_SET_SETPOINT_HOVER, demands, 4);
+                serializer.serializeFloats(MSP_SET_SETPOINT_HOVER, setpoint, 4);
                 sendPayload(serialfd, serializer.payload, serializer.payloadSize);
             }
 
