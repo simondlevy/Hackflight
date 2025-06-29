@@ -22,7 +22,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include <sys/ioctl.h>
 #include <pthread.h>
 #include <time.h>
@@ -30,19 +29,19 @@
 #include <posix-utils/server.hpp>
 #include <posix-utils/serial.hpp>
 
-#include <datatypes.h>
 #include <msp/parser.hpp>
 #include <msp/messages.h>
+#include <msp/serializer.hpp>
 #include <tennlab/differencer.hpp>
 
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
-//static const uint16_t SPIKE_PORT = 3;
 
 // Serial connection to FC
 static int serialfd;
 
-static demands_t hover_demands;
+// Current altitude (m)
+static float state_z;
 
 static void * control_fun(void * arg)
 {
@@ -56,12 +55,18 @@ static void * control_fun(void * arg)
 
         if (read(serialfd, &byte, 1) == 1 && 
                 parser.parse(byte) == MSP_STATE_Z) {
-            const float z = parser.getFloat(0);
-            printf("z=%3.3f\n", z);
+            state_z = parser.getFloat(0);
         }
     }
 
     return NULL;
+}
+
+static void sendPayload(
+        const int serialfd, const uint8_t * payload, const uint8_t size)
+{
+    const auto ignore = write(serialfd, payload, size);
+    (void)ignore;
 }
 
 int main(int argc, char ** argv)
@@ -94,18 +99,30 @@ int main(int argc, char ** argv)
         // If we've got a new message
         if (msgid) {
 
-            // Get the message payload and send it to the flight controller
-            uint8_t payload[256] = {};
-            const auto payloadSize = parser.getPayload(payload);
-            const auto ignore = write(serialfd, payload, payloadSize);
-            (void)ignore;
-
-            // If the message is a hover setpoint, store the demands
+            // Special handling for hover setpoint messages
             if (msgid == MSP_SET_SETPOINT_HOVER) {
-                hover_demands.thrust = parser.getFloat(0);
-                hover_demands.roll = parser.getFloat(1);
-                hover_demands.pitch = parser.getFloat(2);
-                hover_demands.yaw = parser.getFloat(3);
+
+                // Grab the setpoint values and replace the altitude setpoint
+                // with its error
+                const float setpoint[4] = {
+                    parser.getFloat(0),
+                    parser.getFloat(1),
+                    parser.getFloat(2),
+                    parser.getFloat(3) - state_z
+                };
+
+                // Send the modified setpoint to the flight controller
+                MspSerializer serializer = {};
+                serializer.serializeFloats(MSP_SET_SETPOINT_HOVER, setpoint, 4);
+                sendPayload(serialfd, serializer.payload, serializer.payloadSize);
+            }
+
+            // Otherwise, send the unmodified payload along to the flight
+            // controller
+            else {
+                uint8_t payload[256] = {};
+                const auto payloadSize = parser.getPayload(payload);
+                sendPayload(serialfd, payload, payloadSize);
             }
         }
 

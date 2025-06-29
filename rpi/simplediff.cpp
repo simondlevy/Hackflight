@@ -22,7 +22,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include <sys/ioctl.h>
 #include <pthread.h>
 #include <time.h>
@@ -30,7 +29,6 @@
 #include <posix-utils/server.hpp>
 #include <posix-utils/serial.hpp>
 
-#include <datatypes.h>
 #include <msp/parser.hpp>
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
