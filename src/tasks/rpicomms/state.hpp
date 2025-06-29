@@ -66,6 +66,7 @@ class LoggerTask {
 
                 _estimatorTask->getVehicleState(&state);
 
+                /*
                 const float statevals[10] = {
                     state.dx,
                     state.dy,
@@ -79,7 +80,9 @@ class LoggerTask {
                     state.dpsi
                 };
 
-                serializer.serializeFloats(MSP_STATE, statevals, 10);
+                serializer.serializeFloats(MSP_STATE, statevals, 10);*/
+
+                serializer.serializeFloats(MSP_STATE_Z, &state.z, 1);
 
                 for (uint8_t k=0; k<serializer.payloadSize; ++k) {
                     systemUartWriteByte(serializer.payload[k]);
