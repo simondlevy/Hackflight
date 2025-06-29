@@ -84,7 +84,8 @@ def gamepad_threadfun(vals, status):
                 # Hover button
                 elif code == 'BTN_TR':
 
-                    if (status['armed'] and not event.state and hover_button_state_prev):
+                    if (status['armed'] and not event.state and
+                            hover_button_state_prev):
 
                         status['hovering'] = not status['hovering']
 

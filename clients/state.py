@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import struct
 import argparse
+from argparse import ArgumentDefaultsHelpFormatter
 
 from btsupport import connect_to_server
 
@@ -49,7 +50,17 @@ def logging_fun(client, status):
 
 def main():
 
-    client = connect_to_server(RPI_LOGGING_PORT)
+    argparser = argparse.ArgumentParser(
+            formatter_class=ArgumentDefaultsHelpFormatter)
+
+    argparser.add_argument('-s', '--server',
+                           choices=['onboard', 'pihat'],
+                           default='onboard',
+                           help='RaspberryPi Bluetooth server')
+
+    args = argparser.parse_args()
+
+    client = connect_to_server(args.server, RPI_LOGGING_PORT)
 
     status = {'running': True}
 
