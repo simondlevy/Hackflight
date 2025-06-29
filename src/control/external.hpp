@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,7 @@
 
 #pragma once
 
-#include <math.h>
-#include <stdio.h>
-
-#include <clock.hpp>
-#include <datatypes.h>
-#include <num.hpp>
-
-#include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
-#include <control/pids/position.hpp>
-#include <control/pids/pitchroll_angle.hpp>
-#include <control/pids/pitchroll_rate.hpp>
-#include <control/pids/yaw_angle.hpp>
-#include <control/pids/yaw_rate.hpp>
+#include <control/partial.hpp>
 
 static void runClosedLoopControl(
         const float dt,
@@ -39,45 +26,8 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    const auto climbrate = AltitudeController::run(hovering,
-            dt, vehicleState.z, openLoopDemands.thrust);
+    const auto zerror = openLoopDemands.thrust - vehicleState.z;
 
-    demands.thrust =
-        ClimbRateController::run(
-                hovering,
-                landingAltitudeMeters,
-                dt,
-                vehicleState.z,
-                vehicleState.dz,
-                climbrate);
-
-    const auto airborne = demands.thrust > 0;
-
-    const auto yaw = YawAngleController::run(
-            airborne, dt, vehicleState.psi, openLoopDemands.yaw);
-
-    demands.yaw =
-        YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
-
-    PositionController::run(
-            airborne,
-            dt,
-            vehicleState.dx, vehicleState.dy, vehicleState.psi,
-            hovering ? openLoopDemands.pitch : 0,
-            hovering ? openLoopDemands.roll : 0,
-            demands.roll, demands.pitch);
-
-    PitchRollAngleController::run(
-            airborne,
-            dt,
-            vehicleState.phi, vehicleState.theta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
-
-    PitchRollRateController::run(
-            airborne,
-            dt,
-            vehicleState.dphi, vehicleState.dtheta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
+    runControlWithZError(hovering, dt, zerror, landingAltitudeMeters,
+        vehicleState, openLoopDemands, demands);
 }
