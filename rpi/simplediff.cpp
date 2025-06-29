@@ -33,14 +33,13 @@
 #include <datatypes.h>
 #include <msp/parser.hpp>
 #include <msp/messages.h>
+#include <msp/serializer.hpp>
 
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
 
 // Serial connection to FC
 static int serialfd;
-
-static demands_t hover_demands;
 
 static void * control_fun(void * arg)
 {
@@ -55,11 +54,18 @@ static void * control_fun(void * arg)
         if (read(serialfd, &byte, 1) == 1 && 
                 parser.parse(byte) == MSP_STATE_Z) {
             const float z = parser.getFloat(0);
-            printf("z=%3.3f\n", z);
+            (void)z;
         }
     }
 
     return NULL;
+}
+
+static void sendPayload(
+        const int serialfd, const uint8_t * payload, const uint8_t size)
+{
+    const auto ignore = write(serialfd, payload, size);
+    (void)ignore;
 }
 
 int main(int argc, char ** argv)
@@ -92,18 +98,29 @@ int main(int argc, char ** argv)
         // If we've got a new message
         if (msgid) {
 
-            // Get the message payload and send it to the flight controller
-            uint8_t payload[256] = {};
-            const auto payloadSize = parser.getPayload(payload);
-            const auto ignore = write(serialfd, payload, payloadSize);
-            (void)ignore;
-
-            // If the message is a hover setpoint, store the demands
+            // Special handling for hover setpoint messages
             if (msgid == MSP_SET_SETPOINT_HOVER) {
-                hover_demands.thrust = parser.getFloat(0);
-                hover_demands.roll = parser.getFloat(1);
-                hover_demands.pitch = parser.getFloat(2);
-                hover_demands.yaw = parser.getFloat(3);
+
+                // Grab the demands
+                const float demands[4] = {
+                    parser.getFloat(0),
+                    parser.getFloat(1),
+                    parser.getFloat(2),
+                    parser.getFloat(3)
+                };
+
+                // Send the modified demands to the flight controller
+                MspSerializer serializer = {};
+                serializer.serializeFloats(MSP_SET_SETPOINT_HOVER, demands, 4);
+                sendPayload(serialfd, serializer.payload, serializer.payloadSize);
+            }
+
+            // Otherwise, send the unmodified payload along to the flight
+            // controller
+            else {
+                uint8_t payload[256] = {};
+                const auto payloadSize = parser.getPayload(payload);
+                sendPayload(serialfd, payload, payloadSize);
             }
         }
 
