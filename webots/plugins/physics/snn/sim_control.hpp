@@ -19,8 +19,6 @@
 #include <control/partial.hpp>
 #include <tennlab/differencer.hpp>
 
-#include <posix-utils/socket.hpp>
-
 static void runClosedLoopControl(
         const float dt,
         const bool hovering,
