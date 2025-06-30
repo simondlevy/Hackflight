@@ -14,7 +14,8 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-NET = $(HOME)/Desktop/tennlab-networks/difference_risp_plank.txt
+NET = $(HOME)/Desktop/tennlab-networks/difference_risp_plank_1000.txt
+#NET = $(HOME)/Desktop/tennlab-networks/difference_risp_plank_100.txt
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 

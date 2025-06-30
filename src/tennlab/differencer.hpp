@@ -26,19 +26,18 @@ class DifferenceNetwork {
 
     private:
 
+        static constexpr double MAX_SPIKE_TIME = 1000;
+
         static const uint16_t VIZ_PORT = 8100;
 
         static const uint32_t VIZ_SEND_PERIOD = 50; // ticks
 
         const char * NETWORK_PATH =
-            "%s/Desktop/tennlab-networks/difference_risp_plank.txt";
-
-        static constexpr double MAX_SPIKE_TIME = 1000;
+            "%s/Desktop/tennlab-networks/difference_risp_plank_%d.txt";
 
         // For visualization
         static constexpr double I_SCALE = 0.05;
         static constexpr double D_SCALE = 0.25;
-        static constexpr double O_BIAS = 1000;
         static constexpr double O_SCALE = 0.025;
         static constexpr double S_BIAS = 800;
         static constexpr double S_SCALE = 0.125;
@@ -64,7 +63,7 @@ class DifferenceNetwork {
                     1,
                     (int)(tmp[3] * D_SCALE),
                     (int)(tmp[4] * D_SCALE),
-                    (int)((out - O_BIAS) * O_SCALE),
+                    (int)((out - MAX_SPIKE_TIME) * O_SCALE),
                     (int)((tmp[6] - S_BIAS) * S_SCALE)
                 };
 
@@ -80,7 +79,7 @@ class DifferenceNetwork {
         {
             // Load the network
             char path[256] = {};
-            sprintf(path, NETWORK_PATH, getenv("HOME"));
+            sprintf(path, NETWORK_PATH, getenv("HOME"), (int)MAX_SPIKE_TIME);
             _framework.load(path);
 
             // Listen for and accept connections from vizualization client
