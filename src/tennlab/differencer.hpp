@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include <posix-utils/socket.hpp>
-#include <tennlab/framework.hpp>
+#include <tennlab/utils.hpp>
 
 class DifferenceNetwork {
 
