@@ -16,6 +16,11 @@
 
 #pragma once
 
+// emebdded neuromorphic
+#include <network.h>
+#include <network_load.h>
+
+// Hackflight
 #include <control/partial.hpp>
 
 static void runClosedLoopControl(
@@ -30,6 +35,8 @@ static void runClosedLoopControl(
 
     // Initialize the first time around
     if (!_initialized) {
+
+        load_network();
 
         _initialized = true;
     }
