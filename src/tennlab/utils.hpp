@@ -58,35 +58,6 @@ class Framework {
             return success;
         }
 
-        static Network * loadnetwork(Processor **pp, const json &network_json)
-        {
-
-            Network * net = new Network();
-
-            net->from_json(network_json);
-
-            Processor * p = *pp;
-            if (p == nullptr) {
-                json proc_params = net->get_data("proc_params");
-                string proc_name = net->get_data("other")["proc_name"];
-                p = Processor::make(proc_name, proc_params);
-                *pp = p;
-            } 
-
-            if (p->get_network_properties().as_json() !=
-                    net->get_properties().as_json()) {
-                printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2\n"); fflush(stdout);
-            }
-
-
-            if (!p->load_network(net)) {
-                throw SRE("loadnetwork() failed");
-            }
-            track_all_neuron_events(p, net);
-
-            return net;
-        }
-
         static double cap(const double val)
         {
             return val > +1 ? +1 : val < -1 ? -1 : val;
@@ -107,22 +78,39 @@ class Framework {
         {
             json network_json = {};
 
-            if (!read_json(network_filename, network_json)) {
-
-                printf("usage: ML network_json. Bad json\n");
-
-            } else {
+            if (read_json(network_filename, network_json)) {
 
                 try {
 
+                    _net = new Network();
 
-                    _net = loadnetwork(&_proc, network_json);
+                    _net->from_json(network_json);
+
+                    json proc_params = _net->get_data("proc_params");
+
+                    string proc_name = _net->get_data("other")["proc_name"];
+
+                    _proc = Processor::make(proc_name, proc_params);
+
+                    if (_proc->get_network_properties().as_json() !=
+                            _net->get_properties().as_json()) {
+                    }
+
+                    if (!_proc->load_network(_net)) {
+                        throw SRE("loadnetwork() failed");
+                    }
+                    track_all_neuron_events(_proc, _net);
 
                 } catch (const SRE &e) {
                     printf("%s\n",e.what());
                 } catch (...) {
                     printf("Unknown error when making processor\n");
                 }
+            } 
+            
+            else {
+
+                printf("usage: ML network_json. Bad json\n");
             }
         }
 
