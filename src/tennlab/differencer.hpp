@@ -36,11 +36,11 @@ class DifferenceNetwork {
             "%s/Desktop/tennlab-networks/difference_risp_plank_%d.txt";
 
         // For visualization
-        static constexpr double I_SCALE = 0.05;
-        static constexpr double D_SCALE = 0.25;
-        static constexpr double O_SCALE = 0.025;
-        static constexpr double S_BIAS = 800;
-        static constexpr double S_SCALE = 0.125;
+        static constexpr double I_SCALE = 50 / MAX_SPIKE_TIME;
+        static constexpr double D_SCALE = 250 / MAX_SPIKE_TIME;
+        static constexpr double O_SCALE = 25 / MAX_SPIKE_TIME;
+        static constexpr double S_BIAS = 0.8 * MAX_SPIKE_TIME;
+        static constexpr double S_SCALE = 125 / MAX_SPIKE_TIME;
 
         Framework _framework = Framework(MAX_SPIKE_TIME);
 
