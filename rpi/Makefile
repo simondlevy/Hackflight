@@ -18,9 +18,10 @@ ROOT = $(HOME)/Desktop
 
 FRO = $(ROOT)/framework-open
 FROINC = -I$(FRO)/include -I$(FRO)/include/utils
-FROSRC = $(FRO)/src
+FROOBJ = $(FRO)/obj/risp.o $(FRO)/obj/risp_static.o
+FROLIB = -L $(FRO)/lib -lframework
 
-INCLUDE = -I$(ROOT) -I../src
+INCLUDE =  -I$(ROOT) -I../src
 
 standard: standard.cpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver standard.cpp
@@ -29,7 +30,8 @@ simplediff: simplediff.cpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver simplediff.cpp
 
 snn: snn.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -I../src/tennlab -O3 -Wall -o btserver snn.cpp -L $(FRO)/lib -lframework
+	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o btserver \
+		snn.cpp  $(FROOBJ) $(FROLIB)
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi
