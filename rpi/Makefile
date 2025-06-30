@@ -29,9 +29,10 @@ standard: standard.cpp ../src/msp/messages.h
 simplediff: simplediff.cpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver simplediff.cpp
 
-loadsnn: loadsnn.cpp ../src/msp/messages.h
+loadsnn: loadsnn.cpp ../src/msp/messages.h \
+	../src/tennlab/utils.hpp ../src/tennlab/differencer.hpp
 	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o loadsnn \
-		snn.cpp  $(FROOBJ) $(FROLIB)
+		loadsnn.cpp  $(FROOBJ) $(FROLIB)
 
 snn: snn.cpp ../src/msp/messages.h
 	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o btserver \

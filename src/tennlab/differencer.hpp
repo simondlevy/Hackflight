@@ -81,7 +81,8 @@ class DifferenceNetwork {
             // Load the network
             char path[256] = {};
             sprintf(path, NETWORK_PATH, getenv("HOME"));
-            printf("PATH=%s\n", path);
+            printf("PATH=%s\n", path); fflush(stdout);
+            exit(0);
             _framework.load(path);
 
             // Listen for and accept connections from vizualization client
