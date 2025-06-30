@@ -29,14 +29,13 @@ INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 # TeNNLab embedded stuff ------------------------------ -----------------------
 
 EMB = $(HOME)/Desktop/embedded-neuromorphic
+NETS = $(HOME)/Desktop/tennlab-networks
+RISP = $(EMB)/processors/risp
 
-INCLUDE += -I$(EMB)/include -I$(EMB)/include/utils
+INCLUDE += -I$(RISP)/include
 
-#CXX_SOURCES += $(EMB)/src/risp.cpp
-#CXX_SOURCES += $(EMB)/src/risp_static.cpp
-#CXX_SOURCES += $(EMB)/src/framework.cpp
-#CXX_SOURCES += $(EMB)/src/processor_help.cpp
-#CXX_SOURCES += $(EMB)/src/properties.cpp
+CXX_SOURCES += $(RISP)/src/network.cpp
+CXX_SOURCES += $(NETS)/difference_risp_plank_100.cpp
 
 # -----------------------------------------------------------------------------
 
