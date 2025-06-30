@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <math.h>
 
 #include <framework.hpp>
@@ -58,26 +60,30 @@ class Framework {
 
         static Network * loadnetwork(Processor **pp, const json &network_json)
         {
-            Network *net;
-            json proc_params;
-            string proc_name;
-            Processor *p;
 
-            net = new Network();
+            Network * net = new Network();
+
             net->from_json(network_json);
 
-            p = *pp;
+            Processor * p = *pp;
             if (p == nullptr) {
-                proc_params = net->get_data("proc_params");
-                proc_name = net->get_data("other")["proc_name"];
+                json proc_params = net->get_data("proc_params");
+                string proc_name = net->get_data("other")["proc_name"];
                 p = Processor::make(proc_name, proc_params);
                 *pp = p;
             } 
 
+            printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1: p=%p\n", p); fflush(stdout);
+
             if (p->get_network_properties().as_json() !=
                     net->get_properties().as_json()) {
+                printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2\n"); fflush(stdout);
                 throw SRE("network and processor properties do not match.");
             }
+
+            printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3\n"); fflush(stdout);
+
+
 
             if (!p->load_network(net)) {
                 throw SRE("loadnetwork() failed");
@@ -114,6 +120,7 @@ class Framework {
             } else {
 
                 try {
+
 
                     _net = loadnetwork(&_proc, network_json);
 

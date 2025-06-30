@@ -22,38 +22,14 @@ FROSRC = $(FRO)/src
 
 INCLUDE = -I$(ROOT) -I../src
 
-standard: standard.o 
-	g++ -O3 -o btserver standard.o 
+standard: standard.cpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver standard.cpp
 
-standard.o: standard.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall -c standard.cpp
+simplediff: simplediff.cpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver simplediff.cpp
 
-simplediff: simplediff.o 
-	g++ -O3 -o btserver simplediff.o 
-
-simplediff.o: simplediff.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall -c simplediff.cpp
-
-snn: snn.o risp.o risp_static.o framework.o processor_help.o properties.o
-	g++ -O3 -o btserver snn.o risp.o risp_static.o framework.o processor_help.o properties.o
-
-snn.o: snn.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) $(FROINC) -O3 -Wall -c snn.cpp
-
-risp.o: 
-	g++ -c -O3 -Wall $(FROINC) $(FROSRC)/risp.cpp
-
-risp_static.o: 
-	g++ -c -O3 -Wall $(FROINC) $(FROSRC)/risp_static.cpp
-
-framework.o: 
-	g++ -c -O3 -Wall $(FROINC) $(FROSRC)/framework.cpp
-
-processor_help.o: 
-	g++ -c -O3 -Wall $(FROINC) $(FROSRC)/processor_help.cpp
-
-properties.o: 
-	g++ -c -O3 -Wall $(FROINC) $(FROSRC)/properties.cpp
+snn: snn.cpp ../src/msp/messages.h
+	g++ -Wall $(INCLUDE) -I../src/tennlab -O3 -Wall -o btserver snn.cpp -L $(FRO)/lib -lframework
 
 ../src/msp/messages.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../rpi

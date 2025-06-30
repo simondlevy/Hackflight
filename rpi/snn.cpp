@@ -108,6 +108,8 @@ int main(int argc, char ** argv)
 
                 const float zerror = _network.run(parser.getFloat(3), state_z);
 
+                printf("zerror=%+3.3f\n", zerror);
+
                 // Grab the setpoint values and replace the altitude setpoint
                 // with its error
                 const float setpoint[4] = {
