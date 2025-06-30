@@ -246,11 +246,13 @@ class CoreTask {
 
                 const auto timestamp = xTaskGetTickCount();
 
+                // Disarm on lost contact
                 if (setpoint_timestamp > 0 &&
                         timestamp - setpoint_timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
                     motorsStop();
+                    _safety->requestArming(false);
                 }
 
                 else if (!lost_contact && _safety->isArmed()) {
