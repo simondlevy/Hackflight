@@ -26,17 +26,17 @@ CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
-# TeNNLab framework stuff ------------------------------ ----------------------
+# TeNNLab embedded stuff ------------------------------ -----------------------
 
-FRO = $(HOME)/Desktop/framework-open
+EMB = $(HOME)/Desktop/embedded-neuromorphic
 
-INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
+INCLUDE += -I$(EMB)/include -I$(EMB)/include/utils
 
-CXX_SOURCES += $(FRO)/src/risp.cpp
-CXX_SOURCES += $(FRO)/src/risp_static.cpp
-CXX_SOURCES += $(FRO)/src/framework.cpp
-CXX_SOURCES += $(FRO)/src/processor_help.cpp
-CXX_SOURCES += $(FRO)/src/properties.cpp
+#CXX_SOURCES += $(EMB)/src/risp.cpp
+#CXX_SOURCES += $(EMB)/src/risp_static.cpp
+#CXX_SOURCES += $(EMB)/src/framework.cpp
+#CXX_SOURCES += $(EMB)/src/processor_help.cpp
+#CXX_SOURCES += $(EMB)/src/properties.cpp
 
 # -----------------------------------------------------------------------------
 
