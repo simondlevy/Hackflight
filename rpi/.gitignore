@@ -1,3 +1,2 @@
-*.hpp
 btserver
-*.o
+loadsnn

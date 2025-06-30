@@ -29,6 +29,10 @@ standard: standard.cpp ../src/msp/messages.h
 simplediff: simplediff.cpp ../src/msp/messages.h
 	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver simplediff.cpp
 
+loadsnn: loadsnn.cpp ../src/msp/messages.h
+	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o loadsnn \
+		snn.cpp  $(FROOBJ) $(FROLIB)
+
 snn: snn.cpp ../src/msp/messages.h
 	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o btserver \
 		snn.cpp  $(FROOBJ) $(FROLIB)
@@ -40,4 +44,4 @@ run: btserver
 	./btserver $(FDIR)/networks/$(NETWORK).txt
 
 clean:
-	rm -f btserver *.o $(NETWORK).hpp
+	rm -f btserver loadsnn
