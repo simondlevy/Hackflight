@@ -73,16 +73,10 @@ class Framework {
                 *pp = p;
             } 
 
-            printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1: p=%p\n", p); fflush(stdout);
-
             if (p->get_network_properties().as_json() !=
                     net->get_properties().as_json()) {
                 printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 2\n"); fflush(stdout);
-                throw SRE("network and processor properties do not match.");
             }
-
-            printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 3\n"); fflush(stdout);
-
 
 
             if (!p->load_network(net)) {
