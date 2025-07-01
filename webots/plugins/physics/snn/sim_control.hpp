@@ -20,6 +20,8 @@
 
 #include <control/partial.hpp>
 
+#include "visualizer.hpp"
+
 static const float MAX_SPIKE_TIME = 1000;
 
 static void runClosedLoopControl(
