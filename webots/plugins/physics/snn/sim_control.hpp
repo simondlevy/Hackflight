@@ -45,4 +45,15 @@ static void runClosedLoopControl(
             openLoopDemands.pitch,
             openLoopDemands.yaw,
             demands);
+
+    static bool _initialized;
+
+    static Visualizer _visualizer;
+
+    if (!_initialized) {
+
+        _visualizer.init(MAX_SPIKE_TIME);
+
+        _initialized = true;
+    }
 }
