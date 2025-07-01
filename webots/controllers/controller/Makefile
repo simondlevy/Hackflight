@@ -14,7 +14,8 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-NET = $(HOME)/Desktop/tennlab-networks/difference_risp_plank.txt
+NET = $(HOME)/Desktop/tennlab-networks/difference_risp_plank_1000.txt
+#NET = $(HOME)/Desktop/tennlab-networks/difference_risp_plank_100.txt
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 
@@ -47,6 +48,20 @@ runhaskell:
 		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
+runnewsnn:
+	cp ../../plugins/physics/newsnn/libnewsnn.so \
+		../../plugins/physics/custom/libcustom.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME) #&
+#	sleep 1
+#	cd $(VIZ_DIR); \
+# 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":"localhost"}' \
+     	-n $(NET) --show_spike_count --set_num_screen_shot 0 \
+		--use_name_neuron \
+		'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O","6":"S2"}' \
+		--set_font_size 16 \
+		> /dev/null
 
 runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
