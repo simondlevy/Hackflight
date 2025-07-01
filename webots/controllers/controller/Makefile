@@ -50,7 +50,7 @@ runhaskell:
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runnewsnn:
-	cp ../../plugins/physics/newsnn/libnewsnn.so \
+	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/custom/libcustom.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) #&

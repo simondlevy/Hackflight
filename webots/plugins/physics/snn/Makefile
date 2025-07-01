@@ -18,27 +18,13 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+NET = $(ROOT)/2025-diff-network/levy/
 
-INCLUDE = -I$(SRC)
+CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
-
-# TeNNLab framework stuff ------------------------------ ----------------------
-
-FRO = $(HOME)/Desktop/framework-open
-
-INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
-
-CXX_SOURCES += $(FRO)/src/risp.cpp
-CXX_SOURCES += $(FRO)/src/risp_static.cpp
-CXX_SOURCES += $(FRO)/src/framework.cpp
-CXX_SOURCES += $(FRO)/src/processor_help.cpp
-CXX_SOURCES += $(FRO)/src/properties.cpp
-
-# -----------------------------------------------------------------------------
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
 
 all: libsnn.so
 

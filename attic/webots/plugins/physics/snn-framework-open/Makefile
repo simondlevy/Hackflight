@@ -18,15 +18,29 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-NET = $(ROOT)/2025-diff-network/levy/
-
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
+
+INCLUDE = -I$(SRC)
 
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
-all: libnewsnn.so
+# TeNNLab framework stuff ------------------------------ ----------------------
+
+FRO = $(HOME)/Desktop/framework-open
+
+INCLUDE += -I$(FRO)/include -I$(FRO)/include/utils
+
+CXX_SOURCES += $(FRO)/src/risp.cpp
+CXX_SOURCES += $(FRO)/src/risp_static.cpp
+CXX_SOURCES += $(FRO)/src/framework.cpp
+CXX_SOURCES += $(FRO)/src/processor_help.cpp
+CXX_SOURCES += $(FRO)/src/properties.cpp
+
+# -----------------------------------------------------------------------------
+
+all: libsnn.so
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

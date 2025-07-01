@@ -16,8 +16,11 @@
 
 #pragma once
 
+#include <difference_network.hpp>
+
 #include <control/partial.hpp>
-#include <tennlab/differencer.hpp>
+
+static const float MAX_SPIKE_TIME = 1000;
 
 static void runClosedLoopControl(
         const float dt,
@@ -27,20 +30,8 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    static DifferenceNetwork _network;
-
-    static bool _initialized;
-
-    // Initialize the first time around
-    if (!_initialized) {
-
-        // true = visualize
-        _network.init(true);
-
-        _initialized = true;
-    }
-
-    const float zerror = _network.run(openLoopDemands.thrust, vehicleState.z);
+    const float zerror = DifferenceNetwork::run(
+            openLoopDemands.thrust, vehicleState.z, MAX_SPIKE_TIME);
 
     runControlWithZError(
             hovering,
