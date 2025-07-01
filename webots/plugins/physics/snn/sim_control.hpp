@@ -92,11 +92,11 @@ static void runClosedLoopControl(
 
     if (_tick++ == VIZ_SEND_PERIOD) {
 
-        (void)make_viz_message;
+        const std::vector<int> counts = {10, 10, 10, 10, 10, 10, 10};
 
-        //const std::string msg = make_viz_message(counts);
+        const std::string msg = make_viz_message(counts);
 
-        //_spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
+        _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
 
         _tick = 0;
     }
