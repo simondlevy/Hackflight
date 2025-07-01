@@ -20,7 +20,7 @@
 
 #include <control/partial.hpp>
 
-#include "visualizer.hpp"
+//#include "visualizer.hpp"
 
 static const float MAX_SPIKE_TIME = 1000;
 
@@ -32,8 +32,20 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    const float zerror = DifferenceNetwork::run(
-            openLoopDemands.thrust, vehicleState.z, MAX_SPIKE_TIME);
+    static bool _initialized;
+    static DifferenceNetwork _net;
+    //static Visualizer _visualizer;
+
+    if (!_initialized) {
+
+        _net.init(MAX_SPIKE_TIME);
+
+        //_visualizer.init(MAX_SPIKE_TIME);
+
+        _initialized = true;
+    }    
+    
+    const float zerror = _net.run(openLoopDemands.thrust, vehicleState.z);
 
     runControlWithZError(
             hovering,
@@ -46,14 +58,5 @@ static void runClosedLoopControl(
             openLoopDemands.yaw,
             demands);
 
-    static bool _initialized;
-
-    static Visualizer _visualizer;
-
-    if (!_initialized) {
-
-        _visualizer.init(MAX_SPIKE_TIME);
-
-        _initialized = true;
-    }
+    //_visualizer.send_spikes(10, 10, 10, 10, 10, 10);
 }

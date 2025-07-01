@@ -78,7 +78,6 @@ class Visualizer {
                 const int s_spike_time,
                 const int o_spike_time)
         {
-            const float i_scale = 50 / _max_spike_time;
             const float d_scale = 250 / _max_spike_time;
             const float o_scale = 25 / _max_spike_time;
             const float s_bias = 0.8 * _max_spike_time;
