@@ -16,13 +16,42 @@
 
 #pragma once
 
-#include <difference_network.hpp>
+#include <vector>
+#include <string>
 
+#include <posix-utils/server.hpp>
+#include <difference_network.hpp>
 #include <control/partial.hpp>
 
-//#include "visualizer.hpp"
+static const int VIZ_PORT = 8100;
+
+static const int VIZ_SEND_PERIOD = 50; // ticks
 
 static const float MAX_SPIKE_TIME = 1000;
+
+std::string make_viz_message(const std::vector<int> counts)
+{
+    const int n = counts.size();
+
+    std::string msg = "{\"Event Counts\":[";
+
+    for (int i=0; i<n; ++i) {
+        char tmp[100] = {};
+        const int count = counts[i];
+        sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
+        msg += tmp;
+    }
+
+    msg += ", \"Neuron Alias\":[";
+
+    for (int i=0; i<n; ++i) {
+        char tmp[100] = {};
+        sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
+        msg += tmp;
+    }
+
+    return msg + "}\n"; 
+}
 
 static void runClosedLoopControl(
         const float dt,
@@ -34,17 +63,18 @@ static void runClosedLoopControl(
 {
     static bool _initialized;
     static DifferenceNetwork _net;
-    //static Visualizer _visualizer;
+    static ServerSocket _spikeServer;
 
     if (!_initialized) {
 
         _net.init(MAX_SPIKE_TIME);
 
-        //_visualizer.init(MAX_SPIKE_TIME);
+        _spikeServer.open(VIZ_PORT);
+        _spikeServer.acceptClient();
 
         _initialized = true;
     }    
-    
+
     const float zerror = _net.run(openLoopDemands.thrust, vehicleState.z);
 
     runControlWithZError(
@@ -57,6 +87,19 @@ static void runClosedLoopControl(
             openLoopDemands.pitch,
             openLoopDemands.yaw,
             demands);
+
+    static int _tick;
+
+    if (_tick++ == VIZ_SEND_PERIOD) {
+
+        (void)make_viz_message;
+
+        //const std::string msg = make_viz_message(counts);
+
+        //_spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
+
+        _tick = 0;
+    }
 
     //_visualizer.send_spikes(10, 10, 10, 10, 10, 10);
 }
