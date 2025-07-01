@@ -34,6 +34,8 @@
 #include <msp/serializer.hpp>
 #include <tennlab/differencer.hpp>
 
+#include "tick.hpp"
+
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
 
@@ -106,9 +108,15 @@ int main(int argc, char ** argv)
             // Special handling for hover setpoint messages
             if (msgid == MSP_SET_SETPOINT_HOVER) {
 
-                const float zerror = _network.run(parser.getFloat(3), state_z);
+                tick();
 
-                printf("zerror=%+3.3f\n", zerror);
+                const float demand = parser.getFloat(3);
+                const float actual = state_z;
+
+                const float zerror = demand - actual;
+
+                const float tmperror = _network.run(demand, actual);
+                (void)tmperror;
 
                 // Grab the setpoint values and replace the altitude setpoint
                 // with its error
