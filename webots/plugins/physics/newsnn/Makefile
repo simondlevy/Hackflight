@@ -20,11 +20,10 @@ ROOT = $(HOME)/Desktop
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I$(SRC)
-
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) \
+		  -I$(ROOT)/tennlab-networks
 
 all: libnewsnn.so
 
