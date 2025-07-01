@@ -26,19 +26,6 @@ CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT)
 
-# TeNNLab embedded stuff ------------------------------ -----------------------
-
-EMB = $(HOME)/Desktop/embedded-neuromorphic
-NETS = $(HOME)/Desktop/tennlab-networks
-RISP = $(EMB)/processors/risp
-
-INCLUDE += -I$(RISP)/include
-
-CXX_SOURCES += $(RISP)/src/network.cpp
-CXX_SOURCES += $(NETS)/difference_risp_plank_100.cpp
-
-# -----------------------------------------------------------------------------
-
 all: libnewsnn.so
 
 ### Do not modify: this includes Webots global Makefile.include

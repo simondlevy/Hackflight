@@ -16,11 +16,6 @@
 
 #pragma once
 
-// emebdded neuromorphic
-#include <network.h>
-#include <network_load.h>
-
-// Hackflight
 #include <control/partial.hpp>
 
 static void runClosedLoopControl(
@@ -36,13 +31,12 @@ static void runClosedLoopControl(
     // Initialize the first time around
     if (!_initialized) {
 
-        load_network();
-
         _initialized = true;
     }
 
-    // const float zerror = _network.run(openLoopDemands.thrust, vehicleState.z);
-    const float zerror = openLoopDemands.thrust - vehicleState.z;
+    const float demand = openLoopDemands.thrust;
+    const float actual = vehicleState.z;
+    const float zerror = demand - actual;
 
     runControlWithZError(
             hovering,

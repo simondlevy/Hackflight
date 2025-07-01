@@ -61,7 +61,7 @@ class DifferenceNetwork {
                     (int)(spike_time_1 * I_SCALE),
                     (int)(spike_time_2 * I_SCALE),
                     1,
-                    (int)(tmp[3] * D_SCALE),
+                    (int)(tmp[3] * D_SCAE),
                     (int)(tmp[4] * D_SCALE),
                     (int)((out - MAX_SPIKE_TIME) * O_SCALE),
                     (int)((tmp[6] - S_BIAS) * S_SCALE)
