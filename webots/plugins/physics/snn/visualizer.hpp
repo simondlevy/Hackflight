@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include <posix-utils/server.hpp>
 
@@ -35,7 +36,31 @@ class Visualizer {
 
         ServerSocket _spikeServer;
 
-    public:
+        std::string make_viz_message(const std::vector<int> counts)
+        {
+            const int n = counts.size();
+
+            std::string msg = "{\"Event Counts\":[";
+
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                const int count = counts[i];
+                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
+                msg += tmp;
+            }
+
+            msg += ", \"Neuron Alias\":[";
+
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
+                msg += tmp;
+            }
+
+            return msg + "}\n"; 
+        }
+
+     public:
 
         void init(const float max_spike_time)
         {
@@ -73,9 +98,9 @@ class Visualizer {
                     (int)((s_spike_time - s_bias) * s_scale)
                 };
 
-                //const string msg = _framework.make_viz_message(counts);
+                const std::string msg = make_viz_message(counts);
 
-                //_spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
+                _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
 
                 _tick = 0;
             }
