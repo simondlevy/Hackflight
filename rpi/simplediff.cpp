@@ -83,7 +83,7 @@ int main(int argc, char ** argv)
     pthread_create(&control_thread, NULL, control_fun, NULL);
 
     // true = Bluetooth
-    auto setpointServer = Server(RADIO_PORT, "setpoint", true);
+    auto setpointServer = Server(RADIO_PORT, "simplediff setpoint", true);
 
     MspParser parser = {};
 

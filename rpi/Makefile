@@ -24,13 +24,13 @@ FROLIB = -L $(FRO)/lib -lframework
 INCLUDE =  -I$(ROOT) -I../src
 
 standard: standard.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver standard.cpp
+	g++ -Wall $(INCLUDE) -O3 -Wall -o standard standard.cpp
 
 simplediff: simplediff.cpp ../src/msp/messages.h
-	g++ -Wall $(INCLUDE) -O3 -Wall -o btserver simplediff.cpp
+	g++ -Wall $(INCLUDE) -O3 -Wall -o simplediff simplediff.cpp
 
 snn: snn.cpp ../src/msp/messages.h
-	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o btserver \
+	g++ -Wall $(FROINC) $(INCLUDE) -I../src/tennlab -O3 -Wall -o snn \
 		snn.cpp  $(FROOBJ) $(FROLIB)
 
 ../src/msp/messages.h: ../msppg/messages.json
