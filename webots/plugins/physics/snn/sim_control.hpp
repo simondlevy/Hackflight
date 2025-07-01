@@ -20,8 +20,16 @@
 #include <string>
 
 #include <posix-utils/server.hpp>
+
 #include <difference_network.hpp>
-#include <control/partial.hpp>
+
+#include <control/pids/altitude.hpp>
+#include <control/pids/position.hpp>
+#include <control/pids/pitchroll_angle.hpp>
+#include <control/pids/pitchroll_rate.hpp>
+#include <control/pids/yaw_angle.hpp>
+#include <control/pids/yaw_rate.hpp>
+#include <vehicles/diyquad.hpp>
 
 static const int VIZ_PORT = 8100;
 
@@ -53,6 +61,36 @@ std::string make_viz_message(const std::vector<int> counts)
     return msg + "}\n"; 
 }
 
+static float runClimbRateController(
+        DifferenceNetwork & net,
+        const bool hovering,
+        const float z0,
+        const float dt,
+        const float z,
+        const float dz,
+        const float demand)
+{
+    static const float KP = 25;
+    static const float KI = 15;
+    static const float ILIMIT = 5000;
+
+    static float _integral;
+
+    const auto airborne = hovering || (z > z0);
+
+    const auto error = net.run(demand, dz);
+
+    _integral = airborne ? 
+        Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+
+    const auto thrust = KP * error + KI * _integral;
+
+    return airborne ?
+        Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                THRUST_MIN, THRUST_MAX) : 0;
+}
+
+
 static void runClosedLoopControl(
         const float dt,
         const bool hovering,
@@ -75,24 +113,62 @@ static void runClosedLoopControl(
         _initialized = true;
     }    
 
-    const float zerror = _net.run(openLoopDemands.thrust, vehicleState.z);
+    const auto climbrate = AltitudeController::run(hovering,
+            dt, vehicleState.z, openLoopDemands.thrust);
 
-    runControlWithZError(
-            hovering,
+    demands.thrust =
+        runClimbRateController(
+                _net,
+                hovering,
+                landingAltitudeMeters,
+                dt,
+                vehicleState.z,
+                vehicleState.dz,
+                climbrate);
+
+    const auto airborne = demands.thrust > 0;
+
+    const auto yaw = YawAngleController::run(
+            airborne, dt, vehicleState.psi, openLoopDemands.yaw);
+
+    demands.yaw =
+        YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+
+    PositionController::run(
+            airborne,
             dt,
-            landingAltitudeMeters,
-            vehicleState,
-            zerror,
-            openLoopDemands.roll,
-            openLoopDemands.pitch,
-            openLoopDemands.yaw,
-            demands);
+            vehicleState.dx, vehicleState.dy, vehicleState.psi,
+            hovering ? openLoopDemands.pitch : 0,
+            hovering ? openLoopDemands.roll : 0,
+            demands.roll, demands.pitch);
+
+    PitchRollAngleController::run(
+            airborne,
+            dt,
+            vehicleState.phi, vehicleState.theta,
+            demands.roll, demands.pitch,
+            demands.roll, demands.pitch);
+
+    PitchRollRateController::run(
+            airborne,
+            dt,
+            vehicleState.dphi, vehicleState.dtheta,
+            demands.roll, demands.pitch,
+            demands.roll, demands.pitch);
 
     static int _tick;
 
     if (_tick++ == VIZ_SEND_PERIOD) {
 
-        const std::vector<int> counts = {10, 10, 10, 10, 10, 10, 10};
+        const std::vector<int> counts = {
+            _net.get_i1_spike_count(),
+            _net.get_i2_spike_count(),
+            _net.get_s_spike_count(),
+            _net.get_d1_spike_count(),
+            _net.get_d2_spike_count(),
+            _net.get_s2_spike_count(),
+            _net.get_o_spike_count()
+        };
 
         const std::string msg = make_viz_message(counts);
 
@@ -100,6 +176,4 @@ static void runClosedLoopControl(
 
         _tick = 0;
     }
-
-    //_visualizer.send_spikes(10, 10, 10, 10, 10, 10);
 }
