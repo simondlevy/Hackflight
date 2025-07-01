@@ -44,7 +44,7 @@ static int serialfd;
 static void * logging_fun(void * arg)
 {
     // true = Bluetooth
-    auto stateServer = Server(STATE_PORT, "state", true);
+    auto stateServer = Server(STATE_PORT, "standard state", true);
 
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
@@ -102,7 +102,7 @@ int main(int argc, char ** argv)
     pthread_create(&logging_thread, NULL, logging_fun, NULL);
 
     // true = Bluetooth
-    auto setpointServer = Server(RADIO_PORT, "setpoint", true);
+    auto setpointServer = Server(RADIO_PORT, "standard setpoint", true);
 
     MspParser parser = {};
 
