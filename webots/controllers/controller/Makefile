@@ -39,19 +39,19 @@ VERBOSE = 1
 
 runstandard:
 	cp ../../plugins/physics/standard/libstandard.so \
-		../../plugins/physics/custom/libcustom.so
+		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runhaskell:
 	cp ../../plugins/physics/haskell/libhaskell.so \
-		../../plugins/physics/custom/libcustom.so
+		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 runnewsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
-		../../plugins/physics/custom/libcustom.so
+		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) #&
 #	sleep 1
@@ -65,7 +65,7 @@ runnewsnn:
 
 runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
-		../../plugins/physics/custom/libcustom.so
+		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
 	sleep 1
