@@ -16,9 +16,11 @@
 
 #pragma once
 
-#include <max_1000.hpp>
+#include <difference_network.hpp>
 
 #include <control/partial.hpp>
+
+static const float MAX_SPIKE_TIME = 1000;
 
 static void runClosedLoopControl(
         const float dt,
@@ -28,16 +30,8 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    static bool _initialized;
-
-    // Initialize the first time around
-    if (!_initialized) {
-
-        _initialized = true;
-    }
-
-    const float zerror = DifferenceNetwork::run(openLoopDemands.thrust, vehicleState.z);
-    //const float zerror = openLoopDemands.thrust - vehicleState.z;
+    const float zerror = DifferenceNetwork::run(
+            openLoopDemands.thrust, vehicleState.z, MAX_SPIKE_TIME);
 
     runControlWithZError(
             hovering,
