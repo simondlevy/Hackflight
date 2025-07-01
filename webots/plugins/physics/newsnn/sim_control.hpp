@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <difference_risp_plank_1000.hpp>
+#include <max_1000.hpp>
 
 #include <control/partial.hpp>
 
@@ -36,8 +36,8 @@ static void runClosedLoopControl(
         _initialized = true;
     }
 
-    const float zerror = runDifferenceNetwork(
-            openLoopDemands.thrust, vehicleState.z);
+    const float zerror = DifferenceNetwork::run(openLoopDemands.thrust, vehicleState.z);
+    //const float zerror = openLoopDemands.thrust - vehicleState.z;
 
     runControlWithZError(
             hovering,
