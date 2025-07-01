@@ -49,7 +49,7 @@ runhaskell:
 	webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
-runnewsnn:
+runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
@@ -57,20 +57,6 @@ runnewsnn:
 #	sleep 1
 #	cd $(VIZ_DIR); \
 # 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":"localhost"}' \
-     	-n $(NET) --show_spike_count --set_num_screen_shot 0 \
-		--use_name_neuron \
-		'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O","6":"S2"}' \
-		--set_font_size 16 \
-		> /dev/null
-
-runsnn:
-	cp ../../plugins/physics/snn/libsnn.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
-	sleep 1
-	cd $(VIZ_DIR); \
- 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":"localhost"}' \
      	-n $(NET) --show_spike_count --set_num_screen_shot 0 \
 		--use_name_neuron \
 		'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O","6":"S2"}' \
