@@ -166,8 +166,8 @@ static void runClosedLoopControl(
             _net.get_s_spike_count(),
             _net.get_d1_spike_count(),
             _net.get_d2_spike_count(),
-            _net.get_s2_spike_count(),
-            _net.get_o_spike_count()
+            _net.get_o_spike_count(),
+            _net.get_s2_spike_count()
         };
 
         const std::string msg = make_viz_message(counts);
