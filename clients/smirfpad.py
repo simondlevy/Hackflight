@@ -31,15 +31,7 @@ except Exception as e:
     exit(0)
 
 
-try:
-    from msp import Parser as MspParser
-except Exception as e:
-    print('%s: Install msp: cd ../msppg; make install' % str(e))
-    exit(0)
-
 RPI_SETPOINT_PORT = 1
-
-RPI_SERVER 
 
 SUPPORTED_GAMEPADS = {'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
 
