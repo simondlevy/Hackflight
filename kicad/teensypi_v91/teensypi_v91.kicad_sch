@@ -1,1973 +1,4888 @@
-(kicad_sch (version 20211123) (generator eeschema)
-
-  (uuid afb8e687-4a13-41a1-b8c0-89a749e897fe)
-
-  (paper "User" 297.002 244.323)
-
-  (lib_symbols
-    (symbol "teensypi_v91-eagle-import:1X1" (in_bom yes) (on_board yes)
-      (property "Reference" "" (id 0) (at -2.54 3.175 0)
-        (effects (font (size 1.27 1.27)) (justify left bottom))
-      )
-      (property "Value" "1X1" (id 1) (at -2.54 -4.445 0)
-        (effects (font (size 1.27 1.27)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:1X1" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "1X1_1_0"
-        (polyline
-          (pts
-            (xy -2.54 -2.54)
-            (xy 2.54 -2.54)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -2.54 2.54)
-            (xy -2.54 -2.54)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -2.54 2.54)
-            (xy 2.54 2.54)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 0)
-            (xy 2.54 0)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 2.54 -2.54)
-            (xy 2.54 0)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 2.54 0)
-            (xy 2.54 2.54)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (text "01" (at 0 0 0)
-          (effects (font (size 1.016 1.016)))
-        )
-        (pin bidirectional line (at 2.54 0 180) (length 0)
-          (name "1" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 0 0))))
-        )
-      )
-    )
-    (symbol "teensypi_v91-eagle-import:CONN_02" (in_bom yes) (on_board yes)
-      (property "Reference" "J" (id 0) (at -2.54 5.588 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Value" "CONN_02" (id 1) (at -2.54 -4.826 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:1X02" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "CONN_02_1_0"
-        (polyline
-          (pts
-            (xy -2.54 5.08)
-            (xy -2.54 -2.54)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -2.54 5.08)
-            (xy 3.81 5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 0)
-            (xy 2.54 0)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 2.54)
-            (xy 2.54 2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -2.54)
-            (xy -2.54 -2.54)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -2.54)
-            (xy 3.81 5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (pin passive line (at 7.62 0 180) (length 5.08)
-          (name "1" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 7.62 2.54 180) (length 5.08)
-          (name "2" (effects (font (size 0 0))))
-          (number "2" (effects (font (size 1.27 1.27))))
-        )
-      )
-    )
-    (symbol "teensypi_v91-eagle-import:CONN_03" (in_bom yes) (on_board yes)
-      (property "Reference" "J" (id 0) (at -2.54 5.588 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Value" "CONN_03" (id 1) (at -2.54 -7.366 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:1X03" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "CONN_03_1_0"
-        (polyline
-          (pts
-            (xy -2.54 5.08)
-            (xy -2.54 -5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -2.54 5.08)
-            (xy 3.81 5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 -2.54)
-            (xy 2.54 -2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 0)
-            (xy 2.54 0)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 2.54)
-            (xy 2.54 2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -5.08)
-            (xy -2.54 -5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -5.08)
-            (xy 3.81 5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (pin passive line (at 7.62 -2.54 180) (length 5.08)
-          (name "1" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 7.62 0 180) (length 5.08)
-          (name "2" (effects (font (size 0 0))))
-          (number "2" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 7.62 2.54 180) (length 5.08)
-          (name "3" (effects (font (size 0 0))))
-          (number "3" (effects (font (size 1.27 1.27))))
-        )
-      )
-    )
-    (symbol "teensypi_v91-eagle-import:CONN_04PTH" (in_bom yes) (on_board yes)
-      (property "Reference" "J" (id 0) (at -5.08 8.128 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Value" "CONN_04PTH" (id 1) (at -5.08 -7.366 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:1X04" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "CONN_04PTH_1_0"
-        (polyline
-          (pts
-            (xy -5.08 7.62)
-            (xy -5.08 -5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -5.08 7.62)
-            (xy 1.27 7.62)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -1.27 -2.54)
-            (xy 0 -2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -1.27 0)
-            (xy 0 0)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -1.27 2.54)
-            (xy 0 2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -1.27 5.08)
-            (xy 0 5.08)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 -5.08)
-            (xy -5.08 -5.08)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 1.27 -5.08)
-            (xy 1.27 7.62)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (pin passive line (at 5.08 -2.54 180) (length 5.08)
-          (name "1" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 5.08 0 180) (length 5.08)
-          (name "2" (effects (font (size 0 0))))
-          (number "2" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 5.08 2.54 180) (length 5.08)
-          (name "3" (effects (font (size 0 0))))
-          (number "3" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 5.08 5.08 180) (length 5.08)
-          (name "4" (effects (font (size 0 0))))
-          (number "4" (effects (font (size 1.27 1.27))))
-        )
-      )
-    )
-    (symbol "teensypi_v91-eagle-import:CONN_14" (in_bom yes) (on_board yes)
-      (property "Reference" "J" (id 0) (at 0 18.288 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Value" "CONN_14" (id 1) (at 0 -22.606 0)
-        (effects (font (size 1.778 1.778)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:1X14" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "CONN_14_1_0"
-        (polyline
-          (pts
-            (xy 0 17.78)
-            (xy 0 -20.32)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 0 17.78)
-            (xy 6.35 17.78)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -17.78)
-            (xy 5.08 -17.78)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -15.24)
-            (xy 5.08 -15.24)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -12.7)
-            (xy 5.08 -12.7)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -10.16)
-            (xy 5.08 -10.16)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -7.62)
-            (xy 5.08 -7.62)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -5.08)
-            (xy 5.08 -5.08)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 -2.54)
-            (xy 5.08 -2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 0)
-            (xy 5.08 0)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 2.54)
-            (xy 5.08 2.54)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 5.08)
-            (xy 5.08 5.08)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 7.62)
-            (xy 5.08 7.62)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 10.16)
-            (xy 5.08 10.16)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 12.7)
-            (xy 5.08 12.7)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 3.81 15.24)
-            (xy 5.08 15.24)
-          )
-          (stroke (width 0.6096) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 6.35 -20.32)
-            (xy 0 -20.32)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy 6.35 -20.32)
-            (xy 6.35 17.78)
-          )
-          (stroke (width 0.4064) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (pin passive line (at 10.16 -17.78 180) (length 5.08)
-          (name "1" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 5.08 180) (length 5.08)
-          (name "10" (effects (font (size 0 0))))
-          (number "10" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 7.62 180) (length 5.08)
-          (name "11" (effects (font (size 0 0))))
-          (number "11" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 10.16 180) (length 5.08)
-          (name "12" (effects (font (size 0 0))))
-          (number "12" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 12.7 180) (length 5.08)
-          (name "13" (effects (font (size 0 0))))
-          (number "13" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 15.24 180) (length 5.08)
-          (name "14" (effects (font (size 0 0))))
-          (number "14" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 -15.24 180) (length 5.08)
-          (name "2" (effects (font (size 0 0))))
-          (number "2" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 -12.7 180) (length 5.08)
-          (name "3" (effects (font (size 0 0))))
-          (number "3" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 -10.16 180) (length 5.08)
-          (name "4" (effects (font (size 0 0))))
-          (number "4" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 -7.62 180) (length 5.08)
-          (name "5" (effects (font (size 0 0))))
-          (number "5" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 -5.08 180) (length 5.08)
-          (name "6" (effects (font (size 0 0))))
-          (number "6" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 -2.54 180) (length 5.08)
-          (name "7" (effects (font (size 0 0))))
-          (number "7" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 0 180) (length 5.08)
-          (name "8" (effects (font (size 0 0))))
-          (number "8" (effects (font (size 1.27 1.27))))
-        )
-        (pin passive line (at 10.16 2.54 180) (length 5.08)
-          (name "9" (effects (font (size 0 0))))
-          (number "9" (effects (font (size 1.27 1.27))))
-        )
-      )
-    )
-    (symbol "teensypi_v91-eagle-import:SMD2" (in_bom yes) (on_board yes)
-      (property "Reference" "PAD" (id 0) (at -1.143 1.8542 0)
-        (effects (font (size 1.778 1.5113)) (justify left bottom))
-      )
-      (property "Value" "SMD2" (id 1) (at -1.143 -3.302 0)
-        (effects (font (size 1.778 1.5113)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "SMD2_1_0"
-        (polyline
-          (pts
-            (xy -1.016 -1.016)
-            (xy 1.016 1.016)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -1.016 1.016)
-            (xy 1.016 -1.016)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (pin passive line (at 2.54 0 180) (length 2.54)
-          (name "P" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 0 0))))
-        )
-      )
-    )
-    (symbol "teensypi_v91-eagle-import:SMD5" (in_bom yes) (on_board yes)
-      (property "Reference" "PAD" (id 0) (at -1.143 1.8542 0)
-        (effects (font (size 1.778 1.5113)) (justify left bottom))
-      )
-      (property "Value" "SMD5" (id 1) (at -1.143 -3.302 0)
-        (effects (font (size 1.778 1.5113)) (justify left bottom))
-      )
-      (property "Footprint" "teensypi_v91:SMD2,54-5,08" (id 2) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "Datasheet" "" (id 3) (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property "ki_locked" "" (id 4) (at 0 0 0)
-        (effects (font (size 1.27 1.27)))
-      )
-      (symbol "SMD5_1_0"
-        (polyline
-          (pts
-            (xy -1.016 -1.016)
-            (xy 1.016 1.016)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (polyline
-          (pts
-            (xy -1.016 1.016)
-            (xy 1.016 -1.016)
-          )
-          (stroke (width 0.254) (type default) (color 0 0 0 0))
-          (fill (type none))
-        )
-        (pin passive line (at 2.54 0 180) (length 2.54)
-          (name "P" (effects (font (size 0 0))))
-          (number "1" (effects (font (size 0 0))))
-        )
-      )
-    )
-  )
-
-
-  (wire (pts (xy 68.58 114.3) (xy 73.66 114.3))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 005f6ea1-3526-4e97-86e4-41388e3bc145)
-  )
-  (wire (pts (xy 50.8 152.4) (xy 55.88 152.4))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 0afa5357-c57e-42cd-b476-72d99f39fe9f)
-  )
-  (wire (pts (xy 88.9 180.34) (xy 93.98 180.34))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 0b2da3ef-2445-490e-b668-8ae41309ee36)
-  )
-  (wire (pts (xy 71.12 25.4) (xy 76.2 25.4))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 0f28d312-e674-493b-bb0d-24fe0fb55a5f)
-  )
-  (wire (pts (xy 50.8 165.1) (xy 58.42 165.1))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 0fe73d7c-983e-4368-b1af-2c7091659c0b)
-  )
-  (wire (pts (xy 254 203.2) (xy 256.54 203.2))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 10a5cee8-0f6f-4aac-80c1-915f5fcf52f0)
-  )
-  (wire (pts (xy 132.08 170.18) (xy 137.16 170.18))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 111becb9-cb80-417e-8fbe-97b6e8030333)
-  )
-  (wire (pts (xy 68.58 109.22) (xy 73.66 109.22))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 202e566d-5dd9-4e58-8d82-bf96da938851)
-  )
-  (wire (pts (xy 50.8 172.72) (xy 58.42 172.72))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 24cb67fc-f0c9-4f6e-88c1-7636ab854c5e)
-  )
-  (wire (pts (xy 208.28 175.26) (xy 213.36 175.26))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 2652ca87-c786-4061-81b7-9315b84b5d2c)
-  )
-  (wire (pts (xy 152.4 35.56) (xy 160.02 35.56))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 2b670198-954c-4e3b-b1b0-4485bbd2f4ee)
-  )
-  (wire (pts (xy 111.76 25.4) (xy 116.84 25.4))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 2cad3fe2-0f3b-467e-9c49-f271aa1ec49b)
-  )
-  (wire (pts (xy 71.12 55.88) (xy 76.2 55.88))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 347b3477-2f16-4a24-a474-1e5febecef0e)
-  )
-  (wire (pts (xy 147.32 81.28) (xy 152.4 81.28))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 36786f1c-5181-4b16-85f0-7a9b5e48989f)
-  )
-  (wire (pts (xy 71.12 53.34) (xy 76.2 53.34))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 3adb9496-2d9f-40cf-b330-cf802996ea7f)
-  )
-  (wire (pts (xy 71.12 27.94) (xy 76.2 27.94))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 3da2a955-efa4-4cba-97bf-5c3895b6ca21)
-  )
-  (wire (pts (xy 132.08 172.72) (xy 137.16 172.72))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 3dd67e23-151f-4030-9f89-07540f8b3bb5)
-  )
-  (wire (pts (xy 231.14 195.58) (xy 238.76 195.58))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 42f4679b-2c4d-49cf-8f9e-afb5127a3112)
-  )
-  (wire (pts (xy 187.96 86.36) (xy 193.04 86.36))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 446bf57c-8a66-4199-8c1c-73dc66bbce20)
-  )
-  (wire (pts (xy 187.96 93.98) (xy 193.04 93.98))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 4b91a28b-e778-4691-8d2b-bb09bc10e8e8)
-  )
-  (wire (pts (xy 88.9 152.4) (xy 93.98 152.4))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 53a382a5-9123-45f3-a2e9-3b2de6ca541d)
-  )
-  (wire (pts (xy 231.14 190.5) (xy 238.76 190.5))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 55dcb42c-b26a-49b8-8a1f-cc80851d2e4d)
-  )
-  (wire (pts (xy 254 205.74) (xy 256.54 205.74))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 56ba8f65-c244-4416-8ed2-b5691db880ab)
-  )
-  (wire (pts (xy 88.9 172.72) (xy 93.98 172.72))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 58eb1f49-1e5e-4c0c-97da-fb971f13fe25)
-  )
-  (wire (pts (xy 83.82 76.2) (xy 88.9 76.2))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 5946461c-3619-4297-ada8-808db114b5fb)
-  )
-  (wire (pts (xy 111.76 55.88) (xy 116.84 55.88))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 5c946c69-aabf-45dc-9f47-f37983b2dc53)
-  )
-  (wire (pts (xy 208.28 172.72) (xy 213.36 172.72))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 60b868e3-a9f8-4d20-ae5a-40ca53af4adb)
-  )
-  (wire (pts (xy 111.76 22.86) (xy 116.84 22.86))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 63a30107-e64a-4f1f-b117-b90cb84b149e)
-  )
-  (wire (pts (xy 50.8 154.94) (xy 55.88 154.94))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 642badde-3a43-415c-9e9a-0400e9ad9539)
-  )
-  (wire (pts (xy 71.12 22.86) (xy 76.2 22.86))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 6a82e1e6-8e23-40fe-9f7f-da90c0712b96)
-  )
-  (wire (pts (xy 180.34 218.44) (xy 187.96 218.44))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 6b065e8e-fef9-4b30-824e-7d9ccd606772)
-  )
-  (wire (pts (xy 152.4 25.4) (xy 160.02 25.4))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 70b53718-ed58-494c-b8a6-19eb974c07c4)
-  )
-  (wire (pts (xy 111.76 27.94) (xy 116.84 27.94))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 74d431fd-cb2a-4a57-b8ad-03906426963d)
-  )
-  (wire (pts (xy 50.8 175.26) (xy 58.42 175.26))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 80bbd906-780d-49d4-9591-df6c1a36ee85)
-  )
-  (wire (pts (xy 147.32 96.52) (xy 152.4 96.52))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 8a203993-fbf3-470f-ab7c-4d95a24716de)
-  )
-  (wire (pts (xy 111.76 58.42) (xy 116.84 58.42))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 92832a32-dcb2-4058-8ad9-237ebe5ab0e8)
-  )
-  (wire (pts (xy 71.12 58.42) (xy 76.2 58.42))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 939bb0a1-244e-4741-90f1-d06027d85c51)
-  )
-  (wire (pts (xy 50.8 177.8) (xy 58.42 177.8))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 951f92e3-c509-40e8-964b-37dd7e0e82bf)
-  )
-  (wire (pts (xy 50.8 180.34) (xy 58.42 180.34))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 95a40d19-41c6-4680-9b37-9cb1bed1a413)
-  )
-  (wire (pts (xy 50.8 149.86) (xy 55.88 149.86))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 95a9cb1b-c155-4d37-a2b5-cecc3f928209)
-  )
-  (wire (pts (xy 231.14 193.04) (xy 238.76 193.04))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid 99772301-d596-41c7-ac2d-d8320c28783c)
-  )
-  (wire (pts (xy 83.82 91.44) (xy 88.9 91.44))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid a092ea0d-146f-427f-adaf-641182334974)
-  )
-  (wire (pts (xy 111.76 53.34) (xy 116.84 53.34))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid a43a5da1-e224-4f65-b747-f67973f2af88)
-  )
-  (wire (pts (xy 50.8 147.32) (xy 55.88 147.32))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid a43ae97f-ff8c-43dd-8d6d-82a22f1be9b5)
-  )
-  (wire (pts (xy 231.14 208.28) (xy 236.22 208.28))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid a58b425b-6fc3-4a86-ae11-a84decf83c5a)
-  )
-  (wire (pts (xy 88.9 165.1) (xy 93.98 165.1))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid aac506cf-4156-47e4-9980-1111a3bb6bcc)
-  )
-  (wire (pts (xy 68.58 111.76) (xy 73.66 111.76))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid ab276e50-f838-4362-9aac-7d16f40393c4)
-  )
-  (wire (pts (xy 152.4 43.18) (xy 160.02 43.18))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid ac975f7b-5c1b-42e6-a54b-1829692bd60c)
-  )
-  (wire (pts (xy 88.9 177.8) (xy 93.98 177.8))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid b3d89762-54ee-4dc0-8c86-98a5d2a2dca5)
-  )
-  (wire (pts (xy 50.8 167.64) (xy 58.42 167.64))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid b867fb16-61a5-4031-9766-9c1c9e8171a2)
-  )
-  (wire (pts (xy 88.9 154.94) (xy 93.98 154.94))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid b89754be-9738-4e5f-8e95-e260ee696903)
-  )
-  (wire (pts (xy 208.28 154.94) (xy 213.36 154.94))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid b90d0267-ce26-4e19-a4c7-fd16cc7a521c)
-  )
-  (wire (pts (xy 187.96 101.6) (xy 193.04 101.6))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid c50a4250-2225-4797-b4a1-1bc3d1138c0f)
-  )
-  (wire (pts (xy 152.4 53.34) (xy 160.02 53.34))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid c548aac3-2100-48bf-a57e-c299f9466e79)
-  )
-  (wire (pts (xy 68.58 116.84) (xy 73.66 116.84))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid c77b66c0-41f5-4d31-abb8-e152e2d28a11)
-  )
-  (wire (pts (xy 88.9 175.26) (xy 93.98 175.26))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid cbbec9dc-3ece-41ba-b187-0bad09b173d6)
-  )
-  (wire (pts (xy 147.32 86.36) (xy 152.4 86.36))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid e2c309e4-b8cd-4d42-b61b-673943cf082a)
-  )
-  (wire (pts (xy 88.9 149.86) (xy 93.98 149.86))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid e92c974a-b07f-4799-a79e-f281f85dbc1a)
-  )
-  (wire (pts (xy 50.8 170.18) (xy 58.42 170.18))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid e9b2f4e0-b0c4-45da-921b-36e4af201264)
-  )
-  (wire (pts (xy 88.9 147.32) (xy 93.98 147.32))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid eb8e38cd-dc17-4593-889c-e9f58005f6e7)
-  )
-  (wire (pts (xy 208.28 157.48) (xy 213.36 157.48))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid fa7a68a5-1582-4679-bafe-2a2ea2733064)
-  )
-  (wire (pts (xy 180.34 195.58) (xy 187.96 195.58))
-    (stroke (width 0) (type default) (color 0 0 0 0))
-    (uuid fec985c7-f284-4d68-8727-af7eebd8b5f8)
-  )
-
-  (label "SCL0" (at 53.34 165.1 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 05bcb62f-e639-408b-893f-71715cd8f94a)
-  )
-  (label "MOSI" (at 88.9 177.8 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 05bdee95-c42e-4b6f-9645-2ec41619b2fe)
-  )
-  (label "GND" (at 111.76 58.42 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 0c83fcb5-bcc7-4f84-8394-d4fc9899e233)
-  )
-  (label "5V" (at 68.58 109.22 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 0c9e7917-e0a0-46fb-b233-2640231d0e2c)
-  )
-  (label "GND" (at 68.58 111.76 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 0eaea668-c353-4e5e-8f10-4648bd7737ed)
-  )
-  (label "3V3" (at 187.96 101.6 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 11d75bf4-5480-4a2f-baa3-58a51cac0470)
-  )
-  (label "MISO" (at 233.68 190.5 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 15fcf661-f7ee-4981-92aa-29fa30316a60)
-  )
-  (label "GND" (at 254 205.74 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 1b0f55f9-5fa5-489c-9db2-e63c29ecdd31)
-  )
-  (label "LED_LED" (at 182.88 195.58 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 2022f2c2-2d52-4762-8871-c3aaafed73b6)
-  )
-  (label "M1" (at 111.76 25.4 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 290311ab-2acc-454a-9a59-6cba16c0a08d)
-  )
-  (label "LED_LED" (at 132.08 170.18 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 2ab6f680-d446-4f8f-9f8c-8ce4722c87d3)
-  )
-  (label "SDA1" (at 53.34 170.18 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 361dcb36-1f5d-45a8-a966-bd2a77e39204)
-  )
-  (label "3V3" (at 208.28 175.26 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 3a13a33d-0399-4bf3-800a-72a2421cb176)
-  )
-  (label "LED_MCU" (at 53.34 175.26 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 3c0e161b-77de-41cd-8057-090b9a285b00)
-  )
-  (label "GND" (at 86.36 76.2 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 3de27c1c-897a-4a6c-b0f7-6b3c6fd91fd1)
-  )
-  (label "VBAT" (at 86.36 91.44 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 4126d392-495e-4ef5-9351-6f700c8637bc)
-  )
-  (label "GND" (at 53.34 149.86 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 44d6780b-0f7d-4066-bfb2-bff50f00afa0)
-  )
-  (label "LED_MCU" (at 182.88 218.44 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 461c24bd-c29b-4d81-bd76-c5414eb04a70)
-  )
-  (label "M2" (at 53.34 154.94 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 4df412ae-87c4-4ec7-8738-a6a72291cb75)
-  )
-  (label "VBAT" (at 71.12 53.34 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 4e861688-f76d-4846-81a3-359bef1f427a)
-  )
-  (label "SDA0" (at 187.96 93.98 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 52194c94-e7df-49ff-beb1-04a1b4f2344e)
-  )
-  (label "GND" (at 154.94 25.4 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 54cae88e-0c1e-4c17-9589-ea6ab2d12694)
-  )
-  (label "3V3" (at 147.32 81.28 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 5e27c7e3-130d-477a-b693-9d7d6d05e3e3)
-  )
-  (label "TX1" (at 154.94 53.34 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 6162fbb8-6718-45ec-b23f-6a6f1488ec21)
-  )
-  (label "CS" (at 233.68 195.58 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 619cf9e3-25a5-4699-bab6-469aedc62cab)
-  )
-  (label "M3" (at 71.12 55.88 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 6ae74015-156b-4b08-b0b7-49ff17fb760f)
-  )
-  (label "RX1" (at 154.94 43.18 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 6af91ec1-f5c6-4c49-998d-22cb7b1bdc03)
-  )
-  (label "M4" (at 71.12 25.4 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 6ddca9c6-d93f-48af-8707-e3012416640e)
-  )
-  (label "SCK" (at 233.68 208.28 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 6e18bff7-8b21-4bb4-8a05-3a319b07518f)
-  )
-  (label "GND" (at 147.32 86.36 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 719303cc-9ddf-4f19-9751-b8db3875f499)
-  )
-  (label "INT" (at 147.32 96.52 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 719e34f3-a935-4f7b-982b-9c19691e49e1)
-  )
-  (label "SCK" (at 53.34 180.34 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 720f9518-b0d8-4879-8ffc-0a3335e2eb9d)
-  )
-  (label "GND" (at 71.12 27.94 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 784b6458-3ae8-48f4-9482-731714d7927e)
-  )
-  (label "CS" (at 88.9 175.26 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 7da9f5c8-a062-40f4-88c6-61890bbc359f)
-  )
-  (label "M2" (at 111.76 55.88 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 84ba6563-aa9a-4a44-a402-ba732fd7b0d2)
-  )
-  (label "5V" (at 53.34 147.32 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 89b81b16-224b-4483-a357-720a8e6eb208)
-  )
-  (label "SDA1" (at 208.28 157.48 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 8f38d61d-85a4-4a20-aa88-865d9c66b0b4)
-  )
-  (label "RX1" (at 88.9 149.86 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid 9d12ed3c-0713-4da7-86c7-5331347f3457)
-  )
-  (label "VBAT" (at 111.76 53.34 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid a2c6281c-1798-4c93-a973-786fd5788e7e)
-  )
-  (label "GND" (at 71.12 58.42 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid a4372ae3-288f-4a9a-96e7-306ddba718f6)
-  )
-  (label "SCL1" (at 208.28 154.94 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid a76c0baf-6e69-4f8d-a142-018c46047833)
-  )
-  (label "GND" (at 68.58 114.3 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid a82c7da7-6077-4900-b925-87315eda8158)
-  )
-  (label "SCL1" (at 53.34 172.72 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid b0f642eb-e44e-4747-9d08-48aa7b02d88d)
-  )
-  (label "SDA0" (at 53.34 167.64 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid c1d15993-12e6-4c0d-a72e-2f76d98a62f2)
-  )
-  (label "MISO" (at 88.9 180.34 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid c2288b71-0313-4831-b20b-64c01771a6a6)
-  )
-  (label "GND" (at 208.28 172.72 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid c47c1013-522e-4afa-9dd5-776b2bbec89a)
-  )
-  (label "VBAT" (at 71.12 22.86 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid c6750bbb-1f60-4923-a832-20fb722c1b93)
-  )
-  (label "VBAT" (at 111.76 22.86 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid cacc113d-885e-464c-bed1-96200200e5f6)
-  )
-  (label "M1" (at 88.9 154.94 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid de6a8a79-ffb1-408e-99f7-331b8dd7ba96)
-  )
-  (label "INT" (at 88.9 165.1 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid df0a2432-7a90-46bd-b54d-8bf995c9c0f2)
-  )
-  (label "MOSI" (at 233.68 193.04 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid df425070-f6bd-4dc2-bc2c-ec8e49ad418d)
-  )
-  (label "GND" (at 132.08 172.72 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid e16db058-fa43-40bf-9cff-c2ed4fab6ab5)
-  )
-  (label "GND" (at 111.76 27.94 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid e584f27e-45dd-4fdd-8c50-c7400e4b2ab2)
-  )
-  (label "5V" (at 157.48 35.56 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid e671ffe9-4ebb-42bd-be8d-cda9a798e138)
-  )
-  (label "SCL0" (at 187.96 86.36 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid e8a669b7-c663-4fa5-9b1f-ce9eb01dc726)
-  )
-  (label "GND" (at 88.9 147.32 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid f01a08c4-d9f1-4838-af18-b59bca81082c)
-  )
-  (label "3V3" (at 254 203.2 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid f138c51d-0ee0-424a-a154-6e86a60a846b)
-  )
-  (label "M3" (at 53.34 177.8 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid f28095b2-5bdd-4916-8fd7-8ee2cde7e2ae)
-  )
-  (label "TX1" (at 88.9 152.4 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid f5bc60e0-ca9c-4444-9bc3-6e40e983addd)
-  )
-  (label "M4" (at 88.9 172.72 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid f711db5e-77b0-4494-90e8-aecb55e572ba)
-  )
-  (label "3V3" (at 53.34 152.4 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid f8deac2f-522c-4605-b44f-70351a68e5b0)
-  )
-  (label "VBAT" (at 68.58 116.84 0)
-    (effects (font (size 1.2446 1.2446)) (justify left bottom))
-    (uuid ff870511-3a90-49f1-9990-5aec7ad35822)
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 144.78 96.52 0)
-    (in_bom yes) (on_board yes)
-    (uuid 0a7da8e8-4a29-4619-8c2a-45042f49f661)
-    (property "Reference" "PAD8" (id 0) (at 143.637 94.6658 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 143.637 99.822 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 144.78 96.52 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 144.78 96.52 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 20fac508-78eb-4aa5-add1-1566151feb66))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_03") (at 104.14 25.4 0)
-    (in_bom yes) (on_board yes)
-    (uuid 24c732be-56c7-40ff-a440-789a73d66281)
-    (property "Reference" "M1" (id 0) (at 101.6 19.812 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "455-1750-1-ND" (id 1) (at 101.6 32.766 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom) hide)
-    )
-    (property "Footprint" "teensypi_v91:1X03" (id 2) (at 104.14 25.4 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 104.14 25.4 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 90871ced-792e-45f5-b74e-584f9a150cb4))
-    (pin "2" (uuid 8de39313-d6b3-49d5-879e-e7c755da7625))
-    (pin "3" (uuid fa837821-0cb5-4c2d-b2ac-2376f32f5c33))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 160.02 81.28 0)
-    (in_bom yes) (on_board yes)
-    (uuid 2ad27911-6b4b-41d3-af19-3a88d479912c)
-    (property "Reference" "PAD12" (id 0) (at 158.877 79.4258 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 158.877 84.582 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 160.02 81.28 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 160.02 81.28 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 7eaae2d7-b4ad-4554-8c8a-2037170131bd))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 185.42 111.76 0)
-    (in_bom yes) (on_board yes)
-    (uuid 2f274d35-c819-4fa4-bf08-0f05441a1514)
-    (property "Reference" "PAD17" (id 0) (at 184.277 109.9058 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 184.277 115.062 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 185.42 111.76 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 185.42 111.76 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 468fcc7f-55f8-4783-b36e-f80ec4401b15))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 185.42 86.36 0)
-    (in_bom yes) (on_board yes)
-    (uuid 442f453a-9b44-44ab-a898-82f45629c72d)
-    (property "Reference" "PAD10" (id 0) (at 184.277 84.5058 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 184.277 89.662 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 185.42 86.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 185.42 86.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 009110da-fae2-454e-8387-1e8fd70409cb))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 149.86 53.34 0)
-    (in_bom yes) (on_board yes)
-    (uuid 44f6de44-c3d8-405f-ac4c-196fb6e5deee)
-    (property "Reference" "RP_RX1" (id 0) (at 148.717 51.4858 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Value" "SMD2" (id 1) (at 148.717 56.642 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 149.86 53.34 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 149.86 53.34 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid dba4ad5b-8704-4fc8-9247-b9c4709cf1cf))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_03") (at 63.5 25.4 0)
-    (in_bom yes) (on_board yes)
-    (uuid 49edae70-5dd4-4020-bb66-e19aaf00297f)
-    (property "Reference" "M4" (id 0) (at 60.96 19.812 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "455-1750-1-ND" (id 1) (at 60.96 32.766 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom) hide)
-    )
-    (property "Footprint" "teensypi_v91:1X03" (id 2) (at 63.5 25.4 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 63.5 25.4 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid caefe669-4c1f-4a42-9061-2eea0460c08d))
-    (pin "2" (uuid e584287a-6232-40cf-a082-8dea5986b945))
-    (pin "3" (uuid 5f48357f-c353-4808-811f-74ed7ffaa7c6))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 198.12 101.6 0)
-    (in_bom yes) (on_board yes)
-    (uuid 49fbb162-ed97-4907-b60a-506613a9940b)
-    (property "Reference" "PAD21" (id 0) (at 196.977 99.7458 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 196.977 104.902 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 198.12 101.6 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 198.12 101.6 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 283ed2be-f188-4938-9d07-b9e8bad5f0d4))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 198.12 111.76 0)
-    (in_bom yes) (on_board yes)
-    (uuid 4b3ca595-07d8-471d-a599-10e87e77b20e)
-    (property "Reference" "PAD22" (id 0) (at 196.977 109.9058 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 196.977 115.062 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 198.12 111.76 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 198.12 111.76 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid bc3f6e1f-c81e-4889-865a-0e223a5a22e2))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_04PTH") (at 63.5 114.3 0)
-    (in_bom yes) (on_board yes)
-    (uuid 4c717b47-484c-4d70-8fcd-83c406ff2d17)
-    (property "Reference" "REG" (id 0) (at 58.42 106.172 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_04PTH" (id 1) (at 58.42 121.666 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X04" (id 2) (at 63.5 114.3 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 63.5 114.3 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid e6eb6955-2cd6-4a24-9d4c-bf3c42dcce77))
-    (pin "2" (uuid 43cc948b-7aa9-4530-a448-911bd0e35fae))
-    (pin "3" (uuid 449c1c23-1f0d-4ed5-b566-2c18ec95c2a3))
-    (pin "4" (uuid 9b11964f-5943-49c9-bbf0-08d035779463))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_02") (at 246.38 205.74 0)
-    (in_bom yes) (on_board yes)
-    (uuid 4cd135a5-fdd1-4851-864a-dadf7c96d9ff)
-    (property "Reference" "PMW3901_3" (id 0) (at 243.84 200.152 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_02" (id 1) (at 243.84 210.566 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X02" (id 2) (at 246.38 205.74 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 246.38 205.74 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 6c1d0ff6-53d9-4a5b-89a8-5313d6ca7d94))
-    (pin "2" (uuid 94b40fef-8e3d-4a32-a137-035c86ca86c8))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_14") (at 78.74 162.56 0)
-    (in_bom yes) (on_board yes)
-    (uuid 657bd73d-9c40-4ca8-b3ea-e75927d498b6)
-    (property "Reference" "T2" (id 0) (at 78.74 144.272 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_14" (id 1) (at 78.74 185.166 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X14" (id 2) (at 78.74 162.56 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 78.74 162.56 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 8ce5f070-df4e-4d8d-b78f-3ef1b6a0875c))
-    (pin "10" (uuid 00d22a94-4415-4f7c-bba5-9ac8913c5f96))
-    (pin "11" (uuid 5498fdb6-915a-4445-8b00-6524ae4d6c27))
-    (pin "12" (uuid e31b63b1-e50c-436f-8b2d-c664bc43a016))
-    (pin "13" (uuid 8764b520-89c4-4e8f-9e4f-12a445e1a616))
-    (pin "14" (uuid 42b75c7f-e205-4778-8b80-6010e5eef40d))
-    (pin "2" (uuid 31880686-d14b-45e6-a2ae-8550fa4d37d7))
-    (pin "3" (uuid d732dada-3bdf-40ee-b2d0-4e0254c2408c))
-    (pin "4" (uuid 59a4dc33-016c-4cea-b648-6fe1c8836f68))
-    (pin "5" (uuid e91ad237-6778-4565-a41c-5451c22b839e))
-    (pin "6" (uuid 16010e58-8aee-45c1-99df-d1cc2bd80779))
-    (pin "7" (uuid 76973292-11cb-4c20-8b65-30d05bb4f01c))
-    (pin "8" (uuid d6dd0f16-8940-44d4-96ec-2f3144e7eef5))
-    (pin "9" (uuid 8e0527a1-64cc-4c21-af5a-5910f4c387cc))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 149.86 35.56 0)
-    (in_bom yes) (on_board yes)
-    (uuid 73e2a101-0bc0-414b-9aa7-7eeb8a3caef1)
-    (property "Reference" "RP_5V" (id 0) (at 148.717 33.7058 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Value" "SMD2" (id 1) (at 148.717 38.862 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 149.86 35.56 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 149.86 35.56 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 48d919bf-1f23-4426-bfff-25ceb2530f1f))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_04PTH") (at 226.06 195.58 0)
-    (in_bom yes) (on_board yes)
-    (uuid 78ce8c1e-89e0-4419-807a-81faccaa13a1)
-    (property "Reference" "PMW3901_1" (id 0) (at 220.98 187.452 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_04PTH" (id 1) (at 220.98 202.946 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X04" (id 2) (at 226.06 195.58 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 226.06 195.58 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 262fe442-673c-4133-92f6-23f6d42651f0))
-    (pin "2" (uuid 2330617f-82c2-43f9-8a7c-826ddfdbb89f))
-    (pin "3" (uuid 4ed25a91-62bc-460f-b416-f09c2b72ae30))
-    (pin "4" (uuid 321c97ce-037e-4926-8c05-7be14a63f7fd))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_03") (at 200.66 154.94 0)
-    (in_bom yes) (on_board yes)
-    (uuid 794e55a0-75fe-436a-8b64-c2f248c65f18)
-    (property "Reference" "VL53L1_1" (id 0) (at 198.12 149.352 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "455-1750-1-ND" (id 1) (at 198.12 162.306 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom) hide)
-    )
-    (property "Footprint" "teensypi_v91:1X03" (id 2) (at 200.66 154.94 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 200.66 154.94 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 6db6b2d8-cd53-4924-910c-ce03370c85ba))
-    (pin "2" (uuid 3d0ee88c-fab5-44ff-91c4-a21e663a09de))
-    (pin "3" (uuid 7fd58396-b4e5-46f4-aa37-499fb1457243))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 160.02 91.44 0)
-    (in_bom yes) (on_board yes)
-    (uuid 7d7305a7-c7da-4881-b215-37c7f2ad171a)
-    (property "Reference" "PAD16" (id 0) (at 158.877 89.5858 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 158.877 94.742 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 160.02 91.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 160.02 91.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid df70582b-c4f2-479d-8c60-1cee46d8e0bc))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 185.42 93.98 0)
-    (in_bom yes) (on_board yes)
-    (uuid 834d0192-2f8f-45da-a664-ea874d4070f9)
-    (property "Reference" "PAD11" (id 0) (at 184.277 92.1258 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 184.277 97.282 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 185.42 93.98 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 185.42 93.98 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 1bd13fbe-d376-42a1-8a94-f12442f4121a))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:1X1") (at 177.8 195.58 0)
-    (in_bom yes) (on_board yes)
-    (uuid 875404be-e359-458a-af29-1bd3403dd55f)
-    (property "Reference" "U$1" (id 0) (at 175.26 192.405 0)
-      (effects (font (size 1.27 1.27)) (justify left bottom))
-    )
-    (property "Value" "1X1" (id 1) (at 175.26 200.025 0)
-      (effects (font (size 1.27 1.27)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X1" (id 2) (at 177.8 195.58 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 177.8 195.58 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 9b396834-9f2e-4234-8e77-e2f453053d8c))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_04PTH") (at 226.06 213.36 0)
-    (in_bom yes) (on_board yes)
-    (uuid 8b56f428-76c6-47f4-814c-d4162e003c52)
-    (property "Reference" "PMW3901_2" (id 0) (at 220.98 205.232 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_04PTH" (id 1) (at 220.98 220.726 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X04" (id 2) (at 226.06 213.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 226.06 213.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 3661902e-90e5-456c-bea6-67cccf66598c))
-    (pin "2" (uuid 303c400a-1ac8-4f8f-ae11-254f46fa0fb3))
-    (pin "3" (uuid fc5e93f7-8264-46ce-a278-5944e151e5a7))
-    (pin "4" (uuid ae3c331f-8808-430e-931c-7d9b2cc37f5b))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD5") (at 81.28 91.44 0)
-    (in_bom yes) (on_board yes)
-    (uuid 949cc60c-3f6b-4495-915a-ef19f31633cf)
-    (property "Reference" "PAD14" (id 0) (at 80.137 89.5858 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Value" "SMD5" (id 1) (at 80.137 94.742 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD2,54-5,08" (id 2) (at 81.28 91.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 81.28 91.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid bba52ae1-2c60-4612-b640-b785ed4cdd7e))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD5") (at 81.28 76.2 0)
-    (in_bom yes) (on_board yes)
-    (uuid 9801ccc8-5152-40bb-932d-67072f8cd8ad)
-    (property "Reference" "PAD13" (id 0) (at 80.137 74.3458 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Value" "SMD5" (id 1) (at 80.137 79.502 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD2,54-5,08" (id 2) (at 81.28 76.2 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 81.28 76.2 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid d67f893e-d62b-44c0-a1ed-06c27930b246))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 160.02 86.36 0)
-    (in_bom yes) (on_board yes)
-    (uuid 9c3dbdfa-1d03-4398-9be7-f28a12c9bf19)
-    (property "Reference" "PAD9" (id 0) (at 158.877 84.5058 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 158.877 89.662 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 160.02 86.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 160.02 86.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 78fa7842-f3c6-48db-8c77-7797633506e5))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_03") (at 63.5 55.88 0)
-    (in_bom yes) (on_board yes)
-    (uuid 9d7822b4-339e-43c0-b115-d4b16189cc93)
-    (property "Reference" "M3" (id 0) (at 60.96 50.292 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "455-1750-1-ND" (id 1) (at 60.96 63.246 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom) hide)
-    )
-    (property "Footprint" "teensypi_v91:1X03" (id 2) (at 63.5 55.88 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 63.5 55.88 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid fae21104-6d06-49da-9a8b-b74f2e8a3574))
-    (pin "2" (uuid 91815931-350b-44ea-ae11-854683127765))
-    (pin "3" (uuid 8b7bd606-8d7f-4fbd-a2d5-a4d4e067ee34))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 144.78 91.44 0)
-    (in_bom yes) (on_board yes)
-    (uuid 9e5493fd-e148-46c4-ab73-9e150e0f216c)
-    (property "Reference" "PAD7" (id 0) (at 143.637 89.5858 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 143.637 94.742 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 144.78 91.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 144.78 91.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 77482be5-b12a-41cb-b345-89c6c297fbe1))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_03") (at 200.66 172.72 0)
-    (in_bom yes) (on_board yes)
-    (uuid 9f9c31ca-425c-43ab-adfe-2e1ae4fe8686)
-    (property "Reference" "VL53L1_2" (id 0) (at 198.12 167.132 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "455-1750-1-ND" (id 1) (at 198.12 180.086 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom) hide)
-    )
-    (property "Footprint" "teensypi_v91:1X03" (id 2) (at 200.66 172.72 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 200.66 172.72 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid a632aa3e-0113-4f5d-90b5-27bac9ed8392))
-    (pin "2" (uuid 49389a66-8741-452b-8284-834f65c51e1b))
-    (pin "3" (uuid d5605fa7-538d-473c-8da8-4e6409672b1d))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:1X1") (at 177.8 218.44 0)
-    (in_bom yes) (on_board yes)
-    (uuid a6e0def8-4f4c-4324-b688-07d61c9eec31)
-    (property "Reference" "U$2" (id 0) (at 175.26 215.265 0)
-      (effects (font (size 1.27 1.27)) (justify left bottom))
-    )
-    (property "Value" "1X1" (id 1) (at 175.26 222.885 0)
-      (effects (font (size 1.27 1.27)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X1" (id 2) (at 177.8 218.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 177.8 218.44 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 0454b0ed-4e94-46b1-9058-7210ddee62e4))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 149.86 43.18 0)
-    (in_bom yes) (on_board yes)
-    (uuid b34ce9ce-d270-4842-8d95-94720e40d3ca)
-    (property "Reference" "RP_TX1" (id 0) (at 148.717 41.3258 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Value" "SMD2" (id 1) (at 148.717 46.482 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 149.86 43.18 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 149.86 43.18 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 736f4bca-0539-488f-ab5b-c659fa9836b0))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 144.78 86.36 0)
-    (in_bom yes) (on_board yes)
-    (uuid b3dfbe76-e5a2-48e9-bf61-46c24ad01a97)
-    (property "Reference" "PAD5" (id 0) (at 143.637 84.5058 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 143.637 89.662 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 144.78 86.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 144.78 86.36 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 6db64f46-9e2d-4604-b932-a6f7a66a0d14))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_14") (at 40.64 162.56 0)
-    (in_bom yes) (on_board yes)
-    (uuid bb592211-9895-49a1-bb6a-47f7a9f85864)
-    (property "Reference" "T1" (id 0) (at 40.64 144.272 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_14" (id 1) (at 40.64 185.166 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X14" (id 2) (at 40.64 162.56 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 40.64 162.56 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 729e0aa9-1770-4b96-8a01-af601278faec))
-    (pin "10" (uuid 7847981b-5502-41f3-9413-b29fe20c5b32))
-    (pin "11" (uuid fe36219f-13f1-47e3-b06a-60e954519022))
-    (pin "12" (uuid 6b732b9b-51f6-479d-b29b-3f7cb9c273ef))
-    (pin "13" (uuid 3f4ca593-2b3f-4c1d-83fb-6afbc1dc83bd))
-    (pin "14" (uuid 34e4c084-25ed-4154-b584-44597cd86748))
-    (pin "2" (uuid b8a69dfb-4ff5-4171-8662-f4fd81f9fc4a))
-    (pin "3" (uuid d5926ae5-e972-4dcc-8335-d8bd16db6dbc))
-    (pin "4" (uuid 142e2caa-2b2c-4696-83a8-bdbb5b82c7f7))
-    (pin "5" (uuid 3036986f-780f-4e5b-8e4b-4e66acc1e072))
-    (pin "6" (uuid eab7c737-4450-406f-9f80-b2e18bb45dd6))
-    (pin "7" (uuid 317a2bf1-677c-46ed-b6b4-eef240063844))
-    (pin "8" (uuid 61d63f1b-dbdf-4e18-9e78-d70eac21ae65))
-    (pin "9" (uuid 23d0e929-f5a1-4c62-b387-0887d9659f38))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 149.86 25.4 0)
-    (in_bom yes) (on_board yes)
-    (uuid bdb69042-8fa0-4d7e-be19-fed7218cdfd8)
-    (property "Reference" "RP_GND" (id 0) (at 148.717 23.5458 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Value" "SMD2" (id 1) (at 148.717 28.702 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 149.86 25.4 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 149.86 25.4 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid f03f8712-a7f0-45ba-8dbf-7ce6f298ed42))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 185.42 101.6 0)
-    (in_bom yes) (on_board yes)
-    (uuid c4587bb7-c73a-4ad0-bcd4-d7dc9697e09b)
-    (property "Reference" "PAD15" (id 0) (at 184.277 99.7458 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 184.277 104.902 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 185.42 101.6 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 185.42 101.6 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 8bdd2fb5-8fc3-46f1-ade7-9687b983a86b))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_03") (at 104.14 55.88 0)
-    (in_bom yes) (on_board yes)
-    (uuid d0bca7c3-16fb-43b6-91c1-9db8fac52cb2)
-    (property "Reference" "M2" (id 0) (at 101.6 50.292 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "455-1750-1-ND" (id 1) (at 101.6 63.246 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom) hide)
-    )
-    (property "Footprint" "teensypi_v91:1X03" (id 2) (at 104.14 55.88 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 104.14 55.88 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 18b61e14-f0cb-4bda-9e7e-35086cd0bce5))
-    (pin "2" (uuid b0150d2b-85b3-4331-b915-3086266e149b))
-    (pin "3" (uuid 95ef63d7-a7a2-4718-a404-714eb6412ee9))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 198.12 83.82 0)
-    (in_bom yes) (on_board yes)
-    (uuid d16f4efb-8280-42d4-b6f7-9241e542014e)
-    (property "Reference" "PAD19" (id 0) (at 196.977 81.9658 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 196.977 87.122 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 198.12 83.82 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 198.12 83.82 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 5aec5c76-9c76-4aad-b7fa-9f497abad71a))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 144.78 81.28 0)
-    (in_bom yes) (on_board yes)
-    (uuid d1e5ef30-0c74-4f13-89aa-ab10a4b051eb)
-    (property "Reference" "BMI_1" (id 0) (at 143.637 79.4258 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 143.637 84.582 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 144.78 81.28 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 144.78 81.28 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid a1916e9e-4224-4c5d-a9c6-82b80a4bae89))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:CONN_02") (at 124.46 172.72 0)
-    (in_bom yes) (on_board yes)
-    (uuid e2d57c80-00fb-4077-9c97-5541d2825a6b)
-    (property "Reference" "LED" (id 0) (at 121.92 167.132 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Value" "CONN_02" (id 1) (at 121.92 177.546 0)
-      (effects (font (size 1.778 1.778)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:1X02" (id 2) (at 124.46 172.72 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 124.46 172.72 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid fd2d066c-2ff9-43c4-ab8e-a65d2b71b5c1))
-    (pin "2" (uuid 815a0815-7930-45ec-8d6e-dc110f979c75))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 160.02 96.52 0)
-    (in_bom yes) (on_board yes)
-    (uuid eed9d712-571a-4fa2-b617-7f564bf5e0ac)
-    (property "Reference" "PAD18" (id 0) (at 158.877 94.6658 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 158.877 99.822 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 160.02 96.52 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 160.02 96.52 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid fbef883a-9c30-4b66-add6-8cab5f0ab881))
-  )
-
-  (symbol (lib_id "teensypi_v91-eagle-import:SMD2") (at 198.12 93.98 0)
-    (in_bom yes) (on_board yes)
-    (uuid f36426ed-7479-4f20-ba5d-0f7f3108a945)
-    (property "Reference" "PAD20" (id 0) (at 196.977 92.1258 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom) hide)
-    )
-    (property "Value" "SMD2" (id 1) (at 196.977 97.282 0)
-      (effects (font (size 1.778 1.5113)) (justify left bottom))
-    )
-    (property "Footprint" "teensypi_v91:SMD1,27-2,54" (id 2) (at 198.12 93.98 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (id 3) (at 198.12 93.98 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 4fe3cd02-8864-4b3e-a1a0-2dfa4d191ca2))
-  )
-
-  (sheet_instances
-    (path "/" (page "1"))
-  )
-
-  (symbol_instances
-    (path "/d1e5ef30-0c74-4f13-89aa-ab10a4b051eb"
-      (reference "BMI_1") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/e2d57c80-00fb-4077-9c97-5541d2825a6b"
-      (reference "LED") (unit 1) (value "CONN_02") (footprint "teensypi_v91:1X02")
-    )
-    (path "/24c732be-56c7-40ff-a440-789a73d66281"
-      (reference "M1") (unit 1) (value "455-1750-1-ND") (footprint "teensypi_v91:1X03")
-    )
-    (path "/d0bca7c3-16fb-43b6-91c1-9db8fac52cb2"
-      (reference "M2") (unit 1) (value "455-1750-1-ND") (footprint "teensypi_v91:1X03")
-    )
-    (path "/9d7822b4-339e-43c0-b115-d4b16189cc93"
-      (reference "M3") (unit 1) (value "455-1750-1-ND") (footprint "teensypi_v91:1X03")
-    )
-    (path "/49edae70-5dd4-4020-bb66-e19aaf00297f"
-      (reference "M4") (unit 1) (value "455-1750-1-ND") (footprint "teensypi_v91:1X03")
-    )
-    (path "/b3dfbe76-e5a2-48e9-bf61-46c24ad01a97"
-      (reference "PAD5") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/9e5493fd-e148-46c4-ab73-9e150e0f216c"
-      (reference "PAD7") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/0a7da8e8-4a29-4619-8c2a-45042f49f661"
-      (reference "PAD8") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/9c3dbdfa-1d03-4398-9be7-f28a12c9bf19"
-      (reference "PAD9") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/442f453a-9b44-44ab-a898-82f45629c72d"
-      (reference "PAD10") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/834d0192-2f8f-45da-a664-ea874d4070f9"
-      (reference "PAD11") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/2ad27911-6b4b-41d3-af19-3a88d479912c"
-      (reference "PAD12") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/9801ccc8-5152-40bb-932d-67072f8cd8ad"
-      (reference "PAD13") (unit 1) (value "SMD5") (footprint "teensypi_v91:SMD2,54-5,08")
-    )
-    (path "/949cc60c-3f6b-4495-915a-ef19f31633cf"
-      (reference "PAD14") (unit 1) (value "SMD5") (footprint "teensypi_v91:SMD2,54-5,08")
-    )
-    (path "/c4587bb7-c73a-4ad0-bcd4-d7dc9697e09b"
-      (reference "PAD15") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/7d7305a7-c7da-4881-b215-37c7f2ad171a"
-      (reference "PAD16") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/2f274d35-c819-4fa4-bf08-0f05441a1514"
-      (reference "PAD17") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/eed9d712-571a-4fa2-b617-7f564bf5e0ac"
-      (reference "PAD18") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/d16f4efb-8280-42d4-b6f7-9241e542014e"
-      (reference "PAD19") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/f36426ed-7479-4f20-ba5d-0f7f3108a945"
-      (reference "PAD20") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/49fbb162-ed97-4907-b60a-506613a9940b"
-      (reference "PAD21") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/4b3ca595-07d8-471d-a599-10e87e77b20e"
-      (reference "PAD22") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/78ce8c1e-89e0-4419-807a-81faccaa13a1"
-      (reference "PMW3901_1") (unit 1) (value "CONN_04PTH") (footprint "teensypi_v91:1X04")
-    )
-    (path "/8b56f428-76c6-47f4-814c-d4162e003c52"
-      (reference "PMW3901_2") (unit 1) (value "CONN_04PTH") (footprint "teensypi_v91:1X04")
-    )
-    (path "/4cd135a5-fdd1-4851-864a-dadf7c96d9ff"
-      (reference "PMW3901_3") (unit 1) (value "CONN_02") (footprint "teensypi_v91:1X02")
-    )
-    (path "/4c717b47-484c-4d70-8fcd-83c406ff2d17"
-      (reference "REG") (unit 1) (value "CONN_04PTH") (footprint "teensypi_v91:1X04")
-    )
-    (path "/73e2a101-0bc0-414b-9aa7-7eeb8a3caef1"
-      (reference "RP_5V") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/bdb69042-8fa0-4d7e-be19-fed7218cdfd8"
-      (reference "RP_GND") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/44f6de44-c3d8-405f-ac4c-196fb6e5deee"
-      (reference "RP_RX1") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/b34ce9ce-d270-4842-8d95-94720e40d3ca"
-      (reference "RP_TX1") (unit 1) (value "SMD2") (footprint "teensypi_v91:SMD1,27-2,54")
-    )
-    (path "/bb592211-9895-49a1-bb6a-47f7a9f85864"
-      (reference "T1") (unit 1) (value "CONN_14") (footprint "teensypi_v91:1X14")
-    )
-    (path "/657bd73d-9c40-4ca8-b3ea-e75927d498b6"
-      (reference "T2") (unit 1) (value "CONN_14") (footprint "teensypi_v91:1X14")
-    )
-    (path "/875404be-e359-458a-af29-1bd3403dd55f"
-      (reference "U$1") (unit 1) (value "1X1") (footprint "teensypi_v91:1X1")
-    )
-    (path "/a6e0def8-4f4c-4324-b688-07d61c9eec31"
-      (reference "U$2") (unit 1) (value "1X1") (footprint "teensypi_v91:1X1")
-    )
-    (path "/794e55a0-75fe-436a-8b64-c2f248c65f18"
-      (reference "VL53L1_1") (unit 1) (value "455-1750-1-ND") (footprint "teensypi_v91:1X03")
-    )
-    (path "/9f9c31ca-425c-43ab-adfe-2e1ae4fe8686"
-      (reference "VL53L1_2") (unit 1) (value "455-1750-1-ND") (footprint "teensypi_v91:1X03")
-    )
-  )
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "afb8e687-4a13-41a1-b8c0-89a749e897fe")
+	(paper "User" 297.002 244.323)
+	(lib_symbols
+		(symbol "teensypi_v91-eagle-import:1X1"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" ""
+				(at -2.54 3.175 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "1X1"
+				(at -2.54 -4.445 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:1X1"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "1X1_1_0"
+				(polyline
+					(pts
+						(xy -2.54 2.54) (xy -2.54 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 2.54) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 -2.54) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy 2.54 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 0) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -2.54) (xy 2.54 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(text "01"
+					(at 0 0 0)
+					(effects
+						(font
+							(size 1.016 1.016)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 2.54 0 180)
+					(length 0)
+					(name "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "teensypi_v91-eagle-import:CONN_02"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at -2.54 5.588 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "CONN_02"
+				(at -2.54 -4.826 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:1X02"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "CONN_02_1_0"
+				(polyline
+					(pts
+						(xy -2.54 5.08) (xy -2.54 -2.54)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 5.08) (xy 3.81 5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 2.54) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy 2.54 0)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -2.54) (xy -2.54 -2.54)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -2.54) (xy 3.81 5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 7.62 2.54 180)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 7.62 0 180)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "teensypi_v91-eagle-import:CONN_03"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at -2.54 5.588 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "CONN_03"
+				(at -2.54 -7.366 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:1X03"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "CONN_03_1_0"
+				(polyline
+					(pts
+						(xy -2.54 5.08) (xy -2.54 -5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 5.08) (xy 3.81 5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 2.54) (xy 2.54 2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy 2.54 0)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -2.54) (xy 2.54 -2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -5.08) (xy -2.54 -5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -5.08) (xy 3.81 5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 7.62 2.54 180)
+					(length 5.08)
+					(name "3"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 7.62 0 180)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 7.62 -2.54 180)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "teensypi_v91-eagle-import:CONN_04PTH"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at -5.08 8.128 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "CONN_04PTH"
+				(at -5.08 -7.366 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:1X04"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "CONN_04PTH_1_0"
+				(polyline
+					(pts
+						(xy -5.08 7.62) (xy -5.08 -5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 7.62) (xy 1.27 7.62)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 5.08) (xy 0 5.08)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.54) (xy 0 2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0) (xy 0 0)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -2.54) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -5.08) (xy -5.08 -5.08)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -5.08) (xy 1.27 7.62)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 5.08 5.08 180)
+					(length 5.08)
+					(name "4"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 5.08)
+					(name "3"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "teensypi_v91-eagle-import:CONN_14"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 18.288 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "CONN_14"
+				(at 0 -22.606 0)
+				(effects
+					(font
+						(size 1.778 1.778)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:1X14"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "CONN_14_1_0"
+				(polyline
+					(pts
+						(xy 0 17.78) (xy 0 -20.32)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 17.78) (xy 6.35 17.78)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 15.24) (xy 5.08 15.24)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 12.7) (xy 5.08 12.7)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 10.16) (xy 5.08 10.16)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 7.62) (xy 5.08 7.62)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 5.08) (xy 5.08 5.08)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 2.54) (xy 5.08 2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 0) (xy 5.08 0)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -2.54) (xy 5.08 -2.54)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -5.08) (xy 5.08 -5.08)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -7.62) (xy 5.08 -7.62)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -10.16) (xy 5.08 -10.16)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -12.7) (xy 5.08 -12.7)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -15.24) (xy 5.08 -15.24)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -17.78) (xy 5.08 -17.78)
+					)
+					(stroke
+						(width 0.6096)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 6.35 -20.32) (xy 0 -20.32)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 6.35 -20.32) (xy 6.35 17.78)
+					)
+					(stroke
+						(width 0.4064)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 10.16 15.24 180)
+					(length 5.08)
+					(name "14"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 12.7 180)
+					(length 5.08)
+					(name "13"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 10.16 180)
+					(length 5.08)
+					(name "12"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "12"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 7.62 180)
+					(length 5.08)
+					(name "11"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "11"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 5.08 180)
+					(length 5.08)
+					(name "10"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 2.54 180)
+					(length 5.08)
+					(name "9"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 0 180)
+					(length 5.08)
+					(name "8"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -2.54 180)
+					(length 5.08)
+					(name "7"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -5.08 180)
+					(length 5.08)
+					(name "6"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -7.62 180)
+					(length 5.08)
+					(name "5"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -10.16 180)
+					(length 5.08)
+					(name "4"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -12.7 180)
+					(length 5.08)
+					(name "3"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -15.24 180)
+					(length 5.08)
+					(name "2"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -17.78 180)
+					(length 5.08)
+					(name "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "teensypi_v91-eagle-import:SMD2"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "PAD"
+				(at -1.143 1.8542 0)
+				(effects
+					(font
+						(size 1.778 1.5113)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "SMD2"
+				(at -1.143 -3.302 0)
+				(effects
+					(font
+						(size 1.778 1.5113)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "SMD2_1_0"
+				(polyline
+					(pts
+						(xy -1.016 1.016) (xy 1.016 -1.016)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 -1.016) (xy 1.016 1.016)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 2.54 0 180)
+					(length 2.54)
+					(name "P"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "teensypi_v91-eagle-import:SMD5"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "PAD"
+				(at -1.143 1.8542 0)
+				(effects
+					(font
+						(size 1.778 1.5113)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "SMD5"
+				(at -1.143 -3.302 0)
+				(effects
+					(font
+						(size 1.778 1.5113)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "teensypi_v91:SMD2,54-5,08"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "SMD5_1_0"
+				(polyline
+					(pts
+						(xy -1.016 1.016) (xy 1.016 -1.016)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 -1.016) (xy 1.016 1.016)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 2.54 0 180)
+					(length 2.54)
+					(name "P"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 0 0)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(wire
+		(pts
+			(xy 50.8 152.4) (xy 55.88 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0afa5357-c57e-42cd-b476-72d99f39fe9f")
+	)
+	(wire
+		(pts
+			(xy 88.9 180.34) (xy 93.98 180.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0b2da3ef-2445-490e-b668-8ae41309ee36")
+	)
+	(wire
+		(pts
+			(xy 71.12 25.4) (xy 76.2 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f28d312-e674-493b-bb0d-24fe0fb55a5f")
+	)
+	(wire
+		(pts
+			(xy 50.8 165.1) (xy 58.42 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0fe73d7c-983e-4368-b1af-2c7091659c0b")
+	)
+	(wire
+		(pts
+			(xy 254 203.2) (xy 256.54 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "10a5cee8-0f6f-4aac-80c1-915f5fcf52f0")
+	)
+	(wire
+		(pts
+			(xy 50.8 172.72) (xy 58.42 172.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "24cb67fc-f0c9-4f6e-88c1-7636ab854c5e")
+	)
+	(wire
+		(pts
+			(xy 208.28 175.26) (xy 213.36 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2652ca87-c786-4061-81b7-9315b84b5d2c")
+	)
+	(wire
+		(pts
+			(xy 111.76 25.4) (xy 116.84 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2cad3fe2-0f3b-467e-9c49-f271aa1ec49b")
+	)
+	(wire
+		(pts
+			(xy 71.12 55.88) (xy 76.2 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "347b3477-2f16-4a24-a474-1e5febecef0e")
+	)
+	(wire
+		(pts
+			(xy 147.32 81.28) (xy 152.4 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "36786f1c-5181-4b16-85f0-7a9b5e48989f")
+	)
+	(wire
+		(pts
+			(xy 71.12 53.34) (xy 76.2 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3adb9496-2d9f-40cf-b330-cf802996ea7f")
+	)
+	(wire
+		(pts
+			(xy 71.12 27.94) (xy 76.2 27.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3da2a955-efa4-4cba-97bf-5c3895b6ca21")
+	)
+	(wire
+		(pts
+			(xy 231.14 195.58) (xy 238.76 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "42f4679b-2c4d-49cf-8f9e-afb5127a3112")
+	)
+	(wire
+		(pts
+			(xy 187.96 86.36) (xy 193.04 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "446bf57c-8a66-4199-8c1c-73dc66bbce20")
+	)
+	(wire
+		(pts
+			(xy 187.96 93.98) (xy 193.04 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4b91a28b-e778-4691-8d2b-bb09bc10e8e8")
+	)
+	(wire
+		(pts
+			(xy 88.9 152.4) (xy 93.98 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "53a382a5-9123-45f3-a2e9-3b2de6ca541d")
+	)
+	(wire
+		(pts
+			(xy 231.14 190.5) (xy 238.76 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "55dcb42c-b26a-49b8-8a1f-cc80851d2e4d")
+	)
+	(wire
+		(pts
+			(xy 254 205.74) (xy 256.54 205.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "56ba8f65-c244-4416-8ed2-b5691db880ab")
+	)
+	(wire
+		(pts
+			(xy 88.9 172.72) (xy 93.98 172.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "58eb1f49-1e5e-4c0c-97da-fb971f13fe25")
+	)
+	(wire
+		(pts
+			(xy 83.82 76.2) (xy 88.9 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5946461c-3619-4297-ada8-808db114b5fb")
+	)
+	(wire
+		(pts
+			(xy 111.76 55.88) (xy 116.84 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5c946c69-aabf-45dc-9f47-f37983b2dc53")
+	)
+	(wire
+		(pts
+			(xy 208.28 172.72) (xy 213.36 172.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "60b868e3-a9f8-4d20-ae5a-40ca53af4adb")
+	)
+	(wire
+		(pts
+			(xy 111.76 22.86) (xy 116.84 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "63a30107-e64a-4f1f-b117-b90cb84b149e")
+	)
+	(wire
+		(pts
+			(xy 50.8 154.94) (xy 55.88 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "642badde-3a43-415c-9e9a-0400e9ad9539")
+	)
+	(wire
+		(pts
+			(xy 71.12 22.86) (xy 76.2 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6a82e1e6-8e23-40fe-9f7f-da90c0712b96")
+	)
+	(wire
+		(pts
+			(xy 180.34 218.44) (xy 187.96 218.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6b065e8e-fef9-4b30-824e-7d9ccd606772")
+	)
+	(wire
+		(pts
+			(xy 111.76 27.94) (xy 116.84 27.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "74d431fd-cb2a-4a57-b8ad-03906426963d")
+	)
+	(wire
+		(pts
+			(xy 50.8 175.26) (xy 58.42 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80bbd906-780d-49d4-9591-df6c1a36ee85")
+	)
+	(wire
+		(pts
+			(xy 147.32 96.52) (xy 152.4 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a203993-fbf3-470f-ab7c-4d95a24716de")
+	)
+	(wire
+		(pts
+			(xy 111.76 58.42) (xy 116.84 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "92832a32-dcb2-4058-8ad9-237ebe5ab0e8")
+	)
+	(wire
+		(pts
+			(xy 71.12 58.42) (xy 76.2 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "939bb0a1-244e-4741-90f1-d06027d85c51")
+	)
+	(wire
+		(pts
+			(xy 50.8 177.8) (xy 58.42 177.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "951f92e3-c509-40e8-964b-37dd7e0e82bf")
+	)
+	(wire
+		(pts
+			(xy 50.8 180.34) (xy 58.42 180.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95a40d19-41c6-4680-9b37-9cb1bed1a413")
+	)
+	(wire
+		(pts
+			(xy 50.8 149.86) (xy 55.88 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95a9cb1b-c155-4d37-a2b5-cecc3f928209")
+	)
+	(wire
+		(pts
+			(xy 231.14 193.04) (xy 238.76 193.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "99772301-d596-41c7-ac2d-d8320c28783c")
+	)
+	(wire
+		(pts
+			(xy 83.82 91.44) (xy 88.9 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a092ea0d-146f-427f-adaf-641182334974")
+	)
+	(wire
+		(pts
+			(xy 111.76 53.34) (xy 116.84 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a43a5da1-e224-4f65-b747-f67973f2af88")
+	)
+	(wire
+		(pts
+			(xy 50.8 147.32) (xy 55.88 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a43ae97f-ff8c-43dd-8d6d-82a22f1be9b5")
+	)
+	(wire
+		(pts
+			(xy 231.14 208.28) (xy 236.22 208.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a58b425b-6fc3-4a86-ae11-a84decf83c5a")
+	)
+	(wire
+		(pts
+			(xy 88.9 165.1) (xy 93.98 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aac506cf-4156-47e4-9980-1111a3bb6bcc")
+	)
+	(wire
+		(pts
+			(xy 153.67 52.07) (xy 161.29 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ac975f7b-5c1b-42e6-a54b-1829692bd60c")
+	)
+	(wire
+		(pts
+			(xy 88.9 177.8) (xy 93.98 177.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b3d89762-54ee-4dc0-8c86-98a5d2a2dca5")
+	)
+	(wire
+		(pts
+			(xy 50.8 167.64) (xy 58.42 167.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b867fb16-61a5-4031-9766-9c1c9e8171a2")
+	)
+	(wire
+		(pts
+			(xy 88.9 154.94) (xy 93.98 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b89754be-9738-4e5f-8e95-e260ee696903")
+	)
+	(wire
+		(pts
+			(xy 208.28 154.94) (xy 213.36 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b90d0267-ce26-4e19-a4c7-fd16cc7a521c")
+	)
+	(wire
+		(pts
+			(xy 187.96 101.6) (xy 193.04 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c50a4250-2225-4797-b4a1-1bc3d1138c0f")
+	)
+	(wire
+		(pts
+			(xy 153.67 62.23) (xy 161.29 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c548aac3-2100-48bf-a57e-c299f9466e79")
+	)
+	(wire
+		(pts
+			(xy 88.9 175.26) (xy 93.98 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cbbec9dc-3ece-41ba-b187-0bad09b173d6")
+	)
+	(wire
+		(pts
+			(xy 147.32 86.36) (xy 152.4 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e2c309e4-b8cd-4d42-b61b-673943cf082a")
+	)
+	(wire
+		(pts
+			(xy 88.9 149.86) (xy 93.98 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e92c974a-b07f-4799-a79e-f281f85dbc1a")
+	)
+	(wire
+		(pts
+			(xy 50.8 170.18) (xy 58.42 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e9b2f4e0-b0c4-45da-921b-36e4af201264")
+	)
+	(wire
+		(pts
+			(xy 88.9 147.32) (xy 93.98 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eb8e38cd-dc17-4593-889c-e9f58005f6e7")
+	)
+	(wire
+		(pts
+			(xy 208.28 157.48) (xy 213.36 157.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fa7a68a5-1582-4679-bafe-2a2ea2733064")
+	)
+	(wire
+		(pts
+			(xy 180.34 195.58) (xy 187.96 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fec985c7-f284-4d68-8727-af7eebd8b5f8")
+	)
+	(label "SCL0"
+		(at 53.34 165.1 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "05bcb62f-e639-408b-893f-71715cd8f94a")
+	)
+	(label "MOSI"
+		(at 88.9 177.8 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "05bdee95-c42e-4b6f-9645-2ec41619b2fe")
+	)
+	(label "GND"
+		(at 111.76 58.42 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "0c83fcb5-bcc7-4f84-8394-d4fc9899e233")
+	)
+	(label "3V3"
+		(at 187.96 101.6 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "11d75bf4-5480-4a2f-baa3-58a51cac0470")
+	)
+	(label "MISO"
+		(at 233.68 190.5 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "15fcf661-f7ee-4981-92aa-29fa30316a60")
+	)
+	(label "GND"
+		(at 254 205.74 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "1b0f55f9-5fa5-489c-9db2-e63c29ecdd31")
+	)
+	(label "LED_LED"
+		(at 182.88 195.58 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "2022f2c2-2d52-4762-8871-c3aaafed73b6")
+	)
+	(label "M1"
+		(at 111.76 25.4 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "290311ab-2acc-454a-9a59-6cba16c0a08d")
+	)
+	(label "SDA1"
+		(at 53.34 170.18 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "361dcb36-1f5d-45a8-a966-bd2a77e39204")
+	)
+	(label "3V3"
+		(at 208.28 175.26 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "3a13a33d-0399-4bf3-800a-72a2421cb176")
+	)
+	(label "LED_MCU"
+		(at 53.34 175.26 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "3c0e161b-77de-41cd-8057-090b9a285b00")
+	)
+	(label "GND"
+		(at 86.36 76.2 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "3de27c1c-897a-4a6c-b0f7-6b3c6fd91fd1")
+	)
+	(label "VBAT"
+		(at 86.36 91.44 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "4126d392-495e-4ef5-9351-6f700c8637bc")
+	)
+	(label "GND"
+		(at 53.34 149.86 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "44d6780b-0f7d-4066-bfb2-bff50f00afa0")
+	)
+	(label "LED_MCU"
+		(at 182.88 218.44 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "461c24bd-c29b-4d81-bd76-c5414eb04a70")
+	)
+	(label "M2"
+		(at 53.34 154.94 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "4df412ae-87c4-4ec7-8738-a6a72291cb75")
+	)
+	(label "VBAT"
+		(at 71.12 53.34 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "4e861688-f76d-4846-81a3-359bef1f427a")
+	)
+	(label "SDA0"
+		(at 187.96 93.98 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "52194c94-e7df-49ff-beb1-04a1b4f2344e")
+	)
+	(label "3V3"
+		(at 147.32 81.28 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "5e27c7e3-130d-477a-b693-9d7d6d05e3e3")
+	)
+	(label "TX1"
+		(at 156.21 62.23 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "6162fbb8-6718-45ec-b23f-6a6f1488ec21")
+	)
+	(label "CS"
+		(at 233.68 195.58 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "619cf9e3-25a5-4699-bab6-469aedc62cab")
+	)
+	(label "M3"
+		(at 71.12 55.88 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "6ae74015-156b-4b08-b0b7-49ff17fb760f")
+	)
+	(label "RX1"
+		(at 156.21 52.07 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "6af91ec1-f5c6-4c49-998d-22cb7b1bdc03")
+	)
+	(label "M4"
+		(at 71.12 25.4 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "6ddca9c6-d93f-48af-8707-e3012416640e")
+	)
+	(label "SCK"
+		(at 233.68 208.28 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "6e18bff7-8b21-4bb4-8a05-3a319b07518f")
+	)
+	(label "GND"
+		(at 147.32 86.36 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "719303cc-9ddf-4f19-9751-b8db3875f499")
+	)
+	(label "INT"
+		(at 147.32 96.52 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "719e34f3-a935-4f7b-982b-9c19691e49e1")
+	)
+	(label "SCK"
+		(at 53.34 180.34 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "720f9518-b0d8-4879-8ffc-0a3335e2eb9d")
+	)
+	(label "GND"
+		(at 71.12 27.94 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "784b6458-3ae8-48f4-9482-731714d7927e")
+	)
+	(label "CS"
+		(at 88.9 175.26 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "7da9f5c8-a062-40f4-88c6-61890bbc359f")
+	)
+	(label "M2"
+		(at 111.76 55.88 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "84ba6563-aa9a-4a44-a402-ba732fd7b0d2")
+	)
+	(label "5V"
+		(at 53.34 147.32 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "89b81b16-224b-4483-a357-720a8e6eb208")
+	)
+	(label "SDA1"
+		(at 208.28 157.48 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "8f38d61d-85a4-4a20-aa88-865d9c66b0b4")
+	)
+	(label "RX1"
+		(at 88.9 149.86 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "9d12ed3c-0713-4da7-86c7-5331347f3457")
+	)
+	(label "VBAT"
+		(at 111.76 53.34 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "a2c6281c-1798-4c93-a973-786fd5788e7e")
+	)
+	(label "GND"
+		(at 71.12 58.42 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "a4372ae3-288f-4a9a-96e7-306ddba718f6")
+	)
+	(label "SCL1"
+		(at 208.28 154.94 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "a76c0baf-6e69-4f8d-a142-018c46047833")
+	)
+	(label "SCL1"
+		(at 53.34 172.72 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "b0f642eb-e44e-4747-9d08-48aa7b02d88d")
+	)
+	(label "SDA0"
+		(at 53.34 167.64 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "c1d15993-12e6-4c0d-a72e-2f76d98a62f2")
+	)
+	(label "MISO"
+		(at 88.9 180.34 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "c2288b71-0313-4831-b20b-64c01771a6a6")
+	)
+	(label "GND"
+		(at 208.28 172.72 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "c47c1013-522e-4afa-9dd5-776b2bbec89a")
+	)
+	(label "VBAT"
+		(at 71.12 22.86 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "c6750bbb-1f60-4923-a832-20fb722c1b93")
+	)
+	(label "VBAT"
+		(at 111.76 22.86 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "cacc113d-885e-464c-bed1-96200200e5f6")
+	)
+	(label "M1"
+		(at 88.9 154.94 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "de6a8a79-ffb1-408e-99f7-331b8dd7ba96")
+	)
+	(label "INT"
+		(at 88.9 165.1 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "df0a2432-7a90-46bd-b54d-8bf995c9c0f2")
+	)
+	(label "MOSI"
+		(at 233.68 193.04 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "df425070-f6bd-4dc2-bc2c-ec8e49ad418d")
+	)
+	(label "GND"
+		(at 111.76 27.94 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "e584f27e-45dd-4fdd-8c50-c7400e4b2ab2")
+	)
+	(label "SCL0"
+		(at 187.96 86.36 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "e8a669b7-c663-4fa5-9b1f-ce9eb01dc726")
+	)
+	(label "GND"
+		(at 88.9 147.32 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "f01a08c4-d9f1-4838-af18-b59bca81082c")
+	)
+	(label "3V3"
+		(at 254 203.2 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "f138c51d-0ee0-424a-a154-6e86a60a846b")
+	)
+	(label "M3"
+		(at 53.34 177.8 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "f28095b2-5bdd-4916-8fd7-8ee2cde7e2ae")
+	)
+	(label "TX1"
+		(at 88.9 152.4 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "f5bc60e0-ca9c-4444-9bc3-6e40e983addd")
+	)
+	(label "M4"
+		(at 88.9 172.72 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "f711db5e-77b0-4494-90e8-aecb55e572ba")
+	)
+	(label "3V3"
+		(at 53.34 152.4 0)
+		(effects
+			(font
+				(size 1.2446 1.2446)
+			)
+			(justify left bottom)
+		)
+		(uuid "f8deac2f-522c-4605-b44f-70351a68e5b0")
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 144.78 96.52 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "0a7da8e8-4a29-4619-8c2a-45042f49f661")
+		(property "Reference" "PAD8"
+			(at 143.637 94.6658 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 143.637 99.822 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 144.78 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 144.78 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 144.78 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "20fac508-78eb-4aa5-add1-1566151feb66")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_03")
+		(at 104.14 25.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "24c732be-56c7-40ff-a440-789a73d66281")
+		(property "Reference" "M1"
+			(at 101.6 19.812 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "455-1750-1-ND"
+			(at 101.6 32.766 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X03"
+			(at 104.14 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 104.14 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 104.14 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "90871ced-792e-45f5-b74e-584f9a150cb4")
+		)
+		(pin "2"
+			(uuid "8de39313-d6b3-49d5-879e-e7c755da7625")
+		)
+		(pin "3"
+			(uuid "fa837821-0cb5-4c2d-b2ac-2376f32f5c33")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "M1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 160.02 81.28 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2ad27911-6b4b-41d3-af19-3a88d479912c")
+		(property "Reference" "PAD12"
+			(at 158.877 79.4258 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 158.877 84.582 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 160.02 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 160.02 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 160.02 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7eaae2d7-b4ad-4554-8c8a-2037170131bd")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 185.42 111.76 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2f274d35-c819-4fa4-bf08-0f05441a1514")
+		(property "Reference" "PAD17"
+			(at 184.277 109.9058 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 184.277 115.062 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 185.42 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 185.42 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "468fcc7f-55f8-4783-b36e-f80ec4401b15")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 185.42 86.36 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "442f453a-9b44-44ab-a898-82f45629c72d")
+		(property "Reference" "PAD10"
+			(at 184.277 84.5058 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 184.277 89.662 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 185.42 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 185.42 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "009110da-fae2-454e-8387-1e8fd70409cb")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 151.13 62.23 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "44f6de44-c3d8-405f-ac4c-196fb6e5deee")
+		(property "Reference" "RP_RX1"
+			(at 149.987 60.3758 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 149.987 65.532 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 151.13 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 151.13 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 151.13 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "dba4ad5b-8704-4fc8-9247-b9c4709cf1cf")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "RP_RX1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_03")
+		(at 63.5 25.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "49edae70-5dd4-4020-bb66-e19aaf00297f")
+		(property "Reference" "M4"
+			(at 60.96 19.812 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "455-1750-1-ND"
+			(at 60.96 32.766 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X03"
+			(at 63.5 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "caefe669-4c1f-4a42-9061-2eea0460c08d")
+		)
+		(pin "2"
+			(uuid "e584287a-6232-40cf-a082-8dea5986b945")
+		)
+		(pin "3"
+			(uuid "5f48357f-c353-4808-811f-74ed7ffaa7c6")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "M4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 198.12 101.6 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "49fbb162-ed97-4907-b60a-506613a9940b")
+		(property "Reference" "PAD21"
+			(at 196.977 99.7458 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 196.977 104.902 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 198.12 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 198.12 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 198.12 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "283ed2be-f188-4938-9d07-b9e8bad5f0d4")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD21")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 198.12 111.76 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4b3ca595-07d8-471d-a599-10e87e77b20e")
+		(property "Reference" "PAD22"
+			(at 196.977 109.9058 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 196.977 115.062 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 198.12 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 198.12 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 198.12 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bc3f6e1f-c81e-4889-865a-0e223a5a22e2")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD22")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_02")
+		(at 246.38 205.74 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4cd135a5-fdd1-4851-864a-dadf7c96d9ff")
+		(property "Reference" "PMW3901_3"
+			(at 243.84 200.152 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "CONN_02"
+			(at 243.84 210.566 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X02"
+			(at 246.38 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 246.38 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 246.38 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6c1d0ff6-53d9-4a5b-89a8-5313d6ca7d94")
+		)
+		(pin "2"
+			(uuid "94b40fef-8e3d-4a32-a137-035c86ca86c8")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PMW3901_3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_14")
+		(at 78.74 162.56 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "657bd73d-9c40-4ca8-b3ea-e75927d498b6")
+		(property "Reference" "T2"
+			(at 78.74 144.272 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "CONN_14"
+			(at 78.74 185.166 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X14"
+			(at 78.74 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 78.74 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 78.74 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8ce5f070-df4e-4d8d-b78f-3ef1b6a0875c")
+		)
+		(pin "10"
+			(uuid "00d22a94-4415-4f7c-bba5-9ac8913c5f96")
+		)
+		(pin "11"
+			(uuid "5498fdb6-915a-4445-8b00-6524ae4d6c27")
+		)
+		(pin "12"
+			(uuid "e31b63b1-e50c-436f-8b2d-c664bc43a016")
+		)
+		(pin "13"
+			(uuid "8764b520-89c4-4e8f-9e4f-12a445e1a616")
+		)
+		(pin "14"
+			(uuid "42b75c7f-e205-4778-8b80-6010e5eef40d")
+		)
+		(pin "2"
+			(uuid "31880686-d14b-45e6-a2ae-8550fa4d37d7")
+		)
+		(pin "3"
+			(uuid "d732dada-3bdf-40ee-b2d0-4e0254c2408c")
+		)
+		(pin "4"
+			(uuid "59a4dc33-016c-4cea-b648-6fe1c8836f68")
+		)
+		(pin "5"
+			(uuid "e91ad237-6778-4565-a41c-5451c22b839e")
+		)
+		(pin "6"
+			(uuid "16010e58-8aee-45c1-99df-d1cc2bd80779")
+		)
+		(pin "7"
+			(uuid "76973292-11cb-4c20-8b65-30d05bb4f01c")
+		)
+		(pin "8"
+			(uuid "d6dd0f16-8940-44d4-96ec-2f3144e7eef5")
+		)
+		(pin "9"
+			(uuid "8e0527a1-64cc-4c21-af5a-5910f4c387cc")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "T2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_04PTH")
+		(at 226.06 195.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "78ce8c1e-89e0-4419-807a-81faccaa13a1")
+		(property "Reference" "PMW3901_1"
+			(at 220.98 187.452 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "CONN_04PTH"
+			(at 220.98 202.946 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X04"
+			(at 226.06 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 226.06 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 226.06 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "262fe442-673c-4133-92f6-23f6d42651f0")
+		)
+		(pin "2"
+			(uuid "2330617f-82c2-43f9-8a7c-826ddfdbb89f")
+		)
+		(pin "3"
+			(uuid "4ed25a91-62bc-460f-b416-f09c2b72ae30")
+		)
+		(pin "4"
+			(uuid "321c97ce-037e-4926-8c05-7be14a63f7fd")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PMW3901_1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_03")
+		(at 200.66 154.94 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "794e55a0-75fe-436a-8b64-c2f248c65f18")
+		(property "Reference" "VL53L1_1"
+			(at 198.12 149.352 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "455-1750-1-ND"
+			(at 198.12 162.306 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X03"
+			(at 200.66 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 200.66 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 200.66 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6db6b2d8-cd53-4924-910c-ce03370c85ba")
+		)
+		(pin "2"
+			(uuid "3d0ee88c-fab5-44ff-91c4-a21e663a09de")
+		)
+		(pin "3"
+			(uuid "7fd58396-b4e5-46f4-aa37-499fb1457243")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "VL53L1_1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 160.02 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7d7305a7-c7da-4881-b215-37c7f2ad171a")
+		(property "Reference" "PAD16"
+			(at 158.877 89.5858 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 158.877 94.742 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 160.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 160.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 160.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "df70582b-c4f2-479d-8c60-1cee46d8e0bc")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD16")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 185.42 93.98 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "834d0192-2f8f-45da-a664-ea874d4070f9")
+		(property "Reference" "PAD11"
+			(at 184.277 92.1258 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 184.277 97.282 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 185.42 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 185.42 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1bd13fbe-d376-42a1-8a94-f12442f4121a")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:1X1")
+		(at 177.8 195.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "875404be-e359-458a-af29-1bd3403dd55f")
+		(property "Reference" "U$1"
+			(at 175.26 192.405 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "1X1"
+			(at 175.26 200.025 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X1"
+			(at 177.8 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 177.8 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 177.8 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "9b396834-9f2e-4234-8e77-e2f453053d8c")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "U$1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_04PTH")
+		(at 226.06 213.36 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8b56f428-76c6-47f4-814c-d4162e003c52")
+		(property "Reference" "PMW3901_2"
+			(at 220.98 205.232 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "CONN_04PTH"
+			(at 220.98 220.726 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X04"
+			(at 226.06 213.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 226.06 213.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 226.06 213.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3661902e-90e5-456c-bea6-67cccf66598c")
+		)
+		(pin "2"
+			(uuid "303c400a-1ac8-4f8f-ae11-254f46fa0fb3")
+		)
+		(pin "3"
+			(uuid "fc5e93f7-8264-46ce-a278-5944e151e5a7")
+		)
+		(pin "4"
+			(uuid "ae3c331f-8808-430e-931c-7d9b2cc37f5b")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PMW3901_2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD5")
+		(at 81.28 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "949cc60c-3f6b-4495-915a-ef19f31633cf")
+		(property "Reference" "PAD14"
+			(at 80.137 89.5858 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "SMD5"
+			(at 80.137 94.742 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD2,54-5,08"
+			(at 81.28 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 81.28 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 81.28 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bba52ae1-2c60-4612-b640-b785ed4cdd7e")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD5")
+		(at 81.28 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9801ccc8-5152-40bb-932d-67072f8cd8ad")
+		(property "Reference" "PAD13"
+			(at 80.137 74.3458 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "SMD5"
+			(at 80.137 79.502 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD2,54-5,08"
+			(at 81.28 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 81.28 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 81.28 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d67f893e-d62b-44c0-a1ed-06c27930b246")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 160.02 86.36 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9c3dbdfa-1d03-4398-9be7-f28a12c9bf19")
+		(property "Reference" "PAD9"
+			(at 158.877 84.5058 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 158.877 89.662 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 160.02 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 160.02 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 160.02 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "78fa7842-f3c6-48db-8c77-7797633506e5")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_03")
+		(at 63.5 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9d7822b4-339e-43c0-b115-d4b16189cc93")
+		(property "Reference" "M3"
+			(at 60.96 50.292 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "455-1750-1-ND"
+			(at 60.96 63.246 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X03"
+			(at 63.5 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "fae21104-6d06-49da-9a8b-b74f2e8a3574")
+		)
+		(pin "2"
+			(uuid "91815931-350b-44ea-ae11-854683127765")
+		)
+		(pin "3"
+			(uuid "8b7bd606-8d7f-4fbd-a2d5-a4d4e067ee34")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "M3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 144.78 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9e5493fd-e148-46c4-ab73-9e150e0f216c")
+		(property "Reference" "PAD7"
+			(at 143.637 89.5858 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 143.637 94.742 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 144.78 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 144.78 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 144.78 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "77482be5-b12a-41cb-b345-89c6c297fbe1")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_03")
+		(at 200.66 172.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9f9c31ca-425c-43ab-adfe-2e1ae4fe8686")
+		(property "Reference" "VL53L1_2"
+			(at 198.12 167.132 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "455-1750-1-ND"
+			(at 198.12 180.086 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X03"
+			(at 200.66 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 200.66 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 200.66 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a632aa3e-0113-4f5d-90b5-27bac9ed8392")
+		)
+		(pin "2"
+			(uuid "49389a66-8741-452b-8284-834f65c51e1b")
+		)
+		(pin "3"
+			(uuid "d5605fa7-538d-473c-8da8-4e6409672b1d")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "VL53L1_2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:1X1")
+		(at 177.8 218.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a6e0def8-4f4c-4324-b688-07d61c9eec31")
+		(property "Reference" "U$2"
+			(at 175.26 215.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "1X1"
+			(at 175.26 222.885 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X1"
+			(at 177.8 218.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 177.8 218.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 177.8 218.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0454b0ed-4e94-46b1-9058-7210ddee62e4")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "U$2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 151.13 52.07 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b34ce9ce-d270-4842-8d95-94720e40d3ca")
+		(property "Reference" "RP_TX1"
+			(at 149.987 50.2158 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 149.987 55.372 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 151.13 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 151.13 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 151.13 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "736f4bca-0539-488f-ab5b-c659fa9836b0")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "RP_TX1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 144.78 86.36 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b3dfbe76-e5a2-48e9-bf61-46c24ad01a97")
+		(property "Reference" "PAD5"
+			(at 143.637 84.5058 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 143.637 89.662 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 144.78 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 144.78 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 144.78 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6db64f46-9e2d-4604-b932-a6f7a66a0d14")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_14")
+		(at 40.64 162.56 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "bb592211-9895-49a1-bb6a-47f7a9f85864")
+		(property "Reference" "T1"
+			(at 40.64 144.272 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "CONN_14"
+			(at 40.64 185.166 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X14"
+			(at 40.64 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 40.64 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 40.64 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "729e0aa9-1770-4b96-8a01-af601278faec")
+		)
+		(pin "10"
+			(uuid "7847981b-5502-41f3-9413-b29fe20c5b32")
+		)
+		(pin "11"
+			(uuid "fe36219f-13f1-47e3-b06a-60e954519022")
+		)
+		(pin "12"
+			(uuid "6b732b9b-51f6-479d-b29b-3f7cb9c273ef")
+		)
+		(pin "13"
+			(uuid "3f4ca593-2b3f-4c1d-83fb-6afbc1dc83bd")
+		)
+		(pin "14"
+			(uuid "34e4c084-25ed-4154-b584-44597cd86748")
+		)
+		(pin "2"
+			(uuid "b8a69dfb-4ff5-4171-8662-f4fd81f9fc4a")
+		)
+		(pin "3"
+			(uuid "d5926ae5-e972-4dcc-8335-d8bd16db6dbc")
+		)
+		(pin "4"
+			(uuid "142e2caa-2b2c-4696-83a8-bdbb5b82c7f7")
+		)
+		(pin "5"
+			(uuid "3036986f-780f-4e5b-8e4b-4e66acc1e072")
+		)
+		(pin "6"
+			(uuid "eab7c737-4450-406f-9f80-b2e18bb45dd6")
+		)
+		(pin "7"
+			(uuid "317a2bf1-677c-46ed-b6b4-eef240063844")
+		)
+		(pin "8"
+			(uuid "61d63f1b-dbdf-4e18-9e78-d70eac21ae65")
+		)
+		(pin "9"
+			(uuid "23d0e929-f5a1-4c62-b387-0887d9659f38")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "T1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 185.42 101.6 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c4587bb7-c73a-4ad0-bcd4-d7dc9697e09b")
+		(property "Reference" "PAD15"
+			(at 184.277 99.7458 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 184.277 104.902 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 185.42 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 185.42 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 185.42 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8bdd2fb5-8fc3-46f1-ade7-9687b983a86b")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD15")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:CONN_03")
+		(at 104.14 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d0bca7c3-16fb-43b6-91c1-9db8fac52cb2")
+		(property "Reference" "M2"
+			(at 101.6 50.292 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "455-1750-1-ND"
+			(at 101.6 63.246 0)
+			(effects
+				(font
+					(size 1.778 1.778)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "teensypi_v91:1X03"
+			(at 104.14 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 104.14 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 104.14 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "18b61e14-f0cb-4bda-9e7e-35086cd0bce5")
+		)
+		(pin "2"
+			(uuid "b0150d2b-85b3-4331-b915-3086266e149b")
+		)
+		(pin "3"
+			(uuid "95ef63d7-a7a2-4718-a404-714eb6412ee9")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "M2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 198.12 83.82 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d16f4efb-8280-42d4-b6f7-9241e542014e")
+		(property "Reference" "PAD19"
+			(at 196.977 81.9658 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 196.977 87.122 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 198.12 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 198.12 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 198.12 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5aec5c76-9c76-4aad-b7fa-9f497abad71a")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 144.78 81.28 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d1e5ef30-0c74-4f13-89aa-ab10a4b051eb")
+		(property "Reference" "BMI_1"
+			(at 143.637 79.4258 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 143.637 84.582 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 144.78 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 144.78 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 144.78 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a1916e9e-4224-4c5d-a9c6-82b80a4bae89")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "BMI_1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 160.02 96.52 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "eed9d712-571a-4fa2-b617-7f564bf5e0ac")
+		(property "Reference" "PAD18"
+			(at 158.877 94.6658 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 158.877 99.822 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 160.02 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 160.02 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 160.02 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "fbef883a-9c30-4b66-add6-8cab5f0ab881")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "teensypi_v91-eagle-import:SMD2")
+		(at 198.12 93.98 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f36426ed-7479-4f20-ba5d-0f7f3108a945")
+		(property "Reference" "PAD20"
+			(at 196.977 92.1258 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Value" "SMD2"
+			(at 196.977 97.282 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "teensypi_v91:SMD1,27-2,54"
+			(at 198.12 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 198.12 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 198.12 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "4fe3cd02-8864-4b3e-a1a0-2dfa4d191ca2")
+		)
+		(instances
+			(project ""
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PAD20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )
