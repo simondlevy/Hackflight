@@ -23,19 +23,36 @@ import struct
 import sys
 import time
 
+import msp
+
 RPI_LOGGING_PORT = 2
 
 RPI_SERVER = '64:B7:08:94:28:76'
 
 
+class StateParser(msp.Parser):
+
+    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+
+        print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
+               'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
+               'psi=%+5.1f dpsi=%+5.1f') %
+              (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+
+
+
 def logging_fun(client, status):
+
+    parser = StateParser()
 
     while status['running']:
 
         try:
-            byte = client.recv(1)
 
-            print('x%02X' % ord(byte))
+            parser.parse(client.recv(1))
+
+            #byte = client.recv(1)
+            #print('x%02X' % ord(byte))
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))

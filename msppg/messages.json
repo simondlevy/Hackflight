@@ -14,12 +14,6 @@
    {"dpsi":   "float"}
   ],
 
-  "STATE_Z": 
-  [{"ID": 101},
-   {"comment": "Minimal proof-of-concept for SNN"},
-   {"z":     "float"}
-  ],
-
   "SET_ARMING": 
   [{"ID": 200},
    {"comment": "Dis/arm"},
