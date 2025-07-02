@@ -159,7 +159,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 11 "SDA0")
@@ -2542,7 +2542,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at -0.04 1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -2928,7 +2928,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 1.15 5.1 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 9 "3V3")
@@ -3132,7 +3132,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -3203,7 +3203,7 @@
 	(footprint "teensypi_v91:SMD1,27-2,54"
 		(layer "F.Cu")
 		(uuid "3c121a93-b189-409b-a104-2bdd37ff0b51")
-		(at 148.5 74.5 90)
+		(at 145 75.5 90)
 		(descr "<b>SMD PAD</b>")
 		(property "Reference" "PAD18"
 			(at -0.8 2.4 180)
@@ -3255,7 +3255,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 1.4 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -3318,7 +3318,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -3329,7 +3329,7 @@
 	(footprint "teensypi_v91:SMD1,27-2,54"
 		(layer "F.Cu")
 		(uuid "3f96e159-1f3b-4ee7-a46e-e60d78f2137a")
-		(at 148.5 69.42 90)
+		(at 145 70.42 90)
 		(descr "<b>SMD PAD</b>")
 		(property "Reference" "PAD9"
 			(at -0.8 2.4 180)
@@ -3381,7 +3381,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at -0.08 1.4 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -3767,7 +3767,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -5288,7 +5288,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -5591,7 +5591,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 9 "3V3")
@@ -6518,7 +6518,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -6529,7 +6529,7 @@
 	(footprint "teensypi_v91:SMD1,27-2,54"
 		(layer "F.Cu")
 		(uuid "d4ef5db0-5fba-4fcd-ab64-2ef2646c5c6d")
-		(at 144.9 75.77 90)
+		(at 148.74 75 90)
 		(descr "<b>SMD PAD</b>")
 		(property "Reference" "PAD8"
 			(at -0.8 2.4 180)
@@ -6581,7 +6581,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0.5 1.26 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 13 "INT")
@@ -6593,7 +6593,7 @@
 	(footprint "teensypi_v91:SMD1,27-2,54"
 		(layer "F.Cu")
 		(uuid "d6040293-95f0-436a-938c-ad69875a4be8")
-		(at 167.5 67.24 90)
+		(at 167.5 66.75 90)
 		(descr "<b>SMD PAD</b>")
 		(property "Reference" "PAD19"
 			(at -0.8 2.4 180)
@@ -6645,7 +6645,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -8958,7 +8958,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 -1.5 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 10 "SCL0")
@@ -8970,7 +8970,7 @@
 	(footprint "teensypi_v91:SMD1,27-2,54"
 		(layer "F.Cu")
 		(uuid "f284b1e2-75a4-4a3f-a5f4-6f05f15fb4f5")
-		(at 144.9 70.69 90)
+		(at 148.74 69.5 90)
 		(descr "<b>SMD PAD</b>")
 		(property "Reference" "PAD5"
 			(at -0.8 2.4 180)
@@ -9022,7 +9022,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at 0 1.26 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 1 "GND")
@@ -9098,13 +9098,13 @@
 	(footprint "teensypi_v91:SMD1,27-2,54"
 		(layer "F.Cu")
 		(uuid "fead07ab-5a70-40db-ada8-c72dcc827bfc")
-		(at 148.5 67.24 90)
+		(at 149 66.75 90)
 		(descr "<b>SMD PAD</b>")
 		(property "Reference" "PAD12"
 			(at -0.8 2.4 180)
 			(layer "F.Cu")
 			(hide yes)
-			(uuid "59e09498-d26e-4ba7-b47d-fece2ea7c274")
+			(uuid "1242524f-1e9c-42b9-8827-60e1acacc81a")
 			(effects
 				(font
 					(size 1.1684 1.1684)
@@ -9116,7 +9116,7 @@
 		(property "Value" ""
 			(at 0 0 90)
 			(layer "F.Cu")
-			(uuid "ea4f0afc-785b-40cf-8ef1-cbe20404c18b")
+			(uuid "2df993d1-f797-4007-b24d-96553df4dd33")
 			(effects
 				(font
 					(size 0.023531 0.023531)
@@ -9129,7 +9129,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "5c56981a-a294-4b69-bb6c-99d7fb3f6cbe")
+			(uuid "01f96826-d4a5-4a0f-9603-86fa29f9a303")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9141,7 +9141,7 @@
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "fb6dfaf3-2b42-42f4-a396-b026ea22e578")
+			(uuid "60368b28-0619-4d37-9de6-eadb754a96e3")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9150,7 +9150,7 @@
 			)
 		)
 		(pad "1" smd rect
-			(at 0 0 90)
+			(at -1.25 -2.6 90)
 			(size 1.27 2.54)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(solder_mask_margin 0.1016)
@@ -9455,7 +9455,7 @@
 		)
 	)
 	(gr_text "GND"
-		(at 140 71.14 0)
+		(at 151.5 70 0)
 		(layer "F.Cu")
 		(uuid "14769dc5-8525-4984-8b15-a734ee247efa")
 		(effects
@@ -9491,7 +9491,7 @@
 		)
 	)
 	(gr_text "SCL0"
-		(at 158.7 68.54 0)
+		(at 157.5 68.54 0)
 		(layer "F.Cu")
 		(uuid "19c56563-5fe3-442a-885b-418dbc2421eb")
 		(effects
@@ -9503,7 +9503,7 @@
 		)
 	)
 	(gr_text "BMI088"
-		(at 151.2 69.746097 315)
+		(at 157.5 77.5 90)
 		(layer "F.Cu")
 		(uuid "1f3003e6-dce5-420f-906b-3f1e92b67249")
 		(effects
@@ -9515,7 +9515,7 @@
 		)
 	)
 	(gr_text "SDA0"
-		(at 158.6 71.24 0)
+		(at 157.5 71 0)
 		(layer "F.Cu")
 		(uuid "21ae9c3a-7138-444e-be38-56a4842ab594")
 		(effects
@@ -9635,7 +9635,7 @@
 		)
 	)
 	(gr_text "INT"
-		(at 149.2 78.94 0)
+		(at 151.5 75.5 0)
 		(layer "F.Cu")
 		(uuid "60dcd1fe-7079-4cb8-b509-04558ccf5097")
 		(effects
@@ -9707,7 +9707,7 @@
 		)
 	)
 	(gr_text "M2"
-		(at 183.7 116.54 315)
+		(at 183.7 118 315)
 		(layer "F.Cu")
 		(uuid "6ec113ca-7d27-4b14-a180-1e5e2fd1c167")
 		(effects
@@ -10031,7 +10031,7 @@
 		)
 	)
 	(gr_text "3V3"
-		(at 159.7 73.64 0)
+		(at 158.5 73.64 0)
 		(layer "F.Cu")
 		(uuid "c7e7067c-5f5e-48d8-ab59-df26f9b35863")
 		(effects
@@ -10163,7 +10163,7 @@
 		)
 	)
 	(gr_text "3V3"
-		(at 140.6 68.54 0)
+		(at 151.5 67.5 0)
 		(layer "F.Cu")
 		(uuid "e43dbe34-ed17-4e35-a5c7-2f1679b3c415")
 		(effects
