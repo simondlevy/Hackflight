@@ -35,7 +35,7 @@ static const int VIZ_PORT = 8100;
 
 static const int VIZ_SEND_PERIOD = 50; // ticks
 
-static const float MAX_SPIKE_TIME = 1000;
+static const float MAX_SPIKE_TIME = 100;
 
 std::string make_viz_message(const std::vector<int> counts)
 {
