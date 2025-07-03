@@ -24,7 +24,7 @@
 
 // Hackflight
 #include <clock.hpp>
-#include <control.hpp>
+#include <__control__.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
 #include <motors.h>

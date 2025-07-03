@@ -104,16 +104,16 @@ unbrick:
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	cp $(HACKFLIGHT)/src/control/standard.hpp $(HACKFLIGHT)/src/control.hpp
+	cp $(HACKFLIGHT)/src/control/standard.hpp $(HACKFLIGHT)/src/__control__.hpp
 	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
 	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
 	cd $(HACKFLIGHT)/msppg; make install; cd ..
 
-# Closed- loop control from Raspberry Pi
-external_config:
+# Closed- loop control from TeNNLab spiking neural network
+snn_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	cp $(HACKFLIGHT)/src/control/external.hpp $(HACKFLIGHT)/src/control.hpp
+	cp $(HACKFLIGHT)/src/control/snn.hpp $(HACKFLIGHT)/src/__control__.hpp
 	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
 	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
 	cd $(HACKFLIGHT)/msppg; make install; cd ..
@@ -126,7 +126,7 @@ haskell_config:
 	mv copilot_core.c $(HACKFLIGHT)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(HACKFLIGHT)/bolt/src/
 	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
-	cp $(HACKFLIGHT)/src/control/haskell.hpp $(HACKFLIGHT)/src/control.hpp
+	cp $(HACKFLIGHT)/src/control/haskell.hpp $(HACKFLIGHT)/src/__control__.hpp
 	cp $(HACKFLIGHT)/bolt/src/Kbuild.haskell $(HACKFLIGHT)/bolt/src/Kbuild
 	cd $(HACKFLIGHT)/msppg; make install; cd ..
 
