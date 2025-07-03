@@ -6,6 +6,8 @@ HFDIR = $(HOME)/Desktop/hackflight
 
 HASKDIR = $(HFDIR)/haskell
 
+SNNDIR = $(HOME)/Desktop/2025-diff-network/levy
+
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
 ARCH_CFLAGS += -Wno-array-bounds -Wno-stringop-overread
@@ -55,6 +57,8 @@ INCLUDES += -I$(srctree)/src/stm32f4/STM32_USB_OTG_Driver/inc
 INCLUDES += -I$(srctree)/src
 
 INCLUDES += -I$(KBUILD_OUTPUT)/include/generated
+
+INCLUDES += -I$(SNNDIR)
 
 objs-y += src
 objs-y += $(VENDOR)
