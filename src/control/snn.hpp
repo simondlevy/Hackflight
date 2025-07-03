@@ -29,7 +29,7 @@
 static const float MAX_SPIKE_TIME = 100;
 
 static float runClimbRateController(
-        DifferenceNetwork & net,
+        //DifferenceNetwork & net,
         const bool hovering,
         const float z0,
         const float dt,
@@ -45,7 +45,7 @@ static float runClimbRateController(
 
     const auto airborne = hovering || (z > z0);
 
-    const auto error = net.run(demand, dz);
+    const auto error = demand - dz; // net.run(demand, dz);
 
     _integral = airborne ? 
         Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -66,12 +66,12 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    static DifferenceNetwork _net;
+    //static DifferenceNetwork _net;
 
     // XXX we should do this in an init() methds
     static bool _initialized;
     if (!_initialized) {
-        _net.init(MAX_SPIKE_TIME);
+        //_net.init(MAX_SPIKE_TIME);
         _initialized = true;
     }    
 
@@ -80,7 +80,7 @@ static void runClosedLoopControl(
 
     demands.thrust =
         runClimbRateController(
-                _net,
+                //_net,
                 hovering,
                 landingAltitudeMeters,
                 dt,
