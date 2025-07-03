@@ -17,3 +17,6 @@
 #pragma once
 
 #include <control/standard.hpp>
+
+static ClosedLoopControl _closedLoopControl;
+

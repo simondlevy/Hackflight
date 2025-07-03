@@ -22,3 +22,5 @@
 #include <posix-utils/server.hpp>
 
 #include <control/snn.hpp>
+
+static ClosedLoopControl _closedLoopControl;

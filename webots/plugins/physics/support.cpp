@@ -35,8 +35,6 @@ static const auto PID_UPDATE_RATE = Clock::RATE_1000_HZ;
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-static ClosedLoopControl _closedLoopControl;
-
 static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 {
     bool landed = false;
