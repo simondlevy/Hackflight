@@ -57,40 +57,51 @@ void setDemands(float t, float r, float p, float y)
 
 void copilot_step_core();
 
-// ---------------------------------------------------------------------------
+// Common closed-loop control API
 
-static void runClosedLoopControl(
-        const float dt,
-        const bool inHoverMode,
-        const vehicleState_t & vehicleState,
-        const demands_t & openLoopDemands,
-        const float landingAltitudeMeters,
-        demands_t & demands)
-{
-    stream_dt = dt;
+class ClosedLoopControl {
 
-    stream_hovering = inHoverMode;
+    public:
 
-    stream_thrust = openLoopDemands.thrust;
-    stream_roll = openLoopDemands.roll;
-    stream_pitch = openLoopDemands.pitch;
-    stream_yaw = openLoopDemands.yaw;
+        void init()
+        {
+        }
 
-    stream_dx = vehicleState.dx;
-    stream_dy = vehicleState.dy;
-    stream_z = vehicleState.z;
-    stream_dz = vehicleState.dz;
-    stream_phi = vehicleState.phi;
-    stream_dphi = vehicleState.dphi;
-    stream_theta = vehicleState.theta;
-    stream_dtheta = vehicleState.dtheta;
-    stream_psi = vehicleState.psi;
-    stream_dpsi = vehicleState.dpsi;
+        void run(
+                const float dt,
+                const bool inHoverMode,
+                const vehicleState_t & vehicleState,
+                const demands_t & openLoopDemands,
+                const float landingAltitudeMeters,
+                demands_t & demands)
+        {
+            stream_dt = dt;
 
-    stream_landing_altitude_m = landingAltitudeMeters;
+            stream_hovering = inHoverMode;
 
-    // This will call setDemands() defined above
-    copilot_step_core();
+            stream_thrust = openLoopDemands.thrust;
+            stream_roll = openLoopDemands.roll;
+            stream_pitch = openLoopDemands.pitch;
+            stream_yaw = openLoopDemands.yaw;
 
-    memcpy(&demands, &_demands, sizeof(demands_t));
-}
+            stream_dx = vehicleState.dx;
+            stream_dy = vehicleState.dy;
+            stream_z = vehicleState.z;
+            stream_dz = vehicleState.dz;
+            stream_phi = vehicleState.phi;
+            stream_dphi = vehicleState.dphi;
+            stream_theta = vehicleState.theta;
+            stream_dtheta = vehicleState.dtheta;
+            stream_psi = vehicleState.psi;
+            stream_dpsi = vehicleState.dpsi;
+
+            stream_landing_altitude_m = landingAltitudeMeters;
+
+            // This will call setDemands() defined above
+            copilot_step_core();
+
+            memcpy(&demands, &_demands, sizeof(demands_t));
+        }
+
+};
+

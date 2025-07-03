@@ -26,95 +26,98 @@
 #include <control/pids/yaw_rate.hpp>
 #include <vehicles/diyquad.hpp>
 
-static const float MAX_SPIKE_TIME = 100;
+class ClosedLoopControl {
 
-static float runClimbRateController(
-        DifferenceNetwork & net,
-        const bool hovering,
-        const float z0,
-        const float dt,
-        const float z,
-        const float dz,
-        const float demand)
-{
-    static const float KP = 25;
-    static const float KI = 15;
-    static const float ILIMIT = 5000;
+    private:
 
-    static float _integral;
+        static constexpr float MAX_SPIKE_TIME = 100;
 
-    const auto airborne = hovering || (z > z0);
+        DifferenceNetwork _net;
 
-    const auto error = net.run(demand, dz);
+        float runClimbRateController(
+                const bool hovering,
+                const float z0,
+                const float dt,
+                const float z,
+                const float dz,
+                const float demand)
+        {
+            static const float KP = 25;
+            static const float KI = 15;
+            static const float ILIMIT = 5000;
 
-    _integral = airborne ? 
-        Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+            static float _integral;
 
-    const auto thrust = KP * error + KI * _integral;
+            const auto airborne = hovering || (z > z0);
 
-    return airborne ?
-        Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
-                THRUST_MIN, THRUST_MAX) : 0;
-}
+            const auto error = _net.run(demand, dz);
 
+            _integral = airborne ? 
+                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
-static void runClosedLoopControl(
-        const float dt,
-        const bool hovering,
-        const vehicleState_t & vehicleState,
-        const demands_t & openLoopDemands,
-        const float landingAltitudeMeters,
-        demands_t & demands)
-{
-    static DifferenceNetwork _net;
+            const auto thrust = KP * error + KI * _integral;
 
-    // XXX we should do this in an init() methds
-    static bool _initialized;
-    if (!_initialized) {
-        _net.init(MAX_SPIKE_TIME);
-        _initialized = true;
-    }    
+            return airborne ?
+                Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                        THRUST_MIN, THRUST_MAX) : 0;
+        }
 
-    const auto climbrate = AltitudeController::run(hovering,
-            dt, vehicleState.z, openLoopDemands.thrust);
+    public:
 
-    demands.thrust =
-        runClimbRateController(
-                _net,
-                hovering,
-                landingAltitudeMeters,
-                dt,
-                vehicleState.z,
-                vehicleState.dz,
-                climbrate);
+        void init()
+        {
+            _net.init(MAX_SPIKE_TIME);
+        }
 
-    const auto airborne = demands.thrust > 0;
+        void run(
+                const float dt,
+                const bool hovering,
+                const vehicleState_t & vehicleState,
+                const demands_t & openLoopDemands,
+                const float landingAltitudeMeters,
+                demands_t & demands)
+        {
+            const auto climbrate = AltitudeController::run(hovering,
+                    dt, vehicleState.z, openLoopDemands.thrust);
 
-    const auto yaw = YawAngleController::run(
-            airborne, dt, vehicleState.psi, openLoopDemands.yaw);
+            demands.thrust =
+                runClimbRateController(
+                        hovering,
+                        landingAltitudeMeters,
+                        dt,
+                        vehicleState.z,
+                        vehicleState.dz,
+                        climbrate);
 
-    demands.yaw =
-        YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+            const auto airborne = demands.thrust > 0;
 
-    PositionController::run(
-            airborne,
-            dt,
-            vehicleState.dx, vehicleState.dy, vehicleState.psi,
-            hovering ? openLoopDemands.pitch : 0,
-            hovering ? openLoopDemands.roll : 0,
-            demands.roll, demands.pitch);
+            const auto yaw = YawAngleController::run(
+                    airborne, dt, vehicleState.psi, openLoopDemands.yaw);
 
-    PitchRollAngleController::run(
-            airborne,
-            dt,
-            vehicleState.phi, vehicleState.theta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
+            demands.yaw =
+                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
 
-    PitchRollRateController::run(
-            airborne,
-            dt,
-            vehicleState.dphi, vehicleState.dtheta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
-}
+            PositionController::run(
+                    airborne,
+                    dt,
+                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
+                    hovering ? openLoopDemands.pitch : 0,
+                    hovering ? openLoopDemands.roll : 0,
+                    demands.roll, demands.pitch);
+
+            PitchRollAngleController::run(
+                    airborne,
+                    dt,
+                    vehicleState.phi, vehicleState.theta,
+                    demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
+
+            PitchRollRateController::run(
+                    airborne,
+                    dt,
+                    vehicleState.dphi, vehicleState.dtheta,
+                    demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
+        }
+
+};

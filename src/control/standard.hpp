@@ -16,13 +16,6 @@
 
 #pragma once
 
-#include <math.h>
-#include <stdio.h>
-
-#include <clock.hpp>
-#include <datatypes.h>
-#include <num.hpp>
-
 #include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
@@ -31,53 +24,63 @@
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
 
-static void runClosedLoopControl(
-        const float dt,
-        const bool hovering,
-        const vehicleState_t & vehicleState,
-        const demands_t & openLoopDemands,
-        const float landingAltitudeMeters,
-        demands_t & demands)
-{
-    const auto climbrate = AltitudeController::run(hovering,
-            dt, vehicleState.z, openLoopDemands.thrust);
+class ClosedLoopControl {
 
-    demands.thrust =
-        ClimbRateController::run(
-                hovering,
-                landingAltitudeMeters,
-                dt,
-                vehicleState.z,
-                vehicleState.dz,
-                climbrate);
+    public:
 
-    const auto airborne = demands.thrust > 0;
+        void init()
+        {
+        }
 
-    const auto yaw = YawAngleController::run(
-            airborne, dt, vehicleState.psi, openLoopDemands.yaw);
+        void run(
+                const float dt,
+                const bool hovering,
+                const vehicleState_t & vehicleState,
+                const demands_t & openLoopDemands,
+                const float landingAltitudeMeters,
+                demands_t & demands)
+        {
+            const auto climbrate = AltitudeController::run(hovering,
+                    dt, vehicleState.z, openLoopDemands.thrust);
 
-    demands.yaw =
-        YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+            demands.thrust =
+                ClimbRateController::run(
+                        hovering,
+                        landingAltitudeMeters,
+                        dt,
+                        vehicleState.z,
+                        vehicleState.dz,
+                        climbrate);
 
-    PositionController::run(
-            airborne,
-            dt,
-            vehicleState.dx, vehicleState.dy, vehicleState.psi,
-            hovering ? openLoopDemands.pitch : 0,
-            hovering ? openLoopDemands.roll : 0,
-            demands.roll, demands.pitch);
+            const auto airborne = demands.thrust > 0;
 
-    PitchRollAngleController::run(
-            airborne,
-            dt,
-            vehicleState.phi, vehicleState.theta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
+            const auto yaw = YawAngleController::run(
+                    airborne, dt, vehicleState.psi, openLoopDemands.yaw);
 
-    PitchRollRateController::run(
-            airborne,
-            dt,
-            vehicleState.dphi, vehicleState.dtheta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
-}
+            demands.yaw =
+                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+
+            PositionController::run(
+                    airborne,
+                    dt,
+                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
+                    hovering ? openLoopDemands.pitch : 0,
+                    hovering ? openLoopDemands.roll : 0,
+                    demands.roll, demands.pitch);
+
+            PitchRollAngleController::run(
+                    airborne,
+                    dt,
+                    vehicleState.phi, vehicleState.theta,
+                    demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
+
+            PitchRollRateController::run(
+                    airborne,
+                    dt,
+                    vehicleState.dphi, vehicleState.dtheta,
+                    demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
+        }
+
+};
