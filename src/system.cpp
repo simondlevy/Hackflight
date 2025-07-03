@@ -18,6 +18,9 @@
 #include <semphr.h>
 #include <task.h>
 
+// Chosen at config time
+#include <__control__.hpp>
+
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
@@ -44,6 +47,8 @@ static LedTask ledTask;
 static LoggerTask loggerTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
+
+static ClosedLoopControl closedLoopControl;
 
 static Safety safety;
 
@@ -84,7 +89,7 @@ static void systemTask(void *arg)
 
     setpointTask.begin(&safety);
 
-    loggerTask.begin(&estimatorTask);
+    loggerTask.begin(&estimatorTask, &closedLoopControl);
 
     ledTask.begin(&safety, _led_pin);
 
@@ -94,6 +99,7 @@ static void systemTask(void *arg)
             IMU_CALIBRATION_PITCH);
 
     auto coreTaskReady = coreTask.begin(
+            &closedLoopControl,
             &safety,
             &estimatorTask,
             &imuTask,

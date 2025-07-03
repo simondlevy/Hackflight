@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 
-#include <msp/messages.h>
+
 #include <msp/serializer.hpp>
 #include <system.h>
 #include <task.hpp>
@@ -28,13 +28,16 @@ class LoggerTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask)
+        void begin(EstimatorTask * estimatorTask,
+                ClosedLoopControl * closedLoopControl)
         {
             if (_task.didInit()){
                 return;
             }
 
             _estimatorTask = estimatorTask;
+
+            _closedLoopControl = closedLoopControl;
 
             _task.init(runLoggerTask, "logger", this, 3);
         }
@@ -52,6 +55,8 @@ class LoggerTask {
 
         EstimatorTask * _estimatorTask;
 
+        ClosedLoopControl * _closedLoopControl;
+
         void run(void)
         {
             systemWaitStart();
@@ -66,26 +71,23 @@ class LoggerTask {
 
                 _estimatorTask->getVehicleState(&state);
 
-                const float statevals[10] = {
-                    state.dx,
-                    state.dy,
-                    state.z,
-                    state.dz,
-                    state.phi,
-                    state.dphi,
-                    state.theta,
-                    state.dtheta,
-                    state.psi,
-                    state.dpsi
+                const float statevals[10] = { state.dx, state.dy, state.z,
+                    state.dz, state.phi, state.dphi, state.theta,
+                    state.dtheta, state.psi, state.dpsi 
                 };
 
                 serializer.serializeFloats(MSP_STATE, statevals, 10);
 
-                for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                    systemUartWriteByte(serializer.payload[k]);
-                }
+                sendPayload(serializer);
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
             }
+        }
+
+        void sendPayload(const MspSerializer & serializer) {
+            for (uint8_t k=0; k<serializer.payloadSize; ++k) {
+                systemUartWriteByte(serializer.payload[k]);
+            }
+
         }
 };

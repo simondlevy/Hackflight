@@ -44,6 +44,7 @@ class CoreTask {
     public:
 
         bool begin(
+                ClosedLoopControl * closedLoopControl,
                 Safety * safety,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
@@ -55,6 +56,8 @@ class CoreTask {
             if (_task.didInit()) {
                 return true;
             }
+
+            _closedLoopControl = closedLoopControl;
 
             _safety = safety;
 
@@ -135,6 +138,8 @@ class CoreTask {
 
         demands_t _demands;
 
+        ClosedLoopControl * _closedLoopControl;
+
         SetpointTask * _setpointTask;
 
         EstimatorTask * _estimatorTask;
@@ -188,9 +193,7 @@ class CoreTask {
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
 
-            ClosedLoopControl closedLoopControl = {};
-
-            closedLoopControl.init();
+            _closedLoopControl->init();
 
             for (uint32_t step=1; ; step++) {
 
@@ -237,7 +240,7 @@ class CoreTask {
                             (double)vehicleState.theta,
                             (double)vehicleState.psi);
 
-                    closedLoopControl.run(
+                    _closedLoopControl->run(
                             1.f / PID_UPDATE_RATE,
                             setpoint.hovering,
                             vehicleState,

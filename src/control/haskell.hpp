@@ -103,5 +103,10 @@ class ClosedLoopControl {
             memcpy(&demands, &_demands, sizeof(demands_t));
         }
 
+        uint8_t getMessage(uint8_t * msg)
+        {
+            return 0;
+        }
+
 };
 

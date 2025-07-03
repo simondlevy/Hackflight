@@ -83,4 +83,9 @@ class ClosedLoopControl {
                     demands.roll, demands.pitch);
         }
 
+        uint8_t getMessage(uint8_t * msg)
+        {
+            return 0;
+        }
+
 };
