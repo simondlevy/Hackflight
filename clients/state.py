@@ -18,29 +18,24 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import struct
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 
 from btsupport import connect_to_server
 
-RPI_LOGGING_PORT = 2
+try:
+    from msp import Parser as MspParser
+except Exception as e:
+    print('%s;\nto install msp: cd ../msppg; make install' % str(e))
+    exit(0)
 
 
-def logging_fun(client, status):
+LOGGING_PORT = 2
 
-    while status['running']:
 
-        try:
-            msg = client.recv(40)
+class StateParser(MspParser):
 
-        except Exception as e:
-            print('Failed to receiving logging data: ' + str(e))
-            status['running'] = False
-            return
-
-        dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi = (
-                struct.unpack('ffffffffff', msg))
+    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
                'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
@@ -48,19 +43,33 @@ def logging_fun(client, status):
               (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
 
+def logging_fun(client, status):
+
+    parser = StateParser()
+
+    while status['running']:
+
+        try:
+
+            parser.parse(client.recv(1))
+
+        except Exception as e:
+            print('Failed to receiving logging data: ' + str(e))
+            status['running'] = False
+            return
+
+
 def main():
 
     argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
-    argparser.add_argument('-s', '--server',
-                           choices=['onboard', 'pihat'],
-                           default='onboard',
-                           help='RaspberryPi Bluetooth server')
+    argparser.add_argument('-s', '--server', choices=['onboard', 'bench'],
+                           default='onboard', help='Bluetooth server')
 
     args = argparser.parse_args()
 
-    client = connect_to_server(args.server, RPI_LOGGING_PORT)
+    client = connect_to_server(args.server, LOGGING_PORT)
 
     status = {'running': True}
 

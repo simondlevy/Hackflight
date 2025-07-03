@@ -27,10 +27,11 @@ from btsupport import connect_to_server
 try:
     from msp import Parser as MspParser
 except Exception as e:
-    print('Install msp: cd ../msppg; make install')
+    print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
 
-RPI_SETPOINT_PORT = 1
+
+SETPOINT_PORT = 1
 
 SUPPORTED_GAMEPADS = {'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
 
@@ -110,10 +111,8 @@ def main():
     argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
-    argparser.add_argument('-s', '--server',
-                           choices=['onboard', 'pihat', 'none'],
-                           default='onboard',
-                           help='RaspberryPi Bluetooth server')
+    argparser.add_argument('-s', '--server', choices=['onboard', 'bench'],
+                           default='onboard', help='Bluetooth server')
 
     argparser.add_argument('-d', '--debug', action='store_true',
                            help='debug controller')
@@ -147,8 +146,7 @@ def main():
 
     descend_countdown = 0
 
-    if args.server != 'none':
-        client = connect_to_server(args.server, RPI_SETPOINT_PORT)
+    client = connect_to_server(args.server, SETPOINT_PORT)
 
     zdist = ZDIST_INIT
 
@@ -159,8 +157,7 @@ def main():
             armed = status['armed']
 
             if armed != was_armed:
-                if args.server != 'none':
-                    client.send(MspParser.serialize_SET_ARMING(armed))
+                client.send(MspParser.serialize_SET_ARMING(armed))
                 was_armed = armed
 
             if args.debug:
@@ -179,9 +176,8 @@ def main():
 
                 zdist = min(max(zdist + t, ZDIST_MIN), ZDIST_MAX)
 
-                if args.server != 'none':
-                    client.send(MspParser.serialize_SET_SETPOINT_HOVER(
-                        vx, vy, yawrate, zdist))
+                client.send(MspParser.serialize_SET_SETPOINT_HOVER(
+                    vx, vy, yawrate, zdist))
 
                 if args.debug:
                     print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
@@ -203,9 +199,8 @@ def main():
 
                 zdist = ZDIST_INIT
 
-                if args.server != 'none':
-                    client.send(
-                            MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
+                client.send(
+                        MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
 
                 if args.debug:
                     print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d' %

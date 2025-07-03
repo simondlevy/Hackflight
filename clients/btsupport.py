@@ -21,9 +21,11 @@ import time
 
 def connect_to_server(name, port):
 
-    servers = {'onboard': 'B8:27:EB:E0:1D:07', 'pihat': 'B8:27:EB:3F:AB:47'}
+    # addresses = {'onboard': 'B8:27:EB:E0:1D:07', 'pihat': 'B8:27:EB:3F:AB:47'}
 
-    addr = servers[name]
+    addresses = {'onboard': '64:B7:08:94:2A:32', 'bench': '64:B7:08:94:28:76'}
+
+    addr = addresses[name]
 
     while True:
 

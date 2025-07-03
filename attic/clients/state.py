@@ -18,21 +18,29 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from smirfsupport import connect_to_server
+import struct
+import argparse
+from argparse import ArgumentDefaultsHelpFormatter
 
-try:
-    from msp import Parser as MspParser
-except Exception as e:
-    print('%s;\nto install msp: cd ../msppg; make install' % str(e))
-    exit(0)
-
+from btsupport import connect_to_server
 
 RPI_LOGGING_PORT = 2
 
 
-class StateParser(MspParser):
+def logging_fun(client, status):
 
-    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+    while status['running']:
+
+        try:
+            msg = client.recv(40)
+
+        except Exception as e:
+            print('Failed to receiving logging data: ' + str(e))
+            status['running'] = False
+            return
+
+        dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi = (
+                struct.unpack('ffffffffff', msg))
 
         print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
                'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
@@ -40,25 +48,19 @@ class StateParser(MspParser):
               (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
 
-def logging_fun(client, status):
-
-    parser = StateParser()
-
-    while status['running']:
-
-        try:
-
-            parser.parse(client.recv(1))
-
-        except Exception as e:
-            print('Failed to receiving logging data: ' + str(e))
-            status['running'] = False
-            return
-
-
 def main():
 
-    client = connect_to_server(RPI_LOGGING_PORT)
+    argparser = argparse.ArgumentParser(
+            formatter_class=ArgumentDefaultsHelpFormatter)
+
+    argparser.add_argument('-s', '--server',
+                           choices=['onboard', 'pihat'],
+                           default='onboard',
+                           help='RaspberryPi Bluetooth server')
+
+    args = argparser.parse_args()
+
+    client = connect_to_server(args.server, RPI_LOGGING_PORT)
 
     status = {'running': True}
 
