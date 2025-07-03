@@ -16,41 +16,47 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
+#include <difference_network.hpp>
 
-#include <posix-utils/server.hpp>
+#include <control/pids/altitude.hpp>
+#include <control/pids/position.hpp>
+#include <control/pids/pitchroll_angle.hpp>
+#include <control/pids/pitchroll_rate.hpp>
+#include <control/pids/yaw_angle.hpp>
+#include <control/pids/yaw_rate.hpp>
+#include <vehicles/diyquad.hpp>
 
-#include <control/snn.hpp>
+static const float MAX_SPIKE_TIME = 100;
 
-#if 0
-static const int VIZ_PORT = 8100;
-
-static const int VIZ_SEND_PERIOD = 50; // ticks
-
-std::string make_viz_message(const std::vector<int> counts)
+static float runClimbRateController(
+        DifferenceNetwork & net,
+        const bool hovering,
+        const float z0,
+        const float dt,
+        const float z,
+        const float dz,
+        const float demand)
 {
-    const int n = counts.size();
+    static const float KP = 25;
+    static const float KI = 15;
+    static const float ILIMIT = 5000;
 
-    std::string msg = "{\"Event Counts\":[";
+    static float _integral;
 
-    for (int i=0; i<n; ++i) {
-        char tmp[100] = {};
-        const int count = counts[i];
-        sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-        msg += tmp;
-    }
+    const auto airborne = hovering || (z > z0);
 
-    msg += ", \"Neuron Alias\":[";
+    const auto error = net.run(demand, dz);
 
-    for (int i=0; i<n; ++i) {
-        char tmp[100] = {};
-        sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
-        msg += tmp;
-    }
+    _integral = airborne ? 
+        Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
-    return msg + "}\n"; 
+    const auto thrust = KP * error + KI * _integral;
+
+    return airborne ?
+        Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                THRUST_MIN, THRUST_MAX) : 0;
 }
+
 
 static void runClosedLoopControl(
         const float dt,
@@ -60,17 +66,12 @@ static void runClosedLoopControl(
         const float landingAltitudeMeters,
         demands_t & demands)
 {
-    static bool _initialized;
     static DifferenceNetwork _net;
-    static ServerSocket _spikeServer;
 
+    // XXX we should do this in an init() methds
+    static bool _initialized;
     if (!_initialized) {
-
         _net.init(MAX_SPIKE_TIME);
-
-        _spikeServer.open(VIZ_PORT);
-        _spikeServer.acceptClient();
-
         _initialized = true;
     }    
 
@@ -116,26 +117,4 @@ static void runClosedLoopControl(
             vehicleState.dphi, vehicleState.dtheta,
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
-
-    static int _tick;
-
-    if (_tick++ == VIZ_SEND_PERIOD) {
-
-        const std::vector<int> counts = {
-            _net.get_i1_spike_count(),
-            _net.get_i2_spike_count(),
-            _net.get_s_spike_count(),
-            _net.get_d1_spike_count(),
-            _net.get_d2_spike_count(),
-            _net.get_o_spike_count(),
-            _net.get_s2_spike_count()
-        };
-
-        const std::string msg = make_viz_message(counts);
-
-        _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
-
-        _tick = 0;
-    }
 }
-#endif
