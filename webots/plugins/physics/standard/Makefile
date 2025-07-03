@@ -16,20 +16,17 @@
 
 SRC = ../../../../src
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+ROOT = $(HOME)/Desktop
 
-INCLUDE = -I$(SRC)
+NET = $(ROOT)/2025-diff-network/levy/
+
+CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 CXX_SOURCES = ../support.cpp
 
-FILES_TO_REMOVE += sim_control.hpp
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
 
 all: libstandard.so
-
-../support.cpp: ./control.hpp
-
-./control.hpp:
-	cp $(SRC)/control/standard.hpp ./sim_control.hpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

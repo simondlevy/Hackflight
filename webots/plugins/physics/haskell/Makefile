@@ -25,12 +25,11 @@ HASKDIR = ../../../../haskell
 
 CXX_SOURCES = ../support.cpp copilot_core.cpp 
 
-FILES_TO_REMOVE += copilot* sim_control.hpp
+FILES_TO_REMOVE += copilot*
 
 all: libhaskell.so
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
-	cp $(SRC)/control/haskell.hpp ./sim_control.hpp
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c copilot_core.cpp
 
