@@ -22,34 +22,31 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include <sys/ioctl.h>
 #include <pthread.h>
 #include <time.h>
 
-#include "difference_risp_train.hpp"
-static EncoderHelper encoder_helper;
-
-#include <posix-utils/serial.hpp>
 #include <posix-utils/server.hpp>
+#include <posix-utils/serial.hpp>
 
 #include <msp/parser.hpp>
 #include <msp/messages.h>
+#include <msp/serializer.hpp>
+#include <tennlab/differencer.hpp>
+
+#include "tick.hpp"
 
 // NB, Bluetooth
 static const uint16_t RADIO_PORT = 1;
-static const uint16_t STATE_PORT = 2;
-static const uint16_t SPIKE_PORT = 3;
 
 // Serial connection to FC
 static int serialfd;
 
-static void * logging_fun(void * arg)
-{
-    // true = Bluetooth
-    auto stateServer = Server(STATE_PORT, "state", true);
-    auto spikeServer = Server(SPIKE_PORT, "spike", true);
+// Current altitude (m)
+static float state_z;
 
+static void * control_fun(void * arg)
+{
     // Parser accepts messages from flight controller (FC)
     MspParser parser = {};
 
@@ -58,56 +55,20 @@ static void * logging_fun(void * arg)
 
         char byte = 0;
 
-        if (read(serialfd, &byte, 1) == 1) {
-
-            switch (parser.parse(byte)) {
-
-                case MSP_STATE:
-
-                    {
-                        const float state[12] = { 
-                            parser.getFloat(0),
-                            parser.getFloat(1),
-                            parser.getFloat(2),
-                            parser.getFloat(3),
-                            parser.getFloat(4),
-                            parser.getFloat(5),
-                            parser.getFloat(6),
-                            parser.getFloat(7),
-                            parser.getFloat(8),
-                            parser.getFloat(9),
-                            parser.getFloat(10),
-                            parser.getFloat(11)
-                        };
-
-                        if (stateServer.isConnected()) {
-
-                            stateServer.sendData((uint8_t *)state, 12 * sizeof(float));
-                        }
-
-                        if (spikeServer.isConnected()) {
-
-                            // For now, we use the Raspberry Pi to encode just
-                            // the spikes corresponding to the climb rate, then
-                            // send them to the client
-                            const float obs[2] = {0, parser.getFloat(5)};
-                            encoder_helper.get_spikes(obs);
-                            uint8_t counts[1] = {};
-                            for (size_t k=0; k<encoder_helper.nspikes; ++k) {
-                                if (encoder_helper.spikes[k].id == 1) {
-                                    counts[0]++;
-                                }
-                            }
-                            spikeServer.sendData(counts, 1);
-                        }
-                    }
-
-                    break;
-            }
+        if (read(serialfd, &byte, 1) == 1 && 
+                parser.parse(byte) == MSP_STATE_Z) {
+            state_z = parser.getFloat(0);
         }
     }
 
     return NULL;
+}
+
+static void sendPayload(
+        const int serialfd, const uint8_t * payload, const uint8_t size)
+{
+    const auto ignore = write(serialfd, payload, size);
+    (void)ignore;
 }
 
 int main(int argc, char ** argv)
@@ -119,15 +80,17 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    encoder_helper.init();
-
-    pthread_t logging_thread = {};
-    pthread_create(&logging_thread, NULL, logging_fun, NULL);
+    pthread_t control_thread = {};
+    pthread_create(&control_thread, NULL, control_fun, NULL);
 
     // true = Bluetooth
-    auto setpointServer = Server(RADIO_PORT, "setpoint", true);
+    auto setpointServer = Server(RADIO_PORT, "snn setpoint", true);
 
     MspParser parser = {};
+
+    DifferenceNetwork _network = {};
+
+    _network.init();
 
     // Loop forever, retreiving setpoint messages from the client and sending
     // them to the flight controller
@@ -137,15 +100,47 @@ int main(int argc, char ** argv)
 
         setpointServer.receiveData(&byte, 1);
 
-        if (parser.parse(byte)) {
+        const uint8_t msgid = parser.parse(byte);
 
-            uint8_t payload[256] = {};
+        // If we've got a new message
+        if (msgid) {
 
-            const auto payloadSize = parser.getPayload(payload);
+            // Special handling for hover setpoint messages
+            if (msgid == MSP_SET_SETPOINT_HOVER) {
 
-            write(serialfd, payload, payloadSize);
+                tick();
+
+                const float demand = parser.getFloat(3);
+                const float actual = state_z;
+
+                const float zerror = demand - actual;
+
+                const float tmperror = _network.run(demand, actual);
+                (void)tmperror;
+
+                // Grab the setpoint values and replace the altitude setpoint
+                // with its error
+                const float setpoint[4] = {
+                    parser.getFloat(0),
+                    parser.getFloat(1),
+                    parser.getFloat(2),
+                    zerror
+                };
+
+                // Send the modified setpoint to the flight controller
+                MspSerializer serializer = {};
+                serializer.serializeFloats(MSP_SET_SETPOINT_HOVER, setpoint, 4);
+                sendPayload(serialfd, serializer.payload, serializer.payloadSize);
+            }
+
+            // Otherwise, send the unmodified payload along to the flight
+            // controller
+            else {
+                uint8_t payload[256] = {};
+                const auto payloadSize = parser.getPayload(payload);
+                sendPayload(serialfd, payload, payloadSize);
+            }
         }
-
 
         sleep(0); // yield
     }
