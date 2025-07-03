@@ -16,31 +16,7 @@
 
 #pragma once
 
-#include <control/snn/helper.hpp>
+#include <control/standard.hpp>
 
-class ClosedLoopControl {
+static ClosedLoopControl _closedLoopControl;
 
-    private:
-
-        SnnHelper _helper;
-
-    public:
-
-        void init()
-        {
-            _helper.init();
-        }
-
-        void run(
-                const float dt,
-                const bool hovering,
-                const vehicleState_t & vehicleState,
-                const demands_t & openLoopDemands,
-                const float landingAltitudeMeters,
-                demands_t & demands)
-        {
-            _helper.run(dt, hovering, vehicleState, openLoopDemands,
-                    landingAltitudeMeters, demands); 
-        }
-
-};

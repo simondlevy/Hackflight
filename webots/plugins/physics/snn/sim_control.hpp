@@ -21,121 +21,88 @@
 
 #include <posix-utils/server.hpp>
 
-#include <control/snn.hpp>
+#include <control/snn/helper.hpp>
 
-#if 0
-static const int VIZ_PORT = 8100;
+class ClosedLoopControl {
 
-static const int VIZ_SEND_PERIOD = 50; // ticks
+    private:
 
-std::string make_viz_message(const std::vector<int> counts)
-{
-    const int n = counts.size();
+        static const int VIZ_PORT = 8100;
 
-    std::string msg = "{\"Event Counts\":[";
+        static const int VIZ_SEND_PERIOD = 50; // ticks
 
-    for (int i=0; i<n; ++i) {
-        char tmp[100] = {};
-        const int count = counts[i];
-        sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-        msg += tmp;
-    }
+        SnnHelper _helper;
 
-    msg += ", \"Neuron Alias\":[";
+        ServerSocket _spikeServer;
 
-    for (int i=0; i<n; ++i) {
-        char tmp[100] = {};
-        sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
-        msg += tmp;
-    }
+        static std::string make_viz_message(const std::vector<int> counts)
+        {
+            const int n = counts.size();
 
-    return msg + "}\n"; 
-}
+            std::string msg = "{\"Event Counts\":[";
 
-static void runClosedLoopControl(
-        const float dt,
-        const bool hovering,
-        const vehicleState_t & vehicleState,
-        const demands_t & openLoopDemands,
-        const float landingAltitudeMeters,
-        demands_t & demands)
-{
-    static bool _initialized;
-    static DifferenceNetwork _net;
-    static ServerSocket _spikeServer;
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                const int count = counts[i];
+                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
+                msg += tmp;
+            }
 
-    if (!_initialized) {
+            msg += ", \"Neuron Alias\":[";
 
-        _net.init(MAX_SPIKE_TIME);
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
+                msg += tmp;
+            }
 
-        _spikeServer.open(VIZ_PORT);
-        _spikeServer.acceptClient();
+            return msg + "}\n";
+        }
 
-        _initialized = true;
-    }    
 
-    const auto climbrate = AltitudeController::run(hovering,
-            dt, vehicleState.z, openLoopDemands.thrust);
+    public:
 
-    demands.thrust =
-        runClimbRateController(
-                _net,
-                hovering,
-                landingAltitudeMeters,
-                dt,
-                vehicleState.z,
-                vehicleState.dz,
-                climbrate);
+        void init()
+        {
+            _helper.init();
 
-    const auto airborne = demands.thrust > 0;
+            _spikeServer.open(VIZ_PORT);
+            _spikeServer.acceptClient();
+        }
 
-    const auto yaw = YawAngleController::run(
-            airborne, dt, vehicleState.psi, openLoopDemands.yaw);
+        void run(
+                const float dt,
+                const bool hovering,
+                const vehicleState_t & vehicleState,
+                const demands_t & openLoopDemands,
+                const float landingAltitudeMeters,
+                demands_t & demands)
+        {
+            _helper.run(dt, hovering, vehicleState, openLoopDemands,
+                    landingAltitudeMeters, demands); 
 
-    demands.yaw =
-        YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+            static int _tick;
 
-    PositionController::run(
-            airborne,
-            dt,
-            vehicleState.dx, vehicleState.dy, vehicleState.psi,
-            hovering ? openLoopDemands.pitch : 0,
-            hovering ? openLoopDemands.roll : 0,
-            demands.roll, demands.pitch);
+            if (_tick++ == VIZ_SEND_PERIOD) {
 
-    PitchRollAngleController::run(
-            airborne,
-            dt,
-            vehicleState.phi, vehicleState.theta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
+                const std::vector<int> counts = {
+                    _helper.net.get_i1_spike_count(),
+                    _helper.net.get_i2_spike_count(),
+                    _helper.net.get_s_spike_count(),
+                    _helper.net.get_d1_spike_count(),
+                    _helper.net.get_d2_spike_count(),
+                    _helper.net.get_o_spike_count(),
+                    _helper.net.get_s2_spike_count()
+                };
 
-    PitchRollRateController::run(
-            airborne,
-            dt,
-            vehicleState.dphi, vehicleState.dtheta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
+                const std::string msg = make_viz_message(counts);
 
-    static int _tick;
+                _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
 
-    if (_tick++ == VIZ_SEND_PERIOD) {
+                _tick = 0;
+            }
+        }
 
-        const std::vector<int> counts = {
-            _net.get_i1_spike_count(),
-            _net.get_i2_spike_count(),
-            _net.get_s_spike_count(),
-            _net.get_d1_spike_count(),
-            _net.get_d2_spike_count(),
-            _net.get_o_spike_count(),
-            _net.get_s2_spike_count()
-        };
+};
 
-        const std::string msg = make_viz_message(counts);
-
-        _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
-
-        _tick = 0;
-    }
-}
-#endif
+static ClosedLoopControl _closedLoopControl;

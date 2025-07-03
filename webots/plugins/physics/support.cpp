@@ -62,7 +62,7 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
-        runClosedLoopControl(
+        _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
                 siminfo.hovering,
                 state,
@@ -120,6 +120,8 @@ DLLEXPORT void webots_physics_init()
 
         dBodySetGravityMode(_robotBody, 0);
     }
+
+    _closedLoopControl.init();
 }
 
 // This is called by Webots in the outer (display, kinematics) loop

@@ -188,6 +188,10 @@ class CoreTask {
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
 
+            ClosedLoopControl closedLoopControl = {};
+
+            closedLoopControl.init();
+
             for (uint32_t step=1; ; step++) {
 
                 // The IMU should unlock at 1kHz
@@ -233,7 +237,7 @@ class CoreTask {
                             (double)vehicleState.theta,
                             (double)vehicleState.psi);
 
-                    runClosedLoopControl(
+                    closedLoopControl.run(
                             1.f / PID_UPDATE_RATE,
                             setpoint.hovering,
                             vehicleState,

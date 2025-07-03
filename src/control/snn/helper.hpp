@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,57 @@
 
 #pragma once
 
+#include <difference_network.hpp>
+
 #include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
+#include <vehicles/diyquad.hpp>
 
-class ClosedLoopControl {
+class SnnHelper {
 
-    public:
+    friend class ClosedLoopControl;
+
+    private:
+
+        static constexpr float MAX_SPIKE_TIME = 100;
+
+        DifferenceNetwork net;
+
+        float runClimbRateController(
+                const bool hovering,
+                const float z0,
+                const float dt,
+                const float z,
+                const float dz,
+                const float demand)
+        {
+            static const float KP = 25;
+            static const float KI = 15;
+            static const float ILIMIT = 5000;
+
+            static float _integral;
+
+            const auto airborne = hovering || (z > z0);
+
+            const auto error = net.run(demand, dz);
+
+            _integral = airborne ? 
+                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+
+            const auto thrust = KP * error + KI * _integral;
+
+            return airborne ?
+                Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                        THRUST_MIN, THRUST_MAX) : 0;
+        }
 
         void init()
         {
+            net.init(MAX_SPIKE_TIME);
         }
 
         void run(
@@ -44,7 +81,7 @@ class ClosedLoopControl {
                     dt, vehicleState.z, openLoopDemands.thrust);
 
             demands.thrust =
-                ClimbRateController::run(
+                runClimbRateController(
                         hovering,
                         landingAltitudeMeters,
                         dt,
