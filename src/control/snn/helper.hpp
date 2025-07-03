@@ -34,7 +34,7 @@ class SnnHelper {
 
         static constexpr float MAX_SPIKE_TIME = 100;
 
-        DifferenceNetwork _net;
+        DifferenceNetwork net;
 
         float runClimbRateController(
                 const bool hovering,
@@ -52,7 +52,7 @@ class SnnHelper {
 
             const auto airborne = hovering || (z > z0);
 
-            const auto error = _net.run(demand, dz);
+            const auto error = net.run(demand, dz);
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -66,7 +66,7 @@ class SnnHelper {
 
         void init()
         {
-            _net.init(MAX_SPIKE_TIME);
+            net.init(MAX_SPIKE_TIME);
         }
 
         void run(

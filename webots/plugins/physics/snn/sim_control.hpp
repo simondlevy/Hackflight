@@ -27,13 +27,47 @@ class ClosedLoopControl {
 
     private:
 
+        static const int VIZ_PORT = 8100;
+
+        static const int VIZ_SEND_PERIOD = 50; // ticks
+
         SnnHelper _helper;
+
+        ServerSocket _spikeServer;
+
+        static std::string make_viz_message(const std::vector<int> counts)
+        {
+            const int n = counts.size();
+
+            std::string msg = "{\"Event Counts\":[";
+
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                const int count = counts[i];
+                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
+                msg += tmp;
+            }
+
+            msg += ", \"Neuron Alias\":[";
+
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
+                msg += tmp;
+            }
+
+            return msg + "}\n";
+        }
+
 
     public:
 
         void init()
         {
             _helper.init();
+
+            _spikeServer.open(VIZ_PORT);
+            _spikeServer.acceptClient();
         }
 
         void run(
@@ -46,6 +80,27 @@ class ClosedLoopControl {
         {
             _helper.run(dt, hovering, vehicleState, openLoopDemands,
                     landingAltitudeMeters, demands); 
+
+            static int _tick;
+
+            if (_tick++ == VIZ_SEND_PERIOD) {
+
+                const std::vector<int> counts = {
+                    _helper.net.get_i1_spike_count(),
+                    _helper.net.get_i2_spike_count(),
+                    _helper.net.get_s_spike_count(),
+                    _helper.net.get_d1_spike_count(),
+                    _helper.net.get_d2_spike_count(),
+                    _helper.net.get_o_spike_count(),
+                    _helper.net.get_s2_spike_count()
+                };
+
+                const std::string msg = make_viz_message(counts);
+
+                _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
+
+                _tick = 0;
+            }
         }
 
 };
