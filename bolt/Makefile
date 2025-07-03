@@ -2,9 +2,9 @@ PYTHON            ?= python3
 
 DFU_UTIL          ?= dfu-util
 
-HACKFLIGHT = $(HOME)/Desktop/hackflight
+HFDIR = $(HOME)/Desktop/hackflight
 
-HASKDIR = $(HACKFLIGHT)/haskell
+HASKDIR = $(HFDIR)/haskell
 
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
@@ -104,31 +104,31 @@ unbrick:
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	cp $(HACKFLIGHT)/src/control/standard.hpp $(HACKFLIGHT)/src/__control__.hpp
-	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
-	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
-	cd $(HACKFLIGHT)/msppg; make install; cd ..
+	cp $(HFDIR)/src/control/standard.hpp $(HFDIR)/src/__control__.hpp
+	cp $(HFDIR)/src/system.cpp $(HFDIR)/bolt/src/
+	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
+	cd $(HFDIR)/msppg; make install; cd ..
 
 # Closed- loop control from TeNNLab spiking neural network
 snn_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	cp $(HACKFLIGHT)/src/control/snn.hpp $(HACKFLIGHT)/src/__control__.hpp
-	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
-	cp $(HACKFLIGHT)/bolt/src/Kbuild.standard $(HACKFLIGHT)/bolt/src/Kbuild
-	cd $(HACKFLIGHT)/msppg; make install; cd ..
+	cp $(HFDIR)/src/control/snn.hpp $(HFDIR)/src/__control__.hpp
+	cp $(HFDIR)/src/system.cpp $(HFDIR)/bolt/src/
+	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
+	cd $(HFDIR)/msppg; make install; cd ..
 
 # Closed- loop control from NASA Copilot
 haskell_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
-	mv copilot_core.c $(HACKFLIGHT)/bolt/src/copilot_core.cpp
-	mv copilot*.h $(HACKFLIGHT)/bolt/src/
-	cp $(HACKFLIGHT)/src/system.cpp $(HACKFLIGHT)/bolt/src/
-	cp $(HACKFLIGHT)/src/control/haskell.hpp $(HACKFLIGHT)/src/__control__.hpp
-	cp $(HACKFLIGHT)/bolt/src/Kbuild.haskell $(HACKFLIGHT)/bolt/src/Kbuild
-	cd $(HACKFLIGHT)/msppg; make install; cd ..
+	mv copilot_core.c $(HFDIR)/bolt/src/copilot_core.cpp
+	mv copilot*.h $(HFDIR)/bolt/src/
+	cp $(HFDIR)/src/system.cpp $(HFDIR)/bolt/src/
+	cp $(HFDIR)/src/control/haskell.hpp $(HFDIR)/src/__control__.hpp
+	cp $(HFDIR)/bolt/src/Kbuild.haskell $(HFDIR)/bolt/src/Kbuild
+	cd $(HFDIR)/msppg; make install; cd ..
 
 clean:
 	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ bolt.* \
