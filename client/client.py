@@ -170,6 +170,10 @@ def main():
 
     if args.visualize_spikes:
         print('Launching spike server')
+        server_socket = socket.socket()  
+        server_socket.bind(('localhost', SPIKE_VIZ_PORT))  
+        server_socket.listen(1)
+        conn, address = server_socket.accept()
 
     gamepad = Gamepad()
 
