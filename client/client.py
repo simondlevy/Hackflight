@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-import socket
 import os
 import socket
 import sys
@@ -56,21 +55,7 @@ class LoggingParser(MspParser):
         self.client = client
         self.running = True
         self.show_state = show_state
-
-        self.snn_viz_client = None
-
-        if visualize_spikes is not None:
-
-            self.viz_client = 99999
-
-            os.system((('cd %s; ' +
-                        'love . -i \'{"source":"request",' +
-                        '"port":%d,"host":"localhost"}\' ' +
-                        '-n %s --show_spike_count --set_num_screen_shot 0 ' +
-                        ' --use_name_neuron ' +
-                        '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2",' +
-                        '"5":"O","6":"S2"}\' --set_font_size 16 > /dev/null &'
-                        ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
+        self.visualize_spikes = visualize_spikes
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -83,7 +68,7 @@ class LoggingParser(MspParser):
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
 
-        if self.viz_client is not None:
+        if self.visualize_spikes is not None:
 
             msg = (('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d], ' +
                     '"Neuron Alias":[0,1,2,3,4,5,6]}') %
@@ -93,6 +78,17 @@ class LoggingParser(MspParser):
 
 
 def logging_threadfun(parser):
+
+    if parser.visualize_spikes is not None:
+
+        os.system((('cd %s; ' +
+                    'love . -i \'{"source":"request",' +
+                    '"port":%d,"host":"localhost"}\' ' +
+                    '-n %s --show_spike_count --set_num_screen_shot 0 ' +
+                    ' --use_name_neuron ' +
+                    '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2",' +
+                    '"5":"O","6":"S2"}\' --set_font_size 16 > /dev/null &'
+                    ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
 
     while parser.running:
 
