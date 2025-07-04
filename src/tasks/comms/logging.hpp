@@ -67,21 +67,26 @@ class LoggerTask {
 
             while (true) {
 
-                vehicleState_t state = {};
-
-                _estimatorTask->getVehicleState(&state);
-
-                const float statevals[10] = { state.dx, state.dy, state.z,
-                    state.dz, state.phi, state.dphi, state.theta,
-                    state.dtheta, state.psi, state.dpsi 
-                };
-
-                serializer.serializeFloats(MSP_STATE, statevals, 10);
-
-                sendPayload(serializer);
+                sendVehicleState(serializer);
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
             }
+        }
+
+        void sendVehicleState(MspSerializer & serializer)
+        {
+            vehicleState_t state = {};
+
+            _estimatorTask->getVehicleState(&state);
+
+            const float statevals[10] = { state.dx, state.dy, state.z,
+                state.dz, state.phi, state.dphi, state.theta,
+                state.dtheta, state.psi, state.dpsi 
+            };
+
+            serializer.serializeFloats(MSP_STATE, statevals, 10);
+
+            sendPayload(serializer);
         }
 
         void sendPayload(const MspSerializer & serializer) {
