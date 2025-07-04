@@ -44,6 +44,14 @@ class Gamepad:
         self.hovering = False
         self.debug = debug
         self.running = True
+        self.vx = 0
+        self.vy = 0
+        self.yawrate = 0
+        self.zdist = 0
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0
+        self.thrust = 0
 
         gamepads = inputs.devices.gamepads
 
@@ -132,29 +140,31 @@ class Gamepad:
 
                 self.descend_countdown = self.THRUST_DESCEND_MAX
 
-                vx = -self.scale(self.gamepad_vals[2])  # forward positive
-                vy = self.scale(self.gamepad_vals[1])
-                yawrate = self.scale(self.gamepad_vals[3])
+                self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
+                self.vy = self.scale(self.gamepad_vals[1])
+                self.yawrate = self.scale(self.gamepad_vals[3])
 
-                t = -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC
+                self.thrust = (
+                        -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC)
 
-                self.zdist = min(max(self.zdist + t, self.ZDIST_MIN),
+                self.zdist = min(max(self.zdist + self.thrust, self.ZDIST_MIN),
                                  self.ZDIST_MAX)
 
                 if self.debug:
                     print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
                           'yawrate=%+3.f self.zdistance=%+3.2f') %
-                          (vx, vy, yawrate, self.zdist))
+                          (self.vx, self.vy, self.yawrate, self.zdist))
 
             else:
 
-                r = 0
-                p = 0
-                y = 0
+                self.roll = 0
+                self.pitch = 0
+                self.yaw = 0
 
-                t = (self.descend_countdown
-                     if self.descend_countdown > self.THRUST_DESCEND_MIN
-                     else 0)
+                self.thrust = (
+                        self.descend_countdown
+                        if self.descend_countdown > self.THRUST_DESCEND_MIN
+                        else 0)
 
                 self.descend_countdown -= (self.THRUST_DESCEND_DEC
                                            if self.descend_countdown > 0
@@ -164,7 +174,7 @@ class Gamepad:
 
                 if self.debug:
                     print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
-                          % (r, p, y, t))
+                          % (self.roll, self.pitch, self.yaw, self.thrust))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 
