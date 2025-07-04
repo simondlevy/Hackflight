@@ -175,6 +175,7 @@ def main():
 
     if args.visualize_spikes:
         server_socket = socket.socket()
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind(('localhost', SPIKE_VIZ_PORT))
         server_socket.listen(1)
         parser.spike_viz_client, _ = server_socket.accept()
