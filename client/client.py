@@ -164,14 +164,14 @@ def main():
     logging = [True]
 
     parser = LoggingParser(client, args.log_state)
-    thread = Thread(target=logging_threadfun, args=(parser, args.visualize_spikes))
+    thread = Thread(target=logging_threadfun,
+                    args=(parser, args.visualize_spikes))
     thread.daemon = True
     thread.start()
 
     if args.visualize_spikes:
-        print('Launching spike server')
-        server_socket = socket.socket()  
-        server_socket.bind(('localhost', SPIKE_VIZ_PORT))  
+        server_socket = socket.socket()
+        server_socket.bind(('localhost', SPIKE_VIZ_PORT))
         server_socket.listen(1)
         parser.spike_viz_client, _ = server_socket.accept()
 
