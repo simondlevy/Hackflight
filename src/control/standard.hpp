@@ -23,6 +23,7 @@
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
+#include <msp/serializer.hpp>
 
 class ClosedLoopControl {
 
@@ -83,9 +84,8 @@ class ClosedLoopControl {
                     demands.roll, demands.pitch);
         }
 
-        uint8_t getMessage(uint8_t * msg)
+        void serializeMessage(MspSerializer & serializer)
         {
-            return 0;
+            (void)serializer;
         }
-
 };

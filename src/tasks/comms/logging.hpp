@@ -63,19 +63,21 @@ class LoggerTask {
 
             TickType_t lastWakeTime = xTaskGetTickCount();
 
-            MspSerializer serializer = {};
-
             while (true) {
 
-                sendVehicleState(serializer);
+                sendVehicleState();
+
+                sendClosedLoopMessage();
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
             }
         }
 
-        void sendVehicleState(MspSerializer & serializer)
+        void sendVehicleState()
         {
             vehicleState_t state = {};
+
+            MspSerializer serializer = {};
 
             _estimatorTask->getVehicleState(&state);
 
@@ -89,6 +91,15 @@ class LoggerTask {
             sendPayload(serializer);
         }
 
+        void sendClosedLoopMessage()
+        {
+            MspSerializer serializer = {};
+
+            _closedLoopControl->serializeMessage(serializer);
+
+            sendPayload(serializer);
+        }
+ 
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
                 systemUartWriteByte(serializer.payload[k]);
