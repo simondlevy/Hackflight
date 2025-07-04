@@ -74,12 +74,14 @@ class LoggingParser(MspParser):
                     '"Neuron Alias":[0,1,2,3,4,5,6]}') %
                    (n0, n1, n2, n3, n4, n5, n6))
 
-            print(msg)
+            # print(msg)
 
 
 def logging_threadfun(parser):
 
     if parser.visualize_spikes is not None:
+
+        sleep(1)
 
         os.system((('cd %s; ' +
                     'love . -i \'{"source":"request",' +
@@ -150,6 +152,9 @@ def main():
                            help='Visualize Spiking Neural Network activity')
 
     args = argparser.parse_args()
+
+    if args.visualize_spikes:
+        print('Launching spike server')
 
     was_armed = False
 
