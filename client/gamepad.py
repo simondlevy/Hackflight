@@ -43,14 +43,13 @@ class Gamepad:
         self.armed = False
         self.hovering = False
         self.debug = debug
+        self.running = True
 
         gamepads = inputs.devices.gamepads
 
         if len(gamepads) == 0:
             print('No gamepad detected')
             exit(0)
-
-        self.status = {'running': True, 'armed': False, 'hovering': False}
 
         self.gamepad_vals = [0, 0, 0, 0]
 
@@ -70,10 +69,10 @@ class Gamepad:
 
     def threadfun(self, vals):
 
-        arming_button_state_prev = 0
-        hover_button_state_prev = 0
+        arming_prev = 0
+        hover_prev = 0
 
-        while self.status['running']:
+        while self.running:
 
             try:
 
@@ -95,30 +94,28 @@ class Gamepad:
                     # Arming button
                     elif code == 'BTN_WEST':
 
-                        if not event.state and arming_button_state_prev:
+                        if not event.state and arming_prev:
 
-                            self.status['armed'] = not self.status['armed']
+                            self.armed = not self.armed
 
-                        arming_button_state_prev = event.state
+                        arming_prev = event.state
 
                     # Hover button
                     elif code == 'BTN_TR':
 
-                        if (self.status['armed'] and not event.state and
-                                hover_button_state_prev):
+                        if self.armed and not event.state and hover_prev:
 
-                            self.status['hovering'] = (
-                                    not self.status['hovering'])
+                            self.hovering = not self.hovering
 
-                        hover_button_state_prev = event.state
+                        hover_prev = event.state
 
             except inputs.UnpluggedError:
                 print('No gamepad detected')
-                self.status['running'] = False
+                self.running = False
 
             except OSError:
                 print('Gamepad unplugged')
-                self.status['running'] = False
+                self.running = False
 
     def scale(self, axval):
 
@@ -128,12 +125,8 @@ class Gamepad:
 
         try:
 
-            self.armed = self.status['armed']
-
             if self.debug:
                 print('armed=%d' % self.armed, end=' | ')
-
-            self.hovering = self.status['hovering']
 
             if self.hovering:
 
@@ -176,15 +169,13 @@ class Gamepad:
             sleep(1 / self.UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
-            self.status['running'] = False
-
-        return self.armed, self.hovering
+            self.running = False
 
 
 if __name__ == '__main__':
 
     gamepad = Gamepad(True)
 
-    while gamepad.status['running']:
+    while gamepad.running:
 
         gamepad.step()
