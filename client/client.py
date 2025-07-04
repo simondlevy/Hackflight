@@ -44,13 +44,13 @@ UPDATE_RATE_HZ = 100
 
 class LoggingParser(MspParser):
 
-    def __init__(self, client, show_state, visualize_spikes):
+    def __init__(self, client, show_state, spiking_network):
 
         MspParser.__init__(self)
         self.client = client
         self.running = True
         self.show_state = show_state
-        self.visualize_spikes = visualize_spikes
+        self.spiking_network = spiking_network
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -63,7 +63,7 @@ class LoggingParser(MspParser):
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
 
-        if self.visualize_spikes:
+        if self.spiking_network is not None:
 
             msg = ('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d]}' %
                    (n0, n1, n2, n3, n4, n5, n6))
@@ -129,8 +129,8 @@ def main():
     argparser.add_argument('-l', '--log-state', action='store_true',
                            help='log vehicle state')
 
-    argparser.add_argument('-s', '--visualize-spikes', action='store_true',
-                           help='display spikes')
+    argparser.add_argument('-s', '--spiking-network', default=None,
+                           help='Spiking Neural Network JSON file')
 
     args = argparser.parse_args()
 
@@ -140,7 +140,7 @@ def main():
 
     logging = [True]
 
-    parser = LoggingParser(client, args.log_state, args.visualize_spikes)
+    parser = LoggingParser(client, args.log_state, args.spiking_network)
     thread = Thread(target=logging_threadfun, args=(parser, ))
     thread.daemon = True
     thread.start()
