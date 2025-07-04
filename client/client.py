@@ -186,11 +186,18 @@ def main():
     argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
-    argparser.add_argument('-s', '--server', choices=['onboard', 'bench'],
+    argparser.add_argument('-b', '--bluetooth-server',
+                           choices=['onboard', 'bench'],
                            default='onboard', help='Bluetooth server')
 
-    argparser.add_argument('-d', '--debug', action='store_true',
-                           help='debug controller')
+    argparser.add_argument('-g', '--gamepad-debug', action='store_true',
+                           help='debug gamepad')
+
+    argparser.add_argument('-l', '--log-state', action='store_true',
+                           help='log vehicle state')
+
+    argparser.add_argument('-s', '--spikes', action='store_true',
+                           help='display spikes')
 
     args = argparser.parse_args()
 
@@ -214,7 +221,7 @@ def main():
 
     descend_countdown = 0
 
-    client = connect_to_server(args.server, SETPOINT_PORT)
+    client = connect_to_server(args.bluetooth_server, SETPOINT_PORT)
 
     zdist = ZDIST_INIT
 
@@ -232,7 +239,7 @@ def main():
                 client.send(MspParser.serialize_SET_ARMING(armed))
                 was_armed = armed
 
-            if args.debug:
+            if args.gamepad_debug:
 
                 print('armed=%d' % armed, end=' | ')
 
@@ -251,7 +258,7 @@ def main():
                 client.send(MspParser.serialize_SET_SETPOINT_HOVER(
                     vx, vy, yawrate, zdist))
 
-                if args.debug:
+                if args.gamepad_debug:
                     print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
                            'yawrate=%+3.f zdistance=%+3.2f') %
                           (vx, vy, yawrate, zdist))
@@ -274,7 +281,7 @@ def main():
                 client.send(
                         MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
 
-                if args.debug:
+                if args.gamepad_debug:
                     print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d' %
                           (r, p, y, t))
 
