@@ -64,8 +64,11 @@ class LoggingParser(MspParser):
                       n12, n13, n14, n15):
 
         if self.visualize_spikes:
-            print('i1=%d i2=%d s=%d d1=%d d2=%d s2=%d o=%d' %
-                  (n0, n1, n2, n3, n4, n5, n6))
+
+            msg = ('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d]}' %
+                   (n0, n1, n2, n3, n4, n5, n6))
+
+            print(msg)
 
 
 def logging_threadfun(parser):
