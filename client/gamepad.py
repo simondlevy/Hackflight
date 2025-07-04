@@ -126,6 +126,8 @@ def main():
 
     run_thread(gamepad_threadfun, (gamepad_vals, status))
 
+    debug = True
+
     while status['running']:
 
         try:
@@ -136,7 +138,8 @@ def main():
                 #client.send(MspParser.serialize_SET_ARMING(armed))
                 was_armed = armed
 
-            print('armed=%d' % armed, end=' | ')
+            if debug:
+                print('armed=%d' % armed, end=' | ')
 
             if status['hovering']:
 
@@ -152,7 +155,8 @@ def main():
 
                 #client.send(MspParser.serialize_SET_SETPOINT_HOVER(vx, vy, yawrate, zdist))
 
-                print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
+                if debug:
+                    print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
                        'yawrate=%+3.f zdistance=%+3.2f') %
                       (vx, vy, yawrate, zdist))
 
@@ -173,7 +177,8 @@ def main():
 
                 #client.send(MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
 
-                print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d' % (r, p, y, t))
+                if debug:
+                    print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d' % (r, p, y, t))
 
             sleep(1 / UPDATE_RATE_HZ)
 
