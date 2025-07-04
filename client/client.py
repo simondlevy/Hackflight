@@ -69,13 +69,13 @@ class LoggingParser(MspParser):
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
 
-        if self.visualize_spikes:
+        if self.spike_viz_client is not None:
 
             msg = (('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d], ' +
                     '"Neuron Alias":[0,1,2,3,4,5,6]}') %
                    (n0, n1, n2, n3, n4, n5, n6))
 
-            # print(msg)
+            print(msg)
 
 
 def logging_threadfun(parser):
