@@ -56,6 +56,7 @@ class LoggingParser(MspParser):
         self.running = True
         self.show_state = show_state
         self.visualize_spikes = visualize_spikes
+        self.spike_viz_client = None
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -173,7 +174,7 @@ def main():
         server_socket = socket.socket()  
         server_socket.bind(('localhost', SPIKE_VIZ_PORT))  
         server_socket.listen(1)
-        conn, address = server_socket.accept()
+        parser.spike_viz_client, _ = server_socket.accept()
 
     gamepad = Gamepad()
 
