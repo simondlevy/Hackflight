@@ -17,6 +17,7 @@
 #pragma once
 
 #include <control/snn/helper.hpp>
+#include <msp/serializer.hpp>
 
 class ClosedLoopControl {
 
@@ -43,9 +44,8 @@ class ClosedLoopControl {
                     landingAltitudeMeters, demands); 
         }
 
-        uint8_t getMessage(uint8_t * msg)
+        void serializeMessage(MspSerializer & serializer)
         {
-            return 0;
+            (void)serializer;
         }
-
 };
