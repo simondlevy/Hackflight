@@ -20,170 +20,168 @@ import inputs
 from threading import Thread
 from time import sleep
 
-SUPPORTED_GAMEPADS = {'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
 
-GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'RX': 1, 'RY': 2}
+class Gamepad:
 
-UPDATE_RATE_HZ = 100
+    SUPPORTED = {'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
 
-THRUST_DESCEND_MAX = 30000
-THRUST_DESCEND_MIN = 15000
-THRUST_DESCEND_DEC = 208
+    GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'RX': 1, 'RY': 2}
 
-ZDIST_INIT = 0.4
-ZDIST_MAX = 1.0
-ZDIST_MIN = 0.2
-ZDIST_INC = 0.01
+    UPDATE_RATE_HZ = 100
 
+    THRUST_DESCEND_MAX = 30000
+    THRUST_DESCEND_MIN = 15000
+    THRUST_DESCEND_DEC = 208
 
-def gamepad_threadfun(vals, status):
+    ZDIST_INIT = 0.4
+    ZDIST_MAX = 1.0
+    ZDIST_MIN = 0.2
+    ZDIST_INC = 0.01
 
-    arming_button_state_prev = 0
-    hover_button_state_prev = 0
+    def threadfun(self, vals, status):
 
-    while status['running']:
+        arming_button_state_prev = 0
+        hover_button_state_prev = 0
 
-        try:
+        while status['running']:
 
-            for event in inputs.get_gamepad():
+            try:
 
-                code = str(event.code)
+                for event in inputs.get_gamepad():
 
-                # Stick
-                if 'ABS' in code:
+                    code = str(event.code)
 
-                    subcode = code[4:]
+                    # Stick
+                    if 'ABS' in code:
 
-                    if subcode in GAMEPAD_AXIS_MAP:
+                        subcode = code[4:]
 
-                        axis = GAMEPAD_AXIS_MAP[subcode]
+                        if subcode in self.GAMEPAD_AXIS_MAP:
 
-                        vals[axis] = event.state
+                            axis = self.GAMEPAD_AXIS_MAP[subcode]
 
-                # Arming button
-                elif code == 'BTN_WEST':
+                            vals[axis] = event.state
 
-                    if not event.state and arming_button_state_prev:
+                    # Arming button
+                    elif code == 'BTN_WEST':
 
-                        status['armed'] = not status['armed']
+                        if not event.state and arming_button_state_prev:
 
-                    arming_button_state_prev = event.state
+                            status['armed'] = not status['armed']
 
-                # Hover button
-                elif code == 'BTN_TR':
+                        arming_button_state_prev = event.state
 
-                    if (status['armed'] and not event.state and
-                            hover_button_state_prev):
+                    # Hover button
+                    elif code == 'BTN_TR':
 
-                        status['hovering'] = not status['hovering']
+                        if (status['armed'] and not event.state and
+                                hover_button_state_prev):
 
-                    hover_button_state_prev = event.state
+                            status['hovering'] = not status['hovering']
 
-        except inputs.UnpluggedError:
+                        hover_button_state_prev = event.state
+
+            except inputs.UnpluggedError:
+                print('No gamepad detected')
+                status['running'] = False
+
+            except OSError:
+                print('Gamepad unplugged')
+                status['running'] = False
+
+    def scale(self, axval):
+
+        return axval / 32767
+
+    def run(self, debug=False):
+
+        gamepads = inputs.devices.gamepads
+
+        if len(gamepads) == 0:
             print('No gamepad detected')
-            status['running'] = False
+            exit(0)
 
-        except OSError:
-            print('Gamepad unplugged')
-            status['running'] = False
+        status = {'running': True, 'armed': False, 'hovering': False}
 
+        gamepad_vals = [0, 0, 0, 0]
 
-def scale(axval):
+        devname = inputs.devices.gamepads[0].name
 
-    return axval / 32767
+        if devname not in self.SUPPORTED:
+            print(devname + ' not supported')
+            exit(0)
 
+        was_armed = False
 
-def run_thread(fun, args):
+        descend_countdown = 0
 
-    thread = Thread(target=fun, args=args)
-    thread.daemon = True
-    thread.start()
+        zdist = self.ZDIST_INIT
 
+        thread = Thread(target=self.threadfun, args=(gamepad_vals, status))
+        thread.daemon = True
+        thread.start()
 
-def main():
+        debug = True
 
-    gamepads = inputs.devices.gamepads
+        while status['running']:
 
-    if len(gamepads) == 0:
-        print('No gamepad detected')
-        exit(0)
+            try:
 
-    status = {'running': True, 'armed': False, 'hovering': False}
+                armed = status['armed']
 
-    gamepad_vals = [0, 0, 0, 0]
-
-    devname = inputs.devices.gamepads[0].name
-
-    if devname not in SUPPORTED_GAMEPADS:
-        print(devname + ' not supported')
-        exit(0)
-
-    was_armed = False
-
-    descend_countdown = 0
-
-    zdist = ZDIST_INIT
-
-    run_thread(gamepad_threadfun, (gamepad_vals, status))
-
-    debug = True
-
-    while status['running']:
-
-        try:
-
-            armed = status['armed']
-
-            if armed != was_armed:
-                #client.send(MspParser.serialize_SET_ARMING(armed))
-                was_armed = armed
-
-            if debug:
-                print('armed=%d' % armed, end=' | ')
-
-            if status['hovering']:
-
-                descend_countdown = THRUST_DESCEND_MAX
-
-                vx = -scale(gamepad_vals[2])  # negate for forward positive
-                vy = scale(gamepad_vals[1])
-                yawrate = scale(gamepad_vals[3])
-
-                t = -scale(gamepad_vals[0]) * ZDIST_INC
-
-                zdist = min(max(zdist + t, ZDIST_MIN), ZDIST_MAX)
-
-                #client.send(MspParser.serialize_SET_SETPOINT_HOVER(vx, vy, yawrate, zdist))
+                if armed != was_armed:
+                    #client.send(MspParser.serialize_SET_ARMING(armed))
+                    was_armed = armed
 
                 if debug:
-                    print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
-                       'yawrate=%+3.f zdistance=%+3.2f') %
-                      (vx, vy, yawrate, zdist))
+                    print('armed=%d' % armed, end=' | ')
 
-            else:
+                if status['hovering']:
 
-                r = 0
-                p = 0
-                y = 0
+                    descend_countdown = self.THRUST_DESCEND_MAX
 
-                t = (descend_countdown
-                     if descend_countdown > THRUST_DESCEND_MIN
-                     else 0)
+                    vx = -self.scale(gamepad_vals[2])  # make forward positive
+                    vy = self.scale(gamepad_vals[1])
+                    yawrate = self.scale(gamepad_vals[3])
 
-                descend_countdown -= (
-                      THRUST_DESCEND_DEC if descend_countdown > 0 else 0)
+                    t = -self.scale(gamepad_vals[0]) * self.ZDIST_INC
 
-                zdist = ZDIST_INIT
+                    zdist = min(max(zdist + t, self.ZDIST_MIN), self.ZDIST_MAX)
 
-                #client.send(MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
+                    #client.send(MspParser.serialize_SET_SETPOINT_HOVER(vx, vy, yawrate, zdist))
 
-                if debug:
-                    print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d' % (r, p, y, t))
+                    if debug:
+                        print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
+                              'yawrate=%+3.f zdistance=%+3.2f') %
+                              (vx, vy, yawrate, zdist))
 
-            sleep(1 / UPDATE_RATE_HZ)
+                else:
 
-        except KeyboardInterrupt:
-            status['running'] = False
+                    r = 0
+                    p = 0
+                    y = 0
+
+                    t = (descend_countdown
+                         if descend_countdown > self.THRUST_DESCEND_MIN
+                         else 0)
+
+                    descend_countdown -= (self.THRUST_DESCEND_DEC
+                                          if descend_countdown > 0 else 0)
+
+                    zdist = self.ZDIST_INIT
+
+                    # client.send(MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
+
+                    if debug:
+                        print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
+                              % (r, p, y, t))
+
+                sleep(1 / self.UPDATE_RATE_HZ)
+
+            except KeyboardInterrupt:
+                status['running'] = False
 
 
-main()
+if __name__ == '__main__':
+
+    Gamepad().run(True)
