@@ -138,6 +138,13 @@ def scale(axval):
     return axval / 32767
 
 
+def run_thread(fun, args):
+
+    thread = Thread(target=fun, args=args)
+    thread.daemon = True
+    thread.start()
+
+
 def main():
 
     argparser = argparse.ArgumentParser(
@@ -167,12 +174,7 @@ def main():
         print(devname + ' not supported')
         exit(0)
 
-    gamepad_thread = Thread(target=gamepad_threadfun,
-                            args=(gamepad_vals, status))
-
-    gamepad_thread.daemon = True
-
-    gamepad_thread.start()
+    run_thread(gamepad_threadfun, (gamepad_vals, status))
 
     was_armed = False
 
