@@ -38,12 +38,41 @@ class Gamepad:
     ZDIST_MIN = 0.2
     ZDIST_INC = 0.01
 
-    def threadfun(self, vals, status):
+    def __init__(self):
+
+        self.armed = False
+        self.hovering = False
+
+        gamepads = inputs.devices.gamepads
+
+        if len(gamepads) == 0:
+            print('No gamepad detected')
+            exit(0)
+
+        self.status = {'running': True, 'armed': False, 'hovering': False}
+
+        self.gamepad_vals = [0, 0, 0, 0]
+
+        devname = inputs.devices.gamepads[0].name
+
+        if devname not in self.SUPPORTED:
+            print(devname + ' not supported')
+            exit(0)
+
+        self.descend_countdown = 0
+
+        self.zdist = self.ZDIST_INIT
+
+        thread = Thread(target=self.threadfun, args=(self.gamepad_vals, ))
+        thread.daemon = True
+        thread.start()
+
+    def threadfun(self, vals):
 
         arming_button_state_prev = 0
         hover_button_state_prev = 0
 
-        while status['running']:
+        while self.status['running']:
 
             try:
 
@@ -67,27 +96,28 @@ class Gamepad:
 
                         if not event.state and arming_button_state_prev:
 
-                            status['armed'] = not status['armed']
+                            self.status['armed'] = not self.status['armed']
 
                         arming_button_state_prev = event.state
 
                     # Hover button
                     elif code == 'BTN_TR':
 
-                        if (status['armed'] and not event.state and
+                        if (self.status['armed'] and not event.state and
                                 hover_button_state_prev):
 
-                            status['hovering'] = not status['hovering']
+                            self.status['hovering'] = (
+                                    not self.status['hovering'])
 
                         hover_button_state_prev = event.state
 
             except inputs.UnpluggedError:
                 print('No gamepad detected')
-                status['running'] = False
+                self.status['running'] = False
 
             except OSError:
                 print('Gamepad unplugged')
-                status['running'] = False
+                self.status['running'] = False
 
     def scale(self, axval):
 
@@ -95,65 +125,34 @@ class Gamepad:
 
     def run(self, debug=False):
 
-        gamepads = inputs.devices.gamepads
-
-        if len(gamepads) == 0:
-            print('No gamepad detected')
-            exit(0)
-
-        status = {'running': True, 'armed': False, 'hovering': False}
-
-        gamepad_vals = [0, 0, 0, 0]
-
-        devname = inputs.devices.gamepads[0].name
-
-        if devname not in self.SUPPORTED:
-            print(devname + ' not supported')
-            exit(0)
-
-        was_armed = False
-
-        descend_countdown = 0
-
-        zdist = self.ZDIST_INIT
-
-        thread = Thread(target=self.threadfun, args=(gamepad_vals, status))
-        thread.daemon = True
-        thread.start()
-
-        debug = True
-
-        while status['running']:
+        while self.status['running']:
 
             try:
 
-                armed = status['armed']
-
-                if armed != was_armed:
-                    #client.send(MspParser.serialize_SET_ARMING(armed))
-                    was_armed = armed
+                self.armed = self.status['armed']
 
                 if debug:
-                    print('armed=%d' % armed, end=' | ')
+                    print('armed=%d' % self.armed, end=' | ')
 
-                if status['hovering']:
+                self.hovering = self.status['hovering']
 
-                    descend_countdown = self.THRUST_DESCEND_MAX
+                if self.hovering:
 
-                    vx = -self.scale(gamepad_vals[2])  # make forward positive
-                    vy = self.scale(gamepad_vals[1])
-                    yawrate = self.scale(gamepad_vals[3])
+                    self.descend_countdown = self.THRUST_DESCEND_MAX
 
-                    t = -self.scale(gamepad_vals[0]) * self.ZDIST_INC
+                    vx = -self.scale(self.gamepad_vals[2])  # forward positive
+                    vy = self.scale(self.gamepad_vals[1])
+                    yawrate = self.scale(self.gamepad_vals[3])
 
-                    zdist = min(max(zdist + t, self.ZDIST_MIN), self.ZDIST_MAX)
+                    t = -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC
 
-                    #client.send(MspParser.serialize_SET_SETPOINT_HOVER(vx, vy, yawrate, zdist))
+                    self.zdist = min(max(self.zdist + t, self.ZDIST_MIN),
+                                     self.ZDIST_MAX)
 
                     if debug:
                         print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
-                              'yawrate=%+3.f zdistance=%+3.2f') %
-                              (vx, vy, yawrate, zdist))
+                              'yawrate=%+3.f self.zdistance=%+3.2f') %
+                              (vx, vy, yawrate, self.zdist))
 
                 else:
 
@@ -161,16 +160,15 @@ class Gamepad:
                     p = 0
                     y = 0
 
-                    t = (descend_countdown
-                         if descend_countdown > self.THRUST_DESCEND_MIN
+                    t = (self.descend_countdown
+                         if self.descend_countdown > self.THRUST_DESCEND_MIN
                          else 0)
 
-                    descend_countdown -= (self.THRUST_DESCEND_DEC
-                                          if descend_countdown > 0 else 0)
+                    self.descend_countdown -= (self.THRUST_DESCEND_DEC
+                                               if self.descend_countdown > 0
+                                               else 0)
 
-                    zdist = self.ZDIST_INIT
-
-                    # client.send(MspParser.serialize_SET_SETPOINT_RPYT(r, p, y, t))
+                    self.zdist = self.ZDIST_INIT
 
                     if debug:
                         print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
@@ -179,7 +177,9 @@ class Gamepad:
                 sleep(1 / self.UPDATE_RATE_HZ)
 
             except KeyboardInterrupt:
-                status['running'] = False
+                self.status['running'] = False
+
+        return self.armed, self.hovering
 
 
 if __name__ == '__main__':
