@@ -42,6 +42,10 @@ UPDATE_RATE_HZ = 100
 
 class LoggingParser(MspParser):
 
+    def __init__(self):
+
+        MspParser.__init__(self)
+
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
