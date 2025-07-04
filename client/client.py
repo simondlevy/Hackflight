@@ -42,9 +42,13 @@ UPDATE_RATE_HZ = 100
 
 class LoggingParser(MspParser):
 
-    def __init__(self):
+    def __init__(self, client, show_state, visualize_spikes):
 
         MspParser.__init__(self)
+        self.client = client
+        self.running = True
+        self.show_state = show_state
+        self.visualize_spikes = visualize_spikes
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -60,27 +64,18 @@ class LoggingParser(MspParser):
               (n0, n1, n2, n3, n4, n5, n6))
 
 
-def logging_threadfun(client, logging):
+def logging_threadfun(parser):
 
-    parser = LoggingParser()
-
-    while logging[0]:
+    while parser.running:
 
         try:
 
-            parser.parse(client.recv(1))
+            parser.parse(parser.client.recv(1))
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
-            logging[0] = False
+            parsing.running = False
             return
-
-
-def run_thread(fun, args):
-
-    thread = Thread(target=fun, args=args)
-    thread.daemon = True
-    thread.start()
 
 
 def connect_to_server(name, port):
@@ -138,7 +133,10 @@ def main():
 
     logging = [True]
 
-    run_thread(logging_threadfun, (client, logging))
+    parser = LoggingParser(client, True, True)
+    thread = Thread(target=logging_threadfun, args=(parser, ))
+    thread.daemon = True
+    thread.start()
 
     gamepad = Gamepad()
 
