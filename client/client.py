@@ -16,13 +16,13 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import inputs
-from threading import Thread
-from time import sleep
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-
-from btsupport import connect_to_server
+import inputs
+import socket
+import sys
+from threading import Thread
+from time import sleep
 
 try:
     from msp import Parser as MspParser
@@ -144,6 +144,41 @@ def run_thread(fun, args):
     thread.daemon = True
     thread.start()
 
+
+def connect_to_server(name, port):
+
+    # addresses = {'onboard': 'B8:27:EB:E0:1D:07', 'pihat': 'B8:27:EB:3F:AB:47'}
+
+    addresses = {'onboard': '64:B7:08:94:2A:32', 'bench': '64:B7:08:94:28:76'}
+
+    addr = addresses[name]
+
+    while True:
+
+        try:
+
+            print('Connecting to server %s:%d ... ' % (addr, port), end='')
+            sys.stdout.flush()
+
+            # Create a Bluetooth or IP socket depending on address format
+            client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
+                      socket.BTPROTO_RFCOMM)
+                      if ':' in addr
+                      else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+
+            try:
+                client.connect((addr, port))
+                print(' connected')
+                break
+
+            except Exception as e:
+                print(str(e) + ': is server running?')
+                sleep(1)
+
+        except KeyboardInterrupt:
+            break
+
+    return client
 
 def main():
 
