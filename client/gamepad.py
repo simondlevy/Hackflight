@@ -124,65 +124,67 @@ class Gamepad:
 
         return axval / 32767
 
-    def run(self):
+    def step(self):
 
-        while self.status['running']:
+        try:
 
-            try:
+            self.armed = self.status['armed']
 
-                self.armed = self.status['armed']
+            if self.debug:
+                print('armed=%d' % self.armed, end=' | ')
+
+            self.hovering = self.status['hovering']
+
+            if self.hovering:
+
+                self.descend_countdown = self.THRUST_DESCEND_MAX
+
+                vx = -self.scale(self.gamepad_vals[2])  # forward positive
+                vy = self.scale(self.gamepad_vals[1])
+                yawrate = self.scale(self.gamepad_vals[3])
+
+                t = -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC
+
+                self.zdist = min(max(self.zdist + t, self.ZDIST_MIN),
+                                 self.ZDIST_MAX)
 
                 if self.debug:
-                    print('armed=%d' % self.armed, end=' | ')
+                    print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
+                          'yawrate=%+3.f self.zdistance=%+3.2f') %
+                          (vx, vy, yawrate, self.zdist))
 
-                self.hovering = self.status['hovering']
+            else:
 
-                if self.hovering:
+                r = 0
+                p = 0
+                y = 0
 
-                    self.descend_countdown = self.THRUST_DESCEND_MAX
+                t = (self.descend_countdown
+                     if self.descend_countdown > self.THRUST_DESCEND_MIN
+                     else 0)
 
-                    vx = -self.scale(self.gamepad_vals[2])  # forward positive
-                    vy = self.scale(self.gamepad_vals[1])
-                    yawrate = self.scale(self.gamepad_vals[3])
+                self.descend_countdown -= (self.THRUST_DESCEND_DEC
+                                           if self.descend_countdown > 0
+                                           else 0)
 
-                    t = -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC
+                self.zdist = self.ZDIST_INIT
 
-                    self.zdist = min(max(self.zdist + t, self.ZDIST_MIN),
-                                     self.ZDIST_MAX)
+                if self.debug:
+                    print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
+                          % (r, p, y, t))
 
-                    if self.debug:
-                        print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
-                              'yawrate=%+3.f self.zdistance=%+3.2f') %
-                              (vx, vy, yawrate, self.zdist))
+            sleep(1 / self.UPDATE_RATE_HZ)
 
-                else:
-
-                    r = 0
-                    p = 0
-                    y = 0
-
-                    t = (self.descend_countdown
-                         if self.descend_countdown > self.THRUST_DESCEND_MIN
-                         else 0)
-
-                    self.descend_countdown -= (self.THRUST_DESCEND_DEC
-                                               if self.descend_countdown > 0
-                                               else 0)
-
-                    self.zdist = self.ZDIST_INIT
-
-                    if self.debug:
-                        print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
-                              % (r, p, y, t))
-
-                sleep(1 / self.UPDATE_RATE_HZ)
-
-            except KeyboardInterrupt:
-                self.status['running'] = False
+        except KeyboardInterrupt:
+            self.status['running'] = False
 
         return self.armed, self.hovering
 
 
 if __name__ == '__main__':
 
-    Gamepad(True).run()
+    gamepad = Gamepad(True)
+
+    while gamepad.status['running']:
+
+        gamepad.step()
