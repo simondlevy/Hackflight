@@ -41,7 +41,6 @@ BLUETOOTH_PORT = 1
 
 UPDATE_RATE_HZ = 100
 
-
 class LoggingParser(MspParser):
 
     def __init__(self, client, show_state, spiking_network):
@@ -50,7 +49,11 @@ class LoggingParser(MspParser):
         self.client = client
         self.running = True
         self.show_state = show_state
-        self.spiking_network = spiking_network
+
+        self.snn_viz_client = None
+
+        if spiking_network is not None:
+            self.viz_client = 99999
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -63,7 +66,7 @@ class LoggingParser(MspParser):
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
 
-        if self.spiking_network is not None:
+        if self.viz_client is not None:
 
             msg = (('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d], ' +
                     '"Neuron Alias":[0,1,2,3,4,5,6]}') %
