@@ -71,10 +71,14 @@ class LoggingParser(MspParser):
         if self.spike_viz_client is not None:
 
             msg = (('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d], ' +
-                    '"Neuron Alias":[0,1,2,3,4,5,6]}') %
+                    '"Neuron Alias":[0,1,2,3,4,5,6]}\n') %
                    (n0, n1, n2, n3, n4, n5, n6))
 
-            print(msg)
+            try:
+                self.spike_viz_client.send(msg.encode())
+
+            except Exception as e:
+                 pass
 
 
 def logging_threadfun(parser, visualize_spikes):
