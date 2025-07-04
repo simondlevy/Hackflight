@@ -98,8 +98,6 @@ class ClosedLoopControl {
 
                 const std::string msg = make_viz_message(counts);
 
-                std::cout << msg << std::endl;
-
                 _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
 
                 _tick = 0;
