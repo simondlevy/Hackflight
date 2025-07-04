@@ -68,7 +68,7 @@ class LoggingParser(MspParser):
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
 
-        if self.visualize_spikes is not None:
+        if self.visualize_spikes:
 
             msg = (('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d], ' +
                     '"Neuron Alias":[0,1,2,3,4,5,6]}') %
@@ -79,20 +79,24 @@ class LoggingParser(MspParser):
 
 def logging_threadfun(parser):
 
-    if parser.visualize_spikes is not None:
-
-        sleep(1)
-
-        os.system((('cd %s; ' +
-                    'love . -i \'{"source":"request",' +
-                    '"port":%d,"host":"localhost"}\' ' +
-                    '-n %s --show_spike_count --set_num_screen_shot 0 ' +
-                    ' --use_name_neuron ' +
-                    '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2",' +
-                    '"5":"O","6":"S2"}\' --set_font_size 16 > /dev/null &'
-                    ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
+    launched_visualizer = False
 
     while parser.running:
+
+        if parser.visualize_spikes and not launched_visualizer:
+
+            sleep(1)
+
+            os.system((('cd %s; ' +
+                        'love . -i \'{"source":"request",' +
+                        '"port":%d,"host":"localhost"}\' ' +
+                        '-n %s --show_spike_count --set_num_screen_shot 0 ' +
+                        ' --use_name_neuron ' +
+                        '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2",' +
+                        '"5":"O","6":"S2"}\' --set_font_size 16 > /dev/null &'
+                        ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
+
+            launched_visualizer = True
 
         try:
 
@@ -153,9 +157,6 @@ def main():
 
     args = argparser.parse_args()
 
-    if args.visualize_spikes:
-        print('Launching spike server')
-
     was_armed = False
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
@@ -166,6 +167,9 @@ def main():
     thread = Thread(target=logging_threadfun, args=(parser, ))
     thread.daemon = True
     thread.start()
+
+    if args.visualize_spikes:
+        print('Launching spike server')
 
     gamepad = Gamepad()
 
