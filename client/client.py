@@ -20,6 +20,7 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import socket
 import os
+import socket
 import sys
 from threading import Thread
 from time import sleep
@@ -46,6 +47,7 @@ SPIKE_VIZ_DIR = '/home/levys/Desktop/framework/viz'
 SPIKE_NETWORK = '/home/levys/Desktop/2025-diff-network/levy/max_100.txt'
 SPIKE_VIZ_PORT = 8100
 
+
 class LoggingParser(MspParser):
 
     def __init__(self, client, show_state, visualize_spikes):
@@ -62,15 +64,13 @@ class LoggingParser(MspParser):
             self.viz_client = 99999
 
             os.system((('cd %s; ' +
-                   'love . -i \'{"source":"request",' +
-                   '"port":%d,"host":"localhost"}\' ' +
-                   '-n %s --show_spike_count --set_num_screen_shot 0 ' +
-                   ' --use_name_neuron ' +
-                   '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O",' +
-                   '"6":"S2"}\' --set_font_size 16 > /dev/null &'
-                   ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
-
-
+                        'love . -i \'{"source":"request",' +
+                        '"port":%d,"host":"localhost"}\' ' +
+                        '-n %s --show_spike_count --set_num_screen_shot 0 ' +
+                        ' --use_name_neuron ' +
+                        '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2",' +
+                        '"5":"O","6":"S2"}\' --set_font_size 16 > /dev/null &'
+                        ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
