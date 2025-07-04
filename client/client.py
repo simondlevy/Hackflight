@@ -122,7 +122,7 @@ def main():
     argparser.add_argument('-l', '--log-state', action='store_true',
                            help='log vehicle state')
 
-    argparser.add_argument('-s', '--spikes', action='store_true',
+    argparser.add_argument('-s', '--visualize-spikes', action='store_true',
                            help='display spikes')
 
     args = argparser.parse_args()
@@ -133,7 +133,7 @@ def main():
 
     logging = [True]
 
-    parser = LoggingParser(client, True, True)
+    parser = LoggingParser(client, args.log_state, args.visualize_spikes)
     thread = Thread(target=logging_threadfun, args=(parser, ))
     thread.daemon = True
     thread.start()
