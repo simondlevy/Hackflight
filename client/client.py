@@ -61,17 +61,17 @@ class LoggingParser(MspParser):
 
             self.viz_client = 99999
 
-            cmd = ('cd %s; ' +
+            cmd = (('cd %s; ' +
                    'love . -i \'{"source":"request",' +
                    '"port":%d,"host":"localhost"}\' ' +
                    '-n %s --show_spike_count --set_num_screen_shot 0 ' +
                    ' --use_name_neuron ' +
                    '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O",' +
                    '"6":"S2"}\' --set_font_size 16 > /dev/null'
-                   )
+                   ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK))
 
 
-            print(cmd % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK))
+            print(cmd)
 
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
