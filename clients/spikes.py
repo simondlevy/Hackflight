@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-State message logger
+Spike message logger
 
 Copyright (C) 2025 Simon D. Levy
 
@@ -33,23 +33,22 @@ except Exception as e:
 LOGGING_PORT = 2
 
 
-class StateParser(MspParser):
-
-    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
-
-        print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-               'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-               'psi=%+5.1f dpsi=%+5.1f') %
-              (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+class SpikeParser(MspParser):
 
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
+
+        print('i1=%d i2=%d s=%d d1=%d d2=%d s2=%d o=%d' %
+              (n0, n1, n2, n3, n4, n5, n6))
+
+    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+
         pass
 
 
 def logging_fun(client, status):
 
-    parser = StateParser()
+    parser = SpikeParser()
 
     while status['running']:
 

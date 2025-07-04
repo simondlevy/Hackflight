@@ -67,7 +67,7 @@ class LoggerTask {
 
                 sendVehicleState();
 
-                sendClosedLoopMessage();
+                sendClosedLoopControlMessage();
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
             }
@@ -91,7 +91,7 @@ class LoggerTask {
             sendPayload(serializer);
         }
 
-        void sendClosedLoopMessage()
+        void sendClosedLoopControlMessage()
         {
             MspSerializer serializer = {};
 

@@ -14,6 +14,27 @@
    {"dpsi":   "float"}
   ],
 
+  "SPIKES": 
+  [{"ID": 101},
+   {"comment": "Aribtrary max of 16"},
+   {"n0":     "byte"},
+   {"n1":     "byte"},
+   {"n2":     "byte"},
+   {"n3":     "byte"},
+   {"n4":     "byte"},
+   {"n5":     "byte"},
+   {"n6":     "byte"},
+   {"n7":     "byte"},
+   {"n8":     "byte"},
+   {"n9":     "byte"},
+   {"n10":    "byte"},
+   {"n11":    "byte"},
+   {"n12":    "byte"},
+   {"n13":    "byte"},
+   {"n14":    "byte"},
+   {"n15":    "byte"}
+  ],
+
   "SET_ARMING": 
   [{"ID": 200},
    {"comment": "Dis/arm"},

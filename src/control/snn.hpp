@@ -17,6 +17,7 @@
 #pragma once
 
 #include <control/snn/helper.hpp>
+#include <msp/messages.h>
 #include <msp/serializer.hpp>
 
 class ClosedLoopControl {
@@ -46,6 +47,16 @@ class ClosedLoopControl {
 
         void serializeMessage(MspSerializer & serializer)
         {
-            (void)serializer;
+            const uint8_t counts[16] = {
+                (uint8_t)_helper.net.get_i1_spike_count(),
+                (uint8_t)_helper.net.get_i2_spike_count(),
+                (uint8_t)_helper.net.get_s_spike_count(),
+                (uint8_t)_helper.net.get_d1_spike_count(),
+                (uint8_t)_helper.net.get_d2_spike_count(),
+                (uint8_t)_helper.net.get_s2_spike_count(),
+                (uint8_t)_helper.net.get_o_spike_count(),
+                0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            serializer.serializeBytes(MSP_SPIKES, counts, 16);
         }
 };
