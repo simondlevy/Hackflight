@@ -42,6 +42,7 @@ BLUETOOTH_PORT = 1
 
 UPDATE_RATE_HZ = 100
 
+SPIKE_VIZ_DIR = '/home/levys/Desktop/framework/viz'
 SPIKE_NETWORK = '/home/levys/Desktop/2025-diff-network/levy/max_100.txt'
 SPIKE_VIZ_PORT = 8100
 
@@ -60,15 +61,17 @@ class LoggingParser(MspParser):
 
             self.viz_client = 99999
 
-            cmd = ('love . -i \'{"source":"request","port":%d,"host":"localhost"}\' ' +
+            cmd = ('cd %s; ' +
+                   'love . -i \'{"source":"request",' +
+                   '"port":%d,"host":"localhost"}\' ' +
                    '-n %s --show_spike_count --set_num_screen_shot 0 ' +
                    ' --use_name_neuron ' +
-                   '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O","6":"S2"}\'' +
-                   '--set_font_size 16 > /dev/null'
+                   '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O",' +
+                   '"6":"S2"}\' --set_font_size 16 > /dev/null'
                    )
 
 
-            print(cmd % (SPIKE_VIZ_PORT, SPIKE_NETWORK))
+            print(cmd % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK))
 
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
