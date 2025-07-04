@@ -38,10 +38,11 @@ class Gamepad:
     ZDIST_MIN = 0.2
     ZDIST_INC = 0.01
 
-    def __init__(self):
+    def __init__(self, debug=False):
 
         self.armed = False
         self.hovering = False
+        self.debug = debug
 
         gamepads = inputs.devices.gamepads
 
@@ -123,7 +124,7 @@ class Gamepad:
 
         return axval / 32767
 
-    def run(self, debug=False):
+    def run(self):
 
         while self.status['running']:
 
@@ -131,7 +132,7 @@ class Gamepad:
 
                 self.armed = self.status['armed']
 
-                if debug:
+                if self.debug:
                     print('armed=%d' % self.armed, end=' | ')
 
                 self.hovering = self.status['hovering']
@@ -149,7 +150,7 @@ class Gamepad:
                     self.zdist = min(max(self.zdist + t, self.ZDIST_MIN),
                                      self.ZDIST_MAX)
 
-                    if debug:
+                    if self.debug:
                         print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
                               'yawrate=%+3.f self.zdistance=%+3.2f') %
                               (vx, vy, yawrate, self.zdist))
@@ -170,7 +171,7 @@ class Gamepad:
 
                     self.zdist = self.ZDIST_INIT
 
-                    if debug:
+                    if self.debug:
                         print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
                               % (r, p, y, t))
 
@@ -184,4 +185,4 @@ class Gamepad:
 
 if __name__ == '__main__':
 
-    Gamepad().run(True)
+    Gamepad(True).run()
