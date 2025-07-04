@@ -49,13 +49,12 @@ SPIKE_VIZ_PORT = 8100
 
 class LoggingParser(MspParser):
 
-    def __init__(self, client, show_state, visualize_spikes):
+    def __init__(self, client, show_state):
 
         MspParser.__init__(self)
         self.client = client
         self.running = True
         self.show_state = show_state
-        self.visualize_spikes = visualize_spikes
         self.spike_viz_client = None
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
@@ -78,13 +77,13 @@ class LoggingParser(MspParser):
             print(msg)
 
 
-def logging_threadfun(parser):
+def logging_threadfun(parser, visualize_spikes):
 
     launched_visualizer = False
 
     while parser.running:
 
-        if parser.visualize_spikes and not launched_visualizer:
+        if visualize_spikes and not launched_visualizer:
 
             sleep(1)
 
@@ -164,8 +163,8 @@ def main():
 
     logging = [True]
 
-    parser = LoggingParser(client, args.log_state, args.visualize_spikes)
-    thread = Thread(target=logging_threadfun, args=(parser, ))
+    parser = LoggingParser(client, args.log_state)
+    thread = Thread(target=logging_threadfun, args=(parser, args.visualize_spikes))
     thread.daemon = True
     thread.start()
 
