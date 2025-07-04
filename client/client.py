@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-import inputs
 import socket
 import sys
 from threading import Thread
@@ -33,7 +32,10 @@ except Exception as e:
     exit(0)
 
 
-BLUETOOTH_ADDRESSES = {'onboard': '64:B7:08:94:2A:32', 'bench': '64:B7:08:94:28:76'}
+BLUETOOTH_ADDRESSES = {
+        'onboard': '64:B7:08:94:2A:32',
+        'bench': '64:B7:08:94:28:76'
+}
 
 BLUETOOTH_PORT = 1
 
@@ -76,7 +78,7 @@ def logging_threadfun(parser):
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
-            parsing.running = False
+            parser.running = False
             return
 
 
@@ -93,7 +95,7 @@ def connect_to_server(name, port):
 
             # Create a Bluetooth or IP socket depending on address format
             client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
-                      socket.BTPROTO_RFCOMM)
+                                    socket.BTPROTO_RFCOMM)
                       if ':' in addr
                       else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 
