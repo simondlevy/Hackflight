@@ -50,6 +50,7 @@ ZDIST_MAX = 1.0
 ZDIST_MIN = 0.2
 ZDIST_INC = 0.01
 
+
 class LoggingParser(MspParser):
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
@@ -133,6 +134,7 @@ def logging_threadfun(client, status):
             status['running'] = False
             return
 
+
 def scale(axval):
 
     return axval / 32767
@@ -146,8 +148,6 @@ def run_thread(fun, args):
 
 
 def connect_to_server(name, port):
-
-    # addresses = {'onboard': 'B8:27:EB:E0:1D:07', 'pihat': 'B8:27:EB:3F:AB:47'}
 
     addresses = {'onboard': '64:B7:08:94:2A:32', 'bench': '64:B7:08:94:28:76'}
 
@@ -179,6 +179,7 @@ def connect_to_server(name, port):
             break
 
     return client
+
 
 def main():
 
