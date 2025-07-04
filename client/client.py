@@ -174,8 +174,6 @@ def main():
         print(devname + ' not supported')
         exit(0)
 
-    run_thread(gamepad_threadfun, (gamepad_vals, status))
-
     was_armed = False
 
     descend_countdown = 0
@@ -183,6 +181,10 @@ def main():
     client = connect_to_server(args.server, SETPOINT_PORT)
 
     zdist = ZDIST_INIT
+
+    run_thread(gamepad_threadfun, (gamepad_vals, status))
+
+    run_thread(logging_threadfun, (client, status))
 
     while status['running']:
 
