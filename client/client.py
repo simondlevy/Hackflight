@@ -186,6 +186,8 @@ def main():
 
         try:
 
+            gamepad.step()
+
             if gamepad.armed != was_armed:
                 client.send(MspParser.serialize_SET_ARMING(gamepad.armed))
                 was_armed = gamepad.armed
