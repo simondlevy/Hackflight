@@ -33,6 +33,8 @@ except Exception as e:
     exit(0)
 
 
+BLUETOOTH_ADDRESSES = {'onboard': '64:B7:08:94:2A:32', 'bench': '64:B7:08:94:28:76'}
+
 BLUETOOTH_PORT = 1
 
 UPDATE_RATE_HZ = 100
@@ -79,9 +81,7 @@ def run_thread(fun, args):
 
 def connect_to_server(name, port):
 
-    addresses = {'onboard': '64:B7:08:94:2A:32', 'bench': '64:B7:08:94:28:76'}
-
-    addr = addresses[name]
+    addr = BLUETOOTH_ADDRESSES[name]
 
     while True:
 
@@ -162,7 +162,7 @@ def main():
             sleep(1 / UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
-            status['running'] = False
+            logging[0] = False
 
 
 main()
