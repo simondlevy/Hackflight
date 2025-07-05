@@ -2671,7 +2671,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "teensypi_v91:1X03"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
 			(at 104.14 25.4 0)
 			(effects
 				(font
@@ -3006,7 +3006,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "teensypi_v91:1X03"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
 			(at 63.5 25.4 0)
 			(effects
 				(font
@@ -3277,7 +3277,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "teensypi_v91:1X14"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x14_P2.54mm_Vertical"
 			(at 78.74 162.56 0)
 			(effects
 				(font
@@ -3995,7 +3995,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "teensypi_v91:1X03"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
 			(at 63.5 55.88 0)
 			(effects
 				(font
@@ -4400,7 +4400,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "teensypi_v91:1X14"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x14_P2.54mm_Vertical"
 			(at 40.64 162.56 0)
 			(effects
 				(font
@@ -4571,7 +4571,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "teensypi_v91:1X03"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
 			(at 104.14 55.88 0)
 			(effects
 				(font
