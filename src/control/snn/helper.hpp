@@ -52,7 +52,8 @@ class SnnHelper {
 
             const auto airborne = hovering || (z > z0);
 
-            const auto error = net.run(demand, dz);
+            // Note clamped value for third input
+            const auto error = net.run(3*MAX_SPIKE_TIME+2, demand, dz, 1);
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
