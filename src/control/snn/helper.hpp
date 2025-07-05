@@ -80,6 +80,48 @@ class SnnHelper {
             net.init(MAX_SPIKE_TIME);
         }
 
+        int spike_time_to_spike_count(
+                const int spike_time, const int scale, const int offset)
+        {
+            const float value = -(2.f * spike_time / MAX_SPIKE_TIME - 1);
+            return (int)(value * scale + offset);
+        }
+
+        int get_i1_spike_count()
+        {
+            return spike_time_to_spike_count(net.get_i1_spike_time(), 50, 50);
+        }
+
+        int get_i2_spike_count()
+        {
+            return spike_time_to_spike_count(net.get_i2_spike_time(), 50, 50);
+        }
+
+        int get_s_spike_count()
+        {
+            return 1;
+        }
+
+        int get_d1_spike_count()
+        {
+            return spike_time_to_spike_count(net.get_d1_spike_time(), 25, 25);
+        }
+
+        int get_d2_spike_count()
+        {
+            return spike_time_to_spike_count(net.get_d2_spike_time(), 25, 25);
+        }
+
+        int get_s2_spike_count()
+        {
+            return spike_time_to_spike_count(net.get_s2_spike_time(), -5, 40);
+        }
+
+        int get_o_spike_count()
+        {
+            return spike_time_to_spike_count(net.get_o_spike_time(), -5, 40);
+        }
+
         void run(
                 const float dt,
                 const bool hovering,

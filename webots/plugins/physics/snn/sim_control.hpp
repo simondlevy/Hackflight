@@ -87,13 +87,13 @@ class ClosedLoopControl {
             if (_tick++ == VIZ_SEND_PERIOD) {
 
                 const std::vector<int> counts = {
-                    _helper.net.get_i1_spike_count(),
-                    _helper.net.get_i2_spike_count(),
-                    _helper.net.get_s_spike_count(),
-                    _helper.net.get_d1_spike_count(),
-                    _helper.net.get_d2_spike_count(),
-                    _helper.net.get_o_spike_count(),
-                    _helper.net.get_s2_spike_count()
+                    _helper.get_i1_spike_count(),
+                    _helper.get_i2_spike_count(),
+                    _helper.get_s_spike_count(),
+                    _helper.get_d1_spike_count(),
+                    _helper.get_d2_spike_count(),
+                    _helper.get_o_spike_count(),
+                    _helper.get_s2_spike_count()
                 };
 
                 const std::string msg = make_viz_message(counts);
