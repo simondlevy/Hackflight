@@ -36,6 +36,7 @@ class SnnHelper {
 
         DifferenceNetwork net;
 
+        // Hybrid SNN / PID control
         float runClimbRateController(
                 const bool hovering,
                 const float z0,
@@ -53,8 +54,17 @@ class SnnHelper {
             const auto airborne = hovering || (z > z0);
 
             // Note clamped value for third input
-            const auto error = net.run(3*MAX_SPIKE_TIME+2, demand, dz, 1);
+            net.run(3*MAX_SPIKE_TIME+2, demand, dz, 1);
 
+            // Handle edge case
+            const int output_spike_time = net.get_o_spike_time();
+            const int time = output_spike_time == MAX_SPIKE_TIME + 1 ? -2 :
+                output_spike_time;
+
+            // Convert the firing time to a difference in [-2,+2]
+            const float error =
+                ((float)time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
+ 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
