@@ -53,8 +53,13 @@ class SnnHelper {
 
             const auto airborne = hovering || (z > z0);
 
+            const int timesteps = 3 * MAX_SPIKE_TIME + 2;
+
             // Note clamped value for third input
-            net.run(3*MAX_SPIKE_TIME+2, demand, dz, 1);
+            net.run(timesteps,
+                    value_to_spike_time(demand),
+                    value_to_spike_time(dz),
+                    value_to_spike_time(1));
 
             // Handle edge case
             const int output_spike_time = net.get_o_spike_time();
@@ -77,15 +82,16 @@ class SnnHelper {
 
         void init()
         {
-            net.init(MAX_SPIKE_TIME);
         }
 
-        int spike_time_to_spike_count(
-                const int spike_time, const int scale, const int offset)
+        // Encoder -----------------------------------------------------------
+
+        int value_to_spike_time(const float value)
         {
-            const float value = -(2.f * spike_time / MAX_SPIKE_TIME - 1);
-            return (int)(value * scale + offset);
+            return (int)(round(MAX_SPIKE_TIME * (1 - value) / 2));
         }
+
+        // Decoder ------------------------------------------------------------
 
         int get_i1_spike_count()
         {
@@ -121,6 +127,17 @@ class SnnHelper {
         {
             return spike_time_to_spike_count(net.get_o_spike_time(), -5, 40);
         }
+
+        // Utility -----------------------------------------------------------
+
+        int spike_time_to_spike_count(
+                const int spike_time, const int scale, const int offset)
+        {
+            const float value = -(2.f * spike_time / MAX_SPIKE_TIME - 1);
+            return (int)(value * scale + offset);
+        }
+
+        // -------------------------------------------------------------------
 
         void run(
                 const float dt,
