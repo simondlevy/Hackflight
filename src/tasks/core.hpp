@@ -193,8 +193,6 @@ class CoreTask {
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
 
-            _closedLoopControl->init();
-
             for (uint32_t step=1; ; step++) {
 
                 // The IMU should unlock at 1kHz

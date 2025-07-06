@@ -28,10 +28,6 @@ class ClosedLoopControl {
 
     public:
 
-        void init()
-        {
-        }
-
         void run(
                 const float dt,
                 const bool hovering,
