@@ -1,3 +1,3 @@
 (fp_lib_table
-  (lib (name "teensypi_v91")(type "KiCad")(uri "")(options "")(descr ""))
+  (version 7)
 )
