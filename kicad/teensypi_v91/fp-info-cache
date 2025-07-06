@@ -1,4 +1,4 @@
-20131375556486152
+20122615471917906
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -85602,87 +85602,52 @@ varistor SIOV
 0
 2
 2
-teensy
-Teensy1.0
-11
-
-0
-27
-27
-teensy
-Teensy1.0++
-20
-
-0
-51
-51
-teensy
-Teensy2.0
-11
-
-0
-31
-31
-teensy
-Teensy2.0++
-20
-
-0
-52
-52
-teensy
-Teensy30_31_32_All_Pins
-Teensy 3.0/3.1/3.2 All Pins
-
-0
-54
-54
-teensy
-Teensy30_31_32_LC
+teensypi_v91
+1X1
 
 
 0
-39
-38
-teensy
-Teensy35_36
-
-
-0
-62
-62
-teensy
-Teensy35_36_All_Pins
-
+1
+1
+teensypi_v91
+1X02
+<h3>Plated Through Hole</h3>{return}<p>Specifications:{return}<ul><li>Pin count:2</li>{return}<li>Pin pitch:0.1"</li>{return}</ul></p>{return}<p>Example device(s):{return}<ul><li>CONN_02</li>{return}</ul></p>
 
 0
-88
-88
-teensy
-Teensy40
-
-
-0
-44
-44
-teensy
-Teensy40_SMT
-
+2
+2
+teensypi_v91
+1X03
+<h3>Plated Through Hole - 3 Pin</h3>{return}<p>Specifications:{return}<ul><li>Pin count:3</li>{return}<li>Pin pitch:0.1"</li>{return}</ul></p>{return}<p>Example device(s):{return}<ul><li>CONN_03</li>{return}</ul></p>
 
 0
-54
-54
-teensy
-Teensy41
-
-
-0
-67
-67
-teensy
-Teensy_LC
-
+3
+3
+teensypi_v91
+1X04
+<h3>Plated Through Hole - 4 Pin</h3>{return}<p>Specifications:{return}<ul><li>Pin count:4</li>{return}<li>Pin pitch:0.1"</li>{return}</ul></p>{return}<p>Example device(s):{return}<ul><li>CONN_04</li>{return}</ul></p>
 
 0
-39
-39
+4
+4
+teensypi_v91
+1X14
+<h3>Plated Through Hole -14 Pin</h3>{return}<p>Specifications:{return}<ul><li>Pin count:14</li>{return}<li>Pin pitch:0.1"</li>{return}</ul></p>{return}<p>Example device(s):{return}<ul><li>CONN_14</li>{return}</ul></p>
+
+0
+14
+14
+teensypi_v91
+SMD1,27-2,54
+<b>SMD PAD</b>
+
+0
+1
+1
+teensypi_v91
+SMD2,54-5,08
+<b>SMD PAD</b>
+
+0
+1
+1
