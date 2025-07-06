@@ -65,8 +65,6 @@ class ClosedLoopControl {
 
         void init()
         {
-            _helper.init();
-
             _spikeServer.open(VIZ_PORT);
             _spikeServer.acceptClient();
         }

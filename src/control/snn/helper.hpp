@@ -80,10 +80,6 @@ class SnnHelper {
                         THRUST_MIN, THRUST_MAX) : 0;
         }
 
-        void init()
-        {
-        }
-
         // Encoder -----------------------------------------------------------
 
         int value_to_spike_time(const float value)
