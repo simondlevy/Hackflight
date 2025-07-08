@@ -66,7 +66,7 @@ class SnnHelper {
                     encode_input(1));
 
             // Decode the output firing time to a difference in [-2,+2]
-            const float error = decode_output(_net.get_o_spike_time());
+            const float error = decode_output(_net.get_n5_spike_time());
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -102,12 +102,12 @@ class SnnHelper {
 
         int get_i1_spike_count()
         {
-            return zero_until_hovering(_net.get_i1_spike_time());
+            return zero_until_hovering(_net.get_n0_spike_time());
         }
 
         int get_i2_spike_count()
         {
-            return zero_until_hovering(_net.get_i2_spike_time());
+            return zero_until_hovering(_net.get_n1_spike_time());
         }
 
         int get_s_spike_count()
@@ -117,22 +117,22 @@ class SnnHelper {
 
         int get_d1_spike_count()
         {
-            return filter_d(_net.get_d1_spike_time());
+            return filter_d(_net.get_n3_spike_time());
         }
 
         int get_d2_spike_count()
         {
-            return filter_d(_net.get_d2_spike_time());
+            return filter_d(_net.get_n4_spike_time());
         }
 
         int get_o_spike_count()
         {
-            return filter_output(_net.get_o_spike_time());
+            return filter_output(_net.get_n5_spike_time());
         }
 
         int get_s2_spike_count()
         {
-            return filter_output(_net.get_s2_spike_time());
+            return filter_output(_net.get_n6_spike_time());
         }
 
         int filter_output(const int spike_time)
