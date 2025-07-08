@@ -1,6 +1,6 @@
 {
   "board": {
-    "active_layer": 0,
+    "active_layer": 5,
     "active_layer_preset": "",
     "auto_track_width": true,
     "hidden_netclasses": [
@@ -15,19 +15,8 @@
       "/M2",
       "/M3",
       "/M4",
-      "unconnected-(PAD7-P-Pad1)",
-      "/INT",
-      "unconnected-(PAD9-P-Pad1)",
       "/SCL0",
       "/SDA0",
-      "unconnected-(PAD12-P-Pad1)",
-      "unconnected-(PAD16-P-Pad1)",
-      "unconnected-(PAD17-P-Pad1)",
-      "unconnected-(PAD18-P-Pad1)",
-      "unconnected-(PAD19-P-Pad1)",
-      "unconnected-(PAD3-P-Pad1)",
-      "unconnected-(PAD21-P-Pad1)",
-      "unconnected-(PAD22-P-Pad1)",
       "/MISO",
       "unconnected-(PMW3901_1-Pad1)",
       "/CS",
@@ -36,24 +25,16 @@
       "unconnected-(PMW3901_2-Pad3)",
       "/SCK",
       "unconnected-(PMW3901_2-Pad1)",
-      "/RX1",
       "/SCL1",
       "/SDA1",
       "/LED_MCU",
       "unconnected-(T1-Pad10)",
       "/5V",
-      "unconnected-(T2-Pad9)",
-      "unconnected-(T2-Pad5)",
-      "unconnected-(T2-Pad10)",
-      "unconnected-(T2-Pad8)",
-      "unconnected-(T2-Pad6)",
       "/LED_LED",
       "unconnected-(VL53L1_1-Pad3)",
       "unconnected-(VL53L1_2-Pad3)",
       "/TX5",
-      "/RX5",
-      "unconnected-(T2-Pad12)",
-      "unconnected-(T2-Pad11)"
+      "/RX5"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -99,7 +80,7 @@
       "conflict_shadows",
       "shapes"
     ],
-    "visible_layers": "ffffffff_ffffffff_ff555575_5ff575f4",
+    "visible_layers": "ffffffff_ffffffff_ff555575_dff575f7",
     "zone_display_mode": 0
   },
   "git": {

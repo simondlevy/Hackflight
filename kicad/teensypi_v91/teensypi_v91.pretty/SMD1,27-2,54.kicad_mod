@@ -56,7 +56,7 @@
 	(pad "1" smd rect
 		(at 0 0)
 		(size 1.27 2.54)
-		(layers "F.Cu" "F.Mask" "F.Paste")
+		(layers "F.Cu")
 		(solder_mask_margin 0.1016)
 		(clearance 0)
 		(uuid "f1782535-55f4-4299-bd4f-6f51b0b7259c")
