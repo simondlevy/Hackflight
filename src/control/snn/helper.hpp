@@ -34,7 +34,9 @@ class SnnHelper {
 
         static constexpr float MAX_SPIKE_TIME = 100;
 
-        Max_100_Network net;
+        Max_100_Network _net;
+
+        bool _hovering;
 
         // Hybrid SNN / PID control
         float runClimbRateController(
@@ -49,6 +51,8 @@ class SnnHelper {
             static const float KI = 15;
             static const float ILIMIT = 5000;
 
+            _hovering = hovering;
+
             static float _integral;
 
             const auto airborne = hovering || (z > z0);
@@ -56,13 +60,13 @@ class SnnHelper {
             const int timesteps = 3 * MAX_SPIKE_TIME + 2;
 
             // Encode the inputs (note clamped value for third input)
-            net.run(timesteps,
+            _net.run(timesteps,
                     encode_input(demand),
                     encode_input(dz),
                     encode_input(1));
 
             // Decode the output firing time to a difference in [-2,+2]
-            const float error = decode_output(net.get_o_spike_time());
+            const float error = decode_output(_net.get_o_spike_time());
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -98,44 +102,49 @@ class SnnHelper {
 
         int get_i1_spike_count()
         {
-            printf("i1:%03d ", net.get_i1_spike_time());
-            return net.get_i1_spike_time();
+            printf("i1:%03d ", _net.get_i1_spike_time());
+            return filter_count(_net.get_i1_spike_time());
         }
 
         int get_i2_spike_count()
         {
-            printf("i2:%03d ", net.get_i2_spike_time());
-            return net.get_i2_spike_time();
+            printf("i2:%03d ", _net.get_i2_spike_time());
+            return filter_count(_net.get_i2_spike_time());
         }
 
         int get_s_spike_count()
         {
-            return 1;
+            return filter_count(1);
         }
 
         int get_d1_spike_count()
         {
-            printf("d1:%03d ", net.get_d1_spike_time());
-            return 0;
+            printf("d1:%03d ", _net.get_d1_spike_time());
+            return filter_count(0);
         }
 
         int get_d2_spike_count()
         {
-            printf("d2:%03d ", net.get_d2_spike_time());
-            return 0;
+            printf("d2:%03d ", _net.get_d2_spike_time());
+            return filter_count(0);
         }
 
         int get_o_spike_count()
         {
-            const int spike_time = net.get_o_spike_time();
+            const int spike_time = _net.get_o_spike_time();
 
-            return (int)(30 + (spike_time == 0 ? 0 : decode_output(spike_time)) * 10);
+            return filter_count((int)(30 + (spike_time == 0 ? 0 : decode_output(spike_time)) * 10));
         }
 
         int get_s2_spike_count()
         {
-            printf("s2:%03d\n", net.get_s2_spike_time());
-            return 0;
+            printf("s2:%03d\n", _net.get_s2_spike_time());
+            return filter_count(0);
+        }
+
+        int filter_count(const int count)
+        {
+            return _hovering ? count : 0;
         }
 
         // -------------------------------------------------------------------
