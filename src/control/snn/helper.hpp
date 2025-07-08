@@ -102,13 +102,13 @@ class SnnHelper {
 
         int get_i1_spike_count()
         {
-            printf("i1:%03d ", _net.get_i1_spike_time());
+            //printf("i1:%03d ", _net.get_i1_spike_time());
             return filter_count(_net.get_i1_spike_time());
         }
 
         int get_i2_spike_count()
         {
-            printf("i2:%03d ", _net.get_i2_spike_time());
+            //printf("i2:%03d ", _net.get_i2_spike_time());
             return filter_count(_net.get_i2_spike_time());
         }
 
@@ -119,27 +119,29 @@ class SnnHelper {
 
         int get_d1_spike_count()
         {
-            printf("d1:%03d ", _net.get_d1_spike_time());
+            //printf("d1:%03d ", _net.get_d1_spike_time());
             return filter_count(0);
         }
 
         int get_d2_spike_count()
         {
-            printf("d2:%03d ", _net.get_d2_spike_time());
+            //printf("d2:%03d ", _net.get_d2_spike_time());
             return filter_count(0);
         }
 
         int get_o_spike_count()
         {
-            const int spike_time = _net.get_o_spike_time();
-
-            return filter_count((int)(30 + (spike_time == 0 ? 0 : decode_output(spike_time)) * 10));
+            return filter_output(_net.get_o_spike_time());
         }
 
         int get_s2_spike_count()
         {
-            printf("s2:%03d\n", _net.get_s2_spike_time());
-            return filter_count(0);
+            return filter_output(_net.get_s2_spike_time());
+        }
+
+        int filter_output(const int spike_time)
+        {
+            return filter_count((int)(30 + (spike_time == 0 ? 0 : decode_output(spike_time)) * 10));
         }
 
         int filter_count(const int count)
