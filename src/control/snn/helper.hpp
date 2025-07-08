@@ -89,44 +89,40 @@ class SnnHelper {
 
         static float decode_output(const int spike_time)
         {
-            return ((float)(check_spike_time(spike_time) - MAX_SPIKE_TIME) * 2
+            return ((float)(filter_spike_time(spike_time, 1) - MAX_SPIKE_TIME) * 2
                     / MAX_SPIKE_TIME - 2);
         }
 
-        // Helpers ------------------------------------------------------------
+        // Visualization helpers ----------------------------------------------
 
-        static int check_spike_time(const int spike_time)
+        static int filter_spike_time(const int spike_time, const int scale)
         {
-            return spike_time == MAX_SPIKE_TIME + 1 ? 0 : spike_time;
+            return spike_time == scale * MAX_SPIKE_TIME + 1 ? 0 : spike_time;
         }
 
         int get_i1_spike_count()
         {
-            //printf("i1:%03d ", _net.get_i1_spike_time());
-            return filter_count(_net.get_i1_spike_time());
+            return zero_until_hovering(_net.get_i1_spike_time());
         }
 
         int get_i2_spike_count()
         {
-            //printf("i2:%03d ", _net.get_i2_spike_time());
-            return filter_count(_net.get_i2_spike_time());
+            return zero_until_hovering(_net.get_i2_spike_time());
         }
 
         int get_s_spike_count()
         {
-            return filter_count(1);
+            return zero_until_hovering(1);
         }
 
         int get_d1_spike_count()
         {
-            //printf("d1:%03d ", _net.get_d1_spike_time());
-            return filter_count(0);
+            return filter_d(_net.get_d1_spike_time());
         }
 
         int get_d2_spike_count()
         {
-            //printf("d2:%03d ", _net.get_d2_spike_time());
-            return filter_count(0);
+            return filter_d(_net.get_d2_spike_time());
         }
 
         int get_o_spike_count()
@@ -141,10 +137,16 @@ class SnnHelper {
 
         int filter_output(const int spike_time)
         {
-            return filter_count((int)(30 + (spike_time == 0 ? 0 : decode_output(spike_time)) * 10));
+            return zero_until_hovering((int)(30 + (spike_time == 0 ? 0 :
+                            decode_output(spike_time)) * 10));
         }
 
-        int filter_count(const int count)
+        int filter_d(const int spike_time)
+        {
+            return zero_until_hovering(filter_spike_time(spike_time, 3));
+        }
+
+        int zero_until_hovering(const int count)
         {
             return _hovering ? count : 0;
         }
@@ -201,5 +203,4 @@ class SnnHelper {
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
         }
-
 };
