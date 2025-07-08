@@ -41,7 +41,6 @@ class ClosedLoopControl {
             const int n = counts.size();
 
             std::string msg = "{\"Event Counts\":[";
-
             for (int i=0; i<n; ++i) {
                 char tmp[100] = {};
                 const int count = counts[i];
@@ -49,8 +48,16 @@ class ClosedLoopControl {
                 msg += tmp;
             }
 
-            msg += ", \"Neuron Alias\":[";
+            /*
+            std::string msg = "{\"Event Times\":[";
+            for (int i=0; i<n; ++i) {
+                char tmp[100] = {};
+                const int time = 100;
+                sprintf(tmp, "[%d]%s", time, i==n-1 ? "]"  : ", ");
+                msg += tmp;
+            }*/
 
+            msg += ", \"Neuron Alias\":[";
             for (int i=0; i<n; ++i) {
                 char tmp[100] = {};
                 sprintf(tmp, "%d%s", i, i==n-1 ? "]" : ", ");
@@ -59,7 +66,6 @@ class ClosedLoopControl {
 
             return msg + "}\n";
         }
-
 
     public:
 

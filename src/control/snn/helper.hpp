@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <difference_network.hpp>
+#include <max_100.hpp>
 
 #include <control/pids/altitude.hpp>
 #include <control/pids/position.hpp>
@@ -34,7 +34,7 @@ class SnnHelper {
 
         static constexpr float MAX_SPIKE_TIME = 100;
 
-        DifferenceNetwork net;
+        Max_100_Network net;
 
         // Hybrid SNN / PID control
         float runClimbRateController(
@@ -55,21 +55,15 @@ class SnnHelper {
 
             const int timesteps = 3 * MAX_SPIKE_TIME + 2;
 
-            // Note clamped value for third input
+            // Encode the inputs (note clamped value for third input)
             net.run(timesteps,
-                    value_to_spike_time(demand),
-                    value_to_spike_time(dz),
-                    value_to_spike_time(1));
+                    encode_input(demand),
+                    encode_input(dz),
+                    encode_input(1));
 
-            // Handle edge case
-            const int output_spike_time = net.get_o_spike_time();
-            const int time = output_spike_time == MAX_SPIKE_TIME + 1 ? -2 :
-                output_spike_time;
+            // Decode the output firing time to a difference in [-2,+2]
+            const float error = decode_output(net.get_o_spike_time());
 
-            // Convert the firing time to a difference in [-2,+2]
-            const float error =
-                ((float)time-MAX_SPIKE_TIME)*2 / MAX_SPIKE_TIME - 2;
- 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
@@ -82,21 +76,36 @@ class SnnHelper {
 
         // Encoder -----------------------------------------------------------
 
-        int value_to_spike_time(const float value)
+        static int encode_input(const float value)
         {
             return (int)(round(MAX_SPIKE_TIME * (1 - value) / 2));
         }
 
         // Decoder ------------------------------------------------------------
 
+        static float decode_output(const int spike_time)
+        {
+            return ((float)(check_spike_time(spike_time) - MAX_SPIKE_TIME) * 2
+                    / MAX_SPIKE_TIME - 2);
+        }
+
+        // Helpers ------------------------------------------------------------
+
+        static int check_spike_time(const int spike_time)
+        {
+            return spike_time == MAX_SPIKE_TIME + 1 ? 0 : spike_time;
+        }
+
         int get_i1_spike_count()
         {
-            return spike_time_to_spike_count(net.get_i1_spike_time(), 50, 50);
+            printf("i1:%03d ", net.get_i1_spike_time());
+            return net.get_i1_spike_time();
         }
 
         int get_i2_spike_count()
         {
-            return spike_time_to_spike_count(net.get_i2_spike_time(), 50, 50);
+            printf("i2:%03d ", net.get_i2_spike_time());
+            return net.get_i2_spike_time();
         }
 
         int get_s_spike_count()
@@ -106,31 +115,27 @@ class SnnHelper {
 
         int get_d1_spike_count()
         {
-            return spike_time_to_spike_count(net.get_d1_spike_time(), 25, 25);
+            printf("d1:%03d ", net.get_d1_spike_time());
+            return 0;
         }
 
         int get_d2_spike_count()
         {
-            return spike_time_to_spike_count(net.get_d2_spike_time(), 25, 25);
-        }
-
-        int get_s2_spike_count()
-        {
-            return spike_time_to_spike_count(net.get_s2_spike_time(), -5, 40);
+            printf("d2:%03d ", net.get_d2_spike_time());
+            return 0;
         }
 
         int get_o_spike_count()
         {
-            return spike_time_to_spike_count(net.get_o_spike_time(), -5, 40);
+            const int spike_time = net.get_o_spike_time();
+
+            return (int)(30 + (spike_time == 0 ? 0 : decode_output(spike_time)) * 10);
         }
 
-        // Utility -----------------------------------------------------------
-
-        int spike_time_to_spike_count(
-                const int spike_time, const int scale, const int offset)
+        int get_s2_spike_count()
         {
-            const float value = -(2.f * spike_time / MAX_SPIKE_TIME - 1);
-            return (int)(value * scale + offset);
+            printf("s2:%03d\n", net.get_s2_spike_time());
+            return 0;
         }
 
         // -------------------------------------------------------------------
