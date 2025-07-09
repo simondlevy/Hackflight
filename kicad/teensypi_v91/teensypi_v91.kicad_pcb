@@ -375,6 +375,126 @@
 			)
 		)
 	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
+		(layer "F.Cu")
+		(uuid "0cec988f-2798-4644-89c7-5ef932eb98ab")
+		(at 160.3 125.3)
+		(descr "Wire Pad, Square, SMD Pad,  5mm x 10mm,")
+		(tags "MesurementPoint Square SMDPad 5mmx10mm ")
+		(property "Reference" "VB_PAD1"
+			(at 0 -3.81 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "20abd1ae-eacb-4a61-9975-b650a031fc23")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01"
+			(at 0 6.35 0)
+			(layer "F.Fab")
+			(uuid "d611035d-ac8d-4efe-876b-37b309cd0d21")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "32780def-2a66-4742-af5a-0abcf01d0ad1")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0dc4226e-4a01-45e3-9a48-4a1ffd9853e9")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/42b0eb90-7deb-411e-b8e6-2fa777df1620")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr smd exclude_from_pos_files)
+		(fp_line
+			(start -2.75 -5.25)
+			(end -2.75 5.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "6ee577c4-634d-4a44-afa0-e6524df12fb2")
+		)
+		(fp_line
+			(start -2.75 5.25)
+			(end 2.75 5.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "4fe65279-4674-485a-ab73-d429e959642b")
+		)
+		(fp_line
+			(start 2.75 -5.25)
+			(end -2.75 -5.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "9e745eef-39a3-48e4-9af5-702c3fa29c51")
+		)
+		(fp_line
+			(start 2.75 5.25)
+			(end 2.75 -5.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "451f9aa1-5a0f-4f8c-bbb2-ce6abda846e8")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "3db65ba0-990f-4902-a9b9-c24793607b44")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd rect
+			(at 0 0)
+			(size 3 5)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 2 "/VBAT")
+			(pinfunction "Pin_1")
+			(pintype "passive")
+			(uuid "e0122955-d84f-49d8-95bd-d6ac2ae1fb5b")
+		)
+		(embedded_fonts no)
+	)
 	(footprint "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical"
 		(layer "F.Cu")
 		(uuid "1b023dd4-5185-4576-b544-68a05b9c360b")
@@ -1549,14 +1669,15 @@
 	)
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
 		(layer "F.Cu")
-		(uuid "90bd20fa-b51b-4060-9a4e-3e6cb5791be7")
-		(at 152.9 125.1)
+		(uuid "8e22343b-4532-43fb-8e4e-1b88ba28181f")
+		(at 153.75 125.3)
 		(descr "Wire Pad, Square, SMD Pad,  5mm x 10mm,")
 		(tags "MesurementPoint Square SMDPad 5mmx10mm ")
-		(property "Reference" "J1"
+		(property "Reference" "GND_PAD1"
 			(at 0 -3.81 0)
 			(layer "F.SilkS")
-			(uuid "54ed7cd5-2fc6-43ad-9a99-4998a83bfbed")
+			(hide yes)
+			(uuid "7875b6d6-83b1-46f7-850a-5a115c4eece1")
 			(effects
 				(font
 					(size 1 1)
@@ -1567,7 +1688,7 @@
 		(property "Value" "Conn_01x01"
 			(at 0 6.35 0)
 			(layer "F.Fab")
-			(uuid "b3699cfd-3d77-4445-bdab-0124f3fd7650")
+			(uuid "008c8b7f-bce8-4706-bdd4-289ae4d158c2")
 			(effects
 				(font
 					(size 1 1)
@@ -1579,7 +1700,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "add4887f-f2e7-40d5-a392-f131e1819e4d")
+			(uuid "178adfcd-63d6-46d9-98e3-9c664a6438cb")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1591,7 +1712,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "dd674c50-1951-4c62-b0b8-2f2826a431b5")
+			(uuid "99b2fd43-66e7-49ab-83d8-be784b68d5ca")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1612,7 +1733,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "cc42e2ee-0dbb-4eb2-8ecd-f477936c922d")
+			(uuid "7c77520c-df59-4906-8286-73a8ec66c586")
 		)
 		(fp_line
 			(start -2.75 5.25)
@@ -1622,7 +1743,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "be34c22f-6d2e-4ec0-ab01-3e939e8ff41f")
+			(uuid "40f8d41d-9f90-49c0-89f6-91c166f329ae")
 		)
 		(fp_line
 			(start 2.75 -5.25)
@@ -1632,7 +1753,7 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "5ac75967-adae-4c2e-9d8e-f6da854c4f34")
+			(uuid "2d726aa5-b351-4f19-b1a8-f9e763b0406f")
 		)
 		(fp_line
 			(start 2.75 5.25)
@@ -1642,12 +1763,12 @@
 				(type solid)
 			)
 			(layer "F.CrtYd")
-			(uuid "6d4f2e12-af96-4ad8-8a99-87edf4471058")
+			(uuid "afbe7ce3-2eb2-4b79-b6d4-babb9492a358")
 		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
-			(uuid "1055d7cd-837d-4a0c-b21c-e88a3a6ca22e")
+			(uuid "c799ffcf-9cd5-4678-9636-8194514f327e")
 			(effects
 				(font
 					(size 1 1)
@@ -1662,7 +1783,7 @@
 			(net 3 "/GND")
 			(pinfunction "Pin_1")
 			(pintype "passive")
-			(uuid "d474ce80-39d2-4716-b9a5-26add6ebb240")
+			(uuid "6d9e015c-de8f-44e1-b248-f76d9de6cc63")
 		)
 		(embedded_fonts no)
 	)
@@ -4610,7 +4731,7 @@
 		)
 	)
 	(gr_text "VB"
-		(at 158.8 121.74 90)
+		(at 161.1 122.1 90)
 		(layer "F.SilkS")
 		(uuid "c25a772d-af9c-4ebc-96f6-0966738c13a8")
 		(effects
@@ -4634,7 +4755,7 @@
 		)
 	)
 	(gr_text "GD"
-		(at 153.9 121.74 90)
+		(at 154.7 122 90)
 		(layer "F.SilkS")
 		(uuid "c830e3bc-dc64-4f65-8f47-3b106bae2807")
 		(effects

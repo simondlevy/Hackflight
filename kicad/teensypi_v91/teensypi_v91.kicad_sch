@@ -1728,6 +1728,16 @@
 	)
 	(wire
 		(pts
+			(xy 176.53 80.01) (xy 184.15 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7ec5e355-b9e8-4454-aad5-6fdcedc1425e")
+	)
+	(wire
+		(pts
 			(xy 50.8 175.26) (xy 58.42 175.26)
 		)
 		(stroke
@@ -2035,6 +2045,16 @@
 			(justify left bottom)
 		)
 		(uuid "3c0e161b-77de-41cd-8057-090b9a285b00")
+	)
+	(label "VBAT"
+		(at 179.07 80.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3ed3c6ca-eb25-4234-827e-5ed3eea0f86f")
 	)
 	(label "GND"
 		(at 53.34 149.86 0)
@@ -2477,6 +2497,73 @@
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "H1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 189.23 80.01 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "42b0eb90-7deb-411e-b8e6-2fa777df1620")
+		(property "Reference" "VB_PAD1"
+			(at 191.77 78.7399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x01"
+			(at 191.77 81.2799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
+			(at 189.23 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 189.23 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 189.23 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "47f1accc-2878-4a7d-9321-5b7e0a01d9f8")
+		)
+		(instances
+			(project "teensypi_v91"
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "VB_PAD1")
 					(unit 1)
 				)
 			)
@@ -3455,7 +3542,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "dfb3c027-38ac-42de-8e3e-a376eb8d7a83")
-		(property "Reference" "J1"
+		(property "Reference" "GND_PAD1"
 			(at 191.77 68.5799 0)
 			(effects
 				(font
@@ -3506,7 +3593,7 @@
 		(instances
 			(project ""
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "J1")
+					(reference "GND_PAD1")
 					(unit 1)
 				)
 			)

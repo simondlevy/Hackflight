@@ -59,11 +59,13 @@ class SnnHelper {
 
             const int timesteps = 3 * MAX_SPIKE_TIME + 2;
 
-            // Encode the inputs (note clamped value for third input)
-            _net.run(timesteps,
-                    encode_input(demand),
-                    encode_input(dz),
-                    encode_input(1));
+            // Encode the inputs and apply their spikes
+            _net.apply_spike_to_node_0(encode_input(demand));
+            _net.apply_spike_to_node_1(encode_input(dz));
+            _net.apply_spike_to_node_2(encode_input(1)); // clamped
+
+            // Run the network
+            _net.run(timesteps);
 
             // Decode the output firing time to a difference in [-2,+2]
             const float error = decode_output(_net.get_n5_spike_time());
