@@ -523,14 +523,14 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "52b30427-b89c-40a1-b6b3-956b44ae57ad")
-		(at 200.7 49.6)
+		(at 225 56)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "H2"
 			(at 0 -3.2 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "036707ec-9a45-497a-8f0f-6869dae48353")
+			(uuid "d5f852df-f2bc-442a-85b0-aca831a295c1")
 			(effects
 				(font
 					(size 1 1)
@@ -542,7 +542,7 @@
 			(at 0 3.2 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "8c5be180-bb34-4e8d-98cb-be4f691ad459")
+			(uuid "2636e77c-c08e-4053-8c3d-cd7d3851b386")
 			(effects
 				(font
 					(size 1 1)
@@ -554,7 +554,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "a455db0e-3b44-48a7-ab66-ec34b8d6fe50")
+			(uuid "8167c476-b3b6-4699-87b2-c2cd17f8fd29")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -566,7 +566,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "d6b49b5d-b7b1-48ed-bbe4-a262fac3d069")
+			(uuid "1f0b7747-a821-4747-9112-e6c22663472d")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2960,7 +2960,7 @@
 	(footprint "MountingHole:MountingHole_5.5mm"
 		(layer "F.Cu")
 		(uuid "c5cdc59d-850a-4414-b76e-f40a2c1954bc")
-		(at 196 53)
+		(at 223 46)
 		(descr "Mounting Hole 5.5mm, no annular")
 		(tags "mounting hole 5.5mm no annular")
 		(property "Reference" "H1"
@@ -4525,8 +4525,8 @@
 		(uuid "3ac873b0-a607-447e-a9d0-f38896104139")
 	)
 	(gr_line
-		(start 137 104)
-		(end 116.706575 124.6)
+		(start 137 103)
+		(end 116.706575 123.6)
 		(stroke
 			(width 0.05)
 			(type solid)
@@ -4535,18 +4535,8 @@
 		(uuid "04325fb0-c7bd-4f0c-8480-5867aa55303e")
 	)
 	(gr_line
-		(start 196 62)
-		(end 188.1 54.5)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Edge.Cuts")
-		(uuid "05054686-839c-4eac-aee9-f5a643043546")
-	)
-	(gr_line
 		(start 175 83.251716)
-		(end 175 104)
+		(end 175 103)
 		(stroke
 			(width 0.05)
 			(type solid)
@@ -4555,8 +4545,8 @@
 		(uuid "051c5355-355a-4028-a7b1-6e43fca799fa")
 	)
 	(gr_line
-		(start 137 82)
-		(end 137 104)
+		(start 137 83)
+		(end 137 103)
 		(stroke
 			(width 0.05)
 			(type solid)
@@ -4576,7 +4566,7 @@
 	)
 	(gr_line
 		(start 123.824805 132.08694)
-		(end 116.706575 124.6)
+		(end 116.706575 123.6)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -4604,6 +4594,17 @@
 		(layer "Edge.Cuts")
 		(uuid "2b7bb3f1-c9f9-4bd4-aa8b-f3e79ef17330")
 	)
+	(gr_arc
+		(start 187.726263 54.86085)
+		(mid 199.750067 49.279878)
+		(end 195.999173 61.99404)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "2cb7d2b5-a5a7-4838-9ffa-0f9c75b954c1")
+	)
 	(gr_line
 		(start 196 62)
 		(end 175 83.251716)
@@ -4625,7 +4626,7 @@
 		(uuid "3968bfc0-3913-4d63-82e5-d3dd0cee1109")
 	)
 	(gr_line
-		(start 116.458814 61.477521)
+		(start 116.458815 62.477521)
 		(end 124.1 54.500208)
 		(stroke
 			(width 0.05)
@@ -4655,8 +4656,8 @@
 		(uuid "4b22c2ba-0fea-4832-a02c-12059ce6f6b4")
 	)
 	(gr_line
-		(start 175 104)
-		(end 195.694375 124.897255)
+		(start 175 103)
+		(end 197 125)
 		(stroke
 			(width 0.05)
 			(type solid)
@@ -4673,6 +4674,16 @@
 		)
 		(layer "Edge.Cuts")
 		(uuid "5731caff-2a83-416c-b704-909b2f33883a")
+	)
+	(gr_line
+		(start 188.28177 132.106856)
+		(end 197 125)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "60674727-3bae-418c-8a8d-c493d3aac1c7")
 	)
 	(gr_line
 		(start 174 117.5)
@@ -4695,7 +4706,7 @@
 		(uuid "c65442f0-f8d6-40d2-b9c9-42846552f73b")
 	)
 	(gr_line
-		(start 188.1 54.5)
+		(start 187.726263 54.86085)
 		(end 173.6 68.5)
 		(stroke
 			(width 0.05)
@@ -4705,18 +4716,8 @@
 		(uuid "ce48d875-728c-4237-8250-afe279956635")
 	)
 	(gr_line
-		(start 195.694375 124.897255)
-		(end 188.28177 132.106856)
-		(stroke
-			(width 0.05)
-			(type default)
-		)
-		(layer "Edge.Cuts")
-		(uuid "e93bae20-8113-49bc-9b45-583f132e2715")
-	)
-	(gr_line
-		(start 116.458815 61.477521)
-		(end 137 82)
+		(start 116.458815 62.477521)
+		(end 137 83)
 		(stroke
 			(width 0.05)
 			(type solid)
