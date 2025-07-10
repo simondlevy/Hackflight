@@ -16,7 +16,6 @@
 
 #pragma once
 
-// #include <new_max_100.hpp>
 #include <max_100.hpp>
 
 #include <control/pids/altitude.hpp>
