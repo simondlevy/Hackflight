@@ -1,6 +1,6 @@
 {
   "board": {
-    "active_layer": 25,
+    "active_layer": 0,
     "active_layer_preset": "",
     "auto_track_width": true,
     "hidden_netclasses": [
@@ -56,7 +56,13 @@
       "unconnected-(GND_PAD6-Pin_1-Pad1)",
       "unconnected-(GND_PAD7-Pin_1-Pad1)",
       "unconnected-(GND_PAD8-Pin_1-Pad1)",
-      "unconnected-(GND_PAD9-Pin_1-Pad1)"
+      "unconnected-(GND_PAD9-Pin_1-Pad1)",
+      "unconnected-(GND_PAD13-Pin_1-Pad1)",
+      "unconnected-(GND_PAD5-Pin_1-Pad1)",
+      "unconnected-(GND_PAD14-Pin_1-Pad1)",
+      "unconnected-(GND_PAD15-Pin_1-Pad1)",
+      "unconnected-(GND_PAD16-Pin_1-Pad1)",
+      "unconnected-(GND_PAD17-Pin_1-Pad1)"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,

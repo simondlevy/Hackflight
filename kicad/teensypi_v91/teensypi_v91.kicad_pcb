@@ -196,28 +196,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "0890412c-a038-42bf-9ac7-91170fa02b58")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "c4066ce6-0961-4175-932c-2eb46241d689")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -296,46 +274,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6ee577c4-634d-4a44-afa0-e6524df12fb2")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "4fe65279-4674-485a-ab73-d429e959642b")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "9e745eef-39a3-48e4-9af5-702c3fa29c51")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "451f9aa1-5a0f-4f8c-bbb2-ce6abda846e8")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -416,28 +354,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "2bc9c45f-100f-46b8-af39-29510b5a3f5d")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "e359b4f8-e98c-41c7-9628-9b912dcd5278")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -516,28 +432,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "29d31fc1-c77d-4d5d-ade5-cb2a13ec14f5")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "a5ee4f68-32c5-4854-a0b7-13e58b5f567b")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -616,28 +510,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "b9fec1c1-a71d-4c43-8d0e-d0bd34e5f0e4")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "3632460d-1d06-4b11-9421-80d9b1cd7353")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -716,28 +588,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "355f8895-3d0f-403d-b2ed-72d094be77da")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "416c6b2c-8e2a-496a-93f8-729e004209d1")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -816,28 +666,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "9d79c488-280e-4e2d-9a95-e20588c61f4e")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "98849e1f-4ebf-4528-809b-dc29f14b3c26")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -916,28 +744,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "80e48aad-13a1-4075-a6d2-ff65942b2d5e")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "d9a22717-5f37-4c6b-8227-1dbdd0408cd9")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -1016,28 +822,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "50dc9148-2467-4c71-a81b-8685cc631adc")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "16cc1e85-1f40-4ef0-9629-3de0d20f38dc")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -1175,46 +959,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "59785897-f953-4ead-a456-23ce99016d1b")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end 1.75 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "93dd397f-b2f2-4ffe-81fa-c15f83650557")
-		)
-		(fp_line
-			(start -1.8 9.4)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "366145c6-1160-4fb6-b9c6-1eccf12acd45")
-		)
-		(fp_line
-			(start 1.75 -1.8)
-			(end 1.75 9.4)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "665e0e19-9b6e-4a7c-afea-a23e92c9f8a4")
-		)
-		(fp_line
-			(start 1.75 9.4)
-			(end -1.8 9.4)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "c7d1611d-bc20-4cb7-91d2-ac3e69206c15")
 		)
 		(fp_line
 			(start -1.27 -1.27)
@@ -1392,28 +1136,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "7eece1df-5e3b-46b8-b22b-8fe4523ca055")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "7b013549-9d25-49af-9366-8789864fc86e")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -1492,46 +1214,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "df7dde38-7048-4f12-aa82-f9b86bddcb0d")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "60880db4-07d1-461d-a9ec-af595d2c6b7e")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "5c992d9c-20c1-45e9-98bb-05650c2995de")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "70a62283-6ebf-4798-b239-652772627e71")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -1612,28 +1294,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "ad8a2028-7f14-4f3a-b42d-8b803562b053")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "9d68bacf-142a-4dcc-bf7c-bdd26d870538")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -1771,46 +1431,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "24d43701-a80e-4e62-aafa-9a22eeca14fa")
-		)
-		(fp_line
-			(start 1.8 6.850001)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "3a7802e7-ac26-4b45-800c-5fddcd9792ab")
-		)
-		(fp_line
-			(start -1.8 6.85)
-			(end 1.8 6.850001)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6088b22a-8863-4429-ba6c-ee0b4e7ee5a8")
-		)
-		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "64d56d5b-fddd-44a8-8417-a83cfeef2d3e")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "596adc5f-9fcc-4955-b628-46acf3a611b1")
 		)
 		(fp_line
 			(start 1.270001 6.35)
@@ -1977,28 +1597,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 5.5 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "26194dec-60fe-46ab-98b3-353aa50e0edb")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 5.75 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "b7d1f4e8-709c-4485-a27b-825dcc4f433c")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -2077,46 +1675,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "776c1fb5-318e-4b23-8bfc-b21144926e54")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "49907bdc-9a26-4a79-91a3-3b8c62a095be")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "1732ef05-cea0-4c6c-806c-220971f1b7be")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "fdabd0d3-72d3-43fe-9823-ec058cef6bbb")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -2262,46 +1820,6 @@
 			(uuid "f4435ab2-722a-4c8f-adae-e128e9d0791f")
 		)
 		(fp_line
-			(start 3.7 2.25)
-			(end 3.7 -2.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "1e5b5b26-9d57-4678-abdd-60f3dec729a4")
-		)
-		(fp_line
-			(start 3.7 -2.25)
-			(end -1.15 -2.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "20c3ced2-f69d-43ef-99c8-b97c91066745")
-		)
-		(fp_line
-			(start -1.15 2.25)
-			(end 3.7 2.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "b4cafb78-6feb-4799-85ed-cc29f2318d82")
-		)
-		(fp_line
-			(start -1.15 -2.25)
-			(end -1.15 2.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "598b5fa1-87de-4e48-bc12-1a766bf232db")
-		)
-		(fp_line
 			(start -0.23 -1.16619)
 			(end -0.23 1.16619)
 			(stroke
@@ -2437,28 +1955,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "da342b79-bb6f-42d0-9a73-0bb77d986ee7")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "1a26d857-fc2a-4eb8-9e5b-65bdbb9c9ea1")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -2537,46 +2033,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "a9922b96-e910-4cc3-986e-a55560637b35")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "1756b66d-02a5-40b2-98d3-566ca675c270")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "d305433d-eec8-478e-b3b0-5a57f991f318")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "e158c8e7-18f5-4c24-9a56-a1c576ee724d")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -2620,6 +2076,7 @@
 		(property "Value" "Conn_01x01"
 			(at 0 6.35 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "daefbd69-96ae-4ed1-bb9f-c17d32303ed8")
 			(effects
 				(font
@@ -2657,57 +2114,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "36c6527e-9591-4a9a-ad14-4edba11cb803")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "277b8e71-cb0f-48f0-be47-b971686d2cc9")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "87854066-331b-404b-926e-2fdba2111b3e")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "ee12158d-bb57-402d-a6a5-0bd570269f5f")
-		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "b18006d2-c9f8-4cf8-afdd-27fed2d07224")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(pad "1" smd rect
 			(at 0 0)
 			(size 3.5 1.5)
@@ -2836,46 +2242,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "a4b24d22-3add-42ae-bbc2-5f7bca2825a4")
-		)
-		(fp_line
-			(start -1.8 6.850001)
-			(end 1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "9bc86613-e30b-4f99-8e8d-629a28469405")
-		)
-		(fp_line
-			(start 1.8 6.85)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "134f9aed-bedd-4f0a-98ec-35bba1bbdd04")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 6.850001)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "06d5ff08-61ab-4e31-9407-3407a36006e6")
-		)
-		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "42afd223-1401-4f38-9434-9aa89027d3ad")
 		)
 		(fp_line
 			(start -1.270001 6.35)
@@ -3042,28 +2408,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "b9c3eb45-4297-44ce-ae87-261453d1149d")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "506b3a5b-f4a5-4054-88f7-d12f73bbbf28")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -3142,28 +2486,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 5.5 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "16c23202-bf6d-45bb-afcb-f05e5a9540a4")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 5.75 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "47745be5-e602-4151-84c7-2d598a1af289")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -3301,46 +2623,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "4ceb1bb0-18de-415d-a586-89fe33e8c1d2")
-		)
-		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "1460d547-893d-4cbe-9198-20f6ac3be323")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 6.850001)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "170f1970-e227-4280-9f2d-f2c3f2942986")
-		)
-		(fp_line
-			(start 1.8 6.85)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "18c7e51d-38ec-473c-affc-1d992f05343c")
-		)
-		(fp_line
-			(start -1.8 6.850001)
-			(end 1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "2fb30d69-724c-48b0-a4ae-aa7597f7a3e6")
 		)
 		(fp_line
 			(start 1.270001 -1.270001)
@@ -3568,46 +2850,6 @@
 			(uuid "735031e5-62ee-4596-8dac-baa232ea58b6")
 		)
 		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "ad592dff-f77f-4e0b-a495-ddc3a4dba5de")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 4.35)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "651e0d7d-d5b7-44f9-8729-ce439ed7e3e2")
-		)
-		(fp_line
-			(start 1.8 4.35)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "25258eb9-5d1a-4e2e-8a2e-e6d24bf9bf15")
-		)
-		(fp_line
-			(start -1.8 4.35)
-			(end 1.8 4.35)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "388ea62c-3ee9-4d7a-952b-e19238b9833a")
-		)
-		(fp_line
 			(start 1.27 -1.27)
 			(end 1.27 3.81)
 			(stroke
@@ -3822,46 +3064,6 @@
 			(uuid "caae88d8-7677-4a40-94a8-44b4a75c51cb")
 		)
 		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "7327a423-515b-42a5-99aa-646accf5ef4d")
-		)
-		(fp_line
-			(start -1.8 6.85)
-			(end 1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "40049ee1-0736-40b3-b8c1-8f202385dfdd")
-		)
-		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "c6bde46d-43c0-4d66-8e1c-ca02c441e6b9")
-		)
-		(fp_line
-			(start 1.8 6.85)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6b8d8f1f-34da-402c-aeb2-56d5db3de88d")
-		)
-		(fp_line
 			(start -1.27 -0.635)
 			(end -0.635 -1.27)
 			(stroke
@@ -4026,46 +3228,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "927f2f3c-f492-4ac3-90e7-c84051a6a7dc")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "90d392f7-d47e-4084-84d3-d24897aeb256")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "5a40816c-d34b-47a7-a025-da3be3f7dba2")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "3d421ff7-cd3c-42ce-abc6-e3345f819e4c")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -4205,46 +3367,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "e6042694-e35c-483f-b5ea-18031ad7da6b")
-		)
-		(fp_line
-			(start -1.8 34.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "7f796221-7695-482b-a28f-91b2416ecbc5")
-		)
-		(fp_line
-			(start 1.75 34.8)
-			(end -1.8 34.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "9424d6cd-3af4-46de-b3c7-7ec03b82a392")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end 1.75 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "406105ad-e813-426e-af22-3d24665b418a")
-		)
-		(fp_line
-			(start 1.75 -1.8)
-			(end 1.75 34.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "c86248e8-328b-4577-9efb-bb6866dfe1ea")
 		)
 		(fp_line
 			(start -1.27 34.29)
@@ -4532,46 +3654,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "7c77520c-df59-4906-8286-73a8ec66c586")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "40f8d41d-9f90-49c0-89f6-91c166f329ae")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "2d726aa5-b351-4f19-b1a8-f9e763b0406f")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "afbe7ce3-2eb2-4b79-b6d4-babb9492a358")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -4652,28 +3734,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 5.5 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "7143ea25-ac43-4992-9631-4dd05b4459ad")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 5.75 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "d05d82e6-db9b-4d45-9395-c8fdb50b4c98")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -4752,46 +3812,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "a36cbaed-4129-403c-bb40-97122c1b5a22")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "37a73c57-8f65-403a-af74-378a8a9b26ad")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "88763d5e-ee3e-4881-9d93-56835d90e937")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "378b380b-69c1-4fb1-aba8-9259fb833836")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -4872,46 +3892,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "d89a49b3-214a-44d3-ab6b-31895f8d0b19")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "a03b89c3-025b-4286-93b5-fed378ae66d0")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "761ef19b-d1d5-4f96-84e1-8888b2a4ee89")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "8c986edb-3051-41af-a88f-69474fd8921d")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -4992,46 +3972,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "90e32122-1a73-4f83-994d-7cc5ed73eb57")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "dd62bb88-147e-4d6a-970c-3ec5631b07cf")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "4a8716f1-b6a9-4fec-b8e6-488350fa553b")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "00d9fdf2-8623-4808-bd5c-47f65397aa67")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -5112,46 +4052,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "fbe203d6-19b3-4723-b58f-24eebae836fb")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "53e13b7d-ab5a-4800-bc82-c5e4603b2874")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "e3d8dc94-75cb-495d-89ed-3951e323e5d3")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "b0a33265-c1f3-4201-80b4-becdef9a2c34")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -5232,28 +4132,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "8f5fab8d-83b0-4354-9a0c-89b2c918b25c")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "3ce8e8dd-65a4-40ae-910c-2ac131eec74e")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -5332,46 +4210,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "1e1e79e1-638b-4d6e-b56f-ce2a8086aa0d")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "624ca6d3-df6d-4277-ac71-4aee3d8a7619")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "8c98aa6e-a8bb-45e5-a8e0-53cb90a152a0")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "7be1b6b4-fe77-4c8c-b483-74eac46e9c6a")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -5452,46 +4290,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "07d3989e-77c7-4286-921b-28ecbfcb4848")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "8fa5d3eb-2e72-4f19-b0e8-b3d67347ec5c")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "8c585b2c-0a5f-4f76-aa47-64650cdc9af6")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "97171b9b-df63-454f-9334-aff5c0af74d4")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -5633,46 +4431,6 @@
 			(uuid "2cc7f68d-073c-4fbc-ba6f-614590ccc192")
 		)
 		(fp_line
-			(start 1.75 -1.8)
-			(end 1.75 9.4)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "b7e61905-4d30-404b-85e0-714c293d8ba3")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end 1.75 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "b72332a2-2a67-46d2-b987-c134c031c90b")
-		)
-		(fp_line
-			(start 1.75 9.4)
-			(end -1.8 9.4)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "87b71319-9432-4fa7-96bf-466347ef00c0")
-		)
-		(fp_line
-			(start -1.8 9.4)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "8887f925-05e6-42d0-96a8-b92d98766aad")
-		)
-		(fp_line
 			(start 0.635 -1.27)
 			(end 1.27 -0.635)
 			(stroke
@@ -5793,11 +4551,11 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
 		(layer "F.Cu")
 		(uuid "aad704c8-27c4-45e1-8fc9-fafe10654a15")
-		(at 145 62 -90)
+		(at 145 62 180)
 		(descr "Wire Pad, Square, SMD Pad,  5mm x 10mm,")
 		(tags "MesurementPoint Square SMDPad 5mmx10mm ")
 		(property "Reference" "GND_PAD2"
-			(at 0 -3.81 270)
+			(at 0 -3.81 0)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "9b0581e3-6218-4f07-a8b1-bbef0d4cf204")
@@ -5809,8 +4567,9 @@
 			)
 		)
 		(property "Value" "Conn_01x01"
-			(at 0 6.35 270)
+			(at 0 6.35 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "6ffae2e9-9370-4319-8b6a-013d5aa29402")
 			(effects
 				(font
@@ -5820,7 +4579,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 270)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "14f1cee9-1a09-4479-bedf-0f38b89e62d6")
@@ -5832,7 +4591,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 0 0 270)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "05e2de72-8c18-4ca7-aa14-8688e443c219")
@@ -5849,18 +4608,8 @@
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
 		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "64b1ddc7-3f77-4609-a205-413bddbebd1e")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
+			(start 2 1)
+			(end 2 -1)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -5869,18 +4618,8 @@
 			(uuid "2544d5f1-77fb-41c2-8632-ef998b55cf96")
 		)
 		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "43d4a236-cdab-4ffe-9d39-524fd1185682")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
+			(start 2 -1)
+			(end -2 -1)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -5888,20 +4627,29 @@
 			(layer "F.CrtYd")
 			(uuid "f4e62847-1e5d-4d22-84f5-96ffbe556de9")
 		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 270)
-			(layer "F.Fab")
-			(uuid "820a9ff4-518d-4e98-81b5-387d764bddf6")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
+		(fp_line
+			(start -2 1)
+			(end 2 1)
+			(stroke
+				(width 0.05)
+				(type solid)
 			)
+			(layer "F.CrtYd")
+			(uuid "64b1ddc7-3f77-4609-a205-413bddbebd1e")
+		)
+		(fp_line
+			(start -2 -1)
+			(end -2 1)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "43d4a236-cdab-4ffe-9d39-524fd1185682")
 		)
 		(pad "1" smd rect
-			(at 0 0 270)
-			(size 1.5 3.5)
+			(at 0 0 180)
+			(size 3.5 1.5)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(net 14 "/3V3")
 			(pinfunction "Pin_1")
@@ -5968,28 +4716,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 5.5 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "87991a2d-a2ee-437a-898e-e4205765f525")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 5.75 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "cd000b5c-c558-4a08-9e9b-fa2fb37dfea8")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -6068,28 +4794,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "31552ef9-5986-4bdd-a6f4-3d574e3455fd")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "bed5caa9-6af5-4baa-8f8d-c1693623618f")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -6168,46 +4872,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "3ceb0b05-d246-4e76-85ca-4f998024b267")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "46c8fe90-5484-41a7-83a1-8d1c4c616062")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "9bca6749-b697-4a86-9a9f-9cfddd11e350")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "7460382d-cc0a-4833-b75f-3f36a3d77839")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -6251,6 +4915,7 @@
 		(property "Value" "Conn_01x01"
 			(at 0 6.35 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "e4382253-7ba8-4012-9a88-677501022559")
 			(effects
 				(font
@@ -6288,57 +4953,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "09f099af-8638-4c39-97af-cd4c083b4df1")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "7dcf61ac-c711-4fc6-8cb2-4a12b553d31a")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6ce1617d-97b7-49b7-b142-f8bb56e9d9b7")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "0258fdfd-9a2a-4514-9033-c58376feff4b")
-		)
-		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(uuid "ed5b9c10-df0c-43c8-a5df-58263d28e1ed")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(pad "1" smd rect
 			(at 0 0)
 			(size 3.5 1.5)
@@ -6408,28 +5022,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "fb6749a0-9aef-4f4e-afcc-d1831eac0637")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "8c5e2142-31f4-43db-92ea-5b53aa0bcc5f")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -6567,46 +5159,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "28d77eaf-1d73-4da6-9708-b628964c5eef")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "0c17479b-a3ba-48f4-9209-8057cadce7e7")
-		)
-		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "e5d40c42-b409-43c0-9519-9b3345582e11")
-		)
-		(fp_line
-			(start -1.8 6.85)
-			(end 1.8 6.850001)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "a43f9906-1b9a-44b1-ab87-f71dc745cf80")
-		)
-		(fp_line
-			(start 1.8 6.850001)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "27f005a0-6448-45bf-901b-8d2b28c77365")
 		)
 		(fp_line
 			(start -1.270001 -0.635)
@@ -6773,46 +5325,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "81d4f61f-0188-4415-a71f-1b4830b28cac")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "645b966d-1b27-4647-aabb-f611985c1d55")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "5ad18cc9-0de8-4a67-9ef3-e271cab266d3")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "24f7567f-3a67-49ff-a356-b5ee58713b5c")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -6952,46 +5464,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "02afcf49-984a-420a-857a-e871423396bc")
-		)
-		(fp_line
-			(start -1.8 34.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "35e1ffae-dfd4-40f7-b5b2-28593ee38bd6")
-		)
-		(fp_line
-			(start 1.75 34.8)
-			(end -1.8 34.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "3c768465-2875-4a9e-a5dc-0c51c415ed5b")
-		)
-		(fp_line
-			(start -1.8 -1.8)
-			(end 1.75 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6da397b6-63d7-41ec-9f37-1e0a7c68febb")
-		)
-		(fp_line
-			(start 1.75 -1.8)
-			(end 1.75 34.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "54388a8e-d151-4082-bb28-a3df1b8e99d5")
 		)
 		(fp_line
 			(start -1.27 34.29)
@@ -7340,46 +5812,6 @@
 			(uuid "be0c2a91-51db-4985-9faa-cf26ceb7e622")
 		)
 		(fp_line
-			(start -1.8 -1.8)
-			(end 1.75 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "f225062b-327e-4526-ae6b-d9ceaf731d97")
-		)
-		(fp_line
-			(start -1.8 9.4)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6e2b63d3-71cf-4516-bfb5-c683419b99bb")
-		)
-		(fp_line
-			(start 1.75 -1.8)
-			(end 1.75 9.4)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "552acf57-8b16-4c1b-9187-ed845d60cfa7")
-		)
-		(fp_line
-			(start 1.75 9.4)
-			(end -1.8 9.4)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "2fac8a95-2eef-41a5-8782-597000e9e1af")
-		)
-		(fp_line
 			(start -1.27 -1.27)
 			(end 0.635 -1.27)
 			(stroke
@@ -7616,46 +6048,6 @@
 			(uuid "42bd35b0-3bab-4c41-a407-8210684582f9")
 		)
 		(fp_line
-			(start -1.8 -1.8)
-			(end -1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "584c741d-0a4b-42f3-aa14-205de4d44138")
-		)
-		(fp_line
-			(start -1.8 6.85)
-			(end 1.8 6.85)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "99586782-c855-4dad-ada0-a375432e9f91")
-		)
-		(fp_line
-			(start 1.8 -1.8)
-			(end -1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "3288a62f-af74-4d86-a4d4-cdd7bf4f90e5")
-		)
-		(fp_line
-			(start 1.8 6.85)
-			(end 1.8 -1.8)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "022d4feb-2f5d-417a-87b9-60d4e46d5b9e")
-		)
-		(fp_line
 			(start -1.27 -0.635)
 			(end -0.635 -1.27)
 			(stroke
@@ -7820,28 +6212,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr exclude_from_pos_files)
-		(fp_circle
-			(center 0 0)
-			(end 2.2 0)
-			(stroke
-				(width 0.15)
-				(type solid)
-			)
-			(fill no)
-			(layer "Cmts.User")
-			(uuid "abdf296a-f6de-4223-ae8d-a4d8c656bb5b")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 2.45 0)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(fill no)
-			(layer "F.CrtYd")
-			(uuid "78f7041a-58c3-4f8f-bc21-680732aed656")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -7920,46 +6290,6 @@
 		(sheetname "/")
 		(sheetfile "teensypi_v91.kicad_sch")
 		(attr smd exclude_from_pos_files)
-		(fp_line
-			(start -2.75 -5.25)
-			(end -2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "e5c0a04c-4753-4928-8376-449ec865e4dc")
-		)
-		(fp_line
-			(start -2.75 5.25)
-			(end 2.75 5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "4800386d-7d03-4288-ab32-9dce7728b0e5")
-		)
-		(fp_line
-			(start 2.75 -5.25)
-			(end -2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "87d0ea65-eae2-4fb3-ab7a-e12b2ba4493c")
-		)
-		(fp_line
-			(start 2.75 5.25)
-			(end 2.75 -5.25)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "d97760d9-24c8-4e88-91c9-c8a08153d4f5")
-		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
@@ -8099,46 +6429,6 @@
 			)
 			(layer "F.SilkS")
 			(uuid "8ce30942-d326-40ee-a06c-f93cfa8e1633")
-		)
-		(fp_line
-			(start -1.049999 -1.500001)
-			(end -1.05 1.5)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "6c962595-ba2a-4b6d-9459-785219c37d8f")
-		)
-		(fp_line
-			(start 8.670001 -1.5)
-			(end -1.049999 -1.500001)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "c13592ff-dd43-4ad5-99e3-333b1c2a4e60")
-		)
-		(fp_line
-			(start 8.67 1.5)
-			(end 8.670001 -1.5)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "2dca6c8c-2b74-4084-98f9-4f08adb7baf1")
-		)
-		(fp_line
-			(start -1.05 1.5)
-			(end 8.67 1.5)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "d57aed50-398f-46ed-a3cd-c2af2c391a40")
 		)
 		(fp_line
 			(start 6.96 -1.25)
