@@ -89,8 +89,7 @@ class SnnHelper {
             const float MINVAL = -1;
             const float MAXVAL = +1;
 
-            const int ret2 = MAX_SPIKE_TIME -
-                (int)((value - MINVAL) / (MAXVAL - MINVAL) * MAX_SPIKE_TIME);
+            const int ret2 = (int)((value - MAXVAL) / (MINVAL - MAXVAL) * MAX_SPIKE_TIME);
 
             printf("%+3.3f => %03d (%03d)\n", (double)value, ret2, ret1);
 
