@@ -84,15 +84,27 @@ class SnnHelper {
 
         static int encode_input(const float value)
         {
-            return (int)(round(MAX_SPIKE_TIME * (1 - value) / 2));
+            const int ret1 = (int)(round(MAX_SPIKE_TIME * (1 - value) / 2));
+
+            const float MINVAL = -1;
+            const float MAXVAL = +1;
+
+            const int ret2 = MAX_SPIKE_TIME -
+                (int)((value - MINVAL) / (MAXVAL - MINVAL) * MAX_SPIKE_TIME);
+
+            printf("%+3.3f => %03d (%03d)\n", (double)value, ret2, ret1);
+
+            return ret2;
         }
 
         // Decoder ------------------------------------------------------------
 
         static float decode_output(const int spike_time)
         {
-            return ((float)(filter_spike_time(spike_time, 1) - MAX_SPIKE_TIME) * 2
+            const float ret1 = ((float)(filter_spike_time(spike_time, 1) - MAX_SPIKE_TIME) * 2
                     / MAX_SPIKE_TIME - 2);
+
+            return ret1;
         }
 
         // Visualization helpers ----------------------------------------------
