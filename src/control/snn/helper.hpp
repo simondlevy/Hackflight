@@ -64,11 +64,7 @@ class SnnHelper {
             //_net.run(timesteps, demand, dz, 1);
 
             // Encode the inputs (note clamped value for third input)
-            _net.run(timesteps,
-                    demand,
-                    encode_input(demand),
-                    encode_input(dz),
-                    encode_input(1));
+            _net.run(timesteps, demand, dz, 1);
 
             // Decode the output firing time to a difference in [-2,+2]
             const float error = decode_output(_net.get_o_spike_time());
@@ -81,16 +77,6 @@ class SnnHelper {
             return airborne ?
                 Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
                         THRUST_MIN, THRUST_MAX) : 0;
-        }
-
-        // Encoder -----------------------------------------------------------
-
-        static int encode_input(const float value)
-        {
-            const float MINVAL = +1;
-            const float MAXVAL = -1;
-
-            return (int)((value - MINVAL) / (MAXVAL - MINVAL) * MAX_SPIKE_TIME);
         }
 
         // Decoder ------------------------------------------------------------
