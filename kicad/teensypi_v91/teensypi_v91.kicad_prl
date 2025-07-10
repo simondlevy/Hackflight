@@ -62,7 +62,11 @@
       "unconnected-(GND_PAD14-Pin_1-Pad1)",
       "unconnected-(GND_PAD15-Pin_1-Pad1)",
       "unconnected-(GND_PAD16-Pin_1-Pad1)",
-      "unconnected-(GND_PAD17-Pin_1-Pad1)"
+      "unconnected-(GND_PAD17-Pin_1-Pad1)",
+      "unconnected-(GND_PAD18-Pin_1-Pad1)",
+      "unconnected-(GND_PAD19-Pin_1-Pad1)",
+      "unconnected-(GND_PAD20-Pin_1-Pad1)",
+      "unconnected-(GND_PAD21-Pin_1-Pad1)"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -146,16 +150,16 @@
       9
     ],
     "col_widths": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      51
     ],
     "custom_group_rules": [],
     "expanded_rows": [],

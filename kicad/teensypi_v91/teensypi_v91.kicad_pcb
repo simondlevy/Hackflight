@@ -383,7 +383,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "12487103-49de-4638-b4f5-ffb1022dd0d6")
-		(at 120 136)
+		(at 116.25 137)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_3_3"
@@ -461,7 +461,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "14ba2a5b-1cf7-4874-b24f-3161ed77b8c7")
-		(at 111.801001 135)
+		(at 111 132.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_3_1"
@@ -539,14 +539,14 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "20e199f6-369f-424d-b490-9b4de60fd48e")
-		(at 192 136)
+		(at 191.75 131.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_2_4"
 			(at 0 -3.2 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "b84f729e-67ba-44ee-beaa-fbd3825fafbd")
+			(uuid "a5382e2b-9516-45f7-b897-a7fd41cd4f1b")
 			(effects
 				(font
 					(size 1 1)
@@ -557,7 +557,7 @@
 		(property "Value" "MountingHole"
 			(at 0 3.2 0)
 			(layer "F.Fab")
-			(uuid "741a31cf-5148-4e08-908f-d1968091d066")
+			(uuid "ef5747c3-4a2f-4400-8154-2d18e6706027")
 			(effects
 				(font
 					(size 1 1)
@@ -569,7 +569,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "ad64f28a-d768-4ef7-bf15-fcbd5c3556d0")
+			(uuid "a53e5984-aecb-48bf-9191-06fbf497d73f")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -581,7 +581,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9e6934df-f40e-4590-ba5e-96876b399db8")
+			(uuid "a907b44b-f146-4302-bcb8-732502a0d69b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -606,7 +606,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -1 0)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -617,14 +617,14 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "21d42b02-1bf2-476c-8b0e-9890b6922f41")
-		(at 199 136)
+		(at 196.5 137.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_2_3"
 			(at 0 -3.2 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "9f6bfbe4-4b3a-481d-90f8-7c194196cea9")
+			(uuid "bdfdb47b-a70e-44ea-b069-a2da002ca7c5")
 			(effects
 				(font
 					(size 1 1)
@@ -635,7 +635,7 @@
 		(property "Value" "MountingHole"
 			(at 0 3.2 0)
 			(layer "F.Fab")
-			(uuid "f65fb00a-5980-43ce-86f7-6e1fb5f3bd0f")
+			(uuid "c6ceb121-b326-48a2-92d0-fb07701e9cbb")
 			(effects
 				(font
 					(size 1 1)
@@ -647,7 +647,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "68870b23-3973-4d57-b84f-054ea9f53281")
+			(uuid "c729218e-fc05-4d3e-8842-94fd48eb3f52")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -659,7 +659,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "577e5ce7-37f9-41db-9c92-5d6e2ec1f9d8")
+			(uuid "40f54a1e-e6e0-40b4-9ad5-2a07f7b3a220")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -684,7 +684,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -0.75 -0.5)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -695,7 +695,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "2f0c3db6-c6b8-439a-9c43-c635ba4c0310")
-		(at 112 129)
+		(at 121.5 132.158893)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_3_4"
@@ -773,7 +773,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "35a1cfaa-94f2-4977-9f1d-1e362061e4ae")
-		(at 120 58)
+		(at 117 60.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_4_4"
@@ -840,7 +840,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at 0.3 -0.25)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -851,7 +851,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "379933b1-e566-45bc-a934-5ca890ed1351")
-		(at 114.05 52.05)
+		(at 116.75 50.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_4_1"
@@ -1165,14 +1165,14 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "3c1ae2bb-9031-4597-8a69-7cd7f0ce6b58")
-		(at 201 130.65)
+		(at 201.75 131.4)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_2_2"
 			(at 0 -3.2 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "59f905ad-0f8d-40dd-8845-e535f46df37e")
+			(uuid "66912826-e6d6-4ac3-bcbf-26f9c77f82ad")
 			(effects
 				(font
 					(size 1 1)
@@ -1183,7 +1183,7 @@
 		(property "Value" "MountingHole"
 			(at 0 3.2 0)
 			(layer "F.Fab")
-			(uuid "ef1241bd-4440-4e06-854b-bfc52527006c")
+			(uuid "2595ea3f-6c71-4d8e-9a19-fc63d55d502c")
 			(effects
 				(font
 					(size 1 1)
@@ -1195,7 +1195,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "2d9eda44-6767-408a-8dad-18af76bd7ec0")
+			(uuid "fb64e77b-fc9d-4bf7-9344-168ead948661")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1207,7 +1207,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6a5a7ba4-77fb-4fe6-9c30-b65cc1892da8")
+			(uuid "b9aa1c19-a7d3-4f60-97e9-81e009222cb2")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1232,7 +1232,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -0.75 0.35)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -1323,14 +1323,14 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "4a004258-b779-4019-8422-2465f44f0964")
-		(at 194 127)
+		(at 196.25 127.5)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_2_1"
 			(at 0 -3.2 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "31bd9700-d085-48e6-bcf7-4b0e0ebf66c3")
+			(uuid "15b32a7e-54fa-4259-9344-8329a12d5823")
 			(effects
 				(font
 					(size 1 1)
@@ -1341,7 +1341,7 @@
 		(property "Value" "MountingHole"
 			(at 0 3.2 0)
 			(layer "F.Fab")
-			(uuid "7523d5b7-6c00-4e30-a492-d36dadaed45f")
+			(uuid "879dd0d1-4cb0-494c-ae0b-047e90609c64")
 			(effects
 				(font
 					(size 1 1)
@@ -1353,7 +1353,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "c5f3febb-1385-4719-8806-aa8db3a8cdb0")
+			(uuid "c0edf705-c87b-4dc8-8c81-104aaf939128")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1365,7 +1365,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "4775e4d7-2410-47c5-af04-87fed2871e92")
+			(uuid "ea21080d-a55c-4836-89e9-850b4f0a7b54")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1390,7 +1390,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -0.5 -0.5)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -1626,14 +1626,14 @@
 	(footprint "MountingHole:MountingHole_5.5mm"
 		(layer "F.Cu")
 		(uuid "5ae29760-b9a2-4ec5-8254-2406005bf79e")
-		(at 196 132)
+		(at 196.75 132.75)
 		(descr "Mounting Hole 5.5mm, no annular")
 		(tags "mounting hole 5.5mm no annular")
 		(property "Reference" "M2_center1"
 			(at 0 -6.5 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "255eec71-a6f6-472e-97a5-aa182987b35d")
+			(uuid "cb647e4c-32b1-4299-9067-f8f3c861b968")
 			(effects
 				(font
 					(size 1 1)
@@ -1644,7 +1644,7 @@
 		(property "Value" "MountingHole"
 			(at 0 6.5 0)
 			(layer "F.Fab")
-			(uuid "1d5f9c7b-bd63-453a-bb62-0a24b03f8b19")
+			(uuid "3d0ea13d-7fc8-4537-a7db-321ffbd39c6f")
 			(effects
 				(font
 					(size 1 1)
@@ -1656,7 +1656,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "f587c948-a7c8-47c8-800f-1e1c0beee413")
+			(uuid "8fc2b4dd-44a4-4c9b-95cf-c90a0f629d27")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1668,7 +1668,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "bb17d8c3-a6fd-455a-90e9-68ab4736e71f")
+			(uuid "71191a62-dfb1-4d5d-8918-0d3491c23b98")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1693,7 +1693,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -0.75 -0.75)
 			(size 5.5 5.5)
 			(drill 5.5)
 			(layers "*.Cu" "*.Mask")
@@ -4321,7 +4321,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "a1ef30bd-e6a2-47d3-8339-d0092c7cc2db")
-		(at 120 52.05)
+		(at 122.25 54.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_4_3"
@@ -4388,7 +4388,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -0.25 0.75)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -5171,7 +5171,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "c97efdc1-60e7-4be1-95a7-ff977af5653d")
-		(at 114.05 58)
+		(at 112.5 55.5)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_4_2"
@@ -5238,7 +5238,7 @@
 			)
 		)
 		(pad "" np_thru_hole circle
-			(at 0 0)
+			(at -0.3 -0.2)
 			(size 2.2 2.2)
 			(drill 2.2)
 			(layers "*.Cu" "*.Mask")
@@ -6361,7 +6361,7 @@
 	(footprint "MountingHole:MountingHole_2.2mm_M2"
 		(layer "F.Cu")
 		(uuid "f1d27a43-0e6b-4bac-a4fe-a69428d37d58")
-		(at 121 128)
+		(at 116.5 127.25)
 		(descr "Mounting Hole 2.2mm, no annular, M2")
 		(tags "mounting hole 2.2mm no annular m2")
 		(property "Reference" "M_3_2"
