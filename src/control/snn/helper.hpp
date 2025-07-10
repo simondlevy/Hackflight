@@ -65,6 +65,7 @@ class SnnHelper {
 
             // Encode the inputs (note clamped value for third input)
             _net.run(timesteps,
+                    demand,
                     encode_input(demand),
                     encode_input(dz),
                     encode_input(1));
@@ -86,16 +87,10 @@ class SnnHelper {
 
         static int encode_input(const float value)
         {
-            const int ret1 = (int)(round(MAX_SPIKE_TIME * (1 - value) / 2));
+            const float MINVAL = +1;
+            const float MAXVAL = -1;
 
-            const float MINVAL = -1;
-            const float MAXVAL = +1;
-
-            const int ret2 = (int)((value - MAXVAL) / (MINVAL - MAXVAL) * MAX_SPIKE_TIME);
-
-            printf("%+3.3f => %03d (%03d)\n", (double)value, ret2, ret1);
-
-            return ret2;
+            return (int)((value - MINVAL) / (MAXVAL - MINVAL) * MAX_SPIKE_TIME);
         }
 
         // Decoder ------------------------------------------------------------
