@@ -1,0 +1,1859 @@
+(kicad_pcb
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(general
+		(thickness 1.6)
+		(legacy_teardrops no)
+	)
+	(paper "A4")
+	(layers
+		(0 "F.Cu" signal)
+		(2 "B.Cu" signal)
+		(9 "F.Adhes" user "F.Adhesive")
+		(11 "B.Adhes" user "B.Adhesive")
+		(13 "F.Paste" user)
+		(15 "B.Paste" user)
+		(5 "F.SilkS" user "F.Silkscreen")
+		(7 "B.SilkS" user "B.Silkscreen")
+		(1 "F.Mask" user)
+		(3 "B.Mask" user)
+		(17 "Dwgs.User" user "User.Drawings")
+		(19 "Cmts.User" user "User.Comments")
+		(21 "Eco1.User" user "User.Eco1")
+		(23 "Eco2.User" user "User.Eco2")
+		(25 "Edge.Cuts" user)
+		(27 "Margin" user)
+		(31 "F.CrtYd" user "F.Courtyard")
+		(29 "B.CrtYd" user "B.Courtyard")
+		(35 "F.Fab" user)
+		(33 "B.Fab" user)
+		(39 "User.1" user)
+		(41 "User.2" user)
+		(43 "User.3" user)
+		(45 "User.4" user)
+		(47 "User.5" user)
+		(49 "User.6" user)
+		(51 "User.7" user)
+		(53 "User.8" user)
+		(55 "User.9" user)
+	)
+	(setup
+		(pad_to_mask_clearance 0.3)
+		(allow_soldermask_bridges_in_footprints no)
+		(tenting front back)
+		(pcbplotparams
+			(layerselection 0x00000000_00000000_55555555_5755f5ff)
+			(plot_on_all_layers_selection 0x00000000_00000000_00000000_00000000)
+			(disableapertmacros no)
+			(usegerberextensions no)
+			(usegerberattributes yes)
+			(usegerberadvancedattributes yes)
+			(creategerberjobfile yes)
+			(dashed_line_dash_ratio 12.000000)
+			(dashed_line_gap_ratio 3.000000)
+			(svgprecision 6)
+			(plotframeref no)
+			(mode 1)
+			(useauxorigin no)
+			(hpglpennumber 1)
+			(hpglpenspeed 20)
+			(hpglpendiameter 15.000000)
+			(pdf_front_fp_property_popups yes)
+			(pdf_back_fp_property_popups yes)
+			(pdf_metadata yes)
+			(pdf_single_document no)
+			(dxfpolygonmode yes)
+			(dxfimperialunits yes)
+			(dxfusepcbnewfont yes)
+			(psnegative no)
+			(psa4output no)
+			(plot_black_and_white yes)
+			(sketchpadsonfab no)
+			(plotpadnumbers no)
+			(hidednponfab no)
+			(sketchdnponfab yes)
+			(crossoutdnponfab yes)
+			(subtractmaskfromsilk no)
+			(outputformat 1)
+			(mirror no)
+			(drillshape 1)
+			(scaleselection 1)
+			(outputdirectory "")
+		)
+	)
+	(net 0 "")
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "0beae2a8-d37c-4480-ac99-83b65127bff8")
+		(at 190.014379 54.12988)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_1_3"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "b71f2dea-7531-4971-a5c5-64bd2110a111")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "7466608d-8cca-48c9-a3e8-04eb1e91e4f1")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0932d427-c047-4a20-934e-87c49fb6c647")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f7a8b0bd-39ed-421a-8362-283bb2cc6fc1")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/0bba5cc0-f994-41ff-8efc-31afeee2a0e9")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "993db8ec-5a2b-4695-b5b6-c1568baac6a0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "b5ec8af6-c3ce-44d2-b2bc-84cc5d7fa7ea")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "12487103-49de-4638-b4f5-ffb1022dd0d6")
+		(at 116.25 137)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_3_3"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "bb35f082-d223-4a91-9d7d-13902809fe6e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "ee77eadd-f34a-4af9-98bd-34095c582162")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2f752c13-6f05-4385-9e5b-66c87024ea32")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "71a3a40e-7c3e-4902-a47b-c937d350a69f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/0bd51300-486a-4249-ab92-db0d015d47de")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "1896ce82-7c53-435a-8773-73a6e54fb89d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "623cf274-fddd-4741-b235-55ba17ae92a4")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "14ba2a5b-1cf7-4874-b24f-3161ed77b8c7")
+		(at 111 132.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_3_1"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "a3bb5647-300d-44cc-a039-3329899eb01f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "df90fcea-0695-4161-b6ff-c4692943810d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "47febdeb-248b-408f-8db5-418bb8de97d0")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1eaffbf8-5b28-4e7d-b905-86022264b094")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/7d2fa1ee-45d0-4daf-ab6c-eea9482f7b29")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "d373419f-979d-4441-8c9d-246e2ae9ca4c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "d3ca69f2-acce-49f4-b7ea-79ec1785d60d")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "20e199f6-369f-424d-b490-9b4de60fd48e")
+		(at 191.75 131.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_2_4"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "a5382e2b-9516-45f7-b897-a7fd41cd4f1b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "ef5747c3-4a2f-4400-8154-2d18e6706027")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a53e5984-aecb-48bf-9191-06fbf497d73f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a907b44b-f146-4302-bcb8-732502a0d69b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/70ce20ec-6395-4876-8832-ffd2bf7e4e26")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "a9b01e5e-aed4-4fa2-9bac-443281dc77c0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -1 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "6ea2a16e-5af3-4f35-b8cf-d4f368df331d")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "21d42b02-1bf2-476c-8b0e-9890b6922f41")
+		(at 196.5 137.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_2_3"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "bdfdb47b-a70e-44ea-b069-a2da002ca7c5")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "c6ceb121-b326-48a2-92d0-fb07701e9cbb")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c729218e-fc05-4d3e-8842-94fd48eb3f52")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "40f54a1e-e6e0-40b4-9ad5-2a07f7b3a220")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/97f0b22d-fa43-4b1e-9962-f2badbfa5e8e")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "f9672b61-f092-4153-9c38-7b01eb91982f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.75 -0.5)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "a9e45a36-cfa1-424b-813a-ce8a829a8fcf")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "2f0c3db6-c6b8-439a-9c43-c635ba4c0310")
+		(at 121.5 132.158893)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_3_4"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "094a46c0-9a9d-49e6-8967-f4a33e6c5d95")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "a9961fde-320e-4401-8b85-719ef8b80976")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "166daf1f-25bc-490c-9b5b-c53a095ff6e9")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4f4e9c69-ed83-43e9-96e2-76d2a4d3ed16")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/c7f8c089-9d24-4a33-8495-d1e23e40917d")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "5e3569db-db41-40b9-a976-e159dbb82a83")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "7d3e2da8-b953-4813-8c8f-2f333f5756b9")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "35a1cfaa-94f2-4977-9f1d-1e362061e4ae")
+		(at 117 60.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_4_4"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "4fb9612d-ab5d-4576-8f75-f01bf5d2f16c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "e660775e-4c2f-4b02-93ac-bd8d3c7ebdc9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "53acad53-3d97-4d5e-aba1-dffb74c01072")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2add3d74-0e18-4059-b558-4788177c69b9")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/79f48863-d3bb-4800-ac3c-2e3947735246")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "2f2a82d1-aac9-451a-ad1a-cfe6f30324e8")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0.3 -0.25)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "96d2dd5e-b6a4-4cf0-9422-56c0d02e770f")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "379933b1-e566-45bc-a934-5ca890ed1351")
+		(at 116.75 50.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_4_1"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "14c867f7-614a-4079-b0a4-c2ff39384202")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "822a9857-7ec7-445e-aef1-303091201d32")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1c062dc4-ba00-47b3-bed1-3e1afadf991b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d9b650a5-0e95-4065-8ac6-a06b5528566d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/b6f5888b-7553-478b-ba18-c287dbd55416")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "00e1ca84-fedf-456a-a339-5cfddd444497")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "b12b8c09-d7e1-415c-b142-f044807274f3")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "3c1ae2bb-9031-4597-8a69-7cd7f0ce6b58")
+		(at 201.75 131.4)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_2_2"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "66912826-e6d6-4ac3-bcbf-26f9c77f82ad")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "2595ea3f-6c71-4d8e-9a19-fc63d55d502c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "fb64e77b-fc9d-4bf7-9344-168ead948661")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b9aa1c19-a7d3-4f60-97e9-81e009222cb2")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/cfb680d3-daeb-4702-8108-d8f3936de333")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "b62cf724-68c1-4772-b781-04c4a9a997a1")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.75 0.35)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "661fe9ee-8ebf-4c01-ba97-c12f1544e431")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "4a004258-b779-4019-8422-2465f44f0964")
+		(at 196.25 127.5)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_2_1"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "15b32a7e-54fa-4259-9344-8329a12d5823")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "879dd0d1-4cb0-494c-ae0b-047e90609c64")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c0edf705-c87b-4dc8-8c81-104aaf939128")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ea21080d-a55c-4836-89e9-850b4f0a7b54")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/e8b93a24-d3e3-4428-9060-540b4286b5f2")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "5b2d52b5-0700-49b0-9460-90b97fc4555b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.5 -0.5)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "fc54839e-0f95-449f-b340-d93bcf7d0735")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_5.5mm"
+		(layer "F.Cu")
+		(uuid "5ae29760-b9a2-4ec5-8254-2406005bf79e")
+		(at 196.75 132.75)
+		(descr "Mounting Hole 5.5mm, no annular")
+		(tags "mounting hole 5.5mm no annular")
+		(property "Reference" "M2_center1"
+			(at 0 -6.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "cb647e4c-32b1-4299-9067-f8f3c861b968")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 6.5 0)
+			(layer "F.Fab")
+			(uuid "3d0ea13d-7fc8-4537-a7db-321ffbd39c6f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "8fc2b4dd-44a4-4c9b-95cf-c90a0f629d27")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "71191a62-dfb1-4d5d-8918-0d3491c23b98")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/96057e6e-b074-47e3-a354-40a4abc98a50")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "04a45b7b-3f89-4307-b3a1-fd1c7dfc6a29")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.75 -0.75)
+			(size 5.5 5.5)
+			(drill 5.5)
+			(layers "*.Cu" "*.Mask")
+			(uuid "aa9fc9b6-a9ce-4ac5-abdc-ee9b782ea792")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "666c0fed-1771-4a86-a373-bf867e18b9ae")
+		(at 200.287968 54.259925)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_1_2"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "f991140c-16d5-45ea-a17a-eeb7ef7591e7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "d2c8aaca-1dc3-49a6-be0a-1543b5efc0e1")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "df56e5a4-1fea-42a6-b828-db316b6a9792")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ebd958e0-cfcf-486a-9c5f-85cd5af6d978")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/bf516b89-0c79-47e0-893d-964c0dabb751")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "6f6107ad-6ec3-4f7b-8e81-ea8c002fcc80")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.207968 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "fc90cb4b-72be-4991-9b6f-427df30c21b6")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "742b1af7-39ed-4469-9244-874ad3345507")
+		(at 194.703926 60.157936)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_1_4"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "c4a10640-6dab-4279-816e-f8d34d6f3709")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "0850e63f-e7cc-41a0-8504-2c9c90dfcb6a")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ff11bf7d-e756-4739-8007-c5a55632ecca")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a2960ace-1e03-482a-9095-fb1fbf82df9b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/f2c9c829-948f-43ab-a2f5-6eabb1c59efd")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "81b15212-c0c1-489b-b57b-1c1e7a871102")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0.296074 -0.657936)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "42037cf6-87c8-4da6-9dbb-c2e42a2df823")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_5.5mm"
+		(layer "F.Cu")
+		(uuid "74c5c918-c7df-43ac-b38b-698293fb812a")
+		(at 117 55)
+		(descr "Mounting Hole 5.5mm, no annular")
+		(tags "mounting hole 5.5mm no annular")
+		(property "Reference" "M4_center1"
+			(at 0 -6.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "48e24d75-635f-4c23-9900-36f419f95b6b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 6.5 0)
+			(layer "F.Fab")
+			(uuid "cc91e9d2-58b4-4fd8-a1cf-4017e264e288")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "dc86a952-d085-4f93-8901-69068aa76e94")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "64b2f9c3-97fb-4a10-8599-fe6504fa2438")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/092f7a55-3566-4d6f-8d02-8b2e71cda649")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "18964503-6b07-4539-bc90-bf86075d9efc")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 5.5 5.5)
+			(drill 5.5)
+			(layers "*.Cu" "*.Mask")
+			(uuid "63c08a6a-0fe6-4c66-b6b3-22d0a611eac8")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_5.5mm"
+		(layer "F.Cu")
+		(uuid "8f4bcfcd-fccf-485a-a033-fb9bcc495540")
+		(at 195 54.788897)
+		(descr "Mounting Hole 5.5mm, no annular")
+		(tags "mounting hole 5.5mm no annular")
+		(property "Reference" "M1_center1"
+			(at 0 -6.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "030dd156-b557-4f6b-8a08-2416bf17a698")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 6.5 0)
+			(layer "F.Fab")
+			(uuid "ceef7129-4196-4866-bd9a-4b8d6b77d6c4")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "8a269a62-f32a-4b2f-8439-61f85e42057c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "493ac4e2-1eff-44f9-9a1d-aedd67b9603d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/36045eed-4a54-4c50-bf6d-1a6dd693c5b7")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "1a5161ca-cf87-43b6-b748-83d04461d1f3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 5.5 5.5)
+			(drill 5.5)
+			(layers "*.Cu" "*.Mask")
+			(uuid "ad024949-4569-4f96-9a4e-575b8fd0a0ff")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "a1ef30bd-e6a2-47d3-8339-d0092c7cc2db")
+		(at 122.25 54.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_4_3"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "96c326da-ee7d-4be3-b7a7-0a595caa2127")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "8b609821-a75f-410d-812c-ac9602a78433")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7d7ae016-dde5-49fb-a4f3-37019d4a83bd")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6f619c3e-007e-403b-af38-89f202fcde63")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/691d2a48-228f-4969-a535-5e2b3f559990")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "12663a6d-2d92-4241-97ea-33e6fe82a02a")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.25 0.75)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "a6d3e2e2-cb27-4e8f-a1ee-c404c579ea2e")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_5.5mm"
+		(layer "F.Cu")
+		(uuid "abfb10c2-47b0-4aa3-8893-14feb03f699e")
+		(at 116.551068 132.158893)
+		(descr "Mounting Hole 5.5mm, no annular")
+		(tags "mounting hole 5.5mm no annular")
+		(property "Reference" "M3_center1"
+			(at 0 -6.5 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "bd0f0ffb-79aa-4c90-ab72-0dc1241e975c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 6.5 0)
+			(layer "F.Fab")
+			(uuid "3985b02d-6271-433d-a7c5-5c2ea82f63d2")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1e1d8817-d3c4-47cc-b2cb-a496bdbc355d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "56e68f54-6010-4c47-a639-1dc978e03b34")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/e150ad66-7999-4690-bfb0-f2d94a0e4aeb")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "6e43c5c3-f070-4997-a498-debd59f223f3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 5.5 5.5)
+			(drill 5.5)
+			(layers "*.Cu" "*.Mask")
+			(uuid "b2278b51-7300-49d9-8d6f-0eeb7fa76ff3")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "b059b6ea-aa56-4420-b136-064ab9e29647")
+		(at 194.521128 49.533448)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_1_1"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "75ecb0a5-2b8c-4387-b49d-798467ed66ba")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "0d31283b-2081-4e50-8c44-34467c1aaadd")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e7fa6111-8483-4d37-a330-31ea1c4f589d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4b663189-6c3c-4ebb-a6e1-5bc13917aab0")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/813de125-64b3-4821-ae66-da709f587e4a")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "ff2575ad-d53e-4851-a358-d9822ec3b48f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0.5 0.5)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "650a3a28-6fc2-4308-ac0c-31ad4bceb59a")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "c97efdc1-60e7-4be1-95a7-ff977af5653d")
+		(at 112.5 55.5)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_4_2"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "023ca580-ea4c-4d43-ac2f-7717fa1dabc9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "7706d4b8-4d51-4cba-9076-fef9172db336")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "229ca4fb-f776-4283-9687-249ca0f8350b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5ad78f75-c84f-4b60-a9e1-2cc95271b25f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/c6f641cf-7a9f-451a-b6b8-6312923ea756")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "fb5748a6-4f5c-4a83-a289-300a40f97bcb")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at -0.3 -0.2)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "1d15c564-f711-4a42-badf-3b7e444e457a")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "MountingHole:MountingHole_2.2mm_M2"
+		(layer "F.Cu")
+		(uuid "f1d27a43-0e6b-4bac-a4fe-a69428d37d58")
+		(at 116.5 127.25)
+		(descr "Mounting Hole 2.2mm, no annular, M2")
+		(tags "mounting hole 2.2mm no annular m2")
+		(property "Reference" "M_3_2"
+			(at 0 -3.2 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "a6b04284-0ba6-436c-96fb-df21be6c39b7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 0 3.2 0)
+			(layer "F.Fab")
+			(uuid "416529e4-a516-4b37-ad33-aeaf2ff6d30b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "12780dc7-e7f6-4636-a397-d06086ff889d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c4956bff-dd5a-4d85-a7cc-7880fd5e6dd3")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "MountingHole*")
+		(path "/2e4cfcb2-6538-4393-b2b7-f54ad2a17840")
+		(sheetname "/")
+		(sheetfile "teensypi_v91.kicad_sch")
+		(attr exclude_from_pos_files)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "827046c8-a3bd-4ce2-a921-09e723c6a5f5")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "" np_thru_hole circle
+			(at 0 0)
+			(size 2.2 2.2)
+			(drill 2.2)
+			(layers "*.Cu" "*.Mask")
+			(uuid "670c6b7b-0508-4318-83a1-9a62201629b9")
+		)
+		(embedded_fonts no)
+	)
+	(gr_line
+		(start 120.216944 120.178981)
+		(end 115.55222 124.95375)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "04325fb0-c7bd-4f0c-8480-5867aa55303e")
+	)
+	(gr_arc
+		(start 116.000829 62.205143)
+		(mid 112.249932 49.490982)
+		(end 124.273737 55.071953)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "0fccc444-dae6-491c-beb4-af4d745c44f2")
+	)
+	(gr_line
+		(start 127.764122 128.320588)
+		(end 123.824805 132.08694)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "10ee402c-5bb2-40b0-a1f5-bb0d77807dd4")
+	)
+	(gr_line
+		(start 182.644321 59.767552)
+		(end 191.024615 67.035022)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "1ba69cbf-6d2b-4c75-91ac-fc2f40a1ce56")
+	)
+	(gr_line
+		(start 183.789339 127.091099)
+		(end 191.581835 119.427832)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "2b3622b7-ab2d-430a-99f1-3fa0ea452e45")
+	)
+	(gr_arc
+		(start 187.726263 54.86085)
+		(mid 199.750067 49.279878)
+		(end 195.999173 61.99404)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "2cb7d2b5-a5a7-4838-9ffa-0f9c75b954c1")
+	)
+	(gr_line
+		(start 196 62)
+		(end 191.024615 67.035022)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "2ceeb6b3-afc9-4ac9-b743-0538a7f35e68")
+	)
+	(gr_line
+		(start 120.216944 120.178981)
+		(end 127.764122 128.320588)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "43f2ff7a-5544-4299-be79-4e1c20eedba4")
+	)
+	(gr_line
+		(start 191.581835 119.427832)
+		(end 196.999173 124.794857)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "4f35946a-0fc7-477b-a471-ccaa8018a51c")
+	)
+	(gr_line
+		(start 124.273737 55.071953)
+		(end 130.79763 61.311523)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "5731caff-2a83-416c-b704-909b2f33883a")
+	)
+	(gr_arc
+		(start 123.824805 132.08694)
+		(mid 111.801001 137.667912)
+		(end 115.551895 124.95375)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "65cb4466-3123-4d1b-bc07-4e54343c23ae")
+	)
+	(gr_line
+		(start 183.789339 127.091099)
+		(end 188.726263 131.928047)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "6c633214-4497-47e5-9484-586ed8afaadd")
+	)
+	(gr_line
+		(start 130.79763 61.311523)
+		(end 122.612727 68.752705)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "cdbd54e5-96af-4102-847b-45e3d8a3ead0")
+	)
+	(gr_line
+		(start 187.726263 54.86085)
+		(end 182.644321 59.767552)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "ce48d875-728c-4237-8250-afe279956635")
+	)
+	(gr_arc
+		(start 196.999173 124.794857)
+		(mid 200.750067 137.509019)
+		(end 188.726263 131.928047)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "f2ef0067-fc94-4e1d-8633-1f4f9bd8b788")
+	)
+	(gr_line
+		(start 116.000836 62.205143)
+		(end 122.612727 68.752705)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "Edge.Cuts")
+		(uuid "f9039365-8fb5-4b07-ba87-7626a98fc148")
+	)
+	(gr_text "M4"
+		(at 124.273737 55.071953 45)
+		(layer "F.SilkS")
+		(uuid "5bcace5d-edd0-4e19-92d0-835e43cf8eb2")
+		(effects
+			(font
+				(size 3.5052 3.5052)
+				(thickness 0.3048)
+			)
+			(justify right top)
+		)
+	)
+	(gr_text "M2"
+		(at 191.805318 122.360983 45)
+		(layer "F.SilkS")
+		(uuid "6ec113ca-7d27-4b14-a180-1e5e2fd1c167")
+		(effects
+			(font
+				(size 3.5052 3.5052)
+				(thickness 0.3048)
+			)
+			(justify right top)
+		)
+	)
+	(gr_text "M3"
+		(at 125.754067 127.777914 315)
+		(layer "F.SilkS")
+		(uuid "bd065eaf-e495-4837-bdb3-129934de1fc7")
+		(effects
+			(font
+				(size 3.5052 3.5052)
+				(thickness 0.3048)
+			)
+			(justify right top)
+		)
+	)
+	(gr_text "M1"
+		(at 193.065793 61.512821 315)
+		(layer "F.SilkS")
+		(uuid "cb24efdd-07c6-4317-9277-131625b065ac")
+		(effects
+			(font
+				(size 3.5052 3.5052)
+				(thickness 0.3048)
+			)
+			(justify right top)
+		)
+	)
+	(embedded_fonts no)
+)
