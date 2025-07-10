@@ -16,6 +16,7 @@
 
 #pragma once
 
+// #include <new_max_100.hpp>
 #include <max_100.hpp>
 
 #include <control/pids/altitude.hpp>
@@ -59,16 +60,17 @@ class SnnHelper {
 
             const int timesteps = 3 * MAX_SPIKE_TIME + 2;
 
-            // Encode the inputs and apply their spikes
-            _net.apply_spike_to_node_0(encode_input(demand));
-            _net.apply_spike_to_node_1(encode_input(dz));
-            _net.apply_spike_to_node_2(encode_input(1)); // clamped
-
             // Run the network
-            _net.run(timesteps);
+            //_net.run(timesteps, demand, dz, 1);
+
+            // Encode the inputs (note clamped value for third input)
+            _net.run(timesteps,
+                    encode_input(demand),
+                    encode_input(dz),
+                    encode_input(1));
 
             // Decode the output firing time to a difference in [-2,+2]
-            const float error = decode_output(_net.get_n5_spike_time());
+            const float error = decode_output(_net.get_o_spike_time());
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -115,12 +117,12 @@ class SnnHelper {
 
         int get_i1_spike_count()
         {
-            return zero_until_hovering(_net.get_n0_spike_time());
+            return zero_until_hovering(_net.get_i1_spike_time());
         }
 
         int get_i2_spike_count()
         {
-            return zero_until_hovering(_net.get_n1_spike_time());
+            return zero_until_hovering(_net.get_i2_spike_time());
         }
 
         int get_s_spike_count()
@@ -130,22 +132,22 @@ class SnnHelper {
 
         int get_d1_spike_count()
         {
-            return filter_d(_net.get_n3_spike_time());
+            return filter_d(_net.get_d1_spike_time());
         }
 
         int get_d2_spike_count()
         {
-            return filter_d(_net.get_n4_spike_time());
+            return filter_d(_net.get_d2_spike_time());
         }
 
         int get_o_spike_count()
         {
-            return filter_output(_net.get_n5_spike_time());
+            return filter_output(_net.get_o_spike_time());
         }
 
         int get_s2_spike_count()
         {
-            return filter_output(_net.get_n6_spike_time());
+            return filter_output(_net.get_s2_spike_time());
         }
 
         int filter_output(const int spike_time)
