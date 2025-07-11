@@ -81,10 +81,17 @@ class SnnHelper {
 
         static float decode_output(const int spike_time)
         {
-            const float ret1 = ((float)(filter_spike_time(spike_time, 1) - MAX_SPIKE_TIME) * 2
-                    / MAX_SPIKE_TIME - 2);
+            const float dmin = -2;
+            const float dmax = +2;
 
-            return ret1;
+            const int filtered_spike_time = filter_spike_time(spike_time, 1); 
+
+            const float scaled_spike_time = (float)(filtered_spike_time - MAX_SPIKE_TIME);
+
+            const float retval = (scaled_spike_time * dmax / MAX_SPIKE_TIME + dmin);
+
+
+            return retval;
         }
 
         // Visualization helpers ----------------------------------------------
