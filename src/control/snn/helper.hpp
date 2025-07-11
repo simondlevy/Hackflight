@@ -59,13 +59,9 @@ class SnnHelper {
 
             const int timesteps = 3 * MAX_SPIKE_TIME + 2;
 
-            float output = 0;
+            float error = 0;
 
-            // Encode the inputs (note clamped value for third input)
-            _net.run(timesteps, demand, dz, 1, output);
-
-            // Decode the output firing time to a difference in [-2,+2]
-            const float error = decode(_net.get_o_spike_time(), -2, +2);
+            _net.run(timesteps, demand, dz, 1, error);
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -82,13 +78,8 @@ class SnnHelper {
         static float decode(const int spike_time, const float dmin, const float dmax)
         {
             const int filtered_spike_time =  spike_time == MAX_SPIKE_TIME + 1 ? 0 : spike_time;
-
             const float scaled_spike_time = (float)(filtered_spike_time - MAX_SPIKE_TIME);
-
-            const float retval = (scaled_spike_time * dmax / MAX_SPIKE_TIME + dmin);
-
-
-            return retval;
+            return (scaled_spike_time * dmax / MAX_SPIKE_TIME + dmin);
         }
 
         // Visualization helpers ----------------------------------------------
