@@ -75,49 +75,44 @@ class SnnHelper {
 
         // Visualization helpers ----------------------------------------------
 
-        int get_i1_spike_time()
+        int get_i1_relative_spike_time()
         {
-            return zero_until_hovering(_net.get_i1_spike_time());
+            return normalize_when_hovering(_net.get_i1_spike_time());
         }
 
-        int get_i2_spike_time()
+        int get_i2_relative_spike_time()
         {
-            return zero_until_hovering(_net.get_i2_spike_time());
+            return normalize_when_hovering(_net.get_i2_spike_time());
         }
 
-        int get_d1_spike_time()
+        int get_d1_relative_spike_time()
         {
-            return 0;
+            return normalize_when_hovering(_net.get_d1_spike_time());
         }
 
-        int get_d2_spike_time()
+        int get_d2_relative_spike_time()
         {
-            return 0;
+            return normalize_when_hovering(_net.get_d2_spike_time());
         }
 
-        int get_s_spike_time()
+        int get_s_relative_spike_time()
         {
-            return zero_until_hovering(1);
+            return normalize_when_hovering(_net.get_s_spike_time());
         }
 
-        int get_s2_spike_time()
+        int get_s2_relative_spike_time()
         {
-            return get_output_spike_time(_net.get_s2_spike_time());
+            return normalize_when_hovering(_net.get_s2_spike_time());
         }
 
-        int get_o_spike_time()
+        int get_o_relative_spike_time()
         {
-            return get_output_spike_time(_net.get_o_spike_time());
+            return normalize_when_hovering(_net.get_o_spike_time());
         }
 
-        int get_output_spike_time(const int spike_time)
+        int normalize_when_hovering(const int spike_time)
         {
-            return zero_until_hovering(spike_time > 0 ? spike_time - 100 : 0);
-        }
-
-        int zero_until_hovering(const int spike_time)
-        {
-            return _hovering ? spike_time : 0;
+            return _hovering ?  50 * spike_time / 300 + 1: 0;
         }
 
         // -------------------------------------------------------------------

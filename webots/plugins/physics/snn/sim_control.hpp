@@ -40,20 +40,11 @@ class ClosedLoopControl {
         {
             const int n = times.size();
 
-            /*
             std::string msg = "{\"Event Counts\":[";
             for (int i=0; i<n; ++i) {
                 char tmp[100] = {};
-                const int count = counts[i];
-                sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
-                msg += tmp;
-            }*/
-
-            std::string msg = "{\"Event Times\":[";
-            for (int i=0; i<n; ++i) {
-                char tmp[100] = {};
                 const int time = times[i];
-                sprintf(tmp, "[%d]%s", time, i==n-1 ? "]"  : ", ");
+                sprintf(tmp, "%d%s", time, i==n-1 ? "]"  : ", ");
                 msg += tmp;
             }
 
@@ -91,13 +82,13 @@ class ClosedLoopControl {
             if (_tick++ == VIZ_SEND_PERIOD) {
 
                 const std::vector<int> times = {
-                    _helper.get_i1_spike_time(),
-                    _helper.get_i2_spike_time(),
-                    _helper.get_s_spike_time(),
-                    _helper.get_d1_spike_time(),
-                    _helper.get_d2_spike_time(),
-                    _helper.get_o_spike_time(),
-                    _helper.get_s2_spike_time()
+                    _helper.get_i1_relative_spike_time(),
+                    _helper.get_i2_relative_spike_time(),
+                    _helper.get_s_relative_spike_time(),
+                    _helper.get_d1_relative_spike_time(),
+                    _helper.get_d2_relative_spike_time(),
+                    _helper.get_o_relative_spike_time(),
+                    _helper.get_s2_relative_spike_time()
                 };
 
                 const std::string msg = make_viz_message(times);
