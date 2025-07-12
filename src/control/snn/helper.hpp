@@ -73,71 +73,51 @@ class SnnHelper {
                         THRUST_MIN, THRUST_MAX) : 0;
         }
 
-        // Decoder ------------------------------------------------------------
-
-        static float decode(const int spike_time, const float dmin, const float dmax)
-        {
-            const int filtered_spike_time =  spike_time == MAX_SPIKE_TIME + 1 ? 0 : spike_time;
-            const float scaled_spike_time = (float)(filtered_spike_time - MAX_SPIKE_TIME);
-            return (scaled_spike_time * dmax / MAX_SPIKE_TIME + dmin);
-        }
-
         // Visualization helpers ----------------------------------------------
 
-        static int filter_spike_time(const int spike_time, const int scale)
-        {
-            return spike_time == scale * MAX_SPIKE_TIME + 1 ? 0 : spike_time;
-        }
-
-        int get_i1_spike_count()
+        int get_i1_spike_time()
         {
             return zero_until_hovering(_net.get_i1_spike_time());
         }
 
-        int get_i2_spike_count()
+        int get_i2_spike_time()
         {
             return zero_until_hovering(_net.get_i2_spike_time());
         }
 
-        int get_s_spike_count()
+        int get_d1_spike_time()
+        {
+            return 0;
+        }
+
+        int get_d2_spike_time()
+        {
+            return 0;
+        }
+
+        int get_s_spike_time()
         {
             return zero_until_hovering(1);
         }
 
-        int get_d1_spike_count()
+        int get_s2_spike_time()
         {
-            return filter_d(_net.get_d1_spike_time());
+            return get_output_spike_time(_net.get_s2_spike_time());
         }
 
-        int get_d2_spike_count()
+        int get_o_spike_time()
         {
-            return filter_d(_net.get_d2_spike_time());
+            return get_output_spike_time(_net.get_o_spike_time());
         }
 
-        int get_o_spike_count()
+        int get_output_spike_time(const int spike_time)
         {
-            return filter_output(_net.get_o_spike_time());
+            return zero_until_hovering(spike_time > 0 ? spike_time - 100 : 0);
         }
 
-        int get_s2_spike_count()
+        int zero_until_hovering(const int spike_time)
         {
-            return filter_output(_net.get_s2_spike_time());
-        }
-
-        int filter_output(const int spike_time)
-        {
-            return zero_until_hovering((int)(30 + (spike_time == 0 ? 0 :
-                            decode(spike_time, -2, +2)) * 10));
-        }
-
-        int filter_d(const int spike_time)
-        {
-            return zero_until_hovering(filter_spike_time(spike_time, 3));
-        }
-
-        int zero_until_hovering(const int count)
-        {
-            return _hovering ? count : 0;
+            return _hovering ? spike_time : 0;
         }
 
         // -------------------------------------------------------------------

@@ -36,26 +36,26 @@ class ClosedLoopControl {
 
         ServerSocket _spikeServer;
 
-        static std::string make_viz_message(const std::vector<int> counts)
+        static std::string make_viz_message(const std::vector<int> times)
         {
-            const int n = counts.size();
+            const int n = times.size();
 
+            /*
             std::string msg = "{\"Event Counts\":[";
             for (int i=0; i<n; ++i) {
                 char tmp[100] = {};
                 const int count = counts[i];
                 sprintf(tmp, "%d%s", count, i==n-1 ? "]"  : ", ");
                 msg += tmp;
-            }
+            }*/
 
-            /*
             std::string msg = "{\"Event Times\":[";
             for (int i=0; i<n; ++i) {
                 char tmp[100] = {};
-                const int time = 100;
+                const int time = times[i];
                 sprintf(tmp, "[%d]%s", time, i==n-1 ? "]"  : ", ");
                 msg += tmp;
-            }*/
+            }
 
             msg += ", \"Neuron Alias\":[";
             for (int i=0; i<n; ++i) {
@@ -90,17 +90,17 @@ class ClosedLoopControl {
 
             if (_tick++ == VIZ_SEND_PERIOD) {
 
-                const std::vector<int> counts = {
-                    _helper.get_i1_spike_count(),
-                    _helper.get_i2_spike_count(),
-                    _helper.get_s_spike_count(),
-                    _helper.get_d1_spike_count(),
-                    _helper.get_d2_spike_count(),
-                    _helper.get_o_spike_count(),
-                    _helper.get_s2_spike_count()
+                const std::vector<int> times = {
+                    _helper.get_i1_spike_time(),
+                    _helper.get_i2_spike_time(),
+                    _helper.get_s_spike_time(),
+                    _helper.get_d1_spike_time(),
+                    _helper.get_d2_spike_time(),
+                    _helper.get_o_spike_time(),
+                    _helper.get_s2_spike_time()
                 };
 
-                const std::string msg = make_viz_message(counts);
+                const std::string msg = make_viz_message(times);
 
                 _spikeServer.sendData((uint8_t *)msg.c_str(), msg.length());
 
