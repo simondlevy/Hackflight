@@ -43,13 +43,13 @@ class ClosedLoopControl {
         void serializeMessage(MspSerializer & serializer)
         {
             const uint8_t counts[16] = {
-                (uint8_t)_helper.get_i1_spike_count(),
-                (uint8_t)_helper.get_i2_spike_count(),
-                (uint8_t)_helper.get_s_spike_count(),
-                (uint8_t)_helper.get_d1_spike_count(),
-                (uint8_t)_helper.get_d2_spike_count(),
-                (uint8_t)_helper.get_s2_spike_count(),
-                (uint8_t)_helper.get_o_spike_count(),
+                (uint8_t)_helper.get_i1_relative_spike_time(),
+                (uint8_t)_helper.get_i2_relative_spike_time(),
+                (uint8_t)_helper.get_s_relative_spike_time(),
+                (uint8_t)_helper.get_d1_relative_spike_time(),
+                (uint8_t)_helper.get_d2_relative_spike_time(),
+                (uint8_t)_helper.get_s2_relative_spike_time(),
+                (uint8_t)_helper.get_o_relative_spike_time(),
                 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             serializer.serializeBytes(MSP_SPIKES, counts, 16);
