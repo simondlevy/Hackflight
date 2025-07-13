@@ -1,6 +1,6 @@
 install: messages.json msppg.py
 	python3 msppg.py
-	cp msp.py ../clients/
+	cp msp.py ../client/
 	cp messages.h ../src/msp/
 
 edit:

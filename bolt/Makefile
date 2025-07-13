@@ -7,6 +7,7 @@ HFDIR = $(HOME)/Desktop/hackflight
 HASKDIR = $(HFDIR)/haskell
 
 SNNDIR = $(HOME)/Desktop/2025-diff-network/levy
+EMBDIR = $(HOME)/Desktop/embedded-neuromorphic/levy
 
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
@@ -117,6 +118,7 @@ standard_config:
 snn_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
+	$(EMBDIR)/compiler.py $(SNNDIR)/max_100.txt -o $(PWD)/src
 	cp $(HFDIR)/src/control/snn.hpp $(HFDIR)/src/__control__.hpp
 	cp $(HFDIR)/src/system.cpp $(HFDIR)/bolt/src/__system__.cpp
 	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
