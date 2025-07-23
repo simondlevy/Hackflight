@@ -18,7 +18,8 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-NET = $(ROOT)/2025-diff-network/levy/
+# NET = $(ROOT)/2025-diff-network/levy/
+NET = $(ROOT)/embedded-neuromorphic/levy/examples/difference
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
