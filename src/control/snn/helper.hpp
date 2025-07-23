@@ -78,37 +78,37 @@ class SnnHelper {
 
         int get_i1_relative_spike_time()
         {
-            return 0;//normalize_when_hovering(_net.get_i1_spike_time());
+            return normalize_when_hovering(_net.get_i1_spike_time());
         }
 
         int get_i2_relative_spike_time()
         {
-            return 0;//normalize_when_hovering(_net.get_i2_spike_time());
-        }
-
-        int get_d1_relative_spike_time()
-        {
-            return 0;//normalize_when_hovering(_net.get_d1_spike_time());
-        }
-
-        int get_d2_relative_spike_time()
-        {
-            return 0;//normalize_when_hovering(_net.get_d2_spike_time());
+            return normalize_when_hovering(_net.get_i2_spike_time());
         }
 
         int get_s_relative_spike_time()
         {
-            return 0;//normalize_when_hovering(_net.get_s_spike_time());
+            return normalize_when_hovering(_net.get_s_spike_time());
+        }
+
+        int get_d1_relative_spike_time()
+        {
+            return normalize_when_hovering(_net.get_d1_spike_time());
+        }
+
+        int get_d2_relative_spike_time()
+        {
+            return normalize_when_hovering(_net.get_d2_spike_time());
         }
 
         int get_s2_relative_spike_time()
         {
-            return 0;//normalize_when_hovering(_net.get_s2_spike_time());
+            return normalize_when_hovering(_net.get_s2_spike_time());
         }
 
         int get_o_relative_spike_time()
         {
-            return 0;//normalize_when_hovering(_net.get_o_spike_time());
+            return normalize_when_hovering(_net.get_o_spike_time());
         }
 
         int normalize_when_hovering(const int spike_time)
