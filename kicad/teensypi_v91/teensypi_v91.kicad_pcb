@@ -5865,6 +5865,7 @@
 		(property "Value" "Conn_01x01"
 			(at 0 6.35 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "195d8995-2086-47bf-b159-e57196105d46")
 			(effects
 				(font
@@ -7471,6 +7472,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "SDA0"
+		(at 152 105.5 90)
+		(layer "F.SilkS")
+		(uuid "378af8b4-af3d-46e7-89ae-deff12ca9067")
+		(effects
+			(font
+				(size 0.93472 0.93472)
+				(thickness 0.08128)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "M3\n"
 		(at 142.050691 104.703286 90)
 		(layer "F.SilkS")
@@ -7952,7 +7965,7 @@
 		)
 	)
 	(gr_text "SCL1"
-		(at 146 105.5 270)
+		(at 146.75 100 315)
 		(layer "B.SilkS")
 		(uuid "13c0ff76-ed71-4cd9-abb0-92c376825d5d")
 		(effects
@@ -7973,18 +7986,6 @@
 				(thickness 0.08128)
 			)
 			(justify left bottom mirror)
-		)
-	)
-	(gr_text "SDA0"
-		(at 152 105.5 90)
-		(layer "B.SilkS")
-		(uuid "378af8b4-af3d-46e7-89ae-deff12ca9067")
-		(effects
-			(font
-				(size 0.93472 0.93472)
-				(thickness 0.08128)
-			)
-			(justify left bottom)
 		)
 	)
 	(gr_text "GD"
@@ -8096,7 +8097,7 @@
 		)
 	)
 	(gr_text "SDA1"
-		(at 148.5 105.5 270)
+		(at 149.5 100 315)
 		(layer "B.SilkS")
 		(uuid "a27eb049-c992-4f11-a026-1e6a8d9d0160")
 		(effects
