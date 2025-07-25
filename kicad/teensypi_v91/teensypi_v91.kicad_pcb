@@ -7700,6 +7700,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "GD"
+		(at 147.75 130.08 0)
+		(layer "F.SilkS")
+		(uuid "7822f658-5977-4b91-b6c5-c13e711d91a4")
+		(effects
+			(font
+				(size 1.63576 1.63576)
+				(thickness 0.14224)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "SCK"
 		(at 168.447513 90.603329 0)
 		(layer "F.SilkS")
