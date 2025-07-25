@@ -28,10 +28,10 @@ class YawAngleController {
             ouputput is angles-per-second demand sent to YawRateController.
           */
         static float run(
-                const bool airborne, 
-                const float dt,
-                const float psi,
-                const float yaw)
+                const bool airborne,  // ignore this
+                const float dt,       // can be a constant if needed
+                const float psi,      // estimated angle
+                const float yaw)      // desired angle
         {
             static float _target;
             static float _integral;
