@@ -18,14 +18,15 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-# NET = $(ROOT)/2025-diff-network/levy/
-NET = $(ROOT)/embedded-neuromorphic/levy/examples/difference
+EMB = $(ROOT)/embedded-neuromorphic/levy/
+
+NET = $(EMB)/examples/difference
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(EMB) -I$(NET)
 
 all: libsnn.so
 

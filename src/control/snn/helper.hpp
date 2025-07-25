@@ -34,8 +34,7 @@ class SnnHelper {
 
         static constexpr float MAX_SPIKE_TIME = 100;
 
-        //Max_100_Network _net;
-        risp::Network _net;
+        risp::DifferenceNetwork _net;
 
         bool _hovering;
 
