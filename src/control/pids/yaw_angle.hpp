@@ -23,6 +23,10 @@ class YawAngleController {
 
     public:
 
+        /**
+          * Input is desired angle (deg) estimated actual angle (deg) from EKF;
+            ouputput is angles-per-second demand sent to YawRateController.
+          */
         static float run(
                 const bool airborne, 
                 const float dt,
