@@ -84,4 +84,9 @@ class ClosedLoopControl {
         {
             (void)serializer;
         }
+
+        // unused; needed for sim API
+        void init()
+        {
+        }
 };
