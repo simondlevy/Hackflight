@@ -33,7 +33,18 @@ class YawAngleController {
                 const float psi,      // estimated angle
                 const float yaw)      // desired angle
         {
-            return airborne ? runpid(dt, psi, yaw) : 0;
+            float correction = 0;
+
+            if (airborne) {
+
+                static float _target;
+
+                _target = cap(_target + DEMAND_MAX * yaw * dt);
+
+                correction = runpid(KP, KI, KD, dt, _target, psi);
+            }
+
+            return correction;
         }
 
     private:
@@ -47,15 +58,18 @@ class YawAngleController {
         float _integral;
         float _previous;
 
-        static float runpid(const float dt, const float psi, const float yaw) 
+        static float runpid(
+                const float kp,
+                const float ki,
+                const float kd,
+                const float dt,
+                const float target,
+                const float actual)
         {
-            static float _target;
             static float _integral;
             static float _previous;
 
-            _target = cap(_target + DEMAND_MAX * yaw * dt);
-
-            const auto error = cap(_target - psi);
+            const auto error = target - actual;
 
             _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 
@@ -63,9 +77,10 @@ class YawAngleController {
 
             _previous = error;
 
-            return KP * error + KI * _integral + KD * deriv;
-         }
+            return kp * error + ki * _integral + kd * deriv;
+        }
 
+        // Keep angle in (0, 360)
         static float cap(float angle) 
         {
             float result = angle;
