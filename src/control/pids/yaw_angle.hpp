@@ -92,14 +92,14 @@ class YawAngleController {
 
             const auto error = 1000 * target - 1000 * actual;
 
-            _integral = Num::fconstrain(_integral + error * dt, ilimit);
+            // _integral = Num::fconstrain(_integral + error * dt, ilimit);
 
-            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+            auto deriv = error - _previous;
 
             _previous = error;
 
             // return kp * error + ki * _integral + kd * deriv;
-            return (kp * error) / 1000;
+            return (kp * error + kd * deriv) / 1000;
         }
 
         // Keep angle in (0, 360)
