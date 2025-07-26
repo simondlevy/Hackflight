@@ -24,32 +24,16 @@ class YawAngleController {
     public:
 
         /**
-          * Input is desired angle (deg) estimated actual angle (deg) from EKF;
-            ouputput is angles-per-second demand sent to YawRateController.
-          */
+         * Input is desired angle (deg) estimated actual angle (deg) from EKF;
+         ouputput is angles-per-second demand sent to YawRateController.
+         */
         static float run(
                 const bool airborne,  // ignore this
                 const float dt,       // can be a constant if needed
                 const float psi,      // estimated angle
                 const float yaw)      // desired angle
         {
-            static float _target;
-            static float _integral;
-            static float _previous;
-
-            _target = airborne ? 
-                cap(_target + DEMAND_MAX * yaw * dt) : psi;
-
-            const auto error = cap(_target - psi);
-
-            _integral = airborne ?
-                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
-
-            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
-
-            _previous = airborne ? error : 0;
-
-            return airborne ? KP * error + KI * _integral + KD * deriv : 0;
+            return airborne ? runpid(dt, psi, yaw) : 0;
         }
 
     private:
@@ -62,6 +46,25 @@ class YawAngleController {
 
         float _integral;
         float _previous;
+
+        static float runpid(const float dt, const float psi, const float yaw) 
+        {
+            static float _target;
+            static float _integral;
+            static float _previous;
+
+            _target = cap(_target + DEMAND_MAX * yaw * dt);
+
+            const auto error = cap(_target - psi);
+
+            _integral = Num::fconstrain(_integral + error * dt, ILIMIT); 
+
+            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+
+            _previous = error;
+
+            return KP * error + KI * _integral + KD * deriv;
+        }
 
         static float cap(float angle) 
         {
