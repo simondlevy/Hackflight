@@ -84,7 +84,11 @@ class YawAngleController {
             static float _integral;
             static float _previous;
 
-            const float error = 1000 * target - 1000 * actual;
+            // encode
+            const float target_encoded = target * 1000;
+            const float actual_encoded = actual * 1000;
+
+            const float error = target_encoded - actual_encoded;
 
             _integral = Num::fconstrain(_integral + error, ILIMIT);
 
@@ -92,7 +96,27 @@ class YawAngleController {
 
             _previous = error;
 
-            return (KP * error + KI * _integral + KD * deriv) / 1000;
+            const float correction = (KP * error + KI * _integral + KD * deriv);
+
+            csvdump(target_encoded, actual_encoded, error, _integral, deriv, correction);
+
+            // decode
+            return correction / 1000;
+        }
+
+        static void csvdump(const float target, const float actual,
+                const float error, const float integral, const float deriv,
+                const float correction)
+        {
+            static bool _ready;
+
+            if (!_ready) {
+
+                printf("target,actual,error,integral,derivative,correction\n");
+                _ready = true;
+            }
+
+            printf("%f,%f,%f,%f,%f,%f\n", target, actual, error, integral, deriv, correction);
         }
 
         // Keep angle in (0, 360)
