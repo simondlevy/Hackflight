@@ -38,10 +38,10 @@ class YawAngleController {
 
     private:
 
-        static constexpr float KP = 6;
-        static constexpr float KI = 1;
-        static constexpr float KD = 0.35;
-        static constexpr float ILIMIT = 360;
+        static constexpr float KP = 6/1000.f;
+        static constexpr float KI = 1/1000.f;
+        static constexpr float KD = 0.35/1000.f;
+        static constexpr float ILIMIT = 360*1000;
         static constexpr float DEMAND_MAX = 200;
 
         float _integral;
@@ -53,17 +53,17 @@ class YawAngleController {
             static float _integral;
             static float _previous;
 
-            _target = cap(_target + DEMAND_MAX * yaw * dt);
+            _target = 1000 * cap(_target + DEMAND_MAX * yaw * dt);
 
-            const auto error = cap(_target - psi);
+            const auto error = cap(_target - psi*1000);
 
-            _integral = Num::fconstrain(_integral + error * dt, ILIMIT); 
+            _integral = Num::fconstrain(1000*(_integral + error * dt), ILIMIT); 
 
-            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+            auto deriv = dt > 0 ? 1000 * (error - _previous) / dt : 0;
 
             _previous = error;
 
-            return KP * error + KI * _integral + KD * deriv;
+            return (KP * error + KI * _integral + KD * deriv) / 1000;
         }
 
         static float cap(float angle) 
