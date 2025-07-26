@@ -53,18 +53,18 @@ class YawAngleController {
             static float _integral;
             static float _previous;
 
-            _target = 1000 * cap(_target + DEMAND_MAX * yaw * dt);
+            _target = cap(_target + DEMAND_MAX * yaw * dt);
 
-            const auto error = cap(_target - psi*1000);
+            const auto error = cap(_target - psi);
 
-            _integral = Num::fconstrain(1000*(_integral + error * dt), ILIMIT * 1000); 
+            _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 
-            auto deriv = dt > 0 ? 1000 * (error - _previous) / dt : 0;
+            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
 
             _previous = error;
 
-            return (KP * error + KI * _integral + KD * deriv) / 1000;
-        }
+            return KP * error + KI * _integral + KD * deriv;
+         }
 
         static float cap(float angle) 
         {
