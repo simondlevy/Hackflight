@@ -37,17 +37,14 @@ class YawAngleController {
 
             if (airborne) {
 
-                static constexpr float KP = 6;
-                static constexpr float KI = 1;
-                static constexpr float KD = 0.35;
-                static constexpr float ILIMIT = 360;
-                static constexpr float DEMAND_MAX = 200;
+               static constexpr float DEMAND_MAX = 200;
 
                 static float _target;
 
                 _target = cap(_target + DEMAND_MAX * yaw * dt);
 
-                correction = newpid(KP, KI, KD, ILIMIT, dt, _target, psi);
+                // correction = oldpid(dt, _target, psi);
+                correction = newpid(_target, psi);
             }
 
             return correction;
@@ -56,50 +53,46 @@ class YawAngleController {
     private:
 
         static float oldpid(
-                const float kp,
-                const float ki,
-                const float kd,
-                const float ilimit,
-                const float dt,
-                const float target,
-                const float actual)
+                const float dt, const float target, const float actual)
         {
+            static constexpr float KP = 6;
+            static constexpr float KI = 1;
+            static constexpr float KD = 0.35;
+            static constexpr float ILIMIT = 360;
+
             static float _integral;
             static float _previous;
 
             const auto error = target - actual;
 
-            _integral = Num::fconstrain(_integral + error * dt, ilimit);
+            _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 
             auto deriv = dt > 0 ? (error - _previous) / dt : 0;
 
             _previous = error;
 
-            return kp * error + ki * _integral + kd * deriv;
+            return KP * error + KI * _integral + KD * deriv;
         }
 
-        static float newpid(
-                const float kp,
-                const float ki,
-                const float kd,
-                const float ilimit,
-                const float dt,
-                const float target,
-                const float actual)
+        static float newpid(const float target, const float actual)
         {
+            static constexpr float KP = 6;
+            static constexpr float KI = 1;
+            static constexpr float KD = 0.35;
+            static constexpr float ILIMIT = 360;
+
             static float _integral;
             static float _previous;
 
-            const auto error = 1000 * target - 1000 * actual;
+            const float error = 1000 * target - 1000 * actual;
 
-            // _integral = Num::fconstrain(_integral + error * dt, ilimit);
+            _integral = Num::fconstrain(_integral + error, ILIMIT);
 
-            auto deriv = error - _previous;
+            const float deriv = error - _previous;
 
             _previous = error;
 
-            // return kp * error + ki * _integral + kd * deriv;
-            return (kp * error + kd * deriv) / 1000;
+            return (KP * error + KI * _integral + KD * deriv) / 1000;
         }
 
         // Keep angle in (0, 360)
