@@ -85,14 +85,14 @@ class YawAngleController {
             static float _previous;
 
             // encode
-            const float target_encoded = target * 1000;
-            const float actual_encoded = actual * 1000;
+            const int target_encoded = target * 1000;
+            const int actual_encoded = actual * 1000;
 
-            const float error = target_encoded - actual_encoded;
+            const int error = target_encoded - actual_encoded;
 
             _integral = Num::fconstrain(_integral + error, ILIMIT);
 
-            const float deriv = error - _previous;
+            const int deriv = error - _previous;
 
             _previous = error;
 
