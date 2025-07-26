@@ -47,7 +47,7 @@ class YawAngleController {
 
                 _target = cap(_target + DEMAND_MAX * yaw * dt);
 
-                correction = runpid(KP, KI, KD, ILIMIT, dt, _target, psi);
+                correction = oldpid(KP, KI, KD, ILIMIT, dt, _target, psi);
             }
 
             return correction;
@@ -55,7 +55,30 @@ class YawAngleController {
 
     private:
 
-        static float runpid(
+        static float oldpid(
+                const float kp,
+                const float ki,
+                const float kd,
+                const float ilimit,
+                const float dt,
+                const float target,
+                const float actual)
+        {
+            static float _integral;
+            static float _previous;
+
+            const auto error = target - actual;
+
+            _integral = Num::fconstrain(_integral + error * dt, ilimit);
+
+            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+
+            _previous = error;
+
+            return kp * error + ki * _integral + kd * deriv;
+        }
+
+        static float newpid(
                 const float kp,
                 const float ki,
                 const float kd,
