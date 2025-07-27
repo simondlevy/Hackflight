@@ -1,6 +1,6 @@
 #include <BMI088.h>
 
-static const uint8_t GYRO_INTERRUPT_PIN = 4;
+static const uint8_t GYRO_INTERRUPT_PIN = 6;
 
 static Bmi088Accel accel(Wire,0x19);
 

@@ -5,6 +5,129 @@
 	(uuid "afb8e687-4a13-41a1-b8c0-89a749e897fe")
 	(paper "User" 297.002 244.323)
 	(lib_symbols
+		(symbol "Connector:Conn_01x01_Socket"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x01_Socket"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x01, script generated"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x01_Socket_1_1"
+				(polyline
+					(pts
+						(xy -1.27 0) (xy -0.508 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -0.508)
+					(mid -0.5058 0)
+					(end 0 0.508)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:Conn_01x02_Female"
 			(pin_names
 				(offset 1.016)
@@ -1934,6 +2057,16 @@
 	)
 	(wire
 		(pts
+			(xy 39.37 208.28) (xy 43.18 208.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2c3cae39-3765-4d4e-b72f-d35bf89cf77b")
+	)
+	(wire
+		(pts
 			(xy 160.02 91.44) (xy 163.83 91.44)
 		)
 		(stroke
@@ -2044,6 +2177,16 @@
 	)
 	(wire
 		(pts
+			(xy 39.37 205.74) (xy 43.18 205.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6a0da665-a29a-46c9-b348-3ab7e62585f9")
+	)
+	(wire
+		(pts
 			(xy 186.69 176.53) (xy 191.77 176.53)
 		)
 		(stroke
@@ -2104,13 +2247,23 @@
 	)
 	(wire
 		(pts
-			(xy 115.57 44.45) (xy 119.38 44.45)
+			(xy 78.74 204.47) (xy 82.55 204.47)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "7db3db62-0a47-447e-81f5-0e8bf8b9345f")
+		(uuid "74d71e78-3357-402e-8166-2896ddc4509f")
+	)
+	(wire
+		(pts
+			(xy 78.74 207.01) (xy 82.55 207.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7828d108-3a98-49fe-9c85-e794bb7990fd")
 	)
 	(wire
 		(pts
@@ -2141,26 +2294,6 @@
 			(type default)
 		)
 		(uuid "882c5b13-250f-4fe4-9ec5-9555ab6e29ab")
-	)
-	(wire
-		(pts
-			(xy 115.57 39.37) (xy 119.38 39.37)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8ec63083-b53e-4376-89ae-ba5e4d57d8b7")
-	)
-	(wire
-		(pts
-			(xy 149.86 48.26) (xy 156.21 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8ef5b5ca-3649-4d37-9f0f-99492c05a405")
 	)
 	(wire
 		(pts
@@ -2254,6 +2387,16 @@
 	)
 	(wire
 		(pts
+			(xy 38.1 215.9) (xy 40.64 215.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b2ce7638-2484-4ec4-972d-c3bdec33600e")
+	)
+	(wire
+		(pts
 			(xy 96.52 163.83) (xy 100.33 163.83)
 		)
 		(stroke
@@ -2271,16 +2414,6 @@
 			(type default)
 		)
 		(uuid "b6448a06-f895-4695-9e7c-c4fb6922250f")
-	)
-	(wire
-		(pts
-			(xy 149.86 43.18) (xy 156.21 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b7cfe563-5bfc-4a48-943b-e870daf7932b")
 	)
 	(wire
 		(pts
@@ -2334,13 +2467,13 @@
 	)
 	(wire
 		(pts
-			(xy 115.57 54.61) (xy 119.38 54.61)
+			(xy 78.74 209.55) (xy 82.55 209.55)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e0ce7ae9-5194-43c5-8287-59ff99440a01")
+		(uuid "d6a45f30-1de7-4bb6-8294-d2c760a82a5c")
 	)
 	(wire
 		(pts
@@ -2371,16 +2504,6 @@
 			(type default)
 		)
 		(uuid "e9305af8-6fa1-42ba-9910-7b795907b712")
-	)
-	(wire
-		(pts
-			(xy 149.86 38.1) (xy 156.21 38.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ece8b8da-7bf2-487a-9750-0fcfe5d5996a")
 	)
 	(wire
 		(pts
@@ -2431,16 +2554,6 @@
 			(justify left bottom)
 		)
 		(uuid "096b664c-ab85-4b60-91f9-7ffc15776978")
-	)
-	(label "SCL0"
-		(at 151.13 38.1 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "12667f44-5164-43be-b54b-d7d25add564c")
 	)
 	(label "MISO"
 		(at 152.4 179.07 0)
@@ -2552,6 +2665,16 @@
 		)
 		(uuid "37b8a0a2-4686-44f4-9b88-b1b9df38ce9d")
 	)
+	(label "SCL0"
+		(at 78.74 204.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3e751d5a-27be-440a-ab11-9cb3aab3a212")
+	)
 	(label "VBAT"
 		(at 127 129.54 0)
 		(effects
@@ -2602,16 +2725,6 @@
 		)
 		(uuid "45dea17c-c0c1-45fa-9bbb-a7872ddc6671")
 	)
-	(label "3V3"
-		(at 151.13 48.26 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "47125f58-6d88-44af-9584-3da9d9532744")
-	)
 	(label "M3"
 		(at 95.25 176.53 0)
 		(effects
@@ -2632,26 +2745,6 @@
 		)
 		(uuid "49d3f325-204b-4a41-9c14-f8083ceb55b8")
 	)
-	(label "SDA0"
-		(at 151.13 43.18 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "4be7b4d5-74aa-4eea-984f-17aafb6fc219")
-	)
-	(label "GND"
-		(at 116.84 44.45 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "4d2f1138-86a9-4adf-b2fb-80c3feb85233")
-	)
 	(label "GND"
 		(at 96.52 166.37 0)
 		(effects
@@ -2661,6 +2754,16 @@
 			(justify left bottom)
 		)
 		(uuid "5445e2a8-3e5e-4ee0-9ad1-fd6270d111a2")
+	)
+	(label "3V3"
+		(at 39.37 205.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5b649494-ea58-49c9-b238-a46c152ef5f6")
 	)
 	(label "GND"
 		(at 152.4 146.05 0)
@@ -2711,6 +2814,16 @@
 			(justify left bottom)
 		)
 		(uuid "63debfd7-8200-4514-8989-30296dea7e2d")
+	)
+	(label "3V3"
+		(at 78.74 209.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "65b20ded-e302-4533-86fe-e95ef2a34000")
 	)
 	(label "GND"
 		(at 160.02 91.44 0)
@@ -2832,15 +2945,15 @@
 		)
 		(uuid "9ca52c29-6079-4ab3-a71d-86ed215a46ac")
 	)
-	(label "3V3"
-		(at 116.84 39.37 0)
+	(label "INT"
+		(at 38.1 215.9 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "a8a05906-0065-49b3-a713-4c9882247356")
+		(uuid "b0950323-bfb2-4d64-95b5-c5b4f1d2b9b8")
 	)
 	(label "LED_MCU"
 		(at 186.69 173.99 0)
@@ -2892,6 +3005,16 @@
 		)
 		(uuid "bb3b4810-6b68-422d-a884-a8452eb610e2")
 	)
+	(label "SDA0"
+		(at 78.74 207.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "be539bfd-3d17-49bf-b0bf-ac1999280ce8")
+	)
 	(label "3V3"
 		(at 135.89 238.76 0)
 		(effects
@@ -2922,6 +3045,16 @@
 		)
 		(uuid "ce4ce42c-f4d6-4e80-bea0-41e51d66b747")
 	)
+	(label "GND"
+		(at 39.37 208.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d761274a-7397-42fa-9c62-d51f04e95a61")
+	)
 	(label "M3"
 		(at 187.96 176.53 0)
 		(effects
@@ -2951,16 +3084,6 @@
 			(justify left bottom)
 		)
 		(uuid "e2485e87-0a92-4094-8705-111059bed713")
-	)
-	(label "INT"
-		(at 116.84 54.61 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "e74d74a4-2716-4680-8fd3-a79ee3219c9a")
 	)
 	(label "M1"
 		(at 152.4 153.67 0)
@@ -3072,74 +3195,6 @@
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "POST_1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 186.69 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "05397152-5134-4923-b80a-9f7d1f618535")
-		(property "Reference" "GND_PAD9"
-			(at 189.23 53.3399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 189.23 55.8799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 186.69 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 186.69 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 186.69 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "93b0cf90-bbed-432c-af83-a04250270522")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD9")
 					(unit 1)
 				)
 			)
@@ -3486,142 +3541,6 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x01")
-		(at 95.25 52.07 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "214fefdb-978f-4282-9b66-8715726401da")
-		(property "Reference" "GND_PAD5"
-			(at 97.79 50.7999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 97.79 53.3399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 95.25 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 95.25 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 95.25 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "5908d2ed-6595-4216-81f6-048398471017")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 161.29 38.1 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "21e16452-5ff2-49d4-86bd-c61504d3d908")
-		(property "Reference" "GND_PAD14"
-			(at 163.83 36.8299 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 163.83 39.3699 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 161.29 38.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 161.29 38.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 161.29 38.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "6c8ef3af-0299-4717-b3fd-ea6a845ab4a3")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD14")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
 		(at 168.91 102.87 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -3759,142 +3678,6 @@
 			(project ""
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "REG1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 124.46 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "27647def-4f38-46d6-b8f3-ac3e7e22c1a4")
-		(property "Reference" "GND_PAD13"
-			(at 127 53.3399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 127 55.8799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 124.46 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 124.46 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 124.46 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8cb4c3d3-bccd-416b-b949-ccb6084cf886")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD13")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 124.46 49.53 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2cbc9094-1b3d-41a6-9965-3c463e8df969")
-		(property "Reference" "GND_PAD12"
-			(at 127 48.2599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 127 50.7999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 124.46 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 124.46 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 124.46 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d91cd95e-0e5d-46b7-b665-5d517cb7439e")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD12")
 					(unit 1)
 				)
 			)
@@ -4100,142 +3883,6 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x01")
-		(at 186.69 39.37 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3a7021c2-2c9f-48fd-bb36-6291320ec2c0")
-		(property "Reference" "GND_PAD6"
-			(at 189.23 38.0999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 189.23 40.6399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 186.69 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 186.69 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 186.69 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e2583b5b-c3bb-4b2d-9dbd-2f120fd74640")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 95.25 36.83 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3e301185-6f4e-47cf-9237-bb8f9173102d")
-		(property "Reference" "GND_PAD2"
-			(at 97.79 35.5599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 97.79 38.0999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 95.25 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 95.25 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 95.25 36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "0bdd251c-b641-4fc2-b297-4a7154322dcb")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
 		(at 137.16 129.54 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -4375,6 +4022,78 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x02_Female")
+		(at 48.26 205.74 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4fa20205-99c2-482a-9f3b-0e446667ee78")
+		(property "Reference" "PMW3901_PWR2"
+			(at 49.53 205.7399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Value" "Conn_01x02_Female"
+			(at 49.53 208.2799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+			(at 48.26 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 48.26 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 48.26 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "bd6493a6-d00e-4161-a4b9-934b1904ed2f")
+		)
+		(pin "1"
+			(uuid "b1821545-9711-439e-a98d-bd27c9560fe8")
+		)
+		(instances
+			(project "teensypi_v91"
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "PMW3901_PWR2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R_Small_US")
 		(at 95.25 125.73 0)
 		(unit 1)
@@ -4441,142 +4160,6 @@
 			(project ""
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 161.29 53.34 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "50e34647-3623-4c0f-9a53-42e84dc9c9e0")
-		(property "Reference" "GND_PAD17"
-			(at 163.83 52.0699 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 163.83 54.6099 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 161.29 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 161.29 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 161.29 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "4eb354d8-0ba2-46d8-9353-f5e92cc40162")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD17")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 95.25 41.91 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "56b0716c-a0f9-4b16-aca3-a6caea500ca7")
-		(property "Reference" "GND_PAD3"
-			(at 97.79 40.6399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 97.79 43.1799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 95.25 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 95.25 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 95.25 41.91 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "c8dd2e1e-182c-4cdf-83df-90a48ed9938d")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD3")
 					(unit 1)
 				)
 			)
@@ -4757,74 +4340,6 @@
 			(project ""
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "Teensy_top1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 186.69 44.45 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "5c84e696-be51-4f23-a3ed-3b194ae6a323")
-		(property "Reference" "GND_PAD7"
-			(at 189.23 43.1799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 189.23 45.7199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 186.69 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 186.69 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 186.69 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ed1bb84e-6cba-43e0-986d-70af1eb4f187")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD7")
 					(unit 1)
 				)
 			)
@@ -5104,74 +4619,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 124.46 39.37 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7446b7fe-03ad-4106-8f1c-98c84a1072ce")
-		(property "Reference" "GND_PAD10"
-			(at 127 38.0999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 127 40.6399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 124.46 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 124.46 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 124.46 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d7caaa06-094c-44c4-accd-cb5ca67bad20")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD10")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Mechanical:MountingHole")
 		(at 248.92 83.82 0)
 		(unit 1)
@@ -5368,6 +4815,81 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x03_Female")
+		(at 87.63 207.01 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "83c45e28-4967-4d69-a595-851a52811158")
+		(property "Reference" "Motor5"
+			(at 88.9 205.7399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Value" "Conn_01x03_Female"
+			(at 88.9 208.2799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
+			(at 87.63 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 87.63 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 87.63 207.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "637265da-5136-4b60-9de9-daa5a24f35ca")
+		)
+		(pin "2"
+			(uuid "c95cc355-38df-45c6-862c-a445bc493645")
+		)
+		(pin "1"
+			(uuid "92a85585-3a0e-400b-9a13-c17cdf0b04aa")
+		)
+		(instances
+			(project "teensypi_v91"
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "Motor5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x03_Female")
 		(at 190.5 204.47 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -5440,17 +4962,17 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 124.46 44.45 0)
+		(lib_id "Connector:Conn_01x01_Socket")
+		(at 45.72 215.9 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "8ca65b0b-7e03-4c16-8b6e-524cd2a80049")
-		(property "Reference" "GND_PAD11"
-			(at 127 43.1799 0)
+		(uuid "8d4ae625-496c-472a-9898-66eaa32b9ee1")
+		(property "Reference" "J1"
+			(at 46.99 214.6299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5459,17 +4981,18 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "Conn_01x01"
-			(at 127 45.7199 0)
+		(property "Value" "Conn_01x01_Socket"
+			(at 46.99 217.1699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
 			)
 		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 124.46 44.45 0)
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x01_P2.54mm_Vertical"
+			(at 45.72 215.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5478,7 +5001,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 124.46 44.45 0)
+			(at 45.72 215.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5486,76 +5009,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 124.46 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "59e81422-9f3c-46db-b64c-c5193d29dc87")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD11")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 161.29 48.26 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "8e17db69-0d72-4135-bb81-4932dd373358")
-		(property "Reference" "GND_PAD16"
-			(at 163.83 46.9899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 163.83 49.5299 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 161.29 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 161.29 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 161.29 48.26 0)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 45.72 215.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5564,12 +5019,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "30d53ad1-9b11-47fd-8eb2-b5dd2bd876bc")
+			(uuid "e88bb84f-c724-42b7-a290-c566ba2f7547")
 		)
 		(instances
-			(project "teensypi_v91"
+			(project ""
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD16")
+					(reference "J1")
 					(unit 1)
 				)
 			)
@@ -5948,142 +5403,6 @@
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "M_2_3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 95.25 46.99 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a60d1e99-45ae-441e-a3e2-2e1a161d261a")
-		(property "Reference" "GND_PAD4"
-			(at 97.79 45.7199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 97.79 48.2599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 95.25 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 95.25 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 95.25 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "2da1d387-257d-4bdb-9ab0-24fecbd1bb16")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 186.69 49.53 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "ac5e3161-33eb-47ec-a0f6-2fdc25e3a750")
-		(property "Reference" "GND_PAD8"
-			(at 189.23 48.2599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 189.23 50.7999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 186.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 186.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 186.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "cedb3361-8027-4582-ad59-8b9f301b5355")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD8")
 					(unit 1)
 				)
 			)
@@ -6685,74 +6004,6 @@
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "M_2_2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 161.29 43.18 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d1ca29cf-ae1f-4a32-a10c-8c91a758958a")
-		(property "Reference" "GND_PAD15"
-			(at 163.83 41.9099 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 163.83 44.4499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 161.29 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 161.29 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 161.29 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e386a98b-e388-491d-9f12-5626f276f63f")
-		)
-		(instances
-			(project "teensypi_v91"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD15")
 					(unit 1)
 				)
 			)

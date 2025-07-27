@@ -3,8 +3,8 @@ SKETCH = bmi088
 # FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 FQBN = teensy:avr:teensy40
 
-# PORT = /dev/ttyACM0
-PORT = COM3
+PORT = /dev/ttyACM0
+#PORT = COM3
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
@@ -25,6 +25,6 @@ edit:
 	vim $(SKETCH).ino
 
 listen:
-	#miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
-	plink -serial $(PORT)
+	miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
+	# plink -serial $(PORT)
 
