@@ -20,28 +20,47 @@
 #include <oneshot125.hpp>
 #include <vector>
 
-#define RX_SERIAL Serial5
-
-// Un-comment on of these:
-//#include "input_dsmx.hpp"
-#include "input_sbus.hpp"
-
 static const std::vector<uint8_t> PINS = {2, 23, 14, 9};
 
+static float MAX = 0.5;
+static float INC = 1e-5;
+
 static auto motors = OneShot125(PINS);
+
+static float val;
+static float dir;
 
 void setup() 
 {
     Serial.begin(115200);
 
-    inputInit();
-
     motors.arm(); 
+
+    val = 0;
+    dir = +1;
+
+}
+
+static float inputGet()
+{
+    val += INC * dir;
+
+    if (val >= MAX) {
+        dir = -1;
+    }
+
+    if (val <= 0) {
+        dir = +1;
+    }
+    
+    return val;
 }
 
 void loop() 
 {
-    auto pulseWidth = (uint8_t)(125 * (inputGet() + 1));
+    const float input = inputGet();
+
+    auto pulseWidth = (uint8_t)(125 * (input + 1));
 
     motors.set(0, pulseWidth);
     motors.set(1, pulseWidth);
