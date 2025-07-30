@@ -24,45 +24,102 @@ class YawAngleController {
     public:
 
         /**
-          * Input is desired angle (deg) estimated actual angle (deg) from EKF;
-            ouputput is angles-per-second demand sent to YawRateController.
-          */
+         * Input is desired angle (deg) estimated actual angle (deg) from EKF;
+         ouputput is angles-per-second demand sent to YawRateController.
+         */
         static float run(
                 const bool airborne,  // ignore this
                 const float dt,       // can be a constant if needed
                 const float psi,      // estimated angle
                 const float yaw)      // desired angle
         {
-            static float _target;
-            static float _integral;
-            static float _previous;
+            float correction = 0;
 
-            _target = airborne ? 
-                cap(_target + DEMAND_MAX * yaw * dt) : psi;
+            if (airborne) {
 
-            const auto error = cap(_target - psi);
+               static constexpr float DEMAND_MAX = 200;
 
-            _integral = airborne ?
-                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+                static float _target;
 
-            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+                _target = cap(_target + DEMAND_MAX * yaw * dt);
 
-            _previous = airborne ? error : 0;
+                // correction = oldpid(dt, _target, psi);
+                correction = newpid(_target, psi);
+            }
 
-            return airborne ? KP * error + KI * _integral + KD * deriv : 0;
+            return correction;
         }
 
     private:
 
-        static constexpr float KP = 6;
-        static constexpr float KI = 1;
-        static constexpr float KD = 0.35;
-        static constexpr float ILIMIT = 360;
-        static constexpr float DEMAND_MAX = 200;
+        static float oldpid(
+                const float dt, const float target, const float actual)
+        {
+            static constexpr float KP = 6;
+            static constexpr float KI = 1;
+            static constexpr float KD = 0.35;
+            static constexpr float ILIMIT = 360;
 
-        float _integral;
-        float _previous;
+            static float _integral;
+            static float _previous;
 
+            const auto error = target - actual;
+
+            _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
+
+            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+
+            _previous = error;
+
+            return KP * error + KI * _integral + KD * deriv;
+        }
+
+        static float newpid(const float target, const float actual)
+        {
+            static constexpr float KP = 6;
+            static constexpr float KI = 1;
+            static constexpr float KD = 0.35;
+            static constexpr float ILIMIT = 360;
+
+            static float _integral;
+            static float _previous;
+
+            // encode
+            const int target_encoded = target * 1000;
+            const int actual_encoded = actual * 1000;
+
+            const int error = target_encoded - actual_encoded;
+
+            _integral = Num::fconstrain(_integral + error, ILIMIT);
+
+            const int deriv = error - _previous;
+
+            _previous = error;
+
+            const float correction = (KP * error + KI * _integral + KD * deriv);
+
+            csvdump(target_encoded, actual_encoded, error, _integral, deriv, correction);
+
+            // decode
+            return correction / 1000;
+        }
+
+        static void csvdump(const float target, const float actual,
+                const float error, const float integral, const float deriv,
+                const float correction)
+        {
+            static bool _ready;
+
+            if (!_ready) {
+
+                printf("target,actual,error,integral,derivative,correction\n");
+                _ready = true;
+            }
+
+            printf("%f,%f,%f,%f,%f,%f\n", target, actual, error, integral, deriv, correction);
+        }
+
+        // Keep angle in (0, 360)
         static float cap(float angle) 
         {
             float result = angle;
