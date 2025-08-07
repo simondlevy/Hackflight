@@ -5759,7 +5759,7 @@
 		)
 	)
 	(gr_text "CS"
-		(at 145.120604 84.67 90)
+		(at 162.786265 84.716917 90)
 		(layer "F.SilkS")
 		(uuid "d8569bcb-f6da-4a72-8934-5d3b0a58b697")
 		(effects
