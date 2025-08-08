@@ -79,7 +79,7 @@ def main():
 
         try:
 
-            print(client.recv(1))
+            print(client.recv(1).decode(), end='')
 
         except KeyboardInterrupt:
             break

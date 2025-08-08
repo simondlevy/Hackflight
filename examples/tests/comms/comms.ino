@@ -9,5 +9,5 @@ void setup()
 void loop() 
 {
 
-    Serial5.printf("Hello!");
+    Serial5.printf("Hello!\n");
 }
