@@ -43,7 +43,7 @@ void setup()
 
 void loop() 
 {
-    //if (gyro_flag) {
+    if (gyro_flag) {
 
         gyro_flag = false;
 
@@ -64,5 +64,5 @@ void loop()
         Serial.print("\t");
         Serial.print(accel.getTemperature_C());
         Serial.print("\n");
-    //}
+    }
 }
