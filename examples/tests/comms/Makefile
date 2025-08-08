@@ -1,6 +1,5 @@
-SKETCH = bmi088
+SKETCH = comms
 
-# FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 FQBN = teensy:avr:teensy40
 
 PORT = /dev/ttyACM0
@@ -8,17 +7,14 @@ PORT = /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
-SRC = ../../src/
+SRC = ../../../src/
 
 build:
-	cp FreeRTOSConfig.h $(SRC)
 	arduino-cli compile  --libraries ../../.. --libraries $(HOME)/Documents/Arduino/libraries \
 		--fqbn $(FQBN) $(SKETCH).ino
-	rm ../../src/FreeRTOSConfig.h
 
 
 flash:
-	#dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN)
 
 edit:

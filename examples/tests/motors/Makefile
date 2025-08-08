@@ -1,4 +1,4 @@
-SKETCH = motortest
+SKETCH = motors
 
 PORT = /dev/ttyACM0
 
