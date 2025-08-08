@@ -35,7 +35,7 @@ except Exception as e:
 
 BLUETOOTH_ADDRESSES = {
         'onboard': '64:B7:08:94:2A:32',
-        'bench': '64:B7:08:94:28:76'
+        'bench': '64:B7:08:93:71:1E'
 }
 
 BLUETOOTH_PORT = 1

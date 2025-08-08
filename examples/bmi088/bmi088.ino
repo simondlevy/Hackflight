@@ -37,8 +37,8 @@ void setup()
     gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
 
-    pinMode(4,INPUT);
-    attachInterrupt(GYRO_INTERRUPT_PIN,gyro_drdy,RISING);  
+    pinMode(GYRO_INTERRUPT_PIN, INPUT);
+    attachInterrupt(GYRO_INTERRUPT_PIN, gyro_drdy, RISING);  
 }
 
 void loop() 
