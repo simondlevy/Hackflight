@@ -1,13 +1,15 @@
+void serialEvent5()
+{
+    digitalWrite(LED_BUILTIN, Serial5.read() == '+');
+}
+
 void setup() 
 {
-
-    Serial.begin(0);
+    pinMode(LED_BUILTIN, OUTPUT);
 
     Serial5.begin(115200);
 }
 
 void loop() 
 {
-
-    Serial5.printf("Hello!\n");
 }

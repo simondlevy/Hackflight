@@ -20,7 +20,3 @@ flash:
 edit:
 	vim $(SKETCH).ino
 
-listen:
-	miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
-	# plink -serial $(PORT)
-

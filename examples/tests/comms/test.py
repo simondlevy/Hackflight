@@ -77,11 +77,12 @@ def main():
 
     while True:
 
-        try:
+        msg = input('Enter + or -, anything else to quit > ')
 
-            print(client.recv(1).decode(), end='')
+        if msg in ('+', '-'):
+            client.send(msg.encode())
 
-        except KeyboardInterrupt:
+        else:
             break
 
 
