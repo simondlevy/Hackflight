@@ -1,4 +1,4 @@
-SKETCH = comms
+SKETCH = receive
 
 FQBN = teensy:avr:teensy40
 
