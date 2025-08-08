@@ -8,4 +8,6 @@ void setup()
 
 void loop() 
 {
+
+    Serial5.printf("Hello!");
 }
