@@ -1,6 +1,6 @@
 FQBN = teensy:avr:teensy40
 
-SKETCH = Blink
+SKETCH = led
 
 PORT = /dev/ttyACM0
 
