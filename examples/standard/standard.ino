@@ -28,7 +28,7 @@
 #include <tasks/zranger.hpp>
 
 static const uint8_t GYRO_INTERRUPT_PIN = 4;
-static const uint8_t LED_PIN = 5;
+static const uint8_t LED_PIN = 15;
 static const uint8_t FLOWDECK_CS_PIN = 10;
 
 static Bmi088Accel _accel(Wire, 0x19);
