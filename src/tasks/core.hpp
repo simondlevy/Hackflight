@@ -231,12 +231,13 @@ class CoreTask {
 
                     demands_t closedLoopDemands = {};
 
+                    /*
                     _debugTask->setMessage(
                             "z=%+3.3f phi=%+3.1f theta=%+3.f psi=%+3.1f",
                             (double)vehicleState.z,
                             (double)vehicleState.phi,
                             (double)vehicleState.theta,
-                            (double)vehicleState.psi);
+                            (double)vehicleState.psi);*/
 
                     _closedLoopControl->run(
                             1.f / PID_UPDATE_RATE,
