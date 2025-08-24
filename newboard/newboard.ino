@@ -1,12 +1,13 @@
 #include <Wire.h>   
 
-static TwoWire mywire(PB7, PB6);//uint32_t dwSDAPin, uint32_t dwSCLPin);
+static TwoWire wire1(PB7, PB6);
+static TwoWire wire3(PB9, PB8);
 
 void setup()
 {
     Serial.begin(115200);
 
-    mywire.begin();
+    wire3.begin();
     //Wire1.begin();
 
     delay(100);
@@ -55,6 +56,6 @@ static void scan(TwoWire & wire, const char * name)
 
 void loop()
 {  
-    scan(mywire, "Wire");
+    scan(wire3, "wire3");
     //scan(Wire1, "Wire1");
 }
