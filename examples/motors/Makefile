@@ -1,3 +1,3 @@
 SKETCH = motors
 
-include ../../makefile.include
+include ../makefile.include
