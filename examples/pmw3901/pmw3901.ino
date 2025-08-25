@@ -1,55 +1,30 @@
-#include <pmw3901.hpp>
+#include <Bitcraze_PMW3901.h>
 
-#include <SPI.h>
-
-static const uint8_t CS_PIN = 11;
-
-static PMW3901 pmw3901;
-
-static SPIClass spi = SPIClass(
-        64, // MISO
-        32, // SCK
-        128); // MOSI
+Bitcraze_PMW3901 flow(PB4);
 
 void setup() 
 {
     Serial.begin(115200);
 
-    spi.begin();
-
-    if (!pmw3901.begin(CS_PIN, spi)) {
-
-        while(true) { 
-            Serial.println("Initialization of the flow pmw3901 failed");
+    if (!flow.begin()) {
+        while (true) {
+            Serial.println("Initialization of the flow sensor failed");
             delay(500);
         }
     }
 }
 
-void loop() 
-{
-    /*
-    int16_t deltaX = 0;
-    int16_t deltaY = 0;
-    bool gotMotion = false;
+int16_t deltaX,deltaY;
 
-    pmw3901.readMotion(deltaX, deltaY, gotMotion); 
+void loop() {
+    // Get motion count since last call
+    flow.readMotionCount(&deltaX, &deltaY);
 
-    Serial.print("deltaX: ");
+    Serial.print("X: ");
     Serial.print(deltaX);
-    Serial.print(",\tdeltaY: ");
+    Serial.print(", Y: ");
     Serial.print(deltaY);
-    Serial.print(",\tgotMotion: ");
-    Serial.println(gotMotion ? "yes" : "no");*/
-
-    Serial.print("MISO=");
-    Serial.print(GPIO_PIN_6);
-
-    Serial.print("  SCK=");
-    Serial.print(GPIO_PIN_5);
-
-    Serial.print("  MOSI=");
-    Serial.println(GPIO_PIN_7);
+    Serial.print("\n");
 
     delay(100);
 }
