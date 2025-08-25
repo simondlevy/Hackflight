@@ -1,10 +1,14 @@
-#include "BMI088.h"
+#include <BMI088.h>
 
-static TwoWire wire(PC9, PA8);   // internal
+// internal I^2C
+static const uint8_t SDA_PIN = PC9;
+static const uint8_t SCL_PIN = PA8;
 
-static Bmi088Accel accel(wire,0x18);
+static TwoWire wire(SDA_PIN, SCL_PIN);
 
-static Bmi088Gyro gyro(wire,0x69);
+static Bmi088Accel accel(wire, 0x18);
+
+static Bmi088Gyro gyro(wire, 0x69);
 
 static volatile bool accel_flag, gyro_flag;
 
@@ -55,8 +59,7 @@ void setup()
 
 void loop() 
 {
-    // if (accel_flag && gyro_flag) {
-    if (gyro_flag) {
+    if (accel_flag && gyro_flag) {
 
         accel_flag = false;
         gyro_flag = false;
