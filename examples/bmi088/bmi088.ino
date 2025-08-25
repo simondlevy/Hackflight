@@ -28,33 +28,33 @@ static void gyro_drdy()
     gyro_flag = true;
 }
 
+static void error(const char * msg)
+{
+    Serial.println(msg);
+    while (true) ;
+}
+
 void setup() 
 {
-    int status;
-
     Serial.begin(115200);
-    while(!Serial) {}
 
-    status = accel.begin();
-    if (status < 0) {
-        Serial.println("Accel Initialization Error");
-        Serial.println(status);
-        while (1) {}
+    while (!Serial) ;
+
+    if (accel.begin() < 0) {
+        error("Accel Initialization Error");
     }
-    status = accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
-    status = accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
-    status = accel.mapDrdyInt1(true);
 
+    accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
+    accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
+    accel.mapDrdyInt1(true);
 
-    status = gyro.begin();
-    if (status < 0) {
-        Serial.println("Gyro Initialization Error");
-        Serial.println(status);
-        while (1) {}
+    if (gyro.begin() < 0) {
+        error("Gyro Initialization Error");
     }
-    status = gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
-    status = gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
-    status = gyro.mapDrdyInt3(true);
+
+    gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
+    gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
+    gyro.mapDrdyInt3(true);
 
     pinMode(ACCEL_INTERRUPT_PIN,INPUT);
     attachInterrupt(ACCEL_INTERRUPT_PIN,accel_drdy,RISING);
