@@ -4,6 +4,9 @@
 static const uint8_t SDA_PIN = PC9;
 static const uint8_t SCL_PIN = PA8;
 
+static const uint8_t ACCEL_INTERRUPT_PIN = PC13;
+static const uint8_t GYRO_INTERRUPT_PIN = PC14;
+
 static const uint8_t ACCEL_ADDRESS = 0x18;
 static const uint8_t GYRO_ADDRESS = 0x69;
 
@@ -53,11 +56,11 @@ void setup()
     status = gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     status = gyro.mapDrdyInt3(true);
 
-    pinMode(PC13,INPUT);
-    attachInterrupt(PC13,accel_drdy,RISING);
+    pinMode(ACCEL_INTERRUPT_PIN,INPUT);
+    attachInterrupt(ACCEL_INTERRUPT_PIN,accel_drdy,RISING);
 
-    pinMode(PC14,INPUT);
-    attachInterrupt(PC14,gyro_drdy,RISING);  
+    pinMode(GYRO_INTERRUPT_PIN,INPUT);
+    attachInterrupt(GYRO_INTERRUPT_PIN,gyro_drdy,RISING);  
 }
 
 void loop() 
