@@ -1,4 +1,4 @@
-SKETCH = cf2
+SKETCH = i2cscan
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
