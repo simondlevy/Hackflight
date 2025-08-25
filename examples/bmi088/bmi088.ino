@@ -28,10 +28,12 @@ static void gyro_drdy()
     gyro_flag = true;
 }
 
-static void error(const char * msg)
+static void check(const int status, const char * msg)
 {
-    Serial.println(msg);
-    while (true) ;
+    if (status < 0) {
+        Serial.println(msg);
+        while (true) ;
+    }
 }
 
 void setup() 
@@ -40,17 +42,13 @@ void setup()
 
     while (!Serial) ;
 
-    if (accel.begin() < 0) {
-        error("Accel Initialization Error");
-    }
+    check(accel.begin(), "Accel Initialization Error");
 
     accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
     accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
     accel.mapDrdyInt1(true);
 
-    if (gyro.begin() < 0) {
-        error("Gyro Initialization Error");
-    }
+    check(gyro.begin(), "Gyro Initialization Error");
 
     gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
     gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
