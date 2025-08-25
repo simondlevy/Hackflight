@@ -1,3 +1,3 @@
 SKETCH = vl53l1
 
-include ../../makefile.include
+include ../makefile.include

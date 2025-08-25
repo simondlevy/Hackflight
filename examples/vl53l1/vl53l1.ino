@@ -12,10 +12,10 @@ void setup()
 {
   while (!Serial) {}
   Serial.begin(115200);
-  Wire1.begin();
-  Wire1.setClock(400000); // use 400 kHz I2C
+  Wire.begin();
+  Wire.setClock(400000); // use 400 kHz I2C
 
-  sensor.setBus(&Wire1);
+  sensor.setBus(&Wire);
 
   sensor.setTimeout(500);
   if (!sensor.init())
