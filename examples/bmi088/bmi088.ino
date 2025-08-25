@@ -4,11 +4,14 @@
 static const uint8_t SDA_PIN = PC9;
 static const uint8_t SCL_PIN = PA8;
 
+static const uint8_t ACCEL_ADDRESS = 0x18;
+static const uint8_t GYRO_ADDRESS = 0x69;
+
 static TwoWire wire(SDA_PIN, SCL_PIN);
 
-static Bmi088Accel accel(wire, 0x18);
+static Bmi088Accel accel(wire, ACCEL_ADDRESS);
 
-static Bmi088Gyro gyro(wire, 0x69);
+static Bmi088Gyro gyro(wire, GYRO_ADDRESS);
 
 static volatile bool accel_flag, gyro_flag;
 
