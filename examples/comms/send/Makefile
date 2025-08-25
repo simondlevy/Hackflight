@@ -1,3 +1,3 @@
 SKETCH = send
 
-include ../../../makefile.include
+include ../../makefile.include

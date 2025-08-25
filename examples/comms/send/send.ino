@@ -1,17 +1,15 @@
-void serialEvent5()
-{
-    digitalWrite(LED_BUILTIN, Serial5.read() == '+');
-}
+HardwareSerial Serial2(USART2);
 
 void setup() 
 {
-    pinMode(LED_BUILTIN, OUTPUT);
+    Serial.begin(115200);
 
-    digitalWrite(LED_BUILTIN, LOW);
-
-    Serial5.begin(115200);
+    Serial2.begin(115200);
 }
 
 void loop() 
 {
+    if (Serial2.available()) {
+        Serial.print((char)Serial2.read());
+    }
 }
