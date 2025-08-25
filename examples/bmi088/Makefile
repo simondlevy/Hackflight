@@ -1,3 +1,3 @@
 SKETCH = bmi088
 
-include ../../makefile.include
+include ../makefile.include
