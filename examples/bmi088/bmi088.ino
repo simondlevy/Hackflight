@@ -36,6 +36,12 @@ static void check(const int status, const char * msg)
     }
 }
 
+static void add_interrupt(const uint8_t pin, void (*handler)())
+{
+    pinMode(pin, INPUT);
+    attachInterrupt(pin, handler, RISING);
+}
+
 void setup() 
 {
     Serial.begin(115200);
@@ -48,17 +54,15 @@ void setup()
     accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
     accel.mapDrdyInt1(true);
 
+    add_interrupt(ACCEL_INTERRUPT_PIN, accel_drdy);
+
     check(gyro.begin(), "Gyro Initialization Error");
 
     gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
     gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
 
-    pinMode(ACCEL_INTERRUPT_PIN,INPUT);
-    attachInterrupt(ACCEL_INTERRUPT_PIN,accel_drdy,RISING);
-
-    pinMode(GYRO_INTERRUPT_PIN,INPUT);
-    attachInterrupt(GYRO_INTERRUPT_PIN,gyro_drdy,RISING);  
+    add_interrupt(GYRO_INTERRUPT_PIN, gyro_drdy);
 }
 
 void loop() 
