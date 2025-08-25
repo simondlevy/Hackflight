@@ -1,12 +1,12 @@
 #include <Wire.h>   
 
-//static TwoWire wire(PB9, PB8);
+static TwoWire wire(PC9, PA8);
 
 void setup()
 {
     Serial.begin(115200);
 
-    Wire.begin();
+    wire.begin();
     delay(100);
 
 }
@@ -54,5 +54,5 @@ static void scan(TwoWire & wire, const char * name)
 
 void loop()
 {  
-    scan(Wire, "wire");
+    scan(wire, "wire");
 }

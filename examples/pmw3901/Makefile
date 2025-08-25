@@ -1,3 +1,3 @@
 SKETCH = pmw3901
 
-include ../../makefile.include
+include ../makefile.include

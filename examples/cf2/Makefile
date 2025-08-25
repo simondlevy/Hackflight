@@ -1,4 +1,4 @@
-SKETCH = newboard
+SKETCH = cf2
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
