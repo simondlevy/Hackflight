@@ -1,6 +1,6 @@
-static const uint8_t SPEED = 32;
+static const uint8_t MAX_SPEED = 128;
 
-static const uint8_t MAX = 128;
+static const uint32_t DELAY_MSEC = 50;
 
 static const uint8_t MOTOR_1_PIN = PA1;
 static const uint8_t MOTOR_2_PIN = PB11;
@@ -28,7 +28,7 @@ static uint8_t getSpeed()
 
         val += dir;
 
-        if (val >= MAX) {
+        if (val >= MAX_SPEED) {
             dir = -1;
         }
 
@@ -73,6 +73,6 @@ void loop()
 
     prompt();
 
-    delay(100);
+    delay(DELAY_MSEC);
 
 }
