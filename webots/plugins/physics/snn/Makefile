@@ -18,7 +18,7 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-EMB = $(ROOT)/embedded-neuromorphic/levy/
+EMB = $(HOME)/Documents/Arduino/libraries/embedded-neuromorphic
 
 NET = $(EMB)/examples/difference
 
@@ -26,7 +26,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(EMB) -I$(NET)
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(EMB)/src -I$(NET)
 
 all: libsnn.so
 
