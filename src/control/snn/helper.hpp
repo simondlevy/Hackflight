@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <difference.hpp>
+#include <difference-allinone.hpp>
 
 #include <control/pids/altitude.hpp>
 #include <control/pids/position.hpp>
@@ -34,7 +34,7 @@ class SnnHelper {
 
         static constexpr float MAX_SPIKE_TIME = 100;
 
-        risp::DifferenceNetwork _net;
+        Difference_Helper _allinone;
 
         bool _hovering;
 
@@ -57,11 +57,7 @@ class SnnHelper {
 
             const auto airborne = hovering || (z > z0);
 
-            const int timesteps = 3 * MAX_SPIKE_TIME + 2;
-
-            float error = 0;
-
-            _net.run(timesteps, demand, dz, 1, error);
+            const float error = _allinone.run(demand, dz, 1);  // 1 = bias
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -77,42 +73,42 @@ class SnnHelper {
 
         int get_i1_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_i1_spike_time());
+            return normalize_when_hovering(_allinone.proc.i1.get_last_fire_time());
         }
 
         int get_i2_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_i2_spike_time());
+            return normalize_when_hovering(_allinone.proc.i2.get_last_fire_time());
         }
 
         int get_s_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_s_spike_time());
+            return normalize_when_hovering(_allinone.proc.s.get_last_fire_time());
         }
 
         int get_d1_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_d1_spike_time());
+            return normalize_when_hovering(_allinone.proc.d1.get_last_fire_time());
         }
 
         int get_d2_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_d2_spike_time());
+            return normalize_when_hovering(_allinone.proc.d2.get_last_fire_time());
         }
 
         int get_s2_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_s2_spike_time());
+            return normalize_when_hovering(_allinone.proc.s2.get_last_fire_time());
         }
 
         int get_o_relative_spike_time()
         {
-            return normalize_when_hovering(_net.get_o_spike_time());
+            return normalize_when_hovering(_allinone.proc.o.get_last_fire_time());
         }
 
-        int normalize_when_hovering(const int spike_time)
+        int normalize_when_hovering(const int get_last_fire_time)
         {
-            return _hovering ?  50 * spike_time / 300 + 1: 0;
+            return _hovering ?  50 * get_last_fire_time / 300 + 1: 0;
         }
 
         // -------------------------------------------------------------------

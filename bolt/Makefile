@@ -6,8 +6,7 @@ HFDIR = $(HOME)/Desktop/hackflight
 
 HASKDIR = $(HFDIR)/haskell
 
-SNNDIR = $(HOME)/Desktop/2025-diff-network/levy
-EMBDIR = $(HOME)/Desktop/embedded-neuromorphic/levy
+EMBDIR = $(HOME)/Documents/Arduino/libraries/embedded-neuromorphic/
 
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
@@ -59,7 +58,7 @@ INCLUDES += -I$(srctree)/src
 
 INCLUDES += -I$(KBUILD_OUTPUT)/include/generated
 
-INCLUDES += -I$(SNNDIR)
+INCLUDES += -I$(EMBDIR)/src
 
 objs-y += src
 objs-y += $(VENDOR)
@@ -109,6 +108,7 @@ unbrick:
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
+	ln -sf $(HFDIR)/src/free_rtos $(HFDIR)/bolt/src
 	cp $(HFDIR)/src/control/standard.hpp $(HFDIR)/src/__control__.hpp
 	cp $(HFDIR)/src/system.cpp $(HFDIR)/bolt/src/__system__.cpp
 	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
@@ -118,7 +118,8 @@ standard_config:
 snn_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	$(EMBDIR)/compiler.py $(SNNDIR)/max_100.txt -o $(PWD)/src
+	ln -sf $(HFDIR)/src/free_rtos $(HFDIR)/bolt/src
+	$(EMBDIR)/compiler.py $(EMBDIR)/examples/difference/difference.txt -o $(PWD)/src
 	cp $(HFDIR)/src/control/snn.hpp $(HFDIR)/src/__control__.hpp
 	cp $(HFDIR)/src/system.cpp $(HFDIR)/bolt/src/__system__.cpp
 	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
@@ -128,6 +129,7 @@ snn_config:
 haskell_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
+	ln -sf $(HFDIR)/src/free_rtos $(HFDIR)/bolt/src
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c $(HFDIR)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(HFDIR)/bolt/src/
