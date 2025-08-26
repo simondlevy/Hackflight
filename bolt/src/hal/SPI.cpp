@@ -1,7 +1,7 @@
 #include "SPI.h"
 
-#include <FreeRTOS.h>
-#include <semphr.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/semphr.h>
 
 #include <stm32fxxx.h>
 #include <cfassert.h>

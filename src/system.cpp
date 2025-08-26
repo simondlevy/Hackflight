@@ -14,9 +14,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <task.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/semphr.h>
+#include <free_rtos/task.h>
 
 // Chosen at config time
 #include <__control__.hpp>

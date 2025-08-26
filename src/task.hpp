@@ -18,8 +18,8 @@
 
 #include <stdint.h>
 
-#include <FreeRTOS.h>
-#include <task.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/task.h>
 
 class FreeRtosTask {
 

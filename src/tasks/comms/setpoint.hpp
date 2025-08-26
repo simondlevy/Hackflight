@@ -18,9 +18,9 @@
 
 #include <stdint.h>
 
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/task.h>
+#include <free_rtos/queue.h>
 
 #include <msp/messages.h>
 #include <msp/parser.hpp>

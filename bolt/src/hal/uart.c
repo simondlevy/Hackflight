@@ -27,11 +27,11 @@
 
 #include "stm32fxxx.h"
 
-#include <FreeRTOS.h>
-#include <queue.h>
-#include <semphr.h>
-#include <event_groups.h>
-#include <stream_buffer.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/queue.h>
+#include <free_rtos/semphr.h>
+#include <free_rtos/event_groups.h>
+#include <free_rtos/stream_buffer.h>
 
 #include "../../../build/include/generated/autoconf.h"
 

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <semphr.h>
+#include <free_rtos/semphr.h>
 
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>

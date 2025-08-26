@@ -3,9 +3,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <queue.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/semphr.h>
+#include <free_rtos/queue.h>
 
 #include <stm32fxxx.h>
 

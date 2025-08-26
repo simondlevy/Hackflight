@@ -1,8 +1,8 @@
 #include <string.h>
 
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <task.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/semphr.h>
+#include <free_rtos/task.h>
 
 #include <stm32fxxx.h>
 

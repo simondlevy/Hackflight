@@ -19,8 +19,8 @@
 #include <Arduino.h>
 
 // FreeRTOS
-#include <FreeRTOS.h>
-#include <task.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/task.h>
 
 // Hackflight
 #include <clock.hpp>

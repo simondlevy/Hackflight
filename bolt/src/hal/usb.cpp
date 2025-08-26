@@ -28,10 +28,10 @@
 
 #include <stm32fxxx.h>
 
-#include <FreeRTOS.h>
-#include <task.h>
-#include <semphr.h>
-#include <queue.h>
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/task.h>
+#include <free_rtos/semphr.h>
+#include <free_rtos/queue.h>
 
 #include "usb.h"
 
