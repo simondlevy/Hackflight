@@ -2,7 +2,7 @@ PYTHON            ?= python3
 
 DFU_UTIL          ?= dfu-util
 
-HFDIR = $(HOME)/Desktop/hackflight
+HFDIR = $(PWD)/..
 
 HASKDIR = $(HFDIR)/haskell
 
