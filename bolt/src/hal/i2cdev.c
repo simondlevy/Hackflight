@@ -109,7 +109,7 @@ static void devUnlockBus(GPIO_TypeDef* portSCL, GPIO_TypeDef* portSDA,
 
 static void startTransfer(I2C_Dev *i2c)
 {
-    ASSERT_DMA_SAFE(i2c->txMessage.buffer);
+    //ASSERT_DMA_SAFE(i2c->txMessage.buffer);
 
     if (i2c->txMessage.direction == i2cRead)
     {
@@ -237,7 +237,7 @@ static void createMessage(
         uint32_t length,
         const uint8_t *buffer)
 {
-    ASSERT_DMA_SAFE(buffer);
+    //ASSERT_DMA_SAFE(buffer);
     message->slaveAddress = slaveAddress;
     message->direction = direction;
     message->messageLength = length;

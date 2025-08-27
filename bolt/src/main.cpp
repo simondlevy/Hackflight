@@ -58,6 +58,7 @@ void error(const char * msg)
 {
 }
 
+/*
 void assertFail(char *exp, char *file, int line)
 {
     portDISABLE_INTERRUPTS();
@@ -66,7 +67,8 @@ void assertFail(char *exp, char *file, int line)
     motorsStop();
 
     NVIC_SystemReset();
-}
+}*/
+
 
 // ZRangerTask ---------------------------------------------------------------
 

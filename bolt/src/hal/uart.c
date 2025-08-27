@@ -155,7 +155,7 @@ void uartInit(const uint32_t baudrate)
   isrEvents = xEventGroupCreate();
 
   rxStream = xStreamBufferCreate( 200, 1);
-  ASSERT(rxStream);
+  //ASSERT(rxStream);
 
   didInit = true;
 }

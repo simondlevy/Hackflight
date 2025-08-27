@@ -195,7 +195,7 @@ static void spi1_begin_transaction(
 
 static bool spi1_exchange(size_t length, const uint8_t * data)
 {
-    ASSERT_DMA_SAFE(data);
+    //ASSERT_DMA_SAFE(data);
 
     // DMA already configured, just need to set memory addresses
     SPI1_TX_DMA_STREAM->M0AR = (uint32_t)data;

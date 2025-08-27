@@ -1,3 +1,5 @@
+#include <hackflight.h>
+
 static const uint8_t LED_PIN = PC0;
 
 void setup() 

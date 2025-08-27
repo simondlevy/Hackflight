@@ -49,7 +49,7 @@
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    extern "C" {
+//    extern "C" {
 #endif
 /* *INDENT-ON* */
 
@@ -1284,7 +1284,7 @@ typedef StaticStreamBuffer_t StaticMessageBuffer_t;
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
-    }
+//    }
 #endif
 /* *INDENT-ON* */
 

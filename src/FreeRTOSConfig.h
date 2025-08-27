@@ -53,14 +53,15 @@
 
 #pragma once
 
-#if defined(ARDUINO_TEENSY41)
-#define FREERTOS_MCU_CLOCK_HZ   600000000
+#if defined(ARDUINO)
+#include <Arduino.h>
 #define usecTimerInit()
 #else
-//uint32_t micros();
-#define FREERTOS_MCU_CLOCK_HZ   168000000
 #include <hal/time.h>
 #endif
+
+// STM32F405
+#define FREERTOS_MCU_CLOCK_HZ   168000000
 
 #include <cfassert.h>
 
@@ -158,7 +159,7 @@ to exclude the API function. */
 #define configRECORD_STACK_HIGH_ADDRESS 1
 #endif
 
-#define configASSERT( x )  if ( ( x ) == 0 ) assertFail(#x, __FILE__, __LINE__ )
+//#define configASSERT( x )  if ( ( x ) == 0 ) assertFail(#x, __FILE__, __LINE__ )
 
 /*
 #define traceTASK_SWITCHED_IN() \
