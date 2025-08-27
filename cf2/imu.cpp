@@ -23,7 +23,6 @@
 static const uint8_t SDA_PIN = PC9;
 static const uint8_t SCL_PIN = PA8;
 
-static const uint8_t ACCEL_INTERRUPT_PIN = PC13;
 static const uint8_t GYRO_INTERRUPT_PIN = PC14;
 
 static const uint8_t ACCEL_ADDRESS = 0x18;
@@ -80,7 +79,6 @@ void ImuTask::deviceInit(void)
 
     accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
     accel.mapDrdyInt1(true);
-
     add_interrupt(ACCEL_INTERRUPT_PIN, accel_drdy);
 }
 

@@ -16,12 +16,14 @@ static Bmi088Accel accel(wire, ACCEL_ADDRESS);
 
 static Bmi088Gyro gyro(wire, GYRO_ADDRESS);
 
-static volatile bool accel_flag, gyro_flag;
+//static volatile bool accel_flag;
+static volatile bool gyro_flag;
 
+/*
 static void accel_drdy()
 {
     accel_flag = true;
-}
+}*/
 
 static void gyro_drdy()
 {
@@ -51,10 +53,10 @@ void setup()
     check(accel.begin(), "Accel Initialization Error");
 
     accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
-    accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
-    accel.mapDrdyInt1(true);
 
-    add_interrupt(ACCEL_INTERRUPT_PIN, accel_drdy);
+    //accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
+    //accel.mapDrdyInt1(true);
+    //add_interrupt(ACCEL_INTERRUPT_PIN, accel_drdy);
 
     check(gyro.begin(), "Gyro Initialization Error");
 
@@ -67,9 +69,9 @@ void setup()
 
 void loop() 
 {
-    if (accel_flag && gyro_flag) {
+    if (/*accel_flag &&*/ gyro_flag) {
 
-        accel_flag = false;
+        //accel_flag = false;
         gyro_flag = false;
 
         accel.readSensor();
