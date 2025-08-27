@@ -16,8 +16,6 @@
 
 void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin);
 
-const bool systemIsLedInverted();
-
 void systemReportForever(const char * msg);
 
 bool systemUartReadByte(uint8_t *);

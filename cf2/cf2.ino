@@ -24,11 +24,6 @@ static const uint8_t FLOWDECK_CS_PIN = PB4;
 
 static const uint8_t LED_PIN = PC0;
 
-const bool systemIsLedInverted() 
-{
-    return true;
-}
-
 void setup() 
 {
     Serial.begin(115200);

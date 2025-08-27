@@ -85,6 +85,6 @@ class LedTask {
 
         void set(const bool on)
         {
-            digitalWrite(_pin, systemIsLedInverted() ? !on : on);
+            digitalWrite(_pin, !on); // assume LED active low
         }
 };

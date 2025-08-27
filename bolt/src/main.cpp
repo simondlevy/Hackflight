@@ -273,11 +273,6 @@ void ImuTask::deviceInit(void)
 
 static const uint8_t LED_PIN = 4;
 
-const bool systemIsLedInverted() 
-{
-    return true;
-}
-
 // UART ----------------------------------------------------------------------
 
 bool systemUartReadByte(uint8_t * byte)
