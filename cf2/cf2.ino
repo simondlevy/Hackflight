@@ -27,40 +27,6 @@
 
 static const uint8_t FLOWDECK_CS_PIN = PB4;
 
-// Helpers -------------------------------------------------------------------
-
-static void error(const char * msg)
-{
-    while (true) {
-        Serial.println(msg);
-        delay(500);
-    }
-}
-
-// ZRangerTask ---------------------------------------------------------------
-
-static VL53L1X vl53l1;
-
-void ZRangerTask::hardware_init()
-{
-    static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
-
-    if (!vl53l1.init()) {
-        error("ZRANGER: Z-down sensor [FAIL]");
-    }
-
-    vl53l1.setDistanceMode(VL53L1X::Medium);
-
-    vl53l1.setMeasurementTimingBudget(25000); // usec
-
-    vl53l1.startContinuous(25); // msec
-}
-
-float ZRangerTask::hardware_read()
-{
-    return vl53l1.read();
-}
-
 // LED -----------------------------------------------------------------------
 
 static const uint8_t LED_PIN = PC0;
