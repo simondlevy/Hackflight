@@ -16,18 +16,11 @@
  */
 
 #include <hackflight.h>
-#include <motors.h>
 #include <system.h>
-#include <tasks/imu.hpp>
-#include <tasks/zranger.hpp>
 
 #include <Wire.h>
 
-#include <VL53L1X.h>
-
 static const uint8_t FLOWDECK_CS_PIN = PB4;
-
-// LED -----------------------------------------------------------------------
 
 static const uint8_t LED_PIN = PC0;
 
@@ -35,34 +28,6 @@ const bool systemIsLedInverted()
 {
     return true;
 }
-
-// Motors ---------------------------------------------------------------------
-
-int motorsGetRatio(uint32_t id)
-{
-    return 0;
-}
-
-void  motorsInit(void)
-{
-}
-
-bool motorsTest(void)
-{
-    return true;
-}
-
-void  motorsSetRatios(const uint16_t ratios[])
-{
-    (void)ratios;
-}
-
-void  motorsStop(void)
-{
-}
-
-
-// Main -----------------------------------------------------------------------
 
 void setup() 
 {
