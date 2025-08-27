@@ -25,11 +25,7 @@
 
 #include <VL53L1X.h>
 
-static const uint8_t LED_PIN = PC0;
-
 static const uint8_t FLOWDECK_CS_PIN = PB4;
-
-HardwareSerial Serial2(USART2);
 
 // Helpers -------------------------------------------------------------------
 
@@ -40,8 +36,6 @@ static void error(const char * msg)
         delay(500);
     }
 }
-
-// IMUTask -------------------------------------------------------------------
 
 // ZRangerTask ---------------------------------------------------------------
 
@@ -67,8 +61,79 @@ float ZRangerTask::hardware_read()
     return vl53l1.read();
 }
 
+// IMUTask -------------------------------------------------------------------
 
-// Main ----------------------------------------------------------------------
+void ImuTask::deviceInit(void)
+{
+}
+
+void ImuTask::readGyroRaw(Axis3i16* dataOut)
+{
+    (void)dataOut;
+}
+
+void ImuTask::readAccelRaw(Axis3i16 * dataOut)
+{
+    (void)dataOut;
+}
+
+// LED -----------------------------------------------------------------------
+
+static const uint8_t LED_PIN = PC0;
+
+const bool systemIsLedInverted() 
+{
+    return true;
+}
+ 
+
+// UART ----------------------------------------------------------------------
+
+HardwareSerial Serial2(USART2);
+
+bool systemUartReadByte(uint8_t * byte)
+{
+    const bool available = Serial2.available() > 0;
+
+    if (available) {
+        *byte = Serial2.read();
+    }
+
+    return available;
+}
+
+void systemUartWriteByte(const uint8_t byte)
+{
+    Serial2.write(byte);
+}
+
+// Motors ---------------------------------------------------------------------
+
+int motorsGetRatio(uint32_t id)
+{
+    return 0;
+}
+
+void  motorsInit(void)
+{
+}
+
+bool motorsTest(void)
+{
+    return true;
+}
+
+void  motorsSetRatios(const uint16_t ratios[])
+{
+    (void)ratios;
+}
+
+void  motorsStop(void)
+{
+}
+
+
+// Main -----------------------------------------------------------------------
 
 void setup() 
 {
