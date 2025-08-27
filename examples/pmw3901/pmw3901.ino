@@ -1,12 +1,12 @@
 #include <Bitcraze_PMW3901.h>
 
-Bitcraze_PMW3901 flow(PB4);
+Bitcraze_PMW3901 pmw3901(PB4);
 
 void setup() 
 {
     Serial.begin(115200);
 
-    if (!flow.begin()) {
+    if (!pmw3901.begin()) {
         while (true) {
             Serial.println("Initialization of the flow sensor failed");
             delay(500);
@@ -14,11 +14,12 @@ void setup()
     }
 }
 
-int16_t deltaX,deltaY;
+void loop()
+{
+    
+    int16_t deltaX=0, deltaY=0;
 
-void loop() {
-    // Get motion count since last call
-    flow.readMotionCount(&deltaX, &deltaY);
+    pmw3901.readMotionCount(&deltaX, &deltaY);
 
     Serial.print("X: ");
     Serial.print(deltaX);
