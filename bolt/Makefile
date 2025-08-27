@@ -46,8 +46,6 @@ INCLUDES += -I$(srctree)/src/hal
 INCLUDES += -I$(CMSIS)/DSP/Include
 INCLUDES += -I$(CMSIS)/Core/Include
 
-INCLUDES += -I$(srctree)/src/deck/drivers/vl53l1
-
 INCLUDES += -I$(srctree)/src/stm32f4/STM32F4xx_StdPeriph_Driver/inc
 INCLUDES += -I$(srctree)/src/stm32f4/STM32_USB_Device_Library/Core/inc
 INCLUDES += -I$(srctree)/src/stm32f4/STM32_USB_OTG_Driver/inc
