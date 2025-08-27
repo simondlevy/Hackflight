@@ -16,14 +16,20 @@
  */
 
 #include <hackflight.h>
+#include <motors.h>
+#include <system.h>
+#include <tasks/imu.hpp>
+#include <tasks/zranger.hpp>
 
 static const uint8_t LED_PIN = PC0;
+
+HardwareSerial Serial2(USART2);
 
 void setup() 
 {
     Serial.begin(115200);
 
-    pinMode(LED_PIN, OUTPUT);
+    Serial2.begin(115200);
 }
 
 void loop() 

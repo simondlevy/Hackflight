@@ -91,7 +91,7 @@ int main()
     usecTimerInit();
     i2cdevInit();
     usbInit();
-    uartInit(115200); // RaspberryPi comms
+    uartInit(115200); // Bluetooth comms
     SPI.begin();
     systemInit(LED_PIN, FLOWDECK_CS_PIN);
 
