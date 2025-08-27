@@ -27,6 +27,8 @@
 
 static const uint8_t LED_PIN = PC0;
 
+static const uint8_t FLOWDECK_CS_PIN = PB4;
+
 HardwareSerial Serial2(USART2);
 
 // Helpers -------------------------------------------------------------------
@@ -38,6 +40,8 @@ static void error(const char * msg)
         delay(500);
     }
 }
+
+// IMUTask -------------------------------------------------------------------
 
 // ZRangerTask ---------------------------------------------------------------
 
@@ -75,7 +79,7 @@ void setup()
     Wire.begin();
     Wire.setClock(400000);
 
-    //systemInit(LED_PIN, FLOWDECK_CS_PIN);
+    systemInit(LED_PIN, FLOWDECK_CS_PIN);
 }
 
 void loop() 

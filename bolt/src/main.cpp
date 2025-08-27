@@ -43,12 +43,9 @@
 
 #include <st/vl53l1_api.h>
 
-static const uint8_t LED_PIN = 4;
 static const uint8_t FLOWDECK_CS_PIN = 11;
 
-static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
-
-static VL53L1 _vl53l1;
+// Helpers --------------------------------------------------------------------
 
 void debug(const char * msg)
 {
@@ -59,6 +56,10 @@ void error(const char * msg)
 }
 
 // ZRangerTask ---------------------------------------------------------------
+
+static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
+
+static VL53L1 _vl53l1;
 
 void ZRangerTask::hardware_init()
 {
@@ -82,24 +83,40 @@ float ZRangerTask::hardware_read()
     return _vl53l1.readDistance();
 }
 
-// ---------------------------------------------------------------------------
+extern "C" {
 
-int main() 
-{
-    nvicInit();
-    extiInit();
-    usecTimerInit();
-    i2cdevInit();
-    usbInit();
-    uartInit(115200); // Bluetooth comms
-    SPI.begin();
-    systemInit(LED_PIN, FLOWDECK_CS_PIN);
+    VL53L1_Error VL53L1_WaitUs(VL53L1_Dev_t *pdev, int32_t usec)
+    {
+        void delayMicroseconds(const uint32_t usec);
 
-    while(true) {
+        delayMicroseconds(usec);
+
+        return VL53L1_ERROR_NONE;
     }
 
-    return 0;
+    VL53L1_Error VL53L1_WriteMulti(VL53L1_Dev_t *pdev, uint16_t index, 
+            uint8_t * pdata, uint32_t count)
+    {
+        return i2cdevWriteReg16(
+                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
+            VL53L1_ERROR_NONE : 
+            VL53L1_ERROR_CONTROL_INTERFACE;
+    }
+
+    VL53L1_Error VL53L1_ReadMulti(VL53L1_Dev_t *pdev, uint16_t index, 
+            uint8_t * pdata, uint32_t   count)
+    {
+        return i2cdevReadReg16(
+                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
+            VL53L1_ERROR_NONE : 
+            VL53L1_ERROR_CONTROL_INTERFACE;
+    }
+
+
 }
+
+
+// IMUTask -------------------------------------------------------------------
 
 static bstdr_ret_t spi_burst_read(uint8_t dev_id, uint8_t reg_addr,
         uint8_t *reg_data, uint16_t len)
@@ -172,21 +189,6 @@ void ImuTask::readAccelRaw(Axis3i16 * dataOut)
     bmi088_get_accel_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
 }
 
-const bool systemIsLedInverted() 
-{
-    return true;
-}
-
-bool systemUartReadByte(uint8_t * byte)
-{
-    return uartGetData(1, byte);
-}
-
-void systemUartWriteByte(const uint8_t byte)
-{
-    uartSendDataDmaBlocking(1, (uint8_t *)&byte);
-}
- 
 void ImuTask::deviceInit(void)
 {
     _imuTask = this;
@@ -267,35 +269,44 @@ void ImuTask::deviceInit(void)
     portENABLE_INTERRUPTS();
 }
 
-extern "C" {
+// LED -----------------------------------------------------------------------
 
-    VL53L1_Error VL53L1_WaitUs(VL53L1_Dev_t *pdev, int32_t usec)
-    {
-        void delayMicroseconds(const uint32_t usec);
+static const uint8_t LED_PIN = 4;
 
-        delayMicroseconds(usec);
-
-        return VL53L1_ERROR_NONE;
-    }
-
-    VL53L1_Error VL53L1_WriteMulti(VL53L1_Dev_t *pdev, uint16_t index, 
-            uint8_t * pdata, uint32_t count)
-    {
-        return i2cdevWriteReg16(
-                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
-            VL53L1_ERROR_NONE : 
-            VL53L1_ERROR_CONTROL_INTERFACE;
-    }
-
-    VL53L1_Error VL53L1_ReadMulti(VL53L1_Dev_t *pdev, uint16_t index, 
-            uint8_t * pdata, uint32_t   count)
-    {
-        return i2cdevReadReg16(
-                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
-            VL53L1_ERROR_NONE : 
-            VL53L1_ERROR_CONTROL_INTERFACE;
-    }
-
-
+const bool systemIsLedInverted() 
+{
+    return true;
 }
+
+// UART ----------------------------------------------------------------------
+
+bool systemUartReadByte(uint8_t * byte)
+{
+    return uartGetData(1, byte);
+}
+
+void systemUartWriteByte(const uint8_t byte)
+{
+    uartSendDataDmaBlocking(1, (uint8_t *)&byte);
+}
+
+// Main -----------------------------------------------------------------------
+
+int main() 
+{
+    nvicInit();
+    extiInit();
+    usecTimerInit();
+    i2cdevInit();
+    usbInit();
+    uartInit(115200); // Bluetooth comms
+    SPI.begin();
+    systemInit(LED_PIN, FLOWDECK_CS_PIN);
+
+    while(true) {
+    }
+
+    return 0;
+}
+
 
