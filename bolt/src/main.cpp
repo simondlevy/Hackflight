@@ -58,18 +58,6 @@ void error(const char * msg)
 {
 }
 
-/*
-void assertFail(char *exp, char *file, int line)
-{
-    portDISABLE_INTERRUPTS();
-    debug("SYSTEM: Assert failed");
-
-    motorsStop();
-
-    NVIC_SystemReset();
-}*/
-
-
 // ZRangerTask ---------------------------------------------------------------
 
 void ZRangerTask::hardware_init()
