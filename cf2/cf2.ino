@@ -35,27 +35,6 @@ const bool systemIsLedInverted()
 {
     return true;
 }
- 
-
-// UART ----------------------------------------------------------------------
-
-HardwareSerial Serial2(USART2);
-
-bool systemUartReadByte(uint8_t * byte)
-{
-    const bool available = Serial2.available() > 0;
-
-    if (available) {
-        *byte = Serial2.read();
-    }
-
-    return available;
-}
-
-void systemUartWriteByte(const uint8_t byte)
-{
-    Serial2.write(byte);
-}
 
 // Motors ---------------------------------------------------------------------
 
