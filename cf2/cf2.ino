@@ -61,22 +61,6 @@ float ZRangerTask::hardware_read()
     return vl53l1.read();
 }
 
-// IMUTask -------------------------------------------------------------------
-
-void ImuTask::deviceInit(void)
-{
-}
-
-void ImuTask::readGyroRaw(Axis3i16* dataOut)
-{
-    (void)dataOut;
-}
-
-void ImuTask::readAccelRaw(Axis3i16 * dataOut)
-{
-    (void)dataOut;
-}
-
 // LED -----------------------------------------------------------------------
 
 static const uint8_t LED_PIN = PC0;
