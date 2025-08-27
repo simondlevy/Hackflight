@@ -1,6 +1,8 @@
 #include <Bitcraze_PMW3901.h>
 
-Bitcraze_PMW3901 pmw3901(PB4);
+static const uint8_t CS_PIN = PB4;
+
+static Bitcraze_PMW3901 pmw3901(CS_PIN);
 
 void setup() 
 {
