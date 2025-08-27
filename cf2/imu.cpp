@@ -34,16 +34,11 @@ static Bmi088Accel accel(wire, ACCEL_ADDRESS);
 
 static Bmi088Gyro gyro(wire, GYRO_ADDRESS);
 
-static volatile bool accel_flag, gyro_flag;
-
-static void accel_drdy()
-{
-    accel_flag = true;
-}
+static ImuTask * imuTask;
 
 static void gyro_drdy()
 {
-    gyro_flag = true;
+    imuTask->dataAvailableCallback();
 }
 
 static void check(const int status, const char * msg)
@@ -62,6 +57,8 @@ static void add_interrupt(const uint8_t pin, void (*handler)())
 
 void ImuTask::deviceInit(void)
 {
+    imuTask = this;
+
     check(gyro.begin(), "Gyro Initialization Error");
 
     gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ);
@@ -76,10 +73,6 @@ void ImuTask::deviceInit(void)
 
     accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ);
     accel.setRange(Bmi088Accel::RANGE_24G);
-
-    accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
-    accel.mapDrdyInt1(true);
-    add_interrupt(ACCEL_INTERRUPT_PIN, accel_drdy);
 }
 
 void ImuTask::readGyroRaw(Axis3i16* dataOut)
