@@ -1,3 +1,5 @@
+#include <Wire.h>
+
 #include <arduino_freertos.h>
 #include <FreeRTOS.h>
 #include <task.h>
@@ -22,9 +24,12 @@ static ZRangerTask zrangerTask;
 
 void setup() 
 {
+    Wire.begin();
+    Wire.setClock(400000);
+
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask);
+    zrangerTask.begin(&estimatorTask, &debugTask);
 
     debugTask.setMessage("hello");
 

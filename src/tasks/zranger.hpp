@@ -16,24 +16,33 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <VL53L1X.h>
 
 #include <linalg.h>
 #include <system.h>
 #include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 class ZRangerTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask)
+        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask)
         {
             if (_task.didInit()){
                 return;
             }
 
-            //hardware_init();
+            _vl53l1x.setBus(&Wire);
+
+            if (!_vl53l1x.init()) {
+                debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
+            }
+
+            _vl53l1x.setDistanceMode(VL53L1X::Medium);
+            _vl53l1x.setMeasurementTimingBudget(25000); // usec
+            _vl53l1x.startContinuous(25); // msec
 
             _estimatorTask = estimatorTask;
 
@@ -41,7 +50,7 @@ class ZRangerTask {
 
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff =
-				logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+                logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
         }
 
     private:
@@ -66,6 +75,8 @@ class ZRangerTask {
         float _expCoeff;
 
         EstimatorTask * _estimatorTask;
+
+        VL53L1X _vl53l1x;
 
         void run(void)
         {
