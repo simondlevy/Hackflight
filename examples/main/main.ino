@@ -42,6 +42,8 @@ void setup()
 
     zrangerTask.begin(&estimatorTask, &debugTask);
 
+    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN);
+
     ledTask.begin(&safety, LED_PIN);
 
     vTaskStartScheduler();

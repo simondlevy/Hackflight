@@ -35,6 +35,8 @@ class FlowDeckTask {
                 return;
             }
 
+            SPI.begin();
+
             _estimatorTask = estimatorTask;
 
             if (_pmw3901.begin(cs_pin)) {
@@ -66,8 +68,6 @@ class FlowDeckTask {
 
         void run(void)
         {
-            systemWaitStart();
-
             auto lastTime  = micros();
 
             while (true) {
