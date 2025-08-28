@@ -10,15 +10,17 @@ using namespace arduino;
 #define T2M(X) ((unsigned int)(X))
 
 #include <hackflight.h>
+
+// Chosen at config time
+#include "__control__.hpp"
+
 #include <safety.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/led.hpp>
+#include <tasks/comms/logging.hpp>
 #include <tasks/comms/setpoint.hpp>
 #include <tasks/zranger.hpp>
-
-// Chosen at config time
-#include "__control__.hpp"
 
 static Safety safety;
 

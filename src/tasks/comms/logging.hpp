@@ -19,8 +19,8 @@
 #include <stdint.h>
 
 
+#include <msp/messages.h>
 #include <msp/serializer.hpp>
-#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
