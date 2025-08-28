@@ -22,6 +22,8 @@ static EstimatorTask estimatorTask;
 static LedTask ledTask;
 static ZRangerTask zrangerTask;
 
+static const uint8_t LED_PIN = 15;
+
 void setup() 
 {
     Wire.begin();
@@ -39,7 +41,7 @@ void setup()
         Serial.flush();
     }
 
-    ledTask.begin(&safety, 15, false);
+    ledTask.begin(&safety, LED_PIN);
 
     vTaskStartScheduler();
 }
