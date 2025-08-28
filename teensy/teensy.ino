@@ -39,7 +39,7 @@ void setup()
         Serial.flush();
     }
 
-    ledTask.begin(&safety, LED_BUILTIN, false);
+    ledTask.begin(&safety, 15, false);
 
     vTaskStartScheduler();
 }

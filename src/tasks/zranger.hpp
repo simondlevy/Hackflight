@@ -91,7 +91,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
-                float range = 0;//hardware_read();
+                float range = _vl53l1x.read();
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers
