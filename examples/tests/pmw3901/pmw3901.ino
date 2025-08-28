@@ -23,18 +23,13 @@ void setup()
 void loop()
 {
     
-    int16_t deltaX=0, deltaY=0;
+    int16_t dx=0, dy=0;
     bool gotMotion = false;
 
-    pmw3901.readMotion(deltaX, deltaY, gotMotion);
+    pmw3901.readMotion(dx, dy, gotMotion);
 
-    Serial.print("gotMotion: ");
-    Serial.print(gotMotion ? "yes" : "no ");
-    Serial.print(", X: ");
-    Serial.print(deltaX);
-    Serial.print(", Y: ");
-    Serial.print(deltaY);
-    Serial.print("\n");
+    printf("gotMotion=%s dx=%+03d dy=%+03d\n",
+            gotMotion ? "yes" : "no ", dx, dy);
 
     delay(100);
 }
