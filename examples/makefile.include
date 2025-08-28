@@ -22,5 +22,5 @@ edit:
 	vim $(SKETCH).ino
 
 listen:
-	miniterm.py $(PORT) 115200 --exit-char 3
+	miniterm.py $(PORT) --exit-char 3
 

@@ -24,15 +24,15 @@ static const uint8_t LED_PIN = 15;
 
 void setup() 
 {
-	debugTask.begin();
-
-    zrangerTask.begin(&estimatorTask, &debugTask);
-
     if (CrashReport) {
         Serial.print(CrashReport);
         Serial.println();
         Serial.flush();
     }
+
+	debugTask.begin();
+
+    zrangerTask.begin(&estimatorTask, &debugTask);
 
     ledTask.begin(&safety, LED_PIN);
 

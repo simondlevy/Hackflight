@@ -26,10 +26,6 @@ class DebugTask {
 
         void begin()
         {
-            if (_task.didInit()){
-                //return;
-            }
-
             Serial.begin(115200);
 
             _task.init(runDebugCommsTask, "debug", this, 2);
