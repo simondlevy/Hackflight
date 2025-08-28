@@ -25,9 +25,6 @@ using namespace arduino;
 #include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
 
-static const float IMU_CALIBRATION_PITCH = 0;
-static const float IMU_CALIBRATION_ROLL = 0;
-
 static ClosedLoopControl closedLoopControl;
 
 static Safety safety;
@@ -75,8 +72,7 @@ void setup()
 
     ledTask.begin(&safety, LED_PIN);
 
-    imuTask.begin(&estimatorTask, &debugTask,
-            IMU_CALIBRATION_ROLL, IMU_CALIBRATION_PITCH);
+    imuTask.begin(&estimatorTask, &debugTask);
 
     vTaskStartScheduler();
 }
