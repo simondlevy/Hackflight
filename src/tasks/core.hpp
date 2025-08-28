@@ -16,11 +16,9 @@
 
 #pragma once
 
-#include <Arduino.h>
-
-// FreeRTOS
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/task.h>
+#include <arduino_freertos.h>
+#include <FreeRTOS.h>
+#include <task.h>
 
 // Hackflight
 #include <clock.hpp>

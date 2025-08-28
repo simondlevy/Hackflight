@@ -18,7 +18,7 @@ build: $(SKETCH).ino ../../src/msp/messages.h
 	--fqbn $(FQBN) $(SKETCH).ino
 
 standard_config:
-	cp ../../src/control/standard.hpp ./__control__.hpp
+	cp ../../src/control/standard.hpp ../../src/__control__.hpp
 
 ../../src/msp/messages.h:
 	cd ../../msppg; make install; cd ../examples/main

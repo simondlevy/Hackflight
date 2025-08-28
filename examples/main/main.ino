@@ -12,12 +12,15 @@ using namespace arduino;
 #include <hackflight.h>
 
 // Chosen at config time
-#include "__control__.hpp"
+#include <__control__.hpp>
+
+#include <mixers/crazyflie.hpp>
 
 #include <safety.hpp>
 
 #include <tasks/comms/logging.hpp>
 #include <tasks/comms/setpoint.hpp>
+//#include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
@@ -29,6 +32,7 @@ static ClosedLoopControl closedLoopControl;
 
 static Safety safety;
 
+//static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static OpticalFlowTask opticalFlowTask;
