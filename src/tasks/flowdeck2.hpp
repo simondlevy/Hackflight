@@ -25,8 +25,6 @@ class FlowDeckTask {
             else {
                 debugTask->setMessage("PMW3901 initialization failed.");
             }
-
-            //_task.init(runFlowDeckTask, "flow", this, 3);
         }
 
     private:
@@ -50,9 +48,27 @@ class FlowDeckTask {
 
         void run(void)
         {
-            TickType_t lastWakeTime;
+            auto lastTime  = micros();
 
-            lastWakeTime = xTaskGetTickCount();
+            while (true) {
+
+                vTaskDelay(10);
+
+                int16_t deltaX = 0;
+                int16_t deltaY = 0;
+                bool gotMotion = false;
+
+                _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+
+                _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d\n",
+                        gotMotion ? "yes" : "no ", deltaX, deltaY);
+
+            }
+
+            /*
+               TickType_t lastWakeTime;
+
+               lastWakeTime = xTaskGetTickCount();
 
             while (true) {
 
@@ -60,6 +76,6 @@ class FlowDeckTask {
 
                 _debugTask->setMessage("%lu", micros());
 
-            }
+            }*/
         }
 };
