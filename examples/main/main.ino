@@ -38,8 +38,6 @@ static LoggerTask loggerTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
-static const uint8_t LED_PIN = 15;
-
 static HardwareSerial * uart = &Serial5;
 
 void setup() 
@@ -68,7 +66,7 @@ void setup()
 
     loggerTask.begin(&estimatorTask, &closedLoopControl, uart);
 
-    ledTask.begin(&safety, LED_PIN);
+    ledTask.begin(&safety);
 
     imuTask.begin(&estimatorTask, &debugTask);
 
