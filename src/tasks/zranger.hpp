@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <Wire.h>
+
 #include <VL53L1X.h>
 
 #include <linalg.h>
@@ -34,7 +36,10 @@ class ZRangerTask {
                 return;
             }
 
-            _vl53l1x.setBus(&Wire);
+            Wire1.begin();
+            Wire1.setClock(400000);
+
+            _vl53l1x.setBus(&Wire1);
 
             if (!_vl53l1x.init()) {
                 debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
@@ -92,6 +97,8 @@ class ZRangerTask {
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
                 float range = _vl53l1x.read();
+
+                _debugTask->setMessage("zdist=%f", range);
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers

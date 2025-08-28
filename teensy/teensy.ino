@@ -1,5 +1,3 @@
-#include <Wire.h>
-
 #include <arduino_freertos.h>
 #include <FreeRTOS.h>
 #include <task.h>
@@ -26,14 +24,9 @@ static const uint8_t LED_PIN = 15;
 
 void setup() 
 {
-    Wire.begin();
-    Wire.setClock(400000);
-
 	debugTask.begin();
 
     zrangerTask.begin(&estimatorTask, &debugTask);
-
-    debugTask.setMessage("hello");
 
     if (CrashReport) {
         Serial.print(CrashReport);
