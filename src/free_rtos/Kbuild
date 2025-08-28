@@ -1,8 +1,0 @@
-obj-y += event_groups.o
-obj-y += list.o
-obj-y += port_system_dependent.o
-obj-y += heap_4.o
-obj-y += queue.o
-obj-y += tasks.o
-obj-y += timers.o
-obj-y += stream_buffer.o

@@ -5,12 +5,20 @@
 
 using namespace arduino;
 
-//#include <hackflight.h>
-//#include <tasks/led.hpp>
+#define M2T(X) ((unsigned int)(X))
+
+#include <hackflight.h>
+#include <safety.hpp>
+#include <tasks/led.hpp>
 
 static SemaphoreHandle_t canStartMutex;
 static StaticSemaphore_t canStartMutexBuffer;
 
+static Safety safety;
+
+static LedTask ledTask;
+
+/*
 static void systemTask(void*) 
 {
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
@@ -27,7 +35,7 @@ static void systemTask(void*)
     }
 
     vTaskDelete(nullptr);
-}
+}*/
 
 void setup() 
 {
@@ -39,7 +47,9 @@ void setup()
         Serial.flush();
     }
 
-    xTaskCreate(systemTask, "systemTask", 128, nullptr, 2, nullptr);
+    //xTaskCreate(systemTask, "systemTask", 128, nullptr, 2, nullptr);
+
+    ledTask.begin(&safety, LED_BUILTIN, false);
 
     vTaskStartScheduler();
 }
