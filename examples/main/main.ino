@@ -14,6 +14,7 @@ using namespace arduino;
 #include <tasks/debug.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/led.hpp>
+#include <tasks/comms/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
 static Safety safety;
@@ -21,6 +22,7 @@ static Safety safety;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
+static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 static FlowDeckTask flowDeckTask;
 
@@ -28,9 +30,13 @@ static const uint8_t FLOWDECK_CS_PIN = 3;
 
 static const uint8_t LED_PIN = 15;
 
+static HardwareSerial * uart = &Serial5;
+
 void setup() 
 {
     Serial.begin(0);
+
+    uart->begin(115200);
 
     SPI.begin();
 
@@ -47,6 +53,8 @@ void setup()
     flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN, &debugTask);
 
     estimatorTask.begin(&safety);
+
+    setpointTask.begin(&safety, uart);
 
     ledTask.begin(&safety, LED_PIN);
 

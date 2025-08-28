@@ -16,11 +16,10 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/task.h>
-#include <free_rtos/queue.h>
+#include <arduino_freertos.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
 
 #include <msp/messages.h>
 #include <msp/parser.hpp>
@@ -33,13 +32,15 @@ class SetpointTask {
 
     public:
 
-        void begin(Safety * safety)
+        void begin(Safety * safety, HardwareSerial * uart)
         {
             if (_task.didInit()){
                 return;
             }
 
             _safety = safety;
+
+            _uart = uart;
 
             setpointQueue = xQueueCreateStatic(
                     QUEUE_LENGTH,
@@ -98,19 +99,21 @@ class SetpointTask {
 
         Safety * _safety;
 
+        HardwareSerial * _uart;
+
         void run(void)
         {
-            systemWaitStart();
-
             MspParser parser = {};
 
             setpoint_t setpoint = {};
 
             while (true) {
 
-                uint8_t byte = 0;
+                delay(1);
 
-                if (systemUartReadByte(&byte)) {
+                if (_uart->available()) {
+
+                    const uint8_t byte = _uart->read();
 
                     switch (parser.parse(byte)) {
 
