@@ -22,8 +22,6 @@
 
 class DebugTask {
 
-#if defined(ARDUINO)
-
     public:
 
         void begin()
@@ -80,18 +78,5 @@ class DebugTask {
 				vTaskDelay(M2T(1000/REPORT_FREQ));
 			}
 		}
-
-#else
-    public:
-
-        void begin()
-        {
-        }
-
- 		void setMessage(const char * format, ...)
-        {
-            (void)format;
-        }
-#endif
 };
 

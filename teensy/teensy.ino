@@ -34,7 +34,6 @@ void systemWaitStart(void)
     xSemaphoreGive(canStartMutex);
 }
 
-
 void setup() 
 {
     Serial.begin(0);
