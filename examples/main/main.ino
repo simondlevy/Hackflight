@@ -22,11 +22,14 @@ using namespace arduino;
 #include <tasks/comms/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
+static ClosedLoopControl closedLoopControl;
+
 static Safety safety;
 
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
+static LoggerTask loggerTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 static FlowDeckTask flowDeckTask;
@@ -60,6 +63,8 @@ void setup()
     estimatorTask.begin(&safety);
 
     setpointTask.begin(&safety, uart);
+
+    loggerTask.begin(&estimatorTask, &closedLoopControl, uart);
 
     ledTask.begin(&safety, LED_PIN);
 

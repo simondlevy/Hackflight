@@ -29,7 +29,8 @@ class LoggerTask {
     public:
 
         void begin(EstimatorTask * estimatorTask,
-                ClosedLoopControl * closedLoopControl)
+                ClosedLoopControl * closedLoopControl,
+                HardwareSerial * uart)
         {
             if (_task.didInit()){
                 return;
@@ -38,6 +39,8 @@ class LoggerTask {
             _estimatorTask = estimatorTask;
 
             _closedLoopControl = closedLoopControl;
+
+            _uart = uart;
 
             _task.init(runLoggerTask, "logger", this, 3);
         }
@@ -57,10 +60,10 @@ class LoggerTask {
 
         ClosedLoopControl * _closedLoopControl;
 
+        HardwareSerial * _uart;
+
         void run(void)
         {
-            systemWaitStart();
-
             TickType_t lastWakeTime = xTaskGetTickCount();
 
             while (true) {
@@ -102,7 +105,7 @@ class LoggerTask {
  
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                systemUartWriteByte(serializer.payload[k]);
+                _uart->write(serializer.payload[k]);
             }
 
         }
