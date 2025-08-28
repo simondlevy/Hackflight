@@ -17,6 +17,9 @@ using namespace arduino;
 #include <tasks/comms/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
+// Chosen at config time
+#include "__control__.hpp"
+
 static Safety safety;
 
 static DebugTask debugTask;

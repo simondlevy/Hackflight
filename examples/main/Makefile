@@ -17,6 +17,9 @@ build: $(SKETCH).ino ../../src/msp/messages.h
 	--libraries $(HOME)/Documents/Arduino/libraries --libraries ../.. \
 	--fqbn $(FQBN) $(SKETCH).ino
 
+standard_config:
+	cp ../../src/control/standard.hpp ./__control__.hpp
+
 ../../src/msp/messages.h:
 	cd ../../msppg; make install; cd ../examples/main
 
