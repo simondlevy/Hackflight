@@ -16,9 +16,8 @@
 
 #pragma once
 
-#include <SPI.h>
-
-#include <pmw3901.hpp>
+//#include <SPI.h>
+//#include <pmw3901.hpp>
 
 #include <datatypes.h>
 #include <system.h>
@@ -29,19 +28,24 @@ class FlowDeckTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, const uint8_t cs_pin)
+        void begin(EstimatorTask * estimatorTask, const uint8_t cs_pin,
+                DebugTask * debugTask)
         {
             if (_task.didInit()) {
                 return;
             }
 
-            SPI.begin();
+            //SPI.begin();
 
             _estimatorTask = estimatorTask;
 
-            if (_pmw3901.begin(cs_pin)) {
+            _debugTask = _debugTask;
 
+            if (true /*_pmw3901.begin(cs_pin)*/) {
                 _task.init(runFlowdeckTask, "flow", this, 3);
+            }
+            else {
+                debugTask->setMessage("PMW3901 initialization failed.");
             }
         }
 
@@ -62,18 +66,23 @@ class FlowDeckTask {
 
         FreeRtosTask _task;
 
-        PMW3901 _pmw3901;
+        //PMW3901 _pmw3901;
 
         EstimatorTask * _estimatorTask;
+
+        DebugTask * _debugTask;
 
         void run(void)
         {
             auto lastTime  = micros();
 
+            if (_debugTask) _debugTask->setMessage("%lu", lastTime);
+
             while (true) {
 
                 vTaskDelay(10);
 
+                /*
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;
                 bool gotMotion = false;
@@ -109,6 +118,7 @@ class FlowDeckTask {
                         _estimatorTask->enqueueFlow(&flowData, xPortIsInsideInterrupt());
                     }
                 }
+                */
             }        
         }
 };

@@ -12,7 +12,7 @@ using namespace arduino;
 #include <hackflight.h>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
-#include <tasks/flowdeck.hpp>
+#include <tasks/flowdeck2.hpp>
 #include <tasks/led.hpp>
 #include <tasks/zranger.hpp>
 
@@ -42,7 +42,7 @@ void setup()
 
     zrangerTask.begin(&estimatorTask, &debugTask);
 
-    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN);
+    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN, &debugTask);
 
     ledTask.begin(&safety, LED_PIN);
 

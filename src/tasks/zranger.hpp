@@ -98,7 +98,7 @@ class ZRangerTask {
 
                 float range = _vl53l1x.read();
 
-                _debugTask->setMessage("zdist=%f", range);
+                //_debugTask->setMessage("zdist=%f", range);
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers
