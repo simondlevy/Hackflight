@@ -1,12 +1,16 @@
+#include <SPI.h>
+
 #include <pmw3901.hpp>
 
-static const uint8_t CS_PIN = PB4;
+static const uint8_t CS_PIN = 3;
 
 static PMW3901 pmw3901;
 
 void setup() 
 {
     Serial.begin(115200);
+
+    SPI.begin();
 
     if (!pmw3901.begin(CS_PIN)) {
         while (true) {
