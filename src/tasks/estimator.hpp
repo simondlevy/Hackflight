@@ -241,8 +241,6 @@ class EstimatorTask {
 
         void run(void)
         {
-            systemWaitStart();
-
             auto nextPredictionMs = msec();
 
             _rateSupervisor.init(

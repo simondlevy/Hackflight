@@ -46,6 +46,8 @@ void setup()
 
     flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN, &debugTask);
 
+    estimatorTask.begin(&safety);
+
     ledTask.begin(&safety, LED_PIN);
 
     vTaskStartScheduler();
