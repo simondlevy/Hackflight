@@ -75,7 +75,8 @@ void setup()
 
     ledTask.begin(&safety, LED_PIN);
 
-    imuTask.begin(&estimatorTask, IMU_CALIBRATION_ROLL, IMU_CALIBRATION_PITCH);
+    imuTask.begin(&estimatorTask, &debugTask,
+            IMU_CALIBRATION_ROLL, IMU_CALIBRATION_PITCH);
 
     vTaskStartScheduler();
 }

@@ -16,7 +16,10 @@
 
 #pragma once
 
+#include <Wire.h>
+
 #include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 #include <datatypes.h>
@@ -33,6 +36,7 @@ class ImuTask {
         // Called from main program
         void begin(
                 EstimatorTask * estimatorTask, 
+                DebugTask * debugTask,
                 const float calibRoll,
                 const float calibPitch)
         {
@@ -40,7 +44,12 @@ class ImuTask {
                 return;
             }
 
+            Wire.begin();
+            Wire.setClock(400000);
+
             _estimatorTask = estimatorTask;
+
+            _debugTask = debugTask;
 
             // Wait for sensors to startup
             vTaskDelay(M2T(STARTUP_TIME_MS));
@@ -197,6 +206,8 @@ class ImuTask {
         bias_t _gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
+
+        DebugTask * _debugTask;
 
         FreeRtosTask _task;
 
