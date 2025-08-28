@@ -18,6 +18,7 @@ static StaticSemaphore_t canStartMutexBuffer;
 static Safety safety;
 
 static LedTask ledTask;
+static DebugTask debugTask;
 
 static bool didInit;
 
@@ -40,6 +41,10 @@ void setup()
 
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
+
+    didInit = true;
+
+	debugTask.begin();
 
     if (CrashReport) {
         Serial.print(CrashReport);
