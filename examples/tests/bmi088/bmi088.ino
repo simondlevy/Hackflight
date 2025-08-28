@@ -26,12 +26,6 @@ static void check(const int status, const char * msg)
     }
 }
 
-static void add_interrupt(const uint8_t pin, void (*handler)())
-{
-    pinMode(pin, INPUT);
-    attachInterrupt(pin, handler, RISING);
-}
-
 void setup() 
 {
     Serial.begin(115200);
@@ -48,7 +42,8 @@ void setup()
     gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
 
-    add_interrupt(GYRO_INTERRUPT_PIN, gyro_drdy);
+    pinMode(GYRO_INTERRUPT_PIN, INPUT);
+    attachInterrupt(GYRO_INTERRUPT_PIN, gyro_drdy, RISING);
 }
 
 void loop() 
