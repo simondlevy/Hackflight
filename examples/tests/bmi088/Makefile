@@ -1,3 +1,3 @@
-SKETCH = brushless
+SKETCH = bmi088
 
 include ../../makefile.include

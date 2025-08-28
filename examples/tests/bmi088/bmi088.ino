@@ -1,29 +1,17 @@
+#include <Wire.h>
+
 #include <BMI088.h>
 
-// internal I^2C
-static const uint8_t SDA_PIN = PC9;
-static const uint8_t SCL_PIN = PA8;
+static const uint8_t GYRO_INTERRUPT_PIN = 6;
 
-static const uint8_t ACCEL_INTERRUPT_PIN = PC13;
-static const uint8_t GYRO_INTERRUPT_PIN = PC14;
-
-static const uint8_t ACCEL_ADDRESS = 0x18;
+static const uint8_t ACCEL_ADDRESS = 0x19;
 static const uint8_t GYRO_ADDRESS = 0x69;
 
-static TwoWire wire(SDA_PIN, SCL_PIN);
+static Bmi088Accel accel(Wire, ACCEL_ADDRESS);
 
-static Bmi088Accel accel(wire, ACCEL_ADDRESS);
+static Bmi088Gyro gyro(Wire, GYRO_ADDRESS);
 
-static Bmi088Gyro gyro(wire, GYRO_ADDRESS);
-
-//static volatile bool accel_flag;
 static volatile bool gyro_flag;
-
-/*
-static void accel_drdy()
-{
-    accel_flag = true;
-}*/
 
 static void gyro_drdy()
 {
@@ -54,10 +42,6 @@ void setup()
 
     accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
 
-    //accel.pinModeInt1(Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH);
-    //accel.mapDrdyInt1(true);
-    //add_interrupt(ACCEL_INTERRUPT_PIN, accel_drdy);
-
     check(gyro.begin(), "Gyro Initialization Error");
 
     gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
@@ -69,9 +53,8 @@ void setup()
 
 void loop() 
 {
-    if (/*accel_flag &&*/ gyro_flag) {
+    if (gyro_flag) {
 
-        //accel_flag = false;
         gyro_flag = false;
 
         accel.readSensor();
