@@ -16,7 +16,9 @@
 
 #pragma once
 
-#include <free_rtos/semphr.h>
+#include <arduino_freertos.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
 
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>

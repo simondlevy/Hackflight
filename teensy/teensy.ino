@@ -5,11 +5,13 @@
 using namespace arduino;
 
 #define M2T(X) ((unsigned int)(X))
+#define T2M(X) ((unsigned int)(X))
 
 #include <hackflight.h>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/led.hpp>
+#include <tasks/zranger.hpp>
 
 static Safety safety;
 
