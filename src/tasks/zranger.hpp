@@ -33,7 +33,7 @@ class ZRangerTask {
                 return;
             }
 
-            hardware_init();
+            //hardware_init();
 
             _estimatorTask = estimatorTask;
 
@@ -67,15 +67,9 @@ class ZRangerTask {
 
         EstimatorTask * _estimatorTask;
 
-		void hardware_init();
-
-		float hardware_read();
-
         void run(void)
         {
             TickType_t lastWakeTime;
-
-            systemWaitStart();
 
             lastWakeTime = xTaskGetTickCount();
 
@@ -83,7 +77,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
-                float range = hardware_read();
+                float range = 0;//hardware_read();
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers

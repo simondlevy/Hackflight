@@ -15,12 +15,16 @@ using namespace arduino;
 
 static Safety safety;
 
-static LedTask ledTask;
 static DebugTask debugTask;
+static EstimatorTask estimatorTask;
+static LedTask ledTask;
+static ZRangerTask zrangerTask;
 
 void setup() 
 {
 	debugTask.begin();
+
+    zrangerTask.begin(&estimatorTask);
 
     debugTask.setMessage("hello");
 
