@@ -8,9 +8,13 @@
 
 class OpticalFlowTask {
 
+    private:
+
+        static const uint8_t CS_PIN = 3;
+
     public:
 
-        void begin(EstimatorTask * estimatorTask, const uint8_t csPin, DebugTask * debugTask)
+        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask)
         {
             if (_task.didInit()){
                 return;
@@ -19,7 +23,7 @@ class OpticalFlowTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            if (_pmw3901.begin(csPin)) {
+            if (_pmw3901.begin(CS_PIN)) {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
             }
             else {

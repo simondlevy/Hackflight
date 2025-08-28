@@ -38,8 +38,6 @@ static LoggerTask loggerTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
-static const uint8_t FLOW_CS_PIN = 3;
-
 static const uint8_t LED_PIN = 15;
 
 static HardwareSerial * uart = &Serial5;
@@ -62,7 +60,7 @@ void setup()
 
     zrangerTask.begin(&estimatorTask, &debugTask);
 
-    opticalFlowTask.begin(&estimatorTask, FLOW_CS_PIN, &debugTask);
+    opticalFlowTask.begin(&estimatorTask, &debugTask);
 
     estimatorTask.begin(&safety);
 
