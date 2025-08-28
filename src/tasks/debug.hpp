@@ -27,8 +27,10 @@ class DebugTask {
         void begin()
         {
             if (_task.didInit()){
-                return;
+                //return;
             }
+
+            Serial.begin(115200);
 
             _task.init(runDebugCommsTask, "debug", this, 2);
 		}
@@ -52,7 +54,7 @@ class DebugTask {
 
 	private:
 
-		static constexpr float REPORT_FREQ = 100;
+		static constexpr float REPORT_FREQ = 10;
 
 		FreeRtosTask _task;
 
@@ -65,10 +67,6 @@ class DebugTask {
 
 		void run(void)
 		{
-            void systemWaitStart();
-
-			systemWaitStart();
-
 			while (true) {
 
 				if (*_msg) {

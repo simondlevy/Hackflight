@@ -20,30 +20,14 @@ static Safety safety;
 static LedTask ledTask;
 static DebugTask debugTask;
 
-static bool didInit;
-
-void systemWaitStart(void)
-{
-    // This guarantees that the system task is initialized before other
-    // tasks wait for the start event.
-    while (!didInit) {
-        delay(2);
-    }
-
-    xSemaphoreTake(canStartMutex, portMAX_DELAY);
-    xSemaphoreGive(canStartMutex);
-}
-
 void setup() 
 {
-    Serial.begin(0);
-
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
-    didInit = true;
-
 	debugTask.begin();
+
+    debugTask.setMessage("hello");
 
     if (CrashReport) {
         Serial.print(CrashReport);
