@@ -1,48 +1,26 @@
-/**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #pragma once
 
-//#include <SPI.h>
-//#include <pmw3901.hpp>
+#include <pmw3901.hpp>
 
-#include <datatypes.h>
-#include <system.h>
 #include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 class FlowDeckTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, const uint8_t cs_pin,
-                DebugTask * debugTask)
+        void begin(EstimatorTask * estimatorTask, const uint8_t csPin, DebugTask * debugTask)
         {
-            if (_task.didInit()) {
+            if (_task.didInit()){
                 return;
             }
 
-            //SPI.begin();
-
             _estimatorTask = estimatorTask;
+            _debugTask = debugTask;
 
-            _debugTask = _debugTask;
-
-            if (true /*_pmw3901.begin(cs_pin)*/) {
-                _task.init(runFlowdeckTask, "flow", this, 3);
+            if (_pmw3901.begin(csPin)) {
+                _task.init(runFlowDeckTask, "flow", this, 3);
             }
             else {
                 debugTask->setMessage("PMW3901 initialization failed.");
@@ -59,14 +37,16 @@ class FlowDeckTask {
         // Set standard deviation flow
         static constexpr float FLOW_STD_FIXED = 2.0;
 
-        static void runFlowdeckTask(void *obj)
+        static void runFlowDeckTask(void * obj)
         {
             ((FlowDeckTask *)obj)->run();
         }
 
+        PMW3901 _pmw3901;
+
         FreeRtosTask _task;
 
-        //PMW3901 _pmw3901;
+        float _expCoeff;
 
         EstimatorTask * _estimatorTask;
 
@@ -76,18 +56,18 @@ class FlowDeckTask {
         {
             auto lastTime  = micros();
 
-            if (_debugTask) _debugTask->setMessage("%lu", lastTime);
-
             while (true) {
 
                 vTaskDelay(10);
 
-                /*
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;
                 bool gotMotion = false;
 
                 _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+
+                _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
+                        gotMotion ? "yes" : "no ", deltaX, deltaY);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
@@ -118,7 +98,6 @@ class FlowDeckTask {
                         _estimatorTask->enqueueFlow(&flowData, xPortIsInsideInterrupt());
                     }
                 }
-                */
-            }        
+             }
         }
 };

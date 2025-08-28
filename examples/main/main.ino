@@ -12,7 +12,7 @@ using namespace arduino;
 #include <hackflight.h>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
-#include <tasks/flowdeck2.hpp>
+#include <tasks/flowdeck.hpp>
 #include <tasks/led.hpp>
 #include <tasks/zranger.hpp>
 

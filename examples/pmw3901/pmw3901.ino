@@ -23,13 +23,13 @@ void setup()
 void loop()
 {
     
-    int16_t dx=0, dy=0;
+    int16_t deltaX=0, deltaY=0;
     bool gotMotion = false;
 
-    pmw3901.readMotion(dx, dy, gotMotion);
+    pmw3901.readMotion(deltaX, deltaY, gotMotion);
 
-    printf("gotMotion=%s dx=%+03d dy=%+03d\n",
-            gotMotion ? "yes" : "no ", dx, dy);
+    printf("gotMotion=%s deltaX=%+03d deltaY=%+03d\n",
+            gotMotion ? "yes" : "no ", deltaX, deltaY);
 
     delay(100);
 }
