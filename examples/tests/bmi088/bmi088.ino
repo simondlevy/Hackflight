@@ -56,19 +56,12 @@ void loop()
 
         gyro.readSensor();
 
-        Serial.print(accel.getAccelX_mss());
-        Serial.print("\t");
-        Serial.print(accel.getAccelY_mss());
-        Serial.print("\t");
-        Serial.print(accel.getAccelZ_mss());
-        Serial.print("\t");
-        Serial.print(gyro.getGyroX_rads());
-        Serial.print("\t");
-        Serial.print(gyro.getGyroY_rads());
-        Serial.print("\t");
-        Serial.print(gyro.getGyroZ_rads());
-        Serial.print("\t");
-        Serial.print(accel.getTemperature_C());
-        Serial.print("\n");
+        printf("ax=%+3.3f ay=%+3.3f az=%+3.3f m/s^2 | gx=%+3.3f gy=%+3.3f gz=%+3.3f rad/sec\n", 
+                accel.getAccelX_mss(),
+                accel.getAccelY_mss(),
+                accel.getAccelZ_mss(),
+                gyro.getGyroX_rads(),
+                gyro.getGyroY_rads(),
+                gyro.getGyroZ_rads());
     }
 }
