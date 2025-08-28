@@ -1,5 +1,5 @@
 static const int DELAY = 500;
-static const uint8_t PIN = PC0;
+static const uint8_t PIN = 15;
 
 void setup() 
 {

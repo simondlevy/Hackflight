@@ -1,3 +1,3 @@
 SKETCH = led
 
-include ../makefile.include
+include ../../makefile.include
