@@ -82,6 +82,8 @@ def main():
             msg = input('Say something > ')
             client.send((msg + '\n').encode())
 
+            print(client.recv(100).decode())
+
         except KeyboardInterrupt:
             break
 
