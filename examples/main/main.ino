@@ -1,3 +1,5 @@
+#include <pmw3901.hpp>
+
 #include <arduino_freertos.h>
 #include <FreeRTOS.h>
 #include <task.h>
@@ -10,6 +12,7 @@ using namespace arduino;
 #include <hackflight.h>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
+#include <tasks/flowdeck.hpp>
 #include <tasks/led.hpp>
 #include <tasks/zranger.hpp>
 
@@ -19,6 +22,9 @@ static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
 static ZRangerTask zrangerTask;
+static FlowDeckTask flowDeckTask;
+
+static const uint8_t FLOWDECK_CS_PIN = 3;
 
 static const uint8_t LED_PIN = 15;
 

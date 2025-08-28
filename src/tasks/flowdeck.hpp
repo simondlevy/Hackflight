@@ -16,9 +16,8 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include <SPI.h>
 
-// Arduino library
 #include <pmw3901.hpp>
 
 #include <datatypes.h>
