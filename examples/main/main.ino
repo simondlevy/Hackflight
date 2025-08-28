@@ -24,6 +24,8 @@ static const uint8_t LED_PIN = 15;
 
 void setup() 
 {
+    Serial.begin(0);
+
     if (CrashReport) {
         Serial.print(CrashReport);
         Serial.println();
