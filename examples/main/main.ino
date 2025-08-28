@@ -35,7 +35,7 @@ static Safety safety;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static OpticalFlowTask opticalFlowTask;
-//static ImuTask imuTask;
+static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
 static SetpointTask setpointTask;
@@ -75,7 +75,7 @@ void setup()
 
     ledTask.begin(&safety, LED_PIN);
 
-    //imuTask.begin(&estimatorTask, IMU_CALIBRATION_ROLL, IMU_CALIBRATION_PITCH);
+    imuTask.begin(&estimatorTask, IMU_CALIBRATION_ROLL, IMU_CALIBRATION_PITCH);
 
     vTaskStartScheduler();
 }

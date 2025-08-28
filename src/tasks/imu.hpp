@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
@@ -58,8 +56,7 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            // Start our IMU (e.g. BMI088)
-            deviceInit();
+            //deviceInit();
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -377,9 +374,9 @@ class ImuTask {
 
                     // Get raw data from IMU
                     Axis3i16 gyroRaw = {};
-                    readGyroRaw(&gyroRaw);
+                    //readGyroRaw(&gyroRaw);
                     Axis3i16 accelRaw = {};
-                    readAccelRaw(&accelRaw);
+                    //readAccelRaw(&accelRaw);
 
                     // Convert accel to Gs
                     Axis3f accel = {};
@@ -433,9 +430,4 @@ class ImuTask {
         {
             return (float)raw * 2 * 24 / 65536.f;
         }
-
-        // Hardware-dependent
-        void deviceInit(void); 
-        void readGyroRaw(Axis3i16 * dataOut);
-        void readAccelRaw(Axis3i16 * dataOut);
 };
