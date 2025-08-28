@@ -17,7 +17,7 @@ class FlowDeckTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            _task.init(runFlowDeckTask, "flowdeck", this, 2);
+            _task.init(runFlowDeckTask, "flow", this, 3);
         }
 
     private:
