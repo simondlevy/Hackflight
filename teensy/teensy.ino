@@ -11,16 +11,34 @@ using namespace arduino;
 #include <safety.hpp>
 #include <tasks/led.hpp>
 
-//static SemaphoreHandle_t canStartMutex;
-//static StaticSemaphore_t canStartMutexBuffer;
+static SemaphoreHandle_t canStartMutex;
+static StaticSemaphore_t canStartMutexBuffer;
 
 static Safety safety;
 
 static LedTask ledTask;
 
+static bool didInit;
+
+void systemWaitStart(void)
+{
+    // This guarantees that the system task is initialized before other
+    // tasks wait for the start event.
+    while (!didInit) {
+        delay(2);
+    }
+
+    xSemaphoreTake(canStartMutex, portMAX_DELAY);
+    xSemaphoreGive(canStartMutex);
+}
+
+
 void setup() 
 {
     Serial.begin(0);
+
+    canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
+    xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
     if (CrashReport) {
         Serial.print(CrashReport);
