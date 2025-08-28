@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pmw3901.hpp>
+
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -17,7 +19,14 @@ class FlowDeckTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            _task.init(runFlowDeckTask, "flow", this, 3);
+            if (_pmw3901.begin(csPin)) {
+                _task.init(runFlowDeckTask, "flow", this, 3);
+            }
+            else {
+                debugTask->setMessage("PMW3901 initialization failed.");
+            }
+
+            //_task.init(runFlowDeckTask, "flow", this, 3);
         }
 
     private:
@@ -28,6 +37,8 @@ class FlowDeckTask {
         {
             ((FlowDeckTask *)obj)->run();
         }
+
+        PMW3901 _pmw3901;
 
         FreeRtosTask _task;
 

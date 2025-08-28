@@ -1,3 +1,5 @@
+#include <SPI.h>
+
 #include <arduino_freertos.h>
 #include <FreeRTOS.h>
 #include <task.h>
@@ -29,6 +31,8 @@ static const uint8_t LED_PIN = 15;
 void setup() 
 {
     Serial.begin(0);
+
+    SPI.begin();
 
     if (CrashReport) {
         Serial.print(CrashReport);
