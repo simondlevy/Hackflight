@@ -45,6 +45,7 @@ class ZRangerTask {
             _vl53l1x.startContinuous(25); // msec
 
             _estimatorTask = estimatorTask;
+            _debugTask = debugTask;
 
             _task.init(runZrangerTask, "zranger2", this, 2);
 
@@ -75,6 +76,8 @@ class ZRangerTask {
         float _expCoeff;
 
         EstimatorTask * _estimatorTask;
+
+        DebugTask * _debugTask;
 
         VL53L1X _vl53l1x;
 
