@@ -2,6 +2,8 @@ SKETCH = cf2
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
+PORT = /dev/ttyACM0
+
 build: $(SKETCH).ino *.cpp
 	arduino-cli compile \
 	--libraries $(HOME)/Documents/Arduino/libraries --libraries ../.. \

@@ -78,7 +78,7 @@ static void systemTask(void *arg)
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
     didInit = true;
-    
+
 	debugTask.begin();
     
     zrangerTask.begin(&estimatorTask);

@@ -22,6 +22,12 @@
 
 HardwareSerial Serial2(USART2);
 
+void uartInit(const uint32_t baudrate)
+{
+    Serial2.begin(baudrate);
+
+}
+
 bool systemUartReadByte(uint8_t * byte)
 {
     const bool available = Serial2.available() > 0;
