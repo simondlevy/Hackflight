@@ -15,12 +15,18 @@ using namespace arduino;
 #include "__control__.hpp"
 
 #include <safety.hpp>
-#include <tasks/debug.hpp>
-#include <tasks/flowdeck.hpp>
-#include <tasks/led.hpp>
+
 #include <tasks/comms/logging.hpp>
 #include <tasks/comms/setpoint.hpp>
+#include <tasks/debug.hpp>
+#include <tasks/estimator.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/led.hpp>
+#include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
+
+static const float IMU_CALIBRATION_PITCH = 0;
+static const float IMU_CALIBRATION_ROLL = 0;
 
 static ClosedLoopControl closedLoopControl;
 
@@ -28,13 +34,14 @@ static Safety safety;
 
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
+static OpticalFlowTask opticalFlowTask;
+//static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
-static FlowDeckTask flowDeckTask;
 
-static const uint8_t FLOWDECK_CS_PIN = 3;
+static const uint8_t FLOW_CS_PIN = 3;
 
 static const uint8_t LED_PIN = 15;
 
@@ -58,7 +65,7 @@ void setup()
 
     zrangerTask.begin(&estimatorTask, &debugTask);
 
-    flowDeckTask.begin(&estimatorTask, FLOWDECK_CS_PIN, &debugTask);
+    opticalFlowTask.begin(&estimatorTask, FLOW_CS_PIN, &debugTask);
 
     estimatorTask.begin(&safety);
 
@@ -67,6 +74,8 @@ void setup()
     loggerTask.begin(&estimatorTask, &closedLoopControl, uart);
 
     ledTask.begin(&safety, LED_PIN);
+
+    //imuTask.begin(&estimatorTask, IMU_CALIBRATION_ROLL, IMU_CALIBRATION_PITCH);
 
     vTaskStartScheduler();
 }

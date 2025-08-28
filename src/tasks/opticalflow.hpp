@@ -6,7 +6,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
-class FlowDeckTask {
+class OpticalFlowTask {
 
     public:
 
@@ -20,7 +20,7 @@ class FlowDeckTask {
             _debugTask = debugTask;
 
             if (_pmw3901.begin(csPin)) {
-                _task.init(runFlowDeckTask, "flow", this, 3);
+                _task.init(runOpticalFlowTask, "flow", this, 3);
             }
             else {
                 debugTask->setMessage("PMW3901 initialization failed.");
@@ -37,9 +37,9 @@ class FlowDeckTask {
         // Set standard deviation flow
         static constexpr float FLOW_STD_FIXED = 2.0;
 
-        static void runFlowDeckTask(void * obj)
+        static void runOpticalFlowTask(void * obj)
         {
-            ((FlowDeckTask *)obj)->run();
+            ((OpticalFlowTask *)obj)->run();
         }
 
         PMW3901 _pmw3901;
