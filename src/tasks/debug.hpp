@@ -67,6 +67,8 @@ class DebugTask {
 
 		void run(void)
 		{
+            void systemWaitStart();
+
 			systemWaitStart();
 
 			while (true) {

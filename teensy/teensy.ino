@@ -9,6 +9,7 @@ using namespace arduino;
 
 #include <hackflight.h>
 #include <safety.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/led.hpp>
 
 static SemaphoreHandle_t canStartMutex;
