@@ -21,9 +21,9 @@
 static const uint8_t ACCEL_ADDRESS = 0x19;
 static const uint8_t GYRO_ADDRESS = 0x69;
 
-static Bmi088Accel accel = Bmi088Accel(Wire, ACCEL_ADDRESS);
+static Bmi088Accel accel(Wire, ACCEL_ADDRESS);
 
-static Bmi088Gyro gyro = Bmi088Gyro(Wire, GYRO_ADDRESS);
+static Bmi088Gyro gyro(Wire, GYRO_ADDRESS);
 
 bool imu_deviceInit()
 {
@@ -52,6 +52,12 @@ void imu_deviceReadRaw(
         int16_t & ax, int16_t & ay, int16_t & az)
 {
     gyro.readSensor();
-
     gx = gyro.getGyroX_raw();
+    gy = gyro.getGyroY_raw();
+    gz = gyro.getGyroZ_raw();
+
+    accel.readSensor();
+    ax = accel.getAccelX_raw();
+    ay = accel.getAccelY_raw();
+    az = accel.getAccelZ_raw();
 }
