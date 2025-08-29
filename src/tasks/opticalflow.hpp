@@ -1,7 +1,5 @@
 #pragma once
 
-#include <pmw3901.hpp>
-
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -19,7 +17,9 @@ class OpticalFlowTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            if (deviceInit()) {
+            extern bool opticalflow_deviceInit();
+
+            if (opticalflow_deviceInit()) {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
             }
             else {
@@ -62,7 +62,10 @@ class OpticalFlowTask {
                 int16_t deltaY = 0;
                 bool gotMotion = false;
 
-                deviceRead(deltaX, deltaY, gotMotion);
+                extern void opticalflow_deviceRead(
+                        int16_t & deltaX, int16_t & deltaY, bool & gotMotion);
+
+                opticalflow_deviceRead(deltaX, deltaY, gotMotion);
 
                 _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
                         gotMotion ? "yes" : "no ", deltaX, deltaY);
@@ -97,23 +100,5 @@ class OpticalFlowTask {
                     }
                 }
              }
-        }
-
-        // Hardware-dependent stuff ------------------------------------------
-
-        static const uint8_t CS_PIN = 3;
-
-        PMW3901 _pmw3901;
-
-        bool deviceInit()
-        {
-            SPI.begin();
-
-            return _pmw3901.begin(CS_PIN);
-        }
-
-        void deviceRead(int16_t & deltaX, int16_t & deltaY, bool & gotMotion)
-        {
-            _pmw3901.readMotion(deltaX, deltaY, gotMotion);
         }
 };
