@@ -6,6 +6,7 @@ using namespace arduino;
 
 #define M2T(X) ((unsigned int)(X))
 #define T2M(X) ((unsigned int)(X))
+#define F2T(X) ((unsigned int)((configTICK_RATE_HZ/(X))))
 
 #include <hackflight.h>
 
@@ -18,7 +19,7 @@ using namespace arduino;
 
 #include <tasks/comms/logging.hpp>
 #include <tasks/comms/setpoint.hpp>
-//#include <tasks/core.hpp>
+#include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
