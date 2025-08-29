@@ -16,10 +16,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <Arduino.h>
-
 #include <safety.hpp>
 #include <system.h>
 #include <task.hpp>
