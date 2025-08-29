@@ -8,10 +8,6 @@
 
 class OpticalFlowTask {
 
-    private:
-
-        static const uint8_t CS_PIN = 3;
-
     public:
 
         void begin(EstimatorTask * estimatorTask, DebugTask * debugTask)
@@ -23,7 +19,7 @@ class OpticalFlowTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            if (_pmw3901.begin(CS_PIN)) {
+            if (deviceInit()) {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
             }
             else {
@@ -66,7 +62,7 @@ class OpticalFlowTask {
                 int16_t deltaY = 0;
                 bool gotMotion = false;
 
-                _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+                deviceRead(deltaX, deltaY, gotMotion);
 
                 _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
                         gotMotion ? "yes" : "no ", deltaX, deltaY);
@@ -105,6 +101,17 @@ class OpticalFlowTask {
 
         // Hardware-dependent stuff ------------------------------------------
 
+        static const uint8_t CS_PIN = 3;
+
         PMW3901 _pmw3901;
 
+        bool deviceInit()
+        {
+            return _pmw3901.begin(CS_PIN);
+        }
+
+        void deviceRead(int16_t & deltaX, int16_t & deltaY, bool & gotMotion)
+        {
+            _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+        }
 };
