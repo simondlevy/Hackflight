@@ -81,6 +81,16 @@ void setup()
 
     imuTask.begin(&estimatorTask, &debugTask);
 
+    /*const auto coreTaskReady =*/ coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            &debugTask,
+            Mixer::rotorCount,
+            Mixer::mix);
+
     vTaskStartScheduler();
 }
 

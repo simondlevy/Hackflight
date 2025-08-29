@@ -15,13 +15,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <motors.h>
 
-#include <stdint.h>
-#include <stdbool.h>
+int motorsGetRatio(uint32_t id)
+{
+    return 0;
+}
 
-int   motorsGetRatio(uint32_t id);
-void  motorsInit(void);
-bool  motorsTest(void);
-void  motorsSetRatios(const uint16_t ratios[]);
-void  motorsStop();
+void motorsInit(void)
+{
+}
+
+bool  motorsTest(void)
+{
+    return true;
+}
+
+void motorsSetRatios(const uint16_t ratios[])
+{
+    (void)ratios;
+}
+
+void  motorsStop()
+{
+}
