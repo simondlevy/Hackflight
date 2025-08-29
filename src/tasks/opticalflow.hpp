@@ -1,5 +1,7 @@
 #pragma once
 
+#include <opticalflow_api.h>
+
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -16,8 +18,6 @@ class OpticalFlowTask {
 
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
-
-            extern bool opticalflow_deviceInit();
 
             if (opticalflow_deviceInit()) {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
@@ -61,9 +61,6 @@ class OpticalFlowTask {
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;
                 bool gotMotion = false;
-
-                extern void opticalflow_deviceRead(
-                        int16_t & deltaX, int16_t & deltaY, bool & gotMotion);
 
                 opticalflow_deviceRead(deltaX, deltaY, gotMotion);
 

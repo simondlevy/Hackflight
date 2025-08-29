@@ -14,21 +14,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <opticalflow_api.h>
-#include <pmw3901.hpp>
+#pragma once
 
-static const uint8_t CS_PIN = 3;
+#include <stdbool.h>
+#include <stdint.h>
 
-static PMW3901 _pmw3901;
+bool opticalflow_deviceInit();
 
-bool opticalflow_deviceInit()
-{
-    SPI.begin();
-
-    return _pmw3901.begin(CS_PIN);
-}
-
-void opticalflow_deviceRead(int16_t & deltaX, int16_t & deltaY, bool & gotMotion)
-{
-    _pmw3901.readMotion(deltaX, deltaY, gotMotion);
-}
+void opticalflow_deviceRead(
+        int16_t & deltaX, int16_t & deltaY, bool & gotMotion);
