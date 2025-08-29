@@ -67,8 +67,8 @@ class OpticalFlowTask {
 
                 opticalflow_deviceRead(deltaX, deltaY, gotMotion);
 
-                _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
-                        gotMotion ? "yes" : "no ", deltaX, deltaY);
+                //_debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
+                //        gotMotion ? "yes" : "no ", deltaX, deltaY);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)

@@ -394,6 +394,8 @@ class ImuTask {
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
 
+                    _debugTask->setMessage("gx=%+05d", gyroRaw.x);
+
                     // Convert accel to Gs
                     Axis3f accel = {};
                     accel.x = accelRaw2Gs(accelRaw.x);

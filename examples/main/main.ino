@@ -61,7 +61,6 @@ void setup()
         Serial.flush();
     }
 
-
     pinMode(GYRO_INTERRUPT_PIN, INPUT);
     attachInterrupt(GYRO_INTERRUPT_PIN, handle_gyro_interrupt, RISING);
 
