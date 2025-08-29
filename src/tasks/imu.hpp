@@ -24,6 +24,7 @@
 #include <tasks/estimator.hpp>
 
 #include <datatypes.h>
+#include <imu_api.h>
 #include <lpf.hpp>
 #include <m_pi.h>
 #include <num.hpp>
@@ -64,7 +65,6 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            extern bool imu_deviceInit();
             imu_deviceInit();
 
             // Calibrate
@@ -385,10 +385,6 @@ class ImuTask {
 
                     Axis3i16 gyroRaw = {};
                     Axis3i16 accelRaw = {};
-
-                    extern void imu_deviceReadRaw(
-                            int16_t & gx, int16_t & gy, int16_t & gz, 
-                            int16_t & ax, int16_t & ay, int16_t & az);
 
                     imu_deviceReadRaw(
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
