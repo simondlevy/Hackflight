@@ -107,6 +107,8 @@ class OpticalFlowTask {
 
         bool deviceInit()
         {
+            SPI.begin();
+
             return _pmw3901.begin(CS_PIN);
         }
 

@@ -50,8 +50,6 @@ void setup()
 
     uart->begin(115200);
 
-    SPI.begin();
-
     if (CrashReport) {
         Serial.print(CrashReport);
         Serial.println();
