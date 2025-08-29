@@ -31,8 +31,6 @@ class EstimatorTask {
 
     public:
 
-        bool calibratingImu;
-
         void begin(Safety * safety, DebugTask * debugTask=nullptr)
         {
             _safety = safety;
@@ -77,17 +75,6 @@ class EstimatorTask {
             xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
-
-            if (calibratingImu) {
-                DebugTask::setMessage(_debugTask, "EstimatorTask: Calibrating IMU");
-            }
-            else {
-                DebugTask::setMessage(_debugTask,
-                        "EstimatorTask: dx=%3.3f dy=%3.3f z=%3.3f "
-                        "phi=%+3.3f theta=%+3.3f psi=%+3.3f", 
-                        state->dx, state->dy, state->z,
-                        state->phi, state->theta, state->psi);
-            }
         }
 
         void enqueueGyro(const Axis3f * gyro, const bool isInInterrupt)

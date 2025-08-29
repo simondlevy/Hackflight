@@ -79,7 +79,7 @@ void setup()
 
     ledTask.begin(&safety);
 
-    imuTask.begin(&estimatorTask, &debugTask);
+    imuTask.begin(&estimatorTask);
 
     coreTask.begin(
             &closedLoopControl,
