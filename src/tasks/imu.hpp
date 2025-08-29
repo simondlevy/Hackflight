@@ -391,7 +391,7 @@ class ImuTask {
                             accelRaw.x, accelRaw.y, accelRaw.z);
 
                     DebugTask::setMessage(_debugTask,
-                            "gx=%+05d gy=%+05d gz=%+05d ax=%+05d ay=%+05d az=%+05d",
+                            "ImuTask: gx=%+05d gy=%+05d gz=%+05d ax=%+05d ay=%+05d az=%+05d",
                             gyroRaw.x, gyroRaw.y, gyroRaw.z, 
                             accelRaw.x, accelRaw.y, accelRaw.z); 
 

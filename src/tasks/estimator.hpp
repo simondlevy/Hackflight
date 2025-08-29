@@ -79,11 +79,11 @@ class EstimatorTask {
             xSemaphoreGive(_runTaskSemaphore);
 
             if (calibratingImu) {
-                DebugTask::setMessage(_debugTask, "Calibrating IMU");
+                DebugTask::setMessage(_debugTask, "EstimatorTask: Calibrating IMU");
             }
             else {
                 DebugTask::setMessage(_debugTask,
-                        "phi=%+3.3f theta=%+3.3f psi=%+3.3f", 
+                        "EstimatorTask: phi=%+3.3f theta=%+3.3f psi=%+3.3f", 
                         state->phi, state->theta, state->psi);
             }
         }

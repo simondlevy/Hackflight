@@ -23,7 +23,8 @@ class OpticalFlowTask {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
             }
             else {
-                DebugTask::setMessage(_debugTask, "optical flow initialization failed.");
+                DebugTask::setMessage(_debugTask,
+                        "OpticalFlowTask: device initialization failed.");
             }
         }
 
@@ -65,7 +66,7 @@ class OpticalFlowTask {
                 opticalflow_deviceRead(deltaX, deltaY, gotMotion);
 
                 DebugTask::setMessage(_debugTask,
-                        "gotMotion=%s dx=%+03d dy=%+03d",
+                        "OpticalFlowTask: gotMotion=%s dx=%+03d dy=%+03d",
                         gotMotion ? "yes" : "no ", deltaX, deltaY);
 
                 // Flip motion information to comply with sensor mounting

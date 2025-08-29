@@ -29,9 +29,9 @@ class DebugTask {
             _task.init(runDebugCommsTask, "debug", this, 2);
 		}
 
-        static void setMessage(DebugTask * task, const char * format, ...)
+        static void setMessage(DebugTask * debugTask, const char * format, ...)
         {
-            if (task) {
+            if (debugTask) {
 
                 va_list args = {};
 
@@ -42,7 +42,7 @@ class DebugTask {
                 const auto vsErr = vsprintf(buffer, format, args);
 
                 if (vsErr >= 0) { 
-                    strcpy(task->_msg, buffer);
+                    strcpy(debugTask->_msg, buffer);
                 }
 
                 va_end(args);
