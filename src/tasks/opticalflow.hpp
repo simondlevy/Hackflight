@@ -22,8 +22,8 @@ class OpticalFlowTask {
             if (opticalflow_deviceInit()) {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
             }
-            else if (_debugTask) {
-                _debugTask->setMessage("PMW3901 initialization failed.");
+            else {
+                DebugTask::setMessage(_debugTask, "optical flow initialization failed.");
             }
         }
 
@@ -64,10 +64,9 @@ class OpticalFlowTask {
 
                 opticalflow_deviceRead(deltaX, deltaY, gotMotion);
 
-                if (_debugTask) {
-                    _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
-                            gotMotion ? "yes" : "no ", deltaX, deltaY);
-                }
+                DebugTask::setMessage(_debugTask,
+                        "gotMotion=%s dx=%+03d dy=%+03d",
+                        gotMotion ? "yes" : "no ", deltaX, deltaY);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)

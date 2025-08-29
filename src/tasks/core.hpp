@@ -181,9 +181,7 @@ class CoreTask {
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
-                if (_debugTask) {
-                    _debugTask->setMessage("calibrating IMU");
-                }
+                DebugTask::setMessage(_debugTask, "calibrating IMU");
             }
 
             static RateSupervisor rateSupervisor;
@@ -230,14 +228,12 @@ class CoreTask {
 
                     demands_t closedLoopDemands = {};
 
-                    if (_debugTask) {
-                        _debugTask->setMessage(
-                                "z=%+3.3f phi=%+3.1f theta=%+3.f psi=%+3.1f",
-                                (double)vehicleState.z,
-                                (double)vehicleState.phi,
-                                (double)vehicleState.theta,
-                                (double)vehicleState.psi);
-                    }
+                    DebugTask::setMessage(_debugTask,
+                            "z=%+3.3f phi=%+3.1f theta=%+3.f psi=%+3.1f",
+                            (double)vehicleState.z,
+                            (double)vehicleState.phi,
+                            (double)vehicleState.theta,
+                            (double)vehicleState.psi);
 
                     _closedLoopControl->run(
                             1.f / PID_UPDATE_RATE,

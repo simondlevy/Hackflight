@@ -33,7 +33,8 @@ class ZRangerTask {
             }
 
             if (!zranger_deviceInit()) {
-                _debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
+                DebugTask::setMessage(_debugTask,
+                        "Failed to initialize zranger");
             }
 
             _estimatorTask = estimatorTask;
@@ -83,9 +84,7 @@ class ZRangerTask {
 
                 float range = zranger_deviceRead();
 
-                if (_debugTask) {
-                    _debugTask->setMessage("zdist=%d", (int)range);
-                }
+                DebugTask::setMessage(_debugTask, "zdist=%d", (int)range);
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers

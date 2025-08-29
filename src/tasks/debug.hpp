@@ -29,46 +29,49 @@ class DebugTask {
             _task.init(runDebugCommsTask, "debug", this, 2);
 		}
 
-		void setMessage(const char * format, ...)
-		{
-			va_list args = {};
+        static void setMessage(DebugTask * task, const char * format, ...)
+        {
+            if (task) {
 
-			char buffer[256] = {};
+                va_list args = {};
 
-			va_start(args, format);
+                char buffer[256] = {};
 
-			const auto vsErr = vsprintf(buffer, format, args);
+                va_start(args, format);
 
-			if (vsErr >= 0) { 
-				strcpy(_msg, buffer);
-			}
+                const auto vsErr = vsprintf(buffer, format, args);
 
-			va_end(args);
-		}
+                if (vsErr >= 0) { 
+                    strcpy(task->_msg, buffer);
+                }
 
-	private:
+                va_end(args);
+            }
+        }
 
-		static constexpr float REPORT_FREQ = 10;
+    private:
 
-		FreeRtosTask _task;
+        static constexpr float REPORT_FREQ = 10;
 
-		char _msg[100];
+        FreeRtosTask _task;
 
-		static void runDebugCommsTask(void * obj)
-		{
-			((DebugTask *)obj)->run();
-		}
+        char _msg[100];
 
-		void run(void)
-		{
-			while (true) {
+        static void runDebugCommsTask(void * obj)
+        {
+            ((DebugTask *)obj)->run();
+        }
 
-				if (*_msg) {
-					Serial.println(_msg);
-				}
+        void run(void)
+        {
+            while (true) {
 
-				vTaskDelay(M2T(1000/REPORT_FREQ));
-			}
-		}
+                if (*_msg) {
+                    Serial.println(_msg);
+                }
+
+                vTaskDelay(M2T(1000/REPORT_FREQ));
+            }
+        }
 };
 
