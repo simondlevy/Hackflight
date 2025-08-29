@@ -81,7 +81,7 @@ void setup()
 
     imuTask.begin(&estimatorTask, &debugTask);
 
-    /*const auto coreTaskReady =*/ coreTask.begin(
+    coreTask.begin(
             &closedLoopControl,
             &safety,
             &estimatorTask,
