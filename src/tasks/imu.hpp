@@ -46,9 +46,6 @@ class ImuTask {
                 return;
             }
 
-            Wire.begin();
-            Wire.setClock(400000);
-
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
@@ -67,7 +64,8 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            //deviceInit();
+            extern bool imu_deviceInit();
+            imu_deviceInit();
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -212,10 +210,6 @@ class ImuTask {
         DebugTask * _debugTask;
 
         FreeRtosTask _task;
-
-        Bmi088Accel _accel = Bmi088Accel(Wire, ACCEL_ADDRESS);
-
-        Bmi088Gyro _gyro = Bmi088Gyro(Wire, GYRO_ADDRESS);
 
         /**
          * Checks if the variances is below the predefined thresholds.
@@ -447,33 +441,5 @@ class ImuTask {
         static float accelRaw2Gs(const int16_t raw)
         {
             return (float)raw * 2 * 24 / 65536.f;
-        }
-
-        // Hardware-dependent stuff ------------------------------------------
-
-        static const uint8_t ACCEL_ADDRESS = 0x19;
-        static const uint8_t GYRO_ADDRESS = 0x69;
-
-        Bmi088Accel accel = Bmi088Accel(Wire, ACCEL_ADDRESS);
-
-        Bmi088Gyro gyro = Bmi088Gyro(Wire, GYRO_ADDRESS);
-
-        bool deviceInit()
-        {
-            if (accel.begin() < 0) {
-                return false;
-            }
-
-            if (gyro.begin() < 0) {
-                return false;
-            }
-
-            accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
-
-            gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
-            gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
-            gyro.mapDrdyInt3(true);
-
-            return true;
         }
 };
