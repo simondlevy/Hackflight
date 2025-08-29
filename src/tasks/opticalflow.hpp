@@ -69,10 +69,9 @@ class OpticalFlowTask {
                         "OpticalFlowTask: gotMotion=%s dx=%+03d dy=%+03d",
                         gotMotion ? "yes" : "no ", deltaX, deltaY);
 
-                // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
-                int16_t accpx = -deltaY;
-                int16_t accpy = -deltaX;
+                int16_t accpx = deltaY;
+                int16_t accpy = deltaX;
 
                 // Outlier removal
                 if (abs(accpx) < OUTLIER_LIMIT && abs(accpy) < OUTLIER_LIMIT) {
