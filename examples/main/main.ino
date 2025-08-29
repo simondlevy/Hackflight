@@ -69,7 +69,7 @@ void setup()
 
     zrangerTask.begin(&estimatorTask, &debugTask);
 
-    opticalFlowTask.begin(&estimatorTask, &debugTask);
+    opticalFlowTask.begin(&estimatorTask);
 
     estimatorTask.begin(&safety);
 
@@ -79,7 +79,7 @@ void setup()
 
     ledTask.begin(&safety);
 
-    imuTask.begin(&estimatorTask, &debugTask);
+    imuTask.begin(&estimatorTask);
 
     coreTask.begin(
             &closedLoopControl,

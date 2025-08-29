@@ -41,7 +41,7 @@ class ImuTask {
     public:
 
         // Called from main program
-        void begin( EstimatorTask * estimatorTask, DebugTask * debugTask)
+        void begin( EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return;
@@ -390,10 +390,12 @@ class ImuTask {
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
 
-                    _debugTask->setMessage(
-                            "gx=%+05d gy=%+05d gz=%+05d ax=%+05d ay=%+05d az=%+05d",
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z, 
-                            accelRaw.x, accelRaw.y, accelRaw.z); 
+                    if (_debugTask) {
+                        _debugTask->setMessage(
+                                "gx=%+05d gy=%+05d gz=%+05d ax=%+05d ay=%+05d az=%+05d",
+                                gyroRaw.x, gyroRaw.y, gyroRaw.z, 
+                                accelRaw.x, accelRaw.y, accelRaw.z); 
+                    }
 
                     // Convert accel to Gs
                     Axis3f accel = {};

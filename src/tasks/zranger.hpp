@@ -26,7 +26,7 @@ class ZRangerTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask)
+        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()){
                 return;
@@ -83,7 +83,9 @@ class ZRangerTask {
 
                 float range = zranger_deviceRead();
 
-                //_debugTask->setMessage("zdist=%d", (int)range);
+                if (_debugTask) {
+                    _debugTask->setMessage("zdist=%d", (int)range);
+                }
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers

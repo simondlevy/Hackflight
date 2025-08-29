@@ -10,7 +10,7 @@ class OpticalFlowTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask)
+        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()){
                 return;
@@ -22,8 +22,8 @@ class OpticalFlowTask {
             if (opticalflow_deviceInit()) {
                 _task.init(runOpticalFlowTask, "flow", this, 3);
             }
-            else {
-                debugTask->setMessage("PMW3901 initialization failed.");
+            else if (_debugTask) {
+                _debugTask->setMessage("PMW3901 initialization failed.");
             }
         }
 
@@ -64,8 +64,10 @@ class OpticalFlowTask {
 
                 opticalflow_deviceRead(deltaX, deltaY, gotMotion);
 
-                //_debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
-                //        gotMotion ? "yes" : "no ", deltaX, deltaY);
+                if (_debugTask) {
+                    _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
+                            gotMotion ? "yes" : "no ", deltaX, deltaY);
+                }
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
