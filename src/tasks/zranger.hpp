@@ -36,18 +36,9 @@ class ZRangerTask {
                 return;
             }
 
-            Wire1.begin();
-            Wire1.setClock(400000);
-
-            _vl53l1x.setBus(&Wire1);
-
-            if (!_vl53l1x.init()) {
-                debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
+            if (!deviceInit()) {
+                _debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
             }
-
-            _vl53l1x.setDistanceMode(VL53L1X::Medium);
-            _vl53l1x.setMeasurementTimingBudget(25000); // usec
-            _vl53l1x.startContinuous(25); // msec
 
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
@@ -84,8 +75,6 @@ class ZRangerTask {
 
         DebugTask * _debugTask;
 
-        VL53L1X _vl53l1x;
-
         void run(void)
         {
             TickType_t lastWakeTime;
@@ -96,9 +85,9 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
-                float range = _vl53l1x.read();
+                float range = deviceRead();
 
-                //_debugTask->setMessage("zdist=%f", range);
+                _debugTask->setMessage("zdist=%d", (int)range);
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers
@@ -119,5 +108,32 @@ class ZRangerTask {
                             &tofData, xPortIsInsideInterrupt());
                 }
             }
+        }
+
+        // Hardware-dependent stuff ------------------------------------------
+
+        VL53L1X _vl53l1x;
+
+        bool deviceInit()
+        {
+            Wire1.begin();
+            Wire1.setClock(400000);
+
+            _vl53l1x.setBus(&Wire1);
+
+            if (!_vl53l1x.init()) {
+                return false;
+            }
+
+            _vl53l1x.setDistanceMode(VL53L1X::Medium);
+            _vl53l1x.setMeasurementTimingBudget(25000); // usec
+            _vl53l1x.startContinuous(25); // msec
+
+            return true;
+        }
+
+        float deviceRead()
+        {
+            return (float)_vl53l1x.read();
         }
 };

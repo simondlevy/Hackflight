@@ -396,6 +396,7 @@ class ImuTask {
                     // Get raw data from IMU
                     Axis3i16 gyroRaw = {};
                     //readGyroRaw(&gyroRaw);
+
                     Axis3i16 accelRaw = {};
                     //readAccelRaw(&accelRaw);
 
