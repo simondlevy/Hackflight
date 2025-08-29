@@ -75,6 +75,10 @@ class EstimatorTask {
             xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
+
+            DebugTask::setMessage(_debugTask,
+                    "phi=%+3.3f theta=%+3.3f psi=%+3.3f", 
+                    state->phi, state->theta, state->psi);
         }
 
         void enqueueGyro(const Axis3f * gyro, const bool isInInterrupt)
