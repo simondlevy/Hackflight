@@ -56,12 +56,15 @@ void loop()
 
         gyro.readSensor();
 
+        printf("%+05d\n", accel.getAccelX_raw());
+
+        /*
         printf("ax=%+3.3f ay=%+3.3f az=%+3.3f m/s^2 | gx=%+3.3f gy=%+3.3f gz=%+3.3f rad/sec\n", 
                 accel.getAccelX_mss(),
                 accel.getAccelY_mss(),
                 accel.getAccelZ_mss(),
                 gyro.getGyroX_rads(),
                 gyro.getGyroY_rads(),
-                gyro.getGyroZ_rads());
+                gyro.getGyroZ_rads());*/
     }
 }
