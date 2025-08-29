@@ -42,6 +42,13 @@ static ZRangerTask zrangerTask;
 
 static HardwareSerial * uart = &Serial5;
 
+static const uint8_t GYRO_INTERRUPT_PIN = 6;
+
+static void handle_gyro_interrupt()
+{
+    imuTask.dataAvailableCallback();
+}
+
 void setup() 
 {
     Serial.begin(0);
@@ -53,6 +60,10 @@ void setup()
         Serial.println();
         Serial.flush();
     }
+
+
+    pinMode(GYRO_INTERRUPT_PIN, INPUT);
+    attachInterrupt(GYRO_INTERRUPT_PIN, handle_gyro_interrupt, RISING);
 
 	debugTask.begin();
 

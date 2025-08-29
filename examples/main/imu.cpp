@@ -18,19 +18,12 @@
 
 #include <BMI088.h>
 
-static const uint8_t GYRO_INTERRUPT_PIN = 6;
-
 static const uint8_t ACCEL_ADDRESS = 0x19;
 static const uint8_t GYRO_ADDRESS = 0x69;
 
 static Bmi088Accel accel(Wire, ACCEL_ADDRESS);
 
 static Bmi088Gyro gyro(Wire, GYRO_ADDRESS);
-
-static void handle_gyro_interrupt()
-{
-}
-
 
 bool imu_deviceInit()
 {
@@ -50,9 +43,6 @@ bool imu_deviceInit()
     gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
     gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
-
-    pinMode(GYRO_INTERRUPT_PIN, INPUT);
-    attachInterrupt(GYRO_INTERRUPT_PIN, handle_gyro_interrupt, RISING);
 
     return true;
 }
