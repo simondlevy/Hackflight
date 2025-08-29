@@ -47,9 +47,9 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
-				DebugTask * debugTask,
                 const uint8_t rotorCount,
-                const mixFun_t mixFun)
+                const mixFun_t mixFun,
+				DebugTask * debugTask)
         {
             if (_task.didInit()) {
                 return true;

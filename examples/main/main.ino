@@ -87,9 +87,9 @@ void setup()
             &estimatorTask,
             &imuTask,
             &setpointTask,
-            &debugTask,
             Mixer::rotorCount,
-            Mixer::mix);
+            Mixer::mix,
+            &debugTask);
 
     vTaskStartScheduler();
 }
