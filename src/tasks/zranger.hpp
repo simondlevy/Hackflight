@@ -17,10 +17,10 @@
 #pragma once
 
 #include <linalg.h>
-#include <system.h>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
+#include <zranger_api.h>
 
 class ZRangerTask {
 
@@ -31,8 +31,6 @@ class ZRangerTask {
             if (_task.didInit()){
                 return;
             }
-
-            extern bool zranger_deviceInit();
 
             if (!zranger_deviceInit()) {
                 _debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
@@ -82,8 +80,6 @@ class ZRangerTask {
             while (true) {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
-
-                extern float zranger_deviceRead();
 
                 float range = zranger_deviceRead();
 
