@@ -383,12 +383,16 @@ class ImuTask {
 
                     data.interruptTimestamp = interruptTimestamp;
 
-                    // Get raw data from IMU
                     Axis3i16 gyroRaw = {};
-                    //readGyroRaw(&gyroRaw);
-
                     Axis3i16 accelRaw = {};
-                    //readAccelRaw(&accelRaw);
+
+                    extern void imu_deviceReadRaw(
+                            int16_t & gx, int16_t & gy, int16_t & gz, 
+                            int16_t & ax, int16_t & ay, int16_t & az);
+
+                    imu_deviceReadRaw(
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                            accelRaw.x, accelRaw.y, accelRaw.z);
 
                     // Convert accel to Gs
                     Axis3f accel = {};

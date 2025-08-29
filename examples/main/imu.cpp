@@ -46,3 +46,12 @@ bool imu_deviceInit()
 
     return true;
 }
+                    
+void imu_deviceReadRaw(
+        int16_t & gx, int16_t & gy, int16_t & gz, 
+        int16_t & ax, int16_t & ay, int16_t & az)
+{
+    gyro.readSensor();
+
+    gx = gyro.getGyroX_raw();
+}
