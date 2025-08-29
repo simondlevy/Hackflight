@@ -46,8 +46,6 @@ class OpticalFlowTask {
             ((OpticalFlowTask *)obj)->run();
         }
 
-        PMW3901 _pmw3901;
-
         FreeRtosTask _task;
 
         float _expCoeff;
@@ -70,8 +68,8 @@ class OpticalFlowTask {
 
                 _pmw3901.readMotion(deltaX, deltaY, gotMotion);
 
-                //_debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
-                //        gotMotion ? "yes" : "no ", deltaX, deltaY);
+                _debugTask->setMessage("gotMotion=%s dx=%+03d dy=%+03d",
+                        gotMotion ? "yes" : "no ", deltaX, deltaY);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
@@ -104,4 +102,9 @@ class OpticalFlowTask {
                 }
              }
         }
+
+        // Hardware-dependent stuff ------------------------------------------
+
+        PMW3901 _pmw3901;
+
 };
