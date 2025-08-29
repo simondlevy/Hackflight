@@ -31,7 +31,7 @@ static ClosedLoopControl closedLoopControl;
 
 static Safety safety;
 
-//static CoreTask coreTask;
+static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static OpticalFlowTask opticalFlowTask;
