@@ -67,7 +67,7 @@ void setup()
 
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask, &debugTask);
+    zrangerTask.begin(&estimatorTask);
 
     opticalFlowTask.begin(&estimatorTask);
 
@@ -88,7 +88,8 @@ void setup()
             &imuTask,
             &setpointTask,
             Mixer::rotorCount,
-            Mixer::mix);
+            Mixer::mix,
+            &debugTask);
 
     vTaskStartScheduler();
 }

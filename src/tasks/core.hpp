@@ -176,10 +176,14 @@ class CoreTask {
         {
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
+
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
+                if (_debugTask) {
+                    _debugTask->setMessage("calibrating IMU");
+                }
             }
 
             static RateSupervisor rateSupervisor;
