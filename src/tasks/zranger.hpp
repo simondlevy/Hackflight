@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <Wire.h>
-#include <VL53L1X.h>
-
 #include <linalg.h>
 #include <system.h>
 #include <task.hpp>
@@ -35,7 +32,9 @@ class ZRangerTask {
                 return;
             }
 
-            if (!deviceInit()) {
+            extern bool zranger_deviceInit();
+
+            if (!zranger_deviceInit()) {
                 _debugTask->setMessage("Failed to initialize VL53L1X rangerfinder");
             }
 
@@ -84,7 +83,9 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
-                float range = deviceRead();
+                extern float zranger_deviceRead();
+
+                float range = zranger_deviceRead();
 
                 //_debugTask->setMessage("zdist=%d", (int)range);
 
@@ -107,32 +108,5 @@ class ZRangerTask {
                             &tofData, xPortIsInsideInterrupt());
                 }
             }
-        }
-
-        // Hardware-dependent stuff ------------------------------------------
-
-        VL53L1X _vl53l1x;
-
-        bool deviceInit()
-        {
-            Wire1.begin();
-            Wire1.setClock(400000);
-
-            _vl53l1x.setBus(&Wire1);
-
-            if (!_vl53l1x.init()) {
-                return false;
-            }
-
-            _vl53l1x.setDistanceMode(VL53L1X::Medium);
-            _vl53l1x.setMeasurementTimingBudget(25000); // usec
-            _vl53l1x.startContinuous(25); // msec
-
-            return true;
-        }
-
-        float deviceRead()
-        {
-            return (float)_vl53l1x.read();
         }
 };
