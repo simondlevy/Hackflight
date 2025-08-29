@@ -83,7 +83,9 @@ class EstimatorTask {
             }
             else {
                 DebugTask::setMessage(_debugTask,
-                        "EstimatorTask: phi=%+3.3f theta=%+3.3f psi=%+3.3f", 
+                        "EstimatorTask: dx=%3.3f dy=%3.3f z=%3.3f "
+                        "phi=%+3.3f theta=%+3.3f psi=%+3.3f", 
+                        state->dx, state->dy, state->z,
                         state->phi, state->theta, state->psi);
             }
         }
