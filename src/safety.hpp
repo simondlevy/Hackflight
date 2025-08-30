@@ -20,8 +20,8 @@
 #include <math.h>
 
 #include <clock.hpp>
-#include <motor_api.h>
 #include <datatypes.h>
+#include <tasks/motors.hpp>
 
 class Safety {
 
@@ -84,10 +84,11 @@ class Safety {
             auto isThrustOverIdle = false;
 
             for (int i = 0; i < 4; ++i) {
+                /*
                 if (motorsGetRatio(i) > 0) {
                     isThrustOverIdle = true;
                     break;
-                }
+                }*/
             }
 
             static uint32_t latestThrustTick;

@@ -20,7 +20,6 @@
 
 #include <Arduino.h>
 
-#include <motor_api.h>
 #include <oneshot125.hpp>
 #include <vector>
 

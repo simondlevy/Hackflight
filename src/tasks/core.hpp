@@ -25,7 +25,6 @@
 #include <__control__.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
-#include <motor_api.h>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -34,7 +33,8 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/comms/setpoint.hpp>
+#include <tasks/motors.hpp>
+#include <tasks/setpoint.hpp>
 #include <vehicles/diyquad.hpp>
 
 class CoreTask {
@@ -70,8 +70,6 @@ class CoreTask {
             _mixFun = mixFun;
 
             _rotorCount = rotorCount;
-
-            motorsInit();
 
             _task.init(runCoreTask, "core", this, 5);
 
@@ -151,6 +149,8 @@ class CoreTask {
 
         void runMotors(const float motorvals[4]) 
         {
+            (void)motorvals;
+            /*
             const uint16_t motorsPwm[4]  = {
                 (uint16_t)motorvals[0],
                 (uint16_t)motorvals[1],
@@ -158,7 +158,7 @@ class CoreTask {
                 (uint16_t)motorvals[3]
             };
 
-            motorsSetRatios(motorsPwm);
+            motorsSetRatios(motorsPwm);*/
         }
 
         static void runCoreTask(void* obj)
@@ -251,7 +251,7 @@ class CoreTask {
                         timestamp - setpoint_timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
-                    motorsStop();
+                    //motorsStop();
                     _safety->requestArming(false);
                 }
 
@@ -260,9 +260,7 @@ class CoreTask {
                 } 
                 
                 else {
-                    static int count;
-                    DebugTask::setMessage(_debugTask, "%d", count++);
-                    motorsStop();
+                    //motorsStop();
                 }
 
                 if (!rateSupervisor.validate(timestamp)) {

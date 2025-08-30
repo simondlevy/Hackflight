@@ -17,8 +17,8 @@ using namespace arduino;
 
 #include <safety.hpp>
 
-#include <tasks/comms/logging.hpp>
-#include <tasks/comms/setpoint.hpp>
+#include <tasks/logging.hpp>
+#include <tasks/setpoint.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
