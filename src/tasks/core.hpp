@@ -178,9 +178,6 @@ class CoreTask {
         {
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
-            // Wait for the system to be fully started to start core loop
-            //systemWaitStart();
-
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->areCalibrated()) {

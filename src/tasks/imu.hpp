@@ -368,8 +368,6 @@ class ImuTask {
 
         void run(void)
         {
-            //systemWaitStart();
-
             while (true) {
 
                 if (pdTRUE == xSemaphoreTake(

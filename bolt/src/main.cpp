@@ -83,17 +83,8 @@ static Safety safety;
 
 static bool selftestPassed;
 
-static SemaphoreHandle_t canStartMutex;
-static StaticSemaphore_t canStartMutexBuffer;
-
 static uint8_t _led_pin;
 static uint8_t _flowdeck_cs_pin;
-
-static void start()
-{
-    xSemaphoreGive(canStartMutex);
-}
-
 
 // System --------------------------------------------------------------------
 
@@ -106,9 +97,6 @@ void systemWaitStart(void)
     while (!didInit) {
         delay(2);
     }
-
-    //xSemaphoreTake(canStartMutex, portMAX_DELAY);
-    //xSemaphoreGive(canStartMutex);
 }
 
 static void systemTask(void *arg)
@@ -118,9 +106,6 @@ static void systemTask(void *arg)
     }
 
     bool pass = true;
-
-    canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
-    xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
     didInit = true;
 
@@ -159,7 +144,6 @@ static void systemTask(void *arg)
 
     if (pass) {
         selftestPassed = true;
-        start();
     }
 
     else {
@@ -175,7 +159,6 @@ static void systemTask(void *arg)
 
                 if (selftestPassed)
                 {
-                    start();
                     break;
                 }
             }
