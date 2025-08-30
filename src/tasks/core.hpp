@@ -41,9 +41,9 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
-				DebugTask * debugTask,
                 const uint8_t rotorCount,
-                const mixFun_t mixFun)
+                const mixFun_t mixFun,
+				DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return true;
@@ -219,14 +219,6 @@ class CoreTask {
                     }
 
                     demands_t closedLoopDemands = {};
-
-                    /*
-                    _debugTask->setMessage(
-                            "z=%+3.3f phi=%+3.1f theta=%+3.f psi=%+3.1f",
-                            (double)vehicleState.z,
-                            (double)vehicleState.phi,
-                            (double)vehicleState.theta,
-                            (double)vehicleState.psi);*/
 
                     _closedLoopControl->run(
                             1.f / PID_UPDATE_RATE,

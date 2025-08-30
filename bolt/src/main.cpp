@@ -123,7 +123,6 @@ static void systemTask(void *arg)
             &estimatorTask,
             &imuTask,
             &setpointTask,
-            &debugTask,
             Mixer::rotorCount,
             Mixer::mix);
 
