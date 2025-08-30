@@ -39,7 +39,7 @@
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
-#include <uart.h>
+#include <uart_api.h>
 
 #include <hal/digital.h>
 #include <hal/exti.h>

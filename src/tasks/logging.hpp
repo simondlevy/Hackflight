@@ -22,7 +22,7 @@
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
-#include <uart.h>
+#include <uart_api.h>
 
 class LoggerTask {
 
