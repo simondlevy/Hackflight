@@ -31,7 +31,11 @@ class ZRangerTask {
                 return;
             }
 
-            hardware_init();
+            if (!zranger_deviceInit()) {
+                /*
+                DebugTask::setMessage(_debugTask,
+                        "ZRangetTask: Failed to initialize zranger");*/
+            }
 
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
@@ -68,10 +72,6 @@ class ZRangerTask {
 
         DebugTask * _debugTask;
 
-		void hardware_init();
-
-		float hardware_read();
-
         void run(void)
         {
             TickType_t lastWakeTime;
@@ -82,7 +82,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
-                float range = hardware_read();
+                float range = zranger_deviceRead();
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers
