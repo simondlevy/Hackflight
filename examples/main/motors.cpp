@@ -15,15 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-
-#include <motor_api.h>
-#include <oneshot125.hpp>
-#include <vector>
-
-static const std::vector<uint8_t> PINS = {2, 23, 14, 9};
-
-static auto motors = OneShot125(PINS);
+#include <hackflight.h>
 
 int motorsGetRatio(uint32_t id)
 {
@@ -32,7 +24,6 @@ int motorsGetRatio(uint32_t id)
 
 void motorsInit(void)
 {
-    motors.arm(); 
 }
 
 void motorsSetRatios(const uint16_t ratios[])
@@ -42,12 +33,4 @@ void motorsSetRatios(const uint16_t ratios[])
 
 void  motorsStop()
 {
-    const uint8_t pulseWidth = 125;
-
-    motors.set(0, pulseWidth);
-    motors.set(1, pulseWidth);
-    motors.set(2, pulseWidth);
-    motors.set(3, pulseWidth);
-
-    motors.run();
 }

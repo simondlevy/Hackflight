@@ -24,6 +24,7 @@ using namespace arduino;
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
+#include <tasks/motors.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
 
@@ -38,6 +39,7 @@ static OpticalFlowTask opticalFlowTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
+static MotorsTask motorsTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
@@ -90,6 +92,8 @@ void setup()
             Mixer::rotorCount,
             Mixer::mix,
             &debugTask);
+
+    motorsTask.begin();
 
     vTaskStartScheduler();
 }
