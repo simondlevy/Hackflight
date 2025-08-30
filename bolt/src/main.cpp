@@ -40,6 +40,7 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 #include <uart_api.h>
+#include <usb_api.h>
 
 #include <hal/digital.h>
 #include <hal/exti.h>
@@ -403,6 +404,13 @@ bool uartReadByte(uint8_t * byte)
 void uartWriteByte(const uint8_t byte)
 {
     uartSendDataDmaBlocking(1, (uint8_t *)&byte);
+}
+
+// USB serial debugging -------------------------------------------------------
+
+void usbWrite(const char * msg)
+{
+    (void)msg;
 }
 
 // Main -----------------------------------------------------------------------

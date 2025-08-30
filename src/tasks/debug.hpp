@@ -16,78 +16,63 @@
 
 #pragma once
 
-#include <Arduino.h>
+#include <stdarg.h>
 #include <string.h>
 #include <task.hpp>
+#include <usb_api.h>
 
 class DebugTask {
 
-#if defined(ARDUINO)
-
     public:
 
         void begin()
         {
-            if (_task.didInit()){
-                return;
-            }
-
             _task.init(runDebugCommsTask, "debug", this, 2);
 		}
 
-		void setMessage(const char * format, ...)
-		{
-			va_list args = {};
-
-			char buffer[256] = {};
-
-			va_start(args, format);
-
-			const auto vsErr = vsprintf(buffer, format, args);
-
-			if (vsErr >= 0) { 
-				strcpy(_msg, buffer);
-			}
-
-			va_end(args);
-		}
-
-	private:
-
-		static constexpr float REPORT_FREQ = 100;
-
-		FreeRtosTask _task;
-
-		char _msg[100];
-
-		static void runDebugCommsTask(void * obj)
-		{
-			((DebugTask *)obj)->run();
-		}
-
-		void run(void)
-		{
-			while (true) {
-
-				if (*_msg) {
-					Serial.println(_msg);
-				}
-
-				vTaskDelay(M2T(1000/REPORT_FREQ));
-			}
-		}
-
-#else
-    public:
-
-        void begin()
+        static void setMessage(DebugTask * debugTask, const char * format, ...)
         {
+            if (debugTask) {
+
+                va_list args = {};
+
+                char buffer[256] = {};
+
+                va_start(args, format);
+
+                const auto vsErr = vsprintf(buffer, format, args);
+
+                if (vsErr >= 0) { 
+                    strcpy(debugTask->_msg, buffer);
+                }
+
+                va_end(args);
+            }
         }
 
- 		void setMessage(const char * format, ...)
+    private:
+
+        static constexpr float REPORT_FREQ = 10;
+
+        FreeRtosTask _task;
+
+        char _msg[100];
+
+        static void runDebugCommsTask(void * obj)
         {
-            (void)format;
+            ((DebugTask *)obj)->run();
         }
-#endif
+
+        void run(void)
+        {
+            while (true) {
+
+                if (*_msg) {
+                    usbWrite(_msg);
+                }
+
+                vTaskDelay(M2T(1000/REPORT_FREQ));
+            }
+        }
 };
 
