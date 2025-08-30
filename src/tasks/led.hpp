@@ -21,7 +21,6 @@
 #include <Arduino.h>
 
 #include <safety.hpp>
-#include <system.h>
 #include <task.hpp>
 
 class LedTask {

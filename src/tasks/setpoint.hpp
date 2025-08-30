@@ -25,9 +25,9 @@
 #include <msp/messages.h>
 #include <msp/parser.hpp>
 #include <safety.hpp>
-#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
+#include <uart.h>
 
 class SetpointTask {
 
@@ -108,7 +108,7 @@ class SetpointTask {
 
                 uint8_t byte = 0;
 
-                if (systemUartReadByte(&byte)) {
+                if (uartReadByte(&byte)) {
 
                     switch (parser.parse(byte)) {
 

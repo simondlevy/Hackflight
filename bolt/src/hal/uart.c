@@ -40,7 +40,7 @@
 #include "nvicconf.h"
 #include "static_mem.h"
 #include "nvic.h"
-#include "uart.h"
+#include "hal_uart.h"
 
 static SemaphoreHandle_t uartBusy;
 static StaticSemaphore_t uartBusyBuffer;

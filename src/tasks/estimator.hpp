@@ -21,7 +21,6 @@
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
-#include <system.h>
 #include <task.hpp>
 
 class EstimatorTask {

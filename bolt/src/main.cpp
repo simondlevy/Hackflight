@@ -30,7 +30,6 @@
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
-#include <system.h>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -40,21 +39,19 @@
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
-
+#include <uart.h>
 
 #include <hal/digital.h>
 #include <hal/exti.h>
 #include <hal/i2cdev.h>
 #include <hal/nvic.h>
 #include <hal/spi2.h>
-#include <hal/uart.h>
+#include <hal/hal_uart.h>
 #include <hal/time.h>
 #include <hal/usb.h>
 
 #include <bosch/bmi088.h>
 #include <bosch/bstdr_types.h>
-
-#include <system.h>
 
 #include <vl53l1.hpp>
 
@@ -413,12 +410,12 @@ static const uint8_t LED_PIN = 4;
 
 // UART ----------------------------------------------------------------------
 
-bool systemUartReadByte(uint8_t * byte)
+bool uartReadByte(uint8_t * byte)
 {
     return uartGetData(1, byte);
 }
 
-void systemUartWriteByte(const uint8_t byte)
+void uartWriteByte(const uint8_t byte)
 {
     uartSendDataDmaBlocking(1, (uint8_t *)&byte);
 }

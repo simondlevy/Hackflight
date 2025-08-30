@@ -14,6 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-bool systemUartReadByte(uint8_t *);
+bool uartReadByte(uint8_t *);
             
-void systemUartWriteByte(const uint8_t byte);
+void uartWriteByte(const uint8_t byte);

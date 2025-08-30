@@ -19,7 +19,6 @@
 #include <stdint.h>
 
 #include <linalg.h>
-#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 

@@ -20,9 +20,9 @@
 
 
 #include <msp/serializer.hpp>
-#include <system.h>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
+#include <uart.h>
 
 class LoggerTask {
 
@@ -100,7 +100,7 @@ class LoggerTask {
  
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                systemUartWriteByte(serializer.payload[k]);
+                uartWriteByte(serializer.payload[k]);
             }
 
         }
