@@ -37,8 +37,8 @@
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
-#include <tasks/comms/setpoint.hpp>
-#include <tasks/comms/logging.hpp>
+#include <tasks/logging.hpp>
+#include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
 
@@ -104,12 +104,11 @@ void systemWaitStart(void)
     // This guarantees that the system task is initialized before other
     // tasks wait for the start event.
     while (!didInit) {
-        //vTaskDelay(2);
         delay(2);
     }
 
-    xSemaphoreTake(canStartMutex, portMAX_DELAY);
-    xSemaphoreGive(canStartMutex);
+    //xSemaphoreTake(canStartMutex, portMAX_DELAY);
+    //xSemaphoreGive(canStartMutex);
 }
 
 static void systemTask(void *arg)

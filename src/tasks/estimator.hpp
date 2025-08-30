@@ -239,7 +239,7 @@ class EstimatorTask {
 
         void run(void)
         {
-            systemWaitStart();
+            //systemWaitStart();
 
             auto nextPredictionMs = msec();
 

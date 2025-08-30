@@ -67,7 +67,7 @@ class FlowDeckTask {
 
         void run(void)
         {
-            systemWaitStart();
+            //systemWaitStart();
 
             auto lastTime  = micros();
 

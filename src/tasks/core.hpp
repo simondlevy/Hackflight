@@ -36,7 +36,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/comms/setpoint.hpp>
+#include <tasks/setpoint.hpp>
 #include <vehicles/diyquad.hpp>
 
 class CoreTask {
@@ -179,7 +179,7 @@ class CoreTask {
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
             // Wait for the system to be fully started to start core loop
-            systemWaitStart();
+            //systemWaitStart();
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();

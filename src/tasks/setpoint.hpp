@@ -100,7 +100,7 @@ class SetpointTask {
 
         void run(void)
         {
-            systemWaitStart();
+            //systemWaitStart();
 
             MspParser parser = {};
 
