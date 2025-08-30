@@ -22,6 +22,12 @@
 
 #include <vector>
 
+// XXX not sure why we have to do this
+static const uint8_t M1_OFFSET = 22;
+static const uint8_t M2_OFFSET = 0;
+static const uint8_t M3_OFFSET = 22;
+static const uint8_t M4_OFFSET = 0;
+
 static const std::vector<uint8_t> PINS = {2, 23, 14, 9};
 
 static auto motors = OneShot125(PINS);
@@ -39,10 +45,11 @@ void loop()
 {
     auto pulseWidth = (uint8_t)(125 * (inputGet() + 1));
 
-    motors.set(0, pulseWidth);
-    motors.set(1, pulseWidth);
-    motors.set(2, pulseWidth);
-    motors.set(3, pulseWidth);
+
+    motors.set(0, pulseWidth + M1_OFFSET);
+    motors.set(1, pulseWidth + M2_OFFSET);
+    motors.set(2, pulseWidth + M3_OFFSET);
+    motors.set(3, pulseWidth + M4_OFFSET);
 
     motors.run();
 }

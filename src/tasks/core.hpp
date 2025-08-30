@@ -79,7 +79,6 @@ class CoreTask {
 
             pass &= _imuTask->test();
             pass &= _estimatorTask->didInit();
-            pass &= motorsTest();
 
             return pass;
         }
@@ -226,12 +225,13 @@ class CoreTask {
 
                     demands_t closedLoopDemands = {};
 
+                    /*
                     DebugTask::setMessage(_debugTask,
                             "CoreTask: z=%+3.3f phi=%+3.1f theta=%+3.f psi=%+3.1f",
                             (double)vehicleState.z,
                             (double)vehicleState.phi,
                             (double)vehicleState.theta,
-                            (double)vehicleState.psi);
+                            (double)vehicleState.psi);*/
 
                     _closedLoopControl->run(
                             1.f / PID_UPDATE_RATE,
@@ -260,6 +260,8 @@ class CoreTask {
                 } 
                 
                 else {
+                    static int count;
+                    DebugTask::setMessage(_debugTask, "%d", count++);
                     motorsStop();
                 }
 

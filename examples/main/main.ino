@@ -71,7 +71,7 @@ void setup()
 
     opticalFlowTask.begin(&estimatorTask);
 
-    estimatorTask.begin(&safety, &debugTask);
+    estimatorTask.begin(&safety);
 
     setpointTask.begin(&safety, uart);
 
@@ -88,7 +88,8 @@ void setup()
             &imuTask,
             &setpointTask,
             Mixer::rotorCount,
-            Mixer::mix);
+            Mixer::mix,
+            &debugTask);
 
     vTaskStartScheduler();
 }

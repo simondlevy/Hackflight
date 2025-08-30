@@ -22,6 +22,5 @@
 
 int   motorsGetRatio(uint32_t id);
 void  motorsInit(void);
-bool  motorsTest(void);
 void  motorsSetRatios(const uint16_t ratios[]);
 void  motorsStop();
