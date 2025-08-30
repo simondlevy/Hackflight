@@ -20,6 +20,28 @@
 
 #include <stm32fxxx.h>
 
+#include <free_rtos/FreeRTOS.h>
+#include <free_rtos/semphr.h>
+#include <free_rtos/task.h>
+
+// Chosen at config time
+#include <__control__.hpp>
+
+#include <hackflight.h>
+#include <mixers/crazyflie.hpp>
+#include <safety.hpp>
+#include <system.h>
+#include <tasks/core.hpp>
+#include <tasks/debug.hpp>
+#include <tasks/estimator.hpp>
+#include <tasks/flowdeck.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/led.hpp>
+#include <tasks/comms/setpoint.hpp>
+#include <tasks/comms/logging.hpp>
+#include <tasks/zranger.hpp>
+
+
 #include <hal/digital.h>
 #include <hal/exti.h>
 #include <hal/i2cdev.h>
@@ -34,9 +56,6 @@
 
 #include <system.h>
 
-#include <tasks/imu.hpp>
-#include <tasks/zranger.hpp>
-
 #include <vl53l1.hpp>
 
 #include <motors.h>
@@ -44,6 +63,157 @@
 #include <st/vl53l1_api.h>
 
 static const uint8_t FLOWDECK_CS_PIN = 11;
+
+static const float IMU_CALIBRATION_PITCH = 0;
+static const float IMU_CALIBRATION_ROLL = 0;
+
+static CoreTask coreTask;
+static DebugTask debugTask;
+static EstimatorTask estimatorTask;
+static FlowDeckTask flowDeckTask;
+static ImuTask imuTask;
+static LedTask ledTask;
+static LoggerTask loggerTask;
+static SetpointTask setpointTask;
+static ZRangerTask zrangerTask;
+
+static ClosedLoopControl closedLoopControl;
+
+static Safety safety;
+
+static bool selftestPassed;
+
+static SemaphoreHandle_t canStartMutex;
+static StaticSemaphore_t canStartMutexBuffer;
+
+static uint8_t _led_pin;
+static uint8_t _flowdeck_cs_pin;
+
+static void start()
+{
+    xSemaphoreGive(canStartMutex);
+}
+
+
+// System --------------------------------------------------------------------
+
+static bool didInit;
+
+void systemWaitStart(void)
+{
+    // This guarantees that the system task is initialized before other
+    // tasks wait for the start event.
+    while (!didInit) {
+        //vTaskDelay(2);
+        delay(2);
+    }
+
+    xSemaphoreTake(canStartMutex, portMAX_DELAY);
+    xSemaphoreGive(canStartMutex);
+}
+
+static void systemTask(void *arg)
+{
+    if (didInit) {
+        return;
+    }
+
+    bool pass = true;
+
+    canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
+    xSemaphoreTake(canStartMutex, portMAX_DELAY);
+
+    didInit = true;
+
+	debugTask.begin();
+    
+    zrangerTask.begin(&estimatorTask);
+
+    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
+
+    estimatorTask.begin(&safety);
+
+    setpointTask.begin(&safety);
+
+    loggerTask.begin(&estimatorTask, &closedLoopControl);
+
+    ledTask.begin(&safety, _led_pin);
+
+    imuTask.begin(
+            &estimatorTask, 
+            IMU_CALIBRATION_ROLL,
+            IMU_CALIBRATION_PITCH);
+
+    auto coreTaskReady = coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            &debugTask,
+            Mixer::rotorCount,
+            Mixer::mix);
+
+    if (!coreTaskReady) {
+        pass = false;
+    }
+
+    if (pass) {
+        selftestPassed = true;
+        start();
+    }
+
+    else {
+
+        selftestPassed = false;
+
+        if (didInit) {
+
+            while (true) {
+
+                //vTaskDelay(M2T(2000));
+                delay(2000);
+
+                if (selftestPassed)
+                {
+                    start();
+                    break;
+                }
+            }
+        }
+    }
+
+    // Should never reach this point!
+    while (true) {
+        //vTaskDelay(portMAX_DELAY);
+        delay(portMAX_DELAY);
+    }
+}
+
+
+void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
+{
+    _led_pin = led_pin;
+
+    _flowdeck_cs_pin = flowdeck_cs_pin;
+
+    // Launch the system task that will initialize and start everything
+    xTaskCreate(
+            systemTask, 
+            "SYSTEM",
+            2* configMINIMAL_STACK_SIZE, 
+            NULL, 
+            2, 
+            NULL);
+
+    // Start the FreeRTOS scheduler
+    vTaskStartScheduler();
+}
+
+void systemReportForever(const char * msg)
+{
+	debugTask.setMessage(msg);
+}
 
 // Helpers --------------------------------------------------------------------
 
@@ -303,5 +473,4 @@ int main()
 
     return 0;
 }
-
 
