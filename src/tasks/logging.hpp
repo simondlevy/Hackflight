@@ -59,8 +59,6 @@ class LoggerTask {
 
         void run(void)
         {
-            //systemWaitStart();
-
             TickType_t lastWakeTime = xTaskGetTickCount();
 
             while (true) {

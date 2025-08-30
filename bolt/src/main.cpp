@@ -90,15 +90,6 @@ static uint8_t _flowdeck_cs_pin;
 
 static bool didInit;
 
-void systemWaitStart(void)
-{
-    // This guarantees that the system task is initialized before other
-    // tasks wait for the start event.
-    while (!didInit) {
-        delay(2);
-    }
-}
-
 static void systemTask(void *arg)
 {
     if (didInit) {
@@ -173,7 +164,7 @@ static void systemTask(void *arg)
 }
 
 
-void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
+static void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
 {
     _led_pin = led_pin;
 
@@ -190,11 +181,6 @@ void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
 
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
-}
-
-void systemReportForever(const char * msg)
-{
-	debugTask.setMessage(msg);
 }
 
 // Helpers --------------------------------------------------------------------

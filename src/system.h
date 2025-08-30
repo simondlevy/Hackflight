@@ -14,12 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin);
-
-void systemReportForever(const char * msg);
-
 bool systemUartReadByte(uint8_t *);
             
 void systemUartWriteByte(const uint8_t byte);
-
-void systemWaitStart(void);

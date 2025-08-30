@@ -104,7 +104,6 @@ unbrick:
 standard_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	ln -sf $(HFDIR)/src/free_rtos $(HFDIR)/bolt/src
 	cp $(HFDIR)/src/control/standard.hpp $(HFDIR)/src/__control__.hpp
 	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
 	cd $(HFDIR)/msppg; make install; cd ..
@@ -113,7 +112,6 @@ standard_config:
 snn_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	ln -sf $(HFDIR)/src/free_rtos $(HFDIR)/bolt/src
 	$(EMBDIR)/compiler.py $(EMBDIR)/examples/difference/difference.txt -o $(PWD)/src
 	cp $(HFDIR)/src/control/snn.hpp $(HFDIR)/src/__control__.hpp
 	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
@@ -123,7 +121,6 @@ snn_config:
 haskell_config:
 	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
 	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	ln -sf $(HFDIR)/src/free_rtos $(HFDIR)/bolt/src
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c $(HFDIR)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(HFDIR)/bolt/src/
