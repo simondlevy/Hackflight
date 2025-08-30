@@ -6,3 +6,4 @@ obj-y += stm32f4/
 obj-y += main.o
 obj-y += __system__.o
 obj-y += vapplication.o
+obj-y += zranger.o

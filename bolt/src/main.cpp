@@ -181,62 +181,6 @@ static void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
     vTaskStartScheduler();
 }
 
-// ZRangerTask ---------------------------------------------------------------
-
-static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
-
-static VL53L1 _vl53l1;
-
-void ZRangerTask::hardware_init()
-{
-    static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
-
-    _vl53l1.init(&deckBus, VL53L1_DEFAULT_ADDRESS);
-
-    _vl53l1.begin();
-
-    _vl53l1.setDistanceMode(VL53L1::DISTANCE_MODE_MEDIUM);
-    _vl53l1.setTimingBudgetMsec(25);
-}
-
-float ZRangerTask::hardware_read()
-{
-    return _vl53l1.readDistance();
-}
-
-extern "C" {
-
-    VL53L1_Error VL53L1_WaitUs(VL53L1_Dev_t *pdev, int32_t usec)
-    {
-        void delayMicroseconds(const uint32_t usec);
-
-        delayMicroseconds(usec);
-
-        return VL53L1_ERROR_NONE;
-    }
-
-    VL53L1_Error VL53L1_WriteMulti(VL53L1_Dev_t *pdev, uint16_t index, 
-            uint8_t * pdata, uint32_t count)
-    {
-        return i2cdevWriteReg16(
-                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
-            VL53L1_ERROR_NONE : 
-            VL53L1_ERROR_CONTROL_INTERFACE;
-    }
-
-    VL53L1_Error VL53L1_ReadMulti(VL53L1_Dev_t *pdev, uint16_t index, 
-            uint8_t * pdata, uint32_t   count)
-    {
-        return i2cdevReadReg16(
-                (I2C_Dev*)pdev->I2Cx, pdev->devAddr, index, count, pdata) ?
-            VL53L1_ERROR_NONE : 
-            VL53L1_ERROR_CONTROL_INTERFACE;
-    }
-
-
-}
-
-
 // IMUTask -------------------------------------------------------------------
 
 static bstdr_ret_t spi_burst_read(uint8_t dev_id, uint8_t reg_addr,

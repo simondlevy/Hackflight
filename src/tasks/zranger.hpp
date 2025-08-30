@@ -16,17 +16,16 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include <linalg.h>
-#include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
+#include <zranger_api.h>
 
 class ZRangerTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask)
+        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()){
                 return;
@@ -35,6 +34,7 @@ class ZRangerTask {
             hardware_init();
 
             _estimatorTask = estimatorTask;
+            _debugTask = debugTask;
 
             _task.init(runZrangerTask, "zranger2", this, 2);
 
@@ -65,6 +65,8 @@ class ZRangerTask {
         float _expCoeff;
 
         EstimatorTask * _estimatorTask;
+
+        DebugTask * _debugTask;
 
 		void hardware_init();
 
