@@ -180,16 +180,6 @@ static void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
     vTaskStartScheduler();
 }
 
-// Helpers --------------------------------------------------------------------
-
-void debug(const char * msg)
-{
-}
-
-void error(const char * msg)
-{
-}
-
 // ZRangerTask ---------------------------------------------------------------
 
 static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
@@ -202,12 +192,7 @@ void ZRangerTask::hardware_init()
 
     _vl53l1.init(&deckBus, VL53L1_DEFAULT_ADDRESS);
 
-    if (_vl53l1.begin()) {
-        debug("ZRANGER: Z-down sensor [OK]");
-    }
-    else {
-        debug("ZRANGER: Z-down sensor [FAIL]");
-    }
+    _vl53l1.begin();
 
     _vl53l1.setDistanceMode(VL53L1::DISTANCE_MODE_MEDIUM);
     _vl53l1.setTimingBudgetMsec(25);
