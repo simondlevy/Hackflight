@@ -32,9 +32,8 @@ class ZRangerTask {
             }
 
             if (!zranger_deviceInit()) {
-                /*
                 DebugTask::setMessage(_debugTask,
-                        "ZRangetTask: Failed to initialize zranger");*/
+                        "ZRangetTask: Failed to initialize zranger");
             }
 
             _estimatorTask = estimatorTask;

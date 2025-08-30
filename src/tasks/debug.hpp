@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
 #include <task.hpp>
 #include <usb_api.h>
 
@@ -35,6 +32,7 @@ class DebugTask {
         {
             if (debugTask) {
 
+#if defined(ARDUINO)
                 va_list args = {};
 
                 char buffer[256] = {};
@@ -48,6 +46,7 @@ class DebugTask {
                 }
 
                 va_end(args);
+#endif
             }
         }
 
