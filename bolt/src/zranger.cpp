@@ -15,43 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stm32fxxx.h>
-
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/semphr.h>
-#include <free_rtos/task.h>
-
-#include <hackflight.h>
-#include <mixers/crazyflie.hpp>
-#include <safety.hpp>
-#include <tasks/core.hpp>
-#include <tasks/debug.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/led.hpp>
-#include <tasks/logging.hpp>
-#include <tasks/setpoint.hpp>
-#include <tasks/zranger.hpp>
-#include <uart_api.h>
-#include <usb_api.h>
-
-#include <hal/digital.h>
-#include <hal/exti.h>
 #include <hal/i2cdev.h>
-#include <hal/nvic.h>
-#include <hal/spi2.h>
-#include <hal/hal_uart.h>
-#include <hal/time.h>
-#include <hal/usb.h>
 
-#include <bosch/bmi088.h>
-#include <bosch/bstdr_types.h>
-
+#include <tasks/zranger.hpp>
 #include <vl53l1.hpp>
-
-#include <motors.h>
-
 #include <st/vl53l1_api.h>
 
 static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;

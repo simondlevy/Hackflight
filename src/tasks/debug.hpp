@@ -17,6 +17,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 #include <task.hpp>
 #include <usb_api.h>
