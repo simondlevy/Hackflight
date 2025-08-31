@@ -33,7 +33,7 @@
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
+#include <tasks/opticalflow.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
@@ -68,7 +68,7 @@ static const float IMU_CALIBRATION_ROLL = 0;
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
-static FlowDeckTask flowDeckTask;
+static OpticalFlowTask flowDeckTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
@@ -82,7 +82,7 @@ static Safety safety;
 static bool selftestPassed;
 
 static uint8_t _led_pin;
-static uint8_t _flowdeck_cs_pin;
+static uint8_t _opticalflow_cs_pin;
 
 // System --------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, _flowdeck_cs_pin);
+    flowDeckTask.begin(&estimatorTask, _opticalflow_cs_pin);
 
     estimatorTask.begin(&safety);
 
@@ -161,11 +161,11 @@ static void systemTask(void *arg)
 }
 
 
-static void systemInit(const uint8_t led_pin, const uint8_t flowdeck_cs_pin)
+static void systemInit(const uint8_t led_pin, const uint8_t opticalflow_cs_pin)
 {
     _led_pin = led_pin;
 
-    _flowdeck_cs_pin = flowdeck_cs_pin;
+    _opticalflow_cs_pin = opticalflow_cs_pin;
 
     // Launch the system task that will initialize and start everything
     xTaskCreate(

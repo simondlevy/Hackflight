@@ -25,7 +25,7 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
-class FlowDeckTask {
+class OpticalFlowTask {
 
     public:
 
@@ -55,7 +55,7 @@ class FlowDeckTask {
 
         static void runFlowdeckTask(void *obj)
         {
-            ((FlowDeckTask *)obj)->run();
+            ((OpticalFlowTask *)obj)->run();
         }
 
         FreeRtosTask _task;
