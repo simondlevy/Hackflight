@@ -60,7 +60,7 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            deviceInit();
+            imu_deviceInit();
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -381,9 +381,9 @@ class ImuTask {
                     Axis3i16 gyroRaw = {};
                     Axis3i16 accelRaw = {};
 
-                    readGyroRaw(&gyroRaw);
-                    readAccelRaw(&accelRaw);
-
+                    imu_deviceReadRaw(
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                            accelRaw.x, accelRaw.y, accelRaw.z);
 
                     // Convert accel to Gs
                     Axis3f accel = {};
@@ -437,9 +437,4 @@ class ImuTask {
         {
             return (float)raw * 2 * 24 / 65536.f;
         }
-
-        // Hardware-dependent
-        void deviceInit(void); 
-        void readGyroRaw(Axis3i16 * dataOut);
-        void readAccelRaw(Axis3i16 * dataOut);
 };

@@ -83,32 +83,10 @@ static void sensorsBmi088_SPI_deviceInit(struct bmi088_dev *device)
     device->write = (bmi088_com_fptr_t)spi_burst_write;
 }
 
-static ImuTask * _imuTask;
-
 static struct bmi088_dev bmi088Dev;
 
-extern "C" {
-
-    void __attribute__((used)) EXTI14_Callback(void) 
-    {
-        _imuTask->dataAvailableCallback();
-    }
-}
-
-void ImuTask::readGyroRaw(Axis3i16* dataOut)
+bool imu_deviceInit(void)
 {
-    bmi088_get_gyro_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
-}
-
-void ImuTask::readAccelRaw(Axis3i16 * dataOut)
-{
-    bmi088_get_accel_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
-}
-
-void ImuTask::deviceInit(void)
-{
-    _imuTask = this;
-
     bmi088Dev.accel_id = BMI088_ACCEL_I2C_ADDR_PRIMARY;
     bmi088Dev.delay_ms = delay;
 
@@ -116,6 +94,8 @@ void ImuTask::deviceInit(void)
     sensorsBmi088_SPI_deviceInit(&bmi088Dev);
 
     auto rslt = bmi088_gyro_init(&bmi088Dev); // initialize the device
+
+    bool success = true;
 
     if (rslt == BSTDR_OK) {
 
@@ -142,6 +122,10 @@ void ImuTask::deviceInit(void)
         rslt |= bmi088_get_gyro_data(&gyr, &bmi088Dev);
     }
 
+    else {
+
+        success = false;
+    }
 
     rslt |= bmi088_accel_switch_control(&bmi088Dev, BMI088_ACCEL_POWER_ENABLE);
 
@@ -163,6 +147,9 @@ void ImuTask::deviceInit(void)
         struct bmi088_sensor_data acc;
         rslt |= bmi088_get_accel_data(&acc, &bmi088Dev);
     }
+    else {
+        success = false;
+    }
 
     GPIO_InitTypeDef GPIO_InitStructure;
     EXTI_InitTypeDef EXTI_InitStructure;
@@ -183,4 +170,27 @@ void ImuTask::deviceInit(void)
     EXTI_Init(&EXTI_InitStructure);
     EXTI_ClearITPendingBit(EXTI_Line14);
     portENABLE_INTERRUPTS();
+
+    return success;
 }
+
+void imu_deviceReadRaw(
+        int16_t & gx, int16_t & gy, int16_t & gz, 
+        int16_t & ax, int16_t & ay, int16_t & az)
+{
+    struct bmi088_sensor_data dataOut = {};
+
+    bmi088_get_gyro_data(&dataOut, &bmi088Dev);
+
+    gx = dataOut.x;
+    gy = dataOut.y;
+    gz = dataOut.z;
+
+    bmi088_get_accel_data(&dataOut, &bmi088Dev);
+
+    ax = dataOut.x;
+    ay = dataOut.y;
+    az = dataOut.z;
+}
+
+
