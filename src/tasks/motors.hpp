@@ -20,19 +20,6 @@
 
 class MotorsTask {
 
-    private:
-
-        bool didInit = false;
-
-        uint32_t ratios[4]; 
-
-        void setRatio(uint32_t id, uint16_t ratio)
-        {
-            ratios[id] = ratio;
-
-            motors_setRatio(id, ratio);
-        }
-
     public:
 
         int getRatio(uint32_t id)
@@ -71,6 +58,19 @@ class MotorsTask {
             setRatio(1, ratios[1]);
             setRatio(2, ratios[2]);
             setRatio(3, ratios[3]);
+        }
+
+    private:
+
+        bool didInit = false;
+
+        uint32_t ratios[4]; 
+
+        void setRatio(uint32_t id, uint16_t ratio)
+        {
+            ratios[id] = ratio;
+
+            motors_setRatio(id, ratio);
         }
 
 };
