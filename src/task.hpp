@@ -16,10 +16,9 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/task.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include <task.h>
 
 class FreeRtosTask {
 

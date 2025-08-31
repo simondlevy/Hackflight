@@ -41,6 +41,8 @@ INCLUDES += -I$(VL53L1)/st
 
 INCLUDES += -I$(srctree)/src/stm32f4
 
+INCLUDES += -I$(srctree)/src/free_rtos
+
 INCLUDES += -I$(srctree)/src/hal
 
 INCLUDES += -I$(CMSIS)/DSP/Include
