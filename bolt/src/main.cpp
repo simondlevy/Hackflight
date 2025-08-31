@@ -29,6 +29,7 @@
 
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
+#include <motors.h>
 #include <safety.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
@@ -42,23 +43,11 @@
 #include <uart_api.h>
 #include <usb_api.h>
 
-#include <hal/digital.h>
 #include <hal/exti.h>
 #include <hal/i2cdev.h>
 #include <hal/nvic.h>
-#include <hal/spi2.h>
 #include <hal/hal_uart.h>
-#include <hal/time.h>
 #include <hal/usb.h>
-
-#include <bosch/bmi088.h>
-#include <bosch/bstdr_types.h>
-
-#include <vl53l1.hpp>
-
-#include <motors.h>
-
-#include <st/vl53l1_api.h>
 
 static const uint8_t OPTICALFLOW_CS_PIN = 11;
 
