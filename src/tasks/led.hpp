@@ -40,7 +40,7 @@ class LedTask {
 
             _active_low = active_low;
 
-            _task.init(runLedCommsTask, "led", this, 2);
+            _task.init(runLedTask, "led", this, 2);
 
             pinMode(_pin, OUTPUT);
 
@@ -63,7 +63,7 @@ class LedTask {
 
         Safety * _safety;
 
-        static void runLedCommsTask(void * obj)
+        static void runLedTask(void * obj)
         {
             ((LedTask *)obj)->run();
         }
