@@ -14,7 +14,7 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-NET = $(HOME)/Documents/Arduino/libraries/embedded-neuromorphic/examples/difference/difference.txt
+NET = $(HOME)/Desktop/embedded-neuromorphic/examples/difference/difference.txt
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 

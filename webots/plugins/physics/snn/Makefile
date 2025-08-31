@@ -18,7 +18,7 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-EMB = $(HOME)/Documents/Arduino/libraries/embedded-neuromorphic
+EMB = $(HOME)/Desktop/embedded-neuromorphic
 
 NET = $(EMB)/examples/difference
 
