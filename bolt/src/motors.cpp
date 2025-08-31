@@ -32,13 +32,6 @@
 #include <time.h>
 #include <motors_api.h>
 
-enum {
-    MOTOR_M1,
-    MOTOR_M2,
-    MOTOR_M3,
-    MOTOR_M4,
-};
-
 typedef struct {
 
   uint32_t      gpioPerif;
@@ -235,9 +228,6 @@ const MotorPerifDef * motorMap[4] = {
     &MOTORS_PB10_TIM2_CH3_BRUSHLESS_PP
 };
 
-
-const uint32_t MOTORS[] = { MOTOR_M1, MOTOR_M2, MOTOR_M3, MOTOR_M4 };
-
 static bool didInit = false;
 static uint64_t lastCycleTime;
 static uint32_t cycleTime;
@@ -261,7 +251,7 @@ static void setRatio(uint32_t id, uint16_t ithrust)
 
         motorMap[id]->setCompare(motorMap[id]->tim, motorsBLConv16ToBits(ratio));
 
-        if (id == MOTOR_M1)
+        if (id == 0)
         {
             uint64_t currTime = micros();
             cycleTime = currTime - lastCycleTime;
@@ -281,7 +271,7 @@ int motorsGetRatio(uint32_t id)
 void motorsStop()
 {
     for (uint8_t i = 0; i < 4; i++) {
-        setRatio(MOTORS[i], 0);
+        setRatio(i, 0);
     }
 }
 
@@ -368,8 +358,8 @@ bool motorsTest(void)
 
 void motorsSetRatios(const uint16_t ratios[])
 {
-  setRatio(MOTOR_M1, ratios[0]);
-  setRatio(MOTOR_M2, ratios[1]);
-  setRatio(MOTOR_M3, ratios[2]);
-  setRatio(MOTOR_M4, ratios[3]);
+  setRatio(0, ratios[0]);
+  setRatio(1, ratios[1]);
+  setRatio(2, ratios[2]);
+  setRatio(3, ratios[3]);
 }
