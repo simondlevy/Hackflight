@@ -151,18 +151,6 @@ static void systemTask(void *arg)
     }
 }
 
-// UART ----------------------------------------------------------------------
-
-bool uartReadByte(uint8_t * byte)
-{
-    return uartGetData(1, byte);
-}
-
-void uartWriteByte(const uint8_t byte)
-{
-    uartSendDataDmaBlocking(1, (uint8_t *)&byte);
-}
-
 // IMU interrupt -------------------------------------------------------------
 
 extern "C" {
