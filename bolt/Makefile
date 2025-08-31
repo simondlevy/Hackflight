@@ -6,7 +6,7 @@ HFDIR = $(PWD)/..
 
 HASKDIR = $(HFDIR)/haskell
 
-EMBDIR = $(HOME)/Documents/Arduino/libraries/embedded-neuromorphic/
+EMBDIR = $(HOME)/Desktop/embedded-neuromorphic/
 
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
@@ -127,7 +127,7 @@ haskell_config:
 	mv copilot_core.c $(HFDIR)/bolt/src/copilot_core.cpp
 	mv copilot*.h $(HFDIR)/bolt/src/
 	cp $(HFDIR)/src/control/haskell.hpp $(HFDIR)/src/__control__.hpp
-	cp $(HFDIR)/bolt/src/Kbuild.haskell $(HFDIR)/bolt/src/Kbuild
+	cat $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild.haskell > $(HFDIR)/bolt/src/Kbuild
 	cd $(HFDIR)/msppg; make install; cd ..
 
 clean:

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <math.h>
+
 #include <clock.hpp>
 #include <motors.h>
 
