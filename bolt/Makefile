@@ -133,6 +133,5 @@ haskell_config:
 clean:
 	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ bolt.* \
 		src/copilot* build/.firmware.cmd build/Makefile build/scripts build/vendor \
-	 	src/Kbuild build/src build/source $(PROG).bin *.elf  *.hex *.map *.dfu copilot*
-	#find . -name "*.o" -type f -delete
-	#find . -name ".*.o*" -type f -delete
+	 	src/Kbuild build/src build/source $(PROG).bin *.elf  *.hex *.map *.dfu copilot* \
+		src/*.hpp
