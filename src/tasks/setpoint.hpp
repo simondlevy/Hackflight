@@ -16,12 +16,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/task.h>
-#include <free_rtos/queue.h>
-
 #include <msp/messages.h>
 #include <msp/parser.hpp>
 #include <safety.hpp>
@@ -30,6 +24,10 @@
 #include <uart_api.h>
 
 class SetpointTask {
+
+    private:
+
+        static constexpr float FREQ_HZ = 1000;
 
     public:
 
@@ -104,7 +102,11 @@ class SetpointTask {
 
             setpoint_t setpoint = {};
 
+            TickType_t lastWakeTime = xTaskGetTickCount();
+
             while (true) {
+
+                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
 
                 uint8_t byte = 0;
 
