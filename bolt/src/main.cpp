@@ -20,10 +20,6 @@
 
 #include <stm32fxxx.h>
 
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/semphr.h>
-#include <free_rtos/task.h>
-
 // Chosen at config time
 #include <__control__.hpp>
 

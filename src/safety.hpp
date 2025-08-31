@@ -19,6 +19,10 @@
 
 #include <math.h>
 
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include <task.h>
+
 #include <clock.hpp>
 #include <motors_api.h>
 
