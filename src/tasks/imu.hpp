@@ -16,12 +16,11 @@
 
 #pragma once
 
-#include <math.h>
-
-#include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 #include <datatypes.h>
+#include <imu_api.h>
 #include <lpf.hpp>
 #include <m_pi.h>
 #include <num.hpp>

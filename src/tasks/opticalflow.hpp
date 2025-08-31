@@ -16,30 +16,34 @@
 
 #pragma once
 
-#include <stdlib.h>
-
-// Arduino library
 #include <pmw3901.hpp>
 
-#include <datatypes.h>
-#include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 class OpticalFlowTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, const uint8_t cs_pin)
+        void begin(
+                EstimatorTask * estimatorTask,
+                const uint8_t cs_pin,
+                DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return;
             }
 
             _estimatorTask = estimatorTask;
+            _debugTask = debugTask;
 
             if (_pmw3901.begin(cs_pin)) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
+            }
+            else {
+                DebugTask::setMessage(_debugTask,
+                        "OpticalFlowTask: device initialization failed.");
             }
         }
 
@@ -63,6 +67,8 @@ class OpticalFlowTask {
         PMW3901 _pmw3901;
 
         EstimatorTask * _estimatorTask;
+
+        DebugTask * _debugTask;
 
         void run(void)
         {
