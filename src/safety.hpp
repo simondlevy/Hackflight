@@ -17,11 +17,8 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <clock.hpp>
 #include <motors.h>
-#include <datatypes.h>
 
 class Safety {
 
