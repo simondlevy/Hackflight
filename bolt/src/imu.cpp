@@ -1,35 +1,12 @@
-#include <stm32fxxx.h>
-
-#include <free_rtos/FreeRTOS.h>
-#include <free_rtos/semphr.h>
-#include <free_rtos/task.h>
-
-// Chosen at config time
-#include <__control__.hpp>
-
-#include <hackflight.h>
-#include <mixers/crazyflie.hpp>
-#include <safety.hpp>
-#include <tasks/core.hpp>
-#include <tasks/debug.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/opticalflow.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/led.hpp>
-#include <tasks/logging.hpp>
-#include <tasks/setpoint.hpp>
-#include <tasks/zranger.hpp>
-#include <uart_api.h>
-#include <usb_api.h>
-
 #include <hal/digital.h>
 #include <hal/exti.h>
 #include <hal/i2cdev.h>
 #include <hal/nvic.h>
 #include <hal/spi2.h>
-#include <hal/hal_uart.h>
 #include <hal/time.h>
 #include <hal/usb.h>
+
+#include <imu_api.h>
 
 #include <bosch/bmi088.h>
 #include <bosch/bstdr_types.h>
@@ -192,5 +169,3 @@ void imu_deviceReadRaw(
     ay = dataOut.y;
     az = dataOut.z;
 }
-
-
