@@ -22,8 +22,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * motors.c - Motor driver
- *
  * This code mainly interfacing the PWM peripheral lib of ST.
  */
 
@@ -34,32 +32,32 @@
 
 typedef struct {
 
-  uint32_t      gpioPerif;
-  GPIO_TypeDef* gpioPort;
-  uint16_t      gpioPin;
-  uint16_t      gpioPinSource;
-  uint32_t      gpioOType;
-  uint8_t       gpioAF;
-  uint32_t      gpioPowerswitchPerif;
-  GPIO_TypeDef* gpioPowerswitchPort;
-  uint16_t      gpioPowerswitchPin;
-  uint32_t      timPerif;
-  TIM_TypeDef*  tim;
-  uint16_t      timPolarity;
-  uint32_t      timDbgStop;
-  uint32_t      timPeriod;
-  uint16_t      timPrescaler;
-  DMA_Stream_TypeDef *DMA_stream;
-  uint32_t      DMA_Channel;
-  uint32_t      DMA_PerifAddr;
-  uint16_t      TIM_DMASource;
-  uint8_t       DMA_IRQChannel;
+    uint32_t      gpioPerif;
+    GPIO_TypeDef* gpioPort;
+    uint16_t      gpioPin;
+    uint16_t      gpioPinSource;
+    uint32_t      gpioOType;
+    uint8_t       gpioAF;
+    uint32_t      gpioPowerswitchPerif;
+    GPIO_TypeDef* gpioPowerswitchPort;
+    uint16_t      gpioPowerswitchPin;
+    uint32_t      timPerif;
+    TIM_TypeDef*  tim;
+    uint16_t      timPolarity;
+    uint32_t      timDbgStop;
+    uint32_t      timPeriod;
+    uint16_t      timPrescaler;
+    DMA_Stream_TypeDef *DMA_stream;
+    uint32_t      DMA_Channel;
+    uint32_t      DMA_PerifAddr;
+    uint16_t      TIM_DMASource;
+    uint8_t       DMA_IRQChannel;
 
-  /* Function pointers */
-  void (*setCompare)(TIM_TypeDef* TIMx, uint32_t Compare);
-  uint32_t (*getCompare)(TIM_TypeDef* TIMx);
-  void (*ocInit)(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
-  void (*preloadConfig)(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
+    /* Function pointers */
+    void (*setCompare)(TIM_TypeDef* TIMx, uint32_t Compare);
+    uint32_t (*getCompare)(TIM_TypeDef* TIMx);
+    void (*ocInit)(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct);
+    void (*preloadConfig)(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload);
 
 } MotorPerifDef;
 
@@ -228,61 +226,28 @@ const MotorPerifDef * motorMap[4] = {
     &MOTORS_PB10_TIM2_CH3_BRUSHLESS_PP
 };
 
-static bool didInit = false;
-static uint64_t lastCycleTime;
-static uint32_t cycleTime;
-
 static uint16_t motorsBLConv16ToBits(uint16_t bits)
 {
     return (MOTORS_BL_PWM_CNT_FOR_HIGH +
             ((bits * MOTORS_BL_PWM_CNT_FOR_HIGH) / 0xFFFF));
 }
 
-static uint32_t motor_ratios[] = {0, 0, 0, 0};  // actual PWM signals
-
 // Ithrust is thrust mapped for 65536 <==> 60 grams
-static void setRatio(uint32_t id, uint16_t ithrust)
+static void device_setRatio(uint32_t id, uint16_t ratio)
 {
-    if (didInit) {
+    motorMap[id]->setCompare(motorMap[id]->tim, motorsBLConv16ToBits(ratio));
 
-        uint16_t ratio = ithrust;
-
-        motor_ratios[id] = ratio;
-
-        motorMap[id]->setCompare(motorMap[id]->tim, motorsBLConv16ToBits(ratio));
-
-        if (id == 0)
-        {
-            uint64_t currTime = micros();
-            cycleTime = currTime - lastCycleTime;
-            lastCycleTime = currTime;
-        }
+    if (id == 0) {
+        static uint64_t lastCycleTime;
+        static uint32_t cycleTime;
+        uint64_t currTime = micros();
+        cycleTime = currTime - lastCycleTime;
+        lastCycleTime = currTime;
     }
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-
-int motorsGetRatio(uint32_t id)
+static void motors_deviceInit()
 {
-    return motor_ratios[id];
-}
-
-void motorsStop()
-{
-    for (uint8_t i = 0; i < 4; i++) {
-        setRatio(i, 0);
-    }
-}
-
-// Initialization. Will set all motor ratios to 0%
-void motorsInit(void)
-{
-    if (didInit) {
-        // First to init will configure it
-        return;
-    }
-
     //Init structures
     GPIO_InitTypeDef GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
@@ -345,9 +310,47 @@ void motorsInit(void)
         TIM_Cmd(motorMap[i]->tim, ENABLE);
     }
 
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+static bool didInit = false;
+
+static uint32_t motor_ratios[4]; 
+
+static void setRatio(uint32_t id, uint16_t ratio)
+{
+    motor_ratios[id] = ratio;
+
+    device_setRatio(id, ratio);
+}
+
+int motorsGetRatio(uint32_t id)
+{
+    return motor_ratios[id];
+}
+
+void motorsStop()
+{
+    if (didInit) {
+        setRatio(0, 0);
+        setRatio(1, 0);
+        setRatio(2, 0);
+        setRatio(3, 0);
+    }
+}
+
+void motorsInit(void)
+{
+    if (didInit) {
+        return;
+    }
+
     didInit = true;
 
-    // Output zero power
+    motors_deviceInit();
+
     motorsStop();
 }
 
@@ -358,8 +361,8 @@ bool motorsTest(void)
 
 void motorsSetRatios(const uint16_t ratios[])
 {
-  setRatio(0, ratios[0]);
-  setRatio(1, ratios[1]);
-  setRatio(2, ratios[2]);
-  setRatio(3, ratios[3]);
+    setRatio(0, ratios[0]);
+    setRatio(1, ratios[1]);
+    setRatio(2, ratios[2]);
+    setRatio(3, ratios[3]);
 }
