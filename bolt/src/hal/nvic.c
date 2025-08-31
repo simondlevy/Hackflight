@@ -33,7 +33,7 @@
 
 #define DONT_DISCARD __attribute__((used))
 
-extern void motorsStop(void);
+extern void motors_stop(void);
 
 void nvicInit(void)
 {
@@ -101,7 +101,7 @@ void DONT_DISCARD printHardFault(uint32_t* hardfaultArgs)
 void DONT_DISCARD MemManage_Handler(void)
 {
     /* Go to infinite loop when Memory Manage exception occurs */
-    motorsStop();
+    motors_stop();
 
     while (1)
     {}
@@ -113,7 +113,7 @@ void DONT_DISCARD MemManage_Handler(void)
 void DONT_DISCARD BusFault_Handler(void)
 {
     /* Go to infinite loop when Bus Fault exception occurs */
-    motorsStop();
+    motors_stop();
 
     while (1)
     {}
@@ -125,7 +125,7 @@ void DONT_DISCARD BusFault_Handler(void)
 void DONT_DISCARD UsageFault_Handler(void)
 {
     /* Go to infinite loop when Usage Fault exception occurs */
-    motorsStop();
+    motors_stop();
 
     while (1)
     {}

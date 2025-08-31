@@ -20,7 +20,6 @@
 
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
-#include <motors_api.h>
 #include <safety.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
@@ -29,6 +28,7 @@
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
+#include <tasks/motors.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 #include <uart_api.h>
@@ -50,12 +50,13 @@ static OpticalFlowTask flowDeckTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
+static MotorsTask motorsTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
 static ClosedLoopControl closedLoopControl;
 
-static Safety safety;
+static Safety safety = Safety(&motorsTask);
 
 static bool selftestPassed;
 
@@ -93,6 +94,7 @@ static void systemTask(void *arg)
             &estimatorTask,
             &imuTask,
             &setpointTask,
+            &motorsTask,
             Mixer::rotorCount,
             Mixer::mix);
 

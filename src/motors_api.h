@@ -19,17 +19,16 @@
 
 #include <stdbool.h>
 
-int   motorsGetRatio(uint32_t id);
-void  motorsInit(void);
-bool  motorsTest(void);
-void  motorsSetRatios(const uint16_t ratios[]);
+void  motors_init(void);
+
+void  motors_setRatio(uint32_t id, uint16_t ratio);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     // can be called from nvic.c
-    void  motorsStop();
+    void  motors_stop();
 
 #ifdef __cplusplus
 }

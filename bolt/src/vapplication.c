@@ -24,7 +24,6 @@
 static void fail(const char * msg)
 {
     portDISABLE_INTERRUPTS();
-    motorsStop();
     while (true);
 }
 

@@ -233,7 +233,7 @@ static uint16_t motorsBLConv16ToBits(uint16_t bits)
 }
 
 // Ithrust is thrust mapped for 65536 <==> 60 grams
-static void device_setRatio(uint32_t id, uint16_t ratio)
+void motors_setRatio(uint32_t id, uint16_t ratio)
 {
     motorMap[id]->setCompare(motorMap[id]->tim, motorsBLConv16ToBits(ratio));
 
@@ -246,7 +246,7 @@ static void device_setRatio(uint32_t id, uint16_t ratio)
     }
 }
 
-static void motors_deviceInit()
+void motors_init()
 {
     //Init structures
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -309,60 +309,12 @@ static void motors_deviceInit()
     for (int i = 0; i < 4; i++) {
         TIM_Cmd(motorMap[i]->tim, ENABLE);
     }
-
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-
-static bool didInit = false;
-
-static uint32_t motor_ratios[4]; 
-
-static void setRatio(uint32_t id, uint16_t ratio)
+void motors_stop()
 {
-    motor_ratios[id] = ratio;
-
-    device_setRatio(id, ratio);
-}
-
-int motorsGetRatio(uint32_t id)
-{
-    return motor_ratios[id];
-}
-
-void motorsStop()
-{
-    if (didInit) {
-        setRatio(0, 0);
-        setRatio(1, 0);
-        setRatio(2, 0);
-        setRatio(3, 0);
-    }
-}
-
-void motorsInit(void)
-{
-    if (didInit) {
-        return;
-    }
-
-    didInit = true;
-
-    motors_deviceInit();
-
-    motorsStop();
-}
-
-bool motorsTest(void)
-{
-    return didInit;
-}
-
-void motorsSetRatios(const uint16_t ratios[])
-{
-    setRatio(0, ratios[0]);
-    setRatio(1, ratios[1]);
-    setRatio(2, ratios[2]);
-    setRatio(3, ratios[3]);
+    motors_setRatio(0, 0);
+    motors_setRatio(1, 0);
+    motors_setRatio(2, 0);
+    motors_setRatio(3, 0);
 }

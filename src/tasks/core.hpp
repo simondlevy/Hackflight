@@ -20,7 +20,6 @@
 #include <__control__.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
-#include <motors_api.h>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -28,6 +27,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
+#include <tasks/motors.hpp>
 #include <tasks/setpoint.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -41,6 +41,7 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
+                MotorsTask * motorsTask,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
@@ -59,13 +60,15 @@ class CoreTask {
 
             _setpointTask = setpointTask;
 
+            _motorsTask = motorsTask;
+
             _debugTask = debugTask;
 
             _mixFun = mixFun;
 
             _rotorCount = rotorCount;
 
-            motorsInit();
+            motorsTask->begin();
 
             _task.init(runCoreTask, "core", this, 5);
 
@@ -73,7 +76,7 @@ class CoreTask {
 
             pass &= _imuTask->test();
             pass &= _estimatorTask->didInit();
-            pass &= motorsTest();
+            pass &= motorsTask->test();
 
             return pass;
         }
@@ -134,6 +137,8 @@ class CoreTask {
 
         SetpointTask * _setpointTask;
 
+        MotorsTask * _motorsTask;
+
         EstimatorTask * _estimatorTask;
 
         ImuTask * _imuTask;
@@ -153,7 +158,7 @@ class CoreTask {
                 (uint16_t)motorvals[3]
             };
 
-            motorsSetRatios(motorsPwm);
+            _motorsTask->setRatios(motorsPwm);
         }
 
         static void runCoreTask(void* obj)
@@ -238,7 +243,7 @@ class CoreTask {
                         timestamp - setpoint_timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
-                    motorsStop();
+                    _motorsTask->stop();
                     _safety->requestArming(false);
                 }
 
@@ -247,7 +252,7 @@ class CoreTask {
                 } 
                 
                 else {
-                    motorsStop();
+                    _motorsTask->stop();
                 }
 
                 if (!rateSupervisor.validate(timestamp)) {
