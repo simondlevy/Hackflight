@@ -14,7 +14,10 @@
 
 # TeNNLab framework stuff ----------------------------------------------------
 
-NET = $(HOME)/Desktop/embedded-neuromorphic/examples/difference/difference.txt
+include ../../../snn_path.makefile
+
+NET = $(EMBDIR)/examples/difference/difference.txt
+
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 

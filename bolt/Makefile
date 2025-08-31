@@ -6,7 +6,7 @@ HFDIR = $(PWD)/..
 
 HASKDIR = $(HFDIR)/haskell
 
-EMBDIR = $(HOME)/Desktop/embedded-neuromorphic/
+include ../snn_path.makefile
 
 ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
 ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee

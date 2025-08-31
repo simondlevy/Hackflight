@@ -18,15 +18,15 @@ SRC = ../../../../src
 
 ROOT = $(HOME)/Desktop
 
-EMB = $(HOME)/Desktop/embedded-neuromorphic
+include ../../../../snn_path.makefile
 
-NET = $(EMB)/examples/difference
+NET = $(EMBDIR)/examples/difference
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 CXX_SOURCES = ../support.cpp
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(EMB)/src -I$(NET)
+INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(EMBDIR)/src -I$(NET)
 
 all: libsnn.so
 
