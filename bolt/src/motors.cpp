@@ -29,8 +29,8 @@
 
 #include <stm32fxxx.h>
 
-#include "time.h"
-#include "motors.h"
+#include <time.h>
+#include <motors_api.h>
 
 enum {
     MOTOR_M1,

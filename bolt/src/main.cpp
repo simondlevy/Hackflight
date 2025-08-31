@@ -29,7 +29,7 @@
 
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
-#include <motors.h>
+#include <motors_api.h>
 #include <safety.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>

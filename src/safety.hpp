@@ -20,7 +20,7 @@
 #include <math.h>
 
 #include <clock.hpp>
-#include <motors.h>
+#include <motors_api.h>
 
 class Safety {
 

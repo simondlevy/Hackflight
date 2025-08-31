@@ -19,7 +19,7 @@
 #include <free_rtos/semphr.h>
 #include <free_rtos/task.h>
 
-#include <motors.h>
+#include <motors_api.h>
 
 static void fail(const char * msg)
 {

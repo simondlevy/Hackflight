@@ -20,7 +20,7 @@
 #include <__control__.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
-#include <motors.h>
+#include <motors_api.h>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
