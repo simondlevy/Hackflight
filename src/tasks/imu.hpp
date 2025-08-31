@@ -28,19 +28,23 @@
 
 class ImuTask {
 
+    private:
+
+        static constexpr float CALIBRATION_PITCH = 0;
+        static constexpr float CALIBRATION_ROLL = 0;
+
     public:
 
         // Called from main program
-        void begin(
-                EstimatorTask * estimatorTask, 
-                const float calibRoll,
-                const float calibPitch)
+        void begin( EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return;
             }
 
             _estimatorTask = estimatorTask;
+
+            _debugTask = debugTask;
 
             // Wait for sensors to startup
             vTaskDelay(M2T(STARTUP_TIME_MS));
@@ -56,7 +60,6 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            // Start our IMU (e.g. BMI088)
             deviceInit();
 
             // Calibrate
@@ -64,10 +67,10 @@ class ImuTask {
                 _gyroLpf[i].init(1000, GYRO_LPF_CUTOFF_FREQ);
                 _accLpf[i].init(1000, ACCEL_LPF_CUTOFF_FREQ);
             }
-            _cosPitch = cosf(calibPitch * (float) M_PI / 180);
-            _sinPitch = sinf(calibPitch * (float) M_PI / 180);
-            _cosRoll = cosf(calibRoll * (float) M_PI / 180);
-            _sinRoll = sinf(calibRoll * (float) M_PI / 180);
+            _cosPitch = cosf(CALIBRATION_PITCH * (float) M_PI / 180);
+            _sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
+            _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
+            _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
 
             _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
 
@@ -198,6 +201,8 @@ class ImuTask {
         bias_t _gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
+
+        DebugTask * _debugTask;
 
         FreeRtosTask _task;
 
@@ -373,11 +378,12 @@ class ImuTask {
 
                     data.interruptTimestamp = interruptTimestamp;
 
-                    // Get raw data from IMU
                     Axis3i16 gyroRaw = {};
-                    readGyroRaw(&gyroRaw);
                     Axis3i16 accelRaw = {};
+
+                    readGyroRaw(&gyroRaw);
                     readAccelRaw(&accelRaw);
+
 
                     // Convert accel to Gs
                     Axis3f accel = {};

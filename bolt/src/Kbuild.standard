@@ -3,6 +3,7 @@ obj-y += hal/
 obj-y += free_rtos/
 obj-y += stm32f4/
 
+obj-y += imu.o
 obj-y += main.o
 obj-y += __system__.o
 obj-y += vapplication.o

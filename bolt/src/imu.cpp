@@ -1,23 +1,3 @@
-/**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-#define __main
-#include <Arduino.h>
-
 #include <stm32fxxx.h>
 
 #include <free_rtos/FreeRTOS.h>
@@ -53,107 +33,6 @@
 
 #include <bosch/bmi088.h>
 #include <bosch/bstdr_types.h>
-
-#include <vl53l1.hpp>
-
-#include <motors.h>
-
-#include <st/vl53l1_api.h>
-
-static const uint8_t OPTICALFLOW_CS_PIN = 11;
-
-static const uint8_t LED_PIN = 4;
-
-static CoreTask coreTask;
-static DebugTask debugTask;
-static EstimatorTask estimatorTask;
-static OpticalFlowTask flowDeckTask;
-static ImuTask imuTask;
-static LedTask ledTask;
-static LoggerTask loggerTask;
-static SetpointTask setpointTask;
-static ZRangerTask zrangerTask;
-
-static ClosedLoopControl closedLoopControl;
-
-static Safety safety;
-
-static bool selftestPassed;
-
-// System --------------------------------------------------------------------
-
-static bool didInit;
-
-static void systemTask(void *arg)
-{
-    if (didInit) {
-        return;
-    }
-
-    bool pass = true;
-
-    didInit = true;
-
-	debugTask.begin();
-    
-    zrangerTask.begin(&estimatorTask);
-
-    flowDeckTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
-
-    estimatorTask.begin(&safety);
-
-    setpointTask.begin(&safety);
-
-    loggerTask.begin(&estimatorTask, &closedLoopControl);
-
-    ledTask.begin(&safety, LED_PIN);
-
-    imuTask.begin(&estimatorTask);
-
-    auto coreTaskReady = coreTask.begin(
-            &closedLoopControl,
-            &safety,
-            &estimatorTask,
-            &imuTask,
-            &setpointTask,
-            Mixer::rotorCount,
-            Mixer::mix);
-
-    if (!coreTaskReady) {
-        pass = false;
-    }
-
-    if (pass) {
-        selftestPassed = true;
-    }
-
-    else {
-
-        selftestPassed = false;
-
-        if (didInit) {
-
-            while (true) {
-
-                //vTaskDelay(M2T(2000));
-                delay(2000);
-
-                if (selftestPassed)
-                {
-                    break;
-                }
-            }
-        }
-    }
-
-    // Should never reach this point!
-    while (true) {
-        //vTaskDelay(portMAX_DELAY);
-        delay(portMAX_DELAY);
-    }
-}
-
-// IMUTask -------------------------------------------------------------------
 
 static bstdr_ret_t spi_burst_read(uint8_t dev_id, uint8_t reg_addr,
         uint8_t *reg_data, uint16_t len)
@@ -206,6 +85,16 @@ static void sensorsBmi088_SPI_deviceInit(struct bmi088_dev *device)
 
 static ImuTask * _imuTask;
 
+static struct bmi088_dev bmi088Dev;
+
+void foo()
+{
+    (void)bmi088Dev;
+    (void)_imuTask;
+    (void)sensorsBmi088_SPI_deviceInit;
+}
+
+#if 0
 extern "C" {
 
     void __attribute__((used)) EXTI14_Callback(void) 
@@ -213,8 +102,6 @@ extern "C" {
         _imuTask->dataAvailableCallback();
     }
 }
-
-static struct bmi088_dev bmi088Dev;
 
 void ImuTask::readGyroRaw(Axis3i16* dataOut)
 {
@@ -305,53 +192,4 @@ void ImuTask::deviceInit(void)
     EXTI_ClearITPendingBit(EXTI_Line14);
     portENABLE_INTERRUPTS();
 }
-
-// UART ----------------------------------------------------------------------
-
-bool uartReadByte(uint8_t * byte)
-{
-    return uartGetData(1, byte);
-}
-
-void uartWriteByte(const uint8_t byte)
-{
-    uartSendDataDmaBlocking(1, (uint8_t *)&byte);
-}
-
-// USB serial debugging -------------------------------------------------------
-
-void usbWrite(const char * msg)
-{
-    (void)msg;
-}
-
-// Main -----------------------------------------------------------------------
-
-int main() 
-{
-    nvicInit();
-    extiInit();
-    usecTimerInit();
-    i2cdevInit();
-    usbInit();
-    uartInit(115200); // Bluetooth comms
-
-    SPI.begin();
-
-    xTaskCreate(
-            systemTask, 
-            "SYSTEM",
-            2* configMINIMAL_STACK_SIZE, 
-            NULL, 
-            2, 
-            NULL);
-
-    // Start the FreeRTOS scheduler
-    vTaskStartScheduler();
-
-    while(true) {
-    }
-
-    return 0;
-}
-
+#endif
