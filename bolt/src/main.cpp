@@ -163,13 +163,6 @@ void uartWriteByte(const uint8_t byte)
     uartSendDataDmaBlocking(1, (uint8_t *)&byte);
 }
 
-// USB serial debugging -------------------------------------------------------
-
-void usbWrite(const char * msg)
-{
-    (void)msg;
-}
-
 // IMU interrupt -------------------------------------------------------------
 
 extern "C" {
