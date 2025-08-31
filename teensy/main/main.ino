@@ -15,6 +15,8 @@ using namespace arduino;
 
 #include <mixers/crazyflie.hpp>
 
+#include "motors_task.hpp"
+
 #include <safety.hpp>
 
 #include <tasks/logging.hpp>
@@ -24,7 +26,6 @@ using namespace arduino;
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
-#include <tasks/motors.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
 
