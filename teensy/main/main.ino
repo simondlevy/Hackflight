@@ -17,6 +17,8 @@ using namespace arduino;
 
 #include "motors_task.hpp"
 
+#include <motors.hpp>
+
 #include <safety.hpp>
 
 #include <tasks/logging.hpp>
@@ -35,8 +37,6 @@ static const uint8_t OPTICALFLOW_CS_PIN = 3;
 
 static ClosedLoopControl closedLoopControl;
 
-static Safety safety;
-
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
@@ -47,6 +47,10 @@ static LoggerTask loggerTask;
 static MotorsTask motorsTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
+
+static Motors motors;
+
+static Safety safety = Safety(&motors);
 
 static HardwareSerial * uart = &Serial5;
 
@@ -96,6 +100,7 @@ void setup()
             &estimatorTask,
             &imuTask,
             &setpointTask,
+            &motors,
             Mixer::rotorCount,
             Mixer::mix,
             &debugTask);

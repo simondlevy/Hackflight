@@ -19,9 +19,9 @@
 
 #include <stdbool.h>
 
-void  motors_init(void);
+void motors_init(void);
 
-void  motors_setRatio(uint32_t id, uint16_t ratio);
+void motors_setRatio(uint32_t id, uint16_t ratio);
 
 #ifdef __cplusplus
 extern "C" {

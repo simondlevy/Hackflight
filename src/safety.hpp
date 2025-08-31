@@ -24,15 +24,15 @@
 #include <task.h>
 
 #include <clock.hpp>
-#include <tasks/motors.hpp>
+#include <motors.hpp>
 
 class Safety {
 
     public:
 
-        Safety(MotorsTask * motorsTask)
+        Safety(Motors * motors)
         {
-            _motorsTask = motorsTask;
+            _motors = motors;
         }
 
         bool isFlying() 
@@ -72,7 +72,7 @@ class Safety {
 
         static constexpr float MAX_SAFE_ANGLE = 30;
 
-        MotorsTask * _motorsTask;
+        Motors * _motors;
 
         bool _is_flying;
 
@@ -94,7 +94,7 @@ class Safety {
             auto isThrustOverIdle = false;
 
             for (int i = 0; i < 4; ++i) {
-                if (_motorsTask->getRatio(i) > 0) {
+                if (_motors->getRatio(i) > 0) {
                     isThrustOverIdle = true;
                     break;
                 }

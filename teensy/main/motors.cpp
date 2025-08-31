@@ -8,8 +8,8 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY
-{
-}
+ {
+ }
  without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
@@ -21,30 +21,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-int motorsGetRatio(uint32_t id)
+void motors_init(void)
+{
+}
+
+void motors_setRatio(uint32_t id, uint16_t ratio)
 {
     (void)id;
-    return 0;
-}
-
-void motorsInit(void)
-{
-}
-
-bool motorsTest(void)
-{
-    return true;
-}
-
-void motorsSetRatios(const uint16_t ratios[])
-{
-    (void)ratios;
+    (void)ratio;
 }
 
 extern "C" {
 
-void motorsStop()
-{
-}
-
+    void motors_stop()
+    {
+    }
 }

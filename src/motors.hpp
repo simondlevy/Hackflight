@@ -18,7 +18,7 @@
 
 #include <motors_api.h>
 
-class MotorsTask {
+class Motors {
 
     public:
 
