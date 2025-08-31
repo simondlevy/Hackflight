@@ -16,20 +16,21 @@
 
 #pragma once
 
-#include <free_rtos/semphr.h>
-
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
 #include <task.hpp>
+#include <tasks/debug.hpp>
 
 class EstimatorTask {
 
     public:
 
-        void begin(Safety * safety)
+        void begin(Safety * safety, DebugTask * debugTask=nullptr)
         {
             _safety = safety;
+
+            _debugTask = debugTask;
 
             // Created in the 'empty' state, meaning the semaphore must first
             // be given, that is it will block in the task until released by
@@ -167,6 +168,8 @@ class EstimatorTask {
         uint32_t _warningBlockTimeMs;
 
         Safety * _safety;
+
+        DebugTask * _debugTask;
 
         KalmanFilter _kalmanFilter;
 
