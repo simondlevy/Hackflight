@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include <Arduino.h>
+
+#include <stdint.h>
 
 #include <safety.hpp>
 #include <task.hpp>
@@ -27,13 +27,18 @@ class LedTask {
 
     public:
 
-        void begin(Safety * safety, const uint8_t pin) 
+        void begin(
+                Safety * safety,
+                const uint8_t pin,
+                const bool active_low) 
         {
             if (_task.didInit()){
                 return;
             }
 
             _pin = pin;
+
+            _active_low = active_low;
 
             _task.init(runLedCommsTask, "led", this, 2);
 
@@ -51,6 +56,8 @@ class LedTask {
         static constexpr uint32_t PULSE_MSEC = 50;
 
         uint8_t _pin;
+
+        bool _active_low;
 
         FreeRtosTask _task;
 
@@ -82,6 +89,6 @@ class LedTask {
 
         void set(const bool on)
         {
-            digitalWrite(_pin, !on); // assume LED active low
+            digitalWrite(_pin, _active_low ? !on : on);
         }
 };

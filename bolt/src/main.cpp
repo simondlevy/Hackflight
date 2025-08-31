@@ -104,7 +104,7 @@ static void systemTask(void *arg)
 
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&safety, LED_PIN);
+    ledTask.begin(&safety, LED_PIN, true);
 
     imuTask.begin(&estimatorTask);
 
