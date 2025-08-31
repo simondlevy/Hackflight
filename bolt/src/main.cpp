@@ -41,7 +41,6 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 #include <uart_api.h>
-#include <usb_api.h>
 
 #include <hal/exti.h>
 #include <hal/i2cdev.h>

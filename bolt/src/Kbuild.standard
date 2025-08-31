@@ -3,10 +3,10 @@ obj-y += hal/
 obj-y += free_rtos/
 obj-y += stm32f4/
 
+obj-y += debug.o
 obj-y += imu.o
 obj-y += main.o
 obj-y += motors.o
 obj-y += uart.o
-obj-y += usb.o
 obj-y += vapplication.o
 obj-y += zranger.o

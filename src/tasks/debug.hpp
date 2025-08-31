@@ -17,7 +17,7 @@
 #pragma once
 
 #include <task.hpp>
-#include <usb_api.h>
+#include <debug_api.h>
 
 class DebugTask {
 
@@ -68,7 +68,7 @@ class DebugTask {
             while (true) {
 
                 if (*_msg) {
-                    usbWrite(_msg);
+                    debugWrite(_msg);
                 }
 
                 vTaskDelay(M2T(1000/REPORT_FREQ));

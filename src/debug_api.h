@@ -14,10 +14,4 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-#include <string.h>
-
-void usbWrite(const char * msg)
-{
-    Serial.println(msg);
-}
+void debugWrite(const char * msg);
