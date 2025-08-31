@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include <stdint.h>
-
-
+#include <msp/messages.h>
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
