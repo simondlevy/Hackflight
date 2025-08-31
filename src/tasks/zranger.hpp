@@ -73,7 +73,9 @@ class ZRangerTask {
 
         void run(void)
         {
-            TickType_t lastWakeTime = xTaskGetTickCount();
+            TickType_t lastWakeTime;
+
+            lastWakeTime = xTaskGetTickCount();
 
             while (true) {
 
