@@ -154,6 +154,7 @@ static void systemTask(void *arg)
 }
 
 // IMUTask -------------------------------------------------------------------
+#if 0
 
 static bstdr_ret_t spi_burst_read(uint8_t dev_id, uint8_t reg_addr,
         uint8_t *reg_data, uint16_t len)
@@ -305,6 +306,7 @@ void ImuTask::deviceInit(void)
     EXTI_ClearITPendingBit(EXTI_Line14);
     portENABLE_INTERRUPTS();
 }
+#endif
 
 // UART ----------------------------------------------------------------------
 

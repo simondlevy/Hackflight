@@ -87,14 +87,6 @@ static ImuTask * _imuTask;
 
 static struct bmi088_dev bmi088Dev;
 
-void foo()
-{
-    (void)bmi088Dev;
-    (void)_imuTask;
-    (void)sensorsBmi088_SPI_deviceInit;
-}
-
-#if 0
 extern "C" {
 
     void __attribute__((used)) EXTI14_Callback(void) 
@@ -192,4 +184,3 @@ void ImuTask::deviceInit(void)
     EXTI_ClearITPendingBit(EXTI_Line14);
     portENABLE_INTERRUPTS();
 }
-#endif
