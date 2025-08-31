@@ -1,7 +1,6 @@
 obj-y += digital.o
 obj-y += exti.o
 obj-y += i2cdev.o
-obj-y += motors.o
 obj-y += nvic.o
 obj-y += SPI.o
 obj-y += spi2.o

@@ -5,7 +5,7 @@ obj-y += stm32f4/
 
 obj-y += imu.o
 obj-y += main.o
-obj-y += __system__.o
+obj-y += motors.o
 obj-y += uart.o
 obj-y += usb.o
 obj-y += vapplication.o
