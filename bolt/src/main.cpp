@@ -60,7 +60,9 @@
 
 #include <st/vl53l1_api.h>
 
-static const uint8_t FLOWDECK_CS_PIN = 11;
+static const uint8_t OPTICALFLOW_CS_PIN = 11;
+
+static const uint8_t LED_PIN = 4;
 
 static const float IMU_CALIBRATION_PITCH = 0;
 static const float IMU_CALIBRATION_ROLL = 0;
@@ -81,9 +83,6 @@ static Safety safety;
 
 static bool selftestPassed;
 
-static uint8_t _led_pin;
-static uint8_t _opticalflow_cs_pin;
-
 // System --------------------------------------------------------------------
 
 static bool didInit;
@@ -102,7 +101,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, _opticalflow_cs_pin);
+    flowDeckTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
 
     estimatorTask.begin(&safety);
 
@@ -110,7 +109,7 @@ static void systemTask(void *arg)
 
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&safety, _led_pin);
+    ledTask.begin(&safety, LED_PIN);
 
     imuTask.begin(
             &estimatorTask, 
@@ -158,26 +157,6 @@ static void systemTask(void *arg)
         //vTaskDelay(portMAX_DELAY);
         delay(portMAX_DELAY);
     }
-}
-
-
-static void systemInit(const uint8_t led_pin, const uint8_t opticalflow_cs_pin)
-{
-    _led_pin = led_pin;
-
-    _opticalflow_cs_pin = opticalflow_cs_pin;
-
-    // Launch the system task that will initialize and start everything
-    xTaskCreate(
-            systemTask, 
-            "SYSTEM",
-            2* configMINIMAL_STACK_SIZE, 
-            NULL, 
-            2, 
-            NULL);
-
-    // Start the FreeRTOS scheduler
-    vTaskStartScheduler();
 }
 
 // IMUTask -------------------------------------------------------------------
@@ -333,10 +312,6 @@ void ImuTask::deviceInit(void)
     portENABLE_INTERRUPTS();
 }
 
-// LED -----------------------------------------------------------------------
-
-static const uint8_t LED_PIN = 4;
-
 // UART ----------------------------------------------------------------------
 
 bool uartReadByte(uint8_t * byte)
@@ -366,8 +341,19 @@ int main()
     i2cdevInit();
     usbInit();
     uartInit(115200); // Bluetooth comms
+
     SPI.begin();
-    systemInit(LED_PIN, FLOWDECK_CS_PIN);
+
+    xTaskCreate(
+            systemTask, 
+            "SYSTEM",
+            2* configMINIMAL_STACK_SIZE, 
+            NULL, 
+            2, 
+            NULL);
+
+    // Start the FreeRTOS scheduler
+    vTaskStartScheduler();
 
     while(true) {
     }
