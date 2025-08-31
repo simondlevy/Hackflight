@@ -18,11 +18,6 @@
 #define __main
 #include <Arduino.h>
 
-#include <stm32fxxx.h>
-
-// Chosen at config time
-#include <__control__.hpp>
-
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 #include <motors_api.h>
