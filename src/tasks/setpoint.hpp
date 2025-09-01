@@ -118,7 +118,6 @@ class SetpointTask {
                     switch (parser.parse(byte)) {
 
                         case MSP_SET_ARMING:
-                            DebugTask::setMessage(_debugTask, "MSP_SET_ARMING %d", parser.getByte(0));
                             _safety->requestArming((bool)parser.getByte(0));
                             break;
 

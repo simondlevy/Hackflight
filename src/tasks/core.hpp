@@ -177,7 +177,7 @@ class CoreTask {
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
-            while (!_imuTask->areCalibrated()) {
+            while (!_imuTask->imuIsCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
 

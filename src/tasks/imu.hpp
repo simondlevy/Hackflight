@@ -105,7 +105,7 @@ class ImuTask {
         }
 
         // Called by core task
-        bool areCalibrated() {
+        bool imuIsCalibrated() {
             return gyroBiasFound;
         }
 
