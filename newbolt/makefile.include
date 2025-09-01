@@ -1,0 +1,12 @@
+PORT = /dev/ttyACM0
+
+FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
+
+build: $(SKETCH).ino
+	arduino-cli compile \ 
+	--libraries $(HOME)/Documents/Arduino/libraries --build-path . \
+	--fqbn $(FQBN) $(SKETCH).ino
+
+listen:
+	miniterm.py $(PORT) --exit-char 3
+
