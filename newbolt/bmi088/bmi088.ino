@@ -19,14 +19,14 @@ static void gyro_drdy()
     gyro_interrupt_count++;
 }
 
-static void init(const int status, const char * what)
+static void check(const int status, const char * msg)
 {
     if (status < 0) {
-        Serial.print("Error initializing ");
-        Serial.println(what);
+        Serial.println(msg);
         while (true) ;
     }
 }
+
 
 void setup() 
 {
@@ -38,24 +38,26 @@ void setup()
     spi.setMISO(PB14);
     spi.setMOSI(PB15);
 
-    init(accel.begin(), "accel");
+    check(gyro.begin(), "Gyro initialization error");
 
-    gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
+    check(accel.begin(), "Accel initialization error");
+
+    check(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ), "Failed to set gyro ODR");
+    check(gyro.setRange(Bmi088Gyro::RANGE_2000DPS), "Failed to set gyro range");
+
+    //gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL, Bmi088Gyro::ACTIVE_HIGH);
+    //gyro.mapDrdyInt3(true);
+
+    check(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ), "Failed to set accel ODR");
+    check(accel.setRange(Bmi088Accel::RANGE_24G), "Failed to set accel range");
 
     pinMode(GYRO_INT_PIN, INPUT);
     attachInterrupt(GYRO_INT_PIN, gyro_drdy, RISING);
-
-    gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL, Bmi088Gyro::ACTIVE_HIGH);
-    gyro.mapDrdyInt3(true);
-
-    init(gyro.begin(), "gyro");
 }
 
 void loop() 
 {
     accel.readSensor();
-
-    accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
 
     gyro.readSensor();
 
