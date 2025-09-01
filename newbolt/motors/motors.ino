@@ -43,7 +43,6 @@ void loop()
 {
     auto pulseWidth = (uint8_t)(125 * (inputGet() + 1));
 
-
     motors.set(0, pulseWidth);
 
     motors.run();
