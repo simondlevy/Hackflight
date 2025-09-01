@@ -22,9 +22,9 @@
 
 #include <vector>
 
-static const std::vector<uint8_t> MOTOR_PINS = {PA1};
+static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11};
 
-static const std::vector<uint8_t> POWER_SWITCH_PINS = {PA0};
+static const std::vector<uint8_t> POWER_SWITCH_PINS = {PA0, PB12};
 
 static auto motors = OneShot125(MOTOR_PINS);
 
@@ -41,6 +41,7 @@ void setup()
     inputInit();
 
     enableMotor(0);
+    enableMotor(1);
 
     motors.arm(); 
 }
@@ -50,6 +51,7 @@ void loop()
     auto pulseWidth = (uint8_t)(125 * (inputGet() + 1));
 
     motors.set(0, pulseWidth);
+    motors.set(1, pulseWidth);
 
     motors.run();
 }
