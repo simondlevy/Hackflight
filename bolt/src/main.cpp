@@ -46,7 +46,7 @@ static const uint8_t LED_PIN = 4;
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
-static OpticalFlowTask flowDeckTask;
+static OpticalFlowTask opticalFlowTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
@@ -77,7 +77,7 @@ static void systemTask(void *arg)
     
     zrangerTask.begin(&estimatorTask);
 
-    flowDeckTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
+    opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
 
     estimatorTask.begin(&safety);
 

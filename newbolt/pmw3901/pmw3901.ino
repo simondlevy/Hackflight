@@ -2,17 +2,23 @@
 
 #include <pmw3901.hpp>
 
-static const uint8_t CS_PIN = 3;
+static const uint8_t CS_PIN = PB4;
 
 static PMW3901 pmw3901;
+
+static SPIClass spi;
 
 void setup() 
 {
     Serial.begin(115200);
 
-    SPI.begin();
+    spi.setSCLK(PA5);
+    spi.setMISO(PA6);
+    spi.setMOSI(PA7);
 
-    if (!pmw3901.begin(CS_PIN)) {
+    spi.begin();
+
+    if (!pmw3901.begin(CS_PIN, spi)) {
         while (true) {
             Serial.println("Initialization of the flow sensor failed");
             delay(500);
@@ -28,8 +34,12 @@ void loop()
 
     pmw3901.readMotion(deltaX, deltaY, gotMotion);
 
-    printf("gotMotion=%s deltaX=%+03d deltaY=%+03d\n",
-            gotMotion ? "yes" : "no ", deltaX, deltaY);
+    Serial.print("gotMotion = ");
+    Serial.print(gotMotion ? "yes" : "no");
+    Serial.print("  deltaX=");
+    Serial.print(deltaX);
+    Serial.print("  deltaY=");
+    Serial.println(deltaY);
 
     delay(100);
 }
