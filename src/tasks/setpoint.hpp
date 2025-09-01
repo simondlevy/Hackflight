@@ -19,8 +19,7 @@
 #include <msp/messages.h>
 #include <msp/parser.hpp>
 #include <safety.hpp>
-#include <task.hpp>
-#include <tasks/estimator.hpp>
+#include <tasks/debug.hpp>
 #include <uart_api.h>
 
 class SetpointTask {
@@ -31,13 +30,15 @@ class SetpointTask {
 
     public:
 
-        void begin(Safety * safety)
+        void begin(Safety * safety, DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()){
                 return;
             }
 
             _safety = safety;
+
+            _debugTask = debugTask;
 
             setpointQueue = xQueueCreateStatic(
                     QUEUE_LENGTH,
@@ -96,6 +97,8 @@ class SetpointTask {
 
         Safety * _safety;
 
+        DebugTask * _debugTask;
+
         void run(void)
         {
             MspParser parser = {};
@@ -110,11 +113,12 @@ class SetpointTask {
 
                 uint8_t byte = 0;
 
-                if (uartReadByte(&byte)) {
+                while (uartReadByte(&byte)) {
 
                     switch (parser.parse(byte)) {
 
                         case MSP_SET_ARMING:
+                            DebugTask::setMessage(_debugTask, "MSP_SET_ARMING %d", parser.getByte(0));
                             _safety->requestArming((bool)parser.getByte(0));
                             break;
 

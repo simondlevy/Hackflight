@@ -86,7 +86,7 @@ void setup()
 
     estimatorTask.begin(&safety);
 
-    setpointTask.begin(&safety);
+    setpointTask.begin(&safety, &debugTask);
 
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
