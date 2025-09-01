@@ -1,70 +1,64 @@
-#include <Wire.h>
+#include <SPI.h>
 
 #include <BMI088.h>
 
-static const uint8_t GYRO_INTERRUPT_PIN = 6;
+static const uint8_t ACCEL_CS_PIN = PB1;
+static const uint8_t GYRO_CS_PIN = PB0;
 
-static const uint8_t ACCEL_ADDRESS = 0x19;
-static const uint8_t GYRO_ADDRESS = 0x69;
+static SPIClass spi;
 
-static Bmi088Accel accel(Wire, ACCEL_ADDRESS);
+Bmi088Accel accel(spi, ACCEL_CS_PIN);
 
-static Bmi088Gyro gyro(Wire, GYRO_ADDRESS);
-
-static volatile bool gyro_flag;
-
-static void gyro_drdy()
-{
-    gyro_flag = true;
-}
-
-static void check(const int status, const char * msg)
-{
-    if (status < 0) {
-        Serial.println(msg);
-        while (true) ;
-    }
-}
+Bmi088Gyro gyro(spi, GYRO_CS_PIN);
 
 void setup() 
 {
+    int status;
+
     Serial.begin(115200);
+    while(!Serial) {}
 
-    while (!Serial) ;
+    spi.setSCLK(PB13);
+    spi.setMISO(PB14);
+    spi.setMOSI(PB15);
 
-    check(accel.begin(), "Accel Initialization Error");
+    status = accel.begin();
 
-    accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
+    if (status < 0) {
+        Serial.println("Accel Initialization Error");
+        Serial.println(status);
+        while (1) {}
+    }
 
-    check(gyro.begin(), "Gyro Initialization Error");
+    status = gyro.begin();
 
-    gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
-    gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
-    gyro.mapDrdyInt3(true);
-
-    pinMode(GYRO_INTERRUPT_PIN, INPUT);
-    attachInterrupt(GYRO_INTERRUPT_PIN, gyro_drdy, RISING);
+    if (status < 0) {
+        Serial.println("Gyro Initialization Error");
+        Serial.println(status);
+        while (1) {}
+    }
 }
 
 void loop() 
 {
-    if (gyro_flag) {
+    accel.readSensor();
 
-        gyro_flag = false;
+    gyro.readSensor();
 
-        accel.readSensor();
+    Serial.print(accel.getAccelX_mss());
+    Serial.print("\t");
+    Serial.print(accel.getAccelY_mss());
+    Serial.print("\t");
+    Serial.print(accel.getAccelZ_mss());
+    Serial.print("\t");
+    Serial.print(gyro.getGyroX_rads());
+    Serial.print("\t");
+    Serial.print(gyro.getGyroY_rads());
+    Serial.print("\t");
+    Serial.print(gyro.getGyroZ_rads());
+    Serial.print("\t");
+    Serial.print(accel.getTemperature_C());
+    Serial.print("\n");
 
-        gyro.readSensor();
-
-        printf("%+05d\n", accel.getAccelX_raw());
-
-        /*
-        printf("ax=%+3.3f ay=%+3.3f az=%+3.3f m/s^2 | gx=%+3.3f gy=%+3.3f gz=%+3.3f rad/sec\n", 
-                accel.getAccelX_mss(),
-                accel.getAccelY_mss(),
-                accel.getAccelZ_mss(),
-                gyro.getGyroX_rads(),
-                gyro.getGyroY_rads(),
-                gyro.getGyroZ_rads());*/
-    }
+    delay(20);
 }
