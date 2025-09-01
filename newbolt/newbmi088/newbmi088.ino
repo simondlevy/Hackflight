@@ -49,16 +49,14 @@ void setup()
 
     check(bmi.begin(),"IMU Initialization Error");
 
-    check(bmi.setRange(Bmi088::ACCEL_RANGE_6G,Bmi088::GYRO_RANGE_500DPS),
+    check(bmi.setRange(Bmi088::ACCEL_RANGE_24G, Bmi088::GYRO_RANGE_2000DPS),
             "Failed to set ranges");
 
     check(bmi.setOdr(Bmi088::ODR_400HZ), "Failed to set ODR");
 
-    check(bmi.mapSync(Bmi088::PIN_3), "Failed to map sync pin");
-
     check(bmi.mapDrdy(Bmi088::PIN_2), "Failed to map data ready pin");
 
-    check(bmi.pinModeDrdy(Bmi088::PUSH_PULL,Bmi088::ACTIVE_HIGH),
+    check(bmi.pinModeDrdy(Bmi088::PUSH_PULL, Bmi088::ACTIVE_HIGH),
             "Failed to setup data ready pin");
 
     pinMode(GYRO_INT_PIN, INPUT);
