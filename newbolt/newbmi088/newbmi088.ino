@@ -30,10 +30,16 @@ void drdy()
     Serial.print("\n");
 }
 
+static void check(const int status, const char * msg)
+{
+    if (status < 0) {
+        Serial.println(msg);
+        while (true) ;
+    }
+}
+
 void setup() 
 {
-    int status;
-
     Serial.begin(115200);
     while(!Serial) {}
 
@@ -41,47 +47,19 @@ void setup()
     spi.setMISO(PB14);
     spi.setMOSI(PB15);
 
-    status = bmi.begin();
-    if (status < 0) {
-        Serial.println("IMU Initialization Error");
-        Serial.println(status);
-        while (1) {}
-    }
+    check(bmi.begin(),"IMU Initialization Error");
 
-    status = bmi.setRange(Bmi088::ACCEL_RANGE_6G,Bmi088::GYRO_RANGE_500DPS);
-    if (status < 0) {
-        Serial.println("Failed to set ranges");
-        Serial.println(status);
-        while (1) {}
-    }
+    check(bmi.setRange(Bmi088::ACCEL_RANGE_6G,Bmi088::GYRO_RANGE_500DPS),
+            "Failed to set ranges");
 
-    status = bmi.setOdr(Bmi088::ODR_400HZ);
-    if (status < 0) {
-        Serial.println("Failed to set ODR");
-        Serial.println(status);
-        while (1) {}
-    }
+    check(bmi.setOdr(Bmi088::ODR_400HZ), "Failed to set ODR");
 
-    status = bmi.mapSync(Bmi088::PIN_3);
-    if (status < 0) {
-        Serial.println("Failed to map sync pin");
-        Serial.println(status);
-        while (1) {}
-    }
+    check(bmi.mapSync(Bmi088::PIN_3), "Failed to map sync pin");
 
-    status = bmi.mapDrdy(Bmi088::PIN_2);
-    if (status < 0) {
-        Serial.println("Failed to map data ready pin");
-        Serial.println(status);
-        while (1) {}
-    }
+    check(bmi.mapDrdy(Bmi088::PIN_2), "Failed to map data ready pin");
 
-    status = bmi.pinModeDrdy(Bmi088::PUSH_PULL,Bmi088::ACTIVE_HIGH);
-    if (status < 0) {
-        Serial.println("Failed to setup data ready pin");
-        Serial.println(status);
-        while (1) {}
-    }
+    check(bmi.pinModeDrdy(Bmi088::PUSH_PULL,Bmi088::ACTIVE_HIGH),
+            "Failed to setup data ready pin");
 
     pinMode(GYRO_INT_PIN, INPUT);
     attachInterrupt(GYRO_INT_PIN, drdy, RISING);
