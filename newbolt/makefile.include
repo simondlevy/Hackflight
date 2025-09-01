@@ -14,7 +14,7 @@ flash: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin
 
 clean:
-	rm -rf build/*
+	rm -rf build
 
 listen:
 	miniterm.py $(PORT) --exit-char 3
