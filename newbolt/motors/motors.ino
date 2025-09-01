@@ -23,9 +23,16 @@
 #include <vector>
 
 static const std::vector<uint8_t> MOTOR_PINS = {PA1};
-static const std::vector<uint8_t> OVERRIDE_PINS = {PA0};
+
+static const std::vector<uint8_t> POWER_SWITCH_PINS = {PA0};
 
 static auto motors = OneShot125(MOTOR_PINS);
+
+static void enableMotor(const uint8_t id)
+{
+    pinMode(POWER_SWITCH_PINS[id], OUTPUT);
+    digitalWrite(POWER_SWITCH_PINS[id], HIGH);
+}
 
 void setup() 
 {
@@ -33,8 +40,7 @@ void setup()
 
     inputInit();
 
-    pinMode(OVERRIDE_PINS[0], OUTPUT);
-    digitalWrite(OVERRIDE_PINS[0], HIGH);
+    enableMotor(0);
 
     motors.arm(); 
 }
