@@ -45,8 +45,9 @@ void setup()
     check(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ), "Failed to set gyro ODR");
     check(gyro.setRange(Bmi088Gyro::RANGE_2000DPS), "Failed to set gyro range");
 
-    //gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL, Bmi088Gyro::ACTIVE_HIGH);
-    //gyro.mapDrdyInt3(true);
+    check(gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL, Bmi088Gyro::ACTIVE_HIGH),
+            "Failed to setup data-ready pin");
+    check(gyro.mapDrdyInt3(true), "Failed to map data-ready pin");
 
     check(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ), "Failed to set accel ODR");
     check(accel.setRange(Bmi088Accel::RANGE_24G), "Failed to set accel range");
