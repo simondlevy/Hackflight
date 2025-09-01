@@ -11,32 +11,30 @@ Bmi088Accel accel(spi, ACCEL_CS_PIN);
 
 Bmi088Gyro gyro(spi, GYRO_CS_PIN);
 
+static void init(const int status, const char * what)
+{
+    if (status < 0) {
+        Serial.print("Error initializing ");
+        Serial.println(what);
+        while (true) ;
+    }
+}
+
 void setup() 
 {
     int status;
 
     Serial.begin(115200);
-    while(!Serial) {}
+
+    while (!Serial) ;
 
     spi.setSCLK(PB13);
     spi.setMISO(PB14);
     spi.setMOSI(PB15);
 
-    status = accel.begin();
+    init(accel.begin(), "accel");
 
-    if (status < 0) {
-        Serial.println("Accel Initialization Error");
-        Serial.println(status);
-        while (1) {}
-    }
-
-    status = gyro.begin();
-
-    if (status < 0) {
-        Serial.println("Gyro Initialization Error");
-        Serial.println(status);
-        while (1) {}
-    }
+    init(gyro.begin(), "gyro");
 }
 
 void loop() 
