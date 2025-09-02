@@ -19,28 +19,23 @@
 #include "safety.hpp"
 #include "task.hpp"
 
+#include <led_api.h>
+
 class LedTask {
 
     public:
 
-        void begin(
-                Safety * safety,
-                const uint8_t pin,
-                const bool active_low) 
+        void begin(Safety * safety) 
         {
             if (_task.didInit()){
                 return;
             }
 
-            _pin = pin;
-
-            _active_low = active_low;
-
             _task.init(runLedTask, "led", this, 2);
 
-            pinMode(_pin, OUTPUT);
+            led_deviceInit();
 
-            set(LOW);
+            led_deviceSet(false);
 
             _safety = safety;
         }
@@ -50,10 +45,6 @@ class LedTask {
         static constexpr float HEARTBEAT_HZ = 1;
 
         static constexpr uint32_t PULSE_MSEC = 50;
-
-        uint8_t _pin;
-
-        bool _active_low;
 
         FreeRtosTask _task;
 
@@ -71,20 +62,15 @@ class LedTask {
             while (true) {
 
                 if (_safety->isArmed()) { 
-                    set(true);
+                    led_deviceSet(true);
                 }
                 else {
-                    set(true);
+                    led_deviceSet(true);
                     vTaskDelay(PULSE_MSEC);
-                    set(false);
+                    led_deviceSet(false);
                     vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
                 }
 
             }
-        }
-
-        void set(const bool on)
-        {
-            digitalWrite(_pin, _active_low ? !on : on);
         }
 };

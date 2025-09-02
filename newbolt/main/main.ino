@@ -9,8 +9,6 @@
 
 #include "safety.hpp"
 
-static const uint8_t LED_PIN = PC0;
-
 static Motors motors;
 
 static Safety safety = Safety(&motors);
@@ -32,7 +30,7 @@ void setup()
 
     opticalFlowTask.begin(&estimatorTask);
 
-    ledTask.begin(&safety, LED_PIN, true);
+    ledTask.begin(&safety);
 
     estimatorTask.begin(&safety);
 
