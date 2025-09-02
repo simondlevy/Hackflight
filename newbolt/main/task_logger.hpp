@@ -18,10 +18,10 @@
 
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
-#include <uart.hpp>
 
 #include "task.hpp"
 #include "task_estimator.hpp"
+#include "uart.hpp"
 
 class LoggerTask {
 
@@ -62,9 +62,9 @@ class LoggerTask {
 
             while (true) {
 
-                sendVehicleState();
+                //sendVehicleState();
 
-                sendClosedLoopControlMessage();
+                //sendClosedLoopControlMessage();
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
             }

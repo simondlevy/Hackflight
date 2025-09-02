@@ -36,6 +36,7 @@ static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
+static LoggerTask loggerTask;
 static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
 
@@ -60,6 +61,8 @@ void setup()
     ledTask.begin(&safety);
 
     estimatorTask.begin(&safety);
+
+    loggerTask.begin(&estimatorTask, &closedLoopControl);
 
     imuTask.begin(&estimatorTask, &debugTask);
 
