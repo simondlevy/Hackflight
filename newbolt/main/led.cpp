@@ -22,12 +22,12 @@
 
 static const uint8_t PIN = PC0;
 
-void led_deviceInit()
+void LedTask::device_init()
 {
     pinMode(PIN, OUTPUT);
 }
 
-void led_deviceSet(const bool on)
+void LedTask::device_set(const bool on)
 {
     digitalWrite(PIN, !on);
 }

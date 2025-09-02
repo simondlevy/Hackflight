@@ -19,8 +19,6 @@
 #include "safety.hpp"
 #include "task.hpp"
 
-#include <led_api.h>
-
 class LedTask {
 
     public:
@@ -33,9 +31,9 @@ class LedTask {
 
             _task.init(runLedTask, "led", this, 2);
 
-            led_deviceInit();
+            device_init();
 
-            led_deviceSet(false);
+            device_set(false);
 
             _safety = safety;
         }
@@ -62,15 +60,19 @@ class LedTask {
             while (true) {
 
                 if (_safety->isArmed()) { 
-                    led_deviceSet(true);
+                    device_set(true);
                 }
                 else {
-                    led_deviceSet(true);
+                    device_set(true);
                     vTaskDelay(PULSE_MSEC);
-                    led_deviceSet(false);
+                    device_set(false);
                     vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
                 }
 
             }
         }
+
+        void device_init();
+
+        void device_set(const bool on);
 };
