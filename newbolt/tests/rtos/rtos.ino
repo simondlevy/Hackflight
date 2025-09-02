@@ -17,7 +17,7 @@ static void Task1(void* arg)
 
         xSemaphoreTake(sem, portMAX_DELAY);
 
-        digitalWrite(LED_PIN, LOW);
+        //digitalWrite(LED_PIN, LOW);
     }
 }
 
@@ -35,7 +35,10 @@ static void Task2(void* arg) {
 
         xSemaphoreGive(sem);
 
+        digitalWrite(LED_PIN, LOW);
+
         vTaskDelay(m2t(200));
+
     }
 }
 
