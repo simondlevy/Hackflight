@@ -15,6 +15,8 @@
  */
 
 #pragma once
+
+#include "safety.hpp"
 #include "task.hpp"
 
 class LedTask {
@@ -22,7 +24,7 @@ class LedTask {
     public:
 
         void begin(
-                //Safety * safety,
+                Safety * safety,
                 const uint8_t pin,
                 const bool active_low) 
         {
@@ -40,7 +42,7 @@ class LedTask {
 
             set(LOW);
 
-            //_safety = safety;
+            _safety = safety;
         }
 
     private:
@@ -55,7 +57,7 @@ class LedTask {
 
         FreeRtosTask _task;
 
-        //Safety * _safety;
+        Safety * _safety;
 
         static void runLedTask(void * obj)
         {

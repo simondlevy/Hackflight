@@ -8,7 +8,7 @@ PORT = /dev/ttyACM0
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
-build/$(SKETCH).ino.bin: $(SKETCH).ino vapplication.c
+build/$(SKETCH).ino.bin: $(SKETCH).ino vapplication.c *.hpp
 	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries --libraries ../../.. \
 		--fqbn $(FQBN) $(SKETCH).ino --build-path ./build
 
