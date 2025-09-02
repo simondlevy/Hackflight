@@ -4,6 +4,7 @@
 #include "debug.hpp"
 #include "estimator.hpp"
 #include "led.hpp"
+#include "opticalflow.hpp"
 #include "zranger.hpp"
 
 #include "safety.hpp"
@@ -17,6 +18,7 @@ static Safety safety = Safety(&motors);
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
+static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
 
 void setup() 
@@ -25,7 +27,7 @@ void setup()
 
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask, &debugTask);
+    zrangerTask.begin(&estimatorTask);
 
     ledTask.begin(&safety, LED_PIN, true);
 
