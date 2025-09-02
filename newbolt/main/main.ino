@@ -2,6 +2,7 @@
 
 #include "task_debug.hpp"
 #include "task_estimator.hpp"
+#include "task_imu.hpp"
 #include "task_led.hpp"
 #include "task_opticalflow.hpp"
 #include "task_zranger.hpp"
@@ -16,6 +17,7 @@ static Safety safety = Safety(&motors);
 
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
+static ImuTask imuTask;
 static LedTask ledTask;
 static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
