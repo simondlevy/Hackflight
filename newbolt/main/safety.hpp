@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "clock.hpp"
-#include "datatypes.h"
-#include "motors.hpp"
+#include <clock.hpp>
+#include <datatypes.h>
+#include <motors.hpp>
 
 class Safety {
 
