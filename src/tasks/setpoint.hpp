@@ -20,7 +20,7 @@
 #include <msp/parser.hpp>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
-#include <uart_api.h>
+#include <uart.hpp>
 
 class SetpointTask {
 
@@ -109,15 +109,16 @@ class SetpointTask {
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
                 uint8_t byte = 0;
 
-                while (uartReadByte(&byte)) {
+                while (Uart::read_byte(&byte)) {
 
                     switch (parser.parse(byte)) {
 
                         case MSP_SET_ARMING:
+                            DebugTask::setMessage(_debugTask, "arm=%d", (bool)parser.getByte(0));
                             _safety->requestArming((bool)parser.getByte(0));
                             break;
 

@@ -22,6 +22,7 @@
 #include <tasks/led.hpp>
 #include <tasks/logger.hpp>
 #include <tasks/opticalflow.hpp>
+#include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
 #include <safety.hpp>
@@ -37,6 +38,7 @@ static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
 static OpticalFlowTask opticalFlowTask;
+static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
 static ClosedLoopControl closedLoopControl;
@@ -63,9 +65,11 @@ void setup()
 
     estimatorTask.begin(&safety);
 
+    setpointTask.begin(&safety, &debugTask);
+
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
-    imuTask.begin(&estimatorTask, &debugTask);
+    imuTask.begin(&estimatorTask);
 
     const uint8_t pin = imuTask.device_getInterruptPin();
     pinMode(pin, INPUT);
