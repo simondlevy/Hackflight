@@ -14,23 +14,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#include <stdint.h>
 
-#include <uart.hpp>
+class Uart {
 
-static HardwareSerial serial = HardwareSerial(PA3, PA2);
+    public:
 
-bool Uart::read_byte(uint8_t * byte)
-{
-    if (serial.available()) {
-        *byte = serial.read();
-        return true;
-    }
+        static bool read_byte(uint8_t *);
 
-    return false;
-}
-            
-void Uart::write_byte(const uint8_t byte)
-{
-    serial.write(byte);
-}
+        static void write_byte(const uint8_t byte);
+};

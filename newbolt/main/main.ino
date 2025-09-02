@@ -16,6 +16,8 @@
 
 #include <STM32FreeRTOS.h>
 
+#include <__control__.hpp>
+
 #include "task_debug.hpp"
 #include "task_estimator.hpp"
 #include "task_imu.hpp"
@@ -35,6 +37,8 @@ static ImuTask imuTask;
 static LedTask ledTask;
 static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
+
+static ClosedLoopControl closedLoopControl;
 
 static void handle_gyro_interrupt()
 {
