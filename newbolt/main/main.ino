@@ -30,13 +30,14 @@ static void taskfun(void* arg) {
 
     pinMode(LED_PIN, OUTPUT);
 
+    TickType_t lastWakeTime = xTaskGetTickCount();
+
     while (true) {
 
         set(true);
-        vTaskDelay(m2t(200));
+        vTaskDelay(PULSE_MSEC);
         set(false);
-        vTaskDelay(m2t(200));
-
+        vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
     }
 }
 
