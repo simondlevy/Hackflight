@@ -16,7 +16,7 @@ standard_config:
 	cp ../../src/control/standard.hpp ../../src/__control__.hpp
 
 ../../src/msp/__messages__.h:
-	cd ../../msppg; make install; cd ../newbolt/main
+	cd ../../msppg; make install; cd ../bolt/main
 
 flash: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin
