@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "debug.hpp"
-#include "estimator.hpp"
+#include "task_debug.hpp"
+#include "task_estimator.hpp"
 
 #include <opticalflow_api.h>
 

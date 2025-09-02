@@ -19,8 +19,8 @@
 #include <linalg.h>
 #include <zranger_api.h>
 
-#include "debug.hpp"
-#include "estimator.hpp"
+#include "task_debug.hpp"
+#include "task_estimator.hpp"
 
 class ZRangerTask {
 

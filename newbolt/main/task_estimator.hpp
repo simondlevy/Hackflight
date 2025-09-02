@@ -21,7 +21,7 @@
 
 #include "safety.hpp"
 #include "task.hpp"
-#include "debug.hpp"
+#include "task_debug.hpp"
 
 class EstimatorTask {
 

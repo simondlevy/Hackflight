@@ -1,11 +1,10 @@
 #include <STM32FreeRTOS.h>
 
-// tasks
-#include "debug.hpp"
-#include "estimator.hpp"
-#include "led.hpp"
-#include "opticalflow.hpp"
-#include "zranger.hpp"
+#include "task_debug.hpp"
+#include "task_estimator.hpp"
+#include "task_led.hpp"
+#include "task_opticalflow.hpp"
+#include "task_zranger.hpp"
 
 #include "safety.hpp"
 
