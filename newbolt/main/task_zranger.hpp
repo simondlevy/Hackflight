@@ -17,7 +17,6 @@
 #pragma once
 
 #include <linalg.h>
-#include <zranger_api.h>
 
 #include "task_debug.hpp"
 #include "task_estimator.hpp"
@@ -32,7 +31,7 @@ class ZRangerTask {
                 return;
             }
 
-            if (!zranger_deviceInit()) {
+            if (!device_init()) {
                 DebugTask::setMessage(_debugTask,
                         "ZRangetTask: Failed to initialize zranger");
             }
@@ -82,7 +81,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                float range = zranger_deviceRead();
+                float range = device_read();
 
                 DebugTask::setMessage(_debugTask, "range=%d", (int)range);
 
@@ -106,4 +105,8 @@ class ZRangerTask {
                 }
             }
         }
+
+        bool device_init();
+
+        float device_read();
 };

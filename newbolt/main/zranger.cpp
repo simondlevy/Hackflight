@@ -17,11 +17,11 @@
 #include <Wire.h>
 #include <VL53L1X.h>
 
-#include <zranger_api.h>
+#include <task_zranger.hpp>
 
 VL53L1X _vl53l1x;
 
-bool zranger_deviceInit()
+bool ZRangerTask::device_init()
 {
     Wire.begin();
     Wire.setClock(400000);
@@ -39,7 +39,7 @@ bool zranger_deviceInit()
     return true;
 }
 
-float zranger_deviceRead()
+float ZRangerTask::device_read()
 {
     return (float)_vl53l1x.read();
 }
