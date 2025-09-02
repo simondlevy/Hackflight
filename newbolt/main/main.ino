@@ -23,6 +23,7 @@
 #include "task_opticalflow.hpp"
 #include "task_zranger.hpp"
 
+#include "imu_api.h"
 #include "safety.hpp"
 
 static Motors motors;
@@ -35,6 +36,12 @@ static ImuTask imuTask;
 static LedTask ledTask;
 static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
+
+static void handle_gyro_interrupt()
+{
+    imuTask.dataAvailableCallback();
+}
+
 
 void setup() 
 {
@@ -49,6 +56,12 @@ void setup()
     ledTask.begin(&safety);
 
     estimatorTask.begin(&safety);
+
+    imuTask.begin(&estimatorTask, &debugTask);
+
+    const uint8_t pin = imu_deviceGetInterruptPin();
+    pinMode(pin, INPUT);
+    attachInterrupt(pin, handle_gyro_interrupt, RISING);
 
     vTaskStartScheduler();
 

@@ -47,7 +47,7 @@ class ImuTask {
             _debugTask = debugTask;
 
             // Wait for sensors to startup
-            vTaskDelay(STARTUP_TIME_MS);
+            //vTaskDelay(STARTUP_TIME_MS);
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -60,7 +60,9 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            imu_deviceInit();
+            if (!imu_deviceInit()) {
+                DebugTask::setMessage(_debugTask, "IMU initialization failed");
+            }
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -384,6 +386,9 @@ class ImuTask {
                     imu_deviceReadRaw(
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
+
+                    DebugTask::setMessage(_debugTask, "gx=%d gy=d gz=%d",
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z);
 
                     // Convert accel to Gs
                     Axis3f accel = {};
