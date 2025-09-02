@@ -1,6 +1,4 @@
 #include <STM32FreeRTOS.h>
-#include <semphr.h>
-#include <task.h>
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
         StackType_t **ppxIdleTaskStackBuffer,
