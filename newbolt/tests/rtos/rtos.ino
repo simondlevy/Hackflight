@@ -33,7 +33,7 @@ static void Task2(void* arg) {
 
         vTaskDelay(m2t(200));
 
-        xSemaphoreGive(sem);
+        //xSemaphoreGive(sem);
 
         digitalWrite(LED_PIN, LOW);
 
@@ -48,16 +48,17 @@ void setup()
 
     Serial.begin(115200);
 
-    sem = xSemaphoreCreateCounting(1, 0);
+    //sem = xSemaphoreCreateCounting(1, 0);
 
-    s1 = xTaskCreate(Task1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+    //s1 = xTaskCreate(Task1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
     s2 = xTaskCreate(Task2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
+    /*
     if (sem== NULL || s1 != pdPASS || s2 != pdPASS ) {
         Serial.println(F("Creation problem"));
         while (true);
-    }
+    }*/
 
     vTaskStartScheduler();
     Serial.println("Insufficient RAM");
