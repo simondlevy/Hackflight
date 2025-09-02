@@ -66,7 +66,7 @@ class LoggerTask {
 
                 sendClosedLoopControlMessage();
 
-                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
             }
         }
 

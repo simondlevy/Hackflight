@@ -22,6 +22,7 @@
 #include "task_estimator.hpp"
 #include "task_imu.hpp"
 #include "task_led.hpp"
+#include "task_logger.hpp"
 #include "task_opticalflow.hpp"
 #include "task_zranger.hpp"
 
