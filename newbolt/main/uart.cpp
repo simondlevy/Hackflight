@@ -14,8 +14,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
+#include <Arduino.h>
+#include <uart_api.h>
 
-bool uartReadByte(uint8_t *);
+static HardwareSerial serial = HardwareSerial(PA3, PA2);
+
+bool uartReadByte(uint8_t * byte)
+{
+    if (serial.available()) {
+        *byte = serial.read();
+        return true;
+    }
+
+    return false;
+}
             
-void uartWriteByte(const uint8_t byte);
+void uartWriteByte(const uint8_t byte)
+{
+    serial.write(byte);
+}

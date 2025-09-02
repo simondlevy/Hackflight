@@ -29,7 +29,7 @@ void setup()
 
     zrangerTask.begin(&estimatorTask);
 
-    opticalFlowTask.begin(&estimatorTask, &debugTask);
+    opticalFlowTask.begin(&estimatorTask);
 
     ledTask.begin(&safety, LED_PIN, true);
 

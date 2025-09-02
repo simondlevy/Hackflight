@@ -21,7 +21,7 @@ standard_config:
 	cp ../../src/control/standard.hpp ../../src/__control__.hpp
 
 ../../src/msp/messages.h:
-	cd ../../msppg; make install; cd ../examples/main
+	cd ../../msppg; make install; cd ../teensy/main
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
