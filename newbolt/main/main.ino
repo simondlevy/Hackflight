@@ -2,6 +2,7 @@
 
 // tasks
 #include "debug.hpp"
+#include "estimator.hpp"
 #include "led.hpp"
 
 #include "safety.hpp"
