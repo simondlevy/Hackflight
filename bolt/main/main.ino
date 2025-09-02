@@ -16,4 +16,4 @@
 
 #include <STM32FreeRTOS.h>
 
-#include <hackflight_main.hpp>
+#include <main.hpp>
