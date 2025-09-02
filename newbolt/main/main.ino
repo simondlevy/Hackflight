@@ -13,11 +13,14 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
+static DebugTask debugTask;
 static LedTask ledTask;
 
 void setup() 
 {
     Serial.begin(115200);
+
+	debugTask.begin();
 
     ledTask.begin(&safety, LED_PIN, true);
 
