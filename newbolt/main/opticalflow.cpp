@@ -16,17 +16,27 @@
 
 #pragma once
 
+#include <SPI.h>
+#include <pmw3901.hpp>
 #include <opticalflow_api.h>
+
+static PMW3901 pmw3901;
+
+static SPIClass spi;
 
 bool opticalflow_deviceInit()
 {
-    return true;
+    spi.setSCLK(PA5);
+    spi.setMISO(PA6);
+    spi.setMOSI(PA7);
+
+    spi.begin();
+
+    return pmw3901.begin(PB4, spi);
 }
 
 void opticalflow_deviceRead(
         int16_t & deltaX, int16_t & deltaY, bool & gotMotion)
 {
-    (void)deltaX;
-    (void)deltaY;
-    (void)gotMotion;
+    pmw3901.readMotion(deltaX, deltaY, gotMotion);
 }
