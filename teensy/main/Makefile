@@ -12,7 +12,7 @@ endif
 
 FQBN = teensy:avr:teensy40
 
-build: $(SKETCH).ino *.hpp *.cpp ../../src/msp/messages.h
+build: $(SKETCH).ino ../../src/msp/messages.h
 	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries --libraries ../../.. \
 		--fqbn $(FQBN) $(SKETCH).ino
 

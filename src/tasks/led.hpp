@@ -16,35 +16,24 @@
 
 #pragma once
 
-#include <Arduino.h>
-
-#include <stdint.h>
-
-#include <safety.hpp>
-#include <task.hpp>
+#include "safety.hpp"
+#include "task.hpp"
 
 class LedTask {
 
     public:
 
-        void begin(
-                Safety * safety,
-                const uint8_t pin,
-                const bool active_low) 
+        void begin(Safety * safety) 
         {
             if (_task.didInit()){
                 return;
             }
 
-            _pin = pin;
-
-            _active_low = active_low;
-
             _task.init(runLedTask, "led", this, 2);
 
-            pinMode(_pin, OUTPUT);
+            device_init();
 
-            set(LOW);
+            device_set(false);
 
             _safety = safety;
         }
@@ -54,10 +43,6 @@ class LedTask {
         static constexpr float HEARTBEAT_HZ = 1;
 
         static constexpr uint32_t PULSE_MSEC = 50;
-
-        uint8_t _pin;
-
-        bool _active_low;
 
         FreeRtosTask _task;
 
@@ -75,20 +60,19 @@ class LedTask {
             while (true) {
 
                 if (_safety->isArmed()) { 
-                    set(true);
+                    device_set(true);
                 }
                 else {
-                    set(true);
-                    vTaskDelay(M2T(PULSE_MSEC));
-                    set(false);
-                    vTaskDelayUntil(&lastWakeTime, M2T(1000/HEARTBEAT_HZ));
+                    device_set(true);
+                    vTaskDelay(PULSE_MSEC);
+                    device_set(false);
+                    vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
                 }
 
             }
         }
 
-        void set(const bool on)
-        {
-            digitalWrite(_pin, _active_low ? !on : on);
-        }
+        void device_init();
+
+        void device_set(const bool on);
 };

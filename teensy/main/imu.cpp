@@ -18,7 +18,7 @@
 #include <Wire.h>
 #include <BMI088.h>
 
-#include "task_imu.hpp"
+#include <tasks/imu.hpp>
 
 static const uint8_t ACCEL_ADDRESS = 0x19;
 static const uint8_t GYRO_ADDRESS = 0x69;

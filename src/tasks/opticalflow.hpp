@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <pmw3901.hpp>
-
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
@@ -27,7 +25,6 @@ class OpticalFlowTask {
 
         void begin(
                 EstimatorTask * estimatorTask,
-                const uint8_t cs_pin,
                 DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
@@ -37,7 +34,7 @@ class OpticalFlowTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            if (_pmw3901.begin(cs_pin)) {
+            if (device_init()) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
@@ -64,8 +61,6 @@ class OpticalFlowTask {
 
         FreeRtosTask _task;
 
-        PMW3901 _pmw3901;
-
         EstimatorTask * _estimatorTask;
 
         DebugTask * _debugTask;
@@ -82,7 +77,7 @@ class OpticalFlowTask {
                 int16_t deltaY = 0;
                 bool gotMotion = false;
 
-                _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+                device_read(deltaX, deltaY, gotMotion);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
@@ -115,4 +110,8 @@ class OpticalFlowTask {
                 }
             }        
         }
+
+        bool device_init();
+
+        void device_read(int16_t & deltaX, int16_t & deltaY, bool & gotMotion);
 };

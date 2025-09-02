@@ -19,9 +19,9 @@
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
 
-#include "task.hpp"
-#include "task_estimator.hpp"
-#include "uart.hpp"
+#include <task.hpp>
+#include <tasks/estimator.hpp>
+#include <uart.hpp>
 
 class LoggerTask {
 

@@ -17,7 +17,7 @@
 #include <SPI.h>
 #include <pmw3901.hpp>
 
-#include "task_opticalflow.hpp"
+#include <tasks/opticalflow.hpp>
 
 static const uint8_t CS_PIN = 3;
 

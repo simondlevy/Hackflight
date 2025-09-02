@@ -22,16 +22,16 @@ using namespace arduino;
 
 #include <__control__.hpp>
 
-#include "task_debug.hpp"
-#include "task_estimator.hpp"
-#include "task_imu.hpp"
-#include "task_led.hpp"
-#include "task_logger.hpp"
-#include "task_opticalflow.hpp"
-#include "task_zranger.hpp"
+#include <tasks/debug.hpp>
+#include <tasks/estimator.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/led.hpp>
+#include <tasks/logger.hpp>
+#include <tasks/opticalflow.hpp>
+#include <tasks/zranger.hpp>
 
-#include "safety.hpp"
-#include "uart.hpp"
+#include <safety.hpp>
+#include <uart.hpp>
 
 static Motors motors;
 

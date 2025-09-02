@@ -20,7 +20,6 @@
 #include <tasks/estimator.hpp>
 
 #include <datatypes.h>
-#include <imu_api.h>
 #include <lpf.hpp>
 #include <m_pi.h>
 #include <num.hpp>
@@ -47,7 +46,7 @@ class ImuTask {
             _debugTask = debugTask;
 
             // Wait for sensors to startup
-            vTaskDelay(M2T(STARTUP_TIME_MS));
+            //vTaskDelay(STARTUP_TIME_MS);
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -60,7 +59,9 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            imu_deviceInit();
+            if (!device_init()) {
+                DebugTask::setMessage(_debugTask, "IMU initialization failed");
+            }
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -113,6 +114,8 @@ class ImuTask {
         void waitDataReady(void) {
             xSemaphoreTake(coreTaskSemaphore, portMAX_DELAY);
         }
+
+        uint8_t device_getInterruptPin();
 
     private:
 
@@ -381,9 +384,12 @@ class ImuTask {
                     Axis3i16 gyroRaw = {};
                     Axis3i16 accelRaw = {};
 
-                    imu_deviceReadRaw(
+                    device_readRaw(
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
+
+                    DebugTask::setMessage(_debugTask, "gx=%d gy=d gz=%d",
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z);
 
                     // Convert accel to Gs
                     Axis3f accel = {};
@@ -437,4 +443,11 @@ class ImuTask {
         {
             return (float)raw * 2 * 24 / 65536.f;
         }
+
+        bool device_init();
+
+        void device_readRaw(
+                int16_t & gx, int16_t & gy, int16_t & gz, 
+                int16_t & ax, int16_t & ay, int16_t & az);
+
 };

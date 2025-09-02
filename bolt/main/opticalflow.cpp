@@ -19,7 +19,7 @@
 #include <SPI.h>
 #include <pmw3901.hpp>
 
-#include <task_opticalflow.hpp>
+#include <tasks/opticalflow.hpp>
 
 static PMW3901 pmw3901;
 

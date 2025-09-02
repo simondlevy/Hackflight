@@ -16,8 +16,7 @@
 
 #pragma once
 
-#include <task.hpp>
-#include <debug_api.h>
+#include "task.hpp"
 
 class DebugTask {
 
@@ -68,11 +67,13 @@ class DebugTask {
             while (true) {
 
                 if (*_msg) {
-                    debugWrite(_msg);
+                    device_write(_msg);
                 }
 
-                vTaskDelay(M2T(1000/REPORT_FREQ));
+                vTaskDelay(1000/REPORT_FREQ);
             }
         }
+
+        void device_write(const char * msg);
 };
 

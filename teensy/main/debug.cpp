@@ -16,7 +16,7 @@
 
 #include <Arduino.h>
 
-#include "task_debug.hpp"
+#include <tasks/debug.hpp>
 
 void DebugTask::device_write(const char * msg)
 {

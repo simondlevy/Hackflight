@@ -16,7 +16,7 @@
 
 #include <Arduino.h>
 
-#include "uart.hpp"
+#include <uart.hpp>
 
 void Uart::begin(const uint32_t baudrate)
 {
