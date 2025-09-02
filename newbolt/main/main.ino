@@ -1,5 +1,11 @@
 #include <STM32FreeRTOS.h>
 
+#include "task.hpp"
+
+static constexpr float HEARTBEAT_HZ = 1;
+
+static constexpr uint32_t PULSE_MSEC = 50;
+
 static uint32_t m2t(const uint32_t msec)
 {
     return (200L * configTICK_RATE_HZ) / 1000L;
@@ -13,6 +19,11 @@ static StackType_t  _taskStackBuffer[STACKSIZE];
 
 static StaticTask_t _taskTaskBuffer;
 
+void set(const bool on)
+{
+    digitalWrite(LED_PIN, !on);
+}
+
 static void taskfun(void* arg) {
 
     (void)arg;
@@ -21,11 +32,11 @@ static void taskfun(void* arg) {
 
     while (true) {
 
-        digitalWrite(LED_PIN, HIGH);
+        set(HIGH);
 
         vTaskDelay(m2t(200));
 
-        digitalWrite(LED_PIN, LOW);
+        set(LOW);
 
         vTaskDelay(m2t(200));
 
@@ -35,15 +46,6 @@ static void taskfun(void* arg) {
 void setup() 
 {
     Serial.begin(115200);
-
-    /*
-    xTaskCreate(
-            taskfun,
-            "task", // name
-            STACKSIZE,
-            NULL,   // obj
-            1,      // priority
-            NULL);*/
 
     xTaskCreateStatic(
             taskfun,
