@@ -9,7 +9,7 @@ PORT = /dev/ttyACM0
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 build/$(SKETCH).ino.bin: $(SKETCH).ino
-	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries --libraries ../.. \
+	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries --libraries ../../.. \
 		--fqbn $(FQBN) $(SKETCH).ino --build-path ./build
 
 flash: $(BIN)
