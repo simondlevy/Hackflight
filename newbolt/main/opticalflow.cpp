@@ -18,13 +18,14 @@
 
 #include <SPI.h>
 #include <pmw3901.hpp>
-#include <opticalflow_api.h>
+
+#include <task_opticalflow.hpp>
 
 static PMW3901 pmw3901;
 
 static SPIClass spi;
 
-bool opticalflow_deviceInit()
+bool OpticalFlowTask::device_init()
 {
     spi.setSCLK(PA5);
     spi.setMISO(PA6);
@@ -35,7 +36,7 @@ bool opticalflow_deviceInit()
     return pmw3901.begin(PB4, spi);
 }
 
-void opticalflow_deviceRead(
+void OpticalFlowTask::device_read(
         int16_t & deltaX, int16_t & deltaY, bool & gotMotion)
 {
     pmw3901.readMotion(deltaX, deltaY, gotMotion);

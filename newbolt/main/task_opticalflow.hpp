@@ -19,8 +19,6 @@
 #include "task_debug.hpp"
 #include "task_estimator.hpp"
 
-#include <opticalflow_api.h>
-
 class OpticalFlowTask {
 
     public:
@@ -36,7 +34,7 @@ class OpticalFlowTask {
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 
-            if (opticalflow_deviceInit()) {
+            if (device_init()) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
@@ -79,7 +77,7 @@ class OpticalFlowTask {
                 int16_t deltaY = 0;
                 bool gotMotion = false;
 
-                opticalflow_deviceRead(deltaX, deltaY, gotMotion);
+                device_read(deltaX, deltaY, gotMotion);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
@@ -112,4 +110,8 @@ class OpticalFlowTask {
                 }
             }        
         }
+
+        bool device_init();
+
+        void device_read(int16_t & deltaX, int16_t & deltaY, bool & gotMotion);
 };
