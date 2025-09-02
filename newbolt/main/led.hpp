@@ -70,7 +70,7 @@ class LedTask {
 
             while (true) {
 
-                if (false /*_safety->isArmed()*/) { 
+                if (_safety->isArmed()) { 
                     set(true);
                 }
                 else {
