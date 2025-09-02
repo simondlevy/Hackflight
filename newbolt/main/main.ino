@@ -7,7 +7,6 @@
 
 #include "safety.hpp"
 
-
 static const uint8_t LED_PIN = PC0;
 
 static Motors motors;
@@ -15,6 +14,7 @@ static Motors motors;
 static Safety safety = Safety(&motors);
 
 static DebugTask debugTask;
+static EstimatorTask estimatorTask;
 static LedTask ledTask;
 
 void setup() 
@@ -24,6 +24,8 @@ void setup()
 	debugTask.begin();
 
     ledTask.begin(&safety, LED_PIN, true);
+
+    estimatorTask.begin(&safety);
 
     vTaskStartScheduler();
 
