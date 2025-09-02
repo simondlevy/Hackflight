@@ -14,13 +14,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <imu_api.h>
-
 #include <SPI.h>
-
 #include <BMI088.h>
+#include <task_imu.hpp>
 
 static const uint8_t ACCEL_CS_PIN = PB1;
 static const uint8_t GYRO_CS_PIN = PB0;
@@ -33,14 +29,7 @@ static Bmi088Accel accel(spi, ACCEL_CS_PIN);
 
 static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
 
-static volatile uint32_t gyro_interrupt_count;
-
-static void gyro_drdy()
-{
-    gyro_interrupt_count++;
-}
-
-bool imu_deviceInit()
+bool ImuTask::device_init()
 {
     spi.setSCLK(PB13);
     spi.setMISO(PB14);
@@ -66,7 +55,7 @@ bool imu_deviceInit()
     return true;
 }
 
-void imu_deviceReadRaw(
+void ImuTask::device_readRaw(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {
@@ -81,7 +70,7 @@ void imu_deviceReadRaw(
     az = accel.getAccelZ_raw();
 }
 
-uint8_t imu_deviceGetInterruptPin()
+uint8_t ImuTask::device_getInterruptPin()
 {
     return GYRO_INT_PIN;
 }

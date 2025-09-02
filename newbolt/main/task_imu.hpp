@@ -20,7 +20,6 @@
 #include "task_estimator.hpp"
 
 #include <datatypes.h>
-#include <imu_api.h>
 #include <lpf.hpp>
 #include <m_pi.h>
 #include <num.hpp>
@@ -60,7 +59,7 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            if (!imu_deviceInit()) {
+            if (!device_init()) {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
             }
 
@@ -115,6 +114,8 @@ class ImuTask {
         void waitDataReady(void) {
             xSemaphoreTake(coreTaskSemaphore, portMAX_DELAY);
         }
+
+        uint8_t device_getInterruptPin();
 
     private:
 
@@ -383,7 +384,7 @@ class ImuTask {
                     Axis3i16 gyroRaw = {};
                     Axis3i16 accelRaw = {};
 
-                    imu_deviceReadRaw(
+                    device_readRaw(
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
 
@@ -442,4 +443,11 @@ class ImuTask {
         {
             return (float)raw * 2 * 24 / 65536.f;
         }
+
+        bool device_init();
+
+        void device_readRaw(
+                int16_t & gx, int16_t & gy, int16_t & gz, 
+                int16_t & ax, int16_t & ay, int16_t & az);
+
 };

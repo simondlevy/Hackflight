@@ -23,7 +23,6 @@
 #include "task_opticalflow.hpp"
 #include "task_zranger.hpp"
 
-#include "imu_api.h"
 #include "safety.hpp"
 
 static Motors motors;
@@ -59,7 +58,7 @@ void setup()
 
     imuTask.begin(&estimatorTask, &debugTask);
 
-    const uint8_t pin = imu_deviceGetInterruptPin();
+    const uint8_t pin = imuTask.device_getInterruptPin();
     pinMode(pin, INPUT);
     attachInterrupt(pin, handle_gyro_interrupt, RISING);
 
