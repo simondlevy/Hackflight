@@ -7,8 +7,14 @@ static uint32_t m2t(const uint32_t msec)
 
 static const uint8_t LED_PIN = PC0;
 
-static void Task2(void* arg) {
-    
+static const size_t STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
+
+static StackType_t  _taskStackBuffer[STACKSIZE]; 
+
+static StaticTask_t _taskTaskBuffer;
+
+static void taskfun(void* arg) {
+
     (void)arg;
 
     pinMode(LED_PIN, OUTPUT);
@@ -30,7 +36,23 @@ void setup()
 {
     Serial.begin(115200);
 
-    xTaskCreate(Task2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    /*
+    xTaskCreate(
+            taskfun,
+            "task", // name
+            STACKSIZE,
+            NULL,   // obj
+            1,      // priority
+            NULL);*/
+
+    xTaskCreateStatic(
+            taskfun,
+            "task", // name
+            STACKSIZE,
+            NULL,   // obj
+            1,      // priority
+            _taskStackBuffer,
+            &_taskTaskBuffer);
 
     vTaskStartScheduler();
 
