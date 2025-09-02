@@ -27,6 +27,7 @@
 #include "task_zranger.hpp"
 
 #include "safety.hpp"
+#include "uart.hpp"
 
 static Motors motors;
 
@@ -51,6 +52,8 @@ static void handle_gyro_interrupt()
 void setup() 
 {
     Serial.begin(115200);
+
+    Uart::begin(115200);
 
 	debugTask.begin();
 

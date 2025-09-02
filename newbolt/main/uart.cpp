@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,11 @@
 #include <uart.hpp>
 
 static HardwareSerial serial = HardwareSerial(PA3, PA2);
+
+void Uart::begin(const uint32_t baudrate)
+{
+    serial.begin(baudrate);
+}
 
 bool Uart::read_byte(uint8_t * byte)
 {
