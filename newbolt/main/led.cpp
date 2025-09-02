@@ -18,6 +18,8 @@
 
 #include <Arduino.h>
 
+#include "task_led.hpp"
+
 static const uint8_t PIN = PC0;
 
 void led_deviceInit()

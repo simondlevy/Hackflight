@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <FreeRTOS.h>
+#include <task.h>
+
 #include <clock.hpp>
 #include <datatypes.h>
 #include <motors.hpp>
