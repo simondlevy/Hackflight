@@ -1,3 +1,4 @@
+
 /**
  * Copyright (C) 2025 Simon D. Levy
  *
@@ -17,16 +18,18 @@
 #include <Wire.h>
 #include <BMI088.h>
 
-#include <imu_api.h>
+#include "task_imu.hpp"
 
 static const uint8_t ACCEL_ADDRESS = 0x19;
 static const uint8_t GYRO_ADDRESS = 0x69;
+
+static const uint8_t GYRO_INTERRUPT_PIN = 6;
 
 static Bmi088Accel accel(Wire, ACCEL_ADDRESS);
 
 static Bmi088Gyro gyro(Wire, GYRO_ADDRESS);
 
-bool imu_deviceInit()
+bool ImuTask::device_init()
 {
     Wire.begin();
     Wire.setClock(400000);
@@ -48,7 +51,7 @@ bool imu_deviceInit()
     return true;
 }
                     
-void imu_deviceReadRaw(
+void ImuTask::device_readRaw(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {
@@ -61,4 +64,9 @@ void imu_deviceReadRaw(
     ax = accel.getAccelX_raw();
     ay = accel.getAccelY_raw();
     az = accel.getAccelZ_raw();
+}
+
+uint8_t ImuTask::device_getInterruptPin()
+{
+    return GYRO_INTERRUPT_PIN;
 }

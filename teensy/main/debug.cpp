@@ -15,9 +15,10 @@
  */
 
 #include <Arduino.h>
-#include <string.h>
 
-void debugWrite(const char * msg)
+#include "task_debug.hpp"
+
+void DebugTask::device_write(const char * msg)
 {
     Serial.println(msg);
 }

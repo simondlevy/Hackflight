@@ -12,22 +12,19 @@ endif
 
 FQBN = teensy:avr:teensy40
 
-build: $(SKETCH).ino ../../src/msp/messages.h
-	arduino-cli compile \
-	--libraries $(HOME)/Documents/Arduino/libraries --libraries ../.. \
-	--fqbn $(FQBN) $(SKETCH).ino
+build: $(SKETCH).ino *.hpp *.cpp ../../src/msp/messages.h
+	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries --libraries ../../.. \
+		--fqbn $(FQBN) $(SKETCH).ino
 
 standard_config:
 	cp ../../src/control/standard.hpp ../../src/__control__.hpp
 
 ../../src/msp/messages.h:
-	cd ../../msppg; make install; cd ../teensy/main
+	cd ../../msppg; make install; cd ../newbolt/main
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
-edit:
-	vim $(SKETCH).ino
-
 listen:
 	miniterm.py $(PORT) --exit-char 3
+

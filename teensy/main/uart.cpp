@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,14 @@
 
 #include <Arduino.h>
 
-bool uartReadByte(uint8_t * byte)
+#include "uart.hpp"
+
+void Uart::begin(const uint32_t baudrate)
+{
+    Serial5.begin(baudrate);
+}
+
+bool Uart::read_byte(uint8_t * byte)
 {
     if (Serial5.available()) {
         *byte = Serial5.read();
@@ -26,7 +33,7 @@ bool uartReadByte(uint8_t * byte)
     return false;
 }
             
-void uartWriteByte(const uint8_t byte)
+void Uart::write_byte(const uint8_t byte)
 {
     Serial5.write(byte);
 }
