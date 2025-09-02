@@ -1,7 +1,11 @@
 #include <STM32FreeRTOS.h>
 
+// tasks
+#include "debug.hpp"
 #include "led.hpp"
+
 #include "safety.hpp"
+
 
 static const uint8_t LED_PIN = PC0;
 
