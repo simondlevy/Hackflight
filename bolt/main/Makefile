@@ -8,14 +8,14 @@ PORT = /dev/ttyACM0
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
-build/$(SKETCH).ino.bin: $(SKETCH).ino vapplication.c *.cpp ../../src/msp/messages.h
+build/$(SKETCH).ino.bin: $(SKETCH).ino vapplication.c *.cpp ../../src/msp/__messages__.h
 	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries --libraries ../../.. \
 		--fqbn $(FQBN) $(SKETCH).ino --build-path ./build
 
 standard_config:
 	cp ../../src/control/standard.hpp ../../src/__control__.hpp
 
-../../src/msp/messages.h:
+../../src/msp/__messages__.h:
 	cd ../../msppg; make install; cd ../newbolt/main
 
 flash: $(BIN)
