@@ -2,52 +2,15 @@
 
 #include "led.hpp"
 
-static constexpr float HEARTBEAT_HZ = 1;
-
-static constexpr uint32_t PULSE_MSEC = 50;
-
 static const uint8_t LED_PIN = PC0;
 
-static const size_t STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
-
-static StackType_t  _taskStackBuffer[STACKSIZE]; 
-
-static StaticTask_t _taskTaskBuffer;
-
-void set(const bool on)
-{
-    digitalWrite(LED_PIN, !on);
-}
-
-static void taskfun(void* arg) {
-
-    (void)arg;
-
-    pinMode(LED_PIN, OUTPUT);
-
-    TickType_t lastWakeTime = xTaskGetTickCount();
-
-    while (true) {
-
-        set(true);
-        vTaskDelay(PULSE_MSEC);
-        set(false);
-        vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
-    }
-}
+static LedTask ledTask;
 
 void setup() 
 {
     Serial.begin(115200);
 
-    xTaskCreateStatic(
-            taskfun,
-            "task", // name
-            STACKSIZE,
-            NULL,   // obj
-            1,      // priority
-            _taskStackBuffer,
-            &_taskTaskBuffer);
+    ledTask.begin(/*&safety,*/ LED_PIN, true);
 
     vTaskStartScheduler();
 
