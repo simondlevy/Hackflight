@@ -4,6 +4,7 @@
 #include "debug.hpp"
 #include "estimator.hpp"
 #include "led.hpp"
+#include "zranger.hpp"
 
 #include "safety.hpp"
 
@@ -16,6 +17,7 @@ static Safety safety = Safety(&motors);
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
+static ZRangerTask zrangerTask;
 
 void setup() 
 {
