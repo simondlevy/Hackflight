@@ -25,7 +25,7 @@ void setup()
 
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask);
+    zrangerTask.begin(&estimatorTask, &debugTask);
 
     ledTask.begin(&safety, LED_PIN, true);
 
