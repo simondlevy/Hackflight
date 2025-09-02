@@ -32,12 +32,9 @@ static void taskfun(void* arg) {
 
     while (true) {
 
-        set(HIGH);
-
+        set(true);
         vTaskDelay(m2t(200));
-
-        set(LOW);
-
+        set(false);
         vTaskDelay(m2t(200));
 
     }
