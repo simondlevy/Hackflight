@@ -13,7 +13,6 @@
 
 4. In hackflight/bolt/main do:
 
-
 ```make standard_config```
 
 or
@@ -21,7 +20,8 @@ or
 
 ```make haskell_config```
 
-then
+5. Hold down the boot button on the Bolt for around five seconds, until the
+blue LED blinks rapidly
 
 ```make && make flash```
 
