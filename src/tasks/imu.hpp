@@ -377,9 +377,9 @@ class ImuTask {
 
                     // Convert accel to Gs
                     Axis3f accel = {};
-                    accel.x = accelRaw2Gs(accelRaw.x);
-                    accel.y = accelRaw2Gs(accelRaw.y);
-                    accel.z = accelRaw2Gs(accelRaw.z);
+                    accel.x = device_accelRawToGs(accelRaw.x);
+                    accel.y = device_accelRawToGs(accelRaw.y);
+                    accel.z = device_accelRawToGs(accelRaw.z);
 
                     // Calibrate gyro with raw values if necessary
                     gyroBiasFound = processGyroBias(xTaskGetTickCount(),
@@ -387,9 +387,9 @@ class ImuTask {
 
                     // Subtract gyro bias
                     Axis3f gyroUnbiased = {};
-                    gyroUnbiased.x = gyroRaw2Dps(gyroRaw.x - gyroBias.x);
-                    gyroUnbiased.y = gyroRaw2Dps(gyroRaw.y - gyroBias.y);
-                    gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
+                    gyroUnbiased.x = device_gyroRawToDps(gyroRaw.x - gyroBias.x);
+                    gyroUnbiased.y = device_gyroRawToDps(gyroRaw.y - gyroBias.y);
+                    gyroUnbiased.z = device_gyroRawToDps(gyroRaw.z - gyroBias.z);
 
                     // Rotate gyro to airframe
                     alignToAirframe(&gyroUnbiased, &data.gyro);
@@ -418,20 +418,13 @@ class ImuTask {
             }
         }
 
-        static float gyroRaw2Dps(const int16_t raw)
-        {
-            return (float)raw * 2 * 2000 / 65536.f;
-        }
-
-        static float accelRaw2Gs(const int16_t raw)
-        {
-            return (float)raw * 2 * 24 / 65536.f;
-        }
-
         bool device_init();
 
         void device_readRaw(
                 int16_t & gx, int16_t & gy, int16_t & gz, 
                 int16_t & ax, int16_t & ay, int16_t & az);
 
+        float device_gyroRawToDps(const int16_t raw);
+
+        float device_accelRawToGs(const int16_t raw);
 };

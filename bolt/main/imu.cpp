@@ -76,3 +76,14 @@ uint8_t ImuTask::device_getInterruptPin()
     return GYRO_INT_PIN;
 }
 
+float ImuTask::device_gyroRawToDps(const int16_t raw)
+{
+    return (float)raw * 2 * 2000 / 65536.f;
+}
+
+float ImuTask::device_accelRawToGs(const int16_t raw)
+{
+    return (float)raw * 2 * 24 / 65536.f;
+}
+
+
