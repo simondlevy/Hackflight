@@ -10,6 +10,7 @@
 * https://github.com/simondlevy/PMW3901
 * https://github.com/pololu/vl53l1x-arduino
 * https://github.com/bolderflight/bmi088-arduino
+* https://github.com/stm32duino/STM32FreeRTOS
 
 4. In Arduino_CMSIS-DSP, do ```make install```
 
