@@ -45,7 +45,9 @@ Hackflight currently runs on a custom-built micro [quadcopter](media/boltquad2.j
 the [Crazyfle Bolt 1.1](https://www.bitcraze.io/products/crazyflie-bolt-1-1/)
 flight controller for state estimation and PID control, and a
 [BlueSMIRF v2](https://www.sparkfun.com/sparkfun-bluesmirf-v2.html) for 
-remote control and logging.
+remote control and logging.  The firmware is built on the Arduino ecosystem,
+with all of the device-specific code (sensors, motors) coming from Arduino
+libraries.
 
 # Simulator
 
