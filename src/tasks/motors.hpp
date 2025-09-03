@@ -78,7 +78,7 @@ class MotorsTask {
             }
         }
 
-        void setRatio(uint32_t id, uint16_t ratio)
+        void setRatio(uint8_t id, uint16_t ratio)
         {
             ratios[id] = ratio;
 
@@ -87,7 +87,7 @@ class MotorsTask {
 
         void device_init();
 
-        void device_setRatio(const uint32_t, const uint16_t ratio);
+        void device_setRatio(const uint8_t, const uint16_t ratio);
 
         void device_stop();
 };

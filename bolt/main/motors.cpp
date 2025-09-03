@@ -41,7 +41,7 @@ void MotorsTask::device_init()
 
     motors.arm(); }
 
-void MotorsTask::device_setRatio(const uint32_t id, const uint16_t ratio)
+void MotorsTask::device_setRatio(const uint8_t id, const uint16_t ratio)
 {
     motors.set(id, 125);
 
