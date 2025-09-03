@@ -174,7 +174,7 @@ class CoreTask {
 
         void run(void)
         {
-            vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
+            //vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
