@@ -17,13 +17,16 @@
 #pragma once
 
 #include <task.hpp>
+#include <tasks/debug.hpp>
 
 class MotorsTask {
 
     public:
 
-        void begin(void)
+        void begin(DebugTask * debugTask=nullptr)
         {
+            _debugTask = debugTask;
+
             _task.init(runMotorsTask, "motors", this, 5);
 
             device_init();
@@ -52,6 +55,8 @@ class MotorsTask {
     private:
 
         static const uint32_t FREQ_HZ = 1000;
+
+        DebugTask * _debugTask;
 
         FreeRtosTask _task;
 

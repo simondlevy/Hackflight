@@ -64,8 +64,6 @@ class CoreTask {
 
             _rotorCount = rotorCount;
 
-            _motorsTask->begin();
-
             _task.init(runCoreTask, "core", this, 5);
         }
 
@@ -139,7 +137,6 @@ class CoreTask {
 
         void runMotors(const float motorvals[4]) 
         {
-            /*
             const uint16_t motorsPwm[4]  = {
                 (uint16_t)motorvals[0],
                 (uint16_t)motorvals[1],
@@ -147,7 +144,7 @@ class CoreTask {
                 (uint16_t)motorvals[3]
             };
 
-            _motorsTask->setRatios(motorsPwm);*/
+            _motorsTask->setRatios(motorsPwm);
         }
 
         static void runCoreTask(void* obj)

@@ -75,6 +75,8 @@ void setup()
 
     imuTask.begin(&estimatorTask);
 
+    motorsTask.begin(&debugTask);
+
     coreTask.begin(
             &closedLoopControl,
             &safety,
