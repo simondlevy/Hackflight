@@ -16,6 +16,9 @@
 
 #include <__control__.hpp>
 
+#include <mixers/crazyflie.hpp>
+
+#include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
@@ -32,6 +35,7 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
+static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static ImuTask imuTask;
@@ -61,15 +65,25 @@ void setup()
 
     opticalFlowTask.begin(&estimatorTask);
 
-    ledTask.begin(&safety);
-
     estimatorTask.begin(&safety);
 
     setpointTask.begin(&safety, &debugTask);
 
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
+    ledTask.begin(&safety);
+
     imuTask.begin(&estimatorTask);
+
+    coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            //&motors,
+            Mixer::rotorCount,
+            Mixer::mix);
 
     const uint8_t pin = imuTask.device_getInterruptPin();
     pinMode(pin, INPUT);

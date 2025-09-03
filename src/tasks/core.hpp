@@ -20,7 +20,7 @@
 #include <__control__.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
-#include <motors.hpp>
+//#include <motors.hpp>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -41,7 +41,7 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
-                Motors * motors,
+                //Motors * motors,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
@@ -60,7 +60,7 @@ class CoreTask {
 
             _setpointTask = setpointTask;
 
-            _motors = motors;
+            //_motors = motors;
 
             _debugTask = debugTask;
 
@@ -68,7 +68,7 @@ class CoreTask {
 
             _rotorCount = rotorCount;
 
-            motors->begin();
+            //motors->begin();
 
             _task.init(runCoreTask, "core", this, 5);
 
@@ -76,7 +76,7 @@ class CoreTask {
 
             pass &= _imuTask->test();
             pass &= _estimatorTask->didInit();
-            pass &= motors->test();
+            //pass &= motors->test();
 
             return pass;
         }
@@ -137,7 +137,7 @@ class CoreTask {
 
         SetpointTask * _setpointTask;
 
-        Motors * _motors;
+        //Motors * _motors;
 
         EstimatorTask * _estimatorTask;
 
@@ -151,6 +151,7 @@ class CoreTask {
 
         void runMotors(const float motorvals[4]) 
         {
+            /*
             const uint16_t motorsPwm[4]  = {
                 (uint16_t)motorvals[0],
                 (uint16_t)motorvals[1],
@@ -158,7 +159,7 @@ class CoreTask {
                 (uint16_t)motorvals[3]
             };
 
-            _motors->setRatios(motorsPwm);
+            _motors->setRatios(motorsPwm);*/
         }
 
         static void runCoreTask(void* obj)
@@ -178,11 +179,11 @@ class CoreTask {
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->imuIsCalibrated()) {
-                vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
+                vTaskDelayUntil(&lastWakeTime, 1000/Clock::RATE_MAIN_LOOP);
             }
 
             static RateSupervisor rateSupervisor;
-            rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
+            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
 
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
@@ -243,7 +244,7 @@ class CoreTask {
                         timestamp - setpoint_timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
-                    _motors->stop();
+                    //_motors->stop();
                     _safety->requestArming(false);
                 }
 
@@ -252,7 +253,7 @@ class CoreTask {
                 } 
                 
                 else {
-                    _motors->stop();
+                    //_motors->stop();
                 }
 
                 if (!rateSupervisor.validate(timestamp)) {

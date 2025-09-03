@@ -23,14 +23,17 @@
 #include <clock.hpp>
 #include <datatypes.h>
 #include <motors.hpp>
+#include <tasks/debug.hpp>
 
 class Safety {
 
     public:
 
-        Safety(Motors * motors)
+        Safety(Motors * motors, DebugTask * debugTask=nullptr)
         {
             _motors = motors;
+
+            _debugTask = debugTask;
         }
 
         bool isFlying() 
@@ -71,6 +74,8 @@ class Safety {
         static constexpr float MAX_SAFE_ANGLE = 30;
 
         Motors * _motors;
+
+        DebugTask * _debugTask;
 
         bool _is_flying;
 
