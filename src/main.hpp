@@ -85,7 +85,8 @@ void setup()
             &setpointTask,
             &motorsTask,
             Mixer::rotorCount,
-            Mixer::mix);
+            Mixer::mix,
+            &debugTask);
 
     const uint8_t pin = imuTask.device_getInterruptPin();
     pinMode(pin, INPUT);

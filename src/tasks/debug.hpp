@@ -31,7 +31,6 @@ class DebugTask {
         {
             if (debugTask) {
 
-#if defined(ARDUINO)
                 va_list args = {};
 
                 char buffer[256] = {};
@@ -45,7 +44,6 @@ class DebugTask {
                 }
 
                 va_end(args);
-#endif
             }
         }
 

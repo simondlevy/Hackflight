@@ -228,14 +228,17 @@ class CoreTask {
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
                     _motorsTask->stop();
+                    DebugTask::setMessage(_debugTask, "stop motors 1");
                     _safety->requestArming(false);
                 }
 
                 else if (!lost_contact && _safety->isArmed()) {
+                    DebugTask::setMessage(_debugTask, "runMotors");
                     runMotors(_motorvals);
                 } 
                 
                 else {
+                    DebugTask::setMessage(_debugTask, "stop motors 2");
                     _motorsTask->stop();
                 }
 
