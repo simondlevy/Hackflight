@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 class MotorsTask {
 
     public:
@@ -28,7 +30,7 @@ class MotorsTask {
         void stop()
         {
             if (didInit) {
-                //motors_stop();
+                device_stop();
             }
         }
 
@@ -40,9 +42,9 @@ class MotorsTask {
 
             didInit = true;
 
-            //motors_init();
+            device_init();
 
-            stop();
+            device_stop();
         }
 
         bool test(void)
@@ -68,7 +70,12 @@ class MotorsTask {
         {
             ratios[id] = ratio;
 
-            //device_setRatio(id, ratio);
+            device_setRatio(id, ratio);
         }
 
+        void device_init();
+
+        void device_setRatio(const uint32_t, const uint16_t ratio);
+
+        void device_stop();
 };
