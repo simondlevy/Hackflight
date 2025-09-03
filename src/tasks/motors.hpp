@@ -16,11 +16,26 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <task.hpp>
 
 class MotorsTask {
 
     public:
+
+        void begin(void)
+        {
+            if (didInit) {
+                return;
+            }
+
+            didInit = true;
+
+            _task.init(runMotorsTask, "motors", this, 5);
+
+            device_init();
+
+            device_stop();
+        }
 
         int getRatio(uint32_t id)
         {
@@ -32,19 +47,6 @@ class MotorsTask {
             if (didInit) {
                 device_stop();
             }
-        }
-
-        void begin(void)
-        {
-            if (didInit) {
-                return;
-            }
-
-            didInit = true;
-
-            device_init();
-
-            device_stop();
         }
 
         bool test(void)
@@ -62,9 +64,29 @@ class MotorsTask {
 
     private:
 
+        static const uint32_t FREQ_HZ = 1000;
+
+        FreeRtosTask _task;
+
         bool didInit = false;
 
         uint32_t ratios[4]; 
+
+        static void runMotorsTask(void * obj)
+        {
+            ((MotorsTask *)obj)->run();
+        }
+
+        void run(void)
+        {
+            TickType_t lastWakeTime = xTaskGetTickCount();
+
+            while (true) {
+
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
+
+            }
+        }
 
         void setRatio(uint32_t id, uint16_t ratio)
         {
