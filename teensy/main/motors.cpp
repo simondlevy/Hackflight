@@ -30,10 +30,7 @@ void MotorsTask::device_init()
 
 void MotorsTask::device_setRatio(const uint8_t id, const uint16_t ratio)
 {
-    motors.set(0, 125);
-    motors.set(1, 125);
-    motors.set(2, 125);
-    motors.set(3, 125);
+    motors.set(id, 125);
 
     motors.run();
 }

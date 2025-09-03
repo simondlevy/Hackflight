@@ -43,7 +43,9 @@ void MotorsTask::device_init()
 
 void MotorsTask::device_setRatio(const uint8_t id, const uint16_t ratio)
 {
-    motors.set(id, 125);
+    const uint8_t pulse_usec = map(ratio, 0, 65535, 125, 250);
+
+    motors.set(id, pulse_usec);
 
     motors.run();
 }

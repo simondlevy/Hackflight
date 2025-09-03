@@ -67,7 +67,7 @@ void setup()
 
     estimatorTask.begin(&safety);
 
-    setpointTask.begin(&safety, &debugTask);
+    setpointTask.begin(&safety);
 
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
@@ -75,7 +75,7 @@ void setup()
 
     imuTask.begin(&estimatorTask);
 
-    motorsTask.begin(&debugTask);
+    motorsTask.begin();
 
     coreTask.begin(
             &closedLoopControl,
@@ -85,8 +85,7 @@ void setup()
             &setpointTask,
             &motorsTask,
             Mixer::rotorCount,
-            Mixer::mix,
-            &debugTask);
+            Mixer::mix);
 
     const uint8_t pin = imuTask.device_getInterruptPin();
     pinMode(pin, INPUT);

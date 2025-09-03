@@ -216,7 +216,6 @@ class CoreTask {
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
                     _motorsTask->stop();
-                    DebugTask::setMessage(_debugTask, "stop motors 1");
                     _safety->requestArming(false);
                 }
 
@@ -229,15 +228,10 @@ class CoreTask {
                         (uint16_t)_motorvals[3]
                     };
 
-                    DebugTask::setMessage(_debugTask,
-                            "run motors: m1=%d m2=%d m3=%d m4=%d",
-                            motorsPwm[0], motorsPwm[1], motorsPwm[2], motorsPwm[3]); 
-
                     _motorsTask->setRatios(motorsPwm);
                 } 
 
                 else {
-                    DebugTask::setMessage(_debugTask, "stop motors 2");
                     _motorsTask->stop();
                 }
 
