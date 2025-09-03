@@ -1,3 +1,4 @@
+#include "STM32FreeRTOSConfig.h"
 #include <STM32FreeRTOS.h>
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
@@ -23,3 +24,14 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
     *ppxTimerTaskStackBuffer = uxTimerTaskStack;
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
+
+void vApplicationMallocFailedHook( void )
+{
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+{
+    (void)xTask;
+    (void)pcTaskName;
+}
+

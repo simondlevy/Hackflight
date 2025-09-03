@@ -14,6 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "STM32FreeRTOSConfig.h"
 #include <STM32FreeRTOS.h>
 
 #include <main.hpp>
