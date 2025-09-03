@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include <motors_api.h>
-
-class Motors {
+class MotorsTask {
 
     public:
 
@@ -30,7 +28,7 @@ class Motors {
         void stop()
         {
             if (didInit) {
-                motors_stop();
+                //motors_stop();
             }
         }
 
@@ -42,7 +40,7 @@ class Motors {
 
             didInit = true;
 
-            motors_init();
+            //motors_init();
 
             stop();
         }
@@ -70,7 +68,7 @@ class Motors {
         {
             ratios[id] = ratio;
 
-            motors_setRatio(id, ratio);
+            //device_setRatio(id, ratio);
         }
 
 };

@@ -24,6 +24,7 @@
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/logger.hpp>
+#include <tasks/motors.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
@@ -31,19 +32,18 @@
 #include <safety.hpp>
 #include <uart.hpp>
 
-static Motors motors;
-
-static Safety safety = Safety(&motors);
-
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static LoggerTask loggerTask;
+static MotorsTask motorsTask;
 static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
+
+static Safety safety = Safety(&motorsTask);
 
 static ClosedLoopControl closedLoopControl;
 
@@ -81,7 +81,7 @@ void setup()
             &estimatorTask,
             &imuTask,
             &setpointTask,
-            //&motors,
+            &motorsTask,
             Mixer::rotorCount,
             Mixer::mix);
 

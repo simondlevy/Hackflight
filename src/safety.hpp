@@ -22,16 +22,16 @@
 
 #include <clock.hpp>
 #include <datatypes.h>
-#include <motors.hpp>
 #include <tasks/debug.hpp>
+#include <tasks/motors.hpp>
 
 class Safety {
 
     public:
 
-        Safety(Motors * motors, DebugTask * debugTask=nullptr)
+        Safety(MotorsTask * motorsTask, DebugTask * debugTask=nullptr)
         {
-            _motors = motors;
+            _motorsTask = motorsTask;
 
             _debugTask = debugTask;
         }
@@ -73,7 +73,7 @@ class Safety {
 
         static constexpr float MAX_SAFE_ANGLE = 30;
 
-        Motors * _motors;
+        MotorsTask * _motorsTask;
 
         DebugTask * _debugTask;
 
@@ -97,7 +97,7 @@ class Safety {
             auto isThrustOverIdle = false;
 
             for (int i = 0; i < 4; ++i) {
-                if (_motors->getRatio(i) > 0) {
+                if (_motorsTask->getRatio(i) > 0) {
                     isThrustOverIdle = true;
                     break;
                 }
