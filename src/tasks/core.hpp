@@ -230,8 +230,8 @@ class CoreTask {
                     };
 
                     DebugTask::setMessage(_debugTask,
-                            "run motors: m1=%d",
-                            motorsPwm[0]);
+                            "run motors: m1=%d m2=%d m3=%d m4=%d",
+                            motorsPwm[0], motorsPwm[1], motorsPwm[2], motorsPwm[3]); 
 
                     _motorsTask->setRatios(motorsPwm);
                 } 
