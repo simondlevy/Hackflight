@@ -17,29 +17,19 @@
  *
  */
 
-
 #pragma once
 
 #include "FreeRTOSConfig_Default.h"
 
-#if 0
-
-#define FREERTOS_MIN_STACK_SIZE 150       
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) FREERTOS_MIN_STACK_SIZE )
-#define configSUPPORT_STATIC_ALLOCATION 1
-#endif
-
 #include <Arduino.h>
+
 #define usecTimerInit()
+
 #define FREERTOS_MCU_CLOCK_HZ   168000000
 
-#include <cfassert.h>
-
-// For FreeRTOS
 #define configGENERATE_RUN_TIME_STATS 1
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() usecTimerInit()
 #define portGET_RUN_TIME_COUNTER_VALUE() micros()
-
 
 #define configGENERATE_RUN_TIME_STATS 1
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() usecTimerInit()
@@ -112,31 +102,12 @@ to exclude the API function. */
 #define T2M(X) ((unsigned int)(X))
 #define F2T(X) ((unsigned int)((configTICK_RATE_HZ/(X))))
 
-#if configTICK_RATE_HZ_RAW != 1000
-  #error "Please review the use of M2T and T2M if there is not a 1 to 1 mapping between ticks and milliseconds"
-#endif
-
 // Seconds to OS ticks
 #define S2T(X) ((TickType_t)((X) * configTICK_RATE_HZ))
 #define T2S(X) ((X) / (float)configTICK_RATE_HZ)
-
 
 // DEBUG SECTION
 #define configUSE_APPLICATION_TASK_TAG  1
 #define configQUEUE_REGISTRY_SIZE       10
 
-#ifdef DEBUG
-#define configRECORD_STACK_HIGH_ADDRESS 1
-#endif
-
 #define configSUPPORT_STATIC_ALLOCATION 1
-
-// Queue monitoring
-#ifdef CONFIG_DEBUG_QUEUE_MONITOR
-    #undef traceQUEUE_SEND
-    #undef traceQUEUE_SEND_FAILED
-    #define traceQUEUE_SEND(xQueue) qm_traceQUEUE_SEND(xQueue)
-    void qm_traceQUEUE_SEND(void* xQueue);
-    #define traceQUEUE_SEND_FAILED(xQueue) qm_traceQUEUE_SEND_FAILED(xQueue)
-    void qm_traceQUEUE_SEND_FAILED(void* xQueue);
-#endif // CONFIG_DEBUG_QUEUE_MONITOR
