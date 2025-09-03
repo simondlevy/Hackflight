@@ -35,7 +35,7 @@ class CoreTask {
 
     public:
 
-        bool begin(
+        void begin(
                 ClosedLoopControl * closedLoopControl,
                 Safety * safety,
                 EstimatorTask * estimatorTask,
@@ -46,10 +46,6 @@ class CoreTask {
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()) {
-                return true;
-            }
-
             _closedLoopControl = closedLoopControl;
 
             _safety = safety;
@@ -68,17 +64,9 @@ class CoreTask {
 
             _rotorCount = rotorCount;
 
-            //motorsTask->begin();
+            _motorsTask->begin();
 
             _task.init(runCoreTask, "core", this, 5);
-
-            auto pass = true;
-
-            pass &= _imuTask->test();
-            pass &= _estimatorTask->didInit();
-            //pass &= motorsTask->test();
-
-            return pass;
         }
 
     private:

@@ -27,10 +27,6 @@ class OpticalFlowTask {
                 EstimatorTask * estimatorTask,
                 DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()) {
-                return;
-            }
-
             _estimatorTask = estimatorTask;
             _debugTask = debugTask;
 

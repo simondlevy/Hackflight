@@ -32,10 +32,6 @@ class SetpointTask {
 
         void begin(Safety * safety, DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()){
-                return;
-            }
-
             _safety = safety;
 
             _debugTask = debugTask;

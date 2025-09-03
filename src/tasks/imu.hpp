@@ -37,10 +37,6 @@ class ImuTask {
         // Called from main program
         void begin( EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()) {
-                return;
-            }
-
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
@@ -91,18 +87,6 @@ class ImuTask {
             if (xHigherPriorityTaskWoken) {
                 portYIELD();
             }
-        }
-
-        // Called by core task
-        bool test(void)
-        {
-            bool testStatus = true;
-
-            if (!_task.didInit()) {
-                testStatus = false;
-            }
-
-            return testStatus;
         }
 
         // Called by core task

@@ -24,12 +24,6 @@ class MotorsTask {
 
         void begin(void)
         {
-            if (didInit) {
-                return;
-            }
-
-            didInit = true;
-
             _task.init(runMotorsTask, "motors", this, 5);
 
             device_init();
@@ -44,14 +38,7 @@ class MotorsTask {
 
         void stop()
         {
-            if (didInit) {
-                device_stop();
-            }
-        }
-
-        bool test(void)
-        {
-            return didInit;
+            device_stop();
         }
 
         void setRatios(const uint16_t ratios[])
@@ -67,8 +54,6 @@ class MotorsTask {
         static const uint32_t FREQ_HZ = 1000;
 
         FreeRtosTask _task;
-
-        bool didInit = false;
 
         uint32_t ratios[4]; 
 

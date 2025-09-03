@@ -25,10 +25,6 @@ class LedTask {
 
         void begin(Safety * safety) 
         {
-            if (_task.didInit()){
-                return;
-            }
-
             _task.init(runLedTask, "led", this, 2);
 
             device_init();
