@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <msp/messages.h>
+#include <msp/__messages__.h>
 #include <msp/parser.hpp>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
-#include <uart_api.h>
+#include <uart.hpp>
 
 class SetpointTask {
 
@@ -32,10 +32,6 @@ class SetpointTask {
 
         void begin(Safety * safety, DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()){
-                return;
-            }
-
             _safety = safety;
 
             _debugTask = debugTask;
@@ -109,11 +105,11 @@ class SetpointTask {
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
                 uint8_t byte = 0;
 
-                while (uartReadByte(&byte)) {
+                while (Uart::read_byte(&byte)) {
 
                     switch (parser.parse(byte)) {
 

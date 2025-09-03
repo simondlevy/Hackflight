@@ -17,22 +17,23 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <FreeRTOS.h>
-#include <semphr.h>
 #include <task.h>
 
 #include <clock.hpp>
-#include <motors.hpp>
+#include <datatypes.h>
+#include <tasks/debug.hpp>
+#include <tasks/motors.hpp>
 
 class Safety {
 
     public:
 
-        Safety(Motors * motors)
+        Safety(MotorsTask * motorsTask, DebugTask * debugTask=nullptr)
         {
-            _motors = motors;
+            _motorsTask = motorsTask;
+
+            _debugTask = debugTask;
         }
 
         bool isFlying() 
@@ -68,11 +69,13 @@ class Safety {
 
         static const Clock::rate_t CLOCK_RATE = Clock::RATE_25_HZ;
 
-        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = M2T(2000);
+        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
 
         static constexpr float MAX_SAFE_ANGLE = 30;
 
-        Motors * _motors;
+        MotorsTask * _motorsTask;
+
+        DebugTask * _debugTask;
 
         bool _is_flying;
 
@@ -94,7 +97,7 @@ class Safety {
             auto isThrustOverIdle = false;
 
             for (int i = 0; i < 4; ++i) {
-                if (_motors->getRatio(i) > 0) {
+                if (_motorsTask->getRatio(i) > 0) {
                     isThrustOverIdle = true;
                     break;
                 }

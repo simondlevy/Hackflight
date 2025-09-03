@@ -17,9 +17,9 @@
 #pragma once
 
 #include <linalg.h>
+
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
-#include <zranger_api.h>
 
 class ZRangerTask {
 
@@ -27,11 +27,7 @@ class ZRangerTask {
 
         void begin(EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()){
-                return;
-            }
-
-            if (!zranger_deviceInit()) {
+            if (!device_init()) {
                 DebugTask::setMessage(_debugTask,
                         "ZRangetTask: Failed to initialize zranger");
             }
@@ -79,9 +75,11 @@ class ZRangerTask {
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                float range = zranger_deviceRead();
+                float range = device_read();
+
+                DebugTask::setMessage(_debugTask, "range=%d", (int)range);
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers
@@ -103,4 +101,8 @@ class ZRangerTask {
                 }
             }
         }
+
+        bool device_init();
+
+        float device_read();
 };

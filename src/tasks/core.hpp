@@ -20,7 +20,6 @@
 #include <__control__.hpp>
 #include <kalman.hpp>
 #include <datatypes.h>
-#include <motors.hpp>
 #include <num.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -29,27 +28,24 @@
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/setpoint.hpp>
+#include <tasks/motors.hpp>
 #include <vehicles/diyquad.hpp>
 
 class CoreTask {
 
     public:
 
-        bool begin(
+        void begin(
                 ClosedLoopControl * closedLoopControl,
                 Safety * safety,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
-                Motors * motors,
+                MotorsTask * motorsTask,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()) {
-                return true;
-            }
-
             _closedLoopControl = closedLoopControl;
 
             _safety = safety;
@@ -60,7 +56,7 @@ class CoreTask {
 
             _setpointTask = setpointTask;
 
-            _motors = motors;
+            _motorsTask = motorsTask;
 
             _debugTask = debugTask;
 
@@ -68,17 +64,7 @@ class CoreTask {
 
             _rotorCount = rotorCount;
 
-            motors->begin();
-
             _task.init(runCoreTask, "core", this, 5);
-
-            auto pass = true;
-
-            pass &= _imuTask->test();
-            pass &= _estimatorTask->didInit();
-            pass &= motors->test();
-
-            return pass;
         }
 
     private:
@@ -137,7 +123,7 @@ class CoreTask {
 
         SetpointTask * _setpointTask;
 
-        Motors * _motors;
+        MotorsTask * _motorsTask;
 
         EstimatorTask * _estimatorTask;
 
@@ -148,18 +134,6 @@ class CoreTask {
         Safety * _safety;
 
         mixFun_t _mixFun;
-
-        void runMotors(const float motorvals[4]) 
-        {
-            const uint16_t motorsPwm[4]  = {
-                (uint16_t)motorvals[0],
-                (uint16_t)motorvals[1],
-                (uint16_t)motorvals[2],
-                (uint16_t)motorvals[3]
-            };
-
-            _motors->setRatios(motorsPwm);
-        }
 
         static void runCoreTask(void* obj)
         {
@@ -173,16 +147,14 @@ class CoreTask {
 
         void run(void)
         {
-            vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
-
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->imuIsCalibrated()) {
-                vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
+                vTaskDelayUntil(&lastWakeTime, 1000/Clock::RATE_MAIN_LOOP);
             }
 
             static RateSupervisor rateSupervisor;
-            rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
+            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
 
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
@@ -243,16 +215,24 @@ class CoreTask {
                         timestamp - setpoint_timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
-                    _motors->stop();
+                    _motorsTask->stop();
                     _safety->requestArming(false);
                 }
 
                 else if (!lost_contact && _safety->isArmed()) {
-                    runMotors(_motorvals);
-                } 
                 
+                    const uint16_t motorsPwm[4]  = {
+                        (uint16_t)_motorvals[0],
+                        (uint16_t)_motorvals[1],
+                        (uint16_t)_motorvals[2],
+                        (uint16_t)_motorvals[3]
+                    };
+
+                    _motorsTask->setRatios(motorsPwm);
+                } 
+
                 else {
-                    _motors->stop();
+                    _motorsTask->stop();
                 }
 
                 if (!rateSupervisor.validate(timestamp)) {

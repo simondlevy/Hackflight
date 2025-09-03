@@ -18,6 +18,7 @@
 
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
+
 #include <safety.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
@@ -52,10 +53,6 @@ class EstimatorTask {
             _kalmanFilter.init(msec());
         }
 
-        bool didInit(void)
-        {
-            return _kalmanFilter.didInit();
-        }
 
         void getVehicleState(vehicleState_t * state)
         {
@@ -180,7 +177,11 @@ class EstimatorTask {
 
         static uint32_t msec(void)
         {
+#if defined(ARDUINO)
+            return millis();
+#else
             return T2M(xTaskGetTickCount());
+#endif
         }
 
         uint32_t step(const uint32_t nowMs, uint32_t nextPredictionMs) 
