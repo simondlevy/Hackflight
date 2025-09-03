@@ -135,18 +135,6 @@ class CoreTask {
 
         mixFun_t _mixFun;
 
-        void runMotors(const float motorvals[4]) 
-        {
-            const uint16_t motorsPwm[4]  = {
-                (uint16_t)motorvals[0],
-                (uint16_t)motorvals[1],
-                (uint16_t)motorvals[2],
-                (uint16_t)motorvals[3]
-            };
-
-            _motorsTask->setRatios(motorsPwm);
-        }
-
         static void runCoreTask(void* obj)
         {
             ((CoreTask *)obj)->run();
@@ -233,10 +221,21 @@ class CoreTask {
                 }
 
                 else if (!lost_contact && _safety->isArmed()) {
-                    DebugTask::setMessage(_debugTask, "runMotors");
-                    runMotors(_motorvals);
-                } 
                 
+                    const uint16_t motorsPwm[4]  = {
+                        (uint16_t)_motorvals[0],
+                        (uint16_t)_motorvals[1],
+                        (uint16_t)_motorvals[2],
+                        (uint16_t)_motorvals[3]
+                    };
+
+                    DebugTask::setMessage(_debugTask,
+                            "run motors: m1=%d",
+                            motorsPwm[0]);
+
+                    _motorsTask->setRatios(motorsPwm);
+                } 
+
                 else {
                     DebugTask::setMessage(_debugTask, "stop motors 2");
                     _motorsTask->stop();
