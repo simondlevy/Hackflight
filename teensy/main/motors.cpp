@@ -14,17 +14,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Arduino.h>
+#include <oneshot125.hpp>
+
 #include <tasks/motors.hpp>
+
+static const std::vector<uint8_t> PINS = {2, 23, 14, 9};
+
+static auto motors = OneShot125(PINS);
 
 void MotorsTask::device_init()
 {
+    motors.arm();
 }
 
 void MotorsTask::device_setRatio(const uint32_t, const uint16_t ratio)
 {
+    motors.set(0, 125);
+    motors.set(1, 125);
+    motors.set(2, 125);
+    motors.set(3, 125);
+
+    motors.run();
 }
 
 void MotorsTask::device_stop()
 {
+    motors.set(0, 125);
+    motors.set(1, 125);
+    motors.set(2, 125);
+    motors.set(3, 125);
+
+    motors.run();
 }
 
