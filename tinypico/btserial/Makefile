@@ -1,4 +1,4 @@
-SKETCH = tinypico
+SKETCH = btserial
 
 ifeq ($(OS),Windows_NT)
 PORT = COM3
