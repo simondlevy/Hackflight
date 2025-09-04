@@ -1,3 +1,3 @@
-SKETCH = btserial
+SKETCH = rtos
 
 include ../makefile.include
