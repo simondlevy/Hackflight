@@ -1,7 +1,4 @@
-SKETCH = bmi088-i2c
-
-#FQBN = teensy:avr:teensy40
-FQBN = esp32:esp32:um_tinypico
+SKETCH = esp32-rtos
 
 ifeq ($(OS),Windows_NT)
 PORT = COM3
@@ -13,16 +10,15 @@ TERM = miniterm.py
 PYTHON = python3
 endif
 
-build: $(SKETCH).ino
-	arduino-cli compile \
-	--libraries $(HOME)/Documents/Arduino/libraries --libraries ../.. \
-	--fqbn $(FQBN) $(SKETCH).ino
+FQBN = esp32:esp32:um_tinypico
+
+build: $(SKETCH).ino 
+	arduino-cli compile --libraries $(HOME)/Documents/Arduino/libraries \
+		--fqbn $(FQBN) $(SKETCH).ino
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
-edit:
-	vim $(SKETCH).ino
-
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
+

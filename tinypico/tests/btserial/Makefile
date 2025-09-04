@@ -1,3 +1,0 @@
-SKETCH = btserial
-
-include ../makefile.include
