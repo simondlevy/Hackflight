@@ -1,3 +1,5 @@
+SKETCH = bmi088-spi
+
 BIN = build/$(SKETCH).ino.bin
 
 all: $(BIN)
