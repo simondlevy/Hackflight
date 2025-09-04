@@ -8,7 +8,7 @@
 
 * https://github.com/stm32duino/STM32FreeRTOS
 * https://github.com/pololu/vl53l1x-arduino
-* https://github.com/bolderflight/bmi088-arduino
+* https://github.com/simondlevy/bmi088-arduino
 * https://github.com/simondlevy/Arduino_CMSIS-DSP
 * https://github.com/simondlevy/PMW3901
 * https://github.com/simondlevy/OneShot125
