@@ -2,7 +2,7 @@
 
 #include <BMI088.h>
 
-static const uint8_t GYRO_INTERRUPT_PIN = 6;
+static const uint8_t GYRO_INTERRUPT_PIN = 32;
 
 static const uint8_t ACCEL_ADDRESS = 0x19;
 static const uint8_t GYRO_ADDRESS = 0x69;
@@ -56,15 +56,14 @@ void loop()
 
         gyro.readSensor();
 
-        printf("%+05d\n", accel.getAccelX_raw());
+        //printf("%+05d\n", accel.getAccelX_raw());
 
-        /*
         printf("ax=%+3.3f ay=%+3.3f az=%+3.3f m/s^2 | gx=%+3.3f gy=%+3.3f gz=%+3.3f rad/sec\n", 
                 accel.getAccelX_mss(),
                 accel.getAccelY_mss(),
                 accel.getAccelZ_mss(),
                 gyro.getGyroX_rads(),
                 gyro.getGyroY_rads(),
-                gyro.getGyroZ_rads());*/
+                gyro.getGyroZ_rads());
     }
 }
