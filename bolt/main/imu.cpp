@@ -47,7 +47,7 @@ bool ImuTask::device_init()
     gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ);
     gyro.setRange(Bmi088Gyro::RANGE_2000DPS);
 
-    gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL, Bmi088Gyro::ACTIVE_HIGH);
+    gyro.pinModeInt3(Bmi088Gyro::PIN_MODE_PUSH_PULL, Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
 
     accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ);

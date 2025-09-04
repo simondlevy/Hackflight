@@ -39,7 +39,7 @@ void setup()
     check(gyro.begin(), "Gyro Initialization Error");
 
     gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
-    gyro.pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH);
+    gyro.pinModeInt3(Bmi088Gyro::PIN_MODE_PUSH_PULL,Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH);
     gyro.mapDrdyInt3(true);
 
     pinMode(GYRO_INTERRUPT_PIN, INPUT);
