@@ -5,7 +5,7 @@ PORT = COM3
 TERM = plink -serial
 PYTHON = python
 else
-PORT = /dev/ttyACM0
+PORT = /dev/ttyACM1
 TERM = miniterm.py
 PYTHON = python3
 endif
