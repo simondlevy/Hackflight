@@ -1,6 +1,8 @@
 #include <BluetoothSerial.h>
 #include <TinyPICO.h>
 
+static const uint8_t LED_SIGNAL_PIN = 22;
+
 static TinyPICO tp = TinyPICO(); 
 
 static BluetoothSerial serialBt;
@@ -17,10 +19,13 @@ void setup()
     Serial.begin(115200);
 
     setLed(false);
+
+    pinMode(LED_SIGNAL_PIN, INPUT);
 }
 
 void loop() 
 {
+    /*
     if (serialBt.available()) {
 
         const uint8_t cmd = serialBt.read();
@@ -34,5 +39,7 @@ void loop()
             Serial.println("on");
             setLed(true);
         }
-    }
+    }*/
+
+    setLed(digitalRead(LED_SIGNAL_PIN));
 }
