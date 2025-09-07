@@ -34,7 +34,8 @@ except Exception as e:
 
 
 BLUETOOTH_ADDRESSES = {
-        'bolt': '64:B7:08:93:71:1E'
+    'bolt': '64:B7:08:93:71:1E',
+    'teensy': '64:B7:08:86:F2:AE'
 }
 
 BLUETOOTH_PORT = 1
@@ -149,7 +150,7 @@ def main():
             formatter_class=ArgumentDefaultsHelpFormatter)
 
     argparser.add_argument('-b', '--bluetooth-server',
-                           choices=['bolt'],
+                           choices=['bolt', 'teensy'],
                            default='bolt', help='Bluetooth server')
 
     argparser.add_argument('-l', '--log-state', action='store_true',
