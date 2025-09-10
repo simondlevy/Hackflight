@@ -34,6 +34,8 @@ bool ImuTask::device_init()
     Wire.begin();
     Wire.setClock(400000);
 
+    delay(100);
+
     if (accel.begin() < 0) {
         return false;
     }

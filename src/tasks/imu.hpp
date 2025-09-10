@@ -328,6 +328,8 @@ class ImuTask {
         bool processGyroBias(const uint32_t tickCount,
                 const Axis3i16 gyroRaw, Axis3f *gyroBiasOut)
         {
+            DebugTask::setMessage(_debugTask, "tickCount=%u", tickCount);
+
             _gyroBiasRunning.bufHead->x = gyroRaw.x;
             _gyroBiasRunning.bufHead->y = gyroRaw.y;
             _gyroBiasRunning.bufHead->z = gyroRaw.z;
@@ -371,9 +373,6 @@ class ImuTask {
                     device_readRaw(
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
-
-                    DebugTask::setMessage(_debugTask, "gx=%d gy=d gz=%d",
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z);
 
                     // Convert accel to Gs
                     Axis3f accel = {};
