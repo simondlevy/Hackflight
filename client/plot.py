@@ -50,11 +50,11 @@ class TelemetryPlotter(RealtimePlotter):
         RANGE = -60,+60
 
         angle_range = -ANGLE_MAX, ANGLE_MAX
+        angle_ticks = -ANGLE_MAX, 0, ANGLE_MAX
 
         RealtimePlotter.__init__(self, [angle_range, angle_range], 
                 window_name=name,
-                yticks = [angle_range, angle_range],
-                styles = ['b-', 'b-'],
+                yticks = [angle_ticks, angle_ticks],
                 ylabels = ['$\phi$', '$\\theta$'])
 
         self.phi = 0
