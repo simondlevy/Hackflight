@@ -23,6 +23,8 @@ import sys
 from threading import Thread
 from time import sleep
 
+from realtime_plot import RealtimePlotter
+
 try:
     from __msp__ import Parser as MspParser
 except Exception as e:
@@ -39,12 +41,33 @@ BLUETOOTH_PORT = 1
 
 UPDATE_RATE_HZ = 100
 
+
+class SerialPlotter(RealtimePlotter):
+
+    def __init__(self):
+
+        RANGE = (-1,+1)
+
+        RealtimePlotter.__init__(self, [RANGE], 
+                window_name='Serial input',
+                yticks = [RANGE],
+                styles = ['b-'])
+
+        self.xcurr = 0
+        self.ycurr = 0
+
+    def getValues(self):
+
+         return (self.ycurr,)
+
+
 class LoggingParser(MspParser):
 
-    def __init__(self, client):
+    def __init__(self, client, plotter):
 
         MspParser.__init__(self)
         self.client = client
+        self.plotter = plotter
         self.running = True
         self.spike_viz_client = None
 
@@ -130,21 +153,13 @@ def main():
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
-    logging = [True]
+    plotter = SerialPlotter()
 
-    parser = LoggingParser(client)
+    parser = LoggingParser(client, plotter)
     thread = Thread(target=logging_threadfun, args=(parser, ))
     thread.daemon = True
     thread.start()
 
-    while logging[0]:
-
-        try:
-
-            sleep(1 / UPDATE_RATE_HZ)
-
-        except KeyboardInterrupt:
-            logging[0] = False
-
+    plotter.start()
 
 main()
