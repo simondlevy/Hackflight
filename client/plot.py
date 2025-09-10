@@ -40,8 +40,8 @@ BLUETOOTH_ADDRESSES = {
 
 BLUETOOTH_PORT = 1
 
-
 ANGLE_MAX = 60
+PSI_MAX = 180
 
 class TelemetryPlotter(RealtimePlotter):
 
@@ -52,17 +52,23 @@ class TelemetryPlotter(RealtimePlotter):
         angle_range = -ANGLE_MAX, ANGLE_MAX
         angle_ticks = -ANGLE_MAX, 0, ANGLE_MAX
 
-        RealtimePlotter.__init__(self, [angle_range, angle_range], 
+        psi_range = -PSI_MAX, PSI_MAX
+        psi_ticks = -PSI_MAX, 0, PSI_MAX
+
+        RealtimePlotter.__init__(
+                self,
+                [angle_range, angle_range, psi_range], 
                 window_name=name,
-                yticks = [angle_ticks, angle_ticks],
-                ylabels = ['$\phi$', '$\\theta$'])
+                yticks = [angle_ticks, angle_ticks, psi_ticks],
+                ylabels = ['$\phi$', '$\\theta$', '$\psi$'])
 
         self.phi = 0
         self.theta = 0
+        self.psi = 0
 
     def getValues(self):
 
-         return self.phi, self.theta
+         return self.phi, self.theta, self.psi
 
 
 class LoggingParser(MspParser):
@@ -79,6 +85,7 @@ class LoggingParser(MspParser):
 
         self.plotter.phi = phi
         self.plotter.theta = theta
+        self.plotter.psi = psi
 
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
