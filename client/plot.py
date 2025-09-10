@@ -57,12 +57,11 @@ class TelemetryPlotter(RealtimePlotter):
                 styles = ['b-'],
                 ylabels = ['$\phi$'])
 
-        self.xcurr = 0
-        self.ycurr = 0
+        self.phi = 0
 
     def getValues(self):
 
-         return (self.ycurr,)
+         return (self.phi,)
 
 
 class LoggingParser(MspParser):
@@ -77,7 +76,7 @@ class LoggingParser(MspParser):
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        self.plotter.ycurr = phi
+        self.plotter.phi = phi
 
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
