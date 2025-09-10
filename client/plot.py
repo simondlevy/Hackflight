@@ -22,7 +22,6 @@ import socket
 import sys
 from threading import Thread
 from time import sleep
-import matplotlib.pyplot as plt
 import matplotlib
 
 from realtime_plot import RealtimePlotter
@@ -61,10 +60,10 @@ class TelemetryPlotter(RealtimePlotter):
 
         RealtimePlotter.__init__(
                 self,
-                [z_range, angle_range, angle_range, psi_range], 
+                [z_range, angle_range, angle_range, psi_range],
                 window_name=name,
-                yticks = [z_ticks, angle_ticks, angle_ticks, psi_ticks],
-                ylabels = ['$z$', '$\phi$', '$\\theta$', '$\psi$'])
+                yticks=[z_ticks, angle_ticks, angle_ticks, psi_ticks],
+                ylabels=['$z$', '$\\phi$', '$\\theta$', '$\\psi$'])
 
         self.z = 0
         self.phi = 0
@@ -73,7 +72,7 @@ class TelemetryPlotter(RealtimePlotter):
 
     def getValues(self):
 
-         return self.z, self.phi, self.theta, self.psi
+        return self.z, self.phi, self.theta, self.psi
 
 
 class LoggingParser(MspParser):
@@ -105,7 +104,7 @@ class LoggingParser(MspParser):
             try:
                 self.spike_viz_client.send(msg.encode())
 
-            except Exception as e:
+            except Exception:
                 pass
 
 
@@ -166,9 +165,9 @@ def main():
 
     args = argparser.parse_args()
 
-    font = {'family' : 'normal',
-        'weight' : 'bold',
-        'size'   : 18}
+    font = {'family': 'normal',
+            'weight': 'bold',
+            'size': 18}
 
     matplotlib.rc('font', **font)
 
@@ -184,5 +183,6 @@ def main():
     thread.start()
 
     plotter.start()
+
 
 main()
