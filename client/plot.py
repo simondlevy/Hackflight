@@ -42,12 +42,15 @@ BLUETOOTH_PORT = 1
 
 ANGLE_MAX = 60
 PSI_MAX = 180
+Z_MAX = 1
+
 
 class TelemetryPlotter(RealtimePlotter):
 
     def __init__(self, name):
 
-        RANGE = -60,+60
+        z_range = 0, Z_MAX
+        z_ticks = 0, 0.5, Z_MAX
 
         angle_range = -ANGLE_MAX, ANGLE_MAX
         angle_ticks = -ANGLE_MAX, 0, ANGLE_MAX
@@ -57,18 +60,19 @@ class TelemetryPlotter(RealtimePlotter):
 
         RealtimePlotter.__init__(
                 self,
-                [angle_range, angle_range, psi_range], 
+                [z_range, angle_range, angle_range, psi_range], 
                 window_name=name,
-                yticks = [angle_ticks, angle_ticks, psi_ticks],
-                ylabels = ['$\phi$', '$\\theta$', '$\psi$'])
+                yticks = [z_ticks, angle_ticks, angle_ticks, psi_ticks],
+                ylabels = ['$z$', '$\phi$', '$\\theta$', '$\psi$'])
 
+        self.z = 0
         self.phi = 0
         self.theta = 0
         self.psi = 0
 
     def getValues(self):
 
-         return self.phi, self.theta, self.psi
+         return self.z, self.phi, self.theta, self.psi
 
 
 class LoggingParser(MspParser):
@@ -83,6 +87,7 @@ class LoggingParser(MspParser):
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
+        self.plotter.z = z
         self.plotter.phi = phi
         self.plotter.theta = theta
         self.plotter.psi = psi
