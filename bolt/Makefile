@@ -21,7 +21,7 @@ all : $(BIN)
 $(BIN): $(SKETCH).ino vapplication.c *.cpp *.h
 	arduino-cli compile --libraries \
 		$(HOME)/Documents/Arduino/libraries --libraries $(ROOT)/.. \
-		--fqbn $(FQBN) $(SKETCH).ino
+		--build-path ./build --fqbn $(FQBN) $(SKETCH).ino
 
 standard_config:
 	cp $(ROOT)/src/control/standard.hpp $(ROOT)/src/__control__.hpp
