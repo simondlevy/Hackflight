@@ -1,11 +1,11 @@
-SKETCH = tinypico
+SKETCH = btserver
 
 ifeq ($(OS),Windows_NT)
 PORT = COM3
 TERM = plink -serial
 PYTHON = python
 else
-PORT = /dev/ttyACM1
+PORT = /dev/ttyACM0
 TERM = miniterm.py
 PYTHON = python3
 endif
