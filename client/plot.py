@@ -22,6 +22,7 @@ import socket
 import sys
 from threading import Thread
 from time import sleep
+import matplotlib.pyplot as plt
 
 from realtime_plot import RealtimePlotter
 
@@ -53,7 +54,8 @@ class TelemetryPlotter(RealtimePlotter):
         RealtimePlotter.__init__(self, [angle_range], 
                 window_name=name,
                 yticks = [angle_range],
-                styles = ['b-'])
+                styles = ['b-'],
+                ylabels = ['$\phi$'])
 
         self.xcurr = 0
         self.ycurr = 0
@@ -149,6 +151,8 @@ def main():
                            default='bolt', help='Bluetooth server')
 
     args = argparser.parse_args()
+
+    plt.rcParams['text.usetex'] = True  # Enable LaTeX
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
