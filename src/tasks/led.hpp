@@ -59,13 +59,18 @@ class LedTask {
                     device_set(true);
                 }
                 else {
-                    device_set(true);
-                    vTaskDelay(PULSE_MSEC);
-                    device_set(false);
-                    vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
+                    blink(HEARTBEAT_HZ, lastWakeTime);
                 }
 
             }
+        }
+
+        void blink(const float rate, TickType_t & lastWakeTime)
+        {
+            device_set(true);
+            vTaskDelay(PULSE_MSEC);
+            device_set(false);
+            vTaskDelayUntil(&lastWakeTime, 1000/rate);
         }
 
         void device_init();
