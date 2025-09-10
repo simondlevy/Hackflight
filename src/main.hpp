@@ -71,9 +71,9 @@ void setup()
 
     loggerTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&safety);
-
     imuTask.begin(&estimatorTask);
+
+    ledTask.begin(&safety, &imuTask);
 
     motorsTask.begin();
 

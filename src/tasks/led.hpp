@@ -17,13 +17,13 @@
 #pragma once
 
 #include "safety.hpp"
-#include "task.hpp"
+#include "tasks/imu.hpp"
 
 class LedTask {
 
     public:
 
-        void begin(Safety * safety) 
+        void begin(Safety * safety, ImuTask * imuTask) 
         {
             _task.init(runLedTask, "led", this, 2);
 
@@ -32,17 +32,21 @@ class LedTask {
             device_set(false);
 
             _safety = safety;
+
+            _imuTask = imuTask;
         }
 
     private:
 
         static constexpr float HEARTBEAT_HZ = 1;
-
+        static constexpr float CALIBRATING_HZ = 4;
         static constexpr uint32_t PULSE_MSEC = 50;
 
         FreeRtosTask _task;
 
         Safety * _safety;
+
+        ImuTask * _imuTask;
 
         static void runLedTask(void * obj)
         {
@@ -57,6 +61,9 @@ class LedTask {
 
                 if (_safety->isArmed()) { 
                     device_set(true);
+                }
+                else if (!_imuTask->imuIsCalibrated()) {
+                    blink(CALIBRATING_HZ, lastWakeTime);
                 }
                 else {
                     blink(HEARTBEAT_HZ, lastWakeTime);
