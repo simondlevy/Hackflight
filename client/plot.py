@@ -23,6 +23,7 @@ import sys
 from threading import Thread
 from time import sleep
 import matplotlib.pyplot as plt
+import matplotlib
 
 from realtime_plot import RealtimePlotter
 
@@ -165,7 +166,13 @@ def main():
 
     args = argparser.parse_args()
 
-    plt.rcParams['text.usetex'] = True  # Enable LaTeX
+    font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 18}
+
+    matplotlib.rc('font', **font)
+
+    matplotlib.pyplot.rcParams['text.usetex'] = True  # Enable LaTeX
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
