@@ -60,10 +60,13 @@ class TelemetryPlotter(RealtimePlotter):
 
         RealtimePlotter.__init__(
                 self,
-                [dxy_range, dxy_range, z_range, angle_range, angle_range, psi_range],
+                [dxy_range, dxy_range, z_range,
+                 angle_range, angle_range, psi_range],
                 window_name=name,
-                yticks=[dxy_ticks, dxy_ticks, z_ticks, angle_ticks, angle_ticks, psi_ticks],
-                ylabels=['$dx$','$dy$', '$z$', '$\\phi$', '$\\theta$', '$\\psi$'])
+                yticks=[dxy_ticks, dxy_ticks, z_ticks,
+                        angle_ticks, angle_ticks, psi_ticks],
+                ylabels=['$dx$', '$dy$', '$z$',
+                         '$\\phi$', '$\\theta$', '$\\psi$'])
 
         self.dx = 0
         self.dy = 0
