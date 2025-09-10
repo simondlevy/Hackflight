@@ -51,17 +51,18 @@ class TelemetryPlotter(RealtimePlotter):
 
         angle_range = -ANGLE_MAX, ANGLE_MAX
 
-        RealtimePlotter.__init__(self, [angle_range], 
+        RealtimePlotter.__init__(self, [angle_range, angle_range], 
                 window_name=name,
-                yticks = [angle_range],
-                styles = ['b-'],
-                ylabels = ['$\phi$'])
+                yticks = [angle_range, angle_range],
+                styles = ['b-', 'b-'],
+                ylabels = ['$\phi$', '$\theta$'])
 
         self.phi = 0
+        self.theta = 0
 
     def getValues(self):
 
-         return (self.phi,)
+         return self.phi, self.theta
 
 
 class LoggingParser(MspParser):
@@ -77,6 +78,7 @@ class LoggingParser(MspParser):
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         self.plotter.phi = phi
+        self.plotter.theta = theta
 
     def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
                       n12, n13, n14, n15):
