@@ -39,8 +39,8 @@ BLUETOOTH_ADDRESSES = {
 
 BLUETOOTH_PORT = 1
 
-UPDATE_RATE_HZ = 100
 
+ANGLE_MAX = 60
 
 class TelemetryPlotter(RealtimePlotter):
 
@@ -48,9 +48,11 @@ class TelemetryPlotter(RealtimePlotter):
 
         RANGE = -60,+60
 
-        RealtimePlotter.__init__(self, [RANGE], 
+        angle_range = -ANGLE_MAX, ANGLE_MAX
+
+        RealtimePlotter.__init__(self, [angle_range], 
                 window_name=name,
-                yticks = [RANGE],
+                yticks = [angle_range],
                 styles = ['b-'])
 
         self.xcurr = 0
@@ -72,13 +74,6 @@ class LoggingParser(MspParser):
         self.spike_viz_client = None
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
-
-        '''
-        print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-               'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-               'psi=%+5.1f dpsi=%+5.1f') %
-              (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
-        '''
 
         self.plotter.ycurr = phi
 
