@@ -55,7 +55,7 @@ class TelemetryPlotter(RealtimePlotter):
                 window_name=name,
                 yticks = [angle_range, angle_range],
                 styles = ['b-', 'b-'],
-                ylabels = ['$\phi$', '$\theta$'])
+                ylabels = ['$\phi$', '$\\theta$'])
 
         self.phi = 0
         self.theta = 0
