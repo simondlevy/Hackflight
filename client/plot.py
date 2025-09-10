@@ -42,14 +42,14 @@ BLUETOOTH_PORT = 1
 UPDATE_RATE_HZ = 100
 
 
-class SerialPlotter(RealtimePlotter):
+class TelemetryPlotter(RealtimePlotter):
 
-    def __init__(self):
+    def __init__(self, name):
 
         RANGE = -60,+60
 
         RealtimePlotter.__init__(self, [RANGE], 
-                window_name='Serial input',
+                window_name=name,
                 yticks = [RANGE],
                 styles = ['b-'])
 
@@ -157,7 +157,7 @@ def main():
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
-    plotter = SerialPlotter()
+    plotter = TelemetryPlotter(args.bluetooth_server)
 
     parser = LoggingParser(client, plotter)
     thread = Thread(target=logging_threadfun, args=(parser, ))
