@@ -1,16 +1,19 @@
-static const uint8_t LED_PIN = PC13; // XXX
+static HardwareSerial uart = HardwareSerial(PA3, PA2);
 
 void setup() 
 {
-    pinMode(LED_PIN, OUTPUT);
-
     Serial.begin(115200);
+
+    uart.begin(115200);
 }
 
 void loop() 
 {
-    digitalWrite(LED_PIN, HIGH);  
-    delay(1000);                     
-    digitalWrite(LED_PIN, LOW); 
-    delay(1000);
+    static uint8_t c;
+
+    uart.write('A' + c);
+
+    c = (c + 1) % 26;
+
+    delay(50);
 }
