@@ -1,3 +1,3 @@
-SKETCH = blink
+SKETCH = imu
 
 include ../makefile.include

@@ -1,3 +1,3 @@
-SKETCH = mpu6500
+SKETCH = uart
 
 include ../makefile.include
