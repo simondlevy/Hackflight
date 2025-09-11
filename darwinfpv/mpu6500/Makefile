@@ -1,3 +1,3 @@
-SKETCH = mpu6000
+SKETCH = mpu6500
 
 include ../makefile.include
