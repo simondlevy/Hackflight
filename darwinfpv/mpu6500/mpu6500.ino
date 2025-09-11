@@ -62,7 +62,13 @@ void loop(void)
 
         imu.readSensor();
 
-        Serial.print("gx=");
+        Serial.print("ax=");
+        Serial.print(imu.getRawAccelX());
+        Serial.print("  ay=");
+        Serial.print(imu.getRawAccelY());
+        Serial.print("  az=");
+        Serial.print(imu.getRawAccelZ());
+        Serial.print(" gx=");
         Serial.print(imu.getRawGyroX());
         Serial.print("  gy=");
         Serial.print(imu.getRawGyroY());
@@ -73,4 +79,3 @@ void loop(void)
         gotInterrupt = false;
     }
 }
-
