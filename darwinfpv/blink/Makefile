@@ -1,3 +1,3 @@
-SKETCH = btserver
+SKETCH = blink
 
 include ../makefile.include
