@@ -15,9 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <debug_api.h>
+#include <tasks/debug.hpp>
 
-void debugWrite(const char * msg)
+void DebugTask::device_write(const char * msg)
 {
     (void)msg;
 }

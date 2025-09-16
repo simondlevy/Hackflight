@@ -23,7 +23,7 @@
 #include <hal/time.h>
 #include <hal/usb.h>
 
-#include <imu_api.h>
+#include <tasks/imu.hpp>
 
 #include <bosch/bmi088.h>
 #include <bosch/bstdr_types.h>
@@ -79,7 +79,9 @@ static void sensorsBmi088_SPI_deviceInit(struct bmi088_dev *device)
 
 static struct bmi088_dev bmi088Dev;
 
-bool imu_deviceInit(void)
+//////////////////////////////////////////////////////////////////////////////
+
+bool ImuTask::device_init(void)
 {
     bmi088Dev.accel_id = BMI088_ACCEL_I2C_ADDR_PRIMARY;
     bmi088Dev.delay_ms = delay;
@@ -168,7 +170,7 @@ bool imu_deviceInit(void)
     return success;
 }
 
-void imu_deviceReadRaw(
+void ImuTask::device_readRaw(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {

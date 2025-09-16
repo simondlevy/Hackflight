@@ -97,10 +97,11 @@ class OpticalFlowTask {
                     flowData.stdDevX = FLOW_STD_FIXED;
                     flowData.stdDevY = FLOW_STD_FIXED;
                     flowData.dt = (float)(micros()-lastTime)/1000000.0f;
-                    // we do want to update dt every measurement and not only in the
-                    // ones with detected motion, as we work with instantaneous gyro
-                    // and velocity values in the update function
-                    // (meaning assuming the current measurements over all of dt)
+                    // we do want to update dt every measurement and not only
+                    // in the ones with detected motion, as we work with
+                    // instantaneous gyro and velocity values in the update
+                    // function (meaning assuming the current measurements over
+                    // all of dt)
                     lastTime = micros();
 
                     // Use raw measurements
@@ -110,7 +111,8 @@ class OpticalFlowTask {
                     // Push measurements into the estimator if flow is not disabled
                     //    and the PMW flow sensor indicates motion detection
                     if (!USE_FLOW_DISABLED && gotMotion) {
-                        _estimatorTask->enqueueFlow(&flowData, xPortIsInsideInterrupt());
+                        _estimatorTask->enqueueFlow(
+                                &flowData, xPortIsInsideInterrupt());
                     }
                 }
             }        

@@ -20,7 +20,6 @@
 #include <tasks/estimator.hpp>
 
 #include <datatypes.h>
-#include <imu_api.h>
 #include <lpf.hpp>
 #include <m_pi.h>
 #include <num.hpp>
@@ -60,7 +59,7 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            imu_deviceInit();
+            device_init();
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -381,7 +380,7 @@ class ImuTask {
                     Axis3i16 gyroRaw = {};
                     Axis3i16 accelRaw = {};
 
-                    imu_deviceReadRaw(
+                    device_readRaw(
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
 
@@ -437,4 +436,10 @@ class ImuTask {
         {
             return (float)raw * 2 * 24 / 65536.f;
         }
+
+        bool device_init();
+
+        void device_readRaw(
+                int16_t & gx, int16_t & gy, int16_t & gz, 
+                int16_t & ax, int16_t & ay, int16_t & az);
 };
