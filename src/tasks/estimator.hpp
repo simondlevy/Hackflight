@@ -52,11 +52,6 @@ class EstimatorTask {
             _kalmanFilter.init(msec());
         }
 
-        bool didInit(void)
-        {
-            return _kalmanFilter.didInit();
-        }
-
         void getVehicleState(vehicleState_t * state)
         {
             // This function is called from the stabilizer loop. It is

@@ -89,7 +89,7 @@ static void systemTask(void *arg)
 
     imuTask.begin(&estimatorTask);
 
-    auto coreTaskReady = coreTask.begin(
+    coreTask.begin(
             &closedLoopControl,
             &safety,
             &estimatorTask,
@@ -98,10 +98,6 @@ static void systemTask(void *arg)
             &motors,
             Mixer::rotorCount,
             Mixer::mix);
-
-    if (!coreTaskReady) {
-        pass = false;
-    }
 
     if (pass) {
         selftestPassed = true;

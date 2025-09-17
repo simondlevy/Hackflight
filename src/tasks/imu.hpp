@@ -92,18 +92,6 @@ class ImuTask {
         }
 
         // Called by core task
-        bool test(void)
-        {
-            bool testStatus = true;
-
-            if (!_task.didInit()) {
-                testStatus = false;
-            }
-
-            return testStatus;
-        }
-
-        // Called by core task
         bool imuIsCalibrated() {
             return gyroBiasFound;
         }

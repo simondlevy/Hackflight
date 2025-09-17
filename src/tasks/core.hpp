@@ -35,7 +35,7 @@ class CoreTask {
 
     public:
 
-        bool begin(
+        void begin(
                 ClosedLoopControl * closedLoopControl,
                 Safety * safety,
                 EstimatorTask * estimatorTask,
@@ -47,7 +47,7 @@ class CoreTask {
 				DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
-                return true;
+                return;
             }
 
             _closedLoopControl = closedLoopControl;
@@ -71,14 +71,6 @@ class CoreTask {
             motors->begin();
 
             _task.init(runCoreTask, "core", this, 5);
-
-            auto pass = true;
-
-            pass &= _imuTask->test();
-            pass &= _estimatorTask->didInit();
-            pass &= motors->test();
-
-            return pass;
         }
 
     private:

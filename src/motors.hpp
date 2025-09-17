@@ -27,28 +27,15 @@ class Motors {
 
         void stop()
         {
-            if (didInit) {
-                const uint16_t ratios[4] = {0, 0, 0, 0};
-                setRatios(ratios);
-            }
+            const uint16_t ratios[4] = {0, 0, 0, 0};
+            setRatios(ratios);
         }
 
         void begin(void)
         {
-            if (didInit) {
-                return;
-            }
-
-            didInit = true;
-
             device_init();
 
             stop();
-        }
-
-        bool test(void)
-        {
-            return didInit;
         }
 
         void setRatios(const uint16_t ratios[])
@@ -60,8 +47,6 @@ class Motors {
         }
 
     private:
-
-        bool didInit = false;
 
         uint32_t ratios[4]; 
 

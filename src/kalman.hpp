@@ -165,16 +165,6 @@ class KalmanFilter {
 
         } kalmanCoreData_t;
 
-        bool didInit(void)
-        {
-            return _didInit;
-        }
-
-        const char * getName(void)
-        {
-            return "Kalman";
-        }
-
         void setDefaultParams(void)
         {
             // Initial variances, uncertain of position, but know we're
