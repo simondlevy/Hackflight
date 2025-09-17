@@ -1,5 +1,6 @@
 /**
- * Copyright (C) 2025 Simon D. Levy
+ *
+ * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Arduino.h>
 
-#include <stdbool.h>
+#include <motors.hpp>
 
+void Motors::device_setRatio(uint32_t id, uint16_t ratio)
+{
+}
+
+void Motors::device_init()
+{
+}

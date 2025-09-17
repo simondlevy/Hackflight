@@ -1,4 +1,5 @@
 /**
+ *
  * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,7 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <tasks/debug.hpp>
 
-#include <stdbool.h>
+void DebugTask::device_write(const char * msg)
+{
+    (void)msg;
+}
+
 

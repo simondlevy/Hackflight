@@ -25,7 +25,7 @@ static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
 
 static VL53L1 _vl53l1;
 
-bool zranger_deviceInit()
+bool ZRangerTask::device_init()
 {
     static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
 
@@ -40,7 +40,7 @@ bool zranger_deviceInit()
 }
 
 
-float zranger_deviceRead()
+float ZRangerTask::device_read()
 {
     return _vl53l1.readDistance();
 }
