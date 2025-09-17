@@ -6,15 +6,11 @@ FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 BIN = build/$(SKETCH).ino.bin
 
-ROOT = $(HOME)/Desktop/hackflight
-
-SRC = $(ROOT)/src
-
 all : $(BIN)
 
-$(BIN): $(SKETCH).ino $(EXTRA_SRC)
+$(BIN): $(SKETCH).ino
 	arduino-cli compile --libraries \
-		$(HOME)/Documents/Arduino/libraries --libraries $(ROOT)/../.. \
+		$(HOME)/Documents/Arduino/libraries --libraries ../.. \
 		--build-path ./build --fqbn $(FQBN) $(SKETCH).ino
 
 flash: $(BIN)
