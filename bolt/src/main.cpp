@@ -59,20 +59,8 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
-static bool selftestPassed;
-
-static bool didInit;
-
 static void systemTask(void *arg)
 {
-    if (didInit) {
-        return;
-    }
-
-    bool pass = true;
-
-    didInit = true;
-
 	debugTask.begin();
     
     zrangerTask.begin(&estimatorTask);
@@ -99,33 +87,8 @@ static void systemTask(void *arg)
             Mixer::rotorCount,
             Mixer::mix);
 
-    if (pass) {
-        selftestPassed = true;
-    }
-
-    else {
-
-        selftestPassed = false;
-
-        if (didInit) {
-
-            while (true) {
-
-                //vTaskDelay(M2T(2000));
-                delay(2000);
-
-                if (selftestPassed)
-                {
-                    break;
-                }
-            }
-        }
-    }
-
-    // Should never reach this point!
     while (true) {
-        //vTaskDelay(portMAX_DELAY);
-        delay(portMAX_DELAY);
+        vTaskDelay(portMAX_DELAY);
     }
 }
 
