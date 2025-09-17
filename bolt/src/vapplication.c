@@ -19,8 +19,6 @@
 #include <free_rtos/semphr.h>
 #include <free_rtos/task.h>
 
-#include <motors_api.h>
-
 static void fail(const char * msg)
 {
     portDISABLE_INTERRUPTS();

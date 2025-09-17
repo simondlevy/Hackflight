@@ -427,15 +427,9 @@ class ImuTask {
             }
         }
 
-        static float gyroRaw2Dps(const int16_t raw)
-        {
-            return (float)raw * 2 * 2000 / 65536.f;
-        }
+        static float gyroRaw2Dps(const int16_t raw);
 
-        static float accelRaw2Gs(const int16_t raw)
-        {
-            return (float)raw * 2 * 24 / 65536.f;
-        }
+        static float accelRaw2Gs(const int16_t raw);
 
         bool device_init();
 

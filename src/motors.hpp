@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <motors_api.h>
-
 class Motors {
 
     public:
@@ -30,7 +28,8 @@ class Motors {
         void stop()
         {
             if (didInit) {
-                motors_stop();
+                const uint16_t ratios[4] = {0, 0, 0, 0};
+                setRatios(ratios);
             }
         }
 
@@ -42,7 +41,7 @@ class Motors {
 
             didInit = true;
 
-            motors_init();
+            device_init();
 
             stop();
         }
@@ -70,7 +69,10 @@ class Motors {
         {
             ratios[id] = ratio;
 
-            motors_setRatio(id, ratio);
+            device_setRatio(id, ratio);
         }
 
+        void device_init();
+
+        void device_setRatio(uint32_t id, uint16_t ratio);
 };

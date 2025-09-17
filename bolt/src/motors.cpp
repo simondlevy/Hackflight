@@ -28,7 +28,7 @@
 #include <stm32fxxx.h>
 
 #include <time.h>
-#include <motors_api.h>
+#include <motors.hpp>
 
 typedef struct {
 
@@ -233,7 +233,7 @@ static uint16_t motorsBLConv16ToBits(uint16_t bits)
 }
 
 // Ithrust is thrust mapped for 65536 <==> 60 grams
-void motors_setRatio(uint32_t id, uint16_t ratio)
+void Motors::device_setRatio(uint32_t id, uint16_t ratio)
 {
     motorMap[id]->setCompare(motorMap[id]->tim, motorsBLConv16ToBits(ratio));
 
@@ -246,7 +246,7 @@ void motors_setRatio(uint32_t id, uint16_t ratio)
     }
 }
 
-void motors_init()
+void Motors::device_init()
 {
     //Init structures
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -309,12 +309,4 @@ void motors_init()
     for (int i = 0; i < 4; i++) {
         TIM_Cmd(motorMap[i]->tim, ENABLE);
     }
-}
-
-void motors_stop()
-{
-    motors_setRatio(0, 0);
-    motors_setRatio(1, 0);
-    motors_setRatio(2, 0);
-    motors_setRatio(3, 0);
 }
