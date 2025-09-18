@@ -79,9 +79,9 @@ class LedTask {
                 }
                 else {
                     set(true);
-                    vTaskDelay(M2T(PULSE_MSEC));
+                    vTaskDelay(PULSE_MSEC);
                     set(false);
-                    vTaskDelayUntil(&lastWakeTime, M2T(1000/HEARTBEAT_HZ));
+                    vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
                 }
 
             }

@@ -6,6 +6,7 @@
 #include <safety.hpp>
 
 #include <tasks/debug.hpp>
+#include <tasks/led.hpp>
 
 const uint8_t LED_PIN = PC0;
 
@@ -13,9 +14,11 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
-static xSemaphoreHandle sem;
-
 static DebugTask debugTask;
+static LedTask ledTask;
+
+/*
+static xSemaphoreHandle sem;
 
 static void Thread1(void* arg) 
 {
@@ -46,7 +49,7 @@ static void Thread2(void* arg)
 
         vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
     }
-}
+}*/
 
 void setup() 
 {
@@ -54,8 +57,11 @@ void setup()
 
     debugTask.begin();
 
+    ledTask.begin(&safety, LED_PIN, true);
+
     DebugTask::setMessage(&debugTask, "okay");
 
+    /*
     sem = xSemaphoreCreateCounting(1, 0);
 
     portBASE_TYPE s1 =
@@ -69,7 +75,7 @@ void setup()
             Serial.println("Problem creating tasks");
             delay(500);
         }
-    }
+    }*/
 
     vTaskStartScheduler();
 }
