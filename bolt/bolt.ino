@@ -1,4 +1,3 @@
-#include <SPI.h>
 #include <Wire.h>
 
 #include <STM32FreeRTOS.h>
@@ -14,7 +13,12 @@
 #include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
 
-const uint8_t LED_PIN = PC0;
+static const uint8_t LED_PIN = PC0;
+
+static const uint8_t FLOW_MISO_PIN = PA6;
+static const uint8_t FLOW_MOSI_PIN = PA7;
+static const uint8_t FLOW_SCLK_PIN = PA5;
+static const uint8_t FLOW_CS_PIN = PB4;
 
 static Motors motors;
 
@@ -23,15 +27,22 @@ static Safety safety = Safety(&motors);
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
+static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
 {
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask, &debugTask);
+    zrangerTask.begin(&estimatorTask);
 
-    // opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
+    opticalFlowTask.begin(
+            &estimatorTask,
+            FLOW_MISO_PIN,
+            FLOW_MOSI_PIN,
+            FLOW_SCLK_PIN,
+            FLOW_CS_PIN,
+            &debugTask);
 
     estimatorTask.begin(&safety);
 

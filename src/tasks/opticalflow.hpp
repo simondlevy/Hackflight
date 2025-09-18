@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <SPI.h>
+
 #include <pmw3901.hpp>
 
 #include <tasks/debug.hpp>
@@ -27,6 +29,9 @@ class OpticalFlowTask {
 
         void begin(
                 EstimatorTask * estimatorTask,
+                const uint8_t miso_pin,
+                const uint8_t mosi_pin,
+                const uint8_t sclk_pin,
                 const uint8_t cs_pin,
                 DebugTask * debugTask=nullptr)
         {
@@ -35,9 +40,16 @@ class OpticalFlowTask {
             }
 
             _estimatorTask = estimatorTask;
+
             _debugTask = debugTask;
 
-            if (_pmw3901.begin(cs_pin)) {
+            _spi.setMISO(miso_pin);
+            _spi.setMOSI(mosi_pin);
+            _spi.setSCLK(sclk_pin);
+
+            _spi.begin();
+
+            if (_pmw3901.begin(cs_pin, _spi)) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
@@ -64,6 +76,8 @@ class OpticalFlowTask {
 
         FreeRtosTask _task;
 
+        SPIClass _spi;
+
         PMW3901 _pmw3901;
 
         EstimatorTask * _estimatorTask;
@@ -83,6 +97,10 @@ class OpticalFlowTask {
                 bool gotMotion = false;
 
                 _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+
+                DebugTask::setMessage(_debugTask,
+                        "flowx=%d flowy=%d flowgood=%d",
+                        deltaX, deltaY, gotMotion);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)

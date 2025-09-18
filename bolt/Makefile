@@ -12,7 +12,8 @@ $(BIN): $(SKETCH).ino  *.cpp *.h ../src/*.hpp ../src/tasks/*.hpp
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \
-		--build-path ./build --fqbn $(FQBN) $(SKETCH).ino
+		--build-path ./build \
+		--fqbn $(FQBN) $(SKETCH).ino
 
 flash: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin
