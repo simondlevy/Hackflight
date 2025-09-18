@@ -17,6 +17,8 @@
 
 #include <tasks/zranger.hpp>
 
+#include <VL53L1X.h>
+
 bool ZRangerTask::device_init()
 {
     /*
