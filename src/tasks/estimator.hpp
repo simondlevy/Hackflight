@@ -18,6 +18,9 @@
 
 #include <Arduino.h>
 
+#include <STM32FreeRTOS.h>
+#include <semphr.h>
+
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -145,7 +148,7 @@ class EstimatorTask {
         static const auto QUEUE_ITEM_SIZE = sizeof(KalmanFilter::measurement_t);
         uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
         StaticQueue_t _measurementsQueueBuffer;
-        QueueHandle_t _measurementsQueue;
+        xQueueHandle _measurementsQueue;
 
         FreeRtosTask _task;
 
@@ -155,12 +158,12 @@ class EstimatorTask {
 
         // Mutex to protect data that is shared between the task and
         // functions called by the stabilizer loop
-        SemaphoreHandle_t _dataMutex;
+        xSemaphoreHandle _dataMutex;
         StaticSemaphore_t _dataMutexBuffer;
 
         // Semaphore to signal that we got data from the stabilizer loop to
         // process
-        SemaphoreHandle_t _runTaskSemaphore;
+        xSemaphoreHandle _runTaskSemaphore;
 
         uint32_t _warningBlockTimeMs;
 

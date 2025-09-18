@@ -8,6 +8,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/led.hpp>
+#include <tasks/zranger.hpp>
 
 const uint8_t LED_PIN = PC0;
 
@@ -18,16 +19,15 @@ static Safety safety = Safety(&motors);
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static LedTask ledTask;
+static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
 {
 	debugTask.begin();
 
-    /*
     zrangerTask.begin(&estimatorTask);
 
-    opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
-    */
+    // opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
 
     estimatorTask.begin(&safety);
 
