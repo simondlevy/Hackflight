@@ -25,8 +25,7 @@
  * 1 tab == 4 spaces!
  */
 
-#ifndef FREERTOS_CONFIG_DEFAULT_H
-#define FREERTOS_CONFIG_DEFAULT_H
+#pragma once
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -39,6 +38,8 @@
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
+
+#define configUSE_CMSIS_RTOS_V2 1
 
 /* Begin custom definitions for STM32 */
 /* Define memory allocation implementations to use:
@@ -231,6 +232,4 @@ header file. */
  * which is calling xPortSysTickHandler(), defined in respective CortexM-x port
  */
 /* #define xPortSysTickHandler SysTick_Handler */
-
-#endif /* FREERTOS_CONFIG_DEFAULT_H */
 

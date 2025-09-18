@@ -70,7 +70,7 @@ class DebugTask {
                     device_write(_msg);
                 }
 
-                vTaskDelay(M2T(1000/REPORT_FREQ));
+                vTaskDelay(1000/REPORT_FREQ);
             }
         }
 

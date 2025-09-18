@@ -1,8 +1,11 @@
 #include <STM32FreeRTOS.h>
+#include <semphr.h>
 
 #include <hackflight.h>
 #include <motors.hpp>
 #include <safety.hpp>
+
+#include <tasks/debug.hpp>
 
 const uint8_t LED_PIN = PC0;
 
@@ -10,7 +13,7 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
-static SemaphoreHandle_t sem;
+static xSemaphoreHandle sem;
 
 static void Thread1(void* arg) 
 {
