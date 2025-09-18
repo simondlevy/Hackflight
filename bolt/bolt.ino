@@ -2,53 +2,57 @@
 
 const uint8_t LED_PIN = PC0;
 
-SemaphoreHandle_t sem;
+static SemaphoreHandle_t sem;
 
-static void Thread1(void* arg) {
-  UNUSED(arg);
-  while (1) {
+static void Thread1(void* arg) 
+{
+    (void)arg;
 
-    // Wait for signal from thread 2.
-    xSemaphoreTake(sem, portMAX_DELAY);
+    while (true) {
 
-    // Turn LED off.
-    digitalWrite(LED_PIN, LOW);
-  }
+        // Wait for signal from thread 2.
+        xSemaphoreTake(sem, portMAX_DELAY);
+
+        digitalWrite(LED_PIN, LOW);
+    }
 }
 
-static void Thread2(void* arg) {
-  UNUSED(arg);
-  pinMode(LED_PIN, OUTPUT);
+static void Thread2(void* arg) 
+{
+    (void)arg;
 
-  while (1) {
-    // Turn LED on.
-    digitalWrite(LED_PIN, HIGH);
+    pinMode(LED_PIN, OUTPUT);
 
-    vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+    while (true) {
 
-    xSemaphoreGive(sem);
+        digitalWrite(LED_PIN, HIGH);
 
-    vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
-  }
+        vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+
+        xSemaphoreGive(sem);
+
+        vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+    }
 }
 
-void setup() {
-  portBASE_TYPE s1, s2;
+void setup() 
+{
+    Serial.begin(115200);
 
-  Serial.begin(9600);
+    sem = xSemaphoreCreateCounting(1, 0);
 
-  sem = xSemaphoreCreateCounting(1, 0);
+    portBASE_TYPE s1 = xTaskCreate(Thread1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
-  s1 = xTaskCreate(Thread1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+    portBASE_TYPE s2 = xTaskCreate(Thread2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
-  s2 = xTaskCreate(Thread2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    if (sem== NULL || s1 != pdPASS || s2 != pdPASS ) {
+        while (true) {
+            Serial.println("Problem creating tasks");
+            delay(500);
+        }
+    }
 
-  if (sem== NULL || s1 != pdPASS || s2 != pdPASS ) {
-    Serial.println(F("Creation problem"));
-    while(1);
-  }
-
-  vTaskStartScheduler();
+    vTaskStartScheduler();
 }
 
 void loop() 
