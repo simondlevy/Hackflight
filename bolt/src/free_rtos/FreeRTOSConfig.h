@@ -53,14 +53,8 @@
 
 #pragma once
 
-#if defined(ARDUINO)
-#include <Arduino.h>
-#define usecTimerInit()
-#define FREERTOS_MCU_CLOCK_HZ   600000000
-#else
 #include <hal/time.h>
 #define FREERTOS_MCU_CLOCK_HZ   168000000
-#endif
 
 
 #include <cfassert.h>

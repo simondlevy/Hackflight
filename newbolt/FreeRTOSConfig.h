@@ -53,6 +53,8 @@
 
 #pragma once
 
+foooooooooooooooooooooooo
+
 #if defined(ARDUINO)
 #include <Arduino.h>
 #define usecTimerInit()

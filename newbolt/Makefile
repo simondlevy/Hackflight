@@ -6,13 +6,12 @@ FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 BIN = build/$(SKETCH).ino.bin
 
-HFDIR = $(PWD)/..
-
 all : $(BIN)
 
-$(BIN): $(SKETCH).ino *.cpp 
-	arduino-cli compile --libraries \
-		$(HOME)/Documents/Arduino/libraries --libraries ../.. \
+$(BIN): $(SKETCH).ino 
+	arduino-cli compile \
+		--libraries $(HOME)/Documents/Arduino/libraries \
+		--libraries ../.. \
 		--build-path ./build --fqbn $(FQBN) $(SKETCH).ino
 
 flash: $(BIN)
@@ -23,9 +22,5 @@ clean:
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
-
-standard_config:
-	cp $(HFDIR)/src/control/standard.hpp $(HFDIR)/src/__control__.hpp
-	cd $(HFDIR)/msppg; make install; cd ..
 
 
