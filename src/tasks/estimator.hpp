@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <Arduino.h>
+
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -49,7 +51,7 @@ class EstimatorTask {
 
             _task.init(runEstimatorTask, "estimator", this, 4);
 
-            _kalmanFilter.init(msec());
+            _kalmanFilter.init(millis());
         }
 
         void getVehicleState(vehicleState_t * state)
@@ -173,11 +175,6 @@ class EstimatorTask {
         // stabilizer when needed.
         vehicleState_t _state;
 
-        static uint32_t msec(void)
-        {
-            return T2M(xTaskGetTickCount());
-        }
-
         uint32_t step(const uint32_t nowMs, uint32_t nextPredictionMs) 
         {
             xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
@@ -236,7 +233,7 @@ class EstimatorTask {
 
         void run(void)
         {
-            auto nextPredictionMs = msec();
+            auto nextPredictionMs = millis();
 
             _rateSupervisor.init(
                     nextPredictionMs, 
@@ -248,7 +245,7 @@ class EstimatorTask {
             while (true) {
 
                 // would be nice if this had a precision higher than 1ms...
-                nextPredictionMs = step(msec(), nextPredictionMs);
+                nextPredictionMs = step(millis(), nextPredictionMs);
             }
         }
 
