@@ -69,6 +69,8 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, LED_PIN, true);
 
+    DebugTask::setMessage(&debugTask, "okay");
+
     /*
     imuTask.begin(&estimatorTask);
 
@@ -91,13 +93,6 @@ static void systemTask(void *arg)
 void setup() 
 {
     Serial.begin(115200);
-
-    /*
-    debugTask.begin();
-
-    ledTask.begin(&safety, LED_PIN, true);
-
-    DebugTask::setMessage(&debugTask, "okay");*/
 
     /*
     sem = xSemaphoreCreateCounting(1, 0);
