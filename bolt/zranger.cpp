@@ -19,15 +19,21 @@
 
 #include <VL53L1X.h>
 
+static VL53L1X vl53l1x;
+
 bool ZRangerTask::device_init()
 {
-    /*
-    _vl53l1.init(&deckBus, VL53L1_DEFAULT_ADDRESS);
+    Wire.begin();
+    Wire.setClock(400000);
+    delay(100);
 
-    _vl53l1.begin();
+    if (!vl53l1x.init()) {
+        return false;
+    }
 
-    _vl53l1.setDistanceMode(VL53L1::DISTANCE_MODE_MEDIUM);
-    _vl53l1.setTimingBudgetMsec(25);*/
+    vl53l1x.setDistanceMode(VL53L1X::Medium);
+    vl53l1x.setMeasurementTimingBudget(25000);
+    vl53l1x.startContinuous(50);
 
     return true;
 }
@@ -35,5 +41,5 @@ bool ZRangerTask::device_init()
 
 float ZRangerTask::device_read()
 {
-    return 0;
+    return vl53l1x.read();
 }

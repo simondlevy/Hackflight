@@ -25,7 +25,7 @@ static void systemTask(void *arg)
 {
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask);
+    zrangerTask.begin(&estimatorTask, &debugTask);
 
     // opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
 
@@ -38,8 +38,6 @@ static void systemTask(void *arg)
     */
 
     ledTask.begin(&safety, LED_PIN, true);
-
-    DebugTask::setMessage(&debugTask, "okay");
 
     /*
     imuTask.begin(&estimatorTask);
