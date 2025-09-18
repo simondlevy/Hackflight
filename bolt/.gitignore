@@ -1,4 +1,1 @@
-src/Kbuild
-__system__.cpp
-bolt.*
-copilot*
+build/

@@ -1,137 +1,26 @@
-PYTHON            ?= python3
+PORT = /dev/ttyACM0
 
-DFU_UTIL          ?= dfu-util
+SKETCH = bolt
 
-HFDIR = $(PWD)/..
+FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
-HASKDIR = $(HFDIR)/haskell
+BIN = build/$(SKETCH).ino.bin
 
-include ../snn_path.makefile
+all : $(BIN)
 
-ARCH_CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -g3
-ARCH_CFLAGS += -fno-math-errno -DARM_MATH_CM4 -D__FPU_PRESENT=1 -mfp16-format=ieee
-ARCH_CFLAGS += -Wno-array-bounds -Wno-stringop-overread
-ARCH_CFLAGS += -Wno-stringop-overflow
-ARCH_CFLAGS += -DSTM32F4XX -DSTM32F40_41xxx -DHSE_VALUE=8000000 -DUSE_STDPERIPH_DRIVER
+$(BIN): $(SKETCH).ino  *.h
+	arduino-cli compile \
+		--libraries $(HOME)/Documents/Arduino/libraries \
+		--libraries ../.. \
+		--build-path ./build --fqbn $(FQBN) $(SKETCH).ino
 
-VENDOR = ./vendor
-
-PROCESSOR = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
-
-LINKER_DIR = $(srctree)/tools/make/F405/linker
-
-LDFLAGS += --specs=nosys.specs --specs=nano.specs $(PROCESSOR) -nostdlib
-image_LDFLAGS += -Wl,-Map=bolt.map,--cref,--gc-sections,--undefined=uxTopUsedPriority
-image_LDFLAGS += -L$(srctree)/tools/make/F405/linker
-image_LDFLAGS += -T $(LINKER_DIR)/FLASH_CLOAD.ld
-
-CMSIS = $(VENDOR)/STMicroelectronics/tools/CMSIS/5.9.0/CMSIS
-
-ARDUINO_LIBS = $(HOME)/Documents/Arduino/libraries
-
-INCLUDES += -I$(ARDUINO_LIBS)
-
-INCLUDES += -I$(ARDUINO_LIBS)/PMW3901/src/
-INCLUDES += -I$(ARDUINO_LIBS)/VL53L1/src/
-INCLUDES += -I$(ARDUINO_LIBS)/Arduino_CMSIS-DSP/src/
-
-VL53L1 = $(ARDUINO_LIBS)/VL53L1/src
-
-INCLUDES += -I$(VL53L1)/st
-
-INCLUDES += -I$(srctree)/src/stm32f4
-
-INCLUDES += -I$(srctree)/src/free_rtos
-
-INCLUDES += -I$(srctree)/src/hal
-
-INCLUDES += -I$(CMSIS)/DSP/Include
-INCLUDES += -I$(CMSIS)/Core/Include
-
-INCLUDES += -I$(srctree)/src/stm32f4/STM32F4xx_StdPeriph_Driver/inc
-INCLUDES += -I$(srctree)/src/stm32f4/STM32_USB_Device_Library/Core/inc
-INCLUDES += -I$(srctree)/src/stm32f4/STM32_USB_OTG_Driver/inc
-
-INCLUDES += -I$(srctree)/src
-
-INCLUDES += -I$(KBUILD_OUTPUT)/include/generated
-
-INCLUDES += -I$(EMBDIR)/src
-
-objs-y += src
-objs-y += $(VENDOR)
-objs-y += $(VL53L1)
-
-objs-y += $(OOT)
-
-MEM_SIZE_FLASH_K = 1008
-MEM_SIZE_RAM_K = 128
-MEM_SIZE_CCM_K = 64
-
-KBUILD_OUTPUT ?= build
-
--include $(KBUILD_OUTPUT)/include/config/auto.conf
-
-PROG ?= bolt
-
-ifeq ($(CONFIG_DEBUG),y)
-ARCH_CFLAGS	+= -O0 -Wconversion
-else
-ARCH_CFLAGS += -Os -Werror
-endif
-
-_all:
-
-all: $(PROG).hex $(PROG).bin
-	@$(PYTHON) $(srctree)/tools/make/versionTemplate.py --crazyflie-base $(srctree) --print-version
-	@$(PYTHON) $(srctree)/tools/make/size.py $(SIZE) $(PROG).elf $(MEM_SIZE_FLASH_K) $(MEM_SIZE_RAM_K) $(MEM_SIZE_CCM_K)
-
-	for f in $$(ls $(PROG).*); do \
-		ln -sf $(KBUILD_OUTPUT)/$$f $(srctree)/$$(basename $$f); \
-	done
-
-include tools/make/targets.mk
-
-flash:
-	$(DFU_UTIL) -d 0483:df11 -a 0 -s 0x08004000:leave -D $(PROG).bin
-
-unbrick:
-	$(DFU_UTIL) -d 0483:5740 -a 0 -s 0x08000000:leave -D $(PWD)/cf2loader-1.0.bin
-
-# Give control over to Kbuild
--include tools/kbuild/Makefile.kbuild
-
-
-# Closed- loop control from C++ classes
-standard_config:
-	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
-	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	cp $(HFDIR)/src/control/standard.hpp $(HFDIR)/src/__control__.hpp
-	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
-	cd $(HFDIR)/msppg; make install; cd ..
-
-# Closed- loop control from TeNNLab spiking neural network
-snn_config:
-	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
-	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	$(EMBDIR)/compiler.py $(EMBDIR)/examples/difference/difference.txt -o $(PWD)/src
-	cp $(HFDIR)/src/control/snn.hpp $(HFDIR)/src/__control__.hpp
-	cp $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild
-	cd $(HFDIR)/msppg; make install; cd ..
-
-# Closed- loop control from NASA Copilot
-haskell_config:
-	ln -sf $(HOME)/.arduino15/packages/STMicroelectronics/ vendor
-	ln -sf $(ARDUINO_LIBS)/vl53l1x-arduino vendor
-	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
-	mv copilot_core.c $(HFDIR)/bolt/src/copilot_core.cpp
-	mv copilot*.h $(HFDIR)/bolt/src/
-	cp $(HFDIR)/src/control/haskell.hpp $(HFDIR)/src/__control__.hpp
-	cat $(HFDIR)/bolt/src/Kbuild.standard $(HFDIR)/bolt/src/Kbuild.haskell > $(HFDIR)/bolt/src/Kbuild
-	cd $(HFDIR)/msppg; make install; cd ..
+flash: $(BIN)
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin
 
 clean:
-	rm -rf build/*.bin build/*.elf build/*.hex build/*.map build/include/ bolt.* \
-		src/copilot* build/.firmware.cmd build/Makefile build/scripts build/vendor \
-	 	src/Kbuild build/src build/source $(PROG).bin *.elf  *.hex *.map *.dfu copilot* \
-		src/*.hpp
+	rm -rf build
+
+listen:
+	miniterm.py $(PORT) 115200 --exit-char 3
+
+
