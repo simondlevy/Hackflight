@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <VL53L1X.h>
+
 #include <linalg.h>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -30,7 +32,12 @@ class ZRangerTask {
                 return;
             }
 
-            if (!device_init()) {
+            if (_vl53l1x.init()) {
+                _vl53l1x.setDistanceMode(VL53L1X::Medium);
+                _vl53l1x.setMeasurementTimingBudget(25000);
+                _vl53l1x.startContinuous(50);
+            }
+            else {
                 DebugTask::setMessage(_debugTask,
                         "ZRangetTask: Failed to initialize zranger");
             }
@@ -62,6 +69,8 @@ class ZRangerTask {
             ((ZRangerTask *)obj)->run();
         }
 
+        VL53L1X _vl53l1x;
+
         FreeRtosTask _task;
 
         float _expCoeff;
@@ -80,7 +89,7 @@ class ZRangerTask {
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                float range = device_read();
+                float range = _vl53l1x.read();
 
                 DebugTask::setMessage(_debugTask, "z=%d", (int)range);
 
