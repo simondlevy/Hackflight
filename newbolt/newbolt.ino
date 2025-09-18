@@ -15,6 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SPI.h>
+
 #include <hackflight.h>
 #include <mixers/crazyflie.hpp>
 #include <motors.hpp>
@@ -28,6 +30,10 @@
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
+
+static const uint8_t LED_PIN = PC0;
+static const uint8_t OPTICALFLOW_CS_PIN = PB4;
+
 
 static CoreTask coreTask;
 static DebugTask debugTask;
@@ -45,8 +51,56 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
+static void systemTask(void *arg)
+{
+	debugTask.begin();
+    
+    zrangerTask.begin(&estimatorTask);
+
+    opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
+
+    estimatorTask.begin(&safety);
+
+    setpointTask.begin(&safety);
+
+    loggerTask.begin(&estimatorTask, &closedLoopControl);
+
+    ledTask.begin(&safety, LED_PIN, true);
+
+    imuTask.begin(&estimatorTask);
+
+    coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            &motors,
+            Mixer::rotorCount,
+            Mixer::mix);
+
+    while (true) {
+        vTaskDelay(portMAX_DELAY);
+    }
+}
+
+// ---------------------------------------------------------------------------
+
 void setup()
 {
+    Serial.begin(115200);
+
+    SPI.begin();
+
+    xTaskCreate(
+            systemTask, 
+            "SYSTEM",
+            2* configMINIMAL_STACK_SIZE, 
+            NULL, 
+            2, 
+            NULL);
+
+    vTaskStartScheduler();
 }
 
 void loop()

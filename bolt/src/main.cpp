@@ -135,9 +135,6 @@ int main()
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
 
-    while(true) {
-    }
-
     return 0;
 }
 
