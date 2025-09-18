@@ -15,6 +15,8 @@ static Safety safety = Safety(&motors);
 
 static xSemaphoreHandle sem;
 
+static DebugTask debugTask;
+
 static void Thread1(void* arg) 
 {
     (void)arg;
@@ -50,11 +52,17 @@ void setup()
 {
     Serial.begin(115200);
 
+    debugTask.begin();
+
+    DebugTask::setMessage(&debugTask, "okay");
+
     sem = xSemaphoreCreateCounting(1, 0);
 
-    portBASE_TYPE s1 = xTaskCreate(Thread1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+    portBASE_TYPE s1 =
+        xTaskCreate(Thread1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
-    portBASE_TYPE s2 = xTaskCreate(Thread2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    portBASE_TYPE s2 =
+        xTaskCreate(Thread2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
     if (sem== NULL || s1 != pdPASS || s2 != pdPASS ) {
         while (true) {
