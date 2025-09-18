@@ -8,7 +8,7 @@ BIN = build/$(SKETCH).ino.bin
 
 all : $(BIN)
 
-$(BIN): $(SKETCH).ino  *.h
+$(BIN): $(SKETCH).ino  *.h ../src/*.hpp
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \

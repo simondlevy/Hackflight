@@ -1,5 +1,8 @@
 #include <STM32FreeRTOS.h>
 
+#include <hackflight.h>
+#include <safety.hpp>
+
 const uint8_t LED_PIN = PC0;
 
 static SemaphoreHandle_t sem;
