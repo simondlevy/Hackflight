@@ -1,3 +1,6 @@
+#include <SPI.h>
+#include <Wire.h>
+
 #include <STM32FreeRTOS.h>
 #include <semphr.h>
 
@@ -8,6 +11,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/led.hpp>
+#include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
 
 const uint8_t LED_PIN = PC0;
@@ -61,6 +65,10 @@ static void systemTask(void *arg)
 void setup() 
 {
     Serial.begin(115200);
+
+    Wire.begin();
+    Wire.setClock(400000);
+    delay(100);
 
     xTaskCreate(
             systemTask, 
