@@ -1,9 +1,14 @@
 #include <STM32FreeRTOS.h>
 
 #include <hackflight.h>
+#include <motors.hpp>
 #include <safety.hpp>
 
 const uint8_t LED_PIN = PC0;
+
+static Motors motors;
+
+static Safety safety = Safety(&motors);
 
 static SemaphoreHandle_t sem;
 
