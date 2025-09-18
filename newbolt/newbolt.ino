@@ -1,34 +1,56 @@
-/**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-// ---------------------------------------------------------------------------
-
 #include <STM32FreeRTOS.h>
 
-#include <hackflight.h>
+const uint8_t LED_PIN = PC0;
 
-#include <tasks/debug.hpp>
+SemaphoreHandle_t sem;
 
-void setup()
-{
-    Serial.begin(115200);
+static void Thread1(void* arg) {
+  UNUSED(arg);
+  while (1) {
 
+    // Wait for signal from thread 2.
+    xSemaphoreTake(sem, portMAX_DELAY);
+
+    // Turn LED off.
+    digitalWrite(LED_PIN, LOW);
+  }
 }
 
-void loop()
+static void Thread2(void* arg) {
+  UNUSED(arg);
+  pinMode(LED_PIN, OUTPUT);
+
+  while (1) {
+    // Turn LED on.
+    digitalWrite(LED_PIN, HIGH);
+
+    vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+
+    xSemaphoreGive(sem);
+
+    vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+  }
+}
+
+void setup() {
+  portBASE_TYPE s1, s2;
+
+  Serial.begin(9600);
+
+  sem = xSemaphoreCreateCounting(1, 0);
+
+  s1 = xTaskCreate(Thread1, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+
+  s2 = xTaskCreate(Thread2, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+
+  if (sem== NULL || s1 != pdPASS || s2 != pdPASS ) {
+    Serial.println(F("Creation problem"));
+    while(1);
+  }
+
+  vTaskStartScheduler();
+}
+
+void loop() 
 {
 }
