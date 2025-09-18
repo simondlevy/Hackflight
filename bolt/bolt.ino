@@ -51,15 +51,53 @@ static void Thread2(void* arg)
     }
 }*/
 
+static void systemTask(void *arg)
+{
+	debugTask.begin();
+
+    /*
+    zrangerTask.begin(&estimatorTask);
+
+    opticalFlowTask.begin(&estimatorTask, OPTICALFLOW_CS_PIN);
+
+    estimatorTask.begin(&safety);
+
+    setpointTask.begin(&safety);
+
+    loggerTask.begin(&estimatorTask, &closedLoopControl);
+    */
+
+    ledTask.begin(&safety, LED_PIN, true);
+
+    /*
+    imuTask.begin(&estimatorTask);
+
+    coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            &motors,
+            Mixer::rotorCount,
+            Mixer::mix);
+            */
+
+    while (true) {
+        vTaskDelay(portMAX_DELAY);
+    }
+}
+
 void setup() 
 {
     Serial.begin(115200);
 
+    /*
     debugTask.begin();
 
     ledTask.begin(&safety, LED_PIN, true);
 
-    DebugTask::setMessage(&debugTask, "okay");
+    DebugTask::setMessage(&debugTask, "okay");*/
 
     /*
     sem = xSemaphoreCreateCounting(1, 0);
@@ -76,6 +114,14 @@ void setup()
             delay(500);
         }
     }*/
+
+    xTaskCreate(
+            systemTask, 
+            "SYSTEM",
+            2* configMINIMAL_STACK_SIZE, 
+            NULL, 
+            2, 
+            NULL);
 
     vTaskStartScheduler();
 }
