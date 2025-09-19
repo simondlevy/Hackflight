@@ -19,13 +19,28 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
+#include <datatypes.h>
+#include <lpf.hpp>
+#include <m_pi.h>
+#include <num.hpp>
+#include <time.h>
+
 class FooTask {
+
+    private:
+
+        static constexpr float CALIBRATION_PITCH = 0;
+        static constexpr float CALIBRATION_ROLL = 0;
 
     public:
 
         void begin(EstimatorTask * estimatorTask,
                 DebugTask * debugTask)
         {
+            if (_task.didInit()) {
+                return;
+            }
+
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
