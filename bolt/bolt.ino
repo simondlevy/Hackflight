@@ -26,6 +26,7 @@
 
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
+#include <tasks/foo.hpp>
 #include <tasks/led.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
@@ -38,6 +39,7 @@ static Safety safety = Safety(&motors);
 
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
+static FooTask fooTask;
 static LedTask ledTask;
 static OpticalFlowTask opticalFlowTask;
 static ZRangerTask zrangerTask;
@@ -46,7 +48,7 @@ static void systemTask(void *arg)
 {
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask, &debugTask);
+    zrangerTask.begin(&estimatorTask);
 
     opticalFlowTask.begin(&estimatorTask);
 
@@ -60,9 +62,9 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, LED_PIN, true);
 
-    /*
-    imuTask.begin(&estimatorTask);
+    fooTask.begin(&debugTask);
 
+    /*
     coreTask.begin(
             &closedLoopControl,
             &safety,

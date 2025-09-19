@@ -41,12 +41,13 @@ class ImuTask {
                 return;
             }
 
+            /*
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
 
             // Wait for sensors to startup
-            vTaskDelay(M2T(STARTUP_TIME_MS));
+            vTaskDelay(STARTUP_TIME_MS);
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -59,7 +60,9 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            device_init();
+            if (!device_init()) {
+                DebugTask::setMessage(_debugTask, "IMU initialization failed");
+            }
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
@@ -74,6 +77,7 @@ class ImuTask {
             _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
 
             _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
+            */
 
             _task.init(runImuTask, "imu", this, 3);
         }
@@ -360,6 +364,11 @@ class ImuTask {
         {
             while (true) {
 
+                static uint32_t count;
+                DebugTask::setMessage(_debugTask, "ImuTask: %d", +count++);
+                vTaskDelay(1);
+
+                /*
                 if (pdTRUE == xSemaphoreTake(
                             interruptCallbackSemaphore, portMAX_DELAY)) {
 
@@ -369,6 +378,11 @@ class ImuTask {
                     Axis3i16 accelRaw = {};
 
                     device_readRaw(
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                            accelRaw.x, accelRaw.y, accelRaw.z);
+
+                    DebugTask::setMessage(_debugTask,
+                            "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
                             gyroRaw.x, gyroRaw.y, gyroRaw.z,
                             accelRaw.x, accelRaw.y, accelRaw.z);
 
@@ -412,6 +426,7 @@ class ImuTask {
                 xQueueOverwrite(_gyroQueue, &data.gyro);
 
                 xSemaphoreGive(coreTaskSemaphore);
+                */
             }
         }
 

@@ -24,8 +24,6 @@ static VL53L1X vl53l1x;
 
 bool ZRangerTask::device_init()
 {
-    //vl53l1x.setTimeout(500);
-
     if (!vl53l1x.init()) {
         return false;
     }
