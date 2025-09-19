@@ -367,7 +367,6 @@ class ImuTask {
         {
             while (true) {
 
-                static uint32_t count;
                 DebugTask::setMessage(_debugTask, "ImuTask: %d", 
                         interruptCount);
                 vTaskDelay(1);
