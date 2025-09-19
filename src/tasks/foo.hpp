@@ -35,18 +35,18 @@ class FooTask {
     public:
 
         void begin(EstimatorTask * estimatorTask,
-                DebugTask * debugTask)
+                DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return;
             }
 
-            // Wait for sensors to startup
-            vTaskDelay(STARTUP_TIME_MS);
-
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
+
+            // Wait for sensors to startup
+            vTaskDelay(STARTUP_TIME_MS);
 
             _task.init(runFooTask, "foo", this, 3);
         }
