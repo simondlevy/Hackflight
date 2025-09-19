@@ -34,7 +34,7 @@ class ImuTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask,
+        void begin( EstimatorTask * estimatorTask,
                 DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
@@ -83,8 +83,6 @@ class ImuTask {
         // Called by platform-specific IMU interrupt
         void dataAvailableCallback(void)
         {
-            interruptCount++;
-
             portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
             interruptTimestamp = micros();
             xSemaphoreGiveFromISR(
@@ -355,22 +353,14 @@ class ImuTask {
             return _gyroBiasRunning.isBiasValueFound;
         }
 
-
         static void runImuTask(void *obj)
         {
             ((ImuTask *)obj)->run();
         }
 
-        uint32_t interruptCount;
-
         void run(void)
         {
             while (true) {
-
-                /*
-                   DebugTask::setMessage(_debugTask, "ImuTask: %d", 
-                   interruptCount);
-                   vTaskDelay(1);*/
 
                 if (pdTRUE == xSemaphoreTake(
                             interruptCallbackSemaphore, portMAX_DELAY)) {
