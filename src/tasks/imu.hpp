@@ -367,10 +367,68 @@ class ImuTask {
         {
             while (true) {
 
-                DebugTask::setMessage(_debugTask, "ImuTask: %d", 
-                        interruptCount);
-                vTaskDelay(1);
+                /*
+                   DebugTask::setMessage(_debugTask, "ImuTask: %d", 
+                   interruptCount);
+                   vTaskDelay(1);*/
 
+                if (pdTRUE == xSemaphoreTake(
+                            interruptCallbackSemaphore, portMAX_DELAY)) {
+
+                    data.interruptTimestamp = interruptTimestamp;
+
+                    Axis3i16 gyroRaw = {};
+                    Axis3i16 accelRaw = {};
+
+                    device_readRaw(
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                            accelRaw.x, accelRaw.y, accelRaw.z);
+
+                    DebugTask::setMessage(_debugTask,
+                            "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                            accelRaw.x, accelRaw.y, accelRaw.z);
+
+                    // Convert accel to Gs
+                    Axis3f accel = {};
+                    accel.x = accelRaw2Gs(accelRaw.x);
+                    accel.y = accelRaw2Gs(accelRaw.y);
+                    accel.z = accelRaw2Gs(accelRaw.z);
+
+                    // Calibrate gyro with raw values if necessary
+                    gyroBiasFound = processGyroBias(xTaskGetTickCount(),
+                            gyroRaw, &gyroBias);
+
+                    // Subtract gyro bias
+                    Axis3f gyroUnbiased = {};
+                    gyroUnbiased.x = gyroRaw2Dps(gyroRaw.x - gyroBias.x);
+                    gyroUnbiased.y = gyroRaw2Dps(gyroRaw.y - gyroBias.y);
+                    gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
+
+                    // Rotate gyro to airframe
+                    alignToAirframe(&gyroUnbiased, &data.gyro);
+
+                    // LPF gyro
+                    applyLpf(_gyroLpf, &data.gyro);
+
+                    _estimatorTask->enqueueGyro(
+                            &data.gyro, xPortIsInsideInterrupt());
+
+                    Axis3f accScaled = {};
+                    alignToAirframe(&accel, &accScaled);
+
+                    accAlignToGravity(&accScaled, &data.acc);
+
+                    applyLpf(_accLpf, &data.acc);
+
+                    _estimatorTask->enqueueAccel(
+                            &data.acc, xPortIsInsideInterrupt());
+                }
+
+                xQueueOverwrite(_accelQueue, &data.acc);
+                xQueueOverwrite(_gyroQueue, &data.gyro);
+
+                xSemaphoreGive(coreTaskSemaphore);
             }
         }
 
