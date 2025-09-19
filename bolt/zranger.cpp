@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <Wire.h>
-
 #include <VL53L1X.h>
 
 #include <tasks/zranger.hpp>
@@ -26,9 +24,7 @@ static VL53L1X vl53l1x;
 
 bool ZRangerTask::device_init()
 {
-    vl53l1x.setBus(&Wire);
-
-    vl53l1x.setTimeout(500);
+    //vl53l1x.setTimeout(500);
 
     if (!vl53l1x.init()) {
         return false;
