@@ -6,6 +6,10 @@ static const uint8_t ACCEL_CS_PIN = PB1;
 static const uint8_t GYRO_CS_PIN = PB0;
 static const uint8_t GYRO_INT_PIN = PC14;
 
+static const uint8_t MISO_PIN = PB14;
+static const uint8_t MOSI_PIN = PB15;
+static const uint8_t SCLK_PIN = PB13;
+
 static SPIClass spi;
 
 Bmi088Accel accel(spi, ACCEL_CS_PIN);
@@ -32,11 +36,9 @@ void setup()
 {
     Serial.begin(115200);
 
-    while (!Serial) ;
-
-    spi.setSCLK(PB13);
-    spi.setMISO(PB14);
-    spi.setMOSI(PB15);
+    spi.setMISO(MISO_PIN);
+    spi.setMOSI(MOSI_PIN);
+    spi.setSCLK(SCLK_PIN);
 
     check(gyro.begin(), "Gyro initialization error");
 

@@ -21,13 +21,13 @@
 
 #include <tasks/imu.hpp>
 
-static const uint8_t MISO_PIN = PB14;
-static const uint8_t MOSI_PIN = PB15;
-static const uint8_t SCLK_PIN = PB13;
-
 static const uint8_t ACCEL_CS_PIN = PB1;
 static const uint8_t GYRO_CS_PIN = PB0;
 static const uint8_t GYRO_INT_PIN = PC14;
+
+static const uint8_t MISO_PIN = PB14;
+static const uint8_t MOSI_PIN = PB15;
+static const uint8_t SCLK_PIN = PB13;
 
 static SPIClass spi;
 
@@ -68,6 +68,8 @@ bool ImuTask::device_init()
                         Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)))
         return false;
             
+    if (failed(gyro.mapDrdyInt3(true))) return false;
+
     if (failed(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ))) return false;
 
     if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
