@@ -49,7 +49,6 @@ static bool failed(const int status)
 
 bool ImuTask::device_init()
 {
-    /*
     imuTask = this;
 
     spi.setMISO(MISO_PIN);
@@ -75,7 +74,6 @@ bool ImuTask::device_init()
 
     pinMode(GYRO_INT_PIN, INPUT);
     attachInterrupt(GYRO_INT_PIN, handle_gyro_interrupt, RISING);
-    */
 
     return true;
 }
