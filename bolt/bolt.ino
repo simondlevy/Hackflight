@@ -32,11 +32,6 @@
 
 static const uint8_t LED_PIN = PC0;
 
-static const uint8_t FLOW_MISO_PIN = PA6;
-static const uint8_t FLOW_MOSI_PIN = PA7;
-static const uint8_t FLOW_SCLK_PIN = PA5;
-static const uint8_t FLOW_CS_PIN = PB4;
-
 static Motors motors;
 
 static Safety safety = Safety(&motors);
@@ -53,12 +48,7 @@ static void systemTask(void *arg)
 
     zrangerTask.begin(&estimatorTask, &debugTask);
 
-    opticalFlowTask.begin(
-            &estimatorTask,
-            FLOW_MISO_PIN,
-            FLOW_MOSI_PIN,
-            FLOW_SCLK_PIN,
-            FLOW_CS_PIN);
+    opticalFlowTask.begin(&estimatorTask);
 
     estimatorTask.begin(&safety);
 

@@ -16,33 +16,33 @@
 
 #pragma once
 
-#include <Wire.h>
+#include <pmw3901.hpp>
 
-#include <VL53L1X.h>
+#include <tasks/opticalflow.hpp>
 
-#include <tasks/zranger.hpp>
+static const uint8_t MISO_PIN = PA6;
+static const uint8_t MOSI_PIN = PA7;
+static const uint8_t SCLK_PIN = PA5;
+static const uint8_t CS_PIN = PB4;
 
-static VL53L1X vl53l1x;
+static SPIClass spi;
 
-bool ZRangerTask::device_init()
+static PMW3901 pmw3901;
+
+bool OpticalFlowTask::device_init()
 {
-    vl53l1x.setBus(&Wire);
+    spi.setSCLK(PA5);
+    spi.setMISO(PA6);
+    spi.setMOSI(PA7);
 
-    vl53l1x.setTimeout(500);
+    spi.begin();
 
-    if (!vl53l1x.init()) {
-        return false;
-    }
-
-    vl53l1x.setDistanceMode(VL53L1X::Medium);
-    vl53l1x.setMeasurementTimingBudget(25000);
-
-    vl53l1x.startContinuous(50);
-
-    return true;
+    return pmw3901.begin(CS_PIN, spi);
 }
 
-float ZRangerTask::device_read()
+void OpticalFlowTask::device_read(
+        int16_t & dx, int16_t & dy, bool &gotMotion)
 {
-    return vl53l1x.read();
+    pmw3901.readMotion(dx, dy, gotMotion);
+
 }
