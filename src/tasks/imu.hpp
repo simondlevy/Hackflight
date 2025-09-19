@@ -63,6 +63,21 @@ class ImuTask {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
             }
 
+            // Calibrate
+            for (uint8_t i = 0; i < 3; i++) {
+                _gyroLpf[i].init(1000, GYRO_LPF_CUTOFF_FREQ);
+                _accLpf[i].init(1000, ACCEL_LPF_CUTOFF_FREQ);
+            }
+            _cosPitch = cosf(CALIBRATION_PITCH * (float) M_PI / 180);
+            _sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
+            _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
+            _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
+
+            _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
+
+            _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
+
+
             _task.init(runImuTask, "imu", this, 3);
         }
 

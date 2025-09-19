@@ -35,13 +35,13 @@ class ImuTask {
     public:
 
         // Called from main program
-        void begin( EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
+        void begin( EstimatorTask * estimatorTask,
+                DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return;
             }
 
-            /*
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
@@ -77,7 +77,6 @@ class ImuTask {
             _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
 
             _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
-            */
 
             _task.init(runImuTask, "imu", this, 3);
         }
@@ -364,11 +363,6 @@ class ImuTask {
         {
             while (true) {
 
-                static uint32_t count;
-                DebugTask::setMessage(_debugTask, "ImuTask: %d", +count++);
-                vTaskDelay(1);
-
-                /*
                 if (pdTRUE == xSemaphoreTake(
                             interruptCallbackSemaphore, portMAX_DELAY)) {
 
@@ -426,7 +420,6 @@ class ImuTask {
                 xQueueOverwrite(_gyroQueue, &data.gyro);
 
                 xSemaphoreGive(coreTaskSemaphore);
-                */
             }
         }
 
