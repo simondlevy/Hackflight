@@ -48,6 +48,21 @@ class FooTask {
             // Wait for sensors to startup
             vTaskDelay(STARTUP_TIME_MS);
 
+            _gyroBiasRunning.isBufferFilled = false;
+            _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
+
+            // Create a semaphore to protect data-ready interrupts from IMU
+            interruptCallbackSemaphore = xSemaphoreCreateBinaryStatic(
+                    &interruptCallbackSemaphoreBuffer);
+
+            // Create a semaphore to protect waitDataReady() calls from core task
+            coreTaskSemaphore =
+                xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
+
+
+
+
+ 
             _task.init(runFooTask, "foo", this, 3);
         }
 
@@ -137,11 +152,170 @@ class FooTask {
 
         bias_t _gyroBiasRunning;
 
-        FreeRtosTask _task;
-
         EstimatorTask * _estimatorTask;
 
         DebugTask * _debugTask;
+
+        FreeRtosTask _task;
+
+        /**
+         * Checks if the variances is below the predefined thresholds.
+         * The bias value should have been added before calling this.
+         * @param bias  The bias object
+         */
+        bool findBiasValue(const uint32_t ticks)
+        {
+            static int32_t varianceSampleTime;
+            bool foundBias = false;
+
+            if (_gyroBiasRunning.isBufferFilled)
+            {
+                calculateVarianceAndMean( &_gyroBiasRunning,
+                        &_gyroBiasRunning.variance, &_gyroBiasRunning.mean);
+
+                if (_gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
+                   _gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
+                   _gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
+                        (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
+                {
+                    varianceSampleTime = ticks;
+                    _gyroBiasRunning.bias.x = _gyroBiasRunning.mean.x;
+                    _gyroBiasRunning.bias.y = _gyroBiasRunning.mean.y;
+                    _gyroBiasRunning.bias.z = _gyroBiasRunning.mean.z;
+                    foundBias = true;
+                    _gyroBiasRunning.isBiasValueFound = true;
+                }
+            }
+
+            return foundBias;
+        }
+
+        static void applyLpf(Lpf lpf[3], Axis3f* in)
+        {
+            for (uint8_t i = 0; i < 3; i++) {
+                in->axis[i] = lpf[i].apply(in->axis[i]);
+            }
+        }
+
+        // Low Pass filtering
+        Lpf _accLpf[3];
+        Lpf _gyroLpf[3];
+
+        // Pre-calculated values for accelerometer alignment
+        float _cosPitch;
+        float _sinPitch;
+        float _cosRoll;
+        float _sinRoll;
+
+        static QueueHandle_t makeImuQueue(
+                uint8_t storage[], StaticQueue_t * buffer)
+        {
+            return makeQueue(IMU_ITEM_SIZE, storage, buffer);
+
+        }
+
+        static QueueHandle_t makeQueue(
+                const uint8_t itemSize, uint8_t storage[], StaticQueue_t * buffer)
+        {
+            return xQueueCreateStatic(QUEUE_LENGTH, itemSize, storage, buffer);
+
+        }
+
+        static void alignToAirframe(Axis3f* in, Axis3f* out)
+        {
+            static float R[3][3];
+
+            // IMU alignment
+            static float sphi, cphi, stheta, ctheta, spsi, cpsi;
+
+            sphi   = sinf(ALIGN_PHI * (float) M_PI / 180);
+            cphi   = cosf(ALIGN_PHI * (float) M_PI / 180);
+            stheta = sinf(ALIGN_THETA * (float) M_PI / 180);
+            ctheta = cosf(ALIGN_THETA * (float) M_PI / 180);
+            spsi   = sinf(ALIGN_PSI * (float) M_PI / 180);
+            cpsi   = cosf(ALIGN_PSI * (float) M_PI / 180);
+
+            R[0][0] = ctheta * cpsi;
+            R[0][1] = ctheta * spsi;
+            R[0][2] = -stheta;
+            R[1][0] = sphi * stheta * cpsi - cphi * spsi;
+            R[1][1] = sphi * stheta * spsi + cphi * cpsi;
+            R[1][2] = sphi * ctheta;
+            R[2][0] = cphi * stheta * cpsi + sphi * spsi;
+            R[2][1] = cphi * stheta * spsi - sphi * cpsi;
+            R[2][2] = cphi * ctheta;
+
+            out->x = in->x*R[0][0] + in->y*R[0][1] + in->z*R[0][2];
+            out->y = in->x*R[1][0] + in->y*R[1][1] + in->z*R[1][2];
+            out->z = in->x*R[2][0] + in->y*R[2][1] + in->z*R[2][2];
+        }
+
+        bool gyroBiasFound;
+        sensorData_t data;
+        Axis3f gyroBias;
+        volatile uint64_t interruptTimestamp;
+
+        SemaphoreHandle_t interruptCallbackSemaphore;
+        StaticSemaphore_t interruptCallbackSemaphoreBuffer;
+
+        SemaphoreHandle_t coreTaskSemaphore;
+        StaticSemaphore_t coreTaskSemaphoreBuffer;
+
+        /**
+         * Compensate for a miss-aligned accelerometer. It uses the trim
+         * data gathered from the UI and written in the config-block to
+         * rotate the accelerometer to be aligned with gravity.
+         */
+        void accAlignToGravity(Axis3f* in, Axis3f* out)
+        {
+
+            // Rotate around x-axis
+            Axis3f rx = {};
+            rx.x = in->x;
+            rx.y = in->y * _cosRoll - in->z * _sinRoll;
+            rx.z = in->y * _sinRoll + in->z * _cosRoll;
+
+            // Rotate around y-axis
+            Axis3f ry = {};
+            ry.x = rx.x * _cosPitch - rx.z * _sinPitch;
+            ry.y = rx.y;
+            ry.z = -rx.x * _sinPitch + rx.z * _cosPitch;
+
+            out->x = ry.x;
+            out->y = ry.y;
+            out->z = ry.z;
+        }
+
+        /**
+         * Calculates the bias first when the gyro variance is below threshold.
+         * Requires a buffer but calibrates platform first when it is stable.
+         */
+        bool processGyroBias(const uint32_t tickCount,
+                const Axis3i16 gyroRaw, Axis3f *gyroBiasOut)
+        {
+            _gyroBiasRunning.bufHead->x = gyroRaw.x;
+            _gyroBiasRunning.bufHead->y = gyroRaw.y;
+            _gyroBiasRunning.bufHead->z = gyroRaw.z;
+            _gyroBiasRunning.bufHead++;
+
+            if (_gyroBiasRunning.bufHead >= 
+                    &_gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
+
+                _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
+                _gyroBiasRunning.isBufferFilled = true;
+            }
+
+            if (!_gyroBiasRunning.isBiasValueFound) {
+                findBiasValue(tickCount);
+            }
+
+            gyroBiasOut->x = _gyroBiasRunning.bias.x;
+            gyroBiasOut->y = _gyroBiasRunning.bias.y;
+            gyroBiasOut->z = _gyroBiasRunning.bias.z;
+
+            return _gyroBiasRunning.isBiasValueFound;
+        }
+
 
         static void runFooTask(void *obj)
         {
