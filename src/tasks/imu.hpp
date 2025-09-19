@@ -59,10 +59,9 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
-            /*
             if (!device_init()) {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
-            }*/
+            }
 
             _task.init(runImuTask, "imu", this, 3);
         }
@@ -333,4 +332,14 @@ class ImuTask {
 
             }
         }
+
+        static float gyroRaw2Dps(const int16_t raw);
+
+        static float accelRaw2Gs(const int16_t raw);
+
+        bool device_init();
+
+        void device_readRaw(
+                int16_t & gx, int16_t & gy, int16_t & gz, 
+                int16_t & ax, int16_t & ay, int16_t & az);
 };

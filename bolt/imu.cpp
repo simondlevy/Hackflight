@@ -15,7 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if 0
 #include <SPI.h>
 
 #include <BMI088.h>
@@ -40,7 +39,7 @@ static ImuTask * imuTask;
 
 static void handle_gyro_interrupt()
 {
-    imuTask->dataAvailableCallback();
+    //imuTask->dataAvailableCallback();
 }
 
 static bool failed(const int status)
@@ -50,6 +49,7 @@ static bool failed(const int status)
 
 bool ImuTask::device_init()
 {
+    /*
     imuTask = this;
 
     spi.setMISO(MISO_PIN);
@@ -75,6 +75,7 @@ bool ImuTask::device_init()
 
     pinMode(GYRO_INT_PIN, INPUT);
     attachInterrupt(GYRO_INT_PIN, handle_gyro_interrupt, RISING);
+    */
 
     return true;
 }
@@ -83,6 +84,7 @@ void ImuTask::device_readRaw(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {
+    /*
     gyro.readSensor();
 
     gx = gyro.getGyroX_raw();
@@ -93,7 +95,7 @@ void ImuTask::device_readRaw(
 
     ax = accel.getAccelX_raw();
     ay = accel.getAccelY_raw();
-    az = accel.getAccelZ_raw();
+    az = accel.getAccelZ_raw();*/
 }
 
 float ImuTask::gyroRaw2Dps(const int16_t raw)
@@ -105,4 +107,3 @@ float ImuTask::accelRaw2Gs(const int16_t raw)
 {
     return (float)raw * 2 * 24 / 65536.f;
 }
-#endif
