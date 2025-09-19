@@ -82,7 +82,6 @@ void ImuTask::device_readRaw(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {
-    /*
     gyro.readSensor();
 
     gx = gyro.getGyroX_raw();
@@ -93,7 +92,7 @@ void ImuTask::device_readRaw(
 
     ax = accel.getAccelX_raw();
     ay = accel.getAccelY_raw();
-    az = accel.getAccelZ_raw();*/
+    az = accel.getAccelZ_raw();
 }
 
 float ImuTask::gyroRaw2Dps(const int16_t raw)
