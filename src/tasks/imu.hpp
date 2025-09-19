@@ -83,6 +83,8 @@ class ImuTask {
         // Called by platform-specific IMU interrupt
         void dataAvailableCallback(void)
         {
+            interruptCount++;
+
             portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
             interruptTimestamp = micros();
             xSemaphoreGiveFromISR(
@@ -359,12 +361,15 @@ class ImuTask {
             ((ImuTask *)obj)->run();
         }
 
+        uint32_t interruptCount;
+
         void run(void)
         {
             while (true) {
 
                 static uint32_t count;
-                DebugTask::setMessage(_debugTask, "ImuTask: %d", +count++);
+                DebugTask::setMessage(_debugTask, "ImuTask: %d", 
+                        interruptCount);
                 vTaskDelay(1);
 
             }
