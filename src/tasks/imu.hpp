@@ -34,14 +34,13 @@ class ImuTask {
 
     public:
 
-        // Called from main program
-        void begin( EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
+        void begin(EstimatorTask * estimatorTask,
+                DebugTask * debugTask=nullptr)
         {
             if (_task.didInit()) {
                 return;
             }
 
-            /*
             _estimatorTask = estimatorTask;
 
             _debugTask = debugTask;
@@ -60,49 +59,12 @@ class ImuTask {
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
 
+            /*
             if (!device_init()) {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
-            }
-
-            // Calibrate
-            for (uint8_t i = 0; i < 3; i++) {
-                _gyroLpf[i].init(1000, GYRO_LPF_CUTOFF_FREQ);
-                _accLpf[i].init(1000, ACCEL_LPF_CUTOFF_FREQ);
-            }
-            _cosPitch = cosf(CALIBRATION_PITCH * (float) M_PI / 180);
-            _sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
-            _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
-            _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
-
-            _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
-
-            _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
-            */
+            }*/
 
             _task.init(runImuTask, "imu", this, 3);
-        }
-
-        // Called by platform-specific IMU interrupt
-        void dataAvailableCallback(void)
-        {
-            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-            interruptTimestamp = micros();
-            xSemaphoreGiveFromISR(
-                    interruptCallbackSemaphore, &xHigherPriorityTaskWoken);
-
-            if (xHigherPriorityTaskWoken) {
-                portYIELD();
-            }
-        }
-
-        // Called by core task
-        bool imuIsCalibrated() {
-            return gyroBiasFound;
-        }
-
-        // Called by core task
-        void waitDataReady(void) {
-            xSemaphoreTake(coreTaskSemaphore, portMAX_DELAY);
         }
 
     private:
@@ -355,6 +317,7 @@ class ImuTask {
             return _gyroBiasRunning.isBiasValueFound;
         }
 
+
         static void runImuTask(void *obj)
         {
             ((ImuTask *)obj)->run();
@@ -368,75 +331,6 @@ class ImuTask {
                 DebugTask::setMessage(_debugTask, "ImuTask: %d", +count++);
                 vTaskDelay(1);
 
-                /*
-                if (pdTRUE == xSemaphoreTake(
-                            interruptCallbackSemaphore, portMAX_DELAY)) {
-
-                    data.interruptTimestamp = interruptTimestamp;
-
-                    Axis3i16 gyroRaw = {};
-                    Axis3i16 accelRaw = {};
-
-                    device_readRaw(
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                            accelRaw.x, accelRaw.y, accelRaw.z);
-
-                    DebugTask::setMessage(_debugTask,
-                            "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                            accelRaw.x, accelRaw.y, accelRaw.z);
-
-                    // Convert accel to Gs
-                    Axis3f accel = {};
-                    accel.x = accelRaw2Gs(accelRaw.x);
-                    accel.y = accelRaw2Gs(accelRaw.y);
-                    accel.z = accelRaw2Gs(accelRaw.z);
-
-                    // Calibrate gyro with raw values if necessary
-                    gyroBiasFound = processGyroBias(xTaskGetTickCount(),
-                            gyroRaw, &gyroBias);
-
-                    // Subtract gyro bias
-                    Axis3f gyroUnbiased = {};
-                    gyroUnbiased.x = gyroRaw2Dps(gyroRaw.x - gyroBias.x);
-                    gyroUnbiased.y = gyroRaw2Dps(gyroRaw.y - gyroBias.y);
-                    gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
-
-                    // Rotate gyro to airframe
-                    alignToAirframe(&gyroUnbiased, &data.gyro);
-
-                    // LPF gyro
-                    applyLpf(_gyroLpf, &data.gyro);
-
-                    _estimatorTask->enqueueGyro(
-                            &data.gyro, xPortIsInsideInterrupt());
-
-                    Axis3f accScaled = {};
-                    alignToAirframe(&accel, &accScaled);
-
-                    accAlignToGravity(&accScaled, &data.acc);
-
-                    applyLpf(_accLpf, &data.acc);
-
-                    _estimatorTask->enqueueAccel(
-                            &data.acc, xPortIsInsideInterrupt());
-                }
-
-                xQueueOverwrite(_accelQueue, &data.acc);
-                xQueueOverwrite(_gyroQueue, &data.gyro);
-
-                xSemaphoreGive(coreTaskSemaphore);
-                */
             }
         }
-
-        static float gyroRaw2Dps(const int16_t raw);
-
-        static float accelRaw2Gs(const int16_t raw);
-
-        bool device_init();
-
-        void device_readRaw(
-                int16_t & gx, int16_t & gy, int16_t & gz, 
-                int16_t & ax, int16_t & ay, int16_t & az);
 };
