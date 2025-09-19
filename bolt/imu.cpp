@@ -39,7 +39,7 @@ static ImuTask * imuTask;
 
 static void handle_gyro_interrupt()
 {
-    //imuTask->dataAvailableCallback();
+    imuTask->dataAvailableCallback();
 }
 
 static bool failed(const int status)
