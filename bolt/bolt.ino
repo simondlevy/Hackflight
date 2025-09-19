@@ -62,7 +62,7 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, LED_PIN, true);
 
-    fooTask.begin(&debugTask);
+    fooTask.begin(&estimatorTask, &debugTask);
 
     /*
     coreTask.begin(
