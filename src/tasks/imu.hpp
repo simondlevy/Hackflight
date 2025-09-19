@@ -77,8 +77,30 @@ class ImuTask {
 
             _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
 
-
             _task.init(runImuTask, "imu", this, 3);
+        }
+
+        // Called by platform-specific IMU interrupt
+        void dataAvailableCallback(void)
+        {
+            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+            interruptTimestamp = micros();
+            xSemaphoreGiveFromISR(
+                    interruptCallbackSemaphore, &xHigherPriorityTaskWoken);
+
+            if (xHigherPriorityTaskWoken) {
+                portYIELD();
+            }
+        }
+
+        // Called by core task
+        bool imuIsCalibrated() {
+            return gyroBiasFound;
+        }
+
+        // Called by core task
+        void waitDataReady(void) {
+            xSemaphoreTake(coreTaskSemaphore, portMAX_DELAY);
         }
 
     private:
