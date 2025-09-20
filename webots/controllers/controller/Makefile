@@ -64,6 +64,12 @@ runsnn:
 		--set_font_size 16 \
 		> /dev/null
 
+runplank:
+	cp ../../plugins/physics/plank/libplank.so \
+		../../plugins/physics/__custom__/lib__custom__.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
