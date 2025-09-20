@@ -56,11 +56,9 @@ static void systemTask(void *arg)
 
     estimatorTask.begin(&safety);
 
-    /*
     setpointTask.begin(&safety);
 
-    loggerTask.begin(&estimatorTask, &closedLoopControl);
-    */
+    //loggerTask.begin(&estimatorTask, &closedLoopControl);
 
     ledTask.begin(&safety, LED_PIN, true);
 
