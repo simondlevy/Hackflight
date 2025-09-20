@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
+#pragma once
 
-bool uartReadByte(uint8_t *);
+#include <Arduino.h>
+
+#include <tasks/logging.hpp>
+#include <tasks/setpoint.hpp>
+
+static HardwareSerial serial = HardwareSerial(PA3, PA2);
+
+bool SetpointTask::uart_read_byte(uint8_t * byte)
+{
+    if (serial.available()) {
+        *byte = serial.read();
+        return true;
+    }
+
+    return false;
+}
             
-void uartWriteByte(const uint8_t byte);
+void LoggingTask::uart_write_byte(const uint8_t byte)
+{
+    serial.write(byte);
+}
