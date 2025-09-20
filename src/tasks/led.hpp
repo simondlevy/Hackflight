@@ -83,20 +83,24 @@ class LedTask {
             while (true) {
 
                 if (!_imuTask->imuIsCalibrated()) {
+                    blink(&lastWakeTime, IMU_CALIBRATION_HZ);
+                    /*
                     set(true);
                     vTaskDelay(PULSE_MSEC);
                     set(false);
-                    vTaskDelayUntil(&lastWakeTime, 1000/IMU_CALIBRATION_HZ);
+                    vTaskDelayUntil(&lastWakeTime, 1000/IMU_CALIBRATION_HZ);*/
                 }
 
                 else if (_safety->isArmed()) { 
                     set(true);
                 }
                 else {
+                    /*
                     set(true);
                     vTaskDelay(PULSE_MSEC);
                     set(false);
-                    vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);
+                    vTaskDelayUntil(&lastWakeTime, 1000/HEARTBEAT_HZ);*/
+                    blink(&lastWakeTime, HEARTBEAT_HZ);
                 }
 
             }
@@ -105,5 +109,13 @@ class LedTask {
         void set(const bool on)
         {
             digitalWrite(_pin, _active_low ? !on : on);
+        }
+
+        void blink(TickType_t * lastWakeTime, const float rate)
+        {
+            set(true);
+            vTaskDelay(PULSE_MSEC);
+            set(false);
+            vTaskDelayUntil(lastWakeTime, 1000/rate);
         }
 };
