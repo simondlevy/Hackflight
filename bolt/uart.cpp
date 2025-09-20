@@ -35,5 +35,6 @@ bool SetpointTask::uart_read_byte(uint8_t * byte)
             
 void LoggingTask::uart_write_byte(const uint8_t byte)
 {
-    serial.write(byte);
+    (void)byte;
+    //serial.write(byte);
 }

@@ -21,18 +21,21 @@
 #include <semphr.h>
 
 #include <hackflight.h>
+#include <__control__.hpp>
 #include <motors.hpp>
 #include <safety.hpp>
-
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
+#include <tasks/logging.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
 static const uint8_t LED_PIN = PC0;
+
+static ClosedLoopControl closedLoopControl;
 
 static Motors motors;
 
@@ -42,6 +45,7 @@ static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
+static LoggingTask loggingTask;
 static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
@@ -58,7 +62,7 @@ static void systemTask(void *arg)
 
     setpointTask.begin(&safety);
 
-    //loggerTask.begin(&estimatorTask, &closedLoopControl);
+    loggingTask.begin(&estimatorTask, &closedLoopControl);
 
     ledTask.begin(&safety, LED_PIN, true);
 
