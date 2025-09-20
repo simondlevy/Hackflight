@@ -43,7 +43,7 @@ void Motors::device_init()
 
 void Motors::device_setRatio(uint32_t id, uint16_t ratio)
 {
-    const uint8_t pulse_width = (ratio / 65536.f) * 125;
+    const uint8_t pulse_width = 125 * ((ratio / 65536.f) + 1);
 
     motors.set(id, pulse_width);
 }
