@@ -39,6 +39,8 @@ class YawAngleController {
                 const float psi,      // estimated angle
                 const float yaw)      // desired angle
         {
+            printf("dt=%f\n", dt);
+
             static float _target;
 
             _target = airborne ?
