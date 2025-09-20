@@ -21,11 +21,77 @@
 #include <control/pids/position.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
-#include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
+#include <num.hpp>
+
+class YawAngleController {
+
+    public:
+
+        /**
+          * Input is desired angle (deg) estimated actual angle (deg) from EKF;
+            ouputput is angles-per-second demand sent to YawRateController.
+          */
+        static float run(
+                const bool airborne,  // ignore this
+                const float dt,       // can be a constant if needed
+                const float psi,      // estimated angle
+                const float yaw)      // desired angle
+        {
+            static float _target;
+            static float _integral;
+            static float _previous;
+
+            _target = airborne ?
+                cap(_target + DEMAND_MAX * yaw * dt) : psi;
+
+            const auto error = cap(_target - psi);
+
+            _integral = airborne ?
+                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+
+            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+
+            _previous = airborne ? error : 0;
+
+            return airborne ? KP * error + KI * _integral + KD * deriv : 0;
+        }
+
+    private:
+
+        static constexpr float KP = 6;
+        static constexpr float KI = 1;
+        static constexpr float KD = 0.35;
+        static constexpr float ILIMIT = 360;
+        static constexpr float DEMAND_MAX = 200;
+
+        float _integral;
+        float _previous;
+
+        static float cap(float angle)
+        {
+            float result = angle;
+
+            while (result > 180.0f) {
+                result -= 360.0f;
+            }
+
+            while (result < -180.0f) {
+                result += 360.0f;
+            }
+
+            return result;
+        }
+};
 
 class ClosedLoopControl {
+
+    private:
+
+        static constexpr float YAW_P = 6;
+        static constexpr float YAW_I = 1;
+        static constexpr float YAW_D = 0.35;
 
     public:
 
