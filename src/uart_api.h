@@ -16,28 +16,11 @@
 
 #pragma once
 
-#include <Arduino.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-#include <uart_api.h>
+void uart_init();
 
-static HardwareSerial serial = HardwareSerial(PA3, PA2);
-
-void uart_init()
-{
-    serial.begin(115200);
-}
-
-bool uart_read_byte(uint8_t * byte)
-{
-    if (serial.available()) {
-        *byte = serial.read();
-        return true;
-    }
-
-    return false;
-}
+bool uart_read_byte(uint8_t * byte);
             
-void uart_write_byte(const uint8_t byte)
-{
-    serial.write(byte);
-}
+void uart_write_byte(const uint8_t byte);

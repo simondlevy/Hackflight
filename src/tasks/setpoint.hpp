@@ -20,7 +20,7 @@
 #include <msp/parser.hpp>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
-#include <uart.h>
+#include <uart_api.h>
 
 class SetpointTask {
 
@@ -232,6 +232,4 @@ class SetpointTask {
                 xQueueOverwrite(priorityQueue, &priority);
             }        
         }
-
-        bool uart_read_byte(uint8_t * byte);
 };

@@ -22,6 +22,7 @@
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
+#include <uart_api.h>
 
 class LoggingTask {
 
@@ -102,6 +103,4 @@ class LoggingTask {
                 uart_write_byte(serializer.payload[k]);
             }
         }
-
-        void uart_write_byte(const uint8_t byte);
 };
