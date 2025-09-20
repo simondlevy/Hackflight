@@ -8,12 +8,15 @@ BIN = build/$(SKETCH).ino.bin
 
 all : $(BIN)
 
-$(BIN): $(SKETCH).ino  *.cpp *.h ../src/*.hpp ../src/tasks/*.hpp
+$(BIN): $(SKETCH).ino  *.cpp *.h ../src/*.hpp ../src/tasks/*.hpp ../src/msp/__messages__.h
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
+
+../src/msp/__messages__.h: ../msppg/messages.json
+	cd ../msppg; make install; cd ../bolt
 
 flash: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin

@@ -109,7 +109,7 @@ class SetpointTask {
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
                 uint8_t byte = 0;
 

@@ -29,6 +29,7 @@
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/opticalflow.hpp>
+#include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
 static const uint8_t LED_PIN = PC0;
@@ -42,6 +43,7 @@ static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static OpticalFlowTask opticalFlowTask;
+static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
