@@ -165,16 +165,16 @@ class CoreTask {
 
         void run(void)
         {
-            vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
+            // vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
             while (!_imuTask->imuIsCalibrated()) {
-                vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
+                vTaskDelayUntil(&lastWakeTime, 1000/Clock::RATE_MAIN_LOOP);
             }
 
             static RateSupervisor rateSupervisor;
-            rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
+            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
 
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;

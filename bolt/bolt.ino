@@ -22,8 +22,11 @@
 
 #include <hackflight.h>
 #include <__control__.hpp>
+#include <mixers/crazyflie.hpp>
 #include <motors.hpp>
 #include <safety.hpp>
+
+#include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
@@ -41,6 +44,7 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
+static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static ImuTask imuTask;
@@ -68,7 +72,6 @@ static void systemTask(void *arg)
 
     imuTask.begin(&estimatorTask, &debugTask);
 
-    /*
     coreTask.begin(
             &closedLoopControl,
             &safety,
@@ -78,7 +81,6 @@ static void systemTask(void *arg)
             &motors,
             Mixer::rotorCount,
             Mixer::mix);
-            */
 
     while (true) {
         vTaskDelay(portMAX_DELAY);
