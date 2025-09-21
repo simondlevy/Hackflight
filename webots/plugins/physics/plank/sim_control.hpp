@@ -46,7 +46,7 @@ class YawAngleController {
             _target = airborne ?
                 cap(_target + DEMAND_MAX * yaw * dt) : psi;
 
-            return airborne ?  plankpid(_target, psi, dt) : 0;
+            return airborne ?  (float)plankpid(_target, psi, dt) : 0;
         }
 
     private:
@@ -55,23 +55,36 @@ class YawAngleController {
         static constexpr float KI = 1;
         static constexpr float KD = 0.35;
         static constexpr float ILIMIT = 360;
+
         static constexpr float DEMAND_MAX = 200;
 
-        static float plankpid(const float target, const float actual, const float dt)
+        static double plankpid(const float target, const float actual, const float dt)
         {
-            static float _integral;
-            static float _previous;
+            static long long i_m;
+            static long long p_m;
 
-            const float error = target - actual;
+            const long long dtinv = (long long) (1/dt);
+            const long long d_num = (long long) (KD * (double) dtinv);
+            const long long multiplier = dtinv * dtinv;
 
-            _integral += (error * dt) ;
-            if (_integral > ILIMIT) _integral = ILIMIT;
-            if (_integral < -ILIMIT) _integral = -ILIMIT;
+            const long long t_m = (long long) (target * multiplier);
+            const long long a_m = (long long) (actual * multiplier);
 
-            const float deriv = (dt > 0) ? (error - _previous ) / dt : 0;
-            _previous = error;
+            const long long e_m = t_m - a_m;            // E_M = error * multiplier
 
-            return KP * error + KI * _integral + KD * deriv;
+            i_m += (e_m / (long long) dtinv) ;
+
+            if (i_m > ILIMIT*multiplier) i_m = ILIMIT*multiplier;
+            if (i_m < -ILIMIT*multiplier) i_m = -ILIMIT*multiplier;
+
+            const long long d_m = ( e_m - p_m ) * (long long) dtinv;
+
+            p_m = e_m;
+
+            const long long c_m =
+                ((long long) KP)*e_m + ((long long) KI) * i_m + ( d_num * d_m ) / (long long) dtinv;
+
+            return c_m/(double)multiplier;
         }
 
         static float cap(float angle)
@@ -91,12 +104,6 @@ class YawAngleController {
 };
 
 class ClosedLoopControl {
-
-    private:
-
-        static constexpr float YAW_P = 6;
-        static constexpr float YAW_I = 1;
-        static constexpr float YAW_D = 0.35;
 
     public:
 
