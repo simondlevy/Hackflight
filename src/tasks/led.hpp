@@ -32,7 +32,7 @@ class LedTask {
                 Safety * safety,
                 ImuTask * imuTask,
                 const uint8_t pin,
-                const bool active_low) 
+                const bool active_low=false) 
         {
             if (_task.didInit()){
                 return;
