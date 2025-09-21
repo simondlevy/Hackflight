@@ -1,6 +1,6 @@
 ## Building the Hackflight firmware for the Crazyflie Bolt 1.1 flight controller
 
-<img src="../media/boltquad2.jpg" width=500>
+<img src="../media/boltquad2.jpg" width=800>
 
 1. Install [Arduino](https://www.arduino.cc/en/software/) and the
    [Arduino Command-Line Interface (CLI)](https://docs.arduino.cc/arduino-cli/installation/)
