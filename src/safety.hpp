@@ -17,13 +17,8 @@
 
 #pragma once
 
-#include <math.h>
-
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <task.h>
-
 #include <clock.hpp>
+#include <datatypes.h>
 #include <motors.hpp>
 
 class Safety {
@@ -68,7 +63,7 @@ class Safety {
 
         static const Clock::rate_t CLOCK_RATE = Clock::RATE_25_HZ;
 
-        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = M2T(2000);
+        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
 
         static constexpr float MAX_SAFE_ANGLE = 30;
 

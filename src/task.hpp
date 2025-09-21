@@ -16,14 +16,7 @@
 
 #pragma once
 
-#if defined(ARDUINO)
 #include <STM32FreeRTOS.h>
-#else
-#include <FreeRTOS.h>
-#endif
-
-#include <semphr.h>
-#include <task.h>
 
 class FreeRtosTask {
 

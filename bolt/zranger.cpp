@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 Simon D. Levy
+ * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,27 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <VL53L1X.h>
 
-void uart_init();
+#include <tasks/zranger.hpp>
 
-bool uart_read_byte(uint8_t * byte);
-            
-void uart_write_byte(const uint8_t byte);
+static VL53L1X vl53l1x;
+
+bool ZRangerTask::device_init()
+{
+    if (!vl53l1x.init()) {
+        return false;
+    }
+
+    vl53l1x.setDistanceMode(VL53L1X::Medium);
+    vl53l1x.setMeasurementTimingBudget(25000);
+
+    vl53l1x.startContinuous(50);
+
+    return true;
+}
+
+float ZRangerTask::device_read()
+{
+    return vl53l1x.read();
+}

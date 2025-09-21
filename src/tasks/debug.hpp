@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <Arduino.h>
+
 #include <task.hpp>
 
 class DebugTask {
@@ -31,7 +33,6 @@ class DebugTask {
         {
             if (debugTask) {
 
-#if defined(ARDUINO)
                 va_list args = {};
 
                 char buffer[256] = {};
@@ -45,7 +46,6 @@ class DebugTask {
                 }
 
                 va_end(args);
-#endif
             }
         }
 
@@ -67,13 +67,11 @@ class DebugTask {
             while (true) {
 
                 if (*_msg) {
-                    device_write(_msg);
+                    Serial.println(_msg);
                 }
 
-                vTaskDelay(M2T(1000/REPORT_FREQ));
+                vTaskDelay(1000/REPORT_FREQ);
             }
         }
-
-        void device_write(const char * msg);
 };
 

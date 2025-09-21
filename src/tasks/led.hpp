@@ -22,6 +22,7 @@
 
 #include <safety.hpp>
 #include <task.hpp>
+#include <tasks/imu.hpp>
 
 class LedTask {
 
@@ -29,6 +30,7 @@ class LedTask {
 
         void begin(
                 Safety * safety,
+                ImuTask * imuTask,
                 const uint8_t pin,
                 const bool active_low) 
         {
@@ -39,6 +41,8 @@ class LedTask {
             _pin = pin;
 
             _active_low = active_low;
+
+            _imuTask = imuTask;
 
             _task.init(runLedTask, "led", this, 2);
 
@@ -53,6 +57,8 @@ class LedTask {
 
         static constexpr float HEARTBEAT_HZ = 1;
 
+        static constexpr float IMU_CALIBRATION_HZ = 3;
+
         static constexpr uint32_t PULSE_MSEC = 50;
 
         uint8_t _pin;
@@ -62,6 +68,8 @@ class LedTask {
         FreeRtosTask _task;
 
         Safety * _safety;
+
+        ImuTask * _imuTask;
 
         static void runLedTask(void * obj)
         {
@@ -74,14 +82,15 @@ class LedTask {
 
             while (true) {
 
-                if (_safety->isArmed()) { 
+                if (!_imuTask->imuIsCalibrated()) {
+                    blink(lastWakeTime, IMU_CALIBRATION_HZ);
+                }
+
+                else if (_safety->isArmed()) { 
                     set(true);
                 }
                 else {
-                    set(true);
-                    vTaskDelay(M2T(PULSE_MSEC));
-                    set(false);
-                    vTaskDelayUntil(&lastWakeTime, M2T(1000/HEARTBEAT_HZ));
+                    blink(lastWakeTime, HEARTBEAT_HZ);
                 }
 
             }
@@ -90,5 +99,13 @@ class LedTask {
         void set(const bool on)
         {
             digitalWrite(_pin, _active_low ? !on : on);
+        }
+
+        void blink(TickType_t & lastWakeTime, const float rate)
+        {
+            set(true);
+            vTaskDelay(PULSE_MSEC);
+            set(false);
+            vTaskDelayUntil(&lastWakeTime, 1000/rate);
         }
 };

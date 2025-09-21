@@ -16,13 +16,15 @@
 
 #pragma once
 
+#include <__control__.hpp>
+
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <uart_api.h>
 
-class LoggerTask {
+class LoggingTask {
 
     public:
 
@@ -37,16 +39,16 @@ class LoggerTask {
 
             _closedLoopControl = closedLoopControl;
 
-            _task.init(runLoggerTask, "logger", this, 3);
+            _task.init(runLoggingTask, "logger", this, 3);
         }
 
     private:
         
         static constexpr float FREQ_HZ = 100;
 
-        static void runLoggerTask(void * obj)
+        static void runLoggingTask(void * obj)
         {
-            ((LoggerTask *)obj)->run();
+            ((LoggingTask *)obj)->run();
         }
 
         FreeRtosTask _task;
@@ -65,7 +67,7 @@ class LoggerTask {
 
                 sendClosedLoopControlMessage();
 
-                vTaskDelayUntil(&lastWakeTime, M2T(1000/FREQ_HZ));
+                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
             }
         }
 
@@ -98,8 +100,7 @@ class LoggerTask {
  
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                uartWriteByte(serializer.payload[k]);
+                uart_write_byte(serializer.payload[k]);
             }
-
         }
 };

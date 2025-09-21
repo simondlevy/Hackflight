@@ -16,6 +16,11 @@
 
 #pragma once
 
+#include <Arduino.h>
+
+#include <STM32FreeRTOS.h>
+#include <semphr.h>
+
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -49,7 +54,7 @@ class EstimatorTask {
 
             _task.init(runEstimatorTask, "estimator", this, 4);
 
-            _kalmanFilter.init(msec());
+            _kalmanFilter.init(millis());
         }
 
         void getVehicleState(vehicleState_t * state)
@@ -143,7 +148,7 @@ class EstimatorTask {
         static const auto QUEUE_ITEM_SIZE = sizeof(KalmanFilter::measurement_t);
         uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
         StaticQueue_t _measurementsQueueBuffer;
-        QueueHandle_t _measurementsQueue;
+        xQueueHandle _measurementsQueue;
 
         FreeRtosTask _task;
 
@@ -153,12 +158,12 @@ class EstimatorTask {
 
         // Mutex to protect data that is shared between the task and
         // functions called by the stabilizer loop
-        SemaphoreHandle_t _dataMutex;
+        xSemaphoreHandle _dataMutex;
         StaticSemaphore_t _dataMutexBuffer;
 
         // Semaphore to signal that we got data from the stabilizer loop to
         // process
-        SemaphoreHandle_t _runTaskSemaphore;
+        xSemaphoreHandle _runTaskSemaphore;
 
         uint32_t _warningBlockTimeMs;
 
@@ -172,11 +177,6 @@ class EstimatorTask {
         // locking The estimator state produced by the task, copied to the
         // stabilizer when needed.
         vehicleState_t _state;
-
-        static uint32_t msec(void)
-        {
-            return T2M(xTaskGetTickCount());
-        }
 
         uint32_t step(const uint32_t nowMs, uint32_t nextPredictionMs) 
         {
@@ -236,7 +236,7 @@ class EstimatorTask {
 
         void run(void)
         {
-            auto nextPredictionMs = msec();
+            auto nextPredictionMs = millis();
 
             _rateSupervisor.init(
                     nextPredictionMs, 
@@ -248,7 +248,7 @@ class EstimatorTask {
             while (true) {
 
                 // would be nice if this had a precision higher than 1ms...
-                nextPredictionMs = step(msec(), nextPredictionMs);
+                nextPredictionMs = step(millis(), nextPredictionMs);
             }
         }
 

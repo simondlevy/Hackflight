@@ -44,6 +44,8 @@ class Motors {
             setRatio(1, ratios[1]);
             setRatio(2, ratios[2]);
             setRatio(3, ratios[3]);
+
+            device_run();
         }
 
     private:
@@ -60,4 +62,6 @@ class Motors {
         void device_init();
 
         void device_setRatio(uint32_t id, uint16_t ratio);
+
+        void device_run();
 };
