@@ -1,8 +1,11 @@
-## Installation
+## Building the Hackflight firmware for the Crazyflie Bolt 1.1 flight controller
 
-1. Install [Arduino_Core_STM32](https://github.com/stm32duino/Arduino_Core_STM32/wiki/Getting-Started)
+1. Install [Arduino](https://www.arduino.cc/en/software/) and the
+   [Arduino Command-Line Interface (CLI)](https://docs.arduino.cc/arduino-cli/installation/)
 
-2. Install these Arduino libraries:
+2. Install [Arduino_Core_STM32](https://github.com/stm32duino/Arduino_Core_STM32/wiki/Getting-Started)
+
+3. Install these Arduino libraries:
 
 * https://github.com/stm32duino/STM32FreeRTOS
 * https://github.com/simondlevy/Arduino_CMSIS-DSP (note installation instructions)
@@ -12,7 +15,7 @@
 * https://github.com/bolderflight/bmi088-arduino
 * https://github.com/pololu/vl53l1x-arduino
 
-3. In hackflight/bolt do:
+4. In hackflight/bolt do:
 
 ```
 make standard_config
