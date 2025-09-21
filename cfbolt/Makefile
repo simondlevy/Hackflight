@@ -1,6 +1,6 @@
 PORT = /dev/ttyACM0
 
-SKETCH = bolt
+SKETCH = cfbolt
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
@@ -18,7 +18,7 @@ $(BIN): $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(SRC)/msp/__me
 		--fqbn $(FQBN) $(SKETCH).ino
 
 $(SRC)/msp/__messages__.h: ../msppg/messages.json
-	cd ../msppg; make install; cd ../bolt
+	cd ../msppg; make install; cd ../$(SKETCH)
 
 standard_config:
 	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp
