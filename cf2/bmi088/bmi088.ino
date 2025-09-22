@@ -32,6 +32,13 @@ static Bmi088Accel accel(wire, ACCEL_ADDR);
 
 static Bmi088Gyro gyro(wire, GYRO_ADDR);
 
+static volatile bool gyro_flag;
+
+static void gyro_drdy()
+{
+  gyro_flag = true;
+}
+
 void setup() 
 {
   int status;
@@ -45,35 +52,47 @@ void setup()
     Serial.println(status);
     while (1) {}
   }
+  status = accel.setOdr(Bmi088Accel::ODR_100HZ_BW_19HZ);
+  status = accel.pinModeInt1(Bmi088Accel::PIN_MODE_PUSH_PULL,Bmi088Accel::PIN_LEVEL_ACTIVE_HIGH);
+
+
   status = gyro.begin();
   if (status < 0) {
     Serial.println("Gyro Initialization Error");
     Serial.println(status);
     while (1) {}
   }
+  status = gyro.setOdr(Bmi088Gyro::ODR_100HZ_BW_12HZ);
+  status = gyro.pinModeInt3(Bmi088Gyro::PIN_MODE_PUSH_PULL,Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH);
+  status = gyro.mapDrdyInt3(true);
+
+  pinMode(GYRO_INT_PIN, INPUT);
+  attachInterrupt(GYRO_INT_PIN, gyro_drdy, RISING);  
 }
 
 void loop() 
 {
-  
-  accel.readSensor();
-  
-  gyro.readSensor();
-  
-  Serial.print(accel.getAccelX_mss());
-  Serial.print("\t");
-  Serial.print(accel.getAccelY_mss());
-  Serial.print("\t");
-  Serial.print(accel.getAccelZ_mss());
-  Serial.print("\t");
-  Serial.print(gyro.getGyroX_rads());
-  Serial.print("\t");
-  Serial.print(gyro.getGyroY_rads());
-  Serial.print("\t");
-  Serial.print(gyro.getGyroZ_rads());
-  Serial.print("\t");
-  Serial.print(accel.getTemperature_C());
-  Serial.print("\n");
-  
-  delay(20);
+  if (gyro_flag) {
+
+    gyro_flag = false;
+    
+    accel.readSensor();
+    
+    gyro.readSensor();
+    
+    Serial.print(accel.getAccelX_mss());
+    Serial.print("\t");
+    Serial.print(accel.getAccelY_mss());
+    Serial.print("\t");
+    Serial.print(accel.getAccelZ_mss());
+    Serial.print("\t");
+    Serial.print(gyro.getGyroX_rads());
+    Serial.print("\t");
+    Serial.print(gyro.getGyroY_rads());
+    Serial.print("\t");
+    Serial.print(gyro.getGyroZ_rads());
+    Serial.print("\t");
+    Serial.print(accel.getTemperature_C());
+    Serial.print("\n");
+  }
 }
