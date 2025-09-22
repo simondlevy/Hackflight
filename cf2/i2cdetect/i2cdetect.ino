@@ -17,17 +17,10 @@
 
 #include <Wire.h>   
 
-#include <BMI088.h>
-
 static const uint8_t SDA_PIN = PC9;
 static const uint8_t SCL_PIN = PA8;
-static const uint8_t GYRO_INT_PIN = PC14;
 
 static TwoWire wire = TwoWire(SDA_PIN, SCL_PIN);
-
-static Bmi088Accel accel(spi, ACCEL_CS_PIN);
-
-static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
 
 void setup()
 {
@@ -40,4 +33,38 @@ void setup()
 
 void loop()
 {  
+    Serial.println("Scanning ...");
+
+    int nDevices = 0;
+
+    for(byte address = 1; address < 127; address++ ) 
+    {
+
+        wire.beginTransmission(address);
+
+        byte error = wire.endTransmission();
+
+        if (error == 0)
+        {
+            Serial.print("I2C device found at address 0x");
+            if (address<16) 
+                Serial.print("0");
+            Serial.println(address,HEX);
+
+            nDevices++;
+        }
+        else if (error==4) 
+        {
+            Serial.print("Unknown error at address 0x");
+            if (address<16) 
+                Serial.print("0");
+            Serial.println(address,HEX);
+        }    
+    }
+    if (nDevices == 0)
+        Serial.println("No I2C devices found\n");
+    else
+        Serial.println("done\n"); 
+
+    delay(1000);
 }

@@ -1,6 +1,6 @@
 PORT = /dev/ttyACM0
 
-SKETCH = cf2
+SKETCH = bmi088
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
