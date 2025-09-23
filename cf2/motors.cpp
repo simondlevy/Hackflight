@@ -19,18 +19,22 @@
 
 #include <motors.hpp>
 
+static const uint8_t M1_PIN = PA1;
+
+static uint8_t pulse_widths[4];
+
 void Motors::device_init()
 {
 }
 
 void Motors::device_setRatio(uint32_t id, uint16_t ratio)
 {
-    (void)id;
-    (void)ratio;
+    pulse_widths[id] = 255 * (ratio / 65536.f);
 }
 
 void Motors::device_run()
 {
+    analogWrite(M1_PIN, pulse_widths[0]);
 }
 
 
