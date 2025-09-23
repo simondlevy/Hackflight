@@ -30,9 +30,9 @@ void Motors::device_init()
 {
 }
 
-void Motors::device_setRatio(uint32_t id, uint16_t ratio)
+void Motors::device_setSpeed(uint32_t id, float speed)
 {
-    pulse_widths[id] = 255 * (ratio / 65536.f);
+    pulse_widths[id] = (uint8_t)(255 * speed);
 }
 
 void Motors::device_run()

@@ -41,9 +41,9 @@ void Motors::device_init()
     motors.arm();
 }
 
-void Motors::device_setRatio(uint32_t id, uint16_t ratio)
+void Motors::device_setSpeed(uint32_t id, float speed)
 {
-    const uint8_t pulse_width = 125 * ((ratio / 65536.f) + 1);
+    const uint8_t pulse_width = 125 * (speed + 1);
 
     motors.set(id, pulse_width);
 }

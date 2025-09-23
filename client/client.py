@@ -33,7 +33,7 @@ except Exception as e:
     exit(0)
 
 BLUETOOTH_ADDRESSES = {
-    'bolt': '64:B7:08:93:71:1E',
+    'cfbolt': '64:B7:08:93:71:1E',
     'cf2': '64:B7:08:87:AD:76',
     'teensy': '64:B7:08:86:F2:AE'
 }

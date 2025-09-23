@@ -56,12 +56,12 @@ class Motors {
         {
             ratios[id] = ratio;
 
-            device_setRatio(id, ratio);
+            device_setSpeed(id, ratio/65536.f);
         }
 
         void device_init();
 
-        void device_setRatio(uint32_t id, uint16_t ratio);
+        void device_setSpeed(uint32_t id, float speed);
 
         void device_run();
 };
