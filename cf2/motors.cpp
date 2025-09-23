@@ -20,6 +20,9 @@
 #include <motors.hpp>
 
 static const uint8_t M1_PIN = PA1;
+static const uint8_t M2_PIN = PB11;
+static const uint8_t M3_PIN = PA15;
+static const uint8_t M4_PIN = PB9;
 
 static uint8_t pulse_widths[4];
 
@@ -35,6 +38,9 @@ void Motors::device_setRatio(uint32_t id, uint16_t ratio)
 void Motors::device_run()
 {
     analogWrite(M1_PIN, pulse_widths[0]);
+    analogWrite(M2_PIN, pulse_widths[1]);
+    analogWrite(M3_PIN, pulse_widths[2]);
+    analogWrite(M4_PIN, pulse_widths[3]);
 }
 
 
