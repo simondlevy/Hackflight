@@ -73,7 +73,7 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, &imuTask, LED_PIN, true);
 
-    imuTask.begin(&estimatorTask, &debugTask);
+    imuTask.begin(&estimatorTask);
 
     coreTask.begin(
             &closedLoopControl,
