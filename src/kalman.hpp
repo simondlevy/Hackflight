@@ -785,31 +785,6 @@ class KalmanFilter {
             }
         }
 
-        // Cholesky Decomposition for a nxn psd input (from scratch)
-        // Reference: 
-        //   https://www.geeksforgeeks.org/cholesky-decomposition-input-decomposition/
-        static void Cholesky_Decomposition(
-                const float input[KC_STATE_DIM][KC_STATE_DIM],  
-                float output[KC_STATE_DIM][KC_STATE_DIM])
-        {
-            // Decomposing a input into Lower Triangular 
-            for (int i = 0; i < KC_STATE_DIM; i++) { 
-                for (int j = 0; j <= i; j++) { 
-                    float sum = 0.0; 
-                    if (j == i) // summation for diagnols 
-                    { 
-                        for (int k = 0; k < j; k++) 
-                            sum += powf(output[j][k], 2); 
-                        output[j][j] = sqrtf(input[j][j] - sum); 
-                    } else { 
-                        for (int k = 0; k < j; k++) 
-                            sum += (output[i][k] * output[j][k]); 
-                        output[i][j] = (input[i][j] - sum) / output[j][j]; 
-                    } 
-                } 
-            }
-        }
-
         void predictDt(
                 float A[KC_STATE_DIM][KC_STATE_DIM],
                 arm_matrix_instance_f32 * Am,
