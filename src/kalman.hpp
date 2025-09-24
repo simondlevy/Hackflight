@@ -62,10 +62,10 @@
 
 #pragma once
 
-#include <linalg.h>
 #include <math3d.h>
 #include <outlierFilterTdoa.hpp>
 #include <datatypes.h>
+#include <matrix_typedef.h>
 
 class KalmanFilter { 
 
@@ -149,7 +149,7 @@ class KalmanFilter {
 
             // The covariance matrix
             __attribute__((aligned(4))) float P[KC_STATE_DIM][KC_STATE_DIM];
-            arm_matrix_instance_f32 Pm;
+            matrix_t Pm;
 
             float baroReferenceHeight;
 
@@ -213,10 +213,10 @@ class KalmanFilter {
             _kalmanData.S[KC_STATE_Z] = _params.initialZ;
 
             // reset the attitude quaternion
-            _kalmanData.initialQuaternion[0] = arm_cos_f32(_params.initialYaw / 2);
+            _kalmanData.initialQuaternion[0] = device_cos(_params.initialYaw / 2);
             _kalmanData.initialQuaternion[1] = 0.0;
             _kalmanData.initialQuaternion[2] = 0.0;
-            _kalmanData.initialQuaternion[3] = arm_sin_f32(_params.initialYaw / 2);
+            _kalmanData.initialQuaternion[3] = device_sin(_params.initialYaw / 2);
 
             for (int i = 0; i < 4; i++) { 
                 _kalmanData.q[i] = _kalmanData.initialQuaternion[i]; 
@@ -278,18 +278,18 @@ class KalmanFilter {
         {
             // The linearized update matrix
             static float A[KC_STATE_DIM][KC_STATE_DIM];
-            static __attribute__((aligned(4))) arm_matrix_instance_f32 Am = { 
+            static __attribute__((aligned(4))) matrix_t Am = { 
                 KC_STATE_DIM, KC_STATE_DIM, (float *)A
             }; // linearized dynamics for covariance update;
 
             // Temporary matrices for the covariance updates
             static float tmpNN1d[KC_STATE_DIM * KC_STATE_DIM];
-            static __attribute__((aligned(4))) arm_matrix_instance_f32 tmpNN1m = { 
+            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN1d
             };
 
             static float tmpNN2d[KC_STATE_DIM * KC_STATE_DIM];
-            static __attribute__((aligned(4))) arm_matrix_instance_f32 tmpNN2m = { 
+            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN2d
             };
 
@@ -298,9 +298,9 @@ class KalmanFilter {
 
         void finalize(
                 float  A[KC_STATE_DIM][KC_STATE_DIM],
-                arm_matrix_instance_f32 * Am,
-                arm_matrix_instance_f32 * tmpNN1m,
-                arm_matrix_instance_f32 * tmpNN2m)
+                matrix_t * Am,
+                matrix_t * tmpNN1m,
+                matrix_t * tmpNN2m)
         {
             // Only finalize if data is updated
             if (! _kalmanData.isUpdated) {
@@ -317,9 +317,9 @@ class KalmanFilter {
             if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
                         0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                             fabsf(v2) < 10)) {
-                float angle = fast_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
-                float ca = arm_cos_f32(angle / 2.0f);
-                float sa = arm_sin_f32(angle / 2.0f);
+                float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
+                float ca = device_cos(angle / 2.0f);
+                float sa = device_sin(angle / 2.0f);
                 float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
                 // Rotate the quad's attitude by the delta quaternion vector
@@ -334,7 +334,7 @@ class KalmanFilter {
                     dq[1] * _kalmanData.q[2] + dq[0] * _kalmanData.q[3];
 
                 // normalize and store the result
-                float norm = fast_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                         tmpq3 * tmpq3) + EPS;
                 _kalmanData.q[0] = tmpq0 / norm;
                 _kalmanData.q[1] = tmpq1 / norm;
@@ -381,9 +381,9 @@ class KalmanFilter {
                 A[KC_STATE_D2][KC_STATE_D1] = -d0 + d1*d2/2;
                 A[KC_STATE_D2][KC_STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                mat_trans(Am, tmpNN1m); // A'
-                mat_mult(Am, &_kalmanData.Pm, tmpNN2m); // AP
-                mat_mult(tmpNN2m, tmpNN1m, &_kalmanData.Pm); //APA'
+                device_mat_trans(Am, tmpNN1m); // A'
+                device_mat_mult(Am, &_kalmanData.Pm, tmpNN2m); // AP
+                device_mat_mult(tmpNN2m, tmpNN1m, &_kalmanData.Pm); //APA'
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
@@ -508,18 +508,18 @@ class KalmanFilter {
         {
             // Matrix to rotate the attitude covariances once updated
             static float A[KC_STATE_DIM][KC_STATE_DIM];
-            static arm_matrix_instance_f32 Am = {
+            static matrix_t Am = {
                 KC_STATE_DIM, KC_STATE_DIM, (float *)A
             };
 
             // Temporary matrices for the covariance updates
             static float tmpNN1d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN1m = {
+            static matrix_t tmpNN1m = {
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN1d
             };
 
             static float tmpNN2d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN2m = {
+            static matrix_t tmpNN2m = {
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN2d
             }; 
             return finalize(A, &Am, &tmpNN1m, &tmpNN2m);
@@ -787,9 +787,9 @@ class KalmanFilter {
 
         void predictDt(
                 float A[KC_STATE_DIM][KC_STATE_DIM],
-                arm_matrix_instance_f32 * Am,
-                arm_matrix_instance_f32 * tmpNN1m,
-                arm_matrix_instance_f32 * tmpNN2m,
+                matrix_t * Am,
+                matrix_t * tmpNN1m,
+                matrix_t * tmpNN2m,
                 Axis3f *acc, 
                 Axis3f *gyro, 
                 float dt, 
@@ -932,9 +932,9 @@ class KalmanFilter {
             A[KC_STATE_D2][KC_STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
             // ====== COVARIANCE UPDATE ======
-            mat_mult(Am, &_kalmanData.Pm, tmpNN1m); // A P
-            mat_trans(Am, tmpNN2m); // A'
-            mat_mult(tmpNN1m, tmpNN2m, &_kalmanData.Pm); // A P A'
+            device_mat_mult(Am, &_kalmanData.Pm, tmpNN1m); // A P
+            device_mat_trans(Am, tmpNN2m); // A'
+            device_mat_mult(tmpNN1m, tmpNN2m, &_kalmanData.Pm); // A P A'
             // Process noise is added after the return from the prediction step
 
             // ====== PREDICTION STEP ======
@@ -1024,9 +1024,9 @@ class KalmanFilter {
             float dtwz = dt*gyro->z;
 
             // compute the quaternion values in [w,x,y,z] order
-            float angle = fast_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
-            float ca = arm_cos_f32(angle/2.0f);
-            float sa = arm_sin_f32(angle/2.0f);
+            float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
+            float ca = device_cos(angle/2.0f);
+            float sa = device_sin(angle/2.0f);
             float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
             float tmpq0;
@@ -1063,7 +1063,7 @@ class KalmanFilter {
             }
 
             // normalize and store the result
-            float norm = fast_sqrt(
+            float norm = device_sqrt(
                     tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPS;
 
             _kalmanData.q[0] = tmpq0/norm; 
@@ -1076,35 +1076,35 @@ class KalmanFilter {
         }
 
         void scalarUpdate(
-                arm_matrix_instance_f32 *Hm, 
+                matrix_t *Hm, 
                 float error, 
                 float stdMeasNoise)
         {
             // The Kalman gain as a column vector
             static float K[KC_STATE_DIM];
-            static arm_matrix_instance_f32 Km = {KC_STATE_DIM, 1, (float *)K};
+            static matrix_t Km = {KC_STATE_DIM, 1, (float *)K};
 
             // Temporary matrices for the covariance updates
             static float tmpNN1d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN1m = {
+            static matrix_t tmpNN1m = {
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN1d
             };
 
             static float tmpNN2d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN2m = {
+            static matrix_t tmpNN2m = {
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN2d
             };
 
             static float tmpNN3d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN3m = {
+            static matrix_t tmpNN3m = {
                 KC_STATE_DIM, KC_STATE_DIM, tmpNN3d
             };
 
             static float HTd[KC_STATE_DIM * 1];
-            static arm_matrix_instance_f32 HTm = {KC_STATE_DIM, 1, HTd};
+            static matrix_t HTm = {KC_STATE_DIM, 1, HTd};
 
             static float PHTd[KC_STATE_DIM * 1];
-            static arm_matrix_instance_f32 PHTm = {KC_STATE_DIM, 1, PHTd};
+            static matrix_t PHTm = {KC_STATE_DIM, 1, PHTd};
 
             scalarUpdate(Hm, &HTm, &Km, PHTd,
                     K, tmpNN1d, &PHTm, &tmpNN1m, &tmpNN2m, &tmpNN3m, 
@@ -1112,23 +1112,23 @@ class KalmanFilter {
         }
 
         void scalarUpdate(
-                arm_matrix_instance_f32 *Hm, 
-                arm_matrix_instance_f32 *HTm, 
-                arm_matrix_instance_f32 *Km, 
+                matrix_t *Hm, 
+                matrix_t *HTm, 
+                matrix_t *Km, 
                 float * PHTd, 
                 float * K, 
                 float * tmpNN1d, 
-                arm_matrix_instance_f32 *PHTm, 
-                arm_matrix_instance_f32 *tmpNN1m, 
-                arm_matrix_instance_f32 *tmpNN2m, 
-                arm_matrix_instance_f32 *tmpNN3m, 
+                matrix_t *PHTm, 
+                matrix_t *tmpNN1m, 
+                matrix_t *tmpNN2m, 
+                matrix_t *tmpNN3m, 
                 float error, 
                 float stdMeasNoise)
         {
             // ====== INNOVATION COVARIANCE ======
 
-            mat_trans(Hm, HTm);
-            mat_mult(&_kalmanData.Pm, HTm, PHTm); // PH'
+            device_mat_trans(Hm, HTm);
+            device_mat_mult(&_kalmanData.Pm, HTm, PHTm); // PH'
             float R = stdMeasNoise*stdMeasNoise;
             float HPHR = R; // HPH' + R
             for (int i=0; i<KC_STATE_DIM; i++) { 
@@ -1148,13 +1148,13 @@ class KalmanFilter {
 
 
             // ====== COVARIANCE UPDATE ======
-            mat_mult(Km, Hm, tmpNN1m); // KH
+            device_mat_mult(Km, Hm, tmpNN1m); // KH
             for (int i=0; i<KC_STATE_DIM; i++) { 
                 tmpNN1d[KC_STATE_DIM*i+i] -= 1; 
             } // KH - I
-            mat_trans(tmpNN1m, tmpNN2m); // (KH - I)'
-            mat_mult(tmpNN1m, &_kalmanData.Pm, tmpNN3m); // (KH - I)*P
-            mat_mult(tmpNN3m, tmpNN2m, &_kalmanData.Pm); // (KH - I)*P*(KH - I)'
+            device_mat_trans(tmpNN1m, tmpNN2m); // (KH - I)'
+            device_mat_mult(tmpNN1m, &_kalmanData.Pm, tmpNN3m); // (KH - I)*P
+            device_mat_mult(tmpNN3m, tmpNN2m, &_kalmanData.Pm); // (KH - I)*P*(KH - I)'
 
             // add the measurement variance and ensure boundedness and symmetry
             // TODO: Why would it hit these bounds? Needs to be investigated.
@@ -1181,7 +1181,7 @@ class KalmanFilter {
         void updateWithAbsoluteHeight(heightMeasurement_t* height) 
         {
             float h[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+            matrix_t H = {1, KC_STATE_DIM, h};
             h[KC_STATE_Z] = 1;
             scalarUpdate(
                     &H, height->height - _kalmanData.S[KC_STATE_Z], height->stdDev);
@@ -1193,7 +1193,7 @@ class KalmanFilter {
         {
             // a measurement of distance to point (x, y, z)
             float h[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+            matrix_t H = {1, KC_STATE_DIM, h};
 
             float dx = _kalmanData.S[KC_STATE_X] - d->x;
             float dy = _kalmanData.S[KC_STATE_Y] - d->y;
@@ -1201,7 +1201,7 @@ class KalmanFilter {
 
             float measuredDistance = d->distance;
 
-            float predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+            float predictedDistance = device_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
             if (predictedDistance != 0.0f) {
 
                 // The measurement is: z = sqrt(dx^2 + dy^2 + dz^2). The
@@ -1270,7 +1270,7 @@ class KalmanFilter {
             // ~~~ X velocity prediction and update ~~~
             // predicts the number of accumulated pixels in the x-direction
             float hx[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 Hx = {1, KC_STATE_DIM, hx};
+            matrix_t Hx = {1, KC_STATE_DIM, hx};
             _predictedNX = (flow->dt * Npix / thetapix ) * 
                 ((dx_g * _kalmanData.R[2][2] / z_g) - omegay_b);
             _measuredNX = flow->dpixelx*FLOW_RESOLUTION;
@@ -1287,7 +1287,7 @@ class KalmanFilter {
 
             // ~~~ Y velocity prediction and update ~~~
             float hy[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 Hy = {1, KC_STATE_DIM, hy};
+            matrix_t Hy = {1, KC_STATE_DIM, hy};
             _predictedNY = (flow->dt * Npix / thetapix ) * 
                 ((dy_g * _kalmanData.R[2][2] / z_g) + omegax_b);
             _measuredNY = flow->dpixely*FLOW_RESOLUTION;
@@ -1309,7 +1309,7 @@ class KalmanFilter {
             // updating all together
             for (int i=0; i<3; i++) {
                 float h[KC_STATE_DIM] = {};
-                arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+                matrix_t H = {1, KC_STATE_DIM, h};
                 h[KC_STATE_X+i] = 1;
                 scalarUpdate(
                         &H, pose->pos[i] - _kalmanData.S[KC_STATE_X+i], pose->stdDevPos);
@@ -1334,7 +1334,7 @@ class KalmanFilter {
             // do a scalar update for each state
             {
                 float h[KC_STATE_DIM] = {};
-                arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+                matrix_t H = {1, KC_STATE_DIM, h};
                 h[KC_STATE_D0] = 1;
                 scalarUpdate(&H, err_quat.x, pose->stdDevQuat);
                 h[KC_STATE_D0] = 0;
@@ -1355,7 +1355,7 @@ class KalmanFilter {
             // together
             for (int i=0; i<3; i++) {
                 float h[KC_STATE_DIM] = {};
-                arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+                matrix_t H = {1, KC_STATE_DIM, h};
                 h[KC_STATE_X+i] = 1;
                 scalarUpdate(&H, xyz->pos[i] -
                         _kalmanData.S[KC_STATE_X+i], xyz->stdDev); 
@@ -1398,7 +1398,7 @@ class KalmanFilter {
             float error = measurement - predicted;
 
             float h[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+            matrix_t H = {1, KC_STATE_DIM, h};
 
             if ((d0 != 0.0f) && (d1 != 0.0f)) {
                 h[KC_STATE_X] = (dx1 / d1 - dx0 / d0);
@@ -1418,7 +1418,7 @@ class KalmanFilter {
         {
             // Updates the filter with a measured distance in the zb direction using the
             float h[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+            matrix_t H = {1, KC_STATE_DIM, h};
 
             // Only update the filter if the measurement is reliable 
             // (\hat{h} -> infty when R[2][2] -> 0)
@@ -1461,7 +1461,7 @@ class KalmanFilter {
         void updateWithYawError(yawErrorMeasurement_t *error)
         {
             float h[KC_STATE_DIM] = {};
-            arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
+            matrix_t H = {1, KC_STATE_DIM, h};
 
             h[KC_STATE_D2] = 1;
             scalarUpdate(&H, _kalmanData.S[KC_STATE_D2] - error->yawError, error->stdDev); 
@@ -1479,4 +1479,15 @@ class KalmanFilter {
             _gyroLatest = m.data.gyroscope.gyro;
         }
 
+        static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
+
+        static void device_mat_mult(
+                const matrix_t * pSrcA, const matrix_t * pSrcB,
+                matrix_t * pDst);
+
+        static float device_cos(const float x);
+
+        static float device_sin(const float x);
+
+        static float device_sqrt(const float32_t in);
 };

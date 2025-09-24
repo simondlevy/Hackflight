@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2021 Bitcraze AB
+ * Copyright (C) 2018-2021 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,36 +17,44 @@
 
 #pragma once
 
+#include <kalman.hpp>
+
 #include <arm_math.h>
-#pragma GCC diagnostic pop
 
-static inline void mat_trans(const arm_matrix_instance_f32 * pSrc, 
-        arm_matrix_instance_f32 * pDst) 
+void KalmanFilter::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
 {
-  arm_mat_trans_f32(pSrc, pDst);
+  arm_mat_trans_f32((arm_matrix_instance_f32 *)pSrc,
+          (arm_matrix_instance_f32 *)pDst);
 }
 
-static inline void mat_inv(const arm_matrix_instance_f32 * pSrc, 
-        arm_matrix_instance_f32 * pDst) 
+void KalmanFilter::device_mat_mult(
+        const matrix_t * pSrcA, const matrix_t * pSrcB,
+        matrix_t * pDst) 
 {
-  arm_mat_inverse_f32(pSrc, pDst);
+  arm_mat_mult_f32((arm_matrix_instance_f32 *)pSrcA, (arm_matrix_instance_f32 *)pSrcB,
+          (arm_matrix_instance_f32 *)pDst);
 }
 
-static inline void mat_mult(const arm_matrix_instance_f32 * pSrcA, 
-        const arm_matrix_instance_f32 * pSrcB, arm_matrix_instance_f32 * pDst) 
+float KalmanFilter::device_cos(const float x)
 {
-  arm_mat_mult_f32(pSrcA, pSrcB, pDst);
+    return arm_cos_f32(x);
 }
 
-static inline float fast_sqrt(float32_t in) 
+float KalmanFilter::device_sin(const float x)
+{
+    return arm_sin_f32(x);
+}
+
+float KalmanFilter::device_sqrt(const float32_t in) 
 {
   float pOut = 0;
   arm_sqrt_f32(in, &pOut);
   return pOut;
 }
 
+/*
 static inline void mat_scale(const arm_matrix_instance_f32 * pSrcA,
         float32_t scale, arm_matrix_instance_f32 * pDst) 
 {
   arm_mat_scale_f32(pSrcA, scale, pDst);
-}
+}*/
