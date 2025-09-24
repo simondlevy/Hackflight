@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <STM32FreeRTOS.h>
+#include <free_rtos_include.h>
 
 class FreeRtosTask {
 

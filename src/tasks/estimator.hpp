@@ -18,8 +18,7 @@
 
 #include <Arduino.h>
 
-#include <STM32FreeRTOS.h>
-#include <semphr.h>
+#include <free_rtos_include.h>
 
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>

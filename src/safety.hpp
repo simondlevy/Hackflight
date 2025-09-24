@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <STM32FreeRTOS.h>
+#include <free_rtos_include.h>
 
 #include <clock.hpp>
 #include <datatypes.h>
