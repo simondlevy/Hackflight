@@ -15,4 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// FreeRTOS is built into ESP32
+#pragma once
+
+static bool xPortIsInsideInterrupt()
+{
+    return xPortInIsrContext();
+}
