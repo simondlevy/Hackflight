@@ -19,38 +19,16 @@
 
 #include <motors.hpp>
 
-static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
-
-static const std::vector<uint8_t> POWER_SWITCH_PINS = {PA0, PB12, PC8, PC15};
-
-static auto motors = OneShot125(MOTOR_PINS);
-
-static void enableMotor(const uint8_t id)
-{
-    pinMode(POWER_SWITCH_PINS[id], OUTPUT);
-    digitalWrite(POWER_SWITCH_PINS[id], HIGH);
-}
-
 void Motors::device_init()
 {
-    enableMotor(0);
-    enableMotor(1);
-    enableMotor(2);
-    enableMotor(3);
-
-    motors.arm();
 }
 
-void Motors::device_setRatio(uint32_t id, uint16_t ratio)
+void Motors::device_setSpeed(uint32_t id, float speed)
 {
-    const uint8_t pulse_width = 125 * ((ratio / 65536.f) + 1);
-
-    motors.set(id, pulse_width);
 }
 
 void Motors::device_run()
 {
-    motors.run();
 }
 
 

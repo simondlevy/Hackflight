@@ -16,27 +16,14 @@
 
 #pragma once
 
-#include <VL53L1X.h>
-
 #include <tasks/zranger.hpp>
-
-static VL53L1X vl53l1x;
 
 bool ZRangerTask::device_init()
 {
-    if (!vl53l1x.init()) {
-        return false;
-    }
-
-    vl53l1x.setDistanceMode(VL53L1X::Medium);
-    vl53l1x.setMeasurementTimingBudget(25000);
-
-    vl53l1x.startContinuous(50);
-
     return true;
 }
 
 float ZRangerTask::device_read()
 {
-    return vl53l1x.read();
+    return 0;
 }
