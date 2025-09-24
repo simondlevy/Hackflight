@@ -317,7 +317,7 @@ class KalmanFilter {
             if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
                         0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                             fabsf(v2) < 10)) {
-                float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
+                float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
                 float ca = device_cos(angle / 2.0f);
                 float sa = device_sin(angle / 2.0f);
                 float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
@@ -335,7 +335,7 @@ class KalmanFilter {
 
                 // normalize and store the result
                 float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                        tmpq3 * tmpq3) + EPS;
+                        tmpq3 * tmpq3) + EPSILON;
                 _kalmanData.q[0] = tmpq0 / norm;
                 _kalmanData.q[1] = tmpq1 / norm;
                 _kalmanData.q[2] = tmpq2 / norm;
@@ -619,7 +619,7 @@ class KalmanFilter {
         static constexpr float MAX_VELOCITY = 10; //meters per second
 
         // Small number epsilon, to prevent dividing by zero
-        static constexpr float EPS = 1e-6f;
+        static constexpr float EPSILON = 1e-6f;
 
         // the reversion of pitch and roll to zero
         static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
@@ -1024,7 +1024,7 @@ class KalmanFilter {
             float dtwz = dt*gyro->z;
 
             // compute the quaternion values in [w,x,y,z] order
-            float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
+            float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
             float ca = device_cos(angle/2.0f);
             float sa = device_sin(angle/2.0f);
             float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
@@ -1064,7 +1064,7 @@ class KalmanFilter {
 
             // normalize and store the result
             float norm = device_sqrt(
-                    tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPS;
+                    tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
             _kalmanData.q[0] = tmpq0/norm; 
             _kalmanData.q[1] = tmpq1/norm; 
