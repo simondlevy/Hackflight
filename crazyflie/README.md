@@ -17,9 +17,21 @@
 * https://github.com/bolderflight/bmi088-arduino
 * https://github.com/pololu/vl53l1x-arduino
 
-4. In hackflight/bolt do:
+4. In hackflight/crazyflie do:
 
 ```
 make standard_config
-make
 ```
+
+then
+
+```
+make cf2
+```
+
+or
+
+```
+make bolt
+```
+

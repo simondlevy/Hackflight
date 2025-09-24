@@ -16,11 +16,11 @@
 
 #pragma once
 
+#include <comms.hpp>
 #include <msp/messages.h>
 #include <msp/parser.hpp>
 #include <safety.hpp>
 #include <tasks/debug.hpp>
-#include <uart_api.h>
 
 class SetpointTask {
 
@@ -113,7 +113,7 @@ class SetpointTask {
 
                 uint8_t byte = 0;
 
-                while (uart_read_byte(&byte)) {
+                while (Comms::read_byte(&byte)) {
 
                     switch (parser.parse(byte)) {
 

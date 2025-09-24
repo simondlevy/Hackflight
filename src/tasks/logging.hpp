@@ -18,11 +18,11 @@
 
 #include <__control__.hpp>
 
+#include <comms.hpp>
 #include <msp/messages.h>
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
-#include <uart_api.h>
 
 class LoggingTask {
 
@@ -100,7 +100,7 @@ class LoggingTask {
  
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                uart_write_byte(serializer.payload[k]);
+                Comms::write_byte(serializer.payload[k]);
             }
         }
 };

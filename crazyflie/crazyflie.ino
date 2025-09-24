@@ -21,11 +21,11 @@
 #include <semphr.h>
 
 #include <hackflight.h>
+#include <comms.hpp>
 #include <__control__.hpp>
 #include <mixers/crazyflie.hpp>
 #include <motors.hpp>
 #include <safety.hpp>
-#include <uart_api.h>
 
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
@@ -55,7 +55,7 @@ static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
 {
-    uart_init();
+    Comms::init();
 
 	debugTask.begin();
 
