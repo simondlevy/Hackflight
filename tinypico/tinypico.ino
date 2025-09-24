@@ -36,7 +36,6 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
-/*
 static ClosedLoopControl closedLoopControl;
 
 static Motors motors;
@@ -53,6 +52,7 @@ static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
+/*
 static void systemTask(void *arg)
 {
     Comms::init();
@@ -89,6 +89,10 @@ static void systemTask(void *arg)
 }
 */
 
+#include <TinyPICO.h>
+
+static TinyPICO tinypico = TinyPICO();
+
 void setup() 
 {
     /*
@@ -112,4 +116,8 @@ void setup()
 
 void loop() 
 {
+    tinypico.DotStar_SetPixelColor(255, 0, 0 );
+    delay(500);
+    tinypico.DotStar_SetPixelColor(0, 0, 0 );
+    delay(500);
 }

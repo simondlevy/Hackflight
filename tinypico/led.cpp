@@ -16,8 +16,13 @@
 
 #include <tasks/led.hpp>
 
+#include <TinyPICO.h>
+
+static TinyPICO tinypico = TinyPICO();
+
 void LedTask::device_init()
 {
+
 }
 
 void LedTask::device_set(const bool on)
