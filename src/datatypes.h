@@ -115,9 +115,8 @@ typedef struct {
  */
 
 /* vector */
-#define vec3d_size 3
-typedef float vec3d[vec3d_size];
-typedef float mat3d[vec3d_size][vec3d_size];
+typedef float vec3d[3];
+typedef float mat3d[3][3];
 
 typedef struct vec3_s vector_t;
 

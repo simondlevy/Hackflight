@@ -15,8 +15,6 @@
  *
  */
 
-#pragma once
-
 #include <kalman.hpp>
 
 #include <arm_math.h>
