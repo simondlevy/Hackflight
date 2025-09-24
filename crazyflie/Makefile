@@ -6,6 +6,15 @@ BIN = build/crazyflie.ino.bin
 
 SRC = ../src
 
+bolt: crazyflie.ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(SRC)/msp/__messages__.h
+	cp bolt/imu.cpp ./__imu__.cpp
+	cp bolt/motors.cpp ./__motors__.cpp
+	arduino-cli compile \
+		--libraries $(HOME)/Documents/Arduino/libraries \
+		--libraries ../.. \
+		--build-path ./build \
+		--fqbn $(FQBN) crazyflie.ino
+
 cf2: crazyflie.ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(SRC)/msp/__messages__.h
 	cp cf2/imu.cpp ./__imu__.cpp
 	cp cf2/motors.cpp ./__motors__.cpp
