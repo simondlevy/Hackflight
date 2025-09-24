@@ -28,29 +28,19 @@ class LedTask {
 
     public:
 
-        void begin(
-                Safety * safety,
-                ImuTask * imuTask,
-                const uint8_t pin,
-                const bool active_low=false) 
+        void begin( Safety * safety, ImuTask * imuTask)
         {
             if (_task.didInit()){
                 return;
             }
 
-            _pin = pin;
-
-            _active_low = active_low;
-
             _imuTask = imuTask;
 
             _task.init(runLedTask, "led", this, 2);
 
-            pinMode(_pin, OUTPUT);
-
-            set(LOW);
-
             _safety = safety;
+
+            device_init();
         }
 
     private:
@@ -60,10 +50,6 @@ class LedTask {
         static constexpr float IMU_CALIBRATION_HZ = 3;
 
         static constexpr uint32_t PULSE_MSEC = 50;
-
-        uint8_t _pin;
-
-        bool _active_low;
 
         FreeRtosTask _task;
 
@@ -87,7 +73,7 @@ class LedTask {
                 }
 
                 else if (_safety->isArmed()) { 
-                    set(true);
+                    device_set(true);
                 }
                 else {
                     blink(lastWakeTime, HEARTBEAT_HZ);
@@ -96,16 +82,16 @@ class LedTask {
             }
         }
 
-        void set(const bool on)
-        {
-            digitalWrite(_pin, _active_low ? !on : on);
-        }
 
         void blink(TickType_t & lastWakeTime, const float rate)
         {
-            set(true);
+            device_set(true);
             vTaskDelay(PULSE_MSEC);
-            set(false);
+            device_set(false);
             vTaskDelayUntil(&lastWakeTime, 1000/rate);
         }
+
+        void device_init();
+
+        void device_set(const bool on);
 };

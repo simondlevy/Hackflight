@@ -37,8 +37,6 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
-static const uint8_t LED_PIN = PC0;
-
 static ClosedLoopControl closedLoopControl;
 
 static Motors motors;
@@ -71,7 +69,7 @@ static void systemTask(void *arg)
 
     loggingTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&safety, &imuTask, LED_PIN, true);
+    ledTask.begin(&safety, &imuTask);
 
     imuTask.begin(&estimatorTask, &debugTask);
 
