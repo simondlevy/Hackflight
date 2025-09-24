@@ -18,7 +18,6 @@
 #include <Wire.h>
 
 #include <STM32FreeRTOS.h>
-#include <semphr.h>
 
 #include <hackflight.h>
 #include <comms.hpp>
