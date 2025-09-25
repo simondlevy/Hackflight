@@ -44,7 +44,7 @@ void setup()
             "StaticTask",              
             STACKSIZE,    
             NULL, // argument
-            1,    // priority 
+            2,    // priority 
             taskStackBuffer,         
             &taskBuffer         
             );
