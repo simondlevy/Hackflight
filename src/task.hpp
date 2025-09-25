@@ -26,7 +26,7 @@ class FreeRtosTask {
 
         typedef void (*taskfun_t)(void * obj);
 
-        StackType_t  _taskStackBuffer[STACKSIZE]; 
+        StackType_t _taskStackBuffer[STACKSIZE]; 
 
         StaticTask_t _taskTaskBuffer;
 
