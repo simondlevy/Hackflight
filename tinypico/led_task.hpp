@@ -1,5 +1,3 @@
-#include <TinyPICO.h>
-
 #include <task.hpp>
 
 class LedTask {

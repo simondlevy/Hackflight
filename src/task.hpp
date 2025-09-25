@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <TinyPICO.h>
+
 class FreeRtosTask {
 
     private:
