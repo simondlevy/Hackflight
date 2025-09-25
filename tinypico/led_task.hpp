@@ -44,11 +44,6 @@ class LedTask {
             }
         }
 
-        void device_set(const bool on)
-        {
-            tinypico.DotStar_SetPixelColor(on ? 255 : 0, 0, 0 );
-        }
-
         void blink(TickType_t & lastWakeTime, const float rate)
         {
             device_set(true);
@@ -57,4 +52,7 @@ class LedTask {
             vTaskDelayUntil(&lastWakeTime, 1000/rate);
         }
 
+        void device_init();
+
+        void device_set(const bool on);
 };

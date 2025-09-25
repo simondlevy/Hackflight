@@ -14,8 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-#include <tasks/led.hpp>
+#include "led_task.hpp"
 
 #include <TinyPICO.h>
 
@@ -29,4 +28,4 @@ void LedTask::device_init()
 void LedTask::device_set(const bool on)
 {
     tinypico.DotStar_SetPixelColor(on ? 255 : 0, 0, 0 );
-}*/
+}
