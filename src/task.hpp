@@ -22,9 +22,9 @@ class FreeRtosTask {
 
     private:
 
-        typedef void (*taskfun_t)(void * obj);
-
         static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
+
+        typedef void (*taskfun_t)(void * obj);
 
         StackType_t  _taskStackBuffer[STACKSIZE]; 
 

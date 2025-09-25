@@ -49,6 +49,8 @@ class FreeRtosTask {
                     priority,
                     _taskStackBuffer,         
                     &_taskBuffer);        
+
+            _didInit = true;
         }
 
         bool didInit()
