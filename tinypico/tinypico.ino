@@ -1,6 +1,5 @@
 #include <TinyPICO.h>
 
-// #define STACKSIZE 2048
 static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
 StaticTask_t xStaticTaskBuffer;
@@ -32,8 +31,8 @@ void setup()
         fun,      
         "StaticTask",              
         STACKSIZE,    
-        NULL,                      
-        tskIDLE_PRIORITY + 1,      
+        NULL, // argument
+        1,    // priority 
         uxStaticTaskStack,         
         &xStaticTaskBuffer         
     );
