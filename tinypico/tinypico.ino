@@ -2,6 +2,11 @@
 
 #include <free_rtos_include.h>
 
+#include "led_task.hpp"
+
+static LedTask ledTask;
+
+/*
 static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
 StackType_t taskStackBuffer[STACKSIZE];
@@ -26,7 +31,6 @@ static void blink(TickType_t & lastWakeTime, const float rate)
     vTaskDelayUntil(&lastWakeTime, 1000/rate);
 }
 
-
 static void fun(void *) 
 {
     TickType_t lastWakeTime = xTaskGetTickCount();
@@ -36,18 +40,11 @@ static void fun(void *)
         blink(lastWakeTime, HEARTBEAT_HZ);
     }
 }
+*/
 
 void setup() 
 {
-    xTaskCreateStatic(
-            fun,      
-            "StaticTask",              
-            STACKSIZE,    
-            NULL, // argument
-            2,    // priority 
-            taskStackBuffer,         
-            &taskBuffer         
-            );
+    ledTask.begin();
 }
 
 void loop()
