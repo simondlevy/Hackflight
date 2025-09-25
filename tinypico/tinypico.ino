@@ -18,9 +18,9 @@ static void fun(void *)
     while (true) {
 
         device_set(true);
-        vTaskDelay(pdMS_TO_TICKS(20));
+        vTaskDelay(20);
         device_set(false);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(1000);
     }
 }
 
