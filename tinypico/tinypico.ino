@@ -1,5 +1,7 @@
 #include <TinyPICO.h>
 
+#include <free_rtos_include.h>
+
 static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
 StaticTask_t xStaticTaskBuffer;
