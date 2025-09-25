@@ -20,7 +20,7 @@ class LedTask {
         static constexpr float HEARTBEAT_HZ = 1;
         static constexpr uint32_t PULSE_MSEC = 50;
 
-        Task _task;
+        FreeRtosTask _task;
 
         TinyPICO tinypico = TinyPICO();
 
