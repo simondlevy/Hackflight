@@ -1,45 +1,48 @@
-#include <free_rtos_include.h>
+/*
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"*/
 
 #include <TinyPICO.h>
 
-static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
+#define STATIC_TASK_STACK_SIZE 2048
 
-static TaskHandle_t Task1;
+StaticTask_t xStaticTaskBuffer;
+StackType_t uxStaticTaskStack[STATIC_TASK_STACK_SIZE];
 
 static TinyPICO tinypico = TinyPICO();
-
-static StackType_t  taskStackBuffer[STACKSIZE]; 
-
-static StaticTask_t taskTaskBuffer;
-
 
 static void device_set(const bool on)
 {
     tinypico.DotStar_SetPixelColor(on ? 255 : 0, 0, 0 );
 }
 
-static void fun(void * arg)
+
+static void static_task_function(void *pvParameters) 
 {
-    while (true) {
+    for (;;) {
 
         device_set(true);
-        delay(20);
+        vTaskDelay(pdMS_TO_TICKS(20));
         device_set(false);
-        delay(1000);
-    } 
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
 
 void setup() 
 {
-    xTaskCreate(
-            fun,   
-            "Task1",     
-            10000,       // stack size 
-            NULL,        // parameter
-            1,           // priority
-            &Task1);      
+
+    xTaskCreateStatic(
+        static_task_function,      
+        "StaticTask",              
+        STATIC_TASK_STACK_SIZE,    
+        NULL,                      
+        tskIDLE_PRIORITY + 1,      
+        uxStaticTaskStack,         
+        &xStaticTaskBuffer         
+    );
 }
 
-void loop() 
+void loop()
 {
 }
