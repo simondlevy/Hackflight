@@ -1,5 +1,3 @@
-#include <TinyPICO.h>
-
 #include "led_task.hpp"
 
 static LedTask ledTask;
