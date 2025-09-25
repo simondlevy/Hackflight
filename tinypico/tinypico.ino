@@ -1,123 +1,79 @@
-/**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-#include <Wire.h>
-
-#include <free_rtos_include.h>
-
-#include <hackflight.h>
-#include <comms.hpp>
-#include <__control__.hpp>
-#include <mixers/crazyflie.hpp>
-#include <motors.hpp>
-#include <safety.hpp>
-
-#include <tasks/core.hpp>
-#include <tasks/debug.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/led.hpp>
-#include <tasks/logging.hpp>
-#include <tasks/opticalflow.hpp>
-#include <tasks/setpoint.hpp>
-#include <tasks/zranger.hpp>
-
-static ClosedLoopControl closedLoopControl;
-
-static Motors motors;
-
-static Safety safety = Safety(&motors);
-
-static CoreTask coreTask;
-static DebugTask debugTask;
-static EstimatorTask estimatorTask;
-static ImuTask imuTask;
-static LedTask ledTask;
-static LoggingTask loggingTask;
-static OpticalFlowTask opticalFlowTask;
-static SetpointTask setpointTask;
-static ZRangerTask zrangerTask;
-
-/*
-static void systemTask(void *arg)
-{
-    Comms::init();
-
-	debugTask.begin();
-
-    zrangerTask.begin(&estimatorTask);
-
-    opticalFlowTask.begin(&estimatorTask);
-
-    estimatorTask.begin(&safety);
-
-    setpointTask.begin(&safety);
-
-    loggingTask.begin(&estimatorTask, &closedLoopControl);
-
-    ledTask.begin(&safety, &imuTask);
-
-    imuTask.begin(&estimatorTask, &debugTask);
-
-    coreTask.begin(
-            &closedLoopControl,
-            &safety,
-            &estimatorTask,
-            &imuTask,
-            &setpointTask,
-            &motors,
-            Mixer::rotorCount,
-            Mixer::mix);
-
-    while (true) {
-        vTaskDelay(portMAX_DELAY);
-    }
-}
-*/
+/*********
+  Rui Santos
+  Complete project details at http://randomnerdtutorials.com  
+ *********/
 
 #include <TinyPICO.h>
 
+TaskHandle_t Task1;
+TaskHandle_t Task2;
+
 static TinyPICO tinypico = TinyPICO();
 
-void setup() 
-{
-    /*
-    Serial.begin(115200);
+// LED pins
+const int led1 = 2;
+const int led2 = 4;
 
-    Wire.begin();
-    Wire.setClock(400000);
-    delay(100);
+void setup() {
+    Serial.begin(115200); 
+    pinMode(led1, OUTPUT);
+    pinMode(led2, OUTPUT);
 
-    xTaskCreate(
-            systemTask, 
-            "SYSTEM",
-            2* configMINIMAL_STACK_SIZE, 
-            NULL, 
-            2, 
-            NULL);
+    //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
+    xTaskCreatePinnedToCore(
+            Task1code,   /* Task function. */
+            "Task1",     /* name of task. */
+            10000,       /* Stack size of task */
+            NULL,        /* parameter of the task */
+            1,           /* priority of the task */
+            &Task1,      /* Task handle to keep track of created task */
+            0);          /* pin task to core 0 */                  
+    delay(500); 
 
-    vTaskStartScheduler();
-    */
+    //create a task that will be executed in the Task2code() function, with priority 1 and executed on core 1
+    xTaskCreatePinnedToCore(
+            Task2code,   /* Task function. */
+            "Task2",     /* name of task. */
+            10000,       /* Stack size of task */
+            NULL,        /* parameter of the task */
+            1,           /* priority of the task */
+            &Task2,      /* Task handle to keep track of created task */
+            1);          /* pin task to core 1 */
+    delay(500); 
 }
 
-void loop() 
+static void device_set(const bool on)
 {
-    tinypico.DotStar_SetPixelColor(255, 0, 0 );
-    delay(500);
-    tinypico.DotStar_SetPixelColor(0, 0, 0 );
-    delay(500);
+    tinypico.DotStar_SetPixelColor(on ? 255 : 0, 0, 0 );
+}
+
+//Task1code: blinks an LED every 1000 ms
+void Task1code( void * pvParameters ){
+    Serial.print("Task1 running on core ");
+    Serial.println(xPortGetCoreID());
+
+    for(;;){
+        device_set(true);
+        delay(1000);
+        device_set(false);
+        delay(1000);
+    } 
+}
+
+//Task2code: blinks an LED every 700 ms
+void Task2code( void * pvParameters ){
+    Serial.print("Task2 running on core ");
+    Serial.println(xPortGetCoreID());
+
+    for(;;){
+        /*
+        digitalWrite(led2, HIGH);
+        delay(700);
+        digitalWrite(led2, LOW);
+        delay(700);*/
+    }
+}
+
+void loop() {
+
 }
