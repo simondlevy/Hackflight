@@ -1,6 +1,6 @@
 #include <TinyPICO.h>
 
-#include <free_rtos_include.h>
+#include "task_helper.hpp"
 
 class LedTask {
 
@@ -8,39 +8,31 @@ class LedTask {
 
         void begin()
         {
-            xTaskCreateStatic(
-                    fun,      
-                    "StaticTask",              
-                    STACKSIZE,    
-                    this, // argument
-                    2,    // priority 
-                    _taskStackBuffer,         
-                    &_taskBuffer         
-                    );        
+            _task.init(runLedTask, "led", this, 2);
         }
 
     private:
 
-        static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
-
         static constexpr float HEARTBEAT_HZ = 1;
         static constexpr uint32_t PULSE_MSEC = 50;
 
-        StackType_t _taskStackBuffer[STACKSIZE];
-
-        StaticTask_t _taskBuffer;
+        Task _task;
 
         TinyPICO tinypico = TinyPICO();
 
-        static void fun(void * arg) 
+        static void runLedTask(void * obj)
+        {
+            ((LedTask *)obj)->run();
+        }
+
+
+        void run() 
         {
             TickType_t lastWakeTime = xTaskGetTickCount();
 
-            LedTask * ledTask = (LedTask *)arg;
-
             while (true) {
 
-                ledTask->blink(lastWakeTime, HEARTBEAT_HZ);
+                blink(lastWakeTime, HEARTBEAT_HZ);
             }
         }
 
