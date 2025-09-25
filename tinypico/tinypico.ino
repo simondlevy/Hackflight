@@ -19,12 +19,12 @@ static void device_set(const bool on)
     tinypico.DotStar_SetPixelColor(on ? 255 : 0, 0, 0 );
 }
 
-void blink(const float rate)
+static void blink(TickType_t & lastWakeTime, const float rate)
 {
     device_set(true);
     vTaskDelay(PULSE_MSEC);
     device_set(false);
-    vTaskDelay(1000/rate);
+    vTaskDelayUntil(&lastWakeTime, 1000/rate);
 }
 
 
@@ -34,13 +34,7 @@ static void fun(void *)
 
     while (true) {
 
-        blink(HEARTBEAT_HZ);
-
-        /*
-        device_set(true);
-        vTaskDelay(20);
-        device_set(false);
-        vTaskDelay(1000);*/
+        blink(lastWakeTime, HEARTBEAT_HZ);
     }
 }
 
