@@ -12,8 +12,9 @@ static void device_set(const bool on)
 static void Task1code( void * pvParameters )
 {
     while (true) {
+
         device_set(true);
-        delay(1000);
+        delay(20);
         device_set(false);
         delay(1000);
     } 
