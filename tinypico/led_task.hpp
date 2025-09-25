@@ -8,6 +8,10 @@ class LedTask {
 
         void begin()
         {
+            if (_task.didInit()){
+                return;
+            }
+
             _task.init(runLedTask, "led", this, 2);
         }
 
@@ -24,7 +28,6 @@ class LedTask {
         {
             ((LedTask *)obj)->run();
         }
-
 
         void run() 
         {

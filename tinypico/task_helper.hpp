@@ -12,6 +12,8 @@ class Task {
 
         StaticTask_t _taskBuffer;
 
+        bool _didInit;
+
     public:
 
         void init(
@@ -31,5 +33,8 @@ class Task {
                     &_taskBuffer);        
         }
 
-
+        bool didInit()
+        {
+            return _didInit;
+        }
 };
