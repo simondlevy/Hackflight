@@ -4,15 +4,14 @@
 
 static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
-static constexpr float HEARTBEAT_HZ = 1;
-static constexpr uint32_t PULSE_MSEC = 50;
+StackType_t taskStackBuffer[STACKSIZE];
 
-
-StaticTask_t xStaticTaskBuffer;
-
-StackType_t uxStaticTaskStack[STACKSIZE];
+StaticTask_t taskBuffer;
 
 static TinyPICO tinypico = TinyPICO();
+
+static constexpr float HEARTBEAT_HZ = 1;
+static constexpr uint32_t PULSE_MSEC = 50;
 
 static void device_set(const bool on)
 {
@@ -40,15 +39,14 @@ static void fun(void *)
 
 void setup() 
 {
-
     xTaskCreateStatic(
             fun,      
             "StaticTask",              
             STACKSIZE,    
             NULL, // argument
             1,    // priority 
-            uxStaticTaskStack,         
-            &xStaticTaskBuffer         
+            taskStackBuffer,         
+            &taskBuffer         
             );
 }
 
