@@ -9,7 +9,7 @@ static void device_set(const bool on)
     tinypico.DotStar_SetPixelColor(on ? 255 : 0, 0, 0 );
 }
 
-static void Task1code( void * pvParameters )
+static void fun(void * arg)
 {
     while (true) {
 
@@ -23,7 +23,7 @@ static void Task1code( void * pvParameters )
 void setup() 
 {
     xTaskCreatePinnedToCore(
-            Task1code,   
+            fun,   
             "Task1",     
             10000,       // stack size 
             NULL,        // parameter
