@@ -21,25 +21,33 @@
 
 void KalmanFilter::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
 {
+    xtensa_mat_trans_f32((const xtensa_matrix_instance_f32 *)pSrc,
+        (xtensa_matrix_instance_f32 *)pDst);
 }
 
 void KalmanFilter::device_mat_mult(
         const matrix_t * pSrcA, const matrix_t * pSrcB,
         matrix_t * pDst) 
 {
+    xtensa_mat_mult_f32(
+            (const xtensa_matrix_instance_f32 *)pSrcA,
+            (const xtensa_matrix_instance_f32 *)pSrcB,
+            (xtensa_matrix_instance_f32 *)pDst);
 }
 
 float KalmanFilter::device_cos(const float x)
 {
-    return 0;
+    return xtensa_cos_f32(x);
 }
 
 float KalmanFilter::device_sin(const float x)
 {
-    return 0;
+    return xtensa_sin_f32(x);
 }
 
 float KalmanFilter::device_sqrt(const float32_t in) 
 {
-    return 0;
+    float out = 0;
+    xtensa_sqrt_f32(in, (float32_t *)&out);
+    return out;
 }
