@@ -19,6 +19,7 @@
 
 #include <hackflight.h>
 #include <comms.hpp>
+#include <__control__.hpp>
 #include <mixers/crazyflie.hpp>
 #include <motors.hpp>
 #include <safety.hpp>
@@ -28,6 +29,8 @@
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
+
+static ClosedLoopControl closedLoopControl;
 
 static Motors motors;
 
