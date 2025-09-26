@@ -47,7 +47,7 @@ static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
 {
-    //Comms::init();
+    Comms::init();
 
 	//debugTask.begin();
 
