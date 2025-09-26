@@ -23,6 +23,10 @@
 #include <safety.hpp>
 #include <tasks/led.hpp>
 
+static Motors motors;
+
+static Safety safety = Safety(&motors);
+
 static LedTask ledTask;
 
 void setup() 
