@@ -16,7 +16,7 @@
  */
 
 #include <kalman.hpp>
-
+#include "matrix_typedef.h"
 #include "xtensa_math.h"
 
 void KalmanFilter::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)

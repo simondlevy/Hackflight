@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <xtensa_math.h>
+#include "xtensa_math.h"
 
 typedef xtensa_matrix_instance_f32 matrix_t;
 
