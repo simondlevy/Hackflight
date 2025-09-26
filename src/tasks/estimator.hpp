@@ -18,8 +18,6 @@
 
 #include <Arduino.h>
 
-#include <free_rtos_include.h>
-
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
