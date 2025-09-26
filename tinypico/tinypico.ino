@@ -35,9 +35,9 @@ static LedTask ledTask;
 
 static void systemTask(void *arg)
 {
-    /*
     Comms::init();
 
+    /*
 	debugTask.begin();
 
     zrangerTask.begin(&estimatorTask);
