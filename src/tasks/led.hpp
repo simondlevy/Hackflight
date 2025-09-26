@@ -70,7 +70,16 @@ class LedTask {
 
             while (true) {
 
-                blink(lastWakeTime, HEARTBEAT_HZ);
+                if (!_imuTask->imuIsCalibrated()) {
+                    blink(lastWakeTime, IMU_CALIBRATION_HZ);
+                }
+
+                else if (_safety->isArmed()) { 
+                    device_set(true);
+                }
+                else {
+                    blink(lastWakeTime, HEARTBEAT_HZ);
+                }
             }
         }
 
