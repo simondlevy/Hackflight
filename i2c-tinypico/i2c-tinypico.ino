@@ -3,16 +3,12 @@
 static const uint8_t I2C_SDA = 33;
 static const uint8_t I2C_SCL = 32;
 
-//static TwoWire wire1 = TwoWire(0);
-
 void setup()
 {
     Serial.begin(115200);
 
     Wire.begin();
     Wire1.begin(I2C_SDA, I2C_SCL, 100000);
-
-
     delay(100);
 }
 

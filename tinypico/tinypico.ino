@@ -29,6 +29,7 @@
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
+#include <tasks/zranger.hpp>
 
 static ClosedLoopControl closedLoopControl;
 
@@ -42,6 +43,7 @@ static ImuTask imuTask;
 static LedTask ledTask;
 static LoggingTask loggingTask;
 static SetpointTask setpointTask;
+static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
 {
@@ -49,7 +51,7 @@ static void systemTask(void *arg)
 
 	debugTask.begin();
 
-    //zrangerTask.begin(&estimatorTask);
+    zrangerTask.begin(&estimatorTask);
 
     //opticalFlowTask.begin(&estimatorTask);
 
