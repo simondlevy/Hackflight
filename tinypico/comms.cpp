@@ -20,23 +20,6 @@
 
 static BluetoothSerial bts; 
 
-/*
-void loop() {
-  if (Serial.available()) { 
-    char dataToSend = Serial.read();
-    bts.write(dataToSend); 
-    Serial.print("Sent to Bluetooth: ");
-    Serial.println(dataToSend);
-  }
-
-  if (bts.available()) { 
-    char dataReceived = bts.read();
-    Serial.print("Received from Bluetooth: ");
-    Serial.println(dataReceived);
-  }
-  delay(20); 
-}*/
-
 void Comms::init()
 {
   bts.begin("Hackflight"); 
@@ -44,9 +27,15 @@ void Comms::init()
 
 bool Comms::read_byte(uint8_t * byte)
 {
+    if (bts.available()) {
+        *byte = bts.read();
+        return true;
+    }
+
     return false;
 }
             
 void Comms::write_byte(const uint8_t byte)
 {
+    bts.write(byte);
 }
