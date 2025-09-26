@@ -20,8 +20,6 @@ class LedTask {
 
         FreeRtosTask _task;
 
-        TinyPICO tinypico = TinyPICO();
-
         static void runLedTask(void * obj)
         {
             ((LedTask *)obj)->run();
