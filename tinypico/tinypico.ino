@@ -49,7 +49,7 @@ static void systemTask(void *arg)
 {
     Comms::init();
 
-	//debugTask.begin();
+	debugTask.begin();
 
     //zrangerTask.begin(&estimatorTask);
 
