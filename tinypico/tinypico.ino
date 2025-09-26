@@ -47,15 +47,15 @@ static ZRangerTask zrangerTask;
 
 static void systemTask(void *arg)
 {
-    Comms::init();
+    //Comms::init();
 
-	debugTask.begin();
+	//debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask);
+    //zrangerTask.begin(&estimatorTask);
 
     //opticalFlowTask.begin(&estimatorTask);
 
-    estimatorTask.begin(&safety);
+    //estimatorTask.begin(&safety);
 
     //setpointTask.begin(&safety);
 
@@ -63,7 +63,7 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, &imuTask);
 
-    imuTask.begin(&estimatorTask, &debugTask);
+    //imuTask.begin(&estimatorTask, &debugTask);
 
     /*
     coreTask.begin(
