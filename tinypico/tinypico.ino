@@ -22,16 +22,19 @@
 #include <mixers/crazyflie.hpp>
 #include <motors.hpp>
 #include <safety.hpp>
-
 #include <tasks/debug.hpp>
+#include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
+#include <tasks/logging.hpp>
+#include <tasks/setpoint.hpp>
 
 static Motors motors;
 
 static Safety safety = Safety(&motors);
 
 static DebugTask debugTask;
+static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 
