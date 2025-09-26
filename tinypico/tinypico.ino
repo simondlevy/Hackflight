@@ -37,6 +37,8 @@ static DebugTask debugTask;
 static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
+static LoggingTask loggingTask;
+static SetpointTask setpointTask;
 
 static void systemTask(void *arg)
 {
@@ -50,11 +52,11 @@ static void systemTask(void *arg)
     opticalFlowTask.begin(&estimatorTask);
 
     estimatorTask.begin(&safety);
+    */
 
     setpointTask.begin(&safety);
 
-    loggingTask.begin(&estimatorTask, &closedLoopControl);
-    */
+    //loggingTask.begin(&estimatorTask, &closedLoopControl);
 
     ledTask.begin(&safety, &imuTask);
 
