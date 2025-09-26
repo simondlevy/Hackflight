@@ -15,11 +15,31 @@
  */
 
 #include <Arduino.h>
-
+#include <BluetoothSerial.h> 
 #include <comms.hpp>
+
+static BluetoothSerial bts; 
+
+/*
+void loop() {
+  if (Serial.available()) { 
+    char dataToSend = Serial.read();
+    bts.write(dataToSend); 
+    Serial.print("Sent to Bluetooth: ");
+    Serial.println(dataToSend);
+  }
+
+  if (bts.available()) { 
+    char dataReceived = bts.read();
+    Serial.print("Received from Bluetooth: ");
+    Serial.println(dataReceived);
+  }
+  delay(20); 
+}*/
 
 void Comms::init()
 {
+  bts.begin("Hackflight"); 
 }
 
 bool Comms::read_byte(uint8_t * byte)
