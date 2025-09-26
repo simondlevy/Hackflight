@@ -16,22 +16,7 @@
 
 #pragma once
 
-// #include <TinyPICO.h>
-#if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
-#else
-#include <WProgram.h>
-#include <pins_arduino.h>
-#endif
-
-#include <SPI.h>
-
-#define DOTSTAR_PWR 13
-#define DOTSTAR_DATA 2
-#define DOTSTAR_CLK 12
-
-#define BAT_CHARGE 34
-#define BAT_VOLTAGE 35
 
 class FreeRtosTask {
 
