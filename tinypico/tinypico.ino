@@ -1,4 +1,5 @@
-#include "led_task.hpp"
+#include <hackflight.h>
+#include <tasks/led.hpp>
 
 static LedTask ledTask;
 
