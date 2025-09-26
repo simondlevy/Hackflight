@@ -23,6 +23,7 @@
 #include <motors.hpp>
 #include <safety.hpp>
 
+#include <tasks/debug.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 
@@ -30,6 +31,7 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
+static DebugTask debugTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 
@@ -37,9 +39,9 @@ static void systemTask(void *arg)
 {
     Comms::init();
 
-    /*
 	debugTask.begin();
 
+    /*
     zrangerTask.begin(&estimatorTask);
 
     opticalFlowTask.begin(&estimatorTask);
