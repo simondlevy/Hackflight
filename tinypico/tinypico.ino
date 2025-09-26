@@ -32,9 +32,56 @@ static Safety safety = Safety(&motors);
 static ImuTask imuTask;
 static LedTask ledTask;
 
+static void systemTask(void *arg)
+{
+    /*
+    Comms::init();
+
+	debugTask.begin();
+
+    zrangerTask.begin(&estimatorTask);
+
+    opticalFlowTask.begin(&estimatorTask);
+
+    estimatorTask.begin(&safety);
+
+    setpointTask.begin(&safety);
+
+    loggingTask.begin(&estimatorTask, &closedLoopControl);
+    */
+
+    ledTask.begin(&safety, &imuTask);
+
+    /*
+    imuTask.begin(&estimatorTask, &debugTask);
+
+    coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            &motors,
+            Mixer::rotorCount,
+            Mixer::mix);
+            */
+
+    while (true) {
+        vTaskDelay(portMAX_DELAY);
+    }
+}
+
+
 void setup() 
 {
-    ledTask.begin(&safety, &imuTask);
+    xTaskCreate(
+            systemTask, 
+            "SYSTEM",
+            2* configMINIMAL_STACK_SIZE, 
+            NULL, 
+            2, 
+            NULL);
+
 }
 
 void loop()
