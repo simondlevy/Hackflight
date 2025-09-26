@@ -18,6 +18,7 @@
 #include <Wire.h>
 
 #include <hackflight.h>
+#include <comms.hpp>
 #include <mixers/crazyflie.hpp>
 #include <motors.hpp>
 #include <safety.hpp>
