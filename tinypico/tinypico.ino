@@ -63,9 +63,9 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, &imuTask);
 
-    /*
     imuTask.begin(&estimatorTask, &debugTask);
 
+    /*
     coreTask.begin(
             &closedLoopControl,
             &safety,
