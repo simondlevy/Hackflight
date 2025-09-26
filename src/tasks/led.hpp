@@ -24,8 +24,6 @@
 #include <task.hpp>
 #include <tasks/imu.hpp>
 
-#include <task.hpp>
-
 class LedTask {
 
     public:
@@ -59,12 +57,12 @@ class LedTask {
 
         ImuTask * _imuTask;
 
-         static void runLedTask(void * obj)
+        static void runLedTask(void * obj)
         {
             ((LedTask *)obj)->run();
         }
 
-        void run() 
+        void run(void)
         {
             TickType_t lastWakeTime = xTaskGetTickCount();
 
@@ -80,8 +78,10 @@ class LedTask {
                 else {
                     blink(lastWakeTime, HEARTBEAT_HZ);
                 }
+
             }
         }
+
 
         void blink(TickType_t & lastWakeTime, const float rate)
         {
