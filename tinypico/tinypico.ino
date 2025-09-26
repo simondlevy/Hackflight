@@ -47,17 +47,15 @@ static void systemTask(void *arg)
 {
     Comms::init();
 
-	debugTask.begin();
+	//debugTask.begin();
 
-    /*
-    zrangerTask.begin(&estimatorTask);
+    //zrangerTask.begin(&estimatorTask);
 
-    opticalFlowTask.begin(&estimatorTask);
+    //opticalFlowTask.begin(&estimatorTask);
 
     estimatorTask.begin(&safety);
-    */
 
-    setpointTask.begin(&safety);
+    //setpointTask.begin(&safety);
 
     //loggingTask.begin(&estimatorTask, &closedLoopControl);
 
