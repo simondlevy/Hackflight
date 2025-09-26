@@ -29,11 +29,12 @@ static Motors motors;
 
 static Safety safety = Safety(&motors);
 
+static ImuTask imuTask;
 static LedTask ledTask;
 
 void setup() 
 {
-    ledTask.begin();
+    ledTask.begin(&safety, &imuTask);
 }
 
 void loop()
