@@ -1,14 +1,14 @@
 #include <Wire.h>   
 
-static const uint8_t I2C_SDA = 33;
-static const uint8_t I2C_SCL = 32;
+//static const uint8_t I2C_SDA = 33;
+//static const uint8_t I2C_SCL = 32;
 
 void setup()
 {
     Serial.begin(115200);
 
     Wire.begin();
-    Wire1.begin(I2C_SDA, I2C_SCL, 100000);
+    //Wire1.begin(I2C_SDA, I2C_SCL, 100000);
     delay(100);
 }
 
@@ -56,5 +56,5 @@ static void scan(TwoWire & wire, const char * name)
 void loop()
 {  
     scan(Wire, "Wire");
-    scan(Wire1, "Wire1");
+    //scan(Wire1, "Wire1");
 }

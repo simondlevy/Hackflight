@@ -1,11 +1,12 @@
-SKETCH = i2c-tinypico
+SKETCH = bmi088
 
 FQBN = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyACM0
 
 build: $(SKETCH).ino
-	arduino-cli compile --fqbn $(FQBN) $(SKETCH).ino
+	arduino-cli compile --fqbn $(FQBN) \
+		--libraries $(HOME)/Documents/Arduino/libraries $(SKETCH).ino
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
