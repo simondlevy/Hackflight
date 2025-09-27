@@ -4,9 +4,9 @@ static const uint8_t ACCEL_ADDR = 0x19;
 static const uint8_t GYRO_ADDR = 0x69;
 static const uint8_t GYRO_INT_PIN = 4;
 
-Bmi088Accel accel(Wire, 0x19);
+Bmi088Accel accel(Wire, ACCEL_ADDR);
 
-Bmi088Gyro gyro(Wire, 0x69);
+Bmi088Gyro gyro(Wire, GYRO_ADDR);
 
 static volatile bool got_gyro_interrupt;
 
