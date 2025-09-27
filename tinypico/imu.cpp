@@ -20,20 +20,12 @@
 #include <BMI088.h>
 #include <tasks/imu.hpp>
 
-static ImuTask * imuTask;
-
 static const uint8_t ACCEL_ADDR = 0x19;
 static const uint8_t GYRO_ADDR = 0x69;
-static const uint8_t GYRO_INT_PIN = 4;
 
 static Bmi088Accel accel(Wire, ACCEL_ADDR);
 
 static Bmi088Gyro gyro(Wire, GYRO_ADDR);
-
-static void handle_gyro_interrupt()
-{
-    imuTask->dataAvailableCallback();
-}
 
 static bool failed(const int status)
 {
@@ -42,11 +34,6 @@ static bool failed(const int status)
 
 bool ImuTask::device_init()
 {
-    imuTask = this;
-
-    Wire.begin();
-    delay(100); // essential!
-
     if (failed(gyro.begin())) return false;
 
     if (failed(accel.begin())) return false;
@@ -65,9 +52,6 @@ bool ImuTask::device_init()
     if (failed(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ))) return false;
 
     if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
-
-    pinMode(GYRO_INT_PIN, INPUT);
-    attachInterrupt(GYRO_INT_PIN, handle_gyro_interrupt, RISING);
 
     return true;
 }

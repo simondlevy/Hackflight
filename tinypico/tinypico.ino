@@ -32,6 +32,8 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
+static const uint8_t GYRO_INT_PIN = 4;
+
 static ClosedLoopControl closedLoopControl;
 
 static Motors motors;
@@ -46,6 +48,11 @@ static LoggingTask loggingTask;
 static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
+
+static void handle_gyro_interrupt()
+{
+    imuTask.dataAvailableCallback();
+}
 
 static void systemTask(void *arg)
 {
@@ -87,6 +94,12 @@ static void systemTask(void *arg)
 
 void setup() 
 {
+    Wire.begin();
+    delay(100); // essential!
+
+    pinMode(GYRO_INT_PIN, INPUT);
+    attachInterrupt(GYRO_INT_PIN, handle_gyro_interrupt, RISING);
+
     xTaskCreate(
             systemTask, 
             "SYSTEM",
