@@ -55,7 +55,7 @@ static void systemTask(void *arg)
 
     //opticalFlowTask.begin(&estimatorTask);
 
-    //estimatorTask.begin(&safety);
+    estimatorTask.begin(&safety);
 
     //setpointTask.begin(&safety);
 
