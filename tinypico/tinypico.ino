@@ -28,6 +28,7 @@
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
+#include <tasks/opticalflow.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
@@ -42,6 +43,7 @@ static EstimatorTask estimatorTask;
 static ImuTask imuTask;
 static LedTask ledTask;
 static LoggingTask loggingTask;
+static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
@@ -51,9 +53,9 @@ static void systemTask(void *arg)
 
 	debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask, &debugTask);
+    zrangerTask.begin(&estimatorTask);
 
-    //opticalFlowTask.begin(&estimatorTask);
+    opticalFlowTask.begin(&estimatorTask, &debugTask);
 
     estimatorTask.begin(&safety);
 

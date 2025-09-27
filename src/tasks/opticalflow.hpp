@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <free_rtos_include.h>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
