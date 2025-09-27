@@ -51,7 +51,7 @@ static void systemTask(void *arg)
 
 	debugTask.begin();
 
-    //zrangerTask.begin(&estimatorTask);
+    zrangerTask.begin(&estimatorTask, &debugTask);
 
     //opticalFlowTask.begin(&estimatorTask);
 
