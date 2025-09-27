@@ -55,7 +55,7 @@ static void systemTask(void *arg)
 
     zrangerTask.begin(&estimatorTask);
 
-    opticalFlowTask.begin(&estimatorTask, &debugTask);
+    opticalFlowTask.begin(&estimatorTask);
 
     estimatorTask.begin(&safety);
 
@@ -65,7 +65,7 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, &imuTask);
 
-    //imuTask.begin(&estimatorTask, &debugTask);
+    imuTask.begin(&estimatorTask, &debugTask);
 
     /*
     coreTask.begin(

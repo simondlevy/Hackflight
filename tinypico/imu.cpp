@@ -17,17 +17,14 @@
 
 
 #include <Wire.h>   
-
 #include <BMI088.h>
-
 #include <tasks/imu.hpp>
 
 static ImuTask * imuTask;
 
-static const uint8_t GYRO_INT_PIN = 4;
-
 static const uint8_t ACCEL_ADDR = 0x19;
 static const uint8_t GYRO_ADDR = 0x69;
+static const uint8_t GYRO_INT_PIN = 4;
 
 static Bmi088Accel accel(Wire, ACCEL_ADDR);
 
@@ -46,6 +43,9 @@ static bool failed(const int status)
 bool ImuTask::device_init()
 {
     imuTask = this;
+
+    Wire.begin();
+    delay(100); // essential!
 
     if (failed(gyro.begin())) return false;
 
