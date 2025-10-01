@@ -111,8 +111,7 @@ class OpticalFlowTask {
                     // Push measurements into the estimator if flow is not disabled
                     //    and the PMW flow sensor indicates motion detection
                     if (!USE_FLOW_DISABLED && gotMotion) {
-                        _estimatorTask->enqueueFlow(
-                                &flowData, xPortIsInsideInterrupt());
+                        _estimatorTask->enqueueFlow(&flowData);
                     }
                 }
             }        

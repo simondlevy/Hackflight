@@ -98,8 +98,7 @@ class ZRangerTask {
                     tofData.distance = distance;
                     tofData.stdDev = stdDev;
 
-                    _estimatorTask->enqueueRange(
-                            &tofData, xPortIsInsideInterrupt());
+                    _estimatorTask->enqueueRange(&tofData);
                 }
             }
         }

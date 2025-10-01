@@ -51,10 +51,6 @@ class ImuTask {
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
-            // Create a semaphore to protect data-ready interrupts from IMU
-            interruptCallbackSemaphore = xSemaphoreCreateBinaryStatic(
-                    &interruptCallbackSemaphoreBuffer);
-
             // Create a semaphore to protect waitDataReady() calls from core task
             coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
@@ -78,20 +74,6 @@ class ImuTask {
             _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
 
             _task.init(runImuTask, "imu", this, 3);
-        }
-
-        // Called by platform-specific IMU interrupt
-        void dataAvailableCallback(void)
-        {
-            return;
-            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-            interruptTimestamp = micros();
-            xSemaphoreGiveFromISR(
-                    interruptCallbackSemaphore, &xHigherPriorityTaskWoken);
-
-            if (xHigherPriorityTaskWoken) {
-                portYIELD();
-            }
         }
 
         // Called by core task
@@ -291,10 +273,6 @@ class ImuTask {
         bool gyroBiasFound;
         sensorData_t data;
         Axis3f gyroBias;
-        volatile uint64_t interruptTimestamp;
-
-        SemaphoreHandle_t interruptCallbackSemaphore;
-        StaticSemaphore_t interruptCallbackSemaphoreBuffer;
 
         SemaphoreHandle_t coreTaskSemaphore;
         StaticSemaphore_t coreTaskSemaphoreBuffer;
@@ -365,58 +343,50 @@ class ImuTask {
 
                 vTaskDelay(1);
 
-                if (true /*pdTRUE == xSemaphoreTake(
-                            interruptCallbackSemaphore, portMAX_DELAY)*/) {
+                Axis3i16 gyroRaw = {};
+                Axis3i16 accelRaw = {};
 
-                    data.interruptTimestamp = interruptTimestamp;
+                device_readRaw(
+                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                        accelRaw.x, accelRaw.y, accelRaw.z);
 
-                    Axis3i16 gyroRaw = {};
-                    Axis3i16 accelRaw = {};
+                DebugTask::setMessage(_debugTask,
+                        "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
+                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                        accelRaw.x, accelRaw.y, accelRaw.z);
 
-                    device_readRaw(
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                            accelRaw.x, accelRaw.y, accelRaw.z);
+                // Convert accel to Gs
+                Axis3f accel = {};
+                accel.x = accelRaw2Gs(accelRaw.x);
+                accel.y = accelRaw2Gs(accelRaw.y);
+                accel.z = accelRaw2Gs(accelRaw.z);
 
-                    DebugTask::setMessage(_debugTask,
-                            "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                            accelRaw.x, accelRaw.y, accelRaw.z);
+                // Calibrate gyro with raw values if necessary
+                gyroBiasFound = processGyroBias(xTaskGetTickCount(),
+                        gyroRaw, &gyroBias);
 
-                    // Convert accel to Gs
-                    Axis3f accel = {};
-                    accel.x = accelRaw2Gs(accelRaw.x);
-                    accel.y = accelRaw2Gs(accelRaw.y);
-                    accel.z = accelRaw2Gs(accelRaw.z);
+                // Subtract gyro bias
+                Axis3f gyroUnbiased = {};
+                gyroUnbiased.x = gyroRaw2Dps(gyroRaw.x - gyroBias.x);
+                gyroUnbiased.y = gyroRaw2Dps(gyroRaw.y - gyroBias.y);
+                gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
 
-                    // Calibrate gyro with raw values if necessary
-                    gyroBiasFound = processGyroBias(xTaskGetTickCount(),
-                            gyroRaw, &gyroBias);
+                // Rotate gyro to airframe
+                alignToAirframe(&gyroUnbiased, &data.gyro);
 
-                    // Subtract gyro bias
-                    Axis3f gyroUnbiased = {};
-                    gyroUnbiased.x = gyroRaw2Dps(gyroRaw.x - gyroBias.x);
-                    gyroUnbiased.y = gyroRaw2Dps(gyroRaw.y - gyroBias.y);
-                    gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
+                // LPF gyro
+                applyLpf(_gyroLpf, &data.gyro);
 
-                    // Rotate gyro to airframe
-                    alignToAirframe(&gyroUnbiased, &data.gyro);
+                _estimatorTask->enqueueGyro(&data.gyro);
 
-                    // LPF gyro
-                    applyLpf(_gyroLpf, &data.gyro);
+                Axis3f accScaled = {};
+                alignToAirframe(&accel, &accScaled);
 
-                    _estimatorTask->enqueueGyro(
-                            &data.gyro, xPortIsInsideInterrupt());
+                accAlignToGravity(&accScaled, &data.acc);
 
-                    Axis3f accScaled = {};
-                    alignToAirframe(&accel, &accScaled);
+                applyLpf(_accLpf, &data.acc);
 
-                    accAlignToGravity(&accScaled, &data.acc);
-
-                    applyLpf(_accLpf, &data.acc);
-
-                    _estimatorTask->enqueueAccel(
-                            &data.acc, xPortIsInsideInterrupt());
-                }
+                _estimatorTask->enqueueAccel(&data.acc);
 
                 xQueueOverwrite(_accelQueue, &data.acc);
                 xQueueOverwrite(_gyroQueue, &data.gyro);

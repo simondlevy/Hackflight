@@ -71,12 +71,12 @@ class EstimatorTask {
             xSemaphoreGive(_runTaskSemaphore);
         }
 
-        void enqueueGyro(const Axis3f * gyro, const bool isInInterrupt)
+        void enqueueGyro(const Axis3f * gyro)
         {
             KalmanFilter::measurement_t m = {};
             m.type = KalmanFilter::MeasurementTypeGyroscope;
             m.data.gyroscope.gyro = *gyro;
-            enqueue(&m, isInInterrupt);
+            enqueue(&m);
 
             // Get state vector angular velocities directly from gyro
             _state.dphi   =  gyro->x;     
@@ -84,55 +84,28 @@ class EstimatorTask {
             _state.dpsi   = -gyro->z; // negate for nose-right positive
         }
 
-        void enqueueAccel(const Axis3f * accel, const bool isInInterrupt)
+        void enqueueAccel(const Axis3f * accel)
         {
             KalmanFilter::measurement_t m = {};
             m.type = KalmanFilter::MeasurementTypeAcceleration;
             m.data.acceleration.acc = *accel;
-            enqueue(&m, isInInterrupt);
+            enqueue(&m);
         }
 
-        void enqueueBaro(const baro_t * baro, const bool isInInterrupt)
-        {
-            KalmanFilter::measurement_t m = {};
-            m.type = KalmanFilter::MeasurementTypeBarometer;
-            m.data.barometer.baro = *baro;
-            enqueue(&m, isInInterrupt);
-        }
-
-        void enqueueFlow(const flowMeasurement_t * flow, const bool isInInterrupt)
+        void enqueueFlow(const flowMeasurement_t * flow)
         {
             KalmanFilter::measurement_t m = {};
             m.type = KalmanFilter::MeasurementTypeFlow;
             m.data.flow = *flow;
-            enqueue(&m, isInInterrupt);
+            enqueue(&m);
         }
 
-        void enqueueRange(const tofMeasurement_t * tof, const bool isInInterrupt)
+        void enqueueRange(const tofMeasurement_t * tof)
         {
             KalmanFilter::measurement_t m = {};
             m.type = KalmanFilter::MeasurementTypeTOF;
             m.data.tof = *tof;
-            enqueue(&m, isInInterrupt);
-        }
-
-        // For VisualizerTask
-        void getEulerAngles(int16_t angles[3])
-        {
-            static int16_t phi;
-            static int8_t dir;
-
-            dir = 
-                dir == 0 ? +1 : 
-                phi == +450 ? -1 :
-                phi == -450 ? +1 :
-                dir;
-
-            phi += dir;
-
-            angles[0] = phi;
-            angles[1] = 0;
-            angles[2] = 0;
+            enqueue(&m);
         }
 
     private:
@@ -251,23 +224,12 @@ class EstimatorTask {
             }
         }
 
-        void enqueue(
-                const KalmanFilter::measurement_t * measurement, 
-                const bool isInInterrupt)
+        void enqueue( const KalmanFilter::measurement_t * measurement) 
         {
             if (!_measurementsQueue) {
                 return;
             }
 
-            if (isInInterrupt) {
-                auto xHigherPriorityTaskWoken = pdFALSE;
-                xQueueSendFromISR(
-                        _measurementsQueue, measurement, &xHigherPriorityTaskWoken);
-                if (xHigherPriorityTaskWoken == pdTRUE) {
-                    portYIELD();
-                }
-            } else {
-                xQueueSend(_measurementsQueue, measurement, 0);
-            }
+            xQueueSend(_measurementsQueue, measurement, 0);
         }
 };
