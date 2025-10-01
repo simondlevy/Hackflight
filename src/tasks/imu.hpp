@@ -83,6 +83,7 @@ class ImuTask {
         // Called by platform-specific IMU interrupt
         void dataAvailableCallback(void)
         {
+            return;
             portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
             interruptTimestamp = micros();
             xSemaphoreGiveFromISR(
@@ -362,8 +363,10 @@ class ImuTask {
         {
             while (true) {
 
-                if (pdTRUE == xSemaphoreTake(
-                            interruptCallbackSemaphore, portMAX_DELAY)) {
+                vTaskDelay(1);
+
+                if (true /*pdTRUE == xSemaphoreTake(
+                            interruptCallbackSemaphore, portMAX_DELAY)*/) {
 
                     data.interruptTimestamp = interruptTimestamp;
 
