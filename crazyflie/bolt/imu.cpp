@@ -23,7 +23,6 @@
 
 static const uint8_t ACCEL_CS_PIN = PB1;
 static const uint8_t GYRO_CS_PIN = PB0;
-static const uint8_t GYRO_INT_PIN = PC14;
 
 static const uint8_t MISO_PIN = PB14;
 static const uint8_t MOSI_PIN = PB15;
@@ -35,13 +34,6 @@ static Bmi088Accel accel(spi, ACCEL_CS_PIN);
 
 static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
 
-static ImuTask * imuTask;
-
-static void handle_gyro_interrupt()
-{
-    imuTask->dataAvailableCallback();
-}
-
 static bool failed(const int status)
 {
     return status < 0;
@@ -49,8 +41,6 @@ static bool failed(const int status)
 
 bool ImuTask::device_init()
 {
-    imuTask = this;
-
     spi.setMISO(MISO_PIN);
     spi.setMOSI(MOSI_PIN);
     spi.setSCLK(SCLK_PIN);
@@ -73,9 +63,6 @@ bool ImuTask::device_init()
     if (failed(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ))) return false;
 
     if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
-
-    pinMode(GYRO_INT_PIN, INPUT);
-    attachInterrupt(GYRO_INT_PIN, handle_gyro_interrupt, RISING);
 
     return true;
 }
