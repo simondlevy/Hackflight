@@ -49,10 +49,3 @@ float KalmanFilter::device_sqrt(const float32_t in)
   arm_sqrt_f32(in, &pOut);
   return pOut;
 }
-
-/*
-static inline void mat_scale(const arm_matrix_instance_f32 * pSrcA,
-        float32_t scale, arm_matrix_instance_f32 * pDst) 
-{
-  arm_mat_scale_f32(pSrcA, scale, pDst);
-}*/

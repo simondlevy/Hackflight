@@ -6,6 +6,9 @@ BIN = build/crazyflie.ino.bin
 
 SRC = ../src
 
+any:
+	echo "Please specify cf2 or bolt"
+
 bolt: crazyflie.ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 	$(SRC)/msp/__messages__.h
 	cp bolt/imu.cpp ./__imu__.cpp
