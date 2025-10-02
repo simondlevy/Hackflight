@@ -18,8 +18,6 @@
 
 #include <Arduino.h>
 
-#include <free_rtos_include.h>
-
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
@@ -224,7 +222,7 @@ class EstimatorTask {
             }
         }
 
-        void enqueue( const KalmanFilter::measurement_t * measurement) 
+        void enqueue(const KalmanFilter::measurement_t * measurement) 
         {
             if (!_measurementsQueue) {
                 return;
