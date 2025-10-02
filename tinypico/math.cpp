@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2018-2021 Bitcraze AB, 2025 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include <kalman.hpp>
+#include "matrix_typedef.h"
+#include "xtensa_math.h"
+
+void KalmanFilter::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
+{
+    xtensa_mat_trans_f32((const xtensa_matrix_instance_f32 *)pSrc,
+        (xtensa_matrix_instance_f32 *)pDst);
+}
+
+void KalmanFilter::device_mat_mult(
+        const matrix_t * pSrcA, const matrix_t * pSrcB,
+        matrix_t * pDst) 
+{
+    xtensa_mat_mult_f32(
+            (const xtensa_matrix_instance_f32 *)pSrcA,
+            (const xtensa_matrix_instance_f32 *)pSrcB,
+            (xtensa_matrix_instance_f32 *)pDst);
+}
+
+float KalmanFilter::device_cos(const float x)
+{
+    return xtensa_cos_f32(x);
+}
+
+float KalmanFilter::device_sin(const float x)
+{
+    return xtensa_sin_f32(x);
+}
+
+float KalmanFilter::device_sqrt(const float32_t in) 
+{
+    float out = 0;
+    xtensa_sqrt_f32(in, (float32_t *)&out);
+    return out;
+}
