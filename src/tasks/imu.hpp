@@ -34,7 +34,7 @@ class ImuTask {
 
     public:
 
-        void begin( EstimatorTask * estimatorTask,
+        void begin(EstimatorTask * estimatorTask,
                 DebugTask * debugTask=nullptr)
         {
             _estimatorTask = estimatorTask;
@@ -45,8 +45,8 @@ class ImuTask {
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
             // Create a semaphore to protect waitDataReady() calls from core task
-            coreTaskSemaphore =
-                xSemaphoreCreateBinaryStatic(&coreTaskSemaphoreBuffer);
+            _coreTaskSemaphore =
+                xSemaphoreCreateBinaryStatic(&_coreTaskSemaphoreBuffer);
 
             if (!device_init()) {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
@@ -69,21 +69,20 @@ class ImuTask {
             _task.init(runImuTask, "imu", this, 3);
         }
 
-        // Called by core task
-        bool imuIsCalibrated() {
-            return gyroBiasFound;
+        bool imuIsCalibrated()
+        {
+            return _gyroBiasFound;
         }
 
         // Called by core task
         void waitDataReady(void) {
-            xSemaphoreTake(coreTaskSemaphore, portMAX_DELAY);
+            xSemaphoreTake(_coreTaskSemaphore, portMAX_DELAY);
         }
 
     private:
 
         static constexpr float RAW_GYRO_VARIANCE_BASE = 100;
 
-        static const uint32_t STARTUP_TIME_MS = 1000;
         static const uint32_t ACC_SCALE_SAMPLES = 200;
 
         // IMU alignment on the airframe 
@@ -190,8 +189,8 @@ class ImuTask {
                         &_gyroBiasRunning.variance, &_gyroBiasRunning.mean);
 
                 if (_gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
-                   _gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
-                   _gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
+                        _gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
+                        _gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
                         (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                 {
                     varianceSampleTime = ticks;
@@ -266,11 +265,11 @@ class ImuTask {
             out->z = in->x*R[2][0] + in->y*R[2][1] + in->z*R[2][2];
         }
 
-        bool gyroBiasFound;
-        Axis3f gyroBias;
+        bool _gyroBiasFound;
+        Axis3f _gyroBias;
 
-        SemaphoreHandle_t coreTaskSemaphore;
-        StaticSemaphore_t coreTaskSemaphoreBuffer;
+        SemaphoreHandle_t _coreTaskSemaphore;
+        StaticSemaphore_t _coreTaskSemaphoreBuffer;
 
         /**
          * Compensate for a miss-aligned accelerometer. It uses the trim
@@ -351,20 +350,22 @@ class ImuTask {
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
                 // Convert accel to Gs
-                Axis3f accel = {};
-                accel.x = accelRaw2Gs(accelRaw.x);
-                accel.y = accelRaw2Gs(accelRaw.y);
-                accel.z = accelRaw2Gs(accelRaw.z);
+                Axis3f accel = {
+                    device_accelRaw2Gs(accelRaw.x),
+                    device_accelRaw2Gs(accelRaw.y),
+                    device_accelRaw2Gs(accelRaw.z)
+                };
 
                 // Calibrate gyro with raw values if necessary
-                gyroBiasFound = processGyroBias(xTaskGetTickCount(),
-                        gyroRaw, &gyroBias);
+                _gyroBiasFound = processGyroBias(xTaskGetTickCount(),
+                        gyroRaw, &_gyroBias);
 
                 // Subtract gyro bias
-                Axis3f gyroUnbiased = {};
-                gyroUnbiased.x = gyroRaw2Dps(gyroRaw.x - gyroBias.x);
-                gyroUnbiased.y = gyroRaw2Dps(gyroRaw.y - gyroBias.y);
-                gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
+                Axis3f gyroUnbiased = {
+                    device_gyroRaw2Dps(gyroRaw.x - _gyroBias.x),
+                    device_gyroRaw2Dps(gyroRaw.y - _gyroBias.y),
+                    device_gyroRaw2Dps(gyroRaw.z - _gyroBias.z) 
+                };
 
                 // Rotate gyro to airframe
                 alignToAirframe(&gyroUnbiased, &_gyroData);
@@ -374,10 +375,10 @@ class ImuTask {
 
                 _estimatorTask->enqueueGyro(&_gyroData);
 
-                Axis3f accScaled = {};
-                alignToAirframe(&accel, &accScaled);
+                Axis3f accelScaled = {};
+                alignToAirframe(&accel, &accelScaled);
 
-                accAlignToGravity(&accScaled, &_accelData);
+                accAlignToGravity(&accelScaled, &_accelData);
 
                 applyLpf(_accLpf, &_accelData);
 
@@ -386,17 +387,17 @@ class ImuTask {
                 xQueueOverwrite(_accelQueue, &_accelData);
                 xQueueOverwrite(_gyroQueue, &_gyroData);
 
-                xSemaphoreGive(coreTaskSemaphore);
+                xSemaphoreGive(_coreTaskSemaphore);
             }
         }
-
-        static float gyroRaw2Dps(const int16_t raw);
-
-        static float accelRaw2Gs(const int16_t raw);
 
         bool device_init();
 
         void device_readRaw(
                 int16_t & gx, int16_t & gy, int16_t & gz, 
                 int16_t & ax, int16_t & ay, int16_t & az);
+
+        static float device_gyroRaw2Dps(const int16_t raw);
+
+        static float device_accelRaw2Gs(const int16_t raw);
 };
