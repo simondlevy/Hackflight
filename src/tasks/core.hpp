@@ -46,10 +46,6 @@ class CoreTask {
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()) {
-                return;
-            }
-
             _closedLoopControl = closedLoopControl;
 
             _safety = safety;

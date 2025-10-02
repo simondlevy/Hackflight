@@ -31,10 +31,6 @@ class LoggingTask {
         void begin(EstimatorTask * estimatorTask,
                 ClosedLoopControl * closedLoopControl)
         {
-            if (_task.didInit()){
-                return;
-            }
-
             _estimatorTask = estimatorTask;
 
             _closedLoopControl = closedLoopControl;

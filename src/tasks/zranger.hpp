@@ -25,10 +25,6 @@ class ZRangerTask {
 
         void begin(EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
         {
-            if (_task.didInit()){
-                return;
-            }
-
             if (!device_init()) {
                 DebugTask::setMessage(_debugTask,
                         "ZRangerTask: Failed to initialize zranger");

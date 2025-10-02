@@ -30,8 +30,6 @@ class FreeRtosTask {
 
         StaticTask_t _taskTaskBuffer;
 
-        bool _didInit;
-
     public:
 
         void init(
@@ -49,12 +47,5 @@ class FreeRtosTask {
                     priority, 
                     _taskStackBuffer,
                     &_taskTaskBuffer);
-
-            _didInit = true;
-        }
-
-        bool didInit()
-        {
-            return _didInit;
         }
 };

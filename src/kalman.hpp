@@ -194,8 +194,6 @@ class KalmanFilter {
             // PI --- facing negative X
             // 3 * PI / 2 --- facing negative Y
             _params.initialYaw = 0.0;
-
-            _didInit = true;
         }
 
         void init(const uint32_t nowMs)
@@ -682,8 +680,6 @@ class KalmanFilter {
         Axis3fSubSampler_t _gyroSubSampler;
 
         OutlierFilterTdoa _outlierFilterTdoa;
-
-        bool _didInit;
 
         float _predictedNX;
         float _predictedNY;

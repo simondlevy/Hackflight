@@ -30,10 +30,6 @@ class LedTask {
 
         void begin( Safety * safety, ImuTask * imuTask)
         {
-            if (_task.didInit()){
-                return;
-            }
-
             _imuTask = imuTask;
 
             _task.init(runLedTask, "led", this, 2);
