@@ -17,20 +17,13 @@
 
 #pragma once
 
-#include <free_rtos_include.h>
-
 #include <clock.hpp>
 #include <datatypes.h>
-#include <motors.hpp>
+#include <free_rtos_include.h>
 
 class Safety {
 
     public:
-
-        Safety(Motors * motors)
-        {
-            _motors = motors;
-        }
 
         bool isFlying() 
         {
@@ -50,11 +43,13 @@ class Safety {
         void update(
                 const uint32_t coreStep,
                 const uint32_t timestamp,
-                const vehicleState_t & vehicleState)
+                const vehicleState_t & vehicleState,
+                const uint16_t * motorRatios,
+                const uint8_t motorCount)
         { 
             if (Clock::rateDoExecute(CLOCK_RATE, coreStep)) {
 
-                _is_flying = isFlyingCheck(xTaskGetTickCount());
+                _is_flying = isFlyingCheck(xTaskGetTickCount(), motorRatios, motorCount);
 
                 _is_safe_to_arm =safeAngle(vehicleState.phi) &&
                     safeAngle(vehicleState.theta);
@@ -68,8 +63,6 @@ class Safety {
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
 
         static constexpr float MAX_SAFE_ANGLE = 30;
-
-        Motors * _motors;
 
         bool _is_flying;
 
@@ -86,12 +79,13 @@ class Safety {
         // We say we are flying if one or more motors are running over the idle
         // thrust.
         //
-        bool isFlyingCheck(const uint32_t tick) 
+        bool isFlyingCheck(
+                const uint32_t tick, const uint16_t * motorRatios, const uint8_t motorCount) 
         {
             auto isThrustOverIdle = false;
 
-            for (int i = 0; i < 4; ++i) {
-                if (_motors->getRatio(i) > 0) {
+            for (int i = 0; i < motorCount; ++i) {
+                if (motorRatios[i] > 0) {
                     isThrustOverIdle = true;
                     break;
                 }

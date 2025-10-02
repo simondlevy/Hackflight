@@ -17,15 +17,12 @@
 
 #include <Wire.h>
 
-#include <free_rtos_include.h>
-
 #include <hackflight.h>
 #include <comms.hpp>
 #include <__control__.hpp>
+#include <free_rtos_include.h>
 #include <mixers/crazyflie.hpp>
-#include <motors.hpp>
 #include <safety.hpp>
-
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -36,12 +33,6 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
-static ClosedLoopControl closedLoopControl;
-
-static Motors motors;
-
-static Safety safety = Safety(&motors);
-
 static CoreTask coreTask;
 static DebugTask debugTask;
 static EstimatorTask estimatorTask;
@@ -51,6 +42,10 @@ static LoggingTask loggingTask;
 static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
+
+static Safety safety;
+
+static ClosedLoopControl closedLoopControl;
 
 static void systemTask(void *arg)
 {
@@ -78,7 +73,6 @@ static void systemTask(void *arg)
             &estimatorTask,
             &imuTask,
             &setpointTask,
-            &motors,
             Mixer::rotorCount,
             Mixer::mix);
 

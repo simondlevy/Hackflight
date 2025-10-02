@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,13 @@
 
 #pragma once
 
-#include <clock.hpp>
 #include <__control__.hpp>
-#include <kalman.hpp>
-#include <datatypes.h>
-#include <motors.hpp>
-#include <num.hpp>
-#include <rateSupervisor.hpp>
 #include <safety.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/setpoint.hpp>
-#include <vehicles/diyquad.hpp>
 
 class CoreTask {
 
@@ -41,7 +34,6 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
-                Motors * motors,
                 const uint8_t rotorCount,
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
@@ -56,34 +48,142 @@ class CoreTask {
 
             _setpointTask = setpointTask;
 
-            _motors = motors;
-
             _debugTask = debugTask;
 
             _mixFun = mixFun;
 
             _rotorCount = rotorCount;
 
-            motors->begin();
-
             _task.init(runCoreTask, "core", this, 5);
         }
 
     private:
 
-        static constexpr float LANDING_ALTITUDE_M = 0.03;
-
         static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
-
-        static const uint8_t TASK_ID_NBR = 3;
-
+        static constexpr float LANDING_ALTITUDE_M = 0.03;
+        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
 
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-
-        FreeRtosTask _task;
-
+        ClosedLoopControl * _closedLoopControl;
+        SetpointTask * _setpointTask;
+        EstimatorTask * _estimatorTask;
+        ImuTask * _imuTask;
+        DebugTask * _debugTask;
+        Safety * _safety;
+        mixFun_t _mixFun;
         uint8_t _rotorCount;
+        FreeRtosTask _task;
+        uint16_t _motorRatios[4];
+        vehicleState_t _vehicleState;
+
+        static void runCoreTask(void *arg)
+        {
+            ((CoreTask *)arg)->run();
+
+        }
+
+        void setMotorRatiosAndRun(const uint16_t ratios[])
+        {
+            _setMotorRatio(0, ratios[0]);
+            _setMotorRatio(1, ratios[1]);
+            _setMotorRatio(2, ratios[2]);
+            _setMotorRatio(3, ratios[3]);
+
+            motors_run();
+        }
+
+        void run()
+        {
+            motors_init();
+
+            stopMotors();
+
+            static RateSupervisor rateSupervisor;
+            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
+
+            uint32_t setpoint_timestamp = 0;
+            bool lost_contact = false;
+
+            for (uint32_t step=1; ; step++) {
+
+                setMotorRatiosAndRun(_motorRatios);
+
+                _imuTask->waitDataReady();
+
+                _estimatorTask->getVehicleState(&_vehicleState);
+
+                static float _motorvals[4];
+
+                if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
+
+                    setpoint_t setpoint = {};
+
+                    _setpointTask->getSetpoint(setpoint);
+
+                    setpoint_timestamp = setpoint.timestamp;
+
+                    if (setpoint.hovering) {
+
+                        setpoint.demands.thrust = Num::rescale(
+                                setpoint.demands.thrust, 0.2, 2.0, -1, +1);
+                    }
+
+                    // Use safety algorithm to modify demands based on sensor
+                    // data and open-loop info
+                    _safety->update(step, setpoint.timestamp, _vehicleState,
+                            _motorRatios, _rotorCount);
+
+                    if (setpoint.hovering) {
+
+                        // In hover mode, thrust demand comes in as [-1,+1], so
+                        // we convert it to a target altitude in meters
+                        setpoint.demands.thrust = Num::rescale(
+                                setpoint.demands.thrust, -1, +1, 0.2, 2.0);
+                    }
+
+                    demands_t closedLoopDemands = {};
+
+                    _closedLoopControl->run(
+                            1.f / PID_UPDATE_RATE,
+                            setpoint.hovering,
+                            _vehicleState,
+                            setpoint.demands,
+                            LANDING_ALTITUDE_M,
+                            closedLoopDemands);
+
+                    runMixer(_mixFun, closedLoopDemands, _motorvals);
+
+                }
+
+                const auto timestamp = xTaskGetTickCount();
+
+                // Disarm on lost contact
+                if (setpoint_timestamp > 0 &&
+                        timestamp - setpoint_timestamp >
+                        SETPOINT_TIMEOUT_TICKS) {
+                    lost_contact = true;
+                    stopMotors();
+                    _safety->requestArming(false);
+                }
+
+                // Run in flying mode
+                else if (!lost_contact && _safety->isArmed()) {
+                    runMotors(_motorvals);
+                } 
+
+                // Otherwise, maintain motors
+                else {
+                    stopMotors();
+                }
+
+                if (!rateSupervisor.validate(timestamp)) {
+                    static bool rateWarningDisplayed;
+                    if (!rateWarningDisplayed) {
+                        rateWarningDisplayed = true;
+                    }
+                }
+            }
+        }
 
         void runMixer(const mixFun_t mixFun, const demands_t & demands,
                 float motorvals[])
@@ -117,25 +217,10 @@ class CoreTask {
             return thrust < 0 ? 0 : thrust;
         }
 
-        vehicleState_t vehicleState;
-
-        demands_t _demands;
-
-        ClosedLoopControl * _closedLoopControl;
-
-        SetpointTask * _setpointTask;
-
-        Motors * _motors;
-
-        EstimatorTask * _estimatorTask;
-
-        ImuTask * _imuTask;
-
-        DebugTask * _debugTask;
-
-        Safety * _safety;
-
-        mixFun_t _mixFun;
+        void _setMotorRatio(uint32_t id, uint16_t ratio)
+        {
+            motors_setSpeed(id, ratio/65536.f);
+        }
 
         void runMotors(const float motorvals[4]) 
         {
@@ -146,109 +231,30 @@ class CoreTask {
                 (uint16_t)motorvals[3]
             };
 
-            _motors->setRatios(motorsPwm);
+            DebugTask::setMessage(_debugTask, "m1=%d m2=%d m3=%d m4=%d",
+                    motorsPwm[0], motorsPwm[1], motorsPwm[2], motorsPwm[3]);
+
+            setMotorRatios(motorsPwm);
         }
 
-        static void runCoreTask(void* obj)
+        void setMotorRatios(const uint16_t ratios[4])
         {
-            ((CoreTask *)obj)->run();
+            _motorRatios[0] = ratios[0];
+            _motorRatios[1] = ratios[1];
+            _motorRatios[2] = ratios[2];
+            _motorRatios[3] = ratios[3];
         }
 
-        /* The core loop runs at 1kHz. It is the responsibility of the
-         * different functions to run slower by skipping call (ie. returning
-         * without modifying the output structure).
-         */
-
-        void run(void)
+        void stopMotors()
         {
-            // vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_ID_NBR);
-
-            // Wait for sensors to be calibrated
-            auto lastWakeTime = xTaskGetTickCount();
-            while (!_imuTask->imuIsCalibrated()) {
-                vTaskDelayUntil(&lastWakeTime, 1000/Clock::RATE_MAIN_LOOP);
-            }
-
-            static RateSupervisor rateSupervisor;
-            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
-
-            uint32_t setpoint_timestamp = 0;
-            bool lost_contact = false;
-
-            for (uint32_t step=1; ; step++) {
-
-                // The IMU should unlock at 1kHz
-                _imuTask->waitDataReady();
-
-                // Get state from estimator
-                _estimatorTask->getVehicleState(&vehicleState);
-
-                static float _motorvals[4];
-
-                if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
-
-                    setpoint_t setpoint = {};
-
-                    _setpointTask->getSetpoint(setpoint);
-
-                    setpoint_timestamp = setpoint.timestamp;
-
-                    if (setpoint.hovering) {
-
-                        setpoint.demands.thrust = Num::rescale(
-                                setpoint.demands.thrust, 0.2, 2.0, -1, +1);
-                    }
-
-                    // Use safety algorithm to modify demands based on sensor
-                    // data and open-loop info
-                    _safety->update(step, setpoint.timestamp, vehicleState);
-
-                    if (setpoint.hovering) {
-
-                        // In hover mode, thrust demand comes in as [-1,+1], so
-                        // we convert it to a target altitude in meters
-                        setpoint.demands.thrust = Num::rescale(
-                                setpoint.demands.thrust, -1, +1, 0.2, 2.0);
-                    }
-
-                    demands_t closedLoopDemands = {};
-
-                    _closedLoopControl->run(
-                            1.f / PID_UPDATE_RATE,
-                            setpoint.hovering,
-                            vehicleState,
-                            setpoint.demands,
-                            LANDING_ALTITUDE_M,
-                            closedLoopDemands);
-
-                    runMixer(_mixFun, closedLoopDemands, _motorvals);
-                }
-
-                const auto timestamp = xTaskGetTickCount();
-
-                // Disarm on lost contact
-                if (setpoint_timestamp > 0 &&
-                        timestamp - setpoint_timestamp >
-                        SETPOINT_TIMEOUT_TICKS) {
-                    lost_contact = true;
-                    _motors->stop();
-                    _safety->requestArming(false);
-                }
-
-                else if (!lost_contact && _safety->isArmed()) {
-                    runMotors(_motorvals);
-                } 
-                
-                else {
-                    _motors->stop();
-                }
-
-                if (!rateSupervisor.validate(timestamp)) {
-                    static bool rateWarningDisplayed;
-                    if (!rateWarningDisplayed) {
-                        rateWarningDisplayed = true;
-                    }
-                }
-            }
+            const uint16_t ratios[4] = {0, 0, 0, 0};
+            setMotorRatiosAndRun(ratios);
         }
+
+
+        void motors_init();
+
+        void motors_setSpeed(uint32_t id, float speed);
+
+        void motors_run();
 };
