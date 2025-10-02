@@ -70,7 +70,7 @@ static void systemTask(void *arg)
 
     ledTask.begin(&safety, &imuTask);
 
-    imuTask.begin(&estimatorTask, &debugTask);
+    imuTask.begin(&estimatorTask);
 
     coreTask.begin(
             &closedLoopControl,
@@ -89,8 +89,6 @@ static void systemTask(void *arg)
 
 void setup() 
 {
-    Serial.begin(115200);
-
     Wire.begin();
     Wire.setClock(400000);
     delay(100);
