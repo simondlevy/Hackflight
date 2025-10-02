@@ -128,6 +128,9 @@ class ImuTask {
 
         } bias_t;
 
+        Axis3f _accelData;   // Gs
+        Axis3f _gyroData;  // deg/s
+
         static void calculateVarianceAndMean(
                 bias_t* bias, Axis3f* varOut, Axis3f* meanOut)
         {
@@ -271,7 +274,6 @@ class ImuTask {
         }
 
         bool gyroBiasFound;
-        sensorData_t data;
         Axis3f gyroBias;
 
         SemaphoreHandle_t coreTaskSemaphore;
@@ -372,24 +374,24 @@ class ImuTask {
                 gyroUnbiased.z = gyroRaw2Dps(gyroRaw.z - gyroBias.z);
 
                 // Rotate gyro to airframe
-                alignToAirframe(&gyroUnbiased, &data.gyro);
+                alignToAirframe(&gyroUnbiased, &_gyroData);
 
                 // LPF gyro
-                applyLpf(_gyroLpf, &data.gyro);
+                applyLpf(_gyroLpf, &_gyroData);
 
-                _estimatorTask->enqueueGyro(&data.gyro);
+                _estimatorTask->enqueueGyro(&_gyroData);
 
                 Axis3f accScaled = {};
                 alignToAirframe(&accel, &accScaled);
 
-                accAlignToGravity(&accScaled, &data.acc);
+                accAlignToGravity(&accScaled, &_accelData);
 
-                applyLpf(_accLpf, &data.acc);
+                applyLpf(_accLpf, &_accelData);
 
-                _estimatorTask->enqueueAccel(&data.acc);
+                _estimatorTask->enqueueAccel(&_accelData);
 
-                xQueueOverwrite(_accelQueue, &data.acc);
-                xQueueOverwrite(_gyroQueue, &data.gyro);
+                xQueueOverwrite(_accelQueue, &_accelData);
+                xQueueOverwrite(_gyroQueue, &_gyroData);
 
                 xSemaphoreGive(coreTaskSemaphore);
             }

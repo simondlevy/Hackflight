@@ -196,14 +196,6 @@ typedef struct zDistance_s {
     float distance;           // m
 } zDistance_t;
 
-typedef struct sensorData_s {
-    Axis3f acc;               // Gs
-    Axis3f gyro;              // deg/s
-    Axis3f mag;               // gauss
-    baro_t baro;
-    uint64_t interruptTimestamp;
-} sensorData_t;
-
 /** Estimate of position */
 typedef struct estimate_s {
     uint32_t timestamp; // Timestamp when the data was computed
