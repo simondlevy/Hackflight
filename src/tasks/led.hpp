@@ -68,6 +68,8 @@ class LedTask {
 
             while (true) {
 
+                vTaskDelay(1);
+
                 if (!_imuTask->imuIsCalibrated()) {
                     blink(lastWakeTime, IMU_CALIBRATION_HZ);
                 }
