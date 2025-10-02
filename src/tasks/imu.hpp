@@ -41,9 +41,6 @@ class ImuTask {
 
             _debugTask = debugTask;
 
-            // Wait for sensors to startup
-            vTaskDelay(STARTUP_TIME_MS);
-
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
