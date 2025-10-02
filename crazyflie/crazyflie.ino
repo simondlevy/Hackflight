@@ -16,11 +16,11 @@
  */
 
 #include <Wire.h>
+#include <STM32FreeRTOS.h>
 
 #include <hackflight.h>
 #include <comms.hpp>
 #include <__control__.hpp>
-#include <free_rtos_include.h>
 #include <mixers/crazyflie.hpp>
 #include <safety.hpp>
 #include <tasks/core.hpp>
@@ -87,13 +87,41 @@ void setup()
     Wire.setClock(400000);
     delay(100);
 
+    /*
     xTaskCreate(
             systemTask, 
             "SYSTEM",
             2* configMINIMAL_STACK_SIZE, 
             NULL, 
             2, 
-            NULL);
+            NULL);*/
+
+    Comms::init();
+
+	debugTask.begin();
+
+    zrangerTask.begin(&estimatorTask);
+
+    opticalFlowTask.begin(&estimatorTask);
+
+    estimatorTask.begin(&safety);
+
+    setpointTask.begin(&safety);
+
+    loggingTask.begin(&estimatorTask, &closedLoopControl);
+
+    ledTask.begin(&safety, &imuTask);
+
+    imuTask.begin(&estimatorTask);
+
+    coreTask.begin(
+            &closedLoopControl,
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            &setpointTask,
+            Mixer::rotorCount,
+            Mixer::mix);
 
     vTaskStartScheduler();
 }
