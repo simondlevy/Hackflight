@@ -15,17 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wire.h>
 #include <STM32FreeRTOS.h>
 
 #include <hackflight.hpp>
 
 void setup() 
 {
-    Wire.begin();
-    Wire.setClock(400000);
-    delay(100);
-
     hackflight_init();
 
     vTaskStartScheduler();

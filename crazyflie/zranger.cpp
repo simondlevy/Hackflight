@@ -22,6 +22,10 @@ static VL53L1X vl53l1x;
 
 bool ZRangerTask::device_init()
 {
+    Wire.begin();
+    Wire.setClock(400000);
+    delay(100);
+
     if (!vl53l1x.init()) {
         return false;
     }
