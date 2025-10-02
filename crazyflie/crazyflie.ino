@@ -18,68 +18,7 @@
 #include <Wire.h>
 #include <STM32FreeRTOS.h>
 
-#include <hackflight.h>
-#include <comms.hpp>
-#include <__control__.hpp>
-#include <mixers/crazyflie.hpp>
-#include <safety.hpp>
-#include <tasks/core.hpp>
-#include <tasks/debug.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/led.hpp>
-#include <tasks/logging.hpp>
-#include <tasks/opticalflow.hpp>
-#include <tasks/setpoint.hpp>
-#include <tasks/zranger.hpp>
-
-static CoreTask coreTask;
-static DebugTask debugTask;
-static EstimatorTask estimatorTask;
-static ImuTask imuTask;
-static LedTask ledTask;
-static LoggingTask loggingTask;
-static OpticalFlowTask opticalFlowTask;
-static SetpointTask setpointTask;
-static ZRangerTask zrangerTask;
-
-static Safety safety;
-
-static ClosedLoopControl closedLoopControl;
-
-static void systemTask(void *arg)
-{
-    Comms::init();
-
-	debugTask.begin();
-
-    zrangerTask.begin(&estimatorTask);
-
-    opticalFlowTask.begin(&estimatorTask);
-
-    estimatorTask.begin(&safety);
-
-    setpointTask.begin(&safety);
-
-    loggingTask.begin(&estimatorTask, &closedLoopControl);
-
-    ledTask.begin(&safety, &imuTask);
-
-    imuTask.begin(&estimatorTask);
-
-    coreTask.begin(
-            &closedLoopControl,
-            &safety,
-            &estimatorTask,
-            &imuTask,
-            &setpointTask,
-            Mixer::rotorCount,
-            Mixer::mix);
-
-    while (true) {
-        vTaskDelay(portMAX_DELAY);
-    }
-}
+#include <hackflight.hpp>
 
 void setup() 
 {
@@ -87,41 +26,7 @@ void setup()
     Wire.setClock(400000);
     delay(100);
 
-    /*
-    xTaskCreate(
-            systemTask, 
-            "SYSTEM",
-            2* configMINIMAL_STACK_SIZE, 
-            NULL, 
-            2, 
-            NULL);*/
-
-    Comms::init();
-
-	debugTask.begin();
-
-    zrangerTask.begin(&estimatorTask);
-
-    opticalFlowTask.begin(&estimatorTask);
-
-    estimatorTask.begin(&safety);
-
-    setpointTask.begin(&safety);
-
-    loggingTask.begin(&estimatorTask, &closedLoopControl);
-
-    ledTask.begin(&safety, &imuTask);
-
-    imuTask.begin(&estimatorTask);
-
-    coreTask.begin(
-            &closedLoopControl,
-            &safety,
-            &estimatorTask,
-            &imuTask,
-            &setpointTask,
-            Mixer::rotorCount,
-            Mixer::mix);
+    hackflight_init();
 
     vTaskStartScheduler();
 }
