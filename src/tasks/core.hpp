@@ -34,7 +34,7 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
-                const uint8_t rotorCount,
+                const uint8_t motorCount,
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
         {
@@ -52,7 +52,7 @@ class CoreTask {
 
             _mixFun = mixFun;
 
-            _rotorCount = rotorCount;
+            _motorCount = motorCount;
 
             _task.init(runCoreTask, "core", this, 5);
         }
@@ -71,7 +71,7 @@ class CoreTask {
         DebugTask * _debugTask;
         Safety * _safety;
         mixFun_t _mixFun;
-        uint8_t _rotorCount;
+        uint8_t _motorCount;
         FreeRtosTask _task;
         uint16_t _motorRatios[4];
         vehicleState_t _vehicleState;
@@ -79,21 +79,22 @@ class CoreTask {
         static void runCoreTask(void *arg)
         {
             ((CoreTask *)arg)->run();
-
         }
 
         void setMotorRatiosAndRun(const uint16_t ratios[])
         {
-            _setMotorRatio(0, ratios[0]);
-            _setMotorRatio(1, ratios[1]);
-            _setMotorRatio(2, ratios[2]);
-            _setMotorRatio(3, ratios[3]);
+            setMotorRatio(0, ratios[0]);
+            setMotorRatio(1, ratios[1]);
+            setMotorRatio(2, ratios[2]);
+            setMotorRatio(3, ratios[3]);
 
+            // Device-dependent
             motors_run();
         }
 
         void run()
         {
+            // Device-dependent
             motors_init();
 
             stopMotors();
@@ -112,7 +113,7 @@ class CoreTask {
 
                 _estimatorTask->getVehicleState(&_vehicleState);
 
-                static float _motorvals[4];
+                static float _motorvals[MAX_MOTOR_COUNT];
 
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
@@ -128,10 +129,10 @@ class CoreTask {
                                 setpoint.demands.thrust, 0.2, 2.0, -1, +1);
                     }
 
-                    // Use safety algorithm to modify demands based on sensor
-                    // data and open-loop info
+                    // Use safety algorithm to modify demands based on current
+                    // vehicle state, open-loop demads, and motor values
                     _safety->update(step, setpoint.timestamp, _vehicleState,
-                            _motorRatios, _rotorCount);
+                            _motorRatios, _motorCount);
 
                     if (setpoint.hovering) {
 
@@ -152,7 +153,6 @@ class CoreTask {
                             closedLoopDemands);
 
                     runMixer(_mixFun, closedLoopDemands, _motorvals);
-
                 }
 
                 const auto timestamp = xTaskGetTickCount();
@@ -171,7 +171,7 @@ class CoreTask {
                     runMotors(_motorvals);
                 } 
 
-                // Otherwise, maintain motors
+                // Otherwise, maintain motors at stopped (idle) values
                 else {
                     stopMotors();
                 }
@@ -192,7 +192,7 @@ class CoreTask {
             mixFun(demands, uncapped);
 
             float highestThrustFound = 0;
-            for (uint8_t k=0; k<_rotorCount; k++) {
+            for (uint8_t k=0; k<_motorCount; k++) {
 
                 const auto thrust = uncapped[k];
 
@@ -206,7 +206,7 @@ class CoreTask {
                 reduction = highestThrustFound - THRUST_MAX;
             }
 
-            for (uint8_t k = 0; k < _rotorCount; k++) {
+            for (uint8_t k = 0; k < _motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] = capMinThrust(thrustCappedUpper);
             }
@@ -217,8 +217,9 @@ class CoreTask {
             return thrust < 0 ? 0 : thrust;
         }
 
-        void _setMotorRatio(uint32_t id, uint16_t ratio)
+        void setMotorRatio(uint32_t id, uint16_t ratio)
         {
+            // Device-dependent
             motors_setSpeed(id, ratio/65536.f);
         }
 
@@ -251,6 +252,7 @@ class CoreTask {
             setMotorRatiosAndRun(ratios);
         }
 
+        // Device-dependent ---------------------------
 
         void motors_init();
 
