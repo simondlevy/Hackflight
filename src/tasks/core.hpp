@@ -97,7 +97,7 @@ class CoreTask {
             // Device-dependent
             motors_init();
 
-            stopMotors();
+            idleMotors();
 
             static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
@@ -162,7 +162,7 @@ class CoreTask {
                         timestamp - setpoint_timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
-                    stopMotors();
+                    idleMotors();
                     _safety->requestArming(false);
                 }
 
@@ -173,7 +173,7 @@ class CoreTask {
 
                 // Otherwise, maintain motors at stopped (idle) values
                 else {
-                    stopMotors();
+                    idleMotors();
                 }
 
                 if (!rateSupervisor.validate(timestamp)) {
@@ -246,7 +246,7 @@ class CoreTask {
             _motorRatios[3] = ratios[3];
         }
 
-        void stopMotors()
+        void idleMotors()
         {
             const uint16_t ratios[4] = {0, 0, 0, 0};
             setMotorRatiosAndRun(ratios);
