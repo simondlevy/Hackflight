@@ -92,6 +92,9 @@ class CoreTask {
             uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
 
+            // Start with motor speeds at idle
+            float motorvals[MAX_MOTOR_COUNT] = {};
+
             for (uint32_t step=1; ; step++) {
 
                 // Wait for IMU
@@ -100,41 +103,37 @@ class CoreTask {
                 // Get vehicle state from estimator
                 _estimatorTask->getVehicleState(&_vehicleState);
 
-                // Start with motor speeds at idle
-                float motorvals[MAX_MOTOR_COUNT] = {};
-
                 const auto timestamp = xTaskGetTickCount();
 
-                // Disarm on lost contact
+                // If lost contact, disarm
                 if (setpoint_timestamp > 0 &&
                         timestamp - setpoint_timestamp > SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
                     _safety->requestArming(false);
                 }
 
+                // Otherwise, run normally
                 else if (!lost_contact) {
 
-                    demands_t closedLoopDemands = {};
+                    // Update safety status
+                    _safety->update(step, setpoint_timestamp, _vehicleState,
+                            motorvals, _motorCount);
 
+                    // Run closed-loop control to get demands
+                    demands_t closedLoopDemands = {};
                     if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
                         runClosedLoopControl(
                                 step, setpoint_timestamp, closedLoopDemands);
                     }
 
-                    // Run in flying mode
+                    // Run demands through mixer to get motor speeds
                     if (_safety->isArmed()) {
                         runMixer(_mixFun, closedLoopDemands, motorvals);
-                        for (uint8_t id=0; id<_motorCount; ++id) {
-                            motorvals[id] /= 65536;
-                        }
                     } 
                 }
 
                 // Run motors at their current speeds
-                for (uint8_t id=0; id<_motorCount; ++id) {
-                    motors_setSpeed(id, motorvals[id]);
-                }
-                motors_run();
+                runMotors(motorvals);
 
                 if (!rateSupervisor.validate(timestamp)) {
                     static bool rateWarningDisplayed;
@@ -168,8 +167,15 @@ class CoreTask {
 
             for (uint8_t k = 0; k < _motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
-                motorvals[k] = capMinThrust(thrustCappedUpper);
+                motorvals[k] = capMinThrust(thrustCappedUpper) / 65536;
             }
+        }
+
+        void runMotors(float * motorvals) {
+            for (uint8_t id=0; id<_motorCount; ++id) {
+                motors_setSpeed(id, motorvals[id]);
+            }
+            motors_run();
         }
 
         static uint16_t capMinThrust(float thrust) 
@@ -193,11 +199,6 @@ class CoreTask {
                 setpoint.demands.thrust = Num::rescale(
                         setpoint.demands.thrust, 0.2, 2.0, -1, +1);
             }
-
-            // Use safety algorithm to modify demands based on current
-            // vehicle state, open-loop demads, and motor values
-            _safety->update(step, setpoint.timestamp, _vehicleState,
-                    _motorRatios, _motorCount);
 
             if (setpoint.hovering) {
 

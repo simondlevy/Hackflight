@@ -44,12 +44,12 @@ class Safety {
                 const uint32_t coreStep,
                 const uint32_t timestamp,
                 const vehicleState_t & vehicleState,
-                const uint16_t * motorRatios,
+                const float * motorvals,
                 const uint8_t motorCount)
         { 
             if (Clock::rateDoExecute(CLOCK_RATE, coreStep)) {
 
-                _is_flying = isFlyingCheck(xTaskGetTickCount(), motorRatios, motorCount);
+                _is_flying = isFlyingCheck(xTaskGetTickCount(), motorvals, motorCount);
 
                 _is_safe_to_arm =safeAngle(vehicleState.phi) &&
                     safeAngle(vehicleState.theta);
@@ -79,13 +79,13 @@ class Safety {
         // We say we are flying if one or more motors are running over the idle
         // thrust.
         //
-        bool isFlyingCheck(
-                const uint32_t tick, const uint16_t * motorRatios, const uint8_t motorCount) 
+        bool isFlyingCheck(const uint32_t tick, const float * motorvals,
+                const uint8_t motorCount) 
         {
             auto isThrustOverIdle = false;
 
             for (int i = 0; i < motorCount; ++i) {
-                if (motorRatios[i] > 0) {
+                if (motorvals[i] > 0) {
                     isThrustOverIdle = true;
                     break;
                 }
