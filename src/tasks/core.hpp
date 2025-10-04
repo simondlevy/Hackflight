@@ -89,11 +89,12 @@ class CoreTask {
             static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
 
-            uint32_t setpoint_timestamp = 0;
             bool lost_contact = false;
 
             // Start with motor speeds at idle
             float motorvals[MAX_MOTOR_COUNT] = {};
+
+            setpoint_t setpoint = {};
 
             for (uint32_t step=1; ; step++) {
 
@@ -106,8 +107,8 @@ class CoreTask {
                 const auto timestamp = xTaskGetTickCount();
 
                 // If lost contact, disarm
-                if (setpoint_timestamp > 0 &&
-                        timestamp - setpoint_timestamp > SETPOINT_TIMEOUT_TICKS) {
+                if (setpoint.timestamp > 0 &&
+                        timestamp - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
                     lost_contact = true;
                     _safety->requestArming(false);
                 }
@@ -115,12 +116,10 @@ class CoreTask {
                 // Otherwise, run normally
                 else if (!lost_contact) {
 
-                    setpoint_t setpoint = {};
                     _setpointTask->getSetpoint(setpoint);
-                    setpoint_timestamp = setpoint.timestamp;
 
                     // Update safety status
-                    _safety->update(step, setpoint_timestamp, _vehicleState,
+                    _safety->update(step, setpoint.timestamp, _vehicleState,
                             motorvals, _motorCount);
 
                     // Run closed-loop control to get demands from setpoint
