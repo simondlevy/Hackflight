@@ -94,20 +94,16 @@ class CoreTask {
 
             for (uint32_t step=1; ; step++) {
 
+                // Wait for IMU
                 _imuTask->waitDataReady();
 
+                // Get vehicle state from estimator
                 _estimatorTask->getVehicleState(&_vehicleState);
 
-                static demands_t _closedLoopDemands;
-
-                if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
-                    runClosedLoopControl(
-                            step, setpoint_timestamp, _closedLoopDemands);
-                }
+                // Start with motor speeds at idle
+                float motorvals[MAX_MOTOR_COUNT] = {};
 
                 const auto timestamp = xTaskGetTickCount();
-
-                float motorvals[MAX_MOTOR_COUNT] = {};
 
                 // Disarm on lost contact
                 if (setpoint_timestamp > 0 &&
@@ -116,18 +112,28 @@ class CoreTask {
                     _safety->requestArming(false);
                 }
 
-                // Run in flying mode
-                else if (!lost_contact && _safety->isArmed()) {
-                    runMixer(_mixFun, _closedLoopDemands, motorvals);
-                    for (uint8_t id=0; id<_motorCount; ++id) {
-                        motorvals[id] /= 65536;
-                    }
-                } 
+                else {
 
+                    demands_t closedLoopDemands = {};
+
+                    if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
+                        runClosedLoopControl(
+                                step, setpoint_timestamp, closedLoopDemands);
+                    }
+
+                    // Run in flying mode
+                    if (!lost_contact && _safety->isArmed()) {
+                        runMixer(_mixFun, closedLoopDemands, motorvals);
+                        for (uint8_t id=0; id<_motorCount; ++id) {
+                            motorvals[id] /= 65536;
+                        }
+                    } 
+                }
+
+                // Run motors at their current speeds
                 for (uint8_t id=0; id<_motorCount; ++id) {
                     motors_setSpeed(id, motorvals[id]);
                 }
-
                 motors_run();
 
                 if (!rateSupervisor.validate(timestamp)) {
