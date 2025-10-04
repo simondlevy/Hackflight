@@ -112,7 +112,7 @@ class CoreTask {
                     _safety->requestArming(false);
                 }
 
-                else {
+                else if (!lost_contact) {
 
                     demands_t closedLoopDemands = {};
 
@@ -122,7 +122,7 @@ class CoreTask {
                     }
 
                     // Run in flying mode
-                    if (!lost_contact && _safety->isArmed()) {
+                    if (_safety->isArmed()) {
                         runMixer(_mixFun, closedLoopDemands, motorvals);
                         for (uint8_t id=0; id<_motorCount; ++id) {
                             motorvals[id] /= 65536;
