@@ -115,14 +115,18 @@ class CoreTask {
                 // Otherwise, run normally
                 else if (!lost_contact) {
 
+                    setpoint_t setpoint = {};
+                    _setpointTask->getSetpoint(setpoint);
+                    setpoint_timestamp = setpoint.timestamp;
+
                     // Update safety status
                     _safety->update(step, setpoint_timestamp, _vehicleState,
                             motorvals, _motorCount);
 
-                    // Run closed-loop control to get demands
+                    // Run closed-loop control to get demands from setpoint
                     demands_t closedLoopDemands = {};
                     if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
-                        runClosedLoopControl(setpoint_timestamp, closedLoopDemands);
+                        runClosedLoopControl(setpoint, closedLoopDemands);
                     }
 
                     // Run demands through mixer to get motor speeds
@@ -183,14 +187,8 @@ class CoreTask {
         }
 
         void runClosedLoopControl(
-                uint32_t & setpoint_timestamp, demands_t & closedLoopDemands)
+                setpoint_t & setpoint, demands_t & closedLoopDemands)
         {
-            setpoint_t setpoint = {};
-
-            _setpointTask->getSetpoint(setpoint);
-
-            setpoint_timestamp = setpoint.timestamp;
-
             if (setpoint.hovering) {
 
                 setpoint.demands.thrust = Num::rescale(
