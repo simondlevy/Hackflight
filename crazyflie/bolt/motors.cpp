@@ -45,6 +45,15 @@ void CoreTask::motors_setSpeed(uint32_t id, float speed)
 {
     const uint8_t pulse_width = 125 * (speed + 1);
 
+    static uint8_t _m1, _m2, _m3;
+    if (id == 0) _m1 = pulse_width;
+    if (id == 1) _m2 = pulse_width;
+    if (id == 2) _m3 = pulse_width;
+
+    if (id == 3) DebugTask::setMessage(_debugTask,
+            "m1=%03d m2=%03d m3=%03d m4=%03d",
+            _m1, _m2, _m3, pulse_width);
+
     motors.set(id, pulse_width);
 }
 
