@@ -73,5 +73,6 @@ static void hackflight_init()
             &imuTask,
             &setpointTask,
             Mixer::rotorCount,
-            Mixer::mix);
+            Mixer::mix,
+            &debugTask);
 }

@@ -116,43 +116,8 @@ class CoreTask {
                 static float _motorvals[MAX_MOTOR_COUNT];
 
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
-
-                    setpoint_t setpoint = {};
-
-                    _setpointTask->getSetpoint(setpoint);
-
-                    setpoint_timestamp = setpoint.timestamp;
-
-                    if (setpoint.hovering) {
-
-                        setpoint.demands.thrust = Num::rescale(
-                                setpoint.demands.thrust, 0.2, 2.0, -1, +1);
-                    }
-
-                    // Use safety algorithm to modify demands based on current
-                    // vehicle state, open-loop demads, and motor values
-                    _safety->update(step, setpoint.timestamp, _vehicleState,
-                            _motorRatios, _motorCount);
-
-                    if (setpoint.hovering) {
-
-                        // In hover mode, thrust demand comes in as [-1,+1], so
-                        // we convert it to a target altitude in meters
-                        setpoint.demands.thrust = Num::rescale(
-                                setpoint.demands.thrust, -1, +1, 0.2, 2.0);
-                    }
-
-                    demands_t closedLoopDemands = {};
-
-                    _closedLoopControl->run(
-                            1.f / PID_UPDATE_RATE,
-                            setpoint.hovering,
-                            _vehicleState,
-                            setpoint.demands,
-                            LANDING_ALTITUDE_M,
-                            closedLoopDemands);
-
-                    runMixer(_mixFun, closedLoopDemands, _motorvals);
+                    runPidControlAndMixer(
+                            step, setpoint_timestamp, _motorvals);
                 }
 
                 const auto timestamp = xTaskGetTickCount();
@@ -221,6 +186,12 @@ class CoreTask {
         {
             // Device-dependent
             motors_setSpeed(id, ratio/65536.f);
+
+            static uint16_t m1, m2, m3;
+
+            if (id == 0) m1 = ratio;
+            if (id == 1) m2 = ratio;
+            if (id == 2) m3 = ratio;
         }
 
         void runMotors(const float motorvals[4]) 
@@ -231,9 +202,6 @@ class CoreTask {
                 (uint16_t)motorvals[2],
                 (uint16_t)motorvals[3]
             };
-
-            DebugTask::setMessage(_debugTask, "m1=%d m2=%d m3=%d m4=%d",
-                    motorsPwm[0], motorsPwm[1], motorsPwm[2], motorsPwm[3]);
 
             setMotorRatios(motorsPwm);
         }
@@ -250,6 +218,49 @@ class CoreTask {
         {
             const uint16_t ratios[4] = {0, 0, 0, 0};
             setMotorRatiosAndRun(ratios);
+        }
+
+        void runPidControlAndMixer(
+                const uint32_t step,
+                uint32_t & setpoint_timestamp,
+                float * motorvals)
+        {
+            setpoint_t setpoint = {};
+
+            _setpointTask->getSetpoint(setpoint);
+
+            setpoint_timestamp = setpoint.timestamp;
+
+            if (setpoint.hovering) {
+
+                setpoint.demands.thrust = Num::rescale(
+                        setpoint.demands.thrust, 0.2, 2.0, -1, +1);
+            }
+
+            // Use safety algorithm to modify demands based on current
+            // vehicle state, open-loop demads, and motor values
+            _safety->update(step, setpoint.timestamp, _vehicleState,
+                    _motorRatios, _motorCount);
+
+            if (setpoint.hovering) {
+
+                // In hover mode, thrust demand comes in as [-1,+1], so
+                // we convert it to a target altitude in meters
+                setpoint.demands.thrust = Num::rescale(
+                        setpoint.demands.thrust, -1, +1, 0.2, 2.0);
+            }
+
+            demands_t closedLoopDemands = {};
+
+            _closedLoopControl->run(
+                    1.f / PID_UPDATE_RATE,
+                    setpoint.hovering,
+                    _vehicleState,
+                    setpoint.demands,
+                    LANDING_ALTITUDE_M,
+                    closedLoopDemands);
+
+            runMixer(_mixFun, closedLoopDemands, motorvals);
         }
 
         // Device-dependent ---------------------------
