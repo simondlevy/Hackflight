@@ -122,8 +122,7 @@ class CoreTask {
                     // Run closed-loop control to get demands
                     demands_t closedLoopDemands = {};
                     if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
-                        runClosedLoopControl(
-                                step, setpoint_timestamp, closedLoopDemands);
+                        runClosedLoopControl(setpoint_timestamp, closedLoopDemands);
                     }
 
                     // Run demands through mixer to get motor speeds
@@ -184,9 +183,7 @@ class CoreTask {
         }
 
         void runClosedLoopControl(
-                const uint32_t step,
-                uint32_t & setpoint_timestamp,
-                demands_t & closedLoopDemands)
+                uint32_t & setpoint_timestamp, demands_t & closedLoopDemands)
         {
             setpoint_t setpoint = {};
 
