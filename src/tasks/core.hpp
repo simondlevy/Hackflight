@@ -94,6 +94,7 @@ class CoreTask {
             // Start with motor speeds at idle
             float motorvals[MAX_MOTOR_COUNT] = {};
 
+            // No setpoint yet
             setpoint_t setpoint = {};
 
             for (uint32_t step=1; ; step++) {
@@ -116,6 +117,7 @@ class CoreTask {
                 // Otherwise, run normally
                 else if (!lost_contact) {
 
+                    // Get setpoint
                     _setpointTask->getSetpoint(setpoint);
 
                     // Update safety status
@@ -192,12 +194,7 @@ class CoreTask {
 
                 setpoint.demands.thrust = Num::rescale(
                         setpoint.demands.thrust, 0.2, 2.0, -1, +1);
-            }
 
-            if (setpoint.hovering) {
-
-                // In hover mode, thrust demand comes in as [-1,+1], so
-                // we convert it to a target altitude in meters
                 setpoint.demands.thrust = Num::rescale(
                         setpoint.demands.thrust, -1, +1, 0.2, 2.0);
             }
