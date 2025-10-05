@@ -133,14 +133,6 @@ class CoreTask {
                         // Run closedLoopDemands through mixer to get motor speeds
                         runMixer(_mixFun, demands, motorvals);
 
-                        DebugTask::setMessage(_debugTask,
-                                "%05d: thrust=%f m1=%f m2=%f m3=%f m4=%f",
-                                step, demands.thrust,
-                                motorvals[0], motorvals[1],
-                                motorvals[2], motorvals[3]);
-                    }
-                    else {
-                        DebugTask::setMessage(_debugTask, "disarmed");
                     }
 
                     // Update safety status
@@ -148,6 +140,12 @@ class CoreTask {
                             motorvals, _motorCount);
 
                 }
+
+                DebugTask::setMessage(_debugTask,
+                        "%05d: armed=%d thrust=%3.3f m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f",
+                        step, _safety->isArmed(), demands.thrust,
+                        motorvals[0], motorvals[1],
+                        motorvals[2], motorvals[3]);
 
                 // Run motors at their current speeds (perhaps idle)
                 runMotors(motorvals);
