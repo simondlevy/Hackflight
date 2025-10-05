@@ -41,6 +41,8 @@ BLUETOOTH_ADDRESSES = {
 
 BLUETOOTH_PORT = 1
 
+SOCKET_TIMEOUT = 1
+
 UPDATE_RATE_HZ = 100
 
 SPIKE_VIZ_DIR = '/home/levys/Desktop/framework/viz'
@@ -105,14 +107,12 @@ def logging_threadfun(parser, visualize_spikes):
 
         try:
 
-            byte = parser.client.recv(1)
-
-            parser.parse(byte)
+            parser.parse(parser.client.recv(1))
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
             parser.running = False
-            return
+            break
 
 
 def connect_to_server(name, port):
@@ -134,6 +134,7 @@ def connect_to_server(name, port):
 
             try:
                 client.connect((addr, port))
+                client.settimeout(SOCKET_TIMEOUT)
                 print(' connected')
                 break
 
@@ -202,12 +203,16 @@ def main():
 
             else:
 
-                client.send(
-                        MspParser.serialize_SET_SETPOINT_RPYT(gamepad.roll,
-                                                              gamepad.pitch,
-                                                              gamepad.yaw,
-                                                              gamepad.thrust))
+                try:
 
+                    client.send(
+                            MspParser.serialize_SET_SETPOINT_RPYT(gamepad.roll,
+                                                                  gamepad.pitch,
+                                                                  gamepad.yaw,
+                                                                  gamepad.thrust))
+                except Exception as e:
+                    break
+ 
             sleep(1 / UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
