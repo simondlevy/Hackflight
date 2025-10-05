@@ -91,13 +91,16 @@ class CoreTask {
 
             bool lost_contact = false;
 
-            // Start with motor speeds at idle
-            float motorvals[MAX_MOTOR_COUNT] = {};
-
             // No setpoint yet
             setpoint_t setpoint = {};
 
+            // Start with motor speeds at idle
+            float motorvals[MAX_MOTOR_COUNT] = {};
+
             for (uint32_t step=1; ; step++) {
+
+                // No axis demands yet;
+                demands_t demands = {};
 
                 // Wait for IMU
                 _imuTask->waitDataReady();
@@ -120,23 +123,33 @@ class CoreTask {
                     // Get setpoint
                     _setpointTask->getSetpoint(setpoint);
 
+                    // If armed, get demands and run mixer
+                    if (_safety->isArmed()) {
+
+                        //if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
+                        runClosedLoopControl(setpoint, demands);
+                        // }
+
+                        // Run closedLoopDemands through mixer to get motor speeds
+                        runMixer(_mixFun, demands, motorvals);
+
+                        DebugTask::setMessage(_debugTask,
+                                "%05d: thrust=%f m1=%f m2=%f m3=%f m4=%f",
+                                step, demands.thrust,
+                                motorvals[0], motorvals[1],
+                                motorvals[2], motorvals[3]);
+                    }
+                    else {
+                        DebugTask::setMessage(_debugTask, "disarmed");
+                    }
+
                     // Update safety status
                     _safety->update(step, setpoint.timestamp, _vehicleState,
                             motorvals, _motorCount);
 
-                    // Run closed-loop control to get demands from setpoint
-                    demands_t closedLoopDemands = {};
-                    if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
-                        runClosedLoopControl(setpoint, closedLoopDemands);
-                    }
-
-                    // Run demands through mixer to get motor speeds
-                    if (_safety->isArmed()) {
-                        runMixer(_mixFun, closedLoopDemands, motorvals);
-                    } 
                 }
 
-                // Run motors at their current speeds
+                // Run motors at their current speeds (perhaps idle)
                 runMotors(motorvals);
 
                 if (!rateSupervisor.validate(timestamp)) {
@@ -171,7 +184,7 @@ class CoreTask {
 
             for (uint8_t k = 0; k < _motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
-                motorvals[k] = capMinThrust(thrustCappedUpper) / 65536;
+                motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
         }
 
@@ -180,11 +193,6 @@ class CoreTask {
                 motors_setSpeed(id, motorvals[id]);
             }
             motors_run();
-        }
-
-        static uint16_t capMinThrust(float thrust) 
-        {
-            return thrust < 0 ? 0 : thrust;
         }
 
         void runClosedLoopControl(
