@@ -34,12 +34,14 @@ except Exception as e:
 
 BLUETOOTH_ADDRESSES = {
     'bench': '64:B7:08:86:F2:AE',
-    'bolt': '64:B7:08:93:71:1E',
+    'bolt': '64:B7:08:86:F3:6A',
     'cf2': '64:B7:08:87:AD:76',
     'tinypico': 'D4:D4:DA:AA:2E:F2'
 }
 
 BLUETOOTH_PORT = 1
+
+SOCKET_TIMEOUT = 1
 
 UPDATE_RATE_HZ = 100
 
@@ -78,8 +80,8 @@ class LoggingParser(MspParser):
             try:
                 self.spike_viz_client.send(msg.encode())
 
-            except Exception as e:
-                 pass
+            except Exception:
+                pass
 
 
 def logging_threadfun(parser, visualize_spikes):
@@ -110,7 +112,7 @@ def logging_threadfun(parser, visualize_spikes):
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
             parser.running = False
-            return
+            break
 
 
 def connect_to_server(name, port):
@@ -132,6 +134,7 @@ def connect_to_server(name, port):
 
             try:
                 client.connect((addr, port))
+                client.settimeout(SOCKET_TIMEOUT)
                 print(' connected')
                 break
 
@@ -166,8 +169,6 @@ def main():
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
-    logging = [True]
-
     parser = LoggingParser(client, args.log_state)
     thread = Thread(target=logging_threadfun,
                     args=(parser, args.visualize_spikes))
@@ -183,7 +184,7 @@ def main():
 
     gamepad = Gamepad()
 
-    while logging[0] and gamepad.running:
+    while gamepad.connected:
 
         try:
 
@@ -193,6 +194,9 @@ def main():
                 client.send(MspParser.serialize_SET_ARMING(gamepad.armed))
                 was_armed = gamepad.armed
 
+            if not gamepad.armed:
+                gamepad.hovering = False
+
             if gamepad.hovering:
 
                 client.send(MspParser.serialize_SET_SETPOINT_HOVER(
@@ -200,16 +204,21 @@ def main():
 
             else:
 
-                client.send(
-                        MspParser.serialize_SET_SETPOINT_RPYT(gamepad.roll,
-                                                              gamepad.pitch,
-                                                              gamepad.yaw,
-                                                              gamepad.thrust))
+                try:
+
+                    client.send(MspParser.serialize_SET_SETPOINT_RPYT(
+                        gamepad.roll,
+                        gamepad.pitch,
+                        gamepad.yaw,
+                        gamepad.thrust))
+
+                except Exception:
+                    break
 
             sleep(1 / UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
-            logging[0] = False
+            break
 
 
 main()
