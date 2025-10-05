@@ -105,7 +105,9 @@ def logging_threadfun(parser, visualize_spikes):
 
         try:
 
-            parser.parse(parser.client.recv(1))
+            byte = parser.client.recv(1)
+
+            parser.parse(byte)
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
@@ -166,8 +168,6 @@ def main():
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
-    logging = [True]
-
     parser = LoggingParser(client, args.log_state)
     thread = Thread(target=logging_threadfun,
                     args=(parser, args.visualize_spikes))
@@ -183,7 +183,9 @@ def main():
 
     gamepad = Gamepad()
 
-    while logging[0] and gamepad.running:
+    count = 0
+
+    while gamepad.running:
 
         try:
 
@@ -209,7 +211,7 @@ def main():
             sleep(1 / UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
-            logging[0] = False
+            break
 
 
 main()

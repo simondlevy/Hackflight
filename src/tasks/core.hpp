@@ -94,13 +94,13 @@ class CoreTask {
             // No setpoint yet
             setpoint_t setpoint = {};
 
-            // Start with motor speeds at idle
-            float motorvals[MAX_MOTOR_COUNT] = {};
-
             for (uint32_t step=1; ; step++) {
 
                 // No axis demands yet;
                 demands_t demands = {};
+
+                // Start with motor speeds at idle
+                float motorvals[MAX_MOTOR_COUNT] = {};
 
                 // Wait for IMU
                 _imuTask->waitDataReady();
