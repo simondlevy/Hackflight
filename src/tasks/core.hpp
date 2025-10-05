@@ -89,12 +89,13 @@ class CoreTask {
             static RateSupervisor rateSupervisor;
             rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
 
+            // Once we lose contact, we must restart
             bool lost_contact = false;
 
-            // No setpoint yet
-            setpoint_t setpoint = {};
-
             for (uint32_t step=1; ; step++) {
+
+                // No setpoint yet
+                setpoint_t setpoint = {};
 
                 // No axis demands yet;
                 demands_t demands = {};
@@ -142,8 +143,9 @@ class CoreTask {
                 }
 
                 DebugTask::setMessage(_debugTask,
-                        "%05d: armed=%d thrust=%3.3f m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f",
-                        step, _safety->isArmed(), demands.thrust,
+                        "%05d: armed=%d hovering=%d thrust=%3.3f "
+                        "m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f",
+                        step, _safety->isArmed(), setpoint.hovering, demands.thrust,
                         motorvals[0], motorvals[1],
                         motorvals[2], motorvals[3]);
 
