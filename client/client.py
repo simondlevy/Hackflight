@@ -80,8 +80,8 @@ class LoggingParser(MspParser):
             try:
                 self.spike_viz_client.send(msg.encode())
 
-            except Exception as e:
-                 pass
+            except Exception:
+                pass
 
 
 def logging_threadfun(parser, visualize_spikes):
@@ -184,8 +184,6 @@ def main():
 
     gamepad = Gamepad()
 
-    count = 0
-
     while gamepad.connected:
 
         try:
@@ -205,14 +203,15 @@ def main():
 
                 try:
 
-                    client.send(
-                            MspParser.serialize_SET_SETPOINT_RPYT(gamepad.roll,
-                                                                  gamepad.pitch,
-                                                                  gamepad.yaw,
-                                                                  gamepad.thrust))
-                except Exception as e:
+                    client.send(MspParser.serialize_SET_SETPOINT_RPYT(
+                        gamepad.roll,
+                        gamepad.pitch,
+                        gamepad.yaw,
+                        gamepad.thrust))
+
+                except Exception:
                     break
- 
+
             sleep(1 / UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
