@@ -127,7 +127,6 @@ class CoreTask {
                         // Get setpoint
                         _setpointTask->getSetpoint(setpoint);
 
-
                         if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
                             runClosedLoopControl(setpoint, demands);
 

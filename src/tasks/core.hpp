@@ -42,11 +42,14 @@ class CoreTask {
 
             _imuTask = imuTask;
             _debugTask = debugTask;
+            _setpointTask = setpointTask;
 
             _task.init(runCoreTask, "core", this, 5);
         }
 
     private:
+
+        static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
 
         static void runCoreTask(void *arg)
         {
@@ -59,6 +62,9 @@ class CoreTask {
 
         DebugTask * _debugTask;
         ImuTask * _imuTask;
+        SetpointTask * _setpointTask;
+
+        Safety::status_t status = Safety::IDLE;
 
         void run()
         {
@@ -67,28 +73,40 @@ class CoreTask {
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
-                const auto status = _safety->getStatus();
+                // Track time for lost contact
+                const auto timestamp = xTaskGetTickCount();
+
+                // Get setpoint
+                setpoint_t setpoint = {};
+                _setpointTask->getSetpoint(setpoint);
+
+                if (setpoint.timestamp > 0 &&
+                        timestamp - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
+                    status = Safety::LOST_CONTACT;
+                }
+
 
                 if (status == Safety::LOST_CONTACT) {
                     // No way to recover from this
+                    DebugTask::setMessage(_debugTask, "%05d: lost contact", step);
                 }
 
                 else switch (status) {
 
                     case Safety::IDLE:
-                        DebugTask::setMessage(_debugTask, "idle");
+                        DebugTask::setMessage(_debugTask, "%05d: idle", step);
                         break;
 
                     case Safety::ARMED:
-                        DebugTask::setMessage(_debugTask, "armed");
+                        DebugTask::setMessage(_debugTask, "%05d: armed", step);
                         break;
 
                     case Safety::FLYING:
-                        DebugTask::setMessage(_debugTask, "flying");
+                        DebugTask::setMessage(_debugTask, "%05d: flying", step);
                         break;
 
                     case Safety::LANDING:
-                        DebugTask::setMessage(_debugTask, "landing");
+                        DebugTask::setMessage(_debugTask, "%05d: landing", step);
                         break;
                 }
             }
