@@ -19,7 +19,6 @@
 #include <comms.hpp>
 #include <msp/messages.h>
 #include <msp/parser.hpp>
-#include <safety.hpp>
 #include <tasks/debug.hpp>
 
 class SetpointTask {
@@ -30,10 +29,8 @@ class SetpointTask {
 
     public:
 
-        void begin(Safety * safety, DebugTask * debugTask=nullptr)
+        void begin(DebugTask * debugTask=nullptr)
         {
-            _safety = safety;
-
             _debugTask = debugTask;
 
             setpointQueue = xQueueCreateStatic(
@@ -91,8 +88,6 @@ class SetpointTask {
 
         FreeRtosTask _task;
 
-        Safety * _safety;
-
         DebugTask * _debugTask;
 
         void run(void)
@@ -114,7 +109,7 @@ class SetpointTask {
                     switch (parser.parse(byte)) {
 
                         case MSP_SET_ARMING:
-                            _safety->requestArming((bool)parser.getByte(0));
+                            setpoint.arming = !setpoint.arming;
                             break;
 
                         case MSP_SET_SETPOINT_RPYT:

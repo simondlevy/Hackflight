@@ -58,7 +58,7 @@ static void hackflight_init()
 
     estimatorTask.begin(&safety);
 
-    setpointTask.begin(&safety);
+    setpointTask.begin();
 
     loggingTask.begin(&estimatorTask, &closedLoopControl);
 

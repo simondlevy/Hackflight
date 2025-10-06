@@ -38,8 +38,6 @@ class CoreTask {
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
         {
-            _safety = safety;
-
             _imuTask = imuTask;
             _debugTask = debugTask;
             _setpointTask = setpointTask;
@@ -58,8 +56,6 @@ class CoreTask {
 
         FreeRtosTask _task;
 
-        Safety * _safety;
-
         DebugTask * _debugTask;
         ImuTask * _imuTask;
         SetpointTask * _setpointTask;
@@ -73,18 +69,14 @@ class CoreTask {
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
-                // Track time for lost contact
-                const auto timestamp = xTaskGetTickCount();
-
                 // Get setpoint
                 setpoint_t setpoint = {};
                 _setpointTask->getSetpoint(setpoint);
 
                 if (setpoint.timestamp > 0 &&
-                        timestamp - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
+                        xTaskGetTickCount() - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
                     status = Safety::LOST_CONTACT;
                 }
-
 
                 if (status == Safety::LOST_CONTACT) {
                     // No way to recover from this
@@ -94,7 +86,8 @@ class CoreTask {
                 else switch (status) {
 
                     case Safety::IDLE:
-                        DebugTask::setMessage(_debugTask, "%05d: idle", step);
+                        DebugTask::setMessage(_debugTask, "%05d: idle: arming=%d",
+                                step, setpoint.arming);
                         break;
 
                     case Safety::ARMED:
