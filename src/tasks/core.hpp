@@ -160,9 +160,13 @@ class CoreTask {
             }
         }
 
-        void reportStatus(const uint32_t step, const char * status, const float * motorvals)
+        void reportStatus(const uint32_t step, const char * status,
+                const float * motorvals)
         {
-            DebugTask::setMessage(_debugTask, "%05d: %s", step, status);
+            DebugTask::setMessage(_debugTask,
+                    "%05d: %-8s m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
+                    step, status,
+                    motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
         void checkDisarm(const setpoint_t setpoint, status_t &status)
