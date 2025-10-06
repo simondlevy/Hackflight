@@ -48,6 +48,8 @@ class CoreTask {
 
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
 
+        static constexpr float MAX_SAFE_ANGLE = 30;
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
@@ -68,10 +70,12 @@ class CoreTask {
         ImuTask * _imuTask;
         SetpointTask * _setpointTask;
 
-        status_t status = STATUS_IDLE;
+        vehicleState_t _vehicleState;
 
         void run()
         {
+            status_t status = STATUS_IDLE;
+
             for (uint32_t step=1; ; step++) {
 
                 // Wait for IMU
@@ -81,6 +85,7 @@ class CoreTask {
                 setpoint_t setpoint = {};
                 _setpointTask->getSetpoint(setpoint);
 
+                // Check for lost contact
                 if (setpoint.timestamp > 0 &&
                         xTaskGetTickCount() - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
                     status = STATUS_LOST_CONTACT;
@@ -96,6 +101,10 @@ class CoreTask {
                     case STATUS_IDLE:
                         DebugTask::setMessage(_debugTask, "%05d: idle: arming=%d",
                                 step, setpoint.arming);
+                        if (setpoint.arming && isSafeAngle(_vehicleState.phi) &&
+                                isSafeAngle(_vehicleState.theta)) {
+                            status = STATUS_ARMED;
+                        }
                         break;
 
                     case STATUS_ARMED:
@@ -111,6 +120,11 @@ class CoreTask {
                         break;
                 }
             }
+        }
+
+        static bool isSafeAngle(float angle)
+        {
+            return fabs(angle) < MAX_SAFE_ANGLE;
         }
 
         // Device-dependent ---------------------------
