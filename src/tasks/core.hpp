@@ -38,182 +38,58 @@ class CoreTask {
                 const mixFun_t mixFun,
 				DebugTask * debugTask=nullptr)
         {
-            _closedLoopControl = closedLoopControl;
-
             _safety = safety;
 
-            _estimatorTask = estimatorTask;
-
             _imuTask = imuTask;
-
-            _setpointTask = setpointTask;
-
             _debugTask = debugTask;
-
-            _mixFun = mixFun;
-
-            _motorCount = motorCount;
 
             _task.init(runCoreTask, "core", this, 5);
         }
 
     private:
 
-        static const auto CLOSED_LOOP_UPDATE_RATE = Clock::RATE_500_HZ;
-        static constexpr float LANDING_ALTITUDE_M = 0.03;
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-        static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
-
-        ClosedLoopControl * _closedLoopControl;
-        SetpointTask * _setpointTask;
-        EstimatorTask * _estimatorTask;
-        ImuTask * _imuTask;
-        DebugTask * _debugTask;
-        Safety * _safety;
-        mixFun_t _mixFun;
-        uint8_t _motorCount;
-        FreeRtosTask _task;
-        uint16_t _motorRatios[4];
-        vehicleState_t _vehicleState;
-
         static void runCoreTask(void *arg)
         {
             ((CoreTask *)arg)->run();
         }
 
+        FreeRtosTask _task;
+
+        Safety * _safety;
+
+        DebugTask * _debugTask;
+        ImuTask * _imuTask;
+
         void run()
         {
-            // Device-dependent
-            motors_init();
-
-            static RateSupervisor rateSupervisor;
-            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
-
-            // Once we lose contact, we must restart
-            bool lost_contact = false;
-
             for (uint32_t step=1; ; step++) {
-
-                // No setpoint yet
-                setpoint_t setpoint = {};
-
-                // No axis demands yet;
-                demands_t demands = {};
-
-                // Start with motor speeds at idle
-                float motorvals[MAX_MOTOR_COUNT] = {};
 
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
-                // Get vehicle state from estimator
-                _estimatorTask->getVehicleState(&_vehicleState);
+                switch (_safety->getStatus()) {
 
-                const auto timestamp = xTaskGetTickCount();
+                    case Safety::IDLE:
+                        DebugTask::setMessage(_debugTask, "idle");
+                        break;
 
-                // If lost contact, disarm
-                if (setpoint.timestamp > 0 &&
-                        timestamp - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
-                    lost_contact = true;
-                    _safety->requestArming(false);
-                }
+                    case Safety::ARMED:
+                        DebugTask::setMessage(_debugTask, "armed");
+                        break;
 
-                // Otherwise, run normally
-                else if (!lost_contact) {
+                    case Safety::FLYING:
+                        DebugTask::setMessage(_debugTask, "flying");
+                        break;
 
-                    // Get setpoint
-                    _setpointTask->getSetpoint(setpoint);
+                    case Safety::LANDING:
+                        DebugTask::setMessage(_debugTask, "landing");
+                        break;
 
-                    // If armed, get demands and run mixer
-                    if (_safety->isArmed()) {
-
-                        //if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
-                        runClosedLoopControl(setpoint, demands);
-                        // }
-
-                        // Run closedLoopDemands through mixer to get motor speeds
-                        runMixer(_mixFun, demands, motorvals);
-
-                    }
-
-                    // Update safety status
-                    _safety->update(step, setpoint.timestamp, _vehicleState,
-                            motorvals, _motorCount);
-
-                }
-
-                DebugTask::setMessage(_debugTask,
-                        "%05d: armed=%d hovering=%d thrust=%3.3f "
-                        "m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f",
-                        step, _safety->isArmed(), setpoint.hovering, demands.thrust,
-                        motorvals[0], motorvals[1],
-                        motorvals[2], motorvals[3]);
-
-                // Run motors at their current speeds (perhaps idle)
-                runMotors(motorvals);
-
-                if (!rateSupervisor.validate(timestamp)) {
-                    static bool rateWarningDisplayed;
-                    if (!rateWarningDisplayed) {
-                        rateWarningDisplayed = true;
-                    }
+                    case Safety::LOST_CONTACT:
+                        DebugTask::setMessage(_debugTask, "lost contact");
+                        break;
                 }
             }
-        }
-
-        void runMixer(const mixFun_t mixFun, const demands_t & demands,
-                float motorvals[])
-        {
-            float uncapped[MAX_MOTOR_COUNT] = {};
-            mixFun(demands, uncapped);
-
-            float highestThrustFound = 0;
-            for (uint8_t k=0; k<_motorCount; k++) {
-
-                const auto thrust = uncapped[k];
-
-                if (thrust > highestThrustFound) {
-                    highestThrustFound = thrust;
-                }
-            }
-
-            float reduction = 0;
-            if (highestThrustFound > THRUST_MAX) {
-                reduction = highestThrustFound - THRUST_MAX;
-            }
-
-            for (uint8_t k = 0; k < _motorCount; k++) {
-                float thrustCappedUpper = uncapped[k] - reduction;
-                motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
-            }
-        }
-
-        void runMotors(float * motorvals) {
-            for (uint8_t id=0; id<_motorCount; ++id) {
-                motors_setSpeed(id, motorvals[id]);
-            }
-            motors_run();
-        }
-
-        void runClosedLoopControl(
-                setpoint_t & setpoint, demands_t & closedLoopDemands)
-        {
-            if (setpoint.hovering) {
-
-                setpoint.demands.thrust = Num::rescale(
-                        setpoint.demands.thrust, 0.2, 2.0, -1, +1);
-
-                setpoint.demands.thrust = Num::rescale(
-                        setpoint.demands.thrust, -1, +1, 0.2, 2.0);
-            }
-
-            _closedLoopControl->run(
-                    1.f / CLOSED_LOOP_UPDATE_RATE,
-                    setpoint.hovering,
-                    _vehicleState,
-                    setpoint.demands,
-                    LANDING_ALTITUDE_M,
-                    closedLoopDemands);
         }
 
         // Device-dependent ---------------------------

@@ -25,6 +25,20 @@ class Safety {
 
     public:
 
+        typedef enum {
+            IDLE,
+            ARMED,
+            FLYING,
+            LANDING,
+            LOST_CONTACT
+
+        } status_t;
+
+        status_t getStatus()
+        {
+            return status;
+        }
+
         bool isFlying() 
         {
             return _is_flying;
@@ -63,6 +77,8 @@ class Safety {
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
 
         static constexpr float MAX_SAFE_ANGLE = 30;
+
+        status_t status;
 
         bool _is_flying;
 
