@@ -118,7 +118,8 @@ class CoreTask {
                         break;
 
                     case STATUS_ARMED:
-                        DebugTask::setMessage(_debugTask, "%05d: armed", step);
+                        DebugTask::setMessage(_debugTask, "%05d: armed: hovering=%d",
+                                step, setpoint.hovering);
                         if (!setpoint.arming) {
                             status = STATUS_IDLE;
                             _ledTask->setArmed(false);
