@@ -131,7 +131,11 @@ class CoreTask {
 
                     case STATUS_FLYING:
                         DebugTask::setMessage(_debugTask, "%05d: flying", step);
-                        break;
+                        if (!setpoint.arming) {
+                            status = STATUS_IDLE;
+                            _ledTask->setArmed(false);
+                        }
+                         break;
 
                     case STATUS_LANDING:
                         DebugTask::setMessage(_debugTask, "%05d: landing", step);
