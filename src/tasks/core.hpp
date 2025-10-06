@@ -128,7 +128,7 @@ class CoreTask {
                 else switch (status) {
 
                     case STATUS_IDLE:
-                        DebugTask::setMessage(_debugTask, "%05d: idle", step);
+                        reportStatus(step, "idle", motorvals);
                         if (setpoint.arming && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             _ledTask->setArmed(true);
@@ -137,7 +137,7 @@ class CoreTask {
                         break;
 
                     case STATUS_ARMED:
-                        DebugTask::setMessage(_debugTask, "%05d: armed", step);
+                        reportStatus(step, "armed", motorvals);
                         checkDisarm(setpoint, status);
                         if (setpoint.hovering) {
                             status = STATUS_HOVERING;
@@ -145,7 +145,7 @@ class CoreTask {
                         break;
 
                     case STATUS_HOVERING:
-                        DebugTask::setMessage(_debugTask, "%05d: hovering", step);
+                        reportStatus(step, "hovering", motorvals);
                         checkDisarm(setpoint, status);
                         if (!setpoint.hovering) {
                             status = STATUS_LANDING;
@@ -153,11 +153,16 @@ class CoreTask {
                         break;
 
                     case STATUS_LANDING:
-                        DebugTask::setMessage(_debugTask, "%05d: landing", step);
+                        reportStatus(step, "landing", motorvals);
                         checkDisarm(setpoint, status);
                         break;
                 }
             }
+        }
+
+        void reportStatus(const uint32_t step, const char * status, const float * motorvals)
+        {
+            DebugTask::setMessage(_debugTask, "%05d: %s", step, status);
         }
 
         void checkDisarm(const setpoint_t setpoint, status_t &status)
