@@ -67,7 +67,13 @@ class CoreTask {
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
-                switch (_safety->getStatus()) {
+                const auto status = _safety->getStatus();
+
+                if (status == Safety::LOST_CONTACT) {
+                    // No way to recover from this
+                }
+
+                else switch (status) {
 
                     case Safety::IDLE:
                         DebugTask::setMessage(_debugTask, "idle");
@@ -83,10 +89,6 @@ class CoreTask {
 
                     case Safety::LANDING:
                         DebugTask::setMessage(_debugTask, "landing");
-                        break;
-
-                    case Safety::LOST_CONTACT:
-                        DebugTask::setMessage(_debugTask, "lost contact");
                         break;
                 }
             }
