@@ -62,7 +62,7 @@ static void hackflight_init()
 
     loggingTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&safety, &imuTask);
+    ledTask.begin(&imuTask);
 
     imuTask.begin(&estimatorTask);
 
@@ -70,6 +70,7 @@ static void hackflight_init()
             &closedLoopControl,
             &estimatorTask,
             &imuTask,
+            &ledTask,
             &setpointTask,
             Mixer::rotorCount,
             Mixer::mix,

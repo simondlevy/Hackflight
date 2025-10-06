@@ -22,6 +22,8 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/led.hpp>
 #include <tasks/setpoint.hpp>
 
 class CoreTask {
@@ -32,6 +34,7 @@ class CoreTask {
                 ClosedLoopControl * closedLoopControl,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
+                LedTask * ledTask,
                 SetpointTask * setpointTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
@@ -40,6 +43,7 @@ class CoreTask {
             _imuTask = imuTask;
             _debugTask = debugTask;
             _estimatorTask = estimatorTask;
+            _ledTask = ledTask;
             _setpointTask = setpointTask;
 
             _task.init(runCoreTask, "core", this, 5);
@@ -70,6 +74,7 @@ class CoreTask {
         DebugTask * _debugTask;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
+        LedTask * _ledTask;
         SetpointTask * _setpointTask;
 
         vehicleState_t _vehicleState;
@@ -107,6 +112,7 @@ class CoreTask {
                         DebugTask::setMessage(_debugTask, "%05d: idle", step);
                         if (setpoint.arming && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
+                            _ledTask->setArmed(true);
                             status = STATUS_ARMED;
                         }
                         break;
@@ -115,6 +121,7 @@ class CoreTask {
                         DebugTask::setMessage(_debugTask, "%05d: armed", step);
                         if (!setpoint.arming) {
                             status = STATUS_IDLE;
+                            _ledTask->setArmed(false);
                         }
                         break;
 

@@ -20,7 +20,6 @@
 
 #include <stdint.h>
 
-#include <safety.hpp>
 #include <task.hpp>
 #include <tasks/imu.hpp>
 
@@ -28,15 +27,18 @@ class LedTask {
 
     public:
 
-        void begin( Safety * safety, ImuTask * imuTask)
+        void begin(ImuTask * imuTask)
         {
             _imuTask = imuTask;
 
             _task.init(runLedTask, "led", this, 2);
 
-            _safety = safety;
-
             device_init();
+        }
+
+        void setArmed(const bool armed)
+        {
+            _armed = armed;
         }
 
     private:
@@ -49,9 +51,9 @@ class LedTask {
 
         FreeRtosTask _task;
 
-        Safety * _safety;
-
         ImuTask * _imuTask;
+
+        bool _armed;
 
         static void runLedTask(void * obj)
         {
@@ -70,7 +72,7 @@ class LedTask {
                     blink(lastWakeTime, IMU_CALIBRATION_HZ);
                 }
 
-                else if (_safety->isArmed()) { 
+                else if (_armed) { 
                     device_set(true);
                 }
                 else {
