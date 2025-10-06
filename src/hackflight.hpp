@@ -21,7 +21,6 @@
 #include <comms.hpp>
 #include <__control__.hpp>
 #include <mixers/crazyflie.hpp>
-#include <safety.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -41,8 +40,6 @@ static LoggingTask loggingTask;
 static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
-
-static Safety safety;
 
 static ClosedLoopControl closedLoopControl;
 

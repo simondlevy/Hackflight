@@ -38,13 +38,15 @@ class CoreTask {
                 SetpointTask * setpointTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
-				DebugTask * debugTask=nullptr)
+                DebugTask * debugTask=nullptr)
         {
             _imuTask = imuTask;
             _debugTask = debugTask;
             _estimatorTask = estimatorTask;
             _ledTask = ledTask;
             _setpointTask = setpointTask;
+
+            _motorCount = motorCount;
 
             _task.init(runCoreTask, "core", this, 5);
         }
@@ -55,10 +57,16 @@ class CoreTask {
 
         static constexpr float MAX_SAFE_ANGLE = 30;
 
+        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
+
+        static const Clock::rate_t FLYING_STATUS_CLOCK_RATE = Clock::RATE_25_HZ;
+
+        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
-            STATUS_FLYING,
+            STATUS_HOVERING,
             STATUS_LANDING,
             STATUS_LOST_CONTACT
 
@@ -79,9 +87,14 @@ class CoreTask {
 
         vehicleState_t _vehicleState;
 
+        uint8_t _motorCount;
+
         void run()
         {
             status_t status = STATUS_IDLE;
+
+            // Start with motor speeds at idle
+            float motorvals[MAX_MOTOR_COUNT] = {};
 
             for (uint32_t step=1; ; step++) {
 
@@ -91,6 +104,12 @@ class CoreTask {
                 // Get setpoint
                 setpoint_t setpoint = {};
                 _setpointTask->getSetpoint(setpoint);
+
+                // Periodically update estimator with flying status
+                if (Clock::rateDoExecute(FLYING_STATUS_CLOCK_RATE, step)) {
+                    _estimatorTask->setFlyingStatus(
+                            isFlyingCheck(xTaskGetTickCount(), motorvals));
+                }
 
                 // Get vehicle state from estimator
                 _estimatorTask->getVehicleState(&_vehicleState);
@@ -121,12 +140,12 @@ class CoreTask {
                         DebugTask::setMessage(_debugTask, "%05d: armed", step);
                         checkDisarm(setpoint, status);
                         if (setpoint.hovering) {
-                            status = STATUS_FLYING;
+                            status = STATUS_HOVERING;
                         }
                         break;
 
-                    case STATUS_FLYING:
-                        DebugTask::setMessage(_debugTask, "%05d: flying", step);
+                    case STATUS_HOVERING:
+                        DebugTask::setMessage(_debugTask, "%05d: hovering", step);
                         checkDisarm(setpoint, status);
                         if (!setpoint.hovering) {
                             status = STATUS_LANDING;
@@ -148,6 +167,37 @@ class CoreTask {
                 _ledTask->setArmed(false);
             }
         }
+
+        //
+        // We say we are flying if one or more motors are running over the idle
+        // thrust.
+        //
+        bool isFlyingCheck(const uint32_t tick, const float * motorvals)
+        {
+            auto isThrustOverIdle = false;
+
+            for (int i = 0; i < _motorCount; ++i) {
+                if (motorvals[i] > 0) {
+                    isThrustOverIdle = true;
+                    break;
+                }
+            }
+
+            static uint32_t latestThrustTick;
+
+            if (isThrustOverIdle) {
+                latestThrustTick = tick;
+            }
+
+            bool result = false;
+            if (0 != latestThrustTick) {
+                if ((tick - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                    result = true;
+                }
+            }
+
+            return result;
+        }        
 
         static bool isSafeAngle(float angle)
         {
