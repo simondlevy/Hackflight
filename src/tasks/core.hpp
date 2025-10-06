@@ -17,7 +17,7 @@
 #pragma once
 
 #include <__control__.hpp>
-#include <safety.hpp>
+
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -30,7 +30,6 @@ class CoreTask {
 
         void begin(
                 ClosedLoopControl * closedLoopControl,
-                Safety * safety,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 SetpointTask * setpointTask,
@@ -49,6 +48,15 @@ class CoreTask {
 
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
 
+        typedef enum {
+            STATUS_IDLE,
+            STATUS_ARMED,
+            STATUS_FLYING,
+            STATUS_LANDING,
+            STATUS_LOST_CONTACT
+
+        } status_t;
+
         static void runCoreTask(void *arg)
         {
             ((CoreTask *)arg)->run();
@@ -60,7 +68,7 @@ class CoreTask {
         ImuTask * _imuTask;
         SetpointTask * _setpointTask;
 
-        Safety::status_t status = Safety::IDLE;
+        status_t status = STATUS_IDLE;
 
         void run()
         {
@@ -75,30 +83,30 @@ class CoreTask {
 
                 if (setpoint.timestamp > 0 &&
                         xTaskGetTickCount() - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
-                    status = Safety::LOST_CONTACT;
+                    status = STATUS_LOST_CONTACT;
                 }
 
-                if (status == Safety::LOST_CONTACT) {
+                if (status == STATUS_LOST_CONTACT) {
                     // No way to recover from this
                     DebugTask::setMessage(_debugTask, "%05d: lost contact", step);
                 }
 
                 else switch (status) {
 
-                    case Safety::IDLE:
+                    case STATUS_IDLE:
                         DebugTask::setMessage(_debugTask, "%05d: idle: arming=%d",
                                 step, setpoint.arming);
                         break;
 
-                    case Safety::ARMED:
+                    case STATUS_ARMED:
                         DebugTask::setMessage(_debugTask, "%05d: armed", step);
                         break;
 
-                    case Safety::FLYING:
+                    case STATUS_FLYING:
                         DebugTask::setMessage(_debugTask, "%05d: flying", step);
                         break;
 
-                    case Safety::LANDING:
+                    case STATUS_LANDING:
                         DebugTask::setMessage(_debugTask, "%05d: landing", step);
                         break;
                 }

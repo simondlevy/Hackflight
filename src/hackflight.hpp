@@ -68,7 +68,6 @@ static void hackflight_init()
 
     coreTask.begin(
             &closedLoopControl,
-            &safety,
             &estimatorTask,
             &imuTask,
             &setpointTask,
