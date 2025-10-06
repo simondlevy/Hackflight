@@ -118,8 +118,7 @@ class CoreTask {
                         break;
 
                     case STATUS_ARMED:
-                        DebugTask::setMessage(_debugTask, "%05d: armed: hovering=%d",
-                                step, setpoint.hovering);
+                        DebugTask::setMessage(_debugTask, "%05d: armed", step);
                         if (!setpoint.arming) {
                             status = STATUS_IDLE;
                             _ledTask->setArmed(false);
@@ -135,11 +134,18 @@ class CoreTask {
                             status = STATUS_IDLE;
                             _ledTask->setArmed(false);
                         }
+                        if (!setpoint.hovering) {
+                            status = STATUS_LANDING;
+                        }
                          break;
 
                     case STATUS_LANDING:
                         DebugTask::setMessage(_debugTask, "%05d: landing", step);
-                        break;
+                        if (!setpoint.arming) {
+                            status = STATUS_IDLE;
+                            _ledTask->setArmed(false);
+                        }
+                         break;
                 }
             }
         }
