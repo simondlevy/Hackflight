@@ -124,6 +124,9 @@ class CoreTask {
                             status = STATUS_IDLE;
                             _ledTask->setArmed(false);
                         }
+                        if (setpoint.hovering) {
+                            status = STATUS_FLYING;
+                        }
                         break;
 
                     case STATUS_FLYING:
