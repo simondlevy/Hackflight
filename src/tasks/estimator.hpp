@@ -18,9 +18,9 @@
 
 #include <Arduino.h>
 
+#include <clock.hpp>
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
-#include <safety.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 
@@ -28,10 +28,8 @@ class EstimatorTask {
 
     public:
 
-        void begin(Safety * safety, DebugTask * debugTask=nullptr)
+        void begin(DebugTask * debugTask=nullptr)
         {
-            _safety = safety;
-
             _debugTask = debugTask;
 
             // Created in the 'empty' state, meaning the semaphore must first
@@ -67,6 +65,11 @@ class EstimatorTask {
             xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
+        }
+
+        void setFlyingStatus(const bool isFlying)
+        {
+            _isFlying = isFlying;
         }
 
         void enqueueGyro(const Axis3f * gyro)
@@ -125,6 +128,8 @@ class EstimatorTask {
         bool _didResetEstimation;
 
         RateSupervisor _rateSupervisor;
+        
+        bool _isFlying;
 
         // Mutex to protect data that is shared between the task and
         // functions called by the stabilizer loop
@@ -136,8 +141,6 @@ class EstimatorTask {
         xSemaphoreHandle _runTaskSemaphore;
 
         uint32_t _warningBlockTimeMs;
-
-        Safety * _safety;
 
         DebugTask * _debugTask;
 
@@ -160,7 +163,7 @@ class EstimatorTask {
             // Run the system dynamics to predict the state forward.
             if (nowMs >= nextPredictionMs) {
 
-                _kalmanFilter.predict(nowMs, _safety->isFlying()); 
+                _kalmanFilter.predict(nowMs, _isFlying); 
 
                 nextPredictionMs = nowMs + PREDICTION_UPDATE_INTERVAL_MS;
             }

@@ -56,7 +56,7 @@ static void hackflight_init()
 
     opticalFlowTask.begin(&estimatorTask);
 
-    estimatorTask.begin(&safety);
+    estimatorTask.begin();
 
     setpointTask.begin();
 
