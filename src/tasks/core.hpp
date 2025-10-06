@@ -99,8 +99,7 @@ class CoreTask {
                 else switch (status) {
 
                     case STATUS_IDLE:
-                        DebugTask::setMessage(_debugTask, "%05d: idle: arming=%d",
-                                step, setpoint.arming);
+                        DebugTask::setMessage(_debugTask, "%05d: idle", step);
                         if (setpoint.arming && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             status = STATUS_ARMED;
@@ -109,6 +108,9 @@ class CoreTask {
 
                     case STATUS_ARMED:
                         DebugTask::setMessage(_debugTask, "%05d: armed", step);
+                        if (!setpoint.arming) {
+                            status = STATUS_IDLE;
+                        }
                         break;
 
                     case STATUS_FLYING:
