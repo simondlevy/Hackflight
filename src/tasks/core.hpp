@@ -39,6 +39,7 @@ class CoreTask {
         {
             _imuTask = imuTask;
             _debugTask = debugTask;
+            _estimatorTask = estimatorTask;
             _setpointTask = setpointTask;
 
             _task.init(runCoreTask, "core", this, 5);
@@ -67,6 +68,7 @@ class CoreTask {
         FreeRtosTask _task;
 
         DebugTask * _debugTask;
+        EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
         SetpointTask * _setpointTask;
 
@@ -84,6 +86,9 @@ class CoreTask {
                 // Get setpoint
                 setpoint_t setpoint = {};
                 _setpointTask->getSetpoint(setpoint);
+
+                // Get vehicle state from estimator
+                _estimatorTask->getVehicleState(&_vehicleState);
 
                 // Check for lost contact
                 if (setpoint.timestamp > 0 &&
