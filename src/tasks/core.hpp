@@ -119,10 +119,7 @@ class CoreTask {
 
                     case STATUS_ARMED:
                         DebugTask::setMessage(_debugTask, "%05d: armed", step);
-                        if (!setpoint.arming) {
-                            status = STATUS_IDLE;
-                            _ledTask->setArmed(false);
-                        }
+                        checkDisarm(setpoint, status);
                         if (setpoint.hovering) {
                             status = STATUS_FLYING;
                         }
@@ -130,23 +127,25 @@ class CoreTask {
 
                     case STATUS_FLYING:
                         DebugTask::setMessage(_debugTask, "%05d: flying", step);
-                        if (!setpoint.arming) {
-                            status = STATUS_IDLE;
-                            _ledTask->setArmed(false);
-                        }
+                        checkDisarm(setpoint, status);
                         if (!setpoint.hovering) {
                             status = STATUS_LANDING;
                         }
-                         break;
+                        break;
 
                     case STATUS_LANDING:
                         DebugTask::setMessage(_debugTask, "%05d: landing", step);
-                        if (!setpoint.arming) {
-                            status = STATUS_IDLE;
-                            _ledTask->setArmed(false);
-                        }
-                         break;
+                        checkDisarm(setpoint, status);
+                        break;
                 }
+            }
+        }
+
+        void checkDisarm(const setpoint_t setpoint, status_t &status)
+        {
+            if (!setpoint.arming) {
+                status = STATUS_IDLE;
+                _ledTask->setArmed(false);
             }
         }
 
