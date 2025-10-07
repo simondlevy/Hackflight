@@ -217,22 +217,9 @@ class Simulator {
             static bool _hover_button_was_down;
             static bool _hovering;
 
-            static bool _arming_button_was_down;
-            static bool _armed;
-
             auto axes = getJoystickInfo();
 
             const auto button = wb_joystick_get_pressed_button();
-
-            if (button == 3) {
-                _arming_button_was_down = true;
-            }
-            else {
-                if (_arming_button_was_down) {
-                    _armed = !_armed;
-                }
-                _arming_button_was_down = false;
-            }
 
             if (button == 5) {
                 _hover_button_was_down = true;
@@ -245,8 +232,6 @@ class Simulator {
             }
 
             siminfo.hovering = _hovering;
-
-            siminfo.armed = _armed;
 
             if (siminfo.hovering) {
 

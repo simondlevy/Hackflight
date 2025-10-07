@@ -17,11 +17,13 @@
 #pragma once
 
 #include <__control__.hpp>
-#include <safety.hpp>
+
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/led.hpp>
 #include <tasks/setpoint.hpp>
 
 class CoreTask {
@@ -30,163 +32,191 @@ class CoreTask {
 
         void begin(
                 ClosedLoopControl * closedLoopControl,
-                Safety * safety,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
+                LedTask * ledTask,
                 SetpointTask * setpointTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
-				DebugTask * debugTask=nullptr)
+                DebugTask * debugTask=nullptr)
         {
             _closedLoopControl = closedLoopControl;
-
-            _safety = safety;
-
             _estimatorTask = estimatorTask;
-
             _imuTask = imuTask;
-
+            _ledTask = ledTask;
             _setpointTask = setpointTask;
-
             _debugTask = debugTask;
-
-            _mixFun = mixFun;
-
             _motorCount = motorCount;
+            _mixFun = mixFun;
 
             _task.init(runCoreTask, "core", this, 5);
         }
 
     private:
 
-        static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
         static constexpr float LANDING_ALTITUDE_M = 0.03;
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
+        static constexpr float MAX_SAFE_ANGLE = 30;
+        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
+        static const Clock::rate_t FLYING_STATUS_CLOCK_RATE = Clock::RATE_25_HZ;
+        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
-        ClosedLoopControl * _closedLoopControl;
-        SetpointTask * _setpointTask;
-        EstimatorTask * _estimatorTask;
-        ImuTask * _imuTask;
-        DebugTask * _debugTask;
-        Safety * _safety;
-        mixFun_t _mixFun;
-        uint8_t _motorCount;
-        FreeRtosTask _task;
-        uint16_t _motorRatios[4];
-        vehicleState_t _vehicleState;
+        static const auto CLOSED_LOOP_UPDATE_RATE = Clock::RATE_500_HZ; // Needed ?
+
+        typedef enum {
+            STATUS_IDLE,
+            STATUS_ARMED,
+            STATUS_HOVERING,
+            STATUS_LANDING,
+            STATUS_LOST_CONTACT
+
+        } status_t;
 
         static void runCoreTask(void *arg)
         {
             ((CoreTask *)arg)->run();
         }
 
-        void setMotorRatiosAndRun(const uint16_t ratios[])
-        {
-            setMotorRatio(0, ratios[0]);
-            setMotorRatio(1, ratios[1]);
-            setMotorRatio(2, ratios[2]);
-            setMotorRatio(3, ratios[3]);
+        ClosedLoopControl * _closedLoopControl;
+        mixFun_t _mixFun;
+        FreeRtosTask _task;
+        DebugTask * _debugTask;
+        EstimatorTask * _estimatorTask;
+        ImuTask * _imuTask;
+        LedTask * _ledTask;
+        SetpointTask * _setpointTask;
+        vehicleState_t _vehicleState;
 
-            // Device-dependent
-            motors_run();
-        }
+        uint8_t _motorCount;
 
         void run()
         {
-            // Device-dependent
+            status_t status = STATUS_IDLE;
+
+            // Start with motor speeds at idle
+            float motorvals[MAX_MOTOR_COUNT] = {};
+
+            // Start with no axis demands
+            demands_t demands = {};
+
+            // Run device-dependent motor initialization
             motors_init();
-
-            idleMotors();
-
-            static RateSupervisor rateSupervisor;
-            rateSupervisor.init(xTaskGetTickCount(), 1000, 997, 1003, 1);
-
-            uint32_t setpoint_timestamp = 0;
-            bool lost_contact = false;
 
             for (uint32_t step=1; ; step++) {
 
-                setMotorRatiosAndRun(_motorRatios);
-
+                // Wait for IMU
                 _imuTask->waitDataReady();
 
+                // Get setpoint
+                setpoint_t setpoint = {};
+                _setpointTask->getSetpoint(setpoint);
+
+                // Periodically update estimator with flying status
+                if (Clock::rateDoExecute(FLYING_STATUS_CLOCK_RATE, step)) {
+                    _estimatorTask->setFlyingStatus(
+                            isFlyingCheck(xTaskGetTickCount(), motorvals));
+                }
+
+                // Get vehicle state from estimator
                 _estimatorTask->getVehicleState(&_vehicleState);
 
-                static float _motorvals[MAX_MOTOR_COUNT];
-
-                if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
-
-                    setpoint_t setpoint = {};
-
-                    _setpointTask->getSetpoint(setpoint);
-
-                    setpoint_timestamp = setpoint.timestamp;
-
-                    if (setpoint.hovering) {
-
-                        setpoint.demands.thrust = Num::rescale(
-                                setpoint.demands.thrust, 0.2, 2.0, -1, +1);
-                    }
-
-                    // Use safety algorithm to modify demands based on current
-                    // vehicle state, open-loop demads, and motor values
-                    _safety->update(step, setpoint.timestamp, _vehicleState,
-                            _motorRatios, _motorCount);
-
-                    if (setpoint.hovering) {
-
-                        // In hover mode, thrust demand comes in as [-1,+1], so
-                        // we convert it to a target altitude in meters
-                        setpoint.demands.thrust = Num::rescale(
-                                setpoint.demands.thrust, -1, +1, 0.2, 2.0);
-                    }
-
-                    demands_t closedLoopDemands = {};
-
-                    _closedLoopControl->run(
-                            1.f / PID_UPDATE_RATE,
-                            setpoint.hovering,
-                            _vehicleState,
-                            setpoint.demands,
-                            LANDING_ALTITUDE_M,
-                            closedLoopDemands);
-
-                    runMixer(_mixFun, closedLoopDemands, _motorvals);
+                // Check for lost contact
+                if (setpoint.timestamp > 0 &&
+                        xTaskGetTickCount() - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
+                    status = STATUS_LOST_CONTACT;
                 }
 
-                const auto timestamp = xTaskGetTickCount();
+                switch (status) {
 
-                // Disarm on lost contact
-                if (setpoint_timestamp > 0 &&
-                        timestamp - setpoint_timestamp >
-                        SETPOINT_TIMEOUT_TICKS) {
-                    lost_contact = true;
-                    idleMotors();
-                    _safety->requestArming(false);
-                }
+                    case STATUS_IDLE:
+                        reportStatus(step, "idle", motorvals);
+                        if (setpoint.armed && isSafeAngle(_vehicleState.phi) &&
+                                isSafeAngle(_vehicleState.theta)) {
+                            _ledTask->setArmed(true);
+                            status = STATUS_ARMED;
+                        }
+                        runMotors(motorvals);
+                        break;
 
-                // Run in flying mode
-                else if (!lost_contact && _safety->isArmed()) {
-                    runMotors(_motorvals);
-                } 
+                    case STATUS_ARMED:
+                        reportStatus(step, "armed", motorvals);
+                        checkDisarm(setpoint, status, motorvals);
+                        if (setpoint.hovering) {
+                            status = STATUS_HOVERING;
+                        }
+                        runMotors(motorvals);
+                        break;
 
-                // Otherwise, maintain motors at stopped (idle) values
-                else {
-                    idleMotors();
-                }
+                    case STATUS_HOVERING:
+                        reportStatus(step, "hovering", motorvals);
+                        runClosedLoopAndMixer(step, setpoint,
+                                demands, motorvals);
+                        checkDisarm(setpoint, status, motorvals);
+                        if (!setpoint.hovering) {
+                            status = STATUS_LANDING;
+                        }
+                        break;
 
-                if (!rateSupervisor.validate(timestamp)) {
-                    static bool rateWarningDisplayed;
-                    if (!rateWarningDisplayed) {
-                        rateWarningDisplayed = true;
-                    }
+                    case STATUS_LANDING:
+                        reportStatus(step, "landing", motorvals);
+                        runClosedLoopAndMixer(step, setpoint,
+                                demands, motorvals);
+                        checkDisarm(setpoint, status, motorvals);
+                        break;
+
+                    case STATUS_LOST_CONTACT:
+                        // No way to recover from this
+                        DebugTask::setMessage(_debugTask, "%05d: lost contact", step);
+                        break;
                 }
             }
         }
 
+        void runClosedLoopAndMixer(
+                const uint32_t step, setpoint_t &setpoint,
+                demands_t & demands, float *motorvals)
+        {
+            if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
+                runClosedLoopControl(setpoint, demands);
+
+                // Run closedLoopDemands through mixer to get motor speeds
+                runMixer(_mixFun, demands, motorvals);
+
+                runMotors(motorvals);
+            }
+        }
+
+        void runClosedLoopControl(
+                setpoint_t & setpoint, demands_t & closedLoopDemands)
+        {
+            if (setpoint.hovering) {
+
+                setpoint.demands.thrust = Num::rescale(
+                        setpoint.demands.thrust, 0.2, 2.0, -1, +1);
+
+                setpoint.demands.thrust = Num::rescale(
+                        setpoint.demands.thrust, -1, +1, 0.2, 2.0);
+            }
+
+            _closedLoopControl->run(
+                    1.f / CLOSED_LOOP_UPDATE_RATE,
+                    setpoint.hovering,
+                    _vehicleState,
+                    setpoint.demands,
+                    LANDING_ALTITUDE_M,
+                    closedLoopDemands);
+        }
+
+        void runMotors(float * motorvals)
+        {
+            for (uint8_t k=0; k<_motorCount; ++k) {
+                motors_setSpeed(k, motorvals[k]);
+            }
+            motors_run();
+        }
+
         void runMixer(const mixFun_t mixFun, const demands_t & demands,
-                float motorvals[])
+                float * motorvals)
         {
             float uncapped[MAX_MOTOR_COUNT] = {};
             mixFun(demands, uncapped);
@@ -208,48 +238,63 @@ class CoreTask {
 
             for (uint8_t k = 0; k < _motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
-                motorvals[k] = capMinThrust(thrustCappedUpper);
+                motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
         }
 
-        static uint16_t capMinThrust(float thrust) 
+        void reportStatus(const uint32_t step, const char * status,
+                const float * motorvals)
         {
-            return thrust < 0 ? 0 : thrust;
+            DebugTask::setMessage(_debugTask,
+                    "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
+                    step, status,
+                    motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
-        void setMotorRatio(uint32_t id, uint16_t ratio)
+        void checkDisarm(const setpoint_t setpoint, status_t &status,
+                float * motorvals)
         {
-            // Device-dependent
-            motors_setSpeed(id, ratio/65536.f);
+            if (!setpoint.armed) {
+                status = STATUS_IDLE;
+                memset(motorvals, 0, _motorCount * sizeof(motorvals));
+                _ledTask->setArmed(false);
+            }
         }
 
-        void runMotors(const float motorvals[4]) 
+        //
+        // We say we are flying if one or more motors are running over the idle
+        // thrust.
+        //
+        bool isFlyingCheck(const uint32_t tick, const float * motorvals)
         {
-            const uint16_t motorsPwm[4]  = {
-                (uint16_t)motorvals[0],
-                (uint16_t)motorvals[1],
-                (uint16_t)motorvals[2],
-                (uint16_t)motorvals[3]
-            };
+            auto isThrustOverIdle = false;
 
-            DebugTask::setMessage(_debugTask, "m1=%d m2=%d m3=%d m4=%d",
-                    motorsPwm[0], motorsPwm[1], motorsPwm[2], motorsPwm[3]);
+            for (int i = 0; i < _motorCount; ++i) {
+                if (motorvals[i] > 0) {
+                    isThrustOverIdle = true;
+                    break;
+                }
+            }
 
-            setMotorRatios(motorsPwm);
-        }
+            static uint32_t latestThrustTick;
 
-        void setMotorRatios(const uint16_t ratios[4])
+            if (isThrustOverIdle) {
+                latestThrustTick = tick;
+            }
+
+            bool result = false;
+            if (0 != latestThrustTick) {
+                if ((tick - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                    result = true;
+                }
+            }
+
+            return result;
+        }        
+
+        static bool isSafeAngle(float angle)
         {
-            _motorRatios[0] = ratios[0];
-            _motorRatios[1] = ratios[1];
-            _motorRatios[2] = ratios[2];
-            _motorRatios[3] = ratios[3];
-        }
-
-        void idleMotors()
-        {
-            const uint16_t ratios[4] = {0, 0, 0, 0};
-            setMotorRatiosAndRun(ratios);
+            return fabs(angle) < MAX_SAFE_ANGLE;
         }
 
         // Device-dependent ---------------------------

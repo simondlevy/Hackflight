@@ -278,15 +278,6 @@ typedef struct
 
 typedef struct {
 
-    float framerate;
-    bool hovering;
-    bool armed;
-    demands_t demands;
-
-} siminfo_t;
-
-typedef struct {
-
     float x;
     float y;
     float z;
@@ -298,10 +289,17 @@ typedef struct {
 
 typedef struct {
 
-    uint32_t timestamp;
-
+    float framerate;
     bool hovering;
+    demands_t demands;
 
+} siminfo_t;
+
+typedef struct {
+
+    uint32_t timestamp;
+    bool armed;
+    bool hovering;
     demands_t demands;
 
 } setpoint_t;

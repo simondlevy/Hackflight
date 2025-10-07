@@ -21,7 +21,6 @@
 #include <comms.hpp>
 #include <__control__.hpp>
 #include <mixers/crazyflie.hpp>
-#include <safety.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
@@ -42,8 +41,6 @@ static OpticalFlowTask opticalFlowTask;
 static SetpointTask setpointTask;
 static ZRangerTask zrangerTask;
 
-static Safety safety;
-
 static ClosedLoopControl closedLoopControl;
 
 static void hackflight_init()
@@ -56,21 +53,21 @@ static void hackflight_init()
 
     opticalFlowTask.begin(&estimatorTask);
 
-    estimatorTask.begin(&safety);
+    estimatorTask.begin();
 
-    setpointTask.begin(&safety);
+    setpointTask.begin();
 
     loggingTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&safety, &imuTask);
+    ledTask.begin(&imuTask);
 
     imuTask.begin(&estimatorTask);
 
     coreTask.begin(
             &closedLoopControl,
-            &safety,
             &estimatorTask,
             &imuTask,
+            &ledTask,
             &setpointTask,
             Mixer::rotorCount,
             Mixer::mix);
