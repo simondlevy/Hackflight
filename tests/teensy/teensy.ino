@@ -11,6 +11,6 @@ void loop()
 {
     while (Serial1.available()) {
 
-        Serial.println(Serial1.read());
+        printf("%d\n", Serial1.read());
     }
 }
