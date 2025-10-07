@@ -130,7 +130,7 @@ class CoreTask {
 
                     case STATUS_IDLE:
                         reportStatus(step, "idle", motorvals);
-                        if (setpoint.arming && isSafeAngle(_vehicleState.phi) &&
+                        if (setpoint.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             _ledTask->setArmed(true);
                             status = STATUS_ARMED;
@@ -173,7 +173,7 @@ class CoreTask {
         void checkDisarm(const setpoint_t setpoint, status_t &status,
                 float * motorvals)
         {
-            if (!setpoint.arming) {
+            if (!setpoint.armed) {
                 status = STATUS_IDLE;
                 memset(motorvals, 0, _motorCount * sizeof(motorvals));
                 _ledTask->setArmed(false);

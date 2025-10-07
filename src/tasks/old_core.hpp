@@ -161,12 +161,4 @@ class CoreTask {
                     LANDING_ALTITUDE_M,
                     closedLoopDemands);
         }
-
-        // Device-dependent ---------------------------
-
-        void motors_init();
-
-        void motors_setSpeed(uint32_t id, float speed);
-
-        void motors_run();
 };

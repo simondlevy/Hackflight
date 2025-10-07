@@ -109,7 +109,7 @@ class SetpointTask {
                     switch (parser.parse(byte)) {
 
                         case MSP_SET_ARMING:
-                            setpoint.arming = !setpoint.arming;
+                            setpoint.armed = !setpoint.armed;
                             break;
 
                         case MSP_SET_SETPOINT_RPYT:

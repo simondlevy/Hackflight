@@ -298,7 +298,7 @@ typedef struct {
 typedef struct {
 
     uint32_t timestamp;
-    bool arming;
+    bool armed;
     bool hovering;
     demands_t demands;
 
