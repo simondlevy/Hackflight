@@ -1,0 +1,63 @@
+/**
+ * Copyright (C) 2025 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "msp/messages.h"
+#include "msp/parser.hpp"
+
+static MspParser parser; 
+
+static uint8_t status;
+
+static bool armed;
+
+void serialEvent1()
+{
+    while (Serial1.available()) {
+
+        switch (parser.parse(Serial1.read())) {
+
+            case MSP_SET_ARMING:
+                armed = !armed;
+                break;
+
+            case MSP_SET_SETPOINT_RPYT:
+                status = 2;
+                break;
+
+            case MSP_SET_SETPOINT_HOVER:
+                status = 3;
+                break;
+
+        }
+    }
+}
+
+void setup()
+{
+    Serial.begin(115200);
+
+    Serial1.begin(115200);
+
+    pinMode(LED_BUILTIN, OUTPUT);
+}
+
+void loop()
+{
+    printf("%s\n", armed ? "armed" : "disarmed");
+    //const char * msg[4] = {"idle", "arming", "rpyt", "hovering"};
+    //Serial.println(msg[status]);
+    delay(50);
+}

@@ -26,7 +26,7 @@ static HardwareSerial uarts(1);
 
 static TaskHandle_t bt_to_uart_task_handle = NULL;
 
-void bt_to_uart_task(void *parameter) 
+void bt_to_uart_task(void *) 
 {
     while (true) {
 
@@ -41,9 +41,14 @@ void bt_to_uart_task(void *parameter)
 
 static TaskHandle_t uart_to_bt_task_handle = NULL;
 
-void uart_to_bt_task(void *parameter) 
+void uart_to_bt_task(void *) 
 {
     while (true) {
+
+        while (uarts.available()) {
+            const uint8_t b = bts.read();
+            bts.write(b);
+        }
 
         vTaskDelay(1);
     }
