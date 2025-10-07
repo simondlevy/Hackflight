@@ -108,6 +108,7 @@ def logging_threadfun(parser, visualize_spikes):
             parser.parse(parser.client.recv(1))
 
         except Exception as e:
+            pass
             print('Failed to receiving logging data: ' + str(e))
             parser.running = False
             break

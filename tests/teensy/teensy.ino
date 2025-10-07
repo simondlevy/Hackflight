@@ -11,6 +11,6 @@ void loop()
 {
     while (Serial1.available()) {
 
-        printf("%d\n", Serial1.read());
+        printf("0x%02X\n", Serial1.read());
     }
 }
