@@ -34,11 +34,11 @@ void serialEvent1()
                 break;
 
             case MSP_SET_SETPOINT_RPYT:
-                status = 2;
+                status = 1;
                 break;
 
             case MSP_SET_SETPOINT_HOVER:
-                status = 3;
+                status = 2;
                 break;
 
         }
@@ -56,8 +56,9 @@ void setup()
 
 void loop()
 {
-    printf("%s\n", armed ? "armed" : "disarmed");
-    //const char * msg[4] = {"idle", "arming", "rpyt", "hovering"};
-    //Serial.println(msg[status]);
+    const char * msg[3] = {"idle", "rpyt", "hovering"};
+
+    printf("%s: %s\n", armed ? "armed  " : "disarmed", msg[status]);
+
     delay(50);
 }
