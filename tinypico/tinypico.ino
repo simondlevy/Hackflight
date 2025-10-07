@@ -46,7 +46,7 @@ void uart_to_bt_task(void *)
     while (true) {
 
         while (uarts.available()) {
-            const uint8_t b = bts.read();
+            const uint8_t b = uarts.read();
             bts.write(b);
         }
 

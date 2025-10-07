@@ -1,4 +1,4 @@
-SKETCH = teensy
+SKETCH = proxy
 
 FQBN = teensy:avr:teensy40
 
