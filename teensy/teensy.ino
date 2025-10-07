@@ -16,6 +16,7 @@
 
 #include "msp/messages.h"
 #include "msp/parser.hpp"
+#include "msp/serializer.hpp"
 
 static MspParser parser; 
 
@@ -57,8 +58,16 @@ void setup()
 void loop()
 {
     const char * msg[3] = {"idle", "rpyt", "hovering"};
-
     printf("%s: %s\n", armed ? "armed  " : "disarmed", msg[status]);
-
     delay(50);
+
+    const float statevals[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    static MspSerializer serializer;
+
+    serializer.serializeFloats(MSP_STATE, statevals, 10);
+
+    for (uint8_t k=0; k<serializer.payloadSize; ++k) {
+        Serial1.write(serializer.payload[k]);
+    }
 }
