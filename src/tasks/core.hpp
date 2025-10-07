@@ -232,7 +232,7 @@ class CoreTask {
                 const float * motorvals)
         {
             DebugTask::setMessage(_debugTask,
-                    "%05d: %-8s m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
+                    "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
                     step, status,
                     motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
