@@ -126,12 +126,7 @@ class CoreTask {
                     status = STATUS_LOST_CONTACT;
                 }
 
-                if (status == STATUS_LOST_CONTACT) {
-                    // No way to recover from this
-                    DebugTask::setMessage(_debugTask, "%05d: lost contact", step);
-                }
-
-                else switch (status) {
+                switch (status) {
 
                     case STATUS_IDLE:
                         reportStatus(step, "idle", motorvals);
@@ -163,6 +158,11 @@ class CoreTask {
                     case STATUS_LANDING:
                         reportStatus(step, "landing", motorvals);
                         checkDisarm(setpoint, status, motorvals);
+                        break;
+
+                    case STATUS_LOST_CONTACT:
+                        // No way to recover from this
+                        DebugTask::setMessage(_debugTask, "%05d: lost contact", step);
                         break;
                 }
             }
