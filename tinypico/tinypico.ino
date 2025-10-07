@@ -24,9 +24,9 @@ static const uint8_t RXD1 = 4;
 
 static HardwareSerial uarts(1);
 
-TaskHandle_t bt2_to_uartTaskHandle = NULL;
+static TaskHandle_t bt_to_uart_task_handle = NULL;
 
-void bt2_to_uartTask(void *parameter) 
+void bt_to_uart_task(void *parameter) 
 {
     while (true) {
 
@@ -34,6 +34,16 @@ void bt2_to_uartTask(void *parameter)
             const uint8_t b = bts.read();
             uarts.write(b);
         }
+
+        vTaskDelay(1);
+    }
+}
+
+static TaskHandle_t uart_to_bt_task_handle = NULL;
+
+void uart_to_bt_task(void *parameter) 
+{
+    while (true) {
 
         vTaskDelay(1);
     }
@@ -47,12 +57,21 @@ void setup()
     bts.begin("Hackflight"); 
 
     xTaskCreate(
-            bt2_to_uartTask, 
-            "bt2_to_uartTask", 
+            bt_to_uart_task, 
+            "bt_to_uart_task", 
             10000,             // Stack size (bytes)
             NULL,        
             1,                 // Priority
-            &bt2_to_uartTaskHandle);
+            &bt_to_uart_task_handle);
+
+
+    xTaskCreate(
+            uart_to_bt_task, 
+            "uart_to_bt_task", 
+            10000,             // Stack size (bytes)
+            NULL,        
+            1,                 // Priority
+            &uart_to_bt_task_handle);
 }
 
 void loop()
