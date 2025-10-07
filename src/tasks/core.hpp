@@ -135,6 +135,7 @@ class CoreTask {
                             _ledTask->setArmed(true);
                             status = STATUS_ARMED;
                         }
+                        runMotors(motorvals);
                         break;
 
                     case STATUS_ARMED:
@@ -143,6 +144,7 @@ class CoreTask {
                         if (setpoint.hovering) {
                             status = STATUS_HOVERING;
                         }
+                        runMotors(motorvals);
                         break;
 
                     case STATUS_HOVERING:
@@ -199,6 +201,14 @@ class CoreTask {
                     setpoint.demands,
                     LANDING_ALTITUDE_M,
                     closedLoopDemands);
+        }
+
+        void runMotors(float * motorvals)
+        {
+            for (uint8_t k=0; k<_motorCount; ++k) {
+                motors_setSpeed(k, motorvals[k]);
+            }
+            motors_run();
         }
 
         void runMixer(const mixFun_t mixFun, const demands_t & demands,
