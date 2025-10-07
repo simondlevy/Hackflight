@@ -179,6 +179,8 @@ class CoreTask {
 
                 // Run closedLoopDemands through mixer to get motor speeds
                 runMixer(_mixFun, demands, motorvals);
+
+                runMotors(motorvals);
             }
         }
 
