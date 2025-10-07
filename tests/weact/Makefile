@@ -19,6 +19,9 @@ flash: $(BIN)
 clean:
 	rm -rf build
 
+edit:
+	vim weact.ino
+
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
 
