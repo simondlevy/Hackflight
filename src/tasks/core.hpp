@@ -40,12 +40,12 @@ class CoreTask {
                 const mixFun_t mixFun,
                 DebugTask * debugTask=nullptr)
         {
-            _imuTask = imuTask;
-            _debugTask = debugTask;
+            _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
+            _imuTask = imuTask;
             _ledTask = ledTask;
             _setpointTask = setpointTask;
-
+            _debugTask = debugTask;
             _motorCount = motorCount;
 
             _task.init(runCoreTask, "core", this, 5);
@@ -53,15 +53,14 @@ class CoreTask {
 
     private:
 
+        static constexpr float LANDING_ALTITUDE_M = 0.03;
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
-
         static constexpr float MAX_SAFE_ANGLE = 30;
-
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-
         static const Clock::rate_t FLYING_STATUS_CLOCK_RATE = Clock::RATE_25_HZ;
-
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+
+        static const auto CLOSED_LOOP_UPDATE_RATE = Clock::RATE_500_HZ; // Needed ?
 
         typedef enum {
             STATUS_IDLE,
@@ -77,14 +76,13 @@ class CoreTask {
             ((CoreTask *)arg)->run();
         }
 
+        ClosedLoopControl * _closedLoopControl;
         FreeRtosTask _task;
-
         DebugTask * _debugTask;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
         LedTask * _ledTask;
         SetpointTask * _setpointTask;
-
         vehicleState_t _vehicleState;
 
         uint8_t _motorCount;
@@ -95,6 +93,9 @@ class CoreTask {
 
             // Start with motor speeds at idle
             float motorvals[MAX_MOTOR_COUNT] = {};
+
+            // Device-dependent
+            motors_init();
 
             for (uint32_t step=1; ; step++) {
 
@@ -138,7 +139,7 @@ class CoreTask {
 
                     case STATUS_ARMED:
                         reportStatus(step, "armed", motorvals);
-                        checkDisarm(setpoint, status);
+                        checkDisarm(setpoint, status, motorvals);
                         if (setpoint.hovering) {
                             status = STATUS_HOVERING;
                         }
@@ -146,7 +147,7 @@ class CoreTask {
 
                     case STATUS_HOVERING:
                         reportStatus(step, "hovering", motorvals);
-                        checkDisarm(setpoint, status);
+                        checkDisarm(setpoint, status, motorvals);
                         if (!setpoint.hovering) {
                             status = STATUS_LANDING;
                         }
@@ -154,7 +155,7 @@ class CoreTask {
 
                     case STATUS_LANDING:
                         reportStatus(step, "landing", motorvals);
-                        checkDisarm(setpoint, status);
+                        checkDisarm(setpoint, status, motorvals);
                         break;
                 }
             }
@@ -169,10 +170,12 @@ class CoreTask {
                     motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
-        void checkDisarm(const setpoint_t setpoint, status_t &status)
+        void checkDisarm(const setpoint_t setpoint, status_t &status,
+                float * motorvals)
         {
             if (!setpoint.arming) {
                 status = STATUS_IDLE;
+                memset(motorvals, 0, _motorCount * sizeof(motorvals));
                 _ledTask->setArmed(false);
             }
         }
