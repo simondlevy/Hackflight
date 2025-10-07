@@ -159,6 +159,8 @@ class CoreTask {
 
                     case STATUS_LANDING:
                         reportStatus(step, "landing", motorvals);
+                        runClosedLoopAndMixer(step, setpoint,
+                                demands, motorvals);
                         checkDisarm(setpoint, status, motorvals);
                         break;
 
