@@ -47,6 +47,7 @@ class CoreTask {
             _setpointTask = setpointTask;
             _debugTask = debugTask;
             _motorCount = motorCount;
+            _mixFun = mixFun;
 
             _task.init(runCoreTask, "core", this, 5);
         }
@@ -77,6 +78,7 @@ class CoreTask {
         }
 
         ClosedLoopControl * _closedLoopControl;
+        mixFun_t _mixFun;
         FreeRtosTask _task;
         DebugTask * _debugTask;
         EstimatorTask * _estimatorTask;
@@ -94,7 +96,10 @@ class CoreTask {
             // Start with motor speeds at idle
             float motorvals[MAX_MOTOR_COUNT] = {};
 
-            // Device-dependent
+            // Start with no axis demands
+            demands_t demands = {};
+
+            // Run device-dependent motor initialization
             motors_init();
 
             for (uint32_t step=1; ; step++) {
@@ -147,6 +152,8 @@ class CoreTask {
 
                     case STATUS_HOVERING:
                         reportStatus(step, "hovering", motorvals);
+                        runClosedLoopAndMixer(step, setpoint,
+                                demands, motorvals);
                         checkDisarm(setpoint, status, motorvals);
                         if (!setpoint.hovering) {
                             status = STATUS_LANDING;
@@ -158,6 +165,66 @@ class CoreTask {
                         checkDisarm(setpoint, status, motorvals);
                         break;
                 }
+            }
+        }
+
+        void runClosedLoopAndMixer(
+                const uint32_t step, setpoint_t &setpoint,
+                demands_t & demands, float *motorvals)
+        {
+            if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
+                runClosedLoopControl(setpoint, demands);
+
+                // Run closedLoopDemands through mixer to get motor speeds
+                runMixer(_mixFun, demands, motorvals);
+            }
+        }
+
+        void runClosedLoopControl(
+                setpoint_t & setpoint, demands_t & closedLoopDemands)
+        {
+            if (setpoint.hovering) {
+
+                setpoint.demands.thrust = Num::rescale(
+                        setpoint.demands.thrust, 0.2, 2.0, -1, +1);
+
+                setpoint.demands.thrust = Num::rescale(
+                        setpoint.demands.thrust, -1, +1, 0.2, 2.0);
+            }
+
+            _closedLoopControl->run(
+                    1.f / CLOSED_LOOP_UPDATE_RATE,
+                    setpoint.hovering,
+                    _vehicleState,
+                    setpoint.demands,
+                    LANDING_ALTITUDE_M,
+                    closedLoopDemands);
+        }
+
+        void runMixer(const mixFun_t mixFun, const demands_t & demands,
+                float * motorvals)
+        {
+            float uncapped[MAX_MOTOR_COUNT] = {};
+            mixFun(demands, uncapped);
+
+            float highestThrustFound = 0;
+            for (uint8_t k=0; k<_motorCount; k++) {
+
+                const auto thrust = uncapped[k];
+
+                if (thrust > highestThrustFound) {
+                    highestThrustFound = thrust;
+                }
+            }
+
+            float reduction = 0;
+            if (highestThrustFound > THRUST_MAX) {
+                reduction = highestThrustFound - THRUST_MAX;
+            }
+
+            for (uint8_t k = 0; k < _motorCount; k++) {
+                float thrustCappedUpper = uncapped[k] - reduction;
+                motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
         }
 
