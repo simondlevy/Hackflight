@@ -17,7 +17,7 @@ all: $(BIN)
 dfu: $(DFU)
 
 $(DFU): $(HEX)
-	./dfuse-pack.py -i $(HEX) $(DFU)
+	../utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino
 	arduino-cli compile \
@@ -42,7 +42,7 @@ unbrick: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
-	rm -rf build
+	rm -rf build/
 
 edit:
 	vim $(SKETCH).ino
