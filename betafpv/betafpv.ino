@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <jumpToBootloader.hpp>
+#include <bootloaderJumper.hpp>
 
 //static const uint8_t LED_PIN = PB5; // BetaFPV
 static const uint8_t LED_PIN = PB2; // DIY
@@ -23,7 +23,7 @@ static const uint8_t LED_PIN = PB2; // DIY
 void serialEvent()
 {
     if (Serial.available() && Serial.read() == 'R') {
-        jumpToBootloader();
+        BootloaderJumper::jump();
     }
 }
 

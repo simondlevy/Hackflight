@@ -17,7 +17,7 @@ dfu: $(DFU)
 $(DFU): $(HEX)
 	../utils/dfuse-pack.py -i $(HEX) $(DFU)
 
-$(HEX): $(SKETCH).ino
+$(HEX): $(SKETCH).ino ../src/*.hpp
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \
