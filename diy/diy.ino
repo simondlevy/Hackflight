@@ -17,7 +17,7 @@
 
 #include <bootloaderJumper.hpp>
 
-static const uint8_t LED_PIN = PB5;
+static const uint8_t LED_PIN = PB2;
 
 void serialEvent()
 {
