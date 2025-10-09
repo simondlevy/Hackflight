@@ -12,8 +12,6 @@ HEX = build/$(SKETCH).ino.hex
 
 SRC = ../src
 
-all: $(BIN)
-
 dfu: $(DFU)
 
 $(DFU): $(HEX)
@@ -26,19 +24,13 @@ $(HEX): $(SKETCH).ino
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-$(BIN): $(SKETCH).ino
-	arduino-cli compile \
-		--libraries $(HOME)/Documents/Arduino/libraries \
-		--libraries ../.. \
-		--build-path ./build \
-		--fqbn $(FQBN) $(SKETCH).ino
-
 flash: $(DFU)
 	echo -n 'R' > $(PORT)
 	sleep 2
 	dfu-util -a 0 -D $(DFU) -s :leave
 
-unbrick: $(BIN)
+# Building .hex will also build .bin
+unbrick: $(HEX)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:

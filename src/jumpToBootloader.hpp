@@ -18,17 +18,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+class BootloaderJumper {
+
+    public:
+
+        void jump()
+        {
+        }
+};
+
 // Bootloader start address (refer to AN2606). STM32 family-dependent.
 static const uint32_t BOOTLOADER_ADDR = 0x1FFF0000 ;
-
-// #define BOOTLOADER_VECTOR_TABLE	((struct bootloader_vectable__t *)BOOTLOADER_ADDR)
 
 struct bootloader_vectable__t {
     uint32_t stack_pointer;
     void (*reset_handler)(void);
 };
 
-static const struct bootloader_vectable__t * BOOTLOADER_VECTOR_TABLE = ((struct bootloader_vectable__t *)BOOTLOADER_ADDR);
+static const struct bootloader_vectable__t * BOOTLOADER_VECTOR_TABLE = 
+((struct bootloader_vectable__t *)BOOTLOADER_ADDR);
 
 void jumpToBootloader(void) 
 {
