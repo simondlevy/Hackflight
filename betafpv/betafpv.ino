@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-static const uint8_t LED_PIN = PB5;
+static const uint8_t LED_PIN = PB2; // PB5;
 
 #define BOOTLOADER_ADDR 0x1FFF0000 // Bootloader start address (refer to AN2606). STM32 family-dependent.
 
