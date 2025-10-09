@@ -35,7 +35,7 @@ $(BIN): $(SKETCH).ino
 
 flash: $(DFU)
 	echo -n 'R' > $(PORT)
-	sleep 1
+	sleep 2
 	dfu-util -a 0 -D $(DFU) -s :leave
 
 unbrick: $(BIN)
