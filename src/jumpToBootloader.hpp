@@ -19,14 +19,16 @@
  */
 
 // Bootloader start address (refer to AN2606). STM32 family-dependent.
-#define BOOTLOADER_ADDR 0x1FFF0000 
+static const uint32_t BOOTLOADER_ADDR = 0x1FFF0000 ;
 
-#define BOOTLOADER_VECTOR_TABLE	((struct bootloader_vectable__t *)BOOTLOADER_ADDR)
+// #define BOOTLOADER_VECTOR_TABLE	((struct bootloader_vectable__t *)BOOTLOADER_ADDR)
 
 struct bootloader_vectable__t {
     uint32_t stack_pointer;
     void (*reset_handler)(void);
 };
+
+static const struct bootloader_vectable__t * BOOTLOADER_VECTOR_TABLE = ((struct bootloader_vectable__t *)BOOTLOADER_ADDR);
 
 void jumpToBootloader(void) 
 {
