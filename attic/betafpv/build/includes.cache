@@ -1,0 +1,982 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/cores/arduino"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/variants/STM32F4xx/F405RGT_F415RGT"
+  },
+  {
+    "Sourcefile": "/home/levys/Desktop/hackflight/betafpv/build/sketch/betafpv.ino.cpp",
+    "Include": "bootloaderJumper.hpp",
+    "Includepath": "/home/levys/Desktop/hackflight/src"
+  },
+  {
+    "Sourcefile": "/home/levys/Desktop/hackflight/betafpv/build/sketch/betafpv.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/Desktop/hackflight/betafpv/build/sketch/requiredLibraries.cpp",
+    "Include": "SrcWrapper.h",
+    "Includepath": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src"
+  },
+  {
+    "Sourcefile": "/home/levys/Desktop/hackflight/betafpv/build/sketch/requiredLibraries.cpp",
+    "Include": "USBDevice.h",
+    "Includepath": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src"
+  },
+  {
+    "Sourcefile": "/home/levys/Desktop/hackflight/betafpv/build/sketch/requiredLibraries.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_adc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_adc_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_can.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ccb.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_cec.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_comp.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_comp_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_cordic.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_cortex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_crc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_crc_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_cryp.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_cryp_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dac.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dac_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dcache.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dcmi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dcmi_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dfsdm.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dfsdm_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dma.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dma2d.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dma_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dsi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_dts.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_eth.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_eth_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_exti.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_fdcan.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_firewall.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_flash.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_flash_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_flash_ramfunc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_fmac.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_fmpi2c.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_fmpi2c_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_fmpsmbus.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_fmpsmbus_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_gfxmmu.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_gfxtim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_gpio.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_gpio_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_gpu2d.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_gtzc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_hash.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_hash_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_hcd.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_hrtim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_hsem.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_i2c.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_i2c_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_i2s.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_i2s_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_i3c.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_icache.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ipcc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_irda.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_iwdg.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_jpeg.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_lcd.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_lptim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ltdc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ltdc_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_mdf.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_mdios.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_mdma.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_mmc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_mmc_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_nand.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_nor.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_opamp.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_opamp_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ospi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_otfdec.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pccard.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pcd.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pcd_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pka.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pssi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pwr.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_pwr_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_qspi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_radio.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_radio_timer.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ramcfg.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_ramecc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_rcc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_rcc_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_rng.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_rng_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_rtc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_rtc_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sai.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sai_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sd.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sd_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sdadc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sdio.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sdram.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_smartcard.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_smartcard_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_smbus.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_smbus_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_spdifrx.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_spi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_spi_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_sram.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_subghz.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_swpmi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_tim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_tim_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_tsc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_uart.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_uart_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_usart.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_usart_ex.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_wwdg.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HAL/stm32yyxx_hal_xspi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/HardwareTimer.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_adc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_bdma.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_comp.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_cordic.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_crc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_crs.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_dac.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_delayblock.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_dlyb.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_dma.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_dma2d.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_exti.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_fmac.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_fmc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_fmpi2c.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_fsmc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_gpio.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_hrtim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_i2c.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_i3c.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_icache.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_lpgpio.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_lptim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_lpuart.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_mdma.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_opamp.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_pka.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_pwr.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_rcc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_rng.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_rtc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_sdmmc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_spi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_swpmi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_system.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_tim.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_ucpd.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_usart.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_usb.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/LL/stm32yyxx_ll_utils.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/new.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/PortNames.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/analog.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/bootloader.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/clock.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/core_callback.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/dwt.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/hw_config.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/interrupt.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/otp.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/pinmap.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/stm32_def.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/system_stm32yyxx.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/timer.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/stm32/uart.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/SrcWrapper/src/syscalls.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/USBSerial.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/cdc/cdc_queue.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/cdc/usbd_cdc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/cdc/usbd_cdc_if.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/hid/usbd_hid_composite.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/hid/usbd_hid_composite_if.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usb_device_core.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usb_device_ctlreq.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usb_device_ioreq.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usbd_conf.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usbd_desc.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usbd_ep_conf.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/levys/.arduino15/packages/STMicroelectronics/hardware/stm32/2.11.0/libraries/USBDevice/src/usbd_if.c",
+    "Include": "",
+    "Includepath": null
+  }
+]

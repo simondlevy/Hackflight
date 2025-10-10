@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "teensypi_v91-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/teensypi_v91-eagle-import.kicad_sym")(options "")(descr ""))
+)
