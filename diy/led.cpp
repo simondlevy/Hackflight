@@ -18,7 +18,7 @@
 
 #include <tasks/led.hpp>
 
-static const uint8_t LED_PIN = PC0;
+static const uint8_t LED_PIN = PB2;
 
 void LedTask::device_init()
 {
