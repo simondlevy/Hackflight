@@ -39,7 +39,9 @@
       "unconnected-(PMW3901_L1-Pin_2-Pad2)",
       "unconnected-(PMW3901_L1-Pin_4-Pad4)",
       "unconnected-(PMW3901_R1-Pin_4-Pad4)",
-      "unconnected-(Teensy_top1-Pin_3-Pad3)"
+      "unconnected-(Teensy_top1-Pin_3-Pad3)",
+      "unconnected-(Teensy_top1-Pin_8-Pad8)",
+      "unconnected-(Teensy_bottom1-Pin_12-Pad12)"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -123,16 +125,16 @@
       9
     ],
     "col_widths": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      51
     ],
     "custom_group_rules": [],
     "expanded_rows": [],
