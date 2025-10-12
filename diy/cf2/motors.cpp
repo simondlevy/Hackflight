@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <STM32FreeRTOS.h>
+#include <Arduino.h>
 
-#include <hackflight.hpp>
+#include <tasks/core.hpp>
 
-void setup() 
+static const uint8_t M1_PIN = PA1;
+static const uint8_t M2_PIN = PB11;
+static const uint8_t M3_PIN = PA15;
+static const uint8_t M4_PIN = PB9;
+
+static uint8_t pulse_widths[4];
+
+void CoreTask::motors_init()
 {
-    hackflight_init();
-
-    vTaskStartScheduler();
 }
 
-void loop() 
+void CoreTask::motors_setSpeed(uint32_t id, float speed)
 {
+    pulse_widths[id] = (uint8_t)(255 * speed);
 }
+
+void CoreTask::motors_run()
+{
+    analogWrite(M1_PIN, pulse_widths[0]);
+    analogWrite(M2_PIN, pulse_widths[1]);
+    analogWrite(M3_PIN, pulse_widths[2]);
+    analogWrite(M4_PIN, pulse_widths[3]);
+}
+
+

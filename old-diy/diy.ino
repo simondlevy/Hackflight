@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <STM32FreeRTOS.h>
-
 #include <hackflight.hpp>
+#include <bootloaderJumper.hpp>
+
+static const uint8_t LED_PIN = PB2;
+
+void serialEvent()
+{
+    if (Serial.available() && Serial.read() == 'R') {
+        BootloaderJumper::jump();
+    }
+}
 
 void setup() 
 {
-    hackflight_init();
+    Serial.begin(115200);
 
-    vTaskStartScheduler();
+    pinMode(LED_PIN, OUTPUT);
 }
+
 
 void loop() 
 {
+
+    digitalWrite(LED_PIN, LOW);
+    delay(500);
+    digitalWrite(LED_PIN, HIGH);
+    delay(500);
+
 }

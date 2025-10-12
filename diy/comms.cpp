@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +14,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <STM32FreeRTOS.h>
+#include <Arduino.h>
 
-#include <hackflight.hpp>
+#include <comms.hpp>
 
-void setup() 
+static HardwareSerial serial = HardwareSerial(PA3, PA2);
+
+void Comms::init()
 {
-    hackflight_init();
-
-    vTaskStartScheduler();
+    serial.begin(115200);
 }
 
-void loop() 
+bool Comms::read_byte(uint8_t * byte)
 {
+    if (serial.available()) {
+        *byte = serial.read();
+        return true;
+    }
+
+    return false;
+}
+            
+void Comms::write_byte(const uint8_t byte)
+{
+    serial.write(byte);
 }
