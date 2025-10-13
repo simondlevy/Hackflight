@@ -173,38 +173,23 @@ class CoreTask {
         }
 
         void runClosedLoopAndMixer(
-                const uint32_t step, setpoint_t &setpoint,
+                const uint32_t step, const setpoint_t &setpoint,
                 demands_t & demands, float *motorvals)
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
-                runClosedLoopControl(setpoint, demands);
 
-                // Run closedLoopDemands through mixer to get motor speeds
+                _closedLoopControl->run(
+                        1.f / CLOSED_LOOP_UPDATE_RATE,
+                        setpoint.hovering,
+                        _vehicleState,
+                        setpoint.demands,
+                        LANDING_ALTITUDE_M,
+                        demands);
+
                 runMixer(_mixFun, demands, motorvals);
 
                 runMotors(motorvals);
             }
-        }
-
-        void runClosedLoopControl(
-                setpoint_t & setpoint, demands_t & closedLoopDemands)
-        {
-            if (setpoint.hovering) {
-
-                setpoint.demands.thrust = Num::rescale(
-                        setpoint.demands.thrust, 0.2, 2.0, -1, +1);
-
-                setpoint.demands.thrust = Num::rescale(
-                        setpoint.demands.thrust, -1, +1, 0.2, 2.0);
-            }
-
-            _closedLoopControl->run(
-                    1.f / CLOSED_LOOP_UPDATE_RATE,
-                    setpoint.hovering,
-                    _vehicleState,
-                    setpoint.demands,
-                    LANDING_ALTITUDE_M,
-                    closedLoopDemands);
         }
 
         void runMotors(float * motorvals)
