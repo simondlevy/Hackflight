@@ -2056,7 +2056,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "41d38206-ae8b-4cc0-a6dd-9a03123b9616")
-		(property "Reference" "VL53L1_L2"
+		(property "Reference" "M1_GND1"
 			(at 78.74 170.1799 0)
 			(effects
 				(font
@@ -2115,7 +2115,7 @@
 		(instances
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VL53L1_L2")
+					(reference "M1_GND1")
 					(unit 1)
 				)
 			)
