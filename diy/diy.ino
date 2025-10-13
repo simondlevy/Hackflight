@@ -21,12 +21,9 @@
 
 void setup() 
 {
-    //hackflight_init();
+    hackflight_init();
 
-    //vTaskStartScheduler();
-
-    pinMode(PB2, OUTPUT);
-    digitalWrite(PB2, HIGH);
+    vTaskStartScheduler();
 }
 
 void loop() 
