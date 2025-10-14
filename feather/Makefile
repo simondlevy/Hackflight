@@ -8,14 +8,9 @@ SRC = ../src
 
 BIN = build/$(SKETCH).ino.bin
 
-DFU = build/$(SKETCH).ino.dfu
-
 HEX = build/$(SKETCH).ino.hex
 
-$(DFU): $(HEX)
-	../utils/dfuse-pack.py -i $(HEX) $(DFU)
-
-all: $(DFU)
+$(BIN): $(HEX)
 
 $(HEX):  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 	$(SRC)/msp/__messages__.h
@@ -25,20 +20,19 @@ $(HEX):  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
+flash: $(BIN)
+	echo -n 'R' > $(PORT)
+	sleep 2
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
+
+unbrick: $(BIN)
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
+
 $(SRC)/msp/__messages__.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../$(SKETCH)
 
 standard_config:
 	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp
-
-flash: $(DFU)
-	echo -n 'R' > $(PORT)
-	sleep 2
-	dfu-util -a 0 -D $(DFU) -s :leave
-
-# Building .hex will also build .bin
-unbrick:
-	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
 	rm -rf build __*__.cpp

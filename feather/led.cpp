@@ -14,18 +14,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
 
 #include <tasks/led.hpp>
 
-static const uint8_t LED_PIN = 13;
+static const uint8_t PIN = 8;
+
+static Adafruit_NeoPixel pixels(1, PIN, NEO_GRB + NEO_KHZ800);
 
 void LedTask::device_init()
 {
-    pinMode(LED_PIN, OUTPUT);
+    pixels.begin();
 }
 
 void LedTask::device_set(const bool on)
 {
-    digitalWrite(LED_PIN, on);
+    pixels.setPixelColor(0, on ? pixels.Color(255, 0, 0) : pixels.Color(0, 0, 0));
+    pixels.show();
 }
