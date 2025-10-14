@@ -18,14 +18,19 @@
 
 #include <tasks/zranger.hpp>
 
+static const uint8_t SDA_PIN = PB7;
+static const uint8_t SCL_PIN = PB6;
+
 static VL53L1X vl53l1x;
+
+static TwoWire wire(SDA_PIN, SCL_PIN);
 
 bool ZRangerTask::device_init()
 {
-    return true;
+    vl53l1x.setBus(&wire);
 
-    Wire.begin();
-    Wire.setClock(400000);
+    wire.begin();
+    wire.setClock(400000);
     delay(100);
 
     if (!vl53l1x.init()) {
@@ -42,7 +47,5 @@ bool ZRangerTask::device_init()
 
 float ZRangerTask::device_read()
 {
-    return 0;
-
     return vl53l1x.read();
 }

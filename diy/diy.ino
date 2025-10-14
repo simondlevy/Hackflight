@@ -19,9 +19,11 @@
 
 #include <hackflight.hpp>
 
+static Hackflight hackflight;
+
 void setup() 
 {
-    hackflight_init();
+    hackflight.init();
 
     vTaskStartScheduler();
 }

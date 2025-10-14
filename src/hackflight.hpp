@@ -41,7 +41,7 @@ class Hackflight {
 
             debugTask.begin();
 
-            zrangerTask.begin(&estimatorTask);
+            zrangerTask.begin(&estimatorTask, &debugTask);
 
             opticalFlowTask.begin(&estimatorTask);
 
