@@ -31,44 +31,52 @@
 #include <tasks/setpoint.hpp>
 #include <tasks/zranger.hpp>
 
-static CoreTask coreTask;
-static DebugTask debugTask;
-static EstimatorTask estimatorTask;
-static LedTask ledTask;
-static ImuTask imuTask;
-static LoggingTask loggingTask;
-static OpticalFlowTask opticalFlowTask;
-static SetpointTask setpointTask;
-static ZRangerTask zrangerTask;
+class Hackflight {
 
-static ClosedLoopControl closedLoopControl;
+    public:
 
-static void hackflight_init()
-{
-    Comms::init();
+        void init()
+        {
+            Comms::init();
 
-    debugTask.begin();
+            debugTask.begin();
 
-    zrangerTask.begin(&estimatorTask);
+            zrangerTask.begin(&estimatorTask);
 
-    opticalFlowTask.begin(&estimatorTask);
+            opticalFlowTask.begin(&estimatorTask);
 
-    estimatorTask.begin();
+            estimatorTask.begin();
 
-    setpointTask.begin();
+            setpointTask.begin();
 
-    loggingTask.begin(&estimatorTask, &closedLoopControl);
+            loggingTask.begin(&estimatorTask, &closedLoopControl);
 
-    ledTask.begin(&imuTask);
+            ledTask.begin(&imuTask);
 
-    imuTask.begin(&estimatorTask);
+            imuTask.begin(&estimatorTask);
 
-    coreTask.begin(
-            &closedLoopControl,
-            &estimatorTask,
-            &imuTask,
-            &ledTask,
-            &setpointTask,
-            Mixer::rotorCount,
-            Mixer::mix);
-}
+            coreTask.begin(
+                    &closedLoopControl,
+                    &estimatorTask,
+                    &imuTask,
+                    &ledTask,
+                    &setpointTask,
+                    Mixer::rotorCount,
+                    Mixer::mix);
+        }
+
+
+    private:
+
+        CoreTask coreTask;
+        DebugTask debugTask;
+        EstimatorTask estimatorTask;
+        LedTask ledTask;
+        ImuTask imuTask;
+        LoggingTask loggingTask;
+        OpticalFlowTask opticalFlowTask;
+        SetpointTask setpointTask;
+        ZRangerTask zrangerTask;
+
+        ClosedLoopControl closedLoopControl;
+};
