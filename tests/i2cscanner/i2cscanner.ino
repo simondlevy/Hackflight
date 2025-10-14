@@ -17,7 +17,7 @@
 
 #include <Wire.h>   
 
-#include "bootloader.hpp"
+#include <bootloader.hpp>
 
 static const uint8_t LED_PIN = 13;
 
@@ -29,7 +29,7 @@ static TwoWire wire1 = TwoWire(SDA_PIN, SCL_PIN);
 void serialEvent()
 {
     if (Serial.available() && Serial.read() == 'R') {
-        BootloaderJumper::jump();
+        Bootloader::jump();
     }
 }
 

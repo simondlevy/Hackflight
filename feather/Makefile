@@ -15,6 +15,8 @@ HEX = build/$(SKETCH).ino.hex
 $(DFU): $(HEX)
 	../utils/dfuse-pack.py -i $(HEX) $(DFU)
 
+all: $(DFU)
+
 $(HEX):  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 	$(SRC)/msp/__messages__.h
 	arduino-cli compile \
@@ -35,7 +37,7 @@ flash: $(DFU)
 	dfu-util -a 0 -D $(DFU) -s :leave
 
 # Building .hex will also build .bin
-unbrick: $(HEX)
+unbrick:
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:

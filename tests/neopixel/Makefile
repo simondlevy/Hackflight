@@ -1,3 +1,3 @@
-SKETCH = i2cscanner
+SKETCH = neopixel
 
 include ../makefile.include

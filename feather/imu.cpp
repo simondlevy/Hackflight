@@ -22,17 +22,12 @@
 
 #include <tasks/imu.hpp>
 
-static const uint8_t SDA_PIN = 0;
-static const uint8_t SCL_PIN = 1;
-
 static const uint8_t ACCEL_ADDR = 0x19;
 static const uint8_t GYRO_ADDR = 0x69;
 
-static TwoWire wire = TwoWire(SDA_PIN, SCL_PIN);
+static Bmi088Accel accel(Wire, ACCEL_ADDR);
 
-static Bmi088Accel accel(wire, ACCEL_ADDR);
-
-static Bmi088Gyro gyro(wire, GYRO_ADDR);
+static Bmi088Gyro gyro(Wire, GYRO_ADDR);
 
 static bool failed(const int status)
 {
