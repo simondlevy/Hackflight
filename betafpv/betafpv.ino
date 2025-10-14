@@ -15,14 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bootloaderJumper.hpp>
+#include <bootloader.hpp>
 
 static const uint8_t LED_PIN = PB5;
 
 void serialEvent()
 {
     if (Serial.available() && Serial.read() == 'R') {
-        BootloaderJumper::jump();
+        Bootloader::jump();
     }
 }
 

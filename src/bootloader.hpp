@@ -19,7 +19,7 @@
  */
 
 
-class BootloaderJumper {
+class Bootloader {
 
     public:
 

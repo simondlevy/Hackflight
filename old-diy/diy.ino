@@ -16,14 +16,14 @@
  */
 
 #include <hackflight.hpp>
-#include <bootloaderJumper.hpp>
+#include <bootloader.hpp>
 
 static const uint8_t LED_PIN = PB2;
 
 void serialEvent()
 {
     if (Serial.available() && Serial.read() == 'R') {
-        BootloaderJumper::jump();
+        Bootloader::jump();
     }
 }
 
