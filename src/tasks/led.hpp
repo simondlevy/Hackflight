@@ -28,7 +28,7 @@ class LedTask {
 
     public:
 
-        void begin(ImuTask * imuTask, DebugTask * debugTask)
+        void begin(ImuTask * imuTask, DebugTask * debugTask=nullptr)
         {
             _imuTask = imuTask;
 
