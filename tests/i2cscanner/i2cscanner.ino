@@ -33,12 +33,11 @@ void setup()
 
 void loop()
 {  
-    Serial.print("Scanning ");
+    Serial.print("Scanning ...");
 
     int nDevices = 0;
 
-    for(byte address = 1; address < 127; address++ ) 
-    {
+    for(byte address = 1; address < 127; address++ ) {
 
         wire.beginTransmission(address);
 

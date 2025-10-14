@@ -6,8 +6,6 @@ FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 BIN = build/$(SKETCH).ino.bin
 
-DFU = build/$(SKETCH).ino.dfu
-
 HEX = build/$(SKETCH).ino.hex
 
 $(DFU): $(HEX)
@@ -20,12 +18,6 @@ $(HEX):  $(SKETCH).ino
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-flash: $(DFU)
-	echo -n 'R' > $(PORT)
-	sleep 2
-	dfu-util -a 0 -D $(DFU) -s :leave
-
-# Building .hex will also build .bin
 unbrick: $(HEX)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
