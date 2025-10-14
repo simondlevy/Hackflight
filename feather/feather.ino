@@ -18,16 +18,17 @@
 #include <STM32FreeRTOS.h>
 
 #include <hackflight.hpp>
-#include <bootloader.hpp>
+//#include <bootloader.hpp>
 
 static Hackflight hackflight;
 
+/*
 void serialEvent()
 {
     if (Serial.available() && Serial.read() == 'R') {
         Bootloader::jump();
     }
-}
+}*/
 
 void setup()
 {

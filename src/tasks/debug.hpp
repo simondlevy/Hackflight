@@ -18,6 +18,7 @@
 
 #include <Arduino.h>
 
+#include <bootloader.hpp>
 #include <task.hpp>
 
 class DebugTask {
@@ -73,6 +74,10 @@ class DebugTask {
                 }
 
                 vTaskDelay(1000/REPORT_FREQ);
+
+                if (Serial.available() && Serial.read() == 'R') {
+                    Bootloader::jump();
+                }
             }
         }
 };
