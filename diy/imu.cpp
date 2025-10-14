@@ -15,20 +15,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SPI.h>
+
+#include <Wire.h>   
 
 #include <BMI088.h>
 
 #include <tasks/imu.hpp>
 
-/*
-static const uint8_t SDA_PIN = PB7;
-static const uint8_t SCL_PIN = PB6;
+static const uint8_t SDA_PIN = PC9;
+static const uint8_t SCL_PIN = PA8;
 
 static const uint8_t ACCEL_ADDR = 0x18;
 static const uint8_t GYRO_ADDR = 0x69;
 
-static TwoWire wire(SDA_PIN, SCL_PIN);
+static TwoWire wire = TwoWire(SDA_PIN, SCL_PIN);
 
 static Bmi088Accel accel(wire, ACCEL_ADDR);
 
@@ -38,11 +38,9 @@ static bool failed(const int status)
 {
     return status < 0;
 }
-*/
 
 bool ImuTask::device_init()
 {
-    /*
     if (failed(gyro.begin())) return false;
 
     if (failed(accel.begin())) return false;
@@ -61,7 +59,6 @@ bool ImuTask::device_init()
     if (failed(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ))) return false;
 
     if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
-    */
 
     return true;
 }
@@ -70,7 +67,6 @@ void ImuTask::device_readRaw(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {
-    /*
     gyro.readSensor();
 
     gx = gyro.getGyroX_raw();
@@ -82,7 +78,6 @@ void ImuTask::device_readRaw(
     ax = accel.getAccelX_raw();
     ay = accel.getAccelY_raw();
     az = accel.getAccelZ_raw();
-    */
 }
 
 float ImuTask::device_gyroRaw2Dps(const int16_t raw)

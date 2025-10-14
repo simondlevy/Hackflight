@@ -41,7 +41,7 @@ class Hackflight {
 
             debugTask.begin();
 
-            zrangerTask.begin(&estimatorTask, &debugTask);
+            zrangerTask.begin(&estimatorTask);
 
             opticalFlowTask.begin(&estimatorTask);
 
@@ -53,7 +53,7 @@ class Hackflight {
 
             ledTask.begin(&imuTask);
 
-            imuTask.begin(&estimatorTask);
+            imuTask.begin(&estimatorTask, &debugTask);
 
             coreTask.begin(
                     &closedLoopControl,
