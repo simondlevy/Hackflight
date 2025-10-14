@@ -1,4 +1,4 @@
-SKETCH = diy
+SKETCH = feather
 
 PORT = /dev/ttyACM0
 
