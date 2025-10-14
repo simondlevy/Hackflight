@@ -7,10 +7,7 @@ BIN = build/$(SKETCH).ino.bin
 
 HEX = build/$(SKETCH).ino.hex
 
-DFU = build/$(SKETCH).ino.dfu
-
-$(DFU): $(HEX)
-	../utils/dfuse-pack.py -i $(HEX) $(DFU)
+$(BIN): $(HEX)
 
 $(HEX):  $(SKETCH).ino
 	arduino-cli compile \
