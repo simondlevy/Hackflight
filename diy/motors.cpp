@@ -19,13 +19,12 @@
 
 #include <tasks/core.hpp>
 
-static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
+static const std::vector<uint8_t> MOTOR_PINS = {PB14, PB11, PC1, PB3};
 
 static auto motors = OneShot125(MOTOR_PINS);
 
 void CoreTask::motors_init()
 {
-
     motors.arm();
 }
 

@@ -21,7 +21,7 @@
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t MOSI_PIN = PA7;
 static const uint8_t SCLK_PIN = PA5;
-static const uint8_t CS_PIN = PB4;
+static const uint8_t CS_PIN = PC5;
 
 static SPIClass spi;
 
@@ -29,6 +29,8 @@ static PMW3901 pmw3901;
 
 bool OpticalFlowTask::device_init()
 {
+    return true;
+
     spi.setSCLK(PA5);
     spi.setMISO(PA6);
     spi.setMOSI(PA7);
@@ -41,6 +43,6 @@ bool OpticalFlowTask::device_init()
 void OpticalFlowTask::device_read(
         int16_t & dx, int16_t & dy, bool &gotMotion)
 {
-    pmw3901.readMotion(dx, dy, gotMotion);
+    //pmw3901.readMotion(dx, dy, gotMotion);
 
 }

@@ -21,18 +21,17 @@
 
 #include <tasks/imu.hpp>
 
-static const uint8_t ACCEL_CS_PIN = PB1;
-static const uint8_t GYRO_CS_PIN = PB0;
+static const uint8_t SDA_PIN = PB7;
+static const uint8_t SCL_PIN = PB6;
 
-static const uint8_t MISO_PIN = PB14;
-static const uint8_t MOSI_PIN = PB15;
-static const uint8_t SCLK_PIN = PB13;
+static const uint8_t ACCEL_ADDR = 0x18;
+static const uint8_t GYRO_ADDR = 0x69;
 
-static SPIClass spi;
+static TwoWire wire(SDA_PIN, SCL_PIN);
 
-static Bmi088Accel accel(spi, ACCEL_CS_PIN);
+static Bmi088Accel accel(wire, ACCEL_ADDR);
 
-static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
+static Bmi088Gyro gyro(wire, GYRO_ADDR);
 
 static bool failed(const int status)
 {
@@ -41,9 +40,6 @@ static bool failed(const int status)
 
 bool ImuTask::device_init()
 {
-    spi.setMISO(MISO_PIN);
-    spi.setMOSI(MOSI_PIN);
-    spi.setSCLK(SCLK_PIN);
 
     if (failed(gyro.begin())) return false;
 

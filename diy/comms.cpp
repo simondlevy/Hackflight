@@ -18,7 +18,10 @@
 
 #include <comms.hpp>
 
-static HardwareSerial serial = HardwareSerial(PA3, PA2);
+static const uint8_t TX_PIN = PA9;
+static const uint8_t RX_PIN = PA10;
+
+static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
 void Comms::init()
 {

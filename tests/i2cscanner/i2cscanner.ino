@@ -20,7 +20,7 @@
 static const uint8_t SDA_PIN = PB7;
 static const uint8_t SCL_PIN = PB6;
 
-TwoWire wire(SDA_PIN, SCL_PIN);
+static TwoWire wire(SDA_PIN, SCL_PIN);
 
 void setup()
 {

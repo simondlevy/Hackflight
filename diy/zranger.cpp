@@ -22,6 +22,8 @@ static VL53L1X vl53l1x;
 
 bool ZRangerTask::device_init()
 {
+    return true;
+
     Wire.begin();
     Wire.setClock(400000);
     delay(100);
@@ -40,5 +42,7 @@ bool ZRangerTask::device_init()
 
 float ZRangerTask::device_read()
 {
+    return 0;
+
     return vl53l1x.read();
 }

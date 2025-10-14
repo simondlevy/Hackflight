@@ -26,10 +26,8 @@
       "unconnected-(J1-Pin_7-Pad7)",
       "unconnected-(J1-Pin_6-Pad6)",
       "unconnected-(J1-Pin_13-Pad13)",
-      "unconnected-(J1-Pin_1-Pad1)",
-      "unconnected-(J1-Pin_3-Pad3)",
-      "unconnected-(J1-Pin_4-Pad4)",
-      "unconnected-(J1-Pin_2-Pad2)"
+      "Net-(D1-A)",
+      "/PB2"
     ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
@@ -113,16 +111,16 @@
       9
     ],
     "col_widths": [
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      51
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
     ],
     "custom_group_rules": [],
     "expanded_rows": [],

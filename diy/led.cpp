@@ -27,5 +27,5 @@ void LedTask::device_init()
 
 void LedTask::device_set(const bool on)
 {
-    digitalWrite(LED_PIN, !on);
+    digitalWrite(LED_PIN, on);
 }
