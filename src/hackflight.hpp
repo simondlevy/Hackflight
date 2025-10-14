@@ -52,7 +52,7 @@ class Hackflight {
 
             loggingTask.begin(&estimatorTask, &closedLoopControl);*/
 
-            ledTask.begin(&imuTask);
+            ledTask.begin(&imuTask, &debugTask);
 
             /*
             imuTask.begin(&estimatorTask, &debugTask);

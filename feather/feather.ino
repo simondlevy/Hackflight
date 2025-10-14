@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,13 +29,14 @@ void serialEvent()
     }
 }
 
-void setup() 
+void setup()
 {
     hackflight.init();
 
     vTaskStartScheduler();
 }
 
-void loop() 
-{
+void loop()
+{  
 }
+

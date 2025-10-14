@@ -18,27 +18,30 @@
 
 #include <comms.hpp>
 
+/*
 static const uint8_t TX_PIN = PA9;
 static const uint8_t RX_PIN = PA10;
 
 static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
+*/
 
 void Comms::init()
 {
-    serial.begin(115200);
+    //serial.begin(115200);
 }
 
 bool Comms::read_byte(uint8_t * byte)
 {
+    /*
     if (serial.available()) {
         *byte = serial.read();
         return true;
-    }
+    }*/
 
     return false;
 }
             
 void Comms::write_byte(const uint8_t byte)
 {
-    serial.write(byte);
+    //serial.write(byte);
 }

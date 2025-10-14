@@ -21,34 +21,33 @@
 
 static const uint8_t PIN = 8;
 
-// When setting up the NeoPixel library, we tell it how many pixels,
-// and which pin to use to send signals. Note that for older NeoPixel
-// strips you might need to change the third parameter -- see the
-// strandtest example for more information on possible values.
 static Adafruit_NeoPixel pixels(1, PIN, NEO_GRB + NEO_KHZ800);
 
+/*
 void serialEvent()
 {
     if (Serial.available() && Serial.read() == 'R') {
         Bootloader::jump();
     }
-}
+}*/
 
 
 void setup()
 {
     pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
+    pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+    pixels.show();
 }
 
 
 void loop()
 {  
-    delay(500);
+    /*
+    delay(1000);
     pixels.setPixelColor(0, pixels.Color(255, 0, 0));
     pixels.show();
 
-    delay(500);
+    delay(50);
     pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-    pixels.show();
-
+    pixels.show();*/
 }

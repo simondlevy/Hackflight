@@ -29,6 +29,6 @@ void LedTask::device_init()
 
 void LedTask::device_set(const bool on)
 {
-    pixels.setPixelColor(0, on ? pixels.Color(255, 0, 0) : pixels.Color(0, 0, 0));
+    pixels.setPixelColor(0, pixels.Color(on ? 255 : 0, 0, 0));
     pixels.show();
 }

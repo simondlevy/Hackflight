@@ -21,15 +21,18 @@
 #include <stdint.h>
 
 #include <task.hpp>
+#include <tasks/debug.hpp>
 #include <tasks/imu.hpp>
 
 class LedTask {
 
     public:
 
-        void begin(ImuTask * imuTask)
+        void begin(ImuTask * imuTask, DebugTask * debugTask)
         {
             _imuTask = imuTask;
+
+            _debugTask = debugTask;
 
             _task.init(runLedTask, "led", this, 2);
 
@@ -52,6 +55,8 @@ class LedTask {
         FreeRtosTask _task;
 
         ImuTask * _imuTask;
+
+        DebugTask * _debugTask;
 
         bool _armed;
 
