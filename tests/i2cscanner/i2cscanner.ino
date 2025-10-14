@@ -19,6 +19,8 @@
 
 #include "bootloader.hpp"
 
+static const uint8_t LED_PIN = 13;
+
 static const uint8_t SDA_PIN = 0;
 static const uint8_t SCL_PIN = 1;
 
@@ -34,6 +36,8 @@ void serialEvent()
 
 void setup()
 {
+    pinMode(LED_PIN, OUTPUT);
+
     Serial.begin(115200);
 
     Wire.begin();
@@ -51,8 +55,7 @@ static void scan(TwoWire & wire, const char * name)
 
     int nDevices = 0;
 
-    for(byte address = 1; address < 127; address++ ) 
-    {
+    for(byte address = 1; address < 127; address++ ) {
 
         wire.beginTransmission(address);
 
@@ -75,12 +78,15 @@ static void scan(TwoWire & wire, const char * name)
             Serial.println(address,HEX);
         }    
     }
-    if (nDevices == 0)
-        Serial.println("No I2C devices found\n");
-    else
-        Serial.println("done\n"); 
+
+    Serial.println(nDevices == 0 ? "No I2C devices found\n" : "done\n");
 
     delay(1000);
+
+    digitalWrite(LED_PIN, HIGH);
+    delay(100);
+    digitalWrite(LED_PIN, LOW);
+
 }
 
 
