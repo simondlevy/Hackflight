@@ -19,7 +19,7 @@
 #include <__control__.hpp>
 
 #include <comms.hpp>
-#include <msp/messages.h>
+#include <msp/__messages__.h>
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
