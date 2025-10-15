@@ -1,4 +1,5 @@
 /**
+ *
  * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,32 +15,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-
-#include <comms.hpp>
+#include <bootloader.hpp>
 
 static const uint8_t RX_PIN = 5;
 static const uint8_t TX_PIN = 6;
 
 static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
-void Comms::init()
+void serialEvent()
 {
+    if (Serial.available() && Serial.read() == 'R') {
+        Bootloader::jump();
+    }
+}
+
+
+void setup()
+{
+    Serial.begin(115200);
+
     serial.begin(115200);
 }
 
-bool Comms::read_byte(uint8_t * byte)
-{
-    /*
-    if (serial.available()) {
-        *byte = serial.read();
-        return true;
-    }*/
 
-    return false;
-}
-            
-void Comms::write_byte(const uint8_t byte)
-{
-    //serial.write(byte);
+void loop()
+{  
+    static uint8_t k;
+
+    serial.write((char)('A' + k));
+
+    k = (k + 1) % 26;
+
+    delay(50);
 }
