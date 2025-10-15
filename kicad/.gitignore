@@ -1,3 +1,4 @@
+*.lck
 *-bak
 *-cache
 *-backups
