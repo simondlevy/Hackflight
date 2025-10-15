@@ -18,10 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-import os
 import socket
 import sys
-from threading import Thread
 from time import sleep
 
 BLUETOOTH_ADDRESSES = {
@@ -33,6 +31,7 @@ BLUETOOTH_ADDRESSES = {
 BLUETOOTH_PORT = 1
 
 SOCKET_TIMEOUT = 1
+
 
 def connect_to_server(name, port):
 
@@ -74,13 +73,16 @@ def main():
 
     argparser.add_argument('-b', '--bluetooth-server',
                            choices=BLUETOOTH_ADDRESSES.keys(),
-                           help='Bluetooth server')
+                           help='Bluetooth server',
+                           default='bolt')
 
     args = argparser.parse_args()
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
+    while True:
 
+        print(client.recv(1).decode())
 
 
 main()
