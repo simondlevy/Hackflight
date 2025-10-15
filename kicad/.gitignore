@@ -1,4 +1,24 @@
-*auto_saved_files*
-*backups
-*.lck
-*.wrl
+*-bak
+*-cache
+*-backups
+# Local project settings
+*.kicad_prl
+# Fabrication outputs (unless intentionally versioned)
+*.gbr
+*.drl
+*.pos
+*.cmp
+*.rpt
+*.pdf
+# Temporary files
+*.tmp
+# 3D viewer cache
+*-kicad_3d_cache
+# Symbol and footprint library caches
+fp-lib-table
+sym-lib-table
+# Other generated files
+*.net
+*.erc
+*.drc
+*.log
