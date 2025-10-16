@@ -18,8 +18,8 @@
 
 #include <tasks/zranger.hpp>
 
-static const uint8_t SDA_PIN = 0;
-static const uint8_t SCL_PIN = 1;
+static const uint8_t SDA_PIN = PC9;
+static const uint8_t SCL_PIN = PA8;
 
 static VL53L1X vl53l1x;
 
