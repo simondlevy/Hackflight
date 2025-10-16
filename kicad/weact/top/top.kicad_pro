@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 1.0,
-          "height": 1.7,
-          "width": 1.7
+          "drill": 0.7,
+          "height": 1.4,
+          "width": 1.4
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -474,7 +474,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "diy-top.kicad_pro",
+    "filename": "top.kicad_pro",
     "version": 3
   },
   "net_settings": {

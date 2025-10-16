@@ -1342,6 +1342,16 @@
 	)
 	(wire
 		(pts
+			(xy 104.14 134.62) (xy 110.49 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1a6d6a88-fa58-4b80-9d33-bb3829ee8371")
+	)
+	(wire
+		(pts
 			(xy 130.81 127) (xy 134.62 127)
 		)
 		(stroke
@@ -1422,6 +1432,26 @@
 	)
 	(wire
 		(pts
+			(xy 118.11 134.62) (xy 121.92 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "86d9c41b-672a-40de-8337-427d9caba0cc")
+	)
+	(wire
+		(pts
+			(xy 104.14 146.05) (xy 110.49 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95d45ab9-0f14-44ba-bacf-2793260833ca")
+	)
+	(wire
+		(pts
 			(xy 105.41 116.84) (xy 110.49 116.84)
 		)
 		(stroke
@@ -1449,6 +1479,16 @@
 			(type default)
 		)
 		(uuid "d6a45f30-1de7-4bb6-8294-d2c760a82a5c")
+	)
+	(wire
+		(pts
+			(xy 118.11 146.05) (xy 121.92 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e0c6c911-8af1-4873-a373-4c6e32be0dff")
 	)
 	(wire
 		(pts
@@ -1500,6 +1540,16 @@
 		)
 		(uuid "49d3f325-204b-4a41-9c14-f8083ceb55b8")
 	)
+	(label "LED_SAFE"
+		(at 102.87 116.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "578ce9a1-f0ae-4279-9eea-a31a93e73e4a")
+	)
 	(label "3V3"
 		(at 130.81 124.46 0)
 		(effects
@@ -1540,7 +1590,7 @@
 		)
 		(uuid "be539bfd-3d17-49bf-b0bf-ac1999280ce8")
 	)
-	(label "PB2"
+	(label "LED_RAW"
 		(at 119.38 116.84 0)
 		(effects
 			(font
@@ -1633,6 +1683,74 @@
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "GND_PAD18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 114.3 134.62 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "22524b7e-7781-4f5a-bb63-c9e156d6d503")
+		(property "Reference" "R2"
+			(at 114.3 128.27 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "2.2k Ohms"
+			(at 114.3 130.81 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+			(at 114.3 136.398 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 114.3 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 114.3 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e64fe705-ade7-43ff-9300-4eca4433b9e3")
+		)
+		(pin "2"
+			(uuid "e3ddb1c1-7f08-4005-b0a7-38a68371e4be")
+		)
+		(instances
+			(project "top"
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "R2")
 					(unit 1)
 				)
 			)
@@ -1769,6 +1887,74 @@
 			(project "teensypi_v91"
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "GND_PAD20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 114.3 146.05 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4535888c-cb50-461e-aaac-37b0d272b00d")
+		(property "Reference" "R3"
+			(at 114.3 139.7 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "2.2k Ohms"
+			(at 114.3 142.24 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal"
+			(at 114.3 147.828 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 114.3 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 114.3 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "81e58f10-afa4-4e34-b242-0d57f98056a8")
+		)
+		(pin "2"
+			(uuid "c340de75-e246-4321-bde5-6dc61b5fb3aa")
+		)
+		(instances
+			(project "top"
+				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -2068,7 +2254,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic_MountingPin:Conn_01x15_MountingPin")
-		(at 119.38 87.63 0)
+		(at 129.54 83.82 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2077,7 +2263,7 @@
 		(fields_autoplaced yes)
 		(uuid "f4314d57-323a-40e8-a2f6-cfdb03eaac9b")
 		(property "Reference" "J1"
-			(at 121.92 86.7155 0)
+			(at 132.08 82.9055 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2086,24 +2272,26 @@
 			)
 		)
 		(property "Value" "Conn_01x15_MountingPin"
-			(at 121.92 89.2555 0)
+			(at 132.08 85.4455 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
 			)
 		)
 		(property "Footprint" "Connector_IDC:IDC-Header_2x15_P2.54mm_Vertical"
-			(at 119.38 87.63 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
-			(at 119.38 87.63 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2112,7 +2300,7 @@
 			)
 		)
 		(property "Description" "Generic connectable mounting pin connector, single row, 01x15, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 119.38 87.63 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2195,7 +2383,7 @@
 				)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "47 Ohms"
 			(at 114.3 113.03 90)
 			(effects
 				(font

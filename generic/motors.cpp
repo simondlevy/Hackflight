@@ -19,26 +19,25 @@
 
 #include <tasks/core.hpp>
 
-/*
 static const std::vector<uint8_t> MOTOR_PINS = {PB14, PB11, PC1, PB3};
 
 static auto motors = OneShot125(MOTOR_PINS);
-*/
+
 void CoreTask::motors_init()
 {
-    //motors.arm();
+    motors.arm();
 }
 
 void CoreTask::motors_setSpeed(uint32_t id, float speed)
 {
-    //const uint8_t pulse_width = 125 * (speed + 1);
+    const uint8_t pulse_width = 125 * (speed + 1);
 
-    //motors.set(id, pulse_width);
+    motors.set(id, pulse_width);
 }
 
 void CoreTask::motors_run()
 {
-    //motors.run();
+    motors.run();
 }
 
 
