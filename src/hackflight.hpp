@@ -37,25 +37,24 @@ class Hackflight {
 
         void init()
         {
-            //Comms::init();
+            Comms::init();
 
             debugTask.begin();
 
-            zrangerTask.begin(&estimatorTask, &debugTask);
+            zrangerTask.begin(&estimatorTask);
 
             opticalFlowTask.begin(&estimatorTask);
 
-            // estimatorTask.begin();
+            estimatorTask.begin();
 
-            // setpointTask.begin();
+            setpointTask.begin();
 
-            // loggingTask.begin(&estimatorTask, &closedLoopControl);
+            loggingTask.begin(&estimatorTask, &closedLoopControl);
 
             ledTask.begin(&imuTask);
 
             imuTask.begin(&estimatorTask);
 
-            /*
             coreTask.begin(
                     &closedLoopControl,
                     &estimatorTask,
@@ -63,7 +62,7 @@ class Hackflight {
                     &ledTask,
                     &setpointTask,
                     Mixer::rotorCount,
-                    Mixer::mix);*/
+                    Mixer::mix);
         }
 
 
