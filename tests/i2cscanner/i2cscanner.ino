@@ -24,7 +24,7 @@ static const uint8_t LED_PIN = 13;
 static const uint8_t SDA_PIN = 0;
 static const uint8_t SCL_PIN = 1;
 
-static TwoWire wire1 = TwoWire(SDA_PIN, SCL_PIN);
+//static TwoWire wire1 = TwoWire(SDA_PIN, SCL_PIN);
 
 void serialEvent()
 {
@@ -41,7 +41,7 @@ void setup()
     Serial.begin(115200);
 
     Wire.begin();
-    wire1.begin();
+    //wire1.begin();
 
     delay(100);
 }
@@ -93,5 +93,5 @@ static void scan(TwoWire & wire, const char * name)
 void loop()
 {  
     scan(Wire, "Wire");
-    scan(wire1, "wire1");
+    //scan(wire1, "wire1");
 }
