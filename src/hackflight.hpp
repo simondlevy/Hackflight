@@ -41,21 +41,19 @@ class Hackflight {
 
             debugTask.begin();
 
-            /*
-            zrangerTask.begin(&estimatorTask, &debugTask);
+            // zrangerTask.begin(&estimatorTask, &debugTask);
 
-            opticalFlowTask.begin(&estimatorTask);
+            opticalFlowTask.begin(&estimatorTask, &debugTask);
 
-            estimatorTask.begin();
+            // estimatorTask.begin();
 
-            setpointTask.begin();
+            // setpointTask.begin();
 
-            loggingTask.begin(&estimatorTask, &closedLoopControl);
-            */
+            // loggingTask.begin(&estimatorTask, &closedLoopControl);
 
             ledTask.begin(&imuTask);
 
-            imuTask.begin(&estimatorTask, &debugTask);
+            imuTask.begin(&estimatorTask);
 
             /*
             coreTask.begin(

@@ -29,8 +29,6 @@ static PMW3901 pmw3901;
 
 bool OpticalFlowTask::device_init()
 {
-    return true;
-
     spi.setSCLK(PA5);
     spi.setMISO(PA6);
     spi.setMOSI(PA7);
