@@ -18,8 +18,8 @@
 
 #include <comms.hpp>
 
-static const uint8_t RX_PIN = 5;
-static const uint8_t TX_PIN = 6;
+static const uint8_t RX_PIN = 10;
+static const uint8_t TX_PIN = 9;
 
 static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
@@ -30,16 +30,15 @@ void Comms::init()
 
 bool Comms::read_byte(uint8_t * byte)
 {
-    /*
     if (serial.available()) {
         *byte = serial.read();
         return true;
-    }*/
+    }
 
     return false;
 }
             
 void Comms::write_byte(const uint8_t byte)
 {
-    //serial.write(byte);
+    serial.write(byte);
 }

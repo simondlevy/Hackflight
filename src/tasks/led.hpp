@@ -75,13 +75,16 @@ class LedTask {
 
                 if (!_imuTask->imuIsCalibrated()) {
                     blink(lastWakeTime, IMU_CALIBRATION_HZ);
+                    DebugTask::setMessage(_debugTask, "calibrating");
                 }
 
                 else if (_armed) { 
                     device_set(true);
+                    DebugTask::setMessage(_debugTask, "armed");
                 }
                 else {
                     blink(lastWakeTime, HEARTBEAT_HZ);
+                    DebugTask::setMessage(_debugTask, "heartbeat");
                 }
 
             }

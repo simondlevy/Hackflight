@@ -43,6 +43,6 @@ bool OpticalFlowTask::device_init()
 void OpticalFlowTask::device_read(
         int16_t & dx, int16_t & dy, bool &gotMotion)
 {
-    //pmw3901.readMotion(dx, dy, gotMotion);
+    pmw3901.readMotion(dx, dy, gotMotion);
 
 }
