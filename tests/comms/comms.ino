@@ -17,8 +17,8 @@
 
 #include <bootloader.hpp>
 
-static const uint8_t RX_PIN = 5;
-static const uint8_t TX_PIN = 6;
+static const uint8_t RX_PIN = PA10;
+static const uint8_t TX_PIN = PA9;
 
 static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
