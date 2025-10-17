@@ -19,7 +19,7 @@
 
 #include <tasks/core.hpp>
 
-static const std::vector<uint8_t> MOTOR_PINS = {PB14, PB11, PC1, PB3};
+static const std::vector<uint8_t> MOTOR_PINS = {PB14, PB1, PC1, PB4};
 
 static auto motors = OneShot125(MOTOR_PINS);
 
