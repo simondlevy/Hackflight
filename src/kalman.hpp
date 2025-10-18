@@ -62,6 +62,9 @@
 
 #pragma once
 
+//#define TINYEKF_N 10
+//#include <tinyekf.hpp>
+
 #include <math3d.h>
 #include <outlierFilterTdoa.hpp>
 #include <datatypes.h>
@@ -328,20 +331,7 @@ class KalmanFilter {
             _state_vector[KC_STATE_D1] = 0;
             _state_vector[KC_STATE_D2] = 0;
 
-            // enforce symmetry of the covariance matrix, and ensure the values
-            // stay bounded
-            for (int i=0; i<KC_STATE_DIM; i++) {
-                for (int j=i; j<KC_STATE_DIM; j++) {
-                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i];
-                    if (isnan(p) || p > MAX_COVARIANCE) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
-                    } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
-                    } else {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
-                    }
-                }
-            }
+            enforceSymmetry();
 
             _isUpdated = false;
         }
@@ -602,6 +592,23 @@ class KalmanFilter {
             return &subSampler->subSample;
         }
 
+        void enforceSymmetry()
+        {
+            for (int i=0; i<KC_STATE_DIM; i++) {
+                for (int j=i; j<KC_STATE_DIM; j++) {
+                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i];
+                    if (isnan(p) || p > MAX_COVARIANCE) {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
+                    } else if ( i==j && p < MIN_COVARIANCE ) {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
+                    } else {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
+                    }
+                }
+            }
+
+        }
+
         void addProcessNoiseDt(float dt)
         {
             _Pmatrix[KC_STATE_X][KC_STATE_X] += 
@@ -635,18 +642,7 @@ class KalmanFilter {
             _Pmatrix[KC_STATE_D2][KC_STATE_D2] += 
                 powf(MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT, 2);
 
-            for (int i=0; i<KC_STATE_DIM; i++) {
-                for (int j=i; j<KC_STATE_DIM; j++) {
-                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i];
-                    if (isnan(p) || p > MAX_COVARIANCE) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
-                    } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
-                    } else {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
-                    }
-                }
-            }
+            enforceSymmetry();
         }
 
         void predictDt(
