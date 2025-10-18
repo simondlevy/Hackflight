@@ -72,10 +72,18 @@ class KalmanFilter {
     public:
 
         typedef enum {
-            MeasurementTypeAcceleration,
-            MeasurementTypeGyroscope,
+            MeasurementTypeTDOA,
+            MeasurementTypePosition,
+            MeasurementTypePose,
+            MeasurementTypeDistance,
             MeasurementTypeTOF,
+            MeasurementTypeAbsoluteHeight,
             MeasurementTypeFlow,
+            MeasurementTypeYawError,
+            MeasurementTypeSweepAngle,
+            MeasurementTypeGyroscope,
+            MeasurementTypeAcceleration,
+            MeasurementTypeBarometer,
         } MeasurementType;
 
         typedef struct
@@ -83,10 +91,18 @@ class KalmanFilter {
             MeasurementType type;
             union
             {
+                tdoaMeasurement_t tdoa;
+                positionMeasurement_t position;
+                poseMeasurement_t pose;
+                distanceMeasurement_t distance;
+                tofMeasurement_t tof;
+                heightMeasurement_t height;
+                flowMeasurement_t flow;
+                yawErrorMeasurement_t yawError;
+                sweepAngleMeasurement_t sweepAngle;
                 gyroscopeMeasurement_t gyroscope;
                 accelerationMeasurement_t acceleration;
-                tofMeasurement_t tof;
-                flowMeasurement_t flow;
+                barometerMeasurement_t barometer;
             } data;
         } measurement_t;
 
@@ -135,6 +151,8 @@ class KalmanFilter {
             __attribute__((aligned(4))) float P[KC_STATE_DIM][KC_STATE_DIM];
             matrix_t Pm;
 
+            float baroReferenceHeight;
+
             // Quaternion used for initial orientation [w,x,y,z]
             float initialQuaternion[4];
 
@@ -162,6 +180,7 @@ class KalmanFilter {
             _params.procNoiseVel = 0;
             _params.procNoisePos = 0;
             _params.procNoiseAtt = 0;
+            _params.measNoiseBaro = 2.0f;           // meters
             _params.measNoiseGyro_rollpitch = 0.1f; // radians per second
             _params.measNoiseGyro_yaw = 0.1f;       // radians per second
 
@@ -245,6 +264,8 @@ class KalmanFilter {
             _kalmanData.Pm.numRows = KC_STATE_DIM;
             _kalmanData.Pm.numCols = KC_STATE_DIM;
             _kalmanData.Pm.pData = (float*)_kalmanData.P;
+
+            _kalmanData.baroReferenceHeight = 0.0;
 
             _kalmanData.isUpdated = false;
             _kalmanData.lastPredictionMs = nowMs;
@@ -446,22 +467,36 @@ class KalmanFilter {
         {
             switch (m.type) {
 
+                case MeasurementTypeTDOA:
+                    updateWithTdoa(&m.data.tdoa, nowMs);
+                    break;
+                case MeasurementTypePosition:
+                    updateWithPosition(&m.data.position);
+                    break;
+                case MeasurementTypePose:
+                    updateWithPose(&m.data.pose);
+                    break;
+                case MeasurementTypeDistance:
+                    updateWithDistance(&m.data.distance);
+                    break;
                 case MeasurementTypeTOF:
                     updateWithTof(&m.data.tof);
                     break;
-
+                case MeasurementTypeAbsoluteHeight:
+                    updateWithAbsoluteHeight(&m.data.height);
+                    break;
                 case MeasurementTypeFlow:
                     updateWithFlow(&m.data.flow);
                     break;
-
+                case MeasurementTypeYawError:
+                    updateWithYawError(&m.data.yawError);
+                    break;
                 case MeasurementTypeGyroscope:
                     updateWithGyro(m);
                     break;
-
                 case MeasurementTypeAcceleration:
                     updateWithAccel(m);
                     break;
-
                 default:
                     break;
             }
@@ -492,6 +527,15 @@ class KalmanFilter {
         {
             for (int i = 0; i < 3; i++) {
 
+                if (MAX_POSITITON > 0.0f) {
+
+                    if (_kalmanData.S[KC_STATE_X + i] > MAX_POSITITON) {
+                        return false;
+                    } else if (_kalmanData.S[KC_STATE_X + i] < -MAX_POSITITON) {
+                        return false;
+                    }
+                }
+
                 if (MAX_VELOCITY > 0.0f) {
                     if (_kalmanData.S[KC_STATE_PX + i] > MAX_VELOCITY) {
                         return false;
@@ -502,6 +546,14 @@ class KalmanFilter {
             }
 
             return true;
+        }
+
+        void updateWithQuaternion(const quaternion_t & quat)
+        {
+            _kalmanData.q[0] = quat.w;
+            _kalmanData.q[1] = quat.x;
+            _kalmanData.q[2] = quat.y;
+            _kalmanData.q[3] = quat.z;
         }
 
         void getVehicleState(vehicleState_t & state)
@@ -561,6 +613,7 @@ class KalmanFilter {
         static constexpr float MIN_COVARIANCE = 1e-6;
 
         // The bounds on states, these shouldn't be hit...
+        static constexpr float MAX_POSITITON = 100; //meters
         static constexpr float MAX_VELOCITY = 10; //meters per second
 
         // Small number epsilon, to prevent dividing by zero
@@ -568,6 +621,11 @@ class KalmanFilter {
 
         // the reversion of pitch and roll to zero
         static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
+
+        static const int MAX_ITER = 2;
+
+        static constexpr float UPPER_BOUND = 100;
+        static constexpr float LOWER_BOUND = -100;
 
         typedef struct {
             Axis3f sum;
@@ -594,6 +652,7 @@ class KalmanFilter {
             float procNoiseVel;
             float procNoisePos;
             float procNoiseAtt;
+            float measNoiseBaro;           // meters
             float measNoiseGyro_rollpitch; // radians per second
             float measNoiseGyro_yaw;       // radians per second
 
@@ -659,6 +718,20 @@ class KalmanFilter {
             }
 
             return &subSampler->subSample;
+        }
+
+        static void GM_UWB(float e, float * GM_e)
+        {
+            float sigma = 2.0;
+            float GM_dn = sigma + e*e;
+            *GM_e = (sigma * sigma)/(GM_dn * GM_dn);
+        }
+
+        static void GM_state(float e, float * GM_e)
+        {
+            float sigma = 1.5;
+            float GM_dn = sigma + e*e;
+            *GM_e = (sigma * sigma)/(GM_dn * GM_dn);
         }
 
         void addProcessNoiseDt(float dt)
@@ -1100,6 +1173,48 @@ class KalmanFilter {
             _kalmanData.isUpdated = true;
         }
 
+        // Measurement model where the measurement is the absolute height
+        void updateWithAbsoluteHeight(heightMeasurement_t* height) 
+        {
+            float h[KC_STATE_DIM] = {};
+            matrix_t H = {1, KC_STATE_DIM, h};
+            h[KC_STATE_Z] = 1;
+            scalarUpdate(
+                    &H, height->height - _kalmanData.S[KC_STATE_Z], height->stdDev);
+        }
+
+        // Measurement model where the measurement is the distance to a known
+        // point in space
+        void updateWithDistance(distanceMeasurement_t* d) 
+        {
+            // a measurement of distance to point (x, y, z)
+            float h[KC_STATE_DIM] = {};
+            matrix_t H = {1, KC_STATE_DIM, h};
+
+            float dx = _kalmanData.S[KC_STATE_X] - d->x;
+            float dy = _kalmanData.S[KC_STATE_Y] - d->y;
+            float dz = _kalmanData.S[KC_STATE_Z] - d->z;
+
+            float measuredDistance = d->distance;
+
+            float predictedDistance = device_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+            if (predictedDistance != 0.0f) {
+
+                // The measurement is: z = sqrt(dx^2 + dy^2 + dz^2). The
+                // derivative dz/dX gives h.
+                h[KC_STATE_X] = dx/predictedDistance;
+                h[KC_STATE_Y] = dy/predictedDistance;
+                h[KC_STATE_Z] = dz/predictedDistance;
+            } else {
+                // Avoid divide by zero
+                h[KC_STATE_X] = 1.0f;
+                h[KC_STATE_Y] = 0.0f;
+                h[KC_STATE_Z] = 0.0f;
+            }
+
+            scalarUpdate(&H, measuredDistance-predictedDistance, d->stdDev);
+        }
+
         void updateWithFlow(const flowMeasurement_t *flow) 
         {
             const Axis3f *gyro = &_gyroLatest;
@@ -1183,6 +1298,118 @@ class KalmanFilter {
                     &Hy, (_measuredNY-_predictedNY), flow->stdDevY*FLOW_RESOLUTION);
         }
 
+        void updateWithPose(poseMeasurement_t *pose)
+        {
+            // a direct measurement of states x, y, and z, and orientation do a
+            // scalar update for each state, since this should be faster than
+            // updating all together
+            for (int i=0; i<3; i++) {
+                float h[KC_STATE_DIM] = {};
+                matrix_t H = {1, KC_STATE_DIM, h};
+                h[KC_STATE_X+i] = 1;
+                scalarUpdate(
+                        &H, pose->pos[i] - _kalmanData.S[KC_STATE_X+i], pose->stdDevPos);
+            }
+
+            // compute orientation error
+            const quat_t q_ekf = 
+                mkquat(
+                        _kalmanData.q[1], 
+                        _kalmanData.q[2], 
+                        _kalmanData.q[3], 
+                        _kalmanData.q[0]);
+            const quat_t q_measured = 
+                mkquat(pose->quat.x, pose->quat.y, pose->quat.z, pose->quat.w);
+            const quat_t q_residual = qqmul(qinv(q_ekf), q_measured);
+
+            // small angle approximation, see eq. 141 in
+            // http://mars.cs.umn.edu/tr/reports/Trawny05b.pdf
+            struct vec const err_quat = 
+                vscl(2.0f / q_residual.w, quatimagpart(q_residual));
+
+            // do a scalar update for each state
+            {
+                float h[KC_STATE_DIM] = {};
+                matrix_t H = {1, KC_STATE_DIM, h};
+                h[KC_STATE_D0] = 1;
+                scalarUpdate(&H, err_quat.x, pose->stdDevQuat);
+                h[KC_STATE_D0] = 0;
+
+                h[KC_STATE_D1] = 1;
+                scalarUpdate(&H, err_quat.y, pose->stdDevQuat);
+                h[KC_STATE_D1] = 0;
+
+                h[KC_STATE_D2] = 1;
+                scalarUpdate(&H, err_quat.z, pose->stdDevQuat);
+            }
+        }
+
+        void updateWithPosition(positionMeasurement_t *xyz)
+        {
+            // a direct measurement of states x, y, and z do a scalar update
+            // for each state, since this should be faster than updating all
+            // together
+            for (int i=0; i<3; i++) {
+                float h[KC_STATE_DIM] = {};
+                matrix_t H = {1, KC_STATE_DIM, h};
+                h[KC_STATE_X+i] = 1;
+                scalarUpdate(&H, xyz->pos[i] -
+                        _kalmanData.S[KC_STATE_X+i], xyz->stdDev); 
+            }
+        }
+
+        void updateWithTdoa( tdoaMeasurement_t *tdoa, const uint32_t nowMs)
+        {
+            /**
+             * Measurement equation:
+             * dR = dT + d1 - d0
+             */
+
+            float measurement = tdoa->distanceDiff;
+
+            // predict based on current state
+            float x = _kalmanData.S[KC_STATE_X];
+            float y = _kalmanData.S[KC_STATE_Y];
+            float z = _kalmanData.S[KC_STATE_Z];
+
+            float x1 = tdoa->anchorPositions[1].x;
+            float y1 = tdoa->anchorPositions[1].y; 
+            float z1 = tdoa->anchorPositions[1].z;
+            float x0 = tdoa->anchorPositions[0].x;
+            float y0 = tdoa->anchorPositions[0].y;
+            float z0 = tdoa->anchorPositions[0].z;
+
+            float dx1 = x - x1;
+            float dy1 = y - y1;
+            float dz1 = z - z1;
+
+            float dy0 = y - y0;
+            float dx0 = x - x0;
+            float dz0 = z - z0;
+
+            float d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
+            float d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
+
+            float predicted = d1 - d0;
+            float error = measurement - predicted;
+
+            float h[KC_STATE_DIM] = {};
+            matrix_t H = {1, KC_STATE_DIM, h};
+
+            if ((d0 != 0.0f) && (d1 != 0.0f)) {
+                h[KC_STATE_X] = (dx1 / d1 - dx0 / d0);
+                h[KC_STATE_Y] = (dy1 / d1 - dy0 / d0);
+                h[KC_STATE_Z] = (dz1 / d1 - dz0 / d0);
+
+                bool sampleIsGood = 
+                    _outlierFilterTdoa.validateIntegrator(tdoa, error, nowMs);
+
+                if (sampleIsGood) {
+                    scalarUpdate(&H, error, tdoa->stdDev);
+                }
+            }
+        }
+
         void updateWithTof(tofMeasurement_t *tof)
         {
             // Updates the filter with a measured distance in the zb direction using the
@@ -1225,6 +1452,15 @@ class KalmanFilter {
                 scalarUpdate(
                         &H, measuredDistance-predictedDistance, tof->stdDev);
             }
+        }
+
+        void updateWithYawError(yawErrorMeasurement_t *error)
+        {
+            float h[KC_STATE_DIM] = {};
+            matrix_t H = {1, KC_STATE_DIM, h};
+
+            h[KC_STATE_D2] = 1;
+            scalarUpdate(&H, _kalmanData.S[KC_STATE_D2] - error->yawError, error->stdDev); 
         }
 
         void updateWithAccel(measurement_t & m)
