@@ -39,8 +39,6 @@ class EstimatorTask {
 
             _dataMutex = xSemaphoreCreateMutexStatic(&_dataMutexBuffer);
 
-            _kalmanFilter.setDefaultParams();
-
             _measurementsQueue = xQueueCreateStatic(
                     QUEUE_LENGTH, 
                     QUEUE_ITEM_SIZE,

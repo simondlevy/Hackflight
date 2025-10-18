@@ -147,36 +147,6 @@ class KalmanFilter {
 
         } kalmanCoreData_t;
 
-        void setDefaultParams(void)
-        {
-            // Initial variances, uncertain of position, but know we're
-            // stationary and roughly flat
-            _params.stdDevInitialPosition_xy = 100;
-            _params.stdDevInitialPosition_z = 1;
-            _params.stdDevInitialVelocity = 0.01;
-            _params.stdDevInitialAttitude_rollpitch = 0.01;
-            _params.stdDevInitialAttitude_yaw = 0.01;
-
-            _params.procNoiseAcc_xy = 0.5f;
-            _params.procNoiseAcc_z = 1.0f;
-            _params.procNoiseVel = 0;
-            _params.procNoisePos = 0;
-            _params.procNoiseAtt = 0;
-            _params.measNoiseGyro_rollpitch = 0.1f; // radians per second
-            _params.measNoiseGyro_yaw = 0.1f;       // radians per second
-
-            _params.initialX = 0.0;
-            _params.initialY = 0.0;
-            _params.initialZ = 0.0;
-
-            // Initial yaw of the Crazyflie in radians.
-            // 0 --- facing positive X
-            // PI / 2 --- facing positive Y
-            // PI --- facing negative X
-            // 3 * PI / 2 --- facing negative Y
-            _params.initialYaw = 0.0;
-        }
-
         void init(const uint32_t nowMs)
         {
             axis3fSubSamplerInit(&_accSubSampler, GRAVITY_MAGNITUDE);
@@ -187,15 +157,15 @@ class KalmanFilter {
             // Reset all data to 0 (like upon system reset)
             memset(&_kalmanData, 0, sizeof(kalmanCoreData_t));
 
-            _kalmanData.S[KC_STATE_X] = _params.initialX;
-            _kalmanData.S[KC_STATE_Y] = _params.initialY;
-            _kalmanData.S[KC_STATE_Z] = _params.initialZ;
+            _kalmanData.S[KC_STATE_X] = 0;
+            _kalmanData.S[KC_STATE_Y] = 0;
+            _kalmanData.S[KC_STATE_Z] = 0;
 
             // reset the attitude quaternion
-            _kalmanData.initialQuaternion[0] = device_cos(_params.initialYaw / 2);
-            _kalmanData.initialQuaternion[1] = 0.0;
-            _kalmanData.initialQuaternion[2] = 0.0;
-            _kalmanData.initialQuaternion[3] = device_sin(_params.initialYaw / 2);
+            _kalmanData.initialQuaternion[0] = 1;
+            _kalmanData.initialQuaternion[1] = 0;
+            _kalmanData.initialQuaternion[2] = 0;
+            _kalmanData.initialQuaternion[3] = 0;
 
             for (int i = 0; i < 4; i++) { 
                 _kalmanData.q[i] = _kalmanData.initialQuaternion[i]; 
@@ -222,25 +192,25 @@ class KalmanFilter {
 
             // initialize state variances
             _kalmanData.P[KC_STATE_X][KC_STATE_X] = 
-                powf(_params.stdDevInitialPosition_xy, 2);
+                powf(STDEV_INITIAL_POSITION_XY, 2);
             _kalmanData.P[KC_STATE_Y][KC_STATE_Y] = 
-                powf(_params.stdDevInitialPosition_xy, 2);
+                powf(STDEV_INITIAL_POSITION_XY, 2);
             _kalmanData.P[KC_STATE_Z][KC_STATE_Z] = 
-                powf(_params.stdDevInitialPosition_z, 2);
+                powf(STDEV_INITIAL_POSITION_Z, 2);
 
             _kalmanData.P[KC_STATE_PX][KC_STATE_PX] = 
-                powf(_params.stdDevInitialVelocity, 2);
+                powf(STDEV_INITIAL_VELOCITY, 2);
             _kalmanData.P[KC_STATE_PY][KC_STATE_PY] = 
-                powf(_params.stdDevInitialVelocity, 2);
+                powf(STDEV_INITIAL_VELOCITY, 2);
             _kalmanData.P[KC_STATE_PZ][KC_STATE_PZ] = 
-                powf(_params.stdDevInitialVelocity, 2);
+                powf(STDEV_INITIAL_VELOCITY, 2);
 
             _kalmanData.P[KC_STATE_D0][KC_STATE_D0] = 
-                powf(_params.stdDevInitialAttitude_rollpitch, 2);
+                powf(STDEV_INITIAL_ATTITUDE_ROLLPITCH, 2);
             _kalmanData.P[KC_STATE_D1][KC_STATE_D1] = 
-                powf(_params.stdDevInitialAttitude_rollpitch, 2);
+                powf(STDEV_INITIAL_ATTITUDE_ROLLPITCH, 2);
             _kalmanData.P[KC_STATE_D2][KC_STATE_D2] = 
-                powf(_params.stdDevInitialAttitude_yaw, 2);
+                powf(STDEV_INITIAL_ATTITUDE_YAW, 2);
 
             _kalmanData.Pm.numRows = KC_STATE_DIM;
             _kalmanData.Pm.numCols = KC_STATE_DIM;
@@ -509,15 +479,15 @@ class KalmanFilter {
             state.x = _kalmanData.S[KC_STATE_X];
 
             state.dx = _kalmanData.R[0][0]*_kalmanData.S[KC_STATE_PX] + 
-                    _kalmanData.R[0][1]*_kalmanData.S[KC_STATE_PY] + 
-                    _kalmanData.R[0][2]*_kalmanData.S[KC_STATE_PZ];
+                _kalmanData.R[0][1]*_kalmanData.S[KC_STATE_PY] + 
+                _kalmanData.R[0][2]*_kalmanData.S[KC_STATE_PZ];
 
             state.y = _kalmanData.S[KC_STATE_Y];
 
             // Negate for rightward positive
             state.dy = -(_kalmanData.R[1][0]*_kalmanData.S[KC_STATE_PX] + 
-                        _kalmanData.R[1][1]*_kalmanData.S[KC_STATE_PY] + 
-                        _kalmanData.R[1][2]*_kalmanData.S[KC_STATE_PZ]);
+                    _kalmanData.R[1][1]*_kalmanData.S[KC_STATE_PY] + 
+                    _kalmanData.R[1][2]*_kalmanData.S[KC_STATE_PZ]);
 
             state.z = _kalmanData.S[KC_STATE_Z];
 
@@ -535,7 +505,7 @@ class KalmanFilter {
 
             state.theta = RADIANS_TO_DEGREES * 
                 asinf(-2*(_kalmanData.q[1]*_kalmanData.q[3] -
-                        _kalmanData.q[0]*_kalmanData.q[2]));
+                            _kalmanData.q[0]*_kalmanData.q[2]));
 
             state.psi = -RADIANS_TO_DEGREES *   // negate for nose-right positive
                 atan2f(2*(_kalmanData.q[1]*_kalmanData.q[2]+_kalmanData.q[0]*
@@ -547,6 +517,22 @@ class KalmanFilter {
         }
 
     private:
+
+        // Initial variances, uncertain of position, but know we're
+        // stationary and roughly flat
+        static constexpr float STDEV_INITIAL_POSITION_XY = 100;
+        static constexpr float STDEV_INITIAL_POSITION_Z = 1;
+        static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
+        static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
+        static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
+
+        static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
+        static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
+        static constexpr float PROC_NOISE_VEL = 0;
+        static constexpr float PROC_NOISE_POS = 0;
+        static constexpr float PROC_NOISE_ATT = 0;
+        static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
+        static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
 
         static constexpr float GRAVITY_MAGNITUDE = 9.81;
 
@@ -576,41 +562,6 @@ class KalmanFilter {
 
             Axis3f subSample;
         } Axis3fSubSampler_t;
-
-
-        // The parameters used by the filter
-        typedef struct {
-
-            // Initial variances, uncertain of position, but know we're stationary and
-            // roughly flat
-            float stdDevInitialPosition_xy;
-            float stdDevInitialPosition_z;
-            float stdDevInitialVelocity;
-            float stdDevInitialAttitude_rollpitch;
-            float stdDevInitialAttitude_yaw;
-
-            float procNoiseAcc_xy;
-            float procNoiseAcc_z;
-            float procNoiseVel;
-            float procNoisePos;
-            float procNoiseAtt;
-            float measNoiseGyro_rollpitch; // radians per second
-            float measNoiseGyro_yaw;       // radians per second
-
-            float initialX;
-            float initialY;
-            float initialZ;
-
-            // Initial yaw of the Crazyflie in radians.
-            // 0 --- facing positive X
-            // PI / 2 --- facing positive Y
-            // PI --- facing negative X
-            // 3 * PI / 2 --- facing negative Y
-            float initialYaw;
-
-        } params_t;
-
-        params_t _params;
 
         kalmanCoreData_t _kalmanData;
 
@@ -664,35 +615,35 @@ class KalmanFilter {
         void addProcessNoiseDt(float dt)
         {
             _kalmanData.P[KC_STATE_X][KC_STATE_X] += 
-                powf(_params.procNoiseAcc_xy*dt*dt + _params.procNoiseVel*dt + 
-                        _params.procNoisePos, 2);  // add process noise on position
+                powf(PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + 
+                        PROC_NOISE_POS, 2);  // add process noise on position
 
             _kalmanData.P[KC_STATE_Y][KC_STATE_Y] += 
-                powf(_params.procNoiseAcc_xy*dt*dt + _params.procNoiseVel*dt + 
-                        _params.procNoisePos, 2);  // add process noise on position
+                powf(PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + 
+                        PROC_NOISE_POS, 2);  // add process noise on position
 
             _kalmanData.P[KC_STATE_Z][KC_STATE_Z] += 
-                powf(_params.procNoiseAcc_z*dt*dt + _params.procNoiseVel*dt + 
-                        _params.procNoisePos, 2);  // add process noise on position
+                powf(PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + 
+                        PROC_NOISE_POS, 2);  // add process noise on position
 
             _kalmanData.P[KC_STATE_PX][KC_STATE_PX] += 
-                powf(_params.procNoiseAcc_xy*dt + 
-                        _params.procNoiseVel, 2); // add process noise on velocity
+                powf(PROC_NOISE_ACCEL_XY*dt + 
+                        PROC_NOISE_VEL, 2); // add process noise on velocity
 
             _kalmanData.P[KC_STATE_PY][KC_STATE_PY] += 
-                powf(_params.procNoiseAcc_xy*dt + 
-                        _params.procNoiseVel, 2); // add process noise on velocity
+                powf(PROC_NOISE_ACCEL_XY*dt + 
+                        PROC_NOISE_VEL, 2); // add process noise on velocity
 
             _kalmanData.P[KC_STATE_PZ][KC_STATE_PZ] += 
-                powf(_params.procNoiseAcc_z*dt + 
-                        _params.procNoiseVel, 2); // add process noise on velocity
+                powf(PROC_NOISE_ACCEL_Z*dt + 
+                        PROC_NOISE_VEL, 2); // add process noise on velocity
 
             _kalmanData.P[KC_STATE_D0][KC_STATE_D0] += 
-                powf(_params.measNoiseGyro_rollpitch * dt + _params.procNoiseAtt, 2);
+                powf(MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT, 2);
             _kalmanData.P[KC_STATE_D1][KC_STATE_D1] += 
-                powf(_params.measNoiseGyro_rollpitch * dt + _params.procNoiseAtt, 2);
+                powf(MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT, 2);
             _kalmanData.P[KC_STATE_D2][KC_STATE_D2] += 
-                powf(_params.measNoiseGyro_yaw * dt + _params.procNoiseAtt, 2);
+                powf(MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT, 2);
 
             for (int i=0; i<KC_STATE_DIM; i++) {
                 for (int j=i; j<KC_STATE_DIM; j++) {
@@ -858,12 +809,12 @@ class KalmanFilter {
             device_mat_mult(Am, &_kalmanData.Pm, tmpNN1m); // A P
             device_mat_trans(Am, tmpNN2m); // A'
             device_mat_mult(tmpNN1m, tmpNN2m, &_kalmanData.Pm); // A P A'
-            // Process noise is added after the return from the prediction step
+                                                                // Process noise is added after the return from the prediction step
 
-            // ====== PREDICTION STEP ======
-            // The prediction depends on whether we're on the ground, or in flight.
-            // When flying, the accelerometer directly measures thrust (hence is useless
-            // to estimate body angle while flying)
+                                                                // ====== PREDICTION STEP ======
+                                                                // The prediction depends on whether we're on the ground, or in flight.
+                                                                // When flying, the accelerometer directly measures thrust (hence is useless
+                                                                // to estimate body angle while flying)
 
             float dx, dy, dz;
             float tmpSPX, tmpSPY, tmpSPZ;
@@ -1111,10 +1062,10 @@ class KalmanFilter {
             // thankfully look to be symmetric
 
             float Npix = 35.0;                      // [pixels] (same in x and y)
-            //float thetapix = DEGREES_TO_RADIANS * 4.0f;     // [rad]    (same in x and y)
+                                                    //float thetapix = DEGREES_TO_RADIANS * 4.0f;     // [rad]    (same in x and y)
 
-            // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
-            // corresponding ground length
+                                                    // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
+                                                    // corresponding ground length
             float thetapix = 0.71674f;
 
             //~~~ Body rates ~~~
