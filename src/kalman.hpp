@@ -420,9 +420,6 @@ class KalmanFilter {
 
         void finalize(void)
         {
-            // Matrix to rotate the attitude covariances once updated
-            static float A[STATE_DIM][STATE_DIM];
-
             // Only finalize if data is updated
             if (! _isUpdated) {
                 return;
@@ -462,32 +459,6 @@ class KalmanFilter {
                 _quat[1] = tmpq1 / norm;
                 _quat[2] = tmpq2 / norm;
                 _quat[3] = tmpq3 / norm;
-
-                // the attitude error vector (v0,v1,v2) is small,
-                // so we use a first order approximation to d0 = tan(|v0|/2)*v0/|v0|
-                const float d0 = v0/2; 
-                const float d1 = v1/2; 
-                const float d2 = v2/2;
-
-                A[STATE_X][STATE_X] = 1;
-                A[STATE_Y][STATE_Y] = 1;
-                A[STATE_Z][STATE_Z] = 1;
-
-                A[STATE_VX][STATE_VX] = 1;
-                A[STATE_VY][STATE_VY] = 1;
-                A[STATE_VZ][STATE_VZ] = 1;
-
-                A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-                A[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
-
-                A[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-                A[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                A[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
-
-                A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-                A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-                A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
