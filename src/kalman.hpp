@@ -132,7 +132,8 @@ class KalmanFilter {
                 STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                 STDEV_INITIAL_ATTITUDE_YAW
             };
-            addCovarianceNoise(pinit);
+
+            _ekf.addCovarianceNoise(pinit);
 
             _isUpdated = false;
             _lastPredictionMs = nowMs;
@@ -386,7 +387,7 @@ class KalmanFilter {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                addCovarianceNoise(noise);
+                _ekf.addCovarianceNoise(noise);
                 enforceSymmetry();
                 _lastProcessNoiseUpdateMs = nowMs;
             }
@@ -827,13 +828,6 @@ class KalmanFilter {
             device_mat_trans(&Am, &tmpNN2m); // A'
             device_mat_mult(&tmpNN1m, &tmpNN2m, &_ekf.p_m); // A P A'
 
-        }
-
-        void addCovarianceNoise(const float * noise)
-        {
-            for (uint8_t k=0; k<STATE_DIM; ++k) {
-                _ekf.p[k][k] += noise[k] * noise[k];
-            }
         }
 
         void updateWithScalar(const float * h, const float error, const float stdMeasNoise)
