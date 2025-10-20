@@ -46,9 +46,6 @@
 #include <datatypes.h>
 #include <matrix_typedef.h>
 
-#define TINYEKF_N 9
-#include <tinyekf.hpp>
-
 class KalmanFilter { 
 
     private:
@@ -142,8 +139,6 @@ class KalmanFilter {
                 STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                 STDEV_INITIAL_ATTITUDE_YAW
             };
-
-            _tinyekf.init(pinit, MIN_COVARIANCE, MAX_COVARIANCE);
 
             // initialize state variances
             _Pmatrix[STATE_X][STATE_X] = 
@@ -327,8 +322,6 @@ class KalmanFilter {
 
             updateCovariance(A);
 
-            _tinyekf.updateCovariance(A);
-
             // Process noise is added after the return from the prediction step
             // ====== PREDICTION STEP ======
             // The prediction depends on whether we're on the ground, or in flight.
@@ -510,8 +503,6 @@ class KalmanFilter {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                _tinyekf.addProcessNoise(pnoise);
-
                 enforceSymmetry();
 
                 _lastProcessNoiseUpdateMs = nowMs;
@@ -629,8 +620,6 @@ class KalmanFilter {
                 A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 updateCovariance(A);
-
-                _tinyekf.updateCovariance(A);
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
@@ -782,8 +771,6 @@ class KalmanFilter {
             Axis3f subSample;
         } Axis3fSubSampler_t;
 
-        TinyEkf _tinyekf;
-
         // The covariance matrix
         __attribute__((aligned(4))) float _Pmatrix[STATE_DIM][STATE_DIM];
         matrix_t _Pmatrix_m;
@@ -883,10 +870,7 @@ class KalmanFilter {
 
         }
 
-       void scalarUpdate(
-                matrix_t *Hm, 
-                float error, 
-                float stdMeasNoise)
+       void scalarUpdate(matrix_t *Hm, float error, float stdMeasNoise)
         {
             // The Kalman gain as a column vector
             static float K[STATE_DIM];
@@ -914,29 +898,29 @@ class KalmanFilter {
             static float PHTd[STATE_DIM * 1];
             static matrix_t PHTm = {STATE_DIM, 1, PHTd};
 
-            scalarUpdate(Hm, &HTm, &Km, PHTd,
-                    K, tmpNN1d, &PHTm, &tmpNN1m, &tmpNN2m, &tmpNN3m, 
+            scalarUpdate(Hm, HTm, Km, PHTd,
+                    K, tmpNN1d, PHTm, tmpNN1m, tmpNN2m, tmpNN3m, 
                     error, stdMeasNoise);
         }
 
         void scalarUpdate(
-                matrix_t *Hm, 
-                matrix_t *HTm, 
-                matrix_t *Km, 
+                matrix_t * Hm, 
+                matrix_t & HTm, 
+                matrix_t & Km, 
                 float * PHTd, 
                 float * K, 
                 float * tmpNN1d, 
-                matrix_t *PHTm, 
-                matrix_t *tmpNN1m, 
-                matrix_t *tmpNN2m, 
-                matrix_t *tmpNN3m, 
+                matrix_t & PHTm, 
+                matrix_t & tmpNN1m, 
+                matrix_t & tmpNN2m, 
+                matrix_t & tmpNN3m, 
                 float error, 
                 float stdMeasNoise)
         {
             // ====== INNOVATION COVARIANCE ======
 
-            device_mat_trans(Hm, HTm);
-            device_mat_mult(&_Pmatrix_m, HTm, PHTm); // PH'
+            device_mat_trans(Hm, &HTm);
+            device_mat_mult(&_Pmatrix_m, &HTm, &PHTm); // PH'
             float R = stdMeasNoise*stdMeasNoise;
             float HPHR = R; // HPH' + R
             for (int i=0; i<STATE_DIM; i++) { 
@@ -956,13 +940,13 @@ class KalmanFilter {
 
 
             // ====== COVARIANCE UPDATE ======
-            device_mat_mult(Km, Hm, tmpNN1m); // KH
+            device_mat_mult(&Km, Hm, &tmpNN1m); // KH
             for (int i=0; i<STATE_DIM; i++) { 
                 tmpNN1d[STATE_DIM*i+i] -= 1; 
             } // KH - I
-            device_mat_trans(tmpNN1m, tmpNN2m); // (KH - I)'
-            device_mat_mult(tmpNN1m, &_Pmatrix_m, tmpNN3m); // (KH - I)*P
-            device_mat_mult(tmpNN3m, tmpNN2m, &_Pmatrix_m); // (KH - I)*P*(KH - I)'
+            device_mat_trans(&tmpNN1m, &tmpNN2m); // (KH - I)'
+            device_mat_mult(&tmpNN1m, &_Pmatrix_m, &tmpNN3m); // (KH - I)*P
+            device_mat_mult(&tmpNN3m, &tmpNN2m, &_Pmatrix_m); // (KH - I)*P*(KH - I)'
 
             // add the measurement variance and ensure boundedness and symmetry
             // TODO: Why would it hit these bounds? Needs to be investigated.
@@ -1038,7 +1022,6 @@ class KalmanFilter {
             // ~~~ X velocity prediction and update ~~~
             // predicts the number of accumulated pixels in the x-direction
             float hx[STATE_DIM] = {};
-            matrix_t Hx = {1, STATE_DIM, hx};
             _predictedNX = (flow->dt * Npix / thetapix ) * 
                 ((dx_g * _rotmat[2][2] / z_g) - omegay_b);
             _measuredNX = flow->dpixelx*FLOW_RESOLUTION;
@@ -1050,12 +1033,12 @@ class KalmanFilter {
                 (_rotmat[2][2] / z_g);
 
             //First update
+            matrix_t Hx = {1, STATE_DIM, hx};
             scalarUpdate(&Hx, (_measuredNX-_predictedNX), 
                     flow->stdDevX*FLOW_RESOLUTION);
 
             // ~~~ Y velocity prediction and update ~~~
             float hy[STATE_DIM] = {};
-            matrix_t Hy = {1, STATE_DIM, hy};
             _predictedNY = (flow->dt * Npix / thetapix ) * 
                 ((dy_g * _rotmat[2][2] / z_g) + omegax_b);
             _measuredNY = flow->dpixely*FLOW_RESOLUTION;
@@ -1066,6 +1049,7 @@ class KalmanFilter {
             hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_rotmat[2][2] / z_g);
 
             // Second update
+            matrix_t Hy = {1, STATE_DIM, hy};
             scalarUpdate(
                     &Hy, (_measuredNY-_predictedNY), flow->stdDevY*FLOW_RESOLUTION);
         }
