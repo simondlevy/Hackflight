@@ -111,9 +111,6 @@ class KalmanFilter {
                 _quat[i] = _initialQuaternion[i]; 
             }
 
-            // Set the initial rotation matrix to the identity. This only affects
-            // the first prediction step, since in the finalization, after shifting
-            // attitude errors into the attitude state, the rotation matrix is updated.
             for(int i=0; i<3; i++) { 
                 for(int j=0; j<3; j++) { 
                     _rotmat[i][j] = i==j ? 1 : 0; 
@@ -166,29 +163,6 @@ class KalmanFilter {
             // The linearized update matrix
             static float A[STATE_DIM][STATE_DIM];
 
-            /* Here we discretize (euler forward) and linearise the quadrocopter
-             * dynamics in order to push the covariance forward.
-             *
-             * QUADROCOPTER DYNAMICS (see paper):
-             *
-             * \dot{x} = R(I + [[d]])p
-             * \dot{p} = f/m * e3 - [[\omega]]p - g(I - [[d]])R^-1 e3 //drag negligible
-             * \dot{d} = \omega
-             *
-             * where [[.]] is the cross-product matrix of .
-             *       \omega are the gyro measurements
-             *       e3 is the column vector [0 0 1]'
-             *       I is the identity
-             *       R is the current attitude as a rotation matrix
-             *       f/m is the mass-normalized motor force (acceleration in the body's z 
-             direction)
-             *       g is gravity
-             *       x, p, d are the vehicle's states
-             * note that d (attitude error) is zero at the beginning of each iteration,
-             * since error information is incorporated into R after each Kalman update.
-             */
-
-            // ====== DYNAMICS LINEARIZATION ======
             // Initialize as the identity
             A[STATE_X][STATE_X] = 1;
             A[STATE_Y][STATE_Y] = 1;
@@ -263,29 +237,6 @@ class KalmanFilter {
             A[STATE_VY][STATE_D2] =  GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
             A[STATE_VZ][STATE_D2] =  0;
 
-
-            // attitude error from attitude error
-            /**
-             * At first glance, it may not be clear where the next values come from,
-             * since they do not appear directly in the dynamics. In this prediction
-             * step, we skip the step of first updating attitude-error, and then
-             * incorporating the
-             * new error into the current attitude (which requires a rotation of the
-             * attitude-error covariance). Instead, we directly update the body attitude,
-             * however still need to rotate the covariance, which is what you see below.
-             *
-             * This comes from a second order approximation to:
-             * Sigma_post = exps(-d) Sigma_pre exps(-d)'
-             *            ~ (I + [[-d]] + [[-d]]^2 / 2) Sigma_pre (I + [[-d]] + 
-             *             [[-d]]^2 / 2)'
-             * where d is the attitude error expressed as Rodriges parameters, ie. d0 =
-             * 1/2*gyro.x*dt under the assumption that d = [0,0,0] at the beginning of
-             * each prediction step and that gyro.x is constant over the sampling period
-             *
-             * As derived in "Covariance Correction Step for Kalman Filtering with an 
-             Attitude"
-             * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
-             */
             const float d0 = gyro->x*dt/2;
             const float d1 = gyro->y*dt/2;
             const float d2 = gyro->z*dt/2;
@@ -305,12 +256,6 @@ class KalmanFilter {
             updateCovariance(A);
 
             _ekf.updateCovariance(A);
-
-            // Process noise is added after the return from the prediction step
-            // ====== PREDICTION STEP ======
-            // The prediction depends on whether we're on the ground, or in flight.
-            // When flying, the accelerometer directly measures thrust (hence is useless
-            // to estimate body angle while flying)
 
             const float dt2 = dt * dt;
 
@@ -533,20 +478,6 @@ class KalmanFilter {
                 _quat[2] = tmpq2 / norm;
                 _quat[3] = tmpq3 / norm;
 
-                /** Rotate the covariance, since we've rotated the body
-                 *
-                 * This comes from a second order approximation to:
-                 * Sigma_post = exps(-d) Sigma_pre exps(-d)'
-                 *            ~ (I + [[-d]] + [[-d]]^2 / 2) 
-                 Sigma_pre (I + [[-d]] + [[-d]]^2 / 2)'
-                 * where d is the attitude error expressed as Rodriges parameters, ie. 
-                 d = tan(|v|/2)*v/|v|
-                 *
-                 * As derived in "Covariance Correction Step for Kalman Filtering with an 
-                 Attitude"
-                 * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
-                 */
-
                 // the attitude error vector (v0,v1,v2) is small,
                 // so we use a first order approximation to d0 = tan(|v0|/2)*v0/|v0|
                 const float d0 = v0/2; 
@@ -744,16 +675,6 @@ class KalmanFilter {
         float _measuredNX;
         float _measuredNY;
 
-        /**
-         * Vehicle State
-         *
-         * The internally-estimated state is:
-         * - X, Y, Z: the vehicle's position in the global frame
-         * - PX, PY, PZ: the vehicle's velocity in its body frame
-         * - D0, D1, D2: attitude error
-         *
-         * For more information, refer to the paper
-         */
         float _x[STATE_DIM];
 
         // The vehicle's attitude as a rotation matrix (used by the prediction,
@@ -802,12 +723,6 @@ class KalmanFilter {
         {
             const Axis3f *gyro = &_gyroLatest;
 
-            // Inclusion of flow measurements in the EKF done by two scalar updates
-
-            // ~~~ Camera constants ~~~
-            // The angle of aperture is guessed from the raw data register and
-            // thankfully look to be symmetric
-
             // [pixels] (same in x and y)
             float Npix = 35.0;                      
 
@@ -821,21 +736,6 @@ class KalmanFilter {
             // TODO check if this is feasible or if some filtering has to be done
             float omegax_b = gyro->x * DEGREES_TO_RADIANS;
             float omegay_b = gyro->y * DEGREES_TO_RADIANS;
-
-            // ~~~ Moves the body velocity into the global coordinate system ~~~
-            // [bar{x},bar{y},bar{z}]_G = R*[bar{x},bar{y},bar{z}]_B
-            //
-            // \dot{x}_G = (R^T*[dot{x}_B,dot{y}_B,dot{z}_B])\dot \hat{x}_G
-            // \dot{x}_G = (R^T*[dot{x}_B,dot{y}_B,dot{z}_B])\dot \hat{x}_G
-            //
-            // where \hat{} denotes a basis vector, \dot{} denotes a derivative and
-            // _G and _B refer to the global/body coordinate systems.
-
-            // Modification 1
-            //dx_g = R[0][0] * S[STATE_VX] + R[0][1] * S[STATE_VY] + R[0][2] * 
-            //  S[STATE_VZ];
-            //dy_g = R[1][0] * S[STATE_VX] + R[1][1] * S[STATE_VY] + R[1][2] * 
-            //  S[STATE_VZ];
 
 
             float dx_g = _x[STATE_VX];
@@ -862,11 +762,7 @@ class KalmanFilter {
                 (_rotmat[2][2] / z_g);
 
             //First update
-            matrix_t Hx = {1, STATE_DIM, hx};
-            updateWithScalar(Hx, (_measuredNX-_predictedNX), 
-                    flow->stdDevX*FLOW_RESOLUTION);
-
-            _ekf.updateWithScalar(Hx, (_measuredNX-_predictedNX), 
+            updateWithScalar(hx, (_measuredNX-_predictedNX), 
                     flow->stdDevX*FLOW_RESOLUTION);
 
             // ~~~ Y velocity prediction and update ~~~
@@ -881,11 +777,7 @@ class KalmanFilter {
             hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_rotmat[2][2] / z_g);
 
             // Second update
-            matrix_t Hy = {1, STATE_DIM, hy};
-            updateWithScalar(Hy, (_measuredNY-_predictedNY),
-                    flow->stdDevY*FLOW_RESOLUTION);
-
-            _ekf.updateWithScalar(Hy, (_measuredNY-_predictedNY),
+            updateWithScalar(hy, (_measuredNY-_predictedNY),
                     flow->stdDevY*FLOW_RESOLUTION);
         }
 
@@ -893,7 +785,6 @@ class KalmanFilter {
         {
             // Updates the filter with a measured distance in the zb direction using the
             float h[STATE_DIM] = {};
-            matrix_t H = {1, STATE_DIM, h};
 
             // Only update the filter if the measurement is reliable 
             // (\hat{h} -> infty when R[2][2] -> 0)
@@ -907,27 +798,11 @@ class KalmanFilter {
                 float predictedDistance = _x[STATE_Z] / cosf(angle);
                 float measuredDistance = tof->distance; // [m]
 
-
-                // The sensor model (Pg.95-96,
-                // https://lup.lub.lu.se/student-papers/search/publication/8905295)
-                //
-                // h = z/((R*z_b).z_b) = z/cos(alpha)
-                //
-                // Here,
-                // h (Measured variable)[m] = Distance given by TOF sensor. This is the 
-                // closest point from any surface to the sensor in the measurement cone
-                // z (Estimated variable)[m] = THe actual elevation of the crazyflie
-                // z_b = Basis vector in z direction of body coordinate system
-                // R = Rotation matrix made from ZYX Tait-Bryan angles. Assumed to be 
-                // stationary
-                // alpha = angle between [line made by measured point <---> sensor] 
-                // and [the intertial z-axis] 
-
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
                 h[STATE_Z] = 1 / cosf(angle); 
 
-                updateWithScalar(H, measuredDistance-predictedDistance, tof->stdDev);
+                updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
             }
         }
 
@@ -987,9 +862,10 @@ class KalmanFilter {
             }
         }
 
-        void updateWithScalar(
-                matrix_t & Hm, const float error, const float stdMeasNoise)
+        void updateWithScalar(const float * h, const float error, const float stdMeasNoise)
         {
+            matrix_t Hm = {1, STATE_DIM, (float *)h};
+
             // The Kalman gain as a column vector
             static float G[STATE_DIM];
             static matrix_t Gm = {STATE_DIM, 1, (float *)G};
@@ -1016,8 +892,6 @@ class KalmanFilter {
             static float PHTd[STATE_DIM * 1];
             static matrix_t PHTm = {STATE_DIM, 1, PHTd};
 
-            // ====== INNOVATION COVARIANCE ======
-
             device_mat_trans(&Hm, &HTm);
             device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
             float R = stdMeasNoise*stdMeasNoise;
@@ -1028,14 +902,12 @@ class KalmanFilter {
                 HPHR += Hm.pData[i]*PHTd[i]; 
             }
 
-            // ====== MEASUREMENT UPDATE ======
             // Calculate the Kalman gain and perform the state update
             for (int i=0; i<STATE_DIM; i++) {
                 G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 _x[i] = _x[i] + G[i] * error; // state update
             }
 
-            // ====== COVARIANCE UPDATE ======
             device_mat_mult(&Gm, &Hm, &tmpNN1m); // KH
             for (int i=0; i<STATE_DIM; i++) { 
                 tmpNN1d[STATE_DIM*i+i] -= 1; 
@@ -1045,7 +917,6 @@ class KalmanFilter {
             device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
 
             // add the measurement variance and ensure boundedness and symmetry
-            // TODO: Why would it hit these bounds? Needs to be investigated.
             for (int i=0; i<STATE_DIM; i++) {
                 for (int j=i; j<STATE_DIM; j++) {
                     float v = G[i] * R * G[j];
