@@ -243,7 +243,7 @@ class KalmanFilter {
             A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
             A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-            updateCovariance(A);
+            _ekf.updateCovariance(A);
 
             const float dt2 = dt * dt;
 
@@ -808,28 +808,6 @@ class KalmanFilter {
 
         uint32_t _lastPredictionMs;
         uint32_t _lastProcessNoiseUpdateMs;
-
-        void updateCovariance(const float A[STATE_DIM][STATE_DIM])
-        {
-            static __attribute__((aligned(4))) matrix_t Am = { 
-                STATE_DIM, STATE_DIM, (float *)A
-            };
-
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                STATE_DIM, STATE_DIM, tmpNN2d
-            };
-
-            device_mat_mult(&Am, &_ekf.p_m, &tmpNN1m); // A P
-            device_mat_trans(&Am, &tmpNN2m); // A'
-            device_mat_mult(&tmpNN1m, &tmpNN2m, &_ekf.p_m); // A P A'
-
-        }
 
         void updateWithScalar(const float * h, const float error, const float stdMeasNoise)
         {
