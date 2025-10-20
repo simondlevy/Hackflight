@@ -44,7 +44,6 @@
 #include <math3d.h>
 #include <outlierFilterTdoa.hpp>
 #include <datatypes.h>
-#include <matrix_typedef.h>
 
 #define EKF_N 9
 #include <ekf.hpp>
