@@ -810,12 +810,6 @@ class KalmanFilter {
         uint32_t _lastPredictionMs;
         uint32_t _lastProcessNoiseUpdateMs;
 
-        static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
-
-        static void device_mat_mult(
-                const matrix_t * pSrcA, const matrix_t * pSrcB,
-                matrix_t * pDst);
-
         static float device_cos(const float x);
 
         static float device_sin(const float x);

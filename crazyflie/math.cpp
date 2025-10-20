@@ -19,20 +19,6 @@
 
 #include <arm_math.h>
 
-void KalmanFilter::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
-{
-  arm_mat_trans_f32((arm_matrix_instance_f32 *)pSrc,
-          (arm_matrix_instance_f32 *)pDst);
-}
-
-void KalmanFilter::device_mat_mult(
-        const matrix_t * pSrcA, const matrix_t * pSrcB,
-        matrix_t * pDst) 
-{
-  arm_mat_mult_f32((arm_matrix_instance_f32 *)pSrcA, (arm_matrix_instance_f32 *)pSrcB,
-          (arm_matrix_instance_f32 *)pDst);
-}
-
 float KalmanFilter::device_cos(const float x)
 {
     return arm_cos_f32(x);
