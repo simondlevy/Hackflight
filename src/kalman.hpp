@@ -98,7 +98,7 @@ class KalmanFilter {
             _state_vector[STATE_Y] = 0;
             _state_vector[STATE_Z] = 0;
 
-            // reset the attitude quaternion
+            // Reset the attitude quaternion
             _initialQuaternion[0] = 1;
             _initialQuaternion[1] = 0;
             _initialQuaternion[2] = 0;
@@ -108,7 +108,7 @@ class KalmanFilter {
                 _quat[i] = _initialQuaternion[i]; 
             }
 
-            // then set the initial rotation matrix to the identity. This only affects
+            // Set the initial rotation matrix to the identity. This only affects
             // the first prediction step, since in the finalization, after shifting
             // attitude errors into the attitude state, the rotation matrix is updated.
             for(int i=0; i<3; i++) { 
@@ -117,16 +117,14 @@ class KalmanFilter {
                 }
             }
 
+            // Set the covariance matrix to zero
             for (int i=0; i< STATE_DIM; i++) {
-
                 for (int j=0; j < STATE_DIM; j++) {
-
-                    // set covariances to zero (diagonals will be changed from
-                    // zero in the next section)
                     _Pmatrix[i][j] = 0; 
                 }
             }
 
+            // Add in the initial process noise 
             const float pinit[STATE_DIM] = {
 
                 STDEV_INITIAL_POSITION_XY,
@@ -139,28 +137,7 @@ class KalmanFilter {
                 STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                 STDEV_INITIAL_ATTITUDE_YAW
             };
-
-            // initialize state variances
-            _Pmatrix[STATE_X][STATE_X] = 
-                powf(STDEV_INITIAL_POSITION_XY, 2);
-            _Pmatrix[STATE_Y][STATE_Y] = 
-                powf(STDEV_INITIAL_POSITION_XY, 2);
-            _Pmatrix[STATE_Z][STATE_Z] = 
-                powf(STDEV_INITIAL_POSITION_Z, 2);
-
-            _Pmatrix[STATE_VX][STATE_VX] = 
-                powf(STDEV_INITIAL_VELOCITY, 2);
-            _Pmatrix[STATE_VY][STATE_VY] = 
-                powf(STDEV_INITIAL_VELOCITY, 2);
-            _Pmatrix[STATE_VZ][STATE_VZ] = 
-                powf(STDEV_INITIAL_VELOCITY, 2);
-
-            _Pmatrix[STATE_D0][STATE_D0] = 
-                powf(STDEV_INITIAL_ATTITUDE_ROLLPITCH, 2);
-            _Pmatrix[STATE_D1][STATE_D1] = 
-                powf(STDEV_INITIAL_ATTITUDE_ROLLPITCH, 2);
-            _Pmatrix[STATE_D2][STATE_D2] = 
-                powf(STDEV_INITIAL_ATTITUDE_YAW, 2);
+            addCovarianceNoise(pinit);
 
             _Pmatrix_m.numRows = STATE_DIM;
             _Pmatrix_m.numCols = STATE_DIM;
@@ -457,41 +434,9 @@ class KalmanFilter {
         {
             float dt = (nowMs - _lastProcessNoiseUpdateMs) / 1000.0f;
 
-            if (dt > 0.0f) {
+            if (dt > 0) {
 
-                _Pmatrix[STATE_X][STATE_X] += 
-                    powf(PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + 
-                            PROC_NOISE_POS, 2);  // add process noise on position
-
-                _Pmatrix[STATE_Y][STATE_Y] += 
-                    powf(PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + 
-                            PROC_NOISE_POS, 2);  // add process noise on position
-
-                _Pmatrix[STATE_Z][STATE_Z] += 
-                    powf(PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + 
-                            PROC_NOISE_POS, 2);  // add process noise on position
-
-                _Pmatrix[STATE_VX][STATE_VX] += 
-                    powf(PROC_NOISE_ACCEL_XY*dt + 
-                            PROC_NOISE_VEL, 2); // add process noise on velocity
-
-                _Pmatrix[STATE_VY][STATE_VY] += 
-                    powf(PROC_NOISE_ACCEL_XY*dt + 
-                            PROC_NOISE_VEL, 2); // add process noise on velocity
-
-                _Pmatrix[STATE_VZ][STATE_VZ] += 
-                    powf(PROC_NOISE_ACCEL_Z*dt + 
-                            PROC_NOISE_VEL, 2); // add process noise on velocity
-
-                _Pmatrix[STATE_D0][STATE_D0] += 
-                    powf(MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT, 2);
-                _Pmatrix[STATE_D1][STATE_D1] += 
-                    powf(MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT, 2);
-                _Pmatrix[STATE_D2][STATE_D2] += 
-                    powf(MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT, 2);
-
-                const float pnoise[STATE_DIM] = {
-
+                const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                     PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
@@ -502,6 +447,8 @@ class KalmanFilter {
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
+
+                addCovarianceNoise(noise);
 
                 enforceSymmetry();
 
@@ -771,10 +718,6 @@ class KalmanFilter {
             Axis3f subSample;
         } Axis3fSubSampler_t;
 
-        // The covariance matrix
-        __attribute__((aligned(4))) float _Pmatrix[STATE_DIM][STATE_DIM];
-        matrix_t _Pmatrix_m;
-
         // Quaternion used for initial orientation [w,x,y,z]
         float _initialQuaternion[4];
 
@@ -870,7 +813,8 @@ class KalmanFilter {
 
         }
 
-       void scalarUpdate(matrix_t *Hm, float error, float stdMeasNoise)
+       void scalarUpdate(
+               matrix_t & Hm, const float error, const float stdMeasNoise)
         {
             // The Kalman gain as a column vector
             static float K[STATE_DIM];
@@ -900,7 +844,7 @@ class KalmanFilter {
         
             // ====== INNOVATION COVARIANCE ======
 
-            device_mat_trans(Hm, &HTm);
+            device_mat_trans(&Hm, &HTm);
             device_mat_mult(&_Pmatrix_m, &HTm, &PHTm); // PH'
             float R = stdMeasNoise*stdMeasNoise;
             float HPHR = R; // HPH' + R
@@ -909,7 +853,7 @@ class KalmanFilter {
                 // Add the element of HPH' to the above
 
                 // this obviously only works if the update is scalar (as in this function)
-                HPHR += Hm->pData[i]*PHTd[i]; 
+                HPHR += Hm.pData[i]*PHTd[i]; 
             }
 
             // ====== MEASUREMENT UPDATE ======
@@ -920,7 +864,7 @@ class KalmanFilter {
             }
 
             // ====== COVARIANCE UPDATE ======
-            device_mat_mult(&Km, Hm, &tmpNN1m); // KH
+            device_mat_mult(&Km, &Hm, &tmpNN1m); // KH
             for (int i=0; i<STATE_DIM; i++) { 
                 tmpNN1d[STATE_DIM*i+i] -= 1; 
             } // KH - I
@@ -1014,7 +958,7 @@ class KalmanFilter {
 
             //First update
             matrix_t Hx = {1, STATE_DIM, hx};
-            scalarUpdate(&Hx, (_measuredNX-_predictedNX), 
+            scalarUpdate(Hx, (_measuredNX-_predictedNX), 
                     flow->stdDevX*FLOW_RESOLUTION);
 
             // ~~~ Y velocity prediction and update ~~~
@@ -1030,8 +974,8 @@ class KalmanFilter {
 
             // Second update
             matrix_t Hy = {1, STATE_DIM, hy};
-            scalarUpdate(
-                    &Hy, (_measuredNY-_predictedNY), flow->stdDevY*FLOW_RESOLUTION);
+            scalarUpdate(Hy, (_measuredNY-_predictedNY),
+                    flow->stdDevY*FLOW_RESOLUTION);
         }
 
         void updateWithTof(tofMeasurement_t *tof)
@@ -1073,8 +1017,7 @@ class KalmanFilter {
                 h[STATE_Z] = 1 / cosf(angle); 
 
                 // Scalar update
-                scalarUpdate(
-                        &H, measuredDistance-predictedDistance, tof->stdDev);
+                scalarUpdate(H, measuredDistance-predictedDistance, tof->stdDev);
             }
         }
 
@@ -1089,6 +1032,12 @@ class KalmanFilter {
             axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.gyroscope.gyro);
             _gyroLatest = m.data.gyroscope.gyro;
         }
+
+        // Generic EKF stuff //////////////////////////////////////////////////
+
+        // The covariance matrix
+        __attribute__((aligned(4))) float _Pmatrix[STATE_DIM][STATE_DIM];
+        matrix_t _Pmatrix_m;
 
         void updateCovariance(const float A[STATE_DIM][STATE_DIM])
         {
@@ -1112,6 +1061,15 @@ class KalmanFilter {
             device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
 
         }
+
+        void addCovarianceNoise(const float * noise)
+        {
+            for (uint8_t k=0; k<STATE_DIM; ++k) {
+                _Pmatrix[k][k] += noise[k] * noise[k];
+            }
+        }
+
+        // Generic math stuff //////////////////////////////////////////////////
 
         static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
 
