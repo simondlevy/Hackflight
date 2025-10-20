@@ -570,20 +570,6 @@ class KalmanFilter {
         {
             // Matrix to rotate the attitude covariances once updated
             static float A[STATE_DIM][STATE_DIM];
-            static matrix_t Am = {
-                STATE_DIM, STATE_DIM, (float *)A
-            };
-
-            // Temporary matrices for the covariance updates
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN1m = {
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN2m = {
-                STATE_DIM, STATE_DIM, tmpNN2d
-            }; 
 
             // Only finalize if data is updated
             if (! _isUpdated) {
@@ -600,6 +586,7 @@ class KalmanFilter {
             if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
                         0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                             fabsf(v2) < 10)) {
+
                 const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
                 const float ca = device_cos(angle / 2.0f);
                 const float sa = device_sin(angle / 2.0f);
@@ -663,6 +650,21 @@ class KalmanFilter {
                 A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
                 A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
                 A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+
+                static matrix_t Am = {
+                    STATE_DIM, STATE_DIM, (float *)A
+                };
+
+                // Temporary matrices for the covariance updates
+                static float tmpNN1d[STATE_DIM * STATE_DIM];
+                static matrix_t tmpNN1m = {
+                    STATE_DIM, STATE_DIM, tmpNN1d
+                };
+
+                static float tmpNN2d[STATE_DIM * STATE_DIM];
+                static matrix_t tmpNN2m = {
+                    STATE_DIM, STATE_DIM, tmpNN2d
+                }; 
 
                 device_mat_trans(&Am, &tmpNN1m); // A'
                 device_mat_mult(&Am, &_Pmatrix_m, &tmpNN2m); // AP
