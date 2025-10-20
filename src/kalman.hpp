@@ -165,7 +165,7 @@ class KalmanFilter {
 
             const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
 
-            Axis3f * acc = &_accSubSampler.subSample;
+            Axis3f * accel = &_accSubSampler.subSample;
             Axis3f * gyro = &_gyroSubSampler.subSample;
 
             // The linearized update matrix
@@ -185,20 +185,20 @@ class KalmanFilter {
                 STATE_DIM, STATE_DIM, tmpNN2d
             };
 
-            predictDt(A, &Am, &tmpNN1m, &tmpNN2m, acc, gyro, dt, isFlying);
+            predictDt(A, Am, tmpNN1m, tmpNN2m, accel, gyro, dt, isFlying);
 
             _lastPredictionMs = nowMs;
         }
 
         void predictDt(
                 float A[STATE_DIM][STATE_DIM],
-                matrix_t * Am,
-                matrix_t * tmpNN1m,
-                matrix_t * tmpNN2m,
-                Axis3f *acc, 
-                Axis3f *gyro, 
-                float dt, 
-                bool isFlying)
+                matrix_t & Am,
+                matrix_t & tmpNN1m,
+                matrix_t & tmpNN2m,
+                Axis3f * accel, 
+                Axis3f * gyro, 
+                const float dt, 
+                const bool isFlying)
         {
             /* Here we discretize (euler forward) and linearise the quadrocopter
              * dynamics in order to push the covariance forward.
@@ -337,9 +337,9 @@ class KalmanFilter {
             A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
             // ====== COVARIANCE UPDATE ======
-            device_mat_mult(Am, &_Pmatrix_m, tmpNN1m); // A P
-            device_mat_trans(Am, tmpNN2m); // A'
-            device_mat_mult(tmpNN1m, tmpNN2m, &_Pmatrix_m); // A P A'
+            device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
+            device_mat_trans(&Am, &tmpNN2m); // A'
+            device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
 
             // Process noise is added after the return from the prediction step
             // ====== PREDICTION STEP ======
@@ -357,7 +357,7 @@ class KalmanFilter {
 
                 // Use accelerometer and not commanded thrust, as this has
                 // proper physical units
-                zacc = acc->z;
+                zacc = accel->z;
 
                 // position updates in the body frame (will be rotated to inertial frame)
                 dx = _state_vector[STATE_VX] * dt;
@@ -393,9 +393,9 @@ class KalmanFilter {
                 // accelerometer. This occurs, eg. in freefall or while being carried.
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                dx = _state_vector[STATE_VX] * dt + acc->x * dt2 / 2.0f;
-                dy = _state_vector[STATE_VY] * dt + acc->y * dt2 / 2.0f;
-                dz = _state_vector[STATE_VZ] * dt + acc->z * dt2 / 2.0f; 
+                dx = _state_vector[STATE_VX] * dt + accel->x * dt2 / 2.0f;
+                dy = _state_vector[STATE_VY] * dt + accel->y * dt2 / 2.0f;
+                dz = _state_vector[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
@@ -414,11 +414,11 @@ class KalmanFilter {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                _state_vector[STATE_VX] += dt * (acc->x + gyro->z * tmpSPY -
+                _state_vector[STATE_VX] += dt * (accel->x + gyro->z * tmpSPY -
                         gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
-                _state_vector[STATE_VY] += dt * (acc->y - gyro->z * tmpSPX + gyro->x * 
+                _state_vector[STATE_VY] += dt * (accel->y - gyro->z * tmpSPX + gyro->x * 
                         tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][1]);
-                _state_vector[STATE_VZ] += dt * (acc->z + gyro->y * tmpSPX - gyro->x * 
+                _state_vector[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * 
                         tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
             }
 
