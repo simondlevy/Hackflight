@@ -759,6 +759,8 @@ class KalmanFilter {
             // Second update
             updateWithScalar(hy, (_measuredNY-_predictedNY),
                     flow->stdDevY*FLOW_RESOLUTION);
+
+            _isUpdated = true;
         }
 
         void updateWithTof(tofMeasurement_t *tof)
@@ -783,6 +785,8 @@ class KalmanFilter {
                 h[STATE_Z] = 1 / cosf(angle); 
 
                 updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
+
+                _isUpdated = true;
             }
         }
 
@@ -879,8 +883,6 @@ class KalmanFilter {
                     }
                 }
             }
-
-            _isUpdated = true;
         }
 
         // Generic math stuff //////////////////////////////////////////////////
