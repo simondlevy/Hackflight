@@ -327,24 +327,7 @@ class KalmanFilter {
 
             //////////////////////////////////////////////////////////////////////////
 
-            static __attribute__((aligned(4))) matrix_t Am = { 
-                STATE_DIM, STATE_DIM, (float *)A
-            };
-
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                STATE_DIM, STATE_DIM, tmpNN2d
-            };
-
-
-            device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
-            device_mat_trans(&Am, &tmpNN2m); // A'
-            device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
+            updateCovariance(A);
 
             _tinyekf.updateCovariance(A);
 
@@ -651,23 +634,7 @@ class KalmanFilter {
 
                 //////////////////////////////////////////////////////////////////////////
 
-                static __attribute__((aligned(4))) matrix_t Am = { 
-                    STATE_DIM, STATE_DIM, (float *)A
-                };
-
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN1m = {
-                    STATE_DIM, STATE_DIM, tmpNN1d
-                };
-
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN2m = {
-                    STATE_DIM, STATE_DIM, tmpNN2d
-                }; 
-
-                device_mat_trans(&Am, &tmpNN1m); // A'
-                device_mat_mult(&Am, &_Pmatrix_m, &tmpNN2m); // AP
-                device_mat_mult(&tmpNN2m, &tmpNN1m, &_Pmatrix_m); //APA'
+                updateCovariance(A);
 
                 _tinyekf.updateCovariance(A);
 
@@ -1163,6 +1130,29 @@ class KalmanFilter {
         {
             axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.gyroscope.gyro);
             _gyroLatest = m.data.gyroscope.gyro;
+        }
+
+        void updateCovariance(const float A[STATE_DIM][STATE_DIM])
+        {
+            static __attribute__((aligned(4))) matrix_t Am = { 
+                STATE_DIM, STATE_DIM, (float *)A
+            };
+
+            static float tmpNN1d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
+                STATE_DIM, STATE_DIM, tmpNN1d
+            };
+
+            static float tmpNN2d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
+                STATE_DIM, STATE_DIM, tmpNN2d
+            };
+
+
+            device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
+            device_mat_trans(&Am, &tmpNN2m); // A'
+            device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
+
         }
 
         static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
