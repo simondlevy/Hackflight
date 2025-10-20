@@ -163,14 +163,318 @@ class KalmanFilter {
             axis3fSubSamplerFinalize(&_accSubSampler);
             axis3fSubSamplerFinalize(&_gyroSubSampler);
 
-            float dt = (nowMs - _lastPredictionMs) / 1000.0f;
+            const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
 
-            predictDt(&_accSubSampler.subSample, &_gyroSubSampler.subSample, dt,
-                    isFlying);
+            Axis3f * acc = &_accSubSampler.subSample;
+            Axis3f * gyro = &_gyroSubSampler.subSample;
+
+            // The linearized update matrix
+            static float A[STATE_DIM][STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t Am = { 
+                STATE_DIM, STATE_DIM, (float *)A
+            }; // linearized dynamics for covariance update;
+
+            // Temporary matrices for the covariance updates
+            static float tmpNN1d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
+                STATE_DIM, STATE_DIM, tmpNN1d
+            };
+
+            static float tmpNN2d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
+                STATE_DIM, STATE_DIM, tmpNN2d
+            };
+
+            predictDt(A, &Am, &tmpNN1m, &tmpNN2m, acc, gyro, dt, isFlying);
 
             _lastPredictionMs = nowMs;
         }
 
+        void predictDt(
+                float A[STATE_DIM][STATE_DIM],
+                matrix_t * Am,
+                matrix_t * tmpNN1m,
+                matrix_t * tmpNN2m,
+                Axis3f *acc, 
+                Axis3f *gyro, 
+                float dt, 
+                bool isFlying)
+        {
+            /* Here we discretize (euler forward) and linearise the quadrocopter
+             * dynamics in order to push the covariance forward.
+             *
+             * QUADROCOPTER DYNAMICS (see paper):
+             *
+             * \dot{x} = R(I + [[d]])p
+             * \dot{p} = f/m * e3 - [[\omega]]p - g(I - [[d]])R^-1 e3 //drag negligible
+             * \dot{d} = \omega
+             *
+             * where [[.]] is the cross-product matrix of .
+             *       \omega are the gyro measurements
+             *       e3 is the column vector [0 0 1]'
+             *       I is the identity
+             *       R is the current attitude as a rotation matrix
+             *       f/m is the mass-normalized motor force (acceleration in the body's z 
+             direction)
+             *       g is gravity
+             *       x, p, d are the vehicle's states
+             * note that d (attitude error) is zero at the beginning of each iteration,
+             * since error information is incorporated into R after each Kalman update.
+             */
+
+            // ====== DYNAMICS LINEARIZATION ======
+            // Initialize as the identity
+            A[STATE_X][STATE_X] = 1;
+            A[STATE_Y][STATE_Y] = 1;
+            A[STATE_Z][STATE_Z] = 1;
+
+            A[STATE_VX][STATE_VX] = 1;
+            A[STATE_VY][STATE_VY] = 1;
+            A[STATE_VZ][STATE_VZ] = 1;
+
+            A[STATE_D0][STATE_D0] = 1;
+            A[STATE_D1][STATE_D1] = 1;
+            A[STATE_D2][STATE_D2] = 1;
+
+            // position from body-frame velocity
+            A[STATE_X][STATE_VX] = _rotmat[0][0]*dt;
+            A[STATE_Y][STATE_VX] = _rotmat[1][0]*dt;
+            A[STATE_Z][STATE_VX] = _rotmat[2][0]*dt;
+
+            A[STATE_X][STATE_VY] = _rotmat[0][1]*dt;
+            A[STATE_Y][STATE_VY] = _rotmat[1][1]*dt;
+            A[STATE_Z][STATE_VY] = _rotmat[2][1]*dt;
+
+            A[STATE_X][STATE_VZ] = _rotmat[0][2]*dt;
+            A[STATE_Y][STATE_VZ] = _rotmat[1][2]*dt;
+            A[STATE_Z][STATE_VZ] = _rotmat[2][2]*dt;
+
+            // position from attitude error
+            A[STATE_X][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[0][2] - 
+                    _state_vector[STATE_VZ]*_rotmat[0][1])*dt;
+            A[STATE_Y][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[1][2] - 
+                    _state_vector[STATE_VZ]*_rotmat[1][1])*dt;
+            A[STATE_Z][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[2][2] - 
+                    _state_vector[STATE_VZ]*_rotmat[2][1])*dt;
+
+            A[STATE_X][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[0][2] + 
+                    _state_vector[STATE_VZ]*_rotmat[0][0])*dt;
+            A[STATE_Y][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[1][2] + 
+                    _state_vector[STATE_VZ]*_rotmat[1][0])*dt;
+            A[STATE_Z][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[2][2] + 
+                    _state_vector[STATE_VZ]*_rotmat[2][0])*dt;
+
+            A[STATE_X][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[0][1] - 
+                    _state_vector[STATE_VY]*_rotmat[0][0])*dt;
+            A[STATE_Y][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[1][1] - 
+                    _state_vector[STATE_VY]*_rotmat[1][0])*dt;
+            A[STATE_Z][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[2][1] - 
+                    _state_vector[STATE_VY]*_rotmat[2][0])*dt;
+
+            // body-frame velocity from body-frame velocity
+            A[STATE_VX][STATE_VX] = 1; //drag negligible
+            A[STATE_VY][STATE_VX] =-gyro->z*dt;
+            A[STATE_VZ][STATE_VX] = gyro->y*dt;
+
+            A[STATE_VX][STATE_VY] = gyro->z*dt;
+            A[STATE_VY][STATE_VY] = 1; //drag negligible
+            A[STATE_VZ][STATE_VY] =-gyro->x*dt;
+
+            A[STATE_VX][STATE_VZ] =-gyro->y*dt;
+            A[STATE_VY][STATE_VZ] = gyro->x*dt;
+            A[STATE_VZ][STATE_VZ] = 1; //drag negligible
+
+            // body-frame velocity from attitude error
+            A[STATE_VX][STATE_D0] =  0;
+            A[STATE_VY][STATE_D0] = -GRAVITY_MAGNITUDE*_rotmat[2][2]*dt;
+            A[STATE_VZ][STATE_D0] =  GRAVITY_MAGNITUDE*_rotmat[2][1]*dt;
+
+            A[STATE_VX][STATE_D1] =  GRAVITY_MAGNITUDE*_rotmat[2][2]*dt;
+            A[STATE_VY][STATE_D1] =  0;
+            A[STATE_VZ][STATE_D1] = -GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
+
+            A[STATE_VX][STATE_D2] = -GRAVITY_MAGNITUDE*_rotmat[2][1]*dt;
+            A[STATE_VY][STATE_D2] =  GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
+            A[STATE_VZ][STATE_D2] =  0;
+
+
+            // attitude error from attitude error
+            /**
+             * At first glance, it may not be clear where the next values come from,
+             * since they do not appear directly in the dynamics. In this prediction
+             * step, we skip the step of first updating attitude-error, and then
+             * incorporating the
+             * new error into the current attitude (which requires a rotation of the
+             * attitude-error covariance). Instead, we directly update the body attitude,
+             * however still need to rotate the covariance, which is what you see below.
+             *
+             * This comes from a second order approximation to:
+             * Sigma_post = exps(-d) Sigma_pre exps(-d)'
+             *            ~ (I + [[-d]] + [[-d]]^2 / 2) Sigma_pre (I + [[-d]] + 
+             *             [[-d]]^2 / 2)'
+             * where d is the attitude error expressed as Rodriges parameters, ie. d0 =
+             * 1/2*gyro.x*dt under the assumption that d = [0,0,0] at the beginning of
+             * each prediction step and that gyro.x is constant over the sampling period
+             *
+             * As derived in "Covariance Correction Step for Kalman Filtering with an 
+             Attitude"
+             * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
+             */
+            float d0 = gyro->x*dt/2;
+            float d1 = gyro->y*dt/2;
+            float d2 = gyro->z*dt/2;
+
+            A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+            A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
+            A[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
+
+            A[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
+            A[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+            A[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
+
+            A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
+            A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
+            A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+
+            // ====== COVARIANCE UPDATE ======
+            device_mat_mult(Am, &_Pmatrix_m, tmpNN1m); // A P
+            device_mat_trans(Am, tmpNN2m); // A'
+            device_mat_mult(tmpNN1m, tmpNN2m, &_Pmatrix_m); // A P A'
+
+            // Process noise is added after the return from the prediction step
+            // ====== PREDICTION STEP ======
+            // The prediction depends on whether we're on the ground, or in flight.
+            // When flying, the accelerometer directly measures thrust (hence is useless
+            // to estimate body angle while flying)
+
+            float dx, dy, dz;
+            float tmpSPX, tmpSPY, tmpSPZ;
+            float zacc;
+
+            float dt2 = dt*dt;
+
+            if (isFlying) { // only acceleration in z direction
+
+                // Use accelerometer and not commanded thrust, as this has
+                // proper physical units
+                zacc = acc->z;
+
+                // position updates in the body frame (will be rotated to inertial frame)
+                dx = _state_vector[STATE_VX] * dt;
+                dy = _state_vector[STATE_VY] * dt;
+                dz = _state_vector[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
+                // thrust can only be produced in the body's Z direction
+
+                // position update
+                _state_vector[STATE_X] += _rotmat[0][0] * dx + 
+                    _rotmat[0][1] * dy + _rotmat[0][2] * dz;
+                _state_vector[STATE_Y] += _rotmat[1][0] * dx + 
+                    _rotmat[1][1] * dy + _rotmat[1][2] * dz;
+                _state_vector[STATE_Z] += _rotmat[2][0] * dx + 
+                    _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
+                    GRAVITY_MAGNITUDE * dt2 / 2.0f;
+
+                // keep previous time step's state for the update
+                tmpSPX = _state_vector[STATE_VX];
+                tmpSPY = _state_vector[STATE_VY];
+                tmpSPZ = _state_vector[STATE_VZ];
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+                _state_vector[STATE_VX] += dt * (gyro->z * tmpSPY - gyro->y *
+                        tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
+                _state_vector[STATE_VY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - 
+                        GRAVITY_MAGNITUDE * _rotmat[2][1]);
+                _state_vector[STATE_VZ] += dt * (zacc + gyro->y * tmpSPX - gyro->x * 
+                        tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
+            }
+            else {
+                // Acceleration can be in any direction, as measured by the
+                // accelerometer. This occurs, eg. in freefall or while being carried.
+
+                // position updates in the body frame (will be rotated to inertial frame)
+                dx = _state_vector[STATE_VX] * dt + acc->x * dt2 / 2.0f;
+                dy = _state_vector[STATE_VY] * dt + acc->y * dt2 / 2.0f;
+                dz = _state_vector[STATE_VZ] * dt + acc->z * dt2 / 2.0f; 
+                // thrust can only be produced in the body's Z direction
+
+                // position update
+                _state_vector[STATE_X] += _rotmat[0][0] * dx 
+                    + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
+                _state_vector[STATE_Y] += _rotmat[1][0] * dx + 
+                    _rotmat[1][1] * dy + _rotmat[1][2] * dz;
+                _state_vector[STATE_Z] += _rotmat[2][0] * dx + 
+                    _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
+                    GRAVITY_MAGNITUDE * dt2 / 2.0f;
+
+                // keep previous time step's state for the update
+                tmpSPX = _state_vector[STATE_VX];
+                tmpSPY = _state_vector[STATE_VY];
+                tmpSPZ = _state_vector[STATE_VZ];
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+                _state_vector[STATE_VX] += dt * (acc->x + gyro->z * tmpSPY -
+                        gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
+                _state_vector[STATE_VY] += dt * (acc->y - gyro->z * tmpSPX + gyro->x * 
+                        tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][1]);
+                _state_vector[STATE_VZ] += dt * (acc->z + gyro->y * tmpSPX - gyro->x * 
+                        tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
+            }
+
+            // attitude update (rotate by gyroscope), we do this in quaternions
+            // this is the gyroscope angular velocity integrated over the sample period
+            float dtwx = dt*gyro->x;
+            float dtwy = dt*gyro->y;
+            float dtwz = dt*gyro->z;
+
+            // compute the quaternion values in [w,x,y,z] order
+            float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+            float ca = device_cos(angle/2.0f);
+            float sa = device_sin(angle/2.0f);
+            float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+
+            // rotate the vehicle's attitude by the delta quaternion vector computed above
+
+            float tmpq0 = dq[0]*_quat[0] - dq[1]*_quat[1] - 
+                dq[2]*_quat[2] - dq[3]*_quat[3];
+
+            float tmpq1 = dq[1]*_quat[0] + dq[0]*_quat[1] + 
+                dq[3]*_quat[2] - dq[2]*_quat[3];
+
+            float tmpq2 = dq[2]*_quat[0] - dq[3]*_quat[1] + 
+                dq[0]*_quat[2] + dq[1]*_quat[3];
+
+            float tmpq3 = dq[3]*_quat[0] + dq[2]*_quat[1] - 
+                dq[1]*_quat[2] + dq[0]*_quat[3];
+
+            if (!isFlying) {
+
+                float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+
+                tmpq0 = keep * tmpq0 + 
+                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[0];
+                tmpq1 = keep * tmpq1 + 
+                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[1];
+                tmpq2 = keep * tmpq2 + 
+                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[2];
+                tmpq3 = keep * tmpq3 + 
+                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[3];
+            }
+
+            // normalize and store the result
+            float norm = device_sqrt(
+                    tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
+
+            _quat[0] = tmpq0/norm; 
+            _quat[1] = tmpq1/norm; 
+            _quat[2] = tmpq2/norm; 
+            _quat[3] = tmpq3/norm;
+
+            _isUpdated = true;
+        }
+
+ 
         void addProcessNoise(const uint32_t nowMs) 
         {
             float dt = (nowMs - _lastProcessNoiseUpdateMs) / 1000.0f;
@@ -593,313 +897,7 @@ class KalmanFilter {
             enforceSymmetry();
         }
 
-        void predictDt(Axis3f *acc, Axis3f *gyro, float dt, bool isFlying)
-        {
-            // The linearized update matrix
-            static float A[STATE_DIM][STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t Am = { 
-                STATE_DIM, STATE_DIM, (float *)A
-            }; // linearized dynamics for covariance update;
-
-            // Temporary matrices for the covariance updates
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                STATE_DIM, STATE_DIM, tmpNN2d
-            };
-
-            predictDt(A, &Am, &tmpNN1m, &tmpNN2m, acc, gyro, dt, isFlying);
-        }
-
-        void predictDt(
-                float A[STATE_DIM][STATE_DIM],
-                matrix_t * Am,
-                matrix_t * tmpNN1m,
-                matrix_t * tmpNN2m,
-                Axis3f *acc, 
-                Axis3f *gyro, 
-                float dt, 
-                bool isFlying)
-        {
-            /* Here we discretize (euler forward) and linearise the quadrocopter
-             * dynamics in order to push the covariance forward.
-             *
-             * QUADROCOPTER DYNAMICS (see paper):
-             *
-             * \dot{x} = R(I + [[d]])p
-             * \dot{p} = f/m * e3 - [[\omega]]p - g(I - [[d]])R^-1 e3 //drag negligible
-             * \dot{d} = \omega
-             *
-             * where [[.]] is the cross-product matrix of .
-             *       \omega are the gyro measurements
-             *       e3 is the column vector [0 0 1]'
-             *       I is the identity
-             *       R is the current attitude as a rotation matrix
-             *       f/m is the mass-normalized motor force (acceleration in the body's z 
-             direction)
-             *       g is gravity
-             *       x, p, d are the vehicle's states
-             * note that d (attitude error) is zero at the beginning of each iteration,
-             * since error information is incorporated into R after each Kalman update.
-             */
-
-            // ====== DYNAMICS LINEARIZATION ======
-            // Initialize as the identity
-            A[STATE_X][STATE_X] = 1;
-            A[STATE_Y][STATE_Y] = 1;
-            A[STATE_Z][STATE_Z] = 1;
-
-            A[STATE_VX][STATE_VX] = 1;
-            A[STATE_VY][STATE_VY] = 1;
-            A[STATE_VZ][STATE_VZ] = 1;
-
-            A[STATE_D0][STATE_D0] = 1;
-            A[STATE_D1][STATE_D1] = 1;
-            A[STATE_D2][STATE_D2] = 1;
-
-            // position from body-frame velocity
-            A[STATE_X][STATE_VX] = _rotmat[0][0]*dt;
-            A[STATE_Y][STATE_VX] = _rotmat[1][0]*dt;
-            A[STATE_Z][STATE_VX] = _rotmat[2][0]*dt;
-
-            A[STATE_X][STATE_VY] = _rotmat[0][1]*dt;
-            A[STATE_Y][STATE_VY] = _rotmat[1][1]*dt;
-            A[STATE_Z][STATE_VY] = _rotmat[2][1]*dt;
-
-            A[STATE_X][STATE_VZ] = _rotmat[0][2]*dt;
-            A[STATE_Y][STATE_VZ] = _rotmat[1][2]*dt;
-            A[STATE_Z][STATE_VZ] = _rotmat[2][2]*dt;
-
-            // position from attitude error
-            A[STATE_X][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[0][2] - 
-                    _state_vector[STATE_VZ]*_rotmat[0][1])*dt;
-            A[STATE_Y][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[1][2] - 
-                    _state_vector[STATE_VZ]*_rotmat[1][1])*dt;
-            A[STATE_Z][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[2][2] - 
-                    _state_vector[STATE_VZ]*_rotmat[2][1])*dt;
-
-            A[STATE_X][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[0][2] + 
-                    _state_vector[STATE_VZ]*_rotmat[0][0])*dt;
-            A[STATE_Y][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[1][2] + 
-                    _state_vector[STATE_VZ]*_rotmat[1][0])*dt;
-            A[STATE_Z][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[2][2] + 
-                    _state_vector[STATE_VZ]*_rotmat[2][0])*dt;
-
-            A[STATE_X][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[0][1] - 
-                    _state_vector[STATE_VY]*_rotmat[0][0])*dt;
-            A[STATE_Y][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[1][1] - 
-                    _state_vector[STATE_VY]*_rotmat[1][0])*dt;
-            A[STATE_Z][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[2][1] - 
-                    _state_vector[STATE_VY]*_rotmat[2][0])*dt;
-
-            // body-frame velocity from body-frame velocity
-            A[STATE_VX][STATE_VX] = 1; //drag negligible
-            A[STATE_VY][STATE_VX] =-gyro->z*dt;
-            A[STATE_VZ][STATE_VX] = gyro->y*dt;
-
-            A[STATE_VX][STATE_VY] = gyro->z*dt;
-            A[STATE_VY][STATE_VY] = 1; //drag negligible
-            A[STATE_VZ][STATE_VY] =-gyro->x*dt;
-
-            A[STATE_VX][STATE_VZ] =-gyro->y*dt;
-            A[STATE_VY][STATE_VZ] = gyro->x*dt;
-            A[STATE_VZ][STATE_VZ] = 1; //drag negligible
-
-            // body-frame velocity from attitude error
-            A[STATE_VX][STATE_D0] =  0;
-            A[STATE_VY][STATE_D0] = -GRAVITY_MAGNITUDE*_rotmat[2][2]*dt;
-            A[STATE_VZ][STATE_D0] =  GRAVITY_MAGNITUDE*_rotmat[2][1]*dt;
-
-            A[STATE_VX][STATE_D1] =  GRAVITY_MAGNITUDE*_rotmat[2][2]*dt;
-            A[STATE_VY][STATE_D1] =  0;
-            A[STATE_VZ][STATE_D1] = -GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
-
-            A[STATE_VX][STATE_D2] = -GRAVITY_MAGNITUDE*_rotmat[2][1]*dt;
-            A[STATE_VY][STATE_D2] =  GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
-            A[STATE_VZ][STATE_D2] =  0;
-
-
-            // attitude error from attitude error
-            /**
-             * At first glance, it may not be clear where the next values come from,
-             * since they do not appear directly in the dynamics. In this prediction
-             * step, we skip the step of first updating attitude-error, and then
-             * incorporating the
-             * new error into the current attitude (which requires a rotation of the
-             * attitude-error covariance). Instead, we directly update the body attitude,
-             * however still need to rotate the covariance, which is what you see below.
-             *
-             * This comes from a second order approximation to:
-             * Sigma_post = exps(-d) Sigma_pre exps(-d)'
-             *            ~ (I + [[-d]] + [[-d]]^2 / 2) Sigma_pre (I + [[-d]] + 
-             *             [[-d]]^2 / 2)'
-             * where d is the attitude error expressed as Rodriges parameters, ie. d0 =
-             * 1/2*gyro.x*dt under the assumption that d = [0,0,0] at the beginning of
-             * each prediction step and that gyro.x is constant over the sampling period
-             *
-             * As derived in "Covariance Correction Step for Kalman Filtering with an 
-             Attitude"
-             * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
-             */
-            float d0 = gyro->x*dt/2;
-            float d1 = gyro->y*dt/2;
-            float d2 = gyro->z*dt/2;
-
-            A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-            A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-            A[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
-
-            A[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-            A[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-            A[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
-
-            A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-            A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-            A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
-
-            // ====== COVARIANCE UPDATE ======
-            device_mat_mult(Am, &_Pmatrix_m, tmpNN1m); // A P
-            device_mat_trans(Am, tmpNN2m); // A'
-            device_mat_mult(tmpNN1m, tmpNN2m, &_Pmatrix_m); // A P A'
-
-            // Process noise is added after the return from the prediction step
-            // ====== PREDICTION STEP ======
-            // The prediction depends on whether we're on the ground, or in flight.
-            // When flying, the accelerometer directly measures thrust (hence is useless
-            // to estimate body angle while flying)
-
-            float dx, dy, dz;
-            float tmpSPX, tmpSPY, tmpSPZ;
-            float zacc;
-
-            float dt2 = dt*dt;
-
-            if (isFlying) { // only acceleration in z direction
-
-                // Use accelerometer and not commanded thrust, as this has
-                // proper physical units
-                zacc = acc->z;
-
-                // position updates in the body frame (will be rotated to inertial frame)
-                dx = _state_vector[STATE_VX] * dt;
-                dy = _state_vector[STATE_VY] * dt;
-                dz = _state_vector[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
-                // thrust can only be produced in the body's Z direction
-
-                // position update
-                _state_vector[STATE_X] += _rotmat[0][0] * dx + 
-                    _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-                _state_vector[STATE_Y] += _rotmat[1][0] * dx + 
-                    _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-                _state_vector[STATE_Z] += _rotmat[2][0] * dx + 
-                    _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
-                    GRAVITY_MAGNITUDE * dt2 / 2.0f;
-
-                // keep previous time step's state for the update
-                tmpSPX = _state_vector[STATE_VX];
-                tmpSPY = _state_vector[STATE_VY];
-                tmpSPZ = _state_vector[STATE_VZ];
-
-                // body-velocity update: accelerometers - gyros cross velocity
-                // - gravity in body frame
-                _state_vector[STATE_VX] += dt * (gyro->z * tmpSPY - gyro->y *
-                        tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
-                _state_vector[STATE_VY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - 
-                        GRAVITY_MAGNITUDE * _rotmat[2][1]);
-                _state_vector[STATE_VZ] += dt * (zacc + gyro->y * tmpSPX - gyro->x * 
-                        tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
-            }
-            else {
-                // Acceleration can be in any direction, as measured by the
-                // accelerometer. This occurs, eg. in freefall or while being carried.
-
-                // position updates in the body frame (will be rotated to inertial frame)
-                dx = _state_vector[STATE_VX] * dt + acc->x * dt2 / 2.0f;
-                dy = _state_vector[STATE_VY] * dt + acc->y * dt2 / 2.0f;
-                dz = _state_vector[STATE_VZ] * dt + acc->z * dt2 / 2.0f; 
-                // thrust can only be produced in the body's Z direction
-
-                // position update
-                _state_vector[STATE_X] += _rotmat[0][0] * dx 
-                    + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-                _state_vector[STATE_Y] += _rotmat[1][0] * dx + 
-                    _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-                _state_vector[STATE_Z] += _rotmat[2][0] * dx + 
-                    _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
-                    GRAVITY_MAGNITUDE * dt2 / 2.0f;
-
-                // keep previous time step's state for the update
-                tmpSPX = _state_vector[STATE_VX];
-                tmpSPY = _state_vector[STATE_VY];
-                tmpSPZ = _state_vector[STATE_VZ];
-
-                // body-velocity update: accelerometers - gyros cross velocity
-                // - gravity in body frame
-                _state_vector[STATE_VX] += dt * (acc->x + gyro->z * tmpSPY -
-                        gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
-                _state_vector[STATE_VY] += dt * (acc->y - gyro->z * tmpSPX + gyro->x * 
-                        tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][1]);
-                _state_vector[STATE_VZ] += dt * (acc->z + gyro->y * tmpSPX - gyro->x * 
-                        tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
-            }
-
-            // attitude update (rotate by gyroscope), we do this in quaternions
-            // this is the gyroscope angular velocity integrated over the sample period
-            float dtwx = dt*gyro->x;
-            float dtwy = dt*gyro->y;
-            float dtwz = dt*gyro->z;
-
-            // compute the quaternion values in [w,x,y,z] order
-            float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-            float ca = device_cos(angle/2.0f);
-            float sa = device_sin(angle/2.0f);
-            float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
-
-            // rotate the vehicle's attitude by the delta quaternion vector computed above
-
-            float tmpq0 = dq[0]*_quat[0] - dq[1]*_quat[1] - 
-                dq[2]*_quat[2] - dq[3]*_quat[3];
-
-            float tmpq1 = dq[1]*_quat[0] + dq[0]*_quat[1] + 
-                dq[3]*_quat[2] - dq[2]*_quat[3];
-
-            float tmpq2 = dq[2]*_quat[0] - dq[3]*_quat[1] + 
-                dq[0]*_quat[2] + dq[1]*_quat[3];
-
-            float tmpq3 = dq[3]*_quat[0] + dq[2]*_quat[1] - 
-                dq[1]*_quat[2] + dq[0]*_quat[3];
-
-            if (!isFlying) {
-
-                float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-
-                tmpq0 = keep * tmpq0 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[0];
-                tmpq1 = keep * tmpq1 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[1];
-                tmpq2 = keep * tmpq2 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[2];
-                tmpq3 = keep * tmpq3 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[3];
-            }
-
-            // normalize and store the result
-            float norm = device_sqrt(
-                    tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
-
-            _quat[0] = tmpq0/norm; 
-            _quat[1] = tmpq1/norm; 
-            _quat[2] = tmpq2/norm; 
-            _quat[3] = tmpq3/norm;
-
-            _isUpdated = true;
-        }
-
-        void scalarUpdate(
+       void scalarUpdate(
                 matrix_t *Hm, 
                 float error, 
                 float stdMeasNoise)
