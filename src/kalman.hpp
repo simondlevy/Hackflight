@@ -898,6 +898,7 @@ class KalmanFilter {
             static float PHTd[STATE_DIM * 1];
             static matrix_t PHTm = {STATE_DIM, 1, PHTd};
 
+            /*
             scalarUpdate(Hm, HTm, Km, PHTd,
                     K, tmpNN1d, PHTm, tmpNN1m, tmpNN2m, tmpNN3m, 
                     error, stdMeasNoise);
@@ -916,7 +917,7 @@ class KalmanFilter {
                 matrix_t & tmpNN3m, 
                 float error, 
                 float stdMeasNoise)
-        {
+        {*/
             // ====== INNOVATION COVARIANCE ======
 
             device_mat_trans(Hm, &HTm);
@@ -937,7 +938,6 @@ class KalmanFilter {
                 K[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 _state_vector[i] = _state_vector[i] + K[i] * error; // state update
             }
-
 
             // ====== COVARIANCE UPDATE ======
             device_mat_mult(&Km, Hm, &tmpNN1m); // KH
