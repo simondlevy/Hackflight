@@ -117,7 +117,7 @@ class KalmanFilter {
                 }
             }
 
-            _ekf.init();
+            _ekf.init(MIN_COVARIANCE, MAX_COVARIANCE);
 
             // Add in the initial process noise 
             const float pinit[STATE_DIM] = {
@@ -388,7 +388,8 @@ class KalmanFilter {
                 };
 
                 _ekf.addCovarianceNoise(noise);
-                enforceSymmetry();
+                _ekf.enforceSymmetry();
+
                 _lastProcessNoiseUpdateMs = nowMs;
             }
         }
@@ -528,7 +529,7 @@ class KalmanFilter {
             _ekf.x[STATE_D1] = 0;
             _ekf.x[STATE_D2] = 0;
 
-            enforceSymmetry();
+            _ekf.enforceSymmetry();
 
             _isUpdated = false;
         }
@@ -902,22 +903,6 @@ class KalmanFilter {
             }
 
             _isUpdated = true;
-        }
-
-        void enforceSymmetry()
-        {
-            for (int i=0; i<STATE_DIM; i++) {
-                for (int j=i; j<STATE_DIM; j++) {
-                    float p = 0.5f*_ekf.p[i][j] + 0.5f*_ekf.p[j][i];
-                    if (isnan(p) || p > MAX_COVARIANCE) {
-                        _ekf.p[i][j] = _ekf.p[j][i] = MAX_COVARIANCE;
-                    } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _ekf.p[i][j] = _ekf.p[j][i] = MIN_COVARIANCE;
-                    } else {
-                        _ekf.p[i][j] = _ekf.p[j][i] = p;
-                    }
-                }
-            }
         }
 
         // Generic math stuff //////////////////////////////////////////////////
