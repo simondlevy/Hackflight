@@ -225,15 +225,6 @@ class KalmanFilter {
                 STATE_DIM, STATE_DIM, tmpNN2d
             }; 
 
-            return finalizeFull(A, Am, tmpNN1m, tmpNN2m);
-        }
-
-        void finalizeFull(
-                float  A[STATE_DIM][STATE_DIM],
-                matrix_t & Am,
-                matrix_t & tmpNN1m,
-                matrix_t & tmpNN2m)
-        {
             // Only finalize if data is updated
             if (! _isUpdated) {
                 return;
