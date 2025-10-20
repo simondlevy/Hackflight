@@ -329,9 +329,8 @@ class KalmanFilter {
 
             static __attribute__((aligned(4))) matrix_t Am = { 
                 STATE_DIM, STATE_DIM, (float *)A
-            }; // linearized dynamics for covariance update;
+            };
 
-            // Temporary matrices for the covariance updates
             static float tmpNN1d[STATE_DIM * STATE_DIM];
             static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
                 STATE_DIM, STATE_DIM, tmpNN1d
@@ -343,7 +342,6 @@ class KalmanFilter {
             };
 
 
-            // ====== COVARIANCE UPDATE ======
             device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
             device_mat_trans(&Am, &tmpNN2m); // A'
             device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
@@ -651,11 +649,12 @@ class KalmanFilter {
                 A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
                 A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                static matrix_t Am = {
+                //////////////////////////////////////////////////////////////////////////
+
+                static __attribute__((aligned(4))) matrix_t Am = { 
                     STATE_DIM, STATE_DIM, (float *)A
                 };
 
-                // Temporary matrices for the covariance updates
                 static float tmpNN1d[STATE_DIM * STATE_DIM];
                 static matrix_t tmpNN1m = {
                     STATE_DIM, STATE_DIM, tmpNN1d
@@ -669,6 +668,10 @@ class KalmanFilter {
                 device_mat_trans(&Am, &tmpNN1m); // A'
                 device_mat_mult(&Am, &_Pmatrix_m, &tmpNN2m); // AP
                 device_mat_mult(&tmpNN2m, &tmpNN1m, &_Pmatrix_m); //APA'
+
+                _tinyekf.updateCovariance(A);
+
+                //////////////////////////////////////////////////////////////////////////
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
