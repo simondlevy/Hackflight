@@ -117,12 +117,7 @@ class KalmanFilter {
                 }
             }
 
-            // Set the covariance matrix to zero
-            for (int i=0; i< STATE_DIM; i++) {
-                for (int j=0; j < STATE_DIM; j++) {
-                    _ekf.p[i][j] = 0; 
-                }
-            }
+            _ekf.init();
 
             // Add in the initial process noise 
             const float pinit[STATE_DIM] = {
@@ -138,10 +133,6 @@ class KalmanFilter {
                 STDEV_INITIAL_ATTITUDE_YAW
             };
             addCovarianceNoise(pinit);
-
-            _ekf.p_m.numRows = STATE_DIM;
-            _ekf.p_m.numCols = STATE_DIM;
-            _ekf.p_m.pData = (float*)_ekf.p;
 
             _isUpdated = false;
             _lastPredictionMs = nowMs;
