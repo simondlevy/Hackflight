@@ -518,6 +518,21 @@ class KalmanFilter {
                 _Pmatrix[STATE_D2][STATE_D2] += 
                     powf(MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT, 2);
 
+                const float pnoise[STATE_DIM] = {
+
+                    PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
+
+                _tinyekf.addProcessNoise(pnoise);
+
                 enforceSymmetry();
 
                 _lastProcessNoiseUpdateMs = nowMs;
