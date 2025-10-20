@@ -130,6 +130,21 @@ class KalmanFilter {
                 }
             }
 
+            const float pinit[STATE_DIM] = {
+
+                STDEV_INITIAL_POSITION_XY,
+                STDEV_INITIAL_POSITION_XY,
+                STDEV_INITIAL_POSITION_Z,
+                STDEV_INITIAL_VELOCITY,
+                STDEV_INITIAL_VELOCITY,
+                STDEV_INITIAL_VELOCITY,
+                STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                STDEV_INITIAL_ATTITUDE_YAW
+            };
+
+            _tinyekf.init(pinit, MIN_COVARIANCE, MAX_COVARIANCE);
+
             // initialize state variances
             _Pmatrix[STATE_X][STATE_X] = 
                 powf(STDEV_INITIAL_POSITION_XY, 2);
@@ -752,6 +767,8 @@ class KalmanFilter {
 
             Axis3f subSample;
         } Axis3fSubSampler_t;
+
+        TinyEkf _tinyekf;
 
         // The covariance matrix
         __attribute__((aligned(4))) float _Pmatrix[STATE_DIM][STATE_DIM];
