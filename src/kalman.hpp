@@ -742,7 +742,7 @@ class KalmanFilter {
                 (_rotmat[2][2] / z_g);
 
             //First update
-            updateWithScalar(hx, (_measuredNX-_predictedNX), 
+            _ekf.updateWithScalar(hx, (_measuredNX-_predictedNX), 
                     flow->stdDevX*FLOW_RESOLUTION);
 
             // ~~~ Y velocity prediction and update ~~~
@@ -757,7 +757,7 @@ class KalmanFilter {
             hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_rotmat[2][2] / z_g);
 
             // Second update
-            updateWithScalar(hy, (_measuredNY-_predictedNY),
+            _ekf.updateWithScalar(hy, (_measuredNY-_predictedNY),
                     flow->stdDevY*FLOW_RESOLUTION);
 
             _isUpdated = true;
@@ -784,7 +784,7 @@ class KalmanFilter {
                 // updates are done in the scalar update function below
                 h[STATE_Z] = 1 / cosf(angle); 
 
-                updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
+                _ekf.updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
 
                 _isUpdated = true;
             }
@@ -802,8 +802,6 @@ class KalmanFilter {
             _gyroLatest = m.data.gyroscope.gyro;
         }
 
-        // Generic EKF stuff //////////////////////////////////////////////////
-
         EKF _ekf;
 
         // Tracks whether an update to the state has been made, and the state
@@ -812,80 +810,6 @@ class KalmanFilter {
 
         uint32_t _lastPredictionMs;
         uint32_t _lastProcessNoiseUpdateMs;
-
-        void updateWithScalar(const float * h, const float error, const float stdMeasNoise)
-        {
-            matrix_t Hm = {1, STATE_DIM, (float *)h};
-
-            // The Kalman gain as a column vector
-            static float G[STATE_DIM];
-            static matrix_t Gm = {STATE_DIM, 1, (float *)G};
-
-            // Temporary matrices for the covariance updates
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN1m = {
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN2m = {
-                STATE_DIM, STATE_DIM, tmpNN2d
-            };
-
-            static float tmpNN3d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN3m = {
-                STATE_DIM, STATE_DIM, tmpNN3d
-            };
-
-            static float HTd[STATE_DIM * 1];
-            static matrix_t HTm = {STATE_DIM, 1, HTd};
-
-            static float PHTd[STATE_DIM * 1];
-            static matrix_t PHTm = {STATE_DIM, 1, PHTd};
-
-            device_mat_trans(&Hm, &HTm);
-            device_mat_mult(&_ekf.p_m, &HTm, &PHTm); // PH'
-            float R = stdMeasNoise*stdMeasNoise;
-            float HPHR = R; // HPH' + R
-            for (int i=0; i<STATE_DIM; i++) { 
-                // Add the element of HPH' to the above
-                // this obviously only works if the update is scalar (as in this function)
-                HPHR += Hm.pData[i]*PHTd[i]; 
-            }
-
-            // Calculate the Kalman gain and perform the state update
-            for (int i=0; i<STATE_DIM; i++) {
-                G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                _ekf.x[i] = _ekf.x[i] + G[i] * error; // state update
-            }
-
-            device_mat_mult(&Gm, &Hm, &tmpNN1m); // KH
-            for (int i=0; i<STATE_DIM; i++) { 
-                tmpNN1d[STATE_DIM*i+i] -= 1; 
-            } // GH - I
-            device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-            device_mat_mult(&tmpNN1m, &_ekf.p_m, &tmpNN3m); // (GH - I)*P
-            device_mat_mult(&tmpNN3m, &tmpNN2m, &_ekf.p_m); // (GH - I)*P*(GH - I)'
-
-            // add the measurement variance and ensure boundedness and symmetry
-            for (int i=0; i<STATE_DIM; i++) {
-                for (int j=i; j<STATE_DIM; j++) {
-                    float v = G[i] * R * G[j];
-
-                    // add measurement noise
-                    float p = 0.5f*_ekf.p[i][j] + 0.5f*_ekf.p[j][i] + v; 
-                    if (isnan(p) || p > MAX_COVARIANCE) {
-                        _ekf.p[i][j] = _ekf.p[j][i] = MAX_COVARIANCE;
-                    } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _ekf.p[i][j] = _ekf.p[j][i] = MIN_COVARIANCE;
-                    } else {
-                        _ekf.p[i][j] = _ekf.p[j][i] = p;
-                    }
-                }
-            }
-        }
-
-        // Generic math stuff //////////////////////////////////////////////////
 
         static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
 
