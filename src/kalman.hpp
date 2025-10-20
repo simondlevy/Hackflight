@@ -185,12 +185,12 @@ class KalmanFilter {
                 STATE_DIM, STATE_DIM, tmpNN2d
             };
 
-            predictDt(A, Am, tmpNN1m, tmpNN2m, accel, gyro, dt, isFlying);
+            predictDt(nowMs, A, Am, tmpNN1m, tmpNN2m, accel, gyro, dt, isFlying);
 
-            _lastPredictionMs = nowMs;
         }
 
         void predictDt(
+                const uint32_t nowMs,
                 float A[STATE_DIM][STATE_DIM],
                 matrix_t & Am,
                 matrix_t & tmpNN1m,
@@ -320,9 +320,9 @@ class KalmanFilter {
              Attitude"
              * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
              */
-            float d0 = gyro->x*dt/2;
-            float d1 = gyro->y*dt/2;
-            float d2 = gyro->z*dt/2;
+            const float d0 = gyro->x*dt/2;
+            const float d1 = gyro->y*dt/2;
+            const float d2 = gyro->z*dt/2;
 
             A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
             A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
@@ -347,22 +347,18 @@ class KalmanFilter {
             // When flying, the accelerometer directly measures thrust (hence is useless
             // to estimate body angle while flying)
 
-            float dx, dy, dz;
-            float tmpSPX, tmpSPY, tmpSPZ;
-            float zacc;
-
-            float dt2 = dt*dt;
+            const float dt2 = dt * dt;
 
             if (isFlying) { // only acceleration in z direction
 
                 // Use accelerometer and not commanded thrust, as this has
                 // proper physical units
-                zacc = accel->z;
+                const float zacc = accel->z;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                dx = _state_vector[STATE_VX] * dt;
-                dy = _state_vector[STATE_VY] * dt;
-                dz = _state_vector[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
+                const float dx = _state_vector[STATE_VX] * dt;
+                const float dy = _state_vector[STATE_VY] * dt;
+                const float dz = _state_vector[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
@@ -375,9 +371,9 @@ class KalmanFilter {
                     GRAVITY_MAGNITUDE * dt2 / 2.0f;
 
                 // keep previous time step's state for the update
-                tmpSPX = _state_vector[STATE_VX];
-                tmpSPY = _state_vector[STATE_VY];
-                tmpSPZ = _state_vector[STATE_VZ];
+                const float tmpSPX = _state_vector[STATE_VX];
+                const float tmpSPY = _state_vector[STATE_VY];
+                const float tmpSPZ = _state_vector[STATE_VZ];
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -393,9 +389,9 @@ class KalmanFilter {
                 // accelerometer. This occurs, eg. in freefall or while being carried.
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                dx = _state_vector[STATE_VX] * dt + accel->x * dt2 / 2.0f;
-                dy = _state_vector[STATE_VY] * dt + accel->y * dt2 / 2.0f;
-                dz = _state_vector[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
+                const float dx = _state_vector[STATE_VX] * dt + accel->x * dt2 / 2.0f;
+                const float dy = _state_vector[STATE_VY] * dt + accel->y * dt2 / 2.0f;
+                const float dz = _state_vector[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
@@ -408,9 +404,9 @@ class KalmanFilter {
                     GRAVITY_MAGNITUDE * dt2 / 2.0f;
 
                 // keep previous time step's state for the update
-                tmpSPX = _state_vector[STATE_VX];
-                tmpSPY = _state_vector[STATE_VY];
-                tmpSPZ = _state_vector[STATE_VZ];
+                const float tmpSPX = _state_vector[STATE_VX];
+                const float tmpSPY = _state_vector[STATE_VY];
+                const float tmpSPZ = _state_vector[STATE_VZ];
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -424,15 +420,15 @@ class KalmanFilter {
 
             // attitude update (rotate by gyroscope), we do this in quaternions
             // this is the gyroscope angular velocity integrated over the sample period
-            float dtwx = dt*gyro->x;
-            float dtwy = dt*gyro->y;
-            float dtwz = dt*gyro->z;
+            const float dtwx = dt*gyro->x;
+            const float dtwy = dt*gyro->y;
+            const float dtwz = dt*gyro->z;
 
             // compute the quaternion values in [w,x,y,z] order
-            float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-            float ca = device_cos(angle/2.0f);
-            float sa = device_sin(angle/2.0f);
-            float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+            const float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+            const float ca = device_cos(angle/2.0f);
+            const float sa = device_sin(angle/2.0f);
+            const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
             // rotate the vehicle's attitude by the delta quaternion vector computed above
 
@@ -450,7 +446,7 @@ class KalmanFilter {
 
             if (!isFlying) {
 
-                float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
                 tmpq0 = keep * tmpq0 + 
                     ROLLPITCH_ZERO_REVERSION * _initialQuaternion[0];
@@ -463,7 +459,7 @@ class KalmanFilter {
             }
 
             // normalize and store the result
-            float norm = device_sqrt(
+            const float norm = device_sqrt(
                     tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
             _quat[0] = tmpq0/norm; 
@@ -472,6 +468,7 @@ class KalmanFilter {
             _quat[3] = tmpq3/norm;
 
             _isUpdated = true;
+            _lastPredictionMs = nowMs;
         }
 
  
