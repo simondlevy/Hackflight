@@ -325,13 +325,9 @@ class KalmanFilter {
             A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
             A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-            //////////////////////////////////////////////////////////////////////////
-
             updateCovariance(A);
 
             _tinyekf.updateCovariance(A);
-
-            //////////////////////////////////////////////////////////////////////////
 
             // Process noise is added after the return from the prediction step
             // ====== PREDICTION STEP ======
@@ -632,13 +628,9 @@ class KalmanFilter {
                 A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
                 A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                //////////////////////////////////////////////////////////////////////////
-
                 updateCovariance(A);
 
                 _tinyekf.updateCovariance(A);
-
-                //////////////////////////////////////////////////////////////////////////
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
@@ -1003,11 +995,13 @@ class KalmanFilter {
             // The angle of aperture is guessed from the raw data register and
             // thankfully look to be symmetric
 
-            float Npix = 35.0;                      // [pixels] (same in x and y)
-                                                    //float thetapix = DEGREES_TO_RADIANS * 4.0f;     // [rad]    (same in x and y)
+            // [pixels] (same in x and y)
+            float Npix = 35.0;                      
 
-                                                    // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
-                                                    // corresponding ground length
+            //float thetapix = DEGREES_TO_RADIANS * 4.0f;
+            // [rad]    (same in x and y)
+            // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
+            // corresponding ground length
             float thetapix = 0.71674f;
 
             //~~~ Body rates ~~~
