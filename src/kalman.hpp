@@ -224,8 +224,143 @@ class KalmanFilter {
             static matrix_t tmpNN2m = {
                 STATE_DIM, STATE_DIM, tmpNN2d
             }; 
-            return finalize(A, &Am, &tmpNN1m, &tmpNN2m);
+
+            return finalizeFull(A, Am, tmpNN1m, tmpNN2m);
         }
+
+        void finalizeFull(
+                float  A[STATE_DIM][STATE_DIM],
+                matrix_t & Am,
+                matrix_t & tmpNN1m,
+                matrix_t & tmpNN2m)
+        {
+            // Only finalize if data is updated
+            if (! _isUpdated) {
+                return;
+            }
+
+            // Incorporate the attitude error (Kalman filter state) with the attitude
+            const float v0 = _state_vector[STATE_D0];
+            const float v1 = _state_vector[STATE_D1];
+            const float v2 = _state_vector[STATE_D2];
+
+            // Move attitude error into attitude if any of the angle errors are
+            // large enough
+            if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
+                        0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
+                            fabsf(v2) < 10)) {
+                const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                const float ca = device_cos(angle / 2.0f);
+                const float sa = device_sin(angle / 2.0f);
+                const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                // Rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
+                const float tmpq0 = dq[0] * _quat[0] - dq[1] * _quat[1] - 
+                    dq[2] * _quat[2] - dq[3] * _quat[3];
+                const float tmpq1 = dq[1] * _quat[0] + dq[0] * _quat[1] + 
+                    dq[3] * _quat[2] - dq[2] * _quat[3];
+                const float tmpq2 = dq[2] * _quat[0] - dq[3] * _quat[1] + 
+                    dq[0] * _quat[2] + dq[1] * _quat[3];
+                const float tmpq3 = dq[3] * _quat[0] + dq[2] * _quat[1] - 
+                    dq[1] * _quat[2] + dq[0] * _quat[3];
+
+                // normalize and store the result
+                float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                        tmpq3 * tmpq3) + EPSILON;
+                _quat[0] = tmpq0 / norm;
+                _quat[1] = tmpq1 / norm;
+                _quat[2] = tmpq2 / norm;
+                _quat[3] = tmpq3 / norm;
+
+                /** Rotate the covariance, since we've rotated the body
+                 *
+                 * This comes from a second order approximation to:
+                 * Sigma_post = exps(-d) Sigma_pre exps(-d)'
+                 *            ~ (I + [[-d]] + [[-d]]^2 / 2) 
+                 Sigma_pre (I + [[-d]] + [[-d]]^2 / 2)'
+                 * where d is the attitude error expressed as Rodriges parameters, ie. 
+                 d = tan(|v|/2)*v/|v|
+                 *
+                 * As derived in "Covariance Correction Step for Kalman Filtering with an 
+                 Attitude"
+                 * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
+                 */
+
+                // the attitude error vector (v0,v1,v2) is small,
+                // so we use a first order approximation to d0 = tan(|v0|/2)*v0/|v0|
+                const float d0 = v0/2; 
+                const float d1 = v1/2; 
+                const float d2 = v2/2;
+
+                A[STATE_X][STATE_X] = 1;
+                A[STATE_Y][STATE_Y] = 1;
+                A[STATE_Z][STATE_Z] = 1;
+
+                A[STATE_VX][STATE_VX] = 1;
+                A[STATE_VY][STATE_VY] = 1;
+                A[STATE_VZ][STATE_VZ] = 1;
+
+                A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
+                A[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
+
+                A[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
+                A[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                A[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
+
+                A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
+                A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
+                A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+
+                device_mat_trans(&Am, &tmpNN1m); // A'
+                device_mat_mult(&Am, &_Pmatrix_m, &tmpNN2m); // AP
+                device_mat_mult(&tmpNN2m, &tmpNN1m, &_Pmatrix_m); //APA'
+            }
+
+            // Convert the new attitude to a rotation matrix, such that we can
+            // rotate body-frame velocity and acc
+
+            _rotmat[0][0] = _quat[0] * _quat[0] + 
+                _quat[1] * _quat[1] - _quat[2] * 
+                _quat[2] - _quat[3] * _quat[3];
+
+            _rotmat[0][1] = 2 * _quat[1] * _quat[2] - 
+                2 * _quat[0] * _quat[3];
+
+            _rotmat[0][2] = 2 * _quat[1] * _quat[3] + 
+                2 * _quat[0] * _quat[2];
+
+            _rotmat[1][0] = 2 * _quat[1] * _quat[2] + 
+                2 * _quat[0] * _quat[3];
+
+            _rotmat[1][1] = _quat[0] * _quat[0] - 
+                _quat[1] * _quat[1] + _quat[2] * 
+                _quat[2] - _quat[3] * _quat[3];
+
+            _rotmat[1][2] = 2 * _quat[2] * _quat[3] - 
+                2 * _quat[0] * _quat[1];
+
+            _rotmat[2][0] = 2 * _quat[1] * _quat[3] - 
+                2 * _quat[0] * _quat[2];
+
+            _rotmat[2][1] = 2 * _quat[2] * _quat[3] + 
+                2 * _quat[0] * _quat[1];
+
+            _rotmat[2][2] = _quat[0] * _quat[0] - 
+                _quat[1] * _quat[1] - _quat[2] * 
+                _quat[2] + _quat[3] * _quat[3];
+
+            // reset the attitude error
+            _state_vector[STATE_D0] = 0;
+            _state_vector[STATE_D1] = 0;
+            _state_vector[STATE_D2] = 0;
+
+            enforceSymmetry();
+
+            _isUpdated = false;
+        }
+
 
         bool isStateWithinBounds(void) 
         {
@@ -1000,139 +1135,6 @@ class KalmanFilter {
                 scalarUpdate(
                         &H, measuredDistance-predictedDistance, tof->stdDev);
             }
-        }
-
-        void finalize(
-                float  A[STATE_DIM][STATE_DIM],
-                matrix_t * Am,
-                matrix_t * tmpNN1m,
-                matrix_t * tmpNN2m)
-        {
-            // Only finalize if data is updated
-            if (! _isUpdated) {
-                return;
-            }
-
-            // Incorporate the attitude error (Kalman filter state) with the attitude
-            float v0 = _state_vector[STATE_D0];
-            float v1 = _state_vector[STATE_D1];
-            float v2 = _state_vector[STATE_D2];
-
-            // Move attitude error into attitude if any of the angle errors are
-            // large enough
-            if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
-                        0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
-                            fabsf(v2) < 10)) {
-                float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                float ca = device_cos(angle / 2.0f);
-                float sa = device_sin(angle / 2.0f);
-                float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
-
-                // Rotate the vehicle's attitude by the delta quaternion vector
-                // computed above
-                float tmpq0 = dq[0] * _quat[0] - dq[1] * _quat[1] - 
-                    dq[2] * _quat[2] - dq[3] * _quat[3];
-                float tmpq1 = dq[1] * _quat[0] + dq[0] * _quat[1] + 
-                    dq[3] * _quat[2] - dq[2] * _quat[3];
-                float tmpq2 = dq[2] * _quat[0] - dq[3] * _quat[1] + 
-                    dq[0] * _quat[2] + dq[1] * _quat[3];
-                float tmpq3 = dq[3] * _quat[0] + dq[2] * _quat[1] - 
-                    dq[1] * _quat[2] + dq[0] * _quat[3];
-
-                // normalize and store the result
-                float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                        tmpq3 * tmpq3) + EPSILON;
-                _quat[0] = tmpq0 / norm;
-                _quat[1] = tmpq1 / norm;
-                _quat[2] = tmpq2 / norm;
-                _quat[3] = tmpq3 / norm;
-
-                /** Rotate the covariance, since we've rotated the body
-                 *
-                 * This comes from a second order approximation to:
-                 * Sigma_post = exps(-d) Sigma_pre exps(-d)'
-                 *            ~ (I + [[-d]] + [[-d]]^2 / 2) 
-                 Sigma_pre (I + [[-d]] + [[-d]]^2 / 2)'
-                 * where d is the attitude error expressed as Rodriges parameters, ie. 
-                 d = tan(|v|/2)*v/|v|
-                 *
-                 * As derived in "Covariance Correction Step for Kalman Filtering with an 
-                 Attitude"
-                 * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
-                 */
-
-                // the attitude error vector (v0,v1,v2) is small,
-                // so we use a first order approximation to d0 = tan(|v0|/2)*v0/|v0|
-                float d0 = v0/2; 
-                float d1 = v1/2; 
-                float d2 = v2/2;
-
-                A[STATE_X][STATE_X] = 1;
-                A[STATE_Y][STATE_Y] = 1;
-                A[STATE_Z][STATE_Z] = 1;
-
-                A[STATE_VX][STATE_VX] = 1;
-                A[STATE_VY][STATE_VY] = 1;
-                A[STATE_VZ][STATE_VZ] = 1;
-
-                A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-                A[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
-
-                A[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-                A[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                A[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
-
-                A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-                A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-                A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
-
-                device_mat_trans(Am, tmpNN1m); // A'
-                device_mat_mult(Am, &_Pmatrix_m, tmpNN2m); // AP
-                device_mat_mult(tmpNN2m, tmpNN1m, &_Pmatrix_m); //APA'
-            }
-
-            // Convert the new attitude to a rotation matrix, such that we can
-            // rotate body-frame velocity and acc
-
-            _rotmat[0][0] = _quat[0] * _quat[0] + 
-                _quat[1] * _quat[1] - _quat[2] * 
-                _quat[2] - _quat[3] * _quat[3];
-
-            _rotmat[0][1] = 2 * _quat[1] * _quat[2] - 
-                2 * _quat[0] * _quat[3];
-
-            _rotmat[0][2] = 2 * _quat[1] * _quat[3] + 
-                2 * _quat[0] * _quat[2];
-
-            _rotmat[1][0] = 2 * _quat[1] * _quat[2] + 
-                2 * _quat[0] * _quat[3];
-
-            _rotmat[1][1] = _quat[0] * _quat[0] - 
-                _quat[1] * _quat[1] + _quat[2] * 
-                _quat[2] - _quat[3] * _quat[3];
-
-            _rotmat[1][2] = 2 * _quat[2] * _quat[3] - 
-                2 * _quat[0] * _quat[1];
-
-            _rotmat[2][0] = 2 * _quat[1] * _quat[3] - 
-                2 * _quat[0] * _quat[2];
-
-            _rotmat[2][1] = 2 * _quat[2] * _quat[3] + 
-                2 * _quat[0] * _quat[1];
-
-            _rotmat[2][2] = _quat[0] * _quat[0] - 
-                _quat[1] * _quat[1] - _quat[2] * 
-                _quat[2] + _quat[3] * _quat[3];
-
-            // reset the attitude error
-            _state_vector[STATE_D0] = 0;
-            _state_vector[STATE_D1] = 0;
-            _state_vector[STATE_D2] = 0;
-
-            enforceSymmetry();
-
-            _isUpdated = false;
         }
 
         void updateWithAccel(measurement_t & m)
