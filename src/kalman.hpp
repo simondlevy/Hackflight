@@ -919,42 +919,6 @@ class KalmanFilter {
 
         }
 
-        void addProcessNoiseDt(float dt)
-        {
-            _Pmatrix[STATE_X][STATE_X] += 
-                powf(PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + 
-                        PROC_NOISE_POS, 2);  // add process noise on position
-
-            _Pmatrix[STATE_Y][STATE_Y] += 
-                powf(PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + 
-                        PROC_NOISE_POS, 2);  // add process noise on position
-
-            _Pmatrix[STATE_Z][STATE_Z] += 
-                powf(PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + 
-                        PROC_NOISE_POS, 2);  // add process noise on position
-
-            _Pmatrix[STATE_VX][STATE_VX] += 
-                powf(PROC_NOISE_ACCEL_XY*dt + 
-                        PROC_NOISE_VEL, 2); // add process noise on velocity
-
-            _Pmatrix[STATE_VY][STATE_VY] += 
-                powf(PROC_NOISE_ACCEL_XY*dt + 
-                        PROC_NOISE_VEL, 2); // add process noise on velocity
-
-            _Pmatrix[STATE_VZ][STATE_VZ] += 
-                powf(PROC_NOISE_ACCEL_Z*dt + 
-                        PROC_NOISE_VEL, 2); // add process noise on velocity
-
-            _Pmatrix[STATE_D0][STATE_D0] += 
-                powf(MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT, 2);
-            _Pmatrix[STATE_D1][STATE_D1] += 
-                powf(MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT, 2);
-            _Pmatrix[STATE_D2][STATE_D2] += 
-                powf(MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT, 2);
-
-            enforceSymmetry();
-        }
-
        void scalarUpdate(
                 matrix_t *Hm, 
                 float error, 
