@@ -46,6 +46,9 @@
 #include <datatypes.h>
 #include <matrix_typedef.h>
 
+#define EKF_N 9
+#include <ekf.hpp>
+
 class KalmanFilter { 
 
     private:
@@ -138,6 +141,8 @@ class KalmanFilter {
                 STDEV_INITIAL_ATTITUDE_YAW
             };
             addCovarianceNoise(pinit);
+
+            _ekf.init(pinit, nowMs, MIN_COVARIANCE, MAX_COVARIANCE);
 
             _Pmatrix_m.numRows = STATE_DIM;
             _Pmatrix_m.numCols = STATE_DIM;
@@ -299,6 +304,8 @@ class KalmanFilter {
 
             updateCovariance(A);
 
+            _ekf.updateCovariance(A);
+
             // Process noise is added after the return from the prediction step
             // ====== PREDICTION STEP ======
             // The prediction depends on whether we're on the ground, or in flight.
@@ -429,7 +436,6 @@ class KalmanFilter {
             _lastPredictionMs = nowMs;
         }
 
- 
         void addProcessNoise(const uint32_t nowMs) 
         {
             float dt = (nowMs - _lastProcessNoiseUpdateMs) / 1000.0f;
@@ -449,10 +455,11 @@ class KalmanFilter {
                 };
 
                 addCovarianceNoise(noise);
-
                 enforceSymmetry();
-
                 _lastProcessNoiseUpdateMs = nowMs;
+
+                _ekf.addCovarianceNoise(noise, nowMs);
+                _ekf.enforceSymmetry();
             }
         }
 
@@ -566,7 +573,7 @@ class KalmanFilter {
                 A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
                 A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                updateCovariance(A);
+                _ekf.updateCovariance(A);
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
@@ -608,6 +615,8 @@ class KalmanFilter {
             _state_vector[STATE_D2] = 0;
 
             enforceSymmetry();
+
+            _ekf.enforceSymmetry();
 
             _isUpdated = false;
         }
@@ -721,13 +730,6 @@ class KalmanFilter {
         // Quaternion used for initial orientation [w,x,y,z]
         float _initialQuaternion[4];
 
-        // Tracks whether an update to the state has been made, and the state
-        // therefore requires finalization
-        bool _isUpdated;
-
-        uint32_t _lastPredictionMs;
-        uint32_t _lastProcessNoiseUpdateMs;
-
         Axis3f _accLatest;
         Axis3f _gyroLatest;
 
@@ -796,103 +798,6 @@ class KalmanFilter {
             return &subSampler->subSample;
         }
 
-        void enforceSymmetry()
-        {
-            for (int i=0; i<STATE_DIM; i++) {
-                for (int j=i; j<STATE_DIM; j++) {
-                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i];
-                    if (isnan(p) || p > MAX_COVARIANCE) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
-                    } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
-                    } else {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
-                    }
-                }
-            }
-
-        }
-
-       void scalarUpdate(
-               matrix_t & Hm, const float error, const float stdMeasNoise)
-        {
-            // The Kalman gain as a column vector
-            static float K[STATE_DIM];
-            static matrix_t Km = {STATE_DIM, 1, (float *)K};
-
-            // Temporary matrices for the covariance updates
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN1m = {
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN2m = {
-                STATE_DIM, STATE_DIM, tmpNN2d
-            };
-
-            static float tmpNN3d[STATE_DIM * STATE_DIM];
-            static matrix_t tmpNN3m = {
-                STATE_DIM, STATE_DIM, tmpNN3d
-            };
-
-            static float HTd[STATE_DIM * 1];
-            static matrix_t HTm = {STATE_DIM, 1, HTd};
-
-            static float PHTd[STATE_DIM * 1];
-            static matrix_t PHTm = {STATE_DIM, 1, PHTd};
-        
-            // ====== INNOVATION COVARIANCE ======
-
-            device_mat_trans(&Hm, &HTm);
-            device_mat_mult(&_Pmatrix_m, &HTm, &PHTm); // PH'
-            float R = stdMeasNoise*stdMeasNoise;
-            float HPHR = R; // HPH' + R
-            for (int i=0; i<STATE_DIM; i++) { 
-
-                // Add the element of HPH' to the above
-
-                // this obviously only works if the update is scalar (as in this function)
-                HPHR += Hm.pData[i]*PHTd[i]; 
-            }
-
-            // ====== MEASUREMENT UPDATE ======
-            // Calculate the Kalman gain and perform the state update
-            for (int i=0; i<STATE_DIM; i++) {
-                K[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                _state_vector[i] = _state_vector[i] + K[i] * error; // state update
-            }
-
-            // ====== COVARIANCE UPDATE ======
-            device_mat_mult(&Km, &Hm, &tmpNN1m); // KH
-            for (int i=0; i<STATE_DIM; i++) { 
-                tmpNN1d[STATE_DIM*i+i] -= 1; 
-            } // KH - I
-            device_mat_trans(&tmpNN1m, &tmpNN2m); // (KH - I)'
-            device_mat_mult(&tmpNN1m, &_Pmatrix_m, &tmpNN3m); // (KH - I)*P
-            device_mat_mult(&tmpNN3m, &tmpNN2m, &_Pmatrix_m); // (KH - I)*P*(KH - I)'
-
-            // add the measurement variance and ensure boundedness and symmetry
-            // TODO: Why would it hit these bounds? Needs to be investigated.
-            for (int i=0; i<STATE_DIM; i++) {
-                for (int j=i; j<STATE_DIM; j++) {
-                    float v = K[i] * R * K[j];
-
-                    // add measurement noise
-                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i] + v; 
-                    if (isnan(p) || p > MAX_COVARIANCE) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
-                    } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
-                    } else {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
-                    }
-                }
-            }
-
-            _isUpdated = true;
-        }
-
         void updateWithFlow(const flowMeasurement_t *flow) 
         {
             const Axis3f *gyro = &_gyroLatest;
@@ -958,7 +863,10 @@ class KalmanFilter {
 
             //First update
             matrix_t Hx = {1, STATE_DIM, hx};
-            scalarUpdate(Hx, (_measuredNX-_predictedNX), 
+            updateWithScalar(Hx, (_measuredNX-_predictedNX), 
+                    flow->stdDevX*FLOW_RESOLUTION);
+
+            _ekf.updateWithScalar(Hx, (_measuredNX-_predictedNX), 
                     flow->stdDevX*FLOW_RESOLUTION);
 
             // ~~~ Y velocity prediction and update ~~~
@@ -974,7 +882,10 @@ class KalmanFilter {
 
             // Second update
             matrix_t Hy = {1, STATE_DIM, hy};
-            scalarUpdate(Hy, (_measuredNY-_predictedNY),
+            updateWithScalar(Hy, (_measuredNY-_predictedNY),
+                    flow->stdDevY*FLOW_RESOLUTION);
+
+            _ekf.updateWithScalar(Hy, (_measuredNY-_predictedNY),
                     flow->stdDevY*FLOW_RESOLUTION);
         }
 
@@ -1016,8 +927,7 @@ class KalmanFilter {
                 // updates are done in the scalar update function below
                 h[STATE_Z] = 1 / cosf(angle); 
 
-                // Scalar update
-                scalarUpdate(H, measuredDistance-predictedDistance, tof->stdDev);
+                updateWithScalar(H, measuredDistance-predictedDistance, tof->stdDev);
             }
         }
 
@@ -1035,9 +945,18 @@ class KalmanFilter {
 
         // Generic EKF stuff //////////////////////////////////////////////////
 
+        EKF _ekf;
+
         // The covariance matrix
         __attribute__((aligned(4))) float _Pmatrix[STATE_DIM][STATE_DIM];
         matrix_t _Pmatrix_m;
+
+        // Tracks whether an update to the state has been made, and the state
+        // therefore requires finalization
+        bool _isUpdated;
+
+        uint32_t _lastPredictionMs;
+        uint32_t _lastProcessNoiseUpdateMs;
 
         void updateCovariance(const float A[STATE_DIM][STATE_DIM])
         {
@@ -1055,7 +974,6 @@ class KalmanFilter {
                 STATE_DIM, STATE_DIM, tmpNN2d
             };
 
-
             device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
             device_mat_trans(&Am, &tmpNN2m); // A'
             device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
@@ -1067,6 +985,101 @@ class KalmanFilter {
             for (uint8_t k=0; k<STATE_DIM; ++k) {
                 _Pmatrix[k][k] += noise[k] * noise[k];
             }
+        }
+
+        void updateWithScalar(
+                matrix_t & Hm, const float error, const float stdMeasNoise)
+        {
+            // The Kalman gain as a column vector
+            static float G[STATE_DIM];
+            static matrix_t Gm = {STATE_DIM, 1, (float *)G};
+
+            // Temporary matrices for the covariance updates
+            static float tmpNN1d[STATE_DIM * STATE_DIM];
+            static matrix_t tmpNN1m = {
+                STATE_DIM, STATE_DIM, tmpNN1d
+            };
+
+            static float tmpNN2d[STATE_DIM * STATE_DIM];
+            static matrix_t tmpNN2m = {
+                STATE_DIM, STATE_DIM, tmpNN2d
+            };
+
+            static float tmpNN3d[STATE_DIM * STATE_DIM];
+            static matrix_t tmpNN3m = {
+                STATE_DIM, STATE_DIM, tmpNN3d
+            };
+
+            static float HTd[STATE_DIM * 1];
+            static matrix_t HTm = {STATE_DIM, 1, HTd};
+
+            static float PHTd[STATE_DIM * 1];
+            static matrix_t PHTm = {STATE_DIM, 1, PHTd};
+
+            // ====== INNOVATION COVARIANCE ======
+
+            device_mat_trans(&Hm, &HTm);
+            device_mat_mult(&_Pmatrix_m, &HTm, &PHTm); // PH'
+            float R = stdMeasNoise*stdMeasNoise;
+            float HPHR = R; // HPH' + R
+            for (int i=0; i<STATE_DIM; i++) { 
+                // Add the element of HPH' to the above
+                // this obviously only works if the update is scalar (as in this function)
+                HPHR += Hm.pData[i]*PHTd[i]; 
+            }
+
+            // ====== MEASUREMENT UPDATE ======
+            // Calculate the Kalman gain and perform the state update
+            for (int i=0; i<STATE_DIM; i++) {
+                G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                _state_vector[i] = _state_vector[i] + G[i] * error; // state update
+            }
+
+            // ====== COVARIANCE UPDATE ======
+            device_mat_mult(&Gm, &Hm, &tmpNN1m); // KH
+            for (int i=0; i<STATE_DIM; i++) { 
+                tmpNN1d[STATE_DIM*i+i] -= 1; 
+            } // GH - I
+            device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+            device_mat_mult(&tmpNN1m, &_Pmatrix_m, &tmpNN3m); // (GH - I)*P
+            device_mat_mult(&tmpNN3m, &tmpNN2m, &_Pmatrix_m); // (GH - I)*P*(GH - I)'
+
+            // add the measurement variance and ensure boundedness and symmetry
+            // TODO: Why would it hit these bounds? Needs to be investigated.
+            for (int i=0; i<STATE_DIM; i++) {
+                for (int j=i; j<STATE_DIM; j++) {
+                    float v = G[i] * R * G[j];
+
+                    // add measurement noise
+                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i] + v; 
+                    if (isnan(p) || p > MAX_COVARIANCE) {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
+                    } else if ( i==j && p < MIN_COVARIANCE ) {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
+                    } else {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
+                    }
+                }
+            }
+
+            _isUpdated = true;
+        }
+
+        void enforceSymmetry()
+        {
+            for (int i=0; i<STATE_DIM; i++) {
+                for (int j=i; j<STATE_DIM; j++) {
+                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i];
+                    if (isnan(p) || p > MAX_COVARIANCE) {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
+                    } else if ( i==j && p < MIN_COVARIANCE ) {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
+                    } else {
+                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
+                    }
+                }
+            }
+
         }
 
         // Generic math stuff //////////////////////////////////////////////////
