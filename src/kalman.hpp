@@ -185,6 +185,7 @@ class KalmanFilter {
                 STATE_DIM, STATE_DIM, tmpNN2d
             };
 
+            /*
             predictDt(nowMs, A, Am, tmpNN1m, tmpNN2m, accel, gyro, dt, isFlying);
 
         }
@@ -199,7 +200,7 @@ class KalmanFilter {
                 Axis3f * gyro, 
                 const float dt, 
                 const bool isFlying)
-        {
+        {*/
             /* Here we discretize (euler forward) and linearise the quadrocopter
              * dynamics in order to push the covariance forward.
              *
