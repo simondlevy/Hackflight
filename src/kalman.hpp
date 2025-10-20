@@ -46,6 +46,9 @@
 #include <datatypes.h>
 #include <matrix_typedef.h>
 
+#define TINYEKF_N 9
+#include <tinyekf.hpp>
+
 class KalmanFilter { 
 
     private:
@@ -170,20 +173,6 @@ class KalmanFilter {
 
             // The linearized update matrix
             static float A[STATE_DIM][STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t Am = { 
-                STATE_DIM, STATE_DIM, (float *)A
-            }; // linearized dynamics for covariance update;
-
-            // Temporary matrices for the covariance updates
-            static float tmpNN1d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                STATE_DIM, STATE_DIM, tmpNN1d
-            };
-
-            static float tmpNN2d[STATE_DIM * STATE_DIM];
-            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                STATE_DIM, STATE_DIM, tmpNN2d
-            };
 
             /* Here we discretize (euler forward) and linearise the quadrocopter
              * dynamics in order to push the covariance forward.
@@ -321,10 +310,30 @@ class KalmanFilter {
             A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
             A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
+            //////////////////////////////////////////////////////////////////////////
+
+            static __attribute__((aligned(4))) matrix_t Am = { 
+                STATE_DIM, STATE_DIM, (float *)A
+            }; // linearized dynamics for covariance update;
+
+            // Temporary matrices for the covariance updates
+            static float tmpNN1d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
+                STATE_DIM, STATE_DIM, tmpNN1d
+            };
+
+            static float tmpNN2d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
+                STATE_DIM, STATE_DIM, tmpNN2d
+            };
+
+
             // ====== COVARIANCE UPDATE ======
             device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
             device_mat_trans(&Am, &tmpNN2m); // A'
             device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
+
+            //////////////////////////////////////////////////////////////////////////
 
             // Process noise is added after the return from the prediction step
             // ====== PREDICTION STEP ======
