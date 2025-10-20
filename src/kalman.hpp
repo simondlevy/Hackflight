@@ -348,6 +348,8 @@ class KalmanFilter {
             device_mat_trans(&Am, &tmpNN2m); // A'
             device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
 
+            _tinyekf.updateCovariance(A);
+
             //////////////////////////////////////////////////////////////////////////
 
             // Process noise is added after the return from the prediction step
