@@ -120,7 +120,7 @@ class KalmanFilter {
             // Set the covariance matrix to zero
             for (int i=0; i< STATE_DIM; i++) {
                 for (int j=0; j < STATE_DIM; j++) {
-                    _p[i][j] = 0; 
+                    _ekf.p[i][j] = 0; 
                 }
             }
 
@@ -141,7 +141,7 @@ class KalmanFilter {
 
             _ekf.p_m.numRows = STATE_DIM;
             _ekf.p_m.numCols = STATE_DIM;
-            _ekf.p_m.pData = (float*)_p;
+            _ekf.p_m.pData = (float*)_ekf.p;
 
             _isUpdated = false;
             _lastPredictionMs = nowMs;
@@ -809,8 +809,6 @@ class KalmanFilter {
 
         EKF _ekf;
 
-        __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
-
         // Tracks whether an update to the state has been made, and the state
         // therefore requires finalization
         bool _isUpdated;
@@ -843,7 +841,7 @@ class KalmanFilter {
         void addCovarianceNoise(const float * noise)
         {
             for (uint8_t k=0; k<STATE_DIM; ++k) {
-                _p[k][k] += noise[k] * noise[k];
+                _ekf.p[k][k] += noise[k] * noise[k];
             }
         }
 
@@ -907,13 +905,13 @@ class KalmanFilter {
                     float v = G[i] * R * G[j];
 
                     // add measurement noise
-                    float p = 0.5f*_p[i][j] + 0.5f*_p[j][i] + v; 
+                    float p = 0.5f*_ekf.p[i][j] + 0.5f*_ekf.p[j][i] + v; 
                     if (isnan(p) || p > MAX_COVARIANCE) {
-                        _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                        _ekf.p[i][j] = _ekf.p[j][i] = MAX_COVARIANCE;
                     } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                        _ekf.p[i][j] = _ekf.p[j][i] = MIN_COVARIANCE;
                     } else {
-                        _p[i][j] = _p[j][i] = p;
+                        _ekf.p[i][j] = _ekf.p[j][i] = p;
                     }
                 }
             }
@@ -925,13 +923,13 @@ class KalmanFilter {
         {
             for (int i=0; i<STATE_DIM; i++) {
                 for (int j=i; j<STATE_DIM; j++) {
-                    float p = 0.5f*_p[i][j] + 0.5f*_p[j][i];
+                    float p = 0.5f*_ekf.p[i][j] + 0.5f*_ekf.p[j][i];
                     if (isnan(p) || p > MAX_COVARIANCE) {
-                        _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                        _ekf.p[i][j] = _ekf.p[j][i] = MAX_COVARIANCE;
                     } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                        _ekf.p[i][j] = _ekf.p[j][i] = MIN_COVARIANCE;
                     } else {
-                        _p[i][j] = _p[j][i] = p;
+                        _ekf.p[i][j] = _ekf.p[j][i] = p;
                     }
                 }
             }
