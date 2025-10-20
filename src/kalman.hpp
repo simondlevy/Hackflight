@@ -97,9 +97,9 @@ class KalmanFilter {
 
             _outlierFilterTdoa.reset();
 
-            _state_vector[STATE_X] = 0;
-            _state_vector[STATE_Y] = 0;
-            _state_vector[STATE_Z] = 0;
+            _x[STATE_X] = 0;
+            _x[STATE_Y] = 0;
+            _x[STATE_Z] = 0;
 
             // Reset the attitude quaternion
             _initialQuaternion[0] = 1;
@@ -123,7 +123,7 @@ class KalmanFilter {
             // Set the covariance matrix to zero
             for (int i=0; i< STATE_DIM; i++) {
                 for (int j=0; j < STATE_DIM; j++) {
-                    _Pmatrix[i][j] = 0; 
+                    _p[i][j] = 0; 
                 }
             }
 
@@ -144,9 +144,9 @@ class KalmanFilter {
 
             _ekf.init(pinit, nowMs, MIN_COVARIANCE, MAX_COVARIANCE);
 
-            _Pmatrix_m.numRows = STATE_DIM;
-            _Pmatrix_m.numCols = STATE_DIM;
-            _Pmatrix_m.pData = (float*)_Pmatrix;
+            _p_m.numRows = STATE_DIM;
+            _p_m.numCols = STATE_DIM;
+            _p_m.pData = (float*)_p;
 
             _isUpdated = false;
             _lastPredictionMs = nowMs;
@@ -216,26 +216,26 @@ class KalmanFilter {
             A[STATE_Z][STATE_VZ] = _rotmat[2][2]*dt;
 
             // position from attitude error
-            A[STATE_X][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[0][2] - 
-                    _state_vector[STATE_VZ]*_rotmat[0][1])*dt;
-            A[STATE_Y][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[1][2] - 
-                    _state_vector[STATE_VZ]*_rotmat[1][1])*dt;
-            A[STATE_Z][STATE_D0] = (_state_vector[STATE_VY]*_rotmat[2][2] - 
-                    _state_vector[STATE_VZ]*_rotmat[2][1])*dt;
+            A[STATE_X][STATE_D0] = (_x[STATE_VY]*_rotmat[0][2] - 
+                    _x[STATE_VZ]*_rotmat[0][1])*dt;
+            A[STATE_Y][STATE_D0] = (_x[STATE_VY]*_rotmat[1][2] - 
+                    _x[STATE_VZ]*_rotmat[1][1])*dt;
+            A[STATE_Z][STATE_D0] = (_x[STATE_VY]*_rotmat[2][2] - 
+                    _x[STATE_VZ]*_rotmat[2][1])*dt;
 
-            A[STATE_X][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[0][2] + 
-                    _state_vector[STATE_VZ]*_rotmat[0][0])*dt;
-            A[STATE_Y][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[1][2] + 
-                    _state_vector[STATE_VZ]*_rotmat[1][0])*dt;
-            A[STATE_Z][STATE_D1] = (- _state_vector[STATE_VX]*_rotmat[2][2] + 
-                    _state_vector[STATE_VZ]*_rotmat[2][0])*dt;
+            A[STATE_X][STATE_D1] = (- _x[STATE_VX]*_rotmat[0][2] + 
+                    _x[STATE_VZ]*_rotmat[0][0])*dt;
+            A[STATE_Y][STATE_D1] = (- _x[STATE_VX]*_rotmat[1][2] + 
+                    _x[STATE_VZ]*_rotmat[1][0])*dt;
+            A[STATE_Z][STATE_D1] = (- _x[STATE_VX]*_rotmat[2][2] + 
+                    _x[STATE_VZ]*_rotmat[2][0])*dt;
 
-            A[STATE_X][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[0][1] - 
-                    _state_vector[STATE_VY]*_rotmat[0][0])*dt;
-            A[STATE_Y][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[1][1] - 
-                    _state_vector[STATE_VY]*_rotmat[1][0])*dt;
-            A[STATE_Z][STATE_D2] = (_state_vector[STATE_VX]*_rotmat[2][1] - 
-                    _state_vector[STATE_VY]*_rotmat[2][0])*dt;
+            A[STATE_X][STATE_D2] = (_x[STATE_VX]*_rotmat[0][1] - 
+                    _x[STATE_VY]*_rotmat[0][0])*dt;
+            A[STATE_Y][STATE_D2] = (_x[STATE_VX]*_rotmat[1][1] - 
+                    _x[STATE_VY]*_rotmat[1][0])*dt;
+            A[STATE_Z][STATE_D2] = (_x[STATE_VX]*_rotmat[2][1] - 
+                    _x[STATE_VY]*_rotmat[2][0])*dt;
 
             // body-frame velocity from body-frame velocity
             A[STATE_VX][STATE_VX] = 1; //drag negligible
@@ -321,32 +321,32 @@ class KalmanFilter {
                 const float zacc = accel->z;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _state_vector[STATE_VX] * dt;
-                const float dy = _state_vector[STATE_VY] * dt;
-                const float dz = _state_vector[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
+                const float dx = _x[STATE_VX] * dt;
+                const float dy = _x[STATE_VY] * dt;
+                const float dz = _x[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
-                _state_vector[STATE_X] += _rotmat[0][0] * dx + 
+                _x[STATE_X] += _rotmat[0][0] * dx + 
                     _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-                _state_vector[STATE_Y] += _rotmat[1][0] * dx + 
+                _x[STATE_Y] += _rotmat[1][0] * dx + 
                     _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-                _state_vector[STATE_Z] += _rotmat[2][0] * dx + 
+                _x[STATE_Z] += _rotmat[2][0] * dx + 
                     _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
                     GRAVITY_MAGNITUDE * dt2 / 2.0f;
 
                 // keep previous time step's state for the update
-                const float tmpSPX = _state_vector[STATE_VX];
-                const float tmpSPY = _state_vector[STATE_VY];
-                const float tmpSPZ = _state_vector[STATE_VZ];
+                const float tmpSPX = _x[STATE_VX];
+                const float tmpSPY = _x[STATE_VY];
+                const float tmpSPZ = _x[STATE_VZ];
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                _state_vector[STATE_VX] += dt * (gyro->z * tmpSPY - gyro->y *
+                _x[STATE_VX] += dt * (gyro->z * tmpSPY - gyro->y *
                         tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
-                _state_vector[STATE_VY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - 
+                _x[STATE_VY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - 
                         GRAVITY_MAGNITUDE * _rotmat[2][1]);
-                _state_vector[STATE_VZ] += dt * (zacc + gyro->y * tmpSPX - gyro->x * 
+                _x[STATE_VZ] += dt * (zacc + gyro->y * tmpSPX - gyro->x * 
                         tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
             }
             else {
@@ -354,32 +354,32 @@ class KalmanFilter {
                 // accelerometer. This occurs, eg. in freefall or while being carried.
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _state_vector[STATE_VX] * dt + accel->x * dt2 / 2.0f;
-                const float dy = _state_vector[STATE_VY] * dt + accel->y * dt2 / 2.0f;
-                const float dz = _state_vector[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
+                const float dx = _x[STATE_VX] * dt + accel->x * dt2 / 2.0f;
+                const float dy = _x[STATE_VY] * dt + accel->y * dt2 / 2.0f;
+                const float dz = _x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
-                _state_vector[STATE_X] += _rotmat[0][0] * dx 
+                _x[STATE_X] += _rotmat[0][0] * dx 
                     + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-                _state_vector[STATE_Y] += _rotmat[1][0] * dx + 
+                _x[STATE_Y] += _rotmat[1][0] * dx + 
                     _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-                _state_vector[STATE_Z] += _rotmat[2][0] * dx + 
+                _x[STATE_Z] += _rotmat[2][0] * dx + 
                     _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
                     GRAVITY_MAGNITUDE * dt2 / 2.0f;
 
                 // keep previous time step's state for the update
-                const float tmpSPX = _state_vector[STATE_VX];
-                const float tmpSPY = _state_vector[STATE_VY];
-                const float tmpSPZ = _state_vector[STATE_VZ];
+                const float tmpSPX = _x[STATE_VX];
+                const float tmpSPY = _x[STATE_VY];
+                const float tmpSPZ = _x[STATE_VZ];
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                _state_vector[STATE_VX] += dt * (accel->x + gyro->z * tmpSPY -
+                _x[STATE_VX] += dt * (accel->x + gyro->z * tmpSPY -
                         gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
-                _state_vector[STATE_VY] += dt * (accel->y - gyro->z * tmpSPX + gyro->x * 
+                _x[STATE_VY] += dt * (accel->y - gyro->z * tmpSPX + gyro->x * 
                         tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][1]);
-                _state_vector[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * 
+                _x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * 
                         tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
             }
 
@@ -499,9 +499,9 @@ class KalmanFilter {
             }
 
             // Incorporate the attitude error (Kalman filter state) with the attitude
-            const float v0 = _state_vector[STATE_D0];
-            const float v1 = _state_vector[STATE_D1];
-            const float v2 = _state_vector[STATE_D2];
+            const float v0 = _x[STATE_D0];
+            const float v1 = _x[STATE_D1];
+            const float v2 = _x[STATE_D2];
 
             // Move attitude error into attitude if any of the angle errors are
             // large enough
@@ -610,9 +610,9 @@ class KalmanFilter {
                 _quat[2] + _quat[3] * _quat[3];
 
             // reset the attitude error
-            _state_vector[STATE_D0] = 0;
-            _state_vector[STATE_D1] = 0;
-            _state_vector[STATE_D2] = 0;
+            _x[STATE_D0] = 0;
+            _x[STATE_D1] = 0;
+            _x[STATE_D2] = 0;
 
             enforceSymmetry();
 
@@ -627,9 +627,9 @@ class KalmanFilter {
             for (int i = 0; i < 3; i++) {
 
                 if (MAX_VELOCITY > 0.0f) {
-                    if (_state_vector[STATE_VX + i] > MAX_VELOCITY) {
+                    if (_x[STATE_VX + i] > MAX_VELOCITY) {
                         return false;
-                    } else if (_state_vector[STATE_VX + i] < -MAX_VELOCITY) {
+                    } else if (_x[STATE_VX + i] < -MAX_VELOCITY) {
                         return false;
                     }
                 }
@@ -640,24 +640,24 @@ class KalmanFilter {
 
         void getVehicleState(vehicleState_t & state)
         {
-            state.x = _state_vector[STATE_X];
+            state.x = _x[STATE_X];
 
-            state.dx = _rotmat[0][0]*_state_vector[STATE_VX] + 
-                _rotmat[0][1]*_state_vector[STATE_VY] + 
-                _rotmat[0][2]*_state_vector[STATE_VZ];
+            state.dx = _rotmat[0][0]*_x[STATE_VX] + 
+                _rotmat[0][1]*_x[STATE_VY] + 
+                _rotmat[0][2]*_x[STATE_VZ];
 
-            state.y = _state_vector[STATE_Y];
+            state.y = _x[STATE_Y];
 
             // Negate for rightward positive
-            state.dy = -(_rotmat[1][0]*_state_vector[STATE_VX] + 
-                    _rotmat[1][1]*_state_vector[STATE_VY] + 
-                    _rotmat[1][2]*_state_vector[STATE_VZ]);
+            state.dy = -(_rotmat[1][0]*_x[STATE_VX] + 
+                    _rotmat[1][1]*_x[STATE_VY] + 
+                    _rotmat[1][2]*_x[STATE_VZ]);
 
-            state.z = _state_vector[STATE_Z];
+            state.z = _x[STATE_Z];
 
-            state.dz = _rotmat[2][0]*_state_vector[STATE_VX] + 
-                _rotmat[2][1]*_state_vector[STATE_VY] + 
-                _rotmat[2][2]*_state_vector[STATE_VZ];
+            state.dz = _rotmat[2][0]*_x[STATE_VX] + 
+                _rotmat[2][1]*_x[STATE_VY] + 
+                _rotmat[2][2]*_x[STATE_VZ];
 
             state.phi = RADIANS_TO_DEGREES *
                 atan2f(2*(_quat[2]*_quat[3]+_quat[0]*
@@ -754,7 +754,7 @@ class KalmanFilter {
          *
          * For more information, refer to the paper
          */
-        float _state_vector[STATE_DIM];
+        float _x[STATE_DIM];
 
         // The vehicle's attitude as a rotation matrix (used by the prediction,
         // updated by the finalization)
@@ -838,14 +838,14 @@ class KalmanFilter {
             //  S[STATE_VZ];
 
 
-            float dx_g = _state_vector[STATE_VX];
-            float dy_g = _state_vector[STATE_VY];
+            float dx_g = _x[STATE_VX];
+            float dy_g = _x[STATE_VY];
             float z_g = 0.0;
             // Saturate elevation in prediction and correction to avoid singularities
-            if ( _state_vector[STATE_Z] < 0.1f ) {
+            if ( _x[STATE_Z] < 0.1f ) {
                 z_g = 0.1;
             } else {
-                z_g = _state_vector[STATE_Z];
+                z_g = _x[STATE_Z];
             }
 
             // ~~~ X velocity prediction and update ~~~
@@ -904,7 +904,7 @@ class KalmanFilter {
                 if (angle < 0.0f) {
                     angle = 0.0f;
                 }
-                float predictedDistance = _state_vector[STATE_Z] / cosf(angle);
+                float predictedDistance = _x[STATE_Z] / cosf(angle);
                 float measuredDistance = tof->distance; // [m]
 
 
@@ -948,8 +948,8 @@ class KalmanFilter {
         EKF _ekf;
 
         // The covariance matrix
-        __attribute__((aligned(4))) float _Pmatrix[STATE_DIM][STATE_DIM];
-        matrix_t _Pmatrix_m;
+        __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+        matrix_t _p_m;
 
         // Tracks whether an update to the state has been made, and the state
         // therefore requires finalization
@@ -974,16 +974,16 @@ class KalmanFilter {
                 STATE_DIM, STATE_DIM, tmpNN2d
             };
 
-            device_mat_mult(&Am, &_Pmatrix_m, &tmpNN1m); // A P
+            device_mat_mult(&Am, &_p_m, &tmpNN1m); // A P
             device_mat_trans(&Am, &tmpNN2m); // A'
-            device_mat_mult(&tmpNN1m, &tmpNN2m, &_Pmatrix_m); // A P A'
+            device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // A P A'
 
         }
 
         void addCovarianceNoise(const float * noise)
         {
             for (uint8_t k=0; k<STATE_DIM; ++k) {
-                _Pmatrix[k][k] += noise[k] * noise[k];
+                _p[k][k] += noise[k] * noise[k];
             }
         }
 
@@ -1019,7 +1019,7 @@ class KalmanFilter {
             // ====== INNOVATION COVARIANCE ======
 
             device_mat_trans(&Hm, &HTm);
-            device_mat_mult(&_Pmatrix_m, &HTm, &PHTm); // PH'
+            device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
             float R = stdMeasNoise*stdMeasNoise;
             float HPHR = R; // HPH' + R
             for (int i=0; i<STATE_DIM; i++) { 
@@ -1032,7 +1032,7 @@ class KalmanFilter {
             // Calculate the Kalman gain and perform the state update
             for (int i=0; i<STATE_DIM; i++) {
                 G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                _state_vector[i] = _state_vector[i] + G[i] * error; // state update
+                _x[i] = _x[i] + G[i] * error; // state update
             }
 
             // ====== COVARIANCE UPDATE ======
@@ -1041,8 +1041,8 @@ class KalmanFilter {
                 tmpNN1d[STATE_DIM*i+i] -= 1; 
             } // GH - I
             device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-            device_mat_mult(&tmpNN1m, &_Pmatrix_m, &tmpNN3m); // (GH - I)*P
-            device_mat_mult(&tmpNN3m, &tmpNN2m, &_Pmatrix_m); // (GH - I)*P*(GH - I)'
+            device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+            device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
 
             // add the measurement variance and ensure boundedness and symmetry
             // TODO: Why would it hit these bounds? Needs to be investigated.
@@ -1051,13 +1051,13 @@ class KalmanFilter {
                     float v = G[i] * R * G[j];
 
                     // add measurement noise
-                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i] + v; 
+                    float p = 0.5f*_p[i][j] + 0.5f*_p[j][i] + v; 
                     if (isnan(p) || p > MAX_COVARIANCE) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
+                        _p[i][j] = _p[j][i] = MAX_COVARIANCE;
                     } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
+                        _p[i][j] = _p[j][i] = MIN_COVARIANCE;
                     } else {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
+                        _p[i][j] = _p[j][i] = p;
                     }
                 }
             }
@@ -1069,17 +1069,16 @@ class KalmanFilter {
         {
             for (int i=0; i<STATE_DIM; i++) {
                 for (int j=i; j<STATE_DIM; j++) {
-                    float p = 0.5f*_Pmatrix[i][j] + 0.5f*_Pmatrix[j][i];
+                    float p = 0.5f*_p[i][j] + 0.5f*_p[j][i];
                     if (isnan(p) || p > MAX_COVARIANCE) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MAX_COVARIANCE;
+                        _p[i][j] = _p[j][i] = MAX_COVARIANCE;
                     } else if ( i==j && p < MIN_COVARIANCE ) {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = MIN_COVARIANCE;
+                        _p[i][j] = _p[j][i] = MIN_COVARIANCE;
                     } else {
-                        _Pmatrix[i][j] = _Pmatrix[j][i] = p;
+                        _p[i][j] = _p[j][i] = p;
                     }
                 }
             }
-
         }
 
         // Generic math stuff //////////////////////////////////////////////////
