@@ -147,22 +147,24 @@ class KalmanFilter {
 
             const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
 
-            Axis3f * accel = &_accSubSampler.subSample;
-            Axis3f * gyro = &_gyroSubSampler.subSample;
+            const Axis3f * accel = &_accSubSampler.subSample;
+            const Axis3f * gyro = &_gyroSubSampler.subSample;
+
+            const float d0 = gyro->x*dt/2;
+            const float d1 = gyro->y*dt/2;
+            const float d2 = gyro->z*dt/2;
+
+            const float vx = _ekf.x[STATE_VX];
+            const float vy = _ekf.x[STATE_VY];
+            const float vz = _ekf.x[STATE_VZ];
 
             // The linearized Jacobean matrix
             static float F[STATE_DIM][STATE_DIM];
 
-            // Initialize Jacobean F as identity
+            // position
             F[STATE_X][STATE_X] = 1;
             F[STATE_Y][STATE_Y] = 1;
             F[STATE_Z][STATE_Z] = 1;
-            F[STATE_VX][STATE_VX] = 1;
-            F[STATE_VY][STATE_VY] = 1;
-            F[STATE_VZ][STATE_VZ] = 1;
-            F[STATE_D0][STATE_D0] = 1;
-            F[STATE_D1][STATE_D1] = 1;
-            F[STATE_D2][STATE_D2] = 1;
 
             // position from body-frame velocity
             F[STATE_X][STATE_VX] = _r00*dt;
@@ -178,26 +180,17 @@ class KalmanFilter {
             F[STATE_Z][STATE_VZ] = _r22*dt;
 
             // position from attitude error
-            F[STATE_X][STATE_D0] = (_ekf.x[STATE_VY]*_r02 - 
-                    _ekf.x[STATE_VZ]*_r01)*dt;
-            F[STATE_Y][STATE_D0] = (_ekf.x[STATE_VY]*_r12 - 
-                    _ekf.x[STATE_VZ]*_r11)*dt;
-            F[STATE_Z][STATE_D0] = (_ekf.x[STATE_VY]*_r22 - 
-                    _ekf.x[STATE_VZ]*_r21)*dt;
+            F[STATE_X][STATE_D0] = (vy*_r02 - vz*_r01)*dt;
+            F[STATE_Y][STATE_D0] = (vy*_r12 - vz*_r11)*dt;
+            F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
 
-            F[STATE_X][STATE_D1] = (- _ekf.x[STATE_VX]*_r02 + 
-                    _ekf.x[STATE_VZ]*_r00)*dt;
-            F[STATE_Y][STATE_D1] = (- _ekf.x[STATE_VX]*_r12 + 
-                    _ekf.x[STATE_VZ]*_r10)*dt;
-            F[STATE_Z][STATE_D1] = (- _ekf.x[STATE_VX]*_r22 + 
-                    _ekf.x[STATE_VZ]*_r20)*dt;
+            F[STATE_X][STATE_D1] = (-vx*_r02 + vz*_r00)*dt;
+            F[STATE_Y][STATE_D1] = (-vx*_r12 + vz*_r10)*dt;
+            F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
 
-            F[STATE_X][STATE_D2] = (_ekf.x[STATE_VX]*_r01 - 
-                    _ekf.x[STATE_VY]*_r00)*dt;
-            F[STATE_Y][STATE_D2] = (_ekf.x[STATE_VX]*_r11 - 
-                    _ekf.x[STATE_VY]*_r10)*dt;
-            F[STATE_Z][STATE_D2] = (_ekf.x[STATE_VX]*_r21 - 
-                    _ekf.x[STATE_VY]*_r20)*dt;
+            F[STATE_X][STATE_D2] = (vx*_r01 - vy*_r00)*dt;
+            F[STATE_Y][STATE_D2] = (vx*_r11 - vy*_r10)*dt;
+            F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
 
             // body-frame velocity from body-frame velocity
             F[STATE_VX][STATE_VX] = 1; //drag negligible
@@ -224,10 +217,6 @@ class KalmanFilter {
             F[STATE_VX][STATE_D2] = -GRAVITY*_r21*dt;
             F[STATE_VY][STATE_D2] =  GRAVITY*_r20*dt;
             F[STATE_VZ][STATE_D2] =  0;
-
-            const float d0 = gyro->x*dt/2;
-            const float d1 = gyro->y*dt/2;
-            const float d2 = gyro->z*dt/2;
 
             F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
             F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
