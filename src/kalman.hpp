@@ -91,7 +91,7 @@ class KalmanFilter {
 
         void init(const uint32_t nowMs)
         {
-            axis3fSubSamplerInit(&_accSubSampler, GRAVITY_MAGNITUDE);
+            axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
             axis3fSubSamplerInit(&_gyroSubSampler, DEGREES_TO_RADIANS);
 
             _outlierFilterTdoa.reset();
@@ -215,15 +215,15 @@ class KalmanFilter {
 
             // body-frame velocity from attitude error
             A[STATE_VX][STATE_D0] =  0;
-            A[STATE_VY][STATE_D0] = -GRAVITY_MAGNITUDE*_rotmat[2][2]*dt;
-            A[STATE_VZ][STATE_D0] =  GRAVITY_MAGNITUDE*_rotmat[2][1]*dt;
+            A[STATE_VY][STATE_D0] = -GRAVITY*_rotmat[2][2]*dt;
+            A[STATE_VZ][STATE_D0] =  GRAVITY*_rotmat[2][1]*dt;
 
-            A[STATE_VX][STATE_D1] =  GRAVITY_MAGNITUDE*_rotmat[2][2]*dt;
+            A[STATE_VX][STATE_D1] =  GRAVITY*_rotmat[2][2]*dt;
             A[STATE_VY][STATE_D1] =  0;
-            A[STATE_VZ][STATE_D1] = -GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
+            A[STATE_VZ][STATE_D1] = -GRAVITY*_rotmat[2][0]*dt;
 
-            A[STATE_VX][STATE_D2] = -GRAVITY_MAGNITUDE*_rotmat[2][1]*dt;
-            A[STATE_VY][STATE_D2] =  GRAVITY_MAGNITUDE*_rotmat[2][0]*dt;
+            A[STATE_VX][STATE_D2] = -GRAVITY*_rotmat[2][1]*dt;
+            A[STATE_VY][STATE_D2] =  GRAVITY*_rotmat[2][0]*dt;
             A[STATE_VZ][STATE_D2] =  0;
 
             const float d0 = gyro->x*dt/2;
@@ -246,17 +246,19 @@ class KalmanFilter {
 
             const float dt2 = dt * dt;
 
-            if (isFlying) { // only acceleration in z direction
+            // keep previous time step's state for the update
+            const float tmpSPX = _ekf.x[STATE_VX];
+            const float tmpSPY = _ekf.x[STATE_VY];
+            const float tmpSPZ = _ekf.x[STATE_VZ];
 
-                // Use accelerometer and not commanded thrust, as this has
-                // proper physical units
-                const float zacc = accel->z;
+            // thrust can only be produced in the body's Z direction
+            const float dz = _ekf.x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
+
+            if (isFlying) { // only acceleration in z direction
 
                 // position updates in the body frame (will be rotated to inertial frame)
                 const float dx = _ekf.x[STATE_VX] * dt;
                 const float dy = _ekf.x[STATE_VY] * dt;
-                const float dz = _ekf.x[STATE_VZ] * dt + zacc * dt2 / 2.0f; 
-                // thrust can only be produced in the body's Z direction
 
                 // position update
                 _ekf.x[STATE_X] += _rotmat[0][0] * dx + 
@@ -265,21 +267,16 @@ class KalmanFilter {
                     _rotmat[1][1] * dy + _rotmat[1][2] * dz;
                 _ekf.x[STATE_Z] += _rotmat[2][0] * dx + 
                     _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
-                    GRAVITY_MAGNITUDE * dt2 / 2.0f;
-
-                // keep previous time step's state for the update
-                const float tmpSPX = _ekf.x[STATE_VX];
-                const float tmpSPY = _ekf.x[STATE_VY];
-                const float tmpSPZ = _ekf.x[STATE_VZ];
+                    GRAVITY * dt2 / 2.0f;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 _ekf.x[STATE_VX] += dt * (gyro->z * tmpSPY - gyro->y *
-                        tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
+                        tmpSPZ - GRAVITY * _rotmat[2][0]);
                 _ekf.x[STATE_VY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - 
-                        GRAVITY_MAGNITUDE * _rotmat[2][1]);
-                _ekf.x[STATE_VZ] += dt * (zacc + gyro->y * tmpSPX - gyro->x * 
-                        tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
+                        GRAVITY * _rotmat[2][1]);
+                _ekf.x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * 
+                        tmpSPY - GRAVITY * _rotmat[2][2]);
             }
             else {
                 // Acceleration can be in any direction, as measured by the
@@ -288,8 +285,6 @@ class KalmanFilter {
                 // position updates in the body frame (will be rotated to inertial frame)
                 const float dx = _ekf.x[STATE_VX] * dt + accel->x * dt2 / 2.0f;
                 const float dy = _ekf.x[STATE_VY] * dt + accel->y * dt2 / 2.0f;
-                const float dz = _ekf.x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
-                // thrust can only be produced in the body's Z direction
 
                 // position update
                 _ekf.x[STATE_X] += _rotmat[0][0] * dx 
@@ -298,21 +293,16 @@ class KalmanFilter {
                     _rotmat[1][1] * dy + _rotmat[1][2] * dz;
                 _ekf.x[STATE_Z] += _rotmat[2][0] * dx + 
                     _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
-                    GRAVITY_MAGNITUDE * dt2 / 2.0f;
-
-                // keep previous time step's state for the update
-                const float tmpSPX = _ekf.x[STATE_VX];
-                const float tmpSPY = _ekf.x[STATE_VY];
-                const float tmpSPZ = _ekf.x[STATE_VZ];
+                    GRAVITY * dt2 / 2.0f;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 _ekf.x[STATE_VX] += dt * (accel->x + gyro->z * tmpSPY -
-                        gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][0]);
+                        gyro->y * tmpSPZ - GRAVITY * _rotmat[2][0]);
                 _ekf.x[STATE_VY] += dt * (accel->y - gyro->z * tmpSPX + gyro->x * 
-                        tmpSPZ - GRAVITY_MAGNITUDE * _rotmat[2][1]);
+                        tmpSPZ - GRAVITY * _rotmat[2][1]);
                 _ekf.x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * 
-                        tmpSPY - GRAVITY_MAGNITUDE * _rotmat[2][2]);
+                        tmpSPY - GRAVITY * _rotmat[2][2]);
             }
 
             // attitude update (rotate by gyroscope), we do this in quaternions
@@ -581,7 +571,7 @@ class KalmanFilter {
         static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
         static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
 
-        static constexpr float GRAVITY_MAGNITUDE = 9.81;
+        static constexpr float GRAVITY = 9.81;
 
         static constexpr float DEGREES_TO_RADIANS = PI / 180.0f;
         static constexpr float RADIANS_TO_DEGREES = 180.0f / PI;
