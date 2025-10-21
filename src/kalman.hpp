@@ -264,27 +264,20 @@ class KalmanFilter {
             _ekf.x[STATE_Z] += _rotmat[2][0] * dx + _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
                 GRAVITY * dt2 / 2.0f;
 
-            if (isFlying) { // only acceleration in z direction
+            const float accelx = isFlying ? 0 : accel->x;
+            const float accely = isFlying ? 0 : accel->y;
 
+            // body-velocity update: accelerometers - gyros cross velocity
+            // - gravity in body frame
 
-                // body-velocity update: accelerometers - gyros cross velocity
-                // - gravity in body frame
-                _ekf.x[STATE_VX] += dt * (gyro->z * tmpSPY - gyro->y *
-                        tmpSPZ - GRAVITY * _rotmat[2][0]);
-                _ekf.x[STATE_VY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - 
-                        GRAVITY * _rotmat[2][1]);
-            }
-            else {
-                // body-velocity update: accelerometers - gyros cross velocity
-                // - gravity in body frame
-                _ekf.x[STATE_VX] += dt * (accel->x + gyro->z * tmpSPY -
-                        gyro->y * tmpSPZ - GRAVITY * _rotmat[2][0]);
-                _ekf.x[STATE_VY] += dt * (accel->y - gyro->z * tmpSPX + gyro->x * 
-                        tmpSPZ - GRAVITY * _rotmat[2][1]);
-            }
+            _ekf.x[STATE_VX] += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
+                    - GRAVITY * _rotmat[2][0]);
 
-            _ekf.x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * 
-                    tmpSPY - GRAVITY * _rotmat[2][2]);
+            _ekf.x[STATE_VY] += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
+                    - GRAVITY * _rotmat[2][1]);
+
+            _ekf.x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
+                    - GRAVITY * _rotmat[2][2]);
 
             // attitude update (rotate by gyroscope), we do this in quaternions
             // this is the gyroscope angular velocity integrated over the sample period
