@@ -101,20 +101,21 @@ class KalmanFilter {
             _ekf.x[STATE_Z] = 0;
 
             // Reset the attitude quaternion
-            _initialQuaternion[0] = 1;
-            _initialQuaternion[1] = 0;
-            _initialQuaternion[2] = 0;
-            _initialQuaternion[3] = 0;
+            _q0 = _qinit0 = 1;
+            _q1 = _qinit1 = 0;
+            _q2 = _qinit2 = 0;
+            _q3 = _qinit3 = 0;
 
-            for (int i = 0; i < 4; i++) { 
-                _quat[i] = _initialQuaternion[i]; 
-            }
-
-            for(int i=0; i<3; i++) { 
-                for(int j=0; j<3; j++) { 
-                    _rotmat[i][j] = i==j ? 1 : 0; 
-                }
-            }
+            // Initialize the rotation matrix
+            _r00 = 1;
+            _r01 = 0;
+            _r02 = 0;
+            _r10 = 0;
+            _r11 = 1;
+            _r12 = 0;
+            _r20 = 0;
+            _r21 = 0;
+            _r22 = 1;
 
             _ekf.init(MIN_COVARIANCE, MAX_COVARIANCE);
 
@@ -149,100 +150,98 @@ class KalmanFilter {
             Axis3f * accel = &_accSubSampler.subSample;
             Axis3f * gyro = &_gyroSubSampler.subSample;
 
-            // The linearized update matrix
-            static float A[STATE_DIM][STATE_DIM];
+            // The linearized Jacobean matrix
+            static float F[STATE_DIM][STATE_DIM];
 
-            // Initialize as the identity
-            A[STATE_X][STATE_X] = 1;
-            A[STATE_Y][STATE_Y] = 1;
-            A[STATE_Z][STATE_Z] = 1;
-
-            A[STATE_VX][STATE_VX] = 1;
-            A[STATE_VY][STATE_VY] = 1;
-            A[STATE_VZ][STATE_VZ] = 1;
-
-            A[STATE_D0][STATE_D0] = 1;
-            A[STATE_D1][STATE_D1] = 1;
-            A[STATE_D2][STATE_D2] = 1;
+            // Initialize Jacobean F as identity
+            F[STATE_X][STATE_X] = 1;
+            F[STATE_Y][STATE_Y] = 1;
+            F[STATE_Z][STATE_Z] = 1;
+            F[STATE_VX][STATE_VX] = 1;
+            F[STATE_VY][STATE_VY] = 1;
+            F[STATE_VZ][STATE_VZ] = 1;
+            F[STATE_D0][STATE_D0] = 1;
+            F[STATE_D1][STATE_D1] = 1;
+            F[STATE_D2][STATE_D2] = 1;
 
             // position from body-frame velocity
-            A[STATE_X][STATE_VX] = _rotmat[0][0]*dt;
-            A[STATE_Y][STATE_VX] = _rotmat[1][0]*dt;
-            A[STATE_Z][STATE_VX] = _rotmat[2][0]*dt;
+            F[STATE_X][STATE_VX] = _r00*dt;
+            F[STATE_Y][STATE_VX] = _r10*dt;
+            F[STATE_Z][STATE_VX] = _r20*dt;
 
-            A[STATE_X][STATE_VY] = _rotmat[0][1]*dt;
-            A[STATE_Y][STATE_VY] = _rotmat[1][1]*dt;
-            A[STATE_Z][STATE_VY] = _rotmat[2][1]*dt;
+            F[STATE_X][STATE_VY] = _r01*dt;
+            F[STATE_Y][STATE_VY] = _r11*dt;
+            F[STATE_Z][STATE_VY] = _r21*dt;
 
-            A[STATE_X][STATE_VZ] = _rotmat[0][2]*dt;
-            A[STATE_Y][STATE_VZ] = _rotmat[1][2]*dt;
-            A[STATE_Z][STATE_VZ] = _rotmat[2][2]*dt;
+            F[STATE_X][STATE_VZ] = _r02*dt;
+            F[STATE_Y][STATE_VZ] = _r12*dt;
+            F[STATE_Z][STATE_VZ] = _r22*dt;
 
             // position from attitude error
-            A[STATE_X][STATE_D0] = (_ekf.x[STATE_VY]*_rotmat[0][2] - 
-                    _ekf.x[STATE_VZ]*_rotmat[0][1])*dt;
-            A[STATE_Y][STATE_D0] = (_ekf.x[STATE_VY]*_rotmat[1][2] - 
-                    _ekf.x[STATE_VZ]*_rotmat[1][1])*dt;
-            A[STATE_Z][STATE_D0] = (_ekf.x[STATE_VY]*_rotmat[2][2] - 
-                    _ekf.x[STATE_VZ]*_rotmat[2][1])*dt;
+            F[STATE_X][STATE_D0] = (_ekf.x[STATE_VY]*_r02 - 
+                    _ekf.x[STATE_VZ]*_r01)*dt;
+            F[STATE_Y][STATE_D0] = (_ekf.x[STATE_VY]*_r12 - 
+                    _ekf.x[STATE_VZ]*_r11)*dt;
+            F[STATE_Z][STATE_D0] = (_ekf.x[STATE_VY]*_r22 - 
+                    _ekf.x[STATE_VZ]*_r21)*dt;
 
-            A[STATE_X][STATE_D1] = (- _ekf.x[STATE_VX]*_rotmat[0][2] + 
-                    _ekf.x[STATE_VZ]*_rotmat[0][0])*dt;
-            A[STATE_Y][STATE_D1] = (- _ekf.x[STATE_VX]*_rotmat[1][2] + 
-                    _ekf.x[STATE_VZ]*_rotmat[1][0])*dt;
-            A[STATE_Z][STATE_D1] = (- _ekf.x[STATE_VX]*_rotmat[2][2] + 
-                    _ekf.x[STATE_VZ]*_rotmat[2][0])*dt;
+            F[STATE_X][STATE_D1] = (- _ekf.x[STATE_VX]*_r02 + 
+                    _ekf.x[STATE_VZ]*_r00)*dt;
+            F[STATE_Y][STATE_D1] = (- _ekf.x[STATE_VX]*_r12 + 
+                    _ekf.x[STATE_VZ]*_r10)*dt;
+            F[STATE_Z][STATE_D1] = (- _ekf.x[STATE_VX]*_r22 + 
+                    _ekf.x[STATE_VZ]*_r20)*dt;
 
-            A[STATE_X][STATE_D2] = (_ekf.x[STATE_VX]*_rotmat[0][1] - 
-                    _ekf.x[STATE_VY]*_rotmat[0][0])*dt;
-            A[STATE_Y][STATE_D2] = (_ekf.x[STATE_VX]*_rotmat[1][1] - 
-                    _ekf.x[STATE_VY]*_rotmat[1][0])*dt;
-            A[STATE_Z][STATE_D2] = (_ekf.x[STATE_VX]*_rotmat[2][1] - 
-                    _ekf.x[STATE_VY]*_rotmat[2][0])*dt;
+            F[STATE_X][STATE_D2] = (_ekf.x[STATE_VX]*_r01 - 
+                    _ekf.x[STATE_VY]*_r00)*dt;
+            F[STATE_Y][STATE_D2] = (_ekf.x[STATE_VX]*_r11 - 
+                    _ekf.x[STATE_VY]*_r10)*dt;
+            F[STATE_Z][STATE_D2] = (_ekf.x[STATE_VX]*_r21 - 
+                    _ekf.x[STATE_VY]*_r20)*dt;
 
             // body-frame velocity from body-frame velocity
-            A[STATE_VX][STATE_VX] = 1; //drag negligible
-            A[STATE_VY][STATE_VX] =-gyro->z*dt;
-            A[STATE_VZ][STATE_VX] = gyro->y*dt;
+            F[STATE_VX][STATE_VX] = 1; //drag negligible
+            F[STATE_VY][STATE_VX] =-gyro->z*dt;
+            F[STATE_VZ][STATE_VX] = gyro->y*dt;
 
-            A[STATE_VX][STATE_VY] = gyro->z*dt;
-            A[STATE_VY][STATE_VY] = 1; //drag negligible
-            A[STATE_VZ][STATE_VY] =-gyro->x*dt;
+            F[STATE_VX][STATE_VY] = gyro->z*dt;
+            F[STATE_VY][STATE_VY] = 1; //drag negligible
+            F[STATE_VZ][STATE_VY] =-gyro->x*dt;
 
-            A[STATE_VX][STATE_VZ] =-gyro->y*dt;
-            A[STATE_VY][STATE_VZ] = gyro->x*dt;
-            A[STATE_VZ][STATE_VZ] = 1; //drag negligible
+            F[STATE_VX][STATE_VZ] =-gyro->y*dt;
+            F[STATE_VY][STATE_VZ] = gyro->x*dt;
+            F[STATE_VZ][STATE_VZ] = 1; //drag negligible
 
             // body-frame velocity from attitude error
-            A[STATE_VX][STATE_D0] =  0;
-            A[STATE_VY][STATE_D0] = -GRAVITY*_rotmat[2][2]*dt;
-            A[STATE_VZ][STATE_D0] =  GRAVITY*_rotmat[2][1]*dt;
+            F[STATE_VX][STATE_D0] =  0;
+            F[STATE_VY][STATE_D0] = -GRAVITY*_r22*dt;
+            F[STATE_VZ][STATE_D0] =  GRAVITY*_r21*dt;
 
-            A[STATE_VX][STATE_D1] =  GRAVITY*_rotmat[2][2]*dt;
-            A[STATE_VY][STATE_D1] =  0;
-            A[STATE_VZ][STATE_D1] = -GRAVITY*_rotmat[2][0]*dt;
+            F[STATE_VX][STATE_D1] =  GRAVITY*_r22*dt;
+            F[STATE_VY][STATE_D1] =  0;
+            F[STATE_VZ][STATE_D1] = -GRAVITY*_r20*dt;
 
-            A[STATE_VX][STATE_D2] = -GRAVITY*_rotmat[2][1]*dt;
-            A[STATE_VY][STATE_D2] =  GRAVITY*_rotmat[2][0]*dt;
-            A[STATE_VZ][STATE_D2] =  0;
+            F[STATE_VX][STATE_D2] = -GRAVITY*_r21*dt;
+            F[STATE_VY][STATE_D2] =  GRAVITY*_r20*dt;
+            F[STATE_VZ][STATE_D2] =  0;
 
             const float d0 = gyro->x*dt/2;
             const float d1 = gyro->y*dt/2;
             const float d2 = gyro->z*dt/2;
 
-            A[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-            A[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-            A[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
+            F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+            F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
+            F[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
 
-            A[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-            A[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-            A[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
+            F[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
+            F[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+            F[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
 
-            A[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-            A[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-            A[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+            F[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
+            F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
+            F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-            _ekf.updateCovariance(A);
+            _ekf.predict(F);
 
             const float dt2 = dt * dt;
 
@@ -259,9 +258,9 @@ class KalmanFilter {
             const float dz = _ekf.x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
 
             // position update
-            _ekf.x[STATE_X] += _rotmat[0][0] * dx + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-            _ekf.x[STATE_Y] += _rotmat[1][0] * dx + _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-            _ekf.x[STATE_Z] += _rotmat[2][0] * dx + _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
+            _ekf.x[STATE_X] += _r00 * dx + _r01 * dy + _r02 * dz;
+            _ekf.x[STATE_Y] += _r10 * dx + _r11 * dy + _r12 * dz;
+            _ekf.x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
                 GRAVITY * dt2 / 2.0f;
 
             const float accelx = isFlying ? 0 : accel->x;
@@ -271,13 +270,13 @@ class KalmanFilter {
             // - gravity in body frame
 
             _ekf.x[STATE_VX] += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
-                    - GRAVITY * _rotmat[2][0]);
+                    - GRAVITY * _r20);
 
             _ekf.x[STATE_VY] += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
-                    - GRAVITY * _rotmat[2][1]);
+                    - GRAVITY * _r21);
 
             _ekf.x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
-                    - GRAVITY * _rotmat[2][2]);
+                    - GRAVITY * _r22);
 
             // attitude update (rotate by gyroscope), we do this in quaternions
             // this is the gyroscope angular velocity integrated over the sample period
@@ -293,40 +292,29 @@ class KalmanFilter {
 
             // rotate the vehicle's attitude by the delta quaternion vector computed above
 
-            float tmpq0 = dq[0]*_quat[0] - dq[1]*_quat[1] - 
-                dq[2]*_quat[2] - dq[3]*_quat[3];
-
-            float tmpq1 = dq[1]*_quat[0] + dq[0]*_quat[1] + 
-                dq[3]*_quat[2] - dq[2]*_quat[3];
-
-            float tmpq2 = dq[2]*_quat[0] - dq[3]*_quat[1] + 
-                dq[0]*_quat[2] + dq[1]*_quat[3];
-
-            float tmpq3 = dq[3]*_quat[0] + dq[2]*_quat[1] - 
-                dq[1]*_quat[2] + dq[0]*_quat[3];
+            float tmpq0 = dq[0]*_q0 - dq[1]*_q1 - dq[2]*_q2 - dq[3]*_q3;
+            float tmpq1 = dq[1]*_q0 + dq[0]*_q1 + dq[3]*_q2 - dq[2]*_q3;
+            float tmpq2 = dq[2]*_q0 - dq[3]*_q1 + dq[0]*_q2 + dq[1]*_q3;
+            float tmpq3 = dq[3]*_q0 + dq[2]*_q1 - dq[1]*_q2 + dq[0]*_q3;
 
             if (!isFlying) {
 
                 const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                tmpq0 = keep * tmpq0 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[0];
-                tmpq1 = keep * tmpq1 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[1];
-                tmpq2 = keep * tmpq2 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[2];
-                tmpq3 = keep * tmpq3 + 
-                    ROLLPITCH_ZERO_REVERSION * _initialQuaternion[3];
+                tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit0;
+                tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit1;
+                tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit2;
+                tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit3;
             }
 
             // normalize and store the result
             const float norm = device_sqrt(
                     tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
-            _quat[0] = tmpq0/norm; 
-            _quat[1] = tmpq1/norm; 
-            _quat[2] = tmpq2/norm; 
-            _quat[3] = tmpq3/norm;
+            _q0 = tmpq0/norm; 
+            _q1 = tmpq1/norm; 
+            _q2 = tmpq2/norm; 
+            _q3 = tmpq3/norm;
 
             _isUpdated = true;
             _lastPredictionMs = nowMs;
@@ -407,56 +395,36 @@ class KalmanFilter {
 
                 // Rotate the vehicle's attitude by the delta quaternion vector
                 // computed above
-                const float tmpq0 = dq[0] * _quat[0] - dq[1] * _quat[1] - 
-                    dq[2] * _quat[2] - dq[3] * _quat[3];
-                const float tmpq1 = dq[1] * _quat[0] + dq[0] * _quat[1] + 
-                    dq[3] * _quat[2] - dq[2] * _quat[3];
-                const float tmpq2 = dq[2] * _quat[0] - dq[3] * _quat[1] + 
-                    dq[0] * _quat[2] + dq[1] * _quat[3];
-                const float tmpq3 = dq[3] * _quat[0] + dq[2] * _quat[1] - 
-                    dq[1] * _quat[2] + dq[0] * _quat[3];
+                const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
+                    dq[2] * _q2 - dq[3] * _q3;
+                const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
+                    dq[3] * _q2 - dq[2] * _q3;
+                const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
+                    dq[0] * _q2 + dq[1] * _q3;
+                const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
+                    dq[1] * _q2 + dq[0] * _q3;
 
                 // normalize and store the result
                 float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                         tmpq3 * tmpq3) + EPSILON;
-                _quat[0] = tmpq0 / norm;
-                _quat[1] = tmpq1 / norm;
-                _quat[2] = tmpq2 / norm;
-                _quat[3] = tmpq3 / norm;
+                _q0 = tmpq0 / norm;
+                _q1 = tmpq1 / norm;
+                _q2 = tmpq2 / norm;
+                _q3 = tmpq3 / norm;
             }
 
             // Convert the new attitude to a rotation matrix, such that we can
             // rotate body-frame velocity and acc
 
-            _rotmat[0][0] = _quat[0] * _quat[0] + 
-                _quat[1] * _quat[1] - _quat[2] * 
-                _quat[2] - _quat[3] * _quat[3];
-
-            _rotmat[0][1] = 2 * _quat[1] * _quat[2] - 
-                2 * _quat[0] * _quat[3];
-
-            _rotmat[0][2] = 2 * _quat[1] * _quat[3] + 
-                2 * _quat[0] * _quat[2];
-
-            _rotmat[1][0] = 2 * _quat[1] * _quat[2] + 
-                2 * _quat[0] * _quat[3];
-
-            _rotmat[1][1] = _quat[0] * _quat[0] - 
-                _quat[1] * _quat[1] + _quat[2] * 
-                _quat[2] - _quat[3] * _quat[3];
-
-            _rotmat[1][2] = 2 * _quat[2] * _quat[3] - 
-                2 * _quat[0] * _quat[1];
-
-            _rotmat[2][0] = 2 * _quat[1] * _quat[3] - 
-                2 * _quat[0] * _quat[2];
-
-            _rotmat[2][1] = 2 * _quat[2] * _quat[3] + 
-                2 * _quat[0] * _quat[1];
-
-            _rotmat[2][2] = _quat[0] * _quat[0] - 
-                _quat[1] * _quat[1] - _quat[2] * 
-                _quat[2] + _quat[3] * _quat[3];
+            _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
+            _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
+            _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
+            _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
+            _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
+            _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
+            _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
+            _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
+            _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
 
             // reset the attitude error
             _ekf.x[STATE_D0] = 0;
@@ -489,42 +457,42 @@ class KalmanFilter {
         {
             state.x = _ekf.x[STATE_X];
 
-            state.dx = _rotmat[0][0]*_ekf.x[STATE_VX] + 
-                _rotmat[0][1]*_ekf.x[STATE_VY] + 
-                _rotmat[0][2]*_ekf.x[STATE_VZ];
+            state.dx = _r00*_ekf.x[STATE_VX] + 
+                _r01*_ekf.x[STATE_VY] + 
+                _r02*_ekf.x[STATE_VZ];
 
             state.y = _ekf.x[STATE_Y];
 
             // Negate for rightward positive
-            state.dy = -(_rotmat[1][0]*_ekf.x[STATE_VX] + 
-                    _rotmat[1][1]*_ekf.x[STATE_VY] + 
-                    _rotmat[1][2]*_ekf.x[STATE_VZ]);
+            state.dy = -(_r10*_ekf.x[STATE_VX] + 
+                    _r11*_ekf.x[STATE_VY] + 
+                    _r12*_ekf.x[STATE_VZ]);
 
             state.z = _ekf.x[STATE_Z];
 
-            state.dz = _rotmat[2][0]*_ekf.x[STATE_VX] + 
-                _rotmat[2][1]*_ekf.x[STATE_VY] + 
-                _rotmat[2][2]*_ekf.x[STATE_VZ];
+            state.dz = _r20*_ekf.x[STATE_VX] + 
+                _r21*_ekf.x[STATE_VY] + 
+                _r22*_ekf.x[STATE_VZ];
 
             state.phi = RADIANS_TO_DEGREES *
-                atan2f(2*(_quat[2]*_quat[3]+_quat[0]*
-                            _quat[1]) ,
-                        _quat[0]*_quat[0] -
-                        _quat[1]*_quat[1] -
-                        _quat[2]*_quat[2] +
-                        _quat[3]*_quat[3]);
+                atan2f(2*(_q2*_q3+_q0*
+                            _q1) ,
+                        _q0*_q0 -
+                        _q1*_q1 -
+                        _q2*_q2 +
+                        _q3*_q3);
 
             state.theta = RADIANS_TO_DEGREES * 
-                asinf(-2*(_quat[1]*_quat[3] -
-                            _quat[0]*_quat[2]));
+                asinf(-2*(_q1*_q3 -
+                            _q0*_q2));
 
             state.psi = -RADIANS_TO_DEGREES *   // negate for nose-right positive
-                atan2f(2*(_quat[1]*_quat[2]+_quat[0]*
-                            _quat[3])
-                        , _quat[0]*_quat[0] +
-                        _quat[1]*_quat[1] -
-                        _quat[2]*_quat[2] -
-                        _quat[3]*_quat[3]);
+                atan2f(2*(_q1*_q2+_q0*
+                            _q3)
+                        , _q0*_q0 +
+                        _q1*_q1 -
+                        _q2*_q2 -
+                        _q3*_q3);
         }
 
     private:
@@ -575,7 +543,7 @@ class KalmanFilter {
         } Axis3fSubSampler_t;
 
         // Quaternion used for initial orientation [w,x,y,z]
-        float _initialQuaternion[4];
+        float _qinit0, _qinit1, _qinit2, _qinit3;
 
         Axis3f _accLatest;
         Axis3f _gyroLatest;
@@ -593,12 +561,12 @@ class KalmanFilter {
 
         // The vehicle's attitude as a rotation matrix (used by the prediction,
         // updated by the finalization)
-        float _rotmat[3][3];
+        float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
 
         // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
         // to allow easy normalization (in comparison to a rotation matrix),
         // while also being robust against singularities (in comparison to euler angles)
-        float _quat[4];
+        float _q0, _q1, _q2, _q3;
 
         static void axis3fSubSamplerInit(Axis3fSubSampler_t* subSampler, const
                 float conversionFactor) { memset(subSampler, 0,
@@ -666,14 +634,14 @@ class KalmanFilter {
             // predicts the number of accumulated pixels in the x-direction
             float hx[STATE_DIM] = {};
             _predictedNX = (flow->dt * Npix / thetapix ) * 
-                ((dx_g * _rotmat[2][2] / z_g) - omegay_b);
+                ((dx_g * _r22 / z_g) - omegay_b);
             _measuredNX = flow->dpixelx*FLOW_RESOLUTION;
 
             // derive measurement equation with respect to dx (and z?)
             hx[STATE_Z] = (Npix * flow->dt / thetapix) * 
-                ((_rotmat[2][2] * dx_g) / (-z_g * z_g));
+                ((_r22 * dx_g) / (-z_g * z_g));
             hx[STATE_VX] = (Npix * flow->dt / thetapix) * 
-                (_rotmat[2][2] / z_g);
+                (_r22 / z_g);
 
             //First update
             _ekf.updateWithScalar(hx, (_measuredNX-_predictedNX), 
@@ -682,13 +650,13 @@ class KalmanFilter {
             // ~~~ Y velocity prediction and update ~~~
             float hy[STATE_DIM] = {};
             _predictedNY = (flow->dt * Npix / thetapix ) * 
-                ((dy_g * _rotmat[2][2] / z_g) + omegax_b);
+                ((dy_g * _r22 / z_g) + omegax_b);
             _measuredNY = flow->dpixely*FLOW_RESOLUTION;
 
             // derive measurement equation with respect to dy (and z?)
             hy[STATE_Z] = (Npix * flow->dt / thetapix) * 
-                ((_rotmat[2][2] * dy_g) / (-z_g * z_g));
-            hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_rotmat[2][2] / z_g);
+                ((_r22 * dy_g) / (-z_g * z_g));
+            hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_r22 / z_g);
 
             // Second update
             _ekf.updateWithScalar(hy, (_measuredNY-_predictedNY),
@@ -704,9 +672,9 @@ class KalmanFilter {
 
             // Only update the filter if the measurement is reliable 
             // (\hat{h} -> infty when R[2][2] -> 0)
-            if (fabs(_rotmat[2][2]) > 0.1f && _rotmat[2][2] > 0) {
+            if (fabs(_r22) > 0.1f && _r22 > 0) {
                 float angle = 
-                    fabsf(acosf(_rotmat[2][2])) - 
+                    fabsf(acosf(_r22)) - 
                     DEGREES_TO_RADIANS * (15.0f / 2.0f);
                 if (angle < 0.0f) {
                     angle = 0.0f;
