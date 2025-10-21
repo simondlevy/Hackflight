@@ -251,20 +251,21 @@ class KalmanFilter {
             const float tmpSPY = _ekf.x[STATE_VY];
             const float tmpSPZ = _ekf.x[STATE_VZ];
 
+            // position updates in the body frame (will be rotated to inertial frame)
+            const float dx = _ekf.x[STATE_VX] * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
+            const float dy = _ekf.x[STATE_VY] * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
+
             // thrust can only be produced in the body's Z direction
             const float dz = _ekf.x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
 
+            // position update
+            _ekf.x[STATE_X] += _rotmat[0][0] * dx + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
+            _ekf.x[STATE_Y] += _rotmat[1][0] * dx + _rotmat[1][1] * dy + _rotmat[1][2] * dz;
+            _ekf.x[STATE_Z] += _rotmat[2][0] * dx + _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
+                GRAVITY * dt2 / 2.0f;
+
             if (isFlying) { // only acceleration in z direction
 
-                // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _ekf.x[STATE_VX] * dt;
-                const float dy = _ekf.x[STATE_VY] * dt;
-
-                // position update
-                _ekf.x[STATE_X] += _rotmat[0][0] * dx + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-                _ekf.x[STATE_Y] += _rotmat[1][0] * dx + _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-                _ekf.x[STATE_Z] += _rotmat[2][0] * dx + _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
-                    GRAVITY * dt2 / 2.0f;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -274,19 +275,6 @@ class KalmanFilter {
                         GRAVITY * _rotmat[2][1]);
             }
             else {
-                // Acceleration can be in any direction, as measured by the
-                // accelerometer. This occurs, eg. in freefall or while being carried.
-
-                // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _ekf.x[STATE_VX] * dt + accel->x * dt2 / 2.0f;
-                const float dy = _ekf.x[STATE_VY] * dt + accel->y * dt2 / 2.0f;
-
-                // position update
-                _ekf.x[STATE_X] += _rotmat[0][0] * dx + _rotmat[0][1] * dy + _rotmat[0][2] * dz;
-                _ekf.x[STATE_Y] += _rotmat[1][0] * dx + _rotmat[1][1] * dy + _rotmat[1][2] * dz;
-                _ekf.x[STATE_Z] += _rotmat[2][0] * dx + _rotmat[2][1] * dy + _rotmat[2][2] * dz - 
-                    GRAVITY * dt2 / 2.0f;
-
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 _ekf.x[STATE_VX] += dt * (accel->x + gyro->z * tmpSPY -
