@@ -46,7 +46,7 @@
 #include <datatypes.h>
 #include <matrix_typedef.h>
 
-class KalmanFilter { 
+class EKF { 
 
     private:
 

@@ -19,7 +19,7 @@
 #include <Arduino.h>
 
 #include <clock.hpp>
-#include <kalman.hpp>
+#include <ekf.hpp>
 #include <rateSupervisor.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
@@ -47,7 +47,7 @@ class EstimatorTask {
 
             _task.init(runEstimatorTask, "estimator", this, 4);
 
-            _kalmanFilter.init(millis());
+            _ekf.init(millis());
         }
 
         void getVehicleState(vehicleState_t * state)
@@ -72,8 +72,8 @@ class EstimatorTask {
 
         void enqueueGyro(const Axis3f * gyro)
         {
-            KalmanFilter::measurement_t m = {};
-            m.type = KalmanFilter::MeasurementTypeGyroscope;
+            EKF::measurement_t m = {};
+            m.type = EKF::MeasurementTypeGyroscope;
             m.data.gyroscope.gyro = *gyro;
             enqueue(&m);
 
@@ -85,24 +85,24 @@ class EstimatorTask {
 
         void enqueueAccel(const Axis3f * accel)
         {
-            KalmanFilter::measurement_t m = {};
-            m.type = KalmanFilter::MeasurementTypeAcceleration;
+            EKF::measurement_t m = {};
+            m.type = EKF::MeasurementTypeAcceleration;
             m.data.acceleration.acc = *accel;
             enqueue(&m);
         }
 
         void enqueueFlow(const flowMeasurement_t * flow)
         {
-            KalmanFilter::measurement_t m = {};
-            m.type = KalmanFilter::MeasurementTypeFlow;
+            EKF::measurement_t m = {};
+            m.type = EKF::MeasurementTypeFlow;
             m.data.flow = *flow;
             enqueue(&m);
         }
 
         void enqueueRange(const tofMeasurement_t * tof)
         {
-            KalmanFilter::measurement_t m = {};
-            m.type = KalmanFilter::MeasurementTypeTOF;
+            EKF::measurement_t m = {};
+            m.type = EKF::MeasurementTypeTOF;
             m.data.tof = *tof;
             enqueue(&m);
         }
@@ -116,7 +116,7 @@ class EstimatorTask {
         static const uint32_t PREDICTION_UPDATE_INTERVAL_MS = 1000 / PREDICT_RATE;
 
         static const size_t QUEUE_LENGTH = 20;
-        static const auto QUEUE_ITEM_SIZE = sizeof(KalmanFilter::measurement_t);
+        static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
         uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
         StaticQueue_t _measurementsQueueBuffer;
         xQueueHandle _measurementsQueue;
@@ -142,7 +142,7 @@ class EstimatorTask {
 
         DebugTask * _debugTask;
 
-        KalmanFilter _kalmanFilter;
+        EKF _ekf;
 
         // Data used to enable the task and stabilizer loop to run with minimal
         // locking The estimator state produced by the task, copied to the
@@ -154,20 +154,20 @@ class EstimatorTask {
             xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
 
             if (_didResetEstimation) {
-                _kalmanFilter.init(nowMs);
+                _ekf.init(nowMs);
                _didResetEstimation = false;
             }
 
             // Run the system dynamics to predict the state forward.
             if (nowMs >= nextPredictionMs) {
 
-                _kalmanFilter.predict(nowMs, _isFlying); 
+                _ekf.predict(nowMs, _isFlying); 
 
                 nextPredictionMs = nowMs + PREDICTION_UPDATE_INTERVAL_MS;
             }
 
             // Add process noise every loop, rather than every prediction
-            _kalmanFilter.addProcessNoise(nowMs);
+            _ekf.addProcessNoise(nowMs);
 
             // Sensor measurements can come in sporadically and faster
             // than the stabilizer loop frequency, we therefore consume all
@@ -175,16 +175,16 @@ class EstimatorTask {
 
             // Pull the latest sensors values of interest; discard the rest
 
-            KalmanFilter::measurement_t m = {};
+            EKF::measurement_t m = {};
 
             while (pdTRUE == xQueueReceive(_measurementsQueue, &m, 0)) {
 
-                _kalmanFilter.update(m, nowMs);
+                _ekf.update(m, nowMs);
             }
 
-            _kalmanFilter.finalize();
+            _ekf.finalize();
 
-            if (!_kalmanFilter.isStateWithinBounds()) {
+            if (!_ekf.isStateWithinBounds()) {
 
                 _didResetEstimation = true;
 
@@ -194,7 +194,7 @@ class EstimatorTask {
             }
 
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
-            _kalmanFilter.getVehicleState(_state);
+            _ekf.getVehicleState(_state);
             xSemaphoreGive(_dataMutex);
 
             return nextPredictionMs;
@@ -223,7 +223,7 @@ class EstimatorTask {
             }
         }
 
-        void enqueue(const KalmanFilter::measurement_t * measurement) 
+        void enqueue(const EKF::measurement_t * measurement) 
         {
             if (!_measurementsQueue) {
                 return;
