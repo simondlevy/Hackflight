@@ -44,9 +44,7 @@
 #include <math3d.h>
 #include <outlierFilterTdoa.hpp>
 #include <datatypes.h>
-
-#define EKF_N 9
-#include <ekf.hpp>
+#include <matrix_typedef.h>
 
 class KalmanFilter { 
 
@@ -96,9 +94,7 @@ class KalmanFilter {
 
             _outlierFilterTdoa.reset();
 
-            _ekf.x[STATE_X] = 0;
-            _ekf.x[STATE_Y] = 0;
-            _ekf.x[STATE_Z] = 0;
+            ekf_init();
 
             // Reset the attitude quaternion
             _q0 = _qinit0 = 1;
@@ -117,8 +113,6 @@ class KalmanFilter {
             _r21 = 0;
             _r22 = 1;
 
-            _ekf.init(MIN_COVARIANCE, MAX_COVARIANCE);
-
             // Add in the initial process noise 
             const float pinit[STATE_DIM] = {
 
@@ -133,7 +127,7 @@ class KalmanFilter {
                 STDEV_INITIAL_ATTITUDE_YAW
             };
 
-            _ekf.addCovarianceNoise(pinit);
+            ekf_addCovarianceNoise(pinit);
 
             _isUpdated = false;
             _lastPredictionMs = nowMs;
@@ -154,9 +148,9 @@ class KalmanFilter {
             const float d1 = gyro->y*dt/2;
             const float d2 = gyro->z*dt/2;
 
-            const float vx = _ekf.x[STATE_VX];
-            const float vy = _ekf.x[STATE_VY];
-            const float vz = _ekf.x[STATE_VZ];
+            const float vx = _x[STATE_VX];
+            const float vy = _x[STATE_VY];
+            const float vz = _x[STATE_VZ];
 
             // The linearized Jacobean matrix
             static float F[STATE_DIM][STATE_DIM];
@@ -230,26 +224,26 @@ class KalmanFilter {
             F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
             F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-            _ekf.predict(F);
+            ekf_predict(F);
 
             const float dt2 = dt * dt;
 
             // keep previous time step's state for the update
-            const float tmpSPX = _ekf.x[STATE_VX];
-            const float tmpSPY = _ekf.x[STATE_VY];
-            const float tmpSPZ = _ekf.x[STATE_VZ];
+            const float tmpSPX = _x[STATE_VX];
+            const float tmpSPY = _x[STATE_VY];
+            const float tmpSPZ = _x[STATE_VZ];
 
             // position updates in the body frame (will be rotated to inertial frame)
-            const float dx = _ekf.x[STATE_VX] * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
-            const float dy = _ekf.x[STATE_VY] * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
+            const float dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
+            const float dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
 
             // thrust can only be produced in the body's Z direction
-            const float dz = _ekf.x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
+            const float dz = _x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
 
             // position update
-            _ekf.x[STATE_X] += _r00 * dx + _r01 * dy + _r02 * dz;
-            _ekf.x[STATE_Y] += _r10 * dx + _r11 * dy + _r12 * dz;
-            _ekf.x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
+            _x[STATE_X] += _r00 * dx + _r01 * dy + _r02 * dz;
+            _x[STATE_Y] += _r10 * dx + _r11 * dy + _r12 * dz;
+            _x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
                 GRAVITY * dt2 / 2.0f;
 
             const float accelx = isFlying ? 0 : accel->x;
@@ -258,13 +252,13 @@ class KalmanFilter {
             // body-velocity update: accelerometers - gyros cross velocity
             // - gravity in body frame
 
-            _ekf.x[STATE_VX] += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
+            _x[STATE_VX] += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
                     - GRAVITY * _r20);
 
-            _ekf.x[STATE_VY] += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
+            _x[STATE_VY] += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
                     - GRAVITY * _r21);
 
-            _ekf.x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
+            _x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
                     - GRAVITY * _r22);
 
             // attitude update (rotate by gyroscope), we do this in quaternions
@@ -327,8 +321,8 @@ class KalmanFilter {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                _ekf.addCovarianceNoise(noise);
-                _ekf.enforceSymmetry();
+                ekf_addCovarianceNoise(noise);
+                ekf_enforceSymmetry();
 
                 _lastProcessNoiseUpdateMs = nowMs;
             }
@@ -367,9 +361,9 @@ class KalmanFilter {
             }
 
             // Incorporate the attitude error (Kalman filter state) with the attitude
-            const float v0 = _ekf.x[STATE_D0];
-            const float v1 = _ekf.x[STATE_D1];
-            const float v2 = _ekf.x[STATE_D2];
+            const float v0 = _x[STATE_D0];
+            const float v1 = _x[STATE_D1];
+            const float v2 = _x[STATE_D2];
 
             // Move attitude error into attitude if any of the angle errors are
             // large enough
@@ -416,11 +410,11 @@ class KalmanFilter {
             _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
 
             // reset the attitude error
-            _ekf.x[STATE_D0] = 0;
-            _ekf.x[STATE_D1] = 0;
-            _ekf.x[STATE_D2] = 0;
+            _x[STATE_D0] = 0;
+            _x[STATE_D1] = 0;
+            _x[STATE_D2] = 0;
 
-            _ekf.enforceSymmetry();
+            ekf_enforceSymmetry();
 
             _isUpdated = false;
         }
@@ -431,9 +425,9 @@ class KalmanFilter {
             for (int i = 0; i < 3; i++) {
 
                 if (MAX_VELOCITY > 0.0f) {
-                    if (_ekf.x[STATE_VX + i] > MAX_VELOCITY) {
+                    if (_x[STATE_VX + i] > MAX_VELOCITY) {
                         return false;
-                    } else if (_ekf.x[STATE_VX + i] < -MAX_VELOCITY) {
+                    } else if (_x[STATE_VX + i] < -MAX_VELOCITY) {
                         return false;
                     }
                 }
@@ -444,24 +438,24 @@ class KalmanFilter {
 
         void getVehicleState(vehicleState_t & state)
         {
-            state.x = _ekf.x[STATE_X];
+            state.x = _x[STATE_X];
 
-            state.dx = _r00*_ekf.x[STATE_VX] + 
-                _r01*_ekf.x[STATE_VY] + 
-                _r02*_ekf.x[STATE_VZ];
+            state.dx = _r00*_x[STATE_VX] + 
+                _r01*_x[STATE_VY] + 
+                _r02*_x[STATE_VZ];
 
-            state.y = _ekf.x[STATE_Y];
+            state.y = _x[STATE_Y];
 
             // Negate for rightward positive
-            state.dy = -(_r10*_ekf.x[STATE_VX] + 
-                    _r11*_ekf.x[STATE_VY] + 
-                    _r12*_ekf.x[STATE_VZ]);
+            state.dy = -(_r10*_x[STATE_VX] + 
+                    _r11*_x[STATE_VY] + 
+                    _r12*_x[STATE_VZ]);
 
-            state.z = _ekf.x[STATE_Z];
+            state.z = _x[STATE_Z];
 
-            state.dz = _r20*_ekf.x[STATE_VX] + 
-                _r21*_ekf.x[STATE_VY] + 
-                _r22*_ekf.x[STATE_VZ];
+            state.dz = _r20*_x[STATE_VX] + 
+                _r21*_x[STATE_VY] + 
+                _r22*_x[STATE_VZ];
 
             state.phi = RADIANS_TO_DEGREES *
                 atan2f(2*(_q2*_q3+_q0*
@@ -609,14 +603,14 @@ class KalmanFilter {
             float omegay_b = gyro->y * DEGREES_TO_RADIANS;
 
 
-            float dx_g = _ekf.x[STATE_VX];
-            float dy_g = _ekf.x[STATE_VY];
+            float dx_g = _x[STATE_VX];
+            float dy_g = _x[STATE_VY];
             float z_g = 0.0;
             // Saturate elevation in prediction and correction to avoid singularities
-            if ( _ekf.x[STATE_Z] < 0.1f ) {
+            if ( _x[STATE_Z] < 0.1f ) {
                 z_g = 0.1;
             } else {
-                z_g = _ekf.x[STATE_Z];
+                z_g = _x[STATE_Z];
             }
 
             // ~~~ X velocity prediction and update ~~~
@@ -633,7 +627,7 @@ class KalmanFilter {
                 (_r22 / z_g);
 
             //First update
-            _ekf.updateWithScalar(hx, (_measuredNX-_predictedNX), 
+            ekf_updateWithScalar(hx, (_measuredNX-_predictedNX), 
                     flow->stdDevX*FLOW_RESOLUTION);
 
             // ~~~ Y velocity prediction and update ~~~
@@ -648,7 +642,7 @@ class KalmanFilter {
             hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_r22 / z_g);
 
             // Second update
-            _ekf.updateWithScalar(hy, (_measuredNY-_predictedNY),
+            ekf_updateWithScalar(hy, (_measuredNY-_predictedNY),
                     flow->stdDevY*FLOW_RESOLUTION);
 
             _isUpdated = true;
@@ -668,14 +662,14 @@ class KalmanFilter {
                 if (angle < 0.0f) {
                     angle = 0.0f;
                 }
-                float predictedDistance = _ekf.x[STATE_Z] / cosf(angle);
+                float predictedDistance = _x[STATE_Z] / cosf(angle);
                 float measuredDistance = tof->distance; // [m]
 
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
                 h[STATE_Z] = 1 / cosf(angle); 
 
-                _ekf.updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
+                ekf_updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
 
                 _isUpdated = true;
             }
@@ -693,7 +687,14 @@ class KalmanFilter {
             _gyroLatest = m.data.gyroscope.gyro;
         }
 
-        EKF _ekf;
+        // State vector
+        __attribute__((aligned(4))) float _x[STATE_DIM];
+
+        // Covariance matrix
+        __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+
+        // Covariance helper
+        matrix_t _p_m;
 
         // Tracks whether an update to the state has been made, and the state
         // therefore requires finalization
@@ -701,6 +702,145 @@ class KalmanFilter {
 
         uint32_t _lastPredictionMs;
         uint32_t _lastProcessNoiseUpdateMs;
+
+        void ekf_init()
+        {
+            for (int i=0; i< STATE_DIM; i++) {
+
+                _x[i] = 0;
+
+                for (int j=0; j < STATE_DIM; j++) {
+                    _p[i][j] = 0; 
+                }
+            }
+
+            _p_m.numRows = STATE_DIM;
+            _p_m.numCols = STATE_DIM;
+            _p_m.pData = (float*)_p;
+        }
+
+        void ekf_addCovarianceNoise(const float * noise)
+        {
+            for (uint8_t k=0; k<STATE_DIM; ++k) {
+                _p[k][k] += noise[k] * noise[k];
+            }
+        }
+
+        void ekf_enforceSymmetry()
+        {
+            for (int i=0; i<STATE_DIM; i++) {
+
+                for (int j=i; j<STATE_DIM; j++) {
+
+                    ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i]);
+                }
+            }
+        }
+
+        // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+        void ekf_predict(const float F[STATE_DIM][STATE_DIM])
+        {
+            static __attribute__((aligned(4))) matrix_t Fm = { 
+                STATE_DIM, STATE_DIM, (float *)F
+            };
+
+            static float tmpNN1d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
+                STATE_DIM, STATE_DIM, tmpNN1d
+            };
+
+            static float tmpNN2d[STATE_DIM * STATE_DIM];
+            static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
+                STATE_DIM, STATE_DIM, tmpNN2d
+            };
+
+            device_mat_mult(&Fm, &_p_m, &tmpNN1m); // F P
+            device_mat_trans(&Fm, &tmpNN2m); // F'
+            device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
+
+        }
+
+        void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
+        {
+            matrix_t Hm = {1, STATE_DIM, (float *)h};
+
+            // The Kalman gain as a column vector
+            static float G[STATE_DIM];
+            static matrix_t Gm = {STATE_DIM, 1, (float *)G};
+
+            // Temporary matrices for the covariance updates
+            static float tmpNN1d[STATE_DIM * STATE_DIM];
+            static matrix_t tmpNN1m = {
+                STATE_DIM, STATE_DIM, tmpNN1d
+            };
+
+            static float tmpNN2d[STATE_DIM * STATE_DIM];
+            static matrix_t tmpNN2m = {
+                STATE_DIM, STATE_DIM, tmpNN2d
+            };
+
+            static float tmpNN3d[STATE_DIM * STATE_DIM];
+            static matrix_t tmpNN3m = {
+                STATE_DIM, STATE_DIM, tmpNN3d
+            };
+
+            static float HTd[STATE_DIM * 1];
+            static matrix_t HTm = {STATE_DIM, 1, HTd};
+
+            static float PHTd[STATE_DIM * 1];
+            static matrix_t PHTm = {STATE_DIM, 1, PHTd};
+
+            device_mat_trans(&Hm, &HTm);
+            device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
+            float R = stdMeasNoise*stdMeasNoise;
+            float HPHR = R; // HPH' + R
+            for (int i=0; i<STATE_DIM; i++) { 
+                // Add the element of HPH' to the above
+                // this obviously only works if the update is scalar (as in this function)
+                HPHR += Hm.pData[i]*PHTd[i]; 
+            }
+
+            // Calculate the Kalman gain and perform the state update
+            for (int i=0; i<STATE_DIM; i++) {
+                G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                _x[i] = _x[i] + G[i] * error; // state update
+            }
+
+            device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+            for (int i=0; i<STATE_DIM; i++) { 
+                tmpNN1d[STATE_DIM*i+i] -= 1; 
+            } // GH - I
+            device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+            device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+            device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+
+            // add the measurement variance and ensure boundedness and symmetry
+            for (int i=0; i<STATE_DIM; i++) {
+
+                for (int j=i; j<STATE_DIM; j++) {
+
+                    float v = G[i] * R * G[j];
+
+                    // add measurement noise
+                    ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+                }
+            }
+        }
+
+        void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
+        {
+            if (isnan(pval) || pval > MAX_COVARIANCE) {
+                _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+            } else if ( i==j && pval < MIN_COVARIANCE ) {
+                _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+            } else {
+                _p[i][j] = _p[j][i] = pval;
+            }
+        }
+        void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
+
+        void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
+                matrix_t * pDst);
 
         static float device_cos(const float x);
 
