@@ -65,6 +65,7 @@ class ClosedLoopControl {
     public:
 
         void run(
+                const uint32_t step,
                 const float dt,
                 const bool inHoverMode,
                 const vehicleState_t & vehicleState,
@@ -72,6 +73,8 @@ class ClosedLoopControl {
                 const float landingAltitudeMeters,
                 demands_t & demands)
         {
+            (void)step;
+
             stream_dt = dt;
 
             stream_hovering = inHoverMode;
