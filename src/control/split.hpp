@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <clock.hpp>
+
 #include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
