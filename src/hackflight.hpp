@@ -18,6 +18,8 @@
 
 #include <stdint.h>
 
+#define _MAIN
+
 #include <comms.hpp>
 #include <__control__.hpp>
 #include <mixers/crazyflie.hpp>

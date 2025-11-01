@@ -16,6 +16,8 @@
 
 #pragma once
 
+#define _MAIN
+
 #include <control/haskell.hpp>
 
 static ClosedLoopControl _closedLoopControl;
