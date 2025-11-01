@@ -23,7 +23,7 @@ INCLUDE = -I$(SRC)
 
 HASKDIR = ../../../../haskell
 
-CXX_SOURCES = ../support.cpp copilot_core.cpp 
+CXX_SOURCES = ../support.cpp copilot_core.cpp $(SRC)/control/haskell/copilot_streams.cpp
 
 FILES_TO_REMOVE += copilot*
 
