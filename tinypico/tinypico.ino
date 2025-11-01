@@ -75,7 +75,7 @@ void blink_task(void *)
 {
     while (true) {
 
-        tp.DotStar_SetPixelColor(0, 255, 0);
+        tp.DotStar_SetPixelColor(0, 64, 0);
 
         vTaskDelay(500);
 
