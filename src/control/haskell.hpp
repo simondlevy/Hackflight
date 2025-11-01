@@ -22,30 +22,6 @@
 #include <datatypes.h>
 #include <msp/serializer.hpp>
 
-// Global data and routines shared with Haskell Copilot ----------------------
-
-float stream_dt;
-
-bool stream_hovering;
-
-float stream_thrust;
-float stream_roll;
-float stream_pitch;
-float stream_yaw;
-
-float stream_dx;
-float stream_dy;
-float stream_z;
-float stream_dz;
-float stream_phi;
-float stream_dphi;
-float stream_theta;
-float stream_dtheta;
-float stream_psi;
-float stream_dpsi;
-
-float stream_landing_altitude_m;
-
 static demands_t _demands;
 
 void setDemands(float t, float r, float p, float y)
@@ -74,6 +50,28 @@ class ClosedLoopControl {
                 demands_t & demands)
         {
             (void)step;
+
+            extern float stream_dt;
+
+            extern bool stream_hovering;
+
+            extern float stream_thrust;
+            extern float stream_roll;
+            extern float stream_pitch;
+            extern float stream_yaw;
+
+            extern float stream_dx;
+            extern float stream_dy;
+            extern float stream_z;
+            extern float stream_dz;
+            extern float stream_phi;
+            extern float stream_dphi;
+            extern float stream_theta;
+            extern float stream_dtheta;
+            extern float stream_psi;
+            extern float stream_dpsi;
+
+            extern float stream_landing_altitude_m;
 
             stream_dt = dt;
 

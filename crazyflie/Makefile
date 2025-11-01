@@ -41,6 +41,7 @@ $(MSGS): ../msppg/messages.json
 
 haskell_config: copilot_core.cpp
 	cp $(SRC)/control/haskell.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/haskell/haskell.cpp ./__haskell__.cpp
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
