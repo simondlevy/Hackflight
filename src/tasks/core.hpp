@@ -26,6 +26,8 @@
 #include <tasks/led.hpp>
 #include <tasks/setpoint.hpp>
 
+#include <vehicles/diyquad.hpp>
+
 class CoreTask {
 
     public:

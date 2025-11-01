@@ -1,2 +1,4 @@
+copilot*
 build/
 __*__.cpp
+*.hpp
