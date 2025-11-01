@@ -31,7 +31,7 @@ class ClosedLoopControl {
 
     private:
 
-        static const Clock::rate_t SLOW_RATE = Clock::RATE_100_HZ;
+        static const Clock::rate_t SLOW_RATE = Clock::RATE_50_HZ;
 
     public:
 
@@ -44,20 +44,22 @@ class ClosedLoopControl {
                 const float landingAltitudeMeters,
                 demands_t & demands)
         {
+            static float climbrate;
+
             if (Clock::rateDoExecute(SLOW_RATE, step)) {
 
-                const auto climbrate = AltitudeController::run(hovering,
+                climbrate = AltitudeController::run(hovering,
                         dt, vehicleState.z, openLoopDemands.thrust);
-
-                demands.thrust =
-                    ClimbRateController::run(
-                            hovering,
-                            landingAltitudeMeters,
-                            dt,
-                            vehicleState.z,
-                            vehicleState.dz,
-                            climbrate);
             }
+
+            demands.thrust =
+                ClimbRateController::run(
+                        hovering,
+                        landingAltitudeMeters,
+                        dt,
+                        vehicleState.z,
+                        vehicleState.dz,
+                        climbrate);
 
             const auto airborne = demands.thrust > 0;
 
