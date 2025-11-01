@@ -23,6 +23,8 @@ static BluetoothSerial bts;
 static const uint8_t TXD1 = 14;
 static const uint8_t RXD1 = 4;
 
+static const uint32_t TIMEOUT_MSEC = 1000;
+
 static HardwareSerial uarts(1);
 
 static TaskHandle_t bt_to_uart_task_handle = NULL;
@@ -33,12 +35,19 @@ static bool connected;
 
 void bt_to_uart_task(void *) 
 {
+    static uint32_t last_received;
+
     while (true) {
 
         while (bts.available()) {
+            last_received = millis();
             connected = true;
             const uint8_t b = bts.read();
             uarts.write(b);
+        }
+
+        if (millis() - last_received > TIMEOUT_MSEC) {
+            connected = false;
         }
 
         vTaskDelay(1);

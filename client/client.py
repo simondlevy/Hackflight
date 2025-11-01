@@ -111,8 +111,8 @@ def logging_threadfun(parser, visualize_spikes):
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
-            #parser.running = False
-            #break
+            parser.running = False
+            break
 
 
 def connect_to_server(name, port):
