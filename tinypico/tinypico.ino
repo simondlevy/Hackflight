@@ -16,6 +16,7 @@
  */
 
 #include <BluetoothSerial.h> 
+#include <TinyPICO.h>
 
 static BluetoothSerial bts; 
 
@@ -26,11 +27,16 @@ static HardwareSerial uarts(1);
 
 static TaskHandle_t bt_to_uart_task_handle = NULL;
 
+static TinyPICO tp = TinyPICO();
+
+static bool connected;
+
 void bt_to_uart_task(void *) 
 {
     while (true) {
 
         while (bts.available()) {
+            connected = true;
             const uint8_t b = bts.read();
             uarts.write(b);
         }
@@ -54,12 +60,28 @@ void uart_to_bt_task(void *)
     }
 }
 
+static TaskHandle_t blink_task_handle = NULL;
+
+void blink_task(void *) 
+{
+    while (true) {
+
+        tp.DotStar_SetPixelColor(0, 255, 0);
+
+        vTaskDelay(500);
+
+        if (!connected) {
+            tp.DotStar_SetPixelColor(0, 0, 0);
+            vTaskDelay(500);
+        }
+    }
+}
 
 void setup() 
 {
     uarts.begin(115200, SERIAL_8N1, RXD1, TXD1);
 
-    bts.begin("Hackflight"); 
+    bts.begin("CrazyFlie-TinyPICO"); 
 
     xTaskCreate(
             bt_to_uart_task, 
@@ -77,10 +99,15 @@ void setup()
             NULL,        
             1,                 // Priority
             &uart_to_bt_task_handle);
-}
+
+    xTaskCreate(
+            blink_task, 
+            "blink_task", 
+            10000,             // Stack size (bytes)
+            NULL,        
+            2,                 // Priority
+            &blink_task_handle);}
 
 void loop()
 {
 }
-
-

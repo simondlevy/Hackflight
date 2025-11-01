@@ -36,7 +36,7 @@ BLUETOOTH_ADDRESSES = {
     'bench': '64:B7:08:94:28:76',
     'cf2': '64:B7:08:87:AD:76',
     'generic': '64:B7:08:87:AD:AA',
-    'tinypico': 'D4:D4:DA:AA:2E:F2'
+    'tinypico': 'D4:D4:DA:AA:31:DE'
 }
 
 BLUETOOTH_PORT = 1
@@ -111,8 +111,8 @@ def logging_threadfun(parser, visualize_spikes):
 
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
-            parser.running = False
-            break
+            #parser.running = False
+            #break
 
 
 def connect_to_server(name, port):
