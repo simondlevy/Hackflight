@@ -52,9 +52,9 @@ class PitchRollRateController {
 
     private:
 
-        static constexpr float KP = 125;
-        static constexpr float KI = 250;
-        static constexpr float KD = 1.25;
+        static constexpr float KP = 125 / 2;
+        static constexpr float KI = 250 / 2;
+        static constexpr float KD = 1.25 / 2;
         static constexpr float ILIMIT = 33;
 
         typedef struct {

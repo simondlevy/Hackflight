@@ -39,5 +39,3 @@ void CoreTask::motors_run()
 {
     motors.run();
 }
-
-

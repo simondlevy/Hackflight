@@ -32,4 +32,8 @@ void OpticalFlowTask::device_read(
 {
     pmw3901.readMotion(dx, dy, gotMotion);
 
+    // Accommodate mounting
+    dx = -dx;
+    dy = -dy;
+
 }
