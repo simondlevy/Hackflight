@@ -51,10 +51,13 @@ class AltitudeController {
             _integral = hovering ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
-            return hovering ? 
+            const float output = 
+                hovering ? 
                 Num::fconstrain(KP * error + KI * _integral,
                         fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
                 -LANDING_SPEED_MPS;
+
+            return output;
         }
 
     private:

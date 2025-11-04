@@ -43,13 +43,14 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const uint8_t z = ByteScaling::float2byte(vehicleState.z,
-                        AltitudeController::ZMIN, AltitudeController::ZMAX);
+            const float climbrate = AltitudeController::run(
+                    hovering, 
+                    dt, 
+                    ByteScaling::float2byte(vehicleState.z,
+                        AltitudeController::ZMIN, AltitudeController::ZMAX),
+                    ByteScaling::float2byte(openLoopDemands.thrust,
+                        AltitudeController::THRUSTMIN, AltitudeController::THRUSTMAX));
 
-            const uint8_t thrust = ByteScaling::float2byte(openLoopDemands.thrust,
-                        AltitudeController::THRUSTMIN, AltitudeController::THRUSTMAX);
-
-            const float climbrate = AltitudeController::run( hovering, dt, z, thrust);
             demands.thrust =
                 ClimbRateController::run(
                         hovering,
@@ -97,6 +98,12 @@ class ClosedLoopControl {
 
         // unused; needed for sim API
         void init()
+        {
+        }
+
+    private:
+
+        void minmax(const float val, float & min, float & max)
         {
         }
 };
