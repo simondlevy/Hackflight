@@ -28,34 +28,44 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I$(SRCDIR)
 
-NAME = controller
-
 CXX_SOURCES = controller.cpp
 
-all: $(NAME)
+all: controller
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
 
 VERBOSE = 1
 
-runstandard:
-	cp ../../plugins/physics/standard/libstandard.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
-
 runhaskell:
 	cp ../../plugins/physics/haskell/libhaskell.so \
 		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+	/usr/local/webots/webots-controller --stdout-redirect controller
+
+runlowres:
+	cp ../../plugins/physics/lowres/liblowres.so \
+		../../plugins/physics/__custom__/lib__custom__.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect controller
+
+runstandard:
+	cp ../../plugins/physics/standard/libstandard.so \
+		../../plugins/physics/__custom__/lib__custom__.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect controller
+
+runplank:
+	cp ../../plugins/physics/plank/libplank.so \
+		../../plugins/physics/__custom__/lib__custom__.so
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
+	/usr/local/webots/webots-controller --stdout-redirect controller &
 	sleep 1
 	cd $(VIZ_DIR); \
  	love . -i '{"source":"request","port":$(VIZ_PORT),"host":"localhost"}' \
@@ -63,12 +73,6 @@ runsnn:
 		'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O","6":"S2"}' \
 		--set_font_size 16 \
 		> /dev/null
-
-runplank:
-	cp ../../plugins/physics/plank/libplank.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
