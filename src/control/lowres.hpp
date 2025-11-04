@@ -16,13 +16,14 @@
 
 #pragma once
 
-#include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
-#include <control/pids/position.hpp>
-#include <control/pids/pitchroll_angle.hpp>
-#include <control/pids/pitchroll_rate.hpp>
-#include <control/pids/yaw_angle.hpp>
-#include <control/pids/yaw_rate.hpp>
+#include <control/lowres/altitude.hpp>
+#include <control/lowres/climbrate.hpp>
+#include <control/lowres/position.hpp>
+#include <control/lowres/pitchroll_angle.hpp>
+#include <control/lowres/pitchroll_rate.hpp>
+#include <control/lowres/yaw_angle.hpp>
+#include <control/lowres/yaw_rate.hpp>
+
 #include <msp/serializer.hpp>
 
 class ClosedLoopControl {
@@ -40,8 +41,18 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const auto climbrate = AltitudeController::run(hovering,
-                    dt, vehicleState.z, openLoopDemands.thrust);
+            const uint8_t z = float2byte(vehicleState.z, ZMIN, ZMAX);
+            const uint8_t thrust = float2byte(openLoopDemands.thrust, THRUSTMIN, THRUSTMAX);
+
+            printf("z=(%3.3f,%03d) thrust=(%3.3f,%03d)\n", 
+                    vehicleState.z, z,
+                    openLoopDemands.thrust, thrust);
+     
+            const auto climbrate = AltitudeController::run(
+                    hovering,
+                    dt,
+                    vehicleState.z,
+                    openLoopDemands.thrust);
 
             demands.thrust =
                 ClimbRateController::run(
@@ -91,5 +102,18 @@ class ClosedLoopControl {
         // unused; needed for sim API
         void init()
         {
+        }
+
+    private:
+
+        static constexpr float ZMIN = 0;
+        static constexpr float ZMAX = 3;
+
+        static constexpr float THRUSTMIN = 0;
+        static constexpr float THRUSTMAX = 1;
+
+        static uint8_t float2byte(const float val, const float min, const float max)
+        {
+            return (uint8_t)(255 * (val - min) / (max - min));
         }
 };

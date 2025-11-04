@@ -18,44 +18,40 @@
 #pragma once
 
 #include <num.hpp>
-#include <vehicles/diyquad.hpp>
 
-class ClimbRateController {
+class AltitudeController {
 
     public:
 
         /**
-         * Demand is input as climbrate target in meters per second and output
-         * as arbitrary positive value to be scaled according to motor
-         * characteristics.
+         * Demand is input as altitude target in meters and output as 
+         * climb rate in meters per second.
          */
         static float run(
                 const bool hovering,
-                const float z0,
                 const float dt,
                 const float z,
-                const float dz,
-                const float demand)
+                const float thrust)
         {
             static float _integral;
 
-            const auto airborne = hovering || (z > z0);
+            const auto error = thrust - z;
 
-            const auto error = demand - dz;
-
-            _integral = airborne ? 
+            _integral = hovering ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
-            const auto thrust = KP * error + KI * _integral;
-
-            return airborne ?
-                Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
-                        THRUST_MIN, THRUST_MAX) : 0;
+            return hovering ? 
+                Num::fconstrain(KP * error + KI * _integral,
+                        fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
+                -LANDING_SPEED_MPS;
         }
 
     private:
 
-        static constexpr float KP = 25;
-        static constexpr float KI = 15;
+        static constexpr float KP = 2;
+        static constexpr float KI = 0.5;
         static constexpr float ILIMIT = 5000;
+        static constexpr float VEL_MAX = 1;
+        static constexpr float VEL_MAX_OVERHEAD = 1.10;
+        static constexpr float LANDING_SPEED_MPS = 0.15;
 };
