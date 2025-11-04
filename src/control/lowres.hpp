@@ -43,23 +43,13 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const uint8_t z = ByteScaling::float2byte(
-                    vehicleState.z, ByteScaling::ZMIN, ByteScaling::ZMAX);
+            const uint8_t z = ByteScaling::float2byte(vehicleState.z,
+                        AltitudeController::ZMIN, AltitudeController::ZMAX);
 
-            const uint8_t thrust = ByteScaling::float2byte(
-                    openLoopDemands.thrust, ByteScaling::THRUSTMIN,
-                    ByteScaling::THRUSTMAX);
+            const uint8_t thrust = ByteScaling::float2byte(openLoopDemands.thrust,
+                        AltitudeController::THRUSTMIN, AltitudeController::THRUSTMAX);
 
-            printf("z=(%3.3f,%03d) thrust=(%3.3f,%03d)\n", 
-                    vehicleState.z, z,
-                    openLoopDemands.thrust, thrust);
-     
-            const auto climbrate = AltitudeController::run(
-                    hovering,
-                    dt,
-                    vehicleState.z,
-                    openLoopDemands.thrust);
-
+            const float climbrate = AltitudeController::run( hovering, dt, z, thrust);
             demands.thrust =
                 ClimbRateController::run(
                         hovering,

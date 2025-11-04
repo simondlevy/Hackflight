@@ -20,11 +20,10 @@ class ByteScaling {
 
     public:
 
-        static constexpr float ZMIN = 0;
-        static constexpr float ZMAX = 3;
-
-        static constexpr float THRUSTMIN = 0;
-        static constexpr float THRUSTMAX = 1;
+        static float byte2float(const uint8_t val, const float min, const float max)
+        {
+            return min + (float)val / 255 * (max - min);
+        }
 
         static uint8_t float2byte(const float val, const float min, const float max)
         {
