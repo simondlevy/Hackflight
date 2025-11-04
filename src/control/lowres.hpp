@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <bytescaling.hpp>
+
 #include <control/lowres/altitude.hpp>
 #include <control/lowres/climbrate.hpp>
 #include <control/lowres/position.hpp>
@@ -41,8 +43,12 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const uint8_t z = float2byte(vehicleState.z, ZMIN, ZMAX);
-            const uint8_t thrust = float2byte(openLoopDemands.thrust, THRUSTMIN, THRUSTMAX);
+            const uint8_t z = ByteScaling::float2byte(
+                    vehicleState.z, ByteScaling::ZMIN, ByteScaling::ZMAX);
+
+            const uint8_t thrust = ByteScaling::float2byte(
+                    openLoopDemands.thrust, ByteScaling::THRUSTMIN,
+                    ByteScaling::THRUSTMAX);
 
             printf("z=(%3.3f,%03d) thrust=(%3.3f,%03d)\n", 
                     vehicleState.z, z,
@@ -102,18 +108,5 @@ class ClosedLoopControl {
         // unused; needed for sim API
         void init()
         {
-        }
-
-    private:
-
-        static constexpr float ZMIN = 0;
-        static constexpr float ZMAX = 3;
-
-        static constexpr float THRUSTMIN = 0;
-        static constexpr float THRUSTMAX = 1;
-
-        static uint8_t float2byte(const float val, const float min, const float max)
-        {
-            return (uint8_t)(255 * (val - min) / (max - min));
         }
 };
