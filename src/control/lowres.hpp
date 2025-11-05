@@ -72,7 +72,7 @@ class ClosedLoopControl {
             PositionController::run(
                     airborne,
                     dt,
-                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
+                    vehicleState.dx, vehicleState.dy, psi_byte,
                     hovering ? openLoopDemands.pitch : 0,
                     hovering ? openLoopDemands.roll : 0,
                     demands.roll, demands.pitch);

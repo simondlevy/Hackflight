@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <datatypes.h>
 #include <num.hpp>
 
 class PositionController {
@@ -36,7 +37,7 @@ class PositionController {
                  const float dt,
                  const float state_dx,
                  const float state_dy,
-                 const float state_psi,
+                 const uint8_t psi_byte,
                  const float demand_x,
                  const float demand_y,
                  float & roll,
@@ -48,7 +49,7 @@ class PositionController {
             // Rotate world-coordinate velocities into body coordinates
             const auto dxw = state_dx;
             const auto dyw = state_dy;
-            const auto psi = Num::DEG2RAD * state_psi;
+            const float psi = Num::DEG2RAD * Num::byte2float(psi_byte, STATE_PSI_MAX);
             const auto cospsi = cos(psi);
             const auto sinpsi = sin(psi);
             const auto dxb =  dxw * cospsi + dyw * sinpsi;
