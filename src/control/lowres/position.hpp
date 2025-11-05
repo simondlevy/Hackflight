@@ -35,8 +35,8 @@ class PositionController {
          static void run(
                  const bool airborne,
                  const float dt,
-                 const float state_dx,
-                 const float state_dy,
+                 const uint8_t dx_byte,
+                 const uint8_t dy_byte,
                  const uint8_t psi_byte,
                  const float demand_x,
                  const float demand_y,
@@ -47,8 +47,8 @@ class PositionController {
             static float _integralY;
 
             // Rotate world-coordinate velocities into body coordinates
-            const auto dxw = state_dx;
-            const auto dyw = state_dy;
+            const auto dxw = Num::byte2float(dx_byte, STATE_DXY_MAX);
+            const auto dyw = Num::byte2float(dy_byte, STATE_DXY_MAX);
             const float psi = Num::DEG2RAD * Num::byte2float(psi_byte, STATE_PSI_MAX);
             const auto cospsi = cos(psi);
             const auto sinpsi = sin(psi);

@@ -43,6 +43,17 @@ class ClosedLoopControl {
         {
             (void)step;
 
+            //static float dymin, dymax;
+            //minmax(vehicleState.dy, dymin, dymax);
+            //printf("dy = %+3.3f, %+3.3f\n", dymin, dymax);
+
+
+            const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
+                        STATE_DXY_MAX);
+
+            const uint8_t dy_byte = Num::float2byte(vehicleState.dy,
+                        STATE_DXY_MAX);
+
             const uint8_t z_byte = Num::float2byte(vehicleState.z,
                         STATE_Z_MIN, STATE_Z_MAX);
 
@@ -72,7 +83,7 @@ class ClosedLoopControl {
             PositionController::run(
                     airborne,
                     dt,
-                    vehicleState.dx, vehicleState.dy, psi_byte,
+                    dx_byte, dy_byte, psi_byte,
                     hovering ? openLoopDemands.pitch : 0,
                     hovering ? openLoopDemands.roll : 0,
                     demands.roll, demands.pitch);

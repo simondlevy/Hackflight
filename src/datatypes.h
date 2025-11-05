@@ -111,11 +111,12 @@ typedef struct {
 } vehicleState_t;
 
 // Limits for state vector, to support conversion to/from eight-bit rep
-static constexpr float STATE_Z_MIN = 0;
-static constexpr float STATE_Z_MAX = 3;
-static constexpr float STATE_DZ_MAX = 1;
-static constexpr float STATE_PSI_MAX = 180;
-static constexpr float STATE_DPSI_MAX = 250;
+static const float STATE_DXY_MAX = 2;
+static const float STATE_Z_MIN = 0;
+static const float STATE_Z_MAX = 3;
+static const float STATE_DZ_MAX = 1;
+static const float STATE_PSI_MAX = 180;
+static const float STATE_DPSI_MAX = 250;
 
 /* Data structure used by the stabilizer subsystem.
  * All have a timestamp to be set when the data is calculated.
