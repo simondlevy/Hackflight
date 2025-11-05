@@ -43,20 +43,25 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const float climbrate = AltitudeController::run(
-                    hovering, 
-                    dt, 
-                    ByteScaling::float2byte(vehicleState.z,
-                        AltitudeController::ZMIN, AltitudeController::ZMAX),
+            const uint8_t z = ByteScaling::float2byte(vehicleState.z,
+                        AltitudeController::ZMIN, AltitudeController::ZMAX);
+
+            const float climbrate = AltitudeController::run(hovering, dt, z,
                     ByteScaling::float2byte(openLoopDemands.thrust,
                         AltitudeController::THRUSTMIN, AltitudeController::THRUSTMAX));
+
+            static float cmin, cmax;
+
+            minmax(climbrate, cmin, cmax);
+
+            printf("%+3.3f %+3.3f %+3.3f\n", climbrate, cmin, cmax);
 
             demands.thrust =
                 ClimbRateController::run(
                         hovering,
                         landingAltitudeMeters,
                         dt,
-                        vehicleState.z,
+                        z,
                         vehicleState.dz,
                         climbrate);
 
@@ -105,5 +110,7 @@ class ClosedLoopControl {
 
         void minmax(const float val, float & min, float & max)
         {
+            min = val < min ? val : min;
+            max = val > max ? val : max;
         }
 };
