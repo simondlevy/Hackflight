@@ -47,7 +47,10 @@ class ClosedLoopControl {
                         STATE_Z_MIN, STATE_Z_MAX);
 
             const uint8_t dz_byte = ByteScaling::float2byte(vehicleState.dz,
-                        STATE_DZ_MIN, STATE_DZ_MAX);
+                        STATE_DZ_MAX);
+
+            const uint8_t psi_byte = ByteScaling::float2byte(vehicleState.psi,
+                        STATE_PSI_MAX);
 
             const float climbrate = AltitudeController::run(hovering, dt, z_byte,
                     openLoopDemands.thrust);
@@ -58,7 +61,7 @@ class ClosedLoopControl {
             const auto airborne = demands.thrust > 0;
 
             const auto yaw = YawAngleController::run(
-                    airborne, dt, vehicleState.psi, openLoopDemands.yaw);
+                    airborne, dt, psi_byte, openLoopDemands.yaw);
 
             demands.yaw =
                 YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);

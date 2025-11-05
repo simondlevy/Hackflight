@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <bytescaling.hpp>
 #include <num.hpp>
 
 class YawAngleController {
@@ -27,15 +28,14 @@ class YawAngleController {
           * Input is desired angle (deg) estimated actual angle (deg) from EKF;
             ouputput is angles-per-second demand sent to YawRateController.
           */
-        static float run(
-                const bool airborne,  // ignore this
-                const float dt,       // can be a constant if needed
-                const float psi,      // estimated angle
-                const float yaw)      // desired angle
+        static float run(const bool airborne, const float dt,
+                const uint8_t psi_byte, const float yaw)      
         {
             static float _target;
             static float _integral;
             static float _previous;
+
+            const float psi = ByteScaling::byte2float(psi_byte, STATE_PSI_MAX);
 
             _target = airborne ? 
                 cap(_target + DEMAND_MAX * yaw * dt) : psi;
