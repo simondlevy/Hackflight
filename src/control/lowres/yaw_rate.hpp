@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <datatypes.h>
 #include <num.hpp>
 
 class YawRateController {
@@ -30,12 +31,13 @@ class YawRateController {
          static float run(
                  const bool airborne,
                  const float dt,
-                 const float dpsi,
+                 const float dpsi_byte,
                  const float yaw)
         {
             static float _integral;
 
-            const auto error = yaw - dpsi;
+            const auto error =
+                yaw - Num::byte2float(dpsi_byte, STATE_DPSI_MAX);
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

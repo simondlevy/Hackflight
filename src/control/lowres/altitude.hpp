@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <bytescaling.hpp>
 #include <datatypes.h>
 #include <num.hpp>
 
@@ -38,7 +37,7 @@ class AltitudeController {
             static float _integral;
 
             const auto error = thrust -
-                ByteScaling::byte2float(z_byte, STATE_Z_MIN, STATE_Z_MAX);
+                Num::byte2float(z_byte, STATE_Z_MIN, STATE_Z_MAX);
                 
             _integral = hovering ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

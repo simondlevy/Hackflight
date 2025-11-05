@@ -17,7 +17,7 @@
 #pragma once
 
 #include <datatypes.h>
-#include <bytescaling.hpp>
+#include <num.hpp>
 
 #include <control/lowres/altitude.hpp>
 #include <control/lowres/climbrate.hpp>
@@ -43,19 +43,22 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const uint8_t z_byte = ByteScaling::float2byte(vehicleState.z,
+            const uint8_t z_byte = Num::float2byte(vehicleState.z,
                         STATE_Z_MIN, STATE_Z_MAX);
 
-            const uint8_t dz_byte = ByteScaling::float2byte(vehicleState.dz,
+            const uint8_t dz_byte = Num::float2byte(vehicleState.dz,
                         STATE_DZ_MAX);
 
-            const uint8_t psi_byte = ByteScaling::float2byte(vehicleState.psi,
+            const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
                         STATE_PSI_MAX);
+
+            const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
+                        STATE_DPSI_MAX);
 
             const float climbrate = AltitudeController::run(hovering, dt, z_byte,
                     openLoopDemands.thrust);
 
-            demands.thrust = ClimbRateController::run( hovering, dt, z_byte,
+            demands.thrust = ClimbRateController::run(hovering, dt, z_byte,
                     dz_byte, climbrate);
 
             const auto airborne = demands.thrust > 0;
@@ -64,7 +67,7 @@ class ClosedLoopControl {
                     airborne, dt, psi_byte, openLoopDemands.yaw);
 
             demands.yaw =
-                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+                YawRateController::run(airborne, dt, dpsi_byte, yaw);
 
             PositionController::run(
                     airborne,

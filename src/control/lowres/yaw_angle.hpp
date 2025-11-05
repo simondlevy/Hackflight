@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <bytescaling.hpp>
 #include <num.hpp>
 
 class YawAngleController {
@@ -35,7 +34,7 @@ class YawAngleController {
             static float _integral;
             static float _previous;
 
-            const float psi = ByteScaling::byte2float(psi_byte, STATE_PSI_MAX);
+            const float psi = Num::byte2float(psi_byte, STATE_PSI_MAX);
 
             _target = airborne ? 
                 cap(_target + DEMAND_MAX * yaw * dt) : psi;
