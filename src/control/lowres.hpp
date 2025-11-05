@@ -43,10 +43,9 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            //static float dymin, dymax;
-            //minmax(vehicleState.dy, dymin, dymax);
-            //printf("dy = %+3.3f, %+3.3f\n", dymin, dymax);
-
+            static float phimin, phimax;
+            minmax(vehicleState.phi, phimin, phimax);
+            printf("phi = %+3.3f, %+3.3f\n", phimin, phimax);
 
             const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
                         STATE_DXY_MAX);
@@ -62,6 +61,12 @@ class ClosedLoopControl {
 
             const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
                         STATE_PSI_MAX);
+
+            const uint8_t phi_byte = Num::float2byte(vehicleState.phi,
+                        STATE_PHITHETA_MAX);
+
+            const uint8_t theta_byte = Num::float2byte(vehicleState.theta,
+                        STATE_PHITHETA_MAX);
 
             const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
                         STATE_DPSI_MAX);
@@ -89,11 +94,8 @@ class ClosedLoopControl {
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(
-                    airborne,
-                    dt,
-                    vehicleState.phi, vehicleState.theta,
-                    demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
+                    airborne, dt, phi_byte, theta_byte, demands.roll,
+                    demands.pitch, demands.roll, demands.pitch);
 
             PitchRollRateController::run(
                     airborne,

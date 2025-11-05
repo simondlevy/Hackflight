@@ -34,8 +34,8 @@ class PitchRollAngleController {
         static void run(
                 const bool airborne,
                 const float dt,
-                const float state_phi,
-                const float state_theta,
+                const float phi_byte,
+                const float theta_byte,
                 const float demand_roll,
                 const float demand_pitch,
                 float & new_demand_roll,
@@ -45,11 +45,13 @@ class PitchRollAngleController {
 
             static float _pitch_integral;
 
-            new_demand_roll = runAxis(airborne, dt, demand_roll, state_phi,
+            new_demand_roll = runAxis(airborne, dt, demand_roll, 
+                    Num::byte2float(phi_byte, STATE_PHITHETA_MAX),
                     _roll_integral);
 
             new_demand_pitch =
-                runAxis(airborne, dt, demand_pitch, state_theta,
+                runAxis(airborne, dt, demand_pitch, 
+                        Num::byte2float(theta_byte, STATE_PHITHETA_MAX),
                         _pitch_integral);
         }
 

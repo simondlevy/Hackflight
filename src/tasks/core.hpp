@@ -57,7 +57,7 @@ class CoreTask {
     private:
 
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
-        static constexpr float MAX_SAFE_ANGLE = 30;
+        static constexpr float STATE_PHITHETA_MAX = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
         static const Clock::rate_t FLYING_STATUS_CLOCK_RATE = Clock::RATE_25_HZ;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
@@ -276,7 +276,7 @@ class CoreTask {
 
         static bool isSafeAngle(float angle)
         {
-            return fabs(angle) < MAX_SAFE_ANGLE;
+            return fabs(angle) < STATE_PHITHETA_MAX;
         }
 
         // Device-dependent ---------------------------
