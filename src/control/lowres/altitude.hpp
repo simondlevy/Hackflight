@@ -18,17 +18,12 @@
 #pragma once
 
 #include <bytescaling.hpp>
+#include <datatypes.h>
 #include <num.hpp>
 
 class AltitudeController {
 
     public:
-
-        static constexpr float ZMIN = 0;
-        static constexpr float ZMAX = 3;
-
-        static constexpr float THRUSTMIN = 0;
-        static constexpr float THRUSTMAX = 1;
 
         /**
          * Demand is input as altitude target in meters and output as 
@@ -37,16 +32,13 @@ class AltitudeController {
         static float run(
                 const bool hovering,
                 const float dt,
-                const uint8_t z,
-                const uint8_t thrust)
+                const uint8_t z_byte,
+                const float thrust)
         {
             static float _integral;
 
-            const float thrustf = ByteScaling::byte2float(thrust, THRUSTMIN, THRUSTMAX );
-
-            const float zf = ByteScaling::byte2float(z , ZMIN, ZMAX);
-
-            const auto error = thrustf - zf;
+            const auto error = thrust -
+                ByteScaling::byte2float(z_byte, STATE_Z_MIN, STATE_Z_MAX);
                 
             _integral = hovering ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

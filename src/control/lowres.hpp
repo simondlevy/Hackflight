@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <datatypes.h>
 #include <bytescaling.hpp>
 
 #include <control/lowres/altitude.hpp>
@@ -43,25 +44,21 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            const uint8_t z = ByteScaling::float2byte(vehicleState.z,
-                        AltitudeController::ZMIN, AltitudeController::ZMAX);
+            const uint8_t z_byte = ByteScaling::float2byte(vehicleState.z,
+                        STATE_Z_MIN, STATE_Z_MAX);
 
-            const float climbrate = AltitudeController::run(hovering, dt, z,
-                    ByteScaling::float2byte(openLoopDemands.thrust,
-                        AltitudeController::THRUSTMIN, AltitudeController::THRUSTMAX));
+            //const uint8_t dz_byte = ByteScaling::float2byte(vehicleState.dz,
+            //            AltitudeController::STATE_Z_MIN, AltitudeController::STATE_Z_MAX);
 
-            static float cmin, cmax;
-
-            minmax(climbrate, cmin, cmax);
-
-            printf("%+3.3f %+3.3f %+3.3f\n", climbrate, cmin, cmax);
+            const float climbrate = AltitudeController::run(hovering, dt, z_byte,
+                    openLoopDemands.thrust);
 
             demands.thrust =
                 ClimbRateController::run(
                         hovering,
                         landingAltitudeMeters,
                         dt,
-                        z,
+                        z_byte,
                         vehicleState.dz,
                         climbrate);
 
