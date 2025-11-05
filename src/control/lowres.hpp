@@ -47,8 +47,8 @@ class ClosedLoopControl {
             const uint8_t z_byte = ByteScaling::float2byte(vehicleState.z,
                         STATE_Z_MIN, STATE_Z_MAX);
 
-            //const uint8_t dz_byte = ByteScaling::float2byte(vehicleState.dz,
-            //            AltitudeController::STATE_Z_MIN, AltitudeController::STATE_Z_MAX);
+            const uint8_t dz_byte = ByteScaling::float2byte(vehicleState.dz,
+                        STATE_DZ_MIN, STATE_DZ_MAX);
 
             const float climbrate = AltitudeController::run(hovering, dt, z_byte,
                     openLoopDemands.thrust);
@@ -59,7 +59,7 @@ class ClosedLoopControl {
                         landingAltitudeMeters,
                         dt,
                         z_byte,
-                        vehicleState.dz,
+                        dz_byte,
                         climbrate);
 
             const auto airborne = demands.thrust > 0;

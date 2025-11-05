@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <bytescaling.hpp>
 #include <num.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -34,14 +35,15 @@ class ClimbRateController {
                 const float z0,
                 const float dt,
                 const float z,
-                const float dz,
+                const uint8_t dz_byte,
                 const float demand)
         {
             static float _integral;
 
-            const auto airborne = hovering || (z > z0);
+            const bool airborne = hovering || (z > z0);
 
-            const auto error = demand - dz;
+            const float error = demand -
+                ByteScaling::byte2float(dz_byte, STATE_DZ_MIN, STATE_DZ_MAX);
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

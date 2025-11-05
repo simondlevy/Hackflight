@@ -113,6 +113,8 @@ typedef struct {
 // Limits for state vector, to support conversion to/from eight-bit rep
 static constexpr float STATE_Z_MIN = 0;
 static constexpr float STATE_Z_MAX = 3;
+static constexpr float STATE_DZ_MIN = -1;
+static constexpr float STATE_DZ_MAX = +1;
 
 
 /* Data structure used by the stabilizer subsystem.
