@@ -56,7 +56,6 @@ class CoreTask {
 
     private:
 
-        static constexpr float LANDING_ALTITUDE_M = 0.03;
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
         static constexpr float MAX_SAFE_ANGLE = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
@@ -180,13 +179,8 @@ class CoreTask {
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
 
-                _closedLoopControl->run(
-                        step,
-                        1.f / CLOSED_LOOP_UPDATE_RATE,
-                        setpoint.hovering,
-                        _vehicleState,
-                        setpoint.demands,
-                        LANDING_ALTITUDE_M,
+                _closedLoopControl->run( step, 1.f / CLOSED_LOOP_UPDATE_RATE,
+                        setpoint.hovering, _vehicleState, setpoint.demands,
                         demands);
 
                 runMixer(_mixFun, demands, motorvals);

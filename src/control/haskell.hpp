@@ -48,7 +48,6 @@ class ClosedLoopControl {
                 const bool inHoverMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
-                const float landingAltitudeMeters,
                 demands_t & demands)
         {
             (void)step;
@@ -73,8 +72,6 @@ class ClosedLoopControl {
             extern float stream_psi;
             extern float stream_dpsi;
 
-            extern float stream_landing_altitude_m;
-
             stream_dt = dt;
 
             stream_hovering = inHoverMode;
@@ -94,8 +91,6 @@ class ClosedLoopControl {
             stream_dtheta = vehicleState.dtheta;
             stream_psi = vehicleState.psi;
             stream_dpsi = vehicleState.dpsi;
-
-            stream_landing_altitude_m = landingAltitudeMeters;
 
             // This will call setDemands() defined above
             copilot_step_core();

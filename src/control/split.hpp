@@ -41,7 +41,6 @@ class ClosedLoopControl {
                 const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
-                const float landingAltitudeMeters,
                 demands_t & demands)
         {
             static float climbrate;
@@ -52,14 +51,8 @@ class ClosedLoopControl {
                         dt, vehicleState.z, openLoopDemands.thrust);
             }
 
-            demands.thrust =
-                ClimbRateController::run(
-                        hovering,
-                        landingAltitudeMeters,
-                        dt,
-                        vehicleState.z,
-                        vehicleState.dz,
-                        climbrate);
+            demands.thrust = ClimbRateController::run( hovering, dt,
+                    vehicleState.z, vehicleState.dz, climbrate);
 
             const auto airborne = demands.thrust > 0;
 

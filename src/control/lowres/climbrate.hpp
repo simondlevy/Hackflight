@@ -32,7 +32,6 @@ class ClimbRateController {
          */
         static float run(
                 const bool hovering,
-                const float z0,
                 const float dt,
                 const float z,
                 const uint8_t dz_byte,
@@ -40,7 +39,7 @@ class ClimbRateController {
         {
             static float _integral;
 
-            const bool airborne = hovering || (z > z0);
+            const bool airborne = hovering || (z > LANDING_ALTITUDE_METERS);
 
             const float error = demand -
                 ByteScaling::byte2float(dz_byte, STATE_DZ_MIN, STATE_DZ_MAX);
@@ -60,4 +59,6 @@ class ClimbRateController {
         static constexpr float KP = 25;
         static constexpr float KI = 15;
         static constexpr float ILIMIT = 5000;
+
+        static constexpr float LANDING_ALTITUDE_METERS = 0.03;
 };

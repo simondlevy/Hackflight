@@ -33,6 +33,7 @@ class SnnHelper {
     private:
 
         static constexpr float MAX_SPIKE_TIME = 100;
+        static constexpr float LANDING_ALTITUDE_METERS = 0.03;
 
         Difference_Helper _allinone;
 
@@ -41,7 +42,6 @@ class SnnHelper {
         // Hybrid SNN / PID control
         float runClimbRateController(
                 const bool hovering,
-                const float z0,
                 const float dt,
                 const float z,
                 const float dz,
@@ -55,7 +55,7 @@ class SnnHelper {
 
             static float _integral;
 
-            const auto airborne = hovering || (z > z0);
+            const auto airborne = hovering || (z > LANDING_ALTITUDE_METERS);
 
             const float error = _allinone.run(demand, dz, 1);  // 1 = bias
 
@@ -118,20 +118,13 @@ class SnnHelper {
                 const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
-                const float landingAltitudeMeters,
                 demands_t & demands)
         {
             const auto climbrate = AltitudeController::run(hovering,
                     dt, vehicleState.z, openLoopDemands.thrust);
 
-            demands.thrust =
-                runClimbRateController(
-                        hovering,
-                        landingAltitudeMeters,
-                        dt,
-                        vehicleState.z,
-                        vehicleState.dz,
-                        climbrate);
+            demands.thrust = runClimbRateController( hovering, dt,
+                    vehicleState.z, vehicleState.dz, climbrate);
 
             const auto airborne = demands.thrust > 0;
 

@@ -72,13 +72,11 @@ class ClosedLoopControl {
                 const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
-                const float landingAltitudeMeters,
                 demands_t & demands)
         {
             (void)step;
 
-            _helper.run(dt, hovering, vehicleState, openLoopDemands,
-                    landingAltitudeMeters, demands); 
+            _helper.run(dt, hovering, vehicleState, openLoopDemands, demands); 
 
             static int _tick;
 

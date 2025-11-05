@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <control/lowres/altitude.hpp>
 #include <num.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -32,17 +31,14 @@ class ClimbRateController {
          */
         static float run(
                 const bool hovering,
-                const float z0,
                 const float dt,
-                const uint8_t z,
+                const float z,
                 const float dz,
                 const float demand)
         {
             static float _integral;
 
-            const float zf = ByteScaling::byte2float(z , ZMIN, ZMAX);
-
-            const auto airborne = hovering || (zf > z0);
+            const auto airborne = hovering || (z > LANDING_ALTITUDE_METERS);
 
             const auto error = demand - dz;
 
@@ -62,6 +58,5 @@ class ClimbRateController {
         static constexpr float KI = 15;
         static constexpr float ILIMIT = 5000;
 
-        static const float DZMIN = -1;
-        static const float DZMAX = -1;
+        static constexpr float LANDING_ALTITUDE_METERS = 0.03;
 };
