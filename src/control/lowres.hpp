@@ -43,10 +43,6 @@ class ClosedLoopControl {
         {
             (void)step;
 
-            static float phimin, phimax;
-            minmax(vehicleState.phi, phimin, phimax);
-            printf("phi = %+3.3f, %+3.3f\n", phimin, phimax);
-
             const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
                         STATE_DXY_MAX);
 
@@ -59,14 +55,20 @@ class ClosedLoopControl {
             const uint8_t dz_byte = Num::float2byte(vehicleState.dz,
                         STATE_DZ_MAX);
 
-            const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
-                        STATE_PSI_MAX);
-
             const uint8_t phi_byte = Num::float2byte(vehicleState.phi,
                         STATE_PHITHETA_MAX);
 
+            const uint8_t dphi_byte = Num::float2byte(vehicleState.dphi,
+                        STATE_DPHITHETA_MAX);
+
             const uint8_t theta_byte = Num::float2byte(vehicleState.theta,
                         STATE_PHITHETA_MAX);
+
+            const uint8_t dtheta_byte = Num::float2byte(vehicleState.dtheta,
+                        STATE_DPHITHETA_MAX);
+
+            const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
+                        STATE_PSI_MAX);
 
             const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
                         STATE_DPSI_MAX);
@@ -97,12 +99,8 @@ class ClosedLoopControl {
                     airborne, dt, phi_byte, theta_byte, demands.roll,
                     demands.pitch, demands.roll, demands.pitch);
 
-            PitchRollRateController::run(
-                    airborne,
-                    dt,
-                    vehicleState.dphi, vehicleState.dtheta,
-                    demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
+            PitchRollRateController::run( airborne, dt, dphi_byte, dtheta_byte,
+                    demands.roll, demands.pitch, demands.roll, demands.pitch);
         }
 
         void serializeMessage(MspSerializer & serializer)

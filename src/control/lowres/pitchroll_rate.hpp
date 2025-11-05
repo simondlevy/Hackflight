@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <datatypes.h>
 #include <num.hpp>
 
 class PitchRollRateController {
@@ -35,7 +36,7 @@ class PitchRollRateController {
          static void run(
                  const bool airborne,
                  const float dt,
-                 const float state_dphi, const float state_dtheta,
+                 const uint8_t dphi_byte, const uint8_t dtheta_byte,
                  const float demand_roll,const float demand_pitch, 
                  float & new_demand_roll, float & new_demand_pitch) 
          {
@@ -44,10 +45,14 @@ class PitchRollRateController {
              static axis_t _pitch;
 
              new_demand_roll =
-                 runAxis(airborne, dt, demand_roll, state_dphi, _roll);
+                 runAxis(airborne, dt, demand_roll,
+                         Num::byte2float(dphi_byte, STATE_DPHITHETA_MAX),
+                         _roll);
 
              new_demand_pitch =
-                 runAxis(airborne, dt, demand_pitch, state_dtheta, _pitch);
+                 runAxis(airborne, dt, demand_pitch,
+                         Num::byte2float(dtheta_byte, STATE_DPHITHETA_MAX),
+                         _pitch);
          }
 
     private:
