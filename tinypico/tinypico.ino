@@ -16,23 +16,38 @@
  */
 
 #include <BluetoothSerial.h> 
+#include <TinyPICO.h>
 
 static BluetoothSerial bts; 
 
 static const uint8_t TXD1 = 14;
 static const uint8_t RXD1 = 4;
 
+static const uint32_t TIMEOUT_MSEC = 1000;
+
 static HardwareSerial uarts(1);
 
 static TaskHandle_t bt_to_uart_task_handle = NULL;
 
+static TinyPICO tp = TinyPICO();
+
+static bool connected;
+
 void bt_to_uart_task(void *) 
 {
+    static uint32_t last_received;
+
     while (true) {
 
         while (bts.available()) {
+            last_received = millis();
+            connected = true;
             const uint8_t b = bts.read();
             uarts.write(b);
+        }
+
+        if (millis() - last_received > TIMEOUT_MSEC) {
+            connected = false;
         }
 
         vTaskDelay(1);
@@ -54,12 +69,28 @@ void uart_to_bt_task(void *)
     }
 }
 
+static TaskHandle_t blink_task_handle = NULL;
+
+void blink_task(void *) 
+{
+    while (true) {
+
+        tp.DotStar_SetPixelColor(0, 64, 0);
+
+        vTaskDelay(500);
+
+        if (!connected) {
+            tp.DotStar_SetPixelColor(0, 0, 0);
+            vTaskDelay(500);
+        }
+    }
+}
 
 void setup() 
 {
     uarts.begin(115200, SERIAL_8N1, RXD1, TXD1);
 
-    bts.begin("Hackflight"); 
+    bts.begin("CrazyFlie-TinyPICO"); 
 
     xTaskCreate(
             bt_to_uart_task, 
@@ -77,10 +108,15 @@ void setup()
             NULL,        
             1,                 // Priority
             &uart_to_bt_task_handle);
-}
+
+    xTaskCreate(
+            blink_task, 
+            "blink_task", 
+            10000,             // Stack size (bytes)
+            NULL,        
+            2,                 // Priority
+            &blink_task_handle);}
 
 void loop()
 {
 }
-
-
