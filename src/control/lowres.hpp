@@ -101,6 +101,11 @@ class ClosedLoopControl {
 
             PitchRollRateController::run( airborne, dt, dphi_byte, dtheta_byte,
                     demands.roll, demands.pitch, demands.roll, demands.pitch);
+
+            demands.thrust = quantize(demands.thrust, 0, UINT16_MAX);
+            demands.roll = quantize(demands.roll);
+            demands.pitch = quantize(demands.pitch);
+            demands.yaw = quantize(demands.yaw, 32767);
         }
 
         void serializeMessage(MspSerializer & serializer)
@@ -119,5 +124,20 @@ class ClosedLoopControl {
         {
             min = val < min ? val : min;
             max = val > max ? val : max;
+        }
+
+        float quantize(const float val, const float min, const float max)
+        {
+            return Num::byte2float(Num::float2byte(val, min, max), min, max);
+        }
+
+        float quantize(const float val, const float max)
+        {
+            return Num::byte2float(Num::float2byte(val, max), max);
+        }
+
+        float quantize(const float val)
+        {
+            return quantize(val, 180000);
         }
 };
