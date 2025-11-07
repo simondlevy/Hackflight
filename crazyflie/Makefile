@@ -56,7 +56,7 @@ snn_config:
 	cp $(SRC)/control/snn.hpp $(SRC)/__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
 
-flash: $(BIN)
+dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/crazyflie.ino.bin
 
 clean:
