@@ -47,20 +47,20 @@ copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	mv copilot_core.c copilot_core.cpp
 
 split_config:
-	cp $(SRC)/control/split.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/split.hpp ./__control__.hpp
 
 standard_config:
-	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/standard.hpp ./__control__.hpp
 
 snn_config:
-	cp $(SRC)/control/snn.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/snn.hpp ./__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
 
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/crazyflie.ino.bin
 
 clean:
-	rm -rf build *.hpp copilot* __*__.cpp ../src/__control__.hpp $(MSGS)
+	rm -rf build *.hpp copilot* __*__.cpp $(MSGS)
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
