@@ -33,14 +33,15 @@ class ClimbRateController {
                 const bool hovering,
                 const float dt,
                 const float z,
-                const float dz,
+                const uint8_t dz_byte,
                 const float demand)
         {
             static float _integral;
 
-            const auto airborne = hovering || (z > LANDING_ALTITUDE_METERS);
+            const bool airborne = hovering || (z > LANDING_ALTITUDE_METERS);
 
-            const auto error = demand - dz;
+            const float error = demand -
+                Num::byte2float(dz_byte, STATE_DZ_MAX);
 
             _integral = airborne ? 
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

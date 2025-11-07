@@ -14,7 +14,7 @@ HEX = build/$(SKETCH).ino.hex
 
 $(BIN): $(HEX)
 
-$(HEX):  $(SKETCH).ino *.cpp $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
+$(HEX):  $(SKETCH).ino *.cpp $(SRC)/*.hpp $(SRC)/*/*.hpp $(SRC)/*/*/*.hpp $(MSGS)
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries --libraries ../.. \
 		--build-path ./build \
@@ -29,7 +29,7 @@ flash: $(BIN)
 	sleep 2
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
-unbrick: $(BIN)
+dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 standard_config:

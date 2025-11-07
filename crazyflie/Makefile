@@ -46,6 +46,9 @@ copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c copilot_core.cpp
 
+split_config:
+	cp $(SRC)/control/split.hpp $(SRC)/__control__.hpp
+
 standard_config:
 	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp
 

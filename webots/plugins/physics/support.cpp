@@ -27,8 +27,6 @@
 #include <dynamics.hpp>
 #include <vehicles/diyquad.hpp>
 
-static const float LANDING_ALTITUDE_M = 0.01;
-
 static const float DYNAMICS_RATE = 100000; // Hz
 
 //static const auto PID_UPDATE_RATE = Clock::RATE_1000_HZ;
@@ -69,7 +67,6 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
                 siminfo.hovering,
                 state,
                 siminfo.demands,
-                LANDING_ALTITUDE_M,
                 demands);
 
         demands.roll *= Num::DEG2RAD;

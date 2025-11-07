@@ -153,4 +153,24 @@ class Num {
                 (newmax - newmin) + newmin;
         }
 
+        static float byte2float(const uint8_t val, const float min, const float max)
+        {
+            return min + (float)val / 255 * (max - min);
+        }
+
+        static float byte2float(const uint8_t val, const float max)
+        {
+            return -max + (float)val / 255 * 2 * max;
+        }
+
+        static uint8_t float2byte(const float val, const float min, const float max)
+        {
+            return (uint8_t)(255 * (val - min) / (max - min));
+        }
+
+        static uint8_t float2byte(const float val, const float max)
+        {
+            return (uint8_t)(255 * (val + max) / (2*max));
+        }
+
 }; // class Num
