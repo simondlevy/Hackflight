@@ -43,6 +43,9 @@ __messages__.h: ../msppg/messages.json
 haskell_config: copilot_core.cpp
 	cp $(SRC)/control/haskell.hpp $(SRC)/__control__.hpp
 
+lowres_config:
+	cp $(SRC)/control/lowres.hpp ./__control__.hpp
+
 nopos_config:
 	cp $(SRC)/control/nopos.hpp ./__control__.hpp
 
