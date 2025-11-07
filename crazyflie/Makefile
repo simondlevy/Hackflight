@@ -43,9 +43,8 @@ __messages__.h: ../msppg/messages.json
 haskell_config: copilot_core.cpp
 	cp $(SRC)/control/haskell.hpp $(SRC)/__control__.hpp
 
-copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
-	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
-	mv copilot_core.c copilot_core.cpp
+nopos_config:
+	cp $(SRC)/control/nopos.hpp ./__control__.hpp
 
 split_config:
 	cp $(SRC)/control/split.hpp ./__control__.hpp
@@ -56,6 +55,10 @@ standard_config:
 snn_config:
 	cp $(SRC)/control/snn.hpp ./__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
+
+copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
+	mv copilot_core.c copilot_core.cpp
 
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/crazyflie.ino.bin
