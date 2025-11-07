@@ -16,8 +16,8 @@
 
 #pragma once
 
+#include <__messages__.h>
 #include <comms.hpp>
-#include <msp/__messages__.h>
 #include <msp/parser.hpp>
 #include <tasks/debug.hpp>
 

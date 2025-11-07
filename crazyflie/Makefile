@@ -8,7 +8,7 @@ BIN = build/$(SKETCH).ino.bin
 
 SRC = ../src
 
-MSGS = $(SRC)/msp/__messages__.h
+MSGS = __messages__.h
 
 HASKDIR = ../haskell
 
@@ -27,7 +27,7 @@ bolt: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
 		--fqbn $(FQBN) $(SKETCH).ino
 
 cf2: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
-	$(SRC)/msp/__messages__.h
+	__messages__.h
 	cp cf2/imu.cpp ./__imu__.cpp
 	cp cf2/motors.cpp ./__motors__.cpp
 	arduino-cli compile \
@@ -36,8 +36,9 @@ cf2: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-$(MSGS): ../msppg/messages.json
+__messages__.h: ../msppg/messages.json
 	cd ../msppg; make install; cd ../crazyflie
+	cp ../msppg/messages.h ./__messages__.h
 
 haskell_config: copilot_core.cpp
 	cp $(SRC)/control/haskell.hpp $(SRC)/__control__.hpp

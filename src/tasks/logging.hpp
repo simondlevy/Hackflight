@@ -17,9 +17,9 @@
 #pragma once
 
 #include <__control__.hpp>
+#include <__messages__.h>
 
 #include <comms.hpp>
-#include <msp/__messages__.h>
 #include <msp/serializer.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
