@@ -1,4 +1,4 @@
-SKETCH = tinypico
+SKETCH = tinypico-i2c
 
 FQBN = esp32:esp32:um_tinypico
 
