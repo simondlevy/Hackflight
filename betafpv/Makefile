@@ -48,6 +48,11 @@ copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c copilot_core.cpp
 
+flash: $(BIN)
+	echo -n 'R' > $(PORT) &
+	sleep 2
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
+
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/betafpv.ino.bin
 
