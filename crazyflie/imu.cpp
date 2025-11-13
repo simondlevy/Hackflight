@@ -15,12 +15,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <Wire.h>   
+#include <SPI.h>
 
 #include <BMI088.h>
 
 #include <tasks/imu.hpp>
+
+#ifdef BOLT
+
+static const uint8_t ACCEL_CS_PIN = PB1;
+static const uint8_t GYRO_CS_PIN = PB0;
+
+static const uint8_t MISO_PIN = PB14;
+static const uint8_t MOSI_PIN = PB15;
+static const uint8_t SCLK_PIN = PB13;
+
+static SPIClass spi = SPIClass(MOSI_PIN, MISO_PIN, SCLK_PIN);
+
+static Bmi088Accel accel(spi, ACCEL_CS_PIN);
+
+static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
+
+#else
 
 static const uint8_t SDA_PIN = PC9;
 static const uint8_t SCL_PIN = PA8;
@@ -33,6 +49,9 @@ static TwoWire wire = TwoWire(SDA_PIN, SCL_PIN);
 static Bmi088Accel accel(wire, ACCEL_ADDR);
 
 static Bmi088Gyro gyro(wire, GYRO_ADDR);
+
+
+#endif
 
 static bool failed(const int status)
 {

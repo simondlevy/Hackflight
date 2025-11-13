@@ -343,11 +343,6 @@ class ImuTask {
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
-                DebugTask::setMessage(_debugTask,
-                        "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
-                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                        accelRaw.x, accelRaw.y, accelRaw.z);
-
                 // Convert accel to Gs
                 Axis3f accel = {
                     device_accelRaw2Gs(accelRaw.x),
