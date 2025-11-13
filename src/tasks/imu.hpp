@@ -47,7 +47,7 @@ class ImuTask {
             _coreTaskSemaphore =
                 xSemaphoreCreateBinaryStatic(&_coreTaskSemaphoreBuffer);
 
-            if (!device_init()) {
+            if (!device_init(_gscale, _ascale)) {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
             }
 
@@ -270,6 +270,9 @@ class ImuTask {
         SemaphoreHandle_t _coreTaskSemaphore;
         StaticSemaphore_t _coreTaskSemaphoreBuffer;
 
+        int16_t _gscale;
+        int16_t _ascale;
+
         /**
          * Compensate for a miss-aligned accelerometer. It uses the trim
          * data gathered from the UI and written in the config-block to
@@ -339,15 +342,15 @@ class ImuTask {
                 Axis3i16 gyroRaw = {};
                 Axis3i16 accelRaw = {};
 
-                device_readRaw(
+                device_read(
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
                 // Convert accel to Gs
                 Axis3f accel = {
-                    device_accelRaw2Gs(accelRaw.x),
-                    device_accelRaw2Gs(accelRaw.y),
-                    device_accelRaw2Gs(accelRaw.z)
+                    scale(accelRaw.x, _ascale),
+                    scale(accelRaw.y, _ascale),
+                    scale(accelRaw.z, _ascale)
                 };
 
                 // Calibrate gyro with raw values if necessary
@@ -356,9 +359,9 @@ class ImuTask {
 
                 // Subtract gyro bias
                 Axis3f gyroUnbiased = {
-                    device_gyroRaw2Dps(gyroRaw.x - _gyroBias.x),
-                    device_gyroRaw2Dps(gyroRaw.y - _gyroBias.y),
-                    device_gyroRaw2Dps(gyroRaw.z - _gyroBias.z) 
+                    scale(gyroRaw.x - _gyroBias.x, _gscale),
+                    scale(gyroRaw.y - _gyroBias.y, _gscale),
+                    scale(gyroRaw.z - _gyroBias.z, _gscale)
                 };
 
                 // Rotate gyro to airframe
@@ -383,13 +386,14 @@ class ImuTask {
             }
         }
 
-        bool device_init();
+        static float scale(const int16_t raw, const int16_t scale)
+        {
+            return (float)raw * 2 * scale / 65536.f;
+        }
 
-        void device_readRaw(
-                int16_t & gx, int16_t & gy, int16_t & gz, 
+        bool device_init(int16_t & gscale, int16_t & ascale);
+
+        void device_read(
+                int16_t & gx, int16_t & gy, int16_t & gz,
                 int16_t & ax, int16_t & ay, int16_t & az);
-
-        static float device_gyroRaw2Dps(const int16_t raw);
-
-        static float device_accelRaw2Gs(const int16_t raw);
 };

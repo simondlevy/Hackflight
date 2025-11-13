@@ -29,16 +29,19 @@ static SPIClass spi = SPIClass(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static Mpu6000 imu = Mpu6000(spi, CS_PIN);
 
-bool ImuTask::device_init()
+bool ImuTask::device_init(int16_t & gscale, int16_t & ascale)
 {
     spi.begin();
 
     if (!imu.begin()) return false;
 
+    gscale = 2000;
+    ascale = 16;
+
     return true;
 }
 
-void ImuTask::device_readRaw(
+void ImuTask::device_read(
         int16_t & gx, int16_t & gy, int16_t & gz, 
         int16_t & ax, int16_t & ay, int16_t & az)
 {
@@ -51,14 +54,4 @@ void ImuTask::device_readRaw(
         ax = imu.getRawAccelX();
         ay = imu.getRawAccelY();
         az = imu.getRawAccelZ();
-}
-
-float ImuTask::device_gyroRaw2Dps(const int16_t raw)
-{
-    return (float)raw * 2 * 2000 / 65536.f;
-}
-
-float ImuTask::device_accelRaw2Gs(const int16_t raw)
-{
-    return (float)raw * 2 * 16 / 65536.f;
 }

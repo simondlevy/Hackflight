@@ -58,7 +58,7 @@ static bool failed(const int status)
     return status < 0;
 }
 
-bool ImuTask::device_init()
+bool ImuTask::device_init(int16_t & gscale, int16_t & ascale)
 {
     if (failed(gyro.begin())) return false;
 
@@ -79,11 +79,14 @@ bool ImuTask::device_init()
 
     if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
 
+    gscale = 2000;
+    ascale = 24;
+
     return true;
 }
 
-void ImuTask::device_readRaw(
-        int16_t & gx, int16_t & gy, int16_t & gz, 
+void ImuTask::device_read(
+        int16_t & gx, int16_t & gy, int16_t & gz,
         int16_t & ax, int16_t & ay, int16_t & az)
 {
     gyro.readSensor();
@@ -97,14 +100,4 @@ void ImuTask::device_readRaw(
     ax = accel.getAccelX_raw();
     ay = accel.getAccelY_raw();
     az = accel.getAccelZ_raw();
-}
-
-float ImuTask::device_gyroRaw2Dps(const int16_t raw)
-{
-    return (float)raw * 2 * 2000 / 65536.f;
-}
-
-float ImuTask::device_accelRaw2Gs(const int16_t raw)
-{
-    return (float)raw * 2 * 24 / 65536.f;
 }
