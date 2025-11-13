@@ -33,9 +33,9 @@ except Exception as e:
     exit(0)
 
 BLUETOOTH_ADDRESSES = {
-    'bench': '64:B7:08:94:28:76',
     'cf2': '64:B7:08:87:AD:AA',
-    'tinypico': 'D4:D4:DA:AA:31:DE'
+    'bolt': '64:B7:08:86:F2:86'
+
 }
 
 BLUETOOTH_PORT = 1
