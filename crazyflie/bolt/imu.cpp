@@ -28,7 +28,7 @@ static const uint8_t MISO_PIN = PB14;
 static const uint8_t MOSI_PIN = PB15;
 static const uint8_t SCLK_PIN = PB13;
 
-static SPIClass spi;
+static SPIClass spi = SPIClass(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static Bmi088Accel accel(spi, ACCEL_CS_PIN);
 
@@ -41,10 +41,6 @@ static bool failed(const int status)
 
 bool ImuTask::device_init()
 {
-    spi.setMISO(MISO_PIN);
-    spi.setMOSI(MOSI_PIN);
-    spi.setSCLK(SCLK_PIN);
-
     if (failed(gyro.begin())) return false;
 
     if (failed(accel.begin())) return false;
