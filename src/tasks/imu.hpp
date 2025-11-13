@@ -372,8 +372,6 @@ class ImuTask {
                 // LPF gyro
                 applyLpf(_gyroLpf, &_gyroData);
 
-                _estimatorTask->enqueueGyro(&_gyroData);
-
                 Axis3f accelScaled = {};
                 alignToAirframe(&accel, &accelScaled);
 
@@ -381,7 +379,7 @@ class ImuTask {
 
                 applyLpf(_accLpf, &_accelData);
 
-                _estimatorTask->enqueueAccel(&_accelData);
+                _estimatorTask->enqueueImu(&_gyroData, &_accelData);
 
                 xQueueOverwrite(_accelQueue, &_accelData);
                 xQueueOverwrite(_gyroQueue, &_gyroData);
