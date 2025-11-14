@@ -24,7 +24,7 @@
 #include <num.hpp>
 #include <time.h>
 
-class ImuTask {
+class Imu {
 
     private:
 
@@ -43,10 +43,6 @@ class ImuTask {
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
-            // Create a semaphore to protect waitDataReady() calls from core task
-            _coreTaskSemaphore =
-                xSemaphoreCreateBinaryStatic(&_coreTaskSemaphoreBuffer);
-
             if (!device_init(_gscale, _ascale)) {
                 DebugTask::setMessage(_debugTask, "IMU initialization failed");
             }
@@ -60,8 +56,6 @@ class ImuTask {
             _sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
             _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
-
-            _task.init(runImuTask, "imu", this, 3);
         }
 
         bool imuIsCalibrated()
@@ -69,9 +63,48 @@ class ImuTask {
             return _gyroBiasFound;
         }
 
-        // Called by core task
-        void waitDataReady(void) {
-            xSemaphoreTake(_coreTaskSemaphore, portMAX_DELAY);
+        void step()
+        {
+            Axis3i16 gyroRaw = {};
+            Axis3i16 accelRaw = {};
+
+            device_read(
+                    gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                    accelRaw.x, accelRaw.y, accelRaw.z);
+
+            // Convert accel to Gs
+            axis3_t accel = {
+                scale(accelRaw.x, _ascale),
+                scale(accelRaw.y, _ascale),
+                scale(accelRaw.z, _ascale)
+            };
+
+            // Calibrate gyro with raw values if necessary
+            _gyroBiasFound = processGyroBias(xTaskGetTickCount(),
+                    gyroRaw, &_gyroBias);
+
+            // Subtract gyro bias
+            axis3_t gyroUnbiased = {
+                scale(gyroRaw.x - _gyroBias.x, _gscale),
+                scale(gyroRaw.y - _gyroBias.y, _gscale),
+                scale(gyroRaw.z - _gyroBias.z, _gscale)
+            };
+
+            // Rotate gyro to airframe
+            alignToAirframe(&gyroUnbiased, &_gyroData);
+
+            // LPF gyro
+            applyLpf(_gyroLpf, &_gyroData);
+
+            axis3_t accelScaled = {};
+            alignToAirframe(&accel, &accelScaled);
+
+            accAlignToGravity(&accelScaled, &_accelData);
+
+            applyLpf(_accLpf, &_accelData);
+
+            _estimatorTask->enqueueImu(&_gyroData, &_accelData);
+
         }
 
     private:
@@ -151,8 +184,6 @@ class ImuTask {
         EstimatorTask * _estimatorTask;
 
         DebugTask * _debugTask;
-
-        FreeRtosTask _task;
 
         /**
          * Checks if the variances is below the predefined thresholds.
@@ -235,9 +266,6 @@ class ImuTask {
         bool _gyroBiasFound;
         axis3_t _gyroBias;
 
-        SemaphoreHandle_t _coreTaskSemaphore;
-        StaticSemaphore_t _coreTaskSemaphoreBuffer;
-
         int16_t _gscale;
         int16_t _ascale;
 
@@ -294,61 +322,6 @@ class ImuTask {
             gyroBiasOut->z = _gyroBiasRunning.bias.z;
 
             return _gyroBiasRunning.isBiasValueFound;
-        }
-
-        static void runImuTask(void *obj)
-        {
-            ((ImuTask *)obj)->run();
-        }
-
-        void run(void)
-        {
-            while (true) {
-
-                vTaskDelay(1000/Clock::IMU_FREQ);
-
-                Axis3i16 gyroRaw = {};
-                Axis3i16 accelRaw = {};
-
-                device_read(
-                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                        accelRaw.x, accelRaw.y, accelRaw.z);
-
-                // Convert accel to Gs
-                axis3_t accel = {
-                    scale(accelRaw.x, _ascale),
-                    scale(accelRaw.y, _ascale),
-                    scale(accelRaw.z, _ascale)
-                };
-
-                // Calibrate gyro with raw values if necessary
-                _gyroBiasFound = processGyroBias(xTaskGetTickCount(),
-                        gyroRaw, &_gyroBias);
-
-                // Subtract gyro bias
-                axis3_t gyroUnbiased = {
-                    scale(gyroRaw.x - _gyroBias.x, _gscale),
-                    scale(gyroRaw.y - _gyroBias.y, _gscale),
-                    scale(gyroRaw.z - _gyroBias.z, _gscale)
-                };
-
-                // Rotate gyro to airframe
-                alignToAirframe(&gyroUnbiased, &_gyroData);
-
-                // LPF gyro
-                applyLpf(_gyroLpf, &_gyroData);
-
-                axis3_t accelScaled = {};
-                alignToAirframe(&accel, &accelScaled);
-
-                accAlignToGravity(&accelScaled, &_accelData);
-
-                applyLpf(_accLpf, &_accelData);
-
-                _estimatorTask->enqueueImu(&_gyroData, &_accelData);
-
-                xSemaphoreGive(_coreTaskSemaphore);
-            }
         }
 
         static float scale(const int16_t raw, const int16_t scale)

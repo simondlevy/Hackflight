@@ -32,10 +32,10 @@ class Clock {
             FREQ_1000_HZ = 1000
         } rate_t ;
 
-        static const rate_t IMU_FREQ = FREQ_1000_HZ;
+        static const rate_t CORE_FREQ = FREQ_1000_HZ;
 
         static bool rateDoExecute(const rate_t rate, const uint32_t tick)
         {
-            return (tick % (IMU_FREQ / rate)) == 0;
+            return (tick % (CORE_FREQ / rate)) == 0;
         }
 };

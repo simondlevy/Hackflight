@@ -18,11 +18,10 @@
 
 #include <clock.hpp>
 #include <__control__.hpp>
+#include <imu.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/command.hpp>
 #include <vehicles/diyquad.hpp>
@@ -34,7 +33,7 @@ class CoreTask {
         void begin(
                 ClosedLoopControl * closedLoopControl,
                 EstimatorTask * estimatorTask,
-                ImuTask * imuTask,
+                Imu * imu,
                 LedTask * ledTask,
                 CommandTask * commandTask,
                 const uint8_t motorCount,
@@ -43,7 +42,7 @@ class CoreTask {
         {
             _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
-            _imuTask = imuTask;
+            _imu = imu;
             _ledTask = ledTask;
             _commandTask = commandTask;
             _debugTask = debugTask;
@@ -81,7 +80,7 @@ class CoreTask {
         FreeRtosTask _task;
         DebugTask * _debugTask;
         EstimatorTask * _estimatorTask;
-        ImuTask * _imuTask;
+        Imu * _imu;
         LedTask * _ledTask;
         CommandTask * _commandTask;
         vehicleState_t _vehicleState;
@@ -104,7 +103,8 @@ class CoreTask {
             for (uint32_t tick=1; ; tick++) {
 
                 // Sync the core loop to the IMU
-                _imuTask->waitDataReady();
+                _imu->step();
+                vTaskDelay(1000/Clock::CORE_FREQ);
 
                 // Get command
                 command_t command = {};

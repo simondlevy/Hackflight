@@ -19,7 +19,7 @@
 
 #include <BMI088.h>
 
-#include <tasks/imu.hpp>
+#include <imu.hpp>
 
 #ifdef BOLT
 
@@ -58,7 +58,7 @@ static bool failed(const int status)
     return status < 0;
 }
 
-bool ImuTask::device_init(int16_t & gscale, int16_t & ascale)
+bool Imu::device_init(int16_t & gscale, int16_t & ascale)
 {
     if (failed(gyro.begin())) return false;
 
@@ -85,7 +85,7 @@ bool ImuTask::device_init(int16_t & gscale, int16_t & ascale)
     return true;
 }
 
-void ImuTask::device_read(
+void Imu::device_read(
         int16_t & gx, int16_t & gy, int16_t & gz,
         int16_t & ax, int16_t & ay, int16_t & az)
 {

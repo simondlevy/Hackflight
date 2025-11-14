@@ -22,15 +22,15 @@
 
 #include <task.hpp>
 #include <tasks/debug.hpp>
-#include <tasks/imu.hpp>
+#include <imu.hpp>
 
 class LedTask {
 
     public:
 
-        void begin(ImuTask * imuTask, DebugTask * debugTask=nullptr)
+        void begin(Imu * imu, DebugTask * debugTask=nullptr)
         {
-            _imuTask = imuTask;
+            _imu = imu;
 
             _debugTask = debugTask;
 
@@ -54,7 +54,7 @@ class LedTask {
 
         FreeRtosTask _task;
 
-        ImuTask * _imuTask;
+        Imu * _imu;
 
         DebugTask * _debugTask;
 
@@ -73,7 +73,7 @@ class LedTask {
 
                 vTaskDelay(1);
 
-                if (!_imuTask->imuIsCalibrated()) {
+                if (!_imu->imuIsCalibrated()) {
                     blink(lastWakeTime, IMU_CALIBRATION_HZ);
                     DebugTask::setMessage(_debugTask, "calibrating");
                 }
