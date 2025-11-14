@@ -44,32 +44,6 @@ typedef union {
     float axis[3];
 } Axis3f;
 
-struct vec3_s {
-    uint32_t timestamp; // Timestamp when the data was computed
-    float x;
-    float y;
-    float z;
-};
-
-typedef struct vec3_s point_t;
-
-typedef struct quaternion_s {
-    union {
-        struct {
-            float q0;
-            float q1;
-            float q2;
-            float q3;
-        };
-        struct {
-            float x;
-            float y;
-            float z;
-            float w;
-        };
-    };
-} quaternion_t;
-
 typedef struct {
 
     float thrust;  // positve upward
@@ -113,9 +87,6 @@ static const float STATE_DPHITHETA_MAX = 250;
 static const float STATE_PSI_MAX = 180;
 static const float STATE_DPSI_MAX = 250;
 
-typedef float vec3d[3];
-typedef float mat3d[3][3];
-
 typedef struct flowMeasurement_s {
     uint32_t timestamp;
     union {
@@ -148,6 +119,14 @@ typedef struct
 
 typedef struct {
 
+    uint32_t timestamp;
+    bool armed;
+    bool hovering;
+    demands_t demands;
+
+} setpoint_t;
+typedef struct {
+
     float x;
     float y;
     float z;
@@ -164,12 +143,3 @@ typedef struct {
     demands_t demands;
 
 } siminfo_t;
-
-typedef struct {
-
-    uint32_t timestamp;
-    bool armed;
-    bool hovering;
-    demands_t demands;
-
-} setpoint_t;

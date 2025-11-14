@@ -106,7 +106,6 @@ class Num {
             return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
         }
 
-        // https://en.wikipedia.org/wiki/
         //  Conversion_between_quaternions_and_Euler_angles
         static void euler2quat(const axis3_t & a, axis4_t & q)
         {
