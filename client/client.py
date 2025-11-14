@@ -203,11 +203,7 @@ def main():
 
             else:
 
-               client.send(MspParser.serialize_SET_IDLE(
-                        gamepad.roll,
-                        gamepad.pitch,
-                        gamepad.yaw,
-                        gamepad.thrust))
+               client.send(MspParser.serialize_SET_IDLE())
 
             sleep(1 / UPDATE_RATE_HZ)
 
