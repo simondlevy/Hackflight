@@ -113,12 +113,8 @@ class SetpointTask {
                             break;
 
                         case MSP_SET_IDLE:
-                            decodeIdle(
-                                    parser.getFloat(0),
-                                    parser.getFloat(1),
-                                    parser.getFloat(2),
-                                    parser.getFloat(3),
-                                    &setpoint);
+                            setpoint.hovering = false;
+                            setSetpoint(&setpoint);
                             break;
 
                         case MSP_SET_SETPOINT:
@@ -147,49 +143,6 @@ class SetpointTask {
             return peekResult == pdTRUE ? priority : 0;
         }
 
-        void relaxPriority(void)
-        {
-            int priority = PRIORITY_LOW;
-            xQueueOverwrite(priorityQueue, &priority);
-        }
-
-        void decodeIdle(
-                const float roll,
-                const float pitch,
-                const float yaw,
-                const float thrust,
-                setpoint_t *setpoint)
-        {
-
-            /*
-            static bool thrustLocked;
-
-            if (getActivePriority() == 0) {
-                thrustLocked = true;
-            }
-
-            if (thrust == 0) {
-                thrustLocked = false;
-            }
-
-            uint16_t rawThrust = thrust;
-
-            if (thrustLocked || (rawThrust < MIN_THRUST)) {
-                setpoint->demands.thrust = 0;
-            } else {
-                setpoint->demands.thrust = fminf(rawThrust, MAX_THRUST);
-            }*/
-
-            setpoint->hovering = false;
-
-            /*
-            setpoint->demands.roll = roll;
-            setpoint->demands.pitch = pitch;
-            setpoint->demands.yaw = yaw;*/
-
-            setSetpoint(setpoint, PRIORITY_HIGH);
-        }
-
         void decodeSetpoint(
                 const float vx,
                 const float vy,
@@ -204,11 +157,12 @@ class SetpointTask {
             setpoint->demands.pitch = vx;
             setpoint->demands.roll = vy;
 
-            setSetpoint(setpoint, PRIORITY_HIGH);
+            setSetpoint(setpoint);
         }
 
-        void setSetpoint(setpoint_t *setpoint, int priority)
+        void setSetpoint(setpoint_t *setpoint)
         {
+            const int priority = PRIORITY_HIGH;
             int currentPriority = 0;
 
             const BaseType_t peekResult =
@@ -220,7 +174,6 @@ class SetpointTask {
 
             if (priority >= currentPriority) {
                 setpoint->timestamp = xTaskGetTickCount();
-                // This is a potential race but without effect on functionality
                 xQueueOverwrite(setpointQueue, setpoint);
                 xQueueOverwrite(priorityQueue, &priority);
             }        
