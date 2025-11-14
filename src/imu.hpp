@@ -16,9 +16,9 @@
 #pragma once
 
 #include <datatypes.h>
+#include <debugger.hpp>
 #include <lpf.hpp>
 #include <num.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <timer.hpp>
 
@@ -32,17 +32,17 @@ class Imu {
     public:
 
         void begin(EstimatorTask * estimatorTask,
-                DebugTask * debugTask=nullptr)
+                Debugger * debugger=nullptr)
         {
             _estimatorTask = estimatorTask;
 
-            _debugTask = debugTask;
+            _debugger = debugger;
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
             if (!device_init(_gscale, _ascale)) {
-                DebugTask::setMessage(_debugTask, "IMU initialization failed");
+                Debugger::setMessage(_debugger, "IMU initialization failed");
             }
 
             // Calibrate
@@ -181,7 +181,7 @@ class Imu {
 
         EstimatorTask * _estimatorTask;
 
-        DebugTask * _debugTask;
+        Debugger * _debugger;
 
         /**
          * Checks if the variances is below the predefined thresholds.

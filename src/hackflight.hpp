@@ -22,10 +22,10 @@
 
 #include <comms.hpp>
 #include <__control__.hpp>
+#include <debugger.hpp>
 #include <imu.hpp>
 #include <mixers/crazyflie.hpp>
 #include <tasks/core.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/logging.hpp>
 #include <tasks/opticalflow.hpp>
@@ -39,8 +39,6 @@ class Hackflight {
         void init()
         {
             Comms::init();
-
-            debugTask.begin();
 
             zrangerTask.begin(&estimatorTask);
 
@@ -66,8 +64,8 @@ class Hackflight {
 
     private:
 
+
         CoreTask coreTask;
-        DebugTask debugTask;
         EstimatorTask estimatorTask;
         Imu imu;
         LoggingTask loggingTask;
@@ -76,4 +74,5 @@ class Hackflight {
         ZRangerTask zrangerTask;
 
         ClosedLoopControl closedLoopControl;
+        Debugger debugger;
 };

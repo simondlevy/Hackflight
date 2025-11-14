@@ -19,7 +19,7 @@
 #include <__messages__.h>
 #include <comms.hpp>
 #include <msp/parser.hpp>
-#include <tasks/debug.hpp>
+#include <debugger.hpp>
 
 class CommandTask {
 
@@ -29,9 +29,9 @@ class CommandTask {
 
     public:
 
-        void begin(DebugTask * debugTask=nullptr)
+        void begin(Debugger * debugger=nullptr)
         {
-            _debugTask = debugTask;
+            _debugger = debugger;
 
             _task.init(runCommandTask, "command", this, 3);
         }
@@ -50,7 +50,7 @@ class CommandTask {
 
         FreeRtosTask _task;
 
-        DebugTask * _debugTask;
+        Debugger * _debugger;
 
         command_t _command;
 

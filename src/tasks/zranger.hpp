@@ -16,22 +16,22 @@
 
 #pragma once
 
-#include <tasks/debug.hpp>
+#include <debugger.hpp>
 #include <tasks/estimator.hpp>
 
 class ZRangerTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, DebugTask * debugTask=nullptr)
+        void begin(EstimatorTask * estimatorTask, Debugger * debugger=nullptr)
         {
             if (!device_init()) {
-                DebugTask::setMessage(_debugTask,
+                Debugger::setMessage(_debugger,
                         "ZRangerTask: Failed to initialize zranger");
             }
 
             _estimatorTask = estimatorTask;
-            _debugTask = debugTask;
+            _debugger = debugger;
 
             _task.init(runZrangerTask, "zranger2", this, 2);
 
@@ -63,7 +63,7 @@ class ZRangerTask {
 
         EstimatorTask * _estimatorTask;
 
-        DebugTask * _debugTask;
+        Debugger * _debugger;
 
         void run(void)
         {
@@ -75,7 +75,7 @@ class ZRangerTask {
 
                 float range = device_read();
 
-                DebugTask::setMessage(_debugTask, "z=%d", (int)range);
+                Debugger::setMessage(_debugger, "z=%d", (int)range);
 
                 // check if range is feasible and push into the estimator the
                 // sensor should not be able to measure >5 [m], and outliers

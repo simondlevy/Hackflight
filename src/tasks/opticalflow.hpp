@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <tasks/debug.hpp>
+#include <debugger.hpp>
 #include <tasks/estimator.hpp>
 
 class OpticalFlowTask {
@@ -25,18 +25,18 @@ class OpticalFlowTask {
 
         void begin(
                 EstimatorTask * estimatorTask,
-                DebugTask * debugTask=nullptr)
+                Debugger * debugger=nullptr)
         {
             _estimatorTask = estimatorTask;
 
-            _debugTask = debugTask;
+            _debugger = debugger;
 
             if (device_init()) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
             else {
-                DebugTask::setMessage(_debugTask,
+                Debugger::setMessage(_debugger,
                         "OpticalFlowTask: device initialization failed.");
             }
         }
@@ -60,7 +60,7 @@ class OpticalFlowTask {
 
         EstimatorTask * _estimatorTask;
 
-        DebugTask * _debugTask;
+        Debugger * _debugger;
 
         void run(void)
         {
@@ -76,7 +76,7 @@ class OpticalFlowTask {
 
                 device_read(deltaX, deltaY, gotMotion);
 
-                DebugTask::setMessage(_debugTask,
+                Debugger::setMessage(_debugger,
                         "flowx=%d flowy=%d flowgood=%d",
                         deltaX, deltaY, gotMotion);
 

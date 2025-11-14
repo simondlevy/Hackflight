@@ -17,9 +17,9 @@
 #pragma once
 
 #include <__control__.hpp>
+#include <debugger.hpp>
 #include <imu.hpp>
 #include <task.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/command.hpp>
 #include <timer.hpp>
@@ -36,13 +36,13 @@ class CoreTask {
                 CommandTask * commandTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
-                DebugTask * debugTask=nullptr)
+                Debugger * debugger=nullptr)
         {
             _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
             _imu = imu;
             _commandTask = commandTask;
-            _debugTask = debugTask;
+            _debugger = debugger;
             _motorCount = motorCount;
             _mixFun = mixFun;
 
@@ -79,7 +79,7 @@ class CoreTask {
         ClosedLoopControl * _closedLoopControl;
         mixFun_t _mixFun;
         FreeRtosTask _task;
-        DebugTask * _debugTask;
+        Debugger * _debugger;
         EstimatorTask * _estimatorTask;
         Imu * _imu;
         CommandTask * _commandTask;
@@ -172,7 +172,7 @@ class CoreTask {
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        DebugTask::setMessage(_debugTask, "%05d: lost contact", tick);
+                        Debugger::setMessage(_debugger, "%05d: lost contact", tick);
                         break;
                 }
             }
@@ -232,7 +232,7 @@ class CoreTask {
         void reportStatus(const uint32_t tick, const char * status,
                 const float * motorvals)
         {
-            DebugTask::setMessage(_debugTask,
+            Debugger::setMessage(_debugger,
                     "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
                     tick, status,
                     motorvals[0], motorvals[1], motorvals[2], motorvals[3]);

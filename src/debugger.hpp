@@ -19,22 +19,15 @@
 #include <Arduino.h>
 
 #include <bootloader.hpp>
-#include <task.hpp>
+#include <timer.hpp>
 
-class DebugTask {
+class Debugger {
 
     public:
 
-        void begin()
+        static void setMessage(Debugger * debugger, const char * format, ...)
         {
-            Serial.begin(115200);
-
-            _task.init(runDebugCommsTask, "debug", this, 2);
-		}
-
-        static void setMessage(DebugTask * debugTask, const char * format, ...)
-        {
-            if (debugTask) {
+            if (debugger) {
 
                 va_list args = {};
 
@@ -45,42 +38,33 @@ class DebugTask {
                 const auto vsErr = vsprintf(buffer, format, args);
 
                 if (vsErr >= 0) { 
-                    strcpy(debugTask->_msg, buffer);
+                    strcpy(debugger->_msg, buffer);
                 }
 
                 va_end(args);
             }
         }
 
-    private:
-
-        static constexpr float TASK_FREQ = 10;
-
-        FreeRtosTask _task;
-
-        char _msg[100];
-
-        static void runDebugCommsTask(void * obj)
+        void step()
         {
-            ((DebugTask *)obj)->run();
-        }
+            if (_timer.ready(REPORT_FREQ)) {
 
-        void run(void)
-        {
-            TickType_t lastWakeTime = xTaskGetTickCount();
-
-            while (true) {
-
-                if (*_msg) {
+                if (*_msg != 0) {
                     Serial.println(_msg);
                 }
-
-                vTaskDelayUntil(&lastWakeTime, 1000/TASK_FREQ);
 
                 if (Serial.available() && Serial.read() == 'R') {
                     Bootloader::jump();
                 }
             }
         }
+
+    private:
+
+        static constexpr float REPORT_FREQ = 10;
+
+        Timer _timer;
+
+        char _msg[100];
 };
 

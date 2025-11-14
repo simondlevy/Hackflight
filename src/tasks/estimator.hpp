@@ -18,18 +18,18 @@
 
 #include <Arduino.h>
 
+#include <debugger.hpp>
 #include <ekf.hpp>
 #include <rateSupervisor.hpp>
 #include <task.hpp>
-#include <tasks/debug.hpp>
 
 class EstimatorTask {
 
     public:
 
-        void begin(DebugTask * debugTask=nullptr)
+        void begin(Debugger * debugger=nullptr)
         {
-            _debugTask = debugTask;
+            _debugger = debugger;
 
             // Created in the 'empty' state, meaning the semaphore must first
             // be given, that is it will block in the task until released by
@@ -129,7 +129,7 @@ class EstimatorTask {
 
         uint32_t _warningBlockTimeMs;
 
-        DebugTask * _debugTask;
+        Debugger * _debugger;
 
         EKF _ekf;
 
