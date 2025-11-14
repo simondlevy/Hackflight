@@ -27,7 +27,6 @@
 #include <mixers/crazyflie.hpp>
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
-#include <tasks/logging.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/command.hpp>
 #include <tasks/zranger.hpp>
@@ -48,8 +47,6 @@ class Hackflight {
 
             commandTask.begin();
 
-            loggingTask.begin(&estimatorTask, &closedLoopControl);
-
             imu.begin(&estimatorTask);
 
             coreTask.begin(
@@ -61,14 +58,12 @@ class Hackflight {
                     Mixer::mix);
         }
 
-
     private:
 
 
         CoreTask coreTask;
         EstimatorTask estimatorTask;
         Imu imu;
-        LoggingTask loggingTask;
         OpticalFlowTask opticalFlowTask;
         CommandTask commandTask;
         ZRangerTask zrangerTask;

@@ -62,6 +62,8 @@ class CoreTask {
         static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
         static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
 
+        static constexpr float LOGGING_FREQ = 100;
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
@@ -89,6 +91,8 @@ class CoreTask {
 
         Timer _ledTimer;
 
+        Timer _loggingTimer;
+
         void run()
         {
             status_t status = STATUS_IDLE;
@@ -105,6 +109,9 @@ class CoreTask {
             // Run device-dependent LED initialization
             led_init();
 
+            // Start serial debugging
+            Serial.begin(115200);
+
             for (uint32_t tick=1; ; tick++) {
 
                 // Sync the core loop to the IMU
@@ -117,6 +124,9 @@ class CoreTask {
 
                 // Set the LED based on current status
                 runLed(status);
+
+                // Run logging
+                runLogger();
 
                 // Periodically update estimator with flying status
                 if (Timer::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
@@ -278,6 +288,48 @@ class CoreTask {
             return result;
         }        
 
+        void runLogger()
+        {
+            if (_loggingTimer.ready(LOGGING_FREQ)) {
+                sendVehicleState();
+                sendClosedLoopControlMessage();
+            }
+        }
+
+        void sendVehicleState()
+        {
+            vehicleState_t state = {};
+
+            MspSerializer serializer = {};
+
+            _estimatorTask->getVehicleState(&state);
+
+            const float statevals[10] = { state.dx, state.dy, state.z,
+                state.dz, state.phi, state.dphi, state.theta,
+                state.dtheta, state.psi, state.dpsi 
+            };
+
+            serializer.serializeFloats(MSP_STATE, statevals, 10);
+
+            sendPayload(serializer);
+        }
+
+        void sendClosedLoopControlMessage()
+        {
+            MspSerializer serializer = {};
+
+            _closedLoopControl->serializeMessage(serializer);
+
+            sendPayload(serializer);
+        }
+
+        void sendPayload(const MspSerializer & serializer) {
+            for (uint8_t k=0; k<serializer.payloadSize; ++k) {
+                Comms::write_byte(serializer.payload[k]);
+            }
+        }
+
+ 
         void runLed(const status_t status)
         {
             const uint32_t msec_curr = millis();
