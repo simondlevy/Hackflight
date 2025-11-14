@@ -113,78 +113,9 @@ static const float STATE_DPHITHETA_MAX = 250;
 static const float STATE_PSI_MAX = 180;
 static const float STATE_DPSI_MAX = 250;
 
-/* Data structure used by the stabilizer subsystem.
- * All have a timestamp to be set when the data is calculated.
- */
-
-/* vector */
 typedef float vec3d[3];
 typedef float mat3d[3][3];
 
-typedef enum {
-    MeasurementSourceLocationService  = 0,
-} measurementSource_t;
-
-typedef struct baro_s {
-    float pressure;           // mbar
-    float temperature;        // degree Celcius
-    float asl;                // m (ASL = altitude above sea level)
-} baro_t;
-
-typedef struct positionMeasurement_s {
-    union {
-        struct {
-            float x;
-            float y;
-            float z;
-        };
-        float pos[3];
-    };
-    float stdDev;
-    measurementSource_t source;
-} positionMeasurement_t;
-
-typedef struct poseMeasurement_s {
-    union {
-        struct {
-            float x;
-            float y;
-            float z;
-        };
-        float pos[3];
-    };
-    quaternion_t quat;
-    float stdDevPos;
-    float stdDevQuat;
-} poseMeasurement_t;
-
-typedef struct distanceMeasurement_s {
-    union {
-        struct {
-            float x;
-            float y;
-            float z;
-        };
-        float pos[3];
-    };
-    uint8_t anchorId;
-    float distance;
-    float stdDev;
-} distanceMeasurement_t;
-
-typedef struct zDistance_s {
-    uint32_t timestamp;
-    float distance;           // m
-} zDistance_t;
-
-/** Estimate of position */
-typedef struct estimate_s {
-    uint32_t timestamp; // Timestamp when the data was computed
-
-    point_t position;
-} estimate_t;
-
-/** Flow measurement**/
 typedef struct flowMeasurement_s {
     uint32_t timestamp;
     union {
@@ -199,42 +130,11 @@ typedef struct flowMeasurement_s {
     float dt;           // Time during which pixels were accumulated
 } flowMeasurement_t;
 
-
-/** TOF measurement**/
 typedef struct tofMeasurement_s {
     uint32_t timestamp;
     float distance;
     float stdDev;
 } tofMeasurement_t;
-
-/** Absolute height measurement */
-typedef struct heightMeasurement_s {
-    uint32_t timestamp;
-    float height;
-    float stdDev;
-} heightMeasurement_t;
-
-/** Yaw error measurement */
-typedef struct {
-    uint32_t timestamp;
-    float yawError;
-    float stdDev;
-} yawErrorMeasurement_t;
-
-/** Sweep angle measurement */
-typedef struct {
-    uint32_t timestamp;
-    const vec3d* sensorPos;    // Sensor position in the CF reference frame
-    const vec3d* rotorPos;     // Pos of rotor origin in global reference frame
-    const mat3d* rotorRot;     // Rotor rotation matrix
-    const mat3d* rotorRotInv;  // Inverted rotor rotation matrix
-    uint8_t sensorId;
-    uint8_t baseStationId;
-    uint8_t sweepId;
-    float t;                   // t is the tilt angle of the light plane on the rotor
-    float measuredSweepAngle;
-    float stdDev;
-} sweepAngleMeasurement_t;
 
 typedef struct
 {
@@ -245,11 +145,6 @@ typedef struct
 {
     Axis3f acc; // Gs, for legacy reasons
 } accelerationMeasurement_t;
-
-typedef struct
-{
-    baro_t baro; // for legacy reasons
-} barometerMeasurement_t;
 
 typedef struct {
 
