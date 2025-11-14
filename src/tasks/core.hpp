@@ -88,8 +88,6 @@ class CoreTask {
 
         uint8_t _motorCount;
 
-        bool _armed;
-
         Timer _ledTimer;
 
         void run()
@@ -119,7 +117,7 @@ class CoreTask {
                 _commandTask->getCommand(command);
 
                 // Set the LED based on current status
-                runLed();
+                runLed(status);
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
@@ -142,7 +140,6 @@ class CoreTask {
                         reportStatus(tick, "idle", motorvals);
                         if (command.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
-                            _armed = true;
                             status = STATUS_ARMED;
                         }
                         runMotors(motorvals);
@@ -176,7 +173,6 @@ class CoreTask {
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        _armed = false;
                         DebugTask::setMessage(_debugTask, "%05d: lost contact", tick);
                         break;
                 }
@@ -249,7 +245,6 @@ class CoreTask {
             if (!command.armed) {
                 status = STATUS_IDLE;
                 memset(motorvals, 0, _motorCount * sizeof(motorvals));
-                _armed = false;
             }
         }
 
@@ -284,7 +279,7 @@ class CoreTask {
             return result;
         }        
 
-        void runLed()
+        void runLed(const status_t status)
         {
             const uint32_t msec_curr = millis();
 
@@ -292,7 +287,9 @@ class CoreTask {
                 blinkLed(msec_curr, LED_IMU_CALIBRATING_FREQ);
             }
 
-            else if (_armed) { 
+            else if (status == STATUS_ARMED ||
+                    status == STATUS_HOVERING || 
+                    status == STATUS_LANDING) { 
                 led_set(true);
             }
             else {
