@@ -146,12 +146,6 @@ class ImuTask {
                 sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
         }
 
-        static const uint8_t QUEUE_LENGTH = 1;
-
-        static const auto IMU_ITEM_SIZE = sizeof(axis3_t);
-
-        static const auto IMU_QUEUE_LENGTH = QUEUE_LENGTH * IMU_ITEM_SIZE;
-
         bias_t _gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
