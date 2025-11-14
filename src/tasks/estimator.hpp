@@ -39,12 +39,6 @@ class EstimatorTask {
 
             _dataMutex = xSemaphoreCreateMutexStatic(&_dataMutexBuffer);
 
-            _measurementsQueue = xQueueCreateStatic(
-                    QUEUE_LENGTH, 
-                    QUEUE_ITEM_SIZE,
-                    measurementsQueueStorage,
-                    &_measurementsQueueBuffer);
-
             _task.init(runEstimatorTask, "estimator", this, 4);
 
             _ekf.init(millis());
@@ -112,11 +106,11 @@ class EstimatorTask {
         static const uint32_t PREDICT_RATE = Clock::RATE_100_HZ; 
         static const uint32_t PREDICTION_UPDATE_INTERVAL_MS = 1000 / PREDICT_RATE;
 
-        static const size_t QUEUE_LENGTH = 20;
+        static const size_t QUEUE_MAX_LENGTH = 20;
         static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
-        uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
-        StaticQueue_t _measurementsQueueBuffer;
-        xQueueHandle _measurementsQueue;
+
+        EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+        uint32_t _queueLength;
 
         FreeRtosTask _task;
 
@@ -171,13 +165,10 @@ class EstimatorTask {
             // measurements since the last loop, rather than accumulating
 
             // Pull the latest sensors values of interest; discard the rest
-
-            EKF::measurement_t m = {};
-
-            while (pdTRUE == xQueueReceive(_measurementsQueue, &m, 0)) {
-
-                _ekf.update(m, nowMs);
+            for (uint32_t k=0; k<_queueLength; ++k) {
+                _ekf.update(_measurementsQueue[k], nowMs);
             }
+            _queueLength = 0;
 
             _ekf.finalize();
 
@@ -222,10 +213,8 @@ class EstimatorTask {
 
         void enqueue(const EKF::measurement_t * measurement) 
         {
-            if (!_measurementsQueue) {
-                return;
-            }
-
-            xQueueSend(_measurementsQueue, measurement, 0);
+            memcpy(&_measurementsQueue[_queueLength], measurement,
+                    sizeof(EKF::measurement_t));
+            _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
         }
 };
