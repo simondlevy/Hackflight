@@ -21,7 +21,7 @@
 #include <msp/parser.hpp>
 #include <tasks/debug.hpp>
 
-class SetpointTask {
+class CommandTask {
 
     private:
 
@@ -33,32 +33,32 @@ class SetpointTask {
         {
             _debugTask = debugTask;
 
-            _task.init(runSetpointTask, "setpoint", this, 3);
+            _task.init(runCommandTask, "command", this, 3);
         }
 
-        void getSetpoint(setpoint_t & setpoint)
+        void getCommand(command_t & command)
         {
-            memcpy(&setpoint, &_setpoint, sizeof(setpoint_t));
+            memcpy(&command, &_command, sizeof(command_t));
         }
 
     private:
 
-        static void runSetpointTask(void * obj)
+        static void runCommandTask(void * obj)
         {
-            ((SetpointTask *)obj)->run();
+            ((CommandTask *)obj)->run();
         }
 
         FreeRtosTask _task;
 
         DebugTask * _debugTask;
 
-        setpoint_t _setpoint;
+        command_t _command;
 
         void run(void)
         {
             MspParser parser = {};
 
-            setpoint_t setpoint = {};
+            command_t command = {};
 
             TickType_t lastWakeTime = xTaskGetTickCount();
 
@@ -73,19 +73,19 @@ class SetpointTask {
                     switch (parser.parse(byte)) {
 
                         case MSP_SET_ARMING:
-                            _setpoint.armed = !_setpoint.armed;
+                            _command.armed = !_command.armed;
                             break;
 
                         case MSP_SET_IDLE:
-                            _setpoint.hovering = false;
+                            _command.hovering = false;
                             break;
 
                         case MSP_SET_SETPOINT:
-                            _setpoint.hovering = true;
-                            _setpoint.demands.pitch = parser.getFloat(0);
-                            _setpoint.demands.roll = parser.getFloat(1);
-                            _setpoint.demands.yaw = parser.getFloat(2);
-                            _setpoint.demands.thrust = parser.getFloat(3);
+                            _command.hovering = true;
+                            _command.demands.pitch = parser.getFloat(0);
+                            _command.demands.roll = parser.getFloat(1);
+                            _command.demands.yaw = parser.getFloat(2);
+                            _command.demands.thrust = parser.getFloat(3);
                             break;
 
                         default:

@@ -30,7 +30,7 @@
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
 #include <tasks/opticalflow.hpp>
-#include <tasks/setpoint.hpp>
+#include <tasks/command.hpp>
 #include <tasks/zranger.hpp>
 
 class Hackflight {
@@ -49,7 +49,7 @@ class Hackflight {
 
             estimatorTask.begin();
 
-            setpointTask.begin();
+            commandTask.begin();
 
             loggingTask.begin(&estimatorTask, &closedLoopControl);
 
@@ -62,7 +62,7 @@ class Hackflight {
                     &estimatorTask,
                     &imuTask,
                     &ledTask,
-                    &setpointTask,
+                    &commandTask,
                     Mixer::rotorCount,
                     Mixer::mix);
         }
@@ -77,7 +77,7 @@ class Hackflight {
         ImuTask imuTask;
         LoggingTask loggingTask;
         OpticalFlowTask opticalFlowTask;
-        SetpointTask setpointTask;
+        CommandTask commandTask;
         ZRangerTask zrangerTask;
 
         ClosedLoopControl closedLoopControl;

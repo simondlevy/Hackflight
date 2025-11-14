@@ -24,7 +24,7 @@
 #include <tasks/imu.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
-#include <tasks/setpoint.hpp>
+#include <tasks/command.hpp>
 
 #include <vehicles/diyquad.hpp>
 
@@ -37,7 +37,7 @@ class CoreTask {
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 LedTask * ledTask,
-                SetpointTask * setpointTask,
+                CommandTask * commandTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 DebugTask * debugTask=nullptr)
@@ -46,7 +46,7 @@ class CoreTask {
             _estimatorTask = estimatorTask;
             _imuTask = imuTask;
             _ledTask = ledTask;
-            _setpointTask = setpointTask;
+            _commandTask = commandTask;
             _debugTask = debugTask;
             _motorCount = motorCount;
             _mixFun = mixFun;
@@ -56,7 +56,7 @@ class CoreTask {
 
     private:
 
-        static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
+        static const uint32_t COMMAND_TIMEOUT_TICKS = 1000;
         static constexpr float STATE_PHITHETA_MAX = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
         static const Clock::rate_t FLYING_STATUS_CLOCK_RATE = Clock::RATE_25_HZ;
@@ -85,7 +85,7 @@ class CoreTask {
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
         LedTask * _ledTask;
-        SetpointTask * _setpointTask;
+        CommandTask * _commandTask;
         vehicleState_t _vehicleState;
 
         uint8_t _motorCount;
@@ -108,9 +108,9 @@ class CoreTask {
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
-                // Get setpoint
-                setpoint_t setpoint = {};
-                _setpointTask->getSetpoint(setpoint);
+                // Get command
+                command_t command = {};
+                _commandTask->getCommand(command);
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_STATUS_CLOCK_RATE, step)) {
@@ -122,8 +122,8 @@ class CoreTask {
                 _estimatorTask->getVehicleState(&_vehicleState);
 
                 // Check for lost contact
-                if (setpoint.timestamp > 0 &&
-                        xTaskGetTickCount() - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
+                if (command.timestamp > 0 &&
+                        xTaskGetTickCount() - command.timestamp > COMMAND_TIMEOUT_TICKS) {
                     status = STATUS_LOST_CONTACT;
                 }
 
@@ -131,7 +131,7 @@ class CoreTask {
 
                     case STATUS_IDLE:
                         reportStatus(step, "idle", motorvals);
-                        if (setpoint.armed && isSafeAngle(_vehicleState.phi) &&
+                        if (command.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             _ledTask->setArmed(true);
                             status = STATUS_ARMED;
@@ -141,8 +141,8 @@ class CoreTask {
 
                     case STATUS_ARMED:
                         reportStatus(step, "armed", motorvals);
-                        checkDisarm(setpoint, status, motorvals);
-                        if (setpoint.hovering) {
+                        checkDisarm(command, status, motorvals);
+                        if (command.hovering) {
                             status = STATUS_HOVERING;
                         }
                         runMotors(motorvals);
@@ -150,19 +150,19 @@ class CoreTask {
 
                     case STATUS_HOVERING:
                         reportStatus(step, "hovering", motorvals);
-                        runClosedLoopAndMixer(step, setpoint,
+                        runClosedLoopAndMixer(step, command,
                                 demands, motorvals);
-                        checkDisarm(setpoint, status, motorvals);
-                        if (!setpoint.hovering) {
+                        checkDisarm(command, status, motorvals);
+                        if (!command.hovering) {
                             status = STATUS_LANDING;
                         }
                         break;
 
                     case STATUS_LANDING:
                         reportStatus(step, "landing", motorvals);
-                        runClosedLoopAndMixer(step, setpoint,
+                        runClosedLoopAndMixer(step, command,
                                 demands, motorvals);
-                        checkDisarm(setpoint, status, motorvals);
+                        checkDisarm(command, status, motorvals);
                         break;
 
                     case STATUS_LOST_CONTACT:
@@ -174,13 +174,13 @@ class CoreTask {
         }
 
         void runClosedLoopAndMixer(
-                const uint32_t step, const setpoint_t &setpoint,
+                const uint32_t step, const command_t &command,
                 demands_t & demands, float *motorvals)
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
 
                 _closedLoopControl->run( step, 1.f / CLOSED_LOOP_UPDATE_RATE,
-                        setpoint.hovering, _vehicleState, setpoint.demands,
+                        command.hovering, _vehicleState, command.demands,
                         demands);
 
                 runMixer(_mixFun, demands, motorvals);
@@ -233,10 +233,10 @@ class CoreTask {
                     motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
-        void checkDisarm(const setpoint_t setpoint, status_t &status,
+        void checkDisarm(const command_t command, status_t &status,
                 float * motorvals)
         {
-            if (!setpoint.armed) {
+            if (!command.armed) {
                 status = STATUS_IDLE;
                 memset(motorvals, 0, _motorCount * sizeof(motorvals));
                 _ledTask->setArmed(false);

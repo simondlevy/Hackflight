@@ -116,7 +116,7 @@ typedef struct {
     bool hovering;
     demands_t demands;
 
-} setpoint_t;
+} command_t;
 
 typedef struct {
 
