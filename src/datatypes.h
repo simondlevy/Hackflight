@@ -78,7 +78,7 @@ static const float STATE_DPHITHETA_MAX = 250;
 static const float STATE_PSI_MAX = 180;
 static const float STATE_DPSI_MAX = 250;
 
-typedef struct flowMeasurement_s {
+typedef struct {
     uint32_t timestamp;
     union {
         struct {
@@ -90,26 +90,27 @@ typedef struct flowMeasurement_s {
     float stdDevX;      // Measurement standard deviation
     float stdDevY;      // Measurement standard deviation
     float dt;           // Time during which pixels were accumulated
+
 } flowMeasurement_t;
 
-typedef struct tofMeasurement_s {
+typedef struct {
     uint32_t timestamp;
     float distance;
     float stdDev;
+
 } tofMeasurement_t;
 
-typedef struct
-{
+typedef struct {
     axis3_t gyro; // deg/s, for legacy reasons
+
 } gyroscopeMeasurement_t;
 
-typedef struct
-{
+typedef struct {
     axis3_t acc; // Gs, for legacy reasons
+
 } accelerationMeasurement_t;
 
 typedef struct {
-
     uint32_t timestamp;
     bool armed;
     bool hovering;
