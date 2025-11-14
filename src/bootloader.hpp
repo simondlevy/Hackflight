@@ -26,7 +26,7 @@ class Bootloader {
 
         static void jump(void) 
         {
-            // Deinit HAL and Clocks
+            // Deinit HAL and Timers
             HAL_DeInit();
             HAL_RCC_DeInit();
 

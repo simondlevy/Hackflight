@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <clock.hpp>
-
 #include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/position.hpp>
@@ -26,12 +24,13 @@
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
+#include <timer.hpp>
 
 class ClosedLoopControl {
 
     private:
 
-        static const Clock::rate_t SLOW_RATE = Clock::RATE_50_HZ;
+        static const Timer::rate_t SLOW_RATE = Timer::RATE_50_HZ;
 
     public:
 
@@ -45,7 +44,7 @@ class ClosedLoopControl {
         {
             static float climbrate;
 
-            if (Clock::rateDoExecute(SLOW_RATE, step)) {
+            if (Timer::rateDoExecute(SLOW_RATE, step)) {
 
                 climbrate = AltitudeController::run(hovering,
                         dt, vehicleState.z, openLoopDemands.thrust);

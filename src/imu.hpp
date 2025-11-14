@@ -15,14 +15,12 @@
 
 #pragma once
 
-#include <tasks/debug.hpp>
-#include <tasks/estimator.hpp>
-
-#include <clock.hpp>
 #include <datatypes.h>
 #include <lpf.hpp>
 #include <num.hpp>
-#include <time.h>
+#include <tasks/debug.hpp>
+#include <tasks/estimator.hpp>
+#include <timer.hpp>
 
 class Imu {
 

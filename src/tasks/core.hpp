@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <clock.hpp>
 #include <__control__.hpp>
 #include <imu.hpp>
 #include <task.hpp>
@@ -55,9 +54,9 @@ class CoreTask {
         static const uint32_t COMMAND_TIMEOUT_TICKS = 1000;
         static constexpr float STATE_PHITHETA_MAX = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const Clock::rate_t FLYING_STATUS_FREQ = Clock::FREQ_25_HZ;
+        static const Timer::rate_t FLYING_STATUS_FREQ = Timer::FREQ_25_HZ;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-        static const auto CLOSED_LOOP_UPDATE_FREQ = Clock::FREQ_500_HZ;
+        static const auto CLOSED_LOOP_UPDATE_FREQ = Timer::FREQ_500_HZ;
 
         static constexpr float LED_HEARTBEAT_FREQ = 1;
         static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
@@ -110,7 +109,7 @@ class CoreTask {
 
                 // Sync the core loop to the IMU
                 _imu->step();
-                vTaskDelay(1000/Clock::CORE_FREQ);
+                vTaskDelay(1000/Timer::CORE_FREQ);
 
                 // Get command
                 command_t command = {};
@@ -120,7 +119,7 @@ class CoreTask {
                 runLed(status);
 
                 // Periodically update estimator with flying status
-                if (Clock::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
+                if (Timer::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
                     _estimatorTask->setFlyingStatus(
                             isFlyingCheck(xTaskGetTickCount(), motorvals));
                 }
@@ -183,7 +182,7 @@ class CoreTask {
                 const uint32_t tick, const command_t &command,
                 demands_t & demands, float *motorvals)
         {
-            if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, tick)) {
+            if (Timer::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, tick)) {
 
                 _closedLoopControl->run( tick, 1.f / CLOSED_LOOP_UPDATE_FREQ,
                         command.hovering, _vehicleState, command.demands,
