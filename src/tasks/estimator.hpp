@@ -18,7 +18,6 @@
 
 #include <Arduino.h>
 
-#include <clock.hpp>
 #include <ekf.hpp>
 #include <rateSupervisor.hpp>
 #include <task.hpp>
@@ -103,8 +102,7 @@ class EstimatorTask {
         static const uint32_t WARNING_HOLD_BACK_TIME_MS = 2000;
 
         // this is slower than the IMU update rate of 1000Hz
-        static const uint32_t PREDICT_RATE = Clock::RATE_100_HZ; 
-        static const uint32_t PREDICTION_UPDATE_INTERVAL_MS = 1000 / PREDICT_RATE;
+        static const uint32_t PREDICTION_FREQ = 100;
 
         static const size_t QUEUE_MAX_LENGTH = 20;
         static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
@@ -154,7 +152,7 @@ class EstimatorTask {
 
                 _ekf.predict(nowMs, _isFlying); 
 
-                nextPredictionMs = nowMs + PREDICTION_UPDATE_INTERVAL_MS;
+                nextPredictionMs = nowMs + (1000 / PREDICTION_FREQ);
             }
 
             // Add process noise every loop, rather than every prediction
@@ -200,8 +198,8 @@ class EstimatorTask {
             _rateSupervisor.init(
                     nextPredictionMs, 
                     1000, 
-                    PREDICT_RATE - 1, 
-                    PREDICT_RATE + 1, 
+                    PREDICTION_FREQ - 1, 
+                    PREDICTION_FREQ + 1, 
                     1); 
 
             while (true) {

@@ -1,6 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
- *
+ * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, in version 3.
@@ -19,6 +18,7 @@
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
+#include <clock.hpp>
 #include <datatypes.h>
 #include <lpf.hpp>
 #include <num.hpp>
@@ -305,7 +305,7 @@ class ImuTask {
         {
             while (true) {
 
-                vTaskDelay(1);
+                vTaskDelay(1000/Clock::IMU_FREQ);
 
                 Axis3i16 gyroRaw = {};
                 Axis3i16 accelRaw = {};

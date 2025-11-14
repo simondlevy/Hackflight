@@ -25,20 +25,17 @@ class Clock {
 
         // Permitted frequencies
         typedef enum {
-            RATE_25_HZ   = 25,
-            RATE_30_HZ   = 30,
-            RATE_33_HZ   = 33,
-            RATE_50_HZ   = 50,
-            RATE_100_HZ  = 100,
-            RATE_250_HZ  = 250,
-            RATE_500_HZ  = 500,
-            RATE_1000_HZ = 1000,
+            FREQ_25_HZ   = 25,
+            FREQ_50_HZ   = 50,
+            FREQ_100_HZ  = 100,
+            FREQ_500_HZ  = 500,
+            FREQ_1000_HZ = 1000
         } rate_t ;
 
-        static const rate_t RATE_MAIN_LOOP = RATE_1000_HZ;
+        static const rate_t IMU_FREQ = FREQ_1000_HZ;
 
         static bool rateDoExecute(const rate_t rate, const uint32_t tick)
         {
-            return (tick % (RATE_MAIN_LOOP / rate)) == 0;
+            return (tick % (IMU_FREQ / rate)) == 0;
         }
 };

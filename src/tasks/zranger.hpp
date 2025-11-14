@@ -42,7 +42,7 @@ class ZRangerTask {
 
     private:
 
-        static constexpr float FREQ_HZ = 40;
+        static constexpr float TASK_FREQ = 40;
 
         static const uint16_t OUTLIER_LIMIT_MM = 5000;
 
@@ -67,13 +67,11 @@ class ZRangerTask {
 
         void run(void)
         {
-            TickType_t lastWakeTime;
-
-            lastWakeTime = xTaskGetTickCount();
+            TickType_t lastWakeTime = xTaskGetTickCount();
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
+                vTaskDelayUntil(&lastWakeTime, 1000/TASK_FREQ);
 
                 float range = device_read();
 

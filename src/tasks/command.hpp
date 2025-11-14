@@ -25,7 +25,7 @@ class CommandTask {
 
     private:
 
-        static constexpr float FREQ_HZ = 1000;
+        static constexpr float TASK_FREQ = 1000;
 
     public:
 
@@ -64,7 +64,7 @@ class CommandTask {
 
             while (true) {
 
-                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
+                vTaskDelayUntil(&lastWakeTime, 1000/TASK_FREQ);
 
                 uint8_t byte = 0;
 

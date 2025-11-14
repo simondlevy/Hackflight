@@ -54,7 +54,7 @@ class DebugTask {
 
     private:
 
-        static constexpr float REPORT_FREQ = 10;
+        static constexpr float TASK_FREQ = 10;
 
         FreeRtosTask _task;
 
@@ -67,13 +67,15 @@ class DebugTask {
 
         void run(void)
         {
+            TickType_t lastWakeTime = xTaskGetTickCount();
+
             while (true) {
 
                 if (*_msg) {
                     Serial.println(_msg);
                 }
 
-                vTaskDelay(1000/REPORT_FREQ);
+                vTaskDelayUntil(&lastWakeTime, 1000/TASK_FREQ);
 
                 if (Serial.available() && Serial.read() == 'R') {
                     Bootloader::jump();

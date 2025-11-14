@@ -40,7 +40,7 @@ class LoggingTask {
 
     private:
         
-        static constexpr float FREQ_HZ = 100;
+        static constexpr float TASK_FREQ = 100;
 
         static void runLoggingTask(void * obj)
         {
@@ -63,7 +63,7 @@ class LoggingTask {
 
                 sendClosedLoopControlMessage();
 
-                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
+                vTaskDelayUntil(&lastWakeTime, 1000/TASK_FREQ);
             }
         }
 
