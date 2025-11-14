@@ -118,13 +118,13 @@ class SetpointTask {
                             break;
 
                         case MSP_SET_SETPOINT:
-                            decodeSetpoint(
-                                    parser.getFloat(0),
-                                    parser.getFloat(1),
-                                    parser.getFloat(2),
-                                    parser.getFloat(3),
-                                    &setpoint);
-                             break;
+                            setpoint.hovering = true;
+                            setpoint.demands.pitch = parser.getFloat(0);
+                            setpoint.demands.roll = parser.getFloat(1);
+                            setpoint.demands.yaw = parser.getFloat(2);
+                            setpoint.demands.thrust = parser.getFloat(3);
+                            setSetpoint(&setpoint);
+                            break;
 
                         default:
                             break;
@@ -141,23 +141,6 @@ class SetpointTask {
             const BaseType_t peekResult = xQueuePeek(priorityQueue, &priority, 0);
 
             return peekResult == pdTRUE ? priority : 0;
-        }
-
-        void decodeSetpoint(
-                const float vx,
-                const float vy,
-                const float yawrate,
-                const float zdistance,
-                setpoint_t *setpoint)
-        {
-            setpoint->hovering = true;
-
-            setpoint->demands.thrust = zdistance;
-            setpoint->demands.yaw = yawrate;
-            setpoint->demands.pitch = vx;
-            setpoint->demands.roll = vy;
-
-            setSetpoint(setpoint);
         }
 
         void setSetpoint(setpoint_t *setpoint)
