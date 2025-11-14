@@ -25,7 +25,7 @@ class CommandTask {
 
     private:
 
-        static constexpr float TASK_FREQ = 1000;
+        static constexpr float TASK_FREQ = 100;
 
     public:
 
@@ -54,10 +54,10 @@ class CommandTask {
 
         command_t _command;
 
+        MspParser _commandParser;
+
         void run(void)
         {
-            MspParser parser = {};
-
             TickType_t lastWakeTime = xTaskGetTickCount();
 
             while (true) {
@@ -68,7 +68,7 @@ class CommandTask {
 
                 while (Comms::read_byte(&byte)) {
 
-                    switch (parser.parse(byte)) {
+                    switch (_commandParser.parse(byte)) {
 
                         case MSP_SET_ARMING:
                             _command.armed = !_command.armed;
@@ -80,10 +80,10 @@ class CommandTask {
 
                         case MSP_SET_SETPOINT:
                             _command.hovering = true;
-                            _command.demands.pitch = parser.getFloat(0);
-                            _command.demands.roll = parser.getFloat(1);
-                            _command.demands.yaw = parser.getFloat(2);
-                            _command.demands.thrust = parser.getFloat(3);
+                            _command.demands.pitch = _commandParser.getFloat(0);
+                            _command.demands.roll = _commandParser.getFloat(1);
+                            _command.demands.yaw = _commandParser.getFloat(2);
+                            _command.demands.thrust = _commandParser.getFloat(3);
                             break;
 
                         default:
