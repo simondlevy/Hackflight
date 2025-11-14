@@ -198,21 +198,16 @@ def main():
 
             if gamepad.hovering:
 
-                client.send(MspParser.serialize_SET_SETPOINT_HOVER(
+                client.send(MspParser.serialize_SET_SETPOINT(
                     gamepad.vx, gamepad.vy, gamepad.yawrate, gamepad.zdist))
 
             else:
 
-                try:
-
-                    client.send(MspParser.serialize_SET_SETPOINT_RPYT(
+               client.send(MspParser.serialize_SET_IDLE(
                         gamepad.roll,
                         gamepad.pitch,
                         gamepad.yaw,
                         gamepad.thrust))
-
-                except Exception:
-                    break
 
             sleep(1 / UPDATE_RATE_HZ)
 

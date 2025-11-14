@@ -112,7 +112,7 @@ class SetpointTask {
                             setpoint.armed = !setpoint.armed;
                             break;
 
-                        case MSP_SET_SETPOINT_RPYT:
+                        case MSP_SET_IDLE:
                             decodeRpytSetpoint(
                                     parser.getFloat(0),
                                     parser.getFloat(1),
@@ -121,7 +121,7 @@ class SetpointTask {
                                     &setpoint);
                             break;
 
-                        case MSP_SET_SETPOINT_HOVER:
+                        case MSP_SET_SETPOINT:
                             decodeHoverSetpoint(
                                     parser.getFloat(0),
                                     parser.getFloat(1),

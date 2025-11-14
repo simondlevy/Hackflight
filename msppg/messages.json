@@ -41,16 +41,15 @@
    {"arm":    "byte"}
   ],
 
-  "SET_SETPOINT_RPYT": 
+  "SET_IDLE": 
   [{"ID": 201},
-   {"comment": "Thrust is ushort in original"},
    {"roll":    "float"},
    {"pitch":   "float"},
    {"yaw":     "float"},
    {"thrust":  "float"}
   ],
 
-  "SET_SETPOINT_HOVER": 
+  "SET_SETPOINT": 
   [{"ID": 202},
    {"comment": "Hover mode"},
    {"vx":        "float"},
