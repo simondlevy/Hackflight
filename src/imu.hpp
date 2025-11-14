@@ -58,7 +58,7 @@ class Imu {
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
         }
 
-        bool imuIsCalibrated()
+        bool isCalibrated()
         {
             return _gyroBiasFound;
         }

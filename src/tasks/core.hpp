@@ -22,8 +22,8 @@
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
-#include <tasks/led.hpp>
 #include <tasks/command.hpp>
+#include <timer.hpp>
 #include <vehicles/diyquad.hpp>
 
 class CoreTask {
@@ -34,7 +34,6 @@ class CoreTask {
                 ClosedLoopControl * closedLoopControl,
                 EstimatorTask * estimatorTask,
                 Imu * imu,
-                LedTask * ledTask,
                 CommandTask * commandTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
@@ -43,7 +42,6 @@ class CoreTask {
             _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
             _imu = imu;
-            _ledTask = ledTask;
             _commandTask = commandTask;
             _debugTask = debugTask;
             _motorCount = motorCount;
@@ -60,6 +58,10 @@ class CoreTask {
         static const Clock::rate_t FLYING_STATUS_FREQ = Clock::FREQ_25_HZ;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
         static const auto CLOSED_LOOP_UPDATE_FREQ = Clock::FREQ_500_HZ;
+
+        static constexpr float LED_HEARTBEAT_FREQ = 1;
+        static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
+        static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
 
         typedef enum {
             STATUS_IDLE,
@@ -81,11 +83,14 @@ class CoreTask {
         DebugTask * _debugTask;
         EstimatorTask * _estimatorTask;
         Imu * _imu;
-        LedTask * _ledTask;
         CommandTask * _commandTask;
         vehicleState_t _vehicleState;
 
         uint8_t _motorCount;
+
+        bool _armed;
+
+        Timer _ledTimer;
 
         void run()
         {
@@ -100,6 +105,9 @@ class CoreTask {
             // Run device-dependent motor initialization
             motors_init();
 
+            // Run device-dependent LED initialization
+            led_init();
+
             for (uint32_t tick=1; ; tick++) {
 
                 // Sync the core loop to the IMU
@@ -109,6 +117,9 @@ class CoreTask {
                 // Get command
                 command_t command = {};
                 _commandTask->getCommand(command);
+
+                // Set the LED based on current status
+                runLed();
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
@@ -131,7 +142,7 @@ class CoreTask {
                         reportStatus(tick, "idle", motorvals);
                         if (command.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
-                            _ledTask->setArmed(true);
+                            _armed = true;
                             status = STATUS_ARMED;
                         }
                         runMotors(motorvals);
@@ -165,6 +176,7 @@ class CoreTask {
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
+                        _armed = false;
                         DebugTask::setMessage(_debugTask, "%05d: lost contact", tick);
                         break;
                 }
@@ -237,7 +249,7 @@ class CoreTask {
             if (!command.armed) {
                 status = STATUS_IDLE;
                 memset(motorvals, 0, _motorCount * sizeof(motorvals));
-                _ledTask->setArmed(false);
+                _armed = false;
             }
         }
 
@@ -272,12 +284,52 @@ class CoreTask {
             return result;
         }        
 
+        void runLed()
+        {
+            const uint32_t msec_curr = millis();
+
+            if (!_imu->isCalibrated()) {
+                blinkLed(msec_curr, LED_IMU_CALIBRATING_FREQ);
+            }
+
+            else if (_armed) { 
+                led_set(true);
+            }
+            else {
+                blinkLed(msec_curr, LED_HEARTBEAT_FREQ);
+            }
+        }
+
+        void blinkLed(const uint32_t msec_curr, const float freq)
+        {
+            static bool pulsing;
+            static uint32_t pulse_start;
+
+            if (_ledTimer.ready(freq)) {
+                led_set(true);
+                pulsing = true;
+                pulse_start = msec_curr;
+            }
+
+            else if (pulsing) {
+                if (millis() - pulse_start > LED_PULSE_DURATION_MSEC) {
+                    led_set(false);
+                    pulsing = false;
+                }
+            }
+        }
+
+ 
         static bool isSafeAngle(float angle)
         {
             return fabs(angle) < STATE_PHITHETA_MAX;
         }
 
         // Device-dependent ---------------------------
+
+        void led_init();
+
+        void led_set(const bool on);
 
         void motors_init();
 

@@ -14,18 +14,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <Arduino.h>
 
-#include <tasks/core.hpp>
+class Timer {
 
-static const uint8_t LED_PIN = PC0;
+    public:
 
-void CoreTask::led_init()
-{
-    pinMode(LED_PIN, OUTPUT);
-}
+        bool ready(const float freq)
+        {
+            const uint32_t msec_curr = millis();
 
-void CoreTask::led_set(const bool on)
-{
-    digitalWrite(LED_PIN, !on);
-}
+            if (msec_curr - _msec_prev > 1000 / freq) {
+
+                _msec_prev = msec_curr;
+
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+
+        uint32_t _msec_prev;
+};
+
