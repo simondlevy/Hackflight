@@ -35,15 +35,6 @@ typedef struct {
 
 } axis4_t;
 
-typedef union {
-    struct {
-        float x;
-        float y;
-        float z;
-    };
-    float axis[3];
-} Axis3f;
-
 typedef struct {
 
     float thrust;  // positve upward
@@ -109,12 +100,12 @@ typedef struct tofMeasurement_s {
 
 typedef struct
 {
-    Axis3f gyro; // deg/s, for legacy reasons
+    axis3_t gyro; // deg/s, for legacy reasons
 } gyroscopeMeasurement_t;
 
 typedef struct
 {
-    Axis3f acc; // Gs, for legacy reasons
+    axis3_t acc; // Gs, for legacy reasons
 } accelerationMeasurement_t;
 
 typedef struct {
@@ -125,6 +116,7 @@ typedef struct {
     demands_t demands;
 
 } setpoint_t;
+
 typedef struct {
 
     float x;
