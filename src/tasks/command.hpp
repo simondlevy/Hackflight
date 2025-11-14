@@ -58,8 +58,6 @@ class CommandTask {
         {
             MspParser parser = {};
 
-            command_t command = {};
-
             TickType_t lastWakeTime = xTaskGetTickCount();
 
             while (true) {
