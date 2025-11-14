@@ -41,7 +41,6 @@
 
 #pragma once
 
-#include <outlierFilterTdoa.hpp>
 #include <datatypes.h>
 #include <matrix_typedef.h>
 
@@ -90,8 +89,6 @@ class EKF {
         {
             axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
             axis3fSubSamplerInit(&_gyroSubSampler, DEGREES_TO_RADIANS);
-
-            _outlierFilterTdoa.reset();
 
             ekf_init();
 
@@ -532,8 +529,6 @@ class EKF {
 
         Axis3fSubSampler_t _accSubSampler;
         Axis3fSubSampler_t _gyroSubSampler;
-
-        OutlierFilterTdoa _outlierFilterTdoa;
 
         float _predictedNX;
         float _predictedNY;

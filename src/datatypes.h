@@ -22,13 +22,6 @@ typedef struct {
 
     float x;
     float y;
-
-} axis2_t;
-
-typedef struct {
-
-    float x;
-    float y;
     float z;
 
 } axis3_t;
@@ -128,31 +121,9 @@ static const float STATE_DPSI_MAX = 250;
 typedef float vec3d[3];
 typedef float mat3d[3][3];
 
-typedef struct vec3_s vector_t;
-
 typedef enum {
     MeasurementSourceLocationService  = 0,
 } measurementSource_t;
-
-typedef struct tdoaMeasurement_s {
-    union {
-        point_t anchorPositions[2];
-        struct {
-            point_t anchorPositionA;
-            point_t anchorPositionB;
-        };
-    };
-    union {
-        uint8_t anchorIds[2];
-        struct {
-            uint8_t anchorIdA;
-            uint8_t anchorIdB;
-        };
-    };
-
-    float distanceDiff;
-    float stdDev;
-} tdoaMeasurement_t;
 
 typedef struct baro_s {
     float pressure;           // mbar
@@ -212,12 +183,6 @@ typedef struct estimate_s {
 
     point_t position;
 } estimate_t;
-
-/** Setpoint for althold */
-typedef struct setpointZ_s {
-    float z;
-    bool isUpdate; // True = small update of setpoint, false = completely new
-} setpointZ_t;
 
 /** Flow measurement**/
 typedef struct flowMeasurement_s {
@@ -313,4 +278,3 @@ typedef struct {
     demands_t demands;
 
 } setpoint_t;
-
