@@ -18,7 +18,6 @@
 
 #include <__control__.hpp>
 #include <__messages__.h>
-#include <comms.hpp>
 #include <debugger.hpp>
 #include <imu.hpp>
 #include <msp/parser.hpp>
@@ -32,13 +31,11 @@ class CoreTask {
     public:
 
         void begin(
-                ClosedLoopControl * closedLoopControl,
                 EstimatorTask * estimatorTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 Debugger * debugger=nullptr)
         {
-            _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
             _debugger = debugger;
             _motorCount = motorCount;
@@ -78,7 +75,7 @@ class CoreTask {
             ((CoreTask *)arg)->run();
         }
 
-        ClosedLoopControl * _closedLoopControl;
+        ClosedLoopControl _closedLoopControl;
         mixFun_t _mixFun;
         FreeRtosTask _task;
         Debugger * _debugger;
@@ -109,6 +106,8 @@ class CoreTask {
 
             // Run device-dependent LED initialization
             led_init();
+
+            comms_init();
 
             // Start serial debugging
             Serial.begin(115200);
@@ -196,7 +195,7 @@ class CoreTask {
         {
             if (Timer::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, tick)) {
 
-                _closedLoopControl->run( tick, 1.f / CLOSED_LOOP_UPDATE_FREQ,
+                _closedLoopControl.run(tick, 1.f / CLOSED_LOOP_UPDATE_FREQ,
                         command.hovering, _vehicleState, command.demands,
                         demands);
 
@@ -320,14 +319,14 @@ class CoreTask {
         {
             MspSerializer serializer = {};
 
-            _closedLoopControl->serializeMessage(serializer);
+            _closedLoopControl.serializeMessage(serializer);
 
             sendPayload(serializer);
         }
 
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                Comms::write_byte(serializer.payload[k]);
+                comms_write_byte(serializer.payload[k]);
             }
         }
  
@@ -376,7 +375,7 @@ class CoreTask {
 
                 uint8_t byte = 0;
 
-                while (Comms::read_byte(&byte)) {
+                while (comms_read_byte(&byte)) {
 
                     switch (_commandParser.parse(byte)) {
 
@@ -409,6 +408,12 @@ class CoreTask {
         }
 
         // Device-dependent ---------------------------
+
+        void comms_init();
+
+        bool comms_read_byte(uint8_t * byte);
+
+        void comms_write_byte(const uint8_t byte);
 
         void led_init();
 

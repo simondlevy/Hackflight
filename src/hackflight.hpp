@@ -20,8 +20,6 @@
 
 #define _MAIN
 
-#include <comms.hpp>
-#include <__control__.hpp>
 #include <debugger.hpp>
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
@@ -34,16 +32,13 @@ class Hackflight {
 
         void init(const uint8_t motorCount, const mixFun_t mixFun)
         {
-            Comms::init();
-
             zrangerTask.begin(&estimatorTask);
 
             opticalFlowTask.begin(&estimatorTask);
 
             estimatorTask.begin();
 
-            coreTask.begin(
-                    &closedLoopControl, &estimatorTask, motorCount, mixFun);
+            coreTask.begin(&estimatorTask, motorCount, mixFun);
         }
 
     private:
@@ -52,7 +47,5 @@ class Hackflight {
         EstimatorTask estimatorTask;
         OpticalFlowTask opticalFlowTask;
         ZRangerTask zrangerTask;
-
-        ClosedLoopControl closedLoopControl;
         Debugger debugger;
 };
