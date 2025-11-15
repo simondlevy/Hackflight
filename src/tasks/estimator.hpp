@@ -20,7 +20,6 @@
 
 #include <debugger.hpp>
 #include <ekf.hpp>
-#include <rateSupervisor.hpp>
 #include <task.hpp>
 
 class EstimatorTask {
@@ -45,13 +44,10 @@ class EstimatorTask {
 
         void getVehicleState(vehicleState_t * state)
         {
-            // This function is called from the stabilizer loop. It is
-            // important that this call returns as quickly as possible. The
-            // dataMutex must only be
-            // locked short periods by the task.
+            // This function is called from the core task. It is important that
+            // this call returns as quickly as possible. The dataMutex must
+            // only be locked short periods by the task.
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
-
-            // Copy the latest state, calculated by the task
             memcpy(state, &_state, sizeof(vehicleState_t));
             xSemaphoreGive(_dataMutex);
 
@@ -114,8 +110,6 @@ class EstimatorTask {
 
         bool _didResetEstimation;
 
-        RateSupervisor _rateSupervisor;
-        
         bool _isFlying;
 
         // Mutex to protect data that is shared between the task and
@@ -194,13 +188,6 @@ class EstimatorTask {
         void run(void)
         {
             auto nextPredictionMs = millis();
-
-            _rateSupervisor.init(
-                    nextPredictionMs, 
-                    1000, 
-                    PREDICTION_FREQ - 1, 
-                    PREDICTION_FREQ + 1, 
-                    1); 
 
             while (true) {
 
