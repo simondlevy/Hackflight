@@ -18,12 +18,13 @@
 #include <STM32FreeRTOS.h>
 
 #include <hackflight.hpp>
+#include <mixers/crazyflie.hpp>
 
 static Hackflight hackflight;
 
 void setup() 
 {
-    hackflight.init();
+    hackflight.init(Mixer::rotorCount, Mixer::mix);
 
     vTaskStartScheduler();
 }

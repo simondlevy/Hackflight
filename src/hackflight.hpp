@@ -23,7 +23,6 @@
 #include <comms.hpp>
 #include <__control__.hpp>
 #include <debugger.hpp>
-#include <mixers/crazyflie.hpp>
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/opticalflow.hpp>
@@ -33,7 +32,7 @@ class Hackflight {
 
     public:
 
-        void init()
+        void init(const uint8_t motorCount, const mixFun_t mixFun)
         {
             Comms::init();
 
@@ -44,14 +43,10 @@ class Hackflight {
             estimatorTask.begin();
 
             coreTask.begin(
-                    &closedLoopControl,
-                    &estimatorTask,
-                    Mixer::rotorCount,
-                    Mixer::mix);
+                    &closedLoopControl, &estimatorTask, motorCount, mixFun);
         }
 
     private:
-
 
         CoreTask coreTask;
         EstimatorTask estimatorTask;
