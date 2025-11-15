@@ -20,7 +20,6 @@
 
 #include <plugins/physics.h>
 
-#include <clock.hpp>
 #include <sim_control.hpp>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
@@ -29,7 +28,6 @@
 
 static const float DYNAMICS_RATE = 100000; // Hz
 
-//static const auto PID_UPDATE_RATE = Clock::RATE_1000_HZ;
 static const int PID_UPDATE_RATE = 1024; // Plank
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
