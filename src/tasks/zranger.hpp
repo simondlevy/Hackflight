@@ -88,7 +88,6 @@ class ZRangerTask {
                             1 + expf(_expCoeff * (distance - EXP_POINT_A)));
 
                     tofMeasurement_t tofData;
-                    tofData.timestamp = xTaskGetTickCount();
                     tofData.distance = distance;
                     tofData.stdDev = stdDev;
 
