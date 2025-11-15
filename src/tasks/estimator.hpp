@@ -121,8 +121,6 @@ class EstimatorTask {
         // process
         xSemaphoreHandle _runTaskSemaphore;
 
-        uint32_t _warningBlockTimeMs;
-
         Debugger * _debugger;
 
         EKF _ekf;
@@ -167,10 +165,6 @@ class EstimatorTask {
             if (!_ekf.isStateWithinBounds()) {
 
                 _didResetEstimation = true;
-
-                if (nowMs > _warningBlockTimeMs) {
-                    _warningBlockTimeMs = nowMs + WARNING_HOLD_BACK_TIME_MS;
-                }
             }
 
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
