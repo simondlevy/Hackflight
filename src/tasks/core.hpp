@@ -17,11 +17,13 @@
 #pragma once
 
 #include <__control__.hpp>
+#include <__messages__.h>
+#include <comms.hpp>
 #include <debugger.hpp>
 #include <imu.hpp>
+#include <msp/parser.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
-#include <tasks/command.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -33,7 +35,6 @@ class CoreTask {
                 ClosedLoopControl * closedLoopControl,
                 EstimatorTask * estimatorTask,
                 Imu * imu,
-                CommandTask * commandTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 Debugger * debugger=nullptr)
@@ -41,7 +42,6 @@ class CoreTask {
             _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
             _imu = imu;
-            _commandTask = commandTask;
             _debugger = debugger;
             _motorCount = motorCount;
             _mixFun = mixFun;
@@ -62,7 +62,7 @@ class CoreTask {
         static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
         static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
 
-        static constexpr float LOGGING_FREQ = 100;
+        static constexpr float COMMS_FREQ = 100;
 
         typedef enum {
             STATUS_IDLE,
@@ -84,7 +84,6 @@ class CoreTask {
         Debugger * _debugger;
         EstimatorTask * _estimatorTask;
         Imu * _imu;
-        CommandTask * _commandTask;
         vehicleState_t _vehicleState;
 
         uint8_t _motorCount;
@@ -92,6 +91,8 @@ class CoreTask {
         Timer _ledTimer;
 
         Timer _loggingTimer;
+
+        Timer _commandTimer;
 
         void run()
         {
@@ -118,15 +119,15 @@ class CoreTask {
                 _imu->step();
                 vTaskDelay(1000/Timer::CORE_FREQ);
 
-                // Get command
-                command_t command = {};
-                _commandTask->getCommand(command);
-
                 // Set the LED based on current status
                 runLed(status);
 
                 // Run logging
                 runLogger();
+
+                // Get command
+                static command_t _command;
+                runCommandParser(_command);
 
                 // Periodically update estimator with flying status
                 if (Timer::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
@@ -138,8 +139,9 @@ class CoreTask {
                 _estimatorTask->getVehicleState(&_vehicleState);
 
                 // Check for lost contact
-                if (command.timestamp > 0 &&
-                        xTaskGetTickCount() - command.timestamp > COMMAND_TIMEOUT_TICKS) {
+                if (_command.timestamp > 0 &&
+                        xTaskGetTickCount() - _command.timestamp >
+                        COMMAND_TIMEOUT_TICKS) {
                     status = STATUS_LOST_CONTACT;
                 }
 
@@ -147,7 +149,7 @@ class CoreTask {
 
                     case STATUS_IDLE:
                         reportStatus(tick, "idle", motorvals);
-                        if (command.armed && isSafeAngle(_vehicleState.phi) &&
+                        if (_command.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             status = STATUS_ARMED;
                         }
@@ -156,8 +158,8 @@ class CoreTask {
 
                     case STATUS_ARMED:
                         reportStatus(tick, "armed", motorvals);
-                        checkDisarm(command, status, motorvals);
-                        if (command.hovering) {
+                        checkDisarm(_command, status, motorvals);
+                        if (_command.hovering) {
                             status = STATUS_HOVERING;
                         }
                         runMotors(motorvals);
@@ -165,19 +167,19 @@ class CoreTask {
 
                     case STATUS_HOVERING:
                         reportStatus(tick, "hovering", motorvals);
-                        runClosedLoopAndMixer(tick, command,
+                        runClosedLoopAndMixer(tick, _command,
                                 demands, motorvals);
-                        checkDisarm(command, status, motorvals);
-                        if (!command.hovering) {
+                        checkDisarm(_command, status, motorvals);
+                        if (!_command.hovering) {
                             status = STATUS_LANDING;
                         }
                         break;
 
                     case STATUS_LANDING:
                         reportStatus(tick, "landing", motorvals);
-                        runClosedLoopAndMixer(tick, command,
+                        runClosedLoopAndMixer(tick, _command,
                                 demands, motorvals);
-                        checkDisarm(command, status, motorvals);
+                        checkDisarm(_command, status, motorvals);
                         break;
 
                     case STATUS_LOST_CONTACT:
@@ -290,7 +292,7 @@ class CoreTask {
 
         void runLogger()
         {
-            if (_loggingTimer.ready(LOGGING_FREQ)) {
+            if (_loggingTimer.ready(COMMS_FREQ)) {
                 sendVehicleState();
                 sendClosedLoopControlMessage();
             }
@@ -367,7 +369,41 @@ class CoreTask {
             }
         }
 
- 
+        void runCommandParser(command_t & command)
+        {
+            if (_commandTimer.ready(COMMS_FREQ)) {
+
+                static MspParser _commandParser;
+
+                uint8_t byte = 0;
+
+                while (Comms::read_byte(&byte)) {
+
+                    switch (_commandParser.parse(byte)) {
+
+                        case MSP_SET_ARMING:
+                            command.armed = !command.armed;
+                            break;
+
+                        case MSP_SET_IDLE:
+                            command.hovering = false;
+                            break;
+
+                        case MSP_SET_SETPOINT:
+                            command.hovering = true;
+                            command.demands.pitch = _commandParser.getFloat(0);
+                            command.demands.roll = _commandParser.getFloat(1);
+                            command.demands.yaw = _commandParser.getFloat(2);
+                            command.demands.thrust = _commandParser.getFloat(3);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
         static bool isSafeAngle(float angle)
         {
             return fabs(angle) < STATE_PHITHETA_MAX;

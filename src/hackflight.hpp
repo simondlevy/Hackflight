@@ -28,7 +28,6 @@
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/opticalflow.hpp>
-#include <tasks/command.hpp>
 #include <tasks/zranger.hpp>
 
 class Hackflight {
@@ -45,15 +44,12 @@ class Hackflight {
 
             estimatorTask.begin();
 
-            commandTask.begin();
-
             imu.begin(&estimatorTask);
 
             coreTask.begin(
                     &closedLoopControl,
                     &estimatorTask,
                     &imu,
-                    &commandTask,
                     Mixer::rotorCount,
                     Mixer::mix);
         }
@@ -65,7 +61,6 @@ class Hackflight {
         EstimatorTask estimatorTask;
         Imu imu;
         OpticalFlowTask opticalFlowTask;
-        CommandTask commandTask;
         ZRangerTask zrangerTask;
 
         ClosedLoopControl closedLoopControl;
