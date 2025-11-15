@@ -34,17 +34,17 @@ class CoreTask {
         void begin(
                 ClosedLoopControl * closedLoopControl,
                 EstimatorTask * estimatorTask,
-                Imu * imu,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 Debugger * debugger=nullptr)
         {
             _closedLoopControl = closedLoopControl;
             _estimatorTask = estimatorTask;
-            _imu = imu;
             _debugger = debugger;
             _motorCount = motorCount;
             _mixFun = mixFun;
+
+            _imu.begin(estimatorTask);
 
             _task.init(runCoreTask, "core", this, 5);
         }
@@ -83,7 +83,7 @@ class CoreTask {
         FreeRtosTask _task;
         Debugger * _debugger;
         EstimatorTask * _estimatorTask;
-        Imu * _imu;
+        Imu _imu;
         vehicleState_t _vehicleState;
 
         uint8_t _motorCount;
@@ -116,7 +116,7 @@ class CoreTask {
             for (uint32_t tick=1; ; tick++) {
 
                 // Sync the core loop to the IMU
-                _imu->step();
+                _imu.step();
                 vTaskDelay(1000/Timer::CORE_FREQ);
 
                 // Set the LED based on current status
@@ -330,13 +330,12 @@ class CoreTask {
                 Comms::write_byte(serializer.payload[k]);
             }
         }
-
  
         void runLed(const status_t status)
         {
             const uint32_t msec_curr = millis();
 
-            if (!_imu->isCalibrated()) {
+            if (!_imu.isCalibrated()) {
                 blinkLed(msec_curr, LED_IMU_CALIBRATING_FREQ);
             }
 

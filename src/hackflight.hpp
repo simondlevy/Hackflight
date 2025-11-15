@@ -23,7 +23,6 @@
 #include <comms.hpp>
 #include <__control__.hpp>
 #include <debugger.hpp>
-#include <imu.hpp>
 #include <mixers/crazyflie.hpp>
 #include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
@@ -44,12 +43,9 @@ class Hackflight {
 
             estimatorTask.begin();
 
-            imu.begin(&estimatorTask);
-
             coreTask.begin(
                     &closedLoopControl,
                     &estimatorTask,
-                    &imu,
                     Mixer::rotorCount,
                     Mixer::mix);
         }
@@ -59,7 +55,6 @@ class Hackflight {
 
         CoreTask coreTask;
         EstimatorTask estimatorTask;
-        Imu imu;
         OpticalFlowTask opticalFlowTask;
         ZRangerTask zrangerTask;
 
