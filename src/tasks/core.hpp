@@ -145,7 +145,7 @@ class CoreTask {
                 }
 
                 // Run ekf to get vehicle state
-                nextPredictionMs = runEkf(isFlying, nextPredictionMs);
+                nextPredictionMs = getStateEstimate(isFlying, nextPredictionMs);
 
                 // Check for lost contact
                 if (_command.timestamp > 0 &&
@@ -199,7 +199,8 @@ class CoreTask {
             }
         }
 
-        uint32_t runEkf(const bool isFlying, uint32_t nextPredictionMs)
+        uint32_t getStateEstimate(
+                const bool isFlying, uint32_t nextPredictionMs)
         {
             const uint32_t nowMs = millis();
 
@@ -216,9 +217,8 @@ class CoreTask {
 
             axis3_t dpos = {};
             axis4_t quat = {};
-            axis3_t dangle = {};
 
-            _ekf->getStateEstimate(nowMs, _vehicleState.z, dpos, dangle, quat);
+            _ekf->getStateEstimate(nowMs, _vehicleState.z, dpos, quat);
 
             if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
                     !velInBounds(dpos.z)) {
@@ -235,10 +235,13 @@ class CoreTask {
             _vehicleState.phi = angles.x;
             _vehicleState.theta = angles.y;
             _vehicleState.psi = -angles.z; // negate for nose-right positive
-            
-            _vehicleState.dphi   = dangle.x;
-            _vehicleState.dtheta = dangle.y;
-            _vehicleState.dpsi   = -dangle.z; // negate for nose-right positive
+
+            // Get angular velocities directly from gyro
+            axis3_t gyroData = {};
+            _imu.getGyroData(gyroData);
+            _vehicleState.dphi   = gyroData.x;
+            _vehicleState.dtheta = gyroData.y;
+            _vehicleState.dpsi   = -gyroData.z; // negate for nose-right positive
 
             return nextPredictionMs;
         }

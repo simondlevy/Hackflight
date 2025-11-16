@@ -239,7 +239,7 @@ class EKF {
         }
 
         void getStateEstimate(const uint32_t nowMs,
-                float & z, axis3_t & dpos, axis3_t & dangle, axis4_t & quat)
+                float & z, axis3_t & dpos, axis4_t & quat)
         {
             addProcessNoise(nowMs);
 
@@ -259,10 +259,6 @@ class EKF {
             dpos.y = _r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ];
             dpos.z = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
 
-            dangle.x = _dangle.x;
-            dangle.y = _dangle.y;
-            dangle.z = _dangle.z;
-
             quat.w = _q0;
             quat.x = _q1;
             quat.y = _q2;
@@ -275,11 +271,6 @@ class EKF {
             m.type = MeasurementTypeGyroscope;
             m.data.gyroscope.gyro = *gyro;
             enqueue(&m);
-
-            // Get state vector angular velocities directly from gyro
-            _dangle.x = gyro->x;     
-            _dangle.y = gyro->y;
-            _dangle.z = gyro->z; // negate for nose-right positive
 
             m = {};
             m.type = MeasurementTypeAcceleration;
@@ -340,8 +331,6 @@ class EKF {
             } data;
         } measurement_t;
 
-
-        axis3_t _dangle;
 
         static const size_t QUEUE_MAX_LENGTH = 20;
         static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);

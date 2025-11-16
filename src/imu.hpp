@@ -104,6 +104,11 @@ class Imu {
             _ekf->enqueueImu(&_gyroData, &accelGs);
         }
 
+        void getGyroData(axis3_t & gyroData)
+        {
+            memcpy(&gyroData, &_gyroData, sizeof(axis3_t));
+        }
+
     private:
 
         static constexpr float RAW_GYRO_VARIANCE_BASE = 100;
