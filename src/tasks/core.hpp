@@ -125,8 +125,10 @@ class CoreTask {
 
             for (uint32_t step=1; ; step++) {
 
+                const uint32_t time = xTaskGetTickCount();
+
                 // Sync the core loop to the IMU
-                _imu.step(xTaskGetTickCount());
+                _imu.step(time);
                 vTaskDelay(1000/Timer::CORE_FREQ);
 
                 // Set the LED based on current status
@@ -141,7 +143,7 @@ class CoreTask {
 
                 // Periodically update ekf with flying status
                 if (Timer::rateDoExecute(FLYING_STATUS_FREQ, step)) {
-                    isFlying = isFlyingCheck(xTaskGetTickCount(), motorvals);
+                    isFlying = isFlyingCheck(time, motorvals);
                 }
 
                 // Run ekf to get vehicle state
@@ -149,8 +151,7 @@ class CoreTask {
 
                 // Check for lost contact
                 if (_command.timestamp > 0 &&
-                        xTaskGetTickCount() - _command.timestamp >
-                        COMMAND_TIMEOUT_TICKS) {
+                        time - _command.timestamp > COMMAND_TIMEOUT_TICKS) {
                     status = STATUS_LOST_CONTACT;
                 }
 

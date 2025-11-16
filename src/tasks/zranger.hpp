@@ -68,11 +68,8 @@ class ZRangerTask {
 
         void run(void)
         {
-            //TickType_t lastWakeTime = xTaskGetTickCount();
-
             while (true) {
 
-                //vTaskDelayUntil(&lastWakeTime, 1000/TASK_FREQ);
                 vTaskDelay(1000/TASK_FREQ);
 
                 float range = device_read();
