@@ -107,6 +107,7 @@ class Num {
         }
 
         //  Conversion_between_quaternions_and_Euler_angles
+
         static void euler2quat(const axis3_t & a, axis4_t & q)
         {
             // Abbreviations for the various angular functions
@@ -123,6 +124,19 @@ class Num {
             q.y = cr * sp * cy + sr * cp * sy;
             q.z = cr * cp * sy - sr * sp * cy;
         }
+
+        static void quat2euler(const axis4_t & q, axis3_t & a)
+        {
+            a.x = RAD2DEG * atan2f(2*(q.y*q.z+q.w* q.x) ,
+                    q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z);
+
+            a.y = RAD2DEG * asinf(-2*(q.x*q.z - q.w*q.y));
+
+
+            a.z = RAD2DEG * atan2f(2*(q.x*q.y+q.w* q.z),
+                    q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z);
+        }
+
         static float fconstrain(float value, const float minVal, const float maxVal)
         {
             return fminf(maxVal, fmaxf(minVal,value));

@@ -432,46 +432,18 @@ class EKF {
             return true;
         }
 
-        void getVehicleState(vehicleState_t & state)
+        void getStateEstimate(float & z, axis3_t & dpos, axis4_t & quat)
         {
-            state.x = _x[STATE_X];
+            z = _x[STATE_Z];
 
-            state.dx = _r00*_x[STATE_VX] + 
-                _r01*_x[STATE_VY] + 
-                _r02*_x[STATE_VZ];
+            dpos.x = _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
+            dpos.y = _r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ];
+            dpos.z = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
 
-            state.y = _x[STATE_Y];
-
-            // Negate for rightward positive
-            state.dy = -(_r10*_x[STATE_VX] + 
-                    _r11*_x[STATE_VY] + 
-                    _r12*_x[STATE_VZ]);
-
-            state.z = _x[STATE_Z];
-
-            state.dz = _r20*_x[STATE_VX] + 
-                _r21*_x[STATE_VY] + 
-                _r22*_x[STATE_VZ];
-
-            state.phi = RADIANS_TO_DEGREES *
-                atan2f(2*(_q2*_q3+_q0*
-                            _q1) ,
-                        _q0*_q0 -
-                        _q1*_q1 -
-                        _q2*_q2 +
-                        _q3*_q3);
-
-            state.theta = RADIANS_TO_DEGREES * 
-                asinf(-2*(_q1*_q3 -
-                            _q0*_q2));
-
-            state.psi = -RADIANS_TO_DEGREES *   // negate for nose-right positive
-                atan2f(2*(_q1*_q2+_q0*
-                            _q3)
-                        , _q0*_q0 +
-                        _q1*_q1 -
-                        _q2*_q2 -
-                        _q3*_q3);
+            quat.w = _q0;
+            quat.x = _q1;
+            quat.y = _q2;
+            quat.z = _q3;
         }
 
     private:

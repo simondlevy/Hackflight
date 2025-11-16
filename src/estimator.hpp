@@ -20,6 +20,7 @@
 
 #include <debugger.hpp>
 #include <ekf.hpp>
+#include <num.hpp>
 
 class Estimator {
 
@@ -40,10 +41,7 @@ class Estimator {
             // Get state vector angular velocities directly from gyro
             _dangle.x = gyro->x;     
             _dangle.y = gyro->y;
-            _dangle.z = -gyro->z; // negate for nose-right positive
-            _state.dphi   =  gyro->x;     
-            _state.dtheta =  gyro->y;
-            _state.dpsi   = -gyro->z; // negate for nose-right positive
+            _dangle.z = gyro->z; // negate for nose-right positive
 
             m = {};
             m.type = EKF::MeasurementTypeAcceleration;
@@ -99,13 +97,25 @@ class Estimator {
                 _didResetEstimation = true;
             }
 
-            _ekf.getVehicleState(_state);
-            
-            memcpy(state, &_state, sizeof(vehicleState_t));
+            axis3_t dpos = {};
+            axis4_t quat = {};
 
+            _ekf.getStateEstimate(state->z, dpos, quat);
+
+            state->dx = dpos.x;
+            state->dy = -dpos.y; // negate for rightward positive
+            state->dz = dpos.z;
+
+            axis3_t angles = {};
+            Num::quat2euler(quat, angles);
+
+            state->phi = angles.x;
+            state->theta = angles.y;
+            state->psi = -angles.z; // negate for nose-right positive
+            
             state->dphi   = _dangle.x;
             state->dtheta = _dangle.y;
-            state->dpsi   = _dangle.z;
+            state->dpsi   = -_dangle.z; // negate for nose-right positive
         }
 
     private:
