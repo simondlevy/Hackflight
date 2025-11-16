@@ -19,10 +19,10 @@
 #include <__control__.hpp>
 #include <__messages__.h>
 #include <debugger.hpp>
+#include <estimator.hpp>
 #include <imu.hpp>
 #include <msp/parser.hpp>
 #include <task.hpp>
-#include <tasks/estimator.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -31,17 +31,17 @@ class CoreTask {
     public:
 
         void begin(
-                EstimatorTask * estimatorTask,
+                Estimator * estimator,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 Debugger * debugger=nullptr)
         {
-            _estimatorTask = estimatorTask;
+            _estimator = estimator;
             _debugger = debugger;
             _motorCount = motorCount;
             _mixFun = mixFun;
 
-            _imu.begin(estimatorTask);
+            _imu.begin(estimator);
 
             _task.init(runCoreTask, "core", this, 5);
         }
@@ -79,7 +79,7 @@ class CoreTask {
         mixFun_t _mixFun;
         FreeRtosTask _task;
         Debugger * _debugger;
-        EstimatorTask * _estimatorTask;
+        Estimator * _estimator;
         Imu _imu;
         vehicleState_t _vehicleState;
 
@@ -114,10 +114,12 @@ class CoreTask {
 
             uint32_t nextPredictionMs = millis();
 
-            for (uint32_t tick=1; ; tick++) {
+            bool isFlying = false;
+
+            for (uint32_t step=1; ; step++) {
 
                 // Sync the core loop to the IMU
-                _imu.step();
+                _imu.step(xTaskGetTickCount());
                 vTaskDelay(1000/Timer::CORE_FREQ);
 
                 // Set the LED based on current status
@@ -131,15 +133,12 @@ class CoreTask {
                 runCommandParser(_command);
 
                 // Periodically update estimator with flying status
-                if (Timer::rateDoExecute(FLYING_STATUS_FREQ, tick)) {
-                    _estimatorTask->setFlyingStatus(
-                            isFlyingCheck(xTaskGetTickCount(), motorvals));
+                if (Timer::rateDoExecute(FLYING_STATUS_FREQ, step)) {
+                    isFlying = isFlyingCheck(xTaskGetTickCount(), motorvals);
                 }
 
-                nextPredictionMs = _estimatorTask->step(millis(), nextPredictionMs);
-
-                // Get vehicle state from estimator
-                _estimatorTask->getVehicleState(&_vehicleState);
+                // Run estimator to get vehicle state
+                _estimator->step(millis(), isFlying, nextPredictionMs, &_vehicleState);
 
                 // Check for lost contact
                 if (_command.timestamp > 0 &&
@@ -151,7 +150,7 @@ class CoreTask {
                 switch (status) {
 
                     case STATUS_IDLE:
-                        reportStatus(tick, "idle", motorvals);
+                        reportStatus(step, "idle", motorvals);
                         if (_command.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             status = STATUS_ARMED;
@@ -160,7 +159,7 @@ class CoreTask {
                         break;
 
                     case STATUS_ARMED:
-                        reportStatus(tick, "armed", motorvals);
+                        reportStatus(step, "armed", motorvals);
                         checkDisarm(_command, status, motorvals);
                         if (_command.hovering) {
                             status = STATUS_HOVERING;
@@ -169,8 +168,8 @@ class CoreTask {
                         break;
 
                     case STATUS_HOVERING:
-                        reportStatus(tick, "hovering", motorvals);
-                        runClosedLoopAndMixer(tick, _command,
+                        reportStatus(step, "hovering", motorvals);
+                        runClosedLoopAndMixer(step, _command,
                                 demands, motorvals);
                         checkDisarm(_command, status, motorvals);
                         if (!_command.hovering) {
@@ -179,27 +178,27 @@ class CoreTask {
                         break;
 
                     case STATUS_LANDING:
-                        reportStatus(tick, "landing", motorvals);
-                        runClosedLoopAndMixer(tick, _command,
+                        reportStatus(step, "landing", motorvals);
+                        runClosedLoopAndMixer(step, _command,
                                 demands, motorvals);
                         checkDisarm(_command, status, motorvals);
                         break;
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        Debugger::setMessage(_debugger, "%05d: lost contact", tick);
+                        Debugger::setMessage(_debugger, "%05d: lost contact", step);
                         break;
                 }
             }
         }
 
         void runClosedLoopAndMixer(
-                const uint32_t tick, const command_t &command,
+                const uint32_t step, const command_t &command,
                 demands_t & demands, float *motorvals)
         {
-            if (Timer::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, tick)) {
+            if (Timer::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, step)) {
 
-                _closedLoopControl.run(tick, 1.f / CLOSED_LOOP_UPDATE_FREQ,
+                _closedLoopControl.run(step, 1.f / CLOSED_LOOP_UPDATE_FREQ,
                         command.hovering, _vehicleState, command.demands,
                         demands);
 
@@ -244,12 +243,12 @@ class CoreTask {
             }
         }
 
-        void reportStatus(const uint32_t tick, const char * status,
+        void reportStatus(const uint32_t step, const char * status,
                 const float * motorvals)
         {
             Debugger::setMessage(_debugger,
                     "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
-                    tick, status,
+                    step, status,
                     motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
@@ -266,7 +265,7 @@ class CoreTask {
         // We say we are flying if one or more motors are running over the idle
         // thrust.
         //
-        bool isFlyingCheck(const uint32_t tick, const float * motorvals)
+        bool isFlyingCheck(const uint32_t step, const float * motorvals)
         {
             auto isThrustOverIdle = false;
 
@@ -280,12 +279,12 @@ class CoreTask {
             static uint32_t latestThrustTick;
 
             if (isThrustOverIdle) {
-                latestThrustTick = tick;
+                latestThrustTick = step;
             }
 
             bool result = false;
             if (0 != latestThrustTick) {
-                if ((tick - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                if ((step - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
                     result = true;
                 }
             }
@@ -303,15 +302,19 @@ class CoreTask {
 
         void sendVehicleState()
         {
-            vehicleState_t state = {};
-
             MspSerializer serializer = {};
 
-            _estimatorTask->getVehicleState(&state);
-
-            const float statevals[10] = { state.dx, state.dy, state.z,
-                state.dz, state.phi, state.dphi, state.theta,
-                state.dtheta, state.psi, state.dpsi 
+            const float statevals[10] = {
+                _vehicleState.dx,
+                _vehicleState.dy,
+                _vehicleState.z,
+                _vehicleState.dz,
+                _vehicleState.phi,
+                _vehicleState.dphi,
+                _vehicleState.theta,
+                _vehicleState.dtheta,
+                _vehicleState.psi,
+                _vehicleState.dpsi
             };
 
             serializer.serializeFloats(MSP_STATE, statevals, 10);

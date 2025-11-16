@@ -21,8 +21,8 @@
 #define _MAIN
 
 #include <debugger.hpp>
+#include <estimator.hpp>
 #include <tasks/core.hpp>
-#include <tasks/estimator.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/zranger.hpp>
 
@@ -32,19 +32,19 @@ class Hackflight {
 
         void init(const uint8_t motorCount, const mixFun_t mixFun)
         {
-            zrangerTask.begin(&estimatorTask);
+            zrangerTask.begin(&estimator);
 
-            opticalFlowTask.begin(&estimatorTask);
+            opticalFlowTask.begin(&estimator);
 
-            estimatorTask.begin();
+            estimator.begin();
 
-            coreTask.begin(&estimatorTask, motorCount, mixFun);
+            coreTask.begin(&estimator, motorCount, mixFun);
         }
 
     private:
 
         CoreTask coreTask;
-        EstimatorTask estimatorTask;
+        Estimator estimator;
         OpticalFlowTask opticalFlowTask;
         ZRangerTask zrangerTask;
         Debugger debugger;

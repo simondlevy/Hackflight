@@ -17,9 +17,9 @@
 
 #include <datatypes.h>
 #include <debugger.hpp>
+#include <estimator.hpp>
 #include <lpf.hpp>
 #include <num.hpp>
-#include <tasks/estimator.hpp>
 #include <timer.hpp>
 
 class Imu {
@@ -31,10 +31,10 @@ class Imu {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask,
+        void begin(Estimator * estimator,
                 Debugger * debugger=nullptr)
         {
-            _estimatorTask = estimatorTask;
+            _estimator = estimator;
 
             _debugger = debugger;
 
@@ -61,7 +61,7 @@ class Imu {
             return _gyroBiasFound;
         }
 
-        void step()
+        void step(const uint32_t tickCount)
         {
             Axis3i16 gyroRaw = {};
             Axis3i16 accelRaw = {};
@@ -78,8 +78,7 @@ class Imu {
             };
 
             // Calibrate gyro with raw values if necessary
-            _gyroBiasFound = processGyroBias(xTaskGetTickCount(),
-                    gyroRaw, &_gyroBias);
+            _gyroBiasFound = processGyroBias(tickCount, gyroRaw, &_gyroBias);
 
             // Subtract gyro bias
             axis3_t gyroUnbiased = {
@@ -101,7 +100,7 @@ class Imu {
 
             applyLpf(_accLpf, &_accelData);
 
-            _estimatorTask->enqueueImu(&_gyroData, &_accelData);
+            _estimator->enqueueImu(&_gyroData, &_accelData);
 
         }
 
@@ -179,7 +178,7 @@ class Imu {
 
         bias_t _gyroBiasRunning;
 
-        EstimatorTask * _estimatorTask;
+        Estimator * _estimator;
 
         Debugger * _debugger;
 

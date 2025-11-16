@@ -20,9 +20,8 @@
 
 #include <debugger.hpp>
 #include <ekf.hpp>
-#include <task.hpp>
 
-class EstimatorTask {
+class Estimator {
 
     public:
 
@@ -30,25 +29,7 @@ class EstimatorTask {
         {
             _debugger = debugger;
 
-            // Created in the 'empty' state, meaning the semaphore must first
-            // be given, that is it will block in the task until released by
-            // the stabilizer loop
-            //_runTaskSemaphore = xSemaphoreCreateBinary();
-
-            //_task.init(runEstimatorTask, "estimator", this, 4);
-
             _ekf.init(millis());
-        }
-
-        void getVehicleState(vehicleState_t * state)
-        {
-            memcpy(state, &_state, sizeof(vehicleState_t));
-            //xSemaphoreGive(_runTaskSemaphore);
-        }
-
-        void setFlyingStatus(const bool isFlying)
-        {
-            _isFlying = isFlying;
         }
 
         void enqueueImu(const axis3_t * gyro, const axis3_t * accel)
@@ -85,10 +66,12 @@ class EstimatorTask {
             enqueue(&m);
         }
 
-        uint32_t step(const uint32_t nowMs, uint32_t nextPredictionMs) 
+        void step(
+                const uint32_t nowMs,
+                const bool isFlying,
+                uint32_t nextPredictionMs,
+                vehicleState_t * state) 
         {
-            //xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
-
             if (_didResetEstimation) {
                 _ekf.init(nowMs);
                _didResetEstimation = false;
@@ -96,18 +79,12 @@ class EstimatorTask {
 
             // Run the system dynamics to predict the state forward.
             if (nowMs >= nextPredictionMs) {
-
-                _ekf.predict(nowMs, _isFlying); 
-
+                _ekf.predict(nowMs, isFlying); 
                 nextPredictionMs = nowMs + (1000 / PREDICTION_FREQ);
             }
 
             // Add process noise every loop, rather than every prediction
             _ekf.addProcessNoise(nowMs);
-
-            // Sensor measurements can come in sporadically and faster
-            // than the stabilizer loop frequency, we therefore consume all
-            // measurements since the last loop, rather than accumulating
 
             // Pull the latest sensors values of interest; discard the rest
             for (uint32_t k=0; k<_queueLength; ++k) {
@@ -124,7 +101,7 @@ class EstimatorTask {
 
             _ekf.getVehicleState(_state);
 
-            return nextPredictionMs;
+            memcpy(state, &_state, sizeof(vehicleState_t));
         }
 
     private:
@@ -140,40 +117,13 @@ class EstimatorTask {
         EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
         uint32_t _queueLength;
 
-        FreeRtosTask _task;
-
         bool _didResetEstimation;
-
-        bool _isFlying;
-
-        // Semaphore to signal that we got data from the stabilizer loop to
-        // process
-        //xSemaphoreHandle _runTaskSemaphore;
 
         Debugger * _debugger;
 
         EKF _ekf;
 
-        // Data used to enable the task and stabilizer loop to run with minimal
-        // locking The estimator state produced by the task, copied to the
-        // stabilizer when needed.
         vehicleState_t _state;
-
-        static void runEstimatorTask(void * obj) 
-        {
-            ((EstimatorTask *)obj)->run();
-        }
-
-        void run(void)
-        {
-            auto nextPredictionMs = millis();
-
-            while (true) {
-
-                // would be nice if this had a precision higher than 1ms...
-                nextPredictionMs = step(millis(), nextPredictionMs);
-            }
-        }
 
         void enqueue(const EKF::measurement_t * measurement) 
         {

@@ -17,20 +17,21 @@
 #pragma once
 
 #include <debugger.hpp>
-#include <tasks/estimator.hpp>
+#include <estimator.hpp>
+#include <task.hpp>
 
 class ZRangerTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, Debugger * debugger=nullptr)
+        void begin(Estimator * estimator, Debugger * debugger=nullptr)
         {
             if (!device_init()) {
                 Debugger::setMessage(_debugger,
                         "ZRangerTask: Failed to initialize zranger");
             }
 
-            _estimatorTask = estimatorTask;
+            _estimator = estimator;
             _debugger = debugger;
 
             _task.init(runZrangerTask, "zranger2", this, 2);
@@ -61,7 +62,7 @@ class ZRangerTask {
 
         float _expCoeff;
 
-        EstimatorTask * _estimatorTask;
+        Estimator * _estimator;
 
         Debugger * _debugger;
 
@@ -91,7 +92,7 @@ class ZRangerTask {
                     tofData.distance = distance;
                     tofData.stdDev = stdDev;
 
-                    _estimatorTask->enqueueRange(&tofData);
+                    _estimator->enqueueRange(&tofData);
                 }
             }
         }
