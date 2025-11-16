@@ -33,9 +33,9 @@ class EstimatorTask {
             // Created in the 'empty' state, meaning the semaphore must first
             // be given, that is it will block in the task until released by
             // the stabilizer loop
-            _runTaskSemaphore = xSemaphoreCreateBinary();
+            //_runTaskSemaphore = xSemaphoreCreateBinary();
 
-            _task.init(runEstimatorTask, "estimator", this, 4);
+            //_task.init(runEstimatorTask, "estimator", this, 4);
 
             _ekf.init(millis());
         }
@@ -43,7 +43,7 @@ class EstimatorTask {
         void getVehicleState(vehicleState_t * state)
         {
             memcpy(state, &_state, sizeof(vehicleState_t));
-            xSemaphoreGive(_runTaskSemaphore);
+            //xSemaphoreGive(_runTaskSemaphore);
         }
 
         void setFlyingStatus(const bool isFlying)
@@ -85,41 +85,9 @@ class EstimatorTask {
             enqueue(&m);
         }
 
-    private:
-
-        static const uint32_t WARNING_HOLD_BACK_TIME_MS = 2000;
-
-        // this is slower than the IMU update rate of 1000Hz
-        static const uint32_t PREDICTION_FREQ = 100;
-
-        static const size_t QUEUE_MAX_LENGTH = 20;
-        static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
-
-        EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
-        uint32_t _queueLength;
-
-        FreeRtosTask _task;
-
-        bool _didResetEstimation;
-
-        bool _isFlying;
-
-        // Semaphore to signal that we got data from the stabilizer loop to
-        // process
-        xSemaphoreHandle _runTaskSemaphore;
-
-        Debugger * _debugger;
-
-        EKF _ekf;
-
-        // Data used to enable the task and stabilizer loop to run with minimal
-        // locking The estimator state produced by the task, copied to the
-        // stabilizer when needed.
-        vehicleState_t _state;
-
         uint32_t step(const uint32_t nowMs, uint32_t nextPredictionMs) 
         {
-            xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
+            //xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
 
             if (_didResetEstimation) {
                 _ekf.init(nowMs);
@@ -158,6 +126,38 @@ class EstimatorTask {
 
             return nextPredictionMs;
         }
+
+    private:
+
+        static const uint32_t WARNING_HOLD_BACK_TIME_MS = 2000;
+
+        // this is slower than the IMU update rate of 1000Hz
+        static const uint32_t PREDICTION_FREQ = 100;
+
+        static const size_t QUEUE_MAX_LENGTH = 20;
+        static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+
+        EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+        uint32_t _queueLength;
+
+        FreeRtosTask _task;
+
+        bool _didResetEstimation;
+
+        bool _isFlying;
+
+        // Semaphore to signal that we got data from the stabilizer loop to
+        // process
+        //xSemaphoreHandle _runTaskSemaphore;
+
+        Debugger * _debugger;
+
+        EKF _ekf;
+
+        // Data used to enable the task and stabilizer loop to run with minimal
+        // locking The estimator state produced by the task, copied to the
+        // stabilizer when needed.
+        vehicleState_t _state;
 
         static void runEstimatorTask(void * obj) 
         {

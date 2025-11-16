@@ -112,6 +112,8 @@ class CoreTask {
             // Start serial debugging
             Serial.begin(115200);
 
+            uint32_t nextPredictionMs = millis();
+
             for (uint32_t tick=1; ; tick++) {
 
                 // Sync the core loop to the IMU
@@ -133,6 +135,8 @@ class CoreTask {
                     _estimatorTask->setFlyingStatus(
                             isFlyingCheck(xTaskGetTickCount(), motorvals));
                 }
+
+                nextPredictionMs = _estimatorTask->step(millis(), nextPredictionMs);
 
                 // Get vehicle state from estimator
                 _estimatorTask->getVehicleState(&_vehicleState);
