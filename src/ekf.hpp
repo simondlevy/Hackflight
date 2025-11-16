@@ -40,8 +40,6 @@ class EKF {
 
         };
 
-    public:
-
         typedef enum {
             MeasurementTypeAcceleration,
             MeasurementTypeGyroscope,
@@ -60,6 +58,8 @@ class EKF {
                 flowMeasurement_t flow;
             } data;
         } measurement_t;
+
+    public:
 
         void init(const uint32_t nowMs)
         {
