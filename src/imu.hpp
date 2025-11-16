@@ -41,7 +41,7 @@ class Imu {
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
             if (!device_init(_gscale, _ascale)) {
-                Debugger::setMessage(_debugger, "IMU initialization failed");
+                Debugger::printf(_debugger, "IMU initialization failed");
             }
 
             // Calibrate

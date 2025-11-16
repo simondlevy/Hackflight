@@ -35,7 +35,7 @@ class OpticalFlowTask {
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
             else {
-                Debugger::setMessage(_debugger,
+                Debugger::printf(_debugger,
                         "OpticalFlowTask: device initialization failed.");
             }
         }
@@ -75,7 +75,7 @@ class OpticalFlowTask {
 
                 device_read(deltaX, deltaY, gotMotion);
 
-                Debugger::setMessage(_debugger,
+                Debugger::printf(_debugger,
                         "flowx=%d flowy=%d flowgood=%d",
                         deltaX, deltaY, gotMotion);
 

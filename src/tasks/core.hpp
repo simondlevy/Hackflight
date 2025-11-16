@@ -194,7 +194,7 @@ class CoreTask {
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        Debugger::setMessage(_debugger, "%05d: lost contact", step);
+                        Debugger::printf(_debugger, "%05d: lost contact", step);
                         break;
                 }
             }
@@ -307,7 +307,7 @@ class CoreTask {
         void reportStatus(const uint32_t step, const char * status,
                 const float * motorvals)
         {
-            Debugger::setMessage(_debugger,
+            Debugger::printf(_debugger,
                     "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
                     step, status,
                     motorvals[0], motorvals[1], motorvals[2], motorvals[3]);

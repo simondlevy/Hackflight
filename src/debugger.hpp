@@ -25,7 +25,7 @@ class Debugger {
 
     public:
 
-        static void setMessage(Debugger * debugger, const char * format, ...)
+        static void printf(Debugger * debugger, const char * format, ...)
         {
             if (debugger) {
 
@@ -42,19 +42,16 @@ class Debugger {
                 }
 
                 va_end(args);
-            }
-        }
 
-        void step()
-        {
-            if (_timer.ready(REPORT_FREQ)) {
+                if (debugger->_timer.ready(REPORT_FREQ)) {
 
-                if (*_msg != 0) {
-                    Serial.println(_msg);
-                }
+                    if (*debugger->_msg != 0) {
+                        Serial.println(debugger->_msg);
+                    }
 
-                if (Serial.available() && Serial.read() == 'R') {
-                    Bootloader::jump();
+                    if (Serial.available() && Serial.read() == 'R') {
+                        Bootloader::jump();
+                    }
                 }
             }
         }

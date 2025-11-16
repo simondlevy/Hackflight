@@ -27,7 +27,7 @@ class ZRangerTask {
         void begin(EKF * ekf, Debugger * debugger=nullptr)
         {
             if (!device_init()) {
-                Debugger::setMessage(_debugger,
+                Debugger::printf(_debugger,
                         "ZRangerTask: Failed to initialize zranger");
             }
 
@@ -74,7 +74,7 @@ class ZRangerTask {
 
                 float range = device_read();
 
-                Debugger::setMessage(_debugger, "z=%d", (int)range);
+                Debugger::printf(_debugger, "z=%d", (int)range);
 
                 // check if range is feasible and push into the ekf the
                 // sensor should not be able to measure >5 [m], and outliers
