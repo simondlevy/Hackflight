@@ -48,7 +48,7 @@ class CoreTask {
 
     private:
 
-        static const uint32_t COMMAND_TIMEOUT_TICKS = 1000;
+        static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
         static constexpr float STATE_PHITHETA_MAX = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
         static const Timer::rate_t FLYING_STATUS_FREQ = Timer::FREQ_25_HZ;
@@ -151,7 +151,7 @@ class CoreTask {
 
                 // Check for lost contact
                 if (_command.timestamp > 0 &&
-                        time - _command.timestamp > COMMAND_TIMEOUT_TICKS) {
+                        millis() - _command.timestamp > COMMAND_TIMEOUT_MSEC) {
                     status = STATUS_LOST_CONTACT;
                 }
 
@@ -449,10 +449,12 @@ class CoreTask {
 
                         case MSP_SET_ARMING:
                             command.armed = !command.armed;
+                            command.timestamp = millis();
                             break;
 
                         case MSP_SET_IDLE:
                             command.hovering = false;
+                            command.timestamp = millis();
                             break;
 
                         case MSP_SET_SETPOINT:
@@ -461,6 +463,7 @@ class CoreTask {
                             command.demands.roll = _commandParser.getFloat(1);
                             command.demands.yaw = _commandParser.getFloat(2);
                             command.demands.thrust = _commandParser.getFloat(3);
+                            command.timestamp = millis();
                             break;
 
                         default:
