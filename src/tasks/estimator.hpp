@@ -35,8 +35,6 @@ class EstimatorTask {
             // the stabilizer loop
             _runTaskSemaphore = xSemaphoreCreateBinary();
 
-            _dataMutex = xSemaphoreCreateMutexStatic(&_dataMutexBuffer);
-
             _task.init(runEstimatorTask, "estimator", this, 4);
 
             _ekf.init(millis());
@@ -44,13 +42,7 @@ class EstimatorTask {
 
         void getVehicleState(vehicleState_t * state)
         {
-            // This function is called from the core task. It is important that
-            // this call returns as quickly as possible. The dataMutex must
-            // only be locked short periods by the task.
-            //xSemaphoreTake(_dataMutex, portMAX_DELAY);
             memcpy(state, &_state, sizeof(vehicleState_t));
-            //xSemaphoreGive(_dataMutex);
-
             xSemaphoreGive(_runTaskSemaphore);
         }
 
@@ -112,11 +104,6 @@ class EstimatorTask {
 
         bool _isFlying;
 
-        // Mutex to protect data that is shared between the task and
-        // functions called by the stabilizer loop
-        xSemaphoreHandle _dataMutex;
-        StaticSemaphore_t _dataMutexBuffer;
-
         // Semaphore to signal that we got data from the stabilizer loop to
         // process
         xSemaphoreHandle _runTaskSemaphore;
@@ -167,9 +154,7 @@ class EstimatorTask {
                 _didResetEstimation = true;
             }
 
-            xSemaphoreTake(_dataMutex, portMAX_DELAY);
             _ekf.getVehicleState(_state);
-            xSemaphoreGive(_dataMutex);
 
             return nextPredictionMs;
         }
