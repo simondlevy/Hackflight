@@ -25,10 +25,8 @@ class Estimator {
 
     public:
 
-        void begin(Debugger * debugger=nullptr)
+        void begin()
         {
-            _debugger = debugger;
-
             _ekf.init(millis());
         }
 
@@ -40,6 +38,9 @@ class Estimator {
             enqueue(&m);
 
             // Get state vector angular velocities directly from gyro
+            _dangle.x = gyro->x;     
+            _dangle.y = gyro->y;
+            _dangle.z = -gyro->z; // negate for nose-right positive
             _state.dphi   =  gyro->x;     
             _state.dtheta =  gyro->y;
             _state.dpsi   = -gyro->z; // negate for nose-right positive
@@ -80,7 +81,7 @@ class Estimator {
             // Run the system dynamics to predict the state forward.
             if (nowMs >= nextPredictionMs) {
                 _ekf.predict(nowMs, isFlying); 
-                nextPredictionMs = nowMs + (1000 / PREDICTION_FREQ);
+                nextPredictionMs = nowMs + (1000 / EKF_PREDICTION_FREQ);
             }
 
             // Add process noise every loop, rather than every prediction
@@ -95,21 +96,22 @@ class Estimator {
             _ekf.finalize();
 
             if (!_ekf.isStateWithinBounds()) {
-
                 _didResetEstimation = true;
             }
 
             _ekf.getVehicleState(_state);
-
+            
             memcpy(state, &_state, sizeof(vehicleState_t));
+
+            state->dphi   = _dangle.x;
+            state->dtheta = _dangle.y;
+            state->dpsi   = _dangle.z;
         }
 
     private:
 
-        static const uint32_t WARNING_HOLD_BACK_TIME_MS = 2000;
-
         // this is slower than the IMU update rate of 1000Hz
-        static const uint32_t PREDICTION_FREQ = 100;
+        static const uint32_t EKF_PREDICTION_FREQ = 100;
 
         static const size_t QUEUE_MAX_LENGTH = 20;
         static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
@@ -119,11 +121,11 @@ class Estimator {
 
         bool _didResetEstimation;
 
-        Debugger * _debugger;
-
         EKF _ekf;
 
         vehicleState_t _state;
+
+        axis3_t _dangle;
 
         void enqueue(const EKF::measurement_t * measurement) 
         {
