@@ -64,6 +64,8 @@ class CoreTask {
         // this is slower than the IMU update rate of 1000Hz
         static const uint32_t EKF_PREDICTION_FREQ = 100;
 
+        static constexpr float MAX_VELOCITY = 10; //meters per second
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
@@ -212,23 +214,16 @@ class CoreTask {
                 nextPredictionMs = nowMs + (1000 / EKF_PREDICTION_FREQ);
             }
 
-            // Add process noise every loop, rather than every prediction
-            _ekf->addProcessNoise(nowMs);
-
-            // Pull the latest sensors values of interest; discard the rest
-            _ekf->clearQueue(nowMs);
-
-            _ekf->finalize();
-
-            if (!_ekf->isStateWithinBounds()) {
-                _didResetEstimation = true;
-            }
-
             axis3_t dpos = {};
             axis4_t quat = {};
             axis3_t dangle = {};
 
-            _ekf->getStateEstimate(_vehicleState.z, dpos, dangle, quat);
+            _ekf->getStateEstimate(nowMs, _vehicleState.z, dpos, dangle, quat);
+
+            if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
+                    !velInBounds(dpos.z)) {
+                _didResetEstimation = true;
+            }
 
             _vehicleState.dx = dpos.x;
             _vehicleState.dy = -dpos.y; // negate for rightward positive
@@ -246,6 +241,11 @@ class CoreTask {
             _vehicleState.dpsi   = -dangle.z; // negate for nose-right positive
 
             return nextPredictionMs;
+        }
+
+        static bool velInBounds(const float vel)
+        {
+            return fabs(vel) < MAX_VELOCITY;
         }
 
  
