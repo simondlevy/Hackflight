@@ -19,7 +19,7 @@
 #include <__control__.hpp>
 #include <__messages__.h>
 #include <debugger.hpp>
-#include <estimator.hpp>
+#include <ekf.hpp>
 #include <imu.hpp>
 #include <msp/parser.hpp>
 #include <task.hpp>
@@ -31,17 +31,17 @@ class CoreTask {
     public:
 
         void begin(
-                Estimator * estimator,
+                EKF * ekf,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 Debugger * debugger=nullptr)
         {
-            _estimator = estimator;
+            _ekf = ekf;
             _debugger = debugger;
             _motorCount = motorCount;
             _mixFun = mixFun;
 
-            _imu.begin(estimator);
+            _imu.begin(ekf);
 
             _task.init(runCoreTask, "core", this, 5);
         }
@@ -61,6 +61,9 @@ class CoreTask {
 
         static constexpr float COMMS_FREQ = 100;
 
+        // this is slower than the IMU update rate of 1000Hz
+        static const uint32_t EKF_PREDICTION_FREQ = 100;
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
@@ -79,9 +82,11 @@ class CoreTask {
         mixFun_t _mixFun;
         FreeRtosTask _task;
         Debugger * _debugger;
-        Estimator * _estimator;
+        EKF * _ekf;
         Imu _imu;
         vehicleState_t _vehicleState;
+
+        bool _didResetEstimation;
 
         uint8_t _motorCount;
 
@@ -132,13 +137,13 @@ class CoreTask {
                 static command_t _command;
                 runCommandParser(_command);
 
-                // Periodically update estimator with flying status
+                // Periodically update ekf with flying status
                 if (Timer::rateDoExecute(FLYING_STATUS_FREQ, step)) {
                     isFlying = isFlyingCheck(xTaskGetTickCount(), motorvals);
                 }
 
-                // Run estimator to get vehicle state
-                _estimator->step(millis(), isFlying, nextPredictionMs, &_vehicleState);
+                // Run ekf to get vehicle state
+                nextPredictionMs = runEkf(isFlying, nextPredictionMs);
 
                 // Check for lost contact
                 if (_command.timestamp > 0 &&
@@ -192,6 +197,58 @@ class CoreTask {
             }
         }
 
+        uint32_t runEkf(const bool isFlying, uint32_t nextPredictionMs)
+        {
+            const uint32_t nowMs = millis();
+
+            if (_didResetEstimation) {
+                _ekf->init(nowMs);
+               _didResetEstimation = false;
+            }
+
+            // Run the system dynamics to predict the state forward.
+            if (nowMs >= nextPredictionMs) {
+                _ekf->predict(nowMs, isFlying); 
+                nextPredictionMs = nowMs + (1000 / EKF_PREDICTION_FREQ);
+            }
+
+            // Add process noise every loop, rather than every prediction
+            _ekf->addProcessNoise(nowMs);
+
+            // Pull the latest sensors values of interest; discard the rest
+            _ekf->clearQueue(nowMs);
+
+            _ekf->finalize();
+
+            if (!_ekf->isStateWithinBounds()) {
+                _didResetEstimation = true;
+            }
+
+            axis3_t dpos = {};
+            axis4_t quat = {};
+            axis3_t dangle = {};
+
+            _ekf->getStateEstimate(_vehicleState.z, dpos, dangle, quat);
+
+            _vehicleState.dx = dpos.x;
+            _vehicleState.dy = -dpos.y; // negate for rightward positive
+            _vehicleState.dz = dpos.z;
+
+            axis3_t angles = {};
+            Num::quat2euler(quat, angles);
+
+            _vehicleState.phi = angles.x;
+            _vehicleState.theta = angles.y;
+            _vehicleState.psi = -angles.z; // negate for nose-right positive
+            
+            _vehicleState.dphi   = dangle.x;
+            _vehicleState.dtheta = dangle.y;
+            _vehicleState.dpsi   = -dangle.z; // negate for nose-right positive
+
+            return nextPredictionMs;
+        }
+
+ 
         void runClosedLoopAndMixer(
                 const uint32_t step, const command_t &command,
                 demands_t & demands, float *motorvals)

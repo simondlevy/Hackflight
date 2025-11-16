@@ -17,18 +17,16 @@
 #pragma once
 
 #include <debugger.hpp>
-#include <estimator.hpp>
+#include <ekf.hpp>
 #include <task.hpp>
 
 class OpticalFlowTask {
 
     public:
 
-        void begin(
-                Estimator * estimator,
-                Debugger * debugger=nullptr)
+        void begin(EKF * ekf, Debugger * debugger=nullptr)
         {
-            _estimator = estimator;
+            _ekf = ekf;
 
             _debugger = debugger;
 
@@ -59,7 +57,7 @@ class OpticalFlowTask {
 
         FreeRtosTask _task;
 
-        Estimator * _estimator;
+        EKF * _ekf;
 
         Debugger * _debugger;
 
@@ -105,10 +103,10 @@ class OpticalFlowTask {
                     flowData.dpixelx = (float)accpx;
                     flowData.dpixely = (float)accpy;
 
-                    // Push measurements into the estimator if flow is not disabled
+                    // Push measurements into the ekf if flow is not disabled
                     //    and the PMW flow sensor indicates motion detection
                     if (!USE_FLOW_DISABLED && gotMotion) {
-                        _estimator->enqueueFlow(&flowData);
+                        _ekf->enqueueFlow(&flowData);
                     }
                 }
             }        

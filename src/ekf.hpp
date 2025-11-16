@@ -1,7 +1,5 @@
 /**
- * Authored by Michael Hamer (http://www.mikehamer.info), June 2016
- * Thank you to Mark Mueller (www.mwm.im) for advice during implementation,
- * and for derivation of the original filter in the below-cited paper.
+ * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,35 +12,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * ============================================================================
- *
- * The Kalman filter implemented in this file is based on the papers:
- *
- * @INPROCEEDINGS{MuellerHamerUWB2015,
- * author = {Mueller, Mark W and Hamer, Michael and D’Andrea, Raffaello},
- * title  = {Fusing ultra-wideband range measurements with accelerometers and rate 
- * gyroscopes for quadrocopter state estimation},
- * booktitle = {2015 IEEE International Conference on Robotics and Automation (ICRA)},
- * year   = {2015},
- * month  = {May},
- * pages  = {1730-1736},
- * doi    = {10.1109/ICRA.2015.7139421},
- * ISSN   = {1050-4729}}
- *
- * @ARTICLE{MuellerCovariance2016,
- * author={Mueller, Mark W and Hehn, Markus and D’Andrea, Raffaello},
- * title={Covariance Correction Step for Kalman Filtering with an Attitude},
- * journal={Journal of Guidance, Control, and Dynamics},
- * pages={1--7},
- * year={2016},
- * publisher={American Institute of Aeronautics and Astronautics}}
  */
 
 #pragma once
 
 #include <datatypes.h>
 #include <matrix_typedef.h>
+#include <num.hpp>
 
 class EKF { 
 
@@ -88,7 +64,7 @@ class EKF {
         void init(const uint32_t nowMs)
         {
             axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
-            axis3fSubSamplerInit(&_gyroSubSampler, DEGREES_TO_RADIANS);
+            axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
 
             ekf_init();
 
@@ -324,6 +300,14 @@ class EKF {
             }
         }
 
+        void clearQueue(const uint32_t nowMs)
+        {
+            for (uint32_t k=0; k<_queueLength; ++k) {
+                update(_measurementsQueue[k], nowMs);
+            }
+            _queueLength = 0;
+        }
+
         void update(measurement_t & m, const uint32_t nowMs)
         {
             switch (m.type) {
@@ -432,7 +416,7 @@ class EKF {
             return true;
         }
 
-        void getStateEstimate(float & z, axis3_t & dpos, axis4_t & quat)
+        void getStateEstimate(float & z, axis3_t & dpos, axis3_t & dangle, axis4_t & quat)
         {
             z = _x[STATE_Z];
 
@@ -440,13 +424,65 @@ class EKF {
             dpos.y = _r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ];
             dpos.z = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
 
+            dangle.x = _dangle.x;
+            dangle.y = _dangle.y;
+            dangle.z = _dangle.z;
+
             quat.w = _q0;
             quat.x = _q1;
             quat.y = _q2;
             quat.z = _q3;
         }
 
+        void enqueueImu(const axis3_t * gyro, const axis3_t * accel)
+        {
+            measurement_t m = {};
+            m.type = MeasurementTypeGyroscope;
+            m.data.gyroscope.gyro = *gyro;
+            enqueue(&m);
+
+            // Get state vector angular velocities directly from gyro
+            _dangle.x = gyro->x;     
+            _dangle.y = gyro->y;
+            _dangle.z = gyro->z; // negate for nose-right positive
+
+            m = {};
+            m.type = MeasurementTypeAcceleration;
+            m.data.acceleration.acc = *accel;
+            enqueue(&m);
+        }
+
+        void enqueueFlow(const flowMeasurement_t * flow)
+        {
+            measurement_t m = {};
+            m.type = MeasurementTypeFlow;
+            m.data.flow = *flow;
+            enqueue(&m);
+        }
+
+        void enqueueRange(const tofMeasurement_t * tof)
+        {
+            measurement_t m = {};
+            m.type = MeasurementTypeTOF;
+            m.data.tof = *tof;
+            enqueue(&m);
+        }
+
     private:
+
+        axis3_t _dangle;
+
+        static const size_t QUEUE_MAX_LENGTH = 20;
+        static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+        EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+        uint32_t _queueLength;
+
+        void enqueue(const EKF::measurement_t * measurement) 
+        {
+            memcpy(&_measurementsQueue[_queueLength], measurement,
+                    sizeof(EKF::measurement_t));
+            _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
+        }
 
         // Initial variances, uncertain of position, but know we're
         // stationary and roughly flat
@@ -465,9 +501,6 @@ class EKF {
         static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
 
         static constexpr float GRAVITY = 9.81;
-
-        static constexpr float DEGREES_TO_RADIANS = PI / 180.0f;
-        static constexpr float RADIANS_TO_DEGREES = 180.0f / PI;
 
         //We do get the measurements in 10x the motion pixels (experimentally measured)
         static constexpr float FLOW_RESOLUTION = 0.1;
@@ -558,7 +591,7 @@ class EKF {
             // [pixels] (same in x and y)
             float Npix = 35.0;                      
 
-            //float thetapix = DEGREES_TO_RADIANS * 4.0f;
+            //float thetapix = Num::DEG2RAD * 4.0f;
             // [rad]    (same in x and y)
             // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
             // corresponding ground length
@@ -566,8 +599,8 @@ class EKF {
 
             //~~~ Body rates ~~~
             // TODO check if this is feasible or if some filtering has to be done
-            float omegax_b = gyro->x * DEGREES_TO_RADIANS;
-            float omegay_b = gyro->y * DEGREES_TO_RADIANS;
+            float omegax_b = gyro->x * Num::DEG2RAD;
+            float omegay_b = gyro->y * Num::DEG2RAD;
 
 
             float dx_g = _x[STATE_VX];
@@ -625,7 +658,7 @@ class EKF {
             if (fabs(_r22) > 0.1f && _r22 > 0) {
                 float angle = 
                     fabsf(acosf(_r22)) - 
-                    DEGREES_TO_RADIANS * (15.0f / 2.0f);
+                    Num::DEG2RAD * (15.0f / 2.0f);
                 if (angle < 0.0f) {
                     angle = 0.0f;
                 }

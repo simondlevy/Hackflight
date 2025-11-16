@@ -27,7 +27,6 @@ class Num {
     public:
 
         static constexpr float RAD2DEG = 180.0f / M_PI;
-
         static constexpr float DEG2RAD = M_PI / 180.0f;
 
         /* Half precision floating point **********************************************

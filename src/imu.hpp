@@ -17,7 +17,7 @@
 
 #include <datatypes.h>
 #include <debugger.hpp>
-#include <estimator.hpp>
+#include <ekf.hpp>
 #include <lpf.hpp>
 #include <num.hpp>
 #include <timer.hpp>
@@ -31,10 +31,9 @@ class Imu {
 
     public:
 
-        void begin(Estimator * estimator,
-                Debugger * debugger=nullptr)
+        void begin(EKF * ekf, Debugger * debugger=nullptr)
         {
-            _estimator = estimator;
+            _ekf = ekf;
 
             _debugger = debugger;
 
@@ -100,8 +99,7 @@ class Imu {
 
             applyLpf(_accLpf, &_accelData);
 
-            _estimator->enqueueImu(&_gyroData, &_accelData);
-
+            _ekf->enqueueImu(&_gyroData, &_accelData);
         }
 
     private:
@@ -178,7 +176,7 @@ class Imu {
 
         bias_t _gyroBiasRunning;
 
-        Estimator * _estimator;
+        EKF * _ekf;
 
         Debugger * _debugger;
 

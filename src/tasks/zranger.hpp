@@ -17,21 +17,21 @@
 #pragma once
 
 #include <debugger.hpp>
-#include <estimator.hpp>
+#include <ekf.hpp>
 #include <task.hpp>
 
 class ZRangerTask {
 
     public:
 
-        void begin(Estimator * estimator, Debugger * debugger=nullptr)
+        void begin(EKF * ekf, Debugger * debugger=nullptr)
         {
             if (!device_init()) {
                 Debugger::setMessage(_debugger,
                         "ZRangerTask: Failed to initialize zranger");
             }
 
-            _estimator = estimator;
+            _ekf = ekf;
             _debugger = debugger;
 
             _task.init(runZrangerTask, "zranger2", this, 2);
@@ -62,7 +62,7 @@ class ZRangerTask {
 
         float _expCoeff;
 
-        Estimator * _estimator;
+        EKF * _ekf;
 
         Debugger * _debugger;
 
@@ -78,7 +78,7 @@ class ZRangerTask {
 
                 Debugger::setMessage(_debugger, "z=%d", (int)range);
 
-                // check if range is feasible and push into the estimator the
+                // check if range is feasible and push into the ekf the
                 // sensor should not be able to measure >5 [m], and outliers
                 // typically occur as >8 [m] measurements
                 if (range < OUTLIER_LIMIT_MM) {
@@ -92,7 +92,7 @@ class ZRangerTask {
                     tofData.distance = distance;
                     tofData.stdDev = stdDev;
 
-                    _estimator->enqueueRange(&tofData);
+                    _ekf->enqueueRange(&tofData);
                 }
             }
         }
