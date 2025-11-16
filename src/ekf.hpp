@@ -22,43 +22,6 @@
 
 class EKF { 
 
-    private:
-
-        // Indexes to access the vehicle's state, stored as a column vector
-        enum
-        {
-            STATE_X,
-            STATE_Y,
-            STATE_Z,
-            STATE_VX,
-            STATE_VY,
-            STATE_VZ,
-            STATE_D0,
-            STATE_D1,
-            STATE_D2,
-            STATE_DIM
-
-        };
-
-        typedef enum {
-            MeasurementTypeAcceleration,
-            MeasurementTypeGyroscope,
-            MeasurementTypeTOF,
-            MeasurementTypeFlow,
-        } MeasurementType;
-
-        typedef struct
-        {
-            MeasurementType type;
-            union
-            {
-                gyroscopeMeasurement_t gyroscope;
-                accelerationMeasurement_t acceleration;
-                tofMeasurement_t tof;
-                flowMeasurement_t flow;
-            } data;
-        } measurement_t;
-
     public:
 
         void init(const uint32_t nowMs)
@@ -341,6 +304,42 @@ class EKF {
         }
 
     private:
+
+        // Indexes to access the vehicle's state, stored as a column vector
+        enum
+        {
+            STATE_X,
+            STATE_Y,
+            STATE_Z,
+            STATE_VX,
+            STATE_VY,
+            STATE_VZ,
+            STATE_D0,
+            STATE_D1,
+            STATE_D2,
+            STATE_DIM
+
+        };
+
+        typedef enum {
+            MeasurementTypeAcceleration,
+            MeasurementTypeGyroscope,
+            MeasurementTypeTOF,
+            MeasurementTypeFlow,
+        } MeasurementType;
+
+        typedef struct
+        {
+            MeasurementType type;
+            union
+            {
+                gyroscopeMeasurement_t gyroscope;
+                accelerationMeasurement_t acceleration;
+                tofMeasurement_t tof;
+                flowMeasurement_t flow;
+            } data;
+        } measurement_t;
+
 
         axis3_t _dangle;
 
