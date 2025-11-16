@@ -95,11 +95,13 @@ class Imu {
             axis3_t accelScaled = {};
             alignToAirframe(&accel, &accelScaled);
 
-            accAlignToGravity(&accelScaled, &_accelData);
+            axis3_t accelGs = {};
 
-            applyLpf(_accLpf, &_accelData);
+            accAlignToGravity(&accelScaled, &accelGs);
 
-            _ekf->enqueueImu(&_gyroData, &_accelData);
+            applyLpf(_accLpf, &accelGs);
+
+            _ekf->enqueueImu(&_gyroData, &accelGs);
         }
 
     private:
@@ -143,7 +145,6 @@ class Imu {
 
         } bias_t;
 
-        axis3_t _accelData;   // Gs
         axis3_t _gyroData;  // deg/s
 
         static void calculateVarianceAndMean(
