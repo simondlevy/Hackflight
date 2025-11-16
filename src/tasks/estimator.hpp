@@ -47,9 +47,9 @@ class EstimatorTask {
             // This function is called from the core task. It is important that
             // this call returns as quickly as possible. The dataMutex must
             // only be locked short periods by the task.
-            xSemaphoreTake(_dataMutex, portMAX_DELAY);
+            //xSemaphoreTake(_dataMutex, portMAX_DELAY);
             memcpy(state, &_state, sizeof(vehicleState_t));
-            xSemaphoreGive(_dataMutex);
+            //xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
         }
