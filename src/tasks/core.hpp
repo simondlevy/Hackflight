@@ -48,19 +48,20 @@ class CoreTask {
 
     private:
 
-        static const uint8_t TASK_PRIORITY = 5;
-        static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
-        static constexpr float STATE_PHITHETA_MAX = 30;
-        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const Timer::rate_t FLYING_STATUS_FREQ = Timer::FREQ_25_HZ;
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-        static const auto CLOSED_LOOP_UPDATE_FREQ = Timer::FREQ_500_HZ;
+        static constexpr float FLYING_STATUS_FREQ = 25;
+        static constexpr float CORE_FREQ = 1000;
+        static constexpr float COMMS_FREQ = 100;
 
         static constexpr float LED_HEARTBEAT_FREQ = 1;
         static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
         static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
 
-        static constexpr float COMMS_FREQ = 100;
+        static const uint8_t TASK_PRIORITY = 5;
+        static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
+        static constexpr float STATE_PHITHETA_MAX = 30;
+        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
+        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+        static const auto CLOSED_LOOP_UPDATE_FREQ = 500;
 
         // this is slower than the IMU update rate of 1000Hz
         static const uint32_t EKF_PREDICTION_FREQ = 100;
@@ -126,13 +127,13 @@ class CoreTask {
 
             Timer flyingStatusTimer = {};
 
-            for (uint32_t step=1; ; step++) {
+            while (true) {
 
                 const uint32_t msec = millis() - msec_start;
 
                 // Sync the core loop to the IMU
                 const bool imuIsCalibrated = _imu.step(_ekf, msec);
-                FreeRtosTask::wait(Timer::CORE_FREQ);
+                FreeRtosTask::wait(CORE_FREQ);
 
                 // Set the LED based on current status
                 runLed(imuIsCalibrated, status);
@@ -177,7 +178,7 @@ class CoreTask {
                         break;
 
                     case STATUS_HOVERING:
-                        runClosedLoopAndMixer(step, command, vehicleState,
+                        runClosedLoopAndMixer(command, vehicleState,
                                 status, closedLoopControl, demands, motorvals);
                         if (!command.hovering) {
                             status = STATUS_LANDING;
@@ -185,13 +186,12 @@ class CoreTask {
                         break;
 
                     case STATUS_LANDING:
-                        runClosedLoopAndMixer(step, command, vehicleState,
+                        runClosedLoopAndMixer(command, vehicleState,
                                 status, closedLoopControl, demands, motorvals);
                         break;
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        Debugger::printf(_debugger, "%05d: lost contact", step);
                         break;
                 }
             }
@@ -251,7 +251,6 @@ class CoreTask {
         }
 
         void runClosedLoopAndMixer(
-                const uint32_t step,
                 const command_t &command,
                 const vehicleState_t & state,
                 status_t & status,
@@ -259,9 +258,11 @@ class CoreTask {
                 demands_t & demands,
                 float *motorvals)
         {
-            if (Timer::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, step)) {
+            static Timer _timer;
 
-                control.run(step, 1.f / CLOSED_LOOP_UPDATE_FREQ,
+            if (_timer.ready(CLOSED_LOOP_UPDATE_FREQ)) {
+
+                control.run(1.f / CLOSED_LOOP_UPDATE_FREQ,
                         command.hovering, state, command.demands,
                         demands);
 

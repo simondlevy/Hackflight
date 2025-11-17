@@ -60,7 +60,6 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
         demands_t demands = {};
 
         _closedLoopControl.run(
-                0, // step, unused
                 1 / (float)PID_UPDATE_RATE,
                 siminfo.hovering,
                 state,

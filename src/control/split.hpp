@@ -30,28 +30,28 @@ class ClosedLoopControl {
 
     private:
 
-        static const Timer::rate_t SLOW_RATE = Timer::RATE_50_HZ;
+        static constexpr float SLOW_FREQ = 50;
 
     public:
 
         void run(
-                const uint32_t step,
                 const float dt,
                 const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
                 demands_t & demands)
         {
-            static float climbrate;
+            static float _climbrate;
+            static Timer _timer;
 
-            if (Timer::rateDoExecute(SLOW_RATE, step)) {
+            if (_timer.ready(SLOW_FREQ)) {
 
-                climbrate = AltitudeController::run(hovering,
+                _climbrate = AltitudeController::run(hovering,
                         dt, vehicleState.z, openLoopDemands.thrust);
             }
 
             demands.thrust = ClimbRateController::run( hovering, dt,
-                    vehicleState.z, vehicleState.dz, climbrate);
+                    vehicleState.z, vehicleState.dz, _climbrate);
 
             const auto airborne = demands.thrust > 0;
 

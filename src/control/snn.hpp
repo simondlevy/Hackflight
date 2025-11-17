@@ -29,14 +29,12 @@ class ClosedLoopControl {
     public:
 
         void run(
-                const uint32_t step,
                 const float dt,
                 const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
                 demands_t & demands)
         {
-            (void)step;
             _helper.run(dt, hovering, vehicleState, openLoopDemands, demands); 
         }
 

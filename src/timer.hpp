@@ -35,22 +35,6 @@ class Timer {
 
             return false;
         }
-
-        // Permitted frequencies
-        typedef enum {
-            FREQ_25_HZ   = 25,
-            FREQ_50_HZ   = 50,
-            FREQ_100_HZ  = 100,
-            FREQ_500_HZ  = 500,
-            FREQ_1000_HZ = 1000
-        } rate_t ;
-
-        static const rate_t CORE_FREQ = FREQ_1000_HZ;
-
-        static bool rateDoExecute(const rate_t rate, const uint32_t tick)
-        {
-            return (tick % (CORE_FREQ / rate)) == 0;
-        }    
     
     private:
 
