@@ -80,23 +80,13 @@ class CoreTask {
             ((CoreTask *)arg)->run();
         }
 
-        ClosedLoopControl _closedLoopControl;
-        mixFun_t _mixFun;
         FreeRtosTask _task;
+
         Debugger * _debugger;
+        mixFun_t _mixFun;
+        uint8_t _motorCount;
         EKF * _ekf;
         Imu _imu;
-        vehicleState_t _vehicleState;
-
-        bool _didResetEstimation;
-
-        uint8_t _motorCount;
-
-        Timer _ledTimer;
-
-        Timer _loggingTimer;
-
-        Timer _commandTimer;
 
         void run()
         {
@@ -125,6 +115,14 @@ class CoreTask {
 
             bool isFlying = false;
 
+            ClosedLoopControl closedLoopControl  = {};
+
+            vehicleState_t vehicleState = {};
+
+            command_t command = {};
+
+            bool didResetEstimation = false;
+
             for (uint32_t step=1; ; step++) {
 
                 const uint32_t time = millis() - msec_start;
@@ -137,11 +135,10 @@ class CoreTask {
                 runLed(status);
 
                 // Run logging
-                runLogger();
+                runLogger(vehicleState, closedLoopControl);
 
                 // Get command
-                static command_t _command;
-                runCommandParser(_command);
+                runCommandParser(command);
 
                 // Periodically update ekf with flying status
                 if (Timer::rateDoExecute(FLYING_STATUS_FREQ, step)) {
@@ -149,45 +146,44 @@ class CoreTask {
                 }
 
                 // Run ekf to get vehicle state
-                nextPredictionMs = getStateEstimate(isFlying, nextPredictionMs);
+                getStateEstimate(isFlying, vehicleState, nextPredictionMs,
+                        didResetEstimation);
 
                 // Check for lost contact
-                if (_command.timestamp > 0 &&
-                        millis() - _command.timestamp > COMMAND_TIMEOUT_MSEC) {
+                if (command.timestamp > 0 &&
+                        millis() - command.timestamp > COMMAND_TIMEOUT_MSEC) {
                     status = STATUS_LOST_CONTACT;
                 }
 
                 switch (status) {
 
                     case STATUS_IDLE:
-                        if (_command.armed && isSafeAngle(_vehicleState.phi) &&
-                                isSafeAngle(_vehicleState.theta)) {
+                        if (command.armed && isSafeAngle(vehicleState.phi) &&
+                                isSafeAngle(vehicleState.theta)) {
                             status = STATUS_ARMED;
                         }
                         runMotors(motorvals);
                         break;
 
                     case STATUS_ARMED:
-                        checkDisarm(_command, status, motorvals);
-                        if (_command.hovering) {
+                        checkDisarm(command, status, motorvals);
+                        if (command.hovering) {
                             status = STATUS_HOVERING;
                         }
                         runMotors(motorvals);
                         break;
 
                     case STATUS_HOVERING:
-                        runClosedLoopAndMixer(step, _command,
-                                demands, motorvals);
-                        checkDisarm(_command, status, motorvals);
-                        if (!_command.hovering) {
+                        runClosedLoopAndMixer(step, command, vehicleState,
+                                status, closedLoopControl, demands, motorvals);
+                        if (!command.hovering) {
                             status = STATUS_LANDING;
                         }
                         break;
 
                     case STATUS_LANDING:
-                        runClosedLoopAndMixer(step, _command,
-                                demands, motorvals);
-                        checkDisarm(_command, status, motorvals);
+                        runClosedLoopAndMixer(step, command, vehicleState,
+                                status, closedLoopControl, demands, motorvals);
                         break;
 
                     case STATUS_LOST_CONTACT:
@@ -198,14 +194,17 @@ class CoreTask {
             }
         }
 
-        uint32_t getStateEstimate(
-                const bool isFlying, uint32_t nextPredictionMs)
+        void getStateEstimate(
+                const bool isFlying,
+                vehicleState_t & state,
+                uint32_t & nextPredictionMs,
+                bool & didResetEstimation)
         {
             const uint32_t nowMs = millis();
 
-            if (_didResetEstimation) {
+            if (didResetEstimation) {
                 _ekf->init(nowMs);
-               _didResetEstimation = false;
+               didResetEstimation = false;
             }
 
             // Run the system dynamics to predict the state forward.
@@ -217,32 +216,30 @@ class CoreTask {
             axis3_t dpos = {};
             axis4_t quat = {};
 
-            _ekf->getStateEstimate(nowMs, _vehicleState.z, dpos, quat);
+            _ekf->getStateEstimate(nowMs, state.z, dpos, quat);
 
             if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
                     !velInBounds(dpos.z)) {
-                _didResetEstimation = true;
+                didResetEstimation = true;
             }
 
-            _vehicleState.dx = dpos.x;
-            _vehicleState.dy = -dpos.y; // negate for rightward positive
-            _vehicleState.dz = dpos.z;
+            state.dx = dpos.x;
+            state.dy = -dpos.y; // negate for rightward positive
+            state.dz = dpos.z;
 
             axis3_t angles = {};
             Num::quat2euler(quat, angles);
 
-            _vehicleState.phi = angles.x;
-            _vehicleState.theta = angles.y;
-            _vehicleState.psi = -angles.z; // negate for nose-right positive
+            state.phi = angles.x;
+            state.theta = angles.y;
+            state.psi = -angles.z; // negate for nose-right positive
 
             // Get angular velocities directly from gyro
             axis3_t gyroData = {};
             _imu.getGyroData(gyroData);
-            _vehicleState.dphi   = gyroData.x;
-            _vehicleState.dtheta = gyroData.y;
-            _vehicleState.dpsi   = -gyroData.z; // negate for nose-right positive
-
-            return nextPredictionMs;
+            state.dphi   = gyroData.x;
+            state.dtheta = gyroData.y;
+            state.dpsi   = -gyroData.z; // negate for nose-right positive
         }
 
         static bool velInBounds(const float vel)
@@ -250,20 +247,26 @@ class CoreTask {
             return fabs(vel) < MAX_VELOCITY;
         }
 
- 
         void runClosedLoopAndMixer(
-                const uint32_t step, const command_t &command,
-                demands_t & demands, float *motorvals)
+                const uint32_t step,
+                const command_t &command,
+                const vehicleState_t & state,
+                status_t & status,
+                ClosedLoopControl & control,
+                demands_t & demands,
+                float *motorvals)
         {
             if (Timer::rateDoExecute(CLOSED_LOOP_UPDATE_FREQ, step)) {
 
-                _closedLoopControl.run(step, 1.f / CLOSED_LOOP_UPDATE_FREQ,
-                        command.hovering, _vehicleState, command.demands,
+                control.run(step, 1.f / CLOSED_LOOP_UPDATE_FREQ,
+                        command.hovering, state, command.demands,
                         demands);
 
                 runMixer(_mixFun, demands, motorvals);
 
                 runMotors(motorvals);
+
+                checkDisarm(command, status, motorvals);
             }
         }
 
@@ -342,29 +345,32 @@ class CoreTask {
             return result;
         }        
 
-        void runLogger()
+        void runLogger(const vehicleState_t & state,
+                ClosedLoopControl & control)
         {
-            if (_loggingTimer.ready(COMMS_FREQ)) {
-                sendVehicleState();
-                sendClosedLoopControlMessage();
+            static Timer _timer;
+
+            if (_timer.ready(COMMS_FREQ)) {
+                sendVehicleState(state);
+                sendClosedLoopControlMessage(control);
             }
         }
 
-        void sendVehicleState()
+        void sendVehicleState(const vehicleState_t & state)
         {
             MspSerializer serializer = {};
 
             const float statevals[10] = {
-                _vehicleState.dx,
-                _vehicleState.dy,
-                _vehicleState.z,
-                _vehicleState.dz,
-                _vehicleState.phi,
-                _vehicleState.dphi,
-                _vehicleState.theta,
-                _vehicleState.dtheta,
-                _vehicleState.psi,
-                _vehicleState.dpsi
+                state.dx,
+                state.dy,
+                state.z,
+                state.dz,
+                state.phi,
+                state.dphi,
+                state.theta,
+                state.dtheta,
+                state.psi,
+                state.dpsi
             };
 
             serializer.serializeFloats(MSP_STATE, statevals, 10);
@@ -372,11 +378,11 @@ class CoreTask {
             sendPayload(serializer);
         }
 
-        void sendClosedLoopControlMessage()
+        void sendClosedLoopControlMessage(ClosedLoopControl & control)
         {
             MspSerializer serializer = {};
 
-            _closedLoopControl.serializeMessage(serializer);
+            control.serializeMessage(serializer);
 
             sendPayload(serializer);
         }
@@ -386,7 +392,7 @@ class CoreTask {
                 comms_write_byte(serializer.payload[k]);
             }
         }
- 
+
         void runLed(const status_t status)
         {
             const uint32_t msec_curr = millis();
@@ -407,34 +413,37 @@ class CoreTask {
 
         void blinkLed(const uint32_t msec_curr, const float freq)
         {
-            static bool pulsing;
-            static uint32_t pulse_start;
+            static bool _pulsing;
+            static uint32_t _pulse_start;
+            static Timer _timer;
 
-            if (_ledTimer.ready(freq)) {
+            if (_timer.ready(freq)) {
                 led_set(true);
-                pulsing = true;
-                pulse_start = msec_curr;
+                _pulsing = true;
+                _pulse_start = msec_curr;
             }
 
-            else if (pulsing) {
-                if (millis() - pulse_start > LED_PULSE_DURATION_MSEC) {
+            else if (_pulsing) {
+                if (millis() - _pulse_start > LED_PULSE_DURATION_MSEC) {
                     led_set(false);
-                    pulsing = false;
+                    _pulsing = false;
                 }
             }
         }
 
         void runCommandParser(command_t & command)
         {
-            if (_commandTimer.ready(COMMS_FREQ)) {
+            static Timer _timer;
 
-                static MspParser _commandParser;
+            if (_timer.ready(COMMS_FREQ)) {
+
+                static MspParser commandParser;
 
                 uint8_t byte = 0;
 
                 while (comms_read_byte(&byte)) {
 
-                    switch (_commandParser.parse(byte)) {
+                    switch (commandParser.parse(byte)) {
 
                         case MSP_SET_ARMING:
                             command.armed = !command.armed;
@@ -448,10 +457,10 @@ class CoreTask {
 
                         case MSP_SET_SETPOINT:
                             command.hovering = true;
-                            command.demands.pitch = _commandParser.getFloat(0);
-                            command.demands.roll = _commandParser.getFloat(1);
-                            command.demands.yaw = _commandParser.getFloat(2);
-                            command.demands.thrust = _commandParser.getFloat(3);
+                            command.demands.pitch = commandParser.getFloat(0);
+                            command.demands.roll = commandParser.getFloat(1);
+                            command.demands.yaw = commandParser.getFloat(2);
+                            command.demands.thrust = commandParser.getFloat(3);
                             command.timestamp = millis();
                             break;
 
