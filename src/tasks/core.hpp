@@ -127,7 +127,7 @@ class CoreTask {
 
             for (uint32_t step=1; ; step++) {
 
-                const uint32_t time = millis() - msec_start; // xTaskGetTickCount();
+                const uint32_t time = millis() - msec_start;
 
                 // Sync the core loop to the IMU
                 _imu.step(time);
