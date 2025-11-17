@@ -41,7 +41,7 @@ class CoreTask {
             _motorCount = motorCount;
             _mixFun = mixFun;
 
-            _imu.begin(ekf);
+            _imu.init();
 
             _task.init(runCoreTask, "core", this, TASK_PRIORITY);
         }
@@ -124,16 +124,18 @@ class CoreTask {
 
             bool didResetEstimation = false;
 
+            Timer flyingStatusTimer = {};
+
             for (uint32_t step=1; ; step++) {
 
-                const uint32_t time = millis() - msec_start;
+                const uint32_t msec = millis() - msec_start;
 
                 // Sync the core loop to the IMU
-                _imu.step(time);
+                const bool imuIsCalibrated = _imu.step(_ekf, msec);
                 FreeRtosTask::wait(Timer::CORE_FREQ);
 
                 // Set the LED based on current status
-                runLed(status);
+                runLed(imuIsCalibrated, status);
 
                 // Run logging
                 runLogger(vehicleState, closedLoopControl);
@@ -142,8 +144,8 @@ class CoreTask {
                 runCommandParser(command);
 
                 // Periodically update ekf with flying status
-                if (Timer::rateDoExecute(FLYING_STATUS_FREQ, step)) {
-                    isFlying = isFlyingCheck(time, motorvals);
+                if (flyingStatusTimer.ready(FLYING_STATUS_FREQ)) {
+                    isFlying = isFlyingCheck(msec, motorvals);
                 }
 
                 // Run ekf to get vehicle state
@@ -394,11 +396,11 @@ class CoreTask {
             }
         }
 
-        void runLed(const status_t status)
+        void runLed(const bool imuIsCalibrated, const status_t status)
         {
             const uint32_t msec_curr = millis();
 
-            if (!_imu.isCalibrated()) {
+            if (!imuIsCalibrated) {
                 blinkLed(msec_curr, LED_IMU_CALIBRATING_FREQ);
             }
 

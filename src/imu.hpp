@@ -31,15 +31,11 @@ class Imu {
 
     public:
 
-        void begin(EKF * ekf, Debugger * debugger=nullptr)
+        void init()
         {
             if (!device_init(_gscale, _ascale)) {
                 Debugger::error("IMU");
             }
-
-            _ekf = ekf;
-
-            _debugger = debugger;
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -55,12 +51,7 @@ class Imu {
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
         }
 
-        bool isCalibrated()
-        {
-            return _gyroBiasFound;
-        }
-
-        void step(const uint32_t tickCount)
+        bool step(EKF * ekf, const uint32_t tickCount)
         {
             Axis3i16 gyroRaw = {};
             Axis3i16 accelRaw = {};
@@ -101,7 +92,9 @@ class Imu {
 
             applyLpf(_accLpf, &accelGs);
 
-            _ekf->enqueueImu(&_gyroData, &accelGs);
+            ekf->enqueueImu(&_gyroData, &accelGs);
+
+            return _gyroBiasFound;
         }
 
         void getGyroData(axis3_t & gyroData)
