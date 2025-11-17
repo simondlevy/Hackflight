@@ -1,4 +1,4 @@
-SKETCH = tinypico-uart
+SKETCH = tinypico
 
 FQBN = esp32:esp32:um_tinypico
 
