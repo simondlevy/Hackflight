@@ -121,11 +121,13 @@ class CoreTask {
 
             uint32_t nextPredictionMs = millis();
 
+            const uint32_t msec_start = millis();
+
             bool isFlying = false;
 
             for (uint32_t step=1; ; step++) {
 
-                const uint32_t time = xTaskGetTickCount();
+                const uint32_t time = millis() - msec_start; // xTaskGetTickCount();
 
                 // Sync the core loop to the IMU
                 _imu.step(time);
@@ -158,7 +160,6 @@ class CoreTask {
                 switch (status) {
 
                     case STATUS_IDLE:
-                        reportStatus(step, "idle", motorvals);
                         if (_command.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             status = STATUS_ARMED;
@@ -167,7 +168,6 @@ class CoreTask {
                         break;
 
                     case STATUS_ARMED:
-                        reportStatus(step, "armed", motorvals);
                         checkDisarm(_command, status, motorvals);
                         if (_command.hovering) {
                             status = STATUS_HOVERING;
@@ -176,7 +176,6 @@ class CoreTask {
                         break;
 
                     case STATUS_HOVERING:
-                        reportStatus(step, "hovering", motorvals);
                         runClosedLoopAndMixer(step, _command,
                                 demands, motorvals);
                         checkDisarm(_command, status, motorvals);
@@ -186,7 +185,6 @@ class CoreTask {
                         break;
 
                     case STATUS_LANDING:
-                        reportStatus(step, "landing", motorvals);
                         runClosedLoopAndMixer(step, _command,
                                 demands, motorvals);
                         checkDisarm(_command, status, motorvals);
@@ -302,15 +300,6 @@ class CoreTask {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
-        }
-
-        void reportStatus(const uint32_t step, const char * status,
-                const float * motorvals)
-        {
-            Debugger::printf(_debugger,
-                    "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
-                    step, status,
-                    motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
         void checkDisarm(const command_t command, status_t &status,
