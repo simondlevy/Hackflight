@@ -42,6 +42,8 @@ class OpticalFlowTask {
 
     private:
 
+        static constexpr float TASK_FREQ = 100;
+
         static const int16_t OUTLIER_LIMIT = 100;
 
         // Disables pushing the flow measurement in the EKF
@@ -67,7 +69,7 @@ class OpticalFlowTask {
 
             while (true) {
 
-                vTaskDelay(10);
+                FreeRtosTask::wait(TASK_FREQ);
 
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;

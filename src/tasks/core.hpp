@@ -131,7 +131,7 @@ class CoreTask {
 
                 // Sync the core loop to the IMU
                 _imu.step(time);
-                vTaskDelay(1000/Timer::CORE_FREQ);
+                FreeRtosTask::wait(Timer::CORE_FREQ);
 
                 // Set the LED based on current status
                 runLed(status);

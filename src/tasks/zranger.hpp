@@ -70,7 +70,7 @@ class ZRangerTask {
         {
             while (true) {
 
-                vTaskDelay(1000/TASK_FREQ);
+                FreeRtosTask::wait(TASK_FREQ);
 
                 float range = device_read();
 
