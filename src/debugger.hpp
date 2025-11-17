@@ -25,6 +25,15 @@ class Debugger {
 
     public:
 
+        static void error(const char * what)
+        {
+            while (true) {
+                Serial.print(what);
+                Serial.println(" initialization failed");
+                delay(500);
+            }
+        }
+
         static void printf(Debugger * debugger, const char * format, ...)
         {
             if (debugger) {

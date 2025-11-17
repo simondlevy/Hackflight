@@ -43,11 +43,12 @@ class CoreTask {
 
             _imu.begin(ekf);
 
-            _task.init(runCoreTask, "core", this, 5);
+            _task.init(runCoreTask, "core", this, TASK_PRIORITY);
         }
 
     private:
 
+        static const uint8_t TASK_PRIORITY = 5;
         static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
         static constexpr float STATE_PHITHETA_MAX = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;

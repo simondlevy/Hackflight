@@ -23,8 +23,7 @@
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <tasks/core.hpp>
-#include <tasks/opticalflow.hpp>
-#include <tasks/zranger.hpp>
+#include <tasks/hover.hpp>
 
 class Hackflight {
 
@@ -32,20 +31,17 @@ class Hackflight {
 
         void init(const uint8_t motorCount, const mixFun_t mixFun)
         {
-            ekf.init(millis());
+            _ekf.init(millis());
 
-            zrangerTask.begin(&ekf);
+            _hoverTask.begin(&_ekf);
 
-            opticalFlowTask.begin(&ekf);
-
-            coreTask.begin(&ekf, motorCount, mixFun);
+            _coreTask.begin(&_ekf, motorCount, mixFun);
         }
 
     private:
 
-        CoreTask coreTask;
-        EKF ekf;
-        OpticalFlowTask opticalFlowTask;
-        ZRangerTask zrangerTask;
-        Debugger debugger;
+        CoreTask _coreTask;
+        HoverTask _hoverTask;
+        EKF _ekf;
+        Debugger _debugger;
 };

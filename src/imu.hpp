@@ -33,16 +33,16 @@ class Imu {
 
         void begin(EKF * ekf, Debugger * debugger=nullptr)
         {
+            if (!device_init(_gscale, _ascale)) {
+                Debugger::error("IMU");
+            }
+
             _ekf = ekf;
 
             _debugger = debugger;
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
-
-            if (!device_init(_gscale, _ascale)) {
-                Debugger::printf(_debugger, "IMU initialization failed");
-            }
 
             // Calibrate
             for (uint8_t i = 0; i < 3; i++) {
