@@ -47,7 +47,7 @@ class HoverTask {
             ((HoverTask *)obj)->run();
         }
 
-        FreeRtosTask _task;
+        Task _task;
 
         EKF * _ekf;
 
@@ -58,11 +58,9 @@ class HoverTask {
 
         void run(void)
         {
-            auto lastTime  = micros();
-
             while (true) {
 
-                FreeRtosTask::wait(TASK_FREQ);
+                Task::wait(TASK_FREQ);
 
                 _zranger.step(_ekf);
                 _opticalflow.step(_ekf);

@@ -18,7 +18,7 @@
 
 #include <free_rtos_include.h>
 
-class FreeRtosTask {
+class Task {
 
     private:
 

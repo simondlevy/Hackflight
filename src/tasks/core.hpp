@@ -82,7 +82,7 @@ class CoreTask {
             ((CoreTask *)arg)->run();
         }
 
-        FreeRtosTask _task;
+        Task _task;
 
         Debugger * _debugger;
         mixFun_t _mixFun;
@@ -133,7 +133,7 @@ class CoreTask {
 
                 // Sync the core loop to the IMU
                 const bool imuIsCalibrated = _imu.step(_ekf, msec);
-                FreeRtosTask::wait(CORE_FREQ);
+                Task::wait(CORE_FREQ);
 
                 // Set the LED based on current status
                 runLed(imuIsCalibrated, status);
