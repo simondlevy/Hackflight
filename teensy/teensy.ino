@@ -18,15 +18,15 @@
 
 #define _MAIN
 
-#include "free_rtos_task.hpp"
-
 #include <hackflight.hpp>
 #include <mixers/crazyflie.hpp>
 
 static Hackflight hackflight;
 
+/*
 static constexpr float LOOP1_TASK_FREQ = 1000;
 static const uint8_t LOOP1_TASK_PRIORITY = 5;
+
 static FreeRtosTask loop1Task;
 static void runLoop1Task(void *)
 {
@@ -47,16 +47,15 @@ static void runLoop2Task(void *)
         hackflight.loop2();
     }
 }
+*/
 
 void setup() 
 {
     hackflight.init();
 
-    loop1Task.init(runLoop1Task, "loop1", NULL, LOOP1_TASK_PRIORITY);
+    // loop1Task.init(runLoop1Task, "loop1", NULL, LOOP1_TASK_PRIORITY);
 
-    loop2Task.init(runLoop2Task, "loop2", NULL, LOOP2_TASK_PRIORITY);
-
-    vTaskStartScheduler();
+    // loop2Task.init(runLoop2Task, "loop2", NULL, LOOP2_TASK_PRIORITY);
 }
 
 void loop() 
