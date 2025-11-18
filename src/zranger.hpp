@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <VL53L1X.h>
+
 #include <debugger.hpp>
 #include <ekf.hpp>
 
@@ -23,11 +25,20 @@ class ZRanger {
 
     public:
 
-        void init()
+        void init(TwoWire * wire)
         {
-            if (!device_init()) {
+            wire->begin();
+            wire->setClock(400000);
+            delay(100);
+
+            if (!_vl53l1x.init()) {
                 Debugger::error("ZRanger");
             }
+
+            _vl53l1x.setDistanceMode(VL53L1X::Medium);
+            _vl53l1x.setMeasurementTimingBudget(25000);
+
+            _vl53l1x.startContinuous(50);
         }
 
         void step(EKF * ekf)
@@ -35,7 +46,7 @@ class ZRanger {
             const float expCoeff =
                 logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
 
-            float range = device_read();
+            float range = _vl53l1x.read();
 
             // check if range is feasible and push into the ekf the
             // sensor should not be able to measure >5 [m], and outliers
@@ -67,7 +78,5 @@ class ZRanger {
         static constexpr float EXP_POINT_B = 4.0;
         static constexpr float EXP_STD_B = 0.2;   
 
-        bool device_init();
-
-        float device_read();
+        VL53L1X _vl53l1x;
 };

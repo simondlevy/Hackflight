@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <Wire.h>
 
 #include <__control__.hpp>
 #include <__messages__.h>
@@ -40,7 +40,7 @@ class Hackflight {
 
             _imu.init();
 
-            _zranger.init();
+            _zranger.init(wire_device());
 
             _opticalflow.init();
 
@@ -476,6 +476,8 @@ class Hackflight {
         }
 
         // Device-dependent ---------------------------
+
+        TwoWire * wire_device();
 
         void comms_init();
 
