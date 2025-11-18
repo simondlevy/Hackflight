@@ -63,7 +63,7 @@ copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	mv copilot_core.c copilot_core.cpp
 
 dfu: $(BIN)
-	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/crazyflie.ino.bin
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
 	rm -rf build copilot* __*__.* $(MSGS)

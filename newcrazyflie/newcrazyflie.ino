@@ -21,27 +21,36 @@
 #include <newhackflight.hpp>
 #include <mixers/crazyflie.hpp>
 
+static Hackflight hackflight;
+
+static constexpr float LOOP1_TASK_FREQ = 1000;
+static const uint8_t LOOP1_TASK_PRIORITY = 5;
+static FreeRtosTask loop1Task;
+static void runLoop1Task(void *)
+{
+    while (true) {
+        FreeRtosTask::wait(LOOP1_TASK_FREQ);
+        hackflight.loop1(Mixer::rotorCount, Mixer::mix);
+    }
+}
+
 static const float LOOP2_TASK_FREQ = 70;
 static const uint8_t LOOP2_TASK_PRIORITY = 3;
 
-static Hackflight hackflight;
-
 static FreeRtosTask loop2Task;
-
 static void runLoop2Task(void *)
 {
     while (true) {
-
         FreeRtosTask::wait(LOOP2_TASK_FREQ);
-
         hackflight.loop2();
     }
 }
 
-
 void setup() 
 {
     hackflight.init();
+
+    loop1Task.init(runLoop1Task, "loop1", NULL, LOOP1_TASK_PRIORITY);
 
     loop2Task.init(runLoop2Task, "loop2", NULL, LOOP2_TASK_PRIORITY);
 
