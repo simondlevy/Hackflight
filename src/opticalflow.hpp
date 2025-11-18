@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <pmw3901.hpp>
+
 #include <debugger.hpp>
 #include <ekf.hpp>
 
@@ -23,10 +25,10 @@ class OpticalFlow {
 
     public:
 
-        void init()
+        void init(SPIClass * spi, const uint8_t cs_pin)
         {
 
-            if (!device_init()) {
+            if (!_pmw3901.begin(cs_pin, *spi)) {
                 Debugger::error("OpticalFlow");
             }
         }
@@ -37,7 +39,7 @@ class OpticalFlow {
             int16_t deltaY = 0;
             bool gotMotion = false;
 
-            device_read(deltaX, deltaY, gotMotion);
+            _pmw3901.readMotion(deltaX, deltaY, gotMotion);
 
             // Flip motion information to comply with sensor mounting
             // (might need to be changed if mounted differently)
@@ -83,7 +85,5 @@ class OpticalFlow {
         // Set standard deviation flow
         static constexpr float FLOW_STD_FIXED = 2.0;
 
-        bool device_init();
-
-        void device_read(int16_t & dx, int16_t & dy, bool &gotMotion);
+        PMW3901 _pmw3901;
 };

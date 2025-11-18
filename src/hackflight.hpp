@@ -17,6 +17,7 @@
 #pragma once
 
 #include <Wire.h>
+#include <SPI.h>
 
 #include <__control__.hpp>
 #include <__messages__.h>
@@ -42,7 +43,7 @@ class Hackflight {
 
             _zranger.init(wire_device());
 
-            _opticalflow.init();
+            _opticalflow.init(spi_device(), spi_cs_pin());
 
             motors_init();
 
@@ -478,6 +479,10 @@ class Hackflight {
         // Device-dependent ---------------------------
 
         TwoWire * wire_device();
+
+        SPIClass * spi_device();
+
+        const uint8_t spi_cs_pin();
 
         void comms_init();
 

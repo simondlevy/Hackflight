@@ -16,6 +16,26 @@
 
 #include <hackflight.hpp>
 
+static const uint8_t CS_PIN = PB4;
+
+SPIClass * Hackflight::spi_device()
+{
+    static SPIClass _spi;
+
+    _spi.setSCLK(PA5);
+    _spi.setMISO(PA6);
+    _spi.setMOSI(PA7);
+
+    _spi.begin();
+
+    return &_spi;
+}
+
+const uint8_t Hackflight::spi_cs_pin()
+{
+    return PB4;
+}
+
 const uint8_t Hackflight::led_pin()
 {
     return PC0;
