@@ -70,7 +70,6 @@ class Hackflight {
 
             // Sync the core loop to the IMU
             const bool imuIsCalibrated = _imu.step(&_ekf, msec);
-            thread_wait(CORE_FREQ);
 
             // Set the LED based on current status
             runLed(imuIsCalibrated, _status);
@@ -492,6 +491,4 @@ class Hackflight {
         void motors_setSpeed(uint32_t id, float speed);
 
         void motors_run();
-
-        void thread_wait(const float freq);
 };

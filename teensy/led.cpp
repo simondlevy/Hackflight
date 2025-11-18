@@ -14,8 +14,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Arduino.h>
+
 #include <hackflight.hpp>
 
-void Hackflight::thread_wait(const float freq)
+static const uint8_t LED_PIN = 15;
+
+void Hackflight::led_init()
 {
+    pinMode(LED_PIN, OUTPUT);
+}
+
+void Hackflight::led_set(const bool on)
+{
+    digitalWrite(LED_PIN, on);
 }
