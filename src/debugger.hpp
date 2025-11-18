@@ -18,7 +18,6 @@
 
 #include <Arduino.h>
 
-#include <bootloader.hpp>
 #include <timer.hpp>
 
 class Debugger {
@@ -59,7 +58,7 @@ class Debugger {
                     }
 
                     if (Serial.available() && Serial.read() == 'R') {
-                        Bootloader::jump();
+                        //Bootloader::jump();
                     }
                 }
             }

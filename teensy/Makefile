@@ -23,32 +23,32 @@ $(MSGS): ../msppg/messages.json
 	cp ../msppg/messages.h $(MSGS)
 
 haskell_config: copilot_core.cpp
-	cp $(SRC)/control/haskell.hpp ./__control__.hpp
+	cp $(SRC)/control/haskell.hpp ../src/__control__.hpp
 
 lowres_config:
-	cp $(SRC)/control/lowres.hpp ./__control__.hpp
+	cp $(SRC)/control/lowres.hpp ../src/__control__.hpp
 
 nopos_config:
-	cp $(SRC)/control/nopos.hpp ./__control__.hpp
+	cp $(SRC)/control/nopos.hpp ../src/__control__.hpp
 
 split_config:
-	cp $(SRC)/control/split.hpp ./__control__.hpp
+	cp $(SRC)/control/split.hpp ../src/__control__.hpp
 
 standard_config:
-	cp $(SRC)/control/standard.hpp ./__control__.hpp
+	cp $(SRC)/control/standard.hpp ../src/__control__.hpp
 
 snn_config:
-	cp $(SRC)/control/snn.hpp ./__control__.hpp
+	cp $(SRC)/control/snn.hpp ../src/__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c copilot_core.cpp
 
+flash:
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 clean:
-	rm -rf copilot* ../src/__*__.*
+	rm -rf build copilot* ../src/__*__.*
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
-
-
