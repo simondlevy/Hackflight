@@ -18,10 +18,12 @@
 #include <BluetoothSerial.h> 
 #include <TinyPICO.h>
 
-static BluetoothSerial bts; 
+static const char * BTNAME = "Hackflight-TinyPICO"; 
 
 static const uint8_t TXD1 = 14;
 static const uint8_t RXD1 = 4;
+
+static BluetoothSerial bts; 
 
 static const uint32_t TIMEOUT_MSEC = 1000;
 
@@ -90,7 +92,7 @@ void setup()
 {
     uarts.begin(115200, SERIAL_8N1, RXD1, TXD1);
 
-    bts.begin("CrazyFlie-TinyPICO"); 
+    bts.begin(BTNAME);
 
     xTaskCreate(
             bt_to_uart_task, 

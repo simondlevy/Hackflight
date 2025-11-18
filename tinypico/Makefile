@@ -1,4 +1,4 @@
-SKETCH = tinypico
+SKETCH = $(shell basename "`pwd`")
 
 FQBN = esp32:esp32:um_tinypico
 
