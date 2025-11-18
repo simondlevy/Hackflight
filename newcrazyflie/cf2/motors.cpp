@@ -17,7 +17,7 @@
 
 #include <Arduino.h>
 
-#include <tasks/core.hpp>
+#include <newhackflight.hpp>
 
 static const uint8_t M1_PIN = PA1;
 static const uint8_t M2_PIN = PB11;
@@ -26,16 +26,16 @@ static const uint8_t M4_PIN = PB9;
 
 static uint8_t pulse_widths[4];
 
-void CoreTask::motors_init()
+void Hackflight::motors_init()
 {
 }
 
-void CoreTask::motors_setSpeed(uint32_t id, float speed)
+void Hackflight::motors_setSpeed(uint32_t id, float speed)
 {
     pulse_widths[id] = (uint8_t)(255 * speed);
 }
 
-void CoreTask::motors_run()
+void Hackflight::motors_run()
 {
     analogWrite(M1_PIN, pulse_widths[0]);
     analogWrite(M2_PIN, pulse_widths[1]);

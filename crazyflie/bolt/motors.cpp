@@ -17,7 +17,7 @@
 
 #include <oneshot125.hpp>
 
-#include <tasks/core.hpp>
+#include <newhackflight.hpp>
 
 static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
 

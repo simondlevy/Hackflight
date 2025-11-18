@@ -134,6 +134,8 @@ class Hackflight {
 
         void loop2()
         {
+            _zranger.step(&_ekf);
+            _opticalflow.step(&_ekf);
         }
 
     private:
@@ -168,6 +170,9 @@ class Hackflight {
         } status_t;
 
         Imu _imu;
+        OpticalFlow _opticalflow;
+        ZRanger _zranger;
+
         EKF _ekf;
         Debugger _debugger;
         uint32_t _msec_start;

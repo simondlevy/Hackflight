@@ -17,7 +17,7 @@
 
 #include <oneshot125.hpp>
 
-#include <tasks/core.hpp>
+#include <newhackflight.hpp>
 
 static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
 
@@ -31,7 +31,7 @@ static void enableMotor(const uint8_t id)
     digitalWrite(POWER_SWITCH_PINS[id], HIGH);
 }
 
-void CoreTask::motors_init()
+void Hackflight::motors_init()
 {
     enableMotor(0);
     enableMotor(1);
@@ -41,14 +41,14 @@ void CoreTask::motors_init()
     motors.arm();
 }
 
-void CoreTask::motors_setSpeed(uint32_t id, float speed)
+void Hackflight::motors_setSpeed(uint32_t id, float speed)
 {
     const uint8_t pulse_width = 125 * (speed + 1);
 
     motors.set(id, pulse_width);
 }
 
-void CoreTask::motors_run()
+void Hackflight::motors_run()
 {
     motors.run();
 }
