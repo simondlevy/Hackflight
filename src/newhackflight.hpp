@@ -41,6 +41,10 @@ class Hackflight {
 
             _imu.init();
 
+            _zranger.init();
+
+            _opticalflow.init();
+
             motors_init();
 
             led_init();
