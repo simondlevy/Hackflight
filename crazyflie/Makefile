@@ -17,7 +17,7 @@ include ../snn_path.makefile
 any:
 	echo "Please specify cf2 or bolt"
 
-bolt: $(SKETCH).ino  *.cpp *.h bolt/*.cpp $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
+bolt: $(SKETCH).ino  *.cpp *.h bolt/*.cpp $(SRC)/*.hpp $(MSGS)
 	cp bolt/motors.cpp ./__motors__.cpp
 	arduino-cli compile \
 		--build-property build.extra_flags=-DBOLT \
@@ -26,8 +26,7 @@ bolt: $(SKETCH).ino  *.cpp *.h bolt/*.cpp $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-cf2: $(SKETCH).ino  *.cpp *.h cf2/*.cpp $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
-	__messages__.h
+cf2: $(SKETCH).ino  *.cpp *.h cf2/*.cpp $(SRC)/*.hpp $(MSGS)
 	cp cf2/motors.cpp ./__motors__.cpp
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
@@ -66,7 +65,7 @@ dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
-	rm -rf build *.hpp copilot* __*__.cpp $(MSGS)
+	rm -rf build copilot* __*__.* $(MSGS)
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3

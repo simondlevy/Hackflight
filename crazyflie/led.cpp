@@ -16,16 +16,16 @@
 
 #include <Arduino.h>
 
-#include <tasks/core.hpp>
+#include <hackflight.hpp>
 
 static const uint8_t LED_PIN = PC0;
 
-void CoreTask::led_init()
+void Hackflight::led_init()
 {
     pinMode(LED_PIN, OUTPUT);
 }
 
-void CoreTask::led_set(const bool on)
+void Hackflight::led_set(const bool on)
 {
     digitalWrite(LED_PIN, !on);
 }

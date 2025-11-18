@@ -14,31 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#include <hackflight.hpp>
 
-#include <newhackflight.hpp>
-
-static const uint8_t RX_PIN = PA3;
-static const uint8_t TX_PIN = PA2;
-
-static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
-
-void Hackflight::comms_init()
+void Hackflight::thread_wait(const float freq)
 {
-    serial.begin(115200);
-}
-
-bool Hackflight::comms_read_byte(uint8_t * byte)
-{
-    if (serial.available()) {
-        *byte = serial.read();
-        return true;
-    }
-
-    return false;
-}
-            
-void Hackflight::comms_write_byte(const uint8_t byte)
-{
-    serial.write(byte);
 }

@@ -16,19 +16,19 @@
 
 #include <Arduino.h>
 
-#include <tasks/core.hpp>
+#include <hackflight.hpp>
 
 static const uint8_t RX_PIN = PA3;
 static const uint8_t TX_PIN = PA2;
 
 static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
-void CoreTask::comms_init()
+void Hackflight::comms_init()
 {
     serial.begin(115200);
 }
 
-bool CoreTask::comms_read_byte(uint8_t * byte)
+bool Hackflight::comms_read_byte(uint8_t * byte)
 {
     if (serial.available()) {
         *byte = serial.read();
@@ -38,7 +38,7 @@ bool CoreTask::comms_read_byte(uint8_t * byte)
     return false;
 }
             
-void CoreTask::comms_write_byte(const uint8_t byte)
+void Hackflight::comms_write_byte(const uint8_t byte)
 {
     serial.write(byte);
 }
