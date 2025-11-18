@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 Simon D. Levy
+ * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,64 +62,66 @@ class Hackflight {
             static bool _didResetEstimation;
             static Timer _flyingStatusTimer;
 
-            const uint32_t msec = millis() - msec_start;
+            const uint32_t msec = millis() - _msec_start;
 
             // Sync the core loop to the IMU
-            const bool imuIsCalibrated = _imu.step(_ekf, msec);
+            const bool imuIsCalibrated = _imu.step(&_ekf, msec);
             thread_wait(CORE_FREQ);
 
             // Set the LED based on current status
             runLed(imuIsCalibrated, _status);
 
             // Run logging
-            runLogger(vehicleState, closedLoopControl);
+            runLogger(_vehicleState, _closedLoopControl);
 
             // Get command
-            runCommandParser(command);
+            runCommandParser(_command);
 
             // Periodically update ekf with flying status
-            if (flyingStatusTimer.ready(FLYING_STATUS_FREQ)) {
-                isFlying = isFlyingCheck(msec, _motorvals);
+            if (_flyingStatusTimer.ready(FLYING_STATUS_FREQ)) {
+                _isFlying = isFlyingCheck(msec, motorCount, _motorvals);
             }
 
             // Run ekf to get vehicle state
-            getStateEstimate(isFlying, vehicleState, didResetEstimation);
+            getStateEstimate(_isFlying, _vehicleState, _didResetEstimation);
 
             // Check for lost contact
-            if (command.timestamp > 0 &&
-                    millis() - command.timestamp > COMMAND_TIMEOUT_MSEC) {
+            if (_command.timestamp > 0 &&
+                    millis() - _command.timestamp > COMMAND_TIMEOUT_MSEC) {
                 _status = STATUS_LOST_CONTACT;
             }
 
             switch (_status) {
 
                 case STATUS_IDLE:
-                    if (command.armed && isSafeAngle(vehicleState.phi) &&
-                            isSafeAngle(vehicleState.theta)) {
+                    if (_command.armed && isSafeAngle(_vehicleState.phi) &&
+                            isSafeAngle(_vehicleState.theta)) {
                         _status = STATUS_ARMED;
                     }
-                    runMotors(_motorvals);
+                    runMotors(motorCount, _motorvals);
                     break;
 
                 case STATUS_ARMED:
-                    checkDisarm(command, _status, _motorvals);
-                    if (command.hovering) {
+                    checkDisarm(_command, motorCount, _status, _motorvals);
+                    if (_command.hovering) {
                         _status = STATUS_HOVERING;
                     }
-                    runMotors(_motorvals);
+                    runMotors(motorCount, _motorvals);
                     break;
 
                 case STATUS_HOVERING:
-                    runClosedLoopAndMixer(command, vehicleState,
-                            _status, closedLoopControl, demands, _motorvals);
-                    if (!command.hovering) {
+                    runClosedLoopAndMixer(_command, _vehicleState, motorCount,
+                            mixFun, _status, _closedLoopControl, _demands,
+                            _motorvals);
+                    if (!_command.hovering) {
                         _status = STATUS_LANDING;
                     }
                     break;
 
                 case STATUS_LANDING:
-                    runClosedLoopAndMixer(command, vehicleState,
-                            _status, closedLoopControl, demands, _motorvals);
+                    runClosedLoopAndMixer(_command, _vehicleState, motorCount,
+                            mixFun, _status, _closedLoopControl, _demands,
+                            _motorvals);
                     break;
 
                 case STATUS_LOST_CONTACT:
@@ -174,19 +176,19 @@ class Hackflight {
             const uint32_t nowMs = millis();
 
             if (didResetEstimation) {
-                _ekf->init(nowMs);
+                _ekf.init(nowMs);
                 didResetEstimation = false;
             }
 
             // Run the system dynamics to predict the state forward.
             if (_timer.ready(EKF_PREDICTION_FREQ)) {
-                _ekf->predict(nowMs, isFlying); 
+                _ekf.predict(nowMs, isFlying); 
             }
 
             axis3_t dpos = {};
             axis4_t quat = {};
 
-            _ekf->getStateEstimate(nowMs, state.z, dpos, quat);
+            _ekf.getStateEstimate(nowMs, state.z, dpos, quat);
 
             if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
                     !velInBounds(dpos.z)) {
@@ -239,7 +241,7 @@ class Hackflight {
 
                 runMotors(motorCount, motorvals);
 
-                checkDisarm(command, status, motorvals);
+                checkDisarm(command, motorCount, status, motorvals);
             }
         }
 
@@ -283,12 +285,15 @@ class Hackflight {
 
         void checkDisarm(
                 const command_t command,
+                const uint8_t motorCount,
                 status_t &status,
                 float * motorvals)
         {
             if (!command.armed) {
                 status = STATUS_IDLE;
-                memset(motorvals, 0, sizeof(motorvals));
+                for (uint8_t k=0; k<motorCount; ++k) {
+                    motorvals[k] = 0;
+                }
             }
         }
 
@@ -296,11 +301,14 @@ class Hackflight {
         // We say we are flying if one or more motors are running over the idle
         // thrust.
         //
-        bool isFlyingCheck(const uint32_t step, const float * motorvals)
+        bool isFlyingCheck(
+                const uint32_t step,
+                const uint8_t motorCount,
+                const float * motorvals)
         {
             auto isThrustOverIdle = false;
 
-            for (int i = 0; i < _motorCount; ++i) {
+            for (int i = 0; i < motorCount; ++i) {
                 if (motorvals[i] > 0) {
                     isThrustOverIdle = true;
                     break;
