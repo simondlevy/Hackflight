@@ -16,8 +16,6 @@
 
 #include <hackflight.hpp>
 
-static const uint8_t CS_PIN = PB4;
-
 SPIClass * Hackflight::spi_device()
 {
     static SPIClass _spi;

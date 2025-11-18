@@ -14,18 +14,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-
 #include <hackflight.hpp>
 
-static const uint8_t LED_PIN = 15;
-
-void Hackflight::led_init()
+SPIClass * Hackflight::spi_device()
 {
-    pinMode(LED_PIN, OUTPUT);
+    return &SPI;
 }
 
-void Hackflight::led_set(const bool on)
+const uint8_t Hackflight::spi_cs_pin()
 {
-    digitalWrite(LED_PIN, on);
+    return SS;
+}
+
+const uint8_t Hackflight::led_pin()
+{
+    return 15;
+}
+
+const bool Hackflight::led_inverted()
+{
+    return false;
+}
+        
+TwoWire * Hackflight::wire_device()
+{
+    return &Wire1;
+}
+
+HardwareSerial * Hackflight::uart_device()
+{
+    return &Serial1;
 }
