@@ -46,7 +46,7 @@ class Hackflight {
 
             motors_init();
 
-            led_init();
+            pinMode(led_pin(), OUTPUT);
 
             comms_init();
 
@@ -483,7 +483,7 @@ class Hackflight {
 
         void comms_write_byte(const uint8_t byte);
 
-        void led_init();
+        const uint8_t led_pin();
 
         void led_set(const bool on);
 

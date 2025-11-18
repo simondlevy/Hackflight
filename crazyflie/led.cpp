@@ -20,9 +20,9 @@
 
 static const uint8_t LED_PIN = PC0;
 
-void Hackflight::led_init()
+const uint8_t Hackflight::led_pin()
 {
-    pinMode(LED_PIN, OUTPUT);
+    return PC0;
 }
 
 void Hackflight::led_set(const bool on)
