@@ -18,8 +18,6 @@
 
 #include <stdint.h>
 
-#define _MAIN
-
 #include <__control__.hpp>
 #include <__messages__.h>
 #include <debugger.hpp>

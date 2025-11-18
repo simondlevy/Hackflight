@@ -16,6 +16,8 @@
  */
 
 
+#define _MAIN
+
 #include "free_rtos_task.hpp"
 
 #include <hackflight.hpp>

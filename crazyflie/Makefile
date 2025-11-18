@@ -39,7 +39,7 @@ __messages__.h: ../msppg/messages.json
 	cp ../msppg/messages.h ./__messages__.h
 
 haskell_config: copilot_core.cpp
-	cp $(SRC)/control/haskell.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/haskell.hpp ./__control__.hpp
 
 lowres_config:
 	cp $(SRC)/control/lowres.hpp ./__control__.hpp
