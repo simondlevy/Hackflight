@@ -16,114 +16,60 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#define _MAIN
+
 #include <__control__.hpp>
 #include <__messages__.h>
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <imu.hpp>
 #include <msp/parser.hpp>
-#include <task.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
 
-class CoreTask {
+class Hackflight {
 
     public:
 
-        void begin(
-                EKF * ekf,
-                const uint8_t motorCount,
-                const mixFun_t mixFun,
-                Debugger * debugger=nullptr)
+        void init()
         {
-            _ekf = ekf;
-            _debugger = debugger;
-            _motorCount = motorCount;
-            _mixFun = mixFun;
+            _ekf.init(millis());
 
             _imu.init();
 
-            _task.init(runCoreTask, "core", this, TASK_PRIORITY);
-        }
-
-    private:
-
-        static constexpr float FLYING_STATUS_FREQ = 25;
-        static constexpr float CORE_FREQ = 1000;
-        static constexpr float COMMS_FREQ = 100;
-
-        static constexpr float LED_HEARTBEAT_FREQ = 1;
-        static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
-        static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
-
-        static const uint8_t TASK_PRIORITY = 5;
-        static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
-        static constexpr float STATE_PHITHETA_MAX = 30;
-        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-        static const auto CLOSED_LOOP_UPDATE_FREQ = 500;
-
-        // this is slower than the IMU update rate of 1000Hz
-        static const uint32_t EKF_PREDICTION_FREQ = 100;
-
-        static constexpr float MAX_VELOCITY = 10; //meters per second
-
-        typedef enum {
-            STATUS_IDLE,
-            STATUS_ARMED,
-            STATUS_HOVERING,
-            STATUS_LANDING,
-            STATUS_LOST_CONTACT
-
-        } status_t;
-
-        static void runCoreTask(void *arg)
-        {
-            ((CoreTask *)arg)->run();
-        }
-
-        Task _task;
-
-        Debugger * _debugger;
-        mixFun_t _mixFun;
-        uint8_t _motorCount;
-        EKF * _ekf;
-        Imu _imu;
-
-        void run()
-        {
-            status_t status = STATUS_IDLE;
-
-            // Start with motor speeds at idle
-            float motorvals[MAX_MOTOR_COUNT] = {};
-
-            // Start with no axis demands
-            demands_t demands = {};
-
-            // Run device-dependent motor initialization
             motors_init();
 
-            // Run device-dependent LED initialization
             led_init();
 
             comms_init();
 
-            // Start serial debugging
             Serial.begin(115200);
 
-            const uint32_t msec_start = millis();
+            static uint32_t nextPredictionMs = millis();
+            static const uint32_t msec_start = millis();
+        }
 
-            bool isFlying = false;
+        void step(const uint8_t motorCount, const mixFun_t mixFun)
+        {
+            static status_t status = STATUS_IDLE;
 
-            ClosedLoopControl closedLoopControl  = {};
+            static float motorvals[MAX_MOTOR_COUNT] = {};
 
-            vehicleState_t vehicleState = {};
+            static demands_t demands = {};
 
-            command_t command = {};
+            static bool isFlying = false;
 
-            bool didResetEstimation = false;
+            static ClosedLoopControl closedLoopControl  = {};
 
-            Timer flyingStatusTimer = {};
+            static vehicleState_t vehicleState = {};
+
+            static command_t command = {};
+
+            static bool didResetEstimation = false;
+
+            static Timer flyingStatusTimer = {};
 
             while (true) {
 
@@ -148,7 +94,8 @@ class CoreTask {
                 }
 
                 // Run ekf to get vehicle state
-                getStateEstimate(isFlying, vehicleState, didResetEstimation);
+                getStateEstimate(isFlying, vehicleState, nextPredictionMs,
+                        didResetEstimation);
 
                 // Check for lost contact
                 if (command.timestamp > 0 &&
@@ -194,13 +141,57 @@ class CoreTask {
             }
         }
 
+    private:
+        
+        static constexpr float FLYING_STATUS_FREQ = 25;
+        static constexpr float CORE_FREQ = 1000;
+        static constexpr float COMMS_FREQ = 100;
+
+        static constexpr float LED_HEARTBEAT_FREQ = 1;
+        static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
+        static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
+
+        static const uint8_t TASK_PRIORITY = 5;
+        static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
+        static constexpr float STATE_PHITHETA_MAX = 30;
+        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
+        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+        static const auto CLOSED_LOOP_UPDATE_FREQ = 500;
+
+        // this is slower than the IMU update rate of 1000Hz
+        static const uint32_t EKF_PREDICTION_FREQ = 100;
+
+        static constexpr float MAX_VELOCITY = 10; //meters per second
+
+        typedef enum {
+            STATUS_IDLE,
+            STATUS_ARMED,
+            STATUS_HOVERING,
+            STATUS_LANDING,
+            STATUS_LOST_CONTACT
+
+        } status_t;
+
+        static void runCoreTask(void *arg)
+        {
+            ((CoreTask *)arg)->run();
+        }
+
+        mixFun_t _mixFun;
+        uint8_t _motorCount;
+        Imu _imu;
+        EKF _ekf;
+        Debugger _debugger;
+
+        uint32_t nextPredictionMs = millis();
+        const uint32_t msec_start = millis();
+
         void getStateEstimate(
                 const bool isFlying,
                 vehicleState_t & state,
+                uint32_t & nextPredictionMs,
                 bool & didResetEstimation)
         {
-            static Timer _timer;
-
             const uint32_t nowMs = millis();
 
             if (didResetEstimation) {
@@ -209,8 +200,9 @@ class CoreTask {
             }
 
             // Run the system dynamics to predict the state forward.
-            if (_timer.ready(EKF_PREDICTION_FREQ)) {
+            if (nowMs >= nextPredictionMs) {
                 _ekf->predict(nowMs, isFlying); 
+                nextPredictionMs = nowMs + (1000 / EKF_PREDICTION_FREQ);
             }
 
             axis3_t dpos = {};

@@ -22,6 +22,7 @@
 
 #include <debugger.hpp>
 #include <ekf.hpp>
+
 #include <tasks/core.hpp>
 #include <tasks/hover.hpp>
 
@@ -42,6 +43,7 @@ class Hackflight {
 
         CoreTask _coreTask;
         HoverTask _hoverTask;
+
         EKF _ekf;
         Debugger _debugger;
 };
