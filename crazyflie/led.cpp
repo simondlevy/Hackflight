@@ -18,14 +18,12 @@
 
 #include <hackflight.hpp>
 
-static const uint8_t LED_PIN = PC0;
-
 const uint8_t Hackflight::led_pin()
 {
     return PC0;
 }
 
-void Hackflight::led_set(const bool on)
+const bool Hackflight::led_inverted()
 {
-    digitalWrite(LED_PIN, !on);
+    return true;
 }

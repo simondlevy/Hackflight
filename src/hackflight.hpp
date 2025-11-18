@@ -403,7 +403,7 @@ class Hackflight {
             else if (status == STATUS_ARMED ||
                     status == STATUS_HOVERING || 
                     status == STATUS_LANDING) { 
-                led_set(true);
+                digitalWrite(led_pin(), !led_inverted());
             }
             else {
                 blinkLed(msec_curr, LED_HEARTBEAT_FREQ);
@@ -417,14 +417,14 @@ class Hackflight {
             static Timer _timer;
 
             if (_timer.ready(freq)) {
-                led_set(true);
+                digitalWrite(led_pin(), !led_inverted());
                 _pulsing = true;
                 _pulse_start = msec_curr;
             }
 
             else if (_pulsing) {
                 if (millis() - _pulse_start > LED_PULSE_DURATION_MSEC) {
-                    led_set(false);
+                    digitalWrite(led_pin(), led_inverted());
                     _pulsing = false;
                 }
             }
@@ -485,7 +485,7 @@ class Hackflight {
 
         const uint8_t led_pin();
 
-        void led_set(const bool on);
+        const bool led_inverted();
 
         void motors_init();
 
