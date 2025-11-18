@@ -17,7 +17,7 @@
 
 #include <Arduino.h>
 
-#include <newhackflight.hpp>
+#include <tasks/core.hpp>
 
 static const uint8_t M1_PIN = PA1;
 static const uint8_t M2_PIN = PB11;
