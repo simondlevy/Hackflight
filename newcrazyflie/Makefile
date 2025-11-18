@@ -66,7 +66,7 @@ dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/crazyflie.ino.bin
 
 clean:
-	rm -rf build *.hpp copilot* __*__.cpp $(MSGS)
+	rm -rf build copilot* __*__.* $(MSGS)
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3

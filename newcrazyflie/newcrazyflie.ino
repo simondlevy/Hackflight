@@ -15,7 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <STM32FreeRTOS.h>
+
+#include "free_rtos_task.hpp"
 
 #include <newhackflight.hpp>
 #include <mixers/crazyflie.hpp>

@@ -18,7 +18,6 @@
 
 #include <debugger.hpp>
 #include <ekf.hpp>
-#include <task.hpp>
 
 class OpticalFlow {
 
