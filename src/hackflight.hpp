@@ -442,8 +442,6 @@ class Hackflight {
 
                 static MspParser commandParser;
 
-                uint8_t byte = 0;
-
                 while (_uart->available()) {
 
                     const uint8_t byte = _uart->read();
