@@ -25,9 +25,11 @@
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <imu.hpp>
+#include <opticalflow.hpp>
 #include <msp/parser.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
+#include <zranger.hpp>
 
 class Hackflight {
 
@@ -50,7 +52,7 @@ class Hackflight {
             _msec_start = millis();
         }
 
-        void step(const uint8_t motorCount, const mixFun_t mixFun)
+        void loop1(const uint8_t motorCount, const mixFun_t mixFun)
         {
             static status_t _status;
             static float _motorvals[MAX_MOTOR_COUNT];
@@ -128,6 +130,10 @@ class Hackflight {
                     // No way to recover from this
                     break;
             }
+        }
+
+        void loop2()
+        {
         }
 
     private:
