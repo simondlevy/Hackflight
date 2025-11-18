@@ -306,12 +306,16 @@ class CoreTask {
             }
         }
 
-        void checkDisarm(const command_t command, status_t &status,
+        void checkDisarm(
+                const command_t command,
+                status_t &status,
                 float * motorvals)
         {
             if (!command.armed) {
                 status = STATUS_IDLE;
-                memset(motorvals, 0, _motorCount * sizeof(motorvals));
+                for (uint8_t k=0; k<_motorCount; ++k) {
+                    motorvals[k] = 0;
+                }
             }
         }
 

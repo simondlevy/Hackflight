@@ -47,102 +47,89 @@ class Hackflight {
 
             Serial.begin(115200);
 
-            static uint32_t nextPredictionMs = millis();
-            static const uint32_t msec_start = millis();
+            _msec_start = millis();
         }
 
         void step(const uint8_t motorCount, const mixFun_t mixFun)
         {
-            static status_t status = STATUS_IDLE;
+            static status_t _status;
+            static float _motorvals[MAX_MOTOR_COUNT];
+            static demands_t _demands;
+            static bool _isFlying;
+            static ClosedLoopControl _closedLoopControl;
+            static vehicleState_t _vehicleState;
+            static command_t _command;
+            static bool _didResetEstimation;
+            static Timer _flyingStatusTimer;
 
-            static float motorvals[MAX_MOTOR_COUNT] = {};
+            const uint32_t msec = millis() - msec_start;
 
-            static demands_t demands = {};
+            // Sync the core loop to the IMU
+            const bool imuIsCalibrated = _imu.step(_ekf, msec);
+            thread_wait(CORE_FREQ);
 
-            static bool isFlying = false;
+            // Set the LED based on current status
+            runLed(imuIsCalibrated, _status);
 
-            static ClosedLoopControl closedLoopControl  = {};
+            // Run logging
+            runLogger(vehicleState, closedLoopControl);
 
-            static vehicleState_t vehicleState = {};
+            // Get command
+            runCommandParser(command);
 
-            static command_t command = {};
+            // Periodically update ekf with flying status
+            if (flyingStatusTimer.ready(FLYING_STATUS_FREQ)) {
+                isFlying = isFlyingCheck(msec, _motorvals);
+            }
 
-            static bool didResetEstimation = false;
+            // Run ekf to get vehicle state
+            getStateEstimate(isFlying, vehicleState, didResetEstimation);
 
-            static Timer flyingStatusTimer = {};
+            // Check for lost contact
+            if (command.timestamp > 0 &&
+                    millis() - command.timestamp > COMMAND_TIMEOUT_MSEC) {
+                _status = STATUS_LOST_CONTACT;
+            }
 
-            while (true) {
+            switch (_status) {
 
-                const uint32_t msec = millis() - msec_start;
+                case STATUS_IDLE:
+                    if (command.armed && isSafeAngle(vehicleState.phi) &&
+                            isSafeAngle(vehicleState.theta)) {
+                        _status = STATUS_ARMED;
+                    }
+                    runMotors(_motorvals);
+                    break;
 
-                // Sync the core loop to the IMU
-                const bool imuIsCalibrated = _imu.step(_ekf, msec);
-                Task::wait(CORE_FREQ);
+                case STATUS_ARMED:
+                    checkDisarm(command, _status, _motorvals);
+                    if (command.hovering) {
+                        _status = STATUS_HOVERING;
+                    }
+                    runMotors(_motorvals);
+                    break;
 
-                // Set the LED based on current status
-                runLed(imuIsCalibrated, status);
+                case STATUS_HOVERING:
+                    runClosedLoopAndMixer(command, vehicleState,
+                            _status, closedLoopControl, demands, _motorvals);
+                    if (!command.hovering) {
+                        _status = STATUS_LANDING;
+                    }
+                    break;
 
-                // Run logging
-                runLogger(vehicleState, closedLoopControl);
+                case STATUS_LANDING:
+                    runClosedLoopAndMixer(command, vehicleState,
+                            _status, closedLoopControl, demands, _motorvals);
+                    break;
 
-                // Get command
-                runCommandParser(command);
-
-                // Periodically update ekf with flying status
-                if (flyingStatusTimer.ready(FLYING_STATUS_FREQ)) {
-                    isFlying = isFlyingCheck(msec, motorvals);
-                }
-
-                // Run ekf to get vehicle state
-                getStateEstimate(isFlying, vehicleState, nextPredictionMs,
-                        didResetEstimation);
-
-                // Check for lost contact
-                if (command.timestamp > 0 &&
-                        millis() - command.timestamp > COMMAND_TIMEOUT_MSEC) {
-                    status = STATUS_LOST_CONTACT;
-                }
-
-                switch (status) {
-
-                    case STATUS_IDLE:
-                        if (command.armed && isSafeAngle(vehicleState.phi) &&
-                                isSafeAngle(vehicleState.theta)) {
-                            status = STATUS_ARMED;
-                        }
-                        runMotors(motorvals);
-                        break;
-
-                    case STATUS_ARMED:
-                        checkDisarm(command, status, motorvals);
-                        if (command.hovering) {
-                            status = STATUS_HOVERING;
-                        }
-                        runMotors(motorvals);
-                        break;
-
-                    case STATUS_HOVERING:
-                        runClosedLoopAndMixer(command, vehicleState,
-                                status, closedLoopControl, demands, motorvals);
-                        if (!command.hovering) {
-                            status = STATUS_LANDING;
-                        }
-                        break;
-
-                    case STATUS_LANDING:
-                        runClosedLoopAndMixer(command, vehicleState,
-                                status, closedLoopControl, demands, motorvals);
-                        break;
-
-                    case STATUS_LOST_CONTACT:
-                        // No way to recover from this
-                        break;
-                }
+                case STATUS_LOST_CONTACT:
+                    // No way to recover from this
+                    break;
             }
         }
 
     private:
-        
+
         static constexpr float FLYING_STATUS_FREQ = 25;
         static constexpr float CORE_FREQ = 1000;
         static constexpr float COMMS_FREQ = 100;
@@ -172,37 +159,28 @@ class Hackflight {
 
         } status_t;
 
-        static void runCoreTask(void *arg)
-        {
-            ((CoreTask *)arg)->run();
-        }
-
-        mixFun_t _mixFun;
-        uint8_t _motorCount;
         Imu _imu;
         EKF _ekf;
         Debugger _debugger;
-
-        uint32_t nextPredictionMs = millis();
-        const uint32_t msec_start = millis();
+        uint32_t _msec_start;
 
         void getStateEstimate(
                 const bool isFlying,
                 vehicleState_t & state,
-                uint32_t & nextPredictionMs,
                 bool & didResetEstimation)
         {
+            static Timer _timer;
+
             const uint32_t nowMs = millis();
 
             if (didResetEstimation) {
                 _ekf->init(nowMs);
-               didResetEstimation = false;
+                didResetEstimation = false;
             }
 
             // Run the system dynamics to predict the state forward.
-            if (nowMs >= nextPredictionMs) {
+            if (_timer.ready(EKF_PREDICTION_FREQ)) {
                 _ekf->predict(nowMs, isFlying); 
-                nextPredictionMs = nowMs + (1000 / EKF_PREDICTION_FREQ);
             }
 
             axis3_t dpos = {};
@@ -242,6 +220,8 @@ class Hackflight {
         void runClosedLoopAndMixer(
                 const command_t &command,
                 const vehicleState_t & state,
+                const uint8_t motorCount,
+                const mixFun_t mixFun,
                 status_t & status,
                 ClosedLoopControl & control,
                 demands_t & demands,
@@ -255,30 +235,33 @@ class Hackflight {
                         command.hovering, state, command.demands,
                         demands);
 
-                runMixer(_mixFun, demands, motorvals);
+                runMixer(motorCount, mixFun, demands, motorvals);
 
-                runMotors(motorvals);
+                runMotors(motorCount, motorvals);
 
                 checkDisarm(command, status, motorvals);
             }
         }
 
-        void runMotors(float * motorvals)
+        void runMotors(const uint8_t motorCount, float * motorvals)
         {
-            for (uint8_t k=0; k<_motorCount; ++k) {
+            for (uint8_t k=0; k<motorCount; ++k) {
                 motors_setSpeed(k, motorvals[k]);
             }
             motors_run();
         }
 
-        void runMixer(const mixFun_t mixFun, const demands_t & demands,
+        void runMixer(
+                const uint8_t motorCount,
+                const mixFun_t mixFun,
+                const demands_t & demands,
                 float * motorvals)
         {
             float uncapped[MAX_MOTOR_COUNT] = {};
             mixFun(demands, uncapped);
 
             float highestThrustFound = 0;
-            for (uint8_t k=0; k<_motorCount; k++) {
+            for (uint8_t k=0; k<motorCount; k++) {
 
                 const auto thrust = uncapped[k];
 
@@ -292,18 +275,20 @@ class Hackflight {
                 reduction = highestThrustFound - THRUST_MAX;
             }
 
-            for (uint8_t k = 0; k < _motorCount; k++) {
+            for (uint8_t k = 0; k < motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
         }
 
-        void checkDisarm(const command_t command, status_t &status,
+        void checkDisarm(
+                const command_t command,
+                status_t &status,
                 float * motorvals)
         {
             if (!command.armed) {
                 status = STATUS_IDLE;
-                memset(motorvals, 0, _motorCount * sizeof(motorvals));
+                memset(motorvals, 0, sizeof(motorvals));
             }
         }
 
@@ -486,4 +471,6 @@ class Hackflight {
         void motors_setSpeed(uint32_t id, float speed);
 
         void motors_run();
+
+        void thread_wait(const float freq);
 };
