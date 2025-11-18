@@ -50,3 +50,10 @@ TwoWire * Hackflight::wire_device()
 {
     return &Wire;
 }
+
+HardwareSerial * Hackflight::uart_device()
+{
+    static HardwareSerial serial = HardwareSerial(PA3, PA2);
+
+    return & serial;
+}

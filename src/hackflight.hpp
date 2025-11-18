@@ -49,7 +49,8 @@ class Hackflight {
 
             pinMode(led_pin(), OUTPUT);
 
-            comms_init();
+            _uart = uart_device();
+            _uart->begin(115200);
 
             Serial.begin(115200);
 
@@ -179,6 +180,8 @@ class Hackflight {
         EKF _ekf;
         Debugger _debugger;
         uint32_t _msec_start;
+
+        HardwareSerial * _uart;
 
         void getStateEstimate(
                 const bool isFlying,
@@ -389,7 +392,7 @@ class Hackflight {
 
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                comms_write_byte(serializer.payload[k]);
+                _uart->write(serializer.payload[k]);
             }
         }
 
@@ -441,7 +444,9 @@ class Hackflight {
 
                 uint8_t byte = 0;
 
-                while (comms_read_byte(&byte)) {
+                while (_uart->available()) {
+
+                    const uint8_t byte = _uart->read();
 
                     switch (commandParser.parse(byte)) {
 
@@ -484,11 +489,7 @@ class Hackflight {
 
         const uint8_t spi_cs_pin();
 
-        void comms_init();
-
-        bool comms_read_byte(uint8_t * byte);
-
-        void comms_write_byte(const uint8_t byte);
+        HardwareSerial * uart_device();
 
         const uint8_t led_pin();
 
