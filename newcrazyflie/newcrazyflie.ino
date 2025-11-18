@@ -21,11 +21,23 @@
 #include <newhackflight.hpp>
 #include <mixers/crazyflie.hpp>
 
+static const uint8_t LOOP2_TASK_PRIORITY = 3;
+
 static Hackflight hackflight;
+
+static FreeRtosTask loop2Task;
+
+static void runLoop2Task(void *obj)
+{
+//    ((hackflight *)obj)->loop2();
+}
+
 
 void setup() 
 {
     hackflight.init();
+
+    loop2Task.init(runLoop2Task, "loop2", &hackflight, LOOP2_TASK_PRIORITY);
 
     vTaskStartScheduler();
 }
