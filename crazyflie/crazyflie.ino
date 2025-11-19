@@ -50,7 +50,17 @@ static void runLoop2Task(void *)
 
 void setup() 
 {
-    hackflight.init();
+    static HardwareSerial uart = HardwareSerial(PA3, PA2);
+
+    static SPIClass spi;
+
+    spi.setSCLK(PA5);
+    spi.setMISO(PA6);
+    spi.setMOSI(PA7);
+
+    spi.begin();
+
+    hackflight.init(PC0, true, &Wire, &spi, PB4, &uart);
 
     loop1Task.init(runLoop1Task, "loop1", NULL, LOOP1_TASK_PRIORITY);
 

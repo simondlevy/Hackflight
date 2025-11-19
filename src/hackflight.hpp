@@ -35,21 +35,29 @@ class Hackflight {
 
     public:
 
-        void init()
+        void init(
+                const uint8_t ledPin,
+                const bool isLedInverted,
+                TwoWire * wire,
+                SPIClass * spi,
+                const uint8_t csPin,
+                HardwareSerial * uart)
         {
             _ekf.init(millis());
 
             _imu.init();
 
-            _zranger.init(wire_device());
+            _zranger.init(wire);
 
-            _opticalflow.init(spi_device(), spi_cs_pin());
+            _opticalflow.init(spi, csPin);
 
             motors_init();
 
-            pinMode(led_pin(), OUTPUT);
+            _ledPin = ledPin;
+            _isLedInverted = isLedInverted;
+            pinMode(_ledPin, OUTPUT);
 
-            _uart = uart_device();
+            _uart = uart;
             _uart->begin(115200);
 
             Serial.begin(115200);
@@ -182,6 +190,9 @@ class Hackflight {
         uint32_t _msec_start;
 
         HardwareSerial * _uart;
+
+        uint8_t _ledPin;
+        bool _isLedInverted;
 
         void getStateEstimate(
                 const bool isFlying,
@@ -407,7 +418,7 @@ class Hackflight {
             else if (status == STATUS_ARMED ||
                     status == STATUS_HOVERING || 
                     status == STATUS_LANDING) { 
-                digitalWrite(led_pin(), !led_inverted());
+                digitalWrite(_ledPin, !_isLedInverted);
             }
             else {
                 blinkLed(msec_curr, LED_HEARTBEAT_FREQ);
@@ -421,14 +432,14 @@ class Hackflight {
             static Timer _timer;
 
             if (_timer.ready(freq)) {
-                digitalWrite(led_pin(), !led_inverted());
+                digitalWrite(_ledPin, !_isLedInverted);
                 _pulsing = true;
                 _pulse_start = msec_curr;
             }
 
             else if (_pulsing) {
                 if (millis() - _pulse_start > LED_PULSE_DURATION_MSEC) {
-                    digitalWrite(led_pin(), led_inverted());
+                    digitalWrite(_ledPin, _isLedInverted);
                     _pulsing = false;
                 }
             }
@@ -480,18 +491,6 @@ class Hackflight {
         }
 
         // Device-dependent ---------------------------
-
-        TwoWire * wire_device();
-
-        SPIClass * spi_device();
-
-        const uint8_t spi_cs_pin();
-
-        HardwareSerial * uart_device();
-
-        const uint8_t led_pin();
-
-        const bool led_inverted();
 
         void motors_init();
 

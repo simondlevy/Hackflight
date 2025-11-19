@@ -19,12 +19,9 @@
 
 #include <imu.hpp>
 
-static const uint8_t ACCEL_ADDR = 0x19;
-static const uint8_t GYRO_ADDR = 0x69;
+static Bmi088Accel accel(Wire, 0x19);
 
-static Bmi088Accel accel(Wire, ACCEL_ADDR);
-
-static Bmi088Gyro gyro(Wire, GYRO_ADDR);
+static Bmi088Gyro gyro(Wire, 0x69);
 
 static bool failed(const int status)
 {
