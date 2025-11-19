@@ -25,6 +25,11 @@ static Hackflight hackflight;
 
 void setup() 
 {
+    pinMode(16, INPUT_PULLUP);
+    pinMode(17, INPUT_PULLUP);
+    pinMode(18, INPUT_PULLUP);
+    pinMode(19, INPUT_PULLUP);
+
     hackflight.init(15, false, &Wire1, &SPI, SS, &Serial1);
 }
 
