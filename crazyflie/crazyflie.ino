@@ -60,7 +60,7 @@ void setup()
 
     spi.begin();
 
-    hackflight.init(PC0, true, &Wire, &spi, PB4, &uart);
+    hackflight.init(PC0, true, &uart, &Wire, &spi, PB4);
 
     loop1Task.init(runLoop1Task, "loop1", NULL, LOOP1_TASK_PRIORITY);
 

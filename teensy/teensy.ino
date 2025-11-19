@@ -30,7 +30,7 @@ void setup()
     pinMode(18, INPUT_PULLUP);
     pinMode(19, INPUT_PULLUP);
 
-    hackflight.init(15, false, &Wire1, &SPI, SS, &Serial1);
+    hackflight.init(15, false, &Serial1); //&Wire1, &SPI, SS);
 }
 
 void loop() 
