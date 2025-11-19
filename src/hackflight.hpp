@@ -35,6 +35,8 @@ class Hackflight {
 
     public:
 
+        static constexpr float LOOP1_TASK_FREQ = 1000;
+
         void init(
                 const uint8_t ledPin,
                 const bool isLedInverted,

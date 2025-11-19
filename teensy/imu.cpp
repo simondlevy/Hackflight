@@ -34,7 +34,6 @@ bool Imu::device_init(int16_t & gscale, int16_t & ascale)
 
     if (failed(accel.begin())) return false;
 
-    /*
     if (failed(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ))) return false;
 
     if (failed(gyro.setRange(Bmi088Gyro::RANGE_2000DPS))) return false;
@@ -51,7 +50,7 @@ bool Imu::device_init(int16_t & gscale, int16_t & ascale)
     if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
 
     gscale = 2000;
-    ascale = 24;*/
+    ascale = 24;
 
     return true;
 }

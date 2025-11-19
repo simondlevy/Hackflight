@@ -23,6 +23,11 @@
 
 static Hackflight hackflight;
 
+static void wait(const float freq)
+{
+    delay(1000/freq);
+}
+
 void setup() 
 {
     pinMode(16, INPUT_PULLUP);
@@ -35,25 +40,7 @@ void setup()
 
 void loop() 
 {
-    /*
-       accel.readSensor();
-       gyro.readSensor();
+    wait(Hackflight::LOOP1_TASK_FREQ);
 
-       Serial.print(accel.getAccelX_mss());
-       Serial.print("\t");
-       Serial.print(accel.getAccelY_mss());
-       Serial.print("\t");
-       Serial.print(accel.getAccelZ_mss());
-       Serial.print("\t");
-       Serial.print(gyro.getGyroX_rads());
-       Serial.print("\t");
-       Serial.print(gyro.getGyroY_rads());
-       Serial.print("\t");
-       Serial.print(gyro.getGyroZ_rads());
-       Serial.print("\t");
-       Serial.print(accel.getTemperature_C());
-       Serial.print("\n");
-
-       delay(20);
-     */
+    hackflight.loop1(Mixer::rotorCount, Mixer::mix);
 }

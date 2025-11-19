@@ -25,13 +25,12 @@
 
 static Hackflight hackflight;
 
-static constexpr float LOOP1_TASK_FREQ = 1000;
 static const uint8_t LOOP1_TASK_PRIORITY = 5;
 static FreeRtosTask loop1Task;
 static void runLoop1Task(void *)
 {
     while (true) {
-        FreeRtosTask::wait(LOOP1_TASK_FREQ);
+        FreeRtosTask::wait(Hackflight::LOOP1_TASK_FREQ);
         hackflight.loop1(Mixer::rotorCount, Mixer::mix);
     }
 }
