@@ -31,6 +31,8 @@ class ZRanger {
             wire->setClock(400000);
             delay(100);
 
+            _vl53l1x.setBus(wire);
+
             if (!_vl53l1x.init()) {
                 Debugger::error("ZRanger");
             }

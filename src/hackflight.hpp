@@ -43,13 +43,12 @@ class Hackflight {
                 const uint8_t csPin,
                 HardwareSerial * uart)
         {
-            //_ekf.init(millis());
+            _ekf.init(millis());
 
             Serial.begin(115200);
 
             _imu.init();
 
-            /*
             _zranger.init(wire);
 
             _opticalflow.init(spi, csPin);
@@ -64,7 +63,6 @@ class Hackflight {
             _uart->begin(115200);
 
             _msec_start = millis();
-            */
         }
 
         void loop1(const uint8_t motorCount, const mixFun_t mixFun)
