@@ -30,15 +30,13 @@ static void loop2_thread()
     while(true) {
 
         hackflight.loop2();
-        threads.delay(20);
+        threads.delay(15);
         threads.yield();
     }
 }
 
 void setup() 
 {
-    Serial.begin(115200);
-
     SPI.begin();
 
     pinMode(16, INPUT_PULLUP);

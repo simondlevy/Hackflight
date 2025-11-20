@@ -39,9 +39,9 @@ class Hackflight {
                 const uint8_t ledPin,
                 const bool isLedInverted,
                 HardwareSerial * uart,
-                TwoWire * wire=nullptr,
-                SPIClass * spi=nullptr,
-                const uint8_t csPin=0)
+                TwoWire * wire,
+                SPIClass * spi,
+                const uint8_t csPin)
         {
             _ekf.init(millis());
 
@@ -58,13 +58,9 @@ class Hackflight {
             _uart = uart;
             _uart->begin(115200);
 
-            if (wire) {
-                _zranger.init(wire);
-            }
+            _zranger.init(wire);
 
-            if (spi) {
-                _opticalflow.init(spi, csPin);
-            }
+            _opticalflow.init(spi, csPin);
 
             _msec_start = millis();
         }
