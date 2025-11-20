@@ -30,7 +30,7 @@ static FreeRtosTask loop1Task;
 static void runLoop1Task(void *)
 {
     while (true) {
-        FreeRtosTask::wait(1); // yield to loop2 task
+        vTaskDelay(1); // yield to loop2 task
         hackflight.loop1(Mixer::rotorCount, Mixer::mix);
     }
 }
