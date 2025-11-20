@@ -9,10 +9,8 @@ PORT = /dev/ttyACM0
 BIN = build/$(SKETCH).ino.bin
 
 $(BIN): $(SKETCH).ino
-	arduino-cli compile --fqbn $(FQBN) $(SKETCH).ino --build-path ./build
-
-build: $(SKETCH).ino
-	arduino-cli compile --fqbn $(FQBN) $(SKETCH).ino
+	arduino-cli compile --fqbn $(FQBN) $(SKETCH).ino --build-path ./build \
+		--libraries $(HOME)/Documents/Arduino/libraries \
 
 flash: $(BIN)
 	echo 'R' > /dev/ttyACM0
