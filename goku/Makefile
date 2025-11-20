@@ -14,7 +14,7 @@ $(BIN): $(SKETCH).ino
 build: $(SKETCH).ino
 	arduino-cli compile --fqbn $(FQBN) $(SKETCH).ino
 
-flash:
+flash: $(BIN)
 	echo 'R' > /dev/ttyACM0
 	sleep 3
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
