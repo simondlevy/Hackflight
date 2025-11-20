@@ -16,7 +16,7 @@ build: $(SKETCH).ino
 
 flash:
 	echo 'R' > /dev/ttyACM0
-	sleep 4
+	sleep 3
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 dfu: $(BIN)
