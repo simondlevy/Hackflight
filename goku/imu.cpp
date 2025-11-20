@@ -24,19 +24,19 @@ static SPIClass spi = SPIClass(PA7, PA6, PA5);
 
 static ICM42688 icm42688(spi, PB12);
 
-static bool failed(const int status)
+static bool okay(const int status)
 {
-    return status < 0;
+    return status >= 0;
 }
+
 
 bool Imu::device_init(int16_t & gscale, int16_t & ascale)
 {
-    if (failed(icm42688.begin())) return false;
-
     gscale = 2000;
     ascale = 24;
 
-    return true;
+    return okay(icm42688.begin());
+
 }
 
 void Imu::device_read(
