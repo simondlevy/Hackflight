@@ -8,7 +8,7 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t MOSI_PIN = PA7;
 
-static SPIClass spi;
+static SPIClass spi = SPIClass(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static ICM42688 IMU(spi, PB12);
 
@@ -25,10 +25,6 @@ void setup()
     Serial.begin(115200);
 
     pinMode(LED_PIN, OUTPUT);
-
-    spi.setSCLK(SCLK_PIN);
-    spi.setMISO(MISO_PIN);
-    spi.setMOSI(MOSI_PIN);
 
 	int status = IMU.begin();
 
