@@ -54,4 +54,5 @@ void setup()
 void loop() 
 {
     hackflight.loop1(Mixer::rotorCount, Mixer::mix);
+    delayMicroseconds(1);
 }
