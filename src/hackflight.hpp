@@ -35,8 +35,6 @@ class Hackflight {
 
     public:
 
-        static constexpr float LOOP1_TASK_FREQ = 1000;
-
         void init(
                 const uint8_t ledPin,
                 const bool isLedInverted,
@@ -71,6 +69,8 @@ class Hackflight {
 
         void loop1(const uint8_t motorCount, const mixFun_t mixFun)
         {
+            //report();
+
             static status_t _status;
             static float _motorvals[MAX_MOTOR_COUNT];
             static demands_t _demands;
@@ -492,6 +492,19 @@ class Hackflight {
         static bool isSafeAngle(float angle)
         {
             return fabs(angle) < STATE_PHITHETA_MAX;
+        }
+
+        void report()
+        {
+            static uint32_t _count;
+            static Timer _timer;
+            if (_timer.ready(1)) {
+                if (_count > 0) {
+                    Serial.println(_count);
+                }
+                _count = 0;
+            }
+            _count++;
         }
 
         // Device-dependent ---------------------------

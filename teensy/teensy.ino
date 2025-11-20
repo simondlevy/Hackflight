@@ -23,11 +23,6 @@
 
 static Hackflight hackflight;
 
-static void wait(const float freq)
-{
-    delay(1000/freq);
-}
-
 void setup() 
 {
     pinMode(16, INPUT_PULLUP);
@@ -40,7 +35,5 @@ void setup()
 
 void loop() 
 {
-    wait(Hackflight::LOOP1_TASK_FREQ);
-
     hackflight.loop1(Mixer::rotorCount, Mixer::mix);
 }

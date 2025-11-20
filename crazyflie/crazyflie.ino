@@ -30,7 +30,7 @@ static FreeRtosTask loop1Task;
 static void runLoop1Task(void *)
 {
     while (true) {
-        FreeRtosTask::wait(Hackflight::LOOP1_TASK_FREQ);
+        FreeRtosTask::wait(1); // yield to loop2 task
         hackflight.loop1(Mixer::rotorCount, Mixer::mix);
     }
 }
