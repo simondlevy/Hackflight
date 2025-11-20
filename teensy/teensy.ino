@@ -25,15 +25,20 @@ static Hackflight hackflight;
 
 void setup() 
 {
+    Serial.begin(115200);
+
+    SPI.begin();
+
     pinMode(16, INPUT_PULLUP);
     pinMode(17, INPUT_PULLUP);
     pinMode(18, INPUT_PULLUP);
     pinMode(19, INPUT_PULLUP);
 
-    hackflight.init(15, false, &Serial1); //&Wire1, &SPI, SS);
+    hackflight.init(15, false, &Serial1, &Wire1, &SPI, SS);
 }
 
 void loop() 
 {
     hackflight.loop1(Mixer::rotorCount, Mixer::mix);
+    delayMicroseconds(250);
 }

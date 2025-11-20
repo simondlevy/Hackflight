@@ -59,8 +59,10 @@ class Hackflight {
             _uart->begin(115200);
 
             if (wire) {
-
                 _zranger.init(wire);
+            }
+
+            if (spi) {
                 _opticalflow.init(spi, csPin);
             }
 
@@ -69,7 +71,7 @@ class Hackflight {
 
         void loop1(const uint8_t motorCount, const mixFun_t mixFun)
         {
-            //report();
+            report();
 
             static status_t _status;
             static float _motorvals[MAX_MOTOR_COUNT];
