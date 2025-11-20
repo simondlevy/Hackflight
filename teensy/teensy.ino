@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,22 @@
 
 #define _MAIN
 
+#include <TeensyThreads.h>
+
 #include <hackflight.hpp>
 #include <mixers/crazyflie.hpp>
 
 static Hackflight hackflight;
+
+static void loop2_thread()
+{
+    while(true) {
+
+        hackflight.loop2();
+        threads.delay(20);
+        threads.yield();
+    }
+}
 
 void setup() 
 {
@@ -35,10 +47,11 @@ void setup()
     pinMode(19, INPUT_PULLUP);
 
     hackflight.init(15, false, &Serial1, &Wire1, &SPI, SS);
+
+    threads.addThread(loop2_thread);
 }
 
 void loop() 
 {
     hackflight.loop1(Mixer::rotorCount, Mixer::mix);
-    delayMicroseconds(250);
 }
