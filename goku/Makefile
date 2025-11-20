@@ -15,7 +15,9 @@ build: $(SKETCH).ino
 	arduino-cli compile --fqbn $(FQBN) $(SKETCH).ino
 
 flash:
-	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
+	echo 'R' > /dev/ttyACM0
+	sleep 4
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
