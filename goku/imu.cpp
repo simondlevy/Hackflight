@@ -15,44 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
 #include <SPI.h>
-
-#include <BMI088.h>
+#include <ICM42688.h>
 
 #include <imu.hpp>
 
-#ifdef BOLT
+static SPIClass spi = SPIClass(PA7, PA6, PA5);
 
-static const uint8_t ACCEL_CS_PIN = PB1;
-static const uint8_t GYRO_CS_PIN = PB0;
-
-static const uint8_t MISO_PIN = PB14;
-static const uint8_t MOSI_PIN = PB15;
-static const uint8_t SCLK_PIN = PB13;
-
-static SPIClass spi = SPIClass(MOSI_PIN, MISO_PIN, SCLK_PIN);
-
-static Bmi088Accel accel(spi, ACCEL_CS_PIN);
-
-static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
-
-#else
-
-static const uint8_t SDA_PIN = PC9;
-static const uint8_t SCL_PIN = PA8;
-
-static const uint8_t ACCEL_ADDR = 0x18;
-static const uint8_t GYRO_ADDR = 0x69;
-
-static TwoWire wire = TwoWire(SDA_PIN, SCL_PIN);
-
-static Bmi088Accel accel(wire, ACCEL_ADDR);
-
-static Bmi088Gyro gyro(wire, GYRO_ADDR);
-
-
-#endif
+static ICM42688 icm42688(spi, PB12);
 
 static bool failed(const int status)
 {
@@ -61,24 +31,7 @@ static bool failed(const int status)
 
 bool Imu::device_init(int16_t & gscale, int16_t & ascale)
 {
-    if (failed(gyro.begin())) return false;
-
-    if (failed(accel.begin())) return false;
-
-    if (failed(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ))) return false;
-
-    if (failed(gyro.setRange(Bmi088Gyro::RANGE_2000DPS))) return false;
-
-    if (failed(gyro.pinModeInt3(
-                        Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                        Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)))
-        return false;
-            
-    if (failed(gyro.mapDrdyInt3(true))) return false;
-
-    if (failed(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ))) return false;
-
-    if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
+    if (failed(icm42688.begin())) return false;
 
     gscale = 2000;
     ascale = 24;
@@ -90,15 +43,13 @@ void Imu::device_read(
         int16_t & gx, int16_t & gy, int16_t & gz,
         int16_t & ax, int16_t & ay, int16_t & az)
 {
-    gyro.readSensor();
+    icm42688.getRawAGT();
 
-    gx = gyro.getGyroX_raw();
-    gy = gyro.getGyroY_raw();
-    gz = gyro.getGyroZ_raw();
+    gx = icm42688.rawGyrX();
+    gy = icm42688.rawGyrY();
+    gz = icm42688.rawGyrZ();
 
-    accel.readSensor();
-
-    ax = accel.getAccelX_raw();
-    ay = accel.getAccelY_raw();
-    az = accel.getAccelZ_raw();
-}*/
+    ax = icm42688.rawAccX();
+    ay = icm42688.rawAccY();
+    az = icm42688.rawAccZ();
+}

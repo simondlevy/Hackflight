@@ -102,7 +102,7 @@ class Imu {
             memcpy(&gyroData, &_gyroData, sizeof(axis3_t));
         }
 
-    private:
+    //private:
 
         static constexpr float RAW_GYRO_VARIANCE_BASE = 100;
 
