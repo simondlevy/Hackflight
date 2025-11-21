@@ -48,11 +48,11 @@ void Imu::device_read(
 {
     icm42688.getRawAGT();
 
-    gx = icm42688.rawGyrX();
-    gy = icm42688.rawGyrY();
-    gz = icm42688.rawGyrZ();
+    gx =  icm42688.rawGyrX();
+    gy = -icm42688.rawGyrY();
+    gz = -icm42688.rawGyrZ();
 
-    ax = icm42688.rawAccX();
-    ay = icm42688.rawAccY();
-    az = icm42688.rawAccZ();
+    ax =  icm42688.rawAccX();
+    ay = -icm42688.rawAccY();
+    az = -icm42688.rawAccZ();
 }

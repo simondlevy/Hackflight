@@ -1,8 +1,4 @@
-/**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
+/** * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy * * This program is free software: you can redistribute it and/or modify * it under the terms of the GNU General Public License as published by * the Free Software Foundation, in version 3.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,7 +47,8 @@ class Imu {
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
         }
 
-        bool step(EKF * ekf, const uint32_t tickCount)
+        bool step(EKF * ekf, const uint32_t tickCount,
+                Debugger * debugger=nullptr)
         {
             Axis3i16 gyroRaw = {};
             Axis3i16 accelRaw = {};
@@ -59,6 +56,12 @@ class Imu {
             device_read(
                     gyroRaw.x, gyroRaw.y, gyroRaw.z,
                     accelRaw.x, accelRaw.y, accelRaw.z);
+
+            /*
+            Debugger::printf(debugger,
+                    "gx=%+d gy=%+d  gz=%+d ax=%+d ay=%+d az=%+d",
+                    gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                    accelRaw.x, accelRaw.y, accelRaw.z);*/
 
             // Convert accel to Gs
             axis3_t accel = {
@@ -176,8 +179,6 @@ class Imu {
         bias_t _gyroBiasRunning;
 
         EKF * _ekf;
-
-        Debugger * _debugger;
 
         /**
          * Checks if the variances is below the predefined thresholds.
@@ -325,6 +326,14 @@ class Imu {
 
         bool device_init(int16_t & gscale, int16_t & ascale);
 
+        /**
+          * gx: positive roll-right
+          * gy: positive nose-downward
+          * gz: positive counter-clockwise
+          * ax: positive nose-up
+          * ay: positive roll-rightward
+          * az: positive rightside-up
+          */
         void device_read(
                 int16_t & gx, int16_t & gy, int16_t & gz,
                 int16_t & ax, int16_t & ay, int16_t & az);

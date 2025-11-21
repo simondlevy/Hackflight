@@ -81,7 +81,7 @@ class Hackflight {
 
         void loop1(const uint8_t motorCount, const mixFun_t mixFun)
         {
-            report();
+            //report();
 
             static status_t _status;
             static float _motorvals[MAX_MOTOR_COUNT];
@@ -96,7 +96,7 @@ class Hackflight {
             const uint32_t msec = millis() - _msec_start;
 
             // Sync the core loop to the IMU
-            const bool imuIsCalibrated = _imu.step(&_ekf, msec);
+            const bool imuIsCalibrated = _imu.step(&_ekf, msec, &_debugger);
 
             // Set the LED based on current status
             runLed(imuIsCalibrated, _status);
