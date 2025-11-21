@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,28 +15,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bootloader.hpp"
+#include <oneshot125.hpp>
 
 #include <hackflight.hpp>
-#include <mixers/crazyflie.hpp>
 
-static Hackflight hackflight;
+static const std::vector<uint8_t> MOTOR_PINS = {PB0, PB1, PA3, PA2};
 
-void setup()
+static auto motors = OneShot125(MOTOR_PINS);
+
+void Hackflight::motors_init()
 {
-    // static HardwareSerial uart = HardwareSerial(PD_6, PD_5);
-    static HardwareSerial uart = HardwareSerial(PC7, PC6);
-
-    hackflight.init1(PC14, true, &uart);
+    motors.arm();
 }
 
-void loop()
-{  
-    delay(1);
+void Hackflight::motors_setSpeed(uint32_t id, float speed)
+{
+    const uint8_t pulse_width = 125 * (speed + 1);
 
-    hackflight.loop1(Mixer::rotorCount, Mixer::mix);
-
-    if (Serial.available() && Serial.read() == 'R') {
-        Bootloader::jump();
-    }
+    motors.set(id, pulse_width);
 }
+
+void Hackflight::motors_run()
+{
+    motors.run();
+}
+
+

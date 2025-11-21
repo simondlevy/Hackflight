@@ -18,7 +18,7 @@
 #include <BluetoothSerial.h> 
 #include <TinyPICO.h>
 
-static const char * BTNAME = "Hackflight-TinyPICO"; 
+static const char * BTNAME = "Goku"; 
 
 static const uint8_t TXD1 = 14;
 static const uint8_t RXD1 = 4;
