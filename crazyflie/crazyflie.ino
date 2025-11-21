@@ -42,7 +42,7 @@ static FreeRtosTask loop2Task;
 static void runLoop2Task(void *)
 {
     while (true) {
-        FreeRtosTask::wait(LOOP2_TASK_FREQ);
+        vTaskDelay(1000/LOOP2_TASK_FREQ);
         hackflight.loop2();
     }
 }

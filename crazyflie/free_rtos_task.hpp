@@ -48,9 +48,4 @@ class FreeRtosTask {
                     _taskStackBuffer,
                     &_taskTaskBuffer);
         }
-
-        static void wait(const float freq)
-        {
-            vTaskDelay(1000/freq);
-        }
 };
