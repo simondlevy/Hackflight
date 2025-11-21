@@ -35,12 +35,11 @@ static void runTask1(void *)
 
 static const float TASK2_FREQ = 70;
 static const uint8_t TASK2_PRIORITY = 3;
-
 static FreeRtosTask task2;
 static void runTask2(void *)
 {
     while (true) {
-        vTaskDelay(1000/TASK2_FREQ);
+        FreeRtosTask::wait(TASK2_FREQ);
         hackflight.loop2();
     }
 }

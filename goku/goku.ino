@@ -34,11 +34,12 @@ static void runTask1(void *)
 }
 
 static const uint8_t REBOOT_TASK_PRIORITY = 2;
+static const float REBOOT_TASK_FREQ = 10;
 static FreeRtosTask rebootTask;
 static void runRebootTask(void *)
 {
     while (true) {
-        vTaskDelay(100);
+        FreeRtosTask::wait(REBOOT_TASK_FREQ);
         if (Serial.available() && Serial.read() == 'R') {
             Bootloader::jump();
         }
