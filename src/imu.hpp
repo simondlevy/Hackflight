@@ -59,7 +59,7 @@ class Imu {
 
             /*
             Debugger::printf(debugger,
-                    "gx=%+d gy=%+d  gz=%+d ax=%+d ay=%+d az=%+d",
+                    "gx=%+4d gy=%+4d  gz=%+4d ax=%+4d ay=%+4d az=%+4d",
                     gyroRaw.x, gyroRaw.y, gyroRaw.z,
                     accelRaw.x, accelRaw.y, accelRaw.z);*/
 
@@ -327,11 +327,11 @@ class Imu {
         bool device_init(int16_t & gscale, int16_t & ascale);
 
         /**
-          * gx: positive roll-right
+          * gx: positive roll-rightward
           * gy: positive nose-downward
           * gz: positive counter-clockwise
           * ax: positive nose-up
-          * ay: positive roll-rightward
+          * ay: positive roll-right
           * az: positive rightside-up
           */
         void device_read(
