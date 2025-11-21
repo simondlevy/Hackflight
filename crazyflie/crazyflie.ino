@@ -51,11 +51,7 @@ void setup()
 {
     static HardwareSerial uart = HardwareSerial(PA3, PA2);
 
-    static SPIClass spi;
-
-    spi.setSCLK(PA5);
-    spi.setMISO(PA6);
-    spi.setMOSI(PA7);
+    static SPIClass spi = SPIClass(PA7, PA6, PA5);
 
     spi.begin();
 
