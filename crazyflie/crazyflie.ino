@@ -15,7 +15,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #define _MAIN
 
 #include "free_rtos_task.hpp"
