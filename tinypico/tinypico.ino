@@ -16,7 +16,9 @@
  */
 
 #include <BluetoothSerial.h> 
+#include <pmw3901.hpp>
 #include <TinyPICO.h>
+#include <VL53L1X.h>
 
 static const char * BTNAME = "Goku"; 
 
@@ -29,11 +31,44 @@ static const uint32_t TIMEOUT_MSEC = 1000;
 
 static HardwareSerial uarts(1);
 
-static TaskHandle_t bt_to_uart_task_handle = NULL;
-
 static TinyPICO tp = TinyPICO();
 
 static bool connected;
+
+class Task {
+
+    private:
+
+        typedef void (*fun_t)(void * obj);
+        
+        TaskHandle_t _handle;
+        fun_t _fun;
+        uint8_t _priority;
+
+    public:
+
+        Task(const fun_t fun, const uint8_t priority) 
+        {
+            _fun = fun;
+            _priority = priority;
+        }
+
+        void run() 
+        {
+            xTaskCreate(
+                    _fun, 
+                    "",      // name
+                    10000,   // stack size (bytes)
+                    NULL,    // data
+                    _priority,
+                    &_handle);
+        }
+
+};
+
+//////////////////////////////////////////////////////////
+
+static TaskHandle_t bt_to_uart_task_handle;
 
 void bt_to_uart_task(void *) 
 {
@@ -56,7 +91,9 @@ void bt_to_uart_task(void *)
     }
 }
 
-static TaskHandle_t uart_to_bt_task_handle = NULL;
+//////////////////////////////////////////////////////////
+
+static TaskHandle_t uart_to_bt_task_handle;
 
 void uart_to_bt_task(void *) 
 {
@@ -71,7 +108,9 @@ void uart_to_bt_task(void *)
     }
 }
 
-static TaskHandle_t blink_task_handle = NULL;
+//////////////////////////////////////////////////////////
+
+static TaskHandle_t blink_task_handle;
 
 void blink_task(void *) 
 {
@@ -88,19 +127,25 @@ void blink_task(void *)
     }
 }
 
+//////////////////////////////////////////////////////////
+
 void setup() 
 {
     uarts.begin(115200, SERIAL_8N1, RXD1, TXD1);
 
     bts.begin(BTNAME);
 
+    static Task _task1 = Task(bt_to_uart_task, 1);
+    _task1.run();
+
+    /*
     xTaskCreate(
             bt_to_uart_task, 
             "bt_to_uart_task", 
             10000,             // Stack size (bytes)
             NULL,        
             1,                 // Priority
-            &bt_to_uart_task_handle);
+            &bt_to_uart_task_handle);*/
 
 
     xTaskCreate(
