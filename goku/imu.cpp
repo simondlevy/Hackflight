@@ -33,10 +33,13 @@ static bool okay(const int status)
 bool Imu::device_init(int16_t & gscale, int16_t & ascale)
 {
     gscale = 2000;
-    ascale = 24;
+    ascale = 16;
 
-    return okay(icm42688.begin());
-
+    return okay(icm42688.begin()) &&
+        okay(icm42688.setGyroODR(ICM42688::odr1k)) &&
+        okay(icm42688.setGyroFS(ICM42688::dps2000)) &&
+        okay(icm42688.setAccelODR(ICM42688::odr1k)) &&
+        okay(icm42688.setAccelFS(ICM42688::gpm16));
 }
 
 void Imu::device_read(
