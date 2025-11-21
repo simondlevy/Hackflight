@@ -150,6 +150,8 @@ void sensor_task(void *)
 
     PMW3901 pmw3901;
 
+    SPI.begin();
+
     if (!pmw3901.begin()) {
         error("PMW3901");
     }
@@ -157,6 +159,14 @@ void sensor_task(void *)
     while (true) {
 
         const float zrange = vl53l1x.read();
+
+        int16_t deltaX = 0;
+        int16_t deltaY = 0;
+        bool gotMotion = false;
+
+        pmw3901.readMotion(deltaX, deltaY, gotMotion);
+
+        Serial.printf("zrange=%d\n", (int)zrange);
 
         vTaskDelay(10);
     }
@@ -166,6 +176,8 @@ void sensor_task(void *)
 
 void setup() 
 {
+    Serial.begin(115200);
+
     uart1.begin(115200, SERIAL_8N1, RXD1, TXD1);
 
     bts.begin(BTNAME);
