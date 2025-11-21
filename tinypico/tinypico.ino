@@ -123,6 +123,16 @@ void blink_task(void *)
 
 //////////////////////////////////////////////////////////
 
+void sensor_task(void *) 
+{
+    while (true) {
+
+        vTaskDelay(1);
+    }
+}
+
+//////////////////////////////////////////////////////////
+
 void setup() 
 {
     uart1.begin(115200, SERIAL_8N1, RXD1, TXD1);
@@ -137,6 +147,9 @@ void setup()
 
     static Task _task3 = Task(blink_task, 2);
     _task3.run();
+
+    static Task _task4 = Task(sensor_task, 3);
+    _task4.run();
 }
 
 void loop()
