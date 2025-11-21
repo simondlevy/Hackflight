@@ -53,6 +53,10 @@ void setup()
     hackflight.init1(PC14, true, &uart);
 
     task1.init(runTask1, "task1", NULL, TASK1_PRIORITY);
+
+    rebootTask.init(runRebootTask, "reboot", NULL, REBOOT_TASK_PRIORITY);
+
+    vTaskStartScheduler();
 }
 
 void loop()
