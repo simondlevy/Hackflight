@@ -24,7 +24,6 @@ static Hackflight hackflight;
 
 void setup()
 {
-    // static HardwareSerial uart = HardwareSerial(PD_6, PD_5);
     static HardwareSerial uart = HardwareSerial(PC7, PC6);
 
     hackflight.init1(PC14, true, &uart);
