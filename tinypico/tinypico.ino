@@ -29,7 +29,7 @@ static BluetoothSerial bts;
 
 static const uint32_t TIMEOUT_MSEC = 1000;
 
-static HardwareSerial uarts(1);
+static HardwareSerial uart1(1);
 
 static TinyPICO tp = TinyPICO();
 
@@ -68,8 +68,6 @@ class Task {
 
 //////////////////////////////////////////////////////////
 
-static TaskHandle_t bt_to_uart_task_handle;
-
 void bt_to_uart_task(void *) 
 {
     static uint32_t last_received;
@@ -80,7 +78,7 @@ void bt_to_uart_task(void *)
             last_received = millis();
             connected = true;
             const uint8_t b = bts.read();
-            uarts.write(b);
+            uart1.write(b);
         }
 
         if (millis() - last_received > TIMEOUT_MSEC) {
@@ -93,14 +91,12 @@ void bt_to_uart_task(void *)
 
 //////////////////////////////////////////////////////////
 
-static TaskHandle_t uart_to_bt_task_handle;
-
 void uart_to_bt_task(void *) 
 {
     while (true) {
 
-        while (uarts.available()) {
-            const uint8_t b = uarts.read();
+        while (uart1.available()) {
+            const uint8_t b = uart1.read();
             bts.write(b);
         }
 
@@ -109,8 +105,6 @@ void uart_to_bt_task(void *)
 }
 
 //////////////////////////////////////////////////////////
-
-static TaskHandle_t blink_task_handle;
 
 void blink_task(void *) 
 {
@@ -131,38 +125,19 @@ void blink_task(void *)
 
 void setup() 
 {
-    uarts.begin(115200, SERIAL_8N1, RXD1, TXD1);
+    uart1.begin(115200, SERIAL_8N1, RXD1, TXD1);
 
     bts.begin(BTNAME);
 
     static Task _task1 = Task(bt_to_uart_task, 1);
     _task1.run();
 
-    /*
-    xTaskCreate(
-            bt_to_uart_task, 
-            "bt_to_uart_task", 
-            10000,             // Stack size (bytes)
-            NULL,        
-            1,                 // Priority
-            &bt_to_uart_task_handle);*/
+    static Task _task2 = Task(uart_to_bt_task, 1);
+    _task2.run();
 
-
-    xTaskCreate(
-            uart_to_bt_task, 
-            "uart_to_bt_task", 
-            10000,             // Stack size (bytes)
-            NULL,        
-            1,                 // Priority
-            &uart_to_bt_task_handle);
-
-    xTaskCreate(
-            blink_task, 
-            "blink_task", 
-            10000,             // Stack size (bytes)
-            NULL,        
-            2,                 // Priority
-            &blink_task_handle);}
+    static Task _task3 = Task(blink_task, 2);
+    _task3.run();
+}
 
 void loop()
 {
