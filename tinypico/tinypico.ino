@@ -123,11 +123,42 @@ void blink_task(void *)
 
 //////////////////////////////////////////////////////////
 
-void sensor_task(void *) 
+static void error(const char * sensorName)
 {
     while (true) {
+        Serial.print("Failed to initialize ");
+        Serial.println(sensorName);
+        delay(500);
+    }
+}
 
-        vTaskDelay(1);
+void sensor_task(void *) 
+{
+    Wire.begin();
+    Wire.setClock(400000);
+    delay(100);
+
+    VL53L1X vl53l1x;
+
+    if (!vl53l1x.init()) {
+        error("VL53L1X");
+    }
+
+    vl53l1x.setDistanceMode(VL53L1X::Medium);
+    vl53l1x.setMeasurementTimingBudget(25000);
+    vl53l1x.startContinuous(50);
+
+    PMW3901 pmw3901;
+
+    if (!pmw3901.begin()) {
+        error("PMW3901");
+    }
+
+    while (true) {
+
+        const float zrange = vl53l1x.read();
+
+        vTaskDelay(10);
     }
 }
 
