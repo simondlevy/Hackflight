@@ -18,24 +18,44 @@
 #include "bootloader.hpp"
 
 #include <hackflight.hpp>
+#include <free_rtos_task.hpp>
 #include <mixers/crazyflie.hpp>
 
 static Hackflight hackflight;
+
+static const uint8_t TASK1_PRIORITY = 5;
+static FreeRtosTask task1;
+static void runTask1(void *)
+{
+    while (true) {
+        vTaskDelay(1); // yield
+        hackflight.loop1(Mixer::rotorCount, Mixer::mix);
+    }
+}
+
+static const uint8_t REBOOT_TASK_PRIORITY = 2;
+static FreeRtosTask rebootTask;
+static void runRebootTask(void *)
+{
+    while (true) {
+        vTaskDelay(100);
+        if (Serial.available() && Serial.read() == 'R') {
+            Bootloader::jump();
+        }
+    }
+}
+
 
 void setup()
 {
     static HardwareSerial uart = HardwareSerial(PC7, PC6);
 
     hackflight.init1(PC14, true, &uart);
+
+    task1.init(runTask1, "task1", NULL, TASK1_PRIORITY);
 }
 
 void loop()
 {  
-    delay(1);
 
-    hackflight.loop1(Mixer::rotorCount, Mixer::mix);
-
-    if (Serial.available() && Serial.read() == 'R') {
-        Bootloader::jump();
-    }
 }

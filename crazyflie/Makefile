@@ -12,12 +12,14 @@ MSGS = ../src/__messages__.h
 
 HASKDIR = ../haskell
 
+DEPS = $(SKETCH).ino  *.cpp $(SRC)/*.h $(SRC)/*.hpp $(MSGS)
+
 include ../snn_path.makefile
 
 any:
 	echo "Please specify cf2 or bolt"
 
-bolt: $(SKETCH).ino  *.cpp *.h bolt/*.cpp $(SRC)/*.hpp $(MSGS)
+bolt:  $(DEPS) bolt/*.cpp 
 	cp bolt/motors.cpp ./__motors__.cpp
 	arduino-cli compile \
 		--build-property build.extra_flags=-DBOLT \
@@ -26,7 +28,7 @@ bolt: $(SKETCH).ino  *.cpp *.h bolt/*.cpp $(SRC)/*.hpp $(MSGS)
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-cf2: $(SKETCH).ino  *.cpp *.h cf2/*.cpp $(SRC)/*.hpp $(MSGS)
+cf2: $(DEPS) cf2/*.cpp
 	cp cf2/motors.cpp ./__motors__.cpp
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \

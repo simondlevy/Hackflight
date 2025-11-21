@@ -17,31 +17,30 @@
 
 #define _MAIN
 
-#include "free_rtos_task.hpp"
-
 #include <hackflight.hpp>
+#include <free_rtos_task.hpp>
 #include <mixers/crazyflie.hpp>
 
 static Hackflight hackflight;
 
-static const uint8_t LOOP1_TASK_PRIORITY = 5;
-static FreeRtosTask loop1Task;
-static void runLoop1Task(void *)
+static const uint8_t TASK1_PRIORITY = 5;
+static FreeRtosTask task1;
+static void runTask1(void *)
 {
     while (true) {
-        vTaskDelay(1); // yield to loop2 task
+        vTaskDelay(1); // yield
         hackflight.loop1(Mixer::rotorCount, Mixer::mix);
     }
 }
 
-static const float LOOP2_TASK_FREQ = 70;
-static const uint8_t LOOP2_TASK_PRIORITY = 3;
+static const float TASK2_FREQ = 70;
+static const uint8_t TASK2_PRIORITY = 3;
 
-static FreeRtosTask loop2Task;
-static void runLoop2Task(void *)
+static FreeRtosTask task2;
+static void runTask2(void *)
 {
     while (true) {
-        vTaskDelay(1000/LOOP2_TASK_FREQ);
+        vTaskDelay(1000/TASK2_FREQ);
         hackflight.loop2();
     }
 }
@@ -56,9 +55,9 @@ void setup()
 
     hackflight.init(PC0, true, &uart, &Wire, &spi, PB4);
 
-    loop1Task.init(runLoop1Task, "loop1", NULL, LOOP1_TASK_PRIORITY);
+    task1.init(runTask1, "task1", NULL, TASK1_PRIORITY);
 
-    loop2Task.init(runLoop2Task, "loop2", NULL, LOOP2_TASK_PRIORITY);
+    task2.init(runTask2, "task2", NULL, TASK2_PRIORITY);
 
     vTaskStartScheduler();
 }
