@@ -19,15 +19,15 @@
 #include <Wire.h>
 #include <SPI.h>
 
+#include <VL53L1X.h>
+#include <pmw3901.hpp>
+
 #include <__control__.hpp>
 #include <__messages__.h>
-
-#include <VL53L1X.h>
 
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <imu.hpp>
-#include <opticalflow.hpp>
 #include <msp/parser.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
@@ -78,7 +78,9 @@ class Hackflight {
         {
             zrangerInit(wire);
 
-            _opticalflow.init(spi, csPin);
+            if (!_pmw3901.begin(csPin, *spi)) {
+                Debugger::error("OpticalFlow");
+            }
         }
 
         void task1(const uint8_t motorCount, const mixFun_t mixFun)
@@ -170,7 +172,17 @@ class Hackflight {
                 _ekf.enqueueRange(&tofData);
             }
 
-            _opticalflow.step(&_ekf);
+            int16_t deltaX = 0;
+            int16_t deltaY = 0;
+            bool gotMotion = false;
+
+            _pmw3901.readMotion(deltaX, deltaY, gotMotion);
+
+            flowMeasurement_t flowData = {};
+
+            if (flowUpdate(deltaX, deltaY, gotMotion, flowData)) {
+                _ekf.enqueueFlow(&flowData);
+            }
         }
 
     private:
@@ -201,6 +213,9 @@ class Hackflight {
         static constexpr float ZRANGER_EXP_POINT_B = 4.0;
         static constexpr float ZRANGER_EXP_STD_B = 0.2;   
 
+        static const int16_t FLOW_OUTLIER_LIMIT = 100;
+        static constexpr float FLOW_STD_FIXED = 2.0;
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
@@ -211,7 +226,6 @@ class Hackflight {
         } status_t;
 
         Imu _imu;
-        OpticalFlow _opticalflow;
         EKF _ekf;
         Debugger _debugger;
         uint32_t _msec_start;
@@ -219,6 +233,7 @@ class Hackflight {
         HardwareSerial * _uart;
 
         VL53L1X _vl53l1x;
+        PMW3901 _pmw3901;
 
         uint8_t _ledPin;
         bool _isLedInverted;
@@ -265,6 +280,50 @@ class Hackflight {
 
             return false;
         }
+
+        bool flowUpdate(
+                const int16_t deltaX,
+                const int16_t deltaY,
+                const bool gotMotion,
+                flowMeasurement_t & flowData)
+        {
+            // Flip motion information to comply with sensor mounting
+            // (might need to be changed if mounted differently)
+            int16_t accpx = -deltaY;
+            int16_t accpy = -deltaX;
+
+            // Outlier removal
+            if (abs(accpx) < FLOW_OUTLIER_LIMIT && abs(accpy) < FLOW_OUTLIER_LIMIT) {
+
+                static uint32_t _msecPrev;
+
+                // Form flow measurement struct and push into the EKF
+                flowData.stdDevX = FLOW_STD_FIXED;
+                flowData.stdDevY = FLOW_STD_FIXED;
+                flowData.dt = (float)(micros()-_msecPrev)/1000000.0f;
+
+                // We do want to update dt every measurement and not only
+                // in the ones with detected motion, as we work with
+                // instantaneous gyro and velocity values in the update
+                // function (meaning assuming the current measurements over
+                // all of dt)
+                _msecPrev = micros();
+
+                // Use raw measurements
+                flowData.dpixelx = (float)accpx;
+                flowData.dpixely = (float)accpy;
+
+                // Push measurements into the ekf if flow is not disabled
+                //    and the PMW flow sensor indicates motion detection
+                if (gotMotion) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
 
         void getStateEstimate(
                 const bool isFlying,
