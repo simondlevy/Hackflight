@@ -31,6 +31,7 @@
 #include <msp/parser.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
+#include <zranger.hpp>
 
 class Hackflight {
 
@@ -44,11 +45,16 @@ class Hackflight {
                 SPIClass * spi,
                 const uint8_t csPin)
         {
-            init1(ledPin, isLedInverted, uart);
-            init2(wire, spi, csPin);
+            init(ledPin, isLedInverted, uart);
+
+            ZRanger::init(wire, _vl53l1x);
+
+            if (!_pmw3901.begin(csPin, *spi)) {
+                Debugger::error("OpticalFlow");
+            }
         }
 
-        void init1(
+        void init(
                 const uint8_t ledPin,
                 const bool isLedInverted,
                 HardwareSerial * uart)
@@ -69,18 +75,6 @@ class Hackflight {
             _uart->begin(115200);
 
             _msec_start = millis();
-        }
-
-        void init2(
-                TwoWire * wire,
-                SPIClass * spi,
-                const uint8_t csPin)
-        {
-            zrangerInit(wire);
-
-            if (!_pmw3901.begin(csPin, *spi)) {
-                Debugger::error("OpticalFlow");
-            }
         }
 
         void task1(const uint8_t motorCount, const mixFun_t mixFun)
@@ -166,11 +160,7 @@ class Hackflight {
 
         void task2()
         {
-            tofMeasurement_t tofData = {};
-
-            if (zrangerUpdate(_vl53l1x.read(), tofData)) {
-                _ekf.enqueueRange(&tofData);
-            }
+            zrangerUpdate(_vl53l1x.read());
 
             int16_t deltaX = 0;
             int16_t deltaY = 0;
@@ -238,25 +228,7 @@ class Hackflight {
         uint8_t _ledPin;
         bool _isLedInverted;
 
-        void zrangerInit(TwoWire * wire)
-        {
-            wire->begin();
-            wire->setClock(400000);
-            delay(100);
-
-            _vl53l1x.setBus(wire);
-
-            if (!_vl53l1x.init()) {
-                Debugger::error("ZRanger");
-            }
-
-            _vl53l1x.setDistanceMode(VL53L1X::Medium);
-            _vl53l1x.setMeasurementTimingBudget(25000);
-
-            _vl53l1x.startContinuous(50);
-         }
-
-        bool zrangerUpdate(const float range, tofMeasurement_t & tofData)
+        void zrangerUpdate(const float range)
         {
             const float expCoeff =
                 logf(ZRANGER_EXP_STD_B / ZRANGER_EXP_STD_A) /
@@ -272,13 +244,14 @@ class Hackflight {
                 float stdDev = ZRANGER_EXP_STD_A * (
                         1 + expf(expCoeff * (distance - ZRANGER_EXP_POINT_A)));
 
+
+                tofMeasurement_t tofData = {};
+
                 tofData.distance = distance;
                 tofData.stdDev = stdDev;
 
-                return true;
+                _ekf.enqueueRange(&tofData);
             }
-
-            return false;
         }
 
         bool flowUpdate(

@@ -20,10 +20,14 @@
 #include <TinyPICO.h>
 #include <VL53L1X.h>
 
+#include <zranger.hpp>
+
 static const char * BTNAME = "Goku"; 
 
 static const uint8_t TXD1 = 14;
 static const uint8_t RXD1 = 4;
+
+static VL53L1X vl53l1x;
 
 static BluetoothSerial bts; 
 
@@ -134,19 +138,7 @@ static void error(const char * sensorName)
 
 void sensor_task(void *) 
 {
-    Wire.begin();
-    Wire.setClock(400000);
-    delay(100);
-
-    VL53L1X vl53l1x;
-
-    if (!vl53l1x.init()) {
-        error("VL53L1X");
-    }
-
-    vl53l1x.setDistanceMode(VL53L1X::Medium);
-    vl53l1x.setMeasurementTimingBudget(25000);
-    vl53l1x.startContinuous(50);
+    ZRanger::init(&Wire, vl53l1x);
 
     PMW3901 pmw3901;
 
