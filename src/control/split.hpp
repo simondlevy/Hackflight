@@ -23,7 +23,7 @@
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
-#include <msp/serializer.hpp>
+#include <serializer.hpp>
 #include <timer.hpp>
 
 class ClosedLoopControl {

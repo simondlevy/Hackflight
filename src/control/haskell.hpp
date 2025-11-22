@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include <datatypes.h>
-#include <msp/serializer.hpp>
+#include <serializer.hpp>
 
 static demands_t _demands;
 

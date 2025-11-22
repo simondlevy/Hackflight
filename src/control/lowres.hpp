@@ -27,7 +27,7 @@
 #include <control/lowres/yaw_angle.hpp>
 #include <control/lowres/yaw_rate.hpp>
 
-#include <msp/serializer.hpp>
+#include <serializer.hpp>
 
 class ClosedLoopControl {
 

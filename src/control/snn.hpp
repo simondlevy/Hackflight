@@ -17,8 +17,8 @@
 #pragma once
 
 #include <control/snn/helper.hpp>
-#include <msp/__messages__.h>
-#include <msp/serializer.hpp>
+#include <__messages__.h>
+#include <serializer.hpp>
 
 class ClosedLoopControl {
 

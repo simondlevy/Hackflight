@@ -20,6 +20,7 @@
 #include <TinyPICO.h>
 #include <VL53L1X.h>
 
+#include <serializer.hpp>
 #include <zranger.hpp>
 
 static const char * BTNAME = "Goku"; 
@@ -158,7 +159,7 @@ void sensor_task(void *)
 
         pmw3901.readMotion(deltaX, deltaY, gotMotion);
 
-        Serial.printf("zrange=%d\n", (int)zrange);
+        MspSerializer serializer = {};
 
         vTaskDelay(10);
     }

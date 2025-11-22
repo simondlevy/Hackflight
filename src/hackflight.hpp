@@ -28,7 +28,7 @@
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <imu.hpp>
-#include <msp/parser.hpp>
+#include <parser.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
 #include <zranger.hpp>
