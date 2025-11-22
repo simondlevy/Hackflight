@@ -22,6 +22,8 @@
 #include <__control__.hpp>
 #include <__messages__.h>
 
+#include <VL53L1X.h>
+
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <imu.hpp>
@@ -29,7 +31,6 @@
 #include <msp/parser.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
-#include <zranger.hpp>
 
 class Hackflight {
 
@@ -75,11 +76,12 @@ class Hackflight {
                 SPIClass * spi,
                 const uint8_t csPin)
         {
-            _zranger.init(wire);
+            zrangerInit(wire);
+
             _opticalflow.init(spi, csPin);
         }
 
-        void loop1(const uint8_t motorCount, const mixFun_t mixFun)
+        void task1(const uint8_t motorCount, const mixFun_t mixFun)
         {
             //report();
 
@@ -160,9 +162,14 @@ class Hackflight {
             }
         }
 
-        void loop2()
+        void task2()
         {
-            _zranger.step(&_ekf);
+            tofMeasurement_t tofData = {};
+
+            if (zrangerUpdate(_vl53l1x.read(), tofData)) {
+                _ekf.enqueueRange(&tofData);
+            }
+
             _opticalflow.step(&_ekf);
         }
 
@@ -188,6 +195,12 @@ class Hackflight {
 
         static constexpr float MAX_VELOCITY = 10; //meters per second
 
+        static const uint16_t ZRANGER_OUTLIER_LIMIT_MM = 5000;
+        static constexpr float ZRANGER_EXP_POINT_A = 2.5;
+        static constexpr float ZRANGER_EXP_STD_A = 0.0025; 
+        static constexpr float ZRANGER_EXP_POINT_B = 4.0;
+        static constexpr float ZRANGER_EXP_STD_B = 0.2;   
+
         typedef enum {
             STATUS_IDLE,
             STATUS_ARMED,
@@ -199,16 +212,59 @@ class Hackflight {
 
         Imu _imu;
         OpticalFlow _opticalflow;
-        ZRanger _zranger;
-
         EKF _ekf;
         Debugger _debugger;
         uint32_t _msec_start;
 
         HardwareSerial * _uart;
 
+        VL53L1X _vl53l1x;
+
         uint8_t _ledPin;
         bool _isLedInverted;
+
+        void zrangerInit(TwoWire * wire)
+        {
+            wire->begin();
+            wire->setClock(400000);
+            delay(100);
+
+            _vl53l1x.setBus(wire);
+
+            if (!_vl53l1x.init()) {
+                Debugger::error("ZRanger");
+            }
+
+            _vl53l1x.setDistanceMode(VL53L1X::Medium);
+            _vl53l1x.setMeasurementTimingBudget(25000);
+
+            _vl53l1x.startContinuous(50);
+         }
+
+        bool zrangerUpdate(const float range, tofMeasurement_t & tofData)
+        {
+            const float expCoeff =
+                logf(ZRANGER_EXP_STD_B / ZRANGER_EXP_STD_A) /
+                (ZRANGER_EXP_POINT_B - ZRANGER_EXP_POINT_A);
+
+            // check if range is feasible and push into the ekf the
+            // sensor should not be able to measure >5 [m], and outliers
+            // typically occur as >8 [m] measurements
+            if (range < ZRANGER_OUTLIER_LIMIT_MM) {
+
+                float distance = range / 1000; // Scale from [mm] to [m]
+
+                float stdDev = ZRANGER_EXP_STD_A * (
+                        1 + expf(expCoeff * (distance - ZRANGER_EXP_POINT_A)));
+
+                tofData.distance = distance;
+                tofData.stdDev = stdDev;
+
+                return true;
+            }
+
+            return false;
+        }
 
         void getStateEstimate(
                 const bool isFlying,
