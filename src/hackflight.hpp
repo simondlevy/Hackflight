@@ -31,7 +31,6 @@
 #include <parser.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
-#include <zranger.hpp>
 
 class Hackflight {
 
@@ -47,7 +46,7 @@ class Hackflight {
         {
             init(ledPin, isLedInverted, uart);
 
-            ZRanger::init(wire, _vl53l1x);
+            zrangerInit(wire);
 
             if (!_pmw3901.begin(csPin, *spi)) {
                 Debugger::error("OpticalFlow");
@@ -227,6 +226,24 @@ class Hackflight {
 
         uint8_t _ledPin;
         bool _isLedInverted;
+
+        void zrangerInit(TwoWire * wire)
+        {
+            wire->begin();
+            wire->setClock(400000);
+            delay(100);
+
+            _vl53l1x.setBus(wire);
+
+            if (!_vl53l1x.init()) {
+                //Debugger::error("ZRanger");
+            }
+
+            _vl53l1x.setDistanceMode(VL53L1X::Medium);
+            _vl53l1x.setMeasurementTimingBudget(25000);
+
+            _vl53l1x.startContinuous(50);
+         }
 
         void zrangerUpdate(const float range)
         {

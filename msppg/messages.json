@@ -35,15 +35,6 @@
    {"n15":    "byte"}
   ],
 
-  "SENSORS": 
-  [{"ID": 102},
-   {"comment": "Zranger, optical flow"},
-   {"zrange":    "short"},
-   {"dx":        "short"},
-   {"dy":        "short"},
-   {"gotMotion": "byte"}
-  ],
-
   "SET_ARMING": 
   [{"ID": 200},
    {"comment": "Dis/arm"},

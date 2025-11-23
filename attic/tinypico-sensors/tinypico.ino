@@ -20,25 +20,29 @@
 #include <TinyPICO.h>
 #include <VL53L1X.h>
 
+#include <__messages__.h>
 #include <serializer.hpp>
 #include <zranger.hpp>
 
 static const char * BTNAME = "Goku"; 
 
-static const uint8_t TXD1 = 14;
-static const uint8_t RXD1 = 4;
+static const uint8_t RX1_PIN = 4;
+static const uint8_t TX1_PIN = 14;
+
+static const uint8_t RX2_PIN = 15;
+static const uint8_t TX2_PIN = 27;
 
 static VL53L1X vl53l1x;
 
 static BluetoothSerial bts; 
 
-static const uint32_t TIMEOUT_MSEC = 1000;
-
-static HardwareSerial uart1(1);
+static const uint32_t BT_RX_TIMEOUT_MSEC = 1000;
 
 static TinyPICO tp = TinyPICO();
 
 static bool connected;
+
+static HardwareSerial uart1(1);
 
 class Task {
 
@@ -71,11 +75,26 @@ class Task {
 
 };
 
-//////////////////////////////////////////////////////////
+static void error(const char * sensorName)
+{
+    while (true) {
+        Serial.print("Failed to initialize ");
+        Serial.println(sensorName);
+        delay(500);
+    }
+}
+
+static void uart_begin(
+        HardwareSerial & uart, const uint8_t rx_pin, const uint8_t tx_pin)
+{
+    uart.begin(115200, SERIAL_8N1, rx_pin, tx_pin);
+}
 
 void bt_to_uart_task(void *) 
 {
     static uint32_t last_received;
+
+    uart_begin(uart1, RX1_PIN, TX1_PIN);
 
     while (true) {
 
@@ -86,15 +105,13 @@ void bt_to_uart_task(void *)
             uart1.write(b);
         }
 
-        if (millis() - last_received > TIMEOUT_MSEC) {
+        if (millis() - last_received > BT_RX_TIMEOUT_MSEC) {
             connected = false;
         }
 
         vTaskDelay(1);
     }
 }
-
-//////////////////////////////////////////////////////////
 
 void uart_to_bt_task(void *) 
 {
@@ -108,8 +125,6 @@ void uart_to_bt_task(void *)
         vTaskDelay(1);
     }
 }
-
-//////////////////////////////////////////////////////////
 
 void blink_task(void *) 
 {
@@ -126,19 +141,9 @@ void blink_task(void *)
     }
 }
 
-//////////////////////////////////////////////////////////
-
-static void error(const char * sensorName)
-{
-    while (true) {
-        Serial.print("Failed to initialize ");
-        Serial.println(sensorName);
-        delay(500);
-    }
-}
-
 void sensor_task(void *) 
 {
+    /*
     ZRanger::init(&Wire, vl53l1x);
 
     PMW3901 pmw3901;
@@ -148,9 +153,16 @@ void sensor_task(void *)
     if (!pmw3901.begin()) {
         error("PMW3901");
     }
+    */
+
+    MspSerializer serializer = {};
+
+    HardwareSerial uart(2);
+    uart_begin(uart, RX2_PIN, TX2_PIN);
 
     while (true) {
 
+        /*
         const float zrange = vl53l1x.read();
 
         int16_t deltaX = 0;
@@ -159,33 +171,44 @@ void sensor_task(void *)
 
         pmw3901.readMotion(deltaX, deltaY, gotMotion);
 
-        MspSerializer serializer = {};
+        const int16_t msg[4] = {
+            (int16_t)zrange,
+            deltaX,
+            deltaY,
+            (int16_t)gotMotion
+        };
+
+        */
+
+        const int16_t msg[4] = {1, 2, 3, 4};
+
+        serializer.serializeShorts(MSP_SENSORS, msg, 4);
+
+        for (uint8_t k=0; k<serializer.payloadSize; ++k) {
+            uart.write(serializer.payload[k]);
+        }
 
         vTaskDelay(10);
     }
 }
 
-//////////////////////////////////////////////////////////
-
 void setup() 
 {
     Serial.begin(115200);
 
-    uart1.begin(115200, SERIAL_8N1, RXD1, TXD1);
-
     bts.begin(BTNAME);
 
-    static Task _task1 = Task(bt_to_uart_task, 1);
-    _task1.run();
+    static Task task1 = Task(bt_to_uart_task, 1);
+    task1.run();
 
-    static Task _task2 = Task(uart_to_bt_task, 1);
-    _task2.run();
+    static Task task2 = Task(uart_to_bt_task, 1);
+    task2.run();
 
-    static Task _task3 = Task(blink_task, 2);
-    _task3.run();
+    static Task task3 = Task(blink_task, 2);
+    task3.run();
 
-    static Task _task4 = Task(sensor_task, 3);
-    _task4.run();
+    static Task task4 = Task(sensor_task, 3);
+    task4.run();
 }
 
 void loop()
