@@ -25,11 +25,11 @@
 
 static Hackflight hackflight;
 
-static void loop2_thread()
+static void task2_thread()
 {
     while(true) {
 
-        hackflight.loop2();
+        hackflight.task2();
         threads.delay(15);
         threads.yield();
     }
@@ -46,11 +46,11 @@ void setup()
 
     hackflight.init(15, false, &Serial1, &Wire1, &SPI, SS);
 
-    threads.addThread(loop2_thread);
+    threads.addThread(task2_thread);
 }
 
 void loop() 
 {
-    hackflight.loop1(Mixer::rotorCount, Mixer::mix);
+    hackflight.task1(Mixer::rotorCount, Mixer::mix);
     delayMicroseconds(1);
 }

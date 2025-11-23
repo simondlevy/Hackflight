@@ -57,11 +57,10 @@ class Imu {
                     gyroRaw.x, gyroRaw.y, gyroRaw.z,
                     accelRaw.x, accelRaw.y, accelRaw.z);
 
-            /*
             Debugger::printf(debugger,
                     "gx=%+4d gy=%+4d  gz=%+4d ax=%+4d ay=%+4d az=%+4d",
                     gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                    accelRaw.x, accelRaw.y, accelRaw.z);*/
+                    accelRaw.x, accelRaw.y, accelRaw.z);
 
             // Convert accel to Gs
             axis3_t accel = {

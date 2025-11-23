@@ -93,7 +93,7 @@ class Hackflight {
             const uint32_t msec = millis() - _msec_start;
 
             // Sync the core loop to the IMU
-            const bool imuIsCalibrated = _imu.step(&_ekf, msec, &_debugger);
+            const bool imuIsCalibrated = _imu.step(&_ekf, msec);
 
             // Set the LED based on current status
             runLed(imuIsCalibrated, _status);

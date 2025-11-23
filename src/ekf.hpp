@@ -502,8 +502,6 @@ class EKF {
             _isUpdated = false;
         }
 
-
-
         void addProcessNoise(const uint32_t nowMs) 
         {
             float dt = (nowMs - _lastProcessNoiseUpdateMs) / 1000.0f;
@@ -528,7 +526,6 @@ class EKF {
                 _lastProcessNoiseUpdateMs = nowMs;
             }
         }
-
 
         void update(measurement_t & m, const uint32_t nowMs)
         {
