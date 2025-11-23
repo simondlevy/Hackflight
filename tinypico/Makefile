@@ -1,24 +1,30 @@
+SKETCH = $(shell basename "`pwd`")
+
 FQBN = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyACM0
 
-SRC = ../src
+MSGS = ../src/__messages__.h
 
-build: tinypico.ino *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
-	$(SRC)/msp/__messages__.h
+build: $(SKETCH).ino $(MSGS)
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \
-		--fqbn $(FQBN) tinypico.ino
+		--fqbn $(FQBN) $(SKETCH).ino
 
-$(SRC)/msp/__messages__.h: ../msppg/messages.json
+$(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../tinypico
-
-standard_config:
-	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp
+	cp ../msppg/messages.h $(MSGS)
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN)
 
+edit:
+	vim $(SKETCH).ino
+
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
+
+clean:
+	rm -rf ../src/__*__.*
+
