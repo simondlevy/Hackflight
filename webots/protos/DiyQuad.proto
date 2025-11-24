@@ -72,6 +72,9 @@ DEF ROBOT Robot {
       width 256
       height 256
     }
+
+    GPS { # For obtaining initial location
+    }
  
     # Motor 1 ----------------------------------------------------------------
 

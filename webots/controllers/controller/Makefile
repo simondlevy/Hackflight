@@ -52,7 +52,8 @@ runlowres:
 runstandard:
 	cp ../../plugins/physics/standard/libstandard.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
+	webots ../../worlds/apartment.wbt &
+	# webots ../../worlds/simple.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runplank:

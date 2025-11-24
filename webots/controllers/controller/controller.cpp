@@ -25,6 +25,7 @@
 
 // Webots
 #include <webots/emitter.h>
+#include <webots/gps.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/range_finder.h>
@@ -102,6 +103,8 @@ class Simulator {
 
         WbDeviceTag _emitter;
 
+        WbDeviceTag _gps;
+
         WbDeviceTag _range_finder;
 
         double _timestep;
@@ -143,6 +146,9 @@ class Simulator {
             _range_finder = wb_robot_get_device("range-finder");
             wb_range_finder_enable(_range_finder, _timestep);
 
+            _gps = wb_robot_get_device("gps");
+            wb_gps_enable(_gps, _timestep);
+
             wb_keyboard_enable(_timestep);
 
             animateMotor("motor1", -1);
@@ -158,10 +164,12 @@ class Simulator {
 
         void sendSimInfo(siminfo_t & siminfo)
         {
+            const double * xyz = wb_gps_get_values(_gps);
+
+            printf("x=%+3.3f y=%+3.3f z=%+3.3f\n", xyz[0], xyz[1], xyz[2]);
+
             siminfo.demands.thrust = _zdist;
-
             siminfo.framerate = 1000 / _timestep;
-
             wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
         }
 

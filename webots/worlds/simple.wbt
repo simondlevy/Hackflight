@@ -3,6 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+
 EXTERNPROTO "../protos/DiyQuad.proto"
 
 WorldInfo {
@@ -18,17 +19,16 @@ WorldInfo {
     }
   ]
 }
+
 Viewpoint {
   orientation -0.02174433254380643 0.9975955462336316 -0.06580509202977021 0.9040344768641304
   position -1.6019216150116158 0.16827365780303696 1.957983967416911
   bloomThreshold 100
 }
+
 DEF diyquad DiyQuad {
-  hidden linearVelocity_0 -5.356412079470049e-08 -3.2676428942977185e-07 0.08120058242720714
-  hidden angularVelocity_0 1.8160064668504474e-05 -2.9768494370700527e-06 -1.115315213897099e-16
-  translation -2.1435055937822824e-07 -1.3958904185934806e-06 0.007598418525911919
-  rotation -0.9523151327705688 0.153016718535764 -0.2639730511713661 3.0284230965362176e-06
 }
+
 TexturedBackground {
 }
 TexturedBackgroundLight {
