@@ -68,9 +68,11 @@ DEF ROBOT Robot {
           ]
         }
       ]
-      fieldOfView 1
-      width 256
-      height 256
+
+      # VL53L5 specs
+      fieldOfView 1.34  # radians
+      width 8
+      height 8
     }
 
     GPS { # For obtaining initial location
