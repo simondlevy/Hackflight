@@ -31,6 +31,7 @@
 #include <webots/range_finder.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
+#include <webots/supervisor.h>
 
 class Simulator {
 
@@ -38,8 +39,25 @@ class Simulator {
 
         void init()
         {
-            _init();
+            wb_robot_init();
 
+            _timestep = wb_robot_get_basic_time_step();
+
+            _emitter = wb_robot_get_device("emitter");
+
+            _range_finder = wb_robot_get_device("range-finder");
+            wb_range_finder_enable(_range_finder, _timestep);
+
+            _gps = wb_robot_get_device("gps");
+            wb_gps_enable(_gps, _timestep);
+
+            wb_keyboard_enable(_timestep);
+
+            animateMotor("motor1", -1);
+            animateMotor("motor2", +1);
+            animateMotor("motor3", +1);
+            animateMotor("motor4", -1);
+ 
             wb_joystick_enable(_timestep);
 
             _zdist = ZDIST_INIT_M;
@@ -133,28 +151,6 @@ class Simulator {
         static float readJoystickAxis(const int8_t index)
         {
             return normalizeJoystickAxis(readJoystickRaw(index));
-        }
-
-        void _init()
-        {
-            wb_robot_init();
-
-            _timestep = wb_robot_get_basic_time_step();
-
-            _emitter = wb_robot_get_device("emitter");
-
-            _range_finder = wb_robot_get_device("range-finder");
-            wb_range_finder_enable(_range_finder, _timestep);
-
-            _gps = wb_robot_get_device("gps");
-            wb_gps_enable(_gps, _timestep);
-
-            wb_keyboard_enable(_timestep);
-
-            animateMotor("motor1", -1);
-            animateMotor("motor2", +1);
-            animateMotor("motor3", +1);
-            animateMotor("motor4", -1);
         }
 
         joystick_t getJoystickInfo() 

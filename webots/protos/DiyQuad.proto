@@ -58,6 +58,7 @@ DEF ROBOT Robot {
       height 8
       minRange 0.01
       maxRange 4.0
+      noise 0.0 # should probably adjust this
 
       # Arbitrary appearance settings
       translation 0.04 0 0.015
