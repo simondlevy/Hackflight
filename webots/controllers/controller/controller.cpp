@@ -27,6 +27,7 @@
 #include <webots/emitter.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
+#include <webots/range_finder.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
 
@@ -101,6 +102,8 @@ class Simulator {
 
         WbDeviceTag _emitter;
 
+        WbDeviceTag _range_finder;
+
         double _timestep;
 
         float _zdist;
@@ -136,6 +139,9 @@ class Simulator {
             _timestep = wb_robot_get_basic_time_step();
 
             _emitter = wb_robot_get_device("emitter");
+
+            _range_finder = wb_robot_get_device("range-finder");
+            wb_range_finder_enable(_range_finder, _timestep);
 
             wb_keyboard_enable(_timestep);
 

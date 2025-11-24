@@ -50,6 +50,30 @@ DEF ROBOT Robot {
             height 324
     }
 
+    RangeFinder {
+      translation 0.031 0 0.08
+      children [
+        Pose {
+          rotation 0 1 0 -1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.03
+                radius 0.01
+              }
+            }
+          ]
+        }
+      ]
+      fieldOfView 1
+      width 256
+      height 256
+    }
+ 
     # Motor 1 ----------------------------------------------------------------
 
     DEF M1 Propeller {
