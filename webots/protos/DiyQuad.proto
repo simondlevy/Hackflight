@@ -51,7 +51,7 @@ DEF ROBOT Robot {
     }
 
     RangeFinder {
-      translation 0.031 0 0.08
+      translation 0.04 0 0.015
       children [
         Pose {
           rotation 0 1 0 -1.5708
@@ -61,9 +61,8 @@ DEF ROBOT Robot {
                 roughness 1
                 metalness 0
               }
-              geometry Cylinder {
-                height 0.03
-                radius 0.01
+              geometry Box {
+                size 0.005 0.009 0.001
               }
             }
           ]
