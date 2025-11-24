@@ -173,8 +173,6 @@ class Simulator {
             siminfo.start_y = _start_y;
             siminfo.start_z = _start_z;
 
-            printf("%+3.3f %+3.3f %+3.3f\n", _start_x, _start_y, _start_z);
-
             siminfo.demands.thrust = _zdist;
             siminfo.framerate = 1000 / _timestep;
             wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
