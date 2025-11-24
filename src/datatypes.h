@@ -130,6 +130,9 @@ typedef struct {
 
 typedef struct {
 
+    float start_x;
+    float start_y;
+    float start_z;
     float framerate;
     bool hovering;
     demands_t demands;

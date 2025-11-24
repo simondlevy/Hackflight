@@ -145,9 +145,6 @@ DLLEXPORT void webots_physics_step()
     // Run controllers in middle loop, dynamics inside that
     const pose_t pose = run_sim_middle_loop(siminfo);
 
-    const double start_x = -5;
-    const double start_y = +2;
-
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
     axis4_t quat = {};
@@ -155,8 +152,13 @@ DLLEXPORT void webots_physics_step()
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
     dBodySetQuaternion(_robotBody, q);
 
-    // Set robot posed based on state, negating for rightward negative
-    dBodySetPosition(_robotBody, pose.x + start_x, -(pose.y + start_y), pose.z);
+    // Set robot posed based on state and starting position, negating for
+    // rightward negative
+    dBodySetPosition(
+            _robotBody,
+            siminfo.start_x + pose.x,
+            siminfo.start_y - pose.y,
+            siminfo.start_z + pose.z);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 

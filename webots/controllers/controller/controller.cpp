@@ -164,9 +164,20 @@ class Simulator {
 
         void sendSimInfo(siminfo_t & siminfo)
         {
-            const double * xyz = wb_gps_get_values(_gps);
+            static double _start_x, _start_y, _start_z;
 
-            printf("x=%+3.3f y=%+3.3f z=%+3.3f\n", xyz[0], xyz[1], xyz[2]);
+            if (_start_x == 0) {
+                const double * xyz = wb_gps_get_values(_gps);
+                _start_x = xyz[0];
+                _start_y = xyz[1];
+                _start_z = xyz[2];
+            }
+
+            siminfo.start_x = _start_x;
+            siminfo.start_y = _start_y;
+            siminfo.start_z = _start_z;
+
+            printf("%+3.3f %+3.3f %+3.3f\n", _start_x, _start_y, _start_z);
 
             siminfo.demands.thrust = _zdist;
             siminfo.framerate = 1000 / _timestep;
