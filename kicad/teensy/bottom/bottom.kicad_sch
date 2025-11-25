@@ -1999,15 +1999,15 @@
 		)
 		(uuid "244bdecb-8db8-4958-bf68-bb1f16525ebc")
 	)
-	(label "M2"
-		(at 99.06 90.17 0)
+	(label "GND"
+		(at 97.79 105.41 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "3a925e46-a2d4-4f98-9a1e-b5b6c63ed182")
+		(uuid "268c218d-739f-459f-ad99-a728672423a4")
 	)
 	(label "VBAT"
 		(at 173.99 82.55 0)
@@ -2089,16 +2089,6 @@
 		)
 		(uuid "64887f57-5c2f-4836-9571-540814abe79c")
 	)
-	(label "GND"
-		(at 97.79 95.25 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "6a620fad-1356-486d-ae67-106011886214")
-	)
 	(label "SDA0"
 		(at 124.46 144.78 0)
 		(effects
@@ -2138,16 +2128,6 @@
 			(justify left bottom)
 		)
 		(uuid "75e7015c-812d-42fe-bbfa-37b2fdff6828")
-	)
-	(label "M3"
-		(at 99.06 105.41 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "779c268a-66c5-4530-b308-34a136da975d")
 	)
 	(label "GND"
 		(at 129.54 82.55 0)
@@ -2198,6 +2178,16 @@
 			(justify left bottom)
 		)
 		(uuid "8154341d-bdec-4a9b-b1cd-28b168fe6525")
+	)
+	(label "GND"
+		(at 97.79 90.17 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "870452f0-be59-4029-b2ac-13fa41e52bd9")
 	)
 	(label "VBAT"
 		(at 97.79 111.76 0)
@@ -2289,16 +2279,6 @@
 		)
 		(uuid "ade216ca-fb42-4513-9325-f8bf45b2bb8b")
 	)
-	(label "GND"
-		(at 97.79 100.33 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "ae111a0e-f3a1-46d1-bd5e-6e0e998c403e")
-	)
 	(label "SDA1"
 		(at 124.46 147.32 0)
 		(effects
@@ -2339,6 +2319,16 @@
 		)
 		(uuid "b9f270f3-cf28-4418-920e-13963d147a2b")
 	)
+	(label "M3"
+		(at 99.06 100.33 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bf1f9893-d08e-4a76-beef-e6dd14c7f325")
+	)
 	(label "3V3"
 		(at 142.24 95.25 0)
 		(effects
@@ -2378,6 +2368,16 @@
 			(justify left bottom)
 		)
 		(uuid "cf74438d-b179-4fb9-b84f-eb0b61fb2ffb")
+	)
+	(label "M2"
+		(at 99.06 95.25 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d547c013-a05c-4b29-990e-aac0fd67fee3")
 	)
 	(label "RX5"
 		(at 125.73 137.16 0)
