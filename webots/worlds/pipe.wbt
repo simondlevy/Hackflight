@@ -1,0 +1,30 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/solids/protos/SolidPipe.proto"
+
+WorldInfo {
+  lineScale 0.5
+}
+Viewpoint {
+  orientation 0.2216086554602646 0.2595123765800149 -0.9399696432475286 1.9214166528779648
+  position 2.2688482664252723 16.681779665137803 10.668736444694735
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+}
+SolidPipe {
+  translation 0.381418849754734 -0.5484139037185342 0.9976626717966925
+  rotation 0.5367561129555262 0.5557370007158429 0.6348616079432065 -2.3120051659423897
+  subdivision 48
+  physics Physics {
+    density -1
+    mass 1
+  }
+}
