@@ -21,6 +21,8 @@ NET = $(EMBDIR)/examples/difference/difference.txt
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 
+WORLD = empty
+
 # -----------------------------------------------------------------------------
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
@@ -40,32 +42,32 @@ VERBOSE = 1
 runhaskell:
 	cp ../../plugins/physics/haskell/libhaskell.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
+	webots ../../worlds/$(WORLD).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runlowres:
 	cp ../../plugins/physics/lowres/liblowres.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
+	webots ../../worlds/$(WORLD).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runstandard:
 	cp ../../plugins/physics/standard/libstandard.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/apartment.wbt &
-	# webots ../../worlds/simple.wbt &
+	# webots ../../worlds/apartment.wbt &
+	webots ../../worlds/$(WORLD).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runplank:
 	cp ../../plugins/physics/plank/libplank.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
+	webots ../../worlds/$(WORLD).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
+	webots ../../worlds/$(WORLD).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller &
 	sleep 1
 	cd $(VIZ_DIR); \
