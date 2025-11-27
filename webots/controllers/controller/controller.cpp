@@ -264,7 +264,6 @@ class Simulator {
         void getSimInfoFromJoystick(siminfo_t & siminfo)
         {
             static bool _hover_button_was_down;
-            static bool _hovering;
             static status_t _status;
 
             auto axes = getJoystickInfo();
@@ -276,16 +275,14 @@ class Simulator {
             }
             else {
                 if (_hover_button_was_down) {
-                    _hovering = !_hovering;
                     switchStatus(_status);
                 }
                 _hover_button_was_down = false;
             }
 
             siminfo.status = _status;
-            siminfo.hovering = _hovering;
 
-            if (siminfo.hovering) {
+            if (siminfo.status == STATUS_HOVERING) {
 
                 siminfo.demands.pitch = readJoystickAxis(axes.pitch);
                 siminfo.demands.roll = readJoystickAxis(axes.roll);
@@ -298,7 +295,6 @@ class Simulator {
         void getSimInfoFromKeyboard(siminfo_t & siminfo)
         {
             static bool _spacebar_was_down;
-            static bool _hovering;
             static status_t _status;
 
             switch (wb_keyboard_get_key()) {
@@ -337,7 +333,6 @@ class Simulator {
 
                 case 32:
                     if (!_spacebar_was_down) {
-                        _hovering = !_hovering;
                         _spacebar_was_down = true;
                         switchStatus(_status);
                     }
@@ -348,27 +343,13 @@ class Simulator {
             }
 
             siminfo.status = _status;
-            siminfo.hovering = _hovering;
         }
 
         void switchStatus(status_t & status)
         {
-            const status_t old_status = status;
-
             status = (status == STATUS_IDLE ? STATUS_HOVERING :
                 status == STATUS_ARMED ? STATUS_HOVERING :
                 STATUS_ARMED);
-
-            const char * str[6] = {
-                "IDLE",
-                "ARMED",
-                "HOVERING",
-                "AUTONOMOUS",
-                "LANDING",
-                "LOST_CONTACT"
-            };
-
-            printf("status %s => %s", str[old_status], str[status]);
         }
 
         void climb(const float rate)

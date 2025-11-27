@@ -43,9 +43,8 @@ static void reportStatus(const siminfo_t & siminfo)
         "LOST_CONTACT"
     };
 
-    dWebotsConsolePrintf("status=%s hovering=%s",
-            str[siminfo.status],
-            siminfo.hovering ? "true" : "false");
+    dWebotsConsolePrintf("status=%s",
+            str[siminfo.status]);
 }
 
 static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
@@ -75,11 +74,11 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
-        // reportStatus(siminfo);
+        reportStatus(siminfo);
 
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
-                siminfo.hovering,
+                siminfo.status == STATUS_HOVERING,
                 state,
                 siminfo.demands,
                 demands);
