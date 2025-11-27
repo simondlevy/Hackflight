@@ -205,15 +205,6 @@ class Hackflight {
         static const int16_t FLOW_OUTLIER_LIMIT = 100;
         static constexpr float FLOW_STD_FIXED = 2.0;
 
-        typedef enum {
-            STATUS_IDLE,
-            STATUS_ARMED,
-            STATUS_HOVERING,
-            STATUS_LANDING,
-            STATUS_LOST_CONTACT
-
-        } status_t;
-
         Imu _imu;
         EKF _ekf;
         Debugger _debugger;

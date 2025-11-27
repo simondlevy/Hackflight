@@ -18,6 +18,16 @@
 
 #include <stdint.h>
 
+typedef enum {
+    STATUS_IDLE,
+    STATUS_ARMED,
+    STATUS_HOVERING,
+    STATUS_AUTONOMOUS,
+    STATUS_LANDING,
+    STATUS_LOST_CONTACT
+
+} status_t;
+
 typedef struct {
 
     float x;
