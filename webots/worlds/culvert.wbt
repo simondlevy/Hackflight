@@ -21,8 +21,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.24095351097857748 -0.4828813263644487 -0.8418830264327744 5.948913990061665
-  position -11.87350608234215 -3.653077566391395 2.173968353322827
+  orientation 0.2292004822707012 -0.10997984691585394 -0.9671460966158335 4.998488027382961
+  position -2.4574710505474977 -9.573292547722197 3.3245002991708676
 }
 DEF diyquad DiyQuad {
   translation -3.93621 -0.0983646 0.196788
@@ -74,6 +74,7 @@ DEF GROUND Solid {
   boundingObject USE GROUND_SHAPE
 }
 Pipe {
+  translation -0.14 2.62688e-07 0.25
 }
 Brick {
   name " brick_r_b_1"
@@ -101,12 +102,7 @@ Brick {
   translation 1.06 -0.61 0.0700003
 }
 Brick {
-  name " brick_r_b_6"
+  name " brick_r_b_5(1)"
   size 0.3 0.3 0.8
-  translation 1.84 -0.61 0.0700003
-}
-Brick {
-  name " brick_r_b_7"
-  size 0.3 0.3 0.3
-  translation 2.37 -0.61 0.0700003
+  translation 1.83 -0.61 0.0700003
 }
