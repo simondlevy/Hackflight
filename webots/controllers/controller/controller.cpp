@@ -353,10 +353,10 @@ class Simulator {
 
         void switchStatus(status_t & status)
         {
-            status = status ==
+            status = (status ==
                 STATUS_IDLE ? STATUS_HOVERING :
                 STATUS_ARMED ? STATUS_HOVERING :
-                STATUS_ARMED;
+                STATUS_ARMED);
         }
 
         void climb(const float rate)
@@ -365,7 +365,7 @@ class Simulator {
 
             static float _time_prev;
 
-            float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
+            const float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
 
             _time_prev = time_curr;
 
