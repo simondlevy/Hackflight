@@ -21,7 +21,10 @@ NET = $(EMBDIR)/examples/difference/difference.txt
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 
-WORLD = culvert
+# Support different worlds and closed-loop controllers ------------------------
+
+world = empty
+closedloop = standard
 
 # -----------------------------------------------------------------------------
 
@@ -39,35 +42,16 @@ USE_C_API = true
 
 VERBOSE = 1
 
-runhaskell:
-	cp ../../plugins/physics/haskell/libhaskell.so \
+run:
+	cp ../../plugins/physics/$(closedloop)/lib$(closedloop).so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/$(WORLD).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller
-
-runlowres:
-	cp ../../plugins/physics/lowres/liblowres.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/$(WORLD).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller
-
-runstandard:
-	cp ../../plugins/physics/standard/libstandard.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	# webots ../../worlds/apartment.wbt &
-	webots ../../worlds/$(WORLD).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller
-
-runplank:
-	cp ../../plugins/physics/plank/libplank.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/$(WORLD).wbt &
+	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
 
 runsnn:
 	cp ../../plugins/physics/snn/libsnn.so \
 		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/$(WORLD).wbt &
+	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller &
 	sleep 1
 	cd $(VIZ_DIR); \
