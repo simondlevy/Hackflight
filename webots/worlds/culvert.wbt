@@ -21,8 +21,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.1557269807664543 -0.9873473744810478 0.029904340266015073 6.173828738085408
-  position -8.543756153040718 0.08736774075864523 0.9889509281158342
+  orientation 0.024690650809546695 -0.9097523018355762 0.414416603271963 6.202901789734707
+  position -6.757578045161547 0.009248660455068242 0.5919422100922384
 }
 DEF diyquad DiyQuad {
   translation -4.43143 0.000764474 0.123756
@@ -33,7 +33,7 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 DEF GROUND Solid {
-  translation 0 -0.62 -0.03
+  translation 0 -0.7 -0.05
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -84,6 +84,24 @@ Pipe {
     }
     roughness 1
   }
+}
+DEF STILL_WATER Fluid {
+  translation 0 -0.09 -0.05
+  children [
+    DEF S Shape {
+      appearance DEF WATER_APPEARANCE PBRAppearance {
+        baseColor 0 0 0.2
+        transparency 0.5
+        roughness 0.001
+        metalness 0
+      }
+      geometry Box {
+        size 5.5 1.2 0.1
+      }
+    }
+  ]
+  name "puddle"
+  boundingObject USE S
 }
 Brick {
   name " brick"
@@ -708,7 +726,7 @@ Brick {
 Brick {
   name " brick2(21)"
   size 0.05 0.55 0.8
-  translation -2.1 -0.0300002 0.83
+  translation -2.1 -0.0300002 0.84
 }
 Brick {
   name " brick2(17)"
