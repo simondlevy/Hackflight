@@ -3,7 +3,6 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
 EXTERNPROTO "../protos/SolidPipe.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
 
@@ -21,18 +20,19 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.34944509632693943 -0.18029150758810109 0.9194471691971572 4.0295050675274
-  position 3.3239212590930167 5.003970975816013 3.6913703344746764
+  orientation -0.12351916114725119 -0.9419602914713457 0.31217595378359403 6.012352281779106
+  position -1.4078066574228703 1.8231624129478767 0.6954355057465664
 }
 DEF diyquad DiyQuad {
-  translation 1.02003 2.07 0.033315
-  rotation 5.652629990404873e-05 -1.413159997601214e-05 0.9999999983025376 -1.5707953071795862
+  translation 1.02026 2.06996 -0.0163744
+  rotation 0.0354269953833322 -0.999128545063562 -0.02206985358535998 0.00869937663786589
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 DEF GROUND Solid {
+  translation 0 0 -0.03
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -72,37 +72,9 @@ DEF GROUND Solid {
   ]
   boundingObject USE GROUND_SHAPE
 }
-Rock {
-  translation -0.866326 -1.02326 0
-  rotation 0 0 1 1.5708
-}
-Rock {
-  translation -0.690235 -0.2394 0.00976803
-  rotation 0 1 0 0.0980463
-  name "rock (1)"
-  type "flat"
-}
-Rock {
-  translation 2.01234 -0.859789 -0.03
-  rotation 0 0 1 1.309
-  name "rock (2)"
-  type "flat"
-}
-Rock {
-  translation -2.2847 2.36097 0
-  rotation -0.1325999849101226 0.1325999849101226 0.9822598882188313 -1.5886953071795862
-  name "rock (3)"
-  type "flat"
-}
-Rock {
-  translation -2.19116 0.215003 0
-  rotation 0 0 1 1.5708
-  name "rock (4)"
-  type "flat"
-}
 SolidPipe {
-  translation 0.510499 -0.569839 0.348955
-  rotation 0.5366734409291396 0.5554316307116519 0.6351986472012298 -2.311303284799553
+  translation 2.36638 2.12125 0.421699
+  rotation 0.7071067811865476 0 0.7071067811865476 3.141592653589793
   subdivision 48
   physics Physics {
     density -1
