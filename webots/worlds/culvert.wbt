@@ -3,7 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
-EXTERNPROTO "../protos/SolidPipe.proto"
+EXTERNPROTO "../protos/MySolidPipe.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
 
 WorldInfo {
@@ -20,19 +20,19 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.12351916114725119 -0.9419602914713457 0.31217595378359403 6.012352281779106
-  position -1.4078066574228703 1.8231624129478767 0.6954355057465664
+  orientation 0.03986075369814749 -0.9881527946420336 0.14820652737229295 6.039005320563786
+  position -13.114868448438957 -4.701417461884196 0.9676516329350691
 }
 DEF diyquad DiyQuad {
-  translation 1.02026 2.06996 -0.0163744
-  rotation 0.0354269953833322 -0.999128545063562 -0.02206985358535998 0.00869937663786589
+  translation -10.133 -4.7115 -0.0105021
+  rotation -0.9135874783979222 0.07640957793480634 -0.3993989180185024 0.030257587766784128
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 DEF GROUND Solid {
-  translation 0 0 -0.03
+  translation 0 -0.62 -0.03
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -73,8 +73,8 @@ DEF GROUND Solid {
   boundingObject USE GROUND_SHAPE
 }
 SolidPipe {
-  translation 2.36638 2.12125 0.421699
-  rotation 0.7071067811865476 0 0.7071067811865476 3.141592653589793
+  translation -5.50362 -4.69872 0.421703
+  rotation 0.7071067811865476 0 0.7071067811865476 3.14159
   subdivision 48
   physics Physics {
     density -1
