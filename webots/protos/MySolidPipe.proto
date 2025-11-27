@@ -4,9 +4,12 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/released/proje
 
 PROTO MySolidPipe [
   field SFRotation rotation 0 0 1 0
-  field SFNode     appearance            PBRAppearance { baseColorMap ImageTexture {
-                                                           url [ "../worlds/textures/light_asphalt.jpg" ] }
-                                                         metalness 0 roughness 0.5 }  
+  field SFNode appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [ "../worlds/textures/light_asphalt.jpg" ] 
+    }
+    metalness 0 roughness 0.5 
+  }  
 ]
 {
   SolidPipe {
