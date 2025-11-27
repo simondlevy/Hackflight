@@ -65,8 +65,6 @@ class Simulator {
             wb_joystick_enable(_timestep);
 
             _zdist = ZDIST_INIT_M;
-
-            _status = STATUS_ARMED;
         }
 
         bool step()
@@ -152,8 +150,6 @@ class Simulator {
             int8_t yaw;
 
         } joystick_t;
-
-        status_t _status;
 
         WbDeviceTag _emitter;
         WbDeviceTag _gps;
@@ -269,6 +265,7 @@ class Simulator {
         {
             static bool _hover_button_was_down;
             static bool _hovering;
+            static status_t _status;
 
             auto axes = getJoystickInfo();
 
@@ -280,11 +277,12 @@ class Simulator {
             else {
                 if (_hover_button_was_down) {
                     _hovering = !_hovering;
-                    switchStatus();
+                    switchStatus(_status);
                 }
                 _hover_button_was_down = false;
             }
 
+            siminfo.status = _status;
             siminfo.hovering = _hovering;
 
             if (siminfo.hovering) {
@@ -301,6 +299,7 @@ class Simulator {
         {
             static bool _spacebar_was_down;
             static bool _hovering;
+            static status_t _status;
 
             switch (wb_keyboard_get_key()) {
 
@@ -340,7 +339,7 @@ class Simulator {
                     if (!_spacebar_was_down) {
                         _hovering = !_hovering;
                         _spacebar_was_down = true;
-                        switchStatus();
+                        switchStatus(_status);
                     }
                     break;
 
@@ -348,23 +347,16 @@ class Simulator {
                     _spacebar_was_down = false;
             }
 
+            siminfo.status = _status;
             siminfo.hovering = _hovering;
         }
 
-        void switchStatus()
+        void switchStatus(status_t & status)
         {
-            _status = _status == STATUS_ARMED ? STATUS_HOVERING : STATUS_ARMED;
-
-            const char * str[6] = {
-                "IDLE",
-                "ARMED",
-                "HOVERING",
-                "AUTONOMOUS",
-                "LANDING",
-                "LOST_CONTACT"
-            };
-
-            printf("status=%s", str[_status]);
+            status = status ==
+                STATUS_IDLE ? STATUS_HOVERING :
+                STATUS_ARMED ? STATUS_HOVERING :
+                STATUS_ARMED;
         }
 
         void climb(const float rate)

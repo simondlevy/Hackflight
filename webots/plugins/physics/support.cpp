@@ -59,6 +59,19 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
+        const char * str[6] = {
+            "IDLE",
+            "ARMED",
+            "HOVERING",
+            "AUTONOMOUS",
+            "LANDING",
+            "LOST_CONTACT"
+        };
+
+        dWebotsConsolePrintf("status=%s hovering=%s",
+                str[siminfo.status],
+                siminfo.hovering ? "true" : "false");
+
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
                 siminfo.hovering,
