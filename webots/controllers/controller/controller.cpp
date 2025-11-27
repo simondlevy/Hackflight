@@ -73,28 +73,7 @@ class Simulator {
                 return false;
             }
 
-            const int range_finder_width =
-                wb_range_finder_get_width(_range_finder);
-            const int range_finder_height =
-                wb_range_finder_get_height(_range_finder);
-
-            const float * image =
-                wb_range_finder_get_range_image(_range_finder);
-
-            for (int i = 0; i < range_finder_width; i++) {
-                for (int j = 0; j < range_finder_height; j++) {
-                    const float distance = wb_range_finder_image_get_depth(
-                            image, range_finder_width, j, i);
-                    if (isinf(distance)) {
-                        printf(" inf  ");
-                    }
-                    else {
-                        printf("%3.3f ", distance);
-                    }
-                }
-                printf(" \n \n \n");
-            }
-            printf("-----------------------------------------------\n");
+            runRangefinder();
 
             siminfo_t siminfo = {};
 
@@ -120,6 +99,32 @@ class Simulator {
         void close()
         {
             wb_robot_cleanup();
+        }
+
+        void runRangefinder()
+        {
+            const int range_finder_width =
+                wb_range_finder_get_width(_range_finder);
+            const int range_finder_height =
+                wb_range_finder_get_height(_range_finder);
+
+            const float * image =
+                wb_range_finder_get_range_image(_range_finder);
+
+            for (int i = 0; i < range_finder_width; i++) {
+                for (int j = 0; j < range_finder_height; j++) {
+                    const float distance = wb_range_finder_image_get_depth(
+                            image, range_finder_width, j, i);
+                    if (isinf(distance)) {
+                        printf(" inf  ");
+                    }
+                    else {
+                        printf("%3.3f ", distance);
+                    }
+                }
+                printf(" \n \n \n");
+            }
+            printf("-----------------------------------------------\n");
         }
 
     private:
