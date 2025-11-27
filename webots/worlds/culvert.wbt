@@ -21,8 +21,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.6136146956214954 -0.7187390118530977 -0.32694225508149294 6.0349929681071535
-  position -13.115846574786133 -3.7468637735988293 3.2584534267585092
+  orientation -0.0496275735286554 0.9793023671095277 0.19622430460912213 0.4491323840797886
+  position -11.308617224079727 -1.1450024024199768 4.718122073325621
 }
 DEF diyquad DiyQuad {
   translation -3.93621 -0.0983646 0.196788
@@ -77,62 +77,157 @@ Pipe {
   translation -0.14 2.62688e-07 0.25
 }
 Brick {
-  name " brick_r_b_1"
-  size 0.3 0.3 0.8
-  translation -2.1 -0.6 0.0700008
+  name " brick"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.05
 }
 Brick {
-  name " brick_r_b_1(1)"
-  size 0.3 0.3 0.8
-  translation -2.1 -0.9 2e-06
+  name " brick(30)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.73 0.0499973
 }
 Brick {
-  name " brick_r_b_1(2)"
-  size 0.3 0.3 0.8
-  translation -1.3 -0.9 2e-06
+  name " brick(12)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 -1.76022e-14
 }
 Brick {
-  name " brick_r_b_1(3)"
-  size 0.3 0.3 0.8
-  translation -0.51 -0.9 2e-06
+  name " brick(1)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.1
 }
 Brick {
-  name " brick_r_b_1(4)"
-  size 0.3 0.3 0.8
-  translation 0.29 -0.9 2e-06
+  name " brick(29)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.73 0.0999971
 }
 Brick {
-  name " brick_r_b_1(5)"
-  size 0.3 0.3 0.8
-  translation 1.09 -0.9 2e-06
+  name " brick(2)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.15
 }
 Brick {
-  name " brick_r_b_1(6)"
-  size 0.3 0.3 0.8
-  translation 1.8 -0.9 2e-06
+  name " brick(28)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.74 0.15
 }
 Brick {
-  name " brick_r_b_2"
-  size 0.3 0.3 0.8
-  translation -1.29 -0.61 0.0700003
+  name " brick(3)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.19
 }
 Brick {
-  name " brick_r_b_3"
-  size 0.3 0.3 0.8
-  translation -0.49 -0.61 0.0700003
+  name " brick(27)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.75 0.189999
 }
 Brick {
-  name " brick_r_b_4"
-  size 0.3 0.3 0.8
-  translation 0.27 -0.61 0.0700003
+  name " brick(4)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.24
 }
 Brick {
-  name " brick_r_b_5"
-  size 0.3 0.3 0.8
-  translation 1.06 -0.61 0.0700003
+  name " brick(26)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.76 0.239999
 }
 Brick {
-  name " brick_r_b_5(1)"
-  size 0.3 0.3 0.8
-  translation 1.83 -0.61 0.0700003
+  name " brick(5)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.29
+}
+Brick {
+  name " brick(25)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.75 0.29
+}
+Brick {
+  name " brick(6)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.73 0.34
+}
+Brick {
+  name " brick(24)"
+  size 0.05 0.55 0.8
+  translation -2.1 0.73 0.339999
+}
+Brick {
+  name " brick(7)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.7 0.39
+}
+Brick {
+  name " brick(23)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.69 0.39
+}
+Brick {
+  name " brick(8)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.7 0.44
+}
+Brick {
+  name " brick(22)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.67 0.439999
+}
+Brick {
+  name " brick(9)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.68 0.49
+}
+Brick {
+  name " brick(21)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.66 0.49
+}
+Brick {
+  name " brick(10)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.63 0.54
+}
+Brick {
+  name " brick(20)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.61 0.54
+}
+Brick {
+  name " brick(11)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.59 0.59
+}
+Brick {
+  name " brick(19)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.58 0.59
+}
+Brick {
+  name " brick(13)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.51 0.64
+}
+Brick {
+  name " brick(18)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.52 0.64
+}
+Brick {
+  name " brick(14)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.38 0.69
+}
+Brick {
+  name " brick(17)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.43 0.69
+}
+Brick {
+  name " brick(15)"
+  size 0.05 0.5 0.8
+  translation -2.1 -0.28 0.74
+}
+Brick {
+  name " brick(16)"
+  size 0.05 0.5 0.8
+  translation -2.1 0.22 0.74
 }
