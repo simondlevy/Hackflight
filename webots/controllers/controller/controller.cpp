@@ -353,10 +353,22 @@ class Simulator {
 
         void switchStatus(status_t & status)
         {
-            status = (status ==
-                STATUS_IDLE ? STATUS_HOVERING :
-                STATUS_ARMED ? STATUS_HOVERING :
+            const status_t old_status = status;
+
+            status = (status == STATUS_IDLE ? STATUS_HOVERING :
+                status == STATUS_ARMED ? STATUS_HOVERING :
                 STATUS_ARMED);
+
+            const char * str[6] = {
+                "IDLE",
+                "ARMED",
+                "HOVERING",
+                "AUTONOMOUS",
+                "LANDING",
+                "LOST_CONTACT"
+            };
+
+            printf("status %s => %s", str[old_status], str[status]);
         }
 
         void climb(const float rate)
