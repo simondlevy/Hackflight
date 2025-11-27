@@ -9,7 +9,8 @@ PROTO Pipe [
     baseColorMap ImageTexture {
       url [ "../worlds/textures/light_asphalt.jpg" ] 
     }
-    metalness 0 roughness 0.5 
+    # metalness 0 roughness 0.5 
+    metalness 1.0 roughness 0.0 
   }  
 ]
 {
