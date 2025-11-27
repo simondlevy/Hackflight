@@ -3,6 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/released/projects/objects/solids/protos/SolidPipe.proto"
 
 PROTO MySolidPipe [
+  field SFVec3f translation 0 0 0.5
   field SFRotation rotation 0 0 1 0
   field SFNode appearance PBRAppearance {
     baseColorMap ImageTexture {
@@ -13,8 +14,11 @@ PROTO MySolidPipe [
 ]
 {
   SolidPipe {
+    radius 0.5
+    thickness 0.05
+    height 5
+    translation IS translation
     rotation IS rotation
     appearance IS appearance
-    height 5
   }
 }
