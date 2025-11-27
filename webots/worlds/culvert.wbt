@@ -3,9 +3,9 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
-EXTERNPROTO "../protos/MySolidPipe.proto"
+EXTERNPROTO "../protos/Pipe.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
-EXTERNPROTO "../protos/MySolidBox.proto"
+EXTERNPROTO "../protos/Brick.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -74,7 +74,7 @@ DEF GROUND Solid {
   boundingObject USE GROUND_SHAPE
 }
 
-MySolidPipe {
+Pipe {
 }
 
 Brick { translation -2.91 -0.58 0.15 }

@@ -3,7 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/solids/protos/SolidBox.proto"
 
 PROTO Brick [
-  field SFVec3f size 0.1 0.1 0.1
+  field SFVec3f size 0.1 0.1 0.2
   field SFVec3f translation 0 0 0
   field SFRotation rotation 0.7071067811865476 0 0.7071067811865476 3.14159
    field SFRotation rotation 0 0 1 0
