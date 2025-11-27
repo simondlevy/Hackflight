@@ -44,10 +44,10 @@ DEF ROBOT Robot {
       }
 
     Camera {
-        translation 0.03 0 0.01
-            fieldOfView 0.87
-            width 324
-            height 324
+        translation 0.05 0 0.01
+        fieldOfView 0.87
+        width 324
+        height 324
     }
 
     RangeFinder {
