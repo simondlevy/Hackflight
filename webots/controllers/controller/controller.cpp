@@ -65,6 +65,8 @@ class Simulator {
             wb_joystick_enable(_timestep);
 
             _zdist = ZDIST_INIT_M;
+
+            _status = STATUS_ARMED;
         }
 
         bool step()
@@ -73,7 +75,7 @@ class Simulator {
                 return false;
             }
 
-            runRangefinder();
+            // runRangefinder();
 
             siminfo_t siminfo = {};
 
@@ -151,10 +153,10 @@ class Simulator {
 
         } joystick_t;
 
+        status_t _status;
+
         WbDeviceTag _emitter;
-
         WbDeviceTag _gps;
-
         WbDeviceTag _range_finder;
 
         double _timestep;
@@ -278,6 +280,7 @@ class Simulator {
             else {
                 if (_hover_button_was_down) {
                     _hovering = !_hovering;
+                    switchStatus();
                 }
                 _hover_button_was_down = false;
             }
@@ -337,6 +340,7 @@ class Simulator {
                     if (!_spacebar_was_down) {
                         _hovering = !_hovering;
                         _spacebar_was_down = true;
+                        switchStatus();
                     }
                     break;
 
@@ -345,6 +349,22 @@ class Simulator {
             }
 
             siminfo.hovering = _hovering;
+        }
+
+        void switchStatus()
+        {
+            _status = _status == STATUS_ARMED ? STATUS_HOVERING : STATUS_ARMED;
+
+            const char * str[6] = {
+                "IDLE",
+                "ARMED",
+                "HOVERING",
+                "AUTONOMOUS",
+                "LANDING",
+                "LOST_CONTACT"
+            };
+
+            printf("status=%s", str[_status]);
         }
 
         void climb(const float rate)

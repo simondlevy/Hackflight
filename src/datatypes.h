@@ -145,6 +145,7 @@ typedef struct {
     float start_z;
     float framerate;
     bool hovering;
+    status_t status;
     demands_t demands;
 
 } siminfo_t;
