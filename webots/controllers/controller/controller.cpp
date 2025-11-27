@@ -24,6 +24,7 @@
 #include <datatypes.h>
 
 // Webots
+#include <webots/camera.h>
 #include <webots/emitter.h>
 #include <webots/gps.h>
 #include <webots/joystick.h>
@@ -50,6 +51,9 @@ class Simulator {
 
             _gps = wb_robot_get_device("gps");
             wb_gps_enable(_gps, _timestep);
+
+            WbDeviceTag camera = wb_robot_get_device("camera");
+            wb_camera_enable(camera, _timestep);
 
             wb_keyboard_enable(_timestep);
 

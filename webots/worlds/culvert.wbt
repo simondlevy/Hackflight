@@ -21,12 +21,12 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.03491183187706835 -0.6627534366374312 0.7480234262509842 6.090493997761981
-  position -5.66408146895223 -0.11920769844043566 0.5184484956604336
+  orientation -0.1557269807664543 -0.9873473744810478 0.029904340266015073 6.173828738085408
+  position -8.543756153040718 0.08736774075864523 0.9889509281158342
 }
 DEF diyquad DiyQuad {
-  translation -3.93627 -0.0991932 0.1668
-  rotation -0.9135874783979222 0.07640957793480634 -0.3993989180185024 0.030257587766784128
+  translation -4.43143 0.000764474 0.123756
+  rotation 0.5502315303325688 0.6058370816373146 0.5746361401278736 9.894336960962855e-07
 }
 TexturedBackground {
 }
@@ -75,6 +75,7 @@ DEF GROUND Solid {
 }
 Pipe {
   translation -0.14 2.62688e-07 0.25
+  rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
   appearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
@@ -477,65 +478,125 @@ Brick {
 Brick {
   name " brick(13)"
   size 0.05 0.5 0.8
-  translation -2.1 -0.51 0.64
+  translation -2.1 -0.52 0.64
 }
 Brick {
   name " brick(46)"
   size 0.05 0.5 0.8
-  translation -1.31 -0.51 0.64
+  translation -1.31 -0.52 0.64
 }
 Brick {
   name " brick(47)"
   size 0.05 0.5 0.8
-  translation -0.51 -0.51 0.64
+  translation -0.51 -0.52 0.64
 }
 Brick {
   name " brick(48)"
   size 0.05 0.5 0.8
-  translation 0.29 -0.51 0.64
+  translation 0.29 -0.52 0.64
 }
 Brick {
   name " brick(49)"
   size 0.05 0.5 0.8
-  translation 1.09 -0.51 0.64
+  translation 1.09 -0.52 0.64
 }
 Brick {
   name " brick(50)"
   size 0.05 0.5 0.8
-  translation 1.89 -0.51 0.64
+  translation 1.89 -0.52 0.64
 }
 Brick {
   name " brick(14)"
   size 0.05 0.5 0.8
-  translation -2.1 -0.38 0.69
+  translation -2.1 -0.43 0.69
 }
 Brick {
   name " brick(41)"
   size 0.05 0.5 0.8
-  translation -1.3 -0.38 0.69
+  translation -1.3 -0.43 0.69
 }
 Brick {
   name " brick(42)"
   size 0.05 0.5 0.8
-  translation -0.51 -0.38 0.69
+  translation -0.51 -0.43 0.69
 }
 Brick {
   name " brick(43)"
   size 0.05 0.5 0.8
-  translation 0.29 -0.38 0.69
+  translation 0.29 -0.43 0.69
 }
 Brick {
   name " brick(44)"
   size 0.05 0.5 0.8
-  translation 1.09 -0.38 0.69
+  translation 1.09 -0.43 0.69
 }
 Brick {
   name " brick(45)"
   size 0.05 0.5 0.8
-  translation 1.89 -0.38 0.69
+  translation 1.89 -0.43 0.69
 }
 Brick {
   name " brick(15)"
+  size 0.05 0.4 0.8
+  translation -2.1 0.17 0.79
+}
+Brick {
+  name " brick(19)"
+  size 0.05 0.4 0.8
+  translation -1.31 0.17 0.79
+}
+Brick {
+  name " brick(21)"
+  size 0.05 0.4 0.8
+  translation -0.51 0.17 0.79
+}
+Brick {
+  name " brick(22)"
+  size 0.05 0.4 0.8
+  translation 0.29 0.17 0.79
+}
+Brick {
+  name " brick(24)"
+  size 0.05 0.4 0.8
+  translation 1.09 0.17 0.79
+}
+Brick {
+  name " brick(26)"
+  size 0.05 0.4 0.8
+  translation 1.89 0.17 0.79
+}
+Brick {
+  name " brick(17)"
+  size 0.05 0.4 0.8
+  translation -2.1 -0.23 0.79
+}
+Brick {
+  name " brick(18)"
+  size 0.05 0.4 0.8
+  translation -1.32 -0.23 0.79
+}
+Brick {
+  name " brick(20)"
+  size 0.05 0.4 0.8
+  translation -0.52 -0.23 0.79
+}
+Brick {
+  name " brick(23)"
+  size 0.05 0.4 0.8
+  translation 0.28 -0.23 0.79
+}
+Brick {
+  name " brick(25)"
+  size 0.05 0.4 0.8
+  translation 1.08 -0.23 0.79
+}
+Brick {
+  name " brick(27)"
+  size 0.05 0.4 0.8
+  translation 1.88 -0.23 0.79
+}
+Brick {
+  name " brick(16)"
   size 0.05 0.5 0.8
   translation -2.1 -0.28 0.74
 }
@@ -638,6 +699,36 @@ Brick {
   name " brick2(1)"
   size 0.05 0.55 0.8
   translation -2.1 0.73 0.1
+}
+Brick {
+  name " brick2(15)"
+  size 0.05 0.55 0.8
+  translation -1.3 -0.0300017 0.83
+}
+Brick {
+  name " brick2(21)"
+  size 0.05 0.55 0.8
+  translation -2.1 -0.0300002 0.83
+}
+Brick {
+  name " brick2(17)"
+  size 0.05 0.55 0.8
+  translation -0.51 -0.0300031 0.83
+}
+Brick {
+  name " brick2(18)"
+  size 0.05 0.55 0.8
+  translation 0.29 -0.0300045 0.83
+}
+Brick {
+  name " brick2(19)"
+  size 0.05 0.55 0.8
+  translation 1.09 -0.0300061 0.83
+}
+Brick {
+  name " brick2(20)"
+  size 0.05 0.55 0.8
+  translation 1.89 -0.030008 0.83
 }
 Brick {
   name " brick2(101)"
@@ -972,62 +1063,62 @@ Brick {
 Brick {
   name " brick2(13)"
   size 0.05 0.5 0.8
-  translation -2.1 0.51 0.64
+  translation -2.1 0.52 0.64
 }
 Brick {
   name " brick2(46)"
   size 0.05 0.5 0.8
-  translation -1.31 0.51 0.64
+  translation -1.31 0.52 0.64
 }
 Brick {
   name " brick2(47)"
   size 0.05 0.5 0.8
-  translation -0.51 0.51 0.64
+  translation -0.51 0.52 0.64
 }
 Brick {
   name " brick2(48)"
   size 0.05 0.5 0.8
-  translation 0.29 0.51 0.64
+  translation 0.29 0.52 0.64
 }
 Brick {
   name " brick2(49)"
   size 0.05 0.5 0.8
-  translation 1.09 0.51 0.64
+  translation 1.09 0.52 0.64
 }
 Brick {
   name " brick2(50)"
   size 0.05 0.5 0.8
-  translation 1.89 0.51 0.64
+  translation 1.89 0.52 0.64
 }
 Brick {
   name " brick2(14)"
   size 0.05 0.5 0.8
-  translation -2.1 0.38 0.69
+  translation -2.1 0.43 0.69
 }
 Brick {
   name " brick2(41)"
   size 0.05 0.5 0.8
-  translation -1.3 0.38 0.69
+  translation -1.3 0.43 0.69
 }
 Brick {
   name " brick2(42)"
   size 0.05 0.5 0.8
-  translation -0.51 0.38 0.69
+  translation -0.51 0.43 0.69
 }
 Brick {
   name " brick2(43)"
   size 0.05 0.5 0.8
-  translation 0.29 0.38 0.69
+  translation 0.29 0.43 0.69
 }
 Brick {
   name " brick2(44)"
   size 0.05 0.5 0.8
-  translation 1.09 0.38 0.69
+  translation 1.09 0.43 0.69
 }
 Brick {
   name " brick2(45)"
   size 0.05 0.5 0.8
-  translation 1.89 0.38 0.69
+  translation 1.89 0.43 0.69
 }
 Brick {
   name " brick2(16)"
