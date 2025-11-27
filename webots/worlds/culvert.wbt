@@ -4,9 +4,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
-
-EXTERNPROTO "../protos/DiyQuad.proto"
 EXTERNPROTO "../protos/SolidPipe.proto"
+EXTERNPROTO "../protos/DiyQuad.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -21,10 +20,13 @@ WorldInfo {
     }
   ]
 }
-
 Viewpoint {
-  orientation -0.11276288120348145 0.0040475082828518895 0.9936136826248869 3.0765915016347227
-  position 4.16236751196975 -0.27644346080569804 1.2868380720715424
+  orientation -0.34944509632693943 -0.18029150758810109 0.9194471691971572 4.0295050675274
+  position 3.3239212590930167 5.003970975816013 3.6913703344746764
+}
+DEF diyquad DiyQuad {
+  translation 1.02003 2.07 0.033315
+  rotation 5.652629990404873e-05 -1.413159997601214e-05 0.9999999983025376 -1.5707953071795862
 }
 TexturedBackground {
 }
@@ -75,13 +77,13 @@ Rock {
   rotation 0 0 1 1.5708
 }
 Rock {
-  translation -0.212539 1.7806 -0.037219
+  translation -0.690235 -0.2394 0.00976803
   rotation 0 1 0 0.0980463
   name "rock (1)"
   type "flat"
 }
 Rock {
-  translation 0.814429 0.889895 0
+  translation 2.01234 -0.859789 -0.03
   rotation 0 0 1 1.309
   name "rock (2)"
   type "flat"
@@ -98,10 +100,9 @@ Rock {
   name "rock (4)"
   type "flat"
 }
-
 SolidPipe {
-  translation 0.3814193079265074 -0.5484139784140392 0.997661673277983
-  rotation 0.5367562771281196 0.5557369119996703 0.6348615467994828 -2.312004870593766
+  translation 0.510499 -0.569839 0.348955
+  rotation 0.5366734409291396 0.5554316307116519 0.6351986472012298 -2.311303284799553
   subdivision 48
   physics Physics {
     density -1

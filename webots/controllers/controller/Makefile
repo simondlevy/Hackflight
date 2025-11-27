@@ -21,7 +21,7 @@ NET = $(EMBDIR)/examples/difference/difference.txt
 VIZ_DIR = $(HOME)/Desktop/framework/viz
 VIZ_PORT = 8100
 
-WORLD = empty
+WORLD = culvert
 
 # -----------------------------------------------------------------------------
 
