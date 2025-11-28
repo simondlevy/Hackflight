@@ -118,6 +118,7 @@ DEF STILL_WATER Fluid {
   name "puddle"
   boundingObject USE S
 }
+
 Brick {
   name " brick(15)"
   size 0.05 1.1 0.05
@@ -278,8 +279,178 @@ Brick {
   size 0.05 1.15 0.05
   translation -2.5 1.03 0.25
 }
+
 Brick {
   name " brick2(5)"
   size 0.05 1.15 0.05
   translation -2.5 -1.07 0.250001
+}
+
+#############################################################
+
+Brick {
+  name " brick(15)"
+  size 0.05 1.1 0.05
+  translation 2.5 1.03 0.3
+}
+Brick {
+  name " brick(10)"
+  size 0.05 1.1 0.05
+  translation 2.5 -1.03 0.3
+}
+Brick {
+  name " brick(18)"
+  size 0.05 1.05 0.05
+  translation 2.5 1.01 0.35
+}
+Brick {
+  name " brick(9)"
+  size 0.05 1.05 0.05
+  translation 2.5 -0.99 0.35
+}
+Brick {
+  name " brick(17)"
+  size 0.05 1 0.05
+  translation 2.5 0.96 0.4
+}
+Brick {
+  name " brick(7)"
+  size 0.05 1 0.05
+  translation 2.5 -0.94 0.4
+}
+Brick {
+  name " brick(19)"
+  size 0.05 0.95 0.05
+  translation 2.5 0.92 0.45
+}
+Brick {
+  name " brick(8)"
+  size 0.05 0.95 0.05
+  translation 2.5 -0.92 0.45
+}
+Brick {
+  name " brick(20)"
+  size 0.05 0.9 0.05
+  translation 2.5 0.866 0.5
+}
+Brick {
+  name " brick(6)"
+  size 0.05 0.9 0.05
+  translation 2.5 -0.864 0.500001
+}
+Brick {
+  name " brick(21)"
+  size 0.05 0.88 0.05
+  translation 2.5 0.816 0.55
+}
+Brick {
+  name " brick(4)"
+  size 0.05 0.88 0.05
+  translation 2.5 -0.814 0.55
+}
+Brick {
+  name " brick(22)"
+  size 0.05 0.9 0.05
+  translation 2.5 0.77 0.6
+}
+Brick {
+  name " brick(5)"
+  size 0.05 0.9 0.05
+  translation 2.5 -0.78 0.6
+}
+Brick {
+  name " brick(23)"
+  size 0.05 0.9 0.05
+  translation 2.5 0.71 0.65
+}
+Brick {
+  name " brick(3)"
+  size 0.05 0.9 0.05
+  translation 2.5 -0.71 0.65
+}
+Brick {
+  name " brick(24)"
+  size 0.05 0.95 0.05
+  translation 2.5 0.6375 0.7
+}
+Brick {
+  name " brick(2)"
+  size 0.05 0.95 0.05
+  translation 2.5 -0.6225 0.7
+}
+Brick {
+  name " brick(16)"
+  size 0.05 1 0.05
+  translation 2.5 0.5 0.75
+}
+Brick {
+  name " brick(1)"
+  size 0.05 1.9 0.05
+  translation 2.5 0.01 0.8
+}
+Brick {
+  name " brick(25)"
+  size 0.05 1 0.05
+  translation 2.5 -0.5 0.75
+}
+Brick {
+  name " brick2"
+  size 0.05 1.35 0.05
+  translation 2.5 1.09 0.0499998
+}
+Brick {
+  name " brick2(8)"
+  size 0.05 1.35 0.05
+  translation 2.5 -1.11 0.0500041
+}
+Brick {
+  name " brick2(12)"
+  size 0.05 1.4 0.05
+  translation 2.5 1.09 -6.75491e-07
+}
+Brick {
+  name " brick2(10)"
+  size 0.05 1.4 0.05
+  translation 2.5 -1.14 3.50888e-06
+}
+Brick {
+  name " brick2(1)"
+  size 0.05 1.3 0.05
+  translation 2.5 1.09 0.0999996
+}
+Brick {
+  name " brick2(9)"
+  size 0.05 1.3 0.05
+  translation 2.5 -1.13 0.100001
+}
+Brick {
+  name " brick2(2)"
+  size 0.05 1.25 0.05
+  translation 2.5 1.1 0.15
+}
+Brick {
+  name " brick2(6)"
+  size 0.05 1.25 0.05
+  translation 2.5 -1.11 0.15
+}
+Brick {
+  name " brick2(3)"
+  size 0.05 1.2 0.05
+  translation 2.5 1.06 0.2
+}
+Brick {
+  name " brick2(7)"
+  size 0.05 1.2 0.05
+  translation 2.5 -1.11 0.200001
+}
+Brick {
+  name " brick2(4)"
+  size 0.05 1.15 0.05
+  translation 2.5 1.03 0.25
+}
+
+Brick {
+  name " brick2(5)"
+  size 0.05 1.15 0.05
+  translation 2.5 -1.07 0.250001
 }
