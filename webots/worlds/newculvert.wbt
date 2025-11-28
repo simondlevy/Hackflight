@@ -21,8 +21,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.01755375295226747 -0.9997336476684946 0.014983306602247464 5.779968410969989
-  position -6.198820315986294 -0.14017898016661035 2.499656089909187
+  orientation 0.029574828465361417 -0.9991257462579214 0.02954780340052607 5.976069655842335
+  position -14.555013471257585 -0.9524803483102365 6.13431199219877
 }
 DEF diyquad DiyQuad {
   translation -2.78143 0.000765464 0.013756
@@ -35,9 +35,7 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 DEF GROUND Solid {
-
-  translation -2.86 -2.91 0
-
+  translation -2.5 -3 -0.21
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -47,14 +45,20 @@ DEF GROUND Solid {
               appearance Grass {
                 type "mossy"
                 textureTransform TextureTransform {
-                    scale 8 8
+                  scale 8 8
                 }
               }
               geometry ElevationGrid {
-                xDimension 30
-                xSpacing 0.2
-                yDimension 30
-                ySpacing 0.2
+                height [
+                  0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0,
+                  1, 1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1, 1,
+                  0, 0, 0, 0, 0, 0
+                ]
+                xDimension 6
+                yDimension 6
               }
             }
           ]
@@ -62,10 +66,34 @@ DEF GROUND Solid {
       ]
     }
   ]
-
   boundingObject USE GROUND_SHAPE
 }
-
+DEF GROUND Solid {
+  translation -3.25 -3.65 0
+  children [
+    DEF GROUND_SHAPE Group {
+      children [
+        Pose {
+          children [
+            Shape {
+              appearance Grass {
+                type "mossy"
+                textureTransform TextureTransform {
+                  scale 8 8
+                }
+              }
+              geometry ElevationGrid {
+                xDimension 8
+                yDimension 8
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  boundingObject USE GROUND_SHAPE
+}
 Pipe {
   translation -0.14 2.62688e-07 0.25
   rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
