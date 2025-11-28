@@ -17,7 +17,7 @@ PROTO Pipe [
   SolidPipe {
     radius 0.5
     thickness 0.05
-    height 4.75
+    height 5 
     translation IS translation
     rotation IS rotation
     appearance IS appearance
