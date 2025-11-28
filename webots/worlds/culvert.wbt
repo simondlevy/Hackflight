@@ -21,8 +21,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.03329463088832193 -0.9987498305362739 0.037285969985702445 6.010991395912513
-  position -13.656913956303093 -0.15533128846194266 4.736667661063291
+  orientation -0.01515514246753301 -0.7288513912175509 0.6845041790793019 6.04682668192953
+  position -7.661168536621719 0.44485589874652776 1.5548949240433583
 }
 DEF diyquad DiyQuad {
   translation -2.78143 0.000765464 0.013756
@@ -60,6 +60,7 @@ DEF GROUND Solid {
       ]
     }
   ]
+  name "cover"
   boundingObject USE GROUND_SHAPE
 }
 DEF GROUND Solid {
@@ -86,6 +87,7 @@ DEF GROUND Solid {
       ]
     }
   ]
+  name "floor"
   boundingObject USE GROUND_SHAPE
 }
 Pipe {
@@ -118,7 +120,6 @@ DEF STILL_WATER Fluid {
   name "puddle"
   boundingObject USE S
 }
-
 Brick {
   name " brick1"
   size 0.05 1.1 0.05
@@ -211,18 +212,18 @@ Brick {
 }
 Brick {
   name " brick19"
-  size 0.05 1 0.05
-  translation -2.5 0.5 0.75
+  size 0.05 1.1 0.05
+  translation -2.5 0.55 0.75
 }
 Brick {
   name " brick20"
-  size 0.05 1.9 0.05
-  translation -2.5 0.01 0.8
+  size 0.05 2 0.05
+  translation -2.5 0.05 0.8
 }
 Brick {
   name " brick21"
-  size 0.05 1 0.05
-  translation -2.5 -0.5 0.75
+  size 0.05 1.05 0.05
+  translation -2.5 -0.52 0.75
 }
 Brick {
   name " brick22"
@@ -279,15 +280,11 @@ Brick {
   size 0.05 1.15 0.05
   translation -2.5 1.03 0.25
 }
-
 Brick {
   name " brick34"
   size 0.05 1.15 0.05
   translation -2.5 -1.07 0.250001
 }
-
-#############################################################
-
 Brick {
   name " brick35"
   size 0.05 1.1 0.05
@@ -448,7 +445,6 @@ Brick {
   size 0.05 1.15 0.05
   translation 2.5 1.03 0.25
 }
-
 Brick {
   name " brick67"
   size 0.05 1.15 0.05
