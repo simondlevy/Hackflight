@@ -35,7 +35,9 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 DEF GROUND Solid {
+
   translation -2.86 -2.91 0
+
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -45,6 +47,7 @@ DEF GROUND Solid {
               appearance Grass {
                 type "mossy"
                 textureTransform TextureTransform {
+                    scale 8 8
                 }
               }
               geometry ElevationGrid {
@@ -59,8 +62,10 @@ DEF GROUND Solid {
       ]
     }
   ]
+
   boundingObject USE GROUND_SHAPE
 }
+
 Pipe {
   translation -0.14 2.62688e-07 0.25
   rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
