@@ -41,7 +41,7 @@ DEF GROUND Solid {
     DEF GROUND_SHAPE Group {
       children [
         Pose {
-          translation -2.5 -0.25 0.83
+          translation -2.5 -1.25 0.83
 
           children [
             Shape {
@@ -54,7 +54,7 @@ DEF GROUND Solid {
               geometry ElevationGrid {
                 # height [1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5]
                 xDimension 6
-                yDimension 3
+                yDimension 5
               }
             }
           ]
