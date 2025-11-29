@@ -23,14 +23,15 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.0034695832116911347 -0.9970825725466094 0.07625159353202081 5.799835912499011
-  position -6.791778177335032 0.056308730717513605 2.09900370097115
+  orientation 0.017811667834530715 -0.9985736341425941 0.05033330591372672 5.899498367038858
+  position -9.747321728038077 -0.30587707207325604 3.316139995717208
 }
 DEF diyquad DiyQuad {
   translation -2.78143 0.000765464 0.013756
   rotation 0.5502315303325688 0.6058370816373146 0.5746361401278736 9.894336960962855e-07
 }
 TexturedBackground {
+  texture "dusk"
   luminosity 0
 }
 TexturedBackgroundLight {
@@ -66,7 +67,7 @@ DEF GROUND Solid {
   boundingObject USE GROUND_SHAPE
 }
 DEF GROUND Solid {
-  translation -5.69 -7.31 0
+  translation -38.52 -48.25 0
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -76,15 +77,15 @@ DEF GROUND Solid {
               appearance Grass {
                 type "mossy"
                 textureTransform TextureTransform {
-                  scale 8 8
+                  scale 80 80
                 }
               }
               geometry ElevationGrid {
                 height [
                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.03, 0.07, 0.09, 0.04, 0.07, 0, 0, 0.07, 0.02, 0.1, 0.06, 0.06, 0.02, 0, 0, 0.04, 0.03, 0.05, 0.02, 0.07, 0.01, 0, 0, 0.1, 0.02, 0.04, 0.03, 0.07, 0.05, 0, 0, 0.1, 0.06, 0.01, 0.02, 0.06, 0.02, 0, 0, 0.09, 0.02, 0.02, 0.06, 0.09, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ]
-                xDimension 16
-                yDimension 16
+                xDimension 100
+                yDimension 100
               }
             }
           ]
@@ -509,9 +510,25 @@ Rock {
   color 0.4 0.35 0.3
 }
 Rock {
+  translation -3.4 1.4 0
+  rotation 0 0 1 -2.8628553071795864
+  name "rock(8)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
   translation -3.44021 -1.46174 0
   rotation 0 0 1 -2
   name "rock(1)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.9 1 0
+  rotation 0 0 1 -2
+  name "rock(7)"
   type "flat"
   scale 0.25
   color 0.4 0.35 0.3
@@ -543,6 +560,13 @@ Rock {
 Rock {
   translation -3.57045 -0.583421 0
   name "rock(5)"
+  type "flat"
+  scale 0.22
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.9705 1.33658 0
+  name "rock(6)"
   type "flat"
   scale 0.22
   color 0.4 0.35 0.3
