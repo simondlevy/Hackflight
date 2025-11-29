@@ -221,7 +221,7 @@ class Simulator {
 
                 if (!_didWarn) {
                     puts("Using keyboard instead:\n");
-                    puts("- Use enter to take off and land\n");
+                    puts("- Use Enter to take off and land\n");
                     puts("- Use W and S to go up and down\n");
                     puts("- Use arrow keys to move horizontally\n");
                     puts("- Use Q and E to change heading\n");
@@ -334,8 +334,7 @@ class Simulator {
                     break;
 
                 case 4:
-                    if (!_enter_was_down) {
-                        _enter_was_down = true;
+                    if (toggle(_enter_was_down)) {
                         switchStatus(_status);
                     }
                     break;
@@ -345,6 +344,15 @@ class Simulator {
             }
 
             siminfo.status = _status;
+        }
+
+        bool toggle(bool & key_was_down)
+        {
+            if (!key_was_down) {
+                key_was_down = true;
+                return true;
+            }
+            return false;
         }
 
         void switchStatus(status_t & status)
