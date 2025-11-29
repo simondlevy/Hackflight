@@ -335,7 +335,8 @@ class Simulator {
                     break;
 
                 case 32:
-                    if (toggle(_spacebar_was_down)) {
+                    if (toggle(_spacebar_was_down) &&
+                            _flightMode == MODE_HOVERING) {
                         printf("Autonomous");
                     }
                     break;
