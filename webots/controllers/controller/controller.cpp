@@ -295,6 +295,7 @@ class Simulator {
         void getSimInfoFromKeyboard(siminfo_t & siminfo)
         {
             static bool _enter_was_down;
+            static bool _spacebar_was_down;
             static status_t _status;
 
             const auto key = wb_keyboard_get_key();
@@ -333,6 +334,12 @@ class Simulator {
                     climb(-1);
                     break;
 
+                case 32:
+                    if (toggle(_spacebar_was_down)) {
+                        printf("Autonomous");
+                    }
+                    break;
+
                 case 4:
                     if (toggle(_enter_was_down)) {
                         switchStatus(_status);
@@ -341,6 +348,7 @@ class Simulator {
 
                 default:
                     _enter_was_down = false;
+                    _spacebar_was_down = false;
             }
 
             siminfo.status = _status;
