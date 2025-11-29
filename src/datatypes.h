@@ -19,14 +19,15 @@
 #include <stdint.h>
 
 typedef enum {
-    STATUS_IDLE,
-    STATUS_ARMED,
-    STATUS_HOVERING,
-    STATUS_AUTONOMOUS,
-    STATUS_LANDING,
-    STATUS_LOST_CONTACT
 
-} status_t;
+    MODE_IDLE,
+    MODE_ARMED,
+    MODE_HOVERING,
+    MODE_AUTONOMOUS,
+    MODE_LANDING,
+    MODE_LOST_CONTACT
+
+} flightMode_t;
 
 typedef struct {
 
@@ -144,7 +145,7 @@ typedef struct {
     float start_y;
     float start_z;
     float framerate;
-    status_t status;
+    flightMode_t flightMode;
     demands_t demands;
 
 } siminfo_t;

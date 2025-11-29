@@ -80,7 +80,7 @@ class Hackflight {
         {
             //report();
 
-            static status_t _status;
+            static flightMode_t _flightMode;
             static float _motorvals[MAX_MOTOR_COUNT];
             static demands_t _demands;
             static bool _isFlying;
@@ -95,8 +95,8 @@ class Hackflight {
             // Sync the core loop to the IMU
             const bool imuIsCalibrated = _imu.step(&_ekf, msec);
 
-            // Set the LED based on current status
-            runLed(imuIsCalibrated, _status);
+            // Set the LED based on current flightMode
+            runLed(imuIsCalibrated, _flightMode);
 
             // Run logging
             runLogger(_vehicleState, _closedLoopControl);
@@ -104,8 +104,8 @@ class Hackflight {
             // Get command
             runCommandParser(_command);
 
-            // Periodically update ekf with flying status
-            if (_flyingStatusTimer.ready(FLYING_STATUS_FREQ)) {
+            // Periodically update ekf with flying flightMode
+            if (_flyingStatusTimer.ready(FLYING_MODE_FREQ)) {
                 _isFlying = isFlyingCheck(msec, motorCount, _motorvals);
             }
 
@@ -115,43 +115,43 @@ class Hackflight {
             // Check for lost contact
             if (_command.timestamp > 0 &&
                     millis() - _command.timestamp > COMMAND_TIMEOUT_MSEC) {
-                _status = STATUS_LOST_CONTACT;
+                _flightMode = MODE_LOST_CONTACT;
             }
 
-            switch (_status) {
+            switch (_flightMode) {
 
-                case STATUS_IDLE:
+                case MODE_IDLE:
                     if (_command.armed && isSafeAngle(_vehicleState.phi) &&
                             isSafeAngle(_vehicleState.theta)) {
-                        _status = STATUS_ARMED;
+                        _flightMode = MODE_ARMED;
                     }
                     runMotors(motorCount, _motorvals);
                     break;
 
-                case STATUS_ARMED:
-                    checkDisarm(_command, motorCount, _status, _motorvals);
+                case MODE_ARMED:
+                    checkDisarm(_command, motorCount, _flightMode, _motorvals);
                     if (_command.hovering) {
-                        _status = STATUS_HOVERING;
+                        _flightMode = MODE_HOVERING;
                     }
                     runMotors(motorCount, _motorvals);
                     break;
 
-                case STATUS_HOVERING:
+                case MODE_HOVERING:
                     runClosedLoopAndMixer(_command, _vehicleState, motorCount,
-                            mixFun, _status, _closedLoopControl, _demands,
+                            mixFun, _flightMode, _closedLoopControl, _demands,
                             _motorvals);
                     if (!_command.hovering) {
-                        _status = STATUS_LANDING;
+                        _flightMode = MODE_LANDING;
                     }
                     break;
 
-                case STATUS_LANDING:
+                case MODE_LANDING:
                     runClosedLoopAndMixer(_command, _vehicleState, motorCount,
-                            mixFun, _status, _closedLoopControl, _demands,
+                            mixFun, _flightMode, _closedLoopControl, _demands,
                             _motorvals);
                     break;
 
-                case STATUS_LOST_CONTACT:
+                case MODE_LOST_CONTACT:
                     // No way to recover from this
                     break;
             }
@@ -176,7 +176,7 @@ class Hackflight {
 
     private:
 
-        static constexpr float FLYING_STATUS_FREQ = 25;
+        static constexpr float FLYING_MODE_FREQ = 25;
         static constexpr float CORE_FREQ = 1000;
         static constexpr float COMMS_FREQ = 100;
 
@@ -364,7 +364,7 @@ class Hackflight {
                 const vehicleState_t & state,
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
-                status_t & status,
+                flightMode_t & flightMode,
                 ClosedLoopControl & control,
                 demands_t & demands,
                 float *motorvals)
@@ -381,7 +381,7 @@ class Hackflight {
 
                 runMotors(motorCount, motorvals);
 
-                checkDisarm(command, motorCount, status, motorvals);
+                checkDisarm(command, motorCount, flightMode, motorvals);
             }
         }
 
@@ -426,11 +426,11 @@ class Hackflight {
         void checkDisarm(
                 const command_t command,
                 const uint8_t motorCount,
-                status_t &status,
+                flightMode_t &flightMode,
                 float * motorvals)
         {
             if (!command.armed) {
-                status = STATUS_IDLE;
+                flightMode = MODE_IDLE;
                 for (uint8_t k=0; k<motorCount; ++k) {
                     motorvals[k] = 0;
                 }
@@ -519,7 +519,7 @@ class Hackflight {
             }
         }
 
-        void runLed(const bool imuIsCalibrated, const status_t status)
+        void runLed(const bool imuIsCalibrated, const flightMode_t flightMode)
         {
             const uint32_t msec_curr = millis();
 
@@ -527,9 +527,9 @@ class Hackflight {
                 blinkLed(msec_curr, LED_IMU_CALIBRATING_FREQ);
             }
 
-            else if (status == STATUS_ARMED ||
-                    status == STATUS_HOVERING || 
-                    status == STATUS_LANDING) { 
+            else if (flightMode == MODE_ARMED ||
+                    flightMode == MODE_HOVERING || 
+                    flightMode == MODE_LANDING) { 
                 digitalWrite(_ledPin, !_isLedInverted);
             }
             else {

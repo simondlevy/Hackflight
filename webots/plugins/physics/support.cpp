@@ -43,8 +43,8 @@ static void reportStatus(const siminfo_t & siminfo)
         "LOST_CONTACT"
     };
 
-    dWebotsConsolePrintf("status=%s",
-            str[siminfo.status]);
+    dWebotsConsolePrintf("flightMode=%s",
+            str[siminfo.flightMode]);
 }
 
 static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
@@ -78,7 +78,7 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
-                siminfo.status == STATUS_HOVERING,
+                siminfo.flightMode == MODE_HOVERING,
                 state,
                 siminfo.demands,
                 demands);
