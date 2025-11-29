@@ -3,6 +3,8 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/SimpleTree.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
 EXTERNPROTO "../protos/Pipe.proto"
 EXTERNPROTO "../protos/Brick.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
@@ -21,8 +23,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.01515514246753301 -0.7288513912175509 0.6845041790793019 6.04682668192953
-  position -7.661168536621719 0.44485589874652776 1.5548949240433583
+  orientation 0.0034695832116911347 -0.9970825725466094 0.07625159353202081 5.799835912499011
+  position -6.791778177335032 0.056308730717513605 2.09900370097115
 }
 DEF diyquad DiyQuad {
   translation -2.78143 0.000765464 0.013756
@@ -49,13 +51,7 @@ DEF GROUND Solid {
               }
               geometry ElevationGrid {
                 height [
-
-                  0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
-                  0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
-                  1.00, 1.05, 1.03, 1.00, 1.04, 1.00,
-                  1.00, 1.03, 1.15, 1.04, 1.06, 1.00,
-                  1.00, 1.08, 1.03, 1.01, 1.02, 1.00,
-                  0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1.05, 1.03, 1, 1.04, 1, 1, 1.03, 1.15, 1.04, 1.06, 1, 1, 1.08, 1.03, 1.01, 1.02, 1, 0, 0, 0, 0, 0, 0
                 ]
                 xDimension 6
                 yDimension 6
@@ -70,7 +66,7 @@ DEF GROUND Solid {
   boundingObject USE GROUND_SHAPE
 }
 DEF GROUND Solid {
-  translation -3.25 -3.65 0
+  translation -5.69 -7.31 0
   children [
     DEF GROUND_SHAPE Group {
       children [
@@ -84,20 +80,12 @@ DEF GROUND Solid {
                 }
               }
               geometry ElevationGrid {
-                xDimension 8
-                yDimension 8
                 height [
-                    0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                    0.00,0.10,0.03,0.07,0.09,0.04,0.07,0.00,
-                    0.00,0.07,0.02,0.10,0.06,0.06,0.02,0.00,
-                    0.00,0.04,0.03,0.05,0.02,0.07,0.01,0.00,
-                    0.00,0.10,0.02,0.04,0.03,0.07,0.05,0.00,
-                    0.00,0.10,0.06,0.01,0.02,0.06,0.02,0.00,
-                    0.00,0.09,0.02,0.02,0.06,0.09,0.06,0.00,
-                    0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00
-
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.03, 0.07, 0.09, 0.04, 0.07, 0, 0, 0.07, 0.02, 0.1, 0.06, 0.06, 0.02, 0, 0, 0.04, 0.03, 0.05, 0.02, 0.07, 0.01, 0, 0, 0.1, 0.02, 0.04, 0.03, 0.07, 0.05, 0, 0, 0.1, 0.06, 0.01, 0.02, 0.06, 0.02, 0, 0, 0.09, 0.02, 0.02, 0.06, 0.09, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ]
-               }
+                xDimension 16
+                yDimension 16
+              }
             }
           ]
         }
@@ -466,4 +454,96 @@ Brick {
   name " brick67"
   size 0.05 1.15 0.05
   translation 2.5 -1.07 0.250001
+}
+SimpleTree {
+  translation 1 3 0
+  name "tree1"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation 1 2 0
+  name "tree1(1)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -1 2.6 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(2)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -3 2.5 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(3)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -3 -1.9 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(4)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -1 -2 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(5)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+Rock {
+  translation -3.22835 -2.20204 0
+  rotation 0 0 1 -2.8628553071795864
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.44021 -1.46174 0
+  rotation 0 0 1 -2
+  name "rock(1)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.11335 -1.36821 0
+  rotation 0 0 1 -2.8628553071795864
+  name "rock(2)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.62092 -0.921003 0
+  rotation 0 0 1 1
+  name "rock(3)"
+  type "flat"
+  scale 0.16
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.57045 -0.583421 0
+  rotation 0 0 1 1.4
+  name "rock(4)"
+  type "flat"
+  scale 0.2
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.57045 -0.583421 0
+  name "rock(5)"
+  type "flat"
+  scale 0.22
+  color 0.4 0.35 0.3
 }
