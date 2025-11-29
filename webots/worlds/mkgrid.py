@@ -2,8 +2,8 @@
 
 import numpy as np
 
-N = 34
-H = 0.2
+N = 6
+H = 0.1
 
 a = H * np.random.random((N, N))
 
