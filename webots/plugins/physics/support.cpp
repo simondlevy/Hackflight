@@ -74,7 +74,7 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
-        (void)reportStatus/*(siminfo)*/;
+        reportStatus(siminfo);
 
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,

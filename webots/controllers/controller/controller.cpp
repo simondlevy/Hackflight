@@ -61,7 +61,7 @@ class Simulator {
             animateMotor("motor2", +1);
             animateMotor("motor3", +1);
             animateMotor("motor4", -1);
- 
+
             wb_joystick_enable(_timestep);
 
             _zdist = ZDIST_INIT_M;
@@ -298,8 +298,59 @@ class Simulator {
             static bool _spacebar_was_down;
             static flightMode_t _flightMode;
 
-            const auto key = wb_keyboard_get_key();
+            const int key = wb_keyboard_get_key();
 
+            if (key == -1 ) {
+                _enter_was_down = false;
+                _spacebar_was_down = false;
+            }
+
+            else if (key == 32) {
+                const bool tapped_spacebar = toggle(_spacebar_was_down);
+                if (tapped_spacebar) {
+                    switchMode2(_flightMode);
+                }
+            }
+
+            else if (key == 4) {
+                if (toggle(_enter_was_down)) {
+                    switchMode(_flightMode);
+                }
+            }
+
+            else if (_flightMode == MODE_HOVERING) {
+
+                getSetpointFromKey(key, siminfo);
+            }
+
+            siminfo.flightMode = _flightMode;
+        }
+
+        bool toggle(bool & key_was_down)
+        {
+            if (!key_was_down) {
+                key_was_down = true;
+                return true;
+            }
+            return false;
+        }
+
+        void switchMode(flightMode_t & mode)
+        {
+            mode = (mode == MODE_IDLE ? MODE_HOVERING :
+                    mode == MODE_ARMED ? MODE_HOVERING :
+                    MODE_ARMED);
+        }
+
+        void switchMode2(flightMode_t & mode)
+        {
+            mode = (mode == MODE_HOVERING ? MODE_AUTONOMOUS :
+                    mode == MODE_AUTONOMOUS ? MODE_HOVERING :
+                    mode);
+        }
+
+        void getSetpointFromKey(const int key, siminfo_t & siminfo)
+        {
             switch (key) {
 
                 case WB_KEYBOARD_UP:
@@ -333,42 +384,8 @@ class Simulator {
                 case 'S':
                     climb(-1);
                     break;
-
-                case 32:
-                    if (toggle(_spacebar_was_down) &&
-                            _flightMode == MODE_HOVERING) {
-                        printf("Autonomous");
-                    }
-                    break;
-
-                case 4:
-                    if (toggle(_enter_was_down)) {
-                        switchMode(_flightMode);
-                    }
-                    break;
-
-                default:
-                    _enter_was_down = false;
-                    _spacebar_was_down = false;
             }
 
-            siminfo.flightMode = _flightMode;
-        }
-
-        bool toggle(bool & key_was_down)
-        {
-            if (!key_was_down) {
-                key_was_down = true;
-                return true;
-            }
-            return false;
-        }
-
-        void switchMode(flightMode_t & mode)
-        {
-            mode = (mode == MODE_IDLE ? MODE_HOVERING :
-                mode == MODE_ARMED ? MODE_HOVERING :
-                MODE_ARMED);
         }
 
         void climb(const float rate)
