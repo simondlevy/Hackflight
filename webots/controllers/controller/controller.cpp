@@ -221,7 +221,7 @@ class Simulator {
 
                 if (!_didWarn) {
                     puts("Using keyboard instead:\n");
-                    puts("- Use spacebar to take off and land\n");
+                    puts("- Use enter to take off and land\n");
                     puts("- Use W and S to go up and down\n");
                     puts("- Use arrow keys to move horizontally\n");
                     puts("- Use Q and E to change heading\n");
@@ -294,10 +294,12 @@ class Simulator {
 
         void getSimInfoFromKeyboard(siminfo_t & siminfo)
         {
-            static bool _spacebar_was_down;
+            static bool _enter_was_down;
             static status_t _status;
 
-            switch (wb_keyboard_get_key()) {
+            const auto key = wb_keyboard_get_key();
+
+            switch (key) {
 
                 case WB_KEYBOARD_UP:
                     siminfo.demands.pitch = +1.0;
@@ -331,15 +333,15 @@ class Simulator {
                     climb(-1);
                     break;
 
-                case 32:
-                    if (!_spacebar_was_down) {
-                        _spacebar_was_down = true;
+                case 4:
+                    if (!_enter_was_down) {
+                        _enter_was_down = true;
                         switchStatus(_status);
                     }
                     break;
 
                 default:
-                    _spacebar_was_down = false;
+                    _enter_was_down = false;
             }
 
             siminfo.status = _status;
