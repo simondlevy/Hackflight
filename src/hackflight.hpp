@@ -374,7 +374,7 @@ class Hackflight {
             if (_timer.ready(CLOSED_LOOP_UPDATE_FREQ)) {
 
                 control.run(1.f / CLOSED_LOOP_UPDATE_FREQ,
-                        command.hovering, state, command.demands,
+                        flightMode, state, command.demands,
                         demands);
 
                 runMixer(motorCount, mixFun, demands, motorvals);

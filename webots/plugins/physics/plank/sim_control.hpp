@@ -109,23 +109,19 @@ class ClosedLoopControl {
 
         void run(
                 const float dt,
-                const bool hovering,
+                const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
-                const float landingAltitudeMeters,
                 demands_t & demands)
         {
+            const bool hovering = flightMode == MODE_HOVERING;
+
             const auto climbrate = AltitudeController::run(hovering,
                     dt, vehicleState.z, openLoopDemands.thrust);
 
             demands.thrust =
-                ClimbRateController::run(
-                        hovering,
-                        landingAltitudeMeters,
-                        dt,
-                        vehicleState.z,
-                        vehicleState.dz,
-                        climbrate);
+                ClimbRateController::run(hovering, dt,
+                        vehicleState.z, vehicleState.dz, climbrate);
 
             const auto airborne = demands.thrust > 0;
 

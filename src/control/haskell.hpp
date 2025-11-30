@@ -44,7 +44,7 @@ class ClosedLoopControl {
 
         void run(
                 const float dt,
-                const bool inHoverMode,
+                const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
                 demands_t & demands)
@@ -71,7 +71,7 @@ class ClosedLoopControl {
 
             stream_dt = dt;
 
-            stream_hovering = inHoverMode;
+            stream_hovering = flightMode == MODE_HOVERING;
 
             stream_thrust = openLoopDemands.thrust;
             stream_roll = openLoopDemands.roll;

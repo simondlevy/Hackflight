@@ -31,11 +31,13 @@ class ClosedLoopControl {
 
         void run(
                 const float dt,
-                const bool hovering,
+                const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & openLoopDemands,
                 demands_t & demands)
         {
+            const bool hovering = flightMode == MODE_HOVERING;
+
             const auto climbrate = AltitudeController::run(hovering,
                     dt, vehicleState.z, openLoopDemands.thrust);
 

@@ -78,7 +78,7 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
-                siminfo.flightMode == MODE_HOVERING,
+                siminfo.flightMode,
                 state,
                 siminfo.demands,
                 demands);
