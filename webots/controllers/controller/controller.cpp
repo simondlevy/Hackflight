@@ -61,7 +61,7 @@ class Simulator {
             animateMotor("motor2", +1);
             animateMotor("motor3", +1);
             animateMotor("motor4", -1);
- 
+
             wb_joystick_enable(_timestep);
 
             _zdist = ZDIST_INIT_M;
@@ -73,28 +73,7 @@ class Simulator {
                 return false;
             }
 
-            const int range_finder_width =
-                wb_range_finder_get_width(_range_finder);
-            const int range_finder_height =
-                wb_range_finder_get_height(_range_finder);
-
-            const float * image =
-                wb_range_finder_get_range_image(_range_finder);
-
-            for (int i = 0; i < range_finder_width; i++) {
-                for (int j = 0; j < range_finder_height; j++) {
-                    const float distance = wb_range_finder_image_get_depth(
-                            image, range_finder_width, j, i);
-                    if (isinf(distance)) {
-                        printf(" inf  ");
-                    }
-                    else {
-                        printf("%3.3f ", distance);
-                    }
-                }
-                printf(" \n \n \n");
-            }
-            printf("-----------------------------------------------\n");
+            // runRangefinder();
 
             siminfo_t siminfo = {};
 
@@ -122,6 +101,32 @@ class Simulator {
             wb_robot_cleanup();
         }
 
+        void runRangefinder()
+        {
+            const int range_finder_width =
+                wb_range_finder_get_width(_range_finder);
+            const int range_finder_height =
+                wb_range_finder_get_height(_range_finder);
+
+            const float * image =
+                wb_range_finder_get_range_image(_range_finder);
+
+            for (int i = 0; i < range_finder_width; i++) {
+                for (int j = 0; j < range_finder_height; j++) {
+                    const float distance = wb_range_finder_image_get_depth(
+                            image, range_finder_width, j, i);
+                    if (isinf(distance)) {
+                        printf(" inf  ");
+                    }
+                    else {
+                        printf("%3.3f ", distance);
+                    }
+                }
+                printf(" \n \n \n");
+            }
+            printf("-----------------------------------------------\n");
+        }
+
     private:
 
         static constexpr float ZDIST_INIT_M = 0.4;
@@ -147,9 +152,7 @@ class Simulator {
         } joystick_t;
 
         WbDeviceTag _emitter;
-
         WbDeviceTag _gps;
-
         WbDeviceTag _range_finder;
 
         double _timestep;
@@ -207,7 +210,7 @@ class Simulator {
 
         joystickStatus_e getJoystickStatus(void)
         {
-            auto status = JOYSTICK_RECOGNIZED;
+            auto mode = JOYSTICK_RECOGNIZED;
 
             auto joyname = wb_joystick_get_model();
 
@@ -218,7 +221,7 @@ class Simulator {
 
                 if (!_didWarn) {
                     puts("Using keyboard instead:\n");
-                    puts("- Use spacebar to take off and land\n");
+                    puts("- Use Enter to take off and land\n");
                     puts("- Use W and S to go up and down\n");
                     puts("- Use arrow keys to move horizontally\n");
                     puts("- Use Q and E to change heading\n");
@@ -226,16 +229,16 @@ class Simulator {
 
                 _didWarn = true;
 
-                status = JOYSTICK_NONE;
+                mode = JOYSTICK_NONE;
             }
 
             // Joystick unrecognized
             else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
 
-                status = JOYSTICK_UNRECOGNIZED;
+                mode = JOYSTICK_UNRECOGNIZED;
             }
 
-            return status;
+            return mode;
         }
 
         static void reportJoystick(void)
@@ -261,7 +264,7 @@ class Simulator {
         void getSimInfoFromJoystick(siminfo_t & siminfo)
         {
             static bool _hover_button_was_down;
-            static bool _hovering;
+            static flightMode_t _flightMode;
 
             auto axes = getJoystickInfo();
 
@@ -272,14 +275,14 @@ class Simulator {
             }
             else {
                 if (_hover_button_was_down) {
-                    _hovering = !_hovering;
+                    switchMode(_flightMode);
                 }
                 _hover_button_was_down = false;
             }
 
-            siminfo.hovering = _hovering;
+            siminfo.flightMode = _flightMode;
 
-            if (siminfo.hovering) {
+            if (siminfo.flightMode == MODE_HOVERING) {
 
                 siminfo.demands.pitch = readJoystickAxis(axes.pitch);
                 siminfo.demands.roll = readJoystickAxis(axes.roll);
@@ -291,10 +294,64 @@ class Simulator {
 
         void getSimInfoFromKeyboard(siminfo_t & siminfo)
         {
+            static bool _enter_was_down;
             static bool _spacebar_was_down;
-            static bool _hovering;
+            static flightMode_t _flightMode;
 
-            switch (wb_keyboard_get_key()) {
+            const int key = wb_keyboard_get_key();
+
+            if (key == -1 ) {
+                _enter_was_down = false;
+                _spacebar_was_down = false;
+            }
+
+            else if (key == 32) {
+                const bool tapped_spacebar = toggle(_spacebar_was_down);
+                if (tapped_spacebar) {
+                    switchMode2(_flightMode);
+                }
+            }
+
+            else if (key == 4) {
+                if (toggle(_enter_was_down)) {
+                    switchMode(_flightMode);
+                }
+            }
+
+            else if (_flightMode == MODE_HOVERING) {
+
+                getSetpointFromKey(key, siminfo);
+            }
+
+            siminfo.flightMode = _flightMode;
+        }
+
+        bool toggle(bool & key_was_down)
+        {
+            if (!key_was_down) {
+                key_was_down = true;
+                return true;
+            }
+            return false;
+        }
+
+        void switchMode(flightMode_t & mode)
+        {
+            mode = (mode == MODE_IDLE ? MODE_HOVERING :
+                    mode == MODE_ARMED ? MODE_HOVERING :
+                    MODE_ARMED);
+        }
+
+        void switchMode2(flightMode_t & mode)
+        {
+            mode = (mode == MODE_HOVERING ? MODE_AUTONOMOUS :
+                    mode == MODE_AUTONOMOUS ? MODE_HOVERING :
+                    mode);
+        }
+
+        void getSetpointFromKey(const int key, siminfo_t & siminfo)
+        {
+            switch (key) {
 
                 case WB_KEYBOARD_UP:
                     siminfo.demands.pitch = +1.0;
@@ -327,19 +384,8 @@ class Simulator {
                 case 'S':
                     climb(-1);
                     break;
-
-                case 32:
-                    if (!_spacebar_was_down) {
-                        _hovering = !_hovering;
-                        _spacebar_was_down = true;
-                    }
-                    break;
-
-                default:
-                    _spacebar_was_down = false;
             }
 
-            siminfo.hovering = _hovering;
         }
 
         void climb(const float rate)
@@ -348,7 +394,7 @@ class Simulator {
 
             static float _time_prev;
 
-            float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
+            const float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
 
             _time_prev = time_curr;
 

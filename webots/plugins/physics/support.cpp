@@ -32,6 +32,21 @@ static const int PID_UPDATE_RATE = 1024; // Plank
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
+static void reportStatus(const siminfo_t & siminfo)
+{
+    const char * str[6] = {
+        "IDLE",
+        "ARMED",
+        "HOVERING",
+        "AUTONOMOUS",
+        "LANDING",
+        "LOST_CONTACT"
+    };
+
+    dWebotsConsolePrintf("flightMode=%s",
+            str[siminfo.flightMode]);
+}
+
 static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 {
     bool landed = false;
@@ -59,9 +74,11 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
+        reportStatus(siminfo);
+
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
-                siminfo.hovering,
+                siminfo.flightMode == MODE_HOVERING,
                 state,
                 siminfo.demands,
                 demands);

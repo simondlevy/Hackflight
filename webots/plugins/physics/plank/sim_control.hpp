@@ -22,7 +22,7 @@
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_rate.hpp>
-#include <msp/serializer.hpp>
+#include <serializer.hpp>
 #include <num.hpp>
 
 class YawAngleController {
