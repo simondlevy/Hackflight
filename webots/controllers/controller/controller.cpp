@@ -73,6 +73,10 @@ class Simulator {
                 return false;
             }
 
+            static flightMode_t _flightMode;
+
+            reportFlightMode(_flightMode);
+
             // runRangefinder();
 
             siminfo_t siminfo = {};
@@ -80,7 +84,7 @@ class Simulator {
             switch (getJoystickStatus()) {
 
                 case JOYSTICK_RECOGNIZED:
-                    getSimInfoFromJoystick(siminfo);
+                    getSimInfoFromJoystick(siminfo, _flightMode);
                     sendSimInfo(siminfo);
                     break;
 
@@ -89,7 +93,7 @@ class Simulator {
                     break;
 
                 default:
-                    getSimInfoFromKeyboard(siminfo);
+                    getSimInfoFromKeyboard(siminfo, _flightMode);
                     sendSimInfo(siminfo);
             }
 
@@ -192,8 +196,9 @@ class Simulator {
         {
             static double _start_x, _start_y, _start_z;
 
+            const double * xyz = wb_gps_get_values(_gps);
+
             if (_start_x == 0) {
-                const double * xyz = wb_gps_get_values(_gps);
                 _start_x = xyz[0];
                 _start_y = xyz[1];
                 _start_z = xyz[2];
@@ -261,10 +266,9 @@ class Simulator {
             wb_motor_set_velocity(motor, direction * 60);
         }
 
-        void getSimInfoFromJoystick(siminfo_t & siminfo)
+        void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _hover_button_was_down;
-            static flightMode_t _flightMode;
 
             auto axes = getJoystickInfo();
 
@@ -275,12 +279,12 @@ class Simulator {
             }
             else {
                 if (_hover_button_was_down) {
-                    switchMode(_flightMode);
+                    switchMode(flightMode);
                 }
                 _hover_button_was_down = false;
             }
 
-            siminfo.flightMode = _flightMode;
+            siminfo.flightMode = flightMode;
 
             if (siminfo.flightMode == MODE_HOVERING) {
 
@@ -292,38 +296,53 @@ class Simulator {
             }
         }
 
-        void getSimInfoFromKeyboard(siminfo_t & siminfo)
+        void reportFlightMode(const flightMode_t flightMode)
+        {
+            const char * str[6] = {
+                "IDLE",
+                "ARMED",
+                "HOVERING",
+                "AUTONOMOUS",
+                "LANDING",
+                "LOST_CONTACT"
+            };
+
+            //dWebotsConsolePrintf("flightMode=%s", str[flightMode]);
+            printf("flightMode=%s z=%+3.3f", str[flightMode], wb_gps_get_values(_gps)[2]);
+        }
+
+        void getSimInfoFromKeyboard(siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _enter_was_down;
-            static bool _spacebar_was_down;
-            static flightMode_t _flightMode;
+            //static bool _spacebar_was_down;
 
             const int key = wb_keyboard_get_key();
 
             if (key == -1 ) {
                 _enter_was_down = false;
-                _spacebar_was_down = false;
+                //_spacebar_was_down = false;
             }
 
-            else if (key == 32) {
-                const bool tapped_spacebar = toggle(_spacebar_was_down);
-                if (tapped_spacebar) {
-                    switchMode2(_flightMode);
-                }
-            }
+            /*
+               else if (key == 32) {
+               const bool tapped_spacebar = toggle(_spacebar_was_down);
+               if (tapped_spacebar) {
+               switchMode2(flightMode);
+               }
+               }*/
 
-            else if (key == 4) {
-                if (toggle(_enter_was_down)) {
-                    switchMode(_flightMode);
-                }
-            }
+               else if (key == 4) {
+                   if (toggle(_enter_was_down)) {
+                       switchMode(flightMode);
+                   }
+               }
 
-            else if (_flightMode == MODE_HOVERING) {
+               else if (flightMode == MODE_HOVERING) {
 
-                getSetpointFromKey(key, siminfo);
-            }
+                   getSetpointFromKey(key, siminfo);
+               }
 
-            siminfo.flightMode = _flightMode;
+               siminfo.flightMode = flightMode;
         }
 
         bool toggle(bool & key_was_down)
@@ -342,12 +361,13 @@ class Simulator {
                     MODE_ARMED);
         }
 
-        void switchMode2(flightMode_t & mode)
-        {
-            mode = (mode == MODE_HOVERING ? MODE_AUTONOMOUS :
-                    mode == MODE_AUTONOMOUS ? MODE_HOVERING :
-                    mode);
-        }
+        /*
+           void switchMode2(flightMode_t & mode)
+           {
+           mode = (mode == MODE_HOVERING ? MODE_AUTONOMOUS :
+           mode == MODE_AUTONOMOUS ? MODE_HOVERING :
+           mode);
+           }*/
 
         void getSetpointFromKey(const int key, siminfo_t & siminfo)
         {

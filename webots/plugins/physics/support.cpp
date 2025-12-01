@@ -32,21 +32,6 @@ static const int PID_UPDATE_RATE = 1024; // Plank
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-static void reportStatus(const siminfo_t & siminfo)
-{
-    const char * str[6] = {
-        "IDLE",
-        "ARMED",
-        "HOVERING",
-        "AUTONOMOUS",
-        "LANDING",
-        "LOST_CONTACT"
-    };
-
-    dWebotsConsolePrintf("flightMode=%s",
-            str[siminfo.flightMode]);
-}
-
 static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 {
     // Run control in middle loop
@@ -72,8 +57,6 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
-        reportStatus(siminfo);
-
         _closedLoopControl.run(
                 1 / (float)PID_UPDATE_RATE,
                 siminfo.flightMode,
@@ -89,25 +72,26 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         Mixer::mix(demands, motors);
 
+        if (_dynamics.state.z < 0) {
+            _dynamics.reset();
+        }
+
         // Run dynamics in innermost loop
         for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
 
-            if (_dynamics.state.z < 0) {
-                _dynamics.reset();
-            }
-            else {
-                _dynamics.update(motors,
-                        Mixer::rotorCount,
-                        Mixer::roll,
-                        Mixer::pitch,
-                        Mixer::yaw);
-            }
-
+            _dynamics.update(motors,
+                    Mixer::rotorCount,
+                    Mixer::roll,
+                    Mixer::pitch,
+                    Mixer::yaw);
         }
     }
 
+    const pose_t pose = _dynamics.getPose();
+
     // Get current pose from dynamics
-    return _dynamics.getPose();
+    //printf("%+3.3f\n", pose.z);
+    return pose; //_dynamics.getPose();
 }
 
 static constexpr char ROBOT_NAME[] = "diyquad";
