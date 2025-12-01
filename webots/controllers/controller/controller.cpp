@@ -64,7 +64,7 @@ class Simulator {
 
             wb_joystick_enable(_timestep);
 
-            _zdist = ZDIST_INIT_M;
+            _zdist = ZDIST_HOVER_INIT_M;
         }
 
         bool step()
@@ -98,8 +98,6 @@ class Simulator {
             if (_flightMode == MODE_LANDING && wb_gps_get_values(_gps)[2] < 0.02) {
                 _flightMode = MODE_IDLE;
             }
-
-            reportFlightMode(_flightMode);
 
             return true;
         }
@@ -137,10 +135,11 @@ class Simulator {
 
     private:
 
-        static constexpr float ZDIST_INIT_M = 0.4;
-        static constexpr float ZDIST_MAX_M = 1.0;
-        static constexpr float ZDIST_MIN_M = 0.2;
-        static constexpr float ZDIST_INC_MPS = 0.2;
+        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
+        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
+        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
+        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
+        static constexpr float ZDIST_LAND_M = 0.02;
 
         typedef enum {
 
@@ -300,21 +299,6 @@ class Simulator {
             }
         }
 
-        void reportFlightMode(const flightMode_t flightMode)
-        {
-            const char * str[6] = {
-                "IDLE",
-                "ARMED",
-                "HOVERING",
-                "AUTONOMOUS",
-                "LANDING",
-                "LOST_CONTACT"
-            };
-
-            //dWebotsConsolePrintf("flightMode=%s", str[flightMode]);
-            printf("flightMode=%s z=%+3.3f", str[flightMode], wb_gps_get_values(_gps)[2]);
-        }
-
         void getSimInfoFromKeyboard(siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _enter_was_down;
@@ -424,8 +408,8 @@ class Simulator {
             _time_prev = time_curr;
 
             _zdist = std::min(std::max(
-                        _zdist + rate * ZDIST_INC_MPS * dt,
-                        ZDIST_MIN_M), ZDIST_MAX_M);
+                        _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
+                        ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
         }
 };
 
