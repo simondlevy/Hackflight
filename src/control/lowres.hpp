@@ -37,7 +37,7 @@ class ClosedLoopControl {
                 const float dt,
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
-                const demands_t & openLoopDemands,
+                const demands_t & setpointDemands,
                 demands_t & demands)
         {
             const bool hovering = flightMode == MODE_HOVERING;
@@ -73,7 +73,7 @@ class ClosedLoopControl {
                         STATE_DPSI_MAX);
 
             const float climbrate = AltitudeController::run(hovering, dt, z_byte,
-                    openLoopDemands.thrust);
+                    setpointDemands.thrust);
 
             demands.thrust = ClimbRateController::run(hovering, dt, z_byte,
                     dz_byte, climbrate);
@@ -81,7 +81,7 @@ class ClosedLoopControl {
             const auto airborne = demands.thrust > 0;
 
             const auto yaw = YawAngleController::run(
-                    airborne, dt, psi_byte, openLoopDemands.yaw);
+                    airborne, dt, psi_byte, setpointDemands.yaw);
 
             demands.yaw =
                 YawRateController::run(airborne, dt, dpsi_byte, yaw);
@@ -90,8 +90,8 @@ class ClosedLoopControl {
                     airborne,
                     dt,
                     dx_byte, dy_byte, psi_byte,
-                    hovering ? openLoopDemands.pitch : 0,
-                    hovering ? openLoopDemands.roll : 0,
+                    hovering ? setpointDemands.pitch : 0,
+                    hovering ? setpointDemands.roll : 0,
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(

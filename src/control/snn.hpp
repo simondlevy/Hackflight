@@ -32,10 +32,10 @@ class ClosedLoopControl {
                 const float dt,
                 const bool hovering,
                 const vehicleState_t & vehicleState,
-                const demands_t & openLoopDemands,
+                const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            _helper.run(dt, hovering, vehicleState, openLoopDemands, demands); 
+            _helper.run(dt, hovering, vehicleState, setpointDemands, demands); 
         }
 
         void serializeMessage(MspSerializer & serializer)

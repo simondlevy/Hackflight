@@ -46,7 +46,7 @@ class ClosedLoopControl {
                 const float dt,
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
-                const demands_t & openLoopDemands,
+                const demands_t & setpointDemands,
                 demands_t & demands)
         {
             extern float stream_dt;
@@ -73,10 +73,10 @@ class ClosedLoopControl {
 
             stream_hovering = flightMode == MODE_HOVERING;
 
-            stream_thrust = openLoopDemands.thrust;
-            stream_roll = openLoopDemands.roll;
-            stream_pitch = openLoopDemands.pitch;
-            stream_yaw = openLoopDemands.yaw;
+            stream_thrust = setpointDemands.thrust;
+            stream_roll = setpointDemands.roll;
+            stream_pitch = setpointDemands.pitch;
+            stream_yaw = setpointDemands.yaw;
 
             stream_dx = vehicleState.dx;
             stream_dy = vehicleState.dy;
