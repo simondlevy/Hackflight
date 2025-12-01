@@ -49,8 +49,6 @@ static void reportStatus(const siminfo_t & siminfo)
 
 static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 {
-    bool landed = false;
-
     // Run control in middle loop
     for (uint32_t j=0;
             j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
@@ -94,22 +92,18 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
         // Run dynamics in innermost loop
         for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
 
-            _dynamics.update(motors,
-                    Mixer::rotorCount,
-                    Mixer::roll,
-                    Mixer::pitch,
-                    Mixer::yaw);
-
             if (_dynamics.state.z < 0) {
-                landed = true;
-                break;
+                _dynamics.reset();
             }
-        }
-    }
+            else {
+                _dynamics.update(motors,
+                        Mixer::rotorCount,
+                        Mixer::roll,
+                        Mixer::pitch,
+                        Mixer::yaw);
+            }
 
-    // Reset dynamics if landed
-    if (landed) {
-        _dynamics.reset();
+        }
     }
 
     // Get current pose from dynamics
