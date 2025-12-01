@@ -57,33 +57,36 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 
         demands_t demands = {};
 
-        _closedLoopControl.run(
-                1 / (float)PID_UPDATE_RATE,
-                siminfo.flightMode,
-                state,
-                siminfo.demands,
-                demands);
+        if (siminfo.flightMode != MODE_IDLE) {
 
-        demands.roll *= Num::DEG2RAD;
-        demands.pitch *= Num::DEG2RAD;
-        demands.yaw *= Num::DEG2RAD;
+            _closedLoopControl.run(
+                    1 / (float)PID_UPDATE_RATE,
+                    siminfo.flightMode,
+                    state,
+                    siminfo.demands,
+                    demands);
 
-        float motors[4] = {};
+            demands.roll *= Num::DEG2RAD;
+            demands.pitch *= Num::DEG2RAD;
+            demands.yaw *= Num::DEG2RAD;
 
-        Mixer::mix(demands, motors);
+            float motors[4] = {};
 
-        if (_dynamics.state.z < 0) {
-            _dynamics.reset();
-        }
+            Mixer::mix(demands, motors);
 
-        // Run dynamics in innermost loop
-        for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
+            if (_dynamics.state.z < 0) {
+                _dynamics.reset();
+            }
 
-            _dynamics.update(motors,
-                    Mixer::rotorCount,
-                    Mixer::roll,
-                    Mixer::pitch,
-                    Mixer::yaw);
+            // Run dynamics in innermost loop
+            for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
+
+                _dynamics.update(motors,
+                        Mixer::rotorCount,
+                        Mixer::roll,
+                        Mixer::pitch,
+                        Mixer::yaw);
+            }
         }
     }
 

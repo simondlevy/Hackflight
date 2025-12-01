@@ -75,8 +75,6 @@ class Simulator {
 
             static flightMode_t _flightMode;
 
-            reportFlightMode(_flightMode);
-
             // runRangefinder();
 
             siminfo_t siminfo = {};
@@ -96,6 +94,12 @@ class Simulator {
                     getSimInfoFromKeyboard(siminfo, _flightMode);
                     sendSimInfo(siminfo);
             }
+
+            if (_flightMode == MODE_LANDING && wb_gps_get_values(_gps)[2] < 0.02) {
+                _flightMode = MODE_IDLE;
+            }
+
+            reportFlightMode(_flightMode);
 
             return true;
         }
@@ -358,6 +362,7 @@ class Simulator {
         {
             mode = (mode == MODE_IDLE ? MODE_HOVERING :
                     mode == MODE_ARMED ? MODE_HOVERING :
+                    mode == MODE_HOVERING ? MODE_LANDING :
                     MODE_ARMED);
         }
 
