@@ -295,25 +295,9 @@ class Simulator {
 
             const auto button = wb_joystick_get_pressed_button();
 
-            if (button == 5) {
-                _hover_button_was_down = true;
-            }
-            else {
-                if (_hover_button_was_down) {
-                    switchMode(flightMode, TOGGLE_HOVER);
-                }
-                _hover_button_was_down = false;
-            }
+            checkButton(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
 
-            if (button == 4) {
-                _auto_button_was_down = true;
-            }
-            else {
-                if (_auto_button_was_down) {
-                    switchMode(flightMode, TOGGLE_AUTO);
-                }
-                _auto_button_was_down = false;
-            }
+            checkButton(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
 
             siminfo.flightMode = flightMode;
 
@@ -359,6 +343,24 @@ class Simulator {
                }
 
                siminfo.flightMode = flightMode;
+        }
+
+        void checkButton(
+                const uint8_t button,
+                const uint8_t target,
+                const toggle_e toggle,
+                bool & button_was_down,
+                flightMode_t & flightMode)
+        {
+            if (button == target) {
+                button_was_down = true;
+            }
+            else {
+                if (button_was_down) {
+                    switchMode(flightMode, toggle);
+                }
+                button_was_down = false;
+            }
         }
 
         bool toggled(bool & key_was_down)
