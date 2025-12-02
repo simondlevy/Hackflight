@@ -20,6 +20,10 @@
 
 class ClosedLoopControl {
 
+    private:
+
+        OriginalClosedLoopControl _original;
+
     public:
 
         void run(
@@ -29,8 +33,7 @@ class ClosedLoopControl {
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            OriginalClosedLoopControl::run(
-                    dt, flightMode, vehicleState, setpointDemands, demands);
+            _original.run(dt, flightMode, vehicleState, setpointDemands, demands);
         }
 
         void serializeMessage(MspSerializer & serializer)

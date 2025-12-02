@@ -29,7 +29,7 @@ class OriginalClosedLoopControl {
 
     public:
 
-        void run(
+        static void run(
                 const float dt,
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
