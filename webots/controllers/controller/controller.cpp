@@ -149,6 +149,13 @@ class Simulator {
 
         } joystickStatus_e;
 
+        typedef enum {
+
+            TOGGLE_HOVER,
+            TOGGLE_AUTO
+
+        } toggle_e;
+
         typedef struct {
 
             int8_t throttle;
@@ -272,6 +279,7 @@ class Simulator {
         void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _hover_button_was_down;
+            static bool _auto_button_was_down;
 
             auto axes = getJoystickInfo();
 
@@ -282,9 +290,18 @@ class Simulator {
             }
             else {
                 if (_hover_button_was_down) {
-                    switchMode(flightMode);
+                    switchMode(flightMode, TOGGLE_HOVER);
                 }
                 _hover_button_was_down = false;
+            }
+
+            if (button == 4) {
+                _auto_button_was_down = true;
+            }
+            else {
+                if (_auto_button_was_down) {
+                }
+                _auto_button_was_down = false;
             }
 
             siminfo.flightMode = flightMode;
@@ -313,15 +330,15 @@ class Simulator {
 
             /*
                else if (key == 32) {
-               const bool tapped_spacebar = toggle(_spacebar_was_down);
+               const bool tapped_spacebar = toggled(_spacebar_was_down);
                if (tapped_spacebar) {
                switchMode2(flightMode);
                }
                }*/
 
                else if (key == 4) {
-                   if (toggle(_enter_was_down)) {
-                       switchMode(flightMode);
+                   if (toggled(_enter_was_down)) {
+                       switchMode(flightMode, TOGGLE_HOVER);
                    }
                }
 
@@ -333,7 +350,7 @@ class Simulator {
                siminfo.flightMode = flightMode;
         }
 
-        bool toggle(bool & key_was_down)
+        bool toggled(bool & key_was_down)
         {
             if (!key_was_down) {
                 key_was_down = true;
@@ -342,12 +359,22 @@ class Simulator {
             return false;
         }
 
-        void switchMode(flightMode_t & mode)
+        void switchMode(flightMode_t & mode, const toggle_e toggle)
         {
-            mode = (mode == MODE_IDLE ? MODE_HOVERING :
-                    mode == MODE_ARMED ? MODE_HOVERING :
-                    mode == MODE_HOVERING ? MODE_LANDING :
-                    MODE_ARMED);
+            switch (mode) {
+
+                case MODE_IDLE:
+                    mode = MODE_HOVERING;
+                    break;
+
+                case MODE_HOVERING:
+                    mode = MODE_LANDING;
+                    break;
+
+                default:
+                    break;
+
+            }
         }
 
         /*
