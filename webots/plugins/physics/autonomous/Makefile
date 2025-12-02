@@ -16,15 +16,11 @@
 
 SRC = ../../../../src
 
-ROOT = $(HOME)/Desktop
-
-NET = $(ROOT)/2025-diff-network/levy/
-
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-CXX_SOURCES = ../support.cpp
+INCLUDE = -I$(SRC)
 
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
+CXX_SOURCES = ../support.cpp
 
 all: libautonomous.so
 

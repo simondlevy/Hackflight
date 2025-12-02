@@ -20,10 +20,6 @@
 
 class ClosedLoopControl {
 
-    private:
-
-        OriginalClosedLoopControl _original;
-
     public:
 
         void run(
@@ -33,7 +29,19 @@ class ClosedLoopControl {
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            _original.run(dt, flightMode, vehicleState, setpointDemands, demands);
+            const char * names[6] = {
+                "IDLE",
+                "ARMED",
+                "HOVERING",
+                "AUTONOMOUS",
+                "LANDING",
+                "LOST_CONTACT"
+            };
+
+            printf("mode: %s\n", names[flightMode]);
+
+            OriginalClosedLoopControl::run(
+                    dt, flightMode, vehicleState, setpointDemands, demands);
         }
 
         void serializeMessage(MspSerializer & serializer)
