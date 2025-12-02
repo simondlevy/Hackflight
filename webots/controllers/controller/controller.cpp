@@ -295,9 +295,9 @@ class Simulator {
 
             const auto button = wb_joystick_get_pressed_button();
 
-            checkToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
+            checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
 
-            checkToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
+            checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
 
             siminfo.flightMode = flightMode;
 
@@ -323,19 +323,19 @@ class Simulator {
                 _spacebar_was_down = false;
             }
 
-            else if (key == 4) {
+            if (key == 4) {
                 if (toggled(_enter_was_down)) {
                     switchMode(flightMode, TOGGLE_HOVER);
                 }
             }
 
-            else if (key == 32) {
+            if (key == 32) {
                 if (toggled(_spacebar_was_down)) {
                     switchMode(flightMode, TOGGLE_AUTO);
                 }
             }
 
-            else if (flightMode == MODE_HOVERING) {
+            if (flightMode == MODE_HOVERING) {
 
                 getSetpointFromKey(key, siminfo);
             }
@@ -343,7 +343,7 @@ class Simulator {
             siminfo.flightMode = flightMode;
         }
 
-        void checkToggle(
+        void checkButtonToggle(
                 const int button,
                 const int target,
                 const toggle_e toggle,
