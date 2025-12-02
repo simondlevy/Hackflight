@@ -95,7 +95,7 @@ class Simulator {
                     sendSimInfo(siminfo);
             }
 
-            if (_flightMode == MODE_LANDING && wb_gps_get_values(_gps)[2] < 0.02) {
+            if (_flightMode == MODE_LANDING && wb_gps_get_values(_gps)[2] < ZDIST_LAND_M) {
                 _flightMode = MODE_IDLE;
             }
 
