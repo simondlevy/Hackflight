@@ -364,16 +364,15 @@ class Simulator {
             switch (mode) {
 
                 case MODE_IDLE:
-                    mode = MODE_HOVERING;
+                    mode = toggle == TOGGLE_HOVER ? MODE_HOVERING : mode;
                     break;
 
                 case MODE_HOVERING:
-                    mode = MODE_LANDING;
+                    mode = toggle == TOGGLE_HOVER ? MODE_LANDING : mode;
                     break;
 
                 default:
                     break;
-
             }
         }
 
