@@ -295,9 +295,9 @@ class Simulator {
 
             const auto button = wb_joystick_get_pressed_button();
 
-            checkButton(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
+            checkToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
 
-            checkButton(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
+            checkToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
 
             siminfo.flightMode = flightMode;
 
@@ -314,40 +314,38 @@ class Simulator {
         void getSimInfoFromKeyboard(siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _enter_was_down;
-            //static bool _spacebar_was_down;
+            static bool _spacebar_was_down;
 
             const int key = wb_keyboard_get_key();
 
             if (key == -1 ) {
                 _enter_was_down = false;
-                //_spacebar_was_down = false;
+                _spacebar_was_down = false;
             }
 
-            /*
-               else if (key == 32) {
-               const bool tapped_spacebar = toggled(_spacebar_was_down);
-               if (tapped_spacebar) {
-               switchMode2(flightMode);
-               }
-               }*/
+            else if (key == 4) {
+                if (toggled(_enter_was_down)) {
+                    switchMode(flightMode, TOGGLE_HOVER);
+                }
+            }
 
-               else if (key == 4) {
-                   if (toggled(_enter_was_down)) {
-                       switchMode(flightMode, TOGGLE_HOVER);
-                   }
-               }
+            else if (key == 32) {
+                if (toggled(_spacebar_was_down)) {
+                    switchMode(flightMode, TOGGLE_AUTO);
+                }
+            }
 
-               else if (flightMode == MODE_HOVERING) {
+            else if (flightMode == MODE_HOVERING) {
 
-                   getSetpointFromKey(key, siminfo);
-               }
+                getSetpointFromKey(key, siminfo);
+            }
 
-               siminfo.flightMode = flightMode;
+            siminfo.flightMode = flightMode;
         }
 
-        void checkButton(
-                const uint8_t button,
-                const uint8_t target,
+        void checkToggle(
+                const int button,
+                const int target,
                 const toggle_e toggle,
                 bool & button_was_down,
                 flightMode_t & flightMode)
