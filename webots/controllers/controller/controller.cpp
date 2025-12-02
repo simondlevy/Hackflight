@@ -75,6 +75,16 @@ class Simulator {
 
             static flightMode_t _flightMode;
 
+            const char * modes[6] = {
+                "IDLE",
+                "ARMED",
+                "HOVERING",
+                "AUTONOMOUS",
+                "LANDING",
+                "LOST_CONTACT"
+            };
+            printf("%s", modes[_flightMode]);
+
             // runRangefinder();
 
             siminfo_t siminfo = {};
@@ -300,6 +310,7 @@ class Simulator {
             }
             else {
                 if (_auto_button_was_down) {
+                    switchMode(flightMode, TOGGLE_AUTO);
                 }
                 _auto_button_was_down = false;
             }
@@ -368,21 +379,22 @@ class Simulator {
                     break;
 
                 case MODE_HOVERING:
-                    mode = toggle == TOGGLE_HOVER ? MODE_LANDING : mode;
+                    mode = 
+                        toggle == TOGGLE_HOVER ?  MODE_LANDING :
+                        toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
+                        mode;
+                    break;
+
+                case MODE_AUTONOMOUS:
+                    mode = 
+                        toggle == TOGGLE_AUTO ?  MODE_HOVERING :
+                        mode;
                     break;
 
                 default:
                     break;
             }
         }
-
-        /*
-           void switchMode2(flightMode_t & mode)
-           {
-           mode = (mode == MODE_HOVERING ? MODE_AUTONOMOUS :
-           mode == MODE_AUTONOMOUS ? MODE_HOVERING :
-           mode);
-           }*/
 
         void getSetpointFromKey(const int key, siminfo_t & siminfo)
         {
