@@ -323,17 +323,9 @@ class Simulator {
                 _spacebar_was_down = false;
             }
 
-            if (key == 4) {
-                if (toggled(_enter_was_down)) {
-                    switchMode(flightMode, TOGGLE_HOVER);
-                }
-            }
+            checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
 
-            if (key == 32) {
-                if (toggled(_spacebar_was_down)) {
-                    switchMode(flightMode, TOGGLE_AUTO);
-                }
-            }
+            checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
 
             if (flightMode == MODE_HOVERING) {
 
@@ -360,6 +352,21 @@ class Simulator {
                 button_was_down = false;
             }
         }
+
+        void checkKeyboardToggle(
+                const int key,
+                const int target,
+                const toggle_e toggle,
+                bool & key_was_down,
+                flightMode_t & flightMode) 
+        {
+            if (key == target) {
+                if (toggled(key_was_down)) {
+                    switchMode(flightMode, toggle);
+                }
+            }
+        }
+
 
         bool toggled(bool & key_was_down)
         {
