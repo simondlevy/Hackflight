@@ -361,20 +361,11 @@ class Simulator {
                 flightMode_t & flightMode) 
         {
             if (key == target) {
-                if (toggled(key_was_down)) {
+                if (!key_was_down) {
+                    key_was_down = true;
                     switchMode(flightMode, toggle);
                 }
             }
-        }
-
-
-        bool toggled(bool & key_was_down)
-        {
-            if (!key_was_down) {
-                key_was_down = true;
-                return true;
-            }
-            return false;
         }
 
         void switchMode(flightMode_t & mode, const toggle_e toggle)
