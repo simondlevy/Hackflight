@@ -15,7 +15,7 @@
 # Support different worlds and closed-loop controllers ------------------------
 
 world = empty
-closedloop = standard
+control = standard
 
 # -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	cp ../../plugins/physics/$(closedloop)/lib$(closedloop).so \
+	cp ../../plugins/physics/$(control)/lib$(control).so \
 		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller
