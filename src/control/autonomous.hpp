@@ -29,19 +29,20 @@ class ClosedLoopControl {
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            const char * names[6] = {
-                "IDLE",
-                "ARMED",
-                "HOVERING",
-                "AUTONOMOUS",
-                "LANDING",
-                "LOST_CONTACT"
-            };
+            if (flightMode == MODE_AUTONOMOUS) {
 
-            printf("mode: %s\n", names[flightMode]);
+                const demands_t autonomousSetpointDemands = demands_t {
+                    setpointDemands.thrust, 0, 0, 0
+                };
 
-            OriginalClosedLoopControl::run(
-                    dt, flightMode, vehicleState, setpointDemands, demands);
+                OriginalClosedLoopControl::run(
+                        dt, MODE_HOVERING, vehicleState, autonomousSetpointDemands, demands);
+            }
+
+            else {
+                OriginalClosedLoopControl::run(
+                        dt, flightMode, vehicleState, setpointDemands, demands);
+            }
         }
 
         void serializeMessage(MspSerializer & serializer)
