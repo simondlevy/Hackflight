@@ -26,8 +26,6 @@ CXX_SOURCES = ../support.cpp
 
 INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
 
-all: liblowres.so
-
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)

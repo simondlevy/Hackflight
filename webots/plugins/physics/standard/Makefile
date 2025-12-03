@@ -22,8 +22,6 @@ INCLUDE = -I$(SRC)
 
 CXX_SOURCES = ../support.cpp
 
-all: libstandard.so
-
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
