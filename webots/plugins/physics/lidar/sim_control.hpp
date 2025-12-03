@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <control/autonomous.hpp>
+#include <control/lidar.hpp>
 
 static ClosedLoopControl _closedLoopControl;
 
