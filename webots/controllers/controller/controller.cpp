@@ -135,7 +135,7 @@ class Simulator {
                     for (int j = 0; j < height; j++) {
                         const float distance =
                             wb_range_finder_image_get_depth( image, width, j, i);
-                        siminfo.rangefinder_distances[i*width+j] =
+                        siminfo.lidar_distances[i*width+j] =
                             isinf(distance) ? -1 : (int16_t)(1000 * distance);
                     }
                 }

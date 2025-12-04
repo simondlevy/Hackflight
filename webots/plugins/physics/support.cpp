@@ -66,8 +66,7 @@ static Dynamics::pose_t run_sim_middle_loop(const siminfo_t & siminfo)
                     siminfo.flightMode,
                     state,
                     siminfo.demands,
-                    demands,
-                    (void *)siminfo.rangefinder_distances);
+                    demands);
 
             demands.roll *= Num::DEG2RAD;
             demands.pitch *= Num::DEG2RAD;
@@ -140,12 +139,12 @@ static void report_fps()
     _count++;*/
 }
 
-static void read_rangefinder(const siminfo_t & siminfo)
+static void report_lidar(const siminfo_t & siminfo)
 {
     for (int i = 0; i < LIDAR_RESOLUTION; i++) {
         for (int j = 0; j < LIDAR_RESOLUTION; j++) {
             const int16_t distance =
-                siminfo.rangefinder_distances[i*LIDAR_RESOLUTION+j];
+                siminfo.lidar_distances[i*LIDAR_RESOLUTION+j];
             if (distance == -1) {
                 printf(" inf  ");
             }
@@ -182,7 +181,7 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    read_rangefinder(siminfo);
+    report_lidar(siminfo);
 
     // Run controllers in middle loop, dynamics inside that
     const Dynamics::pose_t pose = run_sim_middle_loop(siminfo);

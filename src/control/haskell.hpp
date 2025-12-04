@@ -47,11 +47,8 @@ class ClosedLoopControl {
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
-                demands_t & demands,
-                void * extra)
+                demands_t & demands)
         {
-            (void)extra;
-
             extern float stream_dt;
 
             extern bool stream_hovering;
