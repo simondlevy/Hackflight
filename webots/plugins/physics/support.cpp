@@ -17,9 +17,11 @@
  */
 
 #include <stdio.h>
+#include <time.h>
 
 #include <plugins/physics.h>
 
+#include <sim_common.h>
 #include <sim_control.hpp>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
@@ -118,12 +120,32 @@ DLLEXPORT void webots_physics_init()
     _closedLoopControl.init();
 }
 
+static void showFps()
+{
+    static uint32_t _count;
+    static uint32_t _sec_prev;
+
+    time_t now = time(0);
+    struct tm * tm = localtime(&now);
+    const uint32_t sec_curr = tm->tm_sec;
+    if (sec_curr - _sec_prev >= 1) {
+        if (_sec_prev > 0) {
+            dWebotsConsolePrintf("%d\n", _count);
+        }
+        _sec_prev = sec_curr;
+        _count = 0;
+    }
+    _count++;
+}
+
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
     if (_robotBody == NULL) {
         return;
     }
+
+    showFps();
 
     int size = 0;
 

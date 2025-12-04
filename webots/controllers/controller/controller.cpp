@@ -75,6 +75,7 @@ class Simulator {
 
             static flightMode_t _flightMode;
 
+            /*
             const char * modes[6] = {
                 "IDLE",
                 "ARMED",
@@ -84,8 +85,9 @@ class Simulator {
                 "LOST_CONTACT"
             };
             printf("%s", modes[_flightMode]);
+            */
 
-            // runRangefinder();
+            runRangefinder();
 
             siminfo_t siminfo = {};
 
@@ -119,28 +121,35 @@ class Simulator {
 
         void runRangefinder()
         {
-            const int range_finder_width =
-                wb_range_finder_get_width(_range_finder);
-            const int range_finder_height =
-                wb_range_finder_get_height(_range_finder);
+            const int width = wb_range_finder_get_width(_range_finder);
+            const int height = wb_range_finder_get_height(_range_finder);
+
+            static int16_t * distances;
+
+            if (!distances) {
+                distances = new int16_t [width*height];
+            }
 
             const float * image =
                 wb_range_finder_get_range_image(_range_finder);
 
-            for (int i = 0; i < range_finder_width; i++) {
-                for (int j = 0; j < range_finder_height; j++) {
-                    const float distance = wb_range_finder_image_get_depth(
-                            image, range_finder_width, j, i);
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    const float distance =
+                        wb_range_finder_image_get_depth( image, width, j, i);
+                    /*
                     if (isinf(distance)) {
                         printf(" inf  ");
                     }
                     else {
                         printf("%3.3f ", distance);
-                    }
+                    }*/
+                    distances[i*width+j] =
+                        isinf(distance) ? -1 : (int16_t)distance;
                 }
-                printf(" \n \n \n");
+                //printf(" \n \n \n");
             }
-            printf("-----------------------------------------------\n");
+            // printf("-----------------------------------------------\n");
         }
 
     private:

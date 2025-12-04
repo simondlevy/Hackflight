@@ -19,7 +19,7 @@ SRC = ../../../../src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I$(SRC)
+INCLUDE = -I$(SRC) -I../../..
 
 HASKDIR = ../../../../haskell
 

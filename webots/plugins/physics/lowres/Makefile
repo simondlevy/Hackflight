@@ -1,5 +1,3 @@
-# Custom physics plugin for Hackflight simulator 
-#
 #  Copyright (C) 2025 Simon D. Levy
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -14,20 +12,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-SRC = ../../../../src
-
-ROOT = $(HOME)/Desktop
-
-NET = $(ROOT)/2025-diff-network/levy/
-
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
-CXX_SOURCES = ../support.cpp
-
-INCLUDE = -I../../../simsrc -I../../../../src -I$(ROOT) -I$(NET)
-
-### Do not modify: this includes Webots global Makefile.include
-null :=
-space := $(null) $(null)
-WEBOTS_HOME_PATH?=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
-include $(WEBOTS_HOME_PATH)/resources/Makefile.include
+include ../makefile.include
