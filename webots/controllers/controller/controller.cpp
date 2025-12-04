@@ -158,16 +158,16 @@ class Simulator {
         void reportLidarValue(const int16_t value, const int i, const int j)
         {
             if (value < 0) {
-                printf("inf  ");
+                printf(" ---- ");
             }
             else {
-                printf("%4d ", value);
+                printf("%5d ", value);
             }
             if (j == LIDAR_RESOLUTION-1) {
-                printf("\n");
+                printf("\n \n \n");
             }
             if (i==LIDAR_RESOLUTION-1 && j==LIDAR_RESOLUTION-1) {
-                printf("\n-----------------------------------------------\n");
+                printf("\n-----------------------------------------------\n \n");
             }
         }
 
