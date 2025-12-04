@@ -17,7 +17,7 @@
  */
 
 #include <datatypes.h>
-#include <rangefinder.h>
+#include <lidar.h>
 
 typedef struct {
 
@@ -28,6 +28,6 @@ typedef struct {
     flightMode_t flightMode;
     demands_t demands;
     int16_t rangefinder_distances
-        [RANGEFINDER_RESOLUTION*RANGEFINDER_RESOLUTION]; 
+        [LIDAR_RESOLUTION*LIDAR_RESOLUTION]; 
 
 } siminfo_t;

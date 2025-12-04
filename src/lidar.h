@@ -16,4 +16,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-static const uint16_t RANGEFINDER_RESOLUTION = 8;
+#pragma once
+
+static const uint16_t LIDAR_RESOLUTION = 8;

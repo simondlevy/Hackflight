@@ -142,10 +142,10 @@ static void report_fps()
 
 static void read_rangefinder(const siminfo_t & siminfo)
 {
-    for (int i = 0; i < RANGEFINDER_RESOLUTION; i++) {
-        for (int j = 0; j < RANGEFINDER_RESOLUTION; j++) {
+    for (int i = 0; i < LIDAR_RESOLUTION; i++) {
+        for (int j = 0; j < LIDAR_RESOLUTION; j++) {
             const int16_t distance =
-                siminfo.rangefinder_distances[i*RANGEFINDER_RESOLUTION+j];
+                siminfo.rangefinder_distances[i*LIDAR_RESOLUTION+j];
             if (distance == -1) {
                 printf(" inf  ");
             }

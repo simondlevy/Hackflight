@@ -125,8 +125,8 @@ class Simulator {
             const int width = wb_range_finder_get_width(_range_finder);
             const int height = wb_range_finder_get_height(_range_finder);
 
-            if (width == RANGEFINDER_RESOLUTION &&
-                    height == RANGEFINDER_RESOLUTION) {
+            if (width == LIDAR_RESOLUTION &&
+                    height == LIDAR_RESOLUTION) {
 
                 const float * image =
                     wb_range_finder_get_range_image(_range_finder);
@@ -142,7 +142,7 @@ class Simulator {
             }
             else {
                 printf("ERROR: Rangefinder resolution should be %dx%d; actual is %dx%d\n",
-                    RANGEFINDER_RESOLUTION, RANGEFINDER_RESOLUTION, width, height);
+                    LIDAR_RESOLUTION, LIDAR_RESOLUTION, width, height);
             }
         }
 
