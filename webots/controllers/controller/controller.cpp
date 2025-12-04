@@ -83,6 +83,8 @@ class Simulator {
 
             readLidar(lidar_distance_mm);
 
+            reportLidar(lidar_distance_mm);
+
             switch (getJoystickStatus()) {
 
                 case JOYSTICK_RECOGNIZED:
@@ -128,7 +130,6 @@ class Simulator {
                             wb_range_finder_image_get_depth( image, width, j, i);
                         distance_mm[i][j] = isinf(distance_m) ? -1 :
                             (int16_t)(1000 * distance_m);
-                        reportLidarValue(distance_mm[i][j], i, j);
                     }
                 }
             }
@@ -139,20 +140,22 @@ class Simulator {
             }
         }
 
-        void reportLidarValue(const int16_t value, const int i, const int j)
+        void reportLidar(
+                int16_t distance_mm[LIDAR_RESOLUTION][LIDAR_RESOLUTION]) 
         {
-            if (value < 0) {
-                printf(" ---- ");
-            }
-            else {
-                printf("%5d ", value);
-            }
-            if (j == LIDAR_RESOLUTION-1) {
+            for (int i=0; i<LIDAR_RESOLUTION; ++i) {
+                for (int j=0; j<LIDAR_RESOLUTION; ++j) {
+                    const int16_t d = distance_mm[i][j];
+                    if (d < 0) {
+                        printf(" ---- ");
+                    }
+                    else {
+                        printf("%5d ", d);
+                    }
+                }
                 printf("\n \n \n");
             }
-            if (i==LIDAR_RESOLUTION-1 && j==LIDAR_RESOLUTION-1) {
-                printf("\n-----------------------------------------------\n \n");
-            }
+            printf("\n-----------------------------------------------\n \n");
         }
 
     private:
