@@ -34,7 +34,7 @@ static const int PID_UPDATE_RATE = 1024; // Plank
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
+static Dynamics::pose_t run_sim_middle_loop(const siminfo_t & siminfo)
 {
     // Run control in middle loop
     for (uint32_t j=0;
@@ -92,7 +92,7 @@ static pose_t run_sim_middle_loop(const siminfo_t & siminfo)
         }
     }
 
-    const pose_t pose = _dynamics.getPose();
+    const Dynamics::pose_t pose = _dynamics.getPose();
 
     // Get current pose from dynamics
     //printf("%+3.3f\n", pose.z);
@@ -163,7 +163,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Run controllers in middle loop, dynamics inside that
-    const pose_t pose = run_sim_middle_loop(siminfo);
+    const Dynamics::pose_t pose = run_sim_middle_loop(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};

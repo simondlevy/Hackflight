@@ -16,4 +16,17 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <datatypes.h>
+
 static const int RANGEFINDER_RESOLUTION = 8;
+
+typedef struct {
+
+    float start_x;
+    float start_y;
+    float start_z;
+    float framerate;
+    flightMode_t flightMode;
+    demands_t demands;
+
+} siminfo_t;
