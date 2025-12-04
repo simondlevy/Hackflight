@@ -479,7 +479,15 @@ int main(int argc, char ** argv)
 
     const std::string setpoint = std::string(argc < 2 ? "human" : argv[1]);
 
-    printf(">>>>>>>>>>>>> %d\n", setpoint == "human");
+    if (setpoint == "lidar") {
+        printf(">>>>>>>> LIDAR\n");
+    }
+    else if (setpoint == "human") {
+        printf(">>>>>>>> HUMAN\n");
+    }
+    else {
+        printf("Unrecognized setpoint '%s'; defaulting to human\n", setpoint.c_str());
+    }
 
     Simulator sim = {};
 
