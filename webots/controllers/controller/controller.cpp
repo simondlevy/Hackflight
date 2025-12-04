@@ -39,6 +39,13 @@ class Simulator {
 
     public:
 
+        typedef enum {
+
+            SETPOINT_HUMAN,
+            SETPOINT_LIDAR
+
+        } setpoint_e;
+
         void init()
         {
             wb_robot_init();
@@ -83,7 +90,7 @@ class Simulator {
 
             readLidar(lidar_distance_mm);
 
-            reportLidar(lidar_distance_mm);
+            //reportLidar(lidar_distance_mm);
 
             switch (getJoystickStatus()) {
 
@@ -466,8 +473,14 @@ class Simulator {
         }
 };
 
-int main() 
+int main(int argc, char ** argv) 
 {
+    // const char * setpoint = argc < 2 ? "human" : argv[1];
+
+    const std::string setpoint = std::string(argc < 2 ? "human" : argv[1]);
+
+    printf(">>>>>>>>>>>>> %d\n", setpoint == "human");
+
     Simulator sim = {};
 
     sim.init();

@@ -15,6 +15,7 @@
 # Support different worlds and closed-loop controllers ------------------------
 
 world = empty
+setpoint = human
 control = standard
 
 # -----------------------------------------------------------------------------
@@ -37,7 +38,7 @@ run:
 	cp ../../plugins/physics/$(control)/lib$(control).so \
 		../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller
+	/usr/local/webots/webots-controller --stdout-redirect controller $(setpoint)
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
