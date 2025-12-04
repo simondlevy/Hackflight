@@ -78,7 +78,10 @@ class Simulator {
 
             siminfo_t siminfo = {};
 
-            readLidar();
+            int16_t
+                lidar_distance_mm[LIDAR_RESOLUTION][LIDAR_RESOLUTION] = {};
+
+            readLidar(lidar_distance_mm);
 
             switch (getJoystickStatus()) {
 
@@ -108,26 +111,8 @@ class Simulator {
             wb_robot_cleanup();
         }
 
-        /*
-        static void report_lidar(const siminfo_t & siminfo)
-        {
-            for (int i = 0; i < LIDAR_RESOLUTION; i++) {
-                for (int j = 0; j < LIDAR_RESOLUTION; j++) {
-                    const int16_t distance =
-                        siminfo.lidar_distances[i*LIDAR_RESOLUTION+j];
-                    if (distance == -1) {
-                        printf(" inf  ");
-                    }
-                    else {
-                        printf("%5d ", distance);
-                    }
-                }
-                printf(" \n \n \n");
-            }
-            printf("-----------------------------------------------\n");
-            }*/
-
-        void readLidar()
+        void readLidar(
+                int16_t distance_mm[LIDAR_RESOLUTION][LIDAR_RESOLUTION]) 
         {
             const int width = wb_range_finder_get_width(_lidar);
             const int height = wb_range_finder_get_height(_lidar);
@@ -141,9 +126,9 @@ class Simulator {
                     for (int j = 0; j < height; j++) {
                         const float distance_m =
                             wb_range_finder_image_get_depth( image, width, j, i);
-                        const int16_t distance_mm = isinf(distance_m) ? -1 :
+                        distance_mm[i][j] = isinf(distance_m) ? -1 :
                             (int16_t)(1000 * distance_m);
-                        reportLidarValue(distance_mm, i, j);
+                        reportLidarValue(distance_mm[i][j], i, j);
                     }
                 }
             }
