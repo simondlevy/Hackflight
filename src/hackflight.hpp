@@ -205,6 +205,15 @@ class Hackflight {
         static const int16_t FLOW_OUTLIER_LIMIT = 100;
         static constexpr float FLOW_STD_FIXED = 2.0;
 
+        typedef struct {
+
+            uint32_t timestamp;
+            bool armed;
+            bool hovering;
+            demands_t demands;
+
+        } command_t;
+
         Imu _imu;
         EKF _ekf;
         Debugger _debugger;
@@ -234,7 +243,7 @@ class Hackflight {
             _vl53l1x.setMeasurementTimingBudget(25000);
 
             _vl53l1x.startContinuous(50);
-         }
+        }
 
         void zrangerUpdate(const float range)
         {

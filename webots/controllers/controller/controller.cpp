@@ -152,7 +152,6 @@ class Simulator {
                 printf("ERROR: Rangefinder resolution should be %dx%d; actual is %dx%d\n",
                         LIDAR_RESOLUTION, LIDAR_RESOLUTION, width, height);
             }
-
         }
 
         void reportLidarValue(const int16_t value, const int i, const int j)

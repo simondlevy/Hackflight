@@ -121,15 +121,6 @@ typedef struct {
 } accelerationMeasurement_t;
 
 typedef struct {
-    uint32_t timestamp;
-    bool armed;
-    bool hovering;
-    demands_t demands;
-
-} command_t;
-
-
-typedef struct {
 
     float start_x;
     float start_y;
