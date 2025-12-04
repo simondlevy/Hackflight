@@ -22,7 +22,7 @@
 
 // Hackflight
 #include <datatypes.h>
-#include <sim_common.h>
+#include <lidar.h>
 
 // Webots
 #include <webots/camera.h>
@@ -47,8 +47,8 @@ class Simulator {
 
             _emitter = wb_robot_get_device("emitter");
 
-            _range_finder = wb_robot_get_device("range-finder");
-            wb_range_finder_enable(_range_finder, _timestep);
+            _lidar = wb_robot_get_device("range-finder");
+            wb_range_finder_enable(_lidar, _timestep);
 
             _gps = wb_robot_get_device("gps");
             wb_gps_enable(_gps, _timestep);
@@ -76,21 +76,9 @@ class Simulator {
 
             static flightMode_t _flightMode;
 
-            /*
-            const char * modes[6] = {
-                "IDLE",
-                "ARMED",
-                "HOVERING",
-                "AUTONOMOUS",
-                "LANDING",
-                "LOST_CONTACT"
-            };
-            printf("%s", modes[_flightMode]);
-            */
-
             siminfo_t siminfo = {};
 
-            readRangefinder(siminfo);
+            readLidar();
 
             switch (getJoystickStatus()) {
 
@@ -120,29 +108,66 @@ class Simulator {
             wb_robot_cleanup();
         }
 
-        void readRangefinder(siminfo_t & siminfo)
+        /*
+        static void report_lidar(const siminfo_t & siminfo)
         {
-            const int width = wb_range_finder_get_width(_range_finder);
-            const int height = wb_range_finder_get_height(_range_finder);
+            for (int i = 0; i < LIDAR_RESOLUTION; i++) {
+                for (int j = 0; j < LIDAR_RESOLUTION; j++) {
+                    const int16_t distance =
+                        siminfo.lidar_distances[i*LIDAR_RESOLUTION+j];
+                    if (distance == -1) {
+                        printf(" inf  ");
+                    }
+                    else {
+                        printf("%5d ", distance);
+                    }
+                }
+                printf(" \n \n \n");
+            }
+            printf("-----------------------------------------------\n");
+            }*/
+
+        void readLidar()
+        {
+            const int width = wb_range_finder_get_width(_lidar);
+            const int height = wb_range_finder_get_height(_lidar);
 
             if (width == LIDAR_RESOLUTION &&
                     height == LIDAR_RESOLUTION) {
 
-                const float * image =
-                    wb_range_finder_get_range_image(_range_finder);
+                const float * image = wb_range_finder_get_range_image(_lidar);
 
                 for (int i = 0; i < width; i++) {
                     for (int j = 0; j < height; j++) {
-                        const float distance =
+                        const float distance_m =
                             wb_range_finder_image_get_depth( image, width, j, i);
-                        siminfo.lidar_distances[i*width+j] =
-                            isinf(distance) ? -1 : (int16_t)(1000 * distance);
+                        const int16_t distance_mm = isinf(distance_m) ? -1 :
+                            (int16_t)(1000 * distance_m);
+                        reportLidarValue(distance_mm, i, j);
                     }
                 }
             }
+
             else {
                 printf("ERROR: Rangefinder resolution should be %dx%d; actual is %dx%d\n",
-                    LIDAR_RESOLUTION, LIDAR_RESOLUTION, width, height);
+                        LIDAR_RESOLUTION, LIDAR_RESOLUTION, width, height);
+            }
+
+        }
+
+        void reportLidarValue(const int16_t value, const int i, const int j)
+        {
+            if (value < 0) {
+                printf("inf  ");
+            }
+            else {
+                printf("%4d ", value);
+            }
+            if (j == LIDAR_RESOLUTION-1) {
+                printf("\n");
+            }
+            if (i==LIDAR_RESOLUTION-1 && j==LIDAR_RESOLUTION-1) {
+                printf("\n-----------------------------------------------\n");
             }
         }
 
@@ -180,7 +205,7 @@ class Simulator {
 
         WbDeviceTag _emitter;
         WbDeviceTag _gps;
-        WbDeviceTag _range_finder;
+        WbDeviceTag _lidar;
 
         double _timestep;
 

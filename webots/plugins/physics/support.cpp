@@ -21,7 +21,7 @@
 
 #include <plugins/physics.h>
 
-#include <sim_common.h>
+#include <datatypes.h>
 #include <sim_control.hpp>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
@@ -139,24 +139,6 @@ static void report_fps()
     _count++;*/
 }
 
-static void report_lidar(const siminfo_t & siminfo)
-{
-    for (int i = 0; i < LIDAR_RESOLUTION; i++) {
-        for (int j = 0; j < LIDAR_RESOLUTION; j++) {
-            const int16_t distance =
-                siminfo.lidar_distances[i*LIDAR_RESOLUTION+j];
-            if (distance == -1) {
-                printf(" inf  ");
-            }
-            else {
-                printf("%5d ", distance);
-            }
-        }
-        printf(" \n \n \n");
-    }
-    printf("-----------------------------------------------\n");
-}
-
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -180,8 +162,6 @@ DLLEXPORT void webots_physics_step()
     if (siminfo.framerate == 0) {
         return;
     }
-
-    report_lidar(siminfo);
 
     // Run controllers in middle loop, dynamics inside that
     const Dynamics::pose_t pose = run_sim_middle_loop(siminfo);

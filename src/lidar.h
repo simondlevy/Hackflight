@@ -1,6 +1,4 @@
 /* 
-   Common declarations for simulator
-
    Copyright (C) 2025 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify

@@ -127,3 +127,15 @@ typedef struct {
     demands_t demands;
 
 } command_t;
+
+
+typedef struct {
+
+    float start_x;
+    float start_y;
+    float start_z;
+    float framerate;
+    flightMode_t flightMode;
+    demands_t demands;
+
+} siminfo_t;
