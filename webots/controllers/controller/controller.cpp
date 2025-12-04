@@ -136,7 +136,7 @@ class Simulator {
                         const float distance =
                             wb_range_finder_image_get_depth( image, width, j, i);
                         siminfo.rangefinder_distances[i*width+j] =
-                            isinf(distance) ? -1 : (int16_t)distance;
+                            isinf(distance) ? -1 : (int16_t)(1000 * distance);
                     }
                 }
             }
