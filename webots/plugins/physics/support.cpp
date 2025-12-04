@@ -140,7 +140,7 @@ static void report_fps()
     _count++;*/
 }
 
-static void report_rangefinder(const siminfo_t & siminfo)
+static void read_rangefinder(const siminfo_t & siminfo)
 {
     for (int i = 0; i < RANGEFINDER_RESOLUTION; i++) {
         for (int j = 0; j < RANGEFINDER_RESOLUTION; j++) {
@@ -182,7 +182,7 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    report_rangefinder(siminfo);
+    read_rangefinder(siminfo);
 
     // Run controllers in middle loop, dynamics inside that
     const Dynamics::pose_t pose = run_sim_middle_loop(siminfo);
