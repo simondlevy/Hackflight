@@ -89,19 +89,21 @@ class Simulator {
 
                 case JOYSTICK_RECOGNIZED:
                     getSimInfoFromJoystick(siminfo, _flightMode);
-                    sendSimInfo(siminfo);
                     break;
 
                 case JOYSTICK_UNRECOGNIZED:
                     reportJoystick();
-                    break;
+                    // fall thru
 
                 default:
                     getSimInfoFromKeyboard(siminfo, _flightMode);
-                    sendSimInfo(siminfo);
             }
 
-            if (_flightMode == MODE_LANDING && wb_gps_get_values(_gps)[2] < ZDIST_LAND_M) {
+            sendSimInfo(siminfo);
+
+            // On descent, switch mode to idle when close enough to ground
+            if (_flightMode == MODE_LANDING &&
+                    wb_gps_get_values(_gps)[2] < ZDIST_LAND_M) {
                 _flightMode = MODE_IDLE;
             }
 
