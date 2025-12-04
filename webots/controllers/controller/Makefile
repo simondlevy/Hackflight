@@ -22,7 +22,7 @@ control = standard
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
-INCLUDE = -I$(SRCDIR)
+INCLUDE = -I../../../src -I../..
 
 CXX_SOURCES = controller.cpp
 

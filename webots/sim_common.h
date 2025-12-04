@@ -16,4 +16,4 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-static const int LIDAR_SIZE = 8;
+static const int RANGEFINDER_RESOLUTION = 8;
