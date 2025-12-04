@@ -88,9 +88,9 @@ class Simulator {
             printf("%s", modes[_flightMode]);
             */
 
-            runRangefinder();
-
             siminfo_t siminfo = {};
+
+            readRangefinder(siminfo);
 
             switch (getJoystickStatus()) {
 
@@ -120,7 +120,7 @@ class Simulator {
             wb_robot_cleanup();
         }
 
-        void runRangefinder()
+        void readRangefinder(siminfo_t & siminfo)
         {
             const int width = wb_range_finder_get_width(_range_finder);
             const int height = wb_range_finder_get_height(_range_finder);
@@ -135,7 +135,7 @@ class Simulator {
                     for (int j = 0; j < height; j++) {
                         const float distance =
                             wb_range_finder_image_get_depth( image, width, j, i);
-                        rangefinder_distances[i*width+j] =
+                        siminfo.rangefinder_distances[i*width+j] =
                             isinf(distance) ? -1 : (int16_t)distance;
                     }
                 }
@@ -185,9 +185,6 @@ class Simulator {
         double _timestep;
 
         float _zdist;
-
-        int16_t rangefinder_distances
-            [RANGEFINDER_RESOLUTION * RANGEFINDER_RESOLUTION];
 
         std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 

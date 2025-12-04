@@ -120,7 +120,7 @@ DLLEXPORT void webots_physics_init()
     _closedLoopControl.init();
 }
 
-static void showFps()
+static void report_fps()
 {
     static uint32_t _count;
     static uint32_t _sec_prev;
@@ -138,6 +138,24 @@ static void showFps()
     _count++;
 }
 
+static void report_rangefinder(const siminfo_t & siminfo)
+{
+    for (int i = 0; i < RANGEFINDER_RESOLUTION; i++) {
+        for (int j = 0; j < RANGEFINDER_RESOLUTION; j++) {
+            const int16_t distance =
+                siminfo.rangefinder_distances[i*RANGEFINDER_RESOLUTION+j];
+            if (distance == -1) {
+                printf(" inf  ");
+            }
+            else {
+                printf("%5d ", distance);
+            }
+        }
+        printf(" \n \n \n");
+    }
+    printf("-----------------------------------------------\n");
+}
+
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -145,7 +163,7 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    showFps();
+    report_fps();
 
     int size = 0;
 
@@ -161,6 +179,8 @@ DLLEXPORT void webots_physics_step()
     if (siminfo.framerate == 0) {
         return;
     }
+
+    report_rangefinder(siminfo);
 
     // Run controllers in middle loop, dynamics inside that
     const Dynamics::pose_t pose = run_sim_middle_loop(siminfo);

@@ -28,5 +28,7 @@ typedef struct {
     float framerate;
     flightMode_t flightMode;
     demands_t demands;
+    int16_t rangefinder_distances
+        [RANGEFINDER_RESOLUTION*RANGEFINDER_RESOLUTION]; 
 
 } siminfo_t;
