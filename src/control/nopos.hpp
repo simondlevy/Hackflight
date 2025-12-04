@@ -30,14 +30,14 @@ class ClosedLoopControl {
     public:
 
         void run(
-                const uint32_t step,
                 const float dt,
                 const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
-                demands_t & demands)
+                demands_t & demands,
+                void * extra)
         {
-            (void)step;
+            (void)extra;
 
             const auto climbrate = AltitudeController::run(hovering,
                     dt, vehicleState.z, setpointDemands.thrust);

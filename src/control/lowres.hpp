@@ -38,8 +38,11 @@ class ClosedLoopControl {
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
-                demands_t & demands)
+                demands_t & demands,
+                void * extra)
         {
+            (void)extra;
+
             const bool hovering = flightMode == MODE_HOVERING;
 
             const uint8_t dx_byte = Num::float2byte(vehicleState.dx,

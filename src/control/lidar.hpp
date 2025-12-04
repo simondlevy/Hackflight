@@ -27,9 +27,12 @@ class ClosedLoopControl {
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
-                demands_t & demands)
+                demands_t & demands,
+                void * extra)
         {
             if (flightMode == MODE_AUTONOMOUS) {
+
+                int16_t * rangefinder_distance = (int16_t *)extra;
 
                 const demands_t autonomousSetpointDemands = demands_t {
                     setpointDemands.thrust, 0, 0, 0

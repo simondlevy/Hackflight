@@ -66,7 +66,8 @@ static Dynamics::pose_t run_sim_middle_loop(const siminfo_t & siminfo)
                     siminfo.flightMode,
                     state,
                     siminfo.demands,
-                    demands);
+                    demands,
+                    (void *)siminfo.rangefinder_distances);
 
             demands.roll *= Num::DEG2RAD;
             demands.pitch *= Num::DEG2RAD;
@@ -122,6 +123,7 @@ DLLEXPORT void webots_physics_init()
 
 static void report_fps()
 {
+    /*
     static uint32_t _count;
     static uint32_t _sec_prev;
 
@@ -135,7 +137,7 @@ static void report_fps()
         _sec_prev = sec_curr;
         _count = 0;
     }
-    _count++;
+    _count++;*/
 }
 
 static void report_rangefinder(const siminfo_t & siminfo)

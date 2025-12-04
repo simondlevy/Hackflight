@@ -34,8 +34,11 @@ class OriginalClosedLoopControl {
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
-                demands_t & demands)
+                demands_t & demands,
+                void * extra=nullptr)
         {
+            (void)extra;
+
             const bool hovering = flightMode == MODE_HOVERING;
 
             const auto climbrate = AltitudeController::run(hovering,
