@@ -44,7 +44,7 @@ class Simulator {
             SETPOINT_HUMAN,
             SETPOINT_LIDAR
 
-        } setpoint_e;
+        } setpointType_e;
 
         void init()
         {
@@ -75,7 +75,7 @@ class Simulator {
             _zdist = ZDIST_HOVER_INIT_M;
         }
 
-        bool step()
+        bool step(const setpointType_e setpoint)
         {
             if (wb_robot_step(_timestep) == -1) {
                 return false;
@@ -106,13 +106,13 @@ class Simulator {
                     getSimInfoFromKeyboard(siminfo, _flightMode);
             }
 
-            sendSimInfo(siminfo);
-
             // On descent, switch mode to idle when close enough to ground
             if (_flightMode == MODE_LANDING &&
                     wb_gps_get_values(_gps)[2] < ZDIST_LAND_M) {
                 _flightMode = MODE_IDLE;
             }
+
+            sendSimInfo(siminfo);
 
             return true;
         }
@@ -475,18 +475,16 @@ class Simulator {
 
 int main(int argc, char ** argv) 
 {
-    // const char * setpoint = argc < 2 ? "human" : argv[1];
+    const std::string arg = std::string(argc < 2 ? "human" : argv[1]);
 
-    const std::string setpoint = std::string(argc < 2 ? "human" : argv[1]);
+    Simulator::setpointType_e setpointType = Simulator::SETPOINT_HUMAN;
 
-    if (setpoint == "lidar") {
-        printf(">>>>>>>> LIDAR\n");
+    if (arg == "lidar") {
     }
-    else if (setpoint == "human") {
-        printf(">>>>>>>> HUMAN\n");
+    else if (arg == "human") {
     }
     else {
-        printf("Unrecognized setpoint '%s'; defaulting to human\n", setpoint.c_str());
+        printf("Unrecognized setpoint '%s'; defaulting to human\n", arg.c_str());
     }
 
     Simulator sim = {};
@@ -495,7 +493,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!sim.step()) {
+        if (!sim.step(setpointType)) {
             break;
         }
     }
