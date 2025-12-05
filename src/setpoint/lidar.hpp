@@ -16,9 +16,19 @@
 
 #pragma once
 
+#include <datatypes.h>
+
 class Lidar {
 
     public:
 
         static const uint8_t RESOLUTION = 8;
+
+        static void getSetpoint(
+                const int16_t distance_mm[RESOLUTION][RESOLUTION],
+                demands_t & setpoint)
+        {
+            (void)distance_mm;
+            (void)setpoint;
+        }
 };

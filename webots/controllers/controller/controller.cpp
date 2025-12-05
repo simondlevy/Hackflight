@@ -39,13 +39,6 @@ class Simulator {
 
     public:
 
-        typedef enum {
-
-            SETPOINT_HUMAN,
-            SETPOINT_LIDAR
-
-        } setpointType_e;
-
         void init()
         {
             wb_robot_init();
@@ -107,6 +100,7 @@ class Simulator {
             }
 
             if (setpointType == SETPOINT_LIDAR) {
+                Lidar::getSetpoint(lidar_distance_mm, siminfo.setpoint);
             }
 
             // On descent, switch mode to idle when close enough to ground
@@ -255,7 +249,7 @@ class Simulator {
             siminfo.start_y = _start_y;
             siminfo.start_z = _start_z;
 
-            siminfo.demands.thrust = _zdist;
+            siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = 1000 / _timestep;
             wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
         }
@@ -330,9 +324,9 @@ class Simulator {
 
             if (siminfo.flightMode == MODE_HOVERING) {
 
-                siminfo.demands.pitch = readJoystickAxis(axes.pitch);
-                siminfo.demands.roll = readJoystickAxis(axes.roll);
-                siminfo.demands.yaw = readJoystickAxis(axes.yaw);
+                siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
+                siminfo.setpoint.roll = readJoystickAxis(axes.roll);
+                siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
 
                 climb(readJoystickAxis(axes.throttle));
             }
@@ -426,27 +420,27 @@ class Simulator {
             switch (key) {
 
                 case WB_KEYBOARD_UP:
-                    siminfo.demands.pitch = +1.0;
+                    siminfo.setpoint.pitch = +1.0;
                     break;
 
                 case WB_KEYBOARD_DOWN:
-                    siminfo.demands.pitch = -1.0;
+                    siminfo.setpoint.pitch = -1.0;
                     break;
 
                 case WB_KEYBOARD_RIGHT:
-                    siminfo.demands.roll = +1.0;
+                    siminfo.setpoint.roll = +1.0;
                     break;
 
                 case WB_KEYBOARD_LEFT:
-                    siminfo.demands.roll = -1.0;
+                    siminfo.setpoint.roll = -1.0;
                     break;
 
                 case 'Q':
-                    siminfo.demands.yaw = -0.5;
+                    siminfo.setpoint.yaw = -0.5;
                     break;
 
                 case 'E':
-                    siminfo.demands.yaw = +0.5;
+                    siminfo.setpoint.yaw = +0.5;
                     break;
 
                 case 'W':
@@ -480,7 +474,7 @@ int main(int argc, char ** argv)
 {
     const std::string arg = std::string(argc < 2 ? "human" : argv[1]);
 
-    Simulator::setpointType_e setpointType = Simulator::SETPOINT_HUMAN;
+    setpointType_e setpointType = SETPOINT_HUMAN;
 
     if (arg == "lidar") {
     }

@@ -65,7 +65,7 @@ static Dynamics::pose_t run_sim_middle_loop(const siminfo_t & siminfo)
                     1 / (float)PID_UPDATE_RATE,
                     siminfo.flightMode,
                     state,
-                    siminfo.demands,
+                    siminfo.setpoint,
                     demands);
 
             demands.roll *= Num::DEG2RAD;

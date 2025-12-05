@@ -120,6 +120,13 @@ typedef struct {
 
 } accelerationMeasurement_t;
 
+typedef enum {
+
+    SETPOINT_HUMAN,
+    SETPOINT_LIDAR
+
+} setpointType_e;
+
 typedef struct {
 
     float start_x;
@@ -127,6 +134,6 @@ typedef struct {
     float start_z;
     float framerate;
     flightMode_t flightMode;
-    demands_t demands;
+    demands_t setpoint;
 
 } siminfo_t;
