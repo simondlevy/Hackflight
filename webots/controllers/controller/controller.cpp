@@ -22,7 +22,7 @@
 
 // Hackflight
 #include <datatypes.h>
-#include <lidar.h>
+#include <setpoint/lidar.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -75,7 +75,7 @@ class Simulator {
             _zdist = ZDIST_HOVER_INIT_M;
         }
 
-        bool step(const setpointType_e setpoint)
+        bool step(const setpointType_e setpointType)
         {
             if (wb_robot_step(_timestep) == -1) {
                 return false;
@@ -86,7 +86,7 @@ class Simulator {
             siminfo_t siminfo = {};
 
             int16_t
-                lidar_distance_mm[LIDAR_RESOLUTION][LIDAR_RESOLUTION] = {};
+                lidar_distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION] = {};
 
             readLidar(lidar_distance_mm);
 
@@ -106,6 +106,9 @@ class Simulator {
                     getSimInfoFromKeyboard(siminfo, _flightMode);
             }
 
+            if (setpointType == SETPOINT_LIDAR) {
+            }
+
             // On descent, switch mode to idle when close enough to ground
             if (_flightMode == MODE_LANDING &&
                     wb_gps_get_values(_gps)[2] < ZDIST_LAND_M) {
@@ -123,13 +126,13 @@ class Simulator {
         }
 
         void readLidar(
-                int16_t distance_mm[LIDAR_RESOLUTION][LIDAR_RESOLUTION]) 
+                int16_t distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION]) 
         {
             const int width = wb_range_finder_get_width(_lidar);
             const int height = wb_range_finder_get_height(_lidar);
 
-            if (width == LIDAR_RESOLUTION &&
-                    height == LIDAR_RESOLUTION) {
+            if (width == Lidar::RESOLUTION &&
+                    height == Lidar::RESOLUTION) {
 
                 const float * image = wb_range_finder_get_range_image(_lidar);
 
@@ -145,15 +148,15 @@ class Simulator {
 
             else {
                 printf("ERROR: Rangefinder resolution should be %dx%d; actual is %dx%d\n",
-                        LIDAR_RESOLUTION, LIDAR_RESOLUTION, width, height);
+                        Lidar::RESOLUTION, Lidar::RESOLUTION, width, height);
             }
         }
 
         void reportLidar(
-                int16_t distance_mm[LIDAR_RESOLUTION][LIDAR_RESOLUTION]) 
+                int16_t distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION]) 
         {
-            for (int i=0; i<LIDAR_RESOLUTION; ++i) {
-                for (int j=0; j<LIDAR_RESOLUTION; ++j) {
+            for (int i=0; i<Lidar::RESOLUTION; ++i) {
+                for (int j=0; j<Lidar::RESOLUTION; ++j) {
                     const int16_t d = distance_mm[i][j];
                     if (d < 0) {
                         printf(" ---- ");
