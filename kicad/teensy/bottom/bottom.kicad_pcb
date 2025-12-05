@@ -3292,6 +3292,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "5V"
+		(at 167 113.35 0)
+		(layer "F.SilkS")
+		(uuid "11a93848-669d-4a6a-b05e-35c3c72e467a")
+		(effects
+			(font
+				(size 0.93472 0.93472)
+				(thickness 0.08128)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "M2"
 		(at 165.175 125.025 45)
 		(layer "F.SilkS")
