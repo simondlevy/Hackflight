@@ -1798,6 +1798,16 @@
 	)
 	(wire
 		(pts
+			(xy 137.16 173.99) (xy 148.59 173.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2d464c81-74a6-48aa-a066-0f213018fc39")
+	)
+	(wire
+		(pts
 			(xy 123.19 129.54) (xy 129.54 129.54)
 		)
 		(stroke
@@ -1845,16 +1855,6 @@
 			(type default)
 		)
 		(uuid "3838e8ef-c8dd-44bf-995a-8dab990ac0f3")
-	)
-	(wire
-		(pts
-			(xy 123.19 152.4) (xy 129.54 152.4)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3d701472-b09d-4fd8-bfcc-3391eefcd17e")
 	)
 	(wire
 		(pts
@@ -1935,16 +1935,6 @@
 			(type default)
 		)
 		(uuid "647777ac-ea5d-438a-9ee2-8d7c836360b5")
-	)
-	(wire
-		(pts
-			(xy 142.24 173.99) (xy 148.59 173.99)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "672aa2cb-4c6f-4d93-900c-b650af5b22c8")
 	)
 	(wire
 		(pts
@@ -2098,16 +2088,6 @@
 	)
 	(wire
 		(pts
-			(xy 158.75 185.42) (xy 165.1 185.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a42f7f2d-1e54-45c4-ba68-07d5467727d5")
-	)
-	(wire
-		(pts
 			(xy 142.24 85.09) (xy 146.05 85.09)
 		)
 		(stroke
@@ -2175,6 +2155,16 @@
 			(type default)
 		)
 		(uuid "bf4b6c46-6fd7-4116-a823-8dba35917d3a")
+	)
+	(wire
+		(pts
+			(xy 123.19 152.4) (xy 129.54 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c0cacaed-da86-48d2-90e2-6a6c6402bc87")
 	)
 	(wire
 		(pts
@@ -2258,7 +2248,7 @@
 	)
 	(wire
 		(pts
-			(xy 146.05 185.42) (xy 151.13 185.42)
+			(xy 124.46 173.99) (xy 129.54 173.99)
 		)
 		(stroke
 			(width 0)
@@ -2367,7 +2357,7 @@
 		(uuid "3c704693-a50e-4cc4-b5a8-e12c668f005a")
 	)
 	(label "GND"
-		(at 146.05 185.42 0)
+		(at 124.46 173.99 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2405,16 +2395,6 @@
 			(justify left bottom)
 		)
 		(uuid "56059dc4-e8a8-4f5d-9a48-16ec456c2df8")
-	)
-	(label "LED_SAFE"
-		(at 157.48 185.42 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "5612054a-20c0-4d73-83e5-be4ca1848d7d")
 	)
 	(label "VBAT"
 		(at 97.79 81.28 0)
@@ -2476,15 +2456,15 @@
 		)
 		(uuid "6c029cc5-be36-4af5-8a7e-a3384405b239")
 	)
-	(label "LED_RAW"
-		(at 157.48 173.99 0)
+	(label "LED1"
+		(at 156.21 173.99 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "6e264e9f-314e-47e9-aa22-38d9adb52ff3")
+		(uuid "6fd0a04f-a4c6-4555-b6bf-ce2045209e6a")
 	)
 	(label "5V"
 		(at 125.73 124.46 0)
@@ -2495,6 +2475,16 @@
 			(justify left bottom)
 		)
 		(uuid "70922748-8fef-42cb-96a0-a653335d9d19")
+	)
+	(label "LED1"
+		(at 124.46 152.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "71c73c4f-985b-4e25-b859-8f125eba20f8")
 	)
 	(label "5V"
 		(at 175.26 74.93 0)
@@ -2605,16 +2595,6 @@
 			(justify left bottom)
 		)
 		(uuid "9194006f-cdd9-4eef-8898-bedbc47d7704")
-	)
-	(label "LED_RAW"
-		(at 121.92 152.4 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "97b7d9bb-c988-4c3d-a1b3-51704ee48ba0")
 	)
 	(label "GND"
 		(at 124.46 127 0)
@@ -3406,7 +3386,7 @@
 	)
 	(symbol
 		(lib_id "Device:LED")
-		(at 154.94 185.42 0)
+		(at 133.35 173.99 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3415,7 +3395,7 @@
 		(fields_autoplaced yes)
 		(uuid "b48b2efb-61d3-42a5-9fa2-842eee3e3f07")
 		(property "Reference" "D1"
-			(at 153.3525 179.07 0)
+			(at 131.7625 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3424,7 +3404,7 @@
 			)
 		)
 		(property "Value" "LED"
-			(at 153.3525 181.61 0)
+			(at 131.7625 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3432,7 +3412,7 @@
 			)
 		)
 		(property "Footprint" "LED_THT:LED_D3.0mm"
-			(at 154.94 185.42 0)
+			(at 133.35 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3441,7 +3421,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 154.94 185.42 0)
+			(at 133.35 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3450,7 +3430,7 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
-			(at 154.94 185.42 0)
+			(at 133.35 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3459,7 +3439,7 @@
 			)
 		)
 		(property "Sim.Pins" "1=K 2=A"
-			(at 154.94 185.42 0)
+			(at 133.35 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
