@@ -110,7 +110,7 @@ Pipe {
   }
 }
 DEF STILL_WATER Fluid {
-  translation 0.2 -0.09 -0.05
+  translation 0.2 -0.09 -0.01
   children [
     DEF S Shape {
       appearance DEF WATER_APPEARANCE PBRAppearance {
