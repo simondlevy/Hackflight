@@ -39,22 +39,30 @@ class ClosedLoopControl {
             const bool airborne = flightMode == MODE_HOVERING ||
                 flightMode == MODE_AUTONOMOUS;
 
+            // Thrust --------------------------------------------------------
+
             const auto climbrate = AltitudeController::run(airborne,
                     dt, vehicleState.z, setpointDemands.thrust);
 
             demands.thrust = ClimbRateController::run(airborne, dt,
                     vehicleState.z, vehicleState.dz, climbrate);
 
-            const auto posthrust = demands.thrust > 0;
+            const auto thrustpos = demands.thrust > 0;
+
+            // Yaw -----------------------------------------------------------
 
             const auto yaw = YawAngleController::run(
-                    posthrust, dt, vehicleState.psi, setpointDemands.yaw);
+                    thrustpos, dt, vehicleState.psi, setpointDemands.yaw);
+
+            printf("yaw=%+3.3f\n", yaw);
 
             demands.yaw =
-                YawRateController::run(posthrust, dt, vehicleState.dpsi, yaw);
+                YawRateController::run(thrustpos, dt, vehicleState.dpsi, yaw);
+
+            // Pitch/Roll -----------------------------------------------------
 
             PositionController::run(
-                    posthrust,
+                    thrustpos,
                     dt,
                     vehicleState.dx, vehicleState.dy, vehicleState.psi,
                     airborne ? setpointDemands.pitch : 0,
@@ -62,14 +70,14 @@ class ClosedLoopControl {
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(
-                    posthrust,
+                    thrustpos,
                     dt,
                     vehicleState.phi, vehicleState.theta,
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
 
             PitchRollRateController::run(
-                    posthrust,
+                    thrustpos,
                     dt,
                     vehicleState.dphi, vehicleState.dtheta,
                     demands.roll, demands.pitch,
