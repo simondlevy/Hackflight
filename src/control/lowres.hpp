@@ -40,7 +40,8 @@ class ClosedLoopControl {
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            const bool hovering = flightMode == MODE_HOVERING;
+            const bool airborne = flightMode == MODE_HOVERING ||
+                flightMode == MODE_AUTONOMOUS;
 
             const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
                         STATE_DXY_MAX);
@@ -72,33 +73,33 @@ class ClosedLoopControl {
             const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
                         STATE_DPSI_MAX);
 
-            const float climbrate = AltitudeController::run(hovering, dt, z_byte,
+            const float climbrate = AltitudeController::run(airborne, dt, z_byte,
                     setpointDemands.thrust);
 
-            demands.thrust = ClimbRateController::run(hovering, dt, z_byte,
+            demands.thrust = ClimbRateController::run(airborne, dt, z_byte,
                     dz_byte, climbrate);
 
-            const auto airborne = demands.thrust > 0;
+            const auto posthrust = demands.thrust > 0;
 
             const auto yaw = YawAngleController::run(
-                    airborne, dt, psi_byte, setpointDemands.yaw);
+                    posthrust, dt, psi_byte, setpointDemands.yaw);
 
             demands.yaw =
-                YawRateController::run(airborne, dt, dpsi_byte, yaw);
+                YawRateController::run(posthrust, dt, dpsi_byte, yaw);
 
             PositionController::run(
-                    airborne,
+                    posthrust,
                     dt,
                     dx_byte, dy_byte, psi_byte,
-                    hovering ? setpointDemands.pitch : 0,
-                    hovering ? setpointDemands.roll : 0,
+                    airborne ? setpointDemands.pitch : 0,
+                    airborne ? setpointDemands.roll : 0,
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(
-                    airborne, dt, phi_byte, theta_byte, demands.roll,
+                    posthrust, dt, phi_byte, theta_byte, demands.roll,
                     demands.pitch, demands.roll, demands.pitch);
 
-            PitchRollRateController::run( airborne, dt, dphi_byte, dtheta_byte,
+            PitchRollRateController::run( posthrust, dt, dphi_byte, dtheta_byte,
                     demands.roll, demands.pitch, demands.roll, demands.pitch);
 
             demands.thrust = quantize(demands.thrust, 0, UINT16_MAX);

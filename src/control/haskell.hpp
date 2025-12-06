@@ -51,7 +51,7 @@ class ClosedLoopControl {
         {
             extern float stream_dt;
 
-            extern bool stream_hovering;
+            extern bool stream_airborne;
 
             extern float stream_thrust;
             extern float stream_roll;
@@ -71,7 +71,8 @@ class ClosedLoopControl {
 
             stream_dt = dt;
 
-            stream_hovering = flightMode == MODE_HOVERING;
+            stream_airborne = flightMode == MODE_HOVERING || 
+                flightMode == MODE_AUTONOMOUS;
 
             stream_thrust = setpointDemands.thrust;
             stream_roll = setpointDemands.roll;

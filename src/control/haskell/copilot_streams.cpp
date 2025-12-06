@@ -1,6 +1,6 @@
 float stream_dt;
 
-bool stream_hovering;
+bool stream_airborne;
 
 float stream_thrust;
 float stream_roll;

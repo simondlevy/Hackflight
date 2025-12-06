@@ -40,8 +40,8 @@ demand_thrust = extern "stream_thrust" Nothing
 state_z :: SFloat
 state_z = extern "stream_z" Nothing
 
-hovering :: SBool
-hovering = extern "stream_hovering" Nothing
+airborne :: SBool
+airborne = extern "stream_airborne" Nothing
 
 {-- 
   Demand is input as altitude target in meters and output as climb rate in meters
@@ -54,13 +54,13 @@ altitudeController = climbrate where
 
     error = demand_thrust - state_z
 
-    integral = if hovering 
+    integral = if airborne 
                then constrainabs (integral' + error * dt) ilimit
                else 0
 
     integral' = [0] ++ integral
 
-    climbrate = if hovering
+    climbrate = if airborne
                 then constrainabs (kp * error + ki * integral)
                                   ((max vel_max 0.5) * vel_max_overhead)
                 else (-landing_speed_mps)
