@@ -36,39 +36,40 @@ class ClosedLoopControl {
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            const bool hovering = flightMode == MODE_HOVERING;
+            const bool airborne = flightMode == MODE_HOVERING ||
+                flightMode == MODE_AUTONOMOUS;
 
-            const auto climbrate = AltitudeController::run(hovering,
+            const auto climbrate = AltitudeController::run(airborne,
                     dt, vehicleState.z, setpointDemands.thrust);
 
-            demands.thrust = ClimbRateController::run( hovering, dt,
+            demands.thrust = ClimbRateController::run(airborne, dt,
                     vehicleState.z, vehicleState.dz, climbrate);
 
-            const auto airborne = demands.thrust > 0;
+            const auto posthrust = demands.thrust > 0;
 
             const auto yaw = YawAngleController::run(
-                    airborne, dt, vehicleState.psi, setpointDemands.yaw);
+                    posthrust, dt, vehicleState.psi, setpointDemands.yaw);
 
             demands.yaw =
-                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+                YawRateController::run(posthrust, dt, vehicleState.dpsi, yaw);
 
             PositionController::run(
-                    airborne,
+                    posthrust,
                     dt,
                     vehicleState.dx, vehicleState.dy, vehicleState.psi,
-                    hovering ? setpointDemands.pitch : 0,
-                    hovering ? setpointDemands.roll : 0,
+                    airborne ? setpointDemands.pitch : 0,
+                    airborne ? setpointDemands.roll : 0,
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(
-                    airborne,
+                    posthrust,
                     dt,
                     vehicleState.phi, vehicleState.theta,
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
 
             PitchRollRateController::run(
-                    airborne,
+                    posthrust,
                     dt,
                     vehicleState.dphi, vehicleState.dtheta,
                     demands.roll, demands.pitch,
