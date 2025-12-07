@@ -12,9 +12,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds and closed-loop controllers ------------------------
+# Support different worlds and setpoints --------------------------------------
 
 world = empty
+
 setpoint = human
 
 # -----------------------------------------------------------------------------
@@ -24,9 +25,9 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I../../../src -I../..
 
-CXX_SOURCES = controller.cpp
+CXX_SOURCES = custom.cpp
 
-all: controller
+all: custom
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
@@ -35,14 +36,14 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller $(setpoint)
+	/usr/local/webots/webots-controller --stdout-redirect custom $(setpoint)
+
+
+edit:
+	vim custom.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
 WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
-
-edit:
-	vim main.cpp
-
