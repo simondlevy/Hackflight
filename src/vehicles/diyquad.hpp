@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <dynamics.hpp>
+#include <simulator/dynamics.hpp>
 
 // Approximate thrust needed when in perfect hover. More weight/older
 // battery can use a higher value

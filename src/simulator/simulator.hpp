@@ -23,7 +23,7 @@
 #include <sim_control.hpp>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
-#include <dynamics.hpp>
+#include <simulator/dynamics.hpp>
 #include <vehicles/diyquad.hpp>
 
 class Simulator {
