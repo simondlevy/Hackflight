@@ -59,71 +59,73 @@ class Simulator {
 
         Dynamics::pose_t step(const siminfo_t & siminfo)
         {
-            // Run control in middle loop
+            // Run control in outer loop
             for (uint32_t j=0;
-                    j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
+                    j< (uint32_t)(PID_UPDATE_RATE / siminfo.framerate);
+                    ++j) {
 
-                const auto d = _dynamics;
+                float motors[4] = {};
+                outerLoop(siminfo, motors);
 
-                const vehicleState_t state =  {
-                    0, // x
-                    d.state.dx,
-                    0, // y
-                    d.state.dy,
-                    d.state.z,                     
-                    d.state.dz,                   
-                    Num::RAD2DEG* d.state.phi, 
-                    Num::RAD2DEG* d.state.dphi, 
-                    Num::RAD2DEG* d.state.theta, 
-                    Num::RAD2DEG* d.state.dtheta,
-                    Num::RAD2DEG* d.state.psi,   
-                    Num::RAD2DEG* d.state.dpsi
-                };
+                // Run dynamics in inner loop
+                for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
 
-                demands_t demands = {};
-
-                if (siminfo.flightMode != MODE_IDLE) {
-
-                    _closedLoopControl->run(
-                            1 / (float)PID_UPDATE_RATE,
-                            siminfo.flightMode,
-                            state,
-                            siminfo.setpoint,
-                            demands);
-
-                    demands.roll *= Num::DEG2RAD;
-                    demands.pitch *= Num::DEG2RAD;
-                    demands.yaw *= Num::DEG2RAD;
-
-                    float motors[4] = {};
-
-                    Mixer::mix(demands, motors);
-
-                    if (_dynamics.state.z < 0) {
-                        _dynamics.reset();
-                    }
-
-                    // Run dynamics in innermost loop
-                    for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
-
-                        _dynamics.update(motors,
-                                Mixer::rotorCount,
-                                Mixer::roll,
-                                Mixer::pitch,
-                                Mixer::yaw);
-                    }
+                    _dynamics.update(motors, Mixer::rotorCount,
+                            Mixer::roll, Mixer::pitch, Mixer::yaw);
                 }
             }
 
             // Get current pose from dynamics
             return _dynamics.getPose();
         }    
-        
+
     private:
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
         ClosedLoopControl * _closedLoopControl;
+
+        void outerLoop(const siminfo_t & siminfo, float * motors)
+        {
+            const auto d = _dynamics;
+
+            const vehicleState_t state =  {
+                0, // x
+                d.state.dx,
+                0, // y
+                d.state.dy,
+                d.state.z,                     
+                d.state.dz,                   
+                Num::RAD2DEG* d.state.phi, 
+                Num::RAD2DEG* d.state.dphi, 
+                Num::RAD2DEG* d.state.theta, 
+                Num::RAD2DEG* d.state.dtheta,
+                Num::RAD2DEG* d.state.psi,   
+                Num::RAD2DEG* d.state.dpsi
+            };
+
+            demands_t demands = {};
+
+            if (siminfo.flightMode != MODE_IDLE) {
+
+                _closedLoopControl->run(
+                        1 / (float)PID_UPDATE_RATE,
+                        siminfo.flightMode,
+                        state,
+                        siminfo.setpoint,
+                        demands);
+
+                demands.roll *= Num::DEG2RAD;
+                demands.pitch *= Num::DEG2RAD;
+                demands.yaw *= Num::DEG2RAD;
+
+                Mixer::mix(demands, motors);
+
+                if (_dynamics.state.z < 0) {
+                    _dynamics.reset();
+                }
+            }
+        }
 
         static void report_fps()
         {
@@ -136,11 +138,11 @@ class Simulator {
             if (sec_curr - _sec_prev >= 1) {
                 if (_sec_prev > 0) {
                     printf("%d\n", _count);
-               }
-               _sec_prev = sec_curr;
-               _count = 0;
-               }
-               _count++;
+                }
+                _sec_prev = sec_curr;
+                _count = 0;
+            }
+            _count++;
         }
 };
 
