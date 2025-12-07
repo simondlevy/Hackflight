@@ -14,7 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <pid.hpp>
+#pragma once
+
 #include <pid/lowres/altitude.hpp>
 #include <pid/lowres/climbrate.hpp>
 #include <pid/lowres/position.hpp>
@@ -22,102 +23,112 @@
 #include <pid/lowres/pitchroll_rate.hpp>
 #include <pid/lowres/yaw_angle.hpp>
 #include <pid/lowres/yaw_rate.hpp>
+#include <serializer.hpp>
 
-static float quantize(const float val, const float min, const float max)
-{
-    return Num::byte2float(Num::float2byte(val, min, max), min, max);
-}
 
-static float quantize(const float val, const float max)
-{
-    return Num::byte2float(Num::float2byte(val, max), max);
-}
+class PidControl {
 
-static float quantize(const float val)
-{
-    return quantize(val, 180000);
-}
+    public:
 
-void PidControl::run(
-        const float dt,
-        const flightMode_t flightMode,
-        const vehicleState_t & vehicleState,
-        const demands_t & setpointDemands,
-        demands_t & demands)
-{
-    const bool airborne = flightMode == MODE_HOVERING ||
-        flightMode == MODE_AUTONOMOUS;
+        void run(
+                const float dt,
+                const flightMode_t flightMode,
+                const vehicleState_t & vehicleState,
+                const demands_t & setpointDemands,
+                demands_t & demands)
+        {
+            const bool airborne = flightMode == MODE_HOVERING ||
+                flightMode == MODE_AUTONOMOUS;
 
-    const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
-            STATE_DXY_MAX);
+            const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
+                    STATE_DXY_MAX);
 
-    const uint8_t dy_byte = Num::float2byte(vehicleState.dy,
-            STATE_DXY_MAX);
+            const uint8_t dy_byte = Num::float2byte(vehicleState.dy,
+                    STATE_DXY_MAX);
 
-    const uint8_t z_byte = Num::float2byte(vehicleState.z,
-            STATE_Z_MIN, STATE_Z_MAX);
+            const uint8_t z_byte = Num::float2byte(vehicleState.z,
+                    STATE_Z_MIN, STATE_Z_MAX);
 
-    const uint8_t dz_byte = Num::float2byte(vehicleState.dz,
-            STATE_DZ_MAX);
+            const uint8_t dz_byte = Num::float2byte(vehicleState.dz,
+                    STATE_DZ_MAX);
 
-    const uint8_t phi_byte = Num::float2byte(vehicleState.phi,
-            STATE_PHITHETA_MAX);
+            const uint8_t phi_byte = Num::float2byte(vehicleState.phi,
+                    STATE_PHITHETA_MAX);
 
-    const uint8_t dphi_byte = Num::float2byte(vehicleState.dphi,
-            STATE_DPHITHETA_MAX);
+            const uint8_t dphi_byte = Num::float2byte(vehicleState.dphi,
+                    STATE_DPHITHETA_MAX);
 
-    const uint8_t theta_byte = Num::float2byte(vehicleState.theta,
-            STATE_PHITHETA_MAX);
+            const uint8_t theta_byte = Num::float2byte(vehicleState.theta,
+                    STATE_PHITHETA_MAX);
 
-    const uint8_t dtheta_byte = Num::float2byte(vehicleState.dtheta,
-            STATE_DPHITHETA_MAX);
+            const uint8_t dtheta_byte = Num::float2byte(vehicleState.dtheta,
+                    STATE_DPHITHETA_MAX);
 
-    const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
-            STATE_PSI_MAX);
+            const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
+                    STATE_PSI_MAX);
 
-    const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
-            STATE_DPSI_MAX);
+            const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
+                    STATE_DPSI_MAX);
 
-    const float climbrate = AltitudeController::run(airborne, dt, z_byte,
-            setpointDemands.thrust);
+            const float climbrate = AltitudeController::run(airborne, dt, z_byte,
+                    setpointDemands.thrust);
 
-    demands.thrust = ClimbRateController::run(airborne, dt, z_byte,
-            dz_byte, climbrate);
+            demands.thrust = ClimbRateController::run(airborne, dt, z_byte,
+                    dz_byte, climbrate);
 
-    const auto posthrust = demands.thrust > 0;
+            const auto posthrust = demands.thrust > 0;
 
-    const auto yaw = YawAngleController::run(
-            posthrust, dt, psi_byte, setpointDemands.yaw);
+            const auto yaw = YawAngleController::run(
+                    posthrust, dt, psi_byte, setpointDemands.yaw);
 
-    demands.yaw =
-        YawRateController::run(posthrust, dt, dpsi_byte, yaw);
+            demands.yaw =
+                YawRateController::run(posthrust, dt, dpsi_byte, yaw);
 
-    PositionController::run(
-            posthrust,
-            dt,
-            dx_byte, dy_byte, psi_byte,
-            airborne ? setpointDemands.pitch : 0,
-            airborne ? setpointDemands.roll : 0,
-            demands.roll, demands.pitch);
+            PositionController::run(
+                    posthrust,
+                    dt,
+                    dx_byte, dy_byte, psi_byte,
+                    airborne ? setpointDemands.pitch : 0,
+                    airborne ? setpointDemands.roll : 0,
+                    demands.roll, demands.pitch);
 
-    PitchRollAngleController::run(
-            posthrust, dt, phi_byte, theta_byte, demands.roll,
-            demands.pitch, demands.roll, demands.pitch);
+            PitchRollAngleController::run(
+                    posthrust, dt, phi_byte, theta_byte, demands.roll,
+                    demands.pitch, demands.roll, demands.pitch);
 
-    PitchRollRateController::run( posthrust, dt, dphi_byte, dtheta_byte,
-            demands.roll, demands.pitch, demands.roll, demands.pitch);
+            PitchRollRateController::run( posthrust, dt, dphi_byte, dtheta_byte,
+                    demands.roll, demands.pitch, demands.roll, demands.pitch);
 
-    demands.thrust = quantize(demands.thrust, 0, UINT16_MAX);
-    demands.roll = quantize(demands.roll);
-    demands.pitch = quantize(demands.pitch);
-    demands.yaw = quantize(demands.yaw, 32767);
-}
+            demands.thrust = quantize(demands.thrust, 0, UINT16_MAX);
+            demands.roll = quantize(demands.roll);
+            demands.pitch = quantize(demands.pitch);
+            demands.yaw = quantize(demands.yaw, 32767);
+        }
 
-void PidControl::serializeMessage(MspSerializer & serializer)
-{
-    (void)serializer;
-}
+        void serializeMessage(MspSerializer & serializer)
+        {
+            (void)serializer;
+        }
 
-void PidControl::init()
-{
-}
+        void init()
+        {
+        }
+
+    private:
+
+        static float quantize(const float val, const float min, const float max)
+        {
+            return Num::byte2float(Num::float2byte(val, min, max), min, max);
+        }
+
+        static float quantize(const float val, const float max)
+        {
+            return Num::byte2float(Num::float2byte(val, max), max);
+        }
+
+        static float quantize(const float val)
+        {
+            return quantize(val, 180000);
+        }
+
+};
