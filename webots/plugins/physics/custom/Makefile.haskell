@@ -23,11 +23,11 @@ INCLUDE = -I$(SRC) -I../../..
 
 HASKDIR = ../../../../haskell
 
-CXX_SOURCES = custom.cpp $(SRC)/control/haskell.cpp copilot_core.cpp $(SRC)/control/haskell/copilot_streams.cpp
+CXX_SOURCES = custom.cpp $(SRC)/pid/haskell.cpp copilot_core.cpp $(SRC)/pid/haskell/copilot_streams.cpp
 
 FILES_TO_REMOVE += copilot*
 
-all: libphysics.so
+all: libcustom.so
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)

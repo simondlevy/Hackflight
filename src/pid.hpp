@@ -19,7 +19,7 @@
 #include <datatypes.h>
 #include <serializer.hpp>
 
-class ClosedLoopControl {
+class PidControl {
 
     public:
 

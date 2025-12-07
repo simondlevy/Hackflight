@@ -84,7 +84,7 @@ class Hackflight {
             static float _motorvals[MAX_MOTOR_COUNT];
             static demands_t _demands;
             static bool _isFlying;
-            static ClosedLoopControl _closedLoopControl;
+            static PidControl _closedLoopControl;
             static vehicleState_t _vehicleState;
             static command_t _command;
             static bool _didResetEstimation;
@@ -374,7 +374,7 @@ class Hackflight {
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 flightMode_t & flightMode,
-                ClosedLoopControl & control,
+                PidControl & control,
                 demands_t & demands,
                 float *motorvals)
         {
@@ -481,13 +481,13 @@ class Hackflight {
         }        
 
         void runLogger(const vehicleState_t & state,
-                ClosedLoopControl & control)
+                PidControl & control)
         {
             static Timer _timer;
 
             if (_timer.ready(COMMS_FREQ)) {
                 sendVehicleState(state);
-                sendClosedLoopControlMessage(control);
+                sendPidControlMessage(control);
             }
         }
 
@@ -513,7 +513,7 @@ class Hackflight {
             sendPayload(serializer);
         }
 
-        void sendClosedLoopControlMessage(ClosedLoopControl & control)
+        void sendPidControlMessage(PidControl & control)
         {
             MspSerializer serializer = {};
 

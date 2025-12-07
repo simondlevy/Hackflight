@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <control.hpp>
+#include <pid.hpp>
 #include <datatypes.h>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
@@ -49,7 +49,7 @@ class Simulator {
 
         } siminfo_t;
 
-        void init(ClosedLoopControl * closedLoopControl)
+        void init(PidControl * closedLoopControl)
         {
 
             _closedLoopControl = closedLoopControl;
@@ -81,7 +81,7 @@ class Simulator {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-        ClosedLoopControl * _closedLoopControl;
+        PidControl * _closedLoopControl;
 
         void outerLoop(const siminfo_t & siminfo, float * motors)
         {

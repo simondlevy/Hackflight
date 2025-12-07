@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <control.hpp>
+#include <pid.hpp>
 
 static demands_t _demands;
 
@@ -32,7 +32,7 @@ void setDemands(float t, float r, float p, float y)
 void copilot_step_core();
 
 
-void ClosedLoopControl::run(
+void PidControl::run(
         const float dt,
         const flightMode_t flightMode,
         const vehicleState_t & vehicleState,
@@ -86,11 +86,11 @@ void ClosedLoopControl::run(
     memcpy(&demands, &_demands, sizeof(demands_t));
 }
 
-void ClosedLoopControl::serializeMessage(MspSerializer & serializer)
+void PidControl::serializeMessage(MspSerializer & serializer)
 {
     (void)serializer;
 }
 
-void ClosedLoopControl::init()
+void PidControl::init()
 {
 }

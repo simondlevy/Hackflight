@@ -14,16 +14,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <control.hpp>
-#include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
-#include <control/pids/position.hpp>
-#include <control/pids/pitchroll_angle.hpp>
-#include <control/pids/pitchroll_rate.hpp>
-#include <control/pids/yaw_angle.hpp>
-#include <control/pids/yaw_rate.hpp>
+#include <pid.hpp>
+#include <pid/pids/altitude.hpp>
+#include <pid/pids/climbrate.hpp>
+#include <pid/pids/position.hpp>
+#include <pid/pids/pitchroll_angle.hpp>
+#include <pid/pids/pitchroll_rate.hpp>
+#include <pid/pids/yaw_angle.hpp>
+#include <pid/pids/yaw_rate.hpp>
 
-void ClosedLoopControl::run(
+void PidControl::run(
         const float dt,
         const flightMode_t flightMode,
         const vehicleState_t & vehicleState,
@@ -70,11 +70,11 @@ void ClosedLoopControl::run(
             demands.roll, demands.pitch);
 }
 
-void ClosedLoopControl::serializeMessage(MspSerializer & serializer)
+void PidControl::serializeMessage(MspSerializer & serializer)
 {
     (void)serializer;
 }
 
-void ClosedLoopControl::init()
+void PidControl::init()
 {
 }

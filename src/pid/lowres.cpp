@@ -14,14 +14,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <control.hpp>
-#include <control/lowres/altitude.hpp>
-#include <control/lowres/climbrate.hpp>
-#include <control/lowres/position.hpp>
-#include <control/lowres/pitchroll_angle.hpp>
-#include <control/lowres/pitchroll_rate.hpp>
-#include <control/lowres/yaw_angle.hpp>
-#include <control/lowres/yaw_rate.hpp>
+#include <pid.hpp>
+#include <pid/lowres/altitude.hpp>
+#include <pid/lowres/climbrate.hpp>
+#include <pid/lowres/position.hpp>
+#include <pid/lowres/pitchroll_angle.hpp>
+#include <pid/lowres/pitchroll_rate.hpp>
+#include <pid/lowres/yaw_angle.hpp>
+#include <pid/lowres/yaw_rate.hpp>
 
 static float quantize(const float val, const float min, const float max)
 {
@@ -38,7 +38,7 @@ static float quantize(const float val)
     return quantize(val, 180000);
 }
 
-void ClosedLoopControl::run(
+void PidControl::run(
         const float dt,
         const flightMode_t flightMode,
         const vehicleState_t & vehicleState,
@@ -113,11 +113,11 @@ void ClosedLoopControl::run(
     demands.yaw = quantize(demands.yaw, 32767);
 }
 
-void ClosedLoopControl::serializeMessage(MspSerializer & serializer)
+void PidControl::serializeMessage(MspSerializer & serializer)
 {
     (void)serializer;
 }
 
-void ClosedLoopControl::init()
+void PidControl::init()
 {
 }
