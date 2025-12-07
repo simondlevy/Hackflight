@@ -127,13 +127,4 @@ typedef enum {
 
 } setpointType_e;
 
-typedef struct {
 
-    float start_x;
-    float start_y;
-    float start_z;
-    float framerate;
-    flightMode_t flightMode;
-    demands_t setpoint;
-
-} siminfo_t;

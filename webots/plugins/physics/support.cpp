@@ -26,6 +26,7 @@
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
 #include <dynamics.hpp>
+#include <simulator.hpp>
 #include <vehicles/diyquad.hpp>
 
 static const float DYNAMICS_RATE = 100000; // Hz
@@ -74,7 +75,7 @@ static void report_fps()
     _count++;*/
 }
 
-static Dynamics::pose_t run_kinematics_loop(const siminfo_t & siminfo)
+static Dynamics::pose_t run_kinematics_loop(const Simulator::siminfo_t & siminfo)
 {
     // Run control in middle loop
     for (uint32_t j=0;
@@ -147,11 +148,11 @@ DLLEXPORT void webots_physics_step()
 
     int size = 0;
 
-    siminfo_t siminfo = {};
+    Simulator::siminfo_t siminfo = {};
 
-    const auto buffer = (siminfo_t *)dWebotsReceive(&size);
+    const auto buffer = (Simulator::siminfo_t *)dWebotsReceive(&size);
 
-    if (size == sizeof(siminfo_t)) {
+    if (size == sizeof(Simulator::siminfo_t)) {
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 
