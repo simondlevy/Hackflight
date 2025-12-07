@@ -34,68 +34,6 @@ static const int PID_UPDATE_RATE = 1000 /* 1024 Plank */ ;
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-static Dynamics::pose_t run_sim_middle_loop(const siminfo_t & siminfo)
-{
-    // Run control in middle loop
-    for (uint32_t j=0;
-            j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
-
-        const auto d = _dynamics;
-
-        const vehicleState_t state =  {
-            0, // x
-            d.state.dx,
-            0, // y
-            d.state.dy,
-            d.state.z,                     
-            d.state.dz,                   
-            Num::RAD2DEG* d.state.phi, 
-            Num::RAD2DEG* d.state.dphi, 
-            Num::RAD2DEG* d.state.theta, 
-            Num::RAD2DEG* d.state.dtheta,
-            Num::RAD2DEG* d.state.psi,   
-            Num::RAD2DEG* d.state.dpsi
-        };
-
-        demands_t demands = {};
-
-        if (siminfo.flightMode != MODE_IDLE) {
-
-            _closedLoopControl.run(
-                    1 / (float)PID_UPDATE_RATE,
-                    siminfo.flightMode,
-                    state,
-                    siminfo.setpoint,
-                    demands);
-
-            demands.roll *= Num::DEG2RAD;
-            demands.pitch *= Num::DEG2RAD;
-            demands.yaw *= Num::DEG2RAD;
-
-            float motors[4] = {};
-
-            Mixer::mix(demands, motors);
-
-            if (_dynamics.state.z < 0) {
-                _dynamics.reset();
-            }
-
-            // Run dynamics in innermost loop
-            for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
-
-                _dynamics.update(motors,
-                        Mixer::rotorCount,
-                        Mixer::roll,
-                        Mixer::pitch,
-                        Mixer::yaw);
-            }
-        }
-    }
-
-    // Get current pose from dynamics
-    return _dynamics.getPose();
-}
-
 static constexpr char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robotBody;
@@ -160,8 +98,64 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    // Run controllers in middle loop, dynamics inside that
-    const Dynamics::pose_t pose = run_sim_middle_loop(siminfo);
+    // Run control in middle loop
+    for (uint32_t j=0;
+            j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
+
+        const auto d = _dynamics;
+
+        const vehicleState_t state =  {
+            0, // x
+            d.state.dx,
+            0, // y
+            d.state.dy,
+            d.state.z,                     
+            d.state.dz,                   
+            Num::RAD2DEG* d.state.phi, 
+            Num::RAD2DEG* d.state.dphi, 
+            Num::RAD2DEG* d.state.theta, 
+            Num::RAD2DEG* d.state.dtheta,
+            Num::RAD2DEG* d.state.psi,   
+            Num::RAD2DEG* d.state.dpsi
+        };
+
+        demands_t demands = {};
+
+        if (siminfo.flightMode != MODE_IDLE) {
+
+            _closedLoopControl.run(
+                    1 / (float)PID_UPDATE_RATE,
+                    siminfo.flightMode,
+                    state,
+                    siminfo.setpoint,
+                    demands);
+
+            demands.roll *= Num::DEG2RAD;
+            demands.pitch *= Num::DEG2RAD;
+            demands.yaw *= Num::DEG2RAD;
+
+            float motors[4] = {};
+
+            Mixer::mix(demands, motors);
+
+            if (_dynamics.state.z < 0) {
+                _dynamics.reset();
+            }
+
+            // Run dynamics in innermost loop
+            for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
+
+                _dynamics.update(motors,
+                        Mixer::rotorCount,
+                        Mixer::roll,
+                        Mixer::pitch,
+                        Mixer::yaw);
+            }
+        }
+    }
+
+    // Get current pose from dynamics
+    const Dynamics::pose_t pose = _dynamics.getPose();
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
