@@ -23,6 +23,7 @@
 
 static demands_t _demands;
 
+#ifdef _MAIN
 void setDemands(float t, float r, float p, float y)
 {
     _demands.thrust = t;
@@ -30,6 +31,7 @@ void setDemands(float t, float r, float p, float y)
     _demands.pitch = p;
     _demands.yaw = y;
 }
+#endif
 
 void copilot_step_core();
 

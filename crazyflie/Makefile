@@ -41,13 +41,13 @@ $(MSGS): ../msppg/messages.json
 	cp ../msppg/messages.h $(MSGS)
 
 haskell_config: copilot_core.cpp
-	cp $(SRC)/pid/haskell.cpp ./__pid__.cpp
+	cp $(SRC)/pid/haskell/pid.hpp ./__pid__.hpp
 
 lowres_config:
-	cp $(SRC)/pid/lowres.cpp ./__pid__.cpp
+	cp $(SRC)/pid/lowres/pid.hpp ./__pid__.hpp
 
 standard_config:
-	cp $(SRC)/pid/standard.cpp ./__pid__.cpp
+	cp $(SRC)/pid/standard/pid.hpp ./__pid__.hpp
 
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs

@@ -20,6 +20,7 @@
 #include <plugins/physics.h>
 
 // Hackflight
+#define _MAIN
 #include <pid.hpp>
 #include <simulator/simulator.hpp>
 
