@@ -25,9 +25,9 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I../../../src -I../..
 
-CXX_SOURCES = custom.cpp
+CXX_SOURCES = controller.cpp
 
-all: custom
+all: controller
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
@@ -36,11 +36,11 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect custom $(setpoint)
+	/usr/local/webots/webots-controller --stdout-redirect controller $(setpoint)
 
 
 edit:
-	vim custom.cpp
+	vim controller.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
