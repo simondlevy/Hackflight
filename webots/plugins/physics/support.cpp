@@ -29,15 +29,12 @@
 #include <simulator.hpp>
 #include <vehicles/diyquad.hpp>
 
-static const float DYNAMICS_RATE = 100000; // Hz
-
-static const int PID_UPDATE_RATE = 1000 /* 1024 Plank */ ;
-
-static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
-
 static constexpr char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robotBody;
+
+// Platform-independent simulator
+static Simulator _simulator;
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -56,87 +53,6 @@ DLLEXPORT void webots_physics_init()
     _closedLoopControl.init();
 }
 
-static void report_fps()
-{
-    /*
-    static uint32_t _count;
-    static uint32_t _sec_prev;
-
-    time_t now = time(0);
-    struct tm * tm = localtime(&now);
-    const uint32_t sec_curr = tm->tm_sec;
-    if (sec_curr - _sec_prev >= 1) {
-        if (_sec_prev > 0) {
-            dWebotsConsolePrintf("%d\n", _count);
-        }
-        _sec_prev = sec_curr;
-        _count = 0;
-    }
-    _count++;*/
-}
-
-static Dynamics::pose_t run_kinematics_loop(const Simulator::siminfo_t & siminfo)
-{
-    // Run control in middle loop
-    for (uint32_t j=0;
-            j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
-
-        const auto d = _dynamics;
-
-        const vehicleState_t state =  {
-            0, // x
-            d.state.dx,
-            0, // y
-            d.state.dy,
-            d.state.z,                     
-            d.state.dz,                   
-            Num::RAD2DEG* d.state.phi, 
-            Num::RAD2DEG* d.state.dphi, 
-            Num::RAD2DEG* d.state.theta, 
-            Num::RAD2DEG* d.state.dtheta,
-            Num::RAD2DEG* d.state.psi,   
-            Num::RAD2DEG* d.state.dpsi
-        };
-
-        demands_t demands = {};
-
-        if (siminfo.flightMode != MODE_IDLE) {
-
-            _closedLoopControl.run(
-                    1 / (float)PID_UPDATE_RATE,
-                    siminfo.flightMode,
-                    state,
-                    siminfo.setpoint,
-                    demands);
-
-            demands.roll *= Num::DEG2RAD;
-            demands.pitch *= Num::DEG2RAD;
-            demands.yaw *= Num::DEG2RAD;
-
-            float motors[4] = {};
-
-            Mixer::mix(demands, motors);
-
-            if (_dynamics.state.z < 0) {
-                _dynamics.reset();
-            }
-
-            // Run dynamics in innermost loop
-            for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
-
-                _dynamics.update(motors,
-                        Mixer::rotorCount,
-                        Mixer::roll,
-                        Mixer::pitch,
-                        Mixer::yaw);
-            }
-        }
-    }
-
-    // Get current pose from dynamics
-    return _dynamics.getPose();
- }
-
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -144,12 +60,11 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    report_fps();
-
     int size = 0;
 
     Simulator::siminfo_t siminfo = {};
 
+    // Get sim info from main program
     const auto buffer = (Simulator::siminfo_t *)dWebotsReceive(&size);
 
     if (size == sizeof(Simulator::siminfo_t)) {
@@ -162,7 +77,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Update to get the current pose
-    const Dynamics::pose_t pose = run_kinematics_loop(siminfo);
+    const Dynamics::pose_t pose = _simulator.run_kinematics_loop(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};

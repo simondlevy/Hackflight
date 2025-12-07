@@ -28,6 +28,12 @@
 
 class Simulator {
 
+    private:
+
+        static constexpr float DYNAMICS_RATE = 100000; // Hz
+
+        static const int PID_UPDATE_RATE = 1000;  // 1024 Plank 
+
     public:
 
         typedef struct {
@@ -41,7 +47,6 @@ class Simulator {
 
         } siminfo_t;
 
-        /*
         Dynamics::pose_t run_kinematics_loop(const siminfo_t & siminfo)
         {
             // Run control in middle loop
@@ -102,14 +107,11 @@ class Simulator {
 
             // Get current pose from dynamics
             return _dynamics.getPose();
-        }    static const float DYNAMICS_RATE = 100000; // Hz
-
-
+        }    
+        
     private:
 
-        static const int PID_UPDATE_RATE = 1000;  // 1024 Plank 
-
-        static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
+        Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
         static void report_fps()
         {
@@ -127,6 +129,6 @@ class Simulator {
                _count = 0;
                }
                _count++;
-        }*/
+        }
 };
 
