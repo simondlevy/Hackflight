@@ -16,18 +16,11 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <time.h>
-
+// Webots
 #include <plugins/physics.h>
 
-#include <datatypes.h>
-#include <sim_control.hpp>
-#include <num.hpp>
-#include <mixers/crazyflie.hpp>
-#include <dynamics.hpp>
+// Hackflight
 #include <simulator.hpp>
-#include <vehicles/diyquad.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
@@ -50,7 +43,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robotBody, 0);
     }
 
-    _closedLoopControl.init();
+    _simulator.init();
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -77,7 +70,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Update to get the current pose
-    const Dynamics::pose_t pose = _simulator.run_kinematics_loop(siminfo);
+    const Dynamics::pose_t pose = _simulator.step(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};

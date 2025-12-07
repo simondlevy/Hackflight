@@ -47,7 +47,12 @@ class Simulator {
 
         } siminfo_t;
 
-        Dynamics::pose_t run_kinematics_loop(const siminfo_t & siminfo)
+        void init()
+        {
+            _closedLoopControl.init();
+        }
+
+        Dynamics::pose_t step(const siminfo_t & siminfo)
         {
             // Run control in middle loop
             for (uint32_t j=0;
