@@ -22,13 +22,13 @@
 #include <VL53L1X.h>
 #include <pmw3901.hpp>
 
-#include <__control__.hpp>
 #include <__messages__.h>
 
 #include <debugger.hpp>
 #include <ekf.hpp>
 #include <imu.hpp>
 #include <parser.hpp>
+#include <pid.hpp>
 #include <timer.hpp>
 #include <vehicles/diyquad.hpp>
 

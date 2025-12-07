@@ -16,9 +16,13 @@
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I../../../../src -I../../..
+SRC = ../../../../src
 
-CXX_SOURCES = custom.cpp ../../../../src/pid/standard.cpp
+INCLUDE = -I$(SRC) -I$(SRC)/pid/standard
+
+CXX_SOURCES = custom.cpp
+
+all: libcustom.so
 
 FILES_TO_REMOVE += copilot*
 

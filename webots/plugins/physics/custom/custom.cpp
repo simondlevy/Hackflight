@@ -20,6 +20,7 @@
 #include <plugins/physics.h>
 
 // Hackflight
+#include <pid.hpp>
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";

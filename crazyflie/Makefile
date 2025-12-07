@@ -41,13 +41,13 @@ $(MSGS): ../msppg/messages.json
 	cp ../msppg/messages.h $(MSGS)
 
 haskell_config: copilot_core.cpp
-	cp $(SRC)/control/haskell.hpp ../src/__control__.hpp
+	cp $(SRC)/pid/haskell.cpp ./__pid__.cpp
 
 lowres_config:
-	cp $(SRC)/control/lowres.hpp ../src/__control__.hpp
+	cp $(SRC)/pid/lowres.cpp ./__pid__.cpp
 
 standard_config:
-	cp $(SRC)/control/standard.hpp ../src/__control__.hpp
+	cp $(SRC)/pid/standard.cpp ./__pid__.cpp
 
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
@@ -58,7 +58,7 @@ dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)
 
 clean:
-	rm -rf build copilot* ../src/__*__.*
+	rm -rf build copilot* __*__.*
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
