@@ -30,7 +30,7 @@
 
 static const float DYNAMICS_RATE = 100000; // Hz
 
-static const int PID_UPDATE_RATE = 1024; // Plank
+static const int PID_UPDATE_RATE = 1000 /* 1024 Plank */ ;
 
 static Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
@@ -92,11 +92,8 @@ static Dynamics::pose_t run_sim_middle_loop(const siminfo_t & siminfo)
         }
     }
 
-    const Dynamics::pose_t pose = _dynamics.getPose();
-
     // Get current pose from dynamics
-    //printf("%+3.3f\n", pose.z);
-    return pose; //_dynamics.getPose();
+    return _dynamics.getPose();
 }
 
 static constexpr char ROBOT_NAME[] = "diyquad";
