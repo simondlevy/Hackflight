@@ -23,6 +23,7 @@
 // Hackflight
 #include <datatypes.h>
 #include <setpoint/lidar.hpp>
+#include <simulator/simulator.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -35,7 +36,7 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
-class Simulator {
+class WebotsSimulator {
 
     public:
 
@@ -76,7 +77,7 @@ class Simulator {
 
             static flightMode_t _flightMode;
 
-            siminfo_t siminfo = {};
+            Simulator::siminfo_t siminfo = {};
 
             int16_t
                 lidar_distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION] = {};
@@ -233,7 +234,7 @@ class Simulator {
             return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
         }
 
-        void sendSimInfo(siminfo_t & siminfo)
+        void sendSimInfo(Simulator::siminfo_t & siminfo)
         {
             static double _start_x, _start_y, _start_z;
 
@@ -307,7 +308,7 @@ class Simulator {
             wb_motor_set_velocity(motor, direction * 60);
         }
 
-        void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMode)
+        void getSimInfoFromJoystick(Simulator::siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _hover_button_was_down;
             static bool _auto_button_was_down;
@@ -332,7 +333,8 @@ class Simulator {
             }
         }
 
-        void getSimInfoFromKeyboard(siminfo_t & siminfo, flightMode_t & flightMode)
+        void getSimInfoFromKeyboard(
+                Simulator::siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _enter_was_down;
             static bool _spacebar_was_down;
@@ -415,7 +417,7 @@ class Simulator {
             }
         }
 
-        void getSetpointFromKey(const int key, siminfo_t & siminfo)
+        void getSetpointFromKey(const int key, Simulator::siminfo_t & siminfo)
         {
             switch (key) {
 
@@ -484,7 +486,7 @@ int main(int argc, char ** argv)
         printf("Unrecognized setpoint '%s'; defaulting to human\n", arg.c_str());
     }
 
-    Simulator sim = {};
+    WebotsSimulator sim = {};
 
     sim.init();
 

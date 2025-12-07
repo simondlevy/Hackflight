@@ -46,18 +46,9 @@ haskell_config: copilot_core.cpp
 lowres_config:
 	cp $(SRC)/control/lowres.hpp ../src/__control__.hpp
 
-nopos_config:
-	cp $(SRC)/control/nopos.hpp ../src/__control__.hpp
-
-split_config:
-	cp $(SRC)/control/split.hpp ../src/__control__.hpp
-
 standard_config:
 	cp $(SRC)/control/standard.hpp ../src/__control__.hpp
 
-snn_config:
-	cp $(SRC)/control/snn.hpp ../src/__control__.hpp
-	cp $(EMBDIR)/examples/difference/*.hpp .
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)

@@ -29,6 +29,8 @@ static dBodyID _robotBody;
 // Platform-independent simulator
 static Simulator _simulator;
 
+static ClosedLoopControl _closedLoopControl;
+
 DLLEXPORT void webots_physics_init() 
 {
     _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
@@ -43,7 +45,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robotBody, 0);
     }
 
-    _simulator.init();
+    _simulator.init(&_closedLoopControl);
 }
 
 // This is called by Webots in the outer (display, kinematics) loop

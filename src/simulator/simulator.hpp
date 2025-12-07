@@ -16,11 +16,13 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdio.h>
 #include <time.h>
 
+#include <control.hpp>
 #include <datatypes.h>
-#include <sim_control.hpp>
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
 #include <simulator/dynamics.hpp>
@@ -47,9 +49,12 @@ class Simulator {
 
         } siminfo_t;
 
-        void init()
+        void init(ClosedLoopControl * closedLoopControl)
         {
-            _closedLoopControl.init();
+
+            _closedLoopControl = closedLoopControl;
+
+            _closedLoopControl->init();
         }
 
         Dynamics::pose_t step(const siminfo_t & siminfo)
@@ -79,7 +84,7 @@ class Simulator {
 
                 if (siminfo.flightMode != MODE_IDLE) {
 
-                    _closedLoopControl.run(
+                    _closedLoopControl->run(
                             1 / (float)PID_UPDATE_RATE,
                             siminfo.flightMode,
                             state,
@@ -118,6 +123,8 @@ class Simulator {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
+        ClosedLoopControl * _closedLoopControl;
+
         static void report_fps()
         {
             static uint32_t _count;
@@ -128,7 +135,7 @@ class Simulator {
             const uint32_t sec_curr = tm->tm_sec;
             if (sec_curr - _sec_prev >= 1) {
                 if (_sec_prev > 0) {
-                    dWebotsConsolePrintf("%d\n", _count);
+                    printf("%d\n", _count);
                }
                _sec_prev = sec_curr;
                _count = 0;

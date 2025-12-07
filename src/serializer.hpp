@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
 class MspSerializer {
 
