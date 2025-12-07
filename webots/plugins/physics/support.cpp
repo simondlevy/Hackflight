@@ -74,30 +74,8 @@ static void report_fps()
     _count++;*/
 }
 
-// This is called by Webots in the outer (display, kinematics) loop
-DLLEXPORT void webots_physics_step() 
+static Dynamics::pose_t run_kinematics_loop(const siminfo_t & siminfo)
 {
-    if (_robotBody == NULL) {
-        return;
-    }
-
-    report_fps();
-
-    int size = 0;
-
-    siminfo_t siminfo = {};
-
-    const auto buffer = (siminfo_t *)dWebotsReceive(&size);
-
-    if (size == sizeof(siminfo_t)) {
-        memcpy(&siminfo, buffer, sizeof(siminfo));
-    }
-
-    // This happens at startup
-    if (siminfo.framerate == 0) {
-        return;
-    }
-
     // Run control in middle loop
     for (uint32_t j=0;
             j < (uint32_t)(1 / siminfo.framerate * PID_UPDATE_RATE);  ++j) {
@@ -155,12 +133,41 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Get current pose from dynamics
-    const Dynamics::pose_t pose = _dynamics.getPose();
+    return _dynamics.getPose();
+ }
+
+// This is called by Webots in the outer (display, kinematics) loop
+DLLEXPORT void webots_physics_step() 
+{
+    if (_robotBody == NULL) {
+        return;
+    }
+
+    report_fps();
+
+    int size = 0;
+
+    siminfo_t siminfo = {};
+
+    const auto buffer = (siminfo_t *)dWebotsReceive(&size);
+
+    if (size == sizeof(siminfo_t)) {
+        memcpy(&siminfo, buffer, sizeof(siminfo));
+    }
+
+    // This happens at startup
+    if (siminfo.framerate == 0) {
+        return;
+    }
+
+    // Update to get the current pose
+    const Dynamics::pose_t pose = run_kinematics_loop(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
     axis4_t quat = {};
     Num::euler2quat(euler, quat);
+
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
     dBodySetQuaternion(_robotBody, q);
 
