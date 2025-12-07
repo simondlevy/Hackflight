@@ -60,15 +60,13 @@ class Simulator {
         Dynamics::pose_t step(const siminfo_t & siminfo)
         {
             // Run control in outer loop
-            for (uint32_t j=0;
-                    j< (uint32_t)(PID_UPDATE_RATE / siminfo.framerate);
-                    ++j) {
+            for (uint32_t j=0; j<PID_UPDATE_RATE/siminfo.framerate; ++j) {
 
                 float motors[4] = {};
                 outerLoop(siminfo, motors);
 
                 // Run dynamics in inner loop
-                for (uint32_t k=0; k<DYNAMICS_RATE / PID_UPDATE_RATE; ++k) {
+                for (uint32_t k=0; k<DYNAMICS_RATE/PID_UPDATE_RATE; ++k) {
 
                     _dynamics.update(motors, Mixer::rotorCount,
                             Mixer::roll, Mixer::pitch, Mixer::yaw);
