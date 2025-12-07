@@ -74,7 +74,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Update to get the current pose
-    const Dynamics::pose_t pose = _simulator.step(siminfo);
+    const Simulator::pose_t pose = _simulator.step(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};

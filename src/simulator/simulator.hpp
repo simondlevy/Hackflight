@@ -49,6 +49,17 @@ class Simulator {
 
         } siminfo_t;
 
+        typedef struct {
+
+            float x;
+            float y;
+            float z;
+            float phi;
+            float theta;
+            float psi;
+
+        } pose_t;
+
         void init(PidControl * closedLoopControl)
         {
 
@@ -57,7 +68,7 @@ class Simulator {
             _closedLoopControl->init();
         }
 
-        Dynamics::pose_t step(const siminfo_t & siminfo)
+        pose_t step(const siminfo_t & siminfo)
         {
             // Run control in outer loop
             for (uint32_t j=0; j<PID_UPDATE_RATE/siminfo.framerate; ++j) {
@@ -74,7 +85,14 @@ class Simulator {
             }
 
             // Get current pose from dynamics
-            return _dynamics.getPose();
+            return pose_t {
+                _dynamics.state.x,
+                _dynamics.state.y,
+                _dynamics.state.z,
+                _dynamics.state.phi,
+                _dynamics.state.theta,
+                _dynamics.state.psi
+            };
         }    
 
     private:
