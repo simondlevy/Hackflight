@@ -18,7 +18,9 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 INCLUDE = -I../../../../src -I../../..
 
-CXX_SOURCES = ../support.cpp
+CXX_SOURCES = support.cpp ../../../../src/control/standard.cpp
+
+FILES_TO_REMOVE += copilot*
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
