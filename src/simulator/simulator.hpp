@@ -60,19 +60,6 @@ class Simulator {
         pose_t step(const siminfo_t & siminfo)
         {
 
-            const char * modes[6] = {
-                "IDLE",
-                "ARMED",
-                "HOVERING",
-                "AUTONOMOUS",
-                "LANDING",
-                "LOST_CONTACT"
-            };
-
-            auto s = _dynamics.state;
-            printf("z=%+3.3f dz=%+3.3f mode=%s\n",
-                    s.z, s.dz, modes[siminfo.flightMode]);
-
             // Run control in outer loop
             for (uint32_t j=0; j<PID_UPDATE_RATE/siminfo.framerate; ++j) {
 
@@ -88,11 +75,21 @@ class Simulator {
             }
 
             // Get current pose from dynamics
-            s = _dynamics.state;
+            const auto s = _dynamics.state;
             return pose_t { s.x, s.y, s.z, s.phi, s.theta, s.psi };
         }    
 
     private:
+
+        // For debugging
+        const char * modeNames[6] = {
+            "IDLE",
+            "ARMED",
+            "HOVERING",
+            "AUTONOMOUS",
+            "LANDING",
+            "LOST_CONTACT"
+        };
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 

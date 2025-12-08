@@ -22,6 +22,7 @@
 
 // Hackflight
 #include <datatypes.h>
+#include <simulator/dynamics.hpp>
 #include <setpoint/lidar.hpp>
 
 // Webots
@@ -39,7 +40,7 @@ static const float ZDIST_HOVER_INIT_M = 0.4;
 static const float ZDIST_HOVER_MAX_M = 1.0;
 static const float ZDIST_HOVER_MIN_M = 0.2;
 static const float ZDIST_HOVER_INC_MPS = 0.2;
-static const float ZDIST_LAND_M = 0.02;
+//static const float ZDIST_LAND_M = 0.02;
 
 typedef enum {
 
@@ -416,8 +417,7 @@ static bool step(const setpointType_e setpointType)
 
     // On descent, switch mode to idle when close enough to ground
     const auto z = wb_gps_get_values(_gps)[2] - 0.015; 
-    printf("z=%+3.3f\n", z);
-    if (_flightMode == MODE_LANDING && z < ZDIST_LAND_M) {
+    if (_flightMode == MODE_LANDING && z < Dynamics::ZMIN) {
         _flightMode = MODE_IDLE;
     }
 

@@ -136,13 +136,13 @@ class Dynamics {
             _dstate.dz =
                 -_wparams.g + (cos(state.phi)*cos(state.theta)) / m * u1;
 
-            //printf("%+3.3f\n", _dstate.dz);
-
             // We're airborne once net Z acceleration becomes positive
             if (_dstate.dz > 0) {
                 _airborne = true;
             }
 
+            // We're no longer airborne if we're descending and drop below
+            // minimum altitude
             if (_airborne && state.dz < 0 && state.z < ZMIN) {
                 _airborne = false;
                 reset();
