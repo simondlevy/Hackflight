@@ -32,7 +32,6 @@ class PositionController {
           * pitch: input forward positive => output negative
           */
          static void run(
-                 const bool airborne,
                  const float dt,
                  const float state_dx,
                  const float state_dy,
@@ -55,8 +54,8 @@ class PositionController {
             const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
             // Run PIDs on body-coordinate velocities
-            roll = runAxis(airborne, dt, demand_y, dyb, _integralY);
-            pitch =runAxis(airborne, dt, demand_x, dxb, _integralX);
+            roll = runAxis(dt, demand_y, dyb, _integralY);
+            pitch =runAxis(dt, demand_x, dxb, _integralX);
         }
 
     private:
@@ -68,7 +67,6 @@ class PositionController {
         static constexpr float LIMIT_OVERHEAD = 1.10;
 
         static float runAxis(
-                const bool airborne,
                 const float dt,
                 float demand,
                 const float measured, 
@@ -76,10 +74,8 @@ class PositionController {
         {
             const auto error = demand - measured;
 
-            integral = airborne ? 
-                Num::fconstrain(integral + error * dt, ILIMIT) : 0;
+            integral = Num::fconstrain(integral + error * dt, ILIMIT);
 
-            return airborne ?
-                Num::fconstrain(KP * error + KI * integral, LIMIT) : 0;
+            return Num::fconstrain(KP * error + KI * integral, LIMIT);
         }
 };

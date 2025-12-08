@@ -58,9 +58,9 @@ state_psi = extern "stream_psi" Nothing
   pitch: input forward positive => output negative
  --}
 
-positionController :: SBool -> (SFloat, SFloat)
+positionController :: (SFloat, SFloat)
 
-positionController airborne = (roll, pitch) where
+positionController = (roll, pitch) where
 
     psi = deg2rad state_psi
 
@@ -71,18 +71,16 @@ positionController airborne = (roll, pitch) where
     dyb = -state_dx * sinpsi + state_dy * cospsi       
 
     -- Run PIDs on body-coordinate velocities
-    (roll,  integralY) = runAxis airborne dt demand_roll  dyb integralY'
-    (pitch, integralX) = runAxis airborne dt demand_pitch dxb integralX'
+    (roll,  integralY) = runAxis dt demand_roll  dyb integralY'
+    (pitch, integralX) = runAxis dt demand_pitch dxb integralX'
 
     integralX' = [0] ++ integralX
     integralY' = [0] ++ integralY
 
-    runAxis airborne dt demand measured integral = (demand', integral') where
+    runAxis dt demand measured integral = (demand', integral') where
 
         error = demand - measured
 
-        integral' = if airborne
-                    then constrainabs (integral + error * dt) ilimit
-                    else 0
+        integral' = constrainabs (integral + error * dt) ilimit
 
         demand' = constrainabs (kp * error + ki * integral) limit

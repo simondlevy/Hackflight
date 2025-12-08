@@ -16,15 +16,14 @@
 
 #pragma once
 
-#include <pid/lowres/altitude.hpp>
-#include <pid/lowres/climbrate.hpp>
-#include <pid/lowres/position.hpp>
-#include <pid/lowres/pitchroll_angle.hpp>
-#include <pid/lowres/pitchroll_rate.hpp>
-#include <pid/lowres/yaw_angle.hpp>
-#include <pid/lowres/yaw_rate.hpp>
+#include <pid/pids/altitude.hpp>
+#include <pid/pids/climbrate.hpp>
+#include <pid/pids/position.hpp>
+#include <pid/pids/pitchroll_angle.hpp>
+#include <pid/pids/pitchroll_rate.hpp>
+#include <pid/pids/yaw_angle.hpp>
+#include <pid/pids/yaw_rate.hpp>
 #include <serializer.hpp>
-
 
 class PidControl {
 
@@ -37,7 +36,7 @@ class PidControl {
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            const bool airborne = flightMode == MODE_HOVERING ||
+            const bool controlled = flightMode == MODE_HOVERING ||
                 flightMode == MODE_AUTONOMOUS;
 
             const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
@@ -70,33 +69,49 @@ class PidControl {
             const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
                     STATE_DPSI_MAX);
 
-            const float climbrate = AltitudeController::run(airborne, dt, z_byte,
+            const float climbrate = AltitudeController::run(
+                    controlled,
+                    dt,
+                    Num::byte2float(z_byte, STATE_Z_MIN, STATE_Z_MAX),
                     setpointDemands.thrust);
 
-            demands.thrust = ClimbRateController::run(airborne, dt, z_byte,
-                    dz_byte, climbrate);
-
-            const auto posthrust = demands.thrust > 0;
+            demands.thrust = ClimbRateController::run(
+                    controlled,
+                    dt,
+                    Num::byte2float(z_byte, STATE_Z_MIN, STATE_Z_MAX),
+                    Num::byte2float(dz_byte, STATE_DZ_MAX),
+                    climbrate);
 
             const auto yaw = YawAngleController::run(
-                    posthrust, dt, psi_byte, setpointDemands.yaw);
+                    dt,
+                    Num::byte2float(psi_byte, STATE_PSI_MAX),
+                    setpointDemands.yaw);
 
             demands.yaw =
-                YawRateController::run(posthrust, dt, dpsi_byte, yaw);
+                YawRateController::run(
+                        dt,
+                        Num::byte2float(dpsi_byte, STATE_DPSI_MAX),
+                        yaw);
 
             PositionController::run(
-                    posthrust,
                     dt,
-                    dx_byte, dy_byte, psi_byte,
-                    airborne ? setpointDemands.pitch : 0,
-                    airborne ? setpointDemands.roll : 0,
+                    Num::byte2float(dx_byte, STATE_DXY_MAX),
+                    Num::byte2float(dy_byte, STATE_DXY_MAX),
+                    Num::byte2float(psi_byte, STATE_PSI_MAX),
+                    controlled ? setpointDemands.pitch : 0,
+                    controlled ? setpointDemands.roll : 0,
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(
-                    posthrust, dt, phi_byte, theta_byte, demands.roll,
-                    demands.pitch, demands.roll, demands.pitch);
+                    dt,
+                    Num::byte2float(phi_byte, STATE_PHITHETA_MAX),
+                    Num::byte2float(theta_byte, STATE_PHITHETA_MAX),
+                    demands.roll, demands.pitch, demands.roll, demands.pitch);
 
-            PitchRollRateController::run( posthrust, dt, dphi_byte, dtheta_byte,
+            PitchRollRateController::run(
+                    dt,
+                    Num::byte2float(dphi_byte, STATE_DPHITHETA_MAX),
+                    Num::byte2float(dtheta_byte,STATE_DPHITHETA_MAX),
                     demands.roll, demands.pitch, demands.roll, demands.pitch);
 
             demands.thrust = quantize(demands.thrust, 0, UINT16_MAX);

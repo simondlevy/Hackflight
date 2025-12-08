@@ -46,26 +46,22 @@ state_theta = extern "stream_theta" Nothing
   pitch: nose-down positive
   --}
 
-pitchRollAngleController :: SBool -> (SFloat, SFloat) -> (SFloat, SFloat)
+pitchRollAngleController :: (SFloat, SFloat) -> (SFloat, SFloat)
 
-pitchRollAngleController airborne (roll, pitch) = (roll', pitch') where
+pitchRollAngleController (roll, pitch) = (roll', pitch') where
 
     -- Run PIDs on body-coordinate velocities
-    (roll',  roll_integral) =
-      runAxis airborne dt roll  state_phi roll_integral'
+    (roll',  roll_integral) = runAxis dt roll  state_phi roll_integral'
 
-    (pitch', pitch_integral) =
-      runAxis airborne dt pitch state_theta pitch_integral'
+    (pitch', pitch_integral) = runAxis dt pitch state_theta pitch_integral'
 
     roll_integral' = [0] ++ roll_integral
     pitch_integral' = [0] ++ pitch_integral
 
-    runAxis airborne dt demand measured integral = (demand', integral') where
+    runAxis dt demand measured integral = (demand', integral') where
 
         error = demand - measured
 
-        integral' = if airborne 
-                    then constrainabs (integral + error * dt) ilimit
-                    else 0
+        integral' = constrainabs (integral + error * dt) ilimit
 
         demand' = kp * error + ki * integral

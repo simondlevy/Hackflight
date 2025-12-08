@@ -36,7 +36,7 @@ thrust_max   = 65535
 thrust_scale = 1000
 
 hovering :: SBool
-hovering = extern "stream_airborne" Nothing
+hovering = extern "stream_controlled" Nothing
 
 dt :: SFloat
 dt = extern "stream_dt" Nothing

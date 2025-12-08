@@ -44,25 +44,23 @@ demand_yaw = extern "stream_yaw" Nothing
   meters per second.
 --}
 
-yawAngleController :: SBool -> SFloat
+yawAngleController :: SFloat
 
-yawAngleController airborne = demand where
+yawAngleController = demand where
 
     target = cap $ target' + demand_max * demand_yaw * dt
 
     error = cap $ target - state_psi
 
-    integral = if airborne
-               then constrainabs (integral' + error * dt) ilimit
-               else 0
+    integral = constrainabs (integral' + error * dt) ilimit
 
     deriv = if dt > 0 then (error - error') / dt else 0
 
     demand = kp * error + ki * integral + kd * deriv
 
-    target' = [0] ++ if airborne then target else state_psi
+    target' = [0] ++ target 
     integral' = [0] ++ integral
-    error' = [0] ++ if airborne then error else 0
+    error' = [0] ++ error
 
 cap :: SFloat -> SFloat
 

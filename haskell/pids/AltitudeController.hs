@@ -41,7 +41,7 @@ state_z :: SFloat
 state_z = extern "stream_z" Nothing
 
 airborne :: SBool
-airborne = extern "stream_airborne" Nothing
+airborne = extern "stream_controlled" Nothing
 
 {-- 
   Demand is input as altitude target in meters and output as climb rate in meters

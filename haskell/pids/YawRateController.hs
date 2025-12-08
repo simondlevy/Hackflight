@@ -39,15 +39,13 @@ state_dpsi = extern "stream_dpsi" Nothing
     rate from gyro; ouputput is arbitrary units scaled for motors.
 --}
 
-yawRateController :: SBool -> SFloat -> SFloat
+yawRateController :: SFloat -> SFloat
 
-yawRateController airborne demand = demand' where
+yawRateController demand = demand' where
 
     error = demand - state_dpsi
 
-    integral = if airborne
-               then constrainabs (integral' + error * dt) ilimit
-               else 0
+    integral = constrainabs (integral' + error * dt) ilimit
 
     demand' = kp * error + ki * integral
  

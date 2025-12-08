@@ -32,7 +32,6 @@ class PitchRollAngleController {
           * pitch: nose-down positive
          */
         static void run(
-                const bool airborne,
                 const float dt,
                 const float state_phi,
                 const float state_theta,
@@ -45,11 +44,11 @@ class PitchRollAngleController {
 
             static float _pitch_integral;
 
-            new_demand_roll = runAxis(airborne, dt, demand_roll, state_phi,
+            new_demand_roll = runAxis(dt, demand_roll, state_phi,
                     _roll_integral);
 
             new_demand_pitch =
-                runAxis(airborne, dt, demand_pitch, state_theta,
+                runAxis(dt, demand_pitch, state_theta,
                         _pitch_integral);
         }
 
@@ -60,7 +59,6 @@ class PitchRollAngleController {
         static constexpr float ILIMIT = 20;
 
         static float runAxis(
-                const bool airborne,
                 const float dt,
                 const float demand,
                 const float measured,
@@ -68,9 +66,8 @@ class PitchRollAngleController {
         {
             const auto error = demand - measured;
 
-            integral = airborne ?
-                Num::fconstrain(integral + error * dt, ILIMIT): 0;
+            integral = Num::fconstrain(integral + error * dt, ILIMIT);
 
-            return airborne ? KP * error + KI * integral : 0; 
+            return KP * error + KI * integral; 
         }
 };

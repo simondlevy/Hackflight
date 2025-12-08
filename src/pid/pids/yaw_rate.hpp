@@ -28,7 +28,6 @@ class YawRateController {
           * rate from gyro; ouputput is arbitrary units scaled for motors.
           */
          static float run(
-                 const bool airborne,
                  const float dt,
                  const float dpsi,
                  const float yaw)
@@ -37,11 +36,9 @@ class YawRateController {
 
             const auto error = yaw - dpsi;
 
-            _integral = airborne ? 
-                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+            _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 
-            return airborne ? 
-                Num::fconstrain(KP * error + KI * _integral, OUTPUT_LIMIT) : 0;
+            return Num::fconstrain(KP * error + KI * _integral, OUTPUT_LIMIT);
         }
 
     private:

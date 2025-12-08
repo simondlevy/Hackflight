@@ -49,7 +49,7 @@ class PidControl {
         {
             extern float stream_dt;
 
-            extern bool stream_airborne;
+            extern bool stream_controlled;
 
             extern float stream_thrust;
             extern float stream_roll;
@@ -69,7 +69,7 @@ class PidControl {
 
             stream_dt = dt;
 
-            stream_airborne = flightMode == MODE_HOVERING || 
+            stream_controlled = flightMode == MODE_HOVERING || 
                 flightMode == MODE_AUTONOMOUS;
 
             stream_thrust = setpointDemands.thrust;

@@ -41,17 +41,15 @@ spec = do
 
     let thrust = climbRateController climbrate 
 
-    let airborne = thrust > 0
+    let yaw_rate = yawAngleController
 
-    let yaw_rate = yawAngleController airborne
+    let yaw' = yawRateController yaw_rate
 
-    let yaw' = yawRateController airborne yaw_rate
+    let (roll', pitch') = positionController
 
-    let (roll', pitch') = positionController airborne
+    let (roll'', pitch'') = pitchRollAngleController (roll', pitch')
 
-    let (roll'', pitch'') = pitchRollAngleController airborne (roll', pitch')
-
-    let (roll''', pitch''') = pitchRollRateController airborne (roll'', pitch'')
+    let (roll''', pitch''') = pitchRollRateController (roll'', pitch'')
 
     trigger "setDemands" true 
                          [arg thrust, arg roll''', arg pitch''', arg yaw']

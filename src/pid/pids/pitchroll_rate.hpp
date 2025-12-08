@@ -33,7 +33,6 @@ class PitchRollRateController {
           * pitch: input nose-down positive => output positive
           */
          static void run(
-                 const bool airborne,
                  const float dt,
                  const float state_dphi, const float state_dtheta,
                  const float demand_roll,const float demand_pitch, 
@@ -44,10 +43,10 @@ class PitchRollRateController {
              static axis_t _pitch;
 
              new_demand_roll =
-                 runAxis(airborne, dt, demand_roll, state_dphi, _roll);
+                 runAxis(dt, demand_roll, state_dphi, _roll);
 
              new_demand_pitch =
-                 runAxis(airborne, dt, demand_pitch, state_dtheta, _pitch);
+                 runAxis(dt, demand_pitch, state_dtheta, _pitch);
          }
 
     private:
@@ -63,7 +62,6 @@ class PitchRollRateController {
         } axis_t;
 
         static float runAxis(
-                const bool airborne,
                 const float dt,
                 const float demand,
                 const float measured,
@@ -71,13 +69,12 @@ class PitchRollRateController {
         {
             const auto error = demand - measured;
 
-            axis.integral = airborne ?
-                Num::fconstrain( axis.integral + error * dt, ILIMIT) : 0;
+            axis.integral = Num::fconstrain( axis.integral + error * dt, ILIMIT);
 
             auto deriv = dt > 0 ? (error - axis.previous) / dt : 0;
 
-            axis.previous = airborne ? error : 0;
+            axis.previous = error;
 
-            return airborne ? KP * error + KI * axis.integral + deriv : 0;
+            return KP * error + KI * axis.integral + deriv;
         }
 };

@@ -48,15 +48,15 @@ state_dtheta = extern "stream_dtheta" Nothing
   pitch: input nose-down positive => output positive
 --}
 
-pitchRollRateController :: SBool -> (SFloat, SFloat) -> (SFloat, SFloat)
+pitchRollRateController :: (SFloat, SFloat) -> (SFloat, SFloat)
 
-pitchRollRateController airborne (roll, pitch) = (roll', pitch') where
+pitchRollRateController (roll, pitch) = (roll', pitch') where
 
     (roll',  roll_integral, roll_error) =
-       runAxis airborne dt roll state_dphi roll_integral'  roll_error'
+       runAxis dt roll state_dphi roll_integral'  roll_error'
 
     (pitch', pitch_integral, pitch_error) =
-      runAxis airborne dt pitch state_dtheta pitch_integral' pitch_error'
+      runAxis dt pitch state_dtheta pitch_integral' pitch_error'
 
     roll_integral' = [0] ++ roll_integral
     pitch_integral' = [0] ++ pitch_integral
@@ -64,7 +64,7 @@ pitchRollRateController airborne (roll, pitch) = (roll', pitch') where
     roll_error' = [0] ++ roll_error
     pitch_error' = [0] ++ pitch_error
 
-    runAxis airborne dt demand measured integral error' =
+    runAxis dt demand measured integral error' =
       (demand', integral', error'') where
 
         error = demand - measured
@@ -73,8 +73,6 @@ pitchRollRateController airborne (roll, pitch) = (roll', pitch') where
 
         demand' = kp * error + ki * integral + kd * deriv
 
-        integral' = if airborne
-                    then constrainabs (integral + error * dt) ilimit
-                    else 0
+        integral' = constrainabs (integral + error * dt) ilimit
 
-        error'' = if airborne then error else 0
+        error'' = error

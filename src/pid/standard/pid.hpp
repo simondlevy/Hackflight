@@ -45,16 +45,13 @@ class PidControl {
             demands.thrust = ClimbRateController::run(controlled, dt,
                     vehicleState.z, vehicleState.dz, climbrate);
 
-            const auto airborne = demands.thrust > 0;
-
             const auto yaw = YawAngleController::run(
-                    airborne, dt, vehicleState.psi, setpointDemands.yaw);
+                    dt, vehicleState.psi, setpointDemands.yaw);
 
             demands.yaw =
-                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+                YawRateController::run(dt, vehicleState.dpsi, yaw);
 
             PositionController::run(
-                    airborne,
                     dt,
                     vehicleState.dx, vehicleState.dy, vehicleState.psi,
                     controlled ? setpointDemands.pitch : 0,
@@ -62,14 +59,12 @@ class PidControl {
                     demands.roll, demands.pitch);
 
             PitchRollAngleController::run(
-                    airborne,
                     dt,
                     vehicleState.phi, vehicleState.theta,
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
 
             PitchRollRateController::run(
-                    airborne,
                     dt,
                     vehicleState.dphi, vehicleState.dtheta,
                     demands.roll, demands.pitch,
