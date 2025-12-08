@@ -74,14 +74,8 @@ class Simulator {
             }
 
             // Get current pose from dynamics
-            return pose_t {
-                _dynamics.state.x,
-                _dynamics.state.y,
-                _dynamics.state.z,
-                _dynamics.state.phi,
-                _dynamics.state.theta,
-                _dynamics.state.psi
-            };
+            const auto s = _dynamics.state;
+            return pose_t { s.x, s.y, s.z, s.phi, s.theta, s.psi };
         }    
 
     private:
