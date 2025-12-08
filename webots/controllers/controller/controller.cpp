@@ -74,6 +74,8 @@ static double _timestep;
 
 static float _zdist;
 
+static double _start_x, _start_y, _start_z;
+
 static void climb(const float rate)
 {
     const float time_curr = wb_robot_get_time();
@@ -224,8 +226,6 @@ static joystick_t getJoystickInfo()
     return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
 }
 
-
-
 static float normalizeJoystickAxis(const int32_t rawval)
 {
     return 2.0f * rawval / UINT16_MAX; 
@@ -341,8 +341,6 @@ static void reportJoystick(void)
 
 static void sendSimInfo(siminfo_t & siminfo)
 {
-    static double _start_x, _start_y, _start_z;
-
     const double * xyz = wb_gps_get_values(_gps);
 
     if (_start_x == 0) {
@@ -416,8 +414,8 @@ static bool step(const setpointType_e setpointType)
     }
 
     // On descent, switch mode to idle when close enough to ground
-    const auto z = wb_gps_get_values(_gps)[2] - 0.015; 
-    if (_flightMode == MODE_LANDING && z < Dynamics::ZMIN) {
+    const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
+    if (_flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
         _flightMode = MODE_IDLE;
     }
 
