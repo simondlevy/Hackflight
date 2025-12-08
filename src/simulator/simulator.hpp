@@ -49,12 +49,12 @@ class Simulator {
 
         } pose_t;
 
-        void init(PidControl * closedLoopControl)
+        void init(PidControl * pidControl)
         {
 
-            _closedLoopControl = closedLoopControl;
+            _pidControl = pidControl;
 
-            _closedLoopControl->init();
+            _pidControl->init();
         }
 
         pose_t step(const siminfo_t & siminfo)
@@ -93,7 +93,7 @@ class Simulator {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-        PidControl * _closedLoopControl;
+        PidControl * _pidControl;
 
         void outerLoop(const siminfo_t & siminfo, float * motors)
         {
@@ -118,7 +118,7 @@ class Simulator {
 
             if (siminfo.flightMode != MODE_IDLE) {
 
-                _closedLoopControl->run(
+                _pidControl->run(
                         1 / (float)PID_UPDATE_RATE,
                         siminfo.flightMode,
                         state,
