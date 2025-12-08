@@ -23,7 +23,6 @@
 // Hackflight
 #include <datatypes.h>
 #include <setpoint/lidar.hpp>
-#include <simulator/simulator.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -77,7 +76,7 @@ class WebotsSimulator {
 
             static flightMode_t _flightMode;
 
-            Simulator::siminfo_t siminfo = {};
+            siminfo_t siminfo = {};
 
             int16_t
                 lidar_distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION] = {};
@@ -234,7 +233,7 @@ class WebotsSimulator {
             return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
         }
 
-        void sendSimInfo(Simulator::siminfo_t & siminfo)
+        void sendSimInfo(siminfo_t & siminfo)
         {
             static double _start_x, _start_y, _start_z;
 
@@ -308,7 +307,7 @@ class WebotsSimulator {
             wb_motor_set_velocity(motor, direction * 60);
         }
 
-        void getSimInfoFromJoystick(Simulator::siminfo_t & siminfo, flightMode_t & flightMode)
+        void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _hover_button_was_down;
             static bool _auto_button_was_down;
@@ -334,7 +333,7 @@ class WebotsSimulator {
         }
 
         void getSimInfoFromKeyboard(
-                Simulator::siminfo_t & siminfo, flightMode_t & flightMode)
+                siminfo_t & siminfo, flightMode_t & flightMode)
         {
             static bool _enter_was_down;
             static bool _spacebar_was_down;
@@ -417,7 +416,7 @@ class WebotsSimulator {
             }
         }
 
-        void getSetpointFromKey(const int key, Simulator::siminfo_t & siminfo)
+        void getSetpointFromKey(const int key, siminfo_t & siminfo)
         {
             switch (key) {
 

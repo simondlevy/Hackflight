@@ -59,12 +59,12 @@ DLLEXPORT void webots_physics_step()
 
     int size = 0;
 
-    Simulator::siminfo_t siminfo = {};
+    siminfo_t siminfo = {};
 
     // Get sim info from main program
-    const auto buffer = (Simulator::siminfo_t *)dWebotsReceive(&size);
+    const auto buffer = (siminfo_t *)dWebotsReceive(&size);
 
-    if (size == sizeof(Simulator::siminfo_t)) {
+    if (size == sizeof(siminfo_t)) {
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 

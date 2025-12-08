@@ -40,17 +40,6 @@ class Simulator {
 
         typedef struct {
 
-            float start_x;
-            float start_y;
-            float start_z;
-            float framerate;
-            flightMode_t flightMode;
-            demands_t setpoint;
-
-        } siminfo_t;
-
-        typedef struct {
-
             float x;
             float y;
             float z;
