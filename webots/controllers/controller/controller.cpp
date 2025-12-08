@@ -415,8 +415,9 @@ static bool step(const setpointType_e setpointType)
     }
 
     // On descent, switch mode to idle when close enough to ground
-    if (_flightMode == MODE_LANDING &&
-            wb_gps_get_values(_gps)[2] < ZDIST_LAND_M) {
+    const auto z = wb_gps_get_values(_gps)[2] - 0.015; 
+    printf("z=%+3.3f\n", z);
+    if (_flightMode == MODE_LANDING && z < ZDIST_LAND_M) {
         _flightMode = MODE_IDLE;
     }
 

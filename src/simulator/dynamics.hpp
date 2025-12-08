@@ -143,6 +143,11 @@ class Dynamics {
                 _airborne = true;
             }
 
+            if (_airborne && state.dz < 0 && state.z < ZMIN) {
+                _airborne = false;
+                reset();
+            }
+
             // Once airborne, we can update dynamics
             if (_airborne) {
 
