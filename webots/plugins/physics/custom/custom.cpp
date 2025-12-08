@@ -1,5 +1,5 @@
 /* 
- * Custom physics plugin support for Hackflight Webots-based simulator
+ * Custom physics plugin custom for Hackflight Webots-based simulator
  *
  *  Copyright (C) 2025 Simon D. Levy
  *
@@ -20,6 +20,8 @@
 #include <plugins/physics.h>
 
 // Hackflight
+#define _MAIN
+#include <pid.hpp>
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
@@ -29,7 +31,7 @@ static dBodyID _robotBody;
 // Platform-independent simulator
 static Simulator _simulator;
 
-static ClosedLoopControl _closedLoopControl;
+static PidControl _pidControl;
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -45,7 +47,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robotBody, 0);
     }
 
-    _simulator.init(&_closedLoopControl);
+    _simulator.init(&_pidControl);
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -72,7 +74,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Update to get the current pose
-    const Dynamics::pose_t pose = _simulator.step(siminfo);
+    const Simulator::pose_t pose = _simulator.step(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};

@@ -12,11 +12,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds and closed-loop controllers ------------------------
+# Support different worlds and setpoints --------------------------------------
 
 world = empty
+
 setpoint = human
-control = standard
 
 # -----------------------------------------------------------------------------
 
@@ -35,17 +35,15 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	cp ../../plugins/physics/$(control)/lib$(control).so \
-				../../plugins/physics/__custom__/lib__custom__.so
 	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controller $(setpoint)
+
+
+edit:
+	vim controller.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
 WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
-
-edit:
-	vim main.cpp
-

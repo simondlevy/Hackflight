@@ -16,20 +16,17 @@
 
 #pragma once
 
-#include <datatypes.h>
-#include <num.hpp>
-
-#include <control/lowres/altitude.hpp>
-#include <control/lowres/climbrate.hpp>
-#include <control/lowres/position.hpp>
-#include <control/lowres/pitchroll_angle.hpp>
-#include <control/lowres/pitchroll_rate.hpp>
-#include <control/lowres/yaw_angle.hpp>
-#include <control/lowres/yaw_rate.hpp>
-
+#include <pid/lowres/altitude.hpp>
+#include <pid/lowres/climbrate.hpp>
+#include <pid/lowres/position.hpp>
+#include <pid/lowres/pitchroll_angle.hpp>
+#include <pid/lowres/pitchroll_rate.hpp>
+#include <pid/lowres/yaw_angle.hpp>
+#include <pid/lowres/yaw_rate.hpp>
 #include <serializer.hpp>
 
-class ClosedLoopControl {
+
+class PidControl {
 
     public:
 
@@ -44,34 +41,34 @@ class ClosedLoopControl {
                 flightMode == MODE_AUTONOMOUS;
 
             const uint8_t dx_byte = Num::float2byte(vehicleState.dx,
-                        STATE_DXY_MAX);
+                    STATE_DXY_MAX);
 
             const uint8_t dy_byte = Num::float2byte(vehicleState.dy,
-                        STATE_DXY_MAX);
+                    STATE_DXY_MAX);
 
             const uint8_t z_byte = Num::float2byte(vehicleState.z,
-                        STATE_Z_MIN, STATE_Z_MAX);
+                    STATE_Z_MIN, STATE_Z_MAX);
 
             const uint8_t dz_byte = Num::float2byte(vehicleState.dz,
-                        STATE_DZ_MAX);
+                    STATE_DZ_MAX);
 
             const uint8_t phi_byte = Num::float2byte(vehicleState.phi,
-                        STATE_PHITHETA_MAX);
+                    STATE_PHITHETA_MAX);
 
             const uint8_t dphi_byte = Num::float2byte(vehicleState.dphi,
-                        STATE_DPHITHETA_MAX);
+                    STATE_DPHITHETA_MAX);
 
             const uint8_t theta_byte = Num::float2byte(vehicleState.theta,
-                        STATE_PHITHETA_MAX);
+                    STATE_PHITHETA_MAX);
 
             const uint8_t dtheta_byte = Num::float2byte(vehicleState.dtheta,
-                        STATE_DPHITHETA_MAX);
+                    STATE_DPHITHETA_MAX);
 
             const uint8_t psi_byte = Num::float2byte(vehicleState.psi,
-                        STATE_PSI_MAX);
+                    STATE_PSI_MAX);
 
             const uint8_t dpsi_byte = Num::float2byte(vehicleState.dpsi,
-                        STATE_DPSI_MAX);
+                    STATE_DPSI_MAX);
 
             const float climbrate = AltitudeController::run(airborne, dt, z_byte,
                     setpointDemands.thrust);
@@ -113,31 +110,25 @@ class ClosedLoopControl {
             (void)serializer;
         }
 
-        // unused; needed for sim API
         void init()
         {
         }
 
     private:
 
-        void minmax(const float val, float & min, float & max)
-        {
-            min = val < min ? val : min;
-            max = val > max ? val : max;
-        }
-
-        float quantize(const float val, const float min, const float max)
+        static float quantize(const float val, const float min, const float max)
         {
             return Num::byte2float(Num::float2byte(val, min, max), min, max);
         }
 
-        float quantize(const float val, const float max)
+        static float quantize(const float val, const float max)
         {
             return Num::byte2float(Num::float2byte(val, max), max);
         }
 
-        float quantize(const float val)
+        static float quantize(const float val)
         {
             return quantize(val, 180000);
         }
+
 };

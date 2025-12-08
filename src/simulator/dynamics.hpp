@@ -49,17 +49,6 @@ class Dynamics {
 
         static constexpr float ZMIN = 0.005;
 
-        typedef struct {
-
-            float x;
-            float y;
-            float z;
-            float phi;
-            float theta;
-            float psi;
-
-        } pose_t;
-
         // Vehicle state (Equation 11)
         vehicleState_t state;
 
@@ -201,13 +190,6 @@ class Dynamics {
             }
 
         } // update
-
-        pose_t getPose()
-        {
-            return pose_t {
-                state.x, state.y, state.z, state.phi, state.theta, state.psi
-            };
-        }
 
         void reset()
         {

@@ -16,20 +16,20 @@
 
 #pragma once
 
-#include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
-#include <control/pids/position.hpp>
-#include <control/pids/pitchroll_angle.hpp>
-#include <control/pids/pitchroll_rate.hpp>
-#include <control/pids/yaw_angle.hpp>
-#include <control/pids/yaw_rate.hpp>
+#include <pid/pids/altitude.hpp>
+#include <pid/pids/climbrate.hpp>
+#include <pid/pids/position.hpp>
+#include <pid/pids/pitchroll_angle.hpp>
+#include <pid/pids/pitchroll_rate.hpp>
+#include <pid/pids/yaw_angle.hpp>
+#include <pid/pids/yaw_rate.hpp>
 #include <serializer.hpp>
 
-class ClosedLoopControl {
+class PidControl {
 
     public:
 
-        static void run(
+        void run(
                 const float dt,
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
@@ -75,12 +75,12 @@ class ClosedLoopControl {
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
         }
+
         void serializeMessage(MspSerializer & serializer)
         {
             (void)serializer;
         }
 
-        // unused; needed for sim API
         void init()
         {
         }

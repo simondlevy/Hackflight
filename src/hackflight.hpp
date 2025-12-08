@@ -22,8 +22,8 @@
 #include <VL53L1X.h>
 #include <pmw3901.hpp>
 
-#include <__control__.hpp>
 #include <__messages__.h>
+#include <__pid__.hpp>
 
 #include <debugger.hpp>
 #include <ekf.hpp>
@@ -84,7 +84,7 @@ class Hackflight {
             static float _motorvals[MAX_MOTOR_COUNT];
             static demands_t _demands;
             static bool _isFlying;
-            static ClosedLoopControl _closedLoopControl;
+            static PidControl _pidControl;
             static vehicleState_t _vehicleState;
             static command_t _command;
             static bool _didResetEstimation;
@@ -99,7 +99,7 @@ class Hackflight {
             runLed(imuIsCalibrated, _flightMode);
 
             // Run logging
-            runLogger(_vehicleState, _closedLoopControl);
+            runLogger(_vehicleState, _pidControl);
 
             // Get command
             runCommandParser(_command);
@@ -138,7 +138,7 @@ class Hackflight {
 
                 case MODE_HOVERING:
                     runClosedLoopAndMixer(_command, _vehicleState, motorCount,
-                            mixFun, _flightMode, _closedLoopControl, _demands,
+                            mixFun, _flightMode, _pidControl, _demands,
                             _motorvals);
                     if (!_command.hovering) {
                         _flightMode = MODE_LANDING;
@@ -147,7 +147,7 @@ class Hackflight {
 
                 case MODE_LANDING:
                     runClosedLoopAndMixer(_command, _vehicleState, motorCount,
-                            mixFun, _flightMode, _closedLoopControl, _demands,
+                            mixFun, _flightMode, _pidControl, _demands,
                             _motorvals);
                     break;
 
@@ -374,7 +374,7 @@ class Hackflight {
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
                 flightMode_t & flightMode,
-                ClosedLoopControl & control,
+                PidControl & control,
                 demands_t & demands,
                 float *motorvals)
         {
@@ -481,13 +481,13 @@ class Hackflight {
         }        
 
         void runLogger(const vehicleState_t & state,
-                ClosedLoopControl & control)
+                PidControl & control)
         {
             static Timer _timer;
 
             if (_timer.ready(COMMS_FREQ)) {
                 sendVehicleState(state);
-                sendClosedLoopControlMessage(control);
+                sendPidControlMessage(control);
             }
         }
 
@@ -513,7 +513,7 @@ class Hackflight {
             sendPayload(serializer);
         }
 
-        void sendClosedLoopControlMessage(ClosedLoopControl & control)
+        void sendPidControlMessage(PidControl & control)
         {
             MspSerializer serializer = {};
 

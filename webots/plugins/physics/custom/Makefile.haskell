@@ -15,19 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-SRC = ../../../../src
-
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-INCLUDE = -I$(SRC) -I../../..
+SRC = ../../../../src
+
+INCLUDE = -I$(SRC) -I$(SRC)/pid/haskell
 
 HASKDIR = ../../../../haskell
 
-CXX_SOURCES = ../support.cpp copilot_core.cpp $(SRC)/control/haskell/copilot_streams.cpp
+CXX_SOURCES = custom.cpp copilot_core.cpp $(SRC)/pid/haskell/copilot_streams.cpp
 
 FILES_TO_REMOVE += copilot*
 
-all: libhaskell.so
+all: libcustom.so
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)

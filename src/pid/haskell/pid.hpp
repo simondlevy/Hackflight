@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <stdio.h>
 #include <string.h>
 
 #include <datatypes.h>
@@ -36,9 +35,8 @@ void setDemands(float t, float r, float p, float y)
 
 void copilot_step_core();
 
-// Common closed-loop control API
 
-class ClosedLoopControl {
+class PidControl {
 
     public:
 
@@ -101,9 +99,8 @@ class ClosedLoopControl {
             (void)serializer;
         }
 
-        // unused; needed for sim API
         void init()
         {
         }
-};
 
+};

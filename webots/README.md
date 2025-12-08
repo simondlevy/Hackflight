@@ -16,11 +16,11 @@ on your computer.
 3. From the hackflight main directory, do the following:
 
 ```
-cd webots/plugins/physics/standard
+cd webots/plugins/physics/custom
 make
-cd ../../../controllers/controller
+cd ../../../controllers/custom
 make
-make runstandard
+make run
 ```
 
 If you have a game controller or R/C transmitter with adapter dongle, you can
