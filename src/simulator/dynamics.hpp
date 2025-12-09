@@ -172,7 +172,7 @@ class Dynamics {
 
                 _dstate.z = state.dz;                             
                 _dstate.phi = state.dphi;                              
-                _dstate.dphi = l / I * u2;                      
+                _dstate.dphi = l / I * u2;
                 _dstate.theta = state.dtheta;                  
                 _dstate.dtheta = l / I * u3;                  
                 _dstate.psi = state.dpsi;                   

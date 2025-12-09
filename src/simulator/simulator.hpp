@@ -80,10 +80,6 @@ class Simulator {
                     _pidControl->runFast(1 / (float)PID_FAST_RATE,
                             controlled, state, slowDemands, fastDemands);
 
-                    fastDemands.roll *= Num::DEG2RAD;
-                    fastDemands.pitch *= Num::DEG2RAD;
-                    fastDemands.yaw *= Num::DEG2RAD;
-
                     float motors[4] = {};
                     Mixer::mix(fastDemands, motors);
 
