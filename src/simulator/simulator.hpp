@@ -60,7 +60,7 @@ class Simulator {
 
         pose_t step(const siminfo_t & siminfo)
         {
-            // Run slow PID control in outer loop
+            // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_UPDATE_RATE/siminfo.framerate; ++i) {
 
                 const auto state =  getVehicleState();
@@ -72,13 +72,24 @@ class Simulator {
                 _pidControl->runSlow(1 / (float)PID_SLOW_UPDATE_RATE,
                         controlled, state, siminfo.setpoint, demands);
 
-                // Run fast PID control in middle loop
+                // Run fast PID control in middle loop -----------------------
                 for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
 
-                    float motors[4] = {};
-                    runFastPids(state, siminfo, controlled, demands, motors);
+                    _pidControl->runFast(1 / (float)PID_FAST_UPDATE_RATE,
+                            controlled, state, siminfo.setpoint, demands);
 
-                    // Run dynamics in inner loop
+                    demands.roll *= Num::DEG2RAD;
+                    demands.pitch *= Num::DEG2RAD;
+                    demands.yaw *= Num::DEG2RAD;
+
+                    float motors[4] = {};
+                    Mixer::mix(demands, motors);
+
+                    if (_dynamics.state.z < 0) {
+                        _dynamics.reset();
+                    }
+
+                    // Run dynamics in inner loop ----------------------------
                     for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
 
                         _dynamics.update(motors, Mixer::rotorCount,
@@ -107,23 +118,6 @@ class Simulator {
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
         PidControl * _pidControl;
-
-         void runFastPids(const vehicleState_t & state, const siminfo_t & siminfo,
-                const bool controlled, demands_t & demands, float * motors)
-        {
-            _pidControl->runFast(1 / (float)PID_FAST_UPDATE_RATE,
-                    controlled, state, siminfo.setpoint, demands);
-
-            demands.roll *= Num::DEG2RAD;
-            demands.pitch *= Num::DEG2RAD;
-            demands.yaw *= Num::DEG2RAD;
-
-            Mixer::mix(demands, motors);
-
-            if (_dynamics.state.z < 0) {
-                _dynamics.reset();
-            }
-        }
 
         vehicleState_t getVehicleState()
         {
