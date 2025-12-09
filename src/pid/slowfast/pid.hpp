@@ -36,11 +36,12 @@ class PidControl {
                 const demands_t & demandsIn,
                 demands_t & demandsOut)
         {
-                (void)dt;
-                (void) controlled;
-                (void)vehicleState;
+            demandsOut.thrust = AltitudeController::run(controlled,
+                    dt, vehicleState.z, demandsIn.thrust);
 
-                memcpy(&demandsOut, &demandsIn, sizeof(demands_t));
+            demandsOut.roll = demandsIn.roll;
+            demandsOut.pitch = demandsIn.pitch;
+            demandsOut.yaw = demandsIn.yaw;
         }
 
         void runFast(
@@ -50,9 +51,6 @@ class PidControl {
                 const demands_t & demandsIn,
                 demands_t & demandsOut)
         {
-            demandsOut.thrust = AltitudeController::run(controlled,
-                    dt, vehicleState.z, demandsIn.thrust);
-
             demandsOut.yaw = YawAngleController::run(
                     dt, vehicleState.psi, demandsIn.yaw);
 
@@ -72,7 +70,7 @@ class PidControl {
             // ---------------------------------------------------------------
 
             demandsOut.thrust = ClimbRateController::run(controlled, dt,
-                    vehicleState.z, vehicleState.dz, demandsOut.thrust);
+                    vehicleState.z, vehicleState.dz, demandsIn.thrust);
 
             PitchRollRateController::run(
                     dt,
