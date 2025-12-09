@@ -39,8 +39,12 @@ class PidControl {
             demandsOut.thrust = AltitudeController::run(controlled,
                     dt, vehicleState.z, demandsIn.thrust);
 
-            demandsOut.roll = demandsIn.roll;
-            demandsOut.pitch = demandsIn.pitch;
+            PositionController::run(
+                    dt,
+                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
+                    controlled ? demandsIn.pitch : 0,
+                    controlled ? demandsIn.roll : 0,
+                    demandsOut.roll, demandsOut.pitch);
 
             demandsOut.yaw = YawAngleController::run(
                     dt, vehicleState.psi, demandsIn.yaw);
@@ -54,17 +58,10 @@ class PidControl {
                 const demands_t & demandsIn,
                 demands_t & demandsOut)
         {
-            PositionController::run(
-                    dt,
-                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
-                    controlled ? demandsIn.pitch : 0,
-                    controlled ? demandsIn.roll : 0,
-                    demandsOut.roll, demandsOut.pitch);
-
             PitchRollAngleController::run(
                     dt,
                     vehicleState.phi, vehicleState.theta,
-                    demandsOut.roll, demandsOut.pitch,
+                    demandsIn.roll, demandsIn.pitch,
                     demandsOut.roll, demandsOut.pitch);
 
             // ---------------------------------------------------------------
