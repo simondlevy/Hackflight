@@ -33,55 +33,55 @@ class PidControl {
                 const float dt,
                 const bool controlled,
                 const vehicleState_t & vehicleState,
-                const demands_t & setpointDemands,
-                demands_t & demands)
+                const demands_t & demandsIn,
+                demands_t & demandsOut)
         {
                 (void)dt;
                 (void) controlled;
                 (void)vehicleState;
-                (void)setpointDemands;
-                (void)demands;
+                (void)demandsIn;
+                (void)demandsOut;
         }
 
         void runFast(
                 const float dt,
                 const bool controlled,
                 const vehicleState_t & vehicleState,
-                const demands_t & setpointDemands,
-                demands_t & demands)
+                const demands_t & demandsIn,
+                demands_t & demandsOut)
         {
-            demands.thrust = AltitudeController::run(controlled,
-                    dt, vehicleState.z, setpointDemands.thrust);
+            demandsOut.thrust = AltitudeController::run(controlled,
+                    dt, vehicleState.z, demandsIn.thrust);
 
-            demands.yaw = YawAngleController::run(
-                    dt, vehicleState.psi, setpointDemands.yaw);
+            demandsOut.yaw = YawAngleController::run(
+                    dt, vehicleState.psi, demandsIn.yaw);
 
             PositionController::run(
                     dt,
                     vehicleState.dx, vehicleState.dy, vehicleState.psi,
-                    controlled ? setpointDemands.pitch : 0,
-                    controlled ? setpointDemands.roll : 0,
-                    demands.roll, demands.pitch);
+                    controlled ? demandsIn.pitch : 0,
+                    controlled ? demandsIn.roll : 0,
+                    demandsOut.roll, demandsOut.pitch);
 
             PitchRollAngleController::run(
                     dt,
                     vehicleState.phi, vehicleState.theta,
-                    demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
+                    demandsOut.roll, demandsOut.pitch,
+                    demandsOut.roll, demandsOut.pitch);
 
             // ---------------------------------------------------------------
 
-            demands.thrust = ClimbRateController::run(controlled, dt,
-                    vehicleState.z, vehicleState.dz, demands.thrust);
+            demandsOut.thrust = ClimbRateController::run(controlled, dt,
+                    vehicleState.z, vehicleState.dz, demandsOut.thrust);
 
             PitchRollRateController::run(
                     dt,
                     vehicleState.dphi, vehicleState.dtheta,
-                    demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
+                    demandsOut.roll, demandsOut.pitch,
+                    demandsOut.roll, demandsOut.pitch);
 
-            demands.yaw =
-                YawRateController::run(dt, vehicleState.dpsi, demands.yaw);
+            demandsOut.yaw =
+                YawRateController::run(dt, vehicleState.dpsi, demandsOut.yaw);
         }
 
         void serializeMessage(MspSerializer & serializer)
