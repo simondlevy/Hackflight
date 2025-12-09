@@ -30,11 +30,13 @@ static constexpr float THRUST_SCALE = 1000;
 static constexpr Dynamics::vehicle_params_t VPARAMS = {
 
     // Actual values
-    1.6e-3,  // mass [kg]
+    3.0e-2,  // mass [kg]
     5.0e-2,  // arm length L [m]
 
-    // Estimated by using thrust constants above
-    2.3e-10, // force coefficient B [F=b*w^2]
-    1.0e-10, // drag coefficient D [T=d*w^2]
-    2.0e-5   // I [kg*m^2]   // pitch, roll
+    // Estimated by using thrust constants above: 
+    //   B, D increase in proportion to mass;
+    //   I decreases in proportion to mass;
+    4.3e-9, // force coefficient B [F=b*w^2]
+    1.9e-9, // drag coefficient D [T=d*w^2]
+    4.1e-4  // I [kg*m^2]   // pitch, roll
 };
