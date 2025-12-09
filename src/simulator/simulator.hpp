@@ -69,7 +69,8 @@ class Simulator {
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
                     siminfo.flightMode == MODE_AUTONOMOUS;
 
-                runSlowPids(state, siminfo, controlled, demands);
+                _pidControl->runSlow(1 / (float)PID_SLOW_UPDATE_RATE,
+                        controlled, state, siminfo.setpoint, demands);
 
                 // Run fast PID control in middle loop
                 for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
@@ -106,13 +107,6 @@ class Simulator {
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
         PidControl * _pidControl;
-
-        void runSlowPids(const vehicleState_t & state, const siminfo_t & siminfo,
-                const bool controlled, demands_t & demands)
-        {
-            _pidControl->runSlow(1 / (float)PID_SLOW_UPDATE_RATE,
-                    controlled, state, siminfo.setpoint, demands);
-        }
 
          void runFastPids(const vehicleState_t & state, const siminfo_t & siminfo,
                 const bool controlled, demands_t & demands, float * motors)
