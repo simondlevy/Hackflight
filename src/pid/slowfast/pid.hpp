@@ -39,8 +39,8 @@ class PidControl {
                 (void)dt;
                 (void) controlled;
                 (void)vehicleState;
-                (void)demandsIn;
-                (void)demandsOut;
+
+                memcpy(&demandsOut, &demandsIn, sizeof(demands_t));
         }
 
         void runFast(

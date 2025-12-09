@@ -78,7 +78,7 @@ class Simulator {
                     demands_t fastDemands = {};
 
                     _pidControl->runFast(1 / (float)PID_FAST_UPDATE_RATE,
-                            controlled, state, siminfo.setpoint, fastDemands);
+                            controlled, state, slowDemands, fastDemands);
 
                     fastDemands.roll *= Num::DEG2RAD;
                     fastDemands.pitch *= Num::DEG2RAD;
