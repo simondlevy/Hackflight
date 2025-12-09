@@ -66,13 +66,16 @@ class Simulator {
                 const auto state =  getVehicleState();
                 demands_t demands = {};
 
-                runSlowPids(state, siminfo, demands);
+                const bool controlled = siminfo.flightMode == MODE_HOVERING ||
+                    siminfo.flightMode == MODE_AUTONOMOUS;
+
+                runSlowPids(state, siminfo, controlled, demands);
 
                 // Run fast PID control in middle loop
                 for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
 
                     float motors[4] = {};
-                    runFastPids(state, siminfo, demands, motors);
+                    runFastPids(state, siminfo, controlled, demands, motors);
 
                     // Run dynamics in inner loop
                     for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
@@ -105,25 +108,17 @@ class Simulator {
         PidControl * _pidControl;
 
         void runSlowPids(const vehicleState_t & state, const siminfo_t & siminfo,
-                demands_t & demands)
+                const bool controlled, demands_t & demands)
         {
-            _pidControl->runSlow(
-                    1 / (float)PID_SLOW_UPDATE_RATE,
-                    siminfo.flightMode,
-                    state,
-                    siminfo.setpoint,
-                    demands);
+            _pidControl->runSlow(1 / (float)PID_SLOW_UPDATE_RATE,
+                    controlled, state, siminfo.setpoint, demands);
         }
 
          void runFastPids(const vehicleState_t & state, const siminfo_t & siminfo,
-                demands_t & demands, float * motors)
+                const bool controlled, demands_t & demands, float * motors)
         {
-            _pidControl->runFast(
-                    1 / (float)PID_FAST_UPDATE_RATE,
-                    siminfo.flightMode,
-                    state,
-                    siminfo.setpoint,
-                    demands);
+            _pidControl->runFast(1 / (float)PID_FAST_UPDATE_RATE,
+                    controlled, state, siminfo.setpoint, demands);
 
             demands.roll *= Num::DEG2RAD;
             demands.pitch *= Num::DEG2RAD;

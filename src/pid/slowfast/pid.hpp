@@ -31,13 +31,13 @@ class PidControl {
 
         void runSlow(
                 const float dt,
-                const flightMode_t flightMode,
+                const bool controlled,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
                 (void)dt;
-                (void) flightMode;
+                (void) controlled;
                 (void)vehicleState;
                 (void)setpointDemands;
                 (void)demands;
@@ -45,16 +45,11 @@ class PidControl {
 
         void runFast(
                 const float dt,
-                const flightMode_t flightMode,
+                const bool controlled,
                 const vehicleState_t & vehicleState,
                 const demands_t & setpointDemands,
                 demands_t & demands)
         {
-            const bool controlled = flightMode == MODE_HOVERING ||
-                flightMode == MODE_AUTONOMOUS;
-
-            // ---------------------------------------------------------------
-
             demands.thrust = AltitudeController::run(controlled,
                     dt, vehicleState.z, setpointDemands.thrust);
 
