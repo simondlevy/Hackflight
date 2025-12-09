@@ -34,7 +34,7 @@ static constexpr Dynamics::vehicle_params_t VPARAMS = {
     5.0e-2,  // arm length L [m]
 
     // Estimated by using thrust constants above
-    (1.4e-8)/60,  // force coefficient B [F=b*w^2]
+    2.3e-10, // force coefficient B [F=b*w^2]
     1.0e-10, // drag coefficient D [T=d*w^2]
     2.0e-5   // I [kg*m^2]   // pitch, roll
 };
