@@ -41,7 +41,10 @@ class PidControl {
 
             demandsOut.roll = demandsIn.roll;
             demandsOut.pitch = demandsIn.pitch;
-            demandsOut.yaw = demandsIn.yaw;
+
+            demandsOut.yaw = YawAngleController::run(
+                    dt, vehicleState.psi, demandsIn.yaw);
+
         }
 
         void runFast(
@@ -51,9 +54,6 @@ class PidControl {
                 const demands_t & demandsIn,
                 demands_t & demandsOut)
         {
-            demandsOut.yaw = YawAngleController::run(
-                    dt, vehicleState.psi, demandsIn.yaw);
-
             PositionController::run(
                     dt,
                     vehicleState.dx, vehicleState.dy, vehicleState.psi,
@@ -79,7 +79,7 @@ class PidControl {
                     demandsOut.roll, demandsOut.pitch);
 
             demandsOut.yaw =
-                YawRateController::run(dt, vehicleState.dpsi, demandsOut.yaw);
+                YawRateController::run(dt, vehicleState.dpsi, demandsIn.yaw);
         }
 
         void serializeMessage(MspSerializer & serializer)
