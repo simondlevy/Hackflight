@@ -68,7 +68,10 @@ class Simulator {
             for (uint32_t i=0; i<PID_FAST_UPDATE_RATE/siminfo.framerate; ++i) {
 
                 float motors[4] = {};
-                runPids(state, siminfo, demands, motors);
+
+                if (siminfo.flightMode != MODE_IDLE) {
+                    runPids(state, siminfo, demands, motors);
+                }
 
                 // Run dynamics in inner loop
                 for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
@@ -102,24 +105,21 @@ class Simulator {
         void runPids(const vehicleState_t & state, const siminfo_t & siminfo,
                 demands_t & demands, float * motors)
         {
-            if (siminfo.flightMode != MODE_IDLE) {
+            _pidControl->runFast(
+                    1 / (float)PID_FAST_UPDATE_RATE,
+                    siminfo.flightMode,
+                    state,
+                    siminfo.setpoint,
+                    demands);
 
-                _pidControl->runFast(
-                        1 / (float)PID_FAST_UPDATE_RATE,
-                        siminfo.flightMode,
-                        state,
-                        siminfo.setpoint,
-                        demands);
+            demands.roll *= Num::DEG2RAD;
+            demands.pitch *= Num::DEG2RAD;
+            demands.yaw *= Num::DEG2RAD;
 
-                demands.roll *= Num::DEG2RAD;
-                demands.pitch *= Num::DEG2RAD;
-                demands.yaw *= Num::DEG2RAD;
+            Mixer::mix(demands, motors);
 
-                Mixer::mix(demands, motors);
-
-                if (_dynamics.state.z < 0) {
-                    _dynamics.reset();
-                }
+            if (_dynamics.state.z < 0) {
+                _dynamics.reset();
             }
         }
 
