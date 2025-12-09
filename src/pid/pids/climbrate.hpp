@@ -18,7 +18,7 @@
 #pragma once
 
 #include <num.hpp>
-#include <vehicles/diyquad.hpp>
+#include <vehicles/crazyflie.hpp>
 
 class ClimbRateController {
 

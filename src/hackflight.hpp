@@ -30,7 +30,7 @@
 #include <imu.hpp>
 #include <parser.hpp>
 #include <timer.hpp>
-#include <vehicles/diyquad.hpp>
+#include <vehicles/crazyflie.hpp>
 
 class Hackflight {
 
