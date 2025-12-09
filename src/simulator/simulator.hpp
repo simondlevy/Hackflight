@@ -62,11 +62,13 @@ class Simulator {
         {
             const auto state =  getVehicleState();
 
+            demands_t demands = {};
+
             // Run PID control in outer loop
             for (uint32_t i=0; i<PID_FAST_UPDATE_RATE/siminfo.framerate; ++i) {
 
                 float motors[4] = {};
-                runPids(state, siminfo, motors);
+                runPids(state, siminfo, demands, motors);
 
                 // Run dynamics in inner loop
                 for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
@@ -98,10 +100,8 @@ class Simulator {
         PidControl * _pidControl;
 
         void runPids(const vehicleState_t & state, const siminfo_t & siminfo,
-                float * motors)
+                demands_t & demands, float * motors)
         {
-            demands_t demands = {};
-
             if (siminfo.flightMode != MODE_IDLE) {
 
                 _pidControl->runFast(
