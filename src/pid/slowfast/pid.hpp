@@ -58,7 +58,7 @@ class PidControl {
             demands.thrust = AltitudeController::run(controlled,
                     dt, vehicleState.z, setpointDemands.thrust);
 
-            const auto yaw = YawAngleController::run(
+            demands.yaw = YawAngleController::run(
                     dt, vehicleState.psi, setpointDemands.yaw);
 
             PositionController::run(
@@ -84,9 +84,9 @@ class PidControl {
                     vehicleState.dphi, vehicleState.dtheta,
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
-            demands.yaw =
-                YawRateController::run(dt, vehicleState.dpsi, yaw);
 
+            demands.yaw =
+                YawRateController::run(dt, vehicleState.dpsi, demands.yaw);
         }
 
         void serializeMessage(MspSerializer & serializer)
