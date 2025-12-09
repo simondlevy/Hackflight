@@ -60,12 +60,13 @@ class Simulator {
 
         pose_t step(const siminfo_t & siminfo)
         {
-            const auto state =  getVehicleState();
-
-            demands_t demands = {};
-
             // Run slow PID control in outer loop
             for (uint32_t i=0; i<PID_SLOW_UPDATE_RATE/siminfo.framerate; ++i) {
+
+                const auto state =  getVehicleState();
+                demands_t demands = {};
+
+                runSlowPids(state, siminfo, demands);
 
                 // Run fast PID control in middle loop
                 for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
@@ -73,7 +74,7 @@ class Simulator {
                     float motors[4] = {};
 
                     if (siminfo.flightMode != MODE_IDLE) {
-                        runPids(state, siminfo, demands, motors);
+                        runFastPids(state, siminfo, demands, motors);
                     }
 
                     // Run dynamics in inner loop
@@ -106,7 +107,15 @@ class Simulator {
 
         PidControl * _pidControl;
 
-        void runPids(const vehicleState_t & state, const siminfo_t & siminfo,
+        void runSlowPids(const vehicleState_t & state, const siminfo_t & siminfo,
+                demands_t & demands)
+        {
+            (void)state;
+            (void)siminfo;
+            (void)demands;
+        }
+
+         void runFastPids(const vehicleState_t & state, const siminfo_t & siminfo,
                 demands_t & demands, float * motors)
         {
             _pidControl->runFast(
