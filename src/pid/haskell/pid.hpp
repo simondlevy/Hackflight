@@ -40,7 +40,22 @@ class PidControl {
 
     public:
 
-        void run(
+
+        void runSlow(
+                const float dt,
+                const flightMode_t flightMode,
+                const vehicleState_t & vehicleState,
+                const demands_t & setpointDemands,
+                demands_t & demands)
+        {
+                (void)dt;
+                (void) flightMode;
+                (void)vehicleState;
+                (void)setpointDemands;
+                (void)demands;
+        }
+
+        void runFast(
                 const float dt,
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,

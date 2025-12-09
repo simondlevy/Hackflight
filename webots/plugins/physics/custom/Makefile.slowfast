@@ -18,7 +18,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC = ../../../../src
 
-INCLUDE = -I$(SRC) -I$(SRC)/pid/split
+INCLUDE = -I$(SRC) -I$(SRC)/pid/slowfast
 
 CXX_SOURCES = custom.cpp
 

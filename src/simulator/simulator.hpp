@@ -32,9 +32,10 @@ class Simulator {
 
     private:
 
-        static constexpr float DYNAMICS_RATE = 100000; // Hz
+        static constexpr float DYNAMICS_RATE = 1e5; // Hz
 
-        static const int PID_UPDATE_RATE = 1000;  // 1024 Plank 
+        static constexpr float PID_FAST_UPDATE_RATE = 1e3;  // 1024 Plank 
+        static constexpr float PID_SLOW_UPDATE_RATE = 1e2;
 
     public:
 
@@ -60,14 +61,14 @@ class Simulator {
         pose_t step(const siminfo_t & siminfo)
         {
 
-            // Run control in outer loop
-            for (uint32_t j=0; j<PID_UPDATE_RATE/siminfo.framerate; ++j) {
+            // Run PID control in outer loop
+            for (uint32_t i=0; i<PID_FAST_UPDATE_RATE/siminfo.framerate; ++i) {
 
                 float motors[4] = {};
-                outerLoop(siminfo, motors);
+                runPids(siminfo, motors);
 
                 // Run dynamics in inner loop
-                for (uint32_t k=0; k<DYNAMICS_RATE/PID_UPDATE_RATE; ++k) {
+                for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
 
                     _dynamics.update(motors, Mixer::rotorCount,
                             Mixer::roll, Mixer::pitch, Mixer::yaw);
@@ -95,31 +96,16 @@ class Simulator {
 
         PidControl * _pidControl;
 
-        void outerLoop(const siminfo_t & siminfo, float * motors)
+        void runPids(const siminfo_t & siminfo, float * motors)
         {
-            const auto d = _dynamics;
-
-            const vehicleState_t state =  {
-                0, // x
-                d.state.dx,
-                0, // y
-                d.state.dy,
-                d.state.z,                     
-                d.state.dz,                   
-                Num::RAD2DEG* d.state.phi, 
-                Num::RAD2DEG* d.state.dphi, 
-                Num::RAD2DEG* d.state.theta, 
-                Num::RAD2DEG* d.state.dtheta,
-                Num::RAD2DEG* d.state.psi,   
-                Num::RAD2DEG* d.state.dpsi
-            };
+            const auto state =  getVehicleState();
 
             demands_t demands = {};
 
             if (siminfo.flightMode != MODE_IDLE) {
 
-                _pidControl->run(
-                        1 / (float)PID_UPDATE_RATE,
+                _pidControl->runFast(
+                        1 / (float)PID_FAST_UPDATE_RATE,
                         siminfo.flightMode,
                         state,
                         siminfo.setpoint,
@@ -135,6 +121,27 @@ class Simulator {
                     _dynamics.reset();
                 }
             }
+        }
+
+        vehicleState_t getVehicleState()
+        {
+            const auto d = _dynamics;
+
+            return vehicleState_t {
+                0, // x
+                d.state.dx,
+                0, // y
+                d.state.dy,
+                d.state.z,                     
+                d.state.dz,                   
+                Num::RAD2DEG* d.state.phi, 
+                Num::RAD2DEG* d.state.dphi, 
+                Num::RAD2DEG* d.state.theta, 
+                Num::RAD2DEG* d.state.dtheta,
+                Num::RAD2DEG* d.state.psi,   
+                Num::RAD2DEG* d.state.dpsi
+            };
+
         }
 
         static void report_fps()
