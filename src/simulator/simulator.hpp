@@ -72,10 +72,7 @@ class Simulator {
                 for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
 
                     float motors[4] = {};
-
-                    if (siminfo.flightMode != MODE_IDLE) {
-                        runFastPids(state, siminfo, demands, motors);
-                    }
+                    runFastPids(state, siminfo, demands, motors);
 
                     // Run dynamics in inner loop
                     for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
