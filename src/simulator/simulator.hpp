@@ -64,26 +64,28 @@ class Simulator {
             for (uint32_t i=0; i<PID_SLOW_UPDATE_RATE/siminfo.framerate; ++i) {
 
                 const auto state =  getVehicleState();
-                demands_t demands = {};
+                demands_t slowDemands = {};
 
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
                     siminfo.flightMode == MODE_AUTONOMOUS;
 
                 _pidControl->runSlow(1 / (float)PID_SLOW_UPDATE_RATE,
-                        controlled, state, siminfo.setpoint, demands);
+                        controlled, state, siminfo.setpoint, slowDemands);
 
                 // Run fast PID control in middle loop -----------------------
                 for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
 
-                    _pidControl->runFast(1 / (float)PID_FAST_UPDATE_RATE,
-                            controlled, state, siminfo.setpoint, demands);
+                    demands_t fastDemands = {};
 
-                    demands.roll *= Num::DEG2RAD;
-                    demands.pitch *= Num::DEG2RAD;
-                    demands.yaw *= Num::DEG2RAD;
+                    _pidControl->runFast(1 / (float)PID_FAST_UPDATE_RATE,
+                            controlled, state, siminfo.setpoint, fastDemands);
+
+                    fastDemands.roll *= Num::DEG2RAD;
+                    fastDemands.pitch *= Num::DEG2RAD;
+                    fastDemands.yaw *= Num::DEG2RAD;
 
                     float motors[4] = {};
-                    Mixer::mix(demands, motors);
+                    Mixer::mix(fastDemands, motors);
 
                     if (_dynamics.state.z < 0) {
                         _dynamics.reset();
