@@ -35,7 +35,6 @@ void setDemands(float t, float r, float p, float y)
 
 void copilot_step_core();
 
-
 class PidControl {
 
     public:
