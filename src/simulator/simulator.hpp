@@ -64,20 +64,24 @@ class Simulator {
 
             demands_t demands = {};
 
-            // Run PID control in outer loop
-            for (uint32_t i=0; i<PID_FAST_UPDATE_RATE/siminfo.framerate; ++i) {
+            // Run slow PID control in outer loop
+            for (uint32_t i=0; i<PID_SLOW_UPDATE_RATE/siminfo.framerate; ++i) {
 
-                float motors[4] = {};
+                // Run fast PID control in middle loop
+                for (uint32_t j=0; j<PID_FAST_UPDATE_RATE/PID_SLOW_UPDATE_RATE; ++j) {
 
-                if (siminfo.flightMode != MODE_IDLE) {
-                    runPids(state, siminfo, demands, motors);
-                }
+                    float motors[4] = {};
 
-                // Run dynamics in inner loop
-                for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
+                    if (siminfo.flightMode != MODE_IDLE) {
+                        runPids(state, siminfo, demands, motors);
+                    }
 
-                    _dynamics.update(motors, Mixer::rotorCount,
-                            Mixer::roll, Mixer::pitch, Mixer::yaw);
+                    // Run dynamics in inner loop
+                    for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_UPDATE_RATE; ++k) {
+
+                        _dynamics.update(motors, Mixer::rotorCount,
+                                Mixer::roll, Mixer::pitch, Mixer::yaw);
+                    }
                 }
             }
 
