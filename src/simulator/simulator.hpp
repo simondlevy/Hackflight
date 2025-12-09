@@ -110,9 +110,12 @@ class Simulator {
         void runSlowPids(const vehicleState_t & state, const siminfo_t & siminfo,
                 demands_t & demands)
         {
-            (void)state;
-            (void)siminfo;
-            (void)demands;
+            _pidControl->runSlow(
+                    1 / (float)PID_SLOW_UPDATE_RATE,
+                    siminfo.flightMode,
+                    state,
+                    siminfo.setpoint,
+                    demands);
         }
 
          void runFastPids(const vehicleState_t & state, const siminfo_t & siminfo,
