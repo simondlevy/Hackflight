@@ -29,7 +29,21 @@ class PidControl {
 
     public:
 
-        void run(
+        void runSlow(
+                const float dt,
+                const flightMode_t flightMode,
+                const vehicleState_t & vehicleState,
+                const demands_t & setpointDemands,
+                demands_t & demands)
+        {
+                (void)dt;
+                (void) flightMode;
+                (void)vehicleState;
+                (void)setpointDemands;
+                (void)demands;
+        }
+
+         void runFast(
                 const float dt,
                 const flightMode_t flightMode,
                 const vehicleState_t & vehicleState,
@@ -39,17 +53,13 @@ class PidControl {
             const bool controlled = flightMode == MODE_HOVERING ||
                 flightMode == MODE_AUTONOMOUS;
 
+            // ---------------------------------------------------------------
+
             const auto climbrate = AltitudeController::run(controlled,
                     dt, vehicleState.z, setpointDemands.thrust);
 
-            demands.thrust = ClimbRateController::run(controlled, dt,
-                    vehicleState.z, vehicleState.dz, climbrate);
-
             const auto yaw = YawAngleController::run(
                     dt, vehicleState.psi, setpointDemands.yaw);
-
-            demands.yaw =
-                YawRateController::run(dt, vehicleState.dpsi, yaw);
 
             PositionController::run(
                     dt,
@@ -64,11 +74,19 @@ class PidControl {
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
 
+            // ---------------------------------------------------------------
+
+            demands.thrust = ClimbRateController::run(controlled, dt,
+                    vehicleState.z, vehicleState.dz, climbrate);
+
             PitchRollRateController::run(
                     dt,
                     vehicleState.dphi, vehicleState.dtheta,
                     demands.roll, demands.pitch,
                     demands.roll, demands.pitch);
+            demands.yaw =
+                YawRateController::run(dt, vehicleState.dpsi, yaw);
+
         }
 
         void serializeMessage(MspSerializer & serializer)

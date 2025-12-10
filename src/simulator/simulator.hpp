@@ -26,15 +26,16 @@
 #include <num.hpp>
 #include <mixers/crazyflie.hpp>
 #include <simulator/dynamics.hpp>
-#include <vehicles/diyquad.hpp>
+#include <vehicles/crazyflie.hpp>
 
 class Simulator {
 
     private:
 
-        static constexpr float DYNAMICS_RATE = 100000; // Hz
+        static constexpr float DYNAMICS_RATE = 1e5; // Hz
 
-        static const int PID_UPDATE_RATE = 1000;  // 1024 Plank 
+        static constexpr float PID_FAST_RATE = 1e3;  // 1024 Plank 
+        static constexpr float PID_SLOW_RATE = 1e2;
 
     public:
 
@@ -49,28 +50,45 @@ class Simulator {
 
         } pose_t;
 
-        void init(PidControl * closedLoopControl)
+        void init(PidControl * pidControl)
         {
 
-            _closedLoopControl = closedLoopControl;
+            _pidControl = pidControl;
 
-            _closedLoopControl->init();
+            _pidControl->init();
         }
 
         pose_t step(const siminfo_t & siminfo)
         {
+            // Run slow PID control in outer loop ----------------------------
+            for (uint32_t i=0; i<PID_SLOW_RATE/siminfo.framerate; ++i) {
 
-            // Run control in outer loop
-            for (uint32_t j=0; j<PID_UPDATE_RATE/siminfo.framerate; ++j) {
+                const auto state =  getVehicleState();
+                demands_t slowDemands = {};
 
-                float motors[4] = {};
-                outerLoop(siminfo, motors);
+                const bool controlled = siminfo.flightMode == MODE_HOVERING ||
+                    siminfo.flightMode == MODE_AUTONOMOUS;
 
-                // Run dynamics in inner loop
-                for (uint32_t k=0; k<DYNAMICS_RATE/PID_UPDATE_RATE; ++k) {
+                _pidControl->runSlow(1 / (float)PID_SLOW_RATE,
+                        controlled, state, siminfo.setpoint, slowDemands);
 
-                    _dynamics.update(motors, Mixer::rotorCount,
-                            Mixer::roll, Mixer::pitch, Mixer::yaw);
+                // Run fast PID control and mixer in middle loop --------------
+                for (uint32_t j=0; j<PID_FAST_RATE/PID_SLOW_RATE; ++j) {
+
+                    demands_t fastDemands = {};
+
+                    _pidControl->runFast(1 / (float)PID_FAST_RATE,
+                            controlled, state, slowDemands, fastDemands);
+
+                    float motors[4] = {};
+                    Mixer::mix(fastDemands, motors);
+
+                    // Run dynamics in inner loop ----------------------------
+                    for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_RATE; ++k) {
+
+                        _dynamics.update(motors, Mixer::rotorCount,
+                                Mixer::roll, Mixer::pitch, Mixer::yaw);
+                    }
                 }
             }
 
@@ -93,13 +111,13 @@ class Simulator {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
 
-        PidControl * _closedLoopControl;
+        PidControl * _pidControl;
 
-        void outerLoop(const siminfo_t & siminfo, float * motors)
+        vehicleState_t getVehicleState()
         {
             const auto d = _dynamics;
 
-            const vehicleState_t state =  {
+            return vehicleState_t {
                 0, // x
                 d.state.dx,
                 0, // y
@@ -114,27 +132,6 @@ class Simulator {
                 Num::RAD2DEG* d.state.dpsi
             };
 
-            demands_t demands = {};
-
-            if (siminfo.flightMode != MODE_IDLE) {
-
-                _closedLoopControl->run(
-                        1 / (float)PID_UPDATE_RATE,
-                        siminfo.flightMode,
-                        state,
-                        siminfo.setpoint,
-                        demands);
-
-                demands.roll *= Num::DEG2RAD;
-                demands.pitch *= Num::DEG2RAD;
-                demands.yaw *= Num::DEG2RAD;
-
-                Mixer::mix(demands, motors);
-
-                if (_dynamics.state.z < 0) {
-                    _dynamics.reset();
-                }
-            }
         }
 
         static void report_fps()

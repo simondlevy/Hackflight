@@ -18,7 +18,7 @@
 #pragma once
 
 #include <num.hpp>
-#include <vehicles/diyquad.hpp>
+#include <vehicles/crazyflie.hpp>
 
 class ClimbRateController {
 
@@ -30,7 +30,7 @@ class ClimbRateController {
          * characteristics.
          */
         static float run(
-                const bool hovering,
+                const bool controlled,
                 const float dt,
                 const float z,
                 const float dz,
@@ -38,7 +38,7 @@ class ClimbRateController {
         {
             static float _integral;
 
-            const auto airborne = hovering || (z > LANDING_ALTITUDE_METERS);
+            const auto airborne = controlled || (z > LANDING_ALTITUDE_METERS);
 
             const auto error = demand - dz;
 
