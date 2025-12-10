@@ -114,14 +114,20 @@ class Hackflight {
             // Check for lost contact
             if (_command.timestamp > 0 &&
                     millis() - _command.timestamp > COMMAND_TIMEOUT_MSEC) {
-                _flightMode = MODE_LOST_CONTACT;
+                _flightMode = MODE_PANIC;
+            }
+
+            // Check for flipped over
+            if (isFlippedAngle(_vehicleState.theta) ||
+                    isFlippedAngle(_vehicleState.phi)) {
+                _flightMode = MODE_PANIC;
             }
 
             switch (_flightMode) {
 
                 case MODE_IDLE:
-                    if (_command.armed && isSafeAngle(_vehicleState.phi) &&
-                            isSafeAngle(_vehicleState.theta)) {
+                    if (_command.armed && isSafeTakeoffAngle(_vehicleState.phi) &&
+                            isSafeTakeoffAngle(_vehicleState.theta)) {
                         _flightMode = MODE_ARMED;
                     }
                     runMotors(motorCount, _motorvals);
@@ -148,8 +154,12 @@ class Hackflight {
                             mixFun, _flightMode, _pidControl, _motorvals);
                     break;
 
-                case MODE_LOST_CONTACT:
+                case MODE_PANIC:
                     // No way to recover from this
+                    for (uint8_t k=0; k<motorCount; ++k) {
+                        _motorvals[k] = 0;
+                    }
+                    runMotors(motorCount, _motorvals);
                     break;
             }
         }
@@ -185,9 +195,11 @@ class Hackflight {
 
         static const uint8_t TASK_PRIORITY = 5;
         static const uint32_t COMMAND_TIMEOUT_MSEC = 100;
-        static constexpr float STATE_PHITHETA_MAX = 30;
+        static constexpr float TILT_ANGLE_TAKEOFF_MAX = 30;
+        static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+        static constexpr float MAX_SAFE_ANGLE = 75;
 
         static constexpr float MAX_VELOCITY = 10; //meters per second
 
@@ -199,6 +211,7 @@ class Hackflight {
 
         static const int16_t FLOW_OUTLIER_LIMIT = 100;
         static constexpr float FLOW_STD_FIXED = 2.0;
+
 
         typedef struct {
 
@@ -611,9 +624,14 @@ class Hackflight {
             }
         }
 
-        static bool isSafeAngle(float angle)
+        static bool isSafeTakeoffAngle(float angle)
         {
-            return fabs(angle) < STATE_PHITHETA_MAX;
+            return fabs(angle) < TILT_ANGLE_TAKEOFF_MAX;
+        }
+
+        static bool isFlippedAngle(float angle)
+        {
+            return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
         }
 
         void report()

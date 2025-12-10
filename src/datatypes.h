@@ -25,7 +25,7 @@ typedef enum {
     MODE_HOVERING,
     MODE_AUTONOMOUS,
     MODE_LANDING,
-    MODE_LOST_CONTACT
+    MODE_PANIC
 
 } flightMode_t;
 
