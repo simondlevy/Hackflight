@@ -82,7 +82,6 @@ class Hackflight {
 
             static flightMode_t _flightMode;
             static float _motorvals[MAX_MOTOR_COUNT];
-            static demands_t _demands;
             static bool _isFlying;
             static PidControl _pidControl;
             static vehicleState_t _vehicleState;
@@ -138,8 +137,7 @@ class Hackflight {
 
                 case MODE_HOVERING:
                     runPidAndMixer(_command, _vehicleState, motorCount,
-                            mixFun, _flightMode, _pidControl, _demands,
-                            _motorvals);
+                            mixFun, _flightMode, _pidControl, _motorvals);
                     if (!_command.hovering) {
                         _flightMode = MODE_LANDING;
                     }
@@ -147,8 +145,7 @@ class Hackflight {
 
                 case MODE_LANDING:
                     runPidAndMixer(_command, _vehicleState, motorCount,
-                            mixFun, _flightMode, _pidControl, _demands,
-                            _motorvals);
+                            mixFun, _flightMode, _pidControl, _motorvals);
                     break;
 
                 case MODE_LOST_CONTACT:
@@ -371,10 +368,11 @@ class Hackflight {
                 const mixFun_t mixFun,
                 flightMode_t & flightMode,
                 PidControl & control,
-                demands_t & demands,
                 float *motorvals)
         {
             static Timer _timer;
+
+            static demands_t _demands;
 
             if (_timer.ready(PID_FAST_FREQ)) {
 
@@ -382,9 +380,9 @@ class Hackflight {
                     flightMode == MODE_AUTONOMOUS;
 
                 control.runFast(1.f / PID_FAST_FREQ, controlled, state,
-                        command.setpoint, demands);
+                        command.setpoint, _demands);
 
-                runMixer(motorCount, mixFun, demands, motorvals);
+                runMixer(motorCount, mixFun, _demands, motorvals);
 
                 runMotors(motorCount, motorvals);
 
