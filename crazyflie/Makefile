@@ -46,6 +46,9 @@ haskell_config: copilot_core.cpp
 lowres_config:
 	cp $(SRC)/pid/lowres/pid.hpp ./__pid__.hpp
 
+slowfast_config:
+	cp $(SRC)/pid/slowfast/pid.hpp ./__pid__.hpp
+
 standard_config:
 	cp $(SRC)/pid/standard/pid.hpp ./__pid__.hpp
 

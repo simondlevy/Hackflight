@@ -370,19 +370,29 @@ class Hackflight {
                 PidControl & control,
                 float *motorvals)
         {
-            static Timer _timer;
+            const bool controlled = flightMode == MODE_HOVERING ||
+                flightMode == MODE_AUTONOMOUS;
 
-            if (_timer.ready(PID_FAST_FREQ)) {
+            static Timer _timerSlow;
 
-                const bool controlled = flightMode == MODE_HOVERING ||
-                    flightMode == MODE_AUTONOMOUS;
+            static demands_t _demandsSlow;
 
-                demands_t demands = {};
+            if (_timerSlow.ready(PID_SLOW_FREQ)) {
+
+                control.runSlow(1.f / PID_SLOW_FREQ, controlled, state,
+                        command.setpoint, _demandsSlow);
+            }
+
+            static Timer _timerFast;
+
+            if (_timerFast.ready(PID_FAST_FREQ)) {
+
+                demands_t demandsFast = {};
 
                 control.runFast(1.f / PID_FAST_FREQ, controlled, state,
-                        command.setpoint, demands);
+                        _demandsSlow, demandsFast);
 
-                runMixer(motorCount, mixFun, demands, motorvals);
+                runMixer(motorCount, mixFun, demandsFast, motorvals);
 
                 runMotors(motorCount, motorvals);
 
