@@ -49,7 +49,6 @@ class Simulator {
 
         void init(PidControl * pidControl)
         {
-
             _pidControl = pidControl;
 
             _pidControl->init();

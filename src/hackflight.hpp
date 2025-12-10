@@ -208,7 +208,7 @@ class Hackflight {
             uint32_t timestamp;
             bool armed;
             bool hovering;
-            demands_t demands;
+            demands_t setpoint;
 
         } command_t;
 
@@ -311,8 +311,6 @@ class Hackflight {
             return false;
         }
 
-
-
         void getStateEstimate(
                 const bool isFlying,
                 vehicleState_t & state,
@@ -384,7 +382,7 @@ class Hackflight {
                     flightMode == MODE_AUTONOMOUS;
 
                 control.runFast(1.f / PID_FAST_FREQ, controlled, state,
-                        command.demands, demands);
+                        command.setpoint, demands);
 
                 runMixer(motorCount, mixFun, demands, motorvals);
 
@@ -592,10 +590,10 @@ class Hackflight {
 
                         case MSP_SET_SETPOINT:
                             command.hovering = true;
-                            command.demands.pitch = commandParser.getFloat(0);
-                            command.demands.roll = commandParser.getFloat(1);
-                            command.demands.yaw = commandParser.getFloat(2);
-                            command.demands.thrust = commandParser.getFloat(3);
+                            command.setpoint.pitch = commandParser.getFloat(0);
+                            command.setpoint.roll = commandParser.getFloat(1);
+                            command.setpoint.yaw = commandParser.getFloat(2);
+                            command.setpoint.thrust = commandParser.getFloat(3);
                             command.timestamp = millis();
                             break;
 
