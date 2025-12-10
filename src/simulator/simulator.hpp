@@ -21,10 +21,10 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <pid.hpp>
 #include <datatypes.h>
-#include <num.hpp>
 #include <mixers/crazyflie.hpp>
+#include <num.hpp>
+#include <pid.hpp>
 #include <simulator/dynamics.hpp>
 #include <vehicles/crazyflie.hpp>
 
@@ -32,10 +32,7 @@ class Simulator {
 
     private:
 
-        static constexpr float DYNAMICS_RATE = 1e5; // Hz
-
-        static constexpr float PID_FAST_RATE = 1e3;  // 1024 Plank 
-        static constexpr float PID_SLOW_RATE = 1e2;
+        static constexpr float DYNAMICS_FREQ = 1e5; // Hz
 
     public:
 
@@ -61,7 +58,7 @@ class Simulator {
         pose_t step(const siminfo_t & siminfo)
         {
             // Run slow PID control in outer loop ----------------------------
-            for (uint32_t i=0; i<PID_SLOW_RATE/siminfo.framerate; ++i) {
+            for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
 
                 const auto state =  getVehicleState();
                 demands_t slowDemands = {};
@@ -69,22 +66,22 @@ class Simulator {
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
                     siminfo.flightMode == MODE_AUTONOMOUS;
 
-                _pidControl->runSlow(1 / (float)PID_SLOW_RATE,
+                _pidControl->runSlow(1 / (float)PID_SLOW_FREQ,
                         controlled, state, siminfo.setpoint, slowDemands);
 
                 // Run fast PID control and mixer in middle loop --------------
-                for (uint32_t j=0; j<PID_FAST_RATE/PID_SLOW_RATE; ++j) {
+                for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                     demands_t fastDemands = {};
 
-                    _pidControl->runFast(1 / (float)PID_FAST_RATE,
+                    _pidControl->runFast(1 / (float)PID_FAST_FREQ,
                             controlled, state, slowDemands, fastDemands);
 
                     float motors[4] = {};
                     Mixer::mix(fastDemands, motors);
 
                     // Run dynamics in inner loop ----------------------------
-                    for (uint32_t k=0; k<DYNAMICS_RATE/PID_FAST_RATE; ++k) {
+                    for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
                         _dynamics.update(motors, Mixer::rotorCount,
                                 Mixer::roll, Mixer::pitch, Mixer::yaw);
@@ -109,7 +106,7 @@ class Simulator {
             "LOST_CONTACT"
         };
 
-        Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_RATE);
+        Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
         PidControl * _pidControl;
 

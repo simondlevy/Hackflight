@@ -176,10 +176,12 @@ class Hackflight {
 
     private:
 
+        // Crucial frequencies
         static constexpr float FLYING_MODE_FREQ = 25;
-        static constexpr float CORE_FREQ = 1000;
         static constexpr float COMMS_FREQ = 100;
+        static const uint32_t EKF_PREDICTION_FREQ = 100;
 
+        // LED Status indicator
         static constexpr float LED_HEARTBEAT_FREQ = 1;
         static constexpr float LED_IMU_CALIBRATING_FREQ = 3;
         static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
@@ -189,10 +191,6 @@ class Hackflight {
         static constexpr float STATE_PHITHETA_MAX = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-        static const auto CLOSED_LOOP_UPDATE_FREQ = 500;
-
-        // this is slower than the IMU update rate of 1000Hz
-        static const uint32_t EKF_PREDICTION_FREQ = 100;
 
         static constexpr float MAX_VELOCITY = 10; //meters per second
 
@@ -380,14 +378,13 @@ class Hackflight {
         {
             static Timer _timer;
 
-            if (_timer.ready(CLOSED_LOOP_UPDATE_FREQ)) {
+            if (_timer.ready(PID_FAST_FREQ)) {
 
                 const bool controlled = flightMode == MODE_HOVERING ||
                     flightMode == MODE_AUTONOMOUS;
 
-                control.runFast(1.f / CLOSED_LOOP_UPDATE_FREQ,
-                        controlled, state, command.demands,
-                        demands);
+                control.runFast(1.f / PID_FAST_FREQ, controlled, state,
+                        command.demands, demands);
 
                 runMixer(motorCount, mixFun, demands, motorvals);
 

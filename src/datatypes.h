@@ -89,6 +89,9 @@ static const float STATE_DPHITHETA_MAX = 250;
 static const float STATE_PSI_MAX = 180;
 static const float STATE_DPSI_MAX = 250;
 
+static constexpr float PID_FAST_FREQ = 500;  // 1024 Plank 
+static constexpr float PID_SLOW_FREQ = 100;
+
 typedef struct {
     uint32_t timestamp;
     union {
