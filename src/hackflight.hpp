@@ -409,7 +409,7 @@ class Hackflight {
 
                 runMotors(motorCount, motorvals);
 
-                checkDisarm(command, motorCount, flightMode, motorvals);
+                //checkDisarm(command, motorCount, flightMode, motorvals);
             }
         }
 
