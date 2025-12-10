@@ -382,7 +382,7 @@ class Hackflight {
 
             if (_timer.ready(CLOSED_LOOP_UPDATE_FREQ)) {
 
-                control.run(1.f / CLOSED_LOOP_UPDATE_FREQ,
+                control.runFast(1.f / CLOSED_LOOP_UPDATE_FREQ,
                         flightMode, state, command.demands,
                         demands);
 
