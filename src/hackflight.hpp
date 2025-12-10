@@ -372,17 +372,17 @@ class Hackflight {
         {
             static Timer _timer;
 
-            static demands_t _demands;
-
             if (_timer.ready(PID_FAST_FREQ)) {
 
                 const bool controlled = flightMode == MODE_HOVERING ||
                     flightMode == MODE_AUTONOMOUS;
 
-                control.runFast(1.f / PID_FAST_FREQ, controlled, state,
-                        command.setpoint, _demands);
+                demands_t demands = {};
 
-                runMixer(motorCount, mixFun, _demands, motorvals);
+                control.runFast(1.f / PID_FAST_FREQ, controlled, state,
+                        command.setpoint, demands);
+
+                runMixer(motorCount, mixFun, demands, motorvals);
 
                 runMotors(motorCount, motorvals);
 
@@ -476,8 +476,7 @@ class Hackflight {
             return result;
         }        
 
-        void runLogger(const vehicleState_t & state,
-                PidControl & control)
+        void runLogger(const vehicleState_t & state, PidControl & control)
         {
             static Timer _timer;
 
