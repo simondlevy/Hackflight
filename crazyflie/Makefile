@@ -65,3 +65,6 @@ clean:
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
+
+edit:
+	vim crazyflie.ino
