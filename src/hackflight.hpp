@@ -130,17 +130,12 @@ class Hackflight {
                             isSafeTakeoffAngle(_vehicleState.theta)) {
                         _flightMode = MODE_ARMED;
                     }
-                    for (uint8_t k=0; k<motorCount; ++k) {
-                        _motorvals[k] = 0;
-                    }
+                    stopMotors(motorCount, _motorvals);
                     break;
 
                 case MODE_ARMED:
                     if (!_command.armed) {
                         _flightMode = MODE_IDLE;
-                        for (uint8_t k=0; k<motorCount; ++k) {
-                            _motorvals[k] = 0;
-                        }
                     }
                     if (_command.hovering) {
                         _flightMode = MODE_HOVERING;
@@ -165,13 +160,14 @@ class Hackflight {
 
                 case MODE_PANIC:
                     // No way to recover from this
-                    for (uint8_t k=0; k<motorCount; ++k) {
-                        _motorvals[k] = 0;
-                    }
+                    stopMotors(motorCount, _motorvals);
                     break;
             }
 
-            runMotors(motorCount, _motorvals);
+            for (uint8_t k=0; k<motorCount; ++k) {
+                motors_setSpeed(k, _motorvals[k]);
+            }
+            motors_run();
         }
 
         void task2()
@@ -419,14 +415,6 @@ class Hackflight {
             }
         }
 
-        void runMotors(const uint8_t motorCount, float * motorvals)
-        {
-            for (uint8_t k=0; k<motorCount; ++k) {
-                motors_setSpeed(k, motorvals[k]);
-            }
-            motors_run();
-        }
-
         void runMixer(
                 const uint8_t motorCount,
                 const mixFun_t mixFun,
@@ -613,6 +601,13 @@ class Hackflight {
                             break;
                     }
                 }
+            }
+        }
+
+        void stopMotors(const uint8_t motorCount, float * motorvals)
+        {
+            for (uint8_t k=0; k<motorCount; ++k) {
+                motorvals[k] = 0;
             }
         }
 
