@@ -134,7 +134,12 @@ class Hackflight {
                     break;
 
                 case MODE_ARMED:
-                    checkDisarm(_command, motorCount, _flightMode, _motorvals);
+                    if (!_command.armed) {
+                        _flightMode = MODE_IDLE;
+                        for (uint8_t k=0; k<motorCount; ++k) {
+                            _motorvals[k] = 0;
+                        }
+                    }
                     if (_command.hovering) {
                         _flightMode = MODE_HOVERING;
                     }
@@ -408,8 +413,6 @@ class Hackflight {
                 runMixer(motorCount, mixFun, demandsFast, motorvals);
 
                 runMotors(motorCount, motorvals);
-
-                //checkDisarm(command, motorCount, flightMode, motorvals);
             }
         }
 
@@ -448,20 +451,6 @@ class Hackflight {
             for (uint8_t k = 0; k < motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
-            }
-        }
-
-        void checkDisarm(
-                const command_t command,
-                const uint8_t motorCount,
-                flightMode_t &flightMode,
-                float * motorvals)
-        {
-            if (!command.armed) {
-                flightMode = MODE_IDLE;
-                for (uint8_t k=0; k<motorCount; ++k) {
-                    motorvals[k] = 0;
-                }
             }
         }
 
