@@ -19,7 +19,7 @@ include ../snn_path.makefile
 any:
 	echo "Please specify cf2 or bolt"
 
-bolt:  $(DEPS) bolt/*.cpp 
+bolt: $(DEPS) bolt11/*.* 
 	cp bolt/motors.cpp ./__motors__.cpp
 	arduino-cli compile \
 		--build-property build.extra_flags=-DBOLT \
@@ -28,8 +28,9 @@ bolt:  $(DEPS) bolt/*.cpp
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-cf2: $(DEPS) cf2/*.cpp
-	cp cf2/motors.cpp ./__motors__.cpp
+cf2: $(DEPS) crazyflie2/*.*
+	cp crazyflie2/motors.cpp ./__motors__.cpp
+	cp crazyflie2/uart_pins.h ./__uart_pins__.h
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \

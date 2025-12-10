@@ -20,6 +20,7 @@
 #include <hackflight.hpp>
 #include <free_rtos_task.hpp>
 #include <mixers/crazyflie.hpp>
+#include "__uart_pins__.h"
 
 static Hackflight hackflight;
 
@@ -46,7 +47,7 @@ static void runTask2(void *)
 
 void setup() 
 {
-    static HardwareSerial uart = HardwareSerial(PA3, PA2);
+    static HardwareSerial uart = HardwareSerial(RX_PIN, TX_PIN);
 
     static SPIClass spi = SPIClass(PA7, PA6, PA5);
 
