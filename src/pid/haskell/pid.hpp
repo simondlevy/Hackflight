@@ -42,24 +42,24 @@ class PidControl {
 
         void runSlow(
                 const float dt,
-                const flightMode_t flightMode,
+                const bool controlled,
                 const vehicleState_t & vehicleState,
-                const demands_t & setpointDemands,
-                demands_t & demands)
+                const demands_t & demandsIn,
+                demands_t & demandsOut)
         {
                 (void)dt;
-                (void) flightMode;
+                (void)controlled;
                 (void)vehicleState;
-                (void)setpointDemands;
-                (void)demands;
+
+                memcpy(&demandsOut, &demandsIn, sizeof(demands_t));
         }
 
         void runFast(
                 const float dt,
-                const flightMode_t flightMode,
+                const bool controlled,
                 const vehicleState_t & vehicleState,
-                const demands_t & setpointDemands,
-                demands_t & demands)
+                const demands_t & demandsIn,
+                demands_t & demandsOut)
         {
             extern float stream_dt;
 
@@ -83,13 +83,12 @@ class PidControl {
 
             stream_dt = dt;
 
-            stream_controlled = flightMode == MODE_HOVERING || 
-                flightMode == MODE_AUTONOMOUS;
+            stream_controlled = controlled;
 
-            stream_thrust = setpointDemands.thrust;
-            stream_roll = setpointDemands.roll;
-            stream_pitch = setpointDemands.pitch;
-            stream_yaw = setpointDemands.yaw;
+            stream_thrust = demandsIn.thrust;
+            stream_roll = demandsIn.roll;
+            stream_pitch = demandsIn.pitch;
+            stream_yaw = demandsIn.yaw;
 
             stream_dx = vehicleState.dx;
             stream_dy = vehicleState.dy;
@@ -105,7 +104,7 @@ class PidControl {
             // This will call setDemands() defined above
             copilot_step_core();
 
-            memcpy(&demands, &_demands, sizeof(demands_t));
+            memcpy(&demandsOut, &_demands, sizeof(demands_t));
         }
 
         void serializeMessage(MspSerializer & serializer)

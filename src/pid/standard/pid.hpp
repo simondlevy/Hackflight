@@ -31,60 +31,58 @@ class PidControl {
 
         void runSlow(
                 const float dt,
-                const flightMode_t flightMode,
+                const bool controlled,
                 const vehicleState_t & vehicleState,
-                const demands_t & setpointDemands,
-                demands_t & demands)
+                const demands_t & demandsIn,
+                demands_t & demandsOut)
         {
                 (void)dt;
-                (void) flightMode;
+                (void) controlled;
                 (void)vehicleState;
-                (void)setpointDemands;
-                (void)demands;
+
+                memcpy(&demandsOut, &demandsIn, sizeof(demands_t));
         }
 
          void runFast(
                 const float dt,
-                const flightMode_t flightMode,
+                const bool controlled,
                 const vehicleState_t & vehicleState,
-                const demands_t & setpointDemands,
-                demands_t & demands)
+                const demands_t & demandsIn,
+                demands_t & demandsOut)
         {
-            const bool controlled = flightMode == MODE_HOVERING ||
-                flightMode == MODE_AUTONOMOUS;
-
             // ---------------------------------------------------------------
 
             const auto climbrate = AltitudeController::run(controlled,
-                    dt, vehicleState.z, setpointDemands.thrust);
+                    dt, vehicleState.z, demandsIn.thrust);
 
             const auto yaw = YawAngleController::run(
-                    dt, vehicleState.psi, setpointDemands.yaw);
+                    dt, vehicleState.psi, demandsIn.yaw);
 
             PositionController::run(
                     dt,
                     vehicleState.dx, vehicleState.dy, vehicleState.psi,
-                    controlled ? setpointDemands.pitch : 0,
-                    controlled ? setpointDemands.roll : 0,
-                    demands.roll, demands.pitch);
+                    controlled ? demandsIn.pitch : 0,
+                    controlled ? demandsIn.roll : 0,
+                    demandsOut.roll, demandsOut.pitch);
 
             PitchRollAngleController::run(
                     dt,
                     vehicleState.phi, vehicleState.theta,
-                    demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
+                    demandsOut.roll, demandsOut.pitch,
+                    demandsOut.roll, demandsOut.pitch);
 
             // ---------------------------------------------------------------
 
-            demands.thrust = ClimbRateController::run(controlled, dt,
+            demandsOut.thrust = ClimbRateController::run(controlled, dt,
                     vehicleState.z, vehicleState.dz, climbrate);
 
             PitchRollRateController::run(
                     dt,
                     vehicleState.dphi, vehicleState.dtheta,
-                    demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
-            demands.yaw =
+                    demandsOut.roll, demandsOut.pitch,
+                    demandsOut.roll, demandsOut.pitch);
+
+            demandsOut.yaw =
                 YawRateController::run(dt, vehicleState.dpsi, yaw);
 
         }

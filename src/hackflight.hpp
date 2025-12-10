@@ -137,7 +137,7 @@ class Hackflight {
                     break;
 
                 case MODE_HOVERING:
-                    runClosedLoopAndMixer(_command, _vehicleState, motorCount,
+                    runPidAndMixer(_command, _vehicleState, motorCount,
                             mixFun, _flightMode, _pidControl, _demands,
                             _motorvals);
                     if (!_command.hovering) {
@@ -146,7 +146,7 @@ class Hackflight {
                     break;
 
                 case MODE_LANDING:
-                    runClosedLoopAndMixer(_command, _vehicleState, motorCount,
+                    runPidAndMixer(_command, _vehicleState, motorCount,
                             mixFun, _flightMode, _pidControl, _demands,
                             _motorvals);
                     break;
@@ -368,7 +368,7 @@ class Hackflight {
             return fabs(vel) < MAX_VELOCITY;
         }
 
-        void runClosedLoopAndMixer(
+        void runPidAndMixer(
                 const command_t &command,
                 const vehicleState_t & state,
                 const uint8_t motorCount,
@@ -382,8 +382,11 @@ class Hackflight {
 
             if (_timer.ready(CLOSED_LOOP_UPDATE_FREQ)) {
 
+                const bool controlled = flightMode == MODE_HOVERING ||
+                    flightMode == MODE_AUTONOMOUS;
+
                 control.runFast(1.f / CLOSED_LOOP_UPDATE_FREQ,
-                        flightMode, state, command.demands,
+                        controlled, state, command.demands,
                         demands);
 
                 runMixer(motorCount, mixFun, demands, motorvals);
