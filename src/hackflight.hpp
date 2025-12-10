@@ -133,7 +133,6 @@ class Hackflight {
                     for (uint8_t k=0; k<motorCount; ++k) {
                         _motorvals[k] = 0;
                     }
-                    runMotors(motorCount, _motorvals);
                     break;
 
                 case MODE_ARMED:
@@ -146,7 +145,6 @@ class Hackflight {
                     if (_command.hovering) {
                         _flightMode = MODE_HOVERING;
                     }
-                    runMotors(motorCount, _motorvals);
                     break;
 
                 case MODE_HOVERING:
@@ -158,7 +156,7 @@ class Hackflight {
                     if (!_command.armed) {
                         _flightMode = MODE_IDLE;
                     }
-                     break;
+                    break;
 
                 case MODE_LANDING:
                     runPidAndMixer(_command, _vehicleState, motorCount,
@@ -170,9 +168,10 @@ class Hackflight {
                     for (uint8_t k=0; k<motorCount; ++k) {
                         _motorvals[k] = 0;
                     }
-                    runMotors(motorCount, _motorvals);
                     break;
             }
+
+            runMotors(motorCount, _motorvals);
         }
 
         void task2()
@@ -417,8 +416,6 @@ class Hackflight {
                         _demandsSlow, demandsFast);
 
                 runMixer(motorCount, mixFun, demandsFast, motorvals);
-
-                runMotors(motorCount, motorvals);
             }
         }
 
