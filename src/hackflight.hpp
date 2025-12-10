@@ -130,6 +130,9 @@ class Hackflight {
                             isSafeTakeoffAngle(_vehicleState.theta)) {
                         _flightMode = MODE_ARMED;
                     }
+                    for (uint8_t k=0; k<motorCount; ++k) {
+                        _motorvals[k] = 0;
+                    }
                     runMotors(motorCount, _motorvals);
                     break;
 
@@ -152,7 +155,10 @@ class Hackflight {
                     if (!_command.hovering) {
                         _flightMode = MODE_LANDING;
                     }
-                    break;
+                    if (!_command.armed) {
+                        _flightMode = MODE_IDLE;
+                    }
+                     break;
 
                 case MODE_LANDING:
                     runPidAndMixer(_command, _vehicleState, motorCount,
