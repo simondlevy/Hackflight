@@ -148,9 +148,6 @@ class Hackflight {
                     if (!_command.hovering) {
                         _flightMode = MODE_LANDING;
                     }
-                    if (!_command.armed) {
-                        _flightMode = MODE_IDLE;
-                    }
                     break;
 
                 case MODE_LANDING:
@@ -400,6 +397,10 @@ class Hackflight {
 
                 control.runSlow(1.f / PID_SLOW_FREQ, controlled, state,
                         command.setpoint, _demandsSlow);
+
+                if (!command.armed) {
+                    flightMode = MODE_IDLE;
+                }
             }
 
             static Timer _timerFast;
@@ -412,6 +413,7 @@ class Hackflight {
                         _demandsSlow, demandsFast);
 
                 runMixer(motorCount, mixFun, demandsFast, motorvals);
+
             }
         }
 
