@@ -38,6 +38,15 @@ cf2: $(DEPS) crazyflie2/*.*
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
+big: $(DEPS) biggy/*.*
+	cp biggy/motors.cpp ./__motors__.cpp
+	cp biggy/uart_pins.h ./__uart_pins__.h
+	arduino-cli compile \
+		--libraries $(HOME)/Documents/Arduino/libraries \
+		--libraries ../.. \
+		--build-path ./build \
+		--fqbn $(FQBN) $(SKETCH).ino
+
 $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../crazyflie
 	cp ../msppg/messages.h $(MSGS)
