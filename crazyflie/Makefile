@@ -20,7 +20,8 @@ any:
 	echo "Please specify cf2 or bolt"
 
 bolt: $(DEPS) bolt11/*.* 
-	cp bolt/motors.cpp ./__motors__.cpp
+	cp bolt11/motors.cpp ./__motors__.cpp
+	cp bolt11/uart_pins.h ./__uart_pins__.h
 	arduino-cli compile \
 		--build-property build.extra_flags=-DBOLT \
 		--libraries $(HOME)/Documents/Arduino/libraries \
