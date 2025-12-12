@@ -954,119 +954,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x01"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Conn_01x01"
-				(at 0 -2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_1x??_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Conn_01x01_1_1"
-				(rectangle
-					(start -1.27 1.27)
-					(end 1.27 -1.27)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(rectangle
-					(start -1.27 0.127)
-					(end 0 -0.127)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 	)
 	(wire
 		(pts
@@ -1100,16 +987,6 @@
 	)
 	(wire
 		(pts
-			(xy 147.32 128.27) (xy 154.94 128.27)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "25e6bb8f-6b3b-4505-a6a7-3f75acafe251")
-	)
-	(wire
-		(pts
 			(xy 97.79 92.71) (xy 101.6 92.71)
 		)
 		(stroke
@@ -1140,16 +1017,6 @@
 	)
 	(wire
 		(pts
-			(xy 147.32 115.57) (xy 154.94 115.57)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3cf33f42-fdb6-4aeb-8b8e-56b5b69c5108")
-	)
-	(wire
-		(pts
 			(xy 95.25 134.62) (xy 100.33 134.62)
 		)
 		(stroke
@@ -1170,27 +1037,7 @@
 	)
 	(wire
 		(pts
-			(xy 147.32 121.92) (xy 154.94 121.92)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "41ebff3d-0e29-4872-9abb-db779f93ecbf")
-	)
-	(wire
-		(pts
-			(xy 147.32 134.62) (xy 154.94 134.62)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "42b41e39-68f4-47f3-8543-58689733c766")
-	)
-	(wire
-		(pts
-			(xy 173.99 80.01) (xy 179.07 80.01)
+			(xy 121.92 107.95) (xy 127 107.95)
 		)
 		(stroke
 			(width 0)
@@ -1230,16 +1077,6 @@
 	)
 	(wire
 		(pts
-			(xy 195.58 133.35) (xy 203.2 133.35)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6ebdef96-7328-451a-8395-51ccc30966d5")
-	)
-	(wire
-		(pts
 			(xy 95.25 132.08) (xy 100.33 132.08)
 		)
 		(stroke
@@ -1257,16 +1094,6 @@
 			(type default)
 		)
 		(uuid "70943d60-0264-438d-afdf-fce8ec8de3ab")
-	)
-	(wire
-		(pts
-			(xy 147.32 96.52) (xy 154.94 96.52)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7372765b-9731-419d-b233-b6c73a50eca7")
 	)
 	(wire
 		(pts
@@ -1290,17 +1117,7 @@
 	)
 	(wire
 		(pts
-			(xy 147.32 140.97) (xy 154.94 140.97)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "96be7465-a98c-4037-a216-798fa734a881")
-	)
-	(wire
-		(pts
-			(xy 173.99 82.55) (xy 179.07 82.55)
+			(xy 121.92 110.49) (xy 127 110.49)
 		)
 		(stroke
 			(width 0)
@@ -1317,26 +1134,6 @@
 			(type default)
 		)
 		(uuid "9b512584-4005-47db-8f40-4a89a020b239")
-	)
-	(wire
-		(pts
-			(xy 147.32 102.87) (xy 154.94 102.87)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "abce6483-d24a-442f-a242-38eb221fe746")
-	)
-	(wire
-		(pts
-			(xy 195.58 123.19) (xy 203.2 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ae69ba11-5f04-4f84-9b08-91f458e546e9")
 	)
 	(wire
 		(pts
@@ -1360,7 +1157,7 @@
 	)
 	(wire
 		(pts
-			(xy 173.99 77.47) (xy 179.07 77.47)
+			(xy 121.92 105.41) (xy 127 105.41)
 		)
 		(stroke
 			(width 0)
@@ -1440,7 +1237,7 @@
 	)
 	(wire
 		(pts
-			(xy 173.99 74.93) (xy 179.07 74.93)
+			(xy 121.92 102.87) (xy 127 102.87)
 		)
 		(stroke
 			(width 0)
@@ -1498,18 +1295,8 @@
 		)
 		(uuid "268c218d-739f-459f-ad99-a728672423a4")
 	)
-	(label "RX"
-		(at 152.4 134.62 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "2e1bf81f-cab9-4f4d-abfc-ec04569f5581")
-	)
 	(label "VBAT"
-		(at 173.99 82.55 0)
+		(at 121.92 110.49 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1578,16 +1365,6 @@
 		)
 		(uuid "59328882-b3c3-497e-b5e5-a2d4a7b94c50")
 	)
-	(label "5V"
-		(at 152.4 115.57 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "5f6cb7fa-84cb-4f8b-b4ca-6fd2cf90b99b")
-	)
 	(label "VBAT"
 		(at 97.79 92.71 0)
 		(effects
@@ -1599,7 +1376,7 @@
 		(uuid "62b8acc1-90bc-4010-8260-31caf3647a58")
 	)
 	(label "GND"
-		(at 173.99 77.47 0)
+		(at 121.92 105.41 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1608,18 +1385,8 @@
 		)
 		(uuid "64887f57-5c2f-4836-9571-540814abe79c")
 	)
-	(label "GND"
-		(at 151.13 121.92 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "6bcccf44-a39b-4c9e-8702-89b9606466fc")
-	)
 	(label "5V"
-		(at 175.26 74.93 0)
+		(at 123.19 102.87 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1627,16 +1394,6 @@
 			(justify left bottom)
 		)
 		(uuid "75e7015c-812d-42fe-bbfa-37b2fdff6828")
-	)
-	(label "VBAT"
-		(at 198.12 133.35 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "7ab08a48-7c36-41d6-ac2b-2b35ea2b094f")
 	)
 	(label "TX"
 		(at 97.79 134.62 0)
@@ -1657,26 +1414,6 @@
 			(justify left bottom)
 		)
 		(uuid "7fd583d0-bb52-473e-a4d0-4706a6de5f9e")
-	)
-	(label "GND"
-		(at 198.12 123.19 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "8154341d-bdec-4a9b-b1cd-28b168fe6525")
-	)
-	(label "GND"
-		(at 151.13 102.87 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "86119afe-20bd-46d3-a529-d9bca5e11de0")
 	)
 	(label "GND"
 		(at 97.79 90.17 0)
@@ -1759,7 +1496,7 @@
 		(uuid "bf1f9893-d08e-4a76-beef-e6dd14c7f325")
 	)
 	(label "GND"
-		(at 173.99 80.01 0)
+		(at 121.92 107.95 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1777,16 +1514,6 @@
 			(justify left bottom)
 		)
 		(uuid "c13ddf3e-6db5-4569-b2fb-e0afc9a12735")
-	)
-	(label "3V3"
-		(at 151.13 128.27 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "c7f34f6a-6a6c-4065-9d21-b03537d9d129")
 	)
 	(label "M1"
 		(at 120.65 129.54 0)
@@ -1817,26 +1544,6 @@
 			(justify left bottom)
 		)
 		(uuid "d547c013-a05c-4b29-990e-aac0fd67fee3")
-	)
-	(label "5V"
-		(at 152.4 96.52 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "ec4b3ddb-30f1-4bee-bfd9-6ff6acb4b200")
-	)
-	(label "TX"
-		(at 152.4 140.97 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "ed4b6f32-491c-4ed9-b2c4-de2f3cb03033")
 	)
 	(label "SCL"
 		(at 96.52 139.7 0)
@@ -2135,419 +1842,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 208.28 133.35 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "42b0eb90-7deb-411e-b8e6-2fa777df1620")
-		(property "Reference" "VB_PAD1"
-			(at 210.82 132.0799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 210.82 134.6199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 208.28 133.35 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 208.28 133.35 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 208.28 133.35 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "47f1accc-2878-4a7d-9321-5b7e0a01d9f8")
-		)
-		(instances
-			(project "bottom"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 96.52 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "51ac2868-1142-47cd-a266-f3e972576153")
-		(property "Reference" "VB_PAD11"
-			(at 162.56 95.2499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 97.7899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 96.52 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 96.52 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 96.52 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "0a5520c2-a540-49eb-8b7a-680533df1504")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD11")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 102.87 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6432c5d5-6a1f-470b-bae0-1698d95c7aa1")
-		(property "Reference" "VB_PAD12"
-			(at 162.56 101.5999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 104.1399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f0a3628c-97e7-4392-9fcb-1a55f7813565")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD12")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 128.27 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6c966906-da9d-4c6a-b4f0-c53337c64722")
-		(property "Reference" "VB_PAD10"
-			(at 162.56 126.9999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 129.5399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 128.27 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 128.27 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 128.27 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "110497c8-b53c-42be-970a-3a4d1642a06f")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD10")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 121.92 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "91701248-9c92-4883-bfd1-7a885083f3a9")
-		(property "Reference" "VB_PAD9"
-			(at 162.56 120.6499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 123.1899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 121.92 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 121.92 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 121.92 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ea384086-64ca-4520-b0fa-04700f15b871")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 134.62 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a53e2fcf-8ddc-4b02-9c6d-1f4907a15490")
-		(property "Reference" "VB_PAD5"
-			(at 162.56 133.3499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 135.8899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "addca356-3880-430e-ba1c-691777570466")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:Conn_01x03_Socket")
 		(at 106.68 111.76 0)
 		(unit 1)
@@ -2616,144 +1910,6 @@
 			(project ""
 				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
 					(reference "M4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 115.57 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b833935d-43ca-402a-b5c2-f17ddaef4a88")
-		(property "Reference" "VB_PAD8"
-			(at 162.56 114.2999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 116.8399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 115.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "efd83c5f-c6a4-4f76-b8bf-bb9d411831dd")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD8")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 160.02 140.97 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d1345844-698d-43ef-a857-6c5283313bdb")
-		(property "Reference" "VB_PAD6"
-			(at 162.56 139.6999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 162.56 142.2399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 160.02 140.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 160.02 140.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 160.02 140.97 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "63ff7706-5ad1-44a8-98d9-725720835ecf")
-		)
-		(instances
-			(project "crazyflie"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "VB_PAD6")
 					(unit 1)
 				)
 			)
@@ -2908,76 +2064,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x01")
-		(at 208.28 123.19 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "dfb3c027-38ac-42de-8e3e-a376eb8d7a83")
-		(property "Reference" "GND_PAD1"
-			(at 210.82 121.9199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Conn_01x01"
-			(at 210.82 124.4599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_5x10mm"
-			(at 208.28 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 208.28 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 208.28 123.19 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7b25f30e-10ac-45a8-af30-39dfdd440344")
-		)
-		(instances
-			(project "bottom"
-				(path "/afb8e687-4a13-41a1-b8c0-89a749e897fe"
-					(reference "GND_PAD1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:Conn_01x04_Socket")
-		(at 184.15 77.47 0)
+		(at 132.08 105.41 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2986,7 +2074,7 @@
 		(fields_autoplaced yes)
 		(uuid "edd1477d-ceba-4757-a18f-7c7b0d885140")
 		(property "Reference" "J8"
-			(at 185.42 77.4699 0)
+			(at 133.35 105.4099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2996,7 +2084,7 @@
 			)
 		)
 		(property "Value" "Conn_01x04_Socket"
-			(at 185.42 80.0099 0)
+			(at 133.35 107.9499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3006,7 +2094,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical"
-			(at 184.15 77.47 0)
+			(at 132.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3015,7 +2103,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 184.15 77.47 0)
+			(at 132.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3024,7 +2112,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated"
-			(at 184.15 77.47 0)
+			(at 132.08 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
