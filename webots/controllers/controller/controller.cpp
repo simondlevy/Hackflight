@@ -64,10 +64,10 @@ static void showLidar(
             const auto d = distance_mm[k * width + j];
 
             cv::rectangle(img,
-                    cv::Point(j*LIDAR_DISPLAY_SCALEUP,
-                        k*LIDAR_DISPLAY_SCALEUP),
-                    cv::Point((j+1)*LIDAR_DISPLAY_SCALEUP,
-                        (k+1)*LIDAR_DISPLAY_SCALEUP),
+                    cv::Point(k*LIDAR_DISPLAY_SCALEUP,
+                        j*LIDAR_DISPLAY_SCALEUP),
+                    cv::Point((k+1)*LIDAR_DISPLAY_SCALEUP,
+                        (j+1)*LIDAR_DISPLAY_SCALEUP),
                     d == -1 ? 255 : (uint8_t)(d / 4000.f * 255), 
                     -1);
         }
@@ -90,7 +90,7 @@ static void readLidar(int16_t * distance_mm)
         for (int k=0; k<width; ++k) {
 
             const float distance_m =
-                wb_range_finder_image_get_depth( image, width, k, j);
+                wb_range_finder_image_get_depth( image, width, j, k);
 
             distance_mm[j*8+k] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
