@@ -388,11 +388,9 @@ static bool step(const setpointType_e setpointType)
         return false;
     }
 
-    cv::Mat img;
+    cv::Mat img(256, 256, CV_8UC1, cv::Scalar(70));
 
-    cap.read(img);
-
-    cv::imshow("FACES", img);
+    cv::imshow("lidar", img);
 
     cv::waitKey(1);
 
