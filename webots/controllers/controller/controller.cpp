@@ -373,7 +373,7 @@ static void reportRanger(int16_t * distance_mm)
 }*/
 
 
-static bool step(const setpointType_e setpointType)
+static bool step(const setpointType_e setpointType, SimMultiRanger & simRanger)
 {
     if (wb_robot_step(_timestep) == -1) {
         return false;
@@ -387,13 +387,10 @@ static bool step(const setpointType_e setpointType)
 
     const int width = wb_range_finder_get_width(_ranger);
     const int height = wb_range_finder_get_height(_ranger);
-    const double min_range_mm = wb_range_finder_get_min_range(_ranger) * 1000;
-    const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
 
     readRanger(width, height, ranger_distance_mm);
 
-    SimMultiRanger::show(ranger_distance_mm, min_range_mm, max_range_mm, width, height,
-            LIDAR_DISPLAY_SCALEUP);
+    simRanger.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     //reportRanger(ranger_distance_mm);
 
@@ -466,6 +463,13 @@ int main(int argc, char ** argv)
 
     wb_keyboard_enable(_timestep);
 
+    const int width = wb_range_finder_get_width(_ranger);
+    const int height = wb_range_finder_get_height(_ranger);
+    const double min_range_mm = wb_range_finder_get_min_range(_ranger) * 1000;
+    const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
+
+    SimMultiRanger simRanger = SimMultiRanger(width, height, min_range_mm, max_range_mm);
+
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);
     animateMotor("motor3", +1);
@@ -477,7 +481,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!step(setpointType)) {
+        if (!step(setpointType, simRanger)) {
             break;
         }
     }

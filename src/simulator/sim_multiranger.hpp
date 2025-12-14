@@ -23,30 +23,36 @@ class SimMultiRanger {
 
     public:
 
-        static void show(
-                const int16_t * distance_mm,
-                const uint16_t min_distance_mm,
-                const uint16_t max_distance_mm,
+         SimMultiRanger(
                 const uint16_t width,
-                const uint16_t height,
-                const uint16_t scaleup) 
+                const uint16_t height, 
+                const uint16_t min_distance_mm,
+                const uint16_t max_distance_mm)
         {
-            const uint16_t new_width = width * scaleup;
-            const uint16_t new_height = height * scaleup;
+            _width = width;
+            _height = height; 
+            _min_distance_mm = min_distance_mm;
+            _max_distance_mm = max_distance_mm;
+        }
+
+        void show(const int16_t * distance_mm, const uint16_t scaleup) 
+        {
+            const uint16_t new_width = _width * scaleup;
+            const uint16_t new_height = _height * scaleup;
 
             cv::Mat img = cv::Mat::zeros(new_height, new_width, CV_8UC1);
 
-            for (uint8_t j=0; j<height; ++j) {
+            for (uint8_t j=0; j<_height; ++j) {
 
-                for (uint8_t k=0; k<width; ++k) {
+                for (uint8_t k=0; k<_width; ++k) {
 
-                    const double d = distance_mm[k * width + j];
+                    const double d = distance_mm[k * _width + j];
 
                     cv::rectangle(img,
                             cv::Point(k*scaleup, j*scaleup),
                             cv::Point((k+1)*scaleup, (j+1)*scaleup),
-                            d == -1 ? 255 : (uint8_t)((d-min_distance_mm) /
-                                (float)(max_distance_mm - min_distance_mm) * 255), 
+                            d == -1 ? 255 : (uint8_t)((d-_min_distance_mm) /
+                                (float)(_max_distance_mm - _min_distance_mm) * 255), 
                             -1);
                 }
             }
@@ -56,4 +62,11 @@ class SimMultiRanger {
             cv::waitKey(1);
         }
 
+
+    private:
+
+         uint16_t _min_distance_mm;
+         uint16_t _max_distance_mm;
+         uint16_t _width;
+         uint16_t _height; 
 };
