@@ -20,10 +20,14 @@ setpoint = human
 
 # -----------------------------------------------------------------------------
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+OPENCV_DIR = /usr/include/opencv4
+
+CFLAGS = -O3 -std=c++11 -Wall -Wextra $(pkg-config --cflags --libs opencv4)
 
 SRCDIR = ../../../src
-INCLUDE = -I../../../src -I../..
+INCLUDE = -I../../../src -I../.. -I$(OPENCV_DIR)
+
+LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_videoio
 
 CXX_SOURCES = controller.cpp
 
@@ -47,3 +51,4 @@ null :=
 space := $(null) $(null)
 WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
+

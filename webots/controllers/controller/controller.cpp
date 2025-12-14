@@ -20,6 +20,9 @@
 #include <map>
 #include <string>
 
+// OpenCV
+#include <opencv2/highgui.hpp>
+
 // Hackflight
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
@@ -433,6 +436,8 @@ static void animateMotor(const char * name, const float direction)
 
 int main(int argc, char ** argv) 
 {
+    cv::VideoCapture cap(0);
+
     const std::string arg = std::string(argc < 2 ? "human" : argv[1]);
 
     setpointType_e setpointType = SETPOINT_HUMAN;
