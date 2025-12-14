@@ -85,11 +85,14 @@ static void readLidar(int16_t * distance_mm)
 
     const float * image = wb_range_finder_get_range_image(_lidar);
 
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
+    for (int j=0; j<height; ++j) {
+
+        for (int k=0; k<width; ++k) {
+
             const float distance_m =
-                wb_range_finder_image_get_depth( image, width, j, i);
-            distance_mm[i*8+j] = isinf(distance_m) ? -1 :
+                wb_range_finder_image_get_depth( image, width, k, j);
+
+            distance_mm[j*8+k] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
         }
     }
