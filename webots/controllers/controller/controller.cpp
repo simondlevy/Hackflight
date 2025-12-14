@@ -21,7 +21,7 @@
 #include <string>
 
 // OpenCV
-#include <opencv2/highgui.hpp>
+#include <opencv2/opencv.hpp>
 
 // Hackflight
 #include <datatypes.h>
@@ -43,7 +43,6 @@ static const float ZDIST_HOVER_INIT_M = 0.4;
 static const float ZDIST_HOVER_MAX_M = 1.0;
 static const float ZDIST_HOVER_MIN_M = 0.2;
 static const float ZDIST_HOVER_INC_MPS = 0.2;
-//static const float ZDIST_LAND_M = 0.02;
 
 typedef enum {
 
@@ -78,8 +77,6 @@ static double _timestep;
 static float _zdist;
 
 static double _start_x, _start_y, _start_z;
-
-static cv::VideoCapture cap(0);
 
 static void climb(const float rate)
 {
@@ -388,9 +385,13 @@ static bool step(const setpointType_e setpointType)
         return false;
     }
 
-    cv::Mat img(256, 256, CV_8UC1, cv::Scalar(70));
+    cv::Mat img(8, 8, CV_8UC1);//, cv::Scalar(70));
 
-    cv::imshow("lidar", img);
+    cv::Mat big = {};
+
+    cv::resize(img, big, cv::Size(256, 256));
+
+    cv::imshow("lidar", big);
 
     cv::waitKey(1);
 
