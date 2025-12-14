@@ -20,13 +20,11 @@
 #include <map>
 #include <string>
 
-// Multi-ranger simulator
-#include <sim_multiranger.hpp>
-
 // Hackflight
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
 #include <setpoint/multiranger.hpp>
+#include <simulator/sim_multiranger.hpp>
 
 // Webots
 #include <webots/camera.h>
