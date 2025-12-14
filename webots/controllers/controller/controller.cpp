@@ -20,13 +20,13 @@
 #include <map>
 #include <string>
 
-// Lidar simulator
-#include <lidarsim.hpp>
+// Multi-ranger simulator
+#include <sim_multiranger.hpp>
 
 // Hackflight
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
-#include <setpoint/lidar.hpp>
+#include <setpoint/multiranger.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -41,12 +41,12 @@
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 32;
 
-static WbDeviceTag _lidar;
+static WbDeviceTag _ranger;
 
-static void readLidar(const int width, const int height,
+static void readRanger(const int width, const int height,
         int16_t * distance_mm) 
 {
-    const float * image = wb_range_finder_get_range_image(_lidar);
+    const float * image = wb_range_finder_get_range_image(_ranger);
 
     for (int j=0; j<height; ++j) {
 
@@ -357,7 +357,7 @@ static void sendSimInfo(siminfo_t & siminfo)
 }
 
 /*
-static void reportLidar(int16_t * distance_mm) 
+static void reportRanger(int16_t * distance_mm) 
 {
     for (int i=0; i<8; ++i) {
         for (int j=0; j<8; ++j) {
@@ -385,19 +385,19 @@ static bool step(const setpointType_e setpointType)
 
     siminfo_t siminfo = {};
 
-    int16_t lidar_distance_mm[1000] = {}; // arbitrary max size
+    int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
 
-    const int width = wb_range_finder_get_width(_lidar);
-    const int height = wb_range_finder_get_height(_lidar);
-    const double min_range_mm = wb_range_finder_get_min_range(_lidar) * 1000;
-    const double max_range_mm = wb_range_finder_get_max_range(_lidar) * 1000;
+    const int width = wb_range_finder_get_width(_ranger);
+    const int height = wb_range_finder_get_height(_ranger);
+    const double min_range_mm = wb_range_finder_get_min_range(_ranger) * 1000;
+    const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
 
-    readLidar(width, height, lidar_distance_mm);
+    readRanger(width, height, ranger_distance_mm);
 
-    showLidar(lidar_distance_mm, min_range_mm, max_range_mm, width, height,
+    SimMultiRanger::show(ranger_distance_mm, min_range_mm, max_range_mm, width, height,
             LIDAR_DISPLAY_SCALEUP);
 
-    //reportLidar(lidar_distance_mm);
+    //reportRanger(ranger_distance_mm);
 
     switch (getJoystickStatus()) {
 
@@ -414,7 +414,7 @@ static bool step(const setpointType_e setpointType)
     }
 
     if (setpointType == SETPOINT_LIDAR) {
-        Lidar::getSetpoint(8, 8, lidar_distance_mm, siminfo.setpoint);
+        MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
     }
 
     // On descent, switch mode to idle when close enough to ground
@@ -457,8 +457,8 @@ int main(int argc, char ** argv)
 
     _emitter = wb_robot_get_device("emitter");
 
-    _lidar = wb_robot_get_device("range-finder");
-    wb_range_finder_enable(_lidar, _timestep);
+    _ranger = wb_robot_get_device("range-finder");
+    wb_range_finder_enable(_ranger, _timestep);
 
     _gps = wb_robot_get_device("gps");
     wb_gps_enable(_gps, _timestep);

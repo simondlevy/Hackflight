@@ -18,7 +18,7 @@
 
 #include <datatypes.h>
 
-class Lidar {
+class MultiRanger {
 
     public:
 
