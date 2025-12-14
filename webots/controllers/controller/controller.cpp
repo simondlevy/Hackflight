@@ -373,16 +373,23 @@ static void showLidar(int16_t * distance_mm)
 
     cv::Mat img = cv::Mat::zeros(256, 256, CV_8UC1);
 
-    for (uint8_t k=0; k<8; ++k) {
-        cv::rectangle(img, cv::Point(k*32,k*32), cv::Point((k+1)*32,(k+1)*32),
-                255,  -1);
+    for (uint8_t j=0; j<8; ++j) {
+
+        for (uint8_t k=0; k<8; ++k) {
+
+            const auto d = distance_mm[k * 8 + j];
+
+            cv::rectangle(img, cv::Point(j*32, k*32), cv::Point((j+1)*32,(k+1)*32),
+                    d == -1 ? 255 : (uint8_t)(d / 400.f * 255), 
+                    -1);
+        }
     }
 
     cv::imshow("lidar", img);
 
     cv::waitKey(1);
 }
- 
+
 static bool step(const setpointType_e setpointType)
 {
     if (wb_robot_step(_timestep) == -1) {
@@ -399,7 +406,6 @@ static bool step(const setpointType_e setpointType)
 
     showLidar(lidar_distance_mm);
 
-    (void)reportLidar;
     reportLidar(lidar_distance_mm);
 
     switch (getJoystickStatus()) {

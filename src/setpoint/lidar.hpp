@@ -29,6 +29,8 @@ class Lidar {
                 demands_t & setpoint)
         {
             // XXX for now we ignore the lidar distances and simply hover in place
+            (void)width;
+            (void)height;
             (void)distance_mm;
 
             setpoint.thrust = 0.5;
