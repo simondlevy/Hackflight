@@ -39,6 +39,8 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
+static const uint8_t LIDAR_DISPLAY_SCALEUP = 32;
+
 static WbDeviceTag _lidar;
 
 static void readLidar(const int width, const int height,
@@ -392,7 +394,8 @@ static bool step(const setpointType_e setpointType)
 
     readLidar(width, height, lidar_distance_mm);
 
-    showLidar(lidar_distance_mm, min_range_mm, max_range_mm, width, height);
+    showLidar(lidar_distance_mm, min_range_mm, max_range_mm, width, height,
+            LIDAR_DISPLAY_SCALEUP);
 
     //reportLidar(lidar_distance_mm);
 

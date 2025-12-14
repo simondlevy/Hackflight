@@ -19,17 +19,16 @@
 // OpenCV
 #include <opencv2/opencv.hpp>
 
-static const uint8_t LIDAR_DISPLAY_SCALEUP = 32;
-
 static void showLidar(
         const int16_t * distance_mm,
         const uint16_t min_distance_mm,
         const uint16_t max_distance_mm,
         const uint16_t width,
-        const uint16_t height) 
+        const uint16_t height,
+        const uint16_t scaleup) 
 {
-    const uint16_t new_width = width * LIDAR_DISPLAY_SCALEUP;
-    const uint16_t new_height = height * LIDAR_DISPLAY_SCALEUP;
+    const uint16_t new_width = width * scaleup;
+    const uint16_t new_height = height * scaleup;
 
     cv::Mat img = cv::Mat::zeros(new_height, new_width, CV_8UC1);
 
@@ -40,10 +39,8 @@ static void showLidar(
             const double d = distance_mm[k * width + j];
 
             cv::rectangle(img,
-                    cv::Point(k*LIDAR_DISPLAY_SCALEUP,
-                        j*LIDAR_DISPLAY_SCALEUP),
-                    cv::Point((k+1)*LIDAR_DISPLAY_SCALEUP,
-                        (j+1)*LIDAR_DISPLAY_SCALEUP),
+                    cv::Point(k*scaleup, j*scaleup),
+                    cv::Point((k+1)*scaleup, (j+1)*scaleup),
                     d == -1 ? 255 : (uint8_t)((d-min_distance_mm) /
                         (float)(max_distance_mm - min_distance_mm) * 255), 
                     -1);
