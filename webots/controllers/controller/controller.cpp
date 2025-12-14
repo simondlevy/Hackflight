@@ -380,7 +380,7 @@ static void showLidar(int16_t * distance_mm)
             const auto d = distance_mm[k * 8 + j];
 
             cv::rectangle(img, cv::Point(j*32, k*32), cv::Point((j+1)*32,(k+1)*32),
-                    d == -1 ? 255 : (uint8_t)(d / 400.f * 255), 
+                    d == -1 ? 255 : (uint8_t)(d / 4000.f * 255), 
                     -1);
         }
     }
