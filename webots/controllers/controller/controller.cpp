@@ -39,6 +39,64 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
+// ===========================================================================
+
+static const uint8_t LIDAR_DISPLAY_SCALEUP = 32;
+
+static WbDeviceTag _lidar;
+
+static void showLidar(
+        const int16_t * distance_mm,
+        const uint16_t width,
+        const uint16_t height) 
+{
+    (void)distance_mm;
+
+    const uint16_t new_width = width * LIDAR_DISPLAY_SCALEUP;
+    const uint16_t new_height = height * LIDAR_DISPLAY_SCALEUP;
+
+    cv::Mat img = cv::Mat::zeros(new_height, new_width, CV_8UC1);
+
+    for (uint8_t j=0; j<height; ++j) {
+
+        for (uint8_t k=0; k<width; ++k) {
+
+            const auto d = distance_mm[k * width + j];
+
+            cv::rectangle(img,
+                    cv::Point(j*LIDAR_DISPLAY_SCALEUP,
+                        k*LIDAR_DISPLAY_SCALEUP),
+                    cv::Point((j+1)*LIDAR_DISPLAY_SCALEUP,
+                        (k+1)*LIDAR_DISPLAY_SCALEUP),
+                    d == -1 ? 255 : (uint8_t)(d / 4000.f * 255), 
+                    -1);
+        }
+    }
+
+    cv::imshow("lidar", img);
+
+    cv::waitKey(1);
+}
+
+static void readLidar(int16_t * distance_mm) 
+{
+    const int width = wb_range_finder_get_width(_lidar);
+    const int height = wb_range_finder_get_height(_lidar);
+
+    const float * image = wb_range_finder_get_range_image(_lidar);
+
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            const float distance_m =
+                wb_range_finder_image_get_depth( image, width, j, i);
+            distance_mm[i*8+j] = isinf(distance_m) ? -1 :
+                (int16_t)(1000 * distance_m);
+        }
+    }
+}
+
+// ===========================================================================
+
 static const float ZDIST_HOVER_INIT_M = 0.4;
 static const float ZDIST_HOVER_MAX_M = 1.0;
 static const float ZDIST_HOVER_MIN_M = 0.2;
@@ -70,7 +128,6 @@ typedef struct {
 
 static WbDeviceTag _emitter;
 static WbDeviceTag _gps;
-static WbDeviceTag _lidar;
 
 static double _timestep;
 
@@ -270,22 +327,7 @@ static void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMod
     }
 }
 
-static void readLidar(int16_t * distance_mm) 
-{
-    const int width = wb_range_finder_get_width(_lidar);
-    const int height = wb_range_finder_get_height(_lidar);
 
-    const float * image = wb_range_finder_get_range_image(_lidar);
-
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            const float distance_m =
-                wb_range_finder_image_get_depth( image, width, j, i);
-            distance_mm[i*8+j] = isinf(distance_m) ? -1 :
-                (int16_t)(1000 * distance_m);
-        }
-    }
-}
 
 joystickStatus_e getJoystickStatus(void)
 {
@@ -350,6 +392,7 @@ static void sendSimInfo(siminfo_t & siminfo)
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
+/*
 static void reportLidar(int16_t * distance_mm) 
 {
     for (int i=0; i<8; ++i) {
@@ -365,30 +408,8 @@ static void reportLidar(int16_t * distance_mm)
         printf("\n \n \n");
     }
     printf("\n-----------------------------------------------\n \n");
-}
+}*/
 
-static void showLidar(int16_t * distance_mm) 
-{
-    (void)distance_mm;
-
-    cv::Mat img = cv::Mat::zeros(256, 256, CV_8UC1);
-
-    for (uint8_t j=0; j<8; ++j) {
-
-        for (uint8_t k=0; k<8; ++k) {
-
-            const auto d = distance_mm[k * 8 + j];
-
-            cv::rectangle(img, cv::Point(j*32, k*32), cv::Point((j+1)*32,(k+1)*32),
-                    d == -1 ? 255 : (uint8_t)(d / 4000.f * 255), 
-                    -1);
-        }
-    }
-
-    cv::imshow("lidar", img);
-
-    cv::waitKey(1);
-}
 
 static bool step(const setpointType_e setpointType)
 {
@@ -404,9 +425,9 @@ static bool step(const setpointType_e setpointType)
 
     readLidar(lidar_distance_mm);
 
-    showLidar(lidar_distance_mm);
+    showLidar(lidar_distance_mm, 8, 8);
 
-    reportLidar(lidar_distance_mm);
+    //reportLidar(lidar_distance_mm);
 
     switch (getJoystickStatus()) {
 
