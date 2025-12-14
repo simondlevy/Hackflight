@@ -27,7 +27,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 SRCDIR = ../../../src
 INCLUDE = -I../../../src -I../.. -I$(OPENCV_DIR)
 
-LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_videoio -lopencv_imgproc
+LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
 CXX_SOURCES = controller.cpp
 

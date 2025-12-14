@@ -385,13 +385,14 @@ static bool step(const setpointType_e setpointType)
         return false;
     }
 
-    cv::Mat img(8, 8, CV_8UC1);//, cv::Scalar(70));
+    cv::Mat img = cv::Mat::zeros(256, 256, CV_8UC1);
 
-    cv::Mat big = {};
+    for (uint8_t k=0; k<8; ++k) {
+        cv::rectangle(img, cv::Point(k*32,k*32), cv::Point((k+1)*32,(k+1)*32),
+                cv::Scalar(255,255,255), -1);
+    }
 
-    cv::resize(img, big, cv::Size(256, 256));
-
-    cv::imshow("lidar", big);
+    cv::imshow("lidar", img);
 
     cv::waitKey(1);
 
