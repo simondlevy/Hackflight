@@ -270,30 +270,20 @@ static void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMod
     }
 }
 
-static void readLidar(
-        int16_t distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION]) 
+static void readLidar(int16_t * distance_mm) 
 {
     const int width = wb_range_finder_get_width(_lidar);
     const int height = wb_range_finder_get_height(_lidar);
 
-    if (width == Lidar::RESOLUTION &&
-            height == Lidar::RESOLUTION) {
+    const float * image = wb_range_finder_get_range_image(_lidar);
 
-        const float * image = wb_range_finder_get_range_image(_lidar);
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                const float distance_m =
-                    wb_range_finder_image_get_depth( image, width, j, i);
-                distance_mm[i][j] = isinf(distance_m) ? -1 :
-                    (int16_t)(1000 * distance_m);
-            }
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            const float distance_m =
+                wb_range_finder_image_get_depth( image, width, j, i);
+            distance_mm[i*8+j] = isinf(distance_m) ? -1 :
+                (int16_t)(1000 * distance_m);
         }
-    }
-
-    else {
-        printf("ERROR: Rangefinder resolution should be %dx%d; actual is %dx%d\n",
-                Lidar::RESOLUTION, Lidar::RESOLUTION, width, height);
     }
 }
 
@@ -360,12 +350,11 @@ static void sendSimInfo(siminfo_t & siminfo)
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
-static void reportLidar(
-        int16_t distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION]) 
+static void reportLidar(int16_t * distance_mm) 
 {
-    for (int i=0; i<Lidar::RESOLUTION; ++i) {
-        for (int j=0; j<Lidar::RESOLUTION; ++j) {
-            const int16_t d = distance_mm[i][j];
+    for (int i=0; i<8; ++i) {
+        for (int j=0; j<8; ++j) {
+            const int16_t d = distance_mm[i*8+j];
             if (d < 0) {
                 printf(" ---- ");
             }
@@ -378,35 +367,40 @@ static void reportLidar(
     printf("\n-----------------------------------------------\n \n");
 }
 
+static void showLidar(int16_t * distance_mm) 
+{
+    (void)distance_mm;
 
+    cv::Mat img = cv::Mat::zeros(256, 256, CV_8UC1);
+
+    for (uint8_t k=0; k<8; ++k) {
+        cv::rectangle(img, cv::Point(k*32,k*32), cv::Point((k+1)*32,(k+1)*32),
+                255,  -1);
+    }
+
+    cv::imshow("lidar", img);
+
+    cv::waitKey(1);
+}
+ 
 static bool step(const setpointType_e setpointType)
 {
     if (wb_robot_step(_timestep) == -1) {
         return false;
     }
 
-    cv::Mat img = cv::Mat::zeros(256, 256, CV_8UC1);
-
-    for (uint8_t k=0; k<8; ++k) {
-        cv::rectangle(img, cv::Point(k*32,k*32), cv::Point((k+1)*32,(k+1)*32),
-                cv::Scalar(255,255,255), -1);
-    }
-
-    cv::imshow("lidar", img);
-
-    cv::waitKey(1);
-
     static flightMode_t _flightMode;
 
     siminfo_t siminfo = {};
 
-    int16_t
-        lidar_distance_mm[Lidar::RESOLUTION][Lidar::RESOLUTION] = {};
+    int16_t lidar_distance_mm[64] = {};
 
     readLidar(lidar_distance_mm);
 
+    showLidar(lidar_distance_mm);
+
     (void)reportLidar;
-    //reportLidar(lidar_distance_mm);
+    reportLidar(lidar_distance_mm);
 
     switch (getJoystickStatus()) {
 
@@ -423,7 +417,7 @@ static bool step(const setpointType_e setpointType)
     }
 
     if (setpointType == SETPOINT_LIDAR) {
-        Lidar::getSetpoint(lidar_distance_mm, siminfo.setpoint);
+        Lidar::getSetpoint(8, 8, lidar_distance_mm, siminfo.setpoint);
     }
 
     // On descent, switch mode to idle when close enough to ground

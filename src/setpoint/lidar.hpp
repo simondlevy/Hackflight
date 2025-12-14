@@ -22,10 +22,10 @@ class Lidar {
 
     public:
 
-        static const uint8_t RESOLUTION = 8;
-
         static void getSetpoint(
-                const int16_t distance_mm[RESOLUTION][RESOLUTION],
+                const uint16_t width,
+                const uint16_t height,
+                const int16_t * distance_mm,
                 demands_t & setpoint)
         {
             // XXX for now we ignore the lidar distances and simply hover in place
