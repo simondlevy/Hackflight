@@ -79,6 +79,8 @@ static float _zdist;
 
 static double _start_x, _start_y, _start_z;
 
+static cv::VideoCapture cap(0);
+
 static void climb(const float rate)
 {
     const float time_curr = wb_robot_get_time();
@@ -386,6 +388,14 @@ static bool step(const setpointType_e setpointType)
         return false;
     }
 
+    cv::Mat img;
+
+    cap.read(img);
+
+    cv::imshow("FACES", img);
+
+    cv::waitKey(1);
+
     static flightMode_t _flightMode;
 
     siminfo_t siminfo = {};
@@ -436,7 +446,7 @@ static void animateMotor(const char * name, const float direction)
 
 int main(int argc, char ** argv) 
 {
-    cv::VideoCapture cap(0);
+    cv::namedWindow("lidar");
 
     const std::string arg = std::string(argc < 2 ? "human" : argv[1]);
 
