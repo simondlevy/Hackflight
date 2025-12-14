@@ -467,8 +467,10 @@ int main(int argc, char ** argv)
     const int height = wb_range_finder_get_height(_ranger);
     const double min_range_mm = wb_range_finder_get_min_range(_ranger) * 1000;
     const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
+    const double fov_radians = wb_range_finder_get_fov(_ranger);
 
-    SimMultiRanger simRanger = SimMultiRanger(width, height, min_range_mm, max_range_mm);
+    SimMultiRanger simRanger =
+        SimMultiRanger(width, height, min_range_mm, max_range_mm, fov_radians);
 
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);

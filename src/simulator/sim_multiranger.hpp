@@ -27,12 +27,14 @@ class SimMultiRanger {
                 const uint16_t width,
                 const uint16_t height, 
                 const uint16_t min_distance_mm,
-                const uint16_t max_distance_mm)
+                const uint16_t max_distance_mm,
+                const float field_of_view_radians)
         {
             _width = width;
             _height = height; 
             _min_distance_mm = min_distance_mm;
             _max_distance_mm = max_distance_mm;
+            _field_of_view_radians = field_of_view_radians;
         }
 
         void show(const int16_t * distance_mm, const uint16_t scaleup) 
@@ -69,4 +71,5 @@ class SimMultiRanger {
          uint16_t _max_distance_mm;
          uint16_t _width;
          uint16_t _height; 
+         float _field_of_view_radians;
 };
