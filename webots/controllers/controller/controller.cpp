@@ -50,8 +50,6 @@ static void showLidar(
         const uint16_t width,
         const uint16_t height) 
 {
-    (void)distance_mm;
-
     const uint16_t new_width = width * LIDAR_DISPLAY_SCALEUP;
     const uint16_t new_height = height * LIDAR_DISPLAY_SCALEUP;
 
@@ -92,7 +90,7 @@ static void readLidar(int16_t * distance_mm)
             const float distance_m =
                 wb_range_finder_image_get_depth( image, width, j, k);
 
-            distance_mm[j*8+k] = isinf(distance_m) ? -1 :
+            distance_mm[j*width+k] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
         }
     }
