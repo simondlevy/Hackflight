@@ -47,6 +47,7 @@ static WbDeviceTag _lidar;
 
 static void showLidar(
         const int16_t * distance_mm,
+        const uint16_t max_distance_mm,
         const uint16_t width,
         const uint16_t height) 
 {
@@ -66,7 +67,7 @@ static void showLidar(
                         j*LIDAR_DISPLAY_SCALEUP),
                     cv::Point((k+1)*LIDAR_DISPLAY_SCALEUP,
                         (j+1)*LIDAR_DISPLAY_SCALEUP),
-                    d == -1 ? 255 : (uint8_t)(d / 4000.f * 255), 
+                    d == -1 ? 255 : (uint8_t)(d / (float)max_distance_mm * 255), 
                     -1);
         }
     }
@@ -76,11 +77,9 @@ static void showLidar(
     cv::waitKey(1);
 }
 
-static void readLidar(int16_t * distance_mm) 
+static void readLidar(const int width, const int height,
+        int16_t * distance_mm) 
 {
-    const int width = wb_range_finder_get_width(_lidar);
-    const int height = wb_range_finder_get_height(_lidar);
-
     const float * image = wb_range_finder_get_range_image(_lidar);
 
     for (int j=0; j<height; ++j) {
@@ -422,11 +421,16 @@ static bool step(const setpointType_e setpointType)
 
     siminfo_t siminfo = {};
 
-    int16_t lidar_distance_mm[64] = {};
+    int16_t lidar_distance_mm[1000] = {}; // arbitrary max size
 
-    readLidar(lidar_distance_mm);
+    const int width = wb_range_finder_get_width(_lidar);
+    const int height = wb_range_finder_get_height(_lidar);
+    //const double min_range_mm = wb_range_finder_get_min_range(_lidar) * 1000;
+    const double max_range_mm = wb_range_finder_get_max_range(_lidar) * 1000;
 
-    showLidar(lidar_distance_mm, 8, 8);
+    readLidar(width, height, lidar_distance_mm);
+
+    showLidar(lidar_distance_mm, max_range_mm, width, height);
 
     //reportLidar(lidar_distance_mm);
 
