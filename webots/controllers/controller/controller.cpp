@@ -37,6 +37,9 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
+// Misc.
+#include <world_parser.hpp>
+
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
 static WbDeviceTag _ranger;
@@ -420,6 +423,8 @@ int main(int argc, char ** argv)
     const std::string setpoint =  argv[2];
 
     setpointType_e setpointType = SETPOINT_HUMAN;
+
+    WorldParser::parse("../../worlds/maze.wbt");
 
     if (setpoint == "lidar") {
     }
