@@ -424,7 +424,7 @@ int main(int argc, char ** argv)
 
     setpointType_e setpointType = SETPOINT_HUMAN;
 
-    WorldParser::parse("../../worlds/maze.wbt");
+    WorldParser::parse("../../worlds/" + world + ".wbt");
 
     if (setpoint == "lidar") {
     }
