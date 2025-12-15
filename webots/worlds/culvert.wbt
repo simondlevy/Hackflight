@@ -98,7 +98,7 @@ DEF GROUND Solid {
   boundingObject USE GROUND_SHAPE
 }
 Pipe {
-  translation -0.04 -2.72117e-07 0.25
+  translation -0.04 0 0.25
   rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
   appearance PBRAppearance {
     baseColorMap ImageTexture {
