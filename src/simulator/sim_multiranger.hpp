@@ -64,12 +64,29 @@ class SimMultiRanger {
             cv::waitKey(1);
         }
 
+        void report(const int16_t * distance_mm) 
+        {
+            for (int i=0; i<8; ++i) {
+                for (int j=0; j<8; ++j) {
+                    const int16_t d = distance_mm[i*8+j];
+                    if (d < 0) {
+                        printf(" ---- ");
+                    }
+                    else {
+                        printf("%5d ", d);
+                    }
+                }
+                printf("\n \n \n");
+            }
+            printf("\n-----------------------------------------------\n \n");
+        }
+
 
     private:
 
-         uint16_t _min_distance_mm;
-         uint16_t _max_distance_mm;
-         uint16_t _width;
-         uint16_t _height; 
-         float _field_of_view_radians;
+        uint16_t _min_distance_mm;
+        uint16_t _max_distance_mm;
+        uint16_t _width;
+        uint16_t _height; 
+        float _field_of_view_radians;
 };

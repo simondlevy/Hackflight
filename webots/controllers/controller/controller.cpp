@@ -37,7 +37,7 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
-static const uint8_t LIDAR_DISPLAY_SCALEUP = 32;
+static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
 static WbDeviceTag _ranger;
 
@@ -353,24 +353,6 @@ static void sendSimInfo(siminfo_t & siminfo)
     siminfo.framerate = 1000 / _timestep;
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
-
-/*
-static void reportRanger(int16_t * distance_mm) 
-{
-    for (int i=0; i<8; ++i) {
-        for (int j=0; j<8; ++j) {
-            const int16_t d = distance_mm[i*8+j];
-            if (d < 0) {
-                printf(" ---- ");
-            }
-            else {
-                printf("%5d ", d);
-            }
-        }
-        printf("\n \n \n");
-    }
-    printf("\n-----------------------------------------------\n \n");
-}*/
 
 
 static bool step(const setpointType_e setpointType, SimMultiRanger & simRanger)
