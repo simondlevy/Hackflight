@@ -414,18 +414,19 @@ static void animateMotor(const char * name, const float direction)
 
 int main(int argc, char ** argv) 
 {
-    cv::namedWindow("lidar");
+    (void)argc;
 
-    const std::string arg = std::string(argc < 2 ? "human" : argv[1]);
+    const std::string world =  argv[1];
+    const std::string setpoint =  argv[2];
 
     setpointType_e setpointType = SETPOINT_HUMAN;
 
-    if (arg == "lidar") {
+    if (setpoint == "lidar") {
     }
-    else if (arg == "human") {
+    else if (setpoint == "human") {
     }
     else {
-        printf("Unrecognized setpoint '%s'; defaulting to human\n", arg.c_str());
+        printf("Unrecognized setpoint '%s'; defaulting to human\n", setpoint.c_str());
     }
 
     wb_robot_init();
