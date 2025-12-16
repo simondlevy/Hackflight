@@ -59,10 +59,7 @@ class WorldParser {
 
                 if (_in_viewpoint) {
 
-                    if (ParserUtils::string_contains(line, "follow")) {
-                        printf("FOLLOW |%s|\n",
-                                ParserUtils::split_string(line)[1].c_str());
-                    }
+                    try_parse_robot(line);
 
                     if (ParserUtils::string_contains(line, "}")) {
                         _in_viewpoint = false;
@@ -82,6 +79,13 @@ class WorldParser {
     private:
 
         vector<Wall *> _walls;
+
+        void try_parse_robot(const string line)
+        {
+            if (ParserUtils::string_contains(line, "follow")) {
+                printf("ROBOT |%s|\n", ParserUtils::split_string(line)[1].c_str());
+            }
+        }
 
         void parse_wall(const string line, Wall & wall)
         {
