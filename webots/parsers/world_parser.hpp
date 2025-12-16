@@ -45,14 +45,7 @@ class WorldParser {
 
                 if (_wallptr) {
 
-                    ParserUtils::try_parse_vec3(line, "translation",
-                            _wallptr->translation);
-
-                    ParserUtils::try_parse_vec4(line, "rotation",
-                            _wallptr->rotation);
-
-                    ParserUtils::try_parse_vec3(line, "size",
-                            _wallptr->size);
+                    parse_wall(line, *_wallptr);
 
                     if (ParserUtils::string_contains(line, "}")) {
                         _walls.push_back(_wallptr);
@@ -67,6 +60,8 @@ class WorldParser {
                 if (_in_viewpoint) {
 
                     if (ParserUtils::string_contains(line, "follow")) {
+                        printf("FOLLOW |%s|\n",
+                                ParserUtils::split_string(line)[1].c_str());
                     }
 
                     if (ParserUtils::string_contains(line, "}")) {
@@ -87,5 +82,12 @@ class WorldParser {
     private:
 
         vector<Wall *> _walls;
+
+        void parse_wall(const string line, Wall & wall)
+        {
+            ParserUtils::try_parse_vec3(line, "translation", wall.translation);
+            ParserUtils::try_parse_vec4(line, "rotation", wall.rotation);
+            ParserUtils::try_parse_vec3(line, "size", wall.size);
+        }
 };
 

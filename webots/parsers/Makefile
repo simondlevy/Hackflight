@@ -16,7 +16,7 @@
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-world = empty
+world = maze
 
 all: main
 

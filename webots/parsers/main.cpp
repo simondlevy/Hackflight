@@ -16,9 +16,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sstream>
-
-// Obstacles
 #include "world_parser.hpp"
 
 int main(int argc, char ** argv) 
