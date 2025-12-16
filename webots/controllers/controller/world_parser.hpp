@@ -41,19 +41,26 @@ class WorldParser {
                     _in_wall = true;
                 }
                 if (_in_wall) {
+
                     if (string_contains(line, "translation")) {
+                        printf("translation = ");
                         const auto toks = split_string_by_char(line, ' ');
-                        for (string tok : toks) {
-                            if (true /*tok.length() > 0*/) {
-                                printf("    |%s|\n", tok.c_str());
-                            }
+                        for (int k=1; k<4; ++k) {
+                            printf(" |%f| ", stof(toks[k]));
                         }
+                        printf("\n");
                     }
-                    /*
+
                     if (string_contains(line, "size")) {
-                        cout << line << endl;
-                    }*/
+                        printf("size = ");
+                        const auto toks = split_string_by_char(line, ' ');
+                        for (int k=1; k<4; ++k) {
+                            printf(" |%f| ", stof(toks[k]));
+                        }
+                        printf("\n");
+                    }
                 }
+
                 if (string_contains(line, "}")) {
                     _in_wall = false;
                 }
