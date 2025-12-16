@@ -20,6 +20,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 using namespace std;
 
 class WorldParser {
@@ -41,16 +42,19 @@ class WorldParser {
                 }
                 if (_in_wall) {
                     if (string_contains(line, "translation")) {
-                        cout << line << endl;
+                        for (string tok : split_string_by_char(line, ' ')) {
+                            cout << "    " << tok << endl;
+                        }
                     }
+                    /*
                     if (string_contains(line, "size")) {
                         cout << line << endl;
-                    }
+                    }*/
                 }
                 if (string_contains(line, "}")) {
                     _in_wall = false;
                 }
-             }
+            }
         }
 
     private:
@@ -60,6 +64,22 @@ class WorldParser {
         {
             return str.find(substr) < str.length();
         }
+
+        static vector<string> split_string_by_char(
+                const string& s, char delimiter)
+        {
+            vector<string> tokens;
+            string token;
+            // Create a stringstream object initialized with the input string
+            stringstream ss(s); 
+
+            // Use getline to extract tokens from the stream, using the delimiter
+            while (getline(ss, token, delimiter)) { 
+                tokens.push_back(token);
+            }
+            return tokens;
+        }
+
 
 };
 
