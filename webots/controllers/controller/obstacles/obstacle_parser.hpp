@@ -41,6 +41,11 @@ class ObstacleParser {
 
                 if (string_contains(line, "Wall {")) {
                     _wallptr = new Wall();
+                    _wallptr->rotation_w = 0;
+                    _wallptr->rotation_x = 0;
+                    _wallptr->rotation_y = 1;
+                    _wallptr->rotation_z = 0;
+
                 }
 
                 if (_wallptr) {
@@ -50,6 +55,14 @@ class ObstacleParser {
                         _wallptr->translation_x = stof(toks[1]);
                         _wallptr->translation_y = stof(toks[2]);
                         _wallptr->translation_z = stof(toks[3]);
+                    }
+
+                    if (string_contains(line, "rotation")) {
+                        const auto toks = split_string_by_char(line, ' ');
+                        _wallptr->rotation_x = stof(toks[1]);
+                        _wallptr->rotation_x = stof(toks[2]);
+                        _wallptr->rotation_y = stof(toks[3]);
+                        _wallptr->rotation_z = stof(toks[4]);
                     }
 
                     if (string_contains(line, "size")) {

@@ -24,6 +24,11 @@ class Wall {
        double translation_y; 
        double translation_z; 
 
+       double rotation_w; 
+       double rotation_x; 
+       double rotation_y; 
+       double rotation_z; 
+
        double size_x; 
        double size_y; 
        double size_z; 
