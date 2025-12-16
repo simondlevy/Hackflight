@@ -34,7 +34,7 @@ class ObstacleParser {
             ifstream file(world_file_name);
 
             string line;
-            
+
             while (getline(file, line)) {
 
                 static Wall * _wallptr;
@@ -71,12 +71,19 @@ class ObstacleParser {
                         _wallptr->size_y = stof(toks[2]);
                         _wallptr->size_z = stof(toks[3]);
                     }
-                }
 
-                if (string_contains(line, "}")) {
-                    _walls.push_back(_wallptr);
-                    _wallptr = nullptr;
+                    if (string_contains(line, "}")) {
+                        _walls.push_back(_wallptr);
+                        _wallptr = nullptr;
+                    }
                 }
+            }
+        }
+
+        void report()
+        {
+            for (auto _wallptr : _walls) {
+                _wallptr->dump();
             }
         }
 

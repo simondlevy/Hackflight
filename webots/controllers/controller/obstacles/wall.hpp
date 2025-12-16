@@ -16,6 +16,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 class Wall {
 
     public:
@@ -32,4 +34,11 @@ class Wall {
        double size_x; 
        double size_y; 
        double size_z; 
+
+       void dump()
+       {
+           printf("Wall: \n");
+           printf("  rotation: w=%+3.3f x=%+3.3f y=%+3.3f z=%+3.3f\n",
+                   rotation_w, rotation_x, rotation_y, rotation_z);
+       }
 };

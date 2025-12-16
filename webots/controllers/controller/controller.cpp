@@ -428,6 +428,8 @@ int main(int argc, char ** argv)
 
     _obstacleParser.parse("../../worlds/" + world + ".wbt");
 
+    _obstacleParser.report();
+
     if (setpoint == "lidar") {
     }
     else if (setpoint == "human") {
