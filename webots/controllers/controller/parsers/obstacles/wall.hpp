@@ -1,5 +1,5 @@
 /* 
-   Simple class for wall obstacles
+   Simple class for wall worlds
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -18,36 +18,37 @@
 
 #include <stdio.h>
 
+#include "../sim_datatypes.h"
+
 class Wall {
 
     public:
 
-       double translation_x; 
-       double translation_y; 
-       double translation_z; 
+        vec3_t translation;
+        vec4_t rotation;
+        vec3_t size;
 
-       double rotation_w; 
-       double rotation_x; 
-       double rotation_y; 
-       double rotation_z; 
+        Wall()
+        {
+            rotation.w = 0;
+            rotation.x = 0;
+            rotation.y = 1;
+            rotation.z = 0;
+        }
 
-       double size_x; 
-       double size_y; 
-       double size_z; 
+        void dump()
+        {
+            printf("Wall: \n");
 
-       void dump()
-       {
-           printf("Wall: \n");
+            printf("  translation: x=%+3.3f y=%+3.3f z=%+3.3f\n",
+                    translation.x, translation.y, translation.z);
 
-           printf("  translation: x=%+3.3f y=%+3.3f z=%+3.3f\n",
-                   translation_x, translation_y, translation_z);
+            printf("  rotation: w=%+3.3f x=%+3.3f y=%+3.3f z=%+3.3f\n",
+                    rotation.w, rotation.x, rotation.y, rotation.z);
 
-           printf("  rotation: w=%+3.3f x=%+3.3f y=%+3.3f z=%+3.3f\n",
-                   rotation_w, rotation_x, rotation_y, rotation_z);
+            printf("  size: x=%3.3f y=%3.3f z=%3.3f\n",
+                    size.x, size.y, size.z);
 
-           printf("  size: x=%3.3f y=%3.3f z=%3.3f\n",
-                   size_x, size_y, size_z);
-
-           printf("\n");
-       }
+            printf("\n");
+        }
 };

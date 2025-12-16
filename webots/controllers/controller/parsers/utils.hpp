@@ -25,9 +25,22 @@
 #include <vector>
 using namespace std;
 
+#include "sim_datatypes.h"
+
 class ParserUtils {
 
     public:
+
+        static void try_parse_vec3(const string line, const string field_name,
+                vec3_t & vec) 
+        {
+            if (string_contains(line, field_name)) {
+                const auto toks = split_string(line, ' ');
+                vec.x = stof(toks[1]);
+                vec.y = stof(toks[2]);
+                vec.z = stof(toks[3]);
+            }
+        }
 
         static bool string_contains(
                 const string str, const string substr) 

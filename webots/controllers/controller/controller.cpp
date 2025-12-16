@@ -38,7 +38,7 @@
 #include <webots/supervisor.h>
 
 // Obstacles
-#include <parsers/obstacle_parser.hpp>
+#include <parsers/world_parser.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
@@ -424,11 +424,11 @@ int main(int argc, char ** argv)
 
     setpointType_e setpointType = SETPOINT_HUMAN;
 
-    static ObstacleParser _obstacleParser;
+    static WorldParser _worldParser;
 
-    _obstacleParser.parse("../../worlds/" + world + ".wbt");
+    _worldParser.parse("../../worlds/" + world + ".wbt");
 
-    _obstacleParser.report();
+    _worldParser.report();
 
     if (setpoint == "lidar") {
     }

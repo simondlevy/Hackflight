@@ -1,5 +1,5 @@
 /* 
-   Simple VRML parser for Webots proto / proto files
+   Simple VRML parser for Webots .wbt world files
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -21,7 +21,7 @@
 #include "utils.hpp"
 #include "obstacles/wall.hpp"
 
-class ObstacleParser {
+class WorldParser {
 
     public:
 
@@ -37,35 +37,26 @@ class ObstacleParser {
 
                 if (ParserUtils::string_contains(line, "Wall {")) {
                     _wallptr = new Wall();
-                    _wallptr->rotation_w = 0;
-                    _wallptr->rotation_x = 0;
-                    _wallptr->rotation_y = 1;
-                    _wallptr->rotation_z = 0;
-
                 }
 
                 if (_wallptr) {
 
-                    if (ParserUtils::string_contains(line, "translation")) {
-                        const auto toks = ParserUtils::split_string(line, ' ');
-                        _wallptr->translation_x = stof(toks[1]);
-                        _wallptr->translation_y = stof(toks[2]);
-                        _wallptr->translation_z = stof(toks[3]);
-                    }
+                    ParserUtils::try_parse_vec3(line, "translation",
+                            _wallptr->translation);
 
                     if (ParserUtils::string_contains(line, "rotation")) {
                         const auto toks = ParserUtils::split_string(line, ' ');
-                        _wallptr->rotation_x = stof(toks[1]);
-                        _wallptr->rotation_x = stof(toks[2]);
-                        _wallptr->rotation_y = stof(toks[3]);
-                        _wallptr->rotation_z = stof(toks[4]);
+                        _wallptr->rotation.x = stof(toks[1]);
+                        _wallptr->rotation.x = stof(toks[2]);
+                        _wallptr->rotation.y = stof(toks[3]);
+                        _wallptr->rotation.z = stof(toks[4]);
                     }
 
                     if (ParserUtils::string_contains(line, "size")) {
                         const auto toks = ParserUtils::split_string(line, ' ');
-                        _wallptr->size_x = stof(toks[1]);
-                        _wallptr->size_y = stof(toks[2]);
-                        _wallptr->size_z = stof(toks[3]);
+                        _wallptr->size.x = stof(toks[1]);
+                        _wallptr->size.y = stof(toks[2]);
+                        _wallptr->size.z = stof(toks[3]);
                     }
 
                     if (ParserUtils::string_contains(line, "}")) {
