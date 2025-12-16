@@ -38,7 +38,7 @@
 #include <webots/supervisor.h>
 
 // Obstacles
-#include <obstacles/obstacle_parser.hpp>
+#include <parsers/obstacle_parser.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
