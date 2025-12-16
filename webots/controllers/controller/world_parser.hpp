@@ -33,8 +33,18 @@ class WorldParser {
             
             while (std::getline(file, line)) {
 
-                std::cout << line << "|" << (line.find("Wall") == 0) << " " << std::endl;
-            }
+                static bool _in_wall;
+
+                if (line.find("Wall {") == 0) {
+                    _in_wall = true;
+                }
+                if (_in_wall) {
+                    std::cout << line << std::endl;
+                }
+                if (line.find("}") == 0) {
+                    _in_wall = false;
+                }
+             }
         }
 
 };
