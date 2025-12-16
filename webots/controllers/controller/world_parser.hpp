@@ -43,6 +43,9 @@ class WorldParser {
                     if (string_contains(line, "translation")) {
                         cout << line << endl;
                     }
+                    if (string_contains(line, "size")) {
+                        cout << line << endl;
+                    }
                 }
                 if (string_contains(line, "}")) {
                     _in_wall = false;
