@@ -35,16 +35,24 @@ class WorldParser {
 
                 static bool _in_wall;
 
-                if (line.find("Wall {") == 0) {
+                if (string_contains(line, "Wall {")) {
                     _in_wall = true;
                 }
                 if (_in_wall) {
                     std::cout << line << std::endl;
                 }
-                if (line.find("}") == 0) {
+                if (string_contains(line, "}")) {
                     _in_wall = false;
                 }
              }
+        }
+
+    private:
+
+        static bool string_contains(
+                const std::string str, const std::string substr) 
+        {
+            return str.find(substr) == 0;
         }
 
 };
