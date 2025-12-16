@@ -44,20 +44,11 @@ class WorldParser {
                     ParserUtils::try_parse_vec3(line, "translation",
                             _wallptr->translation);
 
-                    if (ParserUtils::string_contains(line, "rotation")) {
-                        const auto toks = ParserUtils::split_string(line, ' ');
-                        _wallptr->rotation.x = stof(toks[1]);
-                        _wallptr->rotation.x = stof(toks[2]);
-                        _wallptr->rotation.y = stof(toks[3]);
-                        _wallptr->rotation.z = stof(toks[4]);
-                    }
+                    ParserUtils::try_parse_vec4(line, "rotation",
+                            _wallptr->rotation);
 
-                    if (ParserUtils::string_contains(line, "size")) {
-                        const auto toks = ParserUtils::split_string(line, ' ');
-                        _wallptr->size.x = stof(toks[1]);
-                        _wallptr->size.y = stof(toks[2]);
-                        _wallptr->size.z = stof(toks[3]);
-                    }
+                    ParserUtils::try_parse_vec3(line, "size",
+                            _wallptr->size);
 
                     if (ParserUtils::string_contains(line, "}")) {
                         _walls.push_back(_wallptr);

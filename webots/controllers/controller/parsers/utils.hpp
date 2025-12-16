@@ -42,11 +42,25 @@ class ParserUtils {
             }
         }
 
+        static void try_parse_vec4(const string line, const string field_name,
+                vec4_t & vec) 
+        {
+            if (string_contains(line, field_name)) {
+                const auto toks = split_string(line, ' ');
+                vec.w = stof(toks[1]);
+                vec.x = stof(toks[2]);
+                vec.y = stof(toks[3]);
+                vec.z = stof(toks[4]);
+            }
+        }
+
         static bool string_contains(
                 const string str, const string substr) 
         {
             return str.find(substr) < str.length();
         }
+
+    private:
 
         static vector<string> split_string(
                 const string& s, char delimiter)
