@@ -16,7 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// C++
+#include <stdio.h>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -42,8 +42,11 @@ class WorldParser {
                 }
                 if (_in_wall) {
                     if (string_contains(line, "translation")) {
-                        for (string tok : split_string_by_char(line, ' ')) {
-                            cout << "    " << tok << endl;
+                        const auto toks = split_string_by_char(line, ' ');
+                        for (string tok : toks) {
+                            if (true /*tok.length() > 0*/) {
+                                printf("    |%s|\n", tok.c_str());
+                            }
                         }
                     }
                     /*
@@ -75,7 +78,9 @@ class WorldParser {
 
             // Use getline to extract tokens from the stream, using the delimiter
             while (getline(ss, token, delimiter)) { 
-                tokens.push_back(token);
+                if (token.length() > 0) {
+                    tokens.push_back(token);
+                }
             }
             return tokens;
         }
