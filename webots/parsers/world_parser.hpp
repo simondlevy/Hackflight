@@ -83,7 +83,9 @@ class WorldParser {
         void try_parse_robot(const string line)
         {
             if (ParserUtils::string_contains(line, "follow")) {
-                printf("ROBOT |%s|\n", ParserUtils::split_string(line)[1].c_str());
+                const string robot_name = ParserUtils::strip_quotes(
+                        ParserUtils::split_string(line)[1]);
+                printf("ROBOT |%s|\n", robot_name.c_str());
             }
         }
 

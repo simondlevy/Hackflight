@@ -55,6 +55,11 @@ class ParserUtils {
             }
         }
 
+        static string strip_quotes(const string str)
+        {
+            return str.substr(1, str.length()-2);
+        }
+
         static bool string_contains(
                 const string str, const string substr) 
         {
