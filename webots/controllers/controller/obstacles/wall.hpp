@@ -38,7 +38,16 @@ class Wall {
        void dump()
        {
            printf("Wall: \n");
+
+           printf("  translation: x=%+3.3f y=%+3.3f z=%+3.3f\n",
+                   translation_x, translation_y, translation_z);
+
            printf("  rotation: w=%+3.3f x=%+3.3f y=%+3.3f z=%+3.3f\n",
                    rotation_w, rotation_x, rotation_y, rotation_z);
+
+           printf("  size: x=%3.3f y=%3.3f z=%3.3f\n",
+                   size_x, size_y, size_z);
+
+           printf("\n");
        }
 };
