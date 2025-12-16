@@ -47,18 +47,16 @@ class ObstacleParser {
 
                     if (string_contains(line, "translation")) {
                         const auto toks = split_string_by_char(line, ' ');
-                        _wallptr->x = stof(toks[1]);
-                        _wallptr->y = stof(toks[2]);
-                        _wallptr->z = stof(toks[3]);
+                        _wallptr->translation_x = stof(toks[1]);
+                        _wallptr->translation_y = stof(toks[2]);
+                        _wallptr->translation_z = stof(toks[3]);
                     }
 
                     if (string_contains(line, "size")) {
-                        printf("size = ");
                         const auto toks = split_string_by_char(line, ' ');
-                        for (int k=1; k<4; ++k) {
-                            printf(" |%f| ", stof(toks[k]));
-                        }
-                        printf("\n");
+                        _wallptr->size_x = stof(toks[1]);
+                        _wallptr->size_y = stof(toks[2]);
+                        _wallptr->size_z = stof(toks[3]);
                     }
                 }
 

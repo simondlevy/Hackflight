@@ -20,8 +20,11 @@ class Wall {
 
     public:
 
-       double x; 
-       double y; 
-       double z; 
+       double translation_x; 
+       double translation_y; 
+       double translation_z; 
 
+       double size_x; 
+       double size_y; 
+       double size_z; 
 };
