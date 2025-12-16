@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include "utils.hpp"
 #include "obstacles/wall.hpp"
 
@@ -31,9 +33,11 @@ class WorldParser {
 
             string line;
 
-            while (getline(file, line)) {
+            Wall * _wallptr = nullptr;
 
-                static Wall * _wallptr;
+            bool _in_viewpoint = false;
+
+            while (getline(file, line)) {
 
                 if (ParserUtils::string_contains(line, "Wall {")) {
                     _wallptr = new Wall();
@@ -55,6 +59,21 @@ class WorldParser {
                         _wallptr = nullptr;
                     }
                 }
+
+                if (ParserUtils::string_contains(line, "Viewpoint {")) {
+                    _in_viewpoint = true;
+                }
+
+                if (_in_viewpoint) {
+
+                    if (ParserUtils::string_contains(line, "follow")) {
+                    }
+
+                    if (ParserUtils::string_contains(line, "}")) {
+                        _in_viewpoint = false;
+                    }
+                }
+
             }
         }
 

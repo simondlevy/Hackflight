@@ -60,10 +60,8 @@ class ParserUtils {
             return str.find(substr) < str.length();
         }
 
-    private:
-
         static vector<string> split_string(
-                const string& s, char delimiter)
+                const string& s, const char delimiter=' ')
         {
             vector<string> tokens;
             string token;
