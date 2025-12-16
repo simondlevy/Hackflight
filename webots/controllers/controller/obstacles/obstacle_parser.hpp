@@ -23,11 +23,13 @@
 #include <vector>
 using namespace std;
 
-class WorldParser {
+#include "wall.hpp"
+
+class ObstacleParser {
 
     public:
 
-        static void parse(string world_file_name)
+        void parse(string world_file_name)
         {
             ifstream file(world_file_name);
 
@@ -35,20 +37,19 @@ class WorldParser {
             
             while (getline(file, line)) {
 
-                static bool _in_wall;
+                static Wall * _wallptr;
 
                 if (string_contains(line, "Wall {")) {
-                    _in_wall = true;
+                    _wallptr = new Wall();
                 }
-                if (_in_wall) {
+
+                if (_wallptr) {
 
                     if (string_contains(line, "translation")) {
-                        printf("translation = ");
                         const auto toks = split_string_by_char(line, ' ');
-                        for (int k=1; k<4; ++k) {
-                            printf(" |%f| ", stof(toks[k]));
-                        }
-                        printf("\n");
+                        _wallptr->x = stof(toks[1]);
+                        _wallptr->y = stof(toks[2]);
+                        _wallptr->z = stof(toks[3]);
                     }
 
                     if (string_contains(line, "size")) {
@@ -62,12 +63,15 @@ class WorldParser {
                 }
 
                 if (string_contains(line, "}")) {
-                    _in_wall = false;
+                    _walls.push_back(_wallptr);
+                    _wallptr = nullptr;
                 }
             }
         }
 
     private:
+
+        vector<Wall *> _walls;
 
         static bool string_contains(
                 const string str, const string substr) 
