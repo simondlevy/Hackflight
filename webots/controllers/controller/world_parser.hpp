@@ -20,18 +20,19 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+using namespace std;
 
 class WorldParser {
 
     public:
 
-        static void parse(std::string world_file_name)
+        static void parse(string world_file_name)
         {
-            std::ifstream file(world_file_name);
+            ifstream file(world_file_name);
 
-            std::string line;
+            string line;
             
-            while (std::getline(file, line)) {
+            while (getline(file, line)) {
 
                 static bool _in_wall;
 
@@ -39,7 +40,11 @@ class WorldParser {
                     _in_wall = true;
                 }
                 if (_in_wall) {
-                    std::cout << line << std::endl;
+                    cout << line << " | " << string_contains(line, "translation") << endl;
+                    /*
+                    if (string_contains(line, "translation")) {
+                        cout << line << endl;
+                    }*/
                 }
                 if (string_contains(line, "}")) {
                     _in_wall = false;
@@ -50,9 +55,9 @@ class WorldParser {
     private:
 
         static bool string_contains(
-                const std::string str, const std::string substr) 
+                const string str, const string substr) 
         {
-            return str.find(substr) == 0;
+            return str.find(substr) < str.length();
         }
 
 };
