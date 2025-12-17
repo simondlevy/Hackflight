@@ -24,7 +24,7 @@
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
 #include <setpoint/multiranger.hpp>
-#include <simulator/sim_multiranger.hpp>
+#include <simulator/sensors/multiranger.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -42,26 +42,6 @@
 #include <parsers/robot_parser.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
-
-static WbDeviceTag _ranger;
-
-static void readRanger(const int width, const int height,
-        int16_t * distance_mm) 
-{
-    const float * image = wb_range_finder_get_range_image(_ranger);
-
-    for (int j=0; j<height; ++j) {
-
-        for (int k=0; k<width; ++k) {
-
-            const float distance_m =
-                wb_range_finder_image_get_depth( image, width, j, k);
-
-            distance_mm[j*width+k] = isinf(distance_m) ? -1 :
-                (int16_t)(1000 * distance_m);
-        }
-    }
-}
 
 static const float ZDIST_HOVER_INIT_M = 0.4;
 static const float ZDIST_HOVER_MAX_M = 1.0;
@@ -94,6 +74,8 @@ typedef struct {
 
 static WbDeviceTag _emitter;
 static WbDeviceTag _gps;
+static WbDeviceTag _ranger;
+
 
 static double _timestep;
 
@@ -356,6 +338,24 @@ static void sendSimInfo(siminfo_t & siminfo)
     siminfo.setpoint.thrust = _zdist;
     siminfo.framerate = 1000 / _timestep;
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+}
+
+static void readRanger(const int width, const int height,
+        int16_t * distance_mm) 
+{
+    const float * image = wb_range_finder_get_range_image(_ranger);
+
+    for (int j=0; j<height; ++j) {
+
+        for (int k=0; k<width; ++k) {
+
+            const float distance_m =
+                wb_range_finder_image_get_depth( image, width, j, k);
+
+            distance_mm[j*width+k] = isinf(distance_m) ? -1 :
+                (int16_t)(1000 * distance_m);
+        }
+    }
 }
 
 
