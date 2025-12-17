@@ -24,7 +24,7 @@
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
 #include <setpoint/multiranger.hpp>
-#include <simulator/sensors/multiranger.hpp>
+#include <simulator/sensors/rangefinder.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -345,21 +345,24 @@ static void readRanger(const int width, const int height,
 {
     const float * image = wb_range_finder_get_range_image(_ranger);
 
-    for (int j=0; j<height; ++j) {
+    for (int x=0; x<width; ++x) {
 
-        for (int k=0; k<width; ++k) {
+        for (int y=0; y<height; ++y) {
 
             const float distance_m =
-                wb_range_finder_image_get_depth( image, width, j, k);
+                wb_range_finder_image_get_depth(image, width, x, y);
 
-            distance_mm[j*width+k] = isinf(distance_m) ? -1 :
+            printf("x=%d y=%d d=%f\n", x, y, distance_m);
+
+            distance_mm[y*width+x] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
         }
+        printf("---------");
     }
 }
 
 
-static bool step(const setpointType_e setpointType, SimMultiRanger & simRanger)
+static bool step(const setpointType_e setpointType, SimRangefinder & simRanger)
 {
     if (wb_robot_step(_timestep) == -1) {
         return false;
@@ -464,8 +467,8 @@ int main(int argc, char ** argv)
     const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
     const double fov_radians = wb_range_finder_get_fov(_ranger);
 
-    SimMultiRanger simRanger =
-        SimMultiRanger(width, height, min_range_mm, max_range_mm, fov_radians);
+    SimRangefinder simRanger =
+        SimRangefinder(width, height, min_range_mm, max_range_mm, fov_radians);
 
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);

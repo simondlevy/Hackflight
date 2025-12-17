@@ -19,11 +19,11 @@
 // OpenCV
 #include <opencv2/opencv.hpp>
 
-class SimMultiRanger {
+class SimRangefinder {
 
     public:
 
-         SimMultiRanger(
+         SimRangefinder(
                 const uint16_t width,
                 const uint16_t height, 
                 const uint16_t min_distance_mm,
@@ -44,15 +44,15 @@ class SimMultiRanger {
 
             cv::Mat img = cv::Mat::zeros(new_height, new_width, CV_8UC1);
 
-            for (uint8_t j=0; j<_height; ++j) {
+            for (uint8_t x=0; x<_width; ++x) {
 
-                for (uint8_t k=0; k<_width; ++k) {
+                for (uint8_t y=0; y<_height; ++y) {
 
-                    const double d = distance_mm[k * _width + j];
+                    const double d = distance_mm[y * _width + x];
 
                     cv::rectangle(img,
-                            cv::Point(k*scaleup, j*scaleup),
-                            cv::Point((k+1)*scaleup, (j+1)*scaleup),
+                            cv::Point(x*scaleup, y*scaleup),
+                            cv::Point((x+1)*scaleup, (y+1)*scaleup),
                             d == -1 ? 255 : (uint8_t)((d-_min_distance_mm) /
                                 (float)(_max_distance_mm - _min_distance_mm) * 255), 
                             -1);
