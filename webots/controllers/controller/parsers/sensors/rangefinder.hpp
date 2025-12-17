@@ -22,21 +22,21 @@ class Rangefinder {
 
     public:
 
-        double fieldOfView_radians;
+        double field_of_view_radians;
         int width;
         int height;
-        double minRange_m;
-        double maxRange_m;
+        double min_distance_m;
+        double max_distance_m;
 
         void dump()
         {
             printf("Rangefinder: \n");
 
-            printf("  fov: %3.3f rad\n", fieldOfView_radians);
+            printf("  fov: %3.3f rad\n", field_of_view_radians);
             printf("  width: %d\n", width);
             printf("  height: %d\n", height);
-            printf("  min range: %3.3f m\n", minRange_m);
-            printf("  max range: %3.3f m\n", maxRange_m);
+            printf("  min range: %3.3f m\n", min_distance_m);
+            printf("  max range: %3.3f m\n", max_distance_m);
 
             printf("\n");
         }

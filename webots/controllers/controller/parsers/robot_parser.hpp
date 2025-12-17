@@ -46,7 +46,7 @@ class RobotParser {
                     if (_rangefinder) {
 
                         ParserUtils::try_parse_double(line, "fieldOfView",
-                                _rangefinder->fieldOfView_radians);
+                                _rangefinder->field_of_view_radians);
 
                         ParserUtils::try_parse_int(line, "width",
                                 _rangefinder->width);
@@ -55,10 +55,10 @@ class RobotParser {
                                 _rangefinder->height);
 
                         ParserUtils::try_parse_double(line, "minRange",
-                                _rangefinder->minRange_m);
+                                _rangefinder->min_distance_m);
 
                         ParserUtils::try_parse_double(line, "maxRange",
-                                _rangefinder->maxRange_m);
+                                _rangefinder->max_distance_m);
 
                         if (ParserUtils::string_contains(line, "}")) {
                             _rangefinders.push_back(_rangefinder);
