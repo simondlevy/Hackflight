@@ -12,7 +12,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds and setpoints --------------------------------------
+SRC = $(HOME)/Desktop/hackflight/src
+OPENCV_INC = /usr/include/opencv4
+OPENCV_LIB = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -24,8 +26,11 @@ all: main
 run: main
 	./main $(world) $(robot)
 
-main: main.cpp  *.h* obstacles/* sensors/*
-	g++ -o main $(CFLAGS) main.cpp
+main: main.o
+	g++ -o main main.o $(OPENCV_LIB)
+
+main.o: main.cpp  *.h* obstacles/* sensors/*
+	g++ -c -I$(SRC) -I$(OPENCV_INC) $(CFLAGS) main.cpp
 
 clean:
 	rm -f main

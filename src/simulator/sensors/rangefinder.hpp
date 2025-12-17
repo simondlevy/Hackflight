@@ -89,4 +89,17 @@ class SimRangefinder {
             }
             printf("\n-----------------------------------------------\n \n");
         }
+
+        void dump()
+        {
+            printf("Rangefinder: \n");
+
+            printf("  fov: %3.3f rad\n", field_of_view_radians);
+            printf("  width: %d\n", width);
+            printf("  height: %d\n", height);
+            printf("  min range: %3.3f m\n", min_distance_m);
+            printf("  max range: %3.3f m\n", max_distance_m);
+
+            printf("\n");
+        }
 };
