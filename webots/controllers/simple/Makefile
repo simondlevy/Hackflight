@@ -12,26 +12,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds and setpoints --------------------------------------
-
-world = simple
-
-setpoint = human
-
-# -----------------------------------------------------------------------------
-
-OPENCV_DIR = /usr/include/opencv4
+ALL = simple
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
-INCLUDE = -I../../../src -I../.. -I$(OPENCV_DIR)
+INCLUDE = -I../../../src 
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
 CXX_SOURCES = simple.cpp
 
-all: simple
+all: $(ALL)
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
@@ -39,13 +31,12 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect simple $(world) $(setpoint) \
-		../../protos
+	webots ../../worlds/$(ALL).wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(ALL)
 
 
 edit:
-	vim controller.cpp
+	vim $(ALL).cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
