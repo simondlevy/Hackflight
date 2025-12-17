@@ -23,11 +23,11 @@ class SimRangefinder {
 
     public:
 
-        double _min_distance_m;
-        double _max_distance_m;
-        int _width;
-        int _height; 
-        double _field_of_view_radians;
+        double field_of_view_radians;
+        int width;
+        int height; 
+        double min_distance_m;
+        double max_distance_m;
 
         SimRangefinder(
                 const int width,
@@ -36,28 +36,28 @@ class SimRangefinder {
                 const double max_distance_m,
                 const double field_of_view_radians)
         {
-            _width = width;
-            _height = height; 
-            _min_distance_m = min_distance_m;
-            _max_distance_m = max_distance_m;
-            _field_of_view_radians = field_of_view_radians;
+            this->width = width;
+            this->height = height; 
+            this->min_distance_m = min_distance_m;
+            this->max_distance_m = max_distance_m;
+            this->field_of_view_radians = field_of_view_radians;
         }
 
         void show(const int16_t * distance_mm, const uint16_t scaleup) 
         {
-            const uint16_t new_width = _width * scaleup;
-            const uint16_t new_height = _height * scaleup;
+            const uint16_t new_width = this->width * scaleup;
+            const uint16_t new_height = this->height * scaleup;
 
             cv::Mat img = cv::Mat::zeros(new_height, new_width, CV_8UC1);
 
-            const double min_distance_mm = _min_distance_m * 1000;
-            const double max_distance_mm = _max_distance_m * 1000;
+            const double min_distance_mm = this->min_distance_m * 1000;
+            const double max_distance_mm = this->max_distance_m * 1000;
 
-            for (uint8_t x=0; x<_width; ++x) {
+            for (uint8_t x=0; x<this->width; ++x) {
 
-                for (uint8_t y=0; y<_height; ++y) {
+                for (uint8_t y=0; y<this->height; ++y) {
 
-                    const double d = distance_mm[y * _width + x];
+                    const double d = distance_mm[y * this->width + x];
 
                     cv::rectangle(img,
                             cv::Point(x*scaleup, y*scaleup),
