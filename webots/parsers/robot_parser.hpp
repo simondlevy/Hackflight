@@ -74,6 +74,13 @@ class RobotParser {
             }
         }
 
+        void report()
+        {
+            for (auto _rangefinder : _rangefinders) {
+                _rangefinder->dump();
+            }
+        }
+
     private:
 
         vector<Rangefinder *> _rangefinders;

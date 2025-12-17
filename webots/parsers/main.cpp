@@ -31,6 +31,7 @@ int main(int argc, char ** argv)
     const std::string robot =  argv[2];
     static RobotParser _robotParser;
     _robotParser.parse(robot);
+    _robotParser.report();
 
      return 0;
 }

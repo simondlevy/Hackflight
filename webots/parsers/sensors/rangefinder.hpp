@@ -28,5 +28,13 @@ class Rangefinder {
         double minRange_m;
         double maxRange_m;
 
+        void dump()
+        {
+            printf("Rangefinder: \n");
+
+            printf("  fov: %3.3f rad", fieldOfView_radians);
+
+            printf("\n");
+        }
 };
 
