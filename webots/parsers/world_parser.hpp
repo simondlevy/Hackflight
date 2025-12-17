@@ -35,21 +35,26 @@ class WorldParser {
 
                 string line;
 
-                Wall * _wallptr = nullptr;
+                Wall * _wall = nullptr;
 
                 while (getline(file, line)) {
 
                     if (ParserUtils::string_contains(line, "Wall {")) {
-                        _wallptr = new Wall();
+                        _wall = new Wall();
                     }
 
-                    if (_wallptr) {
+                    if (_wall) {
 
-                        parse_wall(line, *_wallptr);
+                        ParserUtils::try_parse_vec3(line, "translation",
+                                _wall->translation);
+                        ParserUtils::try_parse_vec4(line, "rotation",
+                                _wall->rotation);
+                        ParserUtils::try_parse_vec3(line, "size",
+                                _wall->size);
 
                         if (ParserUtils::string_contains(line, "}")) {
-                            _walls.push_back(_wallptr);
-                            _wallptr = nullptr;
+                            _walls.push_back(_wall);
+                            _wall = nullptr;
                         }
                     }
                 }
@@ -57,26 +62,19 @@ class WorldParser {
 
             else {
                 fprintf(stderr, "Unable to open file %s for input\n",
-                       world_file_name.c_str());
+                        world_file_name.c_str());
             }
         }
 
         void report()
         {
-            for (auto _wallptr : _walls) {
-                _wallptr->dump();
+            for (auto _wall : _walls) {
+                _wall->dump();
             }
         }
 
     private:
 
         vector<Wall *> _walls;
-
-        void parse_wall(const string line, Wall & wall)
-        {
-            ParserUtils::try_parse_vec3(line, "translation", wall.translation);
-            ParserUtils::try_parse_vec4(line, "rotation", wall.rotation);
-            ParserUtils::try_parse_vec3(line, "size", wall.size);
-        }
 };
 

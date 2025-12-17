@@ -16,11 +16,17 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "utils.hpp"
-#include "rangefinder.hpp"
+#pragma once
 
 class Rangefinder {
 
+    public:
+
+        double fieldOfView_radians;
+        uint8_t width;
+        uint8_t height;
+        double minRange_m;
+        double maxRange_m;
 
 };
 

@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "utils.hpp"
+#include "sensors/rangefinder.hpp"
 
 class RobotParser {
 
@@ -34,9 +35,23 @@ class RobotParser {
 
                 string line;
 
+                Rangefinder * _rangefinder = nullptr;
+
                 while (getline(file, line)) {
 
-                    printf("%s\n", line.c_str());
+                    if (ParserUtils::string_contains(line, "RangeFinder {")) {
+                        _rangefinder = new Rangefinder();
+                    }
+
+                    if (_rangefinder) {
+
+                        printf("rangefinder: %s\n", line.c_str());
+
+                        if (ParserUtils::string_contains(line, "}")) {
+                            _rangefinders.push_back(_rangefinder);
+                            _rangefinder = nullptr;
+                        }
+                    }
                 }
             }
 
@@ -46,5 +61,8 @@ class RobotParser {
             }
         }
 
+    private:
+
+        vector<Rangefinder *> _rangefinders;
 };
 
