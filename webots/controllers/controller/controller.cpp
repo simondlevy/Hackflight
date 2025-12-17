@@ -421,12 +421,13 @@ int main(int argc, char ** argv)
 
     const std::string world =  argv[1];
     const std::string setpoint =  argv[2];
+    const std::string proto_dir =  argv[3];
 
     setpointType_e setpointType = SETPOINT_HUMAN;
 
     static WorldParser _worldParser;
 
-    _worldParser.parse("../../worlds/" + world + ".wbt");
+    _worldParser.parse("../../worlds/" + world + ".wbt", proto_dir);
 
     _worldParser.report();
 

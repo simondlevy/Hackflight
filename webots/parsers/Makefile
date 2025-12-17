@@ -16,12 +16,13 @@
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-world = maze
+world = ../worlds/maze.wbt
+robot = ../protos/DiyQuad.proto
 
 all: main
 
 run: main
-	./main $(world)
+	./main $(world) $(robot)
 
 main: main.cpp  *.h* obstacles/* sensors/*
 	g++ -o main $(CFLAGS) main.cpp

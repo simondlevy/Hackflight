@@ -1,5 +1,5 @@
 /* 
-   Webots world-parsing tester
+   Simple VRML parser for Webots .proto files
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -16,21 +16,35 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "world_parser.hpp"
-#include "robot_parser.hpp"
+#pragma once
 
-int main(int argc, char ** argv) 
-{
-    (void)argc;
+#include <stdio.h>
 
-    const std::string world =  argv[1];
-    static WorldParser _worldParser;
-    _worldParser.parse(world);
-    _worldParser.report();
+#include "utils.hpp"
 
-    const std::string robot =  argv[2];
-    static RobotParser _robotParser;
-    _robotParser.parse(robot);
+class RobotParser {
 
-     return 0;
-}
+    public:
+
+        void parse(const string robot_file_name)
+        {
+            ifstream file(robot_file_name);
+
+            if (file.is_open()) {
+
+                string line;
+
+                while (getline(file, line)) {
+
+                    printf("%s\n", line.c_str());
+                }
+            }
+
+            else {
+                fprintf(stderr, "Unable to open file %s for input\n",
+                       robot_file_name.c_str());
+            }
+        }
+
+};
+

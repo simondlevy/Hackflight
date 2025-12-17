@@ -27,45 +27,37 @@ class WorldParser {
 
     public:
 
-        void parse(string proto_file_name)
+        void parse(const string world_file_name)
         {
-            ifstream file(proto_file_name);
+            ifstream file(world_file_name);
 
-            string line;
+            if (file.is_open()) {
 
-            Wall * _wallptr = nullptr;
+                string line;
 
-            bool _in_viewpoint = false;
+                Wall * _wallptr = nullptr;
 
-            while (getline(file, line)) {
+                while (getline(file, line)) {
 
-                if (ParserUtils::string_contains(line, "Wall {")) {
-                    _wallptr = new Wall();
-                }
+                    if (ParserUtils::string_contains(line, "Wall {")) {
+                        _wallptr = new Wall();
+                    }
 
-                if (_wallptr) {
+                    if (_wallptr) {
 
-                    parse_wall(line, *_wallptr);
+                        parse_wall(line, *_wallptr);
 
-                    if (ParserUtils::string_contains(line, "}")) {
-                        _walls.push_back(_wallptr);
-                        _wallptr = nullptr;
+                        if (ParserUtils::string_contains(line, "}")) {
+                            _walls.push_back(_wallptr);
+                            _wallptr = nullptr;
+                        }
                     }
                 }
+            }
 
-                if (ParserUtils::string_contains(line, "Viewpoint {")) {
-                    _in_viewpoint = true;
-                }
-
-                if (_in_viewpoint) {
-
-                    try_parse_robot(line);
-
-                    if (ParserUtils::string_contains(line, "}")) {
-                        _in_viewpoint = false;
-                    }
-                }
-
+            else {
+                fprintf(stderr, "Unable to open file %s for input\n",
+                       world_file_name.c_str());
             }
         }
 
@@ -79,15 +71,6 @@ class WorldParser {
     private:
 
         vector<Wall *> _walls;
-
-        void try_parse_robot(const string line)
-        {
-            if (ParserUtils::string_contains(line, "follow")) {
-                const string robot_name = ParserUtils::strip_quotes(
-                        ParserUtils::split_string(line)[1]);
-                printf("ROBOT |%s|\n", robot_name.c_str());
-            }
-        }
 
         void parse_wall(const string line, Wall & wall)
         {
