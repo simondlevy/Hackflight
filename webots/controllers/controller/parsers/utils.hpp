@@ -26,7 +26,7 @@
 #include <vector>
 using namespace std;
 
-#include "sim_datatypes.h"
+#include <simulator/sim_datatypes.h>
 
 class ParserUtils {
 
