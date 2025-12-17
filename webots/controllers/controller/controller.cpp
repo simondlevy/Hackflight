@@ -39,6 +39,7 @@
 
 // Obstacles
 #include <parsers/world_parser.hpp>
+#include <parsers/robot_parser.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
@@ -421,15 +422,16 @@ int main(int argc, char ** argv)
 
     const std::string world =  argv[1];
     const std::string setpoint =  argv[2];
-    const std::string proto_dir =  argv[3];
 
     setpointType_e setpointType = SETPOINT_HUMAN;
 
     static WorldParser _worldParser;
-
-    _worldParser.parse("../../worlds/" + world + ".wbt", proto_dir);
-
+    _worldParser.parse("../../worlds/" + world + ".wbt");
     _worldParser.report();
+
+    static RobotParser _robotParser;
+    _robotParser.parse("../../protos/DiyQuad.proto");
+    _robotParser.report();
 
     if (setpoint == "lidar") {
     }

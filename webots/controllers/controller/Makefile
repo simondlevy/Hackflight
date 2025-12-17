@@ -40,7 +40,8 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller $(world) $(setpoint) ../../protos
+	/usr/local/webots/webots-controller --stdout-redirect controller $(world) $(setpoint) \
+		../../protos
 
 
 edit:
