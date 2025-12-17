@@ -45,7 +45,20 @@ class RobotParser {
 
                     if (_rangefinder) {
 
-                        printf("rangefinder: %s\n", line.c_str());
+                        ParserUtils::try_parse_double(line, "fieldOfView",
+                                _rangefinder->fieldOfView_radians);
+
+                        ParserUtils::try_parse_int(line, "width",
+                                _rangefinder->width);
+
+                        ParserUtils::try_parse_int(line, "height",
+                                _rangefinder->height);
+
+                        ParserUtils::try_parse_double(line, "minRange",
+                                _rangefinder->minRange_m);
+
+                        ParserUtils::try_parse_double(line, "maxRange",
+                                _rangefinder->maxRange_m);
 
                         if (ParserUtils::string_contains(line, "}")) {
                             _rangefinders.push_back(_rangefinder);

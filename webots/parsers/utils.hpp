@@ -32,6 +32,24 @@ class ParserUtils {
 
     public:
 
+        static void try_parse_double(const string line, const string field_name,
+                double & value) 
+        {
+            if (string_contains(line, field_name)) {
+                const auto toks = split_string(line, ' ');
+                value = stof(toks[1]);
+            }
+        }
+
+        static void try_parse_int(const string line, const string field_name,
+                int & value) 
+        {
+            if (string_contains(line, field_name)) {
+                const auto toks = split_string(line, ' ');
+                value = stoi(toks[1]);
+            }
+        }
+
         static void try_parse_vec3(const string line, const string field_name,
                 vec3_t & vec) 
         {

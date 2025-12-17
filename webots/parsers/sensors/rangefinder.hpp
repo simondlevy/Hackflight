@@ -23,8 +23,8 @@ class Rangefinder {
     public:
 
         double fieldOfView_radians;
-        uint8_t width;
-        uint8_t height;
+        int width;
+        int height;
         double minRange_m;
         double maxRange_m;
 
