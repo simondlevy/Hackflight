@@ -36,12 +36,12 @@ class RobotParser {
 
                 string line;
 
-                Rangefinder * _rangefinder = nullptr;
+                SimRangefinder * _rangefinder = nullptr;
 
                 while (getline(file, line)) {
 
                     if (ParserUtils::string_contains(line, "RangeFinder {")) {
-                        _rangefinder = new Rangefinder();
+                        _rangefinder = new SimRangefinder();
                     }
 
                     if (_rangefinder) {
@@ -84,6 +84,6 @@ class RobotParser {
 
     private:
 
-        vector<Rangefinder *> _rangefinders;
+        vector<SimRangefinder *> _rangefinders;
 };
 

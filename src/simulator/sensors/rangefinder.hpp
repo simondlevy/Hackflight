@@ -16,7 +16,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// OpenCV
+#pragma once
+
 #include <opencv2/opencv.hpp>
 
 class SimRangefinder {
@@ -28,6 +29,10 @@ class SimRangefinder {
         int height; 
         double min_distance_m;
         double max_distance_m;
+
+        SimRangefinder()
+        {
+        }
 
         SimRangefinder(
                 const int width,
