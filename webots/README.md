@@ -18,7 +18,7 @@ on your computer.
 ```
 cd webots/plugins/physics/custom
 make
-cd ../../../controllers/custom
+cd ../../../controllers/simple
 make
 make run
 ```

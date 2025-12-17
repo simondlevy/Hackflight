@@ -1,0 +1,4 @@
+*.txt
+build/
+simple
+*.csv
