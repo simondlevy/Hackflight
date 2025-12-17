@@ -21,7 +21,8 @@
 #include <stdio.h>
 
 #include "utils.hpp"
-#include "obstacles/wall.hpp"
+
+#include <simulator/obstacles/wall.hpp>
 
 class WorldParser {
 

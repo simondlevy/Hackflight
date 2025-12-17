@@ -29,7 +29,7 @@ run: main
 main: main.o
 	g++ -o main main.o $(OPENCV_LIB)
 
-main.o: main.cpp  *.h* obstacles/*
+main.o: main.cpp  *.h*
 	g++ -c -I$(SRC) -I$(OPENCV_INC) $(CFLAGS) main.cpp
 
 clean:
