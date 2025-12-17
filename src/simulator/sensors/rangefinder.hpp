@@ -23,17 +23,23 @@ class SimRangefinder {
 
     public:
 
-         SimRangefinder(
-                const uint16_t width,
-                const uint16_t height, 
-                const uint16_t min_distance_mm,
-                const uint16_t max_distance_mm,
-                const float field_of_view_radians)
+        double _min_distance_m;
+        double _max_distance_m;
+        int _width;
+        int _height; 
+        double _field_of_view_radians;
+
+        SimRangefinder(
+                const int width,
+                const int height, 
+                const double min_distance_m,
+                const double max_distance_m,
+                const double field_of_view_radians)
         {
             _width = width;
             _height = height; 
-            _min_distance_mm = min_distance_mm;
-            _max_distance_mm = max_distance_mm;
+            _min_distance_m = min_distance_m;
+            _max_distance_m = max_distance_m;
             _field_of_view_radians = field_of_view_radians;
         }
 
@@ -44,6 +50,9 @@ class SimRangefinder {
 
             cv::Mat img = cv::Mat::zeros(new_height, new_width, CV_8UC1);
 
+            const double min_distance_mm = _min_distance_m * 1000;
+            const double max_distance_mm = _max_distance_m * 1000;
+
             for (uint8_t x=0; x<_width; ++x) {
 
                 for (uint8_t y=0; y<_height; ++y) {
@@ -53,8 +62,8 @@ class SimRangefinder {
                     cv::rectangle(img,
                             cv::Point(x*scaleup, y*scaleup),
                             cv::Point((x+1)*scaleup, (y+1)*scaleup),
-                            d == -1 ? 255 : (uint8_t)((d-_min_distance_mm) /
-                                (float)(_max_distance_mm - _min_distance_mm) * 255), 
+                            d == -1 ? 255 : (uint8_t)((d-min_distance_mm) /
+                                (double)(max_distance_mm - min_distance_mm) * 255), 
                             -1);
                 }
             }
@@ -80,13 +89,4 @@ class SimRangefinder {
             }
             printf("\n-----------------------------------------------\n \n");
         }
-
-
-    private:
-
-        uint16_t _min_distance_mm;
-        uint16_t _max_distance_mm;
-        uint16_t _width;
-        uint16_t _height; 
-        float _field_of_view_radians;
 };
