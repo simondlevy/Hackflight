@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "utils.hpp"
-#include "sensors/rangefinder.hpp"
+
 #include <simulator/sensors/rangefinder.hpp>
 
 class RobotParser {
