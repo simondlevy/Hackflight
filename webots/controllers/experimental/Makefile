@@ -14,13 +14,13 @@
 
 # Support different worlds and setpoints --------------------------------------
 
-world = empty
+world = simple
 
 setpoint = human
 
 # -----------------------------------------------------------------------------
 
-ALL = controller
+ALL = experimental
 
 OPENCV_DIR = /usr/include/opencv4
 
