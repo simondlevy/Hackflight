@@ -16,8 +16,8 @@
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-world = ../worlds/maze.wbt
-robot = ../protos/DiyQuad.proto
+world = ../../../worlds/maze.wbt
+robot = ../../../protos/DiyQuad.proto
 
 all: main
 
