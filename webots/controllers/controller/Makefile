@@ -20,6 +20,8 @@ setpoint = human
 
 # -----------------------------------------------------------------------------
 
+ALL = controller
+
 OPENCV_DIR = /usr/include/opencv4
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
@@ -29,9 +31,9 @@ INCLUDE = -I../../../src -I../.. -I$(OPENCV_DIR)
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
-CXX_SOURCES = controller.cpp
+CXX_SOURCES = $(ALL).cpp
 
-all: controller
+all: $(ALL)
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
@@ -40,12 +42,12 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controller $(world) $(setpoint) \
+	/usr/local/webots/webots-controller --stdout-redirect $(ALL) $(world) $(setpoint) \
 		../../protos
 
 
 edit:
-	vim controller.cpp
+	vim $(ALL).cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
