@@ -382,8 +382,6 @@ static bool step(const setpointType_e setpointType, RangefinderVisualizer & rv)
 
     rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
-    //reportRanger(ranger_distance_mm);
-
     switch (getJoystickStatus()) {
 
         case JOYSTICK_RECOGNIZED:
