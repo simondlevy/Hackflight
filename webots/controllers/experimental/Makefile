@@ -24,7 +24,7 @@ ALL = experimental
 
 OPENCV_DIR = /usr/include/opencv4
 
-SIMSENSORS_DIR = $(HOME)/Desktop/simsensors
+SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
