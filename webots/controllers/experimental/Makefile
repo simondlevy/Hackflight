@@ -24,10 +24,12 @@ ALL = experimental
 
 OPENCV_DIR = /usr/include/opencv4
 
+SIMSENSORS_DIR = $(HOME)/Desktop/simsensors
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRCDIR = ../../../src
-INCLUDE = -I../../../src -I../.. -I$(OPENCV_DIR)
+INCLUDE = -I../../../src -I../.. -I$(OPENCV_DIR) -I$(SIMSENSORS_DIR)
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 

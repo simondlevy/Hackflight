@@ -24,7 +24,6 @@
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
 #include <setpoint/multiranger.hpp>
-#include <simulator/sensors/rangefinder.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -37,9 +36,10 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
-// Obstacles
+// Simsensors
 #include <parsers/world_parser.hpp>
 #include <parsers/robot_parser.hpp>
+#include <sensors/rangefinder.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
