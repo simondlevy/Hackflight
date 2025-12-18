@@ -40,6 +40,7 @@
 #include <parsers/world_parser.hpp>
 #include <parsers/robot_parser.hpp>
 #include <sensors/rangefinder.hpp>
+#include <sensors/rangefinder_visualizer.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
@@ -362,7 +363,7 @@ static void readRanger(const int width, const int height,
 }
 
 
-static bool step(const setpointType_e setpointType, SimRangefinder & simRanger)
+static bool step(const setpointType_e setpointType, RangefinderVisualizer & rv)
 {
     if (wb_robot_step(_timestep) == -1) {
         return false;
@@ -379,7 +380,7 @@ static bool step(const setpointType_e setpointType, SimRangefinder & simRanger)
 
     readRanger(width, height, ranger_distance_mm);
 
-    simRanger.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
+    rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     //reportRanger(ranger_distance_mm);
 
@@ -467,8 +468,10 @@ int main(int argc, char ** argv)
     const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
     const double fov_radians = wb_range_finder_get_fov(_ranger);
 
-    SimRangefinder simRanger =
+    SimRangefinder sr =
         SimRangefinder(width, height, min_range_mm, max_range_mm, fov_radians);
+
+    RangefinderVisualizer rv = RangefinderVisualizer(&sr);
 
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);
@@ -481,7 +484,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!step(setpointType, simRanger)) {
+        if (!step(setpointType, rv)) {
             break;
         }
     }
