@@ -28,7 +28,7 @@ Viewpoint {
 DEF diyquad DiyQuad {
   translation -0.96 -0.67 0.015
 }
-DEF diyquad2 DiyQuad2 {
+DEF sphere DiyQuad2 {
   translation -0.86 0.42 0.115
 }
 TexturedBackground {

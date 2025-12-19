@@ -25,7 +25,7 @@
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
-static constexpr char SPHERE_NAME[] = "diyquad2";
+static constexpr char SPHERE_NAME[] = "sphere";
 
 static dBodyID _robot;
 
