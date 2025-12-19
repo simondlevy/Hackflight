@@ -53,6 +53,9 @@ class Simulator {
             float start_x;
             float start_y;
             float start_z;
+            float ball_x;
+            float ball_y;
+            float ball_z;
             float framerate;
             flightMode_t flightMode;
             demands_t setpoint;

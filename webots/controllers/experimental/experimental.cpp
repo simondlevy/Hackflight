@@ -276,8 +276,6 @@ static void getSimInfoFromJoystick(Simulator::info_t & siminfo, flightMode_t & f
     }
 }
 
-
-
 joystickStatus_e getJoystickStatus(void)
 {
     auto mode = JOYSTICK_RECOGNIZED;
@@ -363,7 +361,8 @@ static void readRanger(const int width, const int height,
 }
 
 
-static bool step(const setpointType_e setpointType, SimRangefinder & simRangefinder)
+static bool step(
+        const setpointType_e setpointType, SimRangefinder & simRangefinder)
 {
     (void)simRangefinder;
 
@@ -381,6 +380,10 @@ static bool step(const setpointType_e setpointType, SimRangefinder & simRangefin
     const int height = wb_range_finder_get_height(_ranger);
 
     readRanger(width, height, ranger_distance_mm);
+
+    siminfo.ball_x = +0.5;
+    siminfo.ball_y = 0;
+    siminfo.ball_z = 0;
 
     //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 

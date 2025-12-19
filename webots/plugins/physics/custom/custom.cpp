@@ -92,16 +92,16 @@ DLLEXPORT void webots_physics_step()
 
     // Set robot posed based on state and starting position, negating for
     // rightward negative
-    dBodySetPosition(
-            _robot,
-            siminfo.start_x + pose.x,
-            siminfo.start_y - pose.y,
-            siminfo.start_z + pose.z);
+    const double robot_x = siminfo.start_x + pose.x;
+    const double robot_y = siminfo.start_y - pose.y;
+    const double robot_z = siminfo.start_z + pose.z;
+
+    dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 
     dBodySetPosition( _ball, 
-            siminfo.start_x + pose.x - 1,
-            siminfo.start_y - pose.y,
-            siminfo.start_z + pose.z);
+            robot_x - 1,
+            robot_y,
+            robot_z);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
