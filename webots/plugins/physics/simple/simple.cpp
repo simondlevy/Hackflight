@@ -25,11 +25,8 @@
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
-static constexpr char BALL_NAME[] = "ball";
 
 static dBodyID _robot;
-
-static dBodyID _ball;
 
 // Platform-independent simulator
 static Simulator _simulator;
@@ -40,8 +37,6 @@ DLLEXPORT void webots_physics_init()
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-    _ball = dWebotsGetBodyFromDEF(BALL_NAME);
-
     if (_robot == NULL) {
 
         dWebotsConsolePrintf("webots_physics_init :: ");
@@ -50,7 +45,6 @@ DLLEXPORT void webots_physics_init()
     else {
 
         dBodySetGravityMode(_robot, 0);
-        dBodySetGravityMode(_ball, 0);
     }
 
     _simulator.init(&_pidControl);
@@ -97,11 +91,6 @@ DLLEXPORT void webots_physics_step()
     const double robot_z = siminfo.start_z + pose.z;
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
-
-    dBodySetPosition( _ball, 
-            robot_x - 1,
-            robot_y,
-            robot_z);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
