@@ -89,17 +89,18 @@ DLLEXPORT void webots_physics_step()
 
     static SimRangefinder * _simRangefinder;
     static RangefinderVisualizer * _rangefinderVisualizer;
+    static RobotParser _robotParser;
+    static WorldParser _worldParser;
 
+    // Load world and robot info first time around
     if (!_simRangefinder) {
 
         char path[1000];
 
         sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
-        static WorldParser _worldParser;
         _worldParser.parse(path);
 
         sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
-        static RobotParser _robotParser;
         _robotParser.parse(path);
 
         _simRangefinder = _robotParser.rangefinders[0];
@@ -110,8 +111,9 @@ DLLEXPORT void webots_physics_step()
     // Update to get the current pose
     const Simulator::pose_t pose = _simulator.step(siminfo);
 
-    int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
-    _rangefinderVisualizer->show(ranger_distance_mm, RANGEFINDER_DISPLAY_SCALEUP);
+    int ranger_distances_mm[1000] = {}; // arbitrary max size
+    _simRangefinder->read(_worldParser.walls, ranger_distances_mm);
+    _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
