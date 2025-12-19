@@ -88,10 +88,10 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    static SimRangefinder * _simRangefinder;
-    static RangefinderVisualizer * _rangefinderVisualizer;
-    static RobotParser _robotParser;
-    static WorldParser _worldParser;
+    static simsens::SimRangefinder * _simRangefinder;
+    static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+    static simsens::RobotParser _robotParser;
+    static simsens::WorldParser _worldParser;
 
     // Load world and robot info first time around
     if (!_simRangefinder) {
@@ -106,7 +106,7 @@ DLLEXPORT void webots_physics_step()
 
         _simRangefinder = _robotParser.rangefinders[0];
 
-        _rangefinderVisualizer = new RangefinderVisualizer(_simRangefinder);
+        _rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
     }
 
     // Update to get the current pose
@@ -114,8 +114,10 @@ DLLEXPORT void webots_physics_step()
 
     // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
-    _simRangefinder->read(vec3_t{pose.x, pose.y, pose.z}, _worldParser.walls,
-            ranger_distances_mm);
+    _simRangefinder->read(
+            simsens::pose_t{pose.x, pose.y, pose.z,
+            pose.phi, pose.theta, pose.psi},
+            _worldParser.walls, ranger_distances_mm);
     _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
