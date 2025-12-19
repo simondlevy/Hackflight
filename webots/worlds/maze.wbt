@@ -29,7 +29,7 @@ DEF diyquad DiyQuad {
   translation -0.96 -0.67 0.015
 }
 DEF ball Ball {
-  translation -0.86 0.42 0.115
+#  translation -0.86 0.42 0.115
 }
 TexturedBackground {
 }

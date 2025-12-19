@@ -29,7 +29,7 @@ static constexpr char BALL_NAME[] = "ball";
 
 static dBodyID _robot;
 
-static dBodyID _sphere;
+static dBodyID _ball;
 
 // Platform-independent simulator
 static Simulator _simulator;
@@ -40,9 +40,7 @@ DLLEXPORT void webots_physics_init()
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-    _sphere = dWebotsGetBodyFromDEF(BALL_NAME);
-
-    printf("BALL=%p =================\n", _sphere);
+    _ball = dWebotsGetBodyFromDEF(BALL_NAME);
 
     if (_robot == NULL) {
 
@@ -96,6 +94,12 @@ DLLEXPORT void webots_physics_step()
     dBodySetPosition(
             _robot,
             siminfo.start_x + pose.x,
+            siminfo.start_y - pose.y,
+            siminfo.start_z + pose.z);
+
+    dBodySetPosition(
+            _ball,
+            siminfo.start_x + pose.x - 1,
             siminfo.start_y - pose.y,
             siminfo.start_z + pose.z);
 }

@@ -1,22 +1,22 @@
 #VRML_SIM R2023b utf8
 
-PROTO Ball [
-
-  field SFVec3f translation      0 0 0.015
-  field SFRotation rotation      0 0 0 0
+PROTO Ball 
+[
+#  field SFVec3f translation      0 0 0.015
+#  field SFRotation rotation      0 0 0 0
 ]
 
 {
     Robot {
 
-        translation  IS translation
-            rotation IS rotation
+#            translation  IS translation
+#            rotation IS rotation
             supervisor FALSE
             name "Ball"
             model "Ball"
             children [
               DEF BODY Pose {
-                  translation 0 0 0
+                  # translation 0 0 0
                       children [
                         CadShape {
                             url [ "../meshes/collada_files/diyquad.dae" ]
