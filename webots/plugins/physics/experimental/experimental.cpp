@@ -30,6 +30,8 @@
 #include <sensors/rangefinder.hpp>
 #include <sensors/rangefinder_visualizer.hpp>
 
+static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
+
 static constexpr char ROBOT_NAME[] = "diyquad";
 static constexpr char BALL_NAME[] = "ball";
 
@@ -84,6 +86,21 @@ DLLEXPORT void webots_physics_step()
     if (siminfo.framerate == 0) {
         return;
     }
+
+    static bool _ready;
+    if (!_ready) {
+        char worldpath[1000];
+        sprintf(worldpath, "/home/levys/Desktop/hackflight/webots/worlds/%s.wbt", siminfo.worldname);
+        static WorldParser _worldParser;
+        _worldParser.parse(worldpath);
+        _worldParser.report();
+
+        static RobotParser _robotParser;
+        _robotParser.parse("/home/levys/Desktop/hackflight/webots/protos/DiyQuad.proto");
+        _robotParser.report();
+
+    }
+    _ready = true;
 
     // Update to get the current pose
     const Simulator::pose_t pose = _simulator.step(siminfo);

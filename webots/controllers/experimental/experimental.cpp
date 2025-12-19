@@ -362,7 +362,9 @@ static void readRanger(const int width, const int height,
 
 
 static bool step(
-        const setpointType_e setpointType, SimRangefinder & simRangefinder)
+        const string worldname,
+        const setpointType_e setpointType,
+        SimRangefinder & simRangefinder)
 {
     (void)simRangefinder;
 
@@ -373,6 +375,8 @@ static bool step(
     static flightMode_t _flightMode;
 
     Simulator::info_t siminfo = {};
+
+    strcpy(siminfo.worldname, worldname.c_str());
 
     int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
 
@@ -483,7 +487,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!step(setpointType, simRangefinder)) {
+        if (!step(world, setpointType, simRangefinder)) {
             break;
         }
     }
