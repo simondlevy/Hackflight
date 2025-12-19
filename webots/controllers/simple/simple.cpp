@@ -329,7 +329,7 @@ static void sendSimInfo(Simulator::info_t & siminfo)
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
-static bool step(const setpointType_e setpointType)
+static bool step()
 {
     if (wb_robot_step(_timestep) == -1) {
         return false;
@@ -382,16 +382,6 @@ int main(int argc, char ** argv)
     const std::string world =  argv[1];
     const std::string setpoint =  argv[2];
 
-    setpointType_e setpointType = SETPOINT_HUMAN;
-
-    if (setpoint == "lidar") {
-    }
-    else if (setpoint == "human") {
-    }
-    else {
-        printf("Unrecognized setpoint '%s'; defaulting to human\n", setpoint.c_str());
-    }
-
     wb_robot_init();
 
     _timestep = wb_robot_get_basic_time_step();
@@ -417,7 +407,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!step(setpointType)) {
+        if (!step()) {
             break;
         }
     }
