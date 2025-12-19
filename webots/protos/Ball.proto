@@ -7,7 +7,7 @@ PROTO Ball [
 ]
 
 {
-    DEF ROBOT Robot {
+    Robot {
 
         translation  IS translation
             rotation IS rotation
