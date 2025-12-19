@@ -381,10 +381,6 @@ static bool step(
 
     readRanger(width, height, ranger_distance_mm);
 
-    siminfo.ball_x = +0.5;
-    siminfo.ball_y = 0;
-    siminfo.ball_z = 0;
-
     //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     switch (getJoystickStatus()) {
