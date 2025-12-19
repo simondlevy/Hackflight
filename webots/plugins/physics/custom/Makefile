@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ALL = custom
+ALL = $(shell basename "`pwd`")
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -27,7 +27,7 @@ CXX_SOURCES = $(ALL).cpp
 all: lib$(ALL).so
 
 edit:
-	vim custom.cpp
+	vim $(ALL).cpp
 
 FILES_TO_REMOVE += copilot*
 
