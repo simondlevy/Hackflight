@@ -1,271 +1,38 @@
 #VRML_SIM R2023b utf8
 
 PROTO Ball [
+
   field SFVec3f translation      0 0 0.015
-  field SFColor rear_prop_color  0.5 0 0.25
-  field SFColor front_prop_color 0.1 0.1 0.1
-  field SFFloat prop_fast_helix_radius 0.025
-  field SFFloat prop_fast_helix_height 0.001
-  field SFFloat prop_fast_helix_threshold 50
-  field SFFloat motor_max_velocity 100
-  field SFFloat motor_max_torque 30
   field SFRotation rotation      0 0 0 0
 ]
 
 {
+    DEF ROBOT Robot {
 
-DEF ROBOT Robot {
-
-    translation  IS translation
-        rotation IS rotation
-        supervisor FALSE
-        name "Ball"
-        model "Ball"
-        children [
-        DEF BODY Pose {
-            translation 0 0 0
-                children [
-
-                CadShape {
-                    url [ "../meshes/collada_files/diyquad.dae" ]
-                }
-
-                ]
-      }
-
-    # Motor 1 ----------------------------------------------------------------
-
-    DEF M1 Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust -0.031 -0.031 0.016
-            thrustConstants 0 0
-            torqueConstants 0 0
-            fastHelixThreshold IS prop_fast_helix_threshold
-            device RotationalMotor {
-                name "motor1"
-                maxVelocity IS motor_max_velocity
-                maxTorque IS motor_max_torque
-            }
-        fastHelix Solid {
-
-            translation -0.031 -0.031 0.016
-
-                children [ 
-
-                    Shape {
-                            appearance PBRAppearance {
-                                baseColor IS rear_prop_color
-                                    baseColorMap ImageTexture {
-                                        url [ "../meshes/textures/fast_helix.png" ]
-                                    }
-                                metalness 0
-                            }
-                            geometry Cylinder {
-                                height IS prop_fast_helix_height
-                                radius IS prop_fast_helix_radius
-                            }
+        translation  IS translation
+            rotation IS rotation
+            supervisor FALSE
+            name "Ball"
+            model "Ball"
+            children [
+              DEF BODY Pose {
+                  translation 0 0 0
+                      children [
+                        CadShape {
+                            url [ "../meshes/collada_files/diyquad.dae" ]
                         }
+                      ]
+              }
+          ]
 
-                ]
-        }
-        slowHelix Solid {
+         boundingObject Cylinder {
+          height 0.03
+          radius 0.05
+         }
 
-            translation -0.031 -0.031 0.016
-
-                children [
-
-                    Shape {
-
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS rear_prop_color
-                            metalness 0
-                        }
-
-                      geometry Mesh {
-                          url [ "../meshes/stl_files/prop_cw.stl" ]
-                      }
-                    }
-
-                ]
-        }
-    }
-
-    # Motor 2 ----------------------------------------------------------------
-
-    DEF M2 Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust 0.031 -0.031 0.016  
-            thrustConstants 0 0
-            torqueConstants 0 0
-            fastHelixThreshold IS prop_fast_helix_threshold
-            device RotationalMotor {
-                name "motor2"
-                maxVelocity IS motor_max_velocity
-                maxTorque IS motor_max_torque
-            }
-        fastHelix Solid {
-
-            translation 0.031 -0.031 0.016
-
-                children [ 
-
-                Shape {
-                            appearance PBRAppearance {
-                                baseColor IS front_prop_color
-                                    baseColorMap ImageTexture {
-                                        url [ "../meshes/textures/fast_helix.png" ]
-                                    }
-                                metalness 0
-                            }
-                            geometry Cylinder {
-                                height IS prop_fast_helix_height
-                                radius IS prop_fast_helix_radius
-                            }
-                        }
-
-                ]
-        }
-        slowHelix Solid {
-            translation 0.031 -0.031 0.016
-
-                children [
-
-                    Shape {
-
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS front_prop_color
-                                metalness 0
-                        }
-
-                      geometry Mesh {
-                          url [ "../meshes/stl_files/prop_ccw.stl" ]
-                      }
-                    }
-
-
-                ]
-        }
-    }
-
-    # Motor 3 ----------------------------------------------------------------
-
-    DEF M3 Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust -0.031 0.031 0.016
-            thrustConstants 0 0
-            torqueConstants  0 0
-            fastHelixThreshold IS prop_fast_helix_threshold
-            device RotationalMotor {
-                name "motor3"
-                maxVelocity IS motor_max_velocity
-                maxTorque IS motor_max_torque
-            }
-        fastHelix Solid {
-            translation -0.031 0.031 0.016
-                children [ 
-                  
-                Shape {
-                            appearance PBRAppearance {
-                                baseColor IS rear_prop_color
-                                    baseColorMap ImageTexture {
-                                        url [
-                                            "../meshes/textures/fast_helix.png"
-                                        ]
-                                    }
-                                metalness 0
-                            }
-                            geometry Cylinder {
-                                height IS prop_fast_helix_height
-                                radius IS prop_fast_helix_radius
-                            }
-                        }
-
-                ]
-        }
-        slowHelix Solid {
-            translation -0.031 0.031 0.016
-                children [
-
-                    Shape {
-
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS rear_prop_color
-                                metalness 0
-                        }
-
-                      geometry Mesh {
-                          url [ "../meshes/stl_files/prop_ccw.stl" ]
-                      }
-                    }
-
-                ]
-        }
-    }
-
-    # Motor 4 ----------------------------------------------------------------
-
-    DEF M4 Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust 0.031 0.031 0.016
-            thrustConstants 0 0
-            torqueConstants 0 0
-            fastHelixThreshold IS prop_fast_helix_threshold
-            device RotationalMotor {
-                name "motor4"
-                maxVelocity IS motor_max_velocity
-                maxTorque IS motor_max_torque
-            }
-        fastHelix Solid {
-            translation 0.031 0.031 0.016
-                children [
-
-                Shape {
-                            appearance PBRAppearance {
-                                baseColor IS front_prop_color
-                                    baseColorMap ImageTexture {
-                                        url [
-                                            "../meshes/textures/fast_helix.png"
-                                        ]
-                                    }
-                                metalness 0
-                            }
-                            geometry Cylinder {
-                                height IS prop_fast_helix_height
-                                radius IS prop_fast_helix_radius
-                            }
-                        }
-
-              
-                ] 
-        }
-        slowHelix DEF PROP Solid {
-            translation 0.031 0.031 0.016
-                children [
-
-                    Shape {
-
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS front_prop_color
-                                metalness 0
-                        }
-
-                      geometry Mesh {
-                          url [ "../meshes/stl_files/prop_cw.stl" ]
-                      }
-                    }
-
-                ]
-        }
-    }
-    ]
-        boundingObject Cylinder {
-            height 0.03
-                radius 0.05
-        }
-    physics Physics {
-        density -1
+        physics Physics {
+            density -1
             mass 0.05
+        }
     }
-}
-
 }
