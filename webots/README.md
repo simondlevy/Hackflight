@@ -16,7 +16,7 @@ on your computer.
 3. From the hackflight main directory, do the following:
 
 ```
-cd webots/plugins/physics/custom
+cd webots/plugins/physics/simple
 make
 cd ../../../controllers/simple
 make
