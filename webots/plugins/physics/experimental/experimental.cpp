@@ -25,6 +25,7 @@
 #include <simulator/simulator.hpp>
 
 // Simsensors
+#include <sim_datatypes.h>
 #include <parsers/world_parser.hpp>
 #include <parsers/robot_parser.hpp>
 #include <sensors/rangefinder.hpp>
@@ -111,8 +112,10 @@ DLLEXPORT void webots_physics_step()
     // Update to get the current pose
     const Simulator::pose_t pose = _simulator.step(siminfo);
 
+    // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
-    _simRangefinder->read(_worldParser.walls, ranger_distances_mm);
+    _simRangefinder->read(vec3_t{pose.x, pose.y, pose.z}, _worldParser.walls,
+            ranger_distances_mm);
     _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
