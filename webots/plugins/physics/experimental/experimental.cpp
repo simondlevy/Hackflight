@@ -94,11 +94,10 @@ DLLEXPORT void webots_physics_step()
         static WorldParser _worldParser;
         _worldParser.parse(path);
         _worldParser.report();
-
-        /*
+        sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
         static RobotParser _robotParser;
-        _robotParser.parse(siminfo.robotpath);
-        _robotParser.report();*/
+        _robotParser.parse(path);
+        _robotParser.report();
 
     }
     _ready = true;

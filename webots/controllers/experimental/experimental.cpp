@@ -436,11 +436,9 @@ int main(int argc, char ** argv)
 
     static WorldParser _worldParser;
     _worldParser.parse("../../worlds/" + world + ".wbt");
-    _worldParser.report();
 
     static RobotParser _robotParser;
     _robotParser.parse("../../protos/DiyQuad.proto");
-    _robotParser.report();
 
     if (setpoint == "lidar") {
     }
