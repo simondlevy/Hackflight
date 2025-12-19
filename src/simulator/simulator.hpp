@@ -54,7 +54,8 @@ class Simulator {
             float start_y;
             float start_z;
             float framerate;
-            char worldname[100];
+            char path[200];
+            char worldname[200];
             flightMode_t flightMode;
             demands_t setpoint;
 

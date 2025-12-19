@@ -16,7 +16,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// C++
+// C/C++
+#include <unistd.h>
 #include <map>
 #include <string>
 
@@ -376,6 +377,7 @@ static bool step(
 
     Simulator::info_t siminfo = {};
 
+    strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
     strcpy(siminfo.worldname, worldname.c_str());
 
     int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
