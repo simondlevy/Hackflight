@@ -29,16 +29,10 @@ DEF diyquad DiyQuad {
   translation -0.96 -0.67 0.015
 }
 DEF ball Ball {
-#  translation -0.86 0.42 0.115
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 Floor {
-}
-DEF wall Wall {
-  translation 0 -0.65 0
-  name "wall 1"
-  size 0.1 2 1
 }
