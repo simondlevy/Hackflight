@@ -24,6 +24,12 @@
 #include <pid.hpp>
 #include <simulator/simulator.hpp>
 
+// Simsensors
+#include <parsers/world_parser.hpp>
+#include <parsers/robot_parser.hpp>
+#include <sensors/rangefinder.hpp>
+#include <sensors/rangefinder_visualizer.hpp>
+
 static constexpr char ROBOT_NAME[] = "diyquad";
 static constexpr char BALL_NAME[] = "ball";
 

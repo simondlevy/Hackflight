@@ -28,8 +28,8 @@ SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-SRCDIR = ../../../src
-INCLUDE = -I$(SRCDIR) -I$(SRCDIR)/pid/slowfast -I$(OPENCV_DIR) -I$(SIMSENSORS_DIR)
+SRC_DIR = ../../../src
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(OPENCV_DIR) -I$(SIMSENSORS_DIR)
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 

@@ -16,11 +16,15 @@
 
 ALL = $(shell basename "`pwd`")
 
+OPENCV_DIR = /usr/include/opencv4
+
+SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-SRC = ../../../../src
+SRC_DIR = ../../../../src
 
-INCLUDE = -I$(SRC) -I$(SRC)/pid/standard
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(ALL).cpp
 
