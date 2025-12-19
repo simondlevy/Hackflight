@@ -50,6 +50,7 @@ DLLEXPORT void webots_physics_init()
     else {
 
         dBodySetGravityMode(_robot, 0);
+        dBodySetGravityMode(_ball, 0);
     }
 
     _simulator.init(&_pidControl);
@@ -97,8 +98,7 @@ DLLEXPORT void webots_physics_step()
             siminfo.start_y - pose.y,
             siminfo.start_z + pose.z);
 
-    dBodySetPosition(
-            _ball,
+    dBodySetPosition( _ball, 
             siminfo.start_x + pose.x - 1,
             siminfo.start_y - pose.y,
             siminfo.start_z + pose.z);

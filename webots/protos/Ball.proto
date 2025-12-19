@@ -5,39 +5,46 @@ PROTO Ball [ ]
 {
     Robot {
 
-        supervisor FALSE
         name "Ball"
         model "Ball"
+
         children [
 
     Shape {
       appearance PBRAppearance {
+
         baseColorMap ImageTexture {
           url [
             "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
           ]
         }
+
         roughnessMap ImageTexture {
           url [
             "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
           ]
         }
+
         metalnessMap ImageTexture {
           url [
             "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
           ]
         }
+
         emissiveColorMap ImageTexture {
           url [
             "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
           ]
         }
+
         textureTransform TextureTransform {
           scale 2 1
         }
+
       }
+
       geometry Sphere {
-        radius 0.1
+        radius 0.02
         subdivision 2
       }
     }
@@ -46,13 +53,11 @@ PROTO Ball [ ]
       ]
 
      boundingObject Cylinder {
-      height 0.03
-      radius 0.05
+      height 0.1
+      radius 0.1
      }
 
     physics Physics {
-        density -1
-        mass 0.05
     }
   }
 }
