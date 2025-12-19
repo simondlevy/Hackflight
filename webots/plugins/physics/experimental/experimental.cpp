@@ -44,6 +44,9 @@ static Simulator _simulator;
 
 static PidControl _pidControl;
 
+static SimRangefinder _simRangefinder = SimRangefinder(8, 8, 0.01, 4.0, 1.34);
+static RangefinderVisualizer _rangefinderVisualizer = RangefinderVisualizer(&_simRangefinder);
+
 DLLEXPORT void webots_physics_init() 
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
@@ -104,6 +107,9 @@ DLLEXPORT void webots_physics_step()
 
     // Update to get the current pose
     const Simulator::pose_t pose = _simulator.step(siminfo);
+
+    int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
+    _rangefinderVisualizer.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
