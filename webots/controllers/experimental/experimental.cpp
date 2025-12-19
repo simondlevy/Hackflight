@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <map>
 #include <string>
+using namespace std;
 
 // Hackflight
 #include <datatypes.h>
@@ -36,14 +37,6 @@
 #include <webots/range_finder.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-
-// Simsensors
-#include <parsers/world_parser.hpp>
-#include <parsers/robot_parser.hpp>
-#include <sensors/rangefinder.hpp>
-#include <sensors/rangefinder_visualizer.hpp>
-
-static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
 static const float ZDIST_HOVER_INIT_M = 0.4;
 static const float ZDIST_HOVER_MAX_M = 1.0;
@@ -362,13 +355,8 @@ static void readRanger(const int width, const int height,
 }
 
 
-static bool step(
-        const string worldname,
-        const setpointType_e setpointType,
-        SimRangefinder & simRangefinder)
+static bool step( const string worldname, const setpointType_e setpointType)
 {
-    (void)simRangefinder;
-
     if (wb_robot_step(_timestep) == -1) {
         return false;
     }
@@ -429,16 +417,10 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    const std::string world =  argv[1];
+    const std::string worldname =  argv[1];
     const std::string setpoint =  argv[2];
 
     setpointType_e setpointType = SETPOINT_HUMAN;
-
-    static WorldParser _worldParser;
-    _worldParser.parse("../../worlds/" + world + ".wbt");
-
-    static RobotParser _robotParser;
-    _robotParser.parse("../../protos/DiyQuad.proto");
 
     if (setpoint == "lidar") {
     }
@@ -465,17 +447,6 @@ int main(int argc, char ** argv)
 
     wb_keyboard_enable(_timestep);
 
-    const int width = wb_range_finder_get_width(_ranger);
-    const int height = wb_range_finder_get_height(_ranger);
-    const double min_range_mm = wb_range_finder_get_min_range(_ranger) * 1000;
-    const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
-    const double fov_radians = wb_range_finder_get_fov(_ranger);
-
-    SimRangefinder simRangefinder =
-        SimRangefinder(width, height, min_range_mm, max_range_mm, fov_radians);
-
-    //RangefinderVisualizer rangefinderVisualizer = RangefinderVisualizer(&simRangefinder);
-
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);
     animateMotor("motor3", +1);
@@ -487,7 +458,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!step(world, setpointType, simRangefinder)) {
+        if (!step(worldname, setpointType)) {
             break;
         }
     }

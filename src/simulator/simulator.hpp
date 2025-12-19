@@ -129,17 +129,17 @@ class Simulator {
 
             return vehicleState_t {
                 0, // x
-                d.state.dx,
-                0, // y
-                d.state.dy,
-                d.state.z,                     
-                d.state.dz,                   
-                Num::RAD2DEG* d.state.phi, 
-                Num::RAD2DEG* d.state.dphi, 
-                Num::RAD2DEG* d.state.theta, 
-                Num::RAD2DEG* d.state.dtheta,
-                Num::RAD2DEG* d.state.psi,   
-                Num::RAD2DEG* d.state.dpsi
+                    d.state.dx,
+                    0, // y
+                    d.state.dy,
+                    d.state.z,                     
+                    d.state.dz,                   
+                    Num::RAD2DEG* d.state.phi, 
+                    Num::RAD2DEG* d.state.dphi, 
+                    Num::RAD2DEG* d.state.theta, 
+                    Num::RAD2DEG* d.state.dtheta,
+                    Num::RAD2DEG* d.state.psi,   
+                    Num::RAD2DEG* d.state.dpsi
             };
 
         }
