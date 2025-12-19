@@ -22,8 +22,9 @@
 
 // Hackflight
 #include <datatypes.h>
-#include <simulator/dynamics.hpp>
 #include <setpoint/multiranger.hpp>
+#include <simulator/dynamics.hpp>
+#include <simulator/simulator.hpp>
 
 // Webots
 #include <webots/camera.h>
@@ -98,7 +99,7 @@ static void climb(const float rate)
                 ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
 }
 
-static void getSetpointFromKey(const int key, siminfo_t & siminfo)
+static void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
 {
     switch (key) {
 
@@ -179,7 +180,7 @@ static void checkKeyboardToggle(
 }
 
 static void getSimInfoFromKeyboard(
-        siminfo_t & siminfo, flightMode_t & flightMode)
+        Simulator::info_t & siminfo, flightMode_t & flightMode)
 {
     static bool _enter_was_down;
     static bool _spacebar_was_down;
@@ -250,7 +251,7 @@ static float readJoystickAxis(const int8_t index)
     return normalizeJoystickAxis(readJoystickRaw(index));
 }
 
-static void getSimInfoFromJoystick(siminfo_t & siminfo, flightMode_t & flightMode)
+static void getSimInfoFromJoystick(Simulator::info_t & siminfo, flightMode_t & flightMode)
 {
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
@@ -321,7 +322,7 @@ static void reportJoystick(void)
     }
 }
 
-static void sendSimInfo(siminfo_t & siminfo)
+static void sendSimInfo(Simulator::info_t & siminfo)
 {
     const double * xyz = wb_gps_get_values(_gps);
 
@@ -372,7 +373,7 @@ static bool step(const setpointType_e setpointType, SimRangefinder & simRangefin
 
     static flightMode_t _flightMode;
 
-    siminfo_t siminfo = {};
+    Simulator::info_t siminfo = {};
 
     int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
 

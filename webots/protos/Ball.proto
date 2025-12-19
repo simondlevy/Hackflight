@@ -1,7 +1,6 @@
 #VRML_SIM R2023b utf8
 
 PROTO Ball [ ]
-
 {
     Robot {
 
@@ -20,9 +19,7 @@ PROTO Ball [ ]
            geometry Sphere {
                radius 0.02
            }
-
          }
-
       ]
 
       boundingObject Cylinder {
