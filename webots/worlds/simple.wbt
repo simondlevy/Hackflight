@@ -3,8 +3,9 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
-
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
+EXTERNPROTO "../protos/Ball.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -19,19 +20,25 @@ WorldInfo {
     }
   ]
 }
-
 Viewpoint {
-  orientation -0.02174433254380643 0.9975955462336316 -0.06580509202977021 0.9040344768641304
-  position -1.6019216150116158 0.16827365780303696 1.957983967416911
+  orientation -0.018841745555484787 0.9966780627096252 -0.07923274536333329 0.5833011205053769
+  position -4.538385974641446 -0.15863630273293275 2.630551365566835
   follow "DiyQuad"
 }
-
 DEF diyquad DiyQuad {
+  translation -0.96 -0.67 0.015
 }
-
+DEF ball Ball {
+#  translation -0.86 0.42 0.115
+}
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 Floor {
+}
+DEF wall Wall {
+  translation 0 -0.65 0
+  name "wall 1"
+  size 0.1 2 1
 }

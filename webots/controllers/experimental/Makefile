@@ -20,7 +20,7 @@ setpoint = human
 
 # -----------------------------------------------------------------------------
 
-ALL = experimental
+ALL = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
 

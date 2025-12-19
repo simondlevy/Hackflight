@@ -22,6 +22,7 @@
 
 // Hackflight
 #include <datatypes.h>
+#include <setpoint/multiranger.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/simulator.hpp>
 
@@ -34,7 +35,12 @@
 #include <webots/range_finder.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-#include <webots/supervisor.h>
+
+// Simsensors
+#include <parsers/world_parser.hpp>
+#include <parsers/robot_parser.hpp>
+#include <sensors/rangefinder.hpp>
+#include <sensors/rangefinder_visualizer.hpp>
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
@@ -69,6 +75,7 @@ typedef struct {
 
 static WbDeviceTag _emitter;
 static WbDeviceTag _gps;
+static WbDeviceTag _ranger;
 
 
 static double _timestep;
@@ -269,8 +276,6 @@ static void getSimInfoFromJoystick(Simulator::info_t & siminfo, flightMode_t & f
     }
 }
 
-
-
 joystickStatus_e getJoystickStatus(void)
 {
     auto mode = JOYSTICK_RECOGNIZED;
@@ -334,8 +339,33 @@ static void sendSimInfo(Simulator::info_t & siminfo)
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
-static bool step()
+static void readRanger(const int width, const int height,
+        int16_t * distance_mm) 
 {
+    const float * image = wb_range_finder_get_range_image(_ranger);
+
+    for (int x=0; x<width; ++x) {
+
+        for (int y=0; y<height; ++y) {
+
+            const float distance_m =
+                wb_range_finder_image_get_depth(image, width, x, y);
+
+            //printf("x=%d y=%d d=%f\n", x, y, distance_m);
+
+            distance_mm[y*width+x] = isinf(distance_m) ? -1 :
+                (int16_t)(1000 * distance_m);
+        }
+        //printf("---------");
+    }
+}
+
+
+static bool step(
+        const setpointType_e setpointType, SimRangefinder & simRangefinder)
+{
+    (void)simRangefinder;
+
     if (wb_robot_step(_timestep) == -1) {
         return false;
     }
@@ -343,6 +373,19 @@ static bool step()
     static flightMode_t _flightMode;
 
     Simulator::info_t siminfo = {};
+
+    int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
+
+    const int width = wb_range_finder_get_width(_ranger);
+    const int height = wb_range_finder_get_height(_ranger);
+
+    readRanger(width, height, ranger_distance_mm);
+
+    siminfo.ball_x = +0.5;
+    siminfo.ball_y = 0;
+    siminfo.ball_z = 0;
+
+    //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     switch (getJoystickStatus()) {
 
@@ -356,6 +399,10 @@ static bool step()
 
         default:
             getSimInfoFromKeyboard(siminfo, _flightMode);
+    }
+
+    if (setpointType == SETPOINT_LIDAR) {
+        MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
     }
 
     // On descent, switch mode to idle when close enough to ground
@@ -376,18 +423,58 @@ static void animateMotor(const char * name, const float direction)
     wb_motor_set_velocity(motor, direction * 60);
 }
 
-int main() 
+int main(int argc, char ** argv) 
 {
+    (void)argc;
+
+    const std::string world =  argv[1];
+    const std::string setpoint =  argv[2];
+
+    setpointType_e setpointType = SETPOINT_HUMAN;
+
+    static WorldParser _worldParser;
+    _worldParser.parse("../../worlds/" + world + ".wbt");
+    _worldParser.report();
+
+    static RobotParser _robotParser;
+    _robotParser.parse("../../protos/DiyQuad.proto");
+    _robotParser.report();
+
+    if (setpoint == "lidar") {
+    }
+    else if (setpoint == "human") {
+    }
+    else {
+        printf("Unrecognized setpoint '%s'; defaulting to human\n", setpoint.c_str());
+    }
+
     wb_robot_init();
 
     _timestep = wb_robot_get_basic_time_step();
 
     _emitter = wb_robot_get_device("emitter");
 
+    _ranger = wb_robot_get_device("range-finder");
+    wb_range_finder_enable(_ranger, _timestep);
+
     _gps = wb_robot_get_device("gps");
     wb_gps_enable(_gps, _timestep);
 
+    WbDeviceTag camera = wb_robot_get_device("camera");
+    wb_camera_enable(camera, _timestep);
+
     wb_keyboard_enable(_timestep);
+
+    const int width = wb_range_finder_get_width(_ranger);
+    const int height = wb_range_finder_get_height(_ranger);
+    const double min_range_mm = wb_range_finder_get_min_range(_ranger) * 1000;
+    const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
+    const double fov_radians = wb_range_finder_get_fov(_ranger);
+
+    SimRangefinder simRangefinder =
+        SimRangefinder(width, height, min_range_mm, max_range_mm, fov_radians);
+
+    //RangefinderVisualizer rangefinderVisualizer = RangefinderVisualizer(&simRangefinder);
 
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);
@@ -400,7 +487,7 @@ int main()
 
     while (true) {
 
-        if (!step()) {
+        if (!step(setpointType, simRangefinder)) {
             break;
         }
     }
