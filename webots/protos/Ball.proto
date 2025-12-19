@@ -1,38 +1,58 @@
 #VRML_SIM R2023b utf8
 
-PROTO Ball 
-[
-#  field SFVec3f translation      0 0 0.015
-#  field SFRotation rotation      0 0 0 0
-]
+PROTO Ball [ ]
 
 {
     Robot {
 
-#            translation  IS translation
-#            rotation IS rotation
-            supervisor FALSE
-            name "Ball"
-            model "Ball"
-            children [
-              DEF BODY Pose {
-                  # translation 0 0 0
-                      children [
-                        CadShape {
-                            url [ "../meshes/collada_files/diyquad.dae" ]
-                        }
-                      ]
-              }
+        supervisor FALSE
+        name "Ball"
+        model "Ball"
+        children [
+
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
           ]
-
-         boundingObject Cylinder {
-          height 0.03
-          radius 0.05
-         }
-
-        physics Physics {
-            density -1
-            mass 0.05
         }
+        roughnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        metalnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        emissiveColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
+          ]
+        }
+        textureTransform TextureTransform {
+          scale 2 1
+        }
+      }
+      geometry Sphere {
+        radius 0.1
+        subdivision 2
+      }
     }
+
+
+      ]
+
+     boundingObject Cylinder {
+      height 0.03
+      radius 0.05
+     }
+
+    physics Physics {
+        density -1
+        mass 0.05
+    }
+  }
 }
