@@ -34,7 +34,6 @@
 #include <webots/range_finder.h>
 #include <webots/motor.h>
 #include <webots/robot.h>
-#include <webots/supervisor.h>
 
 // Simsensors
 #include <parsers/world_parser.hpp>
@@ -353,18 +352,20 @@ static void readRanger(const int width, const int height,
             const float distance_m =
                 wb_range_finder_image_get_depth(image, width, x, y);
 
-            printf("x=%d y=%d d=%f\n", x, y, distance_m);
+            //printf("x=%d y=%d d=%f\n", x, y, distance_m);
 
             distance_mm[y*width+x] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
         }
-        printf("---------");
+        //printf("---------");
     }
 }
 
 
-static bool step(const setpointType_e setpointType, RangefinderVisualizer & rv)
+static bool step(const setpointType_e setpointType, SimRangefinder & simRangefinder)
 {
+    (void)simRangefinder;
+
     if (wb_robot_step(_timestep) == -1) {
         return false;
     }
@@ -380,7 +381,7 @@ static bool step(const setpointType_e setpointType, RangefinderVisualizer & rv)
 
     readRanger(width, height, ranger_distance_mm);
 
-    rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
+    //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     switch (getJoystickStatus()) {
 
@@ -466,10 +467,10 @@ int main(int argc, char ** argv)
     const double max_range_mm = wb_range_finder_get_max_range(_ranger) * 1000;
     const double fov_radians = wb_range_finder_get_fov(_ranger);
 
-    SimRangefinder sr =
+    SimRangefinder simRangefinder =
         SimRangefinder(width, height, min_range_mm, max_range_mm, fov_radians);
 
-    RangefinderVisualizer rv = RangefinderVisualizer(&sr);
+    //RangefinderVisualizer rangefinderVisualizer = RangefinderVisualizer(&simRangefinder);
 
     animateMotor("motor1", -1);
     animateMotor("motor2", +1);
@@ -482,7 +483,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        if (!step(setpointType, rv)) {
+        if (!step(setpointType, simRangefinder)) {
             break;
         }
     }

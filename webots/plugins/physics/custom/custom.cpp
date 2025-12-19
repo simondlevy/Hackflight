@@ -25,8 +25,11 @@
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
+static constexpr char SPHERE_NAME[] = "diyquad2";
 
-static dBodyID _robotBody;
+static dBodyID _robot;
+
+static dBodyID _sphere;
 
 // Platform-independent simulator
 static Simulator _simulator;
@@ -35,16 +38,20 @@ static PidControl _pidControl;
 
 DLLEXPORT void webots_physics_init() 
 {
-    _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
+    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-    if (_robotBody == NULL) {
+    _sphere = dWebotsGetBodyFromDEF(SPHERE_NAME);
+
+    printf("SPHERE=%p =================\n", _sphere);
+
+    if (_robot == NULL) {
 
         dWebotsConsolePrintf("webots_physics_init :: ");
         dWebotsConsolePrintf("error : could not get body of robot.\r\n");
     }
     else {
 
-        dBodySetGravityMode(_robotBody, 0);
+        dBodySetGravityMode(_robot, 0);
     }
 
     _simulator.init(&_pidControl);
@@ -53,7 +60,7 @@ DLLEXPORT void webots_physics_init()
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robotBody == NULL) {
+    if (_robot == NULL) {
         return;
     }
 
@@ -82,12 +89,12 @@ DLLEXPORT void webots_physics_step()
     Num::euler2quat(euler, quat);
 
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-    dBodySetQuaternion(_robotBody, q);
+    dBodySetQuaternion(_robot, q);
 
     // Set robot posed based on state and starting position, negating for
     // rightward negative
     dBodySetPosition(
-            _robotBody,
+            _robot,
             siminfo.start_x + pose.x,
             siminfo.start_y - pose.y,
             siminfo.start_z + pose.z);

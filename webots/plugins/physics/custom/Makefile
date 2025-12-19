@@ -14,15 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
+ALL = custom
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC = ../../../../src
 
 INCLUDE = -I$(SRC) -I$(SRC)/pid/standard
 
-CXX_SOURCES = custom.cpp
+CXX_SOURCES = $(ALL).cpp
 
-all: libcustom.so
+all: lib$(ALL).so
+
+edit:
+	vim custom.cpp
 
 FILES_TO_REMOVE += copilot*
 

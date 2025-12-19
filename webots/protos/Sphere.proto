@@ -1,6 +1,6 @@
 #VRML_SIM R2023b utf8
 
-PROTO DiyQuad [
+PROTO Sphere [
   field SFVec3f translation      0 0 0.015
   field SFColor rear_prop_color  0.5 0 0.25
   field SFColor front_prop_color 0.1 0.1 0.1
@@ -14,14 +14,14 @@ PROTO DiyQuad [
 
 {
 
-DEF ROBOT Robot {
+DEF SPHERE Sphere {
 
     translation  IS translation
         rotation IS rotation
         controller "<extern>"
         supervisor FALSE
-        name "DiyQuad"
-        model "DiyQuad"
+        name "Sphere"
+        model "Sphere"
         children [
         DEF BODY Pose {
             translation 0 0 0
