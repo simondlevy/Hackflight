@@ -30,7 +30,7 @@
 #include <sensors/rangefinder.hpp>
 #include <sensors/rangefinder_visualizer.hpp>
 
-static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
+static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 static constexpr char BALL_NAME[] = "ball";
@@ -112,7 +112,7 @@ DLLEXPORT void webots_physics_step()
     const Simulator::pose_t pose = _simulator.step(siminfo);
 
     int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
-    _rangefinderVisualizer->show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
+    _rangefinderVisualizer->show(ranger_distance_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
