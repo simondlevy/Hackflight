@@ -10,49 +10,22 @@ PROTO Ball [ ]
 
         children [
 
-    Shape {
-      appearance PBRAppearance {
+         Shape {
 
-        baseColorMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
-          ]
-        }
+           appearance PBRAppearance {
+               baseColor 1 0 0
+               emissiveColor 1 0 0
+           }
 
-        roughnessMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
-          ]
-        }
+           geometry Sphere {
+               radius 0.02
+           }
 
-        metalnessMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
-          ]
-        }
-
-        emissiveColorMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/abb/irb/worlds/textures/target.png"
-          ]
-        }
-
-        textureTransform TextureTransform {
-          scale 2 1
-        }
-
-      }
-
-      geometry Sphere {
-        radius 0.02
-        subdivision 2
-      }
-    }
-
+         }
 
       ]
 
-     boundingObject Cylinder {
+      boundingObject Cylinder {
       height 0.1
       radius 0.1
      }
