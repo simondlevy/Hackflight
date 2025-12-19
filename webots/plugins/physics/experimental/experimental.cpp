@@ -92,20 +92,19 @@ DLLEXPORT void webots_physics_step()
 
     if (!_simRangefinder) {
 
-        _simRangefinder = new SimRangefinder(8, 8, 0.01, 4.0, 1.34);
-
-        _rangefinderVisualizer = new RangefinderVisualizer(_simRangefinder);
-
         char path[1000];
+
         sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
         static WorldParser _worldParser;
         _worldParser.parse(path);
-        _worldParser.report();
+
         sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
         static RobotParser _robotParser;
         _robotParser.parse(path);
-        _robotParser.report();
 
+        _simRangefinder = _robotParser.rangefinders[0];
+
+        _rangefinderVisualizer = new RangefinderVisualizer(_simRangefinder);
     }
 
     // Update to get the current pose
