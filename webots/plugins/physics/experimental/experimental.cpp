@@ -89,14 +89,17 @@ DLLEXPORT void webots_physics_step()
 
     static bool _ready;
     if (!_ready) {
+        const char *HFPATH = "/home/levys/Desktop";
         char worldpath[1000];
-        sprintf(worldpath, "/home/levys/Desktop/hackflight/webots/worlds/%s.wbt", siminfo.worldname);
+        sprintf(worldpath, "%s/hackflight/webots/worlds/%s.wbt", HFPATH, siminfo.worldname);
         static WorldParser _worldParser;
         _worldParser.parse(worldpath);
         _worldParser.report();
 
         static RobotParser _robotParser;
-        _robotParser.parse("/home/levys/Desktop/hackflight/webots/protos/DiyQuad.proto");
+        char robotpath[1000];
+        sprintf(robotpath, "%s/hackflight/webots/protos/DiyQuad.proto", HFPATH);
+        _robotParser.parse(robotpath);
         _robotParser.report();
 
     }
