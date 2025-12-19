@@ -5,7 +5,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
-EXTERNPROTO "../protos/DiyQuad2.proto"
+EXTERNPROTO "../protos/Ball.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -28,7 +28,7 @@ Viewpoint {
 DEF diyquad DiyQuad {
   translation -0.96 -0.67 0.015
 }
-DEF sphere DiyQuad2 {
+DEF ball Ball {
   translation -0.86 0.42 0.115
 }
 TexturedBackground {

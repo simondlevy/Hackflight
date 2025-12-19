@@ -25,7 +25,7 @@
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
-static constexpr char SPHERE_NAME[] = "sphere";
+static constexpr char BALL_NAME[] = "ball";
 
 static dBodyID _robot;
 
@@ -40,9 +40,9 @@ DLLEXPORT void webots_physics_init()
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-    _sphere = dWebotsGetBodyFromDEF(SPHERE_NAME);
+    _sphere = dWebotsGetBodyFromDEF(BALL_NAME);
 
-    printf("SPHERE=%p =================\n", _sphere);
+    printf("BALL=%p =================\n", _sphere);
 
     if (_robot == NULL) {
 
