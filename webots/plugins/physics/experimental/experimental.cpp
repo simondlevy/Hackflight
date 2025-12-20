@@ -112,12 +112,19 @@ DLLEXPORT void webots_physics_step()
     // Update to get the current pose
     const Simulator::pose_t pose = _simulator.step(siminfo);
 
+    // Set robot posed based on state and starting position, negating for
+    // rightward negative
+    const double robot_x = siminfo.start_x + pose.x;
+    const double robot_y = siminfo.start_y - pose.y;
+    const double robot_z = siminfo.start_z + pose.z;
+
     // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
+    double end_x = 0, end_y = 0;
     _simRangefinder->read(
-            simsens::pose_t{pose.x, pose.y, pose.z,
+            simsens::pose_t{robot_x, robot_y, robot_z,
             pose.phi, pose.theta, pose.psi},
-            _worldParser.walls, ranger_distances_mm);
+            _worldParser.walls, ranger_distances_mm, end_x, end_y);
     _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
@@ -128,18 +135,9 @@ DLLEXPORT void webots_physics_step()
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
     dBodySetQuaternion(_robot, q);
 
-    // Set robot posed based on state and starting position, negating for
-    // rightward negative
-    const double robot_x = siminfo.start_x + pose.x;
-    const double robot_y = siminfo.start_y - pose.y;
-    const double robot_z = siminfo.start_z + pose.z;
-
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 
-    dBodySetPosition( _ball, 
-            robot_x - 1,
-            robot_y,
-            robot_z);
+    dBodySetPosition(_ball, end_x, end_y, robot_z);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
