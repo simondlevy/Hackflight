@@ -143,7 +143,7 @@ DLLEXPORT void webots_physics_step()
     }
     else {
         printf("%f %f\n", endpoint.x, endpoint.y);
-        dBodySetPosition(_ball, endpoint.x, endpoint.y, -1);
+        dBodySetPosition(_ball, 0, 0, -1);
     }
 }
 
