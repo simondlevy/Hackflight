@@ -121,10 +121,11 @@ DLLEXPORT void webots_physics_step()
     // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
     simsens::vec2_t endpoint = {};
+    bool legit = false;
     _simRangefinder->read(
             simsens::pose_t{robot_x, robot_y, robot_z,
             pose.phi, pose.theta, pose.psi},
-            _worldParser.walls, ranger_distances_mm, endpoint);
+            _worldParser.walls, ranger_distances_mm, endpoint, legit);
     _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
@@ -137,7 +138,13 @@ DLLEXPORT void webots_physics_step()
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 
-    dBodySetPosition(_ball, endpoint.x, endpoint.y, robot_z);
+    if (legit) {
+        dBodySetPosition(_ball, endpoint.x, endpoint.y, robot_z);
+    }
+    else {
+        printf("%f %f\n", endpoint.x, endpoint.y);
+        dBodySetPosition(_ball, endpoint.x, endpoint.y, -1);
+    }
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
