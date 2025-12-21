@@ -105,7 +105,6 @@ DLLEXPORT void webots_physics_step()
         _robotParser.parse(path);
 
         _simRangefinder = _robotParser.rangefinders[0];
-        _simRangefinder->dump();
 
         //_rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
     }
