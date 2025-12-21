@@ -17,14 +17,14 @@ PROTO Ball [ ]
            }
 
            geometry Sphere {
-               radius 0.15
+               radius 0.0625
            }
          }
       ]
 
       boundingObject Cylinder {
-        height 0.15
-        radius 0.15
+        height 0.0625
+        radius 0.0625
      }
 
     physics Physics {
