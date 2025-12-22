@@ -101,8 +101,16 @@ DLLEXPORT void webots_physics_step()
         sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
         _worldParser.parse(path);
 
+        for (auto wall : _worldParser.walls) {
+            wall->dump();
+        }
+
         sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
         _robotParser.parse(path);
+
+        for (auto rangefinder : _robotParser.rangefinders) {
+            rangefinder->dump();
+        }
 
         _simRangefinder = _robotParser.rangefinders[0];
 
