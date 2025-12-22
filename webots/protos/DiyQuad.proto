@@ -60,7 +60,7 @@ DEF ROBOT Robot {
       maxRange 4.0
       noise 0.0 # should probably adjust this
       translation 0.04 0 0.015
-      rotation 0 0 1 1.6
+      rotation 0 0 1 1.57
 
       # Arbitrary appearance settings
       children [
