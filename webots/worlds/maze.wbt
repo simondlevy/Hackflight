@@ -5,7 +5,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
-EXTERNPROTO "../protos/Ball.proto"
+EXTERNPROTO "../protos/RedBall.proto"
+EXTERNPROTO "../protos/GreenBall.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -21,18 +22,20 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.0294742924324935 0.9947955375845153 -0.09753514488397856 0.46379980837952867
-  position -7.122882530272896 0.18896371307705406 4.192342159372274
+  orientation -0.012504613624811691 0.9987599528908044 -0.04818911847764535 0.9535841058459243
+  position -3.7025576502008706 0.7542458788268924 4.76939137008658
   follow "DiyQuad"
 }
 DEF diyquad DiyQuad {
-  hidden linearVelocity_0 -8.309193945592443e-26 -6.100123759214021e-28 2.0946575638045186e-09
-  hidden angularVelocity_0 5.9084329468073394e-24 -2.6041682341944254e-24 -1.830596835844655e-26
-  translation -0.9599999785423279 -0.6700000166893005 0.014999999731752915
-  rotation 0.9150566732973001 -0.4033153193988778 -0.0028351000440171277 2.066209228511975e-25
+  translation 0 0.8 0
 }
-DEF ball Ball {
-  hidden translation_0 0 0 -1
+DEF red_ball RedBall {
+  hidden linearVelocity_0 0.032550493804309404 -0.0858838862118669 6.28794166170094
+  hidden angularVelocity_0 4.083517028332466 3.100145767276978 1.0428356031416017
+}
+DEF green_ball GreenBall {
+  hidden linearVelocity_0 4.22059070721965e-16 9.490410406342934e-17 0.6463078507625093
+  hidden angularVelocity_0 -5.363899389032717e-16 -5.551036511945206e-15 -4.13301445156445e-16
 }
 TexturedBackground {
 }
@@ -41,19 +44,29 @@ TexturedBackgroundLight {
 Floor {
 }
 DEF wall Wall {
-  translation 0 -0.65 0
-  name "wall 1"
-  size 0.1 2 1
+  translation -1.23 1.41 0
+  name "wall 1(4)"
+  size 0.05 0.75 1
 }
 DEF wall Wall {
-  translation 5.91375e-07 1.38 0
-  rotation 0 0 1 -1.5707953071795862
-  name "wall 1(1)"
-  size 0.1 2 1
-}
-DEF wall Wall {
-  translation -2.3451e-07 2.19 0
-  rotation 0 0 1 -1.5707953071795862
+  translation -0.20972 1.7604 0
+  rotation 0 0 1 1.57
   name "wall 1(2)"
-  size 0.1 2 1
+  size 0.05 2 1
+}
+DEF wall Wall {
+  translation 0.81028 0.78264 0
+  name "wall 1(5)"
+  size 0.05 2 1
+}
+DEF wall Wall {
+  translation -0.21128 -0.1896 0
+  rotation 0 0 1 1.57
+  name "wall 1(3)"
+  size 0.05 2 1
+}
+DEF wall Wall {
+  translation -1.23 0.16 0
+  name "wall 1(1)"
+  size 0.05 0.75 1
 }

@@ -34,11 +34,11 @@
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
 static constexpr char ROBOT_NAME[] = "diyquad";
-static constexpr char BALL_NAME[] = "ball";
 
 static dBodyID _robot;
 
-static dBodyID _ball;
+static dBodyID _red_ball;
+static dBodyID _green_ball;
 
 // Platform-independent simulator
 static Simulator _simulator;
@@ -49,7 +49,8 @@ DLLEXPORT void webots_physics_init()
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-    _ball = dWebotsGetBodyFromDEF(BALL_NAME);
+    _red_ball = dWebotsGetBodyFromDEF("red_ball");
+    _green_ball = dWebotsGetBodyFromDEF("green_ball");
 
     if (_robot == NULL) {
 
@@ -59,7 +60,9 @@ DLLEXPORT void webots_physics_init()
     else {
 
         dBodySetGravityMode(_robot, 0);
-        dBodySetGravityMode(_ball, 0);
+
+        dBodySetGravityMode(_red_ball, 0);
+        dBodySetGravityMode(_green_ball, 0);
     }
 
     _simulator.init(&_pidControl);
@@ -101,16 +104,8 @@ DLLEXPORT void webots_physics_step()
         sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
         _worldParser.parse(path);
 
-        for (auto wall : _worldParser.walls) {
-            wall->dump();
-        }
-
         sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
         _robotParser.parse(path);
-
-        for (auto rangefinder : _robotParser.rangefinders) {
-            rangefinder->dump();
-        }
 
         _simRangefinder = _robotParser.rangefinders[0];
 
@@ -128,11 +123,15 @@ DLLEXPORT void webots_physics_step()
 
     // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
-    simsens::vec3_t endpoint = {};
+    simsens::vec3_t dbg_beam_start = {};
+    simsens::vec3_t dbg_beam_end = {};
+    simsens::vec3_t dbg_intersection = {};
     _simRangefinder->read(
             simsens::pose_t{robot_x, robot_y, robot_z,
             pose.phi, pose.theta, pose.psi},
-            _worldParser.walls, ranger_distances_mm, endpoint);
+            _worldParser.walls,
+            ranger_distances_mm,
+            dbg_beam_start, dbg_beam_end, dbg_intersection);
     // printf("%d\n", ranger_distances_mm[0]);
     //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
@@ -146,7 +145,11 @@ DLLEXPORT void webots_physics_step()
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 
-    dBodySetPosition(_ball, endpoint.x, endpoint.y, endpoint.z);
+    dBodySetPosition(_green_ball,
+            dbg_beam_end.x, dbg_beam_end.y, dbg_beam_end.z);
+
+    dBodySetPosition(_red_ball,
+            dbg_intersection.x, dbg_intersection.y, dbg_intersection.z);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
