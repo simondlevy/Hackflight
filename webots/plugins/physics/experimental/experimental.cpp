@@ -120,15 +120,13 @@ DLLEXPORT void webots_physics_step()
 
     // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
-    simsens::vec3_t dbg_beam_start = {};
-    simsens::vec3_t dbg_beam_end = {};
     simsens::vec3_t dbg_intersection = {};
     _simRangefinder->read(
             simsens::pose_t{robot_x, robot_y, robot_z,
             pose.phi, pose.theta, pose.psi},
             _worldParser.walls,
             ranger_distances_mm,
-            dbg_beam_start, dbg_beam_end, dbg_intersection);
+            dbg_intersection);
     // printf("%d\n", ranger_distances_mm[0]);
     //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
