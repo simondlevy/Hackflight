@@ -345,17 +345,15 @@ static void readRanger(const int width, const int height,
             const float distance_m =
                 wb_range_finder_image_get_depth(image, width, x, y);
 
-            printf("d=%3.3f\n", distance_m);
-
             distance_mm[y*width+x] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
         }
-        //printf("---------");
     }
 }
 
 
-static bool step( const string worldname, const setpointType_e setpointType)
+static bool step(const string worldname, const setpointType_e setpointType,
+        FILE * logfp)
 {
     if (wb_robot_step(_timestep) == -1) {
         return false;
@@ -399,6 +397,10 @@ static bool step( const string worldname, const setpointType_e setpointType)
     const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
     if (_flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
         _flightMode = MODE_IDLE;
+    }
+
+    if (z > 0.18) {
+        fprintf(logfp?logfp:stdout, "%d\n", ranger_distance_mm[0]);
     }
 
     sendSimInfo(siminfo);
@@ -456,9 +458,12 @@ int main(int argc, char ** argv)
 
     _zdist = ZDIST_HOVER_INIT_M;
 
+    FILE * logfp = fopen(
+            "/home/levys/Desktop/hackflight/webots/controllers/experimental/groundtruth.csv", "w");
+
     while (true) {
 
-        if (!step(worldname, setpointType)) {
+        if (!step(worldname, setpointType, logfp)) {
             break;
         }
     }

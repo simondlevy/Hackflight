@@ -68,7 +68,7 @@ class Simulator {
             _pidControl->init();
         }
 
-        pose_t step(const info_t & siminfo)
+        pose_t step(const info_t & siminfo, const bool freezexy=false)
         {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
@@ -104,7 +104,9 @@ class Simulator {
 
             // Get current pose from dynamics
             const auto s = _dynamics.state;
-            return pose_t { s.x, s.y, s.z, s.phi, s.theta, s.psi };
+            return pose_t {
+                freezexy?0:s.x, freezexy?0:s.y, s.z, s.phi, s.theta, s.psi
+            };
         }    
 
     private:

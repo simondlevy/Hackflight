@@ -339,10 +339,6 @@ static bool step()
 
     Simulator::info_t siminfo = {};
 
-    siminfo.ball_x = +0.5;
-    siminfo.ball_y = 0;
-    siminfo.ball_z = 0;
-
     switch (getJoystickStatus()) {
 
         case JOYSTICK_RECOGNIZED:

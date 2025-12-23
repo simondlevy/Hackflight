@@ -6,7 +6,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
 EXTERNPROTO "../protos/DiyQuad.proto"
 EXTERNPROTO "../protos/RedBall.proto"
-EXTERNPROTO "../protos/GreenBall.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -33,10 +32,6 @@ DEF red_ball RedBall {
   hidden linearVelocity_0 0.032550493804309404 -0.0858838862118669 6.28794166170094
   hidden angularVelocity_0 4.083517028332466 3.100145767276978 1.0428356031416017
 }
-DEF green_ball GreenBall {
-  hidden linearVelocity_0 4.22059070721965e-16 9.490410406342934e-17 0.6463078507625093
-  hidden angularVelocity_0 -5.363899389032717e-16 -5.551036511945206e-15 -4.13301445156445e-16
-}
 TexturedBackground {
 }
 TexturedBackgroundLight {
@@ -57,7 +52,7 @@ DEF wall Wall {
 DEF wall Wall {
   translation 0.81028 0.78264 0
   name "wall 1(5)"
-  size 0.05 2 1
+  size 0.05 2 15
 }
 DEF wall Wall {
   translation -0.21128 -0.1896 0
