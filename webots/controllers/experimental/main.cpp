@@ -345,7 +345,7 @@ static void readRanger(const int width, const int height,
             const float distance_m =
                 wb_range_finder_image_get_depth(image, width, x, y);
 
-            printf("x=%d y=%d d=%3.3f\n", x, y, distance_m);
+            printf("d=%3.3f\n", distance_m);
 
             distance_mm[y*width+x] = isinf(distance_m) ? -1 :
                 (int16_t)(1000 * distance_m);
