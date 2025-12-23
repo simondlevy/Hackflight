@@ -38,7 +38,6 @@ static constexpr char ROBOT_NAME[] = "diyquad";
 static dBodyID _robot;
 
 static dBodyID _red_ball;
-static dBodyID _green_ball;
 
 // Platform-independent simulator
 static Simulator _simulator;
@@ -50,7 +49,6 @@ DLLEXPORT void webots_physics_init()
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
     _red_ball = dWebotsGetBodyFromDEF("red_ball");
-    _green_ball = dWebotsGetBodyFromDEF("green_ball");
 
     if (_robot == NULL) {
 
@@ -62,7 +60,6 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robot, 0);
 
         dBodySetGravityMode(_red_ball, 0);
-        dBodySetGravityMode(_green_ball, 0);
     }
 
     _simulator.init(&_pidControl);
@@ -144,9 +141,6 @@ DLLEXPORT void webots_physics_step()
     dBodySetQuaternion(_robot, q);
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
-
-    dBodySetPosition(_green_ball,
-            dbg_beam_end.x, dbg_beam_end.y, dbg_beam_end.z);
 
     dBodySetPosition(_red_ball,
             dbg_intersection.x, dbg_intersection.y, dbg_intersection.z);
