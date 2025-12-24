@@ -25,11 +25,11 @@
 #include <simulator/simulator.hpp>
 
 // Simsensors
-#include <sim_datatypes.h>
-#include <parsers/world_parser.hpp>
-#include <parsers/robot_parser.hpp>
-#include <sensors/rangefinder.hpp>
-//#include <sensors/rangefinder_visualizer.hpp>
+#include <simsensors/src/collision.hpp>
+#include <simsensors/src/parsers/world.hpp>
+#include <simsensors/src/parsers/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
+//#include <simsensors/src/visualizers/rangefinder.hpp>
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
@@ -122,6 +122,13 @@ DLLEXPORT void webots_physics_step()
     const double robot_x = siminfo.start_x + pose.x;
     const double robot_y = siminfo.start_y - pose.y;
     const double robot_z = siminfo.start_z + pose.z;
+
+    if (simsens::CollisionDetector::detect(
+                simsens::vec3_t{robot_x, robot_y, robot_x},
+                _worldParser.walls)) {
+        static int count;
+        printf("************* COLLISION %d ****************\n", count++);
+    }
 
     // Get simulated rangefinder distances
     int ranger_distances_mm[1000] = {}; // arbitrary max size
