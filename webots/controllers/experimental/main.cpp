@@ -49,31 +49,6 @@ static void readRanger(const int width, const int height,
     }
 }
 
-static void getSimInfoFromKeyboard(
-        Simulator::info_t & siminfo, flightMode_t & flightMode)
-{
-    static bool _enter_was_down;
-    static bool _spacebar_was_down;
-
-    const int key = wb_keyboard_get_key();
-
-    if (key == -1 ) {
-        _enter_was_down = false;
-        _spacebar_was_down = false;
-    }
-
-    checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
-
-    checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
-
-    if (flightMode == MODE_HOVERING) {
-
-        getSetpointFromKey(key, siminfo);
-    }
-
-    siminfo.flightMode = flightMode;
-}
-
 static bool flight_mode_hovering(const flightMode_t mode)
 {
     return mode == MODE_HOVERING;
@@ -113,7 +88,7 @@ static bool step(const string worldname, const setpointType_e setpointType,
             // fall thru
 
         default:
-            getSimInfoFromKeyboard(siminfo, _flightMode);
+            getSimInfoFromKeyboard(siminfo, _flightMode, flight_mode_hovering);
     }
 
     if (setpointType == SETPOINT_LIDAR) {

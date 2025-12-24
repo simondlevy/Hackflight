@@ -22,31 +22,6 @@
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
-static void getSimInfoFromKeyboard(
-        Simulator::info_t & siminfo, flightMode_t & flightMode)
-{
-    static bool _enter_was_down;
-    static bool _spacebar_was_down;
-
-    const int key = wb_keyboard_get_key();
-
-    if (key == -1 ) {
-        _enter_was_down = false;
-        _spacebar_was_down = false;
-    }
-
-    checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
-
-    checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
-
-    if (flightMode != MODE_IDLE) {
-
-        getSetpointFromKey(key, siminfo);
-    }
-
-    siminfo.flightMode = flightMode;
-}
-
 static bool flight_mode_not_idle(const flightMode_t mode)
 {
     return mode != MODE_IDLE;
@@ -73,7 +48,7 @@ static bool step()
             // fall thru
 
         default:
-            getSimInfoFromKeyboard(siminfo, _flightMode);
+            getSimInfoFromKeyboard(siminfo, _flightMode, flight_mode_not_idle);
     }
 
     // On descent, switch mode to idle when close enough to ground

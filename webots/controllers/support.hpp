@@ -277,10 +277,12 @@ static void sendSimInfo(Simulator::info_t & siminfo)
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
+typedef bool (*flightModeFun_t)(const flightMode_t);
+
 static void getSimInfoFromJoystick(
         Simulator::info_t & siminfo,
         flightMode_t & flightMode,
-        bool (*flight_mode_check)(const flightMode_t))
+        flightModeFun_t flight_mode_check)
 {
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
@@ -303,4 +305,31 @@ static void getSimInfoFromJoystick(
 
         climb(readJoystickAxis(axes.throttle));
     }
+}
+
+static void getSimInfoFromKeyboard(
+        Simulator::info_t & siminfo,
+        flightMode_t & flightMode,
+        flightModeFun_t flight_mode_check)
+{
+    static bool _enter_was_down;
+    static bool _spacebar_was_down;
+
+    const int key = wb_keyboard_get_key();
+
+    if (key == -1 ) {
+        _enter_was_down = false;
+        _spacebar_was_down = false;
+    }
+
+    checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
+
+    checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
+
+    if (flight_mode_check(flightMode)) {
+
+        getSetpointFromKey(key, siminfo);
+    }
+
+    siminfo.flightMode = flightMode;
 }
