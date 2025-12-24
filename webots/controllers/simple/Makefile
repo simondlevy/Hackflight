@@ -33,7 +33,7 @@ INCLUDE = -I$(SRCDIR) -I$(SRCDIR)/pid/slowfast -I$(OPENCV_DIR) -I$(SIMSENSORS_DI
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
-CXX_SOURCES = $(ALL).cpp
+CXX_SOURCES = main.cpp
 
 all: $(ALL)
 
