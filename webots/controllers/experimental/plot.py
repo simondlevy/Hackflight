@@ -9,7 +9,7 @@ ss = np.loadtxt('simsens.csv')
 plt.plot(gt)
 plt.plot(ss)
 plt.xlabel('timestep')
-plt.xlabel('distance (mm)')
+plt.ylabel('distance (mm)')
 plt.legend(('groundtruth', 'simsens'))
 plt.show()
 

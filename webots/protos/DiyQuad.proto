@@ -53,7 +53,7 @@ DEF ROBOT Robot {
     RangeFinder {
 
       # VL53L5 specs
-      fieldOfView 1.34  # radians
+      fieldOfView 0.00001 # 1.34  # radians
       width 1 # 8
       height 1 # 8
       minRange 0.01
