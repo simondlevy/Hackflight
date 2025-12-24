@@ -8,7 +8,6 @@ ss = np.loadtxt('simsens.csv')
 
 plt.plot(gt)
 plt.plot(ss)
-plt.ylim((600, 900))
 plt.legend(('groundtruth', 'simsens'))
 plt.show()
 

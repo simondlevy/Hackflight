@@ -400,7 +400,7 @@ static bool step(const string worldname, const setpointType_e setpointType,
     }
 
     if (z > 0.18) {
-        fprintf(logfp?logfp:stdout, "%d\n", ranger_distance_mm[0]);
+        fprintf(logfp, "%d\n", ranger_distance_mm[0]);
     }
 
     sendSimInfo(siminfo);

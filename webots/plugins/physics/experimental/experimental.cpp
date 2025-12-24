@@ -115,7 +115,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Update to get the current pose
-    const Simulator::pose_t pose = _simulator.step(siminfo, true);
+    const Simulator::pose_t pose = _simulator.step(siminfo);
 
     // Set robot posed based on state and starting position, negating for
     // rightward negative
@@ -131,13 +131,10 @@ DLLEXPORT void webots_physics_step()
             pose.phi, pose.theta, pose.psi},
             _worldParser.walls,
             ranger_distances_mm,
-            dbg_intersection);
-    // printf("%d\n", ranger_distances_mm[0]);
-    //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+            &dbg_intersection,
+            _logfp);
 
-    if (robot_z > 0.18) {
-        fprintf(_logfp, "%d\n", ranger_distances_mm[0]);
-    }
+    //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = {pose.phi, pose.theta, -pose.psi};
