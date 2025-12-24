@@ -126,11 +126,6 @@ static bool run_normal()
     return true;
 }
 
-static void hide_red_ball()
-{
-    dBodySetPosition(_red_ball, 0, 0, -1);
-}
-
 DLLEXPORT void webots_physics_init() 
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
@@ -161,31 +156,14 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    typedef enum {
-        STATUS_NORMAL,
-        STATUS_COLLIDING,
-        STATUS_GAMEOVER
-    } status_t;
+    static bool _collided;
 
-    static status_t status;
-
-    switch (status) {
-
-        case STATUS_COLLIDING:
-            dBodySetGravityMode(_robot, 1);
-            hide_red_ball();
-            status = STATUS_GAMEOVER;
-            break;
-
-        case STATUS_GAMEOVER:
-            hide_red_ball();
-            break;
-
-        default:
-            if (!run_normal()) {
-                status = STATUS_COLLIDING;
-            }
-            break;
+    if (_collided) {
+        dBodySetGravityMode(_robot, 1);
+        dBodySetPosition(_red_ball, 0, 0, -1);
+    }
+    else {
+        _collided = !run_normal();
     }
 }
 
