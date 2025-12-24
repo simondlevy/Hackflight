@@ -186,7 +186,7 @@ static void getSimInfoFromKeyboard(
 
     checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
 
-    if (flightMode == MODE_HOVERING) {
+    if (flightMode != MODE_IDLE) {
 
         getSetpointFromKey(key, siminfo);
     }
@@ -256,7 +256,7 @@ static void getSimInfoFromJoystick(Simulator::info_t & siminfo, flightMode_t & f
 
     siminfo.flightMode = flightMode;
 
-    if (siminfo.flightMode == MODE_HOVERING) {
+    if (siminfo.flightMode != MODE_IDLE) {
 
         siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
         siminfo.setpoint.roll = readJoystickAxis(axes.roll);
