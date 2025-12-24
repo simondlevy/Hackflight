@@ -49,31 +49,6 @@ static void readRanger(const int width, const int height,
     }
 }
 
-static void getSimInfoFromJoystick(Simulator::info_t & siminfo, flightMode_t & flightMode)
-{
-    static bool _hover_button_was_down;
-    static bool _auto_button_was_down;
-
-    auto axes = getJoystickInfo();
-
-    const auto button = wb_joystick_get_pressed_button();
-
-    checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
-
-    checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
-
-    siminfo.flightMode = flightMode;
-
-    if (siminfo.flightMode == MODE_HOVERING) {
-
-        siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
-        siminfo.setpoint.roll = readJoystickAxis(axes.roll);
-        siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
-
-        climb(readJoystickAxis(axes.throttle));
-    }
-}
-
 static void getSimInfoFromKeyboard(
         Simulator::info_t & siminfo, flightMode_t & flightMode)
 {
@@ -99,6 +74,10 @@ static void getSimInfoFromKeyboard(
     siminfo.flightMode = flightMode;
 }
 
+static bool flight_mode_hovering(const flightMode_t mode)
+{
+    return mode == MODE_HOVERING;
+}
 
 static bool step(const string worldname, const setpointType_e setpointType,
         FILE * logfp)
@@ -126,7 +105,7 @@ static bool step(const string worldname, const setpointType_e setpointType,
     switch (getJoystickStatus()) {
 
         case JOYSTICK_RECOGNIZED:
-            getSimInfoFromJoystick(siminfo, _flightMode);
+            getSimInfoFromJoystick(siminfo, _flightMode, flight_mode_hovering);
             break;
 
         case JOYSTICK_UNRECOGNIZED:
@@ -206,8 +185,8 @@ int main(int argc, char ** argv)
 
     _zdist = ZDIST_HOVER_INIT_M;
 
-    FILE * logfp = fopen(
-            "/home/levys/Desktop/hackflight/webots/controllers/experimental/groundtruth.csv", "w");
+    FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
+            "experimental/groundtruth.csv", "w");
 
     while (true) {
 

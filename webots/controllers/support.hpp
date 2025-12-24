@@ -167,8 +167,6 @@ static void checkKeyboardToggle(
     }
 }
 
-
-
 static void checkButtonToggle(
         const int button,
         const int target,
@@ -279,4 +277,30 @@ static void sendSimInfo(Simulator::info_t & siminfo)
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
+static void getSimInfoFromJoystick(
+        Simulator::info_t & siminfo,
+        flightMode_t & flightMode,
+        bool (*flight_mode_check)(const flightMode_t))
+{
+    static bool _hover_button_was_down;
+    static bool _auto_button_was_down;
 
+    auto axes = getJoystickInfo();
+
+    const auto button = wb_joystick_get_pressed_button();
+
+    checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
+
+    checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
+
+    siminfo.flightMode = flightMode;
+
+    if (flight_mode_check(siminfo.flightMode)) {
+
+        siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
+        siminfo.setpoint.roll = readJoystickAxis(axes.roll);
+        siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
+
+        climb(readJoystickAxis(axes.throttle));
+    }
+}

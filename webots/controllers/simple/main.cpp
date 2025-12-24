@@ -22,31 +22,6 @@
 
 static const uint8_t LIDAR_DISPLAY_SCALEUP = 64;
 
-static void getSimInfoFromJoystick(Simulator::info_t & siminfo, flightMode_t & flightMode)
-{
-    static bool _hover_button_was_down;
-    static bool _auto_button_was_down;
-
-    auto axes = getJoystickInfo();
-
-    const auto button = wb_joystick_get_pressed_button();
-
-    checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
-
-    checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
-
-    siminfo.flightMode = flightMode;
-
-    if (siminfo.flightMode != MODE_IDLE) {
-
-        siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
-        siminfo.setpoint.roll = readJoystickAxis(axes.roll);
-        siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
-
-        climb(readJoystickAxis(axes.throttle));
-    }
-}
-
 static void getSimInfoFromKeyboard(
         Simulator::info_t & siminfo, flightMode_t & flightMode)
 {
@@ -71,6 +46,12 @@ static void getSimInfoFromKeyboard(
 
     siminfo.flightMode = flightMode;
 }
+
+static bool flight_mode_not_idle(const flightMode_t mode)
+{
+    return mode != MODE_IDLE;
+}
+
 static bool step()
 {
     if (wb_robot_step(_timestep) == -1) {
@@ -84,7 +65,7 @@ static bool step()
     switch (getJoystickStatus()) {
 
         case JOYSTICK_RECOGNIZED:
-            getSimInfoFromJoystick(siminfo, _flightMode);
+            getSimInfoFromJoystick(siminfo, _flightMode, flight_mode_not_idle);
             break;
 
         case JOYSTICK_UNRECOGNIZED:
