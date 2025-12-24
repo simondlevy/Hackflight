@@ -73,18 +73,17 @@ DLLEXPORT void webots_physics_init()
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robot == NULL) {
+    static bool _collided;
+
+    if (_robot == NULL || _collided) {
         return;
     }
 
-    int size = 0;
-
-    Simulator::info_t siminfo = {};
-
     // Get sim info from main program
-    const auto buffer = (Simulator::info_t *)dWebotsReceive(&size);
-
-    if (size == sizeof(Simulator::info_t)) {
+    int bytes_received = 0;
+    Simulator::info_t siminfo = {};
+    const auto buffer = (Simulator::info_t *)dWebotsReceive(&bytes_received);
+    if (bytes_received == sizeof(Simulator::info_t)) {
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 
@@ -126,8 +125,7 @@ DLLEXPORT void webots_physics_step()
     if (simsens::CollisionDetector::detect(
                 simsens::vec3_t{robot_x, robot_y, robot_x},
                 _worldParser.walls)) {
-        static int count;
-        printf("************* COLLISION %d ****************\n", count++);
+        _collided = true;
     }
 
     // Get simulated rangefinder distances
