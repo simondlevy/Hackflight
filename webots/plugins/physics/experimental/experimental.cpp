@@ -46,39 +46,8 @@ static PidControl _pidControl;
 
 static FILE * _logfp;
 
-DLLEXPORT void webots_physics_init() 
+static bool run_normal()
 {
-    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
-
-    _red_ball = dWebotsGetBodyFromDEF("red_ball");
-
-    if (_robot == NULL) {
-
-        dWebotsConsolePrintf("webots_physics_init :: ");
-        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
-    }
-    else {
-
-        dBodySetGravityMode(_robot, 0);
-
-        dBodySetGravityMode(_red_ball, 0);
-    }
-
-    _simulator.init(&_pidControl);
-
-    _logfp = fopen(
-            "/home/levys/Desktop/hackflight/webots/controllers/experimental/simsens.csv", "w");
-}
-
-// This is called by Webots in the outer (display, kinematics) loop
-DLLEXPORT void webots_physics_step() 
-{
-    static bool _collided;
-
-    if (_robot == NULL || _collided) {
-        return;
-    }
-
     // Get sim info from main program
     int bytes_received = 0;
     Simulator::info_t siminfo = {};
@@ -89,7 +58,7 @@ DLLEXPORT void webots_physics_step()
 
     // This happens at startup
     if (siminfo.framerate == 0) {
-        return;
+        return true;
     }
 
     static simsens::SimRangefinder * _simRangefinder;
@@ -125,7 +94,7 @@ DLLEXPORT void webots_physics_step()
     if (simsens::CollisionDetector::detect(
                 simsens::vec3_t{robot_x, robot_y, robot_x},
                 _worldParser.walls)) {
-        _collided = true;
+        return false;
     }
 
     // Get simulated rangefinder distances
@@ -153,6 +122,71 @@ DLLEXPORT void webots_physics_step()
 
     dBodySetPosition(_red_ball,
             dbg_intersection.x, dbg_intersection.y, dbg_intersection.z);
+
+    return true;
+}
+
+static void hide_red_ball()
+{
+    dBodySetPosition(_red_ball, 0, 0, -1);
+}
+
+DLLEXPORT void webots_physics_init() 
+{
+    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
+
+    _red_ball = dWebotsGetBodyFromDEF("red_ball");
+
+    if (_robot == NULL) {
+
+        dWebotsConsolePrintf("webots_physics_init :: ");
+        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
+    }
+    else {
+
+        dBodySetGravityMode(_robot, 0);
+        dBodySetGravityMode(_red_ball, 0);
+    }
+
+    _simulator.init(&_pidControl);
+
+    _logfp = fopen(
+            "/home/levys/Desktop/hackflight/webots/controllers/experimental/simsens.csv", "w");
+}
+
+// This is called by Webots in the outer (display, kinematics) loop
+DLLEXPORT void webots_physics_step() 
+{
+    if (_robot == NULL) {
+        return;
+    }
+
+    typedef enum {
+        STATUS_NORMAL,
+        STATUS_COLLIDING,
+        STATUS_GAMEOVER
+    } status_t;
+
+    static status_t status;
+
+    switch (status) {
+
+        case STATUS_COLLIDING:
+            dBodySetGravityMode(_robot, 1);
+            hide_red_ball();
+            status = STATUS_GAMEOVER;
+            break;
+
+        case STATUS_GAMEOVER:
+            hide_red_ball();
+            break;
+
+        default:
+            if (!run_normal()) {
+                status = STATUS_COLLIDING;
+            }
+            break;
+    }
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
