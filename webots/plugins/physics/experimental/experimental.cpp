@@ -26,8 +26,8 @@
 
 // Simsensors
 #include <simsensors/src/collision.hpp>
-#include <simsensors/src/parsers/world.hpp>
-#include <simsensors/src/parsers/robot.hpp>
+#include <simsensors/src/parsers/webots/world.hpp>
+#include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 //#include <simsensors/src/visualizers/rangefinder.hpp>
 

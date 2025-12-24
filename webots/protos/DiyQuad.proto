@@ -315,7 +315,7 @@ DEF ROBOT Robot {
         }
     physics Physics {
         density -1
-            mass 0.05
+        mass 0.05
     }
 }
 
