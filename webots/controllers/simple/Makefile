@@ -12,14 +12,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds and setpoints --------------------------------------
-
-world = simple
-
-setpoint = human
-
-# -----------------------------------------------------------------------------
-
 ALL = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
@@ -43,9 +35,8 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(ALL) $(world) $(setpoint) \
-		../../protos
+	webots ../../worlds/simple.wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(ALL) ../../protos
 
 
 edit:
