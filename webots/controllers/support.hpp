@@ -381,7 +381,7 @@ class Support {
             sendSimInfo(siminfo);
         }
 
-        static void animateMotor(const char * name, const float direction)
+        static void startMotor(const char * name, const float direction)
         {
             auto motor = wb_robot_get_device(name);
             wb_motor_set_position(motor, INFINITY);
@@ -407,10 +407,10 @@ class Support {
 
             wb_keyboard_enable(_timestep);
 
-            animateMotor("motor1", -1);
-            animateMotor("motor2", +1);
-            animateMotor("motor3", +1);
-            animateMotor("motor4", -1);
+            startMotor("motor1", -1);
+            startMotor("motor2", +1);
+            startMotor("motor3", +1);
+            startMotor("motor4", -1);
 
             wb_joystick_enable(_timestep);
 
