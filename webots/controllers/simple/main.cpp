@@ -31,17 +31,15 @@ int main()
 
     support.begin();
 
-    flightMode_t flightMode = MODE_IDLE;
-
     while (true) {
 
         Simulator::info_t siminfo = {};
 
-        if (!support.beginStep(flight_mode_not_idle, flightMode, siminfo)) {
+        if (!support.beginStep(flight_mode_not_idle, siminfo)) {
             break;
         }
 
-        support.endStep(siminfo, flightMode);
+        support.endStep(siminfo);
     }
 
     return support.end();

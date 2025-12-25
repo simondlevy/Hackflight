@@ -70,6 +70,8 @@ class Support {
 
         double _start_x, _start_y, _start_z;
 
+        flightMode_t _flightMode;
+
         typedef struct {
 
             int8_t throttle;
@@ -142,25 +144,25 @@ class Support {
             }
         }
 
-        static void switchMode(flightMode_t & mode, const toggle_e toggle)
+        void switchMode(toggle_e toggle)
         {
-            switch (mode) {
+            switch (_flightMode) {
 
                 case MODE_IDLE:
-                    mode = toggle == TOGGLE_HOVER ? MODE_HOVERING : mode;
+                    _flightMode = toggle == TOGGLE_HOVER ? MODE_HOVERING : _flightMode;
                     break;
 
                 case MODE_HOVERING:
-                    mode = 
+                    _flightMode = 
                         toggle == TOGGLE_HOVER ?  MODE_LANDING :
                         toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
-                        mode;
+                        _flightMode;
                     break;
 
                 case MODE_AUTONOMOUS:
-                    mode = 
+                    _flightMode = 
                         toggle == TOGGLE_AUTO ?  MODE_HOVERING :
-                        mode;
+                    _flightMode;
                     break;
 
                 default:
@@ -168,38 +170,36 @@ class Support {
             }
         }
 
-        static void checkKeyboardToggle(
+        void checkKeyboardToggle(
                 const int key,
                 const int target,
                 const toggle_e toggle,
-                bool & key_was_down,
-                flightMode_t & flightMode) 
+                bool & key_was_down)
         {
             if (key == target) {
                 if (!key_was_down) {
                     key_was_down = true;
-                    switchMode(flightMode, toggle);
+                    switchMode(toggle);
                 }
             }
         }
 
-        static void checkButtonToggle(
+        void checkButtonToggle(
                 const int button,
                 const int target,
                 const toggle_e toggle,
-                bool & button_was_down,
-        flightMode_t & flightMode)
-{
-    if (button == target) {
-        button_was_down = true;
-    }
-    else {
-        if (button_was_down) {
-            switchMode(flightMode, toggle);
+                bool & button_was_down)
+        {
+            if (button == target) {
+                button_was_down = true;
+            }
+            else {
+                if (button_was_down) {
+                    switchMode(toggle);
+                }
+                button_was_down = false;
+            }
         }
-        button_was_down = false;
-    }
-}
 
         joystick_t getJoystickInfo() 
         {
@@ -289,7 +289,6 @@ class Support {
 
         void getSimInfoFromJoystick(
                 Simulator::info_t & siminfo,
-                flightMode_t & flightMode,
                 flightModeFun_t flight_mode_check)
         {
             static bool _hover_button_was_down;
@@ -299,11 +298,11 @@ class Support {
 
             const auto button = wb_joystick_get_pressed_button();
 
-            checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
+            checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down);
 
-            checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
+            checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
 
-            siminfo.flightMode = flightMode;
+            siminfo.flightMode = _flightMode;
 
             if (flight_mode_check(siminfo.flightMode)) {
 
@@ -317,7 +316,6 @@ class Support {
 
         void getSimInfoFromKeyboard(
                 Simulator::info_t & siminfo,
-                flightMode_t & flightMode,
                 flightModeFun_t flight_mode_check)
         {
             static bool _enter_was_down;
@@ -330,23 +328,21 @@ class Support {
                 _spacebar_was_down = false;
             }
 
-            checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
+            checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down);
 
-            checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
+            checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
 
-            if (flight_mode_check(flightMode)) {
+            if (flight_mode_check(_flightMode)) {
 
                 getSetpointFromKey(key, siminfo);
             }
 
-            siminfo.flightMode = flightMode;
+            siminfo.flightMode = _flightMode;
         }
 
     public:
 
-        bool beginStep(
-                flightModeFun_t flight_mode_check,
-                flightMode_t & flightMode,
+        bool beginStep(flightModeFun_t flight_mode_check,
                 Simulator::info_t & siminfo)
         {
             if (wb_robot_step(_timestep) == -1) {
@@ -356,7 +352,7 @@ class Support {
             switch (getJoystickStatus()) {
 
                 case JOYSTICK_RECOGNIZED:
-                    getSimInfoFromJoystick(siminfo, flightMode, flight_mode_check);
+                    getSimInfoFromJoystick(siminfo, flight_mode_check);
                     break;
 
                 case JOYSTICK_UNRECOGNIZED:
@@ -364,21 +360,26 @@ class Support {
                     // fall thru
 
                 default:
-                    getSimInfoFromKeyboard(siminfo, flightMode, flight_mode_check);
+                    getSimInfoFromKeyboard(siminfo, flight_mode_check);
             }
 
             return true;
         }
 
-        void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
+        void endStep(Simulator::info_t &siminfo)
         {
             // On descent, switch mode to idle when close enough to ground
             const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-            if (flightMode == MODE_LANDING && z < ZDIST_LANDING_MAX_M) {
-                flightMode = MODE_IDLE;
+            if (_flightMode == MODE_LANDING && z < ZDIST_LANDING_MAX_M) {
+                _flightMode = MODE_IDLE;
             }
 
             sendSimInfo(siminfo);
+        }
+
+        flightMode_t getFlightMode()
+        {
+            return _flightMode;
         }
 
         static void startMotor(const char * name, const float direction)
@@ -391,6 +392,8 @@ class Support {
         void begin()
         {
             wb_robot_init();
+
+            _flightMode = MODE_IDLE;
 
             _timestep = wb_robot_get_basic_time_step();
 
