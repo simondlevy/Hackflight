@@ -333,3 +333,40 @@ static void getSimInfoFromKeyboard(
 
     siminfo.flightMode = flightMode;
 }
+
+static bool beginStep(
+        flightModeFun_t flight_mode_check,
+        flightMode_t & flightMode,
+        Simulator::info_t & siminfo)
+{
+    if (wb_robot_step(_timestep) == -1) {
+        return false;
+    }
+
+    switch (getJoystickStatus()) {
+
+        case JOYSTICK_RECOGNIZED:
+            getSimInfoFromJoystick(siminfo, flightMode, flight_mode_check);
+            break;
+
+        case JOYSTICK_UNRECOGNIZED:
+            reportJoystick();
+            // fall thru
+
+        default:
+            getSimInfoFromKeyboard(siminfo, flightMode, flight_mode_check);
+    }
+
+    return true;
+}
+
+static void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
+{
+    // On descent, switch mode to idle when close enough to ground
+    const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
+    if (flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
+        flightMode = MODE_IDLE;
+    }
+
+    sendSimInfo(siminfo);
+}

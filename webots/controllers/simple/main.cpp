@@ -29,35 +29,15 @@ static bool flight_mode_not_idle(const flightMode_t mode)
 
 static bool step()
 {
-    if (wb_robot_step(_timestep) == -1) {
-        return false;
-    }
-
     static flightMode_t _flightMode;
 
     Simulator::info_t siminfo = {};
 
-    switch (getJoystickStatus()) {
-
-        case JOYSTICK_RECOGNIZED:
-            getSimInfoFromJoystick(siminfo, _flightMode, flight_mode_not_idle);
-            break;
-
-        case JOYSTICK_UNRECOGNIZED:
-            reportJoystick();
-            // fall thru
-
-        default:
-            getSimInfoFromKeyboard(siminfo, _flightMode, flight_mode_not_idle);
+    if (!beginStep(flight_mode_not_idle, _flightMode, siminfo)) {
+        return false;
     }
 
-    // On descent, switch mode to idle when close enough to ground
-    const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-    if (_flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
-        _flightMode = MODE_IDLE;
-    }
-
-    sendSimInfo(siminfo);
+    endStep(siminfo, _flightMode);
 
     return true;
 }

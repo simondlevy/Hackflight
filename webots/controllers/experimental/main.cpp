@@ -57,13 +57,13 @@ static bool flight_mode_hovering(const flightMode_t mode)
 static bool step(const string worldname, const setpointType_e setpointType,
         FILE * logfp)
 {
-    if (wb_robot_step(_timestep) == -1) {
-        return false;
-    }
-
     static flightMode_t _flightMode;
 
     Simulator::info_t siminfo = {};
+
+    if (!beginStep(flight_mode_hovering, _flightMode, siminfo)) {
+        return false;
+    }
 
     strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
     strcpy(siminfo.worldname, worldname.c_str());
@@ -77,35 +77,12 @@ static bool step(const string worldname, const setpointType_e setpointType,
 
     //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
-    switch (getJoystickStatus()) {
-
-        case JOYSTICK_RECOGNIZED:
-            getSimInfoFromJoystick(siminfo, _flightMode, flight_mode_hovering);
-            break;
-
-        case JOYSTICK_UNRECOGNIZED:
-            reportJoystick();
-            // fall thru
-
-        default:
-            getSimInfoFromKeyboard(siminfo, _flightMode, flight_mode_hovering);
-    }
-
     if (setpointType == SETPOINT_LIDAR) {
         MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
     }
+    fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
-    // On descent, switch mode to idle when close enough to ground
-    const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-    if (_flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
-        _flightMode = MODE_IDLE;
-    }
-
-    if (z > 0.18) {
-        fprintf(logfp, "%d\n", ranger_distance_mm[0]);
-    }
-
-    sendSimInfo(siminfo);
+    endStep(siminfo, _flightMode);
 
     return true;
 }
