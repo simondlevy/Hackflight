@@ -54,8 +54,7 @@ static bool flight_mode_hovering(const flightMode_t mode)
     return mode == MODE_HOVERING;
 }
 
-static bool step(const string worldname, const setpointType_e setpointType,
-        FILE * logfp)
+static bool step(const string worldname, FILE * logfp)
 {
     static flightMode_t _flightMode;
 
@@ -77,9 +76,7 @@ static bool step(const string worldname, const setpointType_e setpointType,
 
     //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
-    if (setpointType == SETPOINT_LIDAR) {
-        MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
-    }
+    //MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
     fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
     Support::endStep(siminfo, _flightMode);
@@ -94,29 +91,16 @@ int main(int argc, char ** argv)
     Support::begin();
 
     const std::string worldname =  argv[1];
-    const std::string setpoint =  argv[2];
 
     _ranger = wb_robot_get_device("range-finder");
     wb_range_finder_enable(_ranger, _timestep);
-
-    setpointType_e setpointType = SETPOINT_HUMAN;
-
-    if (setpoint == "lidar") {
-    }
-    else if (setpoint == "human") {
-    }
-    else {
-        printf("Unrecognized setpoint '%s'; defaulting to human\n",
-                setpoint.c_str());
-    }
-
 
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
 
     while (true) {
 
-        if (!step(worldname, setpointType, logfp)) {
+        if (!step(worldname, logfp)) {
             break;
         }
     }

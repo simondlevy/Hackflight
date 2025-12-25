@@ -12,11 +12,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds and setpoints --------------------------------------
+# Support different worlds ----------------------------------------------------
 
 world = simple
-
-setpoint = human
 
 # -----------------------------------------------------------------------------
 
@@ -44,7 +42,7 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(ALL) $(world) $(setpoint) \
+	/usr/local/webots/webots-controller --stdout-redirect $(ALL) $(world) \
 		../../protos
 
 
