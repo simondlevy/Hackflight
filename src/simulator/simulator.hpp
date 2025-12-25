@@ -47,7 +47,6 @@ class Simulator {
 
         } pose_t;
 
-
         typedef struct {
 
             float start_x;
@@ -110,16 +109,6 @@ class Simulator {
         }    
 
     private:
-
-        // For debugging
-        const char * modeNames[6] = {
-            "IDLE",
-            "ARMED",
-            "HOVERING",
-            "AUTONOMOUS",
-            "LANDING",
-            "LOST_CONTACT"
-        };
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 

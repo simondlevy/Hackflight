@@ -23,7 +23,6 @@ using namespace std;
 
 // Hackflight
 #include <datatypes.h>
-#include <simulator/dynamics.hpp>
 #include <simulator/simulator.hpp>
 
 // Webots
@@ -43,6 +42,7 @@ class Support {
         static constexpr float ZDIST_HOVER_INIT_M = 0.4;
         static constexpr float ZDIST_HOVER_MAX_M = 1.0;
         static constexpr float ZDIST_HOVER_MIN_M = 0.2;
+        static constexpr float ZDIST_LANDING_MAX_M = 0.01;
         static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
 
         typedef enum {
@@ -374,7 +374,7 @@ class Support {
         {
             // On descent, switch mode to idle when close enough to ground
             const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-            if (flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
+            if (flightMode == MODE_LANDING && z < ZDIST_LANDING_MAX_M) {
                 flightMode = MODE_IDLE;
             }
 
