@@ -73,105 +73,120 @@ static float _zdist;
 
 static double _start_x, _start_y, _start_z;
 
-static void climb(const float rate)
-{
-    const float time_curr = wb_robot_get_time();
 
-    static float _time_prev;
+static std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
-    const float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
+    {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
 
-    _time_prev = time_curr;
+    {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
+};
 
-    _zdist = std::min(std::max(
-                _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
-                ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
-}
 
-static void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
-{
-    switch (key) {
+class Support {
 
-        case WB_KEYBOARD_UP:
-            siminfo.setpoint.pitch = +1.0;
-            break;
+    private:
 
-        case WB_KEYBOARD_DOWN:
-            siminfo.setpoint.pitch = -1.0;
-            break;
+        typedef bool (*flightModeFun_t)(const flightMode_t);
 
-        case WB_KEYBOARD_RIGHT:
-            siminfo.setpoint.roll = +1.0;
-            break;
+        static void climb(const float rate)
+        {
+            const float time_curr = wb_robot_get_time();
 
-        case WB_KEYBOARD_LEFT:
-            siminfo.setpoint.roll = -1.0;
-            break;
+            static float _time_prev;
 
-        case 'Q':
-            siminfo.setpoint.yaw = -0.5;
-            break;
+            const float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
 
-        case 'E':
-            siminfo.setpoint.yaw = +0.5;
-            break;
+            _time_prev = time_curr;
 
-        case 'W':
-            climb(+1);
-            break;
-
-        case 'S':
-            climb(-1);
-            break;
-    }
-}
-
-static void switchMode(flightMode_t & mode, const toggle_e toggle)
-{
-    switch (mode) {
-
-        case MODE_IDLE:
-            mode = toggle == TOGGLE_HOVER ? MODE_HOVERING : mode;
-            break;
-
-        case MODE_HOVERING:
-            mode = 
-                toggle == TOGGLE_HOVER ?  MODE_LANDING :
-                toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
-                mode;
-            break;
-
-        case MODE_AUTONOMOUS:
-            mode = 
-                toggle == TOGGLE_AUTO ?  MODE_HOVERING :
-                mode;
-            break;
-
-        default:
-            break;
-    }
-}
-
-static void checkKeyboardToggle(
-        const int key,
-        const int target,
-        const toggle_e toggle,
-        bool & key_was_down,
-        flightMode_t & flightMode) 
-{
-    if (key == target) {
-        if (!key_was_down) {
-            key_was_down = true;
-            switchMode(flightMode, toggle);
+            _zdist = std::min(std::max(
+                        _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
+                        ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
         }
-    }
-}
 
-static void checkButtonToggle(
-        const int button,
-        const int target,
-        const toggle_e toggle,
-        bool & button_was_down,
+        static void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
+        {
+            switch (key) {
+
+                case WB_KEYBOARD_UP:
+                    siminfo.setpoint.pitch = +1.0;
+                    break;
+
+                case WB_KEYBOARD_DOWN:
+                    siminfo.setpoint.pitch = -1.0;
+                    break;
+
+                case WB_KEYBOARD_RIGHT:
+                    siminfo.setpoint.roll = +1.0;
+                    break;
+
+                case WB_KEYBOARD_LEFT:
+                    siminfo.setpoint.roll = -1.0;
+                    break;
+
+                case 'Q':
+                    siminfo.setpoint.yaw = -0.5;
+                    break;
+
+                case 'E':
+                    siminfo.setpoint.yaw = +0.5;
+                    break;
+
+                case 'W':
+                    climb(+1);
+                    break;
+
+                case 'S':
+                    climb(-1);
+                    break;
+            }
+        }
+
+        static void switchMode(flightMode_t & mode, const toggle_e toggle)
+        {
+            switch (mode) {
+
+                case MODE_IDLE:
+                    mode = toggle == TOGGLE_HOVER ? MODE_HOVERING : mode;
+                    break;
+
+                case MODE_HOVERING:
+                    mode = 
+                        toggle == TOGGLE_HOVER ?  MODE_LANDING :
+                        toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
+                        mode;
+                    break;
+
+                case MODE_AUTONOMOUS:
+                    mode = 
+                        toggle == TOGGLE_AUTO ?  MODE_HOVERING :
+                        mode;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        static void checkKeyboardToggle(
+                const int key,
+                const int target,
+                const toggle_e toggle,
+                bool & key_was_down,
+                flightMode_t & flightMode) 
+        {
+            if (key == target) {
+                if (!key_was_down) {
+                    key_was_down = true;
+                    switchMode(flightMode, toggle);
+                }
+            }
+        }
+
+        static void checkButtonToggle(
+                const int button,
+                const int target,
+                const toggle_e toggle,
+                bool & button_was_down,
         flightMode_t & flightMode)
 {
     if (button == target) {
@@ -185,156 +200,146 @@ static void checkButtonToggle(
     }
 }
 
-static std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-    {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
-
-    {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
-};
-
-static joystick_t getJoystickInfo() 
-{
-    return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-}
-
-static float normalizeJoystickAxis(const int32_t rawval)
-{
-    return 2.0f * rawval / UINT16_MAX; 
-}
-
-static int32_t readJoystickRaw(const int8_t index)
-{
-    const auto axis = abs(index) - 1;
-    const auto sign = index < 0 ? -1 : +1;
-    return sign * wb_joystick_get_axis_value(axis);
-}
-
-static float readJoystickAxis(const int8_t index)
-{
-    return normalizeJoystickAxis(readJoystickRaw(index));
-}
-
-joystickStatus_e getJoystickStatus(void)
-{
-    auto mode = JOYSTICK_RECOGNIZED;
-
-    auto joyname = wb_joystick_get_model();
-
-    // No joystick
-    if (joyname == NULL) {
-
-        static bool _didWarn;
-
-        if (!_didWarn) {
-            puts("Using keyboard instead:\n");
-            puts("- Use Enter to take off and land\n");
-            puts("- Use W and S to go up and down\n");
-            puts("- Use arrow keys to move horizontally\n");
-            puts("- Use Q and E to change heading\n");
+        static joystick_t getJoystickInfo() 
+        {
+            return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
         }
 
-        _didWarn = true;
+        static float normalizeJoystickAxis(const int32_t rawval)
+        {
+            return 2.0f * rawval / UINT16_MAX; 
+        }
 
-        mode = JOYSTICK_NONE;
-    }
+        static int32_t readJoystickRaw(const int8_t index)
+        {
+            const auto axis = abs(index) - 1;
+            const auto sign = index < 0 ? -1 : +1;
+            return sign * wb_joystick_get_axis_value(axis);
+        }
 
-    // Joystick unrecognized
-    else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
+        static float readJoystickAxis(const int8_t index)
+        {
+            return normalizeJoystickAxis(readJoystickRaw(index));
+        }
 
-        mode = JOYSTICK_UNRECOGNIZED;
-    }
 
-    return mode;
-}
+        static joystickStatus_e getJoystickStatus(void)
+        {
+            auto mode = JOYSTICK_RECOGNIZED;
 
-static void reportJoystick(void)
-{
-    printf("Unrecognized joystick '%s' with axes ",
-            wb_joystick_get_model()); 
+            auto joyname = wb_joystick_get_model();
 
-    for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
+            // No joystick
+            if (joyname == NULL) {
 
-        printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
-    }
-}
+                static bool _didWarn;
 
-static void sendSimInfo(Simulator::info_t & siminfo)
-{
-    const double * xyz = wb_gps_get_values(_gps);
+                if (!_didWarn) {
+                    puts("Using keyboard instead:\n");
+                    puts("- Use Enter to take off and land\n");
+                    puts("- Use W and S to go up and down\n");
+                    puts("- Use arrow keys to move horizontally\n");
+                    puts("- Use Q and E to change heading\n");
+                }
 
-    if (_start_x == 0) {
-        _start_x = xyz[0];
-        _start_y = xyz[1];
-        _start_z = xyz[2];
-    }
+                _didWarn = true;
 
-    siminfo.start_x = _start_x;
-    siminfo.start_y = _start_y;
-    siminfo.start_z = _start_z;
+                mode = JOYSTICK_NONE;
+            }
 
-    siminfo.setpoint.thrust = _zdist;
-    siminfo.framerate = 1000 / _timestep;
-    wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
-}
+            // Joystick unrecognized
+            else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
 
-typedef bool (*flightModeFun_t)(const flightMode_t);
+                mode = JOYSTICK_UNRECOGNIZED;
+            }
 
-static void getSimInfoFromJoystick(
-        Simulator::info_t & siminfo,
-        flightMode_t & flightMode,
-        flightModeFun_t flight_mode_check)
-{
-    static bool _hover_button_was_down;
-    static bool _auto_button_was_down;
+            return mode;
+        }
 
-    auto axes = getJoystickInfo();
+        static void reportJoystick(void)
+        {
+            printf("Unrecognized joystick '%s' with axes ",
+                    wb_joystick_get_model()); 
 
-    const auto button = wb_joystick_get_pressed_button();
+            for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
 
-    checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
+                printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
+            }
+        }
 
-    checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
+        static void sendSimInfo(Simulator::info_t & siminfo)
+        {
+            const double * xyz = wb_gps_get_values(_gps);
 
-    siminfo.flightMode = flightMode;
+            if (_start_x == 0) {
+                _start_x = xyz[0];
+                _start_y = xyz[1];
+                _start_z = xyz[2];
+            }
 
-    if (flight_mode_check(siminfo.flightMode)) {
+            siminfo.start_x = _start_x;
+            siminfo.start_y = _start_y;
+            siminfo.start_z = _start_z;
 
-        siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
-        siminfo.setpoint.roll = readJoystickAxis(axes.roll);
-        siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
+            siminfo.setpoint.thrust = _zdist;
+            siminfo.framerate = 1000 / _timestep;
+            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+        }
 
-        climb(readJoystickAxis(axes.throttle));
-    }
-}
+        static void getSimInfoFromJoystick(
+                Simulator::info_t & siminfo,
+                flightMode_t & flightMode,
+                flightModeFun_t flight_mode_check)
+        {
+            static bool _hover_button_was_down;
+            static bool _auto_button_was_down;
 
-static void getSimInfoFromKeyboard(
-        Simulator::info_t & siminfo,
-        flightMode_t & flightMode,
-        flightModeFun_t flight_mode_check)
-{
-    static bool _enter_was_down;
-    static bool _spacebar_was_down;
+            auto axes = getJoystickInfo();
 
-    const int key = wb_keyboard_get_key();
+            const auto button = wb_joystick_get_pressed_button();
 
-    if (key == -1 ) {
-        _enter_was_down = false;
-        _spacebar_was_down = false;
-    }
+            checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, flightMode);
 
-    checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
+            checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, flightMode);
 
-    checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
+            siminfo.flightMode = flightMode;
 
-    if (flight_mode_check(flightMode)) {
+            if (flight_mode_check(siminfo.flightMode)) {
 
-        getSetpointFromKey(key, siminfo);
-    }
+                siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
+                siminfo.setpoint.roll = readJoystickAxis(axes.roll);
+                siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
 
-    siminfo.flightMode = flightMode;
-}
+                climb(readJoystickAxis(axes.throttle));
+            }
+        }
 
-class Support {
+        static void getSimInfoFromKeyboard(
+                Simulator::info_t & siminfo,
+                flightMode_t & flightMode,
+                flightModeFun_t flight_mode_check)
+        {
+            static bool _enter_was_down;
+            static bool _spacebar_was_down;
+
+            const int key = wb_keyboard_get_key();
+
+            if (key == -1 ) {
+                _enter_was_down = false;
+                _spacebar_was_down = false;
+            }
+
+            checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, flightMode);
+
+            checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, flightMode);
+
+            if (flight_mode_check(flightMode)) {
+
+                getSetpointFromKey(key, siminfo);
+            }
+
+            siminfo.flightMode = flightMode;
+        }
 
     public:
 
