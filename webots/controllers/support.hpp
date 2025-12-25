@@ -370,3 +370,12 @@ static void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
 
     sendSimInfo(siminfo);
 }
+
+static void animateMotor(const char * name, const float direction)
+{
+    auto motor = wb_robot_get_device(name);
+    wb_motor_set_position(motor, INFINITY);
+    wb_motor_set_velocity(motor, direction * 60);
+}
+
+

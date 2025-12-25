@@ -87,13 +87,6 @@ static bool step(const string worldname, const setpointType_e setpointType,
     return true;
 }
 
-static void animateMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction * 60);
-}
-
 int main(int argc, char ** argv) 
 {
     (void)argc;
@@ -108,7 +101,8 @@ int main(int argc, char ** argv)
     else if (setpoint == "human") {
     }
     else {
-        printf("Unrecognized setpoint '%s'; defaulting to human\n", setpoint.c_str());
+        printf("Unrecognized setpoint '%s'; defaulting to human\n",
+                setpoint.c_str());
     }
 
     wb_robot_init();
