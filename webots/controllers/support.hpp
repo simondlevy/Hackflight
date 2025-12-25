@@ -378,4 +378,34 @@ static void animateMotor(const char * name, const float direction)
     wb_motor_set_velocity(motor, direction * 60);
 }
 
+static void begin()
+{
+    wb_robot_init();
 
+    _timestep = wb_robot_get_basic_time_step();
+
+    _emitter = wb_robot_get_device("emitter");
+
+    _gps = wb_robot_get_device("gps");
+    wb_gps_enable(_gps, _timestep);
+
+    WbDeviceTag camera = wb_robot_get_device("camera");
+    wb_camera_enable(camera, _timestep);
+
+    wb_keyboard_enable(_timestep);
+
+    animateMotor("motor1", -1);
+    animateMotor("motor2", +1);
+    animateMotor("motor3", +1);
+    animateMotor("motor4", -1);
+
+    wb_joystick_enable(_timestep);
+
+    _zdist = ZDIST_HOVER_INIT_M;
+}
+
+static int end()
+{
+    wb_robot_cleanup();
+    return 0;
+}

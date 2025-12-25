@@ -91,8 +91,13 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
+    begin();
+
     const std::string worldname =  argv[1];
     const std::string setpoint =  argv[2];
+
+    _ranger = wb_robot_get_device("range-finder");
+    wb_range_finder_enable(_ranger, _timestep);
 
     setpointType_e setpointType = SETPOINT_HUMAN;
 
@@ -105,31 +110,6 @@ int main(int argc, char ** argv)
                 setpoint.c_str());
     }
 
-    wb_robot_init();
-
-    _timestep = wb_robot_get_basic_time_step();
-
-    _emitter = wb_robot_get_device("emitter");
-
-    _ranger = wb_robot_get_device("range-finder");
-    wb_range_finder_enable(_ranger, _timestep);
-
-    _gps = wb_robot_get_device("gps");
-    wb_gps_enable(_gps, _timestep);
-
-    WbDeviceTag camera = wb_robot_get_device("camera");
-    wb_camera_enable(camera, _timestep);
-
-    wb_keyboard_enable(_timestep);
-
-    animateMotor("motor1", -1);
-    animateMotor("motor2", +1);
-    animateMotor("motor3", +1);
-    animateMotor("motor4", -1);
-
-    wb_joystick_enable(_timestep);
-
-    _zdist = ZDIST_HOVER_INIT_M;
 
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
@@ -141,7 +121,13 @@ int main(int argc, char ** argv)
         }
     }
 
-    wb_robot_cleanup();
-
-    return 0;
+    return end();
 }
+
+
+
+
+
+
+
+
