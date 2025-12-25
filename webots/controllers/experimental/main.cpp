@@ -46,6 +46,10 @@ int main(int argc, char ** argv)
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
 
+    const char * mode_names[6] = {
+        "IDLE", "ARMED", "HOVERING", "AUTONOMOUS", "LANDING", "PANIC"
+    };
+
     while (true) {
 
         Simulator::info_t siminfo = {};
@@ -53,6 +57,8 @@ int main(int argc, char ** argv)
         if (!support.beginStep(flight_mode_hovering, flightMode, siminfo)) {
             break;
         }
+
+        printf("mode=%s\n", mode_names[flightMode]);
 
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
