@@ -334,78 +334,84 @@ static void getSimInfoFromKeyboard(
     siminfo.flightMode = flightMode;
 }
 
-static bool beginStep(
-        flightModeFun_t flight_mode_check,
-        flightMode_t & flightMode,
-        Simulator::info_t & siminfo)
-{
-    if (wb_robot_step(_timestep) == -1) {
-        return false;
-    }
+class Support {
 
-    switch (getJoystickStatus()) {
+    public:
 
-        case JOYSTICK_RECOGNIZED:
-            getSimInfoFromJoystick(siminfo, flightMode, flight_mode_check);
-            break;
+        static bool beginStep(
+                flightModeFun_t flight_mode_check,
+                flightMode_t & flightMode,
+                Simulator::info_t & siminfo)
+        {
+            if (wb_robot_step(_timestep) == -1) {
+                return false;
+            }
 
-        case JOYSTICK_UNRECOGNIZED:
-            reportJoystick();
-            // fall thru
+            switch (getJoystickStatus()) {
 
-        default:
-            getSimInfoFromKeyboard(siminfo, flightMode, flight_mode_check);
-    }
+                case JOYSTICK_RECOGNIZED:
+                    getSimInfoFromJoystick(siminfo, flightMode, flight_mode_check);
+                    break;
 
-    return true;
-}
+                case JOYSTICK_UNRECOGNIZED:
+                    reportJoystick();
+                    // fall thru
 
-static void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
-{
-    // On descent, switch mode to idle when close enough to ground
-    const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-    if (flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
-        flightMode = MODE_IDLE;
-    }
+                default:
+                    getSimInfoFromKeyboard(siminfo, flightMode, flight_mode_check);
+            }
 
-    sendSimInfo(siminfo);
-}
+            return true;
+        }
 
-static void animateMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction * 60);
-}
+        static void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
+        {
+            // On descent, switch mode to idle when close enough to ground
+            const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
+            if (flightMode == MODE_LANDING && z <= Dynamics::ZMIN) {
+                flightMode = MODE_IDLE;
+            }
 
-static void begin()
-{
-    wb_robot_init();
+            sendSimInfo(siminfo);
+        }
 
-    _timestep = wb_robot_get_basic_time_step();
+        static void animateMotor(const char * name, const float direction)
+        {
+            auto motor = wb_robot_get_device(name);
+            wb_motor_set_position(motor, INFINITY);
+            wb_motor_set_velocity(motor, direction * 60);
+        }
 
-    _emitter = wb_robot_get_device("emitter");
+        static void begin()
+        {
+            wb_robot_init();
 
-    _gps = wb_robot_get_device("gps");
-    wb_gps_enable(_gps, _timestep);
+            _timestep = wb_robot_get_basic_time_step();
 
-    WbDeviceTag camera = wb_robot_get_device("camera");
-    wb_camera_enable(camera, _timestep);
+            _emitter = wb_robot_get_device("emitter");
 
-    wb_keyboard_enable(_timestep);
+            _gps = wb_robot_get_device("gps");
+            wb_gps_enable(_gps, _timestep);
 
-    animateMotor("motor1", -1);
-    animateMotor("motor2", +1);
-    animateMotor("motor3", +1);
-    animateMotor("motor4", -1);
+            WbDeviceTag camera = wb_robot_get_device("camera");
+            wb_camera_enable(camera, _timestep);
 
-    wb_joystick_enable(_timestep);
+            wb_keyboard_enable(_timestep);
 
-    _zdist = ZDIST_HOVER_INIT_M;
-}
+            animateMotor("motor1", -1);
+            animateMotor("motor2", +1);
+            animateMotor("motor3", +1);
+            animateMotor("motor4", -1);
 
-static int end()
-{
-    wb_robot_cleanup();
-    return 0;
-}
+            wb_joystick_enable(_timestep);
+
+            _zdist = ZDIST_HOVER_INIT_M;
+        }
+
+        static int end()
+        {
+            wb_robot_cleanup();
+            return 0;
+        }
+
+};

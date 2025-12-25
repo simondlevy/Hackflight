@@ -61,7 +61,7 @@ static bool step(const string worldname, const setpointType_e setpointType,
 
     Simulator::info_t siminfo = {};
 
-    if (!beginStep(flight_mode_hovering, _flightMode, siminfo)) {
+    if (!Support::beginStep(flight_mode_hovering, _flightMode, siminfo)) {
         return false;
     }
 
@@ -82,7 +82,7 @@ static bool step(const string worldname, const setpointType_e setpointType,
     }
     fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
-    endStep(siminfo, _flightMode);
+    Support::endStep(siminfo, _flightMode);
 
     return true;
 }
@@ -91,7 +91,7 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    begin();
+    Support::begin();
 
     const std::string worldname =  argv[1];
     const std::string setpoint =  argv[2];
@@ -121,5 +121,5 @@ int main(int argc, char ** argv)
         }
     }
 
-    return end();
+    return Support::end();
 }
