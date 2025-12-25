@@ -23,44 +23,23 @@ using namespace std;
 // Hackflight
 #include <setpoint/multiranger.hpp>
 
-// Webots
-#include <webots/range_finder.h>
-
 // Misc.
 #include "../support.hpp"
 
-static WbDeviceTag _ranger;
 
-static void readRanger(const int width, const int height,
-        int16_t * distance_mm) 
-{
-    const float * image = wb_range_finder_get_range_image(_ranger);
-
-    for (int x=0; x<width; ++x) {
-
-        for (int y=0; y<height; ++y) {
-
-            const float distance_m =
-                wb_range_finder_image_get_depth(image, width, x, y);
-
-            distance_mm[y*width+x] = isinf(distance_m) ? -1 :
-                (int16_t)(1000 * distance_m);
-        }
-    }
-}
 
 static bool flight_mode_hovering(const flightMode_t mode)
 {
     return mode == MODE_HOVERING;
 }
 
-static bool step(const string worldname, FILE * logfp)
+static bool step(const string worldname, Support & support, FILE * logfp)
 {
     static flightMode_t _flightMode;
 
     Simulator::info_t siminfo = {};
 
-    if (!Support::beginStep(flight_mode_hovering, _flightMode, siminfo)) {
+    if (!support.beginStep(flight_mode_hovering, _flightMode, siminfo)) {
         return false;
     }
 
@@ -69,17 +48,14 @@ static bool step(const string worldname, FILE * logfp)
 
     int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
 
-    const int width = wb_range_finder_get_width(_ranger);
-    const int height = wb_range_finder_get_height(_ranger);
-
-    readRanger(width, height, ranger_distance_mm);
+    support.readRanger(ranger_distance_mm);
 
     //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
     //MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
     fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
-    Support::endStep(siminfo, _flightMode);
+    support.endStep(siminfo, _flightMode);
 
     return true;
 }
@@ -88,22 +64,21 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    Support::begin();
+    Support support = {};
+
+    support.begin();
 
     const std::string worldname =  argv[1];
-
-    _ranger = wb_robot_get_device("range-finder");
-    wb_range_finder_enable(_ranger, _timestep);
 
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
 
     while (true) {
 
-        if (!step(worldname, logfp)) {
+        if (!step(worldname, support, logfp)) {
             break;
         }
     }
 
-    return Support::end();
+    return support.end();
 }

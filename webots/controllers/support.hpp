@@ -33,62 +33,63 @@ using namespace std;
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
+#include <webots/range_finder.h>
 #include <webots/robot.h>
-
-static const float ZDIST_HOVER_INIT_M = 0.4;
-static const float ZDIST_HOVER_MAX_M = 1.0;
-static const float ZDIST_HOVER_MIN_M = 0.2;
-static const float ZDIST_HOVER_INC_MPS = 0.2;
-
-typedef enum {
-
-    JOYSTICK_NONE,
-    JOYSTICK_UNRECOGNIZED,
-    JOYSTICK_RECOGNIZED
-
-} joystickStatus_e;
-
-typedef enum {
-
-    TOGGLE_HOVER,
-    TOGGLE_AUTO
-
-} toggle_e;
-
-typedef struct {
-
-    int8_t throttle;
-    int8_t roll;
-    int8_t pitch;
-    int8_t yaw;
-
-} joystick_t;
-
-static WbDeviceTag _emitter;
-static WbDeviceTag _gps;
-
-static double _timestep;
-
-static float _zdist;
-
-static double _start_x, _start_y, _start_z;
-
-
-static std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-    {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
-
-    {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
-};
-
 
 class Support {
 
     private:
 
+        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
+        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
+        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
+        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
+
+        typedef enum {
+
+            JOYSTICK_NONE,
+            JOYSTICK_UNRECOGNIZED,
+            JOYSTICK_RECOGNIZED
+
+        } joystickStatus_e;
+
+        typedef enum {
+
+            TOGGLE_HOVER,
+            TOGGLE_AUTO
+
+        } toggle_e;
+
+        WbDeviceTag _emitter;
+        WbDeviceTag _gps;
+        WbDeviceTag _ranger;
+
+        double _timestep;
+
+        float _zdist;
+
+        double _start_x, _start_y, _start_z;
+
+        typedef struct {
+
+            int8_t throttle;
+            int8_t roll;
+            int8_t pitch;
+            int8_t yaw;
+
+        } joystick_t;
+
+        std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
+
+            {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
+
+            {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
+        };
+
+
         typedef bool (*flightModeFun_t)(const flightMode_t);
 
-        static void climb(const float rate)
+        void climb(const float rate)
         {
             const float time_curr = wb_robot_get_time();
 
@@ -103,7 +104,7 @@ class Support {
                         ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
         }
 
-        static void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
+        void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
         {
             switch (key) {
 
@@ -200,7 +201,7 @@ class Support {
     }
 }
 
-        static joystick_t getJoystickInfo() 
+        joystick_t getJoystickInfo() 
         {
             return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
         }
@@ -223,7 +224,7 @@ class Support {
         }
 
 
-        static joystickStatus_e getJoystickStatus(void)
+        joystickStatus_e getJoystickStatus(void)
         {
             auto mode = JOYSTICK_RECOGNIZED;
 
@@ -267,7 +268,7 @@ class Support {
             }
         }
 
-        static void sendSimInfo(Simulator::info_t & siminfo)
+        void sendSimInfo(Simulator::info_t & siminfo)
         {
             const double * xyz = wb_gps_get_values(_gps);
 
@@ -286,7 +287,7 @@ class Support {
             wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
         }
 
-        static void getSimInfoFromJoystick(
+        void getSimInfoFromJoystick(
                 Simulator::info_t & siminfo,
                 flightMode_t & flightMode,
                 flightModeFun_t flight_mode_check)
@@ -314,7 +315,7 @@ class Support {
             }
         }
 
-        static void getSimInfoFromKeyboard(
+        void getSimInfoFromKeyboard(
                 Simulator::info_t & siminfo,
                 flightMode_t & flightMode,
                 flightModeFun_t flight_mode_check)
@@ -343,7 +344,7 @@ class Support {
 
     public:
 
-        static bool beginStep(
+        bool beginStep(
                 flightModeFun_t flight_mode_check,
                 flightMode_t & flightMode,
                 Simulator::info_t & siminfo)
@@ -369,7 +370,7 @@ class Support {
             return true;
         }
 
-        static void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
+        void endStep(Simulator::info_t &siminfo, flightMode_t & flightMode)
         {
             // On descent, switch mode to idle when close enough to ground
             const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
@@ -387,7 +388,7 @@ class Support {
             wb_motor_set_velocity(motor, direction * 60);
         }
 
-        static void begin()
+        void begin()
         {
             wb_robot_init();
 
@@ -401,6 +402,9 @@ class Support {
             WbDeviceTag camera = wb_robot_get_device("camera");
             wb_camera_enable(camera, _timestep);
 
+            _ranger = wb_robot_get_device("range-finder");
+            wb_range_finder_enable(_ranger, _timestep);
+
             wb_keyboard_enable(_timestep);
 
             animateMotor("motor1", -1);
@@ -413,10 +417,30 @@ class Support {
             _zdist = ZDIST_HOVER_INIT_M;
         }
 
-        static int end()
+        int end()
         {
             wb_robot_cleanup();
             return 0;
+        }
+
+        void readRanger(int16_t * distance_mm) 
+        {
+            const float * image = wb_range_finder_get_range_image(_ranger);
+
+            const int width = wb_range_finder_get_width(_ranger);
+            const int height = wb_range_finder_get_height(_ranger);
+
+            for (int x=0; x<width; ++x) {
+
+                for (int y=0; y<height; ++y) {
+
+                    const float distance_m =
+                        wb_range_finder_image_get_depth(image, width, x, y);
+
+                    distance_mm[y*width+x] = isinf(distance_m) ? -1 :
+                        (int16_t)(1000 * distance_m);
+                }
+            }
         }
 
 };

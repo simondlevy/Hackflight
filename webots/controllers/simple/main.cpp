@@ -27,7 +27,9 @@ static bool flight_mode_not_idle(const flightMode_t mode)
 
 int main() 
 {
-    Support::begin();
+    Support support = {};
+
+    support.begin();
 
     flightMode_t flightMode = {};
 
@@ -35,12 +37,12 @@ int main()
 
         Simulator::info_t siminfo = {};
 
-        if (!Support::beginStep(flight_mode_not_idle, flightMode, siminfo)) {
+        if (!support.beginStep(flight_mode_not_idle, flightMode, siminfo)) {
             break;
         }
 
-        Support::endStep(siminfo, flightMode);
+        support.endStep(siminfo, flightMode);
     }
 
-    return Support::end();
+    return support.end();
 }
