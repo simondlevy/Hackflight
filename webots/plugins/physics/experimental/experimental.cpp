@@ -120,8 +120,10 @@ static bool run_normal()
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 
-    dBodySetPosition(_red_ball,
-            dbg_intersection.x, dbg_intersection.y, dbg_intersection.z);
+    if (_red_ball) {
+        dBodySetPosition(_red_ball,
+                dbg_intersection.x, dbg_intersection.y, dbg_intersection.z);
+    }
 
     return true;
 }
@@ -140,7 +142,9 @@ DLLEXPORT void webots_physics_init()
     else {
 
         dBodySetGravityMode(_robot, 0);
-        dBodySetGravityMode(_red_ball, 0);
+        if (_red_ball) {
+            dBodySetGravityMode(_red_ball, 0);
+        }
     }
 
     _simulator.init(&_pidControl);
@@ -160,7 +164,9 @@ DLLEXPORT void webots_physics_step()
 
     if (_collided) {
         dBodySetGravityMode(_robot, 1);
-        dBodySetPosition(_red_ball, 0, 0, -1);
+        if (_red_ball) {
+            dBodySetPosition(_red_ball, 0, 0, -1);
+        }
     }
     else {
         _collided = !run_normal();
