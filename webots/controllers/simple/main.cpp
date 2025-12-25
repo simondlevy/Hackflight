@@ -31,7 +31,7 @@ int main()
 
     support.begin();
 
-    flightMode_t flightMode = {};
+    flightMode_t flightMode = MODE_IDLE;
 
     while (true) {
 
