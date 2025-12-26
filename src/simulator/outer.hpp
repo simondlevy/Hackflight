@@ -1,5 +1,5 @@
 /* 
-   C++ flight simulator support for Hackflight with custom physics plugin
+   Hackflight simulator outer loop (UI / setpoints)
 
    Copyright (C) 2025 Simon D. Levy
 

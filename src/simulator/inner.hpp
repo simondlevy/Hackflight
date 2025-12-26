@@ -1,5 +1,5 @@
 /* 
- * Simulation inner loop
+ * Hackflight simulator inner loop (PID control / dynamics)
  *
  * Copyright (C) 2025 Simon D. Levy
  *
