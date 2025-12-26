@@ -25,10 +25,20 @@ using namespace std;
 
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
+    typedef enum {
+        PHASE_START,
+        PHASE_ROTATE,
+        PHASE_FORWARD,
+        PHASE_DONE
+    } phase_e;
+
+    static phase_e _phase;
+
     const auto d = ranger_distances_mm;
 
-    printf("%d %d %d %d %d %d %d %d\n",
-            d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
+    printf("d0=%d d1=%d d2=%d d3=%d d4=%d d5=%d d6=%d d7=%d | %d\n",
+            d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7],
+            d[3] == -1 && d[4] == -1); 
 
     return demands_t {0.5, 0, 0, 0};
 }
