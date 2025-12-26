@@ -26,9 +26,9 @@ using namespace std;
 #include <simulator/outer.hpp>
 
 // Detects when we're in autonomous mode
-static bool is_flight_mode_manual(const flightMode_t mode)
+static bool is_flight_mode_autonomous(const flightMode_t mode)
 {
-    return mode == MODE_HOVERING;
+    return mode == MODE_AUTONOMOUS;
 }
 
 int main(int argc, char ** argv) 
@@ -48,7 +48,7 @@ int main(int argc, char ** argv)
 
         siminfo_t siminfo = {};
 
-        if (!outerLoop.beginStep(is_flight_mode_manual, siminfo)) {
+        if (!outerLoop.beginStep(is_flight_mode_autonomous, siminfo)) {
             break;
         }
 

@@ -20,9 +20,10 @@
 #include <simulator/outer.hpp>
 
 // Simple version is always in manual mode
-static bool is_flight_mode_manual(const flightMode_t mode)
+static bool is_flight_mode_autonomous(const flightMode_t mode)
 {
-    return mode != MODE_IDLE;
+    (void)mode;
+    return false;
 }
 
 int main() 
@@ -35,7 +36,7 @@ int main()
 
         siminfo_t siminfo = {};
 
-        if (!outerLoop.beginStep(is_flight_mode_manual, siminfo)) {
+        if (!outerLoop.beginStep(is_flight_mode_autonomous, siminfo)) {
             break;
         }
 
