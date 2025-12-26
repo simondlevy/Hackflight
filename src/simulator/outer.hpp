@@ -17,6 +17,7 @@
  */
 
 // C/C++
+#include <string.h>
 #include <map>
 #include <string>
 using namespace std;
@@ -26,6 +27,76 @@ using namespace std;
 #include <simulator/common.h>
 
 class SimOuterLoop {
+
+    public:
+
+        bool beginStep(
+                siminfo_t & siminfo,
+                const demands_t * autonomousSetpoint=nullptr)
+        {
+            if (!platform_step()) {
+                return false;
+            }
+
+            const bool autonomous = autonomousSetpoint != nullptr;
+
+            switch (getJoystickStatus()) {
+
+                case JOYSTICK_RECOGNIZED:
+                    getSimInfoFromJoystick(siminfo, autonomous);
+                    break;
+
+                case JOYSTICK_UNRECOGNIZED:
+                    reportJoystick();
+                    // fall thru
+
+                default:
+                    getSimInfoFromKeyboard(siminfo, autonomous);
+            }
+
+            if (autonomous) {
+                memcpy(&siminfo.setpoint, autonomousSetpoint, sizeof(demands_t));
+            }
+
+            return true;
+        }
+
+        void endStep(siminfo_t &siminfo)
+        {
+            // On descent, switch mode to idle when close enough to ground
+            double x=0, y=0, z=0;
+            platform_get_vehicle_location(x, y, z);
+            if (_flightMode == MODE_LANDING && (z-_start_z )< ZDIST_LANDING_MAX_M) {
+                _flightMode = MODE_IDLE;
+            }
+
+            sendSimInfo(siminfo);
+        }
+
+        flightMode_t getFlightMode()
+        {
+            return _flightMode;
+        }
+
+        void begin()
+        {
+            _flightMode = MODE_IDLE;
+
+            _zdist = ZDIST_HOVER_INIT_M;
+
+            platform_init();
+        }
+
+        int end()
+        {
+            platform_cleanup();
+            return 0;
+        }
+
+        void readRanger(int16_t * distance_mm) 
+        {
+            platform_read_rangefinder(distance_mm);
+        }
 
     private:
 
@@ -304,74 +375,6 @@ class SimOuterLoop {
 
             siminfo.flightMode = _flightMode;
         }
-
-    public:
-
-        bool beginStep(
-                siminfo_t & siminfo,
-                const demands_t * autonomousSetpoint=nullptr)
-        {
-            if (!platform_step()) {
-                return false;
-            }
-
-            const bool autonomous = autonomousSetpoint != nullptr;
-
-            switch (getJoystickStatus()) {
-
-                case JOYSTICK_RECOGNIZED:
-                    getSimInfoFromJoystick(siminfo, autonomous);
-                    break;
-
-                case JOYSTICK_UNRECOGNIZED:
-                    reportJoystick();
-                    // fall thru
-
-                default:
-                    getSimInfoFromKeyboard(siminfo, autonomous);
-            }
-
-            return true;
-        }
-
-        void endStep(siminfo_t &siminfo)
-        {
-            // On descent, switch mode to idle when close enough to ground
-            double x=0, y=0, z=0;
-            platform_get_vehicle_location(x, y, z);
-            if (_flightMode == MODE_LANDING && (z-_start_z )< ZDIST_LANDING_MAX_M) {
-                _flightMode = MODE_IDLE;
-            }
-
-            sendSimInfo(siminfo);
-        }
-
-        flightMode_t getFlightMode()
-        {
-            return _flightMode;
-        }
-
-        void begin()
-        {
-            _flightMode = MODE_IDLE;
-
-            _zdist = ZDIST_HOVER_INIT_M;
-
-            platform_init();
-        }
-
-        int end()
-        {
-            platform_cleanup();
-            return 0;
-        }
-
-        void readRanger(int16_t * distance_mm) 
-        {
-            platform_read_rangefinder(distance_mm);
-        }
-
-    private:
 
         // Platform-dependent ------------------------------------------------
 
