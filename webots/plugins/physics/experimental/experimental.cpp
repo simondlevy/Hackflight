@@ -91,9 +91,11 @@ static bool run_normal()
     const double robot_y = siminfo.start_y - pose.y;
     const double robot_z = siminfo.start_z + pose.z;
 
+    // Stop if we detected a collision
+    const bool debug = true;
     if (simsens::CollisionDetector::detect(
                 simsens::vec3_t{robot_x, robot_y, robot_x},
-                _worldParser.walls)) {
+                _worldParser.walls, debug)) {
         return false;
     }
 
