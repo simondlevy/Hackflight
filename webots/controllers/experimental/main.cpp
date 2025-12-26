@@ -29,10 +29,10 @@ static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 
     const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
-    const float thrust = 0.5;
+    const float thrust = 0.5; // hold altitude
     const float roll = 0;
-    const float pitch = center_is_clear ? 0.1 : 0;
-    const float yaw = center_is_clear ? 0 : 0.1;
+    const float pitch = center_is_clear ? 0.2 : 0;
+    const float yaw = center_is_clear ? 0 : 0.2;
 
     return demands_t {thrust, roll, pitch, yaw};
 }
