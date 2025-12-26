@@ -25,16 +25,6 @@ using namespace std;
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
 
-// Webots
-#include <webots/camera.h>
-#include <webots/emitter.h>
-#include <webots/gps.h>
-#include <webots/joystick.h>
-#include <webots/keyboard.h>
-#include <webots/motor.h>
-#include <webots/range_finder.h>
-#include <webots/robot.h>
-
 class Support {
 
     private:
@@ -80,39 +70,36 @@ class Support {
 
         void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
         {
-            switch (key) {
+            if (key ==platform_keyboard_up()) {
+                siminfo.setpoint.pitch = +1.0;
+            }
 
-                case WB_KEYBOARD_UP:
-                    siminfo.setpoint.pitch = +1.0;
-                    break;
+            else if (key ==platform_keyboard_down()) {
+                siminfo.setpoint.pitch = -1.0;
+            }
 
-                case WB_KEYBOARD_DOWN:
-                    siminfo.setpoint.pitch = -1.0;
-                    break;
+            else if (key ==platform_keyboard_right()) {
+                siminfo.setpoint.roll = +1.0;
+            }
 
-                case WB_KEYBOARD_RIGHT:
-                    siminfo.setpoint.roll = +1.0;
-                    break;
+            else if (key ==platform_keyboard_left()) {
+                siminfo.setpoint.roll = -1.0;
+            }
 
-                case WB_KEYBOARD_LEFT:
-                    siminfo.setpoint.roll = -1.0;
-                    break;
+            else if (key =='Q') {
+                siminfo.setpoint.yaw = -0.5;
+            }
 
-                case 'Q':
-                    siminfo.setpoint.yaw = -0.5;
-                    break;
+            else if (key =='E') {
+                siminfo.setpoint.yaw = +0.5;
+            }
 
-                case 'E':
-                    siminfo.setpoint.yaw = +0.5;
-                    break;
+            else if (key =='W') {
+                climb(+1);
+            }
 
-                case 'W':
-                    climb(+1);
-                    break;
-
-                case 'S':
-                    climb(-1);
-                    break;
+            else if (key =='S') {
+                climb(-1);
             }
         }
 
@@ -134,7 +121,7 @@ class Support {
                 case MODE_AUTONOMOUS:
                     _flightMode = 
                         toggle == Simulator::TOGGLE_AUTO ?  MODE_HOVERING :
-                    _flightMode;
+                        _flightMode;
                     break;
 
                 default:
@@ -366,132 +353,26 @@ class Support {
             platform_read_rangefinder(distance_mm);
         }
 
-        /////////////////////////////////////////////////////////////////////
-
     private:
 
-        WbDeviceTag _emitter;
-        WbDeviceTag _gps;
-        WbDeviceTag _ranger;
+        // Platform-dependent ------------------------------------------------
 
-        double _timestep;
-
-        static void startMotor(const char * name, const float direction)
-        {
-            auto motor = wb_robot_get_device(name);
-            wb_motor_set_position(motor, INFINITY);
-            wb_motor_set_velocity(motor, direction * 60);
-        }
-
-        float platform_get_time()
-        {
-            return wb_robot_get_time();
-        }
-
-        void platform_get_vehicle_location(double & x, double & y, double & z)
-        {
-            const double * xyz = wb_gps_get_values(_gps);
-
-            x = xyz[0];
-            y = xyz[1];
-            z = xyz[2];
-        }
-
-        void platform_send_siminfo(const Simulator::info_t & siminfo)
-        {
-            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
-        }
-
-        int platform_joystick_get_axis_value(const uint8_t axis)
-        {
-            return wb_joystick_get_axis_value(axis);
-        }
-
-        int platform_joystick_get_pressed_button()
-        {
-            return wb_joystick_get_pressed_button();
-        }
-
-        joystick_t platform_joystick_get_info() 
-        {
-            return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-        }
-
-        const char * platform_joystick_get_model()
-        {
-            return wb_joystick_get_model();
-        }
-
-        int platform_joystick_get_number_of_axes()
-        {
-            return wb_joystick_get_number_of_axes();
-        }
-
-        int platform_keyboard_get_key()
-        {
-            return wb_keyboard_get_key();
-        }
-
-        void platform_init()
-        {
-            wb_robot_init();
-
-            _timestep = wb_robot_get_basic_time_step();
-
-            _emitter = wb_robot_get_device("emitter");
-
-            _gps = wb_robot_get_device("gps");
-            wb_gps_enable(_gps, _timestep);
-
-            WbDeviceTag camera = wb_robot_get_device("camera");
-            wb_camera_enable(camera, _timestep);
-
-            _ranger = wb_robot_get_device("range-finder");
-            wb_range_finder_enable(_ranger, _timestep);
-
-            wb_keyboard_enable(_timestep);
-
-            startMotor("motor1", -1);
-            startMotor("motor2", +1);
-            startMotor("motor3", +1);
-            startMotor("motor4", -1);
-
-            wb_joystick_enable(_timestep);
-        }
-
-        void platform_cleanup()
-        {
-            wb_robot_cleanup();
-        }
-
-        bool platform_step()
-        {
-            return wb_robot_step(_timestep) != -1;
-        }
-
-        float platform_get_framerate()
-        {
-            return 1000 / _timestep;
-        }
-
-        void platform_read_rangefinder(int16_t * distance_mm) 
-        {
-            const float * image = wb_range_finder_get_range_image(_ranger);
-
-            const int width = wb_range_finder_get_width(_ranger);
-            const int height = wb_range_finder_get_height(_ranger);
-
-            for (int x=0; x<width; ++x) {
-
-                for (int y=0; y<height; ++y) {
-
-                    const float distance_m =
-                        wb_range_finder_image_get_depth(image, width, x, y);
-
-                    distance_mm[y*width+x] = isinf(distance_m) ? -1 :
-                        (int16_t)(1000 * distance_m);
-                }
-            }
-        }
-
+        void         platform_cleanup();
+        float        platform_get_framerate();
+        float        platform_get_time();
+        void         platform_get_vehicle_location(double & x, double & y, double & z);
+        void         platform_init();
+        int          platform_joystick_get_axis_value(const uint8_t axis);
+        joystick_t   platform_joystick_get_info(); 
+        const char * platform_joystick_get_model();
+        int          platform_joystick_get_number_of_axes();
+        int          platform_joystick_get_pressed_button();
+        int          platform_keyboard_get_key();
+        int          platform_keyboard_down();
+        int          platform_keyboard_left();
+        int          platform_keyboard_right();
+        int          platform_keyboard_up();
+        void         platform_send_siminfo(const Simulator::info_t & siminfo);
+        void         platform_read_rangefinder(int16_t * distance_mm); 
+        bool         platform_step();
  };
