@@ -25,7 +25,10 @@ using namespace std;
 
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
-    (void)ranger_distances_mm;
+    const auto d = ranger_distances_mm;
+
+    printf("%d %d %d %d %d %d %d %d\n",
+            d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
 
     return demands_t {0.5, 0, 0, 0};
 }
@@ -66,7 +69,6 @@ int main(int argc, char ** argv)
         fprintf(logfp, "%d\n", ranger_distances_mm[0]);
 
         outerLoop.endStep(siminfo);
-
     }
 
     return outerLoop.end();
