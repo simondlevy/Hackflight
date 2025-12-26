@@ -23,6 +23,11 @@ using namespace std;
 
 #include <simulator/outer.hpp>
 
+static demands_t getAutonomousSetpoint()
+{
+    return demands_t {0.5, 0, 0, 0};
+}
+
 int main(int argc, char ** argv) 
 {
     (void)argc;
@@ -42,7 +47,7 @@ int main(int argc, char ** argv)
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
 
-        const demands_t autonomousSetpoint = { 0.5, 0, 0, 0 };
+        const demands_t autonomousSetpoint = getAutonomousSetpoint();
 
         const bool autonomous = outerLoop.getFlightMode() == MODE_AUTONOMOUS;
 
@@ -53,8 +58,6 @@ int main(int argc, char ** argv)
 
         int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
         outerLoop.readRanger(ranger_distance_mm);
-        //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
-        //MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
         fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
         outerLoop.endStep(siminfo);
