@@ -62,6 +62,11 @@ class Support {
             z = xyz[2];
         }
 
+        void platform_send_siminfo(const Simulator::info_t & siminfo)
+        {
+            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+        }
+
         //////////////////////////////////////////////////////////////////////
 
         double _timestep;
@@ -279,7 +284,7 @@ class Support {
 
             siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = 1000 / _timestep;
-            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+            platform_send_siminfo(siminfo);
         }
 
         void getSimInfoFromJoystick(
