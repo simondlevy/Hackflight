@@ -23,8 +23,10 @@ using namespace std;
 
 #include <simulator/outer.hpp>
 
-static demands_t getAutonomousSetpoint()
+static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
+    (void)ranger_distances_mm;
+
     return demands_t {0.5, 0, 0, 0};
 }
 
@@ -47,7 +49,10 @@ int main(int argc, char ** argv)
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
 
-        const demands_t autonomousSetpoint = getAutonomousSetpoint();
+        static int16_t ranger_distances_mm[1000]; // arbitrary max size
+
+        const demands_t autonomousSetpoint =
+            getAutonomousSetpoint(ranger_distances_mm);
 
         const bool autonomous = outerLoop.getFlightMode() == MODE_AUTONOMOUS;
 
@@ -56,9 +61,9 @@ int main(int argc, char ** argv)
             break;
         }
 
-        int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
-        outerLoop.readRanger(ranger_distance_mm);
-        fprintf(logfp, "%d\n", ranger_distance_mm[0]);
+        outerLoop.readRanger(ranger_distances_mm);
+
+        fprintf(logfp, "%d\n", ranger_distances_mm[0]);
 
         outerLoop.endStep(siminfo);
 
