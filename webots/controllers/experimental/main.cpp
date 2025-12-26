@@ -25,40 +25,9 @@ using namespace std;
 
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
-    typedef enum {
-        PHASE_START,
-        PHASE_ROTATE,
-        PHASE_FORWARD,
-        PHASE_DONE
-    } phase_e;
-
-    static phase_e _phase;
-
     const auto d = ranger_distances_mm;
 
-    float yaw = 0;
-
-    switch(_phase) {
-
-        case PHASE_START:
-            _phase = PHASE_ROTATE;
-            break;
-
-        case PHASE_ROTATE:
-            yaw = 0.1;
-            if (d[3] == -1 && d[4] == -1) {
-                _phase = PHASE_FORWARD;
-            }
-            break;
-
-        case PHASE_FORWARD:
-            yaw = 0;
-            break;
-
-        case PHASE_DONE:
-            break;
-
-    }
+    const float yaw = d[3] == -1 && d[4] == -1 ? 0 : 0.1;
 
     return demands_t {0.5, 0, 0, yaw};
 }
