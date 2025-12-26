@@ -39,38 +39,6 @@ class Support {
 
     private:
 
-        WbDeviceTag _emitter;
-        WbDeviceTag _gps;
-        WbDeviceTag _ranger;
-
-        float platform_get_time()
-        {
-            return wb_robot_get_time();
-        }
-
-        int platform_get_joystick_axis_value(const uint8_t axis)
-        {
-            return wb_joystick_get_axis_value(axis);
-        }
-
-        void platform_get_vehicle_location(double & x, double & y, double & z)
-        {
-            const double * xyz = wb_gps_get_values(_gps);
-
-            x = xyz[0];
-            y = xyz[1];
-            z = xyz[2];
-        }
-
-        void platform_send_siminfo(const Simulator::info_t & siminfo)
-        {
-            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
-        }
-
-        //////////////////////////////////////////////////////////////////////
-
-        double _timestep;
-
         float _zdist;
 
         double _start_x, _start_y, _start_z;
@@ -205,24 +173,19 @@ class Support {
             }
         }
 
-        joystick_t getJoystickInfo() 
-        {
-            return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
-        }
-
         static float normalizeJoystickAxis(const int32_t rawval)
         {
             return 2.0f * rawval / UINT16_MAX; 
         }
 
-        static int32_t readJoystickRaw(const int8_t index)
+        int32_t readJoystickRaw(const int8_t index)
         {
             const auto axis = abs(index) - 1;
             const auto sign = index < 0 ? -1 : +1;
-            return sign * wb_joystick_get_axis_value(axis);
+            return sign * platform_joystick_get_axis_value(axis);
         }
 
-        static float readJoystickAxis(const int8_t index)
+        float readJoystickAxis(const int8_t index)
         {
             return normalizeJoystickAxis(readJoystickRaw(index));
         }
@@ -232,7 +195,7 @@ class Support {
         {
             auto mode = Simulator::JOYSTICK_RECOGNIZED;
 
-            auto joyname = wb_joystick_get_model();
+            auto joyname = platform_joystick_get_model();
 
             // No joystick
             if (joyname == NULL) {
@@ -261,14 +224,14 @@ class Support {
             return mode;
         }
 
-        static void reportJoystick(void)
+        void reportJoystick(void)
         {
             printf("Unrecognized joystick '%s' with axes ",
-                    wb_joystick_get_model()); 
+                    platform_joystick_get_model()); 
 
-            for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
+            for (uint8_t k=0; k<platform_joystick_get_number_of_axes(); ++k) {
 
-                printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
+                printf("%2d=%+6d |", k+1, platform_joystick_get_axis_value(k));
             }
         }
 
@@ -283,7 +246,7 @@ class Support {
             siminfo.start_z = _start_z;
 
             siminfo.setpoint.thrust = _zdist;
-            siminfo.framerate = 1000 / _timestep;
+            siminfo.framerate = platform_get_framerate();
             platform_send_siminfo(siminfo);
         }
 
@@ -294,9 +257,9 @@ class Support {
             static bool _hover_button_was_down;
             static bool _auto_button_was_down;
 
-            auto axes = getJoystickInfo();
+            auto axes = platform_joystick_get_info();
 
-            const auto button = wb_joystick_get_pressed_button();
+            const auto button = platform_joystick_get_pressed_button();
 
             checkButtonToggle(button, 5, Simulator::TOGGLE_HOVER, _hover_button_was_down);
 
@@ -321,7 +284,7 @@ class Support {
             static bool _enter_was_down;
             static bool _spacebar_was_down;
 
-            const int key = wb_keyboard_get_key();
+            const int key = platform_keyboard_get_key();
 
             if (key == -1 ) {
                 _enter_was_down = false;
@@ -345,7 +308,7 @@ class Support {
         bool beginStep(flightModeFun_t flight_mode_check,
                 Simulator::info_t & siminfo)
         {
-            if (wb_robot_step(_timestep) == -1) {
+            if (!platform_step()) {
                 return false;
             }
 
@@ -369,8 +332,9 @@ class Support {
         void endStep(Simulator::info_t &siminfo)
         {
             // On descent, switch mode to idle when close enough to ground
-            const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-            if (_flightMode == MODE_LANDING && z < Simulator::ZDIST_LANDING_MAX_M) {
+            double x=0, y=0, z=0;
+            platform_get_vehicle_location(x, y, z);
+            if (_flightMode == MODE_LANDING && (z-_start_z )< Simulator::ZDIST_LANDING_MAX_M) {
                 _flightMode = MODE_IDLE;
             }
 
@@ -382,6 +346,36 @@ class Support {
             return _flightMode;
         }
 
+        void begin()
+        {
+            _flightMode = MODE_IDLE;
+
+            _zdist = Simulator::ZDIST_HOVER_INIT_M;
+
+            platform_init();
+        }
+
+        int end()
+        {
+            platform_cleanup();
+            return 0;
+        }
+
+        void readRanger(int16_t * distance_mm) 
+        {
+            platform_read_rangefinder(distance_mm);
+        }
+
+        /////////////////////////////////////////////////////////////////////
+
+    private:
+
+        WbDeviceTag _emitter;
+        WbDeviceTag _gps;
+        WbDeviceTag _ranger;
+
+        double _timestep;
+
         static void startMotor(const char * name, const float direction)
         {
             auto motor = wb_robot_get_device(name);
@@ -389,12 +383,57 @@ class Support {
             wb_motor_set_velocity(motor, direction * 60);
         }
 
-        void begin()
+        float platform_get_time()
         {
-            _flightMode = MODE_IDLE;
+            return wb_robot_get_time();
+        }
 
-            _zdist = Simulator::ZDIST_HOVER_INIT_M;
+        void platform_get_vehicle_location(double & x, double & y, double & z)
+        {
+            const double * xyz = wb_gps_get_values(_gps);
 
+            x = xyz[0];
+            y = xyz[1];
+            z = xyz[2];
+        }
+
+        void platform_send_siminfo(const Simulator::info_t & siminfo)
+        {
+            wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+        }
+
+        int platform_joystick_get_axis_value(const uint8_t axis)
+        {
+            return wb_joystick_get_axis_value(axis);
+        }
+
+        int platform_joystick_get_pressed_button()
+        {
+            return wb_joystick_get_pressed_button();
+        }
+
+        joystick_t platform_joystick_get_info() 
+        {
+            return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
+        }
+
+        const char * platform_joystick_get_model()
+        {
+            return wb_joystick_get_model();
+        }
+
+        int platform_joystick_get_number_of_axes()
+        {
+            return wb_joystick_get_number_of_axes();
+        }
+
+        int platform_keyboard_get_key()
+        {
+            return wb_keyboard_get_key();
+        }
+
+        void platform_init()
+        {
             wb_robot_init();
 
             _timestep = wb_robot_get_basic_time_step();
@@ -420,13 +459,22 @@ class Support {
             wb_joystick_enable(_timestep);
         }
 
-        int end()
+        void platform_cleanup()
         {
             wb_robot_cleanup();
-            return 0;
         }
 
-        void readRanger(int16_t * distance_mm) 
+        bool platform_step()
+        {
+            return wb_robot_step(_timestep) != -1;
+        }
+
+        float platform_get_framerate()
+        {
+            return 1000 / _timestep;
+        }
+
+        void platform_read_rangefinder(int16_t * distance_mm) 
         {
             const float * image = wb_range_finder_get_range_image(_ranger);
 
@@ -446,4 +494,4 @@ class Support {
             }
         }
 
-};
+ };
