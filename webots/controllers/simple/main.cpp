@@ -32,7 +32,7 @@ int main()
 
     while (true) {
 
-        Simulator::info_t siminfo = {};
+        siminfo_t siminfo = {};
 
         if (!support.beginStep(flight_mode_not_idle, siminfo)) {
             break;

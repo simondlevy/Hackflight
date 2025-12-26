@@ -23,11 +23,32 @@ using namespace std;
 
 // Hackflight
 #include <datatypes.h>
-#include <simulator/simulator.hpp>
+#include <simulator/common.h>
 
 class Support {
 
     private:
+
+        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
+        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
+        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
+        static constexpr float ZDIST_LANDING_MAX_M = 0.01;
+        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
+
+        typedef enum {
+
+            JOYSTICK_NONE,
+            JOYSTICK_UNRECOGNIZED,
+            JOYSTICK_RECOGNIZED
+
+        } joystickStatus_e;
+
+        typedef enum {
+
+            TOGGLE_HOVER,
+            TOGGLE_AUTO
+
+        } toggle_e;
 
         float _zdist;
 
@@ -64,11 +85,11 @@ class Support {
             _time_prev = time_curr;
 
             _zdist = std::min(std::max(
-                        _zdist + rate * Simulator::ZDIST_HOVER_INC_MPS * dt,
-                        Simulator::ZDIST_HOVER_MIN_M), Simulator::ZDIST_HOVER_MAX_M);
+                        _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
+                        ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
         }
 
-        void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
+        void getSetpointFromKey(const int key, siminfo_t & siminfo)
         {
             if (key ==platform_keyboard_up()) {
                 siminfo.setpoint.pitch = +1.0;
@@ -103,24 +124,24 @@ class Support {
             }
         }
 
-        void switchMode(Simulator::toggle_e toggle)
+        void switchMode(toggle_e toggle)
         {
             switch (_flightMode) {
 
                 case MODE_IDLE:
-                    _flightMode = toggle == Simulator::TOGGLE_HOVER ? MODE_HOVERING : _flightMode;
+                    _flightMode = toggle == TOGGLE_HOVER ? MODE_HOVERING : _flightMode;
                     break;
 
                 case MODE_HOVERING:
                     _flightMode = 
-                        toggle == Simulator::TOGGLE_HOVER ?  MODE_LANDING :
-                        toggle == Simulator::TOGGLE_AUTO ?  MODE_AUTONOMOUS :
+                        toggle == TOGGLE_HOVER ?  MODE_LANDING :
+                        toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
                         _flightMode;
                     break;
 
                 case MODE_AUTONOMOUS:
                     _flightMode = 
-                        toggle == Simulator::TOGGLE_AUTO ?  MODE_HOVERING :
+                        toggle == TOGGLE_AUTO ?  MODE_HOVERING :
                         _flightMode;
                     break;
 
@@ -132,7 +153,7 @@ class Support {
         void checkKeyboardToggle(
                 const int key,
                 const int target,
-                const Simulator::toggle_e toggle,
+                const toggle_e toggle,
                 bool & key_was_down)
         {
             if (key == target) {
@@ -146,7 +167,7 @@ class Support {
         void checkButtonToggle(
                 const int button,
                 const int target,
-                const Simulator::toggle_e toggle,
+                const toggle_e toggle,
                 bool & button_was_down)
         {
             if (button == target) {
@@ -178,9 +199,9 @@ class Support {
         }
 
 
-        Simulator::joystickStatus_e getJoystickStatus(void)
+        joystickStatus_e getJoystickStatus(void)
         {
-            auto mode = Simulator::JOYSTICK_RECOGNIZED;
+            auto mode = JOYSTICK_RECOGNIZED;
 
             auto joyname = platform_joystick_get_model();
 
@@ -199,13 +220,13 @@ class Support {
 
                 _didWarn = true;
 
-                mode = Simulator::JOYSTICK_NONE;
+                mode = JOYSTICK_NONE;
             }
 
             // Joystick unrecognized
             else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
 
-                mode = Simulator::JOYSTICK_UNRECOGNIZED;
+                mode = JOYSTICK_UNRECOGNIZED;
             }
 
             return mode;
@@ -222,7 +243,7 @@ class Support {
             }
         }
 
-        void sendSimInfo(Simulator::info_t & siminfo)
+        void sendSimInfo(siminfo_t & siminfo)
         {
             if (_start_x == 0) {
                 platform_get_vehicle_location(_start_x, _start_y, _start_z);
@@ -238,7 +259,7 @@ class Support {
         }
 
         void getSimInfoFromJoystick(
-                Simulator::info_t & siminfo,
+                siminfo_t & siminfo,
                 flightModeFun_t flight_mode_check)
         {
             static bool _hover_button_was_down;
@@ -248,9 +269,9 @@ class Support {
 
             const auto button = platform_joystick_get_pressed_button();
 
-            checkButtonToggle(button, 5, Simulator::TOGGLE_HOVER, _hover_button_was_down);
+            checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down);
 
-            checkButtonToggle(button, 4, Simulator::TOGGLE_AUTO, _auto_button_was_down);
+            checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
 
             siminfo.flightMode = _flightMode;
 
@@ -265,7 +286,7 @@ class Support {
         }
 
         void getSimInfoFromKeyboard(
-                Simulator::info_t & siminfo,
+                siminfo_t & siminfo,
                 flightModeFun_t flight_mode_check)
         {
             static bool _enter_was_down;
@@ -278,9 +299,9 @@ class Support {
                 _spacebar_was_down = false;
             }
 
-            checkKeyboardToggle(key, 4, Simulator::TOGGLE_HOVER, _enter_was_down);
+            checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down);
 
-            checkKeyboardToggle(key, 32, Simulator::TOGGLE_AUTO, _spacebar_was_down);
+            checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
 
             if (flight_mode_check(_flightMode)) {
 
@@ -293,7 +314,7 @@ class Support {
     public:
 
         bool beginStep(flightModeFun_t flight_mode_check,
-                Simulator::info_t & siminfo)
+                siminfo_t & siminfo)
         {
             if (!platform_step()) {
                 return false;
@@ -301,11 +322,11 @@ class Support {
 
             switch (getJoystickStatus()) {
 
-                case Simulator::JOYSTICK_RECOGNIZED:
+                case JOYSTICK_RECOGNIZED:
                     getSimInfoFromJoystick(siminfo, flight_mode_check);
                     break;
 
-                case Simulator::JOYSTICK_UNRECOGNIZED:
+                case JOYSTICK_UNRECOGNIZED:
                     reportJoystick();
                     // fall thru
 
@@ -316,12 +337,12 @@ class Support {
             return true;
         }
 
-        void endStep(Simulator::info_t &siminfo)
+        void endStep(siminfo_t &siminfo)
         {
             // On descent, switch mode to idle when close enough to ground
             double x=0, y=0, z=0;
             platform_get_vehicle_location(x, y, z);
-            if (_flightMode == MODE_LANDING && (z-_start_z )< Simulator::ZDIST_LANDING_MAX_M) {
+            if (_flightMode == MODE_LANDING && (z-_start_z )< ZDIST_LANDING_MAX_M) {
                 _flightMode = MODE_IDLE;
             }
 
@@ -337,7 +358,7 @@ class Support {
         {
             _flightMode = MODE_IDLE;
 
-            _zdist = Simulator::ZDIST_HOVER_INIT_M;
+            _zdist = ZDIST_HOVER_INIT_M;
 
             platform_init();
         }
@@ -372,7 +393,7 @@ class Support {
         int          platform_keyboard_left();
         int          platform_keyboard_right();
         int          platform_keyboard_up();
-        void         platform_send_siminfo(const Simulator::info_t & siminfo);
+        void         platform_send_siminfo(const siminfo_t & siminfo);
         void         platform_read_rangefinder(int16_t * distance_mm); 
         bool         platform_step();
  };

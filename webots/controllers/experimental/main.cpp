@@ -17,6 +17,7 @@
  */
 
 // C/C++
+#include <string.h>
 #include <unistd.h>
 using namespace std;
 
@@ -44,7 +45,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        Simulator::info_t siminfo = {};
+        siminfo_t siminfo = {};
 
         if (!support.beginStep(flight_mode_hovering, siminfo)) {
             break;

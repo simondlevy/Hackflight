@@ -26,6 +26,7 @@
 #include <num.hpp>
 #include <pid.hpp>
 #include <simulator/dynamics.hpp>
+#include <simulator/common.h>
 #include <vehicles/crazyflie.hpp>
 
 class Simulator {
@@ -35,27 +36,6 @@ class Simulator {
         static constexpr float DYNAMICS_FREQ = 1e5; // Hz
 
     public:
-
-        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
-        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
-        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
-        static constexpr float ZDIST_LANDING_MAX_M = 0.01;
-        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
-
-        typedef enum {
-
-            JOYSTICK_NONE,
-            JOYSTICK_UNRECOGNIZED,
-            JOYSTICK_RECOGNIZED
-
-        } joystickStatus_e;
-
-        typedef enum {
-
-            TOGGLE_HOVER,
-            TOGGLE_AUTO
-
-        } toggle_e;
 
         typedef struct {
 
@@ -68,20 +48,6 @@ class Simulator {
 
         } pose_t;
 
-        // Structure shared between slow and fast threads
-        typedef struct {
-
-            float start_x;
-            float start_y;
-            float start_z;
-            float framerate;
-            char path[200];
-            char worldname[200];
-            flightMode_t flightMode;
-            demands_t setpoint;
-
-        } info_t;
-
         void init(PidControl * pidControl)
         {
             _pidControl = pidControl;
@@ -89,7 +55,7 @@ class Simulator {
             _pidControl->init();
         }
 
-        pose_t step(const info_t & siminfo, const bool freezexy=false)
+        pose_t step(const siminfo_t & siminfo, const bool freezexy=false)
         {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {

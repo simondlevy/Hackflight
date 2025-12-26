@@ -54,7 +54,7 @@ void Support::platform_get_vehicle_location(double & x, double & y, double & z)
     z = xyz[2];
 }
 
-void Support::platform_send_siminfo(const Simulator::info_t & siminfo)
+void Support::platform_send_siminfo(const siminfo_t & siminfo)
 {
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }

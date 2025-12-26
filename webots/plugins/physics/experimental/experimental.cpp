@@ -50,9 +50,9 @@ static bool run_normal()
 {
     // Get sim info from main program
     int bytes_received = 0;
-    Simulator::info_t siminfo = {};
-    const auto buffer = (Simulator::info_t *)dWebotsReceive(&bytes_received);
-    if (bytes_received == sizeof(Simulator::info_t)) {
+    siminfo_t siminfo = {};
+    const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
+    if (bytes_received == sizeof(siminfo_t)) {
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 
