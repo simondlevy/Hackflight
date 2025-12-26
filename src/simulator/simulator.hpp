@@ -1,13 +1,13 @@
 /* 
- * Hackflight simulator support
+ * Platform-independent simulator support for Hackflight
  *
- *  Copyright (C) 2025 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
- *  This program is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, in version 3.
  *
- *  This program is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
@@ -36,6 +36,27 @@ class Simulator {
 
     public:
 
+        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
+        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
+        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
+        static constexpr float ZDIST_LANDING_MAX_M = 0.01;
+        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
+
+        typedef enum {
+
+            JOYSTICK_NONE,
+            JOYSTICK_UNRECOGNIZED,
+            JOYSTICK_RECOGNIZED
+
+        } joystickStatus_e;
+
+        typedef enum {
+
+            TOGGLE_HOVER,
+            TOGGLE_AUTO
+
+        } toggle_e;
+
         typedef struct {
 
             float x;
@@ -47,6 +68,7 @@ class Simulator {
 
         } pose_t;
 
+        // Structure shared between slow and fast threads
         typedef struct {
 
             float start_x;

@@ -39,27 +39,6 @@ class Support {
 
     private:
 
-        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
-        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
-        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
-        static constexpr float ZDIST_LANDING_MAX_M = 0.01;
-        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
-
-        typedef enum {
-
-            JOYSTICK_NONE,
-            JOYSTICK_UNRECOGNIZED,
-            JOYSTICK_RECOGNIZED
-
-        } joystickStatus_e;
-
-        typedef enum {
-
-            TOGGLE_HOVER,
-            TOGGLE_AUTO
-
-        } toggle_e;
-
         WbDeviceTag _emitter;
         WbDeviceTag _gps;
         WbDeviceTag _ranger;
@@ -88,7 +67,6 @@ class Support {
             {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
         };
 
-
         typedef bool (*flightModeFun_t)(const flightMode_t);
 
         void climb(const float rate)
@@ -102,8 +80,8 @@ class Support {
             _time_prev = time_curr;
 
             _zdist = std::min(std::max(
-                        _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
-                        ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
+                        _zdist + rate * Simulator::ZDIST_HOVER_INC_MPS * dt,
+                        Simulator::ZDIST_HOVER_MIN_M), Simulator::ZDIST_HOVER_MAX_M);
         }
 
         void getSetpointFromKey(const int key, Simulator::info_t & siminfo)
@@ -144,24 +122,24 @@ class Support {
             }
         }
 
-        void switchMode(toggle_e toggle)
+        void switchMode(Simulator::toggle_e toggle)
         {
             switch (_flightMode) {
 
                 case MODE_IDLE:
-                    _flightMode = toggle == TOGGLE_HOVER ? MODE_HOVERING : _flightMode;
+                    _flightMode = toggle == Simulator::TOGGLE_HOVER ? MODE_HOVERING : _flightMode;
                     break;
 
                 case MODE_HOVERING:
                     _flightMode = 
-                        toggle == TOGGLE_HOVER ?  MODE_LANDING :
-                        toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
+                        toggle == Simulator::TOGGLE_HOVER ?  MODE_LANDING :
+                        toggle == Simulator::TOGGLE_AUTO ?  MODE_AUTONOMOUS :
                         _flightMode;
                     break;
 
                 case MODE_AUTONOMOUS:
                     _flightMode = 
-                        toggle == TOGGLE_AUTO ?  MODE_HOVERING :
+                        toggle == Simulator::TOGGLE_AUTO ?  MODE_HOVERING :
                     _flightMode;
                     break;
 
@@ -173,7 +151,7 @@ class Support {
         void checkKeyboardToggle(
                 const int key,
                 const int target,
-                const toggle_e toggle,
+                const Simulator::toggle_e toggle,
                 bool & key_was_down)
         {
             if (key == target) {
@@ -187,7 +165,7 @@ class Support {
         void checkButtonToggle(
                 const int button,
                 const int target,
-                const toggle_e toggle,
+                const Simulator::toggle_e toggle,
                 bool & button_was_down)
         {
             if (button == target) {
@@ -224,9 +202,9 @@ class Support {
         }
 
 
-        joystickStatus_e getJoystickStatus(void)
+        Simulator::joystickStatus_e getJoystickStatus(void)
         {
-            auto mode = JOYSTICK_RECOGNIZED;
+            auto mode = Simulator::JOYSTICK_RECOGNIZED;
 
             auto joyname = wb_joystick_get_model();
 
@@ -245,13 +223,13 @@ class Support {
 
                 _didWarn = true;
 
-                mode = JOYSTICK_NONE;
+                mode = Simulator::JOYSTICK_NONE;
             }
 
             // Joystick unrecognized
             else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
 
-                mode = JOYSTICK_UNRECOGNIZED;
+                mode = Simulator::JOYSTICK_UNRECOGNIZED;
             }
 
             return mode;
@@ -298,9 +276,9 @@ class Support {
 
             const auto button = wb_joystick_get_pressed_button();
 
-            checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down);
+            checkButtonToggle(button, 5, Simulator::TOGGLE_HOVER, _hover_button_was_down);
 
-            checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
+            checkButtonToggle(button, 4, Simulator::TOGGLE_AUTO, _auto_button_was_down);
 
             siminfo.flightMode = _flightMode;
 
@@ -328,9 +306,9 @@ class Support {
                 _spacebar_was_down = false;
             }
 
-            checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down);
+            checkKeyboardToggle(key, 4, Simulator::TOGGLE_HOVER, _enter_was_down);
 
-            checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
+            checkKeyboardToggle(key, 32, Simulator::TOGGLE_AUTO, _spacebar_was_down);
 
             if (flight_mode_check(_flightMode)) {
 
@@ -351,11 +329,11 @@ class Support {
 
             switch (getJoystickStatus()) {
 
-                case JOYSTICK_RECOGNIZED:
+                case Simulator::JOYSTICK_RECOGNIZED:
                     getSimInfoFromJoystick(siminfo, flight_mode_check);
                     break;
 
-                case JOYSTICK_UNRECOGNIZED:
+                case Simulator::JOYSTICK_UNRECOGNIZED:
                     reportJoystick();
                     // fall thru
 
@@ -370,7 +348,7 @@ class Support {
         {
             // On descent, switch mode to idle when close enough to ground
             const auto z = wb_gps_get_values(_gps)[2] - _start_z; 
-            if (_flightMode == MODE_LANDING && z < ZDIST_LANDING_MAX_M) {
+            if (_flightMode == MODE_LANDING && z < Simulator::ZDIST_LANDING_MAX_M) {
                 _flightMode = MODE_IDLE;
             }
 
@@ -391,9 +369,11 @@ class Support {
 
         void begin()
         {
-            wb_robot_init();
-
             _flightMode = MODE_IDLE;
+
+            _zdist = Simulator::ZDIST_HOVER_INIT_M;
+
+            wb_robot_init();
 
             _timestep = wb_robot_get_basic_time_step();
 
@@ -416,8 +396,6 @@ class Support {
             startMotor("motor4", -1);
 
             wb_joystick_enable(_timestep);
-
-            _zdist = ZDIST_HOVER_INIT_M;
         }
 
         int end()
