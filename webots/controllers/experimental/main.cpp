@@ -27,9 +27,12 @@ static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
     const auto d = ranger_distances_mm;
 
-    const float yaw = d[3] == -1 && d[4] == -1 ? 0 : 0.1;
+    const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
-    return demands_t {0.5, 0, 0, yaw};
+    const float thrust = 0.5;
+    const float yaw = center_is_clear ? 0 : 0.1;
+
+    return demands_t {thrust, 0, 0, yaw};
 }
 
 int main(int argc, char ** argv) 
