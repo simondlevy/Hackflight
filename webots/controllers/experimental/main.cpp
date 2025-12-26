@@ -38,17 +38,19 @@ int main(int argc, char ** argv)
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
 
+   siminfo_t siminfo = {};
+   strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
+   strcpy(siminfo.worldname, worldname.c_str());
+
     while (true) {
 
-        siminfo_t siminfo = {};
+        const bool autonomous = outerLoop.getFlightMode() == MODE_AUTONOMOUS;
 
-        if (!outerLoop.beginStep(outerLoop.getFlightMode() == MODE_AUTONOMOUS,
-                    siminfo)) {
+        (void)autonomous;
+
+        if (!outerLoop.beginStep(siminfo)) {
             break;
         }
-
-        strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
-        strcpy(siminfo.worldname, worldname.c_str());
 
         int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
 

@@ -307,11 +307,15 @@ class SimOuterLoop {
 
     public:
 
-        bool beginStep(const bool autonomous, siminfo_t & siminfo)
+        bool beginStep(
+                siminfo_t & siminfo,
+                const demands_t * autonomousSetpoint=nullptr)
         {
             if (!platform_step()) {
                 return false;
             }
+
+            const bool autonomous = autonomousSetpoint != nullptr;
 
             switch (getJoystickStatus()) {
 

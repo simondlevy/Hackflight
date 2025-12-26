@@ -29,8 +29,7 @@ int main()
 
         siminfo_t siminfo = {};
 
-        // false = no autonomous support
-        if (!outerLoop.beginStep(false, siminfo)) {
+        if (!outerLoop.beginStep(siminfo)) {
             break;
         }
 
