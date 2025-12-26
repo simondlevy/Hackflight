@@ -25,12 +25,6 @@ using namespace std;
 #include <setpoint/multiranger.hpp>
 #include <simulator/outer.hpp>
 
-// Detects when we're in autonomous mode
-static bool is_flight_mode_autonomous(const flightMode_t mode)
-{
-    return mode == MODE_AUTONOMOUS;
-}
-
 int main(int argc, char ** argv) 
 {
     (void)argc;
@@ -48,7 +42,8 @@ int main(int argc, char ** argv)
 
         siminfo_t siminfo = {};
 
-        if (!outerLoop.beginStep(is_flight_mode_autonomous, siminfo)) {
+        if (!outerLoop.beginStep(outerLoop.getFlightMode() == MODE_AUTONOMOUS,
+                    siminfo)) {
             break;
         }
 

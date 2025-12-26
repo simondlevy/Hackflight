@@ -72,9 +72,6 @@ class SimOuterLoop {
             {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
         };
 
-        // Support autonomous flight mode
-        typedef bool (*flightModeFun_t)(const flightMode_t);
-
         void climb(const float rate)
         {
             const float time_curr = platform_get_time();
@@ -310,14 +307,11 @@ class SimOuterLoop {
 
     public:
 
-        bool beginStep(flightModeFun_t is_flight_mode_autonomous,
-                siminfo_t & siminfo)
+        bool beginStep(const bool autonomous, siminfo_t & siminfo)
         {
             if (!platform_step()) {
                 return false;
             }
-
-            const bool autonomous = is_flight_mode_autonomous(_flightMode);
 
             switch (getJoystickStatus()) {
 

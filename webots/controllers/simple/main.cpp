@@ -19,13 +19,6 @@
 
 #include <simulator/outer.hpp>
 
-// Simple version is always in manual mode
-static bool is_flight_mode_autonomous(const flightMode_t mode)
-{
-    (void)mode;
-    return false;
-}
-
 int main() 
 {
     SimOuterLoop outerLoop = {};
@@ -36,7 +29,8 @@ int main()
 
         siminfo_t siminfo = {};
 
-        if (!outerLoop.beginStep(is_flight_mode_autonomous, siminfo)) {
+        // false = no autonomous support
+        if (!outerLoop.beginStep(false, siminfo)) {
             break;
         }
 
