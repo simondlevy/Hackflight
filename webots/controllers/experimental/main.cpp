@@ -46,20 +46,19 @@ static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 
         case PHASE_ROTATE:
             yaw = 0.1;
+            if (d[3] == -1 && d[4] == -1) {
+                _phase = PHASE_FORWARD;
+            }
             break;
 
         case PHASE_FORWARD:
+            yaw = 0;
             break;
 
         case PHASE_DONE:
             break;
 
     }
-
-    /*
-    printf("d0=%d d1=%d d2=%d d3=%d d4=%d d5=%d d6=%d d7=%d | %d => %+3.3f\n",
-            d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7],
-            d[3] == -1 && d[4] == -1, yaw); */
 
     return demands_t {0.5, 0, 0, yaw};
 }
