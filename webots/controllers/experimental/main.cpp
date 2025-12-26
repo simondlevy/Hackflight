@@ -1,5 +1,5 @@
 /* 
-   C++ flight simulator support for Hackflight with custom physics plugin
+   C++ flight simulator outerLoop for Hackflight with custom physics plugin
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -23,7 +23,7 @@ using namespace std;
 
 // Hackflight
 #include <setpoint/multiranger.hpp>
-#include <simulator/support.hpp>
+#include <simulator/outer.hpp>
 
 static bool flight_mode_hovering(const flightMode_t mode)
 {
@@ -36,9 +36,9 @@ int main(int argc, char ** argv)
 
     const std::string worldname =  argv[1];
 
-    Support support = {};
+    SimOuterLoop outerLoop = {};
 
-    support.begin();
+    outerLoop.begin();
 
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
 
         siminfo_t siminfo = {};
 
-        if (!support.beginStep(flight_mode_hovering, siminfo)) {
+        if (!outerLoop.beginStep(flight_mode_hovering, siminfo)) {
             break;
         }
 
@@ -56,16 +56,16 @@ int main(int argc, char ** argv)
 
         int16_t ranger_distance_mm[1000] = {}; // arbitrary max size
 
-        support.readRanger(ranger_distance_mm);
+        outerLoop.readRanger(ranger_distance_mm);
 
         //rv.show(ranger_distance_mm, LIDAR_DISPLAY_SCALEUP);
 
         //MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
         fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
-        support.endStep(siminfo);
+        outerLoop.endStep(siminfo);
 
     }
 
-    return support.end();
+    return outerLoop.end();
 }

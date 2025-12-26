@@ -25,7 +25,7 @@ using namespace std;
 #include <datatypes.h>
 #include <simulator/common.h>
 
-class Support {
+class SimOuterLoop {
 
     private:
 

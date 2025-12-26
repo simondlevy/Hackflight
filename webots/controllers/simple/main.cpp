@@ -1,5 +1,5 @@
 /* 
-   C++ flight simulator support for Hackflight with custom physics plugin
+   C++ flight simulator outer loop for Hackflight
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -17,7 +17,7 @@
  */
 
 
-#include <simulator/support.hpp>
+#include <simulator/outer.hpp>
 
 static bool flight_mode_not_idle(const flightMode_t mode)
 {
@@ -26,20 +26,20 @@ static bool flight_mode_not_idle(const flightMode_t mode)
 
 int main() 
 {
-    Support support = {};
+    SimOuterLoop outerLoop = {};
 
-    support.begin();
+    outerLoop.begin();
 
     while (true) {
 
         siminfo_t siminfo = {};
 
-        if (!support.beginStep(flight_mode_not_idle, siminfo)) {
+        if (!outerLoop.beginStep(flight_mode_not_idle, siminfo)) {
             break;
         }
 
-        support.endStep(siminfo);
+        outerLoop.endStep(siminfo);
     }
 
-    return support.end();
+    return outerLoop.end();
 }

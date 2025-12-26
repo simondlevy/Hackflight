@@ -16,7 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <simulator/support.hpp>
+#include <simulator/outer.hpp>
 
 #include <webots/camera.h>
 #include <webots/emitter.h>
@@ -40,12 +40,12 @@ static void startMotor(const char * name, const float direction)
     wb_motor_set_velocity(motor, direction * 60);
 }
 
-float Support::platform_get_time()
+float SimOuterLoop::platform_get_time()
 {
     return wb_robot_get_time();
 }
 
-void Support::platform_get_vehicle_location(double & x, double & y, double & z)
+void SimOuterLoop::platform_get_vehicle_location(double & x, double & y, double & z)
 {
     const double * xyz = wb_gps_get_values(_gps);
 
@@ -54,42 +54,42 @@ void Support::platform_get_vehicle_location(double & x, double & y, double & z)
     z = xyz[2];
 }
 
-void Support::platform_send_siminfo(const siminfo_t & siminfo)
+void SimOuterLoop::platform_send_siminfo(const siminfo_t & siminfo)
 {
     wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
 }
 
-int Support::platform_joystick_get_axis_value(const uint8_t axis)
+int SimOuterLoop::platform_joystick_get_axis_value(const uint8_t axis)
 {
     return wb_joystick_get_axis_value(axis);
 }
 
-int Support::platform_joystick_get_pressed_button()
+int SimOuterLoop::platform_joystick_get_pressed_button()
 {
     return wb_joystick_get_pressed_button();
 }
 
-Support::joystick_t Support::platform_joystick_get_info() 
+SimOuterLoop::joystick_t SimOuterLoop::platform_joystick_get_info() 
 {
     return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
 }
 
-const char * Support::platform_joystick_get_model()
+const char * SimOuterLoop::platform_joystick_get_model()
 {
     return wb_joystick_get_model();
 }
 
-int Support::platform_joystick_get_number_of_axes()
+int SimOuterLoop::platform_joystick_get_number_of_axes()
 {
     return wb_joystick_get_number_of_axes();
 }
 
-int Support::platform_keyboard_get_key()
+int SimOuterLoop::platform_keyboard_get_key()
 {
     return wb_keyboard_get_key();
 }
 
-void Support::platform_init()
+void SimOuterLoop::platform_init()
 {
     wb_robot_init();
 
@@ -116,22 +116,22 @@ void Support::platform_init()
     wb_joystick_enable(_timestep);
 }
 
-void Support::platform_cleanup()
+void SimOuterLoop::platform_cleanup()
 {
     wb_robot_cleanup();
 }
 
-bool Support::platform_step()
+bool SimOuterLoop::platform_step()
 {
     return wb_robot_step(_timestep) != -1;
 }
 
-float Support::platform_get_framerate()
+float SimOuterLoop::platform_get_framerate()
 {
     return 1000 / _timestep;
 }
 
-void Support::platform_read_rangefinder(int16_t * distance_mm) 
+void SimOuterLoop::platform_read_rangefinder(int16_t * distance_mm) 
 {
     const float * image = wb_range_finder_get_range_image(_ranger);
 
@@ -151,22 +151,22 @@ void Support::platform_read_rangefinder(int16_t * distance_mm)
     }
 }
         
-int Support::platform_keyboard_down()
+int SimOuterLoop::platform_keyboard_down()
 {
     return WB_KEYBOARD_DOWN;
 }
         
-int Support::platform_keyboard_left()
+int SimOuterLoop::platform_keyboard_left()
 {
     return WB_KEYBOARD_LEFT;
 }
 
-int Support::platform_keyboard_right()
+int SimOuterLoop::platform_keyboard_right()
 {
     return WB_KEYBOARD_RIGHT;
 }
 
-int Support::platform_keyboard_up()
+int SimOuterLoop::platform_keyboard_up()
 {
     return WB_KEYBOARD_UP;
 }
