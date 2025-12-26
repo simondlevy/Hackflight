@@ -259,9 +259,7 @@ class SimOuterLoop {
             platform_send_siminfo(siminfo);
         }
 
-        void getSimInfoFromJoystick(
-                siminfo_t & siminfo,
-                flightModeFun_t is_flight_mode_autonomous)
+        void getSimInfoFromJoystick(siminfo_t & siminfo, const bool autonomous)
         {
             static bool _hover_button_was_down;
             static bool _auto_button_was_down;
@@ -276,7 +274,7 @@ class SimOuterLoop {
 
             siminfo.flightMode = _flightMode;
 
-            if (!is_flight_mode_autonomous(siminfo.flightMode)) {
+            if (!autonomous) {
 
                 siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
                 siminfo.setpoint.roll = readJoystickAxis(axes.roll);
@@ -286,9 +284,7 @@ class SimOuterLoop {
             }
         }
 
-        void getSimInfoFromKeyboard(
-                siminfo_t & siminfo,
-                flightModeFun_t is_flight_mode_autonomous)
+        void getSimInfoFromKeyboard(siminfo_t & siminfo, const bool autonomous)
         {
             static bool _enter_was_down;
             static bool _spacebar_was_down;
@@ -304,7 +300,7 @@ class SimOuterLoop {
 
             checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
 
-            if (!is_flight_mode_autonomous(_flightMode)) {
+            if (!autonomous) {
 
                 getSetpointFromKey(key, siminfo);
             }
@@ -321,10 +317,12 @@ class SimOuterLoop {
                 return false;
             }
 
+            const bool autonomous = is_flight_mode_autonomous(_flightMode);
+
             switch (getJoystickStatus()) {
 
                 case JOYSTICK_RECOGNIZED:
-                    getSimInfoFromJoystick(siminfo, is_flight_mode_autonomous);
+                    getSimInfoFromJoystick(siminfo, autonomous);
                     break;
 
                 case JOYSTICK_UNRECOGNIZED:
@@ -332,7 +330,7 @@ class SimOuterLoop {
                     // fall thru
 
                 default:
-                    getSimInfoFromKeyboard(siminfo, is_flight_mode_autonomous);
+                    getSimInfoFromKeyboard(siminfo, autonomous);
             }
 
             return true;
