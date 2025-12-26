@@ -43,6 +43,27 @@ class Support {
         WbDeviceTag _gps;
         WbDeviceTag _ranger;
 
+        float platform_get_time()
+        {
+            return wb_robot_get_time();
+        }
+
+        int platform_get_joystick_axis_value(const uint8_t axis)
+        {
+            return wb_joystick_get_axis_value(axis);
+        }
+
+        void platform_get_vehicle_location(double & x, double & y, double & z)
+        {
+            const double * xyz = wb_gps_get_values(_gps);
+
+            x = xyz[0];
+            y = xyz[1];
+            z = xyz[2];
+        }
+
+        //////////////////////////////////////////////////////////////////////
+
         double _timestep;
 
         float _zdist;
@@ -71,7 +92,7 @@ class Support {
 
         void climb(const float rate)
         {
-            const float time_curr = wb_robot_get_time();
+            const float time_curr = platform_get_time();
 
             static float _time_prev;
 
@@ -248,12 +269,8 @@ class Support {
 
         void sendSimInfo(Simulator::info_t & siminfo)
         {
-            const double * xyz = wb_gps_get_values(_gps);
-
             if (_start_x == 0) {
-                _start_x = xyz[0];
-                _start_y = xyz[1];
-                _start_z = xyz[2];
+                platform_get_vehicle_location(_start_x, _start_y, _start_z);
             }
 
             siminfo.start_x = _start_x;
