@@ -304,7 +304,7 @@ class SimOuterLoop {
 
             checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
 
-            if (is_flight_mode_autonomous(_flightMode)) {
+            if (!is_flight_mode_autonomous(_flightMode)) {
 
                 getSetpointFromKey(key, siminfo);
             }
