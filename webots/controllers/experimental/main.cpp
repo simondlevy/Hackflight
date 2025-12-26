@@ -25,7 +25,8 @@ using namespace std;
 #include <setpoint/multiranger.hpp>
 #include <simulator/outer.hpp>
 
-static bool flight_mode_hovering(const flightMode_t mode)
+// Detects when we're in autonomous mode
+static bool is_flight_mode_manual(const flightMode_t mode)
 {
     return mode == MODE_HOVERING;
 }
@@ -47,7 +48,7 @@ int main(int argc, char ** argv)
 
         siminfo_t siminfo = {};
 
-        if (!outerLoop.beginStep(flight_mode_hovering, siminfo)) {
+        if (!outerLoop.beginStep(is_flight_mode_manual, siminfo)) {
             break;
         }
 

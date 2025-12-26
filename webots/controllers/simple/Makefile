@@ -40,7 +40,7 @@ run:
 
 
 edit:
-	vim $(ALL).cpp
+	vim main.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

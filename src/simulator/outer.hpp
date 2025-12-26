@@ -72,6 +72,7 @@ class SimOuterLoop {
             {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
         };
 
+        // Support autonomous flight mode
         typedef bool (*flightModeFun_t)(const flightMode_t);
 
         void climb(const float rate)
@@ -260,7 +261,7 @@ class SimOuterLoop {
 
         void getSimInfoFromJoystick(
                 siminfo_t & siminfo,
-                flightModeFun_t flight_mode_check)
+                flightModeFun_t is_flight_mode_manual)
         {
             static bool _hover_button_was_down;
             static bool _auto_button_was_down;
@@ -275,7 +276,7 @@ class SimOuterLoop {
 
             siminfo.flightMode = _flightMode;
 
-            if (flight_mode_check(siminfo.flightMode)) {
+            if (is_flight_mode_manual(siminfo.flightMode)) {
 
                 siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
                 siminfo.setpoint.roll = readJoystickAxis(axes.roll);
@@ -287,7 +288,7 @@ class SimOuterLoop {
 
         void getSimInfoFromKeyboard(
                 siminfo_t & siminfo,
-                flightModeFun_t flight_mode_check)
+                flightModeFun_t is_flight_mode_manual)
         {
             static bool _enter_was_down;
             static bool _spacebar_was_down;
@@ -303,7 +304,7 @@ class SimOuterLoop {
 
             checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
 
-            if (flight_mode_check(_flightMode)) {
+            if (is_flight_mode_manual(_flightMode)) {
 
                 getSetpointFromKey(key, siminfo);
             }
@@ -313,7 +314,7 @@ class SimOuterLoop {
 
     public:
 
-        bool beginStep(flightModeFun_t flight_mode_check,
+        bool beginStep(flightModeFun_t is_flight_mode_manual,
                 siminfo_t & siminfo)
         {
             if (!platform_step()) {
@@ -323,7 +324,7 @@ class SimOuterLoop {
             switch (getJoystickStatus()) {
 
                 case JOYSTICK_RECOGNIZED:
-                    getSimInfoFromJoystick(siminfo, flight_mode_check);
+                    getSimInfoFromJoystick(siminfo, is_flight_mode_manual);
                     break;
 
                 case JOYSTICK_UNRECOGNIZED:
@@ -331,7 +332,7 @@ class SimOuterLoop {
                     // fall thru
 
                 default:
-                    getSimInfoFromKeyboard(siminfo, flight_mode_check);
+                    getSimInfoFromKeyboard(siminfo, is_flight_mode_manual);
             }
 
             return true;

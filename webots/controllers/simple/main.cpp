@@ -19,7 +19,8 @@
 
 #include <simulator/outer.hpp>
 
-static bool flight_mode_not_idle(const flightMode_t mode)
+// Simple version is always in manual mode
+static bool is_flight_mode_manual(const flightMode_t mode)
 {
     return mode != MODE_IDLE;
 }
@@ -34,7 +35,7 @@ int main()
 
         siminfo_t siminfo = {};
 
-        if (!outerLoop.beginStep(flight_mode_not_idle, siminfo)) {
+        if (!outerLoop.beginStep(is_flight_mode_manual, siminfo)) {
             break;
         }
 
