@@ -17,8 +17,7 @@
  */
 
 
-// Misc.
-#include "../support.hpp"
+#include <simulator/support.hpp>
 
 static bool flight_mode_not_idle(const flightMode_t mode)
 {

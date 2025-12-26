@@ -22,9 +22,7 @@ using namespace std;
 
 // Hackflight
 #include <setpoint/multiranger.hpp>
-
-// Misc.
-#include "../support.hpp"
+#include <simulator/support.hpp>
 
 static bool flight_mode_hovering(const flightMode_t mode)
 {

@@ -16,7 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "support.hpp"
+#include <simulator/support.hpp>
 
 #include <webots/camera.h>
 #include <webots/emitter.h>
