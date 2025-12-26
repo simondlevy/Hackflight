@@ -41,8 +41,6 @@ int main(int argc, char ** argv)
 
     support.begin();
 
-    flightMode_t flightMode = MODE_IDLE;
-
     FILE * logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
             "experimental/groundtruth.csv", "w");
 
@@ -50,7 +48,7 @@ int main(int argc, char ** argv)
 
         Simulator::info_t siminfo = {};
 
-        if (!support.beginStep(flight_mode_hovering, flightMode, siminfo)) {
+        if (!support.beginStep(flight_mode_hovering, siminfo)) {
             break;
         }
 
@@ -66,7 +64,7 @@ int main(int argc, char ** argv)
         //MultiRanger::getSetpoint(8, 8, ranger_distance_mm, siminfo.setpoint);
         fprintf(logfp, "%d\n", ranger_distance_mm[0]);
 
-        support.endStep(siminfo, flightMode);
+        support.endStep(siminfo);
 
     }
 
