@@ -23,7 +23,6 @@ using namespace std;
 
 #include <simulator/outer.hpp>
 
-#if 0
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
     typedef enum {
@@ -46,7 +45,7 @@ static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
             break;
 
         case PHASE_ROTATE:
-            yaw = 0.5;
+            yaw = 0.1;
             break;
 
         case PHASE_FORWARD:
@@ -64,7 +63,6 @@ static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 
     return demands_t {0.5, 0, 0, yaw};
 }
-#endif
 
 int main(int argc, char ** argv) 
 {
@@ -87,20 +85,21 @@ int main(int argc, char ** argv)
 
         static int16_t ranger_distances_mm[1000]; // arbitrary max size
 
+        bool okay = true;
+
         if (outerLoop.getFlightMode() == MODE_AUTONOMOUS) {
 
-            demands_t setpoint = {0.5, 0, 0, 0.5};
+            demands_t setpoint = getAutonomousSetpoint(ranger_distances_mm);
 
-            if (!outerLoop.beginStep(siminfo, &setpoint)) {
-                break;
-            }
-            //getAutonomousSetpoint(ranger_distances_mm);
+            okay = outerLoop.beginStep(siminfo, &setpoint);
         }
 
         else {
-            if (!outerLoop.beginStep(siminfo)) {
-                break;
-            }
+            okay = outerLoop.beginStep(siminfo);
+        }
+
+        if (!okay) {
+            break;
         }
 
         outerLoop.readRanger(ranger_distances_mm);
