@@ -22,14 +22,14 @@
 // Hackflight
 #define _MAIN
 #include <pid.hpp>
-#include <simulator/simulator.hpp>
+#include <simulator/inner.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robot;
 
-// Platform-independent simulator
-static Simulator _simulator;
+// Platform-independent simulator inner loop
+static SimInnerLoop _innerLoop;
 
 static PidControl _pidControl;
 
@@ -47,7 +47,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robot, 0);
     }
 
-    _simulator.init(&_pidControl);
+    _innerLoop.init(&_pidControl);
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -74,7 +74,7 @@ DLLEXPORT void webots_physics_step()
     }
 
     // Update to get the current pose
-    const Simulator::pose_t pose = _simulator.step(siminfo);
+    const SimInnerLoop::pose_t pose = _innerLoop.step(siminfo);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};

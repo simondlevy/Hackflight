@@ -22,7 +22,7 @@
 // Hackflight
 #define _MAIN
 #include <pid.hpp>
-#include <simulator/simulator.hpp>
+#include <simulator/inner.hpp>
 
 // Simsensors
 #include <simsensors/src/collision.hpp>
@@ -40,7 +40,7 @@ static dBodyID _robot;
 static dBodyID _red_ball;
 
 // Platform-independent simulator
-static Simulator _simulator;
+static SimInnerLoop _innerLoop;
 
 static PidControl _pidControl;
 
@@ -83,7 +83,7 @@ static bool run_normal()
     }
 
     // Update to get the current pose
-    const Simulator::pose_t pose = _simulator.step(siminfo);
+    const SimInnerLoop::pose_t pose = _innerLoop.step(siminfo);
 
     // Set robot posed based on state and starting position, negating for
     // rightward negative
@@ -147,7 +147,7 @@ DLLEXPORT void webots_physics_init()
         }
     }
 
-    _simulator.init(&_pidControl);
+    _innerLoop.init(&_pidControl);
 
     _logfp = fopen(
             "/home/levys/Desktop/hackflight/webots/controllers/experimental/simsens.csv", "w");

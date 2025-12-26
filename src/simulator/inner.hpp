@@ -1,5 +1,5 @@
 /* 
- * Platform-independent simulator support for Hackflight
+ * Simulation inner loop
  *
  * Copyright (C) 2025 Simon D. Levy
  *
@@ -29,7 +29,7 @@
 #include <simulator/common.h>
 #include <vehicles/crazyflie.hpp>
 
-class Simulator {
+class SimInnerLoop {
 
     private:
 
