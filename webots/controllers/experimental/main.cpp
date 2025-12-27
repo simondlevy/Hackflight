@@ -31,6 +31,7 @@ static bool isinf(const int16_t d)
 static void dumpdist(FILE * logfp, const int16_t d, const bool last=false)
 {
     fprintf(logfp, "%d%c", d, last?'\n':',');
+    fflush(logfp);
 
     /*
     if (d == -1) {

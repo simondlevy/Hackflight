@@ -110,6 +110,8 @@ static bool run_normal()
             _logfp,
             &dbg_intersection);
 
+    fflush(_logfp);
+
     //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
