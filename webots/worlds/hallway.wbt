@@ -49,15 +49,6 @@ DEF wall Wall {
   name "wall_left"
   size 0.05 4 1
 }
-DEF ceiling Wall {
-  translation 1.14987 1.23927 1.03
-  rotation -0.5771978956908259 0.5776548956082386 -0.5771978956908259 -2.093935307179586
-  name "ceiling"
-  size 0.05 4 0.9
-  appearance PBRAppearance {
-    transparency 0.25
-  }
-}
 DEF wall Wall {
   translation 1.17915 0.349288 0
   rotation 0 0 1 1.57
