@@ -40,20 +40,9 @@ static void dumpdist(FILE * logfp, const int16_t d, const bool last=false)
     }
 }
 
-static demands_t getAutonomousSetpoint(
-        const int16_t * ranger_distances_mm, FILE * logfp)
+static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
     const auto d = ranger_distances_mm;
-
-    dumpdist(logfp, d[0]);
-    dumpdist(logfp, d[1]);
-    dumpdist(logfp, d[2]);
-    dumpdist(logfp, d[3]);
-    dumpdist(logfp, d[4]);
-    dumpdist(logfp, d[5]);
-    dumpdist(logfp, d[6]);
-    dumpdist(logfp, d[7], true);
-    printf("\n");
 
     const bool perimeter_is_clear = isinf(d[0]) && isinf(d[1]) && isinf(d[2])
             && isinf(d[6]) && isinf(d[6]) && isinf(d[7]);
@@ -92,12 +81,22 @@ int main(int argc, char ** argv)
 
         static int16_t ranger_distances_mm[1000]; // arbitrary max size
 
+        dumpdist(logfp, ranger_distances_mm[0]);
+        dumpdist(logfp, ranger_distances_mm[1]);
+        dumpdist(logfp, ranger_distances_mm[2]);
+        dumpdist(logfp, ranger_distances_mm[3]);
+        dumpdist(logfp, ranger_distances_mm[4]);
+        dumpdist(logfp, ranger_distances_mm[5]);
+        dumpdist(logfp, ranger_distances_mm[6]);
+        dumpdist(logfp, ranger_distances_mm[7], true);
+        printf("\n");
+
         bool okay = true;
 
         if (outerLoop.getFlightMode() == MODE_AUTONOMOUS) {
 
-            demands_t setpoint = getAutonomousSetpoint(
-                    ranger_distances_mm, logfp);
+            demands_t setpoint =
+                getAutonomousSetpoint(ranger_distances_mm);
 
             okay = outerLoop.beginStep(siminfo, &setpoint);
         }
@@ -113,6 +112,7 @@ int main(int argc, char ** argv)
         outerLoop.readRanger(ranger_distances_mm);
 
         outerLoop.endStep(siminfo);
+
     }
 
     return outerLoop.end();

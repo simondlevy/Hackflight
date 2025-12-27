@@ -107,8 +107,8 @@ static bool run_normal()
             pose.phi, pose.theta, pose.psi},
             _worldParser.walls,
             ranger_distances_mm,
-            &dbg_intersection,
-            _logfp);
+            _logfp,
+            &dbg_intersection);
 
     //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
