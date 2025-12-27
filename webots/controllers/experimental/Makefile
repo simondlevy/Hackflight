@@ -33,6 +33,8 @@ LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv
 
 CXX_SOURCES = main.cpp ../support.cpp
 
+FILES_TO_REMOVE += *.csv
+
 all: $(ALL)
 
 # Use the Webots C API in your C++ controller program
