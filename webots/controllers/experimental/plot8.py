@@ -3,27 +3,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def clean(a):
-    a[a==-1] = np.nan
-
-def plot(a, k):
+def plot(gt, ss, k):
     plt.subplot(8,1,k+1)
-    plt.plot(a[:,k])
+    plt.plot(gt[:,k])
+    plt.plot(ss[:,k])
     plt.ylim((0, 2000))
+    if k == 0:
+        plt.legend(('groundtruth', 'simsens'))
 
-gt = np.loadtxt('groundtruth.csv', delimiter=',')
-#ss = np.loadtxt('simsens.csv')
+def loadcsv(filename):
+    a = np.loadtxt(filename, delimiter=',')
+    a[a==-1] = np.nan
+    return a
 
-clean(gt)
+gt = loadcsv('groundtruth.csv')
+ss = loadcsv('simsens.csv')
 
-plot(gt, 0)
-plot(gt, 1)
-plot(gt, 2)
-plot(gt, 3)
-plot(gt, 4)
-plot(gt, 5)
-plot(gt, 6)
-plot(gt, 7)
+plot(gt, ss, 0)
+plot(gt, ss, 1)
+plot(gt, ss, 2)
+plot(gt, ss, 3)
+plot(gt, ss, 4)
+plot(gt, ss, 5)
+plot(gt, ss, 6)
+plot(gt, ss, 7)
 
 plt.xlabel('timestep')
 #plt.ylabel('distance (mm)')
