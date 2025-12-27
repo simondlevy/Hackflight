@@ -32,12 +32,13 @@ static void dumpdist(FILE * logfp, const int16_t d, const bool last=false)
 {
     fprintf(logfp, "%d%c", d, last?'\n':',');
 
+    /*
     if (d == -1) {
         printf(" inf ");
     }
     else {
         printf("%4d ", d);
-    }
+    }*/
 }
 
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
