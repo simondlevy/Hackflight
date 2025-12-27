@@ -28,9 +28,32 @@ static bool isinf(const int16_t d)
     return d == -1;
 }
 
-static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
+static void dumpdist(FILE * logfp, const int16_t d, const bool last=false)
+{
+    fprintf(logfp, "%d%c", d, last?'\n':',');
+
+    if (d == -1) {
+        printf(" inf ");
+    }
+    else {
+        printf("%4d ", d);
+    }
+}
+
+static demands_t getAutonomousSetpoint(
+        const int16_t * ranger_distances_mm, FILE * logfp)
 {
     const auto d = ranger_distances_mm;
+
+    dumpdist(logfp, d[0]);
+    dumpdist(logfp, d[1]);
+    dumpdist(logfp, d[2]);
+    dumpdist(logfp, d[3]);
+    dumpdist(logfp, d[4]);
+    dumpdist(logfp, d[5]);
+    dumpdist(logfp, d[6]);
+    dumpdist(logfp, d[7], true);
+    printf("\n");
 
     const bool perimeter_is_clear = isinf(d[0]) && isinf(d[1]) && isinf(d[2])
             && isinf(d[6]) && isinf(d[6]) && isinf(d[7]);
@@ -43,7 +66,7 @@ static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
         perimeter_is_clear ? 0 :
         center_is_clear ? 0.2 :
         0;
-    const float yaw = center_is_clear ? 0 : 0.2;
+    const float yaw = 0;//center_is_clear ? 0 : 0.2;
 
     return demands_t {thrust, roll, pitch, yaw};
 }
@@ -73,7 +96,8 @@ int main(int argc, char ** argv)
 
         if (outerLoop.getFlightMode() == MODE_AUTONOMOUS) {
 
-            demands_t setpoint = getAutonomousSetpoint(ranger_distances_mm);
+            demands_t setpoint = getAutonomousSetpoint(
+                    ranger_distances_mm, logfp);
 
             okay = outerLoop.beginStep(siminfo, &setpoint);
         }
@@ -87,8 +111,6 @@ int main(int argc, char ** argv)
         }
 
         outerLoop.readRanger(ranger_distances_mm);
-
-        fprintf(logfp, "%d\n", ranger_distances_mm[0]);
 
         outerLoop.endStep(siminfo);
     }
