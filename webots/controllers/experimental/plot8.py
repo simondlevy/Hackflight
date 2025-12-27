@@ -7,7 +7,7 @@ def plot(gt, ss, k):
     plt.subplot(8,1,k+1)
     plt.plot(gt[:,k])
     plt.plot(ss[:,k])
-    plt.ylim((0, 2000))
+    plt.ylim((0, 4000))
     if k == 0:
         plt.legend(('groundtruth', 'simsens'))
 
