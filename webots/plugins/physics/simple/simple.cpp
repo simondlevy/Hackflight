@@ -92,15 +92,3 @@ DLLEXPORT void webots_physics_step()
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 }
-
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
-{
-    (void)g1;
-    (void)g2;
-
-    return 0;
-}
-
-DLLEXPORT void webots_physics_cleanup() 
-{
-}
