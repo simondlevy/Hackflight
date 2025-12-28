@@ -24,9 +24,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
-//static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
-
-//static FILE * _logfp;
+static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
 static bool run_normal()
 {
@@ -45,6 +43,23 @@ static bool run_normal()
     if (siminfo.framerate == 0) {
         return true;
     }
+
+    // Update to get the current pose
+    const SimInnerLoop::pose_t pose = _innerLoop.step(siminfo);
+
+    // Turn Euler angles into quaternion, negating psi for nose-right positive 
+    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
+    axis4_t quat = {};
+    Num::euler2quat(euler, quat);
+
+    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
+    dBodySetQuaternion(_robot, q);
+
+    // Set robot posed based on state and starting position, negating for
+    // rightward negative
+    const double robot_x = siminfo.start_x + pose.x;
+    const double robot_y = siminfo.start_y - pose.y;
+    const double robot_z = siminfo.start_z + pose.z;
 
     ///////////////////////////////////////////////////////////////////////
     static simsens::SimRangefinder * _simRangefinder;
@@ -71,24 +86,16 @@ static bool run_normal()
         _logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
                 "experimental/simsens.csv", "w");
     }
+
+    // Stop if we detected a collision
+    const bool debug = true;
+    if (simsens::CollisionDetector::detect(
+                simsens::vec3_t{robot_x, robot_y, robot_x},
+                _worldParser.walls, debug)) {
+        return false;
+    }
+
     ///////////////////////////////////////////////////////////////////////
-
-    // Update to get the current pose
-    const SimInnerLoop::pose_t pose = _innerLoop.step(siminfo);
-
-    // Turn Euler angles into quaternion, negating psi for nose-right positive 
-    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
-    axis4_t quat = {};
-    Num::euler2quat(euler, quat);
-
-    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-    dBodySetQuaternion(_robot, q);
-
-    // Set robot posed based on state and starting position, negating for
-    // rightward negative
-    const double robot_x = siminfo.start_x + pose.x;
-    const double robot_y = siminfo.start_y - pose.y;
-    const double robot_z = siminfo.start_z + pose.z;
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
 
