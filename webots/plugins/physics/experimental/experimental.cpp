@@ -46,6 +46,29 @@ static bool run_normal()
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    static simsens::SimRangefinder * _simRangefinder;
+    static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+    static simsens::RobotParser _robotParser;
+    static simsens::WorldParser _worldParser;
+
+    // Load world and robot info first time around
+    if (!_simRangefinder) {
+
+        char path[1000];
+
+        sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
+        _worldParser.parse(path);
+
+        sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
+        _robotParser.parse(path);
+
+        _simRangefinder = _robotParser.rangefinders[0];
+
+        _rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
+    }
+    ///////////////////////////////////////////////////////////////////////
+
     // Update to get the current pose
     const SimInnerLoop::pose_t pose = _innerLoop.step(siminfo);
 
