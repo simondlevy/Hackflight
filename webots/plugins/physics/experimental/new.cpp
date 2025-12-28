@@ -89,8 +89,6 @@ static bool run_normal()
     return true;
 }
 
-    _logfp = fopen(
-            "/home/levys/Desktop/hackflight/webots/controllers/experimental/simsens.csv", "w");
 }
 
 // This is called by Webots in the outer (display, kinematics) loop

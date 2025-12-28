@@ -51,6 +51,7 @@ static bool run_normal()
     static simsens::RangefinderVisualizer * _rangefinderVisualizer;
     static simsens::RobotParser _robotParser;
     static simsens::WorldParser _worldParser;
+    static FILE * _logfp;
 
     // Load world and robot info first time around
     if (!_simRangefinder) {
@@ -66,6 +67,9 @@ static bool run_normal()
         _simRangefinder = _robotParser.rangefinders[0];
 
         _rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
+
+        _logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
+                "experimental/simsens.csv", "w");
     }
     ///////////////////////////////////////////////////////////////////////
 
