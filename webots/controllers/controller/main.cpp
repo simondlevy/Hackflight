@@ -61,14 +61,9 @@ int main(int argc, char ** argv)
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
 
-        const bool okay = outerLoop.beginStep(siminfo);
-
-        if (!okay) {
+        if (!outerLoop.step(siminfo)) {
             break;
         }
-
-        outerLoop.endStep(siminfo);
-
     }
 
     return outerLoop.end();

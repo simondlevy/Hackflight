@@ -30,7 +30,7 @@ class SimOuterLoop {
 
     public:
 
-        bool beginStep(
+        bool step(
                 siminfo_t & siminfo,
                 const demands_t * autonomousSetpoint=nullptr)
         {
@@ -58,11 +58,6 @@ class SimOuterLoop {
                 memcpy(&siminfo.setpoint, autonomousSetpoint, sizeof(demands_t));
             }
 
-            return true;
-        }
-
-        void endStep(siminfo_t &siminfo)
-        {
             // On descent, switch mode to idle when close enough to ground
             double x=0, y=0, z=0;
             platform_get_vehicle_location(x, y, z);
@@ -71,6 +66,8 @@ class SimOuterLoop {
             }
 
             sendSimInfo(siminfo);
+
+            return true;
         }
 
         flightMode_t getFlightMode()
