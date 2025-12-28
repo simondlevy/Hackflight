@@ -19,6 +19,38 @@
 // Webots
 #include <plugins/physics.h>
 
+// Hackflight
+#define _MAIN
+#include <pid.hpp>
+#include <simulator/inner.hpp>
+
+static constexpr char ROBOT_NAME[] = "diyquad";
+
+static dBodyID _robot;
+
+// Platform-independent simulator inner loop
+static SimInnerLoop _innerLoop;
+
+static PidControl _pidControl;
+
+DLLEXPORT void webots_physics_init() 
+{
+    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
+
+    if (_robot == NULL) {
+
+        dWebotsConsolePrintf("webots_physics_init :: ");
+        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
+    }
+    else {
+
+        dBodySetGravityMode(_robot, 0);
+    }
+
+    _innerLoop.init(&_pidControl);
+}
+
+
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
 {
     (void)g1;

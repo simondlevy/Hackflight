@@ -16,27 +16,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Webots
-#include <plugins/physics.h>
-
-// Hackflight
-#define _MAIN
-#include <pid.hpp>
-#include <simulator/inner.hpp>
-
-// Misc.
 #include "../common.hpp"
 
-static constexpr char ROBOT_NAME[] = "diyquad";
-
-static dBodyID _robot;
-
-// Platform-independent simulator inner loop
-static SimInnerLoop _innerLoop;
-
-static PidControl _pidControl;
-
-// Simsensors -----------------------------------------------------------
 #include <simsensors/src/collision.hpp>
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
@@ -46,27 +27,6 @@ static PidControl _pidControl;
 //static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
 //static FILE * _logfp;
-
-// -----------------------------------------------------------------------
-
-
-// This is called bDLLEXPORT void webots_physics_init() 
-DLLEXPORT void webots_physics_init() 
-{
-    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
-
-    if (_robot == NULL) {
-
-        dWebotsConsolePrintf("webots_physics_init :: ");
-        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
-    }
-    else {
-
-        dBodySetGravityMode(_robot, 0);
-    }
-
-    _innerLoop.init(&_pidControl);
-}
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
