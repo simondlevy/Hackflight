@@ -23,6 +23,28 @@ using namespace std;
 
 #include <simulator/outer.hpp>
 
+#include <webots/camera.h>
+#include <webots/emitter.h>
+#include <webots/gps.h>
+#include <webots/joystick.h>
+#include <webots/keyboard.h>
+#include <webots/motor.h>
+#include <webots/range_finder.h>
+#include <webots/robot.h>
+
+static WbDeviceTag _emitter;
+static WbDeviceTag _gps;
+static WbDeviceTag _ranger;
+
+static double _timestep;
+
+static void startMotor(const char * name, const float direction)
+{
+    auto motor = wb_robot_get_device(name);
+    wb_motor_set_position(motor, INFINITY);
+    wb_motor_set_velocity(motor, direction * 60);
+}
+
 int main(int argc, char ** argv) 
 {
     (void)argc;
@@ -50,4 +72,136 @@ int main(int argc, char ** argv)
     }
 
     return outerLoop.end();
+}
+
+float SimOuterLoop::platform_get_time()
+{
+    return wb_robot_get_time();
+}
+
+void SimOuterLoop::platform_get_vehicle_location(double & x, double & y, double & z)
+{
+    const double * xyz = wb_gps_get_values(_gps);
+
+    x = xyz[0];
+    y = xyz[1];
+    z = xyz[2];
+}
+
+void SimOuterLoop::platform_send_siminfo(const siminfo_t & siminfo)
+{
+    wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+}
+
+int SimOuterLoop::platform_joystick_get_axis_value(const uint8_t axis)
+{
+    return wb_joystick_get_axis_value(axis);
+}
+
+int SimOuterLoop::platform_joystick_get_pressed_button()
+{
+    return wb_joystick_get_pressed_button();
+}
+
+SimOuterLoop::joystick_t SimOuterLoop::platform_joystick_get_info() 
+{
+    return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
+}
+
+const char * SimOuterLoop::platform_joystick_get_model()
+{
+    return wb_joystick_get_model();
+}
+
+int SimOuterLoop::platform_joystick_get_number_of_axes()
+{
+    return wb_joystick_get_number_of_axes();
+}
+
+int SimOuterLoop::platform_keyboard_get_key()
+{
+    return wb_keyboard_get_key();
+}
+
+void SimOuterLoop::platform_init()
+{
+    wb_robot_init();
+
+    _timestep = wb_robot_get_basic_time_step();
+
+    _emitter = wb_robot_get_device("emitter");
+
+    _gps = wb_robot_get_device("gps");
+    wb_gps_enable(_gps, _timestep);
+
+    WbDeviceTag camera = wb_robot_get_device("camera");
+    wb_camera_enable(camera, _timestep);
+
+    _ranger = wb_robot_get_device("range-finder");
+    wb_range_finder_enable(_ranger, _timestep);
+
+    wb_keyboard_enable(_timestep);
+
+    startMotor("motor1", -1);
+    startMotor("motor2", +1);
+    startMotor("motor3", +1);
+    startMotor("motor4", -1);
+
+    wb_joystick_enable(_timestep);
+}
+
+void SimOuterLoop::platform_cleanup()
+{
+    wb_robot_cleanup();
+}
+
+bool SimOuterLoop::platform_step()
+{
+    return wb_robot_step(_timestep) != -1;
+}
+
+float SimOuterLoop::platform_get_framerate()
+{
+    return 1000 / _timestep;
+}
+
+void SimOuterLoop::platform_read_rangefinder(
+        int16_t * distance_mm, int & width, int & height) 
+{
+    const float * image = wb_range_finder_get_range_image(_ranger);
+
+    width = wb_range_finder_get_width(_ranger);
+    height = wb_range_finder_get_height(_ranger);
+
+    for (int x=0; x<width; ++x) {
+
+        for (int y=0; y<height; ++y) {
+
+            const float distance_m =
+                wb_range_finder_image_get_depth(image, width, x, y);
+
+            distance_mm[y*width+x] = isinf(distance_m) ? -1 :
+                (int16_t)(1000 * distance_m);
+        }
+    }
+}
+        
+int SimOuterLoop::platform_keyboard_down()
+{
+    return WB_KEYBOARD_DOWN;
+}
+        
+int SimOuterLoop::platform_keyboard_left()
+{
+    return WB_KEYBOARD_LEFT;
+}
+
+int SimOuterLoop::platform_keyboard_right()
+{
+    return WB_KEYBOARD_RIGHT;
+}
+
+int SimOuterLoop::platform_keyboard_up()
+{
+    return WB_KEYBOARD_UP;
 }
