@@ -28,13 +28,8 @@
 
 //static FILE * _logfp;
 
-// This is called by Webots in the outer (display, kinematics) loop
-DLLEXPORT void webots_physics_step() 
+static bool run_normal()
 {
-    if (_robot == NULL) {
-        return;
-    }
-
     int size = 0;
 
     siminfo_t siminfo = {};
@@ -48,7 +43,7 @@ DLLEXPORT void webots_physics_step()
 
     // This happens at startup
     if (siminfo.framerate == 0) {
-        return;
+        return true;
     }
 
     // Update to get the current pose
@@ -69,4 +64,24 @@ DLLEXPORT void webots_physics_step()
     const double robot_z = siminfo.start_z + pose.z;
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
+
+    return true;
+}
+
+// This is called by Webots in the outer (display, kinematics) loop
+DLLEXPORT void webots_physics_step() 
+{
+    if (_robot == NULL) {
+        return;
+    }
+
+    static bool _collided;
+
+    if (_collided) {
+        dBodySetGravityMode(_robot, 1);
+    }
+    else {
+        _collided = !run_normal();
+    }
+
 }

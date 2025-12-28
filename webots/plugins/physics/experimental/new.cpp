@@ -89,27 +89,6 @@ static bool run_normal()
     return true;
 }
 
-DLLEXPORT void webots_physics_init() 
-{
-    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
-
-    _red_ball = dWebotsGetBodyFromDEF("red_ball");
-
-    if (_robot == NULL) {
-
-        dWebotsConsolePrintf("webots_physics_init :: ");
-        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
-    }
-    else {
-
-        dBodySetGravityMode(_robot, 0);
-        if (_red_ball) {
-            dBodySetGravityMode(_red_ball, 0);
-        }
-    }
-
-    _innerLoop.init(&_pidControl);
-
     _logfp = fopen(
             "/home/levys/Desktop/hackflight/webots/controllers/experimental/simsens.csv", "w");
 }
@@ -121,15 +100,4 @@ DLLEXPORT void webots_physics_step()
         return;
     }
 
-    static bool _collided;
-
-    if (_collided) {
-        dBodySetGravityMode(_robot, 1);
-        if (_red_ball) {
-            dBodySetPosition(_red_ball, 0, 0, -1);
-        }
-    }
-    else {
-        _collided = !run_normal();
-    }
 }
