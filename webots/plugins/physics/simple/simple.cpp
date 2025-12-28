@@ -24,6 +24,9 @@
 #include <pid.hpp>
 #include <simulator/inner.hpp>
 
+// Misc.
+#include "../common.hpp"
+
 static constexpr char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robot;

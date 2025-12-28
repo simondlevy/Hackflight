@@ -1,51 +1,3 @@
-/* 
- * Custom physics plugin custom for Hackflight Webots-based simulator
- *
- *  Copyright (C) 2025 Simon D. Levy
- *
- *  This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- *  This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http:--www.gnu.org/licenses/>.
- */
-
-// Webots
-#include <plugins/physics.h>
-
-// Hackflight
-#define _MAIN
-#include <pid.hpp>
-#include <simulator/inner.hpp>
-
-// Simsensors
-#include <simsensors/src/collision.hpp>
-#include <simsensors/src/parsers/webots/world.hpp>
-#include <simsensors/src/parsers/webots/robot.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
-#include <simsensors/src/visualizers/rangefinder.hpp>
-
-static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
-
-static constexpr char ROBOT_NAME[] = "diyquad";
-
-static dBodyID _robot;
-
-static dBodyID _red_ball;
-
-// Platform-independent simulator
-static SimInnerLoop _innerLoop;
-
-static PidControl _pidControl;
-
-static FILE * _logfp;
-
 static bool run_normal()
 {
     // Get sim info from main program
@@ -180,16 +132,4 @@ DLLEXPORT void webots_physics_step()
     else {
         _collided = !run_normal();
     }
-}
-
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
-{
-    (void)g1;
-    (void)g2;
-
-    return 0;
-}
-
-DLLEXPORT void webots_physics_cleanup() 
-{
 }

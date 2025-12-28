@@ -22,7 +22,7 @@ SRC = ../../../../src
 
 INCLUDE = -I$(SRC) -I$(SRC)/pid/standard
 
-CXX_SOURCES = $(ALL).cpp ../common.cpp
+CXX_SOURCES = $(ALL).cpp
 
 all: lib$(ALL).so
 

@@ -24,6 +24,9 @@
 #include <pid.hpp>
 #include <simulator/inner.hpp>
 
+// Misc.
+#include "../common.hpp"
+
 static constexpr char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robot;
@@ -33,6 +36,21 @@ static SimInnerLoop _innerLoop;
 
 static PidControl _pidControl;
 
+// Simsensors -----------------------------------------------------------
+#include <simsensors/src/collision.hpp>
+#include <simsensors/src/parsers/webots/world.hpp>
+#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
+#include <simsensors/src/visualizers/rangefinder.hpp>
+
+//static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
+
+//static FILE * _logfp;
+
+// -----------------------------------------------------------------------
+
+
+// This is called bDLLEXPORT void webots_physics_init() 
 DLLEXPORT void webots_physics_init() 
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
