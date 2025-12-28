@@ -131,12 +131,13 @@ float SimOuterLoop::platform_get_framerate()
     return 1000 / _timestep;
 }
 
-void SimOuterLoop::platform_read_rangefinder(int16_t * distance_mm) 
+void SimOuterLoop::platform_read_rangefinder(
+        int16_t * distance_mm, int & width, int & height) 
 {
     const float * image = wb_range_finder_get_range_image(_ranger);
 
-    const int width = wb_range_finder_get_width(_ranger);
-    const int height = wb_range_finder_get_height(_ranger);
+    width = wb_range_finder_get_width(_ranger);
+    height = wb_range_finder_get_height(_ranger);
 
     for (int x=0; x<width; ++x) {
 

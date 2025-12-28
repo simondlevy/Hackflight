@@ -29,7 +29,7 @@
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
-//#include <simsensors/src/visualizers/rangefinder.hpp>
+#include <simsensors/src/visualizers/rangefinder.hpp>
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
@@ -66,7 +66,7 @@ static bool run_normal()
     }
 
     static simsens::SimRangefinder * _simRangefinder;
-    //static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+    static simsens::RangefinderVisualizer * _rangefinderVisualizer;
     static simsens::RobotParser _robotParser;
     static simsens::WorldParser _worldParser;
 
@@ -83,7 +83,7 @@ static bool run_normal()
 
         _simRangefinder = _robotParser.rangefinders[0];
 
-        //_rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
+        _rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
     }
 
     // Update to get the current pose
@@ -112,9 +112,6 @@ static bool run_normal()
             _worldParser.walls,
             ranger_distances_mm);
 
-    static int _count;
-    printf("plugin: %d\n", ++_count);
-
     log_distance(_logfp, ranger_distances_mm[0]);
     log_distance(_logfp, ranger_distances_mm[1]);
     log_distance(_logfp, ranger_distances_mm[2]);
@@ -125,7 +122,7 @@ static bool run_normal()
     log_distance(_logfp, ranger_distances_mm[7], true);
     fflush(_logfp);
 
-    //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+    _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = {pose.phi, pose.theta, -pose.psi};

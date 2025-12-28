@@ -93,9 +93,9 @@ class SimOuterLoop {
             return 0;
         }
 
-        void readRanger(int16_t * distance_mm) 
+        void readRanger(int16_t * distance_mm, int & width, int & height) 
         {
-            platform_read_rangefinder(distance_mm);
+            platform_read_rangefinder(distance_mm, width, height);
         }
 
     private:
@@ -394,6 +394,7 @@ class SimOuterLoop {
         int          platform_keyboard_right();
         int          platform_keyboard_up();
         void         platform_send_siminfo(const siminfo_t & siminfo);
-        void         platform_read_rangefinder(int16_t * distance_mm); 
+        void         platform_read_rangefinder(int16_t * distance_mm,
+                                               int & width, int & height); 
         bool         platform_step();
  };

@@ -92,12 +92,14 @@ int main(int argc, char ** argv)
             break;
         }
 
-        static bool _ready; // synch with plugin
-        static int _count;
+        int rangefinder_width=0, rangefinder_height=0;
+        outerLoop.readRanger(
+                ranger_distances_mm,
+                rangefinder_width,
+                rangefinder_height);
 
+        static bool _ready; // synch with plugin
         if (_ready) {
-            printf("control: %d\n", ++_count);
-            outerLoop.readRanger(ranger_distances_mm);
             log_distance(logfp, ranger_distances_mm[0]);
             log_distance(logfp, ranger_distances_mm[1]);
             log_distance(logfp, ranger_distances_mm[2]);
