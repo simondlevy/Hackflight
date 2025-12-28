@@ -46,6 +46,10 @@ static PidControl _pidControl;
 
 static FILE * _logfp;
 
+static void log_distance(FILE * logfp, const int16_t d, const bool last=false)
+{
+    fprintf(logfp, "%d%c", d, last?'\n':',');
+}
 static bool run_normal()
 {
     // Get sim info from main program
@@ -106,10 +110,19 @@ static bool run_normal()
             simsens::pose_t{robot_x, robot_y, robot_z,
             pose.phi, pose.theta, pose.psi},
             _worldParser.walls,
-            ranger_distances_mm,
-            _logfp,
-            &dbg_intersection);
+            ranger_distances_mm);
 
+    static int _count;
+    printf("plugin: %d\n", ++_count);
+
+    log_distance(_logfp, ranger_distances_mm[0]);
+    log_distance(_logfp, ranger_distances_mm[1]);
+    log_distance(_logfp, ranger_distances_mm[2]);
+    log_distance(_logfp, ranger_distances_mm[3]);
+    log_distance(_logfp, ranger_distances_mm[4]);
+    log_distance(_logfp, ranger_distances_mm[5]);
+    log_distance(_logfp, ranger_distances_mm[6]);
+    log_distance(_logfp, ranger_distances_mm[7], true);
     fflush(_logfp);
 
     //_rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);

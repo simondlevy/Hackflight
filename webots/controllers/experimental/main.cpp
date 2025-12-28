@@ -28,18 +28,9 @@ static bool isinf(const int16_t d)
     return d == -1;
 }
 
-static void dumpdist(FILE * logfp, const int16_t d, const bool last=false)
+static void log_distance(FILE * logfp, const int16_t d, const bool last=false)
 {
     fprintf(logfp, "%d%c", d, last?'\n':',');
-    fflush(logfp);
-
-    /*
-    if (d == -1) {
-        printf(" inf ");
-    }
-    else {
-        printf("%4d ", d);
-    }*/
 }
 
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
@@ -83,16 +74,6 @@ int main(int argc, char ** argv)
 
         static int16_t ranger_distances_mm[1000]; // arbitrary max size
 
-        dumpdist(logfp, ranger_distances_mm[0]);
-        dumpdist(logfp, ranger_distances_mm[1]);
-        dumpdist(logfp, ranger_distances_mm[2]);
-        dumpdist(logfp, ranger_distances_mm[3]);
-        dumpdist(logfp, ranger_distances_mm[4]);
-        dumpdist(logfp, ranger_distances_mm[5]);
-        dumpdist(logfp, ranger_distances_mm[6]);
-        dumpdist(logfp, ranger_distances_mm[7], true);
-        printf("\n");
-
         bool okay = true;
 
         if (outerLoop.getFlightMode() == MODE_AUTONOMOUS) {
@@ -111,7 +92,23 @@ int main(int argc, char ** argv)
             break;
         }
 
-        outerLoop.readRanger(ranger_distances_mm);
+        static bool _ready; // synch with plugin
+        static int _count;
+
+        if (_ready) {
+            printf("control: %d\n", ++_count);
+            outerLoop.readRanger(ranger_distances_mm);
+            log_distance(logfp, ranger_distances_mm[0]);
+            log_distance(logfp, ranger_distances_mm[1]);
+            log_distance(logfp, ranger_distances_mm[2]);
+            log_distance(logfp, ranger_distances_mm[3]);
+            log_distance(logfp, ranger_distances_mm[4]);
+            log_distance(logfp, ranger_distances_mm[5]);
+            log_distance(logfp, ranger_distances_mm[6]);
+            log_distance(logfp, ranger_distances_mm[7], true);
+            fflush(logfp);
+        }
+        _ready = true;
 
         outerLoop.endStep(siminfo);
 
