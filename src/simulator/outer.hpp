@@ -93,7 +93,7 @@ class SimOuterLoop {
             return 0;
         }
 
-        void readRanger(int16_t * distance_mm, int & width, int & height) 
+        void readRangefinder(int16_t * distance_mm, int & width, int & height) 
         {
             platform_read_rangefinder(distance_mm, width, height);
         }

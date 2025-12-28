@@ -28,11 +28,6 @@ static bool isinf(const int16_t d)
     return d == -1;
 }
 
-static void log_distance(FILE * logfp, const int16_t d, const bool last=false)
-{
-    fprintf(logfp, "%d%c", d, last?'\n':',');
-}
-
 static demands_t getAutonomousSetpoint(const int16_t * ranger_distances_mm)
 {
     const auto d = ranger_distances_mm;
@@ -72,14 +67,14 @@ int main(int argc, char ** argv)
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
 
-        static int16_t ranger_distances_mm[1000]; // arbitrary max size
+        static int16_t rangefinder_distances_mm[1000]; // arbitrary max size
 
         bool okay = true;
 
         if (outerLoop.getFlightMode() == MODE_AUTONOMOUS) {
 
             demands_t setpoint =
-                getAutonomousSetpoint(ranger_distances_mm);
+                getAutonomousSetpoint(rangefinder_distances_mm);
 
             okay = outerLoop.beginStep(siminfo, &setpoint);
         }
@@ -93,21 +88,17 @@ int main(int argc, char ** argv)
         }
 
         int rangefinder_width=0, rangefinder_height=0;
-        outerLoop.readRanger(
-                ranger_distances_mm,
+        outerLoop.readRangefinder(
+                rangefinder_distances_mm,
                 rangefinder_width,
                 rangefinder_height);
 
         static bool _ready; // synch with plugin
         if (_ready) {
-            log_distance(logfp, ranger_distances_mm[0]);
-            log_distance(logfp, ranger_distances_mm[1]);
-            log_distance(logfp, ranger_distances_mm[2]);
-            log_distance(logfp, ranger_distances_mm[3]);
-            log_distance(logfp, ranger_distances_mm[4]);
-            log_distance(logfp, ranger_distances_mm[5]);
-            log_distance(logfp, ranger_distances_mm[6]);
-            log_distance(logfp, ranger_distances_mm[7], true);
+            for (int k=0; k<rangefinder_width; ++k) {
+                fprintf(logfp, "%d%c", rangefinder_distances_mm[k],
+                        (k==rangefinder_width-1)?'\n':',');
+            }
             fflush(logfp);
         }
         _ready = true;
