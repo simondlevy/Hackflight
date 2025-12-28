@@ -11,7 +11,15 @@ def loadcsv(filename):
 gt = loadcsv('groundtruth.csv')
 ss = loadcsv('simsens.csv')
 
-print(ss-gt)
+n = len(gt)
+
+diff = ss - gt
+
+x = np.linspace(-n, n, n)
+
+plt.plot(x, diff)
+plt.plot(x, (1.25*x)**2)
+plt.show()
 
 '''
 plt.plot(gt[0,:], ss[0,:])
