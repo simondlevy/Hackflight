@@ -16,6 +16,8 @@
 
 world = simple
 
+# -----------------------------------------------------------------------------
+
 ALL = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
@@ -24,12 +26,14 @@ SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-SRCDIR = ../../../src
-INCLUDE = -I$(SRCDIR) -I$(SRCDIR)/pid/slowfast -I$(OPENCV_DIR) -I$(SIMSENSORS_DIR)
+SRC_DIR = ../../../src
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(OPENCV_DIR) -I$(SIMSENSORS_DIR)
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
 CXX_SOURCES = main.cpp ../support.cpp
+
+FILES_TO_REMOVE += *.csv
 
 all: $(ALL)
 
@@ -39,7 +43,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/simple.wbt &
+	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(ALL) $(world) \
 		../../protos
 
