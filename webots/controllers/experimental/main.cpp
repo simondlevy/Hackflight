@@ -93,7 +93,7 @@ int main(int argc, char ** argv)
                 rangefinder_width,
                 rangefinder_height);
 
-        static bool _ready; // synch with plugin
+        static bool _ready; // sync with plugin
         if (_ready) {
             for (int k=0; k<rangefinder_width; ++k) {
                 fprintf(logfp, "%d%c", rangefinder_distances_mm[k],

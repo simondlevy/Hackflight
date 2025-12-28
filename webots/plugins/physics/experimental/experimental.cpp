@@ -46,10 +46,6 @@ static PidControl _pidControl;
 
 static FILE * _logfp;
 
-static void log_distance(FILE * logfp, const int16_t d, const bool last=false)
-{
-    fprintf(logfp, "%d%c", d, last?'\n':',');
-}
 static bool run_normal()
 {
     // Get sim info from main program
@@ -104,25 +100,24 @@ static bool run_normal()
     }
 
     // Get simulated rangefinder distances
-    int ranger_distances_mm[1000] = {}; // arbitrary max size
+    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+    int rangefinder_width=0, rangefinder_height=0;
     simsens::vec3_t dbg_intersection = {};
     _simRangefinder->read(
             simsens::pose_t{robot_x, robot_y, robot_z,
             pose.phi, pose.theta, pose.psi},
             _worldParser.walls,
-            ranger_distances_mm);
+            rangefinder_distances_mm,
+            rangefinder_width,
+            rangefinder_height);
 
-    log_distance(_logfp, ranger_distances_mm[0]);
-    log_distance(_logfp, ranger_distances_mm[1]);
-    log_distance(_logfp, ranger_distances_mm[2]);
-    log_distance(_logfp, ranger_distances_mm[3]);
-    log_distance(_logfp, ranger_distances_mm[4]);
-    log_distance(_logfp, ranger_distances_mm[5]);
-    log_distance(_logfp, ranger_distances_mm[6]);
-    log_distance(_logfp, ranger_distances_mm[7], true);
+    for (int k=0; k<rangefinder_width; ++k) {
+        fprintf(_logfp, "%d%c", rangefinder_distances_mm[k],
+                (k==rangefinder_width-1)?'\n':',');
+    }
     fflush(_logfp);
 
-    _rangefinderVisualizer->show(ranger_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+    _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = {pose.phi, pose.theta, -pose.psi};
