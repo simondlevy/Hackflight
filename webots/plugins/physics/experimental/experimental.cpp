@@ -31,7 +31,7 @@ static const char * LOGFILE_NAME =
 
 static void load(const siminfo_t & siminfo,
         simsens::WorldParser & worldParser,
-        simsens::SimRangefinder ** simRangefinder,
+        simsens::SimRangefinder ** rangefinder,
         simsens::RangefinderVisualizer ** rangefinderVisualizer,
         FILE ** logfpp)
 {
@@ -44,9 +44,9 @@ static void load(const siminfo_t & siminfo,
     simsens::RobotParser robotParser = {};
     robotParser.parse(path);
 
-    *simRangefinder = robotParser.rangefinders[0];
+    *rangefinder = robotParser.rangefinders[0];
 
-    *rangefinderVisualizer = new simsens::RangefinderVisualizer(*simRangefinder);
+    *rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
 
     *logfpp = fopen(LOGFILE_NAME, "w");
 }
@@ -93,53 +93,6 @@ static void read_rangefinder(
     visualizer.show(distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 }
 
-static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & pose)
-{
-    static simsens::SimRangefinder * _simRangefinder;
-    static simsens::RangefinderVisualizer * _rangefinderVisualizer;
-    static simsens::WorldParser _worldParser;
-    static FILE * _logfp;
-
-    // Load world and robot info first time around
-    if (!_simRangefinder) {
-        load(siminfo, _worldParser, &_simRangefinder, &_rangefinderVisualizer,
-                &_logfp);
-    }
-
-    // Get simulated rangefinder distances
-    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
-    read_rangefinder(*_simRangefinder, *_rangefinderVisualizer, _worldParser,
-            pose, rangefinder_distances_mm, _logfp);
-
-    /*
-    int rangefinder_width=0, rangefinder_height=0;
-    _simRangefinder->read(
-            simsens::pose_t{pose.x, pose.y, pose.z,
-            pose.phi, pose.theta, pose.psi},
-            _worldParser.walls,
-            rangefinder_distances_mm,
-            rangefinder_width,
-            rangefinder_height);
-
-    for (int k=0; k<rangefinder_width; ++k) {
-        fprintf(_logfp, "%d%c", rangefinder_distances_mm[k],
-                (k==rangefinder_width-1)?'\n':',');
-    }
-    fflush(_logfp);
-
-    _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
-    */
-
-    if (collided(pose, _worldParser)) {
-        return false;
-    }
-
-    // Stop if we detected a collision
-    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
-
-    return true;
-}
-
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -152,6 +105,7 @@ DLLEXPORT void webots_physics_step()
     if (_collided) {
         dBodySetGravityMode(_robot, 1);
     }
+
     else {
 
         siminfo_t siminfo = {};
@@ -160,8 +114,29 @@ DLLEXPORT void webots_physics_step()
 
         if (_step(siminfo, pose)) {
 
-            _collided = !run_normal(siminfo, pose);
+            static simsens::SimRangefinder * _rangefinder;
+            static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+            static simsens::WorldParser _worldParser;
+            static FILE * _logfp;
+
+            // Load world and robot info first time around
+            if (!_rangefinder) {
+                load(siminfo, _worldParser, &_rangefinder, &_rangefinderVisualizer,
+                        &_logfp);
+            }
+
+            // Get simulated rangefinder distances
+            int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+            read_rangefinder(*_rangefinder, *_rangefinderVisualizer, _worldParser,
+                    pose, rangefinder_distances_mm, _logfp);
+
+            // Stop if we detected a collision
+            if (collided(pose, _worldParser)) {
+                _collided =  true;
+            }
+            else {
+                dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+            }
         }
     }
-
 }
