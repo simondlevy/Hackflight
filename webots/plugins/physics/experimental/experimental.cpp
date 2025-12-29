@@ -93,13 +93,23 @@ static void read_rangefinder(
     visualizer.show(distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 }
 
-static bool run_normal(
-        const siminfo_t & siminfo, const SimInnerLoop::pose_t pose)
+static bool run_normal(siminfo_t & siminfo)
 {
     static simsens::Rangefinder * _rangefinder;
     static simsens::RangefinderVisualizer * _rangefinderVisualizer;
     static simsens::WorldParser _worldParser;
     static FILE * _logfp;
+    static int _rangefinder_distances_mm[1000]; // arbitrary max size
+    static SimInnerLoop::pose_t _pose;
+
+    if (siminfo.flightMode == MODE_AUTONOMOUS) {
+        siminfo.setpoint.thrust = 0.5;
+        siminfo.setpoint.roll = 0;
+        siminfo.setpoint.pitch = 0;
+        siminfo.setpoint.yaw = 0;
+    }
+
+    get_pose(siminfo, _pose);
 
     // Load world and robot info first time around
     if (!_rangefinder) {
@@ -108,16 +118,15 @@ static bool run_normal(
     }
 
     // Get simulated rangefinder distances
-    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
     read_rangefinder(*_rangefinder, *_rangefinderVisualizer, _worldParser,
-            pose, rangefinder_distances_mm, _logfp);
+            _pose, _rangefinder_distances_mm, _logfp);
 
     // Stop if we detected a collision
-    if (collided(pose, _worldParser)) {
+    if (collided(_pose, _worldParser)) {
         return false;
     }
 
-    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+    dBodySetPosition(_robot, _pose.x, _pose.y, _pose.z);
 
     return true;
 }
@@ -141,18 +150,7 @@ DLLEXPORT void webots_physics_step()
 
         if (get_siminfo(siminfo)) {
 
-            if (siminfo.flightMode == MODE_AUTONOMOUS) {
-                siminfo.setpoint.thrust = 0.5;
-                siminfo.setpoint.roll = 0;
-                siminfo.setpoint.pitch = 0;
-                siminfo.setpoint.yaw = 0;
-            }
-
-            SimInnerLoop::pose_t pose = {};
-
-            get_pose(siminfo, pose);
-
-            if (!run_normal(siminfo, pose)) {
+            if (!run_normal(siminfo)) {
                 _collided = true;
             }
         }
