@@ -93,6 +93,17 @@ static void read_rangefinder(
     visualizer.show(distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 }
 
+static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
+        demands_t & setpoint)
+{
+    (void)rangefinder_distances_mm;
+
+    setpoint.thrust = 0.5;
+    setpoint.roll = 0;
+    setpoint.pitch = 0;
+    setpoint.yaw = 0;
+}
+
 static bool run_normal(siminfo_t & siminfo)
 {
     static simsens::Rangefinder * _rangefinder;
@@ -102,13 +113,13 @@ static bool run_normal(siminfo_t & siminfo)
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
     static SimInnerLoop::pose_t _pose;
 
+    // In autonomous mode, use current pose to get setpoints
     if (siminfo.flightMode == MODE_AUTONOMOUS) {
-        siminfo.setpoint.thrust = 0.5;
-        siminfo.setpoint.roll = 0;
-        siminfo.setpoint.pitch = 0;
-        siminfo.setpoint.yaw = 0;
+        get_setpoint_from_rangefinder(_rangefinder_distances_mm,
+                siminfo.setpoint);
     }
 
+    // Use setpoints to get new pose
     get_pose(siminfo, _pose);
 
     // Load world and robot info first time around
