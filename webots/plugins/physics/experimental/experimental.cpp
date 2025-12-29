@@ -66,6 +66,33 @@ static bool collided(
     return false;
 }
 
+static void read_rangefinder(
+        simsens::SimRangefinder & rangefinder,
+        simsens::RangefinderVisualizer & visualizer,
+        simsens::WorldParser & world,
+        const SimInnerLoop::pose_t & pose,
+        int * distances_mm,
+        FILE * logfp)
+{
+    int width=0, height=0;
+
+    rangefinder.read(
+            simsens::pose_t{
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            world.walls,
+            distances_mm,
+            width,
+            height);
+
+    for (int k=0; k<width; ++k) {
+        fprintf(logfp, "%d%c", distances_mm[k], (k==width-1)?'\n':',');
+    }
+
+    fflush(logfp);
+
+    visualizer.show(distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+}
+
 static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & pose)
 {
     static simsens::SimRangefinder * _simRangefinder;
@@ -81,6 +108,10 @@ static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & p
 
     // Get simulated rangefinder distances
     int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+    read_rangefinder(*_simRangefinder, *_rangefinderVisualizer, _worldParser,
+            pose, rangefinder_distances_mm, _logfp);
+
+    /*
     int rangefinder_width=0, rangefinder_height=0;
     _simRangefinder->read(
             simsens::pose_t{pose.x, pose.y, pose.z,
@@ -97,6 +128,7 @@ static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & p
     fflush(_logfp);
 
     _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+    */
 
     if (collided(pose, _worldParser)) {
         return false;
