@@ -93,6 +93,35 @@ static void read_rangefinder(
     visualizer.show(distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 }
 
+static bool run_normal(
+        const siminfo_t & siminfo, const SimInnerLoop::pose_t pose)
+{
+    static simsens::Rangefinder * _rangefinder;
+    static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+    static simsens::WorldParser _worldParser;
+    static FILE * _logfp;
+
+    // Load world and robot info first time around
+    if (!_rangefinder) {
+        load(siminfo, _worldParser, &_rangefinder, &_rangefinderVisualizer,
+                &_logfp);
+    }
+
+    // Get simulated rangefinder distances
+    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+    read_rangefinder(*_rangefinder, *_rangefinderVisualizer, _worldParser,
+            pose, rangefinder_distances_mm, _logfp);
+
+    // Stop if we detected a collision
+    if (collided(pose, _worldParser)) {
+        return false;
+    }
+
+    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+
+    return true;
+}
+
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -114,28 +143,8 @@ DLLEXPORT void webots_physics_step()
 
         if (_step(siminfo, pose)) {
 
-            static simsens::Rangefinder * _rangefinder;
-            static simsens::RangefinderVisualizer * _rangefinderVisualizer;
-            static simsens::WorldParser _worldParser;
-            static FILE * _logfp;
-
-            // Load world and robot info first time around
-            if (!_rangefinder) {
-                load(siminfo, _worldParser, &_rangefinder, &_rangefinderVisualizer,
-                        &_logfp);
-            }
-
-            // Get simulated rangefinder distances
-            int rangefinder_distances_mm[1000] = {}; // arbitrary max size
-            read_rangefinder(*_rangefinder, *_rangefinderVisualizer, _worldParser,
-                    pose, rangefinder_distances_mm, _logfp);
-
-            // Stop if we detected a collision
-            if (collided(pose, _worldParser)) {
-                _collided =  true;
-            }
-            else {
-                dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+            if (!run_normal(siminfo, pose)) {
+                _collided = true;
             }
         }
     }
