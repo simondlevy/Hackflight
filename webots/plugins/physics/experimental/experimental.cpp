@@ -87,6 +87,20 @@ static bool run_normal()
                 "experimental/simsens.csv", "w");
     }
 
+    // Get simulated rangefinder distances
+    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+    int rangefinder_width=0, rangefinder_height=0;
+    _simRangefinder->read(
+            simsens::pose_t{robot_x, robot_y, robot_z,
+            pose.phi, pose.theta, pose.psi},
+            _worldParser.walls,
+            rangefinder_distances_mm,
+            rangefinder_width,
+            rangefinder_height);
+
+    (void)_rangefinderVisualizer;
+    (void)_logfp;
+
     // Stop if we detected a collision
     const bool debug = true;
     if (simsens::CollisionDetector::detect(
