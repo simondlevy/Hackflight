@@ -21,5 +21,6 @@
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    _step();
+     SimInnerLoop::pose_t pose = {};
+    _step(pose);
 }

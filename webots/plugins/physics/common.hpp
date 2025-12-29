@@ -63,7 +63,7 @@ DLLEXPORT void webots_physics_cleanup()
 {
 }
 
-static void _step()
+static void _step(SimInnerLoop::pose_t & pose)
 {
     if (_robot == NULL) {
         return;
@@ -86,7 +86,6 @@ static void _step()
     }
 
     // Update to get the current pose
-    SimInnerLoop::pose_t pose = {};
     _innerLoop.step(siminfo, pose);
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
