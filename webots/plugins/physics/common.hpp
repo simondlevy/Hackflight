@@ -97,11 +97,11 @@ static bool _step(siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
     // Set robot posed based on state and starting position, negating for
     // rightward negative
     pose.y = -pose.y;
-    const double robot_x = siminfo.start_x + pose.x;
-    const double robot_y = siminfo.start_y + pose.y;
-    const double robot_z = siminfo.start_z + pose.z;
+    pose.x += siminfo.start_x;
+    pose.y += siminfo.start_y;
+    pose.z += siminfo.start_z;
 
-    dBodySetPosition(_robot, robot_x, robot_y, robot_z);
+    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
 
     return true;
 }
