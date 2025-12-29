@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <datatypes.h>
-
 // Structure shared between slow and fast threads
 typedef struct {
 

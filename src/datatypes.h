@@ -122,11 +122,3 @@ typedef struct {
     axis3_t acc; // Gs, for legacy reasons
 
 } accelerationMeasurement_t;
-
-typedef enum {
-
-    SETPOINT_HUMAN,
-    SETPOINT_LIDAR
-
-} setpointType_e;
-
