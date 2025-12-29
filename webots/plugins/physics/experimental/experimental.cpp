@@ -26,6 +26,9 @@
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
 
+static const char * LOGFILE_NAME =
+"/home/levys/Desktop/hackflight/webots/controllers/controller/simsens.csv";
+
 static bool run_normal()
 {
     int size = 0;
@@ -83,8 +86,7 @@ static bool run_normal()
 
         _rangefinderVisualizer = new simsens::RangefinderVisualizer(_simRangefinder);
 
-        _logfp = fopen("/home/levys/Desktop/hackflight/webots/controllers/"
-                "experimental/simsens.csv", "w");
+        _logfp = fopen(LOGFILE_NAME, "w");
     }
 
     // Get simulated rangefinder distances
@@ -98,7 +100,12 @@ static bool run_normal()
             rangefinder_width,
             rangefinder_height);
 
-    (void)_logfp;
+    for (int k=0; k<rangefinder_width; ++k) {
+        fprintf(_logfp, "%d%c", rangefinder_distances_mm[k],
+                (k==rangefinder_width-1)?'\n':',');
+    }
+    fflush(_logfp);
+
 
     _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
