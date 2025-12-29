@@ -51,6 +51,21 @@ static void load(const siminfo_t & siminfo,
     *logfpp = fopen(LOGFILE_NAME, "w");
 }
 
+static bool collided(
+        const SimInnerLoop::pose_t & pose,
+        const simsens::WorldParser & worldParser)
+{
+    const bool debug = true;
+
+    if (simsens::CollisionDetector::detect(
+                simsens::vec3_t{pose.x, pose.y, pose.x},
+                worldParser.walls, debug)) {
+        return true;
+    }
+
+    return false;
+}
+
 static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & pose)
 {
     static simsens::SimRangefinder * _simRangefinder;
@@ -60,7 +75,8 @@ static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & p
 
     // Load world and robot info first time around
     if (!_simRangefinder) {
-        load(siminfo, _worldParser, &_simRangefinder, &_rangefinderVisualizer, &_logfp);
+        load(siminfo, _worldParser, &_simRangefinder, &_rangefinderVisualizer,
+                &_logfp);
     }
 
     // Get simulated rangefinder distances
@@ -82,14 +98,11 @@ static bool run_normal(const siminfo_t & siminfo, const SimInnerLoop::pose_t & p
 
     _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
-    // Stop if we detected a collision
-    const bool debug = true;
-    if (simsens::CollisionDetector::detect(
-                simsens::vec3_t{pose.x, pose.y, pose.x},
-                _worldParser.walls, debug)) {
+    if (collided(pose, _worldParser)) {
         return false;
     }
 
+    // Stop if we detected a collision
     dBodySetPosition(_robot, pose.x, pose.y, pose.z);
 
     return true;
