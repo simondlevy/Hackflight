@@ -101,7 +101,5 @@ static bool _step(siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
     pose.y += siminfo.start_y;
     pose.z += siminfo.start_z;
 
-    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
-
     return true;
 }
