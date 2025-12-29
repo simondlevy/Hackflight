@@ -142,8 +142,10 @@ DLLEXPORT void webots_physics_step()
         if (get_siminfo(siminfo)) {
 
             if (siminfo.flightMode == MODE_AUTONOMOUS) {
-                static int count;
-                printf("AUTONOMOUS %d\n", ++count);
+                siminfo.setpoint.thrust = 0.5;
+                siminfo.setpoint.roll = 0;
+                siminfo.setpoint.pitch = 0;
+                siminfo.setpoint.yaw = 0;
             }
 
             SimInnerLoop::pose_t pose = {};
