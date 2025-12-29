@@ -62,3 +62,45 @@ DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2)
 DLLEXPORT void webots_physics_cleanup() 
 {
 }
+
+static void _step()
+{
+    if (_robot == NULL) {
+        return;
+    }
+
+    int bytes_received = 0;
+
+    siminfo_t siminfo = {};
+
+    // Get sim info from main program
+    const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
+
+    if (bytes_received == sizeof(siminfo_t)) {
+        memcpy(&siminfo, buffer, sizeof(siminfo));
+    }
+
+    // This happens at startup
+    if (siminfo.framerate == 0) {
+        return;
+    }
+
+    // Update to get the current pose
+    const SimInnerLoop::pose_t pose = _innerLoop.step(siminfo);
+
+    // Turn Euler angles into quaternion, negating psi for nose-right positive 
+    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
+    axis4_t quat = {};
+    Num::euler2quat(euler, quat);
+
+    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
+    dBodySetQuaternion(_robot, q);
+
+    // Set robot posed based on state and starting position, negating for
+    // rightward negative
+    const double robot_x = siminfo.start_x + pose.x;
+    const double robot_y = siminfo.start_y - pose.y;
+    const double robot_z = siminfo.start_z + pose.z;
+
+    dBodySetPosition(_robot, robot_x, robot_y, robot_z);
+}
