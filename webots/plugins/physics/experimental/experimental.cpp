@@ -77,8 +77,8 @@ static bool run_normal()
         }
         fflush(_logfp);
 
-
-        _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+        _rangefinderVisualizer->show(rangefinder_distances_mm,
+                RANGEFINDER_DISPLAY_SCALEUP);
 
         // Stop if we detected a collision
         const bool debug = true;
@@ -96,10 +96,6 @@ static bool run_normal()
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robot == NULL) {
-        return;
-    }
-
     static bool _collided;
 
     if (_collided) {
