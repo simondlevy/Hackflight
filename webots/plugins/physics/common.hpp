@@ -63,15 +63,13 @@ DLLEXPORT void webots_physics_cleanup()
 {
 }
 
-static void _step(SimInnerLoop::pose_t & pose)
+static bool _step(siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
 {
     if (_robot == NULL) {
-        return;
+        return false;
     }
 
     int bytes_received = 0;
-
-    siminfo_t siminfo = {};
 
     // Get sim info from main program
     const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
@@ -82,7 +80,7 @@ static void _step(SimInnerLoop::pose_t & pose)
 
     // This happens at startup
     if (siminfo.framerate == 0) {
-        return;
+        return false;
     }
 
     // Update to get the current pose
@@ -103,4 +101,6 @@ static void _step(SimInnerLoop::pose_t & pose)
     const double robot_z = siminfo.start_z + pose.z;
 
     dBodySetPosition(_robot, robot_x, robot_y, robot_z);
+
+    return true;
 }

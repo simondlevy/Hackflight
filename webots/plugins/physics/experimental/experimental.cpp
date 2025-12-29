@@ -31,41 +31,15 @@ static const char * LOGFILE_NAME =
 
 static bool run_normal()
 {
-    int size = 0;
-
     siminfo_t siminfo = {};
-
-    // Get sim info from main program
-    const auto buffer = (siminfo_t *)dWebotsReceive(&size);
-
-    if (size == sizeof(siminfo_t)) {
-        memcpy(&siminfo, buffer, sizeof(siminfo));
-    }
-
-    // This happens at startup
-    if (siminfo.framerate == 0) {
-        return true;
-    }
-
-    // Update to get the current pose
     SimInnerLoop::pose_t pose = {};
-    _innerLoop.step(siminfo, pose);
 
-    // Turn Euler angles into quaternion, negating psi for nose-right positive 
-    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
-    axis4_t quat = {};
-    Num::euler2quat(euler, quat);
+    _step(siminfo, pose);
 
-    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-    dBodySetQuaternion(_robot, q);
+    return true;
 
-    // Set robot posed based on state and starting position, negating for
-    // rightward negative
-    const double robot_x = siminfo.start_x + pose.x;
-    const double robot_y = siminfo.start_y - pose.y;
-    const double robot_z = siminfo.start_z + pose.z;
+    /*
 
-    ///////////////////////////////////////////////////////////////////////
     static simsens::SimRangefinder * _simRangefinder;
     static simsens::RangefinderVisualizer * _rangefinderVisualizer;
     static simsens::RobotParser _robotParser;
@@ -118,11 +92,8 @@ static bool run_normal()
         return false;
     }
 
-    ///////////////////////////////////////////////////////////////////////
-
-    dBodySetPosition(_robot, robot_x, robot_y, robot_z);
-
     return true;
+    */
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
