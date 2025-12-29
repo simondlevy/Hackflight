@@ -55,7 +55,10 @@ class SimInnerLoop {
             _pidControl->init();
         }
 
-        pose_t step(const siminfo_t & siminfo, const bool freezexy=false)
+        void step(
+                const siminfo_t & siminfo,
+                pose_t & pose,
+                const bool freezexy=false)
         {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
@@ -89,11 +92,12 @@ class SimInnerLoop {
                 }
             }
 
-            // Get current pose from dynamics
-            const auto s = _dynamics.state;
-            return pose_t {
-                freezexy?0:s.x, freezexy?0:s.y, s.z, s.phi, s.theta, s.psi
-            };
+            pose.x = freezexy ? 0 : _dynamics.state.x;
+            pose.y = freezexy ? 0 : _dynamics.state.y;
+            pose.z = freezexy ? 0 : _dynamics.state.z;
+            pose.phi = _dynamics.state.phi;
+            pose.theta = _dynamics.state.theta;
+            pose.psi = _dynamics.state.psi;
         }    
 
     private:
