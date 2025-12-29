@@ -98,8 +98,9 @@ static bool run_normal()
             rangefinder_width,
             rangefinder_height);
 
-    (void)_rangefinderVisualizer;
     (void)_logfp;
+
+    _rangefinderVisualizer->show(rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Stop if we detected a collision
     const bool debug = true;
