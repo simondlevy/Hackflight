@@ -31,7 +31,7 @@ static const char * LOGFILE_NAME =
 
 static void load(const siminfo_t & siminfo,
         simsens::WorldParser & worldParser,
-        simsens::SimRangefinder ** rangefinder,
+        simsens::Rangefinder ** rangefinder,
         simsens::RangefinderVisualizer ** rangefinderVisualizer,
         FILE ** logfpp)
 {
@@ -67,7 +67,7 @@ static bool collided(
 }
 
 static void read_rangefinder(
-        simsens::SimRangefinder & rangefinder,
+        simsens::Rangefinder & rangefinder,
         simsens::RangefinderVisualizer & visualizer,
         simsens::WorldParser & world,
         const SimInnerLoop::pose_t & pose,
@@ -114,7 +114,7 @@ DLLEXPORT void webots_physics_step()
 
         if (_step(siminfo, pose)) {
 
-            static simsens::SimRangefinder * _rangefinder;
+            static simsens::Rangefinder * _rangefinder;
             static simsens::RangefinderVisualizer * _rangefinderVisualizer;
             static simsens::WorldParser _worldParser;
             static FILE * _logfp;
