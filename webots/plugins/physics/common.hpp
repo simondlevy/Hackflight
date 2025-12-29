@@ -63,7 +63,7 @@ DLLEXPORT void webots_physics_cleanup()
 {
 }
 
-static bool _step(siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
+static bool get_siminfo(siminfo_t & siminfo)
 {
     if (_robot == NULL) {
         return false;
@@ -78,11 +78,12 @@ static bool _step(siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
         memcpy(&siminfo, buffer, sizeof(siminfo));
     }
 
-    // This happens at startup
-    if (siminfo.framerate == 0) {
-        return false;
-    }
+    // Framerate can be zero at startup
+    return siminfo.framerate > 0;
+}
 
+static void get_pose(const siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
+{
     // Update to get the current pose
     _innerLoop.step(siminfo, pose);
 
@@ -100,6 +101,4 @@ static bool _step(siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
     pose.x += siminfo.start_x;
     pose.y += siminfo.start_y;
     pose.z += siminfo.start_z;
-
-    return true;
 }

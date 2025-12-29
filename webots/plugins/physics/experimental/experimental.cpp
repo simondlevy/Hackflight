@@ -139,9 +139,11 @@ DLLEXPORT void webots_physics_step()
 
         siminfo_t siminfo = {};
 
-        SimInnerLoop::pose_t pose = {};
+        if (get_siminfo(siminfo)) {
 
-        if (_step(siminfo, pose)) {
+            SimInnerLoop::pose_t pose = {};
+
+            get_pose(siminfo, pose);
 
             if (!run_normal(siminfo, pose)) {
                 _collided = true;

@@ -23,9 +23,12 @@ DLLEXPORT void webots_physics_step()
 {
     siminfo_t siminfo = {};
 
-    SimInnerLoop::pose_t pose = {};
+    if (get_siminfo(siminfo)) {
 
-    if (_step(siminfo, pose)) {
+        SimInnerLoop::pose_t pose = {};
+
+        get_pose(siminfo, pose);
+
         dBodySetPosition(_robot, pose.x, pose.y, pose.z);
     }
 }
