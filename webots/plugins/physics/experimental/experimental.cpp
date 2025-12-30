@@ -77,12 +77,9 @@ static void read_rangefinder(
     int width=0, height=0;
 
     rangefinder.read(
-            simsens::pose_t{
+            simsens::pose_t {
             pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            world.walls,
-            distances_mm,
-            width,
-            height);
+            world.walls, distances_mm, width, height);
 
     for (int k=0; k<width; ++k) {
         fprintf(logfp, "%d%c", distances_mm[k], (k==width-1)?'\n':',');
@@ -98,12 +95,13 @@ static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
 {
     (void)rangefinder_distances_mm;
 
-    setpoint.thrust = 0.5;
+    setpoint.thrust = 0.4;
     setpoint.roll = 0;
     setpoint.pitch = 0;
-    setpoint.yaw = 0;
+    setpoint.yaw = 0.1;
 }
 
+// Returns false on collision, true otherwise
 static bool run_normal(siminfo_t & siminfo)
 {
     static simsens::Rangefinder * _rangefinder;
