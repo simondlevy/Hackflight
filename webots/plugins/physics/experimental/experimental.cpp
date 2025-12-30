@@ -93,12 +93,17 @@ static void read_rangefinder(
 static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
         demands_t & setpoint)
 {
-    (void)rangefinder_distances_mm;
+    const auto d = rangefinder_distances_mm;
 
-    setpoint.thrust = 0.4;
-    setpoint.roll = 0;
-    setpoint.pitch = 0;
-    setpoint.yaw = 0.1;
+    printf("d0=%d d1=%d d2=%d d3=%d d4=%d d5=%d d6=%d d7=%d\n",
+            d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
+        
+
+    const bool center_is_clear = d[3] == -1 && d[4] == -1;
+
+    setpoint.thrust = 0.4; // altitude
+    setpoint.pitch = center_is_clear ? 0.1 : 0;
+    setpoint.yaw = center_is_clear ? 0 : 0.1;
 }
 
 // Returns false on collision, true otherwise

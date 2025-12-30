@@ -54,7 +54,7 @@ DEF ROBOT Robot {
 
       # VL53L5 specs
       fieldOfView 1.34  # radians
-      width 16 
+      width 8 
       height 1
       minRange 0.01
       maxRange 4.0
