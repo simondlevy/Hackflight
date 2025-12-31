@@ -74,13 +74,13 @@ float SimOuterLoop::platform_get_time()
     return wb_robot_get_time();
 }
 
-void SimOuterLoop::platform_get_vehicle_location(double & x, double & y, double & z)
+void SimOuterLoop::platform_get_vehicle_pose(pose_t & pose)
 {
     const double * xyz = wb_gps_get_values(_gps);
 
-    x = xyz[0];
-    y = xyz[1];
-    z = xyz[2];
+    pose.x = xyz[0];
+    pose.y = xyz[1];
+    pose.z = xyz[2];
 }
 
 void SimOuterLoop::platform_send_siminfo(const siminfo_t & siminfo)

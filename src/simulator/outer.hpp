@@ -60,9 +60,10 @@ class SimOuterLoop {
             }
 
             // On descent, switch mode to idle when close enough to ground
-            double x=0, y=0, z=0;
-            platform_get_vehicle_location(x, y, z);
-            if (_flightMode == MODE_LANDING && (z-_start_z )< ZDIST_LANDING_MAX_M) {
+            pose_t pose = {};
+            platform_get_vehicle_pose(pose);
+            if (_flightMode == MODE_LANDING &&
+                    (pose.z-_startingPose.z ) < ZDIST_LANDING_MAX_M) {
                 _flightMode = MODE_IDLE;
             }
 
@@ -78,7 +79,7 @@ class SimOuterLoop {
 
         void begin()
         {
-            _start_x = INFINITY;
+            _startingPose.x = INFINITY;
 
             _flightMode = MODE_IDLE;
 
@@ -132,7 +133,7 @@ class SimOuterLoop {
 
         float _zdist;
 
-        double _start_x, _start_y, _start_z;
+        pose_t _startingPose;
 
         flightMode_t _flightMode;
 
@@ -314,14 +315,15 @@ class SimOuterLoop {
 
         void sendSimInfo(siminfo_t & siminfo)
         {
-            if (_start_x == INFINITY) {
-                platform_get_vehicle_location(_start_x, _start_y, _start_z);
-                printf("x=%+3.3f =%+3.3f z=%+3.3f\n", _start_x, _start_y, _start_z);
+            if (_startingPose.x == INFINITY) {
+                platform_get_vehicle_pose(_startingPose);
+                printf("x=%+3.3f =%+3.3f z=%+3.3f\n",
+                        _startingPose.x, _startingPose.y, _startingPose.z);
             }
 
-            siminfo.startingPose.x = _start_x;
-            siminfo.startingPose.y = _start_y;
-            siminfo.startingPose.z = _start_z;
+            siminfo.startingPose.x = _startingPose.x;
+            siminfo.startingPose.y = _startingPose.y;
+            siminfo.startingPose.z = _startingPose.z;
 
             siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = platform_get_framerate();
@@ -382,7 +384,7 @@ class SimOuterLoop {
         void         platform_cleanup();
         float        platform_get_framerate();
         float        platform_get_time();
-        void         platform_get_vehicle_location(double & x, double & y, double & z);
+        void         platform_get_vehicle_pose(pose_t & pose);
         void         platform_init();
         int          platform_joystick_get_axis_value(const uint8_t axis);
         joystick_t   platform_joystick_get_info(); 
