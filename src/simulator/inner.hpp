@@ -44,9 +44,7 @@ class SimInnerLoop {
             _pidControl->init();
         }
 
-        pose_t step(
-                const siminfo_t & siminfo,
-                const bool freezexy=false)
+        pose_t step(const siminfo_t & siminfo, const bool freezexy=false)
         {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
