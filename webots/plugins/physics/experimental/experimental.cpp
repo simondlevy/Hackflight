@@ -74,12 +74,12 @@ static void read_rangefinder(
         int * distances_mm,
         FILE * logfp)
 {
-    int width=0, height=0;
-
     rangefinder.read(
             simsens::pose_t {
             pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            world.walls, distances_mm, width, height);
+            world.walls, distances_mm);
+
+    const auto width = rangefinder.getWidth();
 
     for (int k=0; k<width; ++k) {
         fprintf(logfp, "%d%c", distances_mm[k], (k==width-1)?'\n':',');
