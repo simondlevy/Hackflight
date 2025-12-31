@@ -17,6 +17,7 @@
  */
 
 // C/C++
+#include <math.h>
 #include <string.h>
 #include <map>
 #include <string>
@@ -77,6 +78,8 @@ class SimOuterLoop {
 
         void begin()
         {
+            _start_x = INFINITY;
+
             _flightMode = MODE_IDLE;
 
             _zdist = ZDIST_HOVER_INIT_M;
@@ -118,12 +121,6 @@ class SimOuterLoop {
 
         } toggle_e;
 
-        float _zdist;
-
-        double _start_x, _start_y, _start_z;
-
-        flightMode_t _flightMode;
-
         typedef struct {
 
             int8_t throttle;
@@ -133,7 +130,13 @@ class SimOuterLoop {
 
         } joystick_t;
 
-        std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
+        float _zdist;
+
+        double _start_x, _start_y, _start_z;
+
+        flightMode_t _flightMode;
+
+       std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
             {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
 
@@ -311,8 +314,9 @@ class SimOuterLoop {
 
         void sendSimInfo(siminfo_t & siminfo)
         {
-            if (_start_x == 0) {
+            if (_start_x == INFINITY) {
                 platform_get_vehicle_location(_start_x, _start_y, _start_z);
+                printf("x=%+3.3f =%+3.3f z=%+3.3f\n", _start_x, _start_y, _start_z);
             }
 
             siminfo.start_x = _start_x;
