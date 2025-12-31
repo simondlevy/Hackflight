@@ -115,7 +115,6 @@ static bool run_normal(siminfo_t & siminfo)
     static simsens::WorldParser _worldParser;
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
-    static pose_t _pose;
 
     // In autonomous mode, use current pose to get setpoints
     if (siminfo.flightMode == MODE_AUTONOMOUS) {
@@ -124,7 +123,7 @@ static bool run_normal(siminfo_t & siminfo)
     }
 
     // Use setpoints to get new pose
-    get_pose(siminfo, _pose);
+    pose_t pose = get_pose(siminfo);
 
     // Load world and robot info first time around
     if (!_rangefinder) {
@@ -134,14 +133,14 @@ static bool run_normal(siminfo_t & siminfo)
 
     // Get simulated rangefinder distances
     read_rangefinder(*_rangefinder, *_rangefinderVisualizer, _worldParser,
-            _pose, _rangefinder_distances_mm, _logfp);
+            pose, _rangefinder_distances_mm, _logfp);
 
     // Stop if we detected a collision
-    if (collided(_pose, _worldParser)) {
+    if (collided(pose, _worldParser)) {
         return false;
     }
 
-    dBodySetPosition(_robot, _pose.x, _pose.y, _pose.z);
+    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
 
     return true;
 }

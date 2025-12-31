@@ -33,6 +33,8 @@ static SimInnerLoop _innerLoop;
 
 static PidControl _pidControl;
 
+static bool _ready;
+
 DLLEXPORT void webots_physics_init() 
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
@@ -82,10 +84,14 @@ static bool get_siminfo(siminfo_t & siminfo)
     return siminfo.framerate > 0;
 }
 
-static void get_pose(const siminfo_t & siminfo, pose_t & pose)
+static pose_t get_pose(const siminfo_t & siminfo)
 {
+    _ready = true;
+
     // Update to get the current pose
-    _innerLoop.step(siminfo, pose);
+    pose_t pose =_innerLoop.step(siminfo);
+
+    //pose.psi -= siminfo.startingPose.psi;
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
@@ -95,10 +101,12 @@ static void get_pose(const siminfo_t & siminfo, pose_t & pose)
     const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
     dBodySetQuaternion(_robot, q);
 
-    // Set robot posed based on state and starting position, negating for
+    // Set robot pose based on state and starting position, negating for
     // rightward negative
     pose.y = -pose.y;
     pose.x += siminfo.startingPose.x;
     pose.y += siminfo.startingPose.y;
     pose.z += siminfo.startingPose.z;
+
+    return pose;
 }

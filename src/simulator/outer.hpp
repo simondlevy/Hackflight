@@ -327,6 +327,9 @@ class SimOuterLoop {
             siminfo.startingPose.x = _startingPose.x;
             siminfo.startingPose.y = _startingPose.y;
             siminfo.startingPose.z = _startingPose.z;
+            siminfo.startingPose.phi = _startingPose.phi;
+            siminfo.startingPose.theta = _startingPose.theta;
+            siminfo.startingPose.psi = _startingPose.psi;
 
             siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = platform_get_framerate();

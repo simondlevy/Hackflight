@@ -193,7 +193,7 @@ class Dynamics {
                 state.psi += _dt * _dstate.psi;
                 state.dpsi += _dt * _dstate.dpsi;
 
-                // Keep yangle in [-2Pi, +2Pi]
+                // Keep yaw angle in [-2Pi, +2Pi]
                 if (state.psi > 2*M_PI) {
                     state.psi -= 2*M_PI;
                 }

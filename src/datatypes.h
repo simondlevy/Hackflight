@@ -122,3 +122,15 @@ typedef struct {
     axis3_t acc; // Gs, for legacy reasons
 
 } accelerationMeasurement_t;
+
+// For simulation
+typedef struct {
+
+    float x;
+    float y;
+    float z;
+    float phi;
+    float theta;
+    float psi;
+
+} pose_t;

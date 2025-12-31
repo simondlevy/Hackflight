@@ -18,17 +18,6 @@
 
 #pragma once
 
-typedef struct {
-
-    float x;
-    float y;
-    float z;
-    float phi;
-    float theta;
-    float psi;
-
-} pose_t;
-
 // Structure shared between slow and fast threads
 typedef struct {
 
