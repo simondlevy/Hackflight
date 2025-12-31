@@ -52,7 +52,7 @@ static void load(const siminfo_t & siminfo,
 }
 
 static bool collided(
-        const SimInnerLoop::pose_t & pose,
+        const pose_t & pose,
         const simsens::WorldParser & worldParser)
 {
     const bool debug = true;
@@ -70,7 +70,7 @@ static void read_rangefinder(
         simsens::Rangefinder & rangefinder,
         simsens::RangefinderVisualizer & visualizer,
         simsens::WorldParser & world,
-        const SimInnerLoop::pose_t & pose,
+        const pose_t & pose,
         int * distances_mm,
         FILE * logfp)
 {
@@ -95,9 +95,10 @@ static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
 {
     const auto d = rangefinder_distances_mm;
 
+    /*
     printf("d0=%d d1=%d d2=%d d3=%d d4=%d d5=%d d6=%d d7=%d\n",
             d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
-        
+            */
 
     const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
@@ -114,7 +115,7 @@ static bool run_normal(siminfo_t & siminfo)
     static simsens::WorldParser _worldParser;
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
-    static SimInnerLoop::pose_t _pose;
+    static pose_t _pose;
 
     // In autonomous mode, use current pose to get setpoints
     if (siminfo.flightMode == MODE_AUTONOMOUS) {

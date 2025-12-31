@@ -37,17 +37,6 @@ class SimInnerLoop {
 
     public:
 
-        typedef struct {
-
-            float x;
-            float y;
-            float z;
-            float phi;
-            float theta;
-            float psi;
-
-        } pose_t;
-
         void init(PidControl * pidControl)
         {
             _pidControl = pidControl;

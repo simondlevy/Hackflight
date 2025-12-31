@@ -319,9 +319,9 @@ class SimOuterLoop {
                 printf("x=%+3.3f =%+3.3f z=%+3.3f\n", _start_x, _start_y, _start_z);
             }
 
-            siminfo.start_x = _start_x;
-            siminfo.start_y = _start_y;
-            siminfo.start_z = _start_z;
+            siminfo.startingPose.x = _start_x;
+            siminfo.startingPose.y = _start_y;
+            siminfo.startingPose.z = _start_z;
 
             siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = platform_get_framerate();

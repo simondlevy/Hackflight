@@ -82,10 +82,12 @@ static bool get_siminfo(siminfo_t & siminfo)
     return siminfo.framerate > 0;
 }
 
-static void get_pose(const siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
+static void get_pose(const siminfo_t & siminfo, pose_t & pose)
 {
     // Update to get the current pose
     _innerLoop.step(siminfo, pose);
+
+    //pose.psi -= 2.44343;
 
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
@@ -98,7 +100,7 @@ static void get_pose(const siminfo_t & siminfo, SimInnerLoop::pose_t & pose)
     // Set robot posed based on state and starting position, negating for
     // rightward negative
     pose.y = -pose.y;
-    pose.x += siminfo.start_x;
-    pose.y += siminfo.start_y;
-    pose.z += siminfo.start_z;
+    pose.x += siminfo.startingPose.x;
+    pose.y += siminfo.startingPose.y;
+    pose.z += siminfo.startingPose.z;
 }

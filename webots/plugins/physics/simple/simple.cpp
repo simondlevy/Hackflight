@@ -25,7 +25,7 @@ DLLEXPORT void webots_physics_step()
 
     if (get_siminfo(siminfo)) {
 
-        SimInnerLoop::pose_t pose = {};
+        pose_t pose = {};
 
         get_pose(siminfo, pose);
 

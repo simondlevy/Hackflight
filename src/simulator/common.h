@@ -18,12 +18,21 @@
 
 #pragma once
 
+typedef struct {
+
+    float x;
+    float y;
+    float z;
+    float phi;
+    float theta;
+    float psi;
+
+} pose_t;
+
 // Structure shared between slow and fast threads
 typedef struct {
 
-    float start_x;
-    float start_y;
-    float start_z;
+    pose_t startingPose;
     float framerate;
     char path[200];
     char worldname[200];
