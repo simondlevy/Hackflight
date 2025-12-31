@@ -317,8 +317,11 @@ class SimOuterLoop {
         {
             if (_startingPose.x == INFINITY) {
                 platform_get_vehicle_pose(_startingPose);
-                printf("x=%+3.3f =%+3.3f z=%+3.3f\n",
-                        _startingPose.x, _startingPose.y, _startingPose.z);
+                printf("x=%+3.3f =%+3.3f z=%+3.3f "
+                        "phi=%3.3f theta=%3.3f psi=%+3.3f\n",
+                        _startingPose.x, _startingPose.y, _startingPose.z,
+                        _startingPose.phi, _startingPose.theta,
+                        _startingPose.psi);
             }
 
             siminfo.startingPose.x = _startingPose.x;

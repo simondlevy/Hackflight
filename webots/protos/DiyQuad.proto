@@ -84,6 +84,9 @@ DEF ROBOT Robot {
     GPS { # For obtaining initial location
     }
  
+    DEF INERTIAL_UNIT InertialUnit {
+    }
+
     # Motor 1 ----------------------------------------------------------------
 
     DEF M1 Propeller {

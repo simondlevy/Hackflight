@@ -87,8 +87,6 @@ static void get_pose(const siminfo_t & siminfo, pose_t & pose)
     // Update to get the current pose
     _innerLoop.step(siminfo, pose);
 
-    //pose.psi -= 2.44343;
-
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
     axis4_t quat = {};

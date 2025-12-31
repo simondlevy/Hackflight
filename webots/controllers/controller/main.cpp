@@ -26,6 +26,7 @@ using namespace std;
 #include <webots/camera.h>
 #include <webots/emitter.h>
 #include <webots/gps.h>
+#include <webots/inertial_unit.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
 #include <webots/motor.h>
@@ -34,6 +35,7 @@ using namespace std;
 
 static WbDeviceTag _emitter;
 static WbDeviceTag _gps;
+static WbDeviceTag _imu;
 static WbDeviceTag _ranger;
 
 static double _timestep;
@@ -77,10 +79,14 @@ float SimOuterLoop::platform_get_time()
 void SimOuterLoop::platform_get_vehicle_pose(pose_t & pose)
 {
     const double * xyz = wb_gps_get_values(_gps);
+    const double *rpy = wb_inertial_unit_get_roll_pitch_yaw(_imu);
 
     pose.x = xyz[0];
     pose.y = xyz[1];
     pose.z = xyz[2];
+    pose.phi = rpy[0];
+    pose.theta = rpy[1];
+    pose.psi = rpy[2];
 }
 
 void SimOuterLoop::platform_send_siminfo(const siminfo_t & siminfo)
@@ -128,6 +134,9 @@ void SimOuterLoop::platform_init()
 
     _gps = wb_robot_get_device("gps");
     wb_gps_enable(_gps, _timestep);
+
+    _imu = wb_robot_get_device("inertial unit");
+    wb_inertial_unit_enable(_imu, _timestep);
 
     WbDeviceTag camera = wb_robot_get_device("camera");
     wb_camera_enable(camera, _timestep);
