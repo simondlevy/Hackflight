@@ -46,7 +46,7 @@ in which a faster update rate can slow down the simulation.  Fortunately, Webots
 in which you can replace Webots' built-in physics with a physics model
 of your own.   The Hackflight simulator exploits this feature of Webots,
 using a
-[dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/dynamics.hpp)
+[dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/simulator/dynamics.hpp)
 based on the equations presented in this
 [paper](https://infoscience.epfl.ch/record/97532/files/325.pdf).  The webots
 update step represents a slow, outer loop, in which is embeded a faster control
