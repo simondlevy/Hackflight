@@ -101,9 +101,8 @@ static pose_t get_pose(const siminfo_t & siminfo)
 
     // Set robot pose based on state and starting position, negating for
     // rightward negative
-    pose.y = -pose.y;
     pose.x += siminfo.startingPose.x;
-    pose.y += siminfo.startingPose.y;
+    pose.y = siminfo.startingPose.y - pose.y;
     pose.z += siminfo.startingPose.z;
 
     return pose;
