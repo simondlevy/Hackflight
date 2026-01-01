@@ -96,13 +96,10 @@ static pose_t get_pose(const siminfo_t & siminfo)
     return pose;
 }
 
-static void set_location(const pose_t & pose)
+static void set_dbody_from_pose(const pose_t & pose)
 {
     dBodySetPosition(_robot, pose.x, pose.y, pose.z);
-}
 
-static void set_rotation(const pose_t & pose)
-{
     // Turn Euler angles into quaternion, negating psi for nose-right positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
     axis4_t quat = {};
