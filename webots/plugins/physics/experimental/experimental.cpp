@@ -102,9 +102,8 @@ static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
 
     const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
-    setpoint.thrust = 0.4; // altitude
-    setpoint.pitch = center_is_clear ? 0.1 : 0;
-    setpoint.yaw = center_is_clear ? 0 : 0.1;
+    setpoint.pitch = center_is_clear ? 0.4 : 0;
+    setpoint.yaw = center_is_clear ? 0 : 0.2;
 }
 
 // Returns false on collision, true otherwise
