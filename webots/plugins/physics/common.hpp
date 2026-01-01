@@ -87,14 +87,6 @@ static pose_t get_pose(const siminfo_t & siminfo)
     // Update to get the current pose
     pose_t pose =_innerLoop.step(siminfo);
 
-    // Turn Euler angles into quaternion, negating psi for nose-right positive 
-    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
-    axis4_t quat = {};
-    Num::euler2quat(euler, quat);
-
-    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-    dBodySetQuaternion(_robot, q);
-
     // Set robot pose based on state and starting position, negating for
     // rightward negative
     pose.x += siminfo.startingPose.x;
@@ -102,4 +94,20 @@ static pose_t get_pose(const siminfo_t & siminfo)
     pose.z += siminfo.startingPose.z;
 
     return pose;
+}
+
+static void set_location(const pose_t & pose)
+{
+    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+}
+
+static void set_rotation(const pose_t & pose)
+{
+    // Turn Euler angles into quaternion, negating psi for nose-right positive 
+    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
+    axis4_t quat = {};
+    Num::euler2quat(euler, quat);
+
+    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
+    dBodySetQuaternion(_robot, q);
 }

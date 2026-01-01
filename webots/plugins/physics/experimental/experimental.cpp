@@ -125,6 +125,8 @@ static bool run_normal(siminfo_t & siminfo)
     // Use setpoints to get new pose
     pose_t pose = get_pose(siminfo);
 
+    set_rotation(pose);
+
     // Load world and robot info first time around
     if (!_rangefinder) {
         load(siminfo, _worldParser, &_rangefinder, &_rangefinderVisualizer,
@@ -140,7 +142,7 @@ static bool run_normal(siminfo_t & siminfo)
         return false;
     }
 
-    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+    set_location(pose);
 
     return true;
 }

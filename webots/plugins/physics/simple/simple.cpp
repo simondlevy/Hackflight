@@ -27,6 +27,8 @@ DLLEXPORT void webots_physics_step()
 
         pose_t pose = get_pose(siminfo);
 
-        dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+        set_location(pose);
+
+        set_rotation(pose);
     }
 }
