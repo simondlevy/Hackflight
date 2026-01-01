@@ -33,8 +33,6 @@ static SimInnerLoop _innerLoop;
 
 static PidControl _pidControl;
 
-static bool _ready;
-
 DLLEXPORT void webots_physics_init() 
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
@@ -86,8 +84,6 @@ static bool get_siminfo(siminfo_t & siminfo)
 
 static pose_t get_pose(const siminfo_t & siminfo)
 {
-    _ready = true;
-
     // Update to get the current pose
     pose_t pose =_innerLoop.step(siminfo);
 
