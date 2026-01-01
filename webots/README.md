@@ -47,11 +47,11 @@ in which you can replace Webots' built-in physics with a physics model
 of your own.   The Hackflight simulator exploits this feature of Webots,
 using a
 [dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/dynamics.hpp)
-based on the equestions
-presented in this [paper](https://infoscience.epfl.ch/record/97532/files/325.pdf).
-The webots update step represents a slow, outer loop, in which is embeded
-a faster control loop, which in turn embeds an even faster dynamics loop.
-The following figure illustrates this arrangement, using a traditional
+based on the equations presented in this
+[paper](https://infoscience.epfl.ch/record/97532/files/325.pdf).  The webots
+update step represents a slow, outer loop, in which is embeded a faster control
+loop, which in turn embeds an even faster dynamics loop.  The following figure
+illustrates this arrangement, using a traditional
 [cascade-control](https://controlguru.com/the-cascade-control-architecture/)
 diagram:
 
