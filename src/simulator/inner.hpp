@@ -78,10 +78,12 @@ class SimInnerLoop {
                 }
             }
 
+            const auto startingPose = siminfo.startingPose;
+
             return pose_t {
-                freezexy ? 0 : _dynamics.state.x,
-                freezexy ? 0 : _dynamics.state.y,
-                freezexy ? 0 : _dynamics.state.z,
+                freezexy ? 0 : _dynamics.state.x + startingPose.x,
+                freezexy ? 0 :  -_dynamics.state.y + startingPose.y,
+                freezexy ? 0 : _dynamics.state.z + startingPose.z,
                 _dynamics.state.phi,
                 _dynamics.state.theta,
                 _dynamics.state.psi

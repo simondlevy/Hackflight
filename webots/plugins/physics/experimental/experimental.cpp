@@ -122,7 +122,7 @@ static bool run_normal(siminfo_t & siminfo)
     }
 
     // Use setpoints to get new pose
-    pose_t pose = get_pose(siminfo);
+    const auto pose = _innerLoop.step(siminfo);
 
     // Load world and robot info first time around
     if (!_rangefinder) {

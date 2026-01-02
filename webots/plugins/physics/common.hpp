@@ -50,7 +50,6 @@ DLLEXPORT void webots_physics_init()
     _innerLoop.init(&_pidControl);
 }
 
-
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
 {
     (void)g1;
@@ -82,25 +81,12 @@ static bool get_siminfo(siminfo_t & siminfo)
     return siminfo.framerate > 0;
 }
 
-static pose_t get_pose(const siminfo_t & siminfo)
-{
-    // Update to get the current pose
-    pose_t pose =_innerLoop.step(siminfo);
-
-    // Set robot pose based on state and starting position, negating for
-    // rightward negative
-    pose.x += siminfo.startingPose.x;
-    pose.y = siminfo.startingPose.y - pose.y;
-    pose.z += siminfo.startingPose.z;
-
-    return pose;
-}
-
 static void set_dbody_from_pose(const pose_t & pose)
 {
     dBodySetPosition(_robot, pose.x, pose.y, pose.z);
 
-    // Turn Euler angles into quaternion, negating psi for nose-right positive 
+    // Turn Euler angles into quaternion, negating psi for nose-right
+    // positive 
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
     axis4_t quat = {};
     Num::euler2quat(euler, quat);

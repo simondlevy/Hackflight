@@ -25,7 +25,7 @@ DLLEXPORT void webots_physics_step()
 
     if (get_siminfo(siminfo)) {
 
-        pose_t pose = get_pose(siminfo);
+        const auto pose = _innerLoop.step(siminfo);
 
         set_dbody_from_pose(pose);
     }
