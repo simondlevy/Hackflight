@@ -100,11 +100,16 @@ class SimInnerLoop {
 
             return vehicleState_t {
                 s.x, s.dx, s.y, s.dy, s.z, s.dz,                   
-                    Num::RAD2DEG* s.phi, Num::RAD2DEG* s.dphi, 
-                    Num::RAD2DEG* s.theta, Num::RAD2DEG* s.dtheta,
-                    Num::RAD2DEG* s.psi,  Num::RAD2DEG* s.dpsi
+                    r2d(s.phi), r2d(s.dphi), 
+                    r2d(s.theta), r2d(s.dtheta),
+                    r2d(s.psi),  r2d(s.dpsi)
             };
 
+        }
+
+        static float r2d(const float r)
+        {
+            return Num::RAD2DEG * r;
         }
 
         static void report_fps()
