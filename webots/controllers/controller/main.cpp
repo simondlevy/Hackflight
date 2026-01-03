@@ -82,7 +82,7 @@ void SimOuterLoop::platform_get_vehicle_pose(pose_t & pose)
     const double *rpy = wb_inertial_unit_get_roll_pitch_yaw(_imu);
 
     pose.x = xyz[0];
-    pose.y = xyz[1];
+    pose.y = -xyz[1]; // negate Y for leftward positive
     pose.z = xyz[2];
     pose.phi = rpy[0];
     pose.theta = rpy[1];

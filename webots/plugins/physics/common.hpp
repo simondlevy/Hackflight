@@ -83,7 +83,8 @@ static bool get_siminfo(siminfo_t & siminfo)
 
 static void set_dbody_from_pose(const pose_t & pose)
 {
-    dBodySetPosition(_robot, pose.x, pose.y, pose.z);
+    // Negate Y for leftward positive
+    dBodySetPosition(_robot, pose.x, -pose.y, pose.z);
 
     // Turn Euler angles into quaternion, negating psi for nose-right
     // positive 

@@ -81,10 +81,10 @@ class SimInnerLoop {
             const auto s = _dynamics.state;
             const auto p = siminfo.startingPose;
 
-            printf("starting psi=%+3.3f\n", p.psi);
+            printf("starting y=%+3.3f\n", p.y);
 
             return pose_t {
-                s.x + p.x, -s.y + p.y, s.z + p.z,
+                s.x + p.x, s.y + p.y, s.z + p.z,
                 s.phi, s.theta, s.psi
             };
         }    
