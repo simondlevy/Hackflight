@@ -104,6 +104,13 @@ class Dynamics {
             // state.psi = pose.psi;
         }
 
+        pose_t getPose()
+        {
+            return pose_t {
+                state.x, state.y, state.z, state.phi, state.theta, state.psi
+            };
+         }
+
         /**
          * Sets motor spins
          */

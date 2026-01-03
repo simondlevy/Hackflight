@@ -85,11 +85,7 @@ class SimInnerLoop {
                 }
             }
 
-            const auto s = _dynamics.state;
-
-            return pose_t {
-                s.x, s.y, s.z, s.phi, s.theta, s.psi
-            };
+            return _dynamics.getPose();
         }    
 
     private:
