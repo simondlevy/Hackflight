@@ -86,7 +86,7 @@ void SimOuterLoop::platform_get_vehicle_pose(pose_t & pose)
     pose.z = xyz[2];
     pose.phi = rpy[0];
     pose.theta = rpy[1];
-    pose.psi = rpy[2];
+    pose.psi = -rpy[2];
 }
 
 void SimOuterLoop::platform_send_siminfo(const siminfo_t & siminfo)

@@ -25,7 +25,7 @@ Viewpoint {
 }
 DEF diyquad DiyQuad {
   translation -0.96 -0.67 0.015
-  rotation 0 0 1 -0.79
+  rotation 0 0 1 0
 }
 TexturedBackground {
 }

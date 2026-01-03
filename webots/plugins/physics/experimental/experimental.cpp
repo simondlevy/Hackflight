@@ -78,6 +78,8 @@ static void read_rangefinder(
 {
     rangefinder.read(
             simsens::pose_t {
+
+            // Negate for leftward positive
             pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             world.walls, distances_mm);
 

@@ -98,7 +98,7 @@ class Dynamics {
             _state.z = pose.z;
             _state.phi = pose.phi;
             _state.theta = pose.theta;
-            // _state.psi = pose.psi;
+            _state.psi = pose.psi;
         }
 
         pose_t getPose()
