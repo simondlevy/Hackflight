@@ -56,7 +56,7 @@ class SimInnerLoop {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
 
-                const auto state =  getVehicleState();
+                const auto state =  _dynamics.getVehicleStateDegrees();
                 demands_t slowDemands = {};
 
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
@@ -93,24 +93,6 @@ class SimInnerLoop {
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
         PidControl * _pidControl;
-
-        vehicleState_t getVehicleState()
-        {
-            const auto s = _dynamics.state;
-
-            return vehicleState_t {
-                s.x, s.dx, s.y, s.dy, s.z, s.dz,                   
-                    r2d(s.phi), r2d(s.dphi), 
-                    r2d(s.theta), r2d(s.dtheta),
-                    r2d(s.psi),  r2d(s.dpsi)
-            };
-
-        }
-
-        static float r2d(const float r)
-        {
-            return Num::RAD2DEG * r;
-        }
 
         static void report_fps()
         {
