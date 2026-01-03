@@ -78,7 +78,7 @@ static void read_rangefinder(
 {
     rangefinder.read(
             simsens::pose_t {
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             world.walls, distances_mm);
 
     const auto width = rangefinder.getWidth();
