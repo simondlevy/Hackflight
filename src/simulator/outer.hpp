@@ -79,6 +79,7 @@ class SimOuterLoop {
 
         void begin()
         {
+            // OOB value to trigger initialization in step()
             _startingPose.x = INFINITY;
 
             _flightMode = MODE_IDLE;
@@ -137,7 +138,7 @@ class SimOuterLoop {
 
         flightMode_t _flightMode;
 
-       std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
+        std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
             {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
 
@@ -199,7 +200,8 @@ class SimOuterLoop {
             switch (_flightMode) {
 
                 case MODE_IDLE:
-                    _flightMode = toggle == TOGGLE_HOVER ? MODE_HOVERING : _flightMode;
+                    _flightMode = toggle == TOGGLE_HOVER ?
+                        MODE_HOVERING : _flightMode;
                     break;
 
                 case MODE_HOVERING:
@@ -315,22 +317,12 @@ class SimOuterLoop {
 
         void sendSimInfo(siminfo_t & siminfo)
         {
+            // Grab starting pose first time around
             if (_startingPose.x == INFINITY) {
                 platform_get_vehicle_pose(_startingPose);
-                printf("x=%+3.3f =%+3.3f z=%+3.3f "
-                        "phi=%3.3f theta=%3.3f psi=%+3.3f\n",
-                        _startingPose.x, _startingPose.y, _startingPose.z,
-                        _startingPose.phi, _startingPose.theta,
-                        _startingPose.psi);
             }
 
-            siminfo.startingPose.x = _startingPose.x;
-            siminfo.startingPose.y = _startingPose.y;
-            siminfo.startingPose.z = _startingPose.z;
-            siminfo.startingPose.phi = _startingPose.phi;
-            siminfo.startingPose.theta = _startingPose.theta;
-            siminfo.startingPose.psi = _startingPose.psi;
-
+            memcpy(&siminfo.startingPose, &_startingPose, sizeof(pose_t));
             siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = platform_get_framerate();
             platform_send_siminfo(siminfo);
@@ -404,6 +396,6 @@ class SimOuterLoop {
         int          platform_keyboard_up();
         void         platform_send_siminfo(const siminfo_t & siminfo);
         void         platform_read_rangefinder(int16_t * distance_mm,
-                                               int & width, int & height); 
+                int & width, int & height); 
         bool         platform_step();
- };
+};

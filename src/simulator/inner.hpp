@@ -78,15 +78,16 @@ class SimInnerLoop {
                 }
             }
 
-            const auto startingPose = siminfo.startingPose;
+            const auto s = _dynamics.state;
+            const auto p = siminfo.startingPose;
 
             return pose_t {
-                freezexy ? 0 : _dynamics.state.x + startingPose.x,
-                freezexy ? 0 :  -_dynamics.state.y + startingPose.y,
-                freezexy ? 0 : _dynamics.state.z + startingPose.z,
-                _dynamics.state.phi,
-                _dynamics.state.theta,
-                _dynamics.state.psi
+                freezexy ? 0 :  s.x + p.x,
+                freezexy ? 0 : -s.y + p.y,
+                freezexy ? 0 :  s.z + p.z,
+                s.phi,
+                s.theta,
+                s.psi
             };
         }    
 
