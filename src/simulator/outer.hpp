@@ -1,5 +1,5 @@
 /* 
-   Hackflight simulator outer loop (UI / setpoints)
+   Platform-independent support for simulator outer loop (UI / setpoints)
 
    Copyright (C) 2025 Simon D. Levy
 

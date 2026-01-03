@@ -86,8 +86,8 @@ static void set_dbody_from_pose(const pose_t & pose)
     // Negate Y for leftward positive
     dBodySetPosition(_robot, pose.x, -pose.y, pose.z);
 
-    // Turn Euler angles into quaternion, negating psi for nose-right
-    // positive 
+    // Turn Euler angles into quaternion, negating psi for nose-left
+    // positive
     const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
     axis4_t quat = {};
     Num::euler2quat(euler, quat);

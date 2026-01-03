@@ -1,5 +1,6 @@
 /* 
- * Hackflight simulator inner loop (PID control / dynamics)
+ * Platform-independent support for simulator inner loop (PID control /
+ * dynamics)
  *
  * Copyright (C) 2025 Simon D. Levy
  *
@@ -81,8 +82,6 @@ class SimInnerLoop {
             const auto s = _dynamics.state;
             const auto p = siminfo.startingPose;
 
-            printf("starting y=%+3.3f\n", p.y);
-
             return pose_t {
                 s.x + p.x, s.y + p.y, s.z + p.z,
                 s.phi, s.theta, s.psi
@@ -97,21 +96,13 @@ class SimInnerLoop {
 
         vehicleState_t getVehicleState()
         {
-            const auto d = _dynamics;
+            const auto s = _dynamics.state;
 
             return vehicleState_t {
-                0, // x
-                    d.state.dx,
-                    0, // y
-                    d.state.dy,
-                    d.state.z,                     
-                    d.state.dz,                   
-                    Num::RAD2DEG* d.state.phi, 
-                    Num::RAD2DEG* d.state.dphi, 
-                    Num::RAD2DEG* d.state.theta, 
-                    Num::RAD2DEG* d.state.dtheta,
-                    Num::RAD2DEG* d.state.psi,   
-                    Num::RAD2DEG* d.state.dpsi
+                s.x, s.dx, s.y, s.dy, s.z, s.dz,                   
+                    Num::RAD2DEG* s.phi, Num::RAD2DEG* s.dphi, 
+                    Num::RAD2DEG* s.theta, Num::RAD2DEG* s.dtheta,
+                    Num::RAD2DEG* s.psi,  Num::RAD2DEG* s.dpsi
             };
 
         }
