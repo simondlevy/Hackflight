@@ -47,6 +47,12 @@ class SimInnerLoop {
 
         pose_t step(const siminfo_t & siminfo)
         {
+            static bool _ready;
+            if (!_ready) {
+                _dynamics.setPose(siminfo.startingPose);
+            }
+            _ready = true;
+
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
 
@@ -80,11 +86,9 @@ class SimInnerLoop {
             }
 
             const auto s = _dynamics.state;
-            const auto p = siminfo.startingPose;
 
             return pose_t {
-                s.x + p.x, s.y + p.y, s.z + p.z,
-                s.phi, s.theta, s.psi
+                s.x, s.y, s.z, s.phi, s.theta, s.psi
             };
         }    
 

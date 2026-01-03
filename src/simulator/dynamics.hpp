@@ -94,6 +94,16 @@ class Dynamics {
             init(vparams, wparams, dt);
         }
 
+        void setPose(const pose_t & pose)
+        {
+            state.x = pose.x;
+            state.y = pose.y;
+            state.z = pose.z;
+            state.phi = pose.phi;
+            state.theta = pose.theta;
+            // state.psi = pose.psi;
+        }
+
         /**
          * Sets motor spins
          */
