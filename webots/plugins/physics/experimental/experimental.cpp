@@ -58,7 +58,9 @@ static bool collided(
     const bool debug = true;
 
     if (simsens::CollisionDetector::detect(
-                simsens::vec3_t{pose.x, pose.y, pose.x},
+
+                // Negate Y for leftware positive
+                simsens::vec3_t{pose.x, -pose.y, pose.x},
                 worldParser.walls, debug)) {
         return true;
     }
@@ -122,7 +124,7 @@ static bool run_normal(siminfo_t & siminfo)
     }
 
     // Use setpoints to get new pose
-    const auto pose = _innerLoop.step(siminfo);
+    const auto pose = get_pose_from_siminfo(siminfo);
 
     // Load world and robot info first time around
     if (!_rangefinder) {

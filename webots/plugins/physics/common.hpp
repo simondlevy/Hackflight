@@ -81,6 +81,11 @@ static bool get_siminfo(siminfo_t & siminfo)
     return siminfo.framerate > 0;
 }
 
+static pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
+{
+    return _innerLoop.step(siminfo);
+}
+
 static void set_dbody_from_pose(const pose_t & pose)
 {
     // Negate Y for leftward positive
