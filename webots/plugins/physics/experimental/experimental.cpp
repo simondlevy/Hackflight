@@ -70,7 +70,6 @@ static bool collided(
 
 static void read_rangefinder(
         simsens::Rangefinder & rangefinder,
-        simsens::RangefinderVisualizer & visualizer,
         simsens::WorldParser & world,
         const pose_t & pose,
         int * distances_mm,
@@ -90,8 +89,6 @@ static void read_rangefinder(
     }
 
     fflush(logfp);
-
-    visualizer.show(distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 }
 
 static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
@@ -135,8 +132,11 @@ static bool run_normal(siminfo_t & siminfo)
     }
 
     // Get simulated rangefinder distances
-    read_rangefinder(*_rangefinder, *_rangefinderVisualizer, _worldParser,
-            pose, _rangefinder_distances_mm, _logfp);
+    read_rangefinder(*_rangefinder, _worldParser, pose,
+            _rangefinder_distances_mm, _logfp);
+
+    _rangefinderVisualizer->show(
+            _rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
 
     // Stop if we detected a collision
     if (collided(pose, _worldParser)) {
