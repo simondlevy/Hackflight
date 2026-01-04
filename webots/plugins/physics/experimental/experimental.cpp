@@ -116,8 +116,10 @@ static bool run_normal(siminfo_t & siminfo)
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
 
+    const bool autonomous = siminfo.flightMode == MODE_AUTONOMOUS;
+
     // In autonomous mode, use current pose to get setpoints
-    if (siminfo.flightMode == MODE_AUTONOMOUS) {
+    if (autonomous) {
         get_setpoint_from_rangefinder(_rangefinder_distances_mm,
                 siminfo.setpoint);
     }
@@ -135,8 +137,8 @@ static bool run_normal(siminfo_t & siminfo)
     read_rangefinder(*_rangefinder, _worldParser, pose,
             _rangefinder_distances_mm, _logfp);
 
-    _rangefinderVisualizer->show(
-            _rangefinder_distances_mm, RANGEFINDER_DISPLAY_SCALEUP);
+    _rangefinderVisualizer->show(_rangefinder_distances_mm,
+            RANGEFINDER_DISPLAY_SCALEUP, autonomous);
 
     // Stop if we detected a collision
     if (collided(pose, _worldParser)) {
