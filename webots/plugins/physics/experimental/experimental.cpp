@@ -24,7 +24,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
-static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 32;
+static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
 static const char * LOGFILE_NAME =
 "/home/levys/Desktop/hackflight/webots/controllers/controller/simsens.csv";
@@ -94,12 +94,7 @@ static void read_rangefinder(
 static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
         demands_t & setpoint)
 {
-    const auto d = rangefinder_distances_mm;
-
-    /*
-    printf("d0=%d d1=%d d2=%d d3=%d d4=%d d5=%d d6=%d d7=%d\n",
-            d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
-            */
+    const int * d = rangefinder_distances_mm;
 
     const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
