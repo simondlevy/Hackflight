@@ -25,6 +25,7 @@ using namespace std;
 
 // Hackflight
 #include <datatypes.h>
+#include <num.hpp>
 #include <simulator/common.h>
 
 class SimOuterLoop {
@@ -84,8 +85,6 @@ class SimOuterLoop {
 
             _flightMode = MODE_IDLE;
 
-            _zdist = ZDIST_HOVER_INIT_M;
-
             platform_init();
         }
 
@@ -102,11 +101,7 @@ class SimOuterLoop {
 
     private:
 
-        static constexpr float ZDIST_HOVER_INIT_M = 0.4;
-        static constexpr float ZDIST_HOVER_MAX_M = 1.0;
-        static constexpr float ZDIST_HOVER_MIN_M = 0.2;
         static constexpr float ZDIST_LANDING_MAX_M = 0.01;
-        static constexpr float ZDIST_HOVER_INC_MPS = 0.2;
 
         typedef enum {
 
@@ -132,8 +127,6 @@ class SimOuterLoop {
 
         } joystick_t;
 
-        float _zdist;
-
         pose_t _startingPose;
 
         flightMode_t _flightMode;
@@ -144,21 +137,6 @@ class SimOuterLoop {
 
             {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
         };
-
-        void climb(const float rate)
-        {
-            const float time_curr = platform_get_time();
-
-            static float _time_prev;
-
-            const float dt = _time_prev > 0 ? time_curr - _time_prev : 0;
-
-            _time_prev = time_curr;
-
-            _zdist = Num::fconstrain(
-                        _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
-                        ZDIST_HOVER_MIN_M, ZDIST_HOVER_MAX_M);
-        }
 
         void getSetpointFromKey(const int key, siminfo_t & siminfo)
         {
@@ -187,11 +165,11 @@ class SimOuterLoop {
             }
 
             else if (key =='W') {
-                climb(+1);
+                siminfo.setpoint.thrust = +1.0;
             }
 
             else if (key =='S') {
-                climb(-1);
+                siminfo.setpoint.thrust = -1.0;
             }
         }
 
@@ -323,7 +301,6 @@ class SimOuterLoop {
             }
 
             memcpy(&siminfo.startingPose, &_startingPose, sizeof(pose_t));
-            siminfo.setpoint.thrust = _zdist;
             siminfo.framerate = platform_get_framerate();
             platform_send_siminfo(siminfo);
         }
@@ -349,7 +326,7 @@ class SimOuterLoop {
                 siminfo.setpoint.roll = readJoystickAxis(axes.roll);
                 siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
 
-                climb(readJoystickAxis(axes.throttle));
+                siminfo.setpoint.thrust = readJoystickAxis(axes.throttle);
             }
         }
 

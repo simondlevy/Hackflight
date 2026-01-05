@@ -31,14 +31,15 @@ class AltitudeSetpoint {
 
         static float run(const float dt, const float demand)
         {
-            (void)dt;
-            (void)demand; 
-
             static float _target;
 
             if (_target == 0) {
                 _target = HOVER_INIT_M;
             }
+
+            _target = Num::fconstrain(
+                        _target + demand * HOVER_INC_MPS * dt,
+                        HOVER_MIN_M, HOVER_MAX_M);
 
             return _target;
         }
@@ -48,4 +49,5 @@ class AltitudeSetpoint {
         static constexpr float HOVER_INIT_M = 0.4;
         static constexpr float HOVER_MAX_M = 1.0;
         static constexpr float HOVER_MIN_M = 0.2;
+        static constexpr float HOVER_INC_MPS = 0.2;
 };
