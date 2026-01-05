@@ -22,19 +22,11 @@
 #include <datatypes.h>
 #include <num.hpp>
 
-#include <webots/motor.h>
-#include <webots/robot.h>
 #include <webots/supervisor.h>
 
+#include "../common.hpp"
+
 static constexpr char ROBOT_NAME[] = "diyquad";
-
-static void startMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction * 60);
-}
-
 
 // https://www.euclideanspace.com/maths/geometry/rotations/conversions/
 //   eulerToAngle/index.htm
@@ -83,10 +75,7 @@ int main(int argc, char ** argv)
     WbFieldRef rotation_field =
         wb_supervisor_node_get_field(robot_node, "rotation");
 
-    startMotor("motor1", -1);
-    startMotor("motor2", +1);
-    startMotor("motor3", +1);
-    startMotor("motor4", -1);
+    startMotors();
 
     while (true) {
 
