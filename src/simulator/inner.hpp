@@ -68,6 +68,8 @@ class SimInnerLoop {
                 demands_t setpoint = {};
                 memcpy(&setpoint, &siminfo.setpoint, sizeof(demands_t));
 
+                setpoint.yaw = YawAngleSetpoint::run(dt, setpoint.yaw);
+
                 _pidControl->runSlow(dt, controlled, state, setpoint,
                         slowDemands);
 
