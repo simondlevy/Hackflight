@@ -24,13 +24,13 @@
 #include <webots/supervisor.h>
 
 /*
-  while (wb_robot_step(TIME_STEP) != -1) {
-    // this is done repeatedly
-    const double *values = wb_supervisor_field_get_sf_vec3f(trans_field);
-    printf("MY_ROBOT is at position: %g %g %g\n", values[0], values[1], values[2]);
-  }
+   while (wb_robot_step(TIME_STEP) != -1) {
+// this is done repeatedly
+const double *values = wb_supervisor_field_get_sf_vec3f(trans_field);
+printf("MY_ROBOT is at position: %g %g %g\n", values[0], values[1], values[2]);
+}
 
-*/
+ */
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
@@ -48,6 +48,8 @@ int main(int argc, char ** argv)
     }
 
     wb_robot_init();
+
+    const double timestep = wb_robot_get_basic_time_step();
 
     WbNodeRef robot_node = wb_supervisor_node_get_from_def(ROBOT_NAME);
 
@@ -67,7 +69,18 @@ int main(int argc, char ** argv)
         sscanf(line, "%f,%f,%f,%f,%f,%f", 
                 &pose.x, &pose.y, &pose.z,
                 &pose.phi, &pose.theta, &pose.psi);
+
+        if (wb_robot_step(timestep) == -1) {
+            break;
+        }
+
+        const double xyz[3] = {pose.x, pose.y, pose.z};
+
+        wb_supervisor_field_set_sf_vec3f(trans_field, xyz);
+
     }
+
+    printf("done\n");
 
     wb_robot_cleanup();
 
