@@ -65,7 +65,10 @@ class SimInnerLoop {
 
                 const float dt = 1 / (float)PID_SLOW_FREQ;
 
-                _pidControl->runSlow(dt, controlled, state, siminfo.setpoint,
+                demands_t setpoint = {};
+                memcpy(&setpoint, &siminfo.setpoint, sizeof(demands_t));
+
+                _pidControl->runSlow(dt, controlled, state, setpoint,
                         slowDemands);
 
                 // Run fast PID control and mixer in middle loop --------------

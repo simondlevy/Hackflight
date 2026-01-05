@@ -35,6 +35,8 @@ class YawAngleSetpoint {
 
             _target = Num::cap_angle(_target + DEMAND_MAX * yaw_demand * dt);
 
+            printf("setpoint: %+3.3f\n", _target);
+
             return _target;
         }
 

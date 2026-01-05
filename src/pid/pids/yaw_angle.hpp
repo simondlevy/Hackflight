@@ -47,6 +47,8 @@ class YawAngleController {
 
             _target = Num::cap_angle(_target + DEMAND_MAX * yaw * dt);
 
+            printf("pid: %+3.3f\n", _target);
+
             const auto error = Num::cap_angle(_target - (psi - _psi_initial));
 
             _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
