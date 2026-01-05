@@ -26,6 +26,7 @@
 #include <mixers/crazyflie.hpp>
 #include <num.hpp>
 #include <pid.hpp>
+#include <setpoints/altitude.hpp>
 #include <setpoints/yaw_angle.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/common.h>
