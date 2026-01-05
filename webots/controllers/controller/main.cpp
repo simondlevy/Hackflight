@@ -1,5 +1,5 @@
 /* 
-   C++ flight simulator outerLoop for Hackflight with custom physics plugin
+   C++ flight simulator main for Hackflight with custom physics plugin
 
    Copyright (C) 2025 Simon D. Levy
 
