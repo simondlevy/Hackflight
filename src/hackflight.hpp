@@ -344,7 +344,7 @@ class Hackflight {
             }
 
             axis3_t dpos = {};
-            axis4_t quat = {};
+            quaternion_t quat = {};
 
             _ekf.getStateEstimate(nowMs, state.z, dpos, quat);
 

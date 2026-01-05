@@ -98,7 +98,7 @@ class PhysicsPluginHelper {
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
             const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
-            axis4_t quat = {};
+            quaternion_t quat = {};
             Num::euler2quat(euler, quat);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
@@ -114,8 +114,9 @@ class PhysicsPluginHelper {
 
         static void logfile_write_pose(FILE * logfp, const pose_t & pose)
         {
+            // Negate Y for leftward positive
             fprintf(logfp, "%f,%f,%f,%f,%f,%f", 
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+                    pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi);
         }
 
     private:

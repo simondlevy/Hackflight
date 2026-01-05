@@ -16,23 +16,38 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include <stdio.h>
 
 #include <datatypes.h>
+#include <num.hpp>
 
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
-/*
-   while (wb_robot_step(TIME_STEP) != -1) {
-// this is done repeatedly
-const double *values = wb_supervisor_field_get_sf_vec3f(trans_field);
-printf("MY_ROBOT is at position: %g %g %g\n", values[0], values[1], values[2]);
+static constexpr char ROBOT_NAME[] = "diyquad";
+
+// https://www.euclideanspace.com/maths/geometry/rotations/conversions/
+//   eulerToAngle/index.htm
+static void euler_to_rotation(const double euler[3], double rotation[4])
+{
+    const double phi = euler[0];
+    const double theta = euler[1];
+    const double psi = euler[2];
+
+    const double c1 = cos(psi/2);
+    const double c2 = cos(theta/2);
+    const double c3 = cos(phi/2);
+    const double s1 = sin(psi/2);
+    const double s2 = sin(theta/2);
+    const double s3 = sin(phi/2);
+
+    rotation[0] = s1*s2*c3 + c1*c2*s3;
+    rotation[1] = s1*c2*c3 + c1*s2*s3;
+    rotation[2] = c1*s2*c3 - s1*c2*s3;
+    rotation[3] = 2 * acos(c1*c2*c3 - s1*s2*s3);
 }
 
- */
-
-static constexpr char ROBOT_NAME[] = "diyquad";
 
 int main(int argc, char ** argv) 
 {
@@ -53,8 +68,11 @@ int main(int argc, char ** argv)
 
     WbNodeRef robot_node = wb_supervisor_node_get_from_def(ROBOT_NAME);
 
-    WbFieldRef trans_field =
+    WbFieldRef translation_field =
         wb_supervisor_node_get_field(robot_node, "translation");
+
+    WbFieldRef rotation_field =
+        wb_supervisor_node_get_field(robot_node, "rotation");
 
     while (true) {
 
@@ -75,9 +93,12 @@ int main(int argc, char ** argv)
         }
 
         const double xyz[3] = {pose.x, pose.y, pose.z};
+        wb_supervisor_field_set_sf_vec3f(translation_field, xyz);
 
-        wb_supervisor_field_set_sf_vec3f(trans_field, xyz);
-
+        const double euler[3] = {pose.phi, pose.theta, pose.psi};
+        double rotation[4] = {};
+        euler_to_rotation(euler, rotation);
+        wb_supervisor_field_set_sf_rotation(rotation_field, rotation);
     }
 
     printf("done\n");
