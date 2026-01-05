@@ -22,25 +22,34 @@
 #include <datatypes.h>
 #include <num.hpp>
 
+#include <webots/motor.h>
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
+static void startMotor(const char * name, const float direction)
+{
+    auto motor = wb_robot_get_device(name);
+    wb_motor_set_position(motor, INFINITY);
+    wb_motor_set_velocity(motor, direction * 60);
+}
+
+
 // https://www.euclideanspace.com/maths/geometry/rotations/conversions/
 //   eulerToAngle/index.htm
 static void euler_to_rotation(const double euler[3], double rotation[4])
 {
-    const double e0 = euler[0];
-    const double e1 = euler[2];
-    const double e2 = euler[1];
+    const double phi = euler[0];
+    const double theta = euler[1];
+    const double psi = euler[2];
 
-    const double c1 = cos(e2/2);
-    const double c2 = cos(e1/2);
-    const double c3 = cos(e0/2);
-    const double s1 = sin(e2/2);
-    const double s2 = sin(e1/2);
-    const double s3 = sin(e0/2);
+    const double c1 = cos(theta/2);
+    const double c2 = cos(psi/2);
+    const double c3 = cos(phi/2);
+    const double s1 = sin(theta/2);
+    const double s2 = sin(psi/2);
+    const double s3 = sin(phi/2);
 
     rotation[0] = s1*s2*c3 + c1*c2*s3;
     rotation[1] = s1*c2*c3 + c1*s2*s3;
@@ -73,6 +82,11 @@ int main(int argc, char ** argv)
 
     WbFieldRef rotation_field =
         wb_supervisor_node_get_field(robot_node, "rotation");
+
+    startMotor("motor1", -1);
+    startMotor("motor2", +1);
+    startMotor("motor3", +1);
+    startMotor("motor4", -1);
 
     while (true) {
 
