@@ -25,31 +25,27 @@ class YawAngleController {
 
         /**
           *  @param dt time constant
-          *  @param psi current heading in degrees
-          *  @param yaw yaw demand, expressed as fraction of a max turn rate
+          *  @param psi_actual current heading in degrees
+          *  @param psi_target target heading in degrees
           *  @return yaw demand in deg/sec
           */
 
         static float run(
                 const float dt,       
-                const float psi,
-                const float target)
+                const float psi_actual,
+                const float psi_target)
         {
             // Grab initial psi first time around
             static float _psi_initial;
             if (_psi_initial == 0) {
-                _psi_initial = psi;
+                _psi_initial = psi_actual;
             }
 
-            //static float _target;
             static float _integral;
             static float _previous;
 
-            //_target = Num::cap_angle(_target + DEMAND_MAX * yaw * dt);
-
-            printf("pid: %+3.3f\n", target);
-
-            const auto error = Num::cap_angle(target - (psi - _psi_initial));
+            const auto error =
+                Num::cap_angle(psi_target - (psi_actual - _psi_initial));
 
             _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 

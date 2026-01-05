@@ -25,17 +25,15 @@ class YawAngleSetpoint {
 
         /**
           *  @param dt time constant
-          *  @param yaw_demand yaw demand, as fraction of a max turn rate
-          *  @return yaw demand in degrees
+          *  @param demand as fraction of a max turn rate
+          *  @return updated yaw demand in degrees
           */
 
-        static float run(const float dt, const float yaw_demand)
+        static float run(const float dt, const float demand)
         {
             static float _target;
 
-            _target = Num::cap_angle(_target + DEMAND_MAX * yaw_demand * dt);
-
-            printf("setpoint: %+3.3f\n", _target);
+            _target = Num::cap_angle(_target + DEMAND_MAX * demand * dt);
 
             return _target;
         }
