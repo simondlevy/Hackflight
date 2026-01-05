@@ -31,16 +31,16 @@ static constexpr char ROBOT_NAME[] = "diyquad";
 //   eulerToAngle/index.htm
 static void euler_to_rotation(const double euler[3], double rotation[4])
 {
-    const double phi = euler[0];
-    const double theta = euler[1];
-    const double psi = euler[2];
+    const double e0 = euler[0];
+    const double e1 = euler[2];
+    const double e2 = euler[1];
 
-    const double c1 = cos(psi/2);
-    const double c2 = cos(theta/2);
-    const double c3 = cos(phi/2);
-    const double s1 = sin(psi/2);
-    const double s2 = sin(theta/2);
-    const double s3 = sin(phi/2);
+    const double c1 = cos(e2/2);
+    const double c2 = cos(e1/2);
+    const double c3 = cos(e0/2);
+    const double s1 = sin(e2/2);
+    const double s2 = sin(e1/2);
+    const double s3 = sin(e0/2);
 
     rotation[0] = s1*s2*c3 + c1*c2*s3;
     rotation[1] = s1*c2*c3 + c1*s2*s3;

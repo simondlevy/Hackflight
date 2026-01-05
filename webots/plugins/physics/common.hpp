@@ -114,9 +114,13 @@ class PhysicsPluginHelper {
 
         static void logfile_write_pose(FILE * logfp, const pose_t & pose)
         {
-            // Negate Y for leftward positive
             fprintf(logfp, "%f,%f,%f,%f,%f,%f", 
-                    pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+                    pose.x,
+                    -pose.y, // leftward positive
+                    pose.z,
+                    pose.phi,
+                    pose.theta,
+                    -pose.psi); // nose-right positive
         }
 
     private:
