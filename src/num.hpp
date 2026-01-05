@@ -65,6 +65,21 @@ class Num {
                     q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z);
         }
 
+        static float cap_angle(float angle) 
+        {
+            float result = angle;
+
+            while (result > 180.0f) {
+                result -= 360.0f;
+            }
+
+            while (result < -180.0f) {
+                result += 360.0f;
+            }
+
+            return result;
+        }
+
         static float fconstrain(
                 float value, const float minVal, const float maxVal)
         {

@@ -26,6 +26,7 @@
 #include <mixers/crazyflie.hpp>
 #include <num.hpp>
 #include <pid.hpp>
+#include <setpoints/yaw_angle.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/common.h>
 #include <vehicles/crazyflie.hpp>
@@ -62,8 +63,10 @@ class SimInnerLoop {
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
                     siminfo.flightMode == MODE_AUTONOMOUS;
 
-                _pidControl->runSlow(1 / (float)PID_SLOW_FREQ,
-                        controlled, state, siminfo.setpoint, slowDemands);
+                const float dt = 1 / (float)PID_SLOW_FREQ;
+
+                _pidControl->runSlow(dt, controlled, state, siminfo.setpoint,
+                        slowDemands);
 
                 // Run fast PID control and mixer in middle loop --------------
                 for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
