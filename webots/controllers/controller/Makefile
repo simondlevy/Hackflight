@@ -12,11 +12,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Support different worlds ----------------------------------------------------
-
+# Command-line variables; e.g. make run world=maze ---------------------------
 world = simple
-
-# -----------------------------------------------------------------------------
+logfile = log.csv
+# ----------------------------------------------------------------------------
 
 ALL = $(shell basename "`pwd`")
 
@@ -27,9 +26,11 @@ SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC_DIR = ../../../src
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(OPENCV_DIR) -I$(SIMSENSORS_DIR)
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(OPENCV_DIR) \
+		  -I$(SIMSENSORS_DIR)
 
-LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
+LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core \
+			-lopencv_imgproc
 
 CXX_SOURCES = main.cpp
 
@@ -45,7 +46,7 @@ VERBOSE = 1
 run:
 	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(ALL) $(world) \
-		../../protos
+		$(logfile)
 
 
 edit:

@@ -51,7 +51,8 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    const std::string worldname =  argv[1];
+    const string worldname =  argv[1];
+    const string logfilename =  argv[2];
 
     SimOuterLoop outerLoop = {};
 
@@ -62,6 +63,7 @@ int main(int argc, char ** argv)
         siminfo_t siminfo = {};
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
+        strcpy(siminfo.logfilename, logfilename.c_str());
 
         if (!outerLoop.step(siminfo)) {
             break;

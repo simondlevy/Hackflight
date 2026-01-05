@@ -23,10 +23,10 @@ DLLEXPORT void webots_physics_step()
 {
     siminfo_t siminfo = {};
 
-    if (get_siminfo(siminfo)) {
+    if (PhysicsPluginHelper::get_siminfo(siminfo)) {
 
-        const auto pose = get_pose_from_siminfo(siminfo);
+        const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
 
-        set_dbody_from_pose(pose);
+        PhysicsPluginHelper::set_dbody_from_pose(pose);
     }
 }

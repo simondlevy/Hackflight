@@ -26,9 +26,6 @@
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
-static const char * LOGFILE_NAME =
-"/home/levys/Desktop/hackflight/webots/controllers/controller/simsens.csv";
-
 static void load(const siminfo_t & siminfo,
         simsens::WorldParser & worldParser,
         simsens::Rangefinder ** rangefinder,
@@ -48,7 +45,7 @@ static void load(const siminfo_t & siminfo,
 
     *rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
 
-    *logfpp = fopen(LOGFILE_NAME, "w");
+    *logfpp = PhysicsPluginHelper::open_logfile(siminfo);
 }
 
 static bool collided(
@@ -120,7 +117,7 @@ static bool run_normal(siminfo_t & siminfo)
     }
 
     // Use setpoints to get new pose
-    const auto pose = get_pose_from_siminfo(siminfo);
+    const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
 
     // Load world and robot info first time around
     if (!_rangefinder) {
@@ -141,7 +138,7 @@ static bool run_normal(siminfo_t & siminfo)
     }
 
     // Otherwise, set normally
-    set_dbody_from_pose(pose);
+    PhysicsPluginHelper::set_dbody_from_pose(pose);
 
     return true;
 }
@@ -149,10 +146,6 @@ static bool run_normal(siminfo_t & siminfo)
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    if (_robot == NULL) {
-        return;
-    }
-
     static bool _collided;
 
     if (_collided) {
@@ -163,7 +156,7 @@ DLLEXPORT void webots_physics_step()
 
         siminfo_t siminfo = {};
 
-        if (get_siminfo(siminfo)) {
+        if (PhysicsPluginHelper::get_siminfo(siminfo)) {
 
             if (!run_normal(siminfo)) {
                 _collided = true;
