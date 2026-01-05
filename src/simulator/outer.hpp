@@ -155,9 +155,9 @@ class SimOuterLoop {
 
             _time_prev = time_curr;
 
-            _zdist = std::min(std::max(
+            _zdist = Num::fconstrain(
                         _zdist + rate * ZDIST_HOVER_INC_MPS * dt,
-                        ZDIST_HOVER_MIN_M), ZDIST_HOVER_MAX_M);
+                        ZDIST_HOVER_MIN_M, ZDIST_HOVER_MAX_M);
         }
 
         void getSetpointFromKey(const int key, siminfo_t & siminfo)

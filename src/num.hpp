@@ -29,6 +29,12 @@ class Num {
         static constexpr float RAD2DEG = 180.0f / M_PI;
         static constexpr float DEG2RAD = M_PI / 180.0f;
 
+        static float fconstrain(
+                float value, const float minVal, const float maxVal)
+        {
+            return fminf(maxVal, fmaxf(minVal,value));
+        }
+
         static float fconstrain(const float val, const float maxabs)
         {
             return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
@@ -78,12 +84,6 @@ class Num {
             }
 
             return result;
-        }
-
-        static float fconstrain(
-                float value, const float minVal, const float maxVal)
-        {
-            return fminf(maxVal, fmaxf(minVal,value));
         }
 
         static float deadband(float value, const float threshold)

@@ -36,6 +36,10 @@ class AltitudeSetpoint {
 
             static float _target;
 
+            if (_target == 0) {
+                _target = HOVER_INIT_M;
+            }
+
             return _target;
         }
 
