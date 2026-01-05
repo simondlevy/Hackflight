@@ -45,7 +45,7 @@ static void load(const siminfo_t & siminfo,
 
     *rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
 
-    *logfpp = PhysicsPluginHelper::open_logfile(siminfo);
+    *logfpp = PhysicsPluginHelper::logfile_open(siminfo);
 }
 
 static bool collided(

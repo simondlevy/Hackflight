@@ -27,6 +27,17 @@ DLLEXPORT void webots_physics_step()
 
         const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
 
+        // Open log file first time through
+        static FILE * _logfp;
+        if (!_logfp) {
+            _logfp = PhysicsPluginHelper::logfile_open(siminfo);
+        }
+
+        PhysicsPluginHelper::logfile_write_pose(_logfp, pose);
+
+        fprintf(_logfp, "\n");
+        fflush(_logfp);
+
         PhysicsPluginHelper::set_dbody_from_pose(pose);
     }
 }

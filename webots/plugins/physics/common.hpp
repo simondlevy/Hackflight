@@ -105,10 +105,20 @@ class PhysicsPluginHelper {
             dBodySetQuaternion(_robot, q);
         }
 
-        static FILE * open_logfile(const siminfo_t & siminfo)
+        static FILE * logfile_open(const siminfo_t & siminfo)
         {
             char path[1000];
             sprintf(path, "%s/%s", siminfo.path, siminfo.logfilename);
             return fopen(path, "w");
         }
+
+        static void logfile_write_pose(FILE * logfp, const pose_t & pose)
+        {
+            fprintf(logfp, "%f,%f,%f,%f,%f,%f", 
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+        }
+
+    private:
+
+        FILE * logfile;
 };
