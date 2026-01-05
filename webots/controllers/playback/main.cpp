@@ -16,8 +16,23 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <string>
-using namespace std;
+#include <stdio.h>
+
+#include <datatypes.h>
+
+#include <webots/robot.h>
+#include <webots/supervisor.h>
+
+/*
+  while (wb_robot_step(TIME_STEP) != -1) {
+    // this is done repeatedly
+    const double *values = wb_supervisor_field_get_sf_vec3f(trans_field);
+    printf("MY_ROBOT is at position: %g %g %g\n", values[0], values[1], values[2]);
+  }
+
+*/
+
+static constexpr char ROBOT_NAME[] = "diyquad";
 
 int main(int argc, char ** argv) 
 {
@@ -29,19 +44,32 @@ int main(int argc, char ** argv)
 
     if (!logfp) {
         fprintf(stderr, "Unable to open file %s for input\n", logfilename);
-        exit(1);
+        return 1;
     }
+
+    wb_robot_init();
+
+    WbNodeRef robot_node = wb_supervisor_node_get_from_def(ROBOT_NAME);
+
+    WbFieldRef trans_field =
+        wb_supervisor_node_get_field(robot_node, "translation");
 
     while (true) {
 
         char line[1000] = {};
 
-        if (!fgets(line, sizeof(line), logfp) != NULL) {
+        if (!fgets(line, sizeof(line), logfp)) {
             break;
         }
 
-        printf("%s", line);
+        pose_t pose = {};
+
+        sscanf(line, "%f,%f,%f,%f,%f,%f", 
+                &pose.x, &pose.y, &pose.z,
+                &pose.phi, &pose.theta, &pose.psi);
     }
+
+    wb_robot_cleanup();
 
     return 0;
 }

@@ -38,9 +38,8 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	./$(EXE) $(logfile)
-	#webots ../../worlds/$(world).wbt &
-	#/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(logfile)
+	webots ../../worlds/$(world).wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(logfile)
 
 edit:
 	vim main.cpp
