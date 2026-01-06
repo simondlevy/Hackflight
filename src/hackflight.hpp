@@ -160,6 +160,9 @@ class Hackflight {
                     // No way to recover from this
                     stopMotors(motorCount, _motorvals);
                     break;
+
+                default:
+                    break;
             }
 
             for (uint8_t k=0; k<motorCount; ++k) {
@@ -398,10 +401,13 @@ class Hackflight {
 
                 const float dt = 1.f / PID_SLOW_FREQ;
 
-                Setpoint::run(dt, _demandsSlow);
+                const demands_t sp = command.setpoint;
 
-                control.runSlow(dt, controlled, state,
-                        command.setpoint, _demandsSlow);
+                demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
+
+                Setpoint::run(dt, setpoint);
+
+                control.runSlow(dt, controlled, state, setpoint, _demandsSlow);
 
                 if (!command.armed) {
                     flightMode = MODE_IDLE;

@@ -44,7 +44,7 @@ void setup()
     pinMode(18, INPUT_PULLUP);
     pinMode(19, INPUT_PULLUP);
 
-    hackflight.init(15, false, &Serial1, &Wire1, &SPI, SS);
+    hackflight.init(15, false, &Serial5, &Wire1, &SPI, SS);
 
     threads.addThread(task2_thread);
 }

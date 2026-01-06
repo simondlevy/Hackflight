@@ -24,7 +24,14 @@ class Setpoint {
 
     public:
 
-        static void run(const float dt, demands_t & demands)
+        /**
+          *  @param dt time constant
+          *  @setpoint input/output setpoint
+          *
+          *  Setpoint is modified by accmulating altitude target and yaw angle
+          */
+
+        static void run(const float dt, demands_t & setpoint)
         {
             static float _altitude_target;
 
@@ -33,17 +40,17 @@ class Setpoint {
             }
 
             _altitude_target = Num::fconstrain(
-                        _altitude_target + demands.thrust * ALTITUDE_INC_MPS * dt,
+                        _altitude_target + setpoint.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
             static float _yaw_angle_target;
 
             _yaw_angle_target = Num::cap_angle(
-                    _yaw_angle_target + YAW_DEMAND_MAX * demands.yaw * dt);
+                    _yaw_angle_target + YAW_DEMAND_MAX * setpoint.yaw * dt);
 
-            demands.thrust = _altitude_target;
+            setpoint.thrust = _altitude_target;
 
-            demands.yaw = _yaw_angle_target;
+            setpoint.yaw = _yaw_angle_target;
         }
 
     private:

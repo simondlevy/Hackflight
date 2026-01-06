@@ -8,6 +8,8 @@ SRC = ../src
 
 MSGS = ../src/__messages__.h
 
+HASKDIR = ../haskell
+
 include ../snn_path.makefile
 
 build: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(MSGS)
@@ -20,21 +22,28 @@ $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../crazyflie
 	cp ../msppg/messages.h $(MSGS)
 
+haskell_config: copilot_core.cpp
+	cp $(SRC)/control/haskell.hpp ../src/__control__.hpp
+
 lowres_config:
-	cp $(SRC)/pid/lowres/pid.hpp ./__pid__.hpp
+	cp $(SRC)/control/lowres.hpp ../src/__control__.hpp
 
 nopos_config:
-	cp $(SRC)/pid/nopos/pid.hpp ./__pid__.hpp
+	cp $(SRC)/control/nopos.hpp ../src/__control__.hpp
 
 split_config:
-	cp $(SRC)/pid/split/pid.hpp ./__pid__.hpp
+	cp $(SRC)/control/split.hpp ../src/__control__.hpp
 
 standard_config:
-	cp $(SRC)/pid/standard/pid.hpp $(SRC)/__pid__.hpp
+	cp $(SRC)/control/standard.hpp ../src/__control__.hpp
 
 snn_config:
-	cp $(SRC)/control/snn.hpp ./__pid__.hpp
+	cp $(SRC)/control/snn.hpp ../src/__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
+
+copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
+	mv copilot_core.c copilot_core.cpp
 
 flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
