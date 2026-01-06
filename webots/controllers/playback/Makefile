@@ -1,4 +1,4 @@
-#  Copyright (C) 2025 Simon D. Levy
+#  Copyright (C) 2026 Simon D. Levy
  
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,12 +14,10 @@
 
 # Command-line variables; e.g. make run world=maze ---------------------------
 world = simple
-logfile = log.csv
+logfile = ../controller/log.csv
 # ----------------------------------------------------------------------------
 
 EXE = $(shell basename "`pwd`")
-
-SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -41,9 +39,7 @@ VERBOSE = 1
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world) \
-		$(logfile)
-
+	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(logfile)
 
 edit:
 	vim main.cpp

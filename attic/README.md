@@ -53,6 +53,11 @@ remote control and logging.
 For flight simulation, Hackflight uses [Webots](https://cyberbotics.com/),
 a free, open-source robotics simulator. Click [here](webots) to get started.
 
+# Haskell support
+
+If you [love Haskell](https://koerbitz.me/posts/Why-I-love-Haskell.html) as much
+as I do and want to see how it can be used for flight control, click [here](haskell).
+
 # Citing Hackflight
 
 Please cite Hackflight as:

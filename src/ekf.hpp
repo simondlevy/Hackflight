@@ -239,7 +239,7 @@ class EKF {
         }
 
         void getStateEstimate(const uint32_t nowMs,
-                float & z, axis3_t & dpos, axis4_t & quat)
+                float & z, axis3_t & dpos, quaternion_t & quat)
         {
             addProcessNoise(nowMs);
 

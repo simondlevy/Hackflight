@@ -29,6 +29,7 @@
 #include <ekf.hpp>
 #include <imu.hpp>
 #include <parser.hpp>
+#include <setpoints/manual.hpp>
 #include <timer.hpp>
 #include <vehicles/crazyflie.hpp>
 
@@ -158,6 +159,9 @@ class Hackflight {
                 case MODE_PANIC:
                     // No way to recover from this
                     stopMotors(motorCount, _motorvals);
+                    break;
+
+                default:
                     break;
             }
 
@@ -344,7 +348,7 @@ class Hackflight {
             }
 
             axis3_t dpos = {};
-            axis4_t quat = {};
+            quaternion_t quat = {};
 
             _ekf.getStateEstimate(nowMs, state.z, dpos, quat);
 
@@ -395,8 +399,15 @@ class Hackflight {
 
             if (_timerSlow.ready(PID_SLOW_FREQ)) {
 
-                control.runSlow(1.f / PID_SLOW_FREQ, controlled, state,
-                        command.setpoint, _demandsSlow);
+                const float dt = 1.f / PID_SLOW_FREQ;
+
+                const demands_t sp = command.setpoint;
+
+                demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
+
+                Setpoint::run(dt, setpoint);
+
+                control.runSlow(dt, controlled, state, setpoint, _demandsSlow);
 
                 if (!command.armed) {
                     flightMode = MODE_IDLE;

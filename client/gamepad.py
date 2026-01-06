@@ -33,11 +33,6 @@ class Gamepad:
     THRUST_DESCEND_MIN = 15000
     THRUST_DESCEND_DEC = 208
 
-    ZDIST_INIT = 0.4
-    ZDIST_MAX = 1.0
-    ZDIST_MIN = 0.2
-    ZDIST_INC = 0.01
-
     def __init__(self, debug=False):
 
         self.armed = False
@@ -47,7 +42,6 @@ class Gamepad:
         self.vx = 0
         self.vy = 0
         self.yawrate = 0
-        self.zdist = 0
         self.roll = 0
         self.pitch = 0
         self.yaw = 0
@@ -68,8 +62,6 @@ class Gamepad:
             exit(0)
 
         self.descend_countdown = 0
-
-        self.zdist = self.ZDIST_INIT
 
         thread = Thread(target=self.threadfun, args=(self.gamepad_vals, ))
         thread.daemon = True
@@ -140,20 +132,15 @@ class Gamepad:
 
                 self.descend_countdown = self.THRUST_DESCEND_MAX
 
+                self.thrust = -self.scale(self.gamepad_vals[0])
                 self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
                 self.vy = self.scale(self.gamepad_vals[1])
                 self.yawrate = self.scale(self.gamepad_vals[3])
 
-                self.thrust = (
-                        -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC)
-
-                self.zdist = min(max(self.zdist + self.thrust, self.ZDIST_MIN),
-                                 self.ZDIST_MAX)
-
                 if self.debug:
-                    print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
-                          'yawrate=%+3.f self.zdistance=%+3.2f') %
-                          (self.vx, self.vy, self.yawrate, self.zdist))
+                    print(('send_hover_setpoint: thrust=%3.3f ' +
+                           ' vx=%+3.2f vy=%+3.3f yaw=%+3.f') %
+                          (self.thrust, self.vx, self.vy, self.yawrate))
 
             else:
 
@@ -169,8 +156,6 @@ class Gamepad:
                 self.descend_countdown -= (self.THRUST_DESCEND_DEC
                                            if self.descend_countdown > 0
                                            else 0)
-
-                self.zdist = self.ZDIST_INIT
 
                 if self.debug:
                     print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'

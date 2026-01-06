@@ -10,6 +10,8 @@ SRC = ../src
 
 MSGS = ../src/__messages__.h
 
+HASKDIR = ../haskell
+
 DEPS = $(SKETCH).ino  *.cpp $(SRC)/*.h $(SRC)/*.hpp $(MSGS)
 
 include ../snn_path.makefile
@@ -49,6 +51,9 @@ $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../crazyflie
 	cp ../msppg/messages.h $(MSGS)
 
+haskell_config: copilot_core.cpp
+	cp $(SRC)/pid/haskell/pid.hpp ./__pid__.hpp
+
 lowres_config:
 	cp $(SRC)/pid/lowres/pid.hpp ./__pid__.hpp
 
@@ -58,6 +63,10 @@ slowfast_config:
 standard_config:
 	cp $(SRC)/pid/standard/pid.hpp ./__pid__.hpp
 
+
+copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
+	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
+	mv copilot_core.c copilot_core.cpp
 
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D $(BIN)

@@ -24,11 +24,13 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC_DIR = ../../../../src
 
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) \
+		  -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(ALL).cpp
 
-LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ -lopencv_highgui -lopencv_core -lopencv_imgproc
+LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
+			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
 all: lib$(ALL).so
 

@@ -44,7 +44,7 @@ typedef struct {
     float y;
     float z;
 
-} axis4_t;
+} quaternion_t;
 
 typedef struct {
 

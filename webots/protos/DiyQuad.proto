@@ -19,7 +19,7 @@ DEF ROBOT Robot {
     translation  IS translation
         rotation IS rotation
         controller "<extern>"
-        supervisor FALSE
+        supervisor TRUE
         name "DiyQuad"
         model "DiyQuad"
         children [

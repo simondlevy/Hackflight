@@ -51,6 +51,6 @@
    {"vx":        "float"},
    {"vy":        "float"},
    {"yawrate":   "float"},
-   {"zdistance": "float"}
+   {"thrust":    "float"}
   ]
 }

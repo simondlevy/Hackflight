@@ -1,5 +1,5 @@
 /* 
-   C++ flight simulator outerLoop for Hackflight with custom physics plugin
+   C++ flight simulator main for Hackflight with custom physics plugin
 
    Copyright (C) 2025 Simon D. Levy
 
@@ -29,9 +29,9 @@ using namespace std;
 #include <webots/inertial_unit.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
-#include <webots/motor.h>
 #include <webots/range_finder.h>
-#include <webots/robot.h>
+
+#include "../common.hpp"
 
 static WbDeviceTag _emitter;
 static WbDeviceTag _gps;
@@ -40,18 +40,12 @@ static WbDeviceTag _ranger;
 
 static double _timestep;
 
-static void startMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction * 60);
-}
-
 int main(int argc, char ** argv) 
 {
     (void)argc;
 
-    const std::string worldname =  argv[1];
+    const string worldname =  argv[1];
+    const string logfilename =  argv[2];
 
     SimOuterLoop outerLoop = {};
 
@@ -62,6 +56,7 @@ int main(int argc, char ** argv)
         siminfo_t siminfo = {};
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname.c_str());
+        strcpy(siminfo.logfilename, logfilename.c_str());
 
         if (!outerLoop.step(siminfo)) {
             break;
@@ -146,10 +141,7 @@ void SimOuterLoop::platform_init()
 
     wb_keyboard_enable(_timestep);
 
-    startMotor("motor1", -1);
-    startMotor("motor2", +1);
-    startMotor("motor3", +1);
-    startMotor("motor4", -1);
+    startMotors();
 
     wb_joystick_enable(_timestep);
 }

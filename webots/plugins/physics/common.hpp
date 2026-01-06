@@ -1,5 +1,5 @@
 /* 
- * Custom physics plugin custom for Hackflight Webots-based simulator
+ * Webots custom physics plugin support for Hackflight
  *
  *  Copyright (C) 2025 Simon D. Levy
  *
@@ -62,41 +62,68 @@ DLLEXPORT void webots_physics_cleanup()
 {
 }
 
-static bool get_siminfo(siminfo_t & siminfo)
-{
-    if (_robot == NULL) {
-        return false;
-    }
+class PhysicsPluginHelper {
 
-    int bytes_received = 0;
+    public:
 
-    // Get sim info from main program
-    const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
+        static bool get_siminfo(siminfo_t & siminfo)
+        {
+            if (_robot == NULL) {
+                return false;
+            }
 
-    if (bytes_received == sizeof(siminfo_t)) {
-        memcpy(&siminfo, buffer, sizeof(siminfo));
-    }
+            int bytes_received = 0;
 
-    // Framerate can be zero at startup
-    return siminfo.framerate > 0;
-}
+            // Get sim info from main program
+            const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
 
-static pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
-{
-    return _innerLoop.step(siminfo);
-}
+            if (bytes_received == sizeof(siminfo_t)) {
+                memcpy(&siminfo, buffer, sizeof(siminfo));
+            }
 
-static void set_dbody_from_pose(const pose_t & pose)
-{
-    // Negate Y for leftward positive
-    dBodySetPosition(_robot, pose.x, -pose.y, pose.z);
+            // Framerate can be zero at startup
+            return siminfo.framerate > 0;
+        }
 
-    // Turn Euler angles into quaternion, negating psi for nose-left
-    // positive
-    const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
-    axis4_t quat = {};
-    Num::euler2quat(euler, quat);
+        static pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
+        {
+            return _innerLoop.step(siminfo);
+        }
 
-    const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-    dBodySetQuaternion(_robot, q);
-}
+        static void set_dbody_from_pose(const pose_t & pose)
+        {
+            // Negate Y for leftward positive
+            dBodySetPosition(_robot, pose.x, -pose.y, pose.z);
+
+            // Turn Euler angles into quaternion, negating psi for nose-left
+            // positive
+            const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
+            quaternion_t quat = {};
+            Num::euler2quat(euler, quat);
+
+            const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
+            dBodySetQuaternion(_robot, q);
+        }
+
+        static FILE * logfile_open(const siminfo_t & siminfo)
+        {
+            char path[1000];
+            sprintf(path, "%s/%s", siminfo.path, siminfo.logfilename);
+            return fopen(path, "w");
+        }
+
+        static void logfile_write_pose(FILE * logfp, const pose_t & pose)
+        {
+            fprintf(logfp, "%f,%f,%f,%f,%f,%f", 
+                    pose.x,
+                    -pose.y, // leftward positive
+                    pose.z,
+                    pose.phi,
+                    pose.theta,
+                    -pose.psi); // nose-right positive
+        }
+
+    private:
+
+        FILE * logfile;
+};

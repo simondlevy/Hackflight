@@ -24,18 +24,22 @@ class AltitudeController {
     public:
 
         /**
-         * Demand is input as altitude target in meters and output as 
-         * climb rate in meters per second.
-         */
+          *  @param hovering flag for whether we're hovering
+          *  @param dt time constant
+          *  @param target actual altitude in meters
+          *  @param target target altitude in meters
+          *  @return updated thrust demand in m/s
+          */
+
         static float run(
                 const bool hovering,
                 const float dt,
-                const float z,
-                const float thrust)
+                const float actual,
+                const float target)
         {
             static float _integral;
 
-            const auto error = thrust - z;
+            const auto error = target - actual;
 
             _integral = hovering ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

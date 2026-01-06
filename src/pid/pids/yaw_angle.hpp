@@ -24,21 +24,28 @@ class YawAngleController {
     public:
 
         /**
-          * Input is desired angle (deg) estimated actual angle (deg) from EKF;
-            ouputput is angles-per-second demand sent to YawRateController.
+          *  @param dt time constant
+          *  @param psi_actual current heading in degrees
+          *  @param psi_target target heading in degrees
+          *  @return yaw demand in deg/sec
           */
+
         static float run(
-                const float dt,       // can be a constant if needed
-                const float psi,      // estimated angle
-                const float yaw)      // desired angle
+                const float dt,       
+                const float psi_actual,
+                const float psi_target)
         {
-            static float _target;
+            // Grab initial psi first time around
+            static float _psi_initial;
+            if (_psi_initial == 0) {
+                _psi_initial = psi_actual;
+            }
+
             static float _integral;
             static float _previous;
 
-            _target = cap(_target + DEMAND_MAX * yaw * dt);
-
-            const auto error = cap(_target - psi);
+            const auto error =
+                Num::cap_angle(psi_target - (psi_actual - _psi_initial));
 
             _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 
@@ -55,23 +62,9 @@ class YawAngleController {
         static constexpr float KI = 1;
         static constexpr float KD = 0.35;
         static constexpr float ILIMIT = 360;
-        static constexpr float DEMAND_MAX = 200;
+        //static constexpr float DEMAND_MAX = 200;
 
         float _integral;
         float _previous;
 
-        static float cap(float angle) 
-        {
-            float result = angle;
-
-            while (result > 180.0f) {
-                result -= 360.0f;
-            }
-
-            while (result < -180.0f) {
-                result += 360.0f;
-            }
-
-            return result;
-        }
 };

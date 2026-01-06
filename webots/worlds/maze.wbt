@@ -20,13 +20,13 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.006605764802643535 0.9998219132174126 -0.0176778313614801 1.5321687791806828
-  position -0.42699706506966206 0.4017265869519243 5.998079708047744
+  orientation -0.01613946662552814 0.9996222169912405 -0.02224726757515824 0.9923071508958922
+  position -4.334178477580324 0.3608474681064999 6.263373521545586
   follow "DiyQuad"
 }
 DEF diyquad DiyQuad {
-  translation 0 1.2 0.037985
-  rotation 0 0 0.9999999999999997 2.4434275543808597
+  translation -1.81 0.81 0.037985
+  rotation 0 0 0.9999999999999997 0
 }
 TexturedBackground {
 }
@@ -35,26 +35,26 @@ TexturedBackgroundLight {
 Floor {
 }
 DEF wall Wall {
-  translation -1.23 1.41 0
+  translation -1.25 1.41 0
   name "wall1"
   size 0.05 0.75 1
 }
 DEF wall Wall {
-  translation 0.79 1.41 0
+  translation 0.25 1.41 0
   name "wall2"
   size 0.05 0.75 1
 }
 DEF wall Wall {
-  translation -0.20972 1.7604 0
+  translation -0.50972 1.76067 0
   rotation 0 0 1 1.57
   name "wall3"
-  size 0.05 2 1
+  size 0.05 1.5 1
 }
 DEF wall Wall {
-  translation -0.21127 -0.179492 0
+  translation -0.46127 -0.179292 0
   rotation 0 0 1 -1.571595307179586
   name "wall4"
-  size 0.05 2 1
+  size 0.05 1.5 1
 }
 DEF wall Wall {
   translation -1.23 0.16 0
@@ -62,7 +62,7 @@ DEF wall Wall {
   size 0.05 0.75 1
 }
 DEF wall Wall {
-  translation 0.79 0.17 0
+  translation 0.3 0.17 0
   name "wall6"
   size 0.05 0.75 1
 }

@@ -24,17 +24,19 @@ class YawRateController {
     public:
 
         /**
-          * Input is angular rate demand (deg/sec) and actual angular
-          * rate from gyro; ouputput is arbitrary units scaled for motors.
+          *  @param dt time constant
+          *  @param dpsi_actual current heading angle change in deg/sec
+          *  @param dpsi_target demand in deg/sec
+          *  @return yaw demand scaled appropriate to motors
           */
-         static float run(
+          static float run(
                  const float dt,
-                 const float dpsi,
-                 const float yaw)
+                 const float dpsi_actual,
+                 const float dpsi_target)
         {
             static float _integral;
 
-            const auto error = yaw - dpsi;
+            const auto error = dpsi_target - dpsi_actual;
 
             _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
 
