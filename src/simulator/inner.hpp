@@ -26,8 +26,7 @@
 #include <mixers/crazyflie.hpp>
 #include <num.hpp>
 #include <pid.hpp>
-#include <setpoints/altitude.hpp>
-#include <setpoints/yaw_angle.hpp>
+#include <setpoints/manual.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/common.h>
 #include <vehicles/crazyflie.hpp>
@@ -69,9 +68,7 @@ class SimInnerLoop {
                 demands_t setpoint = {};
                 memcpy(&setpoint, &siminfo.setpoint, sizeof(demands_t));
 
-                setpoint.thrust = AltitudeSetpoint::run(dt, setpoint.thrust);
-
-                setpoint.yaw = YawAngleSetpoint::run(dt, setpoint.yaw);
+                Setpoint::run(dt, setpoint);
 
                 _pidControl->runSlow(dt, controlled, state, setpoint,
                         slowDemands);
