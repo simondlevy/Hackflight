@@ -29,6 +29,7 @@
 #include <ekf.hpp>
 #include <imu.hpp>
 #include <parser.hpp>
+#include <setpoints/manual.hpp>
 #include <timer.hpp>
 #include <vehicles/crazyflie.hpp>
 
@@ -395,7 +396,11 @@ class Hackflight {
 
             if (_timerSlow.ready(PID_SLOW_FREQ)) {
 
-                control.runSlow(1.f / PID_SLOW_FREQ, controlled, state,
+                const float dt = 1.f / PID_SLOW_FREQ;
+
+                Setpoint::run(dt, _demandsSlow);
+
+                control.runSlow(dt, controlled, state,
                         command.setpoint, _demandsSlow);
 
                 if (!command.armed) {
