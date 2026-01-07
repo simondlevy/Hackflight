@@ -48,6 +48,7 @@ class SimInnerLoop {
 
         pose_t step(const siminfo_t & siminfo)
         {
+            // Set pose in dynamics first time around
             static bool _ready;
             if (!_ready) {
                 _dynamics.setPose(siminfo.startingPose);
@@ -58,7 +59,6 @@ class SimInnerLoop {
             for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
 
                 const auto state =  _dynamics.getVehicleStateDegrees();
-                demands_t slowDemands = {};
 
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
                     siminfo.flightMode == MODE_AUTONOMOUS;
@@ -69,7 +69,9 @@ class SimInnerLoop {
 
                 demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
 
-                Setpoint::run(dt, setpoint);
+                ManualSetpoint::run(dt, setpoint);
+
+                demands_t slowDemands = {};
 
                 _pidControl->runSlow(dt, controlled, state, setpoint,
                         slowDemands);

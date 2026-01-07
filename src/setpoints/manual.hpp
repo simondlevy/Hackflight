@@ -20,7 +20,7 @@
 
 #include <num.hpp>
 
-class Setpoint {
+class ManualSetpoint {
 
     public:
 

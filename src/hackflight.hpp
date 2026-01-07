@@ -405,7 +405,7 @@ class Hackflight {
 
                 demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
 
-                Setpoint::run(dt, setpoint);
+                ManualSetpoint::run(dt, setpoint);
 
                 control.runSlow(dt, controlled, state, setpoint, _demandsSlow);
 

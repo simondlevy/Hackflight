@@ -16,8 +16,13 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Webots
 #include "../common.hpp"
 
+// Hackflight
+#include <setpoints/rangefinder.hpp>
+
+// SimSensors
 #include <simsensors/src/collision.hpp>
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
@@ -88,17 +93,6 @@ static void read_rangefinder(
     fflush(logfp);
 }
 
-static void get_setpoint_from_rangefinder(const int * rangefinder_distances_mm,
-        demands_t & setpoint)
-{
-    const int * d = rangefinder_distances_mm;
-
-    const bool center_is_clear = d[3] == -1 && d[4] == -1;
-
-    setpoint.pitch = center_is_clear ? 0.4 : 0;
-    setpoint.yaw = center_is_clear ? 0 : 0.2;
-}
-
 // Returns false on collision, true otherwise
 static bool run_normal(siminfo_t & siminfo)
 {
@@ -112,8 +106,7 @@ static bool run_normal(siminfo_t & siminfo)
 
     // In autonomous mode, use current pose to get setpoints
     if (autonomous) {
-        get_setpoint_from_rangefinder(_rangefinder_distances_mm,
-                siminfo.setpoint);
+        RangefinderSetpoint::run(_rangefinder_distances_mm, siminfo.setpoint);
     }
 
     // Use setpoints to get new pose
