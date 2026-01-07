@@ -87,9 +87,15 @@ int main(int argc, char ** argv)
 
         pose_t pose = {};
 
-        sscanf(line, "%f,%f,%f,%f,%f,%f", 
+        int rangefinder_distances_mm[8] = {};
+        int * d = rangefinder_distances_mm;
+
+        if (sscanf(line, "%f,%f,%f,%f,%f,%f,%d,%d,%d,%d,%d,%d,%d,%d", 
                 &pose.x, &pose.y, &pose.z,
-                &pose.phi, &pose.theta, &pose.psi);
+                &pose.phi, &pose.theta, &pose.psi,
+                &d[0], &d[1], &d[2], &d[3], &d[4], &d[5], &d[6], &d[7]) == 14) {
+            printf("RANGEFINDER\n");
+        }
 
         if (wb_robot_step(timestep) == -1) {
             break;
