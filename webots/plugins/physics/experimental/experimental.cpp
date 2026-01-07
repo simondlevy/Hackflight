@@ -89,7 +89,7 @@ static void read_rangefinder(
     PhysicsPluginHelper::logfile_write_pose(logfp, pose);
 
     for (int k=0; k<width; ++k) {
-        //fprintf(logfp, ",%d", distances_mm[k]);
+        fprintf(logfp, ",%d", distances_mm[k]);
     }
     fprintf(logfp, "\n");
 

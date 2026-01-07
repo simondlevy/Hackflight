@@ -101,9 +101,6 @@ int main(int argc, char ** argv)
         const double euler[3] = {pose.phi, pose.theta, pose.psi};
         double rotation[4] = {};
         euler_to_rotation(euler, rotation);
-        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f | rotation: x=%+3.3f y=%+3.3f z=%+3.3f angle=%+3.3f\n",
-                pose.phi, pose.theta, pose.psi,
-                rotation[0], rotation[1], rotation[2], rotation[3]);
         wb_supervisor_field_set_sf_rotation(rotation_field, rotation);
     }
 
