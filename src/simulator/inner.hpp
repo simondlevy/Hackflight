@@ -65,8 +65,9 @@ class SimInnerLoop {
 
                 const float dt = 1 / (float)PID_SLOW_FREQ;
 
-                demands_t setpoint = {};
-                memcpy(&setpoint, &siminfo.setpoint, sizeof(demands_t));
+                const demands_t sp = siminfo.setpoint;
+
+                demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
 
                 Setpoint::run(dt, setpoint);
 
