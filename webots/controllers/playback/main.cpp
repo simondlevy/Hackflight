@@ -45,7 +45,7 @@ static void euler_to_rotation(const double euler[3], double rotation[4])
 
     rotation[0] = s1*s2*c3 + c1*c2*s3;
     rotation[1] = s1*c2*c3 + c1*s2*s3;
-    rotation[2] = c1*s2*c3 - s1*c2*s3;
+    rotation[2] = phi==0 && theta==0 && psi==0 ? 1 : c1*s2*c3 - s1*c2*s3;
     rotation[3] = 2 * acos(c1*c2*c3 - s1*s2*s3);
 }
 
@@ -101,6 +101,9 @@ int main(int argc, char ** argv)
         const double euler[3] = {pose.phi, pose.theta, pose.psi};
         double rotation[4] = {};
         euler_to_rotation(euler, rotation);
+        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f | rotation: x=%+3.3f y=%+3.3f z=%+3.3f angle=%+3.3f\n",
+                pose.phi, pose.theta, pose.psi,
+                rotation[0], rotation[1], rotation[2], rotation[3]);
         wb_supervisor_field_set_sf_rotation(rotation_field, rotation);
     }
 

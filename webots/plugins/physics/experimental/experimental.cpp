@@ -86,9 +86,13 @@ static void read_rangefinder(
 
     const auto width = rangefinder.getWidth();
 
+    PhysicsPluginHelper::logfile_write_pose(logfp, pose);
+
     for (int k=0; k<width; ++k) {
-        fprintf(logfp, "%d%c", distances_mm[k], (k==width-1)?'\n':',');
+        //fprintf(logfp, ",%d", distances_mm[k]);
     }
+    fprintf(logfp, "\n");
+
 
     fflush(logfp);
 }
