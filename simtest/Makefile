@@ -1,10 +1,16 @@
 all: simtest
 
 run: simtest
-	./simtest
+	./simtest ../webots/worlds/simple.wbt
 
 simtest: main.o
 	g++ -o simtest main.o
 
-simtest.o: main.cpp
-	g++ -Wall -c main.cpp
+main.o: main.cpp
+	g++ -Wall -c -I../src main.cpp
+
+edit:
+	vim main.cpp
+
+clean:
+	rm -f simtest *.o
