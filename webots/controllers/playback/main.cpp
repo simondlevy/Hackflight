@@ -24,6 +24,9 @@
 #include <num.hpp>
 
 // SimSensors
+#include <simsensors/src/parsers/webots/world.hpp>
+#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
 // Webots
@@ -60,6 +63,20 @@ int main(int argc, char ** argv)
 
     const char * worldname =  argv[1];
     const char * logfilename =  argv[2];
+
+    char path[1000];
+
+    simsens::WorldParser worldParser = {};
+
+    sprintf(path, "../../worlds/%s.wbt", worldname);
+    worldParser.parse(path);
+
+    simsens::RobotParser robotParser = {};
+    robotParser.parse("../../protos/DiyQuad.proto");
+
+    //*rangefinder = robotParser.rangefinders[0];
+    //*rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
+
 
     FILE * logfp = fopen(logfilename, "r");
 
