@@ -58,7 +58,8 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    const char * logfilename =  argv[1];
+    const char * worldname =  argv[1];
+    const char * logfilename =  argv[2];
 
     FILE * logfp = fopen(logfilename, "r");
 
