@@ -35,6 +35,8 @@
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
+static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
+
 // https://www.euclideanspace.com/maths/geometry/rotations/conversions/
 //   eulerToAngle/index.htm
 static void euler_to_rotation(const double euler[3], double rotation[4])
@@ -74,8 +76,10 @@ int main(int argc, char ** argv)
     simsens::RobotParser robotParser = {};
     robotParser.parse("../../protos/DiyQuad.proto");
 
-    //*rangefinder = robotParser.rangefinders[0];
-    //*rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
+    simsens::Rangefinder * rangefinder = robotParser.rangefinders[0];
+
+    simsens::RangefinderVisualizer rangefinderVisualizer =
+        simsens::RangefinderVisualizer(rangefinder);
 
 
     FILE * logfp = fopen(logfilename, "r");
@@ -117,8 +121,11 @@ int main(int argc, char ** argv)
                 &pose.phi, &pose.theta, &pose.psi,
                 &d[0], &d[1], &d[2], &d[3], &d[4], &d[5], &d[6], &d[7]) == 14) {
 
+            rangefinderVisualizer.show(rangefinder_distances_mm,
+                    RANGEFINDER_DISPLAY_SCALEUP);
+
             printf("%d,%d,%d,%d,%d,%d,%d,%d\n",
-                d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
+                    d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
         }
 
         if (wb_robot_step(timestep) == -1) {
