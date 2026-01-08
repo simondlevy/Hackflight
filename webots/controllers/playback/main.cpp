@@ -18,10 +18,10 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 // Hackflight
 #include <datatypes.h>
-#include <num.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
