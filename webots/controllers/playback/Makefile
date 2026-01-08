@@ -19,12 +19,19 @@ logfile = ../controller/log.csv
 
 EXE = $(shell basename "`pwd`")
 
+OPENCV_DIR = /usr/include/opencv4
+
+SIMSENSORS_DIR = $(HOME)/Desktop
+
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC_DIR = ../../../src
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR)
 
-LIBRARIES = -L/usr/lib/x86_64-linux-gnu
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) \
+		  -I$(OPENCV_DIR)
+
+LIBRARIES = -L/usr/lib/x86_64-linux-gnu \
+			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
 CXX_SOURCES = main.cpp
 

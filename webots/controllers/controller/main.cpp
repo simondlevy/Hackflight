@@ -16,10 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-
 #include <unistd.h>
-using namespace std;
 
 #include <simulator/outer.hpp>
 
@@ -44,8 +41,8 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    const string worldname =  argv[1];
-    const string logfilename =  argv[2];
+    const char * worldname =  argv[1];
+    const char * logfilename =  argv[2];
 
     SimOuterLoop outerLoop = {};
 
@@ -55,8 +52,8 @@ int main(int argc, char ** argv)
 
         siminfo_t siminfo = {};
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
-        strcpy(siminfo.worldname, worldname.c_str());
-        strcpy(siminfo.logfilename, logfilename.c_str());
+        strcpy(siminfo.worldname, worldname);
+        strcpy(siminfo.logfilename, logfilename);
 
         if (!outerLoop.step(siminfo)) {
             break;
