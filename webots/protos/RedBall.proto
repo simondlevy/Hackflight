@@ -1,0 +1,33 @@
+#VRML_SIM R2023b utf8
+
+PROTO RedBall [ ]
+{
+    Robot {
+
+        name "RedBall"
+        model "RedBall"
+
+        children [
+
+         Shape {
+
+           appearance PBRAppearance {
+               baseColor 1 0 0
+               emissiveColor 1 0 0
+           }
+
+           geometry Sphere {
+               radius 0.07
+           }
+         }
+      ]
+
+      boundingObject Cylinder {
+        height 0.07
+        radius 0.07
+     }
+
+    physics Physics {
+    }
+  }
+}

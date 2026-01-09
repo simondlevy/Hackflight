@@ -1,0 +1,25 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/released/projects/objects/solids/protos/SolidPipe.proto"
+
+PROTO Pipe [
+  field SFVec3f translation 0 0 0
+  field SFRotation rotation 0 0 0 0
+  field SFNode appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [ "../worlds/textures/light_asphalt.jpg" ] 
+    }
+    metalness 1.0
+    roughness 0.0 
+  }  
+]
+{
+  SolidPipe {
+    radius 0.5
+    thickness 0.05
+    height 5 
+    translation IS translation
+    rotation IS rotation
+    appearance IS appearance
+  }
+}

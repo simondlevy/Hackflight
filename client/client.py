@@ -34,9 +34,9 @@ except Exception as e:
 
 BLUETOOTH_ADDRESSES = {
     'bolt': '64:B7:08:86:F2:86',
-    'bench': '64:B7:08:94:28:76',
-    'cf2': '64:B7:08:87:AD:76',
-    'generic': '64:B7:08:87:AD:AA',
+    'cf2': '64:B7:08:87:AD:AA',
+    'diy': '64:B7:08:93:E5:3A',
+    'teensy': '64:B7:08:93:E5:9E',
     'tinypico': 'D4:D4:DA:AA:2E:F2'
 }
 
@@ -200,21 +200,12 @@ def main():
 
             if gamepad.hovering:
 
-                client.send(MspParser.serialize_SET_SETPOINT_HOVER(
-                    gamepad.vx, gamepad.vy, gamepad.yawrate, gamepad.zdist))
+                client.send(MspParser.serialize_SET_SETPOINT(
+                    gamepad.vx, gamepad.vy, gamepad.yawrate, gamepad.thrust))
 
             else:
 
-                try:
-
-                    client.send(MspParser.serialize_SET_SETPOINT_RPYT(
-                        gamepad.roll,
-                        gamepad.pitch,
-                        gamepad.yaw,
-                        gamepad.thrust))
-
-                except Exception:
-                    break
+               client.send(MspParser.serialize_SET_IDLE())
 
             sleep(1 / UPDATE_RATE_HZ)
 

@@ -16,37 +16,98 @@
  */
 
 #include <BluetoothSerial.h> 
+#include <TinyPICO.h>
+
+static const char * BTNAME = "tinypico"; 
+
+static const uint8_t RX1_PIN = 4;
+static const uint8_t TX1_PIN = 14;
 
 static BluetoothSerial bts; 
 
-static const uint8_t TXD1 = 14;
-static const uint8_t RXD1 = 4;
+static const uint32_t BT_RX_TIMEOUT_MSEC = 1000;
 
-static HardwareSerial uarts(1);
+static TinyPICO tp = TinyPICO();
 
-static TaskHandle_t bt_to_uart_task_handle = NULL;
+static bool connected;
+
+static HardwareSerial uart1(1);
+
+class Task {
+
+    private:
+
+        typedef void (*fun_t)(void * obj);
+        
+        TaskHandle_t _handle;
+        fun_t _fun;
+        uint8_t _priority;
+
+    public:
+
+        Task(const fun_t fun, const uint8_t priority) 
+        {
+            _fun = fun;
+            _priority = priority;
+        }
+
+        void run() 
+        {
+            xTaskCreate(
+                    _fun, 
+                    "",      // name
+                    10000,   // stack size (bytes)
+                    NULL,    // data
+                    _priority,
+                    &_handle);
+        }
+
+};
+
+static void error(const char * sensorName)
+{
+    while (true) {
+        Serial.print("Failed to initialize ");
+        Serial.println(sensorName);
+        delay(500);
+    }
+}
+
+static void uart_begin(
+        HardwareSerial & uart, const uint8_t rx_pin, const uint8_t tx_pin)
+{
+    uart.begin(115200, SERIAL_8N1, rx_pin, tx_pin);
+}
 
 void bt_to_uart_task(void *) 
 {
+    static uint32_t last_received;
+
+    uart_begin(uart1, RX1_PIN, TX1_PIN);
+
     while (true) {
 
         while (bts.available()) {
+            last_received = millis();
+            connected = true;
             const uint8_t b = bts.read();
-            uarts.write(b);
+            uart1.write(b);
+        }
+
+        if (millis() - last_received > BT_RX_TIMEOUT_MSEC) {
+            connected = false;
         }
 
         vTaskDelay(1);
     }
 }
 
-static TaskHandle_t uart_to_bt_task_handle = NULL;
-
 void uart_to_bt_task(void *) 
 {
     while (true) {
 
-        while (uarts.available()) {
-            const uint8_t b = uarts.read();
+        while (uart1.available()) {
+            const uint8_t b = uart1.read();
             bts.write(b);
         }
 
@@ -54,33 +115,37 @@ void uart_to_bt_task(void *)
     }
 }
 
+void blink_task(void *) 
+{
+    while (true) {
+
+        tp.DotStar_SetPixelColor(0, 64, 0);
+
+        vTaskDelay(500);
+
+        if (!connected) {
+            tp.DotStar_SetPixelColor(0, 0, 0);
+            vTaskDelay(500);
+        }
+    }
+}
 
 void setup() 
 {
-    uarts.begin(115200, SERIAL_8N1, RXD1, TXD1);
+    Serial.begin(115200);
 
-    bts.begin("Hackflight"); 
+    bts.begin(BTNAME);
 
-    xTaskCreate(
-            bt_to_uart_task, 
-            "bt_to_uart_task", 
-            10000,             // Stack size (bytes)
-            NULL,        
-            1,                 // Priority
-            &bt_to_uart_task_handle);
+    static Task task1 = Task(bt_to_uart_task, 1);
+    task1.run();
 
+    static Task task2 = Task(uart_to_bt_task, 1);
+    task2.run();
 
-    xTaskCreate(
-            uart_to_bt_task, 
-            "uart_to_bt_task", 
-            10000,             // Stack size (bytes)
-            NULL,        
-            1,                 // Priority
-            &uart_to_bt_task_handle);
+    static Task task3 = Task(blink_task, 2);
+    task3.run();
 }
 
 void loop()
 {
 }
-
-

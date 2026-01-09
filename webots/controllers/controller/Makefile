@@ -12,70 +12,45 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# TeNNLab framework stuff ----------------------------------------------------
+# Command-line variables; e.g. make run world=maze ---------------------------
+world = simple
+logfile = log.csv
+# ----------------------------------------------------------------------------
 
-include ../../../snn_path.makefile
+EXE = $(shell basename "`pwd`")
 
-NET = $(EMBDIR)/examples/difference/difference.txt
-
-VIZ_DIR = $(HOME)/Desktop/framework/viz
-VIZ_PORT = 8100
-
-# -----------------------------------------------------------------------------
+SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-SRCDIR = ../../../src
-INCLUDE = -I$(SRCDIR)
+SRC_DIR = ../../../src
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR)
 
-NAME = controller
+LIBRARIES = -L/usr/lib/x86_64-linux-gnu
 
 CXX_SOURCES = main.cpp
 
-all: $(NAME)
+FILES_TO_REMOVE += *.csv
+
+all: $(EXE)
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
 
 VERBOSE = 1
 
-runstandard:
-	cp ../../plugins/physics/standard/libstandard.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+run:
+	webots ../../worlds/$(world).wbt &
+	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world) \
+		$(logfile)
 
-runhaskell:
-	cp ../../plugins/physics/haskell/libhaskell.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
 
-runsnn:
-	cp ../../plugins/physics/snn/libsnn.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME) &
-	sleep 1
-	cd $(VIZ_DIR); \
- 	love . -i '{"source":"request","port":$(VIZ_PORT),"host":"localhost"}' \
-     	-n $(NET) --set_num_screen_shot 0 --use_name_neuron \
-		'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2","5":"O","6":"S2"}' \
-		--set_font_size 16 \
-		> /dev/null
-
-runplank:
-	cp ../../plugins/physics/plank/libplank.so \
-		../../plugins/physics/__custom__/lib__custom__.so
-	webots ../../worlds/simple.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(NAME)
+edit:
+	vim main.cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
 WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
-
-edit:
-	vim main.cpp
 

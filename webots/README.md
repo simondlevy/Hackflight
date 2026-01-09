@@ -16,11 +16,11 @@ on your computer.
 3. From the hackflight main directory, do the following:
 
 ```
-cd webots/plugins/physics/standard
+cd webots/plugins/physics/simple
 make
 cd ../../../controllers/controller
 make
-make runstandard
+make run
 ```
 
 If you have a game controller or R/C transmitter with adapter dongle, you can
@@ -46,12 +46,12 @@ in which a faster update rate can slow down the simulation.  Fortunately, Webots
 in which you can replace Webots' built-in physics with a physics model
 of your own.   The Hackflight simulator exploits this feature of Webots,
 using a
-[dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/dynamics.hpp)
-based on the equestions
-presented in this [paper](https://infoscience.epfl.ch/record/97532/files/325.pdf).
-The webots update step represents a slow, outer loop, in which is embeded
-a faster control loop, which in turn embeds an even faster dynamics loop.
-The following figure illustrates this arrangement, using a traditional
+[dynamics model](https://github.com/simondlevy/Hackflight/blob/master/src/simulator/dynamics.hpp)
+based on the equations presented in this
+[paper](https://infoscience.epfl.ch/record/97532/files/325.pdf).  The webots
+update step represents a slow, outer loop, in which is embeded a faster control
+loop, which in turn embeds an even faster dynamics loop.  The following figure
+illustrates this arrangement, using a traditional
 [cascade-control](https://controlguru.com/the-cascade-control-architecture/)
 diagram:
 

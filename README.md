@@ -38,7 +38,7 @@ By using header-only C++ classes whenever possible, avoiding C-style macros and
 and relying on existing Arduino libraries for sensors and actuators,
 Hackflight supports a [composable](https://www.progress.com/blogs/what-composability-why-should-you-care) 
 approach to taming the complexity of flight control. The Hackflight [codebase](src/) is
-under 4,000 lines of code.
+around 3,000 lines of code.
 
 # Hardware
 
@@ -52,11 +52,6 @@ remote control and logging.
 
 For flight simulation, Hackflight uses [Webots](https://cyberbotics.com/),
 a free, open-source robotics simulator. Click [here](webots) to get started.
-
-# Haskell support
-
-If you [love Haskell](https://koerbitz.me/posts/Why-I-love-Haskell.html) as much
-as I do and want to see how it can be used for flight control, click [here](haskell).
 
 # Citing Hackflight
 

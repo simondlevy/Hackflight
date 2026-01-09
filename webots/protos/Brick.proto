@@ -1,0 +1,25 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/solids/protos/SolidBox.proto"
+
+PROTO Brick [
+  field SFString name "brick"
+  field SFVec3f size 0.1 0.1 0.5
+  field SFVec3f translation 0 0 0.5
+  field SFRotation rotation 0.7071067811865476 0 0.7071067811865476 3.14159
+  field SFNode appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [ "../worlds/textures/gray_brick_wall.jpg" ] 
+    }
+    metalness 0 roughness 0.5 
+  }  
+]
+{
+  SolidBox {
+    name IS name
+    size IS size
+    translation IS translation
+    rotation IS rotation
+    appearance IS appearance
+  }
+}

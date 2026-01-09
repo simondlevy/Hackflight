@@ -1,4 +1,3 @@
-*.txt
 build/
 controller
 *.csv

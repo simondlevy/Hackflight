@@ -1,0 +1,61 @@
+{
+  "STATE": 
+  [{"ID": 100},
+   {"comment": "Vehicle state sans X,Y"},
+   {"dx":     "float"},
+   {"dy":     "float"},
+   {"z":      "float"},
+   {"dz":     "float"},
+   {"phi":    "float"},
+   {"dphi":   "float"},
+   {"theta":  "float"},
+   {"dtheta": "float"},
+   {"psi":    "float"},
+   {"dpsi":   "float"}
+  ],
+
+  "SPIKES": 
+  [{"ID": 101},
+   {"comment": "Aribtrary max of 16"},
+   {"n0":     "byte"},
+   {"n1":     "byte"},
+   {"n2":     "byte"},
+   {"n3":     "byte"},
+   {"n4":     "byte"},
+   {"n5":     "byte"},
+   {"n6":     "byte"},
+   {"n7":     "byte"},
+   {"n8":     "byte"},
+   {"n9":     "byte"},
+   {"n10":    "byte"},
+   {"n11":    "byte"},
+   {"n12":    "byte"},
+   {"n13":    "byte"},
+   {"n14":    "byte"},
+   {"n15":    "byte"}
+  ],
+
+  "SET_ARMING": 
+  [{"ID": 200},
+   {"comment": "Dis/arm"},
+   {"arm":    "byte"}
+  ],
+
+  "SET_SETPOINT_RPYT": 
+  [{"ID": 201},
+   {"comment": "Thrust is ushort in original"},
+   {"roll":    "float"},
+   {"pitch":   "float"},
+   {"yaw":     "float"},
+   {"thrust":  "float"}
+  ],
+
+  "SET_SETPOINT_HOVER": 
+  [{"ID": 202},
+   {"comment": "Hover mode"},
+   {"vx":        "float"},
+   {"vy":        "float"},
+   {"yawrate":   "float"},
+   {"zdistance": "float"}
+  ]
+}

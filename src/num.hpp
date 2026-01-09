@@ -21,85 +21,18 @@
 #include <string.h>
 
 #include <datatypes.h>
-#include <m_pi.h>
 
 class Num {
 
     public:
 
         static constexpr float RAD2DEG = 180.0f / M_PI;
-
         static constexpr float DEG2RAD = M_PI / 180.0f;
 
-        /* Half precision floating point **********************************************
-         *
-         * To not use the GCC implementation, uint16_t is used to carry fp16 values
-         *
-         * FP16 or Half precision floating points is specified by IEEE 754 as binary 16.
-         * (float is specified as binary 32). This implementation is NOT GUARANTEED to
-         * be conform to the ieee 754 specification, it is 'just' good enough for the
-         * Crazyflie usage. For more info about fp16 see
-         * http://en.wikipedia.org/wiki/Half-precision_floating-point_format
-         *
-         * The current implementation has the following limitation:
-         *  * No subnormalized number generation
-         *  * Rounding seems to give at least 11 bits precision
-         *  * Faster and smaller than the GCC implementation
-         */
-
-        static uint16_t single2half(float number)
+        static float fconstrain(
+                float value, const float minVal, const float maxVal)
         {
-            uint32_t num = 0;
-
-            memcpy(&num, &number, 4);
-
-            auto s = num >> 31;
-
-            auto e = (num >> 23)&0x0FF;
-
-            return 
-
-                (e==255) && (num&0x007fffff) ?  0x7E00 : // NaN
-
-                e>(127+15) ? s?0xFC00:0x7C00 :  //+/- inf
-
-                e<(127-15) ? 0 : // Don't generate subnormalised representation
-
-                (s<<15) | ((e-127+15)<<10) | (((num>>13)&0x3FF)+((num>>12)&0x01));
-        }
-
-        static float half2single(uint16_t number)
-        {
-            uint32_t s = number>>15;
-
-            uint32_t e = (number>>10)&0x01F;
-
-            //All binary16 can be mapped in a binary32
-            if (e==0) {
-                e=15-127;
-            }
-
-            auto fp32 = 
-
-                e != 0x1F ? (s<<31) | ((e+127-15)<<23) | ((number&0x3ff)<<13) :
-
-                number&0x03FF ?  0x7FC00000 : // NaN
-
-                s?0xFF800000:0x7F800000;  //+/- inf
-
-            float result = 0;
-
-            memcpy(&result, &fp32, 4);
-
-            return result;
-        }
-
-        static uint16_t limitUint16(int32_t value)
-        {
-            return (uint16_t)(
-                    value > UINT16_MAX  ? UINT16_MAX :
-                    value < 0 ? 0 :
-                    value);
+            return fminf(maxVal, fmaxf(minVal,value));
         }
 
         static float fconstrain(const float val, const float maxabs)
@@ -107,9 +40,9 @@ class Num {
             return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
         }
 
-        // https://en.wikipedia.org/wiki/
         //  Conversion_between_quaternions_and_Euler_angles
-        static void euler2quat(const axis3_t & a, axis4_t & q)
+
+        static void euler2quat(const axis3_t & a, quaternion_t & q)
         {
             // Abbreviations for the various angular functions
 
@@ -125,9 +58,32 @@ class Num {
             q.y = cr * sp * cy + sr * cp * sy;
             q.z = cr * cp * sy - sr * sp * cy;
         }
-        static float fconstrain(float value, const float minVal, const float maxVal)
+
+        static void quat2euler(const quaternion_t & q, axis3_t & a)
         {
-            return fminf(maxVal, fmaxf(minVal,value));
+            a.x = RAD2DEG * atan2f(2*(q.y*q.z+q.w* q.x) ,
+                    q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z);
+
+            a.y = RAD2DEG * asinf(-2*(q.x*q.z - q.w*q.y));
+
+
+            a.z = RAD2DEG * atan2f(2*(q.x*q.y+q.w* q.z),
+                    q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z);
+        }
+
+        static float cap_angle(float angle) 
+        {
+            float result = angle;
+
+            while (result > 180.0f) {
+                result -= 360.0f;
+            }
+
+            while (result < -180.0f) {
+                result += 360.0f;
+            }
+
+            return result;
         }
 
         static float deadband(float value, const float threshold)
@@ -154,4 +110,24 @@ class Num {
                 (newmax - newmin) + newmin;
         }
 
-}; // class Num
+        static float byte2float(const uint8_t val, const float min, const float max)
+        {
+            return min + (float)val / 255 * (max - min);
+        }
+
+        static float byte2float(const uint8_t val, const float max)
+        {
+            return -max + (float)val / 255 * 2 * max;
+        }
+
+        static uint8_t float2byte(const float val, const float min, const float max)
+        {
+            return (uint8_t)(255 * (val - min) / (max - min));
+        }
+
+        static uint8_t float2byte(const float val, const float max)
+        {
+            return (uint8_t)(255 * (val + max) / (2*max));
+        }
+
+};

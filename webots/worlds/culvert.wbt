@@ -1,0 +1,574 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/SimpleTree.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
+EXTERNPROTO "../protos/Pipe.proto"
+EXTERNPROTO "../protos/Brick.proto"
+EXTERNPROTO "../protos/DiyQuad.proto"
+
+WorldInfo {
+  title "Hackflight"
+  physics "experimental"
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.017811667834530715 -0.9985736341425941 0.05033330591372672 5.899498367038858
+  position -9.747321728038077 -0.30587707207325604 3.316139995717208
+  follow "DiyQuad"
+}
+DEF diyquad DiyQuad {
+  translation -2.78143 0.000765464 0.013756
+  rotation 0.5502315303325688 0.6058370816373146 0.5746361401278736 9.894336960962855e-07
+}
+TexturedBackground {
+  texture "dusk"
+  luminosity 0
+}
+TexturedBackgroundLight {
+}
+DEF GROUND Solid {
+  translation -2.5 -3 -0.21
+  children [
+    DEF GROUND_SHAPE Group {
+      children [
+        Pose {
+          children [
+            Shape {
+              appearance Grass {
+                type "mossy"
+                textureTransform TextureTransform {
+                  scale 8 8
+                }
+              }
+              geometry ElevationGrid {
+                height [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1.05, 1.03, 1, 1.04, 1, 1, 1.03, 1.15, 1.04, 1.06, 1, 1, 1.08, 1.03, 1.01, 1.02, 1, 0, 0, 0, 0, 0, 0
+                ]
+                xDimension 6
+                yDimension 6
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  name "cover"
+  boundingObject USE GROUND_SHAPE
+}
+DEF GROUND Solid {
+  translation -38.52 -48.25 0
+  children [
+    DEF GROUND_SHAPE Group {
+      children [
+        Pose {
+          children [
+            Shape {
+              appearance Grass {
+                type "mossy"
+                textureTransform TextureTransform {
+                  scale 80 80
+                }
+              }
+              geometry ElevationGrid {
+                height [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.03, 0.07, 0.09, 0.04, 0.07, 0, 0, 0.07, 0.02, 0.1, 0.06, 0.06, 0.02, 0, 0, 0.04, 0.03, 0.05, 0.02, 0.07, 0.01, 0, 0, 0.1, 0.02, 0.04, 0.03, 0.07, 0.05, 0, 0, 0.1, 0.06, 0.01, 0.02, 0.06, 0.02, 0, 0, 0.09, 0.02, 0.02, 0.06, 0.09, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                ]
+                xDimension 100
+                yDimension 100
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  name "floor"
+  boundingObject USE GROUND_SHAPE
+}
+Pipe {
+  translation -0.04 0 0.25
+  rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
+  appearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "../worlds/textures/light_asphalt.jpg"
+      ]
+    }
+    roughness 1
+  }
+}
+DEF STILL_WATER Fluid {
+  translation 0.2 -0.09 -0.01
+  children [
+    DEF S Shape {
+      appearance DEF WATER_APPEARANCE PBRAppearance {
+        baseColor 0 0 0.2
+        transparency 0.5
+        roughness 0.001
+        metalness 0
+      }
+      geometry Box {
+        size 5.5 1.2 0.1
+      }
+    }
+  ]
+  name "puddle"
+  boundingObject USE S
+}
+Brick {
+  name " brick1"
+  size 0.05 1.1 0.05
+  translation -2.5 1.03 0.3
+}
+Brick {
+  name " brick2"
+  size 0.05 1.1 0.05
+  translation -2.5 -1.03 0.3
+}
+Brick {
+  name " brick3"
+  size 0.05 1.05 0.05
+  translation -2.5 1.01 0.35
+}
+Brick {
+  name " brick4"
+  size 0.05 1.05 0.05
+  translation -2.5 -0.99 0.35
+}
+Brick {
+  name " brick5"
+  size 0.05 1 0.05
+  translation -2.5 0.96 0.4
+}
+Brick {
+  name " brick6"
+  size 0.05 1 0.05
+  translation -2.5 -0.94 0.4
+}
+Brick {
+  name " brick7"
+  size 0.05 0.95 0.05
+  translation -2.5 0.92 0.45
+}
+Brick {
+  name " brick8"
+  size 0.05 0.95 0.05
+  translation -2.5 -0.92 0.45
+}
+Brick {
+  name " brick9"
+  size 0.05 0.9 0.05
+  translation -2.5 0.866 0.5
+}
+Brick {
+  name " brick10"
+  size 0.05 0.9 0.05
+  translation -2.5 -0.864 0.500001
+}
+Brick {
+  name " brick11"
+  size 0.05 0.88 0.05
+  translation -2.5 0.816 0.55
+}
+Brick {
+  name " brick12"
+  size 0.05 0.88 0.05
+  translation -2.5 -0.814 0.55
+}
+Brick {
+  name " brick13"
+  size 0.05 0.9 0.05
+  translation -2.5 0.77 0.6
+}
+Brick {
+  name " brick14"
+  size 0.05 0.9 0.05
+  translation -2.5 -0.78 0.6
+}
+Brick {
+  name " brick15"
+  size 0.05 0.9 0.05
+  translation -2.5 0.71 0.65
+}
+Brick {
+  name " brick16"
+  size 0.05 0.9 0.05
+  translation -2.5 -0.71 0.65
+}
+Brick {
+  name " brick17"
+  size 0.05 0.95 0.05
+  translation -2.5 0.6375 0.7
+}
+Brick {
+  name " brick18"
+  size 0.05 0.95 0.05
+  translation -2.5 -0.6225 0.7
+}
+Brick {
+  name " brick19"
+  size 0.05 1.1 0.05
+  translation -2.5 0.55 0.75
+}
+Brick {
+  name " brick20"
+  size 0.05 2 0.05
+  translation -2.5 0.05 0.8
+}
+Brick {
+  name " brick21"
+  size 0.05 1.05 0.05
+  translation -2.5 -0.52 0.75
+}
+Brick {
+  name " brick22"
+  size 0.05 1.35 0.05
+  translation -2.5 1.09 0.0499998
+}
+Brick {
+  name " brick23"
+  size 0.05 1.35 0.05
+  translation -2.5 -1.11 0.0500041
+}
+Brick {
+  name " brick24)"
+  size 0.05 1.4 0.05
+  translation -2.5 1.09 -6.75491e-07
+}
+Brick {
+  name " brick25"
+  size 0.05 1.4 0.05
+  translation -2.5 -1.14 3.50888e-06
+}
+Brick {
+  name " brick26"
+  size 0.05 1.3 0.05
+  translation -2.5 1.09 0.0999996
+}
+Brick {
+  name " brick28"
+  size 0.05 1.3 0.05
+  translation -2.5 -1.13 0.100001
+}
+Brick {
+  name " brick29"
+  size 0.05 1.25 0.05
+  translation -2.5 1.1 0.15
+}
+Brick {
+  name " brick30"
+  size 0.05 1.25 0.05
+  translation -2.5 -1.11 0.15
+}
+Brick {
+  name " brick31"
+  size 0.05 1.2 0.05
+  translation -2.5 1.06 0.2
+}
+Brick {
+  name " brick32"
+  size 0.05 1.2 0.05
+  translation -2.5 -1.11 0.200001
+}
+Brick {
+  name " brick33"
+  size 0.05 1.15 0.05
+  translation -2.5 1.03 0.25
+}
+Brick {
+  name " brick34"
+  size 0.05 1.15 0.05
+  translation -2.5 -1.07 0.250001
+}
+Brick {
+  name " brick35"
+  size 0.05 1.1 0.05
+  translation 2.5 1.03 0.3
+}
+Brick {
+  name " brick36"
+  size 0.05 1.1 0.05
+  translation 2.5 -1.03 0.3
+}
+Brick {
+  name " brick37"
+  size 0.05 1.05 0.05
+  translation 2.5 1.01 0.35
+}
+Brick {
+  name " brick38"
+  size 0.05 1.05 0.05
+  translation 2.5 -0.99 0.35
+}
+Brick {
+  name " brick39"
+  size 0.05 1 0.05
+  translation 2.5 0.96 0.4
+}
+Brick {
+  name " brick40"
+  size 0.05 1 0.05
+  translation 2.5 -0.94 0.4
+}
+Brick {
+  name " brick41"
+  size 0.05 0.95 0.05
+  translation 2.5 0.92 0.45
+}
+Brick {
+  name " brick42"
+  size 0.05 0.95 0.05
+  translation 2.5 -0.92 0.45
+}
+Brick {
+  name " brick43"
+  size 0.05 0.9 0.05
+  translation 2.5 0.866 0.5
+}
+Brick {
+  name " brick44"
+  size 0.05 0.9 0.05
+  translation 2.5 -0.864 0.500001
+}
+Brick {
+  name " brick45"
+  size 0.05 0.88 0.05
+  translation 2.5 0.816 0.55
+}
+Brick {
+  name " brick46"
+  size 0.05 0.88 0.05
+  translation 2.5 -0.814 0.55
+}
+Brick {
+  name " brick47"
+  size 0.05 0.9 0.05
+  translation 2.5 0.77 0.6
+}
+Brick {
+  name " brick48"
+  size 0.05 0.9 0.05
+  translation 2.5 -0.78 0.6
+}
+Brick {
+  name " brick49"
+  size 0.05 0.9 0.05
+  translation 2.5 0.71 0.65
+}
+Brick {
+  name " brick50"
+  size 0.05 0.9 0.05
+  translation 2.5 -0.71 0.65
+}
+Brick {
+  name " brick51"
+  size 0.05 0.95 0.05
+  translation 2.5 0.6375 0.7
+}
+Brick {
+  name " brick52"
+  size 0.05 0.95 0.05
+  translation 2.5 -0.6225 0.7
+}
+Brick {
+  name " brick53"
+  size 0.05 1 0.05
+  translation 2.5 0.5 0.75
+}
+Brick {
+  name " brick54"
+  size 0.05 1.9 0.05
+  translation 2.5 0.01 0.8
+}
+Brick {
+  name " brick55"
+  size 0.05 1 0.05
+  translation 2.5 -0.5 0.75
+}
+Brick {
+  name " brick56"
+  size 0.05 1.35 0.05
+  translation 2.5 1.09 0.0499998
+}
+Brick {
+  name " brick57"
+  size 0.05 1.35 0.05
+  translation 2.5 -1.11 0.0500041
+}
+Brick {
+  name " brick58"
+  size 0.05 1.4 0.05
+  translation 2.5 1.09 -6.75491e-07
+}
+Brick {
+  name " brick59"
+  size 0.05 1.4 0.05
+  translation 2.5 -1.14 3.50888e-06
+}
+Brick {
+  name " brick60"
+  size 0.05 1.3 0.05
+  translation 2.5 1.09 0.0999996
+}
+Brick {
+  name " brick61"
+  size 0.05 1.3 0.05
+  translation 2.5 -1.13 0.100001
+}
+Brick {
+  name " brick62"
+  size 0.05 1.25 0.05
+  translation 2.5 1.1 0.15
+}
+Brick {
+  name " brick63"
+  size 0.05 1.25 0.05
+  translation 2.5 -1.11 0.15
+}
+Brick {
+  name " brick64"
+  size 0.05 1.2 0.05
+  translation 2.5 1.06 0.2
+}
+Brick {
+  name " brick65"
+  size 0.05 1.2 0.05
+  translation 2.5 -1.11 0.200001
+}
+Brick {
+  name " brick66"
+  size 0.05 1.15 0.05
+  translation 2.5 1.03 0.25
+}
+Brick {
+  name " brick67"
+  size 0.05 1.15 0.05
+  translation 2.5 -1.07 0.250001
+}
+SimpleTree {
+  translation 1 3 0
+  name "tree1"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation 1 2 0
+  name "tree1(1)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -1 2.6 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(2)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -3 2.5 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(3)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -3 -1.9 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(4)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+SimpleTree {
+  translation -1 -2 0
+  rotation 0 0.8944271909999159 0.4472135954999579 0
+  name "tree1(5)"
+  height 2
+  radius 1
+  enableBoundingObject FALSE
+}
+Rock {
+  translation -3.22835 -2.20204 0
+  rotation 0 0 1 -2.8628553071795864
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.4 1.4 0
+  rotation 0 0 1 -2.8628553071795864
+  name "rock(8)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.44021 -1.46174 0
+  rotation 0 0 1 -2
+  name "rock(1)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.9 1 0
+  rotation 0 0 1 -2
+  name "rock(7)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.11335 -1.36821 0
+  rotation 0 0 1 -2.8628553071795864
+  name "rock(2)"
+  type "flat"
+  scale 0.25
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.62092 -0.921003 0
+  rotation 0 0 1 1
+  name "rock(3)"
+  type "flat"
+  scale 0.16
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.57045 -0.583421 0
+  rotation 0 0 1 1.4
+  name "rock(4)"
+  type "flat"
+  scale 0.2
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.57045 -0.583421 0
+  name "rock(5)"
+  type "flat"
+  scale 0.22
+  color 0.4 0.35 0.3
+}
+Rock {
+  translation -3.9705 1.33658 0
+  name "rock(6)"
+  type "flat"
+  scale 0.22
+  color 0.4 0.35 0.3
+}
