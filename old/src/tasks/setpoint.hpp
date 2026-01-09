@@ -159,7 +159,7 @@ class SetpointTask {
 
         void decodeRpytSetpoint(const float thrust, setpoint_t *setpoint)
         {
-
+            /*
             static bool thrustLocked;
 
             if (getActivePriority() == 0) {
@@ -176,10 +176,11 @@ class SetpointTask {
                 setpoint->demands.thrust = 0;
             } else {
                 setpoint->demands.thrust = fminf(rawThrust, MAX_THRUST);
-            }
+            }*/
 
             setpoint->hovering = false;
 
+            setpoint->demands.thrust = 0;
             setpoint->demands.roll = 0;
             setpoint->demands.pitch = 0;
             setpoint->demands.yaw = 0;
