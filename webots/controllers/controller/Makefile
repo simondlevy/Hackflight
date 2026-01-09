@@ -30,7 +30,7 @@ INCLUDE = -I$(SRCDIR)
 
 NAME = controller
 
-CXX_SOURCES = controller.cpp
+CXX_SOURCES = main.cpp
 
 all: $(NAME)
 
