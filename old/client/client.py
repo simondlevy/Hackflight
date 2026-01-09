@@ -35,10 +35,14 @@ except Exception as e:
 BLUETOOTH_ADDRESSES = {
     'bolt': '64:B7:08:86:F2:86',
     'cf2': '64:B7:08:87:AD:AA',
-    'teensy': '64:B7:08:86:F2:AE'
+    'diy': '64:B7:08:93:E5:3A',
+    'teensy': '64:B7:08:93:E5:9E',
+    'tinypico': 'D4:D4:DA:AA:2E:F2'
 }
 
 BLUETOOTH_PORT = 1
+
+SOCKET_TIMEOUT = 1
 
 UPDATE_RATE_HZ = 100
 
@@ -77,8 +81,8 @@ class LoggingParser(MspParser):
             try:
                 self.spike_viz_client.send(msg.encode())
 
-            except Exception as e:
-                 pass
+            except Exception:
+                pass
 
 
 def logging_threadfun(parser, visualize_spikes):
@@ -109,7 +113,7 @@ def logging_threadfun(parser, visualize_spikes):
         except Exception as e:
             print('Failed to receiving logging data: ' + str(e))
             parser.running = False
-            return
+            break
 
 
 def connect_to_server(name, port):
@@ -131,6 +135,7 @@ def connect_to_server(name, port):
 
             try:
                 client.connect((addr, port))
+                client.settimeout(SOCKET_TIMEOUT)
                 print(' connected')
                 break
 
@@ -165,8 +170,6 @@ def main():
 
     client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
 
-    logging = [True]
-
     parser = LoggingParser(client, args.log_state)
     thread = Thread(target=logging_threadfun,
                     args=(parser, args.visualize_spikes))
@@ -182,7 +185,7 @@ def main():
 
     gamepad = Gamepad()
 
-    while logging[0] and gamepad.running:
+    while gamepad.running:
 
         try:
 
@@ -204,7 +207,7 @@ def main():
             sleep(1 / UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
-            logging[0] = False
+            break
 
 
 main()
