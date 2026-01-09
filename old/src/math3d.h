@@ -29,8 +29,6 @@ SOFTWARE.
 #include <stdbool.h>
 #include <stddef.h>
 
-#include <m_pi.h>
-
 // ----------------------------- scalars --------------------------------
 
 static inline float fsqr(float x) { return x * x; }
