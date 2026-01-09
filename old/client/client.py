@@ -195,6 +195,9 @@ def main():
                 client.send(MspParser.serialize_SET_ARMING(gamepad.armed))
                 was_armed = gamepad.armed
 
+            if not gamepad.armed:
+                gamepad.hovering = False
+
             if gamepad.hovering:
 
                 client.send(MspParser.serialize_SET_SETPOINT(
