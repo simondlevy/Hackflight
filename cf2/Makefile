@@ -27,9 +27,9 @@ bolt: $(DEPS) bolt11/*.*
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-cf2: $(DEPS) crazyflie2/*.*
-	cp crazyflie2/motors.cpp ./__motors__.cpp
-	cp crazyflie2/uart_pins.h ./__uart_pins__.h
+cf2: $(DEPS) cf2/*.*
+	cp cf2/motors.cpp ./__motors__.cpp
+	cp cf2/uart_pins.h ./__uart_pins__.h
 	arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \
@@ -46,7 +46,7 @@ big: $(DEPS) biggy/*.*
 		--fqbn $(FQBN) $(SKETCH).ino
 
 $(MSGS): ../msppg/messages.json
-	cd ../msppg; make install; cd ../crazyflie
+	cd ../msppg; make install; cd ../cf2
 	cp ../msppg/messages.h $(MSGS)
 
 lowres_config:
@@ -69,4 +69,4 @@ listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
 
 edit:
-	vim crazyflie.ino
+	vim cf2.ino
