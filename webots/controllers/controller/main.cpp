@@ -27,8 +27,8 @@
 #include <webots/emitter.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
-#include <webots/motor.h>
-#include <webots/robot.h>
+
+#include "../common.hpp"
 
 class Simulator {
 
@@ -139,10 +139,7 @@ class Simulator {
 
             wb_keyboard_enable(_timestep);
 
-            animateMotor("motor1", -1);
-            animateMotor("motor2", +1);
-            animateMotor("motor3", +1);
-            animateMotor("motor4", -1);
+            startMotors();
         }
 
         joystick_t getJoystickInfo() 
@@ -201,15 +198,6 @@ class Simulator {
 
                 printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
             }
-        }
-
-        static void animateMotor(const char * name, const float direction)
-        {
-            auto motor = wb_robot_get_device(name);
-
-            wb_motor_set_position(motor, INFINITY);
-
-            wb_motor_set_velocity(motor, direction * 60);
         }
 
         void getSimInfoFromJoystick(siminfo_t & siminfo)
