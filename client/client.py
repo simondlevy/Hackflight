@@ -205,7 +205,7 @@ def main():
 
             else:
 
-               client.send(MspParser.serialize_SET_IDLE())
+                client.send(MspParser.serialize_SET_IDLE())
 
             sleep(1 / UPDATE_RATE_HZ)
 

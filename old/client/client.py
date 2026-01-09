@@ -185,7 +185,7 @@ def main():
 
     gamepad = Gamepad()
 
-    while gamepad.running:
+    while gamepad.connected:
 
         try:
 

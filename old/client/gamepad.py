@@ -43,7 +43,7 @@ class Gamepad:
         self.armed = False
         self.hovering = False
         self.debug = debug
-        self.running = True
+        self.connected = True
         self.vx = 0
         self.vy = 0
         self.yawrate = 0
@@ -80,7 +80,7 @@ class Gamepad:
         arming_prev = 0
         hover_prev = 0
 
-        while self.running:
+        while self.connected:
 
             try:
 
@@ -119,11 +119,11 @@ class Gamepad:
 
             except inputs.UnpluggedError:
                 print('No gamepad detected')
-                self.running = False
+                self.connected = False
 
             except OSError:
                 print('Gamepad unplugged')
-                self.running = False
+                self.connected = False
 
     def scale(self, axval):
 
@@ -179,7 +179,7 @@ class Gamepad:
             sleep(1 / self.UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
-            self.running = False
+            self.connected = False
 
 
 if __name__ == '__main__':
