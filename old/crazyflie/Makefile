@@ -19,8 +19,8 @@ bolt: crazyflie.ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 		--build-path ./build \
 		--fqbn $(FQBN) crazyflie.ino
 
-$(SRC)/msp/__messages__.h: ../msppg/messages.json
-	cd ../msppg; make install; cd ../crazyflie
+$(SRC)/msp/__messages__.h: ../../msppg/messages.json
+	cd ../../msppg; make install; cd ../old/crazyflie
 
 standard_config:
 	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp

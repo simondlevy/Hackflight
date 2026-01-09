@@ -1,6 +1,7 @@
 install: messages.json msppg.py
 	python3 msppg.py
 	cp msp.py ../client/
+	cp msp.py ../old/client/
 
 edit:
 	vim msppg.py

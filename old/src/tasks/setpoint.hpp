@@ -121,12 +121,13 @@ class SetpointTask {
                             _safety->requestArming((bool)parser.getByte(0));
                             break;
 
-                        case MSP_SET_SETPOINT_RPYT:
-                            decodeRpytSetpoint(parser.getFloat(0), &setpoint);
+                        case MSP_SET_IDLE:
+                            decodeSetpoint(false, 0, 0, 0, 0, &setpoint);
                             break;
 
-                        case MSP_SET_SETPOINT_HOVER:
-                            decodeHoverSetpoint(
+                        case MSP_SET_SETPOINT:
+                            decodeSetpoint(
+                                    true,
                                     parser.getFloat(0),
                                     parser.getFloat(1),
                                     parser.getFloat(2),
@@ -157,45 +158,15 @@ class SetpointTask {
             xQueueOverwrite(priorityQueue, &priority);
         }
 
-        void decodeRpytSetpoint(const float thrust, setpoint_t *setpoint)
-        {
-            /*
-            static bool thrustLocked;
-
-            if (getActivePriority() == 0) {
-                thrustLocked = true;
-            }
-
-            if (thrust == 0) {
-                thrustLocked = false;
-            }
-
-            uint16_t rawThrust = thrust;
-
-            if (thrustLocked || (rawThrust < MIN_THRUST)) {
-                setpoint->demands.thrust = 0;
-            } else {
-                setpoint->demands.thrust = fminf(rawThrust, MAX_THRUST);
-            }*/
-
-            setpoint->hovering = false;
-
-            setpoint->demands.thrust = 0;
-            setpoint->demands.roll = 0;
-            setpoint->demands.pitch = 0;
-            setpoint->demands.yaw = 0;
-
-            setSetpoint(setpoint, PRIORITY_HIGH);
-        }
-
-        void decodeHoverSetpoint(
+        void decodeSetpoint(
+                const bool hovering,
                 const float vx,
                 const float vy,
                 const float yawrate,
                 const float zdistance,
                 setpoint_t *setpoint)
         {
-            setpoint->hovering = true;
+            setpoint->hovering = hovering;
 
             setpoint->demands.thrust = zdistance;
             setpoint->demands.yaw = yawrate;
