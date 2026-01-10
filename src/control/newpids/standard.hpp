@@ -29,21 +29,7 @@ class PidControl {
 
     public:
 
-        void runSlow(
-                const float dt,
-                const bool controlled,
-                const vehicleState_t & vehicleState,
-                const demands_t & demandsIn,
-                demands_t & demandsOut)
-        {
-                (void)dt;
-                (void) controlled;
-                (void)vehicleState;
-
-                memcpy(&demandsOut, &demandsIn, sizeof(demands_t));
-        }
-
-         void runFast(
+         void run(
                 const float dt,
                 const bool controlled,
                 const vehicleState_t & vehicleState,
