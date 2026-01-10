@@ -76,8 +76,13 @@ class SimInnerLoop {
 
                     demands_t demands = {};
 
-                    _closedLoopControl->run(1 / (float)PID_FAST_FREQ,
-                            controlled, state, setpoint, demands);
+                    _closedLoopControl->run(
+                            1 / (float)PID_FAST_FREQ,
+                            controlled,
+                            state,
+                            setpoint,
+                            LANDING_ALTITUDE_METERS,
+                            demands);
 
                     float motors[4] = {};
                     Mixer::mix(demands, motors);
@@ -95,6 +100,8 @@ class SimInnerLoop {
         }    
 
     private:
+
+        static constexpr float LANDING_ALTITUDE_METERS = 0.03;
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
