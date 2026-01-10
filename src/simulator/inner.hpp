@@ -74,13 +74,13 @@ class SimInnerLoop {
                 // Run fast PID control and mixer in middle loop --------------
                 for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
-                    demands_t fastDemands = {};
+                    demands_t demands = {};
 
                     _pidControl->run(1 / (float)PID_FAST_FREQ,
-                            controlled, state, setpoint, fastDemands);
+                            controlled, state, setpoint, demands);
 
                     float motors[4] = {};
-                    Mixer::mix(fastDemands, motors);
+                    Mixer::mix(demands, motors);
 
                     // Run dynamics in inner loop ----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
