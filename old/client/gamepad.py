@@ -186,6 +186,6 @@ if __name__ == '__main__':
 
     gamepad = Gamepad(True)
 
-    while gamepad.running:
+    while gamepad.connected:
 
         gamepad.step()
