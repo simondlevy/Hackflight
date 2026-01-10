@@ -33,10 +33,10 @@ class Gamepad:
     THRUST_DESCEND_MIN = 15000
     THRUST_DESCEND_DEC = 208
 
-    ZDIST_INIT = 0.4
-    ZDIST_MAX = 1.0
-    ZDIST_MIN = 0.2
-    ZDIST_INC = 0.01
+    ALTITUDE_INIT_M = 0.4
+    ALTITUDE_MAX_M = 1.0
+    ALTITUDE_MIN_M = 0.2
+    ALTITUDE_INC_MPS = 0.01
 
     def __init__(self, debug=False):
 
@@ -69,7 +69,7 @@ class Gamepad:
 
         self.descend_countdown = 0
 
-        self.zdist = self.ZDIST_INIT
+        self.zdist = self.ALTITUDE_INIT_M
 
         thread = Thread(target=self.threadfun, args=(self.gamepad_vals, ))
         thread.daemon = True
@@ -144,11 +144,12 @@ class Gamepad:
                 self.vy = self.scale(self.gamepad_vals[1])
                 self.yawrate = self.scale(self.gamepad_vals[3])
 
-                self.thrust = (
-                        -self.scale(self.gamepad_vals[0]) * self.ZDIST_INC)
+                self.thrust = (-self.scale(
+                    self.gamepad_vals[0]) * self.ALTITUDE_INC_MPS)
 
-                self.zdist = min(max(self.zdist + self.thrust, self.ZDIST_MIN),
-                                 self.ZDIST_MAX)
+                self.zdist = min(max(
+                    self.zdist + self.thrust, self.ALTITUDE_MIN_M),
+                                 self.ALTITUDE_MAX_M)
 
                 if self.debug:
                     print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
@@ -170,7 +171,7 @@ class Gamepad:
                                            if self.descend_countdown > 0
                                            else 0)
 
-                self.zdist = self.ZDIST_INIT
+                self.zdist = self.ALTITUDE_INIT_M
 
                 if self.debug:
                     print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'

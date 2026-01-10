@@ -43,12 +43,12 @@ class ManualSetpoint {
                         _altitude_target + setpoint.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
+            setpoint.thrust = _altitude_target;
+
             static float _yaw_angle_target;
 
             _yaw_angle_target = Num::cap_angle(
                     _yaw_angle_target + YAW_DEMAND_MAX * setpoint.yaw * dt);
-
-            setpoint.thrust = _altitude_target;
 
             setpoint.yaw = _yaw_angle_target;
         }
