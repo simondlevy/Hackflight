@@ -31,7 +31,7 @@ static dBodyID _robot;
 // Platform-independent simulator inner loop
 static SimInnerLoop _innerLoop;
 
-static PidControl _pidControl;
+static ClosedLoopControl _closedLoopControl;
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -47,7 +47,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robot, 0);
     }
 
-    _innerLoop.init(&_pidControl);
+    _innerLoop.init(&_closedLoopControl);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 

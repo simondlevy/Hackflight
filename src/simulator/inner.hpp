@@ -39,11 +39,11 @@ class SimInnerLoop {
 
     public:
 
-        void init(PidControl * pidControl)
+        void init(ClosedLoopControl * pidControl)
         {
-            _pidControl = pidControl;
+            _closedLoopControl = pidControl;
 
-            _pidControl->init();
+            _closedLoopControl->init();
         }
 
         pose_t step(const siminfo_t & siminfo)
@@ -76,7 +76,7 @@ class SimInnerLoop {
 
                     demands_t demands = {};
 
-                    _pidControl->run(1 / (float)PID_FAST_FREQ,
+                    _closedLoopControl->run(1 / (float)PID_FAST_FREQ,
                             controlled, state, setpoint, demands);
 
                     float motors[4] = {};
@@ -98,7 +98,7 @@ class SimInnerLoop {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
-        PidControl * _pidControl;
+        ClosedLoopControl * _closedLoopControl;
 
         static void report_fps()
         {

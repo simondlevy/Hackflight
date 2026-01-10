@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <serializer.hpp>
-
 #include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/pitchroll_angle.hpp>
@@ -25,8 +23,9 @@
 #include <control/pids/position.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
+#include <serializer.hpp>
 
-class PidControl {
+class ClosedLoopControl {
 
     public:
 
