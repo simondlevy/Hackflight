@@ -22,9 +22,9 @@ SIMSENSORS_DIR = $(HOME)/Desktop
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-NEWSRC_DIR = ../../../../newsrc
+SRC_DIR = ../../../../src
 
-INCLUDE = -I$(NEWSRC_DIR) -I$(NEWSRC_DIR)/newpid/slowfast -I$(SIMSENSORS_DIR) \
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/newpid/slowfast -I$(SIMSENSORS_DIR) \
 		  -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(ALL).cpp

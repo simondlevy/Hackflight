@@ -23,8 +23,8 @@ SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-NEWSRC_DIR = ../../../newsrc
-INCLUDE = -I$(NEWSRC_DIR) -I$(NEWSRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR)
+SRC_DIR = ../../../src
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR)
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu
 

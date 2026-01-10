@@ -18,9 +18,9 @@ ALL = $(shell basename "`pwd`")
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-NEWSRC = ../../../../newsrc
+SRC = ../../../../src
 
-INCLUDE = -I$(NEWSRC) -I$(NEWSRC)/newpid/standard
+INCLUDE = -I$(SRC) -I$(SRC)/newpid/standard
 
 CXX_SOURCES = $(ALL).cpp
 

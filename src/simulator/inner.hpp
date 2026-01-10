@@ -29,7 +29,7 @@
 #include <setpoints/manual.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/common.h>
-#include <vehicles/crazyflie.hpp>
+#include <vehicles/diyquad.hpp>
 
 class SimInnerLoop {
 

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <dynamics.hpp>
+#include <simulator/dynamics.hpp>
 
 // Approximate thrust needed when in perfect hover. More weight/older
 // battery can use a higher value
@@ -30,11 +30,13 @@ static constexpr float THRUST_SCALE = 1000;
 static constexpr Dynamics::vehicle_params_t VPARAMS = {
 
     // Actual values
-    1.0e-1,  // mass [kg]
+    3.0e-2,  // mass [kg]
     5.0e-2,  // arm length L [m]
 
-    // Estimated by using thrust constants above
-    1.4e-8, // force coefficient B [F=b*w^2]
-    7.0e-9, // drag coefficient D [T=d*w^2]
-    2.0e-5  // I [kg*m^2]   // pitch, roll
+    // Estimated by using thrust constants above: 
+    //   B, D increase in proportion to mass;
+    //   I decreases in proportion to mass;
+    4.3e-9, // force coefficient B [F=b*w^2]
+    1.9e-9, // drag coefficient D [T=d*w^2]
+    4.1e-4  // I [kg*m^2]   // pitch, roll
 };
