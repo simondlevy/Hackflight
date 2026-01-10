@@ -23,7 +23,7 @@
 #include <control/pids/position.hpp>
 #include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
-#include <serializer.hpp>
+#include <msp/serializer.hpp>
 
 class ClosedLoopControl {
 
