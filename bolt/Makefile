@@ -25,24 +25,24 @@ $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../bolt
 
 haskell_config: copilot_core.cpp
-	cp $(SRC)/control/haskell.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/haskell.hpp ./__control__.hpp
 
 copilot_core.cpp : $(HASKDIR)/*.hs $(HASKDIR)/pids/*.hs
 	runhaskell -i$(HASKDIR) -i$(HASKDIR)/pids $(HASKDIR)/Pids.hs -i$(PWD)
 	mv copilot_core.c copilot_core.cpp
 
 standard_config:
-	cp $(SRC)/control/standard.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/standard.hpp ./__control__.hpp
 
 snn_config:
-	cp $(SRC)/control/snn.hpp $(SRC)/__control__.hpp
+	cp $(SRC)/control/snn.hpp ./__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
 
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/bolt.ino.bin
 
 clean:
-	rm -rf build ../src/__control__.hpp $(MSGS)
+	rm -rf build __control__.hpp $(MSGS)
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
