@@ -38,9 +38,9 @@ class YawAngleController {
             static float _previous;
 
             _target = airborne ? 
-                cap(_target + DEMAND_MAX * yaw * dt) : psi;
+                Num::cap_angle(_target + DEMAND_MAX * yaw * dt) : psi;
 
-            const auto error = cap(_target - psi);
+            const auto error = Num::cap_angle(_target - psi);
 
             _integral = airborne ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
@@ -62,19 +62,4 @@ class YawAngleController {
 
         float _integral;
         float _previous;
-
-        static float cap(float angle) 
-        {
-            float result = angle;
-
-            while (result > 180.0f) {
-                result -= 360.0f;
-            }
-
-            while (result < -180.0f) {
-                result += 360.0f;
-            }
-
-            return result;
-        }
 };
