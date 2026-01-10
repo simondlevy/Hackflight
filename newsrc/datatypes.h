@@ -18,6 +18,9 @@
 
 #include <stdint.h>
 
+static constexpr float PID_FAST_FREQ = 500;  // 1024 Plank 
+static constexpr float PID_SLOW_FREQ = 100;
+
 typedef enum {
 
     MODE_IDLE,
@@ -28,6 +31,13 @@ typedef enum {
     MODE_PANIC
 
 } flightMode_t;
+
+typedef struct {
+
+    float x;
+    float y;
+
+} axis2_t;
 
 typedef struct {
 
@@ -44,6 +54,41 @@ typedef struct {
     float y;
     float z;
 
+} axis4_t;
+
+typedef union {
+    struct {
+        float x;
+        float y;
+        float z;
+    };
+    float axis[3];
+} Axis3f;
+
+struct vec3_s {
+    uint32_t timestamp; // Timestamp when the data was computed
+    float x;
+    float y;
+    float z;
+};
+
+typedef struct vec3_s point_t;
+
+typedef struct quaternion_s {
+    union {
+        struct {
+            float q0;
+            float q1;
+            float q2;
+            float q3;
+        };
+        struct {
+            float x;
+            float y;
+            float z;
+            float w;
+        };
+    };
 } quaternion_t;
 
 typedef struct {
@@ -79,20 +124,107 @@ typedef struct {
 
 } vehicleState_t;
 
-// Limits for state vector, to support conversion to/from eight-bit rep
-static const float STATE_DXY_MAX = 2;
-static const float STATE_Z_MIN = 0;
-static const float STATE_Z_MAX = 3;
-static const float STATE_DZ_MAX = 1;
-static const float STATE_PHITHETA_MAX = 30;
-static const float STATE_DPHITHETA_MAX = 250;
-static const float STATE_PSI_MAX = 180;
-static const float STATE_DPSI_MAX = 250;
+/* Data structure used by the stabilizer subsystem.
+ * All have a timestamp to be set when the data is calculated.
+ */
 
-static constexpr float PID_FAST_FREQ = 500;  // 1024 Plank 
-static constexpr float PID_SLOW_FREQ = 100;
+/* vector */
+typedef float vec3d[3];
+typedef float mat3d[3][3];
 
-typedef struct {
+typedef struct vec3_s vector_t;
+
+typedef enum {
+    MeasurementSourceLocationService  = 0,
+} measurementSource_t;
+
+typedef struct tdoaMeasurement_s {
+    union {
+        point_t anchorPositions[2];
+        struct {
+            point_t anchorPositionA;
+            point_t anchorPositionB;
+        };
+    };
+    union {
+        uint8_t anchorIds[2];
+        struct {
+            uint8_t anchorIdA;
+            uint8_t anchorIdB;
+        };
+    };
+
+    float distanceDiff;
+    float stdDev;
+} tdoaMeasurement_t;
+
+typedef struct baro_s {
+    float pressure;           // mbar
+    float temperature;        // degree Celcius
+    float asl;                // m (ASL = altitude above sea level)
+} baro_t;
+
+typedef struct positionMeasurement_s {
+    union {
+        struct {
+            float x;
+            float y;
+            float z;
+        };
+        float pos[3];
+    };
+    float stdDev;
+    measurementSource_t source;
+} positionMeasurement_t;
+
+typedef struct poseMeasurement_s {
+    union {
+        struct {
+            float x;
+            float y;
+            float z;
+        };
+        float pos[3];
+    };
+    quaternion_t quat;
+    float stdDevPos;
+    float stdDevQuat;
+} poseMeasurement_t;
+
+typedef struct distanceMeasurement_s {
+    union {
+        struct {
+            float x;
+            float y;
+            float z;
+        };
+        float pos[3];
+    };
+    uint8_t anchorId;
+    float distance;
+    float stdDev;
+} distanceMeasurement_t;
+
+typedef struct zDistance_s {
+    uint32_t timestamp;
+    float distance;           // m
+} zDistance_t;
+
+/** Estimate of position */
+typedef struct estimate_s {
+    uint32_t timestamp; // Timestamp when the data was computed
+
+    point_t position;
+} estimate_t;
+
+/** Setpoint for althold */
+typedef struct setpointZ_s {
+    float z;
+    bool isUpdate; // True = small update of setpoint, false = completely new
+} setpointZ_t;
+
+/** Flow measurement**/
+typedef struct flowMeasurement_s {
     uint32_t timestamp;
     union {
         struct {
@@ -104,26 +236,60 @@ typedef struct {
     float stdDevX;      // Measurement standard deviation
     float stdDevY;      // Measurement standard deviation
     float dt;           // Time during which pixels were accumulated
-
 } flowMeasurement_t;
 
-typedef struct {
+
+/** TOF measurement**/
+typedef struct tofMeasurement_s {
+    uint32_t timestamp;
     float distance;
     float stdDev;
-
 } tofMeasurement_t;
 
-typedef struct {
-    axis3_t gyro; // deg/s, for legacy reasons
+/** Absolute height measurement */
+typedef struct heightMeasurement_s {
+    uint32_t timestamp;
+    float height;
+    float stdDev;
+} heightMeasurement_t;
 
+/** Yaw error measurement */
+typedef struct {
+    uint32_t timestamp;
+    float yawError;
+    float stdDev;
+} yawErrorMeasurement_t;
+
+/** Sweep angle measurement */
+typedef struct {
+    uint32_t timestamp;
+    const vec3d* sensorPos;    // Sensor position in the CF reference frame
+    const vec3d* rotorPos;     // Pos of rotor origin in global reference frame
+    const mat3d* rotorRot;     // Rotor rotation matrix
+    const mat3d* rotorRotInv;  // Inverted rotor rotation matrix
+    uint8_t sensorId;
+    uint8_t baseStationId;
+    uint8_t sweepId;
+    float t;                   // t is the tilt angle of the light plane on the rotor
+    float measuredSweepAngle;
+    float stdDev;
+} sweepAngleMeasurement_t;
+
+typedef struct
+{
+    Axis3f gyro; // deg/s, for legacy reasons
 } gyroscopeMeasurement_t;
 
-typedef struct {
-    axis3_t acc; // Gs, for legacy reasons
-
+typedef struct
+{
+    Axis3f acc; // Gs, for legacy reasons
 } accelerationMeasurement_t;
 
-// For simulation
+typedef struct
+{
+    baro_t baro; // for legacy reasons
+} barometerMeasurement_t;
+
 typedef struct {
 
     float x;
@@ -134,3 +300,13 @@ typedef struct {
     float psi;
 
 } pose_t;
+
+typedef struct {
+
+    uint32_t timestamp;
+    bool armed;
+    bool hovering;
+    demands_t demands;
+
+} setpoint_t;
+

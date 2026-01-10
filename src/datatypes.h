@@ -18,6 +18,20 @@
 
 #include <stdint.h>
 
+static constexpr float PID_FAST_FREQ = 500;  // 1024 Plank 
+static constexpr float PID_SLOW_FREQ = 100;
+
+typedef enum {
+
+    MODE_IDLE,
+    MODE_ARMED,
+    MODE_HOVERING,
+    MODE_AUTONOMOUS,
+    MODE_LANDING,
+    MODE_PANIC
+
+} flightMode_t;
+
 typedef struct {
 
     float x;
@@ -286,14 +300,6 @@ typedef struct {
     float psi;
 
 } pose_t;
-
-typedef struct {
-
-    float framerate;
-    bool hovering;
-    demands_t demands;
-
-} siminfo_t;
 
 typedef struct {
 
