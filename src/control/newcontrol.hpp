@@ -29,37 +29,43 @@ class ClosedLoopControl {
 
     public:
 
-         void run(
+        void run(
                 const float dt,
                 const bool hovering,
                 const vehicleState_t & vehicleState,
-                const demands_t & demandsIn,
-                demands_t & demandsOut)
+                const demands_t & openLoopDemands,
+                demands_t & demands)
         {
             const auto climbrate = AltitudeController::run(hovering,
-                    dt, vehicleState.z, demandsIn.thrust);
+                    dt, vehicleState.z, openLoopDemands.thrust);
 
-            const auto yaw = YawAngleController::run(hovering,
-                    dt, vehicleState.psi, demandsIn.yaw);
+            demands.thrust =
+                ClimbRateController::run(hovering,
+                        LANDING_ALTITUDE_METERS,
+                        dt,
+                        vehicleState.z,
+                        vehicleState.dz,
+                        climbrate);
+
+            const auto airborne = demands.thrust > 0;
+
+            const auto yaw = YawAngleController::run(airborne,
+                    dt, vehicleState.psi, openLoopDemands.yaw);
 
             PositionController::run(hovering, dt, vehicleState.dx,
                     vehicleState.dy, vehicleState.psi, hovering ?
-                    demandsIn.pitch : 0, hovering ? demandsIn.roll : 0,
-                    demandsOut.roll, demandsOut.pitch);
+                    openLoopDemands.pitch : 0, hovering ? openLoopDemands.roll : 0,
+                    demands.roll, demands.pitch);
 
             PitchRollAngleController::run(hovering, dt, vehicleState.phi,
-                    vehicleState.theta, demandsOut.roll, demandsOut.pitch,
-                    demandsOut.roll, demandsOut.pitch);
-
-            demandsOut.thrust = ClimbRateController::run(hovering,
-                    LANDING_ALTITUDE_METERS, dt, vehicleState.z,
-                    vehicleState.dz, climbrate);
+                    vehicleState.theta, demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
 
             PitchRollRateController::run(hovering, dt, vehicleState.dphi,
-                    vehicleState.dtheta, demandsOut.roll, demandsOut.pitch,
-                    demandsOut.roll, demandsOut.pitch);
+                    vehicleState.dtheta, demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
 
-            demandsOut.yaw =
+            demands.yaw =
                 YawRateController::run(true, dt, vehicleState.dpsi, yaw);
 
         }
