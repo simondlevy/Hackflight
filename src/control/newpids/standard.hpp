@@ -17,13 +17,13 @@
 #pragma once
 
 #include <control/newpids/altitude.hpp>
-#include <control/newpids/position.hpp>
 #include <control/newpids/yaw_angle.hpp>
 #include <serializer.hpp>
 
 #include <control/pids/climbrate.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
+#include <control/pids/position.hpp>
 #include <control/pids/yaw_rate.hpp>
 
 class PidControl {
@@ -43,11 +43,9 @@ class PidControl {
             const auto yaw = YawAngleController::run(
                     dt, vehicleState.psi, demandsIn.yaw);
 
-            PositionController::run(
-                    dt,
-                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
-                    controlled ? demandsIn.pitch : 0,
-                    controlled ? demandsIn.roll : 0,
+            PositionController::run(controlled, dt, vehicleState.dx,
+                    vehicleState.dy, vehicleState.psi, controlled ?
+                    demandsIn.pitch : 0, controlled ? demandsIn.roll : 0,
                     demandsOut.roll, demandsOut.pitch);
 
             PitchRollAngleController::run(controlled, dt, vehicleState.phi,
