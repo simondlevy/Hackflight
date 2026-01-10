@@ -38,6 +38,17 @@ cf2: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
+diy: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp \
+	$(SRC)/msp/__messages__.h
+	cp diy/imu.cpp ./__imu__.cpp
+	cp diy/motors.cpp ./__motors__.cpp
+	cp diy/uart_pins.h ./__uart_pins__.h
+	arduino-cli compile \
+		--libraries $(HOME)/Documents/Arduino/libraries \
+		--libraries ../.. \
+		--build-path ./build \
+		--fqbn $(FQBN) $(SKETCH).ino
+
 $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../crazyflie
 
@@ -55,7 +66,7 @@ snn_config:
 	cp $(SRC)/control/snn.hpp $(SRC)/__control__.hpp
 	cp $(EMBDIR)/examples/difference/*.hpp .
 
-flash: $(BIN)
+dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/crazyflie.ino.bin
 
 clean:
