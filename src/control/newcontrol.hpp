@@ -49,25 +49,40 @@ class ClosedLoopControl {
 
             const auto airborne = demands.thrust > 0;
 
+
+
+
+
+
+
+
             const auto yaw = YawAngleController::run(airborne,
                     dt, vehicleState.psi, openLoopDemands.yaw);
-
-            PositionController::run(hovering, dt, vehicleState.dx,
-                    vehicleState.dy, vehicleState.psi, hovering ?
-                    openLoopDemands.pitch : 0, hovering ? openLoopDemands.roll : 0,
-                    demands.roll, demands.pitch);
-
-            PitchRollAngleController::run(hovering, dt, vehicleState.phi,
-                    vehicleState.theta, demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
-
-            PitchRollRateController::run(hovering, dt, vehicleState.dphi,
-                    vehicleState.dtheta, demands.roll, demands.pitch,
-                    demands.roll, demands.pitch);
 
             demands.yaw =
                 YawRateController::run(true, dt, vehicleState.dpsi, yaw);
 
+            PositionController::run(
+                    airborne,
+                    dt,
+                    vehicleState.dx, vehicleState.dy, vehicleState.psi,
+                    hovering ?  openLoopDemands.pitch : 0,
+                    hovering ? openLoopDemands.roll : 0,
+                    demands.roll, demands.pitch);
+
+            PitchRollAngleController::run(
+                    airborne,
+                    dt,
+                    vehicleState.phi, vehicleState.theta,
+                    demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
+
+            PitchRollRateController::run(
+                    airborne,
+                    dt,
+                    vehicleState.dphi, vehicleState.dtheta,
+                    demands.roll, demands.pitch,
+                    demands.roll, demands.pitch);
         }
 
         void serializeMessage(MspSerializer & serializer)
