@@ -21,7 +21,6 @@
 
 // Hackflight
 #define _MAIN
-#include <newstandard.hpp>
 #include <simulator/inner.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
