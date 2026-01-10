@@ -16,13 +16,13 @@
 
 #pragma once
 
-#include <newpids/altitude.hpp>
-#include <newpids/climbrate.hpp>
-#include <newpids/position.hpp>
-#include <newpids/pitchroll_angle.hpp>
-#include <newpids/pitchroll_rate.hpp>
-#include <newpids/yaw_angle.hpp>
-#include <newpids/yaw_rate.hpp>
+#include <control/newpids/altitude.hpp>
+#include <control/newpids/climbrate.hpp>
+#include <control/newpids/position.hpp>
+#include <control/newpids/pitchroll_angle.hpp>
+#include <control/newpids/pitchroll_rate.hpp>
+#include <control/newpids/yaw_angle.hpp>
+#include <control/newpids/yaw_rate.hpp>
 #include <serializer.hpp>
 
 class PidControl {
