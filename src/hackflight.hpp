@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #include <comms.hpp>
-#include <__control__.hpp>
+#include <control/control.hpp>
 #include <mixers/crazyflie.hpp>
 #include <tasks/core.hpp>
 #include <tasks/debug.hpp>

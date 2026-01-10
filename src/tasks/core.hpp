@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <__control__.hpp>
 
+#include <control/control.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
