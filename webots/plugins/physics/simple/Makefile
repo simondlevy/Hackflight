@@ -20,7 +20,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC = ../../../../src
 
-INCLUDE = -I$(SRC) -I$(SRC)/control/newpids
+INCLUDE = -I$(SRC) -I$(SRC)/control
 
 CXX_SOURCES = $(ALL).cpp
 

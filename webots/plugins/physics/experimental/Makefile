@@ -24,7 +24,8 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 SRC_DIR = ../../../../src
 
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/control/newpids -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/control \
+		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(ALL).cpp
 
