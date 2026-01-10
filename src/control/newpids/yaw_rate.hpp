@@ -23,12 +23,6 @@ class YawRateController {
 
     public:
 
-        /**
-          *  @param dt time constant
-          *  @param dpsi_actual current heading angle change in deg/sec
-          *  @param dpsi_target demand in deg/sec
-          *  @return yaw demand scaled appropriate to motors
-          */
           static float run(
                  const float dt,
                  const float dpsi_actual,
