@@ -18,11 +18,11 @@
 
 #include <control/newpids/altitude.hpp>
 #include <control/newpids/position.hpp>
-#include <control/newpids/pitchroll_angle.hpp>
 #include <control/newpids/yaw_angle.hpp>
 #include <serializer.hpp>
 
 #include <control/pids/climbrate.hpp>
+#include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_rate.hpp>
 
@@ -37,8 +37,6 @@ class PidControl {
                 const demands_t & demandsIn,
                 demands_t & demandsOut)
         {
-            // ---------------------------------------------------------------
-
             const auto climbrate = AltitudeController::run(controlled,
                     dt, vehicleState.z, demandsIn.thrust);
 
@@ -52,13 +50,9 @@ class PidControl {
                     controlled ? demandsIn.roll : 0,
                     demandsOut.roll, demandsOut.pitch);
 
-            PitchRollAngleController::run(
-                    dt,
-                    vehicleState.phi, vehicleState.theta,
-                    demandsOut.roll, demandsOut.pitch,
+            PitchRollAngleController::run(controlled, dt, vehicleState.phi,
+                    vehicleState.theta, demandsOut.roll, demandsOut.pitch,
                     demandsOut.roll, demandsOut.pitch);
-
-            // ---------------------------------------------------------------
 
             demandsOut.thrust = ClimbRateController::run(controlled,
                     LANDING_ALTITUDE_METERS, dt, vehicleState.z,
