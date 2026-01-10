@@ -41,7 +41,6 @@
 
 #pragma once
 
-#include <math3d.h>
 #include <outlierFilterTdoa.hpp>
 #include <datatypes.h>
 #include <matrix_typedef.h>
