@@ -17,13 +17,14 @@
 #pragma once
 
 #include <control/newpids/altitude.hpp>
-#include <control/newpids/climbrate.hpp>
 #include <control/newpids/position.hpp>
 #include <control/newpids/pitchroll_angle.hpp>
 #include <control/newpids/pitchroll_rate.hpp>
 #include <control/newpids/yaw_angle.hpp>
-#include <control/newpids/yaw_rate.hpp>
 #include <serializer.hpp>
+
+#include <control/pids/climbrate.hpp>
+#include <control/pids/yaw_rate.hpp>
 
 class PidControl {
 
@@ -59,8 +60,9 @@ class PidControl {
 
             // ---------------------------------------------------------------
 
-            demandsOut.thrust = ClimbRateController::run(controlled, dt,
-                    vehicleState.z, vehicleState.dz, climbrate);
+            demandsOut.thrust = ClimbRateController::run(controlled, 
+                    LANDING_ALTITUDE_METERS, dt, vehicleState.z,
+                    vehicleState.dz, climbrate);
 
             PitchRollRateController::run(
                     dt,
@@ -69,7 +71,7 @@ class PidControl {
                     demandsOut.roll, demandsOut.pitch);
 
             demandsOut.yaw =
-                YawRateController::run(dt, vehicleState.dpsi, yaw);
+                YawRateController::run(true, dt, vehicleState.dpsi, yaw);
 
         }
 
@@ -81,4 +83,9 @@ class PidControl {
         void init()
         {
         }
+
+    private:
+
+        static constexpr float LANDING_ALTITUDE_METERS = 0.03;
+
 };
