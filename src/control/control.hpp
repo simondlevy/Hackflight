@@ -53,10 +53,8 @@ class ClosedLoopControl {
 
             static float _yaw_angle_target;
 
-            _yaw_angle_target = airborne ? 
-                Num::cap_angle(_yaw_angle_target +
-                        YAW_DEMAND_MAX * openLoopDemands.yaw * dt) :
-                vehicleState.psi;
+            _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
+                        YAW_DEMAND_MAX * openLoopDemands.yaw * dt);
 
             const auto yaw = YawAngleController::run(
                     airborne, dt, vehicleState.psi, _yaw_angle_target);
