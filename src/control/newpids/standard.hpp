@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include <control/newpids/altitude.hpp>
 #include <control/newpids/yaw_angle.hpp>
 #include <serializer.hpp>
 
+#include <control/pids/altitude.hpp>
 #include <control/pids/climbrate.hpp>
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
