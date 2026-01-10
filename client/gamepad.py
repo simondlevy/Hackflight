@@ -142,25 +142,6 @@ class Gamepad:
                            ' vx=%+3.2f vy=%+3.3f yaw=%+3.f') %
                           (self.thrust, self.vx, self.vy, self.yawrate))
 
-            else:
-
-                self.roll = 0
-                self.pitch = 0
-                self.yaw = 0
-
-                self.thrust = (
-                        self.descend_countdown
-                        if self.descend_countdown > self.THRUST_DESCEND_MIN
-                        else 0)
-
-                self.descend_countdown -= (self.THRUST_DESCEND_DEC
-                                           if self.descend_countdown > 0
-                                           else 0)
-
-                if self.debug:
-                    print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
-                          % (self.roll, self.pitch, self.yaw, self.thrust))
-
             sleep(1 / self.UPDATE_RATE_HZ)
 
         except KeyboardInterrupt:
