@@ -20,7 +20,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 NEWSRC = ../../../../newsrc
 
-INCLUDE = -I$(NEWSRC) -I$(NEWSRC)/pid/standard
+INCLUDE = -I$(NEWSRC) -I$(NEWSRC)/newpid/standard
 
 CXX_SOURCES = $(ALL).cpp
 

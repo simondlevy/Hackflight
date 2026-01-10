@@ -24,7 +24,7 @@ CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
 NEWSRC_DIR = ../../../../newsrc
 
-INCLUDE = -I$(NEWSRC_DIR) -I$(NEWSRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) \
+INCLUDE = -I$(NEWSRC_DIR) -I$(NEWSRC_DIR)/newpid/slowfast -I$(SIMSENSORS_DIR) \
 		  -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(ALL).cpp
