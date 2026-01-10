@@ -31,31 +31,31 @@ class ClosedLoopControl {
 
          void run(
                 const float dt,
-                const bool controlled,
+                const bool hovering,
                 const vehicleState_t & vehicleState,
                 const demands_t & demandsIn,
                 demands_t & demandsOut)
         {
-            const auto climbrate = AltitudeController::run(controlled,
+            const auto climbrate = AltitudeController::run(hovering,
                     dt, vehicleState.z, demandsIn.thrust);
 
-            const auto yaw = YawAngleController::run(controlled,
+            const auto yaw = YawAngleController::run(hovering,
                     dt, vehicleState.psi, demandsIn.yaw);
 
-            PositionController::run(controlled, dt, vehicleState.dx,
-                    vehicleState.dy, vehicleState.psi, controlled ?
-                    demandsIn.pitch : 0, controlled ? demandsIn.roll : 0,
+            PositionController::run(hovering, dt, vehicleState.dx,
+                    vehicleState.dy, vehicleState.psi, hovering ?
+                    demandsIn.pitch : 0, hovering ? demandsIn.roll : 0,
                     demandsOut.roll, demandsOut.pitch);
 
-            PitchRollAngleController::run(controlled, dt, vehicleState.phi,
+            PitchRollAngleController::run(hovering, dt, vehicleState.phi,
                     vehicleState.theta, demandsOut.roll, demandsOut.pitch,
                     demandsOut.roll, demandsOut.pitch);
 
-            demandsOut.thrust = ClimbRateController::run(controlled,
+            demandsOut.thrust = ClimbRateController::run(hovering,
                     LANDING_ALTITUDE_METERS, dt, vehicleState.z,
                     vehicleState.dz, climbrate);
 
-            PitchRollRateController::run(controlled, dt, vehicleState.dphi,
+            PitchRollRateController::run(hovering, dt, vehicleState.dphi,
                     vehicleState.dtheta, demandsOut.roll, demandsOut.pitch,
                     demandsOut.roll, demandsOut.pitch);
 

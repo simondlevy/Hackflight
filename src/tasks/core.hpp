@@ -168,7 +168,8 @@ class CoreTask {
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        DebugTask::setMessage(_debugTask, "%05d: lost contact", step);
+                        DebugTask::setMessage(_debugTask,
+                                "%05d: lost contact", step);
                         break;
                 }
             }
@@ -181,7 +182,6 @@ class CoreTask {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
 
                 _closedLoopControl->run(
-                        step,
                         1.f / CLOSED_LOOP_UPDATE_RATE,
                         setpoint.hovering,
                         _vehicleState,
