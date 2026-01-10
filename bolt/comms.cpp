@@ -1,5 +1,4 @@
 /**
- *
  * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,30 +16,28 @@
 
 #include <Arduino.h>
 
-#include <tasks/core.hpp>
+#include <comms.hpp>
 
-static const uint8_t M1_PIN = PA1;
-static const uint8_t M2_PIN = PB11;
-static const uint8_t M3_PIN = PA15;
-static const uint8_t M4_PIN = PB9;
+#include "uart_pins.h"
 
-static uint8_t pulse_widths[4];
+static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
-void CoreTask::motors_init()
+void Comms::init()
 {
+    serial.begin(115200);
 }
 
-void CoreTask::motors_setSpeed(uint32_t id, float speed)
+bool Comms::read_byte(uint8_t * byte)
 {
-    pulse_widths[id] = (uint8_t)(255 * speed);
-}
+    if (serial.available()) {
+        *byte = serial.read();
+        return true;
+    }
 
-void CoreTask::motors_run()
+    return false;
+}
+            
+void Comms::write_byte(const uint8_t byte)
 {
-    analogWrite(M1_PIN, pulse_widths[0]);
-    analogWrite(M2_PIN, pulse_widths[1]);
-    analogWrite(M3_PIN, pulse_widths[2]);
-    analogWrite(M4_PIN, pulse_widths[3]);
+    serial.write(byte);
 }
-
-
