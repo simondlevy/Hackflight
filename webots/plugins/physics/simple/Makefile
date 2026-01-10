@@ -18,7 +18,7 @@ ALL = $(shell basename "`pwd`")
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-SRC = ../../../../src
+SRC = ../../../../newsrc
 
 INCLUDE = -I$(SRC) -I$(SRC)/pid/standard
 

@@ -22,7 +22,7 @@ SIMSENSORS_DIR = $(HOME)/Desktop
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-SRC_DIR = ../../../../src
+SRC_DIR = ../../../../newsrc
 
 INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) \
 		  -I$(OPENCV_DIR)
