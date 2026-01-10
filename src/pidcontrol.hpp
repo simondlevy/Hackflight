@@ -16,13 +16,13 @@
 
 #pragma once
 
-#include <control/pids/altitude.hpp>
-#include <control/pids/climbrate.hpp>
-#include <control/pids/position.hpp>
-#include <control/pids/pitchroll_angle.hpp>
-#include <control/pids/pitchroll_rate.hpp>
-#include <control/pids/yaw_angle.hpp>
-#include <control/pids/yaw_rate.hpp>
+#include <pids/altitude.hpp>
+#include <pids/climbrate.hpp>
+#include <pids/position.hpp>
+#include <pids/pitchroll_angle.hpp>
+#include <pids/pitchroll_rate.hpp>
+#include <pids/yaw_angle.hpp>
+#include <pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
 
 class ClosedLoopControl {

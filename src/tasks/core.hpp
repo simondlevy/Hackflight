@@ -17,7 +17,7 @@
 #pragma once
 
 
-#include <control/control.hpp>
+#include <pidcontrol.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>

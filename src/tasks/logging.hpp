@@ -18,7 +18,7 @@
 
 
 #include <comms.hpp>
-#include <control/control.hpp>
+#include <pidcontrol.hpp>
 #include <msp/__messages__.h>
 #include <msp/serializer.hpp>
 #include <task.hpp>
