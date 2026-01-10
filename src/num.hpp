@@ -34,8 +34,12 @@ class Num {
             return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
         }
 
-        // https://en.wikipedia.org/wiki/
-        //  Conversion_between_quaternions_and_Euler_angles
+        static float fconstrain(
+                float value, const float minVal, const float maxVal)
+        {
+            return fminf(maxVal, fmaxf(minVal,value));
+        }
+
         static void euler2quat(const axis3_t & a, axis4_t & q)
         {
             // Abbreviations for the various angular functions
@@ -52,22 +56,20 @@ class Num {
             q.y = cr * sp * cy + sr * cp * sy;
             q.z = cr * cp * sy - sr * sp * cy;
         }
-        static float fconstrain(float value, const float minVal, const float maxVal)
+
+        static float cap_angle(float angle) 
         {
-            return fminf(maxVal, fmaxf(minVal,value));
-        }
+            float result = angle;
 
-        static float deadband(float value, const float threshold)
-        {
-            return 
+            while (result > 180.0f) {
+                result -= 360.0f;
+            }
 
-                fabsf(value) < threshold ? 0 :
+            while (result < -180.0f) {
+                result += 360.0f;
+            }
 
-                value > 0 ? value - threshold :
-
-                value < 0 ? value + threshold :
-
-                value;
+            return result;
         }
 
         static float rescale(
@@ -81,4 +83,4 @@ class Num {
                 (newmax - newmin) + newmin;
         }
 
-}; // class Num
+};
