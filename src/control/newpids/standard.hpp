@@ -40,7 +40,7 @@ class PidControl {
             const auto climbrate = AltitudeController::run(controlled,
                     dt, vehicleState.z, demandsIn.thrust);
 
-            const auto yaw = YawAngleController::run(
+            const auto yaw = YawAngleController::run(controlled,
                     dt, vehicleState.psi, demandsIn.yaw);
 
             PositionController::run(controlled, dt, vehicleState.dx,

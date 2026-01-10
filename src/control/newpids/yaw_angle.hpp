@@ -31,6 +31,7 @@ class YawAngleController {
           */
 
         static float run(
+                const bool airborne, 
                 const float dt,       
                 const float psi_actual,
                 const float psi_target)
@@ -47,7 +48,8 @@ class YawAngleController {
             const auto error =
                 Num::cap_angle(psi_target - (psi_actual - _psi_initial));
 
-            _integral = Num::fconstrain(_integral + error * dt, ILIMIT);
+            _integral = airborne ?
+                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
             auto deriv = dt > 0 ? (error - _previous) / dt : 0;
 
