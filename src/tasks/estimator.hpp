@@ -20,7 +20,6 @@
 
 #include <clock.hpp>
 #include <ekf.hpp>
-#include <rateSupervisor.hpp>
 #include <task.hpp>
 #include <tasks/debug.hpp>
 
@@ -125,8 +124,6 @@ class EstimatorTask {
 
         bool _didResetEstimation;
 
-        RateSupervisor _rateSupervisor;
-        
         bool _isFlying;
 
         // Mutex to protect data that is shared between the task and
@@ -208,13 +205,6 @@ class EstimatorTask {
         void run(void)
         {
             auto nextPredictionMs = millis();
-
-            _rateSupervisor.init(
-                    nextPredictionMs, 
-                    1000, 
-                    PREDICT_RATE - 1, 
-                    PREDICT_RATE + 1, 
-                    1); 
 
             while (true) {
 
