@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <control/newpids/yaw_angle.hpp>
 #include <serializer.hpp>
 
 #include <control/pids/altitude.hpp>
@@ -24,6 +23,7 @@
 #include <control/pids/pitchroll_angle.hpp>
 #include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/position.hpp>
+#include <control/pids/yaw_angle.hpp>
 #include <control/pids/yaw_rate.hpp>
 
 class PidControl {
