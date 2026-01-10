@@ -19,11 +19,11 @@
 #include <control/newpids/altitude.hpp>
 #include <control/newpids/position.hpp>
 #include <control/newpids/pitchroll_angle.hpp>
-#include <control/newpids/pitchroll_rate.hpp>
 #include <control/newpids/yaw_angle.hpp>
 #include <serializer.hpp>
 
 #include <control/pids/climbrate.hpp>
+#include <control/pids/pitchroll_rate.hpp>
 #include <control/pids/yaw_rate.hpp>
 
 class PidControl {
@@ -60,14 +60,12 @@ class PidControl {
 
             // ---------------------------------------------------------------
 
-            demandsOut.thrust = ClimbRateController::run(controlled, 
+            demandsOut.thrust = ClimbRateController::run(controlled,
                     LANDING_ALTITUDE_METERS, dt, vehicleState.z,
                     vehicleState.dz, climbrate);
 
-            PitchRollRateController::run(
-                    dt,
-                    vehicleState.dphi, vehicleState.dtheta,
-                    demandsOut.roll, demandsOut.pitch,
+            PitchRollRateController::run(controlled, dt, vehicleState.dphi,
+                    vehicleState.dtheta, demandsOut.roll, demandsOut.pitch,
                     demandsOut.roll, demandsOut.pitch);
 
             demandsOut.yaw =
