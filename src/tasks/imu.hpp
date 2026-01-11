@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 #include <datatypes.h>
@@ -33,12 +32,9 @@ class ImuTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask,
-                DebugTask * debugTask=nullptr)
+        void begin(EstimatorTask * estimatorTask)
         {
             _estimatorTask = estimatorTask;
-
-            _debugTask = debugTask;
 
             _gyroBiasRunning.isBufferFilled = false;
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -48,7 +44,6 @@ class ImuTask {
                 xSemaphoreCreateBinaryStatic(&_coreTaskSemaphoreBuffer);
 
             if (!device_init()) {
-                DebugTask::setMessage(_debugTask, "IMU initialization failed");
             }
 
             // Calibrate
@@ -167,8 +162,6 @@ class ImuTask {
         bias_t _gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
-
-        DebugTask * _debugTask;
 
         FreeRtosTask _task;
 
@@ -340,11 +333,6 @@ class ImuTask {
                 Axis3i16 accelRaw = {};
 
                 device_readRaw(
-                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                        accelRaw.x, accelRaw.y, accelRaw.z);
-
-                DebugTask::setMessage(_debugTask,
-                        "gx=%d gy=%d gz=%d ax=%d ay=%d az=%d",
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
                         accelRaw.x, accelRaw.y, accelRaw.z);
 

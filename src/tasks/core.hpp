@@ -19,7 +19,6 @@
 
 #include <pidcontrol.hpp>
 #include <task.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/imu.hpp>
@@ -39,15 +38,13 @@ class CoreTask {
                 LedTask * ledTask,
                 SetpointTask * setpointTask,
                 const uint8_t motorCount,
-                const mixFun_t mixFun,
-                DebugTask * debugTask=nullptr)
+                const mixFun_t mixFun)
         {
             _pidControl = pidControl;
             _estimatorTask = estimatorTask;
             _imuTask = imuTask;
             _ledTask = ledTask;
             _setpointTask = setpointTask;
-            _debugTask = debugTask;
             _motorCount = motorCount;
             _mixFun = mixFun;
 
@@ -82,7 +79,6 @@ class CoreTask {
         PidControl * _pidControl;
         mixFun_t _mixFun;
         FreeRtosTask _task;
-        DebugTask * _debugTask;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
         LedTask * _ledTask;
@@ -131,7 +127,6 @@ class CoreTask {
                 switch (status) {
 
                     case STATUS_IDLE:
-                        reportStatus(step, "idle", motorvals);
                         if (setpoint.armed && isSafeAngle(_vehicleState.phi) &&
                                 isSafeAngle(_vehicleState.theta)) {
                             _ledTask->setArmed(true);
@@ -141,7 +136,6 @@ class CoreTask {
                         break;
 
                     case STATUS_ARMED:
-                        reportStatus(step, "armed", motorvals);
                         checkDisarm(setpoint, status, motorvals);
                         if (setpoint.hovering) {
                             status = STATUS_HOVERING;
@@ -150,7 +144,6 @@ class CoreTask {
                         break;
 
                     case STATUS_HOVERING:
-                        reportStatus(step, "hovering", motorvals);
                         runClosedLoopAndMixer(step, setpoint,
                                 demands, motorvals);
                         checkDisarm(setpoint, status, motorvals);
@@ -160,7 +153,6 @@ class CoreTask {
                         break;
 
                     case STATUS_LANDING:
-                        reportStatus(step, "landing", motorvals);
                         runClosedLoopAndMixer(step, setpoint,
                                 demands, motorvals);
                         checkDisarm(setpoint, status, motorvals);
@@ -168,8 +160,6 @@ class CoreTask {
 
                     case STATUS_LOST_CONTACT:
                         // No way to recover from this
-                        DebugTask::setMessage(_debugTask,
-                                "%05d: lost contact", step);
                         break;
                 }
             }
@@ -228,15 +218,6 @@ class CoreTask {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
-        }
-
-        void reportStatus(const uint32_t step, const char * status,
-                const float * motorvals)
-        {
-            DebugTask::setMessage(_debugTask,
-                    "%05d: %-8s    m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f", 
-                    step, status,
-                    motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
         }
 
         void checkDisarm(const setpoint_t setpoint, status_t &status,

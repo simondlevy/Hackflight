@@ -21,18 +21,15 @@
 #include <stdint.h>
 
 #include <task.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/imu.hpp>
 
 class LedTask {
 
     public:
 
-        void begin(ImuTask * imuTask, DebugTask * debugTask=nullptr)
+        void begin(ImuTask * imuTask)
         {
             _imuTask = imuTask;
-
-            _debugTask = debugTask;
 
             _task.init(runLedTask, "led", this, 2);
 
@@ -56,8 +53,6 @@ class LedTask {
 
         ImuTask * _imuTask;
 
-        DebugTask * _debugTask;
-
         bool _armed;
 
         static void runLedTask(void * obj)
@@ -75,16 +70,13 @@ class LedTask {
 
                 if (!_imuTask->imuIsCalibrated()) {
                     blink(lastWakeTime, IMU_CALIBRATION_HZ);
-                    DebugTask::setMessage(_debugTask, "calibrating");
                 }
 
                 else if (_armed) { 
                     device_set(true);
-                    DebugTask::setMessage(_debugTask, "armed");
                 }
                 else {
                     blink(lastWakeTime, HEARTBEAT_HZ);
-                    DebugTask::setMessage(_debugTask, "heartbeat");
                 }
 
             }

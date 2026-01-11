@@ -21,16 +21,13 @@
 #include <clock.hpp>
 #include <ekf.hpp>
 #include <task.hpp>
-#include <tasks/debug.hpp>
 
 class EstimatorTask {
 
     public:
 
-        void begin(DebugTask * debugTask=nullptr)
+        void begin()
         {
-            _debugTask = debugTask;
-
             // Created in the 'empty' state, meaning the semaphore must first
             // be given, that is it will block in the task until released by
             // the stabilizer loop
@@ -136,8 +133,6 @@ class EstimatorTask {
         xSemaphoreHandle _runTaskSemaphore;
 
         uint32_t _warningBlockTimeMs;
-
-        DebugTask * _debugTask;
 
         EKF _ekf;
 

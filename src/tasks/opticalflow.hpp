@@ -16,28 +16,21 @@
 
 #pragma once
 
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 
 class OpticalFlowTask {
 
     public:
 
-        void begin(
-                EstimatorTask * estimatorTask,
-                DebugTask * debugTask=nullptr)
+        void begin(EstimatorTask * estimatorTask)
         {
             _estimatorTask = estimatorTask;
-
-            _debugTask = debugTask;
 
             if (device_init()) {
 
                 _task.init(runFlowdeckTask, "flow", this, 3);
             }
             else {
-                DebugTask::setMessage(_debugTask,
-                        "OpticalFlowTask: device initialization failed.");
             }
         }
 
@@ -60,8 +53,6 @@ class OpticalFlowTask {
 
         EstimatorTask * _estimatorTask;
 
-        DebugTask * _debugTask;
-
         void run(void)
         {
             auto lastTime  = micros();
@@ -75,10 +66,6 @@ class OpticalFlowTask {
                 bool gotMotion = false;
 
                 device_read(deltaX, deltaY, gotMotion);
-
-                DebugTask::setMessage(_debugTask,
-                        "flowx=%d flowy=%d flowgood=%d",
-                        deltaX, deltaY, gotMotion);
 
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)

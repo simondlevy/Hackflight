@@ -19,7 +19,6 @@
 #include <comms.hpp>
 #include <msp/__messages__.h>
 #include <msp/parser.hpp>
-#include <tasks/debug.hpp>
 
 class SetpointTask {
 
@@ -29,10 +28,8 @@ class SetpointTask {
 
     public:
 
-        void begin(DebugTask * debugTask=nullptr)
+        void begin()
         {
-            _debugTask = debugTask;
-
             setpointQueue = xQueueCreateStatic(
                     QUEUE_LENGTH,
                     SETPOINT_ITEM_SIZE,
@@ -87,8 +84,6 @@ class SetpointTask {
         QueueHandle_t priorityQueue;
 
         FreeRtosTask _task;
-
-        DebugTask * _debugTask;
 
         void run(void)
         {

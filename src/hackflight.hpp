@@ -22,7 +22,6 @@
 #include <pidcontrol.hpp>
 #include <mixers/crazyflie.hpp>
 #include <tasks/core.hpp>
-#include <tasks/debug.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
@@ -38,8 +37,6 @@ class Hackflight {
         void init()
         {
             Comms::init();
-
-            debugTask.begin();
 
             zrangerTask.begin(&estimatorTask);
 
@@ -69,7 +66,6 @@ class Hackflight {
     private:
 
         CoreTask coreTask;
-        DebugTask debugTask;
         EstimatorTask estimatorTask;
         LedTask ledTask;
         ImuTask imuTask;
