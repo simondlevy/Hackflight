@@ -29,10 +29,6 @@ class Gamepad:
 
     UPDATE_RATE_HZ = 100
 
-    THRUST_DESCEND_MAX = 30000
-    THRUST_DESCEND_MIN = 15000
-    THRUST_DESCEND_DEC = 208
-
     ALTITUDE_INIT_M = 0.4
     ALTITUDE_MAX_M = 1.0
     ALTITUDE_MIN_M = 0.2
@@ -66,8 +62,6 @@ class Gamepad:
         if devname not in self.SUPPORTED:
             print(devname + ' not supported')
             exit(0)
-
-        self.descend_countdown = 0
 
         self.zdist = self.ALTITUDE_INIT_M
 
@@ -138,8 +132,6 @@ class Gamepad:
 
             if self.hovering:
 
-                self.descend_countdown = self.THRUST_DESCEND_MAX
-
                 self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
                 self.vy = self.scale(self.gamepad_vals[1])
                 self.yawrate = self.scale(self.gamepad_vals[3])
@@ -155,27 +147,6 @@ class Gamepad:
                     print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
                           'yawrate=%+3.f self.zdistance=%+3.2f') %
                           (self.vx, self.vy, self.yawrate, self.zdist))
-
-            else:
-
-                self.roll = 0
-                self.pitch = 0
-                self.yaw = 0
-
-                self.thrust = (
-                        self.descend_countdown
-                        if self.descend_countdown > self.THRUST_DESCEND_MIN
-                        else 0)
-
-                self.descend_countdown -= (self.THRUST_DESCEND_DEC
-                                           if self.descend_countdown > 0
-                                           else 0)
-
-                self.zdist = self.ALTITUDE_INIT_M
-
-                if self.debug:
-                    print('send_setpoint: r=%+3.2f p=%+3.3f y=%+3.f t=%d'
-                          % (self.roll, self.pitch, self.yaw, self.thrust))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 
