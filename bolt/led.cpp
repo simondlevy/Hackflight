@@ -18,12 +18,14 @@
 
 #include <Arduino.h>
 
-const uint8_t Led::pin()
+static const uint8_t PIN = PC0;
+
+void Led::device_init()
 {
-    return PC0;
+    pinMode(PIN, OUTPUT);
 }
 
-const bool Led::inverted()
+void Led::device_set(const bool on)
 {
-    return true;
+    digitalWrite(PIN, !on);
 }

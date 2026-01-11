@@ -33,7 +33,7 @@ class LedTask {
 
             _task.init(runLedTask, "led", this, 2);
 
-            pinMode(_led.pin(), OUTPUT);
+            _led.device_init();
         }
 
         void setArmed(const bool armed)
@@ -75,7 +75,7 @@ class LedTask {
                 }
 
                 else if (_armed) { 
-                    device_set(true);
+                    _led.device_set(true);
                 }
                 else {
                     blink(lastWakeTime, HEARTBEAT_HZ);
@@ -85,14 +85,9 @@ class LedTask {
 
         void blink(TickType_t & lastWakeTime, const float rate)
         {
-            device_set(true);
+            _led.device_set(true);
             vTaskDelay(PULSE_MSEC);
-            device_set(false);
+            _led.device_set(false);
             vTaskDelayUntil(&lastWakeTime, 1000/rate);
-        }
-
-        void device_set(const bool on)
-        {
-            digitalWrite(_led.pin(), _led.inverted() ? !on : on);
         }
 };

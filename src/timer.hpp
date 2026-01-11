@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2026 Simon D. Levy
+ * Copyright (C) 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,27 @@
 
 #pragma once
 
-class Led {
+#include <Arduino.h>
+
+class Timer {
 
     public:
 
-        void device_init();
+        bool ready(const float freq)
+        {
+            const uint32_t msec_curr = millis();
 
-        void device_set(const bool on);
+            if (msec_curr - _msec_prev > 1000 / freq) {
+
+                _msec_prev = msec_curr;
+
+                return true;
+            }
+
+            return false;
+        }
+    
+    private:
+
+        uint32_t _msec_prev;
 };
