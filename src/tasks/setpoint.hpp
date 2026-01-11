@@ -113,12 +113,7 @@ class SetpointTask {
                             break;
 
                         case MSP_SET_SETPOINT_RPYT:
-                            decodeRpytSetpoint(
-                                    parser.getFloat(0),
-                                    parser.getFloat(1),
-                                    parser.getFloat(2),
-                                    parser.getFloat(3),
-                                    &setpoint);
+                            decodeRpytSetpoint(&setpoint);
                             break;
 
                         case MSP_SET_SETPOINT_HOVER:
@@ -153,38 +148,8 @@ class SetpointTask {
             xQueueOverwrite(priorityQueue, &priority);
         }
 
-        void decodeRpytSetpoint(
-                const float roll,
-                const float pitch,
-                const float yaw,
-                const float thrust,
-                setpoint_t *setpoint)
+        void decodeRpytSetpoint(setpoint_t *setpoint)
         {
-
-            static bool thrustLocked;
-
-            if (getActivePriority() == 0) {
-                thrustLocked = true;
-            }
-
-            if (thrust == 0) {
-                thrustLocked = false;
-            }
-
-            uint16_t rawThrust = thrust;
-
-            if (thrustLocked || (rawThrust < MIN_THRUST)) {
-                setpoint->demands.thrust = 0;
-            } else {
-                setpoint->demands.thrust = fminf(rawThrust, MAX_THRUST);
-            }
-
-            setpoint->hovering = false;
-
-            setpoint->demands.roll = roll;
-            setpoint->demands.pitch = pitch;
-            setpoint->demands.yaw = yaw;
-
             setSetpoint(setpoint, PRIORITY_HIGH);
         }
 

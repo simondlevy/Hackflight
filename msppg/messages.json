@@ -42,12 +42,7 @@
   ],
 
   "SET_SETPOINT_RPYT": 
-  [{"ID": 201},
-   {"comment": "Thrust is ushort in original"},
-   {"roll":    "float"},
-   {"pitch":   "float"},
-   {"yaw":     "float"},
-   {"thrust":  "float"}
+  [{"ID": 201}
   ],
 
   "SET_SETPOINT_HOVER": 

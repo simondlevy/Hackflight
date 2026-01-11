@@ -207,8 +207,7 @@ def main():
 
                 try:
 
-                    client.send(MspParser.serialize_SET_SETPOINT_RPYT(
-                        0, 0, 0, 0))
+                    client.send(MspParser.serialize_SET_SETPOINT_RPYT())
 
                 except Exception:
                     print('oopsie')
