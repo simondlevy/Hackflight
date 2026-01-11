@@ -135,7 +135,7 @@ class Gamepad:
                 self.yawrate = self.scale(self.gamepad_vals[3])
 
                 if self.debug:
-                    print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f '+
+                    print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f ' +
                            'vy=%+3.3f yaw=%+3.f') %
                           (self.thrust, self.vx, self.vy, self.yawrate))
 
