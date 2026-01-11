@@ -19,11 +19,11 @@
 #include <stdint.h>
 
 #include <comms.hpp>
+#include <led.hpp>
 #include <pidcontrol.hpp>
 #include <mixers/crazyflie.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/led.hpp>
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/task1.hpp>
@@ -45,15 +45,13 @@ class Hackflight {
 
             loggingTask.begin(&estimatorTask, &pidControl);
 
-            ledTask.begin(&imuTask);
-
             imuTask.begin(&estimatorTask);
 
             task1.begin(
+                    &led,
                     &pidControl,
                     &estimatorTask,
                     &imuTask,
-                    &ledTask,
                     &setpointTask,
                     Mixer::rotorCount,
                     Mixer::mix);
@@ -62,9 +60,9 @@ class Hackflight {
 
     private:
 
+        Led led;
         Task1 task1;
         EstimatorTask estimatorTask;
-        LedTask ledTask;
         ImuTask imuTask;
         LoggingTask loggingTask;
         SetpointTask setpointTask;

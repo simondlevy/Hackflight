@@ -32,6 +32,15 @@ typedef enum {
 
 } flightMode_t;
 
+typedef enum {
+    STATUS_IDLE,
+    STATUS_ARMED,
+    STATUS_HOVERING,
+    STATUS_LANDING,
+    STATUS_LOST_CONTACT
+
+} status_t;
+
 typedef struct {
 
     float x;
