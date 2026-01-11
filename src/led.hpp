@@ -31,15 +31,15 @@ class Led {
         void run(
                 const uint32_t msec_curr,
                 const bool imuIsCalibrated,
-                const status_t status)
+                const mode_e status)
         {
             if (!imuIsCalibrated) {
                 blink(msec_curr, IMU_CALIBRATING_FREQ);
             }
 
-            else if (status == STATUS_ARMED ||
-                    status == STATUS_HOVERING || 
-                    status == STATUS_LANDING) { 
+            else if (status == MODE_ARMED ||
+                    status == MODE_HOVERING || 
+                    status == MODE_LANDING) { 
                 device_set(true);
             }
             else {

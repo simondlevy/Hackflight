@@ -28,7 +28,7 @@ typedef struct {
     char path[200];
     char worldname[200];
     char logfilename[200];
-    flightMode_t flightMode;
+    mode_e mode;
     demands_t setpoint;
 
 } siminfo_t;

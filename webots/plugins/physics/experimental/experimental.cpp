@@ -106,7 +106,7 @@ static bool run_normal(siminfo_t & siminfo)
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
 
-    const bool autonomous = siminfo.flightMode == MODE_AUTONOMOUS;
+    const bool autonomous = siminfo.mode == MODE_AUTONOMOUS;
 
     // In autonomous mode, use current pose to get setpoints
     if (autonomous) {

@@ -56,7 +56,7 @@ class Task1 {
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
         static constexpr float MAX_SAFE_ANGLE = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const Clock::rate_t FLYING_STATUS_CLOCK_RATE =
+        static const Clock::rate_t FLYING_MODE_CLOCK_RATE =
             Clock::RATE_25_HZ;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
@@ -81,7 +81,7 @@ class Task1 {
 
         void run()
         {
-            status_t status = STATUS_IDLE;
+            mode_e status = MODE_IDLE;
 
             // Start with motor speeds at idle
             float motorvals[MAX_MOTOR_COUNT] = {};
@@ -104,7 +104,7 @@ class Task1 {
                 _setpointTask->getSetpoint(setpoint);
 
                 // Periodically update estimator with flying status
-                if (Clock::rateDoExecute(FLYING_STATUS_CLOCK_RATE, step)) {
+                if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
                     _estimatorTask->setFlyingStatus(
                             isFlyingCheck(xTaskGetTickCount(), motorvals));
                 }
@@ -116,45 +116,45 @@ class Task1 {
                 if (setpoint.timestamp > 0 &&
                         xTaskGetTickCount() - setpoint.timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
-                    status = STATUS_LOST_CONTACT;
+                    status = MODE_PANIC;
                 }
 
                 _led->run(millis(), _imuTask->imuIsCalibrated(), status);
 
                 switch (status) {
 
-                    case STATUS_IDLE:
+                    case MODE_IDLE:
                         if (setpoint.armed && isSafeAngle(_vehicleState.phi)
                                 && isSafeAngle(_vehicleState.theta)) {
-                            status = STATUS_ARMED;
+                            status = MODE_ARMED;
                         }
                         runMotors(motorvals);
                         break;
 
-                    case STATUS_ARMED:
+                    case MODE_ARMED:
                         checkDisarm(setpoint, status, motorvals);
                         if (setpoint.hovering) {
-                            status = STATUS_HOVERING;
+                            status = MODE_HOVERING;
                         }
                         runMotors(motorvals);
                         break;
 
-                    case STATUS_HOVERING:
+                    case MODE_HOVERING:
                         runClosedLoopAndMixer(step, setpoint,
                                 demands, motorvals);
                         checkDisarm(setpoint, status, motorvals);
                         if (!setpoint.hovering) {
-                            status = STATUS_LANDING;
+                            status = MODE_LANDING;
                         }
                         break;
 
-                    case STATUS_LANDING:
+                    case MODE_LANDING:
                         runClosedLoopAndMixer(step, setpoint,
                                 demands, motorvals);
                         checkDisarm(setpoint, status, motorvals);
                         break;
 
-                    case STATUS_LOST_CONTACT:
+                    case MODE_PANIC:
                         // No way to recover from this
                         break;
                 }
@@ -217,11 +217,11 @@ class Task1 {
             }
         }
 
-        void checkDisarm(const setpoint_t setpoint, status_t &status,
+        void checkDisarm(const setpoint_t setpoint, mode_e &status,
                 float * motorvals)
         {
             if (!setpoint.armed) {
-                status = STATUS_IDLE;
+                status = MODE_IDLE;
                 memset(motorvals, 0, _motorCount * sizeof(motorvals));
             }
         }

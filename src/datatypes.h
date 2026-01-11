@@ -30,17 +30,7 @@ typedef enum {
     MODE_LANDING,
     MODE_PANIC
 
-} flightMode_t;
-
-typedef enum {
-    STATUS_IDLE,
-    STATUS_ARMED,
-    STATUS_HOVERING,
-    STATUS_LANDING,
-    STATUS_LOST_CONTACT
-
-} status_t;
-
+} mode_e;
 
 typedef struct {
 

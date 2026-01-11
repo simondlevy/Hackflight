@@ -63,9 +63,9 @@ class SimOuterLoop {
             // On descent, switch mode to idle when close enough to ground
             Dynamics::pose_t pose = {};
             platform_get_vehicle_pose(pose);
-            if (_flightMode == MODE_LANDING &&
+            if (_status == MODE_LANDING &&
                     (pose.z-_startingPose.z ) < ZDIST_LANDING_MAX_M) {
-                _flightMode = MODE_IDLE;
+                _status = MODE_IDLE;
             }
 
             sendSimInfo(siminfo);
@@ -73,9 +73,9 @@ class SimOuterLoop {
             return true;
         }
 
-        flightMode_t getFlightMode()
+        mode_e getFlightMode()
         {
-            return _flightMode;
+            return _status;
         }
 
         void begin()
@@ -83,7 +83,7 @@ class SimOuterLoop {
             // OOB value to trigger initialization in step()
             _startingPose.x = INFINITY;
 
-            _flightMode = MODE_IDLE;
+            _status = MODE_IDLE;
 
             platform_init();
         }
@@ -129,7 +129,7 @@ class SimOuterLoop {
 
         Dynamics::pose_t _startingPose;
 
-        flightMode_t _flightMode;
+        mode_e _status;
 
         std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
@@ -175,24 +175,24 @@ class SimOuterLoop {
 
         void switchMode(toggle_e toggle)
         {
-            switch (_flightMode) {
+            switch (_status) {
 
                 case MODE_IDLE:
-                    _flightMode = toggle == TOGGLE_HOVER ?
-                        MODE_HOVERING : _flightMode;
+                    _status = toggle == TOGGLE_HOVER ?
+                        MODE_HOVERING : _status;
                     break;
 
                 case MODE_HOVERING:
-                    _flightMode = 
+                    _status = 
                         toggle == TOGGLE_HOVER ?  MODE_LANDING :
                         toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
-                        _flightMode;
+                        _status;
                     break;
 
                 case MODE_AUTONOMOUS:
-                    _flightMode = 
+                    _status = 
                         toggle == TOGGLE_AUTO ?  MODE_HOVERING :
-                        _flightMode;
+                        _status;
                     break;
 
                 default:
@@ -318,7 +318,7 @@ class SimOuterLoop {
 
             checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
 
-            siminfo.flightMode = _flightMode;
+            siminfo.mode = _status;
 
             if (!autonomous) {
 
@@ -351,7 +351,7 @@ class SimOuterLoop {
                 getSetpointFromKey(key, siminfo);
             }
 
-            siminfo.flightMode = _flightMode;
+            siminfo.mode = _status;
         }
 
         // Platform-dependent ------------------------------------------------

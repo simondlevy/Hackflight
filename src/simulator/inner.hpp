@@ -59,8 +59,8 @@ class SimInnerLoop {
 
                 const auto state =  _dynamics.getVehicleStateDegrees();
 
-                const bool controlled = siminfo.flightMode == MODE_HOVERING ||
-                    siminfo.flightMode == MODE_AUTONOMOUS;
+                const bool controlled = siminfo.mode == MODE_HOVERING ||
+                    siminfo.mode == MODE_AUTONOMOUS;
 
                 const demands_t sp = siminfo.setpoint;
 
