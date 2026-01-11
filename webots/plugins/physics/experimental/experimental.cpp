@@ -20,7 +20,7 @@
 #include "../common.hpp"
 
 // Hackflight
-#include <setpoints/rangefinder.hpp>
+#include <autopilot/rangefinder.hpp>
 
 // SimSensors
 #include <simsensors/src/collision.hpp>
