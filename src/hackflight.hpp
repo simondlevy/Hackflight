@@ -26,7 +26,6 @@
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
-#include <tasks/opticalflow.hpp>
 #include <tasks/setpoint.hpp>
 #include <tasks/task2.hpp>
 
@@ -39,8 +38,6 @@ class Hackflight {
             Comms::init();
 
             task2.begin(&estimatorTask);
-
-            opticalFlowTask.begin(&estimatorTask);
 
             estimatorTask.begin();
 
@@ -70,7 +67,6 @@ class Hackflight {
         LedTask ledTask;
         ImuTask imuTask;
         LoggingTask loggingTask;
-        OpticalFlowTask opticalFlowTask;
         SetpointTask setpointTask;
         Task2 task2;
 

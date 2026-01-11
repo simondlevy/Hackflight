@@ -16,7 +16,7 @@
 
 #include <pmw3901.hpp>
 
-#include <tasks/opticalflow.hpp>
+#include <opticalflow.hpp>
 
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t MOSI_PIN = PA7;
@@ -27,7 +27,7 @@ static SPIClass spi;
 
 static PMW3901 pmw3901;
 
-bool OpticalFlowTask::device_init()
+bool OpticalFlow::device_init()
 {
     spi.setSCLK(PA5);
     spi.setMISO(PA6);
@@ -38,7 +38,7 @@ bool OpticalFlowTask::device_init()
     return pmw3901.begin(CS_PIN, spi);
 }
 
-void OpticalFlowTask::device_read(
+void OpticalFlow::device_read(
         int16_t & dx, int16_t & dy, bool &gotMotion)
 {
     pmw3901.readMotion(dx, dy, gotMotion);

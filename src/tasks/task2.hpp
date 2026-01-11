@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <opticalflow.hpp>
 #include <zranger.hpp>
 #include <tasks/estimator.hpp>
 
@@ -29,6 +30,8 @@ class Task2 {
 
             _zranger.init();
 
+            _opticalFlow.init();
+
             _task.init(runTask2, "task2", this, 2);
         }
 
@@ -36,7 +39,9 @@ class Task2 {
 
         ZRanger _zranger;
 
-        static constexpr float FREQ_HZ = 40;
+        OpticalFlow _opticalFlow;
+
+        static constexpr float FREQ_HZ = 50;
 
         static void runTask2(void * obj)
         {
@@ -58,10 +63,13 @@ class Task2 {
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
                 tofMeasurement_t tofData = {};
-
-                if (_zranger.read(tofData)) {
-
+                if (_zranger.read(tofData, xTaskGetTickCount())) {
                     _estimatorTask->enqueueRange(&tofData);
+                }
+
+                flowMeasurement_t flowData = {};
+                if (_opticalFlow.read(flowData)) {
+                    _estimatorTask->enqueueFlow(&flowData);
                 }
             }
         }

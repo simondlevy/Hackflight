@@ -16,7 +16,9 @@
 
 #pragma once
 
-#include <tasks/estimator.hpp>
+#include <math.h>
+
+#include <datatypes.h>
 
 class ZRanger {
 
@@ -31,7 +33,7 @@ class ZRanger {
             device_init();
         }
 
-        bool read(tofMeasurement_t & tofData)
+        bool read(tofMeasurement_t & tofData, const uint32_t tick)
         {
             float range = device_read();
 
@@ -45,7 +47,7 @@ class ZRanger {
                 float stdDev = EXP_STD_A * (
                         1 + expf(_expCoeff * (distance - EXP_POINT_A)));
 
-                tofData.timestamp = xTaskGetTickCount();
+                tofData.timestamp = tick;
                 tofData.distance = distance;
                 tofData.stdDev = stdDev;
 
