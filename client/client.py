@@ -208,12 +208,10 @@ def main():
                 try:
 
                     client.send(MspParser.serialize_SET_SETPOINT_RPYT(
-                        gamepad.roll,
-                        gamepad.pitch,
-                        gamepad.yaw,
-                        gamepad.thrust))
+                        0, 0, 0, 0))
 
                 except Exception:
+                    print('oopsie')
                     break
 
             sleep(1 / UPDATE_RATE_HZ)
