@@ -200,14 +200,14 @@ def main():
 
             if gamepad.hovering:
 
-                client.send(MspParser.serialize_SET_SETPOINT_HOVER(
+                client.send(MspParser.serialize_SET_HOVER(
                     gamepad.vx, gamepad.vy, gamepad.yawrate, gamepad.zdist))
 
             else:
 
                 try:
 
-                    client.send(MspParser.serialize_SET_SETPOINT_RPYT())
+                    client.send(MspParser.serialize_SET_IDLE())
 
                 except Exception:
                     print('oopsie')

@@ -64,7 +64,7 @@ class SetpointTask {
 
         static const uint16_t MIN_THRUST = 1000;
         static const uint16_t MAX_THRUST = 60000;
- 
+
         static void runSetpointTask(void * obj)
         {
             ((SetpointTask *)obj)->run();
@@ -112,18 +112,19 @@ class SetpointTask {
                             setpoint.armed = !setpoint.armed;
                             break;
 
-                        case MSP_SET_SETPOINT_RPYT:
-                            decodeRpytSetpoint(&setpoint);
+                        case MSP_SET_IDLE:
+                            setpoint.hovering = false;
+                            setSetpoint(&setpoint, PRIORITY_HIGH);
                             break;
 
-                        case MSP_SET_SETPOINT_HOVER:
-                            decodeHoverSetpoint(
-                                    parser.getFloat(0),
-                                    parser.getFloat(1),
-                                    parser.getFloat(2),
-                                    parser.getFloat(3),
-                                    &setpoint);
-                             break;
+                        case MSP_SET_HOVER:
+                            setpoint.hovering = true;
+                            setpoint.demands.pitch = parser.getFloat(0);
+                            setpoint.demands.roll = parser.getFloat(1);
+                            setpoint.demands.yaw = parser.getFloat(2);
+                            setpoint.demands.thrust = parser.getFloat(3);
+                            setSetpoint(&setpoint, PRIORITY_HIGH);
+                            break;
 
                         default:
                             break;
@@ -147,29 +148,6 @@ class SetpointTask {
             int priority = PRIORITY_LOW;
             xQueueOverwrite(priorityQueue, &priority);
         }
-
-        void decodeRpytSetpoint(setpoint_t *setpoint)
-        {
-            setSetpoint(setpoint, PRIORITY_HIGH);
-        }
-
-        void decodeHoverSetpoint(
-                const float vx,
-                const float vy,
-                const float yawrate,
-                const float zdistance,
-                setpoint_t *setpoint)
-        {
-            setpoint->hovering = true;
-
-            setpoint->demands.thrust = zdistance;
-            setpoint->demands.yaw = yawrate;
-            setpoint->demands.pitch = vx;
-            setpoint->demands.roll = vy;
-
-            setSetpoint(setpoint, PRIORITY_HIGH);
-        }
-
         void setSetpoint(setpoint_t *setpoint, int priority)
         {
             int currentPriority = 0;

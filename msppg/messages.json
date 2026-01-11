@@ -41,13 +41,12 @@
    {"arm":    "byte"}
   ],
 
-  "SET_SETPOINT_RPYT": 
+  "SET_IDLE": 
   [{"ID": 201}
   ],
 
-  "SET_SETPOINT_HOVER": 
+  "SET_HOVER": 
   [{"ID": 202},
-   {"comment": "Hover mode"},
    {"vx":        "float"},
    {"vy":        "float"},
    {"yawrate":   "float"},
