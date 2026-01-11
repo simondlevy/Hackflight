@@ -28,7 +28,7 @@
 #include <tasks/logging.hpp>
 #include <tasks/opticalflow.hpp>
 #include <tasks/setpoint.hpp>
-#include <tasks/zranger.hpp>
+#include <tasks/task2.hpp>
 
 class Hackflight {
 
@@ -38,7 +38,7 @@ class Hackflight {
         {
             Comms::init();
 
-            zrangerTask.begin(&estimatorTask);
+            task2.begin(&estimatorTask);
 
             opticalFlowTask.begin(&estimatorTask);
 
@@ -72,7 +72,7 @@ class Hackflight {
         LoggingTask loggingTask;
         OpticalFlowTask opticalFlowTask;
         SetpointTask setpointTask;
-        ZRangerTask zrangerTask;
+        Task2 task2;
 
         PidControl pidControl;
 };

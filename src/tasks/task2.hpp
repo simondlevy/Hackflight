@@ -18,7 +18,7 @@
 
 #include <tasks/estimator.hpp>
 
-class ZRangerTask {
+class Task2 {
 
     public:
 
@@ -50,7 +50,7 @@ class ZRangerTask {
 
         static void runZrangerTask(void * obj)
         {
-            ((ZRangerTask *)obj)->run();
+            ((Task2 *)obj)->run();
         }
 
         FreeRtosTask _task;
