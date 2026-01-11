@@ -54,7 +54,7 @@ static void load(const siminfo_t & siminfo,
 }
 
 static bool collided(
-        const pose_t & pose,
+        const Dynamics::pose_t & pose,
         const simsens::WorldParser & worldParser)
 {
     const bool debug = true;
@@ -73,7 +73,7 @@ static bool collided(
 static void read_rangefinder(
         simsens::Rangefinder & rangefinder,
         simsens::WorldParser & world,
-        const pose_t & pose,
+        const Dynamics::pose_t & pose,
         int * distances_mm,
         FILE * logfp)
 {

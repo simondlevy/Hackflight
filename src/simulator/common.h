@@ -18,10 +18,12 @@
 
 #pragma once
 
+#include <simulator/dynamics.hpp>
+
 // Structure shared between slow and fast threads
 typedef struct {
 
-    pose_t startingPose;
+    Dynamics::pose_t startingPose;
     float framerate;
     char path[200];
     char worldname[200];

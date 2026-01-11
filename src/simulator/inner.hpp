@@ -45,7 +45,7 @@ class SimInnerLoop {
             _pidControl->init();
         }
 
-        pose_t step(const siminfo_t & siminfo)
+        Dynamics::pose_t step(const siminfo_t & siminfo)
         {
             // Set pose in dynamics first time around
             static bool _ready;

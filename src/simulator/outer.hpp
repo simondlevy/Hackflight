@@ -61,7 +61,7 @@ class SimOuterLoop {
             }
 
             // On descent, switch mode to idle when close enough to ground
-            pose_t pose = {};
+            Dynamics::pose_t pose = {};
             platform_get_vehicle_pose(pose);
             if (_flightMode == MODE_LANDING &&
                     (pose.z-_startingPose.z ) < ZDIST_LANDING_MAX_M) {
@@ -127,7 +127,7 @@ class SimOuterLoop {
 
         } joystick_t;
 
-        pose_t _startingPose;
+        Dynamics::pose_t _startingPose;
 
         flightMode_t _flightMode;
 
@@ -300,7 +300,7 @@ class SimOuterLoop {
                 platform_get_vehicle_pose(_startingPose);
             }
 
-            memcpy(&siminfo.startingPose, &_startingPose, sizeof(pose_t));
+            memcpy(&siminfo.startingPose, &_startingPose, sizeof(Dynamics::pose_t));
             siminfo.framerate = platform_get_framerate();
             platform_send_siminfo(siminfo);
         }
@@ -359,7 +359,7 @@ class SimOuterLoop {
         void         platform_cleanup();
         float        platform_get_framerate();
         float        platform_get_time();
-        void         platform_get_vehicle_pose(pose_t & pose);
+        void         platform_get_vehicle_pose(Dynamics::pose_t & pose);
         void         platform_init();
         int          platform_joystick_get_axis_value(const uint8_t axis);
         joystick_t   platform_joystick_get_info(); 

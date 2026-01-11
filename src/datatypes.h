@@ -292,17 +292,6 @@ typedef struct
 
 typedef struct {
 
-    float x;
-    float y;
-    float z;
-    float phi;
-    float theta;
-    float psi;
-
-} pose_t;
-
-typedef struct {
-
     uint32_t timestamp;
     bool armed;
     bool hovering;

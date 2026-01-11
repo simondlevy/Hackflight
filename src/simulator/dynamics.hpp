@@ -50,7 +50,18 @@ class Dynamics {
 
         static constexpr float ZMIN = 0.005;
 
-         /**
+        typedef struct {
+
+            float x;
+            float y;
+            float z;
+            float phi;
+            float theta;
+            float psi;
+
+        } pose_t;
+
+        /**
          *  Vehicle parameters
          */
         typedef struct {
@@ -107,7 +118,7 @@ class Dynamics {
             return pose_t {
                 _state.x, _state.y, _state.z, _state.phi, _state.theta, _state.psi
             };
-         }
+        }
 
         vehicleState_t getVehicleStateDegrees()
         {

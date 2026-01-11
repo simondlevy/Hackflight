@@ -68,7 +68,7 @@ float SimOuterLoop::platform_get_time()
     return wb_robot_get_time();
 }
 
-void SimOuterLoop::platform_get_vehicle_pose(pose_t & pose)
+void SimOuterLoop::platform_get_vehicle_pose(Dynamics::pose_t & pose)
 {
     const double * xyz = wb_gps_get_values(_gps);
     const double *rpy = wb_inertial_unit_get_roll_pitch_yaw(_imu);
