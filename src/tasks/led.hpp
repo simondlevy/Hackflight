@@ -16,10 +16,6 @@
 
 #pragma once
 
-#include <Arduino.h>
-
-#include <stdint.h>
-
 #include <task.hpp>
 #include <tasks/imu.hpp>
 
