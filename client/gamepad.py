@@ -43,11 +43,10 @@ class Gamepad:
         self.vx = 0
         self.vy = 0
         self.yawrate = 0
-        self.zdist = 0
+        self.thrust = 0
         self.roll = 0
         self.pitch = 0
         self.yaw = 0
-        self.thrust = 0
 
         gamepads = inputs.devices.gamepads
 
@@ -62,8 +61,6 @@ class Gamepad:
         if devname not in self.SUPPORTED:
             print(devname + ' not supported')
             exit(0)
-
-        self.zdist = self.ALTITUDE_INIT_M
 
         thread = Thread(target=self.threadfun, args=(self.gamepad_vals, ))
         thread.daemon = True
@@ -132,21 +129,15 @@ class Gamepad:
 
             if self.hovering:
 
+                self.thrust = -self.scale(self.gamepad_vals[0])
                 self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
                 self.vy = self.scale(self.gamepad_vals[1])
                 self.yawrate = self.scale(self.gamepad_vals[3])
 
-                self.thrust = (-self.scale(
-                    self.gamepad_vals[0]) * self.ALTITUDE_INC_MPS)
-
-                self.zdist = min(max(
-                    self.zdist + self.thrust, self.ALTITUDE_MIN_M),
-                                 self.ALTITUDE_MAX_M)
-
                 if self.debug:
-                    print(('send_hover_setpoint: vx=%+3.2f vy=%+3.3f ' +
-                          'yawrate=%+3.f self.zdistance=%+3.2f') %
-                          (self.vx, self.vy, self.yawrate, self.zdist))
+                    print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f '+
+                           'vy=%+3.3f yaw=%+3.f') %
+                          (self.thrust, self.vx, self.vy, self.yawrate))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 

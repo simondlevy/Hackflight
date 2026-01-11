@@ -49,14 +49,14 @@ class Hackflight {
 
             setpointTask.begin();
 
-            loggingTask.begin(&estimatorTask, &closedLoopControl);
+            loggingTask.begin(&estimatorTask, &pidControl);
 
             ledTask.begin(&imuTask);
 
             imuTask.begin(&estimatorTask);
 
             coreTask.begin(
-                    &closedLoopControl,
+                    &pidControl,
                     &estimatorTask,
                     &imuTask,
                     &ledTask,
@@ -78,5 +78,5 @@ class Hackflight {
         SetpointTask setpointTask;
         ZRangerTask zrangerTask;
 
-        ClosedLoopControl closedLoopControl;
+        PidControl pidControl;
 };

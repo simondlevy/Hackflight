@@ -47,9 +47,9 @@
 
   "SET_HOVER": 
   [{"ID": 202},
-   {"vx":        "float"},
-   {"vy":        "float"},
-   {"yawrate":   "float"},
-   {"zdistance": "float"}
+   {"thrust" : "float"},
+   {"vx":      "float"},
+   {"vy":      "float"},
+   {"yaw":     "float"}
   ]
 }

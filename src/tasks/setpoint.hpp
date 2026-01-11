@@ -119,10 +119,10 @@ class SetpointTask {
 
                         case MSP_SET_HOVER:
                             setpoint.hovering = true;
-                            setpoint.demands.pitch = parser.getFloat(0);
-                            setpoint.demands.roll = parser.getFloat(1);
-                            setpoint.demands.yaw = parser.getFloat(2);
-                            setpoint.demands.thrust = parser.getFloat(3);
+                            setpoint.demands.thrust = parser.getFloat(0);
+                            setpoint.demands.pitch = parser.getFloat(1);
+                            setpoint.demands.roll = parser.getFloat(2);
+                            setpoint.demands.yaw = parser.getFloat(3);
                             setSetpoint(&setpoint, PRIORITY_HIGH);
                             break;
 

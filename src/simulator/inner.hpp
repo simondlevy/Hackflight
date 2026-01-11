@@ -26,7 +26,6 @@
 #include <mixers/crazyflie.hpp>
 #include <num.hpp>
 #include <pidcontrol.hpp>
-#include <setpoints/manual.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/common.h>
 #include <vehicles/diyquad.hpp>
@@ -39,11 +38,11 @@ class SimInnerLoop {
 
     public:
 
-        void init(ClosedLoopControl * pidControl)
+        void init(PidControl * pidControl)
         {
-            _closedLoopControl = pidControl;
+            _pidControl = pidControl;
 
-            _closedLoopControl->init();
+            _pidControl->init();
         }
 
         pose_t step(const siminfo_t & siminfo)
@@ -63,20 +62,16 @@ class SimInnerLoop {
                 const bool controlled = siminfo.flightMode == MODE_HOVERING ||
                     siminfo.flightMode == MODE_AUTONOMOUS;
 
-                const float dt = 1 / (float)PID_SLOW_FREQ;
-
                 const demands_t sp = siminfo.setpoint;
 
                 demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
-
-                ManualSetpoint::run(dt, setpoint);
 
                 // Run fast PID control and mixer in middle loop --------------
                 for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                     demands_t demands = {};
 
-                    _closedLoopControl->run(
+                    _pidControl->run(
                             1 / (float)PID_FAST_FREQ,
                             controlled,
                             state,
@@ -105,7 +100,7 @@ class SimInnerLoop {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
-        ClosedLoopControl * _closedLoopControl;
+        PidControl * _pidControl;
 
         static void report_fps()
         {

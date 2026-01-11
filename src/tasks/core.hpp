@@ -33,7 +33,7 @@ class CoreTask {
     public:
 
         void begin(
-                ClosedLoopControl * closedLoopControl,
+                PidControl * pidControl,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
                 LedTask * ledTask,
@@ -42,7 +42,7 @@ class CoreTask {
                 const mixFun_t mixFun,
                 DebugTask * debugTask=nullptr)
         {
-            _closedLoopControl = closedLoopControl;
+            _pidControl = pidControl;
             _estimatorTask = estimatorTask;
             _imuTask = imuTask;
             _ledTask = ledTask;
@@ -79,7 +79,7 @@ class CoreTask {
             ((CoreTask *)arg)->run();
         }
 
-        ClosedLoopControl * _closedLoopControl;
+        PidControl * _pidControl;
         mixFun_t _mixFun;
         FreeRtosTask _task;
         DebugTask * _debugTask;
@@ -181,7 +181,7 @@ class CoreTask {
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
 
-                _closedLoopControl->run(
+                _pidControl->run(
                         1.f / CLOSED_LOOP_UPDATE_RATE,
                         setpoint.hovering,
                         _vehicleState,

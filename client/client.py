@@ -201,7 +201,7 @@ def main():
             if gamepad.hovering:
 
                 client.send(MspParser.serialize_SET_HOVER(
-                    gamepad.vx, gamepad.vy, gamepad.yawrate, gamepad.zdist))
+                    gamepad.thrust, gamepad.vx, gamepad.vy, gamepad.yawrate))
 
             else:
 

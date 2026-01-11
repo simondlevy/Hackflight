@@ -19,6 +19,24 @@
 
 #include <tasks/core.hpp>
 
+#ifdef NO_MOTORS
+
+void CoreTask::motors_init()
+{
+}
+
+
+void CoreTask::motors_setSpeed(uint32_t id, float speed)
+{
+    (void)id;
+    (void)speed;
+}
+
+void CoreTask::motors_run()
+{
+}
+#else
+
 static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
 
 static const std::vector<uint8_t> POWER_SWITCH_PINS = {PA0, PB12, PC8, PC15};
@@ -41,10 +59,10 @@ void CoreTask::motors_init()
     motors.arm();
 }
 
+
 void CoreTask::motors_setSpeed(uint32_t id, float speed)
 {
     const uint8_t pulse_width = 125 * (speed + 1);
-
     motors.set(id, pulse_width);
 }
 
@@ -53,4 +71,5 @@ void CoreTask::motors_run()
     motors.run();
 }
 
+#endif
 

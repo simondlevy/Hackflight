@@ -29,11 +29,11 @@ class LoggingTask {
     public:
 
         void begin(EstimatorTask * estimatorTask,
-                ClosedLoopControl * closedLoopControl)
+                PidControl * pidControl)
         {
             _estimatorTask = estimatorTask;
 
-            _closedLoopControl = closedLoopControl;
+            _pidControl = pidControl;
 
             _task.init(runLoggingTask, "logger", this, 3);
         }
@@ -51,7 +51,7 @@ class LoggingTask {
 
         EstimatorTask * _estimatorTask;
 
-        ClosedLoopControl * _closedLoopControl;
+        PidControl * _pidControl;
 
         void run(void)
         {
@@ -61,7 +61,7 @@ class LoggingTask {
 
                 sendVehicleState();
 
-                sendClosedLoopControlMessage();
+                sendPidControlMessage();
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
             }
@@ -85,11 +85,11 @@ class LoggingTask {
             sendPayload(serializer);
         }
 
-        void sendClosedLoopControlMessage()
+        void sendPidControlMessage()
         {
             MspSerializer serializer = {};
 
-            _closedLoopControl->serializeMessage(serializer);
+            _pidControl->serializeMessage(serializer);
 
             sendPayload(serializer);
         }

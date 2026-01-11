@@ -25,7 +25,7 @@
 #include <pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
 
-class ClosedLoopControl {
+class PidControl {
 
     public:
 
@@ -37,8 +37,19 @@ class ClosedLoopControl {
                 const float landingAltitudeMeters,
                 demands_t & demands)
         {
+            static float _altitude_target;
+
+            if (_altitude_target == 0) {
+                _altitude_target = ALTITUDE_INIT_M;
+            }
+
+            _altitude_target = Num::fconstrain(
+                        _altitude_target +
+                        openLoopDemands.thrust * ALTITUDE_INC_MPS * dt,
+                        ALTITUDE_MIN_M, ALTITUDE_MAX_M);
+
             const auto climbrate = AltitudeController::run(hovering,
-                    dt, vehicleState.z, openLoopDemands.thrust);
+                    dt, vehicleState.z, _altitude_target);
 
             demands.thrust =
                 ClimbRateController::run(
@@ -96,6 +107,11 @@ class ClosedLoopControl {
         }
 
     private:
+
+        static constexpr float ALTITUDE_INIT_M = 0.4;
+        static constexpr float ALTITUDE_MAX_M = 1.0;
+        static constexpr float ALTITUDE_MIN_M = 0.2;
+        static constexpr float ALTITUDE_INC_MPS = 0.2;
 
         static constexpr float YAW_DEMAND_MAX = 200;
 };

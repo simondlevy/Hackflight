@@ -30,12 +30,12 @@ class AltitudeController {
         static float run(
                 const bool hovering,
                 const float dt,
-                const float z,
-                const float thrust)
+                const float actual,
+                const float target)
         {
             static float _integral;
 
-            const auto error = thrust - z;
+            const auto error = target - actual;
 
             _integral = hovering ?
                 Num::fconstrain(_integral + error * dt, ILIMIT) : 0;

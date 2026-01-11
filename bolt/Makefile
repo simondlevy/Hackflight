@@ -21,6 +21,14 @@ bolt: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
+nomotors: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
+	arduino-cli compile \
+		--build-property "compiler.cpp.extra_flags=\"-DNO_MOTORS\"" \
+		--libraries $(HOME)/Documents/Arduino/libraries \
+		--libraries ../.. \
+		--build-path ./build \
+		--fqbn $(FQBN) $(SKETCH).ino
+
 $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../bolt
 
