@@ -16,8 +16,12 @@
 
 #pragma once
 
+#include <Arduino.h>
+
 #include <task.hpp>
 #include <tasks/imu.hpp>
+
+#include <newled.hpp>
 
 class LedTask {
 
@@ -29,7 +33,7 @@ class LedTask {
 
             _task.init(runLedTask, "led", this, 2);
 
-            device_init();
+            pinMode(_led.pin(), OUTPUT);
         }
 
         void setArmed(const bool armed)
@@ -44,6 +48,8 @@ class LedTask {
         static constexpr float IMU_CALIBRATION_HZ = 3;
 
         static constexpr uint32_t PULSE_MSEC = 50;
+
+        Led _led;
 
         FreeRtosTask _task;
 
@@ -85,7 +91,8 @@ class LedTask {
             vTaskDelayUntil(&lastWakeTime, 1000/rate);
         }
 
-        void device_init();
-
-        void device_set(const bool on);
+        void device_set(const bool on)
+        {
+            digitalWrite(_led.pin(), _led.inverted() ? !on : on);
+        }
 };

@@ -14,16 +14,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <newled.hpp>
+#pragma once
 
-#include <Arduino.h>
+#include <stdint.h>
 
-const uint8_t Led::pin()
-{
-    return PC0;
-}
+class Led {
 
-const bool Led::inverted()
-{
-    return true;
-}
+    public:
+
+        const uint8_t pin();
+
+        const bool inverted();
+};
