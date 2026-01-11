@@ -96,7 +96,7 @@ class PhysicsPluginHelper {
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
-            const axis3_t euler = { pose.phi, pose.theta, -pose.psi};
+            const axis3_t euler = { (float)pose.phi, (float)pose.theta, (float)-pose.psi};
             axis4_t quat = {};
             Num::euler2quat(euler, quat);
 

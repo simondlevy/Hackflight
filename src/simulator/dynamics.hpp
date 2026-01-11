@@ -48,16 +48,16 @@ class Dynamics {
 
     public:
 
-        static constexpr float ZMIN = 0.005;
+        static constexpr double ZMIN = 0.005;
 
         typedef struct {
 
-            float x;
-            float y;
-            float z;
-            float phi;
-            float theta;
-            float psi;
+            double x;
+            double y;
+            double z;
+            double phi;
+            double theta;
+            double psi;
 
         } pose_t;
 
@@ -67,13 +67,13 @@ class Dynamics {
         typedef struct {
 
             // These can be measured directly
-            float m;  // mass [kg]
-            float l;  // arm length [m]
+            double m;  // mass [kg]
+            double l;  // arm length [m]
 
             // These should be estimated to get realistic behavior
-            float b;  // thrust coefficient [F=b*w^2]
-            float d;  // drag coefficient [T=d*w^2]
-            float I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
+            double b;  // thrust coefficient [F=b*w^2]
+            double d;  // drag coefficient [T=d*w^2]
+            double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
 
         } vehicle_params_t; 
 
@@ -83,20 +83,20 @@ class Dynamics {
         typedef struct {
 
             // These can be measured directly
-            float g;   // gravitational constant [m/s/s]
-            float rho; // air density [kg/m^3]
+            double g;   // gravitational constant [m/s/s]
+            double rho; // air density [kg/m^3]
 
         } world_params_t; 
 
         Dynamics(
                 const vehicle_params_t & vparams,
                 const world_params_t & wparams,
-                const float dt)
+                const double dt)
         {
             init(vparams, wparams, dt);
         }
 
-        Dynamics(const vehicle_params_t & vparams, const float dt)
+        Dynamics(const vehicle_params_t & vparams, const double dt)
         {
             const world_params_t wparams = { 9.807, 1.225 };
 
@@ -137,7 +137,7 @@ class Dynamics {
          * Sets motor spins
          */
         void update(
-                const float * rpms,
+                const float * rpms, // single-precision for compat with mixer
                 const uint8_t rotorCount,
                 const int8_t * roll,
                 const int8_t * pitch,
@@ -151,7 +151,7 @@ class Dynamics {
 
             // Equation 6 ---------------------------------------
 
-            float u1=0, u2=0, u3=0, u4=0;
+            double u1=0, u2=0, u3=0, u4=0;
 
             for (unsigned int i = 0; i < rotorCount; ++i) {
 
@@ -266,7 +266,7 @@ class Dynamics {
         // Vehicle state first derivative (Equation 12)
         vehicleState_t _dstate;
 
-        float _dt;
+        double _dt;
 
         vehicle_params_t _vparams;
 
@@ -278,7 +278,7 @@ class Dynamics {
         void init(
                 const vehicle_params_t & vparams,
                 const world_params_t & wparams,
-                const float dt)
+                const double dt)
         {
             memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
