@@ -21,12 +21,12 @@
 #include <comms.hpp>
 #include <pidcontrol.hpp>
 #include <mixers/crazyflie.hpp>
-#include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/led.hpp>
 #include <tasks/logging.hpp>
 #include <tasks/setpoint.hpp>
+#include <tasks/task1.hpp>
 #include <tasks/task2.hpp>
 
 class Hackflight {
@@ -49,7 +49,7 @@ class Hackflight {
 
             imuTask.begin(&estimatorTask);
 
-            coreTask.begin(
+            task1.begin(
                     &pidControl,
                     &estimatorTask,
                     &imuTask,
@@ -62,7 +62,7 @@ class Hackflight {
 
     private:
 
-        CoreTask coreTask;
+        Task1 task1;
         EstimatorTask estimatorTask;
         LedTask ledTask;
         ImuTask imuTask;

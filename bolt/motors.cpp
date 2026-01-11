@@ -17,22 +17,22 @@
 
 #include <oneshot125.hpp>
 
-#include <tasks/core.hpp>
+#include <tasks/task1.hpp>
 
 #ifdef NO_MOTORS
 
-void CoreTask::motors_init()
+void Task1::motors_init()
 {
 }
 
 
-void CoreTask::motors_setSpeed(uint32_t id, float speed)
+void Task1::motors_setSpeed(uint32_t id, float speed)
 {
     (void)id;
     (void)speed;
 }
 
-void CoreTask::motors_run()
+void Task1::motors_run()
 {
 }
 #else
@@ -49,7 +49,7 @@ static void enableMotor(const uint8_t id)
     digitalWrite(POWER_SWITCH_PINS[id], HIGH);
 }
 
-void CoreTask::motors_init()
+void Task1::motors_init()
 {
     enableMotor(0);
     enableMotor(1);
@@ -60,13 +60,13 @@ void CoreTask::motors_init()
 }
 
 
-void CoreTask::motors_setSpeed(uint32_t id, float speed)
+void Task1::motors_setSpeed(uint32_t id, float speed)
 {
     const uint8_t pulse_width = 125 * (speed + 1);
     motors.set(id, pulse_width);
 }
 
-void CoreTask::motors_run()
+void Task1::motors_run()
 {
     motors.run();
 }

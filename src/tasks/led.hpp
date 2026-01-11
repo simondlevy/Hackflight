@@ -74,10 +74,8 @@ class LedTask {
                 else {
                     blink(lastWakeTime, HEARTBEAT_HZ);
                 }
-
             }
         }
-
 
         void blink(TickType_t & lastWakeTime, const float rate)
         {

@@ -40,8 +40,8 @@ class ImuTask {
             _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
             // Create a semaphore to protect waitDataReady() calls from core task
-            _coreTaskSemaphore =
-                xSemaphoreCreateBinaryStatic(&_coreTaskSemaphoreBuffer);
+            _task1Semaphore =
+                xSemaphoreCreateBinaryStatic(&_task1SemaphoreBuffer);
 
             if (!device_init()) {
             }
@@ -70,7 +70,7 @@ class ImuTask {
 
         // Called by core task
         void waitDataReady(void) {
-            xSemaphoreTake(_coreTaskSemaphore, portMAX_DELAY);
+            xSemaphoreTake(_task1Semaphore, portMAX_DELAY);
         }
 
     private:
@@ -260,8 +260,8 @@ class ImuTask {
         bool _gyroBiasFound;
         Axis3f _gyroBias;
 
-        SemaphoreHandle_t _coreTaskSemaphore;
-        StaticSemaphore_t _coreTaskSemaphoreBuffer;
+        SemaphoreHandle_t _task1Semaphore;
+        StaticSemaphore_t _task1SemaphoreBuffer;
 
         /**
          * Compensate for a miss-aligned accelerometer. It uses the trim
@@ -374,7 +374,7 @@ class ImuTask {
                 xQueueOverwrite(_accelQueue, &_accelData);
                 xQueueOverwrite(_gyroQueue, &_gyroData);
 
-                xSemaphoreGive(_coreTaskSemaphore);
+                xSemaphoreGive(_task1Semaphore);
             }
         }
 

@@ -27,7 +27,7 @@
 
 #include <vehicles/diyquad.hpp>
 
-class CoreTask {
+class Task1 {
 
     public:
 
@@ -48,7 +48,7 @@ class CoreTask {
             _motorCount = motorCount;
             _mixFun = mixFun;
 
-            _task.init(runCoreTask, "core", this, 5);
+            _task.init(runTask1, "core", this, 5);
         }
 
     private:
@@ -73,9 +73,9 @@ class CoreTask {
 
         } status_t;
 
-        static void runCoreTask(void *arg)
+        static void runTask1(void *arg)
         {
-            ((CoreTask *)arg)->run();
+            ((Task1 *)arg)->run();
         }
 
         PidControl * _pidControl;
