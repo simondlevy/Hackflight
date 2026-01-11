@@ -57,10 +57,12 @@ class CoreTask {
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
         static constexpr float MAX_SAFE_ANGLE = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const Clock::rate_t FLYING_STATUS_CLOCK_RATE = Clock::RATE_25_HZ;
+        static const Clock::rate_t FLYING_STATUS_CLOCK_RATE =
+            Clock::RATE_25_HZ;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
-        static const auto CLOSED_LOOP_UPDATE_RATE = Clock::RATE_500_HZ; // Needed ?
+        static const auto CLOSED_LOOP_UPDATE_RATE =
+            Clock::RATE_500_HZ; // Needed ?
 
         typedef enum {
             STATUS_IDLE,
@@ -120,15 +122,16 @@ class CoreTask {
 
                 // Check for lost contact
                 if (setpoint.timestamp > 0 &&
-                        xTaskGetTickCount() - setpoint.timestamp > SETPOINT_TIMEOUT_TICKS) {
+                        xTaskGetTickCount() - setpoint.timestamp >
+                        SETPOINT_TIMEOUT_TICKS) {
                     status = STATUS_LOST_CONTACT;
                 }
 
                 switch (status) {
 
                     case STATUS_IDLE:
-                        if (setpoint.armed && isSafeAngle(_vehicleState.phi) &&
-                                isSafeAngle(_vehicleState.theta)) {
+                        if (setpoint.armed && isSafeAngle(_vehicleState.phi)
+                                && isSafeAngle(_vehicleState.theta)) {
                             _ledTask->setArmed(true);
                             status = STATUS_ARMED;
                         }
@@ -216,7 +219,8 @@ class CoreTask {
 
             for (uint8_t k = 0; k < _motorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
-                motorvals[k] = thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
+                motorvals[k] =
+                    thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
             }
         }
 
@@ -231,8 +235,8 @@ class CoreTask {
         }
 
         //
-        // We say we are flying if one or more motors are running over the idle
-        // thrust.
+        // We say we are flying if one or more motors are running over the
+        // idle thrust.
         //
         bool isFlyingCheck(const uint32_t tick, const float * motorvals)
         {
@@ -253,7 +257,8 @@ class CoreTask {
 
             bool result = false;
             if (0 != latestThrustTick) {
-                if ((tick - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                if ((tick - latestThrustTick) <
+                        IS_FLYING_HYSTERESIS_THRESHOLD) {
                     result = true;
                 }
             }
