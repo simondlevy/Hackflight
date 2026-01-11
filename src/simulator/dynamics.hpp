@@ -42,6 +42,7 @@
 #include <math.h>
 
 #include <datatypes.h>
+#include <num.hpp>
 
 class Dynamics {
 
