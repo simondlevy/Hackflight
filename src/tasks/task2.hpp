@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <zranger.hpp>
 #include <tasks/estimator.hpp>
 
 class Task2 {
@@ -24,38 +25,25 @@ class Task2 {
 
         void begin(EstimatorTask * estimatorTask)
         {
-            if (!device_init()) {
-            }
-
             _estimatorTask = estimatorTask;
 
-            _task.init(runZrangerTask, "zranger2", this, 2);
+            _zranger.init();
 
-            // pre-compute constant in the measurement noise model for kalman
-            _expCoeff =
-				logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+            _task.init(runTask2, "task2", this, 2);
         }
 
     private:
 
+        ZRanger _zranger;
+
         static constexpr float FREQ_HZ = 40;
 
-        static const uint16_t OUTLIER_LIMIT_MM = 5000;
-
-        // Measurement noise model
-        static constexpr float EXP_POINT_A = 2.5;
-        static constexpr float EXP_STD_A = 0.0025; 
-        static constexpr float EXP_POINT_B = 4.0;
-        static constexpr float EXP_STD_B = 0.2;   
-
-        static void runZrangerTask(void * obj)
+        static void runTask2(void * obj)
         {
             ((Task2 *)obj)->run();
         }
 
         FreeRtosTask _task;
-
-        float _expCoeff;
 
         EstimatorTask * _estimatorTask;
 
@@ -69,29 +57,12 @@ class Task2 {
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                float range = device_read();
+                tofMeasurement_t tofData = {};
 
-                // check if range is feasible and push into the estimator the
-                // sensor should not be able to measure >5 [m], and outliers
-                // typically occur as >8 [m] measurements
-                if (range < OUTLIER_LIMIT_MM) {
-
-                    float distance = range / 1000; // Scale from [mm] to [m]
-
-                    float stdDev = EXP_STD_A * (
-                            1 + expf(_expCoeff * (distance - EXP_POINT_A)));
-
-                    tofMeasurement_t tofData;
-                    tofData.timestamp = xTaskGetTickCount();
-                    tofData.distance = distance;
-                    tofData.stdDev = stdDev;
+                if (_zranger.read(tofData)) {
 
                     _estimatorTask->enqueueRange(&tofData);
                 }
             }
         }
-
-        bool device_init();
-
-        float device_read();
 };

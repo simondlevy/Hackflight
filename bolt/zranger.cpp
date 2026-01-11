@@ -14,13 +14,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <VL53L1X.h>
+#include <zranger.hpp>
 
-#include <tasks/task2.hpp>
+#include <VL53L1X.h>
 
 static VL53L1X vl53l1x;
 
-bool Task2::device_init()
+bool ZRanger::device_init()
 {
     Wire.begin();
     Wire.setClock(400000);
@@ -38,7 +38,7 @@ bool Task2::device_init()
     return true;
 }
 
-float Task2::device_read()
+float ZRanger::device_read()
 {
     return vl53l1x.read();
 }
