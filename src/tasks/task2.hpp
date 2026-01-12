@@ -20,13 +20,17 @@
 #include <zranger.hpp>
 #include <tasks/estimator.hpp>
 
+#include <newekf.hpp>
+
 class Task2 {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask)
+        void begin(EstimatorTask * estimatorTask, NewEKF * ekf)
         {
             _estimatorTask = estimatorTask;
+
+            _ekf = ekf;
 
             _zranger.init();
 
@@ -51,6 +55,8 @@ class Task2 {
         FreeRtosTask _task;
 
         EstimatorTask * _estimatorTask;
+
+        NewEKF * _ekf;
 
         void run(void)
         {

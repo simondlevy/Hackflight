@@ -38,15 +38,16 @@ class Hackflight {
 
             imuTask.begin(&estimatorTask);
 
-            task1.begin(&estimatorTask, &imuTask);
+            task1.begin(&estimatorTask, &imuTask, &ekf);
 
-            task2.begin(&estimatorTask);
+            task2.begin(&estimatorTask, &ekf);
 
         }
 
 
     private:
 
+        NewEKF ekf;
         Task1 task1;
         Task2 task2;
 

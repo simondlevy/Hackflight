@@ -19,6 +19,7 @@
 
 #include <led.hpp>
 #include <logger.hpp>
+#include <newekf.hpp>
 #include <mixers/crazyflie.hpp>
 #include <pidcontrol.hpp>
 #include <rc.hpp>
@@ -34,10 +35,15 @@ class Task1 {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, ImuTask * imuTask)
+        void begin(
+                EstimatorTask * estimatorTask,
+                ImuTask * imuTask,
+                NewEKF * ekf)
         {
             _estimatorTask = estimatorTask;
             _imuTask = imuTask;
+
+            _ekf = ekf;
 
             _task.init(runTask1, "task1", this, 5);
         }
@@ -67,6 +73,8 @@ class Task1 {
         FreeRtosTask _task;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
+
+        NewEKF * _ekf;
 
         void run()
         {
