@@ -24,7 +24,7 @@ class SetpointTask {
 
     private:
 
-        static constexpr float FREQ_HZ = 1000;
+        static constexpr float FREQ_HZ = 100;
 
     public:
 
@@ -56,11 +56,7 @@ class SetpointTask {
 
     private:
 
-        static const uint8_t PRIORITY_LOW  = 1;
         static const uint8_t PRIORITY_HIGH = 2;
-
-        static const uint16_t MIN_THRUST = 1000;
-        static const uint16_t MAX_THRUST = 60000;
 
         static void runSetpointTask(void * obj)
         {
@@ -138,11 +134,6 @@ class SetpointTask {
             return peekResult == pdTRUE ? priority : 0;
         }
 
-        void relaxPriority(void)
-        {
-            int priority = PRIORITY_LOW;
-            xQueueOverwrite(priorityQueue, &priority);
-        }
         void setSetpoint(setpoint_t *setpoint, int priority)
         {
             int currentPriority = 0;
