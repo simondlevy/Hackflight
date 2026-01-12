@@ -55,6 +55,10 @@ class Task1 {
         static const auto CLOSED_LOOP_UPDATE_RATE =
             Clock::RATE_500_HZ; // Needed ?
 
+        static const uint32_t EKF_PREDICTION_FREQ = 100;
+
+        static constexpr float MAX_VELOCITY = 10; //meters per second
+
         static void runTask1(void *arg)
         {
             ((Task1 *)arg)->run();
@@ -91,6 +95,8 @@ class Task1 {
 
             bool isFlying = false;
 
+            bool didResetEstimation = false;
+
             for (uint32_t step=1; ; step++) {
 
                 // Yield
@@ -108,6 +114,9 @@ class Task1 {
                 if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
                     isFlying = isFlyingCheck(msec, motorvals);
                 }
+
+                // Run ekf to get vehicle state
+                getStateEstimate(isFlying, _vehicleState, didResetEstimation);
 
                 // Check for lost contact
                 if (setpoint.timestamp > 0 &&
@@ -161,6 +170,61 @@ class Task1 {
             }
         }
 
+        void getStateEstimate(
+                const bool isFlying,
+                vehicleState_t & state,
+                bool & didResetEstimation)
+        {
+            /*
+               static Timer _timer;
+
+               const uint32_t nowMs = millis();
+
+               if (didResetEstimation) {
+               _ekf.init(nowMs);
+               didResetEstimation = false;
+               }
+
+            // Run the system dynamics to predict the state forward.
+            if (_timer.ready(EKF_PREDICTION_FREQ)) {
+            _ekf.predict(nowMs, isFlying); 
+            }
+
+            axis3_t dpos = {};
+            quaternion_t quat = {};
+
+            _ekf.getStateEstimate(nowMs, state.z, dpos, quat);
+
+            if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
+            !velInBounds(dpos.z)) {
+            didResetEstimation = true;
+            }
+
+            state.dx = dpos.x;
+            state.dy = -dpos.y; // negate for rightward positive
+            state.dz = dpos.z;
+
+            axis3_t angles = {};
+            Num::quat2euler(quat, angles);
+
+            state.phi = angles.x;
+            state.theta = angles.y;
+            state.psi = -angles.z; // negate for nose-right positive
+
+            // Get angular velocities directly from gyro
+            axis3_t gyroData = {};
+            _imu.getGyroData(gyroData);
+            state.dphi   = gyroData.x;
+            state.dtheta = gyroData.y;
+            state.dpsi   = -gyroData.z; // negate for nose-right positive
+            */
+        }
+
+        static bool velInBounds(const float vel)
+        {
+            return fabs(vel) < MAX_VELOCITY;
+        }
+ 
         //
         // We say we are flying if one or more motors are running over the idle
         // thrust.
