@@ -19,9 +19,6 @@
 #include <stdint.h>
 
 #include <comms.hpp>
-#include <led.hpp>
-#include <pidcontrol.hpp>
-#include <mixers/crazyflie.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/task1.hpp>
@@ -41,23 +38,14 @@ class Hackflight {
 
             imuTask.begin(&estimatorTask);
 
-            task1.begin(
-                    &led,
-                    &pidControl,
-                    &estimatorTask,
-                    &imuTask,
-                    Mixer::rotorCount,
-                    Mixer::mix);
+            task1.begin(&estimatorTask, &imuTask);
         }
 
 
     private:
 
-        Led led;
         Task1 task1;
         EstimatorTask estimatorTask;
         ImuTask imuTask;
         Task2 task2;
-
-        PidControl pidControl;
 };

@@ -19,6 +19,7 @@
 
 #include <led.hpp>
 #include <logger.hpp>
+#include <mixers/crazyflie.hpp>
 #include <pidcontrol.hpp>
 #include <rc.hpp>
 #include <task.hpp>
@@ -31,20 +32,10 @@ class Task1 {
 
     public:
 
-        void begin(
-                Led * led,
-                PidControl * pidControl,
-                EstimatorTask * estimatorTask,
-                ImuTask * imuTask,
-                const uint8_t motorCount,
-                const mixFun_t mixFun)
+        void begin(EstimatorTask * estimatorTask, ImuTask * imuTask)
         {
-            _led = led;
-            _pidControl = pidControl;
             _estimatorTask = estimatorTask;
             _imuTask = imuTask;
-            _motorCount = motorCount;
-            _mixFun = mixFun;
 
             _task.init(runTask1, "task1", this, 5);
         }
@@ -67,15 +58,13 @@ class Task1 {
             ((Task1 *)arg)->run();
         }
 
-        Led * _led;
-        PidControl * _pidControl;
-        mixFun_t _mixFun;
+        vehicleState_t _vehicleState;
+        Led _led;
+        PidControl _pidControl;
+
         FreeRtosTask _task;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
-        vehicleState_t _vehicleState;
-
-        uint8_t _motorCount;
 
         void run()
         {
@@ -90,7 +79,7 @@ class Task1 {
             // Run device-dependent motor initialization
             motors_init();
 
-            _led->init();
+            _led.init();
 
             setpoint_t setpoint = {};
 
@@ -118,7 +107,7 @@ class Task1 {
                     status = MODE_PANIC;
                 }
 
-                _led->run(millis(), _imuTask->imuIsCalibrated(), status);
+                _led.run(millis(), _imuTask->imuIsCalibrated(), status);
 
                 Logger::run(millis(), _estimatorTask);
 
@@ -168,7 +157,7 @@ class Task1 {
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
 
-                _pidControl->run(
+                _pidControl.run(
                         1.f / CLOSED_LOOP_UPDATE_RATE,
                         setpoint.hovering,
                         _vehicleState,
@@ -176,7 +165,7 @@ class Task1 {
                         LANDING_ALTITUDE_M,
                         demands);
 
-                runMixer(_mixFun, demands, motorvals);
+                runMixer(demands, motorvals);
 
                 runMotors(motorvals);
             }
@@ -184,20 +173,19 @@ class Task1 {
 
         void runMotors(float * motorvals)
         {
-            for (uint8_t k=0; k<_motorCount; ++k) {
+            for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
                 motors_setSpeed(k, motorvals[k]);
             }
             motors_run();
         }
 
-        void runMixer(const mixFun_t mixFun, const demands_t & demands,
-                float * motorvals)
+        void runMixer(const demands_t & demands, float * motorvals)
         {
             float uncapped[MAX_MOTOR_COUNT] = {};
-            mixFun(demands, uncapped);
+            Mixer::mix(demands, uncapped);
 
             float highestThrustFound = 0;
-            for (uint8_t k=0; k<_motorCount; k++) {
+            for (uint8_t k=0; k<Mixer::rotorCount; k++) {
 
                 const auto thrust = uncapped[k];
 
@@ -211,7 +199,7 @@ class Task1 {
                 reduction = highestThrustFound - THRUST_MAX;
             }
 
-            for (uint8_t k = 0; k < _motorCount; k++) {
+            for (uint8_t k = 0; k < Mixer::rotorCount; k++) {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] =
                     thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
@@ -223,7 +211,7 @@ class Task1 {
         {
             if (!setpoint.armed) {
                 status = MODE_IDLE;
-                memset(motorvals, 0, _motorCount * sizeof(motorvals));
+                memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
             }
         }
 
@@ -235,7 +223,7 @@ class Task1 {
         {
             auto isThrustOverIdle = false;
 
-            for (int i = 0; i < _motorCount; ++i) {
+            for (int i = 0; i < Mixer::rotorCount; ++i) {
                 if (motorvals[i] > 0) {
                     isThrustOverIdle = true;
                     break;
