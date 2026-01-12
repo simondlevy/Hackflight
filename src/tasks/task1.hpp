@@ -19,25 +19,25 @@
 
 #include <led.hpp>
 #include <logger.hpp>
+#include <newekf.hpp>
 #include <mixers/crazyflie.hpp>
 #include <pidcontrol.hpp>
 #include <rc.hpp>
 #include <task.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
-
-//#include <newekf.hpp>
-
 #include <vehicles/diyquad.hpp>
+
+#include <newekf.hpp>
+#include <newimu.hpp>
 
 class Task1 {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, ImuTask * imuTask)
+        void begin(NewEKF * ekf)
         {
-            _estimatorTask = estimatorTask;
-            _imuTask = imuTask;
+            _ekf = ekf;
+
+            _imu.init();
 
             _task.init(runTask1, "task1", this, 5);
         }
@@ -55,18 +55,24 @@ class Task1 {
         static const auto CLOSED_LOOP_UPDATE_RATE =
             Clock::RATE_500_HZ; // Needed ?
 
+        static const uint32_t EKF_PREDICTION_FREQ = 100;
+
+        static constexpr float MAX_VELOCITY = 10; //meters per second
+
         static void runTask1(void *arg)
         {
             ((Task1 *)arg)->run();
         }
+
+        Imu _imu;
 
         vehicleState_t _vehicleState;
         Led _led;
         PidControl _pidControl;
 
         FreeRtosTask _task;
-        EstimatorTask * _estimatorTask;
-        ImuTask * _imuTask;
+
+        NewEKF * _ekf;
 
         void run()
         {
@@ -85,22 +91,32 @@ class Task1 {
 
             setpoint_t setpoint = {};
 
+            const uint32_t msec_start = millis();
+
+            bool isFlying = false;
+
+            bool didResetEstimation = false;
+
             for (uint32_t step=1; ; step++) {
 
-                // Wait for IMU
-                _imuTask->waitDataReady();
+                // Yield
+                vTaskDelay(1);
+
+                const uint32_t msec = millis() - msec_start;
+
+                // Sync the core loop to the IMU
+                const bool imuIsCalibrated = _imu.step(_ekf, msec);
 
                 // Get setpoint from remote control
                 RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
-                    _estimatorTask->setFlyingStatus(
-                            isFlyingCheck(xTaskGetTickCount(), motorvals));
+                    isFlying = isFlyingCheck(msec, motorvals);
                 }
 
-                // Get vehicle state from estimator
-                _estimatorTask->getVehicleState(&_vehicleState);
+                // Run ekf to get vehicle state
+                getStateEstimate(isFlying, _vehicleState, didResetEstimation);
 
                 // Check for lost contact
                 if (setpoint.timestamp > 0 &&
@@ -109,9 +125,9 @@ class Task1 {
                     status = MODE_PANIC;
                 }
 
-                _led.run(millis(), _imuTask->imuIsCalibrated(), status);
+                _led.run(millis(), imuIsCalibrated, status);
 
-                Logger::run(millis(), _estimatorTask);
+                Logger::run(millis(), _vehicleState);
 
                 switch (status) {
 
@@ -152,6 +168,91 @@ class Task1 {
                 }
             }
         }
+
+        void getStateEstimate(
+                const bool isFlying,
+                vehicleState_t & state,
+                bool & didResetEstimation)
+        {
+            static Timer _timer;
+
+            const uint32_t nowMs = millis();
+
+            if (didResetEstimation) {
+                _ekf->init(nowMs);
+                didResetEstimation = false;
+            }
+
+            // Run the system dynamics to predict the state forward.
+            if (_timer.ready(EKF_PREDICTION_FREQ)) {
+                _ekf->predict(nowMs, isFlying); 
+            }
+
+            axis3_t dpos = {};
+            axis4_t quat = {};
+
+            _ekf->getStateEstimate(nowMs, state.z, dpos, quat);
+
+            if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
+                    !velInBounds(dpos.z)) {
+                didResetEstimation = true;
+            }
+
+            state.dx = dpos.x;
+            state.dy = -dpos.y; // negate for rightward positive
+            state.dz = dpos.z;
+
+            axis3_t angles = {};
+            Num::quat2euler(quat, angles);
+
+            state.phi = angles.x;
+            state.theta = angles.y;
+            state.psi = -angles.z; // negate for nose-right positive
+
+            // Get angular velocities directly from gyro
+            axis3_t gyroData = {};
+            _imu.getGyroData(gyroData);
+            state.dphi   = gyroData.x;
+            state.dtheta = gyroData.y;
+            state.dpsi   = -gyroData.z; // negate for nose-right positive
+        }
+
+        static bool velInBounds(const float vel)
+        {
+            return fabs(vel) < MAX_VELOCITY;
+        }
+
+        //
+        // We say we are flying if one or more motors are running over the idle
+        // thrust.
+        //
+        bool isFlyingCheck(const uint32_t step, const float * motorvals)
+        {
+            auto isThrustOverIdle = false;
+
+            for (int i = 0; i < Mixer::rotorCount; ++i) {
+                if (motorvals[i] > 0) {
+                    isThrustOverIdle = true;
+                    break;
+                }
+            }
+
+            static uint32_t latestThrustTick;
+
+            if (isThrustOverIdle) {
+                latestThrustTick = step;
+            }
+
+            bool result = false;
+            if (0 != latestThrustTick) {
+                if ((step - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                    result = true;
+                }
+            }
+
+            return result;
+        }        
+
 
         void runClosedLoopAndMixer(
                 const uint32_t step, const setpoint_t &setpoint,
@@ -216,38 +317,6 @@ class Task1 {
                 memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
             }
         }
-
-        //
-        // We say we are flying if one or more motors are running over the
-        // idle thrust.
-        //
-        bool isFlyingCheck(const uint32_t tick, const float * motorvals)
-        {
-            auto isThrustOverIdle = false;
-
-            for (int i = 0; i < Mixer::rotorCount; ++i) {
-                if (motorvals[i] > 0) {
-                    isThrustOverIdle = true;
-                    break;
-                }
-            }
-
-            static uint32_t latestThrustTick;
-
-            if (isThrustOverIdle) {
-                latestThrustTick = tick;
-            }
-
-            bool result = false;
-            if (0 != latestThrustTick) {
-                if ((tick - latestThrustTick) <
-                        IS_FLYING_HYSTERESIS_THRESHOLD) {
-                    result = true;
-                }
-            }
-
-            return result;
-        }        
 
         static bool isSafeAngle(float angle)
         {

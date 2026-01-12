@@ -19,10 +19,10 @@
 #include <stdint.h>
 
 #include <comms.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
 #include <tasks/task1.hpp>
 #include <tasks/task2.hpp>
+
+#include <newekf.hpp>
 
 class Hackflight {
 
@@ -32,20 +32,16 @@ class Hackflight {
         {
             Comms::init();
 
-            task2.begin(&estimatorTask);
+            _ekf.init(millis());
 
-            estimatorTask.begin();
+            _task1.begin(&_ekf);
 
-            imuTask.begin(&estimatorTask);
-
-            task1.begin(&estimatorTask, &imuTask);
+            _task2.begin(&_ekf);
         }
-
 
     private:
 
-        Task1 task1;
-        EstimatorTask estimatorTask;
-        ImuTask imuTask;
-        Task2 task2;
+        NewEKF _ekf;
+        Task1 _task1;
+        Task2 _task2;
 };

@@ -57,6 +57,18 @@ class Num {
             q.z = cr * cp * sy - sr * sp * cy;
         }
 
+        static void quat2euler(const axis4_t & q, axis3_t & a)
+        {
+            a.x = RAD2DEG * atan2f(2*(q.y*q.z+q.w* q.x) ,
+                    q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z);
+
+            a.y = RAD2DEG * asinf(-2*(q.x*q.z - q.w*q.y));
+
+
+            a.z = RAD2DEG * atan2f(2*(q.x*q.y+q.w* q.z),
+                    q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z);
+        }
+
         static float cap_angle(float angle) 
         {
             float result = angle;
