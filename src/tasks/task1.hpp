@@ -87,6 +87,9 @@ class Task1 {
 
             for (uint32_t step=1; ; step++) {
 
+                // Yield
+                vTaskDelay(1);
+
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
