@@ -18,7 +18,6 @@
 
 #include <opticalflow.hpp>
 #include <zranger.hpp>
-#include <tasks/estimator.hpp>
 
 #include <newekf.hpp>
 
@@ -26,10 +25,8 @@ class Task2 {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask, NewEKF * ekf)
+        void begin(NewEKF * ekf)
         {
-            _estimatorTask = estimatorTask;
-
             _ekf = ekf;
 
             _zranger.init();
@@ -70,12 +67,12 @@ class Task2 {
 
                 tofMeasurement_t tofData = {};
                 if (_zranger.read(tofData, xTaskGetTickCount())) {
-                    _estimatorTask->enqueueRange(&tofData);
+                    _ekf->enqueueRange(&tofData);
                 }
 
                 flowMeasurement_t flowData = {};
                 if (_opticalFlow.read(flowData)) {
-                    _estimatorTask->enqueueFlow(&flowData);
+                    _ekf->enqueueFlow(&flowData);
                 }
             }
         }

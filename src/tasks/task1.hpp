@@ -24,8 +24,6 @@
 #include <pidcontrol.hpp>
 #include <rc.hpp>
 #include <task.hpp>
-#include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
 #include <vehicles/diyquad.hpp>
 
 #include <newekf.hpp>
@@ -35,15 +33,11 @@ class Task1 {
 
     public:
 
-        void begin(
-                EstimatorTask * estimatorTask,
-                ImuTask * imuTask,
-                NewEKF * ekf)
+        void begin(NewEKF * ekf)
         {
-            _estimatorTask = estimatorTask;
-            _imuTask = imuTask;
-
             _ekf = ekf;
+
+            _imu.init();
 
             _task.init(runTask1, "task1", this, 5);
         }
@@ -73,8 +67,6 @@ class Task1 {
         PidControl _pidControl;
 
         FreeRtosTask _task;
-        EstimatorTask * _estimatorTask;
-        ImuTask * _imuTask;
 
         NewEKF * _ekf;
 
@@ -95,25 +87,21 @@ class Task1 {
 
             setpoint_t setpoint = {};
 
+            const uint32_t msec_start = millis();
+
             for (uint32_t step=1; ; step++) {
 
                 // Yield
                 vTaskDelay(1);
-
-                // Wait for IMU
-                _imuTask->waitDataReady();
 
                 // Get setpoint from remote control
                 RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
-                    _estimatorTask->setFlyingStatus(
-                            isFlyingCheck(xTaskGetTickCount(), motorvals));
+                    //_estimatorTask->setFlyingStatus(
+                    //        isFlyingCheck(xTaskGetTickCount(), motorvals));
                 }
-
-                // Get vehicle state from estimator
-                _estimatorTask->getVehicleState(&_vehicleState);
 
                 // Check for lost contact
                 if (setpoint.timestamp > 0 &&
@@ -122,9 +110,15 @@ class Task1 {
                     status = MODE_PANIC;
                 }
 
-                _led.run(millis(), _imuTask->imuIsCalibrated(), status);
+                const uint32_t msec = millis() - msec_start;
 
-                Logger::run(millis(), _estimatorTask);
+                // Sync the core loop to the IMU
+                const bool imuIsCalibrated = _imu.step(_ekf, msec);
+
+                _led.run(millis(), imuIsCalibrated, status);
+
+                // XXX
+                //Logger::run(millis(), _estimatorTask);
 
                 switch (status) {
 
