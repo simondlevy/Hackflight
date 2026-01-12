@@ -127,8 +127,7 @@ class Task1 {
 
                 _led.run(millis(), imuIsCalibrated, status);
 
-                // XXX
-                //Logger::run(millis(), _estimatorTask);
+                Logger::run(millis(), _vehicleState);
 
                 switch (status) {
 

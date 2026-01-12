@@ -29,17 +29,13 @@ class Logger {
 
         static void run(
                 const uint32_t msec_curr,
-                EstimatorTask * estimatorTask)
+                const vehicleState_t & state)
         {
             static Timer _timer;
 
             if (_timer.ready(FREQ_HZ)) {
 
-                vehicleState_t state = {};
-
                 MspSerializer serializer = {};
-
-                estimatorTask->getVehicleState(&state);
 
                 const float statevals[10] = { state.dx, state.dy, state.z,
                     state.dz, state.phi, state.dphi, state.theta,
