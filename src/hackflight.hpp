@@ -34,20 +34,22 @@ class Hackflight {
         {
             Comms::init();
 
-            task2.begin(&estimatorTask);
-
             estimatorTask.begin();
 
             imuTask.begin(&estimatorTask);
 
             task1.begin(&estimatorTask, &imuTask);
+
+            task2.begin(&estimatorTask);
+
         }
 
 
     private:
 
         Task1 task1;
+        Task2 task2;
+
         EstimatorTask estimatorTask;
         ImuTask imuTask;
-        Task2 task2;
 };
