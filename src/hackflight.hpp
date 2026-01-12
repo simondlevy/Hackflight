@@ -43,7 +43,7 @@ class Hackflight {
 
             setpointTask.begin();
 
-            loggingTask.begin(&estimatorTask, &pidControl);
+            loggingTask.begin(&estimatorTask);
 
             imuTask.begin(&estimatorTask);
 

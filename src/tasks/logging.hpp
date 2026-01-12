@@ -28,12 +28,9 @@ class LoggingTask {
 
     public:
 
-        void begin(EstimatorTask * estimatorTask,
-                PidControl * pidControl)
+        void begin(EstimatorTask * estimatorTask)
         {
             _estimatorTask = estimatorTask;
-
-            _pidControl = pidControl;
 
             _task.init(runLoggingTask, "logger", this, 3);
         }
@@ -51,8 +48,6 @@ class LoggingTask {
 
         EstimatorTask * _estimatorTask;
 
-        PidControl * _pidControl;
-
         void run(void)
         {
             TickType_t lastWakeTime = xTaskGetTickCount();
@@ -60,8 +55,6 @@ class LoggingTask {
             while (true) {
 
                 sendVehicleState();
-
-                sendPidControlMessage();
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
             }
@@ -85,14 +78,6 @@ class LoggingTask {
             sendPayload(serializer);
         }
 
-        void sendPidControlMessage()
-        {
-            MspSerializer serializer = {};
-
-            _pidControl->serializeMessage(serializer);
-
-            sendPayload(serializer);
-        }
  
         void sendPayload(const MspSerializer & serializer) {
             for (uint8_t k=0; k<serializer.payloadSize; ++k) {
