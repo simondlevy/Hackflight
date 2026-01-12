@@ -99,8 +99,6 @@ class EstimatorTask {
 
     private:
 
-        static const uint32_t WARNING_HOLD_BACK_TIME_MS = 2000;
-
         // this is slower than the IMU update rate of 1000Hz
         static const uint32_t PREDICT_RATE = Clock::RATE_100_HZ; 
         static const uint32_t PREDICTION_UPDATE_INTERVAL_MS = 1000 / PREDICT_RATE;
