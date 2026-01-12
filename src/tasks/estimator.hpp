@@ -126,8 +126,6 @@ class EstimatorTask {
         // process
         xSemaphoreHandle _runTaskSemaphore;
 
-        uint32_t _warningBlockTimeMs;
-
         EKF _ekf;
 
         // Data used to enable the task and stabilizer loop to run with minimal
@@ -172,10 +170,6 @@ class EstimatorTask {
             if (!_ekf.isStateWithinBounds()) {
 
                 _didResetEstimation = true;
-
-                if (nowMs > _warningBlockTimeMs) {
-                    _warningBlockTimeMs = nowMs + WARNING_HOLD_BACK_TIME_MS;
-                }
             }
 
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
