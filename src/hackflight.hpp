@@ -24,6 +24,8 @@
 #include <tasks/task1.hpp>
 #include <tasks/task2.hpp>
 
+#include <newekf.hpp>
+
 class Hackflight {
 
     public:
