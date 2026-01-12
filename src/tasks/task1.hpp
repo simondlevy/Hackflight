@@ -175,29 +175,28 @@ class Task1 {
                 vehicleState_t & state,
                 bool & didResetEstimation)
         {
-            /*
-               static Timer _timer;
+            static Timer _timer;
 
-               const uint32_t nowMs = millis();
+            const uint32_t nowMs = millis();
 
-               if (didResetEstimation) {
-               _ekf.init(nowMs);
-               didResetEstimation = false;
-               }
+            if (didResetEstimation) {
+                _ekf->init(nowMs);
+                didResetEstimation = false;
+            }
 
             // Run the system dynamics to predict the state forward.
             if (_timer.ready(EKF_PREDICTION_FREQ)) {
-            _ekf.predict(nowMs, isFlying); 
+                _ekf->predict(nowMs, isFlying); 
             }
 
             axis3_t dpos = {};
-            quaternion_t quat = {};
+            axis4_t quat = {};
 
-            _ekf.getStateEstimate(nowMs, state.z, dpos, quat);
+            _ekf->getStateEstimate(nowMs, state.z, dpos, quat);
 
             if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
-            !velInBounds(dpos.z)) {
-            didResetEstimation = true;
+                    !velInBounds(dpos.z)) {
+                didResetEstimation = true;
             }
 
             state.dx = dpos.x;
@@ -217,14 +216,13 @@ class Task1 {
             state.dphi   = gyroData.x;
             state.dtheta = gyroData.y;
             state.dpsi   = -gyroData.z; // negate for nose-right positive
-            */
         }
 
         static bool velInBounds(const float vel)
         {
             return fabs(vel) < MAX_VELOCITY;
         }
- 
+
         //
         // We say we are flying if one or more motors are running over the idle
         // thrust.
