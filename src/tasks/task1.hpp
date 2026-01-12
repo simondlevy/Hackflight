@@ -25,10 +25,10 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
+#include <vehicles/diyquad.hpp>
 
 #include <newekf.hpp>
-
-#include <vehicles/diyquad.hpp>
+#include <newimu.hpp>
 
 class Task1 {
 
