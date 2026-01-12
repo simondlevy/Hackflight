@@ -56,9 +56,10 @@ class ImuTask {
             _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
 
+            /*
             _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
-
             _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
+            */
 
             _task.init(runImuTask, "imu", this, 3);
         }
@@ -151,13 +152,14 @@ class ImuTask {
 
         static const auto IMU_QUEUE_LENGTH = QUEUE_LENGTH * IMU_ITEM_SIZE;
 
+        /*
         uint8_t _accelQueueStorage[IMU_QUEUE_LENGTH];
         StaticQueue_t _accelQueueBuffer;
         QueueHandle_t _accelQueue;
 
         uint8_t _gyroQueueStorage[IMU_QUEUE_LENGTH];
         StaticQueue_t _gyroQueueBuffer;
-        QueueHandle_t _gyroQueue;
+        QueueHandle_t _gyroQueue;*/
 
         bias_t _gyroBiasRunning;
 
@@ -371,8 +373,9 @@ class ImuTask {
 
                 _estimatorTask->enqueueAccel(&_accelData);
 
+                /*
                 xQueueOverwrite(_accelQueue, &_accelData);
-                xQueueOverwrite(_gyroQueue, &_gyroData);
+                xQueueOverwrite(_gyroQueue, &_gyroData);*/
 
                 xSemaphoreGive(_task1Semaphore);
             }
