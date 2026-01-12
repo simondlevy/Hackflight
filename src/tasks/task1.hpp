@@ -18,6 +18,7 @@
 
 
 #include <led.hpp>
+#include <logger.hpp>
 #include <pidcontrol.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
@@ -47,7 +48,7 @@ class Task1 {
             _motorCount = motorCount;
             _mixFun = mixFun;
 
-            _task.init(runTask1, "core", this, 5);
+            _task.init(runTask1, "task1", this, 5);
         }
 
     private:
@@ -120,6 +121,8 @@ class Task1 {
                 }
 
                 _led->run(millis(), _imuTask->imuIsCalibrated(), status);
+
+                Logger::run(millis(), _estimatorTask);
 
                 switch (status) {
 
