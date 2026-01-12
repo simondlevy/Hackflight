@@ -125,14 +125,6 @@ class SetpointTask {
             }
         }
 
-        int getActivePriority(void)
-        {
-            int priority = 0;
-
-            const BaseType_t peekResult = xQueuePeek(priorityQueue, &priority, 0);
-
-            return peekResult == pdTRUE ? priority : 0;
-        }
 
         void setSetpoint(setpoint_t *setpoint, int priority)
         {
