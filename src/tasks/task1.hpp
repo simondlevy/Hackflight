@@ -66,6 +66,8 @@ class Task1 {
             ((Task1 *)arg)->run();
         }
 
+        Imu _imu;
+
         vehicleState_t _vehicleState;
         Led _led;
         PidControl _pidControl;

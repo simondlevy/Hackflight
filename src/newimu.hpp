@@ -314,6 +314,8 @@ class Imu {
             return (float)raw * 2 * scale / 65536.f;
         }
 
+        // Hardware-dependent ------------------------------------------------
+
         bool device_init(int16_t & gscale, int16_t & ascale);
 
         /**
