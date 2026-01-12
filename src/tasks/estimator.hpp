@@ -35,13 +35,6 @@ class EstimatorTask {
 
             _dataMutex = xSemaphoreCreateMutexStatic(&_dataMutexBuffer);
 
-            /*
-            _measurementsQueue = xQueueCreateStatic(
-                    QUEUE_MAX_LENGTH, 
-                    QUEUE_ITEM_SIZE,
-                    measurementsQueueStorage,
-                    &_measurementsQueueBuffer);*/
-
             _task.init(runEstimatorTask, "estimator", this, 4);
 
             _ekf.init(millis());
@@ -115,11 +108,6 @@ class EstimatorTask {
         static const size_t QUEUE_MAX_LENGTH = 20;
         static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
 
-        /*
-        uint8_t measurementsQueueStorage[QUEUE_MAX_LENGTH * QUEUE_ITEM_SIZE];
-        StaticQueue_t _measurementsQueueBuffer;
-        xQueueHandle _measurementsQueue;*/
-
         EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
         uint32_t _queueLength;
 
@@ -173,12 +161,6 @@ class EstimatorTask {
 
             // Pull the latest sensors values of interest; discard the rest
 
-            /*
-                EKF::measurement_t m = {};
-               while (pdTRUE == xQueueReceive(_measurementsQueue, &m, 0)) {
-               _ekf.update(m, nowMs);
-               }*/
-
             // Update with queued measurements and flush the queue
             for (uint32_t k=0; k<_queueLength; ++k) {
                 _ekf.update(_measurementsQueue[k], nowMs);
@@ -225,14 +207,4 @@ class EstimatorTask {
                     sizeof(EKF::measurement_t));
             _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
         }
-
-        /*
-           void enqueue(const EKF::measurement_t * measurement) 
-           {
-           if (!_measurementsQueue) {
-           return;
-           }
-
-           xQueueSend(_measurementsQueue, measurement, 0);
-           }*/
 };
