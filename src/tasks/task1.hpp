@@ -94,6 +94,11 @@ class Task1 {
                 // Yield
                 vTaskDelay(1);
 
+                const uint32_t msec = millis() - msec_start;
+
+                // Sync the core loop to the IMU
+                const bool imuIsCalibrated = _imu.step(_ekf, msec);
+
                 // Get setpoint from remote control
                 RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
@@ -109,11 +114,6 @@ class Task1 {
                         SETPOINT_TIMEOUT_TICKS) {
                     status = MODE_PANIC;
                 }
-
-                const uint32_t msec = millis() - msec_start;
-
-                // Sync the core loop to the IMU
-                const bool imuIsCalibrated = _imu.step(_ekf, msec);
 
                 _led.run(millis(), imuIsCalibrated, status);
 
