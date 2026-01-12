@@ -89,6 +89,8 @@ class Task1 {
 
             const uint32_t msec_start = millis();
 
+            bool isFlying = false;
+
             for (uint32_t step=1; ; step++) {
 
                 // Yield
@@ -104,8 +106,7 @@ class Task1 {
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
-                    //_estimatorTask->setFlyingStatus(
-                    //        isFlyingCheck(xTaskGetTickCount(), motorvals));
+                    isFlying = isFlyingCheck(msec, motorvals);
                 }
 
                 // Check for lost contact
@@ -159,6 +160,38 @@ class Task1 {
                 }
             }
         }
+
+        //
+        // We say we are flying if one or more motors are running over the idle
+        // thrust.
+        //
+        bool isFlyingCheck(const uint32_t step, const float * motorvals)
+        {
+            auto isThrustOverIdle = false;
+
+            for (int i = 0; i < Mixer::rotorCount; ++i) {
+                if (motorvals[i] > 0) {
+                    isThrustOverIdle = true;
+                    break;
+                }
+            }
+
+            static uint32_t latestThrustTick;
+
+            if (isThrustOverIdle) {
+                latestThrustTick = step;
+            }
+
+            bool result = false;
+            if (0 != latestThrustTick) {
+                if ((step - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                    result = true;
+                }
+            }
+
+            return result;
+        }        
+
 
         void runClosedLoopAndMixer(
                 const uint32_t step, const setpoint_t &setpoint,
@@ -223,38 +256,6 @@ class Task1 {
                 memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
             }
         }
-
-        //
-        // We say we are flying if one or more motors are running over the
-        // idle thrust.
-        //
-        bool isFlyingCheck(const uint32_t tick, const float * motorvals)
-        {
-            auto isThrustOverIdle = false;
-
-            for (int i = 0; i < Mixer::rotorCount; ++i) {
-                if (motorvals[i] > 0) {
-                    isThrustOverIdle = true;
-                    break;
-                }
-            }
-
-            static uint32_t latestThrustTick;
-
-            if (isThrustOverIdle) {
-                latestThrustTick = tick;
-            }
-
-            bool result = false;
-            if (0 != latestThrustTick) {
-                if ((tick - latestThrustTick) <
-                        IS_FLYING_HYSTERESIS_THRESHOLD) {
-                    result = true;
-                }
-            }
-
-            return result;
-        }        
 
         static bool isSafeAngle(float angle)
         {
