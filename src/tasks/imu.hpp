@@ -56,11 +56,6 @@ class ImuTask {
             _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
 
-            /*
-            _accelQueue = makeImuQueue(_accelQueueStorage, &_accelQueueBuffer);
-            _gyroQueue = makeImuQueue(_gyroQueueStorage, &_gyroQueueBuffer);
-            */
-
             _task.init(runImuTask, "imu", this, 3);
         }
 
@@ -146,21 +141,6 @@ class ImuTask {
                 sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
         }
 
-        static const uint8_t QUEUE_LENGTH = 1;
-
-        static const auto IMU_ITEM_SIZE = sizeof(Axis3f);
-
-        static const auto IMU_QUEUE_LENGTH = QUEUE_LENGTH * IMU_ITEM_SIZE;
-
-        /*
-        uint8_t _accelQueueStorage[IMU_QUEUE_LENGTH];
-        StaticQueue_t _accelQueueBuffer;
-        QueueHandle_t _accelQueue;
-
-        uint8_t _gyroQueueStorage[IMU_QUEUE_LENGTH];
-        StaticQueue_t _gyroQueueBuffer;
-        QueueHandle_t _gyroQueue;*/
-
         bias_t _gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
@@ -215,20 +195,6 @@ class ImuTask {
         float _sinPitch;
         float _cosRoll;
         float _sinRoll;
-
-        static QueueHandle_t makeImuQueue(
-                uint8_t storage[], StaticQueue_t * buffer)
-        {
-            return makeQueue(IMU_ITEM_SIZE, storage, buffer);
-
-        }
-
-        static QueueHandle_t makeQueue(
-                const uint8_t itemSize, uint8_t storage[], StaticQueue_t * buffer)
-        {
-            return xQueueCreateStatic(QUEUE_LENGTH, itemSize, storage, buffer);
-
-        }
 
         static void alignToAirframe(Axis3f* in, Axis3f* out)
         {
@@ -372,10 +338,6 @@ class ImuTask {
                 applyLpf(_accLpf, &_accelData);
 
                 _estimatorTask->enqueueAccel(&_accelData);
-
-                /*
-                xQueueOverwrite(_accelQueue, &_accelData);
-                xQueueOverwrite(_gyroQueue, &_gyroData);*/
 
                 xSemaphoreGive(_task1Semaphore);
             }
