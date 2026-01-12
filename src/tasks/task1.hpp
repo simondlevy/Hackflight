@@ -20,10 +20,10 @@
 #include <led.hpp>
 #include <logger.hpp>
 #include <pidcontrol.hpp>
+#include <rc.hpp>
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/setpoint.hpp>
 
 #include <vehicles/diyquad.hpp>
 
@@ -36,7 +36,6 @@ class Task1 {
                 PidControl * pidControl,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
-                SetpointTask * setpointTask,
                 const uint8_t motorCount,
                 const mixFun_t mixFun)
         {
@@ -44,7 +43,6 @@ class Task1 {
             _pidControl = pidControl;
             _estimatorTask = estimatorTask;
             _imuTask = imuTask;
-            _setpointTask = setpointTask;
             _motorCount = motorCount;
             _mixFun = mixFun;
 
@@ -75,7 +73,6 @@ class Task1 {
         FreeRtosTask _task;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
-        SetpointTask * _setpointTask;
         vehicleState_t _vehicleState;
 
         uint8_t _motorCount;
@@ -95,14 +92,15 @@ class Task1 {
 
             _led->init();
 
+            setpoint_t setpoint = {};
+
             for (uint32_t step=1; ; step++) {
 
                 // Wait for IMU
                 _imuTask->waitDataReady();
 
-                // Get setpoint
-                setpoint_t setpoint = {};
-                _setpointTask->getSetpoint(setpoint);
+                // Get setpoint from remote control
+                RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
                 // Periodically update estimator with flying status
                 if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {

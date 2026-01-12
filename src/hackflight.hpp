@@ -24,7 +24,6 @@
 #include <mixers/crazyflie.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/setpoint.hpp>
 #include <tasks/task1.hpp>
 #include <tasks/task2.hpp>
 
@@ -40,8 +39,6 @@ class Hackflight {
 
             estimatorTask.begin();
 
-            setpointTask.begin();
-
             imuTask.begin(&estimatorTask);
 
             task1.begin(
@@ -49,7 +46,6 @@ class Hackflight {
                     &pidControl,
                     &estimatorTask,
                     &imuTask,
-                    &setpointTask,
                     Mixer::rotorCount,
                     Mixer::mix);
         }
@@ -61,7 +57,6 @@ class Hackflight {
         Task1 task1;
         EstimatorTask estimatorTask;
         ImuTask imuTask;
-        SetpointTask setpointTask;
         Task2 task2;
 
         PidControl pidControl;
