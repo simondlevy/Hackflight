@@ -21,7 +21,6 @@
 #include <msp/__messages__.h>
 #include <msp/serializer.hpp>
 #include <timer.hpp>
-#include <tasks/estimator.hpp>
 
 class Logger {
 

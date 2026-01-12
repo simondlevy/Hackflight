@@ -19,10 +19,9 @@
 #include <stdint.h>
 
 #include <comms.hpp>
+#include <ekf.hpp>
 #include <tasks/task1.hpp>
 #include <tasks/task2.hpp>
-
-#include <newekf.hpp>
 
 class Hackflight {
 
@@ -41,7 +40,7 @@ class Hackflight {
 
     private:
 
-        NewEKF _ekf;
+        EKF _ekf;
         Task1 _task1;
         Task2 _task2;
 };

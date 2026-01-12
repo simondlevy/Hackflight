@@ -16,16 +16,15 @@
 
 #pragma once
 
+#include <ekf.hpp>
 #include <opticalflow.hpp>
 #include <zranger.hpp>
-
-#include <newekf.hpp>
 
 class Task2 {
 
     public:
 
-        void begin(NewEKF * ekf)
+        void begin(EKF * ekf)
         {
             _ekf = ekf;
 
@@ -51,9 +50,7 @@ class Task2 {
 
         FreeRtosTask _task;
 
-        EstimatorTask * _estimatorTask;
-
-        NewEKF * _ekf;
+        EKF * _ekf;
 
         void run(void)
         {

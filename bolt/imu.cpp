@@ -15,60 +15,60 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SPI.h>
-
+// Arduino library
 #include <BMI088.h>
 
-#include <tasks/imu.hpp>
+// Hackflight
+#include <imu.hpp>
 
-static const uint8_t ACCEL_CS_PIN = PB1;
-static const uint8_t GYRO_CS_PIN = PB0;
+//#ifdef BOLT
+#if 1
 
-static const uint8_t MISO_PIN = PB14;
-static const uint8_t MOSI_PIN = PB15;
-static const uint8_t SCLK_PIN = PB13;
+static SPIClass spi = SPIClass(PB15, PB14, PB13);
+static Bmi088Accel accel(spi, PB1);
+static Bmi088Gyro gyro(spi, PB0);
 
-static SPIClass spi;
+#else
 
-static Bmi088Accel accel(spi, ACCEL_CS_PIN);
+static TwoWire wire = TwoWire(PC9, PA8);
+static Bmi088Accel accel(wire, 0x18);
+static Bmi088Gyro gyro(wire, 0x69);
 
-static Bmi088Gyro gyro(spi, GYRO_CS_PIN);
+#endif
 
-static bool failed(const int status)
+static bool okay(const int status)
 {
-    return status < 0;
+    return status >= 0;
 }
 
-bool ImuTask::device_init()
+bool IMU::device_init(int16_t & gscale, int16_t & ascale)
 {
-    spi.setMISO(MISO_PIN);
-    spi.setMOSI(MOSI_PIN);
-    spi.setSCLK(SCLK_PIN);
+    gscale = 2000;
+    ascale = 24;
 
-    if (failed(gyro.begin())) return false;
+    return 
 
-    if (failed(accel.begin())) return false;
+        okay(gyro.begin()) &&
 
-    if (failed(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ))) return false;
+        okay(accel.begin()) &&
 
-    if (failed(gyro.setRange(Bmi088Gyro::RANGE_2000DPS))) return false;
+        okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-    if (failed(gyro.pinModeInt3(
-                        Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                        Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)))
-        return false;
-            
-    if (failed(gyro.mapDrdyInt3(true))) return false;
+        okay(gyro.setRange(Bmi088Gyro::RANGE_2000DPS)) &&
 
-    if (failed(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ))) return false;
+        okay(gyro.pinModeInt3(
+                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
 
-    if (failed(accel.setRange(Bmi088Accel::RANGE_24G))) return false;
+        okay(gyro.mapDrdyInt3(true)) &&
 
-    return true;
+        okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+
+        okay(accel.setRange(Bmi088Accel::RANGE_24G));
 }
 
-void ImuTask::device_readRaw(
-        int16_t & gx, int16_t & gy, int16_t & gz, 
+void IMU::device_read(
+        int16_t & gx, int16_t & gy, int16_t & gz,
         int16_t & ax, int16_t & ay, int16_t & az)
 {
     gyro.readSensor();
@@ -82,14 +82,4 @@ void ImuTask::device_readRaw(
     ax = accel.getAccelX_raw();
     ay = accel.getAccelY_raw();
     az = accel.getAccelZ_raw();
-}
-
-float ImuTask::device_gyroRaw2Dps(const int16_t raw)
-{
-    return (float)raw * 2 * 2000 / 65536.f;
-}
-
-float ImuTask::device_accelRaw2Gs(const int16_t raw)
-{
-    return (float)raw * 2 * 24 / 65536.f;
 }

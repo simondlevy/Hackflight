@@ -12,12 +12,12 @@
 #pragma once
 
 #include <datatypes.h>
-#include <newekf.hpp>
+#include <ekf.hpp>
 #include <lpf.hpp>
 #include <num.hpp>
 #include <timer.hpp>
 
-class Imu {
+class IMU {
 
     private:
 
@@ -44,7 +44,7 @@ class Imu {
             _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
         }
 
-        bool step(NewEKF * ekf, const uint32_t tickCount)
+        bool step(EKF * ekf, const uint32_t tickCount)
         {
             Axis3i16 gyroRaw = {};
             Axis3i16 accelRaw = {};
@@ -168,7 +168,7 @@ class Imu {
 
         bias_t _gyroBiasRunning;
 
-        NewEKF * _ekf;
+        EKF * _ekf;
 
         /**
          * Checks if the variances is below the predefined thresholds.

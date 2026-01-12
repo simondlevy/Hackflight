@@ -15,17 +15,17 @@
  *
  */
 
-#include <newekf.hpp>
+#include <ekf.hpp>
 #include <matrix_typedef.h>
 #include <arm_math.h>
 
-void NewEKF::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
+void EKF::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
 {
   arm_mat_trans_f32((arm_matrix_instance_f32 *)pSrc,
           (arm_matrix_instance_f32 *)pDst);
 }
 
-void NewEKF::device_mat_mult(
+void EKF::device_mat_mult(
         const matrix_t * pSrcA, const matrix_t * pSrcB,
         matrix_t * pDst) 
 {
@@ -33,17 +33,17 @@ void NewEKF::device_mat_mult(
           (arm_matrix_instance_f32 *)pDst);
 }
 
-float NewEKF::device_cos(const float x)
+float EKF::device_cos(const float x)
 {
     return arm_cos_f32(x);
 }
 
-float NewEKF::device_sin(const float x)
+float EKF::device_sin(const float x)
 {
     return arm_sin_f32(x);
 }
 
-float NewEKF::device_sqrt(const float32_t in) 
+float EKF::device_sqrt(const float32_t in) 
 {
   float pOut = 0;
   arm_sqrt_f32(in, &pOut);

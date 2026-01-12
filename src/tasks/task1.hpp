@@ -17,23 +17,22 @@
 #pragma once
 
 
+#include <clock.hpp>
+#include <ekf.hpp>
 #include <led.hpp>
 #include <logger.hpp>
-#include <newekf.hpp>
+#include <imu.hpp>
 #include <mixers/crazyflie.hpp>
 #include <pidcontrol.hpp>
 #include <rc.hpp>
 #include <task.hpp>
 #include <vehicles/diyquad.hpp>
 
-#include <newekf.hpp>
-#include <newimu.hpp>
-
 class Task1 {
 
     public:
 
-        void begin(NewEKF * ekf)
+        void begin(EKF * ekf)
         {
             _ekf = ekf;
 
@@ -64,7 +63,7 @@ class Task1 {
             ((Task1 *)arg)->run();
         }
 
-        Imu _imu;
+        IMU _imu;
 
         vehicleState_t _vehicleState;
         Led _led;
@@ -72,7 +71,7 @@ class Task1 {
 
         FreeRtosTask _task;
 
-        NewEKF * _ekf;
+        EKF * _ekf;
 
         void run()
         {
