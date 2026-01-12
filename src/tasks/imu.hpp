@@ -100,9 +100,9 @@ class ImuTask {
 
         typedef struct {
 
-            Axis3f     bias;
-            Axis3f     variance;
-            Axis3f     mean;
+            axis3_t     bias;
+            axis3_t     variance;
+            axis3_t     mean;
             bool       isBiasValueFound;
             bool       isBufferFilled;
             Axis3i16*  bufHead;
@@ -110,11 +110,11 @@ class ImuTask {
 
         } bias_t;
 
-        Axis3f _accelData;   // Gs
-        Axis3f _gyroData;  // deg/s
+        axis3_t _accelData;   // Gs
+        axis3_t _gyroData;  // deg/s
 
         static void calculateVarianceAndMean(
-                bias_t* bias, Axis3f* varOut, Axis3f* meanOut)
+                bias_t* bias, axis3_t* varOut, axis3_t* meanOut)
         {
             int64_t sum[3] = {};
             int64_t sumSq[3] = {};
@@ -179,11 +179,11 @@ class ImuTask {
             return foundBias;
         }
 
-        static void applyLpf(Lpf lpf[3], Axis3f* in)
+        static void applyLpf(Lpf lpf[3], axis3_t* in)
         {
-            for (uint8_t i = 0; i < 3; i++) {
-                in->axis[i] = lpf[i].apply(in->axis[i]);
-            }
+            in->x = lpf[0].apply(in->x);
+            in->y = lpf[1].apply(in->y);
+            in->z = lpf[2].apply(in->z);
         }
 
         // Low Pass filtering
@@ -196,7 +196,7 @@ class ImuTask {
         float _cosRoll;
         float _sinRoll;
 
-        static void alignToAirframe(Axis3f* in, Axis3f* out)
+        static void alignToAirframe(axis3_t* in, axis3_t* out)
         {
             static float R[3][3];
 
@@ -226,7 +226,7 @@ class ImuTask {
         }
 
         bool _gyroBiasFound;
-        Axis3f _gyroBias;
+        axis3_t _gyroBias;
 
         SemaphoreHandle_t _task1Semaphore;
         StaticSemaphore_t _task1SemaphoreBuffer;
@@ -236,17 +236,17 @@ class ImuTask {
          * data gathered from the UI and written in the config-block to
          * rotate the accelerometer to be aligned with gravity.
          */
-        void accAlignToGravity(Axis3f* in, Axis3f* out)
+        void accAlignToGravity(axis3_t* in, axis3_t* out)
         {
 
             // Rotate around x-axis
-            Axis3f rx = {};
+            axis3_t rx = {};
             rx.x = in->x;
             rx.y = in->y * _cosRoll - in->z * _sinRoll;
             rx.z = in->y * _sinRoll + in->z * _cosRoll;
 
             // Rotate around y-axis
-            Axis3f ry = {};
+            axis3_t ry = {};
             ry.x = rx.x * _cosPitch - rx.z * _sinPitch;
             ry.y = rx.y;
             ry.z = -rx.x * _sinPitch + rx.z * _cosPitch;
@@ -261,7 +261,7 @@ class ImuTask {
          * Requires a buffer but calibrates platform first when it is stable.
          */
         bool processGyroBias(const uint32_t tickCount,
-                const Axis3i16 gyroRaw, Axis3f *gyroBiasOut)
+                const Axis3i16 gyroRaw, axis3_t *gyroBiasOut)
         {
             _gyroBiasRunning.bufHead->x = gyroRaw.x;
             _gyroBiasRunning.bufHead->y = gyroRaw.y;
@@ -305,7 +305,7 @@ class ImuTask {
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
                 // Convert accel to Gs
-                Axis3f accel = {
+                axis3_t accel = {
                     device_accelRaw2Gs(accelRaw.x),
                     device_accelRaw2Gs(accelRaw.y),
                     device_accelRaw2Gs(accelRaw.z)
@@ -316,7 +316,7 @@ class ImuTask {
                         gyroRaw, &_gyroBias);
 
                 // Subtract gyro bias
-                Axis3f gyroUnbiased = {
+                axis3_t gyroUnbiased = {
                     device_gyroRaw2Dps(gyroRaw.x - _gyroBias.x),
                     device_gyroRaw2Dps(gyroRaw.y - _gyroBias.y),
                     device_gyroRaw2Dps(gyroRaw.z - _gyroBias.z) 
@@ -330,7 +330,7 @@ class ImuTask {
 
                 _estimatorTask->enqueueGyro(&_gyroData);
 
-                Axis3f accelScaled = {};
+                axis3_t accelScaled = {};
                 alignToAirframe(&accel, &accelScaled);
 
                 accAlignToGravity(&accelScaled, &_accelData);

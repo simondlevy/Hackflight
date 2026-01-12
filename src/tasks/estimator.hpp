@@ -60,7 +60,7 @@ class EstimatorTask {
             _isFlying = isFlying;
         }
 
-        void enqueueGyro(const Axis3f * gyro)
+        void enqueueGyro(const axis3_t * gyro)
         {
             EKF::measurement_t m = {};
             m.type = EKF::MeasurementTypeGyroscope;
@@ -73,7 +73,7 @@ class EstimatorTask {
             _state.dpsi   = -gyro->z; // negate for nose-right positive
         }
 
-        void enqueueAccel(const Axis3f * accel)
+        void enqueueAccel(const axis3_t * accel)
         {
             EKF::measurement_t m = {};
             m.type = EKF::MeasurementTypeAcceleration;

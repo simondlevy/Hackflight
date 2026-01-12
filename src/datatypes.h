@@ -56,25 +56,7 @@ typedef struct {
 
 } axis4_t;
 
-typedef union {
-    struct {
-        float x;
-        float y;
-        float z;
-    };
-    float axis[3];
-} Axis3f;
-
-struct vec3_s {
-    uint32_t timestamp; // Timestamp when the data was computed
-    float x;
-    float y;
-    float z;
-};
-
-typedef struct vec3_s point_t;
-
-typedef struct quaternion_s {
+typedef struct {
     union {
         struct {
             float q0;
@@ -124,7 +106,7 @@ typedef struct {
 
 } vehicleState_t;
 
-typedef struct flowMeasurement_s {
+typedef struct {
     uint32_t timestamp;
     union {
         struct {
@@ -138,7 +120,7 @@ typedef struct flowMeasurement_s {
     float dt;           // Time during which pixels were accumulated
 } flowMeasurement_t;
 
-typedef struct tofMeasurement_s {
+typedef struct {
     uint32_t timestamp;
     float distance;
     float stdDev;
@@ -146,12 +128,12 @@ typedef struct tofMeasurement_s {
 
 typedef struct
 {
-    Axis3f gyro; // deg/s, for legacy reasons
+    axis3_t gyro; // deg/s, for legacy reasons
 } gyroscopeMeasurement_t;
 
 typedef struct
 {
-    Axis3f acc; // Gs, for legacy reasons
+    axis3_t acc; // Gs, for legacy reasons
 } accelerationMeasurement_t;
 
 typedef struct {

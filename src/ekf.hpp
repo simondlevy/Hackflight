@@ -137,8 +137,8 @@ class EKF {
 
             const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
 
-            const Axis3f * accel = &_accSubSampler.subSample;
-            const Axis3f * gyro = &_gyroSubSampler.subSample;
+            const axis3_t * accel = &_accSubSampler.subSample;
+            const axis3_t * gyro = &_gyroSubSampler.subSample;
 
             const float d0 = gyro->x*dt/2;
             const float d1 = gyro->y*dt/2;
@@ -514,21 +514,21 @@ class EKF {
         static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
         typedef struct {
-            Axis3f sum;
+            axis3_t sum;
             uint32_t count;
             float conversionFactor;
 
-            Axis3f subSample;
-        } Axis3fSubSampler_t;
+            axis3_t subSample;
+        } axis3_tSubSampler_t;
 
         // Quaternion used for initial orientation [w,x,y,z]
         float _qinit0, _qinit1, _qinit2, _qinit3;
 
-        Axis3f _accLatest;
-        Axis3f _gyroLatest;
+        axis3_t _accLatest;
+        axis3_t _gyroLatest;
 
-        Axis3fSubSampler_t _accSubSampler;
-        Axis3fSubSampler_t _gyroSubSampler;
+        axis3_tSubSampler_t _accSubSampler;
+        axis3_tSubSampler_t _gyroSubSampler;
 
         float _predictedNX;
         float _predictedNY;
@@ -545,14 +545,14 @@ class EKF {
         // while also being robust against singularities (in comparison to euler angles)
         float _q0, _q1, _q2, _q3;
 
-        static void axis3fSubSamplerInit(Axis3fSubSampler_t* subSampler, const
+        static void axis3fSubSamplerInit(axis3_tSubSampler_t* subSampler, const
                 float conversionFactor) { memset(subSampler, 0,
-                    sizeof(Axis3fSubSampler_t));
+                    sizeof(axis3_tSubSampler_t));
                 subSampler->conversionFactor = conversionFactor;
         }
 
-        static void axis3fSubSamplerAccumulate(Axis3fSubSampler_t* subSampler,
-                const Axis3f* sample) {
+        static void axis3fSubSamplerAccumulate(axis3_tSubSampler_t* subSampler,
+                const axis3_t* sample) {
             subSampler->sum.x += sample->x;
             subSampler->sum.y += sample->y;
             subSampler->sum.z += sample->z;
@@ -560,7 +560,7 @@ class EKF {
             subSampler->count++;
         }
 
-        static Axis3f* axis3fSubSamplerFinalize(Axis3fSubSampler_t* subSampler) 
+        static axis3_t* axis3fSubSamplerFinalize(axis3_tSubSampler_t* subSampler) 
         {
             if (subSampler->count > 0) {
                 subSampler->subSample.x = 
@@ -572,7 +572,9 @@ class EKF {
 
                 // Reset
                 subSampler->count = 0;
-                subSampler->sum = (Axis3f){.axis={0}};
+                subSampler->sum.x = 0;
+                subSampler->sum.y = 0;
+                subSampler->sum.z = 0;
             }
 
             return &subSampler->subSample;
@@ -580,7 +582,7 @@ class EKF {
 
         void updateWithFlow(const flowMeasurement_t *flow) 
         {
-            const Axis3f *gyro = &_gyroLatest;
+            const axis3_t *gyro = &_gyroLatest;
 
             // [pixels] (same in x and y)
             float Npix = 35.0;                      
