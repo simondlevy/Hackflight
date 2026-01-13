@@ -136,12 +136,3 @@ typedef struct
     axis3_t acc; // Gs, for legacy reasons
 } accelerationMeasurement_t;
 
-typedef struct {
-
-    uint32_t timestamp;
-    bool armed;
-    bool hovering;
-    demands_t demands;
-
-} setpoint_t;
-

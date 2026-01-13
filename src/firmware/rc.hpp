@@ -27,6 +27,15 @@ class RC {
 
     public:
 
+        typedef struct {
+
+            uint32_t timestamp;
+            bool armed;
+            bool hovering;
+            demands_t demands;
+
+        } setpoint_t;
+
         static void getSetpoint(const uint32_t tick, setpoint_t & setpoint)
         {
             static Timer _timer;

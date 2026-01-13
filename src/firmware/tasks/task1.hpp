@@ -88,7 +88,7 @@ class Task1 {
 
             _led.init();
 
-            setpoint_t setpoint = {};
+            RC::setpoint_t setpoint = {};
 
             const uint32_t msec_start = millis();
 
@@ -254,7 +254,7 @@ class Task1 {
 
 
         void runClosedLoopAndMixer(
-                const uint32_t step, const setpoint_t &setpoint,
+                const uint32_t step, const RC::setpoint_t &setpoint,
                 demands_t & demands, float *motorvals)
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
@@ -308,7 +308,7 @@ class Task1 {
             }
         }
 
-        void checkDisarm(const setpoint_t setpoint, mode_e &status,
+        void checkDisarm(const RC::setpoint_t setpoint, mode_e &status,
                 float * motorvals)
         {
             if (!setpoint.armed) {
