@@ -18,8 +18,8 @@
 
 #include <stdint.h>
 
-#include <comms.hpp>
-#include <ekf.hpp>
+#include <firmware/comms.hpp>
+#include <firmware/ekf.hpp>
 #include <tasks/task1.hpp>
 #include <tasks/task2.hpp>
 

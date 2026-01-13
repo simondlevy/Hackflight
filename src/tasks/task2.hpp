@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <ekf.hpp>
+#include <firmware/ekf.hpp>
 #include <opticalflow.hpp>
 #include <zranger.hpp>
 

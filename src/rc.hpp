@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include <comms.hpp>
+#include <firmware/comms.hpp>
 #include <msp/__messages__.h>
 #include <msp/parser.hpp>
 #include <timer.hpp>

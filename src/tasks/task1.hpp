@@ -17,8 +17,8 @@
 #pragma once
 
 
-#include <clock.hpp>
-#include <ekf.hpp>
+#include <firmware/clock.hpp>
+#include <firmware/ekf.hpp>
 #include <led.hpp>
 #include <logger.hpp>
 #include <imu.hpp>

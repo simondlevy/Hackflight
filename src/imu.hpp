@@ -12,7 +12,7 @@
 #pragma once
 
 #include <datatypes.h>
-#include <ekf.hpp>
+#include <firmware/ekf.hpp>
 #include <lpf.hpp>
 #include <num.hpp>
 #include <timer.hpp>

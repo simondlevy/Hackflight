@@ -16,7 +16,7 @@
 
 #include <Arduino.h>
 
-#include <comms.hpp>
+#include <firmware/comms.hpp>
 
 #include "uart_pins.h"
 
