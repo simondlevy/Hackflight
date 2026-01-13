@@ -189,6 +189,7 @@ class Task1 {
 
                     case MODE_PANIC:
                         // No way to recover from this
+                        stopMotors();
                         break;
                 }
             }
@@ -308,6 +309,14 @@ class Task1 {
         {
             for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
                 motors_setSpeed(k, motorvals[k]);
+            }
+            motors_run();
+        }
+
+        void stopMotors()
+        {
+            for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
+                motors_setSpeed(k, 0);
             }
             motors_run();
         }
