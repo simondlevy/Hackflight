@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 Simon D. Levy
+ * Copyright (C) 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,3 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <comms.hpp>
-#include <ekf.hpp>
-#include <tasks/task1.hpp>
-#include <tasks/task2.hpp>
-
-class Hackflight {
-
-    public:
-
-        void init()
-        {
-            Comms::init();
-
-            _ekf.init(millis());
-
-            _task1.begin(&_ekf);
-
-            _task2.begin(&_ekf);
-        }
-
-    private:
-
-        EKF _ekf;
-        Task1 _task1;
-        Task2 _task2;
-};

@@ -14,30 +14,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#pragma once
+
+#include <stdint.h>
 
 #include <firmware/comms.hpp>
+#include <firmware/ekf.hpp>
+#include <firmware/tasks/task1.hpp>
+#include <firmware/tasks/task2.hpp>
 
-#include "uart_pins.h"
+class Hackflight {
 
-static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
+    public:
 
-void Comms::init()
-{
-    serial.begin(115200);
-}
+        void init()
+        {
+            Comms::init();
 
-bool Comms::read_byte(uint8_t * byte)
-{
-    if (serial.available()) {
-        *byte = serial.read();
-        return true;
-    }
+            _ekf.init(millis());
 
-    return false;
-}
-            
-void Comms::write_byte(const uint8_t byte)
-{
-    serial.write(byte);
-}
+            _task1.begin(&_ekf);
+
+            _task2.begin(&_ekf);
+        }
+
+    private:
+
+        EKF _ekf;
+        Task1 _task1;
+        Task2 _task2;
+};

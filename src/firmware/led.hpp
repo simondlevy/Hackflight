@@ -17,7 +17,7 @@
 #pragma once
 
 #include <datatypes.h>
-#include <timer.hpp>
+#include <firmware/timer.hpp>
 
 class Led {
 

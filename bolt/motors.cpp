@@ -15,9 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Arduino library
 #include <oneshot125.hpp>
 
-#include <tasks/task1.hpp>
+// Hackflight
+#include <firmware/tasks/task1.hpp>
 
 #ifdef NO_MOTORS
 

@@ -57,23 +57,6 @@ typedef struct {
 } axis4_t;
 
 typedef struct {
-    union {
-        struct {
-            float q0;
-            float q1;
-            float q2;
-            float q3;
-        };
-        struct {
-            float x;
-            float y;
-            float z;
-            float w;
-        };
-    };
-} quaternion_t;
-
-typedef struct {
 
     float thrust;  // positve upward
     float roll;    // positive roll right
@@ -81,8 +64,6 @@ typedef struct {
     float yaw;     // positive nose right
 
 } demands_t;
-
-typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
 
 // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
 // We use ENU coordinates based on 
@@ -106,42 +87,5 @@ typedef struct {
 
 } vehicleState_t;
 
-typedef struct {
-    uint32_t timestamp;
-    union {
-        struct {
-            float dpixelx;  // Accumulated pixel count x
-            float dpixely;  // Accumulated pixel count y
-        };
-        float dpixel[2];  // Accumulated pixel count
-    };
-    float stdDevX;      // Measurement standard deviation
-    float stdDevY;      // Measurement standard deviation
-    float dt;           // Time during which pixels were accumulated
-} flowMeasurement_t;
-
-typedef struct {
-    uint32_t timestamp;
-    float distance;
-    float stdDev;
-} tofMeasurement_t;
-
-typedef struct
-{
-    axis3_t gyro; // deg/s, for legacy reasons
-} gyroscopeMeasurement_t;
-
-typedef struct
-{
-    axis3_t acc; // Gs, for legacy reasons
-} accelerationMeasurement_t;
-
-typedef struct {
-
-    uint32_t timestamp;
-    bool armed;
-    bool hovering;
-    demands_t demands;
-
-} setpoint_t;
+typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
 

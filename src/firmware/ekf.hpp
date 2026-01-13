@@ -19,6 +19,8 @@
 #include <datatypes.h>
 #include <matrix_typedef.h>
 #include <num.hpp>
+#include <firmware/opticalflow.hpp>
+#include <firmware/zranger.hpp>
 
 class EKF { 
 
@@ -278,7 +280,7 @@ class EKF {
             enqueue(&m);
         }
 
-        void enqueueFlow(const flowMeasurement_t * flow)
+        void enqueueFlow(const OpticalFlow::measurement_t * flow)
         {
             measurement_t m = {};
             m.type = MeasurementTypeFlow;
@@ -286,7 +288,7 @@ class EKF {
             enqueue(&m);
         }
 
-        void enqueueRange(const tofMeasurement_t * tof)
+        void enqueueRange(const ZRanger::measurement_t * tof)
         {
             measurement_t m = {};
             m.type = MeasurementTypeTOF;
@@ -319,6 +321,17 @@ class EKF {
             MeasurementTypeFlow,
         } MeasurementType;
 
+
+        typedef struct
+        {
+            axis3_t gyro; // deg/s, for legacy reasons
+        } gyroscopeMeasurement_t;
+
+        typedef struct
+        {
+            axis3_t acc; // Gs, for legacy reasons
+        } accelerationMeasurement_t;
+
         typedef struct
         {
             MeasurementType type;
@@ -326,8 +339,8 @@ class EKF {
             {
                 gyroscopeMeasurement_t gyroscope;
                 accelerationMeasurement_t acceleration;
-                tofMeasurement_t tof;
-                flowMeasurement_t flow;
+                ZRanger::measurement_t tof;
+                OpticalFlow::measurement_t flow;
             } data;
         } measurement_t;
 
@@ -552,7 +565,7 @@ class EKF {
             }
         }
 
-        void updateWithFlow(const flowMeasurement_t *flow) 
+        void updateWithFlow(const OpticalFlow::measurement_t *flow) 
         {
             const axis3_t *gyro = &_gyroLatest;
 
@@ -616,7 +629,7 @@ class EKF {
             _isUpdated = true;
         }
 
-        void updateWithTof(tofMeasurement_t *tof)
+        void updateWithTof(ZRanger::measurement_t *tof)
         {
             // Updates the filter with a measured distance in the zb direction using the
             float h[STATE_DIM] = {};

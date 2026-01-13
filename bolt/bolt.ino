@@ -17,7 +17,8 @@
 
 #include <STM32FreeRTOS.h>
 
-#include <hackflight.hpp>
+#include <hackflight.h>
+#include <firmware/firmware.hpp>
 
 static Hackflight hackflight;
 

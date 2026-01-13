@@ -19,7 +19,7 @@
 #include <BMI088.h>
 
 // Hackflight
-#include <imu.hpp>
+#include <firmware/imu.hpp>
 
 //#ifdef BOLT
 #if 1

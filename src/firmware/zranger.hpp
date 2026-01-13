@@ -24,16 +24,22 @@ class ZRanger {
 
     public:
 
+        typedef struct {
+            uint32_t timestamp;
+            float distance;
+            float stdDev;
+        } measurement_t;
+
         void init()
         {
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff =
-				logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+                logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
 
             device_init();
         }
 
-        bool read(tofMeasurement_t & tofData, const uint32_t tick)
+        bool read(measurement_t & tofData, const uint32_t tick)
         {
             float range = device_read();
 

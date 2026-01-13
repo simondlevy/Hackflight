@@ -17,15 +17,15 @@
 #pragma once
 
 
-#include <clock.hpp>
-#include <ekf.hpp>
-#include <led.hpp>
-#include <logger.hpp>
-#include <imu.hpp>
+#include <firmware/clock.hpp>
+#include <firmware/ekf.hpp>
+#include <firmware/imu.hpp>
+#include <firmware/led.hpp>
+#include <firmware/logger.hpp>
 #include <mixers/crazyflie.hpp>
+#include <firmware/rc.hpp>
+#include <firmware/task.hpp>
 #include <pidcontrol.hpp>
-#include <rc.hpp>
-#include <task.hpp>
 #include <vehicles/diyquad.hpp>
 
 class Task1 {
@@ -88,7 +88,7 @@ class Task1 {
 
             _led.init();
 
-            setpoint_t setpoint = {};
+            RC::setpoint_t setpoint = {};
 
             const uint32_t msec_start = millis();
 
@@ -254,7 +254,7 @@ class Task1 {
 
 
         void runClosedLoopAndMixer(
-                const uint32_t step, const setpoint_t &setpoint,
+                const uint32_t step, const RC::setpoint_t &setpoint,
                 demands_t & demands, float *motorvals)
         {
             if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
@@ -308,7 +308,7 @@ class Task1 {
             }
         }
 
-        void checkDisarm(const setpoint_t setpoint, mode_e &status,
+        void checkDisarm(const RC::setpoint_t setpoint, mode_e &status,
                 float * motorvals)
         {
             if (!setpoint.armed) {

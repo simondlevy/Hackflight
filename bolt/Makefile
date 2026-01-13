@@ -14,20 +14,20 @@ HASKDIR = ../haskell
 
 include ../snn_path.makefile
 
-bolt: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
-	arduino-cli compile \
+DEPS = $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/firmware/*.hpp \
+	   $(SRC)/firmware/*/*.hpp $(MSGS) 
+
+COMPILE = arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
 		--libraries ../.. \
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-nomotors: $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS)
-	arduino-cli compile \
-		--build-property "compiler.cpp.extra_flags=\"-DNO_MOTORS\"" \
-		--libraries $(HOME)/Documents/Arduino/libraries \
-		--libraries ../.. \
-		--build-path ./build \
-		--fqbn $(FQBN) $(SKETCH).ino
+bolt: $(DEPS)
+	$(COMPILE)
+
+nomotors: $(DEPS)
+	$(COMPILE) --build-property "compiler.cpp.extra_flags=\"-DNO_MOTORS\""
 
 $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../bolt
@@ -41,4 +41,5 @@ clean:
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3
 
-
+edit:
+	vim $(SKETCH).ino

@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include <ekf.hpp>
-#include <opticalflow.hpp>
-#include <zranger.hpp>
+#include <firmware/ekf.hpp>
+#include <firmware/opticalflow.hpp>
+#include <firmware/zranger.hpp>
 
 class Task2 {
 
@@ -62,12 +62,12 @@ class Task2 {
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                tofMeasurement_t tofData = {};
+                ZRanger::measurement_t tofData = {};
                 if (_zranger.read(tofData, xTaskGetTickCount())) {
                     _ekf->enqueueRange(&tofData);
                 }
 
-                flowMeasurement_t flowData = {};
+                OpticalFlow::measurement_t flowData = {};
                 if (_opticalFlow.read(flowData)) {
                     _ekf->enqueueFlow(&flowData);
                 }

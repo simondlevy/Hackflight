@@ -18,14 +18,23 @@
 
 #include <string.h>
 
-#include <comms.hpp>
+#include <firmware/comms.hpp>
 #include <msp/__messages__.h>
 #include <msp/parser.hpp>
-#include <timer.hpp>
+#include <firmware/timer.hpp>
 
 class RC {
 
     public:
+
+        typedef struct {
+
+            uint32_t timestamp;
+            bool armed;
+            bool hovering;
+            demands_t demands;
+
+        } setpoint_t;
 
         static void getSetpoint(const uint32_t tick, setpoint_t & setpoint)
         {

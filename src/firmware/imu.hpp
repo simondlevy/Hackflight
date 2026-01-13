@@ -12,10 +12,10 @@
 #pragma once
 
 #include <datatypes.h>
-#include <ekf.hpp>
-#include <lpf.hpp>
+#include <firmware/ekf.hpp>
+#include <firmware/lpf.hpp>
+#include <firmware/timer.hpp>
 #include <num.hpp>
-#include <timer.hpp>
 
 class IMU {
 
