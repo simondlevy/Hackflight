@@ -72,6 +72,8 @@ class Task1 {
         static const auto CLOSED_LOOP_UPDATE_RATE =
             RATE_500_HZ; // Needed ?
 
+        static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
+
         static const uint32_t EKF_PREDICTION_FREQ = 100;
 
         static constexpr float MAX_VELOCITY = 10; //meters per second
@@ -93,7 +95,7 @@ class Task1 {
 
         void run()
         {
-            mode_e status = MODE_IDLE;
+            mode_e mode = MODE_IDLE;
 
             // Start with motor speeds at idle
             float motorvals[MAX_MOTOR_COUNT] = {};
@@ -127,7 +129,7 @@ class Task1 {
                 // Get setpoint from remote control
                 RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
-                // Periodically update estimator with flying status
+                // Periodically update estimator with flying mode
                 if (rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
                     isFlying = isFlyingCheck(msec, motorvals);
                 }
@@ -139,44 +141,50 @@ class Task1 {
                 if (setpoint.timestamp > 0 &&
                         xTaskGetTickCount() - setpoint.timestamp >
                         SETPOINT_TIMEOUT_TICKS) {
-                    status = MODE_PANIC;
+                    mode = MODE_PANIC;
                 }
 
-                _led.run(millis(), imuIsCalibrated, status);
+                // Check for flipped over
+                if (isFlippedAngle(_vehicleState.theta) ||
+                        isFlippedAngle(_vehicleState.phi)) {
+                    mode = MODE_PANIC;
+                }
+
+                _led.run(millis(), imuIsCalibrated, mode);
 
                 Logger::run(millis(), _vehicleState);
 
-                switch (status) {
+                switch (mode) {
 
                     case MODE_IDLE:
                         if (setpoint.armed && isSafeAngle(_vehicleState.phi)
                                 && isSafeAngle(_vehicleState.theta)) {
-                            status = MODE_ARMED;
+                            mode = MODE_ARMED;
                         }
                         runMotors(motorvals);
                         break;
 
                     case MODE_ARMED:
-                        checkDisarm(setpoint, status, motorvals);
+                        checkDisarm(setpoint, mode, motorvals);
                         if (setpoint.hovering) {
-                            status = MODE_HOVERING;
+                            mode = MODE_HOVERING;
                         }
                         runMotors(motorvals);
                         break;
 
                     case MODE_HOVERING:
-                        runClosedLoopAndMixer(step, setpoint,
+                        runPidAndMixer(step, setpoint,
                                 demands, motorvals);
-                        checkDisarm(setpoint, status, motorvals);
+                        checkDisarm(setpoint, mode, motorvals);
                         if (!setpoint.hovering) {
-                            status = MODE_LANDING;
+                            mode = MODE_LANDING;
                         }
                         break;
 
                     case MODE_LANDING:
-                        runClosedLoopAndMixer(step, setpoint,
+                        runPidAndMixer(step, setpoint,
                                 demands, motorvals);
-                        checkDisarm(setpoint, status, motorvals);
+                        checkDisarm(setpoint, mode, motorvals);
                         break;
 
                     case MODE_PANIC:
@@ -184,6 +192,11 @@ class Task1 {
                         break;
                 }
             }
+        }
+
+        static bool isFlippedAngle(float angle)
+        {
+            return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
         }
 
         void getStateEstimate(
@@ -271,7 +284,7 @@ class Task1 {
         }        
 
 
-        void runClosedLoopAndMixer(
+        void runPidAndMixer(
                 const uint32_t step, const RC::setpoint_t &setpoint,
                 demands_t & demands, float *motorvals)
         {
@@ -326,11 +339,11 @@ class Task1 {
             }
         }
 
-        void checkDisarm(const RC::setpoint_t setpoint, mode_e &status,
+        void checkDisarm(const RC::setpoint_t setpoint, mode_e &mode,
                 float * motorvals)
         {
             if (!setpoint.armed) {
-                status = MODE_IDLE;
+                mode = MODE_IDLE;
                 memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
             }
         }
