@@ -13,9 +13,9 @@
 
 #include <datatypes.h>
 #include <firmware/ekf.hpp>
-#include <lpf.hpp>
+#include <firmware/lpf.hpp>
+#include <firmware/timer.hpp>
 #include <num.hpp>
-#include <timer.hpp>
 
 class IMU {
 

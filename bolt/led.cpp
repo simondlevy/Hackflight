@@ -14,9 +14,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <led.hpp>
-
 #include <Arduino.h>
+
+#include <firmware/led.hpp>
 
 static const uint8_t PIN = PC0;
 

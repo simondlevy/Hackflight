@@ -14,9 +14,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Arduino library
 #include <pmw3901.hpp>
 
-#include <opticalflow.hpp>
+// Hackflight
+#include <firmware/opticalflow.hpp>
 
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t MOSI_PIN = PA7;

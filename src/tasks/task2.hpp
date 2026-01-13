@@ -17,8 +17,8 @@
 #pragma once
 
 #include <firmware/ekf.hpp>
-#include <opticalflow.hpp>
-#include <zranger.hpp>
+#include <firmware/opticalflow.hpp>
+#include <firmware/zranger.hpp>
 
 class Task2 {
 

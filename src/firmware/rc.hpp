@@ -21,7 +21,7 @@
 #include <firmware/comms.hpp>
 #include <msp/__messages__.h>
 #include <msp/parser.hpp>
-#include <timer.hpp>
+#include <firmware/timer.hpp>
 
 class RC {
 

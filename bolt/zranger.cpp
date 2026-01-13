@@ -14,9 +14,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <zranger.hpp>
-
+// Arduino library
 #include <VL53L1X.h>
+
+// Hackflight
+#include <firmware/zranger.hpp>
 
 static VL53L1X vl53l1x;
 

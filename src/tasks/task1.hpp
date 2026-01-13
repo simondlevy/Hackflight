@@ -19,13 +19,13 @@
 
 #include <firmware/clock.hpp>
 #include <firmware/ekf.hpp>
-#include <led.hpp>
-#include <logger.hpp>
-#include <imu.hpp>
+#include <firmware/imu.hpp>
+#include <firmware/led.hpp>
+#include <firmware/logger.hpp>
 #include <mixers/crazyflie.hpp>
+#include <firmware/rc.hpp>
+#include <firmware/task.hpp>
 #include <pidcontrol.hpp>
-#include <rc.hpp>
-#include <task.hpp>
 #include <vehicles/diyquad.hpp>
 
 class Task1 {
