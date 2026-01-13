@@ -20,8 +20,8 @@
 
 #include <firmware/comms.hpp>
 #include <firmware/ekf.hpp>
-#include <tasks/task1.hpp>
-#include <tasks/task2.hpp>
+#include <firmware/tasks/task1.hpp>
+#include <firmware/tasks/task2.hpp>
 
 class Hackflight {
 

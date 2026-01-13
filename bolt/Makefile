@@ -14,7 +14,8 @@ HASKDIR = ../haskell
 
 include ../snn_path.makefile
 
-DEPS = $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/tasks/*.hpp $(MSGS) 
+DEPS = $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/firmware/*.hpp \
+	   $(SRC)/firmware/*/*.hpp $(MSGS) 
 
 COMPILE = arduino-cli compile \
 		--libraries $(HOME)/Documents/Arduino/libraries \
