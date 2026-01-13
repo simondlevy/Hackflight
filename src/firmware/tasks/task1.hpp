@@ -17,7 +17,6 @@
 #pragma once
 
 
-#include <firmware/clock.hpp>
 #include <firmware/ekf.hpp>
 #include <firmware/imu.hpp>
 #include <firmware/led.hpp>
@@ -43,16 +42,35 @@ class Task1 {
 
     private:
 
+        // Permitted frequencies
+        typedef enum {
+            RATE_25_HZ   = 25,
+            RATE_30_HZ   = 30,
+            RATE_33_HZ   = 33,
+            RATE_50_HZ   = 50,
+            RATE_100_HZ  = 100,
+            RATE_250_HZ  = 250,
+            RATE_500_HZ  = 500,
+            RATE_1000_HZ = 1000,
+        } rate_t ;
+
+        static const rate_t RATE_MAIN_LOOP = RATE_1000_HZ;
+
+        static bool rateDoExecute(const rate_t rate, const uint32_t tick)
+        {
+            return (tick % (RATE_MAIN_LOOP / rate)) == 0;
+        }
+
         static constexpr float LANDING_ALTITUDE_M = 0.03;
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
         static constexpr float MAX_SAFE_ANGLE = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const Clock::rate_t FLYING_MODE_CLOCK_RATE =
-            Clock::RATE_25_HZ;
+        static const rate_t FLYING_MODE_CLOCK_RATE =
+            RATE_25_HZ;
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
         static const auto CLOSED_LOOP_UPDATE_RATE =
-            Clock::RATE_500_HZ; // Needed ?
+            RATE_500_HZ; // Needed ?
 
         static const uint32_t EKF_PREDICTION_FREQ = 100;
 
@@ -110,7 +128,7 @@ class Task1 {
                 RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
                 // Periodically update estimator with flying status
-                if (Clock::rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
+                if (rateDoExecute(FLYING_MODE_CLOCK_RATE, step)) {
                     isFlying = isFlyingCheck(msec, motorvals);
                 }
 
@@ -257,7 +275,7 @@ class Task1 {
                 const uint32_t step, const RC::setpoint_t &setpoint,
                 demands_t & demands, float *motorvals)
         {
-            if (Clock::rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
+            if (rateDoExecute(CLOSED_LOOP_UPDATE_RATE, step)) {
 
                 _pidControl.run(
                         1.f / CLOSED_LOOP_UPDATE_RATE,
