@@ -23,17 +23,20 @@ COMPILE = arduino-cli compile \
 		--build-path ./build \
 		--fqbn $(FQBN) $(SKETCH).ino
 
-bolt: $(DEPS)
+any:
+	@echo Please specify bolt, cf2, or hybrid
+
+cf2: $(DEPS)
 	$(COMPILE)
 
-nomotors: $(DEPS)
-	$(COMPILE) --build-property "compiler.cpp.extra_flags=\"-DNO_MOTORS\""
+bolt: $(DEPS)
+	$(COMPILE) --build-property "compiler.cpp.extra_flags=\"-DBOLT\""
 
 $(MSGS): ../msppg/messages.json
-	cd ../msppg; make install; cd ../bolt
+	cd ../msppg; make install; cd ../$(SKETCH)
 
 dfu: $(BIN)
-	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/bolt.ino.bin
+	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin
 
 clean:
 	rm -rf build $(MSGS)

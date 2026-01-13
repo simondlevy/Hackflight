@@ -21,23 +21,7 @@
 // Hackflight
 #include <firmware/tasks/task1.hpp>
 
-#ifdef NO_MOTORS
-
-void Task1::motors_init()
-{
-}
-
-
-void Task1::motors_setSpeed(uint32_t id, float speed)
-{
-    (void)id;
-    (void)speed;
-}
-
-void Task1::motors_run()
-{
-}
-#else
+#ifdef BOLT
 
 static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
 
@@ -73,5 +57,30 @@ void Task1::motors_run()
     motors.run();
 }
 
-#endif
+#else
 
+static const uint8_t M1_PIN = PA1;
+static const uint8_t M2_PIN = PB11;
+static const uint8_t M3_PIN = PA15;
+static const uint8_t M4_PIN = PB9;
+
+static uint8_t pulse_widths[4];
+
+void Task1::motors_init()
+{
+}
+
+void Task1::motors_setSpeed(uint32_t id, float speed)
+{
+    pulse_widths[id] = (uint8_t)(255 * speed);
+}
+
+void Task1::motors_run()
+{
+    analogWrite(M1_PIN, pulse_widths[0]);
+    analogWrite(M2_PIN, pulse_widths[1]);
+    analogWrite(M3_PIN, pulse_widths[2]);
+    analogWrite(M4_PIN, pulse_widths[3]);
+}
+
+#endif

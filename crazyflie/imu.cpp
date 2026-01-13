@@ -21,8 +21,7 @@
 // Hackflight
 #include <firmware/imu.hpp>
 
-//#ifdef BOLT
-#if 1
+#ifdef BOLT
 
 static SPIClass spi = SPIClass(PB15, PB14, PB13);
 static Bmi088Accel accel(spi, PB1);
