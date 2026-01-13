@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,20 +14,5 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <STM32FreeRTOS.h>
+#pragma once
 
-#include <hackflight.h>
-#include <firmware/firmware.hpp>
-
-static Hackflight hackflight;
-
-void setup() 
-{
-    hackflight.init();
-
-    vTaskStartScheduler();
-}
-
-void loop() 
-{
-}
