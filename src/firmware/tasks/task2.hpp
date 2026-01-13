@@ -62,7 +62,7 @@ class Task2 {
 
                 vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                tofMeasurement_t tofData = {};
+                ZRanger::measurement_t tofData = {};
                 if (_zranger.read(tofData, xTaskGetTickCount())) {
                     _ekf->enqueueRange(&tofData);
                 }

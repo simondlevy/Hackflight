@@ -89,12 +89,6 @@ typedef struct {
 
 } vehicleState_t;
 
-typedef struct {
-    uint32_t timestamp;
-    float distance;
-    float stdDev;
-} tofMeasurement_t;
-
 typedef struct
 {
     axis3_t gyro; // deg/s, for legacy reasons

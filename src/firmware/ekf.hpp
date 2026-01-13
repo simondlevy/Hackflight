@@ -20,6 +20,7 @@
 #include <matrix_typedef.h>
 #include <num.hpp>
 #include <firmware/opticalflow.hpp>
+#include <firmware/zranger.hpp>
 
 class EKF { 
 
@@ -287,7 +288,7 @@ class EKF {
             enqueue(&m);
         }
 
-        void enqueueRange(const tofMeasurement_t * tof)
+        void enqueueRange(const ZRanger::measurement_t * tof)
         {
             measurement_t m = {};
             m.type = MeasurementTypeTOF;
@@ -327,7 +328,7 @@ class EKF {
             {
                 gyroscopeMeasurement_t gyroscope;
                 accelerationMeasurement_t acceleration;
-                tofMeasurement_t tof;
+                ZRanger::measurement_t tof;
                 OpticalFlow::measurement_t flow;
             } data;
         } measurement_t;
@@ -617,7 +618,7 @@ class EKF {
             _isUpdated = true;
         }
 
-        void updateWithTof(tofMeasurement_t *tof)
+        void updateWithTof(ZRanger::measurement_t *tof)
         {
             // Updates the filter with a measured distance in the zb direction using the
             float h[STATE_DIM] = {};
