@@ -19,6 +19,7 @@
 #include <datatypes.h>
 #include <matrix_typedef.h>
 #include <num.hpp>
+#include <firmware/opticalflow.hpp>
 
 class EKF { 
 
@@ -278,7 +279,7 @@ class EKF {
             enqueue(&m);
         }
 
-        void enqueueFlow(const flowMeasurement_t * flow)
+        void enqueueFlow(const OpticalFlow::measurement_t * flow)
         {
             measurement_t m = {};
             m.type = MeasurementTypeFlow;
@@ -327,7 +328,7 @@ class EKF {
                 gyroscopeMeasurement_t gyroscope;
                 accelerationMeasurement_t acceleration;
                 tofMeasurement_t tof;
-                flowMeasurement_t flow;
+                OpticalFlow::measurement_t flow;
             } data;
         } measurement_t;
 
@@ -552,7 +553,7 @@ class EKF {
             }
         }
 
-        void updateWithFlow(const flowMeasurement_t *flow) 
+        void updateWithFlow(const OpticalFlow::measurement_t *flow) 
         {
             const axis3_t *gyro = &_gyroLatest;
 

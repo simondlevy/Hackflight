@@ -57,23 +57,6 @@ typedef struct {
 } axis4_t;
 
 typedef struct {
-    union {
-        struct {
-            float q0;
-            float q1;
-            float q2;
-            float q3;
-        };
-        struct {
-            float x;
-            float y;
-            float z;
-            float w;
-        };
-    };
-} quaternion_t;
-
-typedef struct {
 
     float thrust;  // positve upward
     float roll;    // positive roll right
@@ -105,20 +88,6 @@ typedef struct {
     float dpsi;    // positive nose left
 
 } vehicleState_t;
-
-typedef struct {
-    uint32_t timestamp;
-    union {
-        struct {
-            float dpixelx;  // Accumulated pixel count x
-            float dpixely;  // Accumulated pixel count y
-        };
-        float dpixel[2];  // Accumulated pixel count
-    };
-    float stdDevX;      // Measurement standard deviation
-    float stdDevY;      // Measurement standard deviation
-    float dt;           // Time during which pixels were accumulated
-} flowMeasurement_t;
 
 typedef struct {
     uint32_t timestamp;

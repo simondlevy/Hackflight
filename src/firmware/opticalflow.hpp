@@ -16,18 +16,35 @@
 
 #pragma once
 
+#include <Arduino.h>
+
 #include <datatypes.h>
 
 class OpticalFlow {
 
     public:
 
+        typedef struct {
+            uint32_t timestamp;
+            union {
+                struct {
+                    float dpixelx;  // Accumulated pixel count x
+                    float dpixely;  // Accumulated pixel count y
+                };
+                float dpixel[2];  // Accumulated pixel count
+            };
+            float stdDevX;      // Measurement standard deviation
+            float stdDevY;      // Measurement standard deviation
+            float dt;           // Time during which pixels were accumulated
+        } measurement_t;
+
+
         void init()
         {
             device_init();
         }
 
-        bool read(flowMeasurement_t & flowData)
+        bool read(measurement_t & flowData)
         {
             int16_t deltaX = 0;
             int16_t deltaY = 0;

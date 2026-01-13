@@ -67,7 +67,7 @@ class Task2 {
                     _ekf->enqueueRange(&tofData);
                 }
 
-                flowMeasurement_t flowData = {};
+                OpticalFlow::measurement_t flowData = {};
                 if (_opticalFlow.read(flowData)) {
                     _ekf->enqueueFlow(&flowData);
                 }
