@@ -65,8 +65,6 @@ typedef struct {
 
 } demands_t;
 
-typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
-
 // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
 // We use ENU coordinates based on 
 // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
@@ -89,13 +87,5 @@ typedef struct {
 
 } vehicleState_t;
 
-typedef struct
-{
-    axis3_t gyro; // deg/s, for legacy reasons
-} gyroscopeMeasurement_t;
-
-typedef struct
-{
-    axis3_t acc; // Gs, for legacy reasons
-} accelerationMeasurement_t;
+typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
 

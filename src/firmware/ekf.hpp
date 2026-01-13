@@ -321,6 +321,17 @@ class EKF {
             MeasurementTypeFlow,
         } MeasurementType;
 
+
+        typedef struct
+        {
+            axis3_t gyro; // deg/s, for legacy reasons
+        } gyroscopeMeasurement_t;
+
+        typedef struct
+        {
+            axis3_t acc; // Gs, for legacy reasons
+        } accelerationMeasurement_t;
+
         typedef struct
         {
             MeasurementType type;
