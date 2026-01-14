@@ -15,7 +15,7 @@
  *
  */
 
-#include <firmware/ekf.hpp>
+#include <firmware/estimators/ekf.hpp>
 #include <matrix_typedef.h>
 #include <arm_math.h>
 

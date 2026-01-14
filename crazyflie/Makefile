@@ -24,7 +24,7 @@ COMPILE = arduino-cli compile \
 		--fqbn $(FQBN) $(SKETCH).ino
 
 any:
-	@echo Please specify bolt, cf2, or hybrid
+	@echo Please specify bolt or cf2
 
 cf2: $(DEPS)
 	$(COMPILE)

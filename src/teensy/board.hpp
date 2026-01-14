@@ -32,7 +32,7 @@
 
 // Hackflight library
 #include <teensy/datatypes.h>
-#include <estimators/madgwick.hpp>
+#include <firmware/estimators/madgwick.hpp>
 #include <teensy/msp/serializer.hpp>
 #include <teensy/msp/messages.hpp>
 #include <teensy/utils.hpp>

@@ -17,7 +17,7 @@
 #pragma once
 
 
-#include <firmware/ekf.hpp>
+#include <firmware/estimators/ekf.hpp>
 #include <firmware/imu.hpp>
 #include <firmware/led.hpp>
 #include <firmware/logger.hpp>
