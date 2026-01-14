@@ -36,8 +36,8 @@
 
 #include <teensy/pids/pitch_roll_rate.hpp>
 #include <teensy/pids/yaw_rate.hpp>
-
 #include <teensy/timer.hpp>
+#include <teensy/utils.hpp>
 
 static Dsm2048 _dsm2048;
 

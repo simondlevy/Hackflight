@@ -21,7 +21,7 @@
 #pragma once
 
 #include <datatypes.h>
-#include <teensy/utils.hpp>
+#include <num.hpp>
 
 class MadgwickFilter {
 
@@ -56,9 +56,9 @@ class MadgwickFilter {
             _az_prev = az;
 
             // Convert gyroscope degrees/sec to radians/sec
-            gx /= Utils::RAD2DEG;
-            gy /= Utils::RAD2DEG;
-            gz /= Utils::RAD2DEG;
+            gx /= Num::RAD2DEG;
+            gy /= Num::RAD2DEG;
+            gz /= Num::RAD2DEG;
 
             // Compute rate of change of quaternion from gyroscope
             auto qDot1 = 0.5f * (-_q1 * gx - _q2 * gy - _q3 * gz);
