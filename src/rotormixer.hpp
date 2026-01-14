@@ -1,13 +1,7 @@
 /**
- *  Crazyflie motor mixer for Hackflight
+ * Generic multirotor mixer function
  *
- *               4:cw   1:ccw
- *                   \ /
- *                    X
- *                   / \
- *               3:ccw  2:cw
- *
- * Copyright (C) 2025 Simon D. Levy
+ * Copyright (C) 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,21 +18,28 @@
 
 #pragma once
 
-#include <rotormixer.hpp>
+#include <datatypes.h>
 
-class Mixer {
+class RotorMixer {
 
     public:
 
-        static const uint8_t rotorCount = 4;
-
-        static constexpr int8_t roll[4]  = {-1, -1, +1, +1};
-        static constexpr int8_t pitch[4] = {-1, +1, +1, -1};
-        static constexpr int8_t yaw[4]   = {+1, -1, +1, -1};
-
-        static void mix(const demands_t & demands, float motors[])
+        static void mix(
+                const demands_t & demands,
+                const int8_t * roll,
+                const int8_t * pitch,
+                const int8_t * yaw,
+                const int8_t count,
+                float motors[])
         {
-            RotorMixer::mix(demands, roll, pitch, yaw, 4, motors);
+            for (uint8_t k=0; k<count; ++k) {
+                motors[k] =
+                    demands.thrust +
+                    demands.roll * roll[k] +
+                    demands.pitch * pitch[k] +
+                    demands.yaw * yaw[k];
+            }
         }
 };
+
 
