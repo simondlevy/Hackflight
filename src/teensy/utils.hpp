@@ -24,7 +24,7 @@
 #define M_PI 3.1415928f
 #endif
 
-#include <teensy/datatypes.h>
+#include <datatypes.h>
 
 class Utils {
 

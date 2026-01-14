@@ -29,8 +29,9 @@
 
 // Hackflight library
 #include <hackflight.h>
+#include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
-#include <teensy/datatypes.h>
+
 #include <teensy/mixers/bfquadx.hpp>
 #include <teensy/msp/messages.hpp>
 #include <teensy/msp/serializer.hpp>
@@ -104,7 +105,7 @@ static float _channels[6];
 static MadgwickFilter  _madgwick;
 
 // Safety
-static uint8_t _status;
+static mode_e _mode;
 
 // Telemetry ------------------------------------------------------
 static Timer _telemetryTimer = Timer(60); // Hz
@@ -180,7 +181,7 @@ static void runMotors(const float * motors, const bool safeMode=true)
     auto m4_usec = scaleMotor(motors[3]);
 
     // Shut motors down when not armed
-    if (safeMode && _status != STATUS_ARMED) {
+    if (safeMode && _mode != MODE_ARMED) {
 
         m1_usec = 120;
         m2_usec = 120;
@@ -200,7 +201,7 @@ static void runMotors(const float * motors, const bool safeMode=true)
 }
 
 
-void readData(float & dt, demands_t & demands, state_t & state)
+void readData(float & dt, demands_t & demands, vehicleState_t & state)
 {
     // Keep track of what time it is and how much time has elapsed
     // since the last loop
@@ -212,7 +213,7 @@ void readData(float & dt, demands_t & demands, state_t & state)
     // Read channels values from receiver
     if (_dsm2048.timedOut(micros())) {
 
-        _status = STATUS_FAILSAFE;
+        _mode = MODE_PANIC;
     }
     else if (_dsm2048.gotNewFrame()) {
 
@@ -223,11 +224,11 @@ void readData(float & dt, demands_t & demands, state_t & state)
     const auto is_arming_switch_on = _channels[4] > ARMING_SWITCH_MIN;
 
     if (_channels[0] < THROTTLE_ARMING_MAX && is_arming_switch_on) {
-        _status = _status == STATUS_READY ? STATUS_ARMED : _status;
+        _mode = _mode == MODE_IDLE ? MODE_ARMED : _mode;
     }
 
     if (!is_arming_switch_on) {
-        _status = _status == STATUS_ARMED ? STATUS_READY : _status;
+        _mode = _mode == MODE_ARMED ? MODE_IDLE : _mode;
     }
 
     // Read IMU
@@ -273,8 +274,8 @@ void readData(float & dt, demands_t & demands, state_t & state)
     demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
     demands.yaw   = _channels[3] * YAW_PRESCALE;
 
-    // Use LED to indicate arming status
-    digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
+    // Use LED to indicate arming mode
+    digitalWrite(LED_PIN, _mode == MODE_ARMED ? HIGH : LOW);
 
 }
 
@@ -317,7 +318,7 @@ void loop()
 {
     float dt=0;
     demands_t demands = {};
-    state_t state = {};
+    vehicleState_t state = {};
 
     readData(dt, demands, state);
 

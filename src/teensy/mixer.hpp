@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <teensy/datatypes.h>
+#include <datatypes.h>
 
 class Mixer {
 

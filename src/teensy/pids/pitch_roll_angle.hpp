@@ -35,7 +35,7 @@ class PitchRollAnglePid {
         void run(
                 const float dt, 
                 const bool reset,
-                const state_t & state,
+                const vehicleState_t & state,
                 demands_t & demands)
         {
             runAxis(dt, reset, demands.roll,

@@ -38,7 +38,7 @@ class PitchRollRatePid {
         void run(
                 const float dt, 
                 const bool reset,
-                const state_t & state,
+                const vehicleState_t & state,
                 demands_t & demands,
                 const float postScale=1.0)
         {

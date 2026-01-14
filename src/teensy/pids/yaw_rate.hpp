@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <teensy/datatypes.h>
+#include <datatypes.h>
 #include <teensy/utils.hpp>
 
 /**
@@ -42,7 +42,7 @@ class YawRatePid {
         void run(
                 const float dt, 
                 const bool reset,
-                const state_t & state,
+                const vehicleState_t & state,
                 demands_t & demands) 
         {
             const auto error = demands.yaw - state.dpsi;

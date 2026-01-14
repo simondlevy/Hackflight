@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <teensy/datatypes.h>
+#include <datatypes.h>
 #include <teensy/utils.hpp>
 
 class MadgwickFilter {
