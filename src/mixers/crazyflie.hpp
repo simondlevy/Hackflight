@@ -32,21 +32,19 @@ class Mixer {
 
         static const uint8_t rotorCount = 4;
 
-        static constexpr int8_t roll[4]  = {-1, -1, +1, +1};
-        static constexpr int8_t pitch[4] = {-1, +1, +1, -1};
-        static constexpr int8_t yaw[4]   = {+1, -1, +1, -1};
+        static constexpr int8_t roll[rotorCount]  = {-1, -1, +1, +1};
+        static constexpr int8_t pitch[rotorCount] = {-1, +1, +1, -1};
+        static constexpr int8_t yaw[rotorCount]   = {+1, -1, +1, -1};
 
         static void mix(const demands_t & demands, float motors[])
         {
-            auto t = demands.thrust;
-            auto r = demands.roll;
-            auto p = demands.pitch;
-            auto y = demands.yaw;
-
-            motors[0] = t - r - p + y;
-            motors[1] = t - r + p - y;
-            motors[2] = t + r + p + y;
-            motors[3] = t + r - p - y;
+            for (uint8_t k=0; k<rotorCount; ++k) {
+                motors[k] =
+                    demands.thrust +
+                    demands.roll*roll[k] +
+                    demands.pitch*pitch[k] +
+                    demands.yaw*yaw[k];
+            }
         }
 };
 
