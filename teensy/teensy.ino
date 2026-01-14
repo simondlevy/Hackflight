@@ -38,7 +38,6 @@
 #include <teensy/pids/yaw_rate.hpp>
 
 #include <teensy/timer.hpp>
-#include <teensy/utils.hpp>
 
 static Dsm2048 _dsm2048;
 
@@ -138,9 +137,15 @@ static void runLoopDelay(const uint32_t usec_curr)
     }
 }
 
+static uint8_t u8constrain(
+        const uint8_t val, const uint8_t minval, const uint8_t maxval)
+{
+    return val < minval ? minval : val > maxval ? maxval : val;
+}
+
 static uint8_t scaleMotor(const float mval)
 {
-    return Utils::u8constrain(mval*125 + 125, 125, 250);
+    return u8constrain(mval*125 + 125, 125, 250);
 
 }
 

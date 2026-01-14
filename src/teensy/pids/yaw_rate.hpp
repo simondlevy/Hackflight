@@ -21,6 +21,7 @@
 #pragma once
 
 #include <datatypes.h>
+#include <num.hpp>
 #include <teensy/utils.hpp>
 
 /**
@@ -48,7 +49,7 @@ class YawRateController {
             const auto error = demands.yaw - state.dpsi;
 
             _integral = reset ? 0 :
-                Utils::fconstrain(_integral + error * dt, I_LIMIT);
+                Num::fconstrain(_integral + error * dt, I_LIMIT);
 
             const auto derivative = (error - _error) / dt;
 
