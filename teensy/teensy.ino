@@ -37,7 +37,6 @@
 #include <teensy/pids/pitch_roll_rate.hpp>
 #include <teensy/pids/yaw_rate.hpp>
 #include <teensy/timer.hpp>
-#include <teensy/utils.hpp>
 
 static Dsm2048 _dsm2048;
 
@@ -253,19 +252,16 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
         -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
     };
 
-    axis4_t quat = {};
 
     // Run state estimator
+    axis4_t quat = {};
     _madgwick.getQuaternion(dt, gyro, accel, quat);
-
-    // Compute Euler angles from quaternion
     axis3_t angles = {};
-    Utils::quat2euler(quat, angles);
+    MadgwickFilter::quat2euler(quat, angles);
 
     state.phi = angles.x;
     state.theta = angles.y;
     state.psi = angles.z;
-
 
     // Get angular velocities directly from gyro
     state.dphi = gyro.x;

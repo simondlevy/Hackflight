@@ -142,6 +142,16 @@ class MadgwickFilter {
             quat.z = _q3;
         }
 
+        static void quat2euler(const axis4_t & q, axis3_t &a)
+        {
+            a.x = Num::RAD2DEG * atan2f(q.w*q.x + q.y*q.z,
+                    0.5f - q.x*q.x - q.y*q.y);
+
+            a.y = Num::RAD2DEG * asinf(2 * (q.x*q.z - q.w*q.y));
+
+            a.z = Num::RAD2DEG * atan2f(q.x*q.y + q.w*q.z,
+                    0.5f - q.y*q.y - q.z*q.z);
+        }
     private:
 
         // Filter parameters - tuned for 2kHz loop rate; Do not touch unless
