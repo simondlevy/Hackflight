@@ -200,117 +200,83 @@ static void runMotors(const float * motors, const bool safeMode=true)
 }
 
 
-class Board {
+void readData(float & dt, demands_t & demands, state_t & state)
+{
+    // Keep track of what time it is and how much time has elapsed
+    // since the last loop
+    _usec_curr = micros();      
+    static uint32_t _usec_prev;
+    dt = (_usec_curr - _usec_prev)/1000000.0;
+    _usec_prev = _usec_curr;      
 
-    public:
+    // Read channels values from receiver
+    if (_dsm2048.timedOut(micros())) {
 
-        void init()
-        {
-            // Initialize the I^2C bus
-            Wire.begin();
+        _status = STATUS_FAILSAFE;
+    }
+    else if (_dsm2048.gotNewFrame()) {
 
-            // Initialize the I^2C sensors
-            initImu();
+        _dsm2048.getChannelValuesMlp6Dsm(_channels);
+    }
 
-            // Set up serial debugging
-            Serial.begin(115200);
+    // When throttle is down, toggle arming on switch press/release
+    const auto is_arming_switch_on = _channels[4] > ARMING_SWITCH_MIN;
 
-            // Set up serial connection from DSMX receiver
-            Serial1.begin(115200);
+    if (_channels[0] < THROTTLE_ARMING_MAX && is_arming_switch_on) {
+        _status = _status == STATUS_READY ? STATUS_ARMED : _status;
+    }
 
-            // Set up serial connection with Raspberry Pi
-            Serial4.begin(115200);
+    if (!is_arming_switch_on) {
+        _status = _status == STATUS_ARMED ? STATUS_READY : _status;
+    }
 
-            // Initialize state estimator
-            _madgwick.initialize();
+    // Read IMU
+    int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+    _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-            // Arm OneShot125 motors
-            _motors.arm();
+    // Accelerometer Gs
+    const axis3_t accel = {
+        -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
+        ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
+        az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+    };
 
-            pinMode(LED_PIN, OUTPUT);
-        }
+    // Gyro deg /sec
+    const axis3_t gyro = {
+        gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
+        -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
+        -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
+    };
 
-        void readData(float & dt, demands_t & demands, state_t & state)
-        {
-            // Keep track of what time it is and how much time has elapsed
-            // since the last loop
-            _usec_curr = micros();      
-            static uint32_t _usec_prev;
-            dt = (_usec_curr - _usec_prev)/1000000.0;
-            _usec_prev = _usec_curr;      
+    axis4_t quat = {};
 
-            // Read channels values from receiver
-            if (_dsm2048.timedOut(micros())) {
+    // Run state estimator
+    _madgwick.getQuaternion(dt, gyro, accel, quat);
 
-                _status = STATUS_FAILSAFE;
-            }
-            else if (_dsm2048.gotNewFrame()) {
+    // Compute Euler angles from quaternion
+    axis3_t angles = {};
+    Utils::quat2euler(quat, angles);
 
-                _dsm2048.getChannelValuesMlp6Dsm(_channels);
-            }
-
-            // When throttle is down, toggle arming on switch press/release
-            const auto is_arming_switch_on = _channels[4] > ARMING_SWITCH_MIN;
-
-            if (_channels[0] < THROTTLE_ARMING_MAX && is_arming_switch_on) {
-                _status = _status == STATUS_READY ? STATUS_ARMED : _status;
-            }
-
-            if (!is_arming_switch_on) {
-                _status = _status == STATUS_ARMED ? STATUS_READY : _status;
-            }
-
-            // Read IMU
-            int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
-            _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
-            // Accelerometer Gs
-            const axis3_t accel = {
-                -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
-                ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
-                az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
-            };
-
-            // Gyro deg /sec
-            const axis3_t gyro = {
-                gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
-                -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
-                -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
-            };
-
-            axis4_t quat = {};
-
-            // Run state estimator
-            _madgwick.getQuaternion(dt, gyro, accel, quat);
-
-            // Compute Euler angles from quaternion
-            axis3_t angles = {};
-            Utils::quat2euler(quat, angles);
-
-            state.phi = angles.x;
-            state.theta = angles.y;
-            state.psi = angles.z;
+    state.phi = angles.x;
+    state.theta = angles.y;
+    state.psi = angles.z;
 
 
-            // Get angular velocities directly from gyro
-            state.dphi = gyro.x;
-            state.dtheta = -gyro.y;
-            state.dpsi = gyro.z;
+    // Get angular velocities directly from gyro
+    state.dphi = gyro.x;
+    state.dtheta = -gyro.y;
+    state.dpsi = gyro.z;
 
-            // Convert stick demands to appropriate intervals
-            demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
-            demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
-            demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
-            demands.yaw   = _channels[3] * YAW_PRESCALE;
+    // Convert stick demands to appropriate intervals
+    demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
+    demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
+    demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
+    demands.yaw   = _channels[3] * YAW_PRESCALE;
 
-            // Use LED to indicate arming status
-            digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
+    // Use LED to indicate arming status
+    digitalWrite(LED_PIN, _status == STATUS_ARMED ? HIGH : LOW);
 
-        }
-
-};
-
-static Board _board;
+}
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
@@ -323,7 +289,28 @@ static BfQuadXMixer _mixer;
 
 void setup() 
 {
-    _board.init();
+    // Initialize the I^2C bus
+    Wire.begin();
+
+    // Initialize the I^2C sensors
+    initImu();
+
+    // Set up serial debugging
+    Serial.begin(115200);
+
+    // Set up serial connection from DSMX receiver
+    Serial1.begin(115200);
+
+    // Set up serial connection with Raspberry Pi
+    Serial4.begin(115200);
+
+    // Initialize state estimator
+    _madgwick.initialize();
+
+    // Arm OneShot125 motors
+    _motors.arm();
+
+    pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() 
@@ -332,7 +319,7 @@ void loop()
     demands_t demands = {};
     state_t state = {};
 
-    _board.readData(dt, demands, state);
+    readData(dt, demands, state);
 
     /*
        const auto s = state;
