@@ -33,8 +33,6 @@
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
 
-#include <teensy/msp/messages.hpp>
-#include <teensy/msp/serializer.hpp>
 #include <teensy/pids/pitch_roll_angle.hpp>
 #include <teensy/pids/pitch_roll_rate.hpp>
 #include <teensy/pids/yaw_rate.hpp>
