@@ -35,7 +35,7 @@
 #include <pids/pitchroll_angle.hpp>
 #include <pids/pitchroll_rate.hpp>
 
-#include <teensy/pids/yaw_rate.hpp>
+#include "yaw_rate_pid.hpp"
 
 static Dsm2048 _dsm2048;
 
