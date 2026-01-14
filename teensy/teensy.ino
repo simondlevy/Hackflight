@@ -252,16 +252,9 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
         -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
     };
 
-
-    // Run state estimator
-    axis4_t quat = {};
-    _madgwick.getQuaternion(dt, gyro, accel, quat);
-    axis3_t angles = {};
-    MadgwickFilter::quat2euler(quat, angles);
-
-    state.phi = angles.x;
-    state.theta = angles.y;
-    state.psi = angles.z;
+    // Run state estimator to get Euler angles
+    _madgwick.getEulerAngles(dt, gyro, accel,
+         state.phi, state.theta, state.psi);
 
     // Get angular velocities directly from gyro
     state.dphi = gyro.x;

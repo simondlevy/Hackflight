@@ -35,9 +35,9 @@ class MadgwickFilter {
             _q3 = 0;
         }
 
-        void getQuaternion(
+        void getEulerAngles(
                 const float dt, const axis3_t & gyro, const axis3_t & accel,
-                axis4_t & quat)
+                float & phi, float & theta, float & psi)
         {
             // LP filter gyro data
             auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyro.x;
@@ -136,22 +136,15 @@ class MadgwickFilter {
             _q2 *= recipNorm;
             _q3 *= recipNorm;
 
-            quat.w = _q0;
-            quat.x = _q1;
-            quat.y = _q2;
-            quat.z = _q3;
+            phi = Num::RAD2DEG * atan2f(_q0*_q1 + _q2*_q3,
+                    0.5f - _q1*_q1 - _q2*_q2);
+
+            theta = Num::RAD2DEG * asinf(2 * (_q1*_q3 - _q0*_q2));
+
+            psi = Num::RAD2DEG * atan2f(_q1*_q2 + _q0*_q3,
+                    0.5f - _q2*_q2 - _q3*_q3);
         }
 
-        static void quat2euler(const axis4_t & q, axis3_t &a)
-        {
-            a.x = Num::RAD2DEG * atan2f(q.w*q.x + q.y*q.z,
-                    0.5f - q.x*q.x - q.y*q.y);
-
-            a.y = Num::RAD2DEG * asinf(2 * (q.x*q.z - q.w*q.y));
-
-            a.z = Num::RAD2DEG * atan2f(q.x*q.y + q.w*q.z,
-                    0.5f - q.y*q.y - q.z*q.z);
-        }
     private:
 
         // Filter parameters - tuned for 2kHz loop rate; Do not touch unless
