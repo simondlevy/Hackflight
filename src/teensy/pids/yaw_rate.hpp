@@ -22,7 +22,6 @@
 
 #include <datatypes.h>
 #include <num.hpp>
-#include <teensy/utils.hpp>
 
 /**
   Input is angular rate demand (deg/sec) and actual angular rate from
