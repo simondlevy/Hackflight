@@ -33,8 +33,8 @@
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pids/pitchroll_angle.hpp>
+#include <pids/pitchroll_rate.hpp>
 
-#include <teensy/pids/pitch_roll_rate.hpp>
 #include <teensy/pids/yaw_rate.hpp>
 #include <teensy/timer.hpp>
 
@@ -269,7 +269,6 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
 
     // Use LED to indicate arming mode
     digitalWrite(LED_PIN, _mode == MODE_ARMED ? HIGH : LOW);
-
 }
 
 static constexpr float THROTTLE_DOWN = 0.06;
@@ -329,6 +328,10 @@ void loop()
             state.dphi, state.dtheta,
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
+
+    // Support same pitch/roll rate controller as Crazyflie
+    demands.roll /= 500000;
+    demands.pitch /= 500000;
 
     _yawRateController.run(dt, resetPids, state, demands);
 
