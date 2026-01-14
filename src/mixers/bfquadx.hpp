@@ -39,12 +39,10 @@ class Mixer {
 
         static void mix(const demands_t & demands, float motors[])
         {
-            auto y = demands.yaw;
-
-            motors[0] = demands.thrust + demands.roll*roll[0] + demands.pitch*pitch[0] - y;
-            motors[1] = demands.thrust + demands.roll*roll[1] + demands.pitch*pitch[1] + y;
-            motors[2] = demands.thrust + demands.roll*roll[2] + demands.pitch*pitch[2] + y;
-            motors[3] = demands.thrust + demands.roll*roll[3] + demands.pitch*pitch[3] - y;
+            motors[0] = demands.thrust + demands.roll*roll[0] + demands.pitch*pitch[0] + demands.yaw*yaw[0];
+            motors[1] = demands.thrust + demands.roll*roll[1] + demands.pitch*pitch[1] + demands.yaw*yaw[1];
+            motors[2] = demands.thrust + demands.roll*roll[2] + demands.pitch*pitch[2] + demands.yaw*yaw[2];
+            motors[3] = demands.thrust + demands.roll*roll[3] + demands.pitch*pitch[3] + demands.yaw*yaw[3];
         }
 };
 
