@@ -40,14 +40,13 @@ class Mixer {
         static void mix(const demands_t & demands, float motors[])
         {
             auto t = demands.thrust;
-            auto r = demands.roll;
             auto p = demands.pitch;
             auto y = demands.yaw;
 
-            motors[0] = t - r + p  - y;
-            motors[1] = t - r - p  + y;
-            motors[2] = t + r + p  + y;
-            motors[3] = t + r - p  - y;
+            motors[0] = t + demands.roll*roll[0] + p  - y;
+            motors[1] = t + demands.roll*roll[1] - p  + y;
+            motors[2] = t + demands.roll*roll[2] + p  + y;
+            motors[3] = t + demands.roll*roll[3] - p  - y;
         }
 };
 
