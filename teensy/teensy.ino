@@ -329,7 +329,12 @@ void loop()
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    PitchRollRateController::run(airborne, dt, state, demands);
+    PitchRollRateController::run(
+            airborne,
+            dt,
+            state.dphi, state.dtheta,
+            demands.roll, demands.pitch,
+            demands.roll, demands.pitch);
 
     _yawRateController.run(dt, resetPids, state, demands);
 

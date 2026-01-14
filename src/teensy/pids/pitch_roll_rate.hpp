@@ -1,8 +1,6 @@
 /*
-   Pitch/roll angular rate PID-control algorithm for real and simulated flight
-   controllers
-
-   Copyright (C) 2024 Simon D. Levy
+ *
+ * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,29 +19,35 @@
 
 #include <num.hpp>
 
-/**
-  Input is angular rate demands (deg/sec) and actual angular rates from
-  gyro; ouputput is arbitrary units scaled for motors
- */
 class PitchRollRateController {
 
     public:
 
-        static void run(
+        /**
+          * Demands are input as angular velocities in degrees per second and
+          * output as as arbitrary values to be scaled according to motor
+          * characteristics:
+          *
+          * roll:  input roll-right positive => output positive
+          *
+          * pitch: input nose-down positive => output positive
+          */
+         static void run(
                 const bool airborne,
                 const float dt, 
-                const vehicleState_t & state,
-                demands_t & demands)
+                const float state_dphi, const float state_dtheta,
+                const float demand_roll,const float demand_pitch, 
+                float & new_demand_roll, float & new_demand_pitch) 
         {
             static axis_t _roll;
 
             static axis_t _pitch;
 
-            demands.roll =
-                runAxis(dt, airborne, demands.roll, state.dphi, _roll);
+            new_demand_roll =
+                runAxis(dt, airborne, demand_roll, state_dphi, _roll);
 
-            demands.pitch =
-                runAxis(dt, airborne, demands.pitch, state.dtheta, _pitch);
+            new_demand_pitch =
+                runAxis(dt, airborne, demand_pitch, state_dtheta, _pitch);
         }
 
     private:
