@@ -36,20 +36,17 @@ class PitchRollRateController {
     public:
 
         void run(
+                const bool airborne,
                 const float dt, 
-                const bool reset,
                 const vehicleState_t & state,
-                demands_t & demands,
-                const float postScale=1.0)
+                demands_t & demands)
         {
 
-            runAxis(dt, reset, demands.roll, state.dphi, _roll_integral,
-                    _roll_error, postScale);
+            runAxis(dt, airborne, demands.roll, state.dphi, _roll_integral,
+                    _roll_error);
 
-            //printf("%+3.3f\n", demands.roll);
-
-            runAxis(dt, reset, demands.pitch, state.dtheta, _pitch_integral,
-                    _pitch_error, postScale); 
+            runAxis(dt, airborne, demands.pitch, state.dtheta, _pitch_integral,
+                    _pitch_error); 
         }
 
     private:
@@ -61,24 +58,22 @@ class PitchRollRateController {
         float _pitch_error;
 
         static void runAxis(
+                const bool airborne,
                 const float dt,
-                const bool reset,
                 float & demand,
                 const float dangle, 
                 float & integral,
-                float & errprev,
-                const float postScale)
+                float & errprev)
         {
 
             const auto error = demand - dangle;
 
-            integral = reset ? 0 :
-                Utils::fconstrain(integral + error * dt, ILIMIT);
+            integral = airborne ? 
+                Utils::fconstrain(integral + error * dt, ILIMIT) : 0;
 
             const auto derivative = (error - errprev) / dt;
 
-            demand =
-                postScale * (KP * error + KI * integral + KD * derivative);
+            demand = KP * error + KI * integral + KD * derivative;
 
             errprev = error;
         }

@@ -320,15 +320,6 @@ void loop()
 
     readData(dt, demands, state);
 
-    /*
-       const auto s = state;
-       printf("phi=%+3.3f dphi=%+3.3f theta=%+3.3f dtheta=%+3.3f "
-       "psi = %+3.3f dpsi=%+3.3f |  ",
-       s.phi, s.dphi, s.theta, s.dtheta, s.psi, s.dpsi);
-       printf("roll=%+3.3f pitch=%+3.3f yaw = %+3.3f\n",
-       demands.roll, demands.pitch, demands.yaw);
-     */
-
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
     const auto airborne = demands.thrust > 0;
@@ -340,7 +331,7 @@ void loop()
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    _pitchRollRateController.run(dt, resetPids, state, demands);
+    _pitchRollRateController.run(airborne, dt, state, demands);
 
     _yawRateController.run(dt, resetPids, state, demands);
 
