@@ -31,8 +31,8 @@
 #include <hackflight.h>
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
+#include <mixers/bfquadx.hpp>
 
-#include <teensy/mixers/bfquadx.hpp>
 #include <teensy/msp/messages.hpp>
 #include <teensy/msp/serializer.hpp>
 #include <teensy/pids/pitch_roll_angle.hpp>
@@ -286,8 +286,6 @@ static YawRatePid _yawRatePid;
 static PitchRollAnglePid _pitchRollAnglePid;
 static PitchRollRatePid _pitchRollRatePid;
 
-static BfQuadXMixer _mixer;
-
 void setup() 
 {
     // Initialize the I^2C bus
@@ -341,7 +339,7 @@ void loop()
 
     float motors[4] = {};
 
-    _mixer.run(demands, motors);
+    Mixer::mix(demands, motors);
 
     runMotors(motors);
 }

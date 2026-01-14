@@ -168,7 +168,7 @@ class Dynamics {
 
                 u3 += b * omega2 * pitch[i];
 
-                u4 += d * omega2 * yaw[i];
+                u4 += d * omega2 * -yaw[i];
             }
 
             // Equation 12 line 6 for dz/dt in inertial (earth) frame
