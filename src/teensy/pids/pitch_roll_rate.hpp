@@ -19,62 +19,61 @@
 
 #pragma once
 
+#include <num.hpp>
+
 /**
   Input is angular rate demands (deg/sec) and actual angular rates from
   gyro; ouputput is arbitrary units scaled for motors
  */
 class PitchRollRateController {
 
-    private:
-
-        static constexpr float KP = 0.00025;
-        static constexpr float KI = 0.0005;
-        static constexpr float KD = 2.5e-6;
-
-        static constexpr float ILIMIT = 33;
-
     public:
 
-        void run(
+        static void run(
                 const bool airborne,
                 const float dt, 
                 const vehicleState_t & state,
                 demands_t & demands)
         {
+            static axis_t _roll;
 
-            runAxis(dt, airborne, demands.roll, state.dphi, _roll_integral,
-                    _roll_error);
+            static axis_t _pitch;
 
-            runAxis(dt, airborne, demands.pitch, state.dtheta, _pitch_integral,
-                    _pitch_error); 
+            demands.roll =
+                runAxis(dt, airborne, demands.roll, state.dphi, _roll);
+
+            demands.pitch =
+                runAxis(dt, airborne, demands.pitch, state.dtheta, _pitch);
         }
 
     private:
 
-        float _roll_integral;
-        float _roll_error;
+        static constexpr float KP = 0.00025;
+        static constexpr float KI = 0.0005;
+        static constexpr float KD = 2.5e-6;
+        static constexpr float ILIMIT = 33;
 
-        float _pitch_integral;
-        float _pitch_error;
+        typedef struct {
+            float integral;
+            float previous;
+        } axis_t;
 
-        static void runAxis(
+        static float runAxis(
                 const bool airborne,
                 const float dt,
-                float & demand,
-                const float dangle, 
-                float & integral,
-                float & errprev)
+                const float demand,
+                const float measured, 
+                axis_t & axis)
         {
+            const auto error = demand - measured;
 
-            const auto error = demand - dangle;
+            axis.integral = airborne ? 
+                Num::fconstrain(axis.integral + error * dt, ILIMIT) : 0;
 
-            integral = airborne ? 
-                Utils::fconstrain(integral + error * dt, ILIMIT) : 0;
+            const auto deriv = dt > 0 ? (error - axis.previous) / dt : 0;
 
-            const auto derivative = (error - errprev) / dt;
+            axis.previous = airborne ? error : 0;
 
-            demand = KP * error + KI * integral + KD * derivative;
-
-            errprev = error;
+            return airborne ?  KP * error + KI * axis.integral + KD * deriv : 0;
         }
 };

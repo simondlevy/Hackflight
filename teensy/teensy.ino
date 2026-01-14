@@ -282,8 +282,6 @@ static constexpr float THROTTLE_DOWN = 0.06;
 
 static YawRateController _yawRateController;
 
-static PitchRollRateController _pitchRollRateController;
-
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() 
@@ -331,7 +329,7 @@ void loop()
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    _pitchRollRateController.run(airborne, dt, state, demands);
+    PitchRollRateController::run(airborne, dt, state, demands);
 
     _yawRateController.run(dt, resetPids, state, demands);
 
