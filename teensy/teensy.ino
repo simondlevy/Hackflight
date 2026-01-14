@@ -36,7 +36,6 @@
 #include <pids/pitchroll_rate.hpp>
 
 #include <teensy/pids/yaw_rate.hpp>
-#include <teensy/timer.hpp>
 
 static Dsm2048 _dsm2048;
 
@@ -103,12 +102,6 @@ static MadgwickFilter  _madgwick;
 
 // Safety
 static mode_e _mode;
-
-// Telemetry ------------------------------------------------------
-static Timer _telemetryTimer = Timer(60); // Hz
-
-// Debugging ------------------------------------------------------
-static Timer _debugTimer = Timer(100); // Hz
 
 static void runLoopDelay(const uint32_t usec_curr)
 {
