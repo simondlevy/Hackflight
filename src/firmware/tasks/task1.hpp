@@ -204,26 +204,13 @@ class Task1 {
                 _ekf->predict(nowMs, isFlying); 
             }
 
-            axis3_t dpos = {};
-            axis4_t quat = {};
+            // Get state estimate from EKF
+            _ekf->getStateEstimate(nowMs, state);
 
-            _ekf->getStateEstimate(nowMs, state.z, dpos, quat);
-
-            if (!velInBounds(dpos.x) || !velInBounds(dpos.y) ||
-                    !velInBounds(dpos.z)) {
+            if (!velInBounds(state.dx) || !velInBounds(state.dy) ||
+                    !velInBounds(state.dz)) {
                 didResetEstimation = true;
             }
-
-            state.dx = dpos.x;
-            state.dy = -dpos.y; // negate for rightward positive
-            state.dz = dpos.z;
-
-            axis3_t angles = {};
-            Num::quat2euler(quat, angles);
-
-            state.phi = angles.x;
-            state.theta = angles.y;
-            state.psi = -angles.z; // negate for nose-right positive
 
             // Get angular velocities directly from gyro
             axis3_t gyroData = {};

@@ -240,8 +240,7 @@ class EKF {
             _lastPredictionMs = nowMs;
         }
 
-        void getStateEstimate(const uint32_t nowMs,
-                float & z, axis3_t & dpos, axis4_t & quat)
+        void getStateEstimate(const uint32_t nowMs, vehicleState_t & state)
         {
             addProcessNoise(nowMs);
 
@@ -251,20 +250,23 @@ class EKF {
             }
             _queueLength = 0;
 
-            z = _x[STATE_Z];
+            state.z = _x[STATE_Z];
 
             if (_isUpdated) {
                 finalize(nowMs);
             }
 
-            dpos.x = _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
-            dpos.y = _r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ];
-            dpos.z = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
+            state.dx = _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
+            state.dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); // make right pos
+            state.dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
 
-            quat.w = _q0;
-            quat.x = _q1;
-            quat.y = _q2;
-            quat.z = _q3;
+            state.phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
+                    _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
+
+            state.theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
+
+            state.psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
+                    _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); // make right pos
         }
 
         void enqueueImu(const axis3_t * gyro, const axis3_t * accel)
