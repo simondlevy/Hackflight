@@ -27,7 +27,7 @@
   Input is angular rate demand (deg/sec) and actual angular rate from
   gyro; ouputput is arbitrary units scaled for motors
  */
-class YawRatePid {
+class YawRateController {
 
     private:
 

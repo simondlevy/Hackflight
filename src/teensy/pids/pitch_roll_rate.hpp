@@ -23,7 +23,7 @@
   Input is angular rate demands (deg/sec) and actual angular rates from
   gyro; ouputput is arbitrary units scaled for motors
  */
-class PitchRollRatePid {
+class PitchRollRateController {
 
     private:
 

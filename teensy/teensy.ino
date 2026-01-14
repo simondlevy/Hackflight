@@ -32,10 +32,11 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
+#include <pids/pitchroll_angle.hpp>
 
-#include <teensy/pids/pitch_roll_angle.hpp>
 #include <teensy/pids/pitch_roll_rate.hpp>
 #include <teensy/pids/yaw_rate.hpp>
+
 #include <teensy/timer.hpp>
 #include <teensy/utils.hpp>
 
@@ -279,10 +280,11 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
-static YawRatePid _yawRatePid;
+static YawRateController _yawRateController;
 
-static PitchRollAnglePid _pitchRollAnglePid;
-static PitchRollRatePid _pitchRollRatePid;
+static PitchRollRateController _pitchRollRateController;
+
+//////////////////////////////////////////////////////////////////////////////
 
 void setup() 
 {
@@ -329,11 +331,18 @@ void loop()
 
     const auto resetPids = demands.thrust < THROTTLE_DOWN;
 
-    _pitchRollAnglePid.run(dt, resetPids, state, demands);
+    const auto airborne = demands.thrust > 0;
 
-    _pitchRollRatePid.run(dt, resetPids, state, demands);
+    PitchRollAngleController::run(
+            airborne,
+            dt,
+            state.phi, state.theta,
+            demands.roll, demands.pitch,
+            demands.roll, demands.pitch);
 
-    _yawRatePid.run(dt, resetPids, state, demands);
+    _pitchRollRateController.run(dt, resetPids, state, demands);
+
+    _yawRateController.run(dt, resetPids, state, demands);
 
     float motors[4] = {};
 
