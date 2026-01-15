@@ -21,7 +21,7 @@
 // Hackflight
 #include <firmware/tasks/task1.hpp>
 
-#ifdef BOLT
+#if defined(BOLT)
 
 static const std::vector<uint8_t> MOTOR_PINS = {PA1, PB11, PA15, PB10};
 
@@ -57,7 +57,24 @@ void Task1::motors_run()
     motors.run();
 }
 
-#else
+#elif defined(NOMOTORS)
+
+void Task1::motors_init()
+{
+}
+
+void Task1::motors_setSpeed(uint32_t id, float speed)
+{
+    (void)id;
+    (void)speed;
+}
+
+void Task1::motors_run()
+{
+}
+
+
+#else // cf2
 
 static const uint8_t M1_PIN = PA1;
 static const uint8_t M2_PIN = PB11;

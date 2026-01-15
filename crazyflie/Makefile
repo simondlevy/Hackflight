@@ -24,13 +24,16 @@ COMPILE = arduino-cli compile \
 		--fqbn $(FQBN) $(SKETCH).ino
 
 any:
-	@echo Please specify bolt or cf2
+	@echo Please specify bolt or cf2 or nomotors
 
 cf2: $(DEPS)
 	$(COMPILE)
 
 bolt: $(DEPS)
 	$(COMPILE) --build-property "compiler.cpp.extra_flags=\"-DBOLT\""
+
+nomotors: $(DEPS)
+	$(COMPILE) --build-property "compiler.cpp.extra_flags=\"-DNOMOTORS\""
 
 $(MSGS): ../msppg/messages.json
 	cd ../msppg; make install; cd ../$(SKETCH)

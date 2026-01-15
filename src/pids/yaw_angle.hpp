@@ -64,7 +64,6 @@ class YawAngleController {
         static constexpr float KI = 1;
         static constexpr float KD = 0.35;
         static constexpr float ILIMIT = 360;
-        //static constexpr float DEMAND_MAX = 200;
 
         float _integral;
         float _previous;

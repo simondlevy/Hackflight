@@ -34,8 +34,8 @@
 #include <mixers/bfquadx.hpp>
 #include <pids/pitchroll_angle.hpp>
 #include <pids/pitchroll_rate.hpp>
-
-#include "yaw_rate_pid.hpp"
+#include <pids/yaw_angle.hpp>
+#include <pids/yaw_rate.hpp>
 
 static Dsm2048 _dsm2048;
 
@@ -147,7 +147,6 @@ static void reportForever(const char * message)
         printf("%s\n", message);
         delay(500);
     }
-
 }
 
 static void initImu() 
@@ -318,8 +317,21 @@ void loop()
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    demands.yaw = YawRateController::run(
-        airborne, dt, state.dpsi, demands.yaw);
+    static constexpr float YAW_DEMAND_MAX = 200;
+    static constexpr float DT = 3e-6;
+
+    static float _yaw_angle_target;
+
+    _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
+            YAW_DEMAND_MAX * demands.yaw * DT);
+
+    const auto newyaw = YawAngleController::run(
+        airborne, dt, state.psi, _yaw_angle_target);
+
+    const auto newnewyaw = YawRateController::run(
+        airborne, dt, state.dpsi, newyaw) / 500000;
+
+    demands.yaw = newnewyaw;
 
     // Support same rate controllers as Crazyflie
     demands.roll /= 500000;
