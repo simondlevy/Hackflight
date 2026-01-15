@@ -32,10 +32,7 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <pids/pitchroll_angle.hpp>
-#include <pids/pitchroll_rate.hpp>
-#include <pids/yaw_angle.hpp>
-#include <pids/yaw_rate.hpp>
+#include <pidcontrol.hpp>
 
 static Dsm2048 _dsm2048;
 
@@ -295,41 +292,15 @@ void setup()
 
 void loop() 
 {
+    static constexpr float YAW_DEMAND_INC = 3e-6;
+
     float dt=0;
     demands_t demands = {};
     vehicleState_t state = {};
 
     readData(dt, demands, state);
 
-    const auto airborne = demands.thrust > 0;
-
-    PitchRollAngleController::run(
-            airborne,
-            dt,
-            state.phi, state.theta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
-
-    PitchRollRateController::run(
-            airborne,
-            dt,
-            state.dphi, state.dtheta,
-            demands.roll, demands.pitch,
-            demands.roll, demands.pitch);
-
-    static constexpr float YAW_DEMAND_MAX = 200;
-    static constexpr float DT = 3e-6;
-
-    static float _yaw_angle_target;
-
-    _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
-            YAW_DEMAND_MAX * demands.yaw * DT);
-
-    demands.yaw= YawAngleController::run(
-        airborne, dt, state.psi, _yaw_angle_target);
-
-    demands.yaw = YawRateController::run(
-        airborne, dt, state.dpsi, demands.yaw);
+    PidControl::runStabilizerPids(dt, YAW_DEMAND_INC, state, demands, demands);
 
     // Support same rate controllers as Crazyflie
     demands.roll /= 500000;

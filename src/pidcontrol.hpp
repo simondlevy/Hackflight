@@ -62,17 +62,6 @@ class PidControl {
 
             const auto airborne = demands.thrust > 0;
 
-            static float _yaw_angle_target;
-
-            _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
-                        YAW_DEMAND_MAX * openLoopDemands.yaw * dt);
-
-            const auto yaw = YawAngleController::run(
-                    airborne, dt, vehicleState.psi, _yaw_angle_target);
-
-            demands.yaw =
-                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
-
             PositionController::run(
                     airborne,
                     dt,
@@ -80,6 +69,30 @@ class PidControl {
                     hovering ? openLoopDemands.pitch : 0,
                     hovering ? openLoopDemands.roll : 0,
                     demands.roll, demands.pitch);
+
+
+            runStabilizerPids(dt, dt, vehicleState, openLoopDemands, demands);
+        }
+
+        static void runStabilizerPids(
+                const float dt,
+                const float yaw_demand_inc,
+                const vehicleState_t & vehicleState,
+                const demands_t & openLoopDemands,
+                demands_t & demands)
+         {
+            const auto airborne = demands.thrust > 0;
+
+            static float _yaw_angle_target;
+
+            _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
+                        YAW_DEMAND_MAX * openLoopDemands.yaw * yaw_demand_inc);
+
+            const auto yaw = YawAngleController::run(
+                    airborne, dt, vehicleState.psi, _yaw_angle_target);
+
+            demands.yaw =
+                YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
 
             PitchRollAngleController::run(
                     airborne,
