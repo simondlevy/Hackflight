@@ -266,8 +266,6 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
 
 static constexpr float THROTTLE_DOWN = 0.06;
 
-static YawRateController _yawRateController;
-
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() 
@@ -320,7 +318,8 @@ void loop()
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    _yawRateController.run(airborne, dt, state, demands);
+    demands.yaw = YawRateController::run(
+        airborne, dt, state.dpsi, demands.yaw);
 
     // Support same rate controllers as Crazyflie
     demands.roll /= 500000;

@@ -31,26 +31,26 @@ class YawRateController {
 
     public:
 
-        void run(
+        static float run(
                 const bool airborne,
                 const float dt, 
-                const vehicleState_t & state,
-                demands_t & demands) 
+                const float dpsi,
+                const float yaw)
         {
             static float _integral;
 
             static float _error;
 
-            const auto error = demands.yaw - state.dpsi;
+            const auto error = yaw - dpsi;
 
             _integral = airborne ?
                 Num::fconstrain(_integral + error * dt, I_LIMIT) : 0;
 
             const auto derivative = (error - _error) / dt;
 
-            demands.yaw = KP * error + KI * _integral - KD * derivative; 
-
             _error = error;
+
+            return KP * error + KI * _integral - KD * derivative; 
         }    
 
     private:
