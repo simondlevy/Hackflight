@@ -325,17 +325,16 @@ void loop()
     _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
             YAW_DEMAND_MAX * demands.yaw * DT);
 
-    const auto newyaw = YawAngleController::run(
+    demands.yaw= YawAngleController::run(
         airborne, dt, state.psi, _yaw_angle_target);
 
-    const auto newnewyaw = YawRateController::run(
-        airborne, dt, state.dpsi, newyaw) / 500000;
-
-    demands.yaw = newnewyaw;
+    demands.yaw = YawRateController::run(
+        airborne, dt, state.dpsi, demands.yaw);
 
     // Support same rate controllers as Crazyflie
     demands.roll /= 500000;
     demands.pitch /= 500000;
+    demands.yaw /= 500000;
 
     float motors[4] = {};
 
