@@ -278,9 +278,6 @@ void setup()
     // Set up serial connection from DSMX receiver
     Serial1.begin(115200);
 
-    // Set up serial connection with Raspberry Pi
-    Serial4.begin(115200);
-
     // Initialize state estimator
     _madgwick.initialize();
 
