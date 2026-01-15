@@ -37,6 +37,10 @@ class YawRateController {
                 const vehicleState_t & state,
                 demands_t & demands) 
         {
+            static float _integral;
+
+            static float _error;
+
             const auto error = demands.yaw - state.dpsi;
 
             _integral = airborne ?
@@ -55,9 +59,4 @@ class YawRateController {
         static constexpr float KI = 2.5e-4;          
         static constexpr float KD = 7.5e-7;
         static constexpr float I_LIMIT = 2.5e+1;     
-
-        float _integral;
-
-        float _error;
-
 };
