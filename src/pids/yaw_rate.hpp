@@ -50,6 +50,4 @@ class YawRateController {
          static constexpr float KI = 16.7;
          static constexpr float ILIMIT = 166.7;
          static constexpr float OUTPUT_LIMIT = INT16_MAX;
-
-         float _integral;
 };

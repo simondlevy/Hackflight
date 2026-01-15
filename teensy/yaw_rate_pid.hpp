@@ -29,26 +29,18 @@
  */
 class YawRateController {
 
-    private:
-
-        static constexpr float I_LIMIT = 2.5e+1;     
-
-        static constexpr float KP = 1.5e-3;
-        static constexpr float KI = 2.5e-4;          
-        static constexpr float KD = 7.5e-7;
-
     public:
 
         void run(
+                const bool airborne,
                 const float dt, 
-                const bool reset,
                 const vehicleState_t & state,
                 demands_t & demands) 
         {
             const auto error = demands.yaw - state.dpsi;
 
-            _integral = reset ? 0 :
-                Num::fconstrain(_integral + error * dt, I_LIMIT);
+            _integral = airborne ?
+                Num::fconstrain(_integral + error * dt, I_LIMIT) : 0;
 
             const auto derivative = (error - _error) / dt;
 
@@ -58,6 +50,11 @@ class YawRateController {
         }    
 
     private:
+
+        static constexpr float KP = 1.5e-3;
+        static constexpr float KI = 2.5e-4;          
+        static constexpr float KD = 7.5e-7;
+        static constexpr float I_LIMIT = 2.5e+1;     
 
         float _integral;
 

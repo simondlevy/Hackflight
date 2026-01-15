@@ -304,8 +304,6 @@ void loop()
 
     readData(dt, demands, state);
 
-    const auto resetPids = demands.thrust < THROTTLE_DOWN;
-
     const auto airborne = demands.thrust > 0;
 
     PitchRollAngleController::run(
@@ -322,11 +320,11 @@ void loop()
             demands.roll, demands.pitch,
             demands.roll, demands.pitch);
 
-    // Support same pitch/roll rate controller as Crazyflie
+    _yawRateController.run(airborne, dt, state, demands);
+
+    // Support same rate controllers as Crazyflie
     demands.roll /= 500000;
     demands.pitch /= 500000;
-
-    _yawRateController.run(dt, resetPids, state, demands);
 
     float motors[4] = {};
 
