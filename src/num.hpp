@@ -57,10 +57,6 @@ class Num {
             q.z = cr * cp * sy - sr * sp * cy;
         }
 
-        static void quat2euler(const axis4_t & q, axis3_t & a)
-        {
-       }
-
         static float cap_angle(float angle) 
         {
             float result = angle;

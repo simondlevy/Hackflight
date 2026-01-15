@@ -73,17 +73,6 @@ class PidControl {
             demands.yaw =
                 YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
 
-            static uint32_t _msec;
-            const auto msec = millis();
-            if (msec - _msec > 10) {
-                Serial.print(_yaw_angle_target);
-                Serial.print(" => ");
-                Serial.print(yaw);
-                Serial.print(" => ");
-                Serial.println(demands.yaw);
-                _msec = msec;
-            }
-
             PositionController::run(
                     airborne,
                     dt,
