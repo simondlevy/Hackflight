@@ -11,7 +11,10 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-static constexpr float DYNAMICS_FREQ = 1e5; // Hz
+static const float DYNAMICS_FREQ = 1e5; // Hz
+
+static const uint32_t STEPS = 1000;
+
 
 int main(int argc, char ** argv)
 {
@@ -36,7 +39,17 @@ int main(int argc, char ** argv)
 
     pidControl.init();
 
+    mode_e mode = MODE_IDLE;
+
     FILE * logfp = fopen("log.csv", "w");
+
+    for (uint32_t k=0; k<STEPS; ++k) {
+
+        const auto pose = dynamics.getPose();
+
+        fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
+                pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+    }
 
     fclose(logfp);
 
