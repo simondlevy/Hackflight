@@ -76,7 +76,6 @@ class SimInnerLoop {
                             controlled,
                             state,
                             setpoint,
-                            LANDING_ALTITUDE_METERS,
                             demands);
 
                     float motors[4] = {};
@@ -95,8 +94,6 @@ class SimInnerLoop {
         }    
 
     private:
-
-        static constexpr float LANDING_ALTITUDE_METERS = 0.03;
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
