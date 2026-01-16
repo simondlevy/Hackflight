@@ -82,23 +82,22 @@ static constexpr float GYRO_ERROR_X = -3.3;
 static constexpr float GYRO_ERROR_Y = -0.50;
 static constexpr float GYRO_ERROR_Z = +0.6875;
 
+// Misc. -----------------------------------------------------------
+
+static constexpr float YAW_DEMAND_INC = 3e-6;
+
+
 // Sensors
 static MPU6050 _mpu6050;
 
 // Motors
 static OneShot125 _motors = OneShot125(MOTOR_PINS);
 
-// Timing
-static uint32_t _usec_curr;
-
 // Receiver
 static float _channels[6];
 
 // State estimation
 static MadgwickFilter  _madgwick;
-
-// Safety
-static mode_e _mode;
 
 static void runLoopDelay(const uint32_t usec_curr)
 {
@@ -164,7 +163,7 @@ static void initImu()
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-static void runMotors(const float * motors, const bool safeMode=true)
+static void runMotors(const float * motors, const bool mode)
 {
     // Rescale motor values for OneShot125
     auto m1_usec = scaleMotor(motors[0]);
@@ -173,7 +172,7 @@ static void runMotors(const float * motors, const bool safeMode=true)
     auto m4_usec = scaleMotor(motors[3]);
 
     // Shut motors down when not armed
-    if (safeMode && _mode != MODE_ARMED) {
+    if (mode != MODE_ARMED) {
 
         m1_usec = 120;
         m2_usec = 120;
@@ -189,23 +188,25 @@ static void runMotors(const float * motors, const bool safeMode=true)
 
     _motors.run();
 
-    runLoopDelay(_usec_curr);
+    runLoopDelay(micros());
+}
+
+float getDt()
+{
+    const auto usec_curr = micros();      
+    static uint32_t _usec_prev;
+    const auto dt = (usec_curr - _usec_prev)/1000000.0;
+    _usec_prev = usec_curr;      
+    return dt;
 }
 
 
-void readData(float & dt, demands_t & demands, vehicleState_t & state)
+static void getDemands(demands_t & demands, mode_t & mode)
 {
-    // Keep track of what time it is and how much time has elapsed
-    // since the last loop
-    _usec_curr = micros();      
-    static uint32_t _usec_prev;
-    dt = (_usec_curr - _usec_prev)/1000000.0;
-    _usec_prev = _usec_curr;      
-
     // Read channels values from receiver
     if (_dsm2048.timedOut(micros())) {
 
-        _mode = MODE_PANIC;
+        mode = MODE_PANIC;
     }
     else if (_dsm2048.gotNewFrame()) {
 
@@ -216,13 +217,22 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
     const auto is_arming_switch_on = _channels[4] > ARMING_SWITCH_MIN;
 
     if (_channels[0] < THROTTLE_ARMING_MAX && is_arming_switch_on) {
-        _mode = _mode == MODE_IDLE ? MODE_ARMED : _mode;
+        mode = mode == MODE_IDLE ? MODE_ARMED : mode;
     }
 
     if (!is_arming_switch_on) {
-        _mode = _mode == MODE_ARMED ? MODE_IDLE : _mode;
+        mode = mode == MODE_ARMED ? MODE_IDLE : mode;
     }
 
+    // Convert stick demands to appropriate intervals
+    demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
+    demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
+    demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
+    demands.yaw   = _channels[3] * YAW_PRESCALE;
+}
+
+static void getVehicleState(const float dt, vehicleState_t & state)
+{
     // Read IMU
     int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
     _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -249,18 +259,7 @@ void readData(float & dt, demands_t & demands, vehicleState_t & state)
     state.dphi = gyro.x;
     state.dtheta = -gyro.y;
     state.dpsi = gyro.z;
-
-    // Convert stick demands to appropriate intervals
-    demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
-    demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
-    demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
-    demands.yaw   = _channels[3] * YAW_PRESCALE;
-
-    // Use LED to indicate arming mode
-    digitalWrite(LED_PIN, _mode == MODE_ARMED ? HIGH : LOW);
 }
-
-static constexpr float THROTTLE_DOWN = 0.06;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -284,18 +283,23 @@ void setup()
     // Arm OneShot125 motors
     _motors.arm();
 
+    // Initialized LED
     pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() 
 {
-    static constexpr float YAW_DEMAND_INC = 3e-6;
+    static mode_t _mode;
 
-    float dt=0;
+    const float dt = getDt();
+
     demands_t demands = {};
-    vehicleState_t state = {};
+    getDemands(demands, _mode);
 
-    readData(dt, demands, state);
+    digitalWrite(LED_PIN, _mode == MODE_ARMED ? HIGH : LOW);
+
+    vehicleState_t state = {};
+    getVehicleState(dt, state);
 
     PidControl::runStabilizerPids(dt, YAW_DEMAND_INC, state, demands, demands);
 
@@ -308,5 +312,5 @@ void loop()
 
     Mixer::mix(demands, motors);
 
-    runMotors(motors);
+    runMotors(motors, _mode);
 }
