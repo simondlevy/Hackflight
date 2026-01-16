@@ -31,7 +31,6 @@ class ClimbRateController {
          */
         static float run(
                 const bool hovering,
-                const float z0,
                 const float dt,
                 const float z,
                 const float dz,
@@ -39,7 +38,7 @@ class ClimbRateController {
         {
             static float _integral;
 
-            const auto airborne = hovering || (z > z0);
+            const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
 
             const auto error = demand - dz;
 
@@ -58,4 +57,6 @@ class ClimbRateController {
         static constexpr float KP = 25;
         static constexpr float KI = 15;
         static constexpr float ILIMIT = 5000;
+
+        static constexpr float ALTITUDE_LANDING_M = 0.03;
 };

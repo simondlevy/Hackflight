@@ -47,7 +47,6 @@ class Task1 {
             return (tick % (FREQ_MAIN_LOOP / rate)) == 0;
         }
 
-        static constexpr float LANDING_ALTITUDE_M = 0.03;
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
         static constexpr float MAX_SAFE_ANGLE = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
@@ -268,7 +267,6 @@ class Task1 {
                         setpoint.hovering,
                         _vehicleState,
                         setpoint.demands,
-                        LANDING_ALTITUDE_M,
                         demands);
 
                 runMixer(demands, motorvals);
