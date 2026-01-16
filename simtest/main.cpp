@@ -3,11 +3,15 @@
 // Hackflight
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
+#include <pidcontrol.hpp>
+#include <vehicles/diyquad.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
+
+static constexpr float DYNAMICS_FREQ = 1e5; // Hz
 
 int main(int argc, char ** argv)
 {
@@ -24,8 +28,17 @@ int main(int argc, char ** argv)
 
     const auto pose = worldParser.robotPose;
 
-    printf("x=%+3.3f y=%+3.3f z=%+3.3f phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+    Dynamics dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
+
+    dynamics.setPose({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
+
+    PidControl pidControl;
+
+    pidControl.init();
+
+    FILE * logfp = fopen("log.csv", "w");
+
+    fclose(logfp);
 
     return 0;
 }
