@@ -21,6 +21,7 @@
 
 // Hackflight
 #define _MAIN
+#include <simulator/common.h>
 #include <simulator/inner.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
@@ -86,7 +87,15 @@ class PhysicsPluginHelper {
 
         static Dynamics::pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
         {
-            return _innerLoop.step(siminfo);
+            // Set pose first time around
+            static bool _ready;
+            if (!_ready) {
+                _innerLoop.setPose(siminfo.startingPose);
+            }
+            _ready = true;
+
+            return _innerLoop.step(
+                    siminfo.framerate, siminfo.mode, siminfo.setpoint);
         }
 
         static void set_dbody_from_pose(const Dynamics::pose_t & pose)

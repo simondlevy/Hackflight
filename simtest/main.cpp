@@ -15,7 +15,6 @@ static const float DYNAMICS_FREQ = 1e5; // Hz
 
 static const uint32_t STEPS = 1000;
 
-
 int main(int argc, char ** argv)
 {
     if (argc < 3) {
@@ -39,9 +38,11 @@ int main(int argc, char ** argv)
 
     pidControl.init();
 
-    mode_e mode = MODE_IDLE;
+    mode_e mode = MODE_HOVER;
 
     FILE * logfp = fopen("log.csv", "w");
+
+    float z = pose.z;
 
     for (uint32_t k=0; k<STEPS; ++k) {
 

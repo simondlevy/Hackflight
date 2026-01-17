@@ -27,7 +27,6 @@
 #include <num.hpp>
 #include <pidcontrol.hpp>
 #include <simulator/dynamics.hpp>
-#include <simulator/common.h>
 #include <vehicles/diyquad.hpp>
 
 class SimInnerLoop {
@@ -45,24 +44,25 @@ class SimInnerLoop {
             _pidControl->init();
         }
 
-        Dynamics::pose_t step(const siminfo_t & siminfo)
+        void setPose(const Dynamics::pose_t & pose)
         {
-            // Set pose in dynamics first time around
-            static bool _ready;
-            if (!_ready) {
-                _dynamics.setPose(siminfo.startingPose);
-            }
-            _ready = true;
+            _dynamics.setPose(pose);
+        }
 
+        Dynamics::pose_t step(
+                const float framerate,
+                const mode_e mode,
+                const demands_t & setpoint)
+        {
             // Run slow PID control in outer loop ----------------------------
-            for (uint32_t i=0; i<PID_SLOW_FREQ/siminfo.framerate; ++i) {
+            for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
 
-                const auto state =  _dynamics.getVehicleStateDegrees();
+                const auto state = _dynamics.getVehicleStateDegrees();
 
-                const bool controlled = siminfo.mode == MODE_HOVERING ||
-                    siminfo.mode == MODE_AUTONOMOUS;
+                const bool controlled =
+                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
 
-                const demands_t sp = siminfo.setpoint;
+                const demands_t sp = setpoint;
 
                 demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
 
