@@ -22,14 +22,14 @@
 // Hackflight
 #define _MAIN
 #include <simulator/siminfo.h>
-#include <simulator/inner.hpp>
+#include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
 static dBodyID _robot;
 
-// Platform-independent simulator inner loop
-static SimInnerLoop _innerLoop;
+// Platform-independent simulator simulator loop
+static SimInnerLoop _simulatorLoop;
 
 static PidControl _pidControl;
 
@@ -47,7 +47,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robot, 0);
     }
 
-    _innerLoop.init(&_pidControl);
+    _simulatorLoop.init(&_pidControl);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
@@ -90,11 +90,11 @@ class PhysicsPluginHelper {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                _innerLoop.setPose(siminfo.startingPose);
+                _simulatorLoop.setPose(siminfo.startingPose);
             }
             _ready = true;
 
-            return _innerLoop.step(
+            return _simulatorLoop.step(
                     siminfo.framerate, siminfo.mode, siminfo.setpoint);
         }
 

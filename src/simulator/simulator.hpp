@@ -1,5 +1,5 @@
 /* 
- * Platform-independent support for simulator inner loop (PID control /
+ * Platform-independent support for simulator simulator loop (PID control /
  * dynamics)
  *
  * Copyright (C) 2025 Simon D. Levy
@@ -81,7 +81,7 @@ class SimInnerLoop {
                     float motors[4] = {};
                     Mixer::mix(demands, motors);
 
-                    // Run dynamics in inner loop ----------------------------
+                    // Run dynamics in simulator loop ----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
                         _dynamics.update(motors, Mixer::rotorCount,
