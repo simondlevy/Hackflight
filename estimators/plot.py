@@ -19,8 +19,11 @@ def main():
     data = np.loadtxt('log.csv', delimiter=',')
 
     plot(data, 0, 'phi', 90)
+    plot(data, 1, 'dphi', 400)
     plot(data, 2, 'theta', 90)
+    plot(data, 3, 'dtheta', 400)
     plot(data, 4, 'psi', 180)
+    plot(data, 5, 'dpsi', 400)
 
     plt.show()
 
