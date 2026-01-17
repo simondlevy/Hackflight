@@ -40,23 +40,6 @@ class Num {
             return fminf(maxVal, fmaxf(minVal,value));
         }
 
-        static void euler2quat(const axis3_t & a, axis4_t & q)
-        {
-            // Abbreviations for the various angular functions
-
-            const auto cr = (float)cos(a.x / 2);
-            const auto sr = (float)sin(a.x / 2);
-            const auto cp = (float)cos(a.y / 2);
-            const auto sp = (float)sin(a.y / 2);
-            const auto cy = (float)cos(a.z / 2);
-            const auto sy = (float)sin(a.z / 2);
-
-            q.w = cr * cp * cy + sr * sp * sy;
-            q.x = sr * cp * cy - cr * sp * sy;
-            q.y = cr * sp * cy + sr * cp * sy;
-            q.z = cr * cp * sy - sr * sp * cy;
-        }
-
         static float cap_angle(float angle) 
         {
             float result = angle;

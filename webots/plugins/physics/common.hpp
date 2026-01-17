@@ -106,8 +106,7 @@ class PhysicsPluginHelper {
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
             const axis3_t euler = { (float)pose.phi, (float)pose.theta, (float)-pose.psi};
-            axis4_t quat = {};
-            Num::euler2quat(euler, quat);
+            axis4_t quat = euler2quat(euler);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
             dBodySetQuaternion(_robot, q);
@@ -134,4 +133,23 @@ class PhysicsPluginHelper {
     private:
 
         FILE * logfile;
+
+        static axis4_t euler2quat(const axis3_t & angles)
+        {
+            // Abbreviations for the various angular functions
+
+            const auto cr = (float)cos(angles.x / 2);
+            const auto sr = (float)sin(angles.x / 2);
+            const auto cp = (float)cos(angles.y / 2);
+            const auto sp = (float)sin(angles.y / 2);
+            const auto cy = (float)cos(angles.z / 2);
+            const auto sy = (float)sin(angles.z / 2);
+
+            return {
+                cr * cp * cy + sr * sp * sy,
+                   sr * cp * cy - cr * sp * sy,
+                   cr * sp * cy + sr * cp * sy,
+                   cr * cp * sy - sr * sp * cy
+            };
+        }
 };
