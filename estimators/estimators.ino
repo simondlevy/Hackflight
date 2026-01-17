@@ -1,8 +1,4 @@
 /*
-   Hackflight for Teensy 4.0 
-
-   Based on  https://github.com/nickrehm/dRehmFlight
-
    Copyright (C) 2026 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -23,25 +19,11 @@
 
 // Third-party libraries
 #include <MPU6050.h>
-#include <oneshot125.hpp>
-#include <dsmrx.hpp>
 
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
-#include <mixers/bfquadx.hpp>
-#include <pidcontrol.hpp>
-
-static Dsm2048 _dsm2048;
-
-// DSMX receiver callback
-void serialEvent1(void)
-{
-    while (Serial1.available()) {
-        _dsm2048.parse(Serial1.read(), micros());
-    }
-}
 
 // FAFO -----------------------------------------------------------
 static const uint32_t LOOP_FREQ_HZ = 2000;
@@ -54,24 +36,6 @@ static constexpr float GYRO_SCALE_FACTOR = 131.0;
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
-// LED
-static const uint8_t LED_PIN = 14;
-static constexpr float FAILSAFE_BLINK_RATE_HZ = 3;
-
-// Margins of safety for arming
-static constexpr float THROTTLE_ARMING_MAX = -0.9;
-static constexpr float ARMING_SWITCH_MIN = 0.9;
-
-// Motors ---------------------------------------------------------
-const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
-
-// Max pitch angle in degrees for angle mode (maximum ~70 degrees),
-// deg/sec for rate mode
-static constexpr float PITCH_ROLL_PRESCALE = 30.0;    
-
-// Max yaw rate in deg/sec
-static constexpr float YAW_PRESCALE = 160.0;     
-
 // IMU calibration parameters -------------------------------------
 
 static constexpr float ACC_ERROR_X  = -0.030;
@@ -81,19 +45,8 @@ static constexpr float GYRO_ERROR_X = -3.3;
 static constexpr float GYRO_ERROR_Y = -0.50;
 static constexpr float GYRO_ERROR_Z = +0.6875;
 
-// Misc. -----------------------------------------------------------
-
-static constexpr float YAW_DEMAND_INC = 3e-6;
-
-
 // Sensors
 static MPU6050 _mpu6050;
-
-// Motors
-static OneShot125 _motors = OneShot125(MOTOR_PINS);
-
-// Receiver
-static float _channels[6];
 
 // State estimation
 static MadgwickFilter  _madgwick;
@@ -124,18 +77,6 @@ static void runLoopDelay(const uint32_t usec_curr)
     }
 }
 
-static uint8_t u8constrain(
-        const uint8_t val, const uint8_t minval, const uint8_t maxval)
-{
-    return val < minval ? minval : val > maxval ? maxval : val;
-}
-
-static uint8_t scaleMotor(const float mval)
-{
-    return u8constrain(mval*125 + 125, 125, 250);
-
-}
-
 static void reportForever(const char * message)
 {
     while (true) {
@@ -162,33 +103,6 @@ static void initImu()
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-static void runMotors(const float * motors, const bool mode)
-{
-    // Rescale motor values for OneShot125
-    auto m1_usec = scaleMotor(motors[0]);
-    auto m2_usec = scaleMotor(motors[1]);
-    auto m3_usec = scaleMotor(motors[2]);
-    auto m4_usec = scaleMotor(motors[3]);
-
-    // Shut motors down when not armed
-    if (mode != MODE_ARMED) {
-
-        m1_usec = 120;
-        m2_usec = 120;
-        m3_usec = 120;
-        m4_usec = 120;
-    }
-
-    // Run motors
-    _motors.set(0, m1_usec);
-    _motors.set(1, m2_usec);
-    _motors.set(2, m3_usec);
-    _motors.set(3, m4_usec);
-
-    _motors.run();
-
-    runLoopDelay(micros());
-}
 
 float getDt()
 {
@@ -197,37 +111,6 @@ float getDt()
     const auto dt = (usec_curr - _usec_prev)/1000000.0;
     _usec_prev = usec_curr;      
     return dt;
-}
-
-
-static void getDemands(demands_t & demands, mode_t & mode)
-{
-    // Read channels values from receiver
-    if (_dsm2048.timedOut(micros())) {
-
-        mode = MODE_PANIC;
-    }
-    else if (_dsm2048.gotNewFrame()) {
-
-        _dsm2048.getChannelValuesMlp6Dsm(_channels);
-    }
-
-    // When throttle is down, toggle arming on switch press/release
-    const auto is_arming_switch_on = _channels[4] > ARMING_SWITCH_MIN;
-
-    if (_channels[0] < THROTTLE_ARMING_MAX && is_arming_switch_on) {
-        mode = mode == MODE_IDLE ? MODE_ARMED : mode;
-    }
-
-    if (!is_arming_switch_on) {
-        mode = mode == MODE_ARMED ? MODE_IDLE : mode;
-    }
-
-    // Convert stick demands to appropriate intervals
-    demands.thrust = (_channels[0] + 1) / 2; // -1,+1 => 0,1
-    demands.roll  = _channels[1] * PITCH_ROLL_PRESCALE;
-    demands.pitch = _channels[2] * PITCH_ROLL_PRESCALE;
-    demands.yaw   = _channels[3] * YAW_PRESCALE;
 }
 
 static void getVehicleState(const float dt, vehicleState_t & state)
@@ -273,43 +156,25 @@ void setup()
     // Set up serial debugging
     Serial.begin(115200);
 
-    // Set up serial connection from DSMX receiver
-    Serial1.begin(115200);
-
     // Initialize state estimator
     _madgwick.initialize();
 
-    // Arm OneShot125 motors
-    _motors.arm();
-
-    // Initialized LED
-    pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() 
 {
-    static mode_t _mode;
-
     const float dt = getDt();
-
-    demands_t demands = {};
-    getDemands(demands, _mode);
-
-    digitalWrite(LED_PIN, _mode == MODE_ARMED ? HIGH : LOW);
 
     vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    PidControl::runStabilizerPids(dt, YAW_DEMAND_INC, state, demands, demands);
+    static uint32_t _msec;
+    const auto msec = millis();
+    if (msec - _msec > 10) {
+       printf("phi=%+3.0f theta=%+3.0f psi=%+3.0f\n", 
+              state.phi, state.theta, state.psi);
+        _msec = msec;
+    }
 
-    // Support same rate controllers as Crazyflie
-    demands.roll /= 500000;
-    demands.pitch /= 500000;
-    demands.yaw /= 500000;
-
-    float motors[4] = {};
-
-    Mixer::mix(demands, motors);
-
-    runMotors(motors, _mode);
+    runLoopDelay(micros());
 }
