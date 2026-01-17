@@ -23,24 +23,26 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.h>
+#include <firmware/estimators/ekf.hpp>
 #include <firmware/estimators/madgwick.hpp>
+#include <firmware/imu.hpp>
 
 // FAFO -----------------------------------------------------------
 static const uint32_t LOOP_FREQ_HZ = 2000;
 
-// IMU ------------------------------------------------------------
+// MPU6050 ------------------------------------------------------------
 
 static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
 static constexpr float GYRO_SCALE_FACTOR = 131.0;
-
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
-
-// Sensors
 static MPU6050 _mpu6050 = MPU6050(0x68, &Wire1);
-
-// State estimation
 static MadgwickFilter  _madgwick;
+
+
+// BMI088 ------------------------------------------------------------
+
+static IMU _imu;
 
 static void runLoopDelay(const uint32_t usec_curr)
 {
@@ -76,7 +78,7 @@ static void reportForever(const char * message)
     }
 }
 
-static void initImu() 
+static void initMpu6050() 
 {
     //Note this is 2.5 times the spec sheet 400 kHz max...
     Wire1.setClock(1000000); 
@@ -142,7 +144,9 @@ void setup()
     Wire1.begin();
 
     // Initialize the I^2C sensors
-    initImu();
+    initMpu6050();
+
+    _imu.init();
 
     // Set up serial debugging
     Serial.begin(115200);

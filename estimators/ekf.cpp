@@ -15,6 +15,7 @@
  *
  */
 
+#include <hackflight.h>
 #include <firmware/estimators/ekf.hpp>
 #include <firmware/estimators/matrix_typedef.h>
 #include <arm_math.h>
