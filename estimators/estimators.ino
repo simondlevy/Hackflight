@@ -157,17 +157,25 @@ static void getEkfState(const uint32_t msec, vehicleState_t & state)
     state.dpsi   = -gyroData.z; // negate for nose-right positive
 }
 
+static void dumpState(const char * label, const vehicleState_t & state)
+{
+       printf("%s: phi=%+3.0f theta=%+3.0f psi=%+3.0f | ",
+              label, state.phi, state.theta, state.psi);
+}
+
 static void dump(
       const uint32_t msec,
       const vehicleState_t & mstate,
       const vehicleState_t & estate)
 {
     static uint32_t _msec;
+
     if (msec - _msec > 10) {
-       printf("m: phi=%+3.0f theta=%+3.0f psi=%+3.0f | "
-              "e: phi=%+3.0f theta=%+3.0f psi=%+3.0f\n ", 
-              mstate.phi, mstate.theta, mstate.psi,
-              estate.phi, estate.theta, estate.psi);
+
+       dumpState("m", mstate);
+       dumpState("e", estate);
+       printf("\n");
+
         _msec = msec;
     }
 }
