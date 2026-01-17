@@ -26,6 +26,7 @@
 #include <firmware/estimators/ekf.hpp>
 #include <firmware/estimators/madgwick.hpp>
 #include <firmware/imu.hpp>
+#include <firmware/timer.hpp>
 
 // FAFO -----------------------------------------------------------
 static const uint32_t LOOP_FREQ_HZ = 2000;
@@ -39,9 +40,9 @@ static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 static MPU6050 _mpu6050 = MPU6050(0x68, &Wire1);
 static MadgwickFilter  _madgwick;
 
-
 // BMI088 ------------------------------------------------------------
 
+static const uint32_t FREQ_EKF_PREDICTION = 100;
 static IMU _imu;
 static EKF _ekf;
 
@@ -159,14 +160,27 @@ void loop()
 {
     const float dt = getDt();
 
-    vehicleState_t state = {};
-    getVehicleState(dt, state);
+    vehicleState_t mstate = {};
+    getVehicleState(dt, mstate);
+
+    static Timer _timer;
+
+    const auto msec = millis();
+
+    if (_timer.ready(FREQ_EKF_PREDICTION)) {
+        _ekf.predict(msec, true); 
+    }
+
+    _imu.step(&_ekf, msec);
+    vehicleState_t estate = {};
+    _ekf.getStateEstimate(msec, estate);
 
     static uint32_t _msec;
-    const auto msec = millis();
     if (msec - _msec > 10) {
-       printf("phi=%+3.0f theta=%+3.0f psi=%+3.0f\n", 
-              state.phi, state.theta, state.psi);
+       printf("m: phi=%+3.0f theta=%+3.0f psi=%+3.0f | "
+              "e: phi=%+3.0f theta=%+3.0f psi=%+3.0f\n ", 
+              mstate.phi, mstate.theta, mstate.psi,
+              estate.phi, estate.theta, estate.psi);
         _msec = msec;
     }
 
