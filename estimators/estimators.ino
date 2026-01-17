@@ -36,17 +36,8 @@ static constexpr float GYRO_SCALE_FACTOR = 131.0;
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384.0;
 
-// IMU calibration parameters -------------------------------------
-
-static constexpr float ACC_ERROR_X  = -0.030;
-static constexpr float ACC_ERROR_Y  = +0.025;
-static constexpr float ACC_ERROR_Z  = -0.11;
-static constexpr float GYRO_ERROR_X = -3.3;
-static constexpr float GYRO_ERROR_Y = -0.50;
-static constexpr float GYRO_ERROR_Z = +0.6875;
-
 // Sensors
-static MPU6050 _mpu6050;
+static MPU6050 _mpu6050 = MPU6050(0x68, &Wire1);
 
 // State estimation
 static MadgwickFilter  _madgwick;
@@ -88,7 +79,7 @@ static void reportForever(const char * message)
 static void initImu() 
 {
     //Note this is 2.5 times the spec sheet 400 kHz max...
-    Wire.setClock(1000000); 
+    Wire1.setClock(1000000); 
 
     _mpu6050.initialize();
 
@@ -121,16 +112,16 @@ static void getVehicleState(const float dt, vehicleState_t & state)
 
     // Accelerometer Gs
     const axis3_t accel = {
-        -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
-        ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
-        az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+        -ax / ACCEL_SCALE_FACTOR,
+        ay / ACCEL_SCALE_FACTOR,
+        az / ACCEL_SCALE_FACTOR
     };
 
     // Gyro deg /sec
     const axis3_t gyro = {
-        gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
-        -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
-        -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
+        gx / GYRO_SCALE_FACTOR, 
+        -gy / GYRO_SCALE_FACTOR,
+        -gz / GYRO_SCALE_FACTOR
     };
 
     // Run state estimator to get Euler angles
@@ -148,7 +139,7 @@ static void getVehicleState(const float dt, vehicleState_t & state)
 void setup() 
 {
     // Initialize the I^2C bus
-    Wire.begin();
+    Wire1.begin();
 
     // Initialize the I^2C sensors
     initImu();
