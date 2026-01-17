@@ -43,6 +43,7 @@ static MadgwickFilter  _madgwick;
 // BMI088 ------------------------------------------------------------
 
 static IMU _imu;
+static EKF _ekf;
 
 static void runLoopDelay(const uint32_t usec_curr)
 {
@@ -140,13 +141,11 @@ static void getVehicleState(const float dt, vehicleState_t & state)
 
 void setup() 
 {
-    // Initialize the I^2C bus
     Wire1.begin();
-
-    // Initialize the I^2C sensors
     initMpu6050();
 
     _imu.init();
+    _ekf.init(millis());
 
     // Set up serial debugging
     Serial.begin(115200);
