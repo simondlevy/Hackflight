@@ -108,7 +108,7 @@ float getDt()
     return dt;
 }
 
-static void getVehicleState(const float dt, vehicleState_t & state)
+static void getMadgwickState(const float dt, vehicleState_t & state)
 {
     // Read IMU
     int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
@@ -138,6 +138,34 @@ static void getVehicleState(const float dt, vehicleState_t & state)
     state.dpsi = gyro.z;
 }
 
+static void getEkfState(const uint32_t msec, vehicleState_t & estate)
+{
+    static Timer _timer;
+
+    if (_timer.ready(FREQ_EKF_PREDICTION)) {
+        _ekf.predict(msec, true); 
+    }
+
+    _imu.step(&_ekf, msec);
+    _ekf.getStateEstimate(msec, estate);
+}
+
+static void dump(
+      const uint32_t msec,
+      const vehicleState_t & mstate,
+      const vehicleState_t & estate)
+{
+    static uint32_t _msec;
+    if (msec - _msec > 10) {
+       printf("m: phi=%+3.0f theta=%+3.0f psi=%+3.0f | "
+              "e: phi=%+3.0f theta=%+3.0f psi=%+3.0f\n ", 
+              mstate.phi, mstate.theta, mstate.psi,
+              estate.phi, estate.theta, estate.psi);
+        _msec = msec;
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() 
@@ -158,31 +186,15 @@ void setup()
 
 void loop() 
 {
-    const float dt = getDt();
-
-    vehicleState_t mstate = {};
-    getVehicleState(dt, mstate);
-
-    static Timer _timer;
-
     const auto msec = millis();
 
-    if (_timer.ready(FREQ_EKF_PREDICTION)) {
-        _ekf.predict(msec, true); 
-    }
+    vehicleState_t mstate = {};
+    getMadgwickState(getDt(), mstate);
 
-    _imu.step(&_ekf, msec);
     vehicleState_t estate = {};
-    _ekf.getStateEstimate(msec, estate);
+    getEkfState(msec, estate);
 
-    static uint32_t _msec;
-    if (msec - _msec > 10) {
-       printf("m: phi=%+3.0f theta=%+3.0f psi=%+3.0f | "
-              "e: phi=%+3.0f theta=%+3.0f psi=%+3.0f\n ", 
-              mstate.phi, mstate.theta, mstate.psi,
-              estate.phi, estate.theta, estate.psi);
-        _msec = msec;
-    }
+    dump(msec, mstate, estate);
 
     runLoopDelay(micros());
 }
