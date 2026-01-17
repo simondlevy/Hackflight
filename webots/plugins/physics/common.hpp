@@ -29,7 +29,7 @@ static constexpr char ROBOT_NAME[] = "diyquad";
 static dBodyID _robot;
 
 // Platform-independent simulator simulator loop
-static SimInnerLoop _simulatorLoop;
+static Simulator _simulator;
 
 static PidControl _pidControl;
 
@@ -47,7 +47,7 @@ DLLEXPORT void webots_physics_init()
         dBodySetGravityMode(_robot, 0);
     }
 
-    _simulatorLoop.init(&_pidControl);
+    _simulator.init(&_pidControl);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
@@ -90,11 +90,11 @@ class PhysicsPluginHelper {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                _simulatorLoop.setPose(siminfo.startingPose);
+                _simulator.setPose(siminfo.startingPose);
             }
             _ready = true;
 
-            return _simulatorLoop.step(
+            return _simulator.step(
                     siminfo.framerate, siminfo.mode, siminfo.setpoint);
         }
 

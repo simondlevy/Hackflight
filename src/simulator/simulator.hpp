@@ -29,7 +29,7 @@
 #include <simulator/dynamics.hpp>
 #include <vehicles/diyquad.hpp>
 
-class SimInnerLoop {
+class Simulator {
 
     private:
 
