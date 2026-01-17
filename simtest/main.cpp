@@ -2,7 +2,7 @@
 
 // Hackflight
 #include <datatypes.h>
-#include <simulator/dynamics.hpp>
+#include <simulator/inner.hpp>
 #include <pidcontrol.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -10,8 +10,6 @@
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
-
-static const float DYNAMICS_FREQ = 1e5; // Hz
 
 static const uint32_t STEPS = 1000;
 
@@ -30,23 +28,20 @@ int main(int argc, char ** argv)
 
     const auto pose = worldParser.robotPose;
 
-    Dynamics dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
+    PidControl pidControl = {};
 
-    dynamics.setPose({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
+    SimInnerLoop simInnerLoop = {};
 
-    PidControl pidControl;
+    simInnerLoop.init(&pidControl);
 
-    pidControl.init();
-
-    mode_e mode = MODE_HOVER;
+    simInnerLoop.setPose(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
 
     FILE * logfp = fopen("log.csv", "w");
 
-    float z = pose.z;
-
     for (uint32_t k=0; k<STEPS; ++k) {
 
-        const auto pose = dynamics.getPose();
+        // const auto pose = simInnerLoop.step(32, MODE_IDLE, setpoint);
 
         fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
                 pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
