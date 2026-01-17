@@ -1,8 +1,8 @@
 /* 
- * Platform-independent support for simulator simulator loop (PID control /
+ * Platform-independent support for fast simulator loop (PID control and
  * dynamics)
  *
- * Copyright (C) 2025 Simon D. Levy
+ * Copyright (C) 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,18 +44,18 @@ class Simulator {
             _pidControl->init();
         }
 
-        void setPose(const Dynamics::pose_t & pose)
+        void setPoseAndFramerate(
+                const Dynamics::pose_t & pose, const float framerate)
         {
             _dynamics.setPose(pose);
+
+            _framerate= framerate;
         }
 
-        Dynamics::pose_t step(
-                const float framerate,
-                const mode_e mode,
-                const demands_t & setpoint)
+        Dynamics::pose_t step(const mode_e mode, const demands_t & setpoint)
         {
             // Run slow PID control in outer loop ----------------------------
-            for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
+            for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
 
                 const auto state = _dynamics.getVehicleStateDegrees();
 
@@ -98,6 +98,8 @@ class Simulator {
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
         PidControl * _pidControl;
+
+        float _framerate;
 
         static void report_fps()
         {

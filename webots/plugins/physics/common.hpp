@@ -90,12 +90,12 @@ class PhysicsPluginHelper {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                _simulator.setPose(siminfo.startingPose);
+                _simulator.setPoseAndFramerate(
+                        siminfo.startingPose, siminfo.framerate);
             }
             _ready = true;
 
-            return _simulator.step(
-                    siminfo.framerate, siminfo.mode, siminfo.setpoint);
+            return _simulator.step(siminfo.mode, siminfo.setpoint);
         }
 
         static void set_dbody_from_pose(const Dynamics::pose_t & pose)

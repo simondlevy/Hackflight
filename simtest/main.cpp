@@ -2,7 +2,7 @@
 
 // Hackflight
 #include <datatypes.h>
-#include <simulator/inner.hpp>
+#include <simulator/simulator.hpp>
 #include <pidcontrol.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -12,6 +12,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 static const uint32_t STEPS = 1000;
+static const float FRAMERATE = 32;
 
 int main(int argc, char ** argv)
 {
@@ -30,18 +31,19 @@ int main(int argc, char ** argv)
 
     PidControl pidControl = {};
 
-    SimInnerLoop simInnerLoop = {};
+    Simulator simulator = {};
 
-    simInnerLoop.init(&pidControl);
+    simulator.init(&pidControl);
 
-    simInnerLoop.setPose(
-            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
+    simulator.setPoseAndFramerate(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
+            FRAMERATE);
 
     FILE * logfp = fopen("log.csv", "w");
 
     for (uint32_t k=0; k<STEPS; ++k) {
 
-        // const auto pose = simInnerLoop.step(32, MODE_IDLE, setpoint);
+        // const auto pose = simulator.step(MODE_IDLE, setpoint);
 
         fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
                 pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
