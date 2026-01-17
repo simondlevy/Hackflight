@@ -37,12 +37,10 @@
  *   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
 #include <datatypes.h>
-#include <num.hpp>
 
 class Dynamics {
 
@@ -124,12 +122,12 @@ class Dynamics {
         {
             return vehicleState_t {
                 _state.x, _state.dx, _state.y, _state.dy, _state.z, _state.dz,
-                    Num::RAD2DEG * _state.phi,
-                    Num::RAD2DEG * _state.dphi,
-                    Num::RAD2DEG * _state.theta,
-                    Num::RAD2DEG * _state.dtheta,
-                    Num::RAD2DEG * _state.psi,
-                    Num::RAD2DEG * _state.dpsi
+                    RAD2DEG * _state.phi,
+                    RAD2DEG * _state.dphi,
+                    RAD2DEG * _state.theta,
+                    RAD2DEG * _state.dtheta,
+                    RAD2DEG * _state.psi,
+                    RAD2DEG * _state.dpsi
             };
         }
 
@@ -259,6 +257,8 @@ class Dynamics {
         // ---------------------------------------------------------------
 
     private:
+
+        static constexpr float RAD2DEG = 180.0f / M_PI;
 
         // Vehicle state (Equation 11)
         vehicleState_t _state;
