@@ -40,7 +40,7 @@ using namespace std;
 #include <webots/range_finder.h>
 
 // Shared with other Webots controllers
-#include "../common.hpp"
+#include "../motors.hpp"
 
 // Support for different joystick models -------------------------------------
 

@@ -31,7 +31,7 @@
 
 // Webots
 #include <webots/supervisor.h>
-#include "../common.hpp"
+#include "../motors.hpp"
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
