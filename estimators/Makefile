@@ -24,3 +24,4 @@ listen:
 
 plot:
 	miniterm.py $(PORT) 115200 --exit-char 3 > log.csv
+	./plot.py
