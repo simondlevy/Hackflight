@@ -34,6 +34,8 @@ class Simulator {
     private:
 
         static constexpr float DYNAMICS_FREQ = 1e5; // Hz
+        static constexpr float PID_FAST_FREQ = 500; // 1024 Plank 
+        static constexpr float PID_SLOW_FREQ = 100;
 
     public:
 
@@ -74,7 +76,14 @@ class Simulator {
                     _pidControl->run(
                             1 / (float)PID_FAST_FREQ,
                             controlled,
-                            state,
+                            {
+                            state.x, state.dx,
+                            state.y, state.dy,
+                            state.z, state.dz,
+                            state.phi, state.dphi,
+                            state.theta, state.dtheta,
+                            state.psi, state.dpsi
+                            },
                             setpoint,
                             demands);
 

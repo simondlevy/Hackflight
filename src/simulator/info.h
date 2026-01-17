@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <datatypes.h>
 #include <simulator/dynamics.hpp>
 
 // Structure shared between slow and fast threads

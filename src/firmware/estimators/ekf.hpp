@@ -21,6 +21,7 @@
 #include <num.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/zranger.hpp>
+#include <state.h>
 
 class EKF { 
 
