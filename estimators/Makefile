@@ -21,3 +21,6 @@ edit:
 
 listen:
 	miniterm.py $(PORT) 115200 --exit-char 3 # exit on CTRL-C
+
+plot:
+	miniterm.py $(PORT) 115200 --exit-char 3 > log.csv
