@@ -138,7 +138,7 @@ static void getMadgwickState(const float dt, vehicleState_t & state)
     state.dpsi = gyro.z;
 }
 
-static void getEkfState(const uint32_t msec, vehicleState_t & state)
+static bool getEkfState(const uint32_t msec, vehicleState_t & state)
 {
     static Timer _timer;
 
@@ -146,7 +146,7 @@ static void getEkfState(const uint32_t msec, vehicleState_t & state)
         _ekf.predict(msec, true); 
     }
 
-    _imu.step(&_ekf, msec);
+    const bool isCalibrated = _imu.step(&_ekf, msec);
     _ekf.getStateEstimate(msec, state);
 
     // Get angular velocities directly from gyro
@@ -155,11 +155,15 @@ static void getEkfState(const uint32_t msec, vehicleState_t & state)
     state.dphi   = gyroData.x;
     state.dtheta = gyroData.y;
     state.dpsi   = -gyroData.z; // negate for nose-right positive
+
+    return isCalibrated;
 }
 
 static void dumpState(const vehicleState_t & state)
 {
-   printf("%f,%f,%f,%f,%f,%f", state.phi, state.dphi, state.theta, state.dtheta,
+   printf("%f,%f,%f,%f,%f,%f",
+          state.phi, state.dphi,
+          state.theta, state.dtheta,
           state.psi, state.dpsi);
 }
 
@@ -173,7 +177,7 @@ static void dump(
     if (msec - _msec > 10) {
 
        dumpState(mstate);
-       printf(",");
+       printf(",  ");
        dumpState(estate);
        printf("\n");
 
@@ -192,10 +196,8 @@ void setup()
     _imu.init();
     _ekf.init(millis());
 
-    // Set up serial debugging
     Serial.begin(115200);
 
-    // Initialize state estimator
     _madgwick.initialize();
 
 }
@@ -212,5 +214,5 @@ void loop()
 
     dump(msec, mstate, estate);
 
-    runLoopDelay(micros());
+    (void)runLoopDelay;
 }
