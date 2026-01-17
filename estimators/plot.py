@@ -3,32 +3,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = np.loadtxt('log.csv', delimiter=',')
 
-mphi = data[:, 0]
-mdphi = data[:, 1]
-mtheta = data[:, 2]
-mdtheta = data[:, 3]
-mpsi = data[:, 4]
-mdpsi = data[:, 5]
+def plot(data, idx, label, lim):
 
-ephi = data[:, 6]
-edphi = data[:, 7]
-etheta = data[:, 8]
-edtheta = data[:, 9]
-epsi = data[:, 10]
-edpsi = data[:, 11]
+    plt.subplot(6, 1, idx+1)
+    plt.plot(data[:, idx])
+    plt.plot(data[:, idx+6])
+    plt.ylabel(label)
+    plt.ylim((-lim, +lim))
+    plt.legend(('Madg', 'EKF'))
 
-plt.subplot(6, 1, 1)
-plt.plot(mphi)
-plt.plot(ephi)
-plt.ylabel('phi')
-plt.legend(('Madg',  'EKF'))
 
-plt.subplot(6, 1, 2)
-plt.plot(mtheta)
-plt.plot(etheta)
-plt.ylabel('theta')
-plt.legend(('Madg', 'EKF'))
+def main():
 
-plt.show()
+    data = np.loadtxt('log.csv', delimiter=',')
+
+    plot(data, 0, 'phi', 90)
+    plot(data, 2, 'theta', 90)
+    plot(data, 4, 'psi', 180)
+
+    plt.show()
+
+
+main()
