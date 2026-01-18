@@ -18,10 +18,9 @@
 
 #include <datatypes.h>
 #include <firmware/estimators/matrix_typedef.h>
-#include <num.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/zranger.hpp>
-#include <state.h>
+#include <num.hpp>
 
 class EKF { 
 

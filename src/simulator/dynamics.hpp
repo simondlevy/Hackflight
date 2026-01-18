@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * Multirotor flight dynamics class for simulators
+ * Standalone multirotor flight dynamics class for simulators
  *
  * Based on:
  *
@@ -41,8 +41,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <state.h>
-
 class Dynamics {
 
     public:
@@ -56,20 +54,20 @@ class Dynamics {
         // angular velocity in degrees/second.
         typedef struct {
 
-            float x;       // positive forward
-            float dx;      // positive forward
-            float y;       // positive leftward
-            float dy;      // positive leftward
-            float z;       // positive upward
-            float dz;      // positive upward
-            float phi;     // positive roll right
-            float dphi;    // positive roll right
-            float theta;   // positive nose up
-            float dtheta;  // positive nose up (opposite of gyro Y)
-            float psi;     // positive nose left
-            float dpsi;    // positive nose left
+            double x;       // positive forward
+            double dx;      // positive forward
+            double y;       // positive leftward
+            double dy;      // positive leftward
+            double z;       // positive upward
+            double dz;      // positive upward
+            double phi;     // positive roll right
+            double dphi;    // positive roll right
+            double theta;   // positive nose up
+            double dtheta;  // positive nose up (opposite of gyro Y)
+            double psi;     // positive nose left
+            double dpsi;    // positive nose left
 
-        } vehicleState_t;
+        } state_t;
 
         typedef struct {
 
@@ -141,9 +139,9 @@ class Dynamics {
             };
         }
 
-        vehicleState_t getVehicleStateDegrees()
+        state_t getVehicleStateDegrees()
         {
-            return vehicleState_t {
+            return state_t {
                 _state.x, _state.dx, _state.y, _state.dy, _state.z, _state.dz,
                     RAD2DEG * _state.phi,
                     RAD2DEG * _state.dphi,
@@ -274,20 +272,20 @@ class Dynamics {
             _state.dtheta = 0;
             _state.dpsi = 0;
 
-            memset(&_dstate, 0, sizeof(vehicleState_t));
+            memset(&_dstate, 0, sizeof(state_t));
         }
 
         // ---------------------------------------------------------------
 
     private:
 
-        static constexpr float RAD2DEG = 180.0f / M_PI;
+        static constexpr double RAD2DEG = 180 / M_PI;
 
         // Vehicle state (Equation 11)
-        vehicleState_t _state;
+        state_t _state;
 
         // Vehicle state first derivative (Equation 12)
-        vehicleState_t _dstate;
+        state_t _dstate;
 
         double _dt;
 

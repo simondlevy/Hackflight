@@ -59,7 +59,10 @@ class Simulator {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
 
-                const auto state = _dynamics.getVehicleStateDegrees();
+                // Get vehicle state from dynamics and convert state values
+                // from doubles to floats
+                const auto state = state2floats(
+                        _dynamics.getVehicleStateDegrees());
 
                 const bool controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
@@ -68,27 +71,19 @@ class Simulator {
 
                 demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
 
+                const float dt = 1/(float)PID_FAST_FREQ;
+
                 // Run fast PID control and mixer in middle loop --------------
                 for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                     demands_t demands = {};
 
-                    _pidControl->run(
-                            1 / (float)PID_FAST_FREQ,
-                            controlled,
-                            {
-                            state.x, state.dx,
-                            state.y, state.dy,
-                            state.z, state.dz,
-                            state.phi, state.dphi,
-                            state.theta, state.dtheta,
-                            state.psi, state.dpsi
-                            },
-                            setpoint,
-                            demands);
+                    _pidControl->run(dt, controlled, state, setpoint, demands);
 
                     float motors[4] = {};
                     Mixer::mix(demands, motors);
+
+                    //double rpms = motors2doubles(motors, 4);
 
                     // Run dynamics in simulator loop ----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
@@ -109,6 +104,16 @@ class Simulator {
         PidControl * _pidControl;
 
         float _framerate;
+
+        static vehicleState_t state2floats(const Dynamics::state_t s)
+        {
+            return vehicleState_t { 
+                (float)s.x, (float)s.dx, (float)s.y, (float)s.dy,
+                (float)s.z, (float)s.dz, (float)s.phi, (float)s.dphi,
+                (float)s.theta, (float)s.dtheta, (float)s.psi,
+                (float)s.dpsi
+            };
+        }
 
         static void report_fps()
         {
