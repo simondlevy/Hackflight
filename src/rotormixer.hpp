@@ -24,6 +24,18 @@ class RotorMixer {
 
     public:
 
+        static float * mix(
+                const demands_t & demands,
+                const int8_t * roll,
+                const int8_t * pitch,
+                const int8_t * yaw,
+                const int8_t count)
+        {
+            static float motors[20];
+            mix(demands, roll, pitch, yaw, count, motors);
+            return motors;
+        }        
+        
         static void mix(
                 const demands_t & demands,
                 const int8_t * roll,

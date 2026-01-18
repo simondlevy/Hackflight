@@ -36,6 +36,11 @@ class Mixer {
         static constexpr int8_t pitch[4] = {-1, +1, +1, -1};
         static constexpr int8_t yaw[4]   = {+1, -1, +1, -1};
 
+        static float * mix(const demands_t & demands)
+        {
+            return RotorMixer::mix(demands, roll, pitch, yaw, 4);
+        }
+
         static void mix(const demands_t & demands, float motors[])
         {
             RotorMixer::mix(demands, roll, pitch, yaw, 4, motors);

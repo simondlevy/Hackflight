@@ -42,9 +42,7 @@ class Simulator {
         void init(const Dynamics::pose_t & pose, const float framerate)
         {
             _pidControl.init();
-
             _dynamics.setPose(pose);
-
             _framerate= framerate;
         }
 
@@ -70,8 +68,7 @@ class Simulator {
                         _pidControl.run(dt, controlled, state, setpoint);
 
                     // Get motor RPMS from mixer
-                    float motors[4] = {};
-                    Mixer::mix(demands, motors);
+                    const float * motors = Mixer::mix(demands);
 
                     // Convert motor values to double for dynamics
                     const auto * rpms = floats2doubles(motors, 4);
