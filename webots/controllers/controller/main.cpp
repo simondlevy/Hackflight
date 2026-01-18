@@ -352,7 +352,7 @@ static void sendSimInfo(siminfo_t & siminfo)
     platform_send_siminfo(siminfo);
 }
 
-static void getSimInfoFromKeyboard(siminfo_t & siminfo, const bool autonomous)
+static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo)
 {
     static bool _enter_was_down;
     static bool _spacebar_was_down;
@@ -376,20 +376,20 @@ static void getSimInfoFromKeyboard(siminfo_t & siminfo, const bool autonomous)
     siminfo.mode = _mode;
 }
 
-static void checkButtonToggle(
+static bool checkButtonToggle(
         const int button,
         const int target,
         const toggle_e toggle,
-        bool & button_was_down)
+        const bool button_was_down)
 {
     if (button == target) {
-        button_was_down = true;
+        return true;
     }
     else {
         if (button_was_down) {
             switchMode(toggle);
         }
-        button_was_down = false;
+        return false;
     }
 }
 
@@ -402,9 +402,11 @@ static void getSimInfoFromJoystick(siminfo_t & siminfo, const bool autonomous)
 
     const auto button = platform_joystick_get_pressed_button();
 
-    checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down);
+    _hover_button_was_down =
+        checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down);
 
-    checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
+    _auto_button_was_down =
+        checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
 
     siminfo.mode = _mode;
 
@@ -459,7 +461,7 @@ int main(int argc, char ** argv)
                 // fall thru
 
             default:
-                getSimInfoFromKeyboard(siminfo, autonomous);
+                getSimInfoFromKeyboard(autonomous, siminfo);
         }
 
         if (autonomous) {
