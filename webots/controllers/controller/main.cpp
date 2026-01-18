@@ -263,11 +263,9 @@ static void checkKeyboardToggle(
         const toggle_e toggle,
         bool & key_was_down)
 {
-    if (key == target) {
-        if (!key_was_down) {
-            key_was_down = true;
-            _mode = switchMode(toggle, _mode);
-        }
+    if (key == target && !key_was_down) {
+        key_was_down = true;
+        _mode = switchMode(toggle, _mode);
     }
 }
 
