@@ -366,9 +366,7 @@ static bool checkButtonToggle(
 }
 
 static void getSimInfoFromJoystick(
-        siminfo_t & siminfo,
-        const bool autonomous,
-        mode_e & mode)
+        const bool autonomous, siminfo_t & siminfo, mode_e & mode)
 {
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
@@ -394,7 +392,6 @@ static void getSimInfoFromJoystick(
         siminfo.setpoint.thrust = readJoystickAxis(axes.throttle);
     }
 }
-
 
 int main(int argc, char ** argv) 
 {
@@ -434,7 +431,7 @@ int main(int argc, char ** argv)
         switch (getJoystickStatus()) {
 
             case JOYSTICK_RECOGNIZED:
-                getSimInfoFromJoystick(siminfo, autonomous, mode);
+                getSimInfoFromJoystick(autonomous, siminfo, mode);
                 break;
 
             case JOYSTICK_UNRECOGNIZED:
