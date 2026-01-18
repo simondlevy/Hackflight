@@ -156,7 +156,7 @@ class Dynamics {
          * Sets motor spins
          */
         void update(
-                const float * rpms, // single-precision for compat with mixer
+                const double * rpms,
                 const uint8_t rotorCount,
                 const int8_t * roll,
                 const int8_t * pitch,

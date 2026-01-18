@@ -80,15 +80,18 @@ class Simulator {
 
                     _pidControl->run(dt, controlled, state, setpoint, demands);
 
+                    // Get motor RPMS from mixer
                     float motors[4] = {};
                     Mixer::mix(demands, motors);
 
-                    //double rpms = motors2doubles(motors, 4);
+                    // Convert motor values to double for dynamics
+                    double rpms[4] = {};
+                    floats2doubles(motors, rpms, 4);
 
                     // Run dynamics in simulator loop ----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
-                        _dynamics.update(motors, Mixer::rotorCount,
+                        _dynamics.update(rpms, 4,
                                 Mixer::roll, Mixer::pitch, Mixer::yaw);
                     }
                 }
@@ -113,6 +116,13 @@ class Simulator {
                 (float)s.theta, (float)s.dtheta, (float)s.psi,
                 (float)s.dpsi
             };
+        }
+
+        void floats2doubles(const float * f, double * d, const size_t n)
+        {
+            for (size_t k=0; k<n; ++k) {
+                d[k] = f[k];
+            }
         }
 
         static void report_fps()
