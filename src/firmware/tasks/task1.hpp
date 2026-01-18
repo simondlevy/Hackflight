@@ -50,7 +50,6 @@ class Task1 {
         static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
         static constexpr float MAX_SAFE_ANGLE = 30;
         static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
         static const uint32_t FREQ_MAIN_LOOP = 1000;
         static const uint32_t FREQ_PID_UPDATE = 500;

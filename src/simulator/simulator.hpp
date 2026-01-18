@@ -42,9 +42,7 @@ class Simulator {
         void init(const Dynamics::pose_t & pose, const float framerate)
         {
             _pidControl.init();
-
             _dynamics.setPose(pose);
-
             _framerate= framerate;
         }
 
@@ -61,22 +59,19 @@ class Simulator {
                 const auto controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
 
-                const float dt = 1/(float)PID_FAST_FREQ;
+                const auto dt = 1/(float)PID_FAST_FREQ;
 
                 // Run fast PID control and mixer in middle loop --------------
                 for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
-                    demands_t demands = {};
-
-                    _pidControl.run(dt, controlled, state, setpoint, demands);
+                    const auto demands =
+                        _pidControl.run(dt, controlled, state, setpoint);
 
                     // Get motor RPMS from mixer
-                    float motors[4] = {};
-                    Mixer::mix(demands, motors);
+                    const auto * motors = Mixer::mix(demands);
 
                     // Convert motor values to double for dynamics
-                    double rpms[4] = {};
-                    floats2doubles(motors, rpms, 4);
+                    const auto * rpms = motors2doubless(motors, 4);
 
                     // Run dynamics in inner loop -----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
@@ -108,11 +103,13 @@ class Simulator {
             };
         }
 
-        void floats2doubles(const float * f, double * d, const size_t n)
+        static double * motors2doubless(const float * f, const size_t n)
         {
+            static double d[MAX_MOTOR_COUNT];
             for (size_t k=0; k<n; ++k) {
                 d[k] = f[k];
             }
+            return d;
         }
 
         static void report_fps()
