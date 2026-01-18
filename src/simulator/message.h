@@ -1,5 +1,5 @@
 /* 
- * Simulation info shared between slow (UI) and fast (PID / dynamics) threads
+ * Simulation data message sent from slow (UI) to fast (PID / dynamics) threads
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -21,7 +21,6 @@
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
 
-// Structure shared between slow and fast threads
 typedef struct {
 
     Dynamics::pose_t startingPose;

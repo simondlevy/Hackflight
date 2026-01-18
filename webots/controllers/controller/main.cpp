@@ -28,7 +28,7 @@ using namespace std;
 // Hackflight
 #include <datatypes.h>
 #include <num.hpp>
-#include <simulator/info.h>
+#include <simulator/message.h>
 
 // Webots
 #include <webots/camera.h>
