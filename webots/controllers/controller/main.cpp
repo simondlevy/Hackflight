@@ -111,17 +111,12 @@ static void platform_cleanup()
     wb_robot_cleanup();
 }
 
-static void platform_get_vehicle_pose(Dynamics::pose_t & pose)
+static Dynamics::pose_t platform_get_vehicle_pose()
 {
     const double * xyz = wb_gps_get_values(_gps);
     const double *rpy = wb_inertial_unit_get_roll_pitch_yaw(_imu);
 
-    pose.x = xyz[0];
-    pose.y = -xyz[1]; // negate Y for leftward positive
-    pose.z = xyz[2];
-    pose.phi = rpy[0];
-    pose.theta = rpy[1];
-    pose.psi = -rpy[2];
+    return { xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2] };
 }
 
 static void platform_send_siminfo(const siminfo_t & siminfo)
@@ -262,39 +257,23 @@ static void switchMode(toggle_e toggle)
     }
 }
 
-static void getSetpointFromKey(const int key, siminfo_t & siminfo)
+static demands_t getSetpointFromKey(const int key)
 {
-    if (key ==platform_keyboard_up()) {
-        siminfo.setpoint.pitch = +1.0;
-    }
+    const float thrust = key == 'W' ? +1 : key == 'S' ? -1 : 0;
 
-    else if (key ==platform_keyboard_down()) {
-        siminfo.setpoint.pitch = -1.0;
-    }
+    const float roll =
+        key == platform_keyboard_right() ? +1.0 :
+        key == platform_keyboard_left() ? -1.0 :
+        0;
 
-    else if (key ==platform_keyboard_right()) {
-        siminfo.setpoint.roll = +1.0;
-    }
+    const float pitch =
+        key == platform_keyboard_up() ? +1.0 :
+        key == platform_keyboard_down() ? -1.0 :
+        0;
 
-    else if (key ==platform_keyboard_left()) {
-        siminfo.setpoint.roll = -1.0;
-    }
+    const float yaw = key == 'E' ? +0.5 : key == 'Q' ? -0.5 : 0;
 
-    else if (key =='Q') {
-        siminfo.setpoint.yaw = -0.5;
-    }
-
-    else if (key =='E') {
-        siminfo.setpoint.yaw = +0.5;
-    }
-
-    else if (key =='W') {
-        siminfo.setpoint.thrust = +1.0;
-    }
-
-    else if (key =='S') {
-        siminfo.setpoint.thrust = -1.0;
-    }
+    return demands_t {thrust, roll, pitch, yaw};
 }
 
 static void checkKeyboardToggle(
@@ -344,7 +323,7 @@ static void sendSimInfo(siminfo_t & siminfo)
 {
     // Grab starting pose first time around
     if (_startingPose.x == INFINITY) {
-        platform_get_vehicle_pose(_startingPose);
+        _startingPose = platform_get_vehicle_pose();
     }
 
     memcpy(&siminfo.startingPose, &_startingPose, sizeof(Dynamics::pose_t));
@@ -370,7 +349,7 @@ static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo)
 
     if (!autonomous) {
 
-        getSetpointFromKey(key, siminfo);
+        siminfo.setpoint = getSetpointFromKey(key);
     }
 
     siminfo.mode = _mode;
@@ -469,10 +448,9 @@ int main(int argc, char ** argv)
         }
 
         // On descent, switch mode to idle when close enough to ground
-        Dynamics::pose_t pose = {};
-        platform_get_vehicle_pose(pose);
+        const auto pose = platform_get_vehicle_pose();
         if (_mode == MODE_LANDING &&
-                (pose.z-_startingPose.z ) < ZDIST_LANDING_MAX_M) {
+                (pose.z -_startingPose.z ) < ZDIST_LANDING_MAX_M) {
             _mode = MODE_IDLE;
         }
 
