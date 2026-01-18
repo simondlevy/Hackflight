@@ -193,8 +193,6 @@ typedef enum {
 
 static constexpr float ZDIST_LANDING_MAX_M = 0.01;
 
-static Dynamics::pose_t _startingPose;
-
 static mode_e _mode;
 
 static joystickStatus_e getJoystickStatus(void)
@@ -319,18 +317,6 @@ static void reportJoystick(void)
     }
 }
 
-static void sendSimInfo(siminfo_t & siminfo)
-{
-    // Grab starting pose first time around
-    if (_startingPose.x == INFINITY) {
-        _startingPose = platform_get_vehicle_pose();
-    }
-
-    memcpy(&siminfo.startingPose, &_startingPose, sizeof(Dynamics::pose_t));
-    siminfo.framerate = platform_get_framerate();
-    platform_send_siminfo(siminfo);
-}
-
 static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo)
 {
     static bool _enter_was_down;
@@ -407,8 +393,10 @@ int main(int argc, char ** argv)
     const char * worldname =  argv[1];
     const char * logfilename =  argv[2];
 
+    Dynamics::pose_t startingPose;
+
     // OOB value to trigger initialization in step()
-    _startingPose.x = INFINITY;
+    startingPose.x = INFINITY;
 
     _mode = MODE_IDLE;
 
@@ -450,11 +438,18 @@ int main(int argc, char ** argv)
         // On descent, switch mode to idle when close enough to ground
         const auto pose = platform_get_vehicle_pose();
         if (_mode == MODE_LANDING &&
-                (pose.z -_startingPose.z ) < ZDIST_LANDING_MAX_M) {
+                (pose.z -startingPose.z ) < ZDIST_LANDING_MAX_M) {
             _mode = MODE_IDLE;
         }
 
-        sendSimInfo(siminfo);
+        // Grab starting pose first time around
+        if (startingPose.x == INFINITY) {
+            startingPose = platform_get_vehicle_pose();
+        }
+
+        memcpy(&siminfo.startingPose, &startingPose, sizeof(Dynamics::pose_t));
+        siminfo.framerate = platform_get_framerate();
+        platform_send_siminfo(siminfo);
     }
 
     platform_cleanup();
