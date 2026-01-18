@@ -31,10 +31,12 @@
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
+static simsens::Rangefinder * _rangefinder;
+
+static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+
 static void load(const siminfo_t & siminfo,
         simsens::WorldParser & worldParser,
-        simsens::Rangefinder ** rangefinder,
-        simsens::RangefinderVisualizer ** rangefinderVisualizer,
         FILE ** logfpp)
 {
     char path[1000];
@@ -46,9 +48,9 @@ static void load(const siminfo_t & siminfo,
     simsens::RobotParser robotParser = {};
     robotParser.parse(path);
 
-    *rangefinder = new simsens::Rangefinder(*robotParser.rangefinders[0]);
+    _rangefinder = new simsens::Rangefinder(*robotParser.rangefinders[0]);
 
-    *rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
+    _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
 
     *logfpp = PhysicsPluginHelper::logfile_open(siminfo);
 }
@@ -100,8 +102,6 @@ static void read_rangefinder(
 // Returns false on collision, true otherwise
 static bool run_normal(siminfo_t & siminfo)
 {
-    static simsens::Rangefinder * _rangefinder;
-    static simsens::RangefinderVisualizer * _rangefinderVisualizer;
     static simsens::WorldParser _worldParser;
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
@@ -118,8 +118,7 @@ static bool run_normal(siminfo_t & siminfo)
 
     // Load world and robot info first time around
     if (!_rangefinder) {
-        load(siminfo, _worldParser, &_rangefinder, &_rangefinderVisualizer,
-                &_logfp);
+        load(siminfo, _worldParser, &_logfp);
     }
 
     // Get simulated rangefinder distances
@@ -160,4 +159,10 @@ DLLEXPORT void webots_physics_step()
             }
         }
     }
+}
+
+DLLEXPORT void webots_physics_cleanup() 
+{
+    delete _rangefinder;
+    delete _rangefinderVisualizer;
 }

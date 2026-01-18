@@ -58,10 +58,6 @@ DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2)
     return 0;
 }
 
-DLLEXPORT void webots_physics_cleanup() 
-{
-}
-
 class PhysicsPluginHelper {
 
     public:

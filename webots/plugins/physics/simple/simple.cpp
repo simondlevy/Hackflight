@@ -41,3 +41,9 @@ DLLEXPORT void webots_physics_step()
         PhysicsPluginHelper::set_dbody_from_pose(pose);
     }
 }
+
+DLLEXPORT void webots_physics_cleanup() 
+{
+}
+
+
