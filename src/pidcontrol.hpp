@@ -29,6 +29,17 @@ class PidControl {
 
     public:
 
+        demands_t run(
+                const float dt,
+                const bool hovering,
+                const vehicleState_t & vehicleState,
+                const demands_t & openLoopDemands)
+        {
+            demands_t demands = {};
+            run(dt, hovering, vehicleState, openLoopDemands, demands);
+            return demands;
+        }
+
         void run(
                 const float dt,
                 const bool hovering,

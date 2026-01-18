@@ -66,9 +66,8 @@ class Simulator {
                 // Run fast PID control and mixer in middle loop --------------
                 for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
-                    demands_t demands = {};
-
-                    _pidControl.run(dt, controlled, state, setpoint, demands);
+                    const auto demands =
+                        _pidControl.run(dt, controlled, state, setpoint);
 
                     // Get motor RPMS from mixer
                     float motors[4] = {};
