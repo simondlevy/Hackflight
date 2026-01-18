@@ -19,7 +19,6 @@
 // Hackflight
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
-#include <pidcontrol.hpp>
 #include <vehicles/diyquad.hpp>
 
 // SimSensors
@@ -45,13 +44,9 @@ int main(int argc, char ** argv)
 
     const auto pose = worldParser.robotPose;
 
-    PidControl pidControl = {};
-
     Simulator simulator = {};
 
-    simulator.init(&pidControl);
-
-    simulator.setPoseAndFramerate(
+    simulator.init(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 

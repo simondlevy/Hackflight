@@ -31,8 +31,6 @@ static dBodyID _robot;
 // Platform-independent simulator simulator loop
 static Simulator _simulator;
 
-static PidControl _pidControl;
-
 DLLEXPORT void webots_physics_init() 
 {
     _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
@@ -46,8 +44,6 @@ DLLEXPORT void webots_physics_init()
 
         dBodySetGravityMode(_robot, 0);
     }
-
-    _simulator.init(&_pidControl);
 }
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
@@ -86,8 +82,7 @@ class PhysicsPluginHelper {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                _simulator.setPoseAndFramerate(
-                        siminfo.startingPose, siminfo.framerate);
+                _simulator.init(siminfo.startingPose, siminfo.framerate);
             }
             _ready = true;
 

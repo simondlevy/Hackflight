@@ -39,16 +39,10 @@ class Simulator {
 
     public:
 
-        void init(PidControl * pidControl)
+        void init(const Dynamics::pose_t & pose, const float framerate)
         {
-            _pidControl = pidControl;
+            _pidControl.init();
 
-            _pidControl->init();
-        }
-
-        void setPoseAndFramerate(
-                const Dynamics::pose_t & pose, const float framerate)
-        {
             _dynamics.setPose(pose);
 
             _framerate= framerate;
@@ -74,7 +68,7 @@ class Simulator {
 
                     demands_t demands = {};
 
-                    _pidControl->run(dt, controlled, state, setpoint, demands);
+                    _pidControl.run(dt, controlled, state, setpoint, demands);
 
                     // Get motor RPMS from mixer
                     float motors[4] = {};
@@ -100,7 +94,7 @@ class Simulator {
 
         Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
-        PidControl * _pidControl;
+        PidControl _pidControl;
 
         float _framerate;
 
