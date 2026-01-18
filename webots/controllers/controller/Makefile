@@ -28,7 +28,7 @@ INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR)
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu
 
-CXX_SOURCES = main.cpp
+CXX_SOURCES = main.cpp platform_webots.cpp
 
 FILES_TO_REMOVE += *.csv
 
