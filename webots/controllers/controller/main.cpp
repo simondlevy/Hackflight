@@ -230,23 +230,12 @@ static joystickStatus_e getJoystickStatus(void)
 
 static mode_e switchMode(const toggle_e toggle, const mode_e mode)
 {
-    switch (mode) {
-
-        case MODE_IDLE:
-            return toggle == TOGGLE_HOVER ?
-                MODE_HOVERING : mode;
-
-        case MODE_HOVERING:
-            return toggle == TOGGLE_HOVER ?  MODE_LANDING :
-                toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
-                mode;
-
-        case MODE_AUTONOMOUS:
-            return toggle == TOGGLE_AUTO ?  MODE_HOVERING : mode;
-
-        default:
-            return mode;
-    }
+    return
+        mode == MODE_IDLE && toggle == TOGGLE_HOVER ? MODE_HOVERING :
+        mode == MODE_HOVERING && toggle == TOGGLE_HOVER ? MODE_LANDING :
+        mode == MODE_HOVERING && toggle == TOGGLE_AUTO ? MODE_AUTONOMOUS :
+        mode == MODE_AUTONOMOUS && toggle == TOGGLE_AUTO ? MODE_HOVERING :
+        mode;
 }
 
 static demands_t getSetpointFromKey(const int key)
