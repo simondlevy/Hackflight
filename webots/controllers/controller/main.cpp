@@ -94,6 +94,8 @@ static void platform_init()
     startMotors();
 
     wb_joystick_enable(_timestep);
+
+    wb_robot_step(_timestep);
 }
 
 static bool platform_step()
@@ -111,12 +113,36 @@ static void platform_cleanup()
     wb_robot_cleanup();
 }
 
-static Dynamics::pose_t platform_get_vehicle_pose()
+static double platform_get_vehicle_x()
 {
-    const double * xyz = wb_gps_get_values(_gps);
-    const double *rpy = wb_inertial_unit_get_roll_pitch_yaw(_imu);
+    return wb_gps_get_values(_gps)[0];
+}
 
-    return Dynamics::pose_t{xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2]};
+static double platform_get_vehicle_y()
+{
+    // Negate for leftward positive
+    return -wb_gps_get_values(_gps)[1];
+}
+
+static double platform_get_vehicle_z()
+{
+    return wb_gps_get_values(_gps)[2];
+}
+
+static double platform_get_vehicle_phi()
+{
+    return wb_inertial_unit_get_roll_pitch_yaw(_imu)[0];
+}
+
+static double platform_get_vehicle_theta()
+{
+    return wb_inertial_unit_get_roll_pitch_yaw(_imu)[1];
+}
+
+static double platform_get_vehicle_psi()
+{
+    // Negate for nose-right positive
+    return -wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 }
 
 static void platform_send_siminfo(const siminfo_t & siminfo)
@@ -377,16 +403,20 @@ int main(int argc, char ** argv)
     const char * worldname =  argv[1];
     const char * logfilename =  argv[2];
 
-    Dynamics::pose_t startingPose;
-
-    // OOB value to trigger initialization in step()
-    startingPose.x = INFINITY;
-
     mode_e mode = MODE_IDLE;
 
     demands_t * autonomousSetpoint = nullptr;
 
     platform_init();
+
+    const auto startingPose = Dynamics::pose_t {
+        platform_get_vehicle_x(),
+        platform_get_vehicle_y(),
+        platform_get_vehicle_z(),
+        platform_get_vehicle_phi(),
+        platform_get_vehicle_theta(),
+        platform_get_vehicle_psi()
+    };
 
     while (true) {
 
@@ -420,15 +450,10 @@ int main(int argc, char ** argv)
         }
 
         // On descent, switch mode to idle when close enough to ground
-        const auto pose = platform_get_vehicle_pose();
         if (mode == MODE_LANDING &&
-                (pose.z -startingPose.z ) < ZDIST_LANDING_MAX_M) {
+                (platform_get_vehicle_z() - startingPose.z ) <
+                ZDIST_LANDING_MAX_M) {
             mode = MODE_IDLE;
-        }
-
-        // Grab starting pose first time around
-        if (startingPose.x == INFINITY) {
-            startingPose = platform_get_vehicle_pose();
         }
 
         memcpy(&siminfo.startingPose, &startingPose, sizeof(Dynamics::pose_t));
