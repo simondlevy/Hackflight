@@ -46,7 +46,7 @@ static void load(const siminfo_t & siminfo,
     simsens::RobotParser robotParser = {};
     robotParser.parse(path);
 
-    *rangefinder = robotParser.rangefinders[0];
+    *rangefinder = new simsens::Rangefinder(*robotParser.rangefinders[0]);
 
     *rangefinderVisualizer = new simsens::RangefinderVisualizer(*rangefinder);
 
