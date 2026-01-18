@@ -261,11 +261,12 @@ static void checkKeyboardToggle(
         const int key,
         const int target,
         const toggle_e toggle,
-        bool & key_was_down)
+        bool & key_was_down,
+        mode_e & mode)
 {
     if (key == target && !key_was_down) {
         key_was_down = true;
-        _mode = switchMode(toggle, _mode);
+        mode = switchMode(toggle, mode);
     }
 }
 
@@ -298,7 +299,7 @@ static void reportJoystick(void)
     }
 }
 
-static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo)
+static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo, mode_e & mode)
 {
     static bool _enter_was_down;
     static bool _spacebar_was_down;
@@ -310,9 +311,9 @@ static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo)
         _spacebar_was_down = false;
     }
 
-    checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down);
+    checkKeyboardToggle(key, 4, TOGGLE_HOVER, _enter_was_down, mode);
 
-    checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down);
+    checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, mode);
 
     if (!autonomous) {
 
@@ -409,7 +410,7 @@ int main(int argc, char ** argv)
                 // fall thru
 
             default:
-                getSimInfoFromKeyboard(autonomous, siminfo);
+                getSimInfoFromKeyboard(autonomous, siminfo, _mode);
         }
 
         if (autonomous) {
