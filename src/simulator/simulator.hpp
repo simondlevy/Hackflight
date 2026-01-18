@@ -88,7 +88,7 @@ class Simulator {
                     double rpms[4] = {};
                     floats2doubles(motors, rpms, 4);
 
-                    // Run dynamics in simulator loop ----------------------------
+                    // Run dynamics in inner loop -----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
                         _dynamics.update(rpms, 4,
