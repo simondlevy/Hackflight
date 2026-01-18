@@ -193,8 +193,6 @@ typedef enum {
 
 static constexpr float ZDIST_LANDING_MAX_M = 0.01;
 
-static mode_e _mode;
-
 static joystickStatus_e getJoystickStatus(void)
 {
     auto mode = JOYSTICK_RECOGNIZED;
@@ -320,27 +318,31 @@ static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo, m
         siminfo.setpoint = getSetpointFromKey(key);
     }
 
-    siminfo.mode = _mode;
+    siminfo.mode = mode;
 }
 
 static bool checkButtonToggle(
         const int button,
         const int target,
         const toggle_e toggle,
-        const bool button_was_down)
+        const bool button_was_down,
+        mode_e & mode)
 {
     if (button == target) {
         return true;
     }
     else {
         if (button_was_down) {
-            _mode = switchMode(toggle, _mode);
+            mode = switchMode(toggle, mode);
         }
         return false;
     }
 }
 
-static void getSimInfoFromJoystick(siminfo_t & siminfo, const bool autonomous)
+static void getSimInfoFromJoystick(
+        siminfo_t & siminfo,
+        const bool autonomous,
+        mode_e & mode)
 {
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
@@ -350,12 +352,12 @@ static void getSimInfoFromJoystick(siminfo_t & siminfo, const bool autonomous)
     const auto button = platform_joystick_get_pressed_button();
 
     _hover_button_was_down =
-        checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down);
+        checkButtonToggle(button, 5, TOGGLE_HOVER, _hover_button_was_down, mode);
 
     _auto_button_was_down =
-        checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down);
+        checkButtonToggle(button, 4, TOGGLE_AUTO, _auto_button_was_down, mode);
 
-    siminfo.mode = _mode;
+    siminfo.mode = mode;
 
     if (!autonomous) {
 
@@ -380,7 +382,7 @@ int main(int argc, char ** argv)
     // OOB value to trigger initialization in step()
     startingPose.x = INFINITY;
 
-    _mode = MODE_IDLE;
+    mode_e mode = MODE_IDLE;
 
     demands_t * autonomousSetpoint = nullptr;
 
@@ -402,7 +404,7 @@ int main(int argc, char ** argv)
         switch (getJoystickStatus()) {
 
             case JOYSTICK_RECOGNIZED:
-                getSimInfoFromJoystick(siminfo, autonomous);
+                getSimInfoFromJoystick(siminfo, autonomous, mode);
                 break;
 
             case JOYSTICK_UNRECOGNIZED:
@@ -410,7 +412,7 @@ int main(int argc, char ** argv)
                 // fall thru
 
             default:
-                getSimInfoFromKeyboard(autonomous, siminfo, _mode);
+                getSimInfoFromKeyboard(autonomous, siminfo, mode);
         }
 
         if (autonomous) {
@@ -419,9 +421,9 @@ int main(int argc, char ** argv)
 
         // On descent, switch mode to idle when close enough to ground
         const auto pose = platform_get_vehicle_pose();
-        if (_mode == MODE_LANDING &&
+        if (mode == MODE_LANDING &&
                 (pose.z -startingPose.z ) < ZDIST_LANDING_MAX_M) {
-            _mode = MODE_IDLE;
+            mode = MODE_IDLE;
         }
 
         // Grab starting pose first time around
