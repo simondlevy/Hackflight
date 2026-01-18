@@ -64,12 +64,8 @@ class Simulator {
                 const auto state = state2floats(
                         _dynamics.getVehicleStateDegrees());
 
-                const bool controlled =
+                const auto controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
-
-                const demands_t sp = setpoint;
-
-                demands_t setpoint = { sp.thrust, sp.roll, sp.pitch, sp.yaw };
 
                 const float dt = 1/(float)PID_FAST_FREQ;
 
