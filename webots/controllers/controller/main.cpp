@@ -42,24 +42,6 @@ using namespace std;
 // Shared with other Webots controllers
 #include "../motors.hpp"
 
-// Support for different joystick models -------------------------------------
-
-typedef struct {
-
-    int8_t throttle;
-    int8_t roll;
-    int8_t pitch;
-    int8_t yaw;
-
-} joystick_t;
-
-static std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
-
-    {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
-
-    {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
-};
-
 // Webots-specific code -------------------------------------------------------
 
 static WbDeviceTag _emitter;
@@ -145,9 +127,9 @@ static double platform_get_vehicle_psi()
     return -wb_inertial_unit_get_roll_pitch_yaw(_imu)[2];
 }
 
-static void platform_send_siminfo(const siminfo_t & siminfo)
+static void platform_send_siminfo(const void * info, const size_t size)
 {
-    wb_emitter_send(_emitter, &siminfo, sizeof(siminfo));
+    wb_emitter_send(_emitter, info, size);
 }
 
 static int platform_joystick_get_axis_value(const uint8_t axis)
@@ -160,9 +142,9 @@ static int platform_joystick_get_pressed_button()
     return wb_joystick_get_pressed_button();
 }
 
-static joystick_t platform_joystick_get_info() 
+static const char * platform_joystick_get_name()
 {
-    return JOYSTICK_AXIS_MAP[wb_joystick_get_model()];
+    return wb_joystick_get_model();
 }
 
 static int platform_joystick_get_number_of_axes()
@@ -201,6 +183,23 @@ static int platform_keyboard_up()
 }
 
 // Code that should work with other platforms --------------------------------
+
+typedef struct {
+
+    int8_t throttle;
+    int8_t roll;
+    int8_t pitch;
+    int8_t yaw;
+
+} joystick_t;
+
+static std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
+
+    {"Logitech Gamepad F310", joystick_t {-2,  4, -5, 1 } },
+
+    {"Microsoft X-Box 360 pad", joystick_t {-2,  4, -5, 1 } }
+};
+
 
 typedef enum {
 
@@ -371,7 +370,7 @@ static void getSimInfoFromJoystick(
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
 
-    auto axes = platform_joystick_get_info();
+    auto axes = JOYSTICK_AXIS_MAP[platform_joystick_get_name()];
 
     const auto button = platform_joystick_get_pressed_button();
 
@@ -455,7 +454,7 @@ int main(int argc, char ** argv)
 
         memcpy(&siminfo.startingPose, &startingPose, sizeof(Dynamics::pose_t));
         siminfo.framerate = platform_get_framerate();
-        platform_send_siminfo(siminfo);
+        platform_send_siminfo(&siminfo, sizeof(siminfo));
     }
 
     platform_cleanup();
