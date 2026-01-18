@@ -116,7 +116,7 @@ static Dynamics::pose_t platform_get_vehicle_pose()
     const double * xyz = wb_gps_get_values(_gps);
     const double *rpy = wb_inertial_unit_get_roll_pitch_yaw(_imu);
 
-    return { xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2] };
+    return Dynamics::pose_t{xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2]};
 }
 
 static void platform_send_siminfo(const siminfo_t & siminfo)
@@ -228,30 +228,24 @@ static joystickStatus_e getJoystickStatus(void)
     return mode;
 }
 
-static void switchMode(toggle_e toggle)
+static mode_e switchMode(const toggle_e toggle, const mode_e mode)
 {
-    switch (_mode) {
+    switch (mode) {
 
         case MODE_IDLE:
-            _mode = toggle == TOGGLE_HOVER ?
-                MODE_HOVERING : _mode;
-            break;
+            return toggle == TOGGLE_HOVER ?
+                MODE_HOVERING : mode;
 
         case MODE_HOVERING:
-            _mode = 
-                toggle == TOGGLE_HOVER ?  MODE_LANDING :
+            return toggle == TOGGLE_HOVER ?  MODE_LANDING :
                 toggle == TOGGLE_AUTO ?  MODE_AUTONOMOUS :
-                _mode;
-            break;
+                mode;
 
         case MODE_AUTONOMOUS:
-            _mode = 
-                toggle == TOGGLE_AUTO ?  MODE_HOVERING :
-                _mode;
-            break;
+            return toggle == TOGGLE_AUTO ?  MODE_HOVERING : mode;
 
         default:
-            break;
+            return mode;
     }
 }
 
@@ -283,7 +277,7 @@ static void checkKeyboardToggle(
     if (key == target) {
         if (!key_was_down) {
             key_was_down = true;
-            switchMode(toggle);
+            _mode = switchMode(toggle, _mode);
         }
     }
 }
@@ -352,7 +346,7 @@ static bool checkButtonToggle(
     }
     else {
         if (button_was_down) {
-            switchMode(toggle);
+            _mode = switchMode(toggle, _mode);
         }
         return false;
     }
