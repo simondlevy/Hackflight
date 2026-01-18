@@ -31,7 +31,7 @@ class RotorMixer {
                 const int8_t * yaw,
                 const int8_t count)
         {
-            static float motors[20];
+            static float motors[MAX_MOTOR_COUNT];
             mix(demands, roll, pitch, yaw, count, motors);
             return motors;
         }        

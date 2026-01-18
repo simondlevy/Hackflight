@@ -18,6 +18,8 @@
 
 #include <stdint.h>
 
+static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+
 typedef struct {
 
     float x;       // positive forward

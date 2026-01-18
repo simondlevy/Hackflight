@@ -68,10 +68,10 @@ class Simulator {
                         _pidControl.run(dt, controlled, state, setpoint);
 
                     // Get motor RPMS from mixer
-                    const float * motors = Mixer::mix(demands);
+                    const auto * motors = Mixer::mix(demands);
 
                     // Convert motor values to double for dynamics
-                    const auto * rpms = floats2doubles(motors, 4);
+                    const auto * rpms = motors2doubless(motors, 4);
 
                     // Run dynamics in inner loop -----------------------------
                     for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
@@ -103,9 +103,9 @@ class Simulator {
             };
         }
 
-        static double * floats2doubles(const float * f, const size_t n)
+        static double * motors2doubless(const float * f, const size_t n)
         {
-            static double d[20];
+            static double d[MAX_MOTOR_COUNT];
             for (size_t k=0; k<n; ++k) {
                 d[k] = f[k];
             }
