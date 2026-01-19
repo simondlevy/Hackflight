@@ -1708,7 +1708,7 @@
 		)
 	)
 	(gr_text "USB"
-		(at 163.851644 87.088137 90)
+		(at 161.7 81.375 270)
 		(layer "F.SilkS")
 		(uuid "4c4adee2-c132-43d0-9952-81d5a2aee762")
 		(effects
@@ -1875,6 +1875,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "REG"
+		(at 157.05 64.65 270)
+		(layer "F.SilkS")
+		(uuid "9ccbf352-ce86-4367-9724-0e0da4a88e31")
+		(effects
+			(font
+				(size 2 2)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "GD"
 		(at 148.644013 59.808556 90)
 		(layer "F.SilkS")
@@ -2007,6 +2019,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "IMU"
+		(at 153.5 100.3 270)
+		(layer "F.SilkS")
+		(uuid "d6a7d6ef-e4f7-455f-b99e-c6dff767e7cc")
+		(effects
+			(font
+				(size 2 2)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "GD"
 		(at 159.887997 89.98 90)
 		(layer "F.SilkS")
@@ -2014,6 +2038,18 @@
 		(effects
 			(font
 				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "COMMS"
+		(at 123.875 63.425 270)
+		(layer "F.SilkS")
+		(uuid "eee0ef80-0cb9-4ebf-b843-531b6a5c311e")
+		(effects
+			(font
+				(size 2 2)
 				(thickness 0.15)
 			)
 			(justify left bottom)
@@ -2038,6 +2074,18 @@
 		(effects
 			(font
 				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "MOTORS"
+		(at 137.325 56.625 0)
+		(layer "F.SilkS")
+		(uuid "fb152112-7cd5-48f1-b76c-a73a0f4a9d42")
+		(effects
+			(font
+				(size 2 2)
 				(thickness 0.15)
 			)
 			(justify left bottom)
