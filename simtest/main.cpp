@@ -54,19 +54,39 @@ int main(int argc, char ** argv)
             FRAMERATE);
 
     const auto poselogname = argv[3];
-    FILE * poselogfp = fopen(poselogname, "w");
+    FILE * poselogfp = fopen(poselogname, "r");
     if (!poselogfp) {
         fprintf(stderr, "Unable to open %s for input\n", poselogname);
         exit(1);
     }
 
+    while (true) {
+
+        char line[1000] = {};
+
+        if (!fgets(line, sizeof(line), setpointlogfp)) {
+            break;
+        }
+
+        printf("%s", line);
+
+        /*
+        if (sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf,%d,%d,%d,%d,%d,%d,%d,%d", 
+                &pose.x, &pose.y, &pose.z,
+                &pose.phi, &pose.theta, &pose.psi,
+                &d[0], &d[1], &d[2], &d[3], &d[4], &d[5], &d[6], &d[7]) == 14) {
+
+        }*/
+    }
+ 
+    /*
     for (uint32_t k=0; k<STEPS; ++k) {
 
         // const auto pose = simulator.step(MODE_IDLE, setpoint);
 
         fprintf(poselogfp, "%f,%f,%f,%f,%f,%f\n",
                 pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-    }
+    }*/
 
     fclose(poselogfp);
     fclose(setpointlogfp);
