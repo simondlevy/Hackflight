@@ -68,15 +68,14 @@ int main(int argc, char ** argv)
             break;
         }
 
-        printf("%s", line);
+        mode_e mode = MODE_IDLE;
+        demands_t sp = {};
 
-        /*
-        if (sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf,%d,%d,%d,%d,%d,%d,%d,%d", 
-                &pose.x, &pose.y, &pose.z,
-                &pose.phi, &pose.theta, &pose.psi,
-                &d[0], &d[1], &d[2], &d[3], &d[4], &d[5], &d[6], &d[7]) == 14) {
-
-        }*/
+        if (sscanf(line, "%d,%f,%f,%f,%f",
+                    (int *)&mode, &sp.thrust, &sp.roll, &sp.pitch, &sp.yaw) == 5) {
+            printf("mode=%d t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f\n",
+                    mode, sp.thrust, sp.roll, sp.pitch, sp.yaw);
+        }
     }
  
     /*
