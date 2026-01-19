@@ -1164,7 +1164,7 @@
 		)
 	)
 	(gr_text "SDA"
-		(at 140.075 96.85 0)
+		(at 137.25 96.875 0)
 		(layer "F.SilkS")
 		(uuid "05da8597-78e2-436b-b901-3a5e5f278851")
 		(effects
@@ -1172,7 +1172,7 @@
 				(size 1 1)
 				(thickness 0.15)
 			)
-			(justify left bottom mirror)
+			(justify left bottom)
 		)
 	)
 	(gr_text "3V3"
