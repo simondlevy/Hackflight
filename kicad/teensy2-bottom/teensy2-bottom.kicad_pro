@@ -451,7 +451,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "teensy2.kicad_pro",
+    "filename": "teensy2-bottom.kicad_pro",
     "version": 3
   },
   "net_settings": {
