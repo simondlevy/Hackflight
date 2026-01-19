@@ -245,7 +245,7 @@ int main(int argc, char ** argv)
     (void)argc;
 
     const char * worldname =  argv[1];
-    const char * logfilename =  argv[2];
+    const char * poselogname =  argv[2];
 
     mode_e mode = MODE_IDLE;
 
@@ -267,7 +267,7 @@ int main(int argc, char ** argv)
         siminfo_t siminfo = {};
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, worldname);
-        strcpy(siminfo.logfilename, logfilename);
+        strcpy(siminfo.poselogname, poselogname);
 
         if (!platform_step()) {
             break;

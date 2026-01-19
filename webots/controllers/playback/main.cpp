@@ -64,7 +64,7 @@ int main(int argc, char ** argv)
     (void)argc;
 
     const char * worldname =  argv[1];
-    const char * logfilename =  argv[2];
+    const char * poselogname =  argv[2];
 
     char path[1000];
 
@@ -82,10 +82,10 @@ int main(int argc, char ** argv)
         simsens::RangefinderVisualizer(rangefinder);
 
 
-    FILE * logfp = fopen(logfilename, "r");
+    FILE * logfp = fopen(poselogname, "r");
 
     if (!logfp) {
-        fprintf(stderr, "Unable to open file %s for input\n", logfilename);
+        fprintf(stderr, "Unable to open file %s for input\n", poselogname);
         return 1;
     }
 

@@ -27,7 +27,7 @@ typedef struct {
     float framerate;
     char path[200];
     char worldname[200];
-    char logfilename[200];
+    char poselogname[200];
     mode_e mode;
     demands_t setpoint;
 

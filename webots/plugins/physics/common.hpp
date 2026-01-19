@@ -106,7 +106,7 @@ class PhysicsPluginHelper {
         static FILE * logfile_open(const siminfo_t & siminfo)
         {
             char path[1000];
-            sprintf(path, "%s/%s", siminfo.path, siminfo.logfilename);
+            sprintf(path, "%s/%s", siminfo.path, siminfo.poselogname);
             return fopen(path, "w");
         }
 
