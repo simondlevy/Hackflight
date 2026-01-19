@@ -56,16 +56,16 @@ class Dynamics {
 
             double x;       // positive forward
             double dx;      // positive forward
-            double y;       // positive leftward
-            double dy;      // positive leftward
+            double y;       // positive rightward
+            double dy;      // positive rightward
             double z;       // positive upward
             double dz;      // positive upward
             double phi;     // positive roll right
             double dphi;    // positive roll right
-            double theta;   // positive nose up
-            double dtheta;  // positive nose up (opposite of gyro Y)
-            double psi;     // positive nose left
-            double dpsi;    // positive nose left
+            double theta;   // positive nose down
+            double dtheta;  // positive nose down
+            double psi;     // positive nose right
+            double dpsi;    // positive nose right
 
         } state_t;
 

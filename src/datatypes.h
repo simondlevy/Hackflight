@@ -24,16 +24,16 @@ typedef struct {
 
     float x;       // positive forward
     float dx;      // positive forward
-    float y;       // positive leftward
-    float dy;      // positive leftward
+    float y;       // positive rightward
+    float dy;      // positive rightward
     float z;       // positive upward
     float dz;      // positive upward
     float phi;     // positive roll right
     float dphi;    // positive roll right
-    float theta;   // positive nose up
-    float dtheta;  // positive nose up (opposite of gyro Y)
-    float psi;     // positive nose left
-    float dpsi;    // positive nose left
+    float theta;   // positive nose down
+    float dtheta;  // positive nose down
+    float psi;     // positive nose right
+    float dpsi;    // positive nose right
 
 } vehicleState_t;
 
