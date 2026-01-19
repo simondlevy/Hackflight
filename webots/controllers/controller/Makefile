@@ -15,6 +15,7 @@
 # Command-line variables; e.g. make run world=maze ---------------------------
 world = simple
 poselogname = poselog.csv
+setpointlogname = setpointlog.csv
 # ----------------------------------------------------------------------------
 
 EXE = $(shell basename "`pwd`")
@@ -42,7 +43,7 @@ VERBOSE = 1
 run:
 	webots ../../worlds/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world) \
-		$(poselogname)
+		$(poselogname) $(setpointlogname)
 
 
 edit:

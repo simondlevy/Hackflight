@@ -244,9 +244,6 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    const char * worldname =  argv[1];
-    const char * poselogname =  argv[2];
-
     mode_e mode = MODE_IDLE;
 
     demands_t * autonomousSetpoint = nullptr;
@@ -262,12 +259,14 @@ int main(int argc, char ** argv)
         platform_get_vehicle_psi()
     };
 
+    FILE * setpointlogfp = fopen(argv[3], "w");
+
     while (true) {
 
         siminfo_t siminfo = {};
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
-        strcpy(siminfo.worldname, worldname);
-        strcpy(siminfo.poselogname, poselogname);
+        strcpy(siminfo.worldname, argv[1]);
+        strcpy(siminfo.poselogname, argv[2]);
 
         if (!platform_step()) {
             break;
@@ -304,6 +303,8 @@ int main(int argc, char ** argv)
         siminfo.framerate = platform_get_framerate();
         platform_send_siminfo(&siminfo, sizeof(siminfo));
     }
+
+    fclose(setpointlogfp);
 
     platform_cleanup();
 
