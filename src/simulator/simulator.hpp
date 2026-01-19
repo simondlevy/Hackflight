@@ -27,6 +27,7 @@
 #include <num.hpp>
 #include <pidcontrol.hpp>
 #include <simulator/dynamics.hpp>
+#include <simulator/pose.h>
 #include <vehicles/diyquad.hpp>
 
 class Simulator {
@@ -39,14 +40,21 @@ class Simulator {
 
     public:
 
-        void init(const Dynamics::pose_t & pose, const float framerate)
+        void init(const pose_t & pose, const float framerate)
         {
             _pidControl.init();
-            _dynamics.setPose(pose);
+
+            _dynamics.state.x = pose.x;
+            _dynamics.state.y = pose.y;
+            _dynamics.state.z = pose.z;
+            _dynamics.state.phi = pose.phi;
+            _dynamics.state.theta = pose.theta;
+            _dynamics.state.psi = pose.psi;
+
             _framerate= framerate;
         }
 
-        Dynamics::pose_t step(const mode_e mode, const demands_t & setpoint)
+        pose_t step(const mode_e mode, const demands_t & setpoint)
         {
             // Run slow PID control in outer loop ----------------------------
             for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
@@ -82,7 +90,14 @@ class Simulator {
                 }
             }
 
-            return _dynamics.getPose();
+            return pose_t {
+                _dynamics.state.x,
+                _dynamics.state.y,
+                _dynamics.state.z,
+                _dynamics.state.phi,
+                _dynamics.state.theta,
+                _dynamics.state.psi
+            };
         }    
 
     private:

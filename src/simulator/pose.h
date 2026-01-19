@@ -1,5 +1,7 @@
+#pragma once
+
 /* 
- * Simulation data message sent from slow (UI) to fast (PID / dynamics) threads
+ * Vehicle pose data
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -16,19 +18,14 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <datatypes.h>
-#include <simulator/pose.h>
 
 typedef struct {
 
-    pose_t startingPose;
-    float framerate;
-    char path[200];
-    char worldname[200];
-    char logfilename[200];
-    mode_e mode;
-    demands_t setpoint;
+    double x;
+    double y;
+    double z;
+    double phi;
+    double theta;
+    double psi;
 
-} siminfo_t;
+} pose_t;

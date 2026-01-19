@@ -27,6 +27,7 @@ using namespace std;
 // Hackflight
 #include <datatypes.h>
 #include <num.hpp>
+#include <simulator/pose.h>
 #include <simulator/message.h>
 
 #include "platform.h"
@@ -252,7 +253,7 @@ int main(int argc, char ** argv)
 
     platform_init();
 
-    const auto startingPose = Dynamics::pose_t {
+    const auto startingPose = pose_t {
         platform_get_vehicle_x(),
         platform_get_vehicle_y(),
         platform_get_vehicle_z(),
@@ -299,7 +300,7 @@ int main(int argc, char ** argv)
             mode = MODE_IDLE;
         }
 
-        memcpy(&siminfo.startingPose, &startingPose, sizeof(Dynamics::pose_t));
+        memcpy(&siminfo.startingPose, &startingPose, sizeof(pose_t));
         siminfo.framerate = platform_get_framerate();
         platform_send_siminfo(&siminfo, sizeof(siminfo));
     }

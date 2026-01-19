@@ -69,16 +69,8 @@ class Dynamics {
 
         } state_t;
 
-        typedef struct {
-
-            double x;
-            double y;
-            double z;
-            double phi;
-            double theta;
-            double psi;
-
-        } pose_t;
+        // Vehicle state (Equation 11)
+        state_t state;
 
         /**
          *  Vehicle parameters
@@ -122,33 +114,16 @@ class Dynamics {
             init(vparams, wparams, dt);
         }
 
-        void setPose(const pose_t & pose)
-        {
-            _state.x = pose.x;
-            _state.y = pose.y;
-            _state.z = pose.z;
-            _state.phi = pose.phi;
-            _state.theta = pose.theta;
-            _state.psi = pose.psi;
-        }
-
-        pose_t getPose()
-        {
-            return pose_t {
-                _state.x, _state.y, _state.z, _state.phi, _state.theta, _state.psi
-            };
-        }
-
         state_t getVehicleStateDegrees()
         {
             return state_t {
-                _state.x, _state.dx, _state.y, _state.dy, _state.z, _state.dz,
-                    RAD2DEG * _state.phi,
-                    RAD2DEG * _state.dphi,
-                    RAD2DEG * _state.theta,
-                    RAD2DEG * _state.dtheta,
-                    RAD2DEG * _state.psi,
-                    RAD2DEG * _state.dpsi
+                state.x, state.dx, state.y, state.dy, state.z, state.dz,
+                    RAD2DEG * state.phi,
+                    RAD2DEG * state.dphi,
+                    RAD2DEG * state.theta,
+                    RAD2DEG * state.dtheta,
+                    RAD2DEG * state.psi,
+                    RAD2DEG * state.dpsi
             };
         }
 
@@ -192,7 +167,7 @@ class Dynamics {
 
             // Equation 12 line 6 for dz/dt in inertial (earth) frame
             _dstate.dz =
-                -_wparams.g + (cos(_state.phi)*cos(_state.theta)) / m * u1;
+                -_wparams.g + (cos(state.phi)*cos(state.theta)) / m * u1;
 
             // We're airborne once net Z acceleration becomes positive
             if (_dstate.dz > 0) {
@@ -201,7 +176,7 @@ class Dynamics {
 
             // We're no longer airborne if we're descending and drop below
             // minimum altitude
-            if (_airborne && _state.dz < 0 && _state.z < ZMIN) {
+            if (_airborne && state.dz < 0 && state.z < ZMIN) {
                 _airborne = false;
                 reset();
             }
@@ -209,54 +184,54 @@ class Dynamics {
             // Once airborne, we can update dynamics
             if (_airborne) {
 
-                const auto phi = _state.phi;
-                const auto theta = _state.theta;
-                const auto psi = _state.psi;
+                const auto phi = state.phi;
+                const auto theta = state.theta;
+                const auto psi = state.psi;
 
                 // Equation 12 : Note negations to support roll-right
                 // positive
 
-                _dstate.x = _state.dx;
+                _dstate.x = state.dx;
 
                 // Rotate dx/dt from body frame into inertial frame
                 _dstate.dx =(cos(-phi)*sin(theta)*cos(psi) +
                         sin(-phi)*sin(psi)) * u1 / m;
 
-                _dstate.y = _state.dy;                              
+                _dstate.y = state.dy;                              
 
                 // Rotate dy/dt from body frame into inertial frame
                 _dstate.dy = (cos(-phi)*sin(theta)*sin(psi) -
                         sin(-phi)*cos(psi)) * u1 / m;
 
-                _dstate.z = _state.dz;                             
-                _dstate.phi = _state.dphi;                              
+                _dstate.z = state.dz;                             
+                _dstate.phi = state.dphi;                              
                 _dstate.dphi = l / I * u2;                      
-                _dstate.theta = _state.dtheta;                  
+                _dstate.theta = state.dtheta;                  
                 _dstate.dtheta = l / I * u3;                  
-                _dstate.psi = _state.dpsi;                   
+                _dstate.psi = state.dpsi;                   
                 _dstate.dpsi = -l / I * u4;                  
 
                 // Compute state as first temporal integral of first
                 // temporal derivative
-                _state.x += _dt * _dstate.x;
-                _state.dx += _dt * _dstate.dx;
-                _state.y += _dt * _dstate.y;
-                _state.dy += _dt * _dstate.dy;
-                _state.z += _dt * _dstate.z;
-                _state.dz += _dt * _dstate.dz;
-                _state.phi += _dt * _dstate.phi;
-                _state.dphi += _dt * _dstate.dphi;
-                _state.theta += _dt * _dstate.theta;
-                _state.dtheta += _dt * _dstate.dtheta;
-                _state.psi += _dt * _dstate.psi;
-                _state.dpsi += _dt * _dstate.dpsi;
+                state.x += _dt * _dstate.x;
+                state.dx += _dt * _dstate.dx;
+                state.y += _dt * _dstate.y;
+                state.dy += _dt * _dstate.dy;
+                state.z += _dt * _dstate.z;
+                state.dz += _dt * _dstate.dz;
+                state.phi += _dt * _dstate.phi;
+                state.dphi += _dt * _dstate.dphi;
+                state.theta += _dt * _dstate.theta;
+                state.dtheta += _dt * _dstate.dtheta;
+                state.psi += _dt * _dstate.psi;
+                state.dpsi += _dt * _dstate.dpsi;
 
                 // Keep yaw angle in [-2Pi, +2Pi]
-                if(_state.psi > 2*M_PI) {
-                    _state.psi -= 2*M_PI;
+                if(state.psi > 2*M_PI) {
+                    state.psi -= 2*M_PI;
                 }
-                if(_state.psi < -2*M_PI) {
-                    _state.psi += 2*M_PI;
+                if(state.psi < -2*M_PI) {
+                    state.psi += 2*M_PI;
                 }
             }
 
@@ -264,13 +239,13 @@ class Dynamics {
 
         void reset()
         {
-            _state.dx = 0;
-            _state.dy = 0;
-            _state.z = ZMIN;
-            _state.dz = 0;
-            _state.dphi = 0;
-            _state.dtheta = 0;
-            _state.dpsi = 0;
+            state.dx = 0;
+            state.dy = 0;
+            state.z = ZMIN;
+            state.dz = 0;
+            state.dphi = 0;
+            state.dtheta = 0;
+            state.dpsi = 0;
 
             memset(&_dstate, 0, sizeof(state_t));
         }
@@ -280,9 +255,6 @@ class Dynamics {
     private:
 
         static constexpr double RAD2DEG = 180 / M_PI;
-
-        // Vehicle state (Equation 11)
-        state_t _state;
 
         // Vehicle state first derivative (Equation 12)
         state_t _dstate;
