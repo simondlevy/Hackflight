@@ -1553,6 +1553,26 @@
 	)
 	(wire
 		(pts
+			(xy 162.56 101.6) (xy 167.64 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0891e037-91b1-48c0-8480-07375dd51ebf")
+	)
+	(wire
+		(pts
+			(xy 162.56 106.68) (xy 167.64 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "09bc331a-1777-4cf1-81dc-67d2528f1f0c")
+	)
+	(wire
+		(pts
 			(xy 168.91 87.63) (xy 173.99 87.63)
 		)
 		(stroke
@@ -1833,6 +1853,16 @@
 	)
 	(wire
 		(pts
+			(xy 162.56 104.14) (xy 167.64 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c1fd0d3e-0c51-41e5-a5e5-43d939d959c0")
+	)
+	(wire
+		(pts
 			(xy 91.44 132.08) (xy 96.52 132.08)
 		)
 		(stroke
@@ -1870,6 +1900,16 @@
 			(type default)
 		)
 		(uuid "d68a1c3f-2005-47b4-90ef-e335da324f80")
+	)
+	(wire
+		(pts
+			(xy 162.56 99.06) (xy 167.64 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d99fa4b2-eb25-4b23-8a5b-1e9221eff4c6")
 	)
 	(wire
 		(pts
@@ -2041,6 +2081,16 @@
 		)
 		(uuid "2a626863-9f70-44ad-99bb-54d866113111")
 	)
+	(label "TX"
+		(at 163.83 99.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2ad1d644-c354-4f55-a1a0-83914bac2986")
+	)
 	(label "GND"
 		(at 120.65 101.6 0)
 		(effects
@@ -2050,6 +2100,16 @@
 			(justify left bottom)
 		)
 		(uuid "317ecb92-7da4-45f9-bf66-767682182a66")
+	)
+	(label "5V"
+		(at 163.83 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5093b9a3-90fd-44ee-bf45-a6c172732526")
 	)
 	(label "MISO"
 		(at 91.44 132.08 0)
@@ -2111,6 +2171,16 @@
 		)
 		(uuid "8704bc9a-f585-45c9-a1a5-ae548a4f0f80")
 	)
+	(label "RX"
+		(at 163.83 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8a16bc07-61a9-491a-8f61-c82575a09663")
+	)
 	(label "MOSI"
 		(at 91.44 129.54 0)
 		(effects
@@ -2160,6 +2230,16 @@
 			(justify left bottom)
 		)
 		(uuid "b28412bb-84bb-4614-91bf-5ef1231e7516")
+	)
+	(label "GND"
+		(at 163.83 104.14 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c43dd349-8308-4a9c-8ea3-93ec785b95f9")
 	)
 	(label "5V"
 		(at 120.65 99.06 0)
@@ -2656,6 +2736,84 @@
 			(project "hoverdeck"
 				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
 					(reference "H2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x04_Socket")
+		(at 172.72 101.6 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "57caec55-ff66-4a51-8be0-ea3797007358")
+		(property "Reference" "J6"
+			(at 173.99 101.5999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Value" "Conn_01x04_Socket"
+			(at 173.99 104.1399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x04_P2.00mm_Vertical"
+			(at 172.72 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 172.72 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated"
+			(at 172.72 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "bb4f15e0-1016-4aa7-9c00-3753b6904328")
+		)
+		(pin "1"
+			(uuid "39becfc0-0c56-4d34-bf40-a345c5b614c3")
+		)
+		(pin "3"
+			(uuid "5d2ab13d-7ada-4481-ac36-33611cc10003")
+		)
+		(pin "4"
+			(uuid "513ad6d8-3550-4345-bfc7-3937dccf427e")
+		)
+		(instances
+			(project ""
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J6")
 					(unit 1)
 				)
 			)
