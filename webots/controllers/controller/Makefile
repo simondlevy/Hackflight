@@ -14,7 +14,7 @@
 
 # Command-line variables; e.g. make run world=maze ---------------------------
 world = simple
-logfile = log.csv
+logfile = poselog.csv
 # ----------------------------------------------------------------------------
 
 EXE = $(shell basename "`pwd`")
