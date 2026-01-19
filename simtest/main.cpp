@@ -29,6 +29,17 @@
 static const uint32_t STEPS = 1000;
 static const float FRAMERATE = 32;
 
+static FILE * openlog(const char * filename, const char * mode)
+{
+    FILE * fp = fopen(filename, mode);
+    if (!fp) {
+        fprintf(stderr, "Unable to open file %s for %s\n", filename,
+                *mode == 'w' ? "reading" : "writing");
+        exit(1);
+    }
+    return fp;
+}
+
 int main(int argc, char ** argv)
 {
     if (argc < 4) {
@@ -43,8 +54,6 @@ int main(int argc, char ** argv)
     simsens::RobotParser robotParser = {};
     robotParser.parse(argv[2]);
 
-    FILE * setpointlogfp = fopen(argv[3], "r");
-
     const auto pose = worldParser.robotPose;
 
     Simulator simulator = {};
@@ -53,12 +62,9 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
-    const auto poselogname = argv[3];
-    FILE * poselogfp = fopen(poselogname, "r");
-    if (!poselogfp) {
-        fprintf(stderr, "Unable to open %s for input\n", poselogname);
-        exit(1);
-    }
+    auto setpointlogfp = openlog(argv[3], "r");
+
+    auto poselogfp = openlog("poselog.csv", "w");
 
     while (true) {
 
@@ -69,23 +75,18 @@ int main(int argc, char ** argv)
         }
 
         mode_e mode = MODE_IDLE;
-        demands_t sp = {};
+        demands_t setpoint = {};
 
         if (sscanf(line, "%d,%f,%f,%f,%f",
-                    (int *)&mode, &sp.thrust, &sp.roll, &sp.pitch, &sp.yaw) == 5) {
-            printf("mode=%d t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f\n",
-                    mode, sp.thrust, sp.roll, sp.pitch, sp.yaw);
+                    (int *)&mode, &setpoint.thrust,&setpoint.roll,
+                    &setpoint.pitch, &setpoint.yaw) == 5) {
+
+            const auto pose = simulator.step(mode, setpoint);
+
+            fprintf(poselogfp, "%f,%f,%f,%f,%f,%f\n",
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
         }
     }
- 
-    /*
-    for (uint32_t k=0; k<STEPS; ++k) {
-
-        // const auto pose = simulator.step(MODE_IDLE, setpoint);
-
-        fprintf(poselogfp, "%f,%f,%f,%f,%f,%f\n",
-                pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-    }*/
 
     fclose(poselogfp);
     fclose(setpointlogfp);
