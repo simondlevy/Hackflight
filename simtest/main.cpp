@@ -31,8 +31,9 @@ static const float FRAMERATE = 32;
 
 int main(int argc, char ** argv)
 {
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s WORLDFILE ROBOTFILE\n", argv[0]);
+    if (argc < 4) {
+        fprintf(stderr, "Usage: %s WORLDFILE ROBOTFILE SETPOINTFILE\n",
+                argv[0]);
         return 1;
     }
 
@@ -42,6 +43,8 @@ int main(int argc, char ** argv)
     simsens::RobotParser robotParser = {};
     robotParser.parse(argv[2]);
 
+    FILE * setpointlogfp = fopen(argv[3], "r");
+
     const auto pose = worldParser.robotPose;
 
     Simulator simulator = {};
@@ -50,17 +53,23 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
-    FILE * logfp = fopen("log.csv", "w");
+    const auto poselogname = argv[3];
+    FILE * poselogfp = fopen(poselogname, "w");
+    if (!poselogfp) {
+        fprintf(stderr, "Unable to open %s for input\n", poselogname);
+        exit(1);
+    }
 
     for (uint32_t k=0; k<STEPS; ++k) {
 
         // const auto pose = simulator.step(MODE_IDLE, setpoint);
 
-        fprintf(logfp, "%f,%f,%f,%f,%f,%f\n",
+        fprintf(poselogfp, "%f,%f,%f,%f,%f,%f\n",
                 pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
     }
 
-    fclose(logfp);
+    fclose(poselogfp);
+    fclose(setpointlogfp);
 
     return 0;
 }

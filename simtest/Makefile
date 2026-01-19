@@ -5,7 +5,8 @@ SIMSENSORS = $(ROOT)/simsensors/src
 all: simtest
 
 run: simtest
-	./simtest ../webots/worlds/simple.wbt ../webots/protos/DiyQuad.proto
+	./simtest ../webots/worlds/simple.wbt ../webots/protos/DiyQuad.proto \
+        ../webots/controllers/controller/setpointlog.csv
 
 simtest: main.o 
 	g++ -o simtest main.o
