@@ -299,9 +299,16 @@ int main(int argc, char ** argv)
             mode = MODE_IDLE;
         }
 
+        // Send siminfo to fast thread
         memcpy(&siminfo.startingPose, &startingPose, sizeof(pose_t));
         siminfo.framerate = platform_get_framerate();
         platform_send_siminfo(&siminfo, sizeof(siminfo));
+
+        // Save mode and setpoint to logfile
+        const auto sp = siminfo.setpoint;
+        fprintf(setpointlogfp, "%d,%f,%f,%f,%f\n",
+                siminfo.mode, sp.thrust, sp.roll, sp.pitch, sp.yaw);
+
     }
 
     fclose(setpointlogfp);
