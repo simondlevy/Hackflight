@@ -2540,16 +2540,6 @@
 		)
 		(uuid "3a458b05-2083-40fa-9c4d-1d5e5a660965")
 	)
-	(label "CS"
-		(at 81.28 77.47 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "42bdd13d-55a8-45e7-bfd9-86ecf7b1a1d9")
-	)
 	(label "MISO"
 		(at 91.44 132.08 0)
 		(effects
@@ -2600,6 +2590,16 @@
 		)
 		(uuid "5f957b84-af5e-4d54-a965-e51372c955c3")
 	)
+	(label "CS"
+		(at 81.28 72.39 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "66214f6c-b000-4efb-8bb3-6ba720b3086d")
+	)
 	(label "M3"
 		(at 92.71 111.76 0)
 		(effects
@@ -2641,6 +2641,16 @@
 		(uuid "831cf402-d4ff-4f55-b0ae-e7a5ed6ec15e")
 	)
 	(label "MOSI"
+		(at 81.28 74.93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "857668f3-e9a8-4add-9c63-fc841b12ea52")
+	)
+	(label "MOSI"
 		(at 91.44 129.54 0)
 		(effects
 			(font
@@ -2670,15 +2680,15 @@
 		)
 		(uuid "98ca4983-4266-4a56-ac2a-584776457698")
 	)
-	(label "MOSI"
-		(at 81.28 74.93 0)
+	(label "MISO"
+		(at 81.28 77.47 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "a13370b5-f701-4029-876c-bb13ecb32bf3")
+		(uuid "9f832f06-6bf6-4d56-995d-023681b2d74d")
 	)
 	(label "M1"
 		(at 168.91 78.74 0)
@@ -2729,16 +2739,6 @@
 			(justify left bottom)
 		)
 		(uuid "cc074601-d9a5-4626-adb3-4b9c4a57159a")
-	)
-	(label "MISO"
-		(at 81.28 72.39 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "ce3202c5-c6c4-44bb-9292-f1a74555bdf9")
 	)
 	(label "SCL0"
 		(at 140.97 96.52 0)
