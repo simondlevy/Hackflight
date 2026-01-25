@@ -14,9 +14,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// C/C++
 #include <stdio.h>
 
 // Hackflight
+#include <autopilot/rangefinder.hpp>
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
 #include <vehicles/diyquad.hpp>
@@ -52,6 +54,9 @@ int main(int argc, char ** argv)
 
     simsens::RobotParser robotParser = {};
     robotParser.parse(argv[2]);
+
+    simsens::Rangefinder rangefinder =
+        simsens::Rangefinder(*robotParser.rangefinders[0]);
 
     const auto pose = worldParser.robotPose;
 

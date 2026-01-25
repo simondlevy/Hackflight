@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <datatypes.h>
+
 class RangefinderSetpoint {
 
     public:

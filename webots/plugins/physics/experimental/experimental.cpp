@@ -61,15 +61,11 @@ static bool collided(
 {
     const bool debug = true;
 
-    if (simsens::CollisionDetector::detect(
+    return simsens::CollisionDetector::detect(
 
-                // Negate Y for leftware positive
-                simsens::vec3_t{pose.x, -pose.y, pose.x},
-                worldParser.walls, debug)) {
-        return true;
-    }
-
-    return false;
+            // Negate Y for leftware positive
+            simsens::vec3_t{pose.x, -pose.y, pose.x},
+            worldParser.walls, debug);
 }
 
 static void read_rangefinder(
