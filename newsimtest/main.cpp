@@ -26,7 +26,7 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-static const uint32_t MAXTIME = 10;
+static const uint32_t MAXTIME = 5;
 static const float FRAMERATE = 32;
 
 static FILE * openlog(const char * filename, const char * mode)
@@ -65,7 +65,8 @@ int main(int argc, char ** argv)
 
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
 
-        mode_e mode = MODE_IDLE;
+        mode_e mode = MODE_HOVERING;
+
         demands_t setpoint = {};
 
         const auto pose = simulator.step(mode, setpoint);
