@@ -62,15 +62,15 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
-    auto setpointlogfp = openlog(argv[3], "r");
+    auto inputfp = openlog(argv[3], "r");
 
-    auto poselogfp = openlog("poselog.csv", "w");
+    auto outputfp = openlog("poselog.csv", "w");
 
     while (true) {
 
         char line[1000] = {};
 
-        if (!fgets(line, sizeof(line), setpointlogfp)) {
+        if (!fgets(line, sizeof(line), inputfp)) {
             break;
         }
 
@@ -83,13 +83,13 @@ int main(int argc, char ** argv)
 
             const auto pose = simulator.step(mode, setpoint);
 
-            fprintf(poselogfp, "%f,%f,%f,%f,%f,%f\n",
+            fprintf(outputfp, "%f,%f,%f,%f,%f,%f\n",
                     pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
         }
     }
 
-    fclose(poselogfp);
-    fclose(setpointlogfp);
+    fclose(outputfp);
+    fclose(inputfp);
 
     return 0;
 }
