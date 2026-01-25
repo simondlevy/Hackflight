@@ -29,7 +29,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 static const float MAXTIME = 10;
-static const float HOVERTIME = 10;
+static const float HOVERTIME = 2;
 static const float FRAMERATE = 32;
 
 static FILE * openlog(const char * filename, const char * mode)
@@ -69,16 +69,22 @@ int main(int argc, char ** argv)
 
     auto outputfp = openlog("poselog.csv", "w");
 
+    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
 
         const auto mode =
-            t < HOVERTIME*FRAMERATE ? MODE_HOVERING : MODE_HOVERING;
+            t < HOVERTIME*FRAMERATE ? MODE_HOVERING : MODE_AUTONOMOUS;
+
+        printf("mode=%d\n", mode);
 
         demands_t setpoint = {};
 
-        const auto pose = simulator.step(mode, setpoint);
+        if (mode == MODE_AUTONOMOUS) {
+            RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
+        }
 
-        int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+        const auto pose = simulator.step(mode, setpoint);
 
         rangefinder.read(
                 simsens::pose_t {
