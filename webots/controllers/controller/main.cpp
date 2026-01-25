@@ -170,7 +170,7 @@ static void reportJoystick(void)
     }
 }
 
-static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo, mode_e & mode)
+static void getSimInfoFromKeyboard(siminfo_t & siminfo, mode_e & mode)
 {
     static bool _enter_was_down;
     static bool _spacebar_was_down;
@@ -186,10 +186,7 @@ static void getSimInfoFromKeyboard(const bool autonomous, siminfo_t & siminfo, m
 
     checkKeyboardToggle(key, 32, TOGGLE_AUTO, _spacebar_was_down, mode);
 
-    if (!autonomous) {
-
-        siminfo.setpoint = getSetpointFromKey(key);
-    }
+    siminfo.setpoint = getSetpointFromKey(key);
 
     siminfo.mode = mode;
 }
@@ -212,8 +209,7 @@ static bool checkButtonToggle(
     }
 }
 
-static void getSimInfoFromJoystick(
-        const bool autonomous, siminfo_t & siminfo, mode_e & mode)
+static void getSimInfoFromJoystick(siminfo_t & siminfo, mode_e & mode)
 {
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
@@ -230,14 +226,11 @@ static void getSimInfoFromJoystick(
 
     siminfo.mode = mode;
 
-    if (!autonomous) {
+    siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
+    siminfo.setpoint.roll = readJoystickAxis(axes.roll);
+    siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
 
-        siminfo.setpoint.pitch = readJoystickAxis(axes.pitch);
-        siminfo.setpoint.roll = readJoystickAxis(axes.roll);
-        siminfo.setpoint.yaw = readJoystickAxis(axes.yaw);
-
-        siminfo.setpoint.thrust = readJoystickAxis(axes.throttle);
-    }
+    siminfo.setpoint.thrust = readJoystickAxis(axes.throttle);
 }
 
 int main(int argc, char ** argv) 
@@ -245,8 +238,6 @@ int main(int argc, char ** argv)
     (void)argc;
 
     mode_e mode = MODE_IDLE;
-
-    demands_t * autonomousSetpoint = nullptr;
 
     platform_init();
 
@@ -272,12 +263,10 @@ int main(int argc, char ** argv)
             break;
         }
 
-        const bool autonomous = autonomousSetpoint != nullptr;
-
         switch (getJoystickStatus()) {
 
             case JOYSTICK_RECOGNIZED:
-                getSimInfoFromJoystick(autonomous, siminfo, mode);
+                getSimInfoFromJoystick(siminfo, mode);
                 break;
 
             case JOYSTICK_UNRECOGNIZED:
@@ -285,11 +274,7 @@ int main(int argc, char ** argv)
                 // fall thru
 
             default:
-                getSimInfoFromKeyboard(autonomous, siminfo, mode);
-        }
-
-        if (autonomous) {
-            memcpy(&siminfo.setpoint, autonomousSetpoint, sizeof(demands_t));
+                getSimInfoFromKeyboard(siminfo, mode);
         }
 
         // On descent, switch mode to idle when close enough to ground
