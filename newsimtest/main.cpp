@@ -28,7 +28,8 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-static const uint32_t MAXTIME = 5;
+static const float MAXTIME = 10;
+static const float HOVERTIME = 10;
 static const float FRAMERATE = 32;
 
 static FILE * openlog(const char * filename, const char * mode)
@@ -66,15 +67,25 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
-    mode_e mode = MODE_HOVERING;
-
     auto outputfp = openlog("poselog.csv", "w");
 
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
 
+        const auto mode =
+            t < HOVERTIME*FRAMERATE ? MODE_HOVERING : MODE_HOVERING;
+
         demands_t setpoint = {};
 
         const auto pose = simulator.step(mode, setpoint);
+
+        int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+
+        rangefinder.read(
+                simsens::pose_t {
+
+                // Negate for leftward positive
+                pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                worldParser.walls, rangefinder_distances_mm);
 
         fprintf(outputfp, "%f,%f,%f,%f,%f,%f\n",
                 pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
