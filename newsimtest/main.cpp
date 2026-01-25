@@ -61,11 +61,11 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
+    mode_e mode = MODE_HOVERING;
+
     auto outputfp = openlog("poselog.csv", "w");
 
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
-
-        mode_e mode = MODE_HOVERING;
 
         demands_t setpoint = {};
 
