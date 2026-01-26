@@ -112,7 +112,7 @@ class PhysicsPluginHelper {
 
         static void logfile_write_pose(FILE * logfp, const pose_t & pose)
         {
-            fprintf(logfp, "%f,%f,%f,%f,%f,%f", 
+            fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
                     pose.x,
                     -pose.y, // leftward positive
                     pose.z,

@@ -2,10 +2,12 @@ ROOT = ../..
 
 SIMSENSORS = $(ROOT)/simsensors/src
 
+world=../webots/worlds/maze.wbt
+
 all: simtest
 
 run: simtest
-	./simtest ../webots/worlds/simple.wbt ../webots/protos/DiyQuad.proto 
+	./simtest ../webots/protos/DiyQuad.proto $(world)
 
 simtest: main.o 
 	g++ -o simtest main.o
