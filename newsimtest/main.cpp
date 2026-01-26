@@ -24,6 +24,7 @@
 #include <vehicles/diyquad.hpp>
 
 // SimSensors
+#include <simsensors/src/collision.hpp>
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
@@ -50,11 +51,11 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    simsens::WorldParser worldParser = {};
-    worldParser.parse(argv[1], "DiyQuad {");
-
     simsens::RobotParser robotParser = {};
-    robotParser.parse(argv[2]);
+    robotParser.parse(argv[1]);
+
+    simsens::WorldParser worldParser = {};
+    worldParser.parse(argv[2], "DiyQuad {");
 
     simsens::Rangefinder rangefinder =
         simsens::Rangefinder(*robotParser.rangefinders[0]);
@@ -71,12 +72,14 @@ int main(int argc, char ** argv)
 
     int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
+    bool collided = false;
+
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
 
         const auto mode =
-            t < HOVERTIME*FRAMERATE ? MODE_HOVERING : MODE_AUTONOMOUS;
-
-        printf("mode=%d\n", mode);
+            collided ? MODE_IDLE :
+            t < HOVERTIME*FRAMERATE ? MODE_HOVERING :
+            MODE_AUTONOMOUS;
 
         demands_t setpoint = {};
 
@@ -85,6 +88,14 @@ int main(int argc, char ** argv)
         }
 
         const auto pose = simulator.step(mode, setpoint);
+
+        if (simsens::CollisionDetector::detect(
+
+                simsens::vec3_t{pose.x, pose.y, pose.x},
+                worldParser.walls)) {
+            printf("collision!\n");
+            collided = true;
+        }
 
         rangefinder.read(
                 simsens::pose_t {
