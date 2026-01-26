@@ -91,7 +91,7 @@ class PhysicsPluginHelper {
 
         static void set_dbody_from_pose(const pose_t & pose)
         {
-            // Negate Y for leftward positive
+            // Negate Y to make leftward positive
             dBodySetPosition(_robot, pose.x, -pose.y, pose.z);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
@@ -103,27 +103,7 @@ class PhysicsPluginHelper {
             dBodySetQuaternion(_robot, q);
         }
 
-        static FILE * logfile_open(const siminfo_t & siminfo)
-        {
-            char path[1000];
-            sprintf(path, "%s/%s", siminfo.path, siminfo.poselogname);
-            return fopen(path, "w");
-        }
-
-        static void logfile_write_pose(FILE * logfp, const pose_t & pose)
-        {
-            fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                    pose.x,
-                    -pose.y, // leftward positive
-                    pose.z,
-                    pose.phi,
-                    pose.theta,
-                    -pose.psi); // nose-right positive
-        }
-
     private:
-
-        FILE * logfile;
 
         static axis4_t euler2quat(const axis3_t & angles)
         {

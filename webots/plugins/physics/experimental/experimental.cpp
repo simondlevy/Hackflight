@@ -52,7 +52,8 @@ static void load(const siminfo_t & siminfo,
 
     _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
 
-    *logfpp = PhysicsPluginHelper::logfile_open(siminfo);
+    sprintf(path, "%s/%s", siminfo.path, siminfo.poselogname);
+    *logfpp = fopen(path, "w");
 }
 
 static bool collided(
@@ -84,7 +85,13 @@ static void read_rangefinder(
 
     const auto width = rangefinder.getWidth();
 
-    PhysicsPluginHelper::logfile_write_pose(logfp, pose);
+    fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+            pose.x,
+            -pose.y, // leftward positive
+            pose.z,
+            pose.phi,
+            pose.theta,
+            -pose.psi); // nose-right positive
 
     for (int k=0; k<width; ++k) {
         fprintf(logfp, ",%d", distances_mm[k]);

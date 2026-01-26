@@ -97,7 +97,7 @@ double platform_get_vehicle_x()
 
 double platform_get_vehicle_y()
 {
-    // Negate for leftward positive
+    // Negate to make rightward positive
     return -wb_gps_get_values(_gps)[1];
 }
 
