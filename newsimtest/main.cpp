@@ -72,14 +72,10 @@ int main(int argc, char ** argv)
 
     int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
-    bool collided = false;
-
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
 
         const auto mode =
-            collided ? MODE_IDLE :
-            t < HOVERTIME*FRAMERATE ? MODE_HOVERING :
-            MODE_AUTONOMOUS;
+            t < HOVERTIME*FRAMERATE ? MODE_HOVERING : MODE_AUTONOMOUS;
 
         demands_t setpoint = {};
 
@@ -90,11 +86,10 @@ int main(int argc, char ** argv)
         const auto pose = simulator.step(mode, setpoint);
 
         if (simsens::CollisionDetector::detect(
-
                 simsens::vec3_t{pose.x, pose.y, pose.x},
                 worldParser.walls)) {
             printf("collision!\n");
-            collided = true;
+            break;
         }
 
         rangefinder.read(
