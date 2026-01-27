@@ -57,7 +57,7 @@ static void load(const siminfo_t & siminfo,
     *logfpp = fopen(path, "w");
 }
 
-static bool collided(const pose_t & pose, const simsens::World & world)
+static bool collided(const pose_t & pose, simsens::World & world)
 {
     const bool debug = true;
 
@@ -66,8 +66,7 @@ static bool collided(const pose_t & pose, const simsens::World & world)
 
     return simsens::CollisionDetector::detect(
 
-            // Negate Y for leftward positive
-            simsens::vec3_t{pose.x, -pose.y, pose.x}, world, debug);
+            simsens::vec3_t{pose.x, pose.y, pose.x}, world, debug);
 }
 
 static void read_rangefinder(
@@ -79,9 +78,7 @@ static void read_rangefinder(
 {
     rangefinder.read(
             simsens::pose_t {
-
-            // Negate for leftward positive
-            pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             world, distances_mm);
 
     fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
