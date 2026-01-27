@@ -46,17 +46,15 @@ static FILE * openlog(const char * filename, const char * mode)
 
 static void read_rangefinder(
         simsens::Rangefinder & rangefinder,
-        simsens::WorldParser & world,
+        simsens::World & world,
         const pose_t & pose,
         int * distances_mm,
         FILE * logfp)
 {
     rangefinder.read(
             simsens::pose_t {
-
-            // Negate for leftward positive
-            pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            world.walls, distances_mm);
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            world, distances_mm);
 
     fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
             pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
@@ -78,16 +76,16 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    simsens::RobotParser robotParser = {};
-    robotParser.parse(argv[1]);
+    simsens::Robot robot = {};
+    simsens::RobotParser::parse(argv[1], robot);
 
-    simsens::WorldParser worldParser = {};
-    worldParser.parse(argv[2], "DiyQuad {");
+    simsens::World world = {};
+    simsens::WorldParser::parse(argv[2], world, "DiyQuad {");
 
     simsens::Rangefinder rangefinder =
-        simsens::Rangefinder(*robotParser.rangefinders[0]);
+        simsens::Rangefinder(*robot.rangefinders[0]);
 
-    const auto pose = worldParser.robotPose;
+    const auto pose = world.robotPose;
 
     Simulator simulator = {};
 
@@ -111,13 +109,12 @@ int main(int argc, char ** argv)
         const auto pose = simulator.step(mode, setpoint);
 
         if (simsens::CollisionDetector::detect(
-                    simsens::vec3_t{pose.x, pose.y, pose.x},
-                    worldParser.walls)) {
+                    simsens::vec3_t{pose.x, pose.y, pose.x}, world)) {
             printf("collision!\n");
             break;
         }
 
-        read_rangefinder(rangefinder, worldParser, pose,
+        read_rangefinder(rangefinder, world, pose,
                 rangefinder_distances_mm, outputfp);
     }
 

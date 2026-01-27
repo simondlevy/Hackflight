@@ -68,19 +68,17 @@ int main(int argc, char ** argv)
 
     char path[1000];
 
-    simsens::WorldParser worldParser = {};
-
+    simsens::World world = {};
     sprintf(path, "../../worlds/%s.wbt", worldname);
-    worldParser.parse(path);
+    simsens::WorldParser::parse(path, world);
 
-    simsens::RobotParser robotParser = {};
-    robotParser.parse("../../protos/DiyQuad.proto");
+    simsens::Robot robot = {};
+    simsens::RobotParser::parse("../../protos/DiyQuad.proto", robot);
 
-    simsens::Rangefinder * rangefinder = robotParser.rangefinders[0];
+    simsens::Rangefinder * rangefinder = robot.rangefinders[0];
 
     simsens::RangefinderVisualizer rangefinderVisualizer =
         simsens::RangefinderVisualizer(rangefinder);
-
 
     FILE * logfp = fopen(poselogname, "r");
 
