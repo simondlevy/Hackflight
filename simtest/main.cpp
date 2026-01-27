@@ -44,6 +44,38 @@ static FILE * openlog(const char * filename, const char * mode)
     return fp;
 }
 
+static void read_rangefinder(
+        simsens::Rangefinder & rangefinder,
+        simsens::WorldParser & world,
+        const pose_t & pose,
+        int * distances_mm,
+        FILE * logfp)
+{
+    rangefinder.read(
+            simsens::pose_t {
+
+            // Negate for leftward positive
+            pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            world.walls, distances_mm);
+
+    fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+            pose.x,
+            -pose.y, // leftward positive
+            pose.z,
+            pose.phi,
+            pose.theta,
+            -pose.psi); // nose-right positive
+
+    for (int k=0; k<rangefinder.getWidth(); ++k) {
+        fprintf(logfp, ",%d", distances_mm[k]);
+    }
+    fprintf(logfp, "\n");
+
+
+    fflush(logfp);
+}
+
+
 int main(int argc, char ** argv)
 {
     if (argc < 3) {
@@ -79,7 +111,7 @@ int main(int argc, char ** argv)
 
         demands_t setpoint = {};
 
-        RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
+        //RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
 
         const auto pose = simulator.step(mode, setpoint);
 
@@ -90,20 +122,8 @@ int main(int argc, char ** argv)
             break;
         }
 
-        rangefinder.read(
-                simsens::pose_t {
-
-                // Negate for leftward positive
-                pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-                worldParser.walls, rangefinder_distances_mm);
-
-        fprintf(outputfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,"
-                "%d,%d,%d,%d,%d,%d,%d,%d\n",
-                pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi,
-                rangefinder_distances_mm[0], rangefinder_distances_mm[1],
-                rangefinder_distances_mm[2], rangefinder_distances_mm[3],
-                rangefinder_distances_mm[4], rangefinder_distances_mm[5],
-                rangefinder_distances_mm[6], rangefinder_distances_mm[7]);
+        read_rangefinder(rangefinder, worldParser, pose,
+                rangefinder_distances_mm, outputfp);
     }
 
     fclose(outputfp);

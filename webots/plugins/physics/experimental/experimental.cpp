@@ -83,8 +83,6 @@ static void read_rangefinder(
             pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             world.walls, distances_mm);
 
-    const auto width = rangefinder.getWidth();
-
     fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
             pose.x,
             -pose.y, // leftward positive
@@ -93,7 +91,7 @@ static void read_rangefinder(
             pose.theta,
             -pose.psi); // nose-right positive
 
-    for (int k=0; k<width; ++k) {
+    for (int k=0; k<rangefinder.getWidth(); ++k) {
         fprintf(logfp, ",%d", distances_mm[k]);
     }
     fprintf(logfp, "\n");
@@ -118,6 +116,9 @@ static bool run_normal(siminfo_t & siminfo)
 
     // Use setpoints to get new pose
     const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
+
+    printf("x=%+3.3f y=%+3.3f z=%+3.3f, phi=%+3.3f, theta=%+3.3f, psi=%+3.3f\n",
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
 
     // Load world and robot info first time around
     if (!_rangefinder) {
