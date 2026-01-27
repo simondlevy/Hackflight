@@ -106,12 +106,12 @@ int main(int argc, char ** argv)
 
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
 
-        const auto mode = MODE_HOVERING;
-            //t < HOVERTIME*FRAMERATE ? MODE_HOVERING : MODE_AUTONOMOUS;
+        const auto mode = t < HOVERTIME*FRAMERATE ? MODE_HOVERING :
+            MODE_AUTONOMOUS;
 
         demands_t setpoint = {};
 
-        //RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
+        RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
 
         const auto pose = simulator.step(mode, setpoint);
 
