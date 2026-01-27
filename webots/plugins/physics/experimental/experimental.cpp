@@ -61,36 +61,9 @@ static bool collided(const pose_t & pose, simsens::World & world)
 {
     const bool debug = true;
 
-    printf("y=%+3.3f\n", pose.y);
-
-
     return simsens::CollisionDetector::detect(
 
             simsens::vec3_t{pose.x, pose.y, pose.x}, world, debug);
-}
-
-static void read_rangefinder(
-        simsens::Rangefinder & rangefinder,
-        simsens::World & world,
-        const pose_t & pose,
-        int * distances_mm,
-        FILE * logfp)
-{
-    rangefinder.read(
-            simsens::pose_t {
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            world, distances_mm);
-
-    fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-
-    for (int k=0; k<rangefinder.getWidth(); ++k) {
-        fprintf(logfp, ",%d", distances_mm[k]);
-    }
-    fprintf(logfp, "\n");
-
-
-    fflush(logfp);
 }
 
 // Returns false on collision, true otherwise
@@ -116,12 +89,21 @@ static bool run_normal(siminfo_t & siminfo)
         load(siminfo, _world, _robot, &_logfp);
     }
 
-    printf("y=%+3.3f\n", pose.y);
-
     // Get simulated rangefinder distances
-    read_rangefinder(*_rangefinder, _world, pose,
-            _rangefinder_distances_mm, _logfp);
+    _rangefinder->read(
+            simsens::pose_t {
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            _world, _rangefinder_distances_mm);
 
+    // Dump everything to logfile
+    fprintf(_logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+    for (int k=0; k<_rangefinder->getWidth(); ++k) {
+        fprintf(_logfp, ",%d", _rangefinder_distances_mm[k]);
+    }
+    fprintf(_logfp, "\n");
+
+    // Visualize rangefinder distances
     _rangefinderVisualizer->show(_rangefinder_distances_mm,
             RANGEFINDER_DISPLAY_SCALEUP, autonomous);
 
