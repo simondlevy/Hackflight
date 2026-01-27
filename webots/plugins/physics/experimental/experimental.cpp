@@ -117,9 +117,6 @@ static bool run_normal(siminfo_t & siminfo)
     // Use setpoints to get new pose
     const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
 
-    printf("x=%+3.3f y=%+3.3f z=%+3.3f, phi=%+3.3f, theta=%+3.3f, psi=%+3.3f\n",
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-
     // Load world and robot info first time around
     if (!_rangefinder) {
         load(siminfo, _worldParser, &_logfp);
