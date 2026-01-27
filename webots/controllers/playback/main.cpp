@@ -129,9 +129,11 @@ int main(int argc, char ** argv)
             break;
         }
 
+        // Negate y for leftward negative
         const double xyz[3] = {pose.x, -pose.y, pose.z};
         wb_supervisor_field_set_sf_vec3f(translation_field, xyz);
 
+        // Negate psi for nose-left negative
         const double euler[3] = {pose.phi, pose.theta, -pose.psi};
         double rotation[4] = {};
         euler_to_rotation(euler, rotation);

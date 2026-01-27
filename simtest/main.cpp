@@ -59,12 +59,7 @@ static void read_rangefinder(
             world.walls, distances_mm);
 
     fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-            pose.x,
-            pose.y, // leftward positive
-            pose.z,
-            pose.phi,
-            pose.theta,
-            pose.psi); // nose-right positive
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
 
     for (int k=0; k<rangefinder.getWidth(); ++k) {
         fprintf(logfp, ",%d", distances_mm[k]);
