@@ -28,6 +28,7 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
+#include <simsensors/src/world.hpp>
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
@@ -36,19 +37,19 @@ static simsens::Rangefinder * _rangefinder;
 static simsens::RangefinderVisualizer * _rangefinderVisualizer;
 
 static void load(const siminfo_t & siminfo,
-        simsens::WorldParser & worldParser,
+        simsens::World & world,
+        simsens::Robot & robot,
         FILE ** logfpp)
 {
     char path[1000];
 
     sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
-    worldParser.parse(path);
+    simsens::WorldParser::parse(path, world);
 
     sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
-    simsens::RobotParser robotParser = {};
-    robotParser.parse(path);
+    simsens::RobotParser::parse(path, robot);
 
-    _rangefinder = new simsens::Rangefinder(*robotParser.rangefinders[0]);
+    _rangefinder = new simsens::Rangefinder(*robot.rangefinders[0]);
 
     _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
 
@@ -56,9 +57,7 @@ static void load(const siminfo_t & siminfo,
     *logfpp = fopen(path, "w");
 }
 
-static bool collided(
-        const pose_t & pose,
-        const simsens::WorldParser & worldParser)
+static bool collided(const pose_t & pose, const simsens::World & world)
 {
     const bool debug = true;
 
@@ -69,12 +68,12 @@ static bool collided(
 
             // Negate Y for leftward positive
             simsens::vec3_t{pose.x, -pose.y, pose.x},
-            worldParser.walls, debug);
+            world.walls, debug);
 }
 
 static void read_rangefinder(
         simsens::Rangefinder & rangefinder,
-        simsens::WorldParser & world,
+        simsens::World & world,
         const pose_t & pose,
         int * distances_mm,
         FILE * logfp)
@@ -101,7 +100,8 @@ static void read_rangefinder(
 // Returns false on collision, true otherwise
 static bool run_normal(siminfo_t & siminfo)
 {
-    static simsens::WorldParser _worldParser;
+    static simsens::World _world;
+    static simsens::Robot _robot;
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
 
@@ -117,18 +117,20 @@ static bool run_normal(siminfo_t & siminfo)
 
     // Load world and robot info first time around
     if (!_rangefinder) {
-        load(siminfo, _worldParser, &_logfp);
+        load(siminfo, _world, _robot, &_logfp);
     }
 
+    printf("y=%+3.3f\n", pose.y);
+
     // Get simulated rangefinder distances
-    read_rangefinder(*_rangefinder, _worldParser, pose,
+    read_rangefinder(*_rangefinder, _world, pose,
             _rangefinder_distances_mm, _logfp);
 
     _rangefinderVisualizer->show(_rangefinder_distances_mm,
             RANGEFINDER_DISPLAY_SCALEUP, autonomous);
 
     // Stop if we detected a collision
-    if (collided(pose, _worldParser)) {
+    if (collided(pose, _world)) {
         return false;
     }
 
