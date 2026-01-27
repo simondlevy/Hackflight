@@ -33,42 +33,6 @@ static const float MAXTIME = 10;
 static const float HOVERTIME = 2;
 static const float FRAMERATE = 32;
 
-static FILE * openlog(const char * filename, const char * mode)
-{
-    FILE * fp = fopen(filename, mode);
-    if (!fp) {
-        fprintf(stderr, "Unable to open file %s for %s\n", filename,
-                *mode == 'w' ? "reading" : "writing");
-        exit(1);
-    }
-    return fp;
-}
-
-static void read_rangefinder(
-        simsens::Rangefinder & rangefinder,
-        simsens::World & world,
-        const pose_t & pose,
-        int * distances_mm,
-        FILE * logfp)
-{
-    rangefinder.read(
-            simsens::pose_t {
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            world, distances_mm);
-
-    fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-
-    for (int k=0; k<rangefinder.getWidth(); ++k) {
-        fprintf(logfp, ",%d", distances_mm[k]);
-    }
-    fprintf(logfp, "\n");
-
-
-    fflush(logfp);
-}
-
-
 int main(int argc, char ** argv)
 {
     if (argc < 3) {
@@ -93,8 +57,13 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
-    auto outputfp = openlog("poselog.csv", "w");
-
+    const char * LOGNAME = "poselog.csv";
+    auto  * outfp = fopen(LOGNAME, "w");
+    if (!outfp) {
+        fprintf(stderr, "Unable to open file %s for wirting\n", LOGNAME);
+        exit(1);
+    }
+ 
     int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
@@ -114,11 +83,23 @@ int main(int argc, char ** argv)
             break;
         }
 
-        read_rangefinder(rangefinder, world, pose,
-                rangefinder_distances_mm, outputfp);
+        // Get simulated rangefinder distances
+        rangefinder.read(
+                simsens::pose_t {
+                pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                world, rangefinder_distances_mm);
+
+        // Dump everything to logfile
+        fprintf(outfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+        for (int k=0; k<rangefinder.getWidth(); ++k) {
+            fprintf(outfp, ",%d", rangefinder_distances_mm[k]);
+        }
+        fprintf(outfp, "\n");
+
     }
 
-    fclose(outputfp);
+    fclose(outfp);
 
     return 0;
 }
