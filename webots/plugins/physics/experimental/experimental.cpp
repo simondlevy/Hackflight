@@ -67,8 +67,7 @@ static bool collided(const pose_t & pose, const simsens::World & world)
     return simsens::CollisionDetector::detect(
 
             // Negate Y for leftward positive
-            simsens::vec3_t{pose.x, -pose.y, pose.x},
-            world.walls, debug);
+            simsens::vec3_t{pose.x, -pose.y, pose.x}, world, debug);
 }
 
 static void read_rangefinder(
