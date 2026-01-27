@@ -60,11 +60,11 @@ static void read_rangefinder(
 
     fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
             pose.x,
-            -pose.y, // leftward positive
+            pose.y, // leftward positive
             pose.z,
             pose.phi,
             pose.theta,
-            -pose.psi); // nose-right positive
+            pose.psi); // nose-right positive
 
     for (int k=0; k<rangefinder.getWidth(); ++k) {
         fprintf(logfp, ",%d", distances_mm[k]);

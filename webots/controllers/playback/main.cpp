@@ -129,10 +129,10 @@ int main(int argc, char ** argv)
             break;
         }
 
-        const double xyz[3] = {pose.x, pose.y, pose.z};
+        const double xyz[3] = {pose.x, -pose.y, pose.z};
         wb_supervisor_field_set_sf_vec3f(translation_field, xyz);
 
-        const double euler[3] = {pose.phi, pose.theta, pose.psi};
+        const double euler[3] = {pose.phi, pose.theta, -pose.psi};
         double rotation[4] = {};
         euler_to_rotation(euler, rotation);
         wb_supervisor_field_set_sf_rotation(rotation_field, rotation);
