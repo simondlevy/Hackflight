@@ -83,7 +83,7 @@ static void read_rangefinder(
 
             // Negate for leftward positive
             pose.x, -pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            world.walls, distances_mm);
+            world, distances_mm);
 
     fprintf(logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
             pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
