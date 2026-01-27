@@ -62,9 +62,12 @@ static bool collided(
 {
     const bool debug = true;
 
+    printf("y=%+3.3f\n", pose.y);
+
+
     return simsens::CollisionDetector::detect(
 
-            // Negate Y for leftware positive
+            // Negate Y for leftward positive
             simsens::vec3_t{pose.x, -pose.y, pose.x},
             worldParser.walls, debug);
 }
