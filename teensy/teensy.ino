@@ -96,7 +96,7 @@ static OneShot125 _motors = OneShot125(MOTOR_PINS);
 static float _channels[6];
 
 // State estimation
-static MadgwickFilter  _madgwick;
+static hf::MadgwickFilter  _madgwick;
 
 static void runLoopDelay(const uint32_t usec_curr)
 {
@@ -171,7 +171,7 @@ static void runMotors(const float * motors, const bool mode)
     auto m4_usec = scaleMotor(motors[3]);
 
     // Shut motors down when not armed
-    if (mode != MODE_ARMED) {
+    if (mode != hf::MODE_ARMED) {
 
         m1_usec = 120;
         m2_usec = 120;
@@ -200,12 +200,12 @@ float getDt()
 }
 
 
-static void getDemands(demands_t & demands, mode_t & mode)
+static void getDemands(hf::demands_t & demands, hf::mode_e & mode)
 {
     // Read channels values from receiver
     if (_dsm2048.timedOut(micros())) {
 
-        mode = MODE_PANIC;
+        mode = hf::MODE_PANIC;
     }
     else if (_dsm2048.gotNewFrame()) {
 
@@ -216,11 +216,11 @@ static void getDemands(demands_t & demands, mode_t & mode)
     const auto is_arming_switch_on = _channels[4] > ARMING_SWITCH_MIN;
 
     if (_channels[0] < THROTTLE_ARMING_MAX && is_arming_switch_on) {
-        mode = mode == MODE_IDLE ? MODE_ARMED : mode;
+        mode = mode == hf::MODE_IDLE ? hf::MODE_ARMED : mode;
     }
 
     if (!is_arming_switch_on) {
-        mode = mode == MODE_ARMED ? MODE_IDLE : mode;
+        mode = mode == hf::MODE_ARMED ? hf::MODE_IDLE : mode;
     }
 
     // Convert stick demands to appropriate intervals
@@ -230,21 +230,21 @@ static void getDemands(demands_t & demands, mode_t & mode)
     demands.yaw   = _channels[3] * YAW_PRESCALE;
 }
 
-static void getVehicleState(const float dt, vehicleState_t & state)
+static void getVehicleState(const float dt, hf::vehicleState_t & state)
 {
     // Read IMU
     int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
     _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
     // Accelerometer Gs
-    const axis3_t accel = {
+    const hf::axis3_t accel = {
         -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
         ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
         az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
     };
 
     // Gyro deg /sec
-    const axis3_t gyro = {
+    const hf::axis3_t gyro = {
         gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X, 
         -gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y,
         -gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z
@@ -288,19 +288,19 @@ void setup()
 
 void loop() 
 {
-    static mode_t _mode;
+    static hf::mode_e _mode;
 
     const float dt = getDt();
 
-    demands_t demands = {};
+    hf::demands_t demands = {};
     getDemands(demands, _mode);
 
-    digitalWrite(LED_PIN, _mode == MODE_ARMED ? HIGH : LOW);
+    digitalWrite(LED_PIN, _mode == hf::MODE_ARMED ? HIGH : LOW);
 
-    vehicleState_t state = {};
+    hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    PidControl::runStabilizerPids(dt, YAW_DEMAND_INC, state, demands, demands);
+    hf::PidControl::runStabilizerPids(dt, YAW_DEMAND_INC, state, demands, demands);
 
     // Support same rate controllers as Crazyflie
     demands.roll /= 500000;
@@ -309,7 +309,7 @@ void loop()
 
     float motors[4] = {};
 
-    Mixer::mix(demands, motors);
+    hf::Mixer::mix(demands, motors);
 
     runMotors(motors, _mode);
 }
