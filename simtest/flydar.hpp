@@ -48,6 +48,26 @@ class SimTest {
             return true;
         }
 
+        static bool cleared_room(
+                const int frame, 
+                const int * rangefinder_distances_mm, 
+                const int rangefinder_size)
+        {
+            static int _cleared_at_frame;
+
+            if (_cleared_at_frame == 0 &&
+                    clear(rangefinder_distances_mm, rangefinder_size)) {
+                _cleared_at_frame = frame;
+            }
+
+            if (_cleared_at_frame > 0 &&
+                    (frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+                return true;
+            }
+
+            return false;
+        }
+
     public:
 
         static bool run(
@@ -74,8 +94,6 @@ class SimTest {
 
             int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
-            uint32_t cleared_at_frame = 0;
-
             for (uint32_t frame=0; frame<MAX_TIME_SEC*FRAME_RATE_HZ; ++frame) {
 
                 const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ? MODE_HOVERING :
@@ -91,13 +109,7 @@ class SimTest {
                     return false;
                 }
 
-                if (cleared_at_frame == 0 &&
-                        clear(rangefinder_distances_mm, rangefinder.getWidth())) {
-                    cleared_at_frame = frame;
-                }
-
-                if (cleared_at_frame > 0 &&
-                    (frame - cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+                if (cleared_room(frame, rangefinder_distances_mm, rangefinder.getWidth())) {
                     return true;
                 }
 
@@ -106,7 +118,7 @@ class SimTest {
                         {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
                         world, rangefinder_distances_mm);
 
-                // Dump everything to logfile
+                // Dump everything to logfile if indicated
                 if (logfile) {
                     fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
                             pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
