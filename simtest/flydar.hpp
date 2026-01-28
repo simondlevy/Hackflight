@@ -30,6 +30,12 @@
 
 class SimTest {
 
+    private:
+
+        static constexpr float MAX_TIME_SEC = 10;
+        static constexpr float TAKEOFF_TIME_SEC = 2;
+        static constexpr float FRAMERATE_HZ = 32;
+
     public:
 
         static void run(
@@ -53,13 +59,13 @@ class SimTest {
 
             simulator.init(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-                    FRAMERATE);
+                    FRAMERATE_HZ);
 
             int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
-            for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
+            for (uint32_t t=0; t<MAX_TIME_SEC*FRAMERATE_HZ; ++t) {
 
-                const auto mode = t < HOVERTIME*FRAMERATE ? MODE_HOVERING :
+                const auto mode = t < TAKEOFF_TIME_SEC*FRAMERATE_HZ ? MODE_HOVERING :
                     MODE_AUTONOMOUS;
 
                 demands_t setpoint = {};
@@ -90,11 +96,4 @@ class SimTest {
             }
         }
 
-
-
-    private:
-
-        static constexpr float MAXTIME = 10;
-        static constexpr float HOVERTIME = 2;
-        static constexpr float FRAMERATE = 32;
 };
