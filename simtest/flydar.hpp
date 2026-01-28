@@ -34,16 +34,27 @@ class SimTest {
 
         static constexpr float MAX_TIME_SEC = 10;
         static constexpr float TAKEOFF_TIME_SEC = 2;
-        static constexpr float FRAMERATE_HZ = 32;
+        static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
+        static constexpr float FRAME_RATE_HZ = 32;
+
+        static bool clear(const int * rangefinder_distances, const int size)
+        {
+            for (int i=0; i<size; ++i) {
+                if (rangefinder_distances[i] != -1) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
     public:
 
-        static void run(
+        static bool run(
                 const char * robot_path,
                 const char * world_path,
                 FILE * logfile=nullptr)
         {
-
             simsens::Robot robot = {};
             simsens::RobotParser::parse(robot_path, robot);
 
@@ -59,13 +70,15 @@ class SimTest {
 
             simulator.init(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-                    FRAMERATE_HZ);
+                    FRAME_RATE_HZ);
 
             int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
-            for (uint32_t t=0; t<MAX_TIME_SEC*FRAMERATE_HZ; ++t) {
+            uint32_t cleared_at_frame = 0;
 
-                const auto mode = t < TAKEOFF_TIME_SEC*FRAMERATE_HZ ? MODE_HOVERING :
+            for (uint32_t frame=0; frame<MAX_TIME_SEC*FRAME_RATE_HZ; ++frame) {
+
+                const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ? MODE_HOVERING :
                     MODE_AUTONOMOUS;
 
                 demands_t setpoint = {};
@@ -75,8 +88,17 @@ class SimTest {
                 const auto pose = simulator.step(mode, setpoint);
 
                 if (world.collided({pose.x, pose.y, pose.x})) {
-                    printf("collision!\n");
-                    break;
+                    return false;
+                }
+
+                if (cleared_at_frame == 0 &&
+                        clear(rangefinder_distances_mm, rangefinder.getWidth())) {
+                    cleared_at_frame = frame;
+                }
+
+                if (cleared_at_frame > 0 &&
+                    (frame - cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+                    return true;
                 }
 
                 // Get simulated rangefinder distances
@@ -94,6 +116,8 @@ class SimTest {
                     fprintf(logfile, "\n");
                 }
             }
+
+            return false; // timed out
         }
 
 };
