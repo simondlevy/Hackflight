@@ -28,6 +28,78 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
+class SimTest {
+
+    public:
+
+
+        static void run(
+                const char * robotname,
+                const char * worldname,
+                FILE * logfile=nullptr)
+        {
+
+            simsens::Robot robot = {};
+            simsens::RobotParser::parse(robotname, robot);
+
+            simsens::World world = {};
+            simsens::WorldParser::parse(worldname, world, "DiyQuad {");
+
+            simsens::Rangefinder rangefinder =
+                simsens::Rangefinder(*robot.rangefinders[0]);
+
+            const auto pose = world.getRobotPose();
+
+            Simulator simulator = {};
+
+            simulator.init(
+                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
+                    FRAMERATE);
+
+            int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+
+            for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
+
+                const auto mode = t < HOVERTIME*FRAMERATE ? MODE_HOVERING :
+                    MODE_AUTONOMOUS;
+
+                demands_t setpoint = {};
+
+                RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
+
+                const auto pose = simulator.step(mode, setpoint);
+
+                if (world.collided({pose.x, pose.y, pose.x})) {
+                    printf("collision!\n");
+                    break;
+                }
+
+                // Get simulated rangefinder distances
+                rangefinder.read(
+                        {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                        world, rangefinder_distances_mm);
+
+                // Dump everything to logfile
+                if (logfile) {
+                    fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+                    for (int k=0; k<rangefinder.getWidth(); ++k) {
+                        fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
+                    }
+                    fprintf(logfile, "\n");
+                }
+            }
+        }
+
+
+
+    private:
+
+        static constexpr float MAXTIME = 10;
+        static constexpr float HOVERTIME = 2;
+        static constexpr float FRAMERATE = 32;
+};
+
 static const float MAXTIME = 10;
 static const float HOVERTIME = 2;
 static const float FRAMERATE = 32;
@@ -39,6 +111,16 @@ int main(int argc, char ** argv)
         return 1;
     }
 
+    const char * LOGNAME = "poselog.csv";
+    auto  * logfile = fopen(LOGNAME, "w");
+    if (!logfile) {
+        fprintf(stderr, "Unable to open file %s for wirting\n", LOGNAME);
+        exit(1);
+    }
+
+    SimTest::run(argv[1], argv[2], logfile);
+
+    /*
     simsens::Robot robot = {};
     simsens::RobotParser::parse(argv[1], robot);
 
@@ -56,13 +138,6 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAMERATE);
 
-    const char * LOGNAME = "poselog.csv";
-    auto  * outfp = fopen(LOGNAME, "w");
-    if (!outfp) {
-        fprintf(stderr, "Unable to open file %s for wirting\n", LOGNAME);
-        exit(1);
-    }
- 
     int rangefinder_distances_mm[1000] = {}; // arbitrary max size
 
     for (uint32_t t=0; t<MAXTIME*FRAMERATE; ++t) {
@@ -87,16 +162,17 @@ int main(int argc, char ** argv)
                 world, rangefinder_distances_mm);
 
         // Dump everything to logfile
-        fprintf(outfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+        fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
                 pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
         for (int k=0; k<rangefinder.getWidth(); ++k) {
-            fprintf(outfp, ",%d", rangefinder_distances_mm[k]);
+            fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
         }
-        fprintf(outfp, "\n");
+        fprintf(logfile, "\n");
 
     }
+    */
 
-    fclose(outfp);
+    fclose(logfile);
 
     return 0;
 }
