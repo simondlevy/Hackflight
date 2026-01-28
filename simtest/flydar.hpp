@@ -42,7 +42,7 @@ class SimTest {
             simsens::RobotParser::parse(robot_path, robot);
 
             simsens::World world = {};
-            simsens::WorldParser::parse(world_path, world, "DiyQuad {");
+            simsens::WorldParser::parse(world_path, world, robot_path);
 
             simsens::Rangefinder rangefinder =
                 simsens::Rangefinder(*robot.rangefinders[0]);
