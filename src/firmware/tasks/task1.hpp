@@ -27,315 +27,319 @@
 #include <pidcontrol.hpp>
 #include <vehicles/diyquad.hpp>
 
-class Task1 {
+namespace hf {
 
-    public:
+    class Task1 {
 
-        void begin(EKF * ekf)
-        {
-            _ekf = ekf;
+        public:
 
-            _imu.init();
+            void begin(EKF * ekf)
+            {
+                _ekf = ekf;
 
-            _task.init(runTask1, "task1", this, 5);
-        }
+                _imu.init();
 
-    private:
+                _task.init(runTask1, "task1", this, 5);
+            }
 
-        static bool rateDoExecute(const uint32_t rate, const uint32_t tick)
-        {
-            return (tick % (FREQ_MAIN_LOOP / rate)) == 0;
-        }
+        private:
 
-        static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
-        static constexpr float MAX_SAFE_ANGLE = 30;
-        static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
+            static bool rateDoExecute(const uint32_t rate, const uint32_t tick)
+            {
+                return (tick % (FREQ_MAIN_LOOP / rate)) == 0;
+            }
 
-        static const uint32_t FREQ_MAIN_LOOP = 1000;
-        static const uint32_t FREQ_PID_UPDATE = 500;
-        static const uint32_t FREQ_EKF_PREDICTION = 100;
-        static const uint32_t FREQ_FLYING_MODE_CHECK = 25;
+            static const uint32_t SETPOINT_TIMEOUT_TICKS = 1000;
+            static constexpr float MAX_SAFE_ANGLE = 30;
+            static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
 
-        static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
+            static const uint32_t FREQ_MAIN_LOOP = 1000;
+            static const uint32_t FREQ_PID_UPDATE = 500;
+            static const uint32_t FREQ_EKF_PREDICTION = 100;
+            static const uint32_t FREQ_FLYING_MODE_CHECK = 25;
+
+            static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
 
 
-        static constexpr float MAX_VELOCITY = 10; //meters per second
+            static constexpr float MAX_VELOCITY = 10; //meters per second
 
-        static void runTask1(void *arg)
-        {
-            ((Task1 *)arg)->run();
-        }
+            static void runTask1(void *arg)
+            {
+                ((Task1 *)arg)->run();
+            }
 
-        IMU _imu;
+            IMU _imu;
 
-        vehicleState_t _vehicleState;
-        Led _led;
-        PidControl _pidControl;
+            vehicleState_t _vehicleState;
+            Led _led;
+            PidControl _pidControl;
 
-        FreeRtosTask _task;
+            FreeRtosTask _task;
 
-        EKF * _ekf;
+            EKF * _ekf;
 
-        void run()
-        {
-            mode_e mode = MODE_IDLE;
+            void run()
+            {
+                mode_e mode = MODE_IDLE;
 
-            // Start with motor speeds at idle
-            float motorvals[MAX_MOTOR_COUNT] = {};
+                // Start with motor speeds at idle
+                float motorvals[MAX_MOTOR_COUNT] = {};
 
-            // Start with no axis demands
-            demands_t demands = {};
+                // Start with no axis demands
+                demands_t demands = {};
 
-            // Run device-dependent motor initialization
-            motors_init();
+                // Run device-dependent motor initialization
+                motors_init();
 
-            _led.init();
+                _led.init();
 
-            RC::setpoint_t setpoint = {};
+                RC::setpoint_t setpoint = {};
 
-            const uint32_t msec_start = millis();
+                const uint32_t msec_start = millis();
 
-            bool isFlying = false;
+                bool isFlying = false;
 
-            bool didResetEstimation = false;
+                bool didResetEstimation = false;
 
-            for (uint32_t step=1; ; step++) {
+                for (uint32_t step=1; ; step++) {
 
-                // Yield
-                vTaskDelay(1000/FREQ_MAIN_LOOP);
+                    // Yield
+                    vTaskDelay(1000/FREQ_MAIN_LOOP);
 
-                const uint32_t msec = millis() - msec_start;
+                    const uint32_t msec = millis() - msec_start;
 
-                // Sync the core loop to the IMU
-                const bool imuIsCalibrated = _imu.step(_ekf, msec);
+                    // Sync the core loop to the IMU
+                    const bool imuIsCalibrated = _imu.step(_ekf, msec);
 
-                // Get setpoint from remote control
-                RC::getSetpoint(xTaskGetTickCount(), setpoint);
+                    // Get setpoint from remote control
+                    RC::getSetpoint(xTaskGetTickCount(), setpoint);
 
-                // Periodically update estimator with flying mode
-                if (rateDoExecute(FREQ_FLYING_MODE_CHECK, step)) {
-                    isFlying = isFlyingCheck(msec, motorvals);
+                    // Periodically update estimator with flying mode
+                    if (rateDoExecute(FREQ_FLYING_MODE_CHECK, step)) {
+                        isFlying = isFlyingCheck(msec, motorvals);
+                    }
+
+                    // Run ekf to get vehicle state
+                    getStateEstimate(isFlying, _vehicleState, didResetEstimation);
+
+                    // Check for lost contact
+                    if (setpoint.timestamp > 0 &&
+                            xTaskGetTickCount() - setpoint.timestamp >
+                            SETPOINT_TIMEOUT_TICKS) {
+                        mode = MODE_PANIC;
+                    }
+
+                    // Check for flipped over
+                    if (isFlippedAngle(_vehicleState.theta) ||
+                            isFlippedAngle(_vehicleState.phi)) {
+                        mode = MODE_PANIC;
+                    }
+
+                    _led.run(millis(), imuIsCalibrated, mode);
+
+                    Logger::run(millis(), _vehicleState);
+
+                    switch (mode) {
+
+                        case MODE_IDLE:
+                            if (setpoint.armed && isSafeAngle(_vehicleState.phi)
+                                    && isSafeAngle(_vehicleState.theta)) {
+                                mode = MODE_ARMED;
+                            }
+                            runMotors(motorvals);
+                            break;
+
+                        case MODE_ARMED:
+                            checkDisarm(setpoint, mode, motorvals);
+                            if (setpoint.hovering) {
+                                mode = MODE_HOVERING;
+                            }
+                            runMotors(motorvals);
+                            break;
+
+                        case MODE_HOVERING:
+                            runPidAndMixer(step, setpoint,
+                                    demands, motorvals);
+                            checkDisarm(setpoint, mode, motorvals);
+                            if (!setpoint.hovering) {
+                                mode = MODE_LANDING;
+                            }
+                            break;
+
+                        case MODE_LANDING:
+                            runPidAndMixer(step, setpoint,
+                                    demands, motorvals);
+                            checkDisarm(setpoint, mode, motorvals);
+                            break;
+
+                        case MODE_PANIC:
+                            // No way to recover from this
+                            stopMotors();
+                            break;
+                    }
+                }
+            }
+
+            static bool isFlippedAngle(float angle)
+            {
+                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
+            }
+
+            void getStateEstimate(
+                    const bool isFlying,
+                    vehicleState_t & state,
+                    bool & didResetEstimation)
+            {
+                static Timer _timer;
+
+                const uint32_t nowMs = millis();
+
+                if (didResetEstimation) {
+                    _ekf->init(nowMs);
+                    didResetEstimation = false;
                 }
 
-                // Run ekf to get vehicle state
-                getStateEstimate(isFlying, _vehicleState, didResetEstimation);
-
-                // Check for lost contact
-                if (setpoint.timestamp > 0 &&
-                        xTaskGetTickCount() - setpoint.timestamp >
-                        SETPOINT_TIMEOUT_TICKS) {
-                    mode = MODE_PANIC;
+                // Run the system dynamics to predict the state forward.
+                if (_timer.ready(FREQ_EKF_PREDICTION)) {
+                    _ekf->predict(nowMs, isFlying); 
                 }
 
-                // Check for flipped over
-                if (isFlippedAngle(_vehicleState.theta) ||
-                        isFlippedAngle(_vehicleState.phi)) {
-                    mode = MODE_PANIC;
+                // Get state estimate from EKF
+                _ekf->getStateEstimate(nowMs, state);
+
+                if (!velInBounds(state.dx) || !velInBounds(state.dy) ||
+                        !velInBounds(state.dz)) {
+                    didResetEstimation = true;
                 }
 
-                _led.run(millis(), imuIsCalibrated, mode);
+                // Get angular velocities directly from gyro
+                axis3_t gyroData = {};
+                _imu.getGyroData(gyroData);
+                state.dphi   = gyroData.x;
+                state.dtheta = gyroData.y;
+                state.dpsi   = -gyroData.z; // negate for nose-right positive
+            }
 
-                Logger::run(millis(), _vehicleState);
+            static bool velInBounds(const float vel)
+            {
+                return fabs(vel) < MAX_VELOCITY;
+            }
 
-                switch (mode) {
+            //
+            // We say we are flying if one or more motors are running over the idle
+            // thrust.
+            //
+            bool isFlyingCheck(const uint32_t step, const float * motorvals)
+            {
+                auto isThrustOverIdle = false;
 
-                    case MODE_IDLE:
-                        if (setpoint.armed && isSafeAngle(_vehicleState.phi)
-                                && isSafeAngle(_vehicleState.theta)) {
-                            mode = MODE_ARMED;
-                        }
-                        runMotors(motorvals);
+                for (int i = 0; i < Mixer::rotorCount; ++i) {
+                    if (motorvals[i] > 0) {
+                        isThrustOverIdle = true;
                         break;
-
-                    case MODE_ARMED:
-                        checkDisarm(setpoint, mode, motorvals);
-                        if (setpoint.hovering) {
-                            mode = MODE_HOVERING;
-                        }
-                        runMotors(motorvals);
-                        break;
-
-                    case MODE_HOVERING:
-                        runPidAndMixer(step, setpoint,
-                                demands, motorvals);
-                        checkDisarm(setpoint, mode, motorvals);
-                        if (!setpoint.hovering) {
-                            mode = MODE_LANDING;
-                        }
-                        break;
-
-                    case MODE_LANDING:
-                        runPidAndMixer(step, setpoint,
-                                demands, motorvals);
-                        checkDisarm(setpoint, mode, motorvals);
-                        break;
-
-                    case MODE_PANIC:
-                        // No way to recover from this
-                        stopMotors();
-                        break;
+                    }
                 }
-            }
-        }
 
-        static bool isFlippedAngle(float angle)
-        {
-            return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
-        }
+                static uint32_t latestThrustTick;
 
-        void getStateEstimate(
-                const bool isFlying,
-                vehicleState_t & state,
-                bool & didResetEstimation)
-        {
-            static Timer _timer;
+                if (isThrustOverIdle) {
+                    latestThrustTick = step;
+                }
 
-            const uint32_t nowMs = millis();
+                bool result = false;
+                if (0 != latestThrustTick) {
+                    if ((step - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
+                        result = true;
+                    }
+                }
 
-            if (didResetEstimation) {
-                _ekf->init(nowMs);
-                didResetEstimation = false;
-            }
+                return result;
+            }        
 
-            // Run the system dynamics to predict the state forward.
-            if (_timer.ready(FREQ_EKF_PREDICTION)) {
-                _ekf->predict(nowMs, isFlying); 
-            }
 
-            // Get state estimate from EKF
-            _ekf->getStateEstimate(nowMs, state);
+            void runPidAndMixer(
+                    const uint32_t step, const RC::setpoint_t &setpoint,
+                    demands_t & demands, float *motorvals)
+            {
+                if (rateDoExecute(FREQ_PID_UPDATE, step)) {
 
-            if (!velInBounds(state.dx) || !velInBounds(state.dy) ||
-                    !velInBounds(state.dz)) {
-                didResetEstimation = true;
-            }
+                    _pidControl.run(
+                            1.f / FREQ_PID_UPDATE,
+                            setpoint.hovering,
+                            _vehicleState,
+                            setpoint.demands,
+                            demands);
 
-            // Get angular velocities directly from gyro
-            axis3_t gyroData = {};
-            _imu.getGyroData(gyroData);
-            state.dphi   = gyroData.x;
-            state.dtheta = gyroData.y;
-            state.dpsi   = -gyroData.z; // negate for nose-right positive
-        }
+                    runMixer(demands, motorvals);
 
-        static bool velInBounds(const float vel)
-        {
-            return fabs(vel) < MAX_VELOCITY;
-        }
-
-        //
-        // We say we are flying if one or more motors are running over the idle
-        // thrust.
-        //
-        bool isFlyingCheck(const uint32_t step, const float * motorvals)
-        {
-            auto isThrustOverIdle = false;
-
-            for (int i = 0; i < Mixer::rotorCount; ++i) {
-                if (motorvals[i] > 0) {
-                    isThrustOverIdle = true;
-                    break;
+                    runMotors(motorvals);
                 }
             }
 
-            static uint32_t latestThrustTick;
-
-            if (isThrustOverIdle) {
-                latestThrustTick = step;
+            void runMotors(float * motorvals)
+            {
+                for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
+                    motors_setSpeed(k, motorvals[k]);
+                }
+                motors_run();
             }
 
-            bool result = false;
-            if (0 != latestThrustTick) {
-                if ((step - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
-                    result = true;
+            void stopMotors()
+            {
+                for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
+                    motors_setSpeed(k, 0);
+                }
+                motors_run();
+            }
+
+            void runMixer(const demands_t & demands, float * motorvals)
+            {
+                float uncapped[MAX_MOTOR_COUNT] = {};
+                Mixer::mix(demands, uncapped);
+
+                float highestThrustFound = 0;
+                for (uint8_t k=0; k<Mixer::rotorCount; k++) {
+
+                    const auto thrust = uncapped[k];
+
+                    if (thrust > highestThrustFound) {
+                        highestThrustFound = thrust;
+                    }
+                }
+
+                float reduction = 0;
+                if (highestThrustFound > THRUST_MAX) {
+                    reduction = highestThrustFound - THRUST_MAX;
+                }
+
+                for (uint8_t k = 0; k < Mixer::rotorCount; k++) {
+                    float thrustCappedUpper = uncapped[k] - reduction;
+                    motorvals[k] =
+                        thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
                 }
             }
 
-            return result;
-        }        
-
-
-        void runPidAndMixer(
-                const uint32_t step, const RC::setpoint_t &setpoint,
-                demands_t & demands, float *motorvals)
-        {
-            if (rateDoExecute(FREQ_PID_UPDATE, step)) {
-
-                _pidControl.run(
-                        1.f / FREQ_PID_UPDATE,
-                        setpoint.hovering,
-                        _vehicleState,
-                        setpoint.demands,
-                        demands);
-
-                runMixer(demands, motorvals);
-
-                runMotors(motorvals);
-            }
-        }
-
-        void runMotors(float * motorvals)
-        {
-            for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
-                motors_setSpeed(k, motorvals[k]);
-            }
-            motors_run();
-        }
-
-        void stopMotors()
-        {
-            for (uint8_t k=0; k<Mixer::rotorCount; ++k) {
-                motors_setSpeed(k, 0);
-            }
-            motors_run();
-        }
-
-        void runMixer(const demands_t & demands, float * motorvals)
-        {
-            float uncapped[MAX_MOTOR_COUNT] = {};
-            Mixer::mix(demands, uncapped);
-
-            float highestThrustFound = 0;
-            for (uint8_t k=0; k<Mixer::rotorCount; k++) {
-
-                const auto thrust = uncapped[k];
-
-                if (thrust > highestThrustFound) {
-                    highestThrustFound = thrust;
+            void checkDisarm(const RC::setpoint_t setpoint, mode_e &mode,
+                    float * motorvals)
+            {
+                if (!setpoint.armed) {
+                    mode = MODE_IDLE;
+                    memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
                 }
             }
 
-            float reduction = 0;
-            if (highestThrustFound > THRUST_MAX) {
-                reduction = highestThrustFound - THRUST_MAX;
+            static bool isSafeAngle(float angle)
+            {
+                return fabs(angle) < MAX_SAFE_ANGLE;
             }
 
-            for (uint8_t k = 0; k < Mixer::rotorCount; k++) {
-                float thrustCappedUpper = uncapped[k] - reduction;
-                motorvals[k] =
-                    thrustCappedUpper < 0 ? 0 : thrustCappedUpper / 65536;
-            }
-        }
+            // Device-dependent ---------------------------
 
-        void checkDisarm(const RC::setpoint_t setpoint, mode_e &mode,
-                float * motorvals)
-        {
-            if (!setpoint.armed) {
-                mode = MODE_IDLE;
-                memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
-            }
-        }
+            void motors_init();
 
-        static bool isSafeAngle(float angle)
-        {
-            return fabs(angle) < MAX_SAFE_ANGLE;
-        }
+            void motors_setSpeed(uint32_t id, float speed);
 
-        // Device-dependent ---------------------------
+            void motors_run();
+    };
 
-        void motors_init();
-
-        void motors_setSpeed(uint32_t id, float speed);
-
-        void motors_run();
-};
+}

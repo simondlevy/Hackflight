@@ -99,17 +99,17 @@ static joystickStatus_e getJoystickStatus(void)
     return mode;
 }
 
-static mode_e switchMode(const toggle_e toggle, const mode_e mode)
+static hf::mode_e switchMode(const toggle_e toggle, const hf::mode_e mode)
 {
     return
-        mode == MODE_IDLE && toggle == TOGGLE_HOVER ? MODE_HOVERING :
-        mode == MODE_HOVERING && toggle == TOGGLE_HOVER ? MODE_LANDING :
-        mode == MODE_HOVERING && toggle == TOGGLE_AUTO ? MODE_AUTONOMOUS :
-        mode == MODE_AUTONOMOUS && toggle == TOGGLE_AUTO ? MODE_HOVERING :
+        mode == hf::MODE_IDLE && toggle == TOGGLE_HOVER ? hf::MODE_HOVERING :
+        mode == hf::MODE_HOVERING && toggle == TOGGLE_HOVER ? hf::MODE_LANDING :
+        mode == hf::MODE_HOVERING && toggle == TOGGLE_AUTO ? hf::MODE_AUTONOMOUS :
+        mode == hf::MODE_AUTONOMOUS && toggle == TOGGLE_AUTO ? hf::MODE_HOVERING :
         mode;
 }
 
-static demands_t getSetpointFromKey(const int key)
+static hf::demands_t getSetpointFromKey(const int key)
 {
     const float thrust = key == 'W' ? +1 : key == 'S' ? -1 : 0;
 
@@ -125,7 +125,7 @@ static demands_t getSetpointFromKey(const int key)
 
     const float yaw = key == 'E' ? +0.5 : key == 'Q' ? -0.5 : 0;
 
-    return demands_t {thrust, roll, pitch, yaw};
+    return hf::demands_t {thrust, roll, pitch, yaw};
 }
 
 static void checkKeyboardToggle(
@@ -133,7 +133,7 @@ static void checkKeyboardToggle(
         const int target,
         const toggle_e toggle,
         bool & key_was_down,
-        mode_e & mode)
+        hf::mode_e & mode)
 {
     if (key == target && !key_was_down) {
         key_was_down = true;
@@ -170,7 +170,7 @@ static void reportJoystick(void)
     }
 }
 
-static void getSimInfoFromKeyboard(siminfo_t & siminfo, mode_e & mode)
+static void getSimInfoFromKeyboard(hf::siminfo_t & siminfo, hf::mode_e & mode)
 {
     static bool _enter_was_down;
     static bool _spacebar_was_down;
@@ -196,7 +196,7 @@ static bool checkButtonToggle(
         const int target,
         const toggle_e toggle,
         const bool button_was_down,
-        mode_e & mode)
+        hf::mode_e & mode)
 {
     if (button == target) {
         return true;
@@ -209,7 +209,7 @@ static bool checkButtonToggle(
     }
 }
 
-static void getSimInfoFromJoystick(siminfo_t & siminfo, mode_e & mode)
+static void getSimInfoFromJoystick(hf::siminfo_t & siminfo, hf::mode_e & mode)
 {
     static bool _hover_button_was_down;
     static bool _auto_button_was_down;
@@ -237,7 +237,7 @@ int main(int argc, char ** argv)
 {
     (void)argc;
 
-    mode_e mode = MODE_IDLE;
+    hf::mode_e mode = hf::MODE_IDLE;
 
     platform_init();
 
@@ -254,7 +254,7 @@ int main(int argc, char ** argv)
 
     while (true) {
 
-        siminfo_t siminfo = {};
+        hf::siminfo_t siminfo = {};
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, argv[1]);
         strcpy(siminfo.poselogname, argv[2]);
@@ -278,10 +278,10 @@ int main(int argc, char ** argv)
         }
 
         // On descent, switch mode to idle when close enough to ground
-        if (mode == MODE_LANDING &&
+        if (mode == hf::MODE_LANDING &&
                 (platform_get_vehicle_z() - startingPose.z ) <
                 ZDIST_LANDING_MAX_M) {
-            mode = MODE_IDLE;
+            mode = hf::MODE_IDLE;
         }
 
         // Send siminfo to fast thread

@@ -20,38 +20,40 @@
 
 #include <datatypes.h>
 
-class RotorMixer {
+namespace hf {
 
-    public:
+    class RotorMixer {
 
-        static float * mix(
-                const demands_t & demands,
-                const int8_t * roll,
-                const int8_t * pitch,
-                const int8_t * yaw,
-                const int8_t count)
-        {
-            static float motors[MAX_MOTOR_COUNT];
-            mix(demands, roll, pitch, yaw, count, motors);
-            return motors;
-        }        
-        
-        static void mix(
-                const demands_t & demands,
-                const int8_t * roll,
-                const int8_t * pitch,
-                const int8_t * yaw,
-                const int8_t count,
-                float motors[])
-        {
-            for (uint8_t k=0; k<count; ++k) {
-                motors[k] =
-                    demands.thrust +
-                    demands.roll * roll[k] +
-                    demands.pitch * pitch[k] +
-                    demands.yaw * yaw[k];
+        public:
+
+            static float * mix(
+                    const demands_t & demands,
+                    const int8_t * roll,
+                    const int8_t * pitch,
+                    const int8_t * yaw,
+                    const int8_t count)
+            {
+                static float motors[MAX_MOTOR_COUNT];
+                mix(demands, roll, pitch, yaw, count, motors);
+                return motors;
+            }        
+
+            static void mix(
+                    const demands_t & demands,
+                    const int8_t * roll,
+                    const int8_t * pitch,
+                    const int8_t * yaw,
+                    const int8_t count,
+                    float motors[])
+            {
+                for (uint8_t k=0; k<count; ++k) {
+                    motors[k] =
+                        demands.thrust +
+                        demands.roll * roll[k] +
+                        demands.pitch * pitch[k] +
+                        demands.yaw * yaw[k];
+                }
             }
-        }
-};
-
+    };
+}
 

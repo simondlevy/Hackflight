@@ -21,14 +21,17 @@
 #include <datatypes.h>
 #include <simulator/pose.h>
 
-typedef struct {
+namespace hf {
 
-    pose_t startingPose;
-    float framerate;
-    char path[200];
-    char worldname[200];
-    char poselogname[200];
-    mode_e mode;
-    demands_t setpoint;
+    typedef struct {
 
-} siminfo_t;
+        pose_t startingPose;
+        float framerate;
+        char path[200];
+        char worldname[200];
+        char poselogname[200];
+        mode_e mode;
+        demands_t setpoint;
+
+    } siminfo_t;
+}

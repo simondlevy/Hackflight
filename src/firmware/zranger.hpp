@@ -20,64 +20,68 @@
 
 #include <datatypes.h>
 
-class ZRanger {
+namespace hf {
 
-    public:
+    class ZRanger {
 
-        typedef struct {
-            uint32_t timestamp;
-            float distance;
-            float stdDev;
-        } measurement_t;
+        public:
 
-        void init()
-        {
-            // pre-compute constant in the measurement noise model for kalman
-            _expCoeff =
-                logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+            typedef struct {
+                uint32_t timestamp;
+                float distance;
+                float stdDev;
+            } measurement_t;
 
-            device_init();
-        }
+            void init()
+            {
+                // pre-compute constant in the measurement noise model for kalman
+                _expCoeff =
+                    logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
 
-        bool read(measurement_t & tofData, const uint32_t tick)
-        {
-            float range = device_read();
-
-            // check if range is feasible and push into the estimator the
-            // sensor should not be able to measure >5 [m], and outliers
-            // typically occur as >8 [m] measurements
-            if (range < OUTLIER_LIMIT_MM) {
-
-                float distance = range / 1000; // Scale from [mm] to [m]
-
-                float stdDev = EXP_STD_A * (
-                        1 + expf(_expCoeff * (distance - EXP_POINT_A)));
-
-                tofData.timestamp = tick;
-                tofData.distance = distance;
-                tofData.stdDev = stdDev;
-
-                return true;
+                device_init();
             }
 
-            return false;
-        }
+            bool read(measurement_t & tofData, const uint32_t tick)
+            {
+                float range = device_read();
 
-    private:
+                // check if range is feasible and push into the estimator the
+                // sensor should not be able to measure >5 [m], and outliers
+                // typically occur as >8 [m] measurements
+                if (range < OUTLIER_LIMIT_MM) {
 
-        static constexpr float FREQ_HZ = 40;
+                    float distance = range / 1000; // Scale from [mm] to [m]
 
-        static const uint16_t OUTLIER_LIMIT_MM = 5000;
+                    float stdDev = EXP_STD_A * (
+                            1 + expf(_expCoeff * (distance - EXP_POINT_A)));
 
-        // Measurement noise model
-        static constexpr float EXP_POINT_A = 2.5;
-        static constexpr float EXP_STD_A = 0.0025; 
-        static constexpr float EXP_POINT_B = 4.0;
-        static constexpr float EXP_STD_B = 0.2;   
+                    tofData.timestamp = tick;
+                    tofData.distance = distance;
+                    tofData.stdDev = stdDev;
 
-        float _expCoeff;
+                    return true;
+                }
 
-        bool device_init();
+                return false;
+            }
 
-        float device_read();
-};
+        private:
+
+            static constexpr float FREQ_HZ = 40;
+
+            static const uint16_t OUTLIER_LIMIT_MM = 5000;
+
+            // Measurement noise model
+            static constexpr float EXP_POINT_A = 2.5;
+            static constexpr float EXP_STD_A = 0.0025; 
+            static constexpr float EXP_POINT_B = 4.0;
+            static constexpr float EXP_STD_B = 0.2;   
+
+            float _expCoeff;
+
+            bool device_init();
+
+            float device_read();
+    };
+
+}

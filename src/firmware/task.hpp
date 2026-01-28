@@ -18,34 +18,38 @@
 
 #include <free_rtos_include.h>
 
-class FreeRtosTask {
+namespace hf {
 
-    private:
+    class FreeRtosTask {
 
-        static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
+        private:
 
-        typedef void (*taskfun_t)(void * obj);
+            static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
-        StackType_t _taskStackBuffer[STACKSIZE]; 
+            typedef void (*taskfun_t)(void * obj);
 
-        StaticTask_t _taskTaskBuffer;
+            StackType_t _taskStackBuffer[STACKSIZE]; 
 
-    public:
+            StaticTask_t _taskTaskBuffer;
 
-        void init(
-                const taskfun_t fun,
-                const char * name,
-                void * obj,
-                const uint8_t priority
-                )
-        {
-            xTaskCreateStatic(
-                    fun, 
-                    name, 
-                    STACKSIZE, 
-                    obj, 
-                    priority, 
-                    _taskStackBuffer,
-                    &_taskTaskBuffer);
-        }
-};
+        public:
+
+            void init(
+                    const taskfun_t fun,
+                    const char * name,
+                    void * obj,
+                    const uint8_t priority
+                    )
+            {
+                xTaskCreateStatic(
+                        fun, 
+                        name, 
+                        STACKSIZE, 
+                        obj, 
+                        priority, 
+                        _taskStackBuffer,
+                        &_taskTaskBuffer);
+            }
+    };
+
+}

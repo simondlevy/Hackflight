@@ -19,13 +19,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-class Comms {
+namespace hf {
 
-    public:
+    class Comms {
 
-        static void init();
+        public:
 
-        static bool read_byte(uint8_t * byte);
+            static void init();
 
-        static void write_byte(const uint8_t byte);
-};
+            static bool read_byte(uint8_t * byte);
+
+            static void write_byte(const uint8_t byte);
+    };
+
+}

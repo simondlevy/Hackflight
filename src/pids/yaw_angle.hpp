@@ -19,53 +19,56 @@
 
 #include <num.hpp>
 
-class YawAngleController {
+namespace hf {
 
-    public:
+    class YawAngleController {
 
-        /**
-          *  @param dt time constant
-          *  @param psi_actual current heading in degrees
-          *  @param psi_target target heading in degrees
-          *  @return yaw demand in deg/sec
-          */
+        public:
 
-        static float run(
-                const bool airborne, 
-                const float dt,       
-                const float psi_actual,
-                const float psi_target)
-        {
-            // Grab initial psi first time around
-            static float _psi_initial;
-            if (_psi_initial == 0) {
-                _psi_initial = psi_actual;
+            /**
+             *  @param dt time constant
+             *  @param psi_actual current heading in degrees
+             *  @param psi_target target heading in degrees
+             *  @return yaw demand in deg/sec
+             */
+
+            static float run(
+                    const bool airborne, 
+                    const float dt,       
+                    const float psi_actual,
+                    const float psi_target)
+            {
+                // Grab initial psi first time around
+                static float _psi_initial;
+                if (_psi_initial == 0) {
+                    _psi_initial = psi_actual;
+                }
+
+                static float _integral;
+                static float _previous;
+
+                const auto error =
+                    Num::cap_angle(psi_target - (psi_actual - _psi_initial));
+
+                _integral = airborne ?
+                    Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+
+                auto deriv = dt > 0 ? (error - _previous) / dt : 0;
+
+                _previous = error;
+
+                return KP * error + KI * _integral + KD * deriv;
             }
 
-            static float _integral;
-            static float _previous;
+        private:
 
-            const auto error =
-                Num::cap_angle(psi_target - (psi_actual - _psi_initial));
+            static constexpr float KP = 6;
+            static constexpr float KI = 1;
+            static constexpr float KD = 0.35;
+            static constexpr float ILIMIT = 360;
 
-            _integral = airborne ?
-                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+            float _integral;
+            float _previous;
 
-            auto deriv = dt > 0 ? (error - _previous) / dt : 0;
-
-            _previous = error;
-
-            return KP * error + KI * _integral + KD * deriv;
-        }
-
-    private:
-
-        static constexpr float KP = 6;
-        static constexpr float KI = 1;
-        static constexpr float KD = 0.35;
-        static constexpr float ILIMIT = 360;
-
-        float _integral;
-        float _previous;
-
-};
+    };
+}

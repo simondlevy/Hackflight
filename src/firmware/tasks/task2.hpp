@@ -20,57 +20,61 @@
 #include <firmware/opticalflow.hpp>
 #include <firmware/zranger.hpp>
 
-class Task2 {
+namespace hf {
 
-    public:
+    class Task2 {
 
-        void begin(EKF * ekf)
-        {
-            _ekf = ekf;
+        public:
 
-            _zranger.init();
+            void begin(EKF * ekf)
+            {
+                _ekf = ekf;
 
-            _opticalFlow.init();
+                _zranger.init();
 
-            _task.init(runTask2, "task2", this, 2);
-        }
+                _opticalFlow.init();
 
-    private:
+                _task.init(runTask2, "task2", this, 2);
+            }
 
-        ZRanger _zranger;
+        private:
 
-        OpticalFlow _opticalFlow;
+            ZRanger _zranger;
 
-        static constexpr float FREQ_HZ = 50;
+            OpticalFlow _opticalFlow;
 
-        static void runTask2(void * obj)
-        {
-            ((Task2 *)obj)->run();
-        }
+            static constexpr float FREQ_HZ = 50;
 
-        FreeRtosTask _task;
+            static void runTask2(void * obj)
+            {
+                ((Task2 *)obj)->run();
+            }
 
-        EKF * _ekf;
+            FreeRtosTask _task;
 
-        void run(void)
-        {
-            TickType_t lastWakeTime;
+            EKF * _ekf;
 
-            lastWakeTime = xTaskGetTickCount();
+            void run(void)
+            {
+                TickType_t lastWakeTime;
 
-            while (true) {
+                lastWakeTime = xTaskGetTickCount();
 
-                vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
+                while (true) {
 
-                ZRanger::measurement_t tofData = {};
-                if (_zranger.read(tofData, xTaskGetTickCount())) {
-                    _ekf->enqueueRange(&tofData);
-                }
+                    vTaskDelayUntil(&lastWakeTime, 1000/FREQ_HZ);
 
-                OpticalFlow::measurement_t flowData = {};
-                if (_opticalFlow.read(flowData)) {
-                    _ekf->enqueueFlow(&flowData);
+                    ZRanger::measurement_t tofData = {};
+                    if (_zranger.read(tofData, xTaskGetTickCount())) {
+                        _ekf->enqueueRange(&tofData);
+                    }
+
+                    OpticalFlow::measurement_t flowData = {};
+                    if (_opticalFlow.read(flowData)) {
+                        _ekf->enqueueFlow(&flowData);
+                    }
                 }
             }
-        }
-};
+    };
+
+}

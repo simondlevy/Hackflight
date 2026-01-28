@@ -20,43 +20,46 @@
 #include <num.hpp>
 #include <vehicles/diyquad.hpp>
 
-class ClimbRateController {
+namespace hf {
 
-    public:
+    class ClimbRateController {
 
-        /**
-         * Demand is input as altitude target in meters and output as 
-         * arbitrary positive value to be scaled according to motor
-         * characteristics.
-         */
-        static float run(
-                const bool hovering,
-                const float dt,
-                const float z,
-                const float dz,
-                const float demand)
-        {
-            static float _integral;
+        public:
 
-            const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
+            /**
+             * Demand is input as altitude target in meters and output as 
+             * arbitrary positive value to be scaled according to motor
+             * characteristics.
+             */
+            static float run(
+                    const bool hovering,
+                    const float dt,
+                    const float z,
+                    const float dz,
+                    const float demand)
+            {
+                static float _integral;
 
-            const auto error = demand - dz;
+                const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
 
-            _integral = airborne ? 
-                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+                const auto error = demand - dz;
 
-            const auto thrust = KP * error + KI * _integral;
+                _integral = airborne ? 
+                    Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
-            return airborne ?
-                Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
-                        THRUST_MIN, THRUST_MAX) : 0;
-        }
+                const auto thrust = KP * error + KI * _integral;
 
-    private:
+                return airborne ?
+                    Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                            THRUST_MIN, THRUST_MAX) : 0;
+            }
 
-        static constexpr float KP = 25;
-        static constexpr float KI = 15;
-        static constexpr float ILIMIT = 5000;
+        private:
 
-        static constexpr float ALTITUDE_LANDING_M = 0.03;
-};
+            static constexpr float KP = 25;
+            static constexpr float KI = 15;
+            static constexpr float ILIMIT = 5000;
+
+            static constexpr float ALTITUDE_LANDING_M = 0.03;
+    };
+}

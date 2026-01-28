@@ -18,68 +18,70 @@
 
 #include <stdint.h>
 
-static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+namespace hf {
 
-typedef struct {
+    static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
-    float x;       // positive forward
-    float dx;      // positive forward
-    float y;       // positive rightward
-    float dy;      // positive rightward
-    float z;       // positive upward
-    float dz;      // positive upward
-    float phi;     // positive roll right
-    float dphi;    // positive roll right
-    float theta;   // positive nose down
-    float dtheta;  // positive nose down
-    float psi;     // positive nose right
-    float dpsi;    // positive nose right
+    typedef struct {
 
-} vehicleState_t;
+        float x;       // positive forward
+        float dx;      // positive forward
+        float y;       // positive rightward
+        float dy;      // positive rightward
+        float z;       // positive upward
+        float dz;      // positive upward
+        float phi;     // positive roll right
+        float dphi;    // positive roll right
+        float theta;   // positive nose down
+        float dtheta;  // positive nose down
+        float psi;     // positive nose right
+        float dpsi;    // positive nose right
 
-typedef enum {
+    } vehicleState_t;
 
-    MODE_IDLE,
-    MODE_ARMED,
-    MODE_HOVERING,
-    MODE_AUTONOMOUS,
-    MODE_LANDING,
-    MODE_PANIC
+    typedef enum {
 
-} mode_e;
+        MODE_IDLE,
+        MODE_ARMED,
+        MODE_HOVERING,
+        MODE_AUTONOMOUS,
+        MODE_LANDING,
+        MODE_PANIC
 
-typedef struct {
+    } mode_e;
 
-    float x;
-    float y;
+    typedef struct {
 
-} axis2_t;
+        float x;
+        float y;
 
-typedef struct {
+    } axis2_t;
 
-    float x;
-    float y;
-    float z;
+    typedef struct {
 
-} axis3_t;
+        float x;
+        float y;
+        float z;
 
-typedef struct {
+    } axis3_t;
 
-    float w;
-    float x;
-    float y;
-    float z;
+    typedef struct {
 
-} axis4_t;
+        float w;
+        float x;
+        float y;
+        float z;
 
-typedef struct {
+    } axis4_t;
 
-    float thrust;  // positve upward
-    float roll;    // positive roll right
-    float pitch;   // positive nose down
-    float yaw;     // positive nose right
+    typedef struct {
 
-} demands_t;
+        float thrust;  // positve upward
+        float roll;    // positive roll right
+        float pitch;   // positive nose down
+        float yaw;     // positive nose right
 
-typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
+    } demands_t;
 
+    typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
+}

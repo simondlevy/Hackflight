@@ -18,25 +18,29 @@
 
 #include <Arduino.h>
 
-class Timer {
+namespace hf {
 
-    public:
+    class Timer {
 
-        bool ready(const float freq)
-        {
-            const uint32_t msec_curr = millis();
+        public:
 
-            if (msec_curr - _msec_prev > 1000 / freq) {
+            bool ready(const float freq)
+            {
+                const uint32_t msec_curr = millis();
 
-                _msec_prev = msec_curr;
+                if (msec_curr - _msec_prev > 1000 / freq) {
 
-                return true;
+                    _msec_prev = msec_curr;
+
+                    return true;
+                }
+
+                return false;
             }
 
-            return false;
-        }
-    
-    private:
+        private:
 
-        uint32_t _msec_prev;
-};
+            uint32_t _msec_prev;
+    };
+
+}

@@ -19,69 +19,68 @@
 
 #include <num.hpp>
 
-class PitchRollRateController {
+namespace hf {
 
-    public:
+    class PitchRollRateController {
 
-        /**
-          * Demands are input as angular velocities in degrees per second and
-          * output as as arbitrary values to be scaled according to motor
-          * characteristics:
-          *
-          * roll:  input roll-right positive => output positive
-          *
-          * pitch: input nose-down positive => output positive
-          */
-         static void run(
-                 const bool airborne,
-                 const float dt,
-                 const float state_dphi, const float state_dtheta,
-                 const float demand_roll,const float demand_pitch, 
-                 float & new_demand_roll, float & new_demand_pitch) 
-         {
-             static axis_t _roll;
+        public:
 
-             static axis_t _pitch;
+            /**
+             * Demands are input as angular velocities in degrees per second and
+             * output as as arbitrary values to be scaled according to motor
+             * characteristics:
+             *
+             * roll:  input roll-right positive => output positive
+             *
+             * pitch: input nose-down positive => output positive
+             */
+            static void run(
+                    const bool airborne,
+                    const float dt,
+                    const float state_dphi, const float state_dtheta,
+                    const float demand_roll,const float demand_pitch, 
+                    float & new_demand_roll, float & new_demand_pitch) 
+            {
+                static axis_t _roll;
 
-             new_demand_roll =
-                 runAxis(airborne, dt, demand_roll, state_dphi, _roll);
+                static axis_t _pitch;
 
-             new_demand_pitch =
-                 runAxis(airborne, dt, demand_pitch, state_dtheta, _pitch);
-         }
+                new_demand_roll =
+                    runAxis(airborne, dt, demand_roll, state_dphi, _roll);
 
-    private:
+                new_demand_pitch =
+                    runAxis(airborne, dt, demand_pitch, state_dtheta, _pitch);
+            }
 
-        static constexpr float KP = 125;
-        static constexpr float KI = 250;
-        static constexpr float KD = 1.25;
-        static constexpr float ILIMIT = 33;
+        private:
 
-        typedef struct {
-            float integral;
-            float previous;
-        } axis_t;
+            static constexpr float KP = 125;
+            static constexpr float KI = 250;
+            static constexpr float KD = 1.25;
+            static constexpr float ILIMIT = 33;
 
-        static float runAxis(
-                const bool airborne,
-                const float dt,
-                const float demand,
-                const float measured,
-                axis_t & axis)
-        {
-            const auto error = demand - measured;
+            typedef struct {
+                float integral;
+                float previous;
+            } axis_t;
 
-            axis.integral = airborne ?
-                Num::fconstrain( axis.integral + error * dt, ILIMIT) : 0;
+            static float runAxis(
+                    const bool airborne,
+                    const float dt,
+                    const float demand,
+                    const float measured,
+                    axis_t & axis)
+            {
+                const auto error = demand - measured;
 
-            auto deriv = dt > 0 ? (error - axis.previous) / dt : 0;
+                axis.integral = airborne ?
+                    Num::fconstrain( axis.integral + error * dt, ILIMIT) : 0;
 
-            axis.previous = airborne ? error : 0;
+                auto deriv = dt > 0 ? (error - axis.previous) / dt : 0;
 
-            return airborne ? KP * error + KI * axis.integral + deriv : 0;
-        }
-};
+                axis.previous = airborne ? error : 0;
 
-
-
-
+                return airborne ? KP * error + KI * axis.integral + deriv : 0;
+            }
+    };
+}

@@ -23,24 +23,28 @@
 #include <firmware/tasks/task1.hpp>
 #include <firmware/tasks/task2.hpp>
 
-class Hackflight {
+namespace hf {
 
-    public:
+    class Hackflight {
 
-        void init()
-        {
-            Comms::init();
+        public:
 
-            _ekf.init(millis());
+            void init()
+            {
+                Comms::init();
 
-            _task1.begin(&_ekf);
+                _ekf.init(millis());
 
-            _task2.begin(&_ekf);
-        }
+                _task1.begin(&_ekf);
 
-    private:
+                _task2.begin(&_ekf);
+            }
 
-        EKF _ekf;
-        Task1 _task1;
-        Task2 _task2;
-};
+        private:
+
+            EKF _ekf;
+            Task1 _task1;
+            Task2 _task2;
+    };
+
+}

@@ -19,35 +19,38 @@
 
 #include <num.hpp>
 
-class YawRateController {
+namespace hf {
 
-    public:
+    class YawRateController {
 
-        /**
-          * Input is angular rate demand (deg/sec) and actual angular
-          * rate from gyro; ouputput is arbitrary units scaled for motors.
-          */
-         static float run(
-                 const bool airborne,
-                 const float dt,
-                 const float dpsi,
-                 const float yaw)
-        {
-            static float _integral;
+        public:
 
-            const auto error = yaw - dpsi;
+            /**
+             * Input is angular rate demand (deg/sec) and actual angular
+             * rate from gyro; ouputput is arbitrary units scaled for motors.
+             */
+            static float run(
+                    const bool airborne,
+                    const float dt,
+                    const float dpsi,
+                    const float yaw)
+            {
+                static float _integral;
 
-            _integral = airborne ? 
-                Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
+                const auto error = yaw - dpsi;
 
-            return airborne ? 
-                Num::fconstrain(KP * error + KI * _integral, OUTPUT_LIMIT) : 0;
-        }
+                _integral = airborne ? 
+                    Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
 
-    private:
+                return airborne ? 
+                    Num::fconstrain(KP * error + KI * _integral, OUTPUT_LIMIT) : 0;
+            }
 
-         static constexpr float KP = 120;
-         static constexpr float KI = 16.7;
-         static constexpr float ILIMIT = 166.7;
-         static constexpr float OUTPUT_LIMIT = INT16_MAX;
-};
+        private:
+
+            static constexpr float KP = 120;
+            static constexpr float KI = 16.7;
+            static constexpr float ILIMIT = 166.7;
+            static constexpr float OUTPUT_LIMIT = INT16_MAX;
+    };
+}

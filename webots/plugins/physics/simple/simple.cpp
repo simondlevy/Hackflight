@@ -21,7 +21,7 @@
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    siminfo_t siminfo = {};
+    hf::siminfo_t siminfo = {};
 
     if (PhysicsPluginHelper::get_siminfo(siminfo)) {
 
