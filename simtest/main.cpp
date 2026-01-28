@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
     simsens::Rangefinder rangefinder =
         simsens::Rangefinder(*robot.rangefinders[0]);
 
-    const auto pose = world.robotPose;
+    const auto pose = world.getRobotPose();
 
     Simulator simulator = {};
 
