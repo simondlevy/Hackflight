@@ -2,7 +2,7 @@ ROOT = ../..
 
 SIMSENSORS = $(ROOT)/simsensors/src
 
-world=../webots/worlds/maze.wbt
+world=../webots/worlds/flydar.wbt
 
 all: simtest
 
