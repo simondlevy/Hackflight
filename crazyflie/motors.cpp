@@ -35,7 +35,7 @@ static void enableMotor(const uint8_t id)
     digitalWrite(POWER_SWITCH_PINS[id], HIGH);
 }
 
-void Task1::motors_init()
+void hf::Task1::motors_init()
 {
     enableMotor(0);
     enableMotor(1);
@@ -46,30 +46,30 @@ void Task1::motors_init()
 }
 
 
-void Task1::motors_setSpeed(uint32_t id, float speed)
+void hf::Task1::motors_setSpeed(uint32_t id, float speed)
 {
     const uint8_t pulse_width = 125 * (speed + 1);
     motors.set(id, pulse_width);
 }
 
-void Task1::motors_run()
+void hf::Task1::motors_run()
 {
     motors.run();
 }
 
 #elif defined(NOMOTORS)
 
-void Task1::motors_init()
+void hf::Task1::motors_init()
 {
 }
 
-void Task1::motors_setSpeed(uint32_t id, float speed)
+void hf::Task1::motors_setSpeed(uint32_t id, float speed)
 {
     (void)id;
     (void)speed;
 }
 
-void Task1::motors_run()
+void hf::Task1::motors_run()
 {
 }
 
@@ -83,16 +83,16 @@ static const uint8_t M4_PIN = PB9;
 
 static uint8_t pulse_widths[4];
 
-void Task1::motors_init()
+void hf::Task1::motors_init()
 {
 }
 
-void Task1::motors_setSpeed(uint32_t id, float speed)
+void hf::Task1::motors_setSpeed(uint32_t id, float speed)
 {
     pulse_widths[id] = (uint8_t)(255 * speed);
 }
 
-void Task1::motors_run()
+void hf::Task1::motors_run()
 {
     analogWrite(M1_PIN, pulse_widths[0]);
     analogWrite(M2_PIN, pulse_widths[1]);

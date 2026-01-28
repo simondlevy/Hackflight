@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <firmware/firmware.hpp>
 
-static Hackflight hackflight;
+static hf::Hackflight hackflight;
 
 void setup() 
 {

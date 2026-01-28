@@ -79,5 +79,4 @@ namespace hf {
 
             void device_set(const bool on);
     };
-
-}1
+}

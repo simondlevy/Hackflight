@@ -29,7 +29,7 @@ static SPIClass spi;
 
 static PMW3901 pmw3901;
 
-bool OpticalFlow::device_init()
+bool hf::OpticalFlow::device_init()
 {
     spi.setSCLK(PA5);
     spi.setMISO(PA6);
@@ -40,7 +40,7 @@ bool OpticalFlow::device_init()
     return pmw3901.begin(CS_PIN, spi);
 }
 
-void OpticalFlow::device_read(
+void hf::OpticalFlow::device_read(
         int16_t & dx, int16_t & dy, bool &gotMotion)
 {
     pmw3901.readMotion(dx, dy, gotMotion);
