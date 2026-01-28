@@ -23,7 +23,6 @@
 #include <autopilot/rangefinder.hpp>
 
 // SimSensors
-#include <simsensors/src/collision.hpp>
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
@@ -55,15 +54,6 @@ static void load(const siminfo_t & siminfo,
 
     sprintf(path, "%s/%s", siminfo.path, siminfo.poselogname);
     *logfpp = fopen(path, "w");
-}
-
-static bool collided(const pose_t & pose, simsens::World & world)
-{
-    const bool debug = true;
-
-    return simsens::CollisionDetector::detect(
-
-            simsens::vec3_t{pose.x, pose.y, pose.x}, world, debug);
 }
 
 // Returns false on collision, true otherwise
@@ -108,7 +98,7 @@ static bool run_normal(siminfo_t & siminfo)
             RANGEFINDER_DISPLAY_SCALEUP, autonomous);
 
     // Stop if we detected a collision
-    if (collided(pose, _world)) {
+    if (_world.collided({pose.x, pose.y, pose.z})) {
         return false;
     }
 

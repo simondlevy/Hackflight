@@ -24,7 +24,6 @@
 #include <vehicles/diyquad.hpp>
 
 // SimSensors
-#include <simsensors/src/collision.hpp>
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
@@ -77,8 +76,7 @@ int main(int argc, char ** argv)
 
         const auto pose = simulator.step(mode, setpoint);
 
-        if (simsens::CollisionDetector::detect(
-                    simsens::vec3_t{pose.x, pose.y, pose.x}, world)) {
+        if (world.collided({pose.x, pose.y, pose.x})) {
             printf("collision!\n");
             break;
         }
