@@ -83,8 +83,7 @@ int main(int argc, char ** argv)
 
         // Get simulated rangefinder distances
         rangefinder.read(
-                simsens::pose_t {
-                pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
                 world, rangefinder_distances_mm);
 
         // Dump everything to logfile
