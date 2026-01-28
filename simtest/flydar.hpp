@@ -33,16 +33,16 @@ class SimTest {
     public:
 
         static void run(
-                const char * robotname,
-                const char * worldname,
+                const char * robot_path,
+                const char * world_path,
                 FILE * logfile=nullptr)
         {
 
             simsens::Robot robot = {};
-            simsens::RobotParser::parse(robotname, robot);
+            simsens::RobotParser::parse(robot_path, robot);
 
             simsens::World world = {};
-            simsens::WorldParser::parse(worldname, world, "DiyQuad {");
+            simsens::WorldParser::parse(world_path, world, "DiyQuad {");
 
             simsens::Rangefinder rangefinder =
                 simsens::Rangefinder(*robot.rangefinders[0]);
