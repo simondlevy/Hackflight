@@ -37,31 +37,24 @@ class SimTest {
         static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
         static constexpr float FRAME_RATE_HZ = 32;
 
-        static bool clear(const int * rangefinder_distances, const int size)
-        {
-            for (int i=0; i<size; ++i) {
-                if (rangefinder_distances[i] != -1) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         static bool cleared_room(
                 const int frame, 
                 const int * rangefinder_distances_mm, 
                 const int rangefinder_size)
         {
+            for (int i=0; i<rangefinder_size; ++i) {
+                if (rangefinder_distances_mm[i] != -1) {
+                    return false;
+                }
+            }
+
             static int _cleared_at_frame;
 
-            if (_cleared_at_frame == 0 &&
-                    clear(rangefinder_distances_mm, rangefinder_size)) {
+            if (_cleared_at_frame == 0) {
                 _cleared_at_frame = frame;
             }
 
-            if (_cleared_at_frame > 0 &&
-                    (frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+            else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
                 return true;
             }
 
@@ -139,5 +132,4 @@ class SimTest {
 
             return false; // timed out
         }
-
 };
