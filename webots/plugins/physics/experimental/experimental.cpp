@@ -35,7 +35,7 @@ static simsens::Rangefinder * _rangefinder;
 
 static simsens::RangefinderVisualizer * _rangefinderVisualizer;
 
-static void load(const siminfo_t & siminfo,
+static void load(const hf::siminfo_t & siminfo,
         simsens::World & world,
         simsens::Robot & robot,
         FILE ** logfpp)
@@ -57,18 +57,18 @@ static void load(const siminfo_t & siminfo,
 }
 
 // Returns false on collision, true otherwise
-static bool run_normal(siminfo_t & siminfo)
+static bool run_normal(hf::siminfo_t & siminfo)
 {
     static simsens::World _world;
     static simsens::Robot _robot;
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
 
-    const bool autonomous = siminfo.mode == MODE_AUTONOMOUS;
+    const bool autonomous = siminfo.mode == hf::MODE_AUTONOMOUS;
 
     // In autonomous mode, use current pose to get setpoints
     if (autonomous) {
-        RangefinderSetpoint::run(_rangefinder_distances_mm, siminfo.setpoint);
+        hf::RangefinderSetpoint::run(_rangefinder_distances_mm, siminfo.setpoint);
     }
 
     // Use setpoints to get new pose
@@ -119,7 +119,7 @@ DLLEXPORT void webots_physics_step()
 
     else {
 
-        siminfo_t siminfo = {};
+        hf::siminfo_t siminfo = {};
 
         if (PhysicsPluginHelper::get_siminfo(siminfo)) {
 
