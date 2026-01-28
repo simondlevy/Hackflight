@@ -67,6 +67,20 @@ class SimTest {
 
             return false;
         }
+        
+        static void write_to_log(
+                FILE * logfile,
+                const pose_t pose,
+                const int * rangefinder_distances_mm,
+                const int rangefinder_width)
+        {
+            fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+            for (int k=0; k<rangefinder_width; ++k) {
+                fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
+            }
+            fprintf(logfile, "\n");
+        }
 
     public:
 
@@ -113,19 +127,13 @@ class SimTest {
                     return true;
                 }
 
-                // Get simulated rangefinder distances
                 rangefinder.read(
                         {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
                         world, rangefinder_distances_mm);
 
-                // Dump everything to logfile if indicated
                 if (logfile) {
-                    fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-                    for (int k=0; k<rangefinder.getWidth(); ++k) {
-                        fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
-                    }
-                    fprintf(logfile, "\n");
+                    write_to_log(logfile, pose,
+                            rangefinder_distances_mm, rangefinder.getWidth());
                 }
             }
 
