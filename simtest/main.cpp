@@ -89,6 +89,26 @@ static void run(
         const char * world_path,
         FILE * logfile)
 {
+
+}
+
+int main(int argc, char ** argv)
+{
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s WORLDFILE ROBOTFILE\n", argv[0]);
+        return 1;
+    }
+
+    auto  * logfile = fopen(LOGNAME, "w");
+    if (!logfile) {
+        fprintf(stderr, "Unable to open file %s for wirting\n", LOGNAME);
+        exit(1);
+    }
+
+    const char *robot_path = argv[1];
+    const char *world_path = argv[2];
+
+    // run(robot_path, world_path, logfile);
     simsens::Robot robot = {};
     simsens::RobotParser::parse(robot_path, robot);
 
@@ -121,12 +141,12 @@ static void run(
         const auto pose = simulator.step(mode, setpoint);
 
         if (world.collided({pose.x, pose.y, pose.x})) {
-            return;
+            break;
         }
 
         if (SimTest::cleared_room(frame, rangefinder_distances_mm,
                     rangefinder.getWidth())) {
-            return;
+            break;
         }
 
         rangefinder.read(
@@ -136,26 +156,6 @@ static void run(
         write_to_log(logfile, pose,
                 rangefinder_distances_mm, rangefinder.getWidth());
     }
-}
-
-int main(int argc, char ** argv)
-{
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s WORLDFILE ROBOTFILE\n", argv[0]);
-        return 1;
-    }
-
-    auto  * logfile = fopen(LOGNAME, "w");
-    if (!logfile) {
-        fprintf(stderr, "Unable to open file %s for wirting\n", LOGNAME);
-        exit(1);
-    }
-
-    const char *robot_path = argv[1];
-    const char *world_path = argv[2];
-
-    run(robot_path, world_path, logfile);
-
     fclose(logfile);
 
     return 0;
