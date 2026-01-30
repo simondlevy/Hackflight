@@ -30,6 +30,8 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
+//#include "flydar.hpp"
+
 static constexpr float TAKEOFF_TIME_SEC = 2;
 static constexpr float FRAME_RATE_HZ = 32;
 
@@ -84,14 +86,6 @@ class SimTest {
         }
 };
 
-static void run(
-        const char * robot_path,
-        const char * world_path,
-        FILE * logfile)
-{
-
-}
-
 int main(int argc, char ** argv)
 {
     if (argc < 3) {
@@ -115,8 +109,7 @@ int main(int argc, char ** argv)
     simsens::World world = {};
     simsens::WorldParser::parse(world_path, world, robot_path);
 
-    simsens::Rangefinder rangefinder =
-        simsens::Rangefinder(*robot.rangefinders[0]);
+    simsens::Rangefinder rangefinder = *robot.rangefinders[0];
 
     const auto pose = world.getRobotPose();
 
@@ -156,6 +149,7 @@ int main(int argc, char ** argv)
         write_to_log(logfile, pose,
                 rangefinder_distances_mm, rangefinder.getWidth());
     }
+
     fclose(logfile);
 
     return 0;
