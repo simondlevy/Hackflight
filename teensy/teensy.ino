@@ -74,17 +74,16 @@ static constexpr float YAW_PRESCALE = 160.0;
 
 // IMU calibration parameters -------------------------------------
 
-static constexpr float ACC_ERROR_X  = -0.030;
-static constexpr float ACC_ERROR_Y  = +0.025;
-static constexpr float ACC_ERROR_Z  = -0.11;
-static constexpr float GYRO_ERROR_X = -3.3;
-static constexpr float GYRO_ERROR_Y = -0.50;
-static constexpr float GYRO_ERROR_Z = +0.6875;
+static constexpr float ACCEL_ERROR_X  = 0;
+static constexpr float ACCEL_ERROR_Y  = 0;
+static constexpr float ACCEL_ERROR_Z  = 0;
+static constexpr float GYRO_ERROR_X = 0;
+static constexpr float GYRO_ERROR_Y = 0;
+static constexpr float GYRO_ERROR_Z = 0;
 
 // Misc. -----------------------------------------------------------
 
 static constexpr float YAW_DEMAND_INC = 3e-6;
-
 
 // Sensors
 static MPU6050 _mpu6050;
@@ -186,8 +185,6 @@ static void runMotors(const float * motors, const bool mode)
     _motors.set(3, m4_usec);
 
     _motors.run();
-
-    runLoopDelay(micros());
 }
 
 float getDt()
@@ -238,9 +235,9 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
 
     // Accelerometer Gs
     const hf::axis3_t accel = {
-        -ax / ACCEL_SCALE_FACTOR - ACC_ERROR_X,
-        ay / ACCEL_SCALE_FACTOR - ACC_ERROR_Y,
-        az / ACCEL_SCALE_FACTOR - ACC_ERROR_Z
+        -ax / ACCEL_SCALE_FACTOR - ACCEL_ERROR_X,
+        ay / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Y,
+        az / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Z
     };
 
     // Gyro deg /sec
@@ -331,7 +328,9 @@ void loop()
 
     hf::Mixer::mix(demands, motors);
 
-    (void)debug;
+    (void)debug/*(state, demands, motors)*/;
 
     runMotors(motors, _mode);
+
+    runLoopDelay(micros());
 }
