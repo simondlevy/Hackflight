@@ -84,10 +84,10 @@ class SimTest {
         }
 };
 
-static bool run(
+static void run(
         const char * robot_path,
         const char * world_path,
-        FILE * logfile=nullptr)
+        FILE * logfile)
 {
     simsens::Robot robot = {};
     simsens::RobotParser::parse(robot_path, robot);
@@ -121,25 +121,21 @@ static bool run(
         const auto pose = simulator.step(mode, setpoint);
 
         if (world.collided({pose.x, pose.y, pose.x})) {
-            return false;
+            return;
         }
 
         if (SimTest::cleared_room(frame, rangefinder_distances_mm,
                     rangefinder.getWidth())) {
-            return true;
+            return;
         }
 
         rangefinder.read(
                 {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
                 world, rangefinder_distances_mm);
 
-        if (logfile) {
-            write_to_log(logfile, pose,
-                    rangefinder_distances_mm, rangefinder.getWidth());
-        }
+        write_to_log(logfile, pose,
+                rangefinder_distances_mm, rangefinder.getWidth());
     }
-
-    return false; // timed out
 }
 
 int main(int argc, char ** argv)
@@ -155,7 +151,10 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    run(argv[1], argv[2], logfile);
+    const char *robot_path = argv[1];
+    const char *world_path = argv[2];
+
+    run(robot_path, world_path, logfile);
 
     fclose(logfile);
 
