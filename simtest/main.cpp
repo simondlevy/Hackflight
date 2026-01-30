@@ -52,7 +52,7 @@ int main(int argc, char ** argv)
 
     Flydar flydar = Flydar(argv[1], argv[2]);
 
-    for (uint32_t frame=0; frame<Flydar::MAX_TIME_SEC*FRAME_RATE_HZ; ++frame) {
+    for (int frame=0; frame<flydar.maxframes(); ++frame) {
 
         if (flydar.step(frame, logfile)) {
             break;

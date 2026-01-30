@@ -34,6 +34,9 @@ class Flydar {
     private:
 
         static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
+        static constexpr float MAX_TIME_SEC = 10;
+        static constexpr float TAKEOFF_TIME_SEC = 2;
+        static constexpr float FRAME_RATE_HZ = 32;
 
         hf::Simulator _simulator;
 
@@ -41,7 +44,7 @@ class Flydar {
 
         simsens::Rangefinder * _rangefinder;
 
-        static bool cleared_room(
+        static bool succeeded(
                 const int frame, 
                 const int * rangefinder_distances_mm, 
                 const int rangefinder_size)
@@ -81,10 +84,6 @@ class Flydar {
 
     public:
 
-        static constexpr float MAX_TIME_SEC = 10;
-        static constexpr float TAKEOFF_TIME_SEC = 2;
-        static constexpr float FRAME_RATE_HZ = 32;
-
         Flydar(const char * robot_path, const char * world_path)
         {
             // run(robot_path, world_path, logfile);
@@ -100,6 +99,11 @@ class Flydar {
             _simulator.init(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
                     FRAME_RATE_HZ);
+        }
+
+        int maxframes()
+        {
+            return MAX_TIME_SEC * FRAME_RATE_HZ;
         }
 
         bool step(const int frame, FILE * logfile=nullptr)
@@ -125,7 +129,7 @@ class Flydar {
                 return true;
             }
 
-            if (cleared_room(frame, _rangefinder_distances_mm,
+            if (succeeded(frame, _rangefinder_distances_mm,
                         _rangefinder->getWidth())) {
                 return true;
             }
