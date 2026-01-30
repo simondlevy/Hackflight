@@ -2,7 +2,7 @@ ROOT = ../..
 
 SIMSENSORS = $(ROOT)/simsensors/src
 
-world=../webots/worlds/flydar.wbt
+world=../webots/worlds/twoexit.wbt
 
 all: simtest
 
@@ -12,7 +12,7 @@ run: simtest
 simtest: main.o
 	g++ -o simtest main.o
 
-main.o: main.cpp flydar.hpp \
+main.o: main.cpp *.hpp \
 	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
 	g++ -Wall -c -I$(ROOT) -I../src main.cpp
 

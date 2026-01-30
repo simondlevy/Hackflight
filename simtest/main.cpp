@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#include "flydar.hpp"
+#include "twoexit.hpp"
 
 static const char * LOGNAME = "log.csv";
 
