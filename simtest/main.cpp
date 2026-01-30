@@ -16,20 +16,6 @@
 
 #include <stdio.h>
 
-// C/C++
-#include <stdio.h>
-
-// Hackflight
-#include <autopilot/rangefinder.hpp>
-#include <datatypes.h>
-#include <simulator/simulator.hpp>
-#include <vehicles/diyquad.hpp>
-
-// SimSensors
-#include <simsensors/src/parsers/webots/world.hpp>
-#include <simsensors/src/parsers/webots/robot.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
-
 #include "flydar.hpp"
 
 static const char * LOGNAME = "log.csv";
