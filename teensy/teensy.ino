@@ -260,6 +260,26 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
     state.dpsi = gyro.z;
 }
 
+static void debug(
+        const hf::vehicleState_t & state,
+        const hf::demands_t & demands,
+        const float * motors)
+{
+    static uint32_t _msec_prev;
+    const auto msec_curr  = millis();
+    if (msec_curr - _msec_prev > 10) {
+        printf( 
+                "phi=%+3.3f theta=%+3.3f psi=%+3.3f => "
+                "r=%+3.3f p=%+3.3f y=%+3.3f => "
+                "m1+%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n",
+                state.phi, state.theta, state.psi,
+                demands.roll, demands.pitch, demands.yaw,
+                motors[0], motors[1], motors[2], motors[3]);
+        _msec_prev = msec_curr;
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() 
@@ -310,6 +330,8 @@ void loop()
     float motors[4] = {};
 
     hf::Mixer::mix(demands, motors);
+
+    (void)debug;
 
     runMotors(motors, _mode);
 }
