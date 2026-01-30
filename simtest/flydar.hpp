@@ -104,7 +104,7 @@ class Flydar {
 
         bool step(const int frame, FILE * logfile=nullptr)
         {
-            static int rangefinder_distances_mm[1000]; 
+            static int _rangefinder_distances_mm[1000]; 
 
             const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
                 hf::MODE_HOVERING :
@@ -112,27 +112,27 @@ class Flydar {
 
             hf::demands_t setpoint = {};
 
-            hf::RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
+            hf::RangefinderSetpoint::run(_rangefinder_distances_mm, setpoint);
 
             const auto pose = _simulator.step(mode, setpoint);
 
             if (logfile) {
                 write_to_log(logfile, pose,
-                        rangefinder_distances_mm, _rangefinder->getWidth());
+                        _rangefinder_distances_mm, _rangefinder->getWidth());
             }
 
             if (_world.collided({pose.x, pose.y, pose.x})) {
                 return true;
             }
 
-            if (cleared_room(frame, rangefinder_distances_mm,
+            if (cleared_room(frame, _rangefinder_distances_mm,
                         _rangefinder->getWidth())) {
                 return true;
             }
 
             _rangefinder->read(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-                    _world, rangefinder_distances_mm);
+                    _world, _rangefinder_distances_mm);
 
             return false;
         }
