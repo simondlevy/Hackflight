@@ -14,6 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 // C/C++
 #include <stdio.h>
 
@@ -33,7 +35,6 @@ class Flydar {
 
     private:
 
-        static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
         static constexpr float MAX_TIME_SEC = 10;
         static constexpr float TAKEOFF_TIME_SEC = 2;
         static constexpr float FRAME_RATE_HZ = 32;
@@ -44,29 +45,10 @@ class Flydar {
 
         simsens::Rangefinder * _rangefinder;
 
-        static bool succeeded(
+        bool succeeded(
                 const int frame, 
                 const int * rangefinder_distances_mm, 
-                const int rangefinder_size)
-        {
-            for (int i=0; i<rangefinder_size; ++i) {
-                if (rangefinder_distances_mm[i] != -1) {
-                    return false;
-                }
-            }
-
-            static int _cleared_at_frame;
-
-            if (_cleared_at_frame == 0) {
-                _cleared_at_frame = frame;
-            }
-
-            else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
-                return true;
-            }
-
-            return false;
-        }
+                const int rangefinder_size);
 
         static void write_to_log(
                 FILE * logfile,
