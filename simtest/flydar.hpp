@@ -14,8 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-
 // C/C++
 #include <stdio.h>
 
@@ -66,6 +64,21 @@ class Flydar {
 
             return false;
         }
+
+        static void write_to_log(
+                FILE * logfile,
+                const hf::pose_t pose,
+                const int * rangefinder_distances_mm,
+                const int rangefinder_width)
+        {
+            fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+            for (int k=0; k<rangefinder_width; ++k) {
+                fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
+            }
+            fprintf(logfile, "\n");
+        }
+
     public:
 
         static constexpr float MAX_TIME_SEC = 10;
@@ -89,7 +102,7 @@ class Flydar {
                     FRAME_RATE_HZ);
         }
 
-        bool step(const int frame)
+        bool step(const int frame, FILE * logfile=nullptr)
         {
             int rangefinder_distances_mm[1000] = {};
 
@@ -102,6 +115,11 @@ class Flydar {
             hf::RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
 
             const auto pose = _simulator.step(mode, setpoint);
+
+            if (logfile) {
+                write_to_log(logfile, pose,
+                        rangefinder_distances_mm, _rangefinder->getWidth());
+            }
 
             if (_world.collided({pose.x, pose.y, pose.x})) {
                 return false;
@@ -118,9 +136,4 @@ class Flydar {
 
             return false;
         }
-
-        void getInfo(hf::pose_t & pose)
-        {
-        }
-
 };
