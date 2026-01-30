@@ -109,7 +109,7 @@ int main(int argc, char ** argv)
     simsens::World world = {};
     simsens::WorldParser::parse(world_path, world, robot_path);
 
-    simsens::Rangefinder rangefinder = *robot.rangefinders[0];
+    simsens::Rangefinder * rangefinder = robot.rangefinders[0];
 
     const auto pose = world.getRobotPose();
 
@@ -138,16 +138,16 @@ int main(int argc, char ** argv)
         }
 
         if (SimTest::cleared_room(frame, rangefinder_distances_mm,
-                    rangefinder.getWidth())) {
+                    rangefinder->getWidth())) {
             break;
         }
 
-        rangefinder.read(
+        rangefinder->read(
                 {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
                 world, rangefinder_distances_mm);
 
         write_to_log(logfile, pose,
-                rangefinder_distances_mm, rangefinder.getWidth());
+                rangefinder_distances_mm, rangefinder->getWidth());
     }
 
     fclose(logfile);
