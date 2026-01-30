@@ -63,7 +63,7 @@ static constexpr float THROTTLE_ARMING_MAX = -0.9;
 static constexpr float ARMING_SWITCH_MIN = 0.9;
 
 // Motors ---------------------------------------------------------
-const std::vector<uint8_t> MOTOR_PINS = { 6, 5, 4, 3 };
+const std::vector<uint8_t> MOTOR_PINS = { 4, 3, 6, 5 };
 
 // Max pitch angle in degrees for angle mode (maximum ~70 degrees),
 // deg/sec for rate mode
