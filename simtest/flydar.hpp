@@ -40,6 +40,8 @@ class Flydar {
 
         simsens::World _world;
 
+        simsens::Rangefinder * _rangefinder;
+
     public:
 
         static constexpr float MAX_TIME_SEC = 10;
@@ -56,8 +58,7 @@ class Flydar {
 
             simsens::WorldParser::parse(world_path, _world, robot_path);
 
-            simsens::Rangefinder rangefinder =
-                simsens::Rangefinder(*robot.rangefinders[0]);
+            _rangefinder = robot.rangefinders[0];
 
             const auto pose = _world.getRobotPose();
 
@@ -82,14 +83,14 @@ class Flydar {
                 return false;
             }
 
-            if (SimTest::cleared_room(frame, rangefinder_distances_mm,
-                        rangefinder.getWidth())) {
+            if (cleared_room(frame, rangefinder_distances_mm,
+                        _rangefinder->getWidth())) {
                 return true;
             }
 
-            rangefinder.read(
+            _rangefinder->read(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-                    world, rangefinder_distances_mm);
+                    _world, rangefinder_distances_mm);
 
             return false;
         }

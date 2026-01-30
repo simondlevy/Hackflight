@@ -30,7 +30,7 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-//#include "flydar.hpp"
+#include "flydar.hpp"
 
 static constexpr float TAKEOFF_TIME_SEC = 2;
 static constexpr float FRAME_RATE_HZ = 32;
