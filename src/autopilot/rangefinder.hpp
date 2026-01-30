@@ -20,22 +20,26 @@
 
 #include <datatypes.h>
 
-class RangefinderSetpoint {
+namespace hf {
 
-    public:
+    class RangefinderSetpoint {
 
-        static void run(const int * rangefinder_distances_mm,
-                demands_t & setpoint)
-        {
-            const int * d = rangefinder_distances_mm;
+        public:
 
-            // Look for clear (infinity reading) in center of 1x8 readings
-            const bool center_is_clear = d[3] == -1 && d[4] == -1;
+            static void run(const int * rangefinder_distances_mm,
+                    demands_t & setpoint)
+            {
+                const int * d = rangefinder_distances_mm;
 
-            // If clear, pitch forward
-            setpoint.pitch = center_is_clear ? 0.4 : 0;
+                // Look for clear (infinity reading) in center of 1x8 readings
+                const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
-            // Otherwise, yaw rightward
-            setpoint.yaw = center_is_clear ? 0 : 0.2;
-        }        
-};
+                // If clear, pitch forward
+                setpoint.pitch = center_is_clear ? 0.4 : 0;
+
+                // Otherwise, yaw rightward
+                setpoint.yaw = center_is_clear ? 0 : 0.2;
+            }        
+    };
+
+}

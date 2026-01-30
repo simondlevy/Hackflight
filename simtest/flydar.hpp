@@ -93,7 +93,7 @@ class SimTest {
 
             const auto pose = world.getRobotPose();
 
-            Simulator simulator = {};
+            hf::Simulator simulator = {};
 
             simulator.init(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
@@ -103,12 +103,13 @@ class SimTest {
 
             for (uint32_t frame=0; frame<MAX_TIME_SEC*FRAME_RATE_HZ; ++frame) {
 
-                const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ? MODE_HOVERING :
-                    MODE_AUTONOMOUS;
+                const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
+                    hf::MODE_HOVERING :
+                    hf::MODE_AUTONOMOUS;
 
-                demands_t setpoint = {};
+                hf::demands_t setpoint = {};
 
-                RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
+                hf::RangefinderSetpoint::run(rangefinder_distances_mm, setpoint);
 
                 const auto pose = simulator.step(mode, setpoint);
 

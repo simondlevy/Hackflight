@@ -19,58 +19,61 @@
 
 #include <num.hpp>
 
-class PitchRollAngleController {
+namespace hf {
 
-    public:
+    class PitchRollAngleController {
 
-        /**
-          * Demand is input as angles in degrees and output as angular
-          * velocities in degrees per second:
-          *
-          * roll: right-down positive
-          *
-          * pitch: nose-down positive
-         */
-        static void run(
-                const bool airborne,
-                const float dt,
-                const float state_phi,
-                const float state_theta,
-                const float demand_roll,
-                const float demand_pitch,
-                float & new_demand_roll,
-                float & new_demand_pitch)
-        {
-            static float _roll_integral;
+        public:
 
-            static float _pitch_integral;
+            /**
+             * Demand is input as angles in degrees and output as angular
+             * velocities in degrees per second:
+             *
+             * roll: right-down positive
+             *
+             * pitch: nose-down positive
+             */
+            static void run(
+                    const bool airborne,
+                    const float dt,
+                    const float state_phi,
+                    const float state_theta,
+                    const float demand_roll,
+                    const float demand_pitch,
+                    float & new_demand_roll,
+                    float & new_demand_pitch)
+            {
+                static float _roll_integral;
 
-            new_demand_roll = runAxis(airborne, dt, demand_roll, state_phi,
-                    _roll_integral);
+                static float _pitch_integral;
 
-            new_demand_pitch =
-                runAxis(airborne, dt, demand_pitch, state_theta,
-                        _pitch_integral);
-        }
+                new_demand_roll = runAxis(airborne, dt, demand_roll, state_phi,
+                        _roll_integral);
 
-    private:
+                new_demand_pitch =
+                    runAxis(airborne, dt, demand_pitch, state_theta,
+                            _pitch_integral);
+            }
 
-        static constexpr float KP = 6;
-        static constexpr float KI = 3;
-        static constexpr float ILIMIT = 20;
+        private:
 
-        static float runAxis(
-                const bool airborne,
-                const float dt,
-                const float demand,
-                const float measured,
-                float & integral) 
-        {
-            const auto error = demand - measured;
+            static constexpr float KP = 6;
+            static constexpr float KI = 3;
+            static constexpr float ILIMIT = 20;
 
-            integral = airborne ?
-                Num::fconstrain(integral + error * dt, ILIMIT): 0;
+            static float runAxis(
+                    const bool airborne,
+                    const float dt,
+                    const float demand,
+                    const float measured,
+                    float & integral) 
+            {
+                const auto error = demand - measured;
 
-            return airborne ? KP * error + KI * integral : 0; 
-        }
-};
+                integral = airborne ?
+                    Num::fconstrain(integral + error * dt, ILIMIT): 0;
+
+                return airborne ? KP * error + KI * integral : 0; 
+            }
+    };
+}

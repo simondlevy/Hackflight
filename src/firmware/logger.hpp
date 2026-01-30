@@ -16,44 +16,47 @@
 
 #pragma once
 
-
 #include <firmware/comms.hpp>
 #include <msp/__messages__.h>
 #include <msp/serializer.hpp>
 #include <firmware/timer.hpp>
 
-class Logger {
+namespace hf {
 
-    public:
+    class Logger {
 
-        static void run(
-                const uint32_t msec_curr,
-                const vehicleState_t & state)
-        {
-            static Timer _timer;
+        public:
 
-            if (_timer.ready(FREQ_HZ)) {
+            static void run(
+                    const uint32_t msec_curr,
+                    const vehicleState_t & state)
+            {
+                static Timer _timer;
 
-                MspSerializer serializer = {};
+                if (_timer.ready(FREQ_HZ)) {
 
-                const float statevals[10] = { state.dx, state.dy, state.z,
-                    state.dz, state.phi, state.dphi, state.theta,
-                    state.dtheta, state.psi, state.dpsi 
-                };
+                    MspSerializer serializer = {};
 
-                serializer.serializeFloats(MSP_STATE, statevals, 10);
+                    const float statevals[10] = { state.dx, state.dy, state.z,
+                        state.dz, state.phi, state.dphi, state.theta,
+                        state.dtheta, state.psi, state.dpsi 
+                    };
 
-                sendPayload(serializer);
+                    serializer.serializeFloats(MSP_STATE, statevals, 10);
+
+                    sendPayload(serializer);
+                }
             }
-        }
 
-    private:
+        private:
 
-        static constexpr float FREQ_HZ = 100;
+            static constexpr float FREQ_HZ = 100;
 
-        static void sendPayload(const MspSerializer & serializer) {
-            for (uint8_t k=0; k<serializer.payloadSize; ++k) {
-                Comms::write_byte(serializer.payload[k]);
+            static void sendPayload(const MspSerializer & serializer) {
+                for (uint8_t k=0; k<serializer.payloadSize; ++k) {
+                    Comms::write_byte(serializer.payload[k]);
+                }
             }
-        }
-};
+    };
+
+}

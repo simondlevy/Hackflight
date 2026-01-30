@@ -20,12 +20,12 @@
 
 static const uint8_t PIN = PC0;
 
-void Led::device_init()
+void hf::Led::device_init()
 {
     pinMode(PIN, OUTPUT);
 }
 
-void Led::device_set(const bool on)
+void hf::Led::device_set(const bool on)
 {
     digitalWrite(PIN, !on);
 }

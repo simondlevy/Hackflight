@@ -22,7 +22,7 @@
 
 static VL53L1X vl53l1x;
 
-bool ZRanger::device_init()
+bool hf::ZRanger::device_init()
 {
     Wire.begin();
     Wire.setClock(400000);
@@ -40,7 +40,7 @@ bool ZRanger::device_init()
     return true;
 }
 
-float ZRanger::device_read()
+float hf::ZRanger::device_read()
 {
     return vl53l1x.read();
 }

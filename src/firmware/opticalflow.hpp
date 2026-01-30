@@ -20,79 +20,83 @@
 
 #include <datatypes.h>
 
-class OpticalFlow {
+namespace hf {
 
-    public:
+    class OpticalFlow {
 
-        typedef struct {
-            uint32_t timestamp;
-            union {
-                struct {
-                    float dpixelx;  // Accumulated pixel count x
-                    float dpixely;  // Accumulated pixel count y
+        public:
+
+            typedef struct {
+                uint32_t timestamp;
+                union {
+                    struct {
+                        float dpixelx;  // Accumulated pixel count x
+                        float dpixely;  // Accumulated pixel count y
+                    };
+                    float dpixel[2];  // Accumulated pixel count
                 };
-                float dpixel[2];  // Accumulated pixel count
-            };
-            float stdDevX;      // Measurement standard deviation
-            float stdDevY;      // Measurement standard deviation
-            float dt;           // Time during which pixels were accumulated
-        } measurement_t;
+                float stdDevX;      // Measurement standard deviation
+                float stdDevY;      // Measurement standard deviation
+                float dt;           // Time during which pixels were accumulated
+            } measurement_t;
 
 
-        void init()
-        {
-            device_init();
-        }
-
-        bool read(measurement_t & flowData)
-        {
-            int16_t deltaX = 0;
-            int16_t deltaY = 0;
-            bool gotMotion = false;
-
-            device_read(deltaX, deltaY, gotMotion);
-
-            // Flip motion information to comply with sensor mounting
-            // (might need to be changed if mounted differently)
-            int16_t accpx = -deltaY;
-            int16_t accpy = -deltaX;
-
-            // Outlier removal
-            if (abs(accpx) < OUTLIER_LIMIT && abs(accpy) < OUTLIER_LIMIT) {
-
-                static uint32_t _lastTime;
-
-                // Form flow measurement struct and push into the EKF
-                flowData.stdDevX = FLOW_STD_FIXED;
-                flowData.stdDevY = FLOW_STD_FIXED;
-                flowData.dt = (float)(micros()-_lastTime)/1000000.0f;
-                _lastTime = micros();
-
-                // Use raw measurements
-                flowData.dpixelx = (float)accpx;
-                flowData.dpixely = (float)accpy;
-
-                // Push measurements into the estimator if flow is not disabled
-                //    and the PMW flow sensor indicates motion detection
-                if (!USE_FLOW_DISABLED && gotMotion) {
-                    return true;
-                }
+            void init()
+            {
+                device_init();
             }
 
-            return false;
-        }        
+            bool read(measurement_t & flowData)
+            {
+                int16_t deltaX = 0;
+                int16_t deltaY = 0;
+                bool gotMotion = false;
 
-    private:
+                device_read(deltaX, deltaY, gotMotion);
 
-        static const int16_t OUTLIER_LIMIT = 100;
+                // Flip motion information to comply with sensor mounting
+                // (might need to be changed if mounted differently)
+                int16_t accpx = -deltaY;
+                int16_t accpy = -deltaX;
 
-        // Disables pushing the flow measurement in the EKF
-        static const auto USE_FLOW_DISABLED = false;
+                // Outlier removal
+                if (abs(accpx) < OUTLIER_LIMIT && abs(accpy) < OUTLIER_LIMIT) {
 
-        // Set standard deviation flow
-        static constexpr float FLOW_STD_FIXED = 2.0;
+                    static uint32_t _lastTime;
 
-        bool device_init();
+                    // Form flow measurement struct and push into the EKF
+                    flowData.stdDevX = FLOW_STD_FIXED;
+                    flowData.stdDevY = FLOW_STD_FIXED;
+                    flowData.dt = (float)(micros()-_lastTime)/1000000.0f;
+                    _lastTime = micros();
 
-        void device_read(int16_t & dx, int16_t & dy, bool &gotMotion);
-};
+                    // Use raw measurements
+                    flowData.dpixelx = (float)accpx;
+                    flowData.dpixely = (float)accpy;
+
+                    // Push measurements into the estimator if flow is not disabled
+                    //    and the PMW flow sensor indicates motion detection
+                    if (!USE_FLOW_DISABLED && gotMotion) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }        
+
+        private:
+
+            static const int16_t OUTLIER_LIMIT = 100;
+
+            // Disables pushing the flow measurement in the EKF
+            static const auto USE_FLOW_DISABLED = false;
+
+            // Set standard deviation flow
+            static constexpr float FLOW_STD_FIXED = 2.0;
+
+            bool device_init();
+
+            void device_read(int16_t & dx, int16_t & dy, bool &gotMotion);
+    };
+
+}

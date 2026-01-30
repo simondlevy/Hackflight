@@ -29,7 +29,7 @@ static constexpr char ROBOT_NAME[] = "diyquad";
 static dBodyID _robot;
 
 // Platform-independent simulator simulator loop
-static Simulator _simulator;
+static hf::Simulator _simulator;
 
 DLLEXPORT void webots_physics_init() 
 {
@@ -58,7 +58,7 @@ class PhysicsPluginHelper {
 
     public:
 
-        static bool get_siminfo(siminfo_t & siminfo)
+        static bool get_siminfo(hf::siminfo_t & siminfo)
         {
             if (_robot == NULL) {
                 return false;
@@ -67,9 +67,9 @@ class PhysicsPluginHelper {
             int bytes_received = 0;
 
             // Get sim info from main program
-            const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
+            const auto buffer = (hf::siminfo_t *)dWebotsReceive(&bytes_received);
 
-            if (bytes_received == sizeof(siminfo_t)) {
+            if (bytes_received == sizeof(hf::siminfo_t)) {
                 memcpy(&siminfo, buffer, sizeof(siminfo));
             }
 
@@ -77,7 +77,7 @@ class PhysicsPluginHelper {
             return siminfo.framerate > 0;
         }
 
-        static pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
+        static pose_t get_pose_from_siminfo(const hf::siminfo_t & siminfo)
         {
             // Set pose first time around
             static bool _ready;
@@ -96,8 +96,8 @@ class PhysicsPluginHelper {
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
-            const axis3_t euler = { (float)pose.phi, (float)pose.theta, (float)-pose.psi};
-            axis4_t quat = euler2quat(euler);
+            const hf::axis3_t euler = { (float)pose.phi, (float)pose.theta, (float)-pose.psi};
+            const hf::axis4_t quat = euler2quat(euler);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
             dBodySetQuaternion(_robot, q);
@@ -105,7 +105,7 @@ class PhysicsPluginHelper {
 
     private:
 
-        static axis4_t euler2quat(const axis3_t & angles)
+        static hf::axis4_t euler2quat(const hf::axis3_t & angles)
         {
             // Abbreviations for the various angular functions
 

@@ -22,12 +22,12 @@
 
 static HardwareSerial serial = HardwareSerial(RX_PIN, TX_PIN);
 
-void Comms::init()
+void hf::Comms::init()
 {
     serial.begin(115200);
 }
 
-bool Comms::read_byte(uint8_t * byte)
+bool hf::Comms::read_byte(uint8_t * byte)
 {
     if (serial.available()) {
         *byte = serial.read();
@@ -37,7 +37,7 @@ bool Comms::read_byte(uint8_t * byte)
     return false;
 }
             
-void Comms::write_byte(const uint8_t byte)
+void hf::Comms::write_byte(const uint8_t byte)
 {
     serial.write(byte);
 }

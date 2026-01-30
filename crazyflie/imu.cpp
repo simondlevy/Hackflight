@@ -40,7 +40,7 @@ static bool okay(const int status)
     return status >= 0;
 }
 
-bool IMU::device_init(int16_t & gscale, int16_t & ascale)
+bool hf::IMU::device_init(int16_t & gscale, int16_t & ascale)
 {
     gscale = 2000;
     ascale = 24;
@@ -66,7 +66,7 @@ bool IMU::device_init(int16_t & gscale, int16_t & ascale)
         okay(accel.setRange(Bmi088Accel::RANGE_24G));
 }
 
-void IMU::device_read(
+void hf::IMU::device_read(
         int16_t & gx, int16_t & gy, int16_t & gz,
         int16_t & ax, int16_t & ay, int16_t & az)
 {
