@@ -32,9 +32,6 @@
 
 #include "flydar.hpp"
 
-static constexpr float TAKEOFF_TIME_SEC = 2;
-static constexpr float FRAME_RATE_HZ = 32;
-
 static const char * LOGNAME = "log.csv";
 
 int main(int argc, char ** argv)
