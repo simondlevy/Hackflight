@@ -104,6 +104,7 @@ int main(int argc, char ** argv)
 
     Flydar flydar = Flydar(robot_path, world_path);
 
+    /*
     // run(robot_path, world_path, logfile);
     simsens::Robot robot = {};
     simsens::RobotParser::parse(robot_path, robot);
@@ -121,10 +122,16 @@ int main(int argc, char ** argv)
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAME_RATE_HZ);
 
-    int rangefinder_distances_mm[1000] = {}; // arbitrary max size
+    int rangefinder_distances_mm[1000] = {}; // arbitrary max size*/
+
 
     for (uint32_t frame=0; frame<SimTest::MAX_TIME_SEC*FRAME_RATE_HZ; ++frame) {
 
+        if (flydar.step(frame, logfile)) {
+            break;
+        }
+
+        /*
         const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
@@ -150,6 +157,7 @@ int main(int argc, char ** argv)
 
         write_to_log(logfile, pose,
                 rangefinder_distances_mm, rangefinder->getWidth());
+                */
     }
 
     fclose(logfile);

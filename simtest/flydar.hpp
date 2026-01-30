@@ -104,7 +104,7 @@ class Flydar {
 
         bool step(const int frame, FILE * logfile=nullptr)
         {
-            int rangefinder_distances_mm[1000] = {};
+            static int rangefinder_distances_mm[1000]; 
 
             const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
                 hf::MODE_HOVERING :
@@ -122,7 +122,7 @@ class Flydar {
             }
 
             if (_world.collided({pose.x, pose.y, pose.x})) {
-                return false;
+                return true;
             }
 
             if (cleared_room(frame, rangefinder_distances_mm,
