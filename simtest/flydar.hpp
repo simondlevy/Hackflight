@@ -22,6 +22,7 @@
 // Hackflight
 #include <autopilot/rangefinder.hpp>
 #include <datatypes.h>
+#include <simulator/pose.h>
 #include <simulator/simulator.hpp>
 #include <vehicles/diyquad.hpp>
 
@@ -42,13 +43,34 @@ class Flydar {
 
         simsens::Rangefinder * _rangefinder;
 
+        static bool cleared_room(
+                const int frame, 
+                const int * rangefinder_distances_mm, 
+                const int rangefinder_size)
+        {
+            for (int i=0; i<rangefinder_size; ++i) {
+                if (rangefinder_distances_mm[i] != -1) {
+                    return false;
+                }
+            }
+
+            static int _cleared_at_frame;
+
+            if (_cleared_at_frame == 0) {
+                _cleared_at_frame = frame;
+            }
+
+            else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+                return true;
+            }
+
+            return false;
+        }
     public:
 
         static constexpr float MAX_TIME_SEC = 10;
         static constexpr float TAKEOFF_TIME_SEC = 2;
         static constexpr float FRAME_RATE_HZ = 32;
-
-        int rangefinder_distances_mm[1000];
 
         Flydar(const char * robot_path, const char * world_path)
         {
@@ -69,6 +91,8 @@ class Flydar {
 
         bool step(const int frame)
         {
+            int rangefinder_distances_mm[1000] = {};
+
             const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
                 hf::MODE_HOVERING :
                 hf::MODE_AUTONOMOUS;
@@ -95,27 +119,8 @@ class Flydar {
             return false;
         }
 
-        static bool cleared_room(
-                const int frame, 
-                const int * rangefinder_distances_mm, 
-                const int rangefinder_size)
+        void getInfo(hf::pose_t & pose)
         {
-            for (int i=0; i<rangefinder_size; ++i) {
-                if (rangefinder_distances_mm[i] != -1) {
-                    return false;
-                }
-            }
-
-            static int _cleared_at_frame;
-
-            if (_cleared_at_frame == 0) {
-                _cleared_at_frame = frame;
-            }
-
-            else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
-                return true;
-            }
-
-            return false;
         }
+
 };

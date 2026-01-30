@@ -77,7 +77,7 @@ class PhysicsPluginHelper {
             return siminfo.framerate > 0;
         }
 
-        static pose_t get_pose_from_siminfo(const hf::siminfo_t & siminfo)
+        static hf::pose_t get_pose_from_siminfo(const hf::siminfo_t & siminfo)
         {
             // Set pose first time around
             static bool _ready;
@@ -89,7 +89,7 @@ class PhysicsPluginHelper {
             return _simulator.step(siminfo.mode, siminfo.setpoint);
         }
 
-        static void set_dbody_from_pose(const pose_t & pose)
+        static void set_dbody_from_pose(const hf::pose_t & pose)
         {
             // Negate Y to make leftward positive
             dBodySetPosition(_robot, pose.x, -pose.y, pose.z);

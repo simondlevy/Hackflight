@@ -241,7 +241,7 @@ int main(int argc, char ** argv)
 
     platform_init();
 
-    const auto startingPose = pose_t {
+    const auto startingPose = hf::pose_t {
         platform_get_vehicle_x(),
         platform_get_vehicle_y(),
         platform_get_vehicle_z(),
@@ -285,7 +285,7 @@ int main(int argc, char ** argv)
         }
 
         // Send siminfo to fast thread
-        memcpy(&siminfo.startingPose, &startingPose, sizeof(pose_t));
+        memcpy(&siminfo.startingPose, &startingPose, sizeof(hf::pose_t));
         siminfo.framerate = platform_get_framerate();
         platform_send_siminfo(&siminfo, sizeof(siminfo));
 

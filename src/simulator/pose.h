@@ -18,14 +18,16 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+namespace hf {
 
-typedef struct {
+    typedef struct {
 
-    double x;
-    double y;
-    double z;
-    double phi;
-    double theta;
-    double psi;
+        double x;
+        double y;
+        double z;
+        double phi;
+        double theta;
+        double psi;
 
-} pose_t;
+    } pose_t;
+}

@@ -39,7 +39,7 @@ static const char * LOGNAME = "log.csv";
 
 static void write_to_log(
         FILE * logfile,
-        const pose_t pose,
+        const hf::pose_t pose,
         const int * rangefinder_distances_mm,
         const int rangefinder_width)
 {
@@ -101,6 +101,8 @@ int main(int argc, char ** argv)
 
     const char *robot_path = argv[1];
     const char *world_path = argv[2];
+
+    Flydar flydar = Flydar(robot_path, world_path);
 
     // run(robot_path, world_path, logfile);
     simsens::Robot robot = {};
