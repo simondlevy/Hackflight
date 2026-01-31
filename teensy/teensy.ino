@@ -22,6 +22,7 @@
 #include <Wire.h> 
 
 // Third-party libraries
+#include <dshot-teensy4.hpp>  
 #include <dsmrx.hpp>  
 #include <MPU6050.h>
 
@@ -428,8 +429,6 @@ void commandMotors() {
     uint32_t stepsfor0high = (cpuHz * 0.625f) / 1'000'000;
     uint32_t stepsfor1high = (cpuHz * 1.25f) / 1'000'000;
     uint32_t stepsforbit = (cpuHz * 1.67) / 1'000'000;
-    uint32_t offset = 40; // tuned adjustment for minimizing out-of-frame errors
-                          // depending on ESC, range is somewhere between 20 and 80
 
     /*
      * relies on teensy4.0 ARM_DWT_CYCCNT CPU cycle counter. 1 cycle ≈ 1.67 nanoseconds
@@ -497,8 +496,13 @@ void commandMotors() {
 static void armMotors() {
 
     for (int i = 0; i <= 50; i++) {
-        commandMotors();
-        delay(2);
+
+        DshotTeensy4::commandMotors(
+                armedFly,
+                m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
+                m1Pin, m2Pin, m3Pin, m4Pin);
+
+         delay(2);
     }
 }
 
