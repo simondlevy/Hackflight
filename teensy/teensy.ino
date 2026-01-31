@@ -1,41 +1,33 @@
-//Arduino/Teensy Flight Controller - dRehmFlight
-//Author: Nicholas Rehm
-//Project Start: 1/6/2020
-//Last Updated: 7/29/2022
-//Version: Beta 1.3
-
-//========================================================================================================================//
-
-//CREDITS + SPECIAL THANKS
 /*
-   Some elements inspired by:
-http://www.brokking.net/ymfc-32_main.html
+   Hackflight for Teensy 4.0 
 
-Madgwick filter function adapted from:
-https://github.com/arduino-libraries/MadgwickAHRS
+   Based on  https://github.com/nickrehm/dRehmFlight
 
-MPU9250 implementation based on MPU9250 library by:
-brian.taylor@bolderflight.com
-http://www.bolderflight.com
+   Copyright (C) 2026 Simon D. Levy
 
-Thank you to:
-RcGroups 'jihlein' - IMU implementation overhaul + SBUS implementation.
-Everyone that sends me pictures and videos of your flying creations! -Nick
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
 
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <Wire.h>     //I2c communication
+#include <SPI.h>      //SPI communication
+#include <PWMServo.h> //Commanding any extra actuators, installed with teensyduino installer
 
+#include "src/DSMRX/DSMRX.h"  
+#include "src/MPU6050/MPU6050.h"
 
-//========================================================================================================================//
-//                                                 USER-SPECIFIED DEFINES                                                 //                                                                 
-//========================================================================================================================//
-
-//Uncomment only one receiver type
-//#define USE_PWM_RX
-//#define USE_PPM_RX
-//#define USE_SBUS_RX
 #define USE_DSM_RX
-static const uint8_t num_DSM_channels = 6; //If using DSM RX, change this to match the number of transmitter channels you have
+
+static const uint8_t num_DSM_channels = 6; 
 
 //Uncomment only one IMU
 #define USE_MPU6050_I2C //Default
@@ -54,39 +46,7 @@ static const uint8_t num_DSM_channels = 6; //If using DSM RX, change this to mat
                  //#define ACCEL_16G
 
 
-
-                 //========================================================================================================================//
-
-
-
-                 //REQUIRED LIBRARIES (included with download in main sketch folder)
-
-#include <Wire.h>     //I2c communication
-#include <SPI.h>      //SPI communication
-#include <PWMServo.h> //Commanding any extra actuators, installed with teensyduino installer
-
-#if defined USE_SBUS_RX
-#include "src/SBUS/SBUS.h"   //sBus interface
-#endif
-
-#if defined USE_DSM_RX
-#include "src/DSMRX/DSMRX.h"  
-#endif
-
-#if defined USE_MPU6050_I2C
-#include "src/MPU6050/MPU6050.h"
 MPU6050 mpu6050;
-#elif defined USE_MPU9250_SPI
-#include "src/MPU9250/MPU9250.h"
-MPU9250 mpu9250(SPI2,36);
-#else
-#error No MPU defined... 
-#endif
-
-
-
-//========================================================================================================================//
-
 
 
 //Setup gyro and accel full scale value selection and scale factor
@@ -493,13 +453,9 @@ void getIMUdata() {
      * the readings. The filter parameters B_gyro and B_accel are set to be good for a 2kHz loop rate. Finally,
      * the constant errors found in calculate_IMU_error() on startup are subtracted from the accelerometer and gyro readings.
      */
-    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ,MgX,MgY,MgZ;
+    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
-#if defined USE_MPU6050_I2C
     mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
-#elif defined USE_MPU9250_SPI
-    mpu9250.getMotion9(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ, &MgX, &MgY, &MgZ);
-#endif
 
     //Accelerometer
     AccX = AcX / ACCEL_SCALE_FACTOR; //G's
@@ -533,31 +489,18 @@ void getIMUdata() {
     GyroY_prev = GyroY;
     GyroZ_prev = GyroZ;
 
-    //Magnetometer
-    MagX = MgX/6.0; //uT
-    MagY = MgY/6.0;
-    MagZ = MgZ/6.0;
-    //Correct the outputs with the calculated error values
-    MagX = (MagX - MagErrorX)*MagScaleX;
-    MagY = (MagY - MagErrorY)*MagScaleY;
-    MagZ = (MagZ - MagErrorZ)*MagScaleZ;
-    //LP filter magnetometer data
-    MagX = (1.0 - B_mag)*MagX_prev + B_mag*MagX;
-    MagY = (1.0 - B_mag)*MagY_prev + B_mag*MagY;
-    MagZ = (1.0 - B_mag)*MagZ_prev + B_mag*MagZ;
-    MagX_prev = MagX;
-    MagY_prev = MagY;
-    MagZ_prev = MagZ;
 }
 
 void calculate_IMU_error() {
-    //DESCRIPTION: Computes IMU accelerometer and gyro error on startup. Note: vehicle should be powered up on flat surface
+    //DESCRIPTION: Computes IMU accelerometer and gyro error on startup. Note:
+    //vehicle should be powered up on flat surface
     /*
-     * Don't worry too much about what this is doing. The error values it computes are applied to the raw gyro and 
-     * accelerometer values AccX, AccY, AccZ, GyroX, GyroY, GyroZ in getIMUdata(). This eliminates drift in the
-     * measurement. 
+     * Don't worry too much about what this is doing. The error values it
+     * computes are applied to the raw gyro and accelerometer values AccX,
+     * AccY, AccZ, GyroX, GyroY, GyroZ in getIMUdata(). This eliminates drift
+     * in the measurement. 
      */
-    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ,MgX,MgY,MgZ;
+    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
     AccErrorX = 0.0;
     AccErrorY = 0.0;
     AccErrorZ = 0.0;
@@ -568,11 +511,8 @@ void calculate_IMU_error() {
     //Read IMU values 12000 times
     int c = 0;
     while (c < 12000) {
-#if defined USE_MPU6050_I2C
+
         mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
-#elif defined USE_MPU9250_SPI
-        mpu9250.getMotion9(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ, &MgX, &MgY, &MgZ);
-#endif
 
         AccX  = AcX / ACCEL_SCALE_FACTOR;
         AccY  = AcY / ACCEL_SCALE_FACTOR;
