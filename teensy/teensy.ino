@@ -50,6 +50,20 @@ static const uint8_t num_DSM_channels = 6;
 MPU6050 mpu6050;
 
 
+void radioSetup()
+{
+    Serial1.begin(115000);
+}
+
+DSM2048 DSM;
+
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+        DSM.handleSerialEvent(Serial1.read(), micros());
+    }
+}
+
 //Setup gyro and accel full scale value selection and scale factor
 
 #if defined USE_MPU6050_I2C
@@ -202,7 +216,6 @@ bool blinkAlternate;
 unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
 unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
 
-DSM2048 DSM;
 
 //IMU:
 float AccX, AccY, AccZ;
