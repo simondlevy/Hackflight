@@ -427,10 +427,11 @@ void loop()
 
     if ((channel_5_pwm < 1500) || (armedFly == false)) {
         armedFly = false;
+        /*
         motor_pwms[0] = 120;
         motor_pwms[1] = 120;
         motor_pwms[2] = 120;
-        motor_pwms[3] = 120;
+        motor_pwms[3] = 120;*/
     }
 
     _motors.run(armedFly, motor_pwms);
