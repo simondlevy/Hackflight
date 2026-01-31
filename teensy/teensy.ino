@@ -142,18 +142,9 @@ static float maxYaw = 160.0;     //Max yaw rate in deg/sec
 static float Kp_roll_angle = 0.2;    //Roll P-gain - angle mode 
 static float Ki_roll_angle = 0.3;    //Roll I-gain - angle mode
 static float Kd_roll_angle = 0.05;   //Roll D-gain - angle mode (has no effect on controlANGLE2)
-static float B_loop_roll = 0.9;      //Roll damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
 static float Kp_pitch_angle = 0.2;   //Pitch P-gain - angle mode
 static float Ki_pitch_angle = 0.3;   //Pitch I-gain - angle mode
 static float Kd_pitch_angle = 0.05;  //Pitch D-gain - angle mode (has no effect on controlANGLE2)
-static float B_loop_pitch = 0.9;     //Pitch damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
-
-static float Kp_roll_rate = 0.15;    //Roll P-gain - rate mode
-static float Ki_roll_rate = 0.2;     //Roll I-gain - rate mode
-static float Kd_roll_rate = 0.0002;  //Roll D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
-static float Kp_pitch_rate = 0.15;   //Pitch P-gain - rate mode
-static float Ki_pitch_rate = 0.2;    //Pitch I-gain - rate mode
-static float Kd_pitch_rate = 0.0002; //Pitch D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
 
 static float Kp_yaw = 0.3;           //Yaw P-gain
 static float Ki_yaw = 0.05;          //Yaw I-gain
@@ -183,7 +174,7 @@ static float GyroX, GyroY, GyroZ;
 static float GyroX_prev, GyroY_prev, GyroZ_prev;
 static float MagX, MagY, MagZ;
 static float roll_IMU, pitch_IMU, yaw_IMU;
-static float roll_IMU_prev, pitch_IMU_prev;
+
 static float q0 = 1.0f; //Initialize quaternion for madgwick filter
 static float q1 = 0.0f;
 static float q2 = 0.0f;
@@ -194,145 +185,33 @@ static float thro_des, roll_des, pitch_des, yaw_des;
 static float roll_passthru, pitch_passthru, yaw_passthru;
 
 //Controller:
-static float error_roll, error_roll_prev, roll_des_prev, integral_roll, integral_roll_il, integral_roll_ol, integral_roll_prev, integral_roll_prev_il, integral_roll_prev_ol, derivative_roll, roll_PID = 0;
-static float error_pitch, error_pitch_prev, pitch_des_prev, integral_pitch, integral_pitch_il, integral_pitch_ol, integral_pitch_prev, integral_pitch_prev_il, integral_pitch_prev_ol, derivative_pitch, pitch_PID = 0;
-static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev, derivative_yaw, yaw_PID = 0;
+static float error_roll, integral_roll, integral_roll_prev, derivative_roll,
+             roll_PID;
+
+static float error_pitch, integral_pitch, integral_pitch_prev,
+             derivative_pitch, pitch_PID;
+
+static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
+             derivative_yaw, yaw_PID;
 
 //Mixer
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled, m5_command_scaled, m6_command_scaled;
-int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM, m5_command_PWM, m6_command_PWM;
-static float s1_command_scaled, s2_command_scaled, s3_command_scaled, s4_command_scaled, s5_command_scaled, s6_command_scaled, s7_command_scaled;
-int s1_command_PWM, s2_command_PWM, s3_command_PWM, s4_command_PWM, s5_command_PWM, s6_command_PWM, s7_command_PWM;
+
+static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
+           m5_command_PWM, m6_command_PWM;
+
+static float s1_command_scaled, s2_command_scaled, s3_command_scaled,
+             s4_command_scaled, s5_command_scaled, s6_command_scaled,
+             s7_command_scaled;
+
+static int s1_command_PWM, s2_command_PWM, s3_command_PWM, s4_command_PWM,
+           s5_command_PWM, s6_command_PWM, s7_command_PWM;
 
 //Flight status
-bool armedFly = false;
-
-//========================================================================================================================//
-//                                                      VOID SETUP                                                        //                           
-//========================================================================================================================//
-
-void setup()
-{
-    Serial.begin(500000); //USB serial
-    delay(500);
-
-    //Initialize all pins
-    pinMode(13, OUTPUT); //Pin 13 LED blinker on board, do not modify 
-    pinMode(m1Pin, OUTPUT);
-    pinMode(m2Pin, OUTPUT);
-    pinMode(m3Pin, OUTPUT);
-    pinMode(m4Pin, OUTPUT);
-
-    //Set built in LED to turn on to signal startup
-    digitalWrite(13, HIGH);
-
-    delay(5);
-
-    //Initialize radio communication
-    Serial1.begin(115000);
-
-    //Set radio channels to default (safe) values before entering main loop
-    channel_1_pwm = channel_1_fs;
-    channel_2_pwm = channel_2_fs;
-    channel_3_pwm = channel_3_fs;
-    channel_4_pwm = channel_4_fs;
-    channel_5_pwm = channel_5_fs;
-    channel_6_pwm = channel_6_fs;
-
-    //Initialize IMU communication
-    IMUinit();
-
-    delay(5);
-
-    //Get IMU error to zero accelerometer and gyro readings, assuming vehicle is level when powered up
-    //calculate_IMU_error(); //Calibration parameters printed to serial monitor. Paste these in the user specified variables section, then comment this out forever.
+static bool armedFly;
 
 
-    delay(5);
-
-    //Arm OneShot125 motors
-    m1_command_PWM = 125; //Command OneShot125 ESC from 125 to 250us pulse length
-    m2_command_PWM = 125;
-    m3_command_PWM = 125;
-    m4_command_PWM = 125;
-    m5_command_PWM = 125;
-    m6_command_PWM = 125;
-    armMotors(); //Loop over commandMotors() until ESCs happily arm
-
-    //Indicate entering main loop with 3 quick blinks
-    setupBlink(3,160,70); //numBlinks, upTime (ms), downTime (ms)
-
-    //If using MPU9250 IMU, uncomment for one-time magnetometer calibration (may need to repeat for new locations)
-    //calibrateMagnetometer(); //Generates magentometer error and scale factors to be pasted in user-specified variables section
-
-}
-
-
-void loop()
-{
-    //Keep track of what time it is and how much time has elapsed since the last loop
-    prev_time = current_time;      
-    current_time = micros();      
-    dt = (current_time - prev_time)/1000000.0;
-
-    loopBlink(); //Indicate we are in main loop with short blink every 1.5 seconds
-    // Get arming status
-    armedStatus(); //Check if the throttle cut is off and throttle is low.
-
-    //Get vehicle state
-    getIMUdata(); //Pulls raw gyro, accelerometer, and magnetometer data from IMU and LP filters to remove noise
-    Madgwick(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, MagY, -MagX, MagZ, dt); //Updates roll_IMU, pitch_IMU, and yaw_IMU angle estimates (degrees)
-
-    //Compute desired state
-    getDesState(); //Convert raw commands to normalized values based on saturated control limits
-
-    //PID Controller - SELECT ONE:
-    controlANGLE(); //Stabilize on angle setpoint
-                    //controlANGLE2(); //Stabilize on angle setpoint using cascaded method. Rate controller must be tuned well first!
-                    //controlRATE(); //Stabilize on rate setpoint
-
-                    //Actuator mixing and scaling to PWM values
-    controlMixer(); //Mixes PID outputs to scaled actuator commands -- custom mixing assignments done here
-    scaleCommands(); //Scales motor commands to 125 to 250 range (oneshot125 protocol) and servo PWM commands to 0 to 180 (for servo library)
-
-    //Throttle cut check
-    throttleCut(); //Directly sets motor commands to low based on state of ch5
-
-    //Command actuators
-    commandMotors(); //Sends command pulses to each motor pin using OneShot125 protocol
-
-    //Get vehicle commands for next loop iteration
-    getCommands(); //Pulls current available radio commands
-    failSafe(); //Prevent failures in event of bad receiver connection, defaults to failsafe values assigned in setup
-
-    //Regulate loop rate
-    loopRate(2000); //Do not exceed 2000Hz, all filter parameters tuned to 2000Hz by default
-}
-
-
-
-//========================================================================================================================//
-//                                                      FUNCTIONS                                                         //                           
-//========================================================================================================================//
-
-
-
-void controlMixer() {
-    //DESCRIPTION: Mixes scaled commands from PID controller to actuator outputs based on vehicle configuration
-    /*
-     * Takes roll_PID, pitch_PID, and yaw_PID computed from the PID controller and appropriately mixes them for the desired
-     * vehicle configuration. For example on a quadcopter, the left two motors should have +roll_PID while the right two motors
-     * should have -roll_PID. Front two should have -pitch_PID and the back two should have +pitch_PID etc... every motor has
-     * normalized (0 to 1) thro_des command for throttle control. Can also apply direct unstabilized commands from the transmitter with 
-     * roll_passthru, pitch_passthru, and yaw_passthu. mX_command_scaled and sX_command scaled variables are used in scaleCommands() 
-     * in preparation to be sent to the motor ESCs and servos.
-     * 
-     *Relevant variables:
-     *thro_des - direct thottle control
-     *roll_PID, pitch_PID, yaw_PID - stabilized axis variables
-     *roll_passthru, pitch_passthru, yaw_passthru - direct unstabilized command passthrough
-     *channel_6_pwm - free auxillary channel, can be used to toggle things with an 'if' statement
-     */
+static void controlMixer() {
 
     //Quad mixing - EXAMPLE
     m1_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; //Back Right
@@ -354,7 +233,7 @@ void controlMixer() {
 
 }
 
-void armedStatus() {
+static void armedStatus() {
 
     //DESCRIPTION: Check if the throttle cut is off and the throttle input is low to prepare for flight.
     if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
@@ -362,7 +241,7 @@ void armedStatus() {
     }
 }
 
-void IMUinit() {
+static void IMUinit() {
     //DESCRIPTION: Initialize IMU
     /*
      * Don't worry about how this works.
@@ -385,7 +264,7 @@ void IMUinit() {
     mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-void getIMUdata() {
+static void getIMUdata() {
     //DESCRIPTION: Request full dataset from IMU and LP filter gyro, accelerometer, and magnetometer data
     /*
      * Reads accelerometer, gyro, and magnetometer data from IMU as AccX, AccY, AccZ, GyroX, GyroY, GyroZ, MagX, MagY, MagZ. 
@@ -433,95 +312,7 @@ void getIMUdata() {
 
 }
 
-void calculate_IMU_error() {
-    //DESCRIPTION: Computes IMU accelerometer and gyro error on startup. Note:
-    //vehicle should be powered up on flat surface
-    /*
-     * Don't worry too much about what this is doing. The error values it
-     * computes are applied to the raw gyro and accelerometer values AccX,
-     * AccY, AccZ, GyroX, GyroY, GyroZ in getIMUdata(). This eliminates drift
-     * in the measurement. 
-     */
-    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
-    AccErrorX = 0.0;
-    AccErrorY = 0.0;
-    AccErrorZ = 0.0;
-    GyroErrorX = 0.0;
-    GyroErrorY= 0.0;
-    GyroErrorZ = 0.0;
-
-    //Read IMU values 12000 times
-    int c = 0;
-    while (c < 12000) {
-
-        mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
-
-        AccX  = AcX / ACCEL_SCALE_FACTOR;
-        AccY  = AcY / ACCEL_SCALE_FACTOR;
-        AccZ  = AcZ / ACCEL_SCALE_FACTOR;
-        GyroX = GyX / GYRO_SCALE_FACTOR;
-        GyroY = GyY / GYRO_SCALE_FACTOR;
-        GyroZ = GyZ / GYRO_SCALE_FACTOR;
-
-        //Sum all readings
-        AccErrorX  = AccErrorX + AccX;
-        AccErrorY  = AccErrorY + AccY;
-        AccErrorZ  = AccErrorZ + AccZ;
-        GyroErrorX = GyroErrorX + GyroX;
-        GyroErrorY = GyroErrorY + GyroY;
-        GyroErrorZ = GyroErrorZ + GyroZ;
-        c++;
-    }
-    //Divide the sum by 12000 to get the error value
-    AccErrorX  = AccErrorX / c;
-    AccErrorY  = AccErrorY / c;
-    AccErrorZ  = AccErrorZ / c - 1.0;
-    GyroErrorX = GyroErrorX / c;
-    GyroErrorY = GyroErrorY / c;
-    GyroErrorZ = GyroErrorZ / c;
-
-    Serial.print("float AccErrorX = ");
-    Serial.print(AccErrorX);
-    Serial.println(";");
-    Serial.print("float AccErrorY = ");
-    Serial.print(AccErrorY);
-    Serial.println(";");
-    Serial.print("float AccErrorZ = ");
-    Serial.print(AccErrorZ);
-    Serial.println(";");
-
-    Serial.print("float GyroErrorX = ");
-    Serial.print(GyroErrorX);
-    Serial.println(";");
-    Serial.print("float GyroErrorY = ");
-    Serial.print(GyroErrorY);
-    Serial.println(";");
-    Serial.print("float GyroErrorZ = ");
-    Serial.print(GyroErrorZ);
-    Serial.println(";");
-
-    Serial.println("Paste these values in user specified variables section and comment out calculate_IMU_error() in void setup.");
-}
-
-void calibrateAttitude() {
-    //DESCRIPTION: Used to warm up the main loop to allow the madwick filter to converge before commands can be sent to the actuators
-    //Assuming vehicle is powered up on level surface!
-    /*
-     * This function is used on startup to warm up the attitude estimation and is what causes startup to take a few seconds
-     * to boot. 
-     */
-    //Warm up IMU and madgwick filter in simulated main loop
-    for (int i = 0; i <= 10000; i++) {
-        prev_time = current_time;      
-        current_time = micros();      
-        dt = (current_time - prev_time)/1000000.0; 
-        getIMUdata();
-        Madgwick(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, MagY, -MagX, MagZ, dt);
-        loopRate(2000); //do not exceed 2000Hz
-    }
-}
-
-void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float invSampleFreq) {
+static void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float invSampleFreq) {
     //DESCRIPTION: Attitude estimation through sensor fusion - 9DOF
     /*
      * This function fuses the accelerometer gyro, and magnetometer readings AccX, AccY, AccZ, GyroX, GyroY, GyroZ, MagX, MagY, and MagZ for attitude estimation.
@@ -641,7 +432,7 @@ void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float 
     yaw_IMU = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3)*57.29577951; //degrees
 }
 
-void Madgwick6DOF(float gx, float gy, float gz, float ax, float ay, float az, float invSampleFreq) {
+static void Madgwick6DOF(float gx, float gy, float gz, float ax, float ay, float az, float invSampleFreq) {
     //DESCRIPTION: Attitude estimation through sensor fusion - 6DOF
     /*
      * See description of Madgwick() for more information. This is a 6DOF implimentation for when magnetometer data is not
@@ -723,7 +514,7 @@ void Madgwick6DOF(float gx, float gy, float gz, float ax, float ay, float az, fl
     yaw_IMU = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3)*57.29577951; //degrees
 }
 
-void getDesState() {
+static void getDesState() {
     //DESCRIPTION: Normalizes desired control values to appropriate values
     /*
      * Updates the desired state variables thro_des, roll_des, pitch_des, and yaw_des. These are computed by using the raw
@@ -749,7 +540,7 @@ void getDesState() {
     yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
-void controlANGLE() {
+static void controlANGLE() {
     //DESCRIPTION: Computes control commands based on state error (angle)
     /*
      * Basic PID control to stablize on angle setpoint based on desired states roll_des, pitch_des, and yaw_des computed in 
@@ -801,141 +592,7 @@ void controlANGLE() {
     integral_yaw_prev = integral_yaw;
 }
 
-void controlANGLE2() {
-    //DESCRIPTION: Computes control commands based on state error (angle) in cascaded scheme
-    /*
-     * Gives better performance than controlANGLE() but requires much more tuning. Not reccommended for first-time setup.
-     * See the documentation for tuning this controller.
-     */
-    //Outer loop - PID on angle
-    float roll_des_ol, pitch_des_ol;
-    //Roll
-    error_roll = roll_des - roll_IMU;
-    integral_roll_ol = integral_roll_prev_ol + error_roll*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_roll_ol = 0;
-    }
-    integral_roll_ol = constrain(integral_roll_ol, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_roll = (roll_IMU - roll_IMU_prev)/dt; 
-    roll_des_ol = Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll_ol;// - Kd_roll_angle*derivative_roll;
-
-    //Pitch
-    error_pitch = pitch_des - pitch_IMU;
-    integral_pitch_ol = integral_pitch_prev_ol + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_pitch_ol = 0;
-    }
-    integral_pitch_ol = constrain(integral_pitch_ol, -i_limit, i_limit); //saturate integrator to prevent unsafe buildup
-    derivative_pitch = (pitch_IMU - pitch_IMU_prev)/dt;
-    pitch_des_ol = Kp_pitch_angle*error_pitch + Ki_pitch_angle*integral_pitch_ol;// - Kd_pitch_angle*derivative_pitch;
-
-    //Apply loop gain, constrain, and LP filter for artificial damping
-    float Kl = 30.0;
-    roll_des_ol = Kl*roll_des_ol;
-    pitch_des_ol = Kl*pitch_des_ol;
-    roll_des_ol = constrain(roll_des_ol, -240.0, 240.0);
-    pitch_des_ol = constrain(pitch_des_ol, -240.0, 240.0);
-    roll_des_ol = (1.0 - B_loop_roll)*roll_des_prev + B_loop_roll*roll_des_ol;
-    pitch_des_ol = (1.0 - B_loop_pitch)*pitch_des_prev + B_loop_pitch*pitch_des_ol;
-
-    //Inner loop - PID on rate
-    //Roll
-    error_roll = roll_des_ol - GyroX;
-    integral_roll_il = integral_roll_prev_il + error_roll*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_roll_il = 0;
-    }
-    integral_roll_il = constrain(integral_roll_il, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_roll = (error_roll - error_roll_prev)/dt; 
-    roll_PID = .01*(Kp_roll_rate*error_roll + Ki_roll_rate*integral_roll_il + Kd_roll_rate*derivative_roll); //Scaled by .01 to bring within -1 to 1 range
-
-    //Pitch
-    error_pitch = pitch_des_ol - GyroY;
-    integral_pitch_il = integral_pitch_prev_il + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_pitch_il = 0;
-    }
-    integral_pitch_il = constrain(integral_pitch_il, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_pitch = (error_pitch - error_pitch_prev)/dt; 
-    pitch_PID = .01*(Kp_pitch_rate*error_pitch + Ki_pitch_rate*integral_pitch_il + Kd_pitch_rate*derivative_pitch); //Scaled by .01 to bring within -1 to 1 range
-
-    //Yaw
-    error_yaw = yaw_des - GyroZ;
-    integral_yaw = integral_yaw_prev + error_yaw*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_yaw = 0;
-    }
-    integral_yaw = constrain(integral_yaw, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    yaw_PID = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); //Scaled by .01 to bring within -1 to 1 range
-
-    //Update roll variables
-    integral_roll_prev_ol = integral_roll_ol;
-    integral_roll_prev_il = integral_roll_il;
-    error_roll_prev = error_roll;
-    roll_IMU_prev = roll_IMU;
-    roll_des_prev = roll_des_ol;
-    //Update pitch variables
-    integral_pitch_prev_ol = integral_pitch_ol;
-    integral_pitch_prev_il = integral_pitch_il;
-    error_pitch_prev = error_pitch;
-    pitch_IMU_prev = pitch_IMU;
-    pitch_des_prev = pitch_des_ol;
-    //Update yaw variables
-    error_yaw_prev = error_yaw;
-    integral_yaw_prev = integral_yaw;
-
-}
-
-void controlRATE() {
-    //DESCRIPTION: Computes control commands based on state error (rate)
-    /*
-     * See explanation for controlANGLE(). Everything is the same here except the error is now the desired rate - raw gyro reading.
-     */
-    //Roll
-    error_roll = roll_des - GyroX;
-    integral_roll = integral_roll_prev + error_roll*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_roll = 0;
-    }
-    integral_roll = constrain(integral_roll, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_roll = (error_roll - error_roll_prev)/dt; 
-    roll_PID = .01*(Kp_roll_rate*error_roll + Ki_roll_rate*integral_roll + Kd_roll_rate*derivative_roll); //Scaled by .01 to bring within -1 to 1 range
-
-    //Pitch
-    error_pitch = pitch_des - GyroY;
-    integral_pitch = integral_pitch_prev + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_pitch = 0;
-    }
-    integral_pitch = constrain(integral_pitch, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_pitch = (error_pitch - error_pitch_prev)/dt; 
-    pitch_PID = .01*(Kp_pitch_rate*error_pitch + Ki_pitch_rate*integral_pitch + Kd_pitch_rate*derivative_pitch); //Scaled by .01 to bring within -1 to 1 range
-
-    //Yaw, stablize on rate from GyroZ
-    error_yaw = yaw_des - GyroZ;
-    integral_yaw = integral_yaw_prev + error_yaw*dt;
-    if (channel_1_pwm < 1060) {   //Don't let integrator build if throttle is too low
-        integral_yaw = 0;
-    }
-    integral_yaw = constrain(integral_yaw, -i_limit, i_limit); //Saturate integrator to prevent unsafe buildup
-    derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    yaw_PID = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); //Scaled by .01 to bring within -1 to 1 range
-
-    //Update roll variables
-    error_roll_prev = error_roll;
-    integral_roll_prev = integral_roll;
-    GyroX_prev = GyroX;
-    //Update pitch variables
-    error_pitch_prev = error_pitch;
-    integral_pitch_prev = integral_pitch;
-    GyroY_prev = GyroY;
-    //Update yaw variables
-    error_yaw_prev = error_yaw;
-    integral_yaw_prev = integral_yaw;
-}
-
-void scaleCommands() {
+static void scaleCommands() {
     //DESCRIPTION: Scale normalized actuator commands to values for ESC/Servo protocol
     /*
      * mX_command_scaled variables from the mixer function are scaled to 125-250us for OneShot125 protocol. sX_command_scaled variables from
@@ -977,7 +634,7 @@ void scaleCommands() {
 
 }
 
-void getCommands() {
+static void getCommands() {
 
     if (DSM.timedOut(micros())) {
         //Serial.println("*** DSM RX TIMED OUT ***");
@@ -1006,7 +663,7 @@ void getCommands() {
     channel_4_pwm_prev = channel_4_pwm;
 }
 
-void failSafe() {
+static void failSafe() {
     //DESCRIPTION: If radio gives garbage values, set all commands to default values
     /*
      * Radio connection failsafe used to check if the getCommands() function is returning acceptable pwm values. If any of 
@@ -1043,7 +700,7 @@ void failSafe() {
     }
 }
 
-void commandMotors() {
+static void commandMotors() {
     //DESCRIPTION: Send pulses to motor pins, oneshot125 protocol
     /*
      * My crude implimentation of OneShot125 protocol which sends 125 - 250us pulses to the ESCs (mXPin). The pulselengths being
@@ -1089,7 +746,7 @@ void commandMotors() {
     }
 }
 
-void armMotors() {
+static void armMotors() {
     //DESCRIPTION: Sends many command pulses to the motors, to be used to arm motors in the void setup()
     /*  
      *  Loops over the commandMotors() function 50 times with a delay in between, simulating how the commandMotors()
@@ -1102,72 +759,8 @@ void armMotors() {
     }
 }
 
-float floatFaderLinear(float param, float param_min, float param_max, float fadeTime, int state, int loopFreq){
-    //DESCRIPTION: Linearly fades a float type variable between min and max bounds based on desired high or low state and time
-    /*  
-     *  Takes in a float variable, desired minimum and maximum bounds, fade time, high or low desired state, and the loop frequency 
-     *  and linearly interpolates that param variable between the maximum and minimum bounds. This function can be called in controlMixer()
-     *  and high/low states can be determined by monitoring the state of an auxillarly radio channel. For example, if channel_6_pwm is being 
-     *  monitored to switch between two dynamic configurations (hover and forward flight), this function can be called within the logical 
-     *  statements in order to fade controller gains, for example between the two dynamic configurations. The 'state' (1 or 0) can be used
-     *  to designate the two final options for that control gain based on the dynamic configuration assignment to the auxillary radio channel.
-     *  
-     */
-    float diffParam = (param_max - param_min)/(fadeTime*loopFreq); //Difference to add or subtract from param for each loop iteration for desired fadeTime
 
-    if (state == 1) { //Maximum param bound desired, increase param by diffParam for each loop iteration
-        param = param + diffParam;
-    }
-    else if (state == 0) { //Minimum param bound desired, decrease param by diffParam for each loop iteration
-        param = param - diffParam;
-    }
-
-    param = constrain(param, param_min, param_max); //Constrain param within max bounds
-
-    return param;
-}
-
-float floatFaderLinear2(float param, float param_des, float param_lower, float param_upper, float fadeTime_up, float fadeTime_down, int loopFreq){
-    //DESCRIPTION: Linearly fades a float type variable from its current value to the desired value, up or down
-    /*  
-     *  Takes in a float variable to be modified, desired new position, upper value, lower value, fade time, and the loop frequency 
-     *  and linearly fades that param variable up or down to the desired value. This function can be called in controlMixer()
-     *  to fade up or down between flight modes monitored by an auxillary radio channel. For example, if channel_6_pwm is being 
-     *  monitored to switch between two dynamic configurations (hover and forward flight), this function can be called within the logical 
-     *  statements in order to fade controller gains, for example between the two dynamic configurations. 
-     *  
-     */
-    if (param > param_des) { //Need to fade down to get to desired
-        float diffParam = (param_upper - param_des)/(fadeTime_down*loopFreq);
-        param = param - diffParam;
-    }
-    else if (param < param_des) { //Need to fade up to get to desired
-        float diffParam = (param_des - param_lower)/(fadeTime_up*loopFreq);
-        param = param + diffParam;
-    }
-
-    param = constrain(param, param_lower, param_upper); //Constrain param within max bounds
-
-    return param;
-}
-
-void switchRollYaw(int reverseRoll, int reverseYaw) {
-    //DESCRIPTION: Switches roll_des and yaw_des variables for tailsitter-type configurations
-    /*
-     * Takes in two integers (either 1 or -1) corresponding to the desired reversing of the roll axis and yaw axis, respectively.
-     * Reversing of the roll or yaw axis may be needed when switching between the two for some dynamic configurations. Inputs of 1, 1 does not 
-     * reverse either of them, while -1, 1 will reverse the output corresponding to the new roll axis. 
-     * This function may be replaced in the future by a function that switches the IMU data instead (so that angle can also be estimated with the 
-     * IMU tilted 90 degrees from default level).
-     */
-    float switch_holder;
-
-    switch_holder = yaw_des;
-    yaw_des = reverseYaw*roll_des;
-    roll_des = reverseRoll*switch_holder;
-}
-
-void throttleCut() {
+static void throttleCut() {
     //DESCRIPTION: Directly set actuator outputs to minimum value if triggered
     /*
        Monitors the state of radio command channel_5_pwm and directly sets the mx_command_PWM values to minimum (120 is
@@ -1198,7 +791,7 @@ void throttleCut() {
     }
 }
 
-void loopRate(int freq) {
+static void loopRate(int freq) {
     //DESCRIPTION: Regulate main loop rate to specified frequency in Hz
     /*
      * It's good to operate at a constant loop rate for filters to remain stable and whatnot. Interrupt routines running in the
@@ -1216,7 +809,7 @@ void loopRate(int freq) {
     }
 }
 
-void loopBlink() {
+static void loopBlink() {
     //DESCRIPTION: Blink LED on board to indicate main loop is running
     /*
      * It looks cool.
@@ -1236,7 +829,7 @@ void loopBlink() {
     }
 }
 
-void setupBlink(int numBlinks,int upTime, int downTime) {
+static void setupBlink(int numBlinks,int upTime, int downTime) {
     //DESCRIPTION: Simple function to make LED on board blink as desired
     for (int j = 1; j<= numBlinks; j++) {
         digitalWrite(13, LOW);
@@ -1245,6 +838,109 @@ void setupBlink(int numBlinks,int upTime, int downTime) {
         delay(upTime);
     }
 }
-float invSqrt(float x) {
+
+static float invSqrt(float x) {
     return 1.0/sqrtf(x); //Teensy is fast enough to just take the compute penalty lol suck it arduino nano
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void setup()
+{
+    Serial.begin(500000); //USB serial
+    delay(500);
+
+    //Initialize all pins
+    pinMode(13, OUTPUT); //Pin 13 LED blinker on board, do not modify 
+    pinMode(m1Pin, OUTPUT);
+    pinMode(m2Pin, OUTPUT);
+    pinMode(m3Pin, OUTPUT);
+    pinMode(m4Pin, OUTPUT);
+
+    //Set built in LED to turn on to signal startup
+    digitalWrite(13, HIGH);
+
+    delay(5);
+
+    //Initialize radio communication
+    Serial1.begin(115000);
+
+    //Set radio channels to default (safe) values before entering main loop
+    channel_1_pwm = channel_1_fs;
+    channel_2_pwm = channel_2_fs;
+    channel_3_pwm = channel_3_fs;
+    channel_4_pwm = channel_4_fs;
+    channel_5_pwm = channel_5_fs;
+    channel_6_pwm = channel_6_fs;
+
+    //Initialize IMU communication
+    IMUinit();
+
+    delay(5);
+
+    //Get IMU error to zero accelerometer and gyro readings, assuming vehicle is level when powered up
+    //calculate_IMU_error(); //Calibration parameters printed to serial monitor. Paste these in the user specified variables section, then comment this out forever.
+
+    delay(5);
+
+    //Arm OneShot125 motors
+    m1_command_PWM = 125; //Command OneShot125 ESC from 125 to 250us pulse length
+    m2_command_PWM = 125;
+    m3_command_PWM = 125;
+    m4_command_PWM = 125;
+    m5_command_PWM = 125;
+    m6_command_PWM = 125;
+    armMotors(); //Loop over commandMotors() until ESCs happily arm
+
+    //Indicate entering main loop with 3 quick blinks
+    setupBlink(3,160,70); //numBlinks, upTime (ms), downTime (ms)
+
+    //If using MPU9250 IMU, uncomment for one-time magnetometer calibration (may need to repeat for new locations)
+    //calibrateMagnetometer(); //Generates magentometer error and scale factors to be pasted in user-specified variables section
+
+}
+
+
+void loop()
+{
+    //Keep track of what time it is and how much time has elapsed since the last loop
+    prev_time = current_time;      
+    current_time = micros();      
+    dt = (current_time - prev_time)/1000000.0;
+
+    loopBlink(); //Indicate we are in main loop with short blink every 1.5 seconds
+    // Get arming status
+    armedStatus(); //Check if the throttle cut is off and throttle is low.
+
+    //Get vehicle state
+    getIMUdata(); //Pulls raw gyro, accelerometer, and magnetometer data from IMU and LP filters to remove noise
+    Madgwick(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, MagY, -MagX, MagZ, dt); //Updates roll_IMU, pitch_IMU, and yaw_IMU angle estimates (degrees)
+
+    //Compute desired state
+    getDesState(); //Convert raw commands to normalized values based on saturated control limits
+
+    //PID Controller - SELECT ONE:
+    controlANGLE(); //Stabilize on angle setpoint
+                    //controlANGLE2(); //Stabilize on angle setpoint using cascaded method. Rate controller must be tuned well first!
+                    //controlRATE(); //Stabilize on rate setpoint
+
+                    //Actuator mixing and scaling to PWM values
+    controlMixer(); //Mixes PID outputs to scaled actuator commands -- custom mixing assignments done here
+    scaleCommands(); //Scales motor commands to 125 to 250 range (oneshot125 protocol) and servo PWM commands to 0 to 180 (for servo library)
+
+    //Throttle cut check
+    throttleCut(); //Directly sets motor commands to low based on state of ch5
+
+    //Command actuators
+    commandMotors(); //Sends command pulses to each motor pin using OneShot125 protocol
+
+    //Get vehicle commands for next loop iteration
+    getCommands(); //Pulls current available radio commands
+    failSafe(); //Prevent failures in event of bad receiver connection, defaults to failsafe values assigned in setup
+
+    //Regulate loop rate
+    loopRate(2000); //Do not exceed 2000Hz, all filter parameters tuned to 2000Hz by default
+}
+
+
+
