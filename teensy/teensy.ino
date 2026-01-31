@@ -358,8 +358,7 @@ static void armMotors() {
 
         _motors.run(
                 armedFly,
-                m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
-                m1Pin, m2Pin, m3Pin, m4Pin);
+                m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM);
 
          delay(2);
     }
@@ -487,8 +486,7 @@ void loop()
 
     _motors.run(
             armedFly,
-            m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
-            m1Pin, m2Pin, m3Pin, m4Pin);
+            m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM);
 
 
     getCommands(); 
