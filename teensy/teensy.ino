@@ -47,6 +47,9 @@ void serialEvent1(void)
     }
 }
 
+// Motors
+static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
+
 // IMU ------------------------------------------------------------
 
 static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -353,7 +356,7 @@ static void armMotors() {
 
     for (int i = 0; i <= 50; i++) {
 
-        DshotTeensy4::commandMotors(
+        _motors.run(
                 armedFly,
                 m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
                 m1Pin, m2Pin, m3Pin, m4Pin);
@@ -482,7 +485,7 @@ void loop()
 
     throttleCut(); 
 
-    DshotTeensy4::commandMotors(
+    _motors.run(
             armedFly,
             m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
             m1Pin, m2Pin, m3Pin, m4Pin);
