@@ -20,7 +20,6 @@
 
 #include <Wire.h>     //I2c communication
 #include <SPI.h>      //SPI communication
-#include <PWMServo.h> //Commanding any extra actuators, installed with teensyduino installer
 
 #include "src/DSMRX/DSMRX.h"  
 
@@ -200,13 +199,6 @@ static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command
 static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
            m5_command_PWM, m6_command_PWM;
 
-static float s1_command_scaled, s2_command_scaled, s3_command_scaled,
-             s4_command_scaled, s5_command_scaled, s6_command_scaled,
-             s7_command_scaled;
-
-static int s1_command_PWM, s2_command_PWM, s3_command_PWM, s4_command_PWM,
-           s5_command_PWM, s6_command_PWM, s7_command_PWM;
-
 //Flight status
 static bool armedFly;
 
@@ -221,16 +213,6 @@ static void controlMixer() {
 
     m5_command_scaled = 0;
     m6_command_scaled = 0;
-
-    //0.5 is centered servo, 0.0 is zero throttle if connecting to ESC for conventional PWM, 1.0 is max throttle
-    s1_command_scaled = 0;
-    s2_command_scaled = 0;
-    s3_command_scaled = 0;
-    s4_command_scaled = 0;
-    s5_command_scaled = 0;
-    s6_command_scaled = 0;
-    s7_command_scaled = 0;
-
 }
 
 static void armedStatus() {
@@ -614,24 +596,6 @@ static void scaleCommands() {
     m4_command_PWM = constrain(m4_command_PWM, 125, 250);
     m5_command_PWM = constrain(m5_command_PWM, 125, 250);
     m6_command_PWM = constrain(m6_command_PWM, 125, 250);
-
-    //Scaled to 0-180 for servo library
-    s1_command_PWM = s1_command_scaled*180;
-    s2_command_PWM = s2_command_scaled*180;
-    s3_command_PWM = s3_command_scaled*180;
-    s4_command_PWM = s4_command_scaled*180;
-    s5_command_PWM = s5_command_scaled*180;
-    s6_command_PWM = s6_command_scaled*180;
-    s7_command_PWM = s7_command_scaled*180;
-    //Constrain commands to servos within servo library bounds
-    s1_command_PWM = constrain(s1_command_PWM, 0, 180);
-    s2_command_PWM = constrain(s2_command_PWM, 0, 180);
-    s3_command_PWM = constrain(s3_command_PWM, 0, 180);
-    s4_command_PWM = constrain(s4_command_PWM, 0, 180);
-    s5_command_PWM = constrain(s5_command_PWM, 0, 180);
-    s6_command_PWM = constrain(s6_command_PWM, 0, 180);
-    s7_command_PWM = constrain(s7_command_PWM, 0, 180);
-
 }
 
 static void getCommands() {
