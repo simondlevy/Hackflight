@@ -37,12 +37,12 @@
 
 static MPU6050 _mpu6050;
 
-static DSM2048 DSM;
+static DSM2048 _dsm2048;
 
 void serialEvent1(void)
 {
     while (Serial1.available()) {
-        DSM.handleSerialEvent(Serial1.read(), micros());
+        _dsm2048.handleSerialEvent(Serial1.read(), micros());
     }
 }
 
@@ -581,12 +581,12 @@ static void scaleCommands() {
 
 static void getCommands() {
 
-    if (DSM.timedOut(micros())) {
+    if (_dsm2048.timedOut(micros())) {
         //Serial.println("*** DSM RX TIMED OUT ***");
     }
-    else if (DSM.gotNewFrame()) {
+    else if (_dsm2048.gotNewFrame()) {
         uint16_t values[6];
-        DSM.getChannelValues(values, 6);
+        _dsm2048.getChannelValues(values, 6);
 
         channel_1_pwm = values[0];
         channel_2_pwm = values[1];
