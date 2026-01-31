@@ -30,9 +30,6 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 
-#define GYRO_250DPS 
-#define ACCEL_2G 
-
 static MPU6050 _mpu6050;
 
 static Dsm2048 _dsm2048;
@@ -47,42 +44,11 @@ void serialEvent1(void)
     }
 }
 
-#define GYRO_FS_SEL_250    MPU6050_GYRO_FS_250
-#define GYRO_FS_SEL_500    MPU6050_GYRO_FS_500
-#define GYRO_FS_SEL_1000   MPU6050_GYRO_FS_1000
-#define GYRO_FS_SEL_2000   MPU6050_GYRO_FS_2000
-#define ACCEL_FS_SEL_2     MPU6050_ACCEL_FS_2
-#define ACCEL_FS_SEL_4     MPU6050_ACCEL_FS_4
-#define ACCEL_FS_SEL_8     MPU6050_ACCEL_FS_8
-#define ACCEL_FS_SEL_16    MPU6050_ACCEL_FS_16
+static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
+static constexpr float GYRO_SCALE_FACTOR = 131;
 
-#if defined GYRO_250DPS
-#define GYRO_SCALE GYRO_FS_SEL_250
-#define GYRO_SCALE_FACTOR 131.0
-#elif defined GYRO_500DPS
-#define GYRO_SCALE GYRO_FS_SEL_500
-#define GYRO_SCALE_FACTOR 65.5
-#elif defined GYRO_1000DPS
-#define GYRO_SCALE GYRO_FS_SEL_1000
-#define GYRO_SCALE_FACTOR 32.8
-#elif defined GYRO_2000DPS
-#define GYRO_SCALE GYRO_FS_SEL_2000
-#define GYRO_SCALE_FACTOR 16.4
-#endif
-
-#if defined ACCEL_2G
-#define ACCEL_SCALE ACCEL_FS_SEL_2
-#define ACCEL_SCALE_FACTOR 16384.0
-#elif defined ACCEL_4G
-#define ACCEL_SCALE ACCEL_FS_SEL_4
-#define ACCEL_SCALE_FACTOR 8192.0
-#elif defined ACCEL_8G
-#define ACCEL_SCALE ACCEL_FS_SEL_8
-#define ACCEL_SCALE_FACTOR 4096.0
-#elif defined ACCEL_16G
-#define ACCEL_SCALE ACCEL_FS_SEL_16
-#define ACCEL_SCALE_FACTOR 2048.0
-#endif
+static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
+static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 static unsigned long channel_1_fs = 1000; 
 static unsigned long channel_2_fs = 1500; 
