@@ -20,7 +20,7 @@
 
 #include <Wire.h> 
 
-#include <DSMRX.h>  
+#include <dsmrx.hpp>  
 #include <MPU6050.h>
 
 #define GYRO_250DPS //Default
@@ -36,12 +36,12 @@
 
 static MPU6050 _mpu6050;
 
-static DSM2048 _dsm2048;
+static Dsm2048 _dsm2048;
 
 void serialEvent1(void)
 {
     while (Serial1.available()) {
-        _dsm2048.handleSerialEvent(Serial1.read(), micros());
+        _dsm2048.parse(Serial1.read(), micros());
     }
 }
 
