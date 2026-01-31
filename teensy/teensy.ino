@@ -124,15 +124,12 @@ static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM;
 
 static bool armedFly;
 
-static void controlMixer() {
-
-    m1_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; 
-
-    m2_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID; 
-
-    m3_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; 
-
-    m4_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID; 
+static void controlMixer() 
+{
+    m1_command_scaled = thro_des + pitch_PID - roll_PID - yaw_PID; 
+    m2_command_scaled = thro_des - pitch_PID - roll_PID + yaw_PID; 
+    m3_command_scaled = thro_des + pitch_PID + roll_PID + yaw_PID; 
+    m4_command_scaled = thro_des - pitch_PID + roll_PID - yaw_PID; 
 
 }
 
@@ -249,9 +246,15 @@ static void controlANGLE() {
     integral_pitch = constrain(integral_pitch, -i_limit, i_limit); 
 
     derivative_pitch = GyroY;
-    pitch_PID = .01*(Kp_pitch_angle*error_pitch + Ki_pitch_angle*integral_pitch - Kd_pitch_angle*derivative_pitch); 
+    pitch_PID = .01*(
+            Kp_pitch_angle*error_pitch +
+            Ki_pitch_angle*integral_pitch -
+            Kd_pitch_angle*derivative_pitch); 
 
-    error_yaw = -yaw_des - GyroZ;
+    // Negate gyro Z for nose-right positive
+    const auto dpsi = -GyroZ;
+
+    error_yaw = yaw_des - dpsi;
     integral_yaw = integral_yaw_prev + error_yaw*dt;
     if (channel_1_pwm < 1060) {   
 
