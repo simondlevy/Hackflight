@@ -1,15 +1,44 @@
+/*
+   Hackflight for Teensy 4.0 
+
+   Based on  https://github.com/nickrehm/dRehmFlight
+
+   Copyright (C) 2026 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
+// Standard Arduino libraries
 #include <Wire.h> 
 
+// Third-party libraries
 #include <dsmrx.hpp>  
 #include <MPU6050.h>
 
-#define GYRO_250DPS 
+// Hackflight library
+#include <hackflight.h>
+#include <datatypes.h>
+#include <firmware/estimators/madgwick.hpp>
 
+#define GYRO_250DPS 
 #define ACCEL_2G 
 
 static MPU6050 _mpu6050;
 
 static Dsm2048 _dsm2048;
+
+// State estimation
+static hf::MadgwickFilter  _madgwick;
 
 void serialEvent1(void)
 {
@@ -661,14 +690,13 @@ void setup()
 
     IMUinit();
 
-    delay(5);
+    _madgwick.initialize();
 
-//Calibration parameters printed to serial monitor. Paste these in the user specified variables section, then comment this out forever.
+    delay(5);
 
     delay(5);
 
     m1_command_PWM = 125; 
-
     m2_command_PWM = 125;
     m3_command_PWM = 125;
     m4_command_PWM = 125;
@@ -676,9 +704,6 @@ void setup()
     armMotors(); 
 
     setupBlink(3,160,70); 
-
-//Generates magentometer error and scale factors to be pasted in user-specified variables section
-
 }
 
 void loop()
@@ -694,15 +719,14 @@ void loop()
 
     getIMUdata(); 
 
-    Madgwick6DOF(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, dt); 
+    const hf::axis3_t gyro = {GyroX, -GyroY, -GyroZ}; 
+    const hf::axis3_t accel = {-AccX, AccY, AccZ}; 
+    _madgwick.getEulerAngles(dt, gyro, accel, roll_IMU, pitch_IMU, yaw_IMU);
+    yaw_IMU = -yaw_IMU;
 
     getDesState(); 
 
     controlANGLE(); 
-
-//Stabilize on angle setpoint using cascaded method. Rate controller must be tuned well first!
-
-//Stabilize on rate setpoint
 
     controlMixer(); 
 
@@ -719,5 +743,4 @@ void loop()
     loopRate(2000); 
 
 }
-
 
