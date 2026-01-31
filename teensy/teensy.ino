@@ -18,8 +18,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <Wire.h>     //I2c communication
-#include <SPI.h>      //SPI communication
+#include <Wire.h> 
 
 #include "src/DSMRX/DSMRX.h"  
 
@@ -27,17 +26,11 @@
 
 static const uint8_t num_DSM_channels = 6; 
 
-//Uncomment only one IMU
-#define USE_MPU6050_I2C //Default
-                        //#define USE_MPU9250_SPI
-
-                        //Uncomment only one full scale gyro range (deg/sec)
 #define GYRO_250DPS //Default
                     //#define GYRO_500DPS
                     //#define GYRO_1000DPS
                     //#define GYRO_2000DPS
 
-                    //Uncomment only one full scale accelerometer range (G's)
 #define ACCEL_2G //Default
                  //#define ACCEL_4G
                  //#define ACCEL_8G
@@ -57,7 +50,6 @@ void serialEvent1(void)
 
 //Setup gyro and accel full scale value selection and scale factor
 
-#if defined USE_MPU6050_I2C
 #define GYRO_FS_SEL_250    MPU6050_GYRO_FS_250
 #define GYRO_FS_SEL_500    MPU6050_GYRO_FS_500
 #define GYRO_FS_SEL_1000   MPU6050_GYRO_FS_1000
@@ -66,16 +58,6 @@ void serialEvent1(void)
 #define ACCEL_FS_SEL_4     MPU6050_ACCEL_FS_4
 #define ACCEL_FS_SEL_8     MPU6050_ACCEL_FS_8
 #define ACCEL_FS_SEL_16    MPU6050_ACCEL_FS_16
-#elif defined USE_MPU9250_SPI
-#define GYRO_FS_SEL_250    mpu9250.GYRO_RANGE_250DPS
-#define GYRO_FS_SEL_500    mpu9250.GYRO_RANGE_500DPS
-#define GYRO_FS_SEL_1000   mpu9250.GYRO_RANGE_1000DPS                                                        
-#define GYRO_FS_SEL_2000   mpu9250.GYRO_RANGE_2000DPS
-#define ACCEL_FS_SEL_2     mpu9250.ACCEL_RANGE_2G
-#define ACCEL_FS_SEL_4     mpu9250.ACCEL_RANGE_4G
-#define ACCEL_FS_SEL_8     mpu9250.ACCEL_RANGE_8G
-#define ACCEL_FS_SEL_16    mpu9250.ACCEL_RANGE_16G
-#endif
 
 #if defined GYRO_250DPS
 #define GYRO_SCALE GYRO_FS_SEL_250
@@ -589,6 +571,7 @@ static void scaleCommands() {
     m4_command_PWM = m4_command_scaled*125 + 125;
     m5_command_PWM = m5_command_scaled*125 + 125;
     m6_command_PWM = m6_command_scaled*125 + 125;
+
     //Constrain commands to motors within oneshot125 bounds
     m1_command_PWM = constrain(m1_command_PWM, 125, 250);
     m2_command_PWM = constrain(m2_command_PWM, 125, 250);
