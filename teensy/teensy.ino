@@ -23,7 +23,8 @@
 #include <PWMServo.h> //Commanding any extra actuators, installed with teensyduino installer
 
 #include "src/DSMRX/DSMRX.h"  
-#include "src/MPU6050/MPU6050.h"
+
+#include <MPU6050.h>
 
 #define USE_DSM_RX
 
