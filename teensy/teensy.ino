@@ -20,8 +20,7 @@
 
 #include <Wire.h> 
 
-#include "src/DSMRX/DSMRX.h"  
-
+#include <DSMRX.h>  
 #include <MPU6050.h>
 
 #define GYRO_250DPS //Default
