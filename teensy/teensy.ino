@@ -119,8 +119,6 @@ static float error_pitch, integral_pitch, integral_pitch_prev,
 static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
              derivative_yaw, yaw_PID;
 
-static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
-
 static bool armedFly;
 
 
@@ -415,17 +413,13 @@ void loop()
     const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
     float motors[4] = {};
     hf::Mixer::mix(demands, motors);
-    m1_command_scaled = motors[0];
-    m2_command_scaled = motors[1];
-    m3_command_scaled = motors[2];
-    m4_command_scaled = motors[3];
 
     float motor_pwms[4] = {};
 
-    motor_pwms[0] = m1_command_scaled*125 + 125;
-    motor_pwms[1] = m2_command_scaled*125 + 125;
-    motor_pwms[2] = m3_command_scaled*125 + 125;
-    motor_pwms[3] = m4_command_scaled*125 + 125;
+    motor_pwms[0] = motors[0]*125 + 125;
+    motor_pwms[1] = motors[1]*125 + 125;
+    motor_pwms[2] = motors[2]*125 + 125;
+    motor_pwms[3] = motors[3]*125 + 125;
     motor_pwms[0] = constrain(motor_pwms[0], 125, 250);
     motor_pwms[1] = constrain(motor_pwms[1], 125, 250);
     motor_pwms[2] = constrain(motor_pwms[2], 125, 250);
