@@ -26,7 +26,7 @@ namespace hf {
 
         public:
 
-            static void run(const int * rangefinder_distances_mm,
+            static void runTwoExit(const int * rangefinder_distances_mm,
                     demands_t & setpoint)
             {
                 const int * d = rangefinder_distances_mm;
