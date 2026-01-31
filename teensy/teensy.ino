@@ -50,6 +50,9 @@ void serialEvent1(void)
 // Motors
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
+static float _motor_pwms[4];
+
+
 // IMU ------------------------------------------------------------
 
 static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -124,8 +127,6 @@ static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
              derivative_yaw, yaw_PID;
 
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
-
-static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM;
 
 static bool armedFly;
 
@@ -284,15 +285,15 @@ static void controlANGLE() {
 
 static void scaleCommands() {
 
-    m1_command_PWM = m1_command_scaled*125 + 125;
-    m2_command_PWM = m2_command_scaled*125 + 125;
-    m3_command_PWM = m3_command_scaled*125 + 125;
-    m4_command_PWM = m4_command_scaled*125 + 125;
+    _motor_pwms[0] = m1_command_scaled*125 + 125;
+    _motor_pwms[1] = m2_command_scaled*125 + 125;
+    _motor_pwms[2] = m3_command_scaled*125 + 125;
+    _motor_pwms[3] = m4_command_scaled*125 + 125;
 
-    m1_command_PWM = constrain(m1_command_PWM, 125, 250);
-    m2_command_PWM = constrain(m2_command_PWM, 125, 250);
-    m3_command_PWM = constrain(m3_command_PWM, 125, 250);
-    m4_command_PWM = constrain(m4_command_PWM, 125, 250);
+    _motor_pwms[0] = constrain(_motor_pwms[0], 125, 250);
+    _motor_pwms[1] = constrain(_motor_pwms[1], 125, 250);
+    _motor_pwms[2] = constrain(_motor_pwms[2], 125, 250);
+    _motor_pwms[3] = constrain(_motor_pwms[3], 125, 250);
 }
 
 static void getCommands() {
@@ -356,9 +357,7 @@ static void armMotors() {
 
     for (int i = 0; i <= 50; i++) {
 
-        _motors.run(
-                armedFly,
-                m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM);
+        _motors.run(armedFly, _motor_pwms);
 
          delay(2);
     }
@@ -368,10 +367,10 @@ static void throttleCut() {
 
     if ((channel_5_pwm < 1500) || (armedFly == false)) {
         armedFly = false;
-        m1_command_PWM = 120;
-        m2_command_PWM = 120;
-        m3_command_PWM = 120;
-        m4_command_PWM = 120;
+        _motor_pwms[0] = 120;
+        _motor_pwms[1] = 120;
+        _motor_pwms[2] = 120;
+        _motor_pwms[3] = 120;
     }
 }
 
@@ -446,10 +445,10 @@ void setup()
 
     delay(5);
 
-    m1_command_PWM = 125; 
-    m2_command_PWM = 125;
-    m3_command_PWM = 125;
-    m4_command_PWM = 125;
+    _motor_pwms[0] = 125; 
+    _motor_pwms[1] = 125;
+    _motor_pwms[2] = 125;
+    _motor_pwms[3] = 125;
 
     armMotors(); 
 
@@ -484,10 +483,7 @@ void loop()
 
     throttleCut(); 
 
-    _motors.run(
-            armedFly,
-            m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM);
-
+    _motors.run(armedFly, _motor_pwms);
 
     getCommands(); 
 
