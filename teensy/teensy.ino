@@ -37,6 +37,7 @@ static Dsm2048 _dsm2048;
 // State estimation
 static hf::MadgwickFilter  _madgwick;
 
+// DSMX receiver callback
 void serialEvent1(void)
 {
     while (Serial1.available()) {
@@ -44,11 +45,16 @@ void serialEvent1(void)
     }
 }
 
+// IMU ------------------------------------------------------------
+
 static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
 static constexpr float GYRO_SCALE_FACTOR = 131;
 
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384;
+
+// LED -------------------------------------------------------------
+static const uint8_t LED_PIN = 14;
 
 static unsigned long channel_1_fs = 1000; 
 static unsigned long channel_2_fs = 1500; 
@@ -408,7 +414,7 @@ static void loopBlink() {
 
     if (current_time - blink_counter > blink_delay) {
         blink_counter = micros();
-        digitalWrite(13, blinkAlternate); 
+        digitalWrite(LED_PIN, blinkAlternate); 
 
         if (blinkAlternate == 1) {
             blinkAlternate = 0;
@@ -424,9 +430,9 @@ static void loopBlink() {
 static void setupBlink(int numBlinks,int upTime, int downTime) {
 
     for (int j = 1; j<= numBlinks; j++) {
-        digitalWrite(13, LOW);
+        digitalWrite(LED_PIN, LOW);
         delay(downTime);
-        digitalWrite(13, HIGH);
+        digitalWrite(LED_PIN, HIGH);
         delay(upTime);
     }
 }
@@ -437,14 +443,14 @@ void setup()
 
     delay(500);
 
-    pinMode(13, OUTPUT); 
+    pinMode(LED_PIN, OUTPUT); 
 
     pinMode(m1Pin, OUTPUT);
     pinMode(m2Pin, OUTPUT);
     pinMode(m3Pin, OUTPUT);
     pinMode(m4Pin, OUTPUT);
 
-    digitalWrite(13, HIGH);
+    digitalWrite(LED_PIN, HIGH);
 
     delay(5);
 
