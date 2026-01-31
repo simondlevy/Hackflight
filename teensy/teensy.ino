@@ -45,15 +45,9 @@ static const uint8_t num_DSM_channels = 6;
                  //#define ACCEL_16G
 
 
-MPU6050 mpu6050;
+static MPU6050 mpu6050;
 
-
-void radioSetup()
-{
-    Serial1.begin(115000);
-}
-
-DSM2048 DSM;
+static DSM2048 DSM;
 
 void serialEvent1(void)
 {
@@ -119,60 +113,51 @@ void serialEvent1(void)
 //========================================================================================================================//
 
 //Radio failsafe values for every channel in the event that bad reciever data is detected. Recommended defaults:
-unsigned long channel_1_fs = 1000; //thro
-unsigned long channel_2_fs = 1500; //ail
-unsigned long channel_3_fs = 1500; //elev
-unsigned long channel_4_fs = 1500; //rudd
-unsigned long channel_5_fs = 2000; //gear, greater than 1500 = throttle cut
-unsigned long channel_6_fs = 2000; //aux1
+static unsigned long channel_1_fs = 1000; //thro
+static unsigned long channel_2_fs = 1500; //ail
+static unsigned long channel_3_fs = 1500; //elev
+static unsigned long channel_4_fs = 1500; //rudd
+static unsigned long channel_5_fs = 2000; //gear, greater than 1500 = throttle cut
+static unsigned long channel_6_fs = 2000; //aux1
 
 //Filter parameters - Defaults tuned for 2kHz loop rate; Do not touch unless you know what you are doing:
-float B_madgwick = 0.04;  //Madgwick filter parameter
-float B_accel = 0.14;     //Accelerometer LP filter paramter, (MPU6050 default: 0.14. MPU9250 default: 0.2)
-float B_gyro = 0.1;       //Gyro LP filter paramter, (MPU6050 default: 0.1. MPU9250 default: 0.17)
-float B_mag = 1.0;        //Magnetometer LP filter parameter
-
-//Magnetometer calibration parameters - if using MPU9250, uncomment calibrateMagnetometer() in void setup() to get these values, else just ignore these
-float MagErrorX = 0.0;
-float MagErrorY = 0.0; 
-float MagErrorZ = 0.0;
-float MagScaleX = 1.0;
-float MagScaleY = 1.0;
-float MagScaleZ = 1.0;
+static float B_madgwick = 0.04;  //Madgwick filter parameter
+static float B_accel = 0.14;     //Accelerometer LP filter paramter, (MPU6050 default: 0.14. MPU9250 default: 0.2)
+static float B_gyro = 0.1;       //Gyro LP filter paramter, (MPU6050 default: 0.1. MPU9250 default: 0.17)
 
 //IMU calibration parameters - calibrate IMU using calculate_IMU_error() in the void setup() to get these values, then comment out calculate_IMU_error()
-float AccErrorX = 0.0;
-float AccErrorY = 0.0;
-float AccErrorZ = 0.0;
-float GyroErrorX = 0.0;
-float GyroErrorY= 0.0;
-float GyroErrorZ = 0.0;
+static float AccErrorX = 0.0;
+static float AccErrorY = 0.0;
+static float AccErrorZ = 0.0;
+static float GyroErrorX = 0.0;
+static float GyroErrorY= 0.0;
+static float GyroErrorZ = 0.0;
 
 //Controller parameters (take note of defaults before modifying!): 
-float i_limit = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
-float maxRoll = 30.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
-float maxPitch = 30.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-float maxYaw = 160.0;     //Max yaw rate in deg/sec
+static float i_limit = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
+static float maxRoll = 30.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
+static float maxPitch = 30.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+static float maxYaw = 160.0;     //Max yaw rate in deg/sec
 
-float Kp_roll_angle = 0.2;    //Roll P-gain - angle mode 
-float Ki_roll_angle = 0.3;    //Roll I-gain - angle mode
-float Kd_roll_angle = 0.05;   //Roll D-gain - angle mode (has no effect on controlANGLE2)
-float B_loop_roll = 0.9;      //Roll damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
-float Kp_pitch_angle = 0.2;   //Pitch P-gain - angle mode
-float Ki_pitch_angle = 0.3;   //Pitch I-gain - angle mode
-float Kd_pitch_angle = 0.05;  //Pitch D-gain - angle mode (has no effect on controlANGLE2)
-float B_loop_pitch = 0.9;     //Pitch damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
+static float Kp_roll_angle = 0.2;    //Roll P-gain - angle mode 
+static float Ki_roll_angle = 0.3;    //Roll I-gain - angle mode
+static float Kd_roll_angle = 0.05;   //Roll D-gain - angle mode (has no effect on controlANGLE2)
+static float B_loop_roll = 0.9;      //Roll damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
+static float Kp_pitch_angle = 0.2;   //Pitch P-gain - angle mode
+static float Ki_pitch_angle = 0.3;   //Pitch I-gain - angle mode
+static float Kd_pitch_angle = 0.05;  //Pitch D-gain - angle mode (has no effect on controlANGLE2)
+static float B_loop_pitch = 0.9;     //Pitch damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
 
-float Kp_roll_rate = 0.15;    //Roll P-gain - rate mode
-float Ki_roll_rate = 0.2;     //Roll I-gain - rate mode
-float Kd_roll_rate = 0.0002;  //Roll D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
-float Kp_pitch_rate = 0.15;   //Pitch P-gain - rate mode
-float Ki_pitch_rate = 0.2;    //Pitch I-gain - rate mode
-float Kd_pitch_rate = 0.0002; //Pitch D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
+static float Kp_roll_rate = 0.15;    //Roll P-gain - rate mode
+static float Ki_roll_rate = 0.2;     //Roll I-gain - rate mode
+static float Kd_roll_rate = 0.0002;  //Roll D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
+static float Kp_pitch_rate = 0.15;   //Pitch P-gain - rate mode
+static float Ki_pitch_rate = 0.2;    //Pitch I-gain - rate mode
+static float Kd_pitch_rate = 0.0002; //Pitch D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
 
-float Kp_yaw = 0.3;           //Yaw P-gain
-float Ki_yaw = 0.05;          //Yaw I-gain
-float Kd_yaw = 0.00015;       //Yaw D-gain (be careful when increasing too high, motors will begin to overheat!)
+static float Kp_yaw = 0.3;           //Yaw P-gain
+static float Ki_yaw = 0.05;          //Yaw I-gain
+static float Kd_yaw = 0.00015;       //Yaw D-gain (be careful when increasing too high, motors will begin to overheat!)
 
 
 const int m1Pin = 6;
@@ -247,7 +232,7 @@ void setup()
     delay(5);
 
     //Initialize radio communication
-    radioSetup();
+    Serial1.begin(115000);
 
     //Set radio channels to default (safe) values before entering main loop
     channel_1_pwm = channel_1_fs;
