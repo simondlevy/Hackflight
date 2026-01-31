@@ -26,8 +26,6 @@
 
 #include <MPU6050.h>
 
-#define USE_DSM_RX
-
 static const uint8_t num_DSM_channels = 6; 
 
 //Uncomment only one IMU
@@ -177,33 +175,11 @@ float Ki_yaw = 0.05;          //Yaw I-gain
 float Kd_yaw = 0.00015;       //Yaw D-gain (be careful when increasing too high, motors will begin to overheat!)
 
 
-
-//========================================================================================================================//
-//                                                     DECLARE PINS                                                       //                           
-//========================================================================================================================//                                          
-
-//NOTE: Pin 13 is reserved for onboard LED, pins 18 and 19 are reserved for the MPU6050 IMU for default setup
-//Radio:
-//Note: If using SBUS, connect to pin 21 (RX5), if using DSM, connect to pin 15 (RX3)
-const int ch1Pin = 15; //throttle
-const int ch2Pin = 16; //ail
-const int ch3Pin = 17; //ele
-const int ch4Pin = 20; //rudd
-const int ch5Pin = 21; //gear (throttle cut)
-const int ch6Pin = 22; //aux1 (free aux channel)
-const int PPM_Pin = 23;
-//OneShot125 ESC pin outputs:
 const int m1Pin = 6;
 const int m2Pin = 5;
 const int m3Pin = 4;
 const int m4Pin = 3;
 
-
-//========================================================================================================================//
-
-
-
-//DECLARE GLOBAL VARIABLES
 
 //General stuff
 float dt;
@@ -253,7 +229,8 @@ bool armedFly = false;
 //                                                      VOID SETUP                                                        //                           
 //========================================================================================================================//
 
-void setup() {
+void setup()
+{
     Serial.begin(500000); //USB serial
     delay(500);
 
@@ -309,8 +286,8 @@ void setup() {
 }
 
 
-void loop() {
-
+void loop()
+{
     //Keep track of what time it is and how much time has elapsed since the last loop
     prev_time = current_time;      
     current_time = micros();      
@@ -1019,13 +996,6 @@ void scaleCommands() {
 }
 
 void getCommands() {
-    //DESCRIPTION: Get raw PWM values for every channel from the radio
-    /*
-     * Updates radio PWM commands in loop based on current available commands. channel_x_pwm is the raw command used in the rest of 
-     * the loop. If using a PWM or PPM receiver, the radio commands are retrieved from a function in the readPWM file separate from this one which 
-     * is running a bunch of interrupts to continuously update the radio readings. If using an SBUS receiver, the alues are pulled from the SBUS library directly.
-     * The raw radio commands are filtered with a first order low-pass filter to eliminate any really high frequency noise. 
-     */
 
     if (DSM.timedOut(micros())) {
         //Serial.println("*** DSM RX TIMED OUT ***");
@@ -1437,23 +1407,5 @@ void printLoopRate() {
 //HELPER FUNCTIONS
 
 float invSqrt(float x) {
-    //Fast inverse sqrt for madgwick filter
-    /*
-       float halfx = 0.5f * x;
-       float y = x;
-       long i = *(long*)&y;
-       i = 0x5f3759df - (i>>1);
-       y = *(float*)&i;
-       y = y * (1.5f - (halfx * y * y));
-       y = y * (1.5f - (halfx * y * y));
-       return y;
-     */
-    /*
-    //alternate form:
-    unsigned int i = 0x5F1F1412 - (*(unsigned int*)&x >> 1);
-    float tmp = *(float*)&i;
-    float y = tmp * (1.69000231f - 0.714158168f * x * tmp * tmp);
-    return y;
-     */
     return 1.0/sqrtf(x); //Teensy is fast enough to just take the compute penalty lol suck it arduino nano
 }
