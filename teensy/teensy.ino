@@ -29,6 +29,7 @@
 #include <hackflight.h>
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
+#include <mixers/bfquadx.hpp>
 
 static MPU6050 _mpu6050;
 
@@ -126,10 +127,14 @@ static bool armedFly;
 
 static void controlMixer() 
 {
-    m1_command_scaled = thro_des + pitch_PID - roll_PID - yaw_PID; 
-    m2_command_scaled = thro_des - pitch_PID - roll_PID + yaw_PID; 
-    m3_command_scaled = thro_des + pitch_PID + roll_PID + yaw_PID; 
-    m4_command_scaled = thro_des - pitch_PID + roll_PID - yaw_PID; 
+    const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
+    float motors[4] = {};
+    hf::Mixer::mix(demands, motors);
+
+    m1_command_scaled = motors[0];
+    m2_command_scaled = motors[1];
+    m3_command_scaled = motors[2];
+    m4_command_scaled = motors[3];
 
 }
 
