@@ -84,12 +84,6 @@ void serialEvent1(void)
 #define ACCEL_SCALE_FACTOR 2048.0
 #endif
 
-//
-
-//                           
-
-//
-
 static unsigned long channel_1_fs = 1000; 
 static unsigned long channel_2_fs = 1500; 
 static unsigned long channel_3_fs = 1500; 
