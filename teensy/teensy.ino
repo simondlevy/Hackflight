@@ -202,15 +202,7 @@ bool blinkAlternate;
 unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
 unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
 
-#if defined USE_SBUS_RX
-SBUS sbus(Serial5);
-uint16_t sbusChannels[16];
-bool sbusFailSafe;
-bool sbusLostFrame;
-#endif
-#if defined USE_DSM_RX
 DSM2048 DSM;
-#endif
 
 //IMU:
 float AccX, AccY, AccZ;
@@ -403,7 +395,6 @@ void IMUinit() {
     /*
      * Don't worry about how this works.
      */
-#if defined USE_MPU6050_I2C
     Wire.begin();
     Wire.setClock(1000000); //Note this is 2.5 times the spec sheet 400 kHz max...
 
@@ -420,28 +411,6 @@ void IMUinit() {
     //do is set the desired fullscale ranges
     mpu6050.setFullScaleGyroRange(GYRO_SCALE);
     mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
-
-#elif defined USE_MPU9250_SPI
-    int status = mpu9250.begin();    
-
-    if (status < 0) {
-        Serial.println("MPU9250 initialization unsuccessful");
-        Serial.println("Check MPU9250 wiring or try cycling power");
-        Serial.print("Status: ");
-        Serial.println(status);
-        while(1) {}
-    }
-
-    //From the reset state all registers should be 0x00, so we should be at
-    //max sample rate with digital low pass filter(s) off.  All we need to
-    //do is set the desired fullscale ranges
-    mpu9250.setGyroRange(GYRO_SCALE);
-    mpu9250.setAccelRange(ACCEL_SCALE);
-    mpu9250.setMagCalX(MagErrorX, MagScaleX);
-    mpu9250.setMagCalY(MagErrorY, MagScaleY);
-    mpu9250.setMagCalZ(MagErrorZ, MagScaleZ);
-    mpu9250.setSrd(0); //sets gyro and accel read to 1khz, magnetometer read to 100hz
-#endif
 }
 
 void getIMUdata() {
@@ -596,10 +565,10 @@ void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float 
     float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2bx, _2bz, _4bx, _4bz, _2q0, _2q1, _2q2, _2q3, _2q0q2, _2q2q3, q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
 
     //use 6DOF algorithm if MPU6050 is being used
-#if defined USE_MPU6050_I2C 
+
     Madgwick6DOF(gx, gy, gz, ax, ay, az, invSampleFreq);
     return;
-#endif
+
 
     //Use 6DOF algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
     if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
@@ -1262,53 +1231,6 @@ void throttleCut() {
         //s6_command_PWM = 0;
         //s7_command_PWM = 0;
     }
-}
-
-void calibrateMagnetometer() {
-#if defined USE_MPU9250_SPI 
-    float success;
-    Serial.println("Beginning magnetometer calibration in");
-    Serial.println("3...");
-    delay(1000);
-    Serial.println("2...");
-    delay(1000);
-    Serial.println("1...");
-    delay(1000);
-    Serial.println("Rotate the IMU about all axes until complete.");
-    Serial.println(" ");
-    success = mpu9250.calibrateMag();
-    if(success) {
-        Serial.println("Calibration Successful!");
-        Serial.println("Please comment out the calibrateMagnetometer() function and copy these values into the code:");
-        Serial.print("float MagErrorX = ");
-        Serial.print(mpu9250.getMagBiasX_uT());
-        Serial.println(";");
-        Serial.print("float MagErrorY = ");
-        Serial.print(mpu9250.getMagBiasY_uT());
-        Serial.println(";");
-        Serial.print("float MagErrorZ = ");
-        Serial.print(mpu9250.getMagBiasZ_uT());
-        Serial.println(";");
-        Serial.print("float MagScaleX = ");
-        Serial.print(mpu9250.getMagScaleFactorX());
-        Serial.println(";");
-        Serial.print("float MagScaleY = ");
-        Serial.print(mpu9250.getMagScaleFactorY());
-        Serial.println(";");
-        Serial.print("float MagScaleZ = ");
-        Serial.print(mpu9250.getMagScaleFactorZ());
-        Serial.println(";");
-        Serial.println(" ");
-        Serial.println("If you are having trouble with your attitude estimate at a new flying location, repeat this process as needed.");
-    }
-    else {
-        Serial.println("Calibration Unsuccessful. Please reset the board and try again.");
-    }
-
-    while(1); //Halt code so it won't enter main loop until this function commented out
-#endif
-    Serial.println("Error: MPU9250 not selected. Cannot calibrate non-existent magnetometer.");
-    while(1); //Halt code so it won't enter main loop until this function commented out
 }
 
 void loopRate(int freq) {
