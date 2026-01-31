@@ -138,7 +138,7 @@ static void controlMixer()
 
 }
 
-static void armedStatus() {
+static void updateArmedStatus() {
 
     if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
         armedFly = true;
@@ -348,15 +348,14 @@ static void failSafe() {
     }
 }
 
+/*
 static void armMotors() {
 
     for (int i = 0; i <= 50; i++) {
-
-        _motors.run(armedFly, _motor_pwms);
-
+        _motors.run(false, _motor_pwms);
          delay(2);
     }
-}
+}*/
 
 static void throttleCut() {
 
@@ -431,16 +430,16 @@ void setup()
 
     _madgwick.initialize();
 
-    delay(5);
+    delay(10);
 
-    delay(5);
-
+    /*
     _motor_pwms[0] = 125; 
     _motor_pwms[1] = 125;
     _motor_pwms[2] = 125;
     _motor_pwms[3] = 125;
+    */
 
-    armMotors(); 
+    _motors.arm(); 
 
     setupBlink(3,160,70); 
 }
@@ -454,7 +453,7 @@ void loop()
 
     loopBlink(); 
 
-    armedStatus(); 
+    updateArmedStatus(); 
 
     getIMUdata(); 
 
