@@ -494,49 +494,6 @@ void commandMotors() {
     interrupts();
 }
 
-/*
-static void commandMotors() {
-
-    int wentLow = 0;
-    int pulseStart, timer;
-    int flagM1 = 0;
-    int flagM2 = 0;
-    int flagM3 = 0;
-    int flagM4 = 0;
-
-    digitalWrite(m1Pin, HIGH);
-    digitalWrite(m2Pin, HIGH);
-    digitalWrite(m3Pin, HIGH);
-    digitalWrite(m4Pin, HIGH);
-    pulseStart = micros();
-
-    while (wentLow < 4 ) { 
-
-        timer = micros();
-        if ((m1_command_PWM <= timer - pulseStart) && (flagM1==0)) {
-            digitalWrite(m1Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM1 = 1;
-        }
-        if ((m2_command_PWM <= timer - pulseStart) && (flagM2==0)) {
-            digitalWrite(m2Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM2 = 1;
-        }
-        if ((m3_command_PWM <= timer - pulseStart) && (flagM3==0)) {
-            digitalWrite(m3Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM3 = 1;
-        }
-        if ((m4_command_PWM <= timer - pulseStart) && (flagM4==0)) {
-            digitalWrite(m4Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM4 = 1;
-        } 
-    }
-}
-*/
-
 static void armMotors() {
 
     for (int i = 0; i <= 50; i++) {
