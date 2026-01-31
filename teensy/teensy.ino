@@ -159,52 +159,49 @@ static float Kp_yaw = 0.3;           //Yaw P-gain
 static float Ki_yaw = 0.05;          //Yaw I-gain
 static float Kd_yaw = 0.00015;       //Yaw D-gain (be careful when increasing too high, motors will begin to overheat!)
 
-
-const int m1Pin = 6;
-const int m2Pin = 5;
-const int m3Pin = 4;
-const int m4Pin = 3;
+static const int m1Pin = 6;
+static const int m2Pin = 5;
+static const int m3Pin = 4;
+static const int m4Pin = 3;
 
 
 //General stuff
-float dt;
-unsigned long current_time, prev_time;
-unsigned long print_counter, serial_counter;
-unsigned long blink_counter, blink_delay;
-bool blinkAlternate;
+static float dt;
+static unsigned long current_time, prev_time;
+static unsigned long blink_counter, blink_delay;
+static bool blinkAlternate;
 
 //Radio communication:
-unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
-unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
+static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
+static unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
 
 
 //IMU:
-float AccX, AccY, AccZ;
-float AccX_prev, AccY_prev, AccZ_prev;
-float GyroX, GyroY, GyroZ;
-float GyroX_prev, GyroY_prev, GyroZ_prev;
-float MagX, MagY, MagZ;
-float MagX_prev, MagY_prev, MagZ_prev;
-float roll_IMU, pitch_IMU, yaw_IMU;
-float roll_IMU_prev, pitch_IMU_prev;
-float q0 = 1.0f; //Initialize quaternion for madgwick filter
-float q1 = 0.0f;
-float q2 = 0.0f;
-float q3 = 0.0f;
+static float AccX, AccY, AccZ;
+static float AccX_prev, AccY_prev, AccZ_prev;
+static float GyroX, GyroY, GyroZ;
+static float GyroX_prev, GyroY_prev, GyroZ_prev;
+static float MagX, MagY, MagZ;
+static float roll_IMU, pitch_IMU, yaw_IMU;
+static float roll_IMU_prev, pitch_IMU_prev;
+static float q0 = 1.0f; //Initialize quaternion for madgwick filter
+static float q1 = 0.0f;
+static float q2 = 0.0f;
+static float q3 = 0.0f;
 
 //Normalized desired state:
-float thro_des, roll_des, pitch_des, yaw_des;
-float roll_passthru, pitch_passthru, yaw_passthru;
+static float thro_des, roll_des, pitch_des, yaw_des;
+static float roll_passthru, pitch_passthru, yaw_passthru;
 
 //Controller:
-float error_roll, error_roll_prev, roll_des_prev, integral_roll, integral_roll_il, integral_roll_ol, integral_roll_prev, integral_roll_prev_il, integral_roll_prev_ol, derivative_roll, roll_PID = 0;
-float error_pitch, error_pitch_prev, pitch_des_prev, integral_pitch, integral_pitch_il, integral_pitch_ol, integral_pitch_prev, integral_pitch_prev_il, integral_pitch_prev_ol, derivative_pitch, pitch_PID = 0;
-float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev, derivative_yaw, yaw_PID = 0;
+static float error_roll, error_roll_prev, roll_des_prev, integral_roll, integral_roll_il, integral_roll_ol, integral_roll_prev, integral_roll_prev_il, integral_roll_prev_ol, derivative_roll, roll_PID = 0;
+static float error_pitch, error_pitch_prev, pitch_des_prev, integral_pitch, integral_pitch_il, integral_pitch_ol, integral_pitch_prev, integral_pitch_prev_il, integral_pitch_prev_ol, derivative_pitch, pitch_PID = 0;
+static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev, derivative_yaw, yaw_PID = 0;
 
 //Mixer
-float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled, m5_command_scaled, m6_command_scaled;
+static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled, m5_command_scaled, m6_command_scaled;
 int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM, m5_command_PWM, m6_command_PWM;
-float s1_command_scaled, s2_command_scaled, s3_command_scaled, s4_command_scaled, s5_command_scaled, s6_command_scaled, s7_command_scaled;
+static float s1_command_scaled, s2_command_scaled, s3_command_scaled, s4_command_scaled, s5_command_scaled, s6_command_scaled, s7_command_scaled;
 int s1_command_PWM, s2_command_PWM, s3_command_PWM, s4_command_PWM, s5_command_PWM, s6_command_PWM, s7_command_PWM;
 
 //Flight status
@@ -1248,149 +1245,6 @@ void setupBlink(int numBlinks,int upTime, int downTime) {
         delay(upTime);
     }
 }
-
-void printRadioData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F(" CH1:"));
-        Serial.print(channel_1_pwm);
-        Serial.print(F(" CH2:"));
-        Serial.print(channel_2_pwm);
-        Serial.print(F(" CH3:"));
-        Serial.print(channel_3_pwm);
-        Serial.print(F(" CH4:"));
-        Serial.print(channel_4_pwm);
-        Serial.print(F(" CH5:"));
-        Serial.print(channel_5_pwm);
-        Serial.print(F(" CH6:"));
-        Serial.println(channel_6_pwm);
-    }
-}
-
-void printDesiredState() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("thro_des:"));
-        Serial.print(thro_des);
-        Serial.print(F(" roll_des:"));
-        Serial.print(roll_des);
-        Serial.print(F(" pitch_des:"));
-        Serial.print(pitch_des);
-        Serial.print(F(" yaw_des:"));
-        Serial.println(yaw_des);
-    }
-}
-
-void printGyroData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("GyroX:"));
-        Serial.print(GyroX);
-        Serial.print(F(" GyroY:"));
-        Serial.print(GyroY);
-        Serial.print(F(" GyroZ:"));
-        Serial.println(GyroZ);
-    }
-}
-
-void printAccelData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("AccX:"));
-        Serial.print(AccX);
-        Serial.print(F(" AccY:"));
-        Serial.print(AccY);
-        Serial.print(F(" AccZ:"));
-        Serial.println(AccZ);
-    }
-}
-
-void printMagData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("MagX:"));
-        Serial.print(MagX);
-        Serial.print(F(" MagY:"));
-        Serial.print(MagY);
-        Serial.print(F(" MagZ:"));
-        Serial.println(MagZ);
-    }
-}
-
-void printRollPitchYaw() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("roll:"));
-        Serial.print(roll_IMU);
-        Serial.print(F(" pitch:"));
-        Serial.print(pitch_IMU);
-        Serial.print(F(" yaw:"));
-        Serial.println(yaw_IMU);
-    }
-}
-
-void printPIDoutput() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("roll_PID:"));
-        Serial.print(roll_PID);
-        Serial.print(F(" pitch_PID:"));
-        Serial.print(pitch_PID);
-        Serial.print(F(" yaw_PID:"));
-        Serial.println(yaw_PID);
-    }
-}
-
-void printMotorCommands() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("m1_command:"));
-        Serial.print(m1_command_PWM);
-        Serial.print(F(" m2_command:"));
-        Serial.print(m2_command_PWM);
-        Serial.print(F(" m3_command:"));
-        Serial.print(m3_command_PWM);
-        Serial.print(F(" m4_command:"));
-        Serial.print(m4_command_PWM);
-        Serial.print(F(" m5_command:"));
-        Serial.print(m5_command_PWM);
-        Serial.print(F(" m6_command:"));
-        Serial.println(m6_command_PWM);
-    }
-}
-
-void printServoCommands() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("s1_command:"));
-        Serial.print(s1_command_PWM);
-        Serial.print(F(" s2_command:"));
-        Serial.print(s2_command_PWM);
-        Serial.print(F(" s3_command:"));
-        Serial.print(s3_command_PWM);
-        Serial.print(F(" s4_command:"));
-        Serial.print(s4_command_PWM);
-        Serial.print(F(" s5_command:"));
-        Serial.print(s5_command_PWM);
-        Serial.print(F(" s6_command:"));
-        Serial.print(s6_command_PWM);
-        Serial.print(F(" s7_command:"));
-        Serial.println(s7_command_PWM);
-    }
-}
-
-void printLoopRate() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("dt:"));
-        Serial.println(dt*1000000.0);
-    }
-}
-
-//=========================================================================================//
-
-//HELPER FUNCTIONS
-
 float invSqrt(float x) {
     return 1.0/sqrtf(x); //Teensy is fast enough to just take the compute penalty lol suck it arduino nano
 }
