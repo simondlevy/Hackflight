@@ -24,8 +24,6 @@
 
 #include <MPU6050.h>
 
-static const uint8_t num_DSM_channels = 6; 
-
 #define GYRO_250DPS //Default
                     //#define GYRO_500DPS
                     //#define GYRO_1000DPS
@@ -37,7 +35,7 @@ static const uint8_t num_DSM_channels = 6;
                  //#define ACCEL_16G
 
 
-static MPU6050 mpu6050;
+static MPU6050 _mpu6050;
 
 static DSM2048 DSM;
 
@@ -213,9 +211,9 @@ static void IMUinit() {
     Wire.begin();
     Wire.setClock(1000000); //Note this is 2.5 times the spec sheet 400 kHz max...
 
-    mpu6050.initialize();
+    _mpu6050.initialize();
 
-    if (mpu6050.testConnection() == false) {
+    if (_mpu6050.testConnection() == false) {
         Serial.println("MPU6050 initialization unsuccessful");
         Serial.println("Check MPU6050 wiring or try cycling power");
         while(1) {}
@@ -224,8 +222,8 @@ static void IMUinit() {
     //From the reset state all registers should be 0x00, so we should be at
     //max sample rate with digital low pass filter(s) off.  All we need to
     //do is set the desired fullscale ranges
-    mpu6050.setFullScaleGyroRange(GYRO_SCALE);
-    mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+    _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
+    _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
 static void getIMUdata() {
@@ -240,7 +238,7 @@ static void getIMUdata() {
      */
     int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
-    mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
+    _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
     //Accelerometer
     AccX = AcX / ACCEL_SCALE_FACTOR; //G's
@@ -587,8 +585,8 @@ static void getCommands() {
         //Serial.println("*** DSM RX TIMED OUT ***");
     }
     else if (DSM.gotNewFrame()) {
-        uint16_t values[num_DSM_channels];
-        DSM.getChannelValues(values, num_DSM_channels);
+        uint16_t values[6];
+        DSM.getChannelValues(values, 6);
 
         channel_1_pwm = values[0];
         channel_2_pwm = values[1];
