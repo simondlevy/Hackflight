@@ -108,29 +108,17 @@ static float GyroErrorY= 0.0;
 static float GyroErrorZ = 0.0;
 
 static float i_limit = 25.0;     
-
 static float maxRoll = 30.0;     
-
 static float maxPitch = 30.0;    
-
 static float maxYaw = 160.0;     
-
 static float Kp_roll_angle = 0.2;    
-
 static float Ki_roll_angle = 0.3;    
-
 static float Kd_roll_angle = 0.05;   
-
 static float Kp_pitch_angle = 0.2;   
-
 static float Ki_pitch_angle = 0.3;   
-
 static float Kd_pitch_angle = 0.05;  
-
 static float Kp_yaw = 0.3;           
-
 static float Ki_yaw = 0.05;          
-
 static float Kd_yaw = 0.00015;       
 
 static const int m1Pin = 6;
@@ -562,6 +550,5 @@ void loop()
     failSafe(); 
 
     loopRate(2000); 
-
 }
 
