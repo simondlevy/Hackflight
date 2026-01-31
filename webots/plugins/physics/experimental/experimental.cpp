@@ -70,9 +70,12 @@ static bool run_normal(hf::siminfo_t & siminfo)
     if (autonomous) {
 
         if (string(siminfo.worldname) == "twoexit") {
-
             hf::RangefinderSetpoint::runTwoExit(
                     _rangefinder_distances_mm, siminfo.setpoint);
+        }
+
+        else {
+            printf("No autopilot for world %s\n", siminfo.worldname);
         }
     }
 
@@ -100,7 +103,7 @@ static bool run_normal(hf::siminfo_t & siminfo)
 
     // Visualize rangefinder distances
     _rangefinderVisualizer->show(_rangefinder_distances_mm,
-            RANGEFINDER_DISPLAY_SCALEUP, autonomous);
+            RANGEFINDER_DISPLAY_SCALEUP);
 
     // Stop if we detected a collision
     if (_world.collided({pose.x, pose.y, pose.z})) {
