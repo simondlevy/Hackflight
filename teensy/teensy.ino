@@ -95,11 +95,6 @@ static float Kp_yaw = 0.3;
 static float Ki_yaw = 0.05;          
 static float Kd_yaw = 0.00015;       
 
-static const int m1Pin = 6;
-static const int m2Pin = 5;
-static const int m3Pin = 4;
-static const int m4Pin = 3;
-
 static float dt;
 static unsigned long current_time, prev_time;
 static unsigned long blink_counter, blink_delay;
@@ -418,11 +413,6 @@ void setup()
     delay(500);
 
     pinMode(LED_PIN, OUTPUT); 
-
-    pinMode(m1Pin, OUTPUT);
-    pinMode(m2Pin, OUTPUT);
-    pinMode(m3Pin, OUTPUT);
-    pinMode(m4Pin, OUTPUT);
 
     digitalWrite(LED_PIN, HIGH);
 
