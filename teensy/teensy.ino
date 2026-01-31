@@ -50,8 +50,6 @@ void serialEvent1(void)
 // Motors
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
-static float _motor_pwms[4];
-
 
 // IMU ------------------------------------------------------------
 
@@ -125,18 +123,6 @@ static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command
 
 static bool armedFly;
 
-static void controlMixer() 
-{
-    const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
-    float motors[4] = {};
-    hf::Mixer::mix(demands, motors);
-
-    m1_command_scaled = motors[0];
-    m2_command_scaled = motors[1];
-    m3_command_scaled = motors[2];
-    m4_command_scaled = motors[3];
-
-}
 
 static void updateArmedStatus() {
 
@@ -278,19 +264,6 @@ static void controlANGLE() {
     integral_yaw_prev = integral_yaw;
 }
 
-static void scaleCommands() {
-
-    _motor_pwms[0] = m1_command_scaled*125 + 125;
-    _motor_pwms[1] = m2_command_scaled*125 + 125;
-    _motor_pwms[2] = m3_command_scaled*125 + 125;
-    _motor_pwms[3] = m4_command_scaled*125 + 125;
-
-    _motor_pwms[0] = constrain(_motor_pwms[0], 125, 250);
-    _motor_pwms[1] = constrain(_motor_pwms[1], 125, 250);
-    _motor_pwms[2] = constrain(_motor_pwms[2], 125, 250);
-    _motor_pwms[3] = constrain(_motor_pwms[3], 125, 250);
-}
-
 static void getCommands() {
 
     if (_dsm2048.timedOut(micros())) {
@@ -345,26 +318,6 @@ static void failSafe() {
         channel_4_pwm = channel_4_fs;
         channel_5_pwm = channel_5_fs;
         channel_6_pwm = channel_6_fs;
-    }
-}
-
-/*
-static void armMotors() {
-
-    for (int i = 0; i <= 50; i++) {
-        _motors.run(false, _motor_pwms);
-         delay(2);
-    }
-}*/
-
-static void throttleCut() {
-
-    if ((channel_5_pwm < 1500) || (armedFly == false)) {
-        armedFly = false;
-        _motor_pwms[0] = 120;
-        _motor_pwms[1] = 120;
-        _motor_pwms[2] = 120;
-        _motor_pwms[3] = 120;
     }
 }
 
@@ -432,13 +385,6 @@ void setup()
 
     delay(10);
 
-    /*
-    _motor_pwms[0] = 125; 
-    _motor_pwms[1] = 125;
-    _motor_pwms[2] = 125;
-    _motor_pwms[3] = 125;
-    */
-
     _motors.arm(); 
 
     setupBlink(3,160,70); 
@@ -466,13 +412,34 @@ void loop()
 
     controlANGLE(); 
 
-    controlMixer(); 
+    const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
+    float motors[4] = {};
+    hf::Mixer::mix(demands, motors);
+    m1_command_scaled = motors[0];
+    m2_command_scaled = motors[1];
+    m3_command_scaled = motors[2];
+    m4_command_scaled = motors[3];
 
-    scaleCommands(); 
+    float motor_pwms[4] = {};
 
-    throttleCut(); 
+    motor_pwms[0] = m1_command_scaled*125 + 125;
+    motor_pwms[1] = m2_command_scaled*125 + 125;
+    motor_pwms[2] = m3_command_scaled*125 + 125;
+    motor_pwms[3] = m4_command_scaled*125 + 125;
+    motor_pwms[0] = constrain(motor_pwms[0], 125, 250);
+    motor_pwms[1] = constrain(motor_pwms[1], 125, 250);
+    motor_pwms[2] = constrain(motor_pwms[2], 125, 250);
+    motor_pwms[3] = constrain(motor_pwms[3], 125, 250);
 
-    _motors.run(armedFly, _motor_pwms);
+    if ((channel_5_pwm < 1500) || (armedFly == false)) {
+        armedFly = false;
+        motor_pwms[0] = 120;
+        motor_pwms[1] = 120;
+        motor_pwms[2] = 120;
+        motor_pwms[3] = 120;
+    }
+
+    _motors.run(armedFly, motor_pwms);
 
     getCommands(); 
 
