@@ -173,10 +173,9 @@ static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
              derivative_yaw, yaw_PID;
 
 //Mixer
-static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled, m5_command_scaled, m6_command_scaled;
+static float m1_command_scaled, m2_command_scaled, m3_command_scaled, m4_command_scaled;
 
-static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
-           m5_command_PWM, m6_command_PWM;
+static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM;
 
 //Flight status
 static bool armedFly;
@@ -189,9 +188,6 @@ static void controlMixer() {
     m2_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID; //Front Right
     m3_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; //Back Left
     m4_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID; //Front Left
-
-    m5_command_scaled = 0;
-    m6_command_scaled = 0;
 }
 
 static void armedStatus() {
@@ -566,16 +562,12 @@ static void scaleCommands() {
     m2_command_PWM = m2_command_scaled*125 + 125;
     m3_command_PWM = m3_command_scaled*125 + 125;
     m4_command_PWM = m4_command_scaled*125 + 125;
-    m5_command_PWM = m5_command_scaled*125 + 125;
-    m6_command_PWM = m6_command_scaled*125 + 125;
 
     //Constrain commands to motors within oneshot125 bounds
     m1_command_PWM = constrain(m1_command_PWM, 125, 250);
     m2_command_PWM = constrain(m2_command_PWM, 125, 250);
     m3_command_PWM = constrain(m3_command_PWM, 125, 250);
     m4_command_PWM = constrain(m4_command_PWM, 125, 250);
-    m5_command_PWM = constrain(m5_command_PWM, 125, 250);
-    m6_command_PWM = constrain(m6_command_PWM, 125, 250);
 }
 
 static void getCommands() {
@@ -721,17 +713,6 @@ static void throttleCut() {
         m2_command_PWM = 120;
         m3_command_PWM = 120;
         m4_command_PWM = 120;
-        m5_command_PWM = 120;
-        m6_command_PWM = 120;
-
-        //Uncomment if using servo PWM variables to control motor ESCs
-        //s1_command_PWM = 0;
-        //s2_command_PWM = 0;
-        //s3_command_PWM = 0;
-        //s4_command_PWM = 0;
-        //s5_command_PWM = 0;
-        //s6_command_PWM = 0;
-        //s7_command_PWM = 0;
     }
 }
 
@@ -832,8 +813,7 @@ void setup()
     m2_command_PWM = 125;
     m3_command_PWM = 125;
     m4_command_PWM = 125;
-    m5_command_PWM = 125;
-    m6_command_PWM = 125;
+
     armMotors(); //Loop over commandMotors() until ESCs happily arm
 
     //Indicate entering main loop with 3 quick blinks
