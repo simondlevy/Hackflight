@@ -119,15 +119,6 @@ static float error_pitch, integral_pitch, integral_pitch_prev,
 static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
              derivative_yaw, yaw_PID;
 
-static bool armedFly;
-
-
-static void updateArmedStatus() {
-
-    if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
-        armedFly = true;
-    }
-}
 
 static void IMUinit() {
 
@@ -390,14 +381,17 @@ void setup()
 
 void loop()
 {
-
     prev_time = current_time;      
     current_time = micros();      
     dt = (current_time - prev_time)/1000000.0;
 
     loopBlink(); 
 
-    updateArmedStatus(); 
+    static bool _armed;
+
+    if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
+        _armed = true;
+    }
 
     getIMUdata(); 
 
@@ -411,30 +405,26 @@ void loop()
     controlANGLE(); 
 
     const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
-    float motors[4] = {};
-    hf::Mixer::mix(demands, motors);
+    float motorvals[4] = {};
+    hf::Mixer::mix(demands, motorvals);
 
+    /*
     float motor_pwms[4] = {};
-
-    motor_pwms[0] = motors[0]*125 + 125;
-    motor_pwms[1] = motors[1]*125 + 125;
-    motor_pwms[2] = motors[2]*125 + 125;
-    motor_pwms[3] = motors[3]*125 + 125;
+    motor_pwms[0] = motorvals[0]*125 + 125;
+    motor_pwms[1] = motorvals[1]*125 + 125;
+    motor_pwms[2] = motorvals[2]*125 + 125;
+    motor_pwms[3] = motorvals[3]*125 + 125;
     motor_pwms[0] = constrain(motor_pwms[0], 125, 250);
     motor_pwms[1] = constrain(motor_pwms[1], 125, 250);
     motor_pwms[2] = constrain(motor_pwms[2], 125, 250);
     motor_pwms[3] = constrain(motor_pwms[3], 125, 250);
+    */
 
-    if ((channel_5_pwm < 1500) || (armedFly == false)) {
-        armedFly = false;
-        /*
-        motor_pwms[0] = 120;
-        motor_pwms[1] = 120;
-        motor_pwms[2] = 120;
-        motor_pwms[3] = 120;*/
+    if ((channel_5_pwm < 1500) || (_armed == false)) {
+        _armed = false;
     }
 
-    _motors.run(armedFly, motor_pwms);
+    _motors.run(_armed, motorvals);
 
     getCommands(); 
 
