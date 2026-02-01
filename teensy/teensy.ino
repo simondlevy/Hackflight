@@ -88,9 +88,6 @@ static constexpr float GYRO_ERROR_Z = 0.0;
 static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
                      channel_4_pwm, channel_5_pwm, channel_6_pwm;
 
-static float AccX, AccY, AccZ;
-static float GyroX, GyroY, GyroZ;
-
 static float thro_des, roll_des, pitch_des, yaw_des;
 
 static void initImu() {
@@ -110,46 +107,48 @@ static void initImu() {
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-static void readImu() {
-
-    static float AccX_prev, AccY_prev, AccZ_prev;
-    static float GyroX_prev, GyroY_prev, GyroZ_prev;
+static void readImu(
+        float & accel_x, float & accel_y, float & accel_z,
+        float & gyro_x, float & gyro_y, float & gyro_z)
+{
+    static float accel_x_prev, accel_y_prev, accel_z_prev;
+    static float gyro_x_prev, gyro_y_prev, gyro_z_prev;
 
     int16_t AcX=0, AcY=0, AcZ=0, GyX=0, GyY=0, GyZ=0;
 
     _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
-    AccX = AcX / ACCEL_SCALE_FACTOR; 
+    accel_x = AcX / ACCEL_SCALE_FACTOR; 
 
-    AccY = AcY / ACCEL_SCALE_FACTOR;
-    AccZ = AcZ / ACCEL_SCALE_FACTOR;
+    accel_y = AcY / ACCEL_SCALE_FACTOR;
+    accel_z = AcZ / ACCEL_SCALE_FACTOR;
 
-    AccX = AccX - ACCEL_ERROR_X;
-    AccY = AccY - ACCEL_ERROR_Y;
-    AccZ = AccZ - ACCEL_ERROR_Z;
+    accel_x = accel_x - ACCEL_ERROR_X;
+    accel_y = accel_y - ACCEL_ERROR_Y;
+    accel_z = accel_z - ACCEL_ERROR_Z;
 
-    AccX = (1.0 - B_ACCEL)*AccX_prev + B_ACCEL*AccX;
-    AccY = (1.0 - B_ACCEL)*AccY_prev + B_ACCEL*AccY;
-    AccZ = (1.0 - B_ACCEL)*AccZ_prev + B_ACCEL*AccZ;
-    AccX_prev = AccX;
-    AccY_prev = AccY;
-    AccZ_prev = AccZ;
+    accel_x = (1.0 - B_ACCEL)*accel_x_prev + B_ACCEL*accel_x;
+    accel_y = (1.0 - B_ACCEL)*accel_y_prev + B_ACCEL*accel_y;
+    accel_z = (1.0 - B_ACCEL)*accel_z_prev + B_ACCEL*accel_z;
+    accel_x_prev = accel_x;
+    accel_y_prev = accel_y;
+    accel_z_prev = accel_z;
 
-    GyroX = GyX / GYRO_SCALE_FACTOR; 
+    gyro_x = GyX / GYRO_SCALE_FACTOR; 
 
-    GyroY = GyY / GYRO_SCALE_FACTOR;
-    GyroZ = GyZ / GYRO_SCALE_FACTOR;
+    gyro_y = GyY / GYRO_SCALE_FACTOR;
+    gyro_z = GyZ / GYRO_SCALE_FACTOR;
 
-    GyroX = GyroX - GYRO_ERROR_X;
-    GyroY = GyroY - GYRO_ERROR_Y;
-    GyroZ = GyroZ - GYRO_ERROR_Z;
+    gyro_x = gyro_x - GYRO_ERROR_X;
+    gyro_y = gyro_y - GYRO_ERROR_Y;
+    gyro_z = gyro_z - GYRO_ERROR_Z;
 
-    GyroX = (1.0 - B_GYRO)*GyroX_prev + B_GYRO*GyroX;
-    GyroY = (1.0 - B_GYRO)*GyroY_prev + B_GYRO*GyroY;
-    GyroZ = (1.0 - B_GYRO)*GyroZ_prev + B_GYRO*GyroZ;
-    GyroX_prev = GyroX;
-    GyroY_prev = GyroY;
-    GyroZ_prev = GyroZ;
+    gyro_x = (1.0 - B_GYRO)*gyro_x_prev + B_GYRO*gyro_x;
+    gyro_y = (1.0 - B_GYRO)*gyro_y_prev + B_GYRO*gyro_y;
+    gyro_z = (1.0 - B_GYRO)*gyro_z_prev + B_GYRO*gyro_z;
+    gyro_x_prev = gyro_x;
+    gyro_y_prev = gyro_y;
+    gyro_z_prev = gyro_z;
 }
 
 static void getDesState()
@@ -171,6 +170,7 @@ static void getDesState()
 
 static void runPids(
         const float dt, const float phi, const float theta, const float psi,
+        const float gyro_x, const float gyro_y, const float gyro_z,
         float & roll_PID, float & pitch_PID, float & yaw_PID)
 {
 
@@ -197,7 +197,7 @@ static void runPids(
     }
     integral_roll = constrain(integral_roll, -i_limit, i_limit); 
 
-    derivative_roll = GyroX;
+    derivative_roll = gyro_x;
     roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll
             - Kd_roll_angle*derivative_roll); 
 
@@ -209,14 +209,14 @@ static void runPids(
     }
     integral_pitch = constrain(integral_pitch, -i_limit, i_limit); 
 
-    derivative_pitch = GyroY;
+    derivative_pitch = gyro_y;
     pitch_PID = .01*(
             Kp_pitch_angle*error_pitch +
             Ki_pitch_angle*integral_pitch -
             Kd_pitch_angle*derivative_pitch); 
 
     // Negate gyro Z for nose-right positive
-    const auto dpsi = -GyroZ;
+    const auto dpsi = -gyro_z;
 
     const float error_yaw = yaw_des - dpsi;
     integral_yaw = integral_yaw_prev + error_yaw*dt;
@@ -372,12 +372,14 @@ void loop()
         _armed = true;
     }
 
-    readImu(); 
+    float accel_x=0, accel_y=0, accel_z=0;
+    float gyro_x=0, gyro_y=0, gyro_z=0;
+    readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
 
     float phi=0, theta=0, psi=0;
 
-    const hf::axis3_t gyro = {GyroX, -GyroY, -GyroZ}; 
-    const hf::axis3_t accel = {-AccX, AccY, AccZ}; 
+    const hf::axis3_t gyro = {gyro_x, -gyro_y, -gyro_z}; 
+    const hf::axis3_t accel = {-accel_x, accel_y, accel_z}; 
     _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
     psi = -psi; // make nose-right positive
 
@@ -385,7 +387,8 @@ void loop()
 
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
 
-    runPids(dt, phi, theta, psi, roll_PID, pitch_PID, yaw_PID); 
+    runPids(dt, phi, theta, psi, gyro_x, gyro_y, gyro_z,
+            roll_PID, pitch_PID, yaw_PID); 
 
     const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
     float motorvals[4] = {};
