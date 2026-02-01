@@ -145,7 +145,8 @@ namespace hf {
 
                 theta = Num::RAD2DEG * asinf(2 * (_q1*_q3 - _q0*_q2));
 
-                psi = Num::RAD2DEG * atan2f(_q1*_q2 + _q0*_q3,
+                // Negate for nose-right positive
+                psi = -Num::RAD2DEG * atan2f(_q1*_q2 + _q0*_q3,
                         0.5f - _q2*_q2 - _q3*_q3);
             }
 

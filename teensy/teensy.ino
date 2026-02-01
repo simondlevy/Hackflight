@@ -237,20 +237,48 @@ void setup()
     setupBlink(3,160,70); 
 }
 
-void loop()
+static void getVehicleState(const float dt, hf::vehicleState_t & state)
+{
+    float accel_x=0, accel_y=0, accel_z=0;
+    float gyro_x=0, gyro_y=0, gyro_z=0;
+    readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
+
+    _madgwick.getEulerAngles(dt,
+            gyro_x, -gyro_y, -gyro_z,
+            -accel_x, accel_y, accel_z,
+            state.phi, state.theta, state.psi);
+
+    state.dphi = gyro_x;
+    state.dtheta = gyro_y;
+    state.dpsi = -gyro_z;
+}
+
+static void readReceiver(uint16_t * channel_pwms)
+{
+    if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
+        _dsm2048.getChannelValues(channel_pwms, 6);
+    }
+}
+
+static float getDt(const uint32_t current_time)
 {
     static unsigned long _prev_time;
-    const unsigned long current_time = micros();      
     const float dt = (current_time - _prev_time)/1000000.0;
     _prev_time = current_time;
+
+    return dt;
+}
+
+void loop()
+{
+    const unsigned long current_time = micros();      
+
+    const float dt = getDt(current_time);
 
     loopBlink(current_time); 
     
     static uint16_t _channel_pwms[6];
-
-    if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
-        _dsm2048.getChannelValues(_channel_pwms, 6);
-    }
+    readReceiver(_channel_pwms);
 
     const bool throttle_is_down = _channel_pwms[0] < THROTTLE_DOWN_MAX;
 
@@ -261,23 +289,11 @@ void loop()
         throttle_is_down ? true :
         _armed;
 
-    float accel_x=0, accel_y=0, accel_z=0;
-    float gyro_x=0, gyro_y=0, gyro_z=0;
-    readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
-
-    float phi=0, theta=0, psi=0;
-    _madgwick.getEulerAngles(dt,
-            gyro_x, -gyro_y, -gyro_z,
-            -accel_x, accel_y, accel_z,
-            phi, theta, psi);
-
     hf::demands_t open_loop_demands = {};
     getOpenLoopDemands(_channel_pwms, open_loop_demands);
 
-    hf::vehicleState_t state = {
-        0, 0, 0, 0, 0, 0,
-        phi, gyro_x, theta, gyro_y, -psi, -gyro_z
-    };
+    hf::vehicleState_t state = {};
+    getVehicleState(dt, state);
 
     hf::demands_t pid_demands = {open_loop_demands.thrust, 0, 0, 0};
     hf::PidControl::run(dt, throttle_is_down, state, open_loop_demands,
