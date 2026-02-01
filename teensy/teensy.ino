@@ -92,7 +92,6 @@ static float AccX, AccY, AccZ;
 static float GyroX, GyroY, GyroZ;
 
 static float thro_des, roll_des, pitch_des, yaw_des;
-static float roll_passthru, pitch_passthru, yaw_passthru;
 
 static void initImu() {
 
@@ -164,15 +163,10 @@ static void getDesState()
     roll_des = (channel_2_pwm - 1500.0)/500.0; 
     pitch_des = (channel_3_pwm - 1500.0)/500.0; 
     yaw_des = (channel_4_pwm - 1500.0)/500.0; 
-    pitch_passthru = pitch_des/2.0; 
-    yaw_passthru = yaw_des/2.0; 
     thro_des = constrain(thro_des, 0.0, 1.0); 
     roll_des = constrain(roll_des, -1.0, 1.0)*maxRoll; 
     pitch_des = constrain(pitch_des, -1.0, 1.0)*maxPitch; 
     yaw_des = constrain(yaw_des, -1.0, 1.0)*maxYaw; 
-    roll_passthru = constrain(roll_passthru, -0.5, 0.5);
-    pitch_passthru = constrain(pitch_passthru, -0.5, 0.5);
-    yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
 static void runPids(
