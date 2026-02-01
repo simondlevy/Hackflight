@@ -48,9 +48,15 @@ void serialEvent1(void)
     }
 }
 
-// Motors
+// Motors ---------------------------------------------------------
+
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
+
+// Open-loop demands ----------------------------------------------
+
+static constexpr float MAX_PITCH_ROLL_DEMAND_DEG = 30;     
+static constexpr float MAX_YAW_DEMAND_DPS = 160;     
 
 // IMU ------------------------------------------------------------
 
@@ -61,6 +67,7 @@ static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 // LED -------------------------------------------------------------
+
 static const uint8_t LED_PIN = 14;
 
 // Failsafe --------------------------------------------------------
@@ -88,6 +95,8 @@ static constexpr float GYRO_ERROR_Z = 0.0;
 
 static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
                      channel_4_pwm, channel_5_pwm, channel_6_pwm;
+
+// Helper functions ------------------------------------------------
 
 static void initImu() {
 
@@ -152,22 +161,17 @@ static void readImu(
 
 static void getOpenLoopDemands(hf::demands_t & demands)
 {
-
-    static constexpr float maxRoll = 30.0;     
-    static constexpr float maxPitch = 30.0;    
-    static constexpr float maxYaw = 160.0;     
-
     demands.thrust = (channel_1_pwm - 1000.0)/1000.0; 
     demands.thrust = constrain(demands.thrust, 0.0, 1.0); 
 
     demands.roll = (channel_2_pwm - 1500.0)/500.0; 
-    demands.roll = constrain(demands.roll, -1.0, 1.0)*maxRoll; 
+    demands.roll = constrain(demands.roll, -1.0, 1.0)*MAX_PITCH_ROLL_DEMAND_DEG; 
 
     demands.pitch = (channel_3_pwm - 1500.0)/500.0; 
-    demands.pitch = constrain(demands.pitch, -1.0, 1.0)*maxPitch; 
+    demands.pitch = constrain(demands.pitch, -1.0, 1.0)*MAX_PITCH_ROLL_DEMAND_DEG; 
 
     demands.yaw = (channel_4_pwm - 1500.0)/500.0; 
-    demands.yaw = constrain(demands.yaw, -1.0, 1.0)*maxYaw; 
+    demands.yaw = constrain(demands.yaw, -1.0, 1.0)*MAX_YAW_DEMAND_DPS; 
 }
 
 static void getCommands() {
@@ -258,6 +262,8 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
     }
 }
 
+// Main ----------------------------------------------------------------------
+
 void setup()
 {
     Serial.begin(500000); 
@@ -310,7 +316,6 @@ void loop()
     readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
 
     float phi=0, theta=0, psi=0;
-
     const hf::axis3_t gyro = {gyro_x, -gyro_y, -gyro_z}; 
     const hf::axis3_t accel = {-accel_x, accel_y, accel_z}; 
     _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
