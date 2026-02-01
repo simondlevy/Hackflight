@@ -38,21 +38,23 @@ namespace hf {
             }
 
             void getEulerAngles(
-                    const float dt, const axis3_t & gyro, const axis3_t & accel,
+                    const float dt,
+                    const float gyro_x, const float gyro_y, const float gyro_z,
+                    const float accel_x, const float accel_y, const float accel_z,
                     float & phi, float & theta, float & psi)
             {
                 // LP filter gyro data
-                auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyro.x;
-                auto gy = (1 - B_GYRO) * _gy_prev + B_GYRO * gyro.y;
-                auto gz = (1 - B_GYRO) * _gz_prev + B_GYRO * gyro.z;
+                auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyro_x;
+                auto gy = (1 - B_GYRO) * _gy_prev + B_GYRO * gyro_y;
+                auto gz = (1 - B_GYRO) * _gz_prev + B_GYRO * gyro_z;
                 _gx_prev = gx;
                 _gy_prev = gy;
                 _gz_prev = gz;
 
                 // LP filter accelerometer data
-                auto ax = (1 - B_ACCEL) * _ax_prev + B_ACCEL * accel.x;
-                auto ay = (1 - B_ACCEL) * _ay_prev + B_ACCEL * accel.y;
-                auto az = (1 - B_ACCEL) * _az_prev + B_ACCEL * accel.z;
+                auto ax = (1 - B_ACCEL) * _ax_prev + B_ACCEL * accel_x;
+                auto ay = (1 - B_ACCEL) * _ay_prev + B_ACCEL * accel_y;
+                auto az = (1 - B_ACCEL) * _az_prev + B_ACCEL * accel_z;
                 _ax_prev = ax;
                 _ay_prev = ay;
                 _az_prev = az;

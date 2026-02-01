@@ -94,10 +94,6 @@ static constexpr float GYRO_ERROR_X = 0.0;
 static constexpr float GYRO_ERROR_Y= 0.0;
 static constexpr float GYRO_ERROR_Z = 0.0;
 
-// PIDs ------------------------------------------------------------
-
-static uint16_t channel_pwms[6];
-
 // FAFO -----------------------------------------------------------
 
 static const uint32_t LOOP_FREQ_HZ = 2000;
@@ -133,7 +129,6 @@ static void readImu(
     _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
     accel_x = AcX / ACCEL_SCALE_FACTOR; 
-
     accel_y = AcY / ACCEL_SCALE_FACTOR;
     accel_z = AcZ / ACCEL_SCALE_FACTOR;
 
@@ -149,7 +144,6 @@ static void readImu(
     accel_z_prev = accel_z;
 
     gyro_x = GyX / GYRO_SCALE_FACTOR; 
-
     gyro_y = GyY / GYRO_SCALE_FACTOR;
     gyro_z = GyZ / GYRO_SCALE_FACTOR;
 
@@ -160,12 +154,14 @@ static void readImu(
     gyro_x = (1.0 - B_GYRO)*gyro_x_prev + B_GYRO*gyro_x;
     gyro_y = (1.0 - B_GYRO)*gyro_y_prev + B_GYRO*gyro_y;
     gyro_z = (1.0 - B_GYRO)*gyro_z_prev + B_GYRO*gyro_z;
+
     gyro_x_prev = gyro_x;
     gyro_y_prev = gyro_y;
     gyro_z_prev = gyro_z;
 }
 
-static void getOpenLoopDemands(hf::demands_t & demands)
+static void getOpenLoopDemands(const uint16_t * channel_pwms,
+        hf::demands_t & demands)
 {
     demands.thrust = (channel_pwms[0] - 1000.0)/1000.0; 
     demands.thrust = constrain(demands.thrust, 0.0, 1.0); 
@@ -180,14 +176,14 @@ static void getOpenLoopDemands(hf::demands_t & demands)
     demands.yaw = constrain(demands.yaw, -1.0, 1.0)*MAX_YAW_DEMAND_DPS; 
 }
 
-static void setChannelsToFailsafes()
+static void setChannelsToFailsafes(uint16_t * channel_pwms)
 {
     for (uint8_t k=0; k<6; ++k) {
         channel_pwms[k] = CHANNEL_FAILSAFES[k];
     }
 }
 
-static void getCommands() {
+static void getCommands(uint16_t * channel_pwms) {
 
     if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
 
@@ -196,7 +192,7 @@ static void getCommands() {
 
     for (uint8_t k=0; k<6; ++k) {
         if (channel_pwms[k] > FAILSAFE_MAX_VAL || channel_pwms[k] < FAILSAFE_MIN_VAL) {
-            setChannelsToFailsafes();
+            setChannelsToFailsafes(channel_pwms);
         }
     }
 }
@@ -244,6 +240,8 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
 
 // Main ----------------------------------------------------------------------
 
+static uint16_t _channel_pwms[6];
+
 void setup()
 {
     Serial.begin(500000); 
@@ -258,7 +256,7 @@ void setup()
 
     Serial1.begin(115000);
 
-    setChannelsToFailsafes();
+    setChannelsToFailsafes(_channel_pwms);
 
     initImu();
 
@@ -280,12 +278,14 @@ void loop()
 
     loopBlink(current_time); 
 
-    const bool throttle_is_down = channel_pwms[0] < THROTTLE_DOWN_MAX;
+    getCommands(_channel_pwms); 
+
+    const bool throttle_is_down = _channel_pwms[0] < THROTTLE_DOWN_MAX;
 
     static bool _armed;
 
     _armed = 
-        channel_pwms[4] < ARMING_SWITCH_MIN  ? false :
+        _channel_pwms[4] < ARMING_SWITCH_MIN  ? false :
         throttle_is_down ? true :
         _armed;
 
@@ -294,12 +294,13 @@ void loop()
     readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
 
     float phi=0, theta=0, psi=0;
-    const hf::axis3_t gyro = {gyro_x, -gyro_y, -gyro_z}; 
-    const hf::axis3_t accel = {-accel_x, accel_y, accel_z}; 
-    _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
+    _madgwick.getEulerAngles(dt,
+            gyro_x, -gyro_y, -gyro_z,
+            -accel_x, accel_y, accel_z,
+            phi, theta, psi);
 
     hf::demands_t open_loop_demands = {};
-    getOpenLoopDemands(open_loop_demands);
+    getOpenLoopDemands(_channel_pwms, open_loop_demands);
 
     hf::vehicleState_t state = {
         0, 0, 0, 0, 0, 0,
@@ -314,8 +315,6 @@ void loop()
     hf::Mixer::mix(pid_demands, motorvals);
 
     _motors.run(_armed, motorvals);
-
-    getCommands(); 
 
     runDelayLoop(current_time); 
 }
