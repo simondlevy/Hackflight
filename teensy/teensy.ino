@@ -102,9 +102,7 @@ static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
                      channel_4_pwm, channel_5_pwm, channel_6_pwm;
 
 static float AccX, AccY, AccZ;
-static float AccX_prev, AccY_prev, AccZ_prev;
 static float GyroX, GyroY, GyroZ;
-static float GyroX_prev, GyroY_prev, GyroZ_prev;
 static float roll_IMU, pitch_IMU, yaw_IMU;
 
 static float thro_des, roll_des, pitch_des, yaw_des;
@@ -139,7 +137,10 @@ static void IMUinit() {
 
 static void getIMUdata() {
 
-    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
+    static float AccX_prev, AccY_prev, AccZ_prev;
+    static float GyroX_prev, GyroY_prev, GyroZ_prev;
+
+    int16_t AcX=0, AcY=0, AcZ=0, GyX=0, GyY=0, GyZ=0;
 
     _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
@@ -174,7 +175,6 @@ static void getIMUdata() {
     GyroX_prev = GyroX;
     GyroY_prev = GyroY;
     GyroZ_prev = GyroZ;
-
 }
 
 static void getDesState() {
