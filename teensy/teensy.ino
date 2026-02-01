@@ -88,8 +88,6 @@ static constexpr float GYRO_ERROR_Z = 0.0;
 static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
                      channel_4_pwm, channel_5_pwm, channel_6_pwm;
 
-static float thro_des, roll_des, pitch_des, yaw_des;
-
 static void initImu() {
 
     Wire.begin();
@@ -151,7 +149,8 @@ static void readImu(
     gyro_z_prev = gyro_z;
 }
 
-static void getDesState()
+static void getDesState(
+        float & thro_des, float &roll_des, float & pitch_des, float & yaw_des)
 {
 
     static constexpr float maxRoll = 30.0;     
@@ -171,6 +170,7 @@ static void getDesState()
 static void runPids(
         const float dt, const float phi, const float theta, const float psi,
         const float gyro_x, const float gyro_y, const float gyro_z,
+        const float roll_des, const float pitch_des, const float yaw_des,
         float & roll_PID, float & pitch_PID, float & yaw_PID)
 {
 
@@ -383,11 +383,13 @@ void loop()
     _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
     psi = -psi; // make nose-right positive
 
-    getDesState(); 
+    float thro_des=0, roll_des=0, pitch_des=0, yaw_des=0;
+    getDesState(thro_des, roll_des, pitch_des, yaw_des);
 
     float roll_PID=0, pitch_PID=0, yaw_PID=0;
 
     runPids(dt, phi, theta, psi, gyro_x, gyro_y, gyro_z,
+            roll_des, pitch_des, yaw_des,
             roll_PID, pitch_PID, yaw_PID); 
 
     const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
