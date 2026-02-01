@@ -33,9 +33,30 @@ namespace hf {
             static constexpr float KI_PITCH_ROLL = 0.3;    
             static constexpr float KD_PITCH_ROLL = 0.05;   
 
-            static constexpr float KP_YAW = 0.3;           
-            static constexpr float KI_YAW = 0.05;          
-            static constexpr float KD_YAW = 0.00015;       
+            static constexpr float KP_yaw = 0.3;           
+            static constexpr float KI_yaw = 0.05;          
+            static constexpr float KD_yaw = 0.00015;       
+
+            static float runPitchRoll(
+                    const float dt,
+                    const bool reset,
+                    const float demand,
+                    const float angle,
+                    const float dangle,
+                    float & integral_prev)
+            {
+                const float error = demand - angle;
+
+                const float integral = reset ? 0 :
+                    constrain(integral_prev + error * dt, -I_LIMIT, +I_LIMIT); 
+
+                integral_prev = integral;
+
+                return 0.01*(
+                        KP_PITCH_ROLL * error +
+                        KI_PITCH_ROLL * integral -
+                        KD_PITCH_ROLL * dangle); 
+            }
 
         public:
 
@@ -46,51 +67,27 @@ namespace hf {
                     const hf::demands_t & demands_in,
                     hf::demands_t & demands_out)
             {
-                static float integral_roll, integral_roll_prev, derivative_roll;
-                static float integral_pitch, integral_pitch_prev, derivative_pitch;
-                static float error_YAW_prev, integral_YAW, integral_YAW_prev, derivative_YAW;
+                static float integral_roll_prev;
+                static float integral_pitch_prev;
+                static float error_yaw_prev, integral_yaw_prev;
 
-                const float error_roll = demands_in.roll - state.phi;
-                integral_roll = integral_roll_prev + error_roll*dt;
+                demands_out.roll = runPitchRoll(dt, reset, demands_in.roll,
+                        state.phi, state.dphi, integral_roll_prev);
+
+                demands_out.pitch = runPitchRoll(dt, reset, demands_in.pitch,
+                        state.theta, state.dtheta, integral_pitch_prev);
+
+                const float error_yaw = demands_in.yaw - state.dpsi;
+                float integral_yaw = integral_yaw_prev + error_yaw*dt;
                 if (reset) {   
-                    integral_roll = 0;
+                    integral_yaw = 0;
                 }
-                integral_roll = constrain(integral_roll, -I_LIMIT, I_LIMIT); 
-
-                derivative_roll = state.dphi;
-                demands_out.roll = 0.01*(KP_PITCH_ROLL*error_roll + KI_PITCH_ROLL*integral_roll
-                        - KD_PITCH_ROLL*derivative_roll); 
-
-                const float error_pitch = demands_in.pitch - state.theta;
-                integral_pitch = integral_pitch_prev + error_pitch*dt;
-                if (reset) {   
-
-                    integral_pitch = 0;
-                }
-                integral_pitch = constrain(integral_pitch, -I_LIMIT, I_LIMIT); 
-
-                derivative_pitch = state.dtheta;
-                demands_out.pitch = .01*(
-                        KP_PITCH_ROLL*error_pitch +
-                        KI_PITCH_ROLL*integral_pitch -
-                        KD_PITCH_ROLL*derivative_pitch); 
-
-                const float error_YAW = demands_in.yaw - state.dpsi;
-                integral_YAW = integral_YAW_prev + error_YAW*dt;
-                if (reset) {   
-                    integral_YAW = 0;
-                }
-                integral_YAW = constrain(integral_YAW, -I_LIMIT, I_LIMIT); 
-
-                derivative_YAW = (error_YAW - error_YAW_prev)/dt; 
-                demands_out.yaw = .01*(KP_YAW*error_YAW + KI_YAW*integral_YAW + KD_YAW*derivative_YAW); 
-
-                integral_roll_prev = integral_roll;
-
-                integral_pitch_prev = integral_pitch;
-
-                error_YAW_prev = error_YAW;
-                integral_YAW_prev = integral_YAW;
+                integral_yaw = constrain(integral_yaw, -I_LIMIT, I_LIMIT); 
+                error_yaw_prev = error_yaw;
+                integral_yaw_prev = integral_yaw;
+                const float derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
+                demands_out.yaw = .01*(KP_yaw*error_yaw + KI_yaw*integral_yaw +
+                        KD_yaw*derivative_yaw); 
             }
     };
 
