@@ -36,10 +36,10 @@ namespace hf {
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands)
+                    const demands_t & demands_in)
             {
                 demands_t demands = {};
-                run(dt, hovering, vehicleState, openLoopDemands, demands);
+                run(dt, hovering, vehicleState, demands_in, demands);
                 return demands;
             }
 
@@ -47,7 +47,7 @@ namespace hf {
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands,
+                    const demands_t & demands_in,
                     demands_t & demands)
             {
                 static float _altitude_target;
@@ -58,7 +58,7 @@ namespace hf {
 
                 _altitude_target = Num::fconstrain(
                         _altitude_target +
-                        openLoopDemands.thrust * ALTITUDE_INC_MPS * dt,
+                        demands_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
                 const auto climbrate = AltitudeController::run(hovering,
@@ -78,55 +78,55 @@ namespace hf {
                         airborne,
                         dt,
                         vehicleState.dx, vehicleState.dy, vehicleState.psi,
-                        hovering ? openLoopDemands.pitch : 0,
-                        hovering ? openLoopDemands.roll : 0,
+                        hovering ? demands_in.pitch : 0,
+                        hovering ? demands_in.roll : 0,
                         demands.roll, demands.pitch);
 
 
-                runStabilizerPids(dt, dt, vehicleState, openLoopDemands, demands);
+                runStabilizerPids(dt, dt, vehicleState, demands_in, demands);
             }
 
             static void runStabilizerPids(
                     const float dt,
                     const float yaw_demand_inc,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands,
-                    demands_t & demands)
+                    const demands_t & demands_in,
+                    demands_t & demands_out)
             {
-                const auto airborne = demands.thrust > 0;
+                const auto airborne = demands_out.thrust > 0;
 
                 static float _yaw_angle_target;
 
                 _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
-                        YAW_DEMAND_MAX * openLoopDemands.yaw * yaw_demand_inc);
+                        YAW_DEMAND_MAX * demands_in.yaw * yaw_demand_inc);
 
                 const auto yaw = YawAngleController::run(
                         airborne, dt, vehicleState.psi, _yaw_angle_target);
 
-                demands.yaw =
+                demands_out.yaw =
                     YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
+
+                //printf("%f,", demands.yaw);
 
                 PitchRollAngleController::run(
                         airborne,
                         dt,
                         vehicleState.phi, vehicleState.theta,
-                        demands.roll, demands.pitch,
-                        demands.roll, demands.pitch);
+                        demands_out.roll, demands_out.pitch,
+                        demands_out.roll, demands_out.pitch);
 
                 PitchRollRateController::run(
                         airborne,
                         dt,
                         vehicleState.dphi, vehicleState.dtheta,
-                        demands.roll, demands.pitch,
-                        demands.roll, demands.pitch);
+                        demands_out.roll, demands_out.pitch,
+                        demands_out.roll, demands_out.pitch);
 
                 demands_t new_demands = {};
-                PidControl::run(dt, false, vehicleState, openLoopDemands, new_demands);
+                PidControl::run(dt, false, vehicleState, demands_in, new_demands);
 
-                const float S = 1e6;
-                printf("%f,%f,%f,%f\n",
-                        demands.roll, -S*new_demands.roll,
-                        demands.pitch, -S*new_demands.pitch);
+                //demands.yaw = 5e4*new_demands.yaw;
+                //printf("%f\n", demands.yaw);
             }
 
             void serializeMessage(MspSerializer & serializer)
