@@ -73,15 +73,15 @@ static const uint16_t CHANNEL_6_FAILSAFE = 2000;
 
 // IMU -------------------------------------------------------------
 
-static float B_accel = 0.14;     
-static float B_gyro = 0.1;       
+static constexpr float B_ACCEL = 0.14;     
+static constexpr float B_GYRO = 0.1;       
 
-static float AccErrorX = 0.0;
-static float AccErrorY = 0.0;
-static float AccErrorZ = 0.0;
-static float GyroErrorX = 0.0;
-static float GyroErrorY= 0.0;
-static float GyroErrorZ = 0.0;
+static constexpr float ACCEL_ERROR_X = 0.0;
+static constexpr float ACCEL_ERROR_Y = 0.0;
+static constexpr float ACCEL_ERROR_Z = 0.0;
+static constexpr float GYRO_ERROR_X = 0.0;
+static constexpr float GYRO_ERROR_Y= 0.0;
+static constexpr float GYRO_ERROR_Z = 0.0;
 
 // PIDs ------------------------------------------------------------
 
@@ -94,7 +94,7 @@ static float GyroX, GyroY, GyroZ;
 static float thro_des, roll_des, pitch_des, yaw_des;
 static float roll_passthru, pitch_passthru, yaw_passthru;
 
-static void IMUinit() {
+static void initImu() {
 
     Wire.begin();
     Wire.setClock(1000000); 
@@ -111,7 +111,7 @@ static void IMUinit() {
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-static void getIMUdata() {
+static void readImu() {
 
     static float AccX_prev, AccY_prev, AccZ_prev;
     static float GyroX_prev, GyroY_prev, GyroZ_prev;
@@ -125,13 +125,13 @@ static void getIMUdata() {
     AccY = AcY / ACCEL_SCALE_FACTOR;
     AccZ = AcZ / ACCEL_SCALE_FACTOR;
 
-    AccX = AccX - AccErrorX;
-    AccY = AccY - AccErrorY;
-    AccZ = AccZ - AccErrorZ;
+    AccX = AccX - ACCEL_ERROR_X;
+    AccY = AccY - ACCEL_ERROR_Y;
+    AccZ = AccZ - ACCEL_ERROR_Z;
 
-    AccX = (1.0 - B_accel)*AccX_prev + B_accel*AccX;
-    AccY = (1.0 - B_accel)*AccY_prev + B_accel*AccY;
-    AccZ = (1.0 - B_accel)*AccZ_prev + B_accel*AccZ;
+    AccX = (1.0 - B_ACCEL)*AccX_prev + B_ACCEL*AccX;
+    AccY = (1.0 - B_ACCEL)*AccY_prev + B_ACCEL*AccY;
+    AccZ = (1.0 - B_ACCEL)*AccZ_prev + B_ACCEL*AccZ;
     AccX_prev = AccX;
     AccY_prev = AccY;
     AccZ_prev = AccZ;
@@ -141,13 +141,13 @@ static void getIMUdata() {
     GyroY = GyY / GYRO_SCALE_FACTOR;
     GyroZ = GyZ / GYRO_SCALE_FACTOR;
 
-    GyroX = GyroX - GyroErrorX;
-    GyroY = GyroY - GyroErrorY;
-    GyroZ = GyroZ - GyroErrorZ;
+    GyroX = GyroX - GYRO_ERROR_X;
+    GyroY = GyroY - GYRO_ERROR_Y;
+    GyroZ = GyroZ - GYRO_ERROR_Z;
 
-    GyroX = (1.0 - B_gyro)*GyroX_prev + B_gyro*GyroX;
-    GyroY = (1.0 - B_gyro)*GyroY_prev + B_gyro*GyroY;
-    GyroZ = (1.0 - B_gyro)*GyroZ_prev + B_gyro*GyroZ;
+    GyroX = (1.0 - B_GYRO)*GyroX_prev + B_GYRO*GyroX;
+    GyroY = (1.0 - B_GYRO)*GyroY_prev + B_GYRO*GyroY;
+    GyroZ = (1.0 - B_GYRO)*GyroZ_prev + B_GYRO*GyroZ;
     GyroX_prev = GyroX;
     GyroY_prev = GyroY;
     GyroZ_prev = GyroZ;
@@ -352,7 +352,7 @@ void setup()
     channel_5_pwm = CHANNEL_5_FAILSAFE;
     channel_6_pwm = CHANNEL_6_FAILSAFE;
 
-    IMUinit();
+    initImu();
 
     _madgwick.initialize();
 
@@ -378,7 +378,7 @@ void loop()
         _armed = true;
     }
 
-    getIMUdata(); 
+    readImu(); 
 
     float phi=0, theta=0, psi=0;
 
