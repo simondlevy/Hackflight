@@ -149,31 +149,32 @@ static void readImu(
     gyro_z_prev = gyro_z;
 }
 
-static void getDesState(
-        float & thro_des, float &roll_des, float & pitch_des, float & yaw_des)
+static void getOpenLoopDemands(hf::demands_t & demands)
 {
 
     static constexpr float maxRoll = 30.0;     
     static constexpr float maxPitch = 30.0;    
     static constexpr float maxYaw = 160.0;     
 
-    thro_des = (channel_1_pwm - 1000.0)/1000.0; 
-    roll_des = (channel_2_pwm - 1500.0)/500.0; 
-    pitch_des = (channel_3_pwm - 1500.0)/500.0; 
-    yaw_des = (channel_4_pwm - 1500.0)/500.0; 
-    thro_des = constrain(thro_des, 0.0, 1.0); 
-    roll_des = constrain(roll_des, -1.0, 1.0)*maxRoll; 
-    pitch_des = constrain(pitch_des, -1.0, 1.0)*maxPitch; 
-    yaw_des = constrain(yaw_des, -1.0, 1.0)*maxYaw; 
+    demands.thrust = (channel_1_pwm - 1000.0)/1000.0; 
+    demands.thrust = constrain(demands.thrust, 0.0, 1.0); 
+
+    demands.roll = (channel_2_pwm - 1500.0)/500.0; 
+    demands.roll = constrain(demands.roll, -1.0, 1.0)*maxRoll; 
+
+    demands.pitch = (channel_3_pwm - 1500.0)/500.0; 
+    demands.pitch = constrain(demands.pitch, -1.0, 1.0)*maxPitch; 
+
+    demands.yaw = (channel_4_pwm - 1500.0)/500.0; 
+    demands.yaw = constrain(demands.yaw, -1.0, 1.0)*maxYaw; 
 }
 
 static void runPids(
-        const float dt, const float phi, const float theta, const float psi,
-        const float gyro_x, const float gyro_y, const float gyro_z,
-        const float roll_des, const float pitch_des, const float yaw_des,
-        float & roll_PID, float & pitch_PID, float & yaw_PID)
+        const float dt,
+        const hf::vehicleState_t & state,
+        const hf::demands_t & demands_in,
+        hf::demands_t & demands_out)
 {
-
     static constexpr float i_limit = 25.0;     
     static constexpr float Kp_roll_angle = 0.2;    
     static constexpr float Ki_roll_angle = 0.3;    
@@ -189,7 +190,7 @@ static void runPids(
     static float integral_pitch, integral_pitch_prev, derivative_pitch;
     static float error_yaw_prev, integral_yaw, integral_yaw_prev, derivative_yaw;
 
-    const float error_roll = roll_des - phi;
+    const float error_roll = demands_in.roll - state.phi;
     integral_roll = integral_roll_prev + error_roll*dt;
     if (channel_1_pwm < 1060) {   
 
@@ -197,11 +198,11 @@ static void runPids(
     }
     integral_roll = constrain(integral_roll, -i_limit, i_limit); 
 
-    derivative_roll = gyro_x;
-    roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll
+    derivative_roll = state.dphi;
+    demands_out.roll = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll
             - Kd_roll_angle*derivative_roll); 
 
-    const float error_pitch = pitch_des - theta;
+    const float error_pitch = demands_in.pitch - state.theta;
     integral_pitch = integral_pitch_prev + error_pitch*dt;
     if (channel_1_pwm < 1060) {   
 
@@ -209,16 +210,13 @@ static void runPids(
     }
     integral_pitch = constrain(integral_pitch, -i_limit, i_limit); 
 
-    derivative_pitch = gyro_y;
-    pitch_PID = .01*(
+    derivative_pitch = state.dtheta;
+    demands_out.pitch = .01*(
             Kp_pitch_angle*error_pitch +
             Ki_pitch_angle*integral_pitch -
             Kd_pitch_angle*derivative_pitch); 
 
-    // Negate gyro Z for nose-right positive
-    const auto dpsi = -gyro_z;
-
-    const float error_yaw = yaw_des - dpsi;
+    const float error_yaw = demands_in.yaw - state.dpsi;
     integral_yaw = integral_yaw_prev + error_yaw*dt;
     if (channel_1_pwm < 1060) {   
 
@@ -227,7 +225,7 @@ static void runPids(
     integral_yaw = constrain(integral_yaw, -i_limit, i_limit); 
 
     derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    yaw_PID = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); 
+    demands_out.yaw = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); 
 
     integral_roll_prev = integral_roll;
 
@@ -381,20 +379,21 @@ void loop()
     const hf::axis3_t gyro = {gyro_x, -gyro_y, -gyro_z}; 
     const hf::axis3_t accel = {-accel_x, accel_y, accel_z}; 
     _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
-    psi = -psi; // make nose-right positive
 
-    float thro_des=0, roll_des=0, pitch_des=0, yaw_des=0;
-    getDesState(thro_des, roll_des, pitch_des, yaw_des);
+    hf::demands_t openLoopDemands = {};
+    getOpenLoopDemands(openLoopDemands);
 
-    float roll_PID=0, pitch_PID=0, yaw_PID=0;
+    hf::vehicleState_t state = {
+        0, 0, 0, 0, 0, 0,
+        phi, gyro_x, theta, gyro_y, -psi, -gyro_z
+    };
 
-    runPids(dt, phi, theta, psi, gyro_x, gyro_y, gyro_z,
-            roll_des, pitch_des, yaw_des,
-            roll_PID, pitch_PID, yaw_PID); 
+    hf::demands_t pidDemands = {openLoopDemands.thrust, 0, 0, 0};
 
-    const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
+    runPids(dt, state, openLoopDemands, pidDemands);
+
     float motorvals[4] = {};
-    hf::Mixer::mix(demands, motorvals);
+    hf::Mixer::mix(pidDemands, motorvals);
 
     if ((channel_5_pwm < 1500) || (_armed == false)) {
         _armed = false;
