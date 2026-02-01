@@ -72,8 +72,8 @@ static const uint8_t LED_PIN = 14;
 
 // Safety ----------------------------------------------------------
 
-static const uint16_t ARMING_SWITCH_MIN = 1500;
-static const uint16_t THROTTLE_DOWN_MAX = 1050;
+static const float ARMING_SWITCH_MIN = 0;
+static const float THROTTLE_DOWN_MAX = -0.95;
 
 // IMU -------------------------------------------------------------
 
@@ -93,7 +93,8 @@ static const uint32_t LOOP_FREQ_HZ = 2000;
 
 // Helper functions ------------------------------------------------
 
-static void initImu() {
+static void initImu()
+{
 
     Wire.begin();
     Wire.setClock(1000000); 
@@ -153,39 +154,31 @@ static void readImu(
     gyro_z_prev = gyro_z;
 }
 
-static void getOpenLoopDemands(const uint16_t * channel_pwms,
+static void getOpenLoopDemands(const float * channel_values,
         hf::demands_t & demands)
 {
-    demands.thrust = (channel_pwms[0] - 1000.0)/1000.0; 
-    demands.thrust = constrain(demands.thrust, 0.0, 1.0); 
-
-    demands.roll = (channel_pwms[1] - 1500.0)/500.0; 
-    demands.roll = constrain(demands.roll, -1.0, 1.0)*MAX_PITCH_ROLL_DEMAND_DEG; 
-
-    demands.pitch = (channel_pwms[2] - 1500.0)/500.0; 
-    demands.pitch = constrain(demands.pitch, -1.0, 1.0)*MAX_PITCH_ROLL_DEMAND_DEG; 
-
-    demands.yaw = (channel_pwms[3] - 1500.0)/500.0; 
-    demands.yaw = constrain(demands.yaw, -1.0, 1.0)*MAX_YAW_DEMAND_DPS; 
+    demands.thrust = (channel_values[0] + 1) / 2;
+    demands.roll = channel_values[1] * MAX_PITCH_ROLL_DEMAND_DEG; 
+    demands.pitch = channel_values[2] * MAX_PITCH_ROLL_DEMAND_DEG; 
+    demands.yaw = channel_values[3] * MAX_YAW_DEMAND_DPS; 
 }
 
-static void runDelayLoop(const unsigned long current_time)
+static void runDelayLoop(const uint32_t usec_curr)
 {
-
     float invFreq = 1.0 / LOOP_FREQ_HZ * 1000000.0;
-    unsigned long checker = micros();
+    uint32_t checker = micros();
 
-    while (invFreq > (checker - current_time)) {
+    while (invFreq > (checker - usec_curr)) {
         checker = micros();
     }
 }
 
-static void loopBlink(const unsigned long current_time) {
-
-    static unsigned long blink_counter, blink_delay;
+static void blinkInLoop(const uint32_t usec_curr)
+{
+    static uint32_t blink_counter, blink_delay;
     static bool blinkAlternate;
 
-    if (current_time - blink_counter > blink_delay) {
+    if (usec_curr - blink_counter > blink_delay) {
         blink_counter = micros();
         digitalWrite(LED_PIN, blinkAlternate); 
 
@@ -200,41 +193,14 @@ static void loopBlink(const unsigned long current_time) {
     }
 }
 
-static void setupBlink(int numBlinks,int upTime, int downTime) {
-
-    for (int j = 1; j<= numBlinks; j++) {
-        digitalWrite(LED_PIN, LOW);
-        delay(downTime);
-        digitalWrite(LED_PIN, HIGH);
-        delay(upTime);
-    }
-}
-
-// Main ----------------------------------------------------------------------
-
-void setup()
+static void blinkOnStartup()
 {
-    Serial.begin(500000); 
-
-    delay(500);
-
-    pinMode(LED_PIN, OUTPUT); 
-
-    digitalWrite(LED_PIN, HIGH);
-
-    delay(5);
-
-    Serial1.begin(115000);
-
-    initImu();
-
-    _madgwick.initialize();
-
-    delay(10);
-
-    _motors.arm(); 
-
-    setupBlink(3,160,70); 
+    for (int j = 1; j<= 3; j++) {
+        digitalWrite(LED_PIN, LOW);
+        delay(70);
+        digitalWrite(LED_PIN, HIGH);
+        delay(360);
+    }
 }
 
 static void getVehicleState(const float dt, hf::vehicleState_t & state)
@@ -254,51 +220,76 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
 }
 
 static bool readReceiver(
-        const uint32_t current_time, uint16_t * channel_pwms)
+        const uint32_t usec_curr, float * channel_values)
 {
-    if (_dsm2048.timedOut(current_time)) {
+    if (_dsm2048.timedOut(usec_curr)) {
         return false;
     }
 
     if (_dsm2048.gotNewFrame()) {
-        _dsm2048.getChannelValues(channel_pwms, 6);
+        _dsm2048.getChannelValues(channel_values, 6);
     }
 
     return true;
 }
 
-static float getDt(const uint32_t current_time)
+static float getDt(const uint32_t usec_curr)
 {
-    static unsigned long _prev_time;
-    const float dt = (current_time - _prev_time)/1000000.0;
-    _prev_time = current_time;
+    static uint32_t _usec_prev;
+    const float dt = (usec_curr - _usec_prev)/1000000.0;
+    _usec_prev = usec_curr;
 
     return dt;
 }
 
+// Main ----------------------------------------------------------------------
+
+void setup()
+{
+    Serial.begin(0); 
+
+    pinMode(LED_PIN, OUTPUT); 
+
+    digitalWrite(LED_PIN, HIGH);
+
+    delay(5);
+
+    Serial1.begin(115000);
+
+    initImu();
+
+    _madgwick.initialize();
+
+    delay(10);
+
+    _motors.arm(); 
+
+    blinkOnStartup(); 
+}
+
 void loop()
 {
-    const unsigned long current_time = micros();      
+    const auto usec_curr = micros();      
 
-    const float dt = getDt(current_time);
+    const auto dt = getDt(usec_curr);
 
-    loopBlink(current_time); 
+    blinkInLoop(usec_curr); 
     
-    static uint16_t _channel_pwms[6];
-    const bool failsafe = !readReceiver(current_time, _channel_pwms);
+    static float _channel_values[6];
+    const bool failsafe = !readReceiver(usec_curr, _channel_values);
 
-    const bool throttle_is_down = _channel_pwms[0] < THROTTLE_DOWN_MAX;
+    const auto throttle_is_down = _channel_values[0] < THROTTLE_DOWN_MAX;
 
     static bool _armed;
 
     _armed = 
         failsafe ? false :
-        _channel_pwms[4] < ARMING_SWITCH_MIN  ? false :
+        _channel_values[4] < ARMING_SWITCH_MIN  ? false :
         throttle_is_down ? true :
         _armed;
 
     hf::demands_t open_loop_demands = {};
-    getOpenLoopDemands(_channel_pwms, open_loop_demands);
+    getOpenLoopDemands(_channel_values, open_loop_demands);
 
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
@@ -312,6 +303,5 @@ void loop()
 
     _motors.run(_armed, motorvals);
 
-    runDelayLoop(current_time); 
+    runDelayLoop(usec_curr); 
 }
-

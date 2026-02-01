@@ -196,7 +196,6 @@ float getDt()
     return dt;
 }
 
-
 static void getDemands(hf::demands_t & demands, hf::mode_e & mode)
 {
     // Read channels values from receiver
