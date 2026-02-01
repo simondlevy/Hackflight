@@ -72,12 +72,12 @@ static const uint8_t LED_PIN = 14;
 
 // Failsafe --------------------------------------------------------
 
-static const uint16_t CHANNEL_1_FAILSAFE = 1000; 
-static const uint16_t CHANNEL_2_FAILSAFE = 1500; 
-static const uint16_t CHANNEL_3_FAILSAFE = 1500; 
-static const uint16_t CHANNEL_4_FAILSAFE = 1500; 
-static const uint16_t CHANNEL_5_FAILSAFE = 2000; 
-static const uint16_t CHANNEL_6_FAILSAFE = 2000; 
+static const uint16_t CHANNEL_FAILSAFES[6] = {
+    1500, 1500, 1500, 1500, 2000, 2000
+};
+
+static const uint16_t FAILSAFE_MIN_VAL = 800;
+static const uint16_t FAILSAFE_MAX_VAL = 2200;
 
 // IMU -------------------------------------------------------------
 
@@ -93,8 +93,11 @@ static constexpr float GYRO_ERROR_Z = 0.0;
 
 // PIDs ------------------------------------------------------------
 
-static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
-                     channel_4_pwm, channel_5_pwm, channel_6_pwm;
+static uint16_t channel_pwms[6];
+
+// FAFO -----------------------------------------------------------
+
+static const uint32_t LOOP_FREQ_HZ = 2000;
 
 // Helper functions ------------------------------------------------
 
@@ -161,70 +164,44 @@ static void readImu(
 
 static void getOpenLoopDemands(hf::demands_t & demands)
 {
-    demands.thrust = (channel_1_pwm - 1000.0)/1000.0; 
+    demands.thrust = (channel_pwms[0] - 1000.0)/1000.0; 
     demands.thrust = constrain(demands.thrust, 0.0, 1.0); 
 
-    demands.roll = (channel_2_pwm - 1500.0)/500.0; 
+    demands.roll = (channel_pwms[1] - 1500.0)/500.0; 
     demands.roll = constrain(demands.roll, -1.0, 1.0)*MAX_PITCH_ROLL_DEMAND_DEG; 
 
-    demands.pitch = (channel_3_pwm - 1500.0)/500.0; 
+    demands.pitch = (channel_pwms[2] - 1500.0)/500.0; 
     demands.pitch = constrain(demands.pitch, -1.0, 1.0)*MAX_PITCH_ROLL_DEMAND_DEG; 
 
-    demands.yaw = (channel_4_pwm - 1500.0)/500.0; 
+    demands.yaw = (channel_pwms[3] - 1500.0)/500.0; 
     demands.yaw = constrain(demands.yaw, -1.0, 1.0)*MAX_YAW_DEMAND_DPS; 
+}
+
+static void setChannelsToFailsafes()
+{
+    for (uint8_t k=0; k<6; ++k) {
+        channel_pwms[k] = CHANNEL_FAILSAFES[k];
+    }
 }
 
 static void getCommands() {
 
-    if (_dsm2048.timedOut(micros())) {
+    if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
 
+        _dsm2048.getChannelValues(channel_pwms, 6);
     }
-    else if (_dsm2048.gotNewFrame()) {
-        uint16_t values[6];
-        _dsm2048.getChannelValues(values, 6);
 
-        channel_1_pwm = values[0];
-        channel_2_pwm = values[1];
-        channel_3_pwm = values[2];
-        channel_4_pwm = values[3];
-        channel_5_pwm = values[4];
-        channel_6_pwm = values[5];
+    for (uint8_t k=0; k<6; ++k) {
+        if (channel_pwms[k] > FAILSAFE_MAX_VAL || channel_pwms[k] < FAILSAFE_MIN_VAL) {
+            setChannelsToFailsafes();
+        }
     }
 }
 
-static void failSafe() {
-
-    static const uint16_t MINVAL = 800;
-    static const uint16_t MAXVAL = 2200;
-
-    int check1 = 0;
-    int check2 = 0;
-    int check3 = 0;
-    int check4 = 0;
-    int check5 = 0;
-    int check6 = 0;
-
-    if (channel_1_pwm > MAXVAL || channel_1_pwm < MINVAL) check1 = 1;
-    if (channel_2_pwm > MAXVAL || channel_2_pwm < MINVAL) check2 = 1;
-    if (channel_3_pwm > MAXVAL || channel_3_pwm < MINVAL) check3 = 1;
-    if (channel_4_pwm > MAXVAL || channel_4_pwm < MINVAL) check4 = 1;
-    if (channel_5_pwm > MAXVAL || channel_5_pwm < MINVAL) check5 = 1;
-    if (channel_6_pwm > MAXVAL || channel_6_pwm < MINVAL) check6 = 1;
-
-    if ((check1 + check2 + check3 + check4 + check5 + check6) > 0) {
-        channel_1_pwm = CHANNEL_1_FAILSAFE;
-        channel_2_pwm = CHANNEL_2_FAILSAFE;
-        channel_3_pwm = CHANNEL_3_FAILSAFE;
-        channel_4_pwm = CHANNEL_4_FAILSAFE;
-        channel_5_pwm = CHANNEL_5_FAILSAFE;
-        channel_6_pwm = CHANNEL_6_FAILSAFE;
-    }
-}
-
-static void loopRate(int freq, const unsigned long current_time)
+static void runDelayLoop(const unsigned long current_time)
 {
 
-    float invFreq = 1.0/freq*1000000.0;
+    float invFreq = 1.0 / LOOP_FREQ_HZ * 1000000.0;
     unsigned long checker = micros();
 
     while (invFreq > (checker - current_time)) {
@@ -278,12 +255,7 @@ void setup()
 
     Serial1.begin(115000);
 
-    channel_1_pwm = CHANNEL_1_FAILSAFE;
-    channel_2_pwm = CHANNEL_2_FAILSAFE;
-    channel_3_pwm = CHANNEL_3_FAILSAFE;
-    channel_4_pwm = CHANNEL_4_FAILSAFE;
-    channel_5_pwm = CHANNEL_5_FAILSAFE;
-    channel_6_pwm = CHANNEL_6_FAILSAFE;
+    setChannelsToFailsafes();
 
     initImu();
 
@@ -307,7 +279,7 @@ void loop()
 
     static bool _armed;
 
-    if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
+    if ((channel_pwms[4] > 1500) && (channel_pwms[0] < 1050)) {
         _armed = true;
     }
 
@@ -329,13 +301,13 @@ void loop()
     };
 
     hf::demands_t pidDemands = {openLoopDemands.thrust, 0, 0, 0};
-    hf::PidControl::run(dt, channel_1_pwm<1060, state, openLoopDemands,
+    hf::PidControl::run(dt, channel_pwms[0]<1060, state, openLoopDemands,
             pidDemands);
 
     float motorvals[4] = {};
     hf::Mixer::mix(pidDemands, motorvals);
 
-    if ((channel_5_pwm < 1500) || (_armed == false)) {
+    if ((channel_pwms[4] < 1500) || (_armed == false)) {
         _armed = false;
     }
 
@@ -343,8 +315,6 @@ void loop()
 
     getCommands(); 
 
-    failSafe(); 
-
-    loopRate(2000, current_time); 
+    runDelayLoop(current_time); 
 }
 
