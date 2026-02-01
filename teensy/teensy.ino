@@ -62,12 +62,16 @@ static constexpr float ACCEL_SCALE_FACTOR = 16384;
 // LED -------------------------------------------------------------
 static const uint8_t LED_PIN = 14;
 
-static unsigned long channel_1_fs = 1000; 
-static unsigned long channel_2_fs = 1500; 
-static unsigned long channel_3_fs = 1500; 
-static unsigned long channel_4_fs = 1500; 
-static unsigned long channel_5_fs = 2000; 
-static unsigned long channel_6_fs = 2000; 
+// Failsafe --------------------------------------------------------
+
+static const uint16_t CHANNEL_1_FAILSAFE = 1000; 
+static const uint16_t CHANNEL_2_FAILSAFE = 1500; 
+static const uint16_t CHANNEL_3_FAILSAFE = 1500; 
+static const uint16_t CHANNEL_4_FAILSAFE = 1500; 
+static const uint16_t CHANNEL_5_FAILSAFE = 2000; 
+static const uint16_t CHANNEL_6_FAILSAFE = 2000; 
+
+// IMU -------------------------------------------------------------
 
 static float B_accel = 0.14;     
 static float B_gyro = 0.1;       
@@ -79,44 +83,16 @@ static float GyroErrorX = 0.0;
 static float GyroErrorY= 0.0;
 static float GyroErrorZ = 0.0;
 
-static float i_limit = 25.0;     
-static float maxRoll = 30.0;     
-static float maxPitch = 30.0;    
-static float maxYaw = 160.0;     
-static float Kp_roll_angle = 0.2;    
-static float Ki_roll_angle = 0.3;    
-static float Kd_roll_angle = 0.05;   
-static float Kp_pitch_angle = 0.2;   
-static float Ki_pitch_angle = 0.3;   
-static float Kd_pitch_angle = 0.05;  
-static float Kp_yaw = 0.3;           
-static float Ki_yaw = 0.05;          
-static float Kd_yaw = 0.00015;       
-
-static float dt;
-static unsigned long current_time, prev_time;
-static unsigned long blink_counter, blink_delay;
-static bool blinkAlternate;
+// PIDs ------------------------------------------------------------
 
 static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
                      channel_4_pwm, channel_5_pwm, channel_6_pwm;
 
 static float AccX, AccY, AccZ;
 static float GyroX, GyroY, GyroZ;
-static float roll_IMU, pitch_IMU, yaw_IMU;
 
 static float thro_des, roll_des, pitch_des, yaw_des;
 static float roll_passthru, pitch_passthru, yaw_passthru;
-
-static float error_roll, integral_roll, integral_roll_prev, derivative_roll,
-             roll_PID;
-
-static float error_pitch, integral_pitch, integral_pitch_prev,
-             derivative_pitch, pitch_PID;
-
-static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
-             derivative_yaw, yaw_PID;
-
 
 static void IMUinit() {
 
@@ -177,7 +153,12 @@ static void getIMUdata() {
     GyroZ_prev = GyroZ;
 }
 
-static void getDesState() {
+static void getDesState()
+{
+
+    static constexpr float maxRoll = 30.0;     
+    static constexpr float maxPitch = 30.0;    
+    static constexpr float maxYaw = 160.0;     
 
     thro_des = (channel_1_pwm - 1000.0)/1000.0; 
     roll_des = (channel_2_pwm - 1500.0)/500.0; 
@@ -194,9 +175,27 @@ static void getDesState() {
     yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
-static void runPids() {
+static void runPids(
+        const float dt, const float phi, const float theta, const float psi,
+        float & roll_PID, float & pitch_PID, float & yaw_PID)
+{
 
-    error_roll = roll_des - roll_IMU;
+    static constexpr float i_limit = 25.0;     
+    static constexpr float Kp_roll_angle = 0.2;    
+    static constexpr float Ki_roll_angle = 0.3;    
+    static constexpr float Kd_roll_angle = 0.05;   
+    static constexpr float Kp_pitch_angle = 0.2;   
+    static constexpr float Ki_pitch_angle = 0.3;   
+    static constexpr float Kd_pitch_angle = 0.05;  
+    static constexpr float Kp_yaw = 0.3;           
+    static constexpr float Ki_yaw = 0.05;          
+    static constexpr float Kd_yaw = 0.00015;       
+
+    static float integral_roll, integral_roll_prev, derivative_roll;
+    static float integral_pitch, integral_pitch_prev, derivative_pitch;
+    static float error_yaw_prev, integral_yaw, integral_yaw_prev, derivative_yaw;
+
+    const float error_roll = roll_des - phi;
     integral_roll = integral_roll_prev + error_roll*dt;
     if (channel_1_pwm < 1060) {   
 
@@ -208,7 +207,7 @@ static void runPids() {
     roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll
             - Kd_roll_angle*derivative_roll); 
 
-    error_pitch = pitch_des - pitch_IMU;
+    const float error_pitch = pitch_des - theta;
     integral_pitch = integral_pitch_prev + error_pitch*dt;
     if (channel_1_pwm < 1060) {   
 
@@ -225,7 +224,7 @@ static void runPids() {
     // Negate gyro Z for nose-right positive
     const auto dpsi = -GyroZ;
 
-    error_yaw = yaw_des - dpsi;
+    const float error_yaw = yaw_des - dpsi;
     integral_yaw = integral_yaw_prev + error_yaw*dt;
     if (channel_1_pwm < 1060) {   
 
@@ -264,8 +263,9 @@ static void getCommands() {
 
 static void failSafe() {
 
-    unsigned minVal = 800;
-    unsigned maxVal = 2200;
+    static const uint16_t MINVAL = 800;
+    static const uint16_t MAXVAL = 2200;
+
     int check1 = 0;
     int check2 = 0;
     int check3 = 0;
@@ -273,24 +273,25 @@ static void failSafe() {
     int check5 = 0;
     int check6 = 0;
 
-    if (channel_1_pwm > maxVal || channel_1_pwm < minVal) check1 = 1;
-    if (channel_2_pwm > maxVal || channel_2_pwm < minVal) check2 = 1;
-    if (channel_3_pwm > maxVal || channel_3_pwm < minVal) check3 = 1;
-    if (channel_4_pwm > maxVal || channel_4_pwm < minVal) check4 = 1;
-    if (channel_5_pwm > maxVal || channel_5_pwm < minVal) check5 = 1;
-    if (channel_6_pwm > maxVal || channel_6_pwm < minVal) check6 = 1;
+    if (channel_1_pwm > MAXVAL || channel_1_pwm < MINVAL) check1 = 1;
+    if (channel_2_pwm > MAXVAL || channel_2_pwm < MINVAL) check2 = 1;
+    if (channel_3_pwm > MAXVAL || channel_3_pwm < MINVAL) check3 = 1;
+    if (channel_4_pwm > MAXVAL || channel_4_pwm < MINVAL) check4 = 1;
+    if (channel_5_pwm > MAXVAL || channel_5_pwm < MINVAL) check5 = 1;
+    if (channel_6_pwm > MAXVAL || channel_6_pwm < MINVAL) check6 = 1;
 
     if ((check1 + check2 + check3 + check4 + check5 + check6) > 0) {
-        channel_1_pwm = channel_1_fs;
-        channel_2_pwm = channel_2_fs;
-        channel_3_pwm = channel_3_fs;
-        channel_4_pwm = channel_4_fs;
-        channel_5_pwm = channel_5_fs;
-        channel_6_pwm = channel_6_fs;
+        channel_1_pwm = CHANNEL_1_FAILSAFE;
+        channel_2_pwm = CHANNEL_2_FAILSAFE;
+        channel_3_pwm = CHANNEL_3_FAILSAFE;
+        channel_4_pwm = CHANNEL_4_FAILSAFE;
+        channel_5_pwm = CHANNEL_5_FAILSAFE;
+        channel_6_pwm = CHANNEL_6_FAILSAFE;
     }
 }
 
-static void loopRate(int freq) {
+static void loopRate(int freq, const unsigned long current_time)
+{
 
     float invFreq = 1.0/freq*1000000.0;
     unsigned long checker = micros();
@@ -300,7 +301,10 @@ static void loopRate(int freq) {
     }
 }
 
-static void loopBlink() {
+static void loopBlink(const unsigned long current_time) {
+
+    static unsigned long blink_counter, blink_delay;
+    static bool blinkAlternate;
 
     if (current_time - blink_counter > blink_delay) {
         blink_counter = micros();
@@ -341,12 +345,12 @@ void setup()
 
     Serial1.begin(115000);
 
-    channel_1_pwm = channel_1_fs;
-    channel_2_pwm = channel_2_fs;
-    channel_3_pwm = channel_3_fs;
-    channel_4_pwm = channel_4_fs;
-    channel_5_pwm = channel_5_fs;
-    channel_6_pwm = channel_6_fs;
+    channel_1_pwm = CHANNEL_1_FAILSAFE;
+    channel_2_pwm = CHANNEL_2_FAILSAFE;
+    channel_3_pwm = CHANNEL_3_FAILSAFE;
+    channel_4_pwm = CHANNEL_4_FAILSAFE;
+    channel_5_pwm = CHANNEL_5_FAILSAFE;
+    channel_6_pwm = CHANNEL_6_FAILSAFE;
 
     IMUinit();
 
@@ -361,11 +365,12 @@ void setup()
 
 void loop()
 {
-    prev_time = current_time;      
-    current_time = micros();      
-    dt = (current_time - prev_time)/1000000.0;
+    static unsigned long _prev_time;
+    const unsigned long current_time = micros();      
+    const float dt = (current_time - _prev_time)/1000000.0;
+    _prev_time = current_time;
 
-    loopBlink(); 
+    loopBlink(current_time); 
 
     static bool _armed;
 
@@ -375,14 +380,18 @@ void loop()
 
     getIMUdata(); 
 
+    float phi=0, theta=0, psi=0;
+
     const hf::axis3_t gyro = {GyroX, -GyroY, -GyroZ}; 
     const hf::axis3_t accel = {-AccX, AccY, AccZ}; 
-    _madgwick.getEulerAngles(dt, gyro, accel, roll_IMU, pitch_IMU, yaw_IMU);
-    yaw_IMU = -yaw_IMU;
+    _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
+    psi = -psi; // make nose-right positive
 
     getDesState(); 
 
-    runPids(); 
+    float roll_PID=0, pitch_PID=0, yaw_PID=0;
+
+    runPids(dt, phi, theta, psi, roll_PID, pitch_PID, yaw_PID); 
 
     const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
     float motorvals[4] = {};
@@ -398,6 +407,6 @@ void loop()
 
     failSafe(); 
 
-    loopRate(2000); 
+    loopRate(2000, current_time); 
 }
 
