@@ -25,7 +25,7 @@
 #include <datatypes.h>
 #include <mixers/crazyflie.hpp>
 #include <num.hpp>
-#include <pidcontrol.hpp>
+#include <newpidcontrol.hpp>
 #include <simulator/dynamics.hpp>
 #include <simulator/pose.h>
 #include <vehicles/diyquad.hpp>
