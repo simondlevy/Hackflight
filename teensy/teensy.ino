@@ -280,13 +280,14 @@ void loop()
 
     loopBlink(current_time); 
 
-    static bool _armed;
-
     const bool throttle_is_down = channel_pwms[0] < THROTTLE_DOWN_MAX;
 
-    if (channel_pwms[4] > ARMING_SWITCH_MIN && throttle_is_down) {
-        _armed = true;
-    }
+    static bool _armed;
+
+    _armed = 
+        channel_pwms[4] < ARMING_SWITCH_MIN  ? false :
+        throttle_is_down ? true :
+        _armed;
 
     float accel_x=0, accel_y=0, accel_z=0;
     float gyro_x=0, gyro_y=0, gyro_z=0;
@@ -311,10 +312,6 @@ void loop()
 
     float motorvals[4] = {};
     hf::Mixer::mix(pid_demands, motorvals);
-
-    if ((channel_pwms[4] < 1500) || (_armed == false)) {
-        _armed = false;
-    }
 
     _motors.run(_armed, motorvals);
 
