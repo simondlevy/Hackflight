@@ -24,10 +24,11 @@
 #include <pids/yaw_angle.hpp>
 #include <pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
+#include <teensy_pidcontrol.hpp>
 
 namespace hf {
 
-    class PidControl {
+    class NewPidControl {
 
         public:
 
@@ -118,6 +119,14 @@ namespace hf {
                         vehicleState.dphi, vehicleState.dtheta,
                         demands.roll, demands.pitch,
                         demands.roll, demands.pitch);
+
+                demands_t new_demands = {};
+                PidControl::run(dt, false, vehicleState, openLoopDemands, new_demands);
+
+                const float S = 1e6;
+                printf("%f,%f,%f,%f\n",
+                        demands.roll, -S*new_demands.roll,
+                        demands.pitch, -S*new_demands.pitch);
             }
 
             void serializeMessage(MspSerializer & serializer)
