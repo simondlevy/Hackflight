@@ -98,8 +98,8 @@ static unsigned long current_time, prev_time;
 static unsigned long blink_counter, blink_delay;
 static bool blinkAlternate;
 
-static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm;
-static unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev, channel_4_pwm_prev;
+static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm,
+                     channel_4_pwm, channel_5_pwm, channel_6_pwm;
 
 static float AccX, AccY, AccZ;
 static float AccX_prev, AccY_prev, AccZ_prev;
@@ -180,31 +180,21 @@ static void getIMUdata() {
 static void getDesState() {
 
     thro_des = (channel_1_pwm - 1000.0)/1000.0; 
-
     roll_des = (channel_2_pwm - 1500.0)/500.0; 
-
     pitch_des = (channel_3_pwm - 1500.0)/500.0; 
-
     yaw_des = (channel_4_pwm - 1500.0)/500.0; 
-
     pitch_passthru = pitch_des/2.0; 
-
     yaw_passthru = yaw_des/2.0; 
-
     thro_des = constrain(thro_des, 0.0, 1.0); 
-
     roll_des = constrain(roll_des, -1.0, 1.0)*maxRoll; 
-
     pitch_des = constrain(pitch_des, -1.0, 1.0)*maxPitch; 
-
     yaw_des = constrain(yaw_des, -1.0, 1.0)*maxYaw; 
-
     roll_passthru = constrain(roll_passthru, -0.5, 0.5);
     pitch_passthru = constrain(pitch_passthru, -0.5, 0.5);
     yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
-static void controlANGLE() {
+static void runPids() {
 
     error_roll = roll_des - roll_IMU;
     integral_roll = integral_roll_prev + error_roll*dt;
@@ -215,7 +205,8 @@ static void controlANGLE() {
     integral_roll = constrain(integral_roll, -i_limit, i_limit); 
 
     derivative_roll = GyroX;
-    roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll - Kd_roll_angle*derivative_roll); 
+    roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll
+            - Kd_roll_angle*derivative_roll); 
 
     error_pitch = pitch_des - pitch_IMU;
     integral_pitch = integral_pitch_prev + error_pitch*dt;
@@ -269,17 +260,6 @@ static void getCommands() {
         channel_5_pwm = values[4];
         channel_6_pwm = values[5];
     }
-
-    float b = 0.7; 
-
-    channel_1_pwm = (1.0 - b)*channel_1_pwm_prev + b*channel_1_pwm;
-    channel_2_pwm = (1.0 - b)*channel_2_pwm_prev + b*channel_2_pwm;
-    channel_3_pwm = (1.0 - b)*channel_3_pwm_prev + b*channel_3_pwm;
-    channel_4_pwm = (1.0 - b)*channel_4_pwm_prev + b*channel_4_pwm;
-    channel_1_pwm_prev = channel_1_pwm;
-    channel_2_pwm_prev = channel_2_pwm;
-    channel_3_pwm_prev = channel_3_pwm;
-    channel_4_pwm_prev = channel_4_pwm;
 }
 
 static void failSafe() {
@@ -402,23 +382,11 @@ void loop()
 
     getDesState(); 
 
-    controlANGLE(); 
+    runPids(); 
 
     const hf::demands_t demands = {thro_des, roll_PID, pitch_PID, yaw_PID};
     float motorvals[4] = {};
     hf::Mixer::mix(demands, motorvals);
-
-    /*
-    float motor_pwms[4] = {};
-    motor_pwms[0] = motorvals[0]*125 + 125;
-    motor_pwms[1] = motorvals[1]*125 + 125;
-    motor_pwms[2] = motorvals[2]*125 + 125;
-    motor_pwms[3] = motorvals[3]*125 + 125;
-    motor_pwms[0] = constrain(motor_pwms[0], 125, 250);
-    motor_pwms[1] = constrain(motor_pwms[1], 125, 250);
-    motor_pwms[2] = constrain(motor_pwms[2], 125, 250);
-    motor_pwms[3] = constrain(motor_pwms[3], 125, 250);
-    */
 
     if ((channel_5_pwm < 1500) || (_armed == false)) {
         _armed = false;
