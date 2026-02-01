@@ -70,7 +70,7 @@ static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 static const uint8_t LED_PIN = 14;
 
-// Failsafe --------------------------------------------------------
+// Safety ----------------------------------------------------------
 
 static const uint16_t CHANNEL_FAILSAFES[6] = {
     1500, 1500, 1500, 1500, 2000, 2000
@@ -78,6 +78,9 @@ static const uint16_t CHANNEL_FAILSAFES[6] = {
 
 static const uint16_t FAILSAFE_MIN_VAL = 800;
 static const uint16_t FAILSAFE_MAX_VAL = 2200;
+
+static const uint16_t ARMING_SWITCH_MIN = 1500;
+static const uint16_t THROTTLE_DOWN_MAX = 1050;
 
 // IMU -------------------------------------------------------------
 
@@ -279,7 +282,9 @@ void loop()
 
     static bool _armed;
 
-    if ((channel_pwms[4] > 1500) && (channel_pwms[0] < 1050)) {
+    const bool throttle_is_down = channel_pwms[0] < THROTTLE_DOWN_MAX;
+
+    if (channel_pwms[4] > ARMING_SWITCH_MIN && throttle_is_down) {
         _armed = true;
     }
 
@@ -292,20 +297,20 @@ void loop()
     const hf::axis3_t accel = {-accel_x, accel_y, accel_z}; 
     _madgwick.getEulerAngles(dt, gyro, accel, phi, theta, psi);
 
-    hf::demands_t openLoopDemands = {};
-    getOpenLoopDemands(openLoopDemands);
+    hf::demands_t open_loop_demands = {};
+    getOpenLoopDemands(open_loop_demands);
 
     hf::vehicleState_t state = {
         0, 0, 0, 0, 0, 0,
         phi, gyro_x, theta, gyro_y, -psi, -gyro_z
     };
 
-    hf::demands_t pidDemands = {openLoopDemands.thrust, 0, 0, 0};
-    hf::PidControl::run(dt, channel_pwms[0]<1060, state, openLoopDemands,
-            pidDemands);
+    hf::demands_t pid_demands = {open_loop_demands.thrust, 0, 0, 0};
+    hf::PidControl::run(dt, throttle_is_down, state, open_loop_demands,
+            pid_demands);
 
     float motorvals[4] = {};
-    hf::Mixer::mix(pidDemands, motorvals);
+    hf::Mixer::mix(pid_demands, motorvals);
 
     if ((channel_pwms[4] < 1500) || (_armed == false)) {
         _armed = false;
