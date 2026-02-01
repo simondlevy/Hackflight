@@ -20,6 +20,7 @@
 
 #include <hackflight.h>
 #include <datatypes.h>
+#include <num.hpp>
 
 namespace hf {
 
@@ -48,7 +49,7 @@ namespace hf {
                 const float error = demand - angle;
 
                 const float integral = reset ? 0 :
-                    constrain(integral_prev + error * dt, -I_LIMIT, +I_LIMIT); 
+                    Num::fconstrain(integral_prev + error * dt, I_LIMIT); 
 
                 integral_prev = integral;
 
@@ -82,7 +83,7 @@ namespace hf {
                 const float error_yaw = demands_in.yaw - state.dpsi;
 
                 const float integral_yaw = reset ? 0 :
-                    constrain(integral_yaw_prev + error_yaw * dt, -I_LIMIT, +I_LIMIT); 
+                    Num::fconstrain(integral_yaw_prev + error_yaw * dt, I_LIMIT); 
 
                 integral_yaw_prev = integral_yaw;
 

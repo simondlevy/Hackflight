@@ -72,13 +72,6 @@ static const uint8_t LED_PIN = 14;
 
 // Safety ----------------------------------------------------------
 
-static const uint16_t CHANNEL_FAILSAFES[6] = {
-    1500, 1500, 1500, 1500, 2000, 2000
-};
-
-static const uint16_t FAILSAFE_MIN_VAL = 800;
-static const uint16_t FAILSAFE_MAX_VAL = 2200;
-
 static const uint16_t ARMING_SWITCH_MIN = 1500;
 static const uint16_t THROTTLE_DOWN_MAX = 1050;
 
@@ -176,27 +169,6 @@ static void getOpenLoopDemands(const uint16_t * channel_pwms,
     demands.yaw = constrain(demands.yaw, -1.0, 1.0)*MAX_YAW_DEMAND_DPS; 
 }
 
-static void setChannelsToFailsafes(uint16_t * channel_pwms)
-{
-    for (uint8_t k=0; k<6; ++k) {
-        channel_pwms[k] = CHANNEL_FAILSAFES[k];
-    }
-}
-
-static void getCommands(uint16_t * channel_pwms) {
-
-    if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
-
-        _dsm2048.getChannelValues(channel_pwms, 6);
-    }
-
-    for (uint8_t k=0; k<6; ++k) {
-        if (channel_pwms[k] > FAILSAFE_MAX_VAL || channel_pwms[k] < FAILSAFE_MIN_VAL) {
-            setChannelsToFailsafes(channel_pwms);
-        }
-    }
-}
-
 static void runDelayLoop(const unsigned long current_time)
 {
 
@@ -240,8 +212,6 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
 
 // Main ----------------------------------------------------------------------
 
-static uint16_t _channel_pwms[6];
-
 void setup()
 {
     Serial.begin(500000); 
@@ -255,8 +225,6 @@ void setup()
     delay(5);
 
     Serial1.begin(115000);
-
-    setChannelsToFailsafes(_channel_pwms);
 
     initImu();
 
@@ -277,8 +245,12 @@ void loop()
     _prev_time = current_time;
 
     loopBlink(current_time); 
+    
+    static uint16_t _channel_pwms[6];
 
-    getCommands(_channel_pwms); 
+    if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
+        _dsm2048.getChannelValues(_channel_pwms, 6);
+    }
 
     const bool throttle_is_down = _channel_pwms[0] < THROTTLE_DOWN_MAX;
 
