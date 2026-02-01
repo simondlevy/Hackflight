@@ -253,11 +253,18 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
     state.dpsi = -gyro_z;
 }
 
-static void readReceiver(uint16_t * channel_pwms)
+static bool readReceiver(
+        const uint32_t current_time, uint16_t * channel_pwms)
 {
-    if (!_dsm2048.timedOut(micros()) && _dsm2048.gotNewFrame()) {
+    if (_dsm2048.timedOut(current_time)) {
+        return false;
+    }
+
+    if (_dsm2048.gotNewFrame()) {
         _dsm2048.getChannelValues(channel_pwms, 6);
     }
+
+    return true;
 }
 
 static float getDt(const uint32_t current_time)
@@ -278,13 +285,14 @@ void loop()
     loopBlink(current_time); 
     
     static uint16_t _channel_pwms[6];
-    readReceiver(_channel_pwms);
+    const bool failsafe = !readReceiver(current_time, _channel_pwms);
 
     const bool throttle_is_down = _channel_pwms[0] < THROTTLE_DOWN_MAX;
 
     static bool _armed;
 
     _armed = 
+        failsafe ? false :
         _channel_pwms[4] < ARMING_SWITCH_MIN  ? false :
         throttle_is_down ? true :
         _armed;
