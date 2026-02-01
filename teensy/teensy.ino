@@ -31,6 +31,7 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
+#include <teensy_pidcontrol.hpp>
 
 static MPU6050 _mpu6050;
 
@@ -167,72 +168,6 @@ static void getOpenLoopDemands(hf::demands_t & demands)
 
     demands.yaw = (channel_4_pwm - 1500.0)/500.0; 
     demands.yaw = constrain(demands.yaw, -1.0, 1.0)*maxYaw; 
-}
-
-static void runPids(
-        const float dt,
-        const hf::vehicleState_t & state,
-        const hf::demands_t & demands_in,
-        hf::demands_t & demands_out)
-{
-    static constexpr float i_limit = 25.0;     
-    static constexpr float Kp_roll_angle = 0.2;    
-    static constexpr float Ki_roll_angle = 0.3;    
-    static constexpr float Kd_roll_angle = 0.05;   
-    static constexpr float Kp_pitch_angle = 0.2;   
-    static constexpr float Ki_pitch_angle = 0.3;   
-    static constexpr float Kd_pitch_angle = 0.05;  
-    static constexpr float Kp_yaw = 0.3;           
-    static constexpr float Ki_yaw = 0.05;          
-    static constexpr float Kd_yaw = 0.00015;       
-
-    static float integral_roll, integral_roll_prev, derivative_roll;
-    static float integral_pitch, integral_pitch_prev, derivative_pitch;
-    static float error_yaw_prev, integral_yaw, integral_yaw_prev, derivative_yaw;
-
-    const float error_roll = demands_in.roll - state.phi;
-    integral_roll = integral_roll_prev + error_roll*dt;
-    if (channel_1_pwm < 1060) {   
-
-        integral_roll = 0;
-    }
-    integral_roll = constrain(integral_roll, -i_limit, i_limit); 
-
-    derivative_roll = state.dphi;
-    demands_out.roll = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll
-            - Kd_roll_angle*derivative_roll); 
-
-    const float error_pitch = demands_in.pitch - state.theta;
-    integral_pitch = integral_pitch_prev + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   
-
-        integral_pitch = 0;
-    }
-    integral_pitch = constrain(integral_pitch, -i_limit, i_limit); 
-
-    derivative_pitch = state.dtheta;
-    demands_out.pitch = .01*(
-            Kp_pitch_angle*error_pitch +
-            Ki_pitch_angle*integral_pitch -
-            Kd_pitch_angle*derivative_pitch); 
-
-    const float error_yaw = demands_in.yaw - state.dpsi;
-    integral_yaw = integral_yaw_prev + error_yaw*dt;
-    if (channel_1_pwm < 1060) {   
-
-        integral_yaw = 0;
-    }
-    integral_yaw = constrain(integral_yaw, -i_limit, i_limit); 
-
-    derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    demands_out.yaw = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); 
-
-    integral_roll_prev = integral_roll;
-
-    integral_pitch_prev = integral_pitch;
-
-    error_yaw_prev = error_yaw;
-    integral_yaw_prev = integral_yaw;
 }
 
 static void getCommands() {
@@ -389,8 +324,8 @@ void loop()
     };
 
     hf::demands_t pidDemands = {openLoopDemands.thrust, 0, 0, 0};
-
-    runPids(dt, state, openLoopDemands, pidDemands);
+    hf::PidControl::run(dt, channel_1_pwm<1060, state, openLoopDemands,
+            pidDemands);
 
     float motorvals[4] = {};
     hf::Mixer::mix(pidDemands, motorvals);
