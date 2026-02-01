@@ -68,24 +68,30 @@ namespace hf {
                     hf::demands_t & demands_out)
             {
                 static float integral_roll_prev;
-                static float integral_pitch_prev;
-                static float error_yaw_prev, integral_yaw_prev;
 
                 demands_out.roll = runPitchRoll(dt, reset, demands_in.roll,
                         state.phi, state.dphi, integral_roll_prev);
 
+                static float integral_pitch_prev;
+
                 demands_out.pitch = runPitchRoll(dt, reset, demands_in.pitch,
                         state.theta, state.dtheta, integral_pitch_prev);
 
+                static float integral_yaw_prev;
+
                 const float error_yaw = demands_in.yaw - state.dpsi;
-                float integral_yaw = integral_yaw_prev + error_yaw*dt;
-                if (reset) {   
-                    integral_yaw = 0;
-                }
-                integral_yaw = constrain(integral_yaw, -I_LIMIT, I_LIMIT); 
-                error_yaw_prev = error_yaw;
+
+                const float integral_yaw = reset ? 0 :
+                    constrain(integral_yaw_prev + error_yaw * dt, -I_LIMIT, +I_LIMIT); 
+
                 integral_yaw_prev = integral_yaw;
-                const float derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
+
+                static float error_yaw_prev;
+
+                const float derivative_yaw = (error_yaw - error_yaw_prev) / dt; 
+
+                error_yaw_prev = error_yaw;
+
                 demands_out.yaw = .01*(KP_yaw*error_yaw + KI_yaw*integral_yaw +
                         KD_yaw*derivative_yaw); 
             }
