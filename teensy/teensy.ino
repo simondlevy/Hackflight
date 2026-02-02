@@ -52,11 +52,6 @@ void serialEvent1(void)
 
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
-
-// Open-loop demands ----------------------------------------------
-
-static constexpr float MAX_PITCH_ROLL_DEMAND_DEG = 30;     
-
 // IMU ------------------------------------------------------------
 
 static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -288,8 +283,8 @@ void loop()
     _pidControl.runStabilizer(
             dt,
             !throttle_is_down, 
-            _channel_values[1] * MAX_PITCH_ROLL_DEMAND_DEG, 
-            _channel_values[2] * MAX_PITCH_ROLL_DEMAND_DEG, 
+            _channel_values[1] * PositionController::MAX_DEMAND_DEG, 
+            _channel_values[2] * PositionController::MAX_DEMAND_DEG, 
             _channel_values[3],
             state,
             pid_demands);
