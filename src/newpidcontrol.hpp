@@ -21,7 +21,7 @@
 #include <pids/position.hpp>
 #include <pids/pitchroll_angle.hpp>
 #include <pids/pitchroll_rate.hpp>
-#include <pids/yaw_angle.hpp>
+#include <pids/new_yaw_angle.hpp>
 #include <pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
 #include <teensy_pidcontrol.hpp>
@@ -95,6 +95,8 @@ namespace hf {
             {
                 const auto airborne = demands_out.thrust > 0;
 
+                (void)yaw_demand_inc;
+                /*
                 static float _yaw_angle_target;
 
                 _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
@@ -104,9 +106,7 @@ namespace hf {
                         airborne, dt, vehicleState.psi, _yaw_angle_target);
 
                 demands_out.yaw =
-                    YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
-
-                //printf("%f,", demands.yaw);
+                    YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);*/
 
                 PitchRollAngleController::run(
                         airborne,
@@ -122,11 +122,13 @@ namespace hf {
                         demands_out.roll, demands_out.pitch,
                         demands_out.roll, demands_out.pitch);
 
-                demands_t new_demands = {};
-                PidControl::run(dt, false, vehicleState, demands_in, new_demands);
+                demands_t new_demands_in = {0, 0, 0, 160 * demands_in.yaw};
+                demands_t new_demands_out = {};
+                PidControl::run(dt, false, vehicleState, new_demands_in, new_demands_out);
 
-                //demands.yaw = 5e4*new_demands.yaw;
-                //printf("%f\n", demands.yaw);
+                printf("%f,%f\n", new_demands_in.yaw, new_demands_out.yaw);
+
+                demands_out.yaw = new_demands_out.yaw * 16000;
             }
 
             void serializeMessage(MspSerializer & serializer)
