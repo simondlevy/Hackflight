@@ -98,7 +98,8 @@ class Flydar {
 
             hf::demands_t setpoint = {};
 
-            hf::RangefinderSetpoint::run(_rangefinder_distances_mm, setpoint);
+            hf::RangefinderSetpoint::runTwoExit(
+                    _rangefinder_distances_mm, setpoint);
 
             const auto pose = _simulator.step(mode, setpoint);
 
