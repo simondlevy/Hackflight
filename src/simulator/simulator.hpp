@@ -74,11 +74,20 @@ namespace hf {
                     // Run fast PID control and mixer in middle loop --------------
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
+                        // Run PID control
                         const auto demands =
                             _pidControl.run(dt, controlled, state, setpoint);
 
+                        // Scale up demands for motor RPMS
+                        const demands_t new_demands = {
+                            demands.thrust,
+                            demands.roll,
+                            demands.pitch,
+                            demands.yaw * 2.0e4f
+                        };
+
                         // Get motor RPMS from mixer
-                        const auto * motors = Mixer::mix(demands);
+                        const auto * motors = Mixer::mix(new_demands);
 
                         // Convert motor values to double for dynamics
                         const auto * rpms = motors2doubless(motors, 4);

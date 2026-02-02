@@ -35,18 +35,18 @@ namespace hf {
             demands_t run(
                     const float dt,
                     const bool hovering,
-                    const vehicleState_t & vehicleState,
+                    const vehicleState_t & state,
                     const demands_t & demands_in)
             {
                 demands_t demands = {};
-                run(dt, hovering, vehicleState, demands_in, demands);
+                run(dt, hovering, state, demands_in, demands);
                 return demands;
             }
 
             void run(
                     const float dt,
                     const bool hovering,
-                    const vehicleState_t & vehicleState,
+                    const vehicleState_t & state,
                     const demands_t & demands_in,
                     demands_t & demands)
             {
@@ -62,14 +62,14 @@ namespace hf {
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
                 const auto climbrate = AltitudeController::run(hovering,
-                        dt, vehicleState.z, _altitude_target);
+                        dt, state.z, _altitude_target);
 
                 demands.thrust =
                     ClimbRateController::run(
                             hovering,
                             dt,
-                            vehicleState.z,
-                            vehicleState.dz,
+                            state.z,
+                            state.dz,
                             climbrate);
 
                 const auto airborne = demands.thrust > 0;
@@ -77,42 +77,44 @@ namespace hf {
                 PositionController::run(
                         airborne,
                         dt,
-                        vehicleState.dx, vehicleState.dy, vehicleState.psi,
+                        state.dx, state.dy, state.psi,
                         hovering ? demands_in.pitch : 0,
                         hovering ? demands_in.roll : 0,
                         demands.roll, demands.pitch);
 
-
-                runStabilizerPids(dt, vehicleState, demands_in, demands);
+                runStabilizerPids(dt, state, demands_in, demands);
             }
 
             static void runStabilizerPids(
                     const float dt,
-                    const vehicleState_t & vehicleState,
+                    const vehicleState_t & state,
                     const demands_t & demands_in,
                     demands_t & demands_out)
             {
                 const auto airborne = demands_out.thrust > 0;
 
+                const demands_t new_demands_in ={
+                    0, 0, 0, MAX_YAW_DEMAND_DPS * demands_in.yaw
+                };
+
                 PitchRollAngleController::run(
                         airborne,
                         dt,
-                        vehicleState.phi, vehicleState.theta,
+                        state.phi, state.theta,
                         demands_out.roll, demands_out.pitch,
                         demands_out.roll, demands_out.pitch);
 
                 PitchRollRateController::run(
                         airborne,
                         dt,
-                        vehicleState.dphi, vehicleState.dtheta,
+                        state.dphi, state.dtheta,
                         demands_out.roll, demands_out.pitch,
                         demands_out.roll, demands_out.pitch);
 
-                demands_t new_demands_in = {0, 0, 0, MAX_YAW_DEMAND_DPS * demands_in.yaw};
                 demands_t new_demands_out = {};
-                PidControl::run(dt, false, vehicleState, new_demands_in, new_demands_out);
+                PidControl::run(dt, false, state, new_demands_in, new_demands_out);
 
-                demands_out.yaw = new_demands_out.yaw * 2.0e4;
+                demands_out.yaw = new_demands_out.yaw; 
             }
 
             void serializeMessage(MspSerializer & serializer)
