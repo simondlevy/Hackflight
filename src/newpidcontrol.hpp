@@ -21,7 +21,6 @@
 #include <pids/position.hpp>
 #include <pids/pitchroll_angle.hpp>
 #include <pids/pitchroll_rate.hpp>
-#include <pids/new_yaw_angle.hpp>
 #include <pids/yaw_rate.hpp>
 #include <msp/serializer.hpp>
 #include <teensy_pidcontrol.hpp>
