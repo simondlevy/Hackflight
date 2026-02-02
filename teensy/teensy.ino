@@ -31,7 +31,7 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <teensy_pidcontrol.hpp>
+#include <new_pidcontrol.hpp>
 
 static MPU6050 _mpu6050;
 
@@ -56,7 +56,6 @@ static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 // Open-loop demands ----------------------------------------------
 
 static constexpr float MAX_PITCH_ROLL_DEMAND_DEG = 30;     
-static constexpr float MAX_YAW_DEMAND_DPS = 160;     
 
 // IMU ------------------------------------------------------------
 
@@ -152,15 +151,6 @@ static void readImu(
     gyro_x_prev = gyro_x;
     gyro_y_prev = gyro_y;
     gyro_z_prev = gyro_z;
-}
-
-static void getOpenLoopDemands(const float * channel_values,
-        hf::demands_t & demands)
-{
-    demands.thrust = (channel_values[0] + 1) / 2;
-    demands.roll = channel_values[1] * MAX_PITCH_ROLL_DEMAND_DEG; 
-    demands.pitch = channel_values[2] * MAX_PITCH_ROLL_DEMAND_DEG; 
-    demands.yaw = channel_values[3] * MAX_YAW_DEMAND_DPS; 
 }
 
 static void runDelayLoop(const uint32_t usec_curr)
@@ -276,7 +266,7 @@ void loop()
     blinkInLoop(usec_curr); 
     
     static float _channel_values[6];
-    const bool failsafe = !readReceiver(usec_curr, _channel_values);
+    const auto failsafe = !readReceiver(usec_curr, _channel_values);
 
     const auto throttle_is_down = _channel_values[0] < THROTTLE_DOWN_MAX;
 
@@ -288,14 +278,20 @@ void loop()
         throttle_is_down ? true :
         _armed;
 
-    hf::demands_t open_loop_demands = {};
-    getOpenLoopDemands(_channel_values, open_loop_demands);
-
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    hf::demands_t pid_demands = {open_loop_demands.thrust, 0, 0, 0};
-    hf::PidControl::run(dt, throttle_is_down, state, open_loop_demands,
+    hf::demands_t pid_demands = { (_channel_values[0]+1)/2, 0, 0, 0 };
+
+    static hf::PidControl _pidControl;
+
+    _pidControl.runStabilizer(
+            dt,
+            !throttle_is_down, 
+            _channel_values[1] * MAX_PITCH_ROLL_DEMAND_DEG, 
+            _channel_values[2] * MAX_PITCH_ROLL_DEMAND_DEG, 
+            _channel_values[3],
+            state,
             pid_demands);
 
     float motorvals[4] = {};

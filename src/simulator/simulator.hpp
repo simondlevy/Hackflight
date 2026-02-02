@@ -118,7 +118,7 @@ namespace hf {
 
             Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
 
-            NewPidControl _pidControl;
+            PidControl _pidControl;
 
             float _framerate;
 
