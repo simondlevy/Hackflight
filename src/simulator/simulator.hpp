@@ -82,7 +82,7 @@ namespace hf {
                         const demands_t new_demands = {
                             demands.thrust,
                             demands.roll * 1.0e6f,
-                            demands.pitch,
+                            demands.pitch * 1.0e6f,
                             demands.yaw * 2.0e4f
                         };
 
