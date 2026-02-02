@@ -83,30 +83,16 @@ namespace hf {
                         demands.roll, demands.pitch);
 
 
-                runStabilizerPids(dt, dt, vehicleState, demands_in, demands);
+                runStabilizerPids(dt, vehicleState, demands_in, demands);
             }
 
             static void runStabilizerPids(
                     const float dt,
-                    const float yaw_demand_inc,
                     const vehicleState_t & vehicleState,
                     const demands_t & demands_in,
                     demands_t & demands_out)
             {
                 const auto airborne = demands_out.thrust > 0;
-
-                (void)yaw_demand_inc;
-                /*
-                static float _yaw_angle_target;
-
-                _yaw_angle_target = Num::cap_angle(_yaw_angle_target +
-                        YAW_DEMAND_MAX * demands_in.yaw * yaw_demand_inc);
-
-                const auto yaw = YawAngleController::run(
-                        airborne, dt, vehicleState.psi, _yaw_angle_target);
-
-                demands_out.yaw =
-                    YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);*/
 
                 PitchRollAngleController::run(
                         airborne,
@@ -122,13 +108,11 @@ namespace hf {
                         demands_out.roll, demands_out.pitch,
                         demands_out.roll, demands_out.pitch);
 
-                demands_t new_demands_in = {0, 0, 0, 160 * demands_in.yaw};
+                demands_t new_demands_in = {0, 0, 0, MAX_YAW_DEMAND_DPS * demands_in.yaw};
                 demands_t new_demands_out = {};
                 PidControl::run(dt, false, vehicleState, new_demands_in, new_demands_out);
 
-                printf("%f,%f\n", new_demands_in.yaw, new_demands_out.yaw);
-
-                demands_out.yaw = new_demands_out.yaw * 16000;
+                demands_out.yaw = new_demands_out.yaw * 2.0e4;
             }
 
             void serializeMessage(MspSerializer & serializer)
@@ -148,6 +132,6 @@ namespace hf {
             static constexpr float ALTITUDE_MIN_M = 0.2;
             static constexpr float ALTITUDE_INC_MPS = 0.2;
 
-            static constexpr float YAW_DEMAND_MAX = 200;
+            static constexpr float MAX_YAW_DEMAND_DPS = 160;     
     };
 }
