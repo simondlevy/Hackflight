@@ -12,7 +12,7 @@ run: simtest
 simtest: main.o twoexit.o
 	g++ -o simtest main.o twoexit.o
 
-main.o: main.cpp *.hpp \
+main.o: main.cpp *.hpp ../src/*.hpp ../src/pids/*.hpp \
 	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
 	g++ -Wall -c -I$(ROOT) -I../src main.cpp
 

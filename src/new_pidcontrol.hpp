@@ -16,14 +16,12 @@
 
 #pragma once
 
-#include <pids/altitude.hpp>
-#include <pids/climbrate.hpp>
-#include <pids/position.hpp>
-#include <pids/pitchroll_angle.hpp>
-#include <pids/pitchroll_rate.hpp>
-#include <pids/yaw_rate.hpp>
+#include <newpids/altitude.hpp>
+#include <newpids/climbrate.hpp>
+#include <newpids/position.hpp>
+#include <newpids/rollpitch.hpp>
+#include <newpids/yaw.hpp>
 #include <msp/serializer.hpp>
-#include <teensy_pidcontrol.hpp>
 
 namespace hf {
 
@@ -63,35 +61,42 @@ namespace hf {
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
                 const auto climbrate = AltitudeController::run(hovering,
-                        dt, state.z, _altitude_target);
+                        dt, _altitude_target, state.z);
 
                 const auto thrust = ClimbRateController::run(
-                    hovering, dt, state.z, state.dz, climbrate);
+                    hovering, dt, climbrate, state.z, state.dz);
+
+                demands_out.thrust = thrust;
 
                 // Position hold ---------------------------------------------
 
                 const auto airborne = thrust > 0;
 
-                float roll = 0, pitch = 0;
-                PositionController::run(airborne, dt,
-                        state.dx, state.dy, state.psi,
-                        hovering ? demands_in.pitch : 0,
-                        hovering ? demands_in.roll : 0,
-                        roll, pitch);
+                // Rotate world-coordinate velocities into body coordinates
+                const auto dxw = state.dx;
+                const auto dyw = state.dy;
+                const auto psi = Num::DEG2RAD * state.psi;
+                const auto cospsi = cos(psi);
+                const auto sinpsi = sin(psi);
+                const auto dxb =  dxw * cospsi + dyw * sinpsi;
+                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
+
+                const auto roll_angle =_position_y_pid.run(
+                        airborne, dt, demands_in.roll, dyb);
+
+                const auto pitch_angle = _position_x_pid.run(
+                        airborne, dt, demands_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
 
-                const demands_t new_demands_in = {
-                    0, roll, pitch, MAX_YAW_DEMAND_DPS * demands_in.yaw
-                };
+                demands_out.roll = _roll_pid.run(
+                        dt, airborne, roll_angle, state.phi, state.dphi);
 
-                demands_t new_demands_out = {};
-                PidControl::run(dt, !airborne, state, new_demands_in, new_demands_out);
+                demands_out.pitch = _pitch_pid.run(
+                        dt, airborne, pitch_angle, state.theta, state.dtheta);
 
-                demands_out.thrust = thrust;
-                demands_out.roll = new_demands_out.roll; 
-                demands_out.pitch = new_demands_out.pitch; 
-                demands_out.yaw = new_demands_out.yaw; 
+                demands_out.yaw = _yaw_pid.run(dt, airborne, 
+                        demands_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
             }
 
             void serializeMessage(MspSerializer & serializer)
@@ -112,5 +117,13 @@ namespace hf {
             static constexpr float ALTITUDE_INC_MPS = 0.2;
 
             static constexpr float MAX_YAW_DEMAND_DPS = 160;     
+
+            PositionController _position_x_pid;
+            PositionController _position_y_pid;
+
+            RollPitchPid _pitch_pid;
+            RollPitchPid _roll_pid;
+
+            YawPid _yaw_pid;
     };
 }
