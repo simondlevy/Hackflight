@@ -37,8 +37,6 @@ int main(int argc, char ** argv)
 
     for (int frame=0; frame<flydar.maxframes(); ++frame) {
 
-        printf("%d / %d\n", frame, flydar.maxframes());
-
         if (flydar.step(frame, logfile)) {
             break;
         }
