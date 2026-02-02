@@ -93,7 +93,10 @@ namespace hf {
                 const auto airborne = demands_out.thrust > 0;
 
                 const demands_t new_demands_in ={
-                    0, 0, 0, MAX_YAW_DEMAND_DPS * demands_in.yaw
+                    0,
+                    demands_out.roll,
+                    0,
+                    MAX_YAW_DEMAND_DPS * demands_in.yaw
                 };
 
                 PitchRollAngleController::run(
@@ -113,6 +116,9 @@ namespace hf {
                 demands_t new_demands_out = {};
                 PidControl::run(dt, false, state, new_demands_in, new_demands_out);
 
+                //printf("%f,%f\n", demands_out.roll, new_demands_out.roll);
+
+                demands_out.roll = new_demands_out.roll; 
                 demands_out.yaw = new_demands_out.yaw; 
             }
 

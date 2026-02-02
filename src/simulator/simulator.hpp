@@ -81,7 +81,7 @@ namespace hf {
                         // Scale up demands for motor RPMS
                         const demands_t new_demands = {
                             demands.thrust,
-                            demands.roll,
+                            demands.roll * 1.0e6f,
                             demands.pitch,
                             demands.yaw * 2.0e4f
                         };
