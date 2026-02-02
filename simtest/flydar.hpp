@@ -109,11 +109,13 @@ class Flydar {
             }
 
             if (_world.collided({pose.x, pose.y, pose.x})) {
+                printf("collided\n");
                 return true;
             }
 
             if (succeeded(frame, _rangefinder_distances_mm,
                         _rangefinder->getWidth())) {
+                printf("succeeded\n");
                 return true;
             }
 

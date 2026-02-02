@@ -81,23 +81,37 @@ namespace hf {
                 const auto dxb =  dxw * cospsi + dyw * sinpsi;
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
-                const auto roll_angle =_position_y_pid.run(
+                const auto roll_angle_demand =_position_y_pid.run(
                         airborne, dt, demands_in.roll, dyb);
 
-                const auto pitch_angle = _position_x_pid.run(
+                const auto pitch_angle_demand = _position_x_pid.run(
                         airborne, dt, demands_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
 
+                runStabilizer(dt, airborne,
+                        roll_angle_demand, pitch_angle_demand, demands_in.yaw,
+                        state, demands_out);
+            }
+
+            void runStabilizer(
+                    const float dt,
+                    const bool airborne,
+                    const float roll_angle_demand,
+                    const float pitch_angle_demand,
+                    const float yaw_demand,
+                    const vehicleState_t & state,
+                    demands_t & demands_out)
+            {
                 demands_out.roll = _roll_pid.run(
-                        dt, airborne, roll_angle, state.phi, state.dphi);
+                        dt, airborne, roll_angle_demand, state.phi, state.dphi);
 
                 demands_out.pitch = _pitch_pid.run(
-                        dt, airborne, pitch_angle, state.theta, state.dtheta);
+                        dt, airborne, pitch_angle_demand, state.theta, state.dtheta);
 
                 demands_out.yaw = _yaw_pid.run(dt, airborne, 
-                        demands_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
-            }
+                        yaw_demand * MAX_YAW_DEMAND_DPS, state.dpsi);
+             }
 
             void serializeMessage(MspSerializer & serializer)
             {
