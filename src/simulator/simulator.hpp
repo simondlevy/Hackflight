@@ -40,6 +40,9 @@ namespace hf {
             static constexpr float PID_FAST_FREQ = 500; // 1024 Plank 
             static constexpr float PID_SLOW_FREQ = 100;
 
+            static constexpr float PITCH_ROLL_MOTOR_SCALE = 1e6;
+            static constexpr float YAW_MOTOR_SCALE = 2e4;
+
         public:
 
             void init(const pose_t & pose, const float framerate)
@@ -81,9 +84,9 @@ namespace hf {
                         // Scale up demands for motor RPMS
                         const demands_t new_demands = {
                             demands.thrust,
-                            demands.roll * 1.0e6f,
-                            demands.pitch * 1.0e6f,
-                            demands.yaw * 2.0e4f
+                            demands.roll * PITCH_ROLL_MOTOR_SCALE,
+                            demands.pitch * PITCH_ROLL_MOTOR_SCALE,
+                            demands.yaw * YAW_MOTOR_SCALE
                         };
 
                         // Get motor RPMS from mixer

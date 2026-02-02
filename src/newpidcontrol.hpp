@@ -37,9 +37,9 @@ namespace hf {
                     const vehicleState_t & state,
                     const demands_t & demands_in)
             {
-                demands_t demands = {};
-                run(dt, hovering, state, demands_in, demands);
-                return demands;
+                demands_t demands_out = {};
+                run(dt, hovering, state, demands_in, demands_out);
+                return demands_out;
             }
 
             void run(
@@ -47,8 +47,10 @@ namespace hf {
                     const bool hovering,
                     const vehicleState_t & state,
                     const demands_t & demands_in,
-                    demands_t & demands)
+                    demands_t & demands_out)
             {
+                // Altitude hold ---------------------------------------------
+
                 static float _altitude_target;
 
                 if (_altitude_target == 0) {
@@ -63,43 +65,30 @@ namespace hf {
                 const auto climbrate = AltitudeController::run(hovering,
                         dt, state.z, _altitude_target);
 
-                demands.thrust =
-                    ClimbRateController::run(
-                            hovering,
-                            dt,
-                            state.z,
-                            state.dz,
-                            climbrate);
+                const auto thrust = ClimbRateController::run(
+                    hovering, dt, state.z, state.dz, climbrate);
 
-                const auto airborne = demands.thrust > 0;
+                // Position hold ---------------------------------------------
 
-                PositionController::run(
-                        airborne,
-                        dt,
+                const auto airborne = thrust > 0;
+
+                float roll = 0, pitch = 0;
+                PositionController::run(airborne, dt,
                         state.dx, state.dy, state.psi,
                         hovering ? demands_in.pitch : 0,
                         hovering ? demands_in.roll : 0,
-                        demands.roll, demands.pitch);
+                        roll, pitch);
 
-                runStabilizerPids(dt, state, demands_in, demands);
-            }
+                //  Stabilization ---------------------------------------------
 
-            static void runStabilizerPids(
-                    const float dt,
-                    const vehicleState_t & state,
-                    const demands_t & demands_in,
-                    demands_t & demands_out)
-            {
                 const demands_t new_demands_in = {
-                    0,
-                    demands_out.roll,
-                    demands_out.pitch,
-                    MAX_YAW_DEMAND_DPS * demands_in.yaw
+                    0, roll, pitch, MAX_YAW_DEMAND_DPS * demands_in.yaw
                 };
 
                 demands_t new_demands_out = {};
-                PidControl::run(dt, false, state, new_demands_in, new_demands_out);
+                PidControl::run(dt, !airborne, state, new_demands_in, new_demands_out);
 
+                demands_out.thrust = thrust;
                 demands_out.roll = new_demands_out.roll; 
                 demands_out.pitch = new_demands_out.pitch; 
                 demands_out.yaw = new_demands_out.yaw; 
