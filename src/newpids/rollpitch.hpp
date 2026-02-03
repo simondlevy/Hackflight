@@ -38,6 +38,11 @@ namespace hf {
 
         public:
 
+            RollPitchPid()
+            {
+                _integral = 0;
+            }
+
             float run(
                     const float dt,
                     const bool airborne,

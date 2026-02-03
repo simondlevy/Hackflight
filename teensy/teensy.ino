@@ -283,8 +283,8 @@ void loop()
     _pidControl.runStabilizer(
             dt,
             !throttle_is_down, 
-            _channel_values[1] * PositionController::MAX_DEMAND_DEG, 
-            _channel_values[2] * PositionController::MAX_DEMAND_DEG, 
+            _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
+            _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
             _channel_values[3],
             state,
             pid_demands);

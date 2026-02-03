@@ -19,38 +19,48 @@
 
 #include <num.hpp>
 
-class PositionController {
+namespace hf {
 
-    public:
+    class PositionController {
 
-        static constexpr float MAX_DEMAND_DEG = 20;
+        private:
 
-        /**
-          * Demands is input as normalized interval [-1,+1] and output as
-          * angles in degrees.
-          */
-         float run(
-                 const bool airborne,
-                 const float dt,
-                 const float target,
-                 const float actual)
-        {
-            const auto error = target - actual;
+            static constexpr float KP = 25; 
+            static constexpr float KI = 1;
+            static constexpr float ILIMIT = 5000;
 
-            _integral = airborne ? 
-                Num::fconstrain(_integral + error * dt, ILIMIT) :
-                0;
+            float _integral;
 
-            return airborne ?
-                Num::fconstrain(KP * error + KI * _integral, MAX_DEMAND_DEG) :
-                0;
-        }
+        public:
 
-    private:
+            static constexpr float MAX_DEMAND_DEG = 20;
 
-        static constexpr float KP = 25; 
-        static constexpr float KI = 1;
-        static constexpr float ILIMIT = 5000;
+            PositionController()
+            {
+                _integral = 0;
+            }
 
-        float _integral;
-};
+            /**
+             * Demands is input as normalized interval [-1,+1] and output as
+             * angles in degrees.
+             */
+            float run(
+                    const bool airborne,
+                    const float dt,
+                    const float target,
+                    const float actual)
+            {
+                const auto error = target - actual;
+
+                _integral = airborne ? 
+                    Num::fconstrain(_integral + error * dt, ILIMIT) :
+                    0;
+
+                return airborne ?
+                    Num::fconstrain(KP * error + KI * _integral, MAX_DEMAND_DEG) :
+                    0;
+            }
+
+    };
+
+}
