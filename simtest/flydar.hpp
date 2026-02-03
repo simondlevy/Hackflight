@@ -88,6 +88,10 @@ class Flydar {
             return MAX_TIME_SEC * FRAME_RATE_HZ;
         }
 
+        /**
+          * Returns true if done, false otherwise
+          */
+
         bool step(const int frame, FILE * logfile=nullptr)
         {
             static int _rangefinder_distances_mm[1000]; 
