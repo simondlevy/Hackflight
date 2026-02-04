@@ -26,20 +26,23 @@ namespace hf {
 
         public:
 
+            ClimbRateController()
+            {
+                _integral = 0;
+            }
+
             /**
              * Demand is input as altitude target in meters and output as 
              * arbitrary positive value to be scaled according to motor
              * characteristics.
              */
-            static float run(
+            float run(
                     const bool hovering,
                     const float dt,
                     const float target,
                     const float z,
                     const float dz)
             {
-                static float _integral;
-
                 const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
 
                 const auto error = target - dz;
@@ -61,5 +64,7 @@ namespace hf {
             static constexpr float ILIMIT = 5000;
 
             static constexpr float ALTITUDE_LANDING_M = 0.03;
+
+            float _integral;
     };
 }
