@@ -72,23 +72,21 @@ def main():
     
     data = np.loadtxt(argv[1], delimiter=',')
 
-    exit(0)
-    
-    # Set up a SLAM display, named by dataset
-    #viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, dataset)
+    viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS)
 
-    pose = [0,0,0]
+    for row in data:
 
-    # Launch the data-collection / update thread
-    #thread = Thread(target=threadfunc, args=(robot, slam, timestamps, lidars, odometries if use_odometry else None, mapbytes, pose))
-    #thread.daemon = True
-    #thread.start()
-    
+        pose = row[0], row[1], row[5]
+
+        print(pose)
+
+    '''
     # Loop forever,displaying current map and pose
     while True:
 
         # Display map and robot pose, exiting gracefully if user closes it
         if not viz.display(pose[0]/1000., pose[1]/1000., pose[2], mapbytes):
             exit(0)
+    '''
                     
 main()
