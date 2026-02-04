@@ -25,18 +25,14 @@ from sys import argv, exit
 from time import sleep
 
 MAP_SIZE_PIXELS = 800
-MAP_SIZE_METERS = 32
+MAP_SIZE_METERS = 5
 FRAMES_PER_SECOND = 30
+LOG_NAME = "log.csv"
 
 def main():
 	    
-    if len(argv) < 2:
-        print('Usage:   %s LOGFILE' % argv[0])
-        exit(1)
-    
-    data = np.loadtxt(argv[1], delimiter=',')
+    data = np.loadtxt(LOG_NAME, delimiter=',')
 
-    # viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS)
     viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS)
 
     for row in data:
@@ -45,7 +41,7 @@ def main():
 
         lidar = row[6:]
 
-        viz.display(x, y, psi)
+        viz.display(-y, x, 90-psi)
 
         sleep(1 / FRAMES_PER_SECOND)
                     

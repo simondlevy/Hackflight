@@ -24,3 +24,6 @@ edit:
 
 clean:
 	rm -f simtest *.o *.csv
+
+play:
+	./playlog.py
