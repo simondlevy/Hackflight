@@ -25,18 +25,21 @@ namespace hf {
 
         public:
 
+            AltitudeController()
+            {
+                _integral = 0;
+            }
+
             /**
              * Demand is input as altitude target in meters and output as 
              * climb rate in meters per second.
              */
-            static float run(
+            float run(
                     const bool hovering,
                     const float dt,
                     const float target,
                     const float actual)
             {
-                static float _integral;
-
                 const auto error = target - actual;
 
                 _integral = hovering ?
@@ -56,5 +59,8 @@ namespace hf {
             static constexpr float VEL_MAX = 1;
             static constexpr float VEL_MAX_OVERHEAD = 1.10;
             static constexpr float LANDING_SPEED_MPS = 0.15;
+
+            float _integral;
+
     };
 }

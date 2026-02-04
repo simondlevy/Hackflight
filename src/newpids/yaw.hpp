@@ -34,7 +34,16 @@ namespace hf {
             static constexpr float KI = 0.05;          
             static constexpr float KD = 0.00015;       
 
+            float _integral;
+            float _error;
+
         public:
+
+            YawPid()
+            {
+                _integral = 0;
+                _error = 0;
+            }
 
             float run(
                     const float dt,
@@ -42,22 +51,16 @@ namespace hf {
                     const float target,
                     const float actual)
             {
-                static float _integral;
-
-                static float _error; 
-
                 const auto error = target - actual;
 
-                const auto integral = airborne ? 
+                _integral = airborne ? 
                     Num::fconstrain(_integral + error * dt, I_LIMIT) : 0;
-
-                _integral = integral;
 
                 const auto derivative = (error - _error) / dt; 
 
                 _error = error;
 
-                return .01 * (KP*error + KI*integral + KD*derivative); 
+                return .01 * (KP*error + KI*_integral + KD*derivative); 
             }
     };
 

@@ -27,7 +27,16 @@ namespace hf {
 
     class PidControl {
 
+        private:
+
+            float _altitude_target;
+
         public:
+
+            PidControl()
+            {
+                _altitude_target = 0;
+            }
 
             demands_t run(
                     const float dt,
@@ -49,8 +58,6 @@ namespace hf {
             {
                 // Altitude hold ---------------------------------------------
 
-                static float _altitude_target;
-
                 if (_altitude_target == 0) {
                     _altitude_target = ALTITUDE_INIT_M;
                 }
@@ -60,10 +67,10 @@ namespace hf {
                         demands_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
-                const auto climbrate = AltitudeController::run(hovering,
+                const auto climbrate = _altitude_pid.run(hovering,
                         dt, _altitude_target, state.z);
 
-                const auto thrust = ClimbRateController::run(
+                const auto thrust = _climbrate_pid.run(
                     hovering, dt, climbrate, state.z, state.dz);
 
                 demands_out.thrust = thrust;
@@ -131,6 +138,10 @@ namespace hf {
             static constexpr float ALTITUDE_INC_MPS = 0.2;
 
             static constexpr float MAX_YAW_DEMAND_DPS = 160;     
+
+            AltitudeController _altitude_pid;
+
+            ClimbRateController _climbrate_pid;
 
             PositionController _position_x_pid;
             PositionController _position_y_pid;
