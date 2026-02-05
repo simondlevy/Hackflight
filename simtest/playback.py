@@ -23,8 +23,8 @@ from simsensors.parsers.webots.world import parse
 
 import numpy as np
 from sys import argv
-from time import sleep
 from pprint import pprint
+from time import sleep
 
 FRAMES_PER_SECOND = 30
 
@@ -52,7 +52,7 @@ def main():
 
     data = np.loadtxt(LOG_NAME, delimiter=',')
 
-    viz = Visualizer(10)
+    viz = Visualizer(10, map_size_pixels=800)
 
     walls = tuple(wall_to_coords(wall) for wall in world['walls'])
 
@@ -65,6 +65,6 @@ def main():
         if not viz.display(x, y, psi, obstacles=walls, flip_axes=True):
             break
 
-        sleep(1 / FRAMES_PER_SECOND)
+        sleep(1/FRAMES_PER_SECOND)
                     
 main()
