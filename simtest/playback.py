@@ -24,6 +24,7 @@ from simsensors.parsers.webots.world import parse
 import numpy as np
 from sys import argv
 from time import sleep
+from pprint import pprint
 
 FRAMES_PER_SECOND = 30
 
@@ -36,6 +37,10 @@ def main():
         exit(1)
 	    
     world = parse(argv[1])
+
+    pprint(world)
+
+    exit(0)
 
     data = np.loadtxt(LOG_NAME, delimiter=',')
 
