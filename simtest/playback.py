@@ -18,7 +18,7 @@ along with this code.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
-from roboviz import Visualizer # MapVisualizer
+from roboviz import Visualizer
 from simsensors.parsers.webots.world import parse
 
 import numpy as np
@@ -30,6 +30,10 @@ FRAMES_PER_SECOND = 30
 
 LOG_NAME = 'log.csv'
 
+def wall_to_coords(wall):
+
+    return wall['translation'], wall['rotation'], wall['size']
+
 def main():
 
     if len(argv) < 2:
@@ -38,13 +42,13 @@ def main():
 	    
     world = parse(argv[1])
 
-    pprint(world)
-
-    exit(0)
-
     data = np.loadtxt(LOG_NAME, delimiter=',')
 
     viz = Visualizer(10)
+
+    print(tuple(wall_to_coords(wall) for wall in world['walls']))
+
+    exit(0)
 
     for row in data:
 
@@ -52,7 +56,7 @@ def main():
 
         lidar = row[6:]
 
-        if not viz.display(-y, x, 90-psi):
+        if not viz.display(x, y, psi, flip_axes=True):
             break
 
         sleep(1 / FRAMES_PER_SECOND)
