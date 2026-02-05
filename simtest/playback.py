@@ -19,18 +19,26 @@ along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
 
 from roboviz import Visualizer # MapVisualizer
+from simsensors.parsers.webots.world import parse
 
 import numpy as np
-from sys import argv, exit
+from sys import argv
 from time import sleep
 
 MAP_SIZE_PIXELS = 800
 MAP_SIZE_METERS = 5
 FRAMES_PER_SECOND = 30
-LOG_NAME = "log.csv"
+
+LOG_NAME = 'log.csv'
 
 def main():
+
+    if len(argv) < 2:
+        print('Usage: %s WORLD_FILE' % argv[0])
+        exit(1)
 	    
+    world = parse(argv[1])
+
     data = np.loadtxt(LOG_NAME, delimiter=',')
 
     viz = Visualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS)

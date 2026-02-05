@@ -26,4 +26,4 @@ clean:
 	rm -f simtest *.o *.csv
 
 play:
-	./playback.py
+	./playback.py $(world)
