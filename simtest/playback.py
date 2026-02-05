@@ -32,7 +32,8 @@ LOG_NAME = 'log.csv'
 
 def wall_to_coords(wall):
 
-    return wall['translation'], wall['rotation'], wall['size']
+    # return wall['translation'], wall['rotation'], wall['size']
+    return {'x':(0, 100, 100, 0, 0), 'y': (0, 0, 100, 100, 0)}
 
 def main():
 
@@ -46,9 +47,7 @@ def main():
 
     viz = Visualizer(10)
 
-    print(tuple(wall_to_coords(wall) for wall in world['walls']))
-
-    exit(0)
+    walls = tuple(wall_to_coords(wall) for wall in world['walls'])
 
     for row in data:
 
@@ -56,7 +55,7 @@ def main():
 
         lidar = row[6:]
 
-        if not viz.display(x, y, psi, flip_axes=True):
+        if not viz.display(x, y, psi, obstacles=walls, flip_axes=True):
             break
 
         sleep(1 / FRAMES_PER_SECOND)
