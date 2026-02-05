@@ -32,8 +32,15 @@ LOG_NAME = 'log.csv'
 
 def wall_to_coords(wall):
 
-    # return wall['translation'], wall['rotation'], wall['size']
-    return {'x':(0, 100, 100, 0, 0), 'y': (0, 0, 100, 100, 0)}
+    dx, dy = wall['size'][:2]
+
+    x1, y1 = wall['translation'][:2]
+
+    x2, y2 = x1 + dx, y1
+    x3, y3 = x1 + dx, y1 + dy
+    x4, y4 = x1, y1 + dy
+
+    return {'x':(x1, x2, x3, x4, x1), 'y':(y1, y2, y3, y4, y1)}
 
 def main():
 
