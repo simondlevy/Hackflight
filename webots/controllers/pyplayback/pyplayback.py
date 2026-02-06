@@ -18,7 +18,7 @@ According to the messages it receives, the robot change its
 behavior.
 """
 
-from controller import AnsiCodes, Robot
+from controller import Robot, GPS
 
 class Enumerate(object):
     def __init__(self, names):
@@ -27,10 +27,10 @@ class Enumerate(object):
 
 
 class Slave(Robot):
+
     Mode = Enumerate('STOP MOVE_FORWARD AVOIDOBSTACLES TURN')
     timeStep = 32
     maxSpeed = 10.0
-    mode = Mode.AVOIDOBSTACLES
     motors = []
     distanceSensors = []
 
@@ -41,14 +41,15 @@ class Slave(Robot):
 
         super(Slave, self).__init__()
 
-        self.mode = self.Mode.AVOIDOBSTACLES
-
         self.motors.append(self.getDevice("left wheel motor"))
         self.motors.append(self.getDevice("right wheel motor"))
         self.motors[0].setPosition(float("inf"))
         self.motors[1].setPosition(float("inf"))
         self.motors[0].setVelocity(0.0)
         self.motors[1].setVelocity(0.0)
+
+        self.gps = self.getDevice("gps")
+        self.gps.enable(self.timeStep)
 
         for dsnumber in range(0, 2):
             self.distanceSensors.append(self.getDevice('ds' + str(dsnumber)))
@@ -58,12 +59,13 @@ class Slave(Robot):
 
         while True:
 
+            print(self.gps.getValues())
+
             delta = self.distanceSensors[0].getValue() - self.distanceSensors[1].getValue()
             speeds = [0.0, 0.0]
 
-            if self.mode == self.Mode.AVOIDOBSTACLES:
-                speeds[0] = self.boundSpeed(self.maxSpeed / 2 + 0.1 * delta)
-                speeds[1] = self.boundSpeed(self.maxSpeed / 2 - 0.1 * delta)
+            speeds[0] = self.boundSpeed(self.maxSpeed / 2 + 0.1 * delta)
+            speeds[1] = self.boundSpeed(self.maxSpeed / 2 - 0.1 * delta)
 
             self.motors[0].setVelocity(speeds[0])
             self.motors[1].setVelocity(speeds[1])
