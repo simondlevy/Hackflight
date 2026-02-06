@@ -3,14 +3,13 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/CircleArena.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/WoodenBox.proto"
 
 WorldInfo {
   title "Omniscience"
 }
 Viewpoint {
-  orientation -0.23090429863285805 -0.01018523501343265 0.972923155167246 3.245268365009745
-  position 2.7493370609021848 0.14270693160753067 1.601343978411531
+  orientation -0.25514264071172993 -0.010200555110016244 0.9668496168309177 3.2350583167908007
+  position 2.6770247877527327 0.11281858696324515 1.7161213530661148
 }
 TexturedBackground {
 }
@@ -18,39 +17,9 @@ TexturedBackgroundLight {
 }
 CircleArena {
 }
-WoodenBox {
-  translation -0.372612 0.06339 0.05
-  rotation 0 0 1 0.5
-  size 0.1 0.1 0.1
-}
-WoodenBox {
-  translation 0.421524 -0.431299 0.05
-  rotation 0 0 1 4.96782
-  name "wooden box(1)"
-  size 0.1 0.1 0.1
-}
-WoodenBox {
-  translation -0.35471 -0.5 0.05
-  rotation 0 0 1 5.36782
-  name "wooden box(2)"
-  size 0.1 0.1 0.1
-}
-WoodenBox {
-  translation 0.36 0.3 0.05
-  rotation 0 0 1 5.36782
-  name "wooden box(3)"
-  size 0.1 0.1 0.1
-}
-WoodenBox {
-  translation -0.166689 0.612227 0.05
-  rotation 0 0 1 5.36782
-  name "wooden box(4)"
-  size 0.1 0.1 0.1
-}
-
 DEF ROBOT1 Robot {
-  translation 0.7455413004116358 -0.3963815382168711 -0.00238058355361416
-  rotation 0.011182199148405866 0.027142010817824073 0.9995690419730747 0.7586787590386004
+  translation 0.7128930250069729 0.45871695742905105 -0.00023231499317603876
+  rotation 0.014354850025296904 -0.007360218234568475 0.9998698742677923 2.1465019812787873
   children [
     DEF MAIN_BODY Pose {
       translation 0 0 0.0415
@@ -70,7 +39,7 @@ DEF ROBOT1 Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 48.35530587626253
+        position 81.58229443076584
         axis 0 1 0
         anchor 0 0 0.025
       }
@@ -83,8 +52,8 @@ DEF ROBOT1 Robot {
         }
       ]
       endPoint DEF LEFT_WHEEL Solid {
-        translation 0 0.04499999999999999 0.025
-        rotation 0 1 0 5.671524033185007
+        translation 0 0.044999999999999984 0.025
+        rotation 0 1 0 1.1994007446108035
         children [
           DEF WHEEL Pose {
             rotation -1 0 0 1.57
@@ -124,13 +93,13 @@ DEF ROBOT1 Robot {
           density -1
           mass 0.05
         }
-        linearVelocity -0.00818683089481284 -0.014429370119112963 0.00816466462614969
-        angularVelocity 5.769829192990715 -6.1136964725566525 0.16298080647064492
+        linearVelocity -0.0627900956505491 0.09771512372776725 1.4127347890664151e-06
+        angularVelocity -3.875553995750887 -2.490668642218174 0.20886848717553358
       }
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 53.69820720336996
+        position 92.22409721034194
         axis 0 1 0
         anchor 0 0 0.025
       }
@@ -143,8 +112,8 @@ DEF ROBOT1 Robot {
         }
       ]
       endPoint DEF RIGHT_WHEEL Solid {
-        translation 0 -0.04499999999999999 0.025
-        rotation 0 -1 0 1.1546252540667308
+        translation 0 -0.044999999999999984 0.025
+        rotation 0 -1 0 0.3278470901722717
         children [
           DEF WHEEL Pose {
             rotation -1 0 0 1.57
@@ -169,8 +138,8 @@ DEF ROBOT1 Robot {
           density -1
           mass 0.05
         }
-        linearVelocity 0.004025794532769696 0.017160770339630947 0.017254120525873738
-        angularVelocity -6.893791764386775 7.0544648352126895 0.5328297363273286
+        linearVelocity -0.0723990107340023 0.11266040099354682 -1.346221868125839e-06
+        angularVelocity -4.538030917236507 -2.9160350200767007 0.21108512607764324
       }
     }
     DEF LEFT_EYE DistanceSensor {
@@ -272,10 +241,9 @@ DEF ROBOT1 Robot {
     mass 0.5
   }
   controller "pyplayback"
-  linearVelocity -0.0073067297299249725 4.399553642083897e-05 0.005406062280901618
-  angularVelocity -0.0011041733562337785 -0.1791233219825049 3.201799794845242e-05
+  linearVelocity -0.06751100869663551 0.1052758152663758 -2.183998573206304e-05
+  angularVelocity -0.0012697784940443881 0.0010256341613092141 0.20023213584217237
 }
-
 Robot {
   children [
     Emitter {
