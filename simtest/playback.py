@@ -26,21 +26,52 @@ from sys import argv
 from pprint import pprint
 from time import sleep
 
+import matplotlib.pyplot as plt
+
 FRAMES_PER_SECOND = 30
 
 LOG_NAME = 'log.csv'
+
+def rotate_polygon(polygon, angle_radians, pivot_point):
+    """
+    Rotates a polygon (numpy array of vertices) around a pivot point.
+    """
+    cos_angle = np.cos(angle_radians)
+    sin_angle = np.sin(angle_radians)
+
+    # Translate points to the origin
+    translated_polygon = polygon - pivot_point
+
+    # Create the 2D rotation matrix
+    rotation_matrix = np.array([[cos_angle, -sin_angle],
+                                [sin_angle, cos_angle]])
+
+    # Apply the rotation matrix (dot product)
+    rotated_polygon = np.dot(translated_polygon, rotation_matrix.T)
+
+    # Translate points back to the original position
+    rotated_polygon += pivot_point
+
+    return rotated_polygon
 
 def wall_to_coords(wall):
 
     dx, dy = wall['size'][:2]
 
     x1, y1 = wall['translation'][:2]
-
     x2, y2 = x1 + dx, y1
     x3, y3 = x1 + dx, y1 + dy
     x4, y4 = x1, y1 + dy
 
-    return {'x':(x1, x2, x3, x4, x1), 'y':(y1, y2, y3, y4, y1)}
+    coords = np.array([[-y1,x1], [-y2,x2], [-y3,x3], [-y4,x4], [-y1,x1]])
+
+    psi = wall['rotation'][3]
+
+    return rotate_polygon(coords, psi, (x1,y1))
+
+def plot_obst(obst):
+
+    plt.fill(obst[:,0], obst[:,1], color='black')
 
 def main():
 
@@ -54,7 +85,21 @@ def main():
 
     viz = Visualizer(10, map_size_pixels=800)
 
-    walls = tuple(wall_to_coords(wall) for wall in world['walls'])
+    # walls = tuple(wall_to_coords(wall) for wall in world['walls'])
+    for wall in world['walls']:
+        wall = wall_to_coords(wall)
+        plot_obst(wall)
+
+    plt.xlim((-5,+5))
+    plt.ylim((-5,+5))
+
+    plt.plot(0, 0, 'ro')
+
+    plt.xlabel('Y')
+    plt.ylabel('X')
+    plt.show()
+
+    '''
 
     for row in data:
 
@@ -66,5 +111,6 @@ def main():
             break
 
         sleep(1/FRAMES_PER_SECOND)
+    '''
                     
 main()
