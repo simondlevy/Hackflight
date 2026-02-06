@@ -19,8 +19,6 @@ behavior.
 """
 
 from controller import AnsiCodes, Robot
-from common import common_print
-
 
 class Enumerate(object):
     def __init__(self, names):
@@ -94,5 +92,4 @@ class Slave(Robot):
 
 
 controller = Slave()
-common_print('slave')
 controller.run()

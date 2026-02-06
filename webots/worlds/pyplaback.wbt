@@ -271,7 +271,7 @@ DEF ROBOT1 Robot {
     density -1
     mass 0.5
   }
-  controller "pyplayback-slave"
+  controller "pyplayback"
   linearVelocity -0.0073067297299249725 4.399553642083897e-05 0.005406062280901618
   angularVelocity -0.0011041733562337785 -0.1791233219825049 3.201799794845242e-05
 }
