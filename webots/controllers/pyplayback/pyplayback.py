@@ -39,8 +39,6 @@ class Slave(Robot):
 
     def __init__(self):
 
-        self.logfile = open("log.csv", "w")
-
         super(Slave, self).__init__()
 
         self.motors.append(self.getDevice("left wheel motor"))
@@ -59,11 +57,9 @@ class Slave(Robot):
 
     def run(self):
 
-        while True:
+        logfile = open("log.csv")
 
-            loc = self.gps.getValues()
-            self.logfile.write("%f,%f,%f\n" % (loc[0], loc[1], loc[2]))
-            self.logfile.flush()
+        while True:
 
             delta = self.distanceSensors[0].getValue() - self.distanceSensors[1].getValue()
             speeds = [0.0, 0.0]
@@ -77,7 +73,7 @@ class Slave(Robot):
             if self.step(self.timeStep) == -1:
                 break
 
-        self.logfile.close()
+        logfile.close()
 
 
 controller = Slave()
