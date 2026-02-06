@@ -26,4 +26,5 @@ clean:
 	rm -f simtest *.o *.csv
 
 play:
-	./playback.py $(world)
+	#./playback.py $(world)
+	./playback.py onewall.wbt
