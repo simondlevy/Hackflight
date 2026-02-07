@@ -34,15 +34,11 @@ class DiyQuad(Supervisor):
         return Supervisor.getFromDef(self, self.ROBOT_NAME)
 
 
-def euler_to_rotation(euler):
+def euler_to_rotation(phi, theta, psi):
     '''
     https://www.euclideanspace.com/maths/geometry/rotations/conversions/
        eulerToAngle/index.htm
     '''
-
-    phi = euler[0]
-    theta = euler[1]
-    psi = euler[2]
 
     c1 = cos(theta/2)
     c2 = cos(psi/2)
@@ -78,13 +74,9 @@ def main():
 
         vals = list(map(float, line.split(',')))
 
-        xyz = vals[:3]
+        translation_field.setSFVec3f([vals[0], -vals[1], vals[2]])
 
-        translation_field.setSFVec3f(xyz)
-
-        euler = vals[3:6]
-
-        rotation_field.setSFRotation(euler_to_rotation(euler))
+        rotation_field.setSFRotation(euler_to_rotation(vals[3], vals[4], -vals[5]))
 
         rangefinder_distances = vals[6:]
 

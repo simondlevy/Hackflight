@@ -34,6 +34,17 @@ TexturedBackgroundLight {
 }
 Floor {
 }
+Solid {
+  children [
+    Shape {
+      appearance PBRAppearance {
+      }
+      geometry Sphere {
+        radius 0.1
+      }
+    }
+  ]
+}
 DEF wall Wall {
   translation -1.25 1.41 0
   name "wall1"
