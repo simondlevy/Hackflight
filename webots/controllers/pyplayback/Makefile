@@ -15,11 +15,15 @@
 # Command-line variables; e.g. make run world=maze ---------------------------
 
 
-# ----------------------------------------------------------------------------
+# Command-line variables; e.g. make run world=maze ---------------------------
+world = twoexit
+logfile = ../controller/poselog.csv
+#-----------------------------------------------------------------------------
 
 run:
-	webots ../../worlds/pytwoexit.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect ./pyplayback.py
+	webots ../../worlds/py$(world).wbt &
+	/usr/local/webots/webots-controller --stdout-redirect \
+		./pyplayback.py $(logfile)
 
 edit:
 	vim main.cpp

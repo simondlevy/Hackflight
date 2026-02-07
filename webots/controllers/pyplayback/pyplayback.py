@@ -17,6 +17,7 @@
 '''
 
 from math import cos, sin, acos
+from sys import argv
 
 from controller import Supervisor
 
@@ -65,7 +66,7 @@ def main():
 
     rotation_field = robot_node.getField("rotation")
 
-    logfile = open('../../../simtest/log.csv')
+    logfile = open(argv[1])
 
     for line in logfile.readlines():
 
