@@ -54,9 +54,21 @@ def euler_to_rotation(phi, theta, psi):
             2 * acos(c1*c2*c3 - s1*s2*s3)]
 
 
+def start_motor(quad, motor_name, direction):
+
+    motor = quad.getDevice(motor_name)
+    motor.setPosition(float('inf'))
+    motor.setVelocity(direction * 60)
+
+
 def main():
 
     quad = DiyQuad()
+
+    start_motor(quad, "motor1", -1)
+    start_motor(quad, "motor2", +1)
+    start_motor(quad, "motor3", +1)
+    start_motor(quad, "motor4", -1)
 
     timestep = quad.getBasicTimeStep()
 
