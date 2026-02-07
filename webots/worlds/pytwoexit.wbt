@@ -8,6 +8,7 @@ EXTERNPROTO "../protos/PyDiyQuad.proto"
 
 WorldInfo {
   title "Hackflight"
+  gravity 0
   contactProperties [
     ContactProperties {
       coulombFriction [
