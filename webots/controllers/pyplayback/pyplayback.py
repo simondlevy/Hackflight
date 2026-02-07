@@ -49,7 +49,7 @@ def euler_to_rotation(phi, theta, psi):
 
     return [s1*s2*c3 + c1*c2*s3,
             s1*c2*c3 + c1*s2*s3,
-            1 if phi==0 and theta==0 and psi==0 else c1*s2*c3 - s1*c2*s3,
+            1 if phi == 0 and theta == 0 and psi == 0 else c1*s2*c3 - s1*c2*s3,
             2 * acos(c1*c2*c3 - s1*s2*s3)]
 
 
@@ -76,9 +76,10 @@ def main():
 
         translation_field.setSFVec3f([vals[0], -vals[1], vals[2]])
 
-        rotation_field.setSFRotation(euler_to_rotation(vals[3], vals[4], -vals[5]))
+        rotation_field.setSFRotation(
+                euler_to_rotation(vals[3], vals[4], -vals[5]))
 
-        rangefinder_distances = vals[6:]
+        # rangefinder_distances = vals[6:]
 
 
 main()
