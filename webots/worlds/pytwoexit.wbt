@@ -66,14 +66,3 @@ DEF wall Wall {
   name "wall6"
   size 0.05 0.75 1
 }
-Solid {
-  children [
-    Shape {
-      appearance PBRAppearance {
-      }
-      geometry Sphere {
-        radius 0.1
-      }
-    }
-  ]
-}
