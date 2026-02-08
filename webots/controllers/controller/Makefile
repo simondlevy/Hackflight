@@ -20,6 +20,8 @@ setpointlogname = setpointlog.csv
 
 EXE = $(shell basename "`pwd`")
 
+WORLDS_DIR = ../../worlds
+
 SIMSENSORS_DIR = $(HOME)/Desktop/simsensors/src
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
@@ -41,7 +43,8 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	webots ../../worlds/$(world).wbt &
+	sed 's/#physics/physics/' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/tmp.wbt
+	webots $(WORLDS_DIR)/tmp.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world) \
 		$(poselogname) $(setpointlogname)
 
