@@ -8,7 +8,8 @@ EXTERNPROTO "../protos/DiyQuad.proto"
 
 WorldInfo {
   title "Hackflight"
-  physics "experimental"
+  #physics "experimental"
+  gravity 0
   contactProperties [
     ContactProperties {
       coulombFriction [

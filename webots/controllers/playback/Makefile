@@ -13,41 +13,17 @@
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 # Command-line variables; e.g. make run world=maze ---------------------------
-world = simple
-logfile = ../controller/poselog.csv
-# ----------------------------------------------------------------------------
 
-EXE = $(shell basename "`pwd`")
 
-OPENCV_DIR = /usr/include/opencv4
-
-SIMSENSORS_DIR = $(HOME)/Desktop
-
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
-SRC_DIR = ../../../src
-
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/pid/slowfast -I$(SIMSENSORS_DIR) \
-		  -I$(OPENCV_DIR)
-
-LIBRARIES = -L/usr/lib/x86_64-linux-gnu \
-			-lopencv_highgui -lopencv_core -lopencv_imgproc
-
-CXX_SOURCES = main.cpp
-
-FILES_TO_REMOVE += *.csv
-
-all: $(EXE)
-
-# Use the Webots C API in your C++ controller program
-USE_C_API = true
-
-VERBOSE = 1
+# Command-line variables; e.g. make run world=maze ---------------------------
+world = twoexit
+logfile = ../../../simtest/log.csv
+#-----------------------------------------------------------------------------
 
 run:
 	webots ../../worlds/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world) \
-		$(logfile)
+	/usr/local/webots/webots-controller --stdout-redirect \
+		./playback.py $(logfile)
 
 edit:
 	vim main.cpp
