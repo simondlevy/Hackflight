@@ -19,6 +19,10 @@
 
 from sys import argv
 
+from controller import Robot, Joystick
+
+TIME_STEP = 32
+
 MODE_IDLE =  0
 MODE_ARMED = 1
 MODE_HOVERING = 2
@@ -28,7 +32,24 @@ MODE_PANIC = 5
 
 def main():
 
-
     setpointlogfp = open(argv[3], 'w')
 
     mode = MODE_IDLE
+
+    robot = Robot()
+
+    joystick = Joystick()
+
+    joystick.enable(TIME_STEP)
+
+    while True:
+
+        if robot.step(TIME_STEP) == -1:
+            break
+
+        try:
+            print(joystick.model)
+        except:
+            pass
+
+main()
