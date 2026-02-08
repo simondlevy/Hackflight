@@ -30,6 +30,10 @@ MODE_AUTONOMOUS = 3
 MODE_LANDING = 4
 MODE_PANIC = 5
 
+JOYSTICK_NONE = 0
+JOYSTICK_UNRECOGNIZED = 1
+JOYSTICK_RECOGNIZED = 2
+
 def main():
 
     setpointlogfp = open(argv[3], 'w')
@@ -38,18 +42,25 @@ def main():
 
     robot = Robot()
 
-    joystick = Joystick()
+    joystick = robot.getJoystick()
 
     joystick.enable(TIME_STEP)
+
+    did_warn = False
 
     while True:
 
         if robot.step(TIME_STEP) == -1:
             break
 
-        try:
-            print(joystick.model)
-        except:
-            pass
+        if not joystick.is_connected:
+
+            if not did_warn:
+                print('Using keyboard instead:\n');
+                print('- Use Enter to take off and land\n');
+                print('- Use W and S to go up and down\n');
+                print('- Use arrow keys to move horizontally\n');
+                print('- Use Q and E to change heading\n');
+                did_warn = True
 
 main()
