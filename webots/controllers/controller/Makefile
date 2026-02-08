@@ -43,8 +43,7 @@ USE_C_API = true
 VERBOSE = 1
 
 run:
-	sed 's/#physics/physics/' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/tmp.wbt
-	webots $(WORLDS_DIR)/tmp.wbt &
+	webots $(WORLDS_DIR)/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world) \
 		$(poselogname) $(setpointlogname)
 

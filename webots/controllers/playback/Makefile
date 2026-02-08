@@ -12,16 +12,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Command-line variables; e.g. make run world=maze ---------------------------
-
-
-# Command-line variables; e.g. make run world=maze ---------------------------
+# Command-line variables; e.g.:
+#   make run world=simple logfile=../controller/log.csv
+#
 world = twoexit
 logfile = ../../../simtest/log.csv
-#-----------------------------------------------------------------------------
+
+WORLDS_DIR = ../../worlds
 
 run:
-	webots ../../worlds/$(world).wbt &
+	sed 's/physics.*//' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/$(world)_playback.wbt
+	webots $(WORLDS_DIR)/$(world)_playback.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect \
 		./playback.py $(logfile)
 
