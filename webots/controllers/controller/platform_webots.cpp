@@ -32,10 +32,9 @@ using namespace std;
 #include <webots/inertial_unit.h>
 #include <webots/joystick.h>
 #include <webots/keyboard.h>
+#include <webots/motor.h>
 #include <webots/range_finder.h>
-
-// Shared with other Webots controllers
-#include "../motors.hpp"
+#include <webots/robot.h>
 
 // Webots-specific code -------------------------------------------------------
 
@@ -45,6 +44,21 @@ static WbDeviceTag _imu;
 static WbDeviceTag _ranger;
 
 static double _timestep;
+
+static void startMotor(const char * name, const float direction)
+{
+    auto motor = wb_robot_get_device(name);
+    wb_motor_set_position(motor, INFINITY);
+    wb_motor_set_velocity(motor, direction * 60);
+}
+
+static void startMotors()
+{
+    startMotor("motor1", -1);
+    startMotor("motor2", +1);
+    startMotor("motor3", +1);
+    startMotor("motor4", -1);
+}
 
 void platform_init()
 {

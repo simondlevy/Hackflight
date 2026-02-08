@@ -30,6 +30,7 @@ using namespace std;
 #include <simulator/pose.h>
 #include <simulator/message.h>
 
+
 #include "platform.h"
 
 typedef struct {
