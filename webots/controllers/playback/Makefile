@@ -26,7 +26,7 @@ run:
 		./playback.py $(logfile)
 
 edit:
-	vim main.cpp
+	vim pyplayback.py
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

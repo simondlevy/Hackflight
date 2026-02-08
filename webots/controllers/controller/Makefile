@@ -12,7 +12,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Command-line variables; e.g. make run world=maze ---------------------------
+# Command-line variables; e.g. make run world=twoexit ------------------------
 world = simple
 poselogname = poselog.csv
 setpointlogname = setpointlog.csv

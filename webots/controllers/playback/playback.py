@@ -22,6 +22,13 @@ from sys import argv
 
 from controller import Supervisor
 
+import numpy as np
+
+try:
+    import cv2
+except Exception:
+    cv2 = None
+
 
 class DiyQuad(Supervisor):
 
@@ -62,6 +69,32 @@ def start_motor(quad, motor_name, direction):
     motor.setVelocity(direction * 60)
 
 
+def show_rangefinder_distances(distances_mm, width, height,
+                               dmin_m=.01, dmax_m=4, scaleup=32):
+
+    new_width = width * scaleup
+    new_height = height * scaleup
+
+    img = np.zeros((new_height, new_width), dtype=np.uint8)
+
+    for x in range(width):
+
+        for y in range(height):
+
+            d_mm = distances_mm[y * width + x]
+
+            grayval = (255 if d_mm == -1
+                       else int((d_mm/1000. - dmin_m) /
+                                (dmax_m - dmin_m) * 255))
+
+            cv2.rectangle(img, (x*scaleup, y*scaleup),
+                          ((x+1)*scaleup, (y+1)*scaleup),
+                          grayval, -1)
+
+    cv2.imshow('lidar', img)
+    cv2.waitKey(1)
+
+
 def main():
 
     quad = DiyQuad()
@@ -93,7 +126,12 @@ def main():
         rotation_field.setSFRotation(
                 euler_to_rotation(vals[3], vals[4], -vals[5]))
 
-        # rangefinder_distances = vals[6:]
+        rangefinder_distances = vals[6:]
+
+        if cv2 is None:
+            print(rangefinder_distances)
+        else:
+            show_rangefinder_distances(rangefinder_distances, 8, 1)
 
 
 main()

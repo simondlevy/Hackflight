@@ -8,7 +8,6 @@ EXTERNPROTO "../protos/DiyQuad.proto"
 
 WorldInfo {
   title "Hackflight"
-  #physics "experimental"
   gravity 0
   contactProperties [
     ContactProperties {
@@ -22,12 +21,12 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.007365968524207539 0.9998100918073269 -0.01804225118783057 1.4721798116781641
-  position -0.9331254679963351 0.6384823031995971 5.00766176099283
+  position -1.042412150179457 0.6657680853928192 6.1113744057183315
   follow "DiyQuad"
 }
 DEF diyquad DiyQuad {
-  translation -0.27 0.81 0.037985
-  rotation 0 0 1 1.5707999514237778
+  translation 0.616 0.938 0.416
+  rotation -0.003495169512613645 -0.0524814409308571 0.9986157830456612 0.1331838118862579
 }
 TexturedBackground {
 }
