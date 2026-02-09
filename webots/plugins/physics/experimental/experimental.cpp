@@ -16,7 +16,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// C/C++
+// C
+#include <stdlib.h>
 #include <unistd.h>
 
 // Webots
@@ -36,6 +37,9 @@ static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
 static const char * LOG_FILE_NAME = "log.csv";
 
+static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
+static const char * WORLD_VARIABLE_NAME = "WEBOTS_WORLD";
+
 static simsens::Rangefinder * _rangefinder;
 
 static simsens::RangefinderVisualizer * _rangefinderVisualizer;
@@ -45,12 +49,15 @@ static void load(const hf::siminfo_t & siminfo,
         simsens::Robot & robot,
         FILE ** logfpp)
 {
+    const auto pwd = getenv(PATH_VARIABLE_NAME);
+    const auto worldname = getenv(WORLD_VARIABLE_NAME);
+
     char path[1000] = {};
 
-    sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
+    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname);
     simsens::WorldParser::parse(path, world);
 
-    sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
+    sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, robot);
 
     _rangefinder = new simsens::Rangefinder(*robot.rangefinders[0]);

@@ -39,6 +39,11 @@ USE_C_API = true
 
 VERBOSE = 1
 
+# https://stackoverflow.com/a/49524393
+.EXPORT_ALL_VARIABLES:
+WEBOTS_WORLD = $(world)
+WEBOTS_PATH = $(shell pwd)
+
 run:
 	webots $(WORLDS_DIR)/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect $(EXE) $(world)
