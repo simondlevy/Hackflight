@@ -95,8 +95,12 @@ def getSimInfoFromJoystick(joystick, buttons_down, siminfo):
     siminfo['mode'] = mode
 
     axes = JOYSTICK_AXIS_MAP[joystick.model]
+    setpoint = siminfo['setpoint']
 
-    siminfo['setpoint']['thrust'] = readJoystickAxis(joystick, axes[0])
+    setpoint['thrust'] = readJoystickAxis(joystick, axes[0])
+    setpoint['roll'] = readJoystickAxis(joystick, axes[1])
+    setpoint['pitch'] = readJoystickAxis(joystick, axes[2])
+    setpoint['yaw'] = readJoystickAxis(joystick, axes[3])
 
 
 def getAndEnableDevice(robot, timestep, device_name):
@@ -153,8 +157,9 @@ def main():
 
         getSimInfoFromJoystick(joystick, buttons_down, siminfo)
 
-        setpoint = siminfo['setpoint']
-        print('m=%10s | t=%3.3f' % (siminfo['mode'], setpoint['thrust']))
+        s = siminfo['setpoint']
+        print('m=%10s | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f' %
+              (siminfo['mode'], s['thrust'], s['roll'], s['pitch'], s['yaw']))
 
         '''
         siminfo = (getSimInfoFromKeyboard(keyboard, mode)
