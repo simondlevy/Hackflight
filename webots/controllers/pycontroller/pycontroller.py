@@ -29,6 +29,7 @@ JOYSTICK_AXIS_MAP = {
 
 MODES = {'idle': 0, 'hovering': 2, 'autonomous': 2, 'landing': 3}
 
+
 def start_motor(quad, motor_name, direction):
 
     motor = quad.getDevice(motor_name)
@@ -60,7 +61,7 @@ def switchMode(what, mode):
         mode)
 
 
-def checkButton(button, target, what, buttons_down, mode):
+def checkJoystickButton(button, target, what, buttons_down, mode):
     if button == target:
         if not buttons_down[what]:
             mode = switchMode(what, mode)
@@ -68,10 +69,6 @@ def checkButton(button, target, what, buttons_down, mode):
     else:
         buttons_down[what] = False
     return mode
-
-
-def getSimInfoFromKeyboard(keyboard, mode, buttons_down):
-    return None
 
 
 def normalizeJoystickAxis(rawval):
@@ -88,21 +85,21 @@ def readJoystickAxis(joystick, index):
     return normalizeJoystickAxis(readJoystickRaw(joystick, index))
 
 
-def getSimInfoFromJoystick(joystick, buttons_down, siminfo):
+def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
 
     button = joystick.getPressedButton()
-    mode = siminfo['mode']
-    mode = checkButton(button, 5, 'hover', buttons_down, mode)
-    mode = checkButton(button, 4, 'auto', buttons_down, mode)
-    siminfo['mode'] = mode
+    mode = cmdinfo[0]
+    mode = checkJoystickButton(button, 5, 'hover', buttons_down, mode)
+    mode = checkJoystickButton(button, 4, 'auto', buttons_down, mode)
 
     axes = JOYSTICK_AXIS_MAP[joystick.model]
-    setpoint = siminfo['setpoint']
 
-    setpoint['thrust'] = readJoystickAxis(joystick, axes[0])
-    setpoint['roll'] = readJoystickAxis(joystick, axes[1])
-    setpoint['pitch'] = readJoystickAxis(joystick, axes[2])
-    setpoint['yaw'] = readJoystickAxis(joystick, axes[3])
+    thrust = readJoystickAxis(joystick, axes[0])
+    roll = readJoystickAxis(joystick, axes[1])
+    pitch = readJoystickAxis(joystick, axes[2])
+    yaw = readJoystickAxis(joystick, axes[3])
+
+    return mode, thrust, roll, pitch, yaw
 
 
 def getAndEnableDevice(robot, timestep, device_name):
@@ -130,7 +127,6 @@ def main():
 
     gps = getAndEnableDevice(robot, timestep, 'gps')
     imu = getAndEnableDevice(robot, timestep, 'inertial unit')
-    camera = getAndEnableDevice(robot, timestep, 'camera')
     ranger = getAndEnableDevice(robot, timestep, 'range-finder')
 
     keyboard = robot.getKeyboard()
@@ -154,9 +150,6 @@ def main():
 
     buttons_down = {'hover': False, 'auto': False}
 
-    siminfo = {'mode': 'idle',
-               'setpoint': {'thrust': 0, 'roll': 0, 'pitch': 0, 'yaw': 0}}
-
     xyz = gps.getValues()
     rpy = imu.getRollPitchYaw()
 
@@ -169,26 +162,23 @@ def main():
 
     worldname = makeFixedSizePathArray(argv[1])
 
-    print(path)
-
     poselogname = makeFixedSizePathArray(argv[2])
+
+    cmdinfo = 'idle', 0, 0, 0, 0
 
     while True:
 
         if robot.step(timestep) == -1:
             break
 
-        getSimInfoFromJoystick(joystick, buttons_down, siminfo)
+        cmdinfo = getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo)
 
-        mode = MODES[siminfo['mode']]
-
-        s = siminfo['setpoint']
-        setpoint = s['thrust'], s['roll'], s['pitch'], s['yaw']
+        print(cmdinfo)
 
         '''
-        siminfo = (getSimInfoFromKeyboard(keyboard, mode)
+        cmdinfo = (getCommandInfoFromKeyboard(keyboard, mode)
                    if use_keyboard
-                   else getSimInfoFromJoystick(joystick, mode, buttons_down))
+                   else getCommandInfoFromJoystick(joystick, mode, buttons_down))
         '''
 
 
