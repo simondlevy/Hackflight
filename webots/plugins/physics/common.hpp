@@ -69,8 +69,6 @@ class PhysicsPluginHelper {
             // Get sim info from main program
             const auto buffer = (hf::siminfo_t *)dWebotsReceive(&bytes_received);
 
-            printf("received: %d\n", bytes_received);
-
             if (bytes_received == sizeof(hf::siminfo_t)) {
                 memcpy(&siminfo, buffer, sizeof(siminfo));
             }
@@ -84,7 +82,6 @@ class PhysicsPluginHelper {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                printf("framerate=%f\n", siminfo.framerate);
                 _simulator.init(siminfo.startingPose, siminfo.framerate);
             }
             _ready = true;
