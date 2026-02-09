@@ -192,13 +192,26 @@ def main():
                    else getCommandInfoFromJoystick(
                        joystick, buttons_down, cmdinfo))
 
-        print(cmdinfo)
+        # print(cmdinfo)
 
         siminfo = struct.pack(
-                'fffffffIffff', startpose[0], startpose[1], startpose[2],
-                startpose[3], startpose[4], startpose[5], 1/timestep,
-                MODES[cmdinfo[0]], cmdinfo[1], cmdinfo[2], cmdinfo[3],
-                cmdinfo[4])
+
+                'ddddddfIffff',
+
+                # starting pose
+                startpose[0], startpose[1], startpose[2],
+                startpose[3], startpose[4], startpose[5],
+
+                # framerate
+                timestep,
+
+                # mode
+                int(MODES[cmdinfo[0]]),
+
+                # setpoint
+                cmdinfo[1], cmdinfo[2], cmdinfo[3], cmdinfo[4])
+
+        emitter.send(siminfo)
 
 
 main()

@@ -25,10 +25,10 @@ namespace hf {
 
     typedef struct {
 
-        pose_t startingPose;
-        float framerate;
-        mode_e mode;
-        demands_t setpoint;
+        pose_t startingPose; // 48
+        float framerate;     // 4
+        mode_e mode;         // 4
+        demands_t setpoint;  // 16
 
     } siminfo_t;
 }
