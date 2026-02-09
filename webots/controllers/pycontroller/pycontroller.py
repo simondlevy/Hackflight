@@ -72,12 +72,31 @@ def getSimInfoFromKeyboard(keyboard, mode, buttons_down):
     return None
 
 
+def normalizeJoystickAxis(rawval):
+    return 2 * rawval / (2**16)
+
+
+def readJoystickRaw(joystick, index):
+    axis = abs(index) - 1
+    sign = -1 if index < 0 else +1
+    return sign * joystick.getAxisValue(axis)
+
+
+def readJoystickAxis(joystick, index):
+    return normalizeJoystickAxis(readJoystickRaw(joystick, index))
+
+
 def getSimInfoFromJoystick(joystick, buttons_down, siminfo):
+
     button = joystick.getPressedButton()
     mode = siminfo['mode']
     mode = checkButton(button, 5, 'hover', buttons_down, mode)
     mode = checkButton(button, 4, 'auto', buttons_down, mode)
     siminfo['mode'] = mode
+
+    axes = JOYSTICK_AXIS_MAP[joystick.model]
+
+    siminfo['setpoint']['thrust'] = readJoystickAxis(joystick, axes[0])
 
 
 def getAndEnableDevice(robot, timestep, device_name):
@@ -122,9 +141,10 @@ def main():
     if use_keyboard:
         printKeyboardInstructions()
 
-    buttons_down = {'hover':False, 'auto':False}
+    buttons_down = {'hover': False, 'auto': False}
 
-    siminfo = {'mode':'idle', 'setpoint':(0, 0, 0, 0)}
+    siminfo = {'mode': 'idle',
+               'setpoint': {'thrust': 0, 'roll': 0, 'pitch': 0, 'yaw': 0}}
 
     while True:
 
@@ -133,7 +153,8 @@ def main():
 
         getSimInfoFromJoystick(joystick, buttons_down, siminfo)
 
-        print(siminfo['mode'])
+        setpoint = siminfo['setpoint']
+        print('m=%10s | t=%3.3f' % (siminfo['mode'], setpoint['thrust']))
 
         '''
         siminfo = (getSimInfoFromKeyboard(keyboard, mode)
