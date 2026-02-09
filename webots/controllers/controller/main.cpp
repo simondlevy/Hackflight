@@ -16,10 +16,13 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// C/C++
+// C
 #include <unistd.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
+
+// C++
 #include <map>
 #include <string>
 using namespace std;
@@ -29,7 +32,6 @@ using namespace std;
 #include <num.hpp>
 #include <simulator/pose.h>
 #include <simulator/message.h>
-
 
 #include "platform.h"
 
@@ -251,8 +253,6 @@ int main(int argc, char ** argv)
         platform_get_vehicle_psi()
     };
 
-    FILE * setpointlogfp = fopen(argv[3], "w");
-
     while (true) {
 
         hf::siminfo_t siminfo = {};
@@ -289,15 +289,7 @@ int main(int argc, char ** argv)
         memcpy(&siminfo.startingPose, &startingPose, sizeof(hf::pose_t));
         siminfo.framerate = platform_get_framerate();
         platform_send_siminfo(&siminfo, sizeof(siminfo));
-
-        // Save mode and setpoint to logfile
-        const auto sp = siminfo.setpoint;
-        fprintf(setpointlogfp, "%d,%f,%f,%f,%f\n",
-                siminfo.mode, sp.thrust, sp.roll, sp.pitch, sp.yaw);
-
     }
-
-    fclose(setpointlogfp);
 
     platform_cleanup();
 
