@@ -17,6 +17,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
+import struct
+
 from controller import Robot
 
 JOYSTICK_AXIS_MAP = {
@@ -139,16 +141,15 @@ def main():
     timestep = int(robot.getBasicTimeStep())
 
     joystick = robot.getJoystick()
-
     joystick.enable(timestep)
+
+    keyboard = robot.getKeyboard()
+    keyboard.enable(timestep)
 
     gps = getAndEnableDevice(robot, timestep, 'gps')
     imu = getAndEnableDevice(robot, timestep, 'inertial unit')
     ranger = getAndEnableDevice(robot, timestep, 'range-finder')
     emitter = robot.getDevice('emitter')
-
-    keyboard = robot.getKeyboard()
-    keyboard.enable(timestep)
 
     robot.step(timestep)
 
@@ -172,9 +173,7 @@ def main():
     rpy = imu.getRollPitchYaw()
 
     # Negate for leftward/nose-right positive
-    startingPose = (xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2])
-
-    framerate = 1 / timestep
+    startpose = (xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2])
 
     cmdinfo = 'idle', 0, 0, 0, 0
 
@@ -194,6 +193,12 @@ def main():
                        joystick, buttons_down, cmdinfo))
 
         print(cmdinfo)
+
+        siminfo = struct.pack(
+                'fffffffIffff', startpose[0], startpose[1], startpose[2],
+                startpose[3], startpose[4], startpose[5], 1/timestep,
+                MODES[cmdinfo[0]], cmdinfo[1], cmdinfo[2], cmdinfo[3],
+                cmdinfo[4])
 
 
 main()
