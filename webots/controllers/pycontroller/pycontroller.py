@@ -19,9 +19,7 @@
 
 from sys import argv
 
-from controller import Robot, Joystick
-
-TIME_STEP = 32
+from controller import Robot
 
 MODE_IDLE =  0
 MODE_ARMED = 1
@@ -37,11 +35,11 @@ JOYSTICK_AXIS_MAP = {
 
 
 def printKeyboardInstructions():
-    print('Using keyboard instead:\n');
-    print('- Use Enter to take off and land\n');
-    print('- Use W and S to go up and down\n');
-    print('- Use arrow keys to move horizontally\n');
-    print('- Use Q and E to change heading\n');
+    print('Using keyboard instead:\n')
+    print('- Use Enter to take off and land\n')
+    print('- Use W and S to go up and down\n')
+    print('- Use arrow keys to move horizontally\n')
+    print('- Use Q and E to change heading\n')
 
 
 def reportUnrecognizedJoystick(joystick):
@@ -49,6 +47,10 @@ def reportUnrecognizedJoystick(joystick):
     for k in range(joystick.number_of_axes):
         print('%2d=%+6d |' % (k+1, joystick.getAxisValue(k)), end=' ')
     print()
+
+
+def getSimInfoFromKeyboard(mode):
+    print('mode=', mode)
 
 
 def main():
@@ -59,28 +61,48 @@ def main():
 
     robot = Robot()
 
+    timestep = int(robot.getBasicTimeStep())
+
     joystick = robot.getJoystick()
 
-    joystick.enable(TIME_STEP)
+    joystick.enable(timestep)
+
+    gps = robot.getDevice('gps')
+    gps.enable(timestep)
+
+    img = robot.getDevice('inertial unit')
+    img.enable(timestep)
+
+    camera = robot.getDevice('camera')
+    camera.enable(timestep)
+
+    ranger = robot.getDevice('range-finder')
+    ranger.enable(timestep)
+
+    keyboard = robot.getKeyboard()
+    keyboard.enable(timestep)
 
     did_warn = False
 
     while True:
 
-        if robot.step(TIME_STEP) == -1:
+        if robot.step(timestep) == -1:
             break
 
         if joystick.is_connected:
 
             if joystick.model in JOYSTICK_AXIS_MAP:
-                print('okay')
+                print(timestep)
 
             else:
                 reportUnrecognizedJoystick(joystick)
+                getSimInfoFromKeyboard(mode)
 
-        elif not did_warn:
-            printKeyboardInstructions()
+        else:
+            if not did_warn:
+                printKeyboardInstructions()
+                did_warn = True
+            getSimInfoFromKeyboard(mode)
 
-        did_warn = True
 
 main()
