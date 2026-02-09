@@ -34,6 +34,13 @@ JOYSTICK_AXIS_MAP = {
 }
 
 
+def start_motor(quad, motor_name, direction):
+
+    motor = quad.getDevice(motor_name)
+    motor.setPosition(float('inf'))
+    motor.setVelocity(direction * 60)
+
+
 def printKeyboardInstructions():
     print('Using keyboard instead:\n')
     print('- Use Enter to take off and land\n')
@@ -49,8 +56,8 @@ def reportUnrecognizedJoystick(joystick):
     print()
 
 
-def getSimInfoFromKeyboard(mode):
-    print('mode=', mode)
+def getSimInfoFromKeyboard(keyboard, mode):
+    pass
 
 
 def main():
@@ -82,27 +89,32 @@ def main():
     keyboard = robot.getKeyboard()
     keyboard.enable(timestep)
 
-    did_warn = False
+    robot.step(timestep)
+
+    use_keyboard = False
+
+    if joystick.is_connected:
+
+        if joystick.model not in JOYSTICK_AXIS_MAP:
+            print('Unrecognized joystick %s' % joystick.model)
+            use_keyboard = True
+
+    else:
+        use_keyboard = True
+
+    if use_keyboard:
+        printKeyboardInstructions()
 
     while True:
 
         if robot.step(timestep) == -1:
             break
 
-        if joystick.is_connected:
-
-            if joystick.model in JOYSTICK_AXIS_MAP:
-                print(timestep)
-
-            else:
-                reportUnrecognizedJoystick(joystick)
-                getSimInfoFromKeyboard(mode)
+        if use_keyboard:
+           getSimInfoFromKeyboard(keyboard, mode)
 
         else:
-            if not did_warn:
-                printKeyboardInstructions()
-                did_warn = True
-            getSimInfoFromKeyboard(mode)
+            print('okay')
 
 
 main()
