@@ -30,9 +30,11 @@ MODE_AUTONOMOUS = 3
 MODE_LANDING = 4
 MODE_PANIC = 5
 
-JOYSTICK_NONE = 0
-JOYSTICK_UNRECOGNIZED = 1
-JOYSTICK_RECOGNIZED = 2
+JOYSTICK_AXIS_MAP = {
+    'Logitech Gamepad F310': (-2,  4, -5, 1) ,
+    'Microsoft X-Box 360 pad': (-2,  4, -5, 1 )
+}
+
 
 def printKeyboardInstructions():
     print('Using keyboard instead:\n');
@@ -40,6 +42,13 @@ def printKeyboardInstructions():
     print('- Use W and S to go up and down\n');
     print('- Use arrow keys to move horizontally\n');
     print('- Use Q and E to change heading\n');
+
+
+def reportUnrecognizedJoystick(joystick):
+    print('Unrecognized joystick %s with axes ' % joystick.model, end='')
+    for k in range(joystick.number_of_axes):
+        print('%2d=%+6d |' % (k+1, joystick.getAxisValue(k)), end=' ')
+    print()
 
 
 def main():
@@ -62,7 +71,12 @@ def main():
             break
 
         if joystick.is_connected:
-            pass
+
+            if joystick.model in JOYSTICK_AXIS_MAP:
+                print('okay')
+
+            else:
+                reportUnrecognizedJoystick(joystick)
 
         elif not did_warn:
             printKeyboardInstructions()
