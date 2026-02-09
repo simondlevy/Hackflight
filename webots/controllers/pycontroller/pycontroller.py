@@ -111,10 +111,17 @@ def getCommandInfoFromKeyboard(keyboard, keys_down, cmdinfo):
 
     mode = getModeFromButton(key, 4, 32, keys_down, cmdinfo)
 
-    thrust = 0  # readJoystickAxis(joystick, axes[0])
-    roll = 0  # readJoystickAxis(joystick, axes[1])
-    pitch = 0  # readJoystickAxis(joystick, axes[2])
-    yaw = 0  # readJoystickAxis(joystick, axes[3])
+    thrust = +1 if key == ord('W') else -1 if key == ord('S') else 0
+
+    roll = (+1 if key == keyboard.RIGHT else
+            -1 if key == keyboard.LEFT else
+            0)
+
+    pitch = (+1 if key == keyboard.UP else
+             -1 if key == keyboard.DOWN else
+             0)
+
+    yaw = +0.5 if key == ord('E') else -0.5 if key == ord('Q') else 0
 
     return mode, thrust, roll, pitch, yaw
 
