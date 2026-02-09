@@ -44,17 +44,19 @@ static simsens::Rangefinder * _rangefinder;
 
 static simsens::RangefinderVisualizer * _rangefinderVisualizer;
 
-static void load(const hf::siminfo_t & siminfo,
-        simsens::World & world,
-        simsens::Robot & robot,
-        FILE ** logfpp)
+static char * worldname()
+{
+    return getenv(WORLD_VARIABLE_NAME);
+}
+
+static void load(
+        simsens::World & world, simsens::Robot & robot, FILE ** logfpp)
 {
     const auto pwd = getenv(PATH_VARIABLE_NAME);
-    const auto worldname = getenv(WORLD_VARIABLE_NAME);
 
     char path[1000] = {};
 
-    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname);
+    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
     simsens::WorldParser::parse(path, world);
 
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
@@ -64,7 +66,7 @@ static void load(const hf::siminfo_t & siminfo,
 
     _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
 
-    sprintf(path, "%s/%s", siminfo.path, LOG_FILE_NAME);
+    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     *logfpp = fopen(path, "w");
 }
 
@@ -81,13 +83,13 @@ static bool run_normal(hf::siminfo_t & siminfo)
     // In autonomous mode, use current pose to get setpoints
     if (autonomous) {
 
-        if (string(siminfo.worldname) == "twoexit") {
+        if (string(worldname()) == "twoexit") {
             hf::RangefinderSetpoint::runTwoExit(
                     _rangefinder_distances_mm, siminfo.setpoint);
         }
 
         else {
-            printf("No autopilot for world %s\n", siminfo.worldname);
+            printf("No autopilot for world %s\n", worldname());
         }
     }
 
@@ -96,7 +98,7 @@ static bool run_normal(hf::siminfo_t & siminfo)
 
     // Load world and robot info first time around
     if (!_rangefinder) {
-        load(siminfo, _world, _robot, &_logfp);
+        load(_world, _robot, &_logfp);
     }
 
     // Get simulated rangefinder distances

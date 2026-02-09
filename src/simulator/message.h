@@ -30,8 +30,5 @@ namespace hf {
         mode_e mode;
         demands_t setpoint;
 
-        char path[200];
-        char worldname[200];
-
     } siminfo_t;
 }

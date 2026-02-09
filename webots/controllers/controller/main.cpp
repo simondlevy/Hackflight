@@ -236,10 +236,8 @@ static void getSimInfoFromJoystick(hf::siminfo_t & siminfo, hf::mode_e & mode)
     siminfo.setpoint.thrust = readJoystickAxis(axes.throttle);
 }
 
-int main(int argc, char ** argv) 
+int main() 
 {
-    (void)argc;
-
     hf::mode_e mode = hf::MODE_IDLE;
 
     platform_init();
@@ -256,9 +254,6 @@ int main(int argc, char ** argv)
     while (true) {
 
         hf::siminfo_t siminfo = {};
-
-        strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
-        strcpy(siminfo.worldname, argv[1]);
 
         if (!platform_step()) {
             break;
