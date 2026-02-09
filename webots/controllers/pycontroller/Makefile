@@ -12,17 +12,20 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
+# Command-line variable; e.g. make run world=twoexit
 world = simple
-poselogname = poselog.csv
-setpointlogname = setpointlog.csv
-# ----------------------------------------------------------------------------
 
 WORLDS_DIR = ../../worlds
+
+# https://stackoverflow.com/a/49524393
+.EXPORT_ALL_VARIABLES:
+WEBOTS_WORLD = $(world)
+WEBOTS_PATH = $(shell pwd)
 
 run:
 	webots $(WORLDS_DIR)/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect \
-		./pycontroller.py $(world) $(poselogname) $(setpointlogname)
+		./pycontroller.py $(world)
 
 edit:
 	vim pycontroller.py 

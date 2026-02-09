@@ -17,9 +17,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from sys import argv
-from os import getcwd
-
 from controller import Robot
 
 JOYSTICK_AXIS_MAP = {
@@ -108,13 +105,6 @@ def getAndEnableDevice(robot, timestep, device_name):
     return device
 
 
-def makeFixedSizePathArray(path):
-    # https://stackoverflow.com/a/24271591
-    by = bytes(path, 'utf-8')
-    by += b'0' * (200 - len(by))
-    return by
-
-
 def main():
 
     robot = Robot()
@@ -158,12 +148,6 @@ def main():
     startingPose = (xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2])
 
     framerate = 1 / timestep
-
-    path = makeFixedSizePathArray(getcwd())
-
-    worldname = makeFixedSizePathArray(argv[1])
-
-    poselogname = makeFixedSizePathArray(argv[2])
 
     cmdinfo = 'idle', 0, 0, 0, 0
 
