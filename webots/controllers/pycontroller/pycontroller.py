@@ -80,19 +80,9 @@ def getSimInfoFromKeyboard(keyboard, mode, buttons_down):
 
 
 def getSimInfoFromJoystick(joystick, buttons_down):
-
     button = joystick.getPressedButton()
-
     checkButton(button, 5, 'hover', buttons_down)
-
-    if button == 5:
-        if not buttons_down['hover']:
-            print('switch hover')
-        buttons_down['hover'] = True
-    else:
-        buttons_down['hover'] = False
-
-
+    checkButton(button, 4, 'auto', buttons_down)
 
 
 def getAndEnableDevice(robot, timestep, device_name):
