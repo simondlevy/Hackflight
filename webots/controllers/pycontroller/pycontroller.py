@@ -60,6 +60,11 @@ def getSimInfoFromKeyboard(keyboard, mode):
     pass
 
 
+def getAndEnableDevice(robot, timestep, device_name):
+    device = robot.getDevice(device_name)
+    device.enable(timestep)
+    return device
+
 def main():
 
     setpointlogfp = open(argv[3], 'w')
@@ -74,17 +79,10 @@ def main():
 
     joystick.enable(timestep)
 
-    gps = robot.getDevice('gps')
-    gps.enable(timestep)
-
-    img = robot.getDevice('inertial unit')
-    img.enable(timestep)
-
-    camera = robot.getDevice('camera')
-    camera.enable(timestep)
-
-    ranger = robot.getDevice('range-finder')
-    ranger.enable(timestep)
+    gps = getAndEnableDevice(robot, timestep, 'gps')
+    img = getAndEnableDevice(robot, timestep, 'inertial unit')
+    camera = getAndEnableDevice(robot, timestep, 'camera')
+    ranger = getAndEnableDevice(robot, timestep, 'range-finder')
 
     keyboard = robot.getKeyboard()
     keyboard.enable(timestep)
