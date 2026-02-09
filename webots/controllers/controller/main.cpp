@@ -256,9 +256,9 @@ int main(int argc, char ** argv)
     while (true) {
 
         hf::siminfo_t siminfo = {};
+
         strcpy(siminfo.path, getcwd(siminfo.path, sizeof(siminfo.path)));
         strcpy(siminfo.worldname, argv[1]);
-        strcpy(siminfo.poselogname, argv[2]);
 
         if (!platform_step()) {
             break;

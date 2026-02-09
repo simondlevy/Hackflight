@@ -32,7 +32,6 @@ namespace hf {
 
         char path[200];
         char worldname[200];
-        char poselogname[200];
 
     } siminfo_t;
 }
