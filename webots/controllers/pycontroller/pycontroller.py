@@ -111,7 +111,7 @@ def getAndEnableDevice(robot, timestep, device_name):
 
 def main():
 
-    setpointlogfp = open(argv[3], 'w')
+    logfile = open(argv[3], 'w')
 
     robot = Robot()
 
@@ -158,8 +158,9 @@ def main():
         getSimInfoFromJoystick(joystick, buttons_down, siminfo)
 
         s = siminfo['setpoint']
-        print('m=%10s | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f' %
+        logfile.write('%s,%f,%f,%f,%f\n' % 
               (siminfo['mode'], s['thrust'], s['roll'], s['pitch'], s['yaw']))
+        logfile.flush()
 
         '''
         siminfo = (getSimInfoFromKeyboard(keyboard, mode)
