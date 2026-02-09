@@ -128,6 +128,7 @@ def main():
     gps = getAndEnableDevice(robot, timestep, 'gps')
     imu = getAndEnableDevice(robot, timestep, 'inertial unit')
     ranger = getAndEnableDevice(robot, timestep, 'range-finder')
+    emitter = robot.getDevice('emitter')
 
     keyboard = robot.getKeyboard()
     keyboard.enable(timestep)
@@ -173,7 +174,9 @@ def main():
 
         cmdinfo = getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo)
 
-        print(cmdinfo)
+        # print(cmdinfo)
+
+        print(emitter)
 
         '''
         cmdinfo = (getCommandInfoFromKeyboard(keyboard, mode)
