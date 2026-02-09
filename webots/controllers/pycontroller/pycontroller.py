@@ -57,8 +57,11 @@ def reportUnrecognizedJoystick(joystick):
 
 
 def getSimInfoFromKeyboard(keyboard, mode):
-    pass
+    return None
 
+
+def getSimInfoFromJoystick(joystick, mode):
+    return None
 
 def getAndEnableDevice(robot, timestep, device_name):
     device = robot.getDevice(device_name)
@@ -108,11 +111,9 @@ def main():
         if robot.step(timestep) == -1:
             break
 
-        if use_keyboard:
-           getSimInfoFromKeyboard(keyboard, mode)
-
-        else:
-            print('okay')
+        siminfo = (getSimInfoFromKeyboard(keyboard, mode)
+                   if use_keyboard
+                   else getSimInfoFromJoystick(joystick, mode))
 
 
 main()
