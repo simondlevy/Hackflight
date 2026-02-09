@@ -82,13 +82,18 @@ def readJoystickAxis(joystick, index):
     return normalizeJoystickAxis(readJoystickRaw(joystick, index))
 
 
-def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
-
-    button = joystick.getPressedButton()
+def getModeFromButton(
+        button, hover_button, auto_button, buttons_down, cmdinfo):
 
     mode = cmdinfo[0]
-    mode = checkPressed(button, 5, 'hover', buttons_down, mode)
-    mode = checkPressed(button, 4, 'auto', buttons_down, mode)
+    mode = checkPressed(button, hover_button, 'hover', buttons_down, mode)
+    return checkPressed(button, auto_button, 'auto', buttons_down, mode)
+
+
+def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
+
+    mode = getModeFromButton(joystick.getPressedButton(), 5, 4, buttons_down,
+                             cmdinfo)
 
     axes = JOYSTICK_AXIS_MAP[joystick.model]
 
@@ -99,18 +104,17 @@ def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
 
     return mode, thrust, roll, pitch, yaw
 
+
 def getCommandInfoFromKeyboard(keyboard, keys_down, cmdinfo):
 
     key = keyboard.getKey()
 
-    mode = cmdinfo[0]
-    mode = checkPressed(key, 4, 'hover', keys_down, mode)
-    mode = checkPressed(key, 32, 'auto', keys_down, mode)
+    mode = getModeFromButton(key, 4, 32, keys_down, cmdinfo)
 
-    thrust = 0 # readJoystickAxis(joystick, axes[0])
-    roll = 0 # readJoystickAxis(joystick, axes[1])
-    pitch = 0 # readJoystickAxis(joystick, axes[2])
-    yaw = 0 # readJoystickAxis(joystick, axes[3])
+    thrust = 0  # readJoystickAxis(joystick, axes[0])
+    roll = 0  # readJoystickAxis(joystick, axes[1])
+    pitch = 0  # readJoystickAxis(joystick, axes[2])
+    yaw = 0  # readJoystickAxis(joystick, axes[3])
 
     return mode, thrust, roll, pitch, yaw
 
@@ -183,5 +187,6 @@ def main():
                        joystick, buttons_down, cmdinfo))
 
         print(cmdinfo)
+
 
 main()
