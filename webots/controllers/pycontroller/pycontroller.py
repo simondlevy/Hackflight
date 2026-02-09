@@ -27,9 +27,9 @@ JOYSTICK_AXIS_MAP = {
 MODES = {'idle': 0, 'hovering': 2, 'autonomous': 2, 'landing': 3}
 
 
-def start_motor(quad, motor_name, direction):
+def startMotor(robot, motor_name, direction):
 
-    motor = quad.getDevice(motor_name)
+    motor = robot.getDevice(motor_name)
     motor.setPosition(float('inf'))
     motor.setVelocity(direction * 60)
 
@@ -85,6 +85,7 @@ def readJoystickAxis(joystick, index):
 def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
 
     button = joystick.getPressedButton()
+
     mode = cmdinfo[0]
     mode = checkJoystickButton(button, 5, 'hover', buttons_down, mode)
     mode = checkJoystickButton(button, 4, 'auto', buttons_down, mode)
@@ -95,6 +96,19 @@ def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
     roll = readJoystickAxis(joystick, axes[1])
     pitch = readJoystickAxis(joystick, axes[2])
     yaw = readJoystickAxis(joystick, axes[3])
+
+    return mode, thrust, roll, pitch, yaw
+
+def getCommandInfoFromKeyboard(keyboard, buttons_down, cmdinfo):
+
+    mode = cmdinfo[0]
+    # mode = checkJoystickButton(button, 5, 'hover', buttons_down, mode)
+    # mode = checkJoystickButton(button, 4, 'auto', buttons_down, mode)
+
+    thrust = 0 # readJoystickAxis(joystick, axes[0])
+    roll = 0 # readJoystickAxis(joystick, axes[1])
+    pitch = 0 # readJoystickAxis(joystick, axes[2])
+    yaw = 0 # readJoystickAxis(joystick, axes[3])
 
     return mode, thrust, roll, pitch, yaw
 
@@ -151,22 +165,21 @@ def main():
 
     cmdinfo = 'idle', 0, 0, 0, 0
 
+    startMotor(robot, 'motor1', -1)
+    startMotor(robot, 'motor2', +1)
+    startMotor(robot, 'motor3', +1)
+    startMotor(robot, 'motor4', -1)
+
     while True:
 
         if robot.step(timestep) == -1:
             break
 
-        cmdinfo = getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo)
-
-        # print(cmdinfo)
-
-        print(emitter)
-
-        '''
-        cmdinfo = (getCommandInfoFromKeyboard(keyboard, mode)
+        cmdinfo = (getCommandInfoFromKeyboard(keyboard, buttons_down, cmdinfo)
                    if use_keyboard
-                   else getCommandInfoFromJoystick(joystick, mode, buttons_down))
-        '''
+                   else getCommandInfoFromJoystick(
+                       joystick, buttons_down, cmdinfo))
 
+        print(cmdinfo)
 
 main()
