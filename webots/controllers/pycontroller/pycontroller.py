@@ -18,6 +18,7 @@
 '''
 
 from sys import argv
+from os import getcwd
 
 from controller import Robot
 
@@ -110,9 +111,14 @@ def getAndEnableDevice(robot, timestep, device_name):
     return device
 
 
-def main():
+def makeFixedSizePathArray(path):
+    # https://stackoverflow.com/a/24271591
+    by = bytes(path, 'utf-8')
+    by += b'0' * (200 - len(by))
+    return by
 
-    logfile = open(argv[3], 'w')
+
+def main():
 
     robot = Robot()
 
@@ -157,6 +163,16 @@ def main():
     # Negate for leftward/nose-right positive
     startingPose = (xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2])
 
+    framerate = 1 / timestep
+
+    path = makeFixedSizePathArray(getcwd())
+
+    worldname = makeFixedSizePathArray(argv[1])
+
+    print(path)
+
+    poselogname = makeFixedSizePathArray(argv[2])
+
     while True:
 
         if robot.step(timestep) == -1:
@@ -164,10 +180,10 @@ def main():
 
         getSimInfoFromJoystick(joystick, buttons_down, siminfo)
 
+        mode = MODES[siminfo['mode']]
+
         s = siminfo['setpoint']
-        logfile.write('%d,%f,%f,%f,%f\n' % (MODES[siminfo['mode']],
-               s['thrust'], s['roll'], s['pitch'], s['yaw']))
-        logfile.flush()
+        setpoint = s['thrust'], s['roll'], s['pitch'], s['yaw']
 
         '''
         siminfo = (getSimInfoFromKeyboard(keyboard, mode)
