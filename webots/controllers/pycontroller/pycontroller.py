@@ -72,11 +72,12 @@ def getSimInfoFromKeyboard(keyboard, mode, buttons_down):
     return None
 
 
-def getSimInfoFromJoystick(joystick, buttons_down, mode):
+def getSimInfoFromJoystick(joystick, buttons_down, siminfo):
     button = joystick.getPressedButton()
+    mode = siminfo['mode']
     mode = checkButton(button, 5, 'hover', buttons_down, mode)
     mode = checkButton(button, 4, 'auto', buttons_down, mode)
-    return mode
+    siminfo['mode'] = mode
 
 
 def getAndEnableDevice(robot, timestep, device_name):
@@ -88,8 +89,6 @@ def getAndEnableDevice(robot, timestep, device_name):
 def main():
 
     setpointlogfp = open(argv[3], 'w')
-
-    mode = 'idle'
 
     robot = Robot()
 
@@ -125,14 +124,16 @@ def main():
 
     buttons_down = {'hover':False, 'auto':False}
 
+    siminfo = {'mode':'idle', 'setpoint':(0, 0, 0, 0)}
+
     while True:
 
         if robot.step(timestep) == -1:
             break
 
-        mode = getSimInfoFromJoystick(joystick, buttons_down, mode)
+        getSimInfoFromJoystick(joystick, buttons_down, siminfo)
 
-        print(mode)
+        print(siminfo['mode'])
 
         '''
         siminfo = (getSimInfoFromKeyboard(keyboard, mode)
