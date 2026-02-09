@@ -61,6 +61,9 @@ def getSimInfoFromKeyboard(keyboard, mode):
 
 
 def getSimInfoFromJoystick(joystick, mode):
+    axes = JOYSTICK_AXIS_MAP[joystick.model]
+    button = joystick.getPressedButton()
+    print(button)
     return None
 
 def getAndEnableDevice(robot, timestep, device_name):
