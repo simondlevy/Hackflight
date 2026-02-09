@@ -21,7 +21,7 @@ from sys import argv
 
 from controller import Robot
 
-MODE_IDLE =  0
+MODE_IDLE = 0
 MODE_ARMED = 1
 MODE_HOVERING = 2
 MODE_AUTONOMOUS = 3
@@ -29,8 +29,8 @@ MODE_LANDING = 4
 MODE_PANIC = 5
 
 JOYSTICK_AXIS_MAP = {
-    'Logitech Gamepad F310': (-2,  4, -5, 1) ,
-    'Microsoft X-Box 360 pad': (-2,  4, -5, 1 )
+    'Logitech Gamepad F310': (-2, 4, -5, 1),
+    'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
 }
 
 
@@ -56,20 +56,50 @@ def reportUnrecognizedJoystick(joystick):
     print()
 
 
-def getSimInfoFromKeyboard(keyboard, mode):
+def switchMode(what, mode):
+    return (
+        MODE_HOVERING if mode == MODE_IDLE and what == 'hover' else
+        MODE_LANDING if mode == MODE_HOVERING and what == 'hover' else
+        MODE_AUTONOMOUS if mode == MODE_HOVERING and what == 'auto' else
+        MODE_HOVERING if mode == MODE_AUTONOMOUS and what == 'auto' else
+        mode)
+
+
+def checkButton(button, target, what, buttons_down):
+
+    if button == target:
+        if not buttons_down[what]:
+            print('switch ' + what)
+        buttons_down[what] = True
+    else:
+        buttons_down[what] = False
+
+
+def getSimInfoFromKeyboard(keyboard, mode, buttons_down):
     return None
 
 
-def getSimInfoFromJoystick(joystick, mode):
-    axes = JOYSTICK_AXIS_MAP[joystick.model]
+def getSimInfoFromJoystick(joystick, buttons_down):
+
     button = joystick.getPressedButton()
-    print(button)
-    return None
+
+    checkButton(button, 5, 'hover', buttons_down)
+
+    if button == 5:
+        if not buttons_down['hover']:
+            print('switch hover')
+        buttons_down['hover'] = True
+    else:
+        buttons_down['hover'] = False
+
+
+
 
 def getAndEnableDevice(robot, timestep, device_name):
     device = robot.getDevice(device_name)
     device.enable(timestep)
     return device
+
 
 def main():
 
@@ -109,14 +139,20 @@ def main():
     if use_keyboard:
         printKeyboardInstructions()
 
+    buttons_down = {'hover':False, 'auto':False}
+
     while True:
 
         if robot.step(timestep) == -1:
             break
 
+        getSimInfoFromJoystick(joystick, buttons_down)
+
+        '''
         siminfo = (getSimInfoFromKeyboard(keyboard, mode)
                    if use_keyboard
-                   else getSimInfoFromJoystick(joystick, mode))
+                   else getSimInfoFromJoystick(joystick, mode, buttons_down))
+        '''
 
 
 main()
