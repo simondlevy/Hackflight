@@ -26,6 +26,7 @@ JOYSTICK_AXIS_MAP = {
     'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
 }
 
+MODES = {'idle': 0, 'hovering': 2, 'autonomous': 2, 'landing': 3}
 
 def start_motor(quad, motor_name, direction):
 
@@ -122,7 +123,7 @@ def main():
     joystick.enable(timestep)
 
     gps = getAndEnableDevice(robot, timestep, 'gps')
-    img = getAndEnableDevice(robot, timestep, 'inertial unit')
+    imu = getAndEnableDevice(robot, timestep, 'inertial unit')
     camera = getAndEnableDevice(robot, timestep, 'camera')
     ranger = getAndEnableDevice(robot, timestep, 'range-finder')
 
@@ -150,6 +151,12 @@ def main():
     siminfo = {'mode': 'idle',
                'setpoint': {'thrust': 0, 'roll': 0, 'pitch': 0, 'yaw': 0}}
 
+    xyz = gps.getValues()
+    rpy = imu.getRollPitchYaw()
+
+    # Negate for leftward/nose-right positive
+    startingPose = (xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2])
+
     while True:
 
         if robot.step(timestep) == -1:
@@ -158,8 +165,8 @@ def main():
         getSimInfoFromJoystick(joystick, buttons_down, siminfo)
 
         s = siminfo['setpoint']
-        logfile.write('%s,%f,%f,%f,%f\n' % 
-              (siminfo['mode'], s['thrust'], s['roll'], s['pitch'], s['yaw']))
+        logfile.write('%d,%f,%f,%f,%f\n' % (MODES[siminfo['mode']],
+               s['thrust'], s['roll'], s['pitch'], s['yaw']))
         logfile.flush()
 
         '''
