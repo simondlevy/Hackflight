@@ -451,7 +451,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "teensy2-bottom-minimal.kicad_pro",
+    "filename": "teensy-minimal.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -490,7 +490,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "teensy-minimal.stl",
       "svg": "",
       "vrml": ""
     },
