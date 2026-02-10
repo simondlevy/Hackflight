@@ -71,7 +71,7 @@ static void load(
 }
 
 // Returns false on collision, true otherwise
-static bool run_normal(hf::siminfo_t & siminfo)
+static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
 {
     static simsens::World _world;
     static simsens::Robot _robot;
@@ -141,7 +141,7 @@ DLLEXPORT void webots_physics_step()
 
     else {
 
-        hf::siminfo_t siminfo = {};
+        PhysicsPluginHelper::siminfo_t siminfo = {};
 
         if (PhysicsPluginHelper::get_siminfo(siminfo)) {
 

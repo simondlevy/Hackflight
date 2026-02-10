@@ -21,7 +21,8 @@
 
 // Hackflight
 #define _MAIN
-#include <simulator/message.h>
+#include <datatypes.h>
+#include <simulator/pose.h>
 #include <simulator/simulator.hpp>
 
 static constexpr char ROBOT_NAME[] = "diyquad";
@@ -58,7 +59,16 @@ class PhysicsPluginHelper {
 
     public:
 
-        static bool get_siminfo(hf::siminfo_t & siminfo)
+        typedef struct {
+
+            hf::pose_t startingPose;
+            float framerate;
+            hf::mode_e mode;
+            hf::demands_t setpoint;
+
+        } siminfo_t;
+
+        static bool get_siminfo(siminfo_t & siminfo)
         {
             if (_robot == NULL) {
                 return false;
@@ -67,9 +77,9 @@ class PhysicsPluginHelper {
             int bytes_received = 0;
 
             // Get sim info from main program
-            const auto buffer = (hf::siminfo_t *)dWebotsReceive(&bytes_received);
+            const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
 
-            if (bytes_received == sizeof(hf::siminfo_t)) {
+            if (bytes_received == sizeof(siminfo_t)) {
                 memcpy(&siminfo, buffer, sizeof(siminfo));
             }
 
@@ -77,7 +87,7 @@ class PhysicsPluginHelper {
             return siminfo.framerate > 0;
         }
 
-        static hf::pose_t get_pose_from_siminfo(const hf::siminfo_t & siminfo)
+        static hf::pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
         {
             // Set pose first time around
             static bool _ready;
