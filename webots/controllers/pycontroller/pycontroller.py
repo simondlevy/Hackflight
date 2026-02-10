@@ -26,7 +26,9 @@ JOYSTICK_AXIS_MAP = {
     'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
 }
 
-MODES = {'idle': 0, 'hovering': 2, 'autonomous': 2, 'landing': 3}
+MODES = {'idle': 0, 'hovering': 2, 'autonomous': 2, 'landing': 4}
+
+ZDIST_LANDING_MAX_M = 0.01
 
 
 def startMotor(robot, motor_name, direction):
@@ -192,22 +194,23 @@ def main():
                    else getCommandInfoFromJoystick(
                        joystick, buttons_down, cmdinfo))
 
+        mode = cmdinfo[0]
+
+        print(mode)
+
+        # On descent, switch mode to idle when close enough to ground
+        if (mode == 'landing' and
+            (gps.getValues()[2] - startpose[2]) < ZDIST_LANDING_MAX_M):
+            mode = 'idle'
+
+        # Send siminfo to fast thread
         emitter.send(struct.pack(
-
                 'ddddddfIffff',
-
-                # starting pose
-                startpose[0], startpose[1], startpose[2],
+                startpose[0], startpose[1], startpose[2],  # starting pose
                 startpose[3], startpose[4], startpose[5],
-
-                # framerate
-                timestep,
-
-                # mode
-                int(MODES[cmdinfo[0]]),
-
-                # setpoint
-                cmdinfo[1], cmdinfo[2], cmdinfo[3], cmdinfo[4]))
+                timestep,                                 # framerate
+                int(MODES[mode]),                         # mode
+                cmdinfo[1], cmdinfo[2], cmdinfo[3], cmdinfo[4]))  # setpoint
 
 
 main()
