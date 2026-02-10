@@ -26,7 +26,7 @@ JOYSTICK_AXIS_MAP = {
     'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
 }
 
-MODES = {'idle': 0, 'hovering': 2, 'autonomous': 2, 'landing': 4}
+MODES = {'idle': 0, 'hovering': 2, 'autonomous': 3, 'landing': 4}
 
 ZDIST_LANDING_MAX_M = 0.01
 
@@ -150,7 +150,6 @@ def main():
 
     gps = getAndEnableDevice(robot, timestep, 'gps')
     imu = getAndEnableDevice(robot, timestep, 'inertial unit')
-    ranger = getAndEnableDevice(robot, timestep, 'range-finder')
     emitter = robot.getDevice('emitter')
 
     robot.step(timestep)
@@ -196,12 +195,10 @@ def main():
 
         mode = cmdinfo[0]
 
-        print(mode)
-
         # On descent, switch mode to idle when close enough to ground
         if (mode == 'landing' and
-            (gps.getValues()[2] - startpose[2]) < ZDIST_LANDING_MAX_M):
-            mode = 'idle'
+           (gps.getValues()[2] - startpose[2]) < ZDIST_LANDING_MAX_M):
+           mode = 'idle'
 
         # Send siminfo to fast thread
         emitter.send(struct.pack(

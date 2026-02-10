@@ -22,13 +22,15 @@ WORLDS_DIR = ../../worlds
 WEBOTS_WORLD = $(world)
 WEBOTS_PATH = $(shell pwd)
 
+FILES_TO_REMOVE += *.csv __pycache__/
+
 run:
 	webots $(WORLDS_DIR)/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect \
-		./pycontroller.py $(world)
+		./standard.py $(world)
 
 edit:
-	vim pycontroller.py 
+	vim standard.py 
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
