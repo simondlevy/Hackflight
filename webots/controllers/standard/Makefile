@@ -12,22 +12,25 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Command-line variables; e.g.:
-#   make run world=simple logfile=../controller/log.csv
-#
-world = twoexit
-logfile = ../../../simtest/log.csv
+# Command-line variable; e.g. make run world=twoexit
+world = simple
 
 WORLDS_DIR = ../../worlds
 
+# https://stackoverflow.com/a/49524393
+.EXPORT_ALL_VARIABLES:
+WEBOTS_WORLD = $(world)
+WEBOTS_PATH = $(shell pwd)
+
+FILES_TO_REMOVE += *.csv __pycache__/
+
 run:
-	sed 's/physics.*//' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/$(world)_playback.wbt
-	webots $(WORLDS_DIR)/$(world)_playback.wbt &
+	webots $(WORLDS_DIR)/$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect \
-		./playback.py $(logfile)
+		./standard.py $(world)
 
 edit:
-	vim playback.py
+	vim standard.py 
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

@@ -16,6 +16,10 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// C
+#include <stdlib.h>
+#include <unistd.h>
+
 // Webots
 #include "../common.hpp"
 
@@ -31,33 +35,43 @@
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
+static const char * LOG_FILE_NAME = "log.csv";
+
+static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
+static const char * WORLD_VARIABLE_NAME = "WEBOTS_WORLD";
+
 static simsens::Rangefinder * _rangefinder;
 
 static simsens::RangefinderVisualizer * _rangefinderVisualizer;
 
-static void load(const hf::siminfo_t & siminfo,
-        simsens::World & world,
-        simsens::Robot & robot,
-        FILE ** logfpp)
+static char * worldname()
 {
-    char path[1000];
+    return getenv(WORLD_VARIABLE_NAME);
+}
 
-    sprintf(path, "%s/../../worlds/%s.wbt", siminfo.path, siminfo.worldname);
+static void load(
+        simsens::World & world, simsens::Robot & robot, FILE ** logfpp)
+{
+    const auto pwd = getenv(PATH_VARIABLE_NAME);
+
+    char path[1000] = {};
+
+    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
     simsens::WorldParser::parse(path, world);
 
-    sprintf(path, "%s/../../protos/DiyQuad.proto", siminfo.path);
+    sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, robot);
 
     _rangefinder = new simsens::Rangefinder(*robot.rangefinders[0]);
 
     _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
 
-    sprintf(path, "%s/%s", siminfo.path, siminfo.poselogname);
+    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     *logfpp = fopen(path, "w");
 }
 
 // Returns false on collision, true otherwise
-static bool run_normal(hf::siminfo_t & siminfo)
+static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
 {
     static simsens::World _world;
     static simsens::Robot _robot;
@@ -69,13 +83,13 @@ static bool run_normal(hf::siminfo_t & siminfo)
     // In autonomous mode, use current pose to get setpoints
     if (autonomous) {
 
-        if (string(siminfo.worldname) == "twoexit") {
+        if (string(worldname()) == "twoexit") {
             hf::RangefinderSetpoint::runTwoExit(
                     _rangefinder_distances_mm, siminfo.setpoint);
         }
 
         else {
-            printf("No autopilot for world %s\n", siminfo.worldname);
+            printf("No autopilot for world %s\n", worldname());
         }
     }
 
@@ -84,7 +98,7 @@ static bool run_normal(hf::siminfo_t & siminfo)
 
     // Load world and robot info first time around
     if (!_rangefinder) {
-        load(siminfo, _world, _robot, &_logfp);
+        load(_world, _robot, &_logfp);
     }
 
     // Get simulated rangefinder distances
@@ -127,7 +141,7 @@ DLLEXPORT void webots_physics_step()
 
     else {
 
-        hf::siminfo_t siminfo = {};
+        PhysicsPluginHelper::siminfo_t siminfo = {};
 
         if (PhysicsPluginHelper::get_siminfo(siminfo)) {
 
