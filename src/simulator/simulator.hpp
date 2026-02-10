@@ -90,16 +90,17 @@ namespace hf {
                         };
 
                         // Get motor RPMS from mixer
-                        const auto * motors = Mixer::mix(new_demands);
+                        float motors[4] = {};
+                        Mixer::mix(new_demands, motors);
 
                         // Convert motor values to double for dynamics
-                        const auto * rpms = motors2doubless(motors, 4);
+                        //const auto * rpms = motors2doubless(motors, 4);
 
                         // Run dynamics in inner loop -----------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
-                            _dynamics.update(rpms, 4,
-                                    Mixer::roll, Mixer::pitch, Mixer::yaw);
+                            //_dynamics.update(rpms, 4,
+                            //        Mixer::roll, Mixer::pitch, Mixer::yaw);
                         }
                     }
                 }
