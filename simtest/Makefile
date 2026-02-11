@@ -9,10 +9,10 @@ all: simtest
 run: simtest
 	./simtest ../webots/protos/DiyQuad.proto $(world)
 
-simtest: main.o flydar.hpp
+simtest: main.o
 	g++ -o simtest main.o
 
-main.o: main.cpp *.hpp ../src/*.hpp ../src/pids/*.hpp \
+main.o: main.cpp ../src/*.hpp ../src/pids/*.hpp \
 	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
 	g++ -Wall -c -I$(ROOT) -I../src main.cpp
 

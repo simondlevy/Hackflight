@@ -16,7 +16,125 @@
 
 #include <stdio.h>
 
-#include "flydar.hpp"
+// C/C++
+#include <stdio.h>
+
+// Hackflight
+#include <autopilot/rangefinder.hpp>
+#include <datatypes.h>
+#include <simulator/pose.h>
+#include <simulator/simulator.hpp>
+#include <vehicles/diyquad.hpp>
+
+// SimSensors
+#include <simsensors/src/parsers/webots/world.hpp>
+#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
+
+class Flydar {
+
+    private:
+
+        static constexpr float MAX_TIME_SEC = 10;
+        static constexpr float TAKEOFF_TIME_SEC = 2;
+        static constexpr float FRAME_RATE_HZ = 32;
+
+        hf::Simulator _simulator;
+
+        simsens::World _world;
+
+        simsens::Rangefinder * _rangefinder;
+
+        /*
+        bool succeeded(
+                const int frame, 
+                const int * rangefinder_distances_mm, 
+                const int rangefinder_size);*/
+
+        static void write_to_log(
+                FILE * logfile,
+                const hf::pose_t pose,
+                const int * rangefinder_distances_mm,
+                const int rangefinder_width)
+        {
+            fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+            for (int k=0; k<rangefinder_width; ++k) {
+                fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
+            }
+            fprintf(logfile, "\n");
+        }
+
+    public:
+
+        Flydar(const char * robot_path, const char * world_path)
+        {
+            // run(robot_path, world_path, logfile);
+            simsens::Robot robot = {};
+            simsens::RobotParser::parse(robot_path, robot);
+
+            simsens::WorldParser::parse(world_path, _world, robot_path);
+
+            _rangefinder = robot.rangefinders[0];
+
+            const auto pose = _world.getRobotPose();
+
+            _simulator.init(
+                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
+                    FRAME_RATE_HZ);
+        }
+
+        int maxframes()
+        {
+            return MAX_TIME_SEC * FRAME_RATE_HZ;
+        }
+
+        /**
+          * Returns true if done, false otherwise
+          */
+
+        bool step(const int frame, FILE * logfile=nullptr)
+        {
+            static int _rangefinder_distances_mm[1000]; 
+
+            const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
+                hf::MODE_HOVERING :
+                hf::MODE_AUTONOMOUS;
+
+            hf::demands_t setpoint = {};
+
+            if (hf::RangefinderSetpoint::runTwoExit(frame,
+                    _rangefinder_distances_mm, setpoint)) {
+                printf("succeeded\n");
+                return true;
+            }
+
+            const auto pose = _simulator.step(mode, setpoint);
+
+            if (logfile) {
+                write_to_log(logfile, pose,
+                        _rangefinder_distances_mm, _rangefinder->getWidth());
+            }
+
+            if (_world.collided({pose.x, pose.y, pose.x})) {
+                printf("collided\n");
+                return true;
+            }
+
+            /*
+            if (succeeded(frame, _rangefinder_distances_mm,
+                        _rangefinder->getWidth())) {
+                printf("succeeded\n");
+                return true;
+            }*/
+
+            _rangefinder->read(
+                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    _world, _rangefinder_distances_mm);
+
+            return false;
+        }
+};
 
 static const char * LOGNAME = "log.csv";
 
