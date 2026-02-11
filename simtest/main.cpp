@@ -47,21 +47,15 @@ static void write_to_log(
     fprintf(logfile, "\n");
 }
 
+static hf::Simulator _simulator;
+
+static simsens::World _world;
+
+static simsens::Rangefinder * _rangefinder;
+
 class Flydar {
 
     private:
-
-        hf::Simulator _simulator;
-
-        simsens::World _world;
-
-        simsens::Rangefinder * _rangefinder;
-
-        /*
-           bool succeeded(
-           const int frame, 
-           const int * rangefinder_distances_mm, 
-           const int rangefinder_size);*/
 
     public:
 
