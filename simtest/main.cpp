@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// C/C++
+// C
 #include <stdio.h>
 
 // Hackflight
@@ -54,8 +54,6 @@ static hf::Simulator _simulator;
 static simsens::World _world;
 
 static simsens::Rangefinder * _rangefinder;
-
-static simsens::Robot robot;
 
 static bool step(const int frame, FILE * logfile)
 {
@@ -105,6 +103,8 @@ int main(int argc, char ** argv)
 
     const auto robot_path = argv[1];
     const auto world_path = argv[2];
+
+    simsens::Robot robot = {};
 
     simsens::RobotParser::parse(robot_path, robot);
 
