@@ -32,8 +32,8 @@ edit:
 
 
 try:
-	@if [ ! -f $(world) ]; then\
-        echo "World file" $(log) "not found";\
+	@if [ ! -f $(WORLD_FILE) ]; then\
+        echo "World file" $(WORLD_FILE) "not found";\
 	elif [ ! -f $(log) ]; then\
         echo "Log file" $(log) "not found";\
 	else \
