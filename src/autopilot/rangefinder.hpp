@@ -26,9 +26,15 @@ namespace hf {
 
         public:
 
-            static void runTwoExit(const int * rangefinder_distances_mm,
+            static constexpr float FRAME_RATE_HZ = 32;
+
+            static bool runTwoExit(
+                    const int frame,
+                    const int * rangefinder_distances_mm,
                     demands_t & setpoint)
             {
+                static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
+
                 const int * d = rangefinder_distances_mm;
 
                 // Look for clear (infinity reading) in center of 1x8 readings
@@ -39,7 +45,26 @@ namespace hf {
 
                 // Otherwise, yaw rightward
                 setpoint.yaw = center_is_clear ? 0 : 0.2;
+
+                // We're not done until all readings are infinity
+                for (int i=0; i<8; ++i) {
+                    if (d[i] != -1) {
+                        return false;
+                    }
+                }
+
+                static int _cleared_at_frame;
+
+                if (_cleared_at_frame == 0) {
+                    _cleared_at_frame = frame;
+                }
+
+                // Travel a bit after exiting
+                else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+                    return true;
+                }
+
+                return false;
             }        
     };
-
 }

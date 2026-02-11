@@ -9,15 +9,12 @@ all: simtest
 run: simtest
 	./simtest ../webots/protos/DiyQuad.proto $(world)
 
-simtest: main.o twoexit.o
-	g++ -o simtest main.o twoexit.o
+simtest: main.o flydar.hpp
+	g++ -o simtest main.o
 
 main.o: main.cpp *.hpp ../src/*.hpp ../src/pids/*.hpp \
 	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
 	g++ -Wall -c -I$(ROOT) -I../src main.cpp
-
-twoexit.o: twoexit.cpp *.hpp
-	g++ -Wall -c -I$(ROOT) -I../src twoexit.cpp
 
 edit:
 	vim main.cpp

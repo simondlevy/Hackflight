@@ -45,10 +45,11 @@ class Flydar {
 
         simsens::Rangefinder * _rangefinder;
 
+        /*
         bool succeeded(
                 const int frame, 
                 const int * rangefinder_distances_mm, 
-                const int rangefinder_size);
+                const int rangefinder_size);*/
 
         static void write_to_log(
                 FILE * logfile,
@@ -102,8 +103,11 @@ class Flydar {
 
             hf::demands_t setpoint = {};
 
-            hf::RangefinderSetpoint::runTwoExit(
-                    _rangefinder_distances_mm, setpoint);
+            if (hf::RangefinderSetpoint::runTwoExit(frame,
+                    _rangefinder_distances_mm, setpoint)) {
+                printf("succeeded\n");
+                return true;
+            }
 
             const auto pose = _simulator.step(mode, setpoint);
 
@@ -117,11 +121,12 @@ class Flydar {
                 return true;
             }
 
+            /*
             if (succeeded(frame, _rangefinder_distances_mm,
                         _rangefinder->getWidth())) {
                 printf("succeeded\n");
                 return true;
-            }
+            }*/
 
             _rangefinder->read(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
