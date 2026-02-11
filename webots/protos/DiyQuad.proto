@@ -64,6 +64,20 @@ DEF ROBOT Robot {
       name "VL53L5-forward"
     }
 
+    RangeFinder {
+
+      # VL13L1 specs
+      fieldOfView 0.47  # radians
+      width 1 
+      height 1
+      minRange 0.04
+      maxRange 4.0
+      noise 0.0 # should probably adjust this
+      translation 0.04 0 0.015
+      rotation 0 0 1 0
+      name "VL13L1-forward"
+    }
+
     GPS { # For obtaining initial location
     }
  

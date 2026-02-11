@@ -98,17 +98,14 @@ int main(int argc, char ** argv)
     }
 
     const auto robot_path = argv[1];
-    const auto world_path = argv[2];
-
     simsens::Robot robot = {};
+    simsens::RobotParser::parse(argv[1], robot);
 
-    simsens::RobotParser::parse(robot_path, robot);
-
+    const auto world_path = argv[2];
     static simsens::World world = {};
-
     simsens::WorldParser::parse(world_path, world, robot_path);
 
-    auto rangefinder = robot.rangefinders[0];
+    auto rangefinder = robot.rangefinders["VL53L5-forward"];
 
     const auto pose = world.getRobotPose();
 
