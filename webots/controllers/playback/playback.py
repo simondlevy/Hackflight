@@ -19,7 +19,6 @@
 
 from math import cos, sin, acos
 from sys import argv
-from time import sleep
 
 from controller import Supervisor
 
@@ -121,7 +120,7 @@ def main():
             break
 
         vals = list(map(float, line.split(',')))
- 
+
         translation_field.setSFVec3f([vals[0], -vals[1], vals[2]])
 
         rotation_field.setSFRotation(

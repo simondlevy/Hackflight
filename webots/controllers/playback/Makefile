@@ -19,15 +19,29 @@ world = simple
 log = ../standard/log.csv
 
 WORLDS_DIR = ../../worlds
+WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
+PLAYBACK_FILE = $(WORLDS_DIR)/playback_$(world).wbt
 
 run:
-	sed 's/physics.*//' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/playback_$(world).wbt
-	webots $(WORLDS_DIR)//playback_$(world).wbt &
+	sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE) # $(WORLDS_DIR)/playback_$(world).wbt
+	webots $(WORLDS_DIR)/playback_$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect \
 		./playback.py $(log)
 
 edit:
 	vim playback.py
+
+
+try:
+	@if [ ! -f $(world) ]; then\
+        echo "World file" $(log) "not found";\
+	elif [ ! -f $(log) ]; then\
+        echo "Log file" $(log) "not found";\
+	else \
+		echo "Okay";\
+    fi
+
+DIR_TO_CHECK_FOR = 'large_directory'
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
