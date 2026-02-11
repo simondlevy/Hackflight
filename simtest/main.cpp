@@ -49,11 +49,10 @@ static void write_to_log(
     fprintf(logfile, "\n");
 }
 
-static hf::Simulator _simulator;
-
 static simsens::Rangefinder * _rangefinder;
 
-static bool step(simsens::World & world, const int frame, FILE * logfile)
+static bool step(hf::Simulator & simulator, simsens::World & world,
+        const int frame, FILE * logfile)
 {
     static int _rangefinder_distances_mm[1000]; 
 
@@ -69,7 +68,7 @@ static bool step(simsens::World & world, const int frame, FILE * logfile)
         return true;
     }
 
-    const auto pose = _simulator.step(mode, setpoint);
+    const auto pose = simulator.step(mode, setpoint);
 
     write_to_log(logfile, pose,
             _rangefinder_distances_mm, _rangefinder->getWidth());
@@ -114,13 +113,15 @@ int main(int argc, char ** argv)
 
     const auto pose = world.getRobotPose();
 
-    _simulator.init(
+    hf::Simulator simulator = {};
+
+    simulator.init(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
             FRAME_RATE_HZ);
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
-        if (step(world, frame, logfile)) {
+        if (step(simulator, world, frame, logfile)) {
             break;
         }
     }
