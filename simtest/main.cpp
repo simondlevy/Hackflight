@@ -14,8 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-
 // C/C++
 #include <stdio.h>
 
@@ -31,13 +29,13 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
+static constexpr float MAX_TIME_SEC = 10;
+static constexpr float TAKEOFF_TIME_SEC = 2;
+static constexpr float FRAME_RATE_HZ = 32;
+
 class Flydar {
 
     private:
-
-        static constexpr float MAX_TIME_SEC = 10;
-        static constexpr float TAKEOFF_TIME_SEC = 2;
-        static constexpr float FRAME_RATE_HZ = 32;
 
         hf::Simulator _simulator;
 
@@ -46,10 +44,10 @@ class Flydar {
         simsens::Rangefinder * _rangefinder;
 
         /*
-        bool succeeded(
-                const int frame, 
-                const int * rangefinder_distances_mm, 
-                const int rangefinder_size);*/
+           bool succeeded(
+           const int frame, 
+           const int * rangefinder_distances_mm, 
+           const int rangefinder_size);*/
 
         static void write_to_log(
                 FILE * logfile,
@@ -84,14 +82,9 @@ class Flydar {
                     FRAME_RATE_HZ);
         }
 
-        int maxframes()
-        {
-            return MAX_TIME_SEC * FRAME_RATE_HZ;
-        }
-
         /**
-          * Returns true if done, false otherwise
-          */
+         * Returns true if done, false otherwise
+         */
 
         bool step(const int frame, FILE * logfile=nullptr)
         {
@@ -104,7 +97,7 @@ class Flydar {
             hf::demands_t setpoint = {};
 
             if (hf::RangefinderSetpoint::runTwoExit(frame,
-                    _rangefinder_distances_mm, setpoint)) {
+                        _rangefinder_distances_mm, setpoint)) {
                 printf("succeeded\n");
                 return true;
             }
@@ -122,11 +115,11 @@ class Flydar {
             }
 
             /*
-            if (succeeded(frame, _rangefinder_distances_mm,
-                        _rangefinder->getWidth())) {
-                printf("succeeded\n");
-                return true;
-            }*/
+               if (succeeded(frame, _rangefinder_distances_mm,
+               _rangefinder->getWidth())) {
+               printf("succeeded\n");
+               return true;
+               }*/
 
             _rangefinder->read(
                     {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
@@ -153,7 +146,7 @@ int main(int argc, char ** argv)
 
     Flydar flydar = Flydar(argv[1], argv[2]);
 
-    for (int frame=0; frame<flydar.maxframes(); ++frame) {
+    for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
         if (flydar.step(frame, logfile)) {
             break;
