@@ -33,6 +33,20 @@ static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
 static constexpr float FRAME_RATE_HZ = 32;
 
+static void write_to_log(
+        FILE * logfile,
+        const hf::pose_t pose,
+        const int * rangefinder_distances_mm,
+        const int rangefinder_width)
+{
+    fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+    for (int k=0; k<rangefinder_width; ++k) {
+        fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
+    }
+    fprintf(logfile, "\n");
+}
+
 class Flydar {
 
     private:
@@ -48,20 +62,6 @@ class Flydar {
            const int frame, 
            const int * rangefinder_distances_mm, 
            const int rangefinder_size);*/
-
-        static void write_to_log(
-                FILE * logfile,
-                const hf::pose_t pose,
-                const int * rangefinder_distances_mm,
-                const int rangefinder_width)
-        {
-            fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-            for (int k=0; k<rangefinder_width; ++k) {
-                fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
-            }
-            fprintf(logfile, "\n");
-        }
 
     public:
 
