@@ -30,7 +30,6 @@ run:
 edit:
 	vim playback.py
 
-
 try:
 	@if [ ! -f $(WORLD_FILE) ]; then\
         echo "World file" $(WORLD_FILE) "not found";\
@@ -38,7 +37,8 @@ try:
         echo "Log file" $(log) "not found";\
 	else \
 		echo "Okay";\
-    fi
+		sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE);\
+	fi
 
 DIR_TO_CHECK_FOR = 'large_directory'
 
