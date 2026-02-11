@@ -28,9 +28,9 @@ run:
 	elif [ ! -f $(log) ]; then\
         echo "Log file" $(log) "not found";\
 	else \
-		echo "Okay";\
 		sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE);\
-	    webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller --stdout-redirect ./playback.py $(log);\
+	    webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller \
+		--stdout-redirect ./playback.py $(log);\
 	fi
 
 edit:
