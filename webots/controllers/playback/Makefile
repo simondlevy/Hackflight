@@ -23,10 +23,9 @@ WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
 PLAYBACK_FILE = $(WORLDS_DIR)/playback_$(world).wbt
 
 run:
-	sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE) # $(WORLDS_DIR)/playback_$(world).wbt
-	webots $(WORLDS_DIR)/playback_$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect \
-		./playback.py $(log)
+	sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE)
+	webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller \
+		--stdout-redirect ./playback.py $(log)
 
 edit:
 	vim playback.py
