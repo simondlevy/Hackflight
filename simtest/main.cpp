@@ -57,28 +57,6 @@ static simsens::Rangefinder * _rangefinder;
 
 static simsens::Robot robot;
 
-class Flydar {
-
-    private:
-
-    public:
-
-        Flydar(const char * robot_path, const char * world_path)
-        {
-            simsens::RobotParser::parse(robot_path, robot);
-
-            simsens::WorldParser::parse(world_path, _world, robot_path);
-
-            _rangefinder = robot.rangefinders[0];
-
-            const auto pose = _world.getRobotPose();
-
-            _simulator.init(
-                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-                    FRAME_RATE_HZ);
-        }
-};
-
 static bool step(const int frame, FILE * logfile)
 {
     static int _rangefinder_distances_mm[1000]; 
@@ -125,7 +103,20 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    Flydar flydar = Flydar(argv[1], argv[2]);
+    const auto robot_path = argv[1];
+    const auto world_path = argv[2];
+
+    simsens::RobotParser::parse(robot_path, robot);
+
+    simsens::WorldParser::parse(world_path, _world, robot_path);
+
+    _rangefinder = robot.rangefinders[0];
+
+    const auto pose = _world.getRobotPose();
+
+    _simulator.init(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
+            FRAME_RATE_HZ);
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
