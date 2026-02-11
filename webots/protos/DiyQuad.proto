@@ -61,24 +61,6 @@ DEF ROBOT Robot {
       noise 0.0 # should probably adjust this
       translation 0.04 0 0.015
       rotation 0 0 1 0
-
-      # Arbitrary appearance settings
-      children [
-        Pose {
-          rotation 0 1 0 -1.5708
-          children [
-            Shape {
-              appearance PBRAppearance {
-                roughness 1
-                metalness 0
-              }
-              geometry Box {
-                size 0.005 0.009 0.001
-              }
-            }
-          ]
-        }
-      ]
     }
 
     GPS { # For obtaining initial location
