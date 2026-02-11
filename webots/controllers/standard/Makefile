@@ -16,6 +16,7 @@
 world = simple
 
 WORLDS_DIR = ../../worlds
+WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
 
 # https://stackoverflow.com/a/49524393
 .EXPORT_ALL_VARIABLES:
@@ -25,9 +26,12 @@ WEBOTS_PATH = $(shell pwd)
 FILES_TO_REMOVE += *.csv __pycache__/
 
 run:
-	webots $(WORLDS_DIR)/$(world).wbt &
-	/usr/local/webots/webots-controller --stdout-redirect \
-		./standard.py $(world)
+	@if [ ! -f $(WORLD_FILE) ]; then\
+        echo "World file" $(WORLD_FILE) "not found";\
+	else \
+	    webots $(WORLD_FILE) & /usr/local/webots/webots-controller \
+		--stdout-redirect ./standard.py $(world);\
+	fi
 
 edit:
 	vim standard.py 
