@@ -51,11 +51,9 @@ static void write_to_log(
 
 static hf::Simulator _simulator;
 
-static simsens::World _world;
-
 static simsens::Rangefinder * _rangefinder;
 
-static bool step(const int frame, FILE * logfile)
+static bool step(simsens::World & world, const int frame, FILE * logfile)
 {
     static int _rangefinder_distances_mm[1000]; 
 
@@ -76,14 +74,14 @@ static bool step(const int frame, FILE * logfile)
     write_to_log(logfile, pose,
             _rangefinder_distances_mm, _rangefinder->getWidth());
 
-    if (_world.collided({pose.x, pose.y, pose.x})) {
+    if (world.collided({pose.x, pose.y, pose.x})) {
         printf("collided\n");
         return true;
     }
 
     _rangefinder->read(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            _world, _rangefinder_distances_mm);
+            world, _rangefinder_distances_mm);
 
     return false;
 }
@@ -108,11 +106,13 @@ int main(int argc, char ** argv)
 
     simsens::RobotParser::parse(robot_path, robot);
 
-    simsens::WorldParser::parse(world_path, _world, robot_path);
+    static simsens::World world = {};
+
+    simsens::WorldParser::parse(world_path, world, robot_path);
 
     _rangefinder = robot.rangefinders[0];
 
-    const auto pose = _world.getRobotPose();
+    const auto pose = world.getRobotPose();
 
     _simulator.init(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
@@ -120,7 +120,7 @@ int main(int argc, char ** argv)
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
-        if (step(frame, logfile)) {
+        if (step(world, frame, logfile)) {
             break;
         }
     }
