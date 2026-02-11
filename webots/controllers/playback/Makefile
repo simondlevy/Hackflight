@@ -23,14 +23,6 @@ WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
 PLAYBACK_FILE = $(WORLDS_DIR)/playback_$(world).wbt
 
 run:
-	sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE)
-	webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller \
-		--stdout-redirect ./playback.py $(log)
-
-edit:
-	vim playback.py
-
-try:
 	@if [ ! -f $(WORLD_FILE) ]; then\
         echo "World file" $(WORLD_FILE) "not found";\
 	elif [ ! -f $(log) ]; then\
@@ -38,9 +30,11 @@ try:
 	else \
 		echo "Okay";\
 		sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE);\
+	    webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller --stdout-redirect ./playback.py $(log);\
 	fi
 
-DIR_TO_CHECK_FOR = 'large_directory'
+edit:
+	vim playback.py
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
