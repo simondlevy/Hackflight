@@ -13,18 +13,18 @@
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 # Command-line variables; e.g.:
-#   make run world=simple logfile=../controller/log.csv
+#   make run world=simple log=../controller/log.csv
 #
-world = twoexit
-logfile = ../../../simtest/log.csv
+world = simple
+log = ../standard/log.csv
 
 WORLDS_DIR = ../../worlds
 
 run:
-	sed 's/physics.*//' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/$(world)_playback.wbt
-	webots $(WORLDS_DIR)/$(world)_playback.wbt &
+	sed 's/physics.*//' $(WORLDS_DIR)/$(world).wbt > $(WORLDS_DIR)/playback_$(world).wbt
+	webots $(WORLDS_DIR)//playback_$(world).wbt &
 	/usr/local/webots/webots-controller --stdout-redirect \
-		./playback.py $(logfile)
+		./playback.py $(log)
 
 edit:
 	vim playback.py
