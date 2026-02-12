@@ -45,12 +45,12 @@ class TwoExit {
             _rangefinders = robot.rangefinders;
         }
 
-        void getSetpoint(PhysicsPluginHelper::siminfo_t & siminfo)
+        void getSetpoint(hf::demands_t & setpoint)
         {
             static int _frame;
 
             hf::RangefinderSetpoint::runTwoExit(_frame++,
-                    _rangefinder_distances_mm, siminfo.setpoint);
+                    _rangefinder_distances_mm, setpoint);
         }
 
         void readSensors(simsens::World & world, const hf::pose_t & pose,

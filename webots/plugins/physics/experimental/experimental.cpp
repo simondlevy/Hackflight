@@ -23,14 +23,9 @@
 // Webots
 #include "../helper.hpp"
 
-// Hackflight
-#include <autopilot/rangefinder.hpp>
-
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
-#include <simsensors/src/visualizers/rangefinder.hpp>
 #include <simsensors/src/world.hpp>
 
 #include "twoexit.hpp"
@@ -44,7 +39,7 @@ static simsens::World _world;
 
 static simsens::Robot _robot;
 
-static FILE * _logfp;
+static FILE * _logfile;
 
 static PhysicsPluginHelper _helper;
 
@@ -73,14 +68,14 @@ DLLEXPORT void webots_physics_step()
 
             // Use autopilot to get setpoint
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-                _twoExit.getSetpoint(siminfo);
+                _twoExit.getSetpoint(siminfo.setpoint);
             }
 
             // Use setpoint to get new pose
             const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
             // Grab autopilot sensors for next iteration
-            _twoExit.readSensors(_world, pose, _logfp);
+            _twoExit.readSensors(_world, pose, _logfile);
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {
@@ -114,5 +109,5 @@ DLLEXPORT void webots_physics_init()
     _twoExit.init(_robot);
 
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
-    _logfp = fopen(path, "w");
+    _logfile = fopen(path, "w");
 }
