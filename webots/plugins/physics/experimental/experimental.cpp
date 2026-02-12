@@ -162,11 +162,3 @@ DLLEXPORT void webots_physics_init()
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     _logfp = fopen(path, "w");
 }
-
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
-{
-    (void)g1;
-    (void)g2;
-
-    return 0;
-}
