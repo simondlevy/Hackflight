@@ -43,7 +43,7 @@ class PingPongAutopilot : public Autopilot {
 
         void getSetpoint(hf::demands_t & setpoint)
         {
-            (void)setpoint;
+            setpoint.yaw = 1.0;
         }
 
         void readSensors(simsens::World & world, const hf::pose_t & pose,
