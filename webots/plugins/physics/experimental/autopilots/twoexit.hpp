@@ -29,15 +29,13 @@
 
 #include "autopilot.hpp"
 
-class TwoExit : public Autopilot {
+class TwoExitAutopilot : public Autopilot {
 
     private:
 
         static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
         simsens::Rangefinder * _rangefinder;
-
-        std::map<string, simsens::Rangefinder *> _rangefinders;
 
         int _rangefinder_distances_mm[1000]; // arbitrary max size
 
@@ -46,7 +44,6 @@ class TwoExit : public Autopilot {
         void init(simsens::Robot & robot)
         {
             _rangefinder = robot.rangefinders["VL53L5-forward"];
-            _rangefinders = robot.rangefinders;
         }
 
         void getSetpoint(hf::demands_t & setpoint)
