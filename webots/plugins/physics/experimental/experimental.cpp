@@ -58,62 +58,6 @@ static char * worldname()
 }
 
 // Returns false on collision, true otherwise
-static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
-{
-    static int _rangefinder_distances_mm[1000]; // arbitrary max size
-
-    static int _frame;
-
-    // In autonomous mode, use current pose to get setpoints
-    if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-
-        if (string(worldname()) == "twoexit") {
-            hf::RangefinderSetpoint::runTwoExit(_frame++,
-                    _rangefinder_distances_mm, siminfo.setpoint);
-        }
-
-        else {
-            printf("No autopilot for world %s\n", worldname());
-        }
-    }
-
-    // Use setpoints to get new pose
-    const auto pose = _helper.get_pose_from_siminfo(siminfo);
-
-    // Get simulated rangefinder distances
-    _rangefinder->read(
-            simsens::pose_t {
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            _world, _rangefinder_distances_mm);
-
-    // Dump everything to logfile
-    fprintf(_logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-    for (int k=0; k<_rangefinder->width; ++k) {
-        fprintf(_logfp, ",%d", _rangefinder_distances_mm[k]);
-    }
-    fprintf(_logfp, "\n");
-
-    // Visualize rangefinder distances
-    simsens::RangefinderVisualizer::show(
-            _rangefinder_distances_mm,
-            _rangefinder->min_distance_m,
-            _rangefinder->max_distance_m,
-            _rangefinder->width,
-            _rangefinder->height,
-            RANGEFINDER_DISPLAY_SCALEUP);
-
-    // Stop if we detected a collision
-    if (_world.collided({pose.x, pose.y, pose.z})) {
-        return false;
-    }
-
-    // Otherwise, set normally
-    _helper.set_dbody_from_pose(pose);
-
-    return true;
-}
-
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -129,9 +73,56 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper.get_siminfo(siminfo)) {
 
-            if (!run_normal(siminfo)) {
+            static int _rangefinder_distances_mm[1000]; // arbitrary max size
+
+            static int _frame;
+
+            // In autonomous mode, use current pose to get setpoints
+            if (siminfo.mode == hf::MODE_AUTONOMOUS) {
+
+                if (string(worldname()) == "twoexit") {
+                    hf::RangefinderSetpoint::runTwoExit(_frame++,
+                            _rangefinder_distances_mm, siminfo.setpoint);
+                }
+
+                else {
+                    printf("No autopilot for world %s\n", worldname());
+                }
+            }
+
+            // Use setpoints to get new pose
+            const auto pose = _helper.get_pose_from_siminfo(siminfo);
+
+            // Get simulated rangefinder distances
+            _rangefinder->read(
+                    simsens::pose_t {
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    _world, _rangefinder_distances_mm);
+
+            // Dump everything to logfile
+            fprintf(_logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+            for (int k=0; k<_rangefinder->width; ++k) {
+                fprintf(_logfp, ",%d", _rangefinder_distances_mm[k]);
+            }
+            fprintf(_logfp, "\n");
+
+            // Visualize rangefinder distances
+            simsens::RangefinderVisualizer::show(
+                    _rangefinder_distances_mm,
+                    _rangefinder->min_distance_m,
+                    _rangefinder->max_distance_m,
+                    _rangefinder->width,
+                    _rangefinder->height,
+                    RANGEFINDER_DISPLAY_SCALEUP);
+
+            // Stop if we detected a collision
+            if (_world.collided({pose.x, pose.y, pose.z})) {
                 _collided = true;
             }
+
+            // Otherwise, set normally
+            _helper.set_dbody_from_pose(pose);
         }
     }
 }
