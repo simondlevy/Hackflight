@@ -27,25 +27,10 @@
 
 static constexpr char ROBOT_NAME[] = "diyquad";
 
-static dBodyID _robot;
+static dBodyID _robotBody;
 
 // Platform-independent simulator simulator loop
 static hf::Simulator _simulator;
-
-DLLEXPORT void webots_physics_init() 
-{
-    _robot = dWebotsGetBodyFromDEF(ROBOT_NAME);
-
-    if (_robot == NULL) {
-
-        dWebotsConsolePrintf("webots_physics_init :: ");
-        dWebotsConsolePrintf("error : could not get body of robot.\r\n");
-    }
-    else {
-
-        dBodySetGravityMode(_robot, 0);
-    }
-}
 
 DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
 {
@@ -70,7 +55,7 @@ class PhysicsPluginHelper {
 
         static bool get_siminfo(siminfo_t & siminfo)
         {
-            if (_robot == NULL) {
+            if (_robotBody == NULL) {
                 return false;
             }
 
@@ -102,7 +87,7 @@ class PhysicsPluginHelper {
         static void set_dbody_from_pose(const hf::pose_t & pose)
         {
             // Negate Y to make leftward positive
-            dBodySetPosition(_robot, pose.x, -pose.y, pose.z);
+            dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
@@ -110,7 +95,22 @@ class PhysicsPluginHelper {
             const hf::axis4_t quat = euler2quat(euler);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-            dBodySetQuaternion(_robot, q);
+            dBodySetQuaternion(_robotBody, q);
+        }
+
+        static void init()
+        {
+            _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
+
+            if (_robotBody == NULL) {
+
+                dWebotsConsolePrintf("webots_physics_init :: ");
+                dWebotsConsolePrintf("error : could not get body of robot.\r\n");
+            }
+            else {
+
+                dBodySetGravityMode(_robotBody, 0);
+            }
         }
 
     private:

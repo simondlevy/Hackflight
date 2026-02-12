@@ -35,4 +35,9 @@ DLLEXPORT void webots_physics_cleanup()
 {
 }
 
+DLLEXPORT void webots_physics_init() 
+{
+    PhysicsPluginHelper::init();
+}
+
 

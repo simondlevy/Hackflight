@@ -44,38 +44,20 @@ static simsens::Rangefinder * _rangefinder;
 
 std::map<string, simsens::Rangefinder *> _rangefinders;
 
+static simsens::World _world;
+
+static simsens::Robot _robot;
+
+static FILE * _logfp;
+
 static char * worldname()
 {
     return getenv(WORLD_VARIABLE_NAME);
 }
 
-static void load(
-        simsens::World & world, simsens::Robot & robot, FILE ** logfpp)
-{
-    const auto pwd = getenv(PATH_VARIABLE_NAME);
-
-    char path[1000] = {};
-
-    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
-    simsens::WorldParser::parse(path, world);
-
-    sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
-    simsens::RobotParser::parse(path, robot);
-
-    _rangefinder = robot.rangefinders["VL53L5-forward"];
-
-    _rangefinders = robot.rangefinders;
-
-    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
-    *logfpp = fopen(path, "w");
-}
-
 // Returns false on collision, true otherwise
 static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
 {
-    static simsens::World _world;
-    static simsens::Robot _robot;
-    static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
 
     static int _frame;
@@ -95,11 +77,6 @@ static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
 
     // Use setpoints to get new pose
     const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
-
-    // Load world and robot info first time around
-    if (!_rangefinder) {
-        load(_world, _robot, &_logfp);
-    }
 
     // Get simulated rangefinder distances
     _rangefinder->read(
@@ -141,7 +118,7 @@ DLLEXPORT void webots_physics_step()
     static bool _collided;
 
     if (_collided) {
-        dBodySetGravityMode(_robot, 1);
+        dBodySetGravityMode(_robotBody, 1);
     }
 
     else {
@@ -161,3 +138,27 @@ DLLEXPORT void webots_physics_cleanup()
 {
     delete _rangefinder;
 }
+
+DLLEXPORT void webots_physics_init() 
+{
+    PhysicsPluginHelper::init();
+
+    const auto pwd = getenv(PATH_VARIABLE_NAME);
+
+    char path[1000] = {};
+
+    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
+    simsens::WorldParser::parse(path, _world);
+
+    sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
+    simsens::RobotParser::parse(path, _robot);
+
+    _rangefinder = _robot.rangefinders["VL53L5-forward"];
+
+    _rangefinders = _robot.rangefinders;
+
+    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
+    _logfp = fopen(path, "w");
+}
+
+
