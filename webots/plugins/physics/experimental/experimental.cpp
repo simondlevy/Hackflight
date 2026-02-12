@@ -78,15 +78,13 @@ static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
     static FILE * _logfp;
     static int _rangefinder_distances_mm[1000]; // arbitrary max size
 
-    const bool autonomous = siminfo.mode == hf::MODE_AUTONOMOUS;
+    static int _frame;
 
     // In autonomous mode, use current pose to get setpoints
-    if (autonomous) {
-
-        static int frame;
+    if (siminfo.mode == hf::MODE_AUTONOMOUS) {
 
         if (string(worldname()) == "twoexit") {
-            hf::RangefinderSetpoint::runTwoExit(frame++,
+            hf::RangefinderSetpoint::runTwoExit(_frame++,
                     _rangefinder_distances_mm, siminfo.setpoint);
         }
 
