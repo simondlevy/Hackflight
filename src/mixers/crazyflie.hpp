@@ -40,7 +40,7 @@ namespace hf {
 
             static void mix(const demands_t & demands, float motors[])
             {
-                //RotorMixer::mix(demands, roll, pitch, yaw, 4, motors);
+                RotorMixer::mix(demands, roll, pitch, yaw, 4, motors);
             }
     };
 }
