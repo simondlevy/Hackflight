@@ -42,7 +42,7 @@ static const char * WORLD_VARIABLE_NAME = "WEBOTS_WORLD";
 
 static simsens::Rangefinder * _rangefinder;
 
-static simsens::RangefinderVisualizer * _rangefinderVisualizer;
+std::map<string, simsens::Rangefinder *> _rangefinders;
 
 static char * worldname()
 {
@@ -62,9 +62,9 @@ static void load(
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, robot);
 
-    _rangefinder = new simsens::Rangefinder(*robot.rangefinders["VL53L5-forward"]);
+    _rangefinder = robot.rangefinders["VL53L5-forward"];
 
-    _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
+    _rangefinders = robot.rangefinders;
 
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     *logfpp = fopen(path, "w");
@@ -112,13 +112,18 @@ static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
     // Dump everything to logfile
     fprintf(_logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
             pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-    for (int k=0; k<_rangefinder->getWidth(); ++k) {
+    for (int k=0; k<_rangefinder->width; ++k) {
         fprintf(_logfp, ",%d", _rangefinder_distances_mm[k]);
     }
     fprintf(_logfp, "\n");
 
     // Visualize rangefinder distances
-    _rangefinderVisualizer->show(_rangefinder_distances_mm,
+    simsens::RangefinderVisualizer::show(
+            _rangefinder_distances_mm,
+            _rangefinder->min_distance_m,
+            _rangefinder->max_distance_m,
+            _rangefinder->width,
+            _rangefinder->height,
             RANGEFINDER_DISPLAY_SCALEUP);
 
     // Stop if we detected a collision
@@ -157,5 +162,4 @@ DLLEXPORT void webots_physics_step()
 DLLEXPORT void webots_physics_cleanup() 
 {
     delete _rangefinder;
-    delete _rangefinderVisualizer;
 }
