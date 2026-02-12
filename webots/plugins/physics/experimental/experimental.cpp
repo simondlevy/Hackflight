@@ -62,7 +62,7 @@ static void load(
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, robot);
 
-    _rangefinder = new simsens::Rangefinder(*robot.rangefinders[0]);
+    _rangefinder = new simsens::Rangefinder(*robot.rangefinders["VL53L5-forward"]);
 
     _rangefinderVisualizer = new simsens::RangefinderVisualizer(_rangefinder);
 
