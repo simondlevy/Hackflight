@@ -41,11 +41,3 @@ DLLEXPORT void webots_physics_init()
 {
     _helper.init();
 }
-
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
-{
-    (void)g1;
-    (void)g2;
-
-    return 0;
-}
