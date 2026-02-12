@@ -33,17 +33,19 @@ class PingPongAutopilot : public Autopilot {
     private:
 
         simsens::Rangefinder * _rangefinderForward;
+        simsens::Rangefinder * _rangefinderBackward;
 
     public:
 
         void init(simsens::Robot & robot)
         {
             _rangefinderForward = robot.rangefinders["VL53L1-forward"];
+            _rangefinderBackward = robot.rangefinders["VL53L1-backward"];
         }
 
         void getSetpoint(hf::demands_t & setpoint)
         {
-            setpoint.yaw = 1.0;
+            (void)setpoint;
         }
 
         void readSensors(simsens::World & world, const hf::pose_t & pose,

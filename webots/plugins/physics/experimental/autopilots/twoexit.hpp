@@ -59,8 +59,7 @@ class TwoExitAutopilot : public Autopilot {
         {
             // Get simulated rangefinder distances based on new pose
             _rangefinder->read(
-                    simsens::pose_t {
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
                     world, _rangefinder_distances_mm);
 
             // Dump everything to logfile
