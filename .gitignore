@@ -1,4 +1,3 @@
 #auto_saved_files
-#__pycache__/
+__pycache__/
 *.swp
-__*__.*
