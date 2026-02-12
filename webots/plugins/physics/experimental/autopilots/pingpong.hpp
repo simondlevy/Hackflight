@@ -51,6 +51,8 @@ class PingPongAutopilot : public Autopilot {
         void readSensors(simsens::World & world, const hf::pose_t & pose,
                 FILE * logfile)
         {
+            printf("forward=%p backward=%p\n", _rangefinderForward, _rangefinderBackward);
+
             (void)world;
             (void)pose;
             (void)logfile;

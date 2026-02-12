@@ -75,7 +75,7 @@ DEF ROBOT Robot {
       noise 0.0 # should probably adjust this
       translation 0.04 0 0.015
       rotation 0 0 1 0
-      name "VL13L1-forward"
+      name "VL53L1-forward"
     }
 
     RangeFinder {
@@ -89,7 +89,7 @@ DEF ROBOT Robot {
       noise 0.0 # should probably adjust this
       translation 0.04 0 0.015
       rotation 0 0 1 3.14
-      name "VL13L1-backward"
+      name "VL53L1-backward"
     }
 
     GPS { # For obtaining initial location
