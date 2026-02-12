@@ -20,7 +20,7 @@ log = ../standard/log.csv
 
 WORLDS_DIR = ../../worlds
 WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
-PLAYBACK_FILE = $(WORLDS_DIR)/playback_$(world).wbt
+PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
 run:
 	@if [ ! -f $(WORLD_FILE) ]; then\
