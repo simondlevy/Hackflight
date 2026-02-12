@@ -33,6 +33,8 @@
 #include <simsensors/src/visualizers/rangefinder.hpp>
 #include <simsensors/src/world.hpp>
 
+#include "twoexit.hpp"
+
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
 static const char * LOG_FILE_NAME = "log.csv";
