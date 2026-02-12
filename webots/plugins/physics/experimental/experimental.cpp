@@ -35,16 +35,10 @@
 
 #include "twoexit.hpp"
 
-static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
-
 static const char * LOG_FILE_NAME = "log.csv";
 
 static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
 static const char * WORLD_VARIABLE_NAME = "WEBOTS_WORLD";
-
-static simsens::Rangefinder * _rangefinder;
-
-std::map<string, simsens::Rangefinder *> _rangefinders;
 
 static simsens::World _world;
 
@@ -53,6 +47,8 @@ static simsens::Robot _robot;
 static FILE * _logfp;
 
 static PhysicsPluginHelper _helper;
+
+static TwoExit _twoExit;
 
 static char * worldname()
 {
@@ -75,48 +71,16 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper.get_siminfo(siminfo)) {
 
-            static int _rangefinder_distances_mm[1000]; // arbitrary max size
-
-            static int _frame;
-
-            // In autonomous mode, use current pose to get setpoints
+            // Use autopilot to get setpoint
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-
-                if (string(worldname()) == "twoexit") {
-                    hf::RangefinderSetpoint::runTwoExit(_frame++,
-                            _rangefinder_distances_mm, siminfo.setpoint);
-                }
-
-                else {
-                    printf("No autopilot for world %s\n", worldname());
-                }
+                _twoExit.getSetpoint(siminfo);
             }
 
-            // Use setpoints to get new pose
+            // Use setpoint to get new pose
             const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
-            // Get simulated rangefinder distances
-            _rangefinder->read(
-                    simsens::pose_t {
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-                    _world, _rangefinder_distances_mm);
-
-            // Dump everything to logfile
-            fprintf(_logfp, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
-            for (int k=0; k<_rangefinder->width; ++k) {
-                fprintf(_logfp, ",%d", _rangefinder_distances_mm[k]);
-            }
-            fprintf(_logfp, "\n");
-
-            // Visualize rangefinder distances
-            simsens::RangefinderVisualizer::show(
-                    _rangefinder_distances_mm,
-                    _rangefinder->min_distance_m,
-                    _rangefinder->max_distance_m,
-                    _rangefinder->width,
-                    _rangefinder->height,
-                    RANGEFINDER_DISPLAY_SCALEUP);
+            // Grab autopilot sensors for next iteration
+            _twoExit.readSensors(_world, pose, _logfp);
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {
@@ -131,7 +95,6 @@ DLLEXPORT void webots_physics_step()
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _rangefinder;
 }
 
 DLLEXPORT void webots_physics_init() 
@@ -148,9 +111,7 @@ DLLEXPORT void webots_physics_init()
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);
 
-    _rangefinder = _robot.rangefinders["VL53L5-forward"];
-
-    _rangefinders = _robot.rangefinders;
+    _twoExit.init(_robot);
 
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     _logfp = fopen(path, "w");

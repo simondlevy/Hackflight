@@ -45,7 +45,7 @@ class TwoExit {
             _rangefinders = robot.rangefinders;
         }
 
-        void part1(PhysicsPluginHelper::siminfo_t & siminfo)
+        void getSetpoint(PhysicsPluginHelper::siminfo_t & siminfo)
         {
             static int _frame;
 
@@ -53,7 +53,7 @@ class TwoExit {
                     _rangefinder_distances_mm, siminfo.setpoint);
         }
 
-        void part2(simsens::World & world, const hf::pose_t & pose,
+        void readSensors(simsens::World & world, const hf::pose_t & pose,
                 FILE * logfile)
         {
             // Get simulated rangefinder distances based on new pose
