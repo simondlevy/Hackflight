@@ -28,7 +28,8 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/world.hpp>
 
-#include "twoexit.hpp"
+// Autopilots
+#include "autopilots/twoexit.hpp"
 
 static const char * LOG_FILE_NAME = "log.csv";
 
@@ -43,7 +44,7 @@ static FILE * _logfile;
 
 static PhysicsPluginHelper _helper;
 
-static AutoPilot _autopilot;
+static TwoExit _twoExit;
 
 static char * worldname()
 {
@@ -68,14 +69,14 @@ DLLEXPORT void webots_physics_step()
 
             // Replace open-loop setpoint with setpoint from autopilot
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-                _autopilot.getSetpoint(siminfo.setpoint);
+                _twoExit.getSetpoint(siminfo.setpoint);
             }
 
             // Use setpoint to get new pose
             const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
             // Grab autopilot sensors for next iteration
-            _autopilot.readSensors(_world, pose, _logfile);
+            _twoExit.readSensors(_world, pose, _logfile);
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {
@@ -106,7 +107,7 @@ DLLEXPORT void webots_physics_init()
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);
 
-    _autopilot.init(_robot);
+    _twoExit.init(_robot);
 
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     _logfile = fopen(path, "w");

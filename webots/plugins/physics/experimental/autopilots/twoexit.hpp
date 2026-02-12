@@ -16,6 +16,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 // Hackflight
 #include <simulator/pose.h>
 #include <autopilot/rangefinder.hpp>
@@ -25,7 +27,9 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
-class AutoPilot {
+#include "autopilot.hpp"
+
+class TwoExit : public Autopilot {
 
     private:
 
