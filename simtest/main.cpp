@@ -70,7 +70,7 @@ static bool step(hf::Simulator & simulator, simsens::World & world,
     const auto pose = simulator.step(mode, setpoint);
 
     write_to_log(logfile, pose,
-            _rangefinder_distances_mm, rangefinder->getWidth());
+            _rangefinder_distances_mm, rangefinder->width);
 
     if (world.collided({pose.x, pose.y, pose.x})) {
         printf("collided\n");

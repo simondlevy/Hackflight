@@ -22,13 +22,16 @@ WORLDS_DIR = ../../worlds
 WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
 PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
+bazinga:
+	sed 's/physics.*//' $(WORLD_FILE) | sed 's/###//' > $(PLAYBACK_FILE)
+
 run:
 	@if [ ! -f $(WORLD_FILE) ]; then\
         echo "World file" $(WORLD_FILE) "not found";\
 	elif [ ! -f $(log) ]; then\
         echo "Log file" $(log) "not found";\
 	else \
-		sed 's/physics.*//' $(WORLD_FILE) > $(PLAYBACK_FILE);\
+		sed 's/physics.*//' $(WORLD_FILE) | sed 's/###//' > $(PLAYBACK_FILE);\
 	    webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller \
 		--stdout-redirect ./playback.py $(log);\
 	fi
