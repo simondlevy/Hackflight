@@ -25,22 +25,16 @@
 #include <simulator/pose.h>
 #include <simulator/simulator.hpp>
 
-static constexpr char ROBOT_NAME[] = "diyquad";
-
 static dBodyID _robotBody;
 
-// Platform-independent simulator simulator loop
-static hf::Simulator _simulator;
-
-DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
-{
-    (void)g1;
-    (void)g2;
-
-    return 0;
-}
-
 class PhysicsPluginHelper {
+
+    private:
+
+        static constexpr char ROBOT_NAME[] = "diyquad";
+
+        // Platform-independent simulator simulator loop
+        hf::Simulator _simulator;
 
     public:
 
@@ -53,7 +47,7 @@ class PhysicsPluginHelper {
 
         } siminfo_t;
 
-        static bool get_siminfo(siminfo_t & siminfo)
+        bool get_siminfo(siminfo_t & siminfo)
         {
             if (_robotBody == NULL) {
                 return false;
@@ -72,7 +66,7 @@ class PhysicsPluginHelper {
             return siminfo.framerate > 0;
         }
 
-        static hf::pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
+        hf::pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
         {
             // Set pose first time around
             static bool _ready;
@@ -84,7 +78,7 @@ class PhysicsPluginHelper {
             return _simulator.step(siminfo.mode, siminfo.setpoint);
         }
 
-        static void set_dbody_from_pose(const hf::pose_t & pose)
+        void set_dbody_from_pose(const hf::pose_t & pose)
         {
             // Negate Y to make leftward positive
             dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
@@ -98,7 +92,7 @@ class PhysicsPluginHelper {
             dBodySetQuaternion(_robotBody, q);
         }
 
-        static void init()
+        void init()
         {
             _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
 

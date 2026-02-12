@@ -21,7 +21,7 @@
 #include <unistd.h>
 
 // Webots
-#include "../common.hpp"
+#include "../helper.hpp"
 
 // Hackflight
 #include <autopilot/rangefinder.hpp>
@@ -50,6 +50,8 @@ static simsens::Robot _robot;
 
 static FILE * _logfp;
 
+static PhysicsPluginHelper _helper;
+
 static char * worldname()
 {
     return getenv(WORLD_VARIABLE_NAME);
@@ -76,7 +78,7 @@ static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
     }
 
     // Use setpoints to get new pose
-    const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
+    const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
     // Get simulated rangefinder distances
     _rangefinder->read(
@@ -107,7 +109,7 @@ static bool run_normal(PhysicsPluginHelper::siminfo_t & siminfo)
     }
 
     // Otherwise, set normally
-    PhysicsPluginHelper::set_dbody_from_pose(pose);
+    _helper.set_dbody_from_pose(pose);
 
     return true;
 }
@@ -125,7 +127,7 @@ DLLEXPORT void webots_physics_step()
 
         PhysicsPluginHelper::siminfo_t siminfo = {};
 
-        if (PhysicsPluginHelper::get_siminfo(siminfo)) {
+        if (_helper.get_siminfo(siminfo)) {
 
             if (!run_normal(siminfo)) {
                 _collided = true;
@@ -141,7 +143,7 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
-    PhysicsPluginHelper::init();
+    _helper.init();
 
     const auto pwd = getenv(PATH_VARIABLE_NAME);
 
@@ -161,4 +163,10 @@ DLLEXPORT void webots_physics_init()
     _logfp = fopen(path, "w");
 }
 
+DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
+{
+    (void)g1;
+    (void)g2;
 
+    return 0;
+}

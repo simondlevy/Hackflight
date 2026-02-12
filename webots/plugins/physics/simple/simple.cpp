@@ -16,18 +16,20 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include "../common.hpp"
+#include "../helper.hpp"
+
+static PhysicsPluginHelper _helper;
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
     PhysicsPluginHelper::siminfo_t siminfo = {};
 
-    if (PhysicsPluginHelper::get_siminfo(siminfo)) {
+    if (_helper.get_siminfo(siminfo)) {
 
-        const auto pose = PhysicsPluginHelper::get_pose_from_siminfo(siminfo);
+        const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
-        PhysicsPluginHelper::set_dbody_from_pose(pose);
+        _helper.set_dbody_from_pose(pose);
     }
 }
 
@@ -37,7 +39,13 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
-    PhysicsPluginHelper::init();
+    _helper.init();
 }
 
+DLLEXPORT int webots_physics_collide(dGeomID g1, dGeomID g2) 
+{
+    (void)g1;
+    (void)g2;
 
+    return 0;
+}
