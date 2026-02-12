@@ -25,7 +25,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
-class TwoExit {
+class AutoPilot {
 
     private:
 
@@ -78,6 +78,5 @@ class TwoExit {
                     _rangefinder->width,
                     _rangefinder->height,
                     RANGEFINDER_DISPLAY_SCALEUP);
-
         }
 };
