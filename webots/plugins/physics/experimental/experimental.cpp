@@ -46,6 +46,10 @@ static PhysicsPluginHelper _helper;
 
 static TwoExit _twoExit;
 
+static std::map<string, Autopilot *> _autopilots = {
+    {"twoexit", &_twoExit}
+};
+
 static char * worldname()
 {
     return getenv(WORLD_VARIABLE_NAME);
@@ -67,16 +71,30 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper.get_siminfo(siminfo)) {
 
+            Autopilot * autopilot = nullptr;
+
             // Replace open-loop setpoint with setpoint from autopilot
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-                _twoExit.getSetpoint(siminfo.setpoint);
+
+                auto it = _autopilots.find(worldname());
+
+                if (it == _autopilots.end()) {
+                    printf("Autopilot not found for world %s\n", worldname());
+                }
+
+                else {
+                    autopilot = it->second;
+                    autopilot->getSetpoint(siminfo.setpoint);
+                }
             }
 
             // Use setpoint to get new pose
             const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
             // Grab autopilot sensors for next iteration
-            _twoExit.readSensors(_world, pose, _logfile);
+            if (autopilot) {
+                autopilot->readSensors(_world, pose, _logfile);
+            }
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {
