@@ -48,7 +48,9 @@ static PhysicsPluginHelper _helper;
 static TwoExitAutopilot _twoExitAutopilot;
 static PingPongAutopilot _pingPongAutopilot;
 
-static std::map<string, Autopilot *> _autopilots = {
+static Autopilot * _autopilot;
+
+static const std::map<string, Autopilot *> AUTOPILOTS = {
     {"twoexit", &_twoExitAutopilot},
     {"pingpong", &_pingPongAutopilot},
 };
@@ -74,20 +76,14 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper.get_siminfo(siminfo)) {
 
-            Autopilot * autopilot = nullptr;
-
-            // Replace open-loop setpoint with setpoint from autopilot
+            // Replace open-loop setpoint with setpoint from autopilot if
+            // available
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-
-                auto it = _autopilots.find(worldname());
-
-                if (it == _autopilots.end()) {
-                    printf("Autopilot not found for world %s\n", worldname());
+                if (_autopilot) {
+                    _autopilot->getSetpoint(siminfo.setpoint);
                 }
-
                 else {
-                    autopilot = it->second;
-                    autopilot->getSetpoint(siminfo.setpoint);
+                    printf("No autopilot for world %s\n", worldname());
                 }
             }
 
@@ -95,8 +91,8 @@ DLLEXPORT void webots_physics_step()
             const auto pose = _helper.get_pose_from_siminfo(siminfo);
 
             // Grab autopilot sensors for next iteration
-            if (autopilot) {
-                autopilot->readSensors(_world, pose, _logfile);
+            if (_autopilot) {
+                _autopilot->readSensors(_world, pose, _logfile);
             }
 
             // Stop if we detected a collision
@@ -124,6 +120,11 @@ DLLEXPORT void webots_physics_init()
 
     sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
     simsens::WorldParser::parse(path, _world);
+
+    auto it = AUTOPILOTS.find(worldname());
+    if (it != AUTOPILOTS.end()) {
+        _autopilot = it->second;
+    }
 
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);

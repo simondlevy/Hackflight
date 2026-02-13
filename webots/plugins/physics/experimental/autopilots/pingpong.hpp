@@ -32,15 +32,31 @@ class PingPongAutopilot : public Autopilot {
 
     private:
 
+        simsens::Rangefinder * _rangefinderTmp;
         simsens::Rangefinder * _rangefinderForward;
-        simsens::Rangefinder * _rangefinderBackward;
+        //simsens::Rangefinder * _rangefinderBackward;
+
+        void readRangefinder(simsens::Rangefinder * rangefinder,
+                simsens::World & world, const hf::pose_t & pose,
+                const int size)
+        {
+            int d[1000] = {};
+            rangefinder->read(
+                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    world, d);
+            for (int i=0; i<size; ++i) {
+                printf("%d ", d[i]);
+            }
+            printf("\n-------------------------\n");
+        }
 
     public:
 
         void init(simsens::Robot & robot)
         {
+            _rangefinderTmp = robot.rangefinders["VL53L1-tmp"];
             _rangefinderForward = robot.rangefinders["VL53L1-forward"];
-            _rangefinderBackward = robot.rangefinders["VL53L1-backward"];
+            //_rangefinderBackward = robot.rangefinders["VL53L1-backward"];
         }
 
         void getSetpoint(hf::demands_t & setpoint)
@@ -51,10 +67,10 @@ class PingPongAutopilot : public Autopilot {
         void readSensors(simsens::World & world, const hf::pose_t & pose,
                 FILE * logfile)
         {
-            printf("forward=%p backward=%p\n", _rangefinderForward, _rangefinderBackward);
+            readRangefinder(_rangefinderTmp, world, pose, 1);
+            readRangefinder(_rangefinderForward, world, pose, 1);
 
-            (void)world;
-            (void)pose;
             (void)logfile;
+
         }
 };
