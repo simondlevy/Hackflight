@@ -70,7 +70,7 @@ static bool step(hf::Simulator & simulator, simsens::World & world,
     const auto pose = simulator.step(mode, setpoint);
 
     write_to_log(logfile, pose,
-            _rangefinder_distances_mm, rangefinder->getWidth());
+            _rangefinder_distances_mm, rangefinder->width);
 
     if (world.collided({pose.x, pose.y, pose.z})) {
         printf("collided\n");
@@ -105,7 +105,7 @@ int main(int argc, char ** argv)
     static simsens::World world = {};
     simsens::WorldParser::parse(world_path, world, robot_path);
 
-    auto rangefinder = robot.rangefinders[0];
+    auto rangefinder = robot.rangefinders["VL53L5-forward"];
 
     const auto pose = world.getRobotPose();
 
