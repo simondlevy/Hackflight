@@ -28,7 +28,7 @@ closedloop = standard
 
 # -----------------------------------------------------------------------------
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 SRCDIR = ../../../src
 INCLUDE = -I$(SRCDIR)

@@ -30,7 +30,7 @@ namespace hf {
 
             void init(const uint32_t nowMs)
             {
-                axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
+                axis3fSubSamplerInit(&_accSubSampler, 1.0f); // accel already in m/s²
                 axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
 
                 ekf_init();
@@ -333,7 +333,7 @@ namespace hf {
 
             typedef struct
             {
-                axis3_t acc; // Gs, for legacy reasons
+                axis3_t acc; // m/s²
             } accelerationMeasurement_t;
 
             typedef struct

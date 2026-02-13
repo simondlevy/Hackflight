@@ -20,7 +20,7 @@ ROOT = $(HOME)/Desktop
 
 NET = $(ROOT)/2025-diff-network/levy/
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 CXX_SOURCES = ../support.cpp
 

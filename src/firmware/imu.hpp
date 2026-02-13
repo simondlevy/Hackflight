@@ -58,11 +58,12 @@ namespace hf {
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
-                // Convert accel to Gs
+                // Convert accel to m/s²
+                static constexpr float GRAVITY = 9.81f;
                 axis3_t accel = {
-                    scale(accelRaw.x, _ascale),
-                    scale(accelRaw.y, _ascale),
-                    scale(accelRaw.z, _ascale)
+                    scale(accelRaw.x, _ascale) * GRAVITY,
+                    scale(accelRaw.y, _ascale) * GRAVITY,
+                    scale(accelRaw.z, _ascale) * GRAVITY
                 };
 
                 // Calibrate gyro with raw values if necessary
@@ -84,13 +85,13 @@ namespace hf {
                 axis3_t accelScaled = {};
                 alignToAirframe(&accel, &accelScaled);
 
-                axis3_t accelGs = {};
+                axis3_t accelAligned = {};
 
-                accAlignToGravity(&accelScaled, &accelGs);
+                accAlignToGravity(&accelScaled, &accelAligned);
 
-                applyLpf(_accLpf, &accelGs);
+                applyLpf(_accLpf, &accelAligned);
 
-                ekf->enqueueImu(&_gyroData, &accelGs);
+                ekf->enqueueImu(&_gyroData, &accelAligned);
 
                 return _gyroBiasFound;
             }

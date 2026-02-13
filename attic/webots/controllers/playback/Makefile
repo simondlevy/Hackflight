@@ -23,7 +23,7 @@ OPENCV_DIR = /usr/include/opencv4
 
 SIMSENSORS_DIR = $(HOME)/Desktop
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
+CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 SRC_DIR = ../../../src
 

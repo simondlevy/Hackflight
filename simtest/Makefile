@@ -14,7 +14,7 @@ simtest: main.o
 
 main.o: main.cpp ../src/*.hpp ../src/pids/*.hpp \
 	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
-	g++ -Wall -c -I$(ROOT) -I../src main.cpp
+	g++ -std=c++17 -Wall -c -I$(ROOT) -I../src main.cpp
 
 edit:
 	vim main.cpp
