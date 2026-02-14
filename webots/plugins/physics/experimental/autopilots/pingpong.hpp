@@ -28,31 +28,43 @@
 
 #include "autopilot.hpp"
 
+class SingleBeamRangefinder {
+
+    friend class PingPongAutopilot;
+
+    private:
+
+        simsens::Rangefinder * rangefinder;
+        
+        int distance_mm;
+
+        void init(simsens::Robot & robot, const string name)
+        {
+            rangefinder = robot.rangefinders[name];
+        }
+
+        void read(simsens::World & world, const hf::pose_t & pose)
+        {
+            rangefinder->read(
+                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    world, &distance_mm);
+         }
+
+};
+
 class PingPongAutopilot : public Autopilot {
 
     private:
 
-        simsens::Rangefinder * _rangefinderForward;
-        //simsens::Rangefinder * _rangefinderBackward;
-
-        int readRangefinder(simsens::Rangefinder * rangefinder,
-                simsens::World & world, const hf::pose_t & pose)
-        {
-            int distance_mm = 0;
-
-            rangefinder->read(
-                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-                    world, &distance_mm);
-
-            return distance_mm;
-        }
+        SingleBeamRangefinder  _rangefinderForward;
+        SingleBeamRangefinder  _rangefinderBackward;
 
     public:
 
         void init(simsens::Robot & robot)
         {
-            _rangefinderForward = robot.rangefinders["VL53L1-forward"];
-            //_rangefinderBackward = robot.rangefinders["VL53L1-backward"];
+            _rangefinderForward.init(robot, "VL53L1-forward");
+            _rangefinderBackward.init(robot, "VL53L1-backward");
         }
 
         void getSetpoint(hf::demands_t & setpoint)
@@ -63,7 +75,12 @@ class PingPongAutopilot : public Autopilot {
         void readSensors(simsens::World & world, const hf::pose_t & pose,
                 FILE * logfile)
         {
-            printf("%d\n", readRangefinder(_rangefinderForward, world, pose));
+            _rangefinderForward.read(world, pose);
+            _rangefinderBackward.read(world, pose);
+
+            printf("forward=%4dmm  backward=%4dmm\n",
+                    _rangefinderForward.distance_mm,
+                    _rangefinderBackward.distance_mm);
 
             (void)logfile;
 
