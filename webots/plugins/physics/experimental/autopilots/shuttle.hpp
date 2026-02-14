@@ -74,23 +74,10 @@ class ShuttleAutopilot : public Autopilot {
 
             static float _pitch;
 
-            if (_pitch == 0) {
-                _pitch = +SPEED;
-            }
-
-            printf("forward=%4dmm  backward=%4dmm\n",
-                    _rangefinderForward.distance_mm,
-                    _rangefinderBackward.distance_mm);
-
-            if (_rangefinderForward.distance_mm < WALL_PROXIMITY_MM) {
-                printf("front\n");
-                _pitch = -SPEED;
-            }
-
-            if (_rangefinderBackward.distance_mm < WALL_PROXIMITY_MM) {
-                _pitch = +SPEED;
-                printf("back\n");
-            }
+            _pitch = _pitch == 0 ? +SPEED :
+                _rangefinderForward.distance_mm < WALL_PROXIMITY_MM ? -SPEED :
+                _rangefinderBackward.distance_mm < WALL_PROXIMITY_MM ? +SPEED :
+                _pitch;
 
             setpoint.pitch = _pitch;
         }
