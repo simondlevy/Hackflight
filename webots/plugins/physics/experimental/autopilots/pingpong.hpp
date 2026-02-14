@@ -69,6 +69,10 @@ class PingPongAutopilot : public Autopilot {
 
         void getSetpoint(hf::demands_t & setpoint)
         {
+            printf("forward=%4dmm  backward=%4dmm\n",
+                    _rangefinderForward.distance_mm,
+                    _rangefinderBackward.distance_mm);
+
             (void)setpoint;
         }
 
@@ -77,10 +81,6 @@ class PingPongAutopilot : public Autopilot {
         {
             _rangefinderForward.read(world, pose);
             _rangefinderBackward.read(world, pose);
-
-            printf("forward=%4dmm  backward=%4dmm\n",
-                    _rangefinderForward.distance_mm,
-                    _rangefinderBackward.distance_mm);
 
             (void)logfile;
 
