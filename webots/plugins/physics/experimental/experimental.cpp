@@ -29,7 +29,7 @@
 #include <simsensors/src/world.hpp>
 
 // Autopilots
-#include "autopilots/pingpong.hpp"
+#include "autopilots/shuttle.hpp"
 #include "autopilots/twoexit.hpp"
 
 static const char * LOG_FILE_NAME = "log.csv";
@@ -46,13 +46,13 @@ static FILE * _logfile;
 static PhysicsPluginHelper _helper;
 
 static TwoExitAutopilot _twoExitAutopilot;
-static PingPongAutopilot _pingPongAutopilot;
+static ShuttleAutopilot _shuttleAutopilot;
 
 static Autopilot * _autopilot;
 
 static const std::map<string, Autopilot *> AUTOPILOTS = {
     {"twoexit", &_twoExitAutopilot},
-    {"pingpong", &_pingPongAutopilot},
+    {"shuttle", &_shuttleAutopilot},
 };
 
 static char * worldname()
@@ -129,7 +129,7 @@ DLLEXPORT void webots_physics_init()
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);
 
-    _pingPongAutopilot.init(_robot);
+    _shuttleAutopilot.init(_robot);
     _twoExitAutopilot.init(_robot);
 
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);

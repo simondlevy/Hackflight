@@ -30,7 +30,7 @@
 
 class SingleBeamRangefinder {
 
-    friend class PingPongAutopilot;
+    friend class ShuttleAutopilot;
 
     private:
 
@@ -52,12 +52,12 @@ class SingleBeamRangefinder {
 
 };
 
-class PingPongAutopilot : public Autopilot {
+class ShuttleAutopilot : public Autopilot {
 
     private:
 
-        SingleBeamRangefinder  _rangefinderForward;
-        SingleBeamRangefinder  _rangefinderBackward;
+        SingleBeamRangefinder _rangefinderForward;
+        SingleBeamRangefinder _rangefinderBackward;
 
     public:
 
