@@ -1,5 +1,5 @@
 /* 
- *  Ping-pong autopilot using 1x1 rangefinder
+ *  Shuttle autopilot using 1x1 rangefinder
  *
  *  Copyright (C) 2026 Simon D. Levy
  *
@@ -69,11 +69,30 @@ class ShuttleAutopilot : public Autopilot {
 
         void getSetpoint(hf::demands_t & setpoint)
         {
+            static constexpr int WALL_PROXIMITY_MM = 200;
+            static constexpr float SPEED = 0.5;
+
+            static float _pitch;
+
+            if (_pitch == 0) {
+                _pitch = +SPEED;
+            }
+
             printf("forward=%4dmm  backward=%4dmm\n",
                     _rangefinderForward.distance_mm,
                     _rangefinderBackward.distance_mm);
 
-            (void)setpoint;
+            if (_rangefinderForward.distance_mm < WALL_PROXIMITY_MM) {
+                printf("front\n");
+                _pitch = -SPEED;
+            }
+
+            if (_rangefinderBackward.distance_mm < WALL_PROXIMITY_MM) {
+                _pitch = +SPEED;
+                printf("back\n");
+            }
+
+            setpoint.pitch = _pitch;
         }
 
         void readSensors(simsens::World & world, const hf::pose_t & pose,
