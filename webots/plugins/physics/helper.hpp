@@ -27,7 +27,7 @@
 
 static dBodyID _robotBody;
 
-class PhysicsPluginHelper {
+class PluginHelper {
 
     private:
 

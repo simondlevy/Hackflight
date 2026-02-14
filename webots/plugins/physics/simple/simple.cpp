@@ -18,12 +18,12 @@
 
 #include "../helper.hpp"
 
-static PhysicsPluginHelper _helper;
+static PluginHelper _helper;
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    PhysicsPluginHelper::siminfo_t siminfo = {};
+    PluginHelper::siminfo_t siminfo = {};
 
     if (_helper.get_siminfo(siminfo)) {
 

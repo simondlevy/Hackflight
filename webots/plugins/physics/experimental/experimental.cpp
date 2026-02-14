@@ -43,7 +43,7 @@ static simsens::Robot _robot;
 
 static FILE * _logfile;
 
-static PhysicsPluginHelper _helper;
+static PluginHelper _helper;
 
 static TwoExitAutopilot _twoExitAutopilot;
 static ShuttleAutopilot _shuttleAutopilot;
@@ -72,7 +72,7 @@ DLLEXPORT void webots_physics_step()
 
     else {
 
-        PhysicsPluginHelper::siminfo_t siminfo = {};
+        PluginHelper::siminfo_t siminfo = {};
 
         if (_helper.get_siminfo(siminfo)) {
 
