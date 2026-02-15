@@ -36,8 +36,6 @@ namespace hf {
 
             int rangefinder_distances_mm[8];
 
-            TwoExitAutopilot() = default;
-
             simsens::Rangefinder * get_rangefinder(simsens::Robot & robot)
             {
                 return robot.rangefinders["VL53L5-forward"];

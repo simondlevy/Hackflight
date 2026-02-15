@@ -54,7 +54,6 @@ class PingPongAutopilot : public Autopilot {
 
     public:
 
-
         void getSetpoint(const hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
             static constexpr int WALL_PROXIMITY_MM = 200;

@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 // Hackflight
-#include <autopilot/twoexit.hpp>
+#include <autopilots/twoexit.hpp>
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
 #include <vehicles/diyquad.hpp>

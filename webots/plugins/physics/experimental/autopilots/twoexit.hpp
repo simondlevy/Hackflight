@@ -19,7 +19,7 @@
 #pragma once
 
 // Hackflight
-#include <autopilot/twoexit.hpp>
+#include <autopilots/twoexit.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/robot.hpp>
