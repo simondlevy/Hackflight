@@ -76,8 +76,6 @@ class ShuttleAutopilot : public Autopilot {
 
             static float _pitch;
 
-            printf("f: %d b: %d\n", _rangefinderForward.distance_mm, _rangefinderBackward.distance_mm);
-
             _pitch = _pitch == 0 ? +SPEED :
                 _rangefinderForward.distance_mm < WALL_PROXIMITY_MM ? -SPEED :
                 _rangefinderBackward.distance_mm < WALL_PROXIMITY_MM ? +SPEED :

@@ -20,7 +20,6 @@
 
 // Hackflight
 #include <simulator/dynamics.hpp>
-#include <simulator/pose.h>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/robot.hpp>

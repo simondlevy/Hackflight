@@ -27,7 +27,6 @@
 #include <num.hpp>
 #include <new_pidcontrol.hpp>
 #include <simulator/dynamics.hpp>
-#include <simulator/pose.h>
 #include <vehicles/diyquad.hpp>
 
 namespace hf {
@@ -44,6 +43,17 @@ namespace hf {
             static constexpr float YAW_MOTOR_SCALE = 2e4;
 
         public:
+
+            typedef struct {
+
+                double x;
+                double y;
+                double z;
+                double phi;
+                double theta;
+                double psi;
+
+            } pose_t;
 
             void init(const pose_t & pose, const float framerate)
             {

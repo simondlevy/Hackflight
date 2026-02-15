@@ -20,7 +20,6 @@
 // Hackflight
 #include <autopilot/rangefinder.hpp>
 #include <datatypes.h>
-#include <simulator/pose.h>
 #include <simulator/simulator.hpp>
 #include <vehicles/diyquad.hpp>
 

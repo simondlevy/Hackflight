@@ -23,7 +23,6 @@
 #define _MAIN
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
-#include <simulator/pose.h>
 #include <simulator/simulator.hpp>
 
 static dBodyID _robotBody;
@@ -41,7 +40,7 @@ class PluginHelper {
 
         typedef struct {
 
-            hf::pose_t startingPose;
+            hf::Simulator::pose_t startingPose;
             float framerate;
             hf::mode_e mode;
             hf::demands_t setpoint;

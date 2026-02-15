@@ -19,7 +19,6 @@
 #pragma once
 
 // Hackflight
-#include <simulator/pose.h>
 #include <autopilot/rangefinder.hpp>
 
 // SimSensors
