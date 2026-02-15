@@ -38,6 +38,13 @@ namespace hf {
 
             int rangefinder_distances_mm[8];
 
+            TwoExitAutopilot() = default;
+
+            TwoExitAutopilot(simsens::Robot & robot)
+            {
+                init(robot);
+            }
+
             void init(simsens::Robot & robot)
             {
                 rangefinder = robot.rangefinders["VL53L5-forward"];
