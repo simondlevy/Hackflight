@@ -60,32 +60,34 @@ int main(int argc, char ** argv)
 
     hf::Simulator simulator = {};
 
-    simulator.init(
-            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-            hf::TwoExitAutopilot::FRAME_RATE_HZ);
+    const auto rate = hf::TwoExitAutopilot::FRAME_RATE_HZ;
+
+    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
+           rate);
+
+    int _rangefinder_distances_mm[1000] = {}; 
+
+    hf::TwoExitAutopilot autopilot = {};
 
     for (int frame=0;
-            frame<MAX_TIME_SEC * hf::TwoExitAutopilot::FRAME_RATE_HZ;
+            frame<MAX_TIME_SEC * rate;
             ++frame) {
 
-        static int _rangefinder_distances_mm[1000]; 
-
         const auto mode =
-            frame < TAKEOFF_TIME_SEC*hf::TwoExitAutopilot::FRAME_RATE_HZ ?
+            frame < TAKEOFF_TIME_SEC * rate ?
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
 
         hf::demands_t setpoint = {};
 
-        if (hf::TwoExitAutopilot::run(frame, _rangefinder_distances_mm,
-                    setpoint)) {
+        if (autopilot.run(frame, _rangefinder_distances_mm, setpoint)) {
             printf("succeeded\n");
             break;
         }
 
         const auto state = simulator.step(mode, setpoint);
 
-        hf::TwoExitAutopilot::writeToLog(logfile, state,
+        autopilot.writeToLog(logfile, state,
                 _rangefinder_distances_mm, rangefinder->width);
 
         if (world.collided({state.x, state.y, state.z})) {
