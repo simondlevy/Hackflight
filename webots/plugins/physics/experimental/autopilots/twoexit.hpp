@@ -44,7 +44,7 @@ class TwoExitAutopilot : public Autopilot {
 
             static int _frame;
 
-            _helper.run(_frame++, setpoint);
+            _helper.getSetpoint(_frame++, setpoint);
          }
 
         void readSensors(

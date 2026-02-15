@@ -25,8 +25,6 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-#include "autopilot.hpp"
-
 class PingPongAutopilot : public Autopilot {
 
     private:

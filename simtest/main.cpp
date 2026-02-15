@@ -72,7 +72,7 @@ int main(int argc, char ** argv)
 
         hf::demands_t setpoint = {};
 
-        if (autopilot.run(frame, setpoint)) {
+        if (autopilot.getSetpoint(frame, setpoint)) {
             printf("succeeded\n");
             break;
         }

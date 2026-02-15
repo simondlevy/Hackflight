@@ -1,5 +1,5 @@
 /**
- * Helper class for two-exit autopilot using 1x8 rangefinder
+ * "Two-exit" autopilot using 1x8 rangefinder
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -19,11 +19,11 @@
 #pragma once
 
 // Hackflight
-#include <simulator/simulator.hpp>
+#include <datatypes.h>
 
 // SimSensors
-#include <simsensors/src/parsers/webots/world.hpp>
-#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/world.hpp>
+#include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 namespace hf {
@@ -41,7 +41,7 @@ namespace hf {
                 return robot.rangefinders["VL53L5-forward"];
             }
 
-            bool run(const int frame, demands_t & setpoint)
+            bool getSetpoint(const int frame, demands_t & setpoint)
             {
                 static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
 
