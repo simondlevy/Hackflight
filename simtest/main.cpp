@@ -31,18 +31,17 @@
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
 
-static const char * LOGNAME = "log.csv";
-
 int main(int argc, char ** argv)
 {
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s WORLDFILE ROBOTFILE\n", argv[0]);
+    if (argc < 4) {
+        fprintf(stderr, "Usage: %s WORLDFILE ROBOTFILE LOGFILE\n", argv[0]);
         return 1;
     }
 
-    auto  * logfile = fopen(LOGNAME, "w");
+    const auto logname = argv[3];
+    auto  * logfile = fopen(logname, "w");
     if (!logfile) {
-        fprintf(stderr, "Unable to open file %s for wirting\n", LOGNAME);
+        fprintf(stderr, "Unable to open file %s for writing\n", logname);
         exit(1);
     }
 
@@ -50,9 +49,8 @@ int main(int argc, char ** argv)
     simsens::Robot robot = {};
     simsens::RobotParser::parse(argv[1], robot);
 
-    const auto world_path = argv[2];
     static simsens::World world = {};
-    simsens::WorldParser::parse(world_path, world, robot_path);
+    simsens::WorldParser::parse(argv[2], world, robot_path);
 
     hf::TwoExitAutopilot autopilot = {};
 
@@ -67,9 +65,7 @@ int main(int argc, char ** argv)
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
            rate);
 
-    for (int frame=0;
-            frame<MAX_TIME_SEC * rate;
-            ++frame) {
+    for (int frame=0; frame<MAX_TIME_SEC * rate; ++frame) {
 
         const auto mode =
             frame < TAKEOFF_TIME_SEC * rate ?

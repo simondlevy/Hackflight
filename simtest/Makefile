@@ -2,12 +2,14 @@ ROOT = ../..
 
 SIMSENSORS = $(ROOT)/simsensors/src
 
-world=../webots/worlds/twoexit.wbt
+world = ../webots/worlds/twoexit.wbt
+
+log = "log.csv"
 
 all: simtest
 
 run: simtest
-	./simtest ../webots/protos/DiyQuad.proto $(world)
+	./simtest ../webots/protos/DiyQuad.proto $(world) $(log)
 
 simtest: main.o
 	g++ -o simtest main.o
