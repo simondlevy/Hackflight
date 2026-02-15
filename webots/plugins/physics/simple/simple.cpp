@@ -18,26 +18,27 @@
 
 #include "../helper.hpp"
 
-static PluginHelper _helper;
+static PluginHelper * _helper;
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
     PluginHelper::siminfo_t siminfo = {};
 
-    if (_helper.get_siminfo(siminfo)) {
+    if (_helper->get_siminfo(siminfo)) {
 
-        const auto state = _helper.get_state_from_siminfo(siminfo);
+        const auto state = _helper->get_state_from_siminfo(siminfo);
 
-        _helper.set_dbody_from_state(state);
+        _helper->set_dbody_from_state(state);
     }
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
+    delete _helper;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
-    _helper.init();
+    _helper = new PluginHelper();
 }

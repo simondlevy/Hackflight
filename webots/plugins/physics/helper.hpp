@@ -47,6 +47,21 @@ class PluginHelper {
 
         } siminfo_t;
 
+        PluginHelper()
+        {
+            _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
+
+            if (_robotBody == NULL) {
+
+                dWebotsConsolePrintf("webots_physics_init :: ");
+                dWebotsConsolePrintf("error : could not get body of robot.\r\n");
+            }
+            else {
+
+                dBodySetGravityMode(_robotBody, 0);
+            }
+        }
+
         bool get_siminfo(siminfo_t & siminfo)
         {
             if (_robotBody == NULL) {
@@ -90,21 +105,6 @@ class PluginHelper {
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
             dBodySetQuaternion(_robotBody, q);
-        }
-
-        void init()
-        {
-            _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
-
-            if (_robotBody == NULL) {
-
-                dWebotsConsolePrintf("webots_physics_init :: ");
-                dWebotsConsolePrintf("error : could not get body of robot.\r\n");
-            }
-            else {
-
-                dBodySetGravityMode(_robotBody, 0);
-            }
         }
 
     private:

@@ -43,7 +43,7 @@ static simsens::Robot _robot;
 
 static FILE * _logfile;
 
-static PluginHelper _helper;
+static PluginHelper * _helper;
 
 static TwoExitAutopilot _twoExitAutopilot;
 static PingPongAutopilot _pingPongAutopilot;
@@ -54,6 +54,8 @@ static const std::map<string, Autopilot *> AUTOPILOTS = {
     {"twoexit", &_twoExitAutopilot},
     {"pingpong", &_pingPongAutopilot},
 };
+
+static std::map<string, Autopilot *> _autopilots;
 
 static char * worldname()
 {
@@ -74,10 +76,10 @@ DLLEXPORT void webots_physics_step()
 
         PluginHelper::siminfo_t siminfo = {};
 
-        if (_helper.get_siminfo(siminfo)) {
+        if (_helper->get_siminfo(siminfo)) {
 
             // Get current vehicle state
-            const auto state = _helper.get_state_from_siminfo(siminfo);
+            const auto state = _helper->get_state_from_siminfo(siminfo);
 
             // Replace open-loop setpoint with setpoint from autopilot if
             // available
@@ -91,7 +93,7 @@ DLLEXPORT void webots_physics_step()
             }
 
             // Use setpoint to get new state
-            const auto newstate = _helper.get_state_from_siminfo(siminfo);
+            const auto newstate = _helper->get_state_from_siminfo(siminfo);
 
             // Grab autopilot sensors for next iteration
             if (_autopilot) {
@@ -104,7 +106,7 @@ DLLEXPORT void webots_physics_step()
             }
 
             // Otherwise, set normally
-            _helper.set_dbody_from_state(newstate);
+            _helper->set_dbody_from_state(newstate);
         }
     }
 }
@@ -115,7 +117,7 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
-    _helper.init();
+    _helper = new PluginHelper();
 
     const auto pwd = getenv(PATH_VARIABLE_NAME);
 
