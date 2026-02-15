@@ -28,7 +28,7 @@ namespace hf {
 
             static constexpr float FRAME_RATE_HZ = 32;
 
-            static bool run(
+            bool run(
                     const int frame,
                     const int * rangefinder_distances_mm,
                     demands_t & setpoint)
@@ -68,7 +68,7 @@ namespace hf {
                 return false;
             }        
 
-            static void writeToLog(
+            void writeToLog(
                     FILE * logfile,
                     const hf::Dynamics::state_t state,
                     const int * rangefinder_distances_mm,
