@@ -1,5 +1,5 @@
 /**
- * Setpoint from rangedfinder
+ * Helper class for two-exit autopilot using 1x8 rangefinder
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -18,7 +18,13 @@
 
 #pragma once
 
+// Hackflight
 #include <simulator/simulator.hpp>
+
+// SimSensors
+#include <simsensors/src/parsers/webots/world.hpp>
+#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
 
 namespace hf {
 
@@ -28,7 +34,14 @@ namespace hf {
 
             static constexpr float FRAME_RATE_HZ = 32;
 
+            simsens::Rangefinder * rangefinder;
+
             int rangefinder_distances_mm[8];
+
+            void init(simsens::Robot & robot)
+            {
+                rangefinder = robot.rangefinders["VL53L5-forward"];
+            }
 
             bool run(const int frame, demands_t & setpoint)
             {
@@ -67,7 +80,12 @@ namespace hf {
                 return false;
             }        
 
-            void writeToLog( FILE * logfile, const hf::Dynamics::state_t state)
+            void read(simsens::World & world, const simsens::pose_t & pose)
+            {
+                rangefinder->read(pose, world, rangefinder_distances_mm);
+            }
+
+            void writeToLog(FILE * logfile, const hf::Dynamics::state_t state)
             {
                 const auto d = rangefinder_distances_mm;
 

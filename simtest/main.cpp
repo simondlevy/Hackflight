@@ -54,7 +54,9 @@ int main(int argc, char ** argv)
     static simsens::World world = {};
     simsens::WorldParser::parse(world_path, world, robot_path);
 
-    auto rangefinder = robot.rangefinders["VL53L5-forward"];
+    hf::TwoExitAutopilot autopilot = {};
+
+    autopilot.init(robot);
 
     const auto pose = world.getRobotPose();
 
@@ -64,8 +66,6 @@ int main(int argc, char ** argv)
 
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
            rate);
-
-    hf::TwoExitAutopilot autopilot = {};
 
     for (int frame=0;
             frame<MAX_TIME_SEC * rate;
@@ -87,14 +87,13 @@ int main(int argc, char ** argv)
 
         autopilot.writeToLog(logfile, state);
 
+        autopilot.read(world,
+                {state.x, state.y, state.z,
+                state.phi, state.theta, state.psi});
         if (world.collided({state.x, state.y, state.z})) {
             printf("collided\n");
             break;
         }
-
-        rangefinder->read(
-                {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-                world, autopilot.rangefinder_distances_mm);
     }
 
     fclose(logfile);
