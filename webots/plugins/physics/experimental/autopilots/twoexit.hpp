@@ -19,7 +19,7 @@
 #pragma once
 
 // Hackflight
-#include <autopilot/rangefinder.hpp>
+#include <autopilot/twoexit.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/robot.hpp>
@@ -51,8 +51,8 @@ class TwoExitAutopilot : public Autopilot {
 
             static int _frame;
 
-            hf::RangefinderSetpoint::runTwoExit(_frame++,
-                    _rangefinder_distances_mm, setpoint);
+            hf::TwoExitAutopilot::run(
+                    _frame++, _rangefinder_distances_mm, setpoint);
          }
 
         void readSensors(simsens::World & world, const hf::Dynamics::state_t & state,
@@ -63,7 +63,7 @@ class TwoExitAutopilot : public Autopilot {
                     {state.x, state.y, state.z, state.phi, state.theta, state.psi},
                     world, _rangefinder_distances_mm);
 
-            hf::RangefinderSetpoint::write_to_log(logfile, state,
+            hf::TwoExitAutopilot::writeToLog(logfile, state,
                     _rangefinder_distances_mm, _rangefinder->width);
 
             // Visualize rangefinder distances

@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 // Hackflight
-#include <autopilot/rangefinder.hpp>
+#include <autopilot/twoexit.hpp>
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
 #include <vehicles/diyquad.hpp>
@@ -46,15 +46,15 @@ static bool step(hf::Simulator & simulator, simsens::World & world,
 
     hf::demands_t setpoint = {};
 
-    if (hf::RangefinderSetpoint::runTwoExit(frame,
-                _rangefinder_distances_mm, setpoint)) {
+    if (hf::TwoExitAutopilot::run(frame, _rangefinder_distances_mm,
+                setpoint)) {
         printf("succeeded\n");
         return true;
     }
 
     const auto state = simulator.step(mode, setpoint);
 
-    hf::RangefinderSetpoint::write_to_log(logfile, state,
+    hf::TwoExitAutopilot::writeToLog(logfile, state,
             _rangefinder_distances_mm, rangefinder->width);
 
     if (world.collided({state.x, state.y, state.z})) {

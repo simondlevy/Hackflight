@@ -20,7 +20,6 @@
 
 // Hackflight
 #include <simulator/dynamics.hpp>
-#include <autopilot/rangefinder.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/robot.hpp>

@@ -22,13 +22,13 @@
 
 namespace hf {
 
-    class RangefinderSetpoint {
+    class TwoExitAutopilot {
 
         public:
 
             static constexpr float FRAME_RATE_HZ = 32;
 
-            static bool runTwoExit(
+            static bool run(
                     const int frame,
                     const int * rangefinder_distances_mm,
                     demands_t & setpoint)
@@ -68,7 +68,7 @@ namespace hf {
                 return false;
             }        
 
-            static void write_to_log(
+            static void writeToLog(
                     FILE * logfile,
                     const hf::Dynamics::state_t state,
                     const int * rangefinder_distances_mm,
