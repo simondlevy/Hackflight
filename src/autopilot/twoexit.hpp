@@ -28,10 +28,9 @@ namespace hf {
 
             static constexpr float FRAME_RATE_HZ = 32;
 
-            bool run(
-                    const int frame,
-                    const int * rangefinder_distances_mm,
-                    demands_t & setpoint)
+            int rangefinder_distances_mm[8];
+
+            bool run(const int frame, demands_t & setpoint)
             {
                 static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
 
@@ -68,18 +67,15 @@ namespace hf {
                 return false;
             }        
 
-            void writeToLog(
-                    FILE * logfile,
-                    const hf::Dynamics::state_t state,
-                    const int * rangefinder_distances_mm,
-                    const int rangefinder_width)
+            void writeToLog( FILE * logfile, const hf::Dynamics::state_t state)
             {
-                fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                        state.x, state.y, state.z, state.phi, state.theta, state.psi);
-                for (int k=0; k<rangefinder_width; ++k) {
-                    fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
-                }
-                fprintf(logfile, "\n");
+                const auto d = rangefinder_distances_mm;
+
+                fprintf(logfile,
+                        "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f" 
+                        "%d,%d,%d,%d,%d,%d,%d,%d\n",
+                        state.x, state.y, state.z, state.phi, state.theta, state.psi,
+                        d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
             }
 
     };

@@ -65,8 +65,6 @@ int main(int argc, char ** argv)
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
            rate);
 
-    int _rangefinder_distances_mm[1000] = {}; 
-
     hf::TwoExitAutopilot autopilot = {};
 
     for (int frame=0;
@@ -80,15 +78,14 @@ int main(int argc, char ** argv)
 
         hf::demands_t setpoint = {};
 
-        if (autopilot.run(frame, _rangefinder_distances_mm, setpoint)) {
+        if (autopilot.run(frame, setpoint)) {
             printf("succeeded\n");
             break;
         }
 
         const auto state = simulator.step(mode, setpoint);
 
-        autopilot.writeToLog(logfile, state,
-                _rangefinder_distances_mm, rangefinder->width);
+        autopilot.writeToLog(logfile, state);
 
         if (world.collided({state.x, state.y, state.z})) {
             printf("collided\n");
@@ -97,7 +94,7 @@ int main(int argc, char ** argv)
 
         rangefinder->read(
                 {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-                world, _rangefinder_distances_mm);
+                world, autopilot.rangefinder_distances_mm);
     }
 
     fclose(logfile);

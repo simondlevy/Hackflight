@@ -36,8 +36,6 @@ class TwoExitAutopilot : public Autopilot {
 
         simsens::Rangefinder * _rangefinder;
 
-        int _rangefinder_distances_mm[1000]; // arbitrary max size
-
         hf::TwoExitAutopilot _helper;
 
     public:
@@ -53,7 +51,7 @@ class TwoExitAutopilot : public Autopilot {
 
             static int _frame;
 
-            _helper.run(_frame++, _rangefinder_distances_mm, setpoint);
+            _helper.run(_frame++, setpoint);
          }
 
         void readSensors(simsens::World & world, const hf::Dynamics::state_t & state,
@@ -62,18 +60,15 @@ class TwoExitAutopilot : public Autopilot {
             // Get simulated rangefinder distances based on new pose
             _rangefinder->read(
                     {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-                    world, _rangefinder_distances_mm);
+                    world, _helper.rangefinder_distances_mm);
 
-            _helper.writeToLog(
-                    logfile, state, _rangefinder_distances_mm, _rangefinder->width);
+            _helper.writeToLog(logfile, state);
 
             // Visualize rangefinder distances
             simsens::RangefinderVisualizer::show(
-                    _rangefinder_distances_mm,
+                    _helper.rangefinder_distances_mm,
                     _rangefinder->min_distance_m,
                     _rangefinder->max_distance_m,
-                    _rangefinder->width,
-                    _rangefinder->height,
-                    RANGEFINDER_DISPLAY_SCALEUP);
+                    8, 1, RANGEFINDER_DISPLAY_SCALEUP);
         }
 };
