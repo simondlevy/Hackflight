@@ -1,5 +1,5 @@
 /* 
- *  Shuttle autopilot using 1x1 rangefinder
+ *  "Ping-Pong" autopilot using 1x1 rangefinder
  *
  *  Copyright (C) 2026 Simon D. Levy
  *
@@ -30,7 +30,7 @@
 
 class SingleBeamRangefinder {
 
-    friend class ShuttleAutopilot;
+    friend class PingPongAutopilot;
 
     private:
 
@@ -52,7 +52,7 @@ class SingleBeamRangefinder {
 
 };
 
-class ShuttleAutopilot : public Autopilot {
+class PingPongAutopilot : public Autopilot {
 
     private:
 
@@ -69,19 +69,23 @@ class ShuttleAutopilot : public Autopilot {
 
         void getSetpoint(const hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
-            (void)state;
-
             static constexpr int WALL_PROXIMITY_MM = 200;
+            static constexpr float DY_ZERO = 1e-6;
             static constexpr float SPEED = 0.5;
 
-            static float _pitch;
+            setpoint.pitch =
 
-            _pitch = _pitch == 0 ? +SPEED :
+                // On startup, move forward (arbitrary)
+                fabs(state.dy) < DY_ZERO ? +SPEED :
+
+                // Close to forward wall, go backward
                 _rangefinderForward.distance_mm < WALL_PROXIMITY_MM ? -SPEED :
-                _rangefinderBackward.distance_mm < WALL_PROXIMITY_MM ? +SPEED :
-                _pitch;
 
-            setpoint.pitch = _pitch;
+                // Close to backward wall, go forward
+                _rangefinderBackward.distance_mm < WALL_PROXIMITY_MM ? +SPEED :
+
+                // Otherwise, continue in same direction
+                state.dy > 0 ? -SPEED : +SPEED;
         }
 
         void readSensors(simsens::World & world,
