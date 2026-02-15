@@ -133,8 +133,6 @@ DLLEXPORT void webots_physics_init()
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);
 
-    _pingPongAutopilot.init(_robot);
-
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     _logfile = fopen(path, "w");
 }

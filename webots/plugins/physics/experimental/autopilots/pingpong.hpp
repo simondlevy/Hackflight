@@ -27,44 +27,33 @@
 
 #include "autopilot.hpp"
 
-class SingleBeamRangefinder {
-
-    friend class PingPongAutopilot;
-
-    private:
-
-        simsens::Rangefinder * rangefinder;
-        
-        int distance_mm;
-
-        void init(simsens::Robot & robot, const string name)
-        {
-            rangefinder = robot.rangefinders[name];
-        }
-
-        void read(simsens::World & world, const hf::Dynamics::state_t & state)
-        {
-            rangefinder->read(
-                    {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-                    world, &distance_mm);
-         }
-
-};
-
 class PingPongAutopilot : public Autopilot {
 
     private:
 
-        SingleBeamRangefinder _rangefinderForward;
-        SingleBeamRangefinder _rangefinderBackward;
+        int distance_forward_mm;
+
+        int distance_backward_mm;
+
+        static int readRangefinder(
+                const string name,
+                simsens::Robot & robot,
+                simsens::World & world,
+                const hf::Dynamics::state_t & state)
+        {
+            auto rangefinder = robot.rangefinders[name];
+
+            int distance_mm = 0;
+
+            rangefinder->read(
+                    {state.x, state.y, state.z, state.phi, state.theta, state.psi},
+                    world, &distance_mm);
+
+            return distance_mm;
+         }
 
     public:
 
-        void init(simsens::Robot & robot)
-        {
-            _rangefinderForward.init(robot, "VL53L1-forward");
-            _rangefinderBackward.init(robot, "VL53L1-backward");
-        }
 
         void getSetpoint(const hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
@@ -78,22 +67,25 @@ class PingPongAutopilot : public Autopilot {
                 fabs(state.dy) < DY_ZERO ? +SPEED :
 
                 // Close to forward wall, go backward
-                _rangefinderForward.distance_mm < WALL_PROXIMITY_MM ? -SPEED :
+                distance_forward_mm < WALL_PROXIMITY_MM ? -SPEED :
 
                 // Close to backward wall, go forward
-                _rangefinderBackward.distance_mm < WALL_PROXIMITY_MM ? +SPEED :
+                distance_backward_mm < WALL_PROXIMITY_MM ? +SPEED :
 
                 // Otherwise, continue in same direction
                 state.dy > 0 ? -SPEED : +SPEED;
         }
 
-        void readSensors(simsens::Robot & robot, simsens::World & world,
-                const hf::Dynamics::state_t & state, FILE * logfile)
+        void readSensors(
+                simsens::Robot & robot,
+                simsens::World & world,
+                const hf::Dynamics::state_t & state,
+                FILE * logfile)
         {
-            (void)robot;
             (void)logfile;
 
-            _rangefinderForward.read(world, state);
-            _rangefinderBackward.read(world, state);
+            distance_forward_mm = readRangefinder("VL53L1-forward", robot, world, state);
+
+            distance_backward_mm = readRangefinder("VL53L1-backward", robot, world, state);
         }
 };
