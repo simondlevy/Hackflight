@@ -33,42 +33,6 @@ static constexpr float TAKEOFF_TIME_SEC = 2;
 
 static const char * LOGNAME = "log.csv";
 
-static bool step(hf::Simulator & simulator, simsens::World & world,
-        simsens::Rangefinder * rangefinder,
-        const int frame, FILE * logfile)
-{
-    static int _rangefinder_distances_mm[1000]; 
-
-    const auto mode =
-        frame < TAKEOFF_TIME_SEC*hf::TwoExitAutopilot::FRAME_RATE_HZ ?
-        hf::MODE_HOVERING :
-        hf::MODE_AUTONOMOUS;
-
-    hf::demands_t setpoint = {};
-
-    if (hf::TwoExitAutopilot::run(frame, _rangefinder_distances_mm,
-                setpoint)) {
-        printf("succeeded\n");
-        return true;
-    }
-
-    const auto state = simulator.step(mode, setpoint);
-
-    hf::TwoExitAutopilot::writeToLog(logfile, state,
-            _rangefinder_distances_mm, rangefinder->width);
-
-    if (world.collided({state.x, state.y, state.z})) {
-        printf("collided\n");
-        return true;
-    }
-
-    rangefinder->read(
-            {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-            world, _rangefinder_distances_mm);
-
-    return false;
-}
-
 int main(int argc, char ** argv)
 {
     if (argc < 3) {
@@ -104,9 +68,34 @@ int main(int argc, char ** argv)
             frame<MAX_TIME_SEC * hf::TwoExitAutopilot::FRAME_RATE_HZ;
             ++frame) {
 
-        if (step(simulator, world, rangefinder, frame, logfile)) {
+        static int _rangefinder_distances_mm[1000]; 
+
+        const auto mode =
+            frame < TAKEOFF_TIME_SEC*hf::TwoExitAutopilot::FRAME_RATE_HZ ?
+            hf::MODE_HOVERING :
+            hf::MODE_AUTONOMOUS;
+
+        hf::demands_t setpoint = {};
+
+        if (hf::TwoExitAutopilot::run(frame, _rangefinder_distances_mm,
+                    setpoint)) {
+            printf("succeeded\n");
             break;
         }
+
+        const auto state = simulator.step(mode, setpoint);
+
+        hf::TwoExitAutopilot::writeToLog(logfile, state,
+                _rangefinder_distances_mm, rangefinder->width);
+
+        if (world.collided({state.x, state.y, state.z})) {
+            printf("collided\n");
+            break;
+        }
+
+        rangefinder->read(
+                {state.x, state.y, state.z, state.phi, state.theta, state.psi},
+                world, _rangefinder_distances_mm);
     }
 
     fclose(logfile);
