@@ -55,8 +55,6 @@ static const std::map<string, Autopilot *> AUTOPILOTS = {
     {"pingpong", &_pingPongAutopilot},
 };
 
-static std::map<string, Autopilot *> _autopilots;
-
 static char * worldname()
 {
     return getenv(WORLD_VARIABLE_NAME);
@@ -97,7 +95,7 @@ DLLEXPORT void webots_physics_step()
 
             // Grab autopilot sensors for next iteration
             if (_autopilot) {
-                _autopilot->readSensors(_world, newstate, _logfile);
+                _autopilot->readSensors(_robot, _world, newstate, _logfile);
             }
 
             // Stop if we detected a collision
@@ -113,6 +111,7 @@ DLLEXPORT void webots_physics_step()
 
 DLLEXPORT void webots_physics_cleanup() 
 {
+    delete _helper;
 }
 
 DLLEXPORT void webots_physics_init() 
@@ -135,7 +134,6 @@ DLLEXPORT void webots_physics_init()
     simsens::RobotParser::parse(path, _robot);
 
     _pingPongAutopilot.init(_robot);
-    _twoExitAutopilot.init(_robot);
 
     sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
     _logfile = fopen(path, "w");

@@ -34,20 +34,13 @@ namespace hf {
 
             static constexpr float FRAME_RATE_HZ = 32;
 
-            simsens::Rangefinder * rangefinder;
-
             int rangefinder_distances_mm[8];
 
             TwoExitAutopilot() = default;
 
-            TwoExitAutopilot(simsens::Robot & robot)
+            simsens::Rangefinder * get_rangefinder(simsens::Robot & robot)
             {
-                init(robot);
-            }
-
-            void init(simsens::Robot & robot)
-            {
-                rangefinder = robot.rangefinders["VL53L5-forward"];
+                return robot.rangefinders["VL53L5-forward"];
             }
 
             bool run(const int frame, demands_t & setpoint)
@@ -87,10 +80,13 @@ namespace hf {
                 return false;
             }        
 
-            void read(simsens::World & world, const simsens::pose_t & pose,
+            void read(
+                    simsens::Robot & robot,
+                    simsens::World & world,
+                    const simsens::pose_t & pose,
                     FILE * logfile)
             {
-                rangefinder->read(pose, world, rangefinder_distances_mm);
+                get_rangefinder(robot)->read(pose, world, rangefinder_distances_mm);
 
                 const auto d = rangefinder_distances_mm;
 

@@ -87,9 +87,10 @@ class PingPongAutopilot : public Autopilot {
                 state.dy > 0 ? -SPEED : +SPEED;
         }
 
-        void readSensors(simsens::World & world,
+        void readSensors(simsens::Robot & robot, simsens::World & world,
                 const hf::Dynamics::state_t & state, FILE * logfile)
         {
+            (void)robot;
             (void)logfile;
 
             _rangefinderForward.read(world, state);

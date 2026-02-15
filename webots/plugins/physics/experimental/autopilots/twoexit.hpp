@@ -38,11 +38,6 @@ class TwoExitAutopilot : public Autopilot {
 
     public:
 
-        void init(simsens::Robot & robot)
-        {
-            _helper.init(robot);
-        }
-
         void getSetpoint(hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
             (void)state;
@@ -52,11 +47,14 @@ class TwoExitAutopilot : public Autopilot {
             _helper.run(_frame++, setpoint);
          }
 
-        void readSensors(simsens::World & world, const hf::Dynamics::state_t & state,
+        void readSensors(
+                simsens::Robot & robot,
+                simsens::World & world,
+                const hf::Dynamics::state_t & state,
                 FILE * logfile)
         {
             // Get simulated rangefinder distances based on new pose
-            _helper.read(world,
+            _helper.read(robot, world,
                     {state.x, state.y, state.z,
                      state.phi, state.theta, state.psi},
                      logfile);
@@ -64,8 +62,8 @@ class TwoExitAutopilot : public Autopilot {
             // Visualize rangefinder distances
             simsens::RangefinderVisualizer::show(
                     _helper.rangefinder_distances_mm,
-                    _helper.rangefinder->min_distance_m,
-                    _helper.rangefinder->max_distance_m,
+                    _helper.get_rangefinder(robot)->min_distance_m,
+                    _helper.get_rangefinder(robot)->max_distance_m,
                     8, 1, RANGEFINDER_DISPLAY_SCALEUP);
         }
 };

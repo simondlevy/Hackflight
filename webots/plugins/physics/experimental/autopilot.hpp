@@ -30,12 +30,12 @@ class Autopilot {
 
     public:
 
-        virtual void init(simsens::Robot & robot) = 0;
-
         virtual void getSetpoint(
                 hf::Dynamics::state_t, hf::demands_t & setpoint) = 0;
 
-        virtual void readSensors(simsens::World & world,
+        virtual void readSensors(
+                simsens::Robot & robot,
+                simsens::World & world,
                 const hf::Dynamics::state_t & state,
                 FILE * logfile) = 0;
 };

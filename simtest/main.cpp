@@ -52,7 +52,7 @@ int main(int argc, char ** argv)
     static simsens::World world = {};
     simsens::WorldParser::parse(argv[2], world, robot_path);
 
-    auto autopilot = hf::TwoExitAutopilot(robot);
+    hf::TwoExitAutopilot autopilot = {};
 
     const auto pose = world.getRobotPose();
 
@@ -79,7 +79,7 @@ int main(int argc, char ** argv)
 
         const auto state = simulator.step(mode, setpoint);
 
-        autopilot.read(world,
+        autopilot.read(robot, world,
                 {state.x, state.y, state.z,
                 state.phi, state.theta, state.psi},
                 logfile);
