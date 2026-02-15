@@ -59,63 +59,7 @@ namespace hf {
                 _framerate= framerate;
             }
 
-
-            pose_t step(const mode_e mode, const demands_t & setpoint)
-            {
-                // Run slow PID control in outer loop ----------------------------
-                for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
-
-                    // Get vehicle state from dynamics and convert state values
-                    // from doubles to floats
-                    const auto state = state2floats(
-                            _dynamics.getVehicleStateDegrees());
-
-                    const auto controlled =
-                        mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
-
-                    const auto dt = 1/(float)PID_FAST_FREQ;
-
-                    // Run fast PID control and mixer in middle loop --------------
-                    for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
-
-                        // Run PID control
-                        const auto demands =
-                            _pidControl.run(dt, controlled, state, setpoint);
-
-                        // Scale up demands for motor RPMS
-                        const demands_t new_demands = {
-                            demands.thrust,
-                            demands.roll * PITCH_ROLL_MOTOR_SCALE,
-                            demands.pitch * PITCH_ROLL_MOTOR_SCALE,
-                            demands.yaw * YAW_MOTOR_SCALE
-                        };
-
-                        // Get motor RPMS from mixer
-                        const auto * motors = Mixer::mix(new_demands);
-
-                        // Convert motor values to double for dynamics
-                        const auto * rpms = motors2doubless(motors, 4);
-
-                        // Run dynamics in inner loop -----------------------------
-                        for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
-
-                            _dynamics.update(rpms, 4,
-                                    Mixer::roll, Mixer::pitch, Mixer::yaw);
-                        }
-                    }
-                }
-
-                return pose_t {
-                    _dynamics.state.x,
-                        _dynamics.state.y,
-                        _dynamics.state.z,
-                        _dynamics.state.phi,
-                        _dynamics.state.theta,
-                        _dynamics.state.psi
-                };
-            }    
-
-            Dynamics::state_t step2(const mode_e mode, const demands_t & setpoint)
+            Dynamics::state_t step(const mode_e mode, const demands_t & setpoint)
             {
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {

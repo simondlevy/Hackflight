@@ -22,6 +22,7 @@
 // Hackflight
 #define _MAIN
 #include <datatypes.h>
+#include <simulator/dynamics.hpp>
 #include <simulator/pose.h>
 #include <simulator/simulator.hpp>
 
@@ -66,7 +67,7 @@ class PluginHelper {
             return siminfo.framerate > 0;
         }
 
-        hf::pose_t get_pose_from_siminfo(const siminfo_t & siminfo)
+        hf:: Dynamics::state_t get_state_from_siminfo(const siminfo_t & siminfo)
         {
             // Set pose first time around
             static bool _ready;
@@ -78,14 +79,14 @@ class PluginHelper {
             return _simulator.step(siminfo.mode, siminfo.setpoint);
         }
 
-        void set_dbody_from_pose(const hf::pose_t & pose)
+        void set_dbody_from_state(const hf::Dynamics::state_t & state)
         {
             // Negate Y to make leftward positive
-            dBodySetPosition(_robotBody, pose.x, -pose.y, pose.z);
+            dBodySetPosition(_robotBody, state.x, -state.y, state.z);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
-            const hf::axis3_t euler = { (float)pose.phi, (float)pose.theta, (float)-pose.psi};
+            const hf::axis3_t euler = { (float)state.phi, (float)state.theta, (float)-state.psi};
             const hf::axis4_t quat = euler2quat(euler);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};

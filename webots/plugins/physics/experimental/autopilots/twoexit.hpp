@@ -46,25 +46,27 @@ class TwoExitAutopilot : public Autopilot {
             _rangefinder = robot.rangefinders["VL53L5-forward"];
         }
 
-        void getSetpoint(hf::demands_t & setpoint)
+        void getSetpoint(hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
+            (void)state;
+
             static int _frame;
 
             hf::RangefinderSetpoint::runTwoExit(_frame++,
                     _rangefinder_distances_mm, setpoint);
-        }
+         }
 
-        void readSensors(simsens::World & world, const hf::pose_t & pose,
+        void readSensors(simsens::World & world, const hf::Dynamics::state_t & state,
                 FILE * logfile)
         {
             // Get simulated rangefinder distances based on new pose
             _rangefinder->read(
-                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    {state.x, state.y, state.z, state.phi, state.theta, state.psi},
                     world, _rangefinder_distances_mm);
 
             // Dump everything to logfile
             fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+                    state.x, state.y, state.z, state.phi, state.theta, state.psi);
             for (int k=0; k<_rangefinder->width; ++k) {
                 fprintf(logfile, ",%d", _rangefinder_distances_mm[k]);
             }

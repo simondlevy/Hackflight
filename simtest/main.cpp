@@ -37,12 +37,12 @@ static const char * LOGNAME = "log.csv";
 
 static void write_to_log(
         FILE * logfile,
-        const hf::pose_t pose,
+        const hf::Dynamics::state_t state,
         const int * rangefinder_distances_mm,
         const int rangefinder_width)
 {
     fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-            pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
+            state.x, state.y, state.z, state.phi, state.theta, state.psi);
     for (int k=0; k<rangefinder_width; ++k) {
         fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
     }
@@ -67,18 +67,18 @@ static bool step(hf::Simulator & simulator, simsens::World & world,
         return true;
     }
 
-    const auto pose = simulator.step(mode, setpoint);
+    const auto state = simulator.step(mode, setpoint);
 
-    write_to_log(logfile, pose,
+    write_to_log(logfile, state,
             _rangefinder_distances_mm, rangefinder->width);
 
-    if (world.collided({pose.x, pose.y, pose.z})) {
+    if (world.collided({state.x, state.y, state.z})) {
         printf("collided\n");
         return true;
     }
 
     rangefinder->read(
-            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            {state.x, state.y, state.z, state.phi, state.theta, state.psi},
             world, _rangefinder_distances_mm);
 
     return false;

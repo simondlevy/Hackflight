@@ -41,245 +41,249 @@
 #include <stdint.h>
 #include <string.h>
 
-class Dynamics {
+namespace hf {
 
-    public:
+    class Dynamics {
 
-        static constexpr double ZMIN = 0.005;
+        public:
 
-        // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
-        // We use ENU coordinates based on 
-        // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
-        // Position in meters, velocity in meters/second, angles in degrees,
-        // angular velocity in degrees/second.
-        typedef struct {
+            static constexpr double ZMIN = 0.005;
 
-            double x;       // positive forward
-            double dx;      // positive forward
-            double y;       // positive rightward
-            double dy;      // positive rightward
-            double z;       // positive upward
-            double dz;      // positive upward
-            double phi;     // positive roll right
-            double dphi;    // positive roll right
-            double theta;   // positive nose down
-            double dtheta;  // positive nose down
-            double psi;     // positive nose right
-            double dpsi;    // positive nose right
+            // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
+            // We use ENU coordinates based on 
+            // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
+            // Position in meters, velocity in meters/second, angles in degrees,
+            // angular velocity in degrees/second.
+            typedef struct {
 
-        } state_t;
+                double x;       // positive forward
+                double dx;      // positive forward
+                double y;       // positive rightward
+                double dy;      // positive rightward
+                double z;       // positive upward
+                double dz;      // positive upward
+                double phi;     // positive roll right
+                double dphi;    // positive roll right
+                double theta;   // positive nose down
+                double dtheta;  // positive nose down
+                double psi;     // positive nose right
+                double dpsi;    // positive nose right
 
-        // Vehicle state (Equation 11)
-        state_t state;
+            } state_t;
 
-        /**
-         *  Vehicle parameters
-         */
-        typedef struct {
+            // Vehicle state (Equation 11)
+            state_t state;
 
-            // These can be measured directly
-            double m;  // mass [kg]
-            double l;  // arm length [m]
+            /**
+             *  Vehicle parameters
+             */
+            typedef struct {
 
-            // These should be estimated to get realistic behavior
-            double b;  // thrust coefficient [F=b*w^2]
-            double d;  // drag coefficient [T=d*w^2]
-            double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
+                // These can be measured directly
+                double m;  // mass [kg]
+                double l;  // arm length [m]
 
-        } vehicle_params_t; 
+                // These should be estimated to get realistic behavior
+                double b;  // thrust coefficient [F=b*w^2]
+                double d;  // drag coefficient [T=d*w^2]
+                double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
 
-        /**
-         *  World parameters
-         */
-        typedef struct {
+            } vehicle_params_t; 
 
-            // These can be measured directly
-            double g;   // gravitational constant [m/s/s]
-            double rho; // air density [kg/m^3]
+            /**
+             *  World parameters
+             */
+            typedef struct {
 
-        } world_params_t; 
+                // These can be measured directly
+                double g;   // gravitational constant [m/s/s]
+                double rho; // air density [kg/m^3]
 
-        Dynamics(
-                const vehicle_params_t & vparams,
-                const world_params_t & wparams,
-                const double dt)
-        {
-            init(vparams, wparams, dt);
-        }
+            } world_params_t; 
 
-        Dynamics(const vehicle_params_t & vparams, const double dt)
-        {
-            const world_params_t wparams = { 9.807, 1.225 };
+            Dynamics(
+                    const vehicle_params_t & vparams,
+                    const world_params_t & wparams,
+                    const double dt)
+            {
+                init(vparams, wparams, dt);
+            }
 
-            init(vparams, wparams, dt);
-        }
+            Dynamics(const vehicle_params_t & vparams, const double dt)
+            {
+                const world_params_t wparams = { 9.807, 1.225 };
 
-        state_t getVehicleStateDegrees()
-        {
-            return state_t {
-                state.x, state.dx, state.y, state.dy, state.z, state.dz,
+                init(vparams, wparams, dt);
+            }
+
+            state_t getVehicleStateDegrees()
+            {
+                return state_t {
+                    state.x, state.dx, state.y, state.dy, state.z, state.dz,
                     RAD2DEG * state.phi,
                     RAD2DEG * state.dphi,
                     RAD2DEG * state.theta,
                     RAD2DEG * state.dtheta,
                     RAD2DEG * state.psi,
                     RAD2DEG * state.dpsi
-            };
-        }
-
-        /**
-         * Sets motor spins
-         */
-        void update(
-                const double * rpms,
-                const uint8_t rotorCount,
-                const int8_t * roll,
-                const int8_t * pitch,
-                const int8_t * yaw)
-        {
-            const auto b = _vparams.b;
-            const auto d = _vparams.d;
-            const auto I = _vparams.I;
-            const auto l = _vparams.l;
-            const auto m = _vparams.m;
-
-            // Equation 6 ---------------------------------------
-
-            double u1=0, u2=0, u3=0, u4=0;
-
-            for (unsigned int i = 0; i < rotorCount; ++i) {
-
-                // RPM => rad/sec
-                const auto omega = rpms[i] * 2 * M_PI / 60;
-
-                // Thrust is squared rad/sec scaled by air density
-                const auto omega2 = _wparams.rho * omega * omega; 
-
-                // Multiply by thrust coefficient
-                u1 += b * omega2;                  
-
-                u2 += b * omega2 * roll[i];
-
-                u3 += b * omega2 * pitch[i];
-
-                u4 += d * omega2 * -yaw[i];
+                };
             }
 
-            // Equation 12 line 6 for dz/dt in inertial (earth) frame
-            _dstate.dz =
-                -_wparams.g + (cos(state.phi)*cos(state.theta)) / m * u1;
+            /**
+             * Sets motor spins
+             */
+            void update(
+                    const double * rpms,
+                    const uint8_t rotorCount,
+                    const int8_t * roll,
+                    const int8_t * pitch,
+                    const int8_t * yaw)
+            {
+                const auto b = _vparams.b;
+                const auto d = _vparams.d;
+                const auto I = _vparams.I;
+                const auto l = _vparams.l;
+                const auto m = _vparams.m;
 
-            // We're airborne once net Z acceleration becomes positive
-            if (_dstate.dz > 0) {
-                _airborne = true;
+                // Equation 6 ---------------------------------------
+
+                double u1=0, u2=0, u3=0, u4=0;
+
+                for (unsigned int i = 0; i < rotorCount; ++i) {
+
+                    // RPM => rad/sec
+                    const auto omega = rpms[i] * 2 * M_PI / 60;
+
+                    // Thrust is squared rad/sec scaled by air density
+                    const auto omega2 = _wparams.rho * omega * omega; 
+
+                    // Multiply by thrust coefficient
+                    u1 += b * omega2;                  
+
+                    u2 += b * omega2 * roll[i];
+
+                    u3 += b * omega2 * pitch[i];
+
+                    u4 += d * omega2 * -yaw[i];
+                }
+
+                // Equation 12 line 6 for dz/dt in inertial (earth) frame
+                _dstate.dz =
+                    -_wparams.g + (cos(state.phi)*cos(state.theta)) / m * u1;
+
+                // We're airborne once net Z acceleration becomes positive
+                if (_dstate.dz > 0) {
+                    _airborne = true;
+                }
+
+                // We're no longer airborne if we're descending and drop below
+                // minimum altitude
+                if (_airborne && state.dz < 0 && state.z < ZMIN) {
+                    _airborne = false;
+                    reset();
+                }
+
+                // Once airborne, we can update dynamics
+                if (_airborne) {
+
+                    const auto phi = state.phi;
+                    const auto theta = state.theta;
+                    const auto psi = state.psi;
+
+                    // Equation 12 : Note negations to support roll-right
+                    // positive
+
+                    _dstate.x = state.dx;
+
+                    // Rotate dx/dt from body frame into inertial frame
+                    _dstate.dx =(cos(-phi)*sin(theta)*cos(psi) +
+                            sin(-phi)*sin(psi)) * u1 / m;
+
+                    _dstate.y = state.dy;                              
+
+                    // Rotate dy/dt from body frame into inertial frame
+                    _dstate.dy = (cos(-phi)*sin(theta)*sin(psi) -
+                            sin(-phi)*cos(psi)) * u1 / m;
+
+                    _dstate.z = state.dz;                             
+                    _dstate.phi = state.dphi;                              
+                    _dstate.dphi = l / I * u2;                      
+                    _dstate.theta = state.dtheta;                  
+                    _dstate.dtheta = l / I * u3;                  
+                    _dstate.psi = state.dpsi;                   
+                    _dstate.dpsi = -l / I * u4;                  
+
+                    // Compute state as first temporal integral of first
+                    // temporal derivative
+                    state.x += _dt * _dstate.x;
+                    state.dx += _dt * _dstate.dx;
+                    state.y += _dt * _dstate.y;
+                    state.dy += _dt * _dstate.dy;
+                    state.z += _dt * _dstate.z;
+                    state.dz += _dt * _dstate.dz;
+                    state.phi += _dt * _dstate.phi;
+                    state.dphi += _dt * _dstate.dphi;
+                    state.theta += _dt * _dstate.theta;
+                    state.dtheta += _dt * _dstate.dtheta;
+                    state.psi += _dt * _dstate.psi;
+                    state.dpsi += _dt * _dstate.dpsi;
+
+                    // Keep yaw angle in [-2Pi, +2Pi]
+                    if(state.psi > 2*M_PI) {
+                        state.psi -= 2*M_PI;
+                    }
+                    if(state.psi < -2*M_PI) {
+                        state.psi += 2*M_PI;
+                    }
+                }
+
+            } // update
+
+            void reset()
+            {
+                state.dx = 0;
+                state.dy = 0;
+                state.z = ZMIN;
+                state.dz = 0;
+                state.dphi = 0;
+                state.dtheta = 0;
+                state.dpsi = 0;
+
+                memset(&_dstate, 0, sizeof(state_t));
             }
 
-            // We're no longer airborne if we're descending and drop below
-            // minimum altitude
-            if (_airborne && state.dz < 0 && state.z < ZMIN) {
+            // ---------------------------------------------------------------
+
+        private:
+
+            static constexpr double RAD2DEG = 180 / M_PI;
+
+            // Vehicle state first derivative (Equation 12)
+            state_t _dstate;
+
+            double _dt;
+
+            vehicle_params_t _vparams;
+
+            world_params_t _wparams;
+
+            // Flag for whether we're airborne and can update dynamics
+            bool _airborne = false;
+
+            void init(
+                    const vehicle_params_t & vparams,
+                    const world_params_t & wparams,
+                    const double dt)
+            {
+                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
+
+                memcpy(&_wparams, &wparams, sizeof(world_params_t));
+
+                _dt = dt;
+
                 _airborne = false;
-                reset();
             }
 
-            // Once airborne, we can update dynamics
-            if (_airborne) {
+    }; // class Dynamics
 
-                const auto phi = state.phi;
-                const auto theta = state.theta;
-                const auto psi = state.psi;
-
-                // Equation 12 : Note negations to support roll-right
-                // positive
-
-                _dstate.x = state.dx;
-
-                // Rotate dx/dt from body frame into inertial frame
-                _dstate.dx =(cos(-phi)*sin(theta)*cos(psi) +
-                        sin(-phi)*sin(psi)) * u1 / m;
-
-                _dstate.y = state.dy;                              
-
-                // Rotate dy/dt from body frame into inertial frame
-                _dstate.dy = (cos(-phi)*sin(theta)*sin(psi) -
-                        sin(-phi)*cos(psi)) * u1 / m;
-
-                _dstate.z = state.dz;                             
-                _dstate.phi = state.dphi;                              
-                _dstate.dphi = l / I * u2;                      
-                _dstate.theta = state.dtheta;                  
-                _dstate.dtheta = l / I * u3;                  
-                _dstate.psi = state.dpsi;                   
-                _dstate.dpsi = -l / I * u4;                  
-
-                // Compute state as first temporal integral of first
-                // temporal derivative
-                state.x += _dt * _dstate.x;
-                state.dx += _dt * _dstate.dx;
-                state.y += _dt * _dstate.y;
-                state.dy += _dt * _dstate.dy;
-                state.z += _dt * _dstate.z;
-                state.dz += _dt * _dstate.dz;
-                state.phi += _dt * _dstate.phi;
-                state.dphi += _dt * _dstate.dphi;
-                state.theta += _dt * _dstate.theta;
-                state.dtheta += _dt * _dstate.dtheta;
-                state.psi += _dt * _dstate.psi;
-                state.dpsi += _dt * _dstate.dpsi;
-
-                // Keep yaw angle in [-2Pi, +2Pi]
-                if(state.psi > 2*M_PI) {
-                    state.psi -= 2*M_PI;
-                }
-                if(state.psi < -2*M_PI) {
-                    state.psi += 2*M_PI;
-                }
-            }
-
-        } // update
-
-        void reset()
-        {
-            state.dx = 0;
-            state.dy = 0;
-            state.z = ZMIN;
-            state.dz = 0;
-            state.dphi = 0;
-            state.dtheta = 0;
-            state.dpsi = 0;
-
-            memset(&_dstate, 0, sizeof(state_t));
-        }
-
-        // ---------------------------------------------------------------
-
-    private:
-
-        static constexpr double RAD2DEG = 180 / M_PI;
-
-        // Vehicle state first derivative (Equation 12)
-        state_t _dstate;
-
-        double _dt;
-
-        vehicle_params_t _vparams;
-
-        world_params_t _wparams;
-
-        // Flag for whether we're airborne and can update dynamics
-        bool _airborne = false;
-
-        void init(
-                const vehicle_params_t & vparams,
-                const world_params_t & wparams,
-                const double dt)
-        {
-            memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
-
-            memcpy(&_wparams, &wparams, sizeof(world_params_t));
-
-            _dt = dt;
-
-            _airborne = false;
-        }
-
-}; // class Dynamics
+} // namespace hf

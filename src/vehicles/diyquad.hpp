@@ -27,7 +27,7 @@ static constexpr float THRUST_MIN   = 20000;
 static constexpr float THRUST_MAX   = UINT16_MAX;
 static constexpr float THRUST_SCALE = 1000;
 
-static constexpr Dynamics::vehicle_params_t VPARAMS = {
+static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
 
     // Actual values
     3.0e-2,  // mass [kg]

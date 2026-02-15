@@ -19,6 +19,7 @@
 #pragma once
 
 // Hackflight
+#include <simulator/dynamics.hpp>
 #include <simulator/pose.h>
 
 // SimSensors
@@ -32,8 +33,10 @@ class Autopilot {
 
         virtual void init(simsens::Robot & robot) = 0;
 
-        virtual void getSetpoint(hf::demands_t & setpoint) = 0;
+        virtual void getSetpoint(
+                hf::Dynamics::state_t, hf::demands_t & setpoint) = 0;
 
-        virtual void readSensors(simsens::World & world, const hf::pose_t & pose,
+        virtual void readSensors(simsens::World & world,
+                const hf::Dynamics::state_t & state,
                 FILE * logfile) = 0;
 };

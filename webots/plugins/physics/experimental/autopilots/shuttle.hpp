@@ -19,7 +19,7 @@
 #pragma once
 
 // Hackflight
-#include <simulator/pose.h>
+#include <simulator/dynamics.hpp>
 #include <autopilot/rangefinder.hpp>
 
 // SimSensors
@@ -43,10 +43,10 @@ class SingleBeamRangefinder {
             rangefinder = robot.rangefinders[name];
         }
 
-        void read(simsens::World & world, const hf::pose_t & pose)
+        void read(simsens::World & world, const hf::Dynamics::state_t & state)
         {
             rangefinder->read(
-                    {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+                    {state.x, state.y, state.z, state.phi, state.theta, state.psi},
                     world, &distance_mm);
          }
 
@@ -67,12 +67,16 @@ class ShuttleAutopilot : public Autopilot {
             _rangefinderBackward.init(robot, "VL53L1-backward");
         }
 
-        void getSetpoint(hf::demands_t & setpoint)
+        void getSetpoint(const hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
+            (void)state;
+
             static constexpr int WALL_PROXIMITY_MM = 200;
             static constexpr float SPEED = 0.5;
 
             static float _pitch;
+
+            printf("f: %d b: %d\n", _rangefinderForward.distance_mm, _rangefinderBackward.distance_mm);
 
             _pitch = _pitch == 0 ? +SPEED :
                 _rangefinderForward.distance_mm < WALL_PROXIMITY_MM ? -SPEED :
@@ -82,13 +86,12 @@ class ShuttleAutopilot : public Autopilot {
             setpoint.pitch = _pitch;
         }
 
-        void readSensors(simsens::World & world, const hf::pose_t & pose,
-                FILE * logfile)
+        void readSensors(simsens::World & world,
+                const hf::Dynamics::state_t & state, FILE * logfile)
         {
-            _rangefinderForward.read(world, pose);
-            _rangefinderBackward.read(world, pose);
-
             (void)logfile;
 
+            _rangefinderForward.read(world, state);
+            _rangefinderBackward.read(world, state);
         }
 };

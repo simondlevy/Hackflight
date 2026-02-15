@@ -76,32 +76,35 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper.get_siminfo(siminfo)) {
 
+            // Get current vehicle state
+            const auto state = _helper.get_state_from_siminfo(siminfo);
+
             // Replace open-loop setpoint with setpoint from autopilot if
             // available
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
                 if (_autopilot) {
-                    _autopilot->getSetpoint(siminfo.setpoint);
+                    _autopilot->getSetpoint(state, siminfo.setpoint);
                 }
                 else {
                     printf("No autopilot for world %s\n", worldname());
                 }
             }
 
-            // Use setpoint to get new pose
-            const auto pose = _helper.get_pose_from_siminfo(siminfo);
+            // Use setpoint to get new state
+            const auto newstate = _helper.get_state_from_siminfo(siminfo);
 
             // Grab autopilot sensors for next iteration
             if (_autopilot) {
-                _autopilot->readSensors(_world, pose, _logfile);
+                _autopilot->readSensors(_world, newstate, _logfile);
             }
 
             // Stop if we detected a collision
-            if (_world.collided({pose.x, pose.y, pose.z})) {
+            if (_world.collided({newstate.x, newstate.y, newstate.z})) {
                 _collided = true;
             }
 
             // Otherwise, set normally
-            _helper.set_dbody_from_pose(pose);
+            _helper.set_dbody_from_state(newstate);
         }
     }
 }
