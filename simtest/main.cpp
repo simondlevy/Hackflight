@@ -30,7 +30,6 @@
 
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
-static constexpr float FRAME_RATE_HZ = 32;
 
 static const char * LOGNAME = "log.csv";
 
@@ -40,7 +39,8 @@ static bool step(hf::Simulator & simulator, simsens::World & world,
 {
     static int _rangefinder_distances_mm[1000]; 
 
-    const auto mode = frame < TAKEOFF_TIME_SEC*FRAME_RATE_HZ ?
+    const auto mode =
+        frame < TAKEOFF_TIME_SEC*hf::TwoExitAutopilot::FRAME_RATE_HZ ?
         hf::MODE_HOVERING :
         hf::MODE_AUTONOMOUS;
 
@@ -98,9 +98,11 @@ int main(int argc, char ** argv)
 
     simulator.init(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-            FRAME_RATE_HZ);
+            hf::TwoExitAutopilot::FRAME_RATE_HZ);
 
-    for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
+    for (int frame=0;
+            frame<MAX_TIME_SEC * hf::TwoExitAutopilot::FRAME_RATE_HZ;
+            ++frame) {
 
         if (step(simulator, world, rangefinder, frame, logfile)) {
             break;
