@@ -63,13 +63,8 @@ class TwoExitAutopilot : public Autopilot {
                     {state.x, state.y, state.z, state.phi, state.theta, state.psi},
                     world, _rangefinder_distances_mm);
 
-            // Dump everything to logfile
-            fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-                    state.x, state.y, state.z, state.phi, state.theta, state.psi);
-            for (int k=0; k<_rangefinder->width; ++k) {
-                fprintf(logfile, ",%d", _rangefinder_distances_mm[k]);
-            }
-            fprintf(logfile, "\n");
+            hf::RangefinderSetpoint::write_to_log(logfile, state,
+                    _rangefinder_distances_mm, _rangefinder->width);
 
             // Visualize rangefinder distances
             simsens::RangefinderVisualizer::show(
