@@ -88,7 +88,7 @@ namespace hf {
                 const auto d = rangefinder_distances_mm;
 
                 fprintf(logfile,
-                        "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f" 
+                        "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f," 
                         "%d,%d,%d,%d,%d,%d,%d,%d\n",
                         pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi,
                         d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
