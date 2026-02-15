@@ -58,9 +58,8 @@ class TwoExitAutopilot : public Autopilot {
             // Get simulated rangefinder distances based on new pose
             _helper.read(world,
                     {state.x, state.y, state.z,
-                     state.phi, state.theta, state.psi});
-
-            _helper.writeToLog(logfile, state);
+                     state.phi, state.theta, state.psi},
+                     logfile);
 
             // Visualize rangefinder distances
             simsens::RangefinderVisualizer::show(

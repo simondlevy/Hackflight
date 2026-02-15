@@ -85,11 +85,11 @@ int main(int argc, char ** argv)
 
         const auto state = simulator.step(mode, setpoint);
 
-        autopilot.writeToLog(logfile, state);
-
         autopilot.read(world,
                 {state.x, state.y, state.z,
-                state.phi, state.theta, state.psi});
+                state.phi, state.theta, state.psi},
+                logfile);
+
         if (world.collided({state.x, state.y, state.z})) {
             printf("collided\n");
             break;
