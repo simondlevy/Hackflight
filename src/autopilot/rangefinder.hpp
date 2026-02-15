@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <simulator/simulator.hpp>
 
 namespace hf {
 
@@ -60,11 +60,27 @@ namespace hf {
                 }
 
                 // Travel a bit after exiting
-                else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ > TRAVEL_AFTER_CLEAR_SEC) {
+                else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ >
+                        TRAVEL_AFTER_CLEAR_SEC) {
                     return true;
                 }
 
                 return false;
             }        
+
+            static void write_to_log(
+                    FILE * logfile,
+                    const hf::Dynamics::state_t state,
+                    const int * rangefinder_distances_mm,
+                    const int rangefinder_width)
+            {
+                fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
+                        state.x, state.y, state.z, state.phi, state.theta, state.psi);
+                for (int k=0; k<rangefinder_width; ++k) {
+                    fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
+                }
+                fprintf(logfile, "\n");
+            }
+
     };
 }

@@ -34,20 +34,6 @@ static constexpr float FRAME_RATE_HZ = 32;
 
 static const char * LOGNAME = "log.csv";
 
-static void write_to_log(
-        FILE * logfile,
-        const hf::Dynamics::state_t state,
-        const int * rangefinder_distances_mm,
-        const int rangefinder_width)
-{
-    fprintf(logfile, "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f", 
-            state.x, state.y, state.z, state.phi, state.theta, state.psi);
-    for (int k=0; k<rangefinder_width; ++k) {
-        fprintf(logfile, ",%d", rangefinder_distances_mm[k]);
-    }
-    fprintf(logfile, "\n");
-}
-
 static bool step(hf::Simulator & simulator, simsens::World & world,
         simsens::Rangefinder * rangefinder,
         const int frame, FILE * logfile)
@@ -68,7 +54,7 @@ static bool step(hf::Simulator & simulator, simsens::World & world,
 
     const auto state = simulator.step(mode, setpoint);
 
-    write_to_log(logfile, state,
+    hf::RangefinderSetpoint::write_to_log(logfile, state,
             _rangefinder_distances_mm, rangefinder->width);
 
     if (world.collided({state.x, state.y, state.z})) {
