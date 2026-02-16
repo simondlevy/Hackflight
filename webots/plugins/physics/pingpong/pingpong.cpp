@@ -1,5 +1,5 @@
 /* 
- * Custom physics plugin custom for Hackflight Webots-based simulator
+ * Custom physics plugin for ping-pong autopilot simuation
  *
  *  Copyright (C) 2025 Simon D. Levy
  *
@@ -28,11 +28,9 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/world.hpp>
 
-// Autopilots
-#include "autopilots/pingpong.hpp"
-#include "autopilots/twoexit.hpp"
-
-static const char * LOG_FILE_NAME = "log.csv";
+// Hackflight
+#include <simulator/dynamics.hpp>
+#include <autopilots/pingpong.hpp>
 
 static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
 static const char * WORLD_VARIABLE_NAME = "WEBOTS_WORLD";
@@ -41,19 +39,9 @@ static simsens::World _world;
 
 static simsens::Robot _robot;
 
-static FILE * _logfile;
-
 static PluginHelper * _helper;
 
-static TwoExitAutopilot _twoExitAutopilot;
-static PingPongAutopilot _pingPongAutopilot;
-
-static Autopilot * _autopilot;
-
-static const std::map<string, Autopilot *> AUTOPILOTS = {
-    {"twoexit", &_twoExitAutopilot},
-    {"pingpong", &_pingPongAutopilot},
-};
+static hf::PingPongAutopilot _autopilot;
 
 static char * worldname()
 {
@@ -82,21 +70,14 @@ DLLEXPORT void webots_physics_step()
             // Replace open-loop setpoint with setpoint from autopilot if
             // available
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-                if (_autopilot) {
-                    _autopilot->getSetpoint(state, siminfo.setpoint);
-                }
-                else {
-                    printf("No autopilot for world %s\n", worldname());
-                }
+                _autopilot.getSetpoint(state, siminfo.setpoint);
             }
 
             // Use setpoint to get new state
             const auto newstate = _helper->get_state_from_siminfo(siminfo);
 
-            // Grab autopilot sensors for next iteration
-            if (_autopilot) {
-                _autopilot->readSensors(_robot, _world, newstate, _logfile);
-            }
+            // Grab rangefinder readings for next iteration
+            _autopilot.readSensors(_robot, _world, newstate);
 
             // Stop if we detected a collision
             if (_world.collided({newstate.x, newstate.y, newstate.z})) {
@@ -125,14 +106,6 @@ DLLEXPORT void webots_physics_init()
     sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
     simsens::WorldParser::parse(path, _world);
 
-    auto it = AUTOPILOTS.find(worldname());
-    if (it != AUTOPILOTS.end()) {
-        _autopilot = it->second;
-    }
-
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);
-
-    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
-    _logfile = fopen(path, "w");
 }
