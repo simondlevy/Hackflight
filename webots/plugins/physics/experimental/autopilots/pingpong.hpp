@@ -20,10 +20,7 @@
 
 // Hackflight
 #include <simulator/dynamics.hpp>
-
-// SimSensors
-#include <simsensors/src/parsers/webots/robot.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
+#include <autopilots/pingpong.hpp>
 
 #include "autopilot.hpp"
 
@@ -31,48 +28,13 @@ class PingPongAutopilot : public Autopilot {
 
     private:
 
-        int distance_forward_mm;
-
-        int distance_backward_mm;
-
-        static int readRangefinder(
-                const string name,
-                simsens::Robot & robot,
-                simsens::World & world,
-                const hf::Dynamics::state_t & state)
-        {
-            auto rangefinder = robot.rangefinders[name];
-
-            int distance_mm = 0;
-
-            rangefinder->read(
-                    {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-                    world, &distance_mm);
-
-            return distance_mm;
-         }
+        hf::PingPongAutopilot _helper;
 
     public:
 
         void getSetpoint(const hf::Dynamics::state_t state, hf::demands_t & setpoint) 
         {
-            static constexpr int WALL_PROXIMITY_MM = 200;
-            static constexpr float DY_ZERO = 1e-6;
-            static constexpr float SPEED = 0.5;
-
-            setpoint.pitch =
-
-                // On startup, move forward (arbitrary)
-                fabs(state.dy) < DY_ZERO ? +SPEED :
-
-                // Close to forward wall, go backward
-                distance_forward_mm < WALL_PROXIMITY_MM ? -SPEED :
-
-                // Close to backward wall, go forward
-                distance_backward_mm < WALL_PROXIMITY_MM ? +SPEED :
-
-                // Otherwise, continue in same direction
-                state.dy > 0 ? -SPEED : +SPEED;
+            _helper.getSetpoint(state, setpoint);
         }
 
         void readSensors(
@@ -83,8 +45,6 @@ class PingPongAutopilot : public Autopilot {
         {
             (void)logfile;
 
-            distance_forward_mm = readRangefinder("VL53L1-forward", robot, world, state);
-
-            distance_backward_mm = readRangefinder("VL53L1-backward", robot, world, state);
+            _helper.readSensors(robot, world, state);
         }
 };

@@ -54,7 +54,7 @@ class TwoExitAutopilot : public Autopilot {
                 FILE * logfile)
         {
             // Get simulated rangefinder distances based on new pose
-            _helper.read(robot, world,
+            _helper.readSensors(robot, world,
                     {state.x, state.y, state.z,
                      state.phi, state.theta, state.psi},
                      logfile);
