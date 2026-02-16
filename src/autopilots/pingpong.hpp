@@ -32,7 +32,6 @@ namespace hf {
         private:
 
             static constexpr int WALL_PROXIMITY_MM = 200;
-            static constexpr float DY_ZERO = 1e-6;
             static constexpr float SPEED = 0.5;
 
             int distance_forward_mm;
@@ -59,19 +58,18 @@ namespace hf {
 
             void getSetpoint(const float dy, hf::demands_t & setpoint) 
             {
-                setpoint.pitch =
-
-                    // On startup, move forward (arbitrary)
-                    fabs(dy) < DY_ZERO ? +SPEED :
+                const float dir = 
 
                     // Close to forward wall, go backward
-                    distance_forward_mm < WALL_PROXIMITY_MM ? -SPEED :
+                    distance_forward_mm < WALL_PROXIMITY_MM ? -1 :
 
                     // Close to backward wall, go forward
-                    distance_backward_mm < WALL_PROXIMITY_MM ? +SPEED :
+                    distance_backward_mm < WALL_PROXIMITY_MM ? +1 :
 
                     // Otherwise, continue in same direction
-                    dy > 0 ? -SPEED : +SPEED;
+                    dy > 0 ? -1 : +1;
+
+                setpoint.pitch = dir * SPEED;
             }
 
             void readSensors(

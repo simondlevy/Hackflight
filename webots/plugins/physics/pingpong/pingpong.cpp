@@ -58,6 +58,12 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper->get_siminfo(siminfo)) {
 
+            static bool _started;
+            if (!_started) {
+                siminfo.setpoint.pitch = 0.5;
+            }
+            _started = true;
+
             // Get current vehicle state
             const auto state = _helper->get_state_from_siminfo(siminfo);
 
