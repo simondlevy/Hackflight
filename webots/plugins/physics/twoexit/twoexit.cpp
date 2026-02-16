@@ -36,7 +36,6 @@
 static const char * LOG_FILE_NAME = "log.csv";
 
 static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
-static const char * WORLD_VARIABLE_NAME = "WEBOTS_WORLD";
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
@@ -49,11 +48,6 @@ static FILE * _logfile;
 static PluginHelper * _helper;
 
 static hf::TwoExitAutopilot _autopilot;
-
-static char * worldname()
-{
-    return getenv(WORLD_VARIABLE_NAME);
-}
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -122,7 +116,7 @@ DLLEXPORT void webots_physics_init()
 
     char path[1000] = {};
 
-    sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname());
+    sprintf(path, "%s/../../worlds/twoexit.wbt", pwd);
     simsens::WorldParser::parse(path, _world);
 
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
