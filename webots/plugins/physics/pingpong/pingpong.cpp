@@ -58,9 +58,10 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper->get_siminfo(siminfo)) {
 
+            // Start in a random direction (forward or backward)
             static bool _started;
             if (!_started) {
-                siminfo.setpoint.pitch = 0.5;
+                siminfo.setpoint.pitch = 2 * (rand() % 2) - 1;
             }
             _started = true;
 

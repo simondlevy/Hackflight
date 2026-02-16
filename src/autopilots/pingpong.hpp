@@ -18,6 +18,9 @@
 
 #pragma once
 
+// C
+#include <stdlib.h>
+
 // Hackflight
 #include <simulator/dynamics.hpp>
 
@@ -56,9 +59,13 @@ namespace hf {
 
         public:
 
-            void getSetpoint(const float dy, hf::demands_t & setpoint) 
+            void getSetpoint(const float dydt, hf::demands_t & setpoint) 
             {
-                const float dir = 
+                const int8_t direction = 
+
+                    // Motionless on startup; move in a random direction
+                    // (forward or backward)
+                    dydt == 0 ? 2 * (rand() % 2) - 1 :
 
                     // Close to forward wall, go backward
                     distance_forward_mm < WALL_PROXIMITY_MM ? -1 :
@@ -67,9 +74,9 @@ namespace hf {
                     distance_backward_mm < WALL_PROXIMITY_MM ? +1 :
 
                     // Otherwise, continue in same direction
-                    dy > 0 ? -1 : +1;
+                    dydt > 0 ? -1 : +1;
 
-                setpoint.pitch = dir * SPEED;
+                setpoint.pitch = direction * SPEED;
             }
 
             void readSensors(
