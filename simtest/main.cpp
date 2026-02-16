@@ -79,7 +79,7 @@ int main(int argc, char ** argv)
 
         const auto state = simulator.step(mode, setpoint);
 
-        autopilot.readSensors(robot, world,
+        autopilot.readSensor(robot, world,
                 {state.x, state.y, state.z,
                 state.phi, state.theta, state.psi},
                 logfile);

@@ -84,13 +84,14 @@ DLLEXPORT void webots_physics_step()
             // Use setpoint to get new state
             const auto newstate = _helper->get_state_from_siminfo(siminfo);
 
-            // Grab autopilot sensors for next iteration
-            _autopilot.readSensors(_robot, _world,
+            // Read rangefinder distances for next iteration
+            _autopilot.readSensor(_robot, _world,
                     {newstate.x, newstate.y, newstate.z,
                      newstate.phi, newstate.theta, newstate.psi},
                      _logfile);
 
 
+            // Display rangefinder distances
             simsens::RangefinderVisualizer::show(
                     _autopilot.rangefinder_distances_mm,
                     _autopilot.get_rangefinder(_robot)->min_distance_m,

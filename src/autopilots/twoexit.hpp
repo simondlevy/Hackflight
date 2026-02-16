@@ -78,7 +78,7 @@ namespace hf {
                 return false;
             }        
 
-            void readSensors(
+            void readSensor(
                     simsens::Robot & robot,
                     simsens::World & world,
                     const simsens::pose_t & pose,
