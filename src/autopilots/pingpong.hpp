@@ -57,13 +57,12 @@ namespace hf {
 
         public:
 
-            void getSetpoint(const hf::Dynamics::state_t state,
-                    hf::demands_t & setpoint) 
+            void getSetpoint(const float dy, hf::demands_t & setpoint) 
             {
                 setpoint.pitch =
 
                     // On startup, move forward (arbitrary)
-                    fabs(state.dy) < DY_ZERO ? +SPEED :
+                    fabs(dy) < DY_ZERO ? +SPEED :
 
                     // Close to forward wall, go backward
                     distance_forward_mm < WALL_PROXIMITY_MM ? -SPEED :
@@ -72,7 +71,7 @@ namespace hf {
                     distance_backward_mm < WALL_PROXIMITY_MM ? +SPEED :
 
                     // Otherwise, continue in same direction
-                    state.dy > 0 ? -SPEED : +SPEED;
+                    dy > 0 ? -SPEED : +SPEED;
             }
 
             void readSensors(

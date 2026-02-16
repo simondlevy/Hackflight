@@ -64,7 +64,7 @@ DLLEXPORT void webots_physics_step()
             // Replace open-loop setpoint with setpoint from autopilot if
             // available
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-                _autopilot.getSetpoint(state, siminfo.setpoint);
+                _autopilot.getSetpoint(state.dy, siminfo.setpoint);
             }
 
             // Use setpoint to get new state
