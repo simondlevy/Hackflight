@@ -65,10 +65,6 @@ int main()
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             FRAME_RATE_HZ);
 
-    // Start in a random direction (forward or backward)
-    const float pitch = 2 * (rand() % 2) - 1;
-    hf::demands_t setpoint = {0, 0, pitch, 0};
-
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
         const auto mode =
@@ -76,11 +72,13 @@ int main()
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
 
-        // Get current vehicle state
+        // Start with neutral setpoint
+        hf::demands_t setpoint = {};
+
+        // Get current vehicle state based on setpoint
         const auto state = simulator.step(mode, setpoint);
 
-        // Replace open-loop setpoint with setpoint from autopilot if
-        // available
+        // Replace neutral setpoint with setpoint from autopilot if available
         if (mode == hf::MODE_AUTONOMOUS) {
             autopilot.getSetpoint(state.dy, setpoint);
         }
