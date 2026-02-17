@@ -20,8 +20,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-// Webots
+// Helpers
 #include "../helper.hpp"
+#include "../experimental.hpp"
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
@@ -90,13 +91,10 @@ DLLEXPORT void webots_physics_step()
             _autopilot.readSensors(_robot, _world, pose);
 
             // Log data to file
-            fprintf(_logfile,
-                    "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f," 
-                    "%d,%d\n",
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi,
-                    _autopilot.distance_forward_mm, 
-                    _autopilot.distance_backward_mm);
-
+            const int distances[] = {
+                _autopilot.distance_forward_mm, 
+                _autopilot.distance_backward_mm};
+            Experimental::write_to_log( _logfile, pose, distances, 2);
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {

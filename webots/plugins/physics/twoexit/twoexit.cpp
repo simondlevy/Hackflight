@@ -81,7 +81,7 @@ DLLEXPORT void webots_physics_step()
             _autopilot.readSensor(_robot, _world, pose);
 
             // Log data to file
-            ExperimentalHelper::write_to_log(
+            Experimental::write_to_log(
                     _logfile, pose, _autopilot.rangefinder_distances_mm, 8);
 
             // Display rangefinder distances

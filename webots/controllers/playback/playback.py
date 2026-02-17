@@ -131,7 +131,8 @@ def main():
         if cv2 is None:
             print(rangefinder_distances)
         else:
-            show_rangefinder_distances(rangefinder_distances, 8, 1)
+            show_rangefinder_distances(rangefinder_distances,
+                    len(rangefinder_distances), 1)
 
 
 main()

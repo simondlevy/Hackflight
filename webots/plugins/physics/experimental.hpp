@@ -1,5 +1,5 @@
 /* 
- * Webots custom physics plugin support for Hackflight
+ * Webots experimental custom physics plugin support for Hackflight
  *
  *  Copyright (C) 2025 Simon D. Levy
  *
@@ -20,7 +20,7 @@
 
 #include <simsensors/src/types.h>
 
-class ExperimentalHelper {
+class Experimental {
 
     public:
 
