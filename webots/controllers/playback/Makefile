@@ -13,19 +13,16 @@
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 # Command-line variables; e.g.:
-#   make run world=simple log=../controller/log.csv
+#   make run log=../controller/twoexit.csv
 #
-world = simple
-log = ../standard/log.csv
 
+WORLD = $(shell head -1 $(log))
 WORLDS_DIR = ../../worlds
-WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
+WORLD_FILE = $(WORLDS_DIR)/$(WORLD).wbt
 PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
-bazinga:
-	sed 's/physics.*//' $(WORLD_FILE) | sed 's/###//' > $(PLAYBACK_FILE)
-
 run:
+	@echo $(BAZ)
 	@if [ ! -f $(WORLD_FILE) ]; then\
         echo "World file" $(WORLD_FILE) "not found";\
 	elif [ ! -f $(log) ]; then\

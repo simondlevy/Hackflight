@@ -114,7 +114,7 @@ def main():
 
     logfile = open(argv[1])
 
-    for line in logfile.readlines():
+    for line in logfile.readlines()[1:]:  # First line is world name
 
         if quad.step(int(timestep)) == -1:
             break

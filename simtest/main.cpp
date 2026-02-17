@@ -45,6 +45,8 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
+    fprintf(logfile, "twoexit\n");
+
     const auto robot_path = argv[1];
     simsens::Robot robot = {};
     simsens::RobotParser::parse(argv[1], robot);
@@ -81,8 +83,15 @@ int main(int argc, char ** argv)
 
         autopilot.readSensor(robot, world,
                 {state.x, state.y, state.z,
-                state.phi, state.theta, state.psi},
-                logfile);
+                state.phi, state.theta, state.psi});
+
+        const auto d = autopilot.rangefinder_distances_mm;
+
+        fprintf(logfile,
+                "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f"
+                ",%d,%d,%d,%d,%d,%d,%d,%d\n",
+                state.x, state.y, state.z, state.phi, state.theta, state.psi,
+                d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
 
         if (world.collided({state.x, state.y, state.z})) {
             printf("collided\n");

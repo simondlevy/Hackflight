@@ -31,7 +31,6 @@ class ExperimentalHelper {
     private:
 
         static constexpr char PATH_VARIABLE_NAME[] = "WEBOTS_PATH";
-        static constexpr char LOG_FILE_NAME[] = "log.csv";
 
         FILE * _logfile;
 
@@ -56,8 +55,9 @@ class ExperimentalHelper {
             sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
             simsens::RobotParser::parse(path, robot);
 
-            sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
+            sprintf(path, "%s/%s.csv", pwd, worldname);
             _logfile = fopen(path, "w");
+            fprintf(_logfile, "%s\n", worldname);
 
             _collided = false;
             
