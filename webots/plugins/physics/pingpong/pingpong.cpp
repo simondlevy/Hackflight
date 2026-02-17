@@ -16,43 +16,25 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// C
-#include <stdlib.h>
-#include <unistd.h>
-
-// Helpers
 #include "../helper.hpp"
 #include "../experimental.hpp"
 
-// SimSensors
-#include <simsensors/src/parsers/webots/world.hpp>
-#include <simsensors/src/parsers/webots/robot.hpp>
-#include <simsensors/src/world.hpp>
-
-// Hackflight
-#include <simulator/dynamics.hpp>
 #include <autopilots/pingpong.hpp>
 
-static PluginHelper * _helper;
 static ExperimentalHelper * _ehelper;
 
 static hf::PingPongAutopilot _autopilot;
+
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    static bool _collided;
-
-    if (_collided) {
-        dBodySetGravityMode(_helper->robotBody, 1);
-    }
-
-    else {
+    if (!_ehelper->collided()) {
 
         PluginHelper::siminfo_t siminfo = {};
 
-        if (_helper->get_siminfo(siminfo)) {
+        if (_ehelper->get_siminfo(siminfo)) {
 
             // Start in a random direction (forward or backward)
             static bool _started;
@@ -62,7 +44,7 @@ DLLEXPORT void webots_physics_step()
             _started = true;
 
             // Get current vehicle state
-            const auto state = _helper->get_state_from_siminfo(siminfo);
+            const auto state = _ehelper->get_state_from_siminfo(siminfo);
 
             // Replace open-loop setpoint with setpoint from autopilot if
             // available
@@ -70,13 +52,7 @@ DLLEXPORT void webots_physics_step()
                 _autopilot.getSetpoint(state.dy, siminfo.setpoint);
             }
 
-            // Use setpoint to get new state
-            const auto newstate = _helper->get_state_from_siminfo(siminfo);
-
-            // Extract pose from state
-            const simsens::pose_t pose = {
-                newstate.x, newstate.y, newstate.z, newstate.phi, newstate.theta, newstate.psi
-            };
+            const auto pose = _ehelper->get_pose(siminfo);
 
             // Grab rangefinder readings for next iteration
             _autopilot.readSensors(_ehelper->robot, _ehelper->world, pose);
@@ -86,26 +62,17 @@ DLLEXPORT void webots_physics_step()
                 _autopilot.distance_forward_mm, 
                 _autopilot.distance_backward_mm};
             _ehelper->write_to_log(pose, distances, 2);
-
-            // Stop if we detected a collision
-            if (_ehelper->world.collided({pose.x, pose.y, pose.z})) {
-                _collided = true;
-            }
-
-            // Otherwise, set normally
-            _helper->set_dbody_from_state(newstate);
         }
     }
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _helper;
+    delete _ehelper;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
-    _helper = new PluginHelper();
 
     _ehelper = new ExperimentalHelper("pingpong");
 }

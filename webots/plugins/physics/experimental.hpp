@@ -35,10 +35,14 @@ class ExperimentalHelper {
 
         FILE * _logfile;
 
+        PluginHelper * _helper;
+
     public:
 
         simsens::World world;
         simsens::Robot robot;
+
+        bool _collided;
 
         ExperimentalHelper(const char * worldname)
         {
@@ -54,6 +58,52 @@ class ExperimentalHelper {
 
             sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
             _logfile = fopen(path, "w");
+
+            _collided = false;
+            
+            _helper = new PluginHelper();
+        }
+
+        ~ExperimentalHelper()
+        {
+            delete _helper;
+        }
+
+        hf:: Dynamics::state_t get_state_from_siminfo(const PluginHelper::siminfo_t & siminfo)
+        {
+            return _helper->get_state_from_siminfo(siminfo);
+        }
+
+        simsens::pose_t get_pose(const PluginHelper::siminfo_t & siminfo)
+        {
+            // Use setpoint to get new state
+            const auto newstate = _helper->get_state_from_siminfo(siminfo);
+
+            // Extract pose from newstate
+            const simsens::pose_t pose = {
+                newstate.x, newstate.y, newstate.z, newstate.phi, newstate.theta, newstate.psi
+            };
+
+            // Stop if we detected a collision
+            if (world.collided({pose.x, pose.y, pose.z})) {
+                dBodySetGravityMode(_helper->robotBody, 1);
+                _collided = true;
+            }
+
+            // Otherwise, set normally
+            _helper->set_dbody_from_state(newstate);
+
+            return pose;
+        }
+
+        bool get_siminfo(PluginHelper::siminfo_t & siminfo)
+        {
+            return _helper->get_siminfo(siminfo);
+        }
+
+        bool collided()
+        {
+            return _collided;
         }
 
         void write_to_log(
