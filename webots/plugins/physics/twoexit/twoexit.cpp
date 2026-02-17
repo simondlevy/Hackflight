@@ -53,7 +53,7 @@ DLLEXPORT void webots_physics_step()
     static bool _collided;
 
     if (_collided) {
-        dBodySetGravityMode(_robotBody, 1);
+        dBodySetGravityMode(_helper->robotBody, 1);
     }
 
     else {
@@ -81,7 +81,7 @@ DLLEXPORT void webots_physics_step()
             _autopilot.readSensor(_robot, _world, pose);
 
             // Log data to file
-            Experimental::write_to_log(
+            ExperimentalHelper::write_to_log(
                     _logfile, pose, _autopilot.rangefinder_distances_mm, 8);
 
             // Display rangefinder distances

@@ -16,6 +16,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 // C 
 #include <stdio.h>
 
@@ -27,8 +29,6 @@
 #include <datatypes.h>
 #include <simulator/dynamics.hpp>
 #include <simulator/simulator.hpp>
-
-static dBodyID _robotBody;
 
 class PluginHelper {
 
@@ -50,24 +50,26 @@ class PluginHelper {
 
         } siminfo_t;
 
+        dBodyID robotBody;
+
         PluginHelper()
         {
-            _robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
+            robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-            if (_robotBody == NULL) {
+            if (robotBody == NULL) {
 
                 dWebotsConsolePrintf("webots_physics_init :: ");
                 dWebotsConsolePrintf("error : could not get body of robot.\r\n");
             }
             else {
 
-                dBodySetGravityMode(_robotBody, 0);
+                dBodySetGravityMode(robotBody, 0);
             }
         }
 
         bool get_siminfo(siminfo_t & siminfo)
         {
-            if (_robotBody == NULL) {
+            if (robotBody == NULL) {
                 return false;
             }
 
@@ -99,7 +101,7 @@ class PluginHelper {
         void set_dbody_from_state(const hf::Dynamics::state_t & state)
         {
             // Negate Y to make leftward positive
-            dBodySetPosition(_robotBody, state.x, -state.y, state.z);
+            dBodySetPosition(robotBody, state.x, -state.y, state.z);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
@@ -107,7 +109,7 @@ class PluginHelper {
             const hf::axis4_t quat = euler2quat(euler);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
-            dBodySetQuaternion(_robotBody, q);
+            dBodySetQuaternion(robotBody, q);
         }
 
     private:

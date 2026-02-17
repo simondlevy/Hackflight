@@ -16,13 +16,23 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdio.h>
 
 #include <simsensors/src/types.h>
 
-class Experimental {
+#include "helper.hpp"
+
+class ExperimentalHelper {
+
+    private:
 
     public:
+
+        ExperimentalHelper()
+        {
+        }
 
         static void write_to_log(
                 FILE * logfile,

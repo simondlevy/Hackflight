@@ -54,7 +54,7 @@ DLLEXPORT void webots_physics_step()
     static bool _collided;
 
     if (_collided) {
-        dBodySetGravityMode(_robotBody, 1);
+        dBodySetGravityMode(_helper->robotBody, 1);
     }
 
     else {
@@ -94,7 +94,7 @@ DLLEXPORT void webots_physics_step()
             const int distances[] = {
                 _autopilot.distance_forward_mm, 
                 _autopilot.distance_backward_mm};
-            Experimental::write_to_log( _logfile, pose, distances, 2);
+            ExperimentalHelper::write_to_log( _logfile, pose, distances, 2);
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {
