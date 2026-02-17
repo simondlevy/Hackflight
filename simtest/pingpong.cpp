@@ -22,7 +22,6 @@
 #include <autopilots/pingpong.hpp>
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
-#include <vehicles/diyquad.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>

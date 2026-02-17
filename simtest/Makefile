@@ -17,6 +17,12 @@ CC = g++ -std=c++17 -Wall -c -I$(ROOT) -I$(HFSRC)
 
 all: $(ALL)
 
+runexit: twoexit
+	./twoexit
+
+runpong: pingpong
+	./pingpong
+
 twoexit: twoexit.o
 	g++ -o twoexit twoexit.o
 
@@ -26,7 +32,7 @@ pingpong: pingpong.o
 twoexit.o: twoexit.cpp $(DEPS)
 	$(CC) twoexit.cpp
 
-pingpong.o: $(DEPS)
+pingpong.o: pingpong.cpp $(DEPS)
 	$(CC) pingpong.cpp
 
 clean:
