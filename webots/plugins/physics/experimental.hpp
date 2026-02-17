@@ -69,7 +69,8 @@ class ExperimentalHelper {
             delete _helper;
         }
 
-        hf:: Dynamics::state_t get_state_from_siminfo(const PluginHelper::siminfo_t & siminfo)
+        hf:: Dynamics::state_t get_state_from_siminfo(
+                const PluginHelper::siminfo_t & siminfo)
         {
             return _helper->get_state_from_siminfo(siminfo);
         }
@@ -77,11 +78,11 @@ class ExperimentalHelper {
         simsens::pose_t get_pose(const PluginHelper::siminfo_t & siminfo)
         {
             // Use setpoint to get new state
-            const auto newstate = _helper->get_state_from_siminfo(siminfo);
+            const auto state = _helper->get_state_from_siminfo(siminfo);
 
-            // Extract pose from newstate
+            // Extract pose from state
             const simsens::pose_t pose = {
-                newstate.x, newstate.y, newstate.z, newstate.phi, newstate.theta, newstate.psi
+                state.x, state.y, state.z, state.phi, state.theta, state.psi
             };
 
             // Stop if we detected a collision
@@ -91,19 +92,14 @@ class ExperimentalHelper {
             }
 
             // Otherwise, set normally
-            _helper->set_dbody_from_state(newstate);
+            _helper->set_dbody_from_state(state);
 
             return pose;
         }
 
         bool get_siminfo(PluginHelper::siminfo_t & siminfo)
         {
-            return _helper->get_siminfo(siminfo);
-        }
-
-        bool collided()
-        {
-            return _collided;
+            return _collided ? false : _helper->get_siminfo(siminfo);
         }
 
         void write_to_log(

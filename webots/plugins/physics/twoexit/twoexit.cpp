@@ -33,35 +33,33 @@ static ExperimentalHelper * _ehelper;
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    if (!_ehelper->collided()) {
+    PluginHelper::siminfo_t siminfo = {};
 
-        PluginHelper::siminfo_t siminfo = {};
+    if (_ehelper->get_siminfo(siminfo)) {
 
-        if (_ehelper->get_siminfo(siminfo)) {
-
-            // Replace open-loop setpoint with setpoint from autopilot if
-            // available
-            if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-                static int _frame;
-                _autopilot.getSetpoint(_frame++, siminfo.setpoint);
-            }
-
-            const auto pose = _ehelper->get_pose(siminfo);
-
-            // Grab rangefinder distances for next iteration
-            _autopilot.readSensor(_ehelper->robot, _ehelper->world, pose);
-
-            // Log data to file
-            _ehelper->write_to_log(
-                    pose, _autopilot.rangefinder_distances_mm, 8);
-
-            // Display rangefinder distances
-            simsens::RangefinderVisualizer::show(
-                    _autopilot.rangefinder_distances_mm,
-                    _autopilot.get_rangefinder(_ehelper->robot)->min_distance_m,
-                    _autopilot.get_rangefinder(_ehelper->robot)->max_distance_m,
-                    8, 1, RANGEFINDER_DISPLAY_SCALEUP);
+        // Replace open-loop setpoint with setpoint from autopilot if
+        // available
+        if (siminfo.mode == hf::MODE_AUTONOMOUS) {
+            static int _frame;
+            _autopilot.getSetpoint(_frame++, siminfo.setpoint);
         }
+
+        // Get vehicle pose based on setpoint
+        const auto pose = _ehelper->get_pose(siminfo);
+
+        // Grab rangefinder distances for next iteration
+        _autopilot.readSensor(_ehelper->robot, _ehelper->world, pose);
+
+        // Log data to file
+        _ehelper->write_to_log(
+                pose, _autopilot.rangefinder_distances_mm, 8);
+
+        // Display rangefinder distances
+        simsens::RangefinderVisualizer::show(
+                _autopilot.rangefinder_distances_mm,
+                _autopilot.get_rangefinder(_ehelper->robot)->min_distance_m,
+                _autopilot.get_rangefinder(_ehelper->robot)->max_distance_m,
+                8, 1, RANGEFINDER_DISPLAY_SCALEUP);
     }
 }
 
