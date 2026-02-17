@@ -37,27 +37,10 @@ namespace hf {
             static constexpr int WALL_PROXIMITY_MM = 200;
             static constexpr float SPEED = 0.5;
 
+        public:
+
             int distance_forward_mm;
             int distance_backward_mm;
-
-            static int readRangefinder(
-                    const string name,
-                    simsens::Robot & robot,
-                    simsens::World & world,
-                    const hf::Dynamics::state_t & state)
-            {
-                auto rangefinder = robot.rangefinders[name];
-
-                int distance_mm = 0;
-
-                rangefinder->read(
-                        {state.x, state.y, state.z, state.phi, state.theta, state.psi},
-                        world, &distance_mm);
-
-                return distance_mm;
-            }
-
-        public:
 
             void getSetpoint(const float dydt, hf::demands_t & setpoint) 
             {
@@ -89,6 +72,26 @@ namespace hf {
                 distance_backward_mm = readRangefinder("VL53L1-backward", robot,
                         world, state);
             }
+
+        private:
+
+            static int readRangefinder(
+                    const string name,
+                    simsens::Robot & robot,
+                    simsens::World & world,
+                    const hf::Dynamics::state_t & state)
+            {
+                auto rangefinder = robot.rangefinders[name];
+
+                int distance_mm = 0;
+
+                rangefinder->read(
+                        {state.x, state.y, state.z, state.phi, state.theta, state.psi},
+                        world, &distance_mm);
+
+                return distance_mm;
+            }
+
     };
 
 }

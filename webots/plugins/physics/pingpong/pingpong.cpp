@@ -34,6 +34,8 @@
 
 static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
 
+static const char * LOG_FILE_NAME = "log.csv";
+
 static simsens::World _world;
 
 static simsens::Robot _robot;
@@ -41,6 +43,8 @@ static simsens::Robot _robot;
 static PluginHelper * _helper;
 
 static hf::PingPongAutopilot _autopilot;
+
+static FILE * _logfile;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -77,11 +81,25 @@ DLLEXPORT void webots_physics_step()
             // Use setpoint to get new state
             const auto newstate = _helper->get_state_from_siminfo(siminfo);
 
+            // Extract pose from state
+            const simsens::pose_t pose = {
+                newstate.x, newstate.y, newstate.z, newstate.phi, newstate.theta, newstate.psi
+            };
+
             // Grab rangefinder readings for next iteration
             _autopilot.readSensors(_robot, _world, newstate);
 
+            // Log data to file
+            fprintf(_logfile,
+                    "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f," 
+                    "%d,%d\n",
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi,
+                    _autopilot.distance_forward_mm, 
+                    _autopilot.distance_backward_mm);
+
+
             // Stop if we detected a collision
-            if (_world.collided({newstate.x, newstate.y, newstate.z})) {
+            if (_world.collided({pose.x, pose.y, pose.z})) {
                 _collided = true;
             }
 
@@ -109,4 +127,7 @@ DLLEXPORT void webots_physics_init()
 
     sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
     simsens::RobotParser::parse(path, _robot);
+
+    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
+    _logfile = fopen(path, "w");
 }
