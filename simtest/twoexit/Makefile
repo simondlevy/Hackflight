@@ -1,22 +1,28 @@
-ROOT = ../..
+ROOT = ../../..
 
 SIMSENSORS = $(ROOT)/simsensors/src
 
-world = ../webots/worlds/twoexit.wbt
+HF = ../..
+
+HFSRC = $(HF)/src
+
+HFWB = $(HF)/webots
+
+world = $(HFWB)/worlds/twoexit.wbt
 
 log = "log.csv"
 
 all: simtest
 
 run: simtest
-	./simtest ../webots/protos/DiyQuad.proto $(world) $(log)
+	./simtest $(HFWB)/protos/DiyQuad.proto $(world) $(log)
 
 simtest: main.o
 	g++ -o simtest main.o
 
-main.o: main.cpp ../src/*.hpp ../src/pids/*.hpp \
+main.o: main.cpp $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp \
 	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
-	g++ -std=c++17 -Wall -c -I$(ROOT) -I../src main.cpp
+	g++ -std=c++17 -Wall -c -I$(ROOT) -I$(HFSRC) main.cpp
 
 edit:
 	vim main.cpp

@@ -42,17 +42,21 @@ int main(int argc, char ** argv)
     auto  * logfile = fopen(logname, "w");
     if (!logfile) {
         fprintf(stderr, "Unable to open file %s for writing\n", logname);
-        exit(1);
+        return 1;
     }
 
     fprintf(logfile, "twoexit\n");
 
     const auto robot_path = argv[1];
     simsens::Robot robot = {};
-    simsens::RobotParser::parse(argv[1], robot);
+    if (!simsens::RobotParser::parse(argv[1], robot)) {
+        return 1;
+    }
 
     static simsens::World world = {};
-    simsens::WorldParser::parse(argv[2], world, robot_path);
+    if (!simsens::WorldParser::parse(argv[2], world, robot_path)) {
+        return 1;
+    }
 
     hf::TwoExitAutopilot autopilot = {};
 
