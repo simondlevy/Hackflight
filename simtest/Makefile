@@ -8,14 +8,26 @@ HFSRC = $(HF)/src
 
 HFWB = $(HF)/webots
 
-all: twoexit
+ALL = twoexit pingpong 
+
+DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
+	   $(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
+
+CC = g++ -std=c++17 -Wall -c -I$(ROOT) -I$(HFSRC)
+
+all: $(ALL)
 
 twoexit: twoexit.o
 	g++ -o twoexit twoexit.o
 
-twoexit.o: twoexit.cpp $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
-	$(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
-	g++ -std=c++17 -Wall -c -I$(ROOT) -I$(HFSRC) twoexit.cpp
+pingpong: pingpong.o
+	g++ -o pingpong pingpong.o
+
+twoexit.o: twoexit.cpp $(DEPS)
+	$(CC) twoexit.cpp
+
+pingpong.o: $(DEPS)
+	$(CC) pingpong.cpp
 
 clean:
-	rm -f twoexit *.o *.csv
+	rm -f $(ALL) *.o *.csv
