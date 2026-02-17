@@ -55,7 +55,7 @@ namespace hf {
 
             } pose_t;
 
-            void init(const pose_t & pose, const float framerate)
+            void init(const pose_t & pose, const float framerate=32)
             {
                 _pidControl.init();
 

@@ -30,20 +30,19 @@
 
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
-static const char * LOGNAME = "twoexit.csv";
+static const char * LOGNAME = "pingpong.csv";
 static const char * ROBOT_PATH = "../../webots/protos/DiyQuad.proto";
-static const char * WORLD_PATH = "../../webots/worlds/twoexit.wbt";
+static const char * WORLD_PATH = "../../webots/worlds/pingpong.wbt";
 
 int main()
 {
-#if 0
     auto  * logfile = fopen(LOGNAME, "w");
     if (!logfile) {
         fprintf(stderr, "Unable to open file %s for writing\n", LOGNAME);
         return 1;
     }
 
-    fprintf(logfile, "twoexit\n");
+    fprintf(logfile, "pingpong\n");
 
     simsens::Robot robot = {};
     if (!simsens::RobotParser::parse(ROBOT_PATH, robot)) {
@@ -55,13 +54,14 @@ int main()
         return 1;
     }
 
-    hf::TwoExitAutopilot autopilot = {};
+    hf::PingPongAutopilot autopilot = {};
 
     const auto pose = world.getRobotPose();
 
     hf::Simulator simulator = {};
 
-    const auto rate = hf::TwoExitAutopilot::FRAME_RATE_HZ;
+#if 0
+    const auto rate = hf::PingPongAutopilot::FRAME_RATE_HZ;
 
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
            rate);
@@ -99,11 +99,11 @@ int main()
             break;
         }
     }
+#endif
 
     fclose(logfile);
 
     printf("Wrote %s\n", LOGNAME);
-#endif
 
     return 0;
 }
