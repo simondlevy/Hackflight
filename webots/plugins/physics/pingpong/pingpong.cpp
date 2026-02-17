@@ -87,7 +87,7 @@ DLLEXPORT void webots_physics_step()
             };
 
             // Grab rangefinder readings for next iteration
-            _autopilot.readSensors(_robot, _world, newstate);
+            _autopilot.readSensors(_robot, _world, pose);
 
             // Log data to file
             fprintf(_logfile,
