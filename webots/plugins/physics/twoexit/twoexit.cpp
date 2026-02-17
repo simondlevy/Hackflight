@@ -20,8 +20,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-// Webots
+// Helpers
 #include "../helper.hpp"
+#include "../experimental.hpp"
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
@@ -80,12 +81,8 @@ DLLEXPORT void webots_physics_step()
             _autopilot.readSensor(_robot, _world, pose);
 
             // Log data to file
-            const auto d = _autopilot.rangefinder_distances_mm;
-            fprintf(_logfile,
-                    "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f," 
-                    "%d,%d,%d,%d,%d,%d,%d,%d\n",
-                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi,
-                    d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
+            ExperimentalHelper::write_to_log(
+                    _logfile, pose, _autopilot.rangefinder_distances_mm, 8);
 
             // Display rangefinder distances
             simsens::RangefinderVisualizer::show(

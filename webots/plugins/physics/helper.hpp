@@ -16,6 +16,9 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// C 
+#include <stdio.h>
+
 // Webots
 #include <plugins/physics.h>
 
