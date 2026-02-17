@@ -22,10 +22,12 @@
 #include <stdlib.h>
 
 // Hackflight
+#include <datatypes.h>
 #include <simulator/dynamics.hpp>
 
 // SimSensors
-#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/world.hpp>
+#include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 namespace hf {

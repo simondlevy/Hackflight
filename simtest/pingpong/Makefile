@@ -10,8 +10,6 @@ HFWB = $(HF)/webots
 
 world = $(HFWB)/worlds/twoexit.wbt
 
-log = "log.csv"
-
 all: simtest
 
 run: simtest

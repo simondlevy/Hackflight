@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 // Hackflight
-#include <autopilots/twoexit.hpp>
+#include <autopilots/pingpong.hpp>
 #include <datatypes.h>
 #include <simulator/simulator.hpp>
 #include <vehicles/diyquad.hpp>
@@ -36,6 +36,7 @@ static const char * WORLD_PATH = "../../webots/worlds/twoexit.wbt";
 
 int main()
 {
+#if 0
     auto  * logfile = fopen(LOGNAME, "w");
     if (!logfile) {
         fprintf(stderr, "Unable to open file %s for writing\n", LOGNAME);
@@ -102,6 +103,7 @@ int main()
     fclose(logfile);
 
     printf("Wrote %s\n", LOGNAME);
+#endif
 
     return 0;
 }
