@@ -20,7 +20,9 @@
 
 #include <stdio.h>
 
-#include <simsensors/src/types.h>
+#include <simsensors/src/parsers/webots/world.hpp>
+#include <simsensors/src/parsers/webots/robot.hpp>
+#include <simsensors/src/world.hpp>
 
 #include "helper.hpp"
 
@@ -28,26 +30,45 @@ class ExperimentalHelper {
 
     private:
 
+        static constexpr char PATH_VARIABLE_NAME[] = "WEBOTS_PATH";
+        static constexpr char LOG_FILE_NAME[] = "log.csv";
+
+        FILE * _logfile;
+
     public:
 
-        ExperimentalHelper()
+        simsens::World world;
+        simsens::Robot robot;
+
+        ExperimentalHelper(const char * worldname)
         {
+            const auto pwd = getenv(PATH_VARIABLE_NAME);
+
+            char path[1000] = {};
+
+            sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname);
+            simsens::WorldParser::parse(path, world);
+
+            sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
+            simsens::RobotParser::parse(path, robot);
+
+            sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
+            _logfile = fopen(path, "w");
         }
 
         void write_to_log(
-                FILE * logfile,
                 const simsens::pose_t & pose,
                 const int * rangefinder_distances,
                 const int n_distances)
         {       
-            fprintf(logfile,
+            fprintf(_logfile,
                     "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f",
                     pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
 
             for (int k=0; k<n_distances; ++k) {
-                fprintf(logfile, ",%d", rangefinder_distances[k]);
+                fprintf(_logfile, ",%d", rangefinder_distances[k]);
             }
 
-            fprintf(logfile, "\n");
+            fprintf(_logfile, "\n");
         }
 };

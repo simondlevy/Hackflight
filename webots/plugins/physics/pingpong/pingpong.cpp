@@ -33,20 +33,10 @@
 #include <simulator/dynamics.hpp>
 #include <autopilots/pingpong.hpp>
 
-static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
-
-static const char * LOG_FILE_NAME = "log.csv";
-
-static simsens::World _world;
-
-static simsens::Robot _robot;
-
 static PluginHelper * _helper;
 static ExperimentalHelper * _ehelper;
 
 static hf::PingPongAutopilot _autopilot;
-
-static FILE * _logfile;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -89,16 +79,16 @@ DLLEXPORT void webots_physics_step()
             };
 
             // Grab rangefinder readings for next iteration
-            _autopilot.readSensors(_robot, _world, pose);
+            _autopilot.readSensors(_ehelper->robot, _ehelper->world, pose);
 
             // Log data to file
             const int distances[] = {
                 _autopilot.distance_forward_mm, 
                 _autopilot.distance_backward_mm};
-            _ehelper->write_to_log( _logfile, pose, distances, 2);
+            _ehelper->write_to_log(pose, distances, 2);
 
             // Stop if we detected a collision
-            if (_world.collided({pose.x, pose.y, pose.z})) {
+            if (_ehelper->world.collided({pose.x, pose.y, pose.z})) {
                 _collided = true;
             }
 
@@ -117,18 +107,5 @@ DLLEXPORT void webots_physics_init()
 {
     _helper = new PluginHelper();
 
-    _ehelper = new ExperimentalHelper();
-
-    const auto pwd = getenv(PATH_VARIABLE_NAME);
-
-    char path[1000] = {};
-
-    sprintf(path, "%s/../../worlds/pingpong.wbt", pwd);
-    simsens::WorldParser::parse(path, _world);
-
-    sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
-    simsens::RobotParser::parse(path, _robot);
-
-    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
-    _logfile = fopen(path, "w");
+    _ehelper = new ExperimentalHelper("pingpong");
 }

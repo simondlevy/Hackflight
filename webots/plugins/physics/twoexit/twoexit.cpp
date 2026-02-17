@@ -32,20 +32,14 @@
 // Hackflight
 #include <autopilots/twoexit.hpp>
 
-static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
-
-static const char * LOG_FILE_NAME = "log.csv";
-
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
-static simsens::World _world;
-static simsens::Robot _robot;
 static PluginHelper * _helper;
 static ExperimentalHelper * _ehelper;
 
 static hf::TwoExitAutopilot _autopilot;
 
-static FILE * _logfile;
+//static FILE * _logfile;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -79,21 +73,21 @@ DLLEXPORT void webots_physics_step()
             };
 
             // Read rangefinder distances for next iteration
-            _autopilot.readSensor(_robot, _world, pose);
+            _autopilot.readSensor(_ehelper->robot, _ehelper->world, pose);
 
             // Log data to file
             _ehelper->write_to_log(
-                    _logfile, pose, _autopilot.rangefinder_distances_mm, 8);
+                    pose, _autopilot.rangefinder_distances_mm, 8);
 
             // Display rangefinder distances
             simsens::RangefinderVisualizer::show(
                     _autopilot.rangefinder_distances_mm,
-                    _autopilot.get_rangefinder(_robot)->min_distance_m,
-                    _autopilot.get_rangefinder(_robot)->max_distance_m,
+                    _autopilot.get_rangefinder(_ehelper->robot)->min_distance_m,
+                    _autopilot.get_rangefinder(_ehelper->robot)->max_distance_m,
                     8, 1, RANGEFINDER_DISPLAY_SCALEUP);
 
             // Stop if we detected a collision
-            if (_world.collided({state.x, state.y, state.z})) {
+            if (_ehelper->world.collided({state.x, state.y, state.z})) {
                 _collided = true;
             }
 
@@ -112,18 +106,5 @@ DLLEXPORT void webots_physics_init()
 {
     _helper = new PluginHelper();
 
-    _ehelper = new ExperimentalHelper();
-
-    const auto pwd = getenv(PATH_VARIABLE_NAME);
-
-    char path[1000] = {};
-
-    sprintf(path, "%s/../../worlds/twoexit.wbt", pwd);
-    simsens::WorldParser::parse(path, _world);
-
-    sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
-    simsens::RobotParser::parse(path, _robot);
-
-    sprintf(path, "%s/%s", pwd, LOG_FILE_NAME);
-    _logfile = fopen(path, "w");
+    _ehelper = new ExperimentalHelper("twoexit");
 }
