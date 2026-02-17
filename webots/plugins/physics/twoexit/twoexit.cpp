@@ -23,31 +23,27 @@
 // Webots
 #include "../helper.hpp"
 
-// Hackflight
-#include <autopilots/twoexit.hpp>
-
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
-#include <simsensors/src/world.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
-static const char * LOG_FILE_NAME = "log.csv";
+// Hackflight
+#include <autopilots/twoexit.hpp>
 
 static const char * PATH_VARIABLE_NAME = "WEBOTS_PATH";
+
+static const char * LOG_FILE_NAME = "log.csv";
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
 static simsens::World _world;
-
 static simsens::Robot _robot;
-
-static FILE * _logfile;
-
 static PluginHelper * _helper;
 
 static hf::TwoExitAutopilot _autopilot;
+
+static FILE * _logfile;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -65,9 +61,6 @@ DLLEXPORT void webots_physics_step()
 
         if (_helper->get_siminfo(siminfo)) {
 
-            // Get current vehicle state
-            //const auto state = _helper->get_state_from_siminfo(siminfo);
-
             // Replace open-loop setpoint with setpoint from autopilot if
             // available
             if (siminfo.mode == hf::MODE_AUTONOMOUS) {
@@ -76,14 +69,23 @@ DLLEXPORT void webots_physics_step()
             }
 
             // Use setpoint to get new state
-            const auto newstate = _helper->get_state_from_siminfo(siminfo);
+            const auto state = _helper->get_state_from_siminfo(siminfo);
+
+            // Extract pose from state
+            const simsens::pose_t pose = {
+                state.x, state.y, state.z, state.phi, state.theta, state.psi
+            };
 
             // Read rangefinder distances for next iteration
-            _autopilot.readSensor(_robot, _world,
-                    {newstate.x, newstate.y, newstate.z,
-                     newstate.phi, newstate.theta, newstate.psi},
-                     _logfile);
+            _autopilot.readSensor(_robot, _world, pose);
 
+            // Log data to file
+            const auto d = _autopilot.rangefinder_distances_mm;
+            fprintf(_logfile,
+                    "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f," 
+                    "%d,%d,%d,%d,%d,%d,%d,%d\n",
+                    pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi,
+                    d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
 
             // Display rangefinder distances
             simsens::RangefinderVisualizer::show(
@@ -92,13 +94,13 @@ DLLEXPORT void webots_physics_step()
                     _autopilot.get_rangefinder(_robot)->max_distance_m,
                     8, 1, RANGEFINDER_DISPLAY_SCALEUP);
 
-             // Stop if we detected a collision
-            if (_world.collided({newstate.x, newstate.y, newstate.z})) {
+            // Stop if we detected a collision
+            if (_world.collided({state.x, state.y, state.z})) {
                 _collided = true;
             }
 
             // Otherwise, set normally
-            _helper->set_dbody_from_state(newstate);
+            _helper->set_dbody_from_state(state);
         }
     }
 }
