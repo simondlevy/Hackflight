@@ -34,7 +34,7 @@ class ExperimentalHelper {
         {
         }
 
-        static void write_to_log(
+        void write_to_log(
                 FILE * logfile,
                 const simsens::pose_t & pose,
                 const int * rangefinder_distances,
@@ -49,7 +49,5 @@ class ExperimentalHelper {
             }
 
             fprintf(logfile, "\n");
-
-
         }
 };

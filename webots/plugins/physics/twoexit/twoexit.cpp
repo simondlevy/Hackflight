@@ -41,6 +41,7 @@ static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 static simsens::World _world;
 static simsens::Robot _robot;
 static PluginHelper * _helper;
+static ExperimentalHelper * _ehelper;
 
 static hf::TwoExitAutopilot _autopilot;
 
@@ -81,7 +82,7 @@ DLLEXPORT void webots_physics_step()
             _autopilot.readSensor(_robot, _world, pose);
 
             // Log data to file
-            ExperimentalHelper::write_to_log(
+            _ehelper->write_to_log(
                     _logfile, pose, _autopilot.rangefinder_distances_mm, 8);
 
             // Display rangefinder distances
@@ -110,6 +111,8 @@ DLLEXPORT void webots_physics_cleanup()
 DLLEXPORT void webots_physics_init() 
 {
     _helper = new PluginHelper();
+
+    _ehelper = new ExperimentalHelper();
 
     const auto pwd = getenv(PATH_VARIABLE_NAME);
 

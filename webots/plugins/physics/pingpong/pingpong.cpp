@@ -42,6 +42,7 @@ static simsens::World _world;
 static simsens::Robot _robot;
 
 static PluginHelper * _helper;
+static ExperimentalHelper * _ehelper;
 
 static hf::PingPongAutopilot _autopilot;
 
@@ -94,7 +95,7 @@ DLLEXPORT void webots_physics_step()
             const int distances[] = {
                 _autopilot.distance_forward_mm, 
                 _autopilot.distance_backward_mm};
-            ExperimentalHelper::write_to_log( _logfile, pose, distances, 2);
+            _ehelper->write_to_log( _logfile, pose, distances, 2);
 
             // Stop if we detected a collision
             if (_world.collided({pose.x, pose.y, pose.z})) {
@@ -115,6 +116,8 @@ DLLEXPORT void webots_physics_cleanup()
 DLLEXPORT void webots_physics_init() 
 {
     _helper = new PluginHelper();
+
+    _ehelper = new ExperimentalHelper();
 
     const auto pwd = getenv(PATH_VARIABLE_NAME);
 
