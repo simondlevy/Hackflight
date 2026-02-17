@@ -16,6 +16,7 @@
 
 // C
 #include <stdio.h>
+#include <stdlib.h>
 
 // Hackflight
 #include <autopilots/pingpong.hpp>
@@ -31,8 +32,9 @@
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
 static const char * LOGNAME = "pingpong.csv";
-static const char * ROBOT_PATH = "../../webots/protos/DiyQuad.proto";
-static const char * WORLD_PATH = "../../webots/worlds/pingpong.wbt";
+static const char * ROBOT_PATH = "../webots/protos/DiyQuad.proto";
+static const char * WORLD_PATH = "../webots/worlds/pingpong.wbt";
+static constexpr float FRAME_RATE_HZ = 32;
 
 int main()
 {
@@ -60,46 +62,49 @@ int main()
 
     hf::Simulator simulator = {};
 
-#if 0
-    const auto rate = hf::PingPongAutopilot::FRAME_RATE_HZ;
+    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
+            FRAME_RATE_HZ);
 
-    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-           rate);
+    // Start in a random direction (forward or backward)
+    const float pitch = 2 * (rand() % 2) - 1;
+    hf::demands_t setpoint = {0, 0, pitch, 0};
 
-    for (int frame=0; frame<MAX_TIME_SEC * rate; ++frame) {
+    for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
         const auto mode =
-            frame < TAKEOFF_TIME_SEC * rate ?
+            frame < TAKEOFF_TIME_SEC * FRAME_RATE_HZ ?
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
 
-        hf::demands_t setpoint = {};
-
-        if (autopilot.getSetpoint(frame, setpoint)) {
-            printf("succeeded\n");
-            break;
-        }
-
+        // Get current vehicle state
         const auto state = simulator.step(mode, setpoint);
 
-        autopilot.readSensor(robot, world,
-                {state.x, state.y, state.z,
-                state.phi, state.theta, state.psi});
+        // Replace open-loop setpoint with setpoint from autopilot if
+        // available
+        if (mode == hf::MODE_AUTONOMOUS) {
+            autopilot.getSetpoint(state.dy, setpoint);
+        }
 
-        const auto d = autopilot.rangefinder_distances_mm;
+
+        // Get net state based on new setpoint
+        const auto newstate = simulator.step(mode, setpoint);
+
+        // Grab rangefinder readings for next iteration
+        autopilot.readSensors(robot, world,
+                {newstate.x, newstate.y, newstate.z,
+                newstate.phi, newstate.theta, newstate.psi});
 
         fprintf(logfile,
-                "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f"
-                ",%d,%d,%d,%d,%d,%d,%d,%d\n",
+                "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%d,%d\n",
                 state.x, state.y, state.z, state.phi, state.theta, state.psi,
-                d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
+                autopilot.distance_forward_mm, 
+                autopilot.distance_backward_mm);
 
         if (world.collided({state.x, state.y, state.z})) {
             printf("collided\n");
             break;
         }
     }
-#endif
 
     fclose(logfile);
 
