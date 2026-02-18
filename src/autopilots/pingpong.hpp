@@ -51,20 +51,22 @@ namespace hf {
 
             void getSetpoint(const float dydt, hf::demands_t & setpoint) 
             {
+                const auto diff = distance_forward_mm - distance_backward_mm;
+
                 const int8_t direction = 
 
-                    // Motionless on startup; move in a random direction
-                    // (forward or backward)
+                    // (Nearly) motionless on startup; move in a random
+                    // direction (forward or backward)
                     fabs(dydt) < 1e-6 ? 2 * (rand() % 2) - 1 :
 
-                    // Close to forward wall, go backward
-                    distance_forward_mm < WALL_PROXIMITY_MM ? -1 :
+                    diff > 1200 ? +1 :
 
-                    // Close to backward wall, go forward
-                    distance_backward_mm < WALL_PROXIMITY_MM ? +1 :
+                    diff < -1200 ? - 1 :
 
                     // Otherwise, continue in same direction
                     dydt > 0 ? -1 : +1;
+
+                printf("%d,%d\n", diff, direction);
 
                 setpoint.pitch = direction * SPEED;
             }
