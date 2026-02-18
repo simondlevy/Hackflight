@@ -36,7 +36,8 @@ namespace hf {
 
         private:
 
-            static constexpr int WALL_PROXIMITY_MM = 200;
+            static constexpr int DISTANCE_DIFFERENCE_THRESHOLD = 1800;
+
             static constexpr float SPEED = 0.5;
 
         public:
@@ -59,14 +60,12 @@ namespace hf {
                     // direction (forward or backward)
                     fabs(dydt) < 1e-6 ? 2 * (rand() % 2) - 1 :
 
-                    diff > 1200 ? +1 :
-
-                    diff < -1200 ? - 1 :
+                    // Too close to either wall; switch direction
+                    diff > DISTANCE_DIFFERENCE_THRESHOLD ? +1 :
+                    diff < -DISTANCE_DIFFERENCE_THRESHOLD ? - 1 :
 
                     // Otherwise, continue in same direction
                     dydt > 0 ? -1 : +1;
-
-                printf("%d,%d\n", diff, direction);
 
                 setpoint.pitch = direction * SPEED;
             }
