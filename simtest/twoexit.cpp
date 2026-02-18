@@ -19,9 +19,7 @@
 
 // Hackflight
 #include <autopilots/twoexit.hpp>
-#include <datatypes.h>
 #include <simulator/simulator.hpp>
-#include <vehicles/diyquad.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>
@@ -30,7 +28,7 @@
 
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
-static const char * LOGNAME = "twoexit.csv";
+static const char * LOGNAME = "logexit.csv";
 static const char * ROBOT_PATH = "../webots/protos/DiyQuad.proto";
 static const char * WORLD_PATH = "../webots/worlds/twoexit.wbt";
 
