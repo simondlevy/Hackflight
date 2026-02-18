@@ -44,6 +44,11 @@ namespace hf {
             int distance_forward_mm;
             int distance_backward_mm;
 
+            void init()
+            {
+                srand(time(NULL)); 
+            }
+
             void getSetpoint(const float dydt, hf::demands_t & setpoint) 
             {
                 const int8_t direction = 

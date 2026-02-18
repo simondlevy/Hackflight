@@ -63,8 +63,7 @@ int main()
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             FRAME_RATE_HZ);
 
-    // Seed the random number generator "randomly"
-    srand(time(NULL)); 
+    autopilot.init();
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
