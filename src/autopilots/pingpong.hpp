@@ -50,7 +50,7 @@ namespace hf {
 
                     // Motionless on startup; move in a random direction
                     // (forward or backward)
-                    dydt == 0 ? 2 * (rand() % 2) - 1 :
+                    fabs(dydt) < 1e-6 ? 2 * (rand() % 2) - 1 :
 
                     // Close to forward wall, go backward
                     distance_forward_mm < WALL_PROXIMITY_MM ? -1 :

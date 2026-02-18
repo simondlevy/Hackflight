@@ -63,6 +63,9 @@ int main()
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             FRAME_RATE_HZ);
 
+    // Seed the random number generator "randomly"
+    srand(time(NULL)); 
+
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
         const auto mode =
@@ -71,7 +74,7 @@ int main()
             hf::MODE_AUTONOMOUS;
 
         // Get current vehicle state
-        const auto state = simulator.getState();
+        const auto state = simulator.getVehicleState();
 
         // Get setpoint from autopilot if available
         hf::demands_t setpoint = {};

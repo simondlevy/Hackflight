@@ -11,7 +11,8 @@ HFWB = $(HF)/webots
 ALL = twoexit pingpong 
 
 DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
-	   $(SIMSENSORS)/parsers/webots/* $(SIMSENSORS)/sensors/* 
+	   $(HFSRC)/autopilots/*.hpp $(SIMSENSORS)/parsers/webots/* \
+	   $(SIMSENSORS)/sensors/* 
 
 CC = g++ -std=c++17 -Wall -c -I$(ROOT) -I$(HFSRC)
 

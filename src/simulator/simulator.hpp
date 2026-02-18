@@ -117,7 +117,7 @@ namespace hf {
                 return _dynamics.state;
             }
 
-            Dynamics::state_t getState()
+            Dynamics::state_t getVehicleState()
             {
                 return _dynamics.state;
             }
