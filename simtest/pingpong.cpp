@@ -70,19 +70,16 @@ int main()
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
 
-        // Start with neutral setpoint
+        // Get current vehicle state
+        const auto state = simulator.getState();
+
+        // Get setpoint from autopilot if available
         hf::demands_t setpoint = {};
-
-        // Get current vehicle state based on setpoint
-        const auto state = simulator.step(mode, setpoint);
-
-        // Replace neutral setpoint with setpoint from autopilot if available
         if (mode == hf::MODE_AUTONOMOUS) {
             autopilot.getSetpoint(state.dy, setpoint);
         }
 
-
-        // Get net state based on new setpoint
+        // Get net state based on setpoint
         const auto newstate = simulator.step(mode, setpoint);
 
         // Grab rangefinder readings for next iteration

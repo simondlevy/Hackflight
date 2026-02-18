@@ -115,7 +115,12 @@ namespace hf {
                 }
 
                 return _dynamics.state;
-            }    
+            }
+
+            Dynamics::state_t getState()
+            {
+                return _dynamics.state;
+            }
 
         private:
 
