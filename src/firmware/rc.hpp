@@ -53,7 +53,7 @@ namespace hf {
                         switch (parser.parse(byte)) {
 
                             case MSP_SET_ARMING:
-                                message.armed = !setpoint.armed;
+                                message.armed = !message.armed;
                                 message.timestamp = tick;
                                 break;
 
@@ -67,8 +67,11 @@ namespace hf {
                                 message.setpoint.thrust = parser.getFloat(0);
                                 message.setpoint.pitch = parser.getFloat(1);
                                 message.setpoint.roll = parser.getFloat(2);
-                                message.setpoint.yaw = parser.getFloat(3); setpoint.timestamp = tick;
-                                break; default:
+                                message.setpoint.yaw = parser.getFloat(3);
+                                message.timestamp = tick;
+                                break;
+                            
+                            default:
                                 break;
                         }
                     }
