@@ -276,7 +276,7 @@ void loop()
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    hf::demands_t pid_demands = { (_channel_values[0]+1)/2, 0, 0, 0 };
+    hf::setpoint_t pid_setpoint = { (_channel_values[0]+1)/2, 0, 0, 0 };
 
     static hf::PidControl _pidControl;
 
@@ -287,10 +287,10 @@ void loop()
             _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
             _channel_values[3],
             state,
-            pid_demands);
+            pid_setpoint);
 
     float motorvals[4] = {};
-    hf::Mixer::mix(pid_demands, motorvals);
+    hf::Mixer::mix(pid_setpoint, motorvals);
 
     _motors.run(_armed, motorvals);
 

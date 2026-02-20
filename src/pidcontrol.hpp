@@ -31,13 +31,13 @@ namespace hf {
 
         public:
 
-            demands_t run(
+            setpoint_t run(
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands)
+                    const setpoint_t & openLoopDemands)
             {
-                demands_t demands = {};
+                setpoint_t demands = {};
                 run(dt, hovering, vehicleState, openLoopDemands, demands);
                 return demands;
             }
@@ -46,8 +46,8 @@ namespace hf {
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands,
-                    demands_t & demands)
+                    const setpoint_t & openLoopDemands,
+                    setpoint_t & demands)
             {
                 static float _altitude_target;
 
@@ -89,8 +89,8 @@ namespace hf {
                     const float dt,
                     const float yaw_demand_inc,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands,
-                    demands_t & demands)
+                    const setpoint_t & openLoopDemands,
+                    setpoint_t & demands)
             {
                 const auto airborne = demands.thrust > 0;
 

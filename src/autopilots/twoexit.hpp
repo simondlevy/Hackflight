@@ -41,7 +41,7 @@ namespace hf {
                 return robot.rangefinders["VL53L5-forward"];
             }
 
-            bool getSetpoint(const int frame, demands_t & setpoint)
+            bool getSetpoint(const int frame, setpoint_t & setpoint)
             {
                 static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
 

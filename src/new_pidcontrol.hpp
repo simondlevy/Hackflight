@@ -38,13 +38,13 @@ namespace hf {
                 _altitude_target = 0;
             }
 
-            demands_t run(
+            setpoint_t run(
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const demands_t & demands_in)
+                    const setpoint_t & demands_in)
             {
-                demands_t demands_out = {};
+                setpoint_t demands_out = {};
                 run(dt, hovering, state, demands_in, demands_out);
                 return demands_out;
             }
@@ -53,8 +53,8 @@ namespace hf {
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const demands_t & demands_in,
-                    demands_t & demands_out)
+                    const setpoint_t & demands_in,
+                    setpoint_t & demands_out)
             {
                 // Altitude hold ---------------------------------------------
 
@@ -108,7 +108,7 @@ namespace hf {
                     const float pitch_angle_demand,
                     const float yaw_demand,
                     const vehicleState_t & state,
-                    demands_t & demands_out)
+                    setpoint_t & demands_out)
             {
                 demands_out.roll = _roll_pid.run(
                         dt, airborne, roll_angle_demand, state.phi, state.dphi);

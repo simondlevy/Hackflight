@@ -81,7 +81,7 @@ namespace hf {
         float pitch;   // positive nose down
         float yaw;     // positive nose right
 
-    } demands_t;
+    } setpoint_t;
 
-    typedef void (*mixFun_t)(const demands_t & demands, float motorvals[]);
+    typedef void (*mixFun_t)(const setpoint_t & demands, float motorvals[]);
 }

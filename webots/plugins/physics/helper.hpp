@@ -46,7 +46,7 @@ class PluginHelper {
             hf::Simulator::pose_t startingPose;
             float framerate;
             hf::mode_e mode;
-            hf::demands_t setpoint;
+            hf::setpoint_t setpoint;
 
         } siminfo_t;
 

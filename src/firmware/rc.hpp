@@ -34,7 +34,7 @@ namespace hf {
                 uint32_t timestamp;
                 bool armed;
                 bool hovering;
-                demands_t demands;
+                setpoint_t demands;
 
             } message_t;
 
