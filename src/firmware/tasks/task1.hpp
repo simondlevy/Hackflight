@@ -85,8 +85,8 @@ namespace hf {
                 // Start with motor speeds at idle
                 float motorvals[MAX_MOTOR_COUNT] = {};
 
-                // Start with no axis demands
-                setpoint_t demands = {};
+                // Start with no axis setpoint
+                setpoint_t setpoint = {};
 
                 // Run device-dependent motor initialization
                 motors_init();
@@ -159,7 +159,7 @@ namespace hf {
 
                         case MODE_HOVERING:
                             runPidAndMixer(step, message,
-                                    demands, motorvals);
+                                    setpoint, motorvals);
                             checkDisarm(message, mode, motorvals);
                             if (!message.hovering) {
                                 mode = MODE_LANDING;
@@ -168,7 +168,7 @@ namespace hf {
 
                         case MODE_LANDING:
                             runPidAndMixer(step, message,
-                                    demands, motorvals);
+                                    setpoint, motorvals);
                             checkDisarm(message, mode, motorvals);
                             break;
 
@@ -259,7 +259,7 @@ namespace hf {
 
             void runPidAndMixer(
                     const uint32_t step, const RC::message_t &message,
-                    setpoint_t & demands, float *motorvals)
+                    setpoint_t & setpoint, float *motorvals)
             {
                 if (rateDoExecute(FREQ_PID_UPDATE, step)) {
 
@@ -267,10 +267,10 @@ namespace hf {
                             1.f / FREQ_PID_UPDATE,
                             message.hovering,
                             _vehicleState,
-                            message.demands,
-                            demands);
+                            message.setpoint,
+                            setpoint);
 
-                    runMixer(demands, motorvals);
+                    runMixer(setpoint, motorvals);
 
                     runMotors(motorvals);
                 }
@@ -292,10 +292,10 @@ namespace hf {
                 motors_run();
             }
 
-            void runMixer(const setpoint_t & demands, float * motorvals)
+            void runMixer(const setpoint_t & setpoint, float * motorvals)
             {
                 float uncapped[MAX_MOTOR_COUNT] = {};
-                Mixer::mix(demands, uncapped);
+                Mixer::mix(setpoint, uncapped);
 
                 float highestThrustFound = 0;
                 for (uint8_t k=0; k<Mixer::rotorCount; k++) {
