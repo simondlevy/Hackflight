@@ -69,7 +69,7 @@ namespace hf {
                 _framerate= framerate;
             }
 
-            Dynamics::state_t step(const mode_e mode, const demands_t & setpoint)
+            Dynamics::state_t step(const mode_e mode, const setpoint_t & setpoint)
             {
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
@@ -88,19 +88,15 @@ namespace hf {
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control
-                        const auto demands =
+                        auto new_setpoint =
                             _pidControl.run(dt, controlled, state, setpoint);
 
-                        // Scale up demands for motor RPMS
-                        const demands_t new_demands = {
-                            demands.thrust,
-                            demands.roll * PITCH_ROLL_MOTOR_SCALE,
-                            demands.pitch * PITCH_ROLL_MOTOR_SCALE,
-                            demands.yaw * YAW_MOTOR_SCALE
-                        };
+                        new_setpoint.roll *= PITCH_ROLL_MOTOR_SCALE;
+                        new_setpoint.pitch *= PITCH_ROLL_MOTOR_SCALE;
+                        new_setpoint.yaw *= YAW_MOTOR_SCALE;
 
                         // Get motor RPMS from mixer
-                        const auto * motors = Mixer::mix(new_demands);
+                        const auto * motors = Mixer::mix(new_setpoint);
 
                         // Convert motor values to double for dynamics
                         const auto * rpms = motors2doubless(motors, 4);

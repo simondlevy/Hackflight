@@ -31,23 +31,23 @@ namespace hf {
 
         public:
 
-            demands_t run(
+            setpoint_t run(
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands)
+                    const setpoint_t & openLoopDemands)
             {
-                demands_t demands = {};
-                run(dt, hovering, vehicleState, openLoopDemands, demands);
-                return demands;
+                setpoint_t setpoint = {};
+                run(dt, hovering, vehicleState, openLoopDemands, setpoint);
+                return setpoint;
             }
 
             void run(
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands,
-                    demands_t & demands)
+                    const setpoint_t & openLoopDemands,
+                    setpoint_t & setpoint)
             {
                 static float _altitude_target;
 
@@ -63,7 +63,7 @@ namespace hf {
                 const auto climbrate = AltitudeController::run(hovering,
                         dt, vehicleState.z, _altitude_target);
 
-                demands.thrust =
+                setpoint.thrust =
                     ClimbRateController::run(
                             hovering,
                             dt,
@@ -71,7 +71,7 @@ namespace hf {
                             vehicleState.dz,
                             climbrate);
 
-                const auto airborne = demands.thrust > 0;
+                const auto airborne = setpoint.thrust > 0;
 
                 PositionController::run(
                         airborne,
@@ -79,20 +79,20 @@ namespace hf {
                         vehicleState.dx, vehicleState.dy, vehicleState.psi,
                         hovering ? openLoopDemands.pitch : 0,
                         hovering ? openLoopDemands.roll : 0,
-                        demands.roll, demands.pitch);
+                        setpoint.roll, setpoint.pitch);
 
 
-                runStabilizerPids(dt, dt, vehicleState, openLoopDemands, demands);
+                runStabilizerPids(dt, dt, vehicleState, openLoopDemands, setpoint);
             }
 
             static void runStabilizerPids(
                     const float dt,
                     const float yaw_demand_inc,
                     const vehicleState_t & vehicleState,
-                    const demands_t & openLoopDemands,
-                    demands_t & demands)
+                    const setpoint_t & openLoopDemands,
+                    setpoint_t & setpoint)
             {
-                const auto airborne = demands.thrust > 0;
+                const auto airborne = setpoint.thrust > 0;
 
                 static float _yaw_angle_target;
 
@@ -102,22 +102,22 @@ namespace hf {
                 const auto yaw = YawAngleController::run(
                         airborne, dt, vehicleState.psi, _yaw_angle_target);
 
-                demands.yaw =
+                setpoint.yaw =
                     YawRateController::run(airborne, dt, vehicleState.dpsi, yaw);
 
                 PitchRollAngleController::run(
                         airborne,
                         dt,
                         vehicleState.phi, vehicleState.theta,
-                        demands.roll, demands.pitch,
-                        demands.roll, demands.pitch);
+                        setpoint.roll, setpoint.pitch,
+                        setpoint.roll, setpoint.pitch);
 
                 PitchRollRateController::run(
                         airborne,
                         dt,
                         vehicleState.dphi, vehicleState.dtheta,
-                        demands.roll, demands.pitch,
-                        demands.roll, demands.pitch);
+                        setpoint.roll, setpoint.pitch,
+                        setpoint.roll, setpoint.pitch);
             }
 
             void serializeMessage(MspSerializer & serializer)

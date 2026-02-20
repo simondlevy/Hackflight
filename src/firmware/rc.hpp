@@ -34,11 +34,11 @@ namespace hf {
                 uint32_t timestamp;
                 bool armed;
                 bool hovering;
-                demands_t demands;
+                setpoint_t setpoint;
 
-            } setpoint_t;
+            } message_t;
 
-            static void getSetpoint(const uint32_t tick, setpoint_t & setpoint)
+            static void getSetpoint(const uint32_t tick, message_t & message)
             {
                 static Timer _timer;
 
@@ -53,24 +53,24 @@ namespace hf {
                         switch (parser.parse(byte)) {
 
                             case MSP_SET_ARMING:
-                                setpoint.armed = !setpoint.armed;
-                                setpoint.timestamp = tick;
+                                message.armed = !message.armed;
+                                message.timestamp = tick;
                                 break;
 
                             case MSP_SET_IDLE:
-                                setpoint.hovering = false;
-                                setpoint.timestamp = tick;
+                                message.hovering = false;
+                                message.timestamp = tick;
                                 break;
 
                             case MSP_SET_HOVER:
-                                setpoint.hovering = true;
-                                setpoint.demands.thrust = parser.getFloat(0);
-                                setpoint.demands.pitch = parser.getFloat(1);
-                                setpoint.demands.roll = parser.getFloat(2);
-                                setpoint.demands.yaw = parser.getFloat(3);
-                                setpoint.timestamp = tick;
+                                message.hovering = true;
+                                message.setpoint.thrust = parser.getFloat(0);
+                                message.setpoint.pitch = parser.getFloat(1);
+                                message.setpoint.roll = parser.getFloat(2);
+                                message.setpoint.yaw = parser.getFloat(3);
+                                message.timestamp = tick;
                                 break;
-
+                            
                             default:
                                 break;
                         }

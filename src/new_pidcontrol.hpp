@@ -38,23 +38,23 @@ namespace hf {
                 _altitude_target = 0;
             }
 
-            demands_t run(
+            setpoint_t run(
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const demands_t & demands_in)
+                    const setpoint_t & setpoint_in)
             {
-                demands_t demands_out = {};
-                run(dt, hovering, state, demands_in, demands_out);
-                return demands_out;
+                setpoint_t setpoint_out = {};
+                run(dt, hovering, state, setpoint_in, setpoint_out);
+                return setpoint_out;
             }
 
             void run(
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const demands_t & demands_in,
-                    demands_t & demands_out)
+                    const setpoint_t & setpoint_in,
+                    setpoint_t & setpoint_out)
             {
                 // Altitude hold ---------------------------------------------
 
@@ -64,7 +64,7 @@ namespace hf {
 
                 _altitude_target = Num::fconstrain(
                         _altitude_target +
-                        demands_in.thrust * ALTITUDE_INC_MPS * dt,
+                        setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
                 const auto climbrate = _altitude_pid.run(hovering,
@@ -73,7 +73,7 @@ namespace hf {
                 const auto thrust = _climbrate_pid.run(
                     hovering, dt, climbrate, state.z, state.dz);
 
-                demands_out.thrust = thrust;
+                setpoint_out.thrust = thrust;
 
                 // Position hold ---------------------------------------------
 
@@ -89,16 +89,16 @@ namespace hf {
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
                 const auto roll_angle_demand =_position_y_pid.run(
-                        airborne, dt, demands_in.roll, dyb);
+                        airborne, dt, setpoint_in.roll, dyb);
 
                 const auto pitch_angle_demand = _position_x_pid.run(
-                        airborne, dt, demands_in.pitch, dxb);
+                        airborne, dt, setpoint_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
 
                 runStabilizer(dt, airborne,
-                        roll_angle_demand, pitch_angle_demand, demands_in.yaw,
-                        state, demands_out);
+                        roll_angle_demand, pitch_angle_demand, setpoint_in.yaw,
+                        state, setpoint_out);
             }
 
             void runStabilizer(
@@ -108,15 +108,15 @@ namespace hf {
                     const float pitch_angle_demand,
                     const float yaw_demand,
                     const vehicleState_t & state,
-                    demands_t & demands_out)
+                    setpoint_t & setpoint_out)
             {
-                demands_out.roll = _roll_pid.run(
+                setpoint_out.roll = _roll_pid.run(
                         dt, airborne, roll_angle_demand, state.phi, state.dphi);
 
-                demands_out.pitch = _pitch_pid.run(
+                setpoint_out.pitch = _pitch_pid.run(
                         dt, airborne, pitch_angle_demand, state.theta, state.dtheta);
 
-                demands_out.yaw = _yaw_pid.run(dt, airborne, 
+                setpoint_out.yaw = _yaw_pid.run(dt, airborne, 
                         yaw_demand * MAX_YAW_DEMAND_DPS, state.dpsi);
              }
 
