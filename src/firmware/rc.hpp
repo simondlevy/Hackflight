@@ -36,9 +36,9 @@ namespace hf {
                 bool hovering;
                 demands_t demands;
 
-            } setpoint_t;
+            } message_t;
 
-            static void getSetpoint(const uint32_t tick, setpoint_t & setpoint)
+            static void getSetpoint(const uint32_t tick, message_t & setpoint)
             {
                 static Timer _timer;
 

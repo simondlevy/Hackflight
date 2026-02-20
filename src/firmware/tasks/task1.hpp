@@ -93,7 +93,7 @@ namespace hf {
 
                 _led.init();
 
-                RC::setpoint_t setpoint = {};
+                RC::message_t message = {};
 
                 const uint32_t msec_start = millis();
 
@@ -111,8 +111,8 @@ namespace hf {
                     // Sync the core loop to the IMU
                     const bool imuIsCalibrated = _imu.step(_ekf, msec);
 
-                    // Get setpoint from remote control
-                    RC::getSetpoint(xTaskGetTickCount(), setpoint);
+                    // Get message from remote control
+                    RC::getSetpoint(xTaskGetTickCount(), message);
 
                     // Periodically update estimator with flying mode
                     if (rateDoExecute(FREQ_FLYING_MODE_CHECK, step)) {
@@ -123,8 +123,8 @@ namespace hf {
                     getStateEstimate(isFlying, _vehicleState, didResetEstimation);
 
                     // Check for lost contact
-                    if (setpoint.timestamp > 0 &&
-                            xTaskGetTickCount() - setpoint.timestamp >
+                    if (message.timestamp > 0 &&
+                            xTaskGetTickCount() - message.timestamp >
                             SETPOINT_TIMEOUT_TICKS) {
                         mode = MODE_PANIC;
                     }
@@ -142,7 +142,7 @@ namespace hf {
                     switch (mode) {
 
                         case MODE_IDLE:
-                            if (setpoint.armed && isSafeAngle(_vehicleState.phi)
+                            if (message.armed && isSafeAngle(_vehicleState.phi)
                                     && isSafeAngle(_vehicleState.theta)) {
                                 mode = MODE_ARMED;
                             }
@@ -150,26 +150,26 @@ namespace hf {
                             break;
 
                         case MODE_ARMED:
-                            checkDisarm(setpoint, mode, motorvals);
-                            if (setpoint.hovering) {
+                            checkDisarm(message, mode, motorvals);
+                            if (message.hovering) {
                                 mode = MODE_HOVERING;
                             }
                             runMotors(motorvals);
                             break;
 
                         case MODE_HOVERING:
-                            runPidAndMixer(step, setpoint,
+                            runPidAndMixer(step, message,
                                     demands, motorvals);
-                            checkDisarm(setpoint, mode, motorvals);
-                            if (!setpoint.hovering) {
+                            checkDisarm(message, mode, motorvals);
+                            if (!message.hovering) {
                                 mode = MODE_LANDING;
                             }
                             break;
 
                         case MODE_LANDING:
-                            runPidAndMixer(step, setpoint,
+                            runPidAndMixer(step, message,
                                     demands, motorvals);
-                            checkDisarm(setpoint, mode, motorvals);
+                            checkDisarm(message, mode, motorvals);
                             break;
 
                         case MODE_PANIC:
@@ -258,16 +258,16 @@ namespace hf {
 
 
             void runPidAndMixer(
-                    const uint32_t step, const RC::setpoint_t &setpoint,
+                    const uint32_t step, const RC::message_t &message,
                     demands_t & demands, float *motorvals)
             {
                 if (rateDoExecute(FREQ_PID_UPDATE, step)) {
 
                     _pidControl.run(
                             1.f / FREQ_PID_UPDATE,
-                            setpoint.hovering,
+                            message.hovering,
                             _vehicleState,
-                            setpoint.demands,
+                            message.demands,
                             demands);
 
                     runMixer(demands, motorvals);
@@ -319,10 +319,10 @@ namespace hf {
                 }
             }
 
-            void checkDisarm(const RC::setpoint_t setpoint, mode_e &mode,
+            void checkDisarm(const RC::message_t message, mode_e &mode,
                     float * motorvals)
             {
-                if (!setpoint.armed) {
+                if (!message.armed) {
                     mode = MODE_IDLE;
                     memset(motorvals, 0, Mixer::rotorCount * sizeof(motorvals));
                 }
