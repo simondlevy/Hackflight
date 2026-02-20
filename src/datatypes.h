@@ -83,5 +83,5 @@ namespace hf {
 
     } setpoint_t;
 
-    typedef void (*mixFun_t)(const setpoint_t & demands, float motorvals[]);
+    typedef void (*mixFun_t)(const setpoint_t & setpoint, float motorvals[]);
 }
