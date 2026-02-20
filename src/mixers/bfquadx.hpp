@@ -39,9 +39,9 @@ namespace hf {
             static constexpr int8_t pitch[4] = {+1, -1, +1, -1};
             static constexpr int8_t yaw[4]   = {-1, +1, +1, -1};
 
-            static void mix(const setpoint_t & demands, float motors[])
+            static void mix(const setpoint_t & setpoint, float motors[])
             {
-                RotorMixer::mix(demands, roll, pitch, yaw, 4, motors);
+                RotorMixer::mix(setpoint, roll, pitch, yaw, 4, motors);
             }
     };
 
