@@ -63,10 +63,11 @@ int main()
     simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
             FRAME_RATE_HZ);
 
-    autopilot.init();
+   autopilot.init();
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
+        // Delay takeoff for a couple of seconds
         const auto mode =
             frame < TAKEOFF_TIME_SEC * FRAME_RATE_HZ ?
             hf::MODE_HOVERING :
@@ -76,12 +77,12 @@ int main()
         const auto state = simulator.getVehicleState();
 
         // Get setpoint from autopilot if available
-        hf::demands_t setpoint = {};
+        hf::setpoint_t setpoint = {};
         if (mode == hf::MODE_AUTONOMOUS) {
             autopilot.getSetpoint(state.dy, setpoint);
         }
 
-        // Get net state based on setpoint
+        // Get new state based on setpoint
         const auto newstate = simulator.step(mode, setpoint);
 
         // Grab rangefinder readings for next iteration
