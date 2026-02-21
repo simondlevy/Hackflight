@@ -22,35 +22,35 @@ HFSRC = $(HF)/src
 
 HFWB = $(HF)/webots
 
-ALL = twoexit pingpong 
+ALL = twoexit pingpong
 
-CFLAGS = -O3 -std=c++17 -Wall -Wextra # -fsanitize=address
+CFLAGS = -std=c++17 -Wall -Wextra # -fsanitize=memory
 
 DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
 	   $(HFSRC)/autopilots/*.hpp $(SIMSENSORS)/parsers/webots/* \
 	   $(SIMSENSORS)/sensors/* 
 
-CC = g++ $(CFLAGS) -c -I$(ROOT) -I$(HFSRC)
+CC = g++ # clang++
 
 all: $(ALL)
 
 trun: twoexit
 	./twoexit
 
+twoexit: twoexit.o
+	$(CC) $(CFLAGS) -o twoexit twoexit.o
+
+twoexit.o: twoexit.cpp $(DEPS)
+	$(CC) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) twoexit.cpp
+
 prun: pingpong
 	./pingpong
 
-twoexit: twoexit.o
-	g++ -o twoexit twoexit.o
-
 pingpong: pingpong.o
-	g++ -o pingpong pingpong.o
-
-twoexit.o: twoexit.cpp $(DEPS)
-	$(CC) twoexit.cpp
+	$(CC) $(CFLAGS) -o pingpong pingpong.o
 
 pingpong.o: pingpong.cpp $(DEPS)
-	$(CC) pingpong.cpp
+	$(CC) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) pingpong.cpp
 
 clean:
 	rm -f $(ALL) *.o *.csv
