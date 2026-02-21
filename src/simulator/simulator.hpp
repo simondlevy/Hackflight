@@ -59,6 +59,8 @@ namespace hf {
             {
                 _pidControl.init();
 
+                _dynamics.reset();
+
                 _dynamics.state.x = pose.x;
                 _dynamics.state.y = pose.y;
                 _dynamics.state.z = pose.z;
