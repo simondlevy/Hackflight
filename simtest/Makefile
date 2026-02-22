@@ -12,6 +12,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
+C++ = g++ 
+
 ROOT = ../..
 
 SIMSENSORS = $(ROOT)/simsensors/src
@@ -32,8 +34,6 @@ CFLAGS = -std=c++17 -Wall -Wextra $(DBGFLAGS)
 DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
 	   $(HFSRC)/autopilots/*.hpp $(SIMSENSORS)/parsers/webots/* \
 	   $(SIMSENSORS)/sensors/* 
-
-C++ = g++ 
 
 all: $(ALL)
 

@@ -128,11 +128,12 @@ def main():
 
         rangefinder_distances = vals[6:]
 
-        if cv2 is None:
-            print(rangefinder_distances)
-        else:
-            show_rangefinder_distances(rangefinder_distances,
-                    len(rangefinder_distances), 1)
+        if len(rangefinder_distances) > 0:
+            if cv2 is None:
+                print(rangefinder_distances)
+            else:
+                show_rangefinder_distances(rangefinder_distances,
+                        len(rangefinder_distances), 1)
 
 
 main()
