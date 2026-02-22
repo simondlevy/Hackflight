@@ -24,13 +24,16 @@ HFWB = $(HF)/webots
 
 ALL = twoexit pingpong
 
-CFLAGS = -std=c++17 -Wall -Wextra # -fsanitize=memory
+# Uncomment this and run with valgrind to check for memory issues
+# DBGFLAGS = -g -O0
+
+CFLAGS = -std=c++17 -Wall -Wextra $(DBGFLAGS)
 
 DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
 	   $(HFSRC)/autopilots/*.hpp $(SIMSENSORS)/parsers/webots/* \
 	   $(SIMSENSORS)/sensors/* 
 
-CC = g++ # clang++
+C++ = g++ 
 
 all: $(ALL)
 
@@ -38,19 +41,19 @@ trun: twoexit
 	./twoexit
 
 twoexit: twoexit.o
-	$(CC) $(CFLAGS) -o twoexit twoexit.o
+	$(C++) $(CFLAGS) -o twoexit twoexit.o
 
 twoexit.o: twoexit.cpp $(DEPS)
-	$(CC) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) twoexit.cpp
+	$(C++) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) twoexit.cpp
 
 prun: pingpong
 	./pingpong
 
 pingpong: pingpong.o
-	$(CC) $(CFLAGS) -o pingpong pingpong.o
+	$(C++) $(CFLAGS) -o pingpong pingpong.o
 
 pingpong.o: pingpong.cpp $(DEPS)
-	$(CC) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) pingpong.cpp
+	$(C++) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) pingpong.cpp
 
 clean:
 	rm -f $(ALL) *.o *.csv
