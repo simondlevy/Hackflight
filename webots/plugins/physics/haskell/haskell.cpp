@@ -1,5 +1,6 @@
 /* 
- * Custom physics plugin custom for Hackflight Webots-based simulator
+ * Custom physics plugin custom for Hackflight Webots-based simulator, using
+ * Haskell
  *
  *  Copyright (C) 2025 Simon D. Levy
  *

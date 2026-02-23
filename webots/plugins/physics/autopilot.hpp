@@ -1,5 +1,5 @@
 /* 
- * Webots experimental custom physics plugin support for Hackflight
+ * Webots autopilot custom physics plugin support for Hackflight
  *
  *  Copyright (C) 2025 Simon D. Levy
  *
@@ -26,7 +26,7 @@
 
 #include "helper.hpp"
 
-class ExperimentalHelper {
+class AutopilotHelper {
 
     private:
 
@@ -43,7 +43,7 @@ class ExperimentalHelper {
 
         bool _collided;
 
-        ExperimentalHelper(const char * worldname)
+        AutopilotHelper(const char * worldname)
         {
             const auto pwd = getenv(PATH_VARIABLE_NAME);
 
@@ -64,7 +64,7 @@ class ExperimentalHelper {
             _helper = new PluginHelper();
         }
 
-        ~ExperimentalHelper()
+        ~AutopilotHelper()
         {
             delete _helper;
         }
@@ -75,13 +75,13 @@ class ExperimentalHelper {
             return _helper->get_state_from_siminfo(siminfo);
         }
 
-        simsens::pose_t get_pose(const PluginHelper::siminfo_t & siminfo)
+        simsens::Pose get_pose(const PluginHelper::siminfo_t & siminfo)
         {
             // Use setpoint to get new state
             const auto state = _helper->get_state_from_siminfo(siminfo);
 
             // Extract pose from state
-            const simsens::pose_t pose = {
+            const simsens::Pose pose = {
                 state.x, state.y, state.z, state.phi, state.theta, state.psi
             };
 
@@ -103,7 +103,7 @@ class ExperimentalHelper {
         }
 
         void write_to_log(
-                const simsens::pose_t & pose,
+                const simsens::Pose & pose,
                 const int * rangefinder_distances,
                 const int n_distances)
         {       

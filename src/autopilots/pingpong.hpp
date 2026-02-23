@@ -73,7 +73,7 @@ namespace hf {
             void readSensors(
                     simsens::Robot & robot,
                     simsens::World & world,
-                    const simsens::pose_t & pose)
+                    const simsens::Pose & pose)
             {
                 distance_forward_mm = readRangefinder("VL53L1-forward", robot,
                         world, pose);
@@ -87,17 +87,16 @@ namespace hf {
                     const string name,
                     simsens::Robot & robot,
                     simsens::World & world,
-                    const simsens::pose_t & pose)
+                    const simsens::Pose & pose)
             {
                 auto rangefinder = robot.rangefinders[name];
 
                 int distance_mm = 0;
 
-                rangefinder->read(pose, world, &distance_mm);
+                rangefinder.read(pose, world, &distance_mm);
 
                 return distance_mm;
             }
 
     };
-
 }

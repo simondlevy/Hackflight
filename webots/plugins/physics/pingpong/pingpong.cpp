@@ -17,11 +17,11 @@
  */
 
 #include "../helper.hpp"
-#include "../experimental.hpp"
+#include "../autopilot.hpp"
 
 #include <autopilots/pingpong.hpp>
 
-static ExperimentalHelper * _ehelper;
+static AutopilotHelper * _ehelper;
 
 static hf::PingPongAutopilot _autopilot;
 
@@ -65,5 +65,5 @@ DLLEXPORT void webots_physics_init()
 {
     _autopilot.init();
 
-    _ehelper = new ExperimentalHelper("pingpong");
+    _ehelper = new AutopilotHelper("pingpong");
 }

@@ -17,7 +17,7 @@
  */
 
 #include "../helper.hpp"
-#include "../experimental.hpp"
+#include "../autopilot.hpp"
 
 #include <autopilots/twoexit.hpp>
 
@@ -27,7 +27,7 @@ static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
 static hf::TwoExitAutopilot _autopilot;
 
-static ExperimentalHelper * _ehelper;
+static AutopilotHelper * _ehelper;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -57,8 +57,8 @@ DLLEXPORT void webots_physics_step()
         // Display rangefinder distances
         simsens::RangefinderVisualizer::show(
                 _autopilot.rangefinder_distances_mm,
-                _autopilot.get_rangefinder(_ehelper->robot)->min_distance_m,
-                _autopilot.get_rangefinder(_ehelper->robot)->max_distance_m,
+                _autopilot.get_rangefinder(_ehelper->robot).min_distance_m,
+                _autopilot.get_rangefinder(_ehelper->robot).max_distance_m,
                 8, 1, RANGEFINDER_DISPLAY_SCALEUP);
     }
 }
@@ -70,5 +70,5 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
-    _ehelper = new ExperimentalHelper("twoexit");
+    _ehelper = new AutopilotHelper("twoexit");
 }
