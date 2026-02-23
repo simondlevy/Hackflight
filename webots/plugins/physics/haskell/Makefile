@@ -16,26 +16,20 @@
 
 ALL = $(shell basename "`pwd`")
 
-OPENCV_DIR = /usr/include/opencv4
-
-SIMSENSORS_DIR = $(HOME)/Desktop
-
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
-SRC_DIR = ../../../../src
+SRC = ../../../../src
 
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+INCLUDE = -I$(SRC) -I$(SRC)/control
 
 CXX_SOURCES = $(ALL).cpp
-
-LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
-			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
 all: lib$(ALL).so
 
 edit:
 	vim $(ALL).cpp
+
+FILES_TO_REMOVE += copilot*
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

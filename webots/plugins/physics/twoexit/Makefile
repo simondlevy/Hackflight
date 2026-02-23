@@ -37,8 +37,6 @@ all: lib$(ALL).so
 edit:
 	vim $(ALL).cpp
 
-FILES_TO_REMOVE += copilot*
-
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
