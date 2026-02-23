@@ -26,7 +26,7 @@
 #include <mixers/crazyflie.hpp>
 #include <num.hpp>
 #include <new_pidcontrol.hpp>
-#include <simulator/dynamics.hpp>
+#include <sim/dynamics.hpp>
 #include <vehicles/diyquad.hpp>
 
 namespace hf {

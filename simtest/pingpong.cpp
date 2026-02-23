@@ -19,8 +19,8 @@
 #include <stdlib.h>
 
 // Hackflight
-#include <autopilots/pingpong.hpp>
-#include <simulator/simulator.hpp>
+#include <sim/autopilots/pingpong.hpp>
+#include <sim/simulator.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>

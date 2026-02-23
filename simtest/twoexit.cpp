@@ -18,8 +18,8 @@
 #include <stdio.h>
 
 // Hackflight
-#include <autopilots/twoexit.hpp>
-#include <simulator/simulator.hpp>
+#include <sim/autopilots/twoexit.hpp>
+#include <sim/simulator.hpp>
 
 // SimSensors
 #include <simsensors/src/parsers/webots/world.hpp>

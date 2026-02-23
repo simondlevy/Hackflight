@@ -19,7 +19,7 @@
 #include "../helper.hpp"
 #include "../autopilot.hpp"
 
-#include <autopilots/pingpong.hpp>
+#include <sim/autopilots/pingpong.hpp>
 
 static AutopilotHelper * _ehelper;
 

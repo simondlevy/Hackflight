@@ -27,8 +27,8 @@
 // Hackflight
 #define _MAIN
 #include <datatypes.h>
-#include <simulator/dynamics.hpp>
-#include <simulator/simulator.hpp>
+#include <sim/dynamics.hpp>
+#include <sim/simulator.hpp>
 
 class PluginHelper {
 

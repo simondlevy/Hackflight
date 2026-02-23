@@ -31,8 +31,8 @@ ALL = twoexit pingpong
 
 CFLAGS = -std=c++17 -Wall -Wextra $(DBGFLAGS)
 
-DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/simulator/*.hpp \
-	   $(HFSRC)/autopilots/*.hpp $(SIMSENSORS)/parsers/webots/* \
+DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/sim/*.hpp \
+	   $(HFSRC)/sim/autopilots/*.hpp $(SIMSENSORS)/parsers/webots/* \
 	   $(SIMSENSORS)/sensors/* 
 
 all: $(ALL)

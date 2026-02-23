@@ -91,7 +91,7 @@ def show_rangefinder_distances(distances_mm, width, height,
                           ((x+1)*scaleup, (y+1)*scaleup),
                           grayval, -1)
 
-    cv2.imshow('lidar', img)
+    cv2.imshow('rangefinder', img)
     cv2.waitKey(1)
 
 

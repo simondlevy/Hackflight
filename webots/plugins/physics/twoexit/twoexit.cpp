@@ -19,7 +19,7 @@
 #include "../helper.hpp"
 #include "../autopilot.hpp"
 
-#include <autopilots/twoexit.hpp>
+#include <sim/autopilots/twoexit.hpp>
 
 #include <simsensors/src/visualizers/rangefinder.hpp>
 

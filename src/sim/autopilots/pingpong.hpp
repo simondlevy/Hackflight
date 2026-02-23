@@ -23,7 +23,7 @@
 
 // Hackflight
 #include <datatypes.h>
-#include <simulator/dynamics.hpp>
+#include <sim/dynamics.hpp>
 
 // SimSensors
 #include <simsensors/src/world.hpp>
