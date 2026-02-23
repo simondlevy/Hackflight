@@ -27,7 +27,7 @@ static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
 static hf::TwoExitAutopilot _autopilot;
 
-static AutopilotHelper * _ehelper;
+static AutopilotHelper * _helper;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -35,7 +35,7 @@ DLLEXPORT void webots_physics_step()
 {
     PluginHelper::siminfo_t siminfo = {};
 
-    if (_ehelper->get_siminfo(siminfo)) {
+    if (_helper->get_siminfo(siminfo)) {
 
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
@@ -45,30 +45,30 @@ DLLEXPORT void webots_physics_step()
         }
 
         // Get vehicle pose based on setpoint
-        const auto pose = _ehelper->get_pose(siminfo);
+        const auto pose = _helper->get_pose(siminfo);
 
         // Grab rangefinder distances for next iteration
-        _autopilot.readSensor(_ehelper->robot, _ehelper->world, pose);
+        _autopilot.readSensor(_helper->robot, _helper->world, pose);
 
         // Log data to file
-        _ehelper->write_to_log(
+        _helper->write_to_log(
                 pose, _autopilot.rangefinder_distances_mm, 8);
 
         // Display rangefinder distances
         simsens::RangefinderVisualizer::show(
                 _autopilot.rangefinder_distances_mm,
-                _autopilot.get_rangefinder(_ehelper->robot).min_distance_m,
-                _autopilot.get_rangefinder(_ehelper->robot).max_distance_m,
+                _autopilot.get_rangefinder(_helper->robot).min_distance_m,
+                _autopilot.get_rangefinder(_helper->robot).max_distance_m,
                 8, 1, RANGEFINDER_DISPLAY_SCALEUP);
     }
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _ehelper;
+    delete _helper;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
-    _ehelper = new AutopilotHelper("twoexit");
+    _helper = new AutopilotHelper("twoexit");
 }

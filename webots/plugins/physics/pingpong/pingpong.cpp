@@ -21,7 +21,7 @@
 
 #include <sim/autopilots/pingpong.hpp>
 
-static AutopilotHelper * _ehelper;
+static AutopilotHelper * _helper;
 
 static hf::PingPongAutopilot _autopilot;
 
@@ -31,10 +31,10 @@ DLLEXPORT void webots_physics_step()
 {
     PluginHelper::siminfo_t siminfo = {};
 
-    if (_ehelper->get_siminfo(siminfo)) {
+    if (_helper->get_siminfo(siminfo)) {
 
         // Get current vehicle state
-        const auto state = _ehelper->get_state_from_siminfo(siminfo);
+        const auto state = _helper->get_state_from_siminfo(siminfo);
 
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
@@ -43,27 +43,27 @@ DLLEXPORT void webots_physics_step()
         }
 
         // Get vehicle pose based on setpoint
-        const auto pose = _ehelper->get_pose(siminfo);
+        const auto pose = _helper->get_pose(siminfo);
 
         // Grab rangefinder readings for next iteration
-        _autopilot.readSensors(_ehelper->robot, _ehelper->world, pose);
+        _autopilot.readSensors(_helper->robot, _helper->world, pose);
 
         // Log data to file
         const int distances[] = {
             _autopilot.distance_forward_mm, 
             _autopilot.distance_backward_mm};
-        _ehelper->write_to_log(pose, distances, 2);
+        _helper->write_to_log(pose, distances, 2);
     }
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _ehelper;
+    delete _helper;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
     _autopilot.init();
 
-    _ehelper = new AutopilotHelper("pingpong");
+    _helper = new AutopilotHelper("pingpong");
 }
