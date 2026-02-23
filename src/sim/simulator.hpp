@@ -89,16 +89,20 @@ namespace hf {
                     // Run fast PID control and mixer in middle loop --------------
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
-                        // Run PID control
-                        auto new_setpoint =
+                        // Run PID control to get new setpoin
+                        const auto pid_setpoint =
                             _pidControl.run(dt, controlled, state, setpoint);
 
-                        new_setpoint.roll *= PITCH_ROLL_MOTOR_SCALE;
-                        new_setpoint.pitch *= PITCH_ROLL_MOTOR_SCALE;
-                        new_setpoint.yaw *= YAW_MOTOR_SCALE;
+                        // Scale up new setpoint for mixer
+                        const setpoint_t scaled_setpoint = {
+                            pid_setpoint.thrust,
+                            pid_setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
+                            pid_setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
+                            pid_setpoint.yaw * YAW_MOTOR_SCALE
+                        };
 
                         // Get motor RPMS from mixer
-                        const auto * motors = Mixer::mix(new_setpoint);
+                        const auto * motors = Mixer::mix(scaled_setpoint);
 
                         // Convert motor values to double for dynamics
                         const auto * rpms = motors2doubless(motors, 4);
