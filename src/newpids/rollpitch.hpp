@@ -34,13 +34,36 @@ namespace hf {
             static constexpr float KI = 0.3;    
             static constexpr float KD = 0.05;   
 
-            float _integral;
-
         public:
 
-            RollPitchPid()
+            float output;
+
+            RollPitchPid() = default;
+
+            RollPitchPid(const RollPitchPid & a) 
+                : output(a.output), _integral(a._integral) {}
+
+            RollPitchPid(const float output, const float integral)
+                : output(output), _integral(integral) {}
+
+            RollPitchPid& operator=(const RollPitchPid&) = default;
+
+            static auto run(
+                    const RollPitchPid & p,
+                    const float dt,
+                    const bool airborne,
+                    const float target,
+                    const float angle,
+                    const float dangle) -> RollPitchPid
             {
-                _integral = 0;
+                const auto error = target - angle;
+
+                const auto integral = airborne ? 
+                    Num::fconstrain(p._integral + error * dt, I_LIMIT) : 0;
+
+                const auto output = 0.01 * (KP * error + KI * integral - KD * dangle); 
+
+                return RollPitchPid(output, integral);
             }
 
             float run(
@@ -59,5 +82,10 @@ namespace hf {
 
                 return 0.01 * (KP * error + KI * integral - KD * dangle); 
             }
+
+        private:
+
+            float _integral;
+
     };
 }

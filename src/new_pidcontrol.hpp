@@ -98,10 +98,21 @@ namespace hf {
 
                 //  Stabilization ---------------------------------------------
 
-                runStabilizer(dt, airborne,
-                        roll_angle_demand, pitch_angle_demand, setpoint_in.yaw,
-                        state, setpoint_out);
-            }
+                _roll_pid = RollPitchPid::run(_roll_pid, dt, airborne,
+                        roll_angle_demand, state.phi, state.dphi);
+
+                setpoint_out.roll = _roll_pid.output;
+
+                _pitch_pid = RollPitchPid::run(_pitch_pid, dt, airborne,
+                        pitch_angle_demand, state.theta, state.dtheta);
+
+                setpoint_out.pitch = _pitch_pid.output;
+
+                _yaw_pid = YawPid::run(_yaw_pid, dt, airborne, 
+                        setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
+
+                setpoint_out.yaw = _yaw_pid.output;
+              }
 
             void runStabilizer(
                     const float dt,
