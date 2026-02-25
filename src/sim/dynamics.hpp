@@ -135,6 +135,8 @@ namespace hf {
 
             Dynamics() = default;
 
+            Dynamics& operator=(const Dynamics& other) = default;
+
             Dynamics(const pose_t & pose) : state(pose) {}
 
             Dynamics(const State & state, const State & dstate,

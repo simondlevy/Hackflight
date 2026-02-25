@@ -99,7 +99,10 @@ namespace hf {
                         // Run dynamics in inner loop -----------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
-                            _dynamics.update( VPARAMS, 1 / DYNAMICS_FREQ, rpms,
+                            /*_dynamics.update( VPARAMS, 1 / DYNAMICS_FREQ, rpms,
+                                    4, Mixer::roll, Mixer::pitch, Mixer::yaw);*/
+
+                            _dynamics = Dynamics::update(_dynamics, VPARAMS, 1 / DYNAMICS_FREQ, rpms,
                                     4, Mixer::roll, Mixer::pitch, Mixer::yaw);
                         }
                     }
