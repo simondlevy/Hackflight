@@ -138,10 +138,11 @@ namespace hf {
                 (void)serializer;
             }
 
+            /*
             // unused; needed for sim API
             void init()
             {
-            }
+            }*/
 
         private:
 

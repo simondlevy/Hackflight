@@ -69,7 +69,7 @@ class AutopilotHelper {
             delete _helper;
         }
 
-        hf:: Dynamics::state_t get_state_from_siminfo(
+        hf:: Dynamics::State get_state_from_siminfo(
                 const PluginHelper::siminfo_t & siminfo)
         {
             return _helper->get_state_from_siminfo(siminfo);
