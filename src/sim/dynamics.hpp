@@ -247,12 +247,10 @@ namespace hf {
                     state.dpsi += _dt * _dstate.dpsi;
 
                     // Keep yaw angle in [-2Pi, +2Pi]
-                    if(state.psi > 2*M_PI) {
-                        state.psi -= 2*M_PI;
-                    }
-                    if(state.psi < -2*M_PI) {
-                        state.psi += 2*M_PI;
-                    }
+                    state.psi += (
+                            state.psi > 2*M_PI ? -2*M_PI :
+                            state.psi < -2*M_PI ? 2*M_PI :
+                            0);
                 }
 
             } // update
