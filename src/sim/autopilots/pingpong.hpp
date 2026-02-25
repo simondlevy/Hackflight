@@ -50,9 +50,11 @@ namespace hf {
                 srand(time(NULL)); 
             }
 
-            auto getSetpoint(const float dydt) -> Setpoint
+            static auto getSetpoint(const PingPongAutopilot & autopilot,
+                    const float dydt) -> Setpoint
             {
-                const auto diff = distance_forward_mm - distance_backward_mm;
+                const auto diff = autopilot.distance_forward_mm -
+                    autopilot.distance_backward_mm;
 
                 const int8_t direction = 
 

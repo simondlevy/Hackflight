@@ -76,7 +76,8 @@ int main()
 
         // Get setpoint from autopilot if available
         const auto setpoint =
-            mode == hf::MODE_AUTONOMOUS ? autopilot.getSetpoint(state.dy) :
+            mode == hf::MODE_AUTONOMOUS ?
+            hf::PingPongAutopilot::getSetpoint(autopilot, state.dy) :
             hf::Setpoint();
 
         // Get new state based on setpoint

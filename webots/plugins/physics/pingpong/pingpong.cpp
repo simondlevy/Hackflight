@@ -39,7 +39,7 @@ DLLEXPORT void webots_physics_step()
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
         siminfo.setpoint = siminfo.mode == hf::MODE_AUTONOMOUS ?
-            _autopilot.getSetpoint(state.dy) :
+            hf::PingPongAutopilot::getSetpoint(_autopilot, state.dy) :
             siminfo.setpoint;
 
         // Get vehicle pose based on setpoint
