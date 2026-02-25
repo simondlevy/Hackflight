@@ -82,6 +82,10 @@ namespace hf {
             float roll;    // positive roll right
             float pitch;   // positive nose down
             float yaw;     // positive nose right
+
+            Setpoint() = default;
+
+            Setpoint& operator=(const Setpoint& other) = default;
     };
 
     typedef void (*mixFun_t)(const Setpoint & setpoint, float motorvals[]);

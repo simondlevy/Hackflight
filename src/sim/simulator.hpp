@@ -70,15 +70,14 @@ namespace hf {
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
-                        const auto pid_setpoint =
-                            PidControl::run(_pidControl, dt, controlled, state, setpoint);
+                        PidControl::run(_pidControl, dt, controlled, state, setpoint);
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            pid_setpoint.thrust,
-                            pid_setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
-                            pid_setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
-                            pid_setpoint.yaw * YAW_MOTOR_SCALE
+                            _pidControl.setpoint.thrust,
+                            _pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
+                            _pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
+                            _pidControl.setpoint.yaw * YAW_MOTOR_SCALE
                         };
 
                         // Get motor RPMS from mixer

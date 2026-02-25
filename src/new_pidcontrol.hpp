@@ -33,25 +33,14 @@ namespace hf {
 
             PidControl& operator=(const PidControl& other) = default;
 
-            static Setpoint run(
-                    PidControl & self,
-                    const float dt,
-                    const bool hovering,
-                    const vehicleState_t & state,
-                    const Setpoint & setpoint_in)
-            {
-                Setpoint setpoint_out = {};
-                run(self, dt, hovering, state, setpoint_in, setpoint_out);
-                return setpoint_out;
-            }
+            Setpoint setpoint;
 
             static void run(
                     PidControl & self,
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const Setpoint & setpoint_in,
-                    Setpoint & setpoint_out)
+                    const Setpoint & setpoint_in)
             {
                 // Altitude hold ---------------------------------------------
 
@@ -72,7 +61,7 @@ namespace hf {
 
                 const auto thrust = self._climbrate_pid.output;
 
-                setpoint_out.thrust = thrust;
+                self.setpoint.thrust = thrust;
 
                 // Position hold ---------------------------------------------
 
@@ -98,17 +87,17 @@ namespace hf {
                 self._roll_pid = RollPitchPid::run(self._roll_pid, dt, airborne,
                         self._position_y_pid.output, state.phi, state.dphi);
 
-                setpoint_out.roll = self._roll_pid.output;
+                self.setpoint.roll = self._roll_pid.output;
 
                 self._pitch_pid = RollPitchPid::run(self._pitch_pid, dt, airborne,
                         self._position_x_pid.output, state.theta, state.dtheta);
 
-                setpoint_out.pitch = self._pitch_pid.output;
+                self.setpoint.pitch = self._pitch_pid.output;
 
                 self._yaw_pid = YawPid::run(self._yaw_pid, dt, airborne, 
                         setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
 
-                setpoint_out.yaw = self._yaw_pid.output;
+                self.setpoint.yaw = self._yaw_pid.output;
             }
 
             void runStabilizer(
