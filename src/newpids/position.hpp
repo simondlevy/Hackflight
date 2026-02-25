@@ -29,21 +29,47 @@ namespace hf {
             static constexpr float KI = 1;
             static constexpr float ILIMIT = 5000;
 
-            float _integral;
-
         public:
 
             static constexpr float MAX_DEMAND_DEG = 20;
 
-            PositionController()
-            {
-                _integral = 0;
-            }
+            float output;
+
+            PositionController() = default;
+
+            PositionController(const PositionController & a) 
+                : output(a.output), _integral(a._integral) {}
+
+            PositionController(const float output, const float integral)
+                : output(output), _integral(integral) {}
+
+            PositionController& operator=(const PositionController&) = default;
 
             /**
              * Demands is input as normalized interval [-1,+1] and output as
              * angles in degrees.
              */
+
+            static auto run(
+                    const PositionController & c,
+                    const bool airborne,
+                    const float dt,
+                    const float target,
+                    const float actual) -> PositionController
+            {
+                const auto error = target - actual;
+
+                const auto integral = airborne ? 
+                    Num::fconstrain(c._integral + error * dt, ILIMIT) :
+                    0;
+
+                const auto output = airborne ?
+                    Num::fconstrain(KP * error + KI * integral, MAX_DEMAND_DEG) :
+                    0;
+
+                return PositionController(output, integral);
+            }
+
             float run(
                     const bool airborne,
                     const float dt,
@@ -60,6 +86,11 @@ namespace hf {
                     Num::fconstrain(KP * error + KI * _integral, MAX_DEMAND_DEG) :
                     0;
             }
+
+        private:
+
+            float _integral;
+
 
     };
 

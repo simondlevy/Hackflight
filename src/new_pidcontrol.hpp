@@ -90,21 +90,21 @@ namespace hf {
                 const auto dxb =  dxw * cospsi + dyw * sinpsi;
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
-                const auto roll_angle_demand =_position_y_pid.run(
+                _position_y_pid = PositionController::run(_position_y_pid,
                         airborne, dt, setpoint_in.roll, dyb);
 
-                const auto pitch_angle_demand = _position_x_pid.run(
+                _position_x_pid = PositionController::run(_position_x_pid,
                         airborne, dt, setpoint_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
 
                 _roll_pid = RollPitchPid::run(_roll_pid, dt, airborne,
-                        roll_angle_demand, state.phi, state.dphi);
+                        _position_y_pid.output, state.phi, state.dphi);
 
                 setpoint_out.roll = _roll_pid.output;
 
                 _pitch_pid = RollPitchPid::run(_pitch_pid, dt, airborne,
-                        pitch_angle_demand, state.theta, state.dtheta);
+                        _position_x_pid.output, state.theta, state.dtheta);
 
                 setpoint_out.pitch = _pitch_pid.output;
 
