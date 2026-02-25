@@ -27,15 +27,22 @@ namespace hf {
 
     class PidControl {
 
-        private:
-
-            float _altitude_target;
-
         public:
 
-            PidControl()
+            PidControl() = default;
+
+            PidControl& operator=(const PidControl& other) = default;
+
+            static setpoint_t run(
+                    PidControl & self,
+                    const float dt,
+                    const bool hovering,
+                    const vehicleState_t & state,
+                    const setpoint_t & setpoint_in)
             {
-                _altitude_target = 0;
+                setpoint_t setpoint_out = {};
+                run(self, dt, hovering, state, setpoint_in, setpoint_out);
+                return setpoint_out;
             }
 
             setpoint_t run(
@@ -48,6 +55,72 @@ namespace hf {
                 run(dt, hovering, state, setpoint_in, setpoint_out);
                 return setpoint_out;
             }
+
+            static void run(
+                    PidControl & self,
+                    const float dt,
+                    const bool hovering,
+                    const vehicleState_t & state,
+                    const setpoint_t & setpoint_in,
+                    setpoint_t & setpoint_out)
+            {
+                // Altitude hold ---------------------------------------------
+
+                if (self._altitude_target == 0) {
+                    self._altitude_target = ALTITUDE_INIT_M;
+                }
+
+                self._altitude_target = Num::fconstrain(
+                        self._altitude_target +
+                        setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
+                        ALTITUDE_MIN_M, ALTITUDE_MAX_M);
+
+                self._altitude_pid = AltitudeController::run(self._altitude_pid,
+                        hovering, dt, self._altitude_target, state.z);
+
+                self._climbrate_pid = ClimbRateController::run(self._climbrate_pid,
+                    hovering, dt, self._altitude_pid.output, state.z, state.dz);
+
+                const auto thrust = self._climbrate_pid.output;
+
+                setpoint_out.thrust = thrust;
+
+                // Position hold ---------------------------------------------
+
+                const auto airborne = thrust > 0;
+
+                // Rotate world-coordinate velocities into body coordinates
+                const auto dxw = state.dx;
+                const auto dyw = state.dy;
+                const auto psi = Num::DEG2RAD * state.psi;
+                const auto cospsi = cos(psi);
+                const auto sinpsi = sin(psi);
+                const auto dxb =  dxw * cospsi + dyw * sinpsi;
+                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
+
+                self._position_y_pid = PositionController::run(self._position_y_pid,
+                        airborne, dt, setpoint_in.roll, dyb);
+
+                self._position_x_pid = PositionController::run(self._position_x_pid,
+                        airborne, dt, setpoint_in.pitch, dxb);
+
+                //  Stabilization ---------------------------------------------
+
+                self._roll_pid = RollPitchPid::run(self._roll_pid, dt, airborne,
+                        self._position_y_pid.output, state.phi, state.dphi);
+
+                setpoint_out.roll = self._roll_pid.output;
+
+                self._pitch_pid = RollPitchPid::run(self._pitch_pid, dt, airborne,
+                        self._position_x_pid.output, state.theta, state.dtheta);
+
+                setpoint_out.pitch = self._pitch_pid.output;
+
+                self._yaw_pid = YawPid::run(self._yaw_pid, dt, airborne, 
+                        setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
+
+                setpoint_out.yaw = self._yaw_pid.output;
+              }
 
             void run(
                     const float dt,
@@ -138,12 +211,6 @@ namespace hf {
                 (void)serializer;
             }
 
-            /*
-            // unused; needed for sim API
-            void init()
-            {
-            }*/
-
         private:
 
             static constexpr float ALTITUDE_INIT_M = 0.4;
@@ -152,6 +219,8 @@ namespace hf {
             static constexpr float ALTITUDE_INC_MPS = 0.2;
 
             static constexpr float MAX_YAW_DEMAND_DPS = 160;     
+
+            float _altitude_target;
 
             AltitudeController _altitude_pid;
 

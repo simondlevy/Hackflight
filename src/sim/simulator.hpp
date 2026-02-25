@@ -46,8 +46,6 @@ namespace hf {
 
             void init(const Dynamics::pose_t & pose, const float framerate=32)
             {
-                //_pidControl.init();
-
                 _dynamics = Dynamics(pose);
 
                 _framerate= framerate;
@@ -73,7 +71,7 @@ namespace hf {
 
                         // Run PID control to get new setpoint
                         const auto pid_setpoint =
-                            _pidControl.run(dt, controlled, state, setpoint);
+                            PidControl::run(_pidControl, dt, controlled, state, setpoint);
 
                         // Scale up new setpoint for mixer
                         const setpoint_t scaled_setpoint = {
