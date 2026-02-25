@@ -75,10 +75,9 @@ int main()
         const auto state = simulator.getVehicleState();
 
         // Get setpoint from autopilot if available
-        hf::Setpoint setpoint = {};
-        if (mode == hf::MODE_AUTONOMOUS) {
-            autopilot.getSetpoint(state.dy, setpoint);
-        }
+        const auto setpoint =
+            mode == hf::MODE_AUTONOMOUS ? autopilot.getSetpoint(state.dy) :
+            hf::Setpoint();
 
         // Get new state based on setpoint
         const auto newstate = simulator.step(mode, setpoint, FRAME_RATE_HZ);

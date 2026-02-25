@@ -50,7 +50,7 @@ namespace hf {
                 srand(time(NULL)); 
             }
 
-            void getSetpoint(const float dydt, hf::Setpoint & setpoint) 
+            auto getSetpoint(const float dydt) -> Setpoint
             {
                 const auto diff = distance_forward_mm - distance_backward_mm;
 
@@ -67,7 +67,7 @@ namespace hf {
                     // Otherwise, continue in same direction
                     dydt > 0 ? -1 : +1;
 
-                setpoint.pitch = direction * SPEED;
+                return Setpoint(0, 0, direction * SPEED, 0);
             }
 
             void readSensors(

@@ -59,7 +59,6 @@ int main()
     auto simulator = hf::Simulator(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
 
-
     const auto rate = hf::TwoExitAutopilot::FRAME_RATE_HZ;
 
     for (int frame=0; frame<MAX_TIME_SEC * rate; ++frame) {
