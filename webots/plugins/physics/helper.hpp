@@ -78,12 +78,13 @@ class PluginHelper {
             // Get sim info from main program
             const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
 
-            if (bytes_received == sizeof(siminfo_t)) {
+            const auto ready = bytes_received == sizeof(siminfo_t);
+
+            if (ready) {
                 memcpy(&siminfo, buffer, sizeof(siminfo));
             }
 
-            // Framerate can be zero at startup
-            return siminfo.framerate > 0;
+            return ready;
         }
 
         hf:: Dynamics::State get_state_from_siminfo(const siminfo_t & siminfo)
