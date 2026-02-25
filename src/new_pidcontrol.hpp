@@ -45,17 +45,6 @@ namespace hf {
                 return setpoint_out;
             }
 
-            setpoint_t run(
-                    const float dt,
-                    const bool hovering,
-                    const vehicleState_t & state,
-                    const setpoint_t & setpoint_in)
-            {
-                setpoint_t setpoint_out = {};
-                run(dt, hovering, state, setpoint_in, setpoint_out);
-                return setpoint_out;
-            }
-
             static void run(
                     PidControl & self,
                     const float dt,
@@ -79,7 +68,7 @@ namespace hf {
                         hovering, dt, self._altitude_target, state.z);
 
                 self._climbrate_pid = ClimbRateController::run(self._climbrate_pid,
-                    hovering, dt, self._altitude_pid.output, state.z, state.dz);
+                        hovering, dt, self._altitude_pid.output, state.z, state.dz);
 
                 const auto thrust = self._climbrate_pid.output;
 
@@ -120,72 +109,7 @@ namespace hf {
                         setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
 
                 setpoint_out.yaw = self._yaw_pid.output;
-              }
-
-            void run(
-                    const float dt,
-                    const bool hovering,
-                    const vehicleState_t & state,
-                    const setpoint_t & setpoint_in,
-                    setpoint_t & setpoint_out)
-            {
-                // Altitude hold ---------------------------------------------
-
-                if (_altitude_target == 0) {
-                    _altitude_target = ALTITUDE_INIT_M;
-                }
-
-                _altitude_target = Num::fconstrain(
-                        _altitude_target +
-                        setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
-                        ALTITUDE_MIN_M, ALTITUDE_MAX_M);
-
-                _altitude_pid = AltitudeController::run(_altitude_pid,
-                        hovering, dt, _altitude_target, state.z);
-
-                _climbrate_pid = ClimbRateController::run(_climbrate_pid,
-                    hovering, dt, _altitude_pid.output, state.z, state.dz);
-
-                const auto thrust = _climbrate_pid.output;
-
-                setpoint_out.thrust = thrust;
-
-                // Position hold ---------------------------------------------
-
-                const auto airborne = thrust > 0;
-
-                // Rotate world-coordinate velocities into body coordinates
-                const auto dxw = state.dx;
-                const auto dyw = state.dy;
-                const auto psi = Num::DEG2RAD * state.psi;
-                const auto cospsi = cos(psi);
-                const auto sinpsi = sin(psi);
-                const auto dxb =  dxw * cospsi + dyw * sinpsi;
-                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
-
-                _position_y_pid = PositionController::run(_position_y_pid,
-                        airborne, dt, setpoint_in.roll, dyb);
-
-                _position_x_pid = PositionController::run(_position_x_pid,
-                        airborne, dt, setpoint_in.pitch, dxb);
-
-                //  Stabilization ---------------------------------------------
-
-                _roll_pid = RollPitchPid::run(_roll_pid, dt, airborne,
-                        _position_y_pid.output, state.phi, state.dphi);
-
-                setpoint_out.roll = _roll_pid.output;
-
-                _pitch_pid = RollPitchPid::run(_pitch_pid, dt, airborne,
-                        _position_x_pid.output, state.theta, state.dtheta);
-
-                setpoint_out.pitch = _pitch_pid.output;
-
-                _yaw_pid = YawPid::run(_yaw_pid, dt, airborne, 
-                        setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
-
-                setpoint_out.yaw = _yaw_pid.output;
-              }
+            }
 
             void runStabilizer(
                     const float dt,
@@ -204,7 +128,7 @@ namespace hf {
 
                 setpoint_out.yaw = _yaw_pid.run(dt, airborne, 
                         yaw_demand * MAX_YAW_DEMAND_DPS, state.dpsi);
-             }
+            }
 
             void serializeMessage(MspSerializer & serializer)
             {
