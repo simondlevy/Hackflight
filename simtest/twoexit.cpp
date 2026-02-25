@@ -70,7 +70,7 @@ int main()
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
 
-        hf::setpoint_t setpoint = {};
+        hf::Setpoint setpoint = {};
 
         if (autopilot.getSetpoint(frame, setpoint)) {
             printf("succeeded\n");
