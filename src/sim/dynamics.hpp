@@ -132,20 +132,6 @@ namespace hf {
 
             } world_params_t; 
 
-            Dynamics(
-                    const vehicle_params_t & vparams,
-                    const world_params_t & wparams,
-                    const double dt)
-            {
-                init(vparams, wparams, dt);
-            }
-
-            Dynamics(const vehicle_params_t & vparams, const double dt)
-            {
-                const world_params_t wparams = { 9.807, 1.225 };
-
-                init(vparams, wparams, dt);
-            }
 
             Dynamics() = default;
 
@@ -248,17 +234,20 @@ namespace hf {
             } // update
 
             void update(
+                    const vehicle_params_t & vparams,
+                    const double dt,
                     const double * rpms,
                     const uint8_t rotorCount,
                     const int8_t * roll,
                     const int8_t * pitch,
-                    const int8_t * yaw)
+                    const int8_t * yaw,
+                    const world_params_t wparams = { 9.807, 1.225 })
             {
-                const auto b = _vparams.b;
-                const auto d = _vparams.d;
-                const auto I = _vparams.I;
-                const auto l = _vparams.l;
-                const auto m = _vparams.m;
+                const auto b = vparams.b;
+                const auto d = vparams.d;
+                const auto I = vparams.I;
+                const auto l = vparams.l;
+                const auto m = vparams.m;
 
                 // Equation 6 ---------------------------------------
 
@@ -270,7 +259,7 @@ namespace hf {
                     const auto omega = rpms[i] * 2 * M_PI / 60;
 
                     // Thrust is squared rad/sec scaled by air density
-                    const auto omega2 = _wparams.rho * omega * omega; 
+                    const auto omega2 = wparams.rho * omega * omega; 
 
                     // Multiply by thrust coefficient
                     u1 += b * omega2;                  
@@ -284,7 +273,7 @@ namespace hf {
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 _dstate.dz =
-                    -_wparams.g + (cos(state.phi)*cos(state.theta)) / m * u1;
+                    -wparams.g + (cos(state.phi)*cos(state.theta)) / m * u1;
 
                 // We're airborne once net Z acceleration becomes positive
                 if (_dstate.dz > 0) {
@@ -330,18 +319,18 @@ namespace hf {
 
                     // Compute state as first temporal integral of first
                     // temporal derivative
-                    state.x += _dt * _dstate.x;
-                    state.dx += _dt * _dstate.dx;
-                    state.y += _dt * _dstate.y;
-                    state.dy += _dt * _dstate.dy;
-                    state.z += _dt * _dstate.z;
-                    state.dz += _dt * _dstate.dz;
-                    state.phi += _dt * _dstate.phi;
-                    state.dphi += _dt * _dstate.dphi;
-                    state.theta += _dt * _dstate.theta;
-                    state.dtheta += _dt * _dstate.dtheta;
-                    state.psi += _dt * _dstate.psi;
-                    state.dpsi += _dt * _dstate.dpsi;
+                    state.x += dt * _dstate.x;
+                    state.dx += dt * _dstate.dx;
+                    state.y += dt * _dstate.y;
+                    state.dy += dt * _dstate.dy;
+                    state.z += dt * _dstate.z;
+                    state.dz += dt * _dstate.dz;
+                    state.phi += dt * _dstate.phi;
+                    state.dphi += dt * _dstate.dphi;
+                    state.theta += dt * _dstate.theta;
+                    state.dtheta += dt * _dstate.dtheta;
+                    state.psi += dt * _dstate.psi;
+                    state.dpsi += dt * _dstate.dpsi;
 
                     // Keep yaw angle in [-2Pi, +2Pi]
                     state.psi = constrain_psi(state.psi);
@@ -382,12 +371,6 @@ namespace hf {
             // Vehicle state first derivative (Equation 12)
             State _dstate;
 
-            double _dt;
-
-            vehicle_params_t _vparams;
-
-            world_params_t _wparams;
-
             // Flag for whether we're airborne and can update dynamics
             bool _airborne = false;
 
@@ -395,20 +378,6 @@ namespace hf {
             {
                 const auto twopi = 2 * M_PI;
                 return psi + (psi > twopi ? -twopi : psi < -twopi ? twopi : 0);
-            }
-
-            void init(
-                    const vehicle_params_t & vparams,
-                    const world_params_t & wparams,
-                    const double dt)
-            {
-                memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
-
-                memcpy(&_wparams, &wparams, sizeof(world_params_t));
-
-                _dt = dt;
-
-                _airborne = false;
             }
 
     }; // class Dynamics

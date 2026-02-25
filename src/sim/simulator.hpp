@@ -99,8 +99,8 @@ namespace hf {
                         // Run dynamics in inner loop -----------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
-                            _dynamics.update(rpms, 4,
-                                    Mixer::roll, Mixer::pitch, Mixer::yaw);
+                            _dynamics.update( VPARAMS, 1 / DYNAMICS_FREQ, rpms,
+                                    4, Mixer::roll, Mixer::pitch, Mixer::yaw);
                         }
                     }
                 }
@@ -115,7 +115,7 @@ namespace hf {
 
         private:
 
-            Dynamics _dynamics = Dynamics(VPARAMS, 1./DYNAMICS_FREQ);
+            Dynamics _dynamics;
 
             PidControl _pidControl;
 
