@@ -25,15 +25,43 @@ namespace hf {
 
         public:
 
-            AltitudeController()
-            {
-                _integral = 0;
-            }
+            float output;
+
+            AltitudeController() = default;
+
+            AltitudeController(const AltitudeController & a) 
+                : output(a.output), _integral(a._integral) {}
+
+            AltitudeController(const float output, const float integral)
+                : output(output), _integral(integral) {}
+
+            AltitudeController& operator=(const AltitudeController&) = default;
 
             /**
              * Demand is input as altitude target in meters and output as 
              * climb rate in meters per second.
              */
+
+            static auto run(
+                    const AltitudeController & controller,
+                    const bool hovering,
+                    const float dt,
+                    const float target,
+                    const float actual) -> AltitudeController
+            {
+                const auto error = target - actual;
+
+                const auto integral = hovering ?
+                    Num::fconstrain(controller._integral + error * dt, ILIMIT) : 0;
+
+                const auto output = hovering ? 
+                    Num::fconstrain(KP * error + KI * integral,
+                            fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
+                    -LANDING_SPEED_MPS;
+
+                return AltitudeController(output, integral);
+            }
+
             float run(
                     const bool hovering,
                     const float dt,

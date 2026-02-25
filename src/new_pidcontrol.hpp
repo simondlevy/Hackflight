@@ -67,8 +67,13 @@ namespace hf {
                         setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
-                const auto climbrate = _altitude_pid.run(hovering,
-                        dt, _altitude_target, state.z);
+                //const auto climbrate = _altitude_pid.run(hovering,
+                //        dt, _altitude_target, state.z);
+
+                _altitude_pid = AltitudeController::run(_altitude_pid,
+                        hovering, dt, _altitude_target, state.z);
+
+                const auto climbrate = _altitude_pid.output;
 
                 const auto thrust = _climbrate_pid.run(
                     hovering, dt, climbrate, state.z, state.dz);
