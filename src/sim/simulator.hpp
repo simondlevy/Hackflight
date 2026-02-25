@@ -60,7 +60,7 @@ namespace hf {
                 _framerate= framerate;
             }
 
-            Dynamics::state_t step(const mode_e mode, const setpoint_t & setpoint)
+            Dynamics::State step(const mode_e mode, const setpoint_t & setpoint)
             {
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
@@ -108,7 +108,7 @@ namespace hf {
                 return _dynamics.state;
             }
 
-            Dynamics::state_t getVehicleState()
+            Dynamics::State getVehicleState()
             {
                 return _dynamics.state;
             }
@@ -121,7 +121,7 @@ namespace hf {
 
             float _framerate;
 
-            static vehicleState_t state2floats(const Dynamics::state_t s)
+            static vehicleState_t state2floats(const Dynamics::State s)
             {
                 return vehicleState_t { 
                     (float)s.x, (float)s.dx, (float)s.y, (float)s.dy,

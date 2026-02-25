@@ -60,30 +60,50 @@ namespace hf {
 
             } pose_t;
 
-             // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
+            // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
             // We use ENU coordinates based on 
             // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
             // Position in meters, velocity in meters/second, angles in degrees,
             // angular velocity in degrees/second.
-            typedef struct {
+            class State {
 
-                double x;       // positive forward
-                double dx;      // positive forward
-                double y;       // positive rightward
-                double dy;      // positive rightward
-                double z;       // positive upward
-                double dz;      // positive upward
-                double phi;     // positive roll right
-                double dphi;    // positive roll right
-                double theta;   // positive nose down
-                double dtheta;  // positive nose down
-                double psi;     // positive nose right
-                double dpsi;    // positive nose right
+                public:
 
-            } state_t;
+                    double x;       // positive forward
+                    double dx;      // positive forward
+                    double y;       // positive rightward
+                    double dy;      // positive rightward
+                    double z;       // positive upward
+                    double dz;      // positive upward
+                    double phi;     // positive roll right
+                    double dphi;    // positive roll right
+                    double theta;   // positive nose down
+                    double dtheta;  // positive nose down
+                    double psi;     // positive nose right
+                    double dpsi;    // positive nose right
+
+                    State() 
+                        : x(0), dx(0), y(0), dy(0), z(0), dz(0), phi(0),
+                        dphi(0), theta(0), dtheta(0), psi(0), dpsi(0) {}
+
+                    State(const pose_t & p) 
+                        : x(p.x), dx(0), y(p.y), dy(0), z(p.z), dz(0),
+                        phi(p.phi), dphi(0), theta(p.theta), dtheta(0),
+                        psi(p.psi), dpsi(0) {}
+
+                    State(
+                            const double x, const double dx,
+                            const double y, const double dy,
+                            const double z, const double dz,
+                            const double phi, const double dphi,
+                            const double theta, const double dtheta,
+                            const double psi, const double dpsi)
+                        : x(x), dx(dx), y(y), dy(dy), z(z), dz(dz), phi(phi),
+                        dphi(dphi), theta(theta), dtheta(dtheta), psi(psi), dpsi(dpsi) {}
+             };
 
             // Vehicle state (Equation 11)
-            state_t state;
+            State state;
 
             /**
              *  Vehicle parameters
@@ -127,9 +147,9 @@ namespace hf {
                 init(vparams, wparams, dt);
             }
 
-            state_t getVehicleStateDegrees()
+            State getVehicleStateDegrees()
             {
-                return state_t {
+                return State (
                     state.x, state.dx, state.y, state.dy, state.z, state.dz,
                     RAD2DEG * state.phi,
                     RAD2DEG * state.dphi,
@@ -137,7 +157,7 @@ namespace hf {
                     RAD2DEG * state.dtheta,
                     RAD2DEG * state.psi,
                     RAD2DEG * state.dpsi
-                };
+                );
             }
 
             /**
@@ -260,7 +280,18 @@ namespace hf {
                 state.dtheta = 0;
                 state.dpsi = 0;
 
-                memset(&_dstate, 0, sizeof(state_t));
+                _dstate.x = 0;
+                _dstate.dx = 0;
+                _dstate.y = 0;
+                _dstate.dy = 0;
+                _dstate.z = 0;
+                _dstate.dz = 0;
+                _dstate.phi = 0;
+                _dstate.dphi = 0;
+                _dstate.theta = 0;
+                _dstate.dtheta = 0;
+                _dstate.psi = 0;
+                _dstate.dpsi = 0;
             }
 
             // ---------------------------------------------------------------
@@ -270,7 +301,7 @@ namespace hf {
             static constexpr double RAD2DEG = 180 / M_PI;
 
             // Vehicle state first derivative (Equation 12)
-            state_t _dstate;
+            State _dstate;
 
             double _dt;
 

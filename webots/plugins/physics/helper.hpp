@@ -86,7 +86,7 @@ class PluginHelper {
             return siminfo.framerate > 0;
         }
 
-        hf:: Dynamics::state_t get_state_from_siminfo(const siminfo_t & siminfo)
+        hf:: Dynamics::State get_state_from_siminfo(const siminfo_t & siminfo)
         {
             // Set pose first time around
             static bool _ready;
@@ -98,7 +98,7 @@ class PluginHelper {
             return _simulator.step(siminfo.mode, siminfo.setpoint);
         }
 
-        void set_dbody_from_state(const hf::Dynamics::state_t & state)
+        void set_dbody_from_state(const hf::Dynamics::State & state)
         {
             // Negate Y to make leftward positive
             dBodySetPosition(robotBody, state.x, -state.y, state.z);
