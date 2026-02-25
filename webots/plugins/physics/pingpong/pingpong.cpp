@@ -79,14 +79,14 @@ class PingPongAutopilot {
             return hf::Setpoint(0, 0, direction * SPEED, 0);
         }
 
-        void readSensors(
+        static void readSensors(PingPongAutopilot & autopilot,
                 simsens::Robot & robot,
                 simsens::World & world,
                 const simsens::Pose & pose)
         {
-            distance_forward_mm = readRangefinder("VL53L1-forward", robot,
+            autopilot.distance_forward_mm = readRangefinder("VL53L1-forward", robot,
                     world, pose);
-            distance_backward_mm = readRangefinder("VL53L1-backward", robot,
+            autopilot.distance_backward_mm = readRangefinder("VL53L1-backward", robot,
                     world, pose);
         }
 
@@ -115,7 +115,7 @@ DLLEXPORT void webots_physics_step()
         const auto pose = _helper->get_pose(siminfo);
 
         // Grab rangefinder readings for next iteration
-        _autopilot.readSensors(_helper->robot, _helper->world, pose);
+        PingPongAutopilot::readSensors(_autopilot, _helper->robot, _helper->world, pose);
 
         // Log data to file
         const int distances[] = {
