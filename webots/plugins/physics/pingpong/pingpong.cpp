@@ -63,7 +63,7 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
-    _autopilot.init();
+    hf::PingPongAutopilot::init();
 
     _helper = new AutopilotHelper("pingpong");
 }

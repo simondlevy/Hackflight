@@ -45,7 +45,7 @@ namespace hf {
             int distance_forward_mm;
             int distance_backward_mm;
 
-            void init()
+            static void init()
             {
                 srand(time(NULL)); 
             }

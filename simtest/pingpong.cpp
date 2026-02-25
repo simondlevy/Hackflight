@@ -61,8 +61,7 @@ int main()
     auto simulator = hf::Simulator(
             {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
 
-    // XXX
-    autopilot.init();
+    hf::PingPongAutopilot::init();
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
