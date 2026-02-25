@@ -58,12 +58,11 @@ int main()
 
     const auto pose = world.getRobotPose();
 
-    hf::Simulator simulator = {};
+    auto simulator = hf::Simulator(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
 
-    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            FRAME_RATE_HZ);
-
-   autopilot.init();
+    // XXX
+    autopilot.init();
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
@@ -83,7 +82,7 @@ int main()
         }
 
         // Get new state based on setpoint
-        const auto newstate = simulator.step(mode, setpoint);
+        const auto newstate = simulator.step(mode, setpoint, FRAME_RATE_HZ);
 
         // Grab rangefinder readings for next iteration
         autopilot.readSensors(robot, world,

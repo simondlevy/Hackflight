@@ -91,11 +91,11 @@ class PluginHelper {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                _simulator.init(siminfo.startingPose, siminfo.framerate);
+                _simulator = hf::Simulator(siminfo.startingPose);
             }
             _ready = true;
 
-            return _simulator.step(siminfo.mode, siminfo.setpoint);
+            return _simulator.step(siminfo.mode, siminfo.setpoint, siminfo.framerate);
         }
 
         void set_dbody_from_state(const hf::Dynamics::State & state)

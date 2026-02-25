@@ -56,12 +56,11 @@ int main()
 
     const auto pose = world.getRobotPose();
 
-    hf::Simulator simulator = {};
+    auto simulator = hf::Simulator(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
+
 
     const auto rate = hf::TwoExitAutopilot::FRAME_RATE_HZ;
-
-    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-           rate);
 
     for (int frame=0; frame<MAX_TIME_SEC * rate; ++frame) {
 
@@ -77,7 +76,7 @@ int main()
             break;
         }
 
-        const auto state = simulator.step(mode, setpoint);
+        const auto state = simulator.step(mode, setpoint, rate);
 
         autopilot.readSensor(robot, world,
                 {state.x, state.y, state.z,
