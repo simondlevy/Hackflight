@@ -70,7 +70,8 @@ namespace hf {
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
-                        PidControl::run(_pidControl, dt, controlled, state, setpoint);
+                        // PidControl::run(_pidControl, dt, controlled, state, setpoint);
+                        _pidControl = PidControl::run(_pidControl, dt, controlled, state, setpoint);
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {

@@ -85,6 +85,10 @@ namespace hf {
 
             Setpoint() = default;
 
+            Setpoint
+                (const float t, const float r, const float p, const float y) 
+                : thrust(t), roll(r), pitch(p), yaw(y) {}
+
             Setpoint& operator=(const Setpoint& other) = default;
     };
 
