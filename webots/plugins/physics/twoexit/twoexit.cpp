@@ -52,19 +52,19 @@ static AutopilotHelper * _helper;
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    PluginHelper::siminfo_t siminfo = {};
+    PluginHelper::message_t message = {};
 
-    if (_helper->get_siminfo(siminfo)) {
+    if (_helper->get_message(message)) {
 
         static int _rangefinder_distances_mm[8];
 
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
-        siminfo.setpoint = siminfo.mode == hf::MODE_AUTONOMOUS ?
-            getSetpoint(_rangefinder_distances_mm) : siminfo.setpoint;
+        message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+            getSetpoint(_rangefinder_distances_mm) : message.setpoint;
 
         // Get vehicle pose based on setpoint
-        const auto pose = _helper->get_pose(siminfo);
+        const auto pose = _helper->get_pose(message);
 
         auto rangefinder = _helper->robot.rangefinders["VL53L5-forward"];
 
