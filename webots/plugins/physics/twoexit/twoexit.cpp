@@ -30,41 +30,20 @@
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 static constexpr float FRAME_RATE_HZ = 32;
 
-static void getSetpoint(
-        const int * rangefinder_distances_mm,
-        const int frame,
-        hf::Setpoint & setpoint)
+static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
 {
-    static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
-
     const int * d = rangefinder_distances_mm;
 
     // Look for clear (infinity reading) in center of 1x8 readings
     const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
     // If clear, pitch forward
-    setpoint.pitch = center_is_clear ? 0.4 : 0;
+    const auto pitch = center_is_clear ? 0.4 : 0;
 
     // Otherwise, yaw rightward
-    setpoint.yaw = center_is_clear ? 0 : 0.2;
+    const auto yaw = center_is_clear ? 0 : 0.2;
 
-    // We're not done until all readings are infinity
-    for (int i=0; i<8; ++i) {
-        if (d[i] != -1) {
-            return;
-        }
-    }
-
-    static int _cleared_at_frame;
-
-    if (_cleared_at_frame == 0) {
-        _cleared_at_frame = frame;
-    }
-
-    // Travel a bit after exiting
-    else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ >
-            TRAVEL_AFTER_CLEAR_SEC) {
-    }
+    return hf::Setpoint(0, 0, pitch, yaw);
 }        
 
 static AutopilotHelper * _helper;
@@ -81,10 +60,8 @@ DLLEXPORT void webots_physics_step()
 
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
-        if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-            static int _frame;
-            getSetpoint(_rangefinder_distances_mm, _frame++, siminfo.setpoint);
-        }
+        siminfo.setpoint = siminfo.mode == hf::MODE_AUTONOMOUS ?
+            getSetpoint(_rangefinder_distances_mm) : siminfo.setpoint;
 
         // Get vehicle pose based on setpoint
         const auto pose = _helper->get_pose(siminfo);
