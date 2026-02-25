@@ -147,19 +147,6 @@ namespace hf {
                 init(vparams, wparams, dt);
             }
 
-            State getVehicleStateDegrees()
-            {
-                return State (
-                    state.x, state.dx, state.y, state.dy, state.z, state.dz,
-                    RAD2DEG * state.phi,
-                    RAD2DEG * state.dphi,
-                    RAD2DEG * state.theta,
-                    RAD2DEG * state.dtheta,
-                    RAD2DEG * state.psi,
-                    RAD2DEG * state.dpsi
-                );
-            }
-
             /**
              * Sets motor spins
              */
@@ -297,8 +284,6 @@ namespace hf {
             // ---------------------------------------------------------------
 
         private:
-
-            static constexpr double RAD2DEG = 180 / M_PI;
 
             // Vehicle state first derivative (Equation 12)
             State _dstate;

@@ -67,8 +67,7 @@ namespace hf {
 
                     // Get vehicle state from dynamics and convert state values
                     // from doubles to floats
-                    const auto state = state2floats(
-                            _dynamics.getVehicleStateDegrees());
+                    const auto state = state2degrees(_dynamics.state);
 
                     const auto controlled =
                         mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
@@ -139,6 +138,25 @@ namespace hf {
                 }
                 return d;
             }
+
+            static vehicleState_t state2degrees(const Dynamics::State state)
+            {
+                return vehicleState_t {
+                    (float)state.x,
+                    (float)state.dx,
+                    (float)state.y,
+                    (float)state.dy,
+                    (float)state.z,
+                    (float)state.dz,
+                    (float)(Num::RAD2DEG * state.phi),
+                    (float)(Num::RAD2DEG * state.dphi),
+                    (float)(Num::RAD2DEG * state.theta),
+                    (float)(Num::RAD2DEG * state.dtheta),
+                    (float)(Num::RAD2DEG * state.psi),
+                    (float)(Num::RAD2DEG * state.dpsi)
+                };
+            }
+
 
             static void report_fps()
             {
