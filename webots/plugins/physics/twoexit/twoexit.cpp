@@ -28,25 +28,25 @@
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
+static constexpr float FRAME_RATE_HZ = 32;
+
+static simsens::Rangefinder get_rangefinder(simsens::Robot & robot)
+{
+    return robot.rangefinders["VL53L5-forward"];
+}
 
 class TwoExitAutopilot {
 
     public:
 
-        static constexpr float FRAME_RATE_HZ = 32;
-
         int rangefinder_distances_mm[8];
 
-        simsens::Rangefinder get_rangefinder(simsens::Robot & robot)
-        {
-            return robot.rangefinders["VL53L5-forward"];
-        }
-
-        bool getSetpoint(const int frame, hf::Setpoint & setpoint)
+        static bool getSetpoint(TwoExitAutopilot & autopilot,
+                const int frame, hf::Setpoint & setpoint)
         {
             static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
 
-            const int * d = rangefinder_distances_mm;
+            const int * d = autopilot.rangefinder_distances_mm;
 
             // Look for clear (infinity reading) in center of 1x8 readings
             const bool center_is_clear = d[3] == -1 && d[4] == -1;
@@ -104,7 +104,7 @@ DLLEXPORT void webots_physics_step()
         // available
         if (siminfo.mode == hf::MODE_AUTONOMOUS) {
             static int _frame;
-            _autopilot.getSetpoint(_frame++, siminfo.setpoint);
+            TwoExitAutopilot::getSetpoint(_autopilot, _frame++, siminfo.setpoint);
         }
 
         // Get vehicle pose based on setpoint
@@ -120,8 +120,8 @@ DLLEXPORT void webots_physics_step()
         // Display rangefinder distances
         simsens::RangefinderVisualizer::show(
                 _autopilot.rangefinder_distances_mm,
-                _autopilot.get_rangefinder(_helper->robot).min_distance_m,
-                _autopilot.get_rangefinder(_helper->robot).max_distance_m,
+                get_rangefinder(_helper->robot).min_distance_m,
+                get_rangefinder(_helper->robot).max_distance_m,
                 8, 1, RANGEFINDER_DISPLAY_SCALEUP);
     }
 }
