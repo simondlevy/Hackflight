@@ -30,7 +30,7 @@
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 static constexpr float FRAME_RATE_HZ = 32;
 
-static bool getSetpoint(
+static void getSetpoint(
         const int * rangefinder_distances_mm,
         const int frame,
         hf::Setpoint & setpoint)
@@ -51,7 +51,7 @@ static bool getSetpoint(
     // We're not done until all readings are infinity
     for (int i=0; i<8; ++i) {
         if (d[i] != -1) {
-            return false;
+            return;
         }
     }
 
@@ -64,10 +64,7 @@ static bool getSetpoint(
     // Travel a bit after exiting
     else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ >
             TRAVEL_AFTER_CLEAR_SEC) {
-        return true;
     }
-
-    return false;
 }        
 
 static AutopilotHelper * _helper;
