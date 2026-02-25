@@ -51,7 +51,7 @@ namespace hf {
                 _framerate= framerate;
             }
 
-            Dynamics::State step(const mode_e mode, const setpoint_t & setpoint)
+            Dynamics::State step(const mode_e mode, const Setpoint & setpoint)
             {
                 const auto controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
@@ -74,7 +74,7 @@ namespace hf {
                             PidControl::run(_pidControl, dt, controlled, state, setpoint);
 
                         // Scale up new setpoint for mixer
-                        const setpoint_t scaled_setpoint = {
+                        const Setpoint scaled_setpoint = {
                             pid_setpoint.thrust,
                             pid_setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
                             pid_setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,

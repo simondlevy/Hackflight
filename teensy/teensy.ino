@@ -276,7 +276,7 @@ void loop()
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    hf::setpoint_t pid_setpoint = { (_channel_values[0]+1)/2, 0, 0, 0 };
+    hf::Setpoint pid_setpoint = { (_channel_values[0]+1)/2, 0, 0, 0 };
 
     static hf::PidControl _pidControl;
 

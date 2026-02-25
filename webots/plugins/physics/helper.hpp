@@ -46,7 +46,7 @@ class PluginHelper {
             hf::Dynamics::pose_t startingPose;
             float framerate;
             hf::mode_e mode;
-            hf::setpoint_t setpoint;
+            hf::Setpoint setpoint;
 
         } siminfo_t;
 

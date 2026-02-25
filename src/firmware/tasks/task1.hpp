@@ -86,7 +86,7 @@ namespace hf {
                 float motorvals[MAX_MOTOR_COUNT] = {};
 
                 // Start with no axis setpoint
-                setpoint_t setpoint = {};
+                Setpoint setpoint = {};
 
                 // Run device-dependent motor initialization
                 motors_init();
@@ -259,7 +259,7 @@ namespace hf {
 
             void runPidAndMixer(
                     const uint32_t step, const RC::message_t &message,
-                    setpoint_t & setpoint, float *motorvals)
+                    Setpoint & setpoint, float *motorvals)
             {
                 if (rateDoExecute(FREQ_PID_UPDATE, step)) {
 
@@ -292,7 +292,7 @@ namespace hf {
                 motors_run();
             }
 
-            void runMixer(const setpoint_t & setpoint, float * motorvals)
+            void runMixer(const Setpoint & setpoint, float * motorvals)
             {
                 float uncapped[MAX_MOTOR_COUNT] = {};
                 Mixer::mix(setpoint, uncapped);

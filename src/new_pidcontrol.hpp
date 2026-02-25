@@ -33,14 +33,14 @@ namespace hf {
 
             PidControl& operator=(const PidControl& other) = default;
 
-            static setpoint_t run(
+            static Setpoint run(
                     PidControl & self,
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const setpoint_t & setpoint_in)
+                    const Setpoint & setpoint_in)
             {
-                setpoint_t setpoint_out = {};
+                Setpoint setpoint_out = {};
                 run(self, dt, hovering, state, setpoint_in, setpoint_out);
                 return setpoint_out;
             }
@@ -50,8 +50,8 @@ namespace hf {
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const setpoint_t & setpoint_in,
-                    setpoint_t & setpoint_out)
+                    const Setpoint & setpoint_in,
+                    Setpoint & setpoint_out)
             {
                 // Altitude hold ---------------------------------------------
 
@@ -118,7 +118,7 @@ namespace hf {
                     const float pitch_angle_demand,
                     const float yaw_demand,
                     const vehicleState_t & state,
-                    setpoint_t & setpoint_out)
+                    Setpoint & setpoint_out)
             {
                 setpoint_out.roll = _roll_pid.run(
                         dt, airborne, roll_angle_demand, state.phi, state.dphi);

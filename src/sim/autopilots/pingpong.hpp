@@ -50,7 +50,7 @@ namespace hf {
                 srand(time(NULL)); 
             }
 
-            void getSetpoint(const float dydt, hf::setpoint_t & setpoint) 
+            void getSetpoint(const float dydt, hf::Setpoint & setpoint) 
             {
                 const auto diff = distance_forward_mm - distance_backward_mm;
 
