@@ -62,22 +62,23 @@ namespace hf {
 
             Dynamics::State step(const mode_e mode, const setpoint_t & setpoint)
             {
+                const auto controlled =
+                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
+
+                const auto dt = 1/(float)PID_FAST_FREQ;
+
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
 
                     // Get vehicle state from dynamics and convert state values
-                    // from doubles to floats
+                    // from doubles/radians to floats/degrees for PID
+                    // controllers
                     const auto state = state2degrees(_dynamics.state);
-
-                    const auto controlled =
-                        mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
-
-                    const auto dt = 1/(float)PID_FAST_FREQ;
 
                     // Run fast PID control and mixer in middle loop --------------
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
-                        // Run PID control to get new setpoin
+                        // Run PID control to get new setpoint
                         const auto pid_setpoint =
                             _pidControl.run(dt, controlled, state, setpoint);
 
@@ -143,17 +144,17 @@ namespace hf {
             {
                 return vehicleState_t {
                     (float)state.x,
-                    (float)state.dx,
-                    (float)state.y,
-                    (float)state.dy,
-                    (float)state.z,
-                    (float)state.dz,
-                    (float)(Num::RAD2DEG * state.phi),
-                    (float)(Num::RAD2DEG * state.dphi),
-                    (float)(Num::RAD2DEG * state.theta),
-                    (float)(Num::RAD2DEG * state.dtheta),
-                    (float)(Num::RAD2DEG * state.psi),
-                    (float)(Num::RAD2DEG * state.dpsi)
+                        (float)state.dx,
+                        (float)state.y,
+                        (float)state.dy,
+                        (float)state.z,
+                        (float)state.dz,
+                        (float)(Num::RAD2DEG * state.phi),
+                        (float)(Num::RAD2DEG * state.dphi),
+                        (float)(Num::RAD2DEG * state.theta),
+                        (float)(Num::RAD2DEG * state.dtheta),
+                        (float)(Num::RAD2DEG * state.psi),
+                        (float)(Num::RAD2DEG * state.dpsi)
                 };
             }
 
