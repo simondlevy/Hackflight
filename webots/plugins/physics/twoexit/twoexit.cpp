@@ -16,16 +16,79 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Hackflight
+#include <datatypes.h>
 #include "../helper.hpp"
 #include "../autopilot.hpp"
 
-#include <sim/autopilots/twoexit.hpp>
-
+// SimSensors
+#include <simsensors/src/world.hpp>
+#include <simsensors/src/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 
-static hf::TwoExitAutopilot _autopilot;
+class TwoExitAutopilot {
+
+    public:
+
+        static constexpr float FRAME_RATE_HZ = 32;
+
+        int rangefinder_distances_mm[8];
+
+        simsens::Rangefinder get_rangefinder(simsens::Robot & robot)
+        {
+            return robot.rangefinders["VL53L5-forward"];
+        }
+
+        bool getSetpoint(const int frame, hf::Setpoint & setpoint)
+        {
+            static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
+
+            const int * d = rangefinder_distances_mm;
+
+            // Look for clear (infinity reading) in center of 1x8 readings
+            const bool center_is_clear = d[3] == -1 && d[4] == -1;
+
+            // If clear, pitch forward
+            setpoint.pitch = center_is_clear ? 0.4 : 0;
+
+            // Otherwise, yaw rightward
+            setpoint.yaw = center_is_clear ? 0 : 0.2;
+
+            // We're not done until all readings are infinity
+            for (int i=0; i<8; ++i) {
+                if (d[i] != -1) {
+                    return false;
+                }
+            }
+
+            static int _cleared_at_frame;
+
+            if (_cleared_at_frame == 0) {
+                _cleared_at_frame = frame;
+            }
+
+            // Travel a bit after exiting
+            else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ >
+                    TRAVEL_AFTER_CLEAR_SEC) {
+                return true;
+            }
+
+            return false;
+        }        
+
+        void readSensor(
+                simsens::Robot & robot,
+                simsens::World & world,
+                const simsens::Pose & pose)
+        {
+            get_rangefinder(robot).read(pose, world, rangefinder_distances_mm);
+        }
+};
+
+static TwoExitAutopilot _autopilot;
 
 static AutopilotHelper * _helper;
 
