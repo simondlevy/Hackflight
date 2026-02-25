@@ -30,65 +30,45 @@
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
 static constexpr float FRAME_RATE_HZ = 32;
 
-static simsens::Rangefinder get_rangefinder(simsens::Robot & robot)
+static bool getSetpoint(
+        const int * rangefinder_distances_mm,
+        const int frame,
+        hf::Setpoint & setpoint)
 {
-    return robot.rangefinders["VL53L5-forward"];
-}
+    static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
 
-class TwoExitAutopilot {
+    const int * d = rangefinder_distances_mm;
 
-    public:
+    // Look for clear (infinity reading) in center of 1x8 readings
+    const bool center_is_clear = d[3] == -1 && d[4] == -1;
 
-        int rangefinder_distances_mm[8];
+    // If clear, pitch forward
+    setpoint.pitch = center_is_clear ? 0.4 : 0;
 
-        static bool getSetpoint(TwoExitAutopilot & autopilot,
-                const int frame, hf::Setpoint & setpoint)
-        {
-            static constexpr float TRAVEL_AFTER_CLEAR_SEC = 1;
+    // Otherwise, yaw rightward
+    setpoint.yaw = center_is_clear ? 0 : 0.2;
 
-            const int * d = autopilot.rangefinder_distances_mm;
-
-            // Look for clear (infinity reading) in center of 1x8 readings
-            const bool center_is_clear = d[3] == -1 && d[4] == -1;
-
-            // If clear, pitch forward
-            setpoint.pitch = center_is_clear ? 0.4 : 0;
-
-            // Otherwise, yaw rightward
-            setpoint.yaw = center_is_clear ? 0 : 0.2;
-
-            // We're not done until all readings are infinity
-            for (int i=0; i<8; ++i) {
-                if (d[i] != -1) {
-                    return false;
-                }
-            }
-
-            static int _cleared_at_frame;
-
-            if (_cleared_at_frame == 0) {
-                _cleared_at_frame = frame;
-            }
-
-            // Travel a bit after exiting
-            else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ >
-                    TRAVEL_AFTER_CLEAR_SEC) {
-                return true;
-            }
-
+    // We're not done until all readings are infinity
+    for (int i=0; i<8; ++i) {
+        if (d[i] != -1) {
             return false;
-        }        
-
-        void readSensor(
-                simsens::Robot & robot,
-                simsens::World & world,
-                const simsens::Pose & pose)
-        {
-            get_rangefinder(robot).read(pose, world, rangefinder_distances_mm);
         }
-};
+    }
 
-static TwoExitAutopilot _autopilot;
+    static int _cleared_at_frame;
+
+    if (_cleared_at_frame == 0) {
+        _cleared_at_frame = frame;
+    }
+
+    // Travel a bit after exiting
+    else if ((frame - _cleared_at_frame)/FRAME_RATE_HZ >
+            TRAVEL_AFTER_CLEAR_SEC) {
+        return true;
+    }
+
+    return false;
+}        
 
 static AutopilotHelper * _helper;
 
@@ -100,28 +80,31 @@ DLLEXPORT void webots_physics_step()
 
     if (_helper->get_siminfo(siminfo)) {
 
+        static int _rangefinder_distances_mm[8];
+
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
         if (siminfo.mode == hf::MODE_AUTONOMOUS) {
             static int _frame;
-            TwoExitAutopilot::getSetpoint(_autopilot, _frame++, siminfo.setpoint);
+            getSetpoint(_rangefinder_distances_mm, _frame++, siminfo.setpoint);
         }
 
         // Get vehicle pose based on setpoint
         const auto pose = _helper->get_pose(siminfo);
 
+        auto rangefinder = _helper->robot.rangefinders["VL53L5-forward"];
+
         // Grab rangefinder distances for next iteration
-        _autopilot.readSensor(_helper->robot, _helper->world, pose);
+        rangefinder.read(pose, _helper->world, _rangefinder_distances_mm);
 
         // Log data to file
-        _helper->write_to_log(
-                pose, _autopilot.rangefinder_distances_mm, 8);
+        _helper->write_to_log(pose, _rangefinder_distances_mm, 8);
 
         // Display rangefinder distances
         simsens::RangefinderVisualizer::show(
-                _autopilot.rangefinder_distances_mm,
-                get_rangefinder(_helper->robot).min_distance_m,
-                get_rangefinder(_helper->robot).max_distance_m,
+                _rangefinder_distances_mm,
+                rangefinder.min_distance_m,
+                rangefinder.max_distance_m,
                 8, 1, RANGEFINDER_DISPLAY_SCALEUP);
     }
 }
