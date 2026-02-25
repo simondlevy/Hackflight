@@ -81,29 +81,30 @@ DLLEXPORT void webots_physics_step()
 
     if (_helper->get_siminfo(siminfo)) {
 
-        static int distance_forward_mm;
-        static int distance_backward_mm;
-
         // Get current vehicle state
         const auto state = _helper->get_state_from_siminfo(siminfo);
+
+        static int _distance_forward_mm;
+        static int _distance_backward_mm;
 
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
         siminfo.setpoint = siminfo.mode == hf::MODE_AUTONOMOUS ?
-            getSetpoint(distance_forward_mm, distance_backward_mm, state.dy) :
+            getSetpoint(_distance_forward_mm, 
+                    _distance_backward_mm, state.dy) :
             siminfo.setpoint;
 
         // Get vehicle pose based on setpoint
         const auto pose = _helper->get_pose(siminfo);
 
         // Grab rangefinder readings for next iteration
-        distance_forward_mm = readRangefinder("VL53L1-forward", _helper->robot,
-                _helper->world, pose);
-        distance_backward_mm = readRangefinder("VL53L1-backward", _helper->robot,
-                _helper->world, pose);
+        _distance_forward_mm = readRangefinder("VL53L1-forward",
+                _helper->robot, _helper->world, pose);
+        _distance_backward_mm = readRangefinder("VL53L1-backward",
+                _helper->robot, _helper->world, pose);
 
         // Log data to file
-        const int distances[] = { distance_forward_mm, distance_backward_mm};
+        const int distances[] = {_distance_forward_mm, _distance_backward_mm};
         _helper->write_to_log(pose, distances, 2);
     }
 }
