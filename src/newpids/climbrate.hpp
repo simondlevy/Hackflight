@@ -26,16 +26,48 @@ namespace hf {
 
         public:
 
-            ClimbRateController()
-            {
-                _integral = 0;
-            }
+            float output;
+
+            ClimbRateController() = default;
+
+            ClimbRateController(const ClimbRateController & a) 
+                : output(a.output), _integral(a._integral) {}
+
+            ClimbRateController(const float output, const float integral)
+                : output(output), _integral(integral) {}
+
+            ClimbRateController& operator=(const ClimbRateController&) = default;
 
             /**
              * Demand is input as altitude target in meters and output as 
              * arbitrary positive value to be scaled according to motor
              * characteristics.
              */
+
+            static auto run(
+                    const ClimbRateController & controller,
+                    const bool hovering,
+                    const float dt,
+                    const float target,
+                    const float z,
+                    const float dz) -> ClimbRateController
+            {
+                const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
+
+                const auto error = target - dz;
+
+                const auto integral = airborne ? 
+                    Num::fconstrain(controller._integral + error * dt, ILIMIT) : 0;
+
+                const auto thrust = KP * error + KI * integral;
+
+                const auto output = airborne ?
+                    Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
+                            THRUST_MIN, THRUST_MAX) : 0;
+
+                return ClimbRateController(output, integral);
+            }
+
             float run(
                     const bool hovering,
                     const float dt,
