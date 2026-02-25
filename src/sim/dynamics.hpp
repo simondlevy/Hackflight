@@ -49,7 +49,18 @@ namespace hf {
 
             static constexpr double ZMIN = 0.005;
 
-            // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
+            typedef struct {
+
+                double x;
+                double y;
+                double z;
+                double phi;
+                double theta;
+                double psi;
+
+            } pose_t;
+
+             // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
             // We use ENU coordinates based on 
             // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
             // Position in meters, velocity in meters/second, angles in degrees,

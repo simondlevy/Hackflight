@@ -43,7 +43,7 @@ class PluginHelper {
 
         typedef struct {
 
-            hf::Simulator::pose_t startingPose;
+            hf::Dynamics::pose_t startingPose;
             float framerate;
             hf::mode_e mode;
             hf::setpoint_t setpoint;

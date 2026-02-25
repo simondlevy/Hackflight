@@ -44,18 +44,7 @@ namespace hf {
 
         public:
 
-            typedef struct {
-
-                double x;
-                double y;
-                double z;
-                double phi;
-                double theta;
-                double psi;
-
-            } pose_t;
-
-            void init(const pose_t & pose, const float framerate=32)
+            void init(const Dynamics::pose_t & pose, const float framerate=32)
             {
                 _pidControl.init();
 
