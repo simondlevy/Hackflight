@@ -150,7 +150,7 @@ namespace hf {
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,
-                    const world_params_t & wparams=EARTH_PARAMS) -> Dynamics
+                    const world_params_t wparams = { 9.807, 1.225 })
             {
                 const auto cphi = cos(dyn.state.phi);
                 const auto cnphi = cos(-dyn.state.phi);
@@ -366,13 +366,11 @@ namespace hf {
 
         private:
 
-            static constexpr world_params_t EARTH_PARAMS = { 9.807, 1.225 };
-
             // Vehicle state first derivative (Equation 12)
             State _dstate;
 
             // Flag for whether we're airborne and can update dynamics
-            bool _airborne = false;
+            bool _airborne;
 
             static float constrain_psi(const double psi)
             {
