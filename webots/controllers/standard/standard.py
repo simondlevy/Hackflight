@@ -197,8 +197,7 @@ def main():
            mode = 'idle'
 
         # Send siminfo to fast thread
-        emitter.send(struct.pack('Iffff', int(MODES[mode]),
-                                  cmdinfo[1], cmdinfo[2], cmdinfo[3], cmdinfo[4]))  # setpoint
+        emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
 
 
 main()
