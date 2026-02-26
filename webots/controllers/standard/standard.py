@@ -149,7 +149,6 @@ def main():
     keyboard.enable(timestep)
 
     gps = getAndEnableDevice(robot, timestep, 'gps')
-    imu = getAndEnableDevice(robot, timestep, 'inertial unit')
     emitter = robot.getDevice('emitter')
 
     robot.step(timestep)
@@ -194,7 +193,7 @@ def main():
         # On descent, switch mode to idle when close enough to ground
         if (mode == 'landing' and
            (gps.getValues()[2] - zstart) < ZDIST_LANDING_MAX_M):
-           mode = 'idle'
+            mode = 'idle'
 
         # Send siminfo to fast thread
         emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
