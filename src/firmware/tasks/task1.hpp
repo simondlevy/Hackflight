@@ -24,7 +24,7 @@
 #include <mixers/crazyflie.hpp>
 #include <firmware/rc.hpp>
 #include <firmware/task.hpp>
-#include <pidcontrol.hpp>
+#include <pidcontrol/pidcontrol.hpp>
 #include <vehicles/diyquad.hpp>
 
 namespace hf {

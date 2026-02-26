@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include <newpids/altitude.hpp>
-#include <newpids/climbrate.hpp>
-#include <newpids/position.hpp>
-#include <newpids/rollpitch.hpp>
-#include <newpids/yaw.hpp>
 #include <msp/serializer.hpp>
+#include <pidcontrol/newpids/altitude.hpp>
+#include <pidcontrol/newpids/climbrate.hpp>
+#include <pidcontrol/newpids/position.hpp>
+#include <pidcontrol/newpids/rollpitch.hpp>
+#include <pidcontrol/newpids/yaw.hpp>
 
 namespace hf {
 
@@ -117,25 +117,6 @@ namespace hf {
                 return PidControl(new_altitude_target, altitude_pid,
                         climbrate_pid, position_x_pid, position_y_pid,
                         pitch_pid, roll_pid, yaw_pid, setpoint_out);
-            }
-
-            void runStabilizer(
-                    const float dt,
-                    const bool airborne,
-                    const float roll_angle_demand,
-                    const float pitch_angle_demand,
-                    const float yaw_demand,
-                    const vehicleState_t & state,
-                    Setpoint & setpoint_out)
-            {
-                setpoint_out.roll = _roll_pid.run(
-                        dt, airborne, roll_angle_demand, state.phi, state.dphi);
-
-                setpoint_out.pitch = _pitch_pid.run(
-                        dt, airborne, pitch_angle_demand, state.theta, state.dtheta);
-
-                setpoint_out.yaw = _yaw_pid.run(dt, airborne, 
-                        yaw_demand * MAX_YAW_DEMAND_DPS, state.dpsi);
             }
 
             void serializeMessage(MspSerializer & serializer)

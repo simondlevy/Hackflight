@@ -31,8 +31,8 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <newpids/position.hpp>
-#include <stabilizer_pid.hpp>
+#include <pidcontrol/newpids/position.hpp>
+#include <pidcontrol/stabilizer.hpp>
 
 static MPU6050 _mpu6050;
 

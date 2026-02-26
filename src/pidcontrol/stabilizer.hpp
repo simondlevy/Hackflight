@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <newpids/rollpitch.hpp>
-#include <newpids/yaw.hpp>
+#include <pidcontrol/newpids/rollpitch.hpp>
+#include <pidcontrol/newpids/yaw.hpp>
 #include <msp/serializer.hpp>
 
 namespace hf {
