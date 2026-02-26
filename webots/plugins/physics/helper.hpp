@@ -46,9 +46,9 @@ class PluginHelper {
             hf::Dynamics::pose_t startingPose;
             float framerate;
             hf::mode_e mode;
-            hf::setpoint_t setpoint;
+            hf::Setpoint setpoint;
 
-        } siminfo_t;
+        } message_t;
 
         dBodyID robotBody;
 
@@ -67,7 +67,7 @@ class PluginHelper {
             }
         }
 
-        bool get_siminfo(siminfo_t & siminfo)
+        bool get_message(message_t & message)
         {
             if (robotBody == NULL) {
                 return false;
@@ -76,26 +76,27 @@ class PluginHelper {
             int bytes_received = 0;
 
             // Get sim info from main program
-            const auto buffer = (siminfo_t *)dWebotsReceive(&bytes_received);
+            const auto buffer = (message_t *)dWebotsReceive(&bytes_received);
 
-            if (bytes_received == sizeof(siminfo_t)) {
-                memcpy(&siminfo, buffer, sizeof(siminfo));
+            const auto ready = bytes_received == sizeof(message_t);
+
+            if (ready) {
+                memcpy(&message, buffer, sizeof(message));
             }
 
-            // Framerate can be zero at startup
-            return siminfo.framerate > 0;
+            return ready;
         }
 
-        hf:: Dynamics::State get_state_from_siminfo(const siminfo_t & siminfo)
+        hf:: Dynamics::State get_state_from_message(const message_t & message)
         {
             // Set pose first time around
             static bool _ready;
             if (!_ready) {
-                _simulator.init(siminfo.startingPose, siminfo.framerate);
+                _simulator = hf::Simulator(message.startingPose);
             }
             _ready = true;
 
-            return _simulator.step(siminfo.mode, siminfo.setpoint);
+            return _simulator.step(message.mode, message.setpoint, message.framerate);
         }
 
         void set_dbody_from_state(const hf::Dynamics::State & state)

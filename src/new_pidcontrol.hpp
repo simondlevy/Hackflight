@@ -29,50 +29,57 @@ namespace hf {
 
         public:
 
+            Setpoint setpoint;
+
             PidControl() = default;
 
             PidControl& operator=(const PidControl& other) = default;
 
-            static setpoint_t run(
-                    PidControl & self,
-                    const float dt,
-                    const bool hovering,
-                    const vehicleState_t & state,
-                    const setpoint_t & setpoint_in)
-            {
-                setpoint_t setpoint_out = {};
-                run(self, dt, hovering, state, setpoint_in, setpoint_out);
-                return setpoint_out;
-            }
+            PidControl(
+                    const float altitude_target,
+                    const AltitudeController & altitude_pid,
+                    const ClimbRateController & climbrate_pid,
+                    const PositionController & position_x_pid,
+                    const PositionController & position_y_pid,
+                    const RollPitchPid & pitch_pid,
+                    const RollPitchPid & roll_pid,
+                    const YawPid & yaw_pid,
+                    const Setpoint & setpoint)
+                : setpoint(setpoint),
+                _altitude_target(altitude_target),
+                _altitude_pid(altitude_pid),
+                _climbrate_pid(climbrate_pid),
+                _position_x_pid(position_x_pid),
+                _position_y_pid(position_y_pid),
+                _pitch_pid(pitch_pid),
+                _roll_pid(roll_pid),
+                _yaw_pid(yaw_pid) {}
 
-            static void run(
-                    PidControl & self,
+            static auto run(
+                    const PidControl & pid,
                     const float dt,
                     const bool hovering,
                     const vehicleState_t & state,
-                    const setpoint_t & setpoint_in,
-                    setpoint_t & setpoint_out)
+                    const Setpoint & setpoint_in) -> PidControl
             {
                 // Altitude hold ---------------------------------------------
 
-                if (self._altitude_target == 0) {
-                    self._altitude_target = ALTITUDE_INIT_M;
-                }
+                const auto  altitude_target =
+                    pid._altitude_target == 0 ? ALTITUDE_INIT_M :
+                    pid._altitude_target;
 
-                self._altitude_target = Num::fconstrain(
-                        self._altitude_target +
+                const auto new_altitude_target = Num::fconstrain(
+                        altitude_target +
                         setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
-                self._altitude_pid = AltitudeController::run(self._altitude_pid,
-                        hovering, dt, self._altitude_target, state.z);
+                const auto altitude_pid = AltitudeController::run(pid._altitude_pid,
+                        hovering, dt, new_altitude_target, state.z);
 
-                self._climbrate_pid = ClimbRateController::run(self._climbrate_pid,
-                        hovering, dt, self._altitude_pid.output, state.z, state.dz);
+                const auto climbrate_pid = ClimbRateController::run(pid._climbrate_pid,
+                        hovering, dt, altitude_pid.output, state.z, state.dz);
 
-                const auto thrust = self._climbrate_pid.output;
-
-                setpoint_out.thrust = thrust;
+                const auto thrust = climbrate_pid.output;
 
                 // Position hold ---------------------------------------------
 
@@ -87,28 +94,29 @@ namespace hf {
                 const auto dxb =  dxw * cospsi + dyw * sinpsi;
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
-                self._position_y_pid = PositionController::run(self._position_y_pid,
+                const auto position_y_pid = PositionController::run(pid._position_y_pid,
                         airborne, dt, setpoint_in.roll, dyb);
 
-                self._position_x_pid = PositionController::run(self._position_x_pid,
+                const auto position_x_pid = PositionController::run(pid._position_x_pid,
                         airborne, dt, setpoint_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
 
-                self._roll_pid = RollPitchPid::run(self._roll_pid, dt, airborne,
-                        self._position_y_pid.output, state.phi, state.dphi);
+                const auto roll_pid = RollPitchPid::run(pid._roll_pid, dt, airborne,
+                        position_y_pid.output, state.phi, state.dphi);
 
-                setpoint_out.roll = self._roll_pid.output;
+                const auto pitch_pid = RollPitchPid::run(pid._pitch_pid, dt, airborne,
+                        position_x_pid.output, state.theta, state.dtheta);
 
-                self._pitch_pid = RollPitchPid::run(self._pitch_pid, dt, airborne,
-                        self._position_x_pid.output, state.theta, state.dtheta);
-
-                setpoint_out.pitch = self._pitch_pid.output;
-
-                self._yaw_pid = YawPid::run(self._yaw_pid, dt, airborne, 
+                const auto yaw_pid = YawPid::run(pid._yaw_pid, dt, airborne, 
                         setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
 
-                setpoint_out.yaw = self._yaw_pid.output;
+                const auto setpoint_out = Setpoint(thrust, roll_pid.output,
+                        pitch_pid.output, yaw_pid.output);
+
+                return PidControl( altitude_target, altitude_pid,
+                        climbrate_pid, position_x_pid, position_y_pid,
+                        pitch_pid, roll_pid, yaw_pid, setpoint_out);
             }
 
             void runStabilizer(
@@ -118,7 +126,7 @@ namespace hf {
                     const float pitch_angle_demand,
                     const float yaw_demand,
                     const vehicleState_t & state,
-                    setpoint_t & setpoint_out)
+                    Setpoint & setpoint_out)
             {
                 setpoint_out.roll = _roll_pid.run(
                         dt, airborne, roll_angle_demand, state.phi, state.dphi);

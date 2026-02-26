@@ -37,17 +37,11 @@ DEPS = $(HFSRC)/*.hpp $(HFSRC)/pids/*.hpp  $(HFSRC)/sim/*.hpp \
 
 all: $(ALL)
 
-trun: twoexit
-	./twoexit
-
 twoexit: twoexit.o
 	$(C++) $(CFLAGS) -o twoexit twoexit.o
 
 twoexit.o: twoexit.cpp $(DEPS)
 	$(C++) $(CFLAGS) -c -I$(ROOT) -I$(HFSRC) twoexit.cpp
-
-prun: pingpong
-	./pingpong
 
 pingpong: pingpong.o
 	$(C++) $(CFLAGS) -o pingpong pingpong.o

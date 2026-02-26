@@ -16,16 +16,35 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Hackflight
+#include <datatypes.h>
 #include "../helper.hpp"
 #include "../autopilot.hpp"
 
-#include <sim/autopilots/twoexit.hpp>
-
+// SimSensors
+#include <simsensors/src/world.hpp>
+#include <simsensors/src/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
 static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
+static constexpr float FRAME_RATE_HZ = 32;
 
-static hf::TwoExitAutopilot _autopilot;
+static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
+{
+    const int * d = rangefinder_distances_mm;
+
+    // Look for clear (infinity reading) in center of 1x8 readings
+    const bool center_is_clear = d[3] == -1 && d[4] == -1;
+
+    // If clear, pitch forward
+    const auto pitch = center_is_clear ? 0.4 : 0;
+
+    // Otherwise, yaw rightward
+    const auto yaw = center_is_clear ? 0 : 0.2;
+
+    return hf::Setpoint(0, 0, pitch, yaw);
+}        
 
 static AutopilotHelper * _helper;
 
@@ -33,32 +52,33 @@ static AutopilotHelper * _helper;
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    PluginHelper::siminfo_t siminfo = {};
+    PluginHelper::message_t message = {};
 
-    if (_helper->get_siminfo(siminfo)) {
+    if (_helper->get_message(message)) {
+
+        static int _rangefinder_distances_mm[8];
 
         // Replace open-loop setpoint with setpoint from autopilot if
         // available
-        if (siminfo.mode == hf::MODE_AUTONOMOUS) {
-            static int _frame;
-            _autopilot.getSetpoint(_frame++, siminfo.setpoint);
-        }
+        message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+            getSetpoint(_rangefinder_distances_mm) : message.setpoint;
 
         // Get vehicle pose based on setpoint
-        const auto pose = _helper->get_pose(siminfo);
+        const auto pose = _helper->get_pose(message);
+
+        auto rangefinder = _helper->robot.rangefinders["VL53L5-forward"];
 
         // Grab rangefinder distances for next iteration
-        _autopilot.readSensor(_helper->robot, _helper->world, pose);
+        rangefinder.read(pose, _helper->world, _rangefinder_distances_mm);
 
         // Log data to file
-        _helper->write_to_log(
-                pose, _autopilot.rangefinder_distances_mm, 8);
+        _helper->write_to_log(pose, _rangefinder_distances_mm, 8);
 
         // Display rangefinder distances
         simsens::RangefinderVisualizer::show(
-                _autopilot.rangefinder_distances_mm,
-                _autopilot.get_rangefinder(_helper->robot).min_distance_m,
-                _autopilot.get_rangefinder(_helper->robot).max_distance_m,
+                _rangefinder_distances_mm,
+                rangefinder.min_distance_m,
+                rangefinder.max_distance_m,
                 8, 1, RANGEFINDER_DISPLAY_SCALEUP);
     }
 }

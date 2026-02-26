@@ -28,7 +28,7 @@
 
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
-static const char * LOGNAME = "logexit.csv";
+static const char * LOGNAME = "twoexit.csv";
 static const char * ROBOT_PATH = "../webots/protos/DiyQuad.proto";
 static const char * WORLD_PATH = "../webots/worlds/twoexit.wbt";
 
@@ -56,12 +56,10 @@ int main()
 
     const auto pose = world.getRobotPose();
 
-    hf::Simulator simulator = {};
+    auto simulator = hf::Simulator(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
 
     const auto rate = hf::TwoExitAutopilot::FRAME_RATE_HZ;
-
-    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi}, 
-           rate);
 
     for (int frame=0; frame<MAX_TIME_SEC * rate; ++frame) {
 
@@ -70,14 +68,14 @@ int main()
             hf::MODE_HOVERING :
             hf::MODE_AUTONOMOUS;
 
-        hf::setpoint_t setpoint = {};
+        hf::Setpoint setpoint = {};
 
         if (autopilot.getSetpoint(frame, setpoint)) {
             printf("succeeded\n");
             break;
         }
 
-        const auto state = simulator.step(mode, setpoint);
+        const auto state = simulator.step(mode, setpoint, rate);
 
         autopilot.readSensor(robot, world,
                 {state.x, state.y, state.z,

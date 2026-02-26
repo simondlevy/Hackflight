@@ -29,8 +29,8 @@ namespace hf {
 
             AltitudeController() = default;
 
-            AltitudeController(const AltitudeController & a) 
-                : output(a.output), _integral(a._integral) {}
+            AltitudeController(const AltitudeController & other) 
+                : output(other.output), _integral(other._integral) {}
 
             AltitudeController(const float output, const float integral)
                 : output(output), _integral(integral) {}

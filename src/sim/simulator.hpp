@@ -44,14 +44,18 @@ namespace hf {
 
         public:
 
-            void init(const Dynamics::pose_t & pose, const float framerate=32)
+            Simulator() = default;
+
+            Simulator(const Dynamics::pose_t & pose)
+               : _dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
+
+            void init(const Dynamics::pose_t & pose)
             {
                 _dynamics = Dynamics(pose);
-
-                _framerate= framerate;
             }
 
-            Dynamics::State step(const mode_e mode, const setpoint_t & setpoint)
+            Dynamics::State step(const mode_e mode, const Setpoint & setpoint,
+                    const float framerate=32)
             {
                 const auto controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
@@ -59,7 +63,7 @@ namespace hf {
                 const auto dt = 1/(float)PID_FAST_FREQ;
 
                 // Run slow PID control in outer loop ----------------------------
-                for (uint32_t i=0; i<PID_SLOW_FREQ/_framerate; ++i) {
+                for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
 
                     // Get vehicle state from dynamics and convert state values
                     // from doubles/radians to floats/degrees for PID
@@ -70,15 +74,15 @@ namespace hf {
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
-                        const auto pid_setpoint =
-                            PidControl::run(_pidControl, dt, controlled, state, setpoint);
+                        // PidControl::run(_pidControl, dt, controlled, state, setpoint);
+                        _pidControl = PidControl::run(_pidControl, dt, controlled, state, setpoint);
 
                         // Scale up new setpoint for mixer
-                        const setpoint_t scaled_setpoint = {
-                            pid_setpoint.thrust,
-                            pid_setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
-                            pid_setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
-                            pid_setpoint.yaw * YAW_MOTOR_SCALE
+                        const Setpoint scaled_setpoint = {
+                            _pidControl.setpoint.thrust,
+                            _pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
+                            _pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
+                            _pidControl.setpoint.yaw * YAW_MOTOR_SCALE
                         };
 
                         // Get motor RPMS from mixer
@@ -109,8 +113,6 @@ namespace hf {
             Dynamics _dynamics;
 
             PidControl _pidControl;
-
-            float _framerate;
 
             static vehicleState_t state2floats(const Dynamics::State s)
             {
@@ -147,25 +149,6 @@ namespace hf {
                         (float)(Num::RAD2DEG * state.psi),
                         (float)(Num::RAD2DEG * state.dpsi)
                 };
-            }
-
-
-            static void report_fps()
-            {
-                static uint32_t _count;
-                static uint32_t _sec_prev;
-
-                time_t now = time(0);
-                struct tm * tm = localtime(&now);
-                const uint32_t sec_curr = tm->tm_sec;
-                if (sec_curr - _sec_prev >= 1) {
-                    if (_sec_prev > 0) {
-                        printf("%d\n", _count);
-                    }
-                    _sec_prev = sec_curr;
-                    _count = 0;
-                }
-                _count++;
             }
     };
 }

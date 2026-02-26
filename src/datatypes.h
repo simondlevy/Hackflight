@@ -74,14 +74,23 @@ namespace hf {
 
     } axis4_t;
 
-    typedef struct {
+    class Setpoint {
 
-        float thrust;  // positve upward
-        float roll;    // positive roll right
-        float pitch;   // positive nose down
-        float yaw;     // positive nose right
+        public:
 
-    } setpoint_t;
+            float thrust;  // positve upward
+            float roll;    // positive roll right
+            float pitch;   // positive nose down
+            float yaw;     // positive nose right
 
-    typedef void (*mixFun_t)(const setpoint_t & setpoint, float motorvals[]);
+            Setpoint() = default;
+
+            Setpoint
+                (const float t, const float r, const float p, const float y) 
+                : thrust(t), roll(r), pitch(p), yaw(y) {}
+
+            Setpoint& operator=(const Setpoint& other) = default;
+    };
+
+    typedef void (*mixFun_t)(const Setpoint & setpoint, float motorvals[]);
 }

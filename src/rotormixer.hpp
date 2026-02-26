@@ -27,7 +27,7 @@ namespace hf {
         public:
 
             static float * mix(
-                    const setpoint_t & setpoint,
+                    const Setpoint & setpoint,
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,
@@ -39,7 +39,7 @@ namespace hf {
             }        
 
             static void mix(
-                    const setpoint_t & setpoint,
+                    const Setpoint & setpoint,
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,

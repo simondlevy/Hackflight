@@ -29,7 +29,7 @@
 
 static constexpr float MAX_TIME_SEC = 10;
 static constexpr float TAKEOFF_TIME_SEC = 2;
-static const char * LOGNAME = "logpong.csv";
+static const char * LOGNAME = "pingpong.csv";
 static const char * ROBOT_PATH = "../webots/protos/DiyQuad.proto";
 static const char * WORLD_PATH = "../webots/worlds/pingpong.wbt";
 static constexpr float FRAME_RATE_HZ = 32;
@@ -58,12 +58,10 @@ int main()
 
     const auto pose = world.getRobotPose();
 
-    hf::Simulator simulator = {};
+    auto simulator = hf::Simulator(
+            {pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi});
 
-    simulator.init({pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi},
-            FRAME_RATE_HZ);
-
-   autopilot.init();
+    hf::PingPongAutopilot::init();
 
     for (int frame=0; frame<MAX_TIME_SEC * FRAME_RATE_HZ; ++frame) {
 
@@ -77,13 +75,13 @@ int main()
         const auto state = simulator.getVehicleState();
 
         // Get setpoint from autopilot if available
-        hf::setpoint_t setpoint = {};
-        if (mode == hf::MODE_AUTONOMOUS) {
-            autopilot.getSetpoint(state.dy, setpoint);
-        }
+        const auto setpoint =
+            mode == hf::MODE_AUTONOMOUS ?
+            hf::PingPongAutopilot::getSetpoint(autopilot, state.dy) :
+            hf::Setpoint();
 
         // Get new state based on setpoint
-        const auto newstate = simulator.step(mode, setpoint);
+        const auto newstate = simulator.step(mode, setpoint, FRAME_RATE_HZ);
 
         // Grab rangefinder readings for next iteration
         autopilot.readSensors(robot, world,
