@@ -33,7 +33,7 @@
 static constexpr int DISTANCE_DIFFERENCE_THRESHOLD = 1800;
 static constexpr float SPEED = 0.5;
 
-static AutopilotHelper * _helper;
+static AutopilotHelper * _ahelper;
 
 static int readRangefinder(
         const string name,
@@ -80,7 +80,7 @@ DLLEXPORT void webots_physics_step()
     auto message = PluginHelper::get_message();
 
     // Get current vehicle state
-    const auto state = _helper->get_state_from_message(message);
+    const auto state = _ahelper->get_state_from_message(message);
 
     static int _distance_forward_mm;
     static int _distance_backward_mm;
@@ -93,27 +93,27 @@ DLLEXPORT void webots_physics_step()
         message.setpoint;
 
     // Get vehicle pose based on setpoint
-    const auto pose = _helper->get_pose(message);
+    const auto pose = _ahelper->get_pose(message);
 
     // Grab rangefinder readings for next iteration
     _distance_forward_mm = readRangefinder("VL53L1-forward",
-            _helper->robot, _helper->world, pose);
+            _ahelper->robot, _ahelper->world, pose);
     _distance_backward_mm = readRangefinder("VL53L1-backward",
-            _helper->robot, _helper->world, pose);
+            _ahelper->robot, _ahelper->world, pose);
 
     // Log data to file
     const int distances[] = {_distance_forward_mm, _distance_backward_mm};
-    _helper->write_to_log(pose, distances, 2);
+    _ahelper->write_to_log(pose, distances, 2);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _helper;
+    delete _ahelper;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
     srand(time(NULL)); 
 
-    _helper = new AutopilotHelper("pingpong");
+    _ahelper = new AutopilotHelper("pingpong");
 }
