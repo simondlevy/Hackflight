@@ -114,7 +114,7 @@ namespace hf {
                 const auto setpoint_out = Setpoint(thrust, roll_pid.output,
                         pitch_pid.output, yaw_pid.output);
 
-                return PidControl( altitude_target, altitude_pid,
+                return PidControl(new_altitude_target, altitude_pid,
                         climbrate_pid, position_x_pid, position_y_pid,
                         pitch_pid, roll_pid, yaw_pid, setpoint_out);
             }
