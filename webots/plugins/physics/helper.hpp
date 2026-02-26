@@ -70,12 +70,8 @@ class PluginHelper {
         }
 
         // Get sim info from main program
-        bool get_message(message_t & message)
+        static bool get_message(message_t & message)
         {
-            if (robotBody == NULL) {
-                return false;
-            }
-
             int bytes_received = 0;
 
             const auto buffer = (message_t *)dWebotsReceive(&bytes_received);

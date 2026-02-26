@@ -25,7 +25,7 @@ DLLEXPORT void webots_physics_step()
 {
     PluginHelper::message_t message = {};
 
-    if (_helper->get_message(message)) {
+    if (PluginHelper::get_message(message)) {
 
         const auto state = _helper->get_state_from_message(message);
 
