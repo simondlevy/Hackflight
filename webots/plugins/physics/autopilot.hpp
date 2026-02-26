@@ -73,16 +73,17 @@ class AutopilotHelper {
             delete _helper;
         }
 
-        hf:: Dynamics::State get_state_from_message(
-                const PluginHelper::message_t & message)
+        auto get_state(const PluginHelper::message_t & message)
+            -> hf::Dynamics::State
         {
-            return _helper->get_state_from_message(message);
+            return _helper->run_simulator(message.mode, message.setpoint);
         }
 
-        simsens::Pose get_pose(const PluginHelper::message_t & message)
+        auto get_pose(const hf::mode_e mode, const hf::Setpoint & setpoint)
+            -> simsens::Pose
         {
             // Use setpoint to get new state
-            const auto state = _helper->get_state_from_message(message);
+            const auto state = _helper->run_simulator(mode, setpoint);
 
             // Extract pose from state
             const simsens::Pose pose = {
@@ -101,7 +102,7 @@ class AutopilotHelper {
             return pose;
         }
 
-        void write_to_log(
+        auto write_to_log(
                 const simsens::Pose & pose,
                 const int * rangefinder_distances,
                 const int n_distances)

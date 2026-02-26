@@ -77,23 +77,23 @@ static auto getSetpoint(
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    auto message = PluginHelper::get_message();
+    const auto message = PluginHelper::get_message();
 
     // Get current vehicle state
-    const auto state = _ahelper->get_state_from_message(message);
+    const auto state = _ahelper->get_state(message);
 
     static int _distance_forward_mm;
     static int _distance_backward_mm;
 
     // Replace open-loop setpoint with setpoint from autopilot if
     // available
-    message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+    const auto setpoint = message.mode == hf::MODE_AUTONOMOUS ?
         getSetpoint(_distance_forward_mm, 
                 _distance_backward_mm, state.dy) :
         message.setpoint;
 
     // Get vehicle pose based on setpoint
-    const auto pose = _ahelper->get_pose(message);
+    const auto pose = _ahelper->get_pose(message.mode, setpoint);
 
     // Grab rangefinder readings for next iteration
     _distance_forward_mm = readRangefinder("VL53L1-forward",

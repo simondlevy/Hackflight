@@ -87,13 +87,13 @@ class PluginHelper {
             return message;
         }
 
-
-        hf:: Dynamics::State get_state_from_message(const message_t & message)
+        auto run_simulator(const hf::mode_e mode, const hf::Setpoint & setpoint)
+            -> hf::Dynamics::State
         {
-            return _simulator.step(message.mode, message.setpoint);
+            return _simulator.step(mode, setpoint);
         }
 
-        void set_dbody_from_state(const hf::Dynamics::State & state)
+        auto set_dbody_from_state(const hf::Dynamics::State & state)
         {
             // Negate Y to make leftward positive
             dBodySetPosition(robotBody, state.x, -state.y, state.z);
@@ -109,7 +109,7 @@ class PluginHelper {
 
     private:
 
-        static hf::axis4_t euler2quat(const hf::axis3_t & angles)
+        static auto euler2quat(const hf::axis3_t & angles) -> hf::axis4_t 
         {
             // Abbreviations for the various angular functions
 

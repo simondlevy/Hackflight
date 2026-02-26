@@ -25,7 +25,7 @@ DLLEXPORT void webots_physics_step()
 {
     const auto message = PluginHelper::get_message();
 
-    const auto state = _helper->get_state_from_message(message);
+    const auto state = _helper->run_simulator(message.mode, message.setpoint);
 
     _helper->set_dbody_from_state(state);
 }
