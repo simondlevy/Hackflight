@@ -51,9 +51,13 @@ class PluginHelper {
         } message_t;
 
         dBodyID robotBody;
+       
+        PluginHelper() : PluginHelper({0, 0, 0, 0, 0, 0}) {}
 
-        PluginHelper()
+        PluginHelper(const hf::Dynamics::pose_t & startingPose)
         {
+            _simulator = hf::Simulator(startingPose);
+
             robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
             if (robotBody == NULL) {
@@ -89,14 +93,7 @@ class PluginHelper {
 
         hf:: Dynamics::State get_state_from_message(const message_t & message)
         {
-            // Set pose first time around
-            static bool _ready;
-            if (!_ready) {
-                _simulator = hf::Simulator(message.startingPose);
-            }
-            _ready = true;
-
-            return _simulator.step(message.mode, message.setpoint, message.framerate);
+            return _simulator.step(message.mode, message.setpoint);
         }
 
         void set_dbody_from_state(const hf::Dynamics::State & state)

@@ -47,21 +47,25 @@ class AutopilotHelper {
         {
             const auto pwd = getenv(PATH_VARIABLE_NAME);
 
-            char path[1000] = {};
+            char world_path[256] = {};
+            sprintf(world_path, "%s/../../worlds/%s.wbt", pwd, worldname);
 
-            sprintf(path, "%s/../../worlds/%s.wbt", pwd, worldname);
-            simsens::WorldParser::parse(path, world);
+            char robot_path[256] = {};
+            sprintf(robot_path, "%s/../../protos/DiyQuad.proto", pwd);
 
-            sprintf(path, "%s/../../protos/DiyQuad.proto", pwd);
-            simsens::RobotParser::parse(path, robot);
+            simsens::WorldParser::parse(world_path, world, robot_path);
 
-            sprintf(path, "%s/%s.csv", pwd, worldname);
-            _logfile = fopen(path, "w");
+            simsens::RobotParser::parse(robot_path, robot);
+
+            char log_path[256] = {};
+            sprintf(log_path, "%s/%s.csv", pwd, worldname);
+            _logfile = fopen(log_path, "w");
             fprintf(_logfile, "%s\n", worldname);
 
             _collided = false;
             
-            _helper = new PluginHelper();
+            const auto p = world.robotPose;
+            _helper = new PluginHelper({p.x, p.y, p.z, p.phi, p.theta, p.psi});
         }
 
         ~AutopilotHelper()
