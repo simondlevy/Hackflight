@@ -152,7 +152,7 @@ namespace hf {
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,
-                    const world_params_t wparams = { 9.807, 1.225 })
+                    const world_params_t wparams = { 9.807, 1.225 }) -> Dynamics
             {
                 const auto cphi = cos(dyn.state.phi);
                 const auto cnphi = cos(-dyn.state.phi);
