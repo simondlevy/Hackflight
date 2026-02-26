@@ -77,36 +77,33 @@ static auto getSetpoint(
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    PluginHelper::message_t message = {};
+    auto message = PluginHelper::get_message();
 
-    if (_helper->get_message(message)) {
+    // Get current vehicle state
+    const auto state = _helper->get_state_from_message(message);
 
-        // Get current vehicle state
-        const auto state = _helper->get_state_from_message(message);
+    static int _distance_forward_mm;
+    static int _distance_backward_mm;
 
-        static int _distance_forward_mm;
-        static int _distance_backward_mm;
+    // Replace open-loop setpoint with setpoint from autopilot if
+    // available
+    message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+        getSetpoint(_distance_forward_mm, 
+                _distance_backward_mm, state.dy) :
+        message.setpoint;
 
-        // Replace open-loop setpoint with setpoint from autopilot if
-        // available
-        message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
-            getSetpoint(_distance_forward_mm, 
-                    _distance_backward_mm, state.dy) :
-            message.setpoint;
+    // Get vehicle pose based on setpoint
+    const auto pose = _helper->get_pose(message);
 
-        // Get vehicle pose based on setpoint
-        const auto pose = _helper->get_pose(message);
+    // Grab rangefinder readings for next iteration
+    _distance_forward_mm = readRangefinder("VL53L1-forward",
+            _helper->robot, _helper->world, pose);
+    _distance_backward_mm = readRangefinder("VL53L1-backward",
+            _helper->robot, _helper->world, pose);
 
-        // Grab rangefinder readings for next iteration
-        _distance_forward_mm = readRangefinder("VL53L1-forward",
-                _helper->robot, _helper->world, pose);
-        _distance_backward_mm = readRangefinder("VL53L1-backward",
-                _helper->robot, _helper->world, pose);
-
-        // Log data to file
-        const int distances[] = {_distance_forward_mm, _distance_backward_mm};
-        _helper->write_to_log(pose, distances, 2);
-    }
+    // Log data to file
+    const int distances[] = {_distance_forward_mm, _distance_backward_mm};
+    _helper->write_to_log(pose, distances, 2);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

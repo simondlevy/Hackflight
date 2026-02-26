@@ -70,11 +70,13 @@ class PluginHelper {
         }
 
         // Get sim info from main program
-        static bool get_message(message_t & message)
+        static auto get_message() -> message_t
         {
             int bytes_received = 0;
 
             const auto buffer = (message_t *)dWebotsReceive(&bytes_received);
+
+            message_t message = {};
 
             const auto ready = bytes_received == sizeof(message_t);
 
@@ -82,8 +84,9 @@ class PluginHelper {
                 memcpy(&message, buffer, sizeof(message));
             }
 
-            return ready;
+            return message;
         }
+
 
         hf:: Dynamics::State get_state_from_message(const message_t & message)
         {

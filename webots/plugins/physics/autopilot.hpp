@@ -101,11 +101,6 @@ class AutopilotHelper {
             return pose;
         }
 
-        bool get_message(PluginHelper::message_t & message)
-        {
-            return _collided ? false : _helper->get_message(message);
-        }
-
         void write_to_log(
                 const simsens::Pose & pose,
                 const int * rangefinder_distances,

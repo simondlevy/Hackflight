@@ -52,35 +52,32 @@ static AutopilotHelper * _helper;
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    PluginHelper::message_t message = {};
+    auto message = PluginHelper::get_message();
 
-    if (_helper->get_message(message)) {
+    static int _rangefinder_distances_mm[8];
 
-        static int _rangefinder_distances_mm[8];
+    // Replace open-loop setpoint with setpoint from autopilot if
+    // available
+    message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+        getSetpoint(_rangefinder_distances_mm) : message.setpoint;
 
-        // Replace open-loop setpoint with setpoint from autopilot if
-        // available
-        message.setpoint = message.mode == hf::MODE_AUTONOMOUS ?
-            getSetpoint(_rangefinder_distances_mm) : message.setpoint;
+    // Get vehicle pose based on setpoint
+    const auto pose = _helper->get_pose(message);
 
-        // Get vehicle pose based on setpoint
-        const auto pose = _helper->get_pose(message);
+    auto rangefinder = _helper->robot.rangefinders["VL53L5-forward"];
 
-        auto rangefinder = _helper->robot.rangefinders["VL53L5-forward"];
+    // Grab rangefinder distances for next iteration
+    rangefinder.read(pose, _helper->world, _rangefinder_distances_mm);
 
-        // Grab rangefinder distances for next iteration
-        rangefinder.read(pose, _helper->world, _rangefinder_distances_mm);
+    // Log data to file
+    _helper->write_to_log(pose, _rangefinder_distances_mm, 8);
 
-        // Log data to file
-        _helper->write_to_log(pose, _rangefinder_distances_mm, 8);
-
-        // Display rangefinder distances
-        simsens::RangefinderVisualizer::show(
-                _rangefinder_distances_mm,
-                rangefinder.min_distance_m,
-                rangefinder.max_distance_m,
-                8, 1, RANGEFINDER_DISPLAY_SCALEUP);
-    }
+    // Display rangefinder distances
+    simsens::RangefinderVisualizer::show(
+            _rangefinder_distances_mm,
+            rangefinder.min_distance_m,
+            rangefinder.max_distance_m,
+            8, 1, RANGEFINDER_DISPLAY_SCALEUP);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
