@@ -43,8 +43,6 @@ class PluginHelper {
 
         typedef struct {
 
-            hf::Dynamics::pose_t startingPose;
-            float framerate;
             hf::mode_e mode;
             hf::Setpoint setpoint;
 
@@ -71,6 +69,7 @@ class PluginHelper {
             }
         }
 
+        // Get sim info from main program
         bool get_message(message_t & message)
         {
             if (robotBody == NULL) {
@@ -79,7 +78,6 @@ class PluginHelper {
 
             int bytes_received = 0;
 
-            // Get sim info from main program
             const auto buffer = (message_t *)dWebotsReceive(&bytes_received);
 
             const auto ready = bytes_received == sizeof(message_t);

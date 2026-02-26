@@ -170,11 +170,7 @@ def main():
 
     buttons_down = {'hover': False, 'auto': False}
 
-    xyz = gps.getValues()
-    rpy = imu.getRollPitchYaw()
-
-    # Negate for leftward/nose-right positive
-    startpose = (xyz[0], -xyz[1], xyz[2], rpy[0], rpy[1], -rpy[2])
+    zstart = gps.getValues()[2]
 
     cmdinfo = 'idle', 0, 0, 0, 0
 
@@ -197,17 +193,12 @@ def main():
 
         # On descent, switch mode to idle when close enough to ground
         if (mode == 'landing' and
-           (gps.getValues()[2] - startpose[2]) < ZDIST_LANDING_MAX_M):
+           (gps.getValues()[2] - zstart) < ZDIST_LANDING_MAX_M):
            mode = 'idle'
 
         # Send siminfo to fast thread
-        emitter.send(struct.pack(
-                'ddddddfIffff',
-                startpose[0], startpose[1], startpose[2],  # starting pose
-                startpose[3], startpose[4], startpose[5],
-                timestep,                                 # framerate
-                int(MODES[mode]),                         # mode
-                cmdinfo[1], cmdinfo[2], cmdinfo[3], cmdinfo[4]))  # setpoint
+        emitter.send(struct.pack('Iffff', int(MODES[mode]),
+                                  cmdinfo[1], cmdinfo[2], cmdinfo[3], cmdinfo[4]))  # setpoint
 
 
 main()
