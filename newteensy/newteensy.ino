@@ -31,7 +31,8 @@
 #include <datatypes.h>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <new_pidcontrol.hpp>
+#include <newpids/position.hpp>
+#include <stabilizer_pid.hpp>
 
 static MPU6050 _mpu6050;
 
@@ -62,8 +63,8 @@ static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 // LED -------------------------------------------------------------
 
-//static const uint8_t LED_PIN = 14; // external 
-static const uint8_t LED_PIN = 13; // built-in
+static const uint8_t LED_PIN = 14; // external 
+//static const uint8_t LED_PIN = 13; // built-in
 
 // Safety ----------------------------------------------------------
 
@@ -277,21 +278,19 @@ void loop()
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    hf::Setpoint pid_setpoint = { (_channel_values[0]+1)/2, 0, 0, 0 };
+    hf::Setpoint setpoint = {
+        (_channel_values[0]+1)/2,
+        _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
+        _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
+        _channel_values[3]};
 
-    static hf::PidControl _pidControl;
+    static hf::StabilizerPid _stabilizerPid;
 
-    _pidControl.runStabilizer(
-            dt,
-            !throttle_is_down, 
-            _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
-            _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
-            _channel_values[3],
-            state,
-            pid_setpoint);
+    _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid, !throttle_is_down,
+            dt, state, setpoint);
 
     float motorvals[4] = {};
-    hf::Mixer::mix(pid_setpoint, motorvals);
+    hf::Mixer::mix(_stabilizerPid.setpoint, motorvals);
 
     _motors.run(_armed, motorvals);
 
