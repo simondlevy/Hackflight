@@ -119,11 +119,6 @@ namespace hf {
                         pitch_pid, roll_pid, yaw_pid, setpoint_out);
             }
 
-            void serializeMessage(MspSerializer & serializer)
-            {
-                (void)serializer;
-            }
-
         private:
 
             static constexpr float ALTITUDE_INIT_M = 0.4;
