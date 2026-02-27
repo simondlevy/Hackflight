@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2011-2022 Bitcraze AB, 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,23 @@
 
 #pragma once
 
-#include <msp/serializer.hpp>
 #include <pidcontrol/newpids/altitude.hpp>
 #include <pidcontrol/newpids/climbrate.hpp>
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/newpids/rollpitch.hpp>
 #include <pidcontrol/newpids/yaw.hpp>
+#include <pidcontrol/stabilizer.hpp>
 
 namespace hf {
 
     class PidControl {
+
+        private:
+
+            static constexpr float ALTITUDE_INIT_M = 0.4;
+            static constexpr float ALTITUDE_MAX_M = 1.0;
+            static constexpr float ALTITUDE_MIN_M = 0.2;
+            static constexpr float ALTITUDE_INC_MPS = 0.2;
 
         public:
 
@@ -41,9 +48,7 @@ namespace hf {
                     const ClimbRateController & climbrate_pid,
                     const PositionController & position_x_pid,
                     const PositionController & position_y_pid,
-                    const RollPitchPid & pitch_pid,
-                    const RollPitchPid & roll_pid,
-                    const YawPid & yaw_pid,
+                    const StabilizerPid & stabilizer_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
                 _altitude_target(altitude_target),
@@ -51,9 +56,7 @@ namespace hf {
                 _climbrate_pid(climbrate_pid),
                 _position_x_pid(position_x_pid),
                 _position_y_pid(position_y_pid),
-                _pitch_pid(pitch_pid),
-                _roll_pid(roll_pid),
-                _yaw_pid(yaw_pid) {}
+                _stabilizer_pid(stabilizer_pid) {}
 
             static auto run(
                     const PidControl & pid,
@@ -102,31 +105,19 @@ namespace hf {
 
                 //  Stabilization ---------------------------------------------
 
-                const auto roll_pid = RollPitchPid::run(pid._roll_pid, dt, airborne,
-                        position_y_pid.output, state.phi, state.dphi);
+                const auto setpoint_mid = Setpoint(thrust,
+                        position_y_pid.output, position_x_pid.output,
+                        setpoint_in.yaw);
 
-                const auto pitch_pid = RollPitchPid::run(pid._pitch_pid, dt, airborne,
-                        position_x_pid.output, state.theta, state.dtheta);
-
-                const auto yaw_pid = YawPid::run(pid._yaw_pid, dt, airborne, 
-                        setpoint_in.yaw * MAX_YAW_DEMAND_DPS, state.dpsi);
-
-                const auto setpoint_out = Setpoint(thrust, roll_pid.output,
-                        pitch_pid.output, yaw_pid.output);
+                const auto stabilizer_pid = StabilizerPid::run(
+                        pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
 
                 return PidControl(new_altitude_target, altitude_pid,
                         climbrate_pid, position_x_pid, position_y_pid,
-                        pitch_pid, roll_pid, yaw_pid, setpoint_out);
+                        stabilizer_pid, stabilizer_pid.setpoint);
             }
 
         private:
-
-            static constexpr float ALTITUDE_INIT_M = 0.4;
-            static constexpr float ALTITUDE_MAX_M = 1.0;
-            static constexpr float ALTITUDE_MIN_M = 0.2;
-            static constexpr float ALTITUDE_INC_MPS = 0.2;
-
-            static constexpr float MAX_YAW_DEMAND_DPS = 160;     
 
             float _altitude_target;
 
@@ -137,9 +128,6 @@ namespace hf {
             PositionController _position_x_pid;
             PositionController _position_y_pid;
 
-            RollPitchPid _pitch_pid;
-            RollPitchPid _roll_pid;
-
-            YawPid _yaw_pid;
+            StabilizerPid _stabilizer_pid;
     };
 }
