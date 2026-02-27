@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 #include <pidcontrol/newpids/rollpitch.hpp>
 #include <pidcontrol/newpids/yaw.hpp>
-#include <msp/serializer.hpp>
 
 namespace hf {
 
@@ -26,7 +25,7 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_YAW_DEMAND_DPS = 160;     
+            static constexpr float YAW_MAX_DPS = 160;     
 
         public:
 
@@ -60,7 +59,7 @@ namespace hf {
                         dt, airborne, setpoint_in.pitch, state.theta, state.dtheta);
 
                 const auto yaw_pid = YawPid::run(s._yaw_pid,
-                        dt, airborne, setpoint_in.yaw, state.dpsi);
+                        dt, airborne, setpoint_in.yaw * YAW_MAX_DPS, state.dpsi);
 
                 const auto setpoint_out = Setpoint(
                         setpoint_in.thrust,
@@ -71,11 +70,6 @@ namespace hf {
                 return StabilizerPid(
                         roll_pid, pitch_pid, yaw_pid, setpoint_out);
              }
-
-            void serializeMessage(MspSerializer & serializer)
-            {
-                (void)serializer;
-            }
 
         private:
 
