@@ -51,7 +51,8 @@ void serialEvent1(void)
 
 // Motors ---------------------------------------------------------
 
-static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
+// static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
+static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 // IMU ------------------------------------------------------------
 
@@ -63,8 +64,8 @@ static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 // LED -------------------------------------------------------------
 
-static const uint8_t LED_PIN = 14; // external 
-//static const uint8_t LED_PIN = 13; // built-in
+// static const uint8_t LED_PIN = 14; // external 
+static const uint8_t LED_PIN = 13; // built-in
 
 // Safety ----------------------------------------------------------
 
