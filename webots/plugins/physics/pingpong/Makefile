@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ALL = $(shell basename "`pwd`")
+NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
 
@@ -27,15 +27,15 @@ SRC_DIR = ../../../../src
 INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(ALL).cpp
+CXX_SOURCES = $(NAME).cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-all: lib$(ALL).so
+all: lib$(NAME).so
 
 edit:
-	vim $(ALL).cpp
+	vim $(NAME).cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

@@ -14,9 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ALL = $(shell basename "`pwd`")
+NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
+
+APP = dronepong
+
+EMBEDDER = $(HOME)/Desktop/embedded-framework/bin/framework_embedder
 
 SIMSENSORS_DIR = $(HOME)/Desktop
 
@@ -27,15 +31,20 @@ SRC_DIR = ../../../../src
 INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(ALL).cpp
+CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-all: lib$(ALL).so
+FILES_TO_REMOVE += embedded_$(APP).cpp
+
+all: lib$(NAME).so
+
+embedded_$(APP).cpp:
+	$(EMBEDDER) < $(fr)/cpp-apps/networks/$(APP)_risp_train.txt > embedded_$(APP).cpp
 
 edit:
-	vim $(ALL).cpp
+	vim $(NAME).cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

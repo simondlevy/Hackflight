@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-ALL = $(shell basename "`pwd`")
+NAME = $(shell basename "`pwd`")
 
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
@@ -22,12 +22,12 @@ SRC = ../../../../src
 
 INCLUDE = -I$(SRC) -I$(SRC)/control
 
-CXX_SOURCES = $(ALL).cpp
+CXX_SOURCES = $(NAME).cpp
 
-all: lib$(ALL).so
+all: lib$(NAME).so
 
 edit:
-	vim $(ALL).cpp
+	vim $(NAME).cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
