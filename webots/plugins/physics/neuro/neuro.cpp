@@ -57,18 +57,16 @@ static auto getSetpoint(
 {
     const auto diff = distance_forward_mm - distance_backward_mm;
 
-    const int8_t direction = 
+    extern double encoder_vals[2];
+    encoder_vals[0] = diff;
+    encoder_vals[1] = dydt;
 
-        // (Nearly) motionless on startup; move in a random
-        // direction (forward or backward)
-        fabs(dydt) < 1e-6 ? 2 * (rand() % 2) - 1 :
+    extern void encode_run_decode();
+    encode_run_decode();
 
-        // Too close to either wall; switch direction
-        diff > DISTANCE_DIFFERENCE_THRESHOLD ? +1 :
-        diff < -DISTANCE_DIFFERENCE_THRESHOLD ? - 1 :
+    extern double decoder_vals[1];
 
-        // Otherwise, continue in same direction
-        dydt > 0 ? -1 : +1;
+    const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
     return hf::Setpoint(0, 0, direction * SPEED, 0);
 }
