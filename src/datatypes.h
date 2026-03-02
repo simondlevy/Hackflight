@@ -74,6 +74,58 @@ namespace hf {
 
     } axis4_t;
 
+    class Vec2 {
+
+        public:
+
+            float x;
+            float y;
+
+            Vec2() = default;
+
+            Vec2
+                (const float x, const float y) 
+                : x(x), y(y) {}
+
+            Vec2& operator=(const Vec2& other) = default;
+     };
+
+    class Vec3 {
+
+        public:
+
+            float x;
+            float y;
+            float z;
+
+            Vec3() = default;
+
+            Vec3
+                (const float x, const float y, const float z) 
+                : x(x), y(y), z(z) {}
+
+            Vec3& operator=(const Vec3& other) = default;
+     };
+
+    class Vec4 {
+
+        public:
+
+            float w;
+            float x;
+            float y;
+            float z;
+
+            Vec4() = default;
+
+            Vec4
+                (const float w, const float x, const float y, const float z) 
+                : w(w), x(x), y(y), z(z) {}
+
+            Vec4& operator=(const Vec4& other) = default;
+     };
+
+
     class Setpoint {
 
         public:

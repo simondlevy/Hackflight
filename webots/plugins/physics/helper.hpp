@@ -100,8 +100,8 @@ class PluginHelper {
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
-            const hf::axis3_t euler = { (float)state.phi, (float)state.theta, (float)-state.psi};
-            const hf::axis4_t quat = euler2quat(euler);
+            const hf::Vec3 euler = { (float)state.phi, (float)state.theta, (float)-state.psi};
+            const hf::Vec4 quat = euler2quat(euler);
 
             const dQuaternion q = {quat.w, quat.x, quat.y, quat.z};
             dBodySetQuaternion(robotBody, q);
@@ -109,7 +109,7 @@ class PluginHelper {
 
     private:
 
-        static auto euler2quat(const hf::axis3_t & angles) -> hf::axis4_t 
+        static auto euler2quat(const hf::Vec3 & angles) -> hf::Vec4 
         {
             // Abbreviations for the various angular functions
 
