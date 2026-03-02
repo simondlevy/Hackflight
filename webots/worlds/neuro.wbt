@@ -1,0 +1,49 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
+EXTERNPROTO "../protos/DiyQuad.proto"
+
+WorldInfo {
+  title "Hackflight"
+  physics "neuro"
+  ### gravity 0
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.0003176718890822768 0.9999069471299215 -0.013638041131020262 0.8248681887802143
+  position -1.9331339285684632 0.08331128415878952 3.1094423098913775
+  follow "DiyQuad"
+}
+DEF diyquad DiyQuad {
+  translation 1.02 -0.05 0.0131967
+  rotation -1.56804e-18 -1.60403e-18 1 1.5708
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Floor {
+}
+DEF wall Wall {
+  translation 1.14986 1.22927 0
+  rotation 0 0 1 1.57
+  name "wall_left"
+  size 0.05 2 1
+}
+DEF wall Wall {
+  translation 1.17792 -1.10071 0
+  rotation 0 0 1 1.57
+  name "wall_right"
+  size 0.05 2 1
+}
