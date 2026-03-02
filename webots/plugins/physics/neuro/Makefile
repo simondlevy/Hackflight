@@ -20,7 +20,7 @@ OPENCV_DIR = /usr/include/opencv4
 
 APP = dronepong
 
-EMBEDDER = $(HOME)/Desktop/embedded-framework/bin/framework_embedder
+EMBEDDER = $(HOME)/Desktop/embedded-framework-simon/bin/framework_embedder
 
 SIMSENSORS_DIR = $(HOME)/Desktop
 
