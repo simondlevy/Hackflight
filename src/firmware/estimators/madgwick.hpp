@@ -31,33 +31,43 @@ namespace hf {
 
             void initialize()
             {
-                _q0 = 1;
-                _q1 = 0;
-                _q2 = 0;
-                _q3 = 0;
+                _quat.w = 1;
+                _quat.x = 0;
+                _quat.y = 0;
+                _quat.z = 0;
+
+                _accel.x = 0;
+                _accel.y = 0;
+                _accel.z = 0;
+
+                _gyro.x = 0;
+                _gyro.y = 0;
+                _gyro.z = 0;
             }
 
             void getEulerAngles(
                     const float dt,
-                    const float gyro_x, const float gyro_y, const float gyro_z,
-                    const float accel_x, const float accel_y, const float accel_z,
-                    float & phi, float & theta, float & psi)
+                    const Vec3 & gyro,
+                    const Vec3 & accel,
+                    Vec3 & angles)
             {
                 // LP filter gyro data
-                auto gx = (1 - B_GYRO) * _gx_prev + B_GYRO * gyro_x;
-                auto gy = (1 - B_GYRO) * _gy_prev + B_GYRO * gyro_y;
-                auto gz = (1 - B_GYRO) * _gz_prev + B_GYRO * gyro_z;
-                _gx_prev = gx;
-                _gy_prev = gy;
-                _gz_prev = gz;
+                auto gx = (1 - B_GYRO) * _gyro.x + B_GYRO * gyro.x;
+                auto gy = (1 - B_GYRO) * _gyro.y + B_GYRO * gyro.y;
+                auto gz = (1 - B_GYRO) * _gyro.z + B_GYRO * gyro.z;
+
+                _gyro.x = gx;
+                _gyro.y = gy;
+                _gyro.z = gz;
 
                 // LP filter accelerometer data
-                auto ax = (1 - B_ACCEL) * _ax_prev + B_ACCEL * accel_x;
-                auto ay = (1 - B_ACCEL) * _ay_prev + B_ACCEL * accel_y;
-                auto az = (1 - B_ACCEL) * _az_prev + B_ACCEL * accel_z;
-                _ax_prev = ax;
-                _ay_prev = ay;
-                _az_prev = az;
+                auto ax = (1 - B_ACCEL) * _accel.x + B_ACCEL * accel.x;
+                auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
+                auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
+
+                _accel.x = ax;
+                _accel.y = ay;
+                _accel.z = az;
 
                 // Convert gyroscope degrees/sec to radians/sec
                 gx /= Num::RAD2DEG;
@@ -65,14 +75,15 @@ namespace hf {
                 gz /= Num::RAD2DEG;
 
                 // Compute rate of change of quaternion from gyroscope
-                auto qDot1 = 0.5f * (-_q1 * gx - _q2 * gy - _q3 * gz);
-                auto qDot2 = 0.5f * (_q0 * gx + _q2 * gz - _q3 * gy);
-                auto qDot3 = 0.5f * (_q0 * gy - _q1 * gz + _q3 * gx);
-                auto qDot4 = 0.5f * (_q0 * gz + _q1 * gy - _q2 * gx);
+                auto qdot = Vec4(
+                        0.5 * (-_quat.x * gx - _quat.y * gy - _quat.z * gz),
+                        0.5 * (_quat.w * gx + _quat.y * gz - _quat.z * gy),
+                        0.5 * (_quat.w * gy - _quat.x * gz + _quat.z * gx),
+                        0.5 * (_quat.w * gz + _quat.x * gy - _quat.y * gx));
 
                 // Compute feedback only if accelerometer measurement valid
                 // (avoids NaN in accelerometer normalisation)
-                if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
+                if(!((ax == 0) && (ay == 0) && (az == 0))) {
 
                     // Normalise accelerometer measurement
                     auto recipNorm = invSqrt(ax * ax + ay * ay + az * az);
@@ -81,73 +92,77 @@ namespace hf {
                     az *= recipNorm;
 
                     // Auxiliary variables to avoid repeated arithmetic
-                    const auto _2q0 = 2.0f * _q0;
-                    const auto _2q1 = 2.0f * _q1;
-                    const auto _2q2 = 2.0f * _q2;
-                    const auto _2q3 = 2.0f * _q3;
-                    const auto _4q0 = 4.0f * _q0;
-                    const auto _4q1 = 4.0f * _q1;
-                    const auto _4q2 = 4.0f * _q2;
-                    const auto _8q1 = 8.0f * _q1;
-                    const auto _8q2 = 8.0f * _q2;
-                    const auto q0q0 = _q0 * _q0;
-                    const auto q1q1 = _q1 * _q1;
-                    const auto q2q2 = _q2 * _q2;
-                    const auto q3q3 = _q3 * _q3;
+                    const auto _2q0 = 2 * _quat.w;
+                    const auto _2q1 = 2 * _quat.x;
+                    const auto _2q2 = 2 * _quat.y;
+                    const auto _2q3 = 2 * _quat.z;
+                    const auto _4q0 = 4 * _quat.w;
+                    const auto _4q1 = 4 * _quat.x;
+                    const auto _4q2 = 4 * _quat.y;
+                    const auto _8q1 = 8 * _quat.x;
+                    const auto _8q2 = 8 * _quat.y;
+                    const auto q0q0 = _quat.w * _quat.w;
+                    const auto q1q1 = _quat.x * _quat.x;
+                    const auto q2q2 = _quat.y * _quat.y;
+                    const auto q3q3 = _quat.z * _quat.z;
 
                     // Gradient decent algorithm corrective step
+                    auto s = Vec4(
 
-                    auto s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
+                            _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay,
 
-                    auto s1 = _4q1 * q3q3 - _2q3 * ax +
-                        4.0f * q0q0 * _q1 - _2q0 * ay - 
-                        _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
+                            _4q1 * q3q3 - _2q3 * ax +
+                            4 * q0q0 * _quat.x - _2q0 * ay - 
+                            _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az,
 
-                    auto s2 = 4.0f * q0q0 * _q2 + _2q0 * ax +
-                        _4q2 * q3q3 - _2q3 * ay - 
-                        _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
+                            4 * q0q0 * _quat.y + _2q0 * ax +
+                            _4q2 * q3q3 - _2q3 * ay - 
+                            _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az,
 
-                    auto s3 = 4.0f * q1q1 * _q3 - _2q1 * ax +
-                        4.0f * q2q2 * _q3 - _2q2 * ay;
+                            4 * q1q1 * _quat.z - _2q1 * ax +
+                            4 * q2q2 * _quat.z - _2q2 * ay);
 
                     // Normalize step magnitude
-                    recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); 
+                    recipNorm = invSqrt(s.w * s.w + s.x * s.x + s.y * s.y + s.z * s.z); 
 
-                    s0 *= recipNorm;
-                    s1 *= recipNorm;
-                    s2 *= recipNorm;
-                    s3 *= recipNorm;
+                    s.w *= recipNorm;
+                    s.x *= recipNorm;
+                    s.y *= recipNorm;
+                    s.z *= recipNorm;
 
                     // Apply feedback step
-                    qDot1 -= B_MADGWICK * s0;
-                    qDot2 -= B_MADGWICK * s1;
-                    qDot3 -= B_MADGWICK * s2;
-                    qDot4 -= B_MADGWICK * s3;
+                    qdot.w -= B_MADGWICK * s.w;
+                    qdot.x -= B_MADGWICK * s.x;
+                    qdot.y -= B_MADGWICK * s.y;
+                    qdot.z -= B_MADGWICK * s.z;
                 }
 
                 // Integrate rate of change of quaternion to yield quaternion
-                _q0 += qDot1 * dt;
-                _q1 += qDot2 * dt;
-                _q2 += qDot3 * dt;
-                _q3 += qDot4 * dt;
+                _quat.w += qdot.w * dt;
+                _quat.x += qdot.x * dt;
+                _quat.y += qdot.y * dt;
+                _quat.z += qdot.z * dt;
 
                 // Normalise quaternion
                 const auto recipNorm = invSqrt(
-                        _q0 * _q0 + _q1 * _q1 + _q2 * _q2 + _q3 * _q3);
+                        _quat.w * _quat.w +
+                        _quat.x * _quat.x +
+                        _quat.y * _quat.y +
+                        _quat.z * _quat.z);
 
-                _q0 *= recipNorm;
-                _q1 *= recipNorm;
-                _q2 *= recipNorm;
-                _q3 *= recipNorm;
+                _quat.w *= recipNorm;
+                _quat.x *= recipNorm;
+                _quat.y *= recipNorm;
+                _quat.z *= recipNorm;
 
-                phi = Num::RAD2DEG * atan2f(_q0*_q1 + _q2*_q3,
-                        0.5f - _q1*_q1 - _q2*_q2);
+                angles.x = Num::RAD2DEG * atan2f(_quat.w*_quat.x + _quat.y*_quat.z,
+                        0.5 - _quat.x*_quat.x - _quat.y*_quat.y);
 
-                theta = Num::RAD2DEG * asinf(2 * (_q1*_q3 - _q0*_q2));
+                angles.y = Num::RAD2DEG * asinf(2 * (_quat.x*_quat.z - _quat.w*_quat.y));
 
                 // Negate for nose-right positive
-                psi = -Num::RAD2DEG * atan2f(_q1*_q2 + _q0*_q3,
-                        0.5f - _q2*_q2 - _q3*_q3);
+                angles.z = -Num::RAD2DEG * atan2f(_quat.x*_quat.y + _quat.w*_quat.z,
+                        0.5 - _quat.y*_quat.y - _quat.z*_quat.z);
             }
 
         private:
@@ -158,15 +173,12 @@ namespace hf {
             static constexpr float B_ACCEL = 0.14;    // Accelerometer LPF
             static constexpr float B_GYRO = 0.1;      // Gyro LPF
 
-            // Initialize quaternion for madgwick filter
-            float _q0; 
-            float _q1;
-            float _q2;
-            float _q3;
+            // Current quaternion
+            Vec4 _quat;
 
-            // Previous IMU values for LPF
-            float _ax_prev, _ay_prev, _az_prev;
-            float _gx_prev, _gy_prev, _gz_prev;
+            // Previous IMU readings for LPF
+            Vec3 _gyro;
+            Vec3 _accel;
 
             static float invSqrt(float x) 
             {

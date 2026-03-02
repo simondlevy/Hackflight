@@ -50,6 +50,7 @@ namespace hf {
 
     } mode_e;
 
+    // XXX delendum
     typedef struct {
 
         float x;
@@ -57,15 +58,6 @@ namespace hf {
         float z;
 
     } axis3_t;
-
-    typedef struct {
-
-        float w;
-        float x;
-        float y;
-        float z;
-
-    } axis4_t;
 
     class Vec2 {
 

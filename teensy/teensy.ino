@@ -197,10 +197,17 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
     float gyro_x=0, gyro_y=0, gyro_z=0;
     readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
 
+    hf::Vec3 angles = {};
+
     _madgwick.getEulerAngles(dt,
-            gyro_x, -gyro_y, -gyro_z,
-            -accel_x, accel_y, accel_z,
-            state.phi, state.theta, state.psi);
+            {gyro_x, -gyro_y, -gyro_z},
+            {-accel_x, accel_y, accel_z},
+            angles);
+
+    state.phi = angles.x;
+    state.theta = angles.y;
+    state.psi = angles.z;
+
 
     state.dphi = gyro_x;
     state.dtheta = gyro_y;
@@ -255,6 +262,17 @@ void setup()
     blinkOnStartup(); 
 }
 
+static void debug(const hf::vehicleState_t & state)
+{
+    static uint32_t _msec;
+    const auto msec = millis();
+    if (msec - _msec > 20) {
+        printf("phi=%+3.3f theta=%+3.3f\n", state.phi, state.theta);
+        _msec = msec;
+    }
+}
+
+
 void loop()
 {
     const auto usec_curr = micros();      
@@ -278,6 +296,9 @@ void loop()
 
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
+
+    //debug(state);
+    (void)debug;
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
