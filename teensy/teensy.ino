@@ -199,7 +199,7 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
 
     hf::Vec3 angles = {};
 
-    _madgwick.getEulerAngles(dt,
+    _madgwick.run(dt,
             {gyro_x, -gyro_y, -gyro_z},
             {-accel_x, accel_y, accel_z},
             angles);
@@ -207,7 +207,6 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
     state.phi = angles.x;
     state.theta = angles.y;
     state.psi = angles.z;
-
 
     state.dphi = gyro_x;
     state.dtheta = gyro_y;

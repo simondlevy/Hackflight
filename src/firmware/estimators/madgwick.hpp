@@ -45,115 +45,49 @@ namespace hf {
                 _gyro.z = 0;
             }
 
-            void getEulerAngles(
+            void run(
                     const float dt,
                     const Vec3 & gyro,
                     const Vec3 & accel,
                     Vec3 & angles)
             {
                 // LP filter gyro data
-                auto gx = (1 - B_GYRO) * _gyro.x + B_GYRO * gyro.x;
-                auto gy = (1 - B_GYRO) * _gyro.y + B_GYRO * gyro.y;
-                auto gz = (1 - B_GYRO) * _gyro.z + B_GYRO * gyro.z;
-
-                _gyro.x = gx;
-                _gyro.y = gy;
-                _gyro.z = gz;
+                const auto gx = (1 - B_GYRO) * _gyro.x + B_GYRO * gyro.x;
+                const auto gy = (1 - B_GYRO) * _gyro.y + B_GYRO * gyro.y;
+                const auto gz = (1 - B_GYRO) * _gyro.z + B_GYRO * gyro.z;
 
                 // LP filter accelerometer data
-                auto ax = (1 - B_ACCEL) * _accel.x + B_ACCEL * accel.x;
-                auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
-                auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
-
-                _accel.x = ax;
-                _accel.y = ay;
-                _accel.z = az;
+                const auto ax = (1 - B_ACCEL) * _accel.x + B_ACCEL * accel.x;
+                const auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
+                const auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
 
                 // Convert gyroscope degrees/sec to radians/sec
-                gx /= Num::RAD2DEG;
-                gy /= Num::RAD2DEG;
-                gz /= Num::RAD2DEG;
+                const auto gxr = gx * Num::DEG2RAD;
+                const auto gyr = gy * Num::DEG2RAD;
+                const auto gzr = gz * Num::DEG2RAD;
 
                 // Compute rate of change of quaternion from gyroscope
                 auto qdot = Vec4(
-                        0.5 * (-_quat.x * gx - _quat.y * gy - _quat.z * gz),
-                        0.5 * (_quat.w * gx + _quat.y * gz - _quat.z * gy),
-                        0.5 * (_quat.w * gy - _quat.x * gz + _quat.z * gx),
-                        0.5 * (_quat.w * gz + _quat.x * gy - _quat.y * gx));
+                        0.5 * (-_quat.x * gxr - _quat.y * gyr - _quat.z * gzr),
+                        0.5 * ( _quat.w * gxr + _quat.y * gzr - _quat.z * gyr),
+                        0.5 * ( _quat.w * gyr - _quat.x * gzr + _quat.z * gxr),
+                        0.5 * ( _quat.w * gzr + _quat.x * gyr - _quat.y * gxr));
 
                 // Compute feedback only if accelerometer measurement valid
                 // (avoids NaN in accelerometer normalisation)
-                if(!((ax == 0) && (ay == 0) && (az == 0))) {
+                if ((ax != 0) || (ay != 0) || (az != 0)) {
 
-                    // Normalise accelerometer measurement
-                    auto recipNorm = invSqrt(ax * ax + ay * ay + az * az);
-                    ax *= recipNorm;
-                    ay *= recipNorm;
-                    az *= recipNorm;
-
-                    // Auxiliary variables to avoid repeated arithmetic
-                    const auto _2q0 = 2 * _quat.w;
-                    const auto _2q1 = 2 * _quat.x;
-                    const auto _2q2 = 2 * _quat.y;
-                    const auto _2q3 = 2 * _quat.z;
-                    const auto _4q0 = 4 * _quat.w;
-                    const auto _4q1 = 4 * _quat.x;
-                    const auto _4q2 = 4 * _quat.y;
-                    const auto _8q1 = 8 * _quat.x;
-                    const auto _8q2 = 8 * _quat.y;
-                    const auto q0q0 = _quat.w * _quat.w;
-                    const auto q1q1 = _quat.x * _quat.x;
-                    const auto q2q2 = _quat.y * _quat.y;
-                    const auto q3q3 = _quat.z * _quat.z;
-
-                    // Gradient decent algorithm corrective step
-                    auto s = Vec4(
-
-                            _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay,
-
-                            _4q1 * q3q3 - _2q3 * ax +
-                            4 * q0q0 * _quat.x - _2q0 * ay - 
-                            _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az,
-
-                            4 * q0q0 * _quat.y + _2q0 * ax +
-                            _4q2 * q3q3 - _2q3 * ay - 
-                            _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az,
-
-                            4 * q1q1 * _quat.z - _2q1 * ax +
-                            4 * q2q2 * _quat.z - _2q2 * ay);
-
-                    // Normalize step magnitude
-                    recipNorm = invSqrt(s.w * s.w + s.x * s.x + s.y * s.y + s.z * s.z); 
-
-                    s.w *= recipNorm;
-                    s.x *= recipNorm;
-                    s.y *= recipNorm;
-                    s.z *= recipNorm;
-
-                    // Apply feedback step
-                    qdot.w -= B_MADGWICK * s.w;
-                    qdot.x -= B_MADGWICK * s.x;
-                    qdot.y -= B_MADGWICK * s.y;
-                    qdot.z -= B_MADGWICK * s.z;
+                    computeFeedback({ax, ay, az}, _quat, qdot);
                 }
 
                 // Integrate rate of change of quaternion to yield quaternion
-                _quat.w += qdot.w * dt;
-                _quat.x += qdot.x * dt;
-                _quat.y += qdot.y * dt;
-                _quat.z += qdot.z * dt;
+                _quat.w = _quat.w + qdot.w * dt;
+                _quat.x = _quat.x + qdot.x * dt;
+                _quat.y = _quat.y + qdot.y * dt;
+                _quat.z = _quat.z + qdot.z * dt;
 
-                // Normalise quaternion
-                const auto recipNorm = invSqrt(
-                        _quat.w * _quat.w +
-                        _quat.x * _quat.x +
-                        _quat.y * _quat.y +
-                        _quat.z * _quat.z);
-
-                _quat.w *= recipNorm;
-                _quat.x *= recipNorm;
-                _quat.y *= recipNorm;
-                _quat.z *= recipNorm;
+                // Normalize quaternion
+                normalize(_quat);
 
                 angles.x = Num::RAD2DEG * atan2f(_quat.w*_quat.x + _quat.y*_quat.z,
                         0.5 - _quat.x*_quat.x - _quat.y*_quat.y);
@@ -163,6 +97,14 @@ namespace hf {
                 // Negate for nose-right positive
                 angles.z = -Num::RAD2DEG * atan2f(_quat.x*_quat.y + _quat.w*_quat.z,
                         0.5 - _quat.y*_quat.y - _quat.z*_quat.z);
+
+                // Store previous IMU readings for next time
+                _gyro.x = gx;
+                _gyro.y = gy;
+                _gyro.z = gz;
+                _accel.x = ax;
+                _accel.y = ay;
+                _accel.z = az;
             }
 
         private:
@@ -180,9 +122,77 @@ namespace hf {
             Vec3 _gyro;
             Vec3 _accel;
 
-            static float invSqrt(float x) 
+            static void computeFeedback(
+                    const Vec3 & accel,
+                    const Vec4 & quat,
+                    Vec4 & qdot)
             {
-                return 1.0/sqrtf(x);
+                auto an = Vec3(accel.x, accel.y, accel.z);
+                normalize(an);
+
+                // Auxiliary variables to avoid repeated arithmetic
+                const auto _2q0 = 2 * quat.w;
+                const auto _2q1 = 2 * quat.x;
+                const auto _2q2 = 2 * quat.y;
+                const auto _2q3 = 2 * quat.z;
+                const auto _4q0 = 4 * quat.w;
+                const auto _4q1 = 4 * quat.x;
+                const auto _4q2 = 4 * quat.y;
+                const auto _8q1 = 8 * quat.x;
+                const auto _8q2 = 8 * quat.y;
+                const auto q0q0 = quat.w * quat.w;
+                const auto q1q1 = quat.x * quat.x;
+                const auto q2q2 = quat.y * quat.y;
+                const auto q3q3 = quat.z * quat.z;
+
+                // Gradient-descent algorithm corrective step
+                auto s = Vec4(
+
+                        _4q0 * q2q2 + _2q2 * an.x + _4q0 * q1q1 - _2q1 * an.y,
+
+                        _4q1 * q3q3 - _2q3 * an.x +
+                        4 * q0q0 * quat.x - _2q0 * an.y - 
+                        _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * an.z,
+
+                        4 * q0q0 * quat.y + _2q0 * an.x +
+                        _4q2 * q3q3 - _2q3 * an.y - 
+                        _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * an.z,
+
+                        4 * q1q1 * quat.z - _2q1 * an.x +
+                        4 * q2q2 * quat.z - _2q2 * an.y);
+
+                // Normalize step magnitude
+                normalize(s);
+
+                // Apply feedback step
+                qdot.w = qdot.w - B_MADGWICK * s.w;
+                qdot.x = qdot.x - B_MADGWICK * s.x;
+                qdot.y = qdot.y - B_MADGWICK * s.y;
+                qdot.z = qdot.z - B_MADGWICK * s.z;
+            }
+
+            static float invsqrt(const float x) 
+            {
+                return 1 / sqrtf(x);
+            }
+
+            static void normalize(Vec3 & v)
+            {
+                const auto rn = invsqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+
+                v.x = v.x * rn;
+                v.y = v.y * rn;
+                v.z = v.z * rn;
+            }
+
+            static void normalize(Vec4 & v)
+            {
+                const auto rn = invsqrt(v.w*v.w + v.x*v.x + v.y*v.y + v.z*v.z);
+
+                v.w = v.w * rn;
+                v.x = v.x * rn;
+                v.y = v.y * rn;
+                v.z = v.z * rn;
             }
     };
 
