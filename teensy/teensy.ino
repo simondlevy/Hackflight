@@ -40,9 +40,6 @@ static MPU6050 _mpu6050;
 
 static Dsm2048 _dsm2048;
 
-// State estimation
-static hf::MadgwickFilter  _madgwick;
-
 // DSMX receiver callback
 void serialEvent1(void)
 {
@@ -198,6 +195,8 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
     float accel_x=0, accel_y=0, accel_z=0;
     float gyro_x=0, gyro_y=0, gyro_z=0;
     readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
+
+    static hf::MadgwickFilter  _madgwick;
 
     _madgwick = hf::MadgwickFilter::run(
             _madgwick, dt,
