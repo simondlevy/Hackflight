@@ -39,8 +39,26 @@ namespace hf {
 
             Vec3 angles;
 
-            MadgwickFilter() = default;
+            MadgwickFilter() 
+            {
+                _quat.w = 1;
+                _quat.x = 0;
+                _quat.y = 0;
+                _quat.z = 0;
 
+                _accel.x = 0;
+                _accel.y = 0;
+                _accel.z = 0;
+
+                _gyro.x = 0;
+                _gyro.y = 0;
+                _gyro.z = 0;
+
+                angles.x = 0;
+                angles.y = 0;
+                angles.z = 0;
+            }
+ 
             MadgwickFilter
                 (const Vec3 & angles,
                  const Vec4 & quat,
