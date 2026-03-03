@@ -25,17 +25,15 @@
 
 #pragma once
 
-#include <rotormixer.hpp>
-
 namespace hf {
 
     class Mixer {
 
         public:
 
-            static constexpr int8_t roll[4]  = {-1, -1, +1, +1};
-            static constexpr int8_t pitch[4] = {+1, -1, +1, -1};
-            static constexpr int8_t yaw[4]   = {-1, +1, +1, -1};
+            int8_t roll[4]  = {-1, -1, +1, +1};
+            int8_t pitch[4] = {+1, -1, +1, -1};
+            int8_t yaw[4]   = {-1, +1, +1, -1};
 
             float motorvals[4];
 
@@ -55,21 +53,21 @@ namespace hf {
 
             Mixer& operator=(const Mixer& other) = default;
 
-            static auto run(
-                    const Mixer & mixer, const Setpoint & setpoint) -> Mixer
+            static auto run(const Mixer & mixer, const Setpoint & setpoint) -> Mixer
             {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m1 = t - r + p - y;
-                const float m2 = t - r - p + y;
-                const float m3 = t + r + p + y;
-                const float m4 = t + r - p - y;
+                const float m1 = t + r * mixer.roll[0] + p * mixer.pitch[0] + y * mixer.yaw[0];
+                const float m2 = t + r * mixer.roll[1] + p * mixer.pitch[1] + y * mixer.yaw[1];
+                const float m3 = t + r * mixer.roll[2] + p * mixer.pitch[2] + y * mixer.yaw[2];
+                const float m4 = t + r * mixer.roll[3] + p * mixer.pitch[3] + y * mixer.yaw[3];
 
                 return Mixer(m1, m2, m3, m4);
             }
+
     };
 
 }

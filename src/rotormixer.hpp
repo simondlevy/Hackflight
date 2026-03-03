@@ -26,34 +26,6 @@ namespace hf {
 
         public:
 
-            static float * mix(
-                    const Setpoint & setpoint,
-                    const int8_t * roll,
-                    const int8_t * pitch,
-                    const int8_t * yaw,
-                    const int8_t count)
-            {
-                static float motors[MAX_MOTOR_COUNT];
-                mix(setpoint, roll, pitch, yaw, count, motors);
-                return motors;
-            }        
-
-            static void mix(
-                    const Setpoint & setpoint,
-                    const int8_t * roll,
-                    const int8_t * pitch,
-                    const int8_t * yaw,
-                    const int8_t count,
-                    float motors[])
-            {
-                for (uint8_t k=0; k<count; ++k) {
-                    motors[k] =
-                        setpoint.thrust +
-                        setpoint.roll * roll[k] +
-                        setpoint.pitch * pitch[k] +
-                        setpoint.yaw * yaw[k];
-                }
-            }
     };
 }
 

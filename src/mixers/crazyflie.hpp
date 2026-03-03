@@ -90,9 +90,26 @@ namespace hf {
                 return Mixer(m1, m2, m3, m4);
             }
 
+            static void mix(
+                    const Setpoint & setpoint,
+                    const int8_t * roll,
+                    const int8_t * pitch,
+                    const int8_t * yaw,
+                    const int8_t count,
+                    float motors[])
+            {
+                for (uint8_t k=0; k<count; ++k) {
+                    motors[k] =
+                        setpoint.thrust +
+                        setpoint.roll * roll[k] +
+                        setpoint.pitch * pitch[k] +
+                        setpoint.yaw * yaw[k];
+                }
+            }
+
             static void mix(const Setpoint & setpoint, float motors[])
             {
-                RotorMixer::mix(setpoint, ROLL, PITCH, YAW, 4, motors);
+                mix(setpoint, ROLL, PITCH, YAW, 4, motors);
             }
     };
 }
