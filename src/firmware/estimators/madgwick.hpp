@@ -82,23 +82,27 @@ namespace hf {
                         gyrolpf.y *Num::DEG2RAD,
                         gyrolpf.z *Num::DEG2RAD);
 
+                // Compute rate of change of quaternion from gyro
+                const auto qdot = Vec4(
+                        0.5 * (-mf._quat.x * gyror.x - mf._quat.y * gyror.y - mf._quat.z * gyror.z),
+                        0.5 * ( mf._quat.w * gyror.x + mf._quat.y * gyror.z - mf._quat.z * gyror.y),
+                        0.5 * ( mf._quat.w * gyror.y - mf._quat.x * gyror.z + mf._quat.z * gyror.x),
+                        0.5 * ( mf._quat.w * gyror.z + mf._quat.x * gyror.y - mf._quat.y * gyror.x));
+
+                const auto qdotf =
+                    accellpf.x != 0 || accellpf.y != 0 || accellpf.z != 0 ? 
+                    addFeedback(qdot, mf._quat, accellpf) :
+                    qdot;
+
+
                 (void)mf;
                 (void)dt;
-                (void)accellpf;
-                (void)gyror;
+                (void)qdotf;
 
                 /*
-
-                // Compute rate of change of quaternion from gyro
-                auto qdot = Vec4(
-                        0.5 * (-_quat.x * gxr - _quat.y * gyr - _quat.z * gzr),
-                        0.5 * ( _quat.w * gxr + _quat.y * gzr - _quat.z * gyr),
-                        0.5 * ( _quat.w * gyr - _quat.x * gzr + _quat.z * gxr),
-                        0.5 * ( _quat.w * gzr + _quat.x * gyr - _quat.y * gxr));
-
                 // Compute feedback only if accelerometer measurement valid
                 // (avoids NaN in accelerometer normalisation)
-                if ((ax != 0) || (ay != 0) || (az != 0)) {
+                if () {
 
                     computeFeedback({ax, ay, az}, _quat, qdot);
                 }
@@ -221,6 +225,62 @@ namespace hf {
                     const float coeff) -> float
             {
                 return (1 - coeff) * prev + coeff * curr;
+            }
+
+            static auto addFeedback(
+                    const Vec4 & qdot,
+                    const Vec4 & quat,
+                    const Vec3 & accel) -> Vec4
+            {
+                (void)qdot;
+                (void)accel;
+                (void)quat;
+
+                /*
+                auto an = Vec3(accel.x, accel.y, accel.z);
+                normalize(an);
+
+                // Auxiliary variables to avoid repeated arithmetic
+                const auto _2q0 = 2 * quat.w;
+                const auto _2q1 = 2 * quat.x;
+                const auto _2q2 = 2 * quat.y;
+                const auto _2q3 = 2 * quat.z;
+                const auto _4q0 = 4 * quat.w;
+                const auto _4q1 = 4 * quat.x;
+                const auto _4q2 = 4 * quat.y;
+                const auto _8q1 = 8 * quat.x;
+                const auto _8q2 = 8 * quat.y;
+                const auto q0q0 = quat.w * quat.w;
+                const auto q1q1 = quat.x * quat.x;
+                const auto q2q2 = quat.y * quat.y;
+                const auto q3q3 = quat.z * quat.z;
+
+                // Gradient-descent algorithm corrective step
+                auto s = Vec4(
+
+                        _4q0 * q2q2 + _2q2 * an.x + _4q0 * q1q1 - _2q1 * an.y,
+
+                        _4q1 * q3q3 - _2q3 * an.x +
+                        4 * q0q0 * quat.x - _2q0 * an.y - 
+                        _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * an.z,
+
+                        4 * q0q0 * quat.y + _2q0 * an.x +
+                        _4q2 * q3q3 - _2q3 * an.y - 
+                        _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * an.z,
+
+                        4 * q1q1 * quat.z - _2q1 * an.x +
+                        4 * q2q2 * quat.z - _2q2 * an.y);
+
+                // Normalize step magnitude
+                normalize(s);
+
+                // Apply feedback step
+                qdot.w = qdot.w - B_MADGWICK * s.w;
+                qdot.x = qdot.x - B_MADGWICK * s.x;
+                qdot.y = qdot.y - B_MADGWICK * s.y;
+                qdot.z = qdot.z - B_MADGWICK * s.z;*/
+
+                return Vec4();
             }
 
             static void computeFeedback(
