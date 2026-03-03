@@ -101,8 +101,7 @@ namespace hf {
 
                         Num::RAD2DEG * asinf(2 * (quat.x*quat.z - quat.w*quat.y)),
 
-                        // Negate for nose-right positive
-                        -Num::RAD2DEG * atan2f(quat.x*quat.y + quat.w*quat.z,
+                        Num::RAD2DEG * atan2f(quat.x*quat.y + quat.w*quat.z,
                             0.5 - quat.y*quat.y - quat.z*quat.z)
                         );
 

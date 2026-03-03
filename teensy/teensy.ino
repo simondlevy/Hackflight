@@ -259,27 +259,16 @@ void setup()
 }
 
 #ifdef DEBUG
-static void debug(const hf::vehicleState_t & state)
+static void debug(
+        const hf::vehicleState_t & state, const hf::Setpoint & setpoint)
 {
-    static uint32_t _count;
     static uint32_t _msec;
     const auto msec = millis();
 
-    /*
     if (msec - _msec > 20) {
-        printf("phi=%+3.3f theta=%+3.3f\n", state.phi, state.theta);
+        printf("psi=%+3.3f\n", state.psi);
         _msec = msec;
-        _count = 0;
-    }*/
-
-    (void)state;
-    if (msec - _msec > 1000) {
-        printf("%d\n", (int)_count);
-        _msec = msec;
-        _count = 0;
     }
-
-    _count++;
 }
 #endif
 
@@ -307,15 +296,15 @@ void loop()
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-#ifdef DEBUG
-    debug(state);
-#endif
-
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
         _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
         _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
         _channel_values[3]};
+
+#ifdef DEBUG
+    debug(state, setpoint);
+#endif
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid, !throttle_is_down,
