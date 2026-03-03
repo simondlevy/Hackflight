@@ -325,9 +325,5 @@ void loop()
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
     _motors.run(_armed, _mixer.motorvals);
 
-    //float motorvals[4] = {};
-    //hf::Mixer::mix(_stabilizerPid.setpoint, motorvals);
-    //_motors.run(_armed, motorvals);
-
-    (void)runDelayLoop/*(usec_curr)*/; 
+    runDelayLoop(usec_curr); 
 }
