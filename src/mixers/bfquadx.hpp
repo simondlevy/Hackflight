@@ -72,11 +72,6 @@ namespace hf {
 
                 return Mixer(m1, m2, m3, m4);
             }
-
-            static void mix(const Setpoint & setpoint, float motors[])
-            {
-                RotorMixer::mix(setpoint, roll, pitch, yaw, 4, motors);
-            }
     };
 
 }
