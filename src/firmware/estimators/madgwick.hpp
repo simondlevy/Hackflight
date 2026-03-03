@@ -89,6 +89,8 @@ namespace hf {
                         0.5 * ( mf._quat.w * gyror.y - mf._quat.x * gyror.z + mf._quat.z * gyror.x),
                         0.5 * ( mf._quat.w * gyror.z + mf._quat.x * gyror.y - mf._quat.y * gyror.x));
 
+                // Compute feedback only if accelerometer measurement valid
+                // (avoids NaN in accelerometer normalisation)
                 const auto qdotf =
                     accellpf.x != 0 || accellpf.y != 0 || accellpf.z != 0 ? 
                     addFeedback(qdot, mf._quat, accellpf) :
@@ -99,14 +101,8 @@ namespace hf {
                 (void)dt;
                 (void)qdotf;
 
+
                 /*
-                // Compute feedback only if accelerometer measurement valid
-                // (avoids NaN in accelerometer normalisation)
-                if () {
-
-                    computeFeedback({ax, ay, az}, _quat, qdot);
-                }
-
                 // Integrate rate of change of quaternion to yield quaternion
                 _quat.w = _quat.w + qdot.w * dt;
                 _quat.x = _quat.x + qdot.x * dt;
@@ -232,13 +228,8 @@ namespace hf {
                     const Vec4 & quat,
                     const Vec3 & accel) -> Vec4
             {
-                (void)qdot;
-                (void)accel;
-                (void)quat;
 
-                /*
-                auto an = Vec3(accel.x, accel.y, accel.z);
-                normalize(an);
+                const auto an = normalize(accel);
 
                 // Auxiliary variables to avoid repeated arithmetic
                 const auto _2q0 = 2 * quat.w;
@@ -256,7 +247,7 @@ namespace hf {
                 const auto q3q3 = quat.z * quat.z;
 
                 // Gradient-descent algorithm corrective step
-                auto s = Vec4(
+                const auto s = Vec4(
 
                         _4q0 * q2q2 + _2q2 * an.x + _4q0 * q1q1 - _2q1 * an.y,
 
@@ -271,16 +262,17 @@ namespace hf {
                         4 * q1q1 * quat.z - _2q1 * an.x +
                         4 * q2q2 * quat.z - _2q2 * an.y);
 
+
                 // Normalize step magnitude
-                normalize(s);
+                const auto sn = normalize(s);
 
                 // Apply feedback step
-                qdot.w = qdot.w - B_MADGWICK * s.w;
-                qdot.x = qdot.x - B_MADGWICK * s.x;
-                qdot.y = qdot.y - B_MADGWICK * s.y;
-                qdot.z = qdot.z - B_MADGWICK * s.z;*/
+                return Vec4(
+                        qdot.w - B_MADGWICK * sn.w,
+                        qdot.x - B_MADGWICK * sn.x,
+                        qdot.y - B_MADGWICK * sn.y,
+                        qdot.z - B_MADGWICK * sn.z);
 
-                return Vec4();
             }
 
             static void computeFeedback(
