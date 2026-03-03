@@ -34,6 +34,8 @@
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
+//#define DEBUG
+
 static MPU6050 _mpu6050;
 
 static Dsm2048 _dsm2048;
@@ -257,6 +259,7 @@ void setup()
     blinkOnStartup(); 
 }
 
+#ifdef DEBUG
 static void debug(const hf::vehicleState_t & state)
 {
     static uint32_t _count;
@@ -272,7 +275,7 @@ static void debug(const hf::vehicleState_t & state)
 
     _count++;
 }
-
+#endif
 
 void loop()
 {
@@ -298,8 +301,9 @@ void loop()
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    //debug(state);
-    (void)debug;
+#ifdef DEBUG
+    debug(state);
+#endif
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,

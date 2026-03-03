@@ -41,22 +41,10 @@ namespace hf {
 
             MadgwickFilter() 
             {
-                _quat.w = 1;
-                _quat.x = 0;
-                _quat.y = 0;
-                _quat.z = 0;
-
-                _accel.x = 0;
-                _accel.y = 0;
-                _accel.z = 0;
-
-                _gyro.x = 0;
-                _gyro.y = 0;
-                _gyro.z = 0;
-
-                angles.x = 0;
-                angles.y = 0;
-                angles.z = 0;
+                _quat = {1, 0, 0, 0};
+                _accel = {0, 0, 0};
+                _gyro = {0, 0, 0};
+                angles = {0, 0, 0};
             }
  
             MadgwickFilter
@@ -67,22 +55,6 @@ namespace hf {
                 : angles(angles), _quat(quat), _gyro(gyro), _accel(accel) {}
 
             MadgwickFilter& operator=(const MadgwickFilter& other) = default;
-
-            void initialize()
-            {
-                _quat.w = 1;
-                _quat.x = 0;
-                _quat.y = 0;
-                _quat.z = 0;
-
-                _accel.x = 0;
-                _accel.y = 0;
-                _accel.z = 0;
-
-                _gyro.x = 0;
-                _gyro.y = 0;
-                _gyro.z = 0;
-            }
 
             static auto run(
                     const MadgwickFilter & mf,
