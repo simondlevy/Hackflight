@@ -23,7 +23,7 @@
 #include <time.h>
 
 #include <datatypes.h>
-#include <mixers/crazyflie.hpp>
+#include <mixers/bfquadx.hpp>
 #include <num.hpp>
 #include <pidcontrol/new_pidcontrol.hpp>
 #include <sim/dynamics.hpp>
@@ -96,7 +96,7 @@ namespace hf {
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
                             _dynamics = Dynamics::update(_dynamics, VPARAMS, 1 / DYNAMICS_FREQ, rpms,
-                                    4, Mixer::ROLL, Mixer::PITCH, Mixer::YAW);
+                                    4, _mixer.roll, _mixer.pitch, _mixer.yaw);
                         }
                     }
                 }

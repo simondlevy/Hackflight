@@ -102,12 +102,69 @@ DEF ROBOT Robot {
 
     DEF M1 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust -0.031 -0.031 0.016
+            centerOfThrust 0.031 -0.031 0.016  
             thrustConstants 0 0
             torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
                 name "motor1"
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
+            }
+        fastHelix Solid {
+
+            translation 0.031 -0.031 0.016
+
+                children [ 
+
+                Shape {
+                            appearance PBRAppearance {
+                                baseColor IS front_prop_color
+                                    baseColorMap ImageTexture {
+                                        url [ "../meshes/textures/fast_helix.png" ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
+                            }
+                        }
+
+                ]
+        }
+        slowHelix Solid {
+            translation 0.031 -0.031 0.016
+
+                children [
+
+                    Shape {
+
+                        appearance DEF PLASTIC PBRAppearance {
+                            baseColor IS front_prop_color
+                                metalness 0
+                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files/prop_cw.stl" ]
+                      }
+                    }
+
+
+                ]
+        }
+    }
+
+     # Motor 2 ----------------------------------------------------------------
+
+    DEF M2 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust -0.031 -0.031 0.016
+            thrustConstants 0 0
+            torqueConstants 0 0
+            fastHelixThreshold IS prop_fast_helix_threshold
+            device RotationalMotor {
+                name "motor2"
                 maxVelocity IS motor_max_velocity
                 maxTorque IS motor_max_torque
             }
@@ -147,72 +204,15 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/prop_cw.stl" ]
-                      }
-                    }
-
-                ]
-        }
-    }
-
-    # Motor 2 ----------------------------------------------------------------
-
-    DEF M2 Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust 0.031 -0.031 0.016  
-            thrustConstants 0 0
-            torqueConstants 0 0
-            fastHelixThreshold IS prop_fast_helix_threshold
-            device RotationalMotor {
-                name "motor2"
-                maxVelocity IS motor_max_velocity
-                maxTorque IS motor_max_torque
-            }
-        fastHelix Solid {
-
-            translation 0.031 -0.031 0.016
-
-                children [ 
-
-                Shape {
-                            appearance PBRAppearance {
-                                baseColor IS front_prop_color
-                                    baseColorMap ImageTexture {
-                                        url [ "../meshes/textures/fast_helix.png" ]
-                                    }
-                                metalness 0
-                            }
-                            geometry Cylinder {
-                                height IS prop_fast_helix_height
-                                radius IS prop_fast_helix_radius
-                            }
-                        }
-
-                ]
-        }
-        slowHelix Solid {
-            translation 0.031 -0.031 0.016
-
-                children [
-
-                    Shape {
-
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS front_prop_color
-                                metalness 0
-                        }
-
-                      geometry Mesh {
                           url [ "../meshes/stl_files/prop_ccw.stl" ]
                       }
                     }
 
-
                 ]
         }
     }
 
-    # Motor 3 ----------------------------------------------------------------
+   # Motor 3 ----------------------------------------------------------------
 
     DEF M3 Propeller {
         shaftAxis 0 0 1
