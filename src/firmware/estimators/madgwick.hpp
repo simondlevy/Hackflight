@@ -27,7 +27,28 @@ namespace hf {
 
     class MadgwickFilter {
 
+        private:
+
+            // Filter parameters - tuned for 2kHz loop rate; Do not touch unless
+            // you know what you are doing:
+            static constexpr float B_MADGWICK = 0.04; // Madgwick filter param
+            static constexpr float B_ACCEL = 0.14;    // Accelerometer LPF
+            static constexpr float B_GYRO = 0.1;      // Gyro LPF
+
         public:
+
+            Vec3 angles;
+
+            MadgwickFilter() = default;
+
+            MadgwickFilter
+                (const Vec3 & angles,
+                 const Vec4 & quat,
+                 const Vec3 & gyro,
+                 const Vec3 & accel)
+                : angles(angles), _quat(quat), _gyro(gyro), _accel(accel) {}
+
+            MadgwickFilter& operator=(const MadgwickFilter& other) = default;
 
             void initialize()
             {
@@ -43,6 +64,77 @@ namespace hf {
                 _gyro.x = 0;
                 _gyro.y = 0;
                 _gyro.z = 0;
+            }
+
+            static auto run(
+                    const MadgwickFilter & mf,
+                    const float dt,
+                    const Vec3 & gyro,
+                    const Vec3 & accel) -> MadgwickFilter
+            {
+                (void)mf;
+                (void)dt;
+                (void)gyro;
+                (void)accel;
+
+                /*
+                // LP filter gyro data
+                const auto gx = (1 - B_GYRO) * _gyro.x + B_GYRO * gyro.x;
+                const auto gy = (1 - B_GYRO) * _gyro.y + B_GYRO * gyro.y;
+                const auto gz = (1 - B_GYRO) * _gyro.z + B_GYRO * gyro.z;
+
+                // LP filter accelerometer data
+                const auto ax = (1 - B_ACCEL) * _accel.x + B_ACCEL * accel.x;
+                const auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
+                const auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
+
+                // Convert gyro degrees/sec to radians/sec
+                const auto gxr = gx * Num::DEG2RAD;
+                const auto gyr = gy * Num::DEG2RAD;
+                const auto gzr = gz * Num::DEG2RAD;
+
+                // Compute rate of change of quaternion from gyro
+                auto qdot = Vec4(
+                        0.5 * (-_quat.x * gxr - _quat.y * gyr - _quat.z * gzr),
+                        0.5 * ( _quat.w * gxr + _quat.y * gzr - _quat.z * gyr),
+                        0.5 * ( _quat.w * gyr - _quat.x * gzr + _quat.z * gxr),
+                        0.5 * ( _quat.w * gzr + _quat.x * gyr - _quat.y * gxr));
+
+                // Compute feedback only if accelerometer measurement valid
+                // (avoids NaN in accelerometer normalisation)
+                if ((ax != 0) || (ay != 0) || (az != 0)) {
+
+                    computeFeedback({ax, ay, az}, _quat, qdot);
+                }
+
+                // Integrate rate of change of quaternion to yield quaternion
+                _quat.w = _quat.w + qdot.w * dt;
+                _quat.x = _quat.x + qdot.x * dt;
+                _quat.y = _quat.y + qdot.y * dt;
+                _quat.z = _quat.z + qdot.z * dt;
+
+                // Normalize quaternion
+                normalize(_quat);
+
+                angles.x = Num::RAD2DEG * atan2f(_quat.w*_quat.x + _quat.y*_quat.z,
+                        0.5 - _quat.x*_quat.x - _quat.y*_quat.y);
+
+                angles.y = Num::RAD2DEG * asinf(2 * (_quat.x*_quat.z - _quat.w*_quat.y));
+
+                // Negate for nose-right positive
+                angles.z = -Num::RAD2DEG * atan2f(_quat.x*_quat.y + _quat.w*_quat.z,
+                        0.5 - _quat.y*_quat.y - _quat.z*_quat.z);
+
+                // Store previous IMU readings for next time
+                _gyro.x = gx;
+                _gyro.y = gy;
+                _gyro.z = gz;
+                _accel.x = ax;
+                _accel.y = ay;
+                _accel.z = az;
+                */
+
+                return MadgwickFilter();
             }
 
             void run(
@@ -108,12 +200,6 @@ namespace hf {
             }
 
         private:
-
-            // Filter parameters - tuned for 2kHz loop rate; Do not touch unless
-            // you know what you are doing:
-            static constexpr float B_MADGWICK = 0.04; // Madgwick filter param
-            static constexpr float B_ACCEL = 0.14;    // Accelerometer LPF
-            static constexpr float B_GYRO = 0.1;      // Gyro LPF
 
             // Current quaternion
             Vec4 _quat;
