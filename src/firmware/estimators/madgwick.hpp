@@ -97,40 +97,26 @@ namespace hf {
                     qdot;
 
 
-                (void)mf;
-                (void)dt;
-                (void)qdotf;
+                // Integrate rate of change of quaternion to yield quaternion,
+                // then normalize
+                const auto quat = normalize(Vec4(
+                        mf._quat.w + qdotf.w * dt,
+                        mf._quat.x + qdotf.x * dt,
+                        mf._quat.y + qdotf.y * dt,
+                        mf._quat.z + qdotf.z * dt));
 
+                const auto angles = Vec3(
+                        Num::RAD2DEG * atan2f(quat.w*quat.x + quat.y*quat.z,
+                            0.5 - quat.x*quat.x - quat.y*quat.y),
 
-                /*
-                // Integrate rate of change of quaternion to yield quaternion
-                _quat.w = _quat.w + qdot.w * dt;
-                _quat.x = _quat.x + qdot.x * dt;
-                _quat.y = _quat.y + qdot.y * dt;
-                _quat.z = _quat.z + qdot.z * dt;
+                        Num::RAD2DEG * asinf(2 * (quat.x*quat.z - quat.w*quat.y)),
 
-                // Normalize quaternion
-                normalize(_quat);
+                        // Negate for nose-right positive
+                        -Num::RAD2DEG * atan2f(quat.x*quat.y + quat.w*quat.z,
+                            0.5 - quat.y*quat.y - quat.z*quat.z)
+                        );
 
-                angles.x = Num::RAD2DEG * atan2f(_quat.w*_quat.x + _quat.y*_quat.z,
-                        0.5 - _quat.x*_quat.x - _quat.y*_quat.y);
-
-                angles.y = Num::RAD2DEG * asinf(2 * (_quat.x*_quat.z - _quat.w*_quat.y));
-
-                // Negate for nose-right positive
-                angles.z = -Num::RAD2DEG * atan2f(_quat.x*_quat.y + _quat.w*_quat.z,
-                        0.5 - _quat.y*_quat.y - _quat.z*_quat.z);
-
-                // Store previous IMU readings for next time
-                _gyro.x = gx;
-                _gyro.y = gy;
-                _gyro.z = gz;
-                _accel.x = ax;
-                _accel.y = ay;
-                _accel.z = az;
-                */
-
-                return MadgwickFilter();
+                return MadgwickFilter(angles, quat, gyrolpf, accellpf);
             }
 
             void run(
