@@ -72,26 +72,22 @@ namespace hf {
                     const Vec3 & gyro,
                     const Vec3 & accel) -> MadgwickFilter
             {
+                // LP filter IMU data
+                const auto gyrolpf = lpf(gyro, mf._gyro, B_GYRO);
+                const auto accellpf = lpf(accel, mf._accel, B_ACCEL);
+
+                // Convert filtered gyro degrees/sec to radians/sec
+                const auto gyror = Vec3(
+                        gyrolpf.x *Num::DEG2RAD,
+                        gyrolpf.y *Num::DEG2RAD,
+                        gyrolpf.z *Num::DEG2RAD);
+
                 (void)mf;
                 (void)dt;
-                (void)gyro;
-                (void)accel;
+                (void)accellpf;
+                (void)gyror;
 
                 /*
-                // LP filter gyro data
-                const auto gx = (1 - B_GYRO) * _gyro.x + B_GYRO * gyro.x;
-                const auto gy = (1 - B_GYRO) * _gyro.y + B_GYRO * gyro.y;
-                const auto gz = (1 - B_GYRO) * _gyro.z + B_GYRO * gyro.z;
-
-                // LP filter accelerometer data
-                const auto ax = (1 - B_ACCEL) * _accel.x + B_ACCEL * accel.x;
-                const auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
-                const auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
-
-                // Convert gyro degrees/sec to radians/sec
-                const auto gxr = gx * Num::DEG2RAD;
-                const auto gyr = gy * Num::DEG2RAD;
-                const auto gzr = gz * Num::DEG2RAD;
 
                 // Compute rate of change of quaternion from gyro
                 auto qdot = Vec4(
