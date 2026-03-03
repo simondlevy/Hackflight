@@ -197,20 +197,6 @@ static void getVehicleState(const float dt, hf::vehicleState_t & state)
     float gyro_x=0, gyro_y=0, gyro_z=0;
     readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
 
-
-    /*
-    hf::Vec3 angles = {};
-
-    _madgwick.run(dt,
-            {gyro_x, -gyro_y, -gyro_z},
-            {-accel_x, accel_y, accel_z},
-            angles);
-
-    state.phi = angles.x;
-    state.theta = angles.y;
-    state.psi = angles.z;
-    */
-
     _madgwick = hf::MadgwickFilter::run(
             _madgwick, dt,
             {gyro_x, -gyro_y, -gyro_z},
@@ -275,12 +261,18 @@ void setup()
 
 static void debug(const hf::vehicleState_t & state)
 {
+    static uint32_t _count;
     static uint32_t _msec;
     const auto msec = millis();
+
     if (msec - _msec > 20) {
         printf("phi=%+3.3f theta=%+3.3f\n", state.phi, state.theta);
+        //printf("%d\n", (int)_count);
         _msec = msec;
+        _count = 0;
     }
+
+    _count++;
 }
 
 
