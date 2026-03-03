@@ -61,12 +61,12 @@ namespace hf {
                 const auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
                 const auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
 
-                // Convert gyroscope degrees/sec to radians/sec
+                // Convert gyro degrees/sec to radians/sec
                 const auto gxr = gx * Num::DEG2RAD;
                 const auto gyr = gy * Num::DEG2RAD;
                 const auto gzr = gz * Num::DEG2RAD;
 
-                // Compute rate of change of quaternion from gyroscope
+                // Compute rate of change of quaternion from gyro
                 auto qdot = Vec4(
                         0.5 * (-_quat.x * gxr - _quat.y * gyr - _quat.z * gzr),
                         0.5 * ( _quat.w * gxr + _quat.y * gzr - _quat.z * gyr),
