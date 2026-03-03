@@ -33,8 +33,6 @@ namespace hf {
 
         public:
 
-            static const uint8_t rotorCount = 4;
-
             static constexpr int8_t roll[4]  = {-1, -1, +1, +1};
             static constexpr int8_t pitch[4] = {+1, -1, +1, -1};
             static constexpr int8_t yaw[4]   = {-1, +1, +1, -1};

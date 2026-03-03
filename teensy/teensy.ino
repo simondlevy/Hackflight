@@ -323,6 +323,7 @@ void loop()
 
     static hf::Mixer _mixer;
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
+
     _motors.run(_armed, _mixer.motorvals);
 
     runDelayLoop(usec_curr); 
