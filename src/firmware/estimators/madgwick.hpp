@@ -144,14 +144,14 @@ namespace hf {
                     Vec3 & angles)
             {
                 // LP filter gyro data
-                const auto gx = (1 - B_GYRO) * _gyro.x + B_GYRO * gyro.x;
-                const auto gy = (1 - B_GYRO) * _gyro.y + B_GYRO * gyro.y;
-                const auto gz = (1 - B_GYRO) * _gyro.z + B_GYRO * gyro.z;
+                const auto gx = lpf(gyro.x, _gyro.x, B_GYRO);
+                const auto gy = lpf(gyro.y, _gyro.y, B_GYRO);
+                const auto gz = lpf(gyro.z, _gyro.z, B_GYRO);
 
                 // LP filter accelerometer data
-                const auto ax = (1 - B_ACCEL) * _accel.x + B_ACCEL * accel.x;
-                const auto ay = (1 - B_ACCEL) * _accel.y + B_ACCEL * accel.y;
-                const auto az = (1 - B_ACCEL) * _accel.z + B_ACCEL * accel.z;
+                const auto ax = lpf(accel.x, _accel.x, B_ACCEL);
+                const auto ay = lpf(accel.y, _accel.y, B_ACCEL);
+                const auto az = lpf(accel.z, _accel.z, B_ACCEL);
 
                 // Convert gyro degrees/sec to radians/sec
                 const auto gxr = gx * Num::DEG2RAD;
@@ -207,6 +207,25 @@ namespace hf {
             // Previous IMU readings for LPF
             Vec3 _gyro;
             Vec3 _accel;
+
+            static auto lpf(
+                    const Vec3 & curr,
+                    const Vec3 & prev,
+                    const float coeff) -> Vec3
+                {
+                    return Vec3(
+                            lpf(curr.x, prev.x, coeff),
+                            lpf(curr.y, prev.y, coeff),
+                            lpf(curr.z, prev.z, coeff));
+                }
+
+            static auto lpf(
+                    const float curr,
+                    const float prev,
+                    const float coeff) -> float
+            {
+                return (1 - coeff) * prev + coeff * curr;
+            }
 
             static void computeFeedback(
                     const Vec3 & accel,

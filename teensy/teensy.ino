@@ -296,8 +296,8 @@ void loop()
     hf::vehicleState_t state = {};
     getVehicleState(dt, state);
 
-    //debug(state);
-    (void)debug;
+    debug(state);
+    //(void)debug;
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
