@@ -337,6 +337,20 @@ namespace hf {
                 return 1 / sqrtf(x);
             }
 
+            static auto normalize(const Vec3 & v) -> Vec3
+            {
+                const auto rn = invsqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+
+                return Vec3(v.x * rn, v.y * rn, v.z * rn);
+            }
+
+            static auto normalize(const Vec4 & v) -> Vec4
+            {
+                const auto rn = invsqrt(v.w*v.w + v.x*v.x + v.y*v.y + v.z*v.z);
+
+                return Vec4(v.w * rn, v.x * rn, v.y * rn, v.z * rn);
+            }
+
             static void normalize(Vec3 & v)
             {
                 const auto rn = invsqrt(v.x*v.x + v.y*v.y + v.z*v.z);
@@ -355,6 +369,7 @@ namespace hf {
                 v.y = v.y * rn;
                 v.z = v.z * rn;
             }
+
     };
 
 }
