@@ -265,9 +265,16 @@ static void debug(const hf::vehicleState_t & state)
     static uint32_t _msec;
     const auto msec = millis();
 
+    /*
     if (msec - _msec > 20) {
         printf("phi=%+3.3f theta=%+3.3f\n", state.phi, state.theta);
-        //printf("%d\n", (int)_count);
+        _msec = msec;
+        _count = 0;
+    }*/
+
+    (void)state;
+    if (msec - _msec > 1000) {
+        printf("%d\n", (int)_count);
         _msec = msec;
         _count = 0;
     }
@@ -311,14 +318,16 @@ void loop()
         _channel_values[3]};
 
     static hf::StabilizerPid _stabilizerPid;
-
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid, !throttle_is_down,
             dt, state, setpoint);
 
-    float motorvals[4] = {};
-    hf::Mixer::mix(_stabilizerPid.setpoint, motorvals);
+    static hf::Mixer _mixer;
+    _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
+    _motors.run(_armed, _mixer.motorvals);
 
-    _motors.run(_armed, motorvals);
+    //float motorvals[4] = {};
+    //hf::Mixer::mix(_stabilizerPid.setpoint, motorvals);
+    //_motors.run(_armed, motorvals);
 
-    runDelayLoop(usec_curr); 
+    (void)runDelayLoop/*(usec_curr)*/; 
 }
