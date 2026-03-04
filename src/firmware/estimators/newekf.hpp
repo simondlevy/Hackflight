@@ -75,8 +75,8 @@ namespace hf {
 
             void predict(const uint32_t nowMs, bool isFlying) 
             {
-                axis3fSubSamplerFinalize(&_accSubSampler);
-                axis3fSubSamplerFinalize(&_gyroSubSampler);
+                axis3fSubSamplerFinalize(&_accSubSampler, "accel");
+                axis3fSubSamplerFinalize(&_gyroSubSampler, "gyro");
 
                 const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
 
@@ -438,9 +438,11 @@ namespace hf {
                 subSampler->count++;
             }
 
-            static axis3_t* axis3fSubSamplerFinalize(axis3_tSubSampler_t* subSampler) 
+            static axis3_t* axis3fSubSamplerFinalize(axis3_tSubSampler_t* subSampler,
+                    const char * label) 
             {
                 if (subSampler->count > 0) {
+
                     subSampler->subSample.x = 
                         subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
                     subSampler->subSample.y = 

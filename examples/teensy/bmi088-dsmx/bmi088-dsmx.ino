@@ -169,6 +169,23 @@ static float getDt(const uint32_t usec_curr)
     return dt;
 }
 
+#ifdef DEBUG
+static void debug(
+        const bool imuIsCalibrated,
+        const hf::vehicleState_t & state,
+        const hf::Setpoint & setpoint)
+{
+    static uint32_t _msec;
+    const auto msec = millis();
+
+    if (msec - _msec > 20) {
+        //printf("imu is calibrated: %d\n", imuIsCalibrated);
+        printf("phi=%+3.3f\n", state.phi);
+        _msec = msec;
+    }
+}
+#endif
+
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -183,7 +200,9 @@ void setup()
 
     Serial1.begin(115000);
 
+    // XXX should be done in constructors
     _imu.init();
+    _ekf.init(millis());
 
     delay(10);
 
@@ -191,23 +210,6 @@ void setup()
 
     blinkOnStartup(); 
 }
-
-#ifdef DEBUG
-static void debug(
-        const bool imuIsCalibrated,
-        const hf::vehicleState_t & state,
-        const hf::Setpoint & setpoint)
-{
-    static uint32_t _msec;
-    const auto msec = millis();
-
-    if (msec - _msec > 20) {
-        //printf("imu is calibrated: %d\n", imuIsCalibrated);
-        printf("dpsi=%+3.3f\n", state.dpsi);
-        _msec = msec;
-    }
-}
-#endif
 
 void loop()
 {

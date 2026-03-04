@@ -65,6 +65,7 @@ void hf::IMU::device_read(
     gy = gyro.getGyroY_raw();
     gz = gyro.getGyroZ_raw();
 
+
     accel.readSensor();
 
     ax = accel.getAccelX_raw();
