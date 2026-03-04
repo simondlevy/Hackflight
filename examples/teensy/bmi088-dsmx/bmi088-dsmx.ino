@@ -180,7 +180,8 @@ static void debug(
 
     if (msec - _msec > 20) {
         //printf("imu is calibrated: %d\n", imuIsCalibrated);
-        printf("phi=%+3.3f\n", state.phi);
+        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
+                state.phi, state.theta, state.psi);
         _msec = msec;
     }
 }
