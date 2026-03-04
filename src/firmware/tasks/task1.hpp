@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <firmware/estimators/ekf.hpp>
 #include <firmware/imu.hpp>
 #include <firmware/led.hpp>
@@ -59,7 +58,6 @@ namespace hf {
             static const uint32_t FREQ_FLYING_MODE_CHECK = 25;
 
             static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
-
 
             static constexpr float MAX_VELOCITY = 10; //meters per second
 

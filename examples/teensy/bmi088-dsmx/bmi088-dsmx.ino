@@ -40,6 +40,8 @@ static hf::IMU _imu;
 
 // EKF ------------------------------------------------------------
 
+static const uint32_t FREQ_EKF_PREDICTION = 100;
+
 static hf::EKF _ekf;
 
 // Receiver -------------------------------------------------------
@@ -115,11 +117,26 @@ static void blinkOnStartup()
     }
 }
 
-static void getVehicleState(const float dt, hf::vehicleState_t & state)
+static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
 {
-    state.phi = 0;
-    state.theta = 0;
-    state.psi = 0;
+    static hf::Timer _timer;
+
+    static bool _didResetEstimation;
+
+    const uint32_t nowMs = millis();
+
+    if (_didResetEstimation) {
+        _ekf.init(nowMs);
+        _didResetEstimation = false;
+    }
+
+    // Run the system dynamics to predict the state forward.
+    if (_timer.ready(FREQ_EKF_PREDICTION)) {
+        _ekf.predict(nowMs, isFlying); 
+    }
+
+    // Get state estimate from EKF
+    _ekf.getStateEstimate(nowMs, state);
 
     // Get angular velocities directly from gyro
     hf::axis3_t gyroData = {}; // XXX should use Vec3, returned value
@@ -185,7 +202,8 @@ static void debug(
     const auto msec = millis();
 
     if (msec - _msec > 20) {
-        printf("imu is calibrated: %d\n", imuIsCalibrated);
+        //printf("imu is calibrated: %d\n", imuIsCalibrated);
+        printf("dpsi=%+3.3f\n", state.dpsi);
         _msec = msec;
     }
 }
@@ -214,9 +232,11 @@ void loop()
 
     const bool imuIsCalibrated = _imu.step(&_ekf, usec_curr/1000);
 
+    const bool isFlying = true; // XXX
+
     // XXX should be return value
     hf::vehicleState_t state = {};
-    getVehicleState(dt, state);
+    getVehicleState(isFlying, state);
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
