@@ -1,18 +1,20 @@
 SKETCH = $(shell basename "`pwd`")
 
+ROOT = ../..
+
 PORT = /dev/ttyACM0
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 BIN = build/$(SKETCH).ino.bin
 
-SRC = ../src
+SRC = $(ROOT)/src
 
 MSGS = $(SRC)/msp/__messages__.h
 
-HASKDIR = ../haskell
+HASKDIR = $(ROOT)/haskell
 
-include ../snn_path.makefile
+include ../../snn_path.makefile
 
 DEPS = $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/firmware/*.hpp \
 	   $(SRC)/firmware/*/*.hpp $(MSGS) 
@@ -35,8 +37,8 @@ bolt: $(DEPS)
 nomotors: $(DEPS)
 	$(COMPILE) --build-property "compiler.cpp.extra_flags=\"-DNOMOTORS\""
 
-$(MSGS): ../msppg/messages.json
-	cd ../msppg; make install; cd ../$(SKETCH)
+$(MSGS): $(ROOT)/msppg/messages.json
+	cd $(ROOT)/msppg; make install; cd ../examples/$(SKETCH)
 
 dfu: $(BIN)
 	dfu-util -d 0483:5740 -a 0 -s 0x08000000:leave -D build/$(SKETCH).ino.bin
