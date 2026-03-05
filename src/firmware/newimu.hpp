@@ -93,11 +93,12 @@ namespace hf {
 
                 applyLpf(_gyroLpf, gyroAligned, gyroDps);
 
-                const auto accelScaled = alignToAirframe(accel);
+                const auto accelAlignedToAirframe = alignToAirframe(accel);
 
-                alignAccelToGravity(accelScaled, accelGs);
+                const auto accelAlignedToGravity = alignToGravity(
+                        accelAlignedToAirframe);
 
-                applyLpf(_accLpf, accelGs);
+                applyLpf(_accLpf, accelAlignedToGravity, accelGs);
 
                 return gyroBiasFound;
             }
@@ -213,7 +214,7 @@ namespace hf {
              * data gathered from the UI and written in the config-block to
              * rotate the accelerometer to be aligned with gravity.
              */
-            static void alignAccelToGravity(const Vec3 & in, Vec3 & out)
+            static auto alignToGravity(const Vec3 & in) -> Vec3
             {
 
                 const auto cosPitch = cosf(CALIBRATION_PITCH * Num::DEG2RAD);
@@ -222,20 +223,17 @@ namespace hf {
                 const auto sinRoll = sinf(CALIBRATION_ROLL * Num::DEG2RAD);
 
                 // Rotate around x-axis
-                Vec3 rx = {};
-                rx.x = in.x;
-                rx.y = in.y * cosRoll - in.z * sinRoll;
-                rx.z = in.y * sinRoll + in.z * cosRoll;
+                const Vec3 rx = {
+                    in.x,
+                    in.y * cosRoll - in.z * sinRoll,
+                    in.y * sinRoll + in.z * cosRoll
+                };
 
                 // Rotate around y-axis
-                Vec3 ry = {};
-                ry.x = rx.x * cosPitch - rx.z * sinPitch;
-                ry.y = rx.y;
-                ry.z = -rx.x * sinPitch + rx.z * cosPitch;
-
-                out.x = ry.x;
-                out.y = ry.y;
-                out.z = ry.z;
+                return Vec3(
+                        rx.x * cosPitch - rx.z * sinPitch,
+                        rx.y,
+                        -rx.x * sinPitch + rx.z * cosPitch);
             }
 
             static void calculateVarianceAndMean(
