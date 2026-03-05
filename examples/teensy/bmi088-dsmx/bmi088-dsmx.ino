@@ -77,16 +77,6 @@ static const uint32_t LOOP_FREQ_HZ = 2000;
 
 // Helper functions ------------------------------------------------
 
-static void runDelayLoop(const uint32_t usec_curr)
-{
-    float invFreq = 1.0 / LOOP_FREQ_HZ * 1000000.0;
-    uint32_t checker = micros();
-
-    while (invFreq > (checker - usec_curr)) {
-        checker = micros();
-    }
-}
-
 static void blinkInLoop(const uint32_t usec_curr)
 {
     static uint32_t blink_counter, blink_delay;
@@ -177,15 +167,19 @@ static void debug(
 {
     static uint32_t _msec;
     const auto msec = millis();
+    static uint32_t _count;
 
-    if (msec - _msec > 20) {
-        printf("t=%3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
-                setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
+    if (msec - _msec > 1000) {
+        //printf("t=%3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
+        //        setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
         //printf("imu is calibrated: %d\n", imuIsCalibrated);
         //printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
         //        state.phi, state.theta, state.psi);
+        printf("count=%d\n", (int)_count);
         _msec = msec;
+        _count = 0;
     }
+    _count++;
 }
 #endif
 
@@ -263,6 +257,4 @@ void loop()
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(_armed, _mixer.motorvals);
-
-    runDelayLoop(usec_curr); 
 }
