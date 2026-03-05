@@ -32,7 +32,7 @@
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-#define DEBUG
+//#define DEBUG
 
 // IMU ------------------------------------------------------------
 
@@ -179,9 +179,11 @@ static void debug(
     const auto msec = millis();
 
     if (msec - _msec > 20) {
+        printf("t=%3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
+                setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
         //printf("imu is calibrated: %d\n", imuIsCalibrated);
-        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
-                state.phi, state.theta, state.psi);
+        //printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
+        //        state.phi, state.theta, state.psi);
         _msec = msec;
     }
 }
@@ -234,6 +236,8 @@ void loop()
         _armed;
 
     const bool imuIsCalibrated = _imu.step(&_ekf, usec_curr/1000);
+
+    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
     const bool isFlying = true; // XXX
 
