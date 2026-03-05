@@ -48,6 +48,14 @@ namespace hf {
                         _lpfz.init(sample_freq, cutoff_freq);
                     }
 
+                    static auto apply(ThreeAxisLpf & f, const Vec3 & in) -> Vec3
+                    {
+                        return Vec3(
+                                f._lpfx.apply(in.x),
+                                f._lpfy.apply(in.y),
+                                f._lpfz.apply(in.z));
+                    }
+
                 private:
 
                     LPF _lpfx;
