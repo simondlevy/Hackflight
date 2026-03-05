@@ -91,14 +91,23 @@ namespace hf {
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                applyLpf(_gyroLpf, gyroAligned, gyroDps);
+                const auto gyroFiltered = applyLpf(_gyroLpf, gyroAligned);
 
                 const auto accelAlignedToAirframe = alignToAirframe(accel);
 
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
 
-                applyLpf(_accLpf, accelAlignedToGravity, accelGs);
+                const auto accelFiltered = applyLpf(
+                        _accLpf, accelAlignedToGravity);
+
+                gyroDps.x = gyroFiltered.x;
+                gyroDps.y = gyroFiltered.y;
+                gyroDps.z = gyroFiltered.z;
+
+                accelGs.x = accelFiltered.x;
+                accelGs.y = accelFiltered.y;
+                accelGs.z = accelFiltered.z;
 
                 return gyroBiasFound;
             }
@@ -264,11 +273,12 @@ namespace hf {
                     sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
             }
 
-            static void applyLpf(LPF lpf[3], Vec3 & in)
+            static auto applyLpf(LPF lpf[3], const Vec3 & in) -> Vec3
             {
-                in.x = lpf[0].apply(in.x);
-                in.y = lpf[1].apply(in.y);
-                in.z = lpf[2].apply(in.z);
+                return Vec3(
+                        lpf[0].apply(in.x),
+                        lpf[1].apply(in.y),
+                        lpf[2].apply(in.z));
             }
 
             static void applyLpf(LPF lpf[3], const Vec3 & in, Vec3 & out)
