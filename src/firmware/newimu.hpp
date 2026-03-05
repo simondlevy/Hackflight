@@ -147,37 +147,27 @@ namespace hf {
 
             } bias_t;
 
-            Vec3 _gyroData;  // deg/s
-
-            static void calculateVarianceAndMean(
-                    bias_t* bias, Vec3* varOut, Vec3* meanOut)
-            {
-                int64_t sum[3] = {};
-                int64_t sumSq[3] = {};
-
-                for (uint16_t i=0; i<NBR_OF_BIAS_SAMPLES; i++) {
-
-                    sum[0] += bias->buffer[i].x;
-                    sum[1] += bias->buffer[i].y;
-                    sum[2] += bias->buffer[i].z;
-                    sumSq[0] += bias->buffer[i].x * bias->buffer[i].x;
-                    sumSq[1] += bias->buffer[i].y * bias->buffer[i].y;
-                    sumSq[2] += bias->buffer[i].z * bias->buffer[i].z;
-                }
-
-                meanOut->x = (float) sum[0] / NBR_OF_BIAS_SAMPLES;
-                meanOut->y = (float) sum[1] / NBR_OF_BIAS_SAMPLES;
-                meanOut->z = (float) sum[2] / NBR_OF_BIAS_SAMPLES;
-
-                varOut->x =
-                    sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut->x * meanOut->x;
-                varOut->y =
-                    sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut->y * meanOut->y;
-                varOut->z =
-                    sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
-            }
+            // ---------------------------------------------------------------
 
             bias_t _gyroBiasRunning;
+
+            Vec3 _gyroData;  // deg/s
+
+            // Low Pass filtering
+            Lpf _accLpf[3];
+            Lpf _gyroLpf[3];
+
+            // Pre-calculated values for accelerometer alignment
+            float _cosPitch;
+            float _sinPitch;
+            float _cosRoll;
+            float _sinRoll;
+
+            bool _gyroBiasFound;
+            Vec3 _gyroBias;
+
+            int16_t _gscale;
+            int16_t _ascale;
 
             /**
              * Checks if the variances is below the predefined thresholds.
@@ -210,58 +200,6 @@ namespace hf {
 
                 return foundBias;
             }
-
-            static void applyLpf(Lpf lpf[3], Vec3* in)
-            {
-                in->x = lpf[0].apply(in->x);
-                in->y = lpf[1].apply(in->y);
-                in->z = lpf[2].apply(in->z);
-            }
-
-            // Low Pass filtering
-            Lpf _accLpf[3];
-            Lpf _gyroLpf[3];
-
-            // Pre-calculated values for accelerometer alignment
-            float _cosPitch;
-            float _sinPitch;
-            float _cosRoll;
-            float _sinRoll;
-
-            static void alignToAirframe(Vec3* in, Vec3* out)
-            {
-                static float R[3][3];
-
-                // IMU alignment
-                static float sphi, cphi, stheta, ctheta, spsi, cpsi;
-
-                sphi   = sinf(ALIGN_PHI * (float) M_PI / 180);
-                cphi   = cosf(ALIGN_PHI * (float) M_PI / 180);
-                stheta = sinf(ALIGN_THETA * (float) M_PI / 180);
-                ctheta = cosf(ALIGN_THETA * (float) M_PI / 180);
-                spsi   = sinf(ALIGN_PSI * (float) M_PI / 180);
-                cpsi   = cosf(ALIGN_PSI * (float) M_PI / 180);
-
-                R[0][0] = ctheta * cpsi;
-                R[0][1] = ctheta * spsi;
-                R[0][2] = -stheta;
-                R[1][0] = sphi * stheta * cpsi - cphi * spsi;
-                R[1][1] = sphi * stheta * spsi + cphi * cpsi;
-                R[1][2] = sphi * ctheta;
-                R[2][0] = cphi * stheta * cpsi + sphi * spsi;
-                R[2][1] = cphi * stheta * spsi - sphi * cpsi;
-                R[2][2] = cphi * ctheta;
-
-                out->x = in->x*R[0][0] + in->y*R[0][1] + in->z*R[0][2];
-                out->y = in->x*R[1][0] + in->y*R[1][1] + in->z*R[1][2];
-                out->z = in->x*R[2][0] + in->y*R[2][1] + in->z*R[2][2];
-            }
-
-            bool _gyroBiasFound;
-            Vec3 _gyroBias;
-
-            int16_t _gscale;
-            int16_t _ascale;
 
             /**
              * Compensate for a miss-aligned accelerometer. It uses the trim
@@ -316,6 +254,72 @@ namespace hf {
                 gyroBiasOut->z = _gyroBiasRunning.bias.z;
 
                 return _gyroBiasRunning.isBiasValueFound;
+            }
+
+            // ---------------------------------------------------------------
+
+            static void calculateVarianceAndMean(
+                    bias_t* bias, Vec3* varOut, Vec3* meanOut)
+            {
+                int64_t sum[3] = {};
+                int64_t sumSq[3] = {};
+
+                for (uint16_t i=0; i<NBR_OF_BIAS_SAMPLES; i++) {
+
+                    sum[0] += bias->buffer[i].x;
+                    sum[1] += bias->buffer[i].y;
+                    sum[2] += bias->buffer[i].z;
+                    sumSq[0] += bias->buffer[i].x * bias->buffer[i].x;
+                    sumSq[1] += bias->buffer[i].y * bias->buffer[i].y;
+                    sumSq[2] += bias->buffer[i].z * bias->buffer[i].z;
+                }
+
+                meanOut->x = (float) sum[0] / NBR_OF_BIAS_SAMPLES;
+                meanOut->y = (float) sum[1] / NBR_OF_BIAS_SAMPLES;
+                meanOut->z = (float) sum[2] / NBR_OF_BIAS_SAMPLES;
+
+                varOut->x =
+                    sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut->x * meanOut->x;
+                varOut->y =
+                    sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut->y * meanOut->y;
+                varOut->z =
+                    sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
+            }
+
+            static void applyLpf(Lpf lpf[3], Vec3* in)
+            {
+                in->x = lpf[0].apply(in->x);
+                in->y = lpf[1].apply(in->y);
+                in->z = lpf[2].apply(in->z);
+            }
+
+            static void alignToAirframe(Vec3* in, Vec3* out)
+            {
+                static float R[3][3];
+
+                // IMU alignment
+                static float sphi, cphi, stheta, ctheta, spsi, cpsi;
+
+                sphi   = sinf(ALIGN_PHI * (float) M_PI / 180);
+                cphi   = cosf(ALIGN_PHI * (float) M_PI / 180);
+                stheta = sinf(ALIGN_THETA * (float) M_PI / 180);
+                ctheta = cosf(ALIGN_THETA * (float) M_PI / 180);
+                spsi   = sinf(ALIGN_PSI * (float) M_PI / 180);
+                cpsi   = cosf(ALIGN_PSI * (float) M_PI / 180);
+
+                R[0][0] = ctheta * cpsi;
+                R[0][1] = ctheta * spsi;
+                R[0][2] = -stheta;
+                R[1][0] = sphi * stheta * cpsi - cphi * spsi;
+                R[1][1] = sphi * stheta * spsi + cphi * cpsi;
+                R[1][2] = sphi * ctheta;
+                R[2][0] = cphi * stheta * cpsi + sphi * spsi;
+                R[2][1] = cphi * stheta * spsi - sphi * cpsi;
+                R[2][2] = cphi * ctheta;
+
+                out->x = in->x*R[0][0] + in->y*R[0][1] + in->z*R[0][2];
+                out->y = in->x*R[1][0] + in->y*R[1][1] + in->z*R[1][2];
+                out->z = in->x*R[2][0] + in->y*R[2][1] + in->z*R[2][2];
             }
 
             static float scale(const int16_t raw, const int16_t scale)
