@@ -33,6 +33,7 @@
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
+//#define PROFILE
 //#define DEBUG
 
 // IMU ------------------------------------------------------------
@@ -208,6 +209,22 @@ static float getDt(const uint32_t usec_curr)
     return dt;
 }
 
+#ifdef PROFILE
+static void profile()
+{
+    static uint32_t _msec;
+    const auto msec = millis();
+    static uint32_t _count;
+
+    if (msec - _msec > 1000) {
+        printf("count=%d\n", (int)_count);
+        _msec = msec;
+        _count = 0;
+    }
+    _count++;
+}
+#endif
+
 #ifdef DEBUG
 static void debug(
         const bool imuIsCalibrated,
@@ -217,7 +234,6 @@ static void debug(
 {
     static uint32_t _msec;
     const auto msec = millis();
-    static uint32_t _count;
 
     if (msec - _msec > 10) {
         //printf("dpsi=%+3.3f\n", gyroDps.z);
@@ -226,11 +242,8 @@ static void debug(
         //printf("imu is calibrated: %d\n", imuIsCalibrated);
         printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
                 state.phi, state.theta, state.psi);
-        //printf("count=%d\n", (int)_count);
         _msec = msec;
-        _count = 0;
     }
-    _count++;
 }
 #endif
 
@@ -304,6 +317,10 @@ void loop()
         _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
         _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
         _channel_values[3]};
+
+#ifdef PROFILE
+    profile();
+#endif
 
 #ifdef DEBUG
     debug(imuIsCalibrated, gyroDps, state, setpoint);

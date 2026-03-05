@@ -20,6 +20,8 @@
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
+#define NEW
+
 namespace hf {
 
     class IMU {
@@ -87,14 +89,11 @@ namespace hf {
                     scale(gyroRaw.z - _gyroBias.z, gscale)
                 };
 
-                // Rotate gyro to airframe
-                alignToAirframe(gyroUnbiased, gyroDps);
+                const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                // LPF gyro
-                applyLpf(_gyroLpf, gyroDps);
+                applyLpf(_gyroLpf, gyroAligned, gyroDps);
 
-                Vec3 accelScaled = {};
-                alignToAirframe(accel, accelScaled);
+                const auto accelScaled = alignToAirframe(accel);
 
                 alignAccelToGravity(accelScaled, accelGs);
 
@@ -274,7 +273,14 @@ namespace hf {
                 in.z = lpf[2].apply(in.z);
             }
 
-            static void alignToAirframe(const Vec3 & in, Vec3 & out)
+            static void applyLpf(LPF lpf[3], const Vec3 & in, Vec3 & out)
+            {
+                out.x = lpf[0].apply(in.x);
+                out.y = lpf[1].apply(in.y);
+                out.z = lpf[2].apply(in.z);
+            }
+
+            static auto alignToAirframe(const Vec3 & in) -> Vec3
             {
                 const auto sphi   = sinf(ALIGN_PHI * Num::DEG2RAD);
                 const auto cphi   = cosf(ALIGN_PHI * Num::DEG2RAD);
@@ -293,9 +299,10 @@ namespace hf {
                 const auto r21 = cphi * stheta * spsi - sphi * cpsi;
                 const auto r22 = cphi * ctheta;
 
-                out.x = in.x*r00 + in.y*r01 + in.z*r02;
-                out.y = in.x*r10 + in.y*r11 + in.z*r12;
-                out.z = in.x*r20 + in.y*r21 + in.z*r22;
+                return Vec3(
+                        in.x*r00 + in.y*r01 + in.z*r02,
+                        in.x*r10 + in.y*r11 + in.z*r12,
+                        in.x*r20 + in.y*r21 + in.z*r22);
             }
 
             static float scale(const int16_t raw, const int16_t scale)
