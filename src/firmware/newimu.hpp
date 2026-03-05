@@ -59,8 +59,6 @@ namespace hf {
                 _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
             }
 
-            bool device_init();
-
             /**
              * gx: positive roll-rightward
              * gy: positive nose-downward
@@ -69,10 +67,6 @@ namespace hf {
              * ay: positive roll-right
              * az: positive rightside-up
              */
-            void device_read(
-                    int16_t & gx, int16_t & gy, int16_t & gz,
-                    int16_t & ax, int16_t & ay, int16_t & az);
-
             bool step(
                     EKF * ekf,
                     const uint32_t tickCount,

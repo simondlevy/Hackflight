@@ -50,9 +50,8 @@ static bool okay(const int status)
     return status >= 0;
 }
 
-bool hf::IMU::device_init()
+static bool imu_device_init()
 {
-
     return 
 
         okay(gyro.begin()) &&
@@ -74,7 +73,7 @@ bool hf::IMU::device_init()
         okay(accel.setRange(Bmi088Accel::RANGE_24G));
 }
 
-void hf::IMU::device_read(
+static void imu_device_read(
         int16_t & gx, int16_t & gy, int16_t & gz,
         int16_t & ax, int16_t & ay, int16_t & az)
 {
@@ -83,7 +82,6 @@ void hf::IMU::device_read(
     gx = gyro.getGyroX_raw();
     gy = gyro.getGyroY_raw();
     gz = gyro.getGyroZ_raw();
-
 
     accel.readSensor();
 
@@ -251,7 +249,7 @@ void setup()
     _imu.init(GYRO_SCALE, ACCEL_SCALE);
     _ekf.init(millis());
 
-    _imu.device_init();
+    imu_device_init();
 
     delay(10);
 
@@ -283,7 +281,7 @@ void loop()
 
     hf::IMU::Axis3i16 gyroRaw = {};
     hf::IMU::Axis3i16 accelRaw = {};
-    _imu.device_read(
+    imu_device_read(
             gyroRaw.x, gyroRaw.y, gyroRaw.z,
             accelRaw.x, accelRaw.y, accelRaw.z);
 
