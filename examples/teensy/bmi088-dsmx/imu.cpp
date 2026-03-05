@@ -29,10 +29,8 @@ static bool okay(const int status)
     return status >= 0;
 }
 
-bool hf::IMU::device_init(int16_t & gscale, int16_t & ascale)
+bool hf::IMU::device_init()
 {
-    gscale = 2000;
-    ascale = 24;
 
     return 
 

@@ -31,9 +31,12 @@ namespace hf {
 
         public:
 
-            void init()
+            void init(const int16_t gscale, const int16_t ascale)
             {
-                device_init(_gscale, _ascale);
+                _gscale = gscale;
+                _ascale = ascale;
+
+                device_init();
 
                 _gyroBiasRunning.isBufferFilled = false;
                 _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -48,6 +51,8 @@ namespace hf {
                 _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
                 _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
             }
+
+            bool device_init();
 
             bool step(EKF * ekf, const uint32_t tickCount)
             {
@@ -320,8 +325,6 @@ namespace hf {
             }
 
             // Hardware-dependent ------------------------------------------------
-
-            bool device_init(int16_t & gscale, int16_t & ascale);
 
             /**
              * gx: positive roll-rightward

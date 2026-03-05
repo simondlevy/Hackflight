@@ -36,6 +36,9 @@
 
 // IMU ------------------------------------------------------------
 
+static const int16_t GYRO_SCALE = 2000;
+static const int16_t ACCEL_SCALE = 24;
+
 static hf::IMU _imu;
 
 // EKF ------------------------------------------------------------
@@ -56,6 +59,20 @@ void serialEvent1(void)
     }
 }
 
+static bool readReceiver(
+        const uint32_t usec_curr, float * channel_values)
+{
+    if (_dsm2048.timedOut(usec_curr)) {
+        return false;
+    }
+
+    if (_dsm2048.gotNewFrame()) {
+        _dsm2048.getChannelValues(channel_values, 6);
+    }
+
+    return true;
+}
+
 // Motors ---------------------------------------------------------
 
 // static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
@@ -65,17 +82,6 @@ static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 // static const uint8_t LED_PIN = 14; // external 
 static const uint8_t LED_PIN = 13; // built-in
-
-// Safety ----------------------------------------------------------
-
-static const float ARMING_SWITCH_MIN = 0;
-static const float THROTTLE_DOWN_MAX = -0.95;
-
-// FAFO -----------------------------------------------------------
-
-static const uint32_t LOOP_FREQ_HZ = 2000;
-
-// Helper functions ------------------------------------------------
 
 static void blinkInLoop(const uint32_t usec_curr)
 {
@@ -107,6 +113,14 @@ static void blinkOnStartup()
     }
 }
 
+// Safety ----------------------------------------------------------
+
+static const float ARMING_SWITCH_MIN = 0;
+static const float THROTTLE_DOWN_MAX = -0.95;
+
+
+// Helper functions ------------------------------------------------
+
 static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
 {
     static hf::Timer _timer;
@@ -134,20 +148,6 @@ static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
     state.dphi   = gyroData.x;
     state.dtheta = gyroData.y;
     state.dpsi   = -gyroData.z; // negate for nose-right positive
-}
-
-static bool readReceiver(
-        const uint32_t usec_curr, float * channel_values)
-{
-    if (_dsm2048.timedOut(usec_curr)) {
-        return false;
-    }
-
-    if (_dsm2048.gotNewFrame()) {
-        _dsm2048.getChannelValues(channel_values, 6);
-    }
-
-    return true;
 }
 
 static float getDt(const uint32_t usec_curr)
@@ -198,8 +198,10 @@ void setup()
     Serial1.begin(115000);
 
     // XXX should be done in constructors
-    _imu.init();
+    _imu.init(GYRO_SCALE, ACCEL_SCALE);
     _ekf.init(millis());
+
+    _imu.device_init();
 
     delay(10);
 
