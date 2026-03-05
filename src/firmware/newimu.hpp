@@ -31,6 +31,30 @@ namespace hf {
             static constexpr float CALIBRATION_PITCH = 0;
             static constexpr float CALIBRATION_ROLL = 0;
 
+            class ThreeAxisLpf {
+
+                public:
+
+                    ThreeAxisLpf() = default;
+
+                    ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
+
+
+                    ThreeAxisLpf(
+                            const float sample_freq, const float cutoff_freq)
+                    {
+                        _lpfx.init(sample_freq, cutoff_freq);
+                        _lpfy.init(sample_freq, cutoff_freq);
+                        _lpfz.init(sample_freq, cutoff_freq);
+                    }
+
+                private:
+
+                    LPF _lpfx;
+                    LPF _lpfy;
+                    LPF _lpfz;
+            };
+
         public:
 
             typedef struct {
@@ -279,13 +303,6 @@ namespace hf {
                         lpf[0].apply(in.x),
                         lpf[1].apply(in.y),
                         lpf[2].apply(in.z));
-            }
-
-            static void applyLpf(LPF lpf[3], const Vec3 & in, Vec3 & out)
-            {
-                out.x = lpf[0].apply(in.x);
-                out.y = lpf[1].apply(in.y);
-                out.z = lpf[2].apply(in.z);
             }
 
             static auto alignToAirframe(const Vec3 & in) -> Vec3
