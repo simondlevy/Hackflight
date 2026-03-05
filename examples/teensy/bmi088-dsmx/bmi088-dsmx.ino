@@ -191,7 +191,7 @@ static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
     _ekf.getStateEstimate(nowMs, state);
 
     // Get angular velocities directly from gyro
-    hf::axis3_t gyroData = {}; // XXX should use Vec3, returned value
+    hf::Vec3 gyroData = {}; // XXX should use Vec3, returned value
     _imu.getGyroData(gyroData);
     state.dphi   = gyroData.x;
     state.dtheta = gyroData.y;
@@ -286,7 +286,7 @@ void loop()
             accelRaw.x, accelRaw.y, accelRaw.z);
 
     const bool imuIsCalibrated =
-        _imu.step( &_ekf, usec_curr/1000, gyroRaw, accelRaw);
+        _imu.step(_ekf, usec_curr/1000, gyroRaw, accelRaw);
 
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 

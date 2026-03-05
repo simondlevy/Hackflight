@@ -60,22 +60,22 @@ namespace hf {
             }
 
             /**
-             * gx: positive roll-rightward
-             * gy: positive nose-downward
-             * gz: positive counter-clockwise
-             * ax: positive nose-up
-             * ay: positive roll-right
-             * az: positive rightside-up
+             * gyro.x: positive roll-rightward
+             * gyro.y: positive nose-downward
+             * gyro.z: positive counter-clockwise
+             * accel.x: positive nose-up
+             * accel.y: positive roll-right
+             * accel.z: positive rightside-up
              */
             bool step(
-                    EKF * ekf,
+                    EKF & ekf,
                     const uint32_t tickCount,
                     const Axis3i16 gyroRaw, 
                     const Axis3i16 accelRaw)
             {
 
                 // Convert accel to Gs
-                axis3_t accel = {
+                Vec3 accel = {
                     scale(accelRaw.x, _ascale),
                     scale(accelRaw.y, _ascale),
                     scale(accelRaw.z, _ascale)
@@ -85,7 +85,7 @@ namespace hf {
                 _gyroBiasFound = processGyroBias(tickCount, gyroRaw, &_gyroBias);
 
                 // Subtract gyro bias
-                axis3_t gyroUnbiased = {
+                Vec3 gyroUnbiased = {
                     scale(gyroRaw.x - _gyroBias.x, _gscale),
                     scale(gyroRaw.y - _gyroBias.y, _gscale),
                     scale(gyroRaw.z - _gyroBias.z, _gscale)
@@ -97,23 +97,23 @@ namespace hf {
                 // LPF gyro
                 applyLpf(_gyroLpf, &_gyroData);
 
-                axis3_t accelScaled = {};
+                Vec3 accelScaled = {};
                 alignToAirframe(&accel, &accelScaled);
 
-                axis3_t accelGs = {};
+                Vec3 accelGs = {};
 
                 accAlignToGravity(&accelScaled, &accelGs);
 
                 applyLpf(_accLpf, &accelGs);
 
-                ekf->enqueueImu(&_gyroData, &accelGs);
+                ekf.enqueueImu(&_gyroData, &accelGs);
 
                 return _gyroBiasFound;
             }
 
-            void getGyroData(axis3_t & gyroData)
+            void getGyroData(Vec3 & gyroData)
             {
-                memcpy(&gyroData, &_gyroData, sizeof(axis3_t));
+                memcpy(&gyroData, &_gyroData, sizeof(Vec3));
             }
 
         private:
@@ -138,9 +138,9 @@ namespace hf {
 
             typedef struct {
 
-                axis3_t     bias;
-                axis3_t     variance;
-                axis3_t     mean;
+                Vec3     bias;
+                Vec3     variance;
+                Vec3     mean;
                 bool       isBiasValueFound;
                 bool       isBufferFilled;
                 Axis3i16*  bufHead;
@@ -148,10 +148,10 @@ namespace hf {
 
             } bias_t;
 
-            axis3_t _gyroData;  // deg/s
+            Vec3 _gyroData;  // deg/s
 
             static void calculateVarianceAndMean(
-                    bias_t* bias, axis3_t* varOut, axis3_t* meanOut)
+                    bias_t* bias, Vec3* varOut, Vec3* meanOut)
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
@@ -179,8 +179,6 @@ namespace hf {
             }
 
             bias_t _gyroBiasRunning;
-
-            EKF * _ekf;
 
             /**
              * Checks if the variances is below the predefined thresholds.
@@ -214,7 +212,7 @@ namespace hf {
                 return foundBias;
             }
 
-            static void applyLpf(Lpf lpf[3], axis3_t* in)
+            static void applyLpf(Lpf lpf[3], Vec3* in)
             {
                 in->x = lpf[0].apply(in->x);
                 in->y = lpf[1].apply(in->y);
@@ -231,7 +229,7 @@ namespace hf {
             float _cosRoll;
             float _sinRoll;
 
-            static void alignToAirframe(axis3_t* in, axis3_t* out)
+            static void alignToAirframe(Vec3* in, Vec3* out)
             {
                 static float R[3][3];
 
@@ -261,7 +259,7 @@ namespace hf {
             }
 
             bool _gyroBiasFound;
-            axis3_t _gyroBias;
+            Vec3 _gyroBias;
 
             int16_t _gscale;
             int16_t _ascale;
@@ -271,17 +269,17 @@ namespace hf {
              * data gathered from the UI and written in the config-block to
              * rotate the accelerometer to be aligned with gravity.
              */
-            void accAlignToGravity(axis3_t* in, axis3_t* out)
+            void accAlignToGravity(Vec3* in, Vec3* out)
             {
 
                 // Rotate around x-axis
-                axis3_t rx = {};
+                Vec3 rx = {};
                 rx.x = in->x;
                 rx.y = in->y * _cosRoll - in->z * _sinRoll;
                 rx.z = in->y * _sinRoll + in->z * _cosRoll;
 
                 // Rotate around y-axis
-                axis3_t ry = {};
+                Vec3 ry = {};
                 ry.x = rx.x * _cosPitch - rx.z * _sinPitch;
                 ry.y = rx.y;
                 ry.z = -rx.x * _sinPitch + rx.z * _cosPitch;
@@ -296,7 +294,7 @@ namespace hf {
              * Requires a buffer but calibrates platform first when it is stable.
              */
             bool processGyroBias(const uint32_t tickCount,
-                    const Axis3i16 gyroRaw, axis3_t *gyroBiasOut)
+                    const Axis3i16 gyroRaw, Vec3 *gyroBiasOut)
             {
                 _gyroBiasRunning.bufHead->x = gyroRaw.x;
                 _gyroBiasRunning.bufHead->y = gyroRaw.y;
