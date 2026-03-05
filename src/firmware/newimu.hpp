@@ -88,13 +88,13 @@ namespace hf {
                 };
 
                 // Rotate gyro to airframe
-                alignToAirframe(&gyroUnbiased, &gyroDps);
+                alignToAirframe(gyroUnbiased, gyroDps);
 
                 // LPF gyro
                 applyLpf(_gyroLpf, gyroDps);
 
                 Vec3 accelScaled = {};
-                alignToAirframe(&accel, &accelScaled);
+                alignToAirframe(accel, accelScaled);
 
                 alignAccelToGravity(accelScaled, accelGs);
 
@@ -218,10 +218,10 @@ namespace hf {
             static void alignAccelToGravity(const Vec3 & in, Vec3 & out)
             {
 
-                const auto cosPitch = cosf(CALIBRATION_PITCH * (float) M_PI / 180);
-                const auto sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
-                const auto cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
-                const auto sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
+                const auto cosPitch = cosf(CALIBRATION_PITCH * Num::DEG2RAD);
+                const auto sinPitch = sinf(CALIBRATION_PITCH * Num::DEG2RAD);
+                const auto cosRoll = cosf(CALIBRATION_ROLL * Num::DEG2RAD);
+                const auto sinRoll = sinf(CALIBRATION_ROLL * Num::DEG2RAD);
 
                 // Rotate around x-axis
                 Vec3 rx = {};
@@ -275,33 +275,28 @@ namespace hf {
                 in.z = lpf[2].apply(in.z);
             }
 
-            static void alignToAirframe(Vec3* in, Vec3* out)
+            static void alignToAirframe(Vec3 & in, Vec3 & out)
             {
-                static float R[3][3];
+                const auto sphi   = sinf(ALIGN_PHI * Num::DEG2RAD);
+                const auto cphi   = cosf(ALIGN_PHI * Num::DEG2RAD);
+                const auto stheta = sinf(ALIGN_THETA * Num::DEG2RAD);
+                const auto ctheta = cosf(ALIGN_THETA * Num::DEG2RAD);
+                const auto spsi   = sinf(ALIGN_PSI * Num::DEG2RAD);
+                const auto cpsi   = cosf(ALIGN_PSI * Num::DEG2RAD);
 
-                // IMU alignment
-                static float sphi, cphi, stheta, ctheta, spsi, cpsi;
+                const auto r00 = ctheta * cpsi;
+                const auto r01 = ctheta * spsi;
+                const auto r02 = -stheta;
+                const auto r10 = sphi * stheta * cpsi - cphi * spsi;
+                const auto r11 = sphi * stheta * spsi + cphi * cpsi;
+                const auto r12 = sphi * ctheta;
+                const auto r20 = cphi * stheta * cpsi + sphi * spsi;
+                const auto r21 = cphi * stheta * spsi - sphi * cpsi;
+                const auto r22 = cphi * ctheta;
 
-                sphi   = sinf(ALIGN_PHI * (float) M_PI / 180);
-                cphi   = cosf(ALIGN_PHI * (float) M_PI / 180);
-                stheta = sinf(ALIGN_THETA * (float) M_PI / 180);
-                ctheta = cosf(ALIGN_THETA * (float) M_PI / 180);
-                spsi   = sinf(ALIGN_PSI * (float) M_PI / 180);
-                cpsi   = cosf(ALIGN_PSI * (float) M_PI / 180);
-
-                R[0][0] = ctheta * cpsi;
-                R[0][1] = ctheta * spsi;
-                R[0][2] = -stheta;
-                R[1][0] = sphi * stheta * cpsi - cphi * spsi;
-                R[1][1] = sphi * stheta * spsi + cphi * cpsi;
-                R[1][2] = sphi * ctheta;
-                R[2][0] = cphi * stheta * cpsi + sphi * spsi;
-                R[2][1] = cphi * stheta * spsi - sphi * cpsi;
-                R[2][2] = cphi * ctheta;
-
-                out->x = in->x*R[0][0] + in->y*R[0][1] + in->z*R[0][2];
-                out->y = in->x*R[1][0] + in->y*R[1][1] + in->z*R[1][2];
-                out->z = in->x*R[2][0] + in->y*R[2][1] + in->z*R[2][2];
+                out.x = in.x*r00 + in.y*r01 + in.z*r02;
+                out.y = in.x*r10 + in.y*r11 + in.z*r12;
+                out.z = in.x*r20 + in.y*r21 + in.z*r22;
             }
 
             static float scale(const int16_t raw, const int16_t scale)
