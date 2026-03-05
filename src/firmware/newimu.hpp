@@ -31,24 +31,23 @@ namespace hf {
 
         public:
 
-            typedef union {
-                struct {
-                    int16_t x;
-                    int16_t y;
-                    int16_t z;
-                };
-                int16_t axis[3];
+            typedef struct {
+                int16_t x;
+                int16_t y;
+                int16_t z;
             } Axis3i16;
 
-            void init(const int16_t gscale, const int16_t ascale)
-            {
-                _gscale = gscale;
-                _ascale = ascale;
+            IMU() = default;
 
+            IMU& operator=(const IMU& other) = default;
+
+            IMU (const int16_t gscale, const int16_t ascale) 
+                : _gscale(gscale), _ascale(ascale)
+            {
                 _gyroBiasRunning.isBufferFilled = false;
+
                 _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
-                // Calibrate
                 for (uint8_t i = 0; i < 3; i++) {
                     _gyroLpf[i].init(1000, GYRO_LPF_CUTOFF_FREQ);
                     _accLpf[i].init(1000, ACCEL_LPF_CUTOFF_FREQ);

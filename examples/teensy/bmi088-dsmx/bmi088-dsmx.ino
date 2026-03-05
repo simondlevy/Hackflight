@@ -40,7 +40,7 @@
 static const int16_t GYRO_SCALE = 2000;
 static const int16_t ACCEL_SCALE = 24;
 
-static hf::IMU _imu;
+static hf::IMU _imu = hf::IMU(GYRO_SCALE, ACCEL_SCALE);
 
 static Bmi088Accel accel(Wire, 0x19);
 static Bmi088Gyro gyro(Wire, 0x69);
@@ -178,7 +178,7 @@ static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
     const uint32_t nowMs = millis();
 
     if (_didResetEstimation) {
-        _ekf.init(nowMs);
+        _ekf.reset(nowMs);
         _didResetEstimation = false;
     }
 
@@ -217,13 +217,13 @@ static void debug(
     const auto msec = millis();
     static uint32_t _count;
 
-    if (msec - _msec > 1000) {
+    if (msec - _msec > 20) {
         //printf("t=%3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
         //        setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
         //printf("imu is calibrated: %d\n", imuIsCalibrated);
-        //printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
-        //        state.phi, state.theta, state.psi);
-        printf("count=%d\n", (int)_count);
+        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
+                state.phi, state.theta, state.psi);
+        //printf("count=%d\n", (int)_count);
         _msec = msec;
         _count = 0;
     }
@@ -244,10 +244,6 @@ void setup()
     delay(5);
 
     Serial1.begin(115000);
-
-    // XXX should be done in constructors
-    _imu.init(GYRO_SCALE, ACCEL_SCALE);
-    _ekf.init(millis());
 
     imu_device_init();
 

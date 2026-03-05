@@ -28,7 +28,16 @@ namespace hf {
 
         public:
 
-            void init(const uint32_t nowMs)
+            EKF()
+            {
+                reset(0);
+            }
+
+            // XXX needs copy constructor
+
+            EKF& operator=(const EKF& other) = default;
+ 
+            void reset(const uint32_t nowMs)
             {
                 axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
                 axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
