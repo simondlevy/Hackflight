@@ -20,6 +20,7 @@
 #include <Wire.h> 
 
 // Third-party libraries
+#include <BMI088.h>
 #include <dshot-teensy4.hpp>  
 #include <dsmrx.hpp>  
 
@@ -41,6 +42,55 @@ static const int16_t ACCEL_SCALE = 24;
 
 static hf::IMU _imu;
 
+static Bmi088Accel accel(Wire, 0x19);
+static Bmi088Gyro gyro(Wire, 0x69);
+
+static bool okay(const int status)
+{
+    return status >= 0;
+}
+
+bool hf::IMU::device_init()
+{
+
+    return 
+
+        okay(gyro.begin()) &&
+
+        okay(accel.begin()) &&
+
+        okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+
+        okay(gyro.setRange(Bmi088Gyro::RANGE_2000DPS)) &&
+
+        okay(gyro.pinModeInt3(
+                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
+
+        okay(gyro.mapDrdyInt3(true)) &&
+
+        okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+
+        okay(accel.setRange(Bmi088Accel::RANGE_24G));
+}
+
+void hf::IMU::device_read(
+        int16_t & gx, int16_t & gy, int16_t & gz,
+        int16_t & ax, int16_t & ay, int16_t & az)
+{
+    gyro.readSensor();
+
+    gx = gyro.getGyroX_raw();
+    gy = gyro.getGyroY_raw();
+    gz = gyro.getGyroZ_raw();
+
+
+    accel.readSensor();
+
+    ax = accel.getAccelX_raw();
+    ay = accel.getAccelY_raw();
+    az = accel.getAccelZ_raw();
+}
 // EKF ------------------------------------------------------------
 
 static const uint32_t FREQ_EKF_PREDICTION = 100;
@@ -231,7 +281,14 @@ void loop()
         throttle_is_down ? true :
         _armed;
 
-    const bool imuIsCalibrated = _imu.step(&_ekf, usec_curr/1000);
+    hf::IMU::Axis3i16 gyroRaw = {};
+    hf::IMU::Axis3i16 accelRaw = {};
+    _imu.device_read(
+            gyroRaw.x, gyroRaw.y, gyroRaw.z,
+            accelRaw.x, accelRaw.y, accelRaw.z);
+
+    const bool imuIsCalibrated =
+        _imu.step( &_ekf, usec_curr/1000, gyroRaw, accelRaw);
 
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 

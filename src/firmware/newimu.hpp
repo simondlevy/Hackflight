@@ -31,12 +31,19 @@ namespace hf {
 
         public:
 
+            typedef union {
+                struct {
+                    int16_t x;
+                    int16_t y;
+                    int16_t z;
+                };
+                int16_t axis[3];
+            } Axis3i16;
+
             void init(const int16_t gscale, const int16_t ascale)
             {
                 _gscale = gscale;
                 _ascale = ascale;
-
-                device_init();
 
                 _gyroBiasRunning.isBufferFilled = false;
                 _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
@@ -54,14 +61,24 @@ namespace hf {
 
             bool device_init();
 
-            bool step(EKF * ekf, const uint32_t tickCount)
-            {
-                Axis3i16 gyroRaw = {};
-                Axis3i16 accelRaw = {};
+            /**
+             * gx: positive roll-rightward
+             * gy: positive nose-downward
+             * gz: positive counter-clockwise
+             * ax: positive nose-up
+             * ay: positive roll-right
+             * az: positive rightside-up
+             */
+            void device_read(
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & ax, int16_t & ay, int16_t & az);
 
-                device_read(
-                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                        accelRaw.x, accelRaw.y, accelRaw.z);
+            bool step(
+                    EKF * ekf,
+                    const uint32_t tickCount,
+                    const Axis3i16 gyroRaw, 
+                    const Axis3i16 accelRaw)
+            {
 
                 // Convert accel to Gs
                 axis3_t accel = {
@@ -124,15 +141,6 @@ namespace hf {
             static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
             static const uint32_t GYRO_MIN_BIAS_TIMEOUT_MS = 1000;
-
-            typedef union {
-                struct {
-                    int16_t x;
-                    int16_t y;
-                    int16_t z;
-                };
-                int16_t axis[3];
-            } Axis3i16;
 
             typedef struct {
 
@@ -324,19 +332,6 @@ namespace hf {
                 return (float)raw * 2 * scale / 65536.f;
             }
 
-            // Hardware-dependent ------------------------------------------------
-
-            /**
-             * gx: positive roll-rightward
-             * gy: positive nose-downward
-             * gz: positive counter-clockwise
-             * ax: positive nose-up
-             * ay: positive roll-right
-             * az: positive rightside-up
-             */
-            void device_read(
-                    int16_t & gx, int16_t & gy, int16_t & gz,
-                    int16_t & ax, int16_t & ay, int16_t & az);
     };
 
 }
