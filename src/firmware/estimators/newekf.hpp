@@ -838,10 +838,10 @@ namespace hf {
             void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
                     matrix_t * pDst);
 
+            // Hardware-dependent --------------------------------------------
+
             static float device_cos(const float x);
-
             static float device_sin(const float x);
-
             static float device_sqrt(const float32_t in);
     };
 

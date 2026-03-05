@@ -40,7 +40,7 @@
 static const int16_t GYRO_SCALE = 2000;
 static const int16_t ACCEL_SCALE = 24;
 
-static hf::IMU _imu = hf::IMU(GYRO_SCALE, ACCEL_SCALE);
+static hf::IMU _imu;
 
 static Bmi088Accel accel(Wire, 0x19);
 static Bmi088Gyro gyro(Wire, 0x69);
@@ -169,7 +169,10 @@ static const float THROTTLE_DOWN_MAX = -0.95;
 
 // Helper functions ------------------------------------------------
 
-static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
+static void getVehicleState(
+        const bool isFlying,
+        const hf::Vec3 & gyroDps,
+        hf::vehicleState_t & state)
 {
     static hf::Timer _timer;
 
@@ -191,11 +194,9 @@ static void getVehicleState(const bool isFlying, hf::vehicleState_t & state)
     _ekf.getStateEstimate(nowMs, state);
 
     // Get angular velocities directly from gyro
-    hf::Vec3 gyroData = {}; // XXX should use Vec3, returned value
-    _imu.getGyroData(gyroData);
-    state.dphi   = gyroData.x;
-    state.dtheta = gyroData.y;
-    state.dpsi   = -gyroData.z; // negate for nose-right positive
+    state.dphi   = gyroDps.x;
+    state.dtheta = gyroDps.y;
+    state.dpsi   = -gyroDps.z; // negate for nose-right positive
 }
 
 static float getDt(const uint32_t usec_curr)
@@ -210,6 +211,7 @@ static float getDt(const uint32_t usec_curr)
 #ifdef DEBUG
 static void debug(
         const bool imuIsCalibrated,
+        const hf::Vec3 & gyroDps,
         const hf::vehicleState_t & state,
         const hf::Setpoint & setpoint)
 {
@@ -217,7 +219,8 @@ static void debug(
     const auto msec = millis();
     static uint32_t _count;
 
-    if (msec - _msec > 20) {
+    if (msec - _msec > 10) {
+        //printf("dpsi=%+3.3f\n", gyroDps.z);
         //printf("t=%3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
         //        setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
         //printf("imu is calibrated: %d\n", imuIsCalibrated);
@@ -281,16 +284,20 @@ void loop()
             gyroRaw.x, gyroRaw.y, gyroRaw.z,
             accelRaw.x, accelRaw.y, accelRaw.z);
 
+    hf::Vec3 gyroDps = {}; // XXX should use returned value
+    hf::Vec3 accelGs = {}; // XXX should use returned value
     const bool imuIsCalibrated =
-        _imu.step(_ekf, usec_curr/1000, gyroRaw, accelRaw);
-
+        _imu.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE, ACCEL_SCALE,
+                gyroDps, accelGs);
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
+
+    _ekf.enqueueImu(&gyroDps, &accelGs);
 
     const bool isFlying = true; // XXX
 
     // XXX should be return value
     hf::vehicleState_t state = {};
-    getVehicleState(isFlying, state);
+    getVehicleState(isFlying, gyroDps, state);
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
@@ -299,7 +306,7 @@ void loop()
         _channel_values[3]};
 
 #ifdef DEBUG
-    debug(imuIsCalibrated, state, setpoint);
+    debug(imuIsCalibrated, gyroDps, state, setpoint);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;

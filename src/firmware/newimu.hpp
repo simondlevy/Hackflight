@@ -37,12 +37,9 @@ namespace hf {
                 int16_t z;
             } Axis3i16;
 
-            IMU() = default;
-
             IMU& operator=(const IMU& other) = default;
 
-            IMU (const int16_t gscale, const int16_t ascale) 
-                : _gscale(gscale), _ascale(ascale)
+            IMU()
             {
                 _gyroBiasRunning.isBufferFilled = false;
 
@@ -52,10 +49,6 @@ namespace hf {
                     _gyroLpf[i].init(1000, GYRO_LPF_CUTOFF_FREQ);
                     _accLpf[i].init(1000, ACCEL_LPF_CUTOFF_FREQ);
                 }
-                _cosPitch = cosf(CALIBRATION_PITCH * (float) M_PI / 180);
-                _sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
-                _cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
-                _sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
             }
 
             /**
@@ -67,52 +60,47 @@ namespace hf {
              * accel.z: positive rightside-up
              */
             bool step(
-                    EKF & ekf,
                     const uint32_t tickCount,
                     const Axis3i16 gyroRaw, 
-                    const Axis3i16 accelRaw)
+                    const Axis3i16 accelRaw,
+                    const int16_t gscale,
+                    const int16_t ascale,
+                    Vec3 & gyroDps,
+                    Vec3 & accelGs)
             {
 
                 // Convert accel to Gs
                 Vec3 accel = {
-                    scale(accelRaw.x, _ascale),
-                    scale(accelRaw.y, _ascale),
-                    scale(accelRaw.z, _ascale)
+                    scale(accelRaw.x, ascale),
+                    scale(accelRaw.y, ascale),
+                    scale(accelRaw.z, ascale)
                 };
 
                 // Calibrate gyro with raw values if necessary
-                _gyroBiasFound = processGyroBias(tickCount, gyroRaw, &_gyroBias);
+                const auto gyroBiasFound = processGyroBias(tickCount, gyroRaw,
+                        _gyroBias, _gyroBiasRunning);
 
                 // Subtract gyro bias
                 Vec3 gyroUnbiased = {
-                    scale(gyroRaw.x - _gyroBias.x, _gscale),
-                    scale(gyroRaw.y - _gyroBias.y, _gscale),
-                    scale(gyroRaw.z - _gyroBias.z, _gscale)
+                    scale(gyroRaw.x - _gyroBias.x, gscale),
+                    scale(gyroRaw.y - _gyroBias.y, gscale),
+                    scale(gyroRaw.z - _gyroBias.z, gscale)
                 };
 
                 // Rotate gyro to airframe
-                alignToAirframe(&gyroUnbiased, &_gyroData);
+                alignToAirframe(&gyroUnbiased, &gyroDps);
 
                 // LPF gyro
-                applyLpf(_gyroLpf, &_gyroData);
+                applyLpf(_gyroLpf, &gyroDps);
 
                 Vec3 accelScaled = {};
                 alignToAirframe(&accel, &accelScaled);
 
-                Vec3 accelGs = {};
-
-                accAlignToGravity(&accelScaled, &accelGs);
+                alignAccelToGravity(accelScaled, accelGs);
 
                 applyLpf(_accLpf, &accelGs);
 
-                ekf.enqueueImu(&_gyroData, &accelGs);
-
-                return _gyroBiasFound;
-            }
-
-            void getGyroData(Vec3 & gyroData)
-            {
-                memcpy(&gyroData, &_gyroData, sizeof(Vec3));
+                return gyroBiasFound;
             }
 
         private:
@@ -151,54 +139,75 @@ namespace hf {
 
             bias_t _gyroBiasRunning;
 
-            Vec3 _gyroData;  // deg/s
-
             // Low Pass filtering
             Lpf _accLpf[3];
             Lpf _gyroLpf[3];
 
-            // Pre-calculated values for accelerometer alignment
-            float _cosPitch;
-            float _sinPitch;
-            float _cosRoll;
-            float _sinRoll;
-
-            bool _gyroBiasFound;
             Vec3 _gyroBias;
 
-            int16_t _gscale;
-            int16_t _ascale;
+            // ---------------------------------------------------------------
+
+            /**
+             * Calculates the bias first when the gyro variance is below threshold.
+             * Requires a buffer but calibrates platform first when it is stable.
+             */
+            static bool processGyroBias(
+                    const uint32_t tickCount,
+                    const Axis3i16 gyroRaw,
+                    Vec3 & gyroBiasOut,
+                    bias_t & gyroBiasRunning)
+            {
+                gyroBiasRunning.bufHead->x = gyroRaw.x;
+                gyroBiasRunning.bufHead->y = gyroRaw.y;
+                gyroBiasRunning.bufHead->z = gyroRaw.z;
+                gyroBiasRunning.bufHead++;
+
+                if (gyroBiasRunning.bufHead >= 
+                        &gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
+
+                    gyroBiasRunning.bufHead = gyroBiasRunning.buffer;
+                    gyroBiasRunning.isBufferFilled = true;
+                }
+
+                if (!gyroBiasRunning.isBiasValueFound) {
+                    findBiasValue(tickCount, gyroBiasRunning);
+                }
+
+                gyroBiasOut.x = gyroBiasRunning.bias.x;
+                gyroBiasOut.y = gyroBiasRunning.bias.y;
+                gyroBiasOut.z = gyroBiasRunning.bias.z;
+
+                return gyroBiasRunning.isBiasValueFound;
+            }
 
             /**
              * Checks if the variances is below the predefined thresholds.
              * The bias value should have been added before calling this.
              * @param bias  The bias object
              */
-            bool findBiasValue(const uint32_t ticks)
+            static void findBiasValue(
+                    const uint32_t ticks,
+                    bias_t & gyroBiasRunning)
             {
                 static int32_t varianceSampleTime;
-                bool foundBias = false;
 
-                if (_gyroBiasRunning.isBufferFilled)
+                if (gyroBiasRunning.isBufferFilled)
                 {
-                    calculateVarianceAndMean( &_gyroBiasRunning,
-                            &_gyroBiasRunning.variance, &_gyroBiasRunning.mean);
+                    calculateVarianceAndMean( &gyroBiasRunning,
+                            &gyroBiasRunning.variance, &gyroBiasRunning.mean);
 
-                    if (_gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
-                            _gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
-                            _gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
+                    if (gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
+                            gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
+                            gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
                             (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                     {
                         varianceSampleTime = ticks;
-                        _gyroBiasRunning.bias.x = _gyroBiasRunning.mean.x;
-                        _gyroBiasRunning.bias.y = _gyroBiasRunning.mean.y;
-                        _gyroBiasRunning.bias.z = _gyroBiasRunning.mean.z;
-                        foundBias = true;
-                        _gyroBiasRunning.isBiasValueFound = true;
+                        gyroBiasRunning.bias.x = gyroBiasRunning.mean.x;
+                        gyroBiasRunning.bias.y = gyroBiasRunning.mean.y;
+                        gyroBiasRunning.bias.z = gyroBiasRunning.mean.z;
+                        gyroBiasRunning.isBiasValueFound = true;
                     }
                 }
-
-                return foundBias;
             }
 
             /**
@@ -206,57 +215,30 @@ namespace hf {
              * data gathered from the UI and written in the config-block to
              * rotate the accelerometer to be aligned with gravity.
              */
-            void accAlignToGravity(Vec3* in, Vec3* out)
+            static void alignAccelToGravity(const Vec3 & in, Vec3 & out)
             {
+
+                const auto cosPitch = cosf(CALIBRATION_PITCH * (float) M_PI / 180);
+                const auto sinPitch = sinf(CALIBRATION_PITCH * (float) M_PI / 180);
+                const auto cosRoll = cosf(CALIBRATION_ROLL * (float) M_PI / 180);
+                const auto sinRoll = sinf(CALIBRATION_ROLL * (float) M_PI / 180);
 
                 // Rotate around x-axis
                 Vec3 rx = {};
-                rx.x = in->x;
-                rx.y = in->y * _cosRoll - in->z * _sinRoll;
-                rx.z = in->y * _sinRoll + in->z * _cosRoll;
+                rx.x = in.x;
+                rx.y = in.y * cosRoll - in.z * sinRoll;
+                rx.z = in.y * sinRoll + in.z * cosRoll;
 
                 // Rotate around y-axis
                 Vec3 ry = {};
-                ry.x = rx.x * _cosPitch - rx.z * _sinPitch;
+                ry.x = rx.x * cosPitch - rx.z * sinPitch;
                 ry.y = rx.y;
-                ry.z = -rx.x * _sinPitch + rx.z * _cosPitch;
+                ry.z = -rx.x * sinPitch + rx.z * cosPitch;
 
-                out->x = ry.x;
-                out->y = ry.y;
-                out->z = ry.z;
+                out.x = ry.x;
+                out.y = ry.y;
+                out.z = ry.z;
             }
-
-            /**
-             * Calculates the bias first when the gyro variance is below threshold.
-             * Requires a buffer but calibrates platform first when it is stable.
-             */
-            bool processGyroBias(const uint32_t tickCount,
-                    const Axis3i16 gyroRaw, Vec3 *gyroBiasOut)
-            {
-                _gyroBiasRunning.bufHead->x = gyroRaw.x;
-                _gyroBiasRunning.bufHead->y = gyroRaw.y;
-                _gyroBiasRunning.bufHead->z = gyroRaw.z;
-                _gyroBiasRunning.bufHead++;
-
-                if (_gyroBiasRunning.bufHead >= 
-                        &_gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
-
-                    _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
-                    _gyroBiasRunning.isBufferFilled = true;
-                }
-
-                if (!_gyroBiasRunning.isBiasValueFound) {
-                    findBiasValue(tickCount);
-                }
-
-                gyroBiasOut->x = _gyroBiasRunning.bias.x;
-                gyroBiasOut->y = _gyroBiasRunning.bias.y;
-                gyroBiasOut->z = _gyroBiasRunning.bias.z;
-
-                return _gyroBiasRunning.isBiasValueFound;
-            }
-
-            // ---------------------------------------------------------------
 
             static void calculateVarianceAndMean(
                     bias_t* bias, Vec3* varOut, Vec3* meanOut)
