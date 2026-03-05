@@ -70,7 +70,7 @@ namespace hf {
             {
 
                 // Convert accel to Gs
-                Vec3 accel = {
+                const Vec3 accel = {
                     scale(accelRaw.x, ascale),
                     scale(accelRaw.y, ascale),
                     scale(accelRaw.z, ascale)
@@ -81,7 +81,7 @@ namespace hf {
                         _gyroBias, _gyroBiasRunning);
 
                 // Subtract gyro bias
-                Vec3 gyroUnbiased = {
+                const Vec3 gyroUnbiased = {
                     scale(gyroRaw.x - _gyroBias.x, gscale),
                     scale(gyroRaw.y - _gyroBias.y, gscale),
                     scale(gyroRaw.z - _gyroBias.z, gscale)
@@ -139,9 +139,8 @@ namespace hf {
 
             bias_t _gyroBiasRunning;
 
-            // Low Pass filtering
-            Lpf _accLpf[3];
-            Lpf _gyroLpf[3];
+            LPF _accLpf[3];
+            LPF _gyroLpf[3];
 
             Vec3 _gyroBias;
 
@@ -268,14 +267,14 @@ namespace hf {
                     sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
             }
 
-            static void applyLpf(Lpf lpf[3], Vec3 & in)
+            static void applyLpf(LPF lpf[3], Vec3 & in)
             {
                 in.x = lpf[0].apply(in.x);
                 in.y = lpf[1].apply(in.y);
                 in.z = lpf[2].apply(in.z);
             }
 
-            static void alignToAirframe(Vec3 & in, Vec3 & out)
+            static void alignToAirframe(const Vec3 & in, Vec3 & out)
             {
                 const auto sphi   = sinf(ALIGN_PHI * Num::DEG2RAD);
                 const auto cphi   = cosf(ALIGN_PHI * Num::DEG2RAD);

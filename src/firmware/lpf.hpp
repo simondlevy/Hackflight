@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class Lpf {
+    class LPF {
 
         private:
 
