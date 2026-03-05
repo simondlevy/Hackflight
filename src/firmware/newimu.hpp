@@ -91,14 +91,14 @@ namespace hf {
                 alignToAirframe(&gyroUnbiased, &gyroDps);
 
                 // LPF gyro
-                applyLpf(_gyroLpf, &gyroDps);
+                applyLpf(_gyroLpf, gyroDps);
 
                 Vec3 accelScaled = {};
                 alignToAirframe(&accel, &accelScaled);
 
                 alignAccelToGravity(accelScaled, accelGs);
 
-                applyLpf(_accLpf, &accelGs);
+                applyLpf(_accLpf, accelGs);
 
                 return gyroBiasFound;
             }
@@ -268,11 +268,11 @@ namespace hf {
                     sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
             }
 
-            static void applyLpf(Lpf lpf[3], Vec3* in)
+            static void applyLpf(Lpf lpf[3], Vec3 & in)
             {
-                in->x = lpf[0].apply(in->x);
-                in->y = lpf[1].apply(in->y);
-                in->z = lpf[2].apply(in->z);
+                in.x = lpf[0].apply(in.x);
+                in.y = lpf[1].apply(in.y);
+                in.z = lpf[2].apply(in.z);
             }
 
             static void alignToAirframe(Vec3* in, Vec3* out)
