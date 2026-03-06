@@ -42,6 +42,7 @@ namespace hf {
                 _bufHead = _buffer;
             }
 
+            /*
             GyroBiasCalculator(
                     const Vec3 & biasOut,
                     const bool wasValueFound,
@@ -57,14 +58,14 @@ namespace hf {
                     _values(values),
                     _isBufferFilled(isBufferFilled),
                     _bufHead(bufHead),
-                    _varianceSampleTime(varianceSampleTime) {}
+                    _varianceSampleTime(varianceSampleTime) {}*/
 
             GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                 = default;
 
             static void process(
                     GyroBiasCalculator & calc,
-                    const uint32_t tickCount,
+                    const uint32_t ticks,
                     const axis3_i16_t gyroRaw)
             {
                 calc._bufHead->x = gyroRaw.x;
@@ -79,7 +80,24 @@ namespace hf {
                 }
 
                 if (!calc.wasValueFound) {
-                    findValue(calc, tickCount);
+
+                    if (calc._isBufferFilled)
+                    {
+                        calc._stats = calculateStats(calc);
+
+                        if (
+                                calc._stats.variance.x < RAW_VARIANCE_BASE &&
+                                calc._stats.variance.y < RAW_VARIANCE_BASE &&
+                                calc._stats.variance.z < RAW_VARIANCE_BASE &&
+                                (calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
+                        {
+                            calc._varianceSampleTime = ticks;
+                            calc._values.x = calc._stats.mean.x;
+                            calc._values.y = calc._stats.mean.y;
+                            calc._values.z = calc._stats.mean.z;
+                            calc.wasValueFound = true;
+                        }
+                    }
                 }
 
                 calc.biasOut.x = calc._values.x;
@@ -98,53 +116,32 @@ namespace hf {
 
             static auto calculateStats(const GyroBiasCalculator & calc)
                 -> SixAxisStats
-            {
-                int64_t xsum=0, ysum=0, zsum=0;
-                int64_t xsumsq=0, ysumsq=0, zsumsq=0;
-
-                for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
-
-                    xsum += calc._buffer[i].x;
-                    ysum += calc._buffer[i].y;
-                    zsum += calc._buffer[i].z;
-                    xsumsq += calc._buffer[i].x * calc._buffer[i].x;
-                    ysumsq += calc._buffer[i].y * calc._buffer[i].y;
-                    zsumsq += calc._buffer[i].z * calc._buffer[i].z;
-                }
-
-                const auto mean = Vec3(
-                        (float) xsum / NBR_OF_SAMPLES,
-                        (float) ysum / NBR_OF_SAMPLES,
-                        (float) zsum / NBR_OF_SAMPLES);
-
-                const auto variance = Vec3(
-                    xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
-                    ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
-                    zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
-
-                return SixAxisStats(mean, variance);
-            }
-
-            static void findValue(GyroBiasCalculator & calc, const uint32_t ticks)
-            {
-                if (calc._isBufferFilled)
                 {
-                    calc._stats = calculateStats(calc);
+                    int64_t xsum=0, ysum=0, zsum=0;
+                    int64_t xsumsq=0, ysumsq=0, zsumsq=0;
 
-                    if (
-                            calc._stats.variance.x < RAW_VARIANCE_BASE &&
-                            calc._stats.variance.y < RAW_VARIANCE_BASE &&
-                            calc._stats.variance.z < RAW_VARIANCE_BASE &&
-                            (calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
-                    {
-                        calc._varianceSampleTime = ticks;
-                        calc._values.x = calc._stats.mean.x;
-                        calc._values.y = calc._stats.mean.y;
-                        calc._values.z = calc._stats.mean.z;
-                        calc.wasValueFound = true;
+                    for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
+
+                        xsum += calc._buffer[i].x;
+                        ysum += calc._buffer[i].y;
+                        zsum += calc._buffer[i].z;
+                        xsumsq += calc._buffer[i].x * calc._buffer[i].x;
+                        ysumsq += calc._buffer[i].y * calc._buffer[i].y;
+                        zsumsq += calc._buffer[i].z * calc._buffer[i].z;
                     }
+
+                    const auto mean = Vec3(
+                            (float) xsum / NBR_OF_SAMPLES,
+                            (float) ysum / NBR_OF_SAMPLES,
+                            (float) zsum / NBR_OF_SAMPLES);
+
+                    const auto variance = Vec3(
+                            xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
+                            ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
+                            zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
+
+                    return SixAxisStats(mean, variance);
                 }
-            }
 
     }; // class GyroBias
 
