@@ -49,14 +49,14 @@ namespace hf {
                     {
                         float fr = sample_freq/cutoff_freq;
                         float ohm = tanf(M_PI/fr);
-                        float c = 1.0f+2.0f*cosf(M_PI/4.0f)*ohm+ohm*ohm;
+                        float c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
                         _b0 = ohm*ohm/c;
-                        _b1 = 2.0f*_b0;
+                        _b1 = 2*_b0;
                         _b2 = _b0;
-                        _a1 = 2.0f*(ohm*ohm-1.0f)/c;
-                        _a2 = (1.0f-2.0f*cosf(M_PI/4.0f)*ohm+ohm*ohm)/c;
-                        _delay_element_1 = 0.0f;
-                        _delay_element_2 = 0.0f;
+                        _a1 = 2*(ohm*ohm-1)/c;
+                        _a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
+                        _delay_element_1 = 0;
+                        _delay_element_2 = 0;
                      }
 
                     float apply(float sample)
