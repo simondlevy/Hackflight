@@ -85,19 +85,20 @@ namespace hf {
             int32_t _varianceSampleTime;
 
 
-            static void calculateStats(const GyroBiasCalculator & bias, SixAxisStats & stats)
+            static void calculateStats(
+                    const GyroBiasCalculator & calc, SixAxisStats & stats)
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
 
                 for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
 
-                    sum[0] += bias._buffer[i].x;
-                    sum[1] += bias._buffer[i].y;
-                    sum[2] += bias._buffer[i].z;
-                    sumSq[0] += bias._buffer[i].x * bias._buffer[i].x;
-                    sumSq[1] += bias._buffer[i].y * bias._buffer[i].y;
-                    sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
+                    sum[0] += calc._buffer[i].x;
+                    sum[1] += calc._buffer[i].y;
+                    sum[2] += calc._buffer[i].z;
+                    sumSq[0] += calc._buffer[i].x * calc._buffer[i].x;
+                    sumSq[1] += calc._buffer[i].y * calc._buffer[i].y;
+                    sumSq[2] += calc._buffer[i].z * calc._buffer[i].z;
                 }
 
                 stats.mean.x = (float) sum[0] / NBR_OF_SAMPLES;
@@ -112,23 +113,23 @@ namespace hf {
                     sumSq[2] / NBR_OF_SAMPLES - stats.mean.z * stats.mean.z;
             }
 
-            static void findValue(GyroBiasCalculator & bias, const uint32_t ticks)
+            static void findValue(GyroBiasCalculator & calc, const uint32_t ticks)
             {
-                if (bias._isBufferFilled)
+                if (calc._isBufferFilled)
                 {
-                    calculateStats(bias, bias._stats);
+                    calculateStats(calc, calc._stats);
 
                     if (
-                            bias._stats.variance.x < RAW_VARIANCE_BASE &&
-                            bias._stats.variance.y < RAW_VARIANCE_BASE &&
-                            bias._stats.variance.z < RAW_VARIANCE_BASE &&
-                            (bias._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
+                            calc._stats.variance.x < RAW_VARIANCE_BASE &&
+                            calc._stats.variance.y < RAW_VARIANCE_BASE &&
+                            calc._stats.variance.z < RAW_VARIANCE_BASE &&
+                            (calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
                     {
-                        bias._varianceSampleTime = ticks;
-                        bias._values.x = bias._stats.mean.x;
-                        bias._values.y = bias._stats.mean.y;
-                        bias._values.z = bias._stats.mean.z;
-                        bias.wasValueFound = true;
+                        calc._varianceSampleTime = ticks;
+                        calc._values.x = calc._stats.mean.x;
+                        calc._values.y = calc._stats.mean.y;
+                        calc._values.z = calc._stats.mean.z;
+                        calc.wasValueFound = true;
                     }
                 }
             }
