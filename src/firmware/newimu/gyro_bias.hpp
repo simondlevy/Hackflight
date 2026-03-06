@@ -79,24 +79,21 @@ namespace hf {
                     calc._isBufferFilled = true;
                 }
 
-                if (!calc.wasValueFound) {
+                if (!calc.wasValueFound && calc._isBufferFilled) {
 
-                    if (calc._isBufferFilled)
+                    calc._stats = calculateStats(calc);
+
+                    if (
+                            calc._stats.variance.x < RAW_VARIANCE_BASE &&
+                            calc._stats.variance.y < RAW_VARIANCE_BASE &&
+                            calc._stats.variance.z < RAW_VARIANCE_BASE &&
+                            (calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
                     {
-                        calc._stats = calculateStats(calc);
-
-                        if (
-                                calc._stats.variance.x < RAW_VARIANCE_BASE &&
-                                calc._stats.variance.y < RAW_VARIANCE_BASE &&
-                                calc._stats.variance.z < RAW_VARIANCE_BASE &&
-                                (calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
-                        {
-                            calc._varianceSampleTime = ticks;
-                            calc._values.x = calc._stats.mean.x;
-                            calc._values.y = calc._stats.mean.y;
-                            calc._values.z = calc._stats.mean.z;
-                            calc.wasValueFound = true;
-                        }
+                        calc._varianceSampleTime = ticks;
+                        calc._values.x = calc._stats.mean.x;
+                        calc._values.y = calc._stats.mean.y;
+                        calc._values.z = calc._stats.mean.z;
+                        calc.wasValueFound = true;
                     }
                 }
 
