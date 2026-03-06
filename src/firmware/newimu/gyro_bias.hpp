@@ -76,9 +76,8 @@ namespace hf {
 
         private:
 
+            SixAxisStats _stats;
             Vec3 _values;
-            Vec3 _variance;
-            Vec3 _mean;
 
             bool _wasValueFound;
             bool _isBufferFilled;
@@ -112,52 +111,24 @@ namespace hf {
                     sumSq[2] / NBR_OF_SAMPLES - stats.mean.z * stats.mean.z;
             }
 
-            static void calculateStats(
-                    const GyroBias & bias, Vec3 & variance, Vec3 & mean)
-            {
-                int64_t sum[3] = {};
-                int64_t sumSq[3] = {};
-
-                for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
-
-                    sum[0] += bias._buffer[i].x;
-                    sum[1] += bias._buffer[i].y;
-                    sum[2] += bias._buffer[i].z;
-                    sumSq[0] += bias._buffer[i].x * bias._buffer[i].x;
-                    sumSq[1] += bias._buffer[i].y * bias._buffer[i].y;
-                    sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
-                }
-
-                mean.x = (float) sum[0] / NBR_OF_SAMPLES;
-                mean.y = (float) sum[1] / NBR_OF_SAMPLES;
-                mean.z = (float) sum[2] / NBR_OF_SAMPLES;
-
-                variance.x =
-                    sumSq[0] / NBR_OF_SAMPLES - mean.x * mean.x;
-                variance.y =
-                    sumSq[1] / NBR_OF_SAMPLES - mean.y * mean.y;
-                variance.z =
-                    sumSq[2] / NBR_OF_SAMPLES - mean.z * mean.z;
-            }
-
             static void findValue(GyroBias & bias, const uint32_t ticks)
             {
                 static int32_t varianceSampleTime;
 
                 if (bias._isBufferFilled)
                 {
-                    calculateStats(bias, bias._variance, bias._mean);
+                    calculateStats(bias, bias._stats);
 
                     if (
-                            bias._variance.x < RAW_VARIANCE_BASE &&
-                            bias._variance.y < RAW_VARIANCE_BASE &&
-                            bias._variance.z < RAW_VARIANCE_BASE &&
+                            bias._stats.variance.x < RAW_VARIANCE_BASE &&
+                            bias._stats.variance.y < RAW_VARIANCE_BASE &&
+                            bias._stats.variance.z < RAW_VARIANCE_BASE &&
                             (varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
                     {
                         varianceSampleTime = ticks;
-                        bias._values.x = bias._mean.x;
-                        bias._values.y = bias._mean.y;
-                        bias._values.z = bias._mean.z;
+                        bias._values.x = bias._stats.mean.x;
+                        bias._values.y = bias._stats.mean.y;
+                        bias._values.z = bias._stats.mean.z;
                         bias._wasValueFound = true;
                     }
                 }
