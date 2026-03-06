@@ -86,14 +86,6 @@ namespace hf {
 
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
-
-                    ThreeAxisLpf(const float cutoff_freq)
-                    {
-                        _lpfx.init();
-                        _lpfy.init();
-                        _lpfz.init();
-                    }
-
                     static auto apply(
                             ThreeAxisLpf & f,
                             const Vec3 & in,
