@@ -109,21 +109,6 @@ namespace hf {
 
             }; // class ThreeAxisLpf
 
-            class ThreeAxisStats {
-
-                public:
-
-                    Vec3 mean;
-                    Vec3 variance;
-
-                    ThreeAxisStats() : mean(0, 0, 0), variance(0, 0, 0) {}
-
-                    ThreeAxisStats(const Vec3 & mean, const Vec3 & variance)
-                        : mean(mean), variance(variance) {}
-
-                    ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
-            };
-
         public:
 
             typedef struct {
@@ -225,8 +210,6 @@ namespace hf {
             class GyroBias {
 
                 public:
-
-                    ThreeAxisStats stats;
 
                     Vec3 variance;
                     Vec3 mean;
