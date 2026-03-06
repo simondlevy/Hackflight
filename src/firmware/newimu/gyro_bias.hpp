@@ -85,8 +85,7 @@ namespace hf {
             axis3_i16_t * _bufHead;
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
 
-            static void calculateStats(
-                    const GyroBias & bias, Vec3 & varOut, Vec3 & meanOut)
+            static void calculateStats(const GyroBias & bias, SixAxisStats & stats)
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
@@ -101,16 +100,44 @@ namespace hf {
                     sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
                 }
 
-                meanOut.x = (float) sum[0] / NBR_OF_SAMPLES;
-                meanOut.y = (float) sum[1] / NBR_OF_SAMPLES;
-                meanOut.z = (float) sum[2] / NBR_OF_SAMPLES;
+                stats.mean.x = (float) sum[0] / NBR_OF_SAMPLES;
+                stats.mean.y = (float) sum[1] / NBR_OF_SAMPLES;
+                stats.mean.z = (float) sum[2] / NBR_OF_SAMPLES;
 
-                varOut.x =
-                    sumSq[0] / NBR_OF_SAMPLES - meanOut.x * meanOut.x;
-                varOut.y =
-                    sumSq[1] / NBR_OF_SAMPLES - meanOut.y * meanOut.y;
-                varOut.z =
-                    sumSq[2] / NBR_OF_SAMPLES - meanOut.z * meanOut.z;
+                stats.variance.x =
+                    sumSq[0] / NBR_OF_SAMPLES - stats.mean.x * stats.mean.x;
+                stats.variance.y =
+                    sumSq[1] / NBR_OF_SAMPLES - stats.mean.y * stats.mean.y;
+                stats.variance.z =
+                    sumSq[2] / NBR_OF_SAMPLES - stats.mean.z * stats.mean.z;
+            }
+
+            static void calculateStats(
+                    const GyroBias & bias, Vec3 & variance, Vec3 & mean)
+            {
+                int64_t sum[3] = {};
+                int64_t sumSq[3] = {};
+
+                for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
+
+                    sum[0] += bias._buffer[i].x;
+                    sum[1] += bias._buffer[i].y;
+                    sum[2] += bias._buffer[i].z;
+                    sumSq[0] += bias._buffer[i].x * bias._buffer[i].x;
+                    sumSq[1] += bias._buffer[i].y * bias._buffer[i].y;
+                    sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
+                }
+
+                mean.x = (float) sum[0] / NBR_OF_SAMPLES;
+                mean.y = (float) sum[1] / NBR_OF_SAMPLES;
+                mean.z = (float) sum[2] / NBR_OF_SAMPLES;
+
+                variance.x =
+                    sumSq[0] / NBR_OF_SAMPLES - mean.x * mean.x;
+                variance.y =
+                    sumSq[1] / NBR_OF_SAMPLES - mean.y * mean.y;
+                variance.z =
+                    sumSq[2] / NBR_OF_SAMPLES - mean.z * mean.z;
             }
 
             static void findValue(GyroBias & bias, const uint32_t ticks)
@@ -119,8 +146,7 @@ namespace hf {
 
                 if (bias._isBufferFilled)
                 {
-                    GyroBias::calculateStats(bias,
-                            bias._variance, bias._mean);
+                    calculateStats(bias, bias._variance, bias._mean);
 
                     if (
                             bias._variance.x < RAW_VARIANCE_BASE &&
