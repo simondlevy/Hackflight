@@ -65,7 +65,9 @@ namespace hf {
 
                 // Calibrate gyro with raw values if necessary
                 const auto gyroBiasFound = GyroBias::process(_gyroBiasRunning,
-                        tickCount, gyroRaw, _gyroBias);
+                        tickCount, gyroRaw);
+
+                _gyroBias = _gyroBiasRunning.biasOut;
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {

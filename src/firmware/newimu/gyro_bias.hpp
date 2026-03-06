@@ -32,6 +32,8 @@ namespace hf {
 
         public:
 
+            Vec3 biasOut;
+
             GyroBias() 
             {
                 _isBufferFilled = false;
@@ -48,8 +50,7 @@ namespace hf {
             static bool process(
                     GyroBias & bias,
                     const uint32_t tickCount,
-                    const axis3_i16_t gyroRaw,
-                    Vec3 & gyroBiasOut)
+                    const axis3_i16_t gyroRaw)
             {
                 bias._bufHead->x = gyroRaw.x;
                 bias._bufHead->y = gyroRaw.y;
@@ -67,9 +68,9 @@ namespace hf {
                     GyroBias::findValue(bias, tickCount);
                 }
 
-                gyroBiasOut.x = bias._values.x;
-                gyroBiasOut.y = bias._values.y;
-                gyroBiasOut.z = bias._values.z;
+                bias.biasOut.x = bias._values.x;
+                bias.biasOut.y = bias._values.y;
+                bias.biasOut.z = bias._values.z;
 
                 return bias._wasValueFound;
             }
