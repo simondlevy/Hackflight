@@ -79,17 +79,21 @@ namespace hf {
 
                 public:
 
-                   ThreeAxisLpf() = default;
+                    Vec3 output;
+
+                    ThreeAxisLpf() = default;
 
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
-                    auto apply(const Vec3 & in, const float cutoff_freq) -> Vec3
+                    void apply(const Vec3 & in, const float cutoff_freq)
                     {
                         _x = LPF::apply(_x, in.x, cutoff_freq);
                         _y = LPF::apply(_y, in.y, cutoff_freq);
                         _z = LPF::apply(_z, in.z, cutoff_freq);
 
-                        return Vec3(_x.output, _y.output, _z.output);
+                        output.x = _x.output;
+                        output.y = _y.output;
+                        output.z = _z.output;
                     }
 
                 private:
@@ -98,7 +102,7 @@ namespace hf {
                     LPF _y;
                     LPF _z;
 
-             };
+            };
 
         public:
 
@@ -154,16 +158,18 @@ namespace hf {
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                const auto gyroFiltered = _gyroLpf.apply(gyroAligned,
-                        GYRO_LPF_CUTOFF_FREQ);
+                _gyroLpf.apply(gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+
+                const auto gyroFiltered = _gyroLpf.output;
 
                 const auto accelAlignedToAirframe = alignToAirframe(accel);
 
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
 
-                const auto accelFiltered = _accelLpf.apply(
-                        accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+                _accelLpf.apply(accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+
+                const auto accelFiltered = _accelLpf.output;
 
                 gyroDps.x = gyroFiltered.x;
                 gyroDps.y = gyroFiltered.y;
