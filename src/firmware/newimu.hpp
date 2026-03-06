@@ -38,7 +38,7 @@ namespace hf {
 
                     LPF() : output(0), _delay1(0), _delay2(0) {}
 
-                    LPF(const float delay1, const float delay2, const float output)
+                    LPF(const float output, const float delay1, const float delay2)
                         : output(output), _delay1(0), _delay2(0) {}
 
                     LPF& operator=(const LPF& other) = default;
@@ -68,31 +68,6 @@ namespace hf {
                         return LPF(delay0, lpf._delay1, output);
                     }
 
-                    void apply(
-                            const float sample,
-                            const float cutoff_freq,
-                            const float sample_freq=1000)
-                    {
-                        const auto fr = sample_freq/cutoff_freq;
-                        const auto ohm = tanf(M_PI/fr);
-                        const auto c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
-
-                        const auto b0 = ohm*ohm/c;
-                        const auto b1 = 2*b0;
-                        const auto a1 = 2*(ohm*ohm-1)/c;
-                        const auto a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
-
-                        const auto try_delay0 = sample - _delay1 * a1 - _delay2 * a2;
-
-                        // don't allow bad values to propigate through the filter
-                        const auto delay0 = isfinite(try_delay0) ? try_delay0 : sample;
-
-                        output = delay0 * b0 + _delay1 * b1 + _delay2 * b0;
-
-                        _delay2 = _delay1;
-                        _delay1 = delay0;
-                    }
-
                 private:
 
                     float _delay1;
@@ -110,9 +85,9 @@ namespace hf {
 
                     auto apply(const Vec3 & in, const float cutoff_freq) -> Vec3
                     {
-                        _x.apply(in.x, cutoff_freq);
-                        _y.apply(in.y, cutoff_freq);
-                        _z.apply(in.z, cutoff_freq);
+                        _x = LPF::apply(_x, in.x, cutoff_freq);
+                        _y = LPF::apply(_y, in.y, cutoff_freq);
+                        _z = LPF::apply(_z, in.z, cutoff_freq);
 
                         return Vec3(_x.output, _y.output, _z.output);
                     }

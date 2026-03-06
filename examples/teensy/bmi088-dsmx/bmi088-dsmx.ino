@@ -34,7 +34,7 @@
 #include <pidcontrol/stabilizer.hpp>
 
 //#define PROFILE
-#define DEBUG
+//#define DEBUG
 
 // IMU ------------------------------------------------------------
 
