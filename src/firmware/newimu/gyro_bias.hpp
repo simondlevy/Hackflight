@@ -42,6 +42,9 @@ namespace hf {
                 _bufHead = _buffer;
             }
 
+
+            GyroBiasCalculator& operator=(const GyroBiasCalculator& other) = default;
+
             /**
              * Checks if the variances is below the predefined thresholds.
              */

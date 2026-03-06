@@ -25,6 +25,14 @@ namespace hf {
             Vec3 mean;
             Vec3 variance;
 
-    }; // class SixAxisStats
+            SixAxisStats() = default;
+
+            SixAxisStats
+                (const Vec3& mean, const Vec3& variance) 
+                : mean(mean), variance(variance) {}
+
+            SixAxisStats& operator=(const SixAxisStats& other) = default;
+
+     }; // class SixAxisStats
 
 } // namespace hf
