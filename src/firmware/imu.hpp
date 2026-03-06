@@ -51,8 +51,8 @@ namespace hf {
 
             bool step(EKF * ekf, const uint32_t tickCount)
             {
-                Axis3i16 gyroRaw = {};
-                Axis3i16 accelRaw = {};
+                axis3_i16_t gyroRaw = {};
+                axis3_i16_t accelRaw = {};
 
                 device_read(
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
@@ -127,7 +127,7 @@ namespace hf {
                     int16_t z;
                 };
                 int16_t axis[3];
-            } Axis3i16;
+            } axis3_i16_t;
 
             typedef struct {
 
@@ -136,8 +136,8 @@ namespace hf {
                 axis3_t     mean;
                 bool       isBiasValueFound;
                 bool       isBufferFilled;
-                Axis3i16*  bufHead;
-                Axis3i16   buffer[NBR_OF_BIAS_SAMPLES];
+                axis3_i16_t*  bufHead;
+                axis3_i16_t   buffer[NBR_OF_BIAS_SAMPLES];
 
             } bias_t;
 
@@ -289,7 +289,7 @@ namespace hf {
              * Requires a buffer but calibrates platform first when it is stable.
              */
             bool processGyroBias(const uint32_t tickCount,
-                    const Axis3i16 gyroRaw, axis3_t *gyroBiasOut)
+                    const axis3_i16_t gyroRaw, axis3_t *gyroBiasOut)
             {
                 _gyroBiasRunning.bufHead->x = gyroRaw.x;
                 _gyroBiasRunning.bufHead->y = gyroRaw.y;

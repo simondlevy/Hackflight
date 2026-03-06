@@ -27,7 +27,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/estimators/newekf.hpp>
-#include <firmware/newimu.hpp>
+#include <firmware/newimu/imu.hpp>
 #include <datatypes.h>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/newpids/position.hpp>
@@ -293,8 +293,8 @@ void loop()
         throttle_is_down ? true :
         _armed;
 
-    hf::IMU::Axis3i16 gyroRaw = {};
-    hf::IMU::Axis3i16 accelRaw = {};
+    hf::axis3_i16_t gyroRaw = {};
+    hf::axis3_i16_t accelRaw = {};
     imu_device_read(
             gyroRaw.x, gyroRaw.y, gyroRaw.z,
             accelRaw.x, accelRaw.y, accelRaw.z);

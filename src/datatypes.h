@@ -59,6 +59,12 @@ namespace hf {
 
     } axis3_t;
 
+    typedef struct {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+    } axis3_i16_t;
+
     class Vec3 {
 
         public:
@@ -74,7 +80,7 @@ namespace hf {
                 : x(x), y(y), z(z) {}
 
             Vec3& operator=(const Vec3& other) = default;
-     };
+    };
 
     class Vec4 {
 
@@ -92,7 +98,7 @@ namespace hf {
                 : w(w), x(x), y(y), z(z) {}
 
             Vec4& operator=(const Vec4& other) = default;
-     };
+    };
 
 
     class Setpoint {
