@@ -62,8 +62,11 @@ namespace hf {
 
                     auto apply(
                             const float sample,
+                            const float cutoff_freq,
                             const float sample_freq=1000) -> float
                     {
+                        (void)cutoff_freq;
+
                         float delay_element_0 = sample - _delay_element_1 * _a1 - 
                             _delay_element_2 * _a2;
 
@@ -99,12 +102,15 @@ namespace hf {
                         _lpfz.init(cutoff_freq);
                     }
 
-                    static auto apply(ThreeAxisLpf & f, const Vec3 & in) -> Vec3
+                    static auto apply(
+                            ThreeAxisLpf & f,
+                            const Vec3 & in,
+                            const float cutoff_freq) -> Vec3
                     {
                         return Vec3(
-                                f._lpfx.apply(in.x),
-                                f._lpfy.apply(in.y),
-                                f._lpfz.apply(in.z));
+                                f._lpfx.apply(in.x, cutoff_freq),
+                                f._lpfy.apply(in.y, cutoff_freq),
+                                f._lpfz.apply(in.z, cutoff_freq));
                     }
 
                 private:
@@ -174,7 +180,8 @@ namespace hf {
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                const auto gyroFiltered = applyLpf(_gyroLpf, gyroAligned);
+                const auto gyroFiltered = applyLpf(_gyroLpf, gyroAligned,
+                        GYRO_LPF_CUTOFF_FREQ);
 
                 const auto accelAlignedToAirframe = alignToAirframe(accel);
 
@@ -182,7 +189,7 @@ namespace hf {
                         accelAlignedToAirframe);
 
                 const auto accelFiltered = applyLpf(
-                        _accLpf, accelAlignedToGravity);
+                        _accLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
 
                 gyroDps.x = gyroFiltered.x;
                 gyroDps.y = gyroFiltered.y;
@@ -356,12 +363,13 @@ namespace hf {
                     sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
             }
 
-            static auto applyLpf(LPF lpf[3], const Vec3 & in) -> Vec3
+            static auto applyLpf(LPF lpf[3], const Vec3 & in,
+                    const float cutoff_freq) -> Vec3
             {
                 return Vec3(
-                        lpf[0].apply(in.x),
-                        lpf[1].apply(in.y),
-                        lpf[2].apply(in.z));
+                        lpf[0].apply(in.x, cutoff_freq),
+                        lpf[1].apply(in.y, cutoff_freq),
+                        lpf[2].apply(in.z, cutoff_freq));
             }
 
             static auto alignToAirframe(const Vec3 & in) -> Vec3
