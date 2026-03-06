@@ -83,6 +83,8 @@ namespace hf {
             bool _isBufferFilled;
             axis3_i16_t * _bufHead;
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
+            int32_t _varianceSampleTime;
+
 
             static void calculateStats(const GyroBias & bias, SixAxisStats & stats)
             {
@@ -113,8 +115,6 @@ namespace hf {
 
             static void findValue(GyroBias & bias, const uint32_t ticks)
             {
-                static int32_t varianceSampleTime;
-
                 if (bias._isBufferFilled)
                 {
                     calculateStats(bias, bias._stats);
@@ -123,9 +123,9 @@ namespace hf {
                             bias._stats.variance.x < RAW_VARIANCE_BASE &&
                             bias._stats.variance.y < RAW_VARIANCE_BASE &&
                             bias._stats.variance.z < RAW_VARIANCE_BASE &&
-                            (varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
+                            (bias._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
                     {
-                        varianceSampleTime = ticks;
+                        bias._varianceSampleTime = ticks;
                         bias._values.x = bias._stats.mean.x;
                         bias._values.y = bias._stats.mean.y;
                         bias._values.z = bias._stats.mean.z;
