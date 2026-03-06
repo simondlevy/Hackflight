@@ -104,24 +104,26 @@ namespace hf {
 
                 public:
 
-                    LPF x;
-                    LPF y;
-                    LPF z;
-
-                    ThreeAxisLpf() = default;
+                   ThreeAxisLpf() = default;
 
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
                     auto apply(const Vec3 & in, const float cutoff_freq) -> Vec3
                     {
-                        x.apply(in.x, cutoff_freq);
-                        y.apply(in.y, cutoff_freq);
-                        z.apply(in.z, cutoff_freq);
+                        _x.apply(in.x, cutoff_freq);
+                        _y.apply(in.y, cutoff_freq);
+                        _z.apply(in.z, cutoff_freq);
 
-                        return Vec3(x.output, y.output, z.output);
+                        return Vec3(_x.output, _y.output, _z.output);
                     }
 
-            };
+                private:
+
+                    LPF _x;
+                    LPF _y;
+                    LPF _z;
+
+             };
 
         public:
 
