@@ -106,6 +106,22 @@ namespace hf {
                     LPF _x;
                     LPF _y;
                     LPF _z;
+
+            }; // class ThreeAxisLpf
+
+            class ThreeAxisStats {
+
+                public:
+
+                    Vec3 mean;
+                    Vec3 variance;
+
+                    ThreeAxisStats() : mean(0, 0, 0), variance(0, 0, 0) {}
+
+                    ThreeAxisStats(const Vec3 & mean, const Vec3 & variance)
+                        : mean(mean), variance(variance) {}
+
+                    ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
             };
 
         public:
@@ -275,8 +291,8 @@ namespace hf {
 
                 if (gyroBiasRunning.isBufferFilled)
                 {
-                    calculateVarianceAndMean( &gyroBiasRunning,
-                            &gyroBiasRunning.variance, &gyroBiasRunning.mean);
+                    calculateVarianceAndMean(gyroBiasRunning,
+                            gyroBiasRunning.variance, gyroBiasRunning.mean);
 
                     if (gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
                             gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
@@ -320,31 +336,31 @@ namespace hf {
             }
 
             static void calculateVarianceAndMean(
-                    bias_t* bias, Vec3* varOut, Vec3* meanOut)
+                    const bias_t & bias, Vec3 & varOut, Vec3 & meanOut)
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
 
                 for (uint16_t i=0; i<NBR_OF_BIAS_SAMPLES; i++) {
 
-                    sum[0] += bias->buffer[i].x;
-                    sum[1] += bias->buffer[i].y;
-                    sum[2] += bias->buffer[i].z;
-                    sumSq[0] += bias->buffer[i].x * bias->buffer[i].x;
-                    sumSq[1] += bias->buffer[i].y * bias->buffer[i].y;
-                    sumSq[2] += bias->buffer[i].z * bias->buffer[i].z;
+                    sum[0] += bias.buffer[i].x;
+                    sum[1] += bias.buffer[i].y;
+                    sum[2] += bias.buffer[i].z;
+                    sumSq[0] += bias.buffer[i].x * bias.buffer[i].x;
+                    sumSq[1] += bias.buffer[i].y * bias.buffer[i].y;
+                    sumSq[2] += bias.buffer[i].z * bias.buffer[i].z;
                 }
 
-                meanOut->x = (float) sum[0] / NBR_OF_BIAS_SAMPLES;
-                meanOut->y = (float) sum[1] / NBR_OF_BIAS_SAMPLES;
-                meanOut->z = (float) sum[2] / NBR_OF_BIAS_SAMPLES;
+                meanOut.x = (float) sum[0] / NBR_OF_BIAS_SAMPLES;
+                meanOut.y = (float) sum[1] / NBR_OF_BIAS_SAMPLES;
+                meanOut.z = (float) sum[2] / NBR_OF_BIAS_SAMPLES;
 
-                varOut->x =
-                    sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut->x * meanOut->x;
-                varOut->y =
-                    sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut->y * meanOut->y;
-                varOut->z =
-                    sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
+                varOut.x =
+                    sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut.x * meanOut.x;
+                varOut.y =
+                    sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut.y * meanOut.y;
+                varOut.z =
+                    sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut.z * meanOut.z;
             }
 
             static auto alignToAirframe(const Vec3 & in) -> Vec3
