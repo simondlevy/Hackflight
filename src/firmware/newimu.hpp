@@ -119,11 +119,7 @@ namespace hf {
 
             IMU& operator=(const IMU& other) = default;
 
-            IMU()
-            {
-                _gyroBiasRunning.isBufferFilled = false;
-                _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
-            }
+            IMU() = default;
 
             /**
              * gyro.x: positive roll-rightward
@@ -211,10 +207,16 @@ namespace hf {
 
                 public:
 
-                    bool isBiasValueFound;
+                    bool wasValueFound;
                     bool isBufferFilled;
                     Axis3i16 * bufHead;
                     Axis3i16 buffer[NBR_OF_BIAS_SAMPLES];
+
+                    GyroBias() 
+                    {
+                        isBufferFilled = false;
+                        bufHead = buffer;
+                    }
 
                     static void calculateStats(
                             const GyroBias & bias, Vec3 & varOut, Vec3 & meanOut)
@@ -267,7 +269,7 @@ namespace hf {
                                 bias._values.x = bias._mean.x;
                                 bias._values.y = bias._mean.y;
                                 bias._values.z = bias._mean.z;
-                                bias.isBiasValueFound = true;
+                                bias.wasValueFound = true;
                             }
                         }
                     }
@@ -294,7 +296,7 @@ namespace hf {
                             bias.isBufferFilled = true;
                         }
 
-                        if (!bias.isBiasValueFound) {
+                        if (!bias.wasValueFound) {
                             GyroBias::findValue(bias, tickCount);
                         }
 
@@ -302,7 +304,7 @@ namespace hf {
                         gyroBiasOut.y = bias._values.y;
                         gyroBiasOut.z = bias._values.z;
 
-                        return bias.isBiasValueFound;
+                        return bias.wasValueFound;
                     }
 
                 private:
