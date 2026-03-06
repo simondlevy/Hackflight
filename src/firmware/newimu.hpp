@@ -38,7 +38,6 @@ namespace hf {
                     float _a2;
                     float _b0;
                     float _b1;
-                    float _b2;
                     float _delay_element_1;
                     float _delay_element_2;
 
@@ -53,9 +52,9 @@ namespace hf {
 
                         _b0 = ohm*ohm/c;
                         _b1 = 2*_b0;
-                        _b2 = _b0;
                         _a1 = 2*(ohm*ohm-1)/c;
                         _a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
+
                         _delay_element_1 = 0;
                         _delay_element_2 = 0;
                      }
@@ -65,7 +64,11 @@ namespace hf {
                             const float cutoff_freq,
                             const float sample_freq=1000) -> float
                     {
-                        (void)cutoff_freq;
+                        const auto fr = sample_freq/cutoff_freq;
+                        const auto ohm = tanf(M_PI/fr);
+                        const auto c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
+
+                        (void)c;
 
                         float delay_element_0 = sample - _delay_element_1 * _a1 - 
                             _delay_element_2 * _a2;
@@ -76,7 +79,7 @@ namespace hf {
                         }
 
                         float output = delay_element_0 * _b0 + _delay_element_1 * _b1 + 
-                            _delay_element_2 * _b2;
+                            _delay_element_2 * _b0;
 
                         _delay_element_2 = _delay_element_1;
                         _delay_element_1 = delay_element_0;
