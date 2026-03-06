@@ -39,15 +39,9 @@ namespace hf {
 
                 public:
 
-                    LPF() = default;
+                    LPF() : _delay1(0), _delay2(0) {}
 
                     LPF& operator=(const LPF& other) = default;
-
-                    void init()
-                    {
-                        _delay1 = 0;
-                        _delay2 = 0;
-                    }
 
                     auto apply(
                             const float sample,
@@ -121,13 +115,7 @@ namespace hf {
             IMU()
             {
                 _gyroBiasRunning.isBufferFilled = false;
-
                 _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
-
-                for (uint8_t i = 0; i < 3; i++) {
-                    _gyroLpf[i].init();
-                    _accLpf[i].init();
-                }
             }
 
             /**
