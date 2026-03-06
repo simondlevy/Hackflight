@@ -99,28 +99,28 @@ namespace hf {
             static auto calculateStats(const GyroBiasCalculator & calc)
                 -> SixAxisStats
             {
-                int64_t sum[3] = {};
-                int64_t sumSq[3] = {};
+                int64_t xsum=0, ysum=0, zsum=0;
+                int64_t xsumsq=0, ysumsq=0, zsumsq=0;
 
                 for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
 
-                    sum[0] += calc._buffer[i].x;
-                    sum[1] += calc._buffer[i].y;
-                    sum[2] += calc._buffer[i].z;
-                    sumSq[0] += calc._buffer[i].x * calc._buffer[i].x;
-                    sumSq[1] += calc._buffer[i].y * calc._buffer[i].y;
-                    sumSq[2] += calc._buffer[i].z * calc._buffer[i].z;
+                    xsum += calc._buffer[i].x;
+                    ysum += calc._buffer[i].y;
+                    zsum += calc._buffer[i].z;
+                    xsumsq += calc._buffer[i].x * calc._buffer[i].x;
+                    ysumsq += calc._buffer[i].y * calc._buffer[i].y;
+                    zsumsq += calc._buffer[i].z * calc._buffer[i].z;
                 }
 
                 const auto mean = Vec3(
-                        (float) sum[0] / NBR_OF_SAMPLES,
-                        (float) sum[1] / NBR_OF_SAMPLES,
-                        (float) sum[2] / NBR_OF_SAMPLES);
+                        (float) xsum / NBR_OF_SAMPLES,
+                        (float) ysum / NBR_OF_SAMPLES,
+                        (float) zsum / NBR_OF_SAMPLES);
 
                 const auto variance = Vec3(
-                    sumSq[0] / NBR_OF_SAMPLES - mean.x * mean.x,
-                    sumSq[1] / NBR_OF_SAMPLES - mean.y * mean.y,
-                    sumSq[2] / NBR_OF_SAMPLES - mean.z * mean.z);
+                    xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
+                    ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
+                    zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
 
                 return SixAxisStats(mean, variance);
             }
