@@ -39,7 +39,7 @@ namespace hf {
 
                 public:
 
-                    void init(const float sample_freq=1000)
+                    void init()
                     {
                         _delay_element_1 = 0;
                         _delay_element_2 = 0;
@@ -129,8 +129,8 @@ namespace hf {
                 _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
                 for (uint8_t i = 0; i < 3; i++) {
-                    _gyroLpf[i].init(GYRO_LPF_CUTOFF_FREQ);
-                    _accLpf[i].init(ACCEL_LPF_CUTOFF_FREQ);
+                    _gyroLpf[i].init();
+                    _accLpf[i].init();
                 }
             }
 
