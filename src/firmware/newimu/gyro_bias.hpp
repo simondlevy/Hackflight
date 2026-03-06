@@ -37,6 +37,7 @@ namespace hf {
 
             GyroBiasCalculator() 
             {
+                wasValueFound = false;
                 _isBufferFilled = false;
                 _bufHead = _buffer;
             }
@@ -78,12 +79,10 @@ namespace hf {
 
             SixAxisStats _stats;
             Vec3 _values;
-
             bool _isBufferFilled;
             axis3_i16_t * _bufHead;
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
             int32_t _varianceSampleTime;
-
 
             static void calculateStats(
                     const GyroBiasCalculator & calc, SixAxisStats & stats)
