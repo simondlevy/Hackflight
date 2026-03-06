@@ -166,8 +166,8 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                const auto gyroBiasFound = processGyroBias(tickCount, gyroRaw,
-                        _gyroBias, _gyroBiasRunning);
+                const auto gyroBiasFound = Bias::processGyroBias(_gyroBiasRunning,
+                        tickCount, gyroRaw, _gyroBias);
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
@@ -265,7 +265,69 @@ namespace hf {
                         varOut.z =
                             sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut.z * meanOut.z;
                     }
-            };
+
+                    /**
+                     * Checks if the variances is below the predefined thresholds.
+                     */
+                    static void findBiasValue(
+                            Bias & gyroBiasRunning, const uint32_t ticks)
+                    {
+                        static int32_t varianceSampleTime;
+
+                        if (gyroBiasRunning.isBufferFilled)
+                        {
+                            Bias::calculateVarianceAndMean(gyroBiasRunning,
+                                    gyroBiasRunning.variance, gyroBiasRunning.mean);
+
+                            if (gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
+                                    gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
+                                    gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
+                                    (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
+                            {
+                                varianceSampleTime = ticks;
+                                gyroBiasRunning.bias.x = gyroBiasRunning.mean.x;
+                                gyroBiasRunning.bias.y = gyroBiasRunning.mean.y;
+                                gyroBiasRunning.bias.z = gyroBiasRunning.mean.z;
+                                gyroBiasRunning.isBiasValueFound = true;
+                            }
+                        }
+                    }
+
+                    /**
+                     * Calculates the bias first when the gyro variance is below threshold.
+                     * Requires a buffer but calibrates platform first when it is stable.
+                     */
+                    static bool processGyroBias(
+                            Bias & gyroBiasRunning,
+                            const uint32_t tickCount,
+                            const Axis3i16 gyroRaw,
+                            Vec3 & gyroBiasOut)
+                    {
+                        gyroBiasRunning.bufHead->x = gyroRaw.x;
+                        gyroBiasRunning.bufHead->y = gyroRaw.y;
+                        gyroBiasRunning.bufHead->z = gyroRaw.z;
+                        gyroBiasRunning.bufHead++;
+
+                        if (gyroBiasRunning.bufHead >= 
+                                &gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
+
+                            gyroBiasRunning.bufHead = gyroBiasRunning.buffer;
+                            gyroBiasRunning.isBufferFilled = true;
+                        }
+
+                        if (!gyroBiasRunning.isBiasValueFound) {
+                            Bias::findBiasValue(gyroBiasRunning, tickCount);
+                        }
+
+                        gyroBiasOut.x = gyroBiasRunning.bias.x;
+                        gyroBiasOut.y = gyroBiasRunning.bias.y;
+                        gyroBiasOut.z = gyroBiasRunning.bias.z;
+
+                        return gyroBiasRunning.isBiasValueFound;
+                    }
+
+
+            }; // class Bias
 
             // ---------------------------------------------------------------
 
@@ -277,69 +339,6 @@ namespace hf {
             Vec3 _gyroBias;
 
             // ---------------------------------------------------------------
-
-            /**
-             * Calculates the bias first when the gyro variance is below threshold.
-             * Requires a buffer but calibrates platform first when it is stable.
-             */
-            static bool processGyroBias(
-                    const uint32_t tickCount,
-                    const Axis3i16 gyroRaw,
-                    Vec3 & gyroBiasOut,
-                    Bias & gyroBiasRunning)
-            {
-                gyroBiasRunning.bufHead->x = gyroRaw.x;
-                gyroBiasRunning.bufHead->y = gyroRaw.y;
-                gyroBiasRunning.bufHead->z = gyroRaw.z;
-                gyroBiasRunning.bufHead++;
-
-                if (gyroBiasRunning.bufHead >= 
-                        &gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
-
-                    gyroBiasRunning.bufHead = gyroBiasRunning.buffer;
-                    gyroBiasRunning.isBufferFilled = true;
-                }
-
-                if (!gyroBiasRunning.isBiasValueFound) {
-                    findBiasValue(tickCount, gyroBiasRunning);
-                }
-
-                gyroBiasOut.x = gyroBiasRunning.bias.x;
-                gyroBiasOut.y = gyroBiasRunning.bias.y;
-                gyroBiasOut.z = gyroBiasRunning.bias.z;
-
-                return gyroBiasRunning.isBiasValueFound;
-            }
-
-            /**
-             * Checks if the variances is below the predefined thresholds.
-             * The bias value should have been added before calling this.
-             * @param bias  The bias object
-             */
-            static void findBiasValue(
-                    const uint32_t ticks,
-                    Bias & gyroBiasRunning)
-            {
-                static int32_t varianceSampleTime;
-
-                if (gyroBiasRunning.isBufferFilled)
-                {
-                    Bias::calculateVarianceAndMean(gyroBiasRunning,
-                            gyroBiasRunning.variance, gyroBiasRunning.mean);
-
-                    if (gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
-                            gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
-                            gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
-                            (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
-                    {
-                        varianceSampleTime = ticks;
-                        gyroBiasRunning.bias.x = gyroBiasRunning.mean.x;
-                        gyroBiasRunning.bias.y = gyroBiasRunning.mean.y;
-                        gyroBiasRunning.bias.z = gyroBiasRunning.mean.z;
-                        gyroBiasRunning.isBiasValueFound = true;
-                    }
-                }
-            }
 
             /**
              * Compensate for a miss-aligned accelerometer. It uses the trim
