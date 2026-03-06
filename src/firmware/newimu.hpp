@@ -47,9 +47,10 @@ namespace hf {
                     void init(const float cutoff_freq,
                             const float sample_freq=1000)
                     {
-                        float fr = sample_freq/cutoff_freq;
-                        float ohm = tanf(M_PI/fr);
-                        float c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
+                        const auto fr = sample_freq/cutoff_freq;
+                        const auto ohm = tanf(M_PI/fr);
+                        const auto c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
+
                         _b0 = ohm*ohm/c;
                         _b1 = 2*_b0;
                         _b2 = _b0;
