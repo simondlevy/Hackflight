@@ -111,6 +111,16 @@ namespace hf {
                     ThreeAxisLpf() = default;
 
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
+
+                    auto apply(const Vec3 & in, const float cutoff_freq) -> Vec3
+                    {
+                        x.apply(in.x, cutoff_freq);
+                        y.apply(in.y, cutoff_freq);
+                        z.apply(in.z, cutoff_freq);
+
+                        return Vec3(x.output, y.output, z.output);
+                    }
+
             };
 
         public:
@@ -167,7 +177,7 @@ namespace hf {
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                const auto gyroFiltered = applyLpf(_gyroLpf, gyroAligned,
+                const auto gyroFiltered = _gyroLpf.apply(gyroAligned,
                         GYRO_LPF_CUTOFF_FREQ);
 
                 const auto accelAlignedToAirframe = alignToAirframe(accel);
@@ -175,8 +185,8 @@ namespace hf {
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
 
-                const auto accelFiltered = applyLpf(
-                        _accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+                const auto accelFiltered = _accelLpf.apply(
+                        accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
 
                 gyroDps.x = gyroFiltered.x;
                 gyroDps.y = gyroFiltered.y;
@@ -348,16 +358,6 @@ namespace hf {
                     sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut->y * meanOut->y;
                 varOut->z =
                     sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut->z * meanOut->z;
-            }
-
-            static auto applyLpf(ThreeAxisLpf & lpf, const Vec3 & in,
-                    const float cutoff_freq) -> Vec3
-            {
-                lpf.x.apply(in.x, cutoff_freq);
-                lpf.y.apply(in.y, cutoff_freq);
-                lpf.z.apply(in.z, cutoff_freq);
-
-                return Vec3(lpf.x.output, lpf.y.output, lpf.z.output);
             }
 
             static auto alignToAirframe(const Vec3 & in) -> Vec3
