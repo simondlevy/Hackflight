@@ -211,9 +211,6 @@ namespace hf {
 
                 public:
 
-                    Vec3 variance;
-                    Vec3 mean;
-
                     bool isBiasValueFound;
                     bool isBufferFilled;
                     Axis3i16 * bufHead;
@@ -258,17 +255,18 @@ namespace hf {
                         if (bias.isBufferFilled)
                         {
                             GyroBias::calculateStats(bias,
-                                    bias.variance, bias.mean);
+                                    bias._variance, bias._mean);
 
-                            if (bias.variance.x < RAW_GYRO_VARIANCE_BASE &&
-                                    bias.variance.y < RAW_GYRO_VARIANCE_BASE &&
-                                    bias.variance.z < RAW_GYRO_VARIANCE_BASE &&
+                            if (
+                                    bias._variance.x < RAW_GYRO_VARIANCE_BASE &&
+                                    bias._variance.y < RAW_GYRO_VARIANCE_BASE &&
+                                    bias._variance.z < RAW_GYRO_VARIANCE_BASE &&
                                     (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                             {
                                 varianceSampleTime = ticks;
-                                bias._values.x = bias.mean.x;
-                                bias._values.y = bias.mean.y;
-                                bias._values.z = bias.mean.z;
+                                bias._values.x = bias._mean.x;
+                                bias._values.y = bias._mean.y;
+                                bias._values.z = bias._mean.z;
                                 bias.isBiasValueFound = true;
                             }
                         }
@@ -310,6 +308,8 @@ namespace hf {
                 private:
 
                     Vec3 _values;
+                    Vec3 _variance;
+                    Vec3 _mean;
 
             }; // class GyroBias
 
