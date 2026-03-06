@@ -270,25 +270,25 @@ namespace hf {
                      * Checks if the variances is below the predefined thresholds.
                      */
                     static void findValue(
-                            GyroBias & gyroBiasRunning, const uint32_t ticks)
+                            GyroBias & bias, const uint32_t ticks)
                     {
                         static int32_t varianceSampleTime;
 
-                        if (gyroBiasRunning.isBufferFilled)
+                        if (bias.isBufferFilled)
                         {
-                            GyroBias::calculateStats(gyroBiasRunning,
-                                    gyroBiasRunning.variance, gyroBiasRunning.mean);
+                            GyroBias::calculateStats(bias,
+                                    bias.variance, bias.mean);
 
-                            if (gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
-                                    gyroBiasRunning.variance.y < RAW_GYRO_VARIANCE_BASE &&
-                                    gyroBiasRunning.variance.z < RAW_GYRO_VARIANCE_BASE &&
+                            if (bias.variance.x < RAW_GYRO_VARIANCE_BASE &&
+                                    bias.variance.y < RAW_GYRO_VARIANCE_BASE &&
+                                    bias.variance.z < RAW_GYRO_VARIANCE_BASE &&
                                     (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                             {
                                 varianceSampleTime = ticks;
-                                gyroBiasRunning.bias.x = gyroBiasRunning.mean.x;
-                                gyroBiasRunning.bias.y = gyroBiasRunning.mean.y;
-                                gyroBiasRunning.bias.z = gyroBiasRunning.mean.z;
-                                gyroBiasRunning.isBiasValueFound = true;
+                                bias.bias.x = bias.mean.x;
+                                bias.bias.y = bias.mean.y;
+                                bias.bias.z = bias.mean.z;
+                                bias.isBiasValueFound = true;
                             }
                         }
                     }
@@ -298,32 +298,32 @@ namespace hf {
                      * Requires a buffer but calibrates platform first when it is stable.
                      */
                     static bool process(
-                            GyroBias & gyroBiasRunning,
+                            GyroBias & bias,
                             const uint32_t tickCount,
                             const Axis3i16 gyroRaw,
                             Vec3 & gyroBiasOut)
                     {
-                        gyroBiasRunning.bufHead->x = gyroRaw.x;
-                        gyroBiasRunning.bufHead->y = gyroRaw.y;
-                        gyroBiasRunning.bufHead->z = gyroRaw.z;
-                        gyroBiasRunning.bufHead++;
+                        bias.bufHead->x = gyroRaw.x;
+                        bias.bufHead->y = gyroRaw.y;
+                        bias.bufHead->z = gyroRaw.z;
+                        bias.bufHead++;
 
-                        if (gyroBiasRunning.bufHead >= 
-                                &gyroBiasRunning.buffer[NBR_OF_BIAS_SAMPLES]) {
+                        if (bias.bufHead >= 
+                                &bias.buffer[NBR_OF_BIAS_SAMPLES]) {
 
-                            gyroBiasRunning.bufHead = gyroBiasRunning.buffer;
-                            gyroBiasRunning.isBufferFilled = true;
+                            bias.bufHead = bias.buffer;
+                            bias.isBufferFilled = true;
                         }
 
-                        if (!gyroBiasRunning.isBiasValueFound) {
-                            GyroBias::findValue(gyroBiasRunning, tickCount);
+                        if (!bias.isBiasValueFound) {
+                            GyroBias::findValue(bias, tickCount);
                         }
 
-                        gyroBiasOut.x = gyroBiasRunning.bias.x;
-                        gyroBiasOut.y = gyroBiasRunning.bias.y;
-                        gyroBiasOut.z = gyroBiasRunning.bias.z;
+                        gyroBiasOut.x = bias.bias.x;
+                        gyroBiasOut.y = bias.bias.y;
+                        gyroBiasOut.z = bias.bias.z;
 
-                        return gyroBiasRunning.isBiasValueFound;
+                        return bias.isBiasValueFound;
                     }
 
 
