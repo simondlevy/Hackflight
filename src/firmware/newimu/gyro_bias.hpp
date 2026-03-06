@@ -38,61 +38,9 @@ namespace hf {
                 _bufHead = _buffer;
             }
 
-            static void calculateStats(
-                    const GyroBias & bias, Vec3 & varOut, Vec3 & meanOut)
-            {
-                int64_t sum[3] = {};
-                int64_t sumSq[3] = {};
-
-                for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
-
-                    sum[0] += bias._buffer[i].x;
-                    sum[1] += bias._buffer[i].y;
-                    sum[2] += bias._buffer[i].z;
-                    sumSq[0] += bias._buffer[i].x * bias._buffer[i].x;
-                    sumSq[1] += bias._buffer[i].y * bias._buffer[i].y;
-                    sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
-                }
-
-                meanOut.x = (float) sum[0] / NBR_OF_SAMPLES;
-                meanOut.y = (float) sum[1] / NBR_OF_SAMPLES;
-                meanOut.z = (float) sum[2] / NBR_OF_SAMPLES;
-
-                varOut.x =
-                    sumSq[0] / NBR_OF_SAMPLES - meanOut.x * meanOut.x;
-                varOut.y =
-                    sumSq[1] / NBR_OF_SAMPLES - meanOut.y * meanOut.y;
-                varOut.z =
-                    sumSq[2] / NBR_OF_SAMPLES - meanOut.z * meanOut.z;
-            }
-
             /**
              * Checks if the variances is below the predefined thresholds.
              */
-            static void findValue(GyroBias & bias, const uint32_t ticks)
-            {
-                static int32_t varianceSampleTime;
-
-                if (bias._isBufferFilled)
-                {
-                    GyroBias::calculateStats(bias,
-                            bias._variance, bias._mean);
-
-                    if (
-                            bias._variance.x < RAW_VARIANCE_BASE &&
-                            bias._variance.y < RAW_VARIANCE_BASE &&
-                            bias._variance.z < RAW_VARIANCE_BASE &&
-                            (varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
-                    {
-                        varianceSampleTime = ticks;
-                        bias._values.x = bias._mean.x;
-                        bias._values.y = bias._mean.y;
-                        bias._values.z = bias._mean.z;
-                        bias._wasValueFound = true;
-                    }
-                }
-            }
-
             /**
              * Calculates the bias first when the gyro variance is below threshold.
              * Requires a buffer but calibrates platform first when it is stable.
@@ -136,6 +84,58 @@ namespace hf {
             bool _isBufferFilled;
             axis3_i16_t * _bufHead;
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
+
+            static void calculateStats(
+                    const GyroBias & bias, Vec3 & varOut, Vec3 & meanOut)
+            {
+                int64_t sum[3] = {};
+                int64_t sumSq[3] = {};
+
+                for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
+
+                    sum[0] += bias._buffer[i].x;
+                    sum[1] += bias._buffer[i].y;
+                    sum[2] += bias._buffer[i].z;
+                    sumSq[0] += bias._buffer[i].x * bias._buffer[i].x;
+                    sumSq[1] += bias._buffer[i].y * bias._buffer[i].y;
+                    sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
+                }
+
+                meanOut.x = (float) sum[0] / NBR_OF_SAMPLES;
+                meanOut.y = (float) sum[1] / NBR_OF_SAMPLES;
+                meanOut.z = (float) sum[2] / NBR_OF_SAMPLES;
+
+                varOut.x =
+                    sumSq[0] / NBR_OF_SAMPLES - meanOut.x * meanOut.x;
+                varOut.y =
+                    sumSq[1] / NBR_OF_SAMPLES - meanOut.y * meanOut.y;
+                varOut.z =
+                    sumSq[2] / NBR_OF_SAMPLES - meanOut.z * meanOut.z;
+            }
+
+            static void findValue(GyroBias & bias, const uint32_t ticks)
+            {
+                static int32_t varianceSampleTime;
+
+                if (bias._isBufferFilled)
+                {
+                    GyroBias::calculateStats(bias,
+                            bias._variance, bias._mean);
+
+                    if (
+                            bias._variance.x < RAW_VARIANCE_BASE &&
+                            bias._variance.y < RAW_VARIANCE_BASE &&
+                            bias._variance.z < RAW_VARIANCE_BASE &&
+                            (varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
+                    {
+                        varianceSampleTime = ticks;
+                        bias._values.x = bias._mean.x;
+                        bias._values.y = bias._mean.y;
+                        bias._values.z = bias._mean.z;
+                        bias._wasValueFound = true;
+                    }
+                }
+            }
 
     }; // class GyroBias
 
