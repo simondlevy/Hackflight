@@ -166,7 +166,7 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                const auto gyroBiasFound = Bias::processGyroBias(_gyroBiasRunning,
+                const auto gyroBiasFound = GyroBias::process(_gyroBiasRunning,
                         tickCount, gyroRaw, _gyroBias);
 
                 // Subtract gyro bias
@@ -222,7 +222,7 @@ namespace hf {
 
             static const uint32_t GYRO_MIN_BIAS_TIMEOUT_MS = 1000;
 
-            class Bias {
+            class GyroBias {
 
                 public:
 
@@ -238,8 +238,8 @@ namespace hf {
                     Axis3i16 * bufHead;
                     Axis3i16 buffer[NBR_OF_BIAS_SAMPLES];
 
-                    static void calculateVarianceAndMean(
-                            const Bias & bias, Vec3 & varOut, Vec3 & meanOut)
+                    static void calculateStats(
+                            const GyroBias & bias, Vec3 & varOut, Vec3 & meanOut)
                     {
                         int64_t sum[3] = {};
                         int64_t sumSq[3] = {};
@@ -269,14 +269,14 @@ namespace hf {
                     /**
                      * Checks if the variances is below the predefined thresholds.
                      */
-                    static void findBiasValue(
-                            Bias & gyroBiasRunning, const uint32_t ticks)
+                    static void findValue(
+                            GyroBias & gyroBiasRunning, const uint32_t ticks)
                     {
                         static int32_t varianceSampleTime;
 
                         if (gyroBiasRunning.isBufferFilled)
                         {
-                            Bias::calculateVarianceAndMean(gyroBiasRunning,
+                            GyroBias::calculateStats(gyroBiasRunning,
                                     gyroBiasRunning.variance, gyroBiasRunning.mean);
 
                             if (gyroBiasRunning.variance.x < RAW_GYRO_VARIANCE_BASE &&
@@ -297,8 +297,8 @@ namespace hf {
                      * Calculates the bias first when the gyro variance is below threshold.
                      * Requires a buffer but calibrates platform first when it is stable.
                      */
-                    static bool processGyroBias(
-                            Bias & gyroBiasRunning,
+                    static bool process(
+                            GyroBias & gyroBiasRunning,
                             const uint32_t tickCount,
                             const Axis3i16 gyroRaw,
                             Vec3 & gyroBiasOut)
@@ -316,7 +316,7 @@ namespace hf {
                         }
 
                         if (!gyroBiasRunning.isBiasValueFound) {
-                            Bias::findBiasValue(gyroBiasRunning, tickCount);
+                            GyroBias::findValue(gyroBiasRunning, tickCount);
                         }
 
                         gyroBiasOut.x = gyroBiasRunning.bias.x;
@@ -327,11 +327,11 @@ namespace hf {
                     }
 
 
-            }; // class Bias
+            }; // class GyroBias
 
             // ---------------------------------------------------------------
 
-            Bias _gyroBiasRunning;
+            GyroBias _gyroBiasRunning;
 
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
