@@ -42,8 +42,15 @@ namespace hf {
                 _bufHead = _buffer;
             }
 
+            GyroBiasCalculator(
+                    Vec3 & biasOut,
+                    bool wasValueFound
+                    ) 
+            : biasOut(biasOut),
+            wasValueFound(wasValueFound) {}
 
-            GyroBiasCalculator& operator=(const GyroBiasCalculator& other) = default;
+            GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
+                = default;
 
             /**
              * Checks if the variances is below the predefined thresholds.
