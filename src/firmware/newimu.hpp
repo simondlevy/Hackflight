@@ -222,21 +222,26 @@ namespace hf {
 
             static const uint32_t GYRO_MIN_BIAS_TIMEOUT_MS = 1000;
 
-            typedef struct {
+            class Bias {
 
-                Vec3     bias;
-                Vec3     variance;
-                Vec3     mean;
-                bool       isBiasValueFound;
-                bool       isBufferFilled;
-                Axis3i16*  bufHead;
-                Axis3i16   buffer[NBR_OF_BIAS_SAMPLES];
+                public:
 
-            } bias_t;
+                    Vec3 bias;
+
+                    ThreeAxisStats stats;
+
+                    Vec3 variance;
+                    Vec3 mean;
+
+                    bool isBiasValueFound;
+                    bool isBufferFilled;
+                    Axis3i16 * bufHead;
+                    Axis3i16 buffer[NBR_OF_BIAS_SAMPLES];
+            };
 
             // ---------------------------------------------------------------
 
-            bias_t _gyroBiasRunning;
+            Bias _gyroBiasRunning;
 
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
@@ -253,7 +258,7 @@ namespace hf {
                     const uint32_t tickCount,
                     const Axis3i16 gyroRaw,
                     Vec3 & gyroBiasOut,
-                    bias_t & gyroBiasRunning)
+                    Bias & gyroBiasRunning)
             {
                 gyroBiasRunning.bufHead->x = gyroRaw.x;
                 gyroBiasRunning.bufHead->y = gyroRaw.y;
@@ -285,7 +290,7 @@ namespace hf {
              */
             static void findBiasValue(
                     const uint32_t ticks,
-                    bias_t & gyroBiasRunning)
+                    Bias & gyroBiasRunning)
             {
                 static int32_t varianceSampleTime;
 
@@ -335,8 +340,37 @@ namespace hf {
                         -rx.x * sinPitch + rx.z * cosPitch);
             }
 
+            static auto calculateVarianceAndMean(const Bias & bias) 
+                -> ThreeAxisStats
+            {
+                int64_t sum[3] = {};
+                int64_t sumSq[3] = {};
+
+                for (uint16_t i=0; i<NBR_OF_BIAS_SAMPLES; i++) {
+
+                    sum[0] += bias.buffer[i].x;
+                    sum[1] += bias.buffer[i].y;
+                    sum[2] += bias.buffer[i].z;
+                    sumSq[0] += bias.buffer[i].x * bias.buffer[i].x;
+                    sumSq[1] += bias.buffer[i].y * bias.buffer[i].y;
+                    sumSq[2] += bias.buffer[i].z * bias.buffer[i].z;
+                }
+
+                const auto mean = Vec3(
+                        (float) sum[0] / NBR_OF_BIAS_SAMPLES,
+                        (float) sum[1] / NBR_OF_BIAS_SAMPLES,
+                        (float) sum[2] / NBR_OF_BIAS_SAMPLES);
+
+                const auto variance = Vec3(
+                        sumSq[0] / NBR_OF_BIAS_SAMPLES - mean.x * mean.x,
+                        sumSq[1] / NBR_OF_BIAS_SAMPLES - mean.y * mean.y,
+                        sumSq[2] / NBR_OF_BIAS_SAMPLES - mean.z * mean.z);
+
+                return ThreeAxisStats(mean, variance);
+            }
+
             static void calculateVarianceAndMean(
-                    const bias_t & bias, Vec3 & varOut, Vec3 & meanOut)
+                    const Bias & bias, Vec3 & varOut, Vec3 & meanOut)
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
