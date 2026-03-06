@@ -32,21 +32,18 @@ namespace hf {
 
             class LPF {
 
-                private:
-
-                    float _delay1;
-                    float _delay2;
-
                 public:
+
+                    float output;
 
                     LPF() : _delay1(0), _delay2(0) {}
 
                     LPF& operator=(const LPF& other) = default;
 
-                    auto apply(
+                    void apply(
                             const float sample,
                             const float cutoff_freq,
-                            const float sample_freq=1000) -> float
+                            const float sample_freq=1000)
                     {
                         const auto fr = sample_freq/cutoff_freq;
                         const auto ohm = tanf(M_PI/fr);
@@ -62,13 +59,16 @@ namespace hf {
                         // don't allow bad values to propigate through the filter
                         const auto delay0 = isfinite(try_delay0) ? try_delay0 : sample;
 
-                        const auto output = delay0 * b0 + _delay1 * b1 + _delay2 * b0;
+                        output = delay0 * b0 + _delay1 * b1 + _delay2 * b0;
 
                         _delay2 = _delay1;
                         _delay1 = delay0;
-
-                        return output;
                     }
+
+                private:
+
+                    float _delay1;
+                    float _delay2;
 
             }; // class Lpf
 
@@ -89,10 +89,11 @@ namespace hf {
                             const Vec3 & in,
                             const float cutoff_freq) -> Vec3
                     {
-                        return Vec3(
-                                f.x.apply(in.x, cutoff_freq),
-                                f.y.apply(in.y, cutoff_freq),
-                                f.z.apply(in.z, cutoff_freq));
+                        f.x.apply(in.x, cutoff_freq);
+                        f.y.apply(in.y, cutoff_freq);
+                        f.z.apply(in.z, cutoff_freq);
+
+                        return Vec3(f.x.output, f.y.output, f.z.output);
                     }
             };
 
@@ -336,10 +337,11 @@ namespace hf {
             static auto applyLpf(ThreeAxisLpf & lpf, const Vec3 & in,
                     const float cutoff_freq) -> Vec3
             {
-                return Vec3(
-                        lpf.x.apply(in.x, cutoff_freq),
-                        lpf.y.apply(in.y, cutoff_freq),
-                        lpf.z.apply(in.z, cutoff_freq));
+                lpf.x.apply(in.x, cutoff_freq);
+                lpf.y.apply(in.y, cutoff_freq);
+                lpf.z.apply(in.z, cutoff_freq);
+
+                return Vec3(lpf.x.output, lpf.y.output, lpf.z.output);
             }
 
             static auto alignToAirframe(const Vec3 & in) -> Vec3
