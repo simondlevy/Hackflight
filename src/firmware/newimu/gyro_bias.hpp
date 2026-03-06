@@ -43,22 +43,25 @@ namespace hf {
             }
 
             GyroBiasCalculator(
-                    Vec3 & biasOut,
-                    bool wasValueFound
-                    ) 
-            : biasOut(biasOut),
-            wasValueFound(wasValueFound) {}
+                    const Vec3 & biasOut,
+                    const bool wasValueFound,
+                    const SixAxisStats & stats,
+                    const Vec3 & values,
+                    const bool isBufferFilled,
+                    axis3_i16_t * bufHead,
+                    const int32_t varianceSampleTime) 
+                :
+                    biasOut(biasOut),
+                    wasValueFound(wasValueFound),
+                    _stats(stats),
+                    _values(values),
+                    _isBufferFilled(isBufferFilled),
+                    _bufHead(bufHead),
+                    _varianceSampleTime(varianceSampleTime) {}
 
             GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                 = default;
 
-            /**
-             * Checks if the variances is below the predefined thresholds.
-             */
-            /**
-             * Calculates the bias first when the gyro variance is below threshold.
-             * Requires a buffer but calibrates platform first when it is stable.
-             */
             static void process(
                     GyroBiasCalculator & calc,
                     const uint32_t tickCount,
