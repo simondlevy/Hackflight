@@ -39,12 +39,11 @@ namespace hf {
 
                 public:
 
-                    void init(const float cutoff_freq,
-                            const float sample_freq=1000)
+                    void init(const float sample_freq=1000)
                     {
                         _delay_element_1 = 0;
                         _delay_element_2 = 0;
-                     }
+                    }
 
                     auto apply(
                             const float sample,
@@ -55,10 +54,10 @@ namespace hf {
                         const auto ohm = tanf(M_PI/fr);
                         const auto c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
 
-                       const auto b0 = ohm*ohm/c;
-                       const auto b1 = 2*b0;
-                       const auto a1 = 2*(ohm*ohm-1)/c;
-                       const auto a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
+                        const auto b0 = ohm*ohm/c;
+                        const auto b1 = 2*b0;
+                        const auto a1 = 2*(ohm*ohm-1)/c;
+                        const auto a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
 
                         float delay_element_0 = sample - _delay_element_1 * a1 - 
                             _delay_element_2 * a2;
@@ -90,9 +89,9 @@ namespace hf {
 
                     ThreeAxisLpf(const float cutoff_freq)
                     {
-                        _lpfx.init(cutoff_freq);
-                        _lpfy.init(cutoff_freq);
-                        _lpfz.init(cutoff_freq);
+                        _lpfx.init();
+                        _lpfy.init();
+                        _lpfz.init();
                     }
 
                     static auto apply(
@@ -130,8 +129,8 @@ namespace hf {
                 _gyroBiasRunning.bufHead = _gyroBiasRunning.buffer;
 
                 for (uint8_t i = 0; i < 3; i++) {
-                    _gyroLpf[i].init(1000, GYRO_LPF_CUTOFF_FREQ);
-                    _accLpf[i].init(1000, ACCEL_LPF_CUTOFF_FREQ);
+                    _gyroLpf[i].init(GYRO_LPF_CUTOFF_FREQ);
+                    _accLpf[i].init(ACCEL_LPF_CUTOFF_FREQ);
                 }
             }
 

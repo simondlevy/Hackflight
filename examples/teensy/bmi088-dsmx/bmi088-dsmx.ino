@@ -33,8 +33,8 @@
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-#define PROFILE
-//#define DEBUG
+//#define PROFILE
+#define DEBUG
 
 // IMU ------------------------------------------------------------
 
@@ -217,7 +217,9 @@ static void profile()
     static uint32_t _count;
 
     if (msec - _msec > 1000) {
-        printf("count=%d\n", (int)_count);
+        if (_count > 0) {
+            printf("count=%d\n", (int)_count);
+        }
         _msec = msec;
         _count = 0;
     }
