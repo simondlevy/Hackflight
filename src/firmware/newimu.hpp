@@ -83,17 +83,22 @@ namespace hf {
 
                     ThreeAxisLpf() = default;
 
+                    ThreeAxisLpf(const Vec3 & output,
+                            const LPF &x, const LPF &y, const LPF &z)
+                        : output(output), _x(x), _y(y), _z(z) {}
+
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
-                    void apply(const Vec3 & in, const float cutoff_freq)
+                    static auto apply(const ThreeAxisLpf & lpf, const Vec3 & in,
+                            const float cutoff_freq) -> ThreeAxisLpf
                     {
-                        _x = LPF::apply(_x, in.x, cutoff_freq);
-                        _y = LPF::apply(_y, in.y, cutoff_freq);
-                        _z = LPF::apply(_z, in.z, cutoff_freq);
+                        const auto x = LPF::apply(lpf._x, in.x, cutoff_freq);
+                        const auto y = LPF::apply(lpf._y, in.y, cutoff_freq);
+                        const auto z = LPF::apply(lpf._z, in.z, cutoff_freq);
 
-                        output.x = _x.output;
-                        output.y = _y.output;
-                        output.z = _z.output;
+                        const auto output = Vec3(x.output, y.output, z.output);
+
+                        return ThreeAxisLpf(output, x, y, z);
                     }
 
                 private:
@@ -101,7 +106,6 @@ namespace hf {
                     LPF _x;
                     LPF _y;
                     LPF _z;
-
             };
 
         public:
@@ -158,7 +162,7 @@ namespace hf {
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                _gyroLpf.apply(gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+                _gyroLpf = _gyroLpf.apply(_gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
 
                 const auto gyroFiltered = _gyroLpf.output;
 
@@ -167,7 +171,7 @@ namespace hf {
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
 
-                _accelLpf.apply(accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+                _accelLpf = _accelLpf.apply(_accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
 
                 const auto accelFiltered = _accelLpf.output;
 
