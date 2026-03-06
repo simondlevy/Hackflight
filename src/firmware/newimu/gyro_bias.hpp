@@ -19,7 +19,7 @@
 
 namespace hf {
 
-    class GyroBias {
+    class GyroBiasCalculator {
 
         private:
 
@@ -35,7 +35,7 @@ namespace hf {
             Vec3 biasOut;
             bool wasValueFound;
 
-            GyroBias() 
+            GyroBiasCalculator() 
             {
                 _isBufferFilled = false;
                 _bufHead = _buffer;
@@ -49,7 +49,7 @@ namespace hf {
              * Requires a buffer but calibrates platform first when it is stable.
              */
             static void process(
-                    GyroBias & bias,
+                    GyroBiasCalculator & bias,
                     const uint32_t tickCount,
                     const axis3_i16_t gyroRaw)
             {
@@ -66,7 +66,7 @@ namespace hf {
                 }
 
                 if (!bias.wasValueFound) {
-                    GyroBias::findValue(bias, tickCount);
+                    GyroBiasCalculator::findValue(bias, tickCount);
                 }
 
                 bias.biasOut.x = bias._values.x;
@@ -85,7 +85,7 @@ namespace hf {
             int32_t _varianceSampleTime;
 
 
-            static void calculateStats(const GyroBias & bias, SixAxisStats & stats)
+            static void calculateStats(const GyroBiasCalculator & bias, SixAxisStats & stats)
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
@@ -112,7 +112,7 @@ namespace hf {
                     sumSq[2] / NBR_OF_SAMPLES - stats.mean.z * stats.mean.z;
             }
 
-            static void findValue(GyroBias & bias, const uint32_t ticks)
+            static void findValue(GyroBiasCalculator & bias, const uint32_t ticks)
             {
                 if (bias._isBufferFilled)
                 {

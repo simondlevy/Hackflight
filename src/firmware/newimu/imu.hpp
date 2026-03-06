@@ -64,10 +64,10 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                GyroBias::process(_gyroBiasRunning,
+                GyroBiasCalculator::process(_gyroBiasCalculator,
                         tickCount, gyroRaw);
 
-                _gyroBias = _gyroBiasRunning.biasOut;
+                _gyroBias = _gyroBiasCalculator.biasOut;
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
@@ -99,7 +99,7 @@ namespace hf {
                 accelGs.y = accelFiltered.y;
                 accelGs.z = accelFiltered.z;
 
-                return _gyroBiasRunning.wasValueFound;
+                return _gyroBiasCalculator.wasValueFound;
             }
 
         private:
@@ -116,7 +116,7 @@ namespace hf {
 
             // ---------------------------------------------------------------
 
-            GyroBias _gyroBiasRunning;
+            GyroBiasCalculator _gyroBiasCalculator;
 
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
