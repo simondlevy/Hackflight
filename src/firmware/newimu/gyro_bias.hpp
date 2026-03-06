@@ -33,6 +33,7 @@ namespace hf {
         public:
 
             Vec3 biasOut;
+            bool wasValueFound;
 
             GyroBias() 
             {
@@ -47,7 +48,7 @@ namespace hf {
              * Calculates the bias first when the gyro variance is below threshold.
              * Requires a buffer but calibrates platform first when it is stable.
              */
-            static bool process(
+            static void process(
                     GyroBias & bias,
                     const uint32_t tickCount,
                     const axis3_i16_t gyroRaw)
@@ -64,15 +65,13 @@ namespace hf {
                     bias._isBufferFilled = true;
                 }
 
-                if (!bias._wasValueFound) {
+                if (!bias.wasValueFound) {
                     GyroBias::findValue(bias, tickCount);
                 }
 
                 bias.biasOut.x = bias._values.x;
                 bias.biasOut.y = bias._values.y;
                 bias.biasOut.z = bias._values.z;
-
-                return bias._wasValueFound;
             }
 
         private:
@@ -80,7 +79,6 @@ namespace hf {
             SixAxisStats _stats;
             Vec3 _values;
 
-            bool _wasValueFound;
             bool _isBufferFilled;
             axis3_i16_t * _bufHead;
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
@@ -130,7 +128,7 @@ namespace hf {
                         bias._values.x = bias._stats.mean.x;
                         bias._values.y = bias._stats.mean.y;
                         bias._values.z = bias._stats.mean.z;
-                        bias._wasValueFound = true;
+                        bias.wasValueFound = true;
                     }
                 }
             }

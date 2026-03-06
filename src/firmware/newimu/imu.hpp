@@ -64,7 +64,7 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                const auto gyroBiasFound = GyroBias::process(_gyroBiasRunning,
+                GyroBias::process(_gyroBiasRunning,
                         tickCount, gyroRaw);
 
                 _gyroBias = _gyroBiasRunning.biasOut;
@@ -99,7 +99,7 @@ namespace hf {
                 accelGs.y = accelFiltered.y;
                 accelGs.z = accelFiltered.z;
 
-                return gyroBiasFound;
+                return _gyroBiasRunning.wasValueFound;
             }
 
         private:
