@@ -87,7 +87,8 @@ namespace hf {
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
 
-                _accelLpf = _accelLpf.apply(_accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+                _accelLpf = _accelLpf.apply(
+                        _accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
 
                 const auto accelFiltered = _accelLpf.output;
 

@@ -49,29 +49,29 @@ namespace hf {
              * Requires a buffer but calibrates platform first when it is stable.
              */
             static void process(
-                    GyroBiasCalculator & bias,
+                    GyroBiasCalculator & calc,
                     const uint32_t tickCount,
                     const axis3_i16_t gyroRaw)
             {
-                bias._bufHead->x = gyroRaw.x;
-                bias._bufHead->y = gyroRaw.y;
-                bias._bufHead->z = gyroRaw.z;
-                bias._bufHead++;
+                calc._bufHead->x = gyroRaw.x;
+                calc._bufHead->y = gyroRaw.y;
+                calc._bufHead->z = gyroRaw.z;
+                calc._bufHead++;
 
-                if (bias._bufHead >= 
-                        &bias._buffer[NBR_OF_SAMPLES]) {
+                if (calc._bufHead >= 
+                        &calc._buffer[NBR_OF_SAMPLES]) {
 
-                    bias._bufHead = bias._buffer;
-                    bias._isBufferFilled = true;
+                    calc._bufHead = calc._buffer;
+                    calc._isBufferFilled = true;
                 }
 
-                if (!bias.wasValueFound) {
-                    GyroBiasCalculator::findValue(bias, tickCount);
+                if (!calc.wasValueFound) {
+                    findValue(calc, tickCount);
                 }
 
-                bias.biasOut.x = bias._values.x;
-                bias.biasOut.y = bias._values.y;
-                bias.biasOut.z = bias._values.z;
+                calc.biasOut.x = calc._values.x;
+                calc.biasOut.y = calc._values.y;
+                calc.biasOut.z = calc._values.z;
             }
 
         private:
