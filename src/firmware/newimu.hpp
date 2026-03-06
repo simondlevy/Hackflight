@@ -194,10 +194,6 @@ namespace hf {
             static constexpr float ALIGN_THETA = 0;
             static constexpr float ALIGN_PSI   = 0;
 
-            // Number of samples used in variance calculation. Changing this
-            // effects the threshold
-            static const uint16_t NBR_OF_BIAS_SAMPLES = 512;
-
             static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
             static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
@@ -205,15 +201,18 @@ namespace hf {
 
             class GyroBias {
 
-                public:
+                private:
 
-                    Axis3i16 * bufHead;
-                    Axis3i16 buffer[NBR_OF_BIAS_SAMPLES];
+                    // Number of samples used in variance calculation. Changing this
+                    // effects the threshold
+                    static const uint16_t NBR_OF_SAMPLES = 512;
+
+                public:
 
                     GyroBias() 
                     {
                         _isBufferFilled = false;
-                        bufHead = buffer;
+                        _bufHead = _buffer;
                     }
 
                     static void calculateStats(
@@ -222,26 +221,26 @@ namespace hf {
                         int64_t sum[3] = {};
                         int64_t sumSq[3] = {};
 
-                        for (uint16_t i=0; i<NBR_OF_BIAS_SAMPLES; i++) {
+                        for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
 
-                            sum[0] += bias.buffer[i].x;
-                            sum[1] += bias.buffer[i].y;
-                            sum[2] += bias.buffer[i].z;
-                            sumSq[0] += bias.buffer[i].x * bias.buffer[i].x;
-                            sumSq[1] += bias.buffer[i].y * bias.buffer[i].y;
-                            sumSq[2] += bias.buffer[i].z * bias.buffer[i].z;
+                            sum[0] += bias._buffer[i].x;
+                            sum[1] += bias._buffer[i].y;
+                            sum[2] += bias._buffer[i].z;
+                            sumSq[0] += bias._buffer[i].x * bias._buffer[i].x;
+                            sumSq[1] += bias._buffer[i].y * bias._buffer[i].y;
+                            sumSq[2] += bias._buffer[i].z * bias._buffer[i].z;
                         }
 
-                        meanOut.x = (float) sum[0] / NBR_OF_BIAS_SAMPLES;
-                        meanOut.y = (float) sum[1] / NBR_OF_BIAS_SAMPLES;
-                        meanOut.z = (float) sum[2] / NBR_OF_BIAS_SAMPLES;
+                        meanOut.x = (float) sum[0] / NBR_OF_SAMPLES;
+                        meanOut.y = (float) sum[1] / NBR_OF_SAMPLES;
+                        meanOut.z = (float) sum[2] / NBR_OF_SAMPLES;
 
                         varOut.x =
-                            sumSq[0] / NBR_OF_BIAS_SAMPLES - meanOut.x * meanOut.x;
+                            sumSq[0] / NBR_OF_SAMPLES - meanOut.x * meanOut.x;
                         varOut.y =
-                            sumSq[1] / NBR_OF_BIAS_SAMPLES - meanOut.y * meanOut.y;
+                            sumSq[1] / NBR_OF_SAMPLES - meanOut.y * meanOut.y;
                         varOut.z =
-                            sumSq[2] / NBR_OF_BIAS_SAMPLES - meanOut.z * meanOut.z;
+                            sumSq[2] / NBR_OF_SAMPLES - meanOut.z * meanOut.z;
                     }
 
                     /**
@@ -282,15 +281,15 @@ namespace hf {
                             const Axis3i16 gyroRaw,
                             Vec3 & gyroBiasOut)
                     {
-                        bias.bufHead->x = gyroRaw.x;
-                        bias.bufHead->y = gyroRaw.y;
-                        bias.bufHead->z = gyroRaw.z;
-                        bias.bufHead++;
+                        bias._bufHead->x = gyroRaw.x;
+                        bias._bufHead->y = gyroRaw.y;
+                        bias._bufHead->z = gyroRaw.z;
+                        bias._bufHead++;
 
-                        if (bias.bufHead >= 
-                                &bias.buffer[NBR_OF_BIAS_SAMPLES]) {
+                        if (bias._bufHead >= 
+                                &bias._buffer[NBR_OF_SAMPLES]) {
 
-                            bias.bufHead = bias.buffer;
+                            bias._bufHead = bias._buffer;
                             bias._isBufferFilled = true;
                         }
 
@@ -313,6 +312,8 @@ namespace hf {
 
                     bool _wasValueFound;
                     bool _isBufferFilled;
+                    Axis3i16 * _bufHead;
+                    Axis3i16 _buffer[NBR_OF_SAMPLES];
 
             }; // class GyroBias
 
