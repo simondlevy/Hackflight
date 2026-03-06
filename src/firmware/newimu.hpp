@@ -111,18 +111,6 @@ namespace hf {
                     ThreeAxisLpf() = default;
 
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
-
-                    static auto apply(
-                            ThreeAxisLpf & f,
-                            const Vec3 & in,
-                            const float cutoff_freq) -> Vec3
-                    {
-                        f.x.apply(in.x, cutoff_freq);
-                        f.y.apply(in.y, cutoff_freq);
-                        f.z.apply(in.z, cutoff_freq);
-
-                        return Vec3(f.x.output, f.y.output, f.z.output);
-                    }
             };
 
         public:
