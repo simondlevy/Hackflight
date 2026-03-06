@@ -34,15 +34,19 @@ namespace hf {
 
                 private:
 
-                    float _delay_element_1;
-                    float _delay_element_2;
+                    float _delay1;
+                    float _delay2;
 
                 public:
 
+                    LPF() = default;
+
+                    LPF& operator=(const LPF& other) = default;
+
                     void init()
                     {
-                        _delay_element_1 = 0;
-                        _delay_element_2 = 0;
+                        _delay1 = 0;
+                        _delay2 = 0;
                     }
 
                     auto apply(
@@ -59,19 +63,19 @@ namespace hf {
                         const auto a1 = 2*(ohm*ohm-1)/c;
                         const auto a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
 
-                        float delay_element_0 = sample - _delay_element_1 * a1 - 
-                            _delay_element_2 * a2;
+                        float delay0 = sample - _delay1 * a1 - 
+                            _delay2 * a2;
 
-                        if (!isfinite(delay_element_0)) {
+                        if (!isfinite(delay0)) {
                             // don't allow bad values to propigate via the filter
-                            delay_element_0 = sample;
+                            delay0 = sample;
                         }
 
-                        float output = delay_element_0 * b0 + _delay_element_1 * b1 + 
-                            _delay_element_2 * b0;
+                        float output = delay0 * b0 + _delay1 * b1 + 
+                            _delay2 * b0;
 
-                        _delay_element_2 = _delay_element_1;
-                        _delay_element_1 = delay_element_0;
+                        _delay2 = _delay1;
+                        _delay1 = delay0;
 
                         return output;
                     }
