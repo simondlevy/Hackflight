@@ -57,16 +57,12 @@ namespace hf {
                         const auto a1 = 2*(ohm*ohm-1)/c;
                         const auto a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
 
-                        float delay0 = sample - _delay1 * a1 - 
-                            _delay2 * a2;
+                        const auto try_delay0 = sample - _delay1 * a1 - _delay2 * a2;
 
-                        if (!isfinite(delay0)) {
-                            // don't allow bad values to propigate via the filter
-                            delay0 = sample;
-                        }
+                        // don't allow bad values to propigate through the filter
+                        const auto delay0 = isfinite(try_delay0) ? try_delay0 : sample;
 
-                        float output = delay0 * b0 + _delay1 * b1 + 
-                            _delay2 * b0;
+                        const auto output = delay0 * b0 + _delay1 * b1 + _delay2 * b0;
 
                         _delay2 = _delay1;
                         _delay1 = delay0;
