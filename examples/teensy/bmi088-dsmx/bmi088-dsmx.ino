@@ -33,8 +33,8 @@
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-//#define PROFILE
-#define DEBUG
+#define PROFILE
+//#define DEBUG
 
 // IMU ------------------------------------------------------------
 

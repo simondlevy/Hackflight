@@ -34,10 +34,6 @@ namespace hf {
 
                 private:
 
-                    float _a1;
-                    float _a2;
-                    float _b0;
-                    float _b1;
                     float _delay_element_1;
                     float _delay_element_2;
 
@@ -46,15 +42,6 @@ namespace hf {
                     void init(const float cutoff_freq,
                             const float sample_freq=1000)
                     {
-                        const auto fr = sample_freq/cutoff_freq;
-                        const auto ohm = tanf(M_PI/fr);
-                        const auto c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
-
-                        _b0 = ohm*ohm/c;
-                        _b1 = 2*_b0;
-                        _a1 = 2*(ohm*ohm-1)/c;
-                        _a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
-
                         _delay_element_1 = 0;
                         _delay_element_2 = 0;
                      }
@@ -68,18 +55,21 @@ namespace hf {
                         const auto ohm = tanf(M_PI/fr);
                         const auto c = 1+2*cosf(M_PI/4)*ohm+ohm*ohm;
 
-                        (void)c;
+                       const auto b0 = ohm*ohm/c;
+                       const auto b1 = 2*b0;
+                       const auto a1 = 2*(ohm*ohm-1)/c;
+                       const auto a2 = (1-2*cosf(M_PI/4)*ohm+ohm*ohm)/c;
 
-                        float delay_element_0 = sample - _delay_element_1 * _a1 - 
-                            _delay_element_2 * _a2;
+                        float delay_element_0 = sample - _delay_element_1 * a1 - 
+                            _delay_element_2 * a2;
 
                         if (!isfinite(delay_element_0)) {
                             // don't allow bad values to propigate via the filter
                             delay_element_0 = sample;
                         }
 
-                        float output = delay_element_0 * _b0 + _delay_element_1 * _b1 + 
-                            _delay_element_2 * _b0;
+                        float output = delay_element_0 * b0 + _delay_element_1 * b1 + 
+                            _delay_element_2 * b0;
 
                         _delay_element_2 = _delay_element_1;
                         _delay_element_1 = delay_element_0;
