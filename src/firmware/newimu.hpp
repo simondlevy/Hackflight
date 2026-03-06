@@ -42,7 +42,10 @@ namespace hf {
                     float _delay_element_1;
                     float _delay_element_2;
 
-                    void setCutoffFreq(const float sample_freq, const float cutoff_freq)
+                public:
+
+                    void init(const float cutoff_freq,
+                            const float sample_freq=1000)
                     {
                         float fr = sample_freq/cutoff_freq;
                         float ohm = tanf(M_PI/fr);
@@ -54,21 +57,7 @@ namespace hf {
                         _a2 = (1.0f-2.0f*cosf(M_PI/4.0f)*ohm+ohm*ohm)/c;
                         _delay_element_1 = 0.0f;
                         _delay_element_2 = 0.0f;
-                    }
-
-                public:
-
-                    /**
-                     * 2-Pole low pass filter
-                     */
-                    void init(const float sample_freq, const float cutoff_freq)
-                    {
-                        if (cutoff_freq <= 0) {
-                            return;
-                        }
-
-                        setCutoffFreq(sample_freq, cutoff_freq);
-                    }
+                     }
 
                     float apply(float sample)
                     {
@@ -89,6 +78,7 @@ namespace hf {
                     }
 
             }; // class Lpf
+
             class ThreeAxisLpf {
 
                 public:
@@ -98,12 +88,11 @@ namespace hf {
                     ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
 
-                    ThreeAxisLpf(
-                            const float sample_freq, const float cutoff_freq)
+                    ThreeAxisLpf(const float cutoff_freq)
                     {
-                        _lpfx.init(sample_freq, cutoff_freq);
-                        _lpfy.init(sample_freq, cutoff_freq);
-                        _lpfz.init(sample_freq, cutoff_freq);
+                        _lpfx.init(cutoff_freq);
+                        _lpfy.init(cutoff_freq);
+                        _lpfz.init(cutoff_freq);
                     }
 
                     static auto apply(ThreeAxisLpf & f, const Vec3 & in) -> Vec3
