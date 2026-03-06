@@ -21,7 +21,7 @@
 #pragma once
 
 #include <hackflight.h>
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <num.hpp>
 
 namespace hf {

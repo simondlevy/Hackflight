@@ -28,7 +28,7 @@
 #include <hackflight.h>
 #include <firmware/estimators/newekf.hpp>
 #include <firmware/newimu/imu.hpp>
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/newpids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>

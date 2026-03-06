@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 
 class Num {
 

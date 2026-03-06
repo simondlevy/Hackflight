@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/newekf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>

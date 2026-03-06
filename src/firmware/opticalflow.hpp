@@ -18,7 +18,7 @@
 
 #include <Arduino.h>
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 
 namespace hf {
 

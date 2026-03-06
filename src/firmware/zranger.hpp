@@ -18,7 +18,7 @@
 
 #include <math.h>
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 
 namespace hf {
 

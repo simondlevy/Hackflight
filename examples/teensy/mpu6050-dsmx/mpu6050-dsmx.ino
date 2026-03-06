@@ -28,7 +28,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/newpids/position.hpp>

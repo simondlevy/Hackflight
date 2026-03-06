@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/newekf.hpp>
 #include <firmware/newimu/gyro_bias.hpp>
 #include <firmware/newimu/three_axis_lpf.hpp>

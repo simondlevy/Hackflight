@@ -14,7 +14,8 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <datatypes.hpp>
+#include <firmware/newimu/six_axis_stats.hpp>
 
 namespace hf {
 
@@ -23,7 +24,7 @@ namespace hf {
         private:
 
             // Number of samples used in variance calculation. Changing this
-            // effects the threshold
+            // affects the threshold
             static const uint16_t NBR_OF_SAMPLES = 512;
 
             static constexpr float RAW_VARIANCE_BASE = 100;
@@ -68,8 +69,7 @@ namespace hf {
             /**
              * Checks if the variances is below the predefined thresholds.
              */
-            static void findValue(
-                    GyroBias & bias, const uint32_t ticks)
+            static void findValue(GyroBias & bias, const uint32_t ticks)
             {
                 static int32_t varianceSampleTime;
 

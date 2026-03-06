@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/ekf.hpp>
 #include <firmware/lpf.hpp>
 #include <firmware/timer.hpp>

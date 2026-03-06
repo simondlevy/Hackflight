@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <num.hpp>
 #include <pidcontrol/new_pidcontrol.hpp>

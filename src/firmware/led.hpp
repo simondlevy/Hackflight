@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {

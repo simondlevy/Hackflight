@@ -1,11 +1,7 @@
-/**
- * Generic multirotor mixer function
- *
- * Copyright (C) 2026 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
+/* Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy * * This program
+ * is free software: you can redistribute it and/or modify * it under the terms
+ * of the GNU General Public License as published by * the Free Software
+ * Foundation, in version 3.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +18,13 @@
 
 namespace hf {
 
-    class RotorMixer {
+    class SixAxisStats {
 
         public:
 
-    };
-}
+            Vec3 mean;
+            Vec3 variance;
 
+    }; // class SixAxisStats
+
+} // namespace hf

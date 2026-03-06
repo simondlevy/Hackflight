@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/matrix_typedef.h>
 #include <firmware/opticalflow.hpp>
 #include <firmware/zranger.hpp>

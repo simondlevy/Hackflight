@@ -22,7 +22,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/ekf.hpp>
 #include <firmware/estimators/madgwick.hpp>
 #include <firmware/imu.hpp>
