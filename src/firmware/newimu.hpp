@@ -226,8 +226,6 @@ namespace hf {
 
                 public:
 
-                    Vec3 bias;
-
                     ThreeAxisStats stats;
 
                     Vec3 variance;
@@ -285,9 +283,9 @@ namespace hf {
                                     (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < ticks))
                             {
                                 varianceSampleTime = ticks;
-                                bias.bias.x = bias.mean.x;
-                                bias.bias.y = bias.mean.y;
-                                bias.bias.z = bias.mean.z;
+                                bias._values.x = bias.mean.x;
+                                bias._values.y = bias.mean.y;
+                                bias._values.z = bias.mean.z;
                                 bias.isBiasValueFound = true;
                             }
                         }
@@ -319,13 +317,16 @@ namespace hf {
                             GyroBias::findValue(bias, tickCount);
                         }
 
-                        gyroBiasOut.x = bias.bias.x;
-                        gyroBiasOut.y = bias.bias.y;
-                        gyroBiasOut.z = bias.bias.z;
+                        gyroBiasOut.x = bias._values.x;
+                        gyroBiasOut.y = bias._values.y;
+                        gyroBiasOut.z = bias._values.z;
 
                         return bias.isBiasValueFound;
                     }
 
+                private:
+
+                    Vec3 _values;
 
             }; // class GyroBias
 
