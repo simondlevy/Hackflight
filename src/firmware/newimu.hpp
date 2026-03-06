@@ -59,7 +59,9 @@ namespace hf {
                         _delay_element_2 = 0;
                      }
 
-                    float apply(float sample)
+                    auto apply(
+                            const float sample,
+                            const float sample_freq=1000) -> float
                     {
                         float delay_element_0 = sample - _delay_element_1 * _a1 - 
                             _delay_element_2 * _a2;
@@ -74,6 +76,7 @@ namespace hf {
 
                         _delay_element_2 = _delay_element_1;
                         _delay_element_1 = delay_element_0;
+
                         return output;
                     }
 
