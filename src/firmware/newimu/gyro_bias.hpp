@@ -72,8 +72,7 @@ namespace hf {
                 calc._bufHead->z = gyroRaw.z;
                 calc._bufHead++;
 
-                if (calc._bufHead >= 
-                        &calc._buffer[NBR_OF_SAMPLES]) {
+                if (calc._bufHead >= &calc._buffer[NBR_OF_SAMPLES]) {
 
                     calc._bufHead = calc._buffer;
                     calc._isBufferFilled = true;
@@ -97,8 +96,8 @@ namespace hf {
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
             int32_t _varianceSampleTime;
 
-            static void calculateStats(
-                    const GyroBiasCalculator & calc, SixAxisStats & stats)
+            static auto calculateStats(const GyroBiasCalculator & calc)
+                -> SixAxisStats
             {
                 int64_t sum[3] = {};
                 int64_t sumSq[3] = {};
@@ -113,23 +112,24 @@ namespace hf {
                     sumSq[2] += calc._buffer[i].z * calc._buffer[i].z;
                 }
 
-                stats.mean.x = (float) sum[0] / NBR_OF_SAMPLES;
-                stats.mean.y = (float) sum[1] / NBR_OF_SAMPLES;
-                stats.mean.z = (float) sum[2] / NBR_OF_SAMPLES;
+                const auto mean = Vec3(
+                        (float) sum[0] / NBR_OF_SAMPLES,
+                        (float) sum[1] / NBR_OF_SAMPLES,
+                        (float) sum[2] / NBR_OF_SAMPLES);
 
-                stats.variance.x =
-                    sumSq[0] / NBR_OF_SAMPLES - stats.mean.x * stats.mean.x;
-                stats.variance.y =
-                    sumSq[1] / NBR_OF_SAMPLES - stats.mean.y * stats.mean.y;
-                stats.variance.z =
-                    sumSq[2] / NBR_OF_SAMPLES - stats.mean.z * stats.mean.z;
+                const auto variance = Vec3(
+                    sumSq[0] / NBR_OF_SAMPLES - mean.x * mean.x,
+                    sumSq[1] / NBR_OF_SAMPLES - mean.y * mean.y,
+                    sumSq[2] / NBR_OF_SAMPLES - mean.z * mean.z);
+
+                return SixAxisStats(mean, variance);
             }
 
             static void findValue(GyroBiasCalculator & calc, const uint32_t ticks)
             {
                 if (calc._isBufferFilled)
                 {
-                    calculateStats(calc, calc._stats);
+                    calc._stats = calculateStats(calc);
 
                     if (
                             calc._stats.variance.x < RAW_VARIANCE_BASE &&
