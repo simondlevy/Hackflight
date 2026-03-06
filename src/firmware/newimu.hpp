@@ -207,14 +207,12 @@ namespace hf {
 
                 public:
 
-                    bool wasValueFound;
-                    bool isBufferFilled;
                     Axis3i16 * bufHead;
                     Axis3i16 buffer[NBR_OF_BIAS_SAMPLES];
 
                     GyroBias() 
                     {
-                        isBufferFilled = false;
+                        _isBufferFilled = false;
                         bufHead = buffer;
                     }
 
@@ -254,7 +252,7 @@ namespace hf {
                     {
                         static int32_t varianceSampleTime;
 
-                        if (bias.isBufferFilled)
+                        if (bias._isBufferFilled)
                         {
                             GyroBias::calculateStats(bias,
                                     bias._variance, bias._mean);
@@ -269,7 +267,7 @@ namespace hf {
                                 bias._values.x = bias._mean.x;
                                 bias._values.y = bias._mean.y;
                                 bias._values.z = bias._mean.z;
-                                bias.wasValueFound = true;
+                                bias._wasValueFound = true;
                             }
                         }
                     }
@@ -293,10 +291,10 @@ namespace hf {
                                 &bias.buffer[NBR_OF_BIAS_SAMPLES]) {
 
                             bias.bufHead = bias.buffer;
-                            bias.isBufferFilled = true;
+                            bias._isBufferFilled = true;
                         }
 
-                        if (!bias.wasValueFound) {
+                        if (!bias._wasValueFound) {
                             GyroBias::findValue(bias, tickCount);
                         }
 
@@ -304,7 +302,7 @@ namespace hf {
                         gyroBiasOut.y = bias._values.y;
                         gyroBiasOut.z = bias._values.z;
 
-                        return bias.wasValueFound;
+                        return bias._wasValueFound;
                     }
 
                 private:
@@ -312,6 +310,9 @@ namespace hf {
                     Vec3 _values;
                     Vec3 _variance;
                     Vec3 _mean;
+
+                    bool _wasValueFound;
+                    bool _isBufferFilled;
 
             }; // class GyroBias
 
