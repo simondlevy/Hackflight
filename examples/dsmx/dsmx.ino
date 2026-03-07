@@ -33,7 +33,7 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-//#define PROFILE
+#define PROFILE
 //#define DEBUG
 
 // IMU ------------------------------------------------------------
@@ -170,10 +170,9 @@ static const float THROTTLE_DOWN_MAX = -0.95;
 
 // Helper functions ------------------------------------------------
 
-static void getVehicleState(
+static auto getVehicleState(
         const bool isFlying,
-        const hf::Vec3 & gyroDps,
-        hf::VehicleState & state)
+        const hf::Vec3 & gyroDps) -> hf::VehicleState
 {
     static hf::Timer _timer;
 
@@ -192,12 +191,15 @@ static void getVehicleState(
     }
 
     // Get state estimate from EKF
+    hf::VehicleState state = {};
     _ekf.getStateEstimate(nowMs, state);
 
     // Get angular velocities directly from gyro
     state.dphi   = gyroDps.x;
     state.dtheta = gyroDps.y;
     state.dpsi   = -gyroDps.z; // negate for nose-right positive
+
+    return state;
 }
 
 static float getDt(const uint32_t usec_curr)
@@ -310,9 +312,7 @@ void loop()
 
     const bool isFlying = true; // XXX
 
-    // XXX should be return value
-    hf::VehicleState state = {};
-    getVehicleState(isFlying, gyroDps, state);
+    const auto state = getVehicleState(isFlying, gyroDps);
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
