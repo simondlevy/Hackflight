@@ -99,6 +99,7 @@ namespace hf {
                         varianceSampleTime);
             }
 
+            /*
             static void process(
                     GyroBiasCalculator & calc,
                     const axis3_i16_t * buffer,
@@ -133,7 +134,7 @@ namespace hf {
                 calc._values = values;
                 calc._isBufferFilled = isBufferFilled;
                 calc._varianceSampleTime = varianceSampleTime;
-            }
+            }*/
 
         private:
 
