@@ -65,18 +65,33 @@ namespace hf {
                     const uint32_t ticks,
                     const axis3_i16_t gyroRaw) -> GyroBiasCalculator
             {
-                (void)ticks;
-                (void)gyroRaw;
-
                 _static_buffer[calc._bufferIndex].x = gyroRaw.x;
                 _static_buffer[calc._bufferIndex].y = gyroRaw.y;
                 _static_buffer[calc._bufferIndex].z = gyroRaw.z;
 
                 const auto nextIndex = calc._bufferIndex + 1; 
- 
-                const auto bufferIndex =
-                    nextIndex == NBR_OF_SAMPLES ? 0 : nextIndex;
 
+                const auto isBufferFilled = (nextIndex == NBR_OF_SAMPLES);
+ 
+                const auto bufferIndex = isBufferFilled ? 0 : nextIndex;
+
+                const auto needUpdate = !calc.wasValueFound && isBufferFilled;
+
+                const auto stats = needUpdate ? calculateStats(calc) : calc._stats;
+
+                const auto valueWasFound = needUpdate &&
+                    stats.variance.x < RAW_VARIANCE_BASE &&
+                    stats.variance.y < RAW_VARIANCE_BASE &&
+                    stats.variance.z < RAW_VARIANCE_BASE &&
+                    calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+
+                const auto varianceSampleTime =
+                    valueWasFound ? ticks : calc._varianceSampleTime;
+
+                const auto values = valueWasFound ? stats.mean : calc._stats.mean;
+
+                (void)varianceSampleTime;
+                (void)values;
                 (void)bufferIndex;
 
                 return GyroBiasCalculator();
@@ -109,16 +124,12 @@ namespace hf {
                             (calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks))
                     {
                         calc._varianceSampleTime = ticks;
-                        calc._values.x = calc._stats.mean.x;
-                        calc._values.y = calc._stats.mean.y;
-                        calc._values.z = calc._stats.mean.z;
+                        calc._values = calc._stats.mean;
                         calc.wasValueFound = true;
                     }
                 }
 
-                calc.biasOut.x = calc._values.x;
-                calc.biasOut.y = calc._values.y;
-                calc.biasOut.z = calc._values.z;
+                calc.biasOut = calc._values;
             }
 
         private:
