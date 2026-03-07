@@ -27,6 +27,39 @@ namespace hf {
 
     class EKF { 
 
+        private:
+
+            // Initial variances, uncertain of position, but know we're
+            // stationary and roughly flat
+            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
+            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
+            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
+            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
+            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
+
+            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
+            static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
+            static constexpr float PROC_NOISE_VEL = 0;
+            static constexpr float PROC_NOISE_POS = 0;
+            static constexpr float PROC_NOISE_ATT = 0;
+            static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
+            static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
+
+            static constexpr float GRAVITY = 9.81;
+
+            //We do get the measurements in 10x the motion pixels (experimentally measured)
+            static constexpr float FLOW_RESOLUTION = 0.1;
+
+            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
+            static constexpr float MAX_COVARIANCE = 100;
+            static constexpr float MIN_COVARIANCE = 1e-6;
+
+            // Small number epsilon, to prevent dividing by zero
+            static constexpr float EPSILON = 1e-6f;
+
+            // the reversion of pitch and roll to zero
+            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
+
         public:
 
             EKF()
@@ -377,37 +410,6 @@ namespace hf {
                         sizeof(EKF::measurement_t));
                 _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
             }
-
-            // Initial variances, uncertain of position, but know we're
-            // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
-            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
-            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
-
-            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
-            static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
-            static constexpr float PROC_NOISE_VEL = 0;
-            static constexpr float PROC_NOISE_POS = 0;
-            static constexpr float PROC_NOISE_ATT = 0;
-            static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
-            static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
-
-            static constexpr float GRAVITY = 9.81;
-
-            //We do get the measurements in 10x the motion pixels (experimentally measured)
-            static constexpr float FLOW_RESOLUTION = 0.1;
-
-            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
-            static constexpr float MAX_COVARIANCE = 100;
-            static constexpr float MIN_COVARIANCE = 1e-6;
-
-            // Small number epsilon, to prevent dividing by zero
-            static constexpr float EPSILON = 1e-6f;
-
-            // the reversion of pitch and roll to zero
-            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
             typedef struct {
                 Vec3 sum;

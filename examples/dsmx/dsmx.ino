@@ -170,9 +170,8 @@ static const float THROTTLE_DOWN_MAX = -0.95;
 
 // Helper functions ------------------------------------------------
 
-static auto getVehicleState(
-        const bool isFlying,
-        const hf::Vec3 & gyroDps) -> hf::VehicleState
+static auto getVehicleState(const bool isFlying, const hf::Vec3 & gyroDps)
+    -> hf::VehicleState
 {
     static hf::Timer _timer;
 
@@ -207,8 +206,6 @@ static auto getVehicleState(
             gyroDps.y,
             state.psi,
             -gyroDps.z); // negate for nose-right positive.y
-
-
 }
 
 static float getDt(const uint32_t usec_curr)
