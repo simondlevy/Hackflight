@@ -34,7 +34,7 @@
 #include <pidcontrol/stabilizer.hpp>
 
 //#define PROFILE
-//#define DEBUG
+#define DEBUG
 
 // IMU ------------------------------------------------------------
 
@@ -234,22 +234,18 @@ static void profile()
 #endif
 
 #ifdef DEBUG
-static void debug(
-        const bool imuIsCalibrated,
-        const hf::Vec3 & gyroDps,
-        const hf::VehicleState & state,
-        const hf::Setpoint & setpoint)
+static void debug(const float * chans)
 {
     static uint32_t _msec;
     const auto msec = millis();
 
     if (msec - _msec > 10) {
-        //printf("dpsi=%+3.3f\n", gyroDps.z);
-        //printf("t=%3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
-        //        setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
-        //printf("imu is calibrated: %d\n", imuIsCalibrated);
-        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
-                state.phi, state.theta, state.psi);
+        //printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n", state.phi,
+        //state.theta, state.psi);
+        printf("c0=%3.3f c1=%3.3f c2=%3.3f c3=%3.3f c4=%3.3f c5=%3.3f\n",
+                chans[0], chans[1], chans[2], chans[3], chans[4], chans[5]);
+
+
         _msec = msec;
     }
 }
@@ -329,7 +325,7 @@ void loop()
 #endif
 
 #ifdef DEBUG
-    debug(imuIsCalibrated, gyroDps, state, setpoint);
+    debug(_channel_values);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;

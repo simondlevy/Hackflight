@@ -4,27 +4,17 @@ static CRSFforArduino crsf;
 
 static constexpr int CHANNEL_COUNT = 5;
 
+static auto scalechan(serialReceiverLayer::rcChannels_t *rcChannels, const int k) -> float
+{
+    return map((float)crsf.readRcChannel(k), 989, 2012, -1, +1);
+}
+
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
-    if (!rcChannels->failsafe)
-    {
-
-        unsigned long thisTime = millis();
-        static unsigned long lastTime = millis();
-
-        if (thisTime < lastTime) {
-            lastTime = thisTime;
-        }
-
-        if (thisTime - lastTime >= 100) {
-            lastTime = thisTime;
-            for (int i = 1; i <= CHANNEL_COUNT; i++) {
-                // printf("c%d:%d ", i, crsf.rcToUs(crsf.getChannel(i)));
-                printf("c%d:%d ", i, crsf.readRcChannel(i));
-            }
-            printf("\n");
-        }
+    if (!rcChannels->failsafe) {
+        printf("t=%+3.3f\n", scalechan(rcChannels, 3));
     }
+    delay(10);
 }
 
 void setup()
