@@ -30,7 +30,7 @@
 #include <firmware/imu/imu.hpp>
 #include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
-#include <pidcontrol/newpids/position.hpp>
+#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 //#define PROFILE

@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <pidcontrol/newpids/rollpitch.hpp>
-#include <pidcontrol/newpids/yaw.hpp>
+#include <pidcontrol/pids/rollpitch.hpp>
+#include <pidcontrol/pids/yaw.hpp>
 
 namespace hf {
 
