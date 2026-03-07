@@ -67,6 +67,43 @@ namespace hf {
                     axis3_i16_t * buffer,
                     const uint32_t ticks)
             {
+                const auto bufferIndex = calc.bufferIndex + 1;
+
+                const auto isBufferFilled = bufferIndex == NBR_OF_SAMPLES;
+
+                const auto wantUpdate = !calc.wasValueFound && isBufferFilled;
+
+                const auto stats = wantUpdate ? calculateStats(buffer) : calc._stats;
+
+                const auto shouldUpdate = wantUpdate &&
+                    stats.variance.x < RAW_VARIANCE_BASE &&
+                    stats.variance.y < RAW_VARIANCE_BASE &&
+                    stats.variance.z < RAW_VARIANCE_BASE &&
+                    calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+
+                const auto values = shouldUpdate ? stats.mean : calc._values;
+
+                const auto varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
+
+                const auto wasValueFound = shouldUpdate ? true : calc.wasValueFound;
+
+                const auto newBufferIndex = isBufferFilled ? 0 : bufferIndex;
+
+                calc.biasOut = values;
+                calc.wasValueFound = wasValueFound;
+                calc.bufferIndex = newBufferIndex;
+                calc._stats = stats;
+                calc._values = values;
+                calc._isBufferFilled = isBufferFilled;
+                calc._varianceSampleTime = varianceSampleTime;
+            }
+
+            /*
+            static auto process(
+                    const GyroBiasCalculator & calc,
+                    axis3_i16_t * buffer,
+                    const uint32_t ticks) -> GyroBiasCalculator
+            {
                 calc.bufferIndex++;
 
                 const auto isBufferFilled = calc.bufferIndex == NBR_OF_SAMPLES;
@@ -89,18 +126,15 @@ namespace hf {
 
                 const auto bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
 
-                calc.biasOut = values;
-                calc.wasValueFound = wasValueFound;
-                calc.bufferIndex = bufferIndex;
-                calc._stats = stats;
-                calc._values = values;
-                calc._isBufferFilled = isBufferFilled;
-                calc._varianceSampleTime = varianceSampleTime;
-
-                const auto newcalc = GyroBiasCalculator(
-                        );
-                (void)newcalc;
-            }
+                return GyroBiasCalculator(
+                        values,
+                        wasValueFound,
+                        bufferIndex,
+                        stats,
+                        values,
+                        isBufferFilled,
+                        varianceSampleTime);
+            }*/
 
         private:
 
