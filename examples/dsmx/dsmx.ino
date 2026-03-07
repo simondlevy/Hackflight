@@ -26,14 +26,14 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/estimators/ekf.hpp>
+#include <firmware/estimator/ekf.hpp>
 #include <firmware/imu/imu.hpp>
 #include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-#define PROFILE
+//#define PROFILE
 //#define DEBUG
 
 // IMU ------------------------------------------------------------

@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #include <firmware/comms.hpp>
-#include <firmware/estimators/ekf.hpp>
+#include <firmware/estimator/ekf.hpp>
 #include <firmware/tasks/task1.hpp>
 #include <firmware/tasks/task2.hpp>
 
