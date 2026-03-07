@@ -252,8 +252,7 @@ namespace hf {
                 _lastPredictionMs = nowMs;
             }
 
-            /*
-            auto getStateEstimate(const uint32_t nowMs) -> VehicleState
+            auto getStateEstimate(const uint32_t nowMs) -> EstimatedState
             {
                 addProcessNoise(nowMs);
 
@@ -286,9 +285,8 @@ namespace hf {
                 const auto psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
                         _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
 
-                return VehicleState(0, dx, 0, dy, z, dz,
-                        phi, dphi, theta, dtheta, psi, dpsi);
-            }*/
+                return EstimatedState(dx, dy, z, dz, phi, theta, psi);
+            }
 
             void getStateEstimate(const uint32_t nowMs, VehicleState & state)
             {
