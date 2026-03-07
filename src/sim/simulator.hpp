@@ -27,6 +27,7 @@
 #include <num.hpp>
 #include <pidcontrol/new_pidcontrol.hpp>
 #include <sim/dynamics.hpp>
+#include <sim/state.hpp>
 #include <vehicles/diyquad.hpp>
 
 namespace hf {
@@ -48,7 +49,7 @@ namespace hf {
 
             Simulator() = default;
 
-            Simulator(const Dynamics::pose_t & pose)
+            Simulator(const pose_t & pose)
                 : dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
 
             Simulator(const Dynamics & dynamics, const PidControl & pidControl)
@@ -116,7 +117,7 @@ namespace hf {
 
             PidControl _pidControl;
 
-            static VehicleState state2floats(const Dynamics::State s)
+            static VehicleState state2floats(const State s)
             {
                 return VehicleState { 
                     (float)s.x, (float)s.dx, (float)s.y, (float)s.dy,
@@ -135,7 +136,7 @@ namespace hf {
                 return d;
             }
 
-            static VehicleState state2degrees(const Dynamics::State state)
+            static VehicleState state2degrees(const State state)
             {
                 return VehicleState {
                     (float)state.x,

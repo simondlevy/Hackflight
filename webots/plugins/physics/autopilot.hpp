@@ -73,8 +73,7 @@ class AutopilotHelper {
             delete _helper;
         }
 
-        auto get_state(const PluginHelper::message_t & message)
-            -> hf::Dynamics::State
+        auto get_state(const PluginHelper::message_t & message) -> hf::State
         {
             return _helper->run_simulator(message.mode, message.setpoint);
         }
