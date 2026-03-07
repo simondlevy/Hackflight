@@ -64,8 +64,10 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                GyroBiasCalculator::process(_gyroBiasCalculator,
-                        tickCount, gyroRaw);
+                GyroBiasCalculator::process(
+                        _gyroBiasCalculator,
+                        tickCount,
+                        gyroRaw);
 
                 _gyroBias = _gyroBiasCalculator.biasOut;
 
@@ -116,6 +118,8 @@ namespace hf {
             static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
             // ---------------------------------------------------------------
+
+            axis3_i16_t _gyroSamplesBuffer[GyroBiasCalculator::NBR_OF_SAMPLES];
 
             GyroBiasCalculator _gyroBiasCalculator;
 

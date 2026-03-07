@@ -21,6 +21,8 @@ namespace hf {
 
     class GyroBiasCalculator {
 
+        friend class IMU;
+
         private:
 
             // Number of samples used in variance calculation. Changing this
@@ -60,6 +62,7 @@ namespace hf {
             GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                 = default;
 
+            /*
             static auto process(
                     const GyroBiasCalculator & calc,
                     const uint32_t ticks,
@@ -95,16 +98,19 @@ namespace hf {
                 (void)bufferIndex;
 
                 return GyroBiasCalculator();
-            }
+            }*/
 
             static void process(
                     GyroBiasCalculator & calc,
                     const uint32_t ticks,
                     const axis3_i16_t gyroRaw)
             {
-                calc._buffer[calc._bufferIndex].x = gyroRaw.x;
-                calc._buffer[calc._bufferIndex].y = gyroRaw.y;
-                calc._buffer[calc._bufferIndex].z = gyroRaw.z;
+                calc._buffer[calc._bufferIndex] = gyroRaw;
+
+                //calc._buffer[calc._bufferIndex].x = gyroRaw.x;
+                //calc._buffer[calc._bufferIndex].y = gyroRaw.y;
+                //calc._buffer[calc._bufferIndex].z = gyroRaw.z;
+
                 calc._bufferIndex++;
 
                 auto isBufferFilled = calc._bufferIndex == NBR_OF_SAMPLES;
