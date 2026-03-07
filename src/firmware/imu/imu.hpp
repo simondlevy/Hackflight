@@ -15,9 +15,9 @@
 #pragma once
 
 #include <datatypes.hpp>
-#include <firmware/estimators/newekf.hpp>
-#include <firmware/newimu/gyro_bias.hpp>
-#include <firmware/newimu/three_axis_lpf.hpp>
+#include <firmware/estimators/ekf.hpp>
+#include <firmware/imu/gyro_bias.hpp>
+#include <firmware/imu/three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 

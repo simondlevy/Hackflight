@@ -15,7 +15,7 @@
 #pragma once
 
 #include <datatypes.hpp>
-#include <firmware/newimu/six_axis_stats.hpp>
+#include <firmware/imu/six_axis_stats.hpp>
 
 namespace hf {
 

@@ -26,8 +26,8 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/estimators/newekf.hpp>
-#include <firmware/newimu/imu.hpp>
+#include <firmware/estimators/ekf.hpp>
+#include <firmware/imu/imu.hpp>
 #include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/newpids/position.hpp>
