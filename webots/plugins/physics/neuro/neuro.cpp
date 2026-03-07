@@ -21,7 +21,6 @@
 #include <time.h>
 
 // Hackflight
-#include <datatypes.h>
 #include <sim/dynamics.hpp>
 #include "../helper.hpp"
 #include "../autopilot.hpp"
@@ -72,36 +71,10 @@ static auto getSetpoint(
     return hf::Setpoint(0, 0, direction * SPEED, 0);
 }
 
-/*
-static void profile()
-{
-    time_t now;
-    struct tm *tm;
-    now = time(0);
-
-    if ((tm = localtime (&now)) == NULL) {
-        return;
-    }
-
-    const auto sec_curr = tm->tm_sec;
-
-    static int _sec_prev;
-    static int _count;
-
-    if (sec_curr - _sec_prev > 0) {
-        printf("%d\n", _count);
-        _sec_prev = sec_curr;
-        _count = 0;
-    }
-    _count++;
-}*/
-
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    profile();
-
     const auto message = PluginHelper::get_message();
 
     // Get current vehicle state

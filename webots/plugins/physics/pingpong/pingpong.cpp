@@ -20,7 +20,6 @@
 #include <stdlib.h>
 
 // Hackflight
-#include <datatypes.h>
 #include <sim/dynamics.hpp>
 #include "../helper.hpp"
 #include "../autopilot.hpp"
