@@ -39,6 +39,54 @@ namespace hf {
 
     } vehicleState_t;
 
+    class VehicleState {
+
+        public:
+
+            float x;       // positive forward
+            float dx;      // positive forward
+            float y;       // positive rightward
+            float dy;      // positive rightward
+            float z;       // positive upward
+            float dz;      // positive upward
+            float phi;     // positive roll right
+            float dphi;    // positive roll right
+            float theta;   // positive nose down
+            float dtheta;  // positive nose down
+            float psi;     // positive nose right
+            float dpsi;    // positive nose right
+
+            VehicleState() = default;
+
+            VehicleState
+                (const float x,
+                 const float dx,
+                 const float y,
+                 const float dy,
+                 const float z,
+                 const float dz,
+                 const float phi,
+                 const float dphi,
+                 const float theta,
+                 const float dtheta,
+                 const float psi,
+                 const float dpsi) 
+                : 
+                    x(x),
+                    dx(dx),
+                    dy(dy),
+                    z(z),
+                    dz(dz),
+                    phi(phi),
+                    dphi(dphi),
+                    theta(theta),
+                    dtheta(dtheta),
+                    psi(psi),
+                    dpsi(dpsi) {}
+
+            VehicleState& operator=(const VehicleState& other) = default;
+    };
+
     typedef enum {
 
         MODE_IDLE,
