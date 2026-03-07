@@ -65,13 +65,10 @@ namespace hf {
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
                 calc._stats = wantUpdate ? stats : calc._stats;
-
                 calc._varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
-                calc._values = shouldUpdate ? calc._stats.mean : calc._values;
+                calc._values = shouldUpdate ? stats.mean : calc._values;
                 calc.wasValueFound = shouldUpdate ? true : calc.wasValueFound;
-
                 calc.bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
-
                 calc.biasOut = calc._values;
             }
 
