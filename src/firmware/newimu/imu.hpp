@@ -64,11 +64,11 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
+                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroRaw;
                 GyroBiasCalculator::process(
                         _gyroBiasCalculator,
                         _gyroSamplesBuffer,
-                        tickCount,
-                        gyroRaw);
+                        tickCount);
 
                 _gyroBias = _gyroBiasCalculator.biasOut;
 

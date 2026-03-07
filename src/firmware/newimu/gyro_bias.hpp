@@ -34,28 +34,13 @@ namespace hf {
 
             Vec3 biasOut;
             bool wasValueFound;
+            uint16_t bufferIndex;
 
             GyroBiasCalculator() 
             {
                 wasValueFound = false;
-                _bufferIndex = 0;
+                bufferIndex = 0;
             }
-
-            GyroBiasCalculator(
-                    const Vec3 & biasOut,
-                    const bool wasValueFound,
-                    const SixAxisStats & stats,
-                    const Vec3 & values,
-                    const uint16_t bufferIndex,
-                    const bool isBufferFilled,
-                    const int32_t varianceSampleTime)
-                : 
-                biasOut(biasOut),
-                wasValueFound(wasValueFound),
-                _stats(stats),
-                _values(values),
-                _bufferIndex(bufferIndex),
-                _varianceSampleTime(varianceSampleTime) { }
 
             GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                 = default;
@@ -66,11 +51,11 @@ namespace hf {
                     const uint32_t ticks,
                     const axis3_i16_t gyroRaw) -> GyroBiasCalculator
             {
-                _static_buffer[calc._bufferIndex].x = gyroRaw.x;
-                _static_buffer[calc._bufferIndex].y = gyroRaw.y;
-                _static_buffer[calc._bufferIndex].z = gyroRaw.z;
+                _static_buffer[calc.bufferIndex].x = gyroRaw.x;
+                _static_buffer[calc.bufferIndex].y = gyroRaw.y;
+                _static_buffer[calc.bufferIndex].z = gyroRaw.z;
 
-                const auto nextIndex = calc._bufferIndex + 1; 
+                const auto nextIndex = calc.bufferIndex + 1; 
 
                 const auto isBufferFilled = (nextIndex == NBR_OF_SAMPLES);
  
@@ -101,17 +86,14 @@ namespace hf {
             static void process(
                     GyroBiasCalculator & calc,
                     axis3_i16_t * buffer,
-                    const uint32_t ticks,
-                    const axis3_i16_t gyroRaw)
+                    const uint32_t ticks)
             {
-                buffer[calc._bufferIndex] = gyroRaw;
+                calc.bufferIndex++;
 
-                calc._bufferIndex++;
-
-                auto isBufferFilled = calc._bufferIndex == NBR_OF_SAMPLES;
+                const auto isBufferFilled = calc.bufferIndex == NBR_OF_SAMPLES;
 
                 if (isBufferFilled) {
-                    calc._bufferIndex = 0;
+                    calc.bufferIndex = 0;
                 }
 
                 if (!calc.wasValueFound && isBufferFilled) {
@@ -137,7 +119,6 @@ namespace hf {
 
             SixAxisStats _stats;
             Vec3 _values;
-            uint16_t _bufferIndex;
             bool _isBufferFilled;
             int32_t _varianceSampleTime;
 
