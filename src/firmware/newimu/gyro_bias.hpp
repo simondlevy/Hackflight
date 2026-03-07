@@ -39,7 +39,7 @@ namespace hf {
             {
                 wasValueFound = false;
                 _isBufferFilled = false;
-                _bufHead = _buffer;
+                _bufindex = 0;
             }
 
             /*
@@ -49,7 +49,6 @@ namespace hf {
                     const SixAxisStats & stats,
                     const Vec3 & values,
                     const bool isBufferFilled,
-                    axis3_i16_t * bufHead,
                     const int32_t varianceSampleTime) 
                 :
                     biasOut(biasOut),
@@ -68,14 +67,14 @@ namespace hf {
                     const uint32_t ticks,
                     const axis3_i16_t gyroRaw)
             {
-                calc._bufHead->x = gyroRaw.x;
-                calc._bufHead->y = gyroRaw.y;
-                calc._bufHead->z = gyroRaw.z;
-                calc._bufHead++;
+                calc._buffer[calc._bufindex].x = gyroRaw.x;
+                calc._buffer[calc._bufindex].y = gyroRaw.y;
+                calc._buffer[calc._bufindex].z = gyroRaw.z;
+                calc._bufindex++;
 
-                if (calc._bufHead >= &calc._buffer[NBR_OF_SAMPLES]) {
+                if (calc._bufindex == NBR_OF_SAMPLES) {
 
-                    calc._bufHead = calc._buffer;
+                    calc._bufindex = 0;
                     calc._isBufferFilled = true;
                 }
 
@@ -107,8 +106,8 @@ namespace hf {
             SixAxisStats _stats;
             Vec3 _values;
             bool _isBufferFilled;
-            axis3_i16_t * _bufHead;
             axis3_i16_t _buffer[NBR_OF_SAMPLES];
+            uint16_t _bufindex;
             int32_t _varianceSampleTime;
 
             static auto calculateStats(const GyroBiasCalculator & calc)
