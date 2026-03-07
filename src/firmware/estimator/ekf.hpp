@@ -288,35 +288,6 @@ namespace hf {
                 return EstimatedState(dx, dy, z, dz, phi, theta, psi);
             }
 
-            void getStateEstimate(const uint32_t msec_curr, VehicleState & state)
-            {
-                addProcessNoise(msec_curr);
-
-                // Update with queued measurements and flush the queue
-                for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_measurementsQueue[k], msec_curr);
-                }
-                _queueLength = 0;
-
-                state.z = _x[STATE_Z];
-
-                if (_isUpdated) {
-                    finalize(msec_curr);
-                }
-
-                state.dx = _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
-                state.dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); // make right pos
-                state.dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
-
-                state.phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
-                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
-
-                state.theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
-
-                state.psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
-                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); // make right pos
-            }
-
             void enqueueImu(const Vec3 * gyro, const Vec3 * accel)
             {
                 measurement_t m = {};
