@@ -21,18 +21,16 @@ namespace hf {
 
     class GyroBiasCalculator {
 
-        friend class IMU;
-
         private:
-
-            // Number of samples used in variance calculation. Changing this
-            // affects the threshold
-            static const uint16_t NBR_OF_SAMPLES = 512;
 
             static constexpr float RAW_VARIANCE_BASE = 100;
             static const uint32_t MIN_BIAS_TIMEOUT_MS = 1000;
 
         public:
+
+            // Number of samples used in variance calculation. Changing this
+            // affects the threshold
+            static const uint16_t NBR_OF_SAMPLES = 512;
 
             Vec3 biasOut;
             bool wasValueFound;
