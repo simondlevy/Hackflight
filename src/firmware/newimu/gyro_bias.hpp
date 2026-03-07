@@ -45,6 +45,23 @@ namespace hf {
             GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                 = default;
 
+            GyroBiasCalculator(
+                    const Vec3 & biasOut,
+                    const bool wasValueFound,
+                    const uint16_t bufferIndex,
+                    const SixAxisStats & stats,
+                    const Vec3 & values,
+                    const bool isBufferFilled,
+                    const int32_t varianceSampleTime)
+                :                     
+                    biasOut(biasOut),
+                    wasValueFound(wasValueFound),
+                    bufferIndex(bufferIndex),
+                    _stats(stats),
+                    _values(values),
+                    _isBufferFilled(isBufferFilled),
+                    _varianceSampleTime(varianceSampleTime) {}
+
             static void process(
                     GyroBiasCalculator & calc,
                     axis3_i16_t * buffer,
@@ -65,7 +82,6 @@ namespace hf {
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
                 calc._stats = stats;
-
                 calc._varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
                 calc._values = shouldUpdate ? stats.mean : calc._values;
                 calc.wasValueFound = shouldUpdate ? true : calc.wasValueFound;
