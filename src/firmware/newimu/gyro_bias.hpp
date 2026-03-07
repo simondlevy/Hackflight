@@ -64,7 +64,8 @@ namespace hf {
                     stats.variance.z < RAW_VARIANCE_BASE &&
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
-                calc._stats = wantUpdate ? stats : calc._stats;
+                calc._stats = stats;
+
                 calc._varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
                 calc._values = shouldUpdate ? stats.mean : calc._values;
                 calc.wasValueFound = shouldUpdate ? true : calc.wasValueFound;
