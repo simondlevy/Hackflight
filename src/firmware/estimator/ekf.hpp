@@ -38,7 +38,7 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
  
-            void reset(const uint32_t nowMs)
+            void reset(const uint32_t msec_curr)
             {
                 axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
                 axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
@@ -79,16 +79,16 @@ namespace hf {
                 ekf_addCovarianceNoise(pinit);
 
                 _isUpdated = false;
-                _lastPredictionMs = nowMs;
-                _lastProcessNoiseUpdateMs = nowMs;
+                _lastPredictionMs = msec_curr;
+                _lastProcessNoiseUpdateMs = msec_curr;
             }
 
-            void predict(const uint32_t nowMs, bool isFlying) 
+            void predict(const uint32_t msec_curr, bool isFlying) 
             {
                 axis3fSubSamplerFinalize(&_accSubSampler, "accel");
                 axis3fSubSamplerFinalize(&_gyroSubSampler, "gyro");
 
-                const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
+                const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
                 const Vec3 * accel = &_accSubSampler.subSample;
                 const Vec3 * gyro = &_gyroSubSampler.subSample;
@@ -249,23 +249,23 @@ namespace hf {
                 _q3 = tmpq3/norm;
 
                 _isUpdated = true;
-                _lastPredictionMs = nowMs;
+                _lastPredictionMs = msec_curr;
             }
 
-            auto getStateEstimate(const uint32_t nowMs) -> EstimatedState
+            auto getStateEstimate(const uint32_t msec_curr) -> EstimatedState
             {
-                addProcessNoise(nowMs);
+                addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
                 for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_measurementsQueue[k], nowMs);
+                    update(_measurementsQueue[k], msec_curr);
                 }
                 _queueLength = 0;
 
                 const auto z = _x[STATE_Z];
 
                 if (_isUpdated) {
-                    finalize(nowMs);
+                    finalize(msec_curr);
                 }
 
                 const auto dx =
@@ -288,20 +288,20 @@ namespace hf {
                 return EstimatedState(dx, dy, z, dz, phi, theta, psi);
             }
 
-            void getStateEstimate(const uint32_t nowMs, VehicleState & state)
+            void getStateEstimate(const uint32_t msec_curr, VehicleState & state)
             {
-                addProcessNoise(nowMs);
+                addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
                 for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_measurementsQueue[k], nowMs);
+                    update(_measurementsQueue[k], msec_curr);
                 }
                 _queueLength = 0;
 
                 state.z = _x[STATE_Z];
 
                 if (_isUpdated) {
-                    finalize(nowMs);
+                    finalize(msec_curr);
                 }
 
                 state.dx = _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
@@ -506,7 +506,7 @@ namespace hf {
                 return &subSampler->subSample;
             }
 
-            void finalize(const uint32_t nowMs)
+            void finalize(const uint32_t msec_curr)
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const float v0 = _x[STATE_D0];
@@ -567,9 +567,9 @@ namespace hf {
                 _isUpdated = false;
             }
 
-            void addProcessNoise(const uint32_t nowMs) 
+            void addProcessNoise(const uint32_t msec_curr) 
             {
-                float dt = (nowMs - _lastProcessNoiseUpdateMs) / 1000.0f;
+                float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
 
@@ -588,11 +588,11 @@ namespace hf {
                     ekf_addCovarianceNoise(noise);
                     ekf_enforceSymmetry();
 
-                    _lastProcessNoiseUpdateMs = nowMs;
+                    _lastProcessNoiseUpdateMs = msec_curr;
                 }
             }
 
-            void update(measurement_t & m, const uint32_t nowMs)
+            void update(measurement_t & m, const uint32_t msec_curr)
             {
                 switch (m.type) {
 

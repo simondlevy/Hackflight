@@ -33,7 +33,7 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-//#define PROFILE
+#define PROFILE
 //#define DEBUG
 
 // IMU ------------------------------------------------------------
@@ -178,28 +178,37 @@ static auto getVehicleState(
 
     static bool _didResetEstimation;
 
-    const uint32_t nowMs = millis();
+    const uint32_t msec_curr = millis();
 
     if (_didResetEstimation) {
-        _ekf.reset(nowMs);
+        _ekf.reset(msec_curr);
         _didResetEstimation = false;
     }
 
     // Run the system dynamics to predict the state forward.
     if (_timer.ready(FREQ_EKF_PREDICTION)) {
-        _ekf.predict(nowMs, isFlying); 
+        _ekf.predict(msec_curr, isFlying); 
     }
 
     // Get state estimate from EKF
-    hf::VehicleState state = {};
-    _ekf.getStateEstimate(nowMs, state);
+    const hf::EstimatedState state = _ekf.getStateEstimate(msec_curr);
 
     // Get angular velocities directly from gyro
-    state.dphi   = gyroDps.x;
-    state.dtheta = gyroDps.y;
-    state.dpsi   = -gyroDps.z; // negate for nose-right positive
+    return hf::VehicleState(
+            0,           // x
+            state.dx,
+            0,           // y
+            state.dy,
+            state.z,
+            state.dz,
+            state.phi,
+            gyroDps.x,
+            state.theta,
+            gyroDps.y,
+            state.psi,
+            -gyroDps.z); // negate for nose-right positive.y
 
-    return state;
+
 }
 
 static float getDt(const uint32_t usec_curr)
