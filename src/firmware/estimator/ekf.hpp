@@ -18,6 +18,7 @@
 
 #include <datatypes.hpp>
 #include <firmware/estimator/matrix_typedef.h>
+#include <firmware/estimator/state.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/zranger.hpp>
 #include <num.hpp>
@@ -250,6 +251,44 @@ namespace hf {
                 _isUpdated = true;
                 _lastPredictionMs = nowMs;
             }
+
+            /*
+            auto getStateEstimate(const uint32_t nowMs) -> VehicleState
+            {
+                addProcessNoise(nowMs);
+
+                // Update with queued measurements and flush the queue
+                for (uint32_t k=0; k<_queueLength; ++k) {
+                    update(_measurementsQueue[k], nowMs);
+                }
+                _queueLength = 0;
+
+                const auto z = _x[STATE_Z];
+
+                if (_isUpdated) {
+                    finalize(nowMs);
+                }
+
+                const auto dx =
+                    _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
+
+                // make right positive
+                const auto dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); 
+
+                const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
+
+                const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
+                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
+
+                const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
+
+                // make right positive
+                const auto psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
+                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
+
+                return VehicleState(0, dx, 0, dy, z, dz,
+                        phi, dphi, theta, dtheta, psi, dpsi);
+            }*/
 
             void getStateEstimate(const uint32_t nowMs, VehicleState & state)
             {
