@@ -53,7 +53,7 @@ namespace hf {
             static constexpr double ZMIN = 0.005;
 
             // Vehicle state (Equation 11)
-            State state;
+            SimState state;
 
             /**
              *  Vehicle parameters
@@ -88,7 +88,7 @@ namespace hf {
 
             Dynamics(const pose_t & pose) : state(pose) {}
 
-            Dynamics(const State & state, const State & dstate,
+            Dynamics(const SimState & state, const SimState & dstate,
                     const bool airborne)
                 : state(state), _dstate(dstate), _airborne(airborne) {}
 
@@ -149,7 +149,7 @@ namespace hf {
 
                 // Compute state as first temporal integral of first temporal
                 // derivative
-                const auto newstate = State(
+                const auto newstate = SimState(
                         s.x + (airborne ? dt * ds.x : 0),
                         s.dx + (airborne ? dt * ds.dx : 0),
                         s.y + (airborne ? dt * ds.y : 0),
@@ -163,10 +163,10 @@ namespace hf {
                         constrain_psi(s.psi + (airborne ? dt * ds.psi : 0)),
                         s.dpsi + (airborne ? dt * ds.dpsi : 0));
 
-                const auto newdstate = !airborne ? State() :
+                const auto newdstate = !airborne ? SimState() :
 
                     // Equation 12
-                    State(
+                    SimState(
                             s.dx,
                             (cnphi*stheta*cpsi + snphi*spsi) * u1 / m,
                             s.dy,
@@ -187,7 +187,7 @@ namespace hf {
         private:
 
             // Vehicle state first derivative (Equation 12)
-            State _dstate;
+            SimState _dstate;
 
             // Flag for whether we're airborne and can update dynamics
             bool _airborne;

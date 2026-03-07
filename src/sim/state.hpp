@@ -25,7 +25,7 @@ namespace hf {
     // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
     // Position in meters, velocity in meters/second, angles in degrees,
     // angular velocity in degrees/second.
-    class State {
+    class SimState {
 
         public:
 
@@ -42,16 +42,16 @@ namespace hf {
             double psi;     // positive nose right
             double dpsi;    // positive nose right
 
-            State() 
+            SimState() 
                 : x(0), dx(0), y(0), dy(0), z(0), dz(0), phi(0),
                 dphi(0), theta(0), dtheta(0), psi(0), dpsi(0) {}
 
-            State(const pose_t & p) 
+            SimState(const pose_t & p) 
                 : x(p.x), dx(0), y(p.y), dy(0), z(p.z), dz(0),
                 phi(p.phi), dphi(0), theta(p.theta), dtheta(0),
                 psi(p.psi), dpsi(0) {}
 
-            State(
+            SimState(
                     const double x, const double dx,
                     const double y, const double dy,
                     const double z, const double dz,
