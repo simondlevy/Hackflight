@@ -90,7 +90,9 @@ class PluginHelper {
         auto run_simulator(const hf::mode_e mode, const hf::Setpoint & setpoint)
             -> hf::Dynamics::State
         {
-            return _simulator.step(mode, setpoint);
+            _simulator = hf::Simulator::step(_simulator, mode, setpoint);
+
+            return _simulator._dynamics.state;
         }
 
         auto set_dbody_from_state(const hf::Dynamics::State & state)

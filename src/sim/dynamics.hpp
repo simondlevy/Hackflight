@@ -132,7 +132,6 @@ namespace hf {
 
             } world_params_t; 
 
-
             Dynamics() = default;
 
             Dynamics& operator=(const Dynamics& other) = default;

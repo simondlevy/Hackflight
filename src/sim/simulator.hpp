@@ -44,18 +44,30 @@ namespace hf {
 
         public:
 
+            Dynamics _dynamics;
+
             Simulator() = default;
 
             Simulator(const Dynamics::pose_t & pose)
-               : _dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
+                : _dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
 
-            auto step(const mode_e mode, const Setpoint & setpoint,
-                    const float framerate=32) -> Dynamics::State
+            Simulator(const Dynamics & dynamics, const PidControl & pidControl)
+                : _dynamics(dynamics), _pidControl(pidControl) {}
+
+            static auto step(
+                    const Simulator & sim,
+                    const mode_e mode,
+                    const Setpoint & setpoint,
+                    const float framerate=32) -> Simulator 
             {
                 const auto controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
 
                 const auto dt = 1/(float)PID_FAST_FREQ;
+
+                auto pidControl = sim._pidControl;
+
+                auto dynamics = sim._dynamics;
 
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
@@ -63,21 +75,22 @@ namespace hf {
                     // Get vehicle state from dynamics and convert state values
                     // from doubles/radians to floats/degrees for PID
                     // controllers
-                    const auto state = state2degrees(_dynamics.state);
+                    const auto state = state2degrees(dynamics.state);
 
                     // Run fast PID control and mixer in middle loop --------------
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
                         // PidControl::run(_pidControl, dt, controlled, state, setpoint);
-                        _pidControl = PidControl::run(_pidControl, dt, controlled, state, setpoint);
+                        pidControl = PidControl::run(
+                                pidControl, dt, controlled, state, setpoint);
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            _pidControl.setpoint.thrust,
-                            _pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
-                            _pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
-                            _pidControl.setpoint.yaw * YAW_MOTOR_SCALE
+                            pidControl.setpoint.thrust,
+                            pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
+                            pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
+                            pidControl.setpoint.yaw * YAW_MOTOR_SCALE
                         };
 
                         // Get motor RPMS from mixer
@@ -90,18 +103,16 @@ namespace hf {
                         // Run dynamics in inner loop -----------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
 
-                            _dynamics = Dynamics::update(_dynamics, VPARAMS, 1 / DYNAMICS_FREQ, rpms,
-                                    4, _mixer.roll, _mixer.pitch, _mixer.yaw);
-                        }
+                            dynamics = Dynamics::update(dynamics,
+                                    VPARAMS, 1 / DYNAMICS_FREQ, rpms, 4,
+                                    _mixer.roll, _mixer.pitch, _mixer.yaw); }
                     }
                 }
 
-                return _dynamics.state;
+                return Simulator(dynamics, pidControl);
             }
 
         private:
-
-            Dynamics _dynamics;
 
             PidControl _pidControl;
 
