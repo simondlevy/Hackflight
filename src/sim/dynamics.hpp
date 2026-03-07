@@ -42,7 +42,7 @@
 #include <string.h>
 
 #include <sim/state.hpp>
-#include <sim/pose.hpp>
+#include <sim/pose.h>
 
 namespace hf {
 
