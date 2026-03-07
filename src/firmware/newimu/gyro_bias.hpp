@@ -54,9 +54,12 @@ namespace hf {
 
                 const auto isBufferFilled = calc.bufferIndex == NBR_OF_SAMPLES;
 
-                if (!calc.wasValueFound && isBufferFilled) {
+                const auto wantUpdate = !calc.wasValueFound && isBufferFilled;
 
-                    calc._stats = calculateStats(buffer);
+                calc._stats = wantUpdate ? calculateStats(buffer) : calc._stats;
+
+                if (wantUpdate) {
+
 
                     if (
                             calc._stats.variance.x < RAW_VARIANCE_BASE &&
