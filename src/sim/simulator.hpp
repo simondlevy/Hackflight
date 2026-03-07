@@ -117,16 +117,6 @@ namespace hf {
 
             PidControl _pidControl;
 
-            static VehicleState state2floats(const State s)
-            {
-                return VehicleState { 
-                    (float)s.x, (float)s.dx, (float)s.y, (float)s.dy,
-                        (float)s.z, (float)s.dz, (float)s.phi, (float)s.dphi,
-                        (float)s.theta, (float)s.dtheta, (float)s.psi,
-                        (float)s.dpsi
-                };
-            }
-
             static double * motors2doubless(const float * f, const size_t n)
             {
                 static double d[MAX_MOTOR_COUNT];
@@ -138,10 +128,8 @@ namespace hf {
 
             static VehicleState state2degrees(const State state)
             {
-                return VehicleState {
-                    (float)state.x,
+                return VehicleState(
                         (float)state.dx,
-                        (float)state.y,
                         (float)state.dy,
                         (float)state.z,
                         (float)state.dz,
@@ -150,8 +138,7 @@ namespace hf {
                         (float)(Num::RAD2DEG * state.theta),
                         (float)(Num::RAD2DEG * state.dtheta),
                         (float)(Num::RAD2DEG * state.psi),
-                        (float)(Num::RAD2DEG * state.dpsi)
-                };
+                        (float)(Num::RAD2DEG * state.dpsi));
             }
     };
 }

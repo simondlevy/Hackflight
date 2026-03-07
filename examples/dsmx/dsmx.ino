@@ -33,7 +33,7 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-#define PROFILE
+//#define PROFILE
 //#define DEBUG
 
 // IMU ------------------------------------------------------------
@@ -194,9 +194,7 @@ static auto getVehicleState(const bool isFlying, const hf::Vec3 & gyroDps)
 
     // Get angular velocities directly from gyro
     return hf::VehicleState(
-            0,           // x
             state.dx,
-            0,           // y
             state.dy,
             state.z,
             state.dz,

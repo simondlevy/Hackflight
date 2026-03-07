@@ -26,9 +26,7 @@ namespace hf {
 
         public:
 
-            float x;       // positive forward
             float dx;      // positive forward
-            float y;       // positive rightward
             float dy;      // positive rightward
             float z;       // positive upward
             float dz;      // positive upward
@@ -42,9 +40,7 @@ namespace hf {
             VehicleState() = default;
 
             VehicleState
-                (const float x,
-                 const float dx,
-                 const float y,
+                (const float dx,
                  const float dy,
                  const float z,
                  const float dz,
@@ -55,9 +51,7 @@ namespace hf {
                  const float psi,
                  const float dpsi) 
                 : 
-                    x(x),
                     dx(dx),
-                    y(y),
                     dy(dy),
                     z(z),
                     dz(dz),
