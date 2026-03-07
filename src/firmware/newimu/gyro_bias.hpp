@@ -58,20 +58,16 @@ namespace hf {
 
                 calc._stats = wantUpdate ? calculateStats(buffer) : calc._stats;
 
-                const auto canUpdate = 
+                const auto shouldUpdate = wantUpdate &&
                     calc._stats.variance.x < RAW_VARIANCE_BASE &&
                     calc._stats.variance.y < RAW_VARIANCE_BASE &&
                     calc._stats.variance.z < RAW_VARIANCE_BASE &&
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
-                if (wantUpdate) {
-
-                    if (canUpdate)
-                    {
-                        calc._varianceSampleTime = ticks;
-                        calc._values = calc._stats.mean;
-                        calc.wasValueFound = true;
-                    }
+                if (shouldUpdate) {
+                    calc._varianceSampleTime = ticks;
+                    calc._values = calc._stats.mean;
+                    calc.wasValueFound = true;
                 }
 
                 calc.bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
