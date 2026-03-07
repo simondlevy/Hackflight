@@ -21,8 +21,6 @@
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
-#define NEW
-
 namespace hf {
 
     class IMU {
@@ -69,12 +67,6 @@ namespace hf {
                         _gyroBiasCalculator,
                         _gyroSamplesBuffer,
                         tickCount);
-                /*
-                GyroBiasCalculator::process(
-                        _gyroBiasCalculator,
-                        _gyroSamplesBuffer,
-                        tickCount);*/
-
                 _gyroBias = _gyroBiasCalculator.biasOut;
 
                 // Subtract gyro bias

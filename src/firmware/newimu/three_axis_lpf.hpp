@@ -16,8 +16,6 @@
 
 #include <firmware/newimu/lpf.hpp>
 
-#define NEW
-
 namespace hf {
 
     class ThreeAxisLpf {

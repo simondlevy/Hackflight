@@ -99,43 +99,6 @@ namespace hf {
                         varianceSampleTime);
             }
 
-            /*
-            static void process(
-                    GyroBiasCalculator & calc,
-                    const axis3_i16_t * buffer,
-                    const uint32_t ticks)
-            {
-                const auto bufferIndex = calc.bufferIndex + 1;
-
-                const auto isBufferFilled = bufferIndex == NBR_OF_SAMPLES;
-
-                const auto wantUpdate = !calc.wasValueFound && isBufferFilled;
-
-                const auto stats = wantUpdate ? calculateStats(buffer) : calc._stats;
-
-                const auto shouldUpdate = wantUpdate &&
-                    stats.variance.x < RAW_VARIANCE_BASE &&
-                    stats.variance.y < RAW_VARIANCE_BASE &&
-                    stats.variance.z < RAW_VARIANCE_BASE &&
-                    calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
-
-                const auto values = shouldUpdate ? stats.mean : calc._values;
-
-                const auto varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
-
-                const auto wasValueFound = shouldUpdate ? true : calc.wasValueFound;
-
-                const auto newBufferIndex = isBufferFilled ? 0 : bufferIndex;
-
-                calc.biasOut = values;
-                calc.wasValueFound = wasValueFound;
-                calc.bufferIndex = newBufferIndex;
-                calc._stats = stats;
-                calc._values = values;
-                calc._isBufferFilled = isBufferFilled;
-                calc._varianceSampleTime = varianceSampleTime;
-            }*/
-
         private:
 
             SixAxisStats _stats;

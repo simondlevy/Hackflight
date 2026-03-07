@@ -19,8 +19,6 @@
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
-#define NEW
-
 namespace hf {
 
     class LPF {
