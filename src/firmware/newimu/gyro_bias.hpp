@@ -102,14 +102,11 @@ namespace hf {
 
             static void process(
                     GyroBiasCalculator & calc,
+                    axis3_i16_t * buffer,
                     const uint32_t ticks,
                     const axis3_i16_t gyroRaw)
             {
-                calc._buffer[calc._bufferIndex] = gyroRaw;
-
-                //calc._buffer[calc._bufferIndex].x = gyroRaw.x;
-                //calc._buffer[calc._bufferIndex].y = gyroRaw.y;
-                //calc._buffer[calc._bufferIndex].z = gyroRaw.z;
+                buffer[calc._bufferIndex] = gyroRaw;
 
                 calc._bufferIndex++;
 
@@ -121,7 +118,7 @@ namespace hf {
 
                 if (!calc.wasValueFound && isBufferFilled) {
 
-                    calc._stats = calculateStats(calc);
+                    calc._stats = calculateStats(buffer);
 
                     if (
                             calc._stats.variance.x < RAW_VARIANCE_BASE &&
@@ -142,14 +139,11 @@ namespace hf {
 
             SixAxisStats _stats;
             Vec3 _values;
-            axis3_i16_t _buffer[NBR_OF_SAMPLES];
             uint16_t _bufferIndex;
             bool _isBufferFilled;
             int32_t _varianceSampleTime;
 
-            static axis3_i16_t _static_buffer[NBR_OF_SAMPLES];
-
-            static auto calculateStats(const GyroBiasCalculator & calc)
+            static auto calculateStats(const axis3_i16_t * buffer)
                 -> SixAxisStats
                 {
                     int64_t xsum=0, ysum=0, zsum=0;
@@ -157,12 +151,12 @@ namespace hf {
 
                     for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
 
-                        xsum += calc._buffer[i].x;
-                        ysum += calc._buffer[i].y;
-                        zsum += calc._buffer[i].z;
-                        xsumsq += calc._buffer[i].x * calc._buffer[i].x;
-                        ysumsq += calc._buffer[i].y * calc._buffer[i].y;
-                        zsumsq += calc._buffer[i].z * calc._buffer[i].z;
+                        xsum += buffer[i].x;
+                        ysum += buffer[i].y;
+                        zsum += buffer[i].z;
+                        xsumsq += buffer[i].x * buffer[i].x;
+                        ysumsq += buffer[i].y * buffer[i].y;
+                        zsumsq += buffer[i].z * buffer[i].z;
                     }
 
                     const auto mean = Vec3(

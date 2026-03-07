@@ -66,6 +66,7 @@ namespace hf {
                 // Calibrate gyro with raw values if necessary
                 GyroBiasCalculator::process(
                         _gyroBiasCalculator,
+                        _gyroSamplesBuffer,
                         tickCount,
                         gyroRaw);
 
