@@ -56,8 +56,6 @@ namespace hf {
 
                 const auto wantUpdate = !calc.wasValueFound && isBufferFilled;
 
-                calc._stats = wantUpdate ? calculateStats(buffer) : calc._stats;
-
                 const auto stats = wantUpdate ? calculateStats(buffer) : calc._stats;
 
                 const auto shouldUpdate = wantUpdate &&
@@ -65,6 +63,8 @@ namespace hf {
                     stats.variance.y < RAW_VARIANCE_BASE &&
                     stats.variance.z < RAW_VARIANCE_BASE &&
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+
+                calc._stats = wantUpdate ? stats : calc._stats;
 
                 calc._varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
                 calc._values = shouldUpdate ? calc._stats.mean : calc._values;
