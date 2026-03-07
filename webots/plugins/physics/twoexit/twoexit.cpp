@@ -17,7 +17,6 @@
  */
 
 // Hackflight
-#include <datatypes.h>
 #include "../helper.hpp"
 #include "../autopilot.hpp"
 

@@ -26,7 +26,7 @@
 
 // Hackflight
 #define _MAIN
-#include <datatypes.h>
+#include <datatypes.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
 
