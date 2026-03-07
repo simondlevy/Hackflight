@@ -74,6 +74,7 @@ namespace hf {
                 : 
                     x(x),
                     dx(dx),
+                    y(y),
                     dy(dy),
                     z(z),
                     dz(dz),
