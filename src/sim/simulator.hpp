@@ -44,15 +44,15 @@ namespace hf {
 
         public:
 
-            Dynamics _dynamics;
+            Dynamics dynamics;
 
             Simulator() = default;
 
             Simulator(const Dynamics::pose_t & pose)
-                : _dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
+                : dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
 
             Simulator(const Dynamics & dynamics, const PidControl & pidControl)
-                : _dynamics(dynamics), _pidControl(pidControl) {}
+                : dynamics(dynamics), _pidControl(pidControl) {}
 
             static auto step(
                     const Simulator & sim,
@@ -67,7 +67,7 @@ namespace hf {
 
                 auto pidControl = sim._pidControl;
 
-                auto dynamics = sim._dynamics;
+                auto dynamics = sim.dynamics;
 
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
