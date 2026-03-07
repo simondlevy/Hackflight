@@ -49,7 +49,7 @@ namespace hf {
                     const StabilizerPid & s,
                     const bool airborne,
                     const float dt,
-                    const vehicleState_t & state,
+                    const VehicleState & state,
                     const Setpoint & setpoint_in) -> StabilizerPid
             {
                 const auto roll_pid = RollPitchPid::run(s._roll_pid,

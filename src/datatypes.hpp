@@ -22,23 +22,6 @@ namespace hf {
 
     static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
-    typedef struct {
-
-        float x;       // positive forward
-        float dx;      // positive forward
-        float y;       // positive rightward
-        float dy;      // positive rightward
-        float z;       // positive upward
-        float dz;      // positive upward
-        float phi;     // positive roll right
-        float dphi;    // positive roll right
-        float theta;   // positive nose down
-        float dtheta;  // positive nose down
-        float psi;     // positive nose right
-        float dpsi;    // positive nose right
-
-    } vehicleState_t;
-
     class VehicleState {
 
         public:

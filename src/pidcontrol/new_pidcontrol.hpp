@@ -62,7 +62,7 @@ namespace hf {
                     const PidControl & pid,
                     const float dt,
                     const bool hovering,
-                    const vehicleState_t & state,
+                    const VehicleState & state,
                     const Setpoint & setpoint_in) -> PidControl
             {
                 // Altitude hold ---------------------------------------------

@@ -251,7 +251,7 @@ namespace hf {
                 _lastPredictionMs = nowMs;
             }
 
-            void getStateEstimate(const uint32_t nowMs, vehicleState_t & state)
+            void getStateEstimate(const uint32_t nowMs, VehicleState & state)
             {
                 addProcessNoise(nowMs);
 

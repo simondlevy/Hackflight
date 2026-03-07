@@ -29,7 +29,7 @@ namespace hf {
 
             static void run(
                     const uint32_t msec_curr,
-                    const vehicleState_t & state)
+                    const VehicleState & state)
             {
                 static Timer _timer;
 

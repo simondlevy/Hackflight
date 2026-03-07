@@ -116,9 +116,9 @@ namespace hf {
 
             PidControl _pidControl;
 
-            static vehicleState_t state2floats(const Dynamics::State s)
+            static VehicleState state2floats(const Dynamics::State s)
             {
-                return vehicleState_t { 
+                return VehicleState { 
                     (float)s.x, (float)s.dx, (float)s.y, (float)s.dy,
                         (float)s.z, (float)s.dz, (float)s.phi, (float)s.dphi,
                         (float)s.theta, (float)s.dtheta, (float)s.psi,
@@ -135,9 +135,9 @@ namespace hf {
                 return d;
             }
 
-            static vehicleState_t state2degrees(const Dynamics::State state)
+            static VehicleState state2degrees(const Dynamics::State state)
             {
-                return vehicleState_t {
+                return VehicleState {
                     (float)state.x,
                         (float)state.dx,
                         (float)state.y,

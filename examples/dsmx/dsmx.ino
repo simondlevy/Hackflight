@@ -173,7 +173,7 @@ static const float THROTTLE_DOWN_MAX = -0.95;
 static void getVehicleState(
         const bool isFlying,
         const hf::Vec3 & gyroDps,
-        hf::vehicleState_t & state)
+        hf::VehicleState & state)
 {
     static hf::Timer _timer;
 
@@ -231,7 +231,7 @@ static void profile()
 static void debug(
         const bool imuIsCalibrated,
         const hf::Vec3 & gyroDps,
-        const hf::vehicleState_t & state,
+        const hf::VehicleState & state,
         const hf::Setpoint & setpoint)
 {
     static uint32_t _msec;
@@ -311,7 +311,7 @@ void loop()
     const bool isFlying = true; // XXX
 
     // XXX should be return value
-    hf::vehicleState_t state = {};
+    hf::VehicleState state = {};
     getVehicleState(isFlying, gyroDps, state);
 
     hf::Setpoint setpoint = {
