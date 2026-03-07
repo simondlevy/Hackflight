@@ -81,12 +81,25 @@ namespace hf {
                     stats.variance.z < RAW_VARIANCE_BASE &&
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
+                const auto values = shouldUpdate ? stats.mean : calc._values;
+
+                const auto varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
+
+                const auto wasValueFound = shouldUpdate ? true : calc.wasValueFound;
+
+                const auto bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
+
+                calc.biasOut = values;
+                calc.wasValueFound = wasValueFound;
+                calc.bufferIndex = bufferIndex;
                 calc._stats = stats;
-                calc._varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
-                calc._values = shouldUpdate ? stats.mean : calc._values;
-                calc.wasValueFound = shouldUpdate ? true : calc.wasValueFound;
-                calc.bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
-                calc.biasOut = calc._values;
+                calc._values = values;
+                calc._isBufferFilled = isBufferFilled;
+                calc._varianceSampleTime = varianceSampleTime;
+
+                const auto newcalc = GyroBiasCalculator(
+                        );
+                (void)newcalc;
             }
 
         private:
