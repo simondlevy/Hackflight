@@ -64,11 +64,9 @@ namespace hf {
                     calc._stats.variance.z < RAW_VARIANCE_BASE &&
                     calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
-                if (shouldUpdate) {
-                    calc._varianceSampleTime = ticks;
-                    calc._values = calc._stats.mean;
-                    calc.wasValueFound = true;
-                }
+                calc._varianceSampleTime = shouldUpdate ? ticks : calc._varianceSampleTime;
+                calc._values = shouldUpdate ? calc._stats.mean : calc._values;
+                calc.wasValueFound = shouldUpdate ? true : calc.wasValueFound;
 
                 calc.bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
 
