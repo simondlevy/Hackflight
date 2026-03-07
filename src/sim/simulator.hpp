@@ -49,13 +49,8 @@ namespace hf {
             Simulator(const Dynamics::pose_t & pose)
                : _dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
 
-            void init(const Dynamics::pose_t & pose)
-            {
-                _dynamics = Dynamics(pose);
-            }
-
-            Dynamics::State step(const mode_e mode, const Setpoint & setpoint,
-                    const float framerate=32)
+            auto step(const mode_e mode, const Setpoint & setpoint,
+                    const float framerate=32) -> Dynamics::State
             {
                 const auto controlled =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
@@ -101,11 +96,6 @@ namespace hf {
                     }
                 }
 
-                return _dynamics.state;
-            }
-
-            Dynamics::State getVehicleState()
-            {
                 return _dynamics.state;
             }
 
