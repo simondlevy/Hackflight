@@ -207,7 +207,7 @@ namespace hf {
                 return foundBias;
             }
 
-            static void applyLpf(Lpf lpf[3], axis3_t* in)
+            static void applyLpf(LPF lpf[3], axis3_t* in)
             {
                 in->x = lpf[0].apply(in->x);
                 in->y = lpf[1].apply(in->y);
@@ -215,8 +215,8 @@ namespace hf {
             }
 
             // Low Pass filtering
-            Lpf _accLpf[3];
-            Lpf _gyroLpf[3];
+            LPF _accLpf[3];
+            LPF _gyroLpf[3];
 
             // Pre-calculated values for accelerometer alignment
             float _cosPitch;
