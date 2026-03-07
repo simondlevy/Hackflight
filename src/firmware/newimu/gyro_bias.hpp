@@ -45,44 +45,6 @@ namespace hf {
             GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                 = default;
 
-            /*
-            static auto process(
-                    const GyroBiasCalculator & calc,
-                    const uint32_t ticks,
-                    const axis3_i16_t gyroRaw) -> GyroBiasCalculator
-            {
-                _static_buffer[calc.bufferIndex].x = gyroRaw.x;
-                _static_buffer[calc.bufferIndex].y = gyroRaw.y;
-                _static_buffer[calc.bufferIndex].z = gyroRaw.z;
-
-                const auto nextIndex = calc.bufferIndex + 1; 
-
-                const auto isBufferFilled = (nextIndex == NBR_OF_SAMPLES);
- 
-                const auto bufferIndex = isBufferFilled ? 0 : nextIndex;
-
-                const auto needUpdate = !calc.wasValueFound && isBufferFilled;
-
-                const auto stats = needUpdate ? calculateStats(calc) : calc._stats;
-
-                const auto valueWasFound = needUpdate &&
-                    stats.variance.x < RAW_VARIANCE_BASE &&
-                    stats.variance.y < RAW_VARIANCE_BASE &&
-                    stats.variance.z < RAW_VARIANCE_BASE &&
-                    calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
-
-                const auto varianceSampleTime =
-                    valueWasFound ? ticks : calc._varianceSampleTime;
-
-                const auto values = valueWasFound ? stats.mean : calc._stats.mean;
-
-                (void)varianceSampleTime;
-                (void)values;
-                (void)bufferIndex;
-
-                return GyroBiasCalculator();
-            }*/
-
             static void process(
                     GyroBiasCalculator & calc,
                     axis3_i16_t * buffer,
@@ -91,10 +53,6 @@ namespace hf {
                 calc.bufferIndex++;
 
                 const auto isBufferFilled = calc.bufferIndex == NBR_OF_SAMPLES;
-
-                if (isBufferFilled) {
-                    calc.bufferIndex = 0;
-                }
 
                 if (!calc.wasValueFound && isBufferFilled) {
 
@@ -111,6 +69,8 @@ namespace hf {
                         calc.wasValueFound = true;
                     }
                 }
+
+                calc.bufferIndex = isBufferFilled ? 0 : calc.bufferIndex;
 
                 calc.biasOut = calc._values;
             }
