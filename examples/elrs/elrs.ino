@@ -98,6 +98,8 @@ static hf::EKF _ekf;
 
 // Receiver -------------------------------------------------------
 
+static constexpr uint32_t RX_TIMEOUT_USEC = 500'000;
+
 static CRSFforArduino _crsf;
 
 static float _rx_chanvals[5];
@@ -318,10 +320,12 @@ void loop()
 
     static bool _failsafe;
 
+    // Check failsafe via RX timeout
     if (_last_rx_usec > 0 &&
             usec_curr > _last_rx_usec &&
-            usec_curr - _last_rx_usec > 500'000) {
+            usec_curr - _last_rx_usec > RX_TIMEOUT_USEC) {
         _failsafe = true;
+        _armed = false;
     }
 
     // Push-button arming
