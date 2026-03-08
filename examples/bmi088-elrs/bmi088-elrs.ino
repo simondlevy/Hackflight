@@ -34,7 +34,7 @@
 #include <pidcontrol/stabilizer.hpp>
 
 //#define PROFILE
-#define DEBUG
+//#define DEBUG
 
 // IMU ------------------------------------------------------------
 
@@ -286,8 +286,6 @@ void setup()
     digitalWrite(LED_PIN, HIGH);
 
     delay(5);
-
-    Serial1.begin(115000);
 
     rx_init();
 

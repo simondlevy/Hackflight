@@ -234,6 +234,21 @@ static float getDt(const uint32_t usec_curr)
     return dt;
 }
 
+#ifdef DEBUG
+static void debug(
+        const hf::VehicleState & state, const hf::Setpoint & setpoint)
+{
+    static uint32_t _msec;
+    const auto msec = millis();
+
+    if (msec - _msec > 20) {
+        printf("psi=%+3.3f\n", state.psi);
+        _msec = msec;
+    }
+}
+#endif
+
+
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -257,20 +272,6 @@ void setup()
     blinkOnStartup(); 
 }
 
-#ifdef DEBUG
-static void debug(
-        const hf::VehicleState & state, const hf::Setpoint & setpoint)
-{
-    static uint32_t _msec;
-    const auto msec = millis();
-
-    if (msec - _msec > 20) {
-        printf("psi=%+3.3f\n", state.psi);
-        _msec = msec;
-    }
-}
-#endif
-
 void loop()
 {
     const auto usec_curr = micros();      
@@ -292,14 +293,14 @@ void loop()
         throttle_is_down ? true :
         _armed;
 
-    hf::VehicleState state = {};
-    getVehicleState(dt, state);
-
     hf::Setpoint setpoint = {
         (_rx_chanvals[0]+1)/2,
         _rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
         _rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
         _rx_chanvals[3]};
+
+    hf::VehicleState state = {};
+    getVehicleState(dt, state);
 
 #ifdef DEBUG
     debug(state, setpoint);
