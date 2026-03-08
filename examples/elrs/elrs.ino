@@ -318,11 +318,18 @@ void loop()
 
     static bool _failsafe;
 
+    if (_last_rx_usec > 0 &&
+            usec_curr > _last_rx_usec &&
+            usec_curr - _last_rx_usec > 500'000) {
+        _failsafe = true;
+    }
+
     // Push-button arming
     static float _chan5_prev;
     const float chan5_curr = _rx_chanvals[4];
     if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
-        _armed = _armed ? false :
+        _armed =
+            _armed ? false :
             throttle_is_down && !_failsafe ? true :
             _armed;
     }
