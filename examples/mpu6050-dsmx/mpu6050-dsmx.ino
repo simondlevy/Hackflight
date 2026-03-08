@@ -30,6 +30,7 @@
 #include <hackflight.h>
 #include <datatypes.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
+#include <firmware/led.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>

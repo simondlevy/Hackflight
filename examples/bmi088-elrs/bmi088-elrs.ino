@@ -145,7 +145,6 @@ static void rx_init()
 
 // Motors ---------------------------------------------------------
 
-// static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 // LED -------------------------------------------------------------
