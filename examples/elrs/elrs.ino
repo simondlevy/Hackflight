@@ -110,6 +110,8 @@ static auto scalechan(serialReceiverLayer::rcChannels_t *rcChannels,
     return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
 }
 
+static uint32_t _last_rx_usec;
+
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
@@ -119,6 +121,8 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
         _rx_chanvals[2] = scalechan(rcChannels, 2);
         _rx_chanvals[3] = scalechan(rcChannels, 4);
         _rx_chanvals[4] = scalechan(rcChannels, 5);
+
+        _last_rx_usec = micros();
     }
 }
 
@@ -247,7 +251,10 @@ static void profile()
 #endif
 
 #ifdef DEBUG
-static void debug(const bool armed, const hf::Setpoint &setpoint)
+static void debug(
+        const bool armed,
+        const bool failsafe,
+        const hf::Setpoint &setpoint)
 {
     static uint32_t _count;
 
@@ -263,8 +270,8 @@ static void debug(const bool armed, const hf::Setpoint &setpoint)
                 _rx_chanvals[0], _rx_chanvals[1], _rx_chanvals[2],
                 _rx_chanvals[3], _rx_chanvals[4]);*/
 
-        printf("%5lu: c5=%+3.3f armed=%d | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f\n",
-                _count++, _rx_chanvals[4], armed, 
+        printf("%5lu: c5=%+3.3f armed=%d failsafe=%d | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f\n",
+                _count++, _rx_chanvals[4], armed, failsafe,
                 setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
 
         _msec = msec;
@@ -315,7 +322,9 @@ void loop()
     static float _chan5_prev;
     const float chan5_curr = _rx_chanvals[4];
     if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
-        _armed = _armed ? false : throttle_is_down ? true : _armed;
+        _armed = _armed ? false :
+            throttle_is_down ? true
+            : _armed;
     }
     _chan5_prev = chan5_curr;
 
@@ -349,7 +358,7 @@ void loop()
 #endif
 
 #ifdef DEBUG
-    debug(_armed, setpoint);
+    debug(_armed, _failsafe, setpoint);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;
