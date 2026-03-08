@@ -323,8 +323,8 @@ void loop()
     const float chan5_curr = _rx_chanvals[4];
     if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
         _armed = _armed ? false :
-            throttle_is_down ? true
-            : _armed;
+            throttle_is_down && !_failsafe ? true :
+            _armed;
     }
     _chan5_prev = chan5_curr;
 
