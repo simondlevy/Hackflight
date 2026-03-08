@@ -1,5 +1,7 @@
 /*
-   Hackflight for Teensy 4.0 with DSMX receiver
+   Hackflight for Teensy 4.0 
+
+   Based on  https://github.com/nickrehm/dRehmFlight
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -20,83 +22,22 @@
 #include <Wire.h> 
 
 // Third-party libraries
-#include <BMI088.h>
 #include <dshot-teensy4.hpp>  
 #include <dsmrx.hpp>  
+#include <MPU6050.h>
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/estimator/ekf.hpp>
-#include <firmware/imu/imu.hpp>
 #include <datatypes.hpp>
+#include <firmware/estimators/madgwick/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
-#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-//#define PROFILE
-#define DEBUG
+//#define DEBUG
 
-// IMU ------------------------------------------------------------
+static constexpr float MAX_ROLL_PITCH_DEMAND_DEG = 20;
 
-static const int16_t GYRO_SCALE = 2000;
-static const int16_t ACCEL_SCALE = 24;
-
-static hf::IMU _imu;
-
-static Bmi088Accel accel(Wire, 0x19);
-static Bmi088Gyro gyro(Wire, 0x69);
-
-static bool okay(const int status)
-{
-    return status >= 0;
-}
-
-static bool imu_device_init()
-{
-    return 
-
-        okay(gyro.begin()) &&
-
-        okay(accel.begin()) &&
-
-        okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
-
-        okay(gyro.setRange(Bmi088Gyro::RANGE_2000DPS)) &&
-
-        okay(gyro.pinModeInt3(
-                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
-
-        okay(gyro.mapDrdyInt3(true)) &&
-
-        okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
-
-        okay(accel.setRange(Bmi088Accel::RANGE_24G));
-}
-
-static void imu_device_read(
-        int16_t & gx, int16_t & gy, int16_t & gz,
-        int16_t & ax, int16_t & ay, int16_t & az)
-{
-    gyro.readSensor();
-
-    gx = gyro.getGyroX_raw();
-    gy = gyro.getGyroY_raw();
-    gz = gyro.getGyroZ_raw();
-
-    accel.readSensor();
-
-    ax = accel.getAccelX_raw();
-    ay = accel.getAccelY_raw();
-    az = accel.getAccelZ_raw();
-}
-// EKF ------------------------------------------------------------
-
-static const uint32_t FREQ_EKF_PREDICTION = 100;
-
-static hf::EKF _ekf;
-
-// Receiver -------------------------------------------------------
+static MPU6050 _mpu6050;
 
 static Dsm2048 _dsm2048;
 
@@ -108,29 +49,116 @@ void serialEvent1(void)
     }
 }
 
-static bool readReceiver(
-        const uint32_t usec_curr, float * channel_values)
-{
-    if (_dsm2048.timedOut(usec_curr)) {
-        return false;
-    }
-
-    if (_dsm2048.gotNewFrame()) {
-        _dsm2048.getChannelValues(channel_values, 6);
-    }
-
-    return true;
-}
-
 // Motors ---------------------------------------------------------
 
-// static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
+
+// IMU ------------------------------------------------------------
+
+static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
+static constexpr float GYRO_SCALE_FACTOR = 131;
+
+static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
+static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 // LED -------------------------------------------------------------
 
 // static const uint8_t LED_PIN = 14; // external 
 static const uint8_t LED_PIN = 13; // built-in
+
+// Safety ----------------------------------------------------------
+
+static const float ARMING_SWITCH_MIN = 0;
+static const float THROTTLE_DOWN_MAX = -0.95;
+
+// IMU -------------------------------------------------------------
+
+static constexpr float B_ACCEL = 0.14;     
+static constexpr float B_GYRO = 0.1;       
+
+static constexpr float ACCEL_ERROR_X = 0.0;
+static constexpr float ACCEL_ERROR_Y = 0.0;
+static constexpr float ACCEL_ERROR_Z = 0.0;
+static constexpr float GYRO_ERROR_X = 0.0;
+static constexpr float GYRO_ERROR_Y= 0.0;
+static constexpr float GYRO_ERROR_Z = 0.0;
+
+// FAFO -----------------------------------------------------------
+
+static const uint32_t LOOP_FREQ_HZ = 2000;
+
+// Helper functions ------------------------------------------------
+
+static void initImu()
+{
+
+    Wire.begin();
+    Wire.setClock(1000000); 
+
+    _mpu6050.initialize();
+
+    if (_mpu6050.testConnection() == false) {
+        Serial.println("MPU6050 initialization unsuccessful");
+        Serial.println("Check MPU6050 wiring or try cycling power");
+        while(1) {}
+    }
+
+    _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
+    _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+}
+
+static void readImu(
+        float & accel_x, float & accel_y, float & accel_z,
+        float & gyro_x, float & gyro_y, float & gyro_z)
+{
+    static float accel_x_prev, accel_y_prev, accel_z_prev;
+    static float gyro_x_prev, gyro_y_prev, gyro_z_prev;
+
+    int16_t AcX=0, AcY=0, AcZ=0, GyX=0, GyY=0, GyZ=0;
+
+    _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
+
+    accel_x = AcX / ACCEL_SCALE_FACTOR; 
+    accel_y = AcY / ACCEL_SCALE_FACTOR;
+    accel_z = AcZ / ACCEL_SCALE_FACTOR;
+
+    accel_x = accel_x - ACCEL_ERROR_X;
+    accel_y = accel_y - ACCEL_ERROR_Y;
+    accel_z = accel_z - ACCEL_ERROR_Z;
+
+    accel_x = (1.0 - B_ACCEL)*accel_x_prev + B_ACCEL*accel_x;
+    accel_y = (1.0 - B_ACCEL)*accel_y_prev + B_ACCEL*accel_y;
+    accel_z = (1.0 - B_ACCEL)*accel_z_prev + B_ACCEL*accel_z;
+    accel_x_prev = accel_x;
+    accel_y_prev = accel_y;
+    accel_z_prev = accel_z;
+
+    gyro_x = GyX / GYRO_SCALE_FACTOR; 
+    gyro_y = GyY / GYRO_SCALE_FACTOR;
+    gyro_z = GyZ / GYRO_SCALE_FACTOR;
+
+    gyro_x = gyro_x - GYRO_ERROR_X;
+    gyro_y = gyro_y - GYRO_ERROR_Y;
+    gyro_z = gyro_z - GYRO_ERROR_Z;
+
+    gyro_x = (1.0 - B_GYRO)*gyro_x_prev + B_GYRO*gyro_x;
+    gyro_y = (1.0 - B_GYRO)*gyro_y_prev + B_GYRO*gyro_y;
+    gyro_z = (1.0 - B_GYRO)*gyro_z_prev + B_GYRO*gyro_z;
+
+    gyro_x_prev = gyro_x;
+    gyro_y_prev = gyro_y;
+    gyro_z_prev = gyro_z;
+}
+
+static void runDelayLoop(const uint32_t usec_curr)
+{
+    float invFreq = 1.0 / LOOP_FREQ_HZ * 1000000.0;
+    uint32_t checker = micros();
+
+    while (invFreq > (checker - usec_curr)) {
+        checker = micros();
+    }
+}
 
 static void blinkInLoop(const uint32_t usec_curr)
 {
@@ -162,48 +190,40 @@ static void blinkOnStartup()
     }
 }
 
-// Safety ----------------------------------------------------------
-
-static const float ARMING_SWITCH_MIN = 0;
-static const float THROTTLE_DOWN_MAX = -0.95;
-
-
-// Helper functions ------------------------------------------------
-
-static auto getVehicleState(const bool isFlying, const hf::Vec3 & gyroDps)
-    -> hf::VehicleState
+static void getVehicleState(const float dt, hf::VehicleState & state)
 {
-    static hf::Timer _timer;
+    float accel_x=0, accel_y=0, accel_z=0;
+    float gyro_x=0, gyro_y=0, gyro_z=0;
+    readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
 
-    static bool _didResetEstimation;
+    static hf::MadgwickFilter  _madgwick;
 
-    const uint32_t msec_curr = millis();
+    _madgwick = hf::MadgwickFilter::run(
+            _madgwick, dt,
+            {gyro_x, -gyro_y, -gyro_z},
+            {-accel_x, accel_y, accel_z});
 
-    if (_didResetEstimation) {
-        _ekf.reset(msec_curr);
-        _didResetEstimation = false;
+    state.phi = _madgwick.angles.x;
+    state.theta = _madgwick.angles.y;
+    state.psi = _madgwick.angles.z;
+
+    state.dphi = gyro_x;
+    state.dtheta = gyro_y;
+    state.dpsi = -gyro_z;
+}
+
+static bool readReceiver(
+        const uint32_t usec_curr, float * channel_values)
+{
+    if (_dsm2048.timedOut(usec_curr)) {
+        return false;
     }
 
-    // Run the system dynamics to predict the state forward.
-    if (_timer.ready(FREQ_EKF_PREDICTION)) {
-        _ekf.predict(msec_curr, isFlying); 
+    if (_dsm2048.gotNewFrame()) {
+        _dsm2048.getChannelValues(channel_values, 6);
     }
 
-    // Get state estimate from EKF
-    const hf::EstimatedState state = _ekf.getStateEstimate(msec_curr);
-
-    // Get angular velocities directly from gyro
-    return hf::VehicleState(
-            state.dx,
-            state.dy,
-            state.z,
-            state.dz,
-            state.phi,
-            gyroDps.x,
-            state.theta,
-            gyroDps.y,
-            state.psi,
-            -gyroDps.z); // negate for nose-right positive.y
+    return true;
 }
 
 static float getDt(const uint32_t usec_curr)
@@ -214,42 +234,6 @@ static float getDt(const uint32_t usec_curr)
 
     return dt;
 }
-
-#ifdef PROFILE
-static void profile()
-{
-    static uint32_t _msec;
-    const auto msec = millis();
-    static uint32_t _count;
-
-    if (msec - _msec > 1000) {
-        if (_count > 0) {
-            printf("count=%d\n", (int)_count);
-        }
-        _msec = msec;
-        _count = 0;
-    }
-    _count++;
-}
-#endif
-
-#ifdef DEBUG
-static void debug(const float * chans)
-{
-    static uint32_t _msec;
-    const auto msec = millis();
-
-    if (msec - _msec > 10) {
-        //printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n", state.phi,
-        //state.theta, state.psi);
-        printf("c0=%3.3f c1=%3.3f c2=%3.3f c3=%3.3f c4=%3.3f c5=%3.3f\n",
-                chans[0], chans[1], chans[2], chans[3], chans[4], chans[5]);
-
-
-        _msec = msec;
-    }
-}
-#endif
 
 // Main ----------------------------------------------------------------------
 
@@ -265,7 +249,7 @@ void setup()
 
     Serial1.begin(115000);
 
-    imu_device_init();
+    initImu();
 
     delay(10);
 
@@ -274,6 +258,20 @@ void setup()
     blinkOnStartup(); 
 }
 
+#ifdef DEBUG
+static void debug(
+        const hf::VehicleState & state, const hf::Setpoint & setpoint)
+{
+    static uint32_t _msec;
+    const auto msec = millis();
+
+    if (msec - _msec > 20) {
+        printf("psi=%+3.3f\n", state.psi);
+        _msec = msec;
+    }
+}
+#endif
+
 void loop()
 {
     const auto usec_curr = micros();      
@@ -281,7 +279,7 @@ void loop()
     const auto dt = getDt(usec_curr);
 
     blinkInLoop(usec_curr); 
-
+    
     static float _channel_values[6];
     const auto failsafe = !readReceiver(usec_curr, _channel_values);
 
@@ -295,37 +293,17 @@ void loop()
         throttle_is_down ? true :
         _armed;
 
-    hf::axis3_i16_t gyroRaw = {};
-    hf::axis3_i16_t accelRaw = {};
-    imu_device_read(
-            gyroRaw.x, gyroRaw.y, gyroRaw.z,
-            accelRaw.x, accelRaw.y, accelRaw.z);
-
-    hf::Vec3 gyroDps = {}; // XXX should use returned value
-    hf::Vec3 accelGs = {}; // XXX should use returned value
-    const bool imuIsCalibrated =
-        _imu.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE, ACCEL_SCALE,
-                gyroDps, accelGs);
-    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
-
-    _ekf.enqueueImu(&gyroDps, &accelGs);
-
-    const bool isFlying = true; // XXX
-
-    const auto state = getVehicleState(isFlying, gyroDps);
+    hf::VehicleState state = {};
+    getVehicleState(dt, state);
 
     hf::Setpoint setpoint = {
         (_channel_values[0]+1)/2,
-        _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
-        _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
+        _channel_values[1] * MAX_ROLL_PITCH_DEMAND_DEG, 
+        _channel_values[2] * MAX_ROLL_PITCH_DEMAND_DEG, 
         _channel_values[3]};
 
-#ifdef PROFILE
-    profile();
-#endif
-
 #ifdef DEBUG
-    debug(_channel_values);
+    debug(state, setpoint);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;
@@ -336,4 +314,6 @@ void loop()
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(_armed, _mixer.motorvals);
+
+    runDelayLoop(usec_curr); 
 }
