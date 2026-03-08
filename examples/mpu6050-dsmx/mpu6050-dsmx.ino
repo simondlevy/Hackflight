@@ -31,11 +31,10 @@
 #include <datatypes.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <mixers/bfquadx.hpp>
+#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 //#define DEBUG
-
-static constexpr float MAX_ROLL_PITCH_DEMAND_DEG = 20;
 
 static MPU6050 _mpu6050;
 
@@ -280,16 +279,16 @@ void loop()
 
     blinkInLoop(usec_curr); 
     
-    static float _channel_values[6];
-    const auto failsafe = !readReceiver(usec_curr, _channel_values);
+    static float _rx_chanvals[6];
+    const auto failsafe = !readReceiver(usec_curr, _rx_chanvals);
 
-    const auto throttle_is_down = _channel_values[0] < THROTTLE_DOWN_MAX;
+    const auto throttle_is_down = _rx_chanvals[0] < THROTTLE_DOWN_MAX;
 
     static bool _armed;
 
     _armed = 
         failsafe ? false :
-        _channel_values[4] < ARMING_SWITCH_MIN  ? false :
+        _rx_chanvals[4] < ARMING_SWITCH_MIN  ? false :
         throttle_is_down ? true :
         _armed;
 
@@ -297,10 +296,10 @@ void loop()
     getVehicleState(dt, state);
 
     hf::Setpoint setpoint = {
-        (_channel_values[0]+1)/2,
-        _channel_values[1] * MAX_ROLL_PITCH_DEMAND_DEG, 
-        _channel_values[2] * MAX_ROLL_PITCH_DEMAND_DEG, 
-        _channel_values[3]};
+        (_rx_chanvals[0]+1)/2,
+        _rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
+        _rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
+        _rx_chanvals[3]};
 
 #ifdef DEBUG
     debug(state, setpoint);
