@@ -34,7 +34,7 @@
 #include <pidcontrol/stabilizer.hpp>
 
 //#define PROFILE
-//#define DEBUG
+#define DEBUG
 
 // IMU ------------------------------------------------------------
 
@@ -253,25 +253,22 @@ static void profile()
 #endif
 
 #ifdef DEBUG
-static void debug(const bool armed, const hf::Setpoint &setpoint)
+static void debug(
+        const bool armed,
+        const hf::Setpoint &setpoint,
+        const hf::VehicleState & state)
 {
     static uint32_t _count;
-
     static uint32_t _msec;
     const auto msec = millis();
 
     if (msec - _msec > 10) {
-        /*
-        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n", state.phi,
-        state.theta, state.psi);*/
-        /*
-        printf("c0=%3.3f c1=%3.3f c2=%3.3f c3=%3.3f c4=%3.3f\n",
-                _rx_chanvals[0], _rx_chanvals[1], _rx_chanvals[2],
-                _rx_chanvals[3], _rx_chanvals[4]);*/
 
-        printf("%5lu: armed=%d | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f\n",
+        printf("%5lu: armed=%d | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f | "
+                "phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
                 _count++, armed, 
-                setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
+                setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw,
+                state.phi, state.theta, state.psi);
 
         _msec = msec;
     }
@@ -324,7 +321,7 @@ void loop()
 
     // Push-button arming
     static float _chan5_prev;
-    const float chan5_curr = _rx_chanvals[4];
+    const auto chan5_curr = _rx_chanvals[4];
     if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
         _armed = _armed ? false : throttle_is_down ? true : _armed;
     }
@@ -360,7 +357,7 @@ void loop()
 #endif
 
 #ifdef DEBUG
-    debug(_armed, setpoint);
+    debug(_armed, setpoint, state);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;
