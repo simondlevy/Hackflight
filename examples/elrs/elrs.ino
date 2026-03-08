@@ -98,6 +98,8 @@ static hf::EKF _ekf;
 
 // Receiver -------------------------------------------------------
 
+static const int FAILCOUNT_MAX = 10;
+
 static CRSFforArduino _crsf;
 
 static float _channel_values[5];
@@ -114,9 +116,15 @@ static bool _failsafe;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
+    static int _failcount;
+
     if (rcChannels->failsafe) {
 
-        _failsafe = true;
+        _failcount++;
+
+        if (_failcount > FAILCOUNT_MAX) {
+            _failsafe = true;
+        }
     }
 
     else {
@@ -186,7 +194,6 @@ static void blinkOnStartup()
 
 // Safety ----------------------------------------------------------
 
-static const float ARMING_SWITCH_MIN = 0;
 static const float THROTTLE_DOWN_MAX = -0.95;
 
 // Helper functions ------------------------------------------------
@@ -255,18 +262,21 @@ static void profile()
 #endif
 
 #ifdef DEBUG
-static void debug()
+static void debug(const bool armed)
 {
     static uint32_t _msec;
     const auto msec = millis();
 
     if (msec - _msec > 10) {
-        //printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n", state.phi,
-        //state.theta, state.psi);
+        /*
+        printf("phi=%+3.3f theta=%+3.3f psi=%+3.3f\n", state.phi,
+        state.theta, state.psi);*/
+        /*
         printf("c0=%3.3f c1=%3.3f c2=%3.3f c3=%3.3f c4=%3.3f\n",
                 _channel_values[0], _channel_values[1], _channel_values[2],
-                _channel_values[3], _channel_values[4]);
+                _channel_values[3], _channel_values[4]);*/
 
+        printf("armed=%d failsafe=%d\n", armed, _failsafe);
 
         _msec = msec;
     }
@@ -314,7 +324,7 @@ void loop()
 
     _armed = 
         _failsafe ? false :
-        _channel_values[4] < ARMING_SWITCH_MIN  ? false :
+        _channel_values[4] > 0  ? false :
         throttle_is_down ? true :
         _armed;
 
@@ -348,7 +358,7 @@ void loop()
 #endif
 
 #ifdef DEBUG
-    debug();
+    debug(_armed);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;
