@@ -98,11 +98,9 @@ static hf::EKF _ekf;
 
 // Receiver -------------------------------------------------------
 
-static const int FAILCOUNT_MAX = 10;
-
 static CRSFforArduino _crsf;
 
-static float _channel_values[5];
+static float _rx_chanvals[5];
 
 static constexpr int CHANNEL_COUNT = 5;
 
@@ -112,28 +110,15 @@ static auto scalechan(serialReceiverLayer::rcChannels_t *rcChannels,
     return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
 }
 
-static bool _failsafe;
-
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
-    static int _failcount;
+    if (!rcChannels->failsafe) {
 
-    if (rcChannels->failsafe) {
-
-        _failcount++;
-
-        if (_failcount > FAILCOUNT_MAX) {
-            _failsafe = true;
-        }
-    }
-
-    else {
-
-        _channel_values[0] = scalechan(rcChannels, 3);
-        _channel_values[1] = scalechan(rcChannels, 1);
-        _channel_values[2] = scalechan(rcChannels, 2);
-        _channel_values[3] = scalechan(rcChannels, 4);
-        _channel_values[4] = scalechan(rcChannels, 5);
+        _rx_chanvals[0] = scalechan(rcChannels, 3);
+        _rx_chanvals[1] = scalechan(rcChannels, 1);
+        _rx_chanvals[2] = scalechan(rcChannels, 2);
+        _rx_chanvals[3] = scalechan(rcChannels, 4);
+        _rx_chanvals[4] = scalechan(rcChannels, 5);
     }
 }
 
@@ -262,8 +247,10 @@ static void profile()
 #endif
 
 #ifdef DEBUG
-static void debug(const bool armed)
+static void debug(const bool armed, const hf::Setpoint &setpoint)
 {
+    static uint32_t _count;
+
     static uint32_t _msec;
     const auto msec = millis();
 
@@ -273,10 +260,12 @@ static void debug(const bool armed)
         state.theta, state.psi);*/
         /*
         printf("c0=%3.3f c1=%3.3f c2=%3.3f c3=%3.3f c4=%3.3f\n",
-                _channel_values[0], _channel_values[1], _channel_values[2],
-                _channel_values[3], _channel_values[4]);*/
+                _rx_chanvals[0], _rx_chanvals[1], _rx_chanvals[2],
+                _rx_chanvals[3], _rx_chanvals[4]);*/
 
-        printf("armed=%d failsafe=%d\n", armed, _failsafe);
+        printf("%5lu: c5=%+3.3f armed=%d | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f\n",
+                _count++, _rx_chanvals[4], armed, 
+                setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw);
 
         _msec = msec;
     }
@@ -301,8 +290,6 @@ void setup()
 
     imu_device_init();
 
-    delay(10);
-
     _motors.arm(); 
 
     blinkOnStartup(); 
@@ -318,15 +305,19 @@ void loop()
 
     _crsf.update();
 
-    const auto throttle_is_down = _channel_values[0] < THROTTLE_DOWN_MAX;
+    const auto throttle_is_down = _rx_chanvals[0] < THROTTLE_DOWN_MAX;
 
     static bool _armed;
 
-    _armed = 
-        _failsafe ? false :
-        _channel_values[4] > 0  ? false :
-        throttle_is_down ? true :
-        _armed;
+    static bool _failsafe;
+
+    // Push-button arming
+    static float _chan5_prev;
+    const float chan5_curr = _rx_chanvals[4];
+    if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
+        _armed = _armed ? false : throttle_is_down ? true : _armed;
+    }
+    _chan5_prev = chan5_curr;
 
     hf::axis3_i16_t gyroRaw = {};
     hf::axis3_i16_t accelRaw = {};
@@ -348,17 +339,17 @@ void loop()
     const auto state = getVehicleState(isFlying, gyroDps);
 
     hf::Setpoint setpoint = {
-        (_channel_values[0]+1)/2,
-        _channel_values[1] * hf::PositionController::MAX_DEMAND_DEG, 
-        _channel_values[2] * hf::PositionController::MAX_DEMAND_DEG, 
-        _channel_values[3]};
+        (_rx_chanvals[0]+1)/2,
+        _rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
+        _rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
+        _rx_chanvals[3]};
 
 #ifdef PROFILE
     profile();
 #endif
 
 #ifdef DEBUG
-    debug(_armed);
+    debug(_armed, setpoint);
 #endif
 
     static hf::StabilizerPid _stabilizerPid;
