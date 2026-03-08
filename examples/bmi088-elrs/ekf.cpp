@@ -15,8 +15,8 @@
  *
  */
 
-#include <firmware/estimator/ekf.hpp>
-#include <firmware/estimator/matrix_typedef.h>
+#include <firmware/estimators/ekf/ekf.hpp>
+#include <firmware/estimators/ekf/matrix_typedef.h>
 #include <arm_math.h>
 
 void hf::EKF::device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
