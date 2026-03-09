@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 #include <num.hpp>
 
 namespace hf {

@@ -100,9 +100,7 @@ static void initImu()
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-static auto readImu(
-        float & accel_x, float & accel_y, float & accel_z,
-        float & gyro_x, float & gyro_y, float & gyro_z) -> hf::SixAxis
+static auto readImu() -> hf::SixAxis
 {
     static float accel_x_prev, accel_y_prev, accel_z_prev;
     static float gyro_x_prev, gyro_y_prev, gyro_z_prev;
@@ -111,9 +109,9 @@ static auto readImu(
 
     _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
-    accel_x = AcX / ACCEL_SCALE_FACTOR; 
-    accel_y = AcY / ACCEL_SCALE_FACTOR;
-    accel_z = AcZ / ACCEL_SCALE_FACTOR;
+    auto accel_x = AcX / ACCEL_SCALE_FACTOR; 
+    auto accel_y = AcY / ACCEL_SCALE_FACTOR;
+    auto accel_z = AcZ / ACCEL_SCALE_FACTOR;
 
     accel_x = accel_x - ACCEL_ERROR_X;
     accel_y = accel_y - ACCEL_ERROR_Y;
@@ -126,9 +124,9 @@ static auto readImu(
     accel_y_prev = accel_y;
     accel_z_prev = accel_z;
 
-    gyro_x = GyX / GYRO_SCALE_FACTOR; 
-    gyro_y = GyY / GYRO_SCALE_FACTOR;
-    gyro_z = GyZ / GYRO_SCALE_FACTOR;
+    auto gyro_x = GyX / GYRO_SCALE_FACTOR; 
+    auto gyro_y = GyY / GYRO_SCALE_FACTOR;
+    auto gyro_z = GyZ / GYRO_SCALE_FACTOR;
 
     gyro_x = gyro_x - GYRO_ERROR_X;
     gyro_y = gyro_y - GYRO_ERROR_Y;
@@ -157,24 +155,22 @@ static void runDelayLoop(const uint32_t usec_curr)
 
 static void getVehicleState(const float dt, hf::VehicleState & state)
 {
-    float accel_x=0, accel_y=0, accel_z=0;
-    float gyro_x=0, gyro_y=0, gyro_z=0;
-    readImu(accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z); 
+    const auto sixaxis = readImu();
 
     static hf::MadgwickFilter  _madgwick;
 
     _madgwick = hf::MadgwickFilter::run(
-            _madgwick, dt,
-            {gyro_x, -gyro_y, -gyro_z},
-            {-accel_x, accel_y, accel_z});
+            _madgwick, dt, 
+                {sixaxis.gyro.x, -sixaxis.gyro.y, -sixaxis.gyro.z},
+                {-sixaxis.accel.x, sixaxis.accel.y, sixaxis.accel.z});
 
     state.phi = _madgwick.angles.x;
     state.theta = _madgwick.angles.y;
     state.psi = _madgwick.angles.z;
 
-    state.dphi = gyro_x;
-    state.dtheta = gyro_y;
-    state.dpsi = -gyro_z;
+    state.dphi = sixaxis.gyro.x;
+    state.dtheta = sixaxis.gyro.y;
+    state.dpsi = -sixaxis.gyro.z;
 }
 
 // Main ----------------------------------------------------------------------
@@ -209,7 +205,8 @@ void loop()
     hf::VehicleState state = {};
     getVehicleState(dt, state);
 
-    hf::Debugger::debug(rx_is_armed, setpoint, state);
+    //hf::Debugger::debug(rx_is_armed, setpoint, state);
+    hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
             !rx_is_throttle_down, dt, state, setpoint);
