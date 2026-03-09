@@ -103,9 +103,6 @@ static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static hf::LED _led = hf::LED(13);
 
-// Safety ----------------------------------------------------------
-
-static const float THROTTLE_DOWN_MAX = -0.95;
 
 // Helper functions ------------------------------------------------
 
@@ -177,26 +174,7 @@ void loop()
 
     _led.blinkInLoop(usec_curr); 
 
-    _crsf.update();
-
-    const auto throttle_is_down = _rx_chanvals[0] < THROTTLE_DOWN_MAX;
-
-    static bool _armed;
-
-    // Check failsafe via RX timeout
-    if (_last_rx_usec > 0 &&
-            usec_curr > _last_rx_usec &&
-            usec_curr - _last_rx_usec > RX_TIMEOUT_USEC) {
-        _armed = false;
-    }
-
-    // Push-button arming
-    static float _chan5_prev;
-    const auto chan5_curr = _rx_chanvals[4];
-    if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
-        _armed = _armed ? false : throttle_is_down ? true : _armed;
-    }
-    _chan5_prev = chan5_curr;
+    rx_read();
 
     hf::axis3_i16_t gyroRaw = {};
     hf::axis3_i16_t accelRaw = {};
@@ -218,17 +196,19 @@ void loop()
     const auto state = getVehicleState(isFlying, gyroDps);
 
     hf::Setpoint setpoint = {
-        (_rx_chanvals[0]+1)/2,
-        _rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
-        _rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
-        _rx_chanvals[3]};
+        (rx_chanvals[0]+1)/2,
+        rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
+        rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
+        rx_chanvals[3]};
+
+    hf::Debugger::debug(rx_is_armed, setpoint, state);
 
     static hf::StabilizerPid _stabilizerPid;
-    _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid, !throttle_is_down,
-            dt, state, setpoint);
+    _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
+            !rx_is_throttle_down, dt, state, setpoint);
 
     static hf::Mixer _mixer;
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(_armed, _mixer.motorvals);
+    _motors.run(rx_is_armed, _mixer.motorvals);
 }
