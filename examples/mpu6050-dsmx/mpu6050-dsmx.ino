@@ -63,8 +63,7 @@ static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
 // LED -------------------------------------------------------------
 
-// static const uint8_t LED_PIN = 14; // external 
-static const uint8_t LED_PIN = 13; // built-in
+static hf::LED _led = hf::LED(13);
 
 // Safety ----------------------------------------------------------
 
@@ -160,36 +159,6 @@ static void runDelayLoop(const uint32_t usec_curr)
     }
 }
 
-static void blinkInLoop(const uint32_t usec_curr)
-{
-    static uint32_t blink_counter, blink_delay;
-    static bool blinkAlternate;
-
-    if (usec_curr - blink_counter > blink_delay) {
-        blink_counter = micros();
-        digitalWrite(LED_PIN, blinkAlternate); 
-
-        if (blinkAlternate == 1) {
-            blinkAlternate = 0;
-            blink_delay = 100000;
-        }
-        else if (blinkAlternate == 0) {
-            blinkAlternate = 1;
-            blink_delay = 2000000;
-        }
-    }
-}
-
-static void blinkOnStartup()
-{
-    for (int j = 1; j<= 3; j++) {
-        digitalWrite(LED_PIN, LOW);
-        delay(70);
-        digitalWrite(LED_PIN, HIGH);
-        delay(360);
-    }
-}
-
 static void getVehicleState(const float dt, hf::VehicleState & state)
 {
     float accel_x=0, accel_y=0, accel_z=0;
@@ -256,10 +225,6 @@ void setup()
 {
     Serial.begin(0); 
 
-    pinMode(LED_PIN, OUTPUT); 
-
-    digitalWrite(LED_PIN, HIGH);
-
     delay(5);
 
     Serial1.begin(115000);
@@ -270,7 +235,7 @@ void setup()
 
     _motors.arm(); 
 
-    blinkOnStartup(); 
+    _led.blinkOnStartup(); 
 }
 
 void loop()
@@ -279,7 +244,7 @@ void loop()
 
     const auto dt = getDt(usec_curr);
 
-    blinkInLoop(usec_curr); 
+    _led.blinkInLoop(usec_curr); 
     
     static float _rx_chanvals[6];
     const auto failsafe = !readReceiver(usec_curr, _rx_chanvals);

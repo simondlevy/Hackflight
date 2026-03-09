@@ -26,9 +26,10 @@
 
 // Hackflight library
 #include <hackflight.h>
+#include <datatypes.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
 #include <firmware/imu/imu.hpp>
-#include <datatypes.hpp>
+#include <firmware/led.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
@@ -149,38 +150,7 @@ static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 // LED -------------------------------------------------------------
 
-// static const uint8_t LED_PIN = 14; // external 
-static const uint8_t LED_PIN = 13; // built-in
-
-static void blinkInLoop(const uint32_t usec_curr)
-{
-    static uint32_t blink_counter, blink_delay;
-    static bool blinkAlternate;
-
-    if (usec_curr - blink_counter > blink_delay) {
-        blink_counter = micros();
-        digitalWrite(LED_PIN, blinkAlternate); 
-
-        if (blinkAlternate == 1) {
-            blinkAlternate = 0;
-            blink_delay = 100000;
-        }
-        else if (blinkAlternate == 0) {
-            blinkAlternate = 1;
-            blink_delay = 2000000;
-        }
-    }
-}
-
-static void blinkOnStartup()
-{
-    for (int j = 1; j<= 3; j++) {
-        digitalWrite(LED_PIN, LOW);
-        delay(70);
-        digitalWrite(LED_PIN, HIGH);
-        delay(360);
-    }
-}
+static hf::LED _led = hf::LED(13);
 
 // Safety ----------------------------------------------------------
 
@@ -292,7 +262,7 @@ void setup()
 
     _motors.arm(); 
 
-    blinkOnStartup(); 
+    _led.blinkOnStartup(); 
 }
 
 void loop()
@@ -301,7 +271,7 @@ void loop()
 
     const auto dt = getDt(usec_curr);
 
-    blinkInLoop(usec_curr); 
+    _led.blinkInLoop(usec_curr); 
 
     _crsf.update();
 

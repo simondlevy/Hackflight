@@ -16,43 +16,50 @@
 
 #include <Arduino.h>
 
-class LED {
+namespace hf {
 
-    public:
+    class LED {
 
-        LED(const uint8_t pin) : _pin(pin) {}
+        public:
 
-        void blinkInLoop(const uint32_t usec_curr)
-        {
-            static uint32_t blink_counter, blink_delay;
-            static bool blinkAlternate;
+            LED(const uint8_t pin) : _pin(pin) {}
 
-            if (usec_curr - blink_counter > blink_delay) {
-                blink_counter = micros();
-                digitalWrite(_pin, blinkAlternate); 
+            void blinkOnStartup()
+            {
+                pinMode(_pin, OUTPUT); 
 
-                if (blinkAlternate == 1) {
-                    blinkAlternate = 0;
-                    blink_delay = 100000;
-                }
-                else if (blinkAlternate == 0) {
-                    blinkAlternate = 1;
-                    blink_delay = 2000000;
-                }
-            }
-        }
-
-        void blinkOnStartup()
-        {
-            for (int j = 1; j<= 3; j++) {
-                digitalWrite(_pin, LOW);
-                delay(70);
                 digitalWrite(_pin, HIGH);
-                delay(360);
+
+                for (int j = 1; j<= 3; j++) {
+                    digitalWrite(_pin, LOW);
+                    delay(70);
+                    digitalWrite(_pin, HIGH);
+                    delay(360);
+                }
             }
-        }
-    private:
 
-        uint8_t _pin;
-};
+            void blinkInLoop(const uint32_t usec_curr)
+            {
+                static uint32_t blink_counter, blink_delay;
+                static bool blinkAlternate;
 
+                if (usec_curr - blink_counter > blink_delay) {
+                    blink_counter = micros();
+                    digitalWrite(_pin, blinkAlternate); 
+
+                    if (blinkAlternate == 1) {
+                        blinkAlternate = 0;
+                        blink_delay = 100000;
+                    }
+                    else if (blinkAlternate == 0) {
+                        blinkAlternate = 1;
+                        blink_delay = 2000000;
+                    }
+                }
+            }
+
+        private:
+
+            uint8_t _pin;
+    };
+}
