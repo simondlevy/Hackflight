@@ -28,7 +28,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/dt.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
@@ -100,9 +100,9 @@ static void initImu()
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-static void readImu(
+static auto readImu(
         float & accel_x, float & accel_y, float & accel_z,
-        float & gyro_x, float & gyro_y, float & gyro_z)
+        float & gyro_x, float & gyro_y, float & gyro_z) -> hf::SixAxis
 {
     static float accel_x_prev, accel_y_prev, accel_z_prev;
     static float gyro_x_prev, gyro_y_prev, gyro_z_prev;
@@ -141,6 +141,8 @@ static void readImu(
     gyro_x_prev = gyro_x;
     gyro_y_prev = gyro_y;
     gyro_z_prev = gyro_z;
+
+    return hf::SixAxis({gyro_x, gyro_y, gyro_z}, {accel_x, accel_y, accel_z});
 }
 
 static void runDelayLoop(const uint32_t usec_curr)

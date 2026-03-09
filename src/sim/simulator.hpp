@@ -43,6 +43,8 @@ namespace hf {
             static constexpr float PITCH_ROLL_MOTOR_SCALE = 1e6;
             static constexpr float YAW_MOTOR_SCALE = 2e4;
 
+            static constexpr uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+
         public:
 
             Dynamics dynamics;
