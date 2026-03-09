@@ -24,7 +24,7 @@ namespace hf {
 
             LED(const uint8_t pin) : _pin(pin) {}
 
-            void blinkOnStartup()
+            void begin()
             {
                 pinMode(_pin, OUTPUT); 
 
@@ -38,10 +38,12 @@ namespace hf {
                 }
             }
 
-            void blinkInLoop(const uint32_t usec_curr)
+            void blink()
             {
                 static uint32_t blink_counter, blink_delay;
                 static bool blinkAlternate;
+
+                const auto usec_curr = micros();
 
                 if (usec_curr - blink_counter > blink_delay) {
                     blink_counter = micros();

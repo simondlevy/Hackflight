@@ -189,7 +189,7 @@ void setup()
 
     _motors.arm(); 
 
-    _led.blinkOnStartup(); 
+    _led.begin(); 
 }
 
 void loop()
@@ -198,7 +198,7 @@ void loop()
 
     const auto dt = hf::getDt();
 
-    _led.blinkInLoop(usec_curr); 
+    _led.blink(); 
 
     rx_read();
 
