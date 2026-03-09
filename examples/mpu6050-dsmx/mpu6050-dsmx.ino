@@ -29,13 +29,12 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.hpp>
+#include <firmware/debugging.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/led.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
-
-//#define DEBUG
 
 static MPU6050 _mpu6050;
 
@@ -61,17 +60,6 @@ static constexpr float GYRO_SCALE_FACTOR = 131;
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 static constexpr float ACCEL_SCALE_FACTOR = 16384;
 
-// LED -------------------------------------------------------------
-
-static hf::LED _led = hf::LED(13);
-
-// Safety ----------------------------------------------------------
-
-static const float ARMING_SWITCH_MIN = 0;
-static const float THROTTLE_DOWN_MAX = -0.95;
-
-// IMU -------------------------------------------------------------
-
 static constexpr float B_ACCEL = 0.14;     
 static constexpr float B_GYRO = 0.1;       
 
@@ -81,6 +69,15 @@ static constexpr float ACCEL_ERROR_Z = 0.0;
 static constexpr float GYRO_ERROR_X = 0.0;
 static constexpr float GYRO_ERROR_Y= 0.0;
 static constexpr float GYRO_ERROR_Z = 0.0;
+
+// LED -------------------------------------------------------------
+
+static hf::LED _led = hf::LED(13);
+
+// Safety ----------------------------------------------------------
+
+static const float ARMING_SWITCH_MIN = 0;
+static const float THROTTLE_DOWN_MAX = -0.95;
 
 // FAFO -----------------------------------------------------------
 
@@ -204,21 +201,6 @@ static float getDt(const uint32_t usec_curr)
     return dt;
 }
 
-#ifdef DEBUG
-static void debug(
-        const hf::VehicleState & state, const hf::Setpoint & setpoint)
-{
-    static uint32_t _msec;
-    const auto msec = millis();
-
-    if (msec - _msec > 20) {
-        printf("psi=%+3.3f\n", state.psi);
-        _msec = msec;
-    }
-}
-#endif
-
-
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -240,6 +222,8 @@ void setup()
 
 void loop()
 {
+    hf::Debugger::profile();
+
     const auto usec_curr = micros();      
 
     const auto dt = getDt(usec_curr);

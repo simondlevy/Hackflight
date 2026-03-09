@@ -27,15 +27,13 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.hpp>
+#include <firmware/debugging.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
 #include <firmware/imu/imu.hpp>
 #include <firmware/led.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
-
-//#define PROFILE
-//#define DEBUG
 
 // IMU ------------------------------------------------------------
 
@@ -203,58 +201,11 @@ static float getDt(const uint32_t usec_curr)
     return dt;
 }
 
-#ifdef PROFILE
-static void profile()
-{
-    static uint32_t _msec;
-    const auto msec = millis();
-    static uint32_t _count;
-
-    if (msec - _msec > 1000) {
-        if (_count > 0) {
-            printf("count=%d\n", (int)_count);
-        }
-        _msec = msec;
-        _count = 0;
-    }
-    _count++;
-}
-#endif
-
-#ifdef DEBUG
-static void debug(
-        const bool armed,
-        const hf::Setpoint &setpoint,
-        const hf::VehicleState & state)
-{
-    static uint32_t _count;
-    static uint32_t _msec;
-    const auto msec = millis();
-
-    if (msec - _msec > 10) {
-
-        printf("%5lu: armed=%d | t=%3.3f r=%+3.3f p=%+3.3f y=%+3.3f | "
-                "phi=%+3.3f theta=%+3.3f psi=%+3.3f\n",
-                _count++, armed, 
-                setpoint.thrust, setpoint.roll, setpoint.pitch, setpoint.yaw,
-                state.phi, state.theta, state.psi);
-
-        _msec = msec;
-    }
-}
-#endif
-
 // Main ----------------------------------------------------------------------
 
 void setup()
 {
     Serial.begin(0); 
-
-    pinMode(LED_PIN, OUTPUT); 
-
-    digitalWrite(LED_PIN, HIGH);
-
-    delay(5);
 
     rx_init();
 
@@ -267,6 +218,8 @@ void setup()
 
 void loop()
 {
+    hf::Debugger::profile();
+
     const auto usec_curr = micros();      
 
     const auto dt = getDt(usec_curr);
