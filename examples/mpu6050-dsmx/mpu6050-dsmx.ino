@@ -66,6 +66,14 @@ static constexpr float GYRO_ERROR_Z = 0.0;
 
 static hf::LED _led = hf::LED(13);
 
+// PID control -----------------------------------------------------
+
+static hf::StabilizerPid _stabilizerPid;
+
+// Motor mixing ----------------------------------------------------
+
+static hf::Mixer _mixer;
+
 // FAFO -----------------------------------------------------------
 
 static const uint32_t LOOP_FREQ_HZ = 2000;
@@ -212,11 +220,9 @@ void loop()
 
     hf::Debugger::debug(rx_is_armed, setpoint, state);
 
-    static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
             !rx_is_throttle_down, dt, state, setpoint);
 
-    static hf::Mixer _mixer;
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(rx_is_armed, _mixer.motorvals);
