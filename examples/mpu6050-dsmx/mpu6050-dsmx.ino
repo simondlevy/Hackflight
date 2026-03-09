@@ -32,21 +32,13 @@
 #include <firmware/debugging.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/led.hpp>
+#include <firmware/rx/dsmx.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 static MPU6050 _mpu6050;
 
-static Dsm2048 _dsm2048;
-
-// DSMX receiver callback
-void serialEvent1(void)
-{
-    while (Serial1.available()) {
-        _dsm2048.parse(Serial1.read(), micros());
-    }
-}
 
 // Motors ---------------------------------------------------------
 
@@ -73,11 +65,6 @@ static constexpr float GYRO_ERROR_Z = 0.0;
 // LED -------------------------------------------------------------
 
 static hf::LED _led = hf::LED(13);
-
-// Safety ----------------------------------------------------------
-
-static const float ARMING_SWITCH_MIN = 0;
-static const float THROTTLE_DOWN_MAX = -0.95;
 
 // FAFO -----------------------------------------------------------
 
@@ -178,20 +165,6 @@ static void getVehicleState(const float dt, hf::VehicleState & state)
     state.dpsi = -gyro_z;
 }
 
-static bool readReceiver(
-        const uint32_t usec_curr, float * channel_values)
-{
-    if (_dsm2048.timedOut(usec_curr)) {
-        return false;
-    }
-
-    if (_dsm2048.gotNewFrame()) {
-        _dsm2048.getChannelValues(channel_values, 6);
-    }
-
-    return true;
-}
-
 static float getDt(const uint32_t usec_curr)
 {
     static uint32_t _usec_prev;
@@ -205,9 +178,7 @@ static float getDt(const uint32_t usec_curr)
 
 void setup()
 {
-    Serial.begin(0); 
-
-    delay(5);
+    rx_init();
 
     Serial1.begin(115000);
 
@@ -222,48 +193,33 @@ void setup()
 
 void loop()
 {
-    hf::Debugger::profile();
-
     const auto usec_curr = micros();      
 
     const auto dt = getDt(usec_curr);
 
     _led.blinkInLoop(usec_curr); 
+
+    rx_read();
     
-    static float _rx_chanvals[6];
-    const auto failsafe = !readReceiver(usec_curr, _rx_chanvals);
-
-    const auto throttle_is_down = _rx_chanvals[0] < THROTTLE_DOWN_MAX;
-
-    static bool _armed;
-
-    _armed = 
-        failsafe ? false :
-        _rx_chanvals[4] < ARMING_SWITCH_MIN  ? false :
-        throttle_is_down ? true :
-        _armed;
-
     hf::Setpoint setpoint = {
-        (_rx_chanvals[0]+1)/2,
-        _rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
-        _rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
-        _rx_chanvals[3]};
+        (rx_chanvals[0]+1)/2,
+        rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
+        rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
+        rx_chanvals[3]};
 
     hf::VehicleState state = {};
     getVehicleState(dt, state);
 
-#ifdef DEBUG
-    debug(state, setpoint);
-#endif
+    hf::Debugger::debug(rx_is_armed, setpoint, state);
 
     static hf::StabilizerPid _stabilizerPid;
-    _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid, !throttle_is_down,
-            dt, state, setpoint);
+    _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
+            !rx_is_throttle_down, dt, state, setpoint);
 
     static hf::Mixer _mixer;
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(_armed, _mixer.motorvals);
+    _motors.run(rx_is_armed, _mixer.motorvals);
 
     runDelayLoop(usec_curr); 
 }

@@ -49,6 +49,8 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 static void rx_init()
 {
     if (!_crsf.begin()) {
