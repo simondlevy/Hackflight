@@ -22,7 +22,6 @@
 // Third-party libraries
 #include <BMI088.h>
 #include <dshot-teensy4.hpp>  
-#include <CRSFforArduino.hpp>
 
 // Hackflight library
 #include <hackflight.h>
@@ -31,6 +30,7 @@
 #include <firmware/estimators/ekf/ekf.hpp>
 #include <firmware/imu/imu.hpp>
 #include <firmware/led.hpp>
+#include <firmware/rx/elrs.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
@@ -94,53 +94,6 @@ static void imu_device_read(
 static const uint32_t FREQ_EKF_PREDICTION = 100;
 
 static hf::EKF _ekf;
-
-// Receiver -------------------------------------------------------
-
-static constexpr uint32_t RX_TIMEOUT_USEC = 500'000;
-
-static CRSFforArduino _crsf;
-
-static float _rx_chanvals[5];
-
-static constexpr int CHANNEL_COUNT = 5;
-
-static auto scalechan(serialReceiverLayer::rcChannels_t *rcChannels,
-        const int k) -> float
-{
-    return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
-}
-
-static uint32_t _last_rx_usec;
-
-static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
-{
-    if (!rcChannels->failsafe) {
-
-        _rx_chanvals[0] = scalechan(rcChannels, 3);
-        _rx_chanvals[1] = scalechan(rcChannels, 1);
-        _rx_chanvals[2] = scalechan(rcChannels, 2);
-        _rx_chanvals[3] = scalechan(rcChannels, 4);
-        _rx_chanvals[4] = scalechan(rcChannels, 5);
-
-        _last_rx_usec = micros();
-    }
-}
-
-static void rx_init()
-{
-    if (!_crsf.begin()) {
-
-        _crsf.end();
-
-        while (true) {
-            printf("CRSF for Arduino initialisation failed!\n");
-            delay(500);
-        }
-    }
-
-    _crsf.setRcChannelsCallback(onReceiveRcChannels);
-}
 
 // Motors ---------------------------------------------------------
 
@@ -218,8 +171,6 @@ void setup()
 
 void loop()
 {
-    hf::Debugger::profile();
-
     const auto usec_curr = micros();      
 
     const auto dt = getDt(usec_curr);
@@ -271,14 +222,6 @@ void loop()
         _rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
         _rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
         _rx_chanvals[3]};
-
-#ifdef PROFILE
-    profile();
-#endif
-
-#ifdef DEBUG
-    debug(_armed, setpoint, state);
-#endif
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid, !throttle_is_down,
