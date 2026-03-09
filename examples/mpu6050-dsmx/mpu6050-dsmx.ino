@@ -30,6 +30,7 @@
 #include <hackflight.h>
 #include <datatypes.hpp>
 #include <firmware/debugging.hpp>
+#include <firmware/dt.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/dsmx.hpp>
@@ -174,15 +175,6 @@ static void getVehicleState(const float dt, hf::VehicleState & state)
     state.dpsi = -gyro_z;
 }
 
-static float getDt(const uint32_t usec_curr)
-{
-    static uint32_t _usec_prev;
-    const float dt = (usec_curr - _usec_prev)/1000000.0;
-    _usec_prev = usec_curr;
-
-    return dt;
-}
-
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -204,7 +196,7 @@ void loop()
 {
     const auto usec_curr = micros();      
 
-    const auto dt = getDt(usec_curr);
+    const auto dt = hf::getDt();
 
     _led.blinkInLoop(usec_curr); 
 
