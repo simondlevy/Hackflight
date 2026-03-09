@@ -33,6 +33,7 @@
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/dsmx.hpp>
+#include <firmware/setpoint.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
@@ -208,12 +209,8 @@ void loop()
     _led.blinkInLoop(usec_curr); 
 
     rx_read();
-    
-    hf::Setpoint setpoint = {
-        (rx_chanvals[0]+1)/2,
-        rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
-        rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
-        rx_chanvals[3]};
+
+    const auto setpoint = hf::mksetpoint(rx_chanvals);
 
     hf::VehicleState state = {};
     getVehicleState(dt, state);
