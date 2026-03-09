@@ -100,17 +100,69 @@ static void initImu()
     _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
+namespace hf {
+
+    class ThreeAxisFilter {
+
+        public:
+
+            ThreeAxisFilter() : _prev(Vec3(0, 0, 0)) {}
+
+            ThreeAxisFilter& operator=(const ThreeAxisFilter& other) = default;
+
+            Vec3 run(
+                    const Vec3 & raw,
+                    const Vec3 & error,
+                    const float scale,
+                    const float coeff)
+            {
+                const auto curr = raw / scale - error;
+
+                const auto output = _prev * (1 - coeff) + curr * coeff;
+
+                _prev = curr;
+
+                return output;
+            }
+
+        private:
+
+            Vec3 _prev;
+    };
+
+}
+
 static auto readImu() -> hf::SixAxis
 {
+    int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+    _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+    static hf::ThreeAxisFilter _gyroFilter;
+
+    const auto gyro = _gyroFilter.run(
+            hf::Vec3(gx, gy, gz),
+            hf::Vec3(GYRO_ERROR_X, GYRO_ERROR_Y, GYRO_ERROR_Z),
+            GYRO_SCALE_FACTOR,  B_GYRO);
+
+    static hf::ThreeAxisFilter _accelFilter;
+
+    const auto accel = _accelFilter.run(
+            hf::Vec3(ax, ay, az),
+            hf::Vec3(ACCEL_ERROR_X, ACCEL_ERROR_Y, ACCEL_ERROR_Z),
+            ACCEL_SCALE_FACTOR,  B_ACCEL);
+
+    return hf::SixAxis(gyro, accel);
+
+    /*
     static float accel_x_prev, accel_y_prev, accel_z_prev;
     static float gyro_x_prev, gyro_y_prev, gyro_z_prev;
 
-    int16_t AcX=0, AcY=0, AcZ=0, GyX=0, GyY=0, GyZ=0;
-    _mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
+    (void)gyro;
+    (void)accel;
 
-    auto accel_x = AcX / ACCEL_SCALE_FACTOR - ACCEL_ERROR_X; 
-    auto accel_y = AcY / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Y;
-    auto accel_z = AcZ / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Z;
+    auto accel_x = ax / ACCEL_SCALE_FACTOR - ACCEL_ERROR_X; 
+    auto accel_y = ay / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Y;
+    auto accel_z = az / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Z;
 
     accel_x = (1.0 - B_ACCEL)*accel_x_prev + B_ACCEL*accel_x;
     accel_y = (1.0 - B_ACCEL)*accel_y_prev + B_ACCEL*accel_y;
@@ -120,9 +172,9 @@ static auto readImu() -> hf::SixAxis
     accel_y_prev = accel_y;
     accel_z_prev = accel_z;
 
-    auto gyro_x = GyX / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
-    auto gyro_y = GyY / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
-    auto gyro_z = GyZ / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
+    auto gyro_x = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
+    auto gyro_y = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
+    auto gyro_z = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
 
     gyro_x = (1.0 - B_GYRO)*gyro_x_prev + B_GYRO*gyro_x;
     gyro_y = (1.0 - B_GYRO)*gyro_y_prev + B_GYRO*gyro_y;
@@ -132,7 +184,7 @@ static auto readImu() -> hf::SixAxis
     gyro_y_prev = gyro_y;
     gyro_z_prev = gyro_z;
 
-    return hf::SixAxis({gyro_x, gyro_y, gyro_z}, {accel_x, accel_y, accel_z});
+    return hf::SixAxis({gyro_x, gyro_y, gyro_z}, {accel_x, accel_y, accel_z});*/
 }
 
 static void runDelayLoop(const uint32_t usec_curr)
@@ -197,7 +249,7 @@ void loop()
     hf::VehicleState state = {};
     getVehicleState(dt, state);
 
-    hf::Debugger::debug(rx_is_armed, setpoint, state);
+    //hf::Debugger::debug(rx_is_armed, setpoint, state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
