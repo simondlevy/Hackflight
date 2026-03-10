@@ -62,6 +62,24 @@ namespace hf {
                 }
             }
 
+            static void debug(const ImuRaw & imuraw)
+            {
+                static uint32_t _count;
+                static uint32_t _msec;
+                const auto msec = millis();
+
+                if (msec - _msec > 10) {
+
+                    printf("%5lu | gx=%+05d gy=%+05d gz=%+05d | "
+                            "ax=%+05d ay=%+05d az=%+05d\n",
+                            _count++, 
+                            imuraw.gx, imuraw.gy, imuraw.gz,
+                            imuraw.ax, imuraw.ay, imuraw.az);
+
+                    _msec = msec;
+                }
+            }
+
             static void profile()
             {
                 static uint32_t _msec;

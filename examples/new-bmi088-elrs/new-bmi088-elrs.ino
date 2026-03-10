@@ -53,11 +53,14 @@ void setup()
 
 void loop()
 {
-    const auto usec_curr = micros();      
-
-    const auto dt = hf::Timer::getDt();
-
     _led.blink(); 
 
     rx_read();
+
+    const auto imuraw = _imu.read();
+
+    hf::Debugger::debug(imuraw);
+
+    const auto dt = hf::Timer::getDt();
+
 }
