@@ -132,7 +132,7 @@ namespace hf {
 
 }
 
-static void getVehicleState(const float dt, hf::VehicleState & state)
+static auto getVehicleState(const float dt) -> hf::VehicleState
 {
     int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
     _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -160,13 +160,19 @@ static void getVehicleState(const float dt, hf::VehicleState & state)
                 {sixaxis.gyro.x, -sixaxis.gyro.y, -sixaxis.gyro.z},
                 {-sixaxis.accel.x, sixaxis.accel.y, sixaxis.accel.z});
 
-    state.phi = _madgwick.angles.x;
-    state.theta = _madgwick.angles.y;
-    state.psi = _madgwick.angles.z;
+    const float dx = 0;
+    const float dy = 0;
+    const float z = 0;
+    const float dz = 0;
+    const auto phi = _madgwick.angles.x;
+    const auto theta = _madgwick.angles.y;
+    const auto psi = _madgwick.angles.z;
+    const auto dphi = sixaxis.gyro.x;
+    const auto dtheta = sixaxis.gyro.y;
+    const auto dpsi = -sixaxis.gyro.z;
 
-    state.dphi = sixaxis.gyro.x;
-    state.dtheta = sixaxis.gyro.y;
-    state.dpsi = -sixaxis.gyro.z;
+    return hf::VehicleState(
+            dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi);
 }
 
 // Main ----------------------------------------------------------------------
@@ -198,11 +204,10 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(rx_chanvals);
 
-    hf::VehicleState state = {};
-    getVehicleState(dt, state);
+    const auto state = getVehicleState(dt);
 
-    hf::Debugger::debug(rx_is_armed, setpoint, state);
-    //hf::Debugger::profile();
+    //hf::Debugger::debug(rx_is_armed, setpoint, state);
+    hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
             !rx_is_throttle_down, dt, state, setpoint);
