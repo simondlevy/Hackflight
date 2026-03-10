@@ -24,15 +24,14 @@
 // Third-party libraries
 #include <dshot-teensy4.hpp>  
 #include <dsmrx.hpp>  
-#include <MPU6050.h>
 
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
+#include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/imu/mpu6050.hpp>
 #include <firmware/imu/oldfilter.hpp>
-#include <firmware/imu/old/imu.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/dsmx.hpp>
 #include <firmware/setpoint.hpp>
@@ -40,27 +39,21 @@
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-// Motors ---------------------------------------------------------
-
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
-
-// LED -------------------------------------------------------------
 
 static hf::LED _led = hf::LED(13);
 
-// PID control -----------------------------------------------------
+static hf::IMU _imu;
+
+static hf::ImuFilter _imuFilter;
+
+static hf::MadgwickFilter _madgwick;
 
 static hf::StabilizerPid _stabilizerPid;
 
-// Motor mixing ----------------------------------------------------
-
 static hf::Mixer _mixer;
 
-// FAFO -----------------------------------------------------------
-
 static const uint32_t LOOP_FREQ_HZ = 2000;
-
-// Main ----------------------------------------------------------------------
 
 void setup()
 {
@@ -68,7 +61,7 @@ void setup()
 
     Serial1.begin(115000);
 
-    hf::initImu();
+    _imu.begin();
 
     delay(10);
 
@@ -79,9 +72,7 @@ void setup()
 
 void loop()
 {
-    const auto usec_curr = micros();      
-
-    const auto dt = hf::Timer::getDt();
+    const auto loop_start_usec = micros();      
 
     _led.blink(); 
 
@@ -89,17 +80,23 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(rx_chanvals);
 
-    const auto state = hf::getVehicleState(dt);
+    const auto imuraw = _imu.read();
 
-    hf::Debugger::debug(state);
+    const auto imufilt = _imuFilter.run(imuraw);
+
+    const auto dt = hf::Timer::getDt();
+
+    _madgwick = hf::MadgwickFilter::run(_madgwick, dt, imufilt);
+
+    //hf::Debugger::debug(_madgwick.state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
-            !rx_is_throttle_down, dt, state, setpoint);
+            !rx_is_throttle_down, dt, _madgwick.state, setpoint);
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(rx_is_armed, _mixer.motorvals);
 
-    hf::Timer::runDelayLoop(usec_curr, LOOP_FREQ_HZ); 
+    hf::Timer::runDelayLoop(loop_start_usec, LOOP_FREQ_HZ); 
 }

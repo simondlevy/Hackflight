@@ -37,34 +37,30 @@ namespace hf {
 
         public:
 
-            Vec3 angles;
+            VehicleState state;
 
-            MadgwickFilter() 
-            {
-                _quat = {1, 0, 0, 0};
-                _accel = {0, 0, 0};
-                _gyro = {0, 0, 0};
-                angles = {0, 0, 0};
-            }
- 
+            MadgwickFilter() : state(), _quat(1, 0, 0, 0), _imudata() {}
+
             MadgwickFilter
-                (const Vec3 & angles,
+                (const VehicleState & state,
                  const Vec4 & quat,
-                 const Vec3 & gyro,
-                 const Vec3 & accel)
-                : angles(angles), _quat(quat), _gyro(gyro), _accel(accel) {}
+                 const ImuFiltered & imudata)
+                : state(state), _quat(quat), _imudata(imudata) {}
 
             MadgwickFilter& operator=(const MadgwickFilter& other) = default;
 
             static auto run(
                     const MadgwickFilter & mf,
                     const float dt,
-                    const Vec3 & gyro,
-                    const Vec3 & accel) -> MadgwickFilter
+                    const ImuFiltered & imudata) -> MadgwickFilter
             {
+                // Extra gyro, accel data from IMU data
+                const auto gyroDps = imudata.gyroDps;
+                const auto accelGs = imudata.accelGs;
+
                 // LP filter IMU data
-                const auto gyrolpf = lpf(gyro, mf._gyro, B_GYRO);
-                const auto accellpf = lpf(accel, mf._accel, B_ACCEL);
+                const auto gyrolpf = lpf(gyroDps, mf._imudata.gyroDps, B_GYRO);
+                const auto accellpf = lpf(accelGs, mf._imudata.accelGs, B_ACCEL);
 
                 // Convert filtered gyro degrees/sec to radians/sec
                 const auto gyror = Vec3(
@@ -90,22 +86,39 @@ namespace hf {
                 // Integrate rate of change of quaternion to yield quaternion,
                 // then normalize
                 const auto quat = normalize(Vec4(
-                        mf._quat.w + qdotf.w * dt,
-                        mf._quat.x + qdotf.x * dt,
-                        mf._quat.y + qdotf.y * dt,
-                        mf._quat.z + qdotf.z * dt));
+                            mf._quat.w + qdotf.w * dt,
+                            mf._quat.x + qdotf.x * dt,
+                            mf._quat.y + qdotf.y * dt,
+                            mf._quat.z + qdotf.z * dt));
 
-                const auto angles = Vec3(
-                        Num::RAD2DEG * atan2f(quat.w*quat.x + quat.y*quat.z,
-                            0.5 - quat.x*quat.x - quat.y*quat.y),
+                // Madgwick filter won't give us these
+                const float dx = 0;
+                const float dy = 0;
+                const float z = 0;
+                const float dz = 0;
 
-                        Num::RAD2DEG * asinf(2 * (quat.x*quat.z - quat.w*quat.y)),
+                const auto phi = Num::RAD2DEG *
+                    atan2f(quat.w*quat.x + quat.y*quat.z,
+                            0.5 - quat.x*quat.x - quat.y*quat.y);
 
-                        Num::RAD2DEG * atan2f(quat.x*quat.y + quat.w*quat.z,
-                            0.5 - quat.y*quat.y - quat.z*quat.z)
-                        );
+                const float dphi = gyroDps.x;
 
-                return MadgwickFilter(angles, quat, gyrolpf, accellpf);
+                const auto theta = -Num::RAD2DEG *
+                    asinf(2 * (quat.x*quat.z - quat.w*quat.y));
+
+                const float dtheta = gyroDps.y;
+
+                const auto psi = -Num::RAD2DEG *
+                    atan2f(quat.x*quat.y + quat.w*quat.z,
+                            0.5 - quat.y*quat.y - quat.z*quat.z);
+
+                const float dpsi = -gyroDps.z;
+
+                const auto newstate =
+                    VehicleState(
+                            dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi);
+
+                return MadgwickFilter(newstate, quat, ImuFiltered(gyrolpf, accellpf));
             }
 
         private:
@@ -114,19 +127,18 @@ namespace hf {
             Vec4 _quat;
 
             // Previous IMU readings for LPF
-            Vec3 _gyro;
-            Vec3 _accel;
+            ImuFiltered _imudata;
 
             static auto lpf(
                     const Vec3 & curr,
                     const Vec3 & prev,
                     const float coeff) -> Vec3
-                {
-                    return Vec3(
-                            lpf(curr.x, prev.x, coeff),
-                            lpf(curr.y, prev.y, coeff),
-                            lpf(curr.z, prev.z, coeff));
-                }
+            {
+                return Vec3(
+                        lpf(curr.x, prev.x, coeff),
+                        lpf(curr.y, prev.y, coeff),
+                        lpf(curr.z, prev.z, coeff));
+            }
 
             static auto lpf(
                     const float curr,
