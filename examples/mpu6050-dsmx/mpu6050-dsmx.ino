@@ -63,8 +63,6 @@ void setup()
 
     _imu.begin();
 
-    delay(10);
-
     _motors.arm(); 
 
     _led.begin(); 
