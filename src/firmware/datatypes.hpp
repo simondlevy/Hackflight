@@ -56,6 +56,7 @@ namespace hf {
             EstimatedState& operator=(const EstimatedState& other) = default;
  
     };
+
     class SixAxis {
 
         public:

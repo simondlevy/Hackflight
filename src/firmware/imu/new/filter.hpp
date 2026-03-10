@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class IMU {
+    class ImuFilter {
 
         private:
 
@@ -33,9 +33,9 @@ namespace hf {
 
         public:
 
-            IMU& operator=(const IMU& other) = default;
+            ImuFilter& operator=(const ImuFilter& other) = default;
 
-            IMU() = default;
+            ImuFilter() = default;
 
             /**
              * gyro.x: positive roll-rightward

@@ -28,7 +28,7 @@
 #include <datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
-#include <firmware/imu/new/imu.hpp>
+#include <firmware/imu/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <mixers/bfquadx.hpp>
@@ -40,7 +40,7 @@
 static const int16_t GYRO_SCALE = 2000;
 static const int16_t ACCEL_SCALE = 24;
 
-static hf::IMU _imu;
+static hf::ImuFilter _imuFilter;
 
 static Bmi088Accel accel(Wire, 0x19);
 static Bmi088Gyro gyro(Wire, 0x69);
@@ -185,7 +185,7 @@ void loop()
     hf::Vec3 gyroDps = {}; // XXX should use returned value
     hf::Vec3 accelGs = {}; // XXX should use returned value
     const bool imuIsCalibrated =
-        _imu.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE, ACCEL_SCALE,
+        _imuFilter.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE, ACCEL_SCALE,
                 gyroDps, accelGs);
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
@@ -201,7 +201,7 @@ void loop()
         rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
         rx_chanvals[3]};
 
-    hf::Debugger::debug(rx_is_armed, setpoint, state);
+    hf::Debugger::debug(state);
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
