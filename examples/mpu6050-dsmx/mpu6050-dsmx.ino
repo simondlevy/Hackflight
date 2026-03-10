@@ -187,16 +187,6 @@ static auto readImu() -> hf::SixAxis
     return hf::SixAxis({gyro_x, gyro_y, gyro_z}, {accel_x, accel_y, accel_z});*/
 }
 
-static void runDelayLoop(const uint32_t usec_curr)
-{
-    float invFreq = 1.0 / LOOP_FREQ_HZ * 1000000.0;
-    uint32_t checker = micros();
-
-    while (invFreq > (checker - usec_curr)) {
-        checker = micros();
-    }
-}
-
 static void getVehicleState(const float dt, hf::VehicleState & state)
 {
     const auto sixaxis = readImu();
@@ -259,5 +249,5 @@ void loop()
 
     _motors.run(rx_is_armed, _mixer.motorvals);
 
-    runDelayLoop(usec_curr); 
+    hf::Timer::runDelayLoop(usec_curr, LOOP_FREQ_HZ); 
 }
