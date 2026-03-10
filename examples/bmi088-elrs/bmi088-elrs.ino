@@ -155,8 +155,6 @@ static float getDt(const uint32_t usec_curr)
 
 void setup()
 {
-    Serial.begin(0); 
-
     rx_init();
 
     imu_device_init();
