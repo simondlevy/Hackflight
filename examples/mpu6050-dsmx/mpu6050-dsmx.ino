@@ -30,7 +30,8 @@
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/imu/old/filter.hpp>
+#include <firmware/imu/mpu6050.hpp>
+#include <firmware/imu/oldfilter.hpp>
 #include <firmware/imu/old/imu.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/dsmx.hpp>
