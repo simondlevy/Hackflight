@@ -30,11 +30,11 @@
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/dt.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/dsmx.hpp>
 #include <firmware/setpoint.hpp>
+#include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
@@ -238,7 +238,7 @@ void loop()
 {
     const auto usec_curr = micros();      
 
-    const auto dt = hf::getDt();
+    const auto dt = hf::Timer::getDt();
 
     _led.blink(); 
 
@@ -250,7 +250,7 @@ void loop()
     getVehicleState(dt, state);
 
     //hf::Debugger::debug(rx_is_armed, setpoint, state);
-    //hf::Debugger::profile();
+    hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
             !rx_is_throttle_down, dt, state, setpoint);

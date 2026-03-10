@@ -38,6 +38,16 @@ namespace hf {
                 return false;
             }
 
+            static float getDt()
+            {
+                const auto usec_curr = micros();      
+                static uint32_t _usec_prev;
+                const float dt = (usec_curr - _usec_prev)/1000000.0;
+                _usec_prev = usec_curr;
+
+                return dt;
+            }
+
         private:
 
             uint32_t _msec_prev;
