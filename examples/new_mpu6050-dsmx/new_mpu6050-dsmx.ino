@@ -29,6 +29,7 @@
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
+#include <firmware/estimators/madgwick/new_madgwick.hpp>
 #include <firmware/imu/mpu6050.hpp>
 #include <firmware/imu/oldfilter.hpp>
 #include <firmware/led.hpp>
@@ -46,7 +47,7 @@ static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
 
-static hf::StabilizerPid _stabilizerPid;
+// static hf::StabilizerPid _stabilizerPid;
 
 static hf::Mixer _mixer;
 
@@ -69,7 +70,7 @@ void setup()
 
 void loop()
 {
-    const auto usec_curr = micros();      
+    const auto loop_start_usec = micros();      
 
     //const auto dt = hf::Timer::getDt();
 
@@ -98,5 +99,5 @@ void loop()
 
     _motors.run(rx_is_armed, _mixer.motorvals);*/
 
-    hf::Timer::runDelayLoop(usec_curr, LOOP_FREQ_HZ); 
+    hf::Timer::runDelayLoop(loop_start_usec, LOOP_FREQ_HZ); 
 }

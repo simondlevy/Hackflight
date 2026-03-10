@@ -42,17 +42,15 @@ namespace hf {
             MadgwickFilter() 
             {
                 _quat = {1, 0, 0, 0};
-                _accel = {0, 0, 0};
-                _gyro = {0, 0, 0};
+                _imudata = {{0, 0, 0}, {0, 0, 0}},
                 angles = {0, 0, 0};
             }
  
             MadgwickFilter
                 (const Vec3 & angles,
                  const Vec4 & quat,
-                 const Vec3 & gyro,
-                 const Vec3 & accel)
-                : angles(angles), _quat(quat), _gyro(gyro), _accel(accel) {}
+                 const ImuFiltered & imudata)
+                : angles(angles), _quat(quat), _imudata(imudata) {}
 
             MadgwickFilter& operator=(const MadgwickFilter& other) = default;
 
@@ -62,8 +60,8 @@ namespace hf {
                     const ImuFiltered & imudata) -> MadgwickFilter
             {
                 // LP filter IMU data
-                const auto gyrolpf = lpf(gyro, mf._gyro, B_GYRO);
-                const auto accellpf = lpf(accel, mf._accel, B_ACCEL);
+                const auto gyrolpf = lpf(imudata.gyroDps, mf._imudata.gyroDps, B_GYRO);
+                const auto accellpf = lpf(imudata.accelGs, mf._imudata.accelGs, B_ACCEL);
 
                 // Convert filtered gyro degrees/sec to radians/sec
                 const auto gyror = Vec3(
@@ -104,7 +102,7 @@ namespace hf {
                             0.5 - quat.y*quat.y - quat.z*quat.z)
                         );
 
-                return MadgwickFilter(angles, quat, gyrolpf, accellpf);
+                return MadgwickFilter(angles, quat, ImuFiltered(gyrolpf, accellpf));
             }
 
         private:
@@ -113,8 +111,7 @@ namespace hf {
             Vec4 _quat;
 
             // Previous IMU readings for LPF
-            Vec3 _gyro;
-            Vec3 _accel;
+            ImuFiltered _imudata;
 
             static auto lpf(
                     const Vec3 & curr,
