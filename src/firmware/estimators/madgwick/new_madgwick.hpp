@@ -37,12 +37,12 @@ namespace hf {
 
         public:
 
-            EstimatedState state;
+            VehicleState state;
 
             MadgwickFilter() : state(), _quat(1, 0, 0, 0), _imudata() {}
 
             MadgwickFilter
-                (const EstimatedState & state,
+                (const VehicleState & state,
                  const Vec4 & quat,
                  const ImuFiltered & imudata)
                 : state(state), _quat(quat), _imudata(imudata) {}
@@ -87,19 +87,32 @@ namespace hf {
                             mf._quat.y + qdotf.y * dt,
                             mf._quat.z + qdotf.z * dt));
 
+                // Madgwick filter won't give us these
+                const float dx = 0;
+                const float dy = 0;
+                const float z = 0;
+                const float dz = 0;
+
                 const auto phi = Num::RAD2DEG *
                     atan2f(quat.w*quat.x + quat.y*quat.z,
                             0.5 - quat.x*quat.x - quat.y*quat.y);
 
-                const auto theta = Num::RAD2DEG *
+                const float dphi = 0;
+
+                const auto theta = -Num::RAD2DEG *
                     asinf(2 * (quat.x*quat.z - quat.w*quat.y));
 
-                const auto psi = Num::RAD2DEG *
+                const float dtheta = 0;
+
+                const auto psi = -Num::RAD2DEG *
                     atan2f(quat.x*quat.y + quat.w*quat.z,
                             0.5 - quat.y*quat.y - quat.z*quat.z);
 
+                const float dpsi = 0;
+
                 const auto newstate =
-                    EstimatedState(0, 0, 0, 0, phi, theta, psi);
+                    VehicleState(
+                            dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi);
 
                 return MadgwickFilter(newstate, quat, ImuFiltered(gyrolpf, accellpf));
             }

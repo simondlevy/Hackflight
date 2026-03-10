@@ -47,7 +47,9 @@ static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
 
-// static hf::StabilizerPid _stabilizerPid;
+static hf::MadgwickFilter _madgwick;
+
+static hf::StabilizerPid _stabilizerPid;
 
 static hf::Mixer _mixer;
 
@@ -72,26 +74,24 @@ void loop()
 {
     const auto loop_start_usec = micros();      
 
-    //const auto dt = hf::Timer::getDt();
-
     _led.blink(); 
 
     rx_read();
 
-    //const auto setpoint = hf::mksetpoint(rx_chanvals);
+    const auto setpoint = hf::mksetpoint(rx_chanvals);
 
     const auto imuraw = _imu.read();
 
     const auto imufilt = _imuFilter.run(imuraw);
 
-    hf::Debugger::debug(imufilt);
+    const auto dt = hf::Timer::getDt();
 
-    /*
-    const auto state = hf::getVehicleState(dt);
+    _madgwick = hf::MadgwickFilter::run(_madgwick, dt, imufilt);
 
-    hf::Debugger::debug(rx_is_armed, setpoint, state);
+    hf::Debugger::debug(_madgwick.state);
     //hf::Debugger::profile();
 
+    /*
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
             !rx_is_throttle_down, dt, state, setpoint);
 
