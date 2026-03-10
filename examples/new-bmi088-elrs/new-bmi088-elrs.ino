@@ -59,8 +59,9 @@ void loop()
 
     const auto imuraw = _imu.read();
 
-    hf::Debugger::debug(imuraw);
+    // hf::Debugger::debug(imuraw);
+    hf::Debugger::profile();
 
-    const auto dt = hf::Timer::getDt();
+    (void)rx_is_throttle_down;
 
 }

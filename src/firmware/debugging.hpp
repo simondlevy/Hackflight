@@ -17,20 +17,25 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
+#include <firmware/timer.hpp>
 
 namespace hf {
 
     class Debugger {
 
+        private:
+
+            static constexpr float FREQ = 100;
+
         public:
 
             static void debug(const VehicleState & state)
             {
-                static uint32_t _count;
-                static uint32_t _msec;
-                const auto msec = millis();
+                static Timer _timer;
 
-                if (msec - _msec > 10) {
+                if (_timer.ready(FREQ)) {
+
+                    static uint32_t _count;
 
                     printf("%5lu | dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f "
                             "phi=%+08.3f dphi=%+08.3f theta=%+08.3f dtheta=%+08.3f"
@@ -38,18 +43,16 @@ namespace hf {
                             _count++, state.dx, state.dy, state.z, state.dz,
                             state.phi, state.dphi, state.theta, state.dtheta,
                             state.psi, state.dpsi);
-
-                    _msec = msec;
                 }
             }
 
             static void debug(const ImuFiltered & imufilt)
             {
-                static uint32_t _count;
-                static uint32_t _msec;
-                const auto msec = millis();
+                static Timer _timer;
 
-                if (msec - _msec > 10) {
+                if (_timer.ready(FREQ)) {
+
+                    static uint32_t _count;
 
                     const auto g = imufilt.gyroDps;
                     const auto a = imufilt.accelGs;
@@ -57,40 +60,37 @@ namespace hf {
                     printf("%5lu | gx=%+3.3f gy=%+3.3f gz=%+3.3f dps | "
                             "ax=%+3.3f ay=%+3.3f az=%+3.3f Gs\n",
                             _count++, g.x, g.y, g.z, a.x, a.y, a.z);
-
-                    _msec = msec;
                 }
             }
 
             static void debug(const ImuRaw & imuraw)
             {
-                static uint32_t _count;
-                static uint32_t _msec;
-                const auto msec = millis();
+                static Timer _timer;
 
-                if (msec - _msec > 10) {
+                if (_timer.ready(FREQ)) {
+
+                    static uint32_t _count;
 
                     printf("%5lu | gx=%+05d gy=%+05d gz=%+05d | "
                             "ax=%+05d ay=%+05d az=%+05d\n",
                             _count++, 
                             imuraw.gx, imuraw.gy, imuraw.gz,
                             imuraw.ax, imuraw.ay, imuraw.az);
-
-                    _msec = msec;
                 }
             }
 
             static void profile()
             {
-                static uint32_t _msec;
-                const auto msec = millis();
+                static Timer _timer;
+
                 static uint32_t _count;
 
-                if (msec - _msec > 1000) {
-                    if (_count > 0) {
+                if (_timer.ready(1)) {
+
+                     if (_count > 0) {
                         printf("count=%d\n", (int)_count);
                     }
-                    _msec = msec;
+
                     _count = 0;
                 }
                 _count++;
