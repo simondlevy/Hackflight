@@ -28,7 +28,7 @@
 #include <datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
-#include <firmware/imu/imu.hpp>
+#include <firmware/imu/new/imu.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <mixers/bfquadx.hpp>
@@ -163,7 +163,7 @@ void setup()
 
     _motors.arm(); 
 
-    _led.blinkOnStartup(); 
+    _led.begin(); 
 }
 
 void loop()
@@ -172,7 +172,7 @@ void loop()
 
     const auto dt = getDt(usec_curr);
 
-    _led.blinkInLoop(usec_curr); 
+    _led.blink(); 
 
     rx_read();
 

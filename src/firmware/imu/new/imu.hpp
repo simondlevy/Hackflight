@@ -16,8 +16,9 @@
 
 #include <datatypes.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
-#include <firmware/imu/gyro_bias.hpp>
-#include <firmware/imu/three_axis_lpf.hpp>
+#include <firmware/imu/new/axis3_i16.h>
+#include <firmware/imu/new/gyro_bias.hpp>
+#include <firmware/imu/new/three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
