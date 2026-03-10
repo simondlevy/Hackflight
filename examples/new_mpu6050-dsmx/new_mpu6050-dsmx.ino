@@ -88,7 +88,7 @@ void loop()
 
     _madgwick = hf::MadgwickFilter::run(_madgwick, dt, imufilt);
 
-    hf::Debugger::debug(_madgwick.state);
+    //hf::Debugger::debug(_madgwick.state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
