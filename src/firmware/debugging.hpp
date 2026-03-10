@@ -32,11 +32,12 @@ namespace hf {
 
                 if (msec - _msec > 10) {
 
-                    printf("%5lu: gx=%+3.3f gy=%+3.3f gz=%+3.3f "
-                            "ax=%+3.3f ay=%+3.3f az=%+3.3f\n",
-                            _count++,
-                            imufilt.gx, imufilt.gx, imufilt.gx, 
-                            imufilt.ax, imufilt.ay, imufilt.az); 
+                    const auto g = imufilt.gyroDps;
+                    const auto a = imufilt.accelGs;
+
+                    printf("%5lu | gx=%+3.3f gy=%+3.3f gz=%+3.3f dps | "
+                            "ax=%+3.3f ay=%+3.3f az=%+3.3f Gs\n",
+                            _count++, g.x, g.y, g.z, a.x, a.y, a.z);
 
                     _msec = msec;
                 }

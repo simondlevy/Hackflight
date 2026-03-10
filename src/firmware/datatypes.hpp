@@ -62,22 +62,14 @@ namespace hf {
 
         public:
 
-            // Degrees per second
-            float gx;
-            float gy;
-            float gz;
+            Vec3 gyroDps;
 
-            // Gs
-            float ax;
-            float ay;
-            float az;
+            Vec3 accelGs;
 
             ImuFiltered() = default;
 
-            ImuFiltered(
-                    const float gx, const float gy, const float gz,
-                    const float ax, const float ay, const float az)
-                : gx(gx), gy(gy), gz(gz), ax(ax), ay(ay), az(az) {}
+            ImuFiltered(const Vec3 & gyroDps, const Vec3 & accelGs) 
+                : gyroDps(gyroDps), accelGs(accelGs) {}
 
             ImuFiltered& operator=(const ImuFiltered& other) = default;
      };
