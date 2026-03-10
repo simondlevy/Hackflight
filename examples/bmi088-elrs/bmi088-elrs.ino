@@ -31,6 +31,7 @@
 #include <firmware/imu/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
+#include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
@@ -142,15 +143,6 @@ static auto getVehicleState(const bool isFlying, const hf::Vec3 & gyroDps)
             -gyroDps.z); // negate for nose-right positive.y
 }
 
-static float getDt(const uint32_t usec_curr)
-{
-    static uint32_t _usec_prev;
-    const float dt = (usec_curr - _usec_prev)/1000000.0;
-    _usec_prev = usec_curr;
-
-    return dt;
-}
-
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -168,7 +160,7 @@ void loop()
 {
     const auto usec_curr = micros();      
 
-    const auto dt = getDt(usec_curr);
+    const auto dt = hf::Timer::getDt();
 
     _led.blink(); 
 
