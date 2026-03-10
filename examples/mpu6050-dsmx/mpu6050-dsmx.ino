@@ -1,5 +1,5 @@
 /*
-   Hackflight for Teensy 4.0 
+   Hackflight for Teensy 4.0 with DSMX receiver
 
    Based on  https://github.com/nickrehm/dRehmFlight
 

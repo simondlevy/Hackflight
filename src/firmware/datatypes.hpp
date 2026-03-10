@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <datatypes.hpp>
 
 namespace hf {
@@ -34,4 +36,49 @@ namespace hf {
 
             SixAxis& operator=(const SixAxis& other) = default;
       };
+
+    class ImuRaw {
+
+        public:
+
+            int16_t gx;
+            int16_t gy;
+            int16_t gz;
+            int16_t ax;
+            int16_t ay;
+            int16_t az;
+
+            ImuRaw() = default;
+
+            ImuRaw(
+                    const int16_t gx, const int16_t gy, const int16_t gz,
+                    const int16_t ax, const int16_t ay, const int16_t az)
+                : gx(gx), gy(gy), gz(gz), ax(ax), ay(ay), az(az) {}
+
+            ImuRaw& operator=(const ImuRaw& other) = default;
+     };
+
+    class ImuFiltered {
+
+        public:
+
+            // Degrees per second
+            float gx;
+            float gy;
+            float gz;
+
+            // Gs
+            float ax;
+            float ay;
+            float az;
+
+            ImuFiltered() = default;
+
+            ImuFiltered(
+                    const float gx, const float gy, const float gz,
+                    const float ax, const float ay, const float az)
+                : gx(gx), gy(gy), gz(gz), ax(ax), ay(ay), az(az) {}
+
+            ImuFiltered& operator=(const ImuFiltered& other) = default;
+     };
 }
