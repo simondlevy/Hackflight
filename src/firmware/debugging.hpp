@@ -16,13 +16,31 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 
     class Debugger {
 
         public:
+
+            static void debug(const ImuFiltered & imufilt)
+            {
+                static uint32_t _count;
+                static uint32_t _msec;
+                const auto msec = millis();
+
+                if (msec - _msec > 10) {
+
+                    printf("%5lu: gx=%+3.3f gy=%+3.3f gz=%+3.3f "
+                            "ax=%+3.3f ay=%+3.3f az=%+3.3f\n",
+                            _count++,
+                            imufilt.gx, imufilt.gx, imufilt.gx, 
+                            imufilt.ax, imufilt.ay, imufilt.az); 
+
+                    _msec = msec;
+                }
+            }
 
             static void debug(
                     const bool armed,

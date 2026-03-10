@@ -51,8 +51,6 @@ namespace hf {
                     Vec3 _prev;
             };
 
-        public:
-
         private:
 
             static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
@@ -70,6 +68,8 @@ namespace hf {
             static constexpr float GYRO_ERROR_X = 0.0;
             static constexpr float GYRO_ERROR_Y= 0.0;
             static constexpr float GYRO_ERROR_Z = 0.0;
+
+        public:
 
             auto run(const ImuRaw &rawvals) -> ImuFiltered
             {
@@ -93,7 +93,6 @@ namespace hf {
 
             ThreeAxisFilter _gyroFilter;
             ThreeAxisFilter _accelFilter;
-
     };
 
 }

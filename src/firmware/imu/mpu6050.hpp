@@ -29,6 +29,8 @@ namespace hf {
 
             static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
 
+        public:
+
             void begin()
             {
                 Wire.begin();
@@ -49,7 +51,7 @@ namespace hf {
                 _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
             }
 
-            auto getVehicleState(const float dt) -> ImuRaw
+            auto read() -> ImuRaw
             {
                 int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
 
