@@ -132,7 +132,7 @@ namespace hf {
 
 }
 
-static auto readImu() -> hf::SixAxis
+static void getVehicleState(const float dt, hf::VehicleState & state)
 {
     int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
     _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -151,45 +151,7 @@ static auto readImu() -> hf::SixAxis
             hf::Vec3(ACCEL_ERROR_X, ACCEL_ERROR_Y, ACCEL_ERROR_Z),
             ACCEL_SCALE_FACTOR,  B_ACCEL);
 
-    return hf::SixAxis(gyro, accel);
-
-    /*
-    static float accel_x_prev, accel_y_prev, accel_z_prev;
-    static float gyro_x_prev, gyro_y_prev, gyro_z_prev;
-
-    (void)gyro;
-    (void)accel;
-
-    auto accel_x = ax / ACCEL_SCALE_FACTOR - ACCEL_ERROR_X; 
-    auto accel_y = ay / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Y;
-    auto accel_z = az / ACCEL_SCALE_FACTOR - ACCEL_ERROR_Z;
-
-    accel_x = (1.0 - B_ACCEL)*accel_x_prev + B_ACCEL*accel_x;
-    accel_y = (1.0 - B_ACCEL)*accel_y_prev + B_ACCEL*accel_y;
-    accel_z = (1.0 - B_ACCEL)*accel_z_prev + B_ACCEL*accel_z;
-
-    accel_x_prev = accel_x;
-    accel_y_prev = accel_y;
-    accel_z_prev = accel_z;
-
-    auto gyro_x = gx / GYRO_SCALE_FACTOR - GYRO_ERROR_X; 
-    auto gyro_y = gy / GYRO_SCALE_FACTOR - GYRO_ERROR_Y;
-    auto gyro_z = gz / GYRO_SCALE_FACTOR - GYRO_ERROR_Z;
-
-    gyro_x = (1.0 - B_GYRO)*gyro_x_prev + B_GYRO*gyro_x;
-    gyro_y = (1.0 - B_GYRO)*gyro_y_prev + B_GYRO*gyro_y;
-    gyro_z = (1.0 - B_GYRO)*gyro_z_prev + B_GYRO*gyro_z;
-
-    gyro_x_prev = gyro_x;
-    gyro_y_prev = gyro_y;
-    gyro_z_prev = gyro_z;
-
-    return hf::SixAxis({gyro_x, gyro_y, gyro_z}, {accel_x, accel_y, accel_z});*/
-}
-
-static void getVehicleState(const float dt, hf::VehicleState & state)
-{
-    const auto sixaxis = readImu();
+    const auto sixaxis = hf::SixAxis(gyro, accel);
 
     static hf::MadgwickFilter  _madgwick;
 
@@ -239,8 +201,8 @@ void loop()
     hf::VehicleState state = {};
     getVehicleState(dt, state);
 
-    //hf::Debugger::debug(rx_is_armed, setpoint, state);
-    hf::Debugger::profile();
+    hf::Debugger::debug(rx_is_armed, setpoint, state);
+    //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
             !rx_is_throttle_down, dt, state, setpoint);
