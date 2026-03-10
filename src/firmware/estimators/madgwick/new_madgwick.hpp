@@ -54,9 +54,13 @@ namespace hf {
                     const float dt,
                     const ImuFiltered & imudata) -> MadgwickFilter
             {
+                // Extra gyro, accel data from IMU data
+                const auto gyroDps = imudata.gyroDps;
+                const auto accelGs = imudata.accelGs;
+
                 // LP filter IMU data
-                const auto gyrolpf = lpf(imudata.gyroDps, mf._imudata.gyroDps, B_GYRO);
-                const auto accellpf = lpf(imudata.accelGs, mf._imudata.accelGs, B_ACCEL);
+                const auto gyrolpf = lpf(gyroDps, mf._imudata.gyroDps, B_GYRO);
+                const auto accellpf = lpf(accelGs, mf._imudata.accelGs, B_ACCEL);
 
                 // Convert filtered gyro degrees/sec to radians/sec
                 const auto gyror = Vec3(
@@ -97,18 +101,18 @@ namespace hf {
                     atan2f(quat.w*quat.x + quat.y*quat.z,
                             0.5 - quat.x*quat.x - quat.y*quat.y);
 
-                const float dphi = 0;
+                const float dphi = gyroDps.x;
 
                 const auto theta = -Num::RAD2DEG *
                     asinf(2 * (quat.x*quat.z - quat.w*quat.y));
 
-                const float dtheta = 0;
+                const float dtheta = gyroDps.y;
 
                 const auto psi = -Num::RAD2DEG *
                     atan2f(quat.x*quat.y + quat.w*quat.z,
                             0.5 - quat.y*quat.y - quat.z*quat.z);
 
-                const float dpsi = 0;
+                const float dpsi = -gyroDps.z;
 
                 const auto newstate =
                     VehicleState(

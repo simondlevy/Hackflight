@@ -91,7 +91,7 @@ void loop()
 
     const auto state = hf::getVehicleState(dt);
 
-    hf::Debugger::debug(rx_is_armed, setpoint, state);
+    hf::Debugger::debug(state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,

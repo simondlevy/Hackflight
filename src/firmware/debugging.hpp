@@ -33,8 +33,8 @@ namespace hf {
                 if (msec - _msec > 10) {
 
                     printf("%5lu | dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f "
-                            "phi=%+3.3f dphi=%+3.3f theta=%+3.3f dtheta=%+3.3f"
-                            " psi=%+3.3f dpsi=%+3.3f\n",
+                            "phi=%+08.3f dphi=%+08.3f theta=%+08.3f dtheta=%+08.3f"
+                            " psi=%+08.3f dpsi=%+08.3f\n",
                             _count++, state.dx, state.dy, state.z, state.dz,
                             state.phi, state.dphi, state.theta, state.dtheta,
                             state.psi, state.dpsi);

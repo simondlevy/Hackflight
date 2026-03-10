@@ -91,13 +91,12 @@ void loop()
     hf::Debugger::debug(_madgwick.state);
     //hf::Debugger::profile();
 
-    /*
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
-            !rx_is_throttle_down, dt, state, setpoint);
+            !rx_is_throttle_down, dt, _madgwick.state, setpoint);
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(rx_is_armed, _mixer.motorvals);*/
+    _motors.run(rx_is_armed, _mixer.motorvals);
 
     hf::Timer::runDelayLoop(loop_start_usec, LOOP_FREQ_HZ); 
 }
