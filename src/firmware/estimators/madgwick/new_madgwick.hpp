@@ -37,20 +37,15 @@ namespace hf {
 
         public:
 
-            Vec3 angles;
+            EstimatedState state;
 
-            MadgwickFilter() 
-            {
-                _quat = {1, 0, 0, 0};
-                _imudata = {{0, 0, 0}, {0, 0, 0}},
-                angles = {0, 0, 0};
-            }
- 
+            MadgwickFilter() : state(), _quat(1, 0, 0, 0), _imudata() {}
+
             MadgwickFilter
-                (const Vec3 & angles,
+                (const EstimatedState & state,
                  const Vec4 & quat,
                  const ImuFiltered & imudata)
-                : angles(angles), _quat(quat), _imudata(imudata) {}
+                : state(state), _quat(quat), _imudata(imudata) {}
 
             MadgwickFilter& operator=(const MadgwickFilter& other) = default;
 
@@ -87,22 +82,26 @@ namespace hf {
                 // Integrate rate of change of quaternion to yield quaternion,
                 // then normalize
                 const auto quat = normalize(Vec4(
-                        mf._quat.w + qdotf.w * dt,
-                        mf._quat.x + qdotf.x * dt,
-                        mf._quat.y + qdotf.y * dt,
-                        mf._quat.z + qdotf.z * dt));
+                            mf._quat.w + qdotf.w * dt,
+                            mf._quat.x + qdotf.x * dt,
+                            mf._quat.y + qdotf.y * dt,
+                            mf._quat.z + qdotf.z * dt));
 
-                const auto angles = Vec3(
-                        Num::RAD2DEG * atan2f(quat.w*quat.x + quat.y*quat.z,
-                            0.5 - quat.x*quat.x - quat.y*quat.y),
+                const auto phi = Num::RAD2DEG *
+                    atan2f(quat.w*quat.x + quat.y*quat.z,
+                            0.5 - quat.x*quat.x - quat.y*quat.y);
 
-                        Num::RAD2DEG * asinf(2 * (quat.x*quat.z - quat.w*quat.y)),
+                const auto theta = Num::RAD2DEG *
+                    asinf(2 * (quat.x*quat.z - quat.w*quat.y));
 
-                        Num::RAD2DEG * atan2f(quat.x*quat.y + quat.w*quat.z,
-                            0.5 - quat.y*quat.y - quat.z*quat.z)
-                        );
+                const auto psi = Num::RAD2DEG *
+                    atan2f(quat.x*quat.y + quat.w*quat.z,
+                            0.5 - quat.y*quat.y - quat.z*quat.z);
 
-                return MadgwickFilter(angles, quat, ImuFiltered(gyrolpf, accellpf));
+                const auto newstate =
+                    EstimatedState(0, 0, 0, 0, phi, theta, psi);
+
+                return MadgwickFilter(newstate, quat, ImuFiltered(gyrolpf, accellpf));
             }
 
         private:
@@ -117,12 +116,12 @@ namespace hf {
                     const Vec3 & curr,
                     const Vec3 & prev,
                     const float coeff) -> Vec3
-                {
-                    return Vec3(
-                            lpf(curr.x, prev.x, coeff),
-                            lpf(curr.y, prev.y, coeff),
-                            lpf(curr.z, prev.z, coeff));
-                }
+            {
+                return Vec3(
+                        lpf(curr.x, prev.x, coeff),
+                        lpf(curr.y, prev.y, coeff),
+                        lpf(curr.z, prev.z, coeff));
+            }
 
             static auto lpf(
                     const float curr,
