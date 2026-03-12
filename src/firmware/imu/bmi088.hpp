@@ -33,14 +33,14 @@ namespace hf {
     static const int16_t GYRO_SCALE = 2000;
     static const int16_t ACCEL_SCALE = 24;
 
-    static hf::ImuFilter _imuFilter;
+    static ImuFilter _imuFilter;
 
     static Bmi088Accel accel(Wire, 0x19);
     static Bmi088Gyro gyro(Wire, 0x69);
 
     static const uint32_t FREQ_EKF_PREDICTION = 100;
 
-    static hf::EKF _ekf;
+    static EKF _ekf;
 
     static bool okay(const int status)
     {
@@ -87,10 +87,25 @@ namespace hf {
         az = accel.getAccelZ_raw();
     }
 
-    static auto getVehicleState(const bool isFlying, const hf::Vec3 & gyroDps)
-        -> hf::VehicleState
+    static auto getVehicleState(const uint32_t usec_curr, 
+            const bool isFlying) -> VehicleState
         {
-            static hf::Timer _timer;
+            axis3_i16_t gyroRaw = {};
+            axis3_i16_t accelRaw = {};
+            imu_device_read(
+                    gyroRaw.x, gyroRaw.y, gyroRaw.z,
+                    accelRaw.x, accelRaw.y, accelRaw.z);
+
+            Vec3 gyroDps = {}; // XXX should use returned value
+            Vec3 accelGs = {}; // XXX should use returned value
+            const bool imuIsCalibrated =
+                _imuFilter.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE,
+                        ACCEL_SCALE, gyroDps, accelGs);
+            (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
+
+            _ekf.enqueueImu(&gyroDps, &accelGs);
+
+            static Timer _timer;
 
             static bool _didResetEstimation;
 
@@ -107,10 +122,10 @@ namespace hf {
             }
 
             // Get state estimate from EKF
-            const hf::EstimatedState state = _ekf.getStateEstimate(msec_curr);
+            const EstimatedState state = _ekf.getStateEstimate(msec_curr);
 
             // Get angular velocities directly from gyro
-            return hf::VehicleState(
+            return VehicleState(
                     state.dx,
                     state.dy,
                     state.z,
