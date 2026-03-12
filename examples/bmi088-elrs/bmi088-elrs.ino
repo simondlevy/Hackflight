@@ -65,6 +65,8 @@ void loop()
 
     _rx.read();
 
+    const bool isFlying = true; // XXX
+
     hf::axis3_i16_t gyroRaw = {};
     hf::axis3_i16_t accelRaw = {};
     hf::imu_device_read(
@@ -79,8 +81,6 @@ void loop()
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
     hf::_ekf.enqueueImu(&gyroDps, &accelGs);
-
-    const bool isFlying = true; // XXX
 
     const auto state = hf::getVehicleState(isFlying, gyroDps);
 

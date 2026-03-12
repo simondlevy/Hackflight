@@ -28,7 +28,6 @@
 #include <firmware/estimators/ekf/ekf.hpp>
 #include <firmware/imu/new/filter.hpp>
 
-
 namespace hf {
 
     static const int16_t GYRO_SCALE = 2000;
