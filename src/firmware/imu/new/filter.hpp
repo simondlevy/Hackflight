@@ -32,6 +32,8 @@ namespace hf {
 
         public:
 
+            ImuFiltered output;
+
             bool wasGyroBiasFound;
 
             ImuFilter& operator=(const ImuFilter& other) = default;
@@ -50,8 +52,7 @@ namespace hf {
                     const uint32_t tickCount,
                     const ImuRaw & imuraw,
                     const int16_t gscale,
-                    const int16_t ascale,
-                    ImuFiltered & imufilt)
+                    const int16_t ascale)
             {
 
                 // Convert accel to Gs
@@ -92,13 +93,13 @@ namespace hf {
 
                 const auto accelFiltered = _accelLpf.output;
 
-                imufilt.gyroDps.x = gyroFiltered.x;
-                imufilt.gyroDps.y = gyroFiltered.y;
-                imufilt.gyroDps.z = gyroFiltered.z;
+                output.gyroDps.x = gyroFiltered.x;
+                output.gyroDps.y = gyroFiltered.y;
+                output.gyroDps.z = gyroFiltered.z;
 
-                imufilt.accelGs.x = accelFiltered.x;
-                imufilt.accelGs.y = accelFiltered.y;
-                imufilt.accelGs.z = accelFiltered.z;
+                output.accelGs.x = accelFiltered.x;
+                output.accelGs.y = accelFiltered.y;
+                output.accelGs.z = accelFiltered.z;
 
                 wasGyroBiasFound = _gyroBiasCalculator.wasValueFound;
             }

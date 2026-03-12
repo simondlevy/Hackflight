@@ -66,18 +66,15 @@ namespace hf {
 
             auto getVehicleState(const bool isFlying) -> VehicleState
             {
-                const auto usec_curr = micros();
-
                 const auto imuraw = read();
 
-                ImuFiltered imufilt = {};
-                _imuFilter.step( usec_curr/1000, imuraw, GYRO_SCALE,
-                        ACCEL_SCALE, imufilt);
+                _imuFilter.step(micros()/1000, imuraw, GYRO_SCALE,
+                        ACCEL_SCALE);
 
                 const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
                 (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
-                _ekf.enqueueImu(&imufilt.gyroDps, &imufilt.accelGs);
+                _ekf.enqueueImu(&_imuFilter.output.gyroDps, &_imuFilter.output.accelGs);
 
                 static Timer _timer;
 
@@ -105,11 +102,11 @@ namespace hf {
                         state.z,
                         state.dz,
                         state.phi,
-                        imufilt.gyroDps.x,
+                        _imuFilter.output.gyroDps.x,
                         state.theta,
-                        imufilt.gyroDps.y,
+                        _imuFilter.output.gyroDps.y,
                         state.psi,
-                        -imufilt.gyroDps.z); // negate for nose-right positive.y
+                        -_imuFilter.output.gyroDps.z); // negate for nose-right positive.y
             }
 
         private:
