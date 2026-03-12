@@ -189,7 +189,7 @@ void loop()
 
     const auto state = getVehicleState(isFlying, gyroDps);
 
-    const auto setpoint = hf::mksetpoint(rx_chanvals);
+    const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
     hf::Debugger::debug(setpoint);
 

@@ -16,17 +16,6 @@
 
 #include <CRSFforArduino.hpp>
 
-static float rx_chanvals[5];
-
-static CRSFforArduino _crsf;
-
-static auto scalechan(const int k) -> float
-{
-    return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
-}
-
-static uint32_t _last_rx_msec;
-
 namespace hf {
 
     class RX {
@@ -37,23 +26,35 @@ namespace hf {
 
             static constexpr float THROTTLE_DOWN_MAX = -0.95;
 
+            uint32_t _last_rx_msec;
+
+            CRSFforArduino _crsf;
+
+            void scalechan(const uint8_t j, const uint8_t k)
+            {
+                chanvals[j] = map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
+            }
+
             static void onReceiveRcChannels(
                     serialReceiverLayer::rcChannels_t *rcChannels, void * obj)
             {
                 if (!rcChannels->failsafe) {
 
-                    rx_chanvals[0] = scalechan(3);
-                    rx_chanvals[1] = scalechan(1);
-                    rx_chanvals[2] = scalechan(2);
-                    rx_chanvals[3] = scalechan(4);
-                    rx_chanvals[4] = scalechan(5);
+                    auto rx = (RX *)obj;
 
-                    _last_rx_msec = millis();
+                    rx->scalechan(0 ,3);
+                    rx->scalechan(1 ,1);
+                    rx->scalechan(2 ,2);
+                    rx->scalechan(3 ,4);
+                    rx->scalechan(4 ,5);
+
+                    rx->_last_rx_msec = millis();
                 }
             }
 
         public:
 
+            float chanvals[5];
             bool is_armed;
             bool is_throttle_down;
 
@@ -76,7 +77,7 @@ namespace hf {
             {
                 _crsf.update();
 
-                const auto throttle_is_down = rx_chanvals[0] < THROTTLE_DOWN_MAX;
+                const auto throttle_is_down = chanvals[0] < THROTTLE_DOWN_MAX;
 
                 const auto msec_curr = millis();
 
@@ -89,7 +90,7 @@ namespace hf {
 
                 // Push-button arming
                 static float _chan5_prev;
-                const auto chan5_curr = rx_chanvals[4];
+                const auto chan5_curr = chanvals[4];
                 if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
                     is_armed = is_armed ? false : throttle_is_down ? true : is_armed;
                 }
