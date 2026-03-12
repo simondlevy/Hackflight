@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2011-2022 Bitcraze AB, 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +71,141 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
  
+            auto getStateEstimate(
+                    const uint32_t msec_curr,
+                    const bool isFlying,
+                    const uint32_t prediction_freq=100) -> EstimatedState
+            {
+                static Timer _timer;
+
+                static bool _didResetEstimation;
+
+                if (_didResetEstimation) {
+                    reset(msec_curr);
+                    _didResetEstimation = false;
+                }
+
+                // Run the system dynamics to predict the state forward.
+                if (_timer.ready(prediction_freq)) {
+                    predict(msec_curr, isFlying); 
+                }
+
+                addProcessNoise(msec_curr);
+
+                // Update with queued measurements and flush the queue
+                for (uint32_t k=0; k<_queueLength; ++k) {
+                    update(_measurementsQueue[k], msec_curr);
+                }
+                _queueLength = 0;
+
+                const auto z = _x[STATE_Z];
+
+                if (_isUpdated) {
+                    finalize(msec_curr);
+                }
+
+                const auto dx =
+                    _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
+
+                // make right positive
+                const auto dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); 
+
+                const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
+
+                const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
+                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
+
+                const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
+
+                // make right positive
+                const auto psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
+                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
+
+                return EstimatedState(dx, dy, z, dz, phi, theta, psi);
+            }
+
+            void enqueueImu(const ImuFiltered & imu)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeGyroscope;
+                m.data.gyroscope.gyro = imu.gyroDps;
+                enqueue(&m);
+
+                m = {};
+                m.type = MeasurementTypeAcceleration;
+                m.data.acceleration.acc = imu.accelGs;
+                enqueue(&m);
+            }
+
+            void enqueueFlow(const OpticalFlow::measurement_t * flow)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeFlow;
+                m.data.flow = *flow;
+                enqueue(&m);
+            }
+
+            void enqueueRange(const ZRanger::measurement_t * tof)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeTOF;
+                m.data.tof = *tof;
+                enqueue(&m);
+            }
+
+        private:
+
+            // Indexes to access the vehicle's state, stored as a column vector
+            enum
+            {
+                STATE_X,
+                STATE_Y,
+                STATE_Z,
+                STATE_VX,
+                STATE_VY,
+                STATE_VZ,
+                STATE_D0,
+                STATE_D1,
+                STATE_D2,
+                STATE_DIM
+
+            };
+
+            typedef enum {
+                MeasurementTypeAcceleration,
+                MeasurementTypeGyroscope,
+                MeasurementTypeTOF,
+                MeasurementTypeFlow,
+            } MeasurementType;
+
+
+            typedef struct
+            {
+                Vec3 gyro; // deg/s, for legacy reasons
+            } gyroscopeMeasurement_t;
+
+            typedef struct
+            {
+                Vec3 acc; // Gs, for legacy reasons
+            } accelerationMeasurement_t;
+
+            typedef struct
+            {
+                MeasurementType type;
+                union
+                {
+                    gyroscopeMeasurement_t gyroscope;
+                    accelerationMeasurement_t acceleration;
+                    ZRanger::measurement_t tof;
+                    OpticalFlow::measurement_t flow;
+                } data;
+            } measurement_t;
+
+            static const size_t QUEUE_MAX_LENGTH = 20;
+            static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+            EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+            uint32_t _queueLength;
+
             void reset(const uint32_t msec_curr)
             {
                 axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
@@ -115,6 +250,7 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
                 _lastProcessNoiseUpdateMs = msec_curr;
             }
+
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
@@ -285,141 +421,6 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            auto getStateEstimate(
-                    const uint32_t msec_curr,
-                    const bool isFlying,
-                    const uint32_t prediction_freq=100) -> EstimatedState
-            {
-                static Timer _timer;
-
-                static bool _didResetEstimation;
-
-                if (_didResetEstimation) {
-                    reset(msec_curr);
-                    _didResetEstimation = false;
-                }
-
-                // Run the system dynamics to predict the state forward.
-                if (_timer.ready(prediction_freq)) {
-                    predict(msec_curr, isFlying); 
-                }
-
-                addProcessNoise(msec_curr);
-
-                // Update with queued measurements and flush the queue
-                for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_measurementsQueue[k], msec_curr);
-                }
-                _queueLength = 0;
-
-                const auto z = _x[STATE_Z];
-
-                if (_isUpdated) {
-                    finalize(msec_curr);
-                }
-
-                const auto dx =
-                    _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
-
-                // make right positive
-                const auto dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); 
-
-                const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
-
-                const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
-                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
-
-                const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
-
-                // make right positive
-                const auto psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
-                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
-
-                return EstimatedState(dx, dy, z, dz, phi, theta, psi);
-            }
-
-            void enqueueImu(const ImuFiltered & imu)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeGyroscope;
-                m.data.gyroscope.gyro = imu.gyroDps;
-                enqueue(&m);
-
-                m = {};
-                m.type = MeasurementTypeAcceleration;
-                m.data.acceleration.acc = imu.accelGs;
-                enqueue(&m);
-            }
-
-            void enqueueFlow(const OpticalFlow::measurement_t * flow)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeFlow;
-                m.data.flow = *flow;
-                enqueue(&m);
-            }
-
-            void enqueueRange(const ZRanger::measurement_t * tof)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeTOF;
-                m.data.tof = *tof;
-                enqueue(&m);
-            }
-
-        private:
-
-            // Indexes to access the vehicle's state, stored as a column vector
-            enum
-            {
-                STATE_X,
-                STATE_Y,
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
-
-            };
-
-            typedef enum {
-                MeasurementTypeAcceleration,
-                MeasurementTypeGyroscope,
-                MeasurementTypeTOF,
-                MeasurementTypeFlow,
-            } MeasurementType;
-
-
-            typedef struct
-            {
-                Vec3 gyro; // deg/s, for legacy reasons
-            } gyroscopeMeasurement_t;
-
-            typedef struct
-            {
-                Vec3 acc; // Gs, for legacy reasons
-            } accelerationMeasurement_t;
-
-            typedef struct
-            {
-                MeasurementType type;
-                union
-                {
-                    gyroscopeMeasurement_t gyroscope;
-                    accelerationMeasurement_t acceleration;
-                    ZRanger::measurement_t tof;
-                    OpticalFlow::measurement_t flow;
-                } data;
-            } measurement_t;
-
-
-            static const size_t QUEUE_MAX_LENGTH = 20;
-            static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
-            EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
-            uint32_t _queueLength;
 
             void enqueue(const EKF::measurement_t * measurement) 
             {

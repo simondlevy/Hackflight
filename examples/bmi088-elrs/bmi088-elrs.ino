@@ -52,42 +52,9 @@ static hf::Mixer _mixer;
 
 static hf::IMU _imu;
 
-////////////////////////////////////////////////////////////////////////
-
-static const uint32_t FREQ_EKF_PREDICTION = 100;
-
 static hf::ImuFilter _imuFilter;
 
 static hf::EKF _ekf;
-
-static auto getVehicleState(const hf::ImuRaw & imuraw, 
-        const bool isFlying) -> hf::VehicleState
-{
-    _imuFilter.step(millis(), imuraw);
-
-    const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
-    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
-
-    _ekf.enqueueImu(_imuFilter.output);
-
-    // Get state estimate from EKF
-    const auto state = _ekf.getStateEstimate(millis(), isFlying);
-
-    // Get angular velocities directly from gyro
-    return hf::VehicleState(
-            state.dx,
-            state.dy,
-            state.z,
-            state.dz,
-            state.phi,
-            _imuFilter.output.gyroDps.x,
-            state.theta,
-            _imuFilter.output.gyroDps.y,
-            state.psi,
-            -_imuFilter.output.gyroDps.z); // negate for nose-right positive.y
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void setup()
 {
@@ -112,12 +79,28 @@ void loop()
 
     const auto imuraw = _imu.read();
 
-    const auto state = getVehicleState(imuraw, isFlying);
+    _imuFilter.step(millis(), imuraw);
+
+    const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
+    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
+
+    _ekf.enqueueImu(_imuFilter.output);
+
+    // Get state estimate from EKF
+    const auto ekfstate = _ekf.getStateEstimate(millis(), isFlying);
+
+    // Get angular velocities directly from gyro, negating gyro Z for
+    // nose-right positve
+    const auto state =
+        hf::VehicleState(ekfstate.dx, ekfstate.dy, ekfstate.z, ekfstate.dz,
+                ekfstate.phi, _imuFilter.output.gyroDps.x,
+                ekfstate.theta, _imuFilter.output.gyroDps.y,
+                ekfstate.psi, -_imuFilter.output.gyroDps.z);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    hf::Debugger::debug(state);
-    //hf::Debugger::profile();
+    //hf::Debugger::debug(state);
+    hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
             !_rx.is_throttle_down, dt, state, setpoint);
