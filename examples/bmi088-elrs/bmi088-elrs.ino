@@ -48,11 +48,13 @@ static hf::StabilizerPid _stabilizerPid;
 
 static hf::Mixer _mixer;
 
+static hf::IMU _imu;
+
 void setup()
 {
     _rx.begin();
 
-    hf::imu_device_init();
+    _imu.device_init();
 
     _motors.arm(); 
 
@@ -69,7 +71,7 @@ void loop()
 
     const bool isFlying = true; // XXX
 
-    const auto state = hf::getVehicleState(isFlying);
+    const auto state = _imu.getVehicleState(isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
