@@ -74,7 +74,7 @@ namespace hf {
                 const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
                 (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
-                _ekf.enqueueImu(&_imuFilter.output.gyroDps, &_imuFilter.output.accelGs);
+                _ekf.enqueueImu(_imuFilter.output);
 
                 static Timer _timer;
 

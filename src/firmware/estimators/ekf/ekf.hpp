@@ -320,16 +320,16 @@ namespace hf {
                 return EstimatedState(dx, dy, z, dz, phi, theta, psi);
             }
 
-            void enqueueImu(const Vec3 * gyro, const Vec3 * accel)
+            void enqueueImu(const ImuFiltered & imu)
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeGyroscope;
-                m.data.gyroscope.gyro = *gyro;
+                m.data.gyroscope.gyro = imu.gyroDps;
                 enqueue(&m);
 
                 m = {};
                 m.type = MeasurementTypeAcceleration;
-                m.data.acceleration.acc = *accel;
+                m.data.acceleration.acc = imu.accelGs;
                 enqueue(&m);
             }
 
