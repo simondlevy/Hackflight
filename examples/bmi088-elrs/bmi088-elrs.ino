@@ -63,10 +63,9 @@ static hf::ImuFilter _imuFilter;
 
 static hf::EKF _ekf;
 
-static auto getVehicleState(const bool isFlying) -> hf::VehicleState
+static auto getVehicleState(const hf::ImuRaw & imuraw, 
+        const bool isFlying) -> hf::VehicleState
 {
-    const auto imuraw = _imu.read();
-
     _imuFilter.step(millis(), imuraw, GYRO_SCALE, ACCEL_SCALE);
 
     const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
@@ -107,7 +106,6 @@ static auto getVehicleState(const bool isFlying) -> hf::VehicleState
             -_imuFilter.output.gyroDps.z); // negate for nose-right positive.y
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void setup()
@@ -131,7 +129,9 @@ void loop()
 
     const bool isFlying = true; // XXX
 
-    const auto state = getVehicleState(isFlying);
+    const auto imuraw = _imu.read();
+
+    const auto state = getVehicleState(imuraw, isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
