@@ -14,8 +14,7 @@
 
 #pragma once
 
-#include <datatypes.hpp>
-#include <firmware/imu/new/axis3_i16.h>
+#include <firmware/datatypes.hpp>
 #include <firmware/imu/new/six_axis_stats.hpp>
 
 namespace hf {
