@@ -70,24 +70,8 @@ static auto getVehicleState(const hf::ImuRaw & imuraw,
 
     _ekf.enqueueImu(_imuFilter.output);
 
-    static hf::Timer _timer;
-
-    static bool _didResetEstimation;
-
-    const uint32_t msec_curr = millis();
-
-    if (_didResetEstimation) {
-        _ekf.reset(msec_curr);
-        _didResetEstimation = false;
-    }
-
-    // Run the system dynamics to predict the state forward.
-    if (_timer.ready(FREQ_EKF_PREDICTION)) {
-        _ekf.predict(msec_curr, isFlying); 
-    }
-
     // Get state estimate from EKF
-    const auto state = _ekf.getStateEstimate(msec_curr);
+    const auto state = _ekf.getStateEstimate(millis(), isFlying);
 
     // Get angular velocities directly from gyro
     return hf::VehicleState(
@@ -132,7 +116,7 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    //hf::Debugger::debug(state);
+    hf::Debugger::debug(state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,

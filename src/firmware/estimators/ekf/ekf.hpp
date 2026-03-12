@@ -19,6 +19,7 @@
 #include <firmware/estimators/ekf/matrix_typedef.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/opticalflow.hpp>
+#include <firmware/timer.hpp>
 #include <firmware/zranger.hpp>
 #include <num.hpp>
 
@@ -284,8 +285,25 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            auto getStateEstimate(const uint32_t msec_curr) -> EstimatedState
+            auto getStateEstimate(
+                    const uint32_t msec_curr,
+                    const bool isFlying,
+                    const uint32_t prediction_freq=100) -> EstimatedState
             {
+                static Timer _timer;
+
+                static bool _didResetEstimation;
+
+                if (_didResetEstimation) {
+                    reset(msec_curr);
+                    _didResetEstimation = false;
+                }
+
+                // Run the system dynamics to predict the state forward.
+                if (_timer.ready(prediction_freq)) {
+                    predict(msec_curr, isFlying); 
+                }
+
                 addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
