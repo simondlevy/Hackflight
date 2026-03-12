@@ -53,11 +53,13 @@ static hf::StabilizerPid _stabilizerPid;
 
 static hf::Mixer _mixer;
 
+static hf::RX _rx;
+
 static const uint32_t LOOP_FREQ_HZ = 2000;
 
 void setup()
 {
-    rx_init();
+    _rx.begin();
 
     Serial1.begin(115000);
 
@@ -74,9 +76,9 @@ void loop()
 
     _led.blink(); 
 
-    rx_read();
+    _rx.read();
 
-    const auto setpoint = hf::mksetpoint(rx_chanvals);
+    const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
     const auto imuraw = _imu.read();
 
@@ -86,15 +88,15 @@ void loop()
 
     _madgwick = hf::MadgwickFilter::run(_madgwick, dt, imufilt);
 
-    //hf::Debugger::debug(_madgwick.state);
+    //hf::Debugger::debug(setpoint);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run(_stabilizerPid,
-            !rx_is_throttle_down, dt, _madgwick.state, setpoint);
+            !_rx.is_throttle_down, dt, _madgwick.state, setpoint);
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(rx_is_armed, _mixer.motorvals);
+    _motors.run(_rx.is_armed, _mixer.motorvals);
 
     hf::Timer::runDelayLoop(loop_start_usec, LOOP_FREQ_HZ); 
 }

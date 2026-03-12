@@ -1,6 +1,4 @@
 /*
-   Based on  https://github.com/nickrehm/dRehmFlight
-
    Copyright (C) 2026 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -18,10 +16,6 @@
 
 #include <dsmrx.hpp>  
 
-static const float ARMING_SWITCH_MIN = 0;
-
-static const float THROTTLE_DOWN_MAX = -0.95;
-
 static Dsm2048 _dsm2048;
 
 void serialEvent1(void)
@@ -31,34 +25,45 @@ void serialEvent1(void)
     }
 }
 
-// "public"
-static float rx_chanvals[6];
-static bool rx_is_armed;
-static bool rx_is_throttle_down;
+namespace hf {
 
-//////////////////////////////////////////////////////////////////////////////
+    class RX {
 
-static void rx_init()
-{
-    Serial1.begin(115000);
-}
+        private:
 
-static void rx_read()
-{
-    const auto usec_curr = micros();
+            static constexpr float ARMING_SWITCH_MIN = 0;
 
-    if (_dsm2048.timedOut(usec_curr)) {
-        return;
-    }
+            static constexpr float THROTTLE_DOWN_MAX = -0.95;
 
-    if (_dsm2048.gotNewFrame()) {
-        _dsm2048.getChannelValues(rx_chanvals, 6);
-    }
+        public:
 
-    rx_is_throttle_down = rx_chanvals[0] < THROTTLE_DOWN_MAX;
+            float chanvals[6];
+            bool is_armed;
+            bool is_throttle_down;
 
-    rx_is_armed = 
-        rx_chanvals[4] < ARMING_SWITCH_MIN  ? false :
-        rx_is_throttle_down ? true :
-        rx_is_armed;
+            void begin()
+            {
+                Serial1.begin(115000);
+            }
+
+            void read()
+            {
+                const auto usec_curr = micros();
+
+                if (_dsm2048.timedOut(usec_curr)) {
+                    return;
+                }
+
+                if (_dsm2048.gotNewFrame()) {
+                    _dsm2048.getChannelValues(chanvals, 6);
+                }
+
+                is_throttle_down = chanvals[0] < THROTTLE_DOWN_MAX;
+
+                is_armed = 
+                    chanvals[4] < ARMING_SWITCH_MIN  ? false :
+                    is_throttle_down ? true :
+                    is_armed;
+            }
+    };
 }

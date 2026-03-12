@@ -29,6 +29,33 @@ namespace hf {
 
         public:
 
+            static void debug(const float * chanvals, const bool is_armed)
+            {
+                static Timer _timer;
+
+                if (_timer.ready(FREQ)) {
+
+                    static uint32_t _count;
+
+                    printf("%5lu | armed=%d | throt=%+3.3f roll=%+3.3f "
+                            "pitch=%3.3f yaw=%+3.3f\n",
+                            _count++, is_armed, chanvals[0], chanvals[1],
+                            chanvals[2], chanvals[3]); }
+            }
+
+             static void debug(const Setpoint & setpoint)
+            {
+                static Timer _timer;
+
+                if (_timer.ready(FREQ)) {
+
+                    static uint32_t _count;
+
+                    printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%3.3f yaw=%+3.3f\n",
+                            _count++, setpoint.thrust, setpoint.roll,
+                            setpoint.pitch, setpoint.yaw); }
+            }
+
             static void debug(const VehicleState & state)
             {
                 static Timer _timer;
