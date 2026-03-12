@@ -26,14 +26,13 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.hpp>
+#include <firmware/bmi088.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/estimators/ekf/ekf.hpp>
-#include <firmware/imu/new/filter.hpp>
-#include <firmware/imu/bmi088.hpp>
-#include <firmware/imu/new/filter.hpp>
+#include <firmware/ekf/ekf.hpp>
+#include <firmware/imufilter/filter.hpp>
 #include <firmware/led.hpp>
-#include <firmware/rx/elrs.hpp>
+#include <firmware/elrs.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
