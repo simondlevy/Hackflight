@@ -68,8 +68,7 @@ namespace hf {
             {
                 const auto imuraw = read();
 
-                _imuFilter.step(micros()/1000, imuraw, GYRO_SCALE,
-                        ACCEL_SCALE);
+                _imuFilter.step(millis(), imuraw, GYRO_SCALE, ACCEL_SCALE);
 
                 const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
                 (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated

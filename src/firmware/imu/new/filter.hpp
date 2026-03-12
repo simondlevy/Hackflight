@@ -49,7 +49,7 @@ namespace hf {
              * accel.z: positive rightside-up
              */
             void step(
-                    const uint32_t tickCount,
+                    const uint32_t msec_curr,
                     const ImuRaw & imuraw,
                     const int16_t gscale,
                     const int16_t ascale)
@@ -67,7 +67,7 @@ namespace hf {
                 _gyroBiasCalculator = GyroBiasCalculator::process(
                         _gyroBiasCalculator,
                         _gyroSamplesBuffer,
-                        tickCount);
+                        msec_curr);
                 _gyroBias = _gyroBiasCalculator.biasOut;
 
                 // Subtract gyro bias

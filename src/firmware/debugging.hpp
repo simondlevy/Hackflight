@@ -64,7 +64,7 @@ namespace hf {
 
                     static uint32_t _count;
 
-                    printf("%5lu | dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f "
+                    printf("%5lu | dx=%+8.3f dy=%+8.3f z=%8.3f dz=%+8.3f "
                             "phi=%+08.3f dphi=%+08.3f theta=%+08.3f dtheta=%+08.3f"
                             " psi=%+08.3f dpsi=%+08.3f\n",
                             _count++, state.dx, state.dy, state.z, state.dz,
