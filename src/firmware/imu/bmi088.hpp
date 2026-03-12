@@ -87,9 +87,10 @@ namespace hf {
         az = accel.getAccelZ_raw();
     }
 
-    static auto getVehicleState(const uint32_t usec_curr, 
-            const bool isFlying) -> VehicleState
+    static auto getVehicleState(const bool isFlying) -> VehicleState
         {
+            const auto usec_curr = micros();
+
             axis3_i16_t gyroRaw = {};
             axis3_i16_t accelRaw = {};
             imu_device_read(

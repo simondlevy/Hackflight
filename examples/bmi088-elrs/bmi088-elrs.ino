@@ -57,8 +57,6 @@ void setup()
 
 void loop()
 {
-    const auto usec_curr = micros();      
-
     const auto dt = hf::Timer::getDt();
 
     _led.blink(); 
@@ -67,7 +65,7 @@ void loop()
 
     const bool isFlying = true; // XXX
 
-    const auto state = hf::getVehicleState(usec_curr, isFlying);
+    const auto state = hf::getVehicleState(isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
