@@ -38,6 +38,7 @@
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
+#include <firmware/profiling.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 static hf::RX _rx;
@@ -82,7 +83,9 @@ void loop()
     _imuFilter.step(millis(), imuraw);
 
     const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
-    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
+    (void)imuIsCalibrated; // XXX
+
+    //hf::Debugger::report("calibrated", imuIsCalibrated);
 
     _ekf.enqueueImu(_imuFilter.output);
 
@@ -99,8 +102,8 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    //hf::Debugger::debug(state);
-    hf::Debugger::profile();
+    hf::Debugger::report(state);
+    //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
             !_rx.is_throttle_down, dt, state, setpoint);
