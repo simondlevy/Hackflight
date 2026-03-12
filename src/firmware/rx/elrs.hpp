@@ -35,9 +35,11 @@ namespace hf {
         private:
 
             static constexpr uint32_t ELRS_TIMEOUT_MSEC = 500;
+
             static constexpr float THROTTLE_DOWN_MAX = -0.95;
 
-            static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
+            static void onReceiveRcChannels(
+                    serialReceiverLayer::rcChannels_t *rcChannels, void * obj)
             {
                 if (!rcChannels->failsafe) {
 
@@ -68,7 +70,7 @@ namespace hf {
                     }
                 }
 
-                _crsf.setRcChannelsCallback(onReceiveRcChannels);
+                _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
             }
 
             void read()
