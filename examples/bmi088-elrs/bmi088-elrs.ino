@@ -32,6 +32,7 @@
 #include <firmware/imu/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
+#include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
@@ -186,13 +187,9 @@ void loop()
 
     const auto state = getVehicleState(isFlying, gyroDps);
 
-    hf::Setpoint setpoint = {
-        (rx_chanvals[0]+1)/2,
-        rx_chanvals[1] * hf::PositionController::MAX_DEMAND_DEG, 
-        rx_chanvals[2] * hf::PositionController::MAX_DEMAND_DEG, 
-        rx_chanvals[3]};
+    const auto setpoint = hf::mksetpoint(rx_chanvals);
 
-    hf::Debugger::debug(state);
+    hf::Debugger::debug(setpoint);
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
