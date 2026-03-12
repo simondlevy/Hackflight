@@ -65,21 +65,6 @@ namespace hf {
  
     };
 
-    class SixAxis {
-
-        public:
-
-            Vec3 gyro;
-            Vec3 accel;
-
-            SixAxis() = default;
-
-            SixAxis(const Vec3 & gyro, const Vec3 & accel)
-                : gyro(gyro), accel(accel) {}
-
-            SixAxis& operator=(const SixAxis& other) = default;
-      };
-
     class ImuRaw {
 
         public:
@@ -106,7 +91,6 @@ namespace hf {
         public:
 
             Vec3 gyroDps;
-
             Vec3 accelGs;
 
             ImuFiltered() = default;
