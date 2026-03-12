@@ -50,8 +50,7 @@ namespace hf {
                     const axis3_i16_t accelRaw,
                     const int16_t gscale,
                     const int16_t ascale,
-                    Vec3 & gyroDps,
-                    Vec3 & accelGs)
+                    ImuFiltered & imufilt)
             {
 
                 // Convert accel to Gs
@@ -92,13 +91,13 @@ namespace hf {
 
                 const auto accelFiltered = _accelLpf.output;
 
-                gyroDps.x = gyroFiltered.x;
-                gyroDps.y = gyroFiltered.y;
-                gyroDps.z = gyroFiltered.z;
+                imufilt.gyroDps.x = gyroFiltered.x;
+                imufilt.gyroDps.y = gyroFiltered.y;
+                imufilt.gyroDps.z = gyroFiltered.z;
 
-                accelGs.x = accelFiltered.x;
-                accelGs.y = accelFiltered.y;
-                accelGs.z = accelFiltered.z;
+                imufilt.accelGs.x = accelFiltered.x;
+                imufilt.accelGs.y = accelFiltered.y;
+                imufilt.accelGs.z = accelFiltered.z;
 
                 return _gyroBiasCalculator.wasValueFound;
             }

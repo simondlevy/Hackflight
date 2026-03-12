@@ -74,14 +74,13 @@ namespace hf {
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
-                Vec3 gyroDps = {}; // XXX should use returned value
-                Vec3 accelGs = {}; // XXX should use returned value
+                ImuFiltered imufilt = {};
                 const bool imuIsCalibrated =
                     _imuFilter.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE,
-                            ACCEL_SCALE, gyroDps, accelGs);
+                            ACCEL_SCALE, imufilt);
                 (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
-                _ekf.enqueueImu(&gyroDps, &accelGs);
+                _ekf.enqueueImu(&imufilt.gyroDps, &imufilt.accelGs);
 
                 static Timer _timer;
 
@@ -109,11 +108,11 @@ namespace hf {
                         state.z,
                         state.dz,
                         state.phi,
-                        gyroDps.x,
+                        imufilt.gyroDps.x,
                         state.theta,
-                        gyroDps.y,
+                        imufilt.gyroDps.y,
                         state.psi,
-                        -gyroDps.z); // negate for nose-right positive.y
+                        -imufilt.gyroDps.z); // negate for nose-right positive.y
             }
 
         private:
