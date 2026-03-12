@@ -51,15 +51,15 @@ namespace hf {
             void step(
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
-                    const int16_t gscale,
-                    const int16_t ascale)
+                    const int16_t gyro_dps=2000,
+                    const int16_t accel_gs=24)
             {
 
                 // Convert accel to Gs
                 const Vec3 accel = {
-                    scale(imuraw.accel.x, ascale),
-                    scale(imuraw.accel.y, ascale),
-                    scale(imuraw.accel.z, ascale)
+                    scale(imuraw.accel.x, accel_gs),
+                    scale(imuraw.accel.y, accel_gs),
+                    scale(imuraw.accel.z, accel_gs)
                 };
 
                 // Calibrate gyro with raw values if necessary
@@ -72,9 +72,9 @@ namespace hf {
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
-                    scale(imuraw.gyro.x - _gyroBias.x, gscale),
-                    scale(imuraw.gyro.y - _gyroBias.y, gscale),
-                    scale(imuraw.gyro.z - _gyroBias.z, gscale)
+                    scale(imuraw.gyro.x - _gyroBias.x, gyro_dps),
+                    scale(imuraw.gyro.y - _gyroBias.y, gyro_dps),
+                    scale(imuraw.gyro.z - _gyroBias.z, gyro_dps)
                 };
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);

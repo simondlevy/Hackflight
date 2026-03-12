@@ -54,9 +54,6 @@ static hf::IMU _imu;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int16_t GYRO_SCALE = 2000;
-static const int16_t ACCEL_SCALE = 24;
-
 static const uint32_t FREQ_EKF_PREDICTION = 100;
 
 static hf::ImuFilter _imuFilter;
@@ -66,7 +63,7 @@ static hf::EKF _ekf;
 static auto getVehicleState(const hf::ImuRaw & imuraw, 
         const bool isFlying) -> hf::VehicleState
 {
-    _imuFilter.step(millis(), imuraw, GYRO_SCALE, ACCEL_SCALE);
+    _imuFilter.step(millis(), imuraw);
 
     const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
@@ -135,7 +132,7 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    hf::Debugger::debug(state);
+    //hf::Debugger::debug(state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,

@@ -32,7 +32,9 @@ namespace hf {
 
         public:
 
-            bool begin()
+            bool begin(
+                    const Bmi088Gyro::Range grange=Bmi088Gyro::RANGE_2000DPS,
+                    const Bmi088Accel::Range arange=Bmi088Accel::RANGE_24G)
             {
                 return 
 
@@ -42,7 +44,7 @@ namespace hf {
 
                     okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-                    okay(gyro.setRange(Bmi088Gyro::RANGE_2000DPS)) &&
+                    okay(gyro.setRange(grange)) &&
 
                     okay(gyro.pinModeInt3(
                                 Bmi088Gyro::PIN_MODE_PUSH_PULL,
@@ -52,7 +54,7 @@ namespace hf {
 
                     okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
 
-                    okay(accel.setRange(Bmi088Accel::RANGE_24G));
+                    okay(accel.setRange(arange));
             }
 
             auto read() -> ImuRaw
