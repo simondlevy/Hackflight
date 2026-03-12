@@ -48,7 +48,7 @@ void setup()
 {
     _rx.begin();
 
-    imu_device_init();
+    hf::imu_device_init();
 
     _motors.arm(); 
 
@@ -67,22 +67,22 @@ void loop()
 
     hf::axis3_i16_t gyroRaw = {};
     hf::axis3_i16_t accelRaw = {};
-    imu_device_read(
+    hf::imu_device_read(
             gyroRaw.x, gyroRaw.y, gyroRaw.z,
             accelRaw.x, accelRaw.y, accelRaw.z);
 
     hf::Vec3 gyroDps = {}; // XXX should use returned value
     hf::Vec3 accelGs = {}; // XXX should use returned value
     const bool imuIsCalibrated =
-        _imuFilter.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE, ACCEL_SCALE,
-                gyroDps, accelGs);
+        hf::_imuFilter.step( usec_curr/1000, gyroRaw, accelRaw, hf::GYRO_SCALE,
+                hf::ACCEL_SCALE, gyroDps, accelGs);
     (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
-    _ekf.enqueueImu(&gyroDps, &accelGs);
+    hf::_ekf.enqueueImu(&gyroDps, &accelGs);
 
     const bool isFlying = true; // XXX
 
-    const auto state = getVehicleState(isFlying, gyroDps);
+    const auto state = hf::getVehicleState(isFlying, gyroDps);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
