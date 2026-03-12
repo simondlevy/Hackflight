@@ -41,18 +41,6 @@ namespace hf {
 
         public:
 
-            ImuFilter _imuFilter;
-
-            Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
-            Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
-
-            EKF _ekf;
-
-            static bool okay(const int status)
-            {
-                return status >= 0;
-            }
-
             bool begin()
             {
                 return 
@@ -76,30 +64,13 @@ namespace hf {
                     okay(accel.setRange(Bmi088Accel::RANGE_24G));
             }
 
-            void imu_device_read(
-                    int16_t & gx, int16_t & gy, int16_t & gz,
-                    int16_t & ax, int16_t & ay, int16_t & az)
-            {
-                gyro.readSensor();
-
-                gx = gyro.getGyroX_raw();
-                gy = gyro.getGyroY_raw();
-                gz = gyro.getGyroZ_raw();
-
-                accel.readSensor();
-
-                ax = accel.getAccelX_raw();
-                ay = accel.getAccelY_raw();
-                az = accel.getAccelZ_raw();
-            }
-
             auto getVehicleState(const bool isFlying) -> VehicleState
             {
                 const auto usec_curr = micros();
 
                 axis3_i16_t gyroRaw = {};
                 axis3_i16_t accelRaw = {};
-                imu_device_read(
+                read(
                         gyroRaw.x, gyroRaw.y, gyroRaw.z,
                         accelRaw.x, accelRaw.y, accelRaw.z);
 
@@ -144,5 +115,37 @@ namespace hf {
                         state.psi,
                         -gyroDps.z); // negate for nose-right positive.y
             }
+
+        private:
+
+            ImuFilter _imuFilter;
+
+            Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
+            Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
+
+            EKF _ekf;
+
+            void read(
+                    int16_t & gx, int16_t & gy, int16_t & gz,
+                    int16_t & ax, int16_t & ay, int16_t & az)
+            {
+                gyro.readSensor();
+
+                gx = gyro.getGyroX_raw();
+                gy = gyro.getGyroY_raw();
+                gz = gyro.getGyroZ_raw();
+
+                accel.readSensor();
+
+                ax = accel.getAccelX_raw();
+                ay = accel.getAccelY_raw();
+                az = accel.getAccelZ_raw();
+            }
+
+           static bool okay(const int status)
+            {
+                return status >= 0;
+            }
+
     };
 }
