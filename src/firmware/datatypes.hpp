@@ -22,14 +22,6 @@
 
 namespace hf {
 
-    typedef struct {
-
-        int16_t x;
-        int16_t y;
-        int16_t z;
-
-    } axis3_i16_t;
-
     class ThreeAxisStats {
 
         public:
@@ -82,6 +74,37 @@ namespace hf {
             EstimatedState& operator=(const EstimatedState& other) = default;
  
     };
+
+    class Vec3Raw {
+
+        public:
+
+            int16_t x;
+            int16_t y;
+            int16_t z;
+
+            Vec3Raw() = default;
+
+            Vec3Raw(const int16_t x, const int16_t y, const int16_t z) 
+                : x(x), y(y), z(z) {}
+
+            Vec3Raw& operator=(const Vec3Raw& other) = default;
+      };
+
+    class NewImuRaw {
+
+        public:
+
+            Vec3Raw gyro;
+            Vec3Raw accel;
+
+            NewImuRaw() = default;
+
+            NewImuRaw(const Vec3Raw & gyro, const Vec3Raw & accel)
+                : gyro(gyro), accel(accel) {}
+
+            NewImuRaw& operator=(const NewImuRaw& other) = default;
+     };
 
     class ImuRaw {
 

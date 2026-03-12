@@ -46,8 +46,7 @@ namespace hf {
              */
             bool step(
                     const uint32_t tickCount,
-                    const axis3_i16_t gyroRaw, 
-                    const axis3_i16_t accelRaw,
+                    const NewImuRaw & imuraw,
                     const int16_t gscale,
                     const int16_t ascale,
                     ImuFiltered & imufilt)
@@ -55,13 +54,13 @@ namespace hf {
 
                 // Convert accel to Gs
                 const Vec3 accel = {
-                    scale(accelRaw.x, ascale),
-                    scale(accelRaw.y, ascale),
-                    scale(accelRaw.z, ascale)
+                    scale(imuraw.accel.x, ascale),
+                    scale(imuraw.accel.y, ascale),
+                    scale(imuraw.accel.z, ascale)
                 };
 
                 // Calibrate gyro with raw values if necessary
-                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroRaw;
+                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = imuraw.gyro;
                 _gyroBiasCalculator = GyroBiasCalculator::process(
                         _gyroBiasCalculator,
                         _gyroSamplesBuffer,
@@ -70,9 +69,9 @@ namespace hf {
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
-                    scale(gyroRaw.x - _gyroBias.x, gscale),
-                    scale(gyroRaw.y - _gyroBias.y, gscale),
-                    scale(gyroRaw.z - _gyroBias.z, gscale)
+                    scale(imuraw.gyro.x - _gyroBias.x, gscale),
+                    scale(imuraw.gyro.y - _gyroBias.y, gscale),
+                    scale(imuraw.gyro.z - _gyroBias.z, gscale)
                 };
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
@@ -116,7 +115,7 @@ namespace hf {
 
             // ---------------------------------------------------------------
 
-            axis3_i16_t _gyroSamplesBuffer[GyroBiasCalculator::NBR_OF_SAMPLES];
+            Vec3Raw _gyroSamplesBuffer[GyroBiasCalculator::NBR_OF_SAMPLES];
 
             GyroBiasCalculator _gyroBiasCalculator;
 

@@ -63,7 +63,7 @@ namespace hf {
 
             static auto process(
                     const GyroBiasCalculator & calc,
-                    const axis3_i16_t * buffer,
+                    const Vec3Raw * buffer,
                     const uint32_t ticks) -> GyroBiasCalculator
             {
                 const auto bufferIndex = calc.bufferIndex + 1;
@@ -105,7 +105,7 @@ namespace hf {
             bool _isBufferFilled;
             int32_t _varianceSampleTime;
 
-            static auto calculateStats(const axis3_i16_t * buffer)
+            static auto calculateStats(const Vec3Raw * buffer)
                 -> ThreeAxisStats
                 {
                     int64_t xsum=0, ysum=0, zsum=0;

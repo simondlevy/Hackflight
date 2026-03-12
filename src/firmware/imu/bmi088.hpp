@@ -68,15 +68,11 @@ namespace hf {
             {
                 const auto usec_curr = micros();
 
-                axis3_i16_t gyroRaw = {};
-                axis3_i16_t accelRaw = {};
-                read(
-                        gyroRaw.x, gyroRaw.y, gyroRaw.z,
-                        accelRaw.x, accelRaw.y, accelRaw.z);
+                const auto imuraw = read();
 
                 ImuFiltered imufilt = {};
                 const bool imuIsCalibrated =
-                    _imuFilter.step( usec_curr/1000, gyroRaw, accelRaw, GYRO_SCALE,
+                    _imuFilter.step( usec_curr/1000, imuraw, GYRO_SCALE,
                             ACCEL_SCALE, imufilt);
                 (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
@@ -124,24 +120,26 @@ namespace hf {
 
             EKF _ekf;
 
-            void read(
-                    int16_t & gx, int16_t & gy, int16_t & gz,
-                    int16_t & ax, int16_t & ay, int16_t & az)
+            auto read() -> NewImuRaw
             {
                 gyro.readSensor();
 
-                gx = gyro.getGyroX_raw();
-                gy = gyro.getGyroY_raw();
-                gz = gyro.getGyroZ_raw();
-
                 accel.readSensor();
 
-                ax = accel.getAccelX_raw();
-                ay = accel.getAccelY_raw();
-                az = accel.getAccelZ_raw();
+                return NewImuRaw(
+                        Vec3Raw(
+                            gyro.getGyroX_raw(),
+                            gyro.getGyroY_raw(),
+                            gyro.getGyroZ_raw()
+                            ),
+                        Vec3Raw(
+                            accel.getAccelX_raw(),
+                            accel.getAccelY_raw(),
+                            accel.getAccelZ_raw()
+                            ));
             }
 
-           static bool okay(const int status)
+            static bool okay(const int status)
             {
                 return status >= 0;
             }
