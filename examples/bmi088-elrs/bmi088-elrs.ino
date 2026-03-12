@@ -191,7 +191,7 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(rx_chanvals);
 
-    hf::Debugger::debug(state);
+    hf::Debugger::debug(setpoint);
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,

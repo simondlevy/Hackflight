@@ -28,22 +28,6 @@ static auto scalechan(serialReceiverLayer::rcChannels_t *rcChannels,
 
 static uint32_t _last_rx_msec;
 
-static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
-{
-    if (!rcChannels->failsafe) {
-
-        rx_chanvals[0] = scalechan(rcChannels, 3);
-        rx_chanvals[1] = scalechan(rcChannels, 1);
-        rx_chanvals[2] = scalechan(rcChannels, 2);
-        rx_chanvals[3] = scalechan(rcChannels, 4);
-        rx_chanvals[4] = scalechan(rcChannels, 5);
-
-        _last_rx_msec = millis();
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
 namespace hf {
 
     class RX {
@@ -52,6 +36,20 @@ namespace hf {
 
             static constexpr uint32_t ELRS_TIMEOUT_MSEC = 500;
             static constexpr float THROTTLE_DOWN_MAX = -0.95;
+
+            static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
+            {
+                if (!rcChannels->failsafe) {
+
+                    rx_chanvals[0] = scalechan(rcChannels, 3);
+                    rx_chanvals[1] = scalechan(rcChannels, 1);
+                    rx_chanvals[2] = scalechan(rcChannels, 2);
+                    rx_chanvals[3] = scalechan(rcChannels, 4);
+                    rx_chanvals[4] = scalechan(rcChannels, 5);
+
+                    _last_rx_msec = millis();
+                }
+            }
 
         public:
 
