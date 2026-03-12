@@ -20,8 +20,7 @@ static float rx_chanvals[5];
 
 static CRSFforArduino _crsf;
 
-static auto scalechan(serialReceiverLayer::rcChannels_t *rcChannels,
-        const int k) -> float
+static auto scalechan(const int k) -> float
 {
     return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
 }
@@ -43,11 +42,11 @@ namespace hf {
             {
                 if (!rcChannels->failsafe) {
 
-                    rx_chanvals[0] = scalechan(rcChannels, 3);
-                    rx_chanvals[1] = scalechan(rcChannels, 1);
-                    rx_chanvals[2] = scalechan(rcChannels, 2);
-                    rx_chanvals[3] = scalechan(rcChannels, 4);
-                    rx_chanvals[4] = scalechan(rcChannels, 5);
+                    rx_chanvals[0] = scalechan(3);
+                    rx_chanvals[1] = scalechan(1);
+                    rx_chanvals[2] = scalechan(2);
+                    rx_chanvals[3] = scalechan(4);
+                    rx_chanvals[4] = scalechan(5);
 
                     _last_rx_msec = millis();
                 }
@@ -70,7 +69,7 @@ namespace hf {
                     }
                 }
 
-                _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
+                _crsf.setRcChannelsCallback(onReceiveRcChannels, this);
             }
 
             void read()
