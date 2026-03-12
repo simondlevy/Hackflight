@@ -26,8 +26,10 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
+#include <firmware/imu/new/filter.hpp>
 #include <firmware/imu/bmi088.hpp>
 #include <firmware/imu/new/filter.hpp>
 #include <firmware/led.hpp>
@@ -50,6 +52,64 @@ static hf::Mixer _mixer;
 
 static hf::IMU _imu;
 
+////////////////////////////////////////////////////////////////////////
+
+static const int16_t GYRO_SCALE = 2000;
+static const int16_t ACCEL_SCALE = 24;
+
+static const uint32_t FREQ_EKF_PREDICTION = 100;
+
+static hf::ImuFilter _imuFilter;
+
+static hf::EKF _ekf;
+
+static auto getVehicleState(const bool isFlying) -> hf::VehicleState
+{
+    const auto imuraw = _imu.read();
+
+    _imuFilter.step(millis(), imuraw, GYRO_SCALE, ACCEL_SCALE);
+
+    const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
+    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
+
+    _ekf.enqueueImu(_imuFilter.output);
+
+    static hf::Timer _timer;
+
+    static bool _didResetEstimation;
+
+    const uint32_t msec_curr = millis();
+
+    if (_didResetEstimation) {
+        _ekf.reset(msec_curr);
+        _didResetEstimation = false;
+    }
+
+    // Run the system dynamics to predict the state forward.
+    if (_timer.ready(FREQ_EKF_PREDICTION)) {
+        _ekf.predict(msec_curr, isFlying); 
+    }
+
+    // Get state estimate from EKF
+    const auto state = _ekf.getStateEstimate(msec_curr);
+
+    // Get angular velocities directly from gyro
+    return hf::VehicleState(
+            state.dx,
+            state.dy,
+            state.z,
+            state.dz,
+            state.phi,
+            _imuFilter.output.gyroDps.x,
+            state.theta,
+            _imuFilter.output.gyroDps.y,
+            state.psi,
+            -_imuFilter.output.gyroDps.z); // negate for nose-right positive.y
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 void setup()
 {
     _rx.begin();
@@ -71,11 +131,11 @@ void loop()
 
     const bool isFlying = true; // XXX
 
-    const auto state = _imu.getVehicleState(isFlying);
+    const auto state = getVehicleState(isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    // hf::Debugger::debug(state);
+    hf::Debugger::debug(state);
     //hf::Debugger::profile();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,

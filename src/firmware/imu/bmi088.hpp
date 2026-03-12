@@ -25,19 +25,10 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
-#include <firmware/estimators/ekf/ekf.hpp>
-#include <firmware/imu/new/filter.hpp>
 
 namespace hf {
 
     class IMU {
-
-        private:
-
-            static const int16_t GYRO_SCALE = 2000;
-            static const int16_t ACCEL_SCALE = 24;
-
-            static const uint32_t FREQ_EKF_PREDICTION = 100;
 
         public:
 
@@ -64,59 +55,6 @@ namespace hf {
                     okay(accel.setRange(Bmi088Accel::RANGE_24G));
             }
 
-            auto getVehicleState(const bool isFlying) -> VehicleState
-            {
-                const auto imuraw = read();
-
-                _imuFilter.step(millis(), imuraw, GYRO_SCALE, ACCEL_SCALE);
-
-                const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
-                (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
-
-                _ekf.enqueueImu(_imuFilter.output);
-
-                static Timer _timer;
-
-                static bool _didResetEstimation;
-
-                const uint32_t msec_curr = millis();
-
-                if (_didResetEstimation) {
-                    _ekf.reset(msec_curr);
-                    _didResetEstimation = false;
-                }
-
-                // Run the system dynamics to predict the state forward.
-                if (_timer.ready(FREQ_EKF_PREDICTION)) {
-                    _ekf.predict(msec_curr, isFlying); 
-                }
-
-                // Get state estimate from EKF
-                const EstimatedState state = _ekf.getStateEstimate(msec_curr);
-
-                // Get angular velocities directly from gyro
-                return VehicleState(
-                        state.dx,
-                        state.dy,
-                        state.z,
-                        state.dz,
-                        state.phi,
-                        _imuFilter.output.gyroDps.x,
-                        state.theta,
-                        _imuFilter.output.gyroDps.y,
-                        state.psi,
-                        -_imuFilter.output.gyroDps.z); // negate for nose-right positive.y
-            }
-
-        private:
-
-            ImuFilter _imuFilter;
-
-            Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
-            Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
-
-            EKF _ekf;
-
             auto read() -> ImuRaw
             {
                 gyro.readSensor();
@@ -135,6 +73,11 @@ namespace hf {
                             accel.getAccelZ_raw()
                             ));
             }
+
+        private:
+
+            Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
+            Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
 
             static bool okay(const int status)
             {
