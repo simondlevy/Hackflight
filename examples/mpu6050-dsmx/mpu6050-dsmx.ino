@@ -31,7 +31,7 @@
 #include <firmware/debugging.hpp>
 #include <firmware/estimators/madgwick/madgwick.hpp>
 #include <firmware/imu/mpu6050.hpp>
-#include <firmware/imu/oldfilter.hpp>
+#include <firmware/imu/old/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/dsmx.hpp>
 #include <firmware/setpoint.hpp>
