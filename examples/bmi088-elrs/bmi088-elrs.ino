@@ -44,6 +44,10 @@ static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static hf::LED _led = hf::LED(13);
 
+static hf::StabilizerPid _stabilizerPid;
+
+static hf::Mixer _mixer;
+
 void setup()
 {
     _rx.begin();
@@ -71,11 +75,9 @@ void loop()
 
     hf::Debugger::debug(state);
 
-    static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
             !_rx.is_throttle_down, dt, state, setpoint);
 
-    static hf::Mixer _mixer;
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(_rx.is_armed, _mixer.motorvals);
