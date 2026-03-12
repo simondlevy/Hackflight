@@ -71,16 +71,18 @@ namespace hf {
 
         public:
 
-            auto run(const ImuRaw &rawvals) -> ImuFiltered
+            auto run(const ImuRaw &imuraw) -> ImuFiltered
             {
+                const auto gyro = imuraw.gyro;
                 const auto gyroDps = _gyroFilter.run(
-                        hf::Vec3(rawvals.gx, rawvals.gy, rawvals.gz),
+                        hf::Vec3(gyro.x, gyro.y, gyro.z),
                         hf::Vec3(GYRO_ERROR_X, GYRO_ERROR_Y, GYRO_ERROR_Z),
                         GYRO_SCALE_FACTOR,  B_GYRO);
 
 
+                const auto accel = imuraw.accel;
                 const auto accelGs = _accelFilter.run(
-                        hf::Vec3(rawvals.ax, rawvals.ay, rawvals.az),
+                        hf::Vec3(accel.x, accel.y, accel.z),
                         hf::Vec3(ACCEL_ERROR_X, ACCEL_ERROR_Y, ACCEL_ERROR_Z),
                         ACCEL_SCALE_FACTOR,  B_ACCEL);
 

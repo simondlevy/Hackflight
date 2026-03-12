@@ -91,38 +91,17 @@ namespace hf {
             Vec3Raw& operator=(const Vec3Raw& other) = default;
       };
 
-    class NewImuRaw {
+    class ImuRaw {
 
         public:
 
             Vec3Raw gyro;
             Vec3Raw accel;
 
-            NewImuRaw() = default;
-
-            NewImuRaw(const Vec3Raw & gyro, const Vec3Raw & accel)
-                : gyro(gyro), accel(accel) {}
-
-            NewImuRaw& operator=(const NewImuRaw& other) = default;
-     };
-
-    class ImuRaw {
-
-        public:
-
-            int16_t gx;
-            int16_t gy;
-            int16_t gz;
-            int16_t ax;
-            int16_t ay;
-            int16_t az;
-
             ImuRaw() = default;
 
-            ImuRaw(
-                    const int16_t gx, const int16_t gy, const int16_t gz,
-                    const int16_t ax, const int16_t ay, const int16_t az)
-                : gx(gx), gy(gy), gz(gz), ax(ax), ay(ay), az(az) {}
+            ImuRaw(const Vec3Raw & gyro, const Vec3Raw & accel)
+                : gyro(gyro), accel(accel) {}
 
             ImuRaw& operator=(const ImuRaw& other) = default;
      };

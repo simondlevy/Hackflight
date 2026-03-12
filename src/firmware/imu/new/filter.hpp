@@ -46,7 +46,7 @@ namespace hf {
              */
             bool step(
                     const uint32_t tickCount,
-                    const NewImuRaw & imuraw,
+                    const ImuRaw & imuraw,
                     const int16_t gscale,
                     const int16_t ascale,
                     ImuFiltered & imufilt)

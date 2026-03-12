@@ -98,11 +98,13 @@ namespace hf {
 
                     static uint32_t _count;
 
+                    const auto gyro = imuraw.gyro;
+                    const auto accel = imuraw.accel;
+
                     printf("%5lu | gx=%+05d gy=%+05d gz=%+05d | "
                             "ax=%+05d ay=%+05d az=%+05d\n",
-                            _count++, 
-                            imuraw.gx, imuraw.gy, imuraw.gz,
-                            imuraw.ax, imuraw.ay, imuraw.az);
+                            _count++, gyro.x, gyro.y, gyro.z,
+                            accel.x, accel.y, accel.z);
                 }
             }
 

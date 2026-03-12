@@ -120,13 +120,13 @@ namespace hf {
 
             EKF _ekf;
 
-            auto read() -> NewImuRaw
+            auto read() -> ImuRaw
             {
                 gyro.readSensor();
 
                 accel.readSensor();
 
-                return NewImuRaw(
+                return ImuRaw(
                         Vec3Raw(
                             gyro.getGyroX_raw(),
                             gyro.getGyroY_raw(),
