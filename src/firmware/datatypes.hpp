@@ -30,22 +30,22 @@ namespace hf {
 
     } axis3_i16_t;
 
-    class SixAxisStats {
+    class ThreeAxisStats {
 
         public:
 
             Vec3 mean;
             Vec3 variance;
 
-            SixAxisStats() = default;
+            ThreeAxisStats() = default;
 
-            SixAxisStats
+            ThreeAxisStats
                 (const Vec3& mean, const Vec3& variance) 
                 : mean(mean), variance(variance) {}
 
-            SixAxisStats& operator=(const SixAxisStats& other) = default;
+            ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
 
-     }; // class SixAxisStats
+     }; // class ThreeAxisStats
 
 
     class EstimatedState { 

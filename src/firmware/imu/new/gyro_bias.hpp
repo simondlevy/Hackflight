@@ -48,7 +48,7 @@ namespace hf {
                     const Vec3 & biasOut,
                     const bool wasValueFound,
                     const uint16_t bufferIndex,
-                    const SixAxisStats & stats,
+                    const ThreeAxisStats & stats,
                     const Vec3 & values,
                     const bool isBufferFilled,
                     const int32_t varianceSampleTime)
@@ -100,13 +100,13 @@ namespace hf {
 
         private:
 
-            SixAxisStats _stats;
+            ThreeAxisStats _stats;
             Vec3 _values;
             bool _isBufferFilled;
             int32_t _varianceSampleTime;
 
             static auto calculateStats(const axis3_i16_t * buffer)
-                -> SixAxisStats
+                -> ThreeAxisStats
                 {
                     int64_t xsum=0, ysum=0, zsum=0;
                     int64_t xsumsq=0, ysumsq=0, zsumsq=0;
@@ -131,7 +131,7 @@ namespace hf {
                             ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
                             zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
 
-                    return SixAxisStats(mean, variance);
+                    return ThreeAxisStats(mean, variance);
                 }
 
     }; // class GyroBias
