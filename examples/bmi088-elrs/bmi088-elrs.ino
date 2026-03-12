@@ -38,6 +38,8 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
+static hf::RX _rx;
+
 // IMU ------------------------------------------------------------
 
 static const int16_t GYRO_SCALE = 2000;
@@ -149,7 +151,7 @@ static auto getVehicleState(const bool isFlying, const hf::Vec3 & gyroDps)
 
 void setup()
 {
-    rx_init();
+    _rx.begin();
 
     imu_device_init();
 
@@ -166,7 +168,7 @@ void loop()
 
     _led.blink(); 
 
-    rx_read();
+    _rx.read();
 
     hf::axis3_i16_t gyroRaw = {};
     hf::axis3_i16_t accelRaw = {};
@@ -189,14 +191,14 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(rx_chanvals);
 
-    hf::Debugger::debug(setpoint);
+    hf::Debugger::debug(state);
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
-            !rx_is_throttle_down, dt, state, setpoint);
+            !_rx.is_throttle_down, dt, state, setpoint);
 
     static hf::Mixer _mixer;
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(rx_is_armed, _mixer.motorvals);
+    _motors.run(_rx.is_armed, _mixer.motorvals);
 }
