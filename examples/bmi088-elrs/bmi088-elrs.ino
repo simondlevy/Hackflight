@@ -54,7 +54,7 @@ void setup()
 {
     _rx.begin();
 
-    _imu.device_init();
+    _imu.begin();
 
     _motors.arm(); 
 

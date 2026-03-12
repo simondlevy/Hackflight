@@ -32,17 +32,19 @@ namespace hf {
 
     class IMU {
 
-        public:
+        private:
 
             static const int16_t GYRO_SCALE = 2000;
             static const int16_t ACCEL_SCALE = 24;
+
+            static const uint32_t FREQ_EKF_PREDICTION = 100;
+
+        public:
 
             ImuFilter _imuFilter;
 
             Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
             Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
-
-            static const uint32_t FREQ_EKF_PREDICTION = 100;
 
             EKF _ekf;
 
@@ -51,7 +53,7 @@ namespace hf {
                 return status >= 0;
             }
 
-            bool device_init()
+            bool begin()
             {
                 return 
 
