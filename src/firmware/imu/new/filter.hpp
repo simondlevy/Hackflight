@@ -32,6 +32,8 @@ namespace hf {
 
         public:
 
+            bool wasGyroBiasFound;
+
             ImuFilter& operator=(const ImuFilter& other) = default;
 
             ImuFilter() = default;
@@ -44,7 +46,7 @@ namespace hf {
              * accel.y: positive roll-right
              * accel.z: positive rightside-up
              */
-            bool step(
+            void step(
                     const uint32_t tickCount,
                     const ImuRaw & imuraw,
                     const int16_t gscale,
@@ -98,7 +100,7 @@ namespace hf {
                 imufilt.accelGs.y = accelFiltered.y;
                 imufilt.accelGs.z = accelFiltered.z;
 
-                return _gyroBiasCalculator.wasValueFound;
+                wasGyroBiasFound = _gyroBiasCalculator.wasValueFound;
             }
 
         private:

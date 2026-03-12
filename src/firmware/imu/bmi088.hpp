@@ -71,9 +71,10 @@ namespace hf {
                 const auto imuraw = read();
 
                 ImuFiltered imufilt = {};
-                const bool imuIsCalibrated =
-                    _imuFilter.step( usec_curr/1000, imuraw, GYRO_SCALE,
-                            ACCEL_SCALE, imufilt);
+                _imuFilter.step( usec_curr/1000, imuraw, GYRO_SCALE,
+                        ACCEL_SCALE, imufilt);
+
+                const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
                 (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
 
                 _ekf.enqueueImu(&imufilt.gyroDps, &imufilt.accelGs);
