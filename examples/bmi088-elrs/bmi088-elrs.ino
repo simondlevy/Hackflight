@@ -28,7 +28,6 @@
 #include <datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/estimators/ekf/ekf.hpp>
-#include <firmware/imu/bmi088.hpp>
 #include <firmware/imu/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
@@ -191,7 +190,7 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    hf::Debugger::debug(setpoint);
+    hf::Debugger::debug(state);
 
     static hf::StabilizerPid _stabilizerPid;
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
