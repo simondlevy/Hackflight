@@ -73,16 +73,21 @@ namespace hf {
                 }
             }
 
-            static void report(const float * chanvals, const bool is_armed)
+            static void report(const RxData & rxdata)
             {
                 static Helper _helper;
 
                 if (_helper.ready()) {
 
-                    printf("%5lu | armed=%d | throt=%+3.3f roll=%+3.3f "
-                            "pitch=%3.3f yaw=%+3.3f\n",
-                            _helper.count, is_armed, chanvals[0], chanvals[1],
-                            chanvals[2], chanvals[3]); }
+                    const auto ax = rxdata.axes;
+
+                    printf("%5lu | armed=%d | throt_down=%d | "
+                            "throt=%+3.3f roll=%+3.3f pitch=%3.3f "
+                            "yaw=%+3.3f\n",
+                            _helper.count, rxdata.is_armed,
+                            rxdata.is_throttle_down, 
+                            ax.thrust, ax.roll, ax.pitch, ax.yaw);
+                }
             }
 
             static void report(const Setpoint & setpoint)
@@ -104,7 +109,7 @@ namespace hf {
 
                     printf("%5lu | dx=%+8.3f dy=%+8.3f z=%8.3f dz=%+8.3f "
                             "phi=%+08.3f dphi=%+08.3f theta=%+08.3f dtheta=%+08.3f"
-                            " psi=%+08.3f dpsi=%+08.3f\n",
+                            "psi=%+08.3f dpsi=%+08.3f\n",
                             _helper.count, state.dx, state.dy, state.z, state.dz,
                             state.phi, state.dphi, state.theta, state.dtheta,
                             state.psi, state.dpsi);

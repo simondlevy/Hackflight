@@ -22,6 +22,31 @@
 
 namespace hf {
 
+    class RxData {
+
+        public:
+
+            Setpoint axes;
+            float aux;
+            bool is_armed;
+            bool is_throttle_down;
+
+            RxData() = default;
+
+            RxData(
+                    const Setpoint & axes,
+                    const float aux,
+                    const bool is_armed,
+                    const bool is_throttle_down)
+                :
+                    axes(axes),
+                    aux(aux),
+                    is_armed(is_armed),
+                    is_throttle_down(is_throttle_down) {}
+
+            RxData& operator=(const RxData& other) = default;
+    };
+
     class ThreeAxisStats {
 
         public:
@@ -36,8 +61,7 @@ namespace hf {
                 : mean(mean), variance(variance) {}
 
             ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
-
-     }; // class ThreeAxisStats
+    };
 
     class Vec3Raw {
 
@@ -53,7 +77,7 @@ namespace hf {
                 : x(x), y(y), z(z) {}
 
             Vec3Raw& operator=(const Vec3Raw& other) = default;
-      };
+    };
 
     class ImuRaw {
 
@@ -68,7 +92,7 @@ namespace hf {
                 : gyro(gyro), accel(accel) {}
 
             ImuRaw& operator=(const ImuRaw& other) = default;
-     };
+    };
 
     class ImuFiltered {
 
@@ -83,5 +107,5 @@ namespace hf {
                 : gyroDps(gyroDps), accelGs(accelGs) {}
 
             ImuFiltered& operator=(const ImuFiltered& other) = default;
-     };
+    };
 }
