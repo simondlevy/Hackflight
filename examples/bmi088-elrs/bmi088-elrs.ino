@@ -88,7 +88,7 @@ void loop()
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
     //hf::Debugger::report("calibrated", imuIsCalibrated);
-    //hf::Debugger::report(state);
+    hf::Debugger::report(state);
     //hf::Profiler::report();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,

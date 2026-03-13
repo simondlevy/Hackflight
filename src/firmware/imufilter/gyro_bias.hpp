@@ -66,10 +66,6 @@ namespace hf {
 
                 const auto isBufferFilled = bufferIndex == NBR_OF_SAMPLES;
 
-                if (isBufferFilled) {
-                    printf("found: %d\n", calc.wasValueFound);
-                }
-
                 const auto wantUpdate = !calc.wasValueFound && isBufferFilled;
 
                 const auto stats = wantUpdate ? calculateStats(buffer) : calc._stats;

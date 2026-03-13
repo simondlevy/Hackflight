@@ -18,6 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 
@@ -40,10 +41,7 @@ namespace hf {
                 _mpu6050.initialize();
 
                 if (!_mpu6050.testConnection()) {
-                    while (true) {
-                        printf("MPU6050 initialization unsuccessful\n");
-                        delay(500);
-                    }
+                    Debuger::reportForever("MPU6050 initialization unsuccessful\n");
                 }
 
                 _mpu6050.setFullScaleGyroRange(GYRO_SCALE);

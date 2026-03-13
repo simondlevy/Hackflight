@@ -14,6 +14,10 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#include <Arduino.h>
+
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
@@ -49,6 +53,14 @@ namespace hf {
             };
 
         public:
+
+            static void reportForever(const char * message)
+            {
+                while (true) {
+                    printf("%s\n", message);
+                    delay(500);
+                }
+            }
 
             static void report(const char * label, const bool flag)
             {

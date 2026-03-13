@@ -25,6 +25,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
+#include <firmware/debugging.hpp>
 
 namespace hf {
 
@@ -55,10 +56,7 @@ namespace hf {
 
                             okay(accel.setRange(arange)))) {
 
-                    while (true) {
-                        printf("MPU6050 initialization unsuccessful\n");
-                        delay(500);
-                    }
+                    Debugger::reportForever("BMI088 initialization unsuccessful");
                 }
             }
 
