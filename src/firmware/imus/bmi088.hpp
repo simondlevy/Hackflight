@@ -33,9 +33,12 @@ namespace hf {
 
         public:
 
-            void begin(
+            IMU(
                     const Bmi088Gyro::Range grange=Bmi088Gyro::RANGE_2000DPS,
                     const Bmi088Accel::Range arange=Bmi088Accel::RANGE_24G)
+                : _grange(grange), _arange(arange) {}
+
+            void begin()
             {
                 if (!(
                             okay(gyro.begin()) ||
@@ -44,7 +47,7 @@ namespace hf {
 
                             okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) ||
 
-                            okay(gyro.setRange(grange)) ||
+                            okay(gyro.setRange(_grange)) ||
 
                             okay(gyro.pinModeInt3(
                                     Bmi088Gyro::PIN_MODE_PUSH_PULL,
@@ -54,10 +57,24 @@ namespace hf {
 
                             okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) ||
 
-                            okay(accel.setRange(arange)))) {
+                            okay(accel.setRange(_arange)))) {
 
                     Debugger::reportForever("BMI088 initialization unsuccessful");
                 }
+            }
+
+            auto gyroRangeDps() -> int16_t
+            {
+                static const int16_t granges[5] = {2000, 1000, 500, 250, 125};
+
+                return granges[_grange];
+            }
+
+            auto accelRangeGs() -> int16_t
+            {
+                static const int16_t aranges[4] = {3, 6, 12, 24};
+
+                return aranges[_arange];
             }
 
             auto read() -> ImuRaw
@@ -83,6 +100,10 @@ namespace hf {
 
             Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
             Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
+
+
+            Bmi088Gyro::Range _grange;
+            Bmi088Accel::Range _arange;
 
             static bool okay(const int status)
             {

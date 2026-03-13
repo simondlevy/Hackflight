@@ -76,8 +76,10 @@ void loop()
 
     const auto imuraw = _imu.read();
 
-    _imuFilter.step(millis(), imuraw);
+    _imuFilter.step(millis(), imuraw,
+            _imu.gyroRangeDps(), _imu.accelRangeGs());
 
+    hf::Debugger::report(_imuFilter.output);
     // const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
 
     _ekf.enqueueImu(_imuFilter.output);
@@ -86,11 +88,6 @@ void loop()
     const auto state = _ekf.getVehicleState(millis(), isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.data.axes);
-
-    hf::Debugger::report(_rx.data);
-    //hf::Debugger::report("calibrated", imuIsCalibrated);
-    //hf::Debugger::report(state);
-    //hf::Profiler::report();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
             !_rx.data.is_throttle_down, dt, state, setpoint);

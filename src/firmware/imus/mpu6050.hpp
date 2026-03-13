@@ -24,13 +24,12 @@ namespace hf {
 
     class IMU {
 
-        private:
-
-            static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_250;
-
-            static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_2;
-
         public:
+
+            IMU(
+                    const uint8_t grange =  MPU6050_GYRO_FS_250,
+                    const uint8_t arange = MPU6050_ACCEL_FS_2 )
+                : _grange(grange), _arange(arange) {}
 
             void begin()
             {
@@ -44,9 +43,23 @@ namespace hf {
                     Debugger::reportForever("MPU6050 initialization unsuccessful\n");
                 }
 
-                _mpu6050.setFullScaleGyroRange(GYRO_SCALE);
+                _mpu6050.setFullScaleGyroRange(_grange);
 
-                _mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
+                _mpu6050.setFullScaleAccelRange(_arange);
+            }
+
+            auto gyroRangeDps() -> int16_t
+            {
+                static const int16_t granges[4] = {250, 500, 100, 2000};
+
+                return granges[_grange];
+            }
+
+            auto accelRangeGs() -> int16_t
+            {
+                static const int16_t aranges[4] = {2, 4, 8, 16};
+
+                return aranges[_arange];
             }
 
             auto read() -> ImuRaw
@@ -59,6 +72,9 @@ namespace hf {
             }
 
         private:
+
+            uint8_t _grange;
+            uint8_t _arange;
 
             MPU6050 _mpu6050;
     };

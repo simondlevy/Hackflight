@@ -125,8 +125,8 @@ namespace hf {
                     const auto g = imufilt.gyroDps;
                     const auto a = imufilt.accelGs;
 
-                    printf("%5lu | gx=%+3.3f gy=%+3.3f gz=%+3.3f dps | "
-                            "ax=%+3.3f ay=%+3.3f az=%+3.3f Gs\n",
+                    printf("%5lu | gx=%+08.3f gy=%+08.3f gz=%+08.3f dps | "
+                           "ax=%+08.3f ay=%+08.3f az=%+08.3f Gs\n",
                             _helper.count, g.x, g.y, g.z, a.x, a.y, a.z);
                 }
             }

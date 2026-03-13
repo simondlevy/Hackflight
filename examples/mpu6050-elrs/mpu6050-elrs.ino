@@ -39,7 +39,7 @@
 
 static hf::RX _rx;
 
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
 static hf::LED _led = hf::LED(13);
 
@@ -71,12 +71,15 @@ void loop()
     _led.blink(); 
 
     _rx.read();
+    //hf::Debugger::report(_rx.data);
 
     const bool isFlying = true; // XXX
 
     const auto imuraw = _imu.read();
 
-    _imuFilter.step(millis(), imuraw);
+    _imuFilter.step(millis(), imuraw,
+            _imu.gyroRangeDps(), _imu.accelRangeGs());
+    hf::Debugger::report(_imuFilter.output);
 
     // const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
 
@@ -84,17 +87,14 @@ void loop()
 
     // Get state estimate from EKF
     const auto state = _ekf.getVehicleState(millis(), isFlying);
-
-    const auto setpoint = hf::mksetpoint(_rx.chanvals);
-
-    //hf::Debugger::report("calibrated", imuIsCalibrated);
     //hf::Debugger::report(state);
-    //hf::Profiler::report();
+
+    const auto setpoint = hf::mksetpoint(_rx.data.axes);
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
-            !_rx.is_throttle_down, dt, state, setpoint);
+            !_rx.data.is_throttle_down, dt, state, setpoint);
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(_rx.is_armed, _mixer.motorvals);
+    _motors.run(_rx.data.is_armed, _mixer.motorvals);
 }
