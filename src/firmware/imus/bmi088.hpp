@@ -32,29 +32,34 @@ namespace hf {
 
         public:
 
-            bool begin(
+            void begin(
                     const Bmi088Gyro::Range grange=Bmi088Gyro::RANGE_2000DPS,
                     const Bmi088Accel::Range arange=Bmi088Accel::RANGE_24G)
             {
-                return 
+                if (!(
+                            okay(gyro.begin()) ||
 
-                    okay(gyro.begin()) &&
+                            okay(accel.begin()) ||
 
-                    okay(accel.begin()) &&
+                            okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) ||
 
-                    okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+                            okay(gyro.setRange(grange)) ||
 
-                    okay(gyro.setRange(grange)) &&
+                            okay(gyro.pinModeInt3(
+                                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) ||
 
-                    okay(gyro.pinModeInt3(
-                                Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                                Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
+                            okay(gyro.mapDrdyInt3(true)) ||
 
-                    okay(gyro.mapDrdyInt3(true)) &&
+                            okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) ||
 
-                    okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+                            okay(accel.setRange(arange)))) {
 
-                    okay(accel.setRange(arange));
+                    while (true) {
+                        printf("MPU6050 initialization unsuccessful\n");
+                        delay(500);
+                    }
+                }
             }
 
             auto read() -> ImuRaw
