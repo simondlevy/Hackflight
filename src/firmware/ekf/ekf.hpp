@@ -67,8 +67,6 @@ namespace hf {
                 reset(0);
             }
 
-            // XXX needs copy constructor
-
             EKF& operator=(const EKF& other) = default;
  
             auto getVehicleState(
@@ -878,5 +876,4 @@ namespace hf {
             static float device_sin(const float x);
             static float device_sqrt(const float32_t in);
     };
-
 }

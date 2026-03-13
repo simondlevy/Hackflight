@@ -20,12 +20,10 @@
 #include <Wire.h> 
 
 // Third-party libraries
-#include <BMI088.h>
 #include <dshot-teensy4.hpp>  
 
 // Hackflight library
 #include <hackflight.h>
-#include <datatypes.hpp>
 #include <firmware/bmi088.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
@@ -36,7 +34,6 @@
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
-#include <pidcontrol/pids/position.hpp>
 #include <firmware/profiling.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
