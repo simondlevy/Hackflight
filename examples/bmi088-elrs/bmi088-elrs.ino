@@ -30,7 +30,7 @@
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imufilter/filter.hpp>
 #include <firmware/led.hpp>
-#include <firmware/elrs.hpp>
+#include <firmware/rx/elrs.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
@@ -78,10 +78,7 @@ void loop()
 
     _imuFilter.step(millis(), imuraw);
 
-    const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
-    (void)imuIsCalibrated; // XXX
-
-    //hf::Debugger::report("calibrated", imuIsCalibrated);
+    // const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
 
     _ekf.enqueueImu(_imuFilter.output);
 
@@ -90,6 +87,7 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
+    //hf::Debugger::report("calibrated", imuIsCalibrated);
     //hf::Debugger::report(state);
     //hf::Profiler::report();
 
