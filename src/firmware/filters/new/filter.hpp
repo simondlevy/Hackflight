@@ -15,8 +15,8 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/imufilter/gyro_bias.hpp>
-#include <firmware/imufilter/three_axis_lpf.hpp>
+#include <firmware/filters/new/gyro_bias.hpp>
+#include <firmware/filters/new/three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 

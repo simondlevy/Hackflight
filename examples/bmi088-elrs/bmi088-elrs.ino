@@ -27,8 +27,8 @@
 #include <firmware/imus/bmi088.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/ekf/ekf.hpp>
-#include <firmware/imufilter/filter.hpp>
+#include <firmware/estimators/ekf/ekf.hpp>
+#include <firmware/filters/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/setpoint.hpp>
@@ -79,13 +79,14 @@ void loop()
     _imuFilter.step(millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    hf::Debugger::report(_imuFilter.output);
     // const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
 
     _ekf.enqueueImu(_imuFilter.output);
 
     // Get state estimate from EKF
     const auto state = _ekf.getVehicleState(millis(), isFlying);
+
+    hf::Debugger::report(state);
 
     const auto setpoint = hf::mksetpoint(_rx.data.axes);
 

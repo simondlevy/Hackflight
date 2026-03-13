@@ -16,40 +16,11 @@
 
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
+#include <firmware/filters/old/three_axis.hpp>
 
 namespace hf {
 
     class ImuFilter {
-
-        private:
-
-            class ThreeAxisFilter {
-
-                public:
-
-                    ThreeAxisFilter() : _prev(Vec3(0, 0, 0)) {}
-
-                    ThreeAxisFilter& operator=(const ThreeAxisFilter& other) = default;
-
-                    Vec3 run(
-                            const Vec3 & raw,
-                            const Vec3 & error,
-                            const float scale,
-                            const float coeff)
-                    {
-                        const auto curr = raw / scale - error;
-
-                        const auto output = _prev * (1 - coeff) + curr * coeff;
-
-                        _prev = curr;
-
-                        return output;
-                    }
-
-                private:
-
-                    Vec3 _prev;
-            };
 
         private:
 

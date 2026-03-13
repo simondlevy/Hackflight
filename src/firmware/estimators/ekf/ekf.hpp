@@ -17,7 +17,7 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/ekf/matrix_typedef.h>
+#include <firmware/estimators/ekf/matrix_typedef.h>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/zranger.hpp>
