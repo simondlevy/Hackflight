@@ -89,20 +89,12 @@ void loop()
     _ekf.enqueueImu(_imuFilter.output);
 
     // Get state estimate from EKF
-    const auto ekfstate = _ekf.getStateEstimate(millis(), isFlying);
-
-    // Get angular velocities directly from gyro, negating gyro Z for
-    // nose-right positve
-    const auto state =
-        hf::VehicleState(ekfstate.dx, ekfstate.dy, ekfstate.z, ekfstate.dz,
-                ekfstate.phi, _imuFilter.output.gyroDps.x,
-                ekfstate.theta, _imuFilter.output.gyroDps.y,
-                ekfstate.psi, -_imuFilter.output.gyroDps.z);
+    const auto state = _ekf.getVehicleState(millis(), isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    hf::Debugger::report(state);
-    //hf::Debugger::profile();
+    //hf::Debugger::report(state);
+    //hf::Profiler::report();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
             !_rx.is_throttle_down, dt, state, setpoint);

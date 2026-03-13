@@ -39,42 +39,6 @@ namespace hf {
 
      }; // class ThreeAxisStats
 
-
-    class EstimatedState { 
-
-        public:
-
-            float dx;      // positive forward
-            float dy;      // positive rightward
-            float z;       // positive upward
-            float dz;      // positive upward
-            float phi;     // positive roll right
-            float theta;   // positive nose down
-            float psi;     // positive nose right
-
-            EstimatedState() = default;
-
-            EstimatedState
-                (const float dx,
-                 const float dy,
-                 const float z,
-                 const float dz,
-                 const float phi,
-                 const float theta,
-                 const float psi)
-                : 
-                    dx(dx),
-                    dy(dy),
-                    z(z),
-                    dz(dz),
-                    phi(phi),
-                    theta(theta),
-                    psi(psi) {}
-
-            EstimatedState& operator=(const EstimatedState& other) = default;
- 
-    };
-
     class Vec3Raw {
 
         public:

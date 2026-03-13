@@ -71,10 +71,10 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
  
-            auto getStateEstimate(
+            auto getVehicleState(
                     const uint32_t msec_curr,
                     const bool isFlying,
-                    const uint32_t prediction_freq=100) -> EstimatedState
+                    const uint32_t prediction_freq=100) -> VehicleState
             {
                 static Timer _timer;
 
@@ -115,13 +115,19 @@ namespace hf {
                 const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
                         _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
 
+                const auto dphi = _gyroLatest.x;
+
                 const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
 
-                // make right positive
-                const auto psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
+                const auto dtheta = _gyroLatest.y;
+
+                const auto psi = Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
                         _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
 
-                return EstimatedState(dx, dy, z, dz, phi, theta, psi);
+                const auto dpsi = _gyroLatest.z;
+
+                return VehicleState(dx, dy, z, dz, phi, dphi, theta, dtheta,
+                        -psi, -dpsi); // make nose-right positive
             }
 
             void enqueueImu(const ImuFiltered & imu)
