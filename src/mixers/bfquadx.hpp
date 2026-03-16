@@ -53,22 +53,25 @@ namespace hf {
 
             Mixer& operator=(const Mixer& other) = default;
 
-            static auto run(const Mixer & mixer, const Setpoint & setpoint) -> Mixer
+            static auto run(const Mixer & mixer, const Setpoint & setpoint)
+                -> Mixer
             {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m1 = t + r * mixer.roll[0] + p * mixer.pitch[0] + y * mixer.yaw[0];
-                const float m2 = t + r * mixer.roll[1] + p * mixer.pitch[1] + y * mixer.yaw[1];
-                const float m3 = t + r * mixer.roll[2] + p * mixer.pitch[2] + y * mixer.yaw[2];
-                const float m4 = t + r * mixer.roll[3] + p * mixer.pitch[3] + y * mixer.yaw[3];
+                const auto mr = mixer.roll;
+                const auto mp = mixer.pitch;
+                const auto my = mixer.yaw;
+
+                const float m1 = t + r * mr[0] + p * mp[0] + y * my[0];
+                const float m2 = t + r * mr[1] + p * mp[1] + y * my[1];
+                const float m3 = t + r * mr[2] + p * mp[2] + y * my[2];
+                const float m4 = t + r * mr[3] + p * mp[3] + y * my[3];
 
                 return Mixer(m1, m2, m3, m4);
             }
-
     };
-
 }
 

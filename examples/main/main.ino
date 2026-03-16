@@ -101,9 +101,10 @@ void loop()
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(rxdata.is_armed, _mixer.motorvals);
+    if (_mode != hf::MODE_PANIC) {
+        _motors.run(rxdata.is_armed, _mixer.motorvals);
+    }
 
-    hf::Debugger::report(_mode);
-
+    //hf::Debugger::report(_mode);
     //hf::Profiler::report();
 }
