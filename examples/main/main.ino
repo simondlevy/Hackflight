@@ -1,5 +1,5 @@
 /*
-   Hackflight for Teensy 4.0 with ELRs receiver
+   Hackflight main sketch
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -24,6 +24,7 @@
 
 // Hackflight library
 #include <hackflight.h>
+//#include <firmware/imus/bmi088.hpp>
 #include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
@@ -40,6 +41,7 @@
 static hf::RX _rx;
 
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
+// static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static hf::LED _led = hf::LED(13);
 
