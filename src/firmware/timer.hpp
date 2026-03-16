@@ -24,11 +24,17 @@ namespace hf {
 
         public:
 
-            bool ready(const float freq)
+            static auto ready(const uint32_t msec_curr, const uint32_t msec_prev,
+                    const float freq) -> bool
+            {
+                return msec_curr - msec_prev > 1000 / freq;
+            }
+
+            auto ready(const float freq) -> bool
             {
                 const uint32_t msec_curr = millis();
 
-                if (msec_curr - _msec_prev > 1000 / freq) {
+                if (ready(msec_curr, _msec_prev, freq)) {
 
                     _msec_prev = msec_curr;
 
@@ -38,7 +44,7 @@ namespace hf {
                 return false;
             }
 
-            static float getDt()
+            static auto getDt() -> float
             {
                 const auto usec_curr = micros();      
                 static uint32_t _usec_prev;

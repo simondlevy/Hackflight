@@ -15,6 +15,7 @@
  */
 
 #include <hackflight.h>
+#include <firmware/timer.hpp>
 
 namespace hf {
 
@@ -42,14 +43,14 @@ namespace hf {
              // We say we are flying if one or more motors are running over the idle
             // thrust.
             auto run(
-                    const FlyingCheck & flyingCheck,
+                    const FlyingCheck & fc,
                     const uint32_t msec_curr,
                     const float * motorvals,
                     const uint8_t motor_count) -> FlyingCheck
             {
-                return (msec_curr - flyingCheck._msec_prev > 1000/FREQ_HZ) ?
-                    update(flyingCheck, msec_curr, motorvals, motor_count) :
-                    flyingCheck;
+                return Timer::ready(msec_curr, fc._msec_prev, FREQ_HZ) ?
+                    update(fc, msec_curr, motorvals, motor_count) :
+                    fc;
             }
 
         private:
@@ -57,7 +58,7 @@ namespace hf {
             uint32_t _msec_prev;
 
             auto update(
-                    const FlyingCheck & flyingCheck,
+                    const FlyingCheck & fc,
                     const uint32_t msec_curr,
                     const float * motorvals,
                     const uint8_t motor_count) -> FlyingCheck
@@ -72,7 +73,7 @@ namespace hf {
                 }
 
                 const auto msec_prev = isThrustOverIdle ? msec_curr :
-                    flyingCheck._msec_prev;
+                    fc._msec_prev;
 
                 const auto isFlying = (msec_prev > 0 &&
                         (msec_curr - msec_prev) < HYSTERESIS_THRESHOLD_MSEC);

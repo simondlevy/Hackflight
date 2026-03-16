@@ -96,12 +96,7 @@ void loop()
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    printf("m1=%+3.3f m2=%+3.3f m3=%+3.3f m4=%+3.3f | isFlying=%d\n", 
-            _mixer.motorvals[0], _mixer.motorvals[1], 
-            _mixer.motorvals[2], _mixer.motorvals[3],
-            _flyingCheck.isFlying);
-
-    //_motors.run(rxdata.is_armed, _mixer.motorvals);
+    _motors.run(rxdata.is_armed, _mixer.motorvals);
 
     //hf::Profiler::report();
 }
