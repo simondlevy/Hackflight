@@ -30,6 +30,7 @@
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/imufilter.hpp>
+#include <firmware/flying.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/setpoint.hpp>
@@ -58,47 +59,6 @@ static hf::EKF _ekf;
 static bool _isFlying;
 
 static hf::Timer _flyingCheckTimer;
-
-static const uint32_t FREQ_FLYING_MODE_CHECK = 25;
-
-namespace hf {
-
-    static const uint32_t IS_FLYING_HYSTERESIS_THRESHOLD = 2000;
-    static constexpr float MOTOR_IDLE_MAX = 0.01;
-
-    // We say we are flying if one or more motors are running over the idle
-    // thrust.
-    bool isFlyingCheck(
-            const uint32_t msec_curr,
-            const float * motorvals,
-            const uint8_t motor_count)
-    {
-        auto isThrustOverIdle = false;
-
-        for (int i = 0; i < motor_count; ++i) {
-            if (motorvals[i] > MOTOR_IDLE_MAX) {
-                isThrustOverIdle = true;
-                break;
-            }
-        }
-
-        static uint32_t latestThrustTick;
-
-        if (isThrustOverIdle) {
-            latestThrustTick = msec_curr;
-        }
-
-        bool result = false;
-        if (0 != latestThrustTick) {
-            if ((msec_curr - latestThrustTick) < IS_FLYING_HYSTERESIS_THRESHOLD) {
-                result = true;
-            }
-        }
-
-        return result;
-    }
-}
-
 
 void setup()
 {
@@ -135,8 +95,8 @@ void loop()
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    if (_flyingCheckTimer.ready(FREQ_FLYING_MODE_CHECK)) {
-        _isFlying = hf::isFlyingCheck(millis(), _mixer.motorvals, 4);
+    if (_flyingCheckTimer.ready(hf::FlyingCheck::FREQ_HZ)) {
+        _isFlying = hf::FlyingCheck::run(millis(), _mixer.motorvals, 4);
     }
 
     printf("m1=%+3.3f m2=%+3.3f m3=%+3.3f m4=%+3.3f | isFlying=%d\n", 
