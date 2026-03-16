@@ -44,20 +44,18 @@ namespace hf {
 
                     auto rx = (RX *)obj;
 
-                    rx->data.axes.thrust = rx->scalechan(3);
-                    rx->data.axes.roll = rx->scalechan(1);
-                    rx->data.axes.pitch = rx->scalechan(2);
-                    rx->data.axes.yaw = rx->scalechan(4);
+                    rx->_data.axes.thrust = rx->scalechan(3);
+                    rx->_data.axes.roll = rx->scalechan(1);
+                    rx->_data.axes.pitch = rx->scalechan(2);
+                    rx->_data.axes.yaw = rx->scalechan(4);
 
-                    rx->data.aux = rx->scalechan(5);
+                    rx->_data.aux = rx->scalechan(5);
 
                     rx->_last_rx_msec = millis();
                 }
             }
 
         public:
-
-            RxData data;
 
             void begin()
             {
@@ -74,11 +72,11 @@ namespace hf {
                 _crsf.setRcChannelsCallback(onReceiveRcChannels, this);
             }
 
-            void read()
+            auto read() -> RxData
             {
                 _crsf.update();
 
-                data.is_throttle_down = data.axes.thrust < THROTTLE_DOWN_MAX;
+                _data.is_throttle_down = _data.axes.thrust < THROTTLE_DOWN_MAX;
 
                 const auto msec_curr = millis();
 
@@ -86,19 +84,21 @@ namespace hf {
                 if (_last_rx_msec > 0 &&
                         msec_curr > _last_rx_msec &&
                         msec_curr - _last_rx_msec > ELRS_TIMEOUT_MSEC) {
-                    data.is_armed = false;
+                    _data.is_armed = false;
                 }
 
                 // Push-button arming
                 static float _chan5_prev;
-                const auto chan5_curr = data.aux;
+                const auto chan5_curr = _data.aux;
                 if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
-                    data.is_armed =
-                        data.is_armed ? false :
-                        data.is_throttle_down ? true :
-                        data.is_armed;
+                    _data.is_armed =
+                        _data.is_armed ? false :
+                        _data.is_throttle_down ? true :
+                        _data.is_armed;
                 }
                 _chan5_prev = chan5_curr;
+
+                return RxData(_data);
             }
 
         private:
@@ -107,5 +107,6 @@ namespace hf {
 
             CRSFforArduino _crsf;
 
+            RxData _data;
     };
 }

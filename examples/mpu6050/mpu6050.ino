@@ -69,7 +69,7 @@ void loop()
 {
     const auto dt = hf::Timer::getDt();
 
-    _rx.read();
+    const auto rxdata = _rx.read();
 
     const auto imuraw = _imu.read();
 
@@ -84,12 +84,14 @@ void loop()
 
     const auto state = _ekf.getVehicleState(millis(), isFlying);
 
-    const auto setpoint = hf::mksetpoint(_rx.data.axes);
+    const auto setpoint = hf::mksetpoint(rxdata.axes);
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
-            !_rx.data.is_throttle_down, dt, state, setpoint);
+            !rxdata.is_throttle_down, dt, state, setpoint);
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(_rx.data.is_armed, _mixer.motorvals);
+    _motors.run(rxdata.is_armed, _mixer.motorvals);
+
+    //hf::Profiler::report();
 }
