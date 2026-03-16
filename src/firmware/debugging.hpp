@@ -62,6 +62,25 @@ namespace hf {
                 }
             }
 
+            static void report(const mode_e mode)
+            {
+                static Helper _helper;
+
+                if (_helper.ready()) {
+
+                    static const char * modes[6] = {
+                        "IDLE",
+                        "ARMED",
+                        "HOVERING",
+                        "AUTONOMOUS",
+                        "LANDING",
+                        "PANIC"
+                    };
+
+                    printf("%5lu | mode=%s\n", _helper.count, modes[mode]);
+                }
+            }
+
             static void report(const char * label, const bool flag)
             {
                 static Helper _helper;

@@ -58,6 +58,16 @@ static hf::EKF _ekf;
 
 static hf::FlyingCheck _flyingCheck;
 
+
+static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
+
+static auto isFlippedAngle(const float angle) -> bool
+{
+    return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
+}
+
+static hf::mode_e _mode;
+
 void setup()
 {
     _rx.begin();
@@ -89,6 +99,11 @@ void loop()
 
     const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
+    // Check for flipped over
+    if (isFlippedAngle(state.theta) || isFlippedAngle(state.phi)) {
+        _mode = hf::MODE_PANIC;
+    }
+
     const auto setpoint = hf::mksetpoint(rxdata.axes);
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
@@ -97,6 +112,8 @@ void loop()
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(rxdata.is_armed, _mixer.motorvals);
+
+    hf::Debugger::report(_mode);
 
     //hf::Profiler::report();
 }
