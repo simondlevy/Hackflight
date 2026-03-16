@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <firmware/filters/new/lpf.hpp>
+#include <firmware/filters/lpf.hpp>
 
 namespace hf {
 

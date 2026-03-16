@@ -28,7 +28,7 @@
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
-#include <firmware/filters/new/filter.hpp>
+#include <firmware/filters/imufilter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/setpoint.hpp>
