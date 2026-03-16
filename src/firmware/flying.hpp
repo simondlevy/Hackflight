@@ -56,13 +56,8 @@ namespace hf {
                     _msec_prev = msec_curr;
                 }
 
-                isFlying = false;
-
-                if (_msec_prev > 0) {
-                    if ((msec_curr - _msec_prev) < HYSTERESIS_THRESHOLD_MSEC) {
-                        isFlying = true;
-                    }
-                }
+                isFlying = (_msec_prev > 0 &&
+                     (msec_curr - _msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
             }
     };
 }
