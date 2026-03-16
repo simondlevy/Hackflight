@@ -100,9 +100,8 @@ void loop()
     const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
     // Check for flipped over
-    if (isFlippedAngle(state.theta) || isFlippedAngle(state.phi)) {
-        _mode = hf::MODE_PANIC;
-    }
+    _mode = isFlippedAngle(state.theta) || isFlippedAngle(state.phi) ? 
+        hf::MODE_PANIC : _mode;
 
     const auto setpoint = hf::mksetpoint(rxdata.axes);
 
