@@ -106,5 +106,5 @@ void loop()
     }
 
     //hf::Debugger::report(_mode);
-    //hf::Profiler::report();
+    hf::Profiler::report();
 }

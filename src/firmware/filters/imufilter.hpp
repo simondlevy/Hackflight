@@ -29,6 +29,16 @@ namespace hf {
             static constexpr float CALIBRATION_PITCH = 0;
             static constexpr float CALIBRATION_ROLL = 0;
 
+            static const uint32_t ACC_SCALE_SAMPLES = 200;
+
+            // IMU alignment on the airframe 
+            static constexpr float ALIGN_PHI   = 0;
+            static constexpr float ALIGN_THETA = 0;
+            static constexpr float ALIGN_PSI   = 0;
+
+            static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
+            static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
+
         public:
 
             ImuFiltered output;
@@ -103,16 +113,6 @@ namespace hf {
             }
 
         private:
-
-            static const uint32_t ACC_SCALE_SAMPLES = 200;
-
-            // IMU alignment on the airframe 
-            static constexpr float ALIGN_PHI   = 0;
-            static constexpr float ALIGN_THETA = 0;
-            static constexpr float ALIGN_PSI   = 0;
-
-            static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
-            static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
             // ---------------------------------------------------------------
 
