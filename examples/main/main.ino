@@ -85,7 +85,8 @@ void loop()
     _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
 
     if (_flyingCheckTimer.ready(hf::FlyingCheck::FREQ_HZ)) {
-        _flyingCheck.run(millis(), _mixer.motorvals, 4);
+        _flyingCheck = _flyingCheck.run(
+                _flyingCheck, millis(), _mixer.motorvals, 4);
     }
 
     _ekf.enqueueImu(_imuFilter.output);

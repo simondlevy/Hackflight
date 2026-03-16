@@ -26,6 +26,13 @@ namespace hf {
 
             bool isFlying;
 
+            FlyingCheck() = default;
+
+            FlyingCheck(const bool isFlying, const uint32_t msec_prev)
+                : isFlying(isFlying), _msec_prev(msec_prev) {}
+
+            FlyingCheck& operator=(const FlyingCheck& other) = default;
+
         private:
 
             static const uint32_t HYSTERESIS_THRESHOLD_MSEC = 2000;
@@ -58,6 +65,31 @@ namespace hf {
 
                 isFlying = (_msec_prev > 0 &&
                      (msec_curr - _msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
+            }
+             // We say we are flying if one or more motors are running over the idle
+            // thrust.
+            auto run(
+                    const FlyingCheck & flyingCheck,
+                    const uint32_t msec_curr,
+                    const float * motorvals,
+                    const uint8_t motor_count) -> FlyingCheck
+            {
+                auto isThrustOverIdle = false;
+
+                for (int i = 0; i < motor_count; ++i) {
+                    if (motorvals[i] > MOTOR_IDLE_MAX) {
+                        isThrustOverIdle = true;
+                        break;
+                    }
+                }
+
+                const auto msec_prev = isThrustOverIdle ? msec_curr :
+                    flyingCheck._msec_prev;
+
+                const auto isFlying = (msec_prev > 0 &&
+                     (msec_curr - msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
+
+                return FlyingCheck(isFlying, msec_prev);
             }
     };
 }
