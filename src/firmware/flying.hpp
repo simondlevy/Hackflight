@@ -24,17 +24,21 @@ namespace hf {
 
             static const uint32_t FREQ_HZ = 25;
 
+            bool isFlying;
+
         private:
 
-            static const uint32_t HYSTERESIS_THRESHOLD = 2000;
+            static const uint32_t HYSTERESIS_THRESHOLD_MSEC = 2000;
 
             static constexpr float MOTOR_IDLE_MAX = 0.01;
+
+            uint32_t _msec_prev;
 
         public:
 
             // We say we are flying if one or more motors are running over the idle
             // thrust.
-            static bool run(
+            void run(
                     const uint32_t msec_curr,
                     const float * motorvals,
                     const uint8_t motor_count)
@@ -48,20 +52,17 @@ namespace hf {
                     }
                 }
 
-                static uint32_t _msec_prev;
-
                 if (isThrustOverIdle) {
                     _msec_prev = msec_curr;
                 }
 
-                bool result = false;
+                isFlying = false;
+
                 if (_msec_prev > 0) {
-                    if ((msec_curr - _msec_prev) < HYSTERESIS_THRESHOLD) {
-                        result = true;
+                    if ((msec_curr - _msec_prev) < HYSTERESIS_THRESHOLD_MSEC) {
+                        isFlying = true;
                     }
                 }
-
-                return result;
             }
     };
 }

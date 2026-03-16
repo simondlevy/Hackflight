@@ -56,9 +56,9 @@ static hf::ImuFilter _imuFilter;
 
 static hf::EKF _ekf;
 
-static bool _isFlying;
-
 static hf::Timer _flyingCheckTimer;
+
+static hf::FlyingCheck _flyingCheck;
 
 void setup()
 {
@@ -84,9 +84,13 @@ void loop()
 
     _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
 
+    if (_flyingCheckTimer.ready(hf::FlyingCheck::FREQ_HZ)) {
+        _flyingCheck.run(millis(), _mixer.motorvals, 4);
+    }
+
     _ekf.enqueueImu(_imuFilter.output);
 
-    const auto state = _ekf.getVehicleState(millis(), _isFlying);
+    const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
     const auto setpoint = hf::mksetpoint(rxdata.axes);
 
@@ -95,14 +99,10 @@ void loop()
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    if (_flyingCheckTimer.ready(hf::FlyingCheck::FREQ_HZ)) {
-        _isFlying = hf::FlyingCheck::run(millis(), _mixer.motorvals, 4);
-    }
-
     printf("m1=%+3.3f m2=%+3.3f m3=%+3.3f m4=%+3.3f | isFlying=%d\n", 
             _mixer.motorvals[0], _mixer.motorvals[1], 
             _mixer.motorvals[2], _mixer.motorvals[3],
-            _isFlying);
+            _flyingCheck.isFlying);
 
     //_motors.run(rxdata.is_armed, _mixer.motorvals);
 
