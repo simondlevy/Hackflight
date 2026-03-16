@@ -20,9 +20,15 @@ namespace hf {
 
     class FlyingCheck {
 
-        public:
+        private:
 
-            static const uint32_t FREQ_HZ = 25;
+            static constexpr float FREQ_HZ = 25;
+
+            static const uint32_t HYSTERESIS_THRESHOLD_MSEC = 2000;
+
+            static constexpr float MOTOR_IDLE_MAX = 0.05;
+
+        public:
 
             bool isFlying;
 
@@ -33,39 +39,6 @@ namespace hf {
 
             FlyingCheck& operator=(const FlyingCheck& other) = default;
 
-        private:
-
-            static const uint32_t HYSTERESIS_THRESHOLD_MSEC = 2000;
-
-            static constexpr float MOTOR_IDLE_MAX = 0.01;
-
-            uint32_t _msec_prev;
-
-        public:
-
-            // We say we are flying if one or more motors are running over the idle
-            // thrust.
-            void run(
-                    const uint32_t msec_curr,
-                    const float * motorvals,
-                    const uint8_t motor_count)
-            {
-                auto isThrustOverIdle = false;
-
-                for (int i = 0; i < motor_count; ++i) {
-                    if (motorvals[i] > MOTOR_IDLE_MAX) {
-                        isThrustOverIdle = true;
-                        break;
-                    }
-                }
-
-                if (isThrustOverIdle) {
-                    _msec_prev = msec_curr;
-                }
-
-                isFlying = (_msec_prev > 0 &&
-                     (msec_curr - _msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
-            }
              // We say we are flying if one or more motors are running over the idle
             // thrust.
             auto run(
@@ -74,22 +47,33 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motor_count) -> FlyingCheck
             {
-                auto isThrustOverIdle = false;
+                if (msec_curr - flyingCheck._msec_prev > 1000/FREQ_HZ) {
 
-                for (int i = 0; i < motor_count; ++i) {
-                    if (motorvals[i] > MOTOR_IDLE_MAX) {
-                        isThrustOverIdle = true;
-                        break;
+                    auto isThrustOverIdle = false;
+
+                    for (int i = 0; i < motor_count; ++i) {
+                        if (motorvals[i] > MOTOR_IDLE_MAX) {
+                            isThrustOverIdle = true;
+                            break;
+                        }
                     }
+
+                    const auto msec_prev = isThrustOverIdle ? msec_curr :
+                        flyingCheck._msec_prev;
+
+                    const auto isFlying = (msec_prev > 0 &&
+                            (msec_curr - msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
+
+                    return FlyingCheck(isFlying, msec_prev);
+                }
+                else {
+                    return flyingCheck;
                 }
 
-                const auto msec_prev = isThrustOverIdle ? msec_curr :
-                    flyingCheck._msec_prev;
-
-                const auto isFlying = (msec_prev > 0 &&
-                     (msec_curr - msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
-
-                return FlyingCheck(isFlying, msec_prev);
             }
+
+        private:
+
+            uint32_t _msec_prev;
     };
 }
