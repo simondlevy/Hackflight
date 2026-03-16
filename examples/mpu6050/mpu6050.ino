@@ -24,10 +24,10 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/imus/bmi088.hpp>
+#include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/estimators/ekf/ekf.hpp>
+#include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
@@ -39,7 +39,7 @@
 
 static hf::RX _rx;
 
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
 static hf::LED _led = hf::LED(13);
 
@@ -51,6 +51,7 @@ static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
 
+// static hf::MadgwickFilter _madgwick;
 static hf::EKF _ekf;
 
 void setup()
@@ -68,25 +69,20 @@ void loop()
 {
     const auto dt = hf::Timer::getDt();
 
-    _led.blink(); 
-
     _rx.read();
-
-    const bool isFlying = true; // XXX
 
     const auto imuraw = _imu.read();
 
-    _imuFilter.step(millis(), imuraw,
-            _imu.gyroRangeDps(), _imu.accelRangeGs());
+    _imuFilter.step(
+            millis(), imuraw, _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    // const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
+    _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
 
     _ekf.enqueueImu(_imuFilter.output);
 
-    // Get state estimate from EKF
-    const auto state = _ekf.getVehicleState(millis(), isFlying);
+    const bool isFlying = true;
 
-    hf::Debugger::report(state);
+    const auto state = _ekf.getVehicleState(millis(), isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.data.axes);
 
