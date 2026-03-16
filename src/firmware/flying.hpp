@@ -47,33 +47,39 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motor_count) -> FlyingCheck
             {
-                if (msec_curr - flyingCheck._msec_prev > 1000/FREQ_HZ) {
-
-                    auto isThrustOverIdle = false;
-
-                    for (int i = 0; i < motor_count; ++i) {
-                        if (motorvals[i] > MOTOR_IDLE_MAX) {
-                            isThrustOverIdle = true;
-                            break;
-                        }
-                    }
-
-                    const auto msec_prev = isThrustOverIdle ? msec_curr :
-                        flyingCheck._msec_prev;
-
-                    const auto isFlying = (msec_prev > 0 &&
-                            (msec_curr - msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
-
-                    return FlyingCheck(isFlying, msec_prev);
-                }
-                else {
-                    return flyingCheck;
-                }
-
+                return (msec_curr - flyingCheck._msec_prev > 1000/FREQ_HZ) ?
+                    update(flyingCheck, msec_curr, motorvals, motor_count) :
+                    flyingCheck;
             }
 
         private:
 
             uint32_t _msec_prev;
+
+            auto update(
+                    const FlyingCheck & flyingCheck,
+                    const uint32_t msec_curr,
+                    const float * motorvals,
+                    const uint8_t motor_count) -> FlyingCheck
+            {
+                auto isThrustOverIdle = false;
+
+                for (int i = 0; i < motor_count; ++i) {
+                    if (motorvals[i] > MOTOR_IDLE_MAX) {
+                        isThrustOverIdle = true;
+                        break;
+                    }
+                }
+
+                const auto msec_prev = isThrustOverIdle ? msec_curr :
+                    flyingCheck._msec_prev;
+
+                const auto isFlying = (msec_prev > 0 &&
+                        (msec_curr - msec_prev) < HYSTERESIS_THRESHOLD_MSEC);
+
+                return FlyingCheck(isFlying, msec_prev);
+            }
+
+
     };
 }
