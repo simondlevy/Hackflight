@@ -27,8 +27,8 @@ namespace hf {
         public:
 
             IMU(
-                    const uint8_t grange =  MPU6050_GYRO_FS_250,
-                    const uint8_t arange = MPU6050_ACCEL_FS_2 )
+                    const uint8_t grange =  MPU6050_GYRO_FS_2000,
+                    const uint8_t arange = MPU6050_ACCEL_FS_16)
                 : _grange(grange), _arange(arange) {}
 
             void begin()

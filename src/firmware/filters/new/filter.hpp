@@ -53,7 +53,6 @@ namespace hf {
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs)
             {
-
                 // Convert accel to Gs
                 const Vec3 accel = {
                     scale(imuraw.accel.x, accel_range_gs),
@@ -184,5 +183,5 @@ namespace hf {
             {
                 return (float)raw * 2 * scale / 65536.f;
             }
-    };
+     };
 }

@@ -27,8 +27,10 @@
 #include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/estimators/madgwick.hpp>
-#include <firmware/filters/old/filter.hpp>
+//#include <firmware/estimators/madgwick.hpp>
+//#include <firmware/filters/old/filter.hpp>
+#include <firmware/estimators/ekf/ekf.hpp>
+#include <firmware/filters/new/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/setpoint.hpp>
@@ -51,7 +53,8 @@ static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
 
-static hf::MadgwickFilter _madgwick;
+// static hf::MadgwickFilter _madgwick;
+static hf::EKF _ekf;
 
 void setup()
 {
@@ -68,20 +71,25 @@ void loop()
 {
     const auto dt = hf::Timer::getDt();
 
-    _led.blink(); 
-
     _rx.read();
 
     const auto imuraw = _imu.read();
 
-    const auto imufilt = _imuFilter.run(imuraw);
+    _imuFilter.step(
+            millis(), imuraw, _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    _madgwick = _madgwick.run(_madgwick, dt, imufilt);
+    _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
+
+    _ekf.enqueueImu(_imuFilter.output);
+
+    const bool isFlying = true;
+
+    const auto state = _ekf.getVehicleState(millis(), isFlying);
 
     const auto setpoint = hf::mksetpoint(_rx.data.axes);
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
-            !_rx.data.is_throttle_down, dt, _madgwick.state, setpoint);
+            !_rx.data.is_throttle_down, dt, state, setpoint);
 
     _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
 
