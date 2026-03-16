@@ -30,6 +30,7 @@
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/imufilter.hpp>
+#include <firmware/flipped.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
@@ -57,14 +58,6 @@ static hf::ImuFilter _imuFilter;
 static hf::EKF _ekf;
 
 static hf::FlyingCheck _flyingCheck;
-
-
-static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
-
-static auto isFlippedAngle(const float angle) -> bool
-{
-    return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
-}
 
 static hf::mode_e _mode;
 
@@ -99,9 +92,7 @@ void loop()
 
     const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
-    // Check for flipped over
-    _mode = isFlippedAngle(state.theta) || isFlippedAngle(state.phi) ? 
-        hf::MODE_PANIC : _mode;
+    _mode = hf::FlippedCheck::isFlipped(state) ? hf::MODE_PANIC : _mode;
 
     const auto setpoint = hf::mksetpoint(rxdata.axes);
 
