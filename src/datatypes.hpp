@@ -99,16 +99,15 @@ namespace hf {
                 return Vec3(x-other.x, y-other.y, z-other.z);
             }
 
-            Vec3 operator*(const float d) const
+            Vec3 operator*(const Vec3& other) const
             {
-                return Vec3(x*d, y*d, z*d);
+                return Vec3(x*other.x, y*other.y, z*other.z);
             }
 
             Vec3 operator/(const float d) const
             {
                 return Vec3(x/d, y/d, z/d);
             }
-
       };
 
     class Vec4 {

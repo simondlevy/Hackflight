@@ -82,6 +82,7 @@ namespace hf {
 
                 const auto wasValueFound = shouldUpdate ? true : calc.wasValueFound;
 
+
                 const auto newBufferIndex = isBufferFilled ? 0 : bufferIndex;
 
                 return GyroBiasCalculator(
@@ -109,6 +110,9 @@ namespace hf {
 
                     for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
 
+                        printf("values,%d,%d,%d\n", 
+                                buffer[i].x, buffer[i].y, buffer[i].z);
+
                         xsum += buffer[i].x;
                         ysum += buffer[i].y;
                         zsum += buffer[i].z;
@@ -123,9 +127,14 @@ namespace hf {
                             (float) zsum / NBR_OF_SAMPLES);
 
                     const auto variance = Vec3(
-                            xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
-                            ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
-                            zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
+                            (float)xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
+                            (float)ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
+                            (float)zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
+
+                    printf("\noldmean,%f,%f,%f\n",
+                            mean.x, mean.y, mean.z);
+                    printf("oldvariance,%f,%f,%f\n\n",
+                            variance.x, variance.y, variance.z);
 
                     return ThreeAxisStats(mean, variance);
                 }

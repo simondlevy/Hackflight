@@ -49,100 +49,37 @@ namespace hf {
 
             ImuFilter() = default;
 
-            ImuFilter(
-                    const ImuFiltered & output,
-                    const GyroBiasCalculator & gyroBiasCalculator,
-                    const ThreeAxisLpf & accelLpf,
-                    const ThreeAxisLpf & gyroLpf,
-                    const Vec3 & gyroBias,
-                    const Vec3Raw gyroSamplesBuffer[GyroBiasCalculator::NBR_OF_SAMPLES])
-                :
-                    output(output),
-                    _accelLpf(accelLpf),
-                    _gyroLpf(gyroLpf),
-                    _gyroBias(gyroBias) {
-                        memcpy(_gyroSamplesBuffer, gyroSamplesBuffer,
-                                GyroBiasCalculator::NBR_OF_SAMPLES * sizeof(Vec3));
-                    }
-
-            /**
-             * gyro.x: positive roll-rightward
-             * gyro.y: positive nose-downward
-             * gyro.z: positive counter-clockwise
-             * accel.x: positive nose-up
-             * accel.y: positive roll-right
-             * accel.z: positive rightside-up
-             */
-
-            static auto step(
-                    const ImuFilter & filter,
-                    const uint32_t msec_curr,
-                    const ImuRaw & imuraw,
-                    const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs) -> ImuFilter
-            {
-                // Convert accel to Gs
-                const Vec3 accel = {
-                    scale(imuraw.accel.x, accel_range_gs),
-                    scale(imuraw.accel.y, accel_range_gs),
-                    scale(imuraw.accel.z, accel_range_gs)
-                };
-
-                // Calibrate gyro with raw values if necessary/
-                /*
-                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = imuraw.gyro;
-                _gyroBiasCalculator = GyroBiasCalculator::process(
-                        _gyroBiasCalculator,
-                        _gyroSamplesBuffer,
-                        msec_curr);
-                _gyroBias = _gyroBiasCalculator.biasOut;*/
-
-                // Subtract gyro bias
-                const Vec3 gyroUnbiased = {
-                    scale(imuraw.gyro.x - filter._gyroBias.x, gyro_range_dps),
-                    scale(imuraw.gyro.y - filter._gyroBias.y, gyro_range_dps),
-                    scale(imuraw.gyro.z - filter._gyroBias.z, gyro_range_dps)
-                };
-
-                const auto gyroAligned = alignToAirframe(gyroUnbiased);
-
-                const auto gyroLpf = filter._gyroLpf.apply(
-                        filter._gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
-
-                const auto gyroFiltered = gyroLpf.output;
-
-                const auto accelAlignedToAirframe = alignToAirframe(accel);
-
-                const auto accelAlignedToGravity = alignToGravity(
-                        accelAlignedToAirframe);
-
-                const auto accelLpf = filter._accelLpf.apply(
-                        filter._accelLpf, accelAlignedToGravity,
-                        ACCEL_LPF_CUTOFF_FREQ);
-
-                const auto accelFiltered = accelLpf.output;
-
-                const auto gyroDps = Vec3(
-                        gyroFiltered.x,
-                        gyroFiltered.y,
-                        gyroFiltered.z);
-
-                const auto accelGs = Vec3(
-                        accelFiltered.x,
-                        accelFiltered.y,
-                        accelFiltered.z);
-
-                //const auto wasGyroBiasFound = gyroBiasCalculator.wasValueFound;
-
-                return ImuFilter();
-            }
-
             void step(
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs)
             {
+                const auto gyroraw = imuraw.gyro;
+
+                static bool _printed;
+                if (wasGyroBiasFound) {
+
+                    const auto n = GyroBiasCalculator::NBR_OF_SAMPLES;
+
+                    const auto gyromean = _gyrosum / n;
+
+                    const auto gyrovariance = (_gyrosumsq/n) - (gyromean*gyromean);
+
+                    if (!_printed) {
+                        printf("newmean,%f,%f,%f\n", 
+                                gyromean.x, gyromean.y, gyromean.z);
+                        printf("newvariance,%f,%f,%f\n", 
+                                gyrovariance.x, gyrovariance.y, gyrovariance.z);
+                        _printed = true;
+                    }
+                }
+                else {
+                    const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
+                    _gyrosum = _gyrosum + gyroval;
+                    _gyrosumsq = _gyrosumsq + (gyroval * gyroval);
+                }
+
                 // Convert accel to Gs
                 const Vec3 accel = {
                     scale(imuraw.accel.x, accel_range_gs),
@@ -151,7 +88,7 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = imuraw.gyro;
+                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroraw;
                 _gyroBiasCalculator = GyroBiasCalculator::process(
                         _gyroBiasCalculator,
                         _gyroSamplesBuffer,
@@ -196,7 +133,12 @@ namespace hf {
 
             // ---------------------------------------------------------------
 
+            Vec3 _gyrosum;
+            Vec3 _gyrosumsq;
+
             GyroBiasCalculator _gyroBiasCalculator;
+
+            Vec3 _sumvals;
 
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;

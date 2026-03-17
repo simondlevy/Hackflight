@@ -70,6 +70,8 @@ void setup()
     _motors.arm(); 
 
     _led.begin(); 
+
+    delay(3000);
 }
 
 void loop()
@@ -106,5 +108,5 @@ void loop()
     }
 
     //hf::Debugger::report(_mode);
-    hf::Profiler::report();
+    //hf::Profiler::report();
 }
