@@ -65,16 +65,16 @@ namespace hf {
 
                 const auto n = NBR_OF_SAMPLES;
 
-                const auto gyromean = _gyrosum / n;
+                const auto gyromean = _gyroSum / n;
 
-                const auto gyrovariance = (_gyrosumsq/n) - (gyromean*gyromean);
+                const auto gyrovariance = (_gyroSumOfSquares/n) - (gyromean*gyromean);
 
                 const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
-                _gyrosum = wasGyroBiasFound ? _gyrosum : _gyrosum + gyroval;
+                _gyroSum = wasGyroBiasFound ? _gyroSum : _gyroSum + gyroval;
 
-                _gyrosumsq = wasGyroBiasFound ? _gyrosumsq :
-                    _gyrosumsq + (gyroval * gyroval);
+                _gyroSumOfSquares = wasGyroBiasFound ? _gyroSumOfSquares :
+                    _gyroSumOfSquares + (gyroval * gyroval);
 
                 // Convert accel to Gs
                 const Vec3 accel = {
@@ -153,12 +153,11 @@ namespace hf {
 
             // ---------------------------------------------------------------
 
-            Vec3 _gyrosum;
-            Vec3 _gyrosumsq;
+            Vec3 _gyroSum;
+            Vec3 _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
             Vec3 _gyroBias;
             int32_t _gyroVarianceSampleTimeMsec;
-            Vec3 _sumvals;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
 
