@@ -38,8 +38,8 @@ namespace hf {
             static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
             static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
-            static constexpr float RAW_VARIANCE_BASE = 100;
-            static const uint32_t MIN_BIAS_TIMEOUT_MS = 1000;
+            static constexpr float GYRO_RAW_VARIANCE_BASE = 100;
+            static const uint32_t GYRO_MIN_BIAS_TIMEOUT_MS = 1000;
 
             // Number of samples used in variance calculation. Changing this
             // affects the threshold
@@ -83,11 +83,11 @@ namespace hf {
                     scale(imuraw.accel.z, accel_range_gs)
                 };
 
-                const auto newBufferIndex = bufferIndex + 1;
+                const auto newBufferIndex = _gyroSampleCount + 1;
 
-                _isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+                const auto isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
 
-                const auto wantUpdate = !wasValueFound && _isBufferFilled;
+                const auto wantUpdate = !_wasValueFound && isBufferFilled;
 
                 if (wasGyroBiasFound) {
 
@@ -103,23 +103,23 @@ namespace hf {
                 }
 
                 const auto shouldUpdate = wantUpdate &&
-                    gyrovariance.x < RAW_VARIANCE_BASE &&
-                    gyrovariance.y < RAW_VARIANCE_BASE &&
-                    gyrovariance.z < RAW_VARIANCE_BASE &&
-                    _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < msec_curr;
+                    gyrovariance.x < GYRO_RAW_VARIANCE_BASE &&
+                    gyrovariance.y < GYRO_RAW_VARIANCE_BASE &&
+                    gyrovariance.z < GYRO_RAW_VARIANCE_BASE &&
+                    _varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < msec_curr;
 
                 _values = shouldUpdate ?  gyromean : _values;
 
-                biasOut = _values;
+                _biasOut = _values;
 
                 _varianceSampleTime =
                     shouldUpdate ? msec_curr : _varianceSampleTime;
 
-                wasValueFound = shouldUpdate ? true : wasValueFound;
+                _wasValueFound = shouldUpdate ? true : _wasValueFound;
 
-                bufferIndex = _isBufferFilled ? 0 : newBufferIndex;
+                _gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
-                _gyroBias = biasOut;
+                _gyroBias = _biasOut;
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
@@ -152,28 +152,23 @@ namespace hf {
                 output.accelGs.y = accelFiltered.y;
                 output.accelGs.z = accelFiltered.z;
 
-                wasGyroBiasFound = wasValueFound;
+                wasGyroBiasFound = _wasValueFound;
             }
 
-                private:
+        private:
 
             // ---------------------------------------------------------------
 
             Vec3 _gyrosum;
             Vec3 _gyrosumsq;
-
-            Vec3 biasOut;
-            bool wasValueFound;
-            uint16_t bufferIndex;
+            Vec3 _biasOut;
+            bool _wasValueFound;
+            uint16_t _gyroSampleCount;
             Vec3 _values;
-            bool _isBufferFilled;
             int32_t _varianceSampleTime;
-
             Vec3 _sumvals;
-
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
-
             Vec3 _gyroBias;
 
             // ---------------------------------------------------------------

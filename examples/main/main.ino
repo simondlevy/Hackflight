@@ -87,8 +87,6 @@ void loop()
 
     _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
 
-    printf("%d\n", _imuFilter.wasGyroBiasFound);
-
     _flyingCheck = _flyingCheck.run(
             _flyingCheck, millis(), _mixer.motorvals, 4);
 
