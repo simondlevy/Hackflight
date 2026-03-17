@@ -60,27 +60,6 @@ namespace hf {
 
                     GyroBiasCalculator() = default;
 
-                    /*
-                    GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
-                        = default;
-
-                    GyroBiasCalculator(
-                            const Vec3 & biasOut,
-                            const bool wasValueFound,
-                            const uint16_t bufferIndex,
-                            const ThreeAxisStats & stats,
-                            const Vec3 & values,
-                            const bool isBufferFilled,
-                            const int32_t varianceSampleTime)
-                        :                     
-                            biasOut(biasOut),
-                            wasValueFound(wasValueFound),
-                            bufferIndex(bufferIndex),
-                            _stats(stats),
-                            _values(values),
-                            _isBufferFilled(isBufferFilled),
-                            _varianceSampleTime(varianceSampleTime) {}*/
-
                     void process(const Vec3Raw * buffer, const uint32_t ticks)
                     {
                         const auto newBufferIndex = bufferIndex + 1;
@@ -150,6 +129,78 @@ namespace hf {
 
             }; // class GyroBias
 
+            static auto calculateStats(const Vec3Raw * buffer)
+                -> ThreeAxisStats
+                {
+                    int64_t xsum=0, ysum=0, zsum=0;
+                    int64_t xsumsq=0, ysumsq=0, zsumsq=0;
+
+                    for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
+
+                        printf("values,%d,%d,%d\n", 
+                                buffer[i].x, buffer[i].y, buffer[i].z);
+
+                        xsum += buffer[i].x;
+                        ysum += buffer[i].y;
+                        zsum += buffer[i].z;
+                        xsumsq += buffer[i].x * buffer[i].x;
+                        ysumsq += buffer[i].y * buffer[i].y;
+                        zsumsq += buffer[i].z * buffer[i].z;
+                    }
+
+                    const auto mean = Vec3(
+                            (float) xsum / NBR_OF_SAMPLES,
+                            (float) ysum / NBR_OF_SAMPLES,
+                            (float) zsum / NBR_OF_SAMPLES);
+
+                    const auto variance = Vec3(
+                            (float)xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
+                            (float)ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
+                            (float)zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
+
+                    printf("\noldmean,%f,%f,%f\n",
+                            mean.x, mean.y, mean.z);
+                    printf("oldvariance,%f,%f,%f\n\n",
+                            variance.x, variance.y, variance.z);
+
+                    return ThreeAxisStats(mean, variance);
+                }
+
+
+            void process(const Vec3Raw * buffer, const uint32_t ticks)
+            {
+                const auto newBufferIndex = _gyroBiasCalculator.bufferIndex + 1;
+
+                _gyroBiasCalculator._isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+
+                const auto wantUpdate = !_gyroBiasCalculator.wasValueFound &&
+                    _gyroBiasCalculator._isBufferFilled;
+
+                _gyroBiasCalculator._stats = wantUpdate ? calculateStats(buffer) :
+                    _gyroBiasCalculator._stats;
+
+                const auto shouldUpdate = wantUpdate &&
+                    _gyroBiasCalculator._stats.variance.x < RAW_VARIANCE_BASE &&
+                    _gyroBiasCalculator._stats.variance.y < RAW_VARIANCE_BASE &&
+                    _gyroBiasCalculator._stats.variance.z < RAW_VARIANCE_BASE &&
+                    _gyroBiasCalculator._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+
+                _gyroBiasCalculator._values = shouldUpdate ?
+                    _gyroBiasCalculator._stats.mean : _gyroBiasCalculator._values;
+
+                _gyroBiasCalculator.biasOut = _gyroBiasCalculator._values;
+
+                _gyroBiasCalculator._varianceSampleTime =
+                    shouldUpdate ? ticks : _gyroBiasCalculator._varianceSampleTime;
+
+                _gyroBiasCalculator.wasValueFound = shouldUpdate ? true :
+                    _gyroBiasCalculator.wasValueFound;
+
+                _gyroBiasCalculator.bufferIndex = _gyroBiasCalculator._isBufferFilled ? 0 :
+                    newBufferIndex;
+            }
+
+
         public:
 
             ImuFiltered output;
@@ -201,7 +252,8 @@ namespace hf {
                 // Calibrate gyro with raw values if necessary
                 _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroraw;
 
-                _gyroBiasCalculator.process(_gyroSamplesBuffer, msec_curr);
+                //_gyroBiasCalculator.process(_gyroSamplesBuffer, msec_curr);
+                process(_gyroSamplesBuffer, msec_curr);
 
                 _gyroBias = _gyroBiasCalculator.biasOut;
 
