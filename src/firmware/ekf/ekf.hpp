@@ -60,6 +60,8 @@ namespace hf {
             // the reversion of pitch and roll to zero
             static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
+            static const size_t QUEUE_MAX_LENGTH = 20;
+
         public:
 
             EKF()
@@ -68,7 +70,7 @@ namespace hf {
             }
 
             EKF& operator=(const EKF& other) = default;
- 
+
             auto getVehicleState(
                     const uint32_t msec_curr,
                     const bool isFlying,
@@ -160,8 +162,7 @@ namespace hf {
         private:
 
             // Indexes to access the vehicle's state, stored as a column vector
-            enum
-            {
+            enum {
                 STATE_X,
                 STATE_Y,
                 STATE_Z,
@@ -172,7 +173,6 @@ namespace hf {
                 STATE_D1,
                 STATE_D2,
                 STATE_DIM
-
             };
 
             typedef enum {
@@ -182,19 +182,15 @@ namespace hf {
                 MeasurementTypeFlow,
             } MeasurementType;
 
-
-            typedef struct
-            {
+            typedef struct {
                 Vec3 gyro; // deg/s, for legacy reasons
             } gyroscopeMeasurement_t;
 
-            typedef struct
-            {
+            typedef struct {
                 Vec3 acc; // Gs, for legacy reasons
             } accelerationMeasurement_t;
 
-            typedef struct
-            {
+            typedef struct {
                 MeasurementType type;
                 union
                 {
@@ -205,10 +201,62 @@ namespace hf {
                 } data;
             } measurement_t;
 
-            static const size_t QUEUE_MAX_LENGTH = 20;
             static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+
+            typedef struct {
+                Vec3 sum;
+                uint32_t count;
+                float conversionFactor;
+                Vec3 subSample;
+            } Vec3SubSampler_t;
+
+            // ----------------------------------------------------------------
+
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+
             uint32_t _queueLength;
+
+            // Quaternion used for initial orientation [w,x,y,z]
+            float _qinit0, _qinit1, _qinit2, _qinit3;
+
+            Vec3 _accLatest;
+            Vec3 _gyroLatest;
+
+            Vec3SubSampler_t _accSubSampler;
+            Vec3SubSampler_t _gyroSubSampler;
+
+            float _predictedNX;
+            float _predictedNY;
+
+            float _measuredNX;
+            float _measuredNY;
+
+            // The vehicle's attitude as a rotation matrix (used by the prediction,
+            // updated by the finalization)
+            float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            float _q0, _q1, _q2, _q3;
+
+            // State vector
+            __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+
+            // Covariance helper
+            matrix_t _p_m;
+
+            // Tracks whether an update to the state has been made, and the state
+            // therefore requires finalization
+            bool _isUpdated;
+
+            uint32_t _lastPredictionMs;
+            uint32_t _lastProcessNoiseUpdateMs;
+
+            // ----------------------------------------------------------------
 
             void reset(const uint32_t msec_curr)
             {
@@ -254,7 +302,6 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
                 _lastProcessNoiseUpdateMs = msec_curr;
             }
-
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
@@ -425,80 +472,22 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
+            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
+            {
+                if (isnan(pval) || pval > MAX_COVARIANCE) {
+                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                } else if ( i==j && pval < MIN_COVARIANCE ) {
+                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                } else {
+                    _p[i][j] = _p[j][i] = pval;
+                }
+            }
 
             void enqueue(const EKF::measurement_t * measurement) 
             {
                 memcpy(&_measurementsQueue[_queueLength], measurement,
                         sizeof(EKF::measurement_t));
                 _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
-            }
-
-            typedef struct {
-                Vec3 sum;
-                uint32_t count;
-                float conversionFactor;
-                Vec3 subSample;
-            } Vec3SubSampler_t;
-
-            // Quaternion used for initial orientation [w,x,y,z]
-            float _qinit0, _qinit1, _qinit2, _qinit3;
-
-            Vec3 _accLatest;
-            Vec3 _gyroLatest;
-
-            Vec3SubSampler_t _accSubSampler;
-            Vec3SubSampler_t _gyroSubSampler;
-
-            float _predictedNX;
-            float _predictedNY;
-
-            float _measuredNX;
-            float _measuredNY;
-
-            // The vehicle's attitude as a rotation matrix (used by the prediction,
-            // updated by the finalization)
-            float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
-            float _q0, _q1, _q2, _q3;
-
-            static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
-                    float conversionFactor) { memset(subSampler, 0,
-                        sizeof(Vec3SubSampler_t));
-                    subSampler->conversionFactor = conversionFactor;
-            }
-
-            static void axis3fSubSamplerAccumulate(Vec3SubSampler_t* subSampler,
-                    const Vec3* sample) {
-                subSampler->sum.x += sample->x;
-                subSampler->sum.y += sample->y;
-                subSampler->sum.z += sample->z;
-
-                subSampler->count++;
-            }
-
-            static Vec3* axis3fSubSamplerFinalize(Vec3SubSampler_t* subSampler,
-                    const char * label) 
-            {
-                if (subSampler->count > 0) {
-
-                    subSampler->subSample.x = 
-                        subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.y = 
-                        subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.z = 
-                        subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
-
-                    // Reset
-                    subSampler->count = 0;
-                    subSampler->sum.x = 0;
-                    subSampler->sum.y = 0;
-                    subSampler->sum.z = 0;
-                }
-
-                return &subSampler->subSample;
             }
 
             void finalize(const uint32_t msec_curr)
@@ -715,22 +704,6 @@ namespace hf {
                 _gyroLatest = m.data.gyroscope.gyro;
             }
 
-            // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
-
-            // Covariance matrix
-            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
-
-            // Covariance helper
-            matrix_t _p_m;
-
-            // Tracks whether an update to the state has been made, and the state
-            // therefore requires finalization
-            bool _isUpdated;
-
-            uint32_t _lastPredictionMs;
-            uint32_t _lastProcessNoiseUpdateMs;
-
             void ekf_init()
             {
                 for (int i=0; i< STATE_DIM; i++) {
@@ -855,22 +828,49 @@ namespace hf {
                 }
             }
 
-            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
-            {
-                if (isnan(pval) || pval > MAX_COVARIANCE) {
-                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
-                } else if ( i==j && pval < MIN_COVARIANCE ) {
-                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
-                } else {
-                    _p[i][j] = _p[j][i] = pval;
-                }
+            static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
+                    float conversionFactor) { memset(subSampler, 0,
+                        sizeof(Vec3SubSampler_t));
+                    subSampler->conversionFactor = conversionFactor;
             }
+
+            static void axis3fSubSamplerAccumulate(Vec3SubSampler_t* subSampler,
+                    const Vec3* sample) {
+                subSampler->sum.x += sample->x;
+                subSampler->sum.y += sample->y;
+                subSampler->sum.z += sample->z;
+
+                subSampler->count++;
+            }
+
+            static Vec3* axis3fSubSamplerFinalize(Vec3SubSampler_t* subSampler,
+                    const char * label) 
+            {
+                if (subSampler->count > 0) {
+
+                    subSampler->subSample.x = 
+                        subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
+                    subSampler->subSample.y = 
+                        subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
+                    subSampler->subSample.z = 
+                        subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
+
+                    // Reset
+                    subSampler->count = 0;
+                    subSampler->sum.x = 0;
+                    subSampler->sum.y = 0;
+                    subSampler->sum.z = 0;
+                }
+
+                return &subSampler->subSample;
+            }
+
+            // Hardware-dependent --------------------------------------------
+
             void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
 
             void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
                     matrix_t * pDst);
-
-            // Hardware-dependent --------------------------------------------
 
             static float device_cos(const float x);
             static float device_sin(const float x);
