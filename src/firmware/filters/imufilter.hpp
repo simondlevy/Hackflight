@@ -106,12 +106,12 @@ namespace hf {
                     gyrovariance.x < GYRO_RAW_VARIANCE_BASE &&
                     gyrovariance.y < GYRO_RAW_VARIANCE_BASE &&
                     gyrovariance.z < GYRO_RAW_VARIANCE_BASE &&
-                    _varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < msec_curr;
+                    _gyroVarianceSampleTimeMsec + GYRO_MIN_BIAS_TIMEOUT_MS < msec_curr;
 
                 _gyroBias = shouldUpdate ?  gyromean : _gyroBias;
 
-                _varianceSampleTime =
-                    shouldUpdate ? msec_curr : _varianceSampleTime;
+                _gyroVarianceSampleTimeMsec =
+                    shouldUpdate ? msec_curr : _gyroVarianceSampleTimeMsec;
 
                 wasGyroBiasFound = shouldUpdate ? true : wasGyroBiasFound;
 
@@ -157,7 +157,7 @@ namespace hf {
             Vec3 _gyrosumsq;
             uint16_t _gyroSampleCount;
             Vec3 _gyroBias;
-            int32_t _varianceSampleTime;
+            int32_t _gyroVarianceSampleTimeMsec;
             Vec3 _sumvals;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
