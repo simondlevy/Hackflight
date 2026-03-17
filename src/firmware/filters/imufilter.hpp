@@ -113,6 +113,7 @@ namespace hf {
                 const auto wantUpdate =!filter.wasGyroBiasFound &&
                     isBufferFilled;
 
+                /*
                 if (filter.wasGyroBiasFound) {
 
                     static bool _printed;
@@ -124,7 +125,7 @@ namespace hf {
                                 gyrovariance.x, gyrovariance.y, gyrovariance.z);
                         _printed = true;
                     }
-                }
+                }*/
 
                 const auto shouldUpdate = wantUpdate &&
                     gyrovariance.x < GYRO_RAW_VARIANCE_BASE &&

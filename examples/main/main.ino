@@ -70,8 +70,6 @@ void setup()
     _motors.arm(); 
 
     _led.begin(); 
-
-    delay(3000);
 }
 
 void loop()
@@ -82,8 +80,12 @@ void loop()
 
     const auto imuraw = _imu.read();
 
+    /*
     _imuFilter.step(
-            millis(), imuraw, _imu.gyroRangeDps(), _imu.accelRangeGs());
+            millis(), imuraw, _imu.gyroRangeDps(), _imu.accelRangeGs());*/
+
+    _imuFilter = _imuFilter.step(_imuFilter, millis(), imuraw,
+            _imu.gyroRangeDps(), _imu.accelRangeGs());
 
     _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
 
