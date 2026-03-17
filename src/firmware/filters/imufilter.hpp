@@ -101,6 +101,11 @@ namespace hf {
                 const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
                 static bool _printed;
+
+                _gyrosum = wasGyroBiasFound ? _gyrosum : _gyrosum + gyroval;
+                _gyrosumsq = wasGyroBiasFound ? _gyrosumsq :
+                    _gyrosumsq + (gyroval * gyroval);
+
                 if (wasGyroBiasFound) {
 
                     if (!_printed) {
@@ -112,8 +117,8 @@ namespace hf {
                     }
                 }
                 else {
-                    _gyrosum = _gyrosum + gyroval;
-                    _gyrosumsq = _gyrosumsq + (gyroval * gyroval);
+                    //_gyrosum = _gyrosum + gyroval;
+                    //_gyrosumsq = _gyrosumsq + (gyroval * gyroval);
                 }
 
                 // Convert accel to Gs
