@@ -55,6 +55,19 @@ namespace hf {
 
             ImuFilter() = default;
 
+            /*
+            ImuFilter(
+                    const ImuFiltered & output,
+                    const bool wasGyroBiasFound,
+                    const Vec3 & gyroSum,
+                    const Vec3 & gyroSumOfSquares,
+                    const uint16_t  gyroSampleCount,
+                    const Vec3 & gyroBias,
+                    const uint32_t gyroVarianceSampleTimeMsec,
+                    const ThreeAxisLpf & accelLpf,
+                    const ThreeAxisLpf & gyroLpf) 
+                : {}*/
+
             void step(
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
@@ -157,7 +170,7 @@ namespace hf {
             Vec3 _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
             Vec3 _gyroBias;
-            int32_t _gyroVarianceSampleTimeMsec;
+            uint32_t _gyroVarianceSampleTimeMsec;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
 
