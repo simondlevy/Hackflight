@@ -53,9 +53,6 @@ namespace hf {
 
                     for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
 
-                        printf("values,%d,%d,%d\n", 
-                                buffer[i].x, buffer[i].y, buffer[i].z);
-
                         xsum += buffer[i].x;
                         ysum += buffer[i].y;
                         zsum += buffer[i].z;
