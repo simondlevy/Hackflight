@@ -45,23 +45,6 @@ namespace hf {
             // affects the threshold
             static const uint16_t NBR_OF_SAMPLES = 512;
 
-            class GyroBiasCalculator {
-
-                public:
-
-
-                    Vec3 biasOut;
-                    bool wasValueFound;
-                    uint16_t bufferIndex;
-                    ThreeAxisStats _stats;
-                    Vec3 _values;
-                    bool _isBufferFilled;
-                    int32_t _varianceSampleTime;
-
-                    GyroBiasCalculator() = default;
-
-            }; // class GyroBias
-
             static auto calculateStats(const Vec3Raw * buffer)
                 -> ThreeAxisStats
                 {
@@ -102,34 +85,34 @@ namespace hf {
 
             void process(const Vec3Raw * buffer, const uint32_t ticks)
             {
-                const auto newBufferIndex = _gyroBiasCalculator.bufferIndex + 1;
+                const auto newBufferIndex = bufferIndex + 1;
 
-                _gyroBiasCalculator._isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+                _isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
 
-                const auto wantUpdate = !_gyroBiasCalculator.wasValueFound &&
-                    _gyroBiasCalculator._isBufferFilled;
+                const auto wantUpdate = !wasValueFound &&
+                    _isBufferFilled;
 
-                _gyroBiasCalculator._stats = wantUpdate ? calculateStats(buffer) :
-                    _gyroBiasCalculator._stats;
+                _stats = wantUpdate ? calculateStats(buffer) :
+                    _stats;
 
                 const auto shouldUpdate = wantUpdate &&
-                    _gyroBiasCalculator._stats.variance.x < RAW_VARIANCE_BASE &&
-                    _gyroBiasCalculator._stats.variance.y < RAW_VARIANCE_BASE &&
-                    _gyroBiasCalculator._stats.variance.z < RAW_VARIANCE_BASE &&
-                    _gyroBiasCalculator._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+                    _stats.variance.x < RAW_VARIANCE_BASE &&
+                    _stats.variance.y < RAW_VARIANCE_BASE &&
+                    _stats.variance.z < RAW_VARIANCE_BASE &&
+                    _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
 
-                _gyroBiasCalculator._values = shouldUpdate ?
-                    _gyroBiasCalculator._stats.mean : _gyroBiasCalculator._values;
+                _values = shouldUpdate ?
+                    _stats.mean : _values;
 
-                _gyroBiasCalculator.biasOut = _gyroBiasCalculator._values;
+                biasOut = _values;
 
-                _gyroBiasCalculator._varianceSampleTime =
-                    shouldUpdate ? ticks : _gyroBiasCalculator._varianceSampleTime;
+                _varianceSampleTime =
+                    shouldUpdate ? ticks : _varianceSampleTime;
 
-                _gyroBiasCalculator.wasValueFound = shouldUpdate ? true :
-                    _gyroBiasCalculator.wasValueFound;
+                wasValueFound = shouldUpdate ? true :
+                    wasValueFound;
 
-                _gyroBiasCalculator.bufferIndex = _gyroBiasCalculator._isBufferFilled ? 0 :
+                bufferIndex = _isBufferFilled ? 0 :
                     newBufferIndex;
             }
 
@@ -183,12 +166,12 @@ namespace hf {
                 };
 
                 // Calibrate gyro with raw values if necessary
-                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroraw;
+                _gyroSamplesBuffer[bufferIndex] = gyroraw;
 
-                //_gyroBiasCalculator.process(_gyroSamplesBuffer, msec_curr);
+                //process(_gyroSamplesBuffer, msec_curr);
                 process(_gyroSamplesBuffer, msec_curr);
 
-                _gyroBias = _gyroBiasCalculator.biasOut;
+                _gyroBias = biasOut;
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
@@ -221,7 +204,7 @@ namespace hf {
                 output.accelGs.y = accelFiltered.y;
                 output.accelGs.z = accelFiltered.z;
 
-                wasGyroBiasFound = _gyroBiasCalculator.wasValueFound;
+                wasGyroBiasFound = wasValueFound;
             }
 
         private:
@@ -231,7 +214,13 @@ namespace hf {
             Vec3 _gyrosum;
             Vec3 _gyrosumsq;
 
-            GyroBiasCalculator _gyroBiasCalculator;
+            Vec3 biasOut;
+            bool wasValueFound;
+            uint16_t bufferIndex;
+            ThreeAxisStats _stats;
+            Vec3 _values;
+            bool _isBufferFilled;
+            int32_t _varianceSampleTime;
 
             Vec3 _sumvals;
 
