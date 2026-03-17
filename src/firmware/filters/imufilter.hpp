@@ -124,7 +124,6 @@ namespace hf {
                 _stats = wantUpdate ? calculateStats(_gyroSamplesBuffer) :
                     _stats;
 
-                //if (wantUpdate) {
                 if (wasGyroBiasFound) {
 
                     static bool _printed;
@@ -136,15 +135,6 @@ namespace hf {
                                 mean.x, mean.y, mean.z);
                         printf("oldvariance,%+3.3f,%+3.3f,%+3.3f\n\n",
                                 variance.x, variance.y, variance.z);
-                        _printed = true;
-                    }
-                }
-
-                if (wasGyroBiasFound) {
-
-                    static bool _printed;
-
-                    if (!_printed) {
                         printf("newmean,%+3.3f,%+3.3f,%+3.3f\n", 
                                 gyromean.x, gyromean.y, gyromean.z);
                         printf("newvariance,%+3.3f,%+3.3f,%+3.3f\n", 
