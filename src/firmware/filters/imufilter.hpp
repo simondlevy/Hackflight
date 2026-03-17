@@ -53,6 +53,10 @@ namespace hf {
                     Vec3 biasOut;
                     bool wasValueFound;
                     uint16_t bufferIndex;
+                    ThreeAxisStats _stats;
+                    Vec3 _values;
+                    bool _isBufferFilled;
+                    int32_t _varianceSampleTime;
 
                     GyroBiasCalculator() = default;
 
@@ -117,11 +121,6 @@ namespace hf {
 
                 private:
 
-                    ThreeAxisStats _stats;
-                    Vec3 _values;
-                    bool _isBufferFilled;
-                    int32_t _varianceSampleTime;
-
                     static auto calculateStats(const Vec3Raw * buffer)
                         -> ThreeAxisStats
                         {
@@ -160,6 +159,7 @@ namespace hf {
                         }
 
             }; // class GyroBias
+
         public:
 
             ImuFiltered output;
