@@ -83,38 +83,37 @@ namespace hf {
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs) -> ImuFilter
             {
-                return ImuFilter();
-
-                /*
                 const auto gyroraw = imuraw.gyro;
 
-                const auto n = NBR_OF_SAMPLES;
+                const auto gyromean = filter._gyroSum / NBR_OF_SAMPLES;
 
-                const auto gyromean = _gyroSum / n;
-
-                const auto gyrovariance = (_gyroSumOfSquares/n) - (gyromean*gyromean);
+                const auto gyrovariance =
+                    (filter._gyroSumOfSquares/NBR_OF_SAMPLES) -
+                    (gyromean*gyromean);
 
                 const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
-                _gyroSum = wasGyroBiasFound ? _gyroSum : _gyroSum + gyroval;
+                const auto gyroSum = filter.wasGyroBiasFound ?
+                    filter._gyroSum : filter._gyroSum + gyroval;
 
-                _gyroSumOfSquares = wasGyroBiasFound ? _gyroSumOfSquares :
-                    _gyroSumOfSquares + (gyroval * gyroval);
+                const auto gyroSumOfSquares = filter.wasGyroBiasFound ?
+                    filter._gyroSumOfSquares :
+                    filter._gyroSumOfSquares + (gyroval * gyroval);
 
                 // Convert accel to Gs
-                const Vec3 accel = {
+                const auto accel = Vec3(
                     scale(imuraw.accel.x, accel_range_gs),
                     scale(imuraw.accel.y, accel_range_gs),
-                    scale(imuraw.accel.z, accel_range_gs)
-                };
+                    scale(imuraw.accel.z, accel_range_gs));
 
-                const auto newBufferIndex = _gyroSampleCount + 1;
+                const auto newBufferIndex = filter._gyroSampleCount + 1;
 
                 const auto isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
 
-                const auto wantUpdate = !wasGyroBiasFound && isBufferFilled;
+                const auto wantUpdate =!filter.wasGyroBiasFound &&
+                    isBufferFilled;
 
-                if (wasGyroBiasFound) {
+                if (filter.wasGyroBiasFound) {
 
                     static bool _printed;
 
@@ -131,48 +130,55 @@ namespace hf {
                     gyrovariance.x < GYRO_RAW_VARIANCE_BASE &&
                     gyrovariance.y < GYRO_RAW_VARIANCE_BASE &&
                     gyrovariance.z < GYRO_RAW_VARIANCE_BASE &&
-                    _gyroVarianceSampleTimeMsec + GYRO_MIN_BIAS_TIMEOUT_MS < msec_curr;
+                    filter._gyroVarianceSampleTimeMsec +GYRO_MIN_BIAS_TIMEOUT_MS <
+                    msec_curr;
 
-                _gyroBias = shouldUpdate ?  gyromean : _gyroBias;
+                const auto gyroBias = shouldUpdate ?  gyromean :
+                    filter._gyroBias;
 
-                _gyroVarianceSampleTimeMsec =
-                    shouldUpdate ? msec_curr : _gyroVarianceSampleTimeMsec;
+                const auto gyroVarianceSampleTimeMsec =
+                    shouldUpdate ? msec_curr : filter._gyroVarianceSampleTimeMsec;
 
-                wasGyroBiasFound = shouldUpdate ? true : wasGyroBiasFound;
+                const auto wasGyroBiasFound = shouldUpdate ? true :
+                    filter.wasGyroBiasFound;
 
-                _gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
+                const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
-                // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
-                    scale(imuraw.gyro.x - _gyroBias.x, gyro_range_dps),
-                    scale(imuraw.gyro.y - _gyroBias.y, gyro_range_dps),
-                    scale(imuraw.gyro.z - _gyroBias.z, gyro_range_dps)
+                    scale(imuraw.gyro.x - gyroBias.x, gyro_range_dps),
+                    scale(imuraw.gyro.y - gyroBias.y, gyro_range_dps),
+                    scale(imuraw.gyro.z - gyroBias.z, gyro_range_dps)
                 };
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
-                _gyroLpf = _gyroLpf.apply(_gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+                const auto gyroLpf = filter._gyroLpf.apply(
+                        filter._gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
 
-                const auto gyroFiltered = _gyroLpf.output;
+                const auto gyroFiltered = gyroLpf.output;
 
                 const auto accelAlignedToAirframe = alignToAirframe(accel);
 
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
 
-                _accelLpf = _accelLpf.apply(
-                        _accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+                const auto accelLpf = filter._accelLpf.apply(filter._accelLpf,
+                        accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
 
-                const auto accelFiltered = _accelLpf.output;
+                const auto accelFiltered = filter._accelLpf.output;
 
-                output.gyroDps.x = gyroFiltered.x;
-                output.gyroDps.y = gyroFiltered.y;
-                output.gyroDps.z = gyroFiltered.z;
+                const auto output = ImuFiltered(gyroFiltered, accelFiltered);
 
-                output.accelGs.x = accelFiltered.x;
-                output.accelGs.y = accelFiltered.y;
-                output.accelGs.z = accelFiltered.z;
-                */
+                return ImuFilter(
+                        output,
+                        wasGyroBiasFound,
+                        gyroSum,
+                        gyroSumOfSquares,
+                        gyroSampleCount,
+                        gyroBias,
+                        gyroVarianceSampleTimeMsec,
+                        accelLpf,
+                        gyroLpf);
             }
 
             void step(
