@@ -106,21 +106,6 @@ namespace hf {
                 _gyrosumsq = wasGyroBiasFound ? _gyrosumsq :
                     _gyrosumsq + (gyroval * gyroval);
 
-                if (wasGyroBiasFound) {
-
-                    if (!_printed) {
-                        printf("newmean,%+3.3f,%+3.3f,%+3.3f\n", 
-                                gyromean.x, gyromean.y, gyromean.z);
-                        printf("newvariance,%+3.3f,%+3.3f,%+3.3f\n", 
-                                gyrovariance.x, gyrovariance.y, gyrovariance.z);
-                        _printed = true;
-                    }
-                }
-                else {
-                    //_gyrosum = _gyrosum + gyroval;
-                    //_gyrosumsq = _gyrosumsq + (gyroval * gyroval);
-                }
-
                 // Convert accel to Gs
                 const Vec3 accel = {
                     scale(imuraw.accel.x, accel_range_gs),
@@ -148,6 +133,16 @@ namespace hf {
                             mean.x, mean.y, mean.z);
                     printf("oldvariance,%+3.3f,%+3.3f,%+3.3f\n\n",
                             variance.x, variance.y, variance.z);
+                }
+                if (wasGyroBiasFound) {
+
+                    if (!_printed) {
+                        printf("newmean,%+3.3f,%+3.3f,%+3.3f\n", 
+                                gyromean.x, gyromean.y, gyromean.z);
+                        printf("newvariance,%+3.3f,%+3.3f,%+3.3f\n", 
+                                gyrovariance.x, gyrovariance.y, gyrovariance.z);
+                        _printed = true;
+                    }
                 }
 
                 const auto shouldUpdate = wantUpdate &&
