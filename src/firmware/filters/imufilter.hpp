@@ -104,9 +104,9 @@ namespace hf {
                 if (wasGyroBiasFound) {
 
                     if (!_printed) {
-                        printf("newmean,%f,%f,%f\n", 
+                        printf("newmean,%+3.3f,%+3.3f,%+3.3f\n", 
                                 gyromean.x, gyromean.y, gyromean.z);
-                        printf("newvariance,%f,%f,%f\n", 
+                        printf("newvariance,%+3.3f,%+3.3f,%+3.3f\n", 
                                 gyrovariance.x, gyrovariance.y, gyrovariance.z);
                         _printed = true;
                     }
@@ -139,9 +139,9 @@ namespace hf {
                 if (wantUpdate) {
                     const auto mean = _stats.mean;
                     const auto variance = _stats.variance;
-                    printf("\noldmean,%f,%f,%f\n",
+                    printf("\noldmean,%+3.3f,%+3.3f,%+3.3f\n",
                             mean.x, mean.y, mean.z);
-                    printf("oldvariance,%f,%f,%f\n\n",
+                    printf("oldvariance,%+3.3f,%+3.3f,%+3.3f\n\n",
                             variance.x, variance.y, variance.z);
                 }
 
