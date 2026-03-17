@@ -210,7 +210,7 @@ namespace hf {
                 Vec3 subSample;
             } Vec3SubSampler_t;
 
-            // ----------------------------------------------------------------
+            // Instance vars --------------------------------------------------
 
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
 
@@ -256,7 +256,7 @@ namespace hf {
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
 
-            // ----------------------------------------------------------------
+            // Instance methods ----------------------------------------------
 
             void reset(const uint32_t msec_curr)
             {
@@ -827,6 +827,8 @@ namespace hf {
                     }
                 }
             }
+
+            // Static methods ------------------------------------------------
 
             static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
                     float conversionFactor) { memset(subSampler, 0,
