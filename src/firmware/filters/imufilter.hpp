@@ -83,7 +83,7 @@ namespace hf {
                 }
 
 
-            void process(const Vec3Raw * buffer, const uint32_t ticks)
+            void process(const Vec3Raw * buffer, const uint32_t msec_curr)
             {
                 const auto newBufferIndex = bufferIndex + 1;
 
@@ -99,7 +99,7 @@ namespace hf {
                     _stats.variance.x < RAW_VARIANCE_BASE &&
                     _stats.variance.y < RAW_VARIANCE_BASE &&
                     _stats.variance.z < RAW_VARIANCE_BASE &&
-                    _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+                    _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < msec_curr;
 
                 _values = shouldUpdate ?
                     _stats.mean : _values;
@@ -107,7 +107,7 @@ namespace hf {
                 biasOut = _values;
 
                 _varianceSampleTime =
-                    shouldUpdate ? ticks : _varianceSampleTime;
+                    shouldUpdate ? msec_curr : _varianceSampleTime;
 
                 wasValueFound = shouldUpdate ? true :
                     wasValueFound;
@@ -168,7 +168,6 @@ namespace hf {
                 // Calibrate gyro with raw values if necessary
                 _gyroSamplesBuffer[bufferIndex] = gyroraw;
 
-                //process(_gyroSamplesBuffer, msec_curr);
                 process(_gyroSamplesBuffer, msec_curr);
 
                 _gyroBias = biasOut;
