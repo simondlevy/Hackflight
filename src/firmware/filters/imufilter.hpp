@@ -71,11 +71,6 @@ namespace hf {
                             (float)ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
                             (float)zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
 
-                    printf("\noldmean,%f,%f,%f\n",
-                            mean.x, mean.y, mean.z);
-                    printf("oldvariance,%f,%f,%f\n\n",
-                            variance.x, variance.y, variance.z);
-
                     return ThreeAxisStats(mean, variance);
                 }
 
@@ -139,6 +134,15 @@ namespace hf {
 
                 _stats = wantUpdate ? calculateStats(_gyroSamplesBuffer) :
                     _stats;
+
+                if (wantUpdate) {
+                    const auto mean = _stats.mean;
+                    const auto variance = _stats.variance;
+                    printf("\noldmean,%f,%f,%f\n",
+                            mean.x, mean.y, mean.z);
+                    printf("oldvariance,%f,%f,%f\n\n",
+                            variance.x, variance.y, variance.z);
+                }
 
                 const auto shouldUpdate = wantUpdate &&
                     _stats.variance.x < RAW_VARIANCE_BASE &&
