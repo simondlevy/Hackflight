@@ -80,6 +80,34 @@ namespace hf {
                             _isBufferFilled(isBufferFilled),
                             _varianceSampleTime(varianceSampleTime) {}
 
+                    void process(const Vec3Raw * buffer, const uint32_t ticks)
+                    {
+                        const auto newBufferIndex = bufferIndex + 1;
+
+                        _isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+
+                        const auto wantUpdate = !wasValueFound && _isBufferFilled;
+
+                        _stats = wantUpdate ? calculateStats(buffer) : _stats;
+
+                        const auto shouldUpdate = wantUpdate &&
+                            _stats.variance.x < RAW_VARIANCE_BASE &&
+                            _stats.variance.y < RAW_VARIANCE_BASE &&
+                            _stats.variance.z < RAW_VARIANCE_BASE &&
+                            _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
+
+                        _values = shouldUpdate ? _stats.mean : _values;
+
+                        biasOut = _values;
+
+                        _varianceSampleTime =
+                            shouldUpdate ? ticks : _varianceSampleTime;
+
+                        wasValueFound = shouldUpdate ? true : wasValueFound;
+
+                        bufferIndex = _isBufferFilled ? 0 : newBufferIndex;
+                    }
+
                     static auto process(
                             const GyroBiasCalculator & calc,
                             const Vec3Raw * buffer,
@@ -210,10 +238,12 @@ namespace hf {
 
                 // Calibrate gyro with raw values if necessary
                 _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroraw;
-                _gyroBiasCalculator = GyroBiasCalculator::process(
-                        _gyroBiasCalculator,
-                        _gyroSamplesBuffer,
-                        msec_curr);
+
+                /*_gyroBiasCalculator = GyroBiasCalculator::process(
+                        _gyroBiasCalculator, _gyroSamplesBuffer, msec_curr);*/
+
+                _gyroBiasCalculator.process(_gyroSamplesBuffer, msec_curr);
+
                 _gyroBias = _gyroBiasCalculator.biasOut;
 
                 // Subtract gyro bias
