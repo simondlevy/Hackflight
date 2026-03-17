@@ -38,18 +38,17 @@ namespace hf {
             static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
             static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
+            static constexpr float RAW_VARIANCE_BASE = 100;
+            static const uint32_t MIN_BIAS_TIMEOUT_MS = 1000;
+
+            // Number of samples used in variance calculation. Changing this
+            // affects the threshold
+            static const uint16_t NBR_OF_SAMPLES = 512;
+
             class GyroBiasCalculator {
-
-                private:
-
-                    static constexpr float RAW_VARIANCE_BASE = 100;
-                    static const uint32_t MIN_BIAS_TIMEOUT_MS = 1000;
 
                 public:
 
-                    // Number of samples used in variance calculation. Changing this
-                    // affects the threshold
-                    static const uint16_t NBR_OF_SAMPLES = 512;
 
                     Vec3 biasOut;
                     bool wasValueFound;
@@ -182,7 +181,7 @@ namespace hf {
                 static bool _printed;
                 if (wasGyroBiasFound) {
 
-                    const auto n = GyroBiasCalculator::NBR_OF_SAMPLES;
+                    const auto n = NBR_OF_SAMPLES;
 
                     const auto gyromean = _gyrosum / n;
 
@@ -267,7 +266,7 @@ namespace hf {
 
             Vec3 _gyroBias;
 
-            Vec3Raw _gyroSamplesBuffer[GyroBiasCalculator::NBR_OF_SAMPLES];
+            Vec3Raw _gyroSamplesBuffer[NBR_OF_SAMPLES];
 
             // ---------------------------------------------------------------
 
