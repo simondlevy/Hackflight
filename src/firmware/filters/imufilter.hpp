@@ -98,6 +98,8 @@ namespace hf {
 
                 const auto gyrovariance = (_gyrosumsq/n) - (gyromean*gyromean);
 
+                const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
+
                 static bool _printed;
                 if (wasGyroBiasFound) {
 
@@ -110,7 +112,6 @@ namespace hf {
                     }
                 }
                 else {
-                    const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
                     _gyrosum = _gyrosum + gyroval;
                     _gyrosumsq = _gyrosumsq + (gyroval * gyroval);
                 }
