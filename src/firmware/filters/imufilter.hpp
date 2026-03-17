@@ -82,41 +82,6 @@ namespace hf {
                     return ThreeAxisStats(mean, variance);
                 }
 
-
-            void process(const Vec3Raw * buffer, const uint32_t msec_curr)
-            {
-                const auto newBufferIndex = bufferIndex + 1;
-
-                _isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
-
-                const auto wantUpdate = !wasValueFound &&
-                    _isBufferFilled;
-
-                _stats = wantUpdate ? calculateStats(buffer) :
-                    _stats;
-
-                const auto shouldUpdate = wantUpdate &&
-                    _stats.variance.x < RAW_VARIANCE_BASE &&
-                    _stats.variance.y < RAW_VARIANCE_BASE &&
-                    _stats.variance.z < RAW_VARIANCE_BASE &&
-                    _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < msec_curr;
-
-                _values = shouldUpdate ?
-                    _stats.mean : _values;
-
-                biasOut = _values;
-
-                _varianceSampleTime =
-                    shouldUpdate ? msec_curr : _varianceSampleTime;
-
-                wasValueFound = shouldUpdate ? true :
-                    wasValueFound;
-
-                bufferIndex = _isBufferFilled ? 0 :
-                    newBufferIndex;
-            }
-
-
         public:
 
             ImuFiltered output;
@@ -168,8 +133,36 @@ namespace hf {
                 // Calibrate gyro with raw values if necessary
                 _gyroSamplesBuffer[bufferIndex] = gyroraw;
 
-                process(_gyroSamplesBuffer, msec_curr);
+                const auto newBufferIndex = bufferIndex + 1;
 
+                _isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+
+                const auto wantUpdate = !wasValueFound &&
+                    _isBufferFilled;
+
+                _stats = wantUpdate ? calculateStats(_gyroSamplesBuffer) :
+                    _stats;
+
+                const auto shouldUpdate = wantUpdate &&
+                    _stats.variance.x < RAW_VARIANCE_BASE &&
+                    _stats.variance.y < RAW_VARIANCE_BASE &&
+                    _stats.variance.z < RAW_VARIANCE_BASE &&
+                    _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < msec_curr;
+
+                _values = shouldUpdate ?
+                    _stats.mean : _values;
+
+                biasOut = _values;
+
+                _varianceSampleTime =
+                    shouldUpdate ? msec_curr : _varianceSampleTime;
+
+                wasValueFound = shouldUpdate ? true :
+                    wasValueFound;
+
+                bufferIndex = _isBufferFilled ? 0 :
+                    newBufferIndex;
+ 
                 _gyroBias = biasOut;
 
                 // Subtract gyro bias
