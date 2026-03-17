@@ -76,6 +76,105 @@ namespace hf {
                     _accelLpf(accelLpf),
                     _gyroLpf(gyroLpf) {}
 
+            static auto step(
+                    const ImuFilter & filter,
+                    const uint32_t msec_curr,
+                    const ImuRaw & imuraw,
+                    const int16_t gyro_range_dps,
+                    const int16_t accel_range_gs) -> ImuFilter
+            {
+                return ImuFilter();
+
+                /*
+                const auto gyroraw = imuraw.gyro;
+
+                const auto n = NBR_OF_SAMPLES;
+
+                const auto gyromean = _gyroSum / n;
+
+                const auto gyrovariance = (_gyroSumOfSquares/n) - (gyromean*gyromean);
+
+                const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
+
+                _gyroSum = wasGyroBiasFound ? _gyroSum : _gyroSum + gyroval;
+
+                _gyroSumOfSquares = wasGyroBiasFound ? _gyroSumOfSquares :
+                    _gyroSumOfSquares + (gyroval * gyroval);
+
+                // Convert accel to Gs
+                const Vec3 accel = {
+                    scale(imuraw.accel.x, accel_range_gs),
+                    scale(imuraw.accel.y, accel_range_gs),
+                    scale(imuraw.accel.z, accel_range_gs)
+                };
+
+                const auto newBufferIndex = _gyroSampleCount + 1;
+
+                const auto isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+
+                const auto wantUpdate = !wasGyroBiasFound && isBufferFilled;
+
+                if (wasGyroBiasFound) {
+
+                    static bool _printed;
+
+                    if (!_printed) {
+                        printf("mean,%+3.3f,%+3.3f,%+3.3f\n", 
+                                gyromean.x, gyromean.y, gyromean.z);
+                        printf("variance,%+3.3f,%+3.3f,%+3.3f\n", 
+                                gyrovariance.x, gyrovariance.y, gyrovariance.z);
+                        _printed = true;
+                    }
+                }
+
+                const auto shouldUpdate = wantUpdate &&
+                    gyrovariance.x < GYRO_RAW_VARIANCE_BASE &&
+                    gyrovariance.y < GYRO_RAW_VARIANCE_BASE &&
+                    gyrovariance.z < GYRO_RAW_VARIANCE_BASE &&
+                    _gyroVarianceSampleTimeMsec + GYRO_MIN_BIAS_TIMEOUT_MS < msec_curr;
+
+                _gyroBias = shouldUpdate ?  gyromean : _gyroBias;
+
+                _gyroVarianceSampleTimeMsec =
+                    shouldUpdate ? msec_curr : _gyroVarianceSampleTimeMsec;
+
+                wasGyroBiasFound = shouldUpdate ? true : wasGyroBiasFound;
+
+                _gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
+
+                // Subtract gyro bias
+                const Vec3 gyroUnbiased = {
+                    scale(imuraw.gyro.x - _gyroBias.x, gyro_range_dps),
+                    scale(imuraw.gyro.y - _gyroBias.y, gyro_range_dps),
+                    scale(imuraw.gyro.z - _gyroBias.z, gyro_range_dps)
+                };
+
+                const auto gyroAligned = alignToAirframe(gyroUnbiased);
+
+                _gyroLpf = _gyroLpf.apply(_gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+
+                const auto gyroFiltered = _gyroLpf.output;
+
+                const auto accelAlignedToAirframe = alignToAirframe(accel);
+
+                const auto accelAlignedToGravity = alignToGravity(
+                        accelAlignedToAirframe);
+
+                _accelLpf = _accelLpf.apply(
+                        _accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+
+                const auto accelFiltered = _accelLpf.output;
+
+                output.gyroDps.x = gyroFiltered.x;
+                output.gyroDps.y = gyroFiltered.y;
+                output.gyroDps.z = gyroFiltered.z;
+
+                output.accelGs.x = accelFiltered.x;
+                output.accelGs.y = accelFiltered.y;
+                output.accelGs.z = accelFiltered.z;
+                */
+            }
+
             void step(
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
