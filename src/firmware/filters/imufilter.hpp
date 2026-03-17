@@ -100,8 +100,6 @@ namespace hf {
 
                 const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
-                static bool _printed;
-
                 _gyrosum = wasGyroBiasFound ? _gyrosum : _gyrosum + gyroval;
                 _gyrosumsq = wasGyroBiasFound ? _gyrosumsq :
                     _gyrosumsq + (gyroval * gyroval);
@@ -126,15 +124,25 @@ namespace hf {
                 _stats = wantUpdate ? calculateStats(_gyroSamplesBuffer) :
                     _stats;
 
-                if (wantUpdate) {
-                    const auto mean = _stats.mean;
-                    const auto variance = _stats.variance;
-                    printf("\noldmean,%+3.3f,%+3.3f,%+3.3f\n",
-                            mean.x, mean.y, mean.z);
-                    printf("oldvariance,%+3.3f,%+3.3f,%+3.3f\n\n",
-                            variance.x, variance.y, variance.z);
-                }
+                //if (wantUpdate) {
                 if (wasGyroBiasFound) {
+
+                    static bool _printed;
+
+                    if (!_printed) {
+                        const auto mean = _stats.mean;
+                        const auto variance = _stats.variance;
+                        printf("\noldmean,%+3.3f,%+3.3f,%+3.3f\n",
+                                mean.x, mean.y, mean.z);
+                        printf("oldvariance,%+3.3f,%+3.3f,%+3.3f\n\n",
+                                variance.x, variance.y, variance.z);
+                        _printed = true;
+                    }
+                }
+
+                if (wasGyroBiasFound) {
+
+                    static bool _printed;
 
                     if (!_printed) {
                         printf("newmean,%+3.3f,%+3.3f,%+3.3f\n", 
@@ -201,7 +209,7 @@ namespace hf {
                 wasGyroBiasFound = wasValueFound;
             }
 
-        private:
+                private:
 
             // ---------------------------------------------------------------
 
