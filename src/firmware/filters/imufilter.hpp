@@ -45,35 +45,6 @@ namespace hf {
             // affects the threshold
             static const uint16_t NBR_OF_SAMPLES = 512;
 
-            static auto calculateStats(const Vec3Raw * buffer)
-                -> ThreeAxisStats
-                {
-                    int64_t xsum=0, ysum=0, zsum=0;
-                    int64_t xsumsq=0, ysumsq=0, zsumsq=0;
-
-                    for (uint16_t i=0; i<NBR_OF_SAMPLES; i++) {
-
-                        xsum += buffer[i].x;
-                        ysum += buffer[i].y;
-                        zsum += buffer[i].z;
-                        xsumsq += buffer[i].x * buffer[i].x;
-                        ysumsq += buffer[i].y * buffer[i].y;
-                        zsumsq += buffer[i].z * buffer[i].z;
-                    }
-
-                    const auto mean = Vec3(
-                            (float) xsum / NBR_OF_SAMPLES,
-                            (float) ysum / NBR_OF_SAMPLES,
-                            (float) zsum / NBR_OF_SAMPLES);
-
-                    const auto variance = Vec3(
-                            (float)xsumsq / NBR_OF_SAMPLES - mean.x * mean.x,
-                            (float)ysumsq / NBR_OF_SAMPLES - mean.y * mean.y,
-                            (float)zsumsq / NBR_OF_SAMPLES - mean.z * mean.z);
-
-                    return ThreeAxisStats(mean, variance);
-                }
-
         public:
 
             ImuFiltered output;
@@ -101,6 +72,7 @@ namespace hf {
                 const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
                 _gyrosum = wasGyroBiasFound ? _gyrosum : _gyrosum + gyroval;
+
                 _gyrosumsq = wasGyroBiasFound ? _gyrosumsq :
                     _gyrosumsq + (gyroval * gyroval);
 
@@ -111,57 +83,41 @@ namespace hf {
                     scale(imuraw.accel.z, accel_range_gs)
                 };
 
-                // Calibrate gyro with raw values if necessary
-                _gyroSamplesBuffer[bufferIndex] = gyroraw;
-
                 const auto newBufferIndex = bufferIndex + 1;
 
                 _isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
 
-                const auto wantUpdate = !wasValueFound &&
-                    _isBufferFilled;
-
-                _stats = wantUpdate ? calculateStats(_gyroSamplesBuffer) :
-                    _stats;
+                const auto wantUpdate = !wasValueFound && _isBufferFilled;
 
                 if (wasGyroBiasFound) {
 
                     static bool _printed;
 
                     if (!_printed) {
-                        const auto mean = _stats.mean;
-                        const auto variance = _stats.variance;
-                        printf("\noldmean,%+3.3f,%+3.3f,%+3.3f\n",
-                                mean.x, mean.y, mean.z);
-                        printf("oldvariance,%+3.3f,%+3.3f,%+3.3f\n\n",
-                                variance.x, variance.y, variance.z);
-                        printf("newmean,%+3.3f,%+3.3f,%+3.3f\n", 
+                        printf("mean,%+3.3f,%+3.3f,%+3.3f\n", 
                                 gyromean.x, gyromean.y, gyromean.z);
-                        printf("newvariance,%+3.3f,%+3.3f,%+3.3f\n", 
+                        printf("variance,%+3.3f,%+3.3f,%+3.3f\n", 
                                 gyrovariance.x, gyrovariance.y, gyrovariance.z);
                         _printed = true;
                     }
                 }
 
                 const auto shouldUpdate = wantUpdate &&
-                    _stats.variance.x < RAW_VARIANCE_BASE &&
-                    _stats.variance.y < RAW_VARIANCE_BASE &&
-                    _stats.variance.z < RAW_VARIANCE_BASE &&
+                    gyrovariance.x < RAW_VARIANCE_BASE &&
+                    gyrovariance.y < RAW_VARIANCE_BASE &&
+                    gyrovariance.z < RAW_VARIANCE_BASE &&
                     _varianceSampleTime + MIN_BIAS_TIMEOUT_MS < msec_curr;
 
-                _values = shouldUpdate ?
-                    _stats.mean : _values;
+                _values = shouldUpdate ?  gyromean : _values;
 
                 biasOut = _values;
 
                 _varianceSampleTime =
                     shouldUpdate ? msec_curr : _varianceSampleTime;
 
-                wasValueFound = shouldUpdate ? true :
-                    wasValueFound;
+                wasValueFound = shouldUpdate ? true : wasValueFound;
 
-                bufferIndex = _isBufferFilled ? 0 :
-                    newBufferIndex;
+                bufferIndex = _isBufferFilled ? 0 : newBufferIndex;
 
                 _gyroBias = biasOut;
 
@@ -209,7 +165,6 @@ namespace hf {
             Vec3 biasOut;
             bool wasValueFound;
             uint16_t bufferIndex;
-            ThreeAxisStats _stats;
             Vec3 _values;
             bool _isBufferFilled;
             int32_t _varianceSampleTime;
@@ -220,8 +175,6 @@ namespace hf {
             ThreeAxisLpf _gyroLpf;
 
             Vec3 _gyroBias;
-
-            Vec3Raw _gyroSamplesBuffer[NBR_OF_SAMPLES];
 
             // ---------------------------------------------------------------
 
