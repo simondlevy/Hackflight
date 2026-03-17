@@ -92,14 +92,14 @@ namespace hf {
             {
                 const auto gyroraw = imuraw.gyro;
 
+                const auto n = NBR_OF_SAMPLES;
+
+                const auto gyromean = _gyrosum / n;
+
+                const auto gyrovariance = (_gyrosumsq/n) - (gyromean*gyromean);
+
                 static bool _printed;
                 if (wasGyroBiasFound) {
-
-                    const auto n = NBR_OF_SAMPLES;
-
-                    const auto gyromean = _gyrosum / n;
-
-                    const auto gyrovariance = (_gyrosumsq/n) - (gyromean*gyromean);
 
                     if (!_printed) {
                         printf("newmean,%f,%f,%f\n", 
@@ -163,7 +163,7 @@ namespace hf {
 
                 bufferIndex = _isBufferFilled ? 0 :
                     newBufferIndex;
- 
+
                 _gyroBias = biasOut;
 
                 // Subtract gyro bias
