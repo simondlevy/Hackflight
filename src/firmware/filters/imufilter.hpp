@@ -55,7 +55,6 @@ namespace hf {
 
             ImuFilter() = default;
 
-            /*
             ImuFilter(
                     const ImuFiltered & output,
                     const bool wasGyroBiasFound,
@@ -66,7 +65,16 @@ namespace hf {
                     const uint32_t gyroVarianceSampleTimeMsec,
                     const ThreeAxisLpf & accelLpf,
                     const ThreeAxisLpf & gyroLpf) 
-                : {}*/
+                : 
+                    output(output),
+                    wasGyroBiasFound(wasGyroBiasFound),
+                    _gyroSum(gyroSum),
+                    _gyroSumOfSquares(gyroSumOfSquares),
+                    _gyroSampleCount(gyroSampleCount),
+                    _gyroBias(gyroBias),
+                    _gyroVarianceSampleTimeMsec(gyroVarianceSampleTimeMsec),
+                    _accelLpf(accelLpf),
+                    _gyroLpf(gyroLpf) {}
 
             void step(
                     const uint32_t msec_curr,
