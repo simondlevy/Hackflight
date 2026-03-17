@@ -110,8 +110,6 @@ namespace hf {
 
                 _values = shouldUpdate ?  gyromean : _values;
 
-                _biasOut = _values;
-
                 _varianceSampleTime =
                     shouldUpdate ? msec_curr : _varianceSampleTime;
 
@@ -119,7 +117,7 @@ namespace hf {
 
                 _gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
-                _gyroBias = _biasOut;
+                _gyroBias = _values;
 
                 // Subtract gyro bias
                 const Vec3 gyroUnbiased = {
@@ -161,7 +159,6 @@ namespace hf {
 
             Vec3 _gyrosum;
             Vec3 _gyrosumsq;
-            Vec3 _biasOut;
             bool _wasValueFound;
             uint16_t _gyroSampleCount;
             Vec3 _values;
