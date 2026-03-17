@@ -87,7 +87,7 @@ namespace hf {
 
                 const auto isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
 
-                const auto wantUpdate = !_wasValueFound && isBufferFilled;
+                const auto wantUpdate = !wasGyroBiasFound && isBufferFilled;
 
                 if (wasGyroBiasFound) {
 
@@ -113,7 +113,7 @@ namespace hf {
                 _varianceSampleTime =
                     shouldUpdate ? msec_curr : _varianceSampleTime;
 
-                _wasValueFound = shouldUpdate ? true : _wasValueFound;
+                wasGyroBiasFound = shouldUpdate ? true : wasGyroBiasFound;
 
                 _gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
@@ -147,8 +147,6 @@ namespace hf {
                 output.accelGs.x = accelFiltered.x;
                 output.accelGs.y = accelFiltered.y;
                 output.accelGs.z = accelFiltered.z;
-
-                wasGyroBiasFound = _wasValueFound;
             }
 
         private:
@@ -157,7 +155,6 @@ namespace hf {
 
             Vec3 _gyrosum;
             Vec3 _gyrosumsq;
-            bool _wasValueFound;
             uint16_t _gyroSampleCount;
             Vec3 _gyroBias;
             int32_t _varianceSampleTime;
