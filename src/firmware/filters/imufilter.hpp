@@ -60,6 +60,7 @@ namespace hf {
 
                     GyroBiasCalculator() = default;
 
+                    /*
                     GyroBiasCalculator& operator=(const GyroBiasCalculator& other)
                         = default;
 
@@ -78,7 +79,7 @@ namespace hf {
                             _stats(stats),
                             _values(values),
                             _isBufferFilled(isBufferFilled),
-                            _varianceSampleTime(varianceSampleTime) {}
+                            _varianceSampleTime(varianceSampleTime) {}*/
 
                     void process(const Vec3Raw * buffer, const uint32_t ticks)
                     {
@@ -106,45 +107,6 @@ namespace hf {
                         wasValueFound = shouldUpdate ? true : wasValueFound;
 
                         bufferIndex = _isBufferFilled ? 0 : newBufferIndex;
-                    }
-
-                    static auto process(
-                            const GyroBiasCalculator & calc,
-                            const Vec3Raw * buffer,
-                            const uint32_t ticks) -> GyroBiasCalculator
-                    {
-                        const auto bufferIndex = calc.bufferIndex + 1;
-
-                        const auto isBufferFilled = bufferIndex == NBR_OF_SAMPLES;
-
-                        const auto wantUpdate = !calc.wasValueFound && isBufferFilled;
-
-                        const auto stats = wantUpdate ? calculateStats(buffer) : calc._stats;
-
-                        const auto shouldUpdate = wantUpdate &&
-                            stats.variance.x < RAW_VARIANCE_BASE &&
-                            stats.variance.y < RAW_VARIANCE_BASE &&
-                            stats.variance.z < RAW_VARIANCE_BASE &&
-                            calc._varianceSampleTime + MIN_BIAS_TIMEOUT_MS < ticks;
-
-                        const auto values = shouldUpdate ? stats.mean : calc._values;
-
-                        const auto varianceSampleTime =
-                            shouldUpdate ? ticks : calc._varianceSampleTime;
-
-                        const auto wasValueFound = shouldUpdate ? true : calc.wasValueFound;
-
-
-                        const auto newBufferIndex = isBufferFilled ? 0 : bufferIndex;
-
-                        return GyroBiasCalculator(
-                                values,
-                                wasValueFound,
-                                newBufferIndex,
-                                stats,
-                                values,
-                                isBufferFilled,
-                                varianceSampleTime);
                     }
 
                 private:
@@ -238,9 +200,6 @@ namespace hf {
 
                 // Calibrate gyro with raw values if necessary
                 _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = gyroraw;
-
-                /*_gyroBiasCalculator = GyroBiasCalculator::process(
-                        _gyroBiasCalculator, _gyroSamplesBuffer, msec_curr);*/
 
                 _gyroBiasCalculator.process(_gyroSamplesBuffer, msec_curr);
 
