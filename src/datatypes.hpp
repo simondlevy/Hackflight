@@ -108,7 +108,12 @@ namespace hf {
             {
                 return Vec3(x/d, y/d, z/d);
             }
-      };
+
+            bool operator<(const float v) const
+            {
+                return x < v && y < v && z < v;
+            }
+    };
 
     class Vec4 {
 

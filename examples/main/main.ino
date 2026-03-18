@@ -70,6 +70,8 @@ void setup()
     _motors.arm(); 
 
     _led.begin(); 
+    
+    delay(3000);
 }
 
 void loop()
