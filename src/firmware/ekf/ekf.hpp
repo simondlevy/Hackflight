@@ -112,17 +112,17 @@ namespace hf {
 
                 const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
 
-                const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
-                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
+                const auto phi = Num::RAD2DEG * atan2f(2*(_q.y*_q.z+_q.w* _q.x) ,
+                        _q.w*_q.w - _q.x*_q.x - _q.y*_q.y + _q.z*_q.z);
 
                 const auto dphi = _gyroLatest.x;
 
-                const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
+                const auto theta = Num::RAD2DEG * asinf(-2*(_q.x*_q.z - _q.w*_q.y));
 
                 const auto dtheta = _gyroLatest.y;
 
-                const auto psi = Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
-                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
+                const auto psi = Num::RAD2DEG * atan2f(2*(_q.x*_q.y+_q.w* _q.z),
+                        _q.w*_q.w + _q.x*_q.x - _q.y*_q.y - _q.z*_q.z); 
 
                 const auto dpsi = _gyroLatest.z;
 
@@ -238,7 +238,7 @@ namespace hf {
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
-            float _q0, _q1, _q2, _q3;
+            Vec4 _q;
 
             // State vector
             __attribute__((aligned(4))) float _x[STATE_DIM];
@@ -266,10 +266,10 @@ namespace hf {
                 ekf_init();
 
                 // Reset the attitude quaternion
-                _q0 = _qinit0 = 1;
-                _q1 = _qinit1 = 0;
-                _q2 = _qinit2 = 0;
-                _q3 = _qinit3 = 0;
+                _q.w = _qinit0 = 1;
+                _q.x = _qinit1 = 0;
+                _q.y = _qinit2 = 0;
+                _q.z = _qinit3 = 0;
 
                 // Initialize the rotation matrix
                 _r00 = 1;
@@ -444,10 +444,10 @@ namespace hf {
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
 
-                float tmpq0 = dq[0]*_q0 - dq[1]*_q1 - dq[2]*_q2 - dq[3]*_q3;
-                float tmpq1 = dq[1]*_q0 + dq[0]*_q1 + dq[3]*_q2 - dq[2]*_q3;
-                float tmpq2 = dq[2]*_q0 - dq[3]*_q1 + dq[0]*_q2 + dq[1]*_q3;
-                float tmpq3 = dq[3]*_q0 + dq[2]*_q1 - dq[1]*_q2 + dq[0]*_q3;
+                float tmpq0 = dq[0]*_q.w - dq[1]*_q.x - dq[2]*_q.y - dq[3]*_q.z;
+                float tmpq1 = dq[1]*_q.w + dq[0]*_q.x + dq[3]*_q.y - dq[2]*_q.z;
+                float tmpq2 = dq[2]*_q.w - dq[3]*_q.x + dq[0]*_q.y + dq[1]*_q.z;
+                float tmpq3 = dq[3]*_q.w + dq[2]*_q.x - dq[1]*_q.y + dq[0]*_q.z;
 
                 if (!isFlying) {
 
@@ -463,10 +463,10 @@ namespace hf {
                 const float norm = device_sqrt(
                         tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
-                _q0 = tmpq0/norm; 
-                _q1 = tmpq1/norm; 
-                _q2 = tmpq2/norm; 
-                _q3 = tmpq3/norm;
+                _q.w = tmpq0/norm; 
+                _q.x = tmpq1/norm; 
+                _q.y = tmpq2/norm; 
+                _q.z = tmpq3/norm;
 
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
@@ -510,36 +510,36 @@ namespace hf {
 
                     // Rotate the vehicle's attitude by the delta quaternion vector
                     // computed above
-                    const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
-                        dq[2] * _q2 - dq[3] * _q3;
-                    const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
-                        dq[3] * _q2 - dq[2] * _q3;
-                    const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
-                        dq[0] * _q2 + dq[1] * _q3;
-                    const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
-                        dq[1] * _q2 + dq[0] * _q3;
+                    const float tmpq0 = dq[0] * _q.w - dq[1] * _q.x - 
+                        dq[2] * _q.y - dq[3] * _q.z;
+                    const float tmpq1 = dq[1] * _q.w + dq[0] * _q.x + 
+                        dq[3] * _q.y - dq[2] * _q.z;
+                    const float tmpq2 = dq[2] * _q.w - dq[3] * _q.x + 
+                        dq[0] * _q.y + dq[1] * _q.z;
+                    const float tmpq3 = dq[3] * _q.w + dq[2] * _q.x - 
+                        dq[1] * _q.y + dq[0] * _q.z;
 
                     // normalize and store the result
                     float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                             tmpq3 * tmpq3) + EPSILON;
-                    _q0 = tmpq0 / norm;
-                    _q1 = tmpq1 / norm;
-                    _q2 = tmpq2 / norm;
-                    _q3 = tmpq3 / norm;
+                    _q.w = tmpq0 / norm;
+                    _q.x = tmpq1 / norm;
+                    _q.y = tmpq2 / norm;
+                    _q.z = tmpq3 / norm;
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
 
-                _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
-                _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
-                _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
-                _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
-                _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
-                _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
-                _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
-                _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
-                _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
+                _r00 = _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z;
+                _r01 = 2 * _q.x * _q.y - 2 * _q.w * _q.z;
+                _r02 = 2 * _q.x * _q.z + 2 * _q.w * _q.y;
+                _r10 = 2 * _q.x * _q.y + 2 * _q.w * _q.z;
+                _r11 = _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z;
+                _r12 = 2 * _q.y * _q.z - 2 * _q.w * _q.x;
+                _r20 = 2 * _q.x * _q.z - 2 * _q.w * _q.y;
+                _r21 = 2 * _q.y * _q.z + 2 * _q.w * _q.x;
+                _r22 = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
 
                 // reset the attitude error
                 _x[STATE_D0] = 0;

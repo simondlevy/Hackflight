@@ -109,20 +109,6 @@ namespace hf {
                 const auto wantUpdate =!filter.wasGyroBiasFound &&
                     isBufferFilled;
 
-                /*
-                if (filter.wasGyroBiasFound) {
-
-                    static bool _printed;
-
-                    if (!_printed) {
-                        printf("mean,%+3.3f,%+3.3f,%+3.3f\n", 
-                                gyromean.x, gyromean.y, gyromean.z);
-                        printf("variance,%+3.3f,%+3.3f,%+3.3f\n", 
-                                gyrovariance.x, gyrovariance.y, gyrovariance.z);
-                        _printed = true;
-                    }
-                }*/
-
                 const auto shouldUpdate = wantUpdate && 
                     gyrovariance < GYRO_RAW_VARIANCE_BASE &&
                     filter._gyroVarianceSampleTimeMsec +
