@@ -142,11 +142,14 @@ namespace hf {
 
                 const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
+                const auto gyroUnbiased = scale(imuraw.gyro, gyroBias, gyro_range_dps);
+
+                /*
                 const Vec3 gyroUnbiased = {
                     scale(imuraw.gyro.x - gyroBias.x, gyro_range_dps),
                     scale(imuraw.gyro.y - gyroBias.y, gyro_range_dps),
                     scale(imuraw.gyro.z - gyroBias.z, gyro_range_dps)
-                };
+                };*/
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
@@ -243,6 +246,12 @@ namespace hf {
                         in.x*r00 + in.y*r01 + in.z*r02,
                         in.x*r10 + in.y*r11 + in.z*r12,
                         in.x*r20 + in.y*r21 + in.z*r22);
+            }
+
+            static Vec3 scale(
+                    const Vec3Raw & raw, const Vec3 & bias, const int16_t s)
+            {
+                return (Vec3(raw) - bias) * 2 * s / 65536.f;
             }
 
             static float scale(const int16_t raw, const int16_t scale)

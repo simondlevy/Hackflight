@@ -63,22 +63,6 @@ namespace hf {
             ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
     };
 
-    class Vec3Raw {
-
-        public:
-
-            int16_t x;
-            int16_t y;
-            int16_t z;
-
-            Vec3Raw() = default;
-
-            Vec3Raw(const int16_t x, const int16_t y, const int16_t z) 
-                : x(x), y(y), z(z) {}
-
-            Vec3Raw& operator=(const Vec3Raw& other) = default;
-    };
-
     class ImuRaw {
 
         public:

@@ -107,6 +107,6 @@ void loop()
         _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
 
-    //hf::Debugger::report(state);
+    hf::Debugger::report(state);
     //hf::Profiler::report();
 }

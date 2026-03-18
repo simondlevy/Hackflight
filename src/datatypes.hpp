@@ -74,6 +74,22 @@ namespace hf {
 
     } mode_e;
 
+    class Vec3Raw {
+
+        public:
+
+            int16_t x;
+            int16_t y;
+            int16_t z;
+
+            Vec3Raw() = default;
+
+            Vec3Raw(const int16_t x, const int16_t y, const int16_t z) 
+                : x(x), y(y), z(z) {}
+
+            Vec3Raw& operator=(const Vec3Raw& other) = default;
+    };
+
     class Vec3 {
 
         public:
@@ -86,6 +102,9 @@ namespace hf {
 
             Vec3(const float x, const float y, const float z) 
                 : x(x), y(y), z(z) {}
+
+            Vec3(const Vec3Raw & raw)
+                : x((float)raw.x), y((float)raw.y), z((float)raw.z) {}
 
             Vec3& operator=(const Vec3& other) = default;
 
@@ -102,6 +121,11 @@ namespace hf {
             Vec3 operator*(const Vec3& other) const
             {
                 return Vec3(x*other.x, y*other.y, z*other.z);
+            }
+
+            Vec3 operator*(const float v) const
+            {
+                return Vec3(x*v, y*v, z*v);
             }
 
             Vec3 operator/(const float d) const
