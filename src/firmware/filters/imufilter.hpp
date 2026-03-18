@@ -91,7 +91,7 @@ namespace hf {
                     (filter._gyroSumOfSquares/NBR_OF_SAMPLES) -
                     (gyromean*gyromean);
 
-                const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
+                const auto gyroval = Vec3(gyroraw);
 
                 const auto gyroSum = filter.wasGyroBiasFound ?
                     filter._gyroSum : filter._gyroSum + gyroval;
