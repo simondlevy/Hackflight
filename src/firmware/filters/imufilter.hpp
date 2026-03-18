@@ -238,11 +238,6 @@ namespace hf {
                         in.x*r20 + in.y*r21 + in.z*r22);
             }
 
-            static Vec3 scale(const Vec3Raw & raw, const int16_t s)
-            {
-                return scale(Vec3(raw), s);
-            }
-
             static Vec3 scale(const Vec3 & vec, const int16_t s)
             {
                 return vec * 2 * (float)s / 65536;
