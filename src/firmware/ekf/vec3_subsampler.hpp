@@ -24,12 +24,23 @@ namespace hf {
 
         public:
 
+            float conversionFactor;
             Vec3 sum;
             uint32_t count;
-            float conversionFactor;
             Vec3 subSample;
 
             Vec3SubSampler() = default;
+
+            Vec3SubSampler(
+                    const float conversionFactor,
+                    const Vec3 & sum,
+                    const uint32_t count,
+                    const Vec3 & subSample)
+                : 
+                    conversionFactor(conversionFactor),
+                    sum(sum),
+                    count(count),
+                    subSample(subSample) {}
 
             static void reset(Vec3SubSampler & subSampler)
             {
