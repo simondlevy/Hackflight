@@ -57,6 +57,11 @@ namespace hf {
                         ss.count + 1);
             }
 
+            static auto newreset(const Vec3SubSampler & ss) -> Vec3SubSampler
+            {
+                return Vec3SubSampler(ss.conversionFactor, ss.subSample);
+            }
+
             ///////////////////////////////////////////////////////////
 
             static void reset(Vec3SubSampler & ss)
