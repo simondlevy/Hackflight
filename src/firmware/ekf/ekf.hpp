@@ -299,8 +299,8 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                Vec3SubSampler::finalize(_accelSubSampler);
-                Vec3SubSampler::finalize(_gyroSubSampler);
+                _accelSubSampler = Vec3SubSampler::finalize(_accelSubSampler);
+                _gyroSubSampler = Vec3SubSampler::finalize(_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 

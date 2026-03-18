@@ -57,34 +57,13 @@ namespace hf {
                         ss.count + 1);
             }
 
-            static auto newreset(const Vec3SubSampler & ss) -> Vec3SubSampler
-            {
-                return Vec3SubSampler(ss.conversionFactor, ss.subSample);
-            }
-
-            static auto newfinalize(const Vec3SubSampler & ss)
+            static auto finalize(const Vec3SubSampler & ss)
                 -> Vec3SubSampler
             {
                 return ss.count > 0 ?
                     Vec3SubSampler(ss.conversionFactor,
                             ss.sum * ss.conversionFactor / ss.count) :
                     ss;
-            }
-
-            ///////////////////////////////////////////////////////////
-
-            static void reset(Vec3SubSampler & ss)
-            {
-                ss.sum = {};
-                ss.count = 0;
-            }
-
-            static void finalize(Vec3SubSampler & ss)
-            {
-                if (ss.count > 0) {
-                    ss.subSample = ss.sum * ss.conversionFactor / ss.count;
-                    reset(ss);
-                }
             }
     };
 }
