@@ -139,7 +139,7 @@ namespace hf {
                 const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
                 const auto gyroUnbiased =
-                    scale(Vec3(imuraw.gyro) - gyroBias, gyro_range_dps);
+                    scale(Vec3(gyroraw) - gyroBias, gyro_range_dps);
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
