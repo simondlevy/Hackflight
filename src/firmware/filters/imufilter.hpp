@@ -100,7 +100,9 @@ namespace hf {
                     filter._gyroSumOfSquares :
                     filter._gyroSumOfSquares + (gyroval * gyroval);
 
-                const auto accel = scale(imuraw.accel, accel_range_gs);
+                // const auto accel = scale(imuraw.accel, accel_range_gs);
+
+                const auto accel = scale(Vec3(imuraw.accel), accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
 
