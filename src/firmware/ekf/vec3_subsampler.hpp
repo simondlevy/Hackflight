@@ -79,20 +79,6 @@ namespace hf {
                 ss.count = 0;
             }
 
-            static void init(Vec3SubSampler & ss,
-                    const float conversionFactor) 
-            {
-                reset(ss);
-                ss.conversionFactor = conversionFactor;
-            }
-
-            static void accumulate(Vec3SubSampler & ss,
-                    const Vec3 & sample)
-            {
-                ss.sum = ss.sum + sample;
-                ss.count++;
-            }
-
             static void finalize(Vec3SubSampler & ss)
             {
                 if (ss.count > 0) {

@@ -254,8 +254,8 @@ namespace hf {
 
             void reset(const uint32_t msec_curr)
             {
-                Vec3SubSampler::init(_accelSubSampler, GRAVITY);
-                Vec3SubSampler::init(_gyroSubSampler, Num::DEG2RAD);
+                _accelSubSampler = Vec3SubSampler(GRAVITY);
+                _gyroSubSampler = Vec3SubSampler(Num::DEG2RAD);
 
                 ekf_init();
 
@@ -688,13 +688,15 @@ namespace hf {
 
             void updateWithAccel(measurement_t & m)
             {
-                Vec3SubSampler::accumulate(_accelSubSampler, m.data.acceleration.acc);
+                _accelSubSampler = Vec3SubSampler::accumulate(_accelSubSampler,
+                        m.data.acceleration.acc);
                 _accLatest = m.data.acceleration.acc;
             }
 
             void updateWithGyro(measurement_t & m)
             {
-                Vec3SubSampler::accumulate(_gyroSubSampler, m.data.gyroscope.gyro);
+                _gyroSubSampler = Vec3SubSampler::accumulate(_gyroSubSampler,
+                        m.data.gyroscope.gyro);
                 _gyroLatest = m.data.gyroscope.gyro;
             }
 
