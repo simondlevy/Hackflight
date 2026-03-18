@@ -20,46 +20,6 @@
 
 namespace hf {
 
-    typedef struct {
-        Vec3 sum;
-        uint32_t count;
-        float conversionFactor;
-        Vec3 subSample;
-    } Vec3SubSampler_t;
-
-    static void vec3SubSamplerReset(Vec3SubSampler_t & subSampler)
-    {
-        subSampler.sum = {};
-        subSampler.count = 0;
-    }
-
-    static void vec3SubSamplerInit(
-            Vec3SubSampler_t & subSampler,
-            const float conversionFactor) 
-    {
-        vec3SubSamplerReset(subSampler);
-        subSampler.conversionFactor = conversionFactor;
-    }
-
-    static void vec3SubSamplerAccumulate(
-            Vec3SubSampler_t & subSampler,
-            const Vec3 & sample)
-    {
-        subSampler.sum = subSampler.sum + sample;
-        subSampler.count++;
-    }
-
-    static void vec3SubSamplerFinalize(Vec3SubSampler_t & subSampler)
-    {
-        if (subSampler.count > 0) {
-
-            subSampler.subSample = 
-                subSampler.sum * subSampler.conversionFactor / subSampler.count;
-
-            vec3SubSamplerReset(subSampler);
-        }
-    }
-
     class Vec3SubSampler {
 
         public:

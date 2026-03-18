@@ -213,8 +213,8 @@ namespace hf {
             Vec3 _accLatest;
             Vec3 _gyroLatest;
 
-            Vec3SubSampler_t _accSubSampler;
-            Vec3SubSampler_t _gyroSubSampler;
+            Vec3SubSampler _accSubSampler;
+            Vec3SubSampler _gyroSubSampler;
 
             float _predictedNX;
             float _predictedNY;
@@ -254,8 +254,8 @@ namespace hf {
 
             void reset(const uint32_t msec_curr)
             {
-                vec3SubSamplerInit(_accSubSampler, GRAVITY);
-                vec3SubSamplerInit(_gyroSubSampler, Num::DEG2RAD);
+                Vec3SubSampler::init(_accSubSampler, GRAVITY);
+                Vec3SubSampler::init(_gyroSubSampler, Num::DEG2RAD);
 
                 ekf_init();
 
@@ -299,8 +299,8 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                vec3SubSamplerFinalize(_accSubSampler);
-                vec3SubSamplerFinalize(_gyroSubSampler);
+                Vec3SubSampler::finalize(_accSubSampler);
+                Vec3SubSampler::finalize(_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
@@ -688,13 +688,13 @@ namespace hf {
 
             void updateWithAccel(measurement_t & m)
             {
-                vec3SubSamplerAccumulate(_accSubSampler, m.data.acceleration.acc);
+                Vec3SubSampler::accumulate(_accSubSampler, m.data.acceleration.acc);
                 _accLatest = m.data.acceleration.acc;
             }
 
             void updateWithGyro(measurement_t & m)
             {
-                vec3SubSamplerAccumulate(_gyroSubSampler, m.data.gyroscope.gyro);
+                Vec3SubSampler::accumulate(_gyroSubSampler, m.data.gyroscope.gyro);
                 _gyroLatest = m.data.gyroscope.gyro;
             }
 
