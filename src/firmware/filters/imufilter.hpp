@@ -100,8 +100,6 @@ namespace hf {
                     filter._gyroSumOfSquares :
                     filter._gyroSumOfSquares + (gyroval * gyroval);
 
-                // const auto accel = scale(imuraw.accel, accel_range_gs);
-
                 const auto accel = scale(Vec3(imuraw.accel), accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
@@ -140,7 +138,8 @@ namespace hf {
 
                 const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
-                const auto gyroUnbiased = scale(imuraw.gyro, gyroBias, gyro_range_dps);
+                const auto gyroUnbiased =
+                    scale(Vec3(imuraw.gyro) - gyroBias, gyro_range_dps);
 
                 const auto gyroAligned = alignToAirframe(gyroUnbiased);
 
@@ -237,12 +236,6 @@ namespace hf {
                         in.x*r00 + in.y*r01 + in.z*r02,
                         in.x*r10 + in.y*r11 + in.z*r12,
                         in.x*r20 + in.y*r21 + in.z*r22);
-            }
-
-            static Vec3 scale(
-                    const Vec3Raw & raw, const Vec3 & bias, const int16_t s)
-            {
-                return scale(Vec3(raw) - bias, s);
             }
 
             static Vec3 scale(const Vec3Raw & raw, const int16_t s)
