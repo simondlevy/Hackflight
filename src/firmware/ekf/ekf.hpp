@@ -213,7 +213,7 @@ namespace hf {
             Vec3 _accLatest;
             Vec3 _gyroLatest;
 
-            Vec3SubSampler _accSubSampler;
+            Vec3SubSampler _accelSubSampler;
             Vec3SubSampler _gyroSubSampler;
 
             float _predictedNX;
@@ -254,7 +254,7 @@ namespace hf {
 
             void reset(const uint32_t msec_curr)
             {
-                Vec3SubSampler::init(_accSubSampler, GRAVITY);
+                Vec3SubSampler::init(_accelSubSampler, GRAVITY);
                 Vec3SubSampler::init(_gyroSubSampler, Num::DEG2RAD);
 
                 ekf_init();
@@ -299,12 +299,12 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                Vec3SubSampler::finalize(_accSubSampler);
+                Vec3SubSampler::finalize(_accelSubSampler);
                 Vec3SubSampler::finalize(_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const Vec3 * accel = &_accSubSampler.subSample;
+                const Vec3 * accel = &_accelSubSampler.subSample;
                 const Vec3 * gyro = &_gyroSubSampler.subSample;
 
                 const float d0 = gyro->x*dt/2;
@@ -688,7 +688,7 @@ namespace hf {
 
             void updateWithAccel(measurement_t & m)
             {
-                Vec3SubSampler::accumulate(_accSubSampler, m.data.acceleration.acc);
+                Vec3SubSampler::accumulate(_accelSubSampler, m.data.acceleration.acc);
                 _accLatest = m.data.acceleration.acc;
             }
 
