@@ -30,11 +30,6 @@ namespace hf {
     static void vec3SubSamplerReset(Vec3SubSampler_t & subSampler)
     {
         subSampler.sum = {};
-        /*
-        subSampler.sum.x = 0;
-        subSampler.sum.y = 0;
-        subSampler.sum.z = 0;*/
-
         subSampler.count = 0;
     }
 
@@ -54,7 +49,7 @@ namespace hf {
         subSampler.count++;
     }
 
-    static Vec3 * vec3SubSamplerFinalize(Vec3SubSampler_t & subSampler)
+    static void vec3SubSamplerFinalize(Vec3SubSampler_t & subSampler)
     {
         if (subSampler.count > 0) {
 
@@ -63,7 +58,48 @@ namespace hf {
 
             vec3SubSamplerReset(subSampler);
         }
-
-        return &subSampler.subSample;
     }
+
+    class Vec3SubSampler {
+
+        public:
+
+            Vec3 sum;
+            uint32_t count;
+            float conversionFactor;
+            Vec3 subSample;
+
+            Vec3SubSampler() = default;
+
+            static void reset(Vec3SubSampler & subSampler)
+            {
+                subSampler.sum = {};
+                subSampler.count = 0;
+            }
+
+            static void init(Vec3SubSampler & subSampler,
+                    const float conversionFactor) 
+            {
+                reset(subSampler);
+                subSampler.conversionFactor = conversionFactor;
+            }
+
+            static void accumulate(Vec3SubSampler & subSampler,
+                    const Vec3 & sample)
+            {
+                subSampler.sum = subSampler.sum + sample;
+                subSampler.count++;
+            }
+
+            static void finalize(Vec3SubSampler & subSampler)
+            {
+                if (subSampler.count > 0) {
+
+                    subSampler.subSample = 
+                        subSampler.sum * subSampler.conversionFactor / subSampler.count;
+
+                    reset(subSampler);
+                }
+            }
+    };
 }
