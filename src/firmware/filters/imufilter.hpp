@@ -100,12 +100,6 @@ namespace hf {
                     filter._gyroSumOfSquares :
                     filter._gyroSumOfSquares + (gyroval * gyroval);
 
-                /*
-                const auto accel = Vec3(
-                    scale(imuraw.accel.x, accel_range_gs),
-                    scale(imuraw.accel.y, accel_range_gs),
-                    scale(imuraw.accel.z, accel_range_gs));*/
-
                 const auto accel = scale(imuraw.accel, accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
@@ -246,17 +240,12 @@ namespace hf {
             static Vec3 scale(
                     const Vec3Raw & raw, const Vec3 & bias, const int16_t s)
             {
-                return (Vec3(raw) - bias) * 2 * s / 65536.f;
+                return (Vec3(raw) - bias) * 2 * (float)s / 65536;
             }
 
             static Vec3 scale(const Vec3Raw & raw, const int16_t s)
             {
                 return Vec3(raw) * 2 * (float)s / 65536;
-            }
-
-            static float scale(const int16_t raw, const int16_t scale)
-            {
-                return (float)raw * 2 * scale / 65536.f;
             }
     };
 }
