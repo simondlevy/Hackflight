@@ -128,8 +128,8 @@ namespace hf {
 
                     printf("%5lu | "
                             //"dx=%+8.3f dy=%+8.3f z=%8.3f dz=%+8.3f "
-                            "phi=%+08.3f dphi=%+08.3f theta=%+08.3f dtheta=%+08.3f "
-                            "psi=%+08.3f dpsi=%+08.3f\n",
+                            "phi=%+04.0f dphi=%+04.0f theta=%+04.0f dtheta=%+04.0f "
+                            "psi=%+04.0f dpsi=%+04.0f\n",
                             _helper.count, 
                             //state.dx, state.dy, state.z, state.dz,
                             state.phi, state.dphi, state.theta, state.dtheta,
