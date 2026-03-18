@@ -18,6 +18,7 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/matrix_typedef.h>
+#include <firmware/ekf/vec3_subsampler.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/zranger.hpp>
@@ -183,11 +184,11 @@ namespace hf {
             } MeasurementType;
 
             typedef struct {
-                Vec3 gyro; // deg/s, for legacy reasons
+                Vec3 gyro; // deg/s
             } gyroscopeMeasurement_t;
 
             typedef struct {
-                Vec3 acc; // Gs, for legacy reasons
+                Vec3 acc; // Gs
             } accelerationMeasurement_t;
 
             typedef struct {
@@ -202,13 +203,6 @@ namespace hf {
             } measurement_t;
 
             static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
-
-            typedef struct {
-                Vec3 sum;
-                uint32_t count;
-                float conversionFactor;
-                Vec3 subSample;
-            } Vec3SubSampler_t;
 
             // Instance vars --------------------------------------------------
 
@@ -826,45 +820,6 @@ namespace hf {
                         ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
                     }
                 }
-            }
-
-            // Static methods ------------------------------------------------
-
-            static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
-                    float conversionFactor) { memset(subSampler, 0,
-                        sizeof(Vec3SubSampler_t));
-                    subSampler->conversionFactor = conversionFactor;
-            }
-
-            static void axis3fSubSamplerAccumulate(Vec3SubSampler_t* subSampler,
-                    const Vec3* sample) {
-                subSampler->sum.x += sample->x;
-                subSampler->sum.y += sample->y;
-                subSampler->sum.z += sample->z;
-
-                subSampler->count++;
-            }
-
-            static Vec3* axis3fSubSamplerFinalize(Vec3SubSampler_t* subSampler,
-                    const char * label) 
-            {
-                if (subSampler->count > 0) {
-
-                    subSampler->subSample.x = 
-                        subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.y = 
-                        subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.z = 
-                        subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
-
-                    // Reset
-                    subSampler->count = 0;
-                    subSampler->sum.x = 0;
-                    subSampler->sum.y = 0;
-                    subSampler->sum.z = 0;
-                }
-
-                return &subSampler->subSample;
             }
 
             // Hardware-dependent --------------------------------------------
