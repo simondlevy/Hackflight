@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <firmware/datatypes.hpp>
+#include <datatypes.hpp>
 
 namespace hf {
 
@@ -27,13 +27,13 @@ namespace hf {
         Vec3 subSample;
     } Vec3SubSampler_t;
 
-    static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
+    static void vec3SubSamplerInit(Vec3SubSampler_t* subSampler, const
             float conversionFactor) { memset(subSampler, 0,
                 sizeof(Vec3SubSampler_t));
             subSampler->conversionFactor = conversionFactor;
     }
 
-    static void axis3fSubSamplerAccumulate(Vec3SubSampler_t* subSampler,
+    static void vec3SubSamplerAccumulate(Vec3SubSampler_t* subSampler,
             const Vec3* sample) {
         subSampler->sum.x += sample->x;
         subSampler->sum.y += sample->y;
@@ -42,7 +42,7 @@ namespace hf {
         subSampler->count++;
     }
 
-    static Vec3* axis3fSubSamplerFinalize(Vec3SubSampler_t* subSampler,
+    static Vec3* vec3SubSamplerFinalize(Vec3SubSampler_t* subSampler,
             const char * label) 
     {
         if (subSampler->count > 0) {
