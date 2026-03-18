@@ -25,22 +25,39 @@ namespace hf {
         public:
 
             float conversionFactor;
+            Vec3 subSample;
             Vec3 sum;
             uint32_t count;
-            Vec3 subSample;
 
             Vec3SubSampler() = default;
 
             Vec3SubSampler(
                     const float conversionFactor,
+                    const Vec3 & subSample = {},
                     const Vec3 & sum = {},
-                    const uint32_t count = 0,
-                    const Vec3 & subSample = {})
+                    const uint32_t count = 0)
                 : 
                     conversionFactor(conversionFactor),
+                    subSample(subSample),
                     sum(sum),
-                    count(count),
-                    subSample(subSample) {}
+                    count(count) {}
+
+            static auto reset(const Vec3SubSampler & ss) -> Vec3SubSampler
+            {
+                return Vec3SubSampler(ss.conversionFactor);
+            }
+
+            static auto accumulate(const Vec3SubSampler & ss,
+                    const Vec3 & sample) -> Vec3SubSampler
+            {
+                return Vec3SubSampler(
+                        ss.conversionFactor,
+                        ss.subSample,
+                        ss.sum + sample,
+                        ss.count + 1);
+            }
+
+            ///////////////////////////////////////////////////////////
 
             static void reset(Vec3SubSampler & ss)
             {
