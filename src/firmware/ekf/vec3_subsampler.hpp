@@ -33,9 +33,9 @@ namespace hf {
 
             Vec3SubSampler(
                     const float conversionFactor,
-                    const Vec3 & sum,
-                    const uint32_t count,
-                    const Vec3 & subSample)
+                    const Vec3 & sum = {},
+                    const uint32_t count = 0,
+                    const Vec3 & subSample = {})
                 : 
                     conversionFactor(conversionFactor),
                     sum(sum),
