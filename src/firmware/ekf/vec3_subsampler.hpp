@@ -42,34 +42,31 @@ namespace hf {
                     count(count),
                     subSample(subSample) {}
 
-            static void reset(Vec3SubSampler & subSampler)
+            static void reset(Vec3SubSampler & ss)
             {
-                subSampler.sum = {};
-                subSampler.count = 0;
+                ss.sum = {};
+                ss.count = 0;
             }
 
-            static void init(Vec3SubSampler & subSampler,
+            static void init(Vec3SubSampler & ss,
                     const float conversionFactor) 
             {
-                reset(subSampler);
-                subSampler.conversionFactor = conversionFactor;
+                reset(ss);
+                ss.conversionFactor = conversionFactor;
             }
 
-            static void accumulate(Vec3SubSampler & subSampler,
+            static void accumulate(Vec3SubSampler & ss,
                     const Vec3 & sample)
             {
-                subSampler.sum = subSampler.sum + sample;
-                subSampler.count++;
+                ss.sum = ss.sum + sample;
+                ss.count++;
             }
 
-            static void finalize(Vec3SubSampler & subSampler)
+            static void finalize(Vec3SubSampler & ss)
             {
-                if (subSampler.count > 0) {
-
-                    subSampler.subSample = 
-                        subSampler.sum * subSampler.conversionFactor / subSampler.count;
-
-                    reset(subSampler);
+                if (ss.count > 0) {
+                    ss.subSample = ss.sum * ss.conversionFactor / ss.count;
+                    reset(ss);
                 }
             }
     };
