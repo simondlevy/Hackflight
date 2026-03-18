@@ -109,6 +109,7 @@ namespace hf {
                 const auto wantUpdate =!filter.wasGyroBiasFound &&
                     isBufferFilled;
 
+                /*
                 if (filter.wasGyroBiasFound) {
 
                     static bool _printed;
@@ -120,7 +121,7 @@ namespace hf {
                                 gyrovariance.x, gyrovariance.y, gyrovariance.z);
                         _printed = true;
                     }
-                }
+                }*/
 
                 const auto shouldUpdate = wantUpdate && 
                     gyrovariance < GYRO_RAW_VARIANCE_BASE &&
@@ -160,16 +161,9 @@ namespace hf {
 
                 const auto output = ImuFiltered(gyroFiltered, accelFiltered);
 
-                return ImuFilter(
-                        output,
-                        wasGyroBiasFound,
-                        gyroSum,
-                        gyroSumOfSquares,
-                        gyroSampleCount,
-                        gyroBias,
-                        gyroVarianceSampleTimeMsec,
-                        accelLpf,
-                        gyroLpf);
+                return ImuFilter(output, wasGyroBiasFound, gyroSum,
+                        gyroSumOfSquares, gyroSampleCount, gyroBias,
+                        gyroVarianceSampleTimeMsec, accelLpf, gyroLpf);
             }
 
         private:
