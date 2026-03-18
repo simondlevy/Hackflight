@@ -240,12 +240,17 @@ namespace hf {
             static Vec3 scale(
                     const Vec3Raw & raw, const Vec3 & bias, const int16_t s)
             {
-                return (Vec3(raw) - bias) * 2 * (float)s / 65536;
+                return scale(Vec3(raw) - bias, s);
             }
 
             static Vec3 scale(const Vec3Raw & raw, const int16_t s)
             {
-                return Vec3(raw) * 2 * (float)s / 65536;
+                return scale(Vec3(raw), s);
             }
-    };
+
+            static Vec3 scale(const Vec3 & vec, const int16_t s)
+            {
+                return vec * 2 * (float)s / 65536;
+            }
+     };
 }
