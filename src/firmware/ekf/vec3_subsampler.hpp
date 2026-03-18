@@ -55,12 +55,16 @@ namespace hf {
     {
         if (subSampler.count > 0) {
 
+            subSampler.subSample = 
+                subSampler.sum * subSampler.conversionFactor / subSampler.count;
+
+            /*
             subSampler.subSample.x = 
                 subSampler.sum.x * subSampler.conversionFactor / subSampler.count;
             subSampler.subSample.y = 
                 subSampler.sum.y * subSampler.conversionFactor / subSampler.count;
             subSampler.subSample.z = 
-                subSampler.sum.z * subSampler.conversionFactor / subSampler.count;
+                subSampler.sum.z * subSampler.conversionFactor / subSampler.count;*/
 
             vec3SubSamplerReset(subSampler);
         }
