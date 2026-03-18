@@ -216,9 +216,6 @@ namespace hf {
 
             uint32_t _queueLength;
 
-            // Quaternion used for initial orientation [w,x,y,z]
-            float _qinit0, _qinit1, _qinit2, _qinit3;
-
             Vec3 _accLatest;
             Vec3 _gyroLatest;
 
@@ -239,6 +236,9 @@ namespace hf {
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
             Vec4 _q;
+
+            // Quaternion used for initial orientation
+            Vec4 _qinit;
 
             // State vector
             __attribute__((aligned(4))) float _x[STATE_DIM];
@@ -266,10 +266,10 @@ namespace hf {
                 ekf_init();
 
                 // Reset the attitude quaternion
-                _q.w = _qinit0 = 1;
-                _q.x = _qinit1 = 0;
-                _q.y = _qinit2 = 0;
-                _q.z = _qinit3 = 0;
+                _q.w = _qinit.w = 1;
+                _q.x = _qinit.x = 0;
+                _q.y = _qinit.y = 0;
+                _q.z = _qinit.z = 0;
 
                 // Initialize the rotation matrix
                 _r00 = 1;
@@ -453,10 +453,10 @@ namespace hf {
 
                     const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit0;
-                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit1;
-                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit2;
-                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit3;
+                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit.w;
+                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit.x;
+                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit.y;
+                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit.z;
                 }
 
                 // normalize and store the result
