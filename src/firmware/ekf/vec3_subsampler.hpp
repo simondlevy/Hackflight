@@ -27,40 +27,40 @@ namespace hf {
         Vec3 subSample;
     } Vec3SubSampler_t;
 
-    static void vec3SubSamplerInit(Vec3SubSampler_t* subSampler, const
-            float conversionFactor) { memset(subSampler, 0,
-                sizeof(Vec3SubSampler_t));
-            subSampler->conversionFactor = conversionFactor;
-    }
-
-    static void vec3SubSamplerAccumulate(Vec3SubSampler_t* subSampler,
-            const Vec3* sample) {
-        subSampler->sum.x += sample->x;
-        subSampler->sum.y += sample->y;
-        subSampler->sum.z += sample->z;
-
-        subSampler->count++;
-    }
-
-    static Vec3* vec3SubSamplerFinalize(Vec3SubSampler_t* subSampler,
-            const char * label) 
+    static void vec3SubSamplerInit(
+            Vec3SubSampler_t & subSampler,
+            const float conversionFactor) 
     {
-        if (subSampler->count > 0) {
+        memset(&subSampler, 0, sizeof(Vec3SubSampler_t));
+        subSampler.conversionFactor = conversionFactor;
+    }
 
-            subSampler->subSample.x = 
-                subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-            subSampler->subSample.y = 
-                subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-            subSampler->subSample.z = 
-                subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
+    static void vec3SubSamplerAccumulate(
+            Vec3SubSampler_t & subSampler,
+            const Vec3 & sample)
+    {
+        subSampler.sum = subSampler.sum + sample;
+        subSampler.count++;
+    }
+
+    static Vec3* vec3SubSamplerFinalize(Vec3SubSampler_t & subSampler)
+    {
+        if (subSampler.count > 0) {
+
+            subSampler.subSample.x = 
+                subSampler.sum.x * subSampler.conversionFactor / subSampler.count;
+            subSampler.subSample.y = 
+                subSampler.sum.y * subSampler.conversionFactor / subSampler.count;
+            subSampler.subSample.z = 
+                subSampler.sum.z * subSampler.conversionFactor / subSampler.count;
 
             // Reset
-            subSampler->count = 0;
-            subSampler->sum.x = 0;
-            subSampler->sum.y = 0;
-            subSampler->sum.z = 0;
+            subSampler.count = 0;
+            subSampler.sum.x = 0;
+            subSampler.sum.y = 0;
+            subSampler.sum.z = 0;
         }
 
-        return &subSampler->subSample;
+        return &subSampler.subSample;
     }
 }
