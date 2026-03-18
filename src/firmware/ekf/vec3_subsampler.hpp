@@ -27,11 +27,19 @@ namespace hf {
         Vec3 subSample;
     } Vec3SubSampler_t;
 
+    static void vec3SubSamplerReset(Vec3SubSampler_t & subSampler)
+    {
+        subSampler.sum.x = 0;
+        subSampler.sum.y = 0;
+        subSampler.sum.z = 0;
+        subSampler.count = 0;
+    }
+
     static void vec3SubSamplerInit(
             Vec3SubSampler_t & subSampler,
             const float conversionFactor) 
     {
-        memset(&subSampler, 0, sizeof(Vec3SubSampler_t));
+        vec3SubSamplerReset(subSampler);
         subSampler.conversionFactor = conversionFactor;
     }
 
@@ -54,11 +62,7 @@ namespace hf {
             subSampler.subSample.z = 
                 subSampler.sum.z * subSampler.conversionFactor / subSampler.count;
 
-            // Reset
-            subSampler.count = 0;
-            subSampler.sum.x = 0;
-            subSampler.sum.y = 0;
-            subSampler.sum.z = 0;
+            vec3SubSamplerReset(subSampler);
         }
 
         return &subSampler.subSample;
