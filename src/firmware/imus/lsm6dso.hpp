@@ -27,8 +27,8 @@ namespace hf {
         public:
 
             IMU(
-                    const int32_t grange =  2000,
-                    const int32_t arange = 16)
+                    const int grange =  2000,
+                    const int arange = 16)
                 : _grange(grange), _arange(arange) {}
 
             void begin()
@@ -38,11 +38,11 @@ namespace hf {
                 // Wire.setClock(1000000); 
 
                 if (
-                        bad(_lsm6.begin())  ||
-                        bad(_lsm6.Enable_X())  ||
-                        bad(_lsm6.Enable_G())  ||
-                        bad(_lsm6.set_X_FS(_arange)) ||
-                        bad(_lsm6.set_G_FS(_grange)))
+                        bad(_lsm6dso.begin())  ||
+                        bad(_lsm6dso.Enable_X())  ||
+                        bad(_lsm6dso.Enable_G())  ||
+                        bad(_lsm6dso.Set_X_FS(_arange)) ||
+                        bad(_lsm6dso.Set_G_FS(_grange)))
                 {
                     Debugger::reportForever(
                             "LSM6DSO initialization unsuccessful\n");
@@ -61,11 +61,15 @@ namespace hf {
 
             auto read() -> ImuRaw
             {
-                int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+                int32_t accel[3] = {};
+                _lsm6dso.Get_X_Axes(accel);
 
-                _lsm6.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+                int32_t gyro[3] = {};
+                _lsm6dso.Get_G_Axes(gyro);
 
-                return ImuRaw(Vec3Raw(gx, gy, gz), Vec3Raw(ax, ay, az));
+                return ImuRaw(
+                        hf::Vec3Raw(gyro[0], gyro[1], gyro[2]),
+                        hf::Vec3Raw(accel[0], accel[1], accel[2]));
             }
 
         private:
@@ -75,9 +79,9 @@ namespace hf {
                 return status != LSM6DSO_OK;
             }
 
-            lsm6dso_fs_g_t _grange;
-            lsm6dso_fs_xl_t _arange;
+            int _grange;
+            int _arange;
 
-            LSM6DSOSensor _lsm6dso;
+            LSM6DSOSensor _lsm6dso = LSM6DSOSensor(&Wire);
     };
 }
