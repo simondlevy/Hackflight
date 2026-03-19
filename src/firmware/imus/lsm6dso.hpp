@@ -35,12 +35,12 @@ namespace hf {
             {
                 Wire.begin();
 
-                // Wire.setClock(1000000); 
+                Wire.setClock(1000000); 
 
                 if (
                         bad(_lsm6dso.begin())  ||
-                        bad(_lsm6dso.Enable_X())  ||
                         bad(_lsm6dso.Enable_G())  ||
+                        bad(_lsm6dso.Enable_X())  ||
                         bad(_lsm6dso.Set_X_FS(_arange)) ||
                         bad(_lsm6dso.Set_G_FS(_grange)))
                 {
@@ -61,11 +61,11 @@ namespace hf {
 
             auto read() -> ImuRaw
             {
-                int32_t accel[3] = {};
-                _lsm6dso.Get_X_Axes(accel);
+                int16_t gyro[3] = {};
+                _lsm6dso.Get_G_AxesRaw(gyro);
 
-                int32_t gyro[3] = {};
-                _lsm6dso.Get_G_Axes(gyro);
+                int16_t accel[3] = {};
+                _lsm6dso.Get_X_AxesRaw(accel);
 
                 return ImuRaw(
                         hf::Vec3Raw(gyro[0], gyro[1], gyro[2]),
