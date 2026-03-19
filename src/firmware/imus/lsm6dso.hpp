@@ -49,12 +49,12 @@ namespace hf {
                 }
             }
 
-            auto gyroRangeDps() -> int16_t
+            const auto gyroRangeDps() -> int16_t
             {
                 return (int16_t)GRANGE;
             }
 
-            auto accelRangeGs() -> int16_t
+            const auto accelRangeGs() -> int16_t
             {
                 return (int16_t)ARANGE;
             }

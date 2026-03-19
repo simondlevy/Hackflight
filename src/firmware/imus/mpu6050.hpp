@@ -48,14 +48,14 @@ namespace hf {
                 _mpu6050.setFullScaleAccelRange(ARANGE);
             }
 
-            auto gyroRangeDps() -> int16_t
+            const auto gyroRangeDps() -> int16_t
             {
                 static constexpr int16_t granges[4] = {250, 500, 100, 2000};
 
                 return granges[GRANGE];
             }
 
-            auto accelRangeGs() -> int16_t
+            const auto accelRangeGs() -> int16_t
             {
                 static constexpr int16_t aranges[4] = {2, 4, 8, 16};
 

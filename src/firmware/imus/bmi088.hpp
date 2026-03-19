@@ -63,14 +63,14 @@ namespace hf {
                 }
             }
 
-            auto gyroRangeDps() -> int16_t
+            const auto gyroRangeDps() -> int16_t
             {
                 static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
 
                 return granges[GRANGE];
             }
 
-            auto accelRangeGs() -> int16_t
+            const auto accelRangeGs() -> int16_t
             {
                 static constexpr int16_t aranges[4] = {3, 6, 12, 24};
 
