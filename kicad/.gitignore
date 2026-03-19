@@ -24,3 +24,6 @@ sym-lib-table
 *.drc
 *.log
 *.stl
+*.gbrjob
+*.zip
+
