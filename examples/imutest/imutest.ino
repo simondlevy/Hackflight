@@ -2,8 +2,8 @@
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/imufilter.hpp>
-#include <firmware/imus/lsm6dso.hpp>
-//#include <firmware/imus/mpu6050.hpp>
+//#include <firmware/imus/lsm6dso.hpp>
+#include <firmware/imus/mpu6050.hpp>
 
 static hf::IMU _imu;
 

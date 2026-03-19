@@ -83,7 +83,7 @@ void loop()
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    _led.blink(millis(), _imuFilter.wasGyroBiasFound ? 1 : 3);
+    _led.blink(millis(), _imuFilter.wasGyroBiasFound);
 
     _flyingCheck = _flyingCheck.run(
             _flyingCheck, millis(), _mixer.motorvals, 4);
@@ -105,6 +105,6 @@ void loop()
         _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
 
-    //hf::Debugger::report(state);
+    hf::Debugger::report(state);
     //hf::Profiler::report();
 }

@@ -22,8 +22,8 @@ namespace hf {
 
         private:
 
-            static constexpr float HEARTBEAT_FREQ = 1;
-            static constexpr float IMU_CALIBRATING_FREQ = 3;
+            static constexpr float HEARTBEAT_FREQ = 0.75;
+            static constexpr float CALIBRATING_FREQ = 3;
             static constexpr uint32_t PULSE_DURATION_MSEC = 50;
 
         public:
@@ -44,35 +44,13 @@ namespace hf {
                 }
             }
 
-            void blink()
-            {
-                static uint32_t blink_counter, blink_delay;
-                static bool blinkAlternate;
-
-                const auto usec_curr = micros();
-
-                if (usec_curr - blink_counter > blink_delay) {
-                    blink_counter = micros();
-                    digitalWrite(_pin, blinkAlternate); 
-
-                    if (blinkAlternate == 1) {
-                        blinkAlternate = 0;
-                        blink_delay = 100000;
-                    }
-                    else if (blinkAlternate == 0) {
-                        blinkAlternate = 1;
-                        blink_delay = 2000000;
-                    }
-                }
-            }
-
-            void blink(const uint32_t msec_curr, const float freq)
+            void blink(const uint32_t msec_curr, const bool calibrated)
             {
                 static bool _pulsing;
                 static uint32_t _pulse_start;
                 static Timer _timer;
 
-                if (_timer.ready(freq)) {
+                if (_timer.ready(calibrated ? HEARTBEAT_FREQ : CALIBRATING_FREQ)) {
                     digitalWrite(_pin, true);
                     _pulsing = true;
                     _pulse_start = msec_curr;
