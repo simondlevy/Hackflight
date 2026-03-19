@@ -43,7 +43,7 @@ namespace hf {
 
             // Number of samples used in variance calculation. Changing this
             // affects the threshold
-            static const uint16_t NBR_OF_SAMPLES = 512;
+            static const uint16_t GYRO_NBR_OF_SAMPLES = 512;
 
         public:
 
@@ -85,10 +85,10 @@ namespace hf {
             {
                 const auto gyroraw = imuraw.gyro;
 
-                const auto gyromean = filter._gyroSum / NBR_OF_SAMPLES;
+                const auto gyromean = filter._gyroSum / GYRO_NBR_OF_SAMPLES;
 
                 const auto gyrovariance =
-                    (filter._gyroSumOfSquares/NBR_OF_SAMPLES) -
+                    (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
                     (gyromean*gyromean);
 
                 const auto gyroval = Vec3(gyroraw);
@@ -104,7 +104,8 @@ namespace hf {
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
 
-                const auto isBufferFilled = newBufferIndex == NBR_OF_SAMPLES;
+                const auto isBufferFilled =
+                    newBufferIndex == GYRO_NBR_OF_SAMPLES;
 
                 const auto wantUpdate =!filter.wasGyroBiasFound &&
                     isBufferFilled;
