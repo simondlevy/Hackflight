@@ -18,6 +18,7 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/matrix_typedef.h>
+#include <firmware/ekf/vec3_subsampler.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/zranger.hpp>
@@ -60,6 +61,8 @@ namespace hf {
             // the reversion of pitch and roll to zero
             static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
+            static const size_t QUEUE_MAX_LENGTH = 20;
+
         public:
 
             EKF()
@@ -68,7 +71,7 @@ namespace hf {
             }
 
             EKF& operator=(const EKF& other) = default;
- 
+
             auto getVehicleState(
                     const uint32_t msec_curr,
                     const bool isFlying,
@@ -110,17 +113,17 @@ namespace hf {
 
                 const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
 
-                const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
-                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
+                const auto phi = Num::RAD2DEG * atan2f(2*(_q.y*_q.z+_q.w* _q.x) ,
+                        _q.w*_q.w - _q.x*_q.x - _q.y*_q.y + _q.z*_q.z);
 
                 const auto dphi = _gyroLatest.x;
 
-                const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
+                const auto theta = Num::RAD2DEG * asinf(-2*(_q.x*_q.z - _q.w*_q.y));
 
                 const auto dtheta = _gyroLatest.y;
 
-                const auto psi = Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
-                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
+                const auto psi = Num::RAD2DEG * atan2f(2*(_q.x*_q.y+_q.w* _q.z),
+                        _q.w*_q.w + _q.x*_q.x - _q.y*_q.y - _q.z*_q.z); 
 
                 const auto dpsi = _gyroLatest.z;
 
@@ -160,8 +163,7 @@ namespace hf {
         private:
 
             // Indexes to access the vehicle's state, stored as a column vector
-            enum
-            {
+            enum {
                 STATE_X,
                 STATE_Y,
                 STATE_Z,
@@ -172,7 +174,6 @@ namespace hf {
                 STATE_D1,
                 STATE_D2,
                 STATE_DIM
-
             };
 
             typedef enum {
@@ -182,19 +183,15 @@ namespace hf {
                 MeasurementTypeFlow,
             } MeasurementType;
 
-
-            typedef struct
-            {
-                Vec3 gyro; // deg/s, for legacy reasons
+            typedef struct {
+                Vec3 gyro; // deg/s
             } gyroscopeMeasurement_t;
 
-            typedef struct
-            {
-                Vec3 acc; // Gs, for legacy reasons
+            typedef struct {
+                Vec3 acc; // Gs
             } accelerationMeasurement_t;
 
-            typedef struct
-            {
+            typedef struct {
                 MeasurementType type;
                 union
                 {
@@ -205,23 +202,68 @@ namespace hf {
                 } data;
             } measurement_t;
 
-            static const size_t QUEUE_MAX_LENGTH = 20;
             static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+
+            // Instance vars --------------------------------------------------
+
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+
             uint32_t _queueLength;
+
+            Vec3 _accLatest;
+            Vec3 _gyroLatest;
+
+            Vec3SubSampler _accelSubSampler;
+            Vec3SubSampler _gyroSubSampler;
+
+            float _predictedNX;
+            float _predictedNY;
+
+            float _measuredNX;
+            float _measuredNY;
+
+            // The vehicle's attitude as a rotation matrix (used by the prediction,
+            // updated by the finalization)
+            float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            Vec4 _q;
+
+            // Quaternion used for initial orientation
+            Vec4 _qinit;
+
+            // State vector
+            __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+
+            // Covariance helper
+            matrix_t _p_m;
+
+            // Tracks whether an update to the state has been made, and the state
+            // therefore requires finalization
+            bool _isUpdated;
+
+            uint32_t _lastPredictionMs;
+            uint32_t _lastProcessNoiseUpdateMs;
+
+            // Instance methods ----------------------------------------------
 
             void reset(const uint32_t msec_curr)
             {
-                axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
-                axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
+                _accelSubSampler = Vec3SubSampler(GRAVITY);
+                _gyroSubSampler = Vec3SubSampler(Num::DEG2RAD);
 
                 ekf_init();
 
                 // Reset the attitude quaternion
-                _q0 = _qinit0 = 1;
-                _q1 = _qinit1 = 0;
-                _q2 = _qinit2 = 0;
-                _q3 = _qinit3 = 0;
+                _q.w = _qinit.w = 1;
+                _q.x = _qinit.x = 0;
+                _q.y = _qinit.y = 0;
+                _q.z = _qinit.z = 0;
 
                 // Initialize the rotation matrix
                 _r00 = 1;
@@ -255,15 +297,14 @@ namespace hf {
                 _lastProcessNoiseUpdateMs = msec_curr;
             }
 
-
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                axis3fSubSamplerFinalize(&_accSubSampler, "accel");
-                axis3fSubSamplerFinalize(&_gyroSubSampler, "gyro");
+                _accelSubSampler = Vec3SubSampler::finalize(_accelSubSampler);
+                _gyroSubSampler = Vec3SubSampler::finalize(_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const Vec3 * accel = &_accSubSampler.subSample;
+                const Vec3 * accel = &_accelSubSampler.subSample;
                 const Vec3 * gyro = &_gyroSubSampler.subSample;
 
                 const float d0 = gyro->x*dt/2;
@@ -397,108 +438,50 @@ namespace hf {
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
 
-                float tmpq0 = dq[0]*_q0 - dq[1]*_q1 - dq[2]*_q2 - dq[3]*_q3;
-                float tmpq1 = dq[1]*_q0 + dq[0]*_q1 + dq[3]*_q2 - dq[2]*_q3;
-                float tmpq2 = dq[2]*_q0 - dq[3]*_q1 + dq[0]*_q2 + dq[1]*_q3;
-                float tmpq3 = dq[3]*_q0 + dq[2]*_q1 - dq[1]*_q2 + dq[0]*_q3;
+                float tmpq0 = dq[0]*_q.w - dq[1]*_q.x - dq[2]*_q.y - dq[3]*_q.z;
+                float tmpq1 = dq[1]*_q.w + dq[0]*_q.x + dq[3]*_q.y - dq[2]*_q.z;
+                float tmpq2 = dq[2]*_q.w - dq[3]*_q.x + dq[0]*_q.y + dq[1]*_q.z;
+                float tmpq3 = dq[3]*_q.w + dq[2]*_q.x - dq[1]*_q.y + dq[0]*_q.z;
 
                 if (!isFlying) {
 
                     const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit0;
-                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit1;
-                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit2;
-                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit3;
+                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit.w;
+                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit.x;
+                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit.y;
+                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit.z;
                 }
 
                 // normalize and store the result
                 const float norm = device_sqrt(
                         tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
-                _q0 = tmpq0/norm; 
-                _q1 = tmpq1/norm; 
-                _q2 = tmpq2/norm; 
-                _q3 = tmpq3/norm;
+                _q.w = tmpq0/norm; 
+                _q.x = tmpq1/norm; 
+                _q.y = tmpq2/norm; 
+                _q.z = tmpq3/norm;
 
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
             }
 
+            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
+            {
+                if (isnan(pval) || pval > MAX_COVARIANCE) {
+                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                } else if ( i==j && pval < MIN_COVARIANCE ) {
+                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                } else {
+                    _p[i][j] = _p[j][i] = pval;
+                }
+            }
 
             void enqueue(const EKF::measurement_t * measurement) 
             {
                 memcpy(&_measurementsQueue[_queueLength], measurement,
                         sizeof(EKF::measurement_t));
                 _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
-            }
-
-            typedef struct {
-                Vec3 sum;
-                uint32_t count;
-                float conversionFactor;
-                Vec3 subSample;
-            } Vec3SubSampler_t;
-
-            // Quaternion used for initial orientation [w,x,y,z]
-            float _qinit0, _qinit1, _qinit2, _qinit3;
-
-            Vec3 _accLatest;
-            Vec3 _gyroLatest;
-
-            Vec3SubSampler_t _accSubSampler;
-            Vec3SubSampler_t _gyroSubSampler;
-
-            float _predictedNX;
-            float _predictedNY;
-
-            float _measuredNX;
-            float _measuredNY;
-
-            // The vehicle's attitude as a rotation matrix (used by the prediction,
-            // updated by the finalization)
-            float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
-            float _q0, _q1, _q2, _q3;
-
-            static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
-                    float conversionFactor) { memset(subSampler, 0,
-                        sizeof(Vec3SubSampler_t));
-                    subSampler->conversionFactor = conversionFactor;
-            }
-
-            static void axis3fSubSamplerAccumulate(Vec3SubSampler_t* subSampler,
-                    const Vec3* sample) {
-                subSampler->sum.x += sample->x;
-                subSampler->sum.y += sample->y;
-                subSampler->sum.z += sample->z;
-
-                subSampler->count++;
-            }
-
-            static Vec3* axis3fSubSamplerFinalize(Vec3SubSampler_t* subSampler,
-                    const char * label) 
-            {
-                if (subSampler->count > 0) {
-
-                    subSampler->subSample.x = 
-                        subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.y = 
-                        subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.z = 
-                        subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
-
-                    // Reset
-                    subSampler->count = 0;
-                    subSampler->sum.x = 0;
-                    subSampler->sum.y = 0;
-                    subSampler->sum.z = 0;
-                }
-
-                return &subSampler->subSample;
             }
 
             void finalize(const uint32_t msec_curr)
@@ -521,36 +504,36 @@ namespace hf {
 
                     // Rotate the vehicle's attitude by the delta quaternion vector
                     // computed above
-                    const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
-                        dq[2] * _q2 - dq[3] * _q3;
-                    const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
-                        dq[3] * _q2 - dq[2] * _q3;
-                    const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
-                        dq[0] * _q2 + dq[1] * _q3;
-                    const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
-                        dq[1] * _q2 + dq[0] * _q3;
+                    const float tmpq0 = dq[0] * _q.w - dq[1] * _q.x - 
+                        dq[2] * _q.y - dq[3] * _q.z;
+                    const float tmpq1 = dq[1] * _q.w + dq[0] * _q.x + 
+                        dq[3] * _q.y - dq[2] * _q.z;
+                    const float tmpq2 = dq[2] * _q.w - dq[3] * _q.x + 
+                        dq[0] * _q.y + dq[1] * _q.z;
+                    const float tmpq3 = dq[3] * _q.w + dq[2] * _q.x - 
+                        dq[1] * _q.y + dq[0] * _q.z;
 
                     // normalize and store the result
                     float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                             tmpq3 * tmpq3) + EPSILON;
-                    _q0 = tmpq0 / norm;
-                    _q1 = tmpq1 / norm;
-                    _q2 = tmpq2 / norm;
-                    _q3 = tmpq3 / norm;
+                    _q.w = tmpq0 / norm;
+                    _q.x = tmpq1 / norm;
+                    _q.y = tmpq2 / norm;
+                    _q.z = tmpq3 / norm;
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
 
-                _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
-                _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
-                _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
-                _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
-                _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
-                _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
-                _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
-                _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
-                _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
+                _r00 = _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z;
+                _r01 = 2 * _q.x * _q.y - 2 * _q.w * _q.z;
+                _r02 = 2 * _q.x * _q.z + 2 * _q.w * _q.y;
+                _r10 = 2 * _q.x * _q.y + 2 * _q.w * _q.z;
+                _r11 = _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z;
+                _r12 = 2 * _q.y * _q.z - 2 * _q.w * _q.x;
+                _r20 = 2 * _q.x * _q.z - 2 * _q.w * _q.y;
+                _r21 = 2 * _q.y * _q.z + 2 * _q.w * _q.x;
+                _r22 = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
 
                 // reset the attitude error
                 _x[STATE_D0] = 0;
@@ -705,31 +688,17 @@ namespace hf {
 
             void updateWithAccel(measurement_t & m)
             {
-                axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.acceleration.acc);
+                _accelSubSampler = Vec3SubSampler::accumulate(_accelSubSampler,
+                        m.data.acceleration.acc);
                 _accLatest = m.data.acceleration.acc;
             }
 
             void updateWithGyro(measurement_t & m)
             {
-                axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.gyroscope.gyro);
+                _gyroSubSampler = Vec3SubSampler::accumulate(_gyroSubSampler,
+                        m.data.gyroscope.gyro);
                 _gyroLatest = m.data.gyroscope.gyro;
             }
-
-            // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
-
-            // Covariance matrix
-            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
-
-            // Covariance helper
-            matrix_t _p_m;
-
-            // Tracks whether an update to the state has been made, and the state
-            // therefore requires finalization
-            bool _isUpdated;
-
-            uint32_t _lastPredictionMs;
-            uint32_t _lastProcessNoiseUpdateMs;
 
             void ekf_init()
             {
@@ -855,22 +824,12 @@ namespace hf {
                 }
             }
 
-            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
-            {
-                if (isnan(pval) || pval > MAX_COVARIANCE) {
-                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
-                } else if ( i==j && pval < MIN_COVARIANCE ) {
-                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
-                } else {
-                    _p[i][j] = _p[j][i] = pval;
-                }
-            }
+            // Hardware-dependent --------------------------------------------
+
             void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
 
             void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
                     matrix_t * pDst);
-
-            // Hardware-dependent --------------------------------------------
 
             static float device_cos(const float x);
             static float device_sin(const float x);
