@@ -5,15 +5,25 @@
 
 static LSM6DSOSensor AccGyr(&Wire);
 
+static bool bad(const LSM6DSOStatusTypeDef status)
+{
+    return status != LSM6DSO_OK;
+}
+
 void setup()
 {
     Serial.begin(0);
 
     Wire.begin();
 
-    AccGyr.begin();
-    AccGyr.Enable_X();
-    AccGyr.Enable_G();
+    if (
+            bad(AccGyr.begin()) ||
+            bad(AccGyr.Enable_X()) || 
+            bad(AccGyr.Enable_G())) {
+
+        hf::Debugger::reportForever(
+                "LSM6DSO initialization unsuccessful\n");
+    }
 }
 
 void loop() 
