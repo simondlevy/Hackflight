@@ -25,7 +25,8 @@
 // Hackflight library
 #include <hackflight.h>
 //#include <firmware/imus/bmi088.hpp>
-#include <firmware/imus/mpu6050.hpp>
+#include <firmware/imus/lsm6dso.hpp>
+//#include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>

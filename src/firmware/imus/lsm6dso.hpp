@@ -24,12 +24,12 @@ namespace hf {
 
     class IMU {
 
-        public:
+        private:
 
-            IMU(
-                    const int grange =  2000,
-                    const int arange = 16)
-                : _grange(grange), _arange(arange) {}
+            static constexpr int16_t GRANGE = 2000;
+            static constexpr int16_t ARANGE = 16; 
+
+        public:
 
             void begin()
             {
@@ -41,8 +41,8 @@ namespace hf {
                         bad(_lsm6dso.begin())  ||
                         bad(_lsm6dso.Enable_G())  ||
                         bad(_lsm6dso.Enable_X())  ||
-                        bad(_lsm6dso.Set_X_FS(_arange)) ||
-                        bad(_lsm6dso.Set_G_FS(_grange)))
+                        bad(_lsm6dso.Set_X_FS(ARANGE)) ||
+                        bad(_lsm6dso.Set_G_FS(GRANGE)))
                 {
                     Debugger::reportForever(
                             "LSM6DSO initialization unsuccessful\n");
@@ -51,12 +51,12 @@ namespace hf {
 
             auto gyroRangeDps() -> int16_t
             {
-                return (int16_t)_grange;
+                return (int16_t)GRANGE;
             }
 
             auto accelRangeGs() -> int16_t
             {
-                return (int16_t)_arange;
+                return (int16_t)ARANGE;
             }
 
             auto read() -> ImuRaw
@@ -78,9 +78,6 @@ namespace hf {
             {
                 return status != LSM6DSO_OK;
             }
-
-            int _grange;
-            int _arange;
 
             LSM6DSOSensor _lsm6dso = LSM6DSOSensor(&Wire);
     };
