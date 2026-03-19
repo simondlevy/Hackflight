@@ -37,6 +37,13 @@ namespace hf {
 
                 Wire.setClock(1000000); 
 
+                uint8_t id = 0;
+                _lsm6dso.ReadID(&id);
+
+                if (id != LSM6DSO_ID) {
+                    Debugger::reportForever("LSM6DSO not detected");
+                }
+                
                 if (
                         bad(_lsm6dso.begin())  ||
                         bad(_lsm6dso.Enable_G())  ||
@@ -45,7 +52,7 @@ namespace hf {
                         bad(_lsm6dso.Set_G_FS(GRANGE)))
                 {
                     Debugger::reportForever(
-                            "LSM6DSO initialization unsuccessful\n");
+                            "LSM6DSO initialization unsuccessful");
                 }
             }
 
