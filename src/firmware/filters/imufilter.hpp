@@ -30,11 +30,6 @@ namespace hf {
 
             static const uint32_t ACC_SCALE_SAMPLES = 200;
 
-            // IMU alignment on the airframe 
-            static constexpr float ALIGN_PHI   = 0;
-            static constexpr float ALIGN_THETA = 0;
-            static constexpr float ALIGN_PSI   = 0;
-
             static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
             static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
 
@@ -90,7 +85,8 @@ namespace hf {
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
                     const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs) -> ImuFilter
+                    const int16_t accel_range_gs,
+                    const Vec3 & alignment={}) -> ImuFilter
             {
                 const auto gyroraw = imuraw.gyro;
 
@@ -138,14 +134,14 @@ namespace hf {
                 const auto gyroUnbiased =
                     scale(gyroval - gyroBias, gyro_range_dps);
 
-                const auto gyroAligned = alignToAirframe(gyroUnbiased);
+                const auto gyroAligned = alignToAirframe(gyroUnbiased, alignment);
 
                 const auto gyroLpf = filter._gyroLpf.apply(
                         filter._gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
 
                 const auto gyroFiltered = gyroLpf.output;
 
-                const auto accelAlignedToAirframe = alignToAirframe(accel);
+                const auto accelAlignedToAirframe = alignToAirframe(accel, alignment);
 
                 const auto accelAlignedToGravity = alignToGravity(
                         accelAlignedToAirframe);
@@ -203,14 +199,15 @@ namespace hf {
                         -rx.x * sinPitch + rx.z * cosPitch);
             }
 
-            static auto alignToAirframe(const Vec3 & in) -> Vec3
+            static auto alignToAirframe(
+                    const Vec3 & in, const Vec3 & align) -> Vec3
             {
-                const auto sphi   = sinf(ALIGN_PHI * Num::DEG2RAD);
-                const auto cphi   = cosf(ALIGN_PHI * Num::DEG2RAD);
-                const auto stheta = sinf(ALIGN_THETA * Num::DEG2RAD);
-                const auto ctheta = cosf(ALIGN_THETA * Num::DEG2RAD);
-                const auto spsi   = sinf(ALIGN_PSI * Num::DEG2RAD);
-                const auto cpsi   = cosf(ALIGN_PSI * Num::DEG2RAD);
+                const auto sphi   = sinf(align.x * Num::DEG2RAD);
+                const auto cphi   = cosf(align.x * Num::DEG2RAD);
+                const auto stheta = sinf(align.y * Num::DEG2RAD);
+                const auto ctheta = cosf(align.y * Num::DEG2RAD);
+                const auto spsi   = sinf(align.z * Num::DEG2RAD);
+                const auto cpsi   = cosf(align.z * Num::DEG2RAD);
 
                 const auto r00 = ctheta * cpsi;
                 const auto r01 = ctheta * spsi;
@@ -232,5 +229,5 @@ namespace hf {
             {
                 return vec * 2 * (float)s / 65536;
             }
-     };
+    };
 }
