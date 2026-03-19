@@ -25,7 +25,7 @@
 // Hackflight library
 #include <hackflight.h>
 //#include <firmware/imus/bmi088.hpp>
-#include <firmware/imus/lsm6dso.hpp>
+#include <firmware/imus/lsm6dso_rot90ccw.hpp>
 //#include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
@@ -106,6 +106,7 @@ void loop()
         _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
 
+    //hf::Debugger::report(imuraw);
     hf::Debugger::report(state);
     //hf::Profiler::report();
 }

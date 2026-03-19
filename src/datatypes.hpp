@@ -74,20 +74,6 @@ namespace hf {
 
     } mode_e;
 
-    class Vec2 {
-
-        public:
-
-            float x;
-            float y;
-
-            Vec2() = default;
-
-            Vec2(const float x, const float y) : x(x), y(y) {}
-
-            Vec2& operator=(const Vec2& other) = default;
-    };
-
     class Vec3Raw {
 
         public:

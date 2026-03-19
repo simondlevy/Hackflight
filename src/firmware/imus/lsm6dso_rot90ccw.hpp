@@ -74,9 +74,10 @@ namespace hf {
                 int16_t accel[3] = {};
                 _lsm6dso.Get_X_AxesRaw(accel);
 
+                // Rotation 90 degrees counter-clockwise
                 return ImuRaw(
-                        hf::Vec3Raw(gyro[0], gyro[1], gyro[2]),
-                        hf::Vec3Raw(accel[0], accel[1], accel[2]));
+                        hf::Vec3Raw(-gyro[1], gyro[0], gyro[2]),
+                        hf::Vec3Raw(-accel[1], accel[0], accel[2]));
             }
 
         private:

@@ -82,8 +82,7 @@ namespace hf {
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
                     const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs,
-                    const Vec3 & alignment={}) -> ImuFilter
+                    const int16_t accel_range_gs)-> ImuFilter
             {
                 const auto gyroraw = imuraw.gyro;
 
