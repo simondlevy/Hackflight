@@ -25,9 +25,6 @@ namespace hf {
 
         private:
 
-            static constexpr float CALIBRATION_PITCH = 0;
-            static constexpr float CALIBRATION_ROLL = 0;
-
             static const uint32_t ACC_SCALE_SAMPLES = 200;
 
             static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
@@ -134,20 +131,13 @@ namespace hf {
                 const auto gyroUnbiased =
                     scale(gyroval - gyroBias, gyro_range_dps);
 
-                const auto gyroAligned = alignToAirframe(gyroUnbiased, alignment);
-
                 const auto gyroLpf = filter._gyroLpf.apply(
-                        filter._gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+                        filter._gyroLpf, gyroUnbiased, GYRO_LPF_CUTOFF_FREQ);
 
                 const auto gyroFiltered = gyroLpf.output;
 
-                const auto accelAlignedToAirframe = alignToAirframe(accel, alignment);
-
-                const auto accelAlignedToGravity = alignToGravity(
-                        accelAlignedToAirframe);
-
                 const auto accelLpf = filter._accelLpf.apply(filter._accelLpf,
-                        accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+                        accel, ACCEL_LPF_CUTOFF_FREQ);
 
                 const auto accelFiltered = filter._accelLpf.output;
 
@@ -160,8 +150,6 @@ namespace hf {
 
         private:
 
-            // ---------------------------------------------------------------
-
             Vec3 _gyroSum;
             Vec3 _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
@@ -169,61 +157,6 @@ namespace hf {
             uint32_t _gyroVarianceSampleTimeMsec;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
-
-            // ---------------------------------------------------------------
-
-            /**
-             * Compensate for a miss-aligned accelerometer. It uses the trim
-             * data gathered from the UI and written in the config-block to
-             * rotate the accelerometer to be aligned with gravity.
-             */
-            static auto alignToGravity(const Vec3 & in) -> Vec3
-            {
-
-                const auto cosPitch = cosf(CALIBRATION_PITCH * Num::DEG2RAD);
-                const auto sinPitch = sinf(CALIBRATION_PITCH * Num::DEG2RAD);
-                const auto cosRoll = cosf(CALIBRATION_ROLL * Num::DEG2RAD);
-                const auto sinRoll = sinf(CALIBRATION_ROLL * Num::DEG2RAD);
-
-                // Rotate around x-axis
-                const Vec3 rx = {
-                    in.x,
-                    in.y * cosRoll - in.z * sinRoll,
-                    in.y * sinRoll + in.z * cosRoll
-                };
-
-                // Rotate around y-axis
-                return Vec3(
-                        rx.x * cosPitch - rx.z * sinPitch,
-                        rx.y,
-                        -rx.x * sinPitch + rx.z * cosPitch);
-            }
-
-            static auto alignToAirframe(
-                    const Vec3 & in, const Vec3 & align) -> Vec3
-            {
-                const auto sphi   = sinf(align.x * Num::DEG2RAD);
-                const auto cphi   = cosf(align.x * Num::DEG2RAD);
-                const auto stheta = sinf(align.y * Num::DEG2RAD);
-                const auto ctheta = cosf(align.y * Num::DEG2RAD);
-                const auto spsi   = sinf(align.z * Num::DEG2RAD);
-                const auto cpsi   = cosf(align.z * Num::DEG2RAD);
-
-                const auto r00 = ctheta * cpsi;
-                const auto r01 = ctheta * spsi;
-                const auto r02 = -stheta;
-                const auto r10 = sphi * stheta * cpsi - cphi * spsi;
-                const auto r11 = sphi * stheta * spsi + cphi * cpsi;
-                const auto r12 = sphi * ctheta;
-                const auto r20 = cphi * stheta * cpsi + sphi * spsi;
-                const auto r21 = cphi * stheta * spsi - sphi * cpsi;
-                const auto r22 = cphi * ctheta;
-
-                return Vec3(
-                        in.x*r00 + in.y*r01 + in.z*r02,
-                        in.x*r10 + in.y*r11 + in.z*r12,
-                        in.x*r20 + in.y*r21 + in.z*r22);
-            }
 
             static Vec3 scale(const Vec3 & vec, const int16_t s)
             {
