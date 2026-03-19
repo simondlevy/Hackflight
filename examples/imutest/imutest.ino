@@ -22,12 +22,12 @@ void loop()
 {
     const auto imuraw = _imu.read();
 
-    hf::Debugger::report(imuraw);
-
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
     _ekf.enqueueImu(_imuFilter.output);
-    //const auto state = _ekf.getVehicleState(millis(), true);
-    //hf::Debugger::report(state);
+
+    const auto state = _ekf.getVehicleState(millis(), true);
+
+    hf::Debugger::report(state);
 }

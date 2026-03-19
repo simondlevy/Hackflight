@@ -76,6 +76,15 @@ namespace hf {
                     _accelLpf(accelLpf),
                     _gyroLpf(gyroLpf) {}
 
+            /**
+             * imuraw should come in as follows:
+             *   gyro.x: positive roll-rightward
+             *   gyro.y: positive nose-downward
+             *   gyro.z: positive counter-clockwise
+             *   accel.x: positive nose-up
+             *   accel.y: positive roll-right
+             *   accel.z: positive rightside-up
+             */
             static auto step(
                     const ImuFilter & filter,
                     const uint32_t msec_curr,
