@@ -208,6 +208,15 @@ namespace hf {
 
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
 
+            // State vector
+            __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+
+            // Covariance helper
+            matrix_t _p_m;
+
             uint32_t _queueLength;
 
             Vec3 _accLatest;
@@ -233,15 +242,6 @@ namespace hf {
 
             // Quaternion used for initial orientation
             Vec4 _qinit;
-
-            // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
-
-            // Covariance matrix
-            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
-
-            // Covariance helper
-            matrix_t _p_m;
 
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
