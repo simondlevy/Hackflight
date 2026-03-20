@@ -29,13 +29,13 @@ namespace hf {
             Vec7() = default;
 
             Vec7(
-                    const float _0,
-                    const float _1,
-                    const float _2,
-                    const float _3,
-                    const float _4,
-                    const float _5,
-                    const float _6)
+                    const float _0,  // Z
+                    const float _1,  // VX
+                    const float _2,  // VY
+                    const float _3,  // VZ
+                    const float _4,  // D0
+                    const float _5,  // D1
+                    const float _6)  // D2
                 : _0(_0), _1(_1), _2(_2), _3(_3), _4(_4), _5(_5), _6(_6) { }
     };
 

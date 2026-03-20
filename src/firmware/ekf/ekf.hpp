@@ -100,19 +100,18 @@ namespace hf {
                 }
                 _queueLength = 0;
 
-                const auto z = _x[STATE_Z];
+                const auto z = _x._0;
 
                 if (_isUpdated) {
                     finalize(msec_curr);
                 }
 
-                const auto dx =
-                    _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
+                const auto dx = _r00*_x._1 + _r01*_x._2 + _r02*_x._3;
 
                 // make right positive
-                const auto dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); 
+                const auto dy = -(_r10*_x._1 + _r11*_x._2 + _r12*_x._3); 
 
-                const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
+                const auto dz = _r20*_x._1 + _r21*_x._2 + _r22*_x._3;
 
                 const auto phi = Num::RAD2DEG * atan2f(2*(_q.y*_q.z+_q.w* _q.x) ,
                         _q.w*_q.w - _q.x*_q.x - _q.y*_q.y + _q.z*_q.z);
@@ -209,9 +208,7 @@ namespace hf {
             uint32_t _queueLength;
 
             // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
-
-            __attribute__((aligned(4))) Vec7 _newx;
+            __attribute__((aligned(4))) Vec7 _x;
 
             // Covariance matrix
             __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
@@ -308,15 +305,16 @@ namespace hf {
                 const float d1 = gyro->y*dt/2;
                 const float d2 = gyro->z*dt/2;
 
-                const float vx = _x[STATE_VX];
-                const float vy = _x[STATE_VY];
-                const float vz = _x[STATE_VZ];
+                const float vx = _x._1;
+                const float vy = _x._2;
+                const float vz = _x._3;
 
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
 
                 ///////////////////////////////////////////////////////
 
+                /*
                 static Mat7x7 newF;
 
                 // position
@@ -373,6 +371,7 @@ namespace hf {
                 newF._6._4 =  d1 + d0*d2/2;
                 newF._6._5 = -d0 + d1*d2/2;
                 newF._6._6 = 1 - d0*d0/2 - d1*d1/2;
+                */
 
                 ///////////////////////////////////////////////////////
  
@@ -436,19 +435,19 @@ namespace hf {
                 const float dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const float tmpSPX = _x[STATE_VX];
-                const float tmpSPY = _x[STATE_VY];
-                const float tmpSPZ = _x[STATE_VZ];
+                const float tmpSPX = _x._1;
+                const float tmpSPY = _x._2;
+                const float tmpSPZ = _x._3;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
-                const float dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
+                const float dx = _x._1 * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
+                const float dy = _x._2 * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const float dz = _x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
+                const float dz = _x._3 * dt + accel->z * dt2 / 2.0f; 
 
                 // position update
-                _x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
+                _x._0 += _r20 * dx + _r21 * dy + _r22 * dz - 
                     GRAVITY * dt2 / 2.0f;
 
                 const float accelx = isFlying ? 0 : accel->x;
@@ -457,13 +456,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _x[STATE_VX] += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
+                _x._1 += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
                         - GRAVITY * _r20);
 
-                _x[STATE_VY] += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
+                _x._2 += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
                         - GRAVITY * _r21);
 
-                _x[STATE_VZ] += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
+                _x._3 += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
                         - GRAVITY * _r22);
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
@@ -529,9 +528,9 @@ namespace hf {
             void finalize(const uint32_t msec_curr)
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = _x[STATE_D0];
-                const float v1 = _x[STATE_D1];
-                const float v2 = _x[STATE_D2];
+                const float v0 = _x._4;
+                const float v1 = _x._5;
+                const float v2 = _x._6;
 
                 // Move attitude error into attitude if any of the angle errors are
                 // large enough
@@ -578,9 +577,9 @@ namespace hf {
                 _r22 = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
 
                 // reset the attitude error
-                _x[STATE_D0] = 0;
-                _x[STATE_D1] = 0;
-                _x[STATE_D2] = 0;
+                _x._4 = 0;
+                _x._5 = 0;
+                _x._6 = 0;
 
                 ekf_enforceSymmetry();
 
@@ -653,15 +652,14 @@ namespace hf {
                 float omegax_b = gyro->x * Num::DEG2RAD;
                 float omegay_b = gyro->y * Num::DEG2RAD;
 
-
-                float dx_g = _x[STATE_VX];
-                float dy_g = _x[STATE_VY];
+                float dx_g = _x._1;
+                float dy_g = _x._2;
                 float z_g = 0.0;
                 // Saturate elevation in prediction and correction to avoid singularities
-                if ( _x[STATE_Z] < 0.1f ) {
+                if ( _x._0 < 0.1f ) {
                     z_g = 0.1;
                 } else {
-                    z_g = _x[STATE_Z];
+                    z_g = _x._0;
                 }
 
                 // ~~~ X velocity prediction and update ~~~
@@ -713,7 +711,7 @@ namespace hf {
                     if (angle < 0.0f) {
                         angle = 0.0f;
                     }
-                    float predictedDistance = _x[STATE_Z] / cosf(angle);
+                    float predictedDistance = _x._0 / cosf(angle);
                     float measuredDistance = tof->distance; // [m]
 
                     // This just acts like a gain for the sensor model. Further
@@ -742,9 +740,9 @@ namespace hf {
 
             void ekf_init()
             {
-                for (int i=0; i< STATE_DIM; i++) {
+                _x = Vec7();
 
-                    _x[i] = 0;
+                for (int i=0; i< STATE_DIM; i++) {
 
                     for (int j=0; j < STATE_DIM; j++) {
                         _p[i][j] = 0; 
@@ -775,6 +773,30 @@ namespace hf {
             }
 
             // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+            void ekf_predict(const Mat7x7 & F)
+            {
+                /*
+                static __attribute__((aligned(4))) matrix_t Fm = { 
+                    STATE_DIM, STATE_DIM, (float *)F
+                };
+
+                static float tmpNN1d[STATE_DIM * STATE_DIM];
+                static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
+                    STATE_DIM, STATE_DIM, tmpNN1d
+                };
+
+                static float tmpNN2d[STATE_DIM * STATE_DIM];
+                static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
+                    STATE_DIM, STATE_DIM, tmpNN2d
+                };
+
+                device_mat_mult(&Fm, &_p_m, &tmpNN1m); // F P
+                device_mat_trans(&Fm, &tmpNN2m); // F'
+                device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
+                */
+            }
+
+             // P_k = F_{k-1} P_{k-1} F^T_{k-1}
             void ekf_predict(const float F[STATE_DIM][STATE_DIM])
             {
                 static __attribute__((aligned(4))) matrix_t Fm = { 
@@ -840,8 +862,16 @@ namespace hf {
                 // Calculate the Kalman gain and perform the state update
                 for (int i=0; i<STATE_DIM; i++) {
                     G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                    _x[i] = _x[i] + G[i] * error; // state update
                 }
+
+                // Update state
+                _x._0 += G[0] * error; 
+                _x._1 += G[1] * error; 
+                _x._2 += G[2] * error; 
+                _x._3 += G[3] * error; 
+                _x._4 += G[4] * error; 
+                _x._5 += G[5] * error; 
+                _x._6 += G[6] * error; 
 
                 device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
                 for (int i=0; i<STATE_DIM; i++) { 

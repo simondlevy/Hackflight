@@ -107,6 +107,6 @@ void loop()
     }
 
     //hf::Debugger::report(imuraw);
-    hf::Debugger::report(state);
-    //hf::Profiler::report();
+    //hf::Debugger::report(state);
+    hf::Profiler::report();
 }
