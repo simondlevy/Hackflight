@@ -315,6 +315,67 @@ namespace hf {
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
 
+                ///////////////////////////////////////////////////////
+
+                static Mat7x7 newF;
+
+                // position
+                newF._0._0 = 1;
+
+                // position from body-frame velocity
+                newF._0._1 = _r20*dt;
+
+                newF._0._2 = _r21*dt;
+
+                newF._0._3 = _r22*dt;
+
+                // position from attitude error
+                newF._0._4 = (vy*_r22 - vz*_r21)*dt;
+
+                newF._0._5 = (-vx*_r22 + vz*_r20)*dt;
+
+                newF._0._6 = (vx*_r21 - vy*_r20)*dt;
+
+                // body-frame velocity from body-frame velocity
+                newF._1._1 = 1; //drag negligible
+                newF._2._1 =-gyro->z*dt;
+                newF._3._1 = gyro->y*dt;
+
+                newF._1._2 = gyro->z*dt;
+                newF._2._2 = 1; //drag negligible
+                newF._3._2 =-gyro->x*dt;
+
+                newF._1._3 =-gyro->y*dt;
+                newF._2._3 = gyro->x*dt;
+                newF._3._3 = 1; //drag negligible
+
+                // body-frame velocity from attitude error
+                newF._1._4 =  0;
+                newF._2._4 = -GRAVITY*_r22*dt;
+                newF._3._4 =  GRAVITY*_r21*dt;
+
+                newF._1._5 =  GRAVITY*_r22*dt;
+                newF._2._5 =  0;
+                newF._3._5 = -GRAVITY*_r20*dt;
+
+                newF._1._6 = -GRAVITY*_r21*dt;
+                newF._2._6 =  GRAVITY*_r20*dt;
+                newF._3._6 =  0;
+
+                newF._4._4 =  1 - d1*d1/2 - d2*d2/2;
+                newF._4._5 =  d2 + d0*d1/2;
+                newF._4._6 = -d1 + d0*d2/2;
+
+                newF._5._4 = -d2 + d0*d1/2;
+                newF._5._5 =  1 - d0*d0/2 - d2*d2/2;
+                newF._5._6 =  d0 + d1*d2/2;
+
+                newF._6._4 =  d1 + d0*d2/2;
+                newF._6._5 = -d0 + d1*d2/2;
+                newF._6._6 = 1 - d0*d0/2 - d1*d1/2;
+
+                ///////////////////////////////////////////////////////
+ 
                 // position
                 F[STATE_Z][STATE_Z] = 1;
 

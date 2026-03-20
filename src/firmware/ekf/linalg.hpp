@@ -38,4 +38,22 @@ namespace hf {
                     const float _6)
                 : _0(_0), _1(_1), _2(_2), _3(_3), _4(_4), _5(_5), _6(_6) { }
     };
-}
+
+    class Mat7x7 {
+
+        public:
+
+            Vec7 _0, _1, _2, _3, _4, _5, _6;
+
+            Mat7x7() = default;
+
+            Mat7x7(
+                    const Vec7 & _0,
+                    const Vec7 & _1,
+                    const Vec7 & _2,
+                    const Vec7 & _3,
+                    const Vec7 & _4,
+                    const Vec7 & _5,
+                    const Vec7 & _6)
+                : _0(_0), _1(_1), _2(_2), _3(_3), _4(_4), _5(_5), _6(_6) { }
+    };}
