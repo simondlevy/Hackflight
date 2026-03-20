@@ -18,6 +18,7 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/matrix_typedef.h>
+#include <firmware/ekf/linalg.hpp>
 #include <firmware/ekf/vec3_subsampler.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
@@ -209,6 +210,8 @@ namespace hf {
 
             // State vector
             __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            __attribute__((aligned(4))) Vec7 _newx;
 
             // Covariance matrix
             __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
