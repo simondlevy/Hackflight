@@ -207,6 +207,7 @@ namespace hf {
             // Instance vars --------------------------------------------------
 
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+            uint32_t _queueLength;
 
             // State vector
             __attribute__((aligned(4))) float _x[STATE_DIM];
@@ -216,8 +217,6 @@ namespace hf {
 
             // Covariance helper
             matrix_t _p_m;
-
-            uint32_t _queueLength;
 
             Vec3 _accLatest;
             Vec3 _gyroLatest;
