@@ -1,7 +1,7 @@
 all: main
 
 main: main.cpp ../src/firmware/ekf/linalg.hpp
-	gcc -I../src -o main main.cpp
+	g++ -I../src -I$(HOME)/Desktop/eigen -o main main.cpp
 
 run: main
 	./main
