@@ -6,6 +6,8 @@ PORT = /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
+EIGEN = $(HOME)/Desktop/eigen
+
 build: $(SKETCH).ino
 	arduino-cli compile --libraries $(LIBS) --libraries ../../.. \
 		--fqbn $(FQBN) $(SKETCH).ino

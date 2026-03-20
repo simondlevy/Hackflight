@@ -25,6 +25,8 @@
 #include <firmware/zranger.hpp>
 #include <num.hpp>
 
+#include <ArduinoEigenDense.h>
+
 namespace hf {
 
     class EKF { 
@@ -211,7 +213,7 @@ namespace hf {
             __attribute__((aligned(4))) Vec7 _x;
 
             // Covariance matrix
-            Mat7x7 P;
+            Eigen::MatrixXd P = Eigen::MatrixXd(7, 7);
 
             // Covariance matrix
             __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
@@ -317,64 +319,64 @@ namespace hf {
 
                 ///////////////////////////////////////////////////////
 
-                /*
-                static Mat7x7 newF;
+                static Eigen::MatrixXd newF(7, 7);
 
                 // position
-                newF._0._0 = 1;
+                newF(0, 0) = 1;
 
                 // position from body-frame velocity
-                newF._0._1 = _r20*dt;
+                newF(0,1) = _r20*dt;
 
-                newF._0._2 = _r21*dt;
+                newF(0,2) = _r21*dt;
 
-                newF._0._3 = _r22*dt;
+                newF(0,3) = _r22*dt;
 
                 // position from attitude error
-                newF._0._4 = (vy*_r22 - vz*_r21)*dt;
+                newF(0,4) = (vy*_r22 - vz*_r21)*dt;
 
-                newF._0._5 = (-vx*_r22 + vz*_r20)*dt;
+                newF(0,5) = (-vx*_r22 + vz*_r20)*dt;
 
-                newF._0._6 = (vx*_r21 - vy*_r20)*dt;
+                newF(0,6) = (vx*_r21 - vy*_r20)*dt;
 
                 // body-frame velocity from body-frame velocity
-                newF._1._1 = 1; //drag negligible
-                newF._2._1 =-gyro->z*dt;
-                newF._3._1 = gyro->y*dt;
+                newF(1,1) = 1; //drag negligible
+                newF(2,1) =-gyro->z*dt;
+                newF(3,1) = gyro->y*dt;
 
-                newF._1._2 = gyro->z*dt;
-                newF._2._2 = 1; //drag negligible
-                newF._3._2 =-gyro->x*dt;
+                newF(1,2) = gyro->z*dt;
+                newF(2,2) = 1; //drag negligible
+                newF(3,2) =-gyro->x*dt;
 
-                newF._1._3 =-gyro->y*dt;
-                newF._2._3 = gyro->x*dt;
-                newF._3._3 = 1; //drag negligible
+                newF(1,3) =-gyro->y*dt;
+                newF(2,3) = gyro->x*dt;
+                newF(3,3) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
-                newF._1._4 =  0;
-                newF._2._4 = -GRAVITY*_r22*dt;
-                newF._3._4 =  GRAVITY*_r21*dt;
+                newF(1,4) =  0;
+                newF(2,4) = -GRAVITY*_r22*dt;
+                newF(3,4) =  GRAVITY*_r21*dt;
 
-                newF._1._5 =  GRAVITY*_r22*dt;
-                newF._2._5 =  0;
-                newF._3._5 = -GRAVITY*_r20*dt;
+                newF(1,5) =  GRAVITY*_r22*dt;
+                newF(2,5) =  0;
+                newF(3,5) = -GRAVITY*_r20*dt;
 
-                newF._1._6 = -GRAVITY*_r21*dt;
-                newF._2._6 =  GRAVITY*_r20*dt;
-                newF._3._6 =  0;
+                newF(1,6) = -GRAVITY*_r21*dt;
+                newF(2,6) =  GRAVITY*_r20*dt;
+                newF(3,6) =  0;
 
-                newF._4._4 =  1 - d1*d1/2 - d2*d2/2;
-                newF._4._5 =  d2 + d0*d1/2;
-                newF._4._6 = -d1 + d0*d2/2;
+                newF(4,4) =  1 - d1*d1/2 - d2*d2/2;
+                newF(4,5) =  d2 + d0*d1/2;
+                newF(4,6) = -d1 + d0*d2/2;
 
-                newF._5._4 = -d2 + d0*d1/2;
-                newF._5._5 =  1 - d0*d0/2 - d2*d2/2;
-                newF._5._6 =  d0 + d1*d2/2;
+                newF(5,4) = -d2 + d0*d1/2;
+                newF(5,5) =  1 - d0*d0/2 - d2*d2/2;
+                newF(5,6) =  d0 + d1*d2/2;
 
-                newF._6._4 =  d1 + d0*d2/2;
-                newF._6._5 = -d0 + d1*d2/2;
-                newF._6._6 = 1 - d0*d0/2 - d1*d1/2;
-                */
+                newF(6,4) =  d1 + d0*d2/2;
+                newF(6,5) = -d0 + d1*d2/2;
+                newF(6,6) = 1 - d0*d0/2 - d1*d1/2;
+
+                ekf_predict(newF);
 
                 ///////////////////////////////////////////////////////
  
@@ -776,29 +778,9 @@ namespace hf {
             }
 
             // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-            void ekf_predict(const Mat7x7 & F)
+            void ekf_predict(const Eigen::MatrixXd & F)
             {
-                //const auto tmpNN = F * P; (void)tmpNN;
-
-                /*
-                static __attribute__((aligned(4))) matrix_t Fm = { 
-                    STATE_DIM, STATE_DIM, (float *)F
-                };
-
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                    STATE_DIM, STATE_DIM, tmpNN1d
-                };
-
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                    STATE_DIM, STATE_DIM, tmpNN2d
-                };
-
-                device_mat_mult(&Fm, &_p_m, &tmpNN1m); // F P
-                device_mat_trans(&Fm, &tmpNN2m); // F'
-                device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
-                */
+                P = (F * P) * F.transpose();
             }
 
              // P_k = F_{k-1} P_{k-1} F^T_{k-1}
