@@ -37,6 +37,11 @@ namespace hf {
                     const float _5,  // D1
                     const float _6)  // D2
                 : _0(_0), _1(_1), _2(_2), _3(_3), _4(_4), _5(_5), _6(_6) { }
+
+            auto operator*(const Vec7 & v) -> float
+            {
+                return _0*v._0+_1*v._1+_2*v._2+_3*v._3+_4*v._4+_5*v._5+_6*v._6;
+            }
     };
 
     class Mat7x7 {
@@ -44,6 +49,8 @@ namespace hf {
         public:
 
             Vec7 _0, _1, _2, _3, _4, _5, _6;
+
+            Vec7 _0t, _1t, _2t, _3t, _4t, _5t, _6t;
 
             Mat7x7() = default;
 
@@ -56,4 +63,5 @@ namespace hf {
                     const Vec7 & _5,
                     const Vec7 & _6)
                 : _0(_0), _1(_1), _2(_2), _3(_3), _4(_4), _5(_5), _6(_6) { }
-    };}
+    };
+}

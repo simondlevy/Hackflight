@@ -211,6 +211,9 @@ namespace hf {
             __attribute__((aligned(4))) Vec7 _x;
 
             // Covariance matrix
+            Mat7x7 P;
+
+            // Covariance matrix
             __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
 
             // Covariance helper
@@ -775,6 +778,8 @@ namespace hf {
             // P_k = F_{k-1} P_{k-1} F^T_{k-1}
             void ekf_predict(const Mat7x7 & F)
             {
+                //const auto tmpNN = F * P; (void)tmpNN;
+
                 /*
                 static __attribute__((aligned(4))) matrix_t Fm = { 
                     STATE_DIM, STATE_DIM, (float *)F
