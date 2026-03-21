@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <ArduinoEigenDense.h>
 
 #include <datatypes.hpp>
 

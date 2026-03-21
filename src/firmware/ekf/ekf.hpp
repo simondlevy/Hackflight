@@ -23,8 +23,6 @@
 #include <firmware/zranger.hpp>
 #include <num.hpp>
 
-#include <ArduinoEigenDense.h>
-
 // We want to use F for the Jacobian, but Arduino pre-defines it
 #ifdef F
 #undef F
