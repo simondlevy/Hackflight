@@ -510,17 +510,6 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
-            {
-                if (isnan(pval) || pval > MAX_COVARIANCE) {
-                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
-                } else if ( i==j && pval < MIN_COVARIANCE ) {
-                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
-                } else {
-                    _p[i][j] = _p[j][i] = pval;
-                }
-            }
-
             void enqueue(const EKF::measurement_t * measurement) 
             {
                 memcpy(&_measurementsQueue[_queueLength], measurement,
@@ -676,7 +665,13 @@ namespace hf {
 
                         const auto pval = 0.5 * _p[i][j] + 0.5 * _p[j][i];
 
-                        ekf_pset(i, j, pval);
+                        if (isnan(pval) || pval > MAX_COVARIANCE) {
+                            _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                        } else if ( i==j && pval < MIN_COVARIANCE ) {
+                            _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                        } else {
+                            _p[i][j] = _p[j][i] = pval;
+                        }
                     }
                 }
             }
