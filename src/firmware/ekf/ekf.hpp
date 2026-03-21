@@ -26,6 +26,10 @@
 
 #include <ArduinoEigenDense.h>
 
+#ifdef F
+#undef F
+#endif
+
 namespace hf {
 
     class EKF { 
@@ -214,10 +218,6 @@ namespace hf {
             // Covariance matrix
             Eigen::MatrixXd P = Eigen::MatrixXd(7, 7);
 
-            // Covariance matrix
-            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
-            matrix_t _p_m; // helper
-
             Vec3 _accLatest;
             Vec3 _gyroLatest;
 
@@ -311,129 +311,65 @@ namespace hf {
                 const float vy = _x(2);
                 const float vz = _x(3);
 
-                // The linearized Jacobean matrix
-                static float F[STATE_DIM][STATE_DIM];
-
-                ///////////////////////////////////////////////////////
-
-                static Eigen::MatrixXd newF(7, 7);
+                static Eigen::MatrixXd F(7, 7);
 
                 // position
-                newF(0, 0) = 1;
+                F(0, 0) = 1;
 
                 // position from body-frame velocity
-                newF(0,1) = _r20*dt;
+                F(0,1) = _r20*dt;
 
-                newF(0,2) = _r21*dt;
+                F(0,2) = _r21*dt;
 
-                newF(0,3) = _r22*dt;
+                F(0,3) = _r22*dt;
 
                 // position from attitude error
-                newF(0,4) = (vy*_r22 - vz*_r21)*dt;
+                F(0,4) = (vy*_r22 - vz*_r21)*dt;
 
-                newF(0,5) = (-vx*_r22 + vz*_r20)*dt;
+                F(0,5) = (-vx*_r22 + vz*_r20)*dt;
 
-                newF(0,6) = (vx*_r21 - vy*_r20)*dt;
+                F(0,6) = (vx*_r21 - vy*_r20)*dt;
 
                 // body-frame velocity from body-frame velocity
-                newF(1,1) = 1; //drag negligible
-                newF(2,1) =-gyro->z*dt;
-                newF(3,1) = gyro->y*dt;
+                F(1,1) = 1; //drag negligible
+                F(2,1) =-gyro->z*dt;
+                F(3,1) = gyro->y*dt;
 
-                newF(1,2) = gyro->z*dt;
-                newF(2,2) = 1; //drag negligible
-                newF(3,2) =-gyro->x*dt;
+                F(1,2) = gyro->z*dt;
+                F(2,2) = 1; //drag negligible
+                F(3,2) =-gyro->x*dt;
 
-                newF(1,3) =-gyro->y*dt;
-                newF(2,3) = gyro->x*dt;
-                newF(3,3) = 1; //drag negligible
+                F(1,3) =-gyro->y*dt;
+                F(2,3) = gyro->x*dt;
+                F(3,3) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
-                newF(1,4) =  0;
-                newF(2,4) = -GRAVITY*_r22*dt;
-                newF(3,4) =  GRAVITY*_r21*dt;
+                F(1,4) =  0;
+                F(2,4) = -GRAVITY*_r22*dt;
+                F(3,4) =  GRAVITY*_r21*dt;
 
-                newF(1,5) =  GRAVITY*_r22*dt;
-                newF(2,5) =  0;
-                newF(3,5) = -GRAVITY*_r20*dt;
+                F(1,5) =  GRAVITY*_r22*dt;
+                F(2,5) =  0;
+                F(3,5) = -GRAVITY*_r20*dt;
 
-                newF(1,6) = -GRAVITY*_r21*dt;
-                newF(2,6) =  GRAVITY*_r20*dt;
-                newF(3,6) =  0;
+                F(1,6) = -GRAVITY*_r21*dt;
+                F(2,6) =  GRAVITY*_r20*dt;
+                F(3,6) =  0;
 
-                newF(4,4) =  1 - d1*d1/2 - d2*d2/2;
-                newF(4,5) =  d2 + d0*d1/2;
-                newF(4,6) = -d1 + d0*d2/2;
+                F(4,4) =  1 - d1*d1/2 - d2*d2/2;
+                F(4,5) =  d2 + d0*d1/2;
+                F(4,6) = -d1 + d0*d2/2;
 
-                newF(5,4) = -d2 + d0*d1/2;
-                newF(5,5) =  1 - d0*d0/2 - d2*d2/2;
-                newF(5,6) =  d0 + d1*d2/2;
+                F(5,4) = -d2 + d0*d1/2;
+                F(5,5) =  1 - d0*d0/2 - d2*d2/2;
+                F(5,6) =  d0 + d1*d2/2;
 
-                newF(6,4) =  d1 + d0*d2/2;
-                newF(6,5) = -d0 + d1*d2/2;
-                newF(6,6) = 1 - d0*d0/2 - d1*d1/2;
+                F(6,4) =  d1 + d0*d2/2;
+                F(6,5) = -d0 + d1*d2/2;
+                F(6,6) = 1 - d0*d0/2 - d1*d1/2;
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                P = (newF * P) * newF.transpose();
-
-                ///////////////////////////////////////////////////////
- 
-                // position
-                F[STATE_Z][STATE_Z] = 1;
-
-                // position from body-frame velocity
-                F[STATE_Z][STATE_VX] = _r20*dt;
-
-                F[STATE_Z][STATE_VY] = _r21*dt;
-
-                F[STATE_Z][STATE_VZ] = _r22*dt;
-
-                // position from attitude error
-                F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
-
-                F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
-
-                F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
-
-                // body-frame velocity from body-frame velocity
-                F[STATE_VX][STATE_VX] = 1; //drag negligible
-                F[STATE_VY][STATE_VX] =-gyro->z*dt;
-                F[STATE_VZ][STATE_VX] = gyro->y*dt;
-
-                F[STATE_VX][STATE_VY] = gyro->z*dt;
-                F[STATE_VY][STATE_VY] = 1; //drag negligible
-                F[STATE_VZ][STATE_VY] =-gyro->x*dt;
-
-                F[STATE_VX][STATE_VZ] =-gyro->y*dt;
-                F[STATE_VY][STATE_VZ] = gyro->x*dt;
-                F[STATE_VZ][STATE_VZ] = 1; //drag negligible
-
-                // body-frame velocity from attitude error
-                F[STATE_VX][STATE_D0] =  0;
-                F[STATE_VY][STATE_D0] = -GRAVITY*_r22*dt;
-                F[STATE_VZ][STATE_D0] =  GRAVITY*_r21*dt;
-
-                F[STATE_VX][STATE_D1] =  GRAVITY*_r22*dt;
-                F[STATE_VY][STATE_D1] =  0;
-                F[STATE_VZ][STATE_D1] = -GRAVITY*_r20*dt;
-
-                F[STATE_VX][STATE_D2] = -GRAVITY*_r21*dt;
-                F[STATE_VY][STATE_D2] =  GRAVITY*_r20*dt;
-                F[STATE_VZ][STATE_D2] =  0;
-
-                F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-                F[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
-
-                F[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-                F[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
-
-                F[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-                F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-                F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
-
-                ekf_predict(F);
+                P = (F * P) * F.transpose();
 
                 const float dt2 = dt * dt;
 
@@ -475,9 +411,9 @@ namespace hf {
                 const float dtwz = dt*gyro->z;
 
                 // compute the quaternion values in [w,x,y,z] order
-                const float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-                const float ca = device_cos(angle/2.0f);
-                const float sa = device_sin(angle/2.0f);
+                const float angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const float ca = cos(angle/2.0f);
+                const float sa = sin(angle/2.0f);
                 const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
@@ -498,7 +434,7 @@ namespace hf {
                 }
 
                 // normalize and store the result
-                const float norm = device_sqrt(
+                const float norm = sqrt(
                         tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
                 _q(0) = tmpq0/norm; 
@@ -530,9 +466,9 @@ namespace hf {
                             0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                                 fabsf(v2) < 10)) {
 
-                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                    const float ca = device_cos(angle / 2.0f);
-                    const float sa = device_sin(angle / 2.0f);
+                    const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                    const float ca = cos(angle / 2.0f);
+                    const float sa = sin(angle / 2.0f);
                     const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
                     // Rotate the vehicle's attitude by the delta quaternion vector
@@ -547,7 +483,7 @@ namespace hf {
                         dq[1] * _q(2) + dq[0] * _q(3);
 
                     // normalize and store the result
-                    float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                    float norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                             tmpq3 * tmpq3) + EPSILON;
                     _q(0) = tmpq0 / norm;
                     _q(1) = tmpq1 / norm;
@@ -637,23 +573,12 @@ namespace hf {
                 _x = Eigen::VectorXd(7);
 
                 P = Eigen::MatrixXd(7, 7);
-
-                for (int i=0; i< STATE_DIM; i++) {
-
-                    for (int j=0; j < STATE_DIM; j++) {
-                        _p[i][j] = 0; 
-                    }
-                }
-
-                _p_m.numRows = STATE_DIM;
-                _p_m.numCols = STATE_DIM;
-                _p_m.pData = (float*)_p;
             }
 
             void ekf_addCovarianceNoise(const float * noise)
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    _p[k][k] += noise[k] * noise[k];
+                    P(k,k) += noise[k] * noise[k];
                 }
             }
 
@@ -663,12 +588,7 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto pval = (_p[i][j] + _p[j][i]) / 2;
-
-                        _p[i][j] = _p[j][i] = 
-                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                            pval;
+                        const auto pval = (P(i,j) + P(j,i)) / 2;
 
                         P(i,j) = P(j,i) = 
                             isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
@@ -677,39 +597,5 @@ namespace hf {
                      }
                 }
             }
-
-            // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-            void ekf_predict(const float F[STATE_DIM][STATE_DIM])
-            {
-                static __attribute__((aligned(4))) matrix_t Fm = { 
-                    STATE_DIM, STATE_DIM, (float *)F
-                };
-
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                    STATE_DIM, STATE_DIM, tmpNN1d
-                };
-
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                    STATE_DIM, STATE_DIM, tmpNN2d
-                };
-
-                device_mat_mult(&Fm, &_p_m, &tmpNN1m); // F P
-                device_mat_trans(&Fm, &tmpNN2m); // F'
-                device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
-
-            }
-
-            // Hardware-dependent --------------------------------------------
-
-            void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
-
-            void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
-                    matrix_t * pDst);
-
-            static float device_cos(const float x);
-            static float device_sin(const float x);
-            static float device_sqrt(const float32_t in);
     };
 }
