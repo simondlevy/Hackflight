@@ -17,7 +17,6 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/ekf/matrix_typedef.h>
 #include <firmware/ekf/vec3_subsampler.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
@@ -26,6 +25,7 @@
 
 #include <ArduinoEigenDense.h>
 
+// We want to use F for the Jacobian, but Arduino pre-defines it
 #ifdef F
 #undef F
 #endif
