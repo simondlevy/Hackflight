@@ -102,6 +102,11 @@ namespace hf {
                 }
                 _queueLength = 0;
 
+                for (uint32_t k=0; k<_queueLength; ++k) {
+                    update(_imuMeasurementsQueue[k], msec_curr);
+                }
+                _imuQueueLength = 0;
+
                 const auto z = _x(0);
 
                 if (_isUpdated) {
@@ -144,6 +149,8 @@ namespace hf {
                 m.type = MeasurementTypeAcceleration;
                 m.data.acceleration.acc = imu.accelGs;
                 enqueue(&m);
+
+                _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
             }
 
         private:
@@ -193,7 +200,8 @@ namespace hf {
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
             uint32_t _queueLength;
 
-            ImuFiltered _imuQueue[QUEUE_MAX_LENGTH];
+            ImuFiltered _imuMeasurementsQueue[QUEUE_MAX_LENGTH];
+            uint32_t _imuQueueLength;
 
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
@@ -523,6 +531,10 @@ namespace hf {
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
+            }
+
+            void update(const ImuFiltered & imuData, const uint32_t msec_curr)
+            {
             }
 
             void update(measurement_t & m, const uint32_t msec_curr)
