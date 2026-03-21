@@ -22,7 +22,90 @@
 
 namespace hf {
 
-    class RxData {
+    class Vec3Raw {
+
+        public:
+
+            int16_t x;
+            int16_t y;
+            int16_t z;
+
+            Vec3Raw() = default;
+
+            Vec3Raw(const int16_t x, const int16_t y, const int16_t z) 
+                : x(x), y(y), z(z) {}
+
+            Vec3Raw& operator=(const Vec3Raw& other) = default;
+    };
+
+    class Vec3 {
+
+        public:
+
+            float x;
+            float y;
+            float z;
+
+            Vec3() = default;
+
+            Vec3(const float x, const float y, const float z) 
+                : x(x), y(y), z(z) {}
+
+            Vec3(const Vec3Raw & raw)
+                : x((float)raw.x), y((float)raw.y), z((float)raw.z) {}
+
+            Vec3& operator=(const Vec3& other) = default;
+
+            Vec3 operator+(const Vec3& other) const
+            {
+                return Vec3(x+other.x, y+other.y, z+other.z);
+            }
+
+            Vec3 operator-(const Vec3& other) const
+            {
+                return Vec3(x-other.x, y-other.y, z-other.z);
+            }
+
+            Vec3 operator*(const Vec3& other) const
+            {
+                return Vec3(x*other.x, y*other.y, z*other.z);
+            }
+
+            Vec3 operator*(const float v) const
+            {
+                return Vec3(x*v, y*v, z*v);
+            }
+
+            Vec3 operator/(const float d) const
+            {
+                return Vec3(x/d, y/d, z/d);
+            }
+
+            bool operator<(const float v) const
+            {
+                return x < v && y < v && z < v;
+            }
+    };
+
+    class Vec4 {
+
+        public:
+
+            float w;
+            float x;
+            float y;
+            float z;
+
+            Vec4() = default;
+
+            Vec4
+                (const float w, const float x, const float y, const float z) 
+                : w(w), x(x), y(y), z(z) {}
+
+            Vec4& operator=(const Vec4& other) = default;
+    };
+
+     class RxData {
 
         public:
 
