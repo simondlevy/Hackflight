@@ -217,9 +217,7 @@ namespace hf {
 
             // Covariance matrix
             __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
-
-            // Covariance helper
-            matrix_t _p_m;
+            matrix_t _p_m; // helper
 
             Vec3 _accLatest;
             Vec3 _gyroLatest;
@@ -376,7 +374,8 @@ namespace hf {
                 newF(6,5) = -d0 + d1*d2/2;
                 newF(6,6) = 1 - d0*d0/2 - d1*d1/2;
 
-                ekf_predict(newF);
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+                P = (newF * P) * newF.transpose();
 
                 ///////////////////////////////////////////////////////
  
@@ -680,12 +679,6 @@ namespace hf {
             }
 
             // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-            void ekf_predict(const Eigen::MatrixXd & F)
-            {
-                P = (F * P) * F.transpose();
-            }
-
-             // P_k = F_{k-1} P_{k-1} F^T_{k-1}
             void ekf_predict(const float F[STATE_DIM][STATE_DIM])
             {
                 static __attribute__((aligned(4))) matrix_t Fm = { 
