@@ -193,6 +193,8 @@ namespace hf {
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
             uint32_t _queueLength;
 
+            ImuFiltered _imuQueue[QUEUE_MAX_LENGTH];
+
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
                 Eigen::VectorXd(STATE_DIM);
