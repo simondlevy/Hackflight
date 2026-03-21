@@ -618,14 +618,6 @@ namespace hf {
             {
                 switch (m.type) {
 
-                    case MeasurementTypeTOF:
-                        updateWithTof(&m.data.tof);
-                        break;
-
-                    case MeasurementTypeFlow:
-                        updateWithFlow(&m.data.flow);
-                        break;
-
                     case MeasurementTypeGyroscope:
                         updateWithGyro(m);
                         break;
@@ -636,96 +628,6 @@ namespace hf {
 
                     default:
                         break;
-                }
-            }
-
-            void updateWithFlow(const OpticalFlow::measurement_t *flow) 
-            {
-                const Vec3 *gyro = &_gyroLatest;
-
-                // [pixels] (same in x and y)
-                float Npix = 35.0;                      
-
-                //float thetapix = Num::DEG2RAD * 4.0f;
-                // [rad]    (same in x and y)
-                // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
-                // corresponding ground length
-                float thetapix = 0.71674f;
-
-                //~~~ Body rates ~~~
-                // TODO check if this is feasible or if some filtering has to be done
-                float omegax_b = gyro->x * Num::DEG2RAD;
-                float omegay_b = gyro->y * Num::DEG2RAD;
-
-                float dx_g = _x._1;
-                float dy_g = _x._2;
-                float z_g = 0.0;
-                // Saturate elevation in prediction and correction to avoid singularities
-                if ( _x._0 < 0.1f ) {
-                    z_g = 0.1;
-                } else {
-                    z_g = _x._0;
-                }
-
-                // ~~~ X velocity prediction and update ~~~
-                // predicts the number of accumulated pixels in the x-direction
-                float hx[STATE_DIM] = {};
-                _predictedNX = (flow->dt * Npix / thetapix ) * 
-                    ((dx_g * _r22 / z_g) - omegay_b);
-                _measuredNX = flow->dpixelx*FLOW_RESOLUTION;
-
-                // derive measurement equation with respect to dx (and z?)
-                hx[STATE_Z] = (Npix * flow->dt / thetapix) * 
-                    ((_r22 * dx_g) / (-z_g * z_g));
-                hx[STATE_VX] = (Npix * flow->dt / thetapix) * 
-                    (_r22 / z_g);
-
-                //First update
-                ekf_updateWithScalar(hx, (_measuredNX-_predictedNX), 
-                        flow->stdDevX*FLOW_RESOLUTION);
-
-                // ~~~ Y velocity prediction and update ~~~
-                float hy[STATE_DIM] = {};
-                _predictedNY = (flow->dt * Npix / thetapix ) * 
-                    ((dy_g * _r22 / z_g) + omegax_b);
-                _measuredNY = flow->dpixely*FLOW_RESOLUTION;
-
-                // derive measurement equation with respect to dy (and z?)
-                hy[STATE_Z] = (Npix * flow->dt / thetapix) * 
-                    ((_r22 * dy_g) / (-z_g * z_g));
-                hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_r22 / z_g);
-
-                // Second update
-                ekf_updateWithScalar(hy, (_measuredNY-_predictedNY),
-                        flow->stdDevY*FLOW_RESOLUTION);
-
-                _isUpdated = true;
-            }
-
-            void updateWithTof(ZRanger::measurement_t *tof)
-            {
-                // Updates the filter with a measured distance in the zb direction using the
-                float h[STATE_DIM] = {};
-
-                // Only update the filter if the measurement is reliable 
-                // (\hat{h} -> infty when R[2][2] -> 0)
-                if (fabs(_r22) > 0.1f && _r22 > 0) {
-                    float angle = 
-                        fabsf(acosf(_r22)) - 
-                        Num::DEG2RAD * (15.0f / 2.0f);
-                    if (angle < 0.0f) {
-                        angle = 0.0f;
-                    }
-                    float predictedDistance = _x._0 / cosf(angle);
-                    float measuredDistance = tof->distance; // [m]
-
-                    // This just acts like a gain for the sensor model. Further
-                    // updates are done in the scalar update function below
-                    h[STATE_Z] = 1 / cosf(angle); 
-
-                    ekf_updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
-
-                    _isUpdated = true;
                 }
             }
 
@@ -804,81 +706,6 @@ namespace hf {
                 device_mat_trans(&Fm, &tmpNN2m); // F'
                 device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
 
-            }
-
-            void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
-            {
-                matrix_t Hm = {1, STATE_DIM, (float *)h};
-
-                // The Kalman gain as a column vector
-                static float G[STATE_DIM];
-                static matrix_t Gm = {STATE_DIM, 1, (float *)G};
-
-                // Temporary matrices for the covariance updates
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN1m = {
-                    STATE_DIM, STATE_DIM, tmpNN1d
-                };
-
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN2m = {
-                    STATE_DIM, STATE_DIM, tmpNN2d
-                };
-
-                static float tmpNN3d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN3m = {
-                    STATE_DIM, STATE_DIM, tmpNN3d
-                };
-
-                static float HTd[STATE_DIM * 1];
-                static matrix_t HTm = {STATE_DIM, 1, HTd};
-
-                static float PHTd[STATE_DIM * 1];
-                static matrix_t PHTm = {STATE_DIM, 1, PHTd};
-
-                device_mat_trans(&Hm, &HTm);
-                device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
-                float R = stdMeasNoise*stdMeasNoise;
-                float HPHR = R; // HPH' + R
-                for (int i=0; i<STATE_DIM; i++) { 
-                    // Add the element of HPH' to the above
-                    // this obviously only works if the update is scalar (as in this function)
-                    HPHR += Hm.pData[i]*PHTd[i]; 
-                }
-
-                // Calculate the Kalman gain and perform the state update
-                for (int i=0; i<STATE_DIM; i++) {
-                    G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                }
-
-                // Update state
-                _x._0 += G[0] * error; 
-                _x._1 += G[1] * error; 
-                _x._2 += G[2] * error; 
-                _x._3 += G[3] * error; 
-                _x._4 += G[4] * error; 
-                _x._5 += G[5] * error; 
-                _x._6 += G[6] * error; 
-
-                device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
-                for (int i=0; i<STATE_DIM; i++) { 
-                    tmpNN1d[STATE_DIM*i+i] -= 1; 
-                } // GH - I
-                device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-                device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-                device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
-
-                // add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        float v = G[i] * R * G[j];
-
-                        // add measurement noise
-                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
-                    }
-                }
             }
 
             // Hardware-dependent --------------------------------------------
