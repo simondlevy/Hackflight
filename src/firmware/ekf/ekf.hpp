@@ -88,7 +88,7 @@ namespace hf {
                     _didResetEstimation = false;
                 }
 
-                // Run the system dynamics to predict the state forward.
+                // Periodically run the system dynamics to predict the state
                 if (Timer::ready(msec_curr, _msec_prev, prediction_freq)) {
                     predict(msec_curr, isFlying); 
                     _msec_prev = msec_curr;
@@ -146,22 +146,6 @@ namespace hf {
                 enqueue(&m);
             }
 
-            void enqueueFlow(const OpticalFlow::measurement_t * flow)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeFlow;
-                m.data.flow = *flow;
-                enqueue(&m);
-            }
-
-            void enqueueRange(const ZRanger::measurement_t * tof)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeTOF;
-                m.data.tof = *tof;
-                enqueue(&m);
-            }
-
         private:
 
             // Indexes to access the vehicle's state, stored as a column vector
@@ -210,10 +194,11 @@ namespace hf {
             uint32_t _queueLength;
 
             // State vector
-            __attribute__((aligned(4))) Eigen::VectorXd _x = Eigen::VectorXd(7);
+            __attribute__((aligned(4))) Eigen::VectorXd _x =
+                Eigen::VectorXd(STATE_DIM);
 
             // Covariance matrix
-            Eigen::MatrixXd P = Eigen::MatrixXd(7, 7);
+            Eigen::MatrixXd P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
             bool _didResetEstimation;
 
