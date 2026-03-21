@@ -669,7 +669,12 @@ namespace hf {
                             isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
                             i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
                             pval;
-                    }
+
+                        P(i,j) = P(j,i) = 
+                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                            pval;
+                     }
                 }
             }
 
