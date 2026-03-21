@@ -97,13 +97,16 @@ namespace hf {
                 addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
-                for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_measurementsQueue[k], msec_curr);
-                }
-                _queueLength = 0;
+                for (uint32_t k=0; k<_imuQueueLength; ++k) {
 
-                for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_imuMeasurementsQueue[k], msec_curr);
+                    const auto imudata = _imuQueue[k];
+
+                    _gyroLatest = imudata.gyroDps;
+                    _gyroSubSampler = Vec3SubSampler::accumulate(
+                            _gyroSubSampler, _gyroLatest);
+
+                    _accelSubSampler = Vec3SubSampler::accumulate(
+                            _accelSubSampler, imudata.accelGs);
                 }
                 _imuQueueLength = 0;
 
@@ -138,19 +141,10 @@ namespace hf {
                         -psi, -dpsi); // make nose-right positive
             }
 
-            void enqueueImu(const ImuFiltered & imu)
+            void enqueueImu(const ImuFiltered & imudata)
             {
-                measurement_t m = {};
-                m.type = MeasurementTypeGyroscope;
-                m.data.gyroscope.gyro = imu.gyroDps;
-                enqueue(&m);
-
-                m = {};
-                m.type = MeasurementTypeAcceleration;
-                m.data.acceleration.acc = imu.accelGs;
-                enqueue(&m);
-
-                _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
+                _imuQueue[_imuQueueLength] = imudata;
+                _imuQueueLength = (_imuQueueLength + 1) % QUEUE_MAX_LENGTH;
             }
 
         private:
@@ -168,39 +162,15 @@ namespace hf {
             };
 
             typedef enum {
-                MeasurementTypeAcceleration,
-                MeasurementTypeGyroscope,
-                MeasurementTypeTOF,
-                MeasurementTypeFlow,
-            } MeasurementType;
-
-            typedef struct {
-                Vec3 gyro; // deg/s
-            } gyroscopeMeasurement_t;
-
-            typedef struct {
-                Vec3 acc; // Gs
-            } accelerationMeasurement_t;
-
-            typedef struct {
-                MeasurementType type;
-                union
-                {
-                    gyroscopeMeasurement_t gyroscope;
-                    accelerationMeasurement_t acceleration;
-                    ZRanger::measurement_t tof;
-                    OpticalFlow::measurement_t flow;
-                } data;
-            } measurement_t;
-
-            static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+                MEASUREMENT_ACCEL,
+                MEASUREMENT_GYRO,
+                MEASUREMENT_TOF,
+                MEASUREMENT_FLOW,
+            } measurementType_e;
 
             // Instance vars --------------------------------------------------
 
-            EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
-            uint32_t _queueLength;
-
-            ImuFiltered _imuMeasurementsQueue[QUEUE_MAX_LENGTH];
+            ImuFiltered _imuQueue[QUEUE_MAX_LENGTH];
             uint32_t _imuQueueLength;
 
             // State vector
@@ -442,13 +412,6 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            void enqueue(const EKF::measurement_t * measurement) 
-            {
-                memcpy(&_measurementsQueue[_queueLength], measurement,
-                        sizeof(EKF::measurement_t));
-                _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
-            }
-
             void finalize(const uint32_t msec_curr)
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
@@ -533,41 +496,6 @@ namespace hf {
                 }
             }
 
-            void update(const ImuFiltered & imuData, const uint32_t msec_curr)
-            {
-            }
-
-            void update(measurement_t & m, const uint32_t msec_curr)
-            {
-                switch (m.type) {
-
-                    case MeasurementTypeGyroscope:
-                        updateWithGyro(m);
-                        break;
-
-                    case MeasurementTypeAcceleration:
-                        updateWithAccel(m);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            void updateWithAccel(measurement_t & m)
-            {
-                _accelSubSampler = Vec3SubSampler::accumulate(_accelSubSampler,
-                        m.data.acceleration.acc);
-                _accLatest = m.data.acceleration.acc;
-            }
-
-            void updateWithGyro(measurement_t & m)
-            {
-                _gyroSubSampler = Vec3SubSampler::accumulate(_gyroSubSampler,
-                        m.data.gyroscope.gyro);
-                _gyroLatest = m.data.gyroscope.gyro;
-            }
-
             void ekf_init()
             {
                 _x = Eigen::VectorXd(7);
@@ -594,7 +522,7 @@ namespace hf {
                             isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
                             i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
                             pval;
-                     }
+                    }
                 }
             }
     };
