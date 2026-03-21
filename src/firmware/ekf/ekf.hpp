@@ -83,16 +83,15 @@ namespace hf {
                     const bool isFlying,
                     const uint32_t prediction_freq=100) -> VehicleState
             {
-                static Timer _timer;
-
                 if (_didResetEstimation) {
                     reset(msec_curr);
                     _didResetEstimation = false;
                 }
 
                 // Run the system dynamics to predict the state forward.
-                if (_timer.ready(prediction_freq)) {
+                if (Timer::ready(msec_curr, _msec_prev, prediction_freq)) {
                     predict(msec_curr, isFlying); 
+                    _msec_prev = msec_curr;
                 }
 
                 addProcessNoise(msec_curr);
@@ -217,6 +216,8 @@ namespace hf {
             Eigen::MatrixXd P = Eigen::MatrixXd(7, 7);
 
             bool _didResetEstimation;
+
+            uint32_t _msec_prev;
 
             Vec3 _accLatest;
             Vec3 _gyroLatest;
