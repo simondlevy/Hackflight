@@ -85,8 +85,6 @@ namespace hf {
             {
                 static Timer _timer;
 
-                static bool _didResetEstimation;
-
                 if (_didResetEstimation) {
                     reset(msec_curr);
                     _didResetEstimation = false;
@@ -217,6 +215,8 @@ namespace hf {
 
             // Covariance matrix
             Eigen::MatrixXd P = Eigen::MatrixXd(7, 7);
+
+            bool _didResetEstimation;
 
             Vec3 _accLatest;
             Vec3 _gyroLatest;

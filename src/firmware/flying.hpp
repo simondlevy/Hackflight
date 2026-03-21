@@ -80,7 +80,5 @@ namespace hf {
 
                 return FlyingCheck(isFlying, msec_prev);
             }
-
-
     };
 }
