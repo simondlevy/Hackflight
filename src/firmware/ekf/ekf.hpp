@@ -674,7 +674,9 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i]);
+                        const auto pval = 0.5 * _p[i][j] + 0.5 * _p[j][i];
+
+                        ekf_pset(i, j, pval);
                     }
                 }
             }
