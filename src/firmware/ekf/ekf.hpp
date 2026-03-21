@@ -663,15 +663,12 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto pval = 0.5 * _p[i][j] + 0.5 * _p[j][i];
+                        const auto pval = (_p[i][j] + _p[j][i]) / 2;
 
-                        if (isnan(pval) || pval > MAX_COVARIANCE) {
-                            _p[i][j] = _p[j][i] = MAX_COVARIANCE;
-                        } else if ( i==j && pval < MIN_COVARIANCE ) {
-                            _p[i][j] = _p[j][i] = MIN_COVARIANCE;
-                        } else {
-                            _p[i][j] = _p[j][i] = pval;
-                        }
+                        _p[i][j] = _p[j][i] = 
+                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                            pval;
                     }
                 }
             }
