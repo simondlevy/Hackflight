@@ -647,6 +647,7 @@ namespace hf {
             void ekf_init()
             {
                 _x = Vec7();
+                P = Eigen::MatrixXd(7, 7);
 
                 for (int i=0; i< STATE_DIM; i++) {
 
