@@ -243,8 +243,8 @@ namespace hf {
             Eigen::VectorXd _q = Eigen::VectorXd(4);
 
             // Quaternion used for initial orientation
-            Vec4 _qinit;
-
+            Eigen::VectorXd _qinit = Eigen::VectorXd(4);
+            
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
             bool _isUpdated;
@@ -262,10 +262,10 @@ namespace hf {
                 ekf_init();
 
                 // Reset the attitude quaternion
-                _q(0) = _qinit.w = 1;
-                _q(1) = _qinit.x = 0;
-                _q(2) = _qinit.y = 0;
-                _q(3) = _qinit.z = 0;
+                _q(0) = _qinit(0) = 1;
+                _q(1) = _qinit(1) = 0;
+                _q(2) = _qinit(2) = 0;
+                _q(3) = _qinit(3) = 0;
 
                 // Initialize the rotation matrix
                 _r00 = 1;
@@ -493,10 +493,10 @@ namespace hf {
 
                     const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit.w;
-                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit.x;
-                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit.y;
-                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit.z;
+                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit(0);
+                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit(1);
+                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit(2);
+                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit(3);
                 }
 
                 // normalize and store the result
