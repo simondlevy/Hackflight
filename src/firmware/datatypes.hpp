@@ -87,25 +87,7 @@ namespace hf {
             }
     };
 
-    class Vec4 {
-
-        public:
-
-            float w;
-            float x;
-            float y;
-            float z;
-
-            Vec4() = default;
-
-            Vec4
-                (const float w, const float x, const float y, const float z) 
-                : w(w), x(x), y(y), z(z) {}
-
-            Vec4& operator=(const Vec4& other) = default;
-    };
-
-     class RxData {
+    class RxData {
 
         public:
 
