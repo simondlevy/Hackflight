@@ -18,7 +18,6 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/matrix_typedef.h>
-#include <firmware/ekf/linalg.hpp>
 #include <firmware/ekf/vec3_subsampler.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
@@ -102,18 +101,18 @@ namespace hf {
                 }
                 _queueLength = 0;
 
-                const auto z = _x._0;
+                const auto z = _x(0);
 
                 if (_isUpdated) {
                     finalize(msec_curr);
                 }
 
-                const auto dx = _r00*_x._1 + _r01*_x._2 + _r02*_x._3;
+                const auto dx = _r00*_x(1) + _r01*_x(2) + _r02*_x(3);
 
                 // make right positive
-                const auto dy = -(_r10*_x._1 + _r11*_x._2 + _r12*_x._3); 
+                const auto dy = -(_r10*_x(1) + _r11*_x(2) + _r12*_x(3)); 
 
-                const auto dz = _r20*_x._1 + _r21*_x._2 + _r22*_x._3;
+                const auto dz = _r20*_x(1) + _r21*_x(2) + _r22*_x(3);
 
                 const auto phi = Num::RAD2DEG * atan2f(2*(_q(2)*_q(3)+_q(0)* _q(1)) ,
                         _q(0)*_q(0) - _q(1)*_q(1) - _q(2)*_q(2) + _q(3)*_q(3));
@@ -210,7 +209,7 @@ namespace hf {
             uint32_t _queueLength;
 
             // State vector
-            __attribute__((aligned(4))) Vec7 _x;
+            __attribute__((aligned(4))) Eigen::VectorXd _x = Eigen::VectorXd(7);
 
             // Covariance matrix
             Eigen::MatrixXd P = Eigen::MatrixXd(7, 7);
@@ -308,9 +307,9 @@ namespace hf {
                 const float d1 = gyro->y*dt/2;
                 const float d2 = gyro->z*dt/2;
 
-                const float vx = _x._1;
-                const float vy = _x._2;
-                const float vz = _x._3;
+                const float vx = _x(1);
+                const float vy = _x(2);
+                const float vz = _x(3);
 
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
@@ -439,19 +438,19 @@ namespace hf {
                 const float dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const float tmpSPX = _x._1;
-                const float tmpSPY = _x._2;
-                const float tmpSPZ = _x._3;
+                const float tmpSPX = _x(1);
+                const float tmpSPY = _x(2);
+                const float tmpSPZ = _x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _x._1 * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
-                const float dy = _x._2 * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
+                const float dx = _x(1) * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
+                const float dy = _x(2) * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const float dz = _x._3 * dt + accel->z * dt2 / 2.0f; 
+                const float dz = _x(3) * dt + accel->z * dt2 / 2.0f; 
 
                 // position update
-                _x._0 += _r20 * dx + _r21 * dy + _r22 * dz - 
+                _x(0) += _r20 * dx + _r21 * dy + _r22 * dz - 
                     GRAVITY * dt2 / 2.0f;
 
                 const float accelx = isFlying ? 0 : accel->x;
@@ -460,13 +459,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _x._1 += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
+                _x(1) += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
                         - GRAVITY * _r20);
 
-                _x._2 += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
+                _x(2) += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
                         - GRAVITY * _r21);
 
-                _x._3 += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
+                _x(3) += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
                         - GRAVITY * _r22);
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
@@ -532,9 +531,9 @@ namespace hf {
             void finalize(const uint32_t msec_curr)
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = _x._4;
-                const float v1 = _x._5;
-                const float v2 = _x._6;
+                const float v0 = _x(4);
+                const float v1 = _x(5);
+                const float v2 = _x(6);
 
                 // Move attitude error into attitude if any of the angle errors are
                 // large enough
@@ -581,9 +580,9 @@ namespace hf {
                 _r22 = _q(0) * _q(0) - _q(1) * _q(1) - _q(2) * _q(2) + _q(3) * _q(3);
 
                 // reset the attitude error
-                _x._4 = 0;
-                _x._5 = 0;
-                _x._6 = 0;
+                _x(4) = 0;
+                _x(5) = 0;
+                _x(6) = 0;
 
                 ekf_enforceSymmetry();
 
@@ -646,7 +645,8 @@ namespace hf {
 
             void ekf_init()
             {
-                _x = Vec7();
+                _x = Eigen::VectorXd(7);
+
                 P = Eigen::MatrixXd(7, 7);
 
                 for (int i=0; i< STATE_DIM; i++) {
