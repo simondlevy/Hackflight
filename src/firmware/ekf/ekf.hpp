@@ -276,7 +276,7 @@ namespace hf {
                 const auto vy = _x(2);
                 const auto vz = _x(3);
 
-                static Eigen::MatrixXd F(7, 7);
+                static Eigen::MatrixXd F(STATE_DIM, STATE_DIM);
 
                 // position
                 F(0, 0) = 1;
@@ -494,9 +494,9 @@ namespace hf {
 
             void ekf_init()
             {
-                _x = Eigen::VectorXd(7);
+                _x = Eigen::VectorXd(STATE_DIM);
 
-                _P = Eigen::MatrixXd(7, 7);
+                _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
             }
 
             void ekf_addCovarianceNoise(const float * noise)
