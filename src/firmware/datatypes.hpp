@@ -38,6 +38,8 @@ namespace hf {
             Vec3Raw& operator=(const Vec3Raw& other) = default;
     };
 
+    typedef Eigen::Vector3d NewVec3;
+
     class Vec3 {
 
         public:
@@ -138,6 +140,21 @@ namespace hf {
                 : gyro(gyro), accel(accel) {}
 
             ImuRaw& operator=(const ImuRaw& other) = default;
+    };
+
+    class NewImuFiltered {
+
+        public:
+
+            NewVec3 gyroDps;
+            NewVec3 accelGs;
+
+            NewImuFiltered() = default;
+
+            NewImuFiltered(const NewVec3 & gyroDps, const NewVec3 & accelGs) 
+                : gyroDps(gyroDps), accelGs(accelGs) {}
+
+            NewImuFiltered& operator=(const NewImuFiltered& other) = default;
     };
 
     class ImuFiltered {

@@ -46,21 +46,21 @@ static hf::RX _rx;
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 // static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
-static hf::LED _led = hf::LED(13);
+//static hf::LED _led = hf::LED(13);
 
-static hf::StabilizerPid _stabilizerPid;
+// static hf::StabilizerPid _stabilizerPid;
 
-static hf::Mixer _mixer;
+// static hf::Mixer _mixer;
 
 static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
 
-static hf::EKF _ekf;
+// static hf::EKF _ekf;
 
-static hf::FlyingCheck _flyingCheck;
+// static hf::FlyingCheck _flyingCheck;
 
-static hf::mode_e _mode;
+// static hf::mode_e _mode;
 
 void setup()
 {
@@ -70,20 +70,23 @@ void setup()
 
     _motors.arm(); 
 
-    _led.begin(); 
+    //_led.begin(); 
 }
 
 void loop()
 {
-    const auto dt = hf::Timer::getDt();
+    // const auto dt = hf::Timer::getDt();
 
-    const auto rxdata = _rx.read();
+    // const auto rxdata = _rx.read();
 
     const auto imuraw = _imu.read();
 
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
+    hf::Debugger::report(_imuFilter.output);
+
+    /*
     _led.blink(millis(), _imuFilter.wasGyroBiasFound);
 
     _flyingCheck = _flyingCheck.run(
@@ -105,7 +108,8 @@ void loop()
     if (_mode != hf::MODE_PANIC) {
         _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
+    */
 
-    hf::Debugger::report(state);
+    //hf::Debugger::report(state);
     //hf::Profiler::report();
 }
