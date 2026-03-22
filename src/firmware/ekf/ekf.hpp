@@ -198,6 +198,7 @@ namespace hf {
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
             float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
+            Eigen::MatrixXd _R = Eigen::MatrixXd(3, 3);
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -224,10 +225,8 @@ namespace hf {
                 ekf_init();
 
                 // Reset the attitude quaternion
-                _q(0) = _qinit(0) = 1;
-                _q(1) = _qinit(1) = 0;
-                _q(2) = _qinit(2) = 0;
-                _q(3) = _qinit(3) = 0;
+                _q << 1, 0, 0, 0;
+                _qinit << 1, 0, 0, 0;
 
                 // Initialize the rotation matrix
                 _r00 = 1;
