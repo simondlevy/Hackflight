@@ -137,6 +137,21 @@ namespace hf {
                 }
             }
 
+            static void report(const NewImuFiltered & imufilt)
+            {
+                static Helper _helper;
+
+                if (_helper.ready()) {
+
+                    const auto g = imufilt.gyroDps;
+                    const auto a = imufilt.accelGs;
+
+                    printf("%5lu | gx=%+04.0f gy=%+04.0f gz=%+04.0f DPS | "
+                           "ax=%+05.3f ay=%+05.3f az=%+05.3f Gs\n\n",
+                            _helper.count, g(0), g(1), g(2), a(0), a(1), a(2));
+                }
+            }
+
             static void report(const ImuFiltered & imufilt)
             {
                 static Helper _helper;

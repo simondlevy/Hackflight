@@ -47,7 +47,7 @@ static hf::RX _rx;
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 // static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
-//static hf::LED _led = hf::LED(13);
+static hf::LED _led = hf::LED(13);
 
 // static hf::StabilizerPid _stabilizerPid;
 
@@ -56,6 +56,8 @@ static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
+
+static hf::NewImuFilter _new_imuFilter;
 
 // static hf::EKF _ekf;
 
@@ -71,7 +73,7 @@ void setup()
 
     _motors.arm(); 
 
-    //_led.begin(); 
+    _led.begin(); 
 }
 
 void loop()
@@ -85,11 +87,15 @@ void loop()
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
+    _new_imuFilter = hf::NewImuFilter::step(_new_imuFilter, millis(), imuraw,
+            _imu.gyroRangeDps(), _imu.accelRangeGs());
+
     hf::Debugger::report(_imuFilter.output);
+    hf::Debugger::report(_new_imuFilter.output);
+
+    _led.blink(millis(), _new_imuFilter.wasGyroBiasFound);
 
     /*
-    _led.blink(millis(), _imuFilter.wasGyroBiasFound);
-
     _flyingCheck = _flyingCheck.run(
             _flyingCheck, millis(), _mixer.motorvals, 4);
 
