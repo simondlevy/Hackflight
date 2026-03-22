@@ -262,18 +262,18 @@ namespace hf {
                 _accelSubSampler = ImuSubSampler::finalize(_accelSubSampler);
                 _gyroSubSampler = ImuSubSampler::finalize(_gyroSubSampler);
 
-                const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
+                const auto dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
                 const auto accel = _accelSubSampler.subSample;
                 const auto gyro = _gyroSubSampler.subSample;
 
-                const float d0 = gyro.x*dt/2;
-                const float d1 = gyro.y*dt/2;
-                const float d2 = gyro.z*dt/2;
+                const auto d0 = gyro.x*dt/2;
+                const auto d1 = gyro.y*dt/2;
+                const auto d2 = gyro.z*dt/2;
 
-                const float vx = _x(1);
-                const float vy = _x(2);
-                const float vz = _x(3);
+                const auto vx = _x(1);
+                const auto vy = _x(2);
+                const auto vz = _x(3);
 
                 static Eigen::MatrixXd F(7, 7);
 
@@ -335,26 +335,26 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 P = (F * P) * F.transpose();
 
-                const float dt2 = dt * dt;
+                const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const float tmpSPX = _x(1);
-                const float tmpSPY = _x(2);
-                const float tmpSPZ = _x(3);
+                const auto tmpSPX = _x(1);
+                const auto tmpSPY = _x(2);
+                const auto tmpSPZ = _x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const float dy = _x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = _x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = _x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const float dz = _x(3) * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = _x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
                 _x(0) += _r20 * dx + _r21 * dy + _r22 * dz - 
                     G * dt2 / 2.0f;
 
-                const float accelx = isFlying ? 0 : accel.x;
-                const float accely = isFlying ? 0 : accel.y;
+                const auto accelx = isFlying ? 0 : accel.x;
+                const auto accely = isFlying ? 0 : accel.y;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -370,14 +370,14 @@ namespace hf {
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
-                const float dtwx = dt*gyro.x;
-                const float dtwy = dt*gyro.y;
-                const float dtwz = dt*gyro.z;
+                const auto dtwx = dt*gyro.x;
+                const auto dtwy = dt*gyro.y;
+                const auto dtwz = dt*gyro.z;
 
                 // compute the quaternion values in [w,x,y,z] order
-                const float angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-                const float ca = cos(angle/2.0f);
-                const float sa = sin(angle/2.0f);
+                const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const auto ca = cos(angle/2.0f);
+                const auto sa = sin(angle/2.0f);
                 const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
