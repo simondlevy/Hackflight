@@ -2,13 +2,18 @@
 
 static const uint8_t INT_1_PIN = 4;
 
-static LSM6DSOSensor accGyr(&Wire);
+static LSM6DSOSensor _lsm6dso(&Wire);
 
 static volatile bool got_interrupt;
 
 static void INT1Event_cb()
 {
     got_interrupt = true;
+}
+
+static bool bad(const LSM6DSOStatusTypeDef status)
+{
+    return status != LSM6DSO_OK;
 }
 
 static void sendOrientation()
@@ -20,12 +25,12 @@ static void sendOrientation()
     uint8_t zl = 0;
     uint8_t zh = 0;
 
-    accGyr.Get_6D_Orientation_XL(&xl);
-    accGyr.Get_6D_Orientation_XH(&xh);
-    accGyr.Get_6D_Orientation_YL(&yl);
-    accGyr.Get_6D_Orientation_YH(&yh);
-    accGyr.Get_6D_Orientation_ZL(&zl);
-    accGyr.Get_6D_Orientation_ZH(&zh);
+    _lsm6dso.Get_6D_Orientation_XL(&xl);
+    _lsm6dso.Get_6D_Orientation_XH(&xh);
+    _lsm6dso.Get_6D_Orientation_YL(&yl);
+    _lsm6dso.Get_6D_Orientation_YH(&yh);
+    _lsm6dso.Get_6D_Orientation_ZL(&zl);
+    _lsm6dso.Get_6D_Orientation_ZH(&zh);
 
     printf("xl=%d xh=%d yl=%d yh=%d zl=%d zh=%d\n", xl, xh, yl, yh, zl, zh);
 }
@@ -40,9 +45,16 @@ void setup()
 
     attachInterrupt(INT_1_PIN, INT1Event_cb, RISING);
 
-    accGyr.begin();
-    accGyr.Enable_X();
-    accGyr.Enable_6D_Orientation(LSM6DSO_INT1_PIN);
+    if (
+            bad(_lsm6dso.begin()) ||
+            bad(_lsm6dso.Enable_X()) ||
+            bad(_lsm6dso.Enable_6D_Orientation(LSM6DSO_INT1_PIN))) {
+
+        while (true) {
+            printf("Initialization failed\n");
+            delay(500);
+        }
+    }
 }
 
 void loop()
@@ -54,7 +66,7 @@ void loop()
 
         LSM6DSO_Event_Status_t status;
 
-        accGyr.Get_X_Event_Status(&status);
+        _lsm6dso.Get_X_Event_Status(&status);
 
         if (status.D6DOrientationStatus) {
 
