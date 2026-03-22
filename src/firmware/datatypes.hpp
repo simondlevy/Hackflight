@@ -51,9 +51,6 @@ namespace hf {
             Vec3(const float x, const float y, const float z) 
                 : x(x), y(y), z(z) {}
 
-            Vec3(const Vec3Raw & raw)
-                : x((float)raw.x), y((float)raw.y), z((float)raw.z) {}
-
             Vec3& operator=(const Vec3& other) = default;
 
             Vec3 operator+(const Vec3& other) const

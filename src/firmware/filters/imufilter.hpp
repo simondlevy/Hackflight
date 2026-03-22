@@ -92,7 +92,7 @@ namespace hf {
                     (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
                     square(gyromean);
 
-                const auto gyroval = Vec3(gyroraw);
+                const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
                 const auto gyroSum = filter.wasGyroBiasFound ?
                     filter._gyroSum : filter._gyroSum + gyroval;
@@ -101,7 +101,10 @@ namespace hf {
                     filter._gyroSumOfSquares :
                     filter._gyroSumOfSquares + square(gyroval);
 
-                const auto accel = scale(Vec3(imuraw.accel), accel_range_gs);
+                const auto accelraw = imuraw.accel;
+                const auto accel = scale(
+                        Vec3(accelraw.x, accelraw.y, accelraw.z),
+                        accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
 
