@@ -19,32 +19,32 @@
 
 namespace hf {
 
-    class ThreeAxisLpf {
+    class NewThreeAxisLpf {
 
         public:
 
-            Vec3 output;
+            NewVec3 output;
 
-            ThreeAxisLpf() = default;
+            NewThreeAxisLpf() = default;
 
-            ThreeAxisLpf(const Vec3 & output,
+            NewThreeAxisLpf(const NewVec3 & output,
                     const LPF &x, const LPF &y, const LPF &z)
                 : output(output), _x(x), _y(y), _z(z) {}
 
-            ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
+            NewThreeAxisLpf& operator=(const NewThreeAxisLpf& other) = default;
 
-            static auto apply(const ThreeAxisLpf & lpf, const Vec3 & in,
-                    const float cutoff_freq) -> ThreeAxisLpf
+            static auto apply(const NewThreeAxisLpf & lpf, const NewVec3 & in,
+                    const float cutoff_freq) -> NewThreeAxisLpf
             {
-                const auto x = LPF::apply(lpf._x, in[0], cutoff_freq);
-                const auto y = LPF::apply(lpf._y, in[1], cutoff_freq);
-                const auto z = LPF::apply(lpf._z, in[2], cutoff_freq);
+                const auto x = LPF::apply(lpf._x, in(0), cutoff_freq);
+                const auto y = LPF::apply(lpf._y, in(1), cutoff_freq);
+                const auto z = LPF::apply(lpf._z, in(2), cutoff_freq);
 
-                const auto output = Vec3(x.output, y.output, z.output);
+                const auto output = NewVec3(x.output, y.output, z.output);
 
-                return ThreeAxisLpf(output, x, y, z);
+                return NewThreeAxisLpf(output, x, y, z);
 
-                return ThreeAxisLpf();
+                return NewThreeAxisLpf();
             }
 
         private:
@@ -53,6 +53,6 @@ namespace hf {
             LPF _y;
             LPF _z;
 
-    }; // class ThreeAxisLpf
+    }; // class NewThreeAxisLpf
 
 } // namespace hf

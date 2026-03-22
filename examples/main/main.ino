@@ -31,6 +31,7 @@
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/imufilter.hpp>
+#include <firmware/filters/new_imufilter.hpp>
 #include <firmware/flipped.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>

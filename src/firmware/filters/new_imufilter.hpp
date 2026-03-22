@@ -15,7 +15,7 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/filters/three_axis_lpf.hpp>
+#include <firmware/filters/new_three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
@@ -39,7 +39,7 @@ namespace hf {
 
         public:
 
-            ImuFiltered output;
+            NewImuFiltered output;
 
             bool wasGyroBiasFound;
 
@@ -48,15 +48,15 @@ namespace hf {
             NewImuFilter() = default;
 
             NewImuFilter(
-                    const ImuFiltered & output,
+                    const NewImuFiltered & output,
                     const bool wasGyroBiasFound,
-                    const Vec3 & gyroSum,
-                    const Vec3 & gyroSumOfSquares,
+                    const NewVec3 & gyroSum,
+                    const NewVec3 & gyroSumOfSquares,
                     const uint16_t  gyroSampleCount,
-                    const Vec3 & gyroBias,
+                    const NewVec3 & gyroBias,
                     const uint32_t gyroVarianceSampleTimeMsec,
-                    const ThreeAxisLpf & accelLpf,
-                    const ThreeAxisLpf & gyroLpf) 
+                    const NewThreeAxisLpf & accelLpf,
+                    const NewThreeAxisLpf & gyroLpf) 
                 : 
                     output(output),
                     wasGyroBiasFound(wasGyroBiasFound),
@@ -78,11 +78,11 @@ namespace hf {
              *   accel.z: positive rightside-up
              */
             static auto step(
-                    const ImuFilter & filter,
+                    const NewImuFilter & filter,
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
                     const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs)-> ImuFilter
+                    const int16_t accel_range_gs)-> NewImuFilter
             {
                 const auto gyroraw = imuraw.gyro;
 
@@ -140,7 +140,7 @@ namespace hf {
 
                 const auto accelFiltered = filter._accelLpf.output;
 
-                const auto output = ImuFiltered(gyroFiltered, accelFiltered);
+                const auto output = NewImuFiltered(gyroFiltered, accelFiltered);
 
                 return NewImuFilter(
                         output,
@@ -156,30 +156,30 @@ namespace hf {
 
         private:
 
-            Vec3 _gyroSum;
-            Vec3 _gyroSumOfSquares;
+            NewVec3 _gyroSum;
+            NewVec3 _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
-            Vec3 _gyroBias;
+            NewVec3 _gyroBias;
             uint32_t _gyroVarianceSampleTimeMsec;
-            ThreeAxisLpf _accelLpf;
-            ThreeAxisLpf _gyroLpf;
+            NewThreeAxisLpf _accelLpf;
+            NewThreeAxisLpf _gyroLpf;
 
-            static auto lt(const Vec3 & vec, const float val) -> bool
+            static auto lt(const NewVec3 & vec, const float val) -> bool
             {
                 return vec(0) < val && vec(1) < val && vec(2) < val;
             }
 
-            static auto raw2float(const Vec3Raw & raw) -> Vec3
+            static auto raw2float(const Vec3Raw & raw) -> NewVec3
             {
-                return Vec3(raw.x, raw.y, raw.z);
+                return NewVec3(raw.x, raw.y, raw.z);
             }
 
-            static auto square(const Vec3 & vec) -> Vec3
+            static auto square(const NewVec3 & vec) -> NewVec3
             {
                 return vec.cwiseProduct(vec);
             }
 
-            static auto scale(const Vec3 & vec, const int16_t s) -> Vec3
+            static auto scale(const NewVec3 & vec, const int16_t s) -> NewVec3
             {
                 return vec * 2 * (float)s / 65536;
             }
