@@ -264,12 +264,12 @@ namespace hf {
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const Vec3 * accel = &_accelSubSampler.subSample;
-                const Vec3 * gyro = &_gyroSubSampler.subSample;
+                const auto accel = _accelSubSampler.subSample;
+                const auto gyro = _gyroSubSampler.subSample;
 
-                const float d0 = gyro->x*dt/2;
-                const float d1 = gyro->y*dt/2;
-                const float d2 = gyro->z*dt/2;
+                const float d0 = gyro.x*dt/2;
+                const float d1 = gyro.y*dt/2;
+                const float d2 = gyro.z*dt/2;
 
                 const float vx = _x(1);
                 const float vy = _x(2);
@@ -296,15 +296,15 @@ namespace hf {
 
                 // body-frame velocity from body-frame velocity
                 F(1,1) = 1; //drag negligible
-                F(2,1) =-gyro->z*dt;
-                F(3,1) = gyro->y*dt;
+                F(2,1) =-gyro.z*dt;
+                F(3,1) = gyro.y*dt;
 
-                F(1,2) = gyro->z*dt;
+                F(1,2) = gyro.z*dt;
                 F(2,2) = 1; //drag negligible
-                F(3,2) =-gyro->x*dt;
+                F(3,2) =-gyro.x*dt;
 
-                F(1,3) =-gyro->y*dt;
-                F(2,3) = gyro->x*dt;
+                F(1,3) =-gyro.y*dt;
+                F(2,3) = gyro.x*dt;
                 F(3,3) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
@@ -343,36 +343,36 @@ namespace hf {
                 const float tmpSPZ = _x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _x(1) * dt + (isFlying ? 0 : accel->x * dt2 / 2.0f);
-                const float dy = _x(2) * dt + (isFlying ? 0 : accel->y * dt2 / 2.0f);
+                const float dx = _x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const float dy = _x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const float dz = _x(3) * dt + accel->z * dt2 / 2.0f; 
+                const float dz = _x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
                 _x(0) += _r20 * dx + _r21 * dy + _r22 * dz - 
                     GRAVITY * dt2 / 2.0f;
 
-                const float accelx = isFlying ? 0 : accel->x;
-                const float accely = isFlying ? 0 : accel->y;
+                const float accelx = isFlying ? 0 : accel.x;
+                const float accely = isFlying ? 0 : accel.y;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _x(1) += dt * (accelx + gyro->z * tmpSPY - gyro->y * tmpSPZ
+                _x(1) += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _r20);
 
-                _x(2) += dt * (accely - gyro->z * tmpSPX + gyro->x * tmpSPZ
+                _x(2) += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
                         - GRAVITY * _r21);
 
-                _x(3) += dt * (accel->z + gyro->y * tmpSPX - gyro->x * tmpSPY
+                _x(3) += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _r22);
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
-                const float dtwx = dt*gyro->x;
-                const float dtwy = dt*gyro->y;
-                const float dtwz = dt*gyro->z;
+                const float dtwx = dt*gyro.x;
+                const float dtwy = dt*gyro.y;
+                const float dtwz = dt*gyro.z;
 
                 // compute the quaternion values in [w,x,y,z] order
                 const float angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
