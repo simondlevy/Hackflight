@@ -50,7 +50,7 @@ namespace hf {
             static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
             static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
 
-            static constexpr float GRAVITY = 9.81;
+            static constexpr float G = 9.81;
 
             //We do get the measurements in 10x the motion pixels (experimentally measured)
             static constexpr float FLOW_RESOLUTION = 0.1;
@@ -217,7 +217,7 @@ namespace hf {
 
             void reset(const uint32_t msec_curr)
             {
-                _accelSubSampler = ImuSubSampler(GRAVITY);
+                _accelSubSampler = ImuSubSampler(G);
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 
                 ekf_init();
@@ -309,15 +309,15 @@ namespace hf {
 
                 // body-frame velocity from attitude error
                 F(1,4) =  0;
-                F(2,4) = -GRAVITY*_r22*dt;
-                F(3,4) =  GRAVITY*_r21*dt;
+                F(2,4) = -G*_r22*dt;
+                F(3,4) =  G*_r21*dt;
 
-                F(1,5) =  GRAVITY*_r22*dt;
+                F(1,5) =  G*_r22*dt;
                 F(2,5) =  0;
-                F(3,5) = -GRAVITY*_r20*dt;
+                F(3,5) = -G*_r20*dt;
 
-                F(1,6) = -GRAVITY*_r21*dt;
-                F(2,6) =  GRAVITY*_r20*dt;
+                F(1,6) = -G*_r21*dt;
+                F(2,6) =  G*_r20*dt;
                 F(3,6) =  0;
 
                 F(4,4) =  1 - d1*d1/2 - d2*d2/2;
@@ -351,7 +351,7 @@ namespace hf {
 
                 // position update
                 _x(0) += _r20 * dx + _r21 * dy + _r22 * dz - 
-                    GRAVITY * dt2 / 2.0f;
+                    G * dt2 / 2.0f;
 
                 const float accelx = isFlying ? 0 : accel.x;
                 const float accely = isFlying ? 0 : accel.y;
@@ -360,13 +360,13 @@ namespace hf {
                 // - gravity in body frame
 
                 _x(1) += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
-                        - GRAVITY * _r20);
+                        - G * _r20);
 
                 _x(2) += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
-                        - GRAVITY * _r21);
+                        - G * _r21);
 
                 _x(3) += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
-                        - GRAVITY * _r22);
+                        - G * _r22);
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
