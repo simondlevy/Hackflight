@@ -41,7 +41,7 @@ namespace hf {
 
             ImuFiltered output;
 
-            bool wasGyroBiasFound;
+            bool isGyroCalibrated;
 
             ImuFilter& operator=(const ImuFilter& other) = default;
 
@@ -49,7 +49,7 @@ namespace hf {
 
             ImuFilter(
                     const ImuFiltered & output,
-                    const bool wasGyroBiasFound,
+                    const bool isGyroCalibrated,
                     const Vec3 & gyroSum,
                     const Vec3 & gyroSumOfSquares,
                     const uint16_t  gyroSampleCount,
@@ -59,7 +59,7 @@ namespace hf {
                     const ThreeAxisLpf & gyroLpf) 
                 : 
                     output(output),
-                    wasGyroBiasFound(wasGyroBiasFound),
+                    isGyroCalibrated(isGyroCalibrated),
                     _gyroSum(gyroSum),
                     _gyroSumOfSquares(gyroSumOfSquares),
                     _gyroSampleCount(gyroSampleCount),
@@ -94,10 +94,10 @@ namespace hf {
 
                 const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
 
-                const auto gyroSum = filter.wasGyroBiasFound ?
+                const auto gyroSum = filter.isGyroCalibrated ?
                     filter._gyroSum : filter._gyroSum + gyroval;
 
-                const auto gyroSumOfSquares = filter.wasGyroBiasFound ?
+                const auto gyroSumOfSquares = filter.isGyroCalibrated ?
                     filter._gyroSumOfSquares :
                     filter._gyroSumOfSquares + square(gyroval);
 
@@ -111,7 +111,7 @@ namespace hf {
                 const auto isBufferFilled =
                     newBufferIndex == GYRO_NBR_OF_SAMPLES;
 
-                const auto wantUpdate =!filter.wasGyroBiasFound &&
+                const auto wantUpdate =!filter.isGyroCalibrated &&
                     isBufferFilled;
 
                 const auto shouldUpdate = wantUpdate && 
@@ -125,8 +125,8 @@ namespace hf {
                 const auto gyroVarianceSampleTimeMsec =
                     shouldUpdate ? msec_curr : filter._gyroVarianceSampleTimeMsec;
 
-                const auto wasGyroBiasFound = shouldUpdate ? true :
-                    filter.wasGyroBiasFound;
+                const auto isGyroCalibrated = shouldUpdate ? true :
+                    filter.isGyroCalibrated;
 
                 const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
@@ -145,7 +145,7 @@ namespace hf {
 
                 const auto output = ImuFiltered(gyroFiltered, accelFiltered);
 
-                return ImuFilter(output, wasGyroBiasFound, gyroSum,
+                return ImuFilter(output, isGyroCalibrated, gyroSum,
                         gyroSumOfSquares, gyroSampleCount, gyroBias,
                         gyroVarianceSampleTimeMsec, accelLpf, gyroLpf);
             }

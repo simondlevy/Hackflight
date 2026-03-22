@@ -84,9 +84,9 @@ void loop()
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    hf::Debugger::report("calibrated: ", _imuFilter.wasGyroBiasFound);
+    hf::Debugger::report("calibrated: ", _imuFilter.isGyroCalibrated);
 
-    _led.blink(millis(), _imuFilter.wasGyroBiasFound);
+    _led.blink(millis(), _imuFilter.isGyroCalibrated);
 
     _flyingCheck = _flyingCheck.run(
             _flyingCheck, millis(), _mixer.motorvals, 4);
