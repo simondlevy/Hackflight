@@ -115,12 +115,9 @@ namespace hf {
                     finalize(msec_curr);
                 }
 
-                const auto dx = _r00*_x(1) + _r01*_x(2) + _r02*_x(3);
-
-                // make right positive
-                const auto dy = -(_r10*_x(1) + _r11*_x(2) + _r12*_x(3)); 
-
-                const auto dz = _r20*_x(1) + _r21*_x(2) + _r22*_x(3);
+                const auto dx = _R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
+                const auto dy = _R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
+                const auto dz = _R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
 
                 const auto phi = Num::RAD2DEG * atan2f(2*(_q(2)*_q(3)+_q(0)* _q(1)) ,
                         _q(0)*_q(0) - _q(1)*_q(1) - _q(2)*_q(2) + _q(3)*_q(3));
@@ -136,7 +133,7 @@ namespace hf {
 
                 const auto dpsi = _gyroLatest.z;
 
-                return VehicleState(dx, dy, z, dz, phi, dphi, theta, dtheta,
+                return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
                         -psi, -dpsi); // make nose-right positive
             }
 
@@ -197,7 +194,6 @@ namespace hf {
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
             Eigen::MatrixXd _R = Eigen::MatrixXd(3, 3);
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
@@ -228,16 +224,8 @@ namespace hf {
                 _q << 1, 0, 0, 0;
                 _qinit << 1, 0, 0, 0;
 
-                // Initialize the rotation matrix
-                _r00 = 1;
-                _r01 = 0;
-                _r02 = 0;
-                _r10 = 0;
-                _r11 = 1;
-                _r12 = 0;
-                _r20 = 0;
-                _r21 = 0;
-                _r22 = 1;
+                // Reset the rotation matrix
+                _R = Eigen::Matrix3d::Identity();
 
                 // Add in the initial process noise 
                 const float pinit[STATE_DIM] = {
@@ -281,18 +269,18 @@ namespace hf {
                 F(0, 0) = 1;
 
                 // position from body-frame velocity
-                F(0,1) = _r20*dt;
+                F(0,1) = _R(2,0)*dt;
 
-                F(0,2) = _r21*dt;
+                F(0,2) = _R(2,1)*dt;
 
-                F(0,3) = _r22*dt;
+                F(0,3) = _R(2,2)*dt;
 
                 // position from attitude error
-                F(0,4) = (vy*_r22 - vz*_r21)*dt;
+                F(0,4) = (vy*_R(2,2) - vz*_R(2,1))*dt;
 
-                F(0,5) = (-vx*_r22 + vz*_r20)*dt;
+                F(0,5) = (-vx*_R(2,2) + vz*_R(2,0))*dt;
 
-                F(0,6) = (vx*_r21 - vy*_r20)*dt;
+                F(0,6) = (vx*_R(2,1) - vy*_R(2,0))*dt;
 
                 // body-frame velocity from body-frame velocity
                 F(1,1) = 1; //drag negligible
@@ -309,15 +297,15 @@ namespace hf {
 
                 // body-frame velocity from attitude error
                 F(1,4) =  0;
-                F(2,4) = -G*_r22*dt;
-                F(3,4) =  G*_r21*dt;
+                F(2,4) = -G*_R(2,2)*dt;
+                F(3,4) =  G*_R(2,1)*dt;
 
-                F(1,5) =  G*_r22*dt;
+                F(1,5) =  G*_R(2,2)*dt;
                 F(2,5) =  0;
-                F(3,5) = -G*_r20*dt;
+                F(3,5) = -G*_R(2,0)*dt;
 
-                F(1,6) = -G*_r21*dt;
-                F(2,6) =  G*_r20*dt;
+                F(1,6) = -G*_R(2,1)*dt;
+                F(2,6) =  G*_R(2,0)*dt;
                 F(3,6) =  0;
 
                 F(4,4) =  1 - d1*d1/2 - d2*d2/2;
@@ -350,7 +338,7 @@ namespace hf {
                 const auto dz = _x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
-                _x(0) += _r20 * dx + _r21 * dy + _r22 * dz - 
+                _x(0) += _R(2,0) * dx + _R(2,1) * dy + _R(2,2) * dz - 
                     G * dt2 / 2.0f;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -360,13 +348,11 @@ namespace hf {
                 // - gravity in body frame
 
                 _x(1) += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
-                        - G * _r20);
-
+                        - G * _R(2,0));
                 _x(2) += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
-                        - G * _r21);
-
+                        - G * _R(2,1));
                 _x(3) += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
-                        - G * _r22);
+                        - G * _R(2,2));
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
@@ -448,15 +434,15 @@ namespace hf {
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
 
-                _r00 = _q(0) * _q(0) + _q(1) * _q(1) - _q(2) * _q(2) - _q(3) * _q(3);
-                _r01 = 2 * _q(1) * _q(2) - 2 * _q(0) * _q(3);
-                _r02 = 2 * _q(1) * _q(3) + 2 * _q(0) * _q(2);
-                _r10 = 2 * _q(1) * _q(2) + 2 * _q(0) * _q(3);
-                _r11 = _q(0) * _q(0) - _q(1) * _q(1) + _q(2) * _q(2) - _q(3) * _q(3);
-                _r12 = 2 * _q(2) * _q(3) - 2 * _q(0) * _q(1);
-                _r20 = 2 * _q(1) * _q(3) - 2 * _q(0) * _q(2);
-                _r21 = 2 * _q(2) * _q(3) + 2 * _q(0) * _q(1);
-                _r22 = _q(0) * _q(0) - _q(1) * _q(1) - _q(2) * _q(2) + _q(3) * _q(3);
+                _R(0,0) = _q(0) * _q(0) + _q(1) * _q(1) - _q(2) * _q(2) - _q(3) * _q(3);
+                _R(0,1) = 2 * _q(1) * _q(2) - 2 * _q(0) * _q(3);
+                _R(0,2) = 2 * _q(1) * _q(3) + 2 * _q(0) * _q(2);
+                _R(1,0) = 2 * _q(1) * _q(2) + 2 * _q(0) * _q(3);
+                _R(1,1) = _q(0) * _q(0) - _q(1) * _q(1) + _q(2) * _q(2) - _q(3) * _q(3);
+                _R(1,2) = 2 * _q(2) * _q(3) - 2 * _q(0) * _q(1);
+                _R(2,0) = 2 * _q(1) * _q(3) - 2 * _q(0) * _q(2);
+                _R(2,1) = 2 * _q(2) * _q(3) + 2 * _q(0) * _q(1);
+                _R(2,2) = _q(0) * _q(0) - _q(1) * _q(1) - _q(2) * _q(2) + _q(3) * _q(3);
 
                 // reset the attitude error
                 _x(4) = 0;
