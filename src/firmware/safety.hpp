@@ -15,10 +15,11 @@
  */
 
 #include <hackflight.h>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 
-    class FlippedCheck {
+    class Safety {
 
         private:
 
@@ -26,13 +27,26 @@ namespace hf {
 
         public:
 
+            static auto updateMode(
+                    const VehicleState & state,
+                    const RxData & rxdata,
+                    const mode_e mode) -> mode_e
+            {
+                return 
+                    mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
+                    isFlipped(state) ? MODE_PANIC :
+                    rxdata.is_armed ? MODE_ARMED :
+                    mode == MODE_ARMED && !rxdata.is_armed ? MODE_IDLE :
+                    mode;
+            }
+
+        private:
+
             static auto isFlipped(const VehicleState & state) -> bool
             {
                 return isFlippedAngle(state.theta) ||
                     isFlippedAngle(state.phi); 
             }
-
-        private:
 
             static auto isFlippedAngle(const float angle) -> bool
             {

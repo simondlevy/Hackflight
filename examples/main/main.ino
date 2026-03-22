@@ -31,10 +31,10 @@
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/imufilter.hpp>
-#include <firmware/flipped.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
+#include <firmware/safety.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
@@ -84,6 +84,8 @@ void loop()
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
+    hf::Debugger::report("calibrated: ", _imuFilter.wasGyroBiasFound);
+
     _led.blink(millis(), _imuFilter.wasGyroBiasFound);
 
     _flyingCheck = _flyingCheck.run(
@@ -93,7 +95,9 @@ void loop()
 
     const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
-    _mode = hf::FlippedCheck::isFlipped(state) ? hf::MODE_PANIC : _mode;
+    _mode = hf::Safety::updateMode(state, rxdata, _mode);
+
+    hf::Debugger::report(_mode);
 
     const auto setpoint = hf::mksetpoint(rxdata.axes);
 
@@ -106,6 +110,6 @@ void loop()
         _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
 
-    hf::Debugger::report(state);
+    //hf::Debugger::report(state);
     //hf::Profiler::report();
 }
