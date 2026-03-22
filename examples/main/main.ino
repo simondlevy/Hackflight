@@ -95,7 +95,7 @@ void loop()
 
     const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
-    _mode = hf::Safety::updateMode(state, rxdata, _mode);
+    _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
     hf::Debugger::report(_mode);
 
