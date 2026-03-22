@@ -84,8 +84,6 @@ void loop()
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    hf::Debugger::report("calibrated: ", _imuFilter.isGyroCalibrated);
-
     _led.blink(millis(), _imuFilter.isGyroCalibrated);
 
     _flyingCheck = _flyingCheck.run(
@@ -96,8 +94,6 @@ void loop()
     const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
     _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);
-
-    hf::Debugger::report(_mode);
 
     const auto setpoint = hf::mksetpoint(rxdata.axes);
 
