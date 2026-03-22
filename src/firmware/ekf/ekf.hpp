@@ -17,7 +17,7 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/ekf/vec3_subsampler.hpp>
+#include <firmware/ekf/imu_subsampler.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/zranger.hpp>
@@ -100,10 +100,10 @@ namespace hf {
                     const auto imudata = _imuQueue[k];
 
                     _gyroLatest = imudata.gyroDps;
-                    _gyroSubSampler = Vec3SubSampler::accumulate(
+                    _gyroSubSampler = ImuSubSampler::accumulate(
                             _gyroSubSampler, _gyroLatest);
 
-                    _accelSubSampler = Vec3SubSampler::accumulate(
+                    _accelSubSampler = ImuSubSampler::accumulate(
                             _accelSubSampler, imudata.accelGs);
                 }
                 _imuQueueLength = 0;
@@ -185,8 +185,8 @@ namespace hf {
             Vec3 _accLatest;
             Vec3 _gyroLatest;
 
-            Vec3SubSampler _accelSubSampler;
-            Vec3SubSampler _gyroSubSampler;
+            ImuSubSampler _accelSubSampler;
+            ImuSubSampler _gyroSubSampler;
 
             float _predictedNX;
             float _predictedNY;
@@ -217,8 +217,8 @@ namespace hf {
 
             void reset(const uint32_t msec_curr)
             {
-                _accelSubSampler = Vec3SubSampler(GRAVITY);
-                _gyroSubSampler = Vec3SubSampler(Num::DEG2RAD);
+                _accelSubSampler = ImuSubSampler(GRAVITY);
+                _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 
                 ekf_init();
 
@@ -259,8 +259,8 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                _accelSubSampler = Vec3SubSampler::finalize(_accelSubSampler);
-                _gyroSubSampler = Vec3SubSampler::finalize(_gyroSubSampler);
+                _accelSubSampler = ImuSubSampler::finalize(_accelSubSampler);
+                _gyroSubSampler = ImuSubSampler::finalize(_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 

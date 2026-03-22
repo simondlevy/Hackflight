@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 
-    class Vec3SubSampler {
+    class ImuSubSampler {
 
         public:
 
@@ -29,9 +29,9 @@ namespace hf {
             Vec3 sum;
             uint32_t count;
 
-            Vec3SubSampler() = default;
+            ImuSubSampler() = default;
 
-            Vec3SubSampler(
+            ImuSubSampler(
                     const float conversionFactor,
                     const Vec3 & subSample = {},
                     const Vec3 & sum = {},
@@ -42,26 +42,26 @@ namespace hf {
                     sum(sum),
                     count(count) {}
 
-            static auto reset(const Vec3SubSampler & ss) -> Vec3SubSampler
+            static auto reset(const ImuSubSampler & ss) -> ImuSubSampler
             {
-                return Vec3SubSampler(ss.conversionFactor);
+                return ImuSubSampler(ss.conversionFactor);
             }
 
-            static auto accumulate(const Vec3SubSampler & ss,
-                    const Vec3 & sample) -> Vec3SubSampler
+            static auto accumulate(const ImuSubSampler & ss,
+                    const Vec3 & sample) -> ImuSubSampler
             {
-                return Vec3SubSampler(
+                return ImuSubSampler(
                         ss.conversionFactor,
                         ss.subSample,
                         ss.sum + sample,
                         ss.count + 1);
             }
 
-            static auto finalize(const Vec3SubSampler & ss)
-                -> Vec3SubSampler
+            static auto finalize(const ImuSubSampler & ss)
+                -> ImuSubSampler
             {
                 return ss.count > 0 ?
-                    Vec3SubSampler(ss.conversionFactor,
+                    ImuSubSampler(ss.conversionFactor,
                             ss.sum * ss.conversionFactor / ss.count) :
                     ss;
             }
