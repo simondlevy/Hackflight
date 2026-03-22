@@ -382,29 +382,26 @@ namespace hf {
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
 
-                float tmpq0 = dq[0]*_q(0) - dq[1]*_q(1) - dq[2]*_q(2) - dq[3]*_q(3);
-                float tmpq1 = dq[1]*_q(0) + dq[0]*_q(1) + dq[3]*_q(2) - dq[2]*_q(3);
-                float tmpq2 = dq[2]*_q(0) - dq[3]*_q(1) + dq[0]*_q(2) + dq[1]*_q(3);
-                float tmpq3 = dq[3]*_q(0) + dq[2]*_q(1) - dq[1]*_q(2) + dq[0]*_q(3);
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                if (!isFlying) {
+                const auto pq0 = dq[0]*_q(0) - dq[1]*_q(1) - dq[2]*_q(2) - dq[3]*_q(3);
+                const auto pq1 = dq[1]*_q(0) + dq[0]*_q(1) + dq[3]*_q(2) - dq[2]*_q(3);
+                const auto pq2 = dq[2]*_q(0) - dq[3]*_q(1) + dq[0]*_q(2) + dq[1]*_q(3);
+                const auto pq3 = dq[3]*_q(0) + dq[2]*_q(1) - dq[1]*_q(2) + dq[0]*_q(3);
 
-                    const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-
-                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit(0);
-                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit(1);
-                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit(2);
-                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit(3);
-                }
+                const auto pq0new = isFlying ? pq0 : keep * pq0 + ROLLPITCH_ZERO_REVERSION * _qinit(0);
+                const auto pq1new = isFlying ? pq1 : keep * pq1 + ROLLPITCH_ZERO_REVERSION * _qinit(1);
+                const auto pq2new = isFlying ? pq2 : keep * pq2 + ROLLPITCH_ZERO_REVERSION * _qinit(2);
+                const auto pq3new = isFlying ? pq3 : keep * pq3 + ROLLPITCH_ZERO_REVERSION * _qinit(3);
 
                 // normalize and store the result
                 const float norm = sqrt(
-                        tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
+                        pq0new*pq0new + pq1new*pq1new + pq2new*pq2new + pq3new*pq3new) + EPSILON;
 
-                _q(0) = tmpq0/norm; 
-                _q(1) = tmpq1/norm; 
-                _q(2) = tmpq2/norm; 
-                _q(3) = tmpq3/norm;
+                _q(0) = pq0new/norm; 
+                _q(1) = pq1new/norm; 
+                _q(2) = pq2new/norm; 
+                _q(3) = pq3new/norm;
 
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
