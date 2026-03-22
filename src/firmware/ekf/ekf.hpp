@@ -26,6 +26,7 @@
 // We want to use F for the Jacobian, but Arduino pre-defines it
 #ifdef F
 #undef F
+#undef _P
 #endif
 
 namespace hf {
@@ -176,7 +177,7 @@ namespace hf {
                 Eigen::VectorXd(STATE_DIM);
 
             // Covariance matrix
-            Eigen::MatrixXd P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
             bool _didResetEstimation;
 
@@ -333,7 +334,7 @@ namespace hf {
                 F(6,6) = 1 - d0*d0/2 - d1*d1/2;
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                P = (F * P) * F.transpose();
+                _P = (F * _P) * F.transpose();
 
                 const auto dt2 = dt * dt;
 
@@ -495,13 +496,13 @@ namespace hf {
             {
                 _x = Eigen::VectorXd(7);
 
-                P = Eigen::MatrixXd(7, 7);
+                _P = Eigen::MatrixXd(7, 7);
             }
 
             void ekf_addCovarianceNoise(const float * noise)
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    P(k,k) += noise[k] * noise[k];
+                    _P(k,k) += noise[k] * noise[k];
                 }
             }
 
@@ -511,9 +512,9 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto pval = (P(i,j) + P(j,i)) / 2;
+                        const auto pval = (_P(i,j) + _P(j,i)) / 2;
 
-                        P(i,j) = P(j,i) = 
+                        _P(i,j) = _P(j,i) = 
                             isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
                             i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
                             pval;
