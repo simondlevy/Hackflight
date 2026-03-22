@@ -25,13 +25,12 @@
 // Hackflight library
 #include <hackflight.h>
 //#include <firmware/imus/bmi088.hpp>
-#include <firmware/imus/lsm6dso_rot90ccw.hpp>
-//#include <firmware/imus/mpu6050.hpp>
+//#include <firmware/imus/lsm6dso_rot90ccw.hpp>
+#include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/filters/imufilter.hpp>
-#include <firmware/filters/new_imufilter.hpp>
 #include <firmware/flipped.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>
@@ -49,21 +48,19 @@ static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
 static hf::LED _led = hf::LED(13);
 
-// static hf::StabilizerPid _stabilizerPid;
+static hf::StabilizerPid _stabilizerPid;
 
-// static hf::Mixer _mixer;
+static hf::Mixer _mixer;
 
 static hf::IMU _imu;
 
 static hf::ImuFilter _imuFilter;
 
-static hf::NewImuFilter _new_imuFilter;
+static hf::EKF _ekf;
 
-// static hf::EKF _ekf;
+static hf::FlyingCheck _flyingCheck;
 
-// static hf::FlyingCheck _flyingCheck;
-
-// static hf::mode_e _mode;
+static hf::mode_e _mode;
 
 void setup()
 {
@@ -78,24 +75,17 @@ void setup()
 
 void loop()
 {
-    // const auto dt = hf::Timer::getDt();
+    const auto dt = hf::Timer::getDt();
 
-    // const auto rxdata = _rx.read();
+    const auto rxdata = _rx.read();
 
     const auto imuraw = _imu.read();
 
     _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    _new_imuFilter = hf::NewImuFilter::step(_new_imuFilter, millis(), imuraw,
-            _imu.gyroRangeDps(), _imu.accelRangeGs());
+    _led.blink(millis(), _imuFilter.wasGyroBiasFound);
 
-    hf::Debugger::report(_imuFilter.output);
-    hf::Debugger::report(_new_imuFilter.output);
-
-    _led.blink(millis(), _new_imuFilter.wasGyroBiasFound);
-
-    /*
     _flyingCheck = _flyingCheck.run(
             _flyingCheck, millis(), _mixer.motorvals, 4);
 
@@ -115,8 +105,7 @@ void loop()
     if (_mode != hf::MODE_PANIC) {
         _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
-    */
 
-    //hf::Debugger::report(state);
+    hf::Debugger::report(state);
     //hf::Profiler::report();
 }
