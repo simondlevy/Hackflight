@@ -90,7 +90,7 @@ namespace hf {
 
                 const auto gyrovariance =
                     (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
-                    (gyromean*gyromean);
+                    square(gyromean);
 
                 const auto gyroval = Vec3(gyroraw);
 
@@ -99,7 +99,7 @@ namespace hf {
 
                 const auto gyroSumOfSquares = filter.wasGyroBiasFound ?
                     filter._gyroSumOfSquares :
-                    filter._gyroSumOfSquares + (gyroval * gyroval);
+                    filter._gyroSumOfSquares + square(gyroval);
 
                 const auto accel = scale(Vec3(imuraw.accel), accel_range_gs);
 
@@ -157,7 +157,12 @@ namespace hf {
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
 
-            static Vec3 scale(const Vec3 & vec, const int16_t s)
+            static auto square(const Vec3 & vec) -> Vec3
+            {
+                return vec * vec;
+            }
+
+            static auto scale(const Vec3 & vec, const int16_t s) -> Vec3
             {
                 return vec * 2 * (float)s / 65536;
             }
