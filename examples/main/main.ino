@@ -80,7 +80,7 @@ void setup()
 
     //_zranger.begin();
 
-    _motors.arm(); 
+    _motors.begin(); 
 
     _led.begin(); 
 }
