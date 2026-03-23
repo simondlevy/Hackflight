@@ -448,7 +448,7 @@ namespace hf {
                 _x(5) = 0;
                 _x(6) = 0;
 
-                ekf_enforceSymmetry();
+                _P = ekf_enforceSymmetry(_P);
 
                 _isUpdated = false;
             }
@@ -470,7 +470,8 @@ namespace hf {
                     };
 
                     ekf_addCovarianceNoise(noise);
-                    ekf_enforceSymmetry();
+
+                    _P = ekf_enforceSymmetry(_P);
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
@@ -500,8 +501,9 @@ namespace hf {
                             pval;
                     }
 
-                    return Psym;
                 }
+
+                return Psym;
             }
 
             void ekf_enforceSymmetry()
