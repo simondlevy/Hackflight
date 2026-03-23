@@ -384,29 +384,23 @@ namespace hf {
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                const auto pq0 = dq[0]*_q(0) - dq[1]*_q(1) - dq[2]*_q(2) - dq[3]*_q(3);
-                const auto pq1 = dq[1]*_q(0) + dq[0]*_q(1) + dq[3]*_q(2) - dq[2]*_q(3);
-                const auto pq2 = dq[2]*_q(0) - dq[3]*_q(1) + dq[0]*_q(2) + dq[1]*_q(3);
-                const auto pq3 = dq[3]*_q(0) + dq[2]*_q(1) - dq[1]*_q(2) + dq[0]*_q(3);
+                Eigen::VectorXd pq = Eigen::VectorXd(4);
+                pq <<
+                    dq[0]*_q(0) - dq[1]*_q(1) - dq[2]*_q(2) - dq[3]*_q(3),
+                    dq[1]*_q(0) + dq[0]*_q(1) + dq[3]*_q(2) - dq[2]*_q(3),
+                    dq[2]*_q(0) - dq[3]*_q(1) + dq[0]*_q(2) + dq[1]*_q(3),
+                    dq[3]*_q(0) + dq[2]*_q(1) - dq[1]*_q(2) + dq[0]*_q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
                 qinit << 1, 0, 0, 0;
 
-                const auto pq0new = isFlying ? pq0 : keep * pq0 + ROLLPITCH_ZERO_REVERSION * qinit(0);
-                const auto pq1new = isFlying ? pq1 : keep * pq1 + ROLLPITCH_ZERO_REVERSION * qinit(1);
-                const auto pq2new = isFlying ? pq2 : keep * pq2 + ROLLPITCH_ZERO_REVERSION * qinit(2);
-                const auto pq3new = isFlying ? pq3 : keep * pq3 + ROLLPITCH_ZERO_REVERSION * qinit(3);
+                const auto pqnew = isFlying ? pq : keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
                 // normalize and store the result
-                const float norm = sqrt(
-                        pq0new*pq0new + pq1new*pq1new + pq2new*pq2new + pq3new*pq3new) + EPSILON;
+                const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
 
-                _q(0) = pq0new/norm; 
-                _q(1) = pq1new/norm; 
-                _q(2) = pq2new/norm; 
-                _q(3) = pq3new/norm;
-
+                _q = pqnew / norm;
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
             }
