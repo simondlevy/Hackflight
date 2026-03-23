@@ -25,8 +25,8 @@
 // Hackflight library
 #include <hackflight.h>
 //#include <firmware/imus/bmi088.hpp>
-//#include <firmware/imus/lsm6dso_rot90ccw.hpp>
-#include <firmware/imus/mpu6050.hpp>
+#include <firmware/imus/lsm6dso_rot90ccw.hpp>
+//#include <firmware/imus/mpu6050.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
@@ -39,6 +39,7 @@
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <firmware/profiling.hpp>
+#include <firmware/zranger.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 static hf::RX _rx;
@@ -54,6 +55,8 @@ static hf::Mixer _mixer;
 
 static hf::IMU _imu;
 
+static hf::ZRanger _zranger;
+
 static hf::ImuFilter _imuFilter;
 
 static hf::EKF _ekf;
@@ -67,6 +70,8 @@ void setup()
     _rx.begin();
 
     _imu.begin();
+
+    _zranger.begin();
 
     _motors.arm(); 
 

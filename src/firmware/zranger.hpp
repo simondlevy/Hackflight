@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2011-2018 Bitcraze AB, 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,74 +14,48 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <VL53L1X.h>
 
-#include <math.h>
-
-#include <datatypes.hpp>
+#include <hackflight.h>
+#include <firmware/debugging.hpp>
 
 namespace hf {
 
     class ZRanger {
 
+        private:
+
+            static constexpr auto DISTANCE_MODE = VL53L1X::Medium;
+            static constexpr uint32_t TIMING_BUDGET_USEC = 25'000;
+
         public:
 
-            typedef struct {
-                uint32_t timestamp;
-                float distance;
-                float stdDev;
-            } measurement_t;
-
-            void init()
+            void begin(TwoWire & wire=Wire1)
             {
-                // pre-compute constant in the measurement noise model for kalman
-                _expCoeff =
-                    logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+                wire.begin();
+                wire.setClock(400000);
 
-                device_init();
-            }
+                _vl53l1x.setBus(&wire);
 
-            bool read(measurement_t & tofData, const uint32_t tick)
-            {
-                float range = device_read();
+                delay(100);
 
-                // check if range is feasible and push into the estimator the
-                // sensor should not be able to measure >5 [m], and outliers
-                // typically occur as >8 [m] measurements
-                if (range < OUTLIER_LIMIT_MM) {
-
-                    float distance = range / 1000; // Scale from [mm] to [m]
-
-                    float stdDev = EXP_STD_A * (
-                            1 + expf(_expCoeff * (distance - EXP_POINT_A)));
-
-                    tofData.timestamp = tick;
-                    tofData.distance = distance;
-                    tofData.stdDev = stdDev;
-
-                    return true;
+                if (!_vl53l1x.init()) {
+                    Debugger::reportForever("VL53L1X initialization failed");
                 }
 
-                return false;
+                _vl53l1x.setDistanceMode(VL53L1X::Medium);
+                _vl53l1x.setMeasurementTimingBudget(25000);
+                _vl53l1x.startContinuous(50);
+
+            }
+
+            auto read() -> uint16_t
+            {
+                return _vl53l1x.read();
             }
 
         private:
 
-            static constexpr float FREQ_HZ = 40;
-
-            static const uint16_t OUTLIER_LIMIT_MM = 5000;
-
-            // Measurement noise model
-            static constexpr float EXP_POINT_A = 2.5;
-            static constexpr float EXP_STD_A = 0.0025; 
-            static constexpr float EXP_POINT_B = 4.0;
-            static constexpr float EXP_STD_B = 0.2;   
-
-            float _expCoeff;
-
-            bool device_init();
-
-            float device_read();
+            VL53L1X _vl53l1x;
     };
-
 }

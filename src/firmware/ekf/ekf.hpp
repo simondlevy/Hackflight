@@ -18,9 +18,7 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/imu_subsampler.hpp>
-#include <firmware/opticalflow.hpp>
 #include <firmware/timer.hpp>
-#include <firmware/zranger.hpp>
 #include <num.hpp>
 
 // We want to use F for the Jacobian, but Arduino pre-defines it
