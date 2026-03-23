@@ -237,7 +237,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                ekf_addCovarianceNoise(pinit);
+                _P = addCovarianceNoise(_P, pinit);
 
                 _isUpdated = false;
                 _lastPredictionMs = msec_curr;
@@ -448,7 +448,7 @@ namespace hf {
                 _x(5) = 0;
                 _x(6) = 0;
 
-                _P = ekf_enforceSymmetry(_P);
+                _P = enforceSymmetry(_P);
 
                 _isUpdated = false;
             }
@@ -469,22 +469,27 @@ namespace hf {
                         MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                     };
 
-                    ekf_addCovarianceNoise(noise);
+                    _P = addCovarianceNoise(_P, noise);
 
-                    _P = ekf_enforceSymmetry(_P);
+                    _P = enforceSymmetry(_P);
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
             }
 
-            void ekf_addCovarianceNoise(const float * noise)
+            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
+                    const float * noise) -> Eigen::MatrixXd
             {
+                Eigen::MatrixXd Pcov = P;
+
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    _P(k,k) += noise[k] * noise[k];
+                    Pcov(k,k) += noise[k] * noise[k];
                 }
+
+                return Pcov;
             }
 
-            static auto ekf_enforceSymmetry(
+            static auto enforceSymmetry(
                     const Eigen::MatrixXd & P) -> Eigen::MatrixXd
             {
                 Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
@@ -504,22 +509,6 @@ namespace hf {
                 }
 
                 return Psym;
-            }
-
-            void ekf_enforceSymmetry()
-            {
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        const auto pval = (_P(i,j) + _P(j,i)) / 2;
-
-                        _P(i,j) = _P(j,i) = 
-                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                            pval;
-                    }
-                }
             }
     };
 }
