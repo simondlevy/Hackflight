@@ -218,9 +218,6 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Eigen::VectorXd _q = Eigen::VectorXd(4);
 
-            // Quaternion used for initial orientation
-            Eigen::VectorXd _qinit = Eigen::VectorXd(4);
-            
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
             bool _isUpdated;
@@ -240,7 +237,6 @@ namespace hf {
 
                 // Reset the attitude quaternion
                 _q << 1, 0, 0, 0;
-                _qinit << 1, 0, 0, 0;
 
                 // Reset the rotation matrix
                 _R = Eigen::Matrix3d::Identity();
@@ -393,10 +389,14 @@ namespace hf {
                 const auto pq2 = dq[2]*_q(0) - dq[3]*_q(1) + dq[0]*_q(2) + dq[1]*_q(3);
                 const auto pq3 = dq[3]*_q(0) + dq[2]*_q(1) - dq[1]*_q(2) + dq[0]*_q(3);
 
-                const auto pq0new = isFlying ? pq0 : keep * pq0 + ROLLPITCH_ZERO_REVERSION * _qinit(0);
-                const auto pq1new = isFlying ? pq1 : keep * pq1 + ROLLPITCH_ZERO_REVERSION * _qinit(1);
-                const auto pq2new = isFlying ? pq2 : keep * pq2 + ROLLPITCH_ZERO_REVERSION * _qinit(2);
-                const auto pq3new = isFlying ? pq3 : keep * pq3 + ROLLPITCH_ZERO_REVERSION * _qinit(3);
+                // Quaternion used for initial orientation
+                Eigen::VectorXd qinit = Eigen::VectorXd(4);
+                qinit << 1, 0, 0, 0;
+
+                const auto pq0new = isFlying ? pq0 : keep * pq0 + ROLLPITCH_ZERO_REVERSION * qinit(0);
+                const auto pq1new = isFlying ? pq1 : keep * pq1 + ROLLPITCH_ZERO_REVERSION * qinit(1);
+                const auto pq2new = isFlying ? pq2 : keep * pq2 + ROLLPITCH_ZERO_REVERSION * qinit(2);
+                const auto pq3new = isFlying ? pq3 : keep * pq3 + ROLLPITCH_ZERO_REVERSION * qinit(3);
 
                 // normalize and store the result
                 const float norm = sqrt(
