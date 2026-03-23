@@ -1,54 +1,78 @@
 #include <LSM6DSOSensor.h>
+#include <MPU6050.h>
 
-static const uint8_t INT_PIN = 4;
+#include <hackflight.h>
+#include <firmware/debugging.hpp>
+#include <firmware/profiling.hpp>
 
-static const int16_t GRANGE = 2000;
-static const int16_t ARANGE = 16; 
+//static LSM6DSOSensor _lsm6dso(&Wire);
 
-static LSM6DSOSensor _lsm6dso(&Wire);
+static MPU6050 _mpu6050;
 
+/*
 static bool bad(const LSM6DSOStatusTypeDef status)
 {
     return status != LSM6DSO_OK;
-}
+}*/
+
 
 void setup()
 {
-    pinMode(LED_BUILTIN, OUTPUT);
-
     Serial.begin(0);
 
     Wire.begin();
 
+    Wire.setClock(1000000); 
+
+    _mpu6050.initialize();
+
+    /*
     if (
             bad(_lsm6dso.begin()) ||
             bad(_lsm6dso.Enable_G())  ||
             bad(_lsm6dso.Enable_X()) ||
-            bad(_lsm6dso.Set_X_FS(ARANGE)) ||
-            bad(_lsm6dso.Set_G_FS(GRANGE))) {
+            bad(_lsm6dso.Set_X_FS(16)) ||
+            bad(_lsm6dso.Set_G_FS(2000))) {*/
 
-        while (true) {
-            printf("Initialization failed\n");
-            delay(500);
-        }
+    if (!_mpu6050.testConnection()) {
+        hf::Debugger::reportForever("Initialization unsuccessful\n");
     }
+
+    _mpu6050.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
+
+    _mpu6050.setFullScaleAccelRange(MPU6050_ACCEL_FS_16);
+
+     _mpu6050.setIntDataReadyEnabled(true);
 }
 
 void loop()
 {
-    uint8_t status = 0;
+    // hf::Profiler::report();
 
-    _lsm6dso.Get_G_DRDY_Status(&status);
+    static uint32_t _count;
+
+    //uint8_t status = 0;
+    //_lsm6dso.Get_G_DRDY_Status(&status);
+
+    bool status = _mpu6050.getIntDataReadyStatus();
 
     if (status) {
 
         int16_t g[3] = {};
-        _lsm6dso.Get_G_AxesRaw(g);
-
         int16_t a[3] = {};
-        _lsm6dso.Get_X_AxesRaw(a);
+        /*
+        _lsm6dso.Get_G_AxesRaw(g);
+        _lsm6dso.Get_X_AxesRaw(a);*/
 
-        printf("gx=%d gy=%d gz=%d ax=%d ay=%d az=%d\n",
-                g[0], g[1], g[2], a[0], a[1], a[2]);
+       _mpu6050.getMotion6(&a[0], &a[1], &a[2], &g[0], &g[1], &g[2]);
+
+        //printf("gx=%d gy=%d gz=%d ax=%d ay=%d az=%d\n",
+        //        g[0], g[1], g[2], a[0], a[1], a[2]);
+
+       _count = 0;
+    }
+
+    else {
+        printf("%d\n", _count++);
     }
 }

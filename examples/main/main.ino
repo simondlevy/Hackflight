@@ -75,37 +75,45 @@ void setup()
 
 void loop()
 {
-    const auto dt = hf::Timer::getDt();
+    const auto loop_start_usec = micros();
 
-    const auto rxdata = _rx.read();
+    if (_imu.available()) {
 
-    const auto imuraw = _imu.read();
+        const auto imuraw = _imu.read();
 
-    _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
-            _imu.gyroRangeDps(), _imu.accelRangeGs());
+        const auto dt = hf::Timer::getDt();
 
-    _led.blink(millis(), _imuFilter.isGyroCalibrated);
+        const auto rxdata = _rx.read();
 
-    _flyingCheck = _flyingCheck.run(
-            _flyingCheck, millis(), _mixer.motorvals, 4);
+        _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
+                _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-    _ekf.enqueueImu(_imuFilter.output);
+        _led.blink(millis(), _imuFilter.isGyroCalibrated);
 
-    const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
+        _flyingCheck = _flyingCheck.run(
+                _flyingCheck, millis(), _mixer.motorvals, 4);
 
-    _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);
+        _ekf.enqueueImu(_imuFilter.output);
 
-    const auto setpoint = hf::mksetpoint(rxdata.axes);
+        const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 
-    _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
-            !rxdata.is_throttle_down, dt, state, setpoint);
+        _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
-    _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
+        const auto setpoint = hf::mksetpoint(rxdata.axes);
 
-    if (_mode != hf::MODE_PANIC) {
-        _motors.run(rxdata.is_armed, _mixer.motorvals);
+        _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
+                !rxdata.is_throttle_down, dt, state, setpoint);
+
+        _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
+
+        if (_mode != hf::MODE_PANIC) {
+            _motors.run(rxdata.is_armed, _mixer.motorvals);
+        }
+
+        //hf::Debugger::report(state);
     }
 
-    //hf::Debugger::report(state);
-    hf::Profiler::report();
+    hf::Timer::runDelayLoop(loop_start_usec);
+
+    //hf::Profiler::report();
 }

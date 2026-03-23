@@ -66,6 +66,13 @@ namespace hf {
                 return (int16_t)ARANGE;
             }
 
+            const auto available() -> bool
+            {
+                uint8_t status = 0;
+                _lsm6dso.Get_G_DRDY_Status(&status);
+                return status == 1;
+            }
+
             auto read() -> ImuRaw
             {
                 int16_t gyro[3] = {};

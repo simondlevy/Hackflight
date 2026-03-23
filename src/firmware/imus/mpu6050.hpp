@@ -48,6 +48,11 @@ namespace hf {
                 _mpu6050.setFullScaleAccelRange(ARANGE);
             }
 
+            auto available() -> bool
+            {
+                return true;
+            }
+
             const auto gyroRangeDps() -> int16_t
             {
                 static constexpr int16_t granges[4] = {250, 500, 100, 2000};

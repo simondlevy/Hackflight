@@ -55,7 +55,7 @@ namespace hf {
             }
 
             static void runDelayLoop(const uint32_t usec_curr, 
-                    const uint32_t loop_freq_hz)
+                    const uint32_t loop_freq_hz=2000)
             {
                 float invFreq = 1.0 / loop_freq_hz * 1000000.0;
                 uint32_t checker = micros();
