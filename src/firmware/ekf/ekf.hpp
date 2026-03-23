@@ -91,7 +91,26 @@ namespace hf {
                     _msec_prev = msec_curr;
                 }
 
-                addProcessNoise(msec_curr);
+                float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+
+                if (dt > 0) {
+
+                    const float noise[STATE_DIM] = {
+                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                    };
+
+                    _P = addCovarianceNoise(_P, noise);
+
+                    _P = enforceSymmetry(_P);
+
+                    _lastProcessNoiseUpdateMs = msec_curr;
+                }
 
                 // Update with queued measurements and flush the queue
                 for (uint32_t k=0; k<_imuQueueLength; ++k) {
@@ -453,34 +472,10 @@ namespace hf {
                 _isUpdated = false;
             }
 
-            void addProcessNoise(const uint32_t msec_curr) 
-            {
-                float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
-
-                if (dt > 0) {
-
-                    const float noise[STATE_DIM] = {
-                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                    };
-
-                    _P = addCovarianceNoise(_P, noise);
-
-                    _P = enforceSymmetry(_P);
-
-                    _lastProcessNoiseUpdateMs = msec_curr;
-                }
-            }
-
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
                     const float * noise) -> Eigen::MatrixXd
             {
-                Eigen::MatrixXd Pcov = P;
+                auto Pcov = P;
 
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
                     Pcov(k,k) += noise[k] * noise[k];
