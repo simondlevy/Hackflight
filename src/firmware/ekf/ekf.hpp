@@ -65,6 +65,8 @@ namespace hf {
             // the reversion of pitch and roll to zero
             static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
+            static constexpr float MAX_VELOCITY_MPS = 10;
+
             static const size_t QUEUE_MAX_LENGTH = 20;
 
         public:
@@ -92,7 +94,7 @@ namespace hf {
                     _msec_prev = msec_curr;
                 }
 
-                float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+                const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
 
@@ -190,9 +192,9 @@ namespace hf {
                     _isUpdated = false;
                 }
 
-                const auto dx = _R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
-                const auto dy = _R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
-                const auto dz = _R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
+                const auto dx = 0;//_R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
+                const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
+                const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
 
                 const auto phi = Num::RAD2DEG * atan2f(2*(_q(2)*_q(3)+_q(0)* _q(1)) ,
                         _q(0)*_q(0) - _q(1)*_q(1) - _q(2)*_q(2) + _q(3)*_q(3));
@@ -207,6 +209,10 @@ namespace hf {
                         _q(0)*_q(0) + _q(1)*_q(1) - _q(2)*_q(2) - _q(3)*_q(3)); 
 
                 const auto dpsi = _gyroLatest.z;
+
+                if (!velInBounds(dx) || !velInBounds(dy) || !velInBounds(dz)) {
+                    _didResetEstimation = true;
+                }
 
                 return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
                         -psi, -dpsi); // make nose-right positive
@@ -290,8 +296,8 @@ namespace hf {
                 _accelSubSampler = ImuSubSampler(G);
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 
+                // Reset the state
                 _x = Eigen::VectorXd(STATE_DIM);
-                _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
                 // Reset the attitude quaternion
                 _q << 1, 0, 0, 0;
@@ -299,7 +305,9 @@ namespace hf {
                 // Reset the rotation matrix
                 _R = Eigen::Matrix3d::Identity();
 
-                // Add in the initial process noise 
+                // Reset the covariance matrix and add the initial process
+                // noise
+                _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
                 const float pinit[STATE_DIM] = {
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
@@ -309,7 +317,6 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
-
                 _P = addCovarianceNoise(_P, pinit);
 
                 _isUpdated = false;
@@ -462,6 +469,11 @@ namespace hf {
                 _q = pqnew / norm;
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
+            }
+
+            static bool velInBounds(const float vel)
+            {
+                return fabs(vel) < MAX_VELOCITY_MPS;
             }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
