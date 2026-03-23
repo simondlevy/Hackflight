@@ -21,7 +21,8 @@
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
-// We want to use F for the Jacobian, but Arduino pre-defines it
+// We want to use F for the Jacobian and _P for the covariance matrix, but
+// Arduino pre-defines them
 #ifdef F
 #undef F
 #undef _P
@@ -129,7 +130,64 @@ namespace hf {
                 const auto z = _x(0);
 
                 if (_isUpdated) {
-                    finalize(msec_curr);
+
+                    // Incorporate the attitude error (Kalman filter state) with the attitude
+                    const float v0 = _x(4);
+                    const float v1 = _x(5);
+                    const float v2 = _x(6);
+
+                    // Move attitude error into attitude if any of the angle errors are
+                    // large enough
+                    if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
+                                0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
+                                    fabsf(v2) < 10)) {
+
+                        const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                        const float ca = cos(angle / 2.0f);
+                        const float sa = sin(angle / 2.0f);
+                        const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                        // Rotate the vehicle's attitude by the delta quaternion vector
+                        // computed above
+                        const float tmpq0 = dq[0] * _q(0) - dq[1] * _q(1) - 
+                            dq[2] * _q(2) - dq[3] * _q(3);
+                        const float tmpq1 = dq[1] * _q(0) + dq[0] * _q(1) + 
+                            dq[3] * _q(2) - dq[2] * _q(3);
+                        const float tmpq2 = dq[2] * _q(0) - dq[3] * _q(1) + 
+                            dq[0] * _q(2) + dq[1] * _q(3);
+                        const float tmpq3 = dq[3] * _q(0) + dq[2] * _q(1) - 
+                            dq[1] * _q(2) + dq[0] * _q(3);
+
+                        // normalize and store the result
+                        float norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                                tmpq3 * tmpq3) + EPSILON;
+                        _q(0) = tmpq0 / norm;
+                        _q(1) = tmpq1 / norm;
+                        _q(2) = tmpq2 / norm;
+                        _q(3) = tmpq3 / norm;
+                    }
+
+                    // Convert the new attitude to a rotation matrix, such that we can
+                    // rotate body-frame velocity and acc
+
+                    _R(0,0) = _q(0) * _q(0) + _q(1) * _q(1) - _q(2) * _q(2) - _q(3) * _q(3);
+                    _R(0,1) = 2 * _q(1) * _q(2) - 2 * _q(0) * _q(3);
+                    _R(0,2) = 2 * _q(1) * _q(3) + 2 * _q(0) * _q(2);
+                    _R(1,0) = 2 * _q(1) * _q(2) + 2 * _q(0) * _q(3);
+                    _R(1,1) = _q(0) * _q(0) - _q(1) * _q(1) + _q(2) * _q(2) - _q(3) * _q(3);
+                    _R(1,2) = 2 * _q(2) * _q(3) - 2 * _q(0) * _q(1);
+                    _R(2,0) = 2 * _q(1) * _q(3) - 2 * _q(0) * _q(2);
+                    _R(2,1) = 2 * _q(2) * _q(3) + 2 * _q(0) * _q(1);
+                    _R(2,2) = _q(0) * _q(0) - _q(1) * _q(1) - _q(2) * _q(2) + _q(3) * _q(3);
+
+                    // reset the attitude error
+                    _x(4) = 0;
+                    _x(5) = 0;
+                    _x(6) = 0;
+
+                    _P = enforceSymmetry(_P);
+
+                    _isUpdated = false;
                 }
 
                 const auto dx = _R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
@@ -277,6 +335,7 @@ namespace hf {
                 const auto vy = _x(2);
                 const auto vz = _x(3);
 
+                // Jacobian of state transition function
                 static Eigen::MatrixXd F(STATE_DIM, STATE_DIM);
 
                 // position
@@ -403,67 +462,6 @@ namespace hf {
                 _q = pqnew / norm;
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
-            }
-
-            void finalize(const uint32_t msec_curr)
-            {
-                // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = _x(4);
-                const float v1 = _x(5);
-                const float v2 = _x(6);
-
-                // Move attitude error into attitude if any of the angle errors are
-                // large enough
-                if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
-                            0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
-                                fabsf(v2) < 10)) {
-
-                    const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                    const float ca = cos(angle / 2.0f);
-                    const float sa = sin(angle / 2.0f);
-                    const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
-
-                    // Rotate the vehicle's attitude by the delta quaternion vector
-                    // computed above
-                    const float tmpq0 = dq[0] * _q(0) - dq[1] * _q(1) - 
-                        dq[2] * _q(2) - dq[3] * _q(3);
-                    const float tmpq1 = dq[1] * _q(0) + dq[0] * _q(1) + 
-                        dq[3] * _q(2) - dq[2] * _q(3);
-                    const float tmpq2 = dq[2] * _q(0) - dq[3] * _q(1) + 
-                        dq[0] * _q(2) + dq[1] * _q(3);
-                    const float tmpq3 = dq[3] * _q(0) + dq[2] * _q(1) - 
-                        dq[1] * _q(2) + dq[0] * _q(3);
-
-                    // normalize and store the result
-                    float norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                            tmpq3 * tmpq3) + EPSILON;
-                    _q(0) = tmpq0 / norm;
-                    _q(1) = tmpq1 / norm;
-                    _q(2) = tmpq2 / norm;
-                    _q(3) = tmpq3 / norm;
-                }
-
-                // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and acc
-
-                _R(0,0) = _q(0) * _q(0) + _q(1) * _q(1) - _q(2) * _q(2) - _q(3) * _q(3);
-                _R(0,1) = 2 * _q(1) * _q(2) - 2 * _q(0) * _q(3);
-                _R(0,2) = 2 * _q(1) * _q(3) + 2 * _q(0) * _q(2);
-                _R(1,0) = 2 * _q(1) * _q(2) + 2 * _q(0) * _q(3);
-                _R(1,1) = _q(0) * _q(0) - _q(1) * _q(1) + _q(2) * _q(2) - _q(3) * _q(3);
-                _R(1,2) = 2 * _q(2) * _q(3) - 2 * _q(0) * _q(1);
-                _R(2,0) = 2 * _q(1) * _q(3) - 2 * _q(0) * _q(2);
-                _R(2,1) = 2 * _q(2) * _q(3) + 2 * _q(0) * _q(1);
-                _R(2,2) = _q(0) * _q(0) - _q(1) * _q(1) - _q(2) * _q(2) + _q(3) * _q(3);
-
-                // reset the attitude error
-                _x(4) = 0;
-                _x(5) = 0;
-                _x(6) = 0;
-
-                _P = enforceSymmetry(_P);
-
-                _isUpdated = false;
             }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
