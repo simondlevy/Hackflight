@@ -49,6 +49,11 @@ namespace hf {
 
             }
 
+            auto available() -> bool
+            {
+                return _vl53l1x.dataReady();
+            }
+
             auto read() -> uint16_t
             {
                 return _vl53l1x.read();

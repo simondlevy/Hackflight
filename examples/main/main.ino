@@ -82,7 +82,16 @@ void loop()
 {
     const auto loop_start_usec = micros();
 
+    if (_zranger.available()) {
+
+        printf("zranger\n");
+
+        _zranger.read();
+    }
+
     if (_imu.available()) {
+
+        printf("imu\n");
 
         const auto imuraw = _imu.read();
 
