@@ -42,6 +42,13 @@
 #include <firmware/profiling.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
+/* Update rates
+FLOW/ZRANGER: 50 Hz
+MAIN_LOOP = 1000
+PIDS = 500;
+EKF_PREDICTION = 100
+*/
+
 static hf::RX _rx;
 
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
@@ -82,16 +89,13 @@ void loop()
 {
     const auto loop_start_usec = micros();
 
+    /*
     if (_zranger.available()) {
 
-        printf("zranger\n");
-
         _zranger.read();
-    }
+    }*/
 
     if (_imu.available()) {
-
-        printf("imu\n");
 
         const auto imuraw = _imu.read();
 
@@ -124,7 +128,7 @@ void loop()
             _motors.run(rxdata.is_armed, _mixer.motorvals);
         }
 
-        //hf::Debugger::report(state);
+        hf::Debugger::report(state);
     }
 
     hf::Timer::runDelayLoop(loop_start_usec);

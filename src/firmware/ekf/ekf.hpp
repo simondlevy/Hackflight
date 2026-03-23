@@ -216,7 +216,8 @@ namespace hf {
                 _accelSubSampler = ImuSubSampler(G);
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 
-                ekf_init();
+                _x = Eigen::VectorXd(STATE_DIM);
+                _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
                 // Reset the attitude quaternion
                 _q << 1, 0, 0, 0;
@@ -473,13 +474,6 @@ namespace hf {
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
-            }
-
-            void ekf_init()
-            {
-                _x = Eigen::VectorXd(STATE_DIM);
-
-                _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
             }
 
             void ekf_addCovarianceNoise(const float * noise)
