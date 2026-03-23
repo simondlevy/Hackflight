@@ -483,6 +483,28 @@ namespace hf {
                 }
             }
 
+            static auto ekf_enforceSymmetry(
+                    const Eigen::MatrixXd & P) -> Eigen::MatrixXd
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        const auto pval = (P(i,j) + P(j,i)) / 2;
+
+                        (void)pval;
+
+                        /*
+                           _P(i,j) = _P(j,i) = 
+                           isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                           i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                           pval;*/
+                    }
+
+                    return Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+                }
+            }
+
             void ekf_enforceSymmetry()
             {
                 for (int i=0; i<STATE_DIM; i++) {
