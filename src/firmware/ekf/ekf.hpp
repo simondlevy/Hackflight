@@ -140,12 +140,7 @@ namespace hf {
 
                 _gyroLatest = _imuLatest.gyroDps;
 
-                // XXX
-                _pred._gyroSubSampler = ImuSubSampler::accumulate(
-                        _pred._gyroSubSampler, _gyroLatest);
-
-                _pred._accelSubSampler = ImuSubSampler::accumulate(
-                        _pred._accelSubSampler, _imuLatest.accelGs);
+                _pred.accumulateImu(_imuLatest);
 
                 const auto z = _pred._x(0);
 
