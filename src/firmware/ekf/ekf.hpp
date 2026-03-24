@@ -140,7 +140,7 @@ namespace hf {
 
                 _gyroLatest = _imuLatest.gyroDps;
 
-                _pred.accumulateImu(_imuLatest);
+                _pred = Prediction::accumulateImu(_pred, _imuLatest);
 
                 const auto z = _pred._x(0);
 

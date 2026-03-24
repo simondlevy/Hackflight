@@ -290,13 +290,18 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Eigen::VectorXd _q = Eigen::VectorXd(4);
 
-            void accumulateImu(const ImuFiltered & imuLatest)
+            static auto accumulateImu(
+                    const Prediction & pred,
+                    const ImuFiltered & imuLatest) -> Prediction
             {
-                _gyroSubSampler = ImuSubSampler::accumulate( _gyroSubSampler,
-                        imuLatest.gyroDps);
+                const auto gyroSubSampler = ImuSubSampler::accumulate(
+                        pred._gyroSubSampler, imuLatest.gyroDps);
 
-                _accelSubSampler = ImuSubSampler::accumulate( _accelSubSampler,
-                        imuLatest.accelGs);
+                const auto accelSubSampler = ImuSubSampler::accumulate(
+                        pred._accelSubSampler, imuLatest.accelGs);
+
+                return Prediction(pred._x, pred._P, accelSubSampler,
+                        gyroSubSampler, pred._q); 
             }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
