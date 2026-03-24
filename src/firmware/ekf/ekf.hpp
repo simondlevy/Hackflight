@@ -115,7 +115,7 @@ namespace hf {
 
                 // Update with queued measurements and flush the queue
 
-                const auto imudata = _imuQueue[0];
+                const auto imudata = _imuQueue;
 
                 _gyroLatest = imudata.gyroDps;
                 _gyroSubSampler = ImuSubSampler::accumulate(
@@ -215,7 +215,7 @@ namespace hf {
 
             void enqueueImu(const ImuFiltered & imudata)
             {
-                _imuQueue[0] = imudata;
+                _imuQueue = imudata;
             }
 
         private:
@@ -241,7 +241,7 @@ namespace hf {
 
             // Instance vars --------------------------------------------------
 
-            ImuFiltered _imuQueue[1];
+            ImuFiltered _imuQueue;
 
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
