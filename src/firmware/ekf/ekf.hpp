@@ -67,8 +67,6 @@ namespace hf {
 
             static constexpr float MAX_VELOCITY_MPS = 10;
 
-            static const size_t QUEUE_MAX_LENGTH = 20;
-
         public:
 
             EKF()
@@ -116,18 +114,15 @@ namespace hf {
                 }
 
                 // Update with queued measurements and flush the queue
-                for (uint32_t k=0; k<_imuQueueLength; ++k) {
 
-                    const auto imudata = _imuQueue[k];
+                const auto imudata = _imuQueue[0];
 
-                    _gyroLatest = imudata.gyroDps;
-                    _gyroSubSampler = ImuSubSampler::accumulate(
-                            _gyroSubSampler, _gyroLatest);
+                _gyroLatest = imudata.gyroDps;
+                _gyroSubSampler = ImuSubSampler::accumulate(
+                        _gyroSubSampler, _gyroLatest);
 
-                    _accelSubSampler = ImuSubSampler::accumulate(
-                            _accelSubSampler, imudata.accelGs);
-                }
-                _imuQueueLength = 0;
+                _accelSubSampler = ImuSubSampler::accumulate(
+                        _accelSubSampler, imudata.accelGs);
 
                 const auto z = _x(0);
 
@@ -220,8 +215,7 @@ namespace hf {
 
             void enqueueImu(const ImuFiltered & imudata)
             {
-                _imuQueue[_imuQueueLength] = imudata;
-                _imuQueueLength = (_imuQueueLength + 1) % QUEUE_MAX_LENGTH;
+                _imuQueue[0] = imudata;
             }
 
         private:
@@ -247,8 +241,7 @@ namespace hf {
 
             // Instance vars --------------------------------------------------
 
-            ImuFiltered _imuQueue[QUEUE_MAX_LENGTH];
-            uint32_t _imuQueueLength;
+            ImuFiltered _imuQueue[1];
 
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
