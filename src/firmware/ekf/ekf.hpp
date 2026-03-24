@@ -120,7 +120,7 @@ namespace hf {
 
                 if (dt > 0) {
 
-                    const float noise[STATE_DIM] = {
+                    const float noise[Prediction::STATE_DIM] = {
                         PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                         PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                         PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
@@ -263,18 +263,6 @@ namespace hf {
             }
 
         private:
-
-            // Indexes to access the vehicle's state, stored as a column vector
-            enum {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
-            };
 
             typedef enum {
                 MEASUREMENT_ACCEL,
