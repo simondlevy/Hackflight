@@ -290,20 +290,6 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Eigen::VectorXd _q = Eigen::VectorXd(4);
 
-            static auto addCovarianceNoise(
-                    const Prediction & pred,
-                    const float * noise) -> Prediction
-            {
-                auto Pcov = pred._P;
-
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    Pcov(k,k) += noise[k] * noise[k];
-                }
-
-                return Prediction(pred._x, Pcov, pred._accelSubSampler,
-                        pred._gyroSubSampler, pred._q); 
-            }
-
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
                     const float * noise) -> Eigen::MatrixXd
             {
@@ -316,8 +302,17 @@ namespace hf {
                 return Pcov;
             }
 
-            static auto enforceSymmetry(
-                    const Eigen::MatrixXd & P) -> Eigen::MatrixXd
+            static auto addCovarianceNoise(
+                    const Prediction & pred,
+                    const float * noise) -> Prediction
+            {
+                const auto Pcov = addCovarianceNoise(pred._P, noise);
+
+                return Prediction(pred._x, Pcov, pred._accelSubSampler,
+                        pred._gyroSubSampler, pred._q); 
+            }
+
+            static auto enforceSymmetry(const Prediction & pred) -> Prediction
             {
                 Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
@@ -325,7 +320,7 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto pval = (P(i,j) + P(j,i)) / 2;
+                        const auto pval = (pred._P(i,j) + pred._P(j,i)) / 2;
 
                         Psym(i,j) = Psym(j,i) = 
                             isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
@@ -335,7 +330,8 @@ namespace hf {
 
                 }
 
-                return Psym;
+                return Prediction(pred._x, Psym, pred._accelSubSampler,
+                        pred._gyroSubSampler, pred._q); 
             }
     };
 }

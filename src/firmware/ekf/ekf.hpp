@@ -130,8 +130,8 @@ namespace hf {
                         MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                     };
 
-                    _pred._P = Prediction::addCovarianceNoise(_pred._P, noise);
-                    _pred._P = Prediction::enforceSymmetry(_pred._P);
+                    _pred = Prediction::addCovarianceNoise(_pred, noise);
+                    _pred = Prediction::enforceSymmetry(_pred);
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
@@ -209,7 +209,7 @@ namespace hf {
                     _pred._x(5) = 0;
                     _pred._x(6) = 0;
 
-                    _pred._P = Prediction::enforceSymmetry(_pred._P);
+                    _pred = Prediction::enforceSymmetry(_pred);
 
                     _isUpdated = false;
                 }
