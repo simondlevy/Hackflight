@@ -96,8 +96,25 @@ namespace hf {
                     const uint32_t lastPredictionMs,
                     const uint32_t lastProcessNoiseUpdateMs
                )
-            {
-            }
+                :
+                    _imuLatest(imuLatest),
+                    _x(x),
+                    _P(P),
+                    _didResetEstimation(didResetEstimation),
+                    _msec_prev(msec_prev),
+                    _accLatest(accLatest),
+                    _gyroLatest(gyroLatest),
+                    _accelSubSampler(accelSubSampler),
+                    _gyroSubSampler(gyroSubSampler),
+                    _predictedNX(predictedNX),
+                    _predictedNY(predictedNY),
+                    _measuredNX(measuredNX),
+                    _measuredNY(measuredNY),
+                    _R(R),
+                    _q(q),
+                    _isUpdated(isUpdated),
+                    _lastPredictionMs(lastPredictionMs),
+                    _lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs) { }
 
             auto getVehicleState(
                     const uint32_t msec_curr,
