@@ -131,7 +131,6 @@ namespace hf {
                     };
 
                     _pred._P = Prediction::addCovarianceNoise(_pred._P, noise);
-
                     _pred._P = Prediction::enforceSymmetry(_pred._P);
 
                     _lastProcessNoiseUpdateMs = msec_curr;

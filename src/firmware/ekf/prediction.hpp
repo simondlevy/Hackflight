@@ -290,6 +290,20 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Eigen::VectorXd _q = Eigen::VectorXd(4);
 
+            static auto addCovarianceNoise(
+                    const Prediction & pred,
+                    const float * noise) -> Prediction
+            {
+                auto Pcov = pred._P;
+
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    Pcov(k,k) += noise[k] * noise[k];
+                }
+
+                return Prediction(pred._x, Pcov, pred._accelSubSampler,
+                        pred._gyroSubSampler, pred._q); 
+            }
+
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
                     const float * noise) -> Eigen::MatrixXd
             {
