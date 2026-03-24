@@ -115,14 +115,12 @@ namespace hf {
 
                 // Update with queued measurements and flush the queue
 
-                const auto imudata = _imuQueue;
-
-                _gyroLatest = imudata.gyroDps;
+                _gyroLatest = _imuQueue.gyroDps;
                 _gyroSubSampler = ImuSubSampler::accumulate(
                         _gyroSubSampler, _gyroLatest);
 
                 _accelSubSampler = ImuSubSampler::accumulate(
-                        _accelSubSampler, imudata.accelGs);
+                        _accelSubSampler, _imuQueue.accelGs);
 
                 const auto z = _x(0);
 
