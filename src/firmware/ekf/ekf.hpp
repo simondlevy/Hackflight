@@ -18,6 +18,7 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/imu_subsampler.hpp>
+#include <firmware/ekf/prediction.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
