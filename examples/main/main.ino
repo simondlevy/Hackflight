@@ -111,7 +111,7 @@ void loop()
         _flyingCheck = _flyingCheck.run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
 
-        _ekf.enqueueImu(_imuFilter.output);
+        _ekf = _ekf.enqueueImu(_ekf, _imuFilter.output);
 
         const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
 

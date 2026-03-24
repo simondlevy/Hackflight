@@ -251,9 +251,28 @@ namespace hf {
                         -psi, -dpsi); // make nose-right positive
             }
 
-            void enqueueImu(const ImuFiltered & imudata)
+            static auto enqueueImu(
+                    const EKF & ekf, const ImuFiltered & imudata) -> EKF
             {
-                _imuLatest = imudata;
+                return EKF(
+                        imudata,
+                        ekf._x,
+                        ekf._P,
+                        ekf._didResetEstimation,
+                        ekf._msec_prev,
+                        ekf._accLatest,
+                        ekf._gyroLatest,
+                        ekf._accelSubSampler,
+                        ekf._gyroSubSampler,
+                        ekf._predictedNX,
+                        ekf._predictedNY,
+                        ekf._measuredNX,
+                        ekf._measuredNY,
+                        ekf._R,
+                        ekf._q,
+                        ekf._isUpdated,
+                        ekf._lastPredictionMs,
+                        ekf._lastProcessNoiseUpdateMs);
             }
 
         private:
