@@ -35,14 +35,6 @@ namespace hf {
 
         private:
 
-            // Initial variances, uncertain of position, but know we're
-            // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
-            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
-            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
-
             static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
             static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
             static constexpr float PROC_NOISE_VEL = 0;
@@ -328,35 +320,6 @@ namespace hf {
             void reset(const uint32_t msec_curr)
             {
                 _pred = Prediction();
-
-                /*
-                _pred._accelSubSampler = ImuSubSampler(G);
-                _pred._gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
-
-                // Reset the state
-                _pred._x = Eigen::VectorXd(STATE_DIM);
-
-                // Reset the attitude quaternion
-                _pred._q << 1, 0, 0, 0;
-
-                // Reset the rotation matrix
-                _R = Eigen::Matrix3d::Identity();
-
-                // Reset the covariance matrix and add the initial process
-                // noise
-                _pred._P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-                const float pinit[STATE_DIM] = {
-                    STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
-                };
-                _pred._P = Prediction::addCovarianceNoise(_pred._P, pinit);
-                */
-
                 _isUpdated = false;
                 _lastPredictionMs = msec_curr;
                 _lastProcessNoiseUpdateMs = msec_curr;
@@ -365,12 +328,12 @@ namespace hf {
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     bool isFlying)  -> EKF
             {
+                const auto dt = (msec_curr - ekf._lastPredictionMs) / 1000.0f;
+
                 const auto accelSubSampler =
                     ImuSubSampler::finalize(ekf._pred._accelSubSampler);
                 const auto gyroSubSampler =
                     ImuSubSampler::finalize(ekf._pred._gyroSubSampler);
-
-                const auto dt = (msec_curr - ekf._lastPredictionMs) / 1000.0f;
 
                 const auto accel = ekf._pred._accelSubSampler.subSample;
                 const auto gyro = ekf._pred._gyroSubSampler.subSample;
