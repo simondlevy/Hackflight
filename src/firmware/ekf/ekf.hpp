@@ -86,6 +86,8 @@ namespace hf {
                     const ImuSubSampler & gyroSubSampler,
                     const Eigen::VectorXd & q,
 
+                    const Prediction & pred,
+
                     const bool didResetEstimation,
                     const uint32_t msec_prev,
                     const Vec3 & accLatest,
@@ -107,6 +109,8 @@ namespace hf {
                     _accelSubSampler(accelSubSampler),
                     _gyroSubSampler(gyroSubSampler),
                     _q(q),
+
+                    _pred(pred),
 
                     _didResetEstimation(didResetEstimation),
                     _msec_prev(msec_prev),
@@ -268,6 +272,8 @@ namespace hf {
                         ekf._gyroSubSampler,
                         ekf._q,
 
+                        ekf._pred,
+
                         ekf._didResetEstimation,
                         ekf._msec_prev,
                         ekf._accLatest,
@@ -307,6 +313,8 @@ namespace hf {
 
             ImuFiltered _imuLatest;
 
+            ///////////////////////////////////////////////////////////////////
+
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
                 Eigen::VectorXd(STATE_DIM);
@@ -321,6 +329,10 @@ namespace hf {
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
             Eigen::VectorXd _q = Eigen::VectorXd(4);
+
+            ///////////////////////////////////////////////////////////////////
+
+            Prediction _pred;
 
             bool _didResetEstimation;
 
@@ -537,6 +549,8 @@ namespace hf {
                         accelSubSampler,
                         gyroSubSampler,
                         pqnew / norm,
+
+                        ekf._pred,
 
                         ekf._didResetEstimation,
                         ekf._msec_prev,
