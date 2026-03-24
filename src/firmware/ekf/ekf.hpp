@@ -115,12 +115,12 @@ namespace hf {
 
                 // Update with queued measurements and flush the queue
 
-                _gyroLatest = _imuQueue.gyroDps;
+                _gyroLatest = _imuLatest.gyroDps;
                 _gyroSubSampler = ImuSubSampler::accumulate(
                         _gyroSubSampler, _gyroLatest);
 
                 _accelSubSampler = ImuSubSampler::accumulate(
-                        _accelSubSampler, _imuQueue.accelGs);
+                        _accelSubSampler, _imuLatest.accelGs);
 
                 const auto z = _x(0);
 
@@ -213,7 +213,7 @@ namespace hf {
 
             void enqueueImu(const ImuFiltered & imudata)
             {
-                _imuQueue = imudata;
+                _imuLatest = imudata;
             }
 
         private:
@@ -239,7 +239,7 @@ namespace hf {
 
             // Instance vars --------------------------------------------------
 
-            ImuFiltered _imuQueue;
+            ImuFiltered _imuLatest;
 
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
