@@ -76,6 +76,29 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
 
+            EKF(
+                    const ImuFiltered & imuLatest,
+                    const Eigen::VectorXd & x,
+                    const Eigen::MatrixXd & P,
+                    const bool didResetEstimation,
+                    const uint32_t msec_prev,
+                    const Vec3 & accLatest,
+                    const Vec3 & gyroLatest,
+                    const ImuSubSampler & accelSubSampler,
+                    const ImuSubSampler & gyroSubSampler,
+                    const float predictedNX,
+                    const float predictedNY,
+                    const float measuredNX,
+                    const float measuredNY,
+                    const Eigen::MatrixXd & R,
+                    const Eigen::VectorXd & q,
+                    const bool isUpdated,
+                    const uint32_t lastPredictionMs,
+                    const uint32_t lastProcessNoiseUpdateMs
+               )
+            {
+            }
+
             auto getVehicleState(
                     const uint32_t msec_curr,
                     const bool isFlying,
