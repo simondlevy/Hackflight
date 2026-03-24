@@ -139,6 +139,8 @@ namespace hf {
                 // Update with queued measurements and flush the queue
 
                 _gyroLatest = _imuLatest.gyroDps;
+
+                // XXX
                 _pred._gyroSubSampler = ImuSubSampler::accumulate(
                         _pred._gyroSubSampler, _gyroLatest);
 
@@ -179,6 +181,8 @@ namespace hf {
                         // normalize and store the result
                         float norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                                 tmpq3 * tmpq3) + EPSILON;
+
+                        // XXX
                         _pred._q(0) = tmpq0 / norm;
                         _pred._q(1) = tmpq1 / norm;
                         _pred._q(2) = tmpq2 / norm;
@@ -203,11 +207,6 @@ namespace hf {
                     _R(2,2) = _pred._q(0) * _pred._q(0) - _pred._q(1) *
                         _pred._q(1) - _pred._q(2) * _pred._q(2) + _pred._q(3) *
                         _pred._q(3);
-
-                    // reset the attitude error
-                    _pred._x(4) = 0;
-                    _pred._x(5) = 0;
-                    _pred._x(6) = 0;
 
                     _pred = Prediction::enforceSymmetry(_pred);
 

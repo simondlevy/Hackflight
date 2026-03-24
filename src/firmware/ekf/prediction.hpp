@@ -330,7 +330,10 @@ namespace hf {
 
                 }
 
-                return Prediction(pred._x, Psym, pred._accelSubSampler,
+                __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
+                x << pred._x(0), pred._x(1), pred._x(2), pred._x(3), 0, 0, 0;
+
+                return Prediction(x, Psym, pred._accelSubSampler,
                         pred._gyroSubSampler, pred._q); 
             }
     };
