@@ -139,7 +139,7 @@ namespace hf {
                         MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                     };
 
-                    _pred._P = addCovarianceNoise(_pred._P, noise);
+                    _pred._P = Prediction::addCovarianceNoise(_pred._P, noise);
 
                     _pred._P = enforceSymmetry(_pred._P);
 
@@ -198,15 +198,21 @@ namespace hf {
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and acc
 
-                    _R(0,0) = _pred._q(0) * _pred._q(0) + _pred._q(1) * _pred._q(1) - _pred._q(2) * _pred._q(2) - _pred._q(3) * _pred._q(3);
-                    _R(0,1) = 2 * _pred._q(1) * _pred._q(2) - 2 * _pred._q(0) * _pred._q(3);
+                    _R(0,0) = _pred._q(0) * _pred._q(0) + _pred._q(1) *
+                        _pred._q(1) - _pred._q(2) * _pred._q(2) - _pred._q(3) *
+                        _pred._q(3); _R(0,1) = 2 * _pred._q(1) * _pred._q(2) -
+                        2 * _pred._q(0) * _pred._q(3);
                     _R(0,2) = 2 * _pred._q(1) * _pred._q(3) + 2 * _pred._q(0) * _pred._q(2);
                     _R(1,0) = 2 * _pred._q(1) * _pred._q(2) + 2 * _pred._q(0) * _pred._q(3);
-                    _R(1,1) = _pred._q(0) * _pred._q(0) - _pred._q(1) * _pred._q(1) + _pred._q(2) * _pred._q(2) - _pred._q(3) * _pred._q(3);
-                    _R(1,2) = 2 * _pred._q(2) * _pred._q(3) - 2 * _pred._q(0) * _pred._q(1);
+                    _R(1,1) = _pred._q(0) * _pred._q(0) - _pred._q(1) *
+                        _pred._q(1) + _pred._q(2) * _pred._q(2) - _pred._q(3) *
+                        _pred._q(3); _R(1,2) = 2 * _pred._q(2) * _pred._q(3) -
+                        2 * _pred._q(0) * _pred._q(1);
                     _R(2,0) = 2 * _pred._q(1) * _pred._q(3) - 2 * _pred._q(0) * _pred._q(2);
                     _R(2,1) = 2 * _pred._q(2) * _pred._q(3) + 2 * _pred._q(0) * _pred._q(1);
-                    _R(2,2) = _pred._q(0) * _pred._q(0) - _pred._q(1) * _pred._q(1) - _pred._q(2) * _pred._q(2) + _pred._q(3) * _pred._q(3);
+                    _R(2,2) = _pred._q(0) * _pred._q(0) - _pred._q(1) *
+                        _pred._q(1) - _pred._q(2) * _pred._q(2) + _pred._q(3) *
+                        _pred._q(3);
 
                     // reset the attitude error
                     _pred._x(4) = 0;
@@ -222,17 +228,25 @@ namespace hf {
                 const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
                 const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
 
-                const auto phi = Num::RAD2DEG * atan2f(2*(_pred._q(2)*_pred._q(3)+_pred._q(0)* _pred._q(1)) ,
-                        _pred._q(0)*_pred._q(0) - _pred._q(1)*_pred._q(1) - _pred._q(2)*_pred._q(2) + _pred._q(3)*_pred._q(3));
+                const auto phi = Num::RAD2DEG *
+                    atan2f(2*(_pred._q(2)*_pred._q(3)+_pred._q(0)* _pred._q(1))
+                            , _pred._q(0)*_pred._q(0) - _pred._q(1)*_pred._q(1)
+                            - _pred._q(2)*_pred._q(2) +
+                            _pred._q(3)*_pred._q(3));
 
                 const auto dphi = _gyroLatest.x;
 
-                const auto theta = Num::RAD2DEG * asinf(-2*(_pred._q(1)*_pred._q(3) - _pred._q(0)*_pred._q(2)));
+                const auto theta = Num::RAD2DEG *
+                    asinf(-2*(_pred._q(1)*_pred._q(3) -
+                                _pred._q(0)*_pred._q(2)));
 
                 const auto dtheta = _gyroLatest.y;
 
-                const auto psi = Num::RAD2DEG * atan2f(2*(_pred._q(1)*_pred._q(2)+_pred._q(0)* _pred._q(3)),
-                        _pred._q(0)*_pred._q(0) + _pred._q(1)*_pred._q(1) - _pred._q(2)*_pred._q(2) - _pred._q(3)*_pred._q(3)); 
+                const auto psi = Num::RAD2DEG *
+                    atan2f(2*(_pred._q(1)*_pred._q(2)+_pred._q(0)*
+                                _pred._q(3)), _pred._q(0)*_pred._q(0) +
+                            _pred._q(1)*_pred._q(1) - _pred._q(2)*_pred._q(2) -
+                            _pred._q(3)*_pred._q(3)); 
 
                 const auto dpsi = _gyroLatest.z;
 
@@ -341,7 +355,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
-                _pred._P = addCovarianceNoise(_pred._P, pinit);
+                _pred._P = Prediction::addCovarianceNoise(_pred._P, pinit);
 
                 _isUpdated = false;
                 _lastPredictionMs = msec_curr;
@@ -454,11 +468,14 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                const auto x1 = ekf._pred._x(1) + dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                const auto x1 = ekf._pred._x(1) + dt * (accelx + gyro.z *
+                        tmpSPY - gyro.y * tmpSPZ
                         - G * ekf._R(2,0));
-                const auto x2 = ekf._pred._x(2) + dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                const auto x2 = ekf._pred._x(2) + dt * (accely - gyro.z *
+                        tmpSPX + gyro.x * tmpSPZ
                         - G * ekf._R(2,1));
-                const auto x3 = ekf._pred._x(3) + dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                const auto x3 = ekf._pred._x(3) + dt * (accel.z + gyro.y *
+                        tmpSPX - gyro.x * tmpSPY
                         - G * ekf._R(2,2));
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
@@ -479,10 +496,14 @@ namespace hf {
 
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
                 pq <<
-                    dq[0]*ekf._pred._q(0) - dq[1]*ekf._pred._q(1) - dq[2]*ekf._pred._q(2) - dq[3]*ekf._pred._q(3),
-                    dq[1]*ekf._pred._q(0) + dq[0]*ekf._pred._q(1) + dq[3]*ekf._pred._q(2) - dq[2]*ekf._pred._q(3),
-                    dq[2]*ekf._pred._q(0) - dq[3]*ekf._pred._q(1) + dq[0]*ekf._pred._q(2) + dq[1]*ekf._pred._q(3),
-                    dq[3]*ekf._pred._q(0) + dq[2]*ekf._pred._q(1) - dq[1]*ekf._pred._q(2) + dq[0]*ekf._pred._q(3);
+                    dq[0]*ekf._pred._q(0) - dq[1]*ekf._pred._q(1) -
+                    dq[2]*ekf._pred._q(2) - dq[3]*ekf._pred._q(3),
+                    dq[1]*ekf._pred._q(0) + dq[0]*ekf._pred._q(1) +
+                        dq[3]*ekf._pred._q(2) - dq[2]*ekf._pred._q(3),
+                    dq[2]*ekf._pred._q(0) - dq[3]*ekf._pred._q(1) +
+                        dq[0]*ekf._pred._q(2) + dq[1]*ekf._pred._q(3),
+                    dq[3]*ekf._pred._q(0) + dq[2]*ekf._pred._q(1) -
+                        dq[1]*ekf._pred._q(2) + dq[0]*ekf._pred._q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
@@ -494,7 +515,8 @@ namespace hf {
                 const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
 
                 __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
-                x << x0, x1, x2, x3, ekf._pred._x(4), ekf._pred._x(5), ekf._pred._x(6); 
+                x << x0, x1, x2, x3, ekf._pred._x(4), ekf._pred._x(5),
+                  ekf._pred._x(6); 
 
                 const auto pred = Prediction(x, P, accelSubSampler, gyroSubSampler, 
                         pqnew / norm);
@@ -604,8 +626,9 @@ namespace hf {
                 const auto tmpSPZ = _pred._x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _pred._x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = _pred._x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = _pred._x(1) * dt + (isFlying ? 0 : accel.x *
+                        dt2 / 2.0f); const auto dy = _pred._x(2) * dt +
+                    (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
                 const auto dz = _pred._x(3) * dt + accel.z * dt2 / 2.0f; 
@@ -667,18 +690,6 @@ namespace hf {
             static bool velInBounds(const float vel)
             {
                 return fabs(vel) < MAX_VELOCITY_MPS;
-            }
-
-            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
-                    const float * noise) -> Eigen::MatrixXd
-            {
-                auto Pcov = P;
-
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    Pcov(k,k) += noise[k] * noise[k];
-                }
-
-                return Pcov;
             }
 
             static auto enforceSymmetry(
