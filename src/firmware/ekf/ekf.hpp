@@ -56,10 +56,6 @@ namespace hf {
             //We do get the measurements in 10x the motion pixels (experimentally measured)
             static constexpr float FLOW_RESOLUTION = 0.1;
 
-            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
-            static constexpr float MAX_COVARIANCE = 100;
-            static constexpr float MIN_COVARIANCE = 1e-6;
-
             // Small number epsilon, to prevent dividing by zero
             static constexpr float EPSILON = 1e-6f;
 
@@ -141,7 +137,7 @@ namespace hf {
 
                     _pred._P = Prediction::addCovarianceNoise(_pred._P, noise);
 
-                    _pred._P = enforceSymmetry(_pred._P);
+                    _pred._P = Prediction::enforceSymmetry(_pred._P);
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
@@ -219,7 +215,7 @@ namespace hf {
                     _pred._x(5) = 0;
                     _pred._x(6) = 0;
 
-                    _pred._P = enforceSymmetry(_pred._P);
+                    _pred._P = Prediction::enforceSymmetry(_pred._P);
 
                     _isUpdated = false;
                 }
@@ -692,26 +688,5 @@ namespace hf {
                 return fabs(vel) < MAX_VELOCITY_MPS;
             }
 
-            static auto enforceSymmetry(
-                    const Eigen::MatrixXd & P) -> Eigen::MatrixXd
-            {
-                Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        const auto pval = (P(i,j) + P(j,i)) / 2;
-
-                        Psym(i,j) = Psym(j,i) = 
-                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                            pval;
-                    }
-
-                }
-
-                return Psym;
-            }
     };
 }

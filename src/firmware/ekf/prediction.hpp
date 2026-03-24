@@ -46,6 +46,10 @@ namespace hf {
             static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
 
+            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
+            static constexpr float MAX_COVARIANCE = 100;
+            static constexpr float MIN_COVARIANCE = 1e-6;
+
             // Indexes to access the vehicle's state, stored as a column vector
             enum {
                 STATE_Z,
@@ -125,6 +129,28 @@ namespace hf {
                 }
 
                 return Pcov;
+            }
+
+            static auto enforceSymmetry(
+                    const Eigen::MatrixXd & P) -> Eigen::MatrixXd
+            {
+                Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        const auto pval = (P(i,j) + P(j,i)) / 2;
+
+                        Psym(i,j) = Psym(j,i) = 
+                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                            pval;
+                    }
+
+                }
+
+                return Psym;
             }
     };
 }
