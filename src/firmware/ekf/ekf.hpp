@@ -327,6 +327,9 @@ namespace hf {
 
             void reset(const uint32_t msec_curr)
             {
+                _pred = Prediction();
+
+                /*
                 _pred._accelSubSampler = ImuSubSampler(G);
                 _pred._gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 
@@ -352,6 +355,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
                 _pred._P = Prediction::addCovarianceNoise(_pred._P, pinit);
+                */
 
                 _isUpdated = false;
                 _lastPredictionMs = msec_curr;
