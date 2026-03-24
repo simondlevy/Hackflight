@@ -227,8 +227,9 @@ namespace hf {
                         tmpSPX - gyro.x * tmpSPY
                         - G * R(2,2));
 
-                // attitude update (rotate by gyroscope), we do this in quaternions
-                // this is the gyroscope angular velocity integrated over the sample period
+                // attitude update (rotate by gyro), we do this in quaternions
+                // this is the gyro angular velocity integrated over the sample
+                // period
                 const auto dtwx = dt*gyro.x;
                 const auto dtwy = dt*gyro.y;
                 const auto dtwz = dt*gyro.z;
@@ -239,7 +240,8 @@ namespace hf {
                 const auto sa = sin(angle/2.0f);
                 const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
-                // rotate the vehicle's attitude by the delta quaternion vector computed above
+                // rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
@@ -258,7 +260,8 @@ namespace hf {
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
                 qinit << 1, 0, 0, 0;
 
-                const auto pqnew = isFlying ? pq : keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
+                const auto pqnew =isFlying ? pq : keep * pq +
+                    ROLLPITCH_ZERO_REVERSION * qinit;
 
                 // normalize and store the result
                 const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
