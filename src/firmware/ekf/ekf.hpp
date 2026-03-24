@@ -78,40 +78,44 @@ namespace hf {
 
             EKF(
                     const ImuFiltered & imuLatest,
+
                     const Eigen::VectorXd & x,
                     const Eigen::MatrixXd & P,
+                    const ImuSubSampler & accelSubSampler,
+                    const ImuSubSampler & gyroSubSampler,
+                    const Eigen::VectorXd & q,
+
                     const bool didResetEstimation,
                     const uint32_t msec_prev,
                     const Vec3 & accLatest,
                     const Vec3 & gyroLatest,
-                    const ImuSubSampler & accelSubSampler,
-                    const ImuSubSampler & gyroSubSampler,
                     const float predictedNX,
                     const float predictedNY,
                     const float measuredNX,
                     const float measuredNY,
                     const Eigen::MatrixXd & R,
-                    const Eigen::VectorXd & q,
                     const bool isUpdated,
                     const uint32_t lastPredictionMs,
                     const uint32_t lastProcessNoiseUpdateMs
                )
                 :
                     _imuLatest(imuLatest),
+
                     _x(x),
                     _P(P),
+                    _accelSubSampler(accelSubSampler),
+                    _gyroSubSampler(gyroSubSampler),
+                    _q(q),
+
                     _didResetEstimation(didResetEstimation),
                     _msec_prev(msec_prev),
                     _accLatest(accLatest),
                     _gyroLatest(gyroLatest),
-                    _accelSubSampler(accelSubSampler),
-                    _gyroSubSampler(gyroSubSampler),
                     _predictedNX(predictedNX),
                     _predictedNY(predictedNY),
                     _measuredNX(measuredNX),
                     _measuredNY(measuredNY),
                     _R(R),
-                    _q(q),
                     _isUpdated(isUpdated),
                     _lastPredictionMs(lastPredictionMs),
                     _lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs) { }
@@ -256,20 +260,22 @@ namespace hf {
             {
                 return EKF(
                         imudata,
+
                         ekf._x,
                         ekf._P,
+                        ekf._accelSubSampler,
+                        ekf._gyroSubSampler,
+                        ekf._q,
+
                         ekf._didResetEstimation,
                         ekf._msec_prev,
                         ekf._accLatest,
                         ekf._gyroLatest,
-                        ekf._accelSubSampler,
-                        ekf._gyroSubSampler,
                         ekf._predictedNX,
                         ekf._predictedNY,
                         ekf._measuredNX,
                         ekf._measuredNY,
                         ekf._R,
-                        ekf._q,
                         ekf._isUpdated,
                         ekf._lastPredictionMs,
                         ekf._lastProcessNoiseUpdateMs);
@@ -307,15 +313,20 @@ namespace hf {
             // Covariance matrix
             Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
+            ImuSubSampler _accelSubSampler;
+            ImuSubSampler _gyroSubSampler;
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            Eigen::VectorXd _q = Eigen::VectorXd(4);
+
             bool _didResetEstimation;
 
             uint32_t _msec_prev;
 
             Vec3 _accLatest;
             Vec3 _gyroLatest;
-
-            ImuSubSampler _accelSubSampler;
-            ImuSubSampler _gyroSubSampler;
 
             float _predictedNX;
             float _predictedNY;
@@ -326,11 +337,6 @@ namespace hf {
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
             Eigen::MatrixXd _R = Eigen::MatrixXd(3, 3);
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
-            Eigen::VectorXd _q = Eigen::VectorXd(4);
 
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
@@ -524,20 +530,22 @@ namespace hf {
 
                 return EKF(
                         ekf._imuLatest,
+
                         x,
                         P,
+                        accelSubSampler,
+                        gyroSubSampler,
+                        pqnew / norm,
+
                         ekf._didResetEstimation,
                         ekf._msec_prev,
                         ekf._accLatest,
                         ekf._gyroLatest,
-                        accelSubSampler,
-                        gyroSubSampler,
                         ekf._predictedNX,
                         ekf._predictedNY,
                         ekf._measuredNX,
                         ekf._measuredNY,
                         ekf._R,
-                        pqnew / norm,
                         true,
                         msec_curr,
                         ekf._lastProcessNoiseUpdateMs);
