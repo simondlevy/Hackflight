@@ -86,7 +86,6 @@ namespace hf {
 
             Prediction& operator=(const Prediction& other) = default;
 
-            /*
             Prediction(
 
                     const Eigen::VectorXd & x,
@@ -100,7 +99,6 @@ namespace hf {
                     _accelSubSampler(accelSubSampler),
                     _gyroSubSampler(gyroSubSampler),
                     _q(q) { }
-                    */
 
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
