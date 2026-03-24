@@ -100,6 +100,7 @@ namespace hf {
                     _accelSubSampler(accelSubSampler),
                     _gyroSubSampler(gyroSubSampler),
                     _q(q) { }
+                    */
 
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
@@ -127,7 +128,5 @@ namespace hf {
 
                 return Pcov;
             }
-            */
-
     };
 }
