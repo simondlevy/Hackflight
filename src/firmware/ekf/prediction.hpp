@@ -58,7 +58,6 @@ namespace hf {
                 STATE_DIM
             };
 
-            /*
             Prediction()
             {
                 _accelSubSampler = ImuSubSampler(G);
@@ -87,6 +86,7 @@ namespace hf {
 
             Prediction& operator=(const Prediction& other) = default;
 
+            /*
             Prediction(
 
                     const Eigen::VectorXd & x,
