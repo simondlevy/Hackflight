@@ -134,8 +134,8 @@ namespace hf {
                 const auto gyroSubSampler =
                     ImuSubSampler::finalize(pred._gyroSubSampler);
 
-                const auto accel = pred._accelSubSampler.subSample;
-                const auto gyro = pred._gyroSubSampler.subSample;
+                const auto accel = /*pred._*/accelSubSampler.subSample;
+                const auto gyro = /*pred._*/gyroSubSampler.subSample;
 
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;

@@ -94,8 +94,167 @@ namespace hf {
 
             static auto predict(const EKF & ekf, const bool isFlying) -> EKF
             {
+                /*
+                const auto accelSubSampler =
+                    ImuSubSampler::finalize(ekf._accelSubSampler);
+                const auto gyroSubSampler =
+                    ImuSubSampler::finalize(ekf._gyroSubSampler);
+
+                const auto accel = ekf._accelSubSampler.subSample;
+                const auto gyro = ekf._gyroSubSampler.subSample;
+
+                const auto d0 = gyro.x*dt/2;
+                const auto d1 = gyro.y*dt/2;
+                const auto d2 = gyro.z*dt/2;
+
+                const auto vx = ekf._x(1);
+                const auto vy = ekf._x(2);
+                const auto vz = ekf._x(3);*/
+
                 return ekf;
-            }
+                
+                /*
+                // Jacobian of state transition function
+                static Eigen::MatrixXd F(STATE_DIM, STATE_DIM);
+
+                // position
+                F(0, 0) = 1;
+
+                // position from body-frame velocity
+                F(0,1) = R(2,0)*dt;
+
+                F(0,2) = R(2,1)*dt;
+
+                F(0,3) = R(2,2)*dt;
+
+                // position from attitude error
+                F(0,4) = (vy*R(2,2) - vz*R(2,1))*dt;
+
+                F(0,5) = (-vx*R(2,2) + vz*R(2,0))*dt;
+
+                F(0,6) = (vx*R(2,1) - vy*R(2,0))*dt;
+
+                // body-frame velocity from body-frame velocity
+                F(1,1) = 1; //drag negligible
+                F(2,1) =-gyro.z*dt;
+                F(3,1) = gyro.y*dt;
+
+                F(1,2) = gyro.z*dt;
+                F(2,2) = 1; //drag negligible
+                F(3,2) =-gyro.x*dt;
+
+                F(1,3) =-gyro.y*dt;
+                F(2,3) = gyro.x*dt;
+                F(3,3) = 1; //drag negligible
+
+                // body-frame velocity from attitude error
+                F(1,4) =  0;
+                F(2,4) = -G*R(2,2)*dt;
+                F(3,4) =  G*R(2,1)*dt;
+
+                F(1,5) =  G*R(2,2)*dt;
+                F(2,5) =  0;
+                F(3,5) = -G*R(2,0)*dt;
+
+                F(1,6) = -G*R(2,1)*dt;
+                F(2,6) =  G*R(2,0)*dt;
+                F(3,6) =  0;
+
+                F(4,4) =  1 - d1*d1/2 - d2*d2/2;
+                F(4,5) =  d2 + d0*d1/2;
+                F(4,6) = -d1 + d0*d2/2;
+
+                F(5,4) = -d2 + d0*d1/2;
+                F(5,5) =  1 - d0*d0/2 - d2*d2/2;
+                F(5,6) =  d0 + d1*d2/2;
+
+                F(6,4) =  d1 + d0*d2/2;
+                F(6,5) = -d0 + d1*d2/2;
+                F(6,6) = 1 - d0*d0/2 - d1*d1/2;
+
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+                const auto P = (F * pred._P) * F.transpose();
+
+                const auto dt2 = dt * dt;
+
+                // keep previous time step's state for the update
+                const auto tmpSPX = pred.x(1);
+                const auto tmpSPY = pred.x(2);
+                const auto tmpSPZ = pred.x(3);
+
+                // position updates in the body frame (will be rotated to inertial frame)
+                const auto dx = pred.x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = pred.x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+
+                // thrust can only be produced in the body's Z direction
+                const auto dz = pred.x(3) * dt + accel.z * dt2 / 2.0f; 
+
+                // position update
+                const auto x0 = pred.x(0) + R(2,0) * dx + R(2,1) * dy
+                    + R(2,2) * dz - G * dt2 / 2.0f;
+
+                const auto accelx = isFlying ? 0 : accel.x;
+                const auto accely = isFlying ? 0 : accel.y;
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+
+                const auto x1 = pred.x(1) + dt * (accelx + gyro.z *
+                        tmpSPY - gyro.y * tmpSPZ
+                        - G * R(2,0));
+                const auto x2 = pred.x(2) + dt * (accely - gyro.z *
+                        tmpSPX + gyro.x * tmpSPZ
+                        - G * R(2,1));
+                const auto x3 = pred.x(3) + dt * (accel.z + gyro.y *
+                        tmpSPX - gyro.x * tmpSPY
+                        - G * R(2,2));
+
+                // attitude update (rotate by gyro), we do this in quaternions
+                // this is the gyro angular velocity integrated over the sample
+                // period
+                const auto dtwx = dt*gyro.x;
+                const auto dtwy = dt*gyro.y;
+                const auto dtwz = dt*gyro.z;
+
+                // compute the quaternion values in [w,x,y,z] order
+                const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const auto ca = cos(angle/2.0f);
+                const auto sa = sin(angle/2.0f);
+                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+
+                // rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
+
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+
+                Eigen::VectorXd pq = Eigen::VectorXd(4);
+                pq <<
+                    dq[0]*pred.q(0) - dq[1]*pred.q(1) -
+                    dq[2]*pred.q(2) - dq[3]*pred.q(3),
+                    dq[1]*pred.q(0) + dq[0]*pred.q(1) +
+                        dq[3]*pred.q(2) - dq[2]*pred.q(3),
+                    dq[2]*pred.q(0) - dq[3]*pred.q(1) +
+                        dq[0]*pred.q(2) + dq[1]*pred.q(3),
+                    dq[3]*pred.q(0) + dq[2]*pred.q(1) -
+                        dq[1]*pred.q(2) + dq[0]*pred.q(3);
+
+                // Quaternion used for initial orientation
+                Eigen::VectorXd qinit = Eigen::VectorXd(4);
+                qinit << 1, 0, 0, 0;
+
+                const auto pqnew = isFlying ? pq : keep * pq +
+                    ROLLPITCH_ZERO_REVERSION * qinit;
+
+                // normalize and store the result
+                const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
+
+                __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
+                x << x0, x1, x2, x3, pred.x(4), pred.x(5), pred.x(6); 
+
+                return Prediction(
+                        x, pqnew/norm, P, accelSubSampler, gyroSubSampler);
+                */
+             }
 
             auto run(
                     const uint32_t msec_curr,
