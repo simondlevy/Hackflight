@@ -93,7 +93,31 @@ namespace hf {
                 // Reset the covariance matrix and add the initial process
                 // noise
                 _P = initializeCovarianceMatrix();
-             }
+            }
+
+            EKF(
+                    const Eigen::VectorXd & x,
+                    const Eigen::VectorXd & q,
+                    const Eigen::MatrixXd & P,
+                    const ImuSubSampler & accelSubSampler,
+                    const ImuSubSampler & gyroSubSampler,
+                    const bool didResetEstimation,
+                    const uint32_t msec_prev,
+                    const Eigen::MatrixXd & R,
+                    const bool isUpdated,
+                    const uint32_t lastPredictionMs,
+                    const uint32_t lastProcessNoiseUpdateMs)
+                :
+                    _x(x),
+                    _q(q),
+                    _gyroSubSampler(gyroSubSampler),
+                    _accelSubSampler(accelSubSampler),
+                    _didResetEstimation(didResetEstimation),
+                    _msec_prev(msec_prev),
+                    _R(R),
+                    _isUpdated(isUpdated),
+                    _lastPredictionMs(lastPredictionMs),
+                    _lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs) { }
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
@@ -142,7 +166,7 @@ namespace hf {
                 const auto x3 = ekf._x(3) + dt * (accel.z + gyro.y *
                         tmpSPX - gyro.x * tmpSPY
                         - G * ekf._R(2,2));
- 
+
                 // attitude update (rotate by gyro), we do this in quaternions
                 // this is the gyro angular velocity integrated over the sample
                 // period
@@ -188,8 +212,8 @@ namespace hf {
                 return ekf;
 
                 /*return EKF(
-                        x, pqnew/norm, P, accelSubSampler, gyroSubSampler);*/
-             }
+                  x, pqnew/norm, P, accelSubSampler, gyroSubSampler);*/
+            }
 
             auto update(
                     const uint32_t msec_curr,
@@ -279,7 +303,7 @@ namespace hf {
                 // rotate body-frame velocity and acc
                 _R = _isUpdated ? quat2rotation(_pred.q) : _R;
 
-                 _pred = _isUpdated ? Prediction::enforceSymmetry(_pred) : _pred;
+                _pred = _isUpdated ? Prediction::enforceSymmetry(_pred) : _pred;
 
                 _P = _isUpdated ? enforceSymmetry(addCovarianceNoise(_P, noise)) :
                     _P;
@@ -321,7 +345,7 @@ namespace hf {
                         -psi, -dpsi); // make nose-right positive
             }
 
-       private:
+        private:
 
             // Prediction -----------------------------------------------------
 
@@ -338,22 +362,14 @@ namespace hf {
             // Covariance matrix
             Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
-            ImuSubSampler _accelSubSampler;
             ImuSubSampler _gyroSubSampler;
-
-            Prediction _pred;
+            ImuSubSampler _accelSubSampler;
 
             // Update --------------------------------------------------------
 
             bool _didResetEstimation;
 
             uint32_t _msec_prev;
-
-            float _predictedNX;
-            float _predictedNY;
-
-            float _measuredNX;
-            float _measuredNY;
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
@@ -366,6 +382,8 @@ namespace hf {
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
 
+            // ---------------------------------------------------------------
+            Prediction _pred;
             // ---------------------------------------------------------------
 
             static auto initializeGyroSubSampler() -> ImuSubSampler
@@ -428,34 +446,34 @@ namespace hf {
 
             static auto enforceSymmetry(const Eigen::MatrixXd & P) ->
                 Eigen::MatrixXd
-            {
-                Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+                {
+                    Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
-                for (int i=0; i<STATE_DIM; i++) {
+                    for (int i=0; i<STATE_DIM; i++) {
 
-                    for (int j=i; j<STATE_DIM; j++) {
+                        for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto pval = (P(i,j) + P(j,i)) / 2;
+                            const auto pval = (P(i,j) + P(j,i)) / 2;
 
-                        Psym(i,j) = Psym(j,i) = 
-                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                            pval;
+                            Psym(i,j) = Psym(j,i) = 
+                                isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                                i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                                pval;
+                        }
+
                     }
 
+                    return Psym;
                 }
-
-                return Psym;
-            }
 
             static auto enforceSymmetry(const Eigen::VectorXd & x)
                 -> Eigen::VectorXd
-            {
-                Eigen::VectorXd xsym = Eigen::VectorXd(STATE_DIM);
-                xsym << x(0), x(1), x(2), x(3), 0, 0, 0;
-                return xsym;
+                {
+                    Eigen::VectorXd xsym = Eigen::VectorXd(STATE_DIM);
+                    xsym << x(0), x(1), x(2), x(3), 0, 0, 0;
+                    return xsym;
 
-            }
+                }
 
             static auto tryToToIncorporateAttitude(
                     const Eigen::VectorXd & q,
@@ -577,7 +595,7 @@ namespace hf {
                 return F;
             }
 
- 
+
             static auto quat2rotation(
                     const Eigen::VectorXd & q) -> Eigen::MatrixXd
             {
@@ -606,5 +624,5 @@ namespace hf {
             {
                 return fabs(vel) > MIN_VELOCITY_MPS;
             }
-      };
+    };
 }
