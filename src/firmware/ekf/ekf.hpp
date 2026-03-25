@@ -82,12 +82,15 @@ namespace hf {
                     const bool isFlying,
                     const uint32_t prediction_freq=100) -> VehicleState
             {
-                if (_didResetEstimation) {
-                    _pred = Prediction();
-                    _isUpdated = false;
-                    _lastPredictionMs = msec_curr;
-                    _lastProcessNoiseUpdateMs = msec_curr;
-                }
+                _pred = _didResetEstimation ? Prediction() : _pred;
+
+                _isUpdated = _didResetEstimation ? false : _isUpdated;
+
+                _lastPredictionMs = _didResetEstimation ? msec_curr :
+                    _lastPredictionMs;
+
+                _lastProcessNoiseUpdateMs = _didResetEstimation ? msec_curr :
+                    _lastProcessNoiseUpdateMs;
 
                 _didResetEstimation = false;
 
