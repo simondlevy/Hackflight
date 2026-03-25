@@ -191,9 +191,7 @@ namespace hf {
 
                 // rotate the vehicle's attitude by the delta quaternion vector
                 // computed above
-
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
                 pq <<
                     dq[0]*pred.q(0) - dq[1]*pred.q(1) -

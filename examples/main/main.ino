@@ -99,7 +99,7 @@ void loop()
     }*/
 
     if (_ekfPredictionTimer.ready(micros())) {
-        _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
+        _ekf = _ekf; //hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
     }
 
     if (_imu.available()) {
@@ -118,7 +118,7 @@ void loop()
         _flyingCheck = _flyingCheck.run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
 
-        const auto state = _ekf.run(millis(), _imuFilter.output,
+        const auto state = _ekf.update(millis(), _imuFilter.output,
                 _flyingCheck.isFlying);
 
         _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);

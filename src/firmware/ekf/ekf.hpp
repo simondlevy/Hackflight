@@ -191,7 +191,7 @@ namespace hf {
                         x, pqnew/norm, P, accelSubSampler, gyroSubSampler);*/
              }
 
-            auto run(
+            auto update(
                     const uint32_t msec_curr,
                     const ImuFiltered & imudata,
                     const bool isFlying,
@@ -258,7 +258,7 @@ namespace hf {
                 _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
                     _lastProcessNoiseUpdateMs;
 
-                _gyroLatest = imudata.gyroDps;
+                const auto gyroLatest = imudata.gyroDps;
 
                 _pred = Prediction::accumulateImu(_pred, imudata);
 
@@ -298,18 +298,18 @@ namespace hf {
                     atan2f(2*(q(2)*q(3)+q(0)* q(1)),
                             q(0)*q(0) - q(1)*q(1) - q(2)*q(2) + q(3)*q(3));
 
-                const auto dphi = _gyroLatest.x;
+                const auto dphi = gyroLatest.x;
 
                 const auto theta = Num::RAD2DEG *
                     asinf(-2*(q(1)*q(3) - q(0)*q(2)));
 
-                const auto dtheta = _gyroLatest.y;
+                const auto dtheta = gyroLatest.y;
 
                 const auto psi = Num::RAD2DEG *
                     atan2f(2*(q(1)*q(2)+q(0)* q(3)),
                             q(0)*q(0) + q(1)*q(1) - q(2)*q(2) - q(3)*q(3)); 
 
-                const auto dpsi = _gyroLatest.z;
+                const auto dpsi = gyroLatest.z;
 
                 _didResetEstimation =
                     (!Prediction::isVelInBounds(dx) ||
@@ -323,13 +323,16 @@ namespace hf {
 
        private:
 
+            // Prediction -----------------------------------------------------
+
             // State vector
             __attribute__((aligned(4))) Eigen::VectorXd _x =
                 Eigen::VectorXd(STATE_DIM);
 
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a
+            // quaternion to allow easy normalization (in comparison to a
+            // rotation matrix), while also being robust against singularities
+            // (in comparison to euler angles)
             Eigen::VectorXd _q = Eigen::VectorXd(4);
 
             // Covariance matrix
@@ -340,12 +343,11 @@ namespace hf {
 
             Prediction _pred;
 
+            // Update --------------------------------------------------------
+
             bool _didResetEstimation;
 
             uint32_t _msec_prev;
-
-            Vec3 _accLatest;
-            Vec3 _gyroLatest;
 
             float _predictedNX;
             float _predictedNY;
@@ -363,6 +365,8 @@ namespace hf {
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
+
+            // ---------------------------------------------------------------
 
             static auto initializeGyroSubSampler() -> ImuSubSampler
             {
