@@ -186,22 +186,7 @@ namespace hf {
 
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and acc
-
-                    _R(0,0) = _pred._q(0) * _pred._q(0) + _pred._q(1) *
-                        _pred._q(1) - _pred._q(2) * _pred._q(2) - _pred._q(3) *
-                        _pred._q(3); _R(0,1) = 2 * _pred._q(1) * _pred._q(2) -
-                        2 * _pred._q(0) * _pred._q(3);
-                    _R(0,2) = 2 * _pred._q(1) * _pred._q(3) + 2 * _pred._q(0) * _pred._q(2);
-                    _R(1,0) = 2 * _pred._q(1) * _pred._q(2) + 2 * _pred._q(0) * _pred._q(3);
-                    _R(1,1) = _pred._q(0) * _pred._q(0) - _pred._q(1) *
-                        _pred._q(1) + _pred._q(2) * _pred._q(2) - _pred._q(3) *
-                        _pred._q(3); _R(1,2) = 2 * _pred._q(2) * _pred._q(3) -
-                        2 * _pred._q(0) * _pred._q(1);
-                    _R(2,0) = 2 * _pred._q(1) * _pred._q(3) - 2 * _pred._q(0) * _pred._q(2);
-                    _R(2,1) = 2 * _pred._q(2) * _pred._q(3) + 2 * _pred._q(0) * _pred._q(1);
-                    _R(2,2) = _pred._q(0) * _pred._q(0) - _pred._q(1) *
-                        _pred._q(1) - _pred._q(2) * _pred._q(2) + _pred._q(3) *
-                        _pred._q(3);
+                    _R = quat2rotation(_pred._q);
 
                     _pred = Prediction::enforceSymmetry(_pred);
 
@@ -240,6 +225,25 @@ namespace hf {
 
                 return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
                         -psi, -dpsi); // make nose-right positive
+            }
+
+            static auto quat2rotation(
+                    const Eigen::VectorXd & q) -> Eigen::MatrixXd
+            {
+                auto R = Eigen::MatrixXd(3, 3);
+
+                R <<
+                    q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3),
+                    2 * q(1) * q(2) - 2 * q(0) * q(3),
+                    2 * q(1) * q(3) + 2 * q(0) * q(2),
+                    2 * q(1) * q(2) + 2 * q(0) * q(3),
+                    q(0) * q(0) - q(1) * q(1) + q(2) * q(2) - q(3) * q(3),
+                    2 * q(2) * q(3) - 2 * q(0) * q(1),
+                    2 * q(1) * q(3) - 2 * q(0) * q(2),
+                    2 * q(2) * q(3) + 2 * q(0) * q(1),
+                    q(0) * q(0) - q(1) * q(1) - q(2) * q(2) + q(3) * q(3);
+
+                return R;
             }
 
             static auto enqueueImu(
