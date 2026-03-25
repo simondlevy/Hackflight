@@ -217,6 +217,17 @@ namespace hf {
                         ekf._lastProcessNoiseUpdateMs);
             }
 
+            static auto update(
+                    const EKF & ekf,
+                    const uint32_t msec_curr,
+                    const ImuFiltered & imudata) -> EKF
+            {
+                (void)msec_curr;
+                (void)imudata;
+
+                return ekf;
+            }
+
             auto update(
                     const uint32_t msec_curr,
                     const ImuFiltered & imudata,
@@ -250,7 +261,6 @@ namespace hf {
                 _pred = shouldPredict ? Prediction::run(_pred,
                         lag2dt(msec_curr, _lastPredictionMs), isFlying,
                         _R) : _pred;
-                // XXX
 
                 _isUpdated = shouldPredict ? true : _isUpdated;
 
