@@ -82,6 +82,7 @@ namespace hf {
 
             Prediction()
             {
+                // Reset the IMU samplers
                 _accelSubSampler = ImuSubSampler(G);
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 

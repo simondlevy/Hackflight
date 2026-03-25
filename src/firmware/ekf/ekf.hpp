@@ -17,6 +17,7 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
+#include <firmware/ekf/imu_subsampler.hpp>
 #include <firmware/ekf/prediction.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
@@ -37,44 +38,59 @@ namespace hf {
 
             static constexpr float G = 9.81;
 
+            // Small number epsilon, to prevent dividing by zero
+            static constexpr float EPSILON = 1e-6f;
+
+            // Initial variances, uncertain of position, but know we're
+            // stationary and roughly flat
+            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
+            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
+            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
+            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
+            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
+
             //We do get the measurements in 10x the motion pixels (experimentally measured)
             static constexpr float FLOW_RESOLUTION = 0.1;
 
-        public:
+            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
+            static constexpr float MAX_COVARIANCE = 100;
+            static constexpr float MIN_COVARIANCE = 1e-6;
 
-            EKF() = default;
+            static constexpr float MIN_VELOCITY_MPS = 1e-4;
+            static constexpr float MAX_VELOCITY_MPS = 10;
+
+            // Indices to access the vehicle's state, stored as a column vector
+            enum {
+                STATE_Z,
+                STATE_VX,
+                STATE_VY,
+                STATE_VZ,
+                STATE_D0,
+                STATE_D1,
+                STATE_D2,
+                STATE_DIM
+            };
+
+        public:
 
             EKF& operator=(const EKF& other) = default;
 
-            EKF(
-                    const Prediction & pred,
-                    const bool didResetEstimation,
-                    const uint32_t msec_prev,
-                    const Vec3 & accLatest,
-                    const Vec3 & gyroLatest,
-                    const float predictedNX,
-                    const float predictedNY,
-                    const float measuredNX,
-                    const float measuredNY,
-                    const Eigen::MatrixXd & R,
-                    const bool isUpdated,
-                    const uint32_t lastPredictionMs,
-                    const uint32_t lastProcessNoiseUpdateMs
-               )
-                :
-                    _pred(pred),
-                    _didResetEstimation(didResetEstimation),
-                    _msec_prev(msec_prev),
-                    _accLatest(accLatest),
-                    _gyroLatest(gyroLatest),
-                    _predictedNX(predictedNX),
-                    _predictedNY(predictedNY),
-                    _measuredNX(measuredNX),
-                    _measuredNY(measuredNY),
-                    _R(R),
-                    _isUpdated(isUpdated),
-                    _lastPredictionMs(lastPredictionMs),
-                    _lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs) { }
+            EKF() 
+            {
+                // Reset the IMU samplers
+                _gyroSubSampler = initializeGyroSubSampler();
+                _accelSubSampler = initializeAccelSubSampler();
+
+                // Reset the state
+                _x = initializeState();
+
+                // Reset the attitude quaternion
+                _q = initializeQuaternion();
+
+                // Reset the covariance matrix and add the initial process
+                // noise
+                _P = initializeCovarianceMatrix();
+             }
 
             auto run(
                     const uint32_t msec_curr,
@@ -83,6 +99,14 @@ namespace hf {
                     const uint32_t prediction_freq=100) -> VehicleState
             {
                 _pred = _didResetEstimation ? Prediction() : _pred;
+
+                _gyroSubSampler = _didResetEstimation ?
+                    initializeGyroSubSampler() : _gyroSubSampler;
+                _accelSubSampler = _didResetEstimation ?
+                    initializeAccelSubSampler() : _accelSubSampler;
+                _x = _didResetEstimation ? initializeState() : _x;
+                _q = _didResetEstimation ? initializeQuaternion() : _q;
+                _P = _didResetEstimation ? initializeCovarianceMatrix() : _P;
 
                 _isUpdated = _didResetEstimation ? false : _isUpdated;
 
@@ -101,6 +125,7 @@ namespace hf {
                 _pred = shouldPredict ? Prediction::run(_pred,
                         lag2dt(msec_curr, _lastPredictionMs), isFlying,
                         _R) : _pred;
+                // XXX
 
                 _isUpdated = shouldPredict ? true : _isUpdated;
 
@@ -111,7 +136,7 @@ namespace hf {
 
                 const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
-                const float noise[Prediction::STATE_DIM] = {
+                const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
@@ -120,6 +145,11 @@ namespace hf {
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
+
+                _P = dt > 0 ? enforceSymmetry(addCovarianceNoise(_P, noise)) :
+                    _P;
+
+                _x = dt > 0 ? enforceSymmetry(_x) : _x;
 
                 _pred = dt > 0 ? Prediction::addCovarianceNoise(_pred, noise) :
                     _pred;
@@ -133,15 +163,29 @@ namespace hf {
 
                 _pred = Prediction::accumulateImu(_pred, imudata);
 
+                _gyroSubSampler = ImuSubSampler::accumulate(_gyroSubSampler,
+                        imudata.gyroDps);
+
+                _accelSubSampler = ImuSubSampler::accumulate(_accelSubSampler,
+                        imudata.accelGs);
+
                 const auto z = _pred.x(0);
 
-                _pred = _isUpdated ? Prediction::tryToToIncorporateAttitude(_pred) : _pred;
+                _pred = _isUpdated ?
+                    Prediction::tryToToIncorporateAttitude(_pred) : _pred;
+
+                _q = _isUpdated ?  tryToToIncorporateAttitude(_q, _x) : _q;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
                 _R = _isUpdated ? quat2rotation(_pred.q) : _R;
 
                  _pred = _isUpdated ? Prediction::enforceSymmetry(_pred) : _pred;
+
+                _P = _isUpdated ? enforceSymmetry(addCovarianceNoise(_P, noise)) :
+                    _P;
+
+                _x = _isUpdated ? enforceSymmetry(_x) : _x;
 
                 _isUpdated = false;
 
@@ -180,6 +224,21 @@ namespace hf {
 
        private:
 
+            // State vector
+            __attribute__((aligned(4))) Eigen::VectorXd _x =
+                Eigen::VectorXd(STATE_DIM);
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            Eigen::VectorXd _q = Eigen::VectorXd(4);
+
+            // Covariance matrix
+            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+            ImuSubSampler _accelSubSampler;
+            ImuSubSampler _gyroSubSampler;
+
             Prediction _pred;
 
             bool _didResetEstimation;
@@ -206,12 +265,141 @@ namespace hf {
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
 
+            static auto initializeGyroSubSampler() -> ImuSubSampler
+            {
+                return ImuSubSampler(Num::DEG2RAD);
+            }
+
+            static auto initializeAccelSubSampler() -> ImuSubSampler
+            {
+                return ImuSubSampler(G);
+            }
+
+
+            static auto initializeState() -> Eigen::VectorXd
+            {
+                return Eigen::VectorXd(STATE_DIM);
+            }
+
+            static auto initializeQuaternion() -> Eigen::VectorXd
+            {
+                auto q = Eigen::VectorXd(4);
+                q << 1, 0, 0, 0;
+                return q;
+            }
+
+            static auto initializeCovarianceMatrix() -> Eigen::MatrixXd
+            {
+                auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+                const float pinit[STATE_DIM] = {
+                    STDEV_INITIAL_POSITION_Z,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                    STDEV_INITIAL_ATTITUDE_YAW
+                };
+
+                return addCovarianceNoise(P, pinit);
+            }
+
             static auto lag2dt(const uint32_t usec_curr,
                     const uint32_t usec_prev) -> float
             {
                 return (usec_curr - usec_prev) / 1000.f;
             }
 
+            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
+                    const float * noise) -> Eigen::MatrixXd
+            {
+                auto Pcov = P;
+
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    Pcov(k,k) += noise[k] * noise[k];
+                }
+
+                return Pcov;
+            }
+
+            static auto enforceSymmetry(const Eigen::MatrixXd & P) ->
+                Eigen::MatrixXd
+            {
+                Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        const auto pval = (P(i,j) + P(j,i)) / 2;
+
+                        Psym(i,j) = Psym(j,i) = 
+                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                            pval;
+                    }
+
+                }
+
+                return Psym;
+            }
+
+            static auto enforceSymmetry(const Eigen::VectorXd & x)
+                -> Eigen::VectorXd
+            {
+                Eigen::VectorXd xsym = Eigen::VectorXd(STATE_DIM);
+                xsym << x(0), x(1), x(2), x(3), 0, 0, 0;
+                return xsym;
+
+            }
+
+            static auto tryToToIncorporateAttitude(
+                    const Eigen::VectorXd & q,
+                    const Eigen::VectorXd & x) -> Eigen::VectorXd
+            {
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const float v0 = x(4);
+                const float v1 = x(5);
+                const float v2 = x(6);
+
+                return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
+                        && (isVelInBounds(v0) && isVelInBounds(v1) &&
+                            isVelInBounds(v2))) ?
+                    incorporateAttitude(v0, v1, v2, q) : q;
+            }
+
+            static auto incorporateAttitude(
+                    const float v0, const float v1, const float v2,
+                    const Eigen::VectorXd & q) -> Eigen::VectorXd
+            {
+                const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                const float ca = cos(angle / 2.0f);
+                const float sa = sin(angle / 2.0f);
+                const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                // Rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
+                const float q0 = dq[0] * q(0) - dq[1] * q(1) - dq[2] * q(2)
+                    - dq[3] * q(3);
+                const float q1 = dq[1] * q(0) + dq[0] * q(1) + dq[3] * q(2)
+                    - dq[2] * q(3);
+                const float q2 = dq[2] * q(0) - dq[3] * q(1) + dq[0] * q(2)
+                    + dq[1] * q(3);
+                const float q3 = dq[3] * q(0) + dq[2] * q(1) - dq[1] * q(2)
+                    + dq[0] * q(3);
+
+                // normalize and store the result
+                const float norm = sqrt(q0 * q0 + q1 * q1 + q2 * q2 + 
+                        q3 * q3) + EPSILON;
+
+                Eigen::VectorXd qnew = Eigen::VectorXd(4);
+                qnew << q0/norm, q1/norm, q2/norm, q3/norm;
+
+                return qnew;
+            }
+
+ 
             static auto quat2rotation(
                     const Eigen::VectorXd & q) -> Eigen::MatrixXd
             {
@@ -231,5 +419,14 @@ namespace hf {
                 return R;
             }
 
-     };
+            static bool isVelInBounds(const float vel)
+            {
+                return fabs(vel) < MAX_VELOCITY_MPS;
+            }
+
+            static bool isVelPositive(const float vel)
+            {
+                return fabs(vel) > MIN_VELOCITY_MPS;
+            }
+      };
 }
