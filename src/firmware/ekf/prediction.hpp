@@ -56,6 +56,9 @@ namespace hf {
             static constexpr float MAX_COVARIANCE = 100;
             static constexpr float MIN_COVARIANCE = 1e-6;
 
+            static constexpr float MIN_VELOCITY_MPS = 1e-4;
+            static constexpr float MAX_VELOCITY_MPS = 10;
+
             // Indexes to access the vehicle's state, stored as a column vector
             enum {
                 STATE_Z,
@@ -273,6 +276,20 @@ namespace hf {
                         x, P, accelSubSampler, gyroSubSampler, pqnew / norm);
             }
 
+            static auto tryToToIncorporateAttitude(const Prediction & pred) -> Prediction
+            {
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const float v0 = pred._x(4);
+                const float v1 = pred._x(5);
+                const float v2 = pred._x(6);
+
+                return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
+                        && (isVelInBounds(v0) && isVelInBounds(v1) &&
+                            isVelInBounds(v2))) ?
+                    incorporateAttitude(v0, v1, v2, pred) :
+                    pred;
+            }
+
             //////////////////////////////////////////////////////////////////
 
             // State vector
@@ -349,6 +366,49 @@ namespace hf {
 
                 return Prediction(x, Psym, pred._accelSubSampler,
                         pred._gyroSubSampler, pred._q); 
+            }
+
+            static auto incorporateAttitude(
+                    const float v0, const float v1, const float v2,
+                    const Prediction & pred) -> Prediction
+            {
+                const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                const float ca = cos(angle / 2.0f);
+                const float sa = sin(angle / 2.0f);
+                const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                const auto q = pred._q;
+
+                // Rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
+                const float q0 = dq[0] * q(0) - dq[1] * q(1) - dq[2] * q(2)
+                    - dq[3] * q(3);
+                const float q1 = dq[1] * q(0) + dq[0] * q(1) + dq[3] * q(2)
+                    - dq[2] * q(3);
+                const float q2 = dq[2] * q(0) - dq[3] * q(1) + dq[0] * q(2)
+                    + dq[1] * q(3);
+                const float q3 = dq[3] * q(0) + dq[2] * q(1) - dq[1] * q(2)
+                    + dq[0] * q(3);
+
+                // normalize and store the result
+                const float norm = sqrt(q0 * q0 + q1 * q1 + q2 * q2 + 
+                        q3 * q3) + EPSILON;
+
+                Eigen::VectorXd qnew = Eigen::VectorXd(4);
+                qnew << q0/norm, q1/norm, q2/norm, q3/norm;
+
+                return Prediction(pred._x, pred._P, pred._accelSubSampler,
+                        pred._gyroSubSampler, qnew);
+            }
+
+            static bool isVelInBounds(const float vel)
+            {
+                return fabs(vel) < MAX_VELOCITY_MPS;
+            }
+
+            static bool isVelPositive(const float vel)
+            {
+                return fabs(vel) > MIN_VELOCITY_MPS;
             }
     };
 }
