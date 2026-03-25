@@ -111,9 +111,8 @@ void loop()
         _flyingCheck = _flyingCheck.run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
 
-        _ekf = _ekf.enqueueImu(_ekf, _imuFilter.output);
-
-        const auto state = _ekf.getVehicleState(millis(), _flyingCheck.isFlying);
+        const auto state = _ekf.run(millis(), _imuFilter.output,
+                _flyingCheck.isFlying);
 
         _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);
 

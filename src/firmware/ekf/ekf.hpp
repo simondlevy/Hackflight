@@ -47,7 +47,6 @@ namespace hf {
             EKF& operator=(const EKF& other) = default;
 
             EKF(
-                    const ImuFiltered & imuLatest,
                     const Prediction & pred,
                     const bool didResetEstimation,
                     const uint32_t msec_prev,
@@ -63,7 +62,6 @@ namespace hf {
                     const uint32_t lastProcessNoiseUpdateMs
                )
                 :
-                    _imuLatest(imuLatest),
                     _pred(pred),
                     _didResetEstimation(didResetEstimation),
                     _msec_prev(msec_prev),
@@ -78,8 +76,9 @@ namespace hf {
                     _lastPredictionMs(lastPredictionMs),
                     _lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs) { }
 
-            auto getVehicleState(
+            auto run(
                     const uint32_t msec_curr,
+                    const ImuFiltered & imudata,
                     const bool isFlying,
                     const uint32_t prediction_freq=100) -> VehicleState
             {
@@ -123,9 +122,9 @@ namespace hf {
 
                 // Update with queued measurements and flush the queue
 
-                _gyroLatest = _imuLatest.gyroDps;
+                _gyroLatest = imudata.gyroDps;
 
-                _pred = Prediction::accumulateImu(_pred, _imuLatest);
+                _pred = Prediction::accumulateImu(_pred, imudata);
 
                 const auto z = _pred.x(0);
 
@@ -175,48 +174,7 @@ namespace hf {
                         -psi, -dpsi); // make nose-right positive
             }
 
-            static auto quat2rotation(
-                    const Eigen::VectorXd & q) -> Eigen::MatrixXd
-            {
-                auto R = Eigen::MatrixXd(3, 3);
-
-                R <<
-                    q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3),
-                    2 * q(1) * q(2) - 2 * q(0) * q(3),
-                    2 * q(1) * q(3) + 2 * q(0) * q(2),
-                    2 * q(1) * q(2) + 2 * q(0) * q(3),
-                    q(0) * q(0) - q(1) * q(1) + q(2) * q(2) - q(3) * q(3),
-                    2 * q(2) * q(3) - 2 * q(0) * q(1),
-                    2 * q(1) * q(3) - 2 * q(0) * q(2),
-                    2 * q(2) * q(3) + 2 * q(0) * q(1),
-                    q(0) * q(0) - q(1) * q(1) - q(2) * q(2) + q(3) * q(3);
-
-                return R;
-            }
-
-            static auto enqueueImu(
-                    const EKF & ekf, const ImuFiltered & imudata) -> EKF
-            {
-                return EKF(
-                        imudata,
-                        ekf._pred,
-                        ekf._didResetEstimation,
-                        ekf._msec_prev,
-                        ekf._accLatest,
-                        ekf._gyroLatest,
-                        ekf._predictedNX,
-                        ekf._predictedNY,
-                        ekf._measuredNX,
-                        ekf._measuredNY,
-                        ekf._R,
-                        ekf._isUpdated,
-                        ekf._lastPredictionMs,
-                        ekf._lastProcessNoiseUpdateMs);
-            }
-
-        private:
-
-            ImuFiltered _imuLatest;
+       private:
 
             Prediction _pred;
 
@@ -243,5 +201,25 @@ namespace hf {
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
-    };
+
+            static auto quat2rotation(
+                    const Eigen::VectorXd & q) -> Eigen::MatrixXd
+            {
+                auto R = Eigen::MatrixXd(3, 3);
+
+                R <<
+                    q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3),
+                    2 * q(1) * q(2) - 2 * q(0) * q(3),
+                    2 * q(1) * q(3) + 2 * q(0) * q(2),
+                    2 * q(1) * q(2) + 2 * q(0) * q(3),
+                    q(0) * q(0) - q(1) * q(1) + q(2) * q(2) - q(3) * q(3),
+                    2 * q(2) * q(3) - 2 * q(0) * q(1),
+                    2 * q(1) * q(3) - 2 * q(0) * q(2),
+                    2 * q(2) * q(3) + 2 * q(0) * q(1),
+                    q(0) * q(0) - q(1) * q(1) - q(2) * q(2) + q(3) * q(3);
+
+                return R;
+            }
+
+     };
 }
