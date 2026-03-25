@@ -32,8 +32,6 @@ namespace hf {
 
     class Prediction { 
 
-        friend class EKF;
-
         private:
 
             static constexpr float G = 9.81;
@@ -59,6 +57,8 @@ namespace hf {
             static constexpr float MIN_VELOCITY_MPS = 1e-4;
             static constexpr float MAX_VELOCITY_MPS = 10;
 
+        public:
+
             // Indexes to access the vehicle's state, stored as a column vector
             enum {
                 STATE_Z,
@@ -71,16 +71,25 @@ namespace hf {
                 STATE_DIM
             };
 
+            // State vector
+            __attribute__((aligned(4))) Eigen::VectorXd x =
+                Eigen::VectorXd(STATE_DIM);
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            Eigen::VectorXd q = Eigen::VectorXd(4);
+
             Prediction()
             {
                 _accelSubSampler = ImuSubSampler(G);
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
 
                 // Reset the state
-                _x = Eigen::VectorXd(STATE_DIM);
+                x = Eigen::VectorXd(STATE_DIM);
 
                 // Reset the attitude quaternion
-                _q << 1, 0, 0, 0;
+                q << 1, 0, 0, 0;
 
                 // Reset the covariance matrix and add the initial process
                 // noise
@@ -102,16 +111,16 @@ namespace hf {
             Prediction(
 
                     const Eigen::VectorXd & x,
+                    const Eigen::VectorXd & q,
                     const Eigen::MatrixXd & P,
                     const ImuSubSampler & accelSubSampler,
-                    const ImuSubSampler & gyroSubSampler,
-                    const Eigen::VectorXd & q)
+                    const ImuSubSampler & gyroSubSampler)
                 :
-                    _x(x),
+                    x(x),
+                    q(q),
                     _P(P),
                     _accelSubSampler(accelSubSampler),
-                    _gyroSubSampler(gyroSubSampler),
-                    _q(q) { }
+                    _gyroSubSampler(gyroSubSampler) {}
 
             static auto run(
                     const Prediction & pred,
@@ -131,9 +140,9 @@ namespace hf {
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                const auto vx = pred._x(1);
-                const auto vy = pred._x(2);
-                const auto vz = pred._x(3);
+                const auto vx = pred.x(1);
+                const auto vy = pred.x(2);
+                const auto vz = pred.x(3);
 
                 // Jacobian of state transition function
                 static Eigen::MatrixXd F(STATE_DIM, STATE_DIM);
@@ -199,19 +208,19 @@ namespace hf {
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = pred._x(1);
-                const auto tmpSPY = pred._x(2);
-                const auto tmpSPZ = pred._x(3);
+                const auto tmpSPX = pred.x(1);
+                const auto tmpSPY = pred.x(2);
+                const auto tmpSPZ = pred.x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = pred._x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = pred._x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = pred.x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = pred.x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = pred._x(3) * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = pred.x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
-                const auto x0 = pred._x(0) + R(2,0) * dx + R(2,1) * dy
+                const auto x0 = pred.x(0) + R(2,0) * dx + R(2,1) * dy
                     + R(2,2) * dz - G * dt2 / 2.0f;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -220,13 +229,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                const auto x1 = pred._x(1) + dt * (accelx + gyro.z *
+                const auto x1 = pred.x(1) + dt * (accelx + gyro.z *
                         tmpSPY - gyro.y * tmpSPZ
                         - G * R(2,0));
-                const auto x2 = pred._x(2) + dt * (accely - gyro.z *
+                const auto x2 = pred.x(2) + dt * (accely - gyro.z *
                         tmpSPX + gyro.x * tmpSPZ
                         - G * R(2,1));
-                const auto x3 = pred._x(3) + dt * (accel.z + gyro.y *
+                const auto x3 = pred.x(3) + dt * (accel.z + gyro.y *
                         tmpSPX - gyro.x * tmpSPY
                         - G * R(2,2));
 
@@ -250,38 +259,38 @@ namespace hf {
 
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
                 pq <<
-                    dq[0]*pred._q(0) - dq[1]*pred._q(1) -
-                    dq[2]*pred._q(2) - dq[3]*pred._q(3),
-                    dq[1]*pred._q(0) + dq[0]*pred._q(1) +
-                        dq[3]*pred._q(2) - dq[2]*pred._q(3),
-                    dq[2]*pred._q(0) - dq[3]*pred._q(1) +
-                        dq[0]*pred._q(2) + dq[1]*pred._q(3),
-                    dq[3]*pred._q(0) + dq[2]*pred._q(1) -
-                        dq[1]*pred._q(2) + dq[0]*pred._q(3);
+                    dq[0]*pred.q(0) - dq[1]*pred.q(1) -
+                    dq[2]*pred.q(2) - dq[3]*pred.q(3),
+                    dq[1]*pred.q(0) + dq[0]*pred.q(1) +
+                        dq[3]*pred.q(2) - dq[2]*pred.q(3),
+                    dq[2]*pred.q(0) - dq[3]*pred.q(1) +
+                        dq[0]*pred.q(2) + dq[1]*pred.q(3),
+                    dq[3]*pred.q(0) + dq[2]*pred.q(1) -
+                        dq[1]*pred.q(2) + dq[0]*pred.q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
                 qinit << 1, 0, 0, 0;
 
-                const auto pqnew =isFlying ? pq : keep * pq +
+                const auto pqnew = isFlying ? pq : keep * pq +
                     ROLLPITCH_ZERO_REVERSION * qinit;
 
                 // normalize and store the result
                 const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
 
                 __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
-                x << x0, x1, x2, x3, pred._x(4), pred._x(5), pred._x(6); 
+                x << x0, x1, x2, x3, pred.x(4), pred.x(5), pred.x(6); 
 
                 return Prediction(
-                        x, P, accelSubSampler, gyroSubSampler, pqnew / norm);
+                        x, pqnew/norm, P, accelSubSampler, gyroSubSampler);
             }
 
             static auto tryToToIncorporateAttitude(const Prediction & pred) -> Prediction
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = pred._x(4);
-                const float v1 = pred._x(5);
-                const float v2 = pred._x(6);
+                const float v0 = pred.x(4);
+                const float v1 = pred.x(5);
+                const float v2 = pred.x(6);
 
                 return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
                         && (isVelInBounds(v0) && isVelInBounds(v1) &&
@@ -290,57 +299,14 @@ namespace hf {
                     pred;
             }
 
-            //////////////////////////////////////////////////////////////////
-
-            // State vector
-            __attribute__((aligned(4))) Eigen::VectorXd _x =
-                Eigen::VectorXd(STATE_DIM);
-
-            // Covariance matrix
-            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-
-            ImuSubSampler _accelSubSampler;
-            ImuSubSampler _gyroSubSampler;
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
-            Eigen::VectorXd _q = Eigen::VectorXd(4);
-
-            static auto accumulateImu(
-                    const Prediction & pred,
-                    const ImuFiltered & imuLatest) -> Prediction
-            {
-                const auto gyroSubSampler = ImuSubSampler::accumulate(
-                        pred._gyroSubSampler, imuLatest.gyroDps);
-
-                const auto accelSubSampler = ImuSubSampler::accumulate(
-                        pred._accelSubSampler, imuLatest.accelGs);
-
-                return Prediction(pred._x, pred._P, accelSubSampler,
-                        gyroSubSampler, pred._q); 
-            }
-
-            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
-                    const float * noise) -> Eigen::MatrixXd
-            {
-                auto Pcov = P;
-
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    Pcov(k,k) += noise[k] * noise[k];
-                }
-
-                return Pcov;
-            }
-
             static auto addCovarianceNoise(
                     const Prediction & pred,
                     const float * noise) -> Prediction
             {
                 const auto Pcov = addCovarianceNoise(pred._P, noise);
 
-                return Prediction(pred._x, Pcov, pred._accelSubSampler,
-                        pred._gyroSubSampler, pred._q); 
+                return Prediction(pred.x, pred.q, Pcov, pred._accelSubSampler,
+                        pred._gyroSubSampler); 
             }
 
             static auto enforceSymmetry(const Prediction & pred) -> Prediction
@@ -362,10 +328,49 @@ namespace hf {
                 }
 
                 __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
-                x << pred._x(0), pred._x(1), pred._x(2), pred._x(3), 0, 0, 0;
+                x << pred.x(0), pred.x(1), pred.x(2), pred.x(3), 0, 0, 0;
 
-                return Prediction(x, Psym, pred._accelSubSampler,
-                        pred._gyroSubSampler, pred._q); 
+                return Prediction(x, pred.q, Psym, pred._accelSubSampler,
+                        pred._gyroSubSampler); 
+            }
+
+            static auto accumulateImu(
+                    const Prediction & pred,
+                    const ImuFiltered & imuLatest) -> Prediction
+            {
+                const auto gyroSubSampler = ImuSubSampler::accumulate(
+                        pred._gyroSubSampler, imuLatest.gyroDps);
+
+                const auto accelSubSampler = ImuSubSampler::accumulate(
+                        pred._accelSubSampler, imuLatest.accelGs);
+
+                return Prediction(pred.x, pred.q, pred._P, accelSubSampler,
+                        gyroSubSampler); 
+            }
+
+            static bool isVelInBounds(const float vel)
+            {
+                return fabs(vel) < MAX_VELOCITY_MPS;
+            }
+
+        private:
+
+            // Covariance matrix
+            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+            ImuSubSampler _accelSubSampler;
+            ImuSubSampler _gyroSubSampler;
+
+            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
+                    const float * noise) -> Eigen::MatrixXd
+            {
+                auto Pcov = P;
+
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    Pcov(k,k) += noise[k] * noise[k];
+                }
+
+                return Pcov;
             }
 
             static auto incorporateAttitude(
@@ -377,7 +382,7 @@ namespace hf {
                 const float sa = sin(angle / 2.0f);
                 const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
-                const auto q = pred._q;
+                const auto q = pred.q;
 
                 // Rotate the vehicle's attitude by the delta quaternion vector
                 // computed above
@@ -397,13 +402,8 @@ namespace hf {
                 Eigen::VectorXd qnew = Eigen::VectorXd(4);
                 qnew << q0/norm, q1/norm, q2/norm, q3/norm;
 
-                return Prediction(pred._x, pred._P, pred._accelSubSampler,
-                        pred._gyroSubSampler, qnew);
-            }
-
-            static bool isVelInBounds(const float vel)
-            {
-                return fabs(vel) < MAX_VELOCITY_MPS;
+                return Prediction(pred.x, qnew, pred._P, pred._accelSubSampler,
+                        pred._gyroSubSampler);
             }
 
             static bool isVelPositive(const float vel)

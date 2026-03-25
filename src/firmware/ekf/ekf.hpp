@@ -17,17 +17,9 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/ekf/imu_subsampler.hpp>
 #include <firmware/ekf/prediction.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
-
-// We want to use F for the Jacobian and _P for the covariance matrix, but
-// Arduino pre-defines them
-#ifdef F
-#undef F
-#undef _P
-#endif
 
 namespace hf {
 
@@ -47,15 +39,6 @@ namespace hf {
 
             //We do get the measurements in 10x the motion pixels (experimentally measured)
             static constexpr float FLOW_RESOLUTION = 0.1;
-
-            // Small number epsilon, to prevent dividing by zero
-            static constexpr float EPSILON = 1e-6f;
-
-            // the reversion of pitch and roll to zero
-            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
-
-            static constexpr float MIN_VELOCITY_MPS = 1e-4;
-            static constexpr float MAX_VELOCITY_MPS = 10;
 
         public:
 
@@ -143,7 +126,7 @@ namespace hf {
 
                 _pred = Prediction::accumulateImu(_pred, _imuLatest);
 
-                const auto z = _pred._x(0);
+                const auto z = _pred.x(0);
 
                 if (_isUpdated) {
 
@@ -151,7 +134,7 @@ namespace hf {
 
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and acc
-                    _R = quat2rotation(_pred._q);
+                    _R = quat2rotation(_pred.q);
 
                     _pred = Prediction::enforceSymmetry(_pred);
                 }
@@ -162,25 +145,22 @@ namespace hf {
                 const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
                 const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
 
+                const auto q = _pred.q;
+
                 const auto phi = Num::RAD2DEG *
-                    atan2f(2*(_pred._q(2)*_pred._q(3)+_pred._q(0)* _pred._q(1))
-                            , _pred._q(0)*_pred._q(0) - _pred._q(1)*_pred._q(1)
-                            - _pred._q(2)*_pred._q(2) +
-                            _pred._q(3)*_pred._q(3));
+                    atan2f(2*(q(2)*q(3)+q(0)* q(1)),
+                            q(0)*q(0) - q(1)*q(1) - q(2)*q(2) + q(3)*q(3));
 
                 const auto dphi = _gyroLatest.x;
 
                 const auto theta = Num::RAD2DEG *
-                    asinf(-2*(_pred._q(1)*_pred._q(3) -
-                                _pred._q(0)*_pred._q(2)));
+                    asinf(-2*(q(1)*q(3) - q(0)*q(2)));
 
                 const auto dtheta = _gyroLatest.y;
 
                 const auto psi = Num::RAD2DEG *
-                    atan2f(2*(_pred._q(1)*_pred._q(2)+_pred._q(0)*
-                                _pred._q(3)), _pred._q(0)*_pred._q(0) +
-                            _pred._q(1)*_pred._q(1) - _pred._q(2)*_pred._q(2) -
-                            _pred._q(3)*_pred._q(3)); 
+                    atan2f(2*(q(1)*q(2)+q(0)* q(3)),
+                            q(0)*q(0) + q(1)*q(1) - q(2)*q(2) - q(3)*q(3)); 
 
                 const auto dpsi = _gyroLatest.z;
 
