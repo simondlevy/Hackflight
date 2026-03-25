@@ -115,15 +115,13 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                if (dt > 0) {
+                _pred = dt > 0 ? Prediction::addCovarianceNoise(_pred, noise) :
+                    _pred;
 
-                    _pred = Prediction::addCovarianceNoise(_pred, noise);
-                    _pred = Prediction::enforceSymmetry(_pred);
+                _pred = dt > 0 ? Prediction::enforceSymmetry(_pred) : _pred;
 
-                    _lastProcessNoiseUpdateMs = msec_curr;
-                }
-
-                // Update with queued measurements and flush the queue
+                _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
+                    _lastProcessNoiseUpdateMs;
 
                 _gyroLatest = imudata.gyroDps;
 
