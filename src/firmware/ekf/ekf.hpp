@@ -118,17 +118,17 @@ namespace hf {
 
                 const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
-                if (dt > 0) {
+                const float noise[Prediction::STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
 
-                    const float noise[Prediction::STATE_DIM] = {
-                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                    };
+                if (dt > 0) {
 
                     _pred = Prediction::addCovarianceNoise(_pred, noise);
                     _pred = Prediction::enforceSymmetry(_pred);
