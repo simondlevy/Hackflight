@@ -46,8 +46,9 @@
 FLOW/ZRANGER: 50 Hz
 MAIN_LOOP = 1000
 PIDS = 500;
-EKF_PREDICTION = 100
 */
+
+static const float EKF_PREDICTION_RATE_HZ = 100;
 
 static hf::RX _rx;
 
@@ -72,6 +73,8 @@ static hf::FlyingCheck _flyingCheck;
 
 static hf::mode_e _mode;
 
+static hf::Timer _ekfPredictionTimer;
+
 void setup()
 {
     _rx.begin();
@@ -94,6 +97,10 @@ void loop()
 
         _zranger.read();
     }*/
+
+    if (_ekfPredictionTimer.ready(micros())) {
+        _ekf = hf::EKF::predict(_ekf, _flyingCheck.isFlying);
+    }
 
     if (_imu.available()) {
 

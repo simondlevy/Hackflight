@@ -92,6 +92,11 @@ namespace hf {
                 _P = initializeCovarianceMatrix();
              }
 
+            static auto predict(const EKF & ekf, const bool isFlying) -> EKF
+            {
+                return ekf;
+            }
+
             auto run(
                     const uint32_t msec_curr,
                     const ImuFiltered & imudata,
