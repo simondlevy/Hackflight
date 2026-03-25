@@ -42,10 +42,7 @@ namespace hf {
 
         public:
 
-            EKF()
-            {
-                reset(0);
-            }
+            EKF() = default;
 
             EKF& operator=(const EKF& other) = default;
 
@@ -87,7 +84,10 @@ namespace hf {
                     const uint32_t prediction_freq=100) -> VehicleState
             {
                 if (_didResetEstimation) {
-                    reset(msec_curr);
+                    _pred = Prediction();
+                    _isUpdated = false;
+                    _lastPredictionMs = msec_curr;
+                    _lastProcessNoiseUpdateMs = msec_curr;
                 }
 
                 _didResetEstimation = false;
@@ -243,13 +243,5 @@ namespace hf {
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
-
-            void reset(const uint32_t msec_curr)
-            {
-                _pred = Prediction();
-                _isUpdated = false;
-                _lastPredictionMs = msec_curr;
-                _lastProcessNoiseUpdateMs = msec_curr;
-            }
     };
 }
