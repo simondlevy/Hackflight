@@ -150,35 +150,40 @@ namespace hf {
                 const float v1 = _pred._x(5);
                 const float v2 = _pred._x(6);
 
-                if (_isUpdated && (isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
-                        && (isVelInBounds(v0) && isVelInBounds(v1) &&
-                            isVelInBounds(v2))) {
+                // Move attitude error into attitude if any of the angle errors
+                // are large enough
+                if (_isUpdated) {
 
-                    const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                    const float ca = cos(angle / 2.0f);
-                    const float sa = sin(angle / 2.0f);
-                    const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+                    if ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
+                            && (isVelInBounds(v0) && isVelInBounds(v1) &&
+                                isVelInBounds(v2))) {
 
-                    // Rotate the vehicle's attitude by the delta quaternion vector
-                    // computed above
-                    const float tmpq0 = dq[0] * _pred._q(0) - dq[1] * _pred._q(1) - 
-                        dq[2] * _pred._q(2) - dq[3] * _pred._q(3);
-                    const float tmpq1 = dq[1] * _pred._q(0) + dq[0] * _pred._q(1) + 
-                        dq[3] * _pred._q(2) - dq[2] * _pred._q(3);
-                    const float tmpq2 = dq[2] * _pred._q(0) - dq[3] * _pred._q(1) + 
-                        dq[0] * _pred._q(2) + dq[1] * _pred._q(3);
-                    const float tmpq3 = dq[3] * _pred._q(0) + dq[2] * _pred._q(1) - 
-                        dq[1] * _pred._q(2) + dq[0] * _pred._q(3);
+                        const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                        const float ca = cos(angle / 2.0f);
+                        const float sa = sin(angle / 2.0f);
+                        const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
-                    // normalize and store the result
-                    float norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                            tmpq3 * tmpq3) + EPSILON;
+                        // Rotate the vehicle's attitude by the delta quaternion vector
+                        // computed above
+                        const float tmpq0 = dq[0] * _pred._q(0) - dq[1] * _pred._q(1) - 
+                            dq[2] * _pred._q(2) - dq[3] * _pred._q(3);
+                        const float tmpq1 = dq[1] * _pred._q(0) + dq[0] * _pred._q(1) + 
+                            dq[3] * _pred._q(2) - dq[2] * _pred._q(3);
+                        const float tmpq2 = dq[2] * _pred._q(0) - dq[3] * _pred._q(1) + 
+                            dq[0] * _pred._q(2) + dq[1] * _pred._q(3);
+                        const float tmpq3 = dq[3] * _pred._q(0) + dq[2] * _pred._q(1) - 
+                            dq[1] * _pred._q(2) + dq[0] * _pred._q(3);
 
-                    // XXX
-                    _pred._q(0) = tmpq0 / norm;
-                    _pred._q(1) = tmpq1 / norm;
-                    _pred._q(2) = tmpq2 / norm;
-                    _pred._q(3) = tmpq3 / norm;
+                        // normalize and store the result
+                        float norm = sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                                tmpq3 * tmpq3) + EPSILON;
+
+                        // XXX
+                        _pred._q(0) = tmpq0 / norm;
+                        _pred._q(1) = tmpq1 / norm;
+                        _pred._q(2) = tmpq2 / norm;
+                        _pred._q(3) = tmpq3 / norm;
+                    }
                 }
 
 
