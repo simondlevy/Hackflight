@@ -94,14 +94,20 @@ namespace hf {
 
                 _didResetEstimation = false;
 
+                const auto shouldPredict = Timer::ready(msec_curr,
+                        _msec_prev, prediction_freq);
+
                 // Periodically run the system dynamics to predict the state
-                if (Timer::ready(msec_curr, _msec_prev, prediction_freq)) {
-                    const auto dt = (msec_curr - _lastPredictionMs) / 1000.0f;
-                    _pred = Prediction::run(_pred, dt, isFlying, _R);
-                    _isUpdated = true;
-                    _lastPredictionMs = msec_curr;
-                    _msec_prev = msec_curr;
-                }
+                _pred = shouldPredict ? Prediction::run(_pred,
+                        lag2dt(msec_curr, _lastPredictionMs), isFlying,
+                        _R) : _pred;
+
+                _isUpdated = shouldPredict ? true : _isUpdated;
+
+                _lastPredictionMs = shouldPredict ? msec_curr :
+                    _lastPredictionMs;
+
+                _msec_prev = shouldPredict ? msec_curr : _msec_prev;
 
                 const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
@@ -199,6 +205,12 @@ namespace hf {
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
+
+            static auto lag2dt(const uint32_t usec_curr,
+                    const uint32_t usec_prev) -> float
+            {
+                return (usec_curr - usec_prev) / 1000.f;
+            }
 
             static auto quat2rotation(
                     const Eigen::VectorXd & q) -> Eigen::MatrixXd
