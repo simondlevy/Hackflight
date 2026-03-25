@@ -134,6 +134,9 @@ namespace hf {
 
                 const auto F = makeJacobian(ekf._x, ekf._R, gyro, accel, dt);
 
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+                const auto P = (F * ekf._P) * F.transpose();
+
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
@@ -207,12 +210,11 @@ namespace hf {
                 __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
                 x << x0, x1, x2, x3, ekf._x(4), ekf._x(5), ekf._x(6); 
 
-                (void)norm;
-
-                return ekf;
-
-                /*return EKF(
-                  x, pqnew/norm, P, accelSubSampler, gyroSubSampler);*/
+                return EKF(
+                        x, pqnew/norm, P, accelSubSampler, gyroSubSampler,
+                        ekf._didResetEstimation, ekf._msec_prev, ekf._R,
+                        ekf._isUpdated, ekf._lastPredictionMs,
+                        ekf._lastProcessNoiseUpdateMs);
             }
 
             auto update(
