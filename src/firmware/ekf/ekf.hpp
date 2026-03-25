@@ -129,16 +129,13 @@ namespace hf {
 
                 const auto z = _pred.x(0);
 
-                if (_isUpdated) {
+                _pred = _isUpdated ? Prediction::tryToToIncorporateAttitude(_pred) : _pred;
 
-                    _pred = Prediction::tryToToIncorporateAttitude(_pred);
+                // Convert the new attitude to a rotation matrix, such that we can
+                // rotate body-frame velocity and acc
+                _R = _isUpdated ? quat2rotation(_pred.q) : _R;
 
-                    // Convert the new attitude to a rotation matrix, such that we can
-                    // rotate body-frame velocity and acc
-                    _R = quat2rotation(_pred.q);
-
-                    _pred = Prediction::enforceSymmetry(_pred);
-                }
+                 _pred = _isUpdated ? Prediction::enforceSymmetry(_pred) : _pred;
 
                 _isUpdated = false;
 
