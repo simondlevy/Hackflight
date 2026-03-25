@@ -154,9 +154,9 @@ namespace hf {
                     _R = quat2rotation(_pred._q);
 
                     _pred = Prediction::enforceSymmetry(_pred);
-
-                    _isUpdated = false;
                 }
+
+                _isUpdated = false;
 
                 const auto dx = 0;//_R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
                 const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
@@ -184,7 +184,11 @@ namespace hf {
 
                 const auto dpsi = _gyroLatest.z;
 
-                if (!isVelInBounds(dx) || !isVelInBounds(dy) || !isVelInBounds(dz)) {
+                if (
+                        !Prediction::isVelInBounds(dx) ||
+                        !Prediction::isVelInBounds(dy) ||
+                        !Prediction::isVelInBounds(dz)) {
+
                     _didResetEstimation = true;
                 }
 
@@ -274,16 +278,6 @@ namespace hf {
                 _isUpdated = false;
                 _lastPredictionMs = msec_curr;
                 _lastProcessNoiseUpdateMs = msec_curr;
-            }
-
-            static bool isVelInBounds(const float vel)
-            {
-                return fabs(vel) < MAX_VELOCITY_MPS;
-            }
-
-            static bool isVelPositive(const float vel)
-            {
-                return fabs(vel) > MIN_VELOCITY_MPS;
             }
     };
 }
