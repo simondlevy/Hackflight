@@ -216,13 +216,6 @@ namespace hf {
 
         private:
 
-            typedef enum {
-                MEASUREMENT_ACCEL,
-                MEASUREMENT_GYRO,
-                MEASUREMENT_TOF,
-                MEASUREMENT_FLOW,
-            } measurementType_e;
-
             ImuFiltered _imuLatest;
 
             Prediction _pred;
