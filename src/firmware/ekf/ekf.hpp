@@ -563,6 +563,81 @@ namespace hf {
                 return qnew;
             }
 
+            static auto makeJacobian(
+                    const Eigen::VectorXd & x,
+                    const Eigen::MatrixXd & R,
+                    const Vec3 & gyro,
+                    const Vec3 & accel,
+                    const float dt) -> Eigen::MatrixXd
+            {
+                const auto d0 = gyro.x*dt/2;
+                const auto d1 = gyro.y*dt/2;
+                const auto d2 = gyro.z*dt/2;
+
+                const auto vx = x(1);
+                const auto vy = x(2);
+                const auto vz = x(3);
+
+                Eigen::MatrixXd F(STATE_DIM, STATE_DIM);
+
+                // position
+                F(0, 0) = 1;
+
+                // position from body-frame velocity
+                F(0,1) = R(2,0)*dt;
+
+                F(0,2) = R(2,1)*dt;
+
+                F(0,3) = R(2,2)*dt;
+
+                // position from attitude error
+                F(0,4) = (vy*R(2,2) - vz*R(2,1))*dt;
+
+                F(0,5) = (-vx*R(2,2) + vz*R(2,0))*dt;
+
+                F(0,6) = (vx*R(2,1) - vy*R(2,0))*dt;
+
+                // body-frame velocity from body-frame velocity
+                F(1,1) = 1; //drag negligible
+                F(2,1) =-gyro.z*dt;
+                F(3,1) = gyro.y*dt;
+
+                F(1,2) = gyro.z*dt;
+                F(2,2) = 1; //drag negligible
+                F(3,2) =-gyro.x*dt;
+
+                F(1,3) =-gyro.y*dt;
+                F(2,3) = gyro.x*dt;
+                F(3,3) = 1; //drag negligible
+
+                // body-frame velocity from attitude error
+                F(1,4) =  0;
+                F(2,4) = -G*R(2,2)*dt;
+                F(3,4) =  G*R(2,1)*dt;
+
+                F(1,5) =  G*R(2,2)*dt;
+                F(2,5) =  0;
+                F(3,5) = -G*R(2,0)*dt;
+
+                F(1,6) = -G*R(2,1)*dt;
+                F(2,6) =  G*R(2,0)*dt;
+                F(3,6) =  0;
+
+                F(4,4) =  1 - d1*d1/2 - d2*d2/2;
+                F(4,5) =  d2 + d0*d1/2;
+                F(4,6) = -d1 + d0*d2/2;
+
+                F(5,4) = -d2 + d0*d1/2;
+                F(5,5) =  1 - d0*d0/2 - d2*d2/2;
+                F(5,6) =  d0 + d1*d2/2;
+
+                F(6,4) =  d1 + d0*d2/2;
+                F(6,5) = -d0 + d1*d2/2;
+                F(6,6) = 1 - d0*d0/2 - d1*d1/2;
+
+                return F;
+            }
+
  
             static auto quat2rotation(
                     const Eigen::VectorXd & q) -> Eigen::MatrixXd
