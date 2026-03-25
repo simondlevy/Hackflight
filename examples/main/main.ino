@@ -99,7 +99,7 @@ void loop()
     }*/
 
     if (_ekfPredictionTimer.ready(micros())) {
-        _ekf = hf::EKF::predict(_ekf, _flyingCheck.isFlying);
+        _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
     }
 
     if (_imu.available()) {
