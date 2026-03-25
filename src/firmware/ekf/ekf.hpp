@@ -88,8 +88,9 @@ namespace hf {
             {
                 if (_didResetEstimation) {
                     reset(msec_curr);
-                    _didResetEstimation = false;
                 }
+
+                _didResetEstimation = false;
 
                 // Periodically run the system dynamics to predict the state
                 if (Timer::ready(msec_curr, _msec_prev, prediction_freq)) {
@@ -164,13 +165,11 @@ namespace hf {
 
                 const auto dpsi = _gyroLatest.z;
 
-                if (
-                        !Prediction::isVelInBounds(dx) ||
-                        !Prediction::isVelInBounds(dy) ||
-                        !Prediction::isVelInBounds(dz)) {
-
-                    _didResetEstimation = true;
-                }
+                _didResetEstimation =
+                    (!Prediction::isVelInBounds(dx) ||
+                     !Prediction::isVelInBounds(dy) ||
+                     !Prediction::isVelInBounds(dz)) ? true :
+                    _didResetEstimation;
 
                 return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
                         -psi, -dpsi); // make nose-right positive
