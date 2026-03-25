@@ -54,6 +54,7 @@ namespace hf {
             // the reversion of pitch and roll to zero
             static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
+            static constexpr float MIN_VELOCITY_MPS = 1e-4;
             static constexpr float MAX_VELOCITY_MPS = 10;
 
         public:
@@ -144,18 +145,18 @@ namespace hf {
 
                 const auto z = _pred._x(0);
 
-                if (_isUpdated) {
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const float v0 = _pred._x(4);
+                const float v1 = _pred._x(5);
+                const float v2 = _pred._x(6);
 
-                    // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const float v0 = _pred._x(4);
-                    const float v1 = _pred._x(5);
-                    const float v2 = _pred._x(6);
+                if (_isUpdated) {
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
-                    if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
-                                0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
-                                    fabsf(v2) < 10)) {
+                    if ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
+                            && (isVelInBounds(v0) && isVelInBounds(v1) &&
+                                isVelInBounds(v2))) {
 
                         const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
                         const float ca = cos(angle / 2.0f);
@@ -219,7 +220,7 @@ namespace hf {
 
                 const auto dpsi = _gyroLatest.z;
 
-                if (!velInBounds(dx) || !velInBounds(dy) || !velInBounds(dz)) {
+                if (!isVelInBounds(dx) || !isVelInBounds(dy) || !isVelInBounds(dz)) {
                     _didResetEstimation = true;
                 }
 
@@ -303,8 +304,6 @@ namespace hf {
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
 
-            // Instance methods ----------------------------------------------
-
             void reset(const uint32_t msec_curr)
             {
                 _pred = Prediction();
@@ -313,10 +312,14 @@ namespace hf {
                 _lastProcessNoiseUpdateMs = msec_curr;
             }
 
-            static bool velInBounds(const float vel)
+            static bool isVelInBounds(const float vel)
             {
                 return fabs(vel) < MAX_VELOCITY_MPS;
             }
 
+            static bool isVelPositive(const float vel)
+            {
+                return fabs(vel) > MIN_VELOCITY_MPS;
+            }
     };
 }
