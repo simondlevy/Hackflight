@@ -117,6 +117,40 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 const auto P = (F * ekf._P) * F.transpose();
 
+                // keep previous time step's state for the update
+                const auto tmpSPX = ekf.x(1);
+                const auto tmpSPY = ekf.x(2);
+                const auto tmpSPZ = ekf.x(3);
+
+                const auto dt2 = dt * dt;
+
+                // position updates in the body frame (will be rotated to inertial frame)
+                const auto dx = ekf.x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = ekf.x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+
+                // thrust can only be produced in the body's Z direction
+                const auto dz = ekf.x(3) * dt + accel.z * dt2 / 2.0f; 
+
+                // position update
+                const auto x0 = ekf.x(0) + ekf._R(2,0) * dx + ekf._R(2,1) * dy
+                    + ekf._R(2,2) * dz - G * dt2 / 2.0f;
+
+                const auto accelx = isFlying ? 0 : accel.x;
+                const auto accely = isFlying ? 0 : accel.y;
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+                const auto x1 = x(1) + dt * (accelx + gyro.z *
+                        tmpSPY - gyro.y * tmpSPZ
+                        - G * ekf._R(2,0));
+                const auto x2 = x(2) + dt * (accely - gyro.z *
+                        tmpSPX + gyro.x * tmpSPZ
+                        - G * ekf._R(2,1));
+                const auto x3 = x(3) + dt * (accel.z + gyro.y *
+                        tmpSPX - gyro.x * tmpSPY
+                        - G * ekf._R(2,2));
+
+
                 return ekf;
             }
 
