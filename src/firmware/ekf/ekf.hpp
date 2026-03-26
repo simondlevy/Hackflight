@@ -87,15 +87,32 @@ namespace hf {
             EKF() 
             {
                 x = xinit();
-
                 q = qinit();
-
                 _P = pinit();
-
                 _accelSubSampler = ImuSubSampler(G);
-
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
             }
+
+            EKF (
+                const Eigen::VectorXd & x,
+                const Eigen::VectorXd & q,
+                const Eigen::MatrixXd & P,
+                const ImuSubSampler  & accelSubSampler,
+                const ImuSubSampler  & gyroSubSampler,
+                const bool didResetEstimation,
+                const uint32_t msec_prev,
+                const Eigen::MatrixXd R,
+                const bool isUpdated,
+                const uint32_t lastPredictionMs,
+                const uint32_t lastProcessNoiseUpdateMs) 
+                : x(x), q(q), _P(P),
+                _accelSubSampler(accelSubSampler),
+                _gyroSubSampler(gyroSubSampler), 
+                _didResetEstimation(didResetEstimation),
+                _msec_prev(msec_prev),
+                _R(R),
+                _isUpdated(isUpdated),
+                _lastPredictionMs(lastPredictionMs) {}
 
             auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
