@@ -80,6 +80,12 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Eigen::VectorXd q = Eigen::VectorXd(4);
 
+            // Covariance matrix
+            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+            ImuSubSampler _accelSubSampler;
+            ImuSubSampler _gyroSubSampler;
+
             Prediction()
             {
                 // Reset the IMU samplers
@@ -289,12 +295,6 @@ namespace hf {
             }
 
         private:
-
-            // Covariance matrix
-            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-
-            ImuSubSampler _accelSubSampler;
-            ImuSubSampler _gyroSubSampler;
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
                     const float * noise) -> Eigen::MatrixXd
