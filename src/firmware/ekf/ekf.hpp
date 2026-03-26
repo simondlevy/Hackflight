@@ -97,6 +97,29 @@ namespace hf {
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
             }
 
+            auto predict(const EKF & ekf, const uint32_t msec_curr,
+                    const bool isFlying) -> EKF
+            {
+                const auto accelSubSampler =
+                    ImuSubSampler::finalize(ekf._accelSubSampler);
+
+                const auto gyroSubSampler =
+                    ImuSubSampler::finalize(ekf._gyroSubSampler);
+
+                const auto dt = lag2dt(msec_curr, ekf._lastPredictionMs);
+
+                const auto accel = accelSubSampler.subSample;
+
+                const auto gyro = gyroSubSampler.subSample;
+
+                const auto F = makeJacobian(ekf.x, ekf._R, gyro, accel, dt);
+
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+                const auto P = (F * ekf._P) * F.transpose();
+
+                return ekf;
+            }
+
             void predict(const uint32_t msec_curr, const bool isFlying)
             {
                 _accelSubSampler = ImuSubSampler::finalize(_accelSubSampler);
