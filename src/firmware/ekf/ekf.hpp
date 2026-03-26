@@ -231,35 +231,29 @@ namespace hf {
             static auto update(const EKF & ekf, const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> EKF
             {
-                (void)msec_curr;
-                (void)imudata;
+                const auto x = ekf._didResetEstimation ? xinit() : ekf.x;
 
-                return ekf;
+                const auto q = ekf._didResetEstimation ? qinit() : ekf.q;
 
-                /*
-                x = _didResetEstimation ? xinit() : x;
+                const auto P = ekf._didResetEstimation ? pinit() : ekf._P;
 
-                q = _didResetEstimation ? qinit() : q;
+                const auto accelSubSampler = ekf._didResetEstimation ?
+                    ImuSubSampler(G) : ekf._accelSubSampler;
 
-                _P = _didResetEstimation ? pinit() : _P;
+                const auto gyroSubSampler = ekf._didResetEstimation ?
+                    ImuSubSampler(Num::DEG2RAD) : ekf._gyroSubSampler;
 
-                _accelSubSampler = _didResetEstimation ?
-                    ImuSubSampler(G) : _accelSubSampler;
+                const auto isUpdated = ekf._didResetEstimation ? false : ekf._isUpdated;
 
-                _gyroSubSampler = _didResetEstimation ?
-                    ImuSubSampler(Num::DEG2RAD) : _gyroSubSampler;
+                const auto lastPredictionMs = ekf._didResetEstimation ? msec_curr :
+                    ekf._lastPredictionMs;
 
-                _isUpdated = _didResetEstimation ? false : _isUpdated;
+                const auto lastProcessNoiseUpdateMs =
+                    ekf._didResetEstimation ?  msec_curr :
+                    ekf._lastProcessNoiseUpdateMs;
 
-                _lastPredictionMs = _didResetEstimation ? msec_curr :
-                    _lastPredictionMs;
-
-                _lastProcessNoiseUpdateMs = _didResetEstimation ? msec_curr :
-                    _lastProcessNoiseUpdateMs;
-
-                _didResetEstimation = false;
-
-                const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+                const float dt = (msec_curr - lastProcessNoiseUpdateMs)
+                    / 1000.0f;
 
                 const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
@@ -271,72 +265,58 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                x = dt > 0 ? enforceSymmetry(x) : x;
+                const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : ekf.x;
 
-                _P = dt > 0 ? addCovarianceNoise(_P, noise) : _P;
+                const auto P_ = dt > 0 ? addCovarianceNoise(P, noise) : P;
 
-                _P = dt > 0 ? enforceSymmetry(_P) : _P;
+                const auto P__ = dt > 0 ? enforceSymmetry(P_) : P_;
 
-                _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
-                    _lastProcessNoiseUpdateMs;
+                const auto lastProcessNoiseUpdateMs_ = dt > 0 ? msec_curr :
+                    lastProcessNoiseUpdateMs;
 
-                const auto gyroLatest = imudata.gyroDps;
-
-                _gyroSubSampler =
-                    ImuSubSampler::accumulate(_gyroSubSampler,
+                const auto gyroSubSampler_ =
+                    ImuSubSampler::accumulate(gyroSubSampler,
                             imudata.gyroDps);
 
-                _accelSubSampler =
-                    ImuSubSampler::accumulate(_accelSubSampler,
+                const auto accelSubSampler_ =
+                    ImuSubSampler::accumulate(accelSubSampler,
                             imudata.accelGs);
 
-                const auto z = x(0);
-
-                q = _isUpdated ? 
-                    tryToToIncorporateAttitude(q, x) : q;
+                const auto q_ =
+                    isUpdated ? tryToToIncorporateAttitude(q, x_) : q;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
-                _R = _isUpdated ? quat2rotation(q) : _R;
+                const auto R = isUpdated ? quat2rotation(q_) : ekf._R;
 
-                _P = _isUpdated ?
-                    enforceSymmetry(addCovarianceNoise(_P, noise)) :
-                    _P;
+                const auto P___ = isUpdated ?
+                    enforceSymmetry(addCovarianceNoise(P__, noise)) :
+                    P__;
 
-                x = _isUpdated ? enforceSymmetry(x) : x;
+                const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
-                _isUpdated = false;
+                const float dx = 0;//R(0,0)*_x(1) + R(0,1)*_x(2) + R(0,2)*_x(3);
+                const float dy = 0;//R(1,0)*_x(1) + R(1,1)*_x(2) + R(1,2)*_x(3); 
+                const float dz = 0;//R(2,0)*_x(1) + R(2,1)*_x(2) + R(2,2)*_x(3);
 
-                const auto dx = 0;//_R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
-                const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
-                const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
-
-                const auto phi = Num::RAD2DEG *
-                    atan2f(2*(q(2)*q(3)+q(0)* q(1)),
-                            q(0)*q(0) - q(1)*q(1) - q(2)*q(2) + q(3)*q(3));
-
-                const auto dphi = gyroLatest.x;
-
-                const auto theta = Num::RAD2DEG *
-                    asinf(-2*(q(1)*q(3) - q(0)*q(2)));
-
-                const auto dtheta = gyroLatest.y;
-
-                const auto psi = Num::RAD2DEG *
-                    atan2f(2*(q(1)*q(2)+q(0)* q(3)),
-                            q(0)*q(0) + q(1)*q(1) - q(2)*q(2) - q(3)*q(3)); 
-
-                const auto dpsi = gyroLatest.z;
-
-                _didResetEstimation =
+                const auto didResetEstimation =
                     (!isVelInBounds(dx) ||
                      !isVelInBounds(dy) ||
                      !isVelInBounds(dz)) ? true :
-                    _didResetEstimation;
+                    ekf._didResetEstimation;
 
-                return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
-                        -psi, -dpsi); // make nose-right positive
-                */
+                return EKF(
+                        x__,
+                        q_,
+                        P___,
+                        accelSubSampler_,
+                        gyroSubSampler_,
+                        didResetEstimation,
+                        ekf._msec_prev,
+                        R,
+                        false, // isUpdated
+                        lastPredictionMs,
+                        lastProcessNoiseUpdateMs_);
             }
 
              auto update(const uint32_t msec_curr,
