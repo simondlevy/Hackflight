@@ -86,7 +86,12 @@ namespace hf {
                     const ImuFiltered & imudata,
                     const bool isFlying) -> VehicleState
             {
-                _pred = _didResetEstimation ? Prediction() : _pred;
+                // Periodically run the system dynamics to predict the state
+                _pred =
+                    shouldPredict ?
+                    Prediction::run(_pred, lag2dt(msec_curr, _lastPredictionMs), isFlying, _R) : 
+                    _didResetEstimation ? Prediction() :
+                    _pred;
 
                 _isUpdated = _didResetEstimation ? false : _isUpdated;
 
@@ -97,11 +102,6 @@ namespace hf {
                     _lastProcessNoiseUpdateMs;
 
                 _didResetEstimation = false;
-
-                // Periodically run the system dynamics to predict the state
-                _pred = shouldPredict ? Prediction::run(_pred,
-                        lag2dt(msec_curr, _lastPredictionMs), isFlying,
-                        _R) : _pred;
 
                 _isUpdated = shouldPredict ? true : _isUpdated;
 
