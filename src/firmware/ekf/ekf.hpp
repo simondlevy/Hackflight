@@ -89,8 +89,8 @@ namespace hf {
                 x = xinit();
                 q = qinit();
                 _P = pinit();
-                _accelSubSampler = ImuSubSampler(G);
-                _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
+                accelSubSampler = ImuSubSampler(G);
+                gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
             }
 
             EKF (
@@ -100,36 +100,34 @@ namespace hf {
                 const ImuSubSampler  & accelSubSampler,
                 const ImuSubSampler  & gyroSubSampler,
                 const bool didResetEstimation,
-                const uint32_t msec_prev,
                 const Eigen::MatrixXd R,
                 const bool isUpdated,
                 const uint32_t lastPredictionMs,
                 const uint32_t lastProcessNoiseUpdateMs) 
                 : x(x), q(q), _P(P),
-                _accelSubSampler(accelSubSampler),
-                _gyroSubSampler(gyroSubSampler), 
-                _didResetEstimation(didResetEstimation),
-                _msec_prev(msec_prev),
-                _R(R),
-                _isUpdated(isUpdated),
-                _lastPredictionMs(lastPredictionMs) {}
+                accelSubSampler(accelSubSampler),
+                gyroSubSampler(gyroSubSampler), 
+                didResetEstimation(didResetEstimation),
+                R(R),
+                isUpdated(isUpdated),
+                lastPredictionMs(lastPredictionMs) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
             {
                 const auto accelSubSampler =
-                    ImuSubSampler::finalize(ekf._accelSubSampler);
+                    ImuSubSampler::finalize(ekf.accelSubSampler);
 
                 const auto gyroSubSampler =
-                    ImuSubSampler::finalize(ekf._gyroSubSampler);
+                    ImuSubSampler::finalize(ekf.gyroSubSampler);
 
-                const auto dt = lag2dt(msec_curr, ekf._lastPredictionMs);
+                const auto dt = lag2dt(msec_curr, ekf.lastPredictionMs);
 
                 const auto accel = accelSubSampler.subSample;
 
                 const auto gyro = gyroSubSampler.subSample;
 
-                const auto F = makeJacobian(ekf.x, ekf._R, gyro, accel, dt);
+                const auto F = makeJacobian(ekf.x, ekf.R, gyro, accel, dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 const auto P = (F * ekf._P) * F.transpose();
@@ -149,8 +147,8 @@ namespace hf {
                 const auto dz = ekf.x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
-                const auto x0 = ekf.x(0) + ekf._R(2,0) * dx + ekf._R(2,1) * dy
-                    + ekf._R(2,2) * dz - G * dt2 / 2.0f;
+                const auto x0 = ekf.x(0) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
+                    + ekf.R(2,2) * dz - G * dt2 / 2.0f;
 
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
@@ -159,13 +157,13 @@ namespace hf {
                 // - gravity in body frame
                 const auto x1 = ekf.x(1) + dt * (accelx + gyro.z *
                         tmpSPY - gyro.y * tmpSPZ
-                        - G * ekf._R(2,0));
+                        - G * ekf.R(2,0));
                 const auto x2 = ekf.x(2) + dt * (accely - gyro.z *
                         tmpSPX + gyro.x * tmpSPZ
-                        - G * ekf._R(2,1));
+                        - G * ekf.R(2,1));
                 const auto x3 = ekf.x(3) + dt * (accel.z + gyro.y *
                         tmpSPX - gyro.x * tmpSPY
-                        - G * ekf._R(2,2));
+                        - G * ekf.R(2,2));
 
                 // attitude update (rotate by gyro), we do this in quaternions
                 // this is the gyro angular velocity integrated over the sample
@@ -210,7 +208,6 @@ namespace hf {
 
                 const auto q = pqnew / norm;
 
-                const auto msec_prev = msec_curr;
                 const auto isUpdated = true;
                 const auto lastPredictionMs = msec_curr;
 
@@ -220,37 +217,36 @@ namespace hf {
                         P,
                         accelSubSampler,
                         gyroSubSampler,
-                        ekf._didResetEstimation,
-                        msec_prev,
-                        ekf._R,
+                        ekf.didResetEstimation,
+                        ekf.R,
                         isUpdated,
                         lastPredictionMs,
-                        ekf._lastProcessNoiseUpdateMs);
+                        ekf.lastProcessNoiseUpdateMs);
             }
 
             static auto update(const EKF & ekf, const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> EKF
             {
-                const auto x = ekf._didResetEstimation ? xinit() : ekf.x;
+                const auto x = ekf.didResetEstimation ? xinit() : ekf.x;
 
-                const auto q = ekf._didResetEstimation ? qinit() : ekf.q;
+                const auto q = ekf.didResetEstimation ? qinit() : ekf.q;
 
-                const auto P = ekf._didResetEstimation ? pinit() : ekf._P;
+                const auto P = ekf.didResetEstimation ? pinit() : ekf._P;
 
-                const auto accelSubSampler = ekf._didResetEstimation ?
-                    ImuSubSampler(G) : ekf._accelSubSampler;
+                const auto accelSubSampler = ekf.didResetEstimation ?
+                    ImuSubSampler(G) : ekf.accelSubSampler;
 
-                const auto gyroSubSampler = ekf._didResetEstimation ?
-                    ImuSubSampler(Num::DEG2RAD) : ekf._gyroSubSampler;
+                const auto gyroSubSampler = ekf.didResetEstimation ?
+                    ImuSubSampler(Num::DEG2RAD) : ekf.gyroSubSampler;
 
-                const auto isUpdated = ekf._didResetEstimation ? false : ekf._isUpdated;
+                const auto isUpdated = ekf.didResetEstimation ? false : ekf.isUpdated;
 
-                const auto lastPredictionMs = ekf._didResetEstimation ? msec_curr :
-                    ekf._lastPredictionMs;
+                const auto lastPredictionMs = ekf.didResetEstimation ? msec_curr :
+                    ekf.lastPredictionMs;
 
                 const auto lastProcessNoiseUpdateMs =
-                    ekf._didResetEstimation ?  msec_curr :
-                    ekf._lastProcessNoiseUpdateMs;
+                    ekf.didResetEstimation ?  msec_curr :
+                    ekf.lastProcessNoiseUpdateMs;
 
                 const float dt = (msec_curr - lastProcessNoiseUpdateMs)
                     / 1000.0f;
@@ -278,7 +274,7 @@ namespace hf {
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
-                const auto R = isUpdated ? quat2rotation(q_) : ekf._R;
+                const auto R = isUpdated ? quat2rotation(q_) : ekf.R;
 
                 const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
@@ -290,7 +286,7 @@ namespace hf {
                     (!isVelInBounds(dx) ||
                      !isVelInBounds(dy) ||
                      !isVelInBounds(dz)) ? true :
-                    ekf._didResetEstimation;
+                    ekf.didResetEstimation;
 
                 return EKF(
                         x__,
@@ -299,7 +295,6 @@ namespace hf {
                         accelSubSampler_,
                         gyroSubSampler_,
                         didResetEstimation,
-                        ekf._msec_prev,
                         R,
                         false, // isUpdated
                         lastPredictionMs,
@@ -354,23 +349,21 @@ namespace hf {
             // Covariance matrix
             Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
-            ImuSubSampler _accelSubSampler;
-            ImuSubSampler _gyroSubSampler;
+            ImuSubSampler accelSubSampler;
+            ImuSubSampler gyroSubSampler;
 
-            bool _didResetEstimation;
-
-            uint32_t _msec_prev;
+            bool didResetEstimation;
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Eigen::MatrixXd _R = Eigen::MatrixXd(3, 3);
+            Eigen::MatrixXd R = Eigen::MatrixXd(3, 3);
 
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
-            bool _isUpdated;
+            bool isUpdated;
 
-            uint32_t _lastPredictionMs;
-            uint32_t _lastProcessNoiseUpdateMs;
+            uint32_t lastPredictionMs;
+            uint32_t lastProcessNoiseUpdateMs;
 
             static auto initializeGyroSubSampler() -> ImuSubSampler
             {
@@ -381,7 +374,6 @@ namespace hf {
             {
                 return ImuSubSampler(G);
             }
-
 
             static auto initializeState() -> Eigen::VectorXd
             {

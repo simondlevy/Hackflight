@@ -118,7 +118,6 @@ void loop()
         _flyingCheck = _flyingCheck.run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
 
-        // _ekf.update(millis(), _imuFilter.output);
         _ekf = hf::EKF::update(_ekf, millis(), _imuFilter.output);
 
         const auto state = hf::EKF::getVehicleState(_ekf, _imuFilter.output);
