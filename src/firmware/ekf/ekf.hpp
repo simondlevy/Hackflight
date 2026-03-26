@@ -319,6 +319,13 @@ namespace hf {
                         lastProcessNoiseUpdateMs_);
             }
 
+            auto getVehicleState(const EKF & ekf) -> VehicleState
+            {
+                (void)ekf;
+
+                return VehicleState();
+            }
+
              auto update(const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> VehicleState
             {
