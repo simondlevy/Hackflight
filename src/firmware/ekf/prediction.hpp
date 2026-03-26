@@ -74,21 +74,11 @@ namespace hf {
                 x = xinit(); //Eigen::VectorXd(STATE_DIM);
 
                 // Reset the attitude quaternion
-                q = qinit(); //<< 1, 0, 0, 0;
+                q = qinit();
 
                 // Reset the covariance matrix and add the initial process
                 // noise
-                _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-                const float pinit[STATE_DIM] = {
-                    STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
-                };
-                _P = addCovarianceNoise(_P, pinit);
+                _P = pinit();
             }
 
             Prediction& operator=(const Prediction& other) = default;
@@ -112,6 +102,23 @@ namespace hf {
                 auto q = Eigen::VectorXd(4);
                 q << 1, 0, 0, 0;
                 return q;
+            }
+
+            static auto pinit() -> Eigen::MatrixXd
+            {
+                auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+                const float noise[STATE_DIM] = {
+                    STDEV_INITIAL_POSITION_Z,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                    STDEV_INITIAL_ATTITUDE_YAW
+                };
+
+                return addCovarianceNoise(P, noise);
             }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
