@@ -232,6 +232,7 @@ namespace hf {
             {
                 const auto accelSubSampler = ekf.didResetEstimation ?
                     ImuSubSampler(G) : ekf.accelSubSampler;
+
                 const auto accelSubSampler_ =
                     ImuSubSampler::accumulate(accelSubSampler,
                             imudata.accelGs);
@@ -255,7 +256,7 @@ namespace hf {
                     / 1000.0f;
 
                 const auto x = ekf.didResetEstimation ? xinit() : ekf.x;
-                const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : ekf.x;
+                const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : x;
                 const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
                 const auto P = ekf.didResetEstimation ? pinit() : ekf.P;
