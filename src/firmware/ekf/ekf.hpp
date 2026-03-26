@@ -78,14 +78,25 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
 
-            EKF() = default;
+            EKF() 
+            {
+                _accelSubSampler = ImuSubSampler(G);
+                _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
+            }
 
             void predict(const uint32_t msec_curr, const bool isFlying)
             {
+                _accelSubSampler = ImuSubSampler::finalize(_accelSubSampler);
+                _gyroSubSampler = ImuSubSampler::finalize(_gyroSubSampler);
+
                 _pred = Prediction::run(
-                        _pred, lag2dt(msec_curr, _lastPredictionMs),
+                        _pred,
+                        _accelSubSampler.subSample,
+                        _gyroSubSampler.subSample,
+                        lag2dt(msec_curr, _lastPredictionMs),
                         isFlying,
                         _R);
+
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
                 _msec_prev = msec_curr;
@@ -95,6 +106,12 @@ namespace hf {
                     const ImuFiltered & imudata) -> VehicleState
             {
                 _pred = _didResetEstimation ? Prediction() : _pred;
+
+                _accelSubSampler = _didResetEstimation ?
+                    ImuSubSampler(G) : _accelSubSampler;
+
+                _gyroSubSampler = _didResetEstimation ?
+                    ImuSubSampler(Num::DEG2RAD) : _gyroSubSampler;
 
                 _isUpdated = _didResetEstimation ? false : _isUpdated;
 
@@ -129,12 +146,12 @@ namespace hf {
 
                 const auto gyroLatest = imudata.gyroDps;
 
-                _pred._gyroSubSampler =
-                    ImuSubSampler::accumulate(_pred._gyroSubSampler,
+                _gyroSubSampler =
+                    ImuSubSampler::accumulate(_gyroSubSampler,
                             imudata.gyroDps);
 
-                _pred._accelSubSampler =
-                    ImuSubSampler::accumulate(_pred._accelSubSampler,
+                _accelSubSampler =
+                    ImuSubSampler::accumulate(_accelSubSampler,
                             imudata.accelGs);
 
                 const auto z = _pred.x(0);
@@ -189,6 +206,8 @@ namespace hf {
 
         private:
 
+            ImuSubSampler _accelSubSampler;
+            ImuSubSampler _gyroSubSampler;
 
             bool _didResetEstimation;
 

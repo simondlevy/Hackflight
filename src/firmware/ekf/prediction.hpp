@@ -83,15 +83,8 @@ namespace hf {
             // Covariance matrix
             Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
-            ImuSubSampler _accelSubSampler;
-            ImuSubSampler _gyroSubSampler;
-
             Prediction()
             {
-                // Reset the IMU samplers
-                _accelSubSampler = ImuSubSampler(G);
-                _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
-
                 // Reset the state
                 x = Eigen::VectorXd(STATE_DIM);
 
@@ -119,29 +112,17 @@ namespace hf {
 
                     const Eigen::VectorXd & x,
                     const Eigen::VectorXd & q,
-                    const Eigen::MatrixXd & P,
-                    const ImuSubSampler & accelSubSampler,
-                    const ImuSubSampler & gyroSubSampler)
-                :
-                    x(x),
-                    q(q),
-                    _P(P),
-                    _accelSubSampler(accelSubSampler),
-                    _gyroSubSampler(gyroSubSampler) {}
+                    const Eigen::MatrixXd & P)
+                : x(x), q(q), _P(P) {}
 
             static auto run(
                     const Prediction & pred,
+                    const Vec3 & accel,
+                    const Vec3 & gyro,
                     const float dt,
                     const bool isFlying,
                     const Eigen::MatrixXd & R) -> Prediction
             {
-                const auto accelSubSampler =
-                    ImuSubSampler::finalize(pred._accelSubSampler);
-                const auto gyroSubSampler =
-                    ImuSubSampler::finalize(pred._gyroSubSampler);
-
-                const auto accel = /*pred._*/accelSubSampler.subSample;
-                const auto gyro = /*pred._*/gyroSubSampler.subSample;
 
                 const auto F = makeJacobian(pred.x, R, gyro, accel, dt);
 
@@ -222,8 +203,7 @@ namespace hf {
                 __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
                 x << x0, x1, x2, x3, pred.x(4), pred.x(5), pred.x(6); 
 
-                return Prediction(
-                        x, pqnew/norm, P, accelSubSampler, gyroSubSampler);
+                return Prediction(x, pqnew/norm, P);
             }
 
             static bool isVelInBounds(const float vel)
