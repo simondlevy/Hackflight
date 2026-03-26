@@ -319,11 +319,37 @@ namespace hf {
                         lastProcessNoiseUpdateMs_);
             }
 
-            auto getVehicleState(const EKF & ekf) -> VehicleState
+            static auto getVehicleState(const EKF & ekf,
+                    const ImuFiltered & imudata) -> VehicleState
             {
-                (void)ekf;
+                const auto gyroDps = imudata.gyroDps;
 
-                return VehicleState();
+                const auto phi = Num::RAD2DEG *
+                    atan2f(2*(ekf.q(2)*ekf.q(3)+ekf.q(0)* ekf.q(1)),
+                            ekf.q(0)*ekf.q(0) - ekf.q(1)*ekf.q(1) -
+                            ekf.q(2)*ekf.q(2) + ekf.q(3)*ekf.q(3));
+
+                const auto dphi = gyroDps.x;
+
+                const auto theta = Num::RAD2DEG *
+                    asinf(-2*(ekf.q(1)*ekf.q(3) - ekf.q(0)*ekf.q(2)));
+
+                const auto dtheta = gyroDps.y;
+
+                const auto psi = Num::RAD2DEG *
+                    atan2f(2*(ekf.q(1)*ekf.q(2)+ekf.q(0)* ekf.q(3)),
+                            ekf.q(0)*ekf.q(0) + ekf.q(1)*ekf.q(1) -
+                            ekf.q(2)*ekf.q(2) - ekf.q(3)*ekf.q(3)); 
+
+                const auto dpsi = gyroDps.z;
+
+                const float z = 0;
+                const float dx = 0;
+                const float dy = 0;
+                const float dz = 0;
+
+                return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
+                        -psi, -dpsi); // make nose-right positive
             }
 
              auto update(const uint32_t msec_curr,
@@ -372,8 +398,6 @@ namespace hf {
                 _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
                     _lastProcessNoiseUpdateMs;
 
-                const auto gyroLatest = imudata.gyroDps;
-
                 _gyroSubSampler =
                     ImuSubSampler::accumulate(_gyroSubSampler,
                             imudata.gyroDps);
@@ -406,6 +430,8 @@ namespace hf {
                 const auto phi = Num::RAD2DEG *
                     atan2f(2*(q(2)*q(3)+q(0)* q(1)),
                             q(0)*q(0) - q(1)*q(1) - q(2)*q(2) + q(3)*q(3));
+
+                const auto gyroLatest = imudata.gyroDps;
 
                 const auto dphi = gyroLatest.x;
 
