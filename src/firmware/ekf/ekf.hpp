@@ -150,6 +150,48 @@ namespace hf {
                         tmpSPX - gyro.x * tmpSPY
                         - G * ekf._R(2,2));
 
+                // attitude update (rotate by gyro), we do this in quaternions
+                // this is the gyro angular velocity integrated over the sample
+                // period
+                const auto dtwx = dt*gyro.x;
+                const auto dtwy = dt*gyro.y;
+                const auto dtwz = dt*gyro.z;
+
+                // compute the quaternion values in [w,x,y,z] order
+                const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const auto ca = cos(angle/2.0f);
+                const auto sa = sin(angle/2.0f);
+                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+
+                // rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                Eigen::VectorXd pq = Eigen::VectorXd(4);
+                pq <<
+                    dq[0]*q(0) - dq[1]*q(1) -
+                    dq[2]*q(2) - dq[3]*q(3),
+                    dq[1]*q(0) + dq[0]*q(1) +
+                        dq[3]*q(2) - dq[2]*q(3),
+                    dq[2]*q(0) - dq[3]*q(1) +
+                        dq[0]*q(2) + dq[1]*q(3),
+                    dq[3]*q(0) + dq[2]*q(1) -
+                        dq[1]*q(2) + dq[0]*q(3);
+
+                // Quaternion used for initial orientation
+                Eigen::VectorXd qinit = Eigen::VectorXd(4);
+                qinit << 1, 0, 0, 0;
+
+                const auto pqnew = isFlying ? pq : keep * pq +
+                    ROLLPITCH_ZERO_REVERSION * qinit;
+
+                // Normalize the quaternion
+                const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
+
+                __attribute__((aligned(4))) Eigen::VectorXd x =
+                    Eigen::VectorXd(STATE_DIM);
+                x << x0, x1, x2, x3, ekf.x(4), ekf.x(5), ekf.x(6); 
+
+                const auto q = pqnew / norm;
 
                 return ekf;
             }
