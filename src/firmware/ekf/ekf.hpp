@@ -252,10 +252,12 @@ namespace hf {
                 const float dt = (msec_curr - lastProcessNoiseUpdateMs)
                     / 1000.0f;
 
+                // XXX can we compress this?
                 const auto x = ekf.didResetEstimation ? xinit() : ekf.x;
-                const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : x;
+                const auto x_ = dt > 0 ? enforceSymmetry(x) : x;
                 const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
+                // XXX ditto ^^^
                 const auto P = ekf.didResetEstimation ? pinit() : ekf.P;
                 const auto P_ = dt > 0 ? enforceSymmetry(pnoisy(P, dt)) : P;
                 const auto P__ = isUpdated ?
