@@ -71,7 +71,7 @@ namespace hf {
             Prediction()
             {
                 // Reset the state
-                x = Eigen::VectorXd(STATE_DIM);
+                x = xinit(); //Eigen::VectorXd(STATE_DIM);
 
                 // Reset the attitude quaternion
                 q << 1, 0, 0, 0;
@@ -101,6 +101,11 @@ namespace hf {
                 : x(x), q(q), _P(P) {}
 
         private:
+
+            static auto xinit() -> Eigen::VectorXd
+            {
+                return Eigen::VectorXd(STATE_DIM);
+            }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
                     const float * noise) -> Eigen::MatrixXd
