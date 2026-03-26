@@ -257,12 +257,10 @@ namespace hf {
 
                 const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : ekf.x;
 
-                const auto P_ = dt > 0 ? pnoisy(P, dt) : P;
+                const auto P_ = dt > 0 ? enforceSymmetry(pnoisy(P, dt)) : P;
 
-                const auto P__ = dt > 0 ? enforceSymmetry(P_) : P_;
-
-                const auto P___ = isUpdated ?
-                    enforceSymmetry(pnoisy(P__, dt)) : P__;
+                const auto P__ = isUpdated ?
+                    enforceSymmetry(pnoisy(P_, dt)) : P_;
 
                 const auto lastProcessNoiseUpdateMs_ = dt > 0 ? msec_curr :
                     lastProcessNoiseUpdateMs;
@@ -297,7 +295,7 @@ namespace hf {
                 return EKF(
                         x__,
                         q_,
-                        P___,
+                        P__,
                         accelSubSampler_,
                         gyroSubSampler_,
                         didResetEstimation,
