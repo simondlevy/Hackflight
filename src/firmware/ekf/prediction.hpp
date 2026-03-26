@@ -34,14 +34,6 @@ namespace hf {
 
         private:
 
-            static constexpr float G = 9.81;
-
-            // Small number epsilon, to prevent dividing by zero
-            static constexpr float EPSILON = 1e-6f;
-
-            // the reversion of pitch and roll to zero
-            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
-
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
             static constexpr float STDEV_INITIAL_POSITION_XY = 100;
@@ -49,13 +41,6 @@ namespace hf {
             static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
-
-            // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
-            static constexpr float MAX_COVARIANCE = 100;
-            static constexpr float MIN_COVARIANCE = 1e-6;
-
-            static constexpr float MIN_VELOCITY_MPS = 1e-4;
-            static constexpr float MAX_VELOCITY_MPS = 10;
 
         public:
 
