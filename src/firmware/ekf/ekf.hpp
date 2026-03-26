@@ -18,7 +18,6 @@
 
 #include <firmware/datatypes.hpp>
 #include <firmware/ekf/imu_subsampler.hpp>
-#include <firmware/ekf/prediction.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
@@ -108,27 +107,27 @@ namespace hf {
                 const auto accel = _accelSubSampler.subSample;
                 const auto gyro = _gyroSubSampler.subSample;
 
-                const auto F = makeJacobian(_pred.x, _R, gyro, accel, dt);
+                const auto F = makeJacobian(x, _R, gyro, accel, dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                _pred._P = (F * _pred._P) * F.transpose();
+                _P = (F * _P) * F.transpose();
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _pred.x(1);
-                const auto tmpSPY = _pred.x(2);
-                const auto tmpSPZ = _pred.x(3);
+                const auto tmpSPX = x(1);
+                const auto tmpSPY = x(2);
+                const auto tmpSPZ = x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _pred.x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = _pred.x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _pred.x(3) * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
-                const auto x0 = _pred.x(0) + _R(2,0) * dx + _R(2,1) * dy
+                const auto x0 = x(0) + _R(2,0) * dx + _R(2,1) * dy
                     + _R(2,2) * dz - G * dt2 / 2.0f;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -137,13 +136,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                const auto x1 = _pred.x(1) + dt * (accelx + gyro.z *
+                const auto x1 = x(1) + dt * (accelx + gyro.z *
                         tmpSPY - gyro.y * tmpSPZ
                         - G * _R(2,0));
-                const auto x2 = _pred.x(2) + dt * (accely - gyro.z *
+                const auto x2 = x(2) + dt * (accely - gyro.z *
                         tmpSPX + gyro.x * tmpSPZ
                         - G * _R(2,1));
-                const auto x3 = _pred.x(3) + dt * (accel.z + gyro.y *
+                const auto x3 = x(3) + dt * (accel.z + gyro.y *
                         tmpSPX - gyro.x * tmpSPY
                         - G * _R(2,2));
 
@@ -165,14 +164,14 @@ namespace hf {
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
                 pq <<
-                    dq[0]*_pred.q(0) - dq[1]*_pred.q(1) -
-                    dq[2]*_pred.q(2) - dq[3]*_pred.q(3),
-                    dq[1]*_pred.q(0) + dq[0]*_pred.q(1) +
-                        dq[3]*_pred.q(2) - dq[2]*_pred.q(3),
-                    dq[2]*_pred.q(0) - dq[3]*_pred.q(1) +
-                        dq[0]*_pred.q(2) + dq[1]*_pred.q(3),
-                    dq[3]*_pred.q(0) + dq[2]*_pred.q(1) -
-                        dq[1]*_pred.q(2) + dq[0]*_pred.q(3);
+                    dq[0]*q(0) - dq[1]*q(1) -
+                    dq[2]*q(2) - dq[3]*q(3),
+                    dq[1]*q(0) + dq[0]*q(1) +
+                        dq[3]*q(2) - dq[2]*q(3),
+                    dq[2]*q(0) - dq[3]*q(1) +
+                        dq[0]*q(2) + dq[1]*q(3),
+                    dq[3]*q(0) + dq[2]*q(1) -
+                        dq[1]*q(2) + dq[0]*q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
@@ -184,9 +183,9 @@ namespace hf {
                 // normalize and store the result
                 const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
 
-                _pred.x << x0, x1, x2, x3, _pred.x(4), _pred.x(5), _pred.x(6); 
+                x << x0, x1, x2, x3, x(4), x(5), x(6); 
 
-                _pred.q = pqnew / norm;
+                q = pqnew / norm;
  
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
@@ -196,8 +195,6 @@ namespace hf {
             auto update(const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> VehicleState
             {
-                _pred = _didResetEstimation ? Prediction() : _pred;
-
                 x = _didResetEstimation ? xinit() : x;
 
                 q = _didResetEstimation ? qinit() : q;
@@ -232,11 +229,11 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                _pred.x = dt > 0 ? enforceSymmetry(_pred.x) : _pred.x;
+                x = dt > 0 ? enforceSymmetry(x) : x;
 
-                _pred._P = dt > 0 ? addCovarianceNoise(_pred._P, noise) : _pred._P;
+                _P = dt > 0 ? addCovarianceNoise(_P, noise) : _P;
 
-                _pred._P = dt > 0 ? enforceSymmetry(_pred._P) : _pred._P;
+                _P = dt > 0 ? enforceSymmetry(_P) : _P;
 
                 _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
                     _lastProcessNoiseUpdateMs;
@@ -251,28 +248,26 @@ namespace hf {
                     ImuSubSampler::accumulate(_accelSubSampler,
                             imudata.accelGs);
 
-                const auto z = _pred.x(0);
+                const auto z = x(0);
 
-                _pred.q = _isUpdated ? 
-                    tryToToIncorporateAttitude(_pred.q, _pred.x) : _pred.q;
+                q = _isUpdated ? 
+                    tryToToIncorporateAttitude(q, x) : q;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
-                _R = _isUpdated ? quat2rotation(_pred.q) : _R;
+                _R = _isUpdated ? quat2rotation(q) : _R;
 
-                _pred._P = _isUpdated ?
-                    enforceSymmetry(addCovarianceNoise(_pred._P, noise)) :
-                    _pred._P;
+                _P = _isUpdated ?
+                    enforceSymmetry(addCovarianceNoise(_P, noise)) :
+                    _P;
 
-                _pred.x = _isUpdated ? enforceSymmetry(_pred.x) : _pred.x;
+                x = _isUpdated ? enforceSymmetry(x) : x;
 
                 _isUpdated = false;
 
                 const auto dx = 0;//_R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
                 const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
                 const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
-
-                const auto q = _pred.q;
 
                 const auto phi = Num::RAD2DEG *
                     atan2f(2*(q(2)*q(3)+q(0)* q(1)),
@@ -332,8 +327,6 @@ namespace hf {
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
-
-            Prediction _pred;
 
             static auto initializeGyroSubSampler() -> ImuSubSampler
             {
