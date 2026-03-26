@@ -78,13 +78,195 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
 
-            EKF() = default;
+            EKF() 
+            {
+                // Reset the IMU samplers
+                _gyroSubSampler = initializeGyroSubSampler();
+                _accelSubSampler = initializeAccelSubSampler();
+
+                // Reset the state
+                _x = initializeState();
+
+                // Reset the attitude quaternion
+                _q = initializeQuaternion();
+
+                // Reset the covariance matrix and add the initial process
+                // noise
+                _P = initializeCovarianceMatrix();
+            }
+
+            EKF(
+                    const Eigen::VectorXd & x,
+                    const Eigen::VectorXd & q,
+                    const Eigen::MatrixXd & P,
+                    const ImuSubSampler & accelSubSampler,
+                    const ImuSubSampler & gyroSubSampler,
+                    const bool didResetEstimation,
+                    const uint32_t msec_prev,
+                    const Eigen::MatrixXd & R,
+                    const bool isUpdated,
+                    const uint32_t lastPredictionMs,
+                    const uint32_t lastProcessNoiseUpdateMs)
+                :
+                    _x(x),
+                    _q(q),
+                    _gyroSubSampler(gyroSubSampler),
+                    _accelSubSampler(accelSubSampler),
+                    _didResetEstimation(didResetEstimation),
+                    _msec_prev(msec_prev),
+                    _R(R),
+                    _isUpdated(isUpdated),
+                    _lastPredictionMs(lastPredictionMs),
+                    _lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs) { }
+
+            static auto predict(const EKF & ekf, const uint32_t msec_curr,
+                    const bool isFlying) -> EKF
+            {
+                const auto accelSubSampler =
+                    ImuSubSampler::finalize(ekf._accelSubSampler);
+                const auto gyroSubSampler =
+                    ImuSubSampler::finalize(ekf._gyroSubSampler);
+
+                const auto accel = accelSubSampler.subSample;
+                const auto gyro = gyroSubSampler.subSample;
+
+                const auto dt = lag2dt(msec_curr, ekf._lastPredictionMs);
+
+                const auto F = makeJacobian(ekf._x, ekf._R, gyro, accel, dt);
+
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+                const auto P = (F * ekf._P) * F.transpose();
+
+                const auto dt2 = dt * dt;
+
+                // keep previous time step's state for the update
+                const auto tmpSPX = ekf._x(1);
+                const auto tmpSPY = ekf._x(2);
+                const auto tmpSPZ = ekf._x(3);
+
+                // position updates in the body frame (will be rotated to inertial frame)
+                const auto dx = ekf._x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = ekf._x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+
+                // thrust can only be produced in the body's Z direction
+                const auto dz = ekf._x(3) * dt + accel.z * dt2 / 2.0f; 
+
+                // position update
+                const auto x0 = ekf._x(0) + ekf._R(2,0) * dx + ekf._R(2,1) * dy
+                    + ekf._R(2,2) * dz - G * dt2 / 2.0f;
+
+                const auto accelx = isFlying ? 0 : accel.x;
+                const auto accely = isFlying ? 0 : accel.y;
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+                const auto x1 = ekf._x(1) + dt * (accelx + gyro.z *
+                        tmpSPY - gyro.y * tmpSPZ
+                        - G * ekf._R(2,0));
+                const auto x2 = ekf._x(2) + dt * (accely - gyro.z *
+                        tmpSPX + gyro.x * tmpSPZ
+                        - G * ekf._R(2,1));
+                const auto x3 = ekf._x(3) + dt * (accel.z + gyro.y *
+                        tmpSPX - gyro.x * tmpSPY
+                        - G * ekf._R(2,2));
+
+                // attitude update (rotate by gyro), we do this in quaternions
+                // this is the gyro angular velocity integrated over the sample
+                // period
+                const auto dtwx = dt*gyro.x;
+                const auto dtwy = dt*gyro.y;
+                const auto dtwz = dt*gyro.z;
+
+                // compute the quaternion values in [w,x,y,z] order
+                const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const auto ca = cos(angle/2.0f);
+                const auto sa = sin(angle/2.0f);
+                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+
+                // rotate the vehicle's attitude by the delta quaternion vector
+                // computed above
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                Eigen::VectorXd pq = Eigen::VectorXd(4);
+                pq <<
+                    dq[0]*ekf._q(0) - dq[1]*ekf._q(1) -
+                    dq[2]*ekf._q(2) - dq[3]*ekf._q(3),
+                    dq[1]*ekf._q(0) + dq[0]*ekf._q(1) +
+                        dq[3]*ekf._q(2) - dq[2]*ekf._q(3),
+                    dq[2]*ekf._q(0) - dq[3]*ekf._q(1) +
+                        dq[0]*ekf._q(2) + dq[1]*ekf._q(3),
+                    dq[3]*ekf._q(0) + dq[2]*ekf._q(1) -
+                        dq[1]*ekf._q(2) + dq[0]*ekf._q(3);
+
+                // Quaternion used for initial orientation
+                Eigen::VectorXd qinit = Eigen::VectorXd(4);
+                qinit << 1, 0, 0, 0;
+
+                const auto pqnew = isFlying ? pq : keep * pq +
+                    ROLLPITCH_ZERO_REVERSION * qinit;
+
+                // normalize and store the result
+                const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
+
+                __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
+                x << x0, x1, x2, x3, ekf._x(4), ekf._x(5), ekf._x(6); 
+
+                return EKF(
+                        x, pqnew/norm, P, accelSubSampler, gyroSubSampler,
+                        ekf._didResetEstimation, ekf._msec_prev, ekf._R,
+                        ekf._isUpdated, ekf._lastPredictionMs,
+                        ekf._lastProcessNoiseUpdateMs);
+            }
+
+            static auto update(
+                    const EKF & ekf,
+                    const uint32_t msec_curr,
+                    const ImuFiltered & imudata) -> EKF
+            {
+                const auto gyroSubSampler = ekf._didResetEstimation ?
+                    initializeGyroSubSampler() : ekf._gyroSubSampler;
+
+                const auto accelSubSampler = ekf._didResetEstimation ?
+                    initializeAccelSubSampler() : ekf._accelSubSampler;
+
+                const auto x = ekf._didResetEstimation ? initializeState() :
+                    ekf._x;
+
+                const auto q = ekf._didResetEstimation ? initializeQuaternion()
+                    : ekf._q;
+
+                const auto P = ekf._didResetEstimation ?
+                    initializeCovarianceMatrix() : ekf._P;
+
+                const auto isUpdated = ekf._didResetEstimation ? false :
+                    ekf._isUpdated;
+
+                const auto lastPredictionMs = ekf._didResetEstimation ?
+                    msec_curr : ekf._lastPredictionMs;
+
+                const auto lastProcessNoiseUpdateMs = ekf._didResetEstimation ?
+                    msec_curr : ekf._lastProcessNoiseUpdateMs;
+
+                const auto didResetEstimation = false;
+
+                (void)imudata;
+                (void)gyroSubSampler;
+                (void)accelSubSampler;
+                (void)x;
+                (void)q;
+                (void)P;
+                (void)isUpdated;
+                (void)lastPredictionMs;
+                (void)lastProcessNoiseUpdateMs;
+                (void)didResetEstimation;
+
+                return ekf;
+            }
 
             auto update(
-                    const bool shouldPredict,
                     const uint32_t msec_curr,
                     const ImuFiltered & imudata,
-                    const bool isFlying) -> VehicleState
+                    const bool isFlying,
+                    const uint32_t prediction_freq=100) -> VehicleState
             {
                 _pred = _didResetEstimation ? Prediction() : _pred;
 
@@ -97,6 +279,9 @@ namespace hf {
                     _lastProcessNoiseUpdateMs;
 
                 _didResetEstimation = false;
+
+                const auto shouldPredict = Timer::ready(msec_curr,
+                        _msec_prev, prediction_freq);
 
                 // Periodically run the system dynamics to predict the state
                 _pred = shouldPredict ? Prediction::run(_pred,
