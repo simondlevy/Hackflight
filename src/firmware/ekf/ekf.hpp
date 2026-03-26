@@ -210,7 +210,22 @@ namespace hf {
 
                 const auto q = pqnew / norm;
 
-                return ekf;
+                const auto msec_prev = msec_curr;
+                const auto isUpdated = true;
+                const auto lastPredictionMs = msec_curr;
+
+                return EKF(
+                        x,
+                        q,
+                        P,
+                        accelSubSampler,
+                        gyroSubSampler,
+                        ekf._didResetEstimation,
+                        msec_prev,
+                        ekf._R,
+                        isUpdated,
+                        lastPredictionMs,
+                        ekf._lastProcessNoiseUpdateMs);
             }
 
             void predict(const uint32_t msec_curr, const bool isFlying)
