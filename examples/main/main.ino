@@ -99,7 +99,6 @@ void loop()
     }*/
 
     if (_ekfPredictionTimer.ready(micros())) {
-        //_ekf.predict(millis(), _flyingCheck.isFlying);
         _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
     }
 
@@ -119,7 +118,8 @@ void loop()
         _flyingCheck = _flyingCheck.run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
 
-        _ekf.update(millis(), _imuFilter.output);
+        // _ekf.update(millis(), _imuFilter.output);
+        _ekf = hf::EKF::update(_ekf, millis(), _imuFilter.output);
 
         const auto state = hf::EKF::getVehicleState(_ekf, _imuFilter.output);
 
