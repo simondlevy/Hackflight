@@ -209,23 +209,19 @@ namespace hf {
                     Eigen::VectorXd(STATE_DIM);
                 x << x0, x1, x2, x3, ekf.x(4), ekf.x(5), ekf.x(6); 
 
-                const auto q = pqnew / norm;
-
-                const auto isUpdated = true;
-                const auto lastPredictionMs = msec_curr;
-
                 return EKF(
                         x,
-                        q,
+                        pqnew / norm, // q
                         P,
                         ekf.R,
                         accelSubSampler,
                         gyroSubSampler,
                         ekf.didResetEstimation,
-                        isUpdated,
-                        lastPredictionMs,
+                        true,         // isUpdated
+                        msec_curr,    // lastPredictionMs
                         ekf.lastProcessNoiseUpdateMs);
-            }
+
+            } // predict
 
             static auto update(const EKF & ekf, const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> EKF
@@ -239,14 +235,15 @@ namespace hf {
 
                 const auto gyroSubSampler = ekf.didResetEstimation ?
                     ImuSubSampler(Num::DEG2RAD) : ekf.gyroSubSampler;
+
                 const auto gyroSubSampler_ =
                     ImuSubSampler::accumulate(gyroSubSampler,
                             imudata.gyroDps);
 
                 const auto isUpdated = ekf.didResetEstimation ? false : ekf.isUpdated;
 
-                const auto lastPredictionMs = ekf.didResetEstimation ? msec_curr :
-                    ekf.lastPredictionMs;
+                const auto lastPredictionMs = ekf.didResetEstimation ?
+                    msec_curr : ekf.lastPredictionMs;
 
                 const auto lastProcessNoiseUpdateMs =
                     ekf.didResetEstimation ?  msec_curr :
@@ -296,7 +293,8 @@ namespace hf {
                         false, // isUpdated
                         lastPredictionMs,
                         lastProcessNoiseUpdateMs_);
-            }
+
+            } // update
 
             static auto getVehicleState(const EKF & ekf,
                     const ImuFiltered & imudata) -> VehicleState
