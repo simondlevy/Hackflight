@@ -88,7 +88,7 @@ namespace hf {
             {
                 x = xinit();
                 q = qinit();
-                _P = pinit();
+                P = pinit();
                 accelSubSampler = ImuSubSampler(G);
                 gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
             }
@@ -97,20 +97,23 @@ namespace hf {
                 const Eigen::VectorXd & x,
                 const Eigen::VectorXd & q,
                 const Eigen::MatrixXd & P,
+                const Eigen::MatrixXd R,
                 const ImuSubSampler  & accelSubSampler,
                 const ImuSubSampler  & gyroSubSampler,
                 const bool didResetEstimation,
-                const Eigen::MatrixXd R,
                 const bool isUpdated,
                 const uint32_t lastPredictionMs,
                 const uint32_t lastProcessNoiseUpdateMs) 
-                : x(x), q(q), _P(P),
-                accelSubSampler(accelSubSampler),
-                gyroSubSampler(gyroSubSampler), 
-                didResetEstimation(didResetEstimation),
-                R(R),
-                isUpdated(isUpdated),
-                lastPredictionMs(lastPredictionMs) {}
+                :
+                    x(x),
+                    q(q),
+                    P(P),
+                    R(R),
+                    accelSubSampler(accelSubSampler),
+                    gyroSubSampler(gyroSubSampler), 
+                    didResetEstimation(didResetEstimation),
+                    isUpdated(isUpdated),
+                    lastPredictionMs(lastPredictionMs) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
@@ -130,7 +133,7 @@ namespace hf {
                 const auto F = makeJacobian(ekf.x, ekf.R, gyro, accel, dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                const auto P = (F * ekf._P) * F.transpose();
+                const auto P = (F * ekf.P) * F.transpose();
 
                 // keep previous time step's state for the update
                 const auto tmpSPX = ekf.x(1);
@@ -215,10 +218,10 @@ namespace hf {
                         x,
                         q,
                         P,
+                        ekf.R,
                         accelSubSampler,
                         gyroSubSampler,
                         ekf.didResetEstimation,
-                        ekf.R,
                         isUpdated,
                         lastPredictionMs,
                         ekf.lastProcessNoiseUpdateMs);
@@ -231,7 +234,7 @@ namespace hf {
 
                 const auto q = ekf.didResetEstimation ? qinit() : ekf.q;
 
-                const auto P = ekf.didResetEstimation ? pinit() : ekf._P;
+                const auto P = ekf.didResetEstimation ? pinit() : ekf.P;
 
                 const auto accelSubSampler = ekf.didResetEstimation ?
                     ImuSubSampler(G) : ekf.accelSubSampler;
@@ -292,10 +295,10 @@ namespace hf {
                         x__,
                         q_,
                         P__,
+                        R,
                         accelSubSampler_,
                         gyroSubSampler_,
                         didResetEstimation,
-                        R,
                         false, // isUpdated
                         lastPredictionMs,
                         lastProcessNoiseUpdateMs_);
@@ -347,16 +350,16 @@ namespace hf {
             Eigen::VectorXd q = Eigen::VectorXd(4);
 
             // Covariance matrix
-            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+            Eigen::MatrixXd P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+            // The vehicle's attitude as a rotation matrix (used by the prediction,
+            // updated by the finalization)
+            Eigen::MatrixXd R = Eigen::MatrixXd(3, 3);
 
             ImuSubSampler accelSubSampler;
             ImuSubSampler gyroSubSampler;
 
             bool didResetEstimation;
-
-            // The vehicle's attitude as a rotation matrix (used by the prediction,
-            // updated by the finalization)
-            Eigen::MatrixXd R = Eigen::MatrixXd(3, 3);
 
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
