@@ -271,6 +271,10 @@ namespace hf {
 
                 const auto P__ = dt > 0 ? enforceSymmetry(P_) : P_;
 
+                const auto P___ = isUpdated ?
+                    enforceSymmetry(addCovarianceNoise(P__, noise)) :
+                    P__;
+
                 const auto lastProcessNoiseUpdateMs_ = dt > 0 ? msec_curr :
                     lastProcessNoiseUpdateMs;
 
@@ -288,10 +292,6 @@ namespace hf {
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
                 const auto R = isUpdated ? quat2rotation(q_) : ekf._R;
-
-                const auto P___ = isUpdated ?
-                    enforceSymmetry(addCovarianceNoise(P__, noise)) :
-                    P__;
 
                 const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
