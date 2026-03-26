@@ -115,36 +115,34 @@ namespace hf {
                     const Eigen::MatrixXd & P)
                 : x(x), q(q), _P(P) {}
 
-            static auto run(
-                    const Prediction & pred,
+            void run(
                     const Vec3 & accel,
                     const Vec3 & gyro,
                     const float dt,
                     const bool isFlying,
-                    const Eigen::MatrixXd & R) -> Prediction
+                    const Eigen::MatrixXd & R)
             {
-
-                const auto F = makeJacobian(pred.x, R, gyro, accel, dt);
+                const auto F = makeJacobian(x, R, gyro, accel, dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                const auto P = (F * pred._P) * F.transpose();
+                _P = (F * _P) * F.transpose();
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = pred.x(1);
-                const auto tmpSPY = pred.x(2);
-                const auto tmpSPZ = pred.x(3);
+                const auto tmpSPX = x(1);
+                const auto tmpSPY = x(2);
+                const auto tmpSPZ = x(3);
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = pred.x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = pred.x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = pred.x(3) * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = x(3) * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
-                const auto x0 = pred.x(0) + R(2,0) * dx + R(2,1) * dy
+                const auto x0 = x(0) + R(2,0) * dx + R(2,1) * dy
                     + R(2,2) * dz - G * dt2 / 2.0f;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -153,13 +151,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                const auto x1 = pred.x(1) + dt * (accelx + gyro.z *
+                const auto x1 = x(1) + dt * (accelx + gyro.z *
                         tmpSPY - gyro.y * tmpSPZ
                         - G * R(2,0));
-                const auto x2 = pred.x(2) + dt * (accely - gyro.z *
+                const auto x2 = x(2) + dt * (accely - gyro.z *
                         tmpSPX + gyro.x * tmpSPZ
                         - G * R(2,1));
-                const auto x3 = pred.x(3) + dt * (accel.z + gyro.y *
+                const auto x3 = x(3) + dt * (accel.z + gyro.y *
                         tmpSPX - gyro.x * tmpSPY
                         - G * R(2,2));
 
@@ -181,14 +179,14 @@ namespace hf {
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
                 pq <<
-                    dq[0]*pred.q(0) - dq[1]*pred.q(1) -
-                    dq[2]*pred.q(2) - dq[3]*pred.q(3),
-                    dq[1]*pred.q(0) + dq[0]*pred.q(1) +
-                        dq[3]*pred.q(2) - dq[2]*pred.q(3),
-                    dq[2]*pred.q(0) - dq[3]*pred.q(1) +
-                        dq[0]*pred.q(2) + dq[1]*pred.q(3),
-                    dq[3]*pred.q(0) + dq[2]*pred.q(1) -
-                        dq[1]*pred.q(2) + dq[0]*pred.q(3);
+                    dq[0]*q(0) - dq[1]*q(1) -
+                    dq[2]*q(2) - dq[3]*q(3),
+                    dq[1]*q(0) + dq[0]*q(1) +
+                        dq[3]*q(2) - dq[2]*q(3),
+                    dq[2]*q(0) - dq[3]*q(1) +
+                        dq[0]*q(2) + dq[1]*q(3),
+                    dq[3]*q(0) + dq[2]*q(1) -
+                        dq[1]*q(2) + dq[0]*q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
@@ -200,10 +198,9 @@ namespace hf {
                 // normalize and store the result
                 const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
 
-                __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
-                x << x0, x1, x2, x3, pred.x(4), pred.x(5), pred.x(6); 
+                x << x0, x1, x2, x3, x(4), x(5), x(6); 
 
-                return Prediction(x, pqnew/norm, P);
+                q = pqnew / norm;
             }
 
             static bool isVelInBounds(const float vel)

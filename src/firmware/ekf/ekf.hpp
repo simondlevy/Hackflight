@@ -89,8 +89,7 @@ namespace hf {
                 _accelSubSampler = ImuSubSampler::finalize(_accelSubSampler);
                 _gyroSubSampler = ImuSubSampler::finalize(_gyroSubSampler);
 
-                _pred = Prediction::run(
-                        _pred,
+                _pred.run(
                         _accelSubSampler.subSample,
                         _gyroSubSampler.subSample,
                         lag2dt(msec_curr, _lastPredictionMs),
