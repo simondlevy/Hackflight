@@ -272,9 +272,9 @@ namespace hf {
                 const auto dpsi = gyroLatest.z;
 
                 _didResetEstimation =
-                    (!Prediction::isVelInBounds(dx) ||
-                     !Prediction::isVelInBounds(dy) ||
-                     !Prediction::isVelInBounds(dz)) ? true :
+                    (!isVelInBounds(dx) ||
+                     !isVelInBounds(dy) ||
+                     !isVelInBounds(dz)) ? true :
                     _didResetEstimation;
 
                 return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
