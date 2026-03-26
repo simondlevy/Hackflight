@@ -189,25 +189,6 @@ namespace hf {
 
         private:
 
-            // Prediction -----------------------------------------------------
-
-            // State vector
-            __attribute__((aligned(4))) Eigen::VectorXd _x =
-                Eigen::VectorXd(STATE_DIM);
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a
-            // quaternion to allow easy normalization (in comparison to a
-            // rotation matrix), while also being robust against singularities
-            // (in comparison to euler angles)
-            Eigen::VectorXd _q = Eigen::VectorXd(4);
-
-            // Covariance matrix
-            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-
-            ImuSubSampler _gyroSubSampler;
-            ImuSubSampler _accelSubSampler;
-
-            // Update --------------------------------------------------------
 
             bool _didResetEstimation;
 
@@ -224,9 +205,7 @@ namespace hf {
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
 
-            // ---------------------------------------------------------------
             Prediction _pred;
-            // ---------------------------------------------------------------
 
             static auto initializeGyroSubSampler() -> ImuSubSampler
             {
