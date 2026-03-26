@@ -228,7 +228,118 @@ namespace hf {
                         ekf._lastProcessNoiseUpdateMs);
             }
 
-            auto update(const uint32_t msec_curr,
+            static auto update(const EKF & ekf, const uint32_t msec_curr,
+                    const ImuFiltered & imudata) -> EKF
+            {
+                (void)msec_curr;
+                (void)imudata;
+
+                return ekf;
+
+                /*
+                x = _didResetEstimation ? xinit() : x;
+
+                q = _didResetEstimation ? qinit() : q;
+
+                _P = _didResetEstimation ? pinit() : _P;
+
+                _accelSubSampler = _didResetEstimation ?
+                    ImuSubSampler(G) : _accelSubSampler;
+
+                _gyroSubSampler = _didResetEstimation ?
+                    ImuSubSampler(Num::DEG2RAD) : _gyroSubSampler;
+
+                _isUpdated = _didResetEstimation ? false : _isUpdated;
+
+                _lastPredictionMs = _didResetEstimation ? msec_curr :
+                    _lastPredictionMs;
+
+                _lastProcessNoiseUpdateMs = _didResetEstimation ? msec_curr :
+                    _lastProcessNoiseUpdateMs;
+
+                _didResetEstimation = false;
+
+                const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
+
+                x = dt > 0 ? enforceSymmetry(x) : x;
+
+                _P = dt > 0 ? addCovarianceNoise(_P, noise) : _P;
+
+                _P = dt > 0 ? enforceSymmetry(_P) : _P;
+
+                _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
+                    _lastProcessNoiseUpdateMs;
+
+                const auto gyroLatest = imudata.gyroDps;
+
+                _gyroSubSampler =
+                    ImuSubSampler::accumulate(_gyroSubSampler,
+                            imudata.gyroDps);
+
+                _accelSubSampler =
+                    ImuSubSampler::accumulate(_accelSubSampler,
+                            imudata.accelGs);
+
+                const auto z = x(0);
+
+                q = _isUpdated ? 
+                    tryToToIncorporateAttitude(q, x) : q;
+
+                // Convert the new attitude to a rotation matrix, such that we can
+                // rotate body-frame velocity and acc
+                _R = _isUpdated ? quat2rotation(q) : _R;
+
+                _P = _isUpdated ?
+                    enforceSymmetry(addCovarianceNoise(_P, noise)) :
+                    _P;
+
+                x = _isUpdated ? enforceSymmetry(x) : x;
+
+                _isUpdated = false;
+
+                const auto dx = 0;//_R(0,0)*_x(1) + _R(0,1)*_x(2) + _R(0,2)*_x(3);
+                const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
+                const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
+
+                const auto phi = Num::RAD2DEG *
+                    atan2f(2*(q(2)*q(3)+q(0)* q(1)),
+                            q(0)*q(0) - q(1)*q(1) - q(2)*q(2) + q(3)*q(3));
+
+                const auto dphi = gyroLatest.x;
+
+                const auto theta = Num::RAD2DEG *
+                    asinf(-2*(q(1)*q(3) - q(0)*q(2)));
+
+                const auto dtheta = gyroLatest.y;
+
+                const auto psi = Num::RAD2DEG *
+                    atan2f(2*(q(1)*q(2)+q(0)* q(3)),
+                            q(0)*q(0) + q(1)*q(1) - q(2)*q(2) - q(3)*q(3)); 
+
+                const auto dpsi = gyroLatest.z;
+
+                _didResetEstimation =
+                    (!isVelInBounds(dx) ||
+                     !isVelInBounds(dy) ||
+                     !isVelInBounds(dz)) ? true :
+                    _didResetEstimation;
+
+                return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
+                        -psi, -dpsi); // make nose-right positive
+                */
+            }
+
+             auto update(const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> VehicleState
             {
                 x = _didResetEstimation ? xinit() : x;
