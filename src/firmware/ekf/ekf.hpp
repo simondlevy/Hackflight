@@ -80,18 +80,21 @@ namespace hf {
 
             EKF() = default;
 
-            auto update(
-                    const bool shouldPredict,
-                    const uint32_t msec_curr,
-                    const ImuFiltered & imudata,
-                    const bool isFlying) -> VehicleState
+            void predict(const uint32_t msec_curr, const bool isFlying)
             {
-                // Periodically run the system dynamics to predict the state
-                _pred =
-                    shouldPredict ?
-                    Prediction::run(_pred, lag2dt(msec_curr, _lastPredictionMs), isFlying, _R) : 
-                    _didResetEstimation ? Prediction() :
-                    _pred;
+                _pred = Prediction::run(
+                        _pred, lag2dt(msec_curr, _lastPredictionMs),
+                        isFlying,
+                        _R);
+                _isUpdated = true;
+                _lastPredictionMs = msec_curr;
+                _msec_prev = msec_curr;
+            }
+
+            auto update(const uint32_t msec_curr,
+                    const ImuFiltered & imudata) -> VehicleState
+            {
+                _pred = _didResetEstimation ? Prediction() : _pred;
 
                 _isUpdated = _didResetEstimation ? false : _isUpdated;
 
@@ -102,13 +105,6 @@ namespace hf {
                     _lastProcessNoiseUpdateMs;
 
                 _didResetEstimation = false;
-
-                _isUpdated = shouldPredict ? true : _isUpdated;
-
-                _lastPredictionMs = shouldPredict ? msec_curr :
-                    _lastPredictionMs;
-
-                _msec_prev = shouldPredict ? msec_curr : _msec_prev;
 
                 const float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 

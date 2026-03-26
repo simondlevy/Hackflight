@@ -98,12 +98,9 @@ void loop()
         _zranger.read();
     }*/
 
-    /*
     if (_ekfPredictionTimer.ready(micros())) {
-        _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
-    }*/
-
-    const auto shouldPredict = _ekfPredictionTimer.ready(micros());
+        _ekf.predict(millis(), _flyingCheck.isFlying);
+    }
 
     if (_imu.available()) {
 
@@ -121,8 +118,7 @@ void loop()
         _flyingCheck = _flyingCheck.run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
 
-        const auto state = _ekf.update(shouldPredict, millis(),
-                _imuFilter.output, _flyingCheck.isFlying);
+        const auto state = _ekf.update(millis(), _imuFilter.output);
 
         _mode = hf::Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
