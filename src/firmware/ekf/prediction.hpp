@@ -240,16 +240,6 @@ namespace hf {
                     pred;
             }
 
-            static auto addCovarianceNoise(
-                    const Prediction & pred,
-                    const float * noise) -> Prediction
-            {
-                const auto Pcov = addCovarianceNoise(pred._P, noise);
-
-                return Prediction(pred.x, pred.q, Pcov, pred._accelSubSampler,
-                        pred._gyroSubSampler); 
-            }
-
             static auto enforceSymmetry(const Prediction & pred) -> Prediction
             {
                 Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);

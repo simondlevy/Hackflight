@@ -122,13 +122,9 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                _P = dt > 0 ? enforceSymmetry(addCovarianceNoise(_P, noise)) :
-                    _P;
-
                 _x = dt > 0 ? enforceSymmetry(_x) : _x;
 
-                _pred = dt > 0 ? Prediction::addCovarianceNoise(_pred, noise) :
-                    _pred;
+                _pred._P = dt > 0 ? addCovarianceNoise(_pred._P, noise) : _pred._P;
 
                 _pred = dt > 0 ? Prediction::enforceSymmetry(_pred) : _pred;
 
