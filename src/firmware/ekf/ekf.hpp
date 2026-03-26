@@ -22,6 +22,13 @@
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
+// We want to use F for the Jacobian and _P for the covariance matrix, but
+// Arduino pre-defines them
+#ifdef F
+#undef F
+#undef _P
+#endif
+
 namespace hf {
 
     class EKF { 
@@ -80,7 +87,14 @@ namespace hf {
 
             EKF() 
             {
+                x = xinit();
+
+                q = qinit();
+
+                _P = pinit();
+
                 _accelSubSampler = ImuSubSampler(G);
+
                 _gyroSubSampler = ImuSubSampler(Num::DEG2RAD);
             }
 
@@ -184,6 +198,12 @@ namespace hf {
             {
                 _pred = _didResetEstimation ? Prediction() : _pred;
 
+                x = _didResetEstimation ? xinit() : x;
+
+                q = _didResetEstimation ? qinit() : q;
+
+                _P = _didResetEstimation ? pinit() : _P;
+
                 _accelSubSampler = _didResetEstimation ?
                     ImuSubSampler(G) : _accelSubSampler;
 
@@ -283,7 +303,17 @@ namespace hf {
 
         private:
 
-            Eigen::VectorXd _qinit = Eigen::VectorXd(4);
+            // State vector
+            __attribute__((aligned(4))) Eigen::VectorXd x =
+                Eigen::VectorXd(STATE_DIM);
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            Eigen::VectorXd q = Eigen::VectorXd(4);
+
+            // Covariance matrix
+            Eigen::MatrixXd _P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
 
             ImuSubSampler _accelSubSampler;
             ImuSubSampler _gyroSubSampler;
@@ -514,6 +544,34 @@ namespace hf {
                 return F;
             }
 
+            static auto xinit() -> Eigen::VectorXd
+            {
+                return Eigen::VectorXd(STATE_DIM);
+            }
+
+            static auto qinit() -> Eigen::VectorXd
+            {
+                auto q = Eigen::VectorXd(4);
+                q << 1, 0, 0, 0;
+                return q;
+            }
+
+            static auto pinit() -> Eigen::MatrixXd
+            {
+                auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+
+                const float noise[STATE_DIM] = {
+                    STDEV_INITIAL_POSITION_Z,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_VELOCITY,
+                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
+                    STDEV_INITIAL_ATTITUDE_YAW
+                };
+
+                return addCovarianceNoise(P, noise);
+            }
 
             static auto quat2rotation(
                     const Eigen::VectorXd & q) -> Eigen::MatrixXd
