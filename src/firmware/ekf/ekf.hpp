@@ -230,17 +230,17 @@ namespace hf {
             static auto update(const EKF & ekf, const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> EKF
             {
-                const auto x = ekf.didResetEstimation ? xinit() : ekf.x;
-
-                const auto q = ekf.didResetEstimation ? qinit() : ekf.q;
-
-                const auto P = ekf.didResetEstimation ? pinit() : ekf.P;
-
                 const auto accelSubSampler = ekf.didResetEstimation ?
                     ImuSubSampler(G) : ekf.accelSubSampler;
+                const auto accelSubSampler_ =
+                    ImuSubSampler::accumulate(accelSubSampler,
+                            imudata.accelGs);
 
                 const auto gyroSubSampler = ekf.didResetEstimation ?
                     ImuSubSampler(Num::DEG2RAD) : ekf.gyroSubSampler;
+                const auto gyroSubSampler_ =
+                    ImuSubSampler::accumulate(gyroSubSampler,
+                            imudata.gyroDps);
 
                 const auto isUpdated = ekf.didResetEstimation ? false : ekf.isUpdated;
 
@@ -254,32 +254,25 @@ namespace hf {
                 const float dt = (msec_curr - lastProcessNoiseUpdateMs)
                     / 1000.0f;
 
+                const auto x = ekf.didResetEstimation ? xinit() : ekf.x;
                 const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : ekf.x;
+                const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
+                const auto P = ekf.didResetEstimation ? pinit() : ekf.P;
                 const auto P_ = dt > 0 ? enforceSymmetry(pnoisy(P, dt)) : P;
-
                 const auto P__ = isUpdated ?
                     enforceSymmetry(pnoisy(P_, dt)) : P_;
 
                 const auto lastProcessNoiseUpdateMs_ = dt > 0 ? msec_curr :
                     lastProcessNoiseUpdateMs;
 
-                const auto gyroSubSampler_ =
-                    ImuSubSampler::accumulate(gyroSubSampler,
-                            imudata.gyroDps);
-
-                const auto accelSubSampler_ =
-                    ImuSubSampler::accumulate(accelSubSampler,
-                            imudata.accelGs);
-
+                const auto q = ekf.didResetEstimation ? qinit() : ekf.q;
                 const auto q_ =
                     isUpdated ? tryToToIncorporateAttitude(q, x_) : q;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
                 const auto R = isUpdated ? quat2rotation(q_) : ekf.R;
-
-                const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
 
                 const float dx = 0;//R(0,0)*_x(1) + R(0,1)*_x(2) + R(0,2)*_x(3);
                 const float dy = 0;//R(1,0)*_x(1) + R(1,1)*_x(2) + R(1,2)*_x(3); 
