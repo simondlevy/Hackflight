@@ -226,34 +226,6 @@ namespace hf {
                         x, pqnew/norm, P, accelSubSampler, gyroSubSampler);
             }
 
-            static auto tryToToIncorporateAttitude(const Prediction & pred) -> Prediction
-            {
-                // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = pred.x(4);
-                const float v1 = pred.x(5);
-                const float v2 = pred.x(6);
-
-                return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
-                        && (isVelInBounds(v0) && isVelInBounds(v1) &&
-                            isVelInBounds(v2))) ?
-                    incorporateAttitude(v0, v1, v2, pred) :
-                    pred;
-            }
-
-            static auto accumulateImu(
-                    const Prediction & pred,
-                    const ImuFiltered & imuLatest) -> Prediction
-            {
-                const auto gyroSubSampler = ImuSubSampler::accumulate(
-                        pred._gyroSubSampler, imuLatest.gyroDps);
-
-                const auto accelSubSampler = ImuSubSampler::accumulate(
-                        pred._accelSubSampler, imuLatest.accelGs);
-
-                return Prediction(pred.x, pred.q, pred._P, accelSubSampler,
-                        gyroSubSampler); 
-            }
-
             static bool isVelInBounds(const float vel)
             {
                 return fabs(vel) < MAX_VELOCITY_MPS;
@@ -334,39 +306,6 @@ namespace hf {
                 F(6,6) = 1 - d0*d0/2 - d1*d1/2;
 
                 return F;
-            }
-
-            static auto incorporateAttitude(
-                    const float v0, const float v1, const float v2,
-                    const Prediction & pred) -> Prediction
-            {
-                const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                const float ca = cos(angle / 2.0f);
-                const float sa = sin(angle / 2.0f);
-                const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
-
-                const auto q = pred.q;
-
-                // Rotate the vehicle's attitude by the delta quaternion vector
-                // computed above
-                const float q0 = dq[0] * q(0) - dq[1] * q(1) - dq[2] * q(2)
-                    - dq[3] * q(3);
-                const float q1 = dq[1] * q(0) + dq[0] * q(1) + dq[3] * q(2)
-                    - dq[2] * q(3);
-                const float q2 = dq[2] * q(0) - dq[3] * q(1) + dq[0] * q(2)
-                    + dq[1] * q(3);
-                const float q3 = dq[3] * q(0) + dq[2] * q(1) - dq[1] * q(2)
-                    + dq[0] * q(3);
-
-                // normalize and store the result
-                const float norm = sqrt(q0 * q0 + q1 * q1 + q2 * q2 + 
-                        q3 * q3) + EPSILON;
-
-                Eigen::VectorXd qnew = Eigen::VectorXd(4);
-                qnew << q0/norm, q1/norm, q2/norm, q3/norm;
-
-                return Prediction(pred.x, qnew, pred._P, pred._accelSubSampler,
-                        pred._gyroSubSampler);
             }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,

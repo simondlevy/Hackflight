@@ -133,20 +133,18 @@ namespace hf {
 
                 const auto gyroLatest = imudata.gyroDps;
 
-                _pred = Prediction::accumulateImu(_pred, imudata);
+                _pred._gyroSubSampler =
+                    ImuSubSampler::accumulate(_pred._gyroSubSampler,
+                            imudata.gyroDps);
 
-                _gyroSubSampler = ImuSubSampler::accumulate(_gyroSubSampler,
-                        imudata.gyroDps);
-
-                _accelSubSampler = ImuSubSampler::accumulate(_accelSubSampler,
-                        imudata.accelGs);
+                _pred._accelSubSampler =
+                    ImuSubSampler::accumulate(_pred._accelSubSampler,
+                            imudata.accelGs);
 
                 const auto z = _pred.x(0);
 
-                _pred = _isUpdated ?
-                    Prediction::tryToToIncorporateAttitude(_pred) : _pred;
-
-                _q = _isUpdated ?  tryToToIncorporateAttitude(_q, _x) : _q;
+                _pred.q = _isUpdated ? 
+                    tryToToIncorporateAttitude(_pred.q, _pred.x) : _pred.q;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and acc
