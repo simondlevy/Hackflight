@@ -74,7 +74,7 @@ namespace hf {
                 x = xinit(); //Eigen::VectorXd(STATE_DIM);
 
                 // Reset the attitude quaternion
-                q << 1, 0, 0, 0;
+                q = qinit(); //<< 1, 0, 0, 0;
 
                 // Reset the covariance matrix and add the initial process
                 // noise
@@ -105,6 +105,13 @@ namespace hf {
             static auto xinit() -> Eigen::VectorXd
             {
                 return Eigen::VectorXd(STATE_DIM);
+            }
+
+            static auto qinit() -> Eigen::VectorXd
+            {
+                auto q = Eigen::VectorXd(4);
+                q << 1, 0, 0, 0;
+                return q;
             }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
