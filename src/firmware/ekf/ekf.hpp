@@ -255,25 +255,14 @@ namespace hf {
                 const float dt = (msec_curr - lastProcessNoiseUpdateMs)
                     / 1000.0f;
 
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
-
                 const auto x_ = dt > 0 ? enforceSymmetry(ekf.x) : ekf.x;
 
-                const auto P_ = dt > 0 ? addCovarianceNoise(P, noise) : P;
+                const auto P_ = dt > 0 ? pnoisy(P, dt) : P;
 
                 const auto P__ = dt > 0 ? enforceSymmetry(P_) : P_;
 
                 const auto P___ = isUpdated ?
-                    enforceSymmetry(addCovarianceNoise(P__, noise)) :
-                    P__;
+                    enforceSymmetry(pnoisy(P__, dt)) : P__;
 
                 const auto lastProcessNoiseUpdateMs_ = dt > 0 ? msec_curr :
                     lastProcessNoiseUpdateMs;
@@ -697,6 +686,22 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW
+                };
+
+                return addCovarianceNoise(P, noise);
+            }
+
+            static auto pnoisy(const Eigen::MatrixXd &P, const float dt)
+                -> Eigen::MatrixXd
+            {
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
                 return addCovarianceNoise(P, noise);
