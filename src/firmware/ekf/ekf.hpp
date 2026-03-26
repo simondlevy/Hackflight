@@ -343,7 +343,8 @@ namespace hf {
 
                 const auto dpsi = gyroDps.z;
 
-                const float z = 0;
+                const auto z = ekf.x(0);
+
                 const float dx = 0;
                 const float dy = 0;
                 const float dz = 0;
@@ -352,8 +353,7 @@ namespace hf {
                         -psi, -dpsi); // make nose-right positive
             }
 
-             auto update(const uint32_t msec_curr,
-                    const ImuFiltered & imudata) -> VehicleState
+             void update(const uint32_t msec_curr, const ImuFiltered & imudata)
             {
                 x = _didResetEstimation ? xinit() : x;
 
@@ -406,8 +406,6 @@ namespace hf {
                     ImuSubSampler::accumulate(_accelSubSampler,
                             imudata.accelGs);
 
-                const auto z = x(0);
-
                 q = _isUpdated ? 
                     tryToToIncorporateAttitude(q, x) : q;
 
@@ -427,33 +425,11 @@ namespace hf {
                 const auto dy = 0;//_R(1,0)*_x(1) + _R(1,1)*_x(2) + _R(1,2)*_x(3); 
                 const auto dz = 0;//_R(2,0)*_x(1) + _R(2,1)*_x(2) + _R(2,2)*_x(3);
 
-                const auto phi = Num::RAD2DEG *
-                    atan2f(2*(q(2)*q(3)+q(0)* q(1)),
-                            q(0)*q(0) - q(1)*q(1) - q(2)*q(2) + q(3)*q(3));
-
-                const auto gyroLatest = imudata.gyroDps;
-
-                const auto dphi = gyroLatest.x;
-
-                const auto theta = Num::RAD2DEG *
-                    asinf(-2*(q(1)*q(3) - q(0)*q(2)));
-
-                const auto dtheta = gyroLatest.y;
-
-                const auto psi = Num::RAD2DEG *
-                    atan2f(2*(q(1)*q(2)+q(0)* q(3)),
-                            q(0)*q(0) + q(1)*q(1) - q(2)*q(2) - q(3)*q(3)); 
-
-                const auto dpsi = gyroLatest.z;
-
                 _didResetEstimation =
                     (!isVelInBounds(dx) ||
                      !isVelInBounds(dy) ||
                      !isVelInBounds(dz)) ? true :
                     _didResetEstimation;
-
-                return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
-                        -psi, -dpsi); // make nose-right positive
             }
 
         private:
