@@ -114,7 +114,7 @@ namespace hf {
                 _isUpdated(isUpdated),
                 _lastPredictionMs(lastPredictionMs) {}
 
-            auto predict(const EKF & ekf, const uint32_t msec_curr,
+            static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
             {
                 const auto accelSubSampler =
@@ -157,13 +157,13 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                const auto x1 = x(1) + dt * (accelx + gyro.z *
+                const auto x1 = ekf.x(1) + dt * (accelx + gyro.z *
                         tmpSPY - gyro.y * tmpSPZ
                         - G * ekf._R(2,0));
-                const auto x2 = x(2) + dt * (accely - gyro.z *
+                const auto x2 = ekf.x(2) + dt * (accely - gyro.z *
                         tmpSPX + gyro.x * tmpSPZ
                         - G * ekf._R(2,1));
-                const auto x3 = x(3) + dt * (accel.z + gyro.y *
+                const auto x3 = ekf.x(3) + dt * (accel.z + gyro.y *
                         tmpSPX - gyro.x * tmpSPY
                         - G * ekf._R(2,2));
 
@@ -185,14 +185,14 @@ namespace hf {
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
                 pq <<
-                    dq[0]*q(0) - dq[1]*q(1) -
-                    dq[2]*q(2) - dq[3]*q(3),
-                    dq[1]*q(0) + dq[0]*q(1) +
-                        dq[3]*q(2) - dq[2]*q(3),
-                    dq[2]*q(0) - dq[3]*q(1) +
-                        dq[0]*q(2) + dq[1]*q(3),
-                    dq[3]*q(0) + dq[2]*q(1) -
-                        dq[1]*q(2) + dq[0]*q(3);
+                    dq[0]*ekf.q(0) - dq[1]*ekf.q(1) -
+                    dq[2]*ekf.q(2) - dq[3]*ekf.q(3),
+                    dq[1]*ekf.q(0) + dq[0]*ekf.q(1) +
+                        dq[3]*ekf.q(2) - dq[2]*ekf.q(3),
+                    dq[2]*ekf.q(0) - dq[3]*ekf.q(1) +
+                        dq[0]*ekf.q(2) + dq[1]*ekf.q(3),
+                    dq[3]*ekf.q(0) + dq[2]*ekf.q(1) -
+                        dq[1]*ekf.q(2) + dq[0]*ekf.q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
@@ -226,101 +226,6 @@ namespace hf {
                         isUpdated,
                         lastPredictionMs,
                         ekf._lastProcessNoiseUpdateMs);
-            }
-
-            void predict(const uint32_t msec_curr, const bool isFlying)
-            {
-                _accelSubSampler = ImuSubSampler::finalize(_accelSubSampler);
-                _gyroSubSampler = ImuSubSampler::finalize(_gyroSubSampler);
-
-                const auto dt = lag2dt(msec_curr, _lastPredictionMs);
-
-                const auto accel = _accelSubSampler.subSample;
-                const auto gyro = _gyroSubSampler.subSample;
-
-                const auto F = makeJacobian(x, _R, gyro, accel, dt);
-
-                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                _P = (F * _P) * F.transpose();
-
-                const auto dt2 = dt * dt;
-
-                // keep previous time step's state for the update
-                const auto tmpSPX = x(1);
-                const auto tmpSPY = x(2);
-                const auto tmpSPZ = x(3);
-
-                // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
-
-                // thrust can only be produced in the body's Z direction
-                const auto dz = x(3) * dt + accel.z * dt2 / 2.0f; 
-
-                // position update
-                const auto x0 = x(0) + _R(2,0) * dx + _R(2,1) * dy
-                    + _R(2,2) * dz - G * dt2 / 2.0f;
-
-                const auto accelx = isFlying ? 0 : accel.x;
-                const auto accely = isFlying ? 0 : accel.y;
-
-                // body-velocity update: accelerometers - gyros cross velocity
-                // - gravity in body frame
-
-                const auto x1 = x(1) + dt * (accelx + gyro.z *
-                        tmpSPY - gyro.y * tmpSPZ
-                        - G * _R(2,0));
-                const auto x2 = x(2) + dt * (accely - gyro.z *
-                        tmpSPX + gyro.x * tmpSPZ
-                        - G * _R(2,1));
-                const auto x3 = x(3) + dt * (accel.z + gyro.y *
-                        tmpSPX - gyro.x * tmpSPY
-                        - G * _R(2,2));
-
-                // attitude update (rotate by gyro), we do this in quaternions
-                // this is the gyro angular velocity integrated over the sample
-                // period
-                const auto dtwx = dt*gyro.x;
-                const auto dtwy = dt*gyro.y;
-                const auto dtwz = dt*gyro.z;
-
-                // compute the quaternion values in [w,x,y,z] order
-                const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-                const auto ca = cos(angle/2.0f);
-                const auto sa = sin(angle/2.0f);
-                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
-
-                // rotate the vehicle's attitude by the delta quaternion vector
-                // computed above
-                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-                Eigen::VectorXd pq = Eigen::VectorXd(4);
-                pq <<
-                    dq[0]*q(0) - dq[1]*q(1) -
-                    dq[2]*q(2) - dq[3]*q(3),
-                    dq[1]*q(0) + dq[0]*q(1) +
-                        dq[3]*q(2) - dq[2]*q(3),
-                    dq[2]*q(0) - dq[3]*q(1) +
-                        dq[0]*q(2) + dq[1]*q(3),
-                    dq[3]*q(0) + dq[2]*q(1) -
-                        dq[1]*q(2) + dq[0]*q(3);
-
-                // Quaternion used for initial orientation
-                Eigen::VectorXd qinit = Eigen::VectorXd(4);
-                qinit << 1, 0, 0, 0;
-
-                const auto pqnew = isFlying ? pq : keep * pq +
-                    ROLLPITCH_ZERO_REVERSION * qinit;
-
-                // normalize and store the result
-                const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
-
-                x << x0, x1, x2, x3, x(4), x(5), x(6); 
-
-                q = pqnew / norm;
- 
-                _isUpdated = true;
-                _lastPredictionMs = msec_curr;
-                _msec_prev = msec_curr;
             }
 
             auto update(const uint32_t msec_curr,

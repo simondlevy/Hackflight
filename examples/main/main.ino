@@ -33,8 +33,8 @@
 #include <firmware/rx/elrs.hpp>
 #include <firmware/safety.hpp>
 //#include <firmware/sensors/imus/bmi088.hpp>
-//#include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
-#include <firmware/sensors/imus/mpu6050.hpp>
+#include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
+//#include <firmware/sensors/imus/mpu6050.hpp>
 #include <firmware/sensors/zranger.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
@@ -99,7 +99,8 @@ void loop()
     }*/
 
     if (_ekfPredictionTimer.ready(micros())) {
-        _ekf.predict(millis(), _flyingCheck.isFlying);
+        //_ekf.predict(millis(), _flyingCheck.isFlying);
+        _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
     }
 
     if (_imu.available()) {
@@ -133,7 +134,7 @@ void loop()
             _motors.run(rxdata.is_armed, _mixer.motorvals);
         }
 
-        //hf::Debugger::report(state);
+        hf::Debugger::report(state);
     }
 
     hf::Timer::runDelayLoop(loop_start_usec);
