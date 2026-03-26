@@ -122,11 +122,11 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                _x = dt > 0 ? enforceSymmetry(_x) : _x;
+                _pred.x = dt > 0 ? enforceSymmetry(_pred.x) : _pred.x;
 
                 _pred._P = dt > 0 ? addCovarianceNoise(_pred._P, noise) : _pred._P;
 
-                _pred = dt > 0 ? Prediction::enforceSymmetry(_pred) : _pred;
+                _pred._P = dt > 0 ? enforceSymmetry(_pred._P) : _pred._P;
 
                 _lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
                     _lastProcessNoiseUpdateMs;
@@ -152,12 +152,11 @@ namespace hf {
                 // rotate body-frame velocity and acc
                 _R = _isUpdated ? quat2rotation(_pred.q) : _R;
 
-                _pred = _isUpdated ? Prediction::enforceSymmetry(_pred) : _pred;
+                _pred._P = _isUpdated ?
+                    enforceSymmetry(addCovarianceNoise(_pred._P, noise)) :
+                    _pred._P;
 
-                _P = _isUpdated ? enforceSymmetry(addCovarianceNoise(_P, noise)) :
-                    _P;
-
-                _x = _isUpdated ? enforceSymmetry(_x) : _x;
+                _pred.x = _isUpdated ? enforceSymmetry(_pred.x) : _pred.x;
 
                 _isUpdated = false;
 

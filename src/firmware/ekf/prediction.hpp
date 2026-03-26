@@ -240,31 +240,6 @@ namespace hf {
                     pred;
             }
 
-            static auto enforceSymmetry(const Prediction & pred) -> Prediction
-            {
-                Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        const auto pval = (pred._P(i,j) + pred._P(j,i)) / 2;
-
-                        Psym(i,j) = Psym(j,i) = 
-                            isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                            i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                            pval;
-                    }
-
-                }
-
-                __attribute__((aligned(4))) Eigen::VectorXd x(STATE_DIM); 
-                x << pred.x(0), pred.x(1), pred.x(2), pred.x(3), 0, 0, 0;
-
-                return Prediction(x, pred.q, Psym, pred._accelSubSampler,
-                        pred._gyroSubSampler); 
-            }
-
             static auto accumulateImu(
                     const Prediction & pred,
                     const ImuFiltered & imuLatest) -> Prediction
@@ -285,18 +260,6 @@ namespace hf {
             }
 
         private:
-
-            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
-                    const float * noise) -> Eigen::MatrixXd
-            {
-                auto Pcov = P;
-
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    Pcov(k,k) += noise[k] * noise[k];
-                }
-
-                return Pcov;
-            }
 
             static auto makeJacobian(
                     const Eigen::VectorXd & x,
@@ -406,7 +369,19 @@ namespace hf {
                         pred._gyroSubSampler);
             }
 
-            static bool isVelPositive(const float vel)
+            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
+                    const float * noise) -> Eigen::MatrixXd
+            {
+                auto Pcov = P;
+
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    Pcov(k,k) += noise[k] * noise[k];
+                }
+
+                return Pcov;
+            }
+
+             static bool isVelPositive(const float vel)
             {
                 return fabs(vel) > MIN_VELOCITY_MPS;
             }
