@@ -128,7 +128,7 @@ namespace hf {
                     ImuSubSampler::finalize(
                             ekf.gyroSubSampler, ekf.imuSampleCount);
 
-                const auto dt = lag2dt(msec_curr, ekf.lastPredictionMs);
+                const auto dt = (msec_curr - ekf.lastPredictionMs) / 1000.f;
 
                 const auto accel = accelSubSampler.subSample;
 
@@ -371,51 +371,6 @@ namespace hf {
 
             uint32_t lastPredictionMs;
             uint32_t lastProcessNoiseUpdateMs;
-
-            static auto initializeGyroSubSampler() -> ImuSubSampler
-            {
-                return ImuSubSampler(Num::DEG2RAD);
-            }
-
-            static auto initializeAccelSubSampler() -> ImuSubSampler
-            {
-                return ImuSubSampler(G);
-            }
-
-            static auto initializeState() -> Eigen::VectorXd
-            {
-                return Eigen::VectorXd(STATE_DIM);
-            }
-
-            static auto initializeQuaternion() -> Eigen::VectorXd
-            {
-                auto q = Eigen::VectorXd(4);
-                q << 1, 0, 0, 0;
-                return q;
-            }
-
-            static auto initializeCovarianceMatrix() -> Eigen::MatrixXd
-            {
-                auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-
-                const float pinit[STATE_DIM] = {
-                    STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
-                };
-
-                return addCovarianceNoise(P, pinit);
-            }
-
-            static auto lag2dt(const uint32_t usec_curr,
-                    const uint32_t usec_prev) -> float
-            {
-                return (usec_curr - usec_prev) / 1000.f;
-            }
 
             static auto addCovarianceNoise(const Eigen::MatrixXd & P,
                     const float * noise) -> Eigen::MatrixXd
