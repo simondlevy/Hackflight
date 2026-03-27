@@ -24,18 +24,15 @@ namespace hf {
 
         public:
 
-            float conversionFactor;
             Vec3 subSample;
             Vec3 sum;
 
             ImuSubSampler() = default;
 
             ImuSubSampler(
-                    const float conversionFactor,
-                    const Vec3 & subSample = {},
-                    const Vec3 & sum = {})
+                    const Vec3 & subSample,
+                    const Vec3 & sum={})
                 : 
-                    conversionFactor(conversionFactor),
                     subSample(subSample),
                     sum(sum) {}
 
@@ -43,7 +40,6 @@ namespace hf {
                     const Vec3 & sample) -> ImuSubSampler
             {
                 return ImuSubSampler(
-                        ss.conversionFactor,
                         ss.subSample,
                         ss.sum + sample);
             }
@@ -52,7 +48,7 @@ namespace hf {
                 -> ImuSubSampler
             {
                 return count > 0 ?
-                    ImuSubSampler(ss.conversionFactor, ss.sum / count) :
+                    ImuSubSampler(ss.sum / count) :
                     ss;
             }
     };

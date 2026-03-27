@@ -89,8 +89,8 @@ namespace hf {
                 x = xinit();
                 q = qinit();
                 P = pinit();
-                accelSubSampler = ImuSubSampler(0);
-                gyroSubSampler = ImuSubSampler(0);
+                accelSubSampler = ImuSubSampler();
+                gyroSubSampler = ImuSubSampler();
             }
 
             EKF (
@@ -232,7 +232,7 @@ namespace hf {
                     const ImuFiltered & imudata) -> EKF
             {
                 const auto accelSubSampler = ekf.didResetEstimation ?
-                    ImuSubSampler(0) : ekf.accelSubSampler;
+                    ImuSubSampler() : ekf.accelSubSampler;
 
                 const auto accelSubSampler_ =
                     ImuSubSampler::accumulate(accelSubSampler,
@@ -241,7 +241,7 @@ namespace hf {
                 const auto imuSampleCount = ekf.imuSampleCount + 1;
 
                 const auto gyroSubSampler = ekf.didResetEstimation ?
-                    ImuSubSampler(0) : ekf.gyroSubSampler;
+                    ImuSubSampler() : ekf.gyroSubSampler;
 
                 const auto gyroSubSampler_ =
                     ImuSubSampler::accumulate(gyroSubSampler,
