@@ -50,6 +50,8 @@
 
 static constexpr float EKF_PREDICTION_RATE_HZ = 100;
 
+static constexpr float ZRANGER_ACQUISITION_RATE_HZ = 50;
+
 static hf::RX _rx;
 
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
@@ -64,7 +66,7 @@ static hf::EKF _ekf;
 static hf::FlyingCheck _flyingCheck;
 static hf::mode_e _mode;
 static hf::Timer _ekfPredictionTimer;
-//static hf::Timer _zrangerTimer;
+static hf::Timer _zrangerTimer;
 
 void setup()
 {
@@ -72,7 +74,7 @@ void setup()
 
     _imu.begin();
 
-    //zranger_begin();
+    hf::ZRanger::begin();
 
     _motors.begin(); 
 
@@ -83,10 +85,10 @@ void loop()
 {
     const auto loop_start_usec = micros();
 
-    //const auto zranger_distance = zranger_acquire();
-    //(void)zranger_distance;
+    if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
+    }
 
-    if (_ekfPredictionTimer.ready(micros())) {
+    if (_ekfPredictionTimer.ready(EKF_PREDICTION_RATE_HZ)) {
         _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
     }
 
@@ -123,10 +125,10 @@ void loop()
             _motors.run(rxdata.is_armed, _mixer.motorvals);
         }
 
-        //hf::Debugger::report(state);
+        hf::Debugger::report(state);
     }
 
     hf::Timer::runDelayLoop(loop_start_usec);
 
-    hf::Profiler::report();
+    //hf::Profiler::report();
 }

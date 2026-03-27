@@ -21,15 +21,15 @@
 
 static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
 
-static Adafruit_VL53L1X _zranger;
+static Adafruit_VL53L1X _vl53l1x;
 
-static volatile bool _zranger_is_data_ready;
+static volatile bool _vl53l1x_is_data_ready;
 
 static void zranger_handle_data_ready()
 {
-    _zranger_is_data_ready = true;
+    _vl53l1x_is_data_ready = true;
 
-    _zranger.clearInterrupt();
+    _vl53l1x.clearInterrupt();
 }
 
 void hf::ZRanger::begin()
@@ -37,33 +37,33 @@ void hf::ZRanger::begin()
     Wire1.begin();
     Wire1.setClock(400000);
 
-    if (!_zranger.begin(0x29, &Wire1)) {
+    if (!_vl53l1x.begin(0x29, &Wire1)) {
         hf::Debugger::reportForever("Unable to initialize sensor");
     }
 
-    if (!_zranger.startRanging()) {
+    if (!_vl53l1x.startRanging()) {
         hf::Debugger::reportForever("Unable to start ranging");
     }
 
     // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
-    _zranger.setTimingBudget(50);
+    _vl53l1x.setTimingBudget(50);
 
     // Polarity=1 => RISING
-    _zranger.VL53L1X_SetInterruptPolarity(1);
+    _vl53l1x.VL53L1X_SetInterruptPolarity(1);
     attachInterrupt(digitalPinToInterrupt(ZRANGER_INTERRUPT_PIN),
             zranger_handle_data_ready, RISING);
 
     // Clear interrupt to get things started
-    _zranger.clearInterrupt();
+    _vl53l1x.clearInterrupt();
 }
 
 int16_t hf::ZRanger::read()
 {
     static int16_t distance;
 
-    if (_zranger_is_data_ready) {
-        distance = _zranger.distance();
-        _zranger_is_data_ready = false;
+    if (_vl53l1x_is_data_ready) {
+        distance = _vl53l1x.distance();
+        _vl53l1x_is_data_ready = false;
     }
 
     return distance;
