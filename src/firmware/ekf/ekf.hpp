@@ -599,14 +599,6 @@ namespace hf {
                 return R;
             }
 
-            static auto finalizeImu(const EKF & ekf, const Vec3 & vec, 
-                    const float conversionFactor) -> Vec3
-            {
-                return ekf.imuSampleCount > 0 ?
-                    vec / ekf.imuSampleCount * conversionFactor :
-                    vec;
-            }
-
             static bool isVelInBounds(const float vel)
             {
                 return fabs(vel) < MAX_VELOCITY_MPS;
