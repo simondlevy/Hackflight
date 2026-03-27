@@ -19,7 +19,12 @@
 
 namespace hf {
 
-    class Zranger {
+    class ZRanger {
 
+        public:
+
+            static void begin();
+
+            static int16_t read();
     };
 }

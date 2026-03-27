@@ -36,13 +36,12 @@
 //#include <firmware/sensors/imus/bmi088.hpp>
 #include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
 //#include <firmware/sensors/imus/mpu6050.hpp>
+#include <firmware/sensors/zranger/zranger.h>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <firmware/profiling.hpp>
 #include <pidcontrol/stabilizer.hpp>
-
-//#include "zranger.h"
 
 /* Update rates
    MAIN_LOOP = 1000
