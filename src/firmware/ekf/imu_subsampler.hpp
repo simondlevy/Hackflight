@@ -42,11 +42,6 @@ namespace hf {
                     sum(sum),
                     count(count) {}
 
-            static auto reset(const ImuSubSampler & ss) -> ImuSubSampler
-            {
-                return ImuSubSampler(ss.conversionFactor);
-            }
-
             static auto accumulate(const ImuSubSampler & ss,
                     const Vec3 & sample) -> ImuSubSampler
             {
