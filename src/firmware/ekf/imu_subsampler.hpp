@@ -52,8 +52,7 @@ namespace hf {
                 -> ImuSubSampler
             {
                 return count > 0 ?
-                    ImuSubSampler(ss.conversionFactor,
-                            ss.sum /** ss.conversionFactor*/ / count) :
+                    ImuSubSampler(ss.conversionFactor, ss.sum / count) :
                     ss;
             }
     };
