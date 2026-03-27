@@ -122,7 +122,7 @@ namespace hf {
             {
                 const auto accelSubSampler =
                     ImuSubSampler::finalize(
-                            ekf.accelSubSampler,ekf.imuSampleCount);
+                            ekf.accelSubSampler, ekf.imuSampleCount);
 
                 const auto gyroSubSampler =
                     ImuSubSampler::finalize(
@@ -130,9 +130,9 @@ namespace hf {
 
                 const auto dt = (msec_curr - ekf.lastPredictionMs) / 1000.f;
 
-                const auto accel = accelSubSampler.subSample;
+                const auto accel = accelSubSampler.subSample * G;
 
-                const auto gyro = gyroSubSampler.subSample;
+                const auto gyro = gyroSubSampler.subSample * Num::DEG2RAD;
 
                 const auto F = makeJacobian(ekf.x, ekf.R, gyro, accel, dt);
 

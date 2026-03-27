@@ -53,7 +53,7 @@ namespace hf {
             {
                 return count > 0 ?
                     ImuSubSampler(ss.conversionFactor,
-                            ss.sum * ss.conversionFactor / count) :
+                            ss.sum /** ss.conversionFactor*/ / count) :
                     ss;
             }
     };
