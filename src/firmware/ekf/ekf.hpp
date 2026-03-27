@@ -100,6 +100,7 @@ namespace hf {
                 const Eigen::MatrixXd R,
                 const ImuSubSampler  & accelSubSampler,
                 const ImuSubSampler  & gyroSubSampler,
+                const uint32_t imuSampleCount,
                 const bool didResetEstimation,
                 const bool isUpdated,
                 const uint32_t lastPredictionMs,
@@ -111,6 +112,7 @@ namespace hf {
                     R(R),
                     accelSubSampler(accelSubSampler),
                     gyroSubSampler(gyroSubSampler), 
+                    imuSampleCount(imuSampleCount),
                     didResetEstimation(didResetEstimation),
                     isUpdated(isUpdated),
                     lastPredictionMs(lastPredictionMs) {}
@@ -216,6 +218,7 @@ namespace hf {
                         ekf.R,
                         accelSubSampler,
                         gyroSubSampler,
+                        0,            // imuSampleCount
                         ekf.didResetEstimation,
                         true,         // isUpdated
                         msec_curr,    // lastPredictionMs
@@ -232,6 +235,8 @@ namespace hf {
                 const auto accelSubSampler_ =
                     ImuSubSampler::accumulate(accelSubSampler,
                             imudata.accelGs);
+
+                const auto imuSampleCount = ekf.imuSampleCount + 1;
 
                 const auto gyroSubSampler = ekf.didResetEstimation ?
                     ImuSubSampler(Num::DEG2RAD) : ekf.gyroSubSampler;
@@ -291,6 +296,7 @@ namespace hf {
                         R,
                         accelSubSampler_,
                         gyroSubSampler_,
+                        imuSampleCount,
                         didResetEstimation,
                         false, // isUpdated
                         lastPredictionMs,
@@ -352,6 +358,8 @@ namespace hf {
 
             ImuSubSampler accelSubSampler;
             ImuSubSampler gyroSubSampler;
+
+            uint32_t imuSampleCount;
 
             bool didResetEstimation;
 
