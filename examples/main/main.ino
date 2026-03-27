@@ -20,6 +20,7 @@
 #include <Wire.h> 
 
 // Third-party libraries
+#include <Adafruit_VL53L1X.h>
 #include <dshot-teensy4.hpp>  
 
 // Hackflight library
@@ -32,10 +33,9 @@
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/safety.hpp>
-//#include <firmware/sensors/imus/bmi088.hpp>
-#include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
-//#include <firmware/sensors/imus/mpu6050.hpp>
-#include <firmware/sensors/zranger.hpp>
+//#include <firmware/imus/bmi088.hpp>
+#include <firmware/imus/lsm6dso_rot90ccw.hpp>
+//#include <firmware/imus/mpu6050.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
@@ -43,12 +43,67 @@
 #include <pidcontrol/stabilizer.hpp>
 
 /* Update rates
-FLOW/ZRANGER: 50 Hz
-MAIN_LOOP = 1000
-PIDS = 500;
-*/
+   MAIN_LOOP = 1000
+   PIDS = 500;
+ */
 
-static const float EKF_PREDICTION_RATE_HZ = 100;
+// ZRanger -------------------------------------------------------------------
+
+static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
+
+//static constexpr float ZRANGER_UPDATE_RATE_HZ = 50;
+
+static Adafruit_VL53L1X _zranger;
+
+static volatile bool _zranger_is_data_ready;
+
+static void zranger_handle_data_ready() {
+
+    _zranger_is_data_ready = true;
+
+    _zranger.clearInterrupt();
+}
+
+static void zranger_begin()
+{
+    Wire1.begin();
+    Wire1.setClock(400000);
+
+    if (!_zranger.begin(0x29, &Wire1)) {
+        hf::Debugger::reportForever("Unable to initialize sensor");
+    }
+
+    if (!_zranger.startRanging()) {
+        hf::Debugger::reportForever("Unable to start ranging");
+    }
+
+    // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
+    _zranger.setTimingBudget(50);
+
+    // Polarity=1 => RISING
+    _zranger.VL53L1X_SetInterruptPolarity(1);
+    attachInterrupt(digitalPinToInterrupt(ZRANGER_INTERRUPT_PIN),
+            zranger_handle_data_ready, RISING);
+
+    // Clear interrupt to get things started
+    _zranger.clearInterrupt();
+}
+
+static int16_t zranger_acquire()
+{
+    static int16_t distance;
+
+    if (_zranger_is_data_ready) {
+        distance = _zranger.distance();
+        _zranger_is_data_ready = false;
+    }
+
+    return distance;
+}
+
+// ---------------------------------------------------------------------------
+
+static constexpr float EKF_PREDICTION_RATE_HZ = 100;
 
 static hf::RX _rx;
 
@@ -56,24 +111,15 @@ static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 // static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static hf::LED _led = hf::LED(13);
-
 static hf::StabilizerPid _stabilizerPid;
-
 static hf::Mixer _mixer;
-
 static hf::IMU _imu;
-
-static hf::ZRanger _zranger;
-
 static hf::ImuFilter _imuFilter;
-
 static hf::EKF _ekf;
-
 static hf::FlyingCheck _flyingCheck;
-
 static hf::mode_e _mode;
-
 static hf::Timer _ekfPredictionTimer;
+static hf::Timer _zrangerTimer;
 
 void setup()
 {
@@ -81,7 +127,7 @@ void setup()
 
     _imu.begin();
 
-    //_zranger.begin();
+    zranger_begin();
 
     _motors.begin(); 
 
@@ -92,11 +138,8 @@ void loop()
 {
     const auto loop_start_usec = micros();
 
-    /*
-    if (_zranger.available()) {
-
-        _zranger.read();
-    }*/
+    const auto zranger_distance = zranger_acquire();
+    (void)zranger_distance;
 
     if (_ekfPredictionTimer.ready(micros())) {
         _ekf = hf::EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
@@ -135,10 +178,10 @@ void loop()
             _motors.run(rxdata.is_armed, _mixer.motorvals);
         }
 
-        hf::Debugger::report(state);
+        //hf::Debugger::report(state);
     }
 
     hf::Timer::runDelayLoop(loop_start_usec);
 
-    //hf::Profiler::report();
+    hf::Profiler::report();
 }
