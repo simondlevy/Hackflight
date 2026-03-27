@@ -5,129 +5,6 @@
 	(uuid "2b1f0318-b347-4cb8-9bbf-78e69ec66761")
 	(paper "A4")
 	(lib_symbols
-		(symbol "Connector:Conn_01x01_Socket"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Conn_01x01_Socket"
-				(at 0 -2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Generic connector, single row, 01x01, script generated"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_1x??_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Conn_01x01_Socket_1_1"
-				(polyline
-					(pts
-						(xy -1.27 0) (xy -0.508 0)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 -0.508)
-					(mid -0.5058 0)
-					(end 0 0.508)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Connector:Conn_01x03_Socket"
 			(pin_names
 				(offset 1.016)
@@ -1379,6 +1256,16 @@
 	)
 	(wire
 		(pts
+			(xy 119.38 111.76) (xy 124.46 111.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "12c78a68-0d9c-4b63-a046-ff703be368aa")
+	)
+	(wire
+		(pts
 			(xy 142.24 118.11) (xy 147.32 118.11)
 		)
 		(stroke
@@ -1446,16 +1333,6 @@
 			(type default)
 		)
 		(uuid "5a5c161c-ae43-407d-97be-e0bece2359b3")
-	)
-	(wire
-		(pts
-			(xy 91.44 101.6) (xy 96.52 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6d259278-6646-4e29-86f2-a8868da6613d")
 	)
 	(wire
 		(pts
@@ -1559,13 +1436,13 @@
 	)
 	(wire
 		(pts
-			(xy 91.44 104.14) (xy 96.52 104.14)
+			(xy 119.38 114.3) (xy 124.46 114.3)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d68a1c3f-2005-47b4-90ef-e335da324f80")
+		(uuid "dc6f02d2-631c-4d84-852a-1b91983762f6")
 	)
 	(wire
 		(pts
@@ -1586,16 +1463,6 @@
 			(type default)
 		)
 		(uuid "ee05895c-f9e3-4d64-b073-ec614932990b")
-	)
-	(wire
-		(pts
-			(xy 154.94 109.22) (xy 158.75 109.22)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f1ffc5c8-4586-4d90-8d68-686e525df156")
 	)
 	(wire
 		(pts
@@ -1697,6 +1564,16 @@
 		)
 		(uuid "317ecb92-7da4-45f9-bf66-767682182a66")
 	)
+	(label "TX5"
+		(at 119.38 114.3 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "369e8975-4441-4f89-8d00-03850e7ebd8c")
+	)
 	(label "MISO"
 		(at 91.44 132.08 0)
 		(effects
@@ -1787,6 +1664,16 @@
 		)
 		(uuid "b506189e-e209-4326-a4a2-d3f254a3f3b2")
 	)
+	(label "RX5"
+		(at 119.38 111.76 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b60925c6-1ea8-43f5-b5ae-cee42ec1d3ef")
+	)
 	(label "3V3"
 		(at 158.75 115.57 0)
 		(effects
@@ -1806,16 +1693,6 @@
 			(justify left bottom)
 		)
 		(uuid "c992c086-e800-47da-98e9-dda152253cd8")
-	)
-	(label "TX1"
-		(at 92.71 104.14 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "cc074601-d9a5-4626-adb3-4b9c4a57159a")
 	)
 	(label "3V3"
 		(at 120.65 104.14 0)
@@ -1866,26 +1743,6 @@
 			(justify left bottom)
 		)
 		(uuid "f00a4997-04a7-4ebd-a43e-fa287af19a43")
-	)
-	(label "RX1"
-		(at 92.71 101.6 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f54d6480-5135-4031-9520-582caaa1a3ff")
-	)
-	(label "5V"
-		(at 156.21 109.22 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "fbd91400-f00b-4584-b110-dc2bc8c2be29")
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x14_Socket")
@@ -2096,75 +1953,6 @@
 			(project ""
 				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
 					(reference "J1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Conn_01x01_Socket")
-		(at 163.83 109.22 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "75c92210-39ce-4a7a-84a7-18c91e5385fc")
-		(property "Reference" "J5"
-			(at 165.1 107.9499 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "Conn_01x01_Socket"
-			(at 165.1 110.4899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
-			(at 163.83 109.22 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 163.83 109.22 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x01, script generated"
-			(at 163.83 109.22 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "245a7c87-4f65-463f-9cf7-030efcc8ffd1")
-		)
-		(instances
-			(project ""
-				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
-					(reference "J5")
 					(unit 1)
 				)
 			)
