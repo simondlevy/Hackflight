@@ -121,10 +121,12 @@ namespace hf {
                     const bool isFlying) -> EKF
             {
                 const auto accelSubSampler =
-                    ImuSubSampler::finalize(ekf.accelSubSampler);
+                    ImuSubSampler::finalize(
+                            ekf.accelSubSampler,ekf.imuSampleCount);
 
                 const auto gyroSubSampler =
-                    ImuSubSampler::finalize(ekf.gyroSubSampler);
+                    ImuSubSampler::finalize(
+                            ekf.gyroSubSampler, ekf.imuSampleCount);
 
                 const auto dt = lag2dt(msec_curr, ekf.lastPredictionMs);
 

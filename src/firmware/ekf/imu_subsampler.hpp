@@ -27,20 +27,17 @@ namespace hf {
             float conversionFactor;
             Vec3 subSample;
             Vec3 sum;
-            uint32_t count;
 
             ImuSubSampler() = default;
 
             ImuSubSampler(
                     const float conversionFactor,
                     const Vec3 & subSample = {},
-                    const Vec3 & sum = {},
-                    const uint32_t count = 0)
+                    const Vec3 & sum = {})
                 : 
                     conversionFactor(conversionFactor),
                     subSample(subSample),
-                    sum(sum),
-                    count(count) {}
+                    sum(sum) {}
 
             static auto accumulate(const ImuSubSampler & ss,
                     const Vec3 & sample) -> ImuSubSampler
@@ -48,16 +45,15 @@ namespace hf {
                 return ImuSubSampler(
                         ss.conversionFactor,
                         ss.subSample,
-                        ss.sum + sample,
-                        ss.count + 1);
+                        ss.sum + sample);
             }
 
-            static auto finalize(const ImuSubSampler & ss)
+            static auto finalize(const ImuSubSampler & ss, const uint32_t count)
                 -> ImuSubSampler
             {
-                return ss.count > 0 ?
+                return count > 0 ?
                     ImuSubSampler(ss.conversionFactor,
-                            ss.sum * ss.conversionFactor / ss.count) :
+                            ss.sum * ss.conversionFactor / count) :
                     ss;
             }
     };
