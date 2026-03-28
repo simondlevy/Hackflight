@@ -410,16 +410,8 @@ namespace hf {
                 return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
                         && (isVelInBounds(v0) && isVelInBounds(v1) &&
                             isVelInBounds(v2))) ?
-                    incorporateAttitude(v0, v1, v2, q) : q;
-            }
-
-            static auto incorporateAttitude(
-                    const float v0, const float v1, const float v2,
-                    const Vector & q) -> Vector
-            {
-                // Rotate the vehicle's attitude by the delta quaternion vector
-                // and normalize the result
-                return qnorm(rotate(q, v0, v1, v2));
+                    qnorm(rotate(q, v0, v1, v2))
+                    : q;
             }
 
             static auto qnorm(const Vector & q) -> Vector
