@@ -137,7 +137,8 @@ namespace hf {
 
                 const auto gyro = gyroSubSampler.subSample * Num::DEG2RAD;
 
-                const auto F = makeJacobian(ekf.x, ekf.R, gyro, dt);
+                const auto F = makeJacobian(
+                        ekf.x, ekf.R, vec3_to_vector(gyro), dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 const auto P = (F * ekf.P) * F.transpose();
@@ -420,14 +421,12 @@ namespace hf {
             static auto makeJacobian(
                     const Vector & x,
                     const Matrix & R,
-                    const Vec3 & gyro,
+                    const Vector & gyro,
                     const float dt) -> Matrix
             {
-                const auto vgyro = vec3_to_vector(gyro);
-
-                const auto d0 = vgyro(0)*dt/2;
-                const auto d1 = vgyro(1)*dt/2;
-                const auto d2 = vgyro(2)*dt/2;
+                const auto d0 = gyro(0)*dt/2;
+                const auto d1 = gyro(1)*dt/2;
+                const auto d2 = gyro(2)*dt/2;
 
                 const auto vx = x(1);
                 const auto vy = x(2);
@@ -454,15 +453,15 @@ namespace hf {
 
                 // body-frame velocity from body-frame velocity
                 F(1,1) = 1; //drag negligible
-                F(2,1) =-vgyro(2)*dt;
-                F(3,1) = vgyro(1)*dt;
+                F(2,1) =-gyro(2)*dt;
+                F(3,1) = gyro(1)*dt;
 
-                F(1,2) = vgyro(2)*dt;
+                F(1,2) = gyro(2)*dt;
                 F(2,2) = 1; //drag negligible
-                F(3,2) =-vgyro(0)*dt;
+                F(3,2) =-gyro(0)*dt;
 
-                F(1,3) =-vgyro(1)*dt;
-                F(2,3) = vgyro(0)*dt;
+                F(1,3) =-gyro(1)*dt;
+                F(2,3) = gyro(0)*dt;
                 F(3,3) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
