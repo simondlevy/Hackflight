@@ -24,8 +24,6 @@ namespace hf {
 
         public:
 
-            Vec3 subSample;
-
             ImuSubSampler() = default;
 
             ImuSubSampler(
@@ -51,8 +49,14 @@ namespace hf {
                     ss;
             }
 
+            static auto getOutput(const ImuSubSampler & ss) -> Vec3
+            {
+                return ss.subSample;
+            }
+
         private:
 
+            Vec3 subSample;
             Vec3 sum;
     };
 }
