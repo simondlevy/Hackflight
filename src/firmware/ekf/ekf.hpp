@@ -137,7 +137,7 @@ namespace hf {
 
                 const auto gyro = gyroSubSampler.subSample * Num::DEG2RAD;
 
-                const auto F = makeJacobian(ekf.x, ekf.R, gyro, accel, dt);
+                const auto F = makeJacobian(ekf.x, ekf.R, gyro, dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 const auto P = (F * ekf.P) * F.transpose();
@@ -421,12 +421,13 @@ namespace hf {
                     const Vector & x,
                     const Matrix & R,
                     const Vec3 & gyro,
-                    const Vec3 & accel,
                     const float dt) -> Matrix
             {
-                const auto d0 = gyro.x*dt/2;
-                const auto d1 = gyro.y*dt/2;
-                const auto d2 = gyro.z*dt/2;
+                const auto vgyro = vec3_to_vector(gyro);
+
+                const auto d0 = vgyro(0)*dt/2;
+                const auto d1 = vgyro(1)*dt/2;
+                const auto d2 = vgyro(2)*dt/2;
 
                 const auto vx = x(1);
                 const auto vy = x(2);
@@ -453,15 +454,15 @@ namespace hf {
 
                 // body-frame velocity from body-frame velocity
                 F(1,1) = 1; //drag negligible
-                F(2,1) =-gyro.z*dt;
-                F(3,1) = gyro.y*dt;
+                F(2,1) =-vgyro(2)*dt;
+                F(3,1) = vgyro(1)*dt;
 
-                F(1,2) = gyro.z*dt;
+                F(1,2) = vgyro(2)*dt;
                 F(2,2) = 1; //drag negligible
-                F(3,2) =-gyro.x*dt;
+                F(3,2) =-vgyro(0)*dt;
 
-                F(1,3) =-gyro.y*dt;
-                F(2,3) = gyro.x*dt;
+                F(1,3) =-vgyro(1)*dt;
+                F(2,3) = vgyro(0)*dt;
                 F(3,3) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
@@ -593,6 +594,13 @@ namespace hf {
             static auto isVelPositive(const float vel) -> bool
             {
                 return fabs(vel) > MIN_VELOCITY_MPS;
+            }
+
+            static auto vec3_to_vector(const Vec3 & vec3) -> Vector
+            {
+                Vector v = Vector(3);
+                v << vec3.x, vec3.y, vec3.z;
+                return v;
             }
     };
 }
