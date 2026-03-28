@@ -25,7 +25,6 @@ namespace hf {
         public:
 
             Vec3 subSample;
-            Vec3 sum;
 
             ImuSubSampler() = default;
 
@@ -51,5 +50,9 @@ namespace hf {
                     ImuSubSampler(ss.sum / count) :
                     ss;
             }
+
+        private:
+
+            Vec3 sum;
     };
 }
