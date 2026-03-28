@@ -269,9 +269,8 @@ namespace hf {
                 const float dz = 0;//R(2,0)*_x(1) + R(2,1)*_x(2) + R(2,2)*_x(3);
 
                 const auto didResetEstimation =
-                    (!isVelInBounds(dx) ||
-                     !isVelInBounds(dy) ||
-                     !isVelInBounds(dz)) ? true :
+                    !areVelsInBounds(dx, dy, dz) ?
+                    true :
                     ekf.didResetEstimation;
 
                 return EKF(
@@ -408,17 +407,14 @@ namespace hf {
                 const float v2 = x(6);
 
                 return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
-                        && (isVelInBounds(v0) && isVelInBounds(v1) &&
-                            isVelInBounds(v2))) ?
+                        && (areVelsInBounds(v0, v1, v2))) ?
                     qnorm(rotate(q, v0, v1, v2))
                     : q;
             }
 
             static auto qnorm(const Vector & q) -> Vector
             {
-                const auto norm = sqrt(q.cwiseProduct(q).sum()) + EPSILON;
-
-                return q / norm;
+                return q / (sqrt(q.cwiseProduct(q).sum()) + EPSILON);
             }
 
             static auto makeJacobian(
@@ -580,12 +576,21 @@ namespace hf {
                 return R;
             }
 
-            static bool isVelInBounds(const float vel)
+            static auto areVelsInBounds(
+                    const float vx, const float vy, const float vz) -> bool
+            {
+                return 
+                    isVelInBounds(vx) &&
+                    isVelInBounds(vy) &&
+                    isVelInBounds(vz);
+            }
+
+            static auto isVelInBounds(const float vel) -> bool
             {
                 return fabs(vel) < MAX_VELOCITY_MPS;
             }
 
-            static bool isVelPositive(const float vel)
+            static auto isVelPositive(const float vel) -> bool
             {
                 return fabs(vel) > MIN_VELOCITY_MPS;
             }
