@@ -181,28 +181,25 @@ namespace hf {
 
                 // compute the quaternion values in [w,x,y,z] order
                 const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-                const auto ca = cos(angle/2.0f);
-                const auto sa = sin(angle/2.0f);
+                const auto ca = cos(angle/2);
+                const auto sa = sin(angle/2);
                 const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
-                // rotate the vehicle's attitude by the delta quaternion vector
+                // Rotate the vehicle's attitude by the delta quaternion vector
                 // computed above
-                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
                 Eigen::VectorXd pq = Eigen::VectorXd(4);
+                const auto q = ekf.q;
                 pq <<
-                    dq[0]*ekf.q(0) - dq[1]*ekf.q(1) -
-                    dq[2]*ekf.q(2) - dq[3]*ekf.q(3),
-                    dq[1]*ekf.q(0) + dq[0]*ekf.q(1) +
-                        dq[3]*ekf.q(2) - dq[2]*ekf.q(3),
-                    dq[2]*ekf.q(0) - dq[3]*ekf.q(1) +
-                        dq[0]*ekf.q(2) + dq[1]*ekf.q(3),
-                    dq[3]*ekf.q(0) + dq[2]*ekf.q(1) -
-                        dq[1]*ekf.q(2) + dq[0]*ekf.q(3);
+                    dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3),
+                    dq[1]*q(0) + dq[0]*q(1) + dq[3]*q(2) - dq[2]*q(3),
+                    dq[2]*q(0) - dq[3]*q(1) + dq[0]*q(2) + dq[1]*q(3),
+                    dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
 
                 // Quaternion used for initial orientation
                 Eigen::VectorXd qinit = Eigen::VectorXd(4);
                 qinit << 1, 0, 0, 0;
 
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
                 const auto pqnew = isFlying ? pq : keep * pq +
                     ROLLPITCH_ZERO_REVERSION * qinit;
 
@@ -435,20 +432,16 @@ namespace hf {
                     const Eigen::VectorXd & q) -> Eigen::VectorXd
             {
                 const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                const float ca = cos(angle / 2.0f);
-                const float sa = sin(angle / 2.0f);
+                const float ca = cos(angle / 2);
+                const float sa = sin(angle / 2);
                 const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
                 // Rotate the vehicle's attitude by the delta quaternion vector
                 // computed above
-                const float q0 = dq[0] * q(0) - dq[1] * q(1) - dq[2] * q(2)
-                    - dq[3] * q(3);
-                const float q1 = dq[1] * q(0) + dq[0] * q(1) + dq[3] * q(2)
-                    - dq[2] * q(3);
-                const float q2 = dq[2] * q(0) - dq[3] * q(1) + dq[0] * q(2)
-                    + dq[1] * q(3);
-                const float q3 = dq[3] * q(0) + dq[2] * q(1) - dq[1] * q(2)
-                    + dq[0] * q(3);
+                const float q0 = dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3);
+                const float q1 = dq[1]*q(0) + dq[0]*q(1) + dq[3]*q(2) - dq[2]*q(3);
+                const float q2 = dq[2]*q(0) - dq[3]*q(1) + dq[0]*q(2) + dq[1]*q(3);
+                const float q3 = dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
 
                 // normalize and store the result
                 const float norm = sqrt(q0 * q0 + q1 * q1 + q2 * q2 + 
