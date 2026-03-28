@@ -27,14 +27,14 @@ namespace hf {
             ImuSubSampler() = default;
 
             ImuSubSampler(
-                    const Vec3 & subSample,
-                    const Vec3 & sum={})
+                    const ThreeAxis & subSample,
+                    const ThreeAxis & sum={})
                 : 
                     subSample(subSample),
                     sum(sum) {}
 
             static auto accumulate(const ImuSubSampler & ss,
-                    const Vec3 & sample) -> ImuSubSampler
+                    const ThreeAxis & sample) -> ImuSubSampler
             {
                 return ImuSubSampler(
                         ss.subSample,
@@ -60,7 +60,7 @@ namespace hf {
 
         private:
 
-            Vec3 subSample;
-            Vec3 sum;
+            ThreeAxis subSample;
+            ThreeAxis sum;
     };
 }

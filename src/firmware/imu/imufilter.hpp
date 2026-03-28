@@ -15,7 +15,7 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
-#include <firmware/filters/three_axis_lpf.hpp>
+#include <firmware/imu/three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
@@ -50,10 +50,10 @@ namespace hf {
             ImuFilter(
                     const ImuFiltered & output,
                     const bool isGyroCalibrated,
-                    const Vec3 & gyroSum,
-                    const Vec3 & gyroSumOfSquares,
+                    const ThreeAxis & gyroSum,
+                    const ThreeAxis & gyroSumOfSquares,
                     const uint16_t  gyroSampleCount,
-                    const Vec3 & gyroBias,
+                    const ThreeAxis & gyroBias,
                     const uint32_t gyroVarianceSampleTimeMsec,
                     const ThreeAxisLpf & accelLpf,
                     const ThreeAxisLpf & gyroLpf) 
@@ -92,7 +92,7 @@ namespace hf {
                     (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
                     square(gyromean);
 
-                const auto gyroval = Vec3(gyroraw.x, gyroraw.y, gyroraw.z);
+                const auto gyroval = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
 
                 const auto gyroSum = filter.isGyroCalibrated ?
                     filter._gyroSum : filter._gyroSum + gyroval;
@@ -103,7 +103,7 @@ namespace hf {
 
                 const auto accelraw = imuraw.accel;
                 const auto accel = scale(
-                        Vec3(accelraw.x, accelraw.y, accelraw.z),
+                        ThreeAxis(accelraw.x, accelraw.y, accelraw.z),
                         accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
@@ -152,20 +152,20 @@ namespace hf {
 
         private:
 
-            Vec3 _gyroSum;
-            Vec3 _gyroSumOfSquares;
+            ThreeAxis _gyroSum;
+            ThreeAxis _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
-            Vec3 _gyroBias;
+            ThreeAxis _gyroBias;
             uint32_t _gyroVarianceSampleTimeMsec;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
 
-            static auto square(const Vec3 & vec) -> Vec3
+            static auto square(const ThreeAxis & vec) -> ThreeAxis
             {
                 return vec * vec;
             }
 
-            static auto scale(const Vec3 & vec, const int16_t s) -> Vec3
+            static auto scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
             {
                 return vec * 2 * (float)s / 65536;
             }

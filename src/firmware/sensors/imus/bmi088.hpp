@@ -84,12 +84,12 @@ namespace hf {
                 accel.readSensor();
 
                 return ImuRaw(
-                        Vec3Raw(
+                        ThreeAxisRaw(
                             gyro.getGyroX_raw(),
                             gyro.getGyroY_raw(),
                             gyro.getGyroZ_raw()
                             ),
-                        Vec3Raw(
+                        ThreeAxisRaw(
                             accel.getAccelX_raw(),
                             accel.getAccelY_raw(),
                             accel.getAccelZ_raw()

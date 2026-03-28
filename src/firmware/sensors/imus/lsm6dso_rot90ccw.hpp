@@ -83,8 +83,8 @@ namespace hf {
 
                 // Rotation 90 degrees counter-clockwise
                 return ImuRaw(
-                        hf::Vec3Raw(-gyro[1], gyro[0], gyro[2]),
-                        hf::Vec3Raw(-accel[1], accel[0], accel[2]));
+                        hf::ThreeAxisRaw(-gyro[1], gyro[0], gyro[2]),
+                        hf::ThreeAxisRaw(-accel[1], accel[0], accel[2]));
             }
 
         private:

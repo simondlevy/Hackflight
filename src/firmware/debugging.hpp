@@ -21,6 +21,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
+#include <firmware/imu/datatypes.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {

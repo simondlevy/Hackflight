@@ -73,7 +73,7 @@ namespace hf {
 
                 _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-                return ImuRaw(Vec3Raw(gx, gy, gz), Vec3Raw(ax, ay, az));
+                return ImuRaw(ThreeAxisRaw(gx, gy, gz), ThreeAxisRaw(ax, ay, az));
             }
 
         private:
