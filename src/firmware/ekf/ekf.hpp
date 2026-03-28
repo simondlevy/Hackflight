@@ -80,6 +80,9 @@ namespace hf {
                 STATE_DIM
             };
 
+            typedef Eigen::VectorXd Vector;
+            typedef Eigen::MatrixXd Matrix;
+
         public:
 
             EKF& operator=(const EKF& other) = default;
@@ -94,10 +97,10 @@ namespace hf {
             }
 
             EKF (
-                const Eigen::VectorXd & x,
-                const Eigen::VectorXd & q,
-                const Eigen::MatrixXd & P,
-                const Eigen::MatrixXd R,
+                const Vector & x,
+                const Vector & q,
+                const Matrix & P,
+                const Matrix R,
                 const ImuSubSampler  & accelSubSampler,
                 const ImuSubSampler  & gyroSubSampler,
                 const uint32_t imuSampleCount,
@@ -187,7 +190,7 @@ namespace hf {
 
                 // Rotate the vehicle's attitude by the delta quaternion vector
                 // computed above
-                Eigen::VectorXd pq = Eigen::VectorXd(4);
+                Vector pq = Vector(4);
                 const auto q = ekf.q;
                 pq <<
                     dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3),
@@ -196,7 +199,7 @@ namespace hf {
                     dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
 
                 // Quaternion used for initial orientation
-                Eigen::VectorXd qinit = Eigen::VectorXd(4);
+                Vector qinit = Vector(4);
                 qinit << 1, 0, 0, 0;
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
@@ -206,8 +209,8 @@ namespace hf {
                 // Normalize the quaternion
                 const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
 
-                __attribute__((aligned(4))) Eigen::VectorXd x =
-                    Eigen::VectorXd(STATE_DIM);
+                __attribute__((aligned(4))) Vector x =
+                    Vector(STATE_DIM);
                 x << x0, x1, x2, x3, ekf.x(4), ekf.x(5), ekf.x(6); 
 
                 return EKF(
@@ -340,20 +343,20 @@ namespace hf {
         private:
 
             // State vector
-            __attribute__((aligned(4))) Eigen::VectorXd x =
-                Eigen::VectorXd(STATE_DIM);
+            __attribute__((aligned(4))) Vector x =
+                Vector(STATE_DIM);
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
-            Eigen::VectorXd q = Eigen::VectorXd(4);
+            Vector q = Vector(4);
 
             // Covariance matrix
-            Eigen::MatrixXd P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+            Matrix P = Matrix(STATE_DIM, STATE_DIM);
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Eigen::MatrixXd R = Eigen::MatrixXd(3, 3);
+            Matrix R = Matrix(3, 3);
 
             ImuSubSampler accelSubSampler;
             ImuSubSampler gyroSubSampler;
@@ -369,8 +372,8 @@ namespace hf {
             uint32_t lastPredictionMs;
             uint32_t lastProcessNoiseUpdateMs;
 
-            static auto addCovarianceNoise(const Eigen::MatrixXd & P,
-                    const float * noise) -> Eigen::MatrixXd
+            static auto addCovarianceNoise(const Matrix & P,
+                    const float * noise) -> Matrix
             {
                 auto Pcov = P;
 
@@ -381,10 +384,10 @@ namespace hf {
                 return Pcov;
             }
 
-            static auto enforceSymmetry(const Eigen::MatrixXd & P) ->
-                Eigen::MatrixXd
+            static auto enforceSymmetry(const Matrix & P) ->
+                Matrix
                 {
-                    Eigen::MatrixXd Psym = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+                    Matrix Psym = Matrix(STATE_DIM, STATE_DIM);
 
                     for (int i=0; i<STATE_DIM; i++) {
 
@@ -403,18 +406,18 @@ namespace hf {
                     return Psym;
                 }
 
-            static auto enforceSymmetry(const Eigen::VectorXd & x)
-                -> Eigen::VectorXd
+            static auto enforceSymmetry(const Vector & x)
+                -> Vector
                 {
-                    Eigen::VectorXd xsym = Eigen::VectorXd(STATE_DIM);
+                    Vector xsym = Vector(STATE_DIM);
                     xsym << x(0), x(1), x(2), x(3), 0, 0, 0;
                     return xsym;
 
                 }
 
             static auto tryToToIncorporateAttitude(
-                    const Eigen::VectorXd & q,
-                    const Eigen::VectorXd & x) -> Eigen::VectorXd
+                    const Vector & q,
+                    const Vector & x) -> Vector
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const float v0 = x(4);
@@ -429,7 +432,7 @@ namespace hf {
 
             static auto incorporateAttitude(
                     const float v0, const float v1, const float v2,
-                    const Eigen::VectorXd & q) -> Eigen::VectorXd
+                    const Vector & q) -> Vector
             {
                 const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
                 const float ca = cos(angle / 2);
@@ -447,18 +450,18 @@ namespace hf {
                 const float norm = sqrt(q0 * q0 + q1 * q1 + q2 * q2 + 
                         q3 * q3) + EPSILON;
 
-                Eigen::VectorXd qnew = Eigen::VectorXd(4);
+                Vector qnew = Vector(4);
                 qnew << q0/norm, q1/norm, q2/norm, q3/norm;
 
                 return qnew;
             }
 
             static auto makeJacobian(
-                    const Eigen::VectorXd & x,
-                    const Eigen::MatrixXd & R,
+                    const Vector & x,
+                    const Matrix & R,
                     const Vec3 & gyro,
                     const Vec3 & accel,
-                    const float dt) -> Eigen::MatrixXd
+                    const float dt) -> Matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -468,7 +471,7 @@ namespace hf {
                 const auto vy = x(2);
                 const auto vz = x(3);
 
-                Eigen::MatrixXd F(STATE_DIM, STATE_DIM);
+                Matrix F(STATE_DIM, STATE_DIM);
 
                 // position
                 F(0, 0) = 1;
@@ -528,21 +531,21 @@ namespace hf {
                 return F;
             }
 
-            static auto xinit() -> Eigen::VectorXd
+            static auto xinit() -> Vector
             {
-                return Eigen::VectorXd(STATE_DIM);
+                return Vector(STATE_DIM);
             }
 
-            static auto qinit() -> Eigen::VectorXd
+            static auto qinit() -> Vector
             {
-                auto q = Eigen::VectorXd(4);
+                auto q = Vector(4);
                 q << 1, 0, 0, 0;
                 return q;
             }
 
-            static auto pinit() -> Eigen::MatrixXd
+            static auto pinit() -> Matrix
             {
-                auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+                auto P = Matrix(STATE_DIM, STATE_DIM);
 
                 const float noise[STATE_DIM] = {
                     STDEV_INITIAL_POSITION_Z,
@@ -557,8 +560,8 @@ namespace hf {
                 return addCovarianceNoise(P, noise);
             }
 
-            static auto pnoisy(const Eigen::MatrixXd &P, const float dt)
-                -> Eigen::MatrixXd
+            static auto pnoisy(const Matrix &P, const float dt)
+                -> Matrix
             {
                 const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
@@ -573,10 +576,15 @@ namespace hf {
                 return addCovarianceNoise(P, noise);
             }
 
-            static auto quat2rotation(
-                    const Eigen::VectorXd & q) -> Eigen::MatrixXd
+            static auto rotate(const Vec3 & r, const Vector q)
+                -> Vector
             {
-                auto R = Eigen::MatrixXd(3, 3);
+                return q;
+            }
+
+            static auto quat2rotation(const Vector & q) -> Matrix
+            {
+                auto R = Matrix(3, 3);
 
                 R <<
                     q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3),
