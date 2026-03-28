@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <firmware/datatypes.hpp>
+#include <firmware/ekf/datatypes.hpp>
 #include <firmware/ekf/imu_subsampler.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>

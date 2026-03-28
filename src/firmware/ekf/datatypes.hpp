@@ -16,32 +16,11 @@
 
 #pragma once
 
-#include <datatypes.hpp>
+#include <ArduinoEigenDense.h>
 
 namespace hf {
 
-    class RxData {
+    typedef Eigen::VectorXd Vector;
 
-        public:
-
-            Setpoint axes;
-            float aux;
-            bool is_armed;
-            bool is_throttle_down;
-
-            RxData() = default;
-
-            RxData(
-                    const Setpoint & axes,
-                    const float aux,
-                    const bool is_armed,
-                    const bool is_throttle_down)
-                :
-                    axes(axes),
-                    aux(aux),
-                    is_armed(is_armed),
-                    is_throttle_down(is_throttle_down) {}
-
-            RxData& operator=(const RxData& other) = default;
-    };
+    typedef Eigen::MatrixXd Matrix;
 }
