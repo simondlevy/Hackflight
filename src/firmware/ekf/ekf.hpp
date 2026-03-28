@@ -80,9 +80,6 @@ namespace hf {
                 STATE_DIM
             };
 
-            typedef Eigen::VectorXd Vector;
-            typedef Eigen::MatrixXd Matrix;
-
         public:
 
             EKF& operator=(const EKF& other) = default;

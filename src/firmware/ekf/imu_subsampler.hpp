@@ -49,6 +49,14 @@ namespace hf {
                     ss;
             }
 
+            static auto new_getOutput(const ImuSubSampler & ss) -> Vector
+            {
+                Vector output = Vector(3);
+                const auto sub = ss.subSample;
+                output << sub.x, sub.y, sub.z;
+                return output;
+            }
+
             static auto getOutput(const ImuSubSampler & ss) -> Vec3
             {
                 return ss.subSample;

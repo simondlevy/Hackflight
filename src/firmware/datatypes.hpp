@@ -22,6 +22,10 @@
 
 namespace hf {
 
+    typedef Eigen::VectorXd Vector;
+
+    typedef Eigen::MatrixXd Matrix;
+
     class Vec3Raw {
 
         public:
