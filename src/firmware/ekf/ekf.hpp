@@ -133,7 +133,8 @@ namespace hf {
 
                 const auto dt = (msec_curr - ekf.lastPredictionMs) / 1000.f;
 
-                const auto accel = accelSubSampler.subSample * G;
+                const auto accel = 
+                    vec3_to_vector(accelSubSampler.subSample * G);
 
                 const auto gyro =
                     vec3_to_vector(gyroSubSampler.subSample * Num::DEG2RAD);
@@ -151,18 +152,18 @@ namespace hf {
                 const auto dt2 = dt * dt;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = ekf.x(1) * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = ekf.x(2) * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = ekf.x(1) * dt + (isFlying ? 0 : accel(0) * dt2 / 2);
+                const auto dy = ekf.x(2) * dt + (isFlying ? 0 : accel(1) * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = ekf.x(3) * dt + accel.z * dt2 / 2; 
+                const auto dz = ekf.x(3) * dt + accel(2) * dt2 / 2; 
 
                 // position update
                 const auto x0 = ekf.x(0) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
                     + ekf.R(2,2) * dz - G * dt2 / 2;
 
-                const auto accelx = isFlying ? 0 : accel.x;
-                const auto accely = isFlying ? 0 : accel.y;
+                const auto accelx = isFlying ? 0 : accel(0);
+                const auto accely = isFlying ? 0 : accel(1);
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -172,7 +173,7 @@ namespace hf {
                 const auto x2 = ekf.x(2) + dt * (accely - gyro(2) *
                         tmpSPX + gyro(0) * tmpSPZ
                         - G * ekf.R(2,1));
-                const auto x3 = ekf.x(3) + dt * (accel.z + gyro(1) *
+                const auto x3 = ekf.x(3) + dt * (accel(2) + gyro(1) *
                         tmpSPX - gyro(0) * tmpSPY
                         - G * ekf.R(2,2));
 
