@@ -592,12 +592,5 @@ namespace hf {
             {
                 return fabs(vel) > MIN_VELOCITY_MPS;
             }
-
-            static auto vec3_to_vector(const Vec3 & vec3) -> Vector
-            {
-                Vector v = Vector(3);
-                v << vec3.x, vec3.y, vec3.z;
-                return v;
-            }
     };
 }
