@@ -130,16 +130,11 @@ namespace hf {
 
                 const auto dt = (msec_curr - ekf.lastPredictionMs) / 1000.f;
 
-                /*
-                const auto accel = 
-                    vec3_to_vector(ImuSubSampler::getOutput(accelSubSampler) * G);
-                    */
-
                 const auto gyro =
-                    vec3_to_vector(ImuSubSampler::getOutput(gyroSubSampler) * Num::DEG2RAD);
+                    vec3_to_vector(ImuSubSampler::getOutput(gyroSubSampler, Num::DEG2RAD));
 
                 const auto accel = 
-                    ImuSubSampler::new_getOutput(accelSubSampler) * G;
+                    vec3_to_vector(ImuSubSampler::getOutput(accelSubSampler,  G));
 
                 const auto F = makeJacobian(ekf.x, ekf.R, gyro, dt);
 
