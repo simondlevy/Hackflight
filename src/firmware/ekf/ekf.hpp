@@ -182,21 +182,8 @@ namespace hf {
                 const auto dtwy = dt*gyro.y;
                 const auto dtwz = dt*gyro.z;
 
-                // compute the quaternion values in [w,x,y,z] order
-                const auto angle = sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
-                const auto ca = cos(angle/2);
-                const auto sa = sin(angle/2);
-                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
-
                 // Rotate the vehicle's attitude by the delta quaternion vector
-                // computed above
-                Vector pq = Vector(4);
-                const auto q = ekf.q;
-                pq <<
-                    dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3),
-                    dq[1]*q(0) + dq[0]*q(1) + dq[3]*q(2) - dq[2]*q(3),
-                    dq[2]*q(0) - dq[3]*q(1) + dq[0]*q(2) + dq[1]*q(3),
-                    dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
+                const auto pq = rotate(ekf.q, dtwx, dtwy, dtwz);
 
                 // Quaternion used for initial orientation
                 Vector qinit = Vector(4);
@@ -434,24 +421,15 @@ namespace hf {
                     const float v0, const float v1, const float v2,
                     const Vector & q) -> Vector
             {
-                const float angle = sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                const float ca = cos(angle / 2);
-                const float sa = sin(angle / 2);
-                const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
-
                 // Rotate the vehicle's attitude by the delta quaternion vector
-                // computed above
-                const float q0 = dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3);
-                const float q1 = dq[1]*q(0) + dq[0]*q(1) + dq[3]*q(2) - dq[2]*q(3);
-                const float q2 = dq[2]*q(0) - dq[3]*q(1) + dq[0]*q(2) + dq[1]*q(3);
-                const float q3 = dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
+                const auto qr = rotate(q, v0, v1, v2);
 
                 // normalize and store the result
-                const float norm = sqrt(q0 * q0 + q1 * q1 + q2 * q2 + 
-                        q3 * q3) + EPSILON;
+                const float norm = sqrt(qr(0)*qr(0) + qr(1)*qr(1) +
+                        qr(2)*qr(2) + qr(3)*qr(3)) + EPSILON;
 
                 Vector qnew = Vector(4);
-                qnew << q0/norm, q1/norm, q2/norm, q3/norm;
+                qnew << qr(0)/norm, qr(1)/norm, qr(2)/norm, qr(3)/norm;
 
                 return qnew;
             }
@@ -576,10 +554,25 @@ namespace hf {
                 return addCovarianceNoise(P, noise);
             }
 
-            static auto rotate(const Vec3 & r, const Vector q)
-                -> Vector
+            static auto rotate(const Vector & q,
+                    const float rx, const float ry, const float rz) -> Vector
             {
-                return q;
+                const float angle = sqrt(rx*rx + ry*ry + rz*rz) + EPSILON;
+                const float ca = cos(angle / 2);
+                const float sa = sin(angle / 2);
+                const float dq[4] = {
+                    ca, sa*rx/angle, sa*ry/angle, sa*rz/angle
+                };
+
+                auto qr = Vector(4);
+
+                qr << 
+                    dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3),
+                    dq[1]*q(0) + dq[0]*q(1) + dq[3]*q(2) - dq[2]*q(3),
+                    dq[2]*q(0) - dq[3]*q(1) + dq[0]*q(2) + dq[1]*q(3),
+                    dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
+
+                return qr;
             }
 
             static auto quat2rotation(const Vector & q) -> Matrix
