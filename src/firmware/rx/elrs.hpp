@@ -57,6 +57,11 @@ namespace hf {
 
         public:
 
+            RX(HardwareSerial * serial)
+            {
+                _crsf = CRSFforArduino(serial);
+            }
+
             void begin()
             {
                 if (!_crsf.begin()) {

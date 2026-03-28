@@ -21,6 +21,7 @@
 
 // Third-party libraries
 #include <Adafruit_VL53L1X.h>
+#include <CRSFforArduino.hpp>
 #include <dshot-teensy4.hpp>  
 
 // Hackflight library
@@ -33,9 +34,7 @@
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/safety.hpp>
-//#include <firmware/sensors/imus/bmi088.hpp>
-#include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
-//#include <firmware/sensors/imus/mpu6050.hpp>
+#include <firmware/sensors/imus/mpu6050.hpp>
 #include <firmware/sensors/zranger/zranger.h>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
@@ -52,10 +51,9 @@ static constexpr float EKF_PREDICTION_RATE_HZ = 100;
 
 static constexpr float ZRANGER_ACQUISITION_RATE_HZ = 50;
 
-static hf::RX _rx;
+static auto _rx = hf::RX(&Serial1);
 
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
-// static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static hf::LED _led = hf::LED(13);
 static hf::StabilizerPid _stabilizerPid;
@@ -74,7 +72,7 @@ void setup()
 
     _imu.begin();
 
-    hf::ZRanger::begin();
+    //hf::ZRanger::begin();
 
     _motors.begin(); 
 
@@ -125,7 +123,7 @@ void loop()
             _motors.run(rxdata.is_armed, _mixer.motorvals);
         }
 
-        hf::Debugger::report(state);
+        //hf::Debugger::report(rxdata);
     }
 
     hf::Timer::runDelayLoop(loop_start_usec);
