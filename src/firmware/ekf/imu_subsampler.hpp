@@ -49,10 +49,13 @@ namespace hf {
                     ss;
             }
 
-            static auto getOutput(
-                    const ImuSubSampler & ss, const float scale) -> Vec3
+            static auto getOutput(const ImuSubSampler & ss, const float scale)
+                -> Vector
             {
-                return ss.subSample * scale;
+                const auto scaled = ss.subSample * scale;
+                auto output = Vector(3);
+                output << scaled.x, scaled.y, scaled.z;
+                return output;
             }
 
         private:
