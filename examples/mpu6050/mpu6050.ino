@@ -26,13 +26,13 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/imufilter.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
+#include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/sensors/imus/mpu6050.hpp>
 #include <firmware/sensors/zranger/zranger.h>

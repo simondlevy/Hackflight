@@ -17,7 +17,6 @@
 #include <MPU6050.h>
 
 #include <hackflight.h>
-#include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 
 namespace hf {

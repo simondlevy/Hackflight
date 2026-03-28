@@ -17,7 +17,6 @@
 #include <LSM6DSOSensor.h>
 
 #include <hackflight.h>
-#include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
 
 namespace hf {

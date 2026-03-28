@@ -15,7 +15,7 @@
  */
 
 #include <hackflight.h>
-#include <firmware/datatypes.hpp>
+#include <firmware/rxdata.hpp>
 
 namespace hf {
 

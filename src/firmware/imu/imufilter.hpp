@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <firmware/datatypes.hpp>
 #include <firmware/imu/three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
