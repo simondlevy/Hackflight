@@ -135,10 +135,10 @@ namespace hf {
 
                 const auto accel = accelSubSampler.subSample * G;
 
-                const auto gyro = gyroSubSampler.subSample * Num::DEG2RAD;
+                const auto gyro =
+                    vec3_to_vector(gyroSubSampler.subSample * Num::DEG2RAD);
 
-                const auto F = makeJacobian(
-                        ekf.x, ekf.R, vec3_to_vector(gyro), dt);
+                const auto F = makeJacobian(ekf.x, ekf.R, gyro, dt);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 const auto P = (F * ekf.P) * F.transpose();
@@ -166,22 +166,22 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                const auto x1 = ekf.x(1) + dt * (accelx + gyro.z *
-                        tmpSPY - gyro.y * tmpSPZ
+                const auto x1 = ekf.x(1) + dt * (accelx + gyro(2) *
+                        tmpSPY - gyro(1) * tmpSPZ
                         - G * ekf.R(2,0));
-                const auto x2 = ekf.x(2) + dt * (accely - gyro.z *
-                        tmpSPX + gyro.x * tmpSPZ
+                const auto x2 = ekf.x(2) + dt * (accely - gyro(2) *
+                        tmpSPX + gyro(0) * tmpSPZ
                         - G * ekf.R(2,1));
-                const auto x3 = ekf.x(3) + dt * (accel.z + gyro.y *
-                        tmpSPX - gyro.x * tmpSPY
+                const auto x3 = ekf.x(3) + dt * (accel.z + gyro(1) *
+                        tmpSPX - gyro(0) * tmpSPY
                         - G * ekf.R(2,2));
 
                 // attitude update (rotate by gyro), we do this in quaternions
                 // this is the gyro angular velocity integrated over the sample
                 // period
-                const auto dtwx = dt*gyro.x;
-                const auto dtwy = dt*gyro.y;
-                const auto dtwz = dt*gyro.z;
+                const auto dtwx = dt*gyro(0);
+                const auto dtwy = dt*gyro(1);
+                const auto dtwz = dt*gyro(2);
 
                 // Rotate the vehicle's attitude by the delta quaternion vector
                 const auto pq = rotate(ekf.q, dtwx, dtwy, dtwz);
