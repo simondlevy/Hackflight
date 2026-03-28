@@ -190,19 +190,15 @@ namespace hf {
                 qinit << 1, 0, 0, 0;
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-                const auto pqnew = isFlying ? pq : keep * pq +
-                    ROLLPITCH_ZERO_REVERSION * qinit;
+                const auto pqnew = isFlying ? pq :
+                    keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
-                // Normalize the quaternion
-                const auto norm = sqrt(pqnew.cwiseProduct(pqnew).sum()) + EPSILON;
-
-                __attribute__((aligned(4))) Vector x =
-                    Vector(STATE_DIM);
+                __attribute__((aligned(4))) Vector x = Vector(STATE_DIM);
                 x << x0, x1, x2, x3, ekf.x(4), ekf.x(5), ekf.x(6); 
 
                 return EKF(
                         x,
-                        pqnew / norm, // q
+                        qnorm(pqnew), // q
                         P,
                         ekf.R,
                         accelSubSampler,
@@ -428,10 +424,14 @@ namespace hf {
                 const float norm = sqrt(qr(0)*qr(0) + qr(1)*qr(1) +
                         qr(2)*qr(2) + qr(3)*qr(3)) + EPSILON;
 
-                Vector qnew = Vector(4);
-                qnew << qr(0)/norm, qr(1)/norm, qr(2)/norm, qr(3)/norm;
+                return qr / norm;
+            }
 
-                return qnew;
+            static auto qnorm(const Vector & q) -> Vector
+            {
+                const auto norm = sqrt(q.cwiseProduct(q).sum()) + EPSILON;
+
+                return q / norm;
             }
 
             static auto makeJacobian(
