@@ -418,13 +418,8 @@ namespace hf {
                     const Vector & q) -> Vector
             {
                 // Rotate the vehicle's attitude by the delta quaternion vector
-                const auto qr = rotate(q, v0, v1, v2);
-
-                // normalize and store the result
-                const float norm = sqrt(qr(0)*qr(0) + qr(1)*qr(1) +
-                        qr(2)*qr(2) + qr(3)*qr(3)) + EPSILON;
-
-                return qr / norm;
+                // and normalize the result
+                return qnorm(rotate(q, v0, v1, v2));
             }
 
             static auto qnorm(const Vector & q) -> Vector
