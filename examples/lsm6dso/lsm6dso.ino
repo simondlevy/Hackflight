@@ -123,7 +123,7 @@ void loop()
             _motors.run(rxdata.is_armed, _mixer.motorvals);
         }
 
-        hf::Debugger::report(state);
+        //hf::Debugger::report(state);
     }
 
     hf::Timer::runDelayLoop(loop_start_usec);

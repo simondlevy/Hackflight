@@ -1,78 +1,47 @@
-#include <LSM6DSOSensor.h>
-#include <MPU6050.h>
+/*
+   Hackflight main sketch
 
+   Copyright (C) 2026 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
+// Hackflight library
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/profiling.hpp>
+#include <firmware/sensors/imus/mpu6050.hpp>
+#include <firmware/sensors/imus/wire1_lsm6dso_rot90ccw.hpp>
 
-//static LSM6DSOSensor _lsm6dso(&Wire);
-
-static MPU6050 _mpu6050;
-
-/*
-static bool bad(const LSM6DSOStatusTypeDef status)
-{
-    return status != LSM6DSO_OK;
-}*/
-
+static hf::IMU _mpu6050;
+static hf::NewIMU _lsm6dso;
 
 void setup()
 {
-    Serial.begin(0);
+    _mpu6050.begin();
 
-    Wire.begin();
+    _lsm6dso.begin();
 
-    Wire.setClock(1000000); 
-
-    _mpu6050.initialize();
-
-    /*
-    if (
-            bad(_lsm6dso.begin()) ||
-            bad(_lsm6dso.Enable_G())  ||
-            bad(_lsm6dso.Enable_X()) ||
-            bad(_lsm6dso.Set_X_FS(16)) ||
-            bad(_lsm6dso.Set_G_FS(2000))) {*/
-
-    if (!_mpu6050.testConnection()) {
-        hf::Debugger::reportForever("Initialization unsuccessful\n");
-    }
-
-    _mpu6050.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
-
-    _mpu6050.setFullScaleAccelRange(MPU6050_ACCEL_FS_16);
-
-     _mpu6050.setIntDataReadyEnabled(true);
 }
 
 void loop()
 {
-    // hf::Profiler::report();
-
-    static uint32_t _count;
-
-    //uint8_t status = 0;
-    //_lsm6dso.Get_G_DRDY_Status(&status);
-
-    bool status = _mpu6050.getIntDataReadyStatus();
-
-    if (status) {
-
-        int16_t g[3] = {};
-        int16_t a[3] = {};
-        /*
-        _lsm6dso.Get_G_AxesRaw(g);
-        _lsm6dso.Get_X_AxesRaw(a);*/
-
-       _mpu6050.getMotion6(&a[0], &a[1], &a[2], &g[0], &g[1], &g[2]);
-
-        //printf("gx=%d gy=%d gz=%d ax=%d ay=%d az=%d\n",
-        //        g[0], g[1], g[2], a[0], a[1], a[2]);
-
-       _count = 0;
+    if (_mpu6050.available()) {
+        const auto mpu6050_raw = _mpu6050.read();
+        hf::Debugger::report(mpu6050_raw);
     }
 
-    else {
-        printf("%d\n", _count++);
+    if (_lsm6dso.available()) {
+        const auto lsm6dso_raw = _lsm6dso.read();
+        hf::Debugger::report(lsm6dso_raw);
     }
 }
