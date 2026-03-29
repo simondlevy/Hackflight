@@ -24,7 +24,7 @@
 #include <firmware/core.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
-#include <firmware/sensors/imu.hpp>
+#include <firmware/imu/imu.hpp>
 
 static auto _rx = hf::RX(&Serial1);
 

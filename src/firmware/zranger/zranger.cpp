@@ -17,7 +17,7 @@
 #include <Adafruit_VL53L1X.h>
 
 #include <hackflight.h>
-#include <firmware/sensors/zranger/zranger.h>
+#include <firmware/zranger/zranger.h>
 
 static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
 

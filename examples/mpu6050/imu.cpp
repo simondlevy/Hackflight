@@ -18,7 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/sensors/imu.hpp>
+#include <firmware/imu/imu.hpp>
 using namespace hf;
 
 static MPU6050 _mpu6050;

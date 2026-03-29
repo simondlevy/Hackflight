@@ -30,14 +30,14 @@
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
+#include <firmware/imu/imu.hpp>
 #include <firmware/imu/imufilter.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
-#include <firmware/sensors/imu.hpp>
-#include <firmware/sensors/zranger/zranger.h>
+#include <firmware/zranger/zranger.h>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
