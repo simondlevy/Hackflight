@@ -127,6 +127,9 @@ namespace hf {
                 const auto isGyroCalibrated = shouldUpdate ? true :
                     filter.isGyroCalibrated;
 
+                //printf("wantUpdate=%d shouldUpdate=%d isGyroCalibrated=%d\n",
+                //        wantUpdate, shouldUpdate, isGyroCalibrated);
+
                 const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 
                 const auto gyroUnbiased =

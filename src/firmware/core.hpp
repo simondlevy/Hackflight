@@ -85,47 +85,43 @@ namespace hf {
                     _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
                 }
 
-                if (imu.available()) {
+                //static uint32_t _imucount; _imucount = Profiler::report(++_imucount);
 
-                    static uint32_t _imucount;
-                    _imucount = Profiler::report(++_imucount);
+                const auto dt = Timer::getDt();
 
-                    const auto dt = Timer::getDt();
+                const auto rxdata =
+                    _imuFilter.isGyroCalibrated ? rx.read() : RxData();
 
-                    const auto rxdata =
-                        _imuFilter.isGyroCalibrated ? rx.read() : RxData();
+                const auto imuraw = imu.read();
 
-                    const auto imuraw = imu.read();
+                _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
+                        imu.gyroRangeDps(), imu.accelRangeGs());
 
-                    _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                            imu.gyroRangeDps(), imu.accelRangeGs());
+                led.blink(millis(), _imuFilter.isGyroCalibrated);
 
-                    led.blink(millis(), _imuFilter.isGyroCalibrated);
+                _flyingCheck = _flyingCheck.run(
+                        _flyingCheck, millis(), _mixer.motorvals, 4);
 
-                    _flyingCheck = _flyingCheck.run(
-                            _flyingCheck, millis(), _mixer.motorvals, 4);
+                _ekf = EKF::update(_ekf, millis(), _imuFilter.output);
 
-                    _ekf = EKF::update(_ekf, millis(), _imuFilter.output);
+                const auto state = EKF::getVehicleState(_ekf, _imuFilter.output);
 
-                    const auto state = EKF::getVehicleState(_ekf, _imuFilter.output);
+                _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
-                    _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
+                const auto setpoint = mksetpoint(rxdata.axes);
 
-                    const auto setpoint = mksetpoint(rxdata.axes);
+                _stabilizerPid = StabilizerPid::run( _stabilizerPid,
+                        !rxdata.is_throttle_down, dt, state, setpoint);
 
-                    _stabilizerPid = StabilizerPid::run( _stabilizerPid,
-                            !rxdata.is_throttle_down, dt, state, setpoint);
+                _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-                    _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
-
-                    if (_mode != MODE_PANIC) {
-                        motors.run(rxdata.is_armed, _mixer.motorvals);
-                    }
-
-                    //Debugger::report(state);
+                if (_mode != MODE_PANIC) {
+                    motors.run(rxdata.is_armed, _mixer.motorvals);
                 }
 
-                //Timer::runDelayLoop(loop_start_usec);
+                //Debugger::report(state);
+
+                Timer::runDelayLoop(loop_start_usec);
 
                 //Profiler::report();
             }

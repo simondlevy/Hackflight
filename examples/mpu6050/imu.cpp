@@ -43,11 +43,6 @@ void IMU::begin()
     _mpu6050.setFullScaleAccelRange(ARANGE);
 }
 
-bool IMU::available()
-{
-    return true;
-}
-
 int16_t IMU::gyroRangeDps()
 {
     static constexpr int16_t granges[4] = {250, 500, 100, 2000};

@@ -28,8 +28,6 @@ namespace hf {
 
             void begin();
 
-            bool available();
-
             int16_t gyroRangeDps();
 
             int16_t accelRangeGs();

@@ -21,6 +21,7 @@
 #include <firmware/sensors/imu.hpp>
 using namespace hf;
 
+static constexpr int16_t GODR = 1000;
 static constexpr int16_t GRANGE = 2000;
 static constexpr int16_t ARANGE = 16;
 
@@ -48,19 +49,13 @@ void IMU::begin()
             bad(_lsm6dso.begin())  ||
             bad(_lsm6dso.Enable_G())  ||
             bad(_lsm6dso.Enable_X())  ||
+            bad(_lsm6dso.Set_G_ODR(GODR)) ||
             bad(_lsm6dso.Set_X_FS(ARANGE)) ||
             bad(_lsm6dso.Set_G_FS(GRANGE)))
     {
         Debugger::reportForever(
                 "LSM6DSO initialization unsuccessful");
     }
-}
-
-bool IMU::available()
-{
-    uint8_t status = 0;
-    _lsm6dso.Get_G_DRDY_Status(&status);
-    return status == 1;
 }
 
 int16_t IMU::gyroRangeDps()
