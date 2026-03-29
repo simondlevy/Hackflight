@@ -40,5 +40,19 @@ namespace hf {
                 }
                 _count++;
             }
+
+            static uint32_t report(const uint32_t count)
+            {
+                static Timer _timer;
+
+                if (_timer.ready(1)) {
+
+                    if (count > 0) {
+                        printf("count=%d\n", (int)count);
+                    }
+                    return 0;
+                }
+                return count;
+            }
     };
 }

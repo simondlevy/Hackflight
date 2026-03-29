@@ -87,6 +87,9 @@ namespace hf {
 
                 if (imu.available()) {
 
+                    static uint32_t _imucount;
+                    _imucount = Profiler::report(++_imucount);
+
                     const auto dt = Timer::getDt();
 
                     const auto rxdata =
@@ -122,7 +125,7 @@ namespace hf {
                     //Debugger::report(state);
                 }
 
-                Timer::runDelayLoop(loop_start_usec);
+                //Timer::runDelayLoop(loop_start_usec);
 
                 //Profiler::report();
             }
