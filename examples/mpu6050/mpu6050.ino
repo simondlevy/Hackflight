@@ -24,7 +24,7 @@
 #include <firmware/core.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
-#include <firmware/sensors/imus/mpu6050.hpp>
+#include <firmware/sensors/imu.hpp>
 
 static auto _rx = hf::RX(&Serial1);
 
@@ -38,21 +38,10 @@ static hf::Core _core;
 
 void setup()
 {
-    _imu.begin();
-
-    _core.setup(_rx, _motors, _led);
+    _core.setup(_imu, _rx, _motors, _led);
 }
 
 void loop()
 {
-    const auto imuraw = _imu.available() ? _imu.read() : hf::ImuRaw();
-
-    _core.loop(
-            _imu.available(),
-            imuraw,
-            _imu.gyroRangeDps(),
-            _imu.accelRangeGs(),
-            _rx,
-            _motors,
-            _led); 
+    _core.loop(_imu, _rx, _motors, _led); 
 }

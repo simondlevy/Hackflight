@@ -36,6 +36,7 @@
 #include <firmware/rx/elrs.hpp>
 #include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
+#include <firmware/sensors/imu.hpp>
 #include <firmware/sensors/zranger/zranger.h>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
@@ -60,8 +61,10 @@ namespace hf {
 
         public:
 
-            void setup(RX & rx, DshotTeensy4 & motors, LED & led)
+            void setup(IMU & imu, RX & rx, DshotTeensy4 & motors, LED & led)
             {
+                imu.begin();
+
                 rx.begin();
 
                 //ZRanger::begin();
@@ -71,14 +74,7 @@ namespace hf {
                 led.begin(); 
             }
 
-            void loop(
-                    const bool imu_available,
-                    const ImuRaw & imuraw,
-                    const int16_t imu_grange_dps,
-                    const int16_t imu_arange_gs,
-                    RX & rx,
-                    DshotTeensy4 & motors,
-                    LED & led)
+            void loop(IMU & imu, RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 const auto loop_start_usec = micros();
 
@@ -89,15 +85,17 @@ namespace hf {
                     _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
                 }
 
-                if (imu_available) {
+                if (imu.available()) {
 
                     const auto dt = Timer::getDt();
 
                     const auto rxdata =
                         _imuFilter.isGyroCalibrated ? rx.read() : RxData();
 
+                    const auto imuraw = imu.read();
+
                     _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                            imu_grange_dps, imu_arange_gs);
+                            imu.gyroRangeDps(), imu.accelRangeGs());
 
                     led.blink(millis(), _imuFilter.isGyroCalibrated);
 
