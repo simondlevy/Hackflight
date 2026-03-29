@@ -25,6 +25,7 @@ namespace hf {
 
         private:
 
+            static constexpr int16_t ODR = 2000;
             static constexpr int16_t GRANGE = 2000;
             static constexpr int16_t ARANGE = 16; 
 
@@ -42,17 +43,20 @@ namespace hf {
                 if (id != LSM6DSO_ID) {
                     Debugger::reportForever("LSM6DSO not detected");
                 }
-                
+
                 if (
                         bad(_lsm6dso.begin())  ||
                         bad(_lsm6dso.Enable_G())  ||
                         bad(_lsm6dso.Enable_X())  ||
                         bad(_lsm6dso.Set_X_FS(ARANGE)) ||
-                        bad(_lsm6dso.Set_G_FS(GRANGE)))
-                {
+                        bad(_lsm6dso.Set_G_FS(GRANGE)) ||
+                        bad(_lsm6dso.Set_G_ODR(ODR)) ||
+                        false) {
+
                     Debugger::reportForever(
                             "LSM6DSO initialization unsuccessful");
                 }
+
             }
 
             const auto gyroRangeDps() -> int16_t

@@ -19,29 +19,30 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/sensors/imus/mpu6050.hpp>
-#include <firmware/sensors/imus/wire1_lsm6dso_rot90ccw.hpp>
+#include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
 
-static hf::IMU _mpu6050;
-static hf::NewIMU _lsm6dso;
+static hf::IMU _lsm6dso;
 
 void setup()
 {
-    _mpu6050.begin();
-
     _lsm6dso.begin();
 
 }
 
 void loop()
 {
-    if (_mpu6050.available()) {
-        const auto mpu6050_raw = _mpu6050.read();
-        hf::Debugger::report(mpu6050_raw);
+    static uint32_t _lcount;
+    if (_lsm6dso.available()) {
+        /*const auto lsm6dso_raw =*/ _lsm6dso.read();
+        //hf::Debugger::report(lsm6dso_raw);
+        _lcount++;
     }
 
-    if (_lsm6dso.available()) {
-        const auto lsm6dso_raw = _lsm6dso.read();
-        hf::Debugger::report(lsm6dso_raw);
+    static hf::Timer _timer;
+
+    if (_timer.ready(1)) {
+        printf("l=%lu\n", _lcount);
+        //_mcount = 0;
+        _lcount = 0;
     }
 }

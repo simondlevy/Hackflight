@@ -96,7 +96,8 @@ void loop()
 
         const auto dt = hf::Timer::getDt();
 
-        const auto rxdata = _rx.read();
+        const auto rxdata =
+            _imuFilter.isGyroCalibrated ? _rx.read() : hf::RxData();
 
         _imuFilter = hf::ImuFilter::step(_imuFilter, millis(), imuraw,
                 _imu.gyroRangeDps(), _imu.accelRangeGs());
