@@ -37,7 +37,7 @@
 #include <firmware/rx/elrs.hpp>
 #include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
-#include <firmware/zranger/zranger.h>
+#include <firmware/zranger/device_api.h>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
@@ -61,13 +61,27 @@ namespace hf {
 
         public:
 
+            void setupWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led,
+                    const uint8_t zranger_interrupt_pin)
+            {
+                setup(rx, motors, led);
+
+                ZRanger::begin(zranger_interrupt_pin);
+
+            }
+            void loopWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led)
+            {
+                if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
+                }
+
+                loop(rx, motors, led);
+            }
+
             void setup(RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 IMU::begin();
 
                 rx.begin();
-
-                //ZRanger::begin();
 
                 motors.begin(); 
 
@@ -77,9 +91,6 @@ namespace hf {
             void loop(RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 const auto loop_start_usec = micros();
-
-                if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
-                }
 
                 if (_ekfPredictionTimer.ready(EKF_PREDICTION_RATE_HZ)) {
                     _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
@@ -117,7 +128,7 @@ namespace hf {
                     motors.run(rxdata.is_armed, _mixer.motorvals);
                 }
 
-                Debugger::report(state);
+                //Debugger::report(state);
 
                 Timer::runDelayLoop(loop_start_usec);
 

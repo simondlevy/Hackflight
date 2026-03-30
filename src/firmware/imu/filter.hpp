@@ -113,6 +113,9 @@ namespace hf {
                 const auto wantUpdate =!filter.isGyroCalibrated &&
                     isBufferFilled;
 
+                // XXX needed to debug BMI088, LSM6DSO
+                //Debugger::report(gyrovariance);
+
                 const auto shouldUpdate = wantUpdate && 
                     gyrovariance < GYRO_RAW_VARIANCE_BASE &&
                     filter._gyroVarianceSampleTimeMsec +
@@ -126,9 +129,6 @@ namespace hf {
 
                 const auto isGyroCalibrated = shouldUpdate ? true :
                     filter.isGyroCalibrated;
-
-                //printf("wantUpdate=%d shouldUpdate=%d isGyroCalibrated=%d\n",
-                //        wantUpdate, shouldUpdate, isGyroCalibrated);
 
                 const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
 

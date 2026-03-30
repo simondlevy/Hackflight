@@ -17,9 +17,8 @@
 #include <Adafruit_VL53L1X.h>
 
 #include <hackflight.h>
-#include <firmware/zranger/zranger.h>
-
-static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
+#include <firmware/debugging.hpp>
+#include <firmware/zranger/device_api.h>
 
 static Adafruit_VL53L1X _vl53l1x;
 
@@ -32,7 +31,7 @@ static void zranger_handle_data_ready()
     _vl53l1x.clearInterrupt();
 }
 
-void hf::ZRanger::begin()
+void hf::ZRanger::begin(const uint8_t interruptPin)
 {
     Wire1.begin();
     Wire1.setClock(400000);
@@ -50,7 +49,7 @@ void hf::ZRanger::begin()
 
     // Polarity=1 => RISING
     _vl53l1x.VL53L1X_SetInterruptPolarity(1);
-    attachInterrupt(digitalPinToInterrupt(ZRANGER_INTERRUPT_PIN),
+    attachInterrupt(digitalPinToInterrupt(interruptPin),
             zranger_handle_data_ready, RISING);
 
     // Clear interrupt to get things started

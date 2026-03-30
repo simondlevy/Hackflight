@@ -138,6 +138,17 @@ namespace hf {
                 }
             }
 
+            static void report(const ThreeAxis & ta)
+            {
+                static Helper _helper;
+
+                if (_helper.ready()) {
+
+                    printf("%5lu | x=%+04.0f y=%+04.0f z=%+04.0f\n",
+                            _helper.count, ta.x, ta.y, ta.z);
+                }
+            }
+
             static void report(const ImuFiltered & imufilt)
             {
                 static Helper _helper;

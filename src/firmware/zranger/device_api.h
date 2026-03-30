@@ -15,7 +15,6 @@
  */
 
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
 
 namespace hf {
 
@@ -23,7 +22,7 @@ namespace hf {
 
         public:
 
-            static void begin();
+            static void begin(const uint8_t interruptPin);
 
             static int16_t read();
     };
