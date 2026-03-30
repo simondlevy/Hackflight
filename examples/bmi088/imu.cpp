@@ -18,7 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/imu/imu.hpp>
+#include <firmware/imu/device_api.h>
 using namespace hf;
 
 Bmi088Accel _accel(Wire, 0x19);

@@ -30,8 +30,8 @@
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
 #include <firmware/ekf/ekf.hpp>
-#include <firmware/imu/imu.hpp>
-#include <firmware/imu/imufilter.hpp>
+#include <firmware/imu/device_api.h>
+#include <firmware/imu/filter.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
@@ -61,9 +61,9 @@ namespace hf {
 
         public:
 
-            void setup(IMU & imu, RX & rx, DshotTeensy4 & motors, LED & led)
+            void setup(RX & rx, DshotTeensy4 & motors, LED & led)
             {
-                imu.begin();
+                IMU::begin();
 
                 rx.begin();
 
@@ -74,7 +74,7 @@ namespace hf {
                 led.begin(); 
             }
 
-            void loop(IMU & imu, RX & rx, DshotTeensy4 & motors, LED & led)
+            void loop(RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 const auto loop_start_usec = micros();
 
@@ -90,10 +90,10 @@ namespace hf {
                 const auto rxdata =
                     _imuFilter.isGyroCalibrated ? rx.read() : RxData();
 
-                const auto imuraw = imu.read();
+                const auto imuraw = IMU::read();
 
                 _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                        imu.gyroRangeDps(), imu.accelRangeGs());
+                        IMU::gyroRangeDps(), IMU::accelRangeGs());
 
                 led.blink(millis(), _imuFilter.isGyroCalibrated);
 

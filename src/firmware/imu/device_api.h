@@ -26,12 +26,12 @@ namespace hf {
 
         public:
 
-            void begin();
+            static void begin();
 
-            int16_t gyroRangeDps();
+            static int16_t gyroRangeDps();
 
-            int16_t accelRangeGs();
+            static int16_t accelRangeGs();
 
-            ImuRaw read();
+            static ImuRaw read();
     };
 }

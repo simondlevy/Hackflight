@@ -24,7 +24,7 @@
 #include <firmware/core.hpp>
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
-#include <firmware/imu/imu.hpp>
+#include <firmware/imu/device_api.h>
 
 static auto _rx = hf::RX(&Serial1);
 
@@ -32,16 +32,14 @@ static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
 
 static hf::LED _led = hf::LED(13);
 
-static hf::IMU _imu;
-
 static hf::Core _core;
 
 void setup()
 {
-    _core.setup(_imu, _rx, _motors, _led);
+    _core.setup(_rx, _motors, _led);
 }
 
 void loop()
 {
-    _core.loop(_imu, _rx, _motors, _led); 
+    _core.loop(_rx, _motors, _led); 
 }

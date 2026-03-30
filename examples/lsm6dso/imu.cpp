@@ -18,7 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/imu/imu.hpp>
+#include <firmware/imu/device_api.h>
 using namespace hf;
 
 static constexpr int16_t GODR = 1000;
