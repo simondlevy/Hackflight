@@ -85,8 +85,6 @@ namespace hf {
                     _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
                 }
 
-                //static uint32_t _imucount; _imucount = Profiler::report(++_imucount);
-
                 const auto dt = Timer::getDt();
 
                 const auto rxdata =
@@ -119,7 +117,7 @@ namespace hf {
                     motors.run(rxdata.is_armed, _mixer.motorvals);
                 }
 
-                //Debugger::report(state);
+                Debugger::report(state);
 
                 Timer::runDelayLoop(loop_start_usec);
 

@@ -16,33 +16,32 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Third-party libraries
+#include <dshot-teensy4.hpp>  
+
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
-#include <firmware/sensors/imus/lsm6dso_rot90ccw.hpp>
+#include <firmware/core.hpp>
+#include <firmware/led.hpp>
+#include <firmware/rx/elrs.hpp>
+#include <firmware/imu/imu.hpp>
 
-static hf::IMU _lsm6dso;
+static auto _rx = hf::RX(&Serial1);
+
+static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
+
+static hf::LED _led = hf::LED(13);
+
+static hf::IMU _imu;
+
+static hf::Core _core;
 
 void setup()
 {
-    _lsm6dso.begin();
-
+    _core.setup(_imu, _rx, _motors, _led);
 }
 
 void loop()
 {
-    static uint32_t _lcount;
-    if (_lsm6dso.available()) {
-        /*const auto lsm6dso_raw =*/ _lsm6dso.read();
-        //hf::Debugger::report(lsm6dso_raw);
-        _lcount++;
-    }
-
-    static hf::Timer _timer;
-
-    if (_timer.ready(1)) {
-        printf("l=%lu\n", _lcount);
-        //_mcount = 0;
-        _lcount = 0;
-    }
+    _core.loop(_imu, _rx, _motors, _led); 
 }
