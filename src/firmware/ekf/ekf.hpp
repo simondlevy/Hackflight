@@ -210,7 +210,7 @@ namespace hf {
 
             } // predict
 
-            static auto update(const EKF & ekf, const uint32_t msec_curr,
+            static auto updateWithImu(const EKF & ekf, const uint32_t msec_curr,
                     const ImuFiltered & imudata) -> EKF
             {
                 const auto accelSubSampler = ekf.didResetEstimation ?

@@ -115,7 +115,7 @@ namespace hf {
                 _flyingCheck = _flyingCheck.run(
                         _flyingCheck, millis(), _mixer.motorvals, 4);
 
-                _ekf = EKF::update(_ekf, millis(), _imuFilter.output);
+                _ekf = EKF::updateWithImu(_ekf, millis(), _imuFilter.output);
 
                 const auto state = EKF::getVehicleState(_ekf, _imuFilter.output);
 
