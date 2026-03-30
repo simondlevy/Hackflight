@@ -73,6 +73,9 @@ namespace hf {
             void loopWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
+
+                    _zrangerFilter = ZRangerFilter::step(
+                            _zrangerFilter, millis(), ZRanger::read());
                 }
 
                 loop(rx, motors, led);
@@ -138,13 +141,14 @@ namespace hf {
 
         private:
 
-            StabilizerPid _stabilizerPid;
-            Mixer _mixer;
-            ImuFilter _imuFilter;
             EKF _ekf;
-            FlyingCheck _flyingCheck;
-            mode_e _mode;
             Timer _ekfPredictionTimer;
+            FlyingCheck _flyingCheck;
+            ImuFilter _imuFilter;
+            Mixer _mixer;
+            mode_e _mode;
+            StabilizerPid _stabilizerPid;
+            ZRangerFilter _zrangerFilter;
             Timer _zrangerTimer;
     };
 }

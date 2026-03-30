@@ -39,47 +39,40 @@ namespace hf {
             ZRangerFilter() = default;
 
             ZRangerFilter& operator=(const ZRangerFilter& other) = default;
- 
-            /*
-            static auto read(
+
+            ZRangerFilter(
+                    const uint32_t timestamp_msec,
+                    const float distance_m,
+                    const float stdev)
+                :
+                    timestamp_msec(timestamp_msec),
+                    distance_m(distance_m),
+                    stdev(stdev) { }
+
+            static auto step(
                     const ZRangerFilter & filter,
-                    const uint16_t range_mm,
-                    const uint32_t tick) -> ZRangerFilter
+                    const uint32_t msec_curr,
+                    const uint16_t distance_mm) -> ZRangerFilter
             {
                 static constexpr float EXP_COEFF =
                     logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
 
-                const auto inrange = range < OUTLIER_LIMIT_MM;
+                const auto distance_m = distance_mm / 1000.f;
 
-                const float distance_m = range_mm / 1000.f;
+                const auto stdev = EXP_STD_A *
+                    ( 1 + expf(EXP_COEFF * (distance_m - EXP_POINT_A)));
 
-                // check if range is feasible and push into the estimator the
-                // sensor should not be able to measure >5 [m], and outliers
-                // typically occur as >8 [m] measurements
+                return distance_mm < OUTLIER_LIMIT_MM ?
+                    ZRangerFilter(distance_m, stdev, msec_curr) :
+                    filter;
 
-                if (range < OUTLIER_LIMIT_MM) {
-
-                    float distance = range / 1000; // Scale from [mm] to [m]
-
-                    float stdDev = EXP_STD_A * (
-                            1 + expf(EXP_COEFF * (distance - EXP_POINT_A)));
-
-                    tofData.timestamp = tick;
-                    tofData.distance = distance;
-                    tofData.stdDev = stdDev;
-
-                    return true;
-                }
-
-                return false;
-            }*/
+            }
 
         private:
 
-            bool inrange;
-            uint32_t timestamp;
-            float distance;
-            float stdDev;
+            uint32_t timestamp_msec;
+            float distance_m;
+            float stdev;
     };
 
 }
