@@ -26,6 +26,8 @@
 #include <firmware/rx/elrs.hpp>
 #include <firmware/imu/device_api.h>
 
+const uint8_t ZRANGER_INTERRUPT_PIN = 7;
+
 static auto _rx = hf::RX(&Serial1);
 
 static DshotTeensy4 _motors = DshotTeensy4({6, 5, 4, 3});
@@ -36,10 +38,10 @@ static hf::Core _core;
 
 void setup()
 {
-    _core.setup(_rx, _motors, _led);
+    _core.setupWithZRanger(_rx, _motors, _led, ZRANGER_INTERRUPT_PIN);
 }
 
 void loop()
 {
-    _core.loop(_rx, _motors, _led); 
+    _core.loopWithZRanger(_rx, _motors, _led); 
 }
