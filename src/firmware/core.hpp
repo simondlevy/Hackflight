@@ -38,6 +38,7 @@
 #include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/zranger/device_api.h>
+#include <firmware/zranger/filter.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
