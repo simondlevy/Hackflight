@@ -266,7 +266,7 @@ namespace hf {
 
                 const float dx = 0;//R(0,0)*_x(1) + R(0,1)*_x(2) + R(0,2)*_x(3);
                 const float dy = 0;//R(1,0)*_x(1) + R(1,1)*_x(2) + R(1,2)*_x(3); 
-                const float dz = 0;//R(2,0)*_x(1) + R(2,1)*_x(2) + R(2,2)*_x(3);
+                const float dz = R(2,0)*ekf.x(1) + R(2,1)*ekf.x(2) + R(2,2)*ekf.x(3);
 
                 const auto didResetEstimation =
                     !areVelsInBounds(dx, dy, dz) ?
@@ -334,6 +334,13 @@ namespace hf {
 
                 const auto measured_distance = zrfilter.distance_m;
 
+                if (fabs(r22) > 0.1 && r22 > 0) {
+                    printf("r22=%f\n", r22);
+                    printf("angle=%f\n", angle);
+                    printf("predicted=%f measured=%f\n\n",
+                            predicted_distance, measured_distance);
+                }
+
                 const float h[STATE_DIM] = {1/cosf(angle), 0, 0, 0, 0, 0, 0};
 
                 return fabs(r22) > 0.1 && r22 > 0 ?
@@ -343,7 +350,7 @@ namespace hf {
                     ekf;
             }
 
-         private:
+        private:
 
             // State vector
             Vector x = Vector(STATE_DIM);
@@ -467,16 +474,12 @@ namespace hf {
 
                 // position from body-frame velocity
                 F(0,1) = R(2,0)*dt;
-
                 F(0,2) = R(2,1)*dt;
-
                 F(0,3) = R(2,2)*dt;
 
                 // position from attitude error
                 F(0,4) = (vy*R(2,2) - vz*R(2,1))*dt;
-
                 F(0,5) = (-vx*R(2,2) + vz*R(2,0))*dt;
-
                 F(0,6) = (vx*R(2,1) - vy*R(2,0))*dt;
 
                 // body-frame velocity from body-frame velocity
