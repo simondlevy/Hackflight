@@ -170,7 +170,7 @@ static void run_old(
 
     printf("old -------------------------------\n\n");
 
-    dump_vector("G", G);
+    dump_vector("x", x);
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
     for (size_t i=0; i<STATE_DIM; i++) { 
@@ -270,7 +270,9 @@ static void run_new(
 
     const auto G = PHT / HPHR;
 
-    dump_vector_new("G", G);
+    x = x + G * error;
+
+    dump_vector_new("x", x);
 
     /*
     for (size_t i=0; i<STATE_DIM; ++i) {
