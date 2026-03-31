@@ -39,24 +39,24 @@ static void device_mat_mult(
             (arm_matrix_instance_f32 *)pDst);
 }
 
-static void ekf_pset(
-        float  _p[STATE_DIM][STATE_DIM],
+static void pset(
+        float  P[STATE_DIM][STATE_DIM],
         const size_t i,
         const size_t j,
         const float pval)
 {
     if (isnan(pval) || pval > MAX_COVARIANCE) {
-        _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+        P[i][j] = P[j][i] = MAX_COVARIANCE;
     } else if ( i==j && pval < MIN_COVARIANCE ) {
-        _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+        P[i][j] = P[j][i] = MIN_COVARIANCE;
     } else {
-        _p[i][j] = _p[j][i] = pval;
+        P[i][j] = P[j][i] = pval;
     }
 }
 
 static void run_old(
-            float _p[STATE_DIM][STATE_DIM],
-            float _x[STATE_DIM],
+            float P[STATE_DIM][STATE_DIM],
+            float x[STATE_DIM],
             const float h[STATE_DIM],
             const float R,
             const float error
@@ -66,7 +66,7 @@ static void run_old(
 
     _p_m.numRows = STATE_DIM;
     _p_m.numCols = STATE_DIM;
-    _p_m.pData = (float*)_p;
+    _p_m.pData = (float*)P;
 
     matrix_t Hm = {1, STATE_DIM, (float *)h};
 
@@ -109,7 +109,7 @@ static void run_old(
     // Calculate the Kalman gain and perform the state update
     for (size_t i=0; i<STATE_DIM; i++) {
         G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-        _x[i] = _x[i] + G[i] * error; // state update
+        x[i] = x[i] + G[i] * error; // state update
     }
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
@@ -128,7 +128,7 @@ static void run_old(
             float v = G[i] * R * G[j];
 
             // add measurement noise
-            ekf_pset(_p, i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+            pset(P, i, j, 0.5 * P[i][j] + 0.5 * P[j][i] + v); 
         }
     }
 }
@@ -139,7 +139,7 @@ void setup()
 
 void loop()
 {
-    float _p[STATE_DIM][STATE_DIM] = {
+    float P[STATE_DIM][STATE_DIM] = {
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9}
@@ -147,7 +147,7 @@ void loop()
 
     const float h[STATE_DIM] = {10, 11, 12};
 
-    float _x[STATE_DIM] = {13, 14, 15};
+    float x[STATE_DIM] = {13, 14, 15};
 
     const auto stdMeasNoise = 1.5f;
     
@@ -155,7 +155,7 @@ void loop()
 
     const auto R = stdMeasNoise*stdMeasNoise;
 
-    run_old(_p, _x, h, R, error);
+    run_old(P, x, h, R, error);
 
     delay(1000);
 }
