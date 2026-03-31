@@ -148,6 +148,8 @@ static void run_old(
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
 
+    dump_vector_old("Gm", Gm);
+    dump_vector_old("Hm", Hm);
     dump_matrix_old("GH", tmpNN1m);
 
     for (size_t i=0; i<STATE_DIM; i++) { 
@@ -244,6 +246,12 @@ static void run_new(
     const auto HPHR = R + PHT.dot(h);
 
     const auto G = PHT / HPHR;
+
+    const auto GH = G * h.transpose();
+
+    dump_vector_new("G", G);
+    dump_vector_new("h", h);
+    dump_matrix_new("GH", GH);
 
     x = x + G * error;
 
