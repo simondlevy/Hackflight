@@ -164,20 +164,18 @@ static void run_new(
         const float R,
         const float error)
 {
-    (void)hvals;
     (void)R;
     (void)error;
 
     auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
+    auto x = Eigen::VectorXd(STATE_DIM);
+    auto h = Eigen::VectorXd(STATE_DIM);
     for (size_t i=0; i<STATE_DIM; ++i) {
+        x(i) = xvals[i];
+        h(i) = hvals[i];
         for (size_t j=0; j<STATE_DIM; ++j) {
             P(i,j) = Pvals[i][j];
         }
-    }
-
-    auto x = Eigen::VectorXd(STATE_DIM);
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        x(i) = xvals[i];
     }
 
     printf("new -------------------------------\n\n");
