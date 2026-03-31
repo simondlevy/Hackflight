@@ -153,9 +153,9 @@ static void run_old(
     } // GH - I
     device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
 
-    dump_matrix_old("(GH-I)'", tmpNN2m);
-
     device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+
+    dump_matrix_old("(GH-I)*P", tmpNN3m);
 
     device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // P = (GH - I)*P*(GH - I)'
 
@@ -248,8 +248,10 @@ static void run_new(
     const auto I = MatrixXd::Identity(STATE_DIM, STATE_DIM);
 
     const auto GH_I_T = (GH - I).transpose();
+
+    const auto GH_I_P = (GH - I) * P;
     
-    dump_matrix_new("(GH-I)'", GH_I_T);
+    dump_matrix_new("(GH-I)*P", GH_I_P);
 
     x = x + G * error;
 
