@@ -23,6 +23,8 @@ static constexpr float MIN_COVARIANCE = 1e-6;
 
 static const size_t STATE_DIM = 3;
 
+// ---------------------------------------------------------------------------
+
 typedef arm_matrix_instance_f32 matrix_t;
 
 static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
@@ -55,20 +57,19 @@ static void pset(
 }
 
 static void run_old(
-            float P[STATE_DIM][STATE_DIM],
-            float x[STATE_DIM],
-            const float h[STATE_DIM],
+            float Pvals[STATE_DIM][STATE_DIM],
+            float xvals[STATE_DIM],
+            const float hvals[STATE_DIM],
             const float R,
-            const float error
-        )
+            const float error)
 {
     matrix_t _p_m;
 
     _p_m.numRows = STATE_DIM;
     _p_m.numCols = STATE_DIM;
-    _p_m.pData = (float*)P;
+    _p_m.pData = (float*)Pvals;
 
-    matrix_t Hm = {1, STATE_DIM, (float *)h};
+    matrix_t Hm = {1, STATE_DIM, (float *)hvals};
 
     // The Kalman gain as a column vector
     static float G[STATE_DIM];
@@ -109,7 +110,7 @@ static void run_old(
     // Calculate the Kalman gain and perform the state update
     for (size_t i=0; i<STATE_DIM; i++) {
         G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-        x[i] = x[i] + G[i] * error; // state update
+        xvals[i] = xvals[i] + G[i] * error; // state update
     }
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
@@ -128,10 +129,42 @@ static void run_old(
             float v = G[i] * R * G[j];
 
             // add measurement noise
-            pset(P, i, j, 0.5 * P[i][j] + 0.5 * P[j][i] + v); 
+            pset(Pvals, i, j, 0.5 * Pvals[i][j] + 0.5 * Pvals[j][i] + v); 
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+
+static void run_new(
+        float Pvals[STATE_DIM][STATE_DIM],
+        float xvals[STATE_DIM],
+        const float hvals[STATE_DIM],
+        const float R,
+        const float error)
+{
+    (void)Pvals;
+    (void)xvals;
+    (void)hvals;
+    (void)R;
+    (void)error;
+}
+
+// ---------------------------------------------------------------------------
+
+static void report(
+        const float P[STATE_DIM][STATE_DIM],
+        const float x[STATE_DIM])
+{
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        for (size_t j=0; j<STATE_DIM; ++j) {
+            printf("%f ", P[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
 
 void setup()
 {
@@ -150,12 +183,20 @@ void loop()
     float x[STATE_DIM] = {13, 14, 15};
 
     const auto stdMeasNoise = 1.5f;
-    
+
     const auto error = -2.3;
 
     const auto R = stdMeasNoise*stdMeasNoise;
 
     run_old(P, x, h, R, error);
+
+    report(P, x);
+
+    printf("\n");
+
+    run_new(P, x, h, R, error);
+
+    printf("\n");
 
     delay(1000);
 }
