@@ -635,13 +635,24 @@ namespace hf {
                     h(k) = hvals[k];
                 }
 
-                (void)R;
-                (void)h;
+                const auto PHT = ekf.P * h;
+
+                const auto G = PHT / (R + PHT.dot(h));
+
+                const auto GH = G * h.transpose();
+
+                const auto I = Matrix::Identity(STATE_DIM, STATE_DIM);
+
+                const auto GH_I = GH - I;
+
+                const auto P = GH_I * ekf.P * GH_I.transpose();
+
+                const auto x = ekf.x + G * error;
 
                 return EKF(
-                        ekf.x,
+                        x,
                         ekf.q,
-                        ekf.P,
+                        P,
                         ekf.R,
                         ekf.accelSubSampler,
                         ekf.gyroSubSampler,
@@ -650,56 +661,6 @@ namespace hf {
                         true, // isUpdated
                         ekf.lastPredictionMs,
                         ekf.lastProcessNoiseUpdateMs);
-#if 0
-
-                matrix_t Hm = {1, STATE_DIM, (float *)h};
-
-                // The Kalman gain as a column vector
-                static float G[STATE_DIM];
-                static matrix_t Gm = {STATE_DIM, 1, (float *)G};
-
-                static float HTd[STATE_DIM * 1];
-                static matrix_t HTm = {STATE_DIM, 1, HTd};
-
-                static float PHTd[STATE_DIM * 1];
-                static matrix_t PHTm = {STATE_DIM, 1, PHTd};
-
-                device_mat_trans(&Hm, &HTm);
-                device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
-                float HPHR = R; // HPH' + R
-                for (int i=0; i<STATE_DIM; i++) { 
-                    // Add the element of HPH' to the above
-                    // this obviously only works if the update is scalar (as in this function)
-                    HPHR += Hm.pData[i]*PHTd[i]; 
-                }
-
-                // Calculate the Kalman gain and perform the state update
-                for (int i=0; i<STATE_DIM; i++) {
-                    G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                    _x[i] = _x[i] + G[i] * error; // state update
-                }
-
-                device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
-                for (int i=0; i<STATE_DIM; i++) { 
-                    tmpNN1d[STATE_DIM*i+i] -= 1; 
-                } // GH - I
-                device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-                device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-                device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
-
-                // add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        float v = G[i] * R * G[j];
-
-                        // add measurement noise
-                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
-                    }
-                }
-#endif
-
             }
 
     };
