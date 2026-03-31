@@ -57,17 +57,23 @@ static void pset(
 }
 
 static void run_old(
-            float Pvals[STATE_DIM][STATE_DIM],
-            float xvals[STATE_DIM],
+            const float Pvals[STATE_DIM][STATE_DIM],
+            const float xvals[STATE_DIM],
             const float hvals[STATE_DIM],
             const float R,
             const float error)
 {
     matrix_t _p_m;
 
+    float P[STATE_DIM][STATE_DIM] = {};
+    float x[STATE_DIM] = {};
+
+    memcpy(P, Pvals, STATE_DIM * STATE_DIM * sizeof(float));
+    memcpy(x, xvals, STATE_DIM * sizeof(float));
+
     _p_m.numRows = STATE_DIM;
     _p_m.numCols = STATE_DIM;
-    _p_m.pData = (float*)Pvals;
+    _p_m.pData = (float*)P;
 
     matrix_t Hm = {1, STATE_DIM, (float *)hvals};
 
@@ -110,7 +116,7 @@ static void run_old(
     // Calculate the Kalman gain and perform the state update
     for (size_t i=0; i<STATE_DIM; i++) {
         G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-        xvals[i] = xvals[i] + G[i] * error; // state update
+        x[i] = x[i] + G[i] * error; // state update
     }
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
@@ -129,16 +135,31 @@ static void run_old(
             float v = G[i] * R * G[j];
 
             // add measurement noise
-            pset(Pvals, i, j, 0.5 * Pvals[i][j] + 0.5 * Pvals[j][i] + v); 
+            pset(P, i, j, 0.5 * P[i][j] + 0.5 * P[j][i] + v); 
         }
     }
+
+    printf("old -------------------------------\n\n");
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        for (size_t j=0; j<STATE_DIM; ++j) {
+            printf("%+f ", P[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+f ", x[i]);
+    }
+    printf("\n");
 }
 
 // ---------------------------------------------------------------------------
 
 static void run_new(
-        float Pvals[STATE_DIM][STATE_DIM],
-        float xvals[STATE_DIM],
+        const float Pvals[STATE_DIM][STATE_DIM],
+        const float xvals[STATE_DIM],
         const float hvals[STATE_DIM],
         const float R,
         const float error)
@@ -157,20 +178,6 @@ static void report(
         const float P[STATE_DIM][STATE_DIM],
         const float x[STATE_DIM])
 {
-    printf("%s -------------------------------\n\n", label);
-
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        for (size_t j=0; j<STATE_DIM; ++j) {
-            printf("%+f ", P[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        printf("%+f ", x[i]);
-    }
-    printf("\n");
 }
 
 
@@ -180,15 +187,15 @@ void setup()
 
 void loop()
 {
-    float P[STATE_DIM][STATE_DIM] = {
+    const float P[STATE_DIM][STATE_DIM] = {
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9}
     };
 
-    const float h[STATE_DIM] = {10, 11, 12};
+    const float x[STATE_DIM] = {13, 14, 15};
 
-    float x[STATE_DIM] = {13, 14, 15};
+    const float h[STATE_DIM] = {10, 11, 12};
 
     const auto stdMeasNoise = 1.5f;
 
@@ -197,14 +204,6 @@ void loop()
     const auto R = stdMeasNoise*stdMeasNoise;
 
     run_old(P, x, h, R, error);
-
-    report("old", P, x);
-
-    printf("\n");
-
-    run_new(P, x, h, R, error);
-
-    printf("\n");
 
     delay(1000);
 }
