@@ -152,7 +152,7 @@ static void run_old(
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+f ", x[i]);
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -172,14 +172,6 @@ static void run_new(
 }
 
 // ---------------------------------------------------------------------------
-
-static void report(
-        const char * label,
-        const float P[STATE_DIM][STATE_DIM],
-        const float x[STATE_DIM])
-{
-}
-
 
 void setup()
 {
@@ -204,6 +196,8 @@ void loop()
     const auto R = stdMeasNoise*stdMeasNoise;
 
     run_old(P, x, h, R, error);
+
+    run_new(P, x, h, R, error);
 
     delay(1000);
 }
