@@ -152,10 +152,12 @@ static void run_old(
         tmpNN1d[STATE_DIM*i+i] -= 1; 
     } // GH - I
     device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-    device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-    device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // P = (GH - I)*P*(GH - I)'
 
     dump_matrix_old("(GH-I)'", tmpNN2m);
+
+    device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+
+    device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // P = (GH - I)*P*(GH - I)'
 
     // add the measurement variance and ensure boundedness and symmetry
     for (size_t i=0; i<STATE_DIM; i++) {
@@ -211,7 +213,6 @@ static void dump_vector_new(const char * label, const VectorXd & v)
     }
     printf("\n");
 }
-
 
 static void run_new(
         const float Pvals[STATE_DIM][STATE_DIM],
