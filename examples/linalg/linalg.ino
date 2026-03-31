@@ -18,29 +18,112 @@
 
 #include <arm_math.h>
 
+static constexpr float MAX_COVARIANCE = 100;
+static constexpr float MIN_COVARIANCE = 1e-6;
+
+static const size_t STATE_DIM = 3;
+
 typedef arm_matrix_instance_f32 matrix_t;
 
 static void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst)
 {
-  arm_mat_trans_f32((arm_matrix_instance_f32 *)pSrc,
-          (arm_matrix_instance_f32 *)pDst);
+    arm_mat_trans_f32((arm_matrix_instance_f32 *)pSrc,
+            (arm_matrix_instance_f32 *)pDst);
 }
 
 static void device_mat_mult(
         const matrix_t * pSrcA, const matrix_t * pSrcB,
         matrix_t * pDst) 
 {
-  arm_mat_mult_f32((arm_matrix_instance_f32 *)pSrcA, (arm_matrix_instance_f32 *)pSrcB,
-          (arm_matrix_instance_f32 *)pDst);
+    arm_mat_mult_f32((arm_matrix_instance_f32 *)pSrcA, (arm_matrix_instance_f32 *)pSrcB,
+            (arm_matrix_instance_f32 *)pDst);
 }
 
+static void ekf_pset(
+        float  _p[STATE_DIM][STATE_DIM],
+        const uint8_t i,
+        const uint8_t j,
+        const float pval)
+{
+    if (isnan(pval) || pval > MAX_COVARIANCE) {
+        _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+    } else if ( i==j && pval < MIN_COVARIANCE ) {
+        _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+    } else {
+        _p[i][j] = _p[j][i] = pval;
+    }
+}
 
 void setup()
 {
-    (void)device_mat_trans;
-    (void)device_mat_mult;
 }
 
 void loop()
 {
+    float _p[STATE_DIM][STATE_DIM] = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+
+    matrix_t _p_m;
+
+    _p_m.numRows = STATE_DIM;
+    _p_m.numCols = STATE_DIM;
+    _p_m.pData = (float*)_p;
+
+    /*
+    const float h[STATE_DIM] = {10, 11, 12};
+
+    const float _x[STATE_DIM] = {13, 14, 15};
+
+    matrix_t Hm = {1, STATE_DIM, (float *)h};
+
+    // The Kalman gain as a column vector
+    static float G[STATE_DIM];
+    static matrix_t Gm = {STATE_DIM, 1, (float *)G};
+
+    static float HTd[STATE_DIM * 1];
+    static matrix_t HTm = {STATE_DIM, 1, HTd};
+
+    static float PHTd[STATE_DIM * 1];
+    static matrix_t PHTm = {STATE_DIM, 1, PHTd};
+
+    device_mat_trans(&Hm, &HTm);
+    device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
+    float HPHR = R; // HPH' + R
+    for (int i=0; i<STATE_DIM; i++) { 
+        // Add the element of HPH' to the above
+        // this obviously only works if the update is scalar (as in this function)
+        HPHR += Hm.pData[i]*PHTd[i]; 
+    }
+
+    // Calculate the Kalman gain and perform the state update
+    for (int i=0; i<STATE_DIM; i++) {
+        G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+        _x[i] = _x[i] + G[i] * error; // state update
+    }
+
+    device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+    for (int i=0; i<STATE_DIM; i++) { 
+        tmpNN1d[STATE_DIM*i+i] -= 1; 
+    } // GH - I
+    device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+    device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+    device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+
+    // add the measurement variance and ensure boundedness and symmetry
+    for (int i=0; i<STATE_DIM; i++) {
+
+        for (int j=i; j<STATE_DIM; j++) {
+
+            float v = G[i] * R * G[j];
+
+            // add measurement noise
+            ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+        }
+    }
+    */
+
+    delay(1000);
 }
