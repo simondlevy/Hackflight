@@ -36,16 +36,6 @@ static void dump_matrix(const char * label, const float a[STATE_DIM][STATE_DIM])
         printf("\n");
     }
     printf("\n");
-}
-
-static void dump_vector(const char * label, const float v[STATE_DIM])
-{
-    printf("%s:\n", label);
-
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        printf("%+f ", v[i]);
-    }
-    printf("\n");
 }*/
 
 // ---------------------------------------------------------------------------
@@ -85,6 +75,16 @@ static void dump_vector_old(const char * label, const matrix_t & v)
 
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+f ", v.pData[i]);
+    }
+    printf("\n");
+}
+
+static void dump_vector(const char * label, const float v[STATE_DIM])
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+f ", v[i]);
     }
     printf("\n");
 }
@@ -168,6 +168,10 @@ static void run_old(
         x[i] = x[i] + G[i] * error; // state update
     }
 
+    printf("old -------------------------------\n\n");
+
+    dump_vector("G", G);
+
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
     for (size_t i=0; i<STATE_DIM; i++) { 
         tmpNN1d[STATE_DIM*i+i] -= 1; 
@@ -188,14 +192,10 @@ static void run_old(
         }
     }
 
-    printf("old -------------------------------\n\n");
-
     (void)dump_matrix_old;
     (void)dump_vector_old;
 
     //dump_vector_old("PHT", PHTm);
-
-    printf("HPHR=%f\n", HPHR);
 
     /*
     for (size_t i=0; i<STATE_DIM; ++i) {
@@ -268,7 +268,7 @@ static void run_new(
 
     printf("new -------------------------------\n\n");
 
-    printf("HPHR=%f\n", HPHR);
+    (void)HPHR;
 
     //dump_vector_new("PHT", PHT);
 
