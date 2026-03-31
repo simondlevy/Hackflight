@@ -262,15 +262,15 @@ static void run_new(
         }
     }
 
+    printf("new -------------------------------\n\n");
+
     const auto PHT = P * h;
 
     const auto HPHR = R + PHT.dot(h);
 
-    printf("new -------------------------------\n\n");
+    const auto G = PHT / HPHR;
 
-    (void)HPHR;
-
-    //dump_vector_new("PHT", PHT);
+    dump_vector_new("G", G);
 
     /*
     for (size_t i=0; i<STATE_DIM; ++i) {
