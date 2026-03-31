@@ -316,7 +316,7 @@ namespace hf {
 
                 const float dx = 0;
                 const float dy = 0;
-                const float dz = 0;
+                const float dz = ekf.x(STATE_VZ);
 
                 return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
                         -psi, -dpsi); // make nose-right positive
