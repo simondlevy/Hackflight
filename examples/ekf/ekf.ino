@@ -15,6 +15,7 @@
  */
 
 #include <ArduinoEigenDense.h>
+using namespace Eigen;
 
 #include <arm_math.h>
 
@@ -22,6 +23,30 @@ static constexpr float MAX_COVARIANCE = 100;
 static constexpr float MIN_COVARIANCE = 1e-6;
 
 static const size_t STATE_DIM = 3;
+
+/*
+static void dump_matrix(const char * label, const float a[STATE_DIM][STATE_DIM])
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        for (size_t j=0; j<STATE_DIM; ++j) {
+            printf("%+f ", a[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+static void dump_vector(const char * label, const float v[STATE_DIM])
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+f ", v[i]);
+    }
+    printf("\n");
+}*/
 
 // ---------------------------------------------------------------------------
 
@@ -39,6 +64,29 @@ static void device_mat_mult(
 {
     arm_mat_mult_f32((arm_matrix_instance_f32 *)pSrcA, (arm_matrix_instance_f32 *)pSrcB,
             (arm_matrix_instance_f32 *)pDst);
+}
+
+static void dump_matrix_old(const char * label, const matrix_t & a)
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        for (size_t j=0; j<STATE_DIM; ++j) {
+            printf("%+f ", a.pData[i*STATE_DIM+j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+static void dump_vector_old(const char * label, const matrix_t & v)
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+f ", v.pData[i]);
+    }
+    printf("\n");
 }
 
 static void pset(
@@ -97,7 +145,6 @@ static void run_old(
         STATE_DIM, STATE_DIM, tmpNN3d
     };
 
-
     static float HTd[STATE_DIM * 1];
     static matrix_t HTm = {STATE_DIM, 1, HTd};
 
@@ -141,6 +188,11 @@ static void run_old(
 
     printf("old -------------------------------\n\n");
 
+    (void)dump_matrix_old;
+
+    dump_vector_old("PHT", PHTm);
+
+    /*
     for (size_t i=0; i<STATE_DIM; ++i) {
         for (size_t j=0; j<STATE_DIM; ++j) {
             printf("%+f ", P[i][j]);
@@ -151,11 +203,36 @@ static void run_old(
 
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+f ", x[i]);
-    }
+    }*/
+
     printf("\n\n");
 }
 
 // ---------------------------------------------------------------------------
+
+static void dump_matrix_new(const char * label, const MatrixXd & a)
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        for (size_t j=0; j<STATE_DIM; ++j) {
+            printf("%+f ", a(i, j));
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+static void dump_vector_new(const char * label, const VectorXd & v)
+{
+    printf("%s:\n", label);
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+f ", v(i));
+    }
+    printf("\n");
+}
+
 
 static void run_new(
         const float Pvals[STATE_DIM][STATE_DIM],
@@ -166,10 +243,12 @@ static void run_new(
 {
     (void)R;
     (void)error;
+    (void)dump_matrix_new;
+    (void)dump_vector_new;
 
-    auto P = Eigen::MatrixXd(STATE_DIM, STATE_DIM);
-    auto x = Eigen::VectorXd(STATE_DIM);
-    auto h = Eigen::VectorXd(STATE_DIM);
+    auto P = MatrixXd(STATE_DIM, STATE_DIM);
+    auto x = VectorXd(STATE_DIM);
+    auto h = VectorXd(STATE_DIM);
     for (size_t i=0; i<STATE_DIM; ++i) {
         x(i) = xvals[i];
         h(i) = hvals[i];
@@ -178,8 +257,13 @@ static void run_new(
         }
     }
 
+    const auto PHT = P * h;
+
     printf("new -------------------------------\n\n");
 
+    dump_vector_new("PHT", PHT);
+
+    /*
     for (size_t i=0; i<STATE_DIM; ++i) {
         for (size_t j=0; j<STATE_DIM; ++j) {
             printf("%+f ", P(i,j));
@@ -191,6 +275,8 @@ static void run_new(
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+f ", x(i));
     }
+    */
+
     printf("\n\n");
 }
 
