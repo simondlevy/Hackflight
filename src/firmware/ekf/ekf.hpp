@@ -624,12 +624,19 @@ namespace hf {
                 return fabs(vel) > MIN_VELOCITY_MPS;
             }
 
-            static auto updateWithScalar(const EKF & ekf, const float * h,
+            static auto updateWithScalar(const EKF & ekf, const float * hvals,
                     const float error, const float stdMeasNoise) -> EKF
             {
                 const auto R = stdMeasNoise * stdMeasNoise;
 
+                auto h = Vector(STATE_DIM);
+
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    h(k) = hvals[k];
+                }
+
                 (void)R;
+                (void)h;
 
                 return EKF(
                         ekf.x,
