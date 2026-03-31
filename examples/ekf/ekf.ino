@@ -153,14 +153,22 @@ static void run_new(
 // ---------------------------------------------------------------------------
 
 static void report(
+        const char * label,
         const float P[STATE_DIM][STATE_DIM],
         const float x[STATE_DIM])
 {
+    printf("%s -------------------------------\n\n", label);
+
     for (size_t i=0; i<STATE_DIM; ++i) {
         for (size_t j=0; j<STATE_DIM; ++j) {
             printf("%+f ", P[i][j]);
         }
         printf("\n");
+    }
+    printf("\n");
+
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+f ", x[i]);
     }
     printf("\n");
 }
@@ -190,7 +198,7 @@ void loop()
 
     run_old(P, x, h, R, error);
 
-    report(P, x);
+    report("old", P, x);
 
     printf("\n");
 
