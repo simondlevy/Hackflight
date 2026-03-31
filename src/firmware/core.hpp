@@ -75,7 +75,7 @@ namespace hf {
                 if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
 
                     _zrangerFilter = ZRangerFilter::step(
-                            _zrangerFilter, millis(), ZRanger::read());
+                            _zrangerFilter, ZRanger::read());
                 }
 
                 loop(rx, motors, led);

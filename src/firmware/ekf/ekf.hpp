@@ -18,6 +18,7 @@
 
 #include <firmware/ekf/datatypes.hpp>
 #include <firmware/ekf/imu_subsampler.hpp>
+#include <firmware/zranger/filter.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
 
@@ -321,7 +322,28 @@ namespace hf {
                         -psi, -dpsi); // make nose-right positive
             }
 
-        private:
+            static auto updateWithZRange(const EKF & ekf,
+                    const ZRangerFilter & zrfilter) -> EKF
+            {
+                const auto r22 = ekf.R(2,2);
+
+                const auto angle =
+                    fmax(0, fabsf(acosf(r22)) - Num::DEG2RAD * (15.0f / 2.0f));
+
+                const auto predicted_distance = ekf.x(STATE_Z) / cosf(angle);
+
+                const auto measured_distance = zrfilter.distance_m;
+
+                const float h[STATE_DIM] = {1/cosf(angle), 0, 0, 0, 0, 0, 0};
+
+                return fabs(r22) > 0.1 && r22 > 0 ?
+                    updateWithScalar(ekf, h,
+                            measured_distance-predicted_distance,
+                            zrfilter.stdev) :
+                    ekf;
+            }
+
+         private:
 
             // State vector
             __attribute__((aligned(4))) Vector x =
@@ -352,6 +374,15 @@ namespace hf {
 
             uint32_t lastPredictionMs;
             uint32_t lastProcessNoiseUpdateMs;
+
+            static auto updateWithZRange(
+                    const EKF & ekf,
+                    const float r22,
+                    const ZRangerFilter & zrfilter) -> EKF
+            {
+                return ekf;
+            }
+
 
             static auto addCovarianceNoise(const Matrix & P,
                     const float * noise) -> Matrix
@@ -592,5 +623,77 @@ namespace hf {
             {
                 return fabs(vel) > MIN_VELOCITY_MPS;
             }
+
+            static auto updateWithScalar(const EKF & ekf, const float * h,
+                    const float error, const float stdMeasNoise) -> EKF
+            {
+                const auto R = stdMeasNoise * stdMeasNoise;
+
+                (void)R;
+
+                return EKF(
+                        ekf.x,
+                        ekf.q,
+                        ekf.P,
+                        ekf.R,
+                        ekf.accelSubSampler,
+                        ekf.gyroSubSampler,
+                        ekf.imuSampleCount,
+                        ekf.didResetEstimation,
+                        true, // isUpdated
+                        ekf.lastPredictionMs,
+                        ekf.lastProcessNoiseUpdateMs);
+#if 0
+
+                matrix_t Hm = {1, STATE_DIM, (float *)h};
+
+                // The Kalman gain as a column vector
+                static float G[STATE_DIM];
+                static matrix_t Gm = {STATE_DIM, 1, (float *)G};
+
+                static float HTd[STATE_DIM * 1];
+                static matrix_t HTm = {STATE_DIM, 1, HTd};
+
+                static float PHTd[STATE_DIM * 1];
+                static matrix_t PHTm = {STATE_DIM, 1, PHTd};
+
+                device_mat_trans(&Hm, &HTm);
+                device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
+                float HPHR = R; // HPH' + R
+                for (int i=0; i<STATE_DIM; i++) { 
+                    // Add the element of HPH' to the above
+                    // this obviously only works if the update is scalar (as in this function)
+                    HPHR += Hm.pData[i]*PHTd[i]; 
+                }
+
+                // Calculate the Kalman gain and perform the state update
+                for (int i=0; i<STATE_DIM; i++) {
+                    G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                    _x[i] = _x[i] + G[i] * error; // state update
+                }
+
+                device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+                for (int i=0; i<STATE_DIM; i++) { 
+                    tmpNN1d[STATE_DIM*i+i] -= 1; 
+                } // GH - I
+                device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+                device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+                device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+
+                // add the measurement variance and ensure boundedness and symmetry
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        float v = G[i] * R * G[j];
+
+                        // add measurement noise
+                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+                    }
+                }
+#endif
+
+            }
+
     };
 }

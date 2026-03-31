@@ -36,22 +36,17 @@ namespace hf {
 
         public:
 
+            float distance_m;
+            float stdev;
+
             ZRangerFilter() = default;
 
             ZRangerFilter& operator=(const ZRangerFilter& other) = default;
 
-            ZRangerFilter(
-                    const uint32_t timestamp_msec,
-                    const float distance_m,
-                    const float stdev)
-                :
-                    timestamp_msec(timestamp_msec),
-                    distance_m(distance_m),
-                    stdev(stdev) { }
+            ZRangerFilter(const float distance_m, const float stdev)
+                : distance_m(distance_m), stdev(stdev) { }
 
-            static auto step(
-                    const ZRangerFilter & filter,
-                    const uint32_t msec_curr,
+            static auto step(const ZRangerFilter & filter,
                     const uint16_t distance_mm) -> ZRangerFilter
             {
                 static constexpr float EXP_COEFF =
@@ -63,16 +58,9 @@ namespace hf {
                     ( 1 + expf(EXP_COEFF * (distance_m - EXP_POINT_A)));
 
                 return distance_mm < OUTLIER_LIMIT_MM ?
-                    ZRangerFilter(distance_m, stdev, msec_curr) :
+                    ZRangerFilter(distance_m, stdev) :
                     filter;
-
             }
-
-        private:
-
-            uint32_t timestamp_msec;
-            float distance_m;
-            float stdev;
     };
 
 }
