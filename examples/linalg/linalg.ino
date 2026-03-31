@@ -41,8 +41,8 @@ static void device_mat_mult(
 
 static void ekf_pset(
         float  _p[STATE_DIM][STATE_DIM],
-        const uint8_t i,
-        const uint8_t j,
+        const size_t i,
+        const size_t j,
         const float pval)
 {
     if (isnan(pval) || pval > MAX_COVARIANCE) {
@@ -66,22 +66,44 @@ void loop()
         {7, 8, 9}
     };
 
+    const auto stdMeasNoise = 1.5f;
+    
+    const auto error = -2.3;
+
+    const auto R = stdMeasNoise*stdMeasNoise;
+
     matrix_t _p_m;
 
     _p_m.numRows = STATE_DIM;
     _p_m.numCols = STATE_DIM;
     _p_m.pData = (float*)_p;
 
-    /*
     const float h[STATE_DIM] = {10, 11, 12};
 
-    const float _x[STATE_DIM] = {13, 14, 15};
+    float _x[STATE_DIM] = {13, 14, 15};
 
     matrix_t Hm = {1, STATE_DIM, (float *)h};
 
     // The Kalman gain as a column vector
     static float G[STATE_DIM];
     static matrix_t Gm = {STATE_DIM, 1, (float *)G};
+
+    // Temporary matrices for the covariance updates
+    static float tmpNN1d[STATE_DIM * STATE_DIM];
+    static matrix_t tmpNN1m = {
+        STATE_DIM, STATE_DIM, tmpNN1d
+    };
+
+    static float tmpNN2d[STATE_DIM * STATE_DIM];
+    static matrix_t tmpNN2m = {
+        STATE_DIM, STATE_DIM, tmpNN2d
+    };
+
+    static float tmpNN3d[STATE_DIM * STATE_DIM];
+    static matrix_t tmpNN3m = {
+        STATE_DIM, STATE_DIM, tmpNN3d
+    };
+
 
     static float HTd[STATE_DIM * 1];
     static matrix_t HTm = {STATE_DIM, 1, HTd};
@@ -92,20 +114,20 @@ void loop()
     device_mat_trans(&Hm, &HTm);
     device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
     float HPHR = R; // HPH' + R
-    for (int i=0; i<STATE_DIM; i++) { 
+    for (size_t i=0; i<STATE_DIM; i++) { 
         // Add the element of HPH' to the above
         // this obviously only works if the update is scalar (as in this function)
         HPHR += Hm.pData[i]*PHTd[i]; 
     }
 
     // Calculate the Kalman gain and perform the state update
-    for (int i=0; i<STATE_DIM; i++) {
+    for (size_t i=0; i<STATE_DIM; i++) {
         G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
         _x[i] = _x[i] + G[i] * error; // state update
     }
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
-    for (int i=0; i<STATE_DIM; i++) { 
+    for (size_t i=0; i<STATE_DIM; i++) { 
         tmpNN1d[STATE_DIM*i+i] -= 1; 
     } // GH - I
     device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
@@ -113,17 +135,16 @@ void loop()
     device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
 
     // add the measurement variance and ensure boundedness and symmetry
-    for (int i=0; i<STATE_DIM; i++) {
+    for (size_t i=0; i<STATE_DIM; i++) {
 
-        for (int j=i; j<STATE_DIM; j++) {
+        for (size_t j=i; j<STATE_DIM; j++) {
 
             float v = G[i] * R * G[j];
 
             // add measurement noise
-            ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+            ekf_pset(_p, i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
         }
     }
-    */
 
     delay(1000);
 }
