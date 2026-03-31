@@ -155,9 +155,9 @@ static void run_old(
 
     device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
 
-    dump_matrix_old("(GH-I)*P", tmpNN3m);
-
     device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // P = (GH - I)*P*(GH - I)'
+
+    dump_matrix_old("(GH-I)*P*(GH-I)'", _p_m);
 
     // add the measurement variance and ensure boundedness and symmetry
     for (size_t i=0; i<STATE_DIM; i++) {
@@ -247,11 +247,11 @@ static void run_new(
 
     const auto I = MatrixXd::Identity(STATE_DIM, STATE_DIM);
 
-    const auto GH_I_T = (GH - I).transpose();
+    const auto GH_I = GH - I;
 
-    const auto GH_I_P = (GH - I) * P;
+    P = GH_I * P * GH_I.transpose();
     
-    dump_matrix_new("(GH-I)*P", GH_I_P);
+    dump_matrix_new("(GH-I)*P*(GH-I)'", P);
 
     x = x + G * error;
 
