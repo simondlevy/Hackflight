@@ -88,16 +88,16 @@ namespace hf {
             EKF() 
             {
                 x = xinit();
-                q = qinit();
                 P = pinit();
+                q = qinit();
                 accelSubSampler = ImuSubSampler();
                 gyroSubSampler = ImuSubSampler();
             }
 
             EKF (
                 const Vector & x,
-                const Vector & q,
                 const Matrix & P,
+                const Vector & q,
                 const Matrix R,
                 const ImuSubSampler  & accelSubSampler,
                 const ImuSubSampler  & gyroSubSampler,
@@ -108,8 +108,8 @@ namespace hf {
                 const uint32_t lastProcessNoiseUpdateMs) 
                 :
                     x(x),
-                    q(q),
                     P(P),
+                    q(q),
                     R(R),
                     accelSubSampler(accelSubSampler),
                     gyroSubSampler(gyroSubSampler), 
@@ -198,8 +198,8 @@ namespace hf {
 
                 return EKF(
                         x,
-                        qnorm(pqnew), // q
                         P,
+                        qnorm(pqnew), // q
                         ekf.R,
                         accelSubSampler,
                         gyroSubSampler,
@@ -275,8 +275,8 @@ namespace hf {
 
                 return EKF(
                         x__,
-                        q_,
                         P__,
+                        q_,
                         R,
                         accelSubSampler_,
                         gyroSubSampler_,
@@ -349,13 +349,13 @@ namespace hf {
             __attribute__((aligned(4))) Vector x =
                 Vector(STATE_DIM);
 
+            // Covariance matrix
+            Matrix P = Matrix(STATE_DIM, STATE_DIM);
+
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
             Vector q = Vector(4);
-
-            // Covariance matrix
-            Matrix P = Matrix(STATE_DIM, STATE_DIM);
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
@@ -651,8 +651,8 @@ namespace hf {
 
                 return EKF(
                         x,
-                        ekf.q,
                         P,
+                        ekf.q,
                         ekf.R,
                         ekf.accelSubSampler,
                         ekf.gyroSubSampler,
@@ -662,6 +662,5 @@ namespace hf {
                         ekf.lastPredictionMs,
                         ekf.lastProcessNoiseUpdateMs);
             }
-
     };
 }
