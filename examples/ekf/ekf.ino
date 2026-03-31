@@ -158,7 +158,7 @@ static void report(
 {
     for (size_t i=0; i<STATE_DIM; ++i) {
         for (size_t j=0; j<STATE_DIM; ++j) {
-            printf("%f ", P[i][j]);
+            printf("%+f ", P[i][j]);
         }
         printf("\n");
     }
