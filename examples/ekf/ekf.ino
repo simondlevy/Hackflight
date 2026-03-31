@@ -148,16 +148,14 @@ static void run_old(
 
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
 
-    dump_vector_old("Gm", Gm);
-    dump_vector_old("Hm", Hm);
-    dump_matrix_old("GH", tmpNN1m);
-
     for (size_t i=0; i<STATE_DIM; i++) { 
         tmpNN1d[STATE_DIM*i+i] -= 1; 
     } // GH - I
     device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
     device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
     device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // P = (GH - I)*P*(GH - I)'
+
+    dump_matrix_old("(GH-I)'", tmpNN2m);
 
     // add the measurement variance and ensure boundedness and symmetry
     for (size_t i=0; i<STATE_DIM; i++) {
@@ -170,9 +168,6 @@ static void run_old(
             pset(P, i, j, 0.5 * P[i][j] + 0.5 * P[j][i] + v); 
         }
     }
-
-    (void)dump_matrix_old;
-    (void)dump_vector_old;
 
     //dump_vector_old("PHT", PHTm);
 
@@ -249,9 +244,11 @@ static void run_new(
 
     const auto GH = G * h.transpose();
 
-    dump_vector_new("G", G);
-    dump_vector_new("h", h);
-    dump_matrix_new("GH", GH);
+    const auto I = MatrixXd::Identity(STATE_DIM, STATE_DIM);
+
+    const auto GH_I_T = (GH - I).transpose();
+    
+    dump_matrix_new("(GH-I)'", GH_I_T);
 
     x = x + G * error;
 
