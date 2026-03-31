@@ -193,7 +193,7 @@ namespace hf {
                 const auto pqnew = isFlying ? pq :
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
-                __attribute__((aligned(4))) Vector x = Vector(STATE_DIM);
+                Vector x = Vector(STATE_DIM);
                 x << x0, x1, x2, x3, ekf.x(4), ekf.x(5), ekf.x(6); 
 
                 return EKF(
@@ -346,8 +346,7 @@ namespace hf {
          private:
 
             // State vector
-            __attribute__((aligned(4))) Vector x =
-                Vector(STATE_DIM);
+            Vector x = Vector(STATE_DIM);
 
             // Covariance matrix
             Matrix P = Matrix(STATE_DIM, STATE_DIM);
@@ -627,7 +626,7 @@ namespace hf {
             static auto updateWithScalar(const EKF & ekf, const float * hvals,
                     const float error, const float stdMeasNoise) -> EKF
             {
-                const auto R = stdMeasNoise * stdMeasNoise;
+                const auto r = stdMeasNoise * stdMeasNoise;
 
                 auto h = Vector(STATE_DIM);
 
@@ -637,7 +636,7 @@ namespace hf {
 
                 const auto PHT = ekf.P * h;
 
-                const auto G = PHT / (R + PHT.dot(h));
+                const auto G = PHT / (r + PHT.dot(h));
 
                 const auto GH = G * h.transpose();
 
