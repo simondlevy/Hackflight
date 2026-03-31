@@ -71,13 +71,13 @@ namespace hf {
 
             // Indices to access the vehicle's state, stored as a column vector
             enum {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
+                STATE_Z,   // 0
+                STATE_VX,  // 1
+                STATE_VY,  // 2
+                STATE_VZ,  // 3
+                STATE_D0,  // 4
+                STATE_D1,  // 5
+                STATE_D2,  // 6
                 STATE_DIM
             };
 
@@ -143,21 +143,21 @@ namespace hf {
                 const auto P = (F * ekf.P) * F.transpose();
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = ekf.x(1);
-                const auto tmpSPY = ekf.x(2);
-                const auto tmpSPZ = ekf.x(3);
+                const auto tmpSPX = ekf.x(STATE_VX);
+                const auto tmpSPY = ekf.x(STATE_VY);
+                const auto tmpSPZ = ekf.x(STATE_VZ);
 
                 const auto dt2 = dt * dt;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = ekf.x(1) * dt + (isFlying ? 0 : accel(0) * dt2 / 2);
-                const auto dy = ekf.x(2) * dt + (isFlying ? 0 : accel(1) * dt2 / 2);
+                const auto dx = ekf.x(STATE_VX) * dt + (isFlying ? 0 : accel(0) * dt2 / 2);
+                const auto dy = ekf.x(STATE_VY) * dt + (isFlying ? 0 : accel(1) * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = ekf.x(3) * dt + accel(2) * dt2 / 2; 
+                const auto dz = ekf.x(STATE_VZ) * dt + accel(2) * dt2 / 2; 
 
                 // position update
-                const auto x0 = ekf.x(0) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
+                const auto x0 = ekf.x(STATE_Z) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
                     + ekf.R(2,2) * dz - G * dt2 / 2;
 
                 const auto accelx = isFlying ? 0 : accel(0);
@@ -165,13 +165,13 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                const auto x1 = ekf.x(1) + dt * (accelx + gyro(2) *
+                const auto x1 = ekf.x(STATE_VX) + dt * (accelx + gyro(2) *
                         tmpSPY - gyro(1) * tmpSPZ
                         - G * ekf.R(2,0));
-                const auto x2 = ekf.x(2) + dt * (accely - gyro(2) *
+                const auto x2 = ekf.x(STATE_VY) + dt * (accely - gyro(2) *
                         tmpSPX + gyro(0) * tmpSPZ
                         - G * ekf.R(2,1));
-                const auto x3 = ekf.x(3) + dt * (accel(2) + gyro(1) *
+                const auto x3 = ekf.x(STATE_VZ) + dt * (accel(2) + gyro(1) *
                         tmpSPX - gyro(0) * tmpSPY
                         - G * ekf.R(2,2));
 
@@ -264,9 +264,9 @@ namespace hf {
                 // rotate body-frame velocity and acc
                 const auto R = isUpdated ? quat2rotation(q_) : ekf.R;
 
-                const float dx = 0;//R(0,0)*_x(1) + R(0,1)*_x(2) + R(0,2)*_x(3);
-                const float dy = 0;//R(1,0)*_x(1) + R(1,1)*_x(2) + R(1,2)*_x(3); 
-                const float dz = R(2,0)*ekf.x(1) + R(2,1)*ekf.x(2) + R(2,2)*ekf.x(3);
+                const float dx = 0;//R(0,0)*_x(STATE_VX) + R(0,1)*_x(STATE_VY) + R(0,2)*_x(STATE_VZ);
+                const float dy = 0;//R(1,0)*_x(STATE_VX) + R(1,1)*_x(STATE_VY) + R(1,2)*_x(STATE_VZ); 
+                const float dz = 0;//R(2,0)*ekf.x(STATE_VX) + R(2,1)*ekf.x(STATE_VY) + R(2,2)*ekf.x(STATE_VZ);
 
                 const auto didResetEstimation =
                     !areVelsInBounds(dx, dy, dz) ?
@@ -312,7 +312,7 @@ namespace hf {
 
                 const auto dpsi = gyroDps.z;
 
-                const auto z = ekf.x(0);
+                const auto z = ekf.x(STATE_Z);
 
                 const float dx = 0;
                 const float dy = 0;
@@ -328,18 +328,11 @@ namespace hf {
                 const auto r22 = ekf.R(2,2);
 
                 const auto angle =
-                    fmax(0, fabsf(acosf(r22)) - Num::DEG2RAD * (15.0f / 2.0f));
+                    fmax(STATE_Z, fabsf(acosf(r22)) - Num::DEG2RAD * (15.0f / 2.0f));
 
                 const auto predicted_distance = ekf.x(STATE_Z) / cosf(angle);
 
                 const auto measured_distance = zrfilter.distance_m;
-
-                if (fabs(r22) > 0.1 && r22 > 0) {
-                    printf("r22=%f\n", r22);
-                    printf("angle=%f\n", angle);
-                    printf("predicted=%f measured=%f\n\n",
-                            predicted_distance, measured_distance);
-                }
 
                 const float h[STATE_DIM] = {1/cosf(angle), 0, 0, 0, 0, 0, 0};
 
@@ -365,7 +358,7 @@ namespace hf {
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Matrix R = Matrix(3, 3);
+            Matrix R = Matrix(STATE_VZ, 3);
 
             ImuSubSampler accelSubSampler;
             ImuSubSampler gyroSubSampler;
@@ -428,7 +421,7 @@ namespace hf {
                 -> Vector
                 {
                     Vector xsym = Vector(STATE_DIM);
-                    xsym << x(0), x(1), x(2), x(3), 0, 0, 0;
+                    xsym << x(STATE_Z), x(STATE_VX), x(STATE_VY), x(STATE_VZ), 0, 0, 0;
                     return xsym;
 
                 }
@@ -463,62 +456,62 @@ namespace hf {
                 const auto d1 = gyro(1)*dt/2;
                 const auto d2 = gyro(2)*dt/2;
 
-                const auto vx = x(1);
-                const auto vy = x(2);
-                const auto vz = x(3);
+                const auto vx = x(STATE_VX);
+                const auto vy = x(STATE_VY);
+                const auto vz = x(STATE_VZ);
 
                 Matrix F(STATE_DIM, STATE_DIM);
 
                 // position
-                F(0, 0) = 1;
+                F(STATE_Z, STATE_Z) = 1;
 
                 // position from body-frame velocity
-                F(0,1) = R(2,0)*dt;
-                F(0,2) = R(2,1)*dt;
-                F(0,3) = R(2,2)*dt;
+                F(STATE_Z,STATE_VX) = R(2,0)*dt;
+                F(STATE_Z,STATE_VY) = R(2,1)*dt;
+                F(STATE_Z,STATE_VZ) = R(2,2)*dt;
 
                 // position from attitude error
-                F(0,4) = (vy*R(2,2) - vz*R(2,1))*dt;
-                F(0,5) = (-vx*R(2,2) + vz*R(2,0))*dt;
-                F(0,6) = (vx*R(2,1) - vy*R(2,0))*dt;
+                F(STATE_Z,STATE_D0) = (vy*R(2,2) - vz*R(2,1))*dt;
+                F(STATE_Z,STATE_D1) = (-vx*R(2,2) + vz*R(2,0))*dt;
+                F(STATE_Z,STATE_D2) = (vx*R(2,1) - vy*R(2,0))*dt;
 
                 // body-frame velocity from body-frame velocity
-                F(1,1) = 1; //drag negligible
-                F(2,1) =-gyro(2)*dt;
-                F(3,1) = gyro(1)*dt;
+                F(STATE_VX,STATE_VX) = 1; //drag negligible
+                F(STATE_VY,STATE_VX) =-gyro(2)*dt;
+                F(STATE_VZ,STATE_VX) = gyro(1)*dt;
 
-                F(1,2) = gyro(2)*dt;
-                F(2,2) = 1; //drag negligible
-                F(3,2) =-gyro(0)*dt;
+                F(STATE_VX,STATE_VY) = gyro(2)*dt;
+                F(STATE_VY,STATE_VY) = 1; //drag negligible
+                F(STATE_VZ,STATE_VY) =-gyro(0)*dt;
 
-                F(1,3) =-gyro(1)*dt;
-                F(2,3) = gyro(0)*dt;
-                F(3,3) = 1; //drag negligible
+                F(STATE_VX,STATE_VZ) =-gyro(1)*dt;
+                F(STATE_VY,STATE_VZ) = gyro(0)*dt;
+                F(STATE_VZ,STATE_VZ) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
-                F(1,4) =  0;
-                F(2,4) = -G*R(2,2)*dt;
-                F(3,4) =  G*R(2,1)*dt;
+                F(STATE_VX,STATE_D0) =  0;
+                F(STATE_VY,STATE_D0) = -G*R(2,2)*dt;
+                F(STATE_VZ,STATE_D0) =  G*R(2,1)*dt;
 
-                F(1,5) =  G*R(2,2)*dt;
-                F(2,5) =  0;
-                F(3,5) = -G*R(2,0)*dt;
+                F(STATE_VX,STATE_D1) =  G*R(2,2)*dt;
+                F(STATE_VY,STATE_D1) =  0;
+                F(STATE_VZ,STATE_D1) = -G*R(2,0)*dt;
 
-                F(1,6) = -G*R(2,1)*dt;
-                F(2,6) =  G*R(2,0)*dt;
-                F(3,6) =  0;
+                F(STATE_VX,STATE_D2) = -G*R(2,1)*dt;
+                F(STATE_VY,STATE_D2) =  G*R(2,0)*dt;
+                F(STATE_VZ,STATE_D2) =  0;
 
-                F(4,4) =  1 - d1*d1/2 - d2*d2/2;
-                F(4,5) =  d2 + d0*d1/2;
-                F(4,6) = -d1 + d0*d2/2;
+                F(STATE_D0,STATE_D0) =  1 - d1*d1/2 - d2*d2/2;
+                F(STATE_D0,STATE_D1) =  d2 + d0*d1/2;
+                F(STATE_D0,STATE_D2) = -d1 + d0*d2/2;
 
-                F(5,4) = -d2 + d0*d1/2;
-                F(5,5) =  1 - d0*d0/2 - d2*d2/2;
-                F(5,6) =  d0 + d1*d2/2;
+                F(STATE_D1,STATE_D0) = -d2 + d0*d1/2;
+                F(STATE_D1,STATE_D1) =  1 - d0*d0/2 - d2*d2/2;
+                F(STATE_D1,STATE_D2) =  d0 + d1*d2/2;
 
-                F(6,4) =  d1 + d0*d2/2;
-                F(6,5) = -d0 + d1*d2/2;
-                F(6,6) = 1 - d0*d0/2 - d1*d1/2;
+                F(STATE_D2,STATE_D0) =  d1 + d0*d2/2;
+                F(STATE_D2,STATE_D1) = -d0 + d1*d2/2;
+                F(STATE_D2,STATE_D2) = 1 - d0*d0/2 - d1*d1/2;
 
                 return F;
             }
