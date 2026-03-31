@@ -24,20 +24,6 @@ static constexpr float MIN_COVARIANCE = 1e-6;
 
 static const size_t STATE_DIM = 3;
 
-/*
-static void dump_matrix(const char * label, const float a[STATE_DIM][STATE_DIM])
-{
-    printf("%s:\n", label);
-
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        for (size_t j=0; j<STATE_DIM; ++j) {
-            printf("%+f ", a[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-}*/
-
 // ---------------------------------------------------------------------------
 
 typedef arm_matrix_instance_f32 matrix_t;
@@ -75,16 +61,6 @@ static void dump_vector_old(const char * label, const matrix_t & v)
 
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+f ", v.pData[i]);
-    }
-    printf("\n");
-}
-
-static void dump_vector(const char * label, const float v[STATE_DIM])
-{
-    printf("%s:\n", label);
-
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        printf("%+f ", v[i]);
     }
     printf("\n");
 }
@@ -170,15 +146,16 @@ static void run_old(
 
     printf("old -------------------------------\n\n");
 
-    dump_vector("x", x);
-
     device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+
+    dump_matrix_old("GH", tmpNN1m);
+
     for (size_t i=0; i<STATE_DIM; i++) { 
         tmpNN1d[STATE_DIM*i+i] -= 1; 
     } // GH - I
     device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
     device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-    device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+    device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // P = (GH - I)*P*(GH - I)'
 
     // add the measurement variance and ensure boundedness and symmetry
     for (size_t i=0; i<STATE_DIM; i++) {
@@ -248,8 +225,6 @@ static void run_new(
 {
     (void)R;
     (void)error;
-    (void)dump_matrix_new;
-    (void)dump_vector_new;
 
     auto P = MatrixXd(STATE_DIM, STATE_DIM);
     auto x = VectorXd(STATE_DIM);
@@ -272,22 +247,6 @@ static void run_new(
 
     x = x + G * error;
 
-    dump_vector_new("x", x);
-
-    /*
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        for (size_t j=0; j<STATE_DIM; ++j) {
-            printf("%+f ", P(i,j));
-        }
-        printf("\n");
-    }
-    printf("\n");
-
-    for (size_t i=0; i<STATE_DIM; ++i) {
-        printf("%+f ", x(i));
-    }
-    */
-
     printf("\n\n");
 }
 
@@ -295,6 +254,10 @@ static void run_new(
 
 void setup()
 {
+    (void)dump_matrix_old;
+    (void)dump_vector_old;
+    (void)dump_matrix_new;
+    (void)dump_vector_new;
 }
 
 void loop()
