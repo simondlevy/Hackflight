@@ -129,7 +129,7 @@ static void run_old(
     static float G[STATE_DIM];
     static matrix_t Gm = {STATE_DIM, 1, (float *)G};
 
-    // Temporary matrices for the covariance updates
+    // Temporary matrices for the covariance updates ----------
     static float tmpNN1d[STATE_DIM * STATE_DIM];
     static matrix_t tmpNN1m = {
         STATE_DIM, STATE_DIM, tmpNN1d
@@ -150,6 +150,8 @@ static void run_old(
 
     static float PHTd[STATE_DIM * 1];
     static matrix_t PHTm = {STATE_DIM, 1, PHTd};
+    // ----------------------------------------------------------
+
 
     device_mat_trans(&Hm, &HTm);
     device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
@@ -189,8 +191,11 @@ static void run_old(
     printf("old -------------------------------\n\n");
 
     (void)dump_matrix_old;
+    (void)dump_vector_old;
 
-    dump_vector_old("PHT", PHTm);
+    //dump_vector_old("PHT", PHTm);
+
+    printf("HPHR=%f\n", HPHR);
 
     /*
     for (size_t i=0; i<STATE_DIM; ++i) {
@@ -259,9 +264,13 @@ static void run_new(
 
     const auto PHT = P * h;
 
+    const auto HPHR = R + PHT.dot(h);
+
     printf("new -------------------------------\n\n");
 
-    dump_vector_new("PHT", PHT);
+    printf("HPHR=%f\n", HPHR);
+
+    //dump_vector_new("PHT", PHT);
 
     /*
     for (size_t i=0; i<STATE_DIM; ++i) {
