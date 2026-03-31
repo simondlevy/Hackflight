@@ -54,33 +54,19 @@ static void ekf_pset(
     }
 }
 
-void setup()
+static void run_old(
+            float _p[STATE_DIM][STATE_DIM],
+            float _x[STATE_DIM],
+            const float h[STATE_DIM],
+            const float R,
+            const float error
+        )
 {
-}
-
-void loop()
-{
-    float _p[STATE_DIM][STATE_DIM] = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 9}
-    };
-
-    const auto stdMeasNoise = 1.5f;
-    
-    const auto error = -2.3;
-
-    const auto R = stdMeasNoise*stdMeasNoise;
-
     matrix_t _p_m;
 
     _p_m.numRows = STATE_DIM;
     _p_m.numCols = STATE_DIM;
     _p_m.pData = (float*)_p;
-
-    const float h[STATE_DIM] = {10, 11, 12};
-
-    float _x[STATE_DIM] = {13, 14, 15};
 
     matrix_t Hm = {1, STATE_DIM, (float *)h};
 
@@ -145,6 +131,31 @@ void loop()
             ekf_pset(_p, i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
         }
     }
+}
+
+void setup()
+{
+}
+
+void loop()
+{
+    float _p[STATE_DIM][STATE_DIM] = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+
+    const float h[STATE_DIM] = {10, 11, 12};
+
+    float _x[STATE_DIM] = {13, 14, 15};
+
+    const auto stdMeasNoise = 1.5f;
+    
+    const auto error = -2.3;
+
+    const auto R = stdMeasNoise*stdMeasNoise;
+
+    run_old(_p, _x, h, R, error);
 
     delay(1000);
 }
