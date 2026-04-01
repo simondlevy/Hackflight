@@ -148,6 +148,17 @@ namespace hf {
                 }
             }
 
+            static void report(const ThreeAxisRaw & tar)
+            {
+                static Helper _helper;
+
+                if (_helper.ready()) {
+
+                    printf("%5lu | x=%+05d y=%+05d z=%+05d\n",
+                            _helper.count, tar.x, tar.y, tar.z);
+                }
+            }
+
             static void report(const ThreeAxis & ta)
             {
                 static Helper _helper;

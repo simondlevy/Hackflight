@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <firmware/debugging.hpp>
 #include <firmware/imu/three_axis_lpf.hpp>
 #include <firmware/timer.hpp>
 #include <num.hpp>
@@ -85,6 +86,8 @@ namespace hf {
             {
                 const auto gyroraw = imuraw.gyro;
 
+                Debugger::report(gyroraw);
+
                 const auto gyromean = filter._gyroSum / GYRO_NBR_OF_SAMPLES;
 
                 const auto gyrovariance =
@@ -112,9 +115,6 @@ namespace hf {
 
                 const auto wantUpdate =!filter.isGyroCalibrated &&
                     isBufferFilled;
-
-                // XXX needed to debug BMI088, LSM6DSO
-                //Debugger::report(gyrovariance);
 
                 const auto shouldUpdate = wantUpdate && 
                     gyrovariance < GYRO_RAW_VARIANCE_BASE &&
