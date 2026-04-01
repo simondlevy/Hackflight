@@ -448,40 +448,18 @@ namespace hf {
                 // position
                 F(STATE_Z, STATE_Z) = 1;
 
-                // position from body-frame velocity
-                //F(STATE_Z,STATE_VX) = 0;
-                //F(STATE_Z,STATE_VY) = 0;
                 F(STATE_Z,STATE_VZ) = R(2,2)*dt;
 
-                // position from attitude error
                 F(STATE_Z,STATE_D0) = (vy*R(2,2) - vz*R(2,1))*dt;
                 F(STATE_Z,STATE_D1) = (-vx*R(2,2) + vz*R(2,0))*dt;
                 F(STATE_Z,STATE_D2) = (vx*R(2,1) - vy*R(2,0))*dt;
 
-                // body-frame velocity from body-frame velocity
-                //F(STATE_VX,STATE_VX) = 1; //drag negligible
-                //F(STATE_VY,STATE_VX) = 0;
-                //F(STATE_VZ,STATE_VX) = 0;
-
-                //F(STATE_VX,STATE_VY) = 0;
-                //F(STATE_VY,STATE_VY) = 1; //drag negligible
-                //F(STATE_VZ,STATE_VY) = 0;
-
-                //F(STATE_VX,STATE_VZ) = 0;
-                //F(STATE_VY,STATE_VZ) = 0;
                 F(STATE_VZ,STATE_VZ) = 1; //drag negligible
 
-                // body-frame velocity from attitude error
-                //F(STATE_VX,STATE_D0) = 0;
-                //F(STATE_VY,STATE_D0) = 0;
                 F(STATE_VZ,STATE_D0) = 0;
 
-                //F(STATE_VX,STATE_D1) = 0;
-                //F(STATE_VY,STATE_D1) = 0;
                 F(STATE_VZ,STATE_D1) = 0;
 
-                //F(STATE_VX,STATE_D2) = 0;
-                //F(STATE_VY,STATE_D2) = 0;
                 F(STATE_VZ,STATE_D2) = 0;
 
                 F(STATE_D0,STATE_D0) =  1 - d1*d1/2 - d2*d2/2;
