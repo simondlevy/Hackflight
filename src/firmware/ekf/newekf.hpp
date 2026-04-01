@@ -176,7 +176,7 @@ namespace hf {
                 const auto pqnew = isFlying ? pq :
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
-                Vector x = Vector(STATE_DIM);
+                auto x = Vector(STATE_DIM);
                 x << 0, 0, z, vz, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
 
                 return EKF(
@@ -443,7 +443,7 @@ namespace hf {
                 const auto vy = 0;
                 const auto vz = x(STATE_VZ);
 
-                Matrix F(STATE_DIM, STATE_DIM);
+                auto F = Matrix(STATE_DIM, STATE_DIM);
 
                 // position
                 F(STATE_Z, STATE_Z) = 1;
