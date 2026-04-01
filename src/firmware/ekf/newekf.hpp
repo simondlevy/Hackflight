@@ -428,9 +428,9 @@ namespace hf {
                     const Vector & x) -> Vector
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = x(4);
-                const float v1 = x(5);
-                const float v2 = x(6);
+                const float v0 = x(STATE_D0);
+                const float v1 = x(STATE_D1);
+                const float v2 = x(STATE_D2);
 
                 return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
                         && (areVelsInBounds(v0, v1, v2))) ?
