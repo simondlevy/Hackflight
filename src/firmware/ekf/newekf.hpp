@@ -140,10 +140,6 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 const auto P = (F * ekf.P) * F.transpose();
 
-                // keep previous time step's state for the update
-                const auto tmpSPX = 0;
-                const auto tmpSPY = 0;
-
                 const auto dt2 = dt * dt;
 
                 // position updates in the body frame (will be rotated to inertial frame)
@@ -159,9 +155,8 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                const auto x3 = ekf.x(STATE_VZ) + dt * (accel(2) + gyro(1) *
-                        tmpSPX - gyro(0) * tmpSPY
-                        - G * ekf.R(2,2));
+                const auto vz =
+                    ekf.x(STATE_VZ) + dt * (accel(2) - G*ekf.R(2,2));
 
                 // attitude update (rotate by gyro), we do this in quaternions
                 // this is the gyro angular velocity integrated over the sample
@@ -182,8 +177,7 @@ namespace hf {
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
                 Vector x = Vector(STATE_DIM);
-                x << z, 0,   0, x3, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
-                //   z   vx  vy  vz
+                x << z, 0, 0, vz, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
 
                 return EKF(
                         x,
