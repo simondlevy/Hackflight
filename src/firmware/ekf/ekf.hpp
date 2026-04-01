@@ -493,13 +493,13 @@ namespace hf {
                 F(STATE_VY,STATE_D0) = 0;
                 F(STATE_VZ,STATE_D0) = 0;
 
-                F(STATE_VX,STATE_D1) =  G*R(2,2)*dt;
-                F(STATE_VY,STATE_D1) =  0;
-                F(STATE_VZ,STATE_D1) = -G*R(2,0)*dt;
+                F(STATE_VX,STATE_D1) = 0;
+                F(STATE_VY,STATE_D1) = 0;
+                F(STATE_VZ,STATE_D1) = 0;
 
-                F(STATE_VX,STATE_D2) = -G*R(2,1)*dt;
-                F(STATE_VY,STATE_D2) =  G*R(2,0)*dt;
-                F(STATE_VZ,STATE_D2) =  0;
+                F(STATE_VX,STATE_D2) = 0;
+                F(STATE_VY,STATE_D2) = 0;
+                F(STATE_VZ,STATE_D2) = 0;
 
                 F(STATE_D0,STATE_D0) =  1 - d1*d1/2 - d2*d2/2;
                 F(STATE_D0,STATE_D1) =  d2 + d0*d1/2;
