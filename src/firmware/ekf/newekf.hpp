@@ -53,7 +53,6 @@ namespace hf {
 
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
             static constexpr float STDEV_INITIAL_POSITION_Z = 1;
             static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
