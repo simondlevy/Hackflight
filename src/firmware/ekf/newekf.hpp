@@ -177,7 +177,11 @@ namespace hf {
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
                 auto x = Vector(STATE_DIM);
-                x << 0, 0, z, vz, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
+                x(STATE_Z) = z;
+                x(STATE_VZ) = vz;
+                x(STATE_D0) = ekf.x(STATE_D0);
+                x(STATE_D1) = ekf.x(STATE_D1);
+                x(STATE_D2) = ekf.x(STATE_D2);
 
                 return EKF(
                         x,
