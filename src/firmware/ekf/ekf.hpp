@@ -165,12 +165,10 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                const auto x1 = ekf.x(STATE_VX) + dt * (accelx + gyro(2) *
-                        tmpSPY - gyro(1) * tmpSPZ
-                        - G * ekf.R(2,0));
-                const auto x2 = ekf.x(STATE_VY) + dt * (accely - gyro(2) *
-                        tmpSPX + gyro(0) * tmpSPZ
-                        - G * ekf.R(2,1));
+                const auto x1 = dt * (accelx + gyro(2) * tmpSPY -
+                        gyro(1) * tmpSPZ - G * ekf.R(2,0));
+                const auto x2 = dt * (accely - gyro(2) * tmpSPX +
+                        gyro(0) * tmpSPZ - G * ekf.R(2,1));
                 const auto x3 = ekf.x(STATE_VZ) + dt * (accel(2) + gyro(1) *
                         tmpSPX - gyro(0) * tmpSPY
                         - G * ekf.R(2,2));
@@ -264,9 +262,9 @@ namespace hf {
                 // rotate body-frame velocity and acc
                 const auto R = isUpdated ? quat2rotation(q_) : ekf.R;
 
-                const float dx = 0;//R(0,0)*_x(STATE_VX) + R(0,1)*_x(STATE_VY) + R(0,2)*_x(STATE_VZ);
-                const float dy = 0;//R(1,0)*_x(STATE_VX) + R(1,1)*_x(STATE_VY) + R(1,2)*_x(STATE_VZ); 
-                const float dz = 0;//R(2,0)*ekf.x(STATE_VX) + R(2,1)*ekf.x(STATE_VY) + R(2,2)*ekf.x(STATE_VZ);
+                const float dx = 0;
+                const float dy = 0;
+                const float dz = 0;// R(2,2)*ekf.x(STATE_VZ);
 
                 const auto didResetEstimation =
                     !areVelsInBounds(dx, dy, dz) ?
