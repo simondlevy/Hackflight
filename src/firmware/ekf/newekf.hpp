@@ -163,10 +163,6 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                const auto x1 = dt * (accelx + gyro(2) * tmpSPY -
-                        gyro(1) * tmpSPZ - G * ekf.R(2,0));
-                const auto x2 = dt * (accely - gyro(2) * tmpSPX +
-                        gyro(0) * tmpSPZ - G * ekf.R(2,1));
                 const auto x3 = ekf.x(STATE_VZ) + dt * (accel(2) + gyro(1) *
                         tmpSPX - gyro(0) * tmpSPY
                         - G * ekf.R(2,2));
@@ -190,7 +186,8 @@ namespace hf {
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
                 Vector x = Vector(STATE_DIM);
-                x << x0, x1, x2, x3, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
+                x << x0, 0,   0, x3, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
+                //   z   vx  vy  vz
 
                 return EKF(
                         x,
