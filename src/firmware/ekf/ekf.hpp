@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2026 Simon D. Levy
+ * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,13 @@
 
 #pragma once
 
-#include <firmware/ekf/datatypes.hpp>
-#include <firmware/ekf/imu_subsampler.hpp>
-#include <firmware/zranger/filter.hpp>
-#include <firmware/timer.hpp>
-#include <num.hpp>
+#include <Arduino.h>
 
-// We want to use F for the Jacobian and _P for the covariance matrix, but
-// Arduino pre-defines them
-#ifdef F
-#undef F
-#undef _P
-#endif
+#include <datatypes.hpp>
+#include <firmware/ekf/matrix_typedef.h>
+#include <firmware/imu/datatypes.hpp>
+#include <firmware/zranger/filter.hpp>
+#include <num.hpp>
 
 namespace hf {
 
@@ -35,7 +30,25 @@ namespace hf {
 
         private:
 
-            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
+            // Indexes to access the vehicle's state, stored as a column vector
+            enum
+            {
+                STATE_Z,
+                STATE_VZ,
+                STATE_D0,
+                STATE_D1,
+                STATE_D2,
+                STATE_DIM
+
+            };
+
+            // Initial variances, uncertain of position, but know we're
+            // stationary and roughly flat
+            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
+            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
+            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
+            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
+
             static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
             static constexpr float PROC_NOISE_VEL = 0;
             static constexpr float PROC_NOISE_POS = 0;
@@ -43,617 +56,633 @@ namespace hf {
             static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
             static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
 
-            static constexpr float G = 9.81;
-
-            // Small number epsilon, to prevent dividing by zero
-            static constexpr float EPSILON = 1e-6f;
-
-            // The reversion of pitch and roll to zero
-            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
-
-            // Initial variances, uncertain of position, but know we're
-            // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
-            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
-            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
-
-            //We do get the measurements in 10x the motion pixels (experimentally measured)
-            static constexpr float FLOW_RESOLUTION = 0.1;
+            static constexpr float GRAVITY = 9.81;
 
             // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
             static constexpr float MAX_COVARIANCE = 100;
             static constexpr float MIN_COVARIANCE = 1e-6;
 
-            static constexpr float MIN_VELOCITY_MPS = 1e-4;
-            static constexpr float MAX_VELOCITY_MPS = 10;
+            // Small number epsilon, to prevent dividing by zero
+            static constexpr float EPSILON = 1e-6f;
 
-            // Indices to access the vehicle's state, stored as a column vector
-            enum {
-                STATE_Z,   // 0
-                STATE_VX,  // 1
-                STATE_VY,  // 2
-                STATE_VZ,  // 3
-                STATE_D0,  // 4
-                STATE_D1,  // 5
-                STATE_D2,  // 6
-                STATE_DIM
-            };
+            // the reversion of pitch and roll to zero
+            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
         public:
 
-            EKF& operator=(const EKF& other) = default;
-
-            EKF() 
+            void init(const uint32_t nowMs)
             {
-                x = xinit();
-                P = pinit();
-                q = qinit();
-                accelSubSampler = ImuSubSampler();
-                gyroSubSampler = ImuSubSampler();
-            }
+                axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
+                axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
 
-            EKF (
-                const Vector & x,
-                const Matrix & P,
-                const Vector & q,
-                const Matrix R,
-                const ImuSubSampler  & accelSubSampler,
-                const ImuSubSampler  & gyroSubSampler,
-                const uint32_t imuSampleCount,
-                const bool didResetEstimation,
-                const bool isUpdated,
-                const uint32_t lastPredictionMs,
-                const uint32_t lastProcessNoiseUpdateMs) 
-                :
-                    x(x),
-                    P(P),
-                    q(q),
-                    R(R),
-                    accelSubSampler(accelSubSampler),
-                    gyroSubSampler(gyroSubSampler), 
-                    imuSampleCount(imuSampleCount),
-                    didResetEstimation(didResetEstimation),
-                    isUpdated(isUpdated),
-                    lastPredictionMs(lastPredictionMs) {}
+                ekf_init();
 
-            static auto predict(const EKF & ekf, const uint32_t msec_curr,
-                    const bool isFlying) -> EKF
-            {
-                const auto accelSubSampler =
-                    ImuSubSampler::finalize(
-                            ekf.accelSubSampler, ekf.imuSampleCount);
+                // Reset the attitude quaternion
+                _q0 = _qinit0 = 1;
+                _q1 = _qinit1 = 0;
+                _q2 = _qinit2 = 0;
+                _q3 = _qinit3 = 0;
 
-                const auto gyroSubSampler =
-                    ImuSubSampler::finalize(
-                            ekf.gyroSubSampler, ekf.imuSampleCount);
+                // Initialize the rotation matrix
+                _r20 = 0;
+                _r21 = 0;
+                _r22 = 1;
 
-                const auto dt = (msec_curr - ekf.lastPredictionMs) / 1000.f;
+                // Add in the initial process noise 
+                const float pinit[STATE_DIM] = {
 
-                const auto gyro =
-                    ImuSubSampler::getOutput(gyroSubSampler, Num::DEG2RAD);
-
-                const auto accel =
-                    ImuSubSampler::getOutput(accelSubSampler,  G);
-
-                const auto F = makeJacobian(ekf.x, ekf.R, gyro, dt);
-
-                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                const auto P = (F * ekf.P) * F.transpose();
-
-                // keep previous time step's state for the update
-                const auto tmpSPX = 0;
-                const auto tmpSPY = 0;
-                const auto tmpSPZ = ekf.x(STATE_VZ);
-
-                const auto dt2 = dt * dt;
-
-                // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = isFlying ? 0 : accel(0) * dt2 / 2;
-                const auto dy = isFlying ? 0 : accel(1) * dt2 / 2;
-
-                // thrust can only be produced in the body's Z direction
-                const auto dz = ekf.x(STATE_VZ) * dt + accel(2) * dt2 / 2; 
-
-                // position update
-                const auto x0 = ekf.x(STATE_Z) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
-                    + ekf.R(2,2) * dz - G * dt2 / 2;
-
-                const auto accelx = isFlying ? 0 : accel(0);
-                const auto accely = isFlying ? 0 : accel(1);
-
-                // body-velocity update: accelerometers - gyros cross velocity
-                // - gravity in body frame
-                const auto x1 = dt * (accelx + gyro(2) * tmpSPY -
-                        gyro(1) * tmpSPZ - G * ekf.R(2,0));
-                const auto x2 = dt * (accely - gyro(2) * tmpSPX +
-                        gyro(0) * tmpSPZ - G * ekf.R(2,1));
-                const auto x3 = ekf.x(STATE_VZ) + dt * (accel(2) + gyro(1) *
-                        tmpSPX - gyro(0) * tmpSPY
-                        - G * ekf.R(2,2));
-
-                // attitude update (rotate by gyro), we do this in quaternions
-                // this is the gyro angular velocity integrated over the sample
-                // period
-                const auto dtwx = dt*gyro(0);
-                const auto dtwy = dt*gyro(1);
-                const auto dtwz = dt*gyro(2);
-
-                // Rotate the vehicle's attitude by the delta quaternion vector
-                const auto pq = rotate(ekf.q, dtwx, dtwy, dtwz);
-
-                // Quaternion used for initial orientation
-                Vector qinit = Vector(4);
-                qinit << 1, 0, 0, 0;
-
-                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-                const auto pqnew = isFlying ? pq :
-                    keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
-
-                Vector x = Vector(STATE_DIM);
-                x << x0, x1, x2, x3, ekf.x(4), ekf.x(5), ekf.x(6); 
-
-                return EKF(
-                        x,
-                        P,
-                        qnorm(pqnew), // q
-                        ekf.R,
-                        accelSubSampler,
-                        gyroSubSampler,
-                        0,            // imuSampleCount
-                        ekf.didResetEstimation,
-                        true,         // isUpdated
-                        msec_curr,    // lastPredictionMs
-                        ekf.lastProcessNoiseUpdateMs);
-
-            } // predict
-
-            static auto updateWithImu(const EKF & ekf, const uint32_t msec_curr,
-                    const ImuFiltered & imudata) -> EKF
-            {
-                const auto accelSubSampler = ekf.didResetEstimation ?
-                    ImuSubSampler() : ekf.accelSubSampler;
-
-                const auto accelSubSampler_ =
-                    ImuSubSampler::accumulate(accelSubSampler,
-                            imudata.accelGs);
-
-                const auto imuSampleCount = ekf.imuSampleCount + 1;
-
-                const auto gyroSubSampler = ekf.didResetEstimation ?
-                    ImuSubSampler() : ekf.gyroSubSampler;
-
-                const auto gyroSubSampler_ =
-                    ImuSubSampler::accumulate(gyroSubSampler,
-                            imudata.gyroDps);
-
-                const auto isUpdated = ekf.didResetEstimation ? false : ekf.isUpdated;
-
-                const auto lastPredictionMs = ekf.didResetEstimation ?
-                    msec_curr : ekf.lastPredictionMs;
-
-                const auto lastProcessNoiseUpdateMs =
-                    ekf.didResetEstimation ?  msec_curr :
-                    ekf.lastProcessNoiseUpdateMs;
-
-                const float dt = (msec_curr - lastProcessNoiseUpdateMs)
-                    / 1000.0f;
-
-                // XXX can we compress this?
-                const auto x = ekf.didResetEstimation ? xinit() : ekf.x;
-                const auto x_ = dt > 0 ? enforceSymmetry(x) : x;
-                const auto x__ = isUpdated ? enforceSymmetry(x_) : x_;
-
-                // XXX ditto ^^^
-                const auto P = ekf.didResetEstimation ? pinit() : ekf.P;
-                const auto P_ = dt > 0 ? enforceSymmetry(pnoisy(P, dt)) : P;
-                const auto P__ = isUpdated ?
-                    enforceSymmetry(pnoisy(P_, dt)) : P_;
-
-                const auto lastProcessNoiseUpdateMs_ = dt > 0 ? msec_curr :
-                    lastProcessNoiseUpdateMs;
-
-                const auto q = ekf.didResetEstimation ? qinit() : ekf.q;
-                const auto q_ =
-                    isUpdated ? tryToToIncorporateAttitude(q, x_) : q;
-
-                // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and acc
-                const auto R = isUpdated ? quat2rotation(q_) : ekf.R;
-
-                const float dx = 0;
-                const float dy = 0;
-                const float dz = 0;// R(2,2)*ekf.x(STATE_VZ);
-
-                const auto didResetEstimation =
-                    !areVelsInBounds(dx, dy, dz) ?
-                    true :
-                    ekf.didResetEstimation;
-
-                return EKF(
-                        x__,
-                        P__,
-                        q_,
-                        R,
-                        accelSubSampler_,
-                        gyroSubSampler_,
-                        imuSampleCount,
-                        didResetEstimation,
-                        false, // isUpdated
-                        lastPredictionMs,
-                        lastProcessNoiseUpdateMs_);
-
-            } // update
-
-            static auto getVehicleState(const EKF & ekf,
-                    const ImuFiltered & imudata) -> VehicleState
-            {
-                const auto gyroDps = imudata.gyroDps;
-
-                const auto phi = Num::RAD2DEG *
-                    atan2f(2*(ekf.q(2)*ekf.q(3)+ekf.q(0)* ekf.q(1)),
-                            ekf.q(0)*ekf.q(0) - ekf.q(1)*ekf.q(1) -
-                            ekf.q(2)*ekf.q(2) + ekf.q(3)*ekf.q(3));
-
-                const auto dphi = gyroDps.x;
-
-                const auto theta = Num::RAD2DEG *
-                    asinf(-2*(ekf.q(1)*ekf.q(3) - ekf.q(0)*ekf.q(2)));
-
-                const auto dtheta = gyroDps.y;
-
-                const auto psi = Num::RAD2DEG *
-                    atan2f(2*(ekf.q(1)*ekf.q(2)+ekf.q(0)* ekf.q(3)),
-                            ekf.q(0)*ekf.q(0) + ekf.q(1)*ekf.q(1) -
-                            ekf.q(2)*ekf.q(2) - ekf.q(3)*ekf.q(3)); 
-
-                const auto dpsi = gyroDps.z;
-
-                const auto z = ekf.x(STATE_Z);
-
-                const float dx = 0;
-                const float dy = 0;
-                const float dz = ekf.x(STATE_VZ);
-
-                return VehicleState(dx, -dy, z, dz, phi, dphi, theta, dtheta,
-                        -psi, -dpsi); // make nose-right positive
-            }
-
-            static auto updateWithZRange(const EKF & ekf,
-                    const ZRangerFilter & zrfilter) -> EKF
-            {
-                const auto r22 = ekf.R(2,2);
-
-                const auto angle =
-                    fmax(STATE_Z, fabsf(acosf(r22)) - Num::DEG2RAD * (15.0f / 2.0f));
-
-                const auto predicted_distance = ekf.x(STATE_Z) / cosf(angle);
-
-                const auto measured_distance = zrfilter.distance_m;
-
-                const float h[STATE_DIM] = {1/cosf(angle), 0, 0, 0, 0, 0, 0};
-
-                return fabs(r22) > 0.1 && r22 > 0 ?
-                    updateWithScalar(ekf, h,
-                            measured_distance-predicted_distance,
-                            zrfilter.stdev) :
-                    ekf;
-            }
-
-        private:
-
-            // State vector
-            Vector x = Vector(STATE_DIM);
-
-            // Covariance matrix
-            Matrix P = Matrix(STATE_DIM, STATE_DIM);
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
-            Vector q = Vector(4);
-
-            // The vehicle's attitude as a rotation matrix (used by the prediction,
-            // updated by the finalization)
-            Matrix R = Matrix(STATE_VZ, 3);
-
-            ImuSubSampler accelSubSampler;
-            ImuSubSampler gyroSubSampler;
-
-            uint32_t imuSampleCount;
-
-            bool didResetEstimation;
-
-            // Tracks whether an update to the state has been made, and the state
-            // therefore requires finalization
-            bool isUpdated;
-
-            uint32_t lastPredictionMs;
-            uint32_t lastProcessNoiseUpdateMs;
-
-            static auto updateWithZRange(
-                    const EKF & ekf,
-                    const float r22,
-                    const ZRangerFilter & zrfilter) -> EKF
-            {
-                return ekf;
-            }
-
-
-            static auto addCovarianceNoise(const Matrix & P,
-                    const float * noise) -> Matrix
-            {
-                auto Pcov = P;
-
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    Pcov(k,k) += noise[k] * noise[k];
-                }
-
-                return Pcov;
-            }
-
-            static auto enforceSymmetry(const Matrix & P) ->
-                Matrix
-                {
-                    Matrix Psym = Matrix(STATE_DIM, STATE_DIM);
-
-                    for (int i=0; i<STATE_DIM; i++) {
-
-                        for (int j=i; j<STATE_DIM; j++) {
-
-                            const auto pval = (P(i,j) + P(j,i)) / 2;
-
-                            Psym(i,j) = Psym(j,i) = 
-                                isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                                i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                                pval;
-                        }
-
-                    }
-
-                    return Psym;
-                }
-
-            static auto enforceSymmetry(const Vector & x)
-                -> Vector
-                {
-                    Vector xsym = Vector(STATE_DIM);
-                    xsym << x(STATE_Z), 0, 0, x(STATE_VZ), 0, 0, 0;
-                    return xsym;
-
-                }
-
-            static auto tryToToIncorporateAttitude(
-                    const Vector & q,
-                    const Vector & x) -> Vector
-            {
-                // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = x(4);
-                const float v1 = x(5);
-                const float v2 = x(6);
-
-                return ((isVelPositive(v0) || isVelPositive(v1) || isVelPositive(v2))
-                        && (areVelsInBounds(v0, v1, v2))) ?
-                    qnorm(rotate(q, v0, v1, v2))
-                    : q;
-            }
-
-            static auto qnorm(const Vector & q) -> Vector
-            {
-                return q / (sqrt(q.cwiseProduct(q).sum()) + EPSILON);
-            }
-
-            static auto makeJacobian(
-                    const Vector & x,
-                    const Matrix & R,
-                    const Vector & gyro,
-                    const float dt) -> Matrix
-            {
-                const auto d0 = gyro(0)*dt/2;
-                const auto d1 = gyro(1)*dt/2;
-                const auto d2 = gyro(2)*dt/2;
-
-                const auto vx = 0;
-                const auto vy = 0;
-                const auto vz = x(STATE_VZ);
-
-                Matrix F(STATE_DIM, STATE_DIM);
-
-                // position
-                F(STATE_Z, STATE_Z) = 1;
-
-                // position from body-frame velocity
-                F(STATE_Z,STATE_VX) = 0;
-                F(STATE_Z,STATE_VY) = 0;
-                F(STATE_Z,STATE_VZ) = R(2,2)*dt;
-
-                // position from attitude error
-                F(STATE_Z,STATE_D0) = (vy*R(2,2) - vz*R(2,1))*dt;
-                F(STATE_Z,STATE_D1) = (-vx*R(2,2) + vz*R(2,0))*dt;
-                F(STATE_Z,STATE_D2) = (vx*R(2,1) - vy*R(2,0))*dt;
-
-                // body-frame velocity from body-frame velocity
-                F(STATE_VX,STATE_VX) = 1; //drag negligible
-                F(STATE_VY,STATE_VX) = 0;
-                F(STATE_VZ,STATE_VX) = 0;
-
-                F(STATE_VX,STATE_VY) = 0;
-                F(STATE_VY,STATE_VY) = 1; //drag negligible
-                F(STATE_VZ,STATE_VY) = 0;
-
-                F(STATE_VX,STATE_VZ) = 0;
-                F(STATE_VY,STATE_VZ) = 0;
-                F(STATE_VZ,STATE_VZ) = 1; //drag negligible
-
-                // body-frame velocity from attitude error
-                F(STATE_VX,STATE_D0) = 0;
-                F(STATE_VY,STATE_D0) = 0;
-                F(STATE_VZ,STATE_D0) = 0;
-
-                F(STATE_VX,STATE_D1) = 0;
-                F(STATE_VY,STATE_D1) = 0;
-                F(STATE_VZ,STATE_D1) = 0;
-
-                F(STATE_VX,STATE_D2) = 0;
-                F(STATE_VY,STATE_D2) = 0;
-                F(STATE_VZ,STATE_D2) = 0;
-
-                F(STATE_D0,STATE_D0) =  1 - d1*d1/2 - d2*d2/2;
-                F(STATE_D0,STATE_D1) =  d2 + d0*d1/2;
-                F(STATE_D0,STATE_D2) = -d1 + d0*d2/2;
-
-                F(STATE_D1,STATE_D0) = -d2 + d0*d1/2;
-                F(STATE_D1,STATE_D1) =  1 - d0*d0/2 - d2*d2/2;
-                F(STATE_D1,STATE_D2) =  d0 + d1*d2/2;
-
-                F(STATE_D2,STATE_D0) =  d1 + d0*d2/2;
-                F(STATE_D2,STATE_D1) = -d0 + d1*d2/2;
-                F(STATE_D2,STATE_D2) = 1 - d0*d0/2 - d1*d1/2;
-
-                return F;
-            }
-
-            static auto xinit() -> Vector
-            {
-                return Vector(STATE_DIM);
-            }
-
-            static auto qinit() -> Vector
-            {
-                auto q = Vector(4);
-                q << 1, 0, 0, 0;
-                return q;
-            }
-
-            static auto pinit() -> Matrix
-            {
-                auto P = Matrix(STATE_DIM, STATE_DIM);
-
-                const float noise[STATE_DIM] = {
                     STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                return addCovarianceNoise(P, noise);
+                ekf_addCovarianceNoise(pinit);
+
+                _isUpdated = false;
+                _lastPredictionMs = nowMs;
+                _lastProcessNoiseUpdateMs = nowMs;
             }
 
-            static auto pnoisy(const Matrix &P, const float dt)
-                -> Matrix
+            void predict(const uint32_t nowMs, bool isFlying) 
             {
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
+                axis3fSubSamplerFinalize(&_accSubSampler);
+                axis3fSubSamplerFinalize(&_gyroSubSampler);
 
-                return addCovarianceNoise(P, noise);
-            }
+                const float dt = (nowMs - _lastPredictionMs) / 1000.0f;
 
-            static auto rotate(const Vector & q,
-                    const float rx, const float ry, const float rz) -> Vector
-            {
-                const float angle = sqrt(rx*rx + ry*ry + rz*rz) + EPSILON;
-                const float ca = cos(angle / 2);
-                const float sa = sin(angle / 2);
-                const float dq[4] = {
-                    ca, sa*rx/angle, sa*ry/angle, sa*rz/angle
-                };
+                const ThreeAxis * accel = &_accSubSampler.subSample;
+                const ThreeAxis * gyro = &_gyroSubSampler.subSample;
 
-                auto qr = Vector(4);
+                const float d0 = gyro->x*dt/2;
+                const float d1 = gyro->y*dt/2;
+                const float d2 = gyro->z*dt/2;
 
-                qr << 
-                    dq[0]*q(0) - dq[1]*q(1) - dq[2]*q(2) - dq[3]*q(3),
-                    dq[1]*q(0) + dq[0]*q(1) + dq[3]*q(2) - dq[2]*q(3),
-                    dq[2]*q(0) - dq[3]*q(1) + dq[0]*q(2) + dq[1]*q(3),
-                    dq[3]*q(0) + dq[2]*q(1) - dq[1]*q(2) + dq[0]*q(3);
+                const float vx = 0;
+                const float vy = 0;
+                const float vz = _x[STATE_VZ];
 
-                return qr;
-            }
+                // The linearized Jacobean matrix
+                static float F[STATE_DIM][STATE_DIM];
 
-            static auto quat2rotation(const Vector & q) -> Matrix
-            {
-                auto R = Matrix(3, 3);
+                F[STATE_Z][STATE_VZ] = _r22*dt;
 
-                R <<
-                    q(0) * q(0) + q(1) * q(1) - q(2) * q(2) - q(3) * q(3),
-                    2 * q(1) * q(2) - 2 * q(0) * q(3),
-                    2 * q(1) * q(3) + 2 * q(0) * q(2),
-                    2 * q(1) * q(2) + 2 * q(0) * q(3),
-                    q(0) * q(0) - q(1) * q(1) + q(2) * q(2) - q(3) * q(3),
-                    2 * q(2) * q(3) - 2 * q(0) * q(1),
-                    2 * q(1) * q(3) - 2 * q(0) * q(2),
-                    2 * q(2) * q(3) + 2 * q(0) * q(1),
-                    q(0) * q(0) - q(1) * q(1) - q(2) * q(2) + q(3) * q(3);
+                // position from attitude error
+                F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
 
-                return R;
-            }
+                F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
 
-            static auto areVelsInBounds(
-                    const float vx, const float vy, const float vz) -> bool
-            {
-                return 
-                    isVelInBounds(vx) &&
-                    isVelInBounds(vy) &&
-                    isVelInBounds(vz);
-            }
+                F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
 
-            static auto isVelInBounds(const float vel) -> bool
-            {
-                return fabs(vel) < MAX_VELOCITY_MPS;
-            }
 
-            static auto isVelPositive(const float vel) -> bool
-            {
-                return fabs(vel) > MIN_VELOCITY_MPS;
-            }
+                F[STATE_VZ][STATE_VZ] = 1; //drag negligible
 
-            static auto updateWithScalar(const EKF & ekf, const float * hvals,
-                    const float error, const float stdMeasNoise) -> EKF
-            {
-                const auto r = stdMeasNoise * stdMeasNoise;
+                // body-frame velocity from attitude error
+                F[STATE_VZ][STATE_D0] =  GRAVITY*_r21*dt;
 
-                auto h = Vector(STATE_DIM);
+                F[STATE_VZ][STATE_D1] = -GRAVITY*_r20*dt;
 
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    h(k) = hvals[k];
+                F[STATE_VZ][STATE_D2] =  0;
+
+                F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
+                F[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
+
+                F[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
+                F[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                F[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
+
+                F[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
+                F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
+                F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+
+                ekf_predict(F);
+
+                const float dt2 = dt * dt;
+
+                // thrust can only be produced in the body's Z direction
+                const float dz = _x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
+
+                // position update
+                _x[STATE_Z] += _r22 * dz - GRAVITY * dt2 / 2.0f;
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+                _x[STATE_VZ] += dt * (accel->z - GRAVITY * _r22);
+
+                // attitude update (rotate by gyroscope), we do this in quaternions
+                // this is the gyroscope angular velocity integrated over the sample period
+                const float dtwx = dt*gyro->x;
+                const float dtwy = dt*gyro->y;
+                const float dtwz = dt*gyro->z;
+
+                // compute the quaternion values in [w,x,y,z] order
+                const float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const float ca = device_cos(angle/2.0f);
+                const float sa = device_sin(angle/2.0f);
+                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+
+                // rotate the vehicle's attitude by the delta quaternion vector computed above
+
+                float tmpq0 = dq[0]*_q0 - dq[1]*_q1 - dq[2]*_q2 - dq[3]*_q3;
+                float tmpq1 = dq[1]*_q0 + dq[0]*_q1 + dq[3]*_q2 - dq[2]*_q3;
+                float tmpq2 = dq[2]*_q0 - dq[3]*_q1 + dq[0]*_q2 + dq[1]*_q3;
+                float tmpq3 = dq[3]*_q0 + dq[2]*_q1 - dq[1]*_q2 + dq[0]*_q3;
+
+                if (!isFlying) {
+
+                    const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+
+                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION * _qinit0;
+                    tmpq1 = keep * tmpq1 + ROLLPITCH_ZERO_REVERSION * _qinit1;
+                    tmpq2 = keep * tmpq2 + ROLLPITCH_ZERO_REVERSION * _qinit2;
+                    tmpq3 = keep * tmpq3 + ROLLPITCH_ZERO_REVERSION * _qinit3;
                 }
 
-                const auto PHT = ekf.P * h;
+                // normalize and store the result
+                const float norm = device_sqrt(
+                        tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
 
-                const auto G = PHT / (r + PHT.dot(h));
+                _q0 = tmpq0/norm; 
+                _q1 = tmpq1/norm; 
+                _q2 = tmpq2/norm; 
+                _q3 = tmpq3/norm;
 
-                const auto GH = G * h.transpose();
-
-                const auto I = Matrix::Identity(STATE_DIM, STATE_DIM);
-
-                const auto GH_I = GH - I;
-
-                const auto P = GH_I * ekf.P * GH_I.transpose();
-
-                const auto x = ekf.x + G * error;
-
-                return EKF(
-                        x,
-                        P,
-                        ekf.q,
-                        ekf.R,
-                        ekf.accelSubSampler,
-                        ekf.gyroSubSampler,
-                        ekf.imuSampleCount,
-                        ekf.didResetEstimation,
-                        true, // isUpdated
-                        ekf.lastPredictionMs,
-                        ekf.lastProcessNoiseUpdateMs);
+                _isUpdated = true;
+                _lastPredictionMs = nowMs;
             }
+
+            void getStateEstimate(const uint32_t nowMs, VehicleState & state)
+            {
+                addProcessNoise(nowMs);
+
+                // Update with queued measurements and flush the queue
+                for (uint32_t k=0; k<_queueLength; ++k) {
+                    update(_measurementsQueue[k], nowMs);
+                }
+                _queueLength = 0;
+
+                state.z = _x[STATE_Z];
+
+                if (_isUpdated) {
+                    finalize(nowMs);
+                }
+
+                state.dx = 0;
+                state.dy = 0;
+                state.dz = _r22*_x[STATE_VZ];
+
+                state.phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
+                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
+
+                state.theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
+
+                state.psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
+                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); // make right pos
+            }
+
+            void enqueueImu(const ThreeAxis * gyro, const ThreeAxis * accel)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeGyroscope;
+                m.data.gyroscope.gyro = *gyro;
+                enqueue(&m);
+
+                m = {};
+                m.type = MeasurementTypeAcceleration;
+                m.data.acceleration.acc = *accel;
+                enqueue(&m);
+            }
+
+            /*
+            void enqueueFlow(const OpticalFlow::measurement_t * flow)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeFlow;
+                m.data.flow = *flow;
+                enqueue(&m);
+            }*/
+
+            void enqueueRange(const ZRangerFilter * zrangerFilter)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeTOF;
+                m.data.tof = *zrangerFilter;
+                enqueue(&m);
+            }
+
+        private:
+
+            typedef enum {
+                MeasurementTypeAcceleration,
+                MeasurementTypeGyroscope,
+                MeasurementTypeTOF,
+                MeasurementTypeFlow,
+            } MeasurementType;
+
+
+            typedef struct
+            {
+                ThreeAxis gyro; // deg/s, for legacy reasons
+            } gyroscopeMeasurement_t;
+
+            typedef struct
+            {
+                ThreeAxis acc; // Gs, for legacy reasons
+            } accelerationMeasurement_t;
+
+            typedef struct
+            {
+                MeasurementType type;
+                union
+                {
+                    gyroscopeMeasurement_t gyroscope;
+                    accelerationMeasurement_t acceleration;
+                    ZRangerFilter tof;
+                    //OpticalFlow::measurement_t flow;
+                } data;
+            } measurement_t;
+
+
+            static const size_t QUEUE_MAX_LENGTH = 20;
+            static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+            EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+            uint32_t _queueLength;
+
+            void enqueue(const EKF::measurement_t * measurement) 
+            {
+                memcpy(&_measurementsQueue[_queueLength], measurement,
+                        sizeof(EKF::measurement_t));
+                _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
+            }
+
+            typedef struct {
+                ThreeAxis sum;
+                uint32_t count;
+                float conversionFactor;
+                ThreeAxis subSample;
+            } ThreeAxisSubSampler_t;
+
+            // Quaternion used for initial orientation [w,x,y,z]
+            float _qinit0, _qinit1, _qinit2, _qinit3;
+
+            ThreeAxis _accLatest;
+            ThreeAxis _gyroLatest;
+
+            ThreeAxisSubSampler_t _accSubSampler;
+            ThreeAxisSubSampler_t _gyroSubSampler;
+
+            float _predictedNX;
+            float _predictedNY;
+
+            float _measuredNX;
+            float _measuredNY;
+
+            // The vehicle's attitude as a rotation matrix (used by the prediction,
+            // updated by the finalization)
+            float _r20, _r21, _r22; 
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            float _q0, _q1, _q2, _q3;
+
+            static void axis3fSubSamplerInit(ThreeAxisSubSampler_t* subSampler, const
+                    float conversionFactor) { memset(subSampler, 0,
+                        sizeof(ThreeAxisSubSampler_t));
+                    subSampler->conversionFactor = conversionFactor;
+            }
+
+            static void axis3fSubSamplerAccumulate(ThreeAxisSubSampler_t* subSampler,
+                    const ThreeAxis* sample) {
+                subSampler->sum.x += sample->x;
+                subSampler->sum.y += sample->y;
+                subSampler->sum.z += sample->z;
+
+                subSampler->count++;
+            }
+
+            static ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler) 
+            {
+                if (subSampler->count > 0) {
+                    subSampler->subSample.x = 
+                        subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
+                    subSampler->subSample.y = 
+                        subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
+                    subSampler->subSample.z = 
+                        subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
+
+                    // Reset
+                    subSampler->count = 0;
+                    subSampler->sum.x = 0;
+                    subSampler->sum.y = 0;
+                    subSampler->sum.z = 0;
+                }
+
+                return &subSampler->subSample;
+            }
+
+            void finalize(const uint32_t nowMs)
+            {
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const float v0 = _x[STATE_D0];
+                const float v1 = _x[STATE_D1];
+                const float v2 = _x[STATE_D2];
+
+                // Move attitude error into attitude if any of the angle errors are
+                // large enough
+                if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
+                            0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
+                                fabsf(v2) < 10)) {
+
+                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                    const float ca = device_cos(angle / 2.0f);
+                    const float sa = device_sin(angle / 2.0f);
+                    const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                    // Rotate the vehicle's attitude by the delta quaternion vector
+                    // computed above
+                    const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
+                        dq[2] * _q2 - dq[3] * _q3;
+                    const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
+                        dq[3] * _q2 - dq[2] * _q3;
+                    const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
+                        dq[0] * _q2 + dq[1] * _q3;
+                    const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
+                        dq[1] * _q2 + dq[0] * _q3;
+
+                    // normalize and store the result
+                    float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                            tmpq3 * tmpq3) + EPSILON;
+                    _q0 = tmpq0 / norm;
+                    _q1 = tmpq1 / norm;
+                    _q2 = tmpq2 / norm;
+                    _q3 = tmpq3 / norm;
+                }
+
+                // Convert the new attitude to a rotation matrix, such that we can
+                // rotate body-frame velocity and acc
+
+                _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
+                _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
+                _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
+
+                // reset the attitude error
+                _x[STATE_D0] = 0;
+                _x[STATE_D1] = 0;
+                _x[STATE_D2] = 0;
+
+                ekf_enforceSymmetry();
+
+                _isUpdated = false;
+            }
+
+            void addProcessNoise(const uint32_t nowMs) 
+            {
+                float dt = (nowMs - _lastProcessNoiseUpdateMs) / 1000.0f;
+
+                if (dt > 0) {
+
+                    const float noise[STATE_DIM] = {
+                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                    };
+
+                    ekf_addCovarianceNoise(noise);
+                    ekf_enforceSymmetry();
+
+                    _lastProcessNoiseUpdateMs = nowMs;
+                }
+            }
+
+            void update(measurement_t & m, const uint32_t nowMs)
+            {
+                switch (m.type) {
+
+                    case MeasurementTypeTOF:
+                        updateWithTof(&m.data.tof);
+                        break;
+
+                    case MeasurementTypeFlow:
+                        //updateWithFlow(&m.data.flow);
+                        break;
+
+                    case MeasurementTypeGyroscope:
+                        updateWithGyro(m);
+                        break;
+
+                    case MeasurementTypeAcceleration:
+                        updateWithAccel(m);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            void updateWithTof(ZRangerFilter *tof)
+            {
+                // Updates the filter with a measured distance in the zb direction using the
+                float h[STATE_DIM] = {};
+
+                // Only update the filter if the measurement is reliable 
+                // (\hat{h} -> infty when R[2][2] -> 0)
+                if (fabs(_r22) > 0.1f && _r22 > 0) {
+                    float angle = 
+                        fabsf(acosf(_r22)) - 
+                        Num::DEG2RAD * (15.0f / 2.0f);
+                    if (angle < 0.0f) {
+                        angle = 0.0f;
+                    }
+                    float predictedDistance = _x[STATE_Z] / cosf(angle);
+                    float measuredDistance = tof->distance_m;
+
+                    // This just acts like a gain for the sensor model. Further
+                    // updates are done in the scalar update function below
+                    h[STATE_Z] = 1 / cosf(angle); 
+
+                    ekf_updateWithScalar(h, measuredDistance-predictedDistance, tof->stdev);
+
+                    _isUpdated = true;
+                }
+            }
+
+            void updateWithAccel(measurement_t & m)
+            {
+                axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.acceleration.acc);
+                _accLatest = m.data.acceleration.acc;
+            }
+
+            void updateWithGyro(measurement_t & m)
+            {
+                axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.gyroscope.gyro);
+                _gyroLatest = m.data.gyroscope.gyro;
+            }
+
+            // State vector
+            __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+
+            // Covariance helper
+            matrix_t _p_m;
+
+            // Tracks whether an update to the state has been made, and the state
+            // therefore requires finalization
+            bool _isUpdated;
+
+            uint32_t _lastPredictionMs;
+            uint32_t _lastProcessNoiseUpdateMs;
+
+            void ekf_init()
+            {
+                for (int i=0; i< STATE_DIM; i++) {
+
+                    _x[i] = 0;
+
+                    for (int j=0; j < STATE_DIM; j++) {
+                        _p[i][j] = 0; 
+                    }
+                }
+
+                _p_m.numRows = STATE_DIM;
+                _p_m.numCols = STATE_DIM;
+                _p_m.pData = (float*)_p;
+            }
+
+            void ekf_addCovarianceNoise(const float * noise)
+            {
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    _p[k][k] += noise[k] * noise[k];
+                }
+            }
+
+            void ekf_enforceSymmetry()
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i]);
+                    }
+                }
+            }
+
+            // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+            void ekf_predict(const float F[STATE_DIM][STATE_DIM])
+            {
+                static __attribute__((aligned(4))) matrix_t Fm = { 
+                    STATE_DIM, STATE_DIM, (float *)F
+                };
+
+                static float tmpNN1d[STATE_DIM * STATE_DIM];
+                static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
+                    STATE_DIM, STATE_DIM, tmpNN1d
+                };
+
+                static float tmpNN2d[STATE_DIM * STATE_DIM];
+                static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
+                    STATE_DIM, STATE_DIM, tmpNN2d
+                };
+
+                device_mat_mult(&Fm, &_p_m, &tmpNN1m); // F P
+                device_mat_trans(&Fm, &tmpNN2m); // F'
+                device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
+
+            }
+
+            void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
+            {
+                matrix_t Hm = {1, STATE_DIM, (float *)h};
+
+                // The Kalman gain as a column vector
+                static float G[STATE_DIM];
+                static matrix_t Gm = {STATE_DIM, 1, (float *)G};
+
+                // Temporary matrices for the covariance updates
+                static float tmpNN1d[STATE_DIM * STATE_DIM];
+                static matrix_t tmpNN1m = {
+                    STATE_DIM, STATE_DIM, tmpNN1d
+                };
+
+                static float tmpNN2d[STATE_DIM * STATE_DIM];
+                static matrix_t tmpNN2m = {
+                    STATE_DIM, STATE_DIM, tmpNN2d
+                };
+
+                static float tmpNN3d[STATE_DIM * STATE_DIM];
+                static matrix_t tmpNN3m = {
+                    STATE_DIM, STATE_DIM, tmpNN3d
+                };
+
+                static float HTd[STATE_DIM * 1];
+                static matrix_t HTm = {STATE_DIM, 1, HTd};
+
+                static float PHTd[STATE_DIM * 1];
+                static matrix_t PHTm = {STATE_DIM, 1, PHTd};
+
+                device_mat_trans(&Hm, &HTm);
+                device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
+                float R = stdMeasNoise*stdMeasNoise;
+                float HPHR = R; // HPH' + R
+                for (int i=0; i<STATE_DIM; i++) { 
+                    // Add the element of HPH' to the above
+                    // this obviously only works if the update is scalar (as in this function)
+                    HPHR += Hm.pData[i]*PHTd[i]; 
+                }
+
+                // Calculate the Kalman gain and perform the state update
+                for (int i=0; i<STATE_DIM; i++) {
+                    G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                    _x[i] = _x[i] + G[i] * error; // state update
+                }
+
+                device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+                for (int i=0; i<STATE_DIM; i++) { 
+                    tmpNN1d[STATE_DIM*i+i] -= 1; 
+                } // GH - I
+                device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+                device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+                device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+
+                // add the measurement variance and ensure boundedness and symmetry
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        float v = G[i] * R * G[j];
+
+                        // add measurement noise
+                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+                    }
+                }
+            }
+
+            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
+            {
+                if (isnan(pval) || pval > MAX_COVARIANCE) {
+                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                } else if ( i==j && pval < MIN_COVARIANCE ) {
+                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                } else {
+                    _p[i][j] = _p[j][i] = pval;
+                }
+            }
+            void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
+
+            void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
+                    matrix_t * pDst);
+
+            static float device_cos(const float x);
+
+            static float device_sin(const float x);
+
+            static float device_sqrt(const float32_t in);
     };
+
 }

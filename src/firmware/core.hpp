@@ -77,7 +77,9 @@ namespace hf {
                     _zrangerFilter = ZRangerFilter::step(
                             _zrangerFilter, ZRanger::read());
 
-                    _ekf = EKF::updateWithZRange(_ekf, _zrangerFilter);
+                    _ekf.enqueueRange(&_zrangerFilter);
+
+                    //_ekf = EKF::updateWithZRange(_ekf, _zrangerFilter);
                 }
 
                 loop(rx, motors, led);
@@ -86,6 +88,8 @@ namespace hf {
             void setup(RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 IMU::begin();
+
+                _ekf.init(millis());
 
                 rx.begin();
 
@@ -99,7 +103,8 @@ namespace hf {
                 const auto loop_start_usec = micros();
 
                 if (_ekfPredictionTimer.ready(EKF_PREDICTION_RATE_HZ)) {
-                    _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
+                    _ekf.predict(millis(), _flyingCheck.isFlying);
+                    //_ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
                 }
 
                 const auto dt = Timer::getDt();
@@ -117,9 +122,20 @@ namespace hf {
                 _flyingCheck = _flyingCheck.run(
                         _flyingCheck, millis(), _mixer.motorvals, 4);
 
-                _ekf = EKF::updateWithImu(_ekf, millis(), _imuFilter.output);
+                const auto gyroDps = _imuFilter.output.gyroDps;
 
-                const auto state = EKF::getVehicleState(_ekf, _imuFilter.output);
+                _ekf.enqueueImu(&gyroDps, &_imuFilter.output.accelGs);
+
+                //_ekf = EKF::updateWithImu(_ekf, millis(), _imuFilter.output);
+
+                //const auto state = EKF::getVehicleState(_ekf, _imuFilter.output);
+
+                VehicleState state = {};
+                _ekf.getStateEstimate(millis(), state);
+
+                state.dphi   =  gyroDps.x;
+                state.dtheta =  gyroDps.y;
+                state.dpsi   = -gyroDps.z;
 
                 _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
@@ -134,7 +150,7 @@ namespace hf {
                     motors.run(rxdata.is_armed, _mixer.motorvals);
                 }
 
-                Debugger::report(state);
+                //Debugger::report(state);
 
                 Timer::runDelayLoop(loop_start_usec);
 

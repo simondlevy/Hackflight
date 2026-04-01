@@ -121,20 +121,30 @@ namespace hf {
                             setpoint.pitch, setpoint.yaw); }
             }
 
-            static void report(const VehicleState & state)
+            static void report(const VehicleState & state, const bool full=false)
             {
                 static Helper _helper;
 
                 if (_helper.ready()) {
 
-                    printf("%5lu | "
-                            //"dx=%+8.3f dy=%+8.3f z=%8.3f dz=%+8.3f "
-                            "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
-                            "psi=%+04.0f dpsi=%+04.0f\n",
-                            _helper.count, 
-                            //state.dx, state.dy, state.z, state.dz,
-                            state.phi, state.dphi, state.theta, state.dtheta,
-                            state.psi, state.dpsi);
+                    if (full) {
+                        printf("%5lu | "
+                                "z=%8.3f dz=%+8.3f "
+                                "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
+                                "psi=%+04.0f dpsi=%+04.0f\n",
+                                _helper.count, 
+                                state.z, state.dz,
+                                state.phi, state.dphi, state.theta, state.dtheta,
+                                state.psi, state.dpsi);
+                    }
+                    else {
+                        printf("%5lu | "
+                                "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
+                                "psi=%+04.0f dpsi=%+04.0f\n",
+                                _helper.count, 
+                                state.phi, state.dphi, state.theta, state.dtheta,
+                                state.psi, state.dpsi);
+                     }
                 }
             }
 
@@ -159,7 +169,7 @@ namespace hf {
                     const auto a = imufilt.accelGs;
 
                     printf("%5lu | gx=%+04.0f gy=%+04.0f gz=%+04.0f DPS | "
-                           "ax=%+05.3f ay=%+05.3f az=%+05.3f Gs\n",
+                            "ax=%+05.3f ay=%+05.3f az=%+05.3f Gs\n",
                             _helper.count, g.x, g.y, g.z, a.x, a.y, a.z);
                 }
             }
