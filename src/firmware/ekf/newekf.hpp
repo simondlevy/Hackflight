@@ -69,13 +69,13 @@ namespace hf {
 
             // Indices to access the vehicle's state, stored as a column vector
             enum {
-                STATE_Z,   // 0
-                STATE_VX,  // 1
-                STATE_VY,  // 2
-                STATE_VZ,  // 3
-                STATE_D0,  // 4
-                STATE_D1,  // 5
-                STATE_D2,  // 6
+                STATE_VX,  
+                STATE_VY,  
+                STATE_Z,   
+                STATE_VZ,  
+                STATE_D0,  
+                STATE_D1,  
+                STATE_D2,  
                 STATE_DIM
             };
 
@@ -177,7 +177,7 @@ namespace hf {
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
                 Vector x = Vector(STATE_DIM);
-                x << z, 0, 0, vz, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
+                x << 0, 0, z, vz, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
 
                 return EKF(
                         x,
@@ -317,7 +317,7 @@ namespace hf {
 
                 const auto measured_distance = zrfilter.distance_m;
 
-                const float h[STATE_DIM] = {1/cosf(angle), 0, 0, 0, 0, 0, 0};
+                const float h[STATE_DIM] = {0, 0, 1/cosf(angle), 0, 0, 0, 0};
 
                 return fabs(r22) > 0.1 && r22 > 0 ?
                     updateWithScalar(ekf, h,
