@@ -150,8 +150,8 @@ namespace hf {
                 const auto dt2 = dt * dt;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = ekf.x(STATE_VX) * dt + (isFlying ? 0 : accel(0) * dt2 / 2);
-                const auto dy = ekf.x(STATE_VY) * dt + (isFlying ? 0 : accel(1) * dt2 / 2);
+                const auto dx = isFlying ? 0 : accel(0) * dt2 / 2;
+                const auto dy = isFlying ? 0 : accel(1) * dt2 / 2;
 
                 // thrust can only be produced in the body's Z direction
                 const auto dz = ekf.x(STATE_VZ) * dt + accel(2) * dt2 / 2; 
