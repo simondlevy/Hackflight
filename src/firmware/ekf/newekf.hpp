@@ -143,7 +143,6 @@ namespace hf {
                 // keep previous time step's state for the update
                 const auto tmpSPX = 0;
                 const auto tmpSPY = 0;
-                const auto tmpSPZ = ekf.x(STATE_VZ);
 
                 const auto dt2 = dt * dt;
 
@@ -155,11 +154,8 @@ namespace hf {
                 const auto dz = ekf.x(STATE_VZ) * dt + accel(2) * dt2 / 2; 
 
                 // position update
-                const auto x0 = ekf.x(STATE_Z) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
+                const auto z = ekf.x(STATE_Z) + ekf.R(2,0) * dx + ekf.R(2,1) * dy
                     + ekf.R(2,2) * dz - G * dt2 / 2;
-
-                const auto accelx = isFlying ? 0 : accel(0);
-                const auto accely = isFlying ? 0 : accel(1);
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -186,7 +182,7 @@ namespace hf {
                     keep * pq + ROLLPITCH_ZERO_REVERSION * qinit;
 
                 Vector x = Vector(STATE_DIM);
-                x << x0, 0,   0, x3, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
+                x << z, 0,   0, x3, ekf.x(STATE_D0), ekf.x(STATE_D1), ekf.x(STATE_D2); 
                 //   z   vx  vy  vz
 
                 return EKF(
