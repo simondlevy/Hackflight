@@ -143,8 +143,8 @@ namespace hf {
                 const auto P = (F * ekf.P) * F.transpose();
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = ekf.x(STATE_VX);
-                const auto tmpSPY = ekf.x(STATE_VY);
+                const auto tmpSPX = 0;
+                const auto tmpSPY = 0;
                 const auto tmpSPZ = ekf.x(STATE_VZ);
 
                 const auto dt2 = dt * dt;
