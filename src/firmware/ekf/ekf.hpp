@@ -480,12 +480,12 @@ namespace hf {
                 F(STATE_VY,STATE_VX) = 0;
                 F(STATE_VZ,STATE_VX) = 0;
 
-                F(STATE_VX,STATE_VY) = gyro(2)*dt;
+                F(STATE_VX,STATE_VY) = 0;
                 F(STATE_VY,STATE_VY) = 1; //drag negligible
-                F(STATE_VZ,STATE_VY) =-gyro(0)*dt;
+                F(STATE_VZ,STATE_VY) = 0;
 
-                F(STATE_VX,STATE_VZ) =-gyro(1)*dt;
-                F(STATE_VY,STATE_VZ) = gyro(0)*dt;
+                F(STATE_VX,STATE_VZ) = 0;
+                F(STATE_VY,STATE_VZ) = 0;
                 F(STATE_VZ,STATE_VZ) = 1; //drag negligible
 
                 // body-frame velocity from attitude error
