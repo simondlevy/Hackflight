@@ -477,8 +477,8 @@ namespace hf {
 
                 // body-frame velocity from body-frame velocity
                 F(STATE_VX,STATE_VX) = 1; //drag negligible
-                F(STATE_VY,STATE_VX) =-gyro(2)*dt;
-                F(STATE_VZ,STATE_VX) = gyro(1)*dt;
+                F(STATE_VY,STATE_VX) = 0;
+                F(STATE_VZ,STATE_VX) = 0;
 
                 F(STATE_VX,STATE_VY) = gyro(2)*dt;
                 F(STATE_VY,STATE_VY) = 1; //drag negligible
