@@ -24,7 +24,7 @@ using namespace hf;
 static MPU6050 _mpu6050;
 
 static constexpr uint8_t GRANGE = MPU6050_GYRO_FS_2000;
-static constexpr uint8_t ARANGE = MPU6050_ACCEL_FS_16;
+static constexpr uint8_t ARANGE = MPU6050_ACCEL_FS_2;
 
 void IMU::begin() 
 {

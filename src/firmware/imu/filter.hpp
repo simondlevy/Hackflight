@@ -86,8 +86,6 @@ namespace hf {
             {
                 const auto gyroraw = imuraw.gyro;
 
-                Debugger::report(gyroraw);
-
                 const auto gyromean = filter._gyroSum / GYRO_NBR_OF_SAMPLES;
 
                 const auto gyrovariance =
@@ -116,13 +114,29 @@ namespace hf {
                 const auto wantUpdate =!filter.isGyroCalibrated &&
                     isBufferFilled;
 
-                const auto shouldUpdate = wantUpdate && 
-                    gyrovariance < GYRO_RAW_VARIANCE_BASE &&
-                    filter._gyroVarianceSampleTimeMsec +
-                    GYRO_MIN_BIAS_TIMEOUT_MS < msec_curr;
+                const bool isGyroVarianceLow = gyrovariance < GYRO_RAW_VARIANCE_BASE;
 
-                const auto gyroBias = shouldUpdate ?  gyromean :
-                    filter._gyroBias;
+                const bool inSampleWindow = (filter._gyroVarianceSampleTimeMsec +
+                     GYRO_MIN_BIAS_TIMEOUT_MS) < msec_curr;
+
+                const auto shouldUpdate =
+                    wantUpdate && isGyroVarianceLow && inSampleWindow;
+
+                /*
+                static bool _didUpdate;
+                static uint32_t _count;
+                if (shouldUpdate) {
+                    _didUpdate = true;
+                }
+                if (!_didUpdate) {
+                    printf("%05lu: (x=%+5.0f y=%+5.0f z=%+5.0f) => " 
+                            "(x=%+5.0f y=%+5.0f z=%+5.0f)\n",
+                            _count++,
+                            gyroval.x, gyroval.y, gyroval.z,
+                            gyrovariance.x, gyrovariance.y, gyrovariance.z);
+                }*/
+
+                const auto gyroBias = shouldUpdate ?  gyromean : filter._gyroBias;
 
                 const auto gyroVarianceSampleTimeMsec =
                     shouldUpdate ? msec_curr : filter._gyroVarianceSampleTimeMsec;

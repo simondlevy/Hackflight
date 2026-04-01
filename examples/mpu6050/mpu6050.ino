@@ -38,12 +38,12 @@ static hf::Core _core;
 
 void setup()
 {
-    // _core.setupWithZRanger(_rx, _motors, _led, ZRANGER_INTERRUPT_PIN);
+    _core.setupWithZRanger(_rx, _motors, _led, ZRANGER_INTERRUPT_PIN);
     _core.setup(_rx, _motors, _led);
 }
 
 void loop()
 {
-    //_core.loopWithZRanger(_rx, _motors, _led); 
-    _core.loop(_rx, _motors, _led); 
+    _core.loopWithZRanger(_rx, _motors, _led); 
+    //_core.loop(_rx, _motors, _led); 
 }

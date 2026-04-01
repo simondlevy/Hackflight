@@ -39,7 +39,6 @@ namespace hf {
                 STATE_D1,
                 STATE_D2,
                 STATE_DIM
-
             };
 
             // Initial variances, uncertain of position, but know we're
@@ -267,7 +266,7 @@ namespace hf {
             void enqueueRange(const ZRangerFilter * zrangerFilter)
             {
                 measurement_t m = {};
-                m.type = MeasurementTypeTOF;
+                m.type = MeasurementTypeRange;
                 m.data.tof = *zrangerFilter;
                 enqueue(&m);
             }
@@ -277,7 +276,7 @@ namespace hf {
             typedef enum {
                 MeasurementTypeAcceleration,
                 MeasurementTypeGyroscope,
-                MeasurementTypeTOF,
+                MeasurementTypeRange,
                 MeasurementTypeFlow,
             } MeasurementType;
 
@@ -463,8 +462,8 @@ namespace hf {
             {
                 switch (m.type) {
 
-                    case MeasurementTypeTOF:
-                        updateWithTof(&m.data.tof);
+                    case MeasurementTypeRange:
+                        updateWithRange(&m.data.tof);
                         break;
 
                     case MeasurementTypeFlow:
@@ -484,7 +483,7 @@ namespace hf {
                 }
             }
 
-            void updateWithTof(ZRangerFilter *tof)
+            void updateWithRange(ZRangerFilter *tof)
             {
                 // Updates the filter with a measured distance in the zb direction using the
                 float h[STATE_DIM] = {};
@@ -492,22 +491,27 @@ namespace hf {
                 // Only update the filter if the measurement is reliable 
                 // (\hat{h} -> infty when R[2][2] -> 0)
                 if (fabs(_r22) > 0.1f && _r22 > 0) {
+
                     float angle = 
-                        fabsf(acosf(_r22)) - 
-                        Num::DEG2RAD * (15.0f / 2.0f);
+                        fabsf(acosf(_r22)) - Num::DEG2RAD * (15.0f / 2.0f);
+
                     if (angle < 0.0f) {
                         angle = 0.0f;
                     }
+
                     float predictedDistance = _x[STATE_Z] / cosf(angle);
+
                     float measuredDistance = tof->distance_m;
 
                     // This just acts like a gain for the sensor model. Further
                     // updates are done in the scalar update function below
                     h[STATE_Z] = 1 / cosf(angle); 
 
-                    ekf_updateWithScalar(h, measuredDistance-predictedDistance, tof->stdev);
+                    (void)measuredDistance;
+                    (void)predictedDistance;
+                    (void)h;
 
-                    _isUpdated = true;
+                    //ekf_updateWithScalar(h, measuredDistance-predictedDistance, tof->stdev);
                 }
             }
 
@@ -639,7 +643,7 @@ namespace hf {
                 // Calculate the Kalman gain and perform the state update
                 for (int i=0; i<STATE_DIM; i++) {
                     G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                    _x[i] = _x[i] + G[i] * error; // state update
+                    //_x[i] = _x[i] + G[i] * error; // state update
                 }
 
                 device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH

@@ -82,7 +82,27 @@ namespace hf {
                 }
             }
 
-            static void report(const char * label, const bool flag)
+            static void report(const char * message)
+            {
+                static Helper _helper;
+
+                if (_helper.ready()) {
+
+                    printf("%5lu | %s\n", _helper.count, message);
+                }
+            }
+
+            static void reportFloat(const char * label, const float value)
+            {
+                static Helper _helper;
+
+                if (_helper.ready()) {
+
+                    printf("%5lu | %s=%f\n", _helper.count, label, value);
+                }
+            }
+
+            static void reportBool(const char * label, const bool flag)
             {
                 static Helper _helper;
 

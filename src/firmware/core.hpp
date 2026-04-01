@@ -62,29 +62,6 @@ namespace hf {
 
         public:
 
-            void setupWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led,
-                    const uint8_t zranger_interrupt_pin)
-            {
-                setup(rx, motors, led);
-
-                ZRanger::begin(zranger_interrupt_pin);
-
-            }
-            void loopWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led)
-            {
-                if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
-
-                    _zrangerFilter = ZRangerFilter::step(
-                            _zrangerFilter, ZRanger::read());
-
-                    _ekf.enqueueRange(&_zrangerFilter);
-
-                    //_ekf = EKF::updateWithZRange(_ekf, _zrangerFilter);
-                }
-
-                loop(rx, motors, led);
-            }
-
             void setup(RX & rx, DshotTeensy4 & motors, LED & led)
             {
                 IMU::begin();
@@ -104,7 +81,6 @@ namespace hf {
 
                 if (_ekfPredictionTimer.ready(EKF_PREDICTION_RATE_HZ)) {
                     _ekf.predict(millis(), _flyingCheck.isFlying);
-                    //_ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying);
                 }
 
                 const auto dt = Timer::getDt();
@@ -125,10 +101,6 @@ namespace hf {
                 const auto gyroDps = _imuFilter.output.gyroDps;
 
                 _ekf.enqueueImu(&gyroDps, &_imuFilter.output.accelGs);
-
-                //_ekf = EKF::updateWithImu(_ekf, millis(), _imuFilter.output);
-
-                //const auto state = EKF::getVehicleState(_ekf, _imuFilter.output);
 
                 VehicleState state = {};
                 _ekf.getStateEstimate(millis(), state);
@@ -155,6 +127,27 @@ namespace hf {
                 Timer::runDelayLoop(loop_start_usec);
 
                 //Profiler::report();
+            }
+
+            void setupWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led,
+                    const uint8_t zranger_interrupt_pin)
+            {
+                setup(rx, motors, led);
+
+                ZRanger::begin(zranger_interrupt_pin);
+
+            }
+            void loopWithZRanger(RX & rx, DshotTeensy4 & motors, LED & led)
+            {
+                if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
+
+                    _zrangerFilter = ZRangerFilter::step(
+                            _zrangerFilter, ZRanger::read());
+
+                    _ekf.enqueueRange(&_zrangerFilter);
+                }
+
+                loop(rx, motors, led);
             }
 
         private:

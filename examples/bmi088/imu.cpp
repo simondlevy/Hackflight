@@ -54,7 +54,7 @@ int16_t IMU::gyroRangeDps()
 
 int16_t IMU::accelRangeGs()
 {
-    static constexpr int16_t aranges[4] = {3, 6, 12, 16};
+    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
 
     return aranges[ARANGE];
 }
