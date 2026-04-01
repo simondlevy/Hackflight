@@ -35,7 +35,6 @@ namespace hf {
 
         private:
 
-            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
             static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
             static constexpr float PROC_NOISE_VEL = 0;
             static constexpr float PROC_NOISE_POS = 0;
@@ -547,8 +546,8 @@ namespace hf {
             {
                 const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    0,
+                    0,
                     PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
