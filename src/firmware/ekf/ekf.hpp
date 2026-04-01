@@ -466,8 +466,8 @@ namespace hf {
                 F(STATE_Z, STATE_Z) = 1;
 
                 // position from body-frame velocity
-                F(STATE_Z,STATE_VX) = R(2,0)*dt;
-                F(STATE_Z,STATE_VY) = R(2,1)*dt;
+                F(STATE_Z,STATE_VX) = 0;
+                F(STATE_Z,STATE_VY) = 0;
                 F(STATE_Z,STATE_VZ) = R(2,2)*dt;
 
                 // position from attitude error
