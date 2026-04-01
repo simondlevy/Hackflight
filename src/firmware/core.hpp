@@ -29,7 +29,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/ekf/ekf.hpp>
+#include <firmware/ekf/newekf.hpp>
 #include <firmware/imu/device_api.h>
 #include <firmware/imu/filter.hpp>
 #include <firmware/flying.hpp>
