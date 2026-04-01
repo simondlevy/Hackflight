@@ -421,7 +421,7 @@ namespace hf {
                 -> Vector
                 {
                     Vector xsym = Vector(STATE_DIM);
-                    xsym << x(STATE_Z), x(STATE_VX), x(STATE_VY), x(STATE_VZ), 0, 0, 0;
+                    xsym << x(STATE_Z), 0, 0, x(STATE_VZ), 0, 0, 0;
                     return xsym;
 
                 }
@@ -456,8 +456,8 @@ namespace hf {
                 const auto d1 = gyro(1)*dt/2;
                 const auto d2 = gyro(2)*dt/2;
 
-                const auto vx = x(STATE_VX);
-                const auto vy = x(STATE_VY);
+                const auto vx = 0;
+                const auto vy = 0;
                 const auto vz = x(STATE_VZ);
 
                 Matrix F(STATE_DIM, STATE_DIM);
