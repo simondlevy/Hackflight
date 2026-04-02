@@ -284,7 +284,7 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            auto getStateEstimate(const uint32_t msec_curr) -> EstimatedState
+            auto getVehicleState(const uint32_t msec_curr) -> VehicleState
             {
                 addProcessNoise(msec_curr);
 
@@ -311,13 +311,20 @@ namespace hf {
                 const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
                         _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
 
+                const auto dphi = _gyroLatest.x;
+
                 const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
 
-                // make right positive
-                const auto psi = -Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
+                const auto dtheta = _gyroLatest.y;
+
+                const auto psi = Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
                         _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
 
-                return EstimatedState(dx, dy, z, dz, phi, theta, psi);
+                const auto dpsi = _gyroLatest.z;
+
+                // Return psi/dpsi nose-right positive
+                return VehicleState(
+                        dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
             void enqueueImu(const ImuFiltered & imu)

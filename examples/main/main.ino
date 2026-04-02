@@ -118,16 +118,7 @@ void loop()
         _ekf.predict(msec_curr, _flyingCheck.isFlying); 
     }
 
-    // Get state estimate from EKF
-    const auto estate = _ekf.getStateEstimate(msec_curr);
-
-    // Get angular velocities directly from gyro, negating gyro Z
-    // for nose-right positive
-    const auto state = VehicleState(
-            estate.dx, estate.dy, estate.z, estate.dz,
-            estate.phi, _imuFilter.output.gyroDps.x,
-            estate.theta, _imuFilter.output.gyroDps.y,
-            estate.psi, -_imuFilter.output.gyroDps.z); 
+    const auto state = _ekf.getVehicleState(msec_curr);
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
