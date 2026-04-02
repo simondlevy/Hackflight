@@ -124,7 +124,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    Debugger::report(state);
+    //Debugger::report(state);
     //Profiler::report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,

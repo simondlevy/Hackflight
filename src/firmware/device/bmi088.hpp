@@ -99,8 +99,10 @@ namespace hf {
 
         private:
 
-            Bmi088Accel accel = Bmi088Accel(Wire, 0x19);
-            Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x69);
+            // The SDO pin should either be pulled low for the 0x18/0x68
+            // addresses, high for 0x19/0x69
+            Bmi088Accel accel = Bmi088Accel(Wire, 0x18);
+            Bmi088Gyro gyro = Bmi088Gyro(Wire, 0x68);
 
             static bool okay(const int status)
             {
