@@ -60,48 +60,6 @@ static ImuFilter _imuFilter;
 
 static EKF _ekf;
 
-static auto getVehicleState(const ImuRaw & imuraw, 
-        const bool isFlying) -> VehicleState
-{
-    _imuFilter.step(millis(), imuraw);
-
-    _ekf.enqueueImu(_imuFilter.output);
-
-    static Timer _timer;
-
-    static bool _didResetEstimation;
-
-    const uint32_t msec_curr = millis();
-
-    if (_didResetEstimation) {
-        _ekf.reset(msec_curr);
-        _didResetEstimation = false;
-    }
-
-    // Run the system dynamics to predict the state forward.
-    if (_timer.ready(FREQ_EKF_PREDICTION)) {
-        _ekf.predict(msec_curr, isFlying); 
-    }
-
-    // Get state estimate from EKF
-    const auto state = _ekf.getStateEstimate(msec_curr);
-
-    // Get angular velocities directly from gyro
-    return VehicleState(
-            state.dx,
-            state.dy,
-            state.z,
-            state.dz,
-            state.phi,
-            _imuFilter.output.gyroDps.x,
-            state.theta,
-            _imuFilter.output.gyroDps.y,
-            state.psi,
-            -_imuFilter.output.gyroDps.z); // negate for nose-right positive.y
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void setup()
 {
     _rx.begin();
@@ -125,11 +83,39 @@ void loop()
 
     const auto imuraw = _imu.read();
 
-    const auto state = getVehicleState(imuraw, isFlying);
+    _imuFilter.step(millis(), imuraw);
+
+    _ekf.enqueueImu(_imuFilter.output);
+
+    static Timer _timer;
+
+    static bool _didResetEstimation;
+
+    const uint32_t msec_curr = millis();
+
+    if (_didResetEstimation) {
+        _ekf.reset(msec_curr);
+        _didResetEstimation = false;
+    }
+
+    // Run the system dynamics to predict the state forward.
+    if (_timer.ready(FREQ_EKF_PREDICTION)) {
+        _ekf.predict(msec_curr, isFlying); 
+    }
+
+    // Get state estimate from EKF
+    const auto estate = _ekf.getStateEstimate(msec_curr);
+
+    // Get angular velocities directly from gyro, negating gyro Z
+    // for nose-right positive
+    const auto state = VehicleState(estate.dx, estate.dy, estate.z, estate.dz,
+            estate.phi, _imuFilter.output.gyroDps.x,
+            estate.theta, _imuFilter.output.gyroDps.y,
+            estate.psi, -_imuFilter.output.gyroDps.z); 
 
     const auto setpoint = mksetpoint(_rx.chanvals);
 
-    //Debugger::report(state);
+    Debugger::report(state);
     //Profiler::report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
