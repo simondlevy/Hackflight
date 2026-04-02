@@ -22,6 +22,60 @@
 
 namespace hf {
 
+    class Vec3 {
+
+        public:
+
+            float x;
+            float y;
+            float z;
+
+            Vec3() = default;
+
+            Vec3(const float x, const float y, const float z) 
+                : x(x), y(y), z(z) {}
+
+            Vec3& operator=(const Vec3& other) = default;
+
+            Vec3 operator+(const Vec3& other) const
+            {
+                return Vec3(x+other.x, y+other.y, z+other.z);
+            }
+
+            Vec3 operator-(const Vec3& other) const
+            {
+                return Vec3(x-other.x, y-other.y, z-other.z);
+            }
+
+            Vec3 operator*(const float d) const
+            {
+                return Vec3(x*d, y*d, z*d);
+            }
+
+            Vec3 operator/(const float d) const
+            {
+                return Vec3(x/d, y/d, z/d);
+            }
+
+      };
+
+    class Vec4 {
+
+        public:
+
+            float w;
+            float x;
+            float y;
+            float z;
+
+            Vec4() = default;
+
+            Vec4
+                (const float w, const float x, const float y, const float z) 
+                : w(w), x(x), y(y), z(z) {}
+
+            Vec4& operator=(const Vec4& other) = default;
+    };
     class ThreeAxisStats {
 
         public:
