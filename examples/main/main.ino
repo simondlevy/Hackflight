@@ -131,8 +131,8 @@ void loop()
 
     const auto setpoint = hf::mksetpoint(_rx.chanvals);
 
-    hf::Debugger::debug(state);
-    //hf::Debugger::profile();
+    hf::Debugger::report(state);
+    //hf::Profiler::report();
 
     _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
             !_rx.is_throttle_down, dt, state, setpoint);
