@@ -35,6 +35,7 @@
 #include <firmware/led.hpp>
 #include <firmware/rx/elrs.hpp>
 #include <firmware/rxdata.hpp>
+#include <firmware/safety.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
@@ -46,9 +47,9 @@ static const uint32_t FREQ_EKF_PREDICTION = 100;
 
 static auto _rx = RX(&Serial1);
 
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+static auto _motors = DshotTeensy4({2, 3, 4, 5});
 
-static LED _led = LED(13);
+static auto _led = LED(13);
 
 static StabilizerPid _stabilizerPid;
 
@@ -61,6 +62,8 @@ static ImuFilter _imuFilter;
 static EKF _ekf;
 
 static FlyingCheck _flyingCheck;
+
+static mode_e _mode;
 
 void setup()
 {
@@ -119,6 +122,8 @@ void loop()
             estate.theta, _imuFilter.output.gyroDps.y,
             estate.psi, -_imuFilter.output.gyroDps.z); 
 
+    _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
+
     const auto setpoint = mksetpoint(rxdata.axes);
 
     Debugger::report(state);
@@ -129,5 +134,7 @@ void loop()
 
     _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(rxdata.is_armed, _mixer.motorvals);
+    if (_mode != MODE_PANIC) {
+        _motors.run(rxdata.is_armed, _mixer.motorvals);
+    }
 }
