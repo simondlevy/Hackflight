@@ -28,6 +28,7 @@
 #include <datatypes.hpp>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
+#include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/bmi088.hpp>
 #include <firmware/imu/filter.hpp>
@@ -39,6 +40,8 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
+
+static const uint32_t FREQ_EKF_PREDICTION = 100;
 
 static RX _rx;
 
@@ -52,13 +55,11 @@ static Mixer _mixer;
 
 static IMU _imu;
 
-////////////////////////////////////////////////////////////////////////
-
-static const uint32_t FREQ_EKF_PREDICTION = 100;
-
 static ImuFilter _imuFilter;
 
 static EKF _ekf;
+
+static FlyingCheck _flyingCheck;
 
 void setup()
 {
@@ -79,8 +80,6 @@ void loop()
 
     _rx.read();
 
-    const bool isFlying = true; // XXX
-
     const auto imuraw = _imu.read();
 
     _imuFilter.step(millis(), imuraw);
@@ -98,9 +97,12 @@ void loop()
         _didResetEstimation = false;
     }
 
+    _flyingCheck = _flyingCheck.run(
+            _flyingCheck, millis(), _mixer.motorvals, 4);
+
     // Run the system dynamics to predict the state forward.
     if (_timer.ready(FREQ_EKF_PREDICTION)) {
-        _ekf.predict(msec_curr, isFlying); 
+        _ekf.predict(msec_curr, _flyingCheck.isFlying); 
     }
 
     // Get state estimate from EKF
@@ -108,7 +110,8 @@ void loop()
 
     // Get angular velocities directly from gyro, negating gyro Z
     // for nose-right positive
-    const auto state = VehicleState(estate.dx, estate.dy, estate.z, estate.dz,
+    const auto state = VehicleState(
+            estate.dx, estate.dy, estate.z, estate.dz,
             estate.phi, _imuFilter.output.gyroDps.x,
             estate.theta, _imuFilter.output.gyroDps.y,
             estate.psi, -_imuFilter.output.gyroDps.z); 

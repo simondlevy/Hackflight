@@ -24,6 +24,14 @@ namespace hf {
 
         public:
 
+            static bool ready(
+                    const uint32_t msec_curr,
+                    const uint32_t msec_prev,
+                    const float freq)
+            {
+                return msec_curr - msec_prev > 1000 / freq;
+            }
+
             bool ready(const float freq)
             {
                 const uint32_t msec_curr = millis();
