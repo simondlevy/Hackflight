@@ -1,0 +1,189 @@
+/* Copyright (C) 2011-2018 Bitcraze AB, 2025 Simon D. Levy * * This program
+ * is free software: you can redistribute it and/or modify * it under the terms
+ * of the GNU General Public License as published by * the Free Software
+ * Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include <firmware/datatypes.hpp>
+#include <firmware/ekf/ekf.hpp>
+#include <firmware/imu/gyro_bias.hpp>
+#include <firmware/imu/three_axis_lpf.hpp>
+#include <firmware/timer.hpp>
+#include <num.hpp>
+
+namespace hf {
+
+    class ImuFilter {
+
+        private:
+
+            static constexpr float CALIBRATION_PITCH = 0;
+            static constexpr float CALIBRATION_ROLL = 0;
+
+        public:
+
+            ImuFiltered output;
+
+            bool wasGyroBiasFound;
+
+            ImuFilter& operator=(const ImuFilter& other) = default;
+
+            ImuFilter() = default;
+
+            /**
+             * gyro.x: positive roll-rightward
+             * gyro.y: positive nose-downward
+             * gyro.z: positive counter-clockwise
+             * accel.x: positive nose-up
+             * accel.y: positive roll-right
+             * accel.z: positive rightside-up
+             */
+            void step(
+                    const uint32_t msec_curr,
+                    const ImuRaw & imuraw,
+                    const int16_t gyro_dps=2000,
+                    const int16_t accel_gs=24)
+            {
+
+                // Convert accel to Gs
+                const Vec3 accel = {
+                    scale(imuraw.accel.x, accel_gs),
+                    scale(imuraw.accel.y, accel_gs),
+                    scale(imuraw.accel.z, accel_gs)
+                };
+
+                // Calibrate gyro with raw values if necessary
+                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = imuraw.gyro;
+                _gyroBiasCalculator = GyroBiasCalculator::process(
+                        _gyroBiasCalculator,
+                        _gyroSamplesBuffer,
+                        msec_curr);
+                _gyroBias = _gyroBiasCalculator.biasOut;
+
+                // Subtract gyro bias
+                const Vec3 gyroUnbiased = {
+                    scale(imuraw.gyro.x - _gyroBias.x, gyro_dps),
+                    scale(imuraw.gyro.y - _gyroBias.y, gyro_dps),
+                    scale(imuraw.gyro.z - _gyroBias.z, gyro_dps)
+                };
+
+                const auto gyroAligned = alignToAirframe(gyroUnbiased);
+
+                _gyroLpf = _gyroLpf.apply(_gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+
+                const auto gyroFiltered = _gyroLpf.output;
+
+                const auto accelAlignedToAirframe = alignToAirframe(accel);
+
+                const auto accelAlignedToGravity = alignToGravity(
+                        accelAlignedToAirframe);
+
+                _accelLpf = _accelLpf.apply(
+                        _accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+
+                const auto accelFiltered = _accelLpf.output;
+
+                output.gyroDps.x = gyroFiltered.x;
+                output.gyroDps.y = gyroFiltered.y;
+                output.gyroDps.z = gyroFiltered.z;
+
+                output.accelGs.x = accelFiltered.x;
+                output.accelGs.y = accelFiltered.y;
+                output.accelGs.z = accelFiltered.z;
+
+                wasGyroBiasFound = _gyroBiasCalculator.wasValueFound;
+            }
+
+        private:
+
+            static const uint32_t ACC_SCALE_SAMPLES = 200;
+
+            // IMU alignment on the airframe 
+            static constexpr float ALIGN_PHI   = 0;
+            static constexpr float ALIGN_THETA = 0;
+            static constexpr float ALIGN_PSI   = 0;
+
+            static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
+            static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
+
+            // ---------------------------------------------------------------
+
+            Vec3Raw _gyroSamplesBuffer[GyroBiasCalculator::NBR_OF_SAMPLES];
+
+            GyroBiasCalculator _gyroBiasCalculator;
+
+            ThreeAxisLpf _accelLpf;
+            ThreeAxisLpf _gyroLpf;
+
+            Vec3 _gyroBias;
+
+            // ---------------------------------------------------------------
+
+            /**
+             * Compensate for a miss-aligned accelerometer. It uses the trim
+             * data gathered from the UI and written in the config-block to
+             * rotate the accelerometer to be aligned with gravity.
+             */
+            static auto alignToGravity(const Vec3 & in) -> Vec3
+            {
+
+                const auto cosPitch = cosf(CALIBRATION_PITCH * Num::DEG2RAD);
+                const auto sinPitch = sinf(CALIBRATION_PITCH * Num::DEG2RAD);
+                const auto cosRoll = cosf(CALIBRATION_ROLL * Num::DEG2RAD);
+                const auto sinRoll = sinf(CALIBRATION_ROLL * Num::DEG2RAD);
+
+                // Rotate around x-axis
+                const Vec3 rx = {
+                    in.x,
+                    in.y * cosRoll - in.z * sinRoll,
+                    in.y * sinRoll + in.z * cosRoll
+                };
+
+                // Rotate around y-axis
+                return Vec3(
+                        rx.x * cosPitch - rx.z * sinPitch,
+                        rx.y,
+                        -rx.x * sinPitch + rx.z * cosPitch);
+            }
+
+            static auto alignToAirframe(const Vec3 & in) -> Vec3
+            {
+                const auto sphi   = sinf(ALIGN_PHI * Num::DEG2RAD);
+                const auto cphi   = cosf(ALIGN_PHI * Num::DEG2RAD);
+                const auto stheta = sinf(ALIGN_THETA * Num::DEG2RAD);
+                const auto ctheta = cosf(ALIGN_THETA * Num::DEG2RAD);
+                const auto spsi   = sinf(ALIGN_PSI * Num::DEG2RAD);
+                const auto cpsi   = cosf(ALIGN_PSI * Num::DEG2RAD);
+
+                const auto r00 = ctheta * cpsi;
+                const auto r01 = ctheta * spsi;
+                const auto r02 = -stheta;
+                const auto r10 = sphi * stheta * cpsi - cphi * spsi;
+                const auto r11 = sphi * stheta * spsi + cphi * cpsi;
+                const auto r12 = sphi * ctheta;
+                const auto r20 = cphi * stheta * cpsi + sphi * spsi;
+                const auto r21 = cphi * stheta * spsi - sphi * cpsi;
+                const auto r22 = cphi * ctheta;
+
+                return Vec3(
+                        in.x*r00 + in.y*r01 + in.z*r02,
+                        in.x*r10 + in.y*r11 + in.z*r12,
+                        in.x*r20 + in.y*r21 + in.z*r22);
+            }
+
+            static float scale(const int16_t raw, const int16_t scale)
+            {
+                return (float)raw * 2 * scale / 65536.f;
+            }
+    };
+}
