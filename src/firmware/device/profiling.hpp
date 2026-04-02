@@ -14,9 +14,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Hackflight library
 #include <hackflight.h>
-#include <firmware/timer.hpp>
+#include <firmware/device/timer.hpp>
 
 namespace hf {
 

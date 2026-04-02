@@ -15,15 +15,12 @@
  */
 
 #include <hackflight.h>
-#include <firmware/timer.hpp>
 
 namespace hf {
 
     class FlyingCheck {
 
         private:
-
-            static constexpr float FREQ_HZ = 25;
 
             static const uint32_t HYSTERESIS_THRESHOLD_MSEC = 2000;
 
@@ -40,7 +37,7 @@ namespace hf {
 
             FlyingCheck& operator=(const FlyingCheck& other) = default;
 
-             // We say we are flying if one or more motors are running over the idle
+            // We say we are flying if one or more motors are running over the idle
             // thrust.
             auto run(
                     const FlyingCheck & fc,
@@ -48,9 +45,7 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motor_count) -> FlyingCheck
             {
-                return Timer::ready(msec_curr, fc._msec_prev, FREQ_HZ) ?
-                    update(fc, msec_curr, motorvals, motor_count) :
-                    fc;
+                return update(fc, msec_curr, motorvals, motor_count);
             }
 
         private:

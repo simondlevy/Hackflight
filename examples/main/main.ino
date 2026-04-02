@@ -27,23 +27,26 @@
 #include <hackflight.h>
 #include <datatypes.hpp>
 #include <firmware/datatypes.hpp>
-#include <firmware/debugging.hpp>
+#include <firmware/device/debugging.hpp>
+#include <firmware/device/elrs.hpp>
+#include <firmware/device/led.hpp>
+#include <firmware/device/profiling.hpp>
+#include <firmware/device/timer.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
-#include <firmware/imu/bmi088.hpp>
+#include <firmware/device/bmi088.hpp>
 #include <firmware/imu/filter.hpp>
-#include <firmware/led.hpp>
-#include <firmware/rx/elrs.hpp>
 #include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/setpoint.hpp>
-#include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
 
 static const uint32_t FREQ_EKF_PREDICTION = 100;
+
+static const uint32_t FREQ_FLYING_CHECK = 25;
 
 static auto _rx = RX(&Serial5);
 
@@ -64,6 +67,10 @@ static EKF _ekf;
 static FlyingCheck _flyingCheck;
 
 static mode_e _mode;
+
+static Timer _ekfPredictionTimer;
+
+static Timer _flyingCheckTimer;
 
 void setup()
 {
@@ -92,8 +99,6 @@ void loop()
 
     _ekf.enqueueImu(_imuFilter.output);
 
-    static Timer _timer;
-
     static bool _didResetEstimation;
 
     const uint32_t msec_curr = millis();
@@ -103,11 +108,13 @@ void loop()
         _didResetEstimation = false;
     }
 
-    _flyingCheck = _flyingCheck.run(
-            _flyingCheck, millis(), _mixer.motorvals, 4);
+    if (_flyingCheckTimer.ready(FREQ_FLYING_CHECK)) {
+        _flyingCheck = _flyingCheck.run(
+                _flyingCheck, millis(), _mixer.motorvals, 4);
+    }
 
     // Run the system dynamics to predict the state forward.
-    if (_timer.ready(FREQ_EKF_PREDICTION)) {
+    if (_ekfPredictionTimer.ready(FREQ_EKF_PREDICTION)) {
         _ekf.predict(msec_curr, _flyingCheck.isFlying); 
     }
 
@@ -126,7 +133,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    Debugger::report(rxdata);
+    Debugger::report(state);
     //Profiler::report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,

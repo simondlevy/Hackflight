@@ -19,7 +19,7 @@
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/rxdata.hpp>
-#include <firmware/timer.hpp>
+#include <firmware/device/timer.hpp>
 
 namespace hf {
 

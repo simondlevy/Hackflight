@@ -18,7 +18,6 @@
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/gyro_bias.hpp>
 #include <firmware/imu/three_axis_lpf.hpp>
-#include <firmware/timer.hpp>
 #include <num.hpp>
 
 namespace hf {
