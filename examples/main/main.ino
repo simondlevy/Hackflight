@@ -33,7 +33,8 @@
 #include <firmware/imu/bmi088.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/led.hpp>
-#include <firmware/elrs.hpp>
+#include <firmware/rx/elrs.hpp>
+#include <firmware/rxdata.hpp>
 #include <firmware/setpoint.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
@@ -43,7 +44,7 @@ using namespace hf;
 
 static const uint32_t FREQ_EKF_PREDICTION = 100;
 
-static RX _rx;
+static auto _rx = RX(&Serial1);
 
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
@@ -78,7 +79,9 @@ void loop()
 
     _led.blink(_imuFilter.wasGyroBiasFound);
 
-    _rx.read();
+    // Disable arming while gyro is calibrating
+    const auto rxdata =
+        _imuFilter.wasGyroBiasFound ? _rx.read() : RxData();
 
     const auto imuraw = _imu.read();
 
@@ -116,15 +119,15 @@ void loop()
             estate.theta, _imuFilter.output.gyroDps.y,
             estate.psi, -_imuFilter.output.gyroDps.z); 
 
-    const auto setpoint = mksetpoint(_rx.chanvals);
+    const auto setpoint = mksetpoint(rxdata.axes);
 
     Debugger::report(state);
     //Profiler::report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
-            !_rx.is_throttle_down, dt, state, setpoint);
+            !rxdata.is_throttle_down, dt, state, setpoint);
 
     _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
-    _motors.run(_rx.is_armed, _mixer.motorvals);
+    _motors.run(rxdata.is_armed, _mixer.motorvals);
 }

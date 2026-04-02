@@ -14,7 +14,13 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <CRSFforArduino.hpp>
+
+// Hackflight
+#include <hackflight.h>
+#include <firmware/rxdata.hpp>
 
 namespace hf {
 
@@ -26,13 +32,9 @@ namespace hf {
 
             static constexpr float THROTTLE_DOWN_MAX = -0.95;
 
-            uint32_t _last_rx_msec;
-
-            CRSFforArduino _crsf;
-
-            void scalechan(const uint8_t j, const uint8_t k)
+            float scalechan(const uint8_t k)
             {
-                chanvals[j] = map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
+                return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
             }
 
             static void onReceiveRcChannels(
@@ -42,11 +44,12 @@ namespace hf {
 
                     auto rx = (RX *)obj;
 
-                    rx->scalechan(0 ,3);
-                    rx->scalechan(1 ,1);
-                    rx->scalechan(2 ,2);
-                    rx->scalechan(3 ,4);
-                    rx->scalechan(4 ,5);
+                    rx->_data.axes.thrust = rx->scalechan(3);
+                    rx->_data.axes.roll = rx->scalechan(1);
+                    rx->_data.axes.pitch = rx->scalechan(2);
+                    rx->_data.axes.yaw = rx->scalechan(4);
+
+                    rx->_data.aux = rx->scalechan(5);
 
                     rx->_last_rx_msec = millis();
                 }
@@ -54,9 +57,10 @@ namespace hf {
 
         public:
 
-            float chanvals[5];
-            bool is_armed;
-            bool is_throttle_down;
+            RX(HardwareSerial * serial)
+            {
+                _crsf = CRSFforArduino(serial);
+            }
 
             void begin()
             {
@@ -73,11 +77,11 @@ namespace hf {
                 _crsf.setRcChannelsCallback(onReceiveRcChannels, this);
             }
 
-            void read()
+            auto read() -> RxData
             {
                 _crsf.update();
 
-                const auto throttle_is_down = chanvals[0] < THROTTLE_DOWN_MAX;
+                _data.is_throttle_down = _data.axes.thrust < THROTTLE_DOWN_MAX;
 
                 const auto msec_curr = millis();
 
@@ -85,16 +89,29 @@ namespace hf {
                 if (_last_rx_msec > 0 &&
                         msec_curr > _last_rx_msec &&
                         msec_curr - _last_rx_msec > ELRS_TIMEOUT_MSEC) {
-                    is_armed = false;
+                    _data.is_armed = false;
                 }
 
                 // Push-button arming
                 static float _chan5_prev;
-                const auto chan5_curr = chanvals[4];
+                const auto chan5_curr = _data.aux;
                 if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
-                    is_armed = is_armed ? false : throttle_is_down ? true : is_armed;
+                    _data.is_armed =
+                        _data.is_armed ? false :
+                        _data.is_throttle_down ? true :
+                        _data.is_armed;
                 }
                 _chan5_prev = chan5_curr;
+
+                return RxData(_data);
             }
+
+        private:
+
+            uint32_t _last_rx_msec;
+
+            CRSFforArduino _crsf;
+
+            RxData _data;
     };
 }

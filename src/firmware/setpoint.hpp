@@ -22,12 +22,13 @@
 
 namespace hf {
 
-    Setpoint mksetpoint(const float * rx_chanvals)
+    Setpoint mksetpoint(const Setpoint & rx_setpoint)
     {
         return Setpoint(
-                (rx_chanvals[0]+1)/2,
-                rx_chanvals[1] * PositionController::MAX_DEMAND_DEG, 
-                rx_chanvals[2] * PositionController::MAX_DEMAND_DEG, 
-                rx_chanvals[3]);
+                (rx_setpoint.thrust+1)/2,
+                rx_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
+                rx_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
+                rx_setpoint.yaw);
     }
 }
+
