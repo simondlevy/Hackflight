@@ -46,6 +46,75 @@ namespace hf {
              * accel.y: positive roll-right
              * accel.z: positive rightside-up
              */
+            static auto step(
+                    const ImuFilter & filter,
+                    const uint32_t msec_curr,
+                    const ImuRaw & imuraw,
+                    const int16_t gyro_dps=2000,
+                    const int16_t accel_gs=24) -> ImuFilter
+            {
+
+                return filter;
+
+#if 0
+                // Convert accel to Gs
+                const Vec3 accel = {
+                    scale(imuraw.accel.x, accel_gs),
+                    scale(imuraw.accel.y, accel_gs),
+                    scale(imuraw.accel.z, accel_gs)
+                };
+
+                // Calibrate gyro with raw values if necessary
+                _gyroSamplesBuffer[_gyroBiasCalculator.bufferIndex] = imuraw.gyro;
+                _gyroBiasCalculator = GyroBiasCalculator::process(
+                        _gyroBiasCalculator,
+                        _gyroSamplesBuffer,
+                        msec_curr);
+                _gyroBias = _gyroBiasCalculator.biasOut;
+
+                // Subtract gyro bias
+                const Vec3 gyroUnbiased = {
+                    scale(imuraw.gyro.x - _gyroBias.x, gyro_dps),
+                    scale(imuraw.gyro.y - _gyroBias.y, gyro_dps),
+                    scale(imuraw.gyro.z - _gyroBias.z, gyro_dps)
+                };
+
+                const auto gyroAligned = alignToAirframe(gyroUnbiased);
+
+                _gyroLpf = _gyroLpf.apply(_gyroLpf, gyroAligned, GYRO_LPF_CUTOFF_FREQ);
+
+                const auto gyroFiltered = _gyroLpf.output;
+
+                const auto accelAlignedToAirframe = alignToAirframe(accel);
+
+                const auto accelAlignedToGravity = alignToGravity(
+                        accelAlignedToAirframe);
+
+                _accelLpf = _accelLpf.apply(
+                        _accelLpf, accelAlignedToGravity, ACCEL_LPF_CUTOFF_FREQ);
+
+                const auto accelFiltered = _accelLpf.output;
+
+                output.gyroDps.x = gyroFiltered.x;
+                output.gyroDps.y = gyroFiltered.y;
+                output.gyroDps.z = gyroFiltered.z;
+
+                output.accelGs.x = accelFiltered.x;
+                output.accelGs.y = accelFiltered.y;
+                output.accelGs.z = accelFiltered.z;
+
+                wasGyroBiasFound = _gyroBiasCalculator.wasValueFound;
+#endif
+            }
+
+             /**
+             * gyro.x: positive roll-rightward
+             * gyro.y: positive nose-downward
+             * gyro.z: positive counter-clockwise
+             * accel.x: positive nose-up
+             * accel.y: positive roll-right
+             * accel.z: positive rightside-up
+             */
             void step(
                     const uint32_t msec_curr,
                     const ImuRaw & imuraw,
@@ -179,7 +248,7 @@ namespace hf {
                         in.x*r20 + in.y*r21 + in.z*r22);
             }
 
-            static float scale(const int16_t raw, const int16_t scale)
+            static auto scale(const int16_t raw, const int16_t scale) -> float
             {
                 return (float)raw * 2 * scale / 65536.f;
             }

@@ -108,7 +108,7 @@ void loop()
     }
 
     if (_flyingCheckTimer.ready(FREQ_FLYING_CHECK)) {
-        _flyingCheck = _flyingCheck.run(
+        _flyingCheck = FlyingCheck::run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
     }
 

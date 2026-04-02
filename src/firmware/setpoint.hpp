@@ -22,7 +22,7 @@
 
 namespace hf {
 
-    Setpoint mksetpoint(const Setpoint & rx_setpoint)
+    static Setpoint mksetpoint(const Setpoint & rx_setpoint)
     {
         return Setpoint(
                 (rx_setpoint.thrust+1)/2,

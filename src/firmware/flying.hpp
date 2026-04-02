@@ -39,7 +39,7 @@ namespace hf {
 
             // We say we are flying if one or more motors are running over the idle
             // thrust.
-            auto run(
+            static auto run(
                     const FlyingCheck & fc,
                     const uint32_t msec_curr,
                     const float * motorvals,
@@ -52,7 +52,7 @@ namespace hf {
 
             uint32_t _msec_prev;
 
-            auto update(
+            static auto update(
                     const FlyingCheck & fc,
                     const uint32_t msec_curr,
                     const float * motorvals,
