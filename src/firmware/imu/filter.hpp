@@ -14,8 +14,7 @@
 
 #pragma once
 
-#include <firmware/datatypes.hpp>
-#include <firmware/ekf/ekf.hpp>
+#include <firmware/imu/datatypes.hpp>
 #include <firmware/imu/gyro_bias.hpp>
 #include <firmware/imu/three_axis_lpf.hpp>
 #include <num.hpp>

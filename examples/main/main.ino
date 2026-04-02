@@ -26,7 +26,6 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.hpp>
-#include <firmware/datatypes.hpp>
 #include <firmware/device/debugging.hpp>
 #include <firmware/device/elrs.hpp>
 #include <firmware/device/led.hpp>

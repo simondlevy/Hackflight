@@ -17,7 +17,7 @@
 #pragma once
 
 #include <firmware/ekf/matrix_typedef.h>
-#include <firmware/datatypes.hpp>
+#include <firmware/imu/datatypes.hpp>
 #include <firmware/opticalflow.hpp>
 #include <firmware/zranger.hpp>
 #include <num.hpp>

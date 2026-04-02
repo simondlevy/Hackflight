@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <firmware/datatypes.hpp>
+#include <firmware/imu/datatypes.hpp>
 
 namespace hf {
 
