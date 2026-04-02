@@ -18,6 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
+#include <firmware/rxdata.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {
@@ -109,7 +110,6 @@ namespace hf {
                 }
             }
 
-            /*
             static void report(const RxData & rxdata)
             {
                 static Helper _helper;
@@ -125,7 +125,7 @@ namespace hf {
                             rxdata.is_throttle_down, 
                             ax.thrust, ax.roll, ax.pitch, ax.yaw);
                 }
-            }*/
+            }
 
             static void report(const Setpoint & setpoint)
             {

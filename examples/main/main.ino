@@ -45,7 +45,7 @@ using namespace hf;
 
 static const uint32_t FREQ_EKF_PREDICTION = 100;
 
-static auto _rx = RX(&Serial1);
+static auto _rx = RX(&Serial5);
 
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
 
@@ -126,7 +126,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    Debugger::report(state);
+    Debugger::report(rxdata);
     //Profiler::report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
