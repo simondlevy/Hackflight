@@ -57,25 +57,8 @@ namespace hf {
                 return Vec3(x/d, y/d, z/d);
             }
 
-      };
-
-    class Vec4 {
-
-        public:
-
-            float w;
-            float x;
-            float y;
-            float z;
-
-            Vec4() = default;
-
-            Vec4
-                (const float w, const float x, const float y, const float z) 
-                : w(w), x(x), y(y), z(z) {}
-
-            Vec4& operator=(const Vec4& other) = default;
     };
+
     class ThreeAxisStats {
 
         public:
@@ -91,7 +74,7 @@ namespace hf {
 
             ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
 
-     }; // class ThreeAxisStats
+    }; // class ThreeAxisStats
 
 
     class EstimatedState { 
@@ -126,7 +109,7 @@ namespace hf {
                     psi(psi) {}
 
             EstimatedState& operator=(const EstimatedState& other) = default;
- 
+
     };
 
     class Vec3Raw {
@@ -143,7 +126,7 @@ namespace hf {
                 : x(x), y(y), z(z) {}
 
             Vec3Raw& operator=(const Vec3Raw& other) = default;
-      };
+    };
 
     class ImuRaw {
 
@@ -158,7 +141,7 @@ namespace hf {
                 : gyro(gyro), accel(accel) {}
 
             ImuRaw& operator=(const ImuRaw& other) = default;
-     };
+    };
 
     class ImuFiltered {
 
@@ -173,5 +156,5 @@ namespace hf {
                 : gyroDps(gyroDps), accelGs(accelGs) {}
 
             ImuFiltered& operator=(const ImuFiltered& other) = default;
-     };
+    };
 }
