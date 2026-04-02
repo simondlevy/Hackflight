@@ -165,7 +165,7 @@ namespace hf {
                 }
             }
 
-            static void report(const Vec3Raw & raw)
+            static void report(const ThreeAxisRaw & raw)
             {
                 static Helper _helper;
 
@@ -176,7 +176,7 @@ namespace hf {
                 }
             }
 
-            static void report(const Vec3 & vec)
+            static void report(const ThreeAxis & vec)
             {
                 static Helper _helper;
 

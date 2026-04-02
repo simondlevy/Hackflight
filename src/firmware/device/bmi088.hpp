@@ -30,11 +30,17 @@ namespace hf {
 
     class IMU {
 
+        private:
+
+            static constexpr Bmi088Gyro::Range GRANGE =
+                Bmi088Gyro::RANGE_2000DPS;
+
+            static constexpr Bmi088Accel::Range ARANGE =
+                Bmi088Accel::RANGE_24G;
+
         public:
 
-            bool begin(
-                    const Bmi088Gyro::Range grange=Bmi088Gyro::RANGE_2000DPS,
-                    const Bmi088Accel::Range arange=Bmi088Accel::RANGE_24G)
+            bool begin()
             {
                 return 
 
@@ -44,7 +50,7 @@ namespace hf {
 
                     okay(gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-                    okay(gyro.setRange(grange)) &&
+                    okay(gyro.setRange(GRANGE)) &&
 
                     okay(gyro.pinModeInt3(
                                 Bmi088Gyro::PIN_MODE_PUSH_PULL,
@@ -54,8 +60,23 @@ namespace hf {
 
                     okay(accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
 
-                    okay(accel.setRange(arange));
+                    okay(accel.setRange(ARANGE));
             }
+
+            static int16_t gyroRangeDps()
+            {
+                static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
+
+                return granges[GRANGE];
+            }
+
+            static int16_t accelRangeGs()
+            {
+                static constexpr int16_t aranges[4] = {3, 6, 12, 24};
+
+                return aranges[ARANGE];
+            }
+
 
             auto read() -> ImuRaw
             {
@@ -64,12 +85,12 @@ namespace hf {
                 accel.readSensor();
 
                 return ImuRaw(
-                        Vec3Raw(
+                        ThreeAxisRaw(
                             gyro.getGyroX_raw(),
                             gyro.getGyroY_raw(),
                             gyro.getGyroZ_raw()
                             ),
-                        Vec3Raw(
+                        ThreeAxisRaw(
                             accel.getAccelX_raw(),
                             accel.getAccelY_raw(),
                             accel.getAccelZ_raw()

@@ -122,8 +122,8 @@ namespace hf {
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const Vec3 * accel = &_accSubSampler.subSample;
-                const Vec3 * gyro = &_gyroSubSampler.subSample;
+                const ThreeAxis * accel = &_accSubSampler.subSample;
+                const ThreeAxis * gyro = &_gyroSubSampler.subSample;
 
                 const float d0 = gyro->x*dt/2;
                 const float d1 = gyro->y*dt/2;
@@ -384,12 +384,12 @@ namespace hf {
 
             typedef struct
             {
-                Vec3 gyro; // deg/s, for legacy reasons
+                ThreeAxis gyro; // deg/s, for legacy reasons
             } gyroscopeMeasurement_t;
 
             typedef struct
             {
-                Vec3 acc; // Gs, for legacy reasons
+                ThreeAxis acc; // Gs, for legacy reasons
             } accelerationMeasurement_t;
 
             typedef struct
@@ -418,20 +418,20 @@ namespace hf {
             }
 
             typedef struct {
-                Vec3 sum;
+                ThreeAxis sum;
                 uint32_t count;
                 float conversionFactor;
-                Vec3 subSample;
-            } Vec3SubSampler_t;
+                ThreeAxis subSample;
+            } ThreeAxisSubSampler_t;
 
             // Quaternion used for initial orientation [w,x,y,z]
             float _qinit0, _qinit1, _qinit2, _qinit3;
 
-            Vec3 _accLatest;
-            Vec3 _gyroLatest;
+            ThreeAxis _accLatest;
+            ThreeAxis _gyroLatest;
 
-            Vec3SubSampler_t _accSubSampler;
-            Vec3SubSampler_t _gyroSubSampler;
+            ThreeAxisSubSampler_t _accSubSampler;
+            ThreeAxisSubSampler_t _gyroSubSampler;
 
             float _predictedNX;
             float _predictedNY;
@@ -448,14 +448,14 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             float _q0, _q1, _q2, _q3;
 
-            static void axis3fSubSamplerInit(Vec3SubSampler_t* subSampler, const
+            static void axis3fSubSamplerInit(ThreeAxisSubSampler_t* subSampler, const
                     float conversionFactor) { memset(subSampler, 0,
-                        sizeof(Vec3SubSampler_t));
+                        sizeof(ThreeAxisSubSampler_t));
                     subSampler->conversionFactor = conversionFactor;
             }
 
-            static void axis3fSubSamplerAccumulate(Vec3SubSampler_t* subSampler,
-                    const Vec3* sample) {
+            static void axis3fSubSamplerAccumulate(ThreeAxisSubSampler_t* subSampler,
+                    const ThreeAxis* sample) {
                 subSampler->sum.x += sample->x;
                 subSampler->sum.y += sample->y;
                 subSampler->sum.z += sample->z;
@@ -463,7 +463,7 @@ namespace hf {
                 subSampler->count++;
             }
 
-            static Vec3* axis3fSubSamplerFinalize(Vec3SubSampler_t* subSampler,
+            static ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler,
                     const char * label) 
             {
                 if (subSampler->count > 0) {
@@ -598,7 +598,7 @@ namespace hf {
 
             void updateWithFlow(const OpticalFlow::measurement_t *flow) 
             {
-                const Vec3 *gyro = &_gyroLatest;
+                const ThreeAxis *gyro = &_gyroLatest;
 
                 // [pixels] (same in x and y)
                 float Npix = 35.0;                      

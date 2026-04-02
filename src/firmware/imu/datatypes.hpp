@@ -16,67 +16,9 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <datatypes.hpp>
-
 namespace hf {
 
-    class Vec3 {
-
-        public:
-
-            float x;
-            float y;
-            float z;
-
-            Vec3() = default;
-
-            Vec3(const float x, const float y, const float z) 
-                : x(x), y(y), z(z) {}
-
-            Vec3& operator=(const Vec3& other) = default;
-
-            Vec3 operator+(const Vec3& other) const
-            {
-                return Vec3(x+other.x, y+other.y, z+other.z);
-            }
-
-            Vec3 operator-(const Vec3& other) const
-            {
-                return Vec3(x-other.x, y-other.y, z-other.z);
-            }
-
-            Vec3 operator*(const float d) const
-            {
-                return Vec3(x*d, y*d, z*d);
-            }
-
-            Vec3 operator/(const float d) const
-            {
-                return Vec3(x/d, y/d, z/d);
-            }
-
-    };
-
-    class ThreeAxisStats {
-
-        public:
-
-            Vec3 mean;
-            Vec3 variance;
-
-            ThreeAxisStats() = default;
-
-            ThreeAxisStats
-                (const Vec3& mean, const Vec3& variance) 
-                : mean(mean), variance(variance) {}
-
-            ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
-
-    }; // class ThreeAxisStats
-
-    class Vec3Raw {
+    class ThreeAxisRaw {
 
         public:
 
@@ -84,24 +26,86 @@ namespace hf {
             int16_t y;
             int16_t z;
 
-            Vec3Raw() = default;
+            ThreeAxisRaw() = default;
 
-            Vec3Raw(const int16_t x, const int16_t y, const int16_t z) 
+            ThreeAxisRaw(const int16_t x, const int16_t y, const int16_t z) 
                 : x(x), y(y), z(z) {}
 
-            Vec3Raw& operator=(const Vec3Raw& other) = default;
+            ThreeAxisRaw& operator=(const ThreeAxisRaw& other) = default;
+    };
+
+    class ThreeAxis {
+
+        public:
+
+            float x;
+            float y;
+            float z;
+
+            ThreeAxis() = default;
+
+            ThreeAxis(const float x, const float y, const float z) 
+                : x(x), y(y), z(z) {}
+
+            ThreeAxis& operator=(const ThreeAxis& other) = default;
+
+            ThreeAxis operator+(const ThreeAxis& other) const
+            {
+                return ThreeAxis(x+other.x, y+other.y, z+other.z);
+            }
+
+            ThreeAxis operator-(const ThreeAxis& other) const
+            {
+                return ThreeAxis(x-other.x, y-other.y, z-other.z);
+            }
+
+            ThreeAxis operator*(const ThreeAxis& other) const
+            {
+                return ThreeAxis(x*other.x, y*other.y, z*other.z);
+            }
+
+            ThreeAxis operator*(const float v) const
+            {
+                return ThreeAxis(x*v, y*v, z*v);
+            }
+
+            ThreeAxis operator/(const float d) const
+            {
+                return ThreeAxis(x/d, y/d, z/d);
+            }
+
+            bool operator<(const float v) const
+            {
+                return x < v && y < v && z < v;
+            }
+    };
+
+    class ThreeAxisStats {
+
+        public:
+
+            ThreeAxis mean;
+            ThreeAxis variance;
+
+            ThreeAxisStats() = default;
+
+            ThreeAxisStats
+                (const ThreeAxis& mean, const ThreeAxis& variance) 
+                : mean(mean), variance(variance) {}
+
+            ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
     };
 
     class ImuRaw {
 
         public:
 
-            Vec3Raw gyro;
-            Vec3Raw accel;
+            ThreeAxisRaw gyro;
+            ThreeAxisRaw accel;
 
             ImuRaw() = default;
 
-            ImuRaw(const Vec3Raw & gyro, const Vec3Raw & accel)
+            ImuRaw(const ThreeAxisRaw & gyro, const ThreeAxisRaw & accel)
                 : gyro(gyro), accel(accel) {}
 
             ImuRaw& operator=(const ImuRaw& other) = default;
@@ -111,12 +115,12 @@ namespace hf {
 
         public:
 
-            Vec3 gyroDps;
-            Vec3 accelGs;
+            ThreeAxis gyroDps;
+            ThreeAxis accelGs;
 
             ImuFiltered() = default;
 
-            ImuFiltered(const Vec3 & gyroDps, const Vec3 & accelGs) 
+            ImuFiltered(const ThreeAxis & gyroDps, const ThreeAxis & accelGs) 
                 : gyroDps(gyroDps), accelGs(accelGs) {}
 
             ImuFiltered& operator=(const ImuFiltered& other) = default;

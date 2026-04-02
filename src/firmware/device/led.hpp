@@ -16,6 +16,8 @@
 
 #include <Arduino.h>
 
+#include <hackflight.h>
+
 namespace hf {
 
     class LED {

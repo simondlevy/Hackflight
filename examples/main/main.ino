@@ -86,15 +86,16 @@ void loop()
 {
     const auto dt = Timer::getDt();
 
-    _led.blink(_imuFilter.wasGyroBiasFound);
+    _led.blink(_imuFilter.isGyroCalibrated);
 
     // Disable arming while gyro is calibrating
     const auto rxdata =
-        _imuFilter.wasGyroBiasFound ? _rx.read() : RxData();
+        _imuFilter.isGyroCalibrated ? _rx.read() : RxData();
 
     const auto imuraw = _imu.read();
 
-    _imuFilter.step(millis(), imuraw);
+    _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
+                IMU::gyroRangeDps(), IMU::accelRangeGs());
 
     _ekf.enqueueImu(_imuFilter.output);
 

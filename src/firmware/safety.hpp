@@ -15,6 +15,7 @@
  */
 
 #include <hackflight.h>
+#include <firmware/imu/filter.hpp>
 #include <firmware/rxdata.hpp>
 
 namespace hf {
@@ -36,7 +37,7 @@ namespace hf {
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
                     isFlipped(state) ? MODE_PANIC :
-                    rxdata.is_armed && imufilt.wasGyroBiasFound ? MODE_ARMED :
+                    rxdata.is_armed && imufilt.isGyroCalibrated ? MODE_ARMED :
                     mode == MODE_ARMED && !rxdata.is_armed ? MODE_IDLE :
                     mode;
             }
