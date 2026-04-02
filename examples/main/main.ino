@@ -38,38 +38,36 @@
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
+using namespace hf;
 
-static hf::RX _rx;
+static RX _rx;
 
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
-static hf::LED _led = hf::LED(13);
+static LED _led = LED(13);
 
-static hf::StabilizerPid _stabilizerPid;
+static StabilizerPid _stabilizerPid;
 
-static hf::Mixer _mixer;
+static Mixer _mixer;
 
-static hf::IMU _imu;
+static IMU _imu;
 
 ////////////////////////////////////////////////////////////////////////
 
 static const uint32_t FREQ_EKF_PREDICTION = 100;
 
-static hf::ImuFilter _imuFilter;
+static ImuFilter _imuFilter;
 
-static hf::EKF _ekf;
+static EKF _ekf;
 
-static auto getVehicleState(const hf::ImuRaw & imuraw, 
-        const bool isFlying) -> hf::VehicleState
+static auto getVehicleState(const ImuRaw & imuraw, 
+        const bool isFlying) -> VehicleState
 {
     _imuFilter.step(millis(), imuraw);
 
-    const auto imuIsCalibrated = _imuFilter.wasGyroBiasFound;
-    (void)imuIsCalibrated; // XXX should rapid-blink LED until IMU calibrated
-
     _ekf.enqueueImu(_imuFilter.output);
 
-    static hf::Timer _timer;
+    static Timer _timer;
 
     static bool _didResetEstimation;
 
@@ -89,7 +87,7 @@ static auto getVehicleState(const hf::ImuRaw & imuraw,
     const auto state = _ekf.getStateEstimate(msec_curr);
 
     // Get angular velocities directly from gyro
-    return hf::VehicleState(
+    return VehicleState(
             state.dx,
             state.dy,
             state.z,
@@ -117,9 +115,9 @@ void setup()
 
 void loop()
 {
-    const auto dt = hf::Timer::getDt();
+    const auto dt = Timer::getDt();
 
-    _led.blink(); 
+    _led.blink(_imuFilter.wasGyroBiasFound);
 
     _rx.read();
 
@@ -129,15 +127,15 @@ void loop()
 
     const auto state = getVehicleState(imuraw, isFlying);
 
-    const auto setpoint = hf::mksetpoint(_rx.chanvals);
+    const auto setpoint = mksetpoint(_rx.chanvals);
 
-    hf::Debugger::report(state);
-    //hf::Profiler::report();
+    //Debugger::report(state);
+    //Profiler::report();
 
-    _stabilizerPid = hf::StabilizerPid::run( _stabilizerPid,
+    _stabilizerPid = StabilizerPid::run( _stabilizerPid,
             !_rx.is_throttle_down, dt, state, setpoint);
 
-    _mixer = hf::Mixer::run(_mixer, _stabilizerPid.setpoint);
+    _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     _motors.run(_rx.is_armed, _mixer.motorvals);
 }

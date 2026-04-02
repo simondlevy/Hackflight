@@ -20,6 +20,12 @@ namespace hf {
 
     class LED {
 
+        private:
+
+            static constexpr float HEARTBEAT_FREQ = 0.75;
+            static constexpr float CALIBRATING_FREQ = 3;
+            static constexpr uint32_t PULSE_DURATION_MSEC = 50;
+
         public:
 
             LED(const uint8_t pin) : _pin(pin) {}
@@ -38,24 +44,22 @@ namespace hf {
                 }
             }
 
-            void blink()
+            void blink(const bool is_imu_calibrated)
             {
-                static uint32_t blink_counter, blink_delay;
-                static bool blinkAlternate;
+                static bool _pulsing;
+                static uint32_t _pulse_start;
+                static Timer _timer;
 
-                const auto usec_curr = micros();
+                if (_timer.ready(is_imu_calibrated ? HEARTBEAT_FREQ : CALIBRATING_FREQ)) {
+                    digitalWrite(_pin, true);
+                    _pulsing = true;
+                    _pulse_start = millis();
+                }
 
-                if (usec_curr - blink_counter > blink_delay) {
-                    blink_counter = micros();
-                    digitalWrite(_pin, blinkAlternate); 
-
-                    if (blinkAlternate == 1) {
-                        blinkAlternate = 0;
-                        blink_delay = 100000;
-                    }
-                    else if (blinkAlternate == 0) {
-                        blinkAlternate = 1;
-                        blink_delay = 2000000;
+                else if (_pulsing) {
+                    if (millis() - _pulse_start > PULSE_DURATION_MSEC) {
+                        digitalWrite(_pin, false);
+                        _pulsing = false;
                     }
                 }
             }
