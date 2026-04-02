@@ -111,7 +111,7 @@ void setup()
 
     _imu.begin();
 
-    _motors.arm(); 
+    _motors.begin(); 
 
     _led.begin(); 
 }
