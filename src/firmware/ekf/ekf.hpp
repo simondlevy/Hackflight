@@ -18,8 +18,7 @@
 
 #include <firmware/ekf/matrix_typedef.h>
 #include <firmware/imu/datatypes.hpp>
-//#include <firmware/opticalflow.hpp>
-//#include <firmware/zranger.hpp>
+#include <firmware/zranger_filter.hpp>
 #include <num.hpp>
 
 namespace hf {
@@ -340,15 +339,15 @@ namespace hf {
                 m.type = MeasurementTypeFlow;
                 m.data.flow = *flow;
                 enqueue(&m);
-            }
+            }*/
 
-            void enqueueRange(const ZRanger::measurement_t * tof)
+            void enqueueRange(const ZRangerFilter & zrfilter)
             {
                 measurement_t m = {};
-                m.type = MeasurementTypeTOF;
-                m.data.tof = *tof;
+                m.type = MeasurementTypeRange;
+                m.data.zrfilter = zrfilter;
                 enqueue(&m);
-            }*/
+            }
 
         private:
 
@@ -371,7 +370,7 @@ namespace hf {
             typedef enum {
                 MeasurementTypeAcceleration,
                 MeasurementTypeGyroscope,
-                MeasurementTypeTOF,
+                MeasurementTypeRange,
                 MeasurementTypeFlow,
             } MeasurementType;
 
@@ -393,7 +392,7 @@ namespace hf {
                 {
                     gyroscopeMeasurement_t gyroscope;
                     accelerationMeasurement_t acceleration;
-                    //ZRanger::measurement_t tof;
+                    ZRangerFilter zrfilter;
                     //OpticalFlow::measurement_t flow;
                 } data;
             } measurement_t;
@@ -570,8 +569,8 @@ namespace hf {
                 switch (m.type) {
 
                     /*
-                    case MeasurementTypeTOF:
-                        updateWithTof(&m.data.tof);
+                    case MeasurementTypeRange:
+                        updateWithRange(&m.data.tof);
                         break;
 
                     case MeasurementTypeFlow:
@@ -657,7 +656,7 @@ namespace hf {
                 _isUpdated = true;
             }
 
-            void updateWithTof(ZRanger::measurement_t *tof)
+            void updateWithRange(ZRanger::measurement_t *tof)
             {
                 // Updates the filter with a measured distance in the zb direction using the
                 float h[STATE_DIM] = {};

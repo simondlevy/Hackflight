@@ -59,21 +59,6 @@ static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
 static auto _zrangerTimer = Timer(ZRANGER_ACQUISITION_RATE_HZ);
 
-// Debugging
-static Debugger _debugger;
-static Profiler _profiler;
-
-// Computation
-static EKF _ekf;
-static FlyingCheck _flyingCheck;
-static ImuFilter _imuFilter;
-static Mixer _mixer;
-static StabilizerPid _stabilizerPid;
-static ZRangerFilter _zrangerFilter;
-
-// Flight mode
-static mode_e _mode;
-
 // Setup
 void setup()
 {
@@ -87,11 +72,27 @@ void setup()
 // Loop
 void loop()
 {
+
+    // Debugging
+    static Debugger _debugger;
+    static Profiler _profiler;
+
+    // Computation
+    static EKF _ekf;
+    static FlyingCheck _flyingCheck;
+    static ImuFilter _imuFilter;
+    static Mixer _mixer;
+    static StabilizerPid _stabilizerPid;
+    static ZRangerFilter _zrangerFilter;
+
+    // Flight mode
+    static mode_e _mode;
+
     if (_zrangerTimer.ready()) {
 
         _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
 
-        //_ekf.enqueueRange(&_zrangerFilter);
+        _ekf.enqueueRange(_zrangerFilter);
     }
 
     const auto dt = Timer::getDt();
@@ -127,7 +128,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    //_debugger.report(state);
+    _debugger.report(state);
     //_profiler.report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
