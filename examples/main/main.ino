@@ -26,6 +26,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <datatypes.hpp>
+#include <firmware/device/bmi088.hpp>
 #include <firmware/device/debugging.hpp>
 #include <firmware/device/elrs.hpp>
 #include <firmware/device/led.hpp>
@@ -33,11 +34,11 @@
 #include <firmware/device/timer.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
-#include <firmware/device/bmi088.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/setpoint.hpp>
+#include <firmware/zranger_filter.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
