@@ -1,6 +1,4 @@
 /*
-   Hackflight for Teensy 4.0 with ELRs receiver
-
    Copyright (C) 2026 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify

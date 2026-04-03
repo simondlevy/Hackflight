@@ -40,6 +40,7 @@
 #include <firmware/device/debugging.hpp>
 #include <firmware/device/elrs.hpp>
 #include <firmware/device/led.hpp>
+#include <firmware/device/pmw3901.hpp>
 #include <firmware/device/profiling.hpp>
 #include <firmware/device/timer.hpp>
 #include <firmware/device/vl53l1x.hpp>
