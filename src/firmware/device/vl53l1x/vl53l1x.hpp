@@ -16,11 +16,14 @@
 
 #include <hackflight.h>
 
-class ZRanger {
+namespace hf {
 
-    public:
+    class ZRanger {
 
-        void begin();
+        public:
 
-        int16_t read();
-};
+            void begin(const uint8_t interruptPin);
+
+            int16_t read();
+    };
+}

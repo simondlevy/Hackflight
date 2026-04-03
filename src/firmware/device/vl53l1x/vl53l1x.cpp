@@ -14,11 +14,14 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Third-party libraries
 #include <Adafruit_VL53L1X.h>
 
+// Hackflight library
+#include <hackflight.h>
+#include <firmware/device/debugging.hpp>
 #include <firmware/device/vl53l1x/vl53l1x.hpp>
-
-#if 0
+using namespace hf;
 
 static Adafruit_VL53L1X _vl53l1x;
 
@@ -31,17 +34,17 @@ static void zranger_handle_data_ready()
     _vl53l1x.clearInterrupt();
 }
 
-void hf::ZRanger::begin(const uint8_t interruptPin)
+void ZRanger::begin(const uint8_t interruptPin)
 {
     Wire1.begin();
     Wire1.setClock(400000);
 
     if (!_vl53l1x.begin(0x29, &Wire1)) {
-        hf::Debugger::reportForever("Unable to initialize sensor");
+        Debugger::reportForever("Unable to initialize sensor");
     }
 
     if (!_vl53l1x.startRanging()) {
-        hf::Debugger::reportForever("Unable to start ranging");
+        Debugger::reportForever("Unable to start ranging");
     }
 
     // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
@@ -56,7 +59,7 @@ void hf::ZRanger::begin(const uint8_t interruptPin)
     _vl53l1x.clearInterrupt();
 }
 
-int16_t hf::ZRanger::read()
+int16_t ZRanger::read()
 {
     static int16_t distance;
 
@@ -67,4 +70,3 @@ int16_t hf::ZRanger::read()
 
     return distance;
 }
-#endif
