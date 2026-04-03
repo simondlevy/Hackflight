@@ -69,6 +69,7 @@ static mode_e _mode;
 static Timer _ekfPredictionTimer;
 static Timer _flyingCheckTimer;
 
+// Setup
 void setup()
 {
     _rx.begin();
@@ -78,6 +79,7 @@ void setup()
     _zranger.begin();
 }
 
+// Loop
 void loop()
 {
     const auto dt = Timer::getDt();
@@ -95,14 +97,7 @@ void loop()
 
     _ekf.enqueueImu(_imuFilter.output);
 
-    static bool _didResetEstimation;
-
     const uint32_t msec_curr = millis();
-
-    if (_didResetEstimation) {
-        _ekf.reset(msec_curr);
-        _didResetEstimation = false;
-    }
 
     if (_flyingCheckTimer.ready(FREQ_FLYING_CHECK)) {
         _flyingCheck = FlyingCheck::run(
