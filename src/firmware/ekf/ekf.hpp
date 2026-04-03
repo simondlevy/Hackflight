@@ -61,16 +61,9 @@ namespace hf {
 
         public:
 
-            EKF()
-            {
-                reset(0);
-            }
-
-            // XXX needs copy constructor
-
             EKF& operator=(const EKF& other) = default;
  
-            void reset(const uint32_t msec_curr)
+            EKF()
             {
                 axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
                 axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
@@ -111,8 +104,8 @@ namespace hf {
                 ekf_addCovarianceNoise(pinit);
 
                 _isUpdated = false;
-                _lastPredictionMs = msec_curr;
-                _lastProcessNoiseUpdateMs = msec_curr;
+                _lastPredictionMs = 0;
+                _lastProcessNoiseUpdateMs = 0;
             }
 
             void predict(const uint32_t msec_curr, bool isFlying) 
