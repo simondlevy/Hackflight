@@ -32,6 +32,7 @@
 #include <firmware/device/led.hpp>
 #include <firmware/device/profiling.hpp>
 #include <firmware/device/timer.hpp>
+#include <firmware/device/vl53l1x/vl53l1x.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>

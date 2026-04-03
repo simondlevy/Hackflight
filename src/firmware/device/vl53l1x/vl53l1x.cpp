@@ -14,12 +14,11 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#if 0
 #include <Adafruit_VL53L1X.h>
 
-#include <hackflight.h>
-#include <firmware/debugging.hpp>
-#include <firmware/zranger/device_api.h>
+#include <firmware/device/vl53l1x/vl53l1x.hpp>
+
+#if 0
 
 static Adafruit_VL53L1X _vl53l1x;
 
