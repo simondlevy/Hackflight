@@ -568,11 +568,11 @@ namespace hf {
             {
                 switch (m.type) {
 
-                    /*
                     case MeasurementTypeRange:
-                        updateWithRange(&m.data.tof);
+                        updateWithRange(m.data.zrfilter);
                         break;
 
+                        /*
                     case MeasurementTypeFlow:
                         updateWithFlow(&m.data.flow);
                         break;
@@ -654,10 +654,11 @@ namespace hf {
                         flow->stdDevY*FLOW_RESOLUTION);
 
                 _isUpdated = true;
-            }
+            }*/
 
-            void updateWithRange(ZRanger::measurement_t *tof)
+            void updateWithRange(const ZRangerFilter & zrfilter)
             {
+                /*
                 // Updates the filter with a measured distance in the zb direction using the
                 float h[STATE_DIM] = {};
 
@@ -680,8 +681,8 @@ namespace hf {
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance, tof->stdDev);
 
                     _isUpdated = true;
-                }
-            }*/
+                }*/
+            }
 
             void updateWithAccel(measurement_t & m)
             {
