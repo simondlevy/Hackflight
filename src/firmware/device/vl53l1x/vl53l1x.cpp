@@ -20,7 +20,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/device/debugging.hpp>
-#include <firmware/device/vl53l1x/vl53l1x.hpp>
+#include <firmware/device/vl53l1x/vl53l1x.h>
 using namespace hf;
 
 static Adafruit_VL53L1X _vl53l1x;
