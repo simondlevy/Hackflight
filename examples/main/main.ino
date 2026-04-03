@@ -16,11 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Standard Arduino libraries
-#include <Wire.h> 
-
 // Third-party libraries
-#include <BMI088.h>
 #include <dshot-teensy4.hpp>  
 
 // Hackflight library
@@ -57,7 +53,7 @@ static auto _led = LED(13);
 static auto _zranger = ZRanger(ZRANGER_INTERRUPT_PIN);
 static IMU _imu;
 
-// Helpers
+// Computation
 static StabilizerPid _stabilizerPid;
 static Mixer _mixer;
 static ImuFilter _imuFilter;
