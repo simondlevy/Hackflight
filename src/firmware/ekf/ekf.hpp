@@ -18,8 +18,8 @@
 
 #include <firmware/ekf/matrix_typedef.h>
 #include <firmware/imu/datatypes.hpp>
-#include <firmware/opticalflow.hpp>
-#include <firmware/zranger.hpp>
+//#include <firmware/opticalflow.hpp>
+//#include <firmware/zranger.hpp>
 #include <num.hpp>
 
 namespace hf {
@@ -340,6 +340,7 @@ namespace hf {
                 enqueue(&m);
             }
 
+            /*
             void enqueueFlow(const OpticalFlow::measurement_t * flow)
             {
                 measurement_t m = {};
@@ -354,7 +355,7 @@ namespace hf {
                 m.type = MeasurementTypeTOF;
                 m.data.tof = *tof;
                 enqueue(&m);
-            }
+            }*/
 
         private:
 
@@ -399,8 +400,8 @@ namespace hf {
                 {
                     gyroscopeMeasurement_t gyroscope;
                     accelerationMeasurement_t acceleration;
-                    ZRanger::measurement_t tof;
-                    OpticalFlow::measurement_t flow;
+                    //ZRanger::measurement_t tof;
+                    //OpticalFlow::measurement_t flow;
                 } data;
             } measurement_t;
 
@@ -575,6 +576,7 @@ namespace hf {
             {
                 switch (m.type) {
 
+                    /*
                     case MeasurementTypeTOF:
                         updateWithTof(&m.data.tof);
                         break;
@@ -582,6 +584,7 @@ namespace hf {
                     case MeasurementTypeFlow:
                         updateWithFlow(&m.data.flow);
                         break;
+                        */
 
                     case MeasurementTypeGyroscope:
                         updateWithGyro(m);
@@ -596,6 +599,7 @@ namespace hf {
                 }
             }
 
+            /*
             void updateWithFlow(const OpticalFlow::measurement_t *flow) 
             {
                 const ThreeAxis *gyro = &_gyroLatest;
@@ -685,7 +689,7 @@ namespace hf {
 
                     _isUpdated = true;
                 }
-            }
+            }*/
 
             void updateWithAccel(measurement_t & m)
             {
