@@ -19,7 +19,8 @@
 #include <Arduino.h>
 
 #include <firmware/ekf/matrix_typedef.h>
-#include <firmware/imu/datatypes.hpp>
+#include <firmware/flow_filter.hpp>
+#include <firmware/imu_filter/datatypes.hpp>
 #include <firmware/zranger_filter.hpp>
 #include <num.hpp>
 

@@ -24,7 +24,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/imu/datatypes.hpp>
+#include <firmware/imu_filter/datatypes.hpp>
 
 namespace hf {
 

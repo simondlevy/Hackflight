@@ -17,7 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/imu/datatypes.hpp>
+#include <firmware/imu_filter/datatypes.hpp>
 #include <firmware/rxdata.hpp>
 #include <firmware/device/timer.hpp>
 
@@ -132,7 +132,7 @@ namespace hf {
 
                     if (full) {
                         printf("%5lu | "
-                                "z=%5.3f dz=%+5.3f "
+                                "z=%6.3f dz=%+5.3f "
                                 "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
                                 "psi=%+04.0f dpsi=%+04.0f\n",
                                 _helper.count, 
