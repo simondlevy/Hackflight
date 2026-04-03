@@ -51,7 +51,7 @@ void ZRanger::begin()
     }
 
     // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
-    _vl53l1x.setTimingBudget(50);
+    _vl53l1x.setTimingBudget(50'000);
 
     // Polarity=1 => RISING
     _vl53l1x.VL53L1X_SetInterruptPolarity(1);
