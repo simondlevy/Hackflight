@@ -42,9 +42,10 @@
 using namespace hf;
 
 // Constants
-static const uint32_t FREQ_EKF_PREDICTION = 100;
-static const uint32_t FREQ_FLYING_CHECK = 25;
-static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
+static constexpr uint32_t EKF_PREDICTION_RATE_HZ      = 100;
+static constexpr uint32_t FLYING_CHECK_RATE_HZ        = 25;
+static constexpr uint32_t ZRANGER_ACQUISITION_RATE_HZ = 100;
+static constexpr uint8_t ZRANGER_INTERRUPT_PIN = 7;
 
 // Devices
 static auto _rx = RX(&Serial5);
@@ -53,17 +54,21 @@ static auto _led = LED(13);
 static auto _zranger = ZRanger(ZRANGER_INTERRUPT_PIN);
 static IMU _imu;
 
+// Timers
+static Timer _ekfPredictionTimer;
+static Timer _flyingCheckTimer;
+static Timer _zrangerTimer;
+
 // Computation
 static StabilizerPid _stabilizerPid;
 static Mixer _mixer;
 static ImuFilter _imuFilter;
 static EKF _ekf;
 static FlyingCheck _flyingCheck;
-static mode_e _mode;
+static ZRangerFilter _zrangerFilter;
 
-// Timers
-static Timer _ekfPredictionTimer;
-static Timer _flyingCheckTimer;
+// Flight mode
+static mode_e _mode;
 
 // Setup
 void setup()
@@ -78,6 +83,13 @@ void setup()
 // Loop
 void loop()
 {
+    if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
+
+        _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
+
+        //_ekf.enqueueRange(&_zrangerFilter);
+    }
+
     const auto dt = Timer::getDt();
 
     _led.blink(_imuFilter.isGyroCalibrated);
@@ -89,19 +101,19 @@ void loop()
     const auto imuraw = _imu.read();
 
     _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                IMU::gyroRangeDps(), IMU::accelRangeGs());
+            IMU::gyroRangeDps(), IMU::accelRangeGs());
 
     _ekf.enqueueImu(_imuFilter.output);
 
     const uint32_t msec_curr = millis();
 
-    if (_flyingCheckTimer.ready(FREQ_FLYING_CHECK)) {
+    if (_flyingCheckTimer.ready(FLYING_CHECK_RATE_HZ)) {
         _flyingCheck = FlyingCheck::run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
     }
 
     // Run the system dynamics to predict the state forward.
-    if (_ekfPredictionTimer.ready(FREQ_EKF_PREDICTION)) {
+    if (_ekfPredictionTimer.ready(EKF_PREDICTION_RATE_HZ)) {
         _ekf.predict(msec_curr, _flyingCheck.isFlying); 
     }
 
