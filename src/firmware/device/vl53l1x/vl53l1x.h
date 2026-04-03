@@ -22,8 +22,14 @@ namespace hf {
 
         public:
 
-            void begin(const uint8_t interruptPin);
+            ZRanger (const uint8_t interruptPin);
+
+            void begin();
 
             int16_t read();
+
+        private:
+
+            uint8_t _interruptPin;
     };
 }

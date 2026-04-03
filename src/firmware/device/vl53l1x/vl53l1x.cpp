@@ -34,7 +34,10 @@ static void zranger_handle_data_ready()
     _vl53l1x.clearInterrupt();
 }
 
-void ZRanger::begin(const uint8_t interruptPin)
+ZRanger::ZRanger(const uint8_t interruptPin)
+    : _interruptPin(interruptPin) {}
+
+void ZRanger::begin()
 {
     Wire1.begin();
     Wire1.setClock(400000);
@@ -52,7 +55,7 @@ void ZRanger::begin(const uint8_t interruptPin)
 
     // Polarity=1 => RISING
     _vl53l1x.VL53L1X_SetInterruptPolarity(1);
-    attachInterrupt(digitalPinToInterrupt(interruptPin),
+    attachInterrupt(digitalPinToInterrupt(_interruptPin),
             zranger_handle_data_ready, RISING);
 
     // Clear interrupt to get things started

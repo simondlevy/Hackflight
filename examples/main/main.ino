@@ -45,49 +45,37 @@
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
 
+// Constants
 static const uint32_t FREQ_EKF_PREDICTION = 100;
-
 static const uint32_t FREQ_FLYING_CHECK = 25;
-
 static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
 
+// Devices
 static auto _rx = RX(&Serial5);
-
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
-
 static auto _led = LED(13);
-
-static ZRanger _zranger;
-
-static StabilizerPid _stabilizerPid;
-
-static Mixer _mixer;
-
+static auto _zranger = ZRanger(ZRANGER_INTERRUPT_PIN);
 static IMU _imu;
 
+// Helpers
+static StabilizerPid _stabilizerPid;
+static Mixer _mixer;
 static ImuFilter _imuFilter;
-
 static EKF _ekf;
-
 static FlyingCheck _flyingCheck;
-
 static mode_e _mode;
 
+// Timers
 static Timer _ekfPredictionTimer;
-
 static Timer _flyingCheckTimer;
 
 void setup()
 {
     _rx.begin();
-
     _imu.begin();
-
     _motors.begin(); 
-
     _led.begin(); 
-
-    _zranger.begin(ZRANGER_INTERRUPT_PIN);
+    _zranger.begin();
 }
 
 void loop()
