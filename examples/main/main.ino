@@ -42,29 +42,33 @@
 using namespace hf;
 
 // Constants
-static constexpr uint32_t EKF_PREDICTION_RATE_HZ      = 100;
-static constexpr uint32_t FLYING_CHECK_RATE_HZ        = 25;
-static constexpr uint32_t ZRANGER_ACQUISITION_RATE_HZ = 100;
+static constexpr float EKF_PREDICTION_RATE_HZ      = 100;
+static constexpr float FLYING_CHECK_RATE_HZ        = 25;
+static constexpr float ZRANGER_ACQUISITION_RATE_HZ = 100;
 static constexpr uint8_t ZRANGER_INTERRUPT_PIN = 7;
 
 // Devices
+static IMU _imu;
+static auto _led = LED(13);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
-static auto _led = LED(13);
 static auto _zranger = ZRanger(ZRANGER_INTERRUPT_PIN);
-static IMU _imu;
 
 // Timers
-static Timer _ekfPredictionTimer;
-static Timer _flyingCheckTimer;
-static Timer _zrangerTimer;
+static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
+static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
+static auto _zrangerTimer = Timer(ZRANGER_ACQUISITION_RATE_HZ);
+
+// Debugging
+static Debugger _debugger;
+static Profiler _profiler;
 
 // Computation
-static StabilizerPid _stabilizerPid;
-static Mixer _mixer;
-static ImuFilter _imuFilter;
 static EKF _ekf;
 static FlyingCheck _flyingCheck;
+static ImuFilter _imuFilter;
+static Mixer _mixer;
+static StabilizerPid _stabilizerPid;
 static ZRangerFilter _zrangerFilter;
 
 // Flight mode
@@ -83,7 +87,7 @@ void setup()
 // Loop
 void loop()
 {
-    if (_zrangerTimer.ready(ZRANGER_ACQUISITION_RATE_HZ)) {
+    if (_zrangerTimer.ready()) {
 
         _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
 
@@ -107,13 +111,13 @@ void loop()
 
     const uint32_t msec_curr = millis();
 
-    if (_flyingCheckTimer.ready(FLYING_CHECK_RATE_HZ)) {
+    if (_flyingCheckTimer.ready()) {
         _flyingCheck = FlyingCheck::run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
     }
 
     // Run the system dynamics to predict the state forward.
-    if (_ekfPredictionTimer.ready(EKF_PREDICTION_RATE_HZ)) {
+    if (_ekfPredictionTimer.ready()) {
         _ekf.predict(msec_curr, _flyingCheck.isFlying); 
     }
 
@@ -123,8 +127,8 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    Debugger::report(state);
-    //Profiler::report();
+    _debugger.report(state);
+    //_profiler.report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
             !rxdata.is_throttle_down, dt, state, setpoint);

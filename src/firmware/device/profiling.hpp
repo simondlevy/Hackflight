@@ -23,13 +23,9 @@ namespace hf {
 
         public:
 
-            static void report()
+            void report()
             {
-                static Timer _timer;
-
-                static uint32_t _count;
-
-                if (_timer.ready(1)) {
+                if (_timer.ready()) {
 
                     if (_count > 0) {
                         printf("count=%d\n", (int)_count);
@@ -40,18 +36,12 @@ namespace hf {
                 _count++;
             }
 
-            static uint32_t report(const uint32_t count)
-            {
-                static Timer _timer;
+        private:
 
-                if (_timer.ready(1)) {
+            Timer _timer = Timer(1); // 1 Hz reporting
 
-                    if (count > 0) {
-                        printf("count=%d\n", (int)count);
-                    }
-                    return 0;
-                }
-                return count;
-            }
+            uint32_t _count;
     };
+
+
 }

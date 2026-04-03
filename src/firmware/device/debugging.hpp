@@ -33,7 +33,7 @@ namespace hf {
 
                 private:
 
-                    Timer _timer;
+                    Timer _timer = Timer(FREQ);
 
                 public:
 
@@ -41,7 +41,7 @@ namespace hf {
 
                     bool ready()
                     {
-                        if (_timer.ready(FREQ)) {
+                        if (_timer.ready()) {
                             count++;
                             return true;
                         }
@@ -60,10 +60,8 @@ namespace hf {
                 }
             }
 
-            static void report(const mode_e mode)
+            void report(const mode_e mode)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     static const char * modes[6] = {
@@ -79,30 +77,24 @@ namespace hf {
                 }
             }
 
-            static void report(const char * message)
+            void report(const char * message)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     printf("%5lu | %s\n", _helper.count, message);
                 }
             }
 
-            static void reportFloat(const char * label, const float value)
+            void reportFloat(const char * label, const float value)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     printf("%5lu | %s=%f\n", _helper.count, label, value);
                 }
             }
 
-            static void reportBool(const char * label, const bool flag)
+            void reportBool(const char * label, const bool flag)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     printf("%5lu | %s=%s\n",
@@ -110,10 +102,8 @@ namespace hf {
                 }
             }
 
-            static void report(const RxData & rxdata)
+            void report(const RxData & rxdata)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     const auto ax = rxdata.axes;
@@ -127,10 +117,8 @@ namespace hf {
                 }
             }
 
-            static void report(const Setpoint & setpoint)
+            void report(const Setpoint & setpoint)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%3.3f yaw=%+3.3f\n",
@@ -138,10 +126,8 @@ namespace hf {
                             setpoint.pitch, setpoint.yaw); }
             }
 
-            static void report(const VehicleState & state, const bool full=false)
+            void report(const VehicleState & state, const bool full=false)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     if (full) {
@@ -165,10 +151,8 @@ namespace hf {
                 }
             }
 
-            static void report(const ThreeAxisRaw & raw)
+            void report(const ThreeAxisRaw & raw)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     printf("%5lu | x=%+05d y=%+05d z=%+05d\n",
@@ -176,10 +160,8 @@ namespace hf {
                 }
             }
 
-            static void report(const ThreeAxis & vec)
+            void report(const ThreeAxis & vec)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     printf("%5lu | x=%+04.0f y=%+04.0f z=%+04.0f\n",
@@ -187,10 +169,8 @@ namespace hf {
                 }
             }
 
-            static void report(const ImuFiltered & imufilt)
+            void report(const ImuFiltered & imufilt)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     const auto g = imufilt.gyroDps;
@@ -202,10 +182,8 @@ namespace hf {
                 }
             }
 
-            static void report(const ImuRaw & imuraw)
+            void report(const ImuRaw & imuraw)
             {
-                static Helper _helper;
-
                 if (_helper.ready()) {
 
                     const auto gyro = imuraw.gyro;
@@ -217,5 +195,9 @@ namespace hf {
                             accel.x, accel.y, accel.z);
                 }
             }
+
+        private:
+
+            Helper _helper;
     };
 }

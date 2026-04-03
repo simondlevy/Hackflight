@@ -24,8 +24,8 @@ namespace hf {
 
         private:
 
-            static constexpr float HEARTBEAT_FREQ = 0.75;
-            static constexpr float CALIBRATING_FREQ = 3;
+            static constexpr float HEARTBEAT_FREQ_HZ = 0.75;
+            static constexpr float FASTBLINK_FREQ_HZ = 3;
             static constexpr uint32_t PULSE_DURATION_MSEC = 50;
 
         public:
@@ -50,9 +50,11 @@ namespace hf {
             {
                 static bool _pulsing;
                 static uint32_t _pulse_start;
-                static Timer _timer;
 
-                if (_timer.ready(is_imu_calibrated ? HEARTBEAT_FREQ : CALIBRATING_FREQ)) {
+                const auto ready = is_imu_calibrated ?
+                    _heartbeatTimer.ready() : _fastblinkTimer.ready();
+                
+                if (ready) {
                     digitalWrite(_pin, true);
                     _pulsing = true;
                     _pulse_start = millis();
@@ -69,5 +71,8 @@ namespace hf {
         private:
 
             uint8_t _pin;
+
+            Timer _heartbeatTimer = Timer(HEARTBEAT_FREQ_HZ);
+            Timer _fastblinkTimer = Timer(FASTBLINK_FREQ_HZ);
     };
 }

@@ -24,19 +24,13 @@ namespace hf {
 
         public:
 
-            static bool ready(
-                    const uint32_t msec_curr,
-                    const uint32_t msec_prev,
-                    const float freq)
-            {
-                return msec_curr - msec_prev > 1000 / freq;
-            }
+            Timer(const float freq) : _freq(freq) { }
 
-            bool ready(const float freq)
+            bool ready()
             {
                 const uint32_t msec_curr = millis();
 
-                if (msec_curr - _msec_prev > 1000 / freq) {
+                if (msec_curr - _msec_prev > 1000 / _freq) {
 
                     _msec_prev = msec_curr;
 
@@ -68,6 +62,8 @@ namespace hf {
             }
 
         private:
+
+            float _freq;
 
             uint32_t _msec_prev;
     };
