@@ -14,13 +14,36 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+
+// Standard Arduino libraries
+#include <SPI.h>
+
+// Third-party libraries
 #include <pmw3901.hpp>
 
-#include <SPI.h>
+// Hackflight library
+#include <hackflight.h>
+#include <firmware/device/debugging.hpp>
+#include <firmware/flow_filter.hpp>
+
+namespace hf {
+
+    class OpticalFlowSensor {
+
+        public:
+
+            void begin()
+            {
+            }
+
+        private:
+
+            PMW3901 _pmw3901;
+    };
+}
 
 #if 0
 // Using digital pin 10 for chip select
-static PMW3901 sensor;
 
 void setup() 
 {

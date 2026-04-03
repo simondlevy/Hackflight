@@ -16,23 +16,9 @@
 
 #pragma once
 
+#include <firmware/device/datatypes.hpp>
+
 namespace hf {
-
-    class ThreeAxisRaw {
-
-        public:
-
-            int16_t x;
-            int16_t y;
-            int16_t z;
-
-            ThreeAxisRaw() = default;
-
-            ThreeAxisRaw(const int16_t x, const int16_t y, const int16_t z) 
-                : x(x), y(y), z(z) {}
-
-            ThreeAxisRaw& operator=(const ThreeAxisRaw& other) = default;
-    };
 
     class ThreeAxis {
 
