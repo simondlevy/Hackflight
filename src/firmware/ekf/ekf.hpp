@@ -675,9 +675,6 @@ namespace hf {
                     float predictedDistance = _x[STATE_Z] / cosf(angle);
                     float measuredDistance = zrfilter.distance_m;
 
-                    printf("predicted=%f  measured=%f\n",
-                            predictedDistance, measuredDistance);
-
                     // This just acts like a gain for the sensor model. Further
                     // updates are done in the scalar update function below
                     h[STATE_Z] = 1 / cosf(angle); 

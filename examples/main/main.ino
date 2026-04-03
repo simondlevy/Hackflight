@@ -88,10 +88,9 @@ void loop()
     // Flight mode
     static mode_e _mode;
 
-    if (_zrangerTimer.ready()) {
-
+    // Wait til gyro is calibrated before acquriing Z-Ranger data
+    if (_imuFilter.isGyroCalibrated && _zrangerTimer.ready()) {
         _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
-
         _ekf.enqueueRange(_zrangerFilter);
     }
 
@@ -128,7 +127,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    //_debugger.report(state);
+    _debugger.report(state, true);
     //_profiler.report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
