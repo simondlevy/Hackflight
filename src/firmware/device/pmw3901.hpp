@@ -24,7 +24,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/device/debugging.hpp>
-#include <firmware/flow_filter.hpp>
+#include <firmware/device/datatypes.hpp>
 
 namespace hf {
 
@@ -34,6 +34,17 @@ namespace hf {
 
             void begin()
             {
+                SPI.begin();
+
+                if (!_pmw3901.begin()) {
+                    Debugger::reportForever("Unable to initialize PMW3901");
+                }
+            }
+
+
+            auto read() -> OpticalFlowRaw
+            {
+                return OpticalFlowRaw(0, 0, false);
             }
 
         private:
@@ -43,22 +54,6 @@ namespace hf {
 }
 
 #if 0
-// Using digital pin 10 for chip select
-
-void setup() 
-{
-    Serial.begin(115200);
-
-    SPI.begin();
-
-    if (!sensor.begin()) {
-
-        while(true) { 
-            Serial.println("Initialization of the flow sensor failed");
-            delay(500);
-        }
-    }
-}
 
 void loop() 
 {
