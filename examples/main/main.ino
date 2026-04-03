@@ -49,11 +49,15 @@ static const uint32_t FREQ_EKF_PREDICTION = 100;
 
 static const uint32_t FREQ_FLYING_CHECK = 25;
 
+static const uint8_t ZRANGER_INTERRUPT_PIN = 7;
+
 static auto _rx = RX(&Serial5);
 
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
 
 static auto _led = LED(13);
+
+static ZRanger _zranger;
 
 static StabilizerPid _stabilizerPid;
 
@@ -82,6 +86,8 @@ void setup()
     _motors.begin(); 
 
     _led.begin(); 
+
+    _zranger.begin(ZRANGER_INTERRUPT_PIN);
 }
 
 void loop()
