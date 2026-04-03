@@ -44,7 +44,13 @@ namespace hf {
 
             auto read() -> OpticalFlowRaw
             {
-                return OpticalFlowRaw(0, 0, false);
+                int16_t dx = 0;
+                int16_t dy = 0;
+                auto moved = false;
+
+                _pmw3901.readMotion(dx, dy, moved);
+
+                return OpticalFlowRaw(dx, dy, moved);
             }
 
         private:
@@ -52,24 +58,3 @@ namespace hf {
             PMW3901 _pmw3901;
     };
 }
-
-#if 0
-
-void loop() 
-{
-    int16_t deltaX = 0;
-    int16_t deltaY = 0;
-    bool gotMotion = false;
-
-    sensor.readMotion(deltaX, deltaY, gotMotion); 
-
-    Serial.print("deltaX: ");
-    Serial.print(deltaX);
-    Serial.print(",\tdeltaY: ");
-    Serial.print(deltaY);
-    Serial.print(",\tgotMotion: ");
-    Serial.println(gotMotion ? "yes" : "no");
-
-    delay(100);
-}
-#endif

@@ -57,6 +57,7 @@ static IMU _imu;
 static auto _led = LED(9);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
+static OpticalFlowSensor _flowSensor;
 static ZRanger _zranger;
 
 // Timers
@@ -67,6 +68,7 @@ static auto _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
 // Setup
 void setup()
 {
+    _flowSensor.begin();
     _rx.begin();
     _imu.begin();
     _motors.begin(); 
