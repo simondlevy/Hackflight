@@ -28,7 +28,7 @@
 #include <firmware/device/led.hpp>
 #include <firmware/device/profiling.hpp>
 #include <firmware/device/timer.hpp>
-#include <firmware/device/vl53l1x/vl53l1x.h>
+#include <firmware/device/vl53l1x.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
@@ -52,7 +52,7 @@ static IMU _imu;
 static auto _led = LED(13);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
-static auto _zranger = ZRanger(ZRANGER_INTERRUPT_PIN);
+static ZRanger _zranger;
 
 // Timers
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
