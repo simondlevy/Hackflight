@@ -130,6 +130,8 @@ void loop()
 
         _ekf.enqueue(_zrangerFilter);
         _ekf.enqueue(_opticalFlowFilter);
+
+        _ekf.enqueue(_zrangerFilter, _opticalFlowFilter);
     }
 #else
     (void)_flowdeckTimer;

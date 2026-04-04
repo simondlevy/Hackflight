@@ -335,6 +335,16 @@ namespace hf {
                 enqueue(&m);
             }
 
+            void enqueue(
+                    const ZRangerFilter & zrfilter,
+                    const OpticalFlowFilter & offilter)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeFlowDeck;
+                //m.data.zrfilter = zrfilter;
+                enqueue(&m);
+            }
+
             void enqueue(const OpticalFlowFilter & offilter)
             {
                 measurement_t m = {};
@@ -389,8 +399,7 @@ namespace hf {
 
             typedef struct {
                 MeasurementType type;
-                union
-                {
+                union {
                     imuMeasurement_t imu;
                     ZRangerFilter zrfilter;
                     OpticalFlowFilter offilter;
