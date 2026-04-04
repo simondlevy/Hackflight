@@ -586,8 +586,6 @@ namespace hf {
 
             void updateWithFlow(const OpticalFlowFilter & offilter)
             {
-                (void)offilter;
-#if 0
                 const IMU::ThreeAxis *gyro = &_gyroLatest;
 
                 // [pixels] (same in x and y)
@@ -618,37 +616,36 @@ namespace hf {
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
                 float hx[STATE_DIM] = {};
-                _predictedNX = (flow->dt * Npix / thetapix ) * 
+                _predictedNX = (offilter.dt * Npix / thetapix ) * 
                     ((dx_g * _r22 / z_g) - omegay_b);
-                _measuredNX = flow->dpixelx*FLOW_RESOLUTION;
+                _measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dx (and z?)
-                hx[STATE_Z] = (Npix * flow->dt / thetapix) * 
+                hx[STATE_Z] = (Npix * offilter.dt / thetapix) * 
                     ((_r22 * dx_g) / (-z_g * z_g));
-                hx[STATE_VX] = (Npix * flow->dt / thetapix) * 
+                hx[STATE_VX] = (Npix * offilter.dt / thetapix) * 
                     (_r22 / z_g);
 
                 //First update
                 ekf_updateWithScalar(hx, (_measuredNX-_predictedNX), 
-                        flow->stdDevX*FLOW_RESOLUTION);
+                        offilter.stdDevX*FLOW_RESOLUTION);
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[STATE_DIM] = {};
-                _predictedNY = (flow->dt * Npix / thetapix ) * 
+                _predictedNY = (offilter.dt * Npix / thetapix ) * 
                     ((dy_g * _r22 / z_g) + omegax_b);
-                _measuredNY = flow->dpixely*FLOW_RESOLUTION;
+                _measuredNY = offilter.dpixely*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dy (and z?)
-                hy[STATE_Z] = (Npix * flow->dt / thetapix) * 
+                hy[STATE_Z] = (Npix * offilter.dt / thetapix) * 
                     ((_r22 * dy_g) / (-z_g * z_g));
-                hy[STATE_VY] = (Npix * flow->dt / thetapix) * (_r22 / z_g);
+                hy[STATE_VY] = (Npix * offilter.dt / thetapix) * (_r22 / z_g);
 
                 // Second update
                 ekf_updateWithScalar(hy, (_measuredNY-_predictedNY),
-                        flow->stdDevY*FLOW_RESOLUTION);
+                        offilter.stdDevY*FLOW_RESOLUTION);
 
                 _isUpdated = true;
-#endif
             }
 
             void updateWithRange(const ZRangerFilter & zrfilter)

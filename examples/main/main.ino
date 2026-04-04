@@ -125,11 +125,10 @@ void loop()
 
         _zrangerFilter = ZRangerFilter::step(_zrangerFilter, _zranger.read());
 
-        _ekf.enqueue(_zrangerFilter);
-
         _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
+        _ekf.enqueue(_zrangerFilter);
         _ekf.enqueue(_opticalFlowFilter);
     }
 #else

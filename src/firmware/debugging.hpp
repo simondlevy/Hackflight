@@ -133,11 +133,11 @@ namespace hf {
 
                     if (full) {
                         printf("%5lu | "
-                                "z=%6.3f dz=%+5.3f "
+                                "dx=%+03.3f dy=%+03.3f z=%6.3f dz=%+5.3f "
                                 "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
                                 "psi=%+04.0f dpsi=%+04.0f\n",
                                 _helper.count, 
-                                state.z, state.dz,
+                                state.dx, state.dy, state.z, state.dz,
                                 state.phi, state.dphi, state.theta, state.dtheta,
                                 state.psi, state.dpsi);
                     }

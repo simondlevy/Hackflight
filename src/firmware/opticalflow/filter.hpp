@@ -31,6 +31,15 @@ namespace hf {
 
         public:
 
+            bool gotMotion;
+            uint32_t timestamp_usec;
+            uint32_t usec_prev;
+            float dpixelx;  // Accumulated pixel count x
+            float dpixely;  // Accumulated pixel count y
+            float stdDevX;  // Measurement standard deviation
+            float stdDevY;  // Measurement standard deviation
+            float dt;       // Time during which pixels were accumulated
+
             OpticalFlowFilter() = default;
 
             OpticalFlowFilter& operator=(const OpticalFlowFilter& other) = default;
@@ -44,13 +53,13 @@ namespace hf {
                     const float stdDevY,
                     const float dt)
                 : 
-                    _gotMotion(gotMotion),
-                    _usec_prev(usec_prev),
-                    _dpixelx(dpixelx),  
-                    _dpixely(dpixely), 
-                    _stdDevX(stdDevX),
-                    _stdDevY(stdDevY),
-                    _dt(dt) {}
+                    gotMotion(gotMotion),
+                    usec_prev(usec_prev),
+                    dpixelx(dpixelx),  
+                    dpixely(dpixely), 
+                    stdDevX(stdDevX),
+                    stdDevY(stdDevY),
+                    dt(dt) {}
 
             static auto step(
                     const OpticalFlowFilter & filter,
@@ -72,22 +81,12 @@ namespace hf {
                             (float)accpy,   // dpixely
                             FLOW_STD_FIXED, // stdDevX
                             FLOW_STD_FIXED, // stdDevY
-                            (float)(usec_curr - filter._usec_prev) / 1e6 // dt
+                            (float)(usec_curr - filter.usec_prev) / 1e6 // dt
                             ) :
                     filter;
             }        
 
         private:
-
-            bool _gotMotion;
-            uint32_t _timestamp_usec;
-            uint32_t _usec_prev;
-            float _dpixelx;  // Accumulated pixel count x
-            float _dpixely;  // Accumulated pixel count y
-            float _stdDevX;  // Measurement standard deviation
-            float _stdDevY;  // Measurement standard deviation
-            float _dt;       // Time during which pixels were accumulated
-
 
             static auto inlimit(const int16_t accval) -> bool
             {
