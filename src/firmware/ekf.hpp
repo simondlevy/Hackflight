@@ -389,7 +389,7 @@ namespace hf {
                 {
                     imuMeasurement_t imu;
                     ZRangerFilter zrfilter;
-                    //OpticalFlow::measurement_t flow;
+                    OpticalFlowFilter flow;
                 } data;
             } measurement_t;
 
