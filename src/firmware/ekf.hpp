@@ -416,6 +416,7 @@ namespace hf {
                 MeasurementType type;
                 union
                 {
+                    imuMeasurement_t imu;
                     gyroscopeMeasurement_t gyroscope;
                     accelerationMeasurement_t acceleration;
                     ZRangerFilter zrfilter;
