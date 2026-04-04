@@ -325,7 +325,7 @@ namespace hf {
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
-            void enqueueImu(const IMU::FilteredData & imu)
+            void enqueue(const IMU::FilteredData & imu)
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeGyroscope;
@@ -347,7 +347,7 @@ namespace hf {
                 enqueue(&m);
             }*/
 
-            void enqueueRange(const ZRangerFilter & zrfilter)
+            void enqueue(const ZRangerFilter & zrfilter)
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeRange;

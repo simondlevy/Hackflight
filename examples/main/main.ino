@@ -125,7 +125,7 @@ void loop()
 
         _zrangerFilter = ZRangerFilter::step(_zrangerFilter, _zranger.read());
 
-        _ekf.enqueueRange(_zrangerFilter);
+        _ekf.enqueue(_zrangerFilter);
 
         _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
                 micros(), _flowsensor.read());
@@ -137,7 +137,7 @@ void loop()
     (void)_opticalFlowFilter;
 #endif
 
-    _ekf.enqueueImu(_imuFilter.output);
+    _ekf.enqueue(_imuFilter.output);
 
     const uint32_t msec_curr = millis();
 
