@@ -17,6 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
+#include <firmware/imu.hpp>
 #include <firmware/imu_filter/datatypes.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/timer.hpp>
@@ -182,7 +183,7 @@ namespace hf {
                 }
             }
 
-            void report(const ImuRaw & imuraw)
+            void report(const IMU::RawData & imuraw)
             {
                 if (_helper.ready()) {
 

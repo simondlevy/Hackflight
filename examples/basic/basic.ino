@@ -31,6 +31,7 @@
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/flow_filter.hpp>
+#include <firmware/imu.hpp>
 #include <firmware/imu_filter/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/profiling.hpp>
@@ -38,8 +39,6 @@
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
-
-#include <firmware/drivers/bmi088.hpp>
 
 using namespace hf;
 
@@ -96,7 +95,7 @@ void loop()
     const auto imuraw = _imu.read();
 
     _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-            IMU::gyroRangeDps(), IMU::accelRangeGs());
+            _imu.gyroRangeDps(), _imu.accelRangeGs());
 
     _ekf.enqueueImu(_imuFilter.output);
 
@@ -118,7 +117,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    _debugger.report(rxdata);
+    _debugger.report(state);
     //_profiler.report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,

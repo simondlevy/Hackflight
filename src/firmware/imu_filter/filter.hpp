@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <firmware/imu.hpp>
 #include <firmware/imu_filter/three_axis_lpf.hpp>
 
 namespace hf {
@@ -77,7 +78,7 @@ namespace hf {
             static auto step(
                     const ImuFilter & filter,
                     const uint32_t msec_curr,
-                    const ImuRaw & imuraw,
+                    const IMU::RawData & imuraw,
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs)-> ImuFilter
             {

@@ -82,21 +82,6 @@ namespace hf {
             ThreeAxisStats& operator=(const ThreeAxisStats& other) = default;
     };
 
-    class ImuRaw {
-
-        public:
-
-            ThreeAxisRaw gyro;
-            ThreeAxisRaw accel;
-
-            ImuRaw() = default;
-
-            ImuRaw(const ThreeAxisRaw & gyro, const ThreeAxisRaw & accel)
-                : gyro(gyro), accel(accel) {}
-
-            ImuRaw& operator=(const ImuRaw& other) = default;
-    };
-
     class ImuFiltered {
 
         public:
