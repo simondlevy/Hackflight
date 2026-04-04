@@ -31,59 +31,68 @@ namespace hf {
 
         public:
 
-            uint32_t timestamp;
-            float dpixelx;  // Accumulated pixel count x
-            float dpixely;  // Accumulated pixel count y
-            float stdDevX;  // Measurement standard deviation
-            float stdDevY;  // Measurement standard deviation
-            float dt;       // Time during which pixels were accumulated
+            OpticalFlowFilter() = default;
+
+            OpticalFlowFilter& operator=(const OpticalFlowFilter& other) = default;
+
+            OpticalFlowFilter(
+                    const bool gotMotion,
+                    const uint32_t usec_prev,
+                    const float dpixelx,  
+                    const float dpixely, 
+                    const float stdDevX,
+                    const float stdDevY,
+                    const float dt)
+                : 
+                    _gotMotion(gotMotion),
+                    _usec_prev(usec_prev),
+                    _dpixelx(dpixelx),  
+                    _dpixely(dpixely), 
+                    _stdDevX(stdDevX),
+                    _stdDevY(stdDevY),
+                    _dt(dt) {}
 
             static auto step(
                     const OpticalFlowFilter & filter,
-                    const OpticalFlowSensor::RawData & rawdata)
-                -> OpticalFlowFilter
+                    const uint32_t usec_curr,
+                    const OpticalFlowSensor::RawData &
+                    rawdata) -> OpticalFlowFilter
             {
-                (void)rawdata;
-
-                return filter;
-
-                /*
-                int16_t deltaX = 0;
-                int16_t deltaY = 0;
-                bool gotMotion = false;
-
-                device_read(deltaX, deltaY, gotMotion);
-
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
-                int16_t accpx = -deltaY;
-                int16_t accpy = -deltaX;
+                const int16_t accpx = -rawdata.y;
+                const int16_t accpy = -rawdata.x;
 
-                // Outlier removal
-                if (abs(accpx) < OUTLIER_LIMIT && abs(accpy) < OUTLIER_LIMIT) {
+                return inlimit(accpx) && inlimit(accpy) ?
 
-                    static uint32_t _lastTime;
-
-                    // Form flow measurement struct and push into the EKF
-                    flowData.stdDevX = FLOW_STD_FIXED;
-                    flowData.stdDevY = FLOW_STD_FIXED;
-                    flowData.dt = (float)(micros()-_lastTime)/1000000.0f;
-                    _lastTime = micros();
-
-                    // Use raw measurements
-                    flowData.dpixelx = (float)accpx;
-                    flowData.dpixely = (float)accpy;
-
-                    // Push measurements into the estimator if flow is not disabled
-                    //    and the PMW flow sensor indicates motion detection
-                    if (gotMotion) {
-                        return true;
-                    }
-                }
-
-                return false;
-                */
+                    OpticalFlowFilter(
+                            true,           // got motion
+                            usec_curr,      // usec_prev
+                            (float)accpx,   // dpixelx
+                            (float)accpy,   // dpixely
+                            FLOW_STD_FIXED, // stdDevX
+                            FLOW_STD_FIXED, // stdDevY
+                            (float)(usec_curr - filter._usec_prev) / 1e6 // dt
+                            ) :
+                    filter;
             }        
+
+        private:
+
+            bool _gotMotion;
+            uint32_t _timestamp_usec;
+            uint32_t _usec_prev;
+            float _dpixelx;  // Accumulated pixel count x
+            float _dpixely;  // Accumulated pixel count y
+            float _stdDevX;  // Measurement standard deviation
+            float _stdDevY;  // Measurement standard deviation
+            float _dt;       // Time during which pixels were accumulated
+
+
+            static auto inlimit(const int16_t accval) -> bool
+            {
+                return abs(accval) < OUTLIER_LIMIT;
+            }
 
     };
 }
