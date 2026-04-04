@@ -18,15 +18,13 @@
 
 #include <math.h>
 
-#include <datatypes.hpp>
-
 namespace hf {
 
     class ZRangerFilter {
 
         private:
 
-            static const uint16_t OUTLIER_LIMIT_MM = 5000;
+            static const uint16_t OUTLIER_LIMIT_MM = 4000;
 
             // Measurement noise model
             static constexpr float EXP_POINT_A = 2.5;
@@ -46,7 +44,7 @@ namespace hf {
             ZRangerFilter(const float distance_m, const float stdev)
                 : distance_m(distance_m), stdev(stdev) { }
 
-            static auto step(const ZRangerFilter & filter,
+            static auto step(const ZRangerFilter& filter,
                     const uint16_t distance_mm) -> ZRangerFilter
             {
                 static constexpr float EXP_COEFF =

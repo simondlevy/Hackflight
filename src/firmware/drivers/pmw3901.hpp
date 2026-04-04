@@ -23,10 +23,25 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/device/debugging.hpp>
-#include <firmware/device/datatypes.hpp>
+#include <firmware/debugging.hpp>
 
 namespace hf {
+
+    class OpticalFlowRaw {
+
+        public:
+
+            int16_t x;
+            int16_t y;
+            bool got_motion;
+
+            OpticalFlowRaw() = default;
+
+            OpticalFlowRaw(const int16_t x, const int16_t y, const bool got_motion)
+                : x(x), y(y), got_motion(got_motion) {}
+
+            OpticalFlowRaw& operator=(const OpticalFlowRaw& other) = default;
+    };
 
     class OpticalFlowSensor {
 

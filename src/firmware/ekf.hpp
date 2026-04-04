@@ -18,7 +18,7 @@
 
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu/imu.hpp>
-#include <firmware/zranger_filter.hpp>
+#include <firmware/zranger/filter.hpp>
 #include <num.hpp>
 
 // We want to use _P for the covariance matrix, but Arduino pre-defines it

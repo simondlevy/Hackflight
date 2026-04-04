@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2026 Simon D. Levy
+ * Copyright (C) 2011-2018 Bitcraze AB, 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,12 @@
 
 namespace hf {
 
-    class OpticalFlowRaw {
+    class ZRanger {
 
         public:
 
-            int16_t x;
-            int16_t y;
-            bool got_motion;
+            void begin();
 
-            OpticalFlowRaw() = default;
-
-            OpticalFlowRaw(const int16_t x, const int16_t y, const bool got_motion)
-                : x(x), y(y), got_motion(got_motion) {}
-
-            OpticalFlowRaw& operator=(const OpticalFlowRaw& other) = default;
+            auto read() -> int16_t;
     };
-
 }
-

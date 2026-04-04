@@ -27,37 +27,33 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
+#include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
-#include <firmware/ekf/ekf.hpp>
-#include <firmware/flow_filter.hpp>
-#include <firmware/imu_filter/filter.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/ekf.hpp>
+#include <firmware/imu/filter.hpp>
+#include <firmware/imu/imu.hpp>
+#include <firmware/led.hpp>
+#include <firmware/profiling.hpp>
+#include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
+#include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
-#include <firmware/zranger_filter.hpp>
-
-#include <firmware/device/bmi088.hpp>
-#include <firmware/device/debugging.hpp>
-#include <firmware/device/elrs.hpp>
-#include <firmware/device/led.hpp>
-#include <firmware/device/pmw3901.hpp>
-#include <firmware/device/profiling.hpp>
-#include <firmware/device/timer.hpp>
-#include <firmware/device/vl53l1x.hpp>
-
+#include <firmware/zranger/zranger.hpp>
+#include <firmware/zranger/filter.hpp>
 using namespace hf;
 
+#define _POSHOLD
+
 // Rate constants
-static constexpr float EKF_PREDICTION_RATE_HZ      = 100;
-static constexpr float FLYING_CHECK_RATE_HZ        = 25;
+static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
+static constexpr float FLYING_CHECK_RATE_HZ         = 25;
 static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 
 // Devices
 static IMU _imu;
-static auto _led = LED(9);
+static auto _led = LED(13);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
-static OpticalFlowSensor _flowSensor;
 static ZRanger _zranger;
 
 // Timers
@@ -73,8 +69,11 @@ void setup()
     _motors.begin(); 
     _led.begin(); 
 
+#ifdef _POSHOLD
     _zranger.begin();
-    _flowSensor.begin();
+#else
+    (void)_zranger;
+#endif
 }
 
 // Loop
@@ -96,26 +95,30 @@ void loop()
     // Flight mode
     static mode_e _mode;
 
-    if (_flowdeckTimer.ready()) {
-        _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
-        _ekf.enqueueRange(_zrangerFilter);
-        const auto flowData = _flowSensor.read();
-        printf("%+03d %+03d %s\n",
-                flowData.x, flowData.y, flowData.got_motion ? "yes" : "no");
-    }
-
     const auto dt = Timer::getDt();
 
     _led.blink(_imuFilter.isGyroCalibrated);
 
     // Disable arming while gyro is calibrating
     const auto rxdata =
-        _imuFilter.isGyroCalibrated ? _rx.read() : RxData();
+        _imuFilter.isGyroCalibrated ? _rx.read() : RX::Data();
 
     const auto imuraw = _imu.read();
 
     _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-            IMU::gyroRangeDps(), IMU::accelRangeGs());
+            _imu.gyroRangeDps(), _imu.accelRangeGs());
+
+#ifdef _POSHOLD
+    if (_flowdeckTimer.ready()) {
+        _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
+        _ekf.enqueueRange(_zrangerFilter);
+        //const auto flowData = _flowSensor.read();
+        //printf("%+03d %+03d %s\n", flowData.x, flowData.y, flowData.got_motion ? "yes" : "no");
+    }
+#else
+    (void)_flowdeckTimer;
+    (void)_zrangerFilter;
+#endif
 
     _ekf.enqueueImu(_imuFilter.output);
 
@@ -137,7 +140,11 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    //_debugger.report(state, true);
+#ifdef _POSHOLD
+    _debugger.report(state, true);
+#else
+    _debugger.report(state);
+#endif
     //_profiler.report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
