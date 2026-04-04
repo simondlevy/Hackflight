@@ -288,17 +288,34 @@ namespace hf {
             void update(const IMU::FilteredData & imudata,
                     const uint32_t msec_curr)
             {
+                addProcessNoise(msec_curr);
+
                 measurement_t m = {};
                 m.type = MeasurementTypeImu;
                 m.data.imu.gyro = imudata.gyroDps;
                 m.data.imu.accel = imudata.accelGs;
                 enqueue(&m);
- 
-                addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
                 for (uint32_t k=0; k<_queueLength; ++k) {
-                    update(_measurementsQueue[k], msec_curr);
+                    const auto m = _measurementsQueue[k];
+                    switch (m.type) {
+
+                        case MeasurementTypeImu:
+                            axis3fSubSamplerAccumulate(&_accelSubSampler, &m.data.imu.accel);
+                            axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
+                            _gyroLatest = m.data.imu.gyro;
+                            break;
+
+                        case MeasurementTypeFlowDeck:
+                            updateWithRange(m.data.flowdeck.zrfilter);
+                            updateWithFlow(m.data.flowdeck.offilter);
+                            _didUpdateWithFlowDeck = true;
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
                 _queueLength = 0;
 
@@ -515,27 +532,6 @@ namespace hf {
                     ekf_enforceSymmetry();
 
                     _lastProcessNoiseUpdateMs = msec_curr;
-                }
-            }
-
-            void update(measurement_t & m, const uint32_t msec_curr)
-            {
-                switch (m.type) {
-
-                    case MeasurementTypeFlowDeck:
-                        updateWithRange(m.data.flowdeck.zrfilter);
-                        updateWithFlow(m.data.flowdeck.offilter);
-                        _didUpdateWithFlowDeck = true;
-                        break;
-
-                    case MeasurementTypeImu:
-                        axis3fSubSamplerAccumulate(&_accelSubSampler, &m.data.imu.accel);
-                        axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
-                        _gyroLatest = m.data.imu.gyro;
-                        break;
-
-                    default:
-                        break;
                 }
             }
 
