@@ -21,42 +21,30 @@
 // Third-party libraries
 #include <pmw3901.hpp>
 
-#if 0
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/opticalflow/opticalflow.hpp>
+#include <firmware/opticalflow/sensor.hpp>
+using namespace hf;
 
-namespace hf {
+static PMW3901 _pmw3901;
 
-    class OpticalFlowSensor {
+void begin()
+{
+    SPI.begin();
 
-        public:
-
-            void begin()
-            {
-                SPI.begin();
-
-                if (!_pmw3901.begin()) {
-                    Debugger::reportForever("Unable to initialize PMW3901");
-                }
-            }
-
-
-            auto read() -> OpticalFlowRaw
-            {
-                int16_t dx = 0;
-                int16_t dy = 0;
-                auto moved = false;
-
-                _pmw3901.readMotion(dx, dy, moved);
-
-                return OpticalFlowRaw(dx, dy, moved);
-            }
-
-        private:
-
-            PMW3901 _pmw3901;
-    };
+    if (!_pmw3901.begin()) {
+        Debugger::reportForever("Unable to initialize PMW3901");
+    }
 }
-#endif
+
+auto read() -> OpticalFlowSensor::RawData
+{
+    int16_t dx = 0;
+    int16_t dy = 0;
+    auto moved = false;
+
+    _pmw3901.readMotion(dx, dy, moved);
+
+    return OpticalFlowSensor::RawData(dx, dy, moved);
+}
