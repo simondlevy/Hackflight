@@ -337,11 +337,10 @@ namespace hf {
 
             void enqueue(const OpticalFlowFilter & offilter)
             {
-                /*
                 measurement_t m = {};
                 m.type = MeasurementTypeFlow;
-                m.data.flow = *flow;
-                enqueue(&m);*/
+                // m.data.flow = *flow;
+                enqueue(&m);
             }
 
             void enqueue(const ZRangerFilter & zrfilter)
@@ -372,8 +371,6 @@ namespace hf {
 
             typedef enum {
                 MeasurementTypeImu,
-                MeasurementTypeAcceleration,
-                MeasurementTypeGyroscope,
                 MeasurementTypeRange,
                 MeasurementTypeFlow,
             } MeasurementType;
