@@ -295,22 +295,10 @@ namespace hf {
 
                 _gyroLatest = imudata.gyroDps;
 
-                // Update with queued measurements and flush the queue
-                for (uint32_t k=0; k<_queueLength; ++k) {
-                    const auto m = _measurementsQueue[k];
-                    switch (m.type) {
-
-                        case MeasurementTypeFlowDeck:
-                            updateWithRange(m.data.flowdeck.zrfilter);
-                            updateWithFlow(m.data.flowdeck.offilter);
-                            _didUpdateWithFlowDeck = true;
-                            break;
-
-                        default:
-                            break;
-                    }
+                if (_didUpdateWithFlowDeck) {
+                    updateWithRange(_zrangerFilterLatest);
+                    updateWithFlow(_opticalFlowFilterLatest);
                 }
-                _queueLength = 0;
 
                 if (_didUpdateWithFlowDeck || _didPredict) {
                     finalize();
@@ -375,11 +363,9 @@ namespace hf {
                     const ZRangerFilter & zrfilter,
                     const OpticalFlowFilter & offilter)
             {
-                measurement_t m = {};
-                m.type = MeasurementTypeFlowDeck;
-                m.data.flowdeck.zrfilter = zrfilter;
-                m.data.flowdeck.offilter = offilter;
-                enqueue(&m);
+                _zrangerFilterLatest = zrfilter;
+                _opticalFlowFilterLatest = offilter;
+                _didUpdateWithFlowDeck = true;
             }
 
         private:
@@ -399,42 +385,6 @@ namespace hf {
                 STATE_DIM
 
             };
-
-            typedef enum {
-                MeasurementTypeImu,
-                MeasurementTypeFlowDeck,
-            } MeasurementType;
-
-            typedef struct {
-                IMU::ThreeAxis accel;
-                IMU::ThreeAxis gyro;
-            } imuMeasurement_t;
-
-            typedef struct {
-                ZRangerFilter zrfilter;
-                OpticalFlowFilter offilter;
-            } flowDeckMeasurement_t;
-
-            typedef struct {
-                MeasurementType type;
-                union {
-                    imuMeasurement_t imu;
-                    flowDeckMeasurement_t flowdeck;
-                } data;
-            } measurement_t;
-
-            static const size_t QUEUE_MAX_LENGTH = 20;
-
-            EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
-
-            uint32_t _queueLength;
-
-            void enqueue(const EKF::measurement_t * measurement) 
-            {
-                memcpy(&_measurementsQueue[_queueLength], measurement,
-                        sizeof(EKF::measurement_t));
-                _queueLength = (_queueLength + 1) % QUEUE_MAX_LENGTH;
-            }
 
             typedef struct {
                 IMU::ThreeAxis sum;
@@ -686,6 +636,9 @@ namespace hf {
             bool _didPredict;
 
             bool _didUpdateWithFlowDeck;
+
+            ZRangerFilter _zrangerFilterLatest;
+            OpticalFlowFilter _opticalFlowFilterLatest;
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
