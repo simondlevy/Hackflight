@@ -18,6 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/imu/imu.hpp>
+#include <firmware/opticalflow/sensor.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/timer.hpp>
 

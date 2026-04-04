@@ -123,8 +123,9 @@ void loop()
     if (_flowdeckTimer.ready()) {
         _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
         _ekf.enqueueRange(_zrangerFilter);
-        //const auto flowData = _flowSensor.read();
-        //printf("%+03d %+03d %s\n", flowData.x, flowData.y, flowData.got_motion ? "yes" : "no");
+        const auto flowdata = _flowsensor.read();
+        printf("%+03d %+03d %s\n", flowdata.x, flowdata.y,
+                flowdata.got_motion ? "yes" : "no");
     }
 #else
     (void)_flowdeckTimer;
@@ -152,7 +153,7 @@ void loop()
     const auto setpoint = mksetpoint(rxdata.axes);
 
 #ifdef _POSHOLD
-    _debugger.report(state, true);
+    //_debugger.report(state, true);
 #else
     _debugger.report(state);
 #endif
