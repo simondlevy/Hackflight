@@ -283,7 +283,7 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            auto getVehicleState(const uint32_t msec_curr) -> VehicleState
+            void finalize(const uint32_t msec_curr)
             {
                 addProcessNoise(msec_curr);
 
@@ -293,40 +293,71 @@ namespace hf {
                 }
                 _queueLength = 0;
 
-                const auto z = _x[STATE_Z];
-
                 if (_isUpdated) {
-                    finalize(msec_curr);
+
+                    // Incorporate the attitude error (Kalman filter state) with the attitude
+                    const float v0 = _x[STATE_D0];
+                    const float v1 = _x[STATE_D1];
+                    const float v2 = _x[STATE_D2];
+
+                    // Move attitude error into attitude if any of the angle errors are
+                    // large enough
+                    if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
+                                0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
+                                    fabsf(v2) < 10)) {
+
+                        const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                        const float ca = device_cos(angle / 2.0f);
+                        const float sa = device_sin(angle / 2.0f);
+                        const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                        // Rotate the vehicle's attitude by the delta quaternion vector
+                        // computed above
+                        const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
+                            dq[2] * _q2 - dq[3] * _q3;
+                        const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
+                            dq[3] * _q2 - dq[2] * _q3;
+                        const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
+                            dq[0] * _q2 + dq[1] * _q3;
+                        const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
+                            dq[1] * _q2 + dq[0] * _q3;
+
+                        // normalize and store the result
+                        float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                                tmpq3 * tmpq3) + EPSILON;
+                        _q0 = tmpq0 / norm;
+                        _q1 = tmpq1 / norm;
+                        _q2 = tmpq2 / norm;
+                        _q3 = tmpq3 / norm;
+                    }
+
+                    // Convert the new attitude to a rotation matrix, such that we can
+                    // rotate body-frame velocity and accel
+
+                    _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
+                    _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
+                    _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
+                    _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
+                    _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
+                    _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
+                    _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
+                    _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
+                    _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
+
+                    // reset the attitude error
+                    _x[STATE_D0] = 0;
+                    _x[STATE_D1] = 0;
+                    _x[STATE_D2] = 0;
+
+                    ekf_enforceSymmetry();
+
+                    _isUpdated = false;
+
+
                 }
-
-                const auto dx =
-                    _r00*_x[STATE_VX] + _r01*_x[STATE_VY] + _r02*_x[STATE_VZ];
-
-                // make right positive
-                const auto dy = -(_r10*_x[STATE_VX] + _r11*_x[STATE_VY] + _r12*_x[STATE_VZ]); 
-
-                const auto dz = _r20*_x[STATE_VX] + _r21*_x[STATE_VY] + _r22*_x[STATE_VZ];
-
-                const auto phi = Num::RAD2DEG * atan2f(2*(_q2*_q3+_q0* _q1) ,
-                        _q0*_q0 - _q1*_q1 - _q2*_q2 + _q3*_q3);
-
-                const auto dphi = _gyroLatest.x;
-
-                const auto theta = Num::RAD2DEG * asinf(-2*(_q1*_q3 - _q0*_q2));
-
-                const auto dtheta = _gyroLatest.y;
-
-                const auto psi = Num::RAD2DEG * atan2f(2*(_q1*_q2+_q0* _q3),
-                        _q0*_q0 + _q1*_q1 - _q2*_q2 - _q3*_q3); 
-
-                const auto dpsi = _gyroLatest.z;
-
-                // Return psi/dpsi nose-right positive
-                return VehicleState(
-                        dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
-            auto getVehicleState(const EKF & ekf) -> VehicleState
+            static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
                 const auto x = ekf._x;
 
@@ -360,7 +391,7 @@ namespace hf {
 
                 const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
 
-                const auto dtheta = _gyroLatest.y;
+                const auto dtheta = ekf._gyroLatest.y;
 
                 const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
                         q0*q0 + q1*q1 - q2*q2 - q3*q3); 
@@ -511,67 +542,6 @@ namespace hf {
                 }
 
                 return &subSampler->subSample;
-            }
-
-            void finalize(const uint32_t msec_curr)
-            {
-                // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = _x[STATE_D0];
-                const float v1 = _x[STATE_D1];
-                const float v2 = _x[STATE_D2];
-
-                // Move attitude error into attitude if any of the angle errors are
-                // large enough
-                if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
-                            0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
-                                fabsf(v2) < 10)) {
-
-                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                    const float ca = device_cos(angle / 2.0f);
-                    const float sa = device_sin(angle / 2.0f);
-                    const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
-
-                    // Rotate the vehicle's attitude by the delta quaternion vector
-                    // computed above
-                    const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
-                        dq[2] * _q2 - dq[3] * _q3;
-                    const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
-                        dq[3] * _q2 - dq[2] * _q3;
-                    const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
-                        dq[0] * _q2 + dq[1] * _q3;
-                    const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
-                        dq[1] * _q2 + dq[0] * _q3;
-
-                    // normalize and store the result
-                    float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                            tmpq3 * tmpq3) + EPSILON;
-                    _q0 = tmpq0 / norm;
-                    _q1 = tmpq1 / norm;
-                    _q2 = tmpq2 / norm;
-                    _q3 = tmpq3 / norm;
-                }
-
-                // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and accel
-
-                _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
-                _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
-                _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
-                _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
-                _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
-                _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
-                _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
-                _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
-                _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
-
-                // reset the attitude error
-                _x[STATE_D0] = 0;
-                _x[STATE_D1] = 0;
-                _x[STATE_D2] = 0;
-
-                ekf_enforceSymmetry();
-
-                _isUpdated = false;
             }
 
             void addProcessNoise(const uint32_t msec_curr) 

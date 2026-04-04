@@ -143,12 +143,14 @@ void loop()
 
     _ekf.enqueue(_imuFilter.output);
 
-    const auto state = _ekf.getVehicleState(millis());
+    _ekf.finalize(millis());
+
+    const auto state = EKF::getVehicleState(_ekf);
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
 #ifdef _POSHOLD
-    //_debugger.report(state, true);
+    _debugger.report(state, true);
 #else
     //_debugger.report(state);
 #endif
