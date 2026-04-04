@@ -339,6 +339,19 @@ namespace hf {
                 enqueue(&m);
             }
 
+            void enqueueImu(const IMU::FilteredData & imu)
+            {
+                measurement_t m = {};
+                m.type = MeasurementTypeGyroscope;
+                m.data.gyroscope.gyro = imu.gyroDps;
+                enqueue(&m);
+
+                m = {};
+                m.type = MeasurementTypeAcceleration;
+                m.data.acceleration.acc = imu.accelGs;
+                enqueue(&m);
+            }
+
             void enqueue(const OpticalFlowFilter & offilter)
             {
                 /*
@@ -375,6 +388,7 @@ namespace hf {
             };
 
             typedef enum {
+                MeasurementTypeImu,
                 MeasurementTypeAcceleration,
                 MeasurementTypeGyroscope,
                 MeasurementTypeRange,
