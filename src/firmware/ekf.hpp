@@ -341,7 +341,8 @@ namespace hf {
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeFlowDeck;
-                //m.data.zrfilter = zrfilter;
+                m.data.flowdeck.zrfilter = zrfilter;
+                m.data.flowdeck.offilter = offilter;
                 enqueue(&m);
             }
 
@@ -401,6 +402,7 @@ namespace hf {
                 MeasurementType type;
                 union {
                     imuMeasurement_t imu;
+                    flowDeckMeasurement_t flowdeck;
                     ZRangerFilter zrfilter;
                     OpticalFlowFilter offilter;
                 } data;
