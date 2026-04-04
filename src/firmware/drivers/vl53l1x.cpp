@@ -19,7 +19,7 @@
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/zranger/zranger.hpp>
+#include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
 static Adafruit_VL53L1X _vl53l1x;

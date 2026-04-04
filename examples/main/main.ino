@@ -38,8 +38,8 @@
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
-#include <firmware/zranger/zranger.hpp>
 #include <firmware/zranger/filter.hpp>
+#include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
 #define _POSHOLD
