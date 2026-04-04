@@ -44,6 +44,12 @@ using namespace hf;
 
 #define _POSHOLD
 
+#ifdef _POSHOLD
+static const uint8_t LED_PIN = 9;
+#else
+static const uint8_t LED_PIN = LED_BUILTIN;
+#endif
+
 // Rate constants
 static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
 static constexpr float FLYING_CHECK_RATE_HZ         = 25;
@@ -51,7 +57,7 @@ static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 
 // Devices
 static IMU _imu;
-static auto _led = LED(13);
+static auto _led = LED(LED_PIN);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
 static ZRanger _zranger;
