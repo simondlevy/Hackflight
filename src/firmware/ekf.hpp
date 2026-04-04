@@ -290,14 +290,10 @@ namespace hf {
             {
                 addProcessNoise(msec_curr);
 
-                measurement_t m = {};
-                m.type = MeasurementTypeImu;
-                m.data.imu.gyro = imudata.gyroDps;
-                m.data.imu.accel = imudata.accelGs;
+                axis3fSubSamplerAccumulate(&_accelSubSampler, &imudata.accelGs);
+                axis3fSubSamplerAccumulate(&_gyroSubSampler, &imudata.gyroDps);
 
-                axis3fSubSamplerAccumulate(&_accelSubSampler, &m.data.imu.accel);
-                axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
-                _gyroLatest = m.data.imu.gyro;
+                _gyroLatest = imudata.gyroDps;
 
                 // Update with queued measurements and flush the queue
                 for (uint32_t k=0; k<_queueLength; ++k) {
