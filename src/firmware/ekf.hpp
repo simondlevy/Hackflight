@@ -294,18 +294,15 @@ namespace hf {
                 m.type = MeasurementTypeImu;
                 m.data.imu.gyro = imudata.gyroDps;
                 m.data.imu.accel = imudata.accelGs;
-                enqueue(&m);
+
+                axis3fSubSamplerAccumulate(&_accelSubSampler, &m.data.imu.accel);
+                axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
+                _gyroLatest = m.data.imu.gyro;
 
                 // Update with queued measurements and flush the queue
                 for (uint32_t k=0; k<_queueLength; ++k) {
                     const auto m = _measurementsQueue[k];
                     switch (m.type) {
-
-                        case MeasurementTypeImu:
-                            axis3fSubSamplerAccumulate(&_accelSubSampler, &m.data.imu.accel);
-                            axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
-                            _gyroLatest = m.data.imu.gyro;
-                            break;
 
                         case MeasurementTypeFlowDeck:
                             updateWithRange(m.data.flowdeck.zrfilter);
