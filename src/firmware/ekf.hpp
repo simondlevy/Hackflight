@@ -18,7 +18,6 @@
 
 #include <Arduino.h>
 
-#include <firmware/ekf/matrix_typedef.h>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu_filter/datatypes.hpp>
 #include <firmware/zranger_filter.hpp>
@@ -200,7 +199,8 @@ namespace hf {
                 F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
                 F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                ekf_predict(F);
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1}
+                device_predict(F, _p);
 
                 const float dt2 = dt * dt;
 
@@ -705,8 +705,6 @@ namespace hf {
             // Covariance matrix
             __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
 
-            // Covariance helper
-            matrix_t _p_m;
 
             // Tracks whether an update to the state has been made, and the state
             // therefore requires finalization
@@ -725,10 +723,6 @@ namespace hf {
                         _p[i][j] = 0; 
                     }
                 }
-
-                _p_m.numRows = STATE_DIM;
-                _p_m.numCols = STATE_DIM;
-                _p_m.pData = (float*)_p;
             }
 
             void ekf_addCovarianceNoise(const float * noise)
@@ -749,82 +743,13 @@ namespace hf {
                 }
             }
 
-            // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-            void ekf_predict(const float F[STATE_DIM][STATE_DIM])
-            {
-                static __attribute__((aligned(4))) matrix_t Fm = { 
-                    STATE_DIM, STATE_DIM, (float *)F
-                };
-
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static __attribute__((aligned(4))) matrix_t tmpNN1m = { 
-                    STATE_DIM, STATE_DIM, tmpNN1d
-                };
-
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static __attribute__((aligned(4))) matrix_t tmpNN2m = { 
-                    STATE_DIM, STATE_DIM, tmpNN2d
-                };
-
-                device_mat_mult(&Fm, &_p_m, &tmpNN1m); // F P
-                device_mat_trans(&Fm, &tmpNN2m); // F'
-                device_mat_mult(&tmpNN1m, &tmpNN2m, &_p_m); // F P F'
-
-            }
-
             void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
             {
-                matrix_t Hm = {1, STATE_DIM, (float *)h};
-
-                // The Kalman gain as a column vector
                 static float G[STATE_DIM];
-                static matrix_t Gm = {STATE_DIM, 1, (float *)G};
 
-                // Temporary matrices for the covariance updates
-                static float tmpNN1d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN1m = {
-                    STATE_DIM, STATE_DIM, tmpNN1d
-                };
+                const auto R = stdMeasNoise*stdMeasNoise;
 
-                static float tmpNN2d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN2m = {
-                    STATE_DIM, STATE_DIM, tmpNN2d
-                };
-
-                static float tmpNN3d[STATE_DIM * STATE_DIM];
-                static matrix_t tmpNN3m = {
-                    STATE_DIM, STATE_DIM, tmpNN3d
-                };
-
-                static float HTd[STATE_DIM * 1];
-                static matrix_t HTm = {STATE_DIM, 1, HTd};
-
-                static float PHTd[STATE_DIM * 1];
-                static matrix_t PHTm = {STATE_DIM, 1, PHTd};
-
-                device_mat_trans(&Hm, &HTm);
-                device_mat_mult(&_p_m, &HTm, &PHTm); // PH'
-                float R = stdMeasNoise*stdMeasNoise;
-                float HPHR = R; // HPH' + R
-                for (int i=0; i<STATE_DIM; i++) { 
-                    // Add the element of HPH' to the above
-                    // this obviously only works if the update is scalar (as in this function)
-                    HPHR += Hm.pData[i]*PHTd[i]; 
-                }
-
-                // Calculate the Kalman gain and perform the state update
-                for (int i=0; i<STATE_DIM; i++) {
-                    G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                    _x[i] = _x[i] + G[i] * error; // state update
-                }
-
-                device_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
-                for (int i=0; i<STATE_DIM; i++) { 
-                    tmpNN1d[STATE_DIM*i+i] -= 1; 
-                } // GH - I
-                device_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-                device_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-                device_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+                device_update_with_scalar(_p, h, error, R, _x, G);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
@@ -849,16 +774,24 @@ namespace hf {
                     _p[i][j] = _p[j][i] = pval;
                 }
             }
-            void device_mat_trans(const matrix_t * pSrc, matrix_t * pDst); 
-
-            void device_mat_mult(const matrix_t * pSrcA, const matrix_t * pSrcB,
-                    matrix_t * pDst);
 
             // Hardware-dependent --------------------------------------------
 
+            static void device_predict(
+                    const float F[STATE_DIM][STATE_DIM],
+                    float P[STATE_DIM][STATE_DIM]);
+
+            static void device_update_with_scalar(
+                    const float P[STATE_DIM][STATE_DIM],
+                    const float * h,
+                    const float error,
+                    const float R,
+                    float x[STATE_DIM],
+                    float G[STATE_DIM]);
+
             static float device_cos(const float x);
             static float device_sin(const float x);
-            static float device_sqrt(const float32_t in);
+            static float device_sqrt(const float in);
     };
 
 }
