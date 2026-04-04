@@ -299,66 +299,9 @@ namespace hf {
 
                 if (_isUpdated) {
 
-                    // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const float v0 = _x[STATE_D0];
-                    const float v1 = _x[STATE_D1];
-                    const float v2 = _x[STATE_D2];
-
-                    // Move attitude error into attitude if any of the angle errors are
-                    // large enough
-                    if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
-                                0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
-                                    fabsf(v2) < 10)) {
-
-                        const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
-                        const float ca = device_cos(angle / 2.0f);
-                        const float sa = device_sin(angle / 2.0f);
-                        const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
-
-                        // Rotate the vehicle's attitude by the delta quaternion vector
-                        // computed above
-                        const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
-                            dq[2] * _q2 - dq[3] * _q3;
-                        const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
-                            dq[3] * _q2 - dq[2] * _q3;
-                        const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
-                            dq[0] * _q2 + dq[1] * _q3;
-                        const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
-                            dq[1] * _q2 + dq[0] * _q3;
-
-                        // normalize and store the result
-                        float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                                tmpq3 * tmpq3) + EPSILON;
-                        _q0 = tmpq0 / norm;
-                        _q1 = tmpq1 / norm;
-                        _q2 = tmpq2 / norm;
-                        _q3 = tmpq3 / norm;
-                    }
-
-                    // Convert the new attitude to a rotation matrix, such that we can
-                    // rotate body-frame velocity and accel
-
-                    _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
-                    _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
-                    _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
-                    _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
-                    _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
-                    _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
-                    _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
-                    _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
-                    _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
-
-                    // reset the attitude error
-                    _x[STATE_D0] = 0;
-                    _x[STATE_D1] = 0;
-                    _x[STATE_D2] = 0;
-
-                    ekf_enforceSymmetry();
-
-                    _isUpdated = false;
+                    finalize();
                 }
-
-            } // finalize
+            }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
@@ -684,6 +627,69 @@ namespace hf {
                 }
             }
 
+            void finalize()
+            {
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const float v0 = _x[STATE_D0];
+                const float v1 = _x[STATE_D1];
+                const float v2 = _x[STATE_D2];
+
+                // Move attitude error into attitude if any of the angle errors are
+                // large enough
+                if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
+                            0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
+                                fabsf(v2) < 10)) {
+
+                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                    const float ca = device_cos(angle / 2.0f);
+                    const float sa = device_sin(angle / 2.0f);
+                    const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+
+                    // Rotate the vehicle's attitude by the delta quaternion vector
+                    // computed above
+                    const float tmpq0 = dq[0] * _q0 - dq[1] * _q1 - 
+                        dq[2] * _q2 - dq[3] * _q3;
+                    const float tmpq1 = dq[1] * _q0 + dq[0] * _q1 + 
+                        dq[3] * _q2 - dq[2] * _q3;
+                    const float tmpq2 = dq[2] * _q0 - dq[3] * _q1 + 
+                        dq[0] * _q2 + dq[1] * _q3;
+                    const float tmpq3 = dq[3] * _q0 + dq[2] * _q1 - 
+                        dq[1] * _q2 + dq[0] * _q3;
+
+                    // normalize and store the result
+                    float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                            tmpq3 * tmpq3) + EPSILON;
+                    _q0 = tmpq0 / norm;
+                    _q1 = tmpq1 / norm;
+                    _q2 = tmpq2 / norm;
+                    _q3 = tmpq3 / norm;
+                }
+
+                // Convert the new attitude to a rotation matrix, such that we can
+                // rotate body-frame velocity and accel
+
+                _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
+                _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
+                _r02 = 2 * _q1 * _q3 + 2 * _q0 * _q2;
+                _r10 = 2 * _q1 * _q2 + 2 * _q0 * _q3;
+                _r11 = _q0 * _q0 - _q1 * _q1 + _q2 * _q2 - _q3 * _q3;
+                _r12 = 2 * _q2 * _q3 - 2 * _q0 * _q1;
+                _r20 = 2 * _q1 * _q3 - 2 * _q0 * _q2;
+                _r21 = 2 * _q2 * _q3 + 2 * _q0 * _q1;
+                _r22 = _q0 * _q0 - _q1 * _q1 - _q2 * _q2 + _q3 * _q3;
+
+                // reset the attitude error
+                _x[STATE_D0] = 0;
+                _x[STATE_D1] = 0;
+                _x[STATE_D2] = 0;
+
+                ekf_enforceSymmetry();
+
+                _isUpdated = false;
+
+            } // finalize
+
+
             // State vector
             __attribute__((aligned(4))) float _x[STATE_DIM];
 
@@ -691,8 +697,9 @@ namespace hf {
             __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
 
 
-            // Tracks whether an update to the state has been made, and the state
-            // therefore requires finalization
+            // Tracks whether an update to the state has been made via
+            // prediction or flowdeck input, and the state therefore requires
+            // finalization
             bool _isUpdated;
 
             uint32_t _lastPredictionMs;
