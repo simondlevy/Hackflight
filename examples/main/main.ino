@@ -44,7 +44,7 @@
 #include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
-//#define _POSHOLD
+#define _POSHOLD
 
 #ifdef _POSHOLD
 static const uint8_t LED_PIN = 9;
@@ -141,9 +141,7 @@ void loop()
         _ekf.predict(millis(), _flyingCheck.isFlying); 
     }
 
-    _ekf.enqueue(_imuFilter.output);
-
-    _ekf.finalize(millis());
+    _ekf.finalize(_imuFilter.output, millis());
 
     const auto state = EKF::getVehicleState(_ekf);
 

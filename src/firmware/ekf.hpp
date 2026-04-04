@@ -283,8 +283,11 @@ namespace hf {
                 _lastPredictionMs = msec_curr;
             }
 
-            void finalize(const uint32_t msec_curr)
+            void finalize(const IMU::FilteredData & imudata,
+                    const uint32_t msec_curr)
             {
+                enqueue(imudata);
+
                 addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
