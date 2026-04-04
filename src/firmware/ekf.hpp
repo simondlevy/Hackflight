@@ -326,6 +326,52 @@ namespace hf {
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
+            auto getVehicleState(const EKF & ekf) -> VehicleState
+            {
+                const auto x = ekf._x;
+
+                const auto dx =
+                    ekf._r00*x[STATE_VX] +
+                    ekf._r01*x[STATE_VY] +
+                    ekf._r02*x[STATE_VZ];
+
+                // make right positive
+                const auto dy = -(
+                        ekf._r10*x[STATE_VX] +
+                        ekf._r11*x[STATE_VY] +
+                        ekf._r12*x[STATE_VZ]); 
+
+                const auto z = x[STATE_Z];
+
+                const auto dz =
+                    ekf._r20*x[STATE_VX] +
+                    ekf._r21*x[STATE_VY] +
+                    ekf._r22*x[STATE_VZ];
+
+                const auto q0 = ekf._q0;
+                const auto q1 = ekf._q1;
+                const auto q2 = ekf._q2;
+                const auto q3 = ekf._q3;
+
+                const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
+                        q0*q0 - q1*q1 - q2*q2 + q3*q3);
+
+                const auto dphi = ekf._gyroLatest.x;
+
+                const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
+
+                const auto dtheta = _gyroLatest.y;
+
+                const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
+                        q0*q0 + q1*q1 - q2*q2 - q3*q3); 
+
+                const auto dpsi = ekf._gyroLatest.z;
+
+                // Return psi/dpsi nose-right positive
+                return VehicleState(
+                        dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
+            }
+
             void enqueue(const IMU::FilteredData & imu)
             {
                 measurement_t m = {};
