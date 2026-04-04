@@ -40,40 +40,32 @@
 #include <firmware/device/debugging.hpp>
 #include <firmware/device/elrs.hpp>
 #include <firmware/device/led.hpp>
-#include <firmware/device/pmw3901.hpp>
 #include <firmware/device/profiling.hpp>
 #include <firmware/device/timer.hpp>
-#include <firmware/device/vl53l1x.hpp>
 
 using namespace hf;
 
 // Rate constants
 static constexpr float EKF_PREDICTION_RATE_HZ      = 100;
 static constexpr float FLYING_CHECK_RATE_HZ        = 25;
-static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 
 // Devices
 static IMU _imu;
-static auto _led = LED(9);
+static auto _led = LED(13);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
-static OpticalFlowSensor _flowSensor;
-static ZRanger _zranger;
 
 // Timers
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
-static auto _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
 
 // Setup
 void setup()
 {
-    _flowSensor.begin();
     _rx.begin();
     _imu.begin();
     _motors.begin(); 
     _led.begin(); 
-    _zranger.begin();
 }
 
 // Loop
@@ -90,18 +82,10 @@ void loop()
     static ImuFilter _imuFilter;
     static Mixer _mixer;
     static StabilizerPid _stabilizerPid;
-    static ZRangerFilter _zrangerFilter;
+    //static ZRangerFilter _zrangerFilter;
 
     // Flight mode
     static mode_e _mode;
-
-    if (_flowdeckTimer.ready()) {
-        _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
-        _ekf.enqueueRange(_zrangerFilter);
-        const auto flowData = _flowSensor.read();
-        printf("%+03d %+03d %s\n",
-                flowData.x, flowData.y, flowData.got_motion ? "yes" : "no");
-    }
 
     const auto dt = Timer::getDt();
 
@@ -136,7 +120,7 @@ void loop()
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
-    //_debugger.report(state, true);
+    _debugger.report(rxdata);
     //_profiler.report();
 
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
