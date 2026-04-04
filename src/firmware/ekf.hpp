@@ -108,7 +108,8 @@ namespace hf {
 
                 ekf_addCovarianceNoise(pinit);
 
-                _isUpdated = false;
+                _didPredict = false;
+                _didUpdateWithFlowDeck = false;
                 _lastPredictionMs = 0;
                 _lastProcessNoiseUpdateMs = 0;
             }
@@ -279,7 +280,7 @@ namespace hf {
                 _q2 = tmpq2/norm; 
                 _q3 = tmpq3/norm;
 
-                _isUpdated = true;
+                _didPredict = true;
                 _lastPredictionMs = msec_curr;
 
             } // predict
@@ -297,9 +298,16 @@ namespace hf {
                 }
                 _queueLength = 0;
 
-                if (_isUpdated) {
-
+                if (_didUpdateWithFlowDeck || _didPredict) {
                     finalize();
+                }
+
+                if (_didUpdateWithFlowDeck) {
+                    _didUpdateWithFlowDeck = false;
+                }
+
+                if (_didPredict) {
+                    _didPredict = false;
                 }
             }
 
@@ -522,7 +530,7 @@ namespace hf {
                     case MeasurementTypeFlowDeck:
                         updateWithRange(m.data.flowdeck.zrfilter);
                         updateWithFlow(m.data.flowdeck.offilter);
-                        _isUpdated = true;
+                        _didUpdateWithFlowDeck = true;
                         break;
 
                     case MeasurementTypeImu:
@@ -682,8 +690,6 @@ namespace hf {
 
                 ekf_enforceSymmetry();
 
-                _isUpdated = false;
-
             } // finalize
 
 
@@ -693,11 +699,9 @@ namespace hf {
             // Covariance matrix
             __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
 
+            bool _didPredict;
 
-            // Tracks whether an update to the state has been made via
-            // prediction or flowdeck input, and the state therefore requires
-            // finalization
-            bool _isUpdated;
+            bool _didUpdateWithFlowDeck;
 
             uint32_t _lastPredictionMs;
             uint32_t _lastProcessNoiseUpdateMs;
