@@ -339,7 +339,7 @@ namespace hf {
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeFlow;
-                // m.data.flow = *flow;
+                m.data.offilter = offilter;
                 enqueue(&m);
             }
 
@@ -389,7 +389,7 @@ namespace hf {
                 {
                     imuMeasurement_t imu;
                     ZRangerFilter zrfilter;
-                    OpticalFlowFilter flow;
+                    OpticalFlowFilter offilter;
                 } data;
             } measurement_t;
 
@@ -568,11 +568,9 @@ namespace hf {
                         updateWithRange(m.data.zrfilter);
                         break;
 
-                        /*
                     case MeasurementTypeFlow:
-                        updateWithFlow(&m.data.flow);
+                        updateWithFlow(m.data.offilter);
                         break;
-                         */
 
                     case MeasurementTypeImu:
                         axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.imu.acc);
@@ -586,9 +584,10 @@ namespace hf {
                 }
             }
 
-            /*
-            void updateWithFlow(const OpticalFlow::measurement_t *flow) 
+            void updateWithFlow(const OpticalFlowFilter & offilter)
             {
+                (void)offilter;
+#if 0
                 const IMU::ThreeAxis *gyro = &_gyroLatest;
 
                 // [pixels] (same in x and y)
@@ -649,7 +648,8 @@ namespace hf {
                         flow->stdDevY*FLOW_RESOLUTION);
 
                 _isUpdated = true;
-            }*/
+#endif
+            }
 
             void updateWithRange(const ZRangerFilter & zrfilter)
             {
