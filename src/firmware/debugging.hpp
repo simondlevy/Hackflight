@@ -169,7 +169,7 @@ namespace hf {
                 }
             }
 
-            void report(const IMU::ImuFiltered & imufilt)
+            void report(const IMU::FilteredData & imufilt)
             {
                 if (_helper.ready()) {
 

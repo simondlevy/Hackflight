@@ -325,7 +325,7 @@ namespace hf {
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
-            void enqueueImu(const IMU::ImuFiltered & imu)
+            void enqueueImu(const IMU::FilteredData & imu)
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeGyroscope;

@@ -101,19 +101,19 @@ namespace hf {
                     }
             };
 
-            class ImuFiltered {
+            class FilteredData {
 
                 public:
 
                     ThreeAxis gyroDps;
                     ThreeAxis accelGs;
 
-                    ImuFiltered() = default;
+                    FilteredData() = default;
 
-                    ImuFiltered(const ThreeAxis & gyroDps, const ThreeAxis & accelGs) 
+                    FilteredData(const ThreeAxis & gyroDps, const ThreeAxis & accelGs) 
                         : gyroDps(gyroDps), accelGs(accelGs) {}
 
-                    ImuFiltered& operator=(const ImuFiltered& other) = default;
+                    FilteredData& operator=(const FilteredData& other) = default;
             };
 
             auto begin() -> bool;

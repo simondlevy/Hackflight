@@ -37,7 +37,7 @@ namespace hf {
 
         public:
 
-            IMU::ImuFiltered output;
+            IMU::FilteredData output;
 
             bool isGyroCalibrated;
 
@@ -46,7 +46,7 @@ namespace hf {
             ImuFilter() = default;
 
             ImuFilter(
-                    const IMU::ImuFiltered & output,
+                    const IMU::FilteredData & output,
                     const bool isGyroCalibrated,
                     const IMU::ThreeAxis & gyroSum,
                     const IMU::ThreeAxis & gyroSumOfSquares,
@@ -157,7 +157,7 @@ namespace hf {
 
                 const auto accelFiltered = filter._accelLpf.output;
 
-                const auto output = IMU::ImuFiltered(gyroFiltered, accelFiltered);
+                const auto output = IMU::FilteredData(gyroFiltered, accelFiltered);
 
                 return ImuFilter(output, isGyroCalibrated, gyroSum,
                         gyroSumOfSquares, gyroSampleCount, gyroBias,
