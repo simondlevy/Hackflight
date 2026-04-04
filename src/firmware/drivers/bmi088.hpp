@@ -22,7 +22,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/device/datatypes.hpp>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 

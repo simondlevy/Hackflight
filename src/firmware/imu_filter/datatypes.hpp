@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <firmware/device/datatypes.hpp>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 

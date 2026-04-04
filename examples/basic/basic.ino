@@ -27,19 +27,19 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
+#include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu_filter/filter.hpp>
+#include <firmware/led.hpp>
+#include <firmware/profiling.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
+#include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
 
-#include <firmware/device/bmi088.hpp>
-#include <firmware/device/debugging.hpp>
-#include <firmware/device/led.hpp>
-#include <firmware/device/profiling.hpp>
-#include <firmware/device/timer.hpp>
+#include <firmware/drivers/bmi088.hpp>
 
 using namespace hf;
 

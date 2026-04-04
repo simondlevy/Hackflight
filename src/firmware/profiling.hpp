@@ -15,7 +15,7 @@
  */
 
 #include <hackflight.h>
-#include <firmware/device/timer.hpp>
+#include <firmware/timer.hpp>
 
 namespace hf {
 
