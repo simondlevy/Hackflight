@@ -136,23 +136,16 @@ void loop()
     (void)_opticalFlowFilter;
 #endif
 
-    _ekf.enqueue(_imuFilter.output);
-
-    if (_flyingCheckTimer.ready()) {
-        _flyingCheck = FlyingCheck::run(
-                _flyingCheck, millis(), _mixer.motorvals, 4);
-    }
-
     // Run the system dynamics to predict the state forward.
     if (_ekfPredictionTimer.ready()) {
         _ekf.predict(millis(), _flyingCheck.isFlying); 
     }
 
+    _ekf.enqueue(_imuFilter.output);
+
     const auto state = _ekf.getVehicleState(millis());
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
-
-    const auto setpoint = mksetpoint(rxdata.axes);
 
 #ifdef _POSHOLD
     //_debugger.report(state, true);
@@ -161,6 +154,7 @@ void loop()
 #endif
     //_profiler.report();
 
+    const auto setpoint = mksetpoint(rxdata.axes);
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
             !rxdata.is_throttle_down, dt, state, setpoint);
 
@@ -168,5 +162,10 @@ void loop()
 
     if (_mode != MODE_PANIC) {
         _motors.run(rxdata.is_armed, _mixer.motorvals);
+    }
+
+    if (_flyingCheckTimer.ready()) {
+        _flyingCheck = FlyingCheck::run(
+                _flyingCheck, millis(), _mixer.motorvals, 4);
     }
 }
