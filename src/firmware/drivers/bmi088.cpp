@@ -84,12 +84,12 @@ auto IMU::read() -> IMU::RawData
     _accel.readSensor();
 
     return IMU::RawData(
-            ThreeAxisRaw(
+            IMU::ThreeAxisRaw(
                 _gyro.getGyroX_raw(),
                 _gyro.getGyroY_raw(),
                 _gyro.getGyroZ_raw()
                 ),
-            ThreeAxisRaw(
+            IMU::ThreeAxisRaw(
                 _accel.getAccelX_raw(),
                 _accel.getAccelY_raw(),
                 _accel.getAccelZ_raw()

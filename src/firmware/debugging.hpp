@@ -152,7 +152,7 @@ namespace hf {
                 }
             }
 
-            void report(const ThreeAxisRaw & raw)
+            void report(const IMU::ThreeAxisRaw & raw)
             {
                 if (_helper.ready()) {
 
