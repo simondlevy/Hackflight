@@ -522,6 +522,7 @@ namespace hf {
                     case MeasurementTypeFlowDeck:
                         updateWithRange(m.data.flowdeck.zrfilter);
                         updateWithFlow(m.data.flowdeck.offilter);
+                        _isUpdated = true;
                         break;
 
                     case MeasurementTypeImu:
@@ -595,8 +596,6 @@ namespace hf {
                 // Second update
                 ekf_updateWithScalar(hy, (_measuredNY-_predictedNY),
                         offilter.stdDevY*FLOW_RESOLUTION);
-
-                _isUpdated = true;
             }
 
             void updateWithRange(const ZRangerFilter & zrfilter)
@@ -622,8 +621,6 @@ namespace hf {
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
                             zrfilter.stdev);
-
-                    _isUpdated = true;
                 }
             }
 
