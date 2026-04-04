@@ -394,6 +394,17 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
+            // State vector
+            __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
+
+            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
+            // to allow easy normalization (in comparison to a rotation matrix),
+            // while also being robust against singularities (in comparison to euler angles)
+            float _q0, _q1, _q2, _q3;
+
             // Quaternion used for initial orientation [w,x,y,z]
             float _qinit0, _qinit1, _qinit2, _qinit3;
 
@@ -411,17 +422,6 @@ namespace hf {
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
             float _r00, _r01, _r02, _r10, _r11, _r12, _r20, _r21, _r22; 
-
-            // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
-            // to allow easy normalization (in comparison to a rotation matrix),
-            // while also being robust against singularities (in comparison to euler angles)
-            float _q0, _q1, _q2, _q3;
-
-            // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
-
-            // Covariance matrix
-            __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
 
             bool _didPredict;
 

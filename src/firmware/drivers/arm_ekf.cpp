@@ -18,7 +18,7 @@
 #include <arm_math.h>
 
 #include <hackflight.h>
-#include <firmware/ekf.hpp>
+#include <firmware/ekf/ekf.hpp>
 using namespace hf;
 
 static void mat_trans(const arm_matrix_instance_f32 * pSrc, arm_matrix_instance_f32 * pDst)

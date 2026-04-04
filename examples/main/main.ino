@@ -29,7 +29,7 @@
 
 #include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
-#include <firmware/ekf.hpp>
+#include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
