@@ -16,12 +16,15 @@
 
 #pragma once
 
-#include <Arduino.h>
-
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu_filter/datatypes.hpp>
 #include <firmware/zranger_filter.hpp>
 #include <num.hpp>
+
+// We want to use _P for the covariance matrix, but Arduino pre-defines it
+#ifdef _P
+#undef _P
+#endif
 
 namespace hf {
 
@@ -200,7 +203,7 @@ namespace hf {
                 F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                device_predict(F, _p);
+                device_predict(F, _P);
 
                 const float dt2 = dt * dt;
 
@@ -703,7 +706,7 @@ namespace hf {
             __attribute__((aligned(4))) float _x[STATE_DIM];
 
             // Covariance matrix
-            __attribute__((aligned(4))) float _p[STATE_DIM][STATE_DIM];
+            __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
 
 
             // Tracks whether an update to the state has been made, and the state
@@ -720,7 +723,7 @@ namespace hf {
                     _x[i] = 0;
 
                     for (int j=0; j < STATE_DIM; j++) {
-                        _p[i][j] = 0; 
+                        _P[i][j] = 0; 
                     }
                 }
             }
@@ -728,7 +731,7 @@ namespace hf {
             void ekf_addCovarianceNoise(const float * noise)
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    _p[k][k] += noise[k] * noise[k];
+                    _P[k][k] += noise[k] * noise[k];
                 }
             }
 
@@ -738,7 +741,7 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i]);
+                        ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i]);
                     }
                 }
             }
@@ -749,7 +752,7 @@ namespace hf {
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                device_update_with_scalar(_p, h, error, R, _x, G);
+                device_update_with_scalar(_P, h, error, R, _x, G);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
@@ -759,7 +762,7 @@ namespace hf {
                         float v = G[i] * R * G[j];
 
                         // add measurement noise
-                        ekf_pset(i, j, 0.5 * _p[i][j] + 0.5 * _p[j][i] + v); 
+                        ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i] + v); 
                     }
                 }
             }
@@ -767,11 +770,11 @@ namespace hf {
             void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
             {
                 if (isnan(pval) || pval > MAX_COVARIANCE) {
-                    _p[i][j] = _p[j][i] = MAX_COVARIANCE;
+                    _P[i][j] = _P[j][i] = MAX_COVARIANCE;
                 } else if ( i==j && pval < MIN_COVARIANCE ) {
-                    _p[i][j] = _p[j][i] = MIN_COVARIANCE;
+                    _P[i][j] = _P[j][i] = MIN_COVARIANCE;
                 } else {
-                    _p[i][j] = _p[j][i] = pval;
+                    _P[i][j] = _P[j][i] = pval;
                 }
             }
 
