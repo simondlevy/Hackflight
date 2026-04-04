@@ -346,22 +346,6 @@ namespace hf {
                 enqueue(&m);
             }
 
-            void enqueue(const OpticalFlowFilter & offilter)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeFlow;
-                m.data.offilter = offilter;
-                enqueue(&m);
-            }
-
-            void enqueue(const ZRangerFilter & zrfilter)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeRange;
-                m.data.zrfilter = zrfilter;
-                enqueue(&m);
-            }
-
         private:
 
             // Indexes to access the vehicle's state, stored as a column vector
@@ -383,10 +367,7 @@ namespace hf {
             typedef enum {
                 MeasurementTypeImu,
                 MeasurementTypeFlowDeck,
-                MeasurementTypeRange,
-                MeasurementTypeFlow,
             } MeasurementType;
-
 
             typedef struct {
                 IMU::ThreeAxis acc;
@@ -403,8 +384,6 @@ namespace hf {
                 union {
                     imuMeasurement_t imu;
                     flowDeckMeasurement_t flowdeck;
-                    ZRangerFilter zrfilter;
-                    OpticalFlowFilter offilter;
                 } data;
             } measurement_t;
 
