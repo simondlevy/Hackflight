@@ -128,9 +128,6 @@ void loop()
         _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
-        _ekf.enqueue(_zrangerFilter);
-        _ekf.enqueue(_opticalFlowFilter);
-
         _ekf.enqueue(_zrangerFilter, _opticalFlowFilter);
     }
 #else
