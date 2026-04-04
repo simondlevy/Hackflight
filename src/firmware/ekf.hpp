@@ -578,6 +578,9 @@ namespace hf {
             {
                 switch (m.type) {
 
+                    case MeasurementTypeFlowDeck:
+                        break;
+
                     case MeasurementTypeRange:
                         updateWithRange(m.data.zrfilter);
                         break;
