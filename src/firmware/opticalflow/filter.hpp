@@ -16,38 +16,38 @@
 
 #pragma once
 
-#include <Arduino.h>
-
-#include <datatypes.hpp>
+#include <hackflight.h>
+#include <firmware/opticalflow/sensor.hpp>
 
 namespace hf {
 
     class OpticalFlowFilter {
 
+        private:
+
+            static constexpr int16_t OUTLIER_LIMIT = 100;
+
+            static constexpr float FLOW_STD_FIXED = 2.0;
+
         public:
 
-            typedef struct {
-                uint32_t timestamp;
-                union {
-                    struct {
-                        float dpixelx;  // Accumulated pixel count x
-                        float dpixely;  // Accumulated pixel count y
-                    };
-                    float dpixel[2];  // Accumulated pixel count
-                };
-                float stdDevX;      // Measurement standard deviation
-                float stdDevY;      // Measurement standard deviation
-                float dt;           // Time during which pixels were accumulated
-            } measurement_t;
+            uint32_t timestamp;
+            float dpixelx;  // Accumulated pixel count x
+            float dpixely;  // Accumulated pixel count y
+            float stdDevX;  // Measurement standard deviation
+            float stdDevY;  // Measurement standard deviation
+            float dt;       // Time during which pixels were accumulated
 
-
-            void init()
+            static auto step(
+                    const OpticalFlowFilter & filter,
+                    const OpticalFlowSensor::RawData & rawdata)
+                -> OpticalFlowFilter
             {
-                device_init();
-            }
+                (void)rawdata;
 
-            bool read(measurement_t & flowData)
-            {
+                return filter;
+
+                /*
                 int16_t deltaX = 0;
                 int16_t deltaY = 0;
                 bool gotMotion = false;
@@ -76,26 +76,14 @@ namespace hf {
 
                     // Push measurements into the estimator if flow is not disabled
                     //    and the PMW flow sensor indicates motion detection
-                    if (!USE_FLOW_DISABLED && gotMotion) {
+                    if (gotMotion) {
                         return true;
                     }
                 }
 
                 return false;
+                */
             }        
 
-        private:
-
-            static const int16_t OUTLIER_LIMIT = 100;
-
-            // Disables pushing the flow measurement in the EKF
-            static const auto USE_FLOW_DISABLED = false;
-
-            // Set standard deviation flow
-            static constexpr float FLOW_STD_FIXED = 2.0;
-
-            bool device_init();
-
-            void device_read(int16_t & dx, int16_t & dy, bool &gotMotion);
     };
 }

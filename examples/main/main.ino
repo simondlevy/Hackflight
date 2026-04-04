@@ -101,6 +101,7 @@ void loop()
     static ImuFilter _imuFilter;
     static Mixer _mixer;
     static StabilizerPid _stabilizerPid;
+    static OpticalFlowFilter _opticalFlowFilter;
     static ZRangerFilter _zrangerFilter;
 
     // Flight mode
@@ -121,13 +122,19 @@ void loop()
 
 #ifdef _POSHOLD
     if (_flowdeckTimer.ready()) {
-        _zrangerFilter = ZRangerFilter::step( _zrangerFilter, _zranger.read());
+
+        _zrangerFilter = ZRangerFilter::step(_zrangerFilter, _zranger.read());
+
         _ekf.enqueueRange(_zrangerFilter);
-        // const auto flowdata = _flowsensor.read();
+
+        _opticalFlowFilter = OpticalFlowFilter::step(
+                _opticalFlowFilter, _flowsensor.read());
+
     }
 #else
     (void)_flowdeckTimer;
     (void)_zrangerFilter;
+    (void)_opticalFlowFilter;
 #endif
 
     _ekf.enqueueImu(_imuFilter.output);
