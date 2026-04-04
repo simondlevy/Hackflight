@@ -157,7 +157,7 @@ void loop()
     const auto setpoint = mksetpoint(rxdata.axes);
 
 #ifdef _POSHOLD
-    //_debugger.report(state, true);
+    _debugger.report(state, true);
 #else
     _debugger.report(state);
 #endif

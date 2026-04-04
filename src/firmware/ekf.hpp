@@ -70,7 +70,7 @@ namespace hf {
  
             EKF()
             {
-                axis3fSubSamplerInit(&_accSubSampler, GRAVITY);
+                axis3fSubSamplerInit(&_accelSubSampler, GRAVITY);
                 axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
 
                 ekf_init();
@@ -115,12 +115,12 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                axis3fSubSamplerFinalize(&_accSubSampler, "accel");
+                axis3fSubSamplerFinalize(&_accelSubSampler, "accel");
                 axis3fSubSamplerFinalize(&_gyroSubSampler, "gyro");
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const IMU::ThreeAxis * accel = &_accSubSampler.subSample;
+                const IMU::ThreeAxis * accel = &_accelSubSampler.subSample;
                 const IMU::ThreeAxis * gyro = &_gyroSubSampler.subSample;
 
                 const float d0 = gyro->x*dt/2;
@@ -331,7 +331,7 @@ namespace hf {
                 measurement_t m = {};
                 m.type = MeasurementTypeImu;
                 m.data.imu.gyro = imu.gyroDps;
-                m.data.imu.acc = imu.accelGs;
+                m.data.imu.accel = imu.accelGs;
                 enqueue(&m);
             }
 
@@ -348,7 +348,7 @@ namespace hf {
 
         private:
 
-            // Indexes to access the vehicle's state, stored as a column vector
+            // Indexes to acceless the vehicle's state, stored as a column vector
             enum
             {
                 STATE_X,
@@ -370,7 +370,7 @@ namespace hf {
             } MeasurementType;
 
             typedef struct {
-                IMU::ThreeAxis acc;
+                IMU::ThreeAxis accel;
                 IMU::ThreeAxis gyro;
             } imuMeasurement_t;
 
@@ -412,7 +412,7 @@ namespace hf {
 
             IMU::ThreeAxis _gyroLatest;
 
-            ThreeAxisSubSampler_t _accSubSampler;
+            ThreeAxisSubSampler_t _accelSubSampler;
             ThreeAxisSubSampler_t _gyroSubSampler;
 
             float _predictedNX;
@@ -506,7 +506,7 @@ namespace hf {
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and acc
+                // rotate body-frame velocity and accel
 
                 _r00 = _q0 * _q0 + _q1 * _q1 - _q2 * _q2 - _q3 * _q3;
                 _r01 = 2 * _q1 * _q2 - 2 * _q0 * _q3;
@@ -563,7 +563,7 @@ namespace hf {
                         break;
 
                     case MeasurementTypeImu:
-                        axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.imu.acc);
+                        axis3fSubSamplerAccumulate(&_accelSubSampler, &m.data.imu.accel);
                         axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
                         _gyroLatest = m.data.imu.gyro;
                         break;
