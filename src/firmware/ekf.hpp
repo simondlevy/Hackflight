@@ -378,16 +378,6 @@ namespace hf {
 
             typedef struct
             {
-                IMU::ThreeAxis gyro; // deg/s, for legacy reasons
-            } gyroscopeMeasurement_t;
-
-            typedef struct
-            {
-                IMU::ThreeAxis acc; // Gs, for legacy reasons
-            } accelerationMeasurement_t;
-
-            typedef struct
-            {
                 IMU::ThreeAxis acc;
                 IMU::ThreeAxis gyro;
             } imuMeasurement_t;
@@ -398,8 +388,6 @@ namespace hf {
                 union
                 {
                     imuMeasurement_t imu;
-                    gyroscopeMeasurement_t gyroscope;
-                    accelerationMeasurement_t acceleration;
                     ZRangerFilter zrfilter;
                     //OpticalFlow::measurement_t flow;
                 } data;
