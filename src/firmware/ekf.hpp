@@ -339,16 +339,15 @@ namespace hf {
                 enqueue(&m);
             }
 
-            void enqueueImu(const IMU::FilteredData & imu)
+            void enqueueNew(const IMU::FilteredData & imu)
             {
                 measurement_t m = {};
-                m.type = MeasurementTypeGyroscope;
-                m.data.gyroscope.gyro = imu.gyroDps;
-                enqueue(&m);
 
-                m = {};
-                m.type = MeasurementTypeAcceleration;
-                m.data.acceleration.acc = imu.accelGs;
+                m.type = MeasurementTypeImu;
+
+                //m.data.gyroscope.gyro = imu.gyroDps;
+                //m.data.acceleration.acc = imu.accelGs;
+
                 enqueue(&m);
             }
 
@@ -405,6 +404,12 @@ namespace hf {
             {
                 IMU::ThreeAxis acc; // Gs, for legacy reasons
             } accelerationMeasurement_t;
+
+            typedef struct
+            {
+                IMU::ThreeAxis acc;
+                IMU::ThreeAxis gyro;
+            } imuMeasurement_t;
 
             typedef struct
             {
