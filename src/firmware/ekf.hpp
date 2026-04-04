@@ -281,7 +281,8 @@ namespace hf {
 
                 _isUpdated = true;
                 _lastPredictionMs = msec_curr;
-            }
+
+            } // predict
 
             void finalize(const IMU::FilteredData & imudata,
                     const uint32_t msec_curr)
@@ -355,10 +356,9 @@ namespace hf {
                     ekf_enforceSymmetry();
 
                     _isUpdated = false;
-
-
                 }
-            }
+
+            } // finalize
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
