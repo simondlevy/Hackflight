@@ -44,7 +44,7 @@
 #include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
-#define _POSHOLD
+//#define _POSHOLD
 
 #ifdef _POSHOLD
 static const uint8_t LED_PIN = 9;
@@ -138,8 +138,6 @@ void loop()
 
     _ekf.enqueue(_imuFilter.output);
 
-    const uint32_t msec_curr = millis();
-
     if (_flyingCheckTimer.ready()) {
         _flyingCheck = FlyingCheck::run(
                 _flyingCheck, millis(), _mixer.motorvals, 4);
@@ -147,19 +145,19 @@ void loop()
 
     // Run the system dynamics to predict the state forward.
     if (_ekfPredictionTimer.ready()) {
-        _ekf.predict(msec_curr, _flyingCheck.isFlying); 
+        _ekf.predict(millis(), _flyingCheck.isFlying); 
     }
 
-    const auto state = _ekf.getVehicleState(msec_curr);
+    const auto state = _ekf.getVehicleState(millis());
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
     const auto setpoint = mksetpoint(rxdata.axes);
 
 #ifdef _POSHOLD
-    _debugger.report(state, true);
+    //_debugger.report(state, true);
 #else
-    _debugger.report(state);
+    //_debugger.report(state);
 #endif
     //_profiler.report();
 
