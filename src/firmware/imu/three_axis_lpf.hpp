@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <firmware/imu/imu.hpp>
+#include <firmware/imu/sensor.hpp>
 #include <firmware/imu/lpf.hpp>
 
 namespace hf {

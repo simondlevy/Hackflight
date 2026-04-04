@@ -17,7 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/imu/imu.hpp>
+#include <firmware/imu/sensor.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/timer.hpp>
