@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <firmware/imu.hpp>
 #include <firmware/imu_filter/lpf.hpp>
 
 namespace hf {
@@ -22,24 +23,24 @@ namespace hf {
 
         public:
 
-            ThreeAxis output;
+            IMU::ThreeAxis output;
 
             ThreeAxisLpf() = default;
 
-            ThreeAxisLpf(const ThreeAxis & output,
+            ThreeAxisLpf(const IMU::ThreeAxis & output,
                     const LPF &x, const LPF &y, const LPF &z)
                 : output(output), _x(x), _y(y), _z(z) {}
 
             ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
-            static auto apply(const ThreeAxisLpf & lpf, const ThreeAxis & in,
+            static auto apply(const ThreeAxisLpf & lpf, const IMU::ThreeAxis & in,
                     const float cutoff_freq) -> ThreeAxisLpf
             {
                 const auto x = LPF::apply(lpf._x, in.x, cutoff_freq);
                 const auto y = LPF::apply(lpf._y, in.y, cutoff_freq);
                 const auto z = LPF::apply(lpf._z, in.z, cutoff_freq);
 
-                const auto output = ThreeAxis(x.output, y.output, z.output);
+                const auto output = IMU::ThreeAxis(x.output, y.output, z.output);
 
                 return ThreeAxisLpf(output, x, y, z);
             }

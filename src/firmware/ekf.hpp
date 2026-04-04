@@ -119,8 +119,8 @@ namespace hf {
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const ThreeAxis * accel = &_accSubSampler.subSample;
-                const ThreeAxis * gyro = &_gyroSubSampler.subSample;
+                const IMU::ThreeAxis * accel = &_accSubSampler.subSample;
+                const IMU::ThreeAxis * gyro = &_gyroSubSampler.subSample;
 
                 const float d0 = gyro->x*dt/2;
                 const float d1 = gyro->y*dt/2;
@@ -325,7 +325,7 @@ namespace hf {
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
-            void enqueueImu(const ImuFiltered & imu)
+            void enqueueImu(const IMU::ImuFiltered & imu)
             {
                 measurement_t m = {};
                 m.type = MeasurementTypeGyroscope;
@@ -383,12 +383,12 @@ namespace hf {
 
             typedef struct
             {
-                ThreeAxis gyro; // deg/s, for legacy reasons
+                IMU::ThreeAxis gyro; // deg/s, for legacy reasons
             } gyroscopeMeasurement_t;
 
             typedef struct
             {
-                ThreeAxis acc; // Gs, for legacy reasons
+                IMU::ThreeAxis acc; // Gs, for legacy reasons
             } accelerationMeasurement_t;
 
             typedef struct
@@ -417,17 +417,17 @@ namespace hf {
             }
 
             typedef struct {
-                ThreeAxis sum;
+                IMU::ThreeAxis sum;
                 uint32_t count;
                 float conversionFactor;
-                ThreeAxis subSample;
+                IMU::ThreeAxis subSample;
             } ThreeAxisSubSampler_t;
 
             // Quaternion used for initial orientation [w,x,y,z]
             float _qinit0, _qinit1, _qinit2, _qinit3;
 
-            ThreeAxis _accLatest;
-            ThreeAxis _gyroLatest;
+            IMU::ThreeAxis _accLatest;
+            IMU::ThreeAxis _gyroLatest;
 
             ThreeAxisSubSampler_t _accSubSampler;
             ThreeAxisSubSampler_t _gyroSubSampler;
@@ -454,7 +454,7 @@ namespace hf {
             }
 
             static void axis3fSubSamplerAccumulate(ThreeAxisSubSampler_t* subSampler,
-                    const ThreeAxis* sample) {
+                    const IMU::ThreeAxis* sample) {
                 subSampler->sum.x += sample->x;
                 subSampler->sum.y += sample->y;
                 subSampler->sum.z += sample->z;
@@ -462,7 +462,7 @@ namespace hf {
                 subSampler->count++;
             }
 
-            static ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler,
+            static IMU::ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler,
                     const char * label) 
             {
                 if (subSampler->count > 0) {
@@ -600,7 +600,7 @@ namespace hf {
             /*
             void updateWithFlow(const OpticalFlow::measurement_t *flow) 
             {
-                const ThreeAxis *gyro = &_gyroLatest;
+                const IMU::ThreeAxis *gyro = &_gyroLatest;
 
                 // [pixels] (same in x and y)
                 float Npix = 35.0;                      

@@ -161,7 +161,7 @@ namespace hf {
                 }
             }
 
-            void report(const ThreeAxis & vec)
+            void report(const IMU::ThreeAxis & vec)
             {
                 if (_helper.ready()) {
 
@@ -170,7 +170,7 @@ namespace hf {
                 }
             }
 
-            void report(const ImuFiltered & imufilt)
+            void report(const IMU::ImuFiltered & imufilt)
             {
                 if (_helper.ready()) {
 

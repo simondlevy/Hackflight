@@ -37,7 +37,7 @@ namespace hf {
 
         public:
 
-            ImuFiltered output;
+            IMU::ImuFiltered output;
 
             bool isGyroCalibrated;
 
@@ -46,12 +46,12 @@ namespace hf {
             ImuFilter() = default;
 
             ImuFilter(
-                    const ImuFiltered & output,
+                    const IMU::ImuFiltered & output,
                     const bool isGyroCalibrated,
-                    const ThreeAxis & gyroSum,
-                    const ThreeAxis & gyroSumOfSquares,
+                    const IMU::ThreeAxis & gyroSum,
+                    const IMU::ThreeAxis & gyroSumOfSquares,
                     const uint16_t  gyroSampleCount,
-                    const ThreeAxis & gyroBias,
+                    const IMU::ThreeAxis & gyroBias,
                     const uint32_t gyroVarianceSampleTimeMsec,
                     const ThreeAxisLpf & accelLpf,
                     const ThreeAxisLpf & gyroLpf) 
@@ -90,7 +90,7 @@ namespace hf {
                     (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
                     square(gyromean);
 
-                const auto gyroval = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
+                const auto gyroval = IMU::ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
 
                 const auto gyroSum = filter.isGyroCalibrated ?
                     filter._gyroSum : filter._gyroSum + gyroval;
@@ -101,7 +101,7 @@ namespace hf {
 
                 const auto accelraw = imuraw.accel;
                 const auto accel = scale(
-                        ThreeAxis(accelraw.x, accelraw.y, accelraw.z),
+                        IMU::ThreeAxis(accelraw.x, accelraw.y, accelraw.z),
                         accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
@@ -157,7 +157,7 @@ namespace hf {
 
                 const auto accelFiltered = filter._accelLpf.output;
 
-                const auto output = ImuFiltered(gyroFiltered, accelFiltered);
+                const auto output = IMU::ImuFiltered(gyroFiltered, accelFiltered);
 
                 return ImuFilter(output, isGyroCalibrated, gyroSum,
                         gyroSumOfSquares, gyroSampleCount, gyroBias,
@@ -166,20 +166,20 @@ namespace hf {
 
         private:
 
-            ThreeAxis _gyroSum;
-            ThreeAxis _gyroSumOfSquares;
+            IMU::ThreeAxis _gyroSum;
+            IMU::ThreeAxis _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
-            ThreeAxis _gyroBias;
+            IMU::ThreeAxis _gyroBias;
             uint32_t _gyroVarianceSampleTimeMsec;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
 
-            static auto square(const ThreeAxis & vec) -> ThreeAxis
+            static auto square(const IMU::ThreeAxis & vec) -> IMU::ThreeAxis
             {
                 return vec * vec;
             }
 
-            static auto scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
+            static auto scale(const IMU::ThreeAxis & vec, const int16_t s) -> IMU::ThreeAxis
             {
                 return vec * 2 * (float)s / 65536;
             }
