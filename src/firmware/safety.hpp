@@ -16,7 +16,7 @@
 
 #include <hackflight.h>
 #include <firmware/imu_filter/filter.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 
 namespace hf {
 
@@ -30,7 +30,7 @@ namespace hf {
 
             static auto updateMode(
                     const VehicleState & state,
-                    const RxData & rxdata,
+                    const RX::Data & rxdata,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {

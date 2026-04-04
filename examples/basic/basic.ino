@@ -31,14 +31,12 @@
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu_filter/filter.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/setpoint.hpp>
-#include <firmware/zranger_filter.hpp>
 
 #include <firmware/device/bmi088.hpp>
 #include <firmware/device/debugging.hpp>
-#include <firmware/device/elrs.hpp>
 #include <firmware/device/led.hpp>
 #include <firmware/device/profiling.hpp>
 #include <firmware/device/timer.hpp>
@@ -93,7 +91,7 @@ void loop()
 
     // Disable arming while gyro is calibrating
     const auto rxdata =
-        _imuFilter.isGyroCalibrated ? _rx.read() : RxData();
+        _imuFilter.isGyroCalibrated ? _rx.read() : RX::Data();
 
     const auto imuraw = _imu.read();
 

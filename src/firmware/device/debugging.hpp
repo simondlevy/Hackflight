@@ -18,7 +18,7 @@
 
 #include <hackflight.h>
 #include <firmware/imu_filter/datatypes.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 #include <firmware/device/timer.hpp>
 
 namespace hf {
@@ -102,7 +102,7 @@ namespace hf {
                 }
             }
 
-            void report(const RxData & rxdata)
+            void report(const RX::Data & rxdata)
             {
                 if (_helper.ready()) {
 
