@@ -329,19 +329,6 @@ namespace hf {
             void enqueue(const IMU::FilteredData & imu)
             {
                 measurement_t m = {};
-                m.type = MeasurementTypeGyroscope;
-                m.data.gyroscope.gyro = imu.gyroDps;
-                enqueue(&m);
-
-                m = {};
-                m.type = MeasurementTypeAcceleration;
-                m.data.acceleration.acc = imu.accelGs;
-                enqueue(&m);
-            }
-
-            void enqueueNew(const IMU::FilteredData & imu)
-            {
-                measurement_t m = {};
                 m.type = MeasurementTypeImu;
                 m.data.imu.gyro = imu.gyroDps;
                 m.data.imu.acc = imu.accelGs;
@@ -602,14 +589,11 @@ namespace hf {
                         break;
                          */
 
-                    case MeasurementTypeGyroscope:
-                        axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.gyroscope.gyro);
-                        _gyroLatest = m.data.gyroscope.gyro;
-                        break;
-
-                    case MeasurementTypeAcceleration:
-                        axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.acceleration.acc);
-                        _accLatest = m.data.acceleration.acc;
+                    case MeasurementTypeImu:
+                        axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.imu.acc);
+                        _accLatest = m.data.imu.acc;
+                        axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
+                        _gyroLatest = m.data.imu.gyro;
                         break;
 
                     default:
