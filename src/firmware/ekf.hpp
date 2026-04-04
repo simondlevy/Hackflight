@@ -18,6 +18,7 @@
 
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu/sensor.hpp>
+#include <firmware/opticalflow/filter.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <num.hpp>
 
@@ -338,14 +339,14 @@ namespace hf {
                 enqueue(&m);
             }
 
-            /*
-            void enqueueFlow(const OpticalFlow::measurement_t * flow)
+            void enqueue(const OpticalFlowFilter & offilter)
             {
+                /*
                 measurement_t m = {};
                 m.type = MeasurementTypeFlow;
                 m.data.flow = *flow;
-                enqueue(&m);
-            }*/
+                enqueue(&m);*/
+            }
 
             void enqueue(const ZRangerFilter & zrfilter)
             {
