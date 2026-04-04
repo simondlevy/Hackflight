@@ -15,7 +15,7 @@
  */
 
 #include <hackflight.h>
-#include <firmware/imu_filter/filter.hpp>
+#include <firmware/imu/filter.hpp>
 #include <firmware/rx.hpp>
 
 namespace hf {

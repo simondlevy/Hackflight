@@ -31,8 +31,8 @@
 #include <firmware/flying.hpp>
 #include <firmware/ekf.hpp>
 #include <firmware/flow_filter.hpp>
-#include <firmware/imu.hpp>
-#include <firmware/imu_filter/filter.hpp>
+#include <firmware/imu/imu.hpp>
+#include <firmware/imu/filter.hpp>
 #include <firmware/led.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/rx.hpp>

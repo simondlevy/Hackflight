@@ -17,8 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/imu.hpp>
-#include <firmware/imu_filter/datatypes.hpp>
+#include <firmware/imu/imu.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/timer.hpp>
 

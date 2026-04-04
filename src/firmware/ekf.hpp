@@ -17,7 +17,7 @@
 #pragma once
 
 #include <firmware/flow_filter.hpp>
-#include <firmware/imu_filter/datatypes.hpp>
+#include <firmware/imu/imu.hpp>
 #include <firmware/zranger_filter.hpp>
 #include <num.hpp>
 

@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include <firmware/imu.hpp>
-#include <firmware/imu_filter/three_axis_lpf.hpp>
+#include <firmware/imu/imu.hpp>
+#include <firmware/imu/three_axis_lpf.hpp>
 
 namespace hf {
 

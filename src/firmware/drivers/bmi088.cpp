@@ -22,7 +22,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/imu.hpp>
+#include <firmware/imu/imu.hpp>
 using namespace hf;
 
 static constexpr Bmi088Gyro::Range GRANGE = Bmi088Gyro::RANGE_2000DPS;
