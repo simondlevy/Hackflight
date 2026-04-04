@@ -29,7 +29,7 @@ using namespace hf;
 
 static PMW3901 _pmw3901;
 
-void begin()
+void OpticalFlowSensor::begin()
 {
     SPI.begin();
 
@@ -38,7 +38,7 @@ void begin()
     }
 }
 
-auto read() -> OpticalFlowSensor::RawData
+auto OpticalFlowSensor::read() -> OpticalFlowSensor::RawData
 {
     int16_t dx = 0;
     int16_t dy = 0;

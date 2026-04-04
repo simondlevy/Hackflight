@@ -33,6 +33,8 @@
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/imu.hpp>
 #include <firmware/led.hpp>
+#include <firmware/opticalflow/filter.hpp>
+#include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
@@ -61,6 +63,7 @@ static auto _led = LED(LED_PIN);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
 static ZRanger _zranger;
+static OpticalFlowSensor _flowsensor;
 
 // Timers
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
@@ -77,8 +80,10 @@ void setup()
 
 #ifdef _POSHOLD
     _zranger.begin();
+    _flowsensor.begin();
 #else
     (void)_zranger;
+    (void)_flowsensor;
 #endif
 }
 
