@@ -288,8 +288,12 @@ namespace hf {
             void update(const IMU::FilteredData & imudata,
                     const uint32_t msec_curr)
             {
-                enqueue(imudata);
-
+                measurement_t m = {};
+                m.type = MeasurementTypeImu;
+                m.data.imu.gyro = imudata.gyroDps;
+                m.data.imu.accel = imudata.accelGs;
+                enqueue(&m);
+ 
                 addProcessNoise(msec_curr);
 
                 // Update with queued measurements and flush the queue
@@ -355,15 +359,6 @@ namespace hf {
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
-            }
-
-            void enqueue(const IMU::FilteredData & imu)
-            {
-                measurement_t m = {};
-                m.type = MeasurementTypeImu;
-                m.data.imu.gyro = imu.gyroDps;
-                m.data.imu.accel = imu.accelGs;
-                enqueue(&m);
             }
 
             void update(
