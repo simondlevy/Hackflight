@@ -388,8 +388,9 @@ namespace hf {
             } measurement_t;
 
             static const size_t QUEUE_MAX_LENGTH = 20;
-            static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
+
             EKF::measurement_t _measurementsQueue[QUEUE_MAX_LENGTH];
+
             uint32_t _queueLength;
 
             void enqueue(const EKF::measurement_t * measurement) 
@@ -409,7 +410,6 @@ namespace hf {
             // Quaternion used for initial orientation [w,x,y,z]
             float _qinit0, _qinit1, _qinit2, _qinit3;
 
-            IMU::ThreeAxis _accLatest;
             IMU::ThreeAxis _gyroLatest;
 
             ThreeAxisSubSampler_t _accSubSampler;
@@ -564,7 +564,6 @@ namespace hf {
 
                     case MeasurementTypeImu:
                         axis3fSubSamplerAccumulate(&_accSubSampler, &m.data.imu.acc);
-                        _accLatest = m.data.imu.acc;
                         axis3fSubSamplerAccumulate(&_gyroSubSampler, &m.data.imu.gyro);
                         _gyroLatest = m.data.imu.gyro;
                         break;
