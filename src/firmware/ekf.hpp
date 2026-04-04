@@ -313,6 +313,14 @@ namespace hf {
                 }
             }
 
+            void update(const ZRangerFilter & zrfilter,
+                    const OpticalFlowFilter & offilter)
+            {
+                _zrangerFilterLatest = zrfilter;
+                _opticalFlowFilterLatest = offilter;
+                _didUpdateWithFlowDeck = true;
+            }
+
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
                 const auto x = ekf._x;
@@ -359,15 +367,6 @@ namespace hf {
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
-            void update(
-                    const ZRangerFilter & zrfilter,
-                    const OpticalFlowFilter & offilter)
-            {
-                _zrangerFilterLatest = zrfilter;
-                _opticalFlowFilterLatest = offilter;
-                _didUpdateWithFlowDeck = true;
-            }
-
         private:
 
             // Indexes to acceless the vehicle's state, stored as a column vector
@@ -393,6 +392,8 @@ namespace hf {
                 IMU::ThreeAxis subSample;
             } ThreeAxisSubSampler_t;
 
+            //////////////////////////////////////////////////////////////////
+
             // Quaternion used for initial orientation [w,x,y,z]
             float _qinit0, _qinit1, _qinit2, _qinit3;
 
@@ -415,6 +416,24 @@ namespace hf {
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
             float _q0, _q1, _q2, _q3;
+
+            // State vector
+            __attribute__((aligned(4))) float _x[STATE_DIM];
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
+
+            bool _didPredict;
+
+            bool _didUpdateWithFlowDeck;
+
+            ZRangerFilter _zrangerFilterLatest;
+            OpticalFlowFilter _opticalFlowFilterLatest;
+
+            uint32_t _lastPredictionMs;
+            uint32_t _lastProcessNoiseUpdateMs;
+
+            //////////////////////////////////////////////////////////////////
 
             static void axis3fSubSamplerInit(ThreeAxisSubSampler_t* subSampler, const
                     float conversionFactor) { memset(subSampler, 0,
@@ -625,23 +644,6 @@ namespace hf {
                 ekf_enforceSymmetry();
 
             } // finalize
-
-
-            // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
-
-            // Covariance matrix
-            __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
-
-            bool _didPredict;
-
-            bool _didUpdateWithFlowDeck;
-
-            ZRangerFilter _zrangerFilterLatest;
-            OpticalFlowFilter _opticalFlowFilterLatest;
-
-            uint32_t _lastPredictionMs;
-            uint32_t _lastProcessNoiseUpdateMs;
 
             void ekf_init()
             {
