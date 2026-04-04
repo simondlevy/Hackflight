@@ -371,19 +371,23 @@ namespace hf {
 
             typedef enum {
                 MeasurementTypeImu,
+                MeasurementTypeFlowDeck,
                 MeasurementTypeRange,
                 MeasurementTypeFlow,
             } MeasurementType;
 
 
-            typedef struct
-            {
+            typedef struct {
                 IMU::ThreeAxis acc;
                 IMU::ThreeAxis gyro;
             } imuMeasurement_t;
 
-            typedef struct
-            {
+            typedef struct {
+                ZRangerFilter zrfilter;
+                OpticalFlowFilter offilter;
+            } flowDeckMeasurement_t;
+
+            typedef struct {
                 MeasurementType type;
                 union
                 {
@@ -392,7 +396,6 @@ namespace hf {
                     OpticalFlowFilter offilter;
                 } data;
             } measurement_t;
-
 
             static const size_t QUEUE_MAX_LENGTH = 20;
             static const auto QUEUE_ITEM_SIZE = sizeof(EKF::measurement_t);
