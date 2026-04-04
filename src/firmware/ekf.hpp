@@ -285,7 +285,7 @@ namespace hf {
 
             } // predict
 
-            void finalize(const IMU::FilteredData & imudata,
+            void update(const IMU::FilteredData & imudata,
                     const uint32_t msec_curr)
             {
                 enqueue(imudata);
@@ -366,7 +366,7 @@ namespace hf {
                 enqueue(&m);
             }
 
-            void enqueue(
+            void update(
                     const ZRangerFilter & zrfilter,
                     const OpticalFlowFilter & offilter)
             {

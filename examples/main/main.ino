@@ -128,7 +128,7 @@ void loop()
         _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
-        _ekf.enqueue(_zrangerFilter, _opticalFlowFilter);
+        _ekf.update(_zrangerFilter, _opticalFlowFilter);
     }
 #else
     (void)_flowdeckTimer;
@@ -141,7 +141,7 @@ void loop()
         _ekf.predict(millis(), _flyingCheck.isFlying); 
     }
 
-    _ekf.finalize(_imuFilter.output, millis());
+    _ekf.update(_imuFilter.output, millis());
 
     const auto state = EKF::getVehicleState(_ekf);
 
