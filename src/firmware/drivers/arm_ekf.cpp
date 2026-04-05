@@ -21,13 +21,13 @@
 #include <firmware/ekf/ekf.hpp>
 using namespace hf;
 
-static void mat_trans(const arm_matrix_instance_f32 * pSrc, arm_matrix_instance_f32 * pDst)
+static void arm_mat_trans(const arm_matrix_instance_f32 * pSrc, arm_matrix_instance_f32 * pDst)
 {
     arm_mat_trans_f32((arm_matrix_instance_f32 *)pSrc,
             (arm_matrix_instance_f32 *)pDst);
 }
 
-static void mat_mult(
+static void arm_mat_mult(
         const arm_matrix_instance_f32 * pSrcA, const arm_matrix_instance_f32 * pSrcB,
         arm_matrix_instance_f32 * pDst) 
 {
@@ -37,53 +37,8 @@ static void mat_mult(
 
 //////////////////////////////////////////////////////////////////////////////
 
-// C = A * B
-void EKF::device_mat_mult(
-        const float A[STATE_DIM][STATE_DIM],
-        const float B[STATE_DIM][STATE_DIM],
-        float C[STATE_DIM][STATE_DIM])
 
-{
-    static __attribute__((aligned(4))) arm_matrix_instance_f32 _A = { 
-        STATE_DIM, STATE_DIM, (float *)A
-    };
-
-    static __attribute__((aligned(4))) arm_matrix_instance_f32 _B = { 
-        STATE_DIM, STATE_DIM, (float *)B
-    };
-
-    arm_matrix_instance_f32 _C = {};
-    _C.numRows = STATE_DIM;
-    _C.numCols = STATE_DIM;
-    _C.pData = (float*)C;
-
-    arm_mat_mult_f32(
-            (arm_matrix_instance_f32 *)&_A,
-            (arm_matrix_instance_f32 *)&_B,
-            (arm_matrix_instance_f32 *)&_C);
-
-    //mat_mult(&_A, &_B, &_C);
-}
-
-// At = A^T
-void EKF::device_mat_trans(
-        const float A[STATE_DIM][STATE_DIM],
-        float At[STATE_DIM][STATE_DIM])
-
-{
-    static __attribute__((aligned(4))) arm_matrix_instance_f32 _A = { 
-        STATE_DIM, STATE_DIM, (float *)A
-    };
-
-    arm_matrix_instance_f32 _At = {};
-    _At.numRows = STATE_DIM;
-    _At.numCols = STATE_DIM;
-    _At.pData = (float*)At;
-
-    arm_mat_trans_f32(
-            (arm_matrix_instance_f32 *)&_A,
-            (arm_matrix_instance_f32 *)&_At);
-}
+//////////////////////////////////////////////////////////////////////////////
 
 void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
         float P[STATE_DIM][STATE_DIM])
@@ -105,7 +60,7 @@ void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
         STATE_DIM, STATE_DIM, FP
     };
 
-    mat_mult(&_F, &_P, &_FP);
+    arm_mat_mult(&_F, &_P, &_FP);
 
     // ------------------------------------------------------------------
 
@@ -116,11 +71,11 @@ void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
     };
 
 
-    mat_trans(&_F, &_Ft); // F'
+    arm_mat_trans(&_F, &_Ft); // F'
 
     // ------------------------------------------------------------------
 
-    mat_mult(&_FP, &_Ft, &_P); // F P F'
+    arm_mat_mult(&_FP, &_Ft, &_P); // F P F'
 }
 
 void EKF::device_update_with_scalar(
@@ -162,8 +117,8 @@ void EKF::device_update_with_scalar(
     _p_m.numCols = STATE_DIM;
     _p_m.pData = (float*)P;
 
-    mat_trans(&Hm, &HTm);
-    mat_mult(&_p_m, &HTm, &PHTm); // PH'
+    arm_mat_trans(&Hm, &HTm);
+    arm_mat_mult(&_p_m, &HTm, &PHTm); // PH'
     float HPHR = R; // HPH' + R
     for (int i=0; i<STATE_DIM; i++) { 
         // Add the element of HPH' to the above
@@ -176,11 +131,11 @@ void EKF::device_update_with_scalar(
         G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
     }
 
-    mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+    arm_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
     for (int i=0; i<STATE_DIM; i++) { 
         tmpNN1d[STATE_DIM*i+i] -= 1; 
     } // GH - I
-    mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-    mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-    mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+    arm_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+    arm_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+    arm_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
 }
