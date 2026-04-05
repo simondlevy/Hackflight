@@ -596,11 +596,14 @@ namespace hf {
 
             void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
             {
-                static float G[STATE_DIM];
+                float G[STATE_DIM] = {};
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
                 device_update_with_scalar(_P, h, error, R, G);
+
+                float newG[STATE_DIM] = {};
+                simple_update_with_scalar(_P, h, error, R, newG);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
@@ -667,6 +670,38 @@ namespace hf {
                         At[i][j] = A[j][i];
                     }
                 }
+            }
+
+            void simple_update_with_scalar(
+                    const float P[STATE_DIM][STATE_DIM],
+                    const float h[STATE_DIM],
+                    const float error,
+                    const float R,
+                    float G[STATE_DIM])
+            {
+                float PH[STATE_DIM] = {};
+                mult(P, h, PH);
+
+                float HPHR = R; // HPH' + R
+                for (int i=0; i<STATE_DIM; i++) { 
+                    // Add the element of HPH' to the above
+                    // this obviously only works if the update is scalar (as in this function)
+                    HPHR += h[i]*PH[i]; 
+                }
+
+                // Calculate the Kalman gain and perform the state update
+                for (int i=0; i<STATE_DIM; i++) {
+                    G[i] = PH[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                }
+
+                /*
+                arm_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
+                for (int i=0; i<STATE_DIM; i++) { 
+                    tmpNN1d[STATE_DIM*i+i] -= 1; 
+                } // GH - I
+                arm_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
+                arm_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
+                arm_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'*/
             }
 
             // Hardware-dependent --------------------------------------------
