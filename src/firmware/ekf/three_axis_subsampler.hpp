@@ -25,25 +25,25 @@ namespace hf {
 
         public:
 
-            IMU::ThreeAxis sum;
-            uint32_t count;
             float conversionFactor;
+            IMU::ThreeAxis sum;
             IMU::ThreeAxis subSample;
+            uint32_t count;
 
             ThreeAxisSubSampler() = default;
 
             ThreeAxisSubSampler& operator=(const ThreeAxisSubSampler& other) = default;
  
             ThreeAxisSubSampler
-                (IMU::ThreeAxis sum,
-                 uint32_t count,
-                 float conversionFactor,
-                 IMU::ThreeAxis subSample)
+                (float conversionFactor,
+                 IMU::ThreeAxis sum,
+                 IMU::ThreeAxis subSample,
+                 uint32_t count)
                 :
-                    sum(sum),
-                    count(count),
                     conversionFactor(conversionFactor),
-                    subSample(subSample) {}
+                    sum(sum),
+                    subSample(subSample),
+                    count(count) {}
 
             static auto accumulate(const ThreeAxisSubSampler & subSampler,
                     const IMU::ThreeAxis* sample) -> ThreeAxisSubSampler
@@ -51,13 +51,13 @@ namespace hf {
                 const auto sum = subSampler.sum;
 
                 return ThreeAxisSubSampler(
+                        subSampler.conversionFactor,
                         IMU::ThreeAxis(
                             sum.x + sample->x,
                             sum.y + sample->y,
                             sum.z + sample->z),
-                        subSampler.count + 1,
-                        subSampler.conversionFactor,
-                        subSampler.subSample);
+                        subSampler.subSample,
+                        subSampler.count + 1);
             }
 
             static auto finalize (const ThreeAxisSubSampler &
@@ -70,15 +70,15 @@ namespace hf {
                 return subSampler.count > 0 ?
 
                     ThreeAxisSubSampler(
-                            IMU::ThreeAxis(), // sum
-                            0,                // count
                             conversionFactor,
+                            IMU::ThreeAxis(), // sum
                             IMU::ThreeAxis(
                                 sum.x * conversionFactor / count,
                                 sum.y * conversionFactor / count,
-                                sum.z * conversionFactor / count)) :
+                                sum.z * conversionFactor / count),
+                            0) :              // count
 
-                    subSampler;
+                        subSampler;
             }
 
     };
