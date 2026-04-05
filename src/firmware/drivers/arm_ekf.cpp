@@ -37,6 +37,16 @@ static void arm_mat_mult(
 
 //////////////////////////////////////////////////////////////////////////////
 
+void EKF::device_mat_mult(
+        const float A[STATE_DIM][STATE_DIM],
+        const float B[STATE_DIM][STATE_DIM],
+        float C[STATE_DIM][STATE_DIM])
+{
+    (void)A;
+    (void)B;
+    (void)C;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 
