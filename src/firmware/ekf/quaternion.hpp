@@ -49,29 +49,6 @@ namespace hf {
             {
                 return sqrtf(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z);
             }
-
-#if 0
-            Quaternion operator+(const Quaternion& other) const
-            {
-                return Quaternion(w+other.w, x+other.x, y+other.y, z+other.z);
-            }
-
-            Quaternion operator-(const Quaternion& other) const
-            {
-                return Quaternion(w-other.w, x-other.x, y-other.y, z-other.z);
-            }
-
-            Quaternion operator*(const Quaternion& other) const
-            {
-                return Quaternion(w*other.w, x*other.x, y*other.y, z*other.z);
-            }
-
-            Quaternion operator*(const float v) const
-            {
-                return Quaternion(w*v, x*v, y*v, z*v);
-            }
-
-#endif
     };
 
 }

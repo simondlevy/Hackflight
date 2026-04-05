@@ -62,6 +62,9 @@ namespace hf {
             // the reversion of pitch and roll to zero
             static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
+            static constexpr float MIN_ANGLE = 1e-4;
+            static constexpr float MAX_ANGLE = 10;
+
         public:
 
             EKF& operator=(const EKF& other) = default;
@@ -500,24 +503,31 @@ namespace hf {
                 }
             }
 
+            static auto bigenough(const float v) -> bool
+            {
+                return fabsf(v) > MIN_ANGLE;
+            }
+
+            static auto smallenough(const float v) -> bool
+            {
+                return fabsf(v) < MAX_ANGLE;
+            }
+
             void finalize()
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
-                const auto v0 = _x[STATE_D0];
-                const auto v1 = _x[STATE_D1];
-                const auto v2 = _x[STATE_D2];
+                const auto v = ThreeAxis(_x[STATE_D0], _x[STATE_D1], _x[STATE_D2]);
 
                 // Move attitude error into attitude if any of the angle errors are
                 // large enough
-                if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
-                            0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
-                                fabsf(v2) < 10)) {
+                if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
+                        smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
 
-                    const auto angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + Num::EPSILON;
+                    const auto angle = device_sqrt(v.x*v.x + v.y*v.y + v.z*v.z) + Num::EPSILON;
                     const auto ca = device_cos(angle / 2.0f);
                     const auto sa = device_sin(angle / 2.0f);
                     const auto dq = Quaternion(
-                            ca, sa*v0/angle, sa*v1/angle, sa*v2/angle);
+                            ca, sa*v.x/angle, sa*v.y/angle, sa*v.z/angle);
 
                     // Rotate the vehicle's attitude by the delta quaternion vector
                     // computed above
