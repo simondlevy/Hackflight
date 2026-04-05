@@ -243,11 +243,7 @@ namespace hf {
 
                 // normalize and store the result
                 const auto norm = Quaternion::l2norm(tmpq) + Num::EPSILON;
-
-                _q.w = tmpq.w/norm; 
-                _q.x = tmpq.x/norm; 
-                _q.y = tmpq.y/norm; 
-                _q.z = tmpq.z/norm;
+                _q = tmpq / norm;
 
                 _didPredict = true;
                 _lastPredictionMs = msec_curr;
