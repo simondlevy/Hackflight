@@ -126,13 +126,14 @@ void EKF::device_update_with_scalar(
     static float PHt[STATE_DIM * 1];
     static arm_matrix_instance_f32 PHTm = {STATE_DIM, 1, PHt};
 
-    arm_matrix_instance_f32 _p_m = {};
-    _p_m.numRows = STATE_DIM;
-    _p_m.numCols = STATE_DIM;
-    _p_m.pData = (float*)P;
+    arm_matrix_instance_f32 Pm = {};
+    Pm.numRows = STATE_DIM;
+    Pm.numCols = STATE_DIM;
+    Pm.pData = (float*)P;
 
     arm_mat_trans(&Hm, &HTm);
-    arm_mat_mult(&_p_m, &HTm, &PHTm); // PH'
+    arm_mat_mult(&Pm, &HTm, &PHTm); // PH'
+
     float HPHR = R; // HPH' + R
     for (int i=0; i<STATE_DIM; i++) { 
         // Add the element of HPH' to the above
@@ -166,6 +167,6 @@ void EKF::device_update_with_scalar(
         tmpNN1d[STATE_DIM*i+i] -= 1; 
     } // GH - I
     arm_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-    arm_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-    arm_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
+    arm_mat_mult(&tmpNN1m, &Pm, &tmpNN3m); // (GH - I)*P
+    arm_mat_mult(&tmpNN3m, &tmpNN2m, &Pm); // (GH - I)*P*(GH - I)'
 }
