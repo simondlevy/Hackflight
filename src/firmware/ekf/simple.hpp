@@ -185,15 +185,12 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
                 float FP[STATE_DIM][STATE_DIM] = {};
-                mat_mult(F, _P, FP);
+                mult(F, _P, FP);
 
                 float Ft[STATE_DIM][STATE_DIM] = {};
-                mat_trans(F, Ft);
+                trans(F, Ft);
 
-                mat_mult(FP, Ft, _P);
-
-                // device_predict(F, _P);
-
+                mult(FP, Ft, _P);
 
                 // -----------------------------------------------------
 
@@ -631,7 +628,8 @@ namespace hf {
                 }
             }
 
-            static void mat_mult(
+            // C = A * B
+            static void mult(
                     const float A[STATE_DIM][STATE_DIM],
                     const float B[STATE_DIM][STATE_DIM],
                     float C[STATE_DIM][STATE_DIM])
@@ -646,7 +644,15 @@ namespace hf {
                 }
             }
 
-            static void mat_trans(
+            // y = A * x
+            static void mult(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const float x[STATE_DIM],
+                    float y[STATE_DIM][STATE_DIM])
+            {
+            }
+
+            static void trans(
                     const float A[STATE_DIM][STATE_DIM],
                     float At[STATE_DIM][STATE_DIM])
             {
