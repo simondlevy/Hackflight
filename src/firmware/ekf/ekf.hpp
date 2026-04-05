@@ -589,14 +589,16 @@ namespace hf {
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                device_update_with_scalar(_P, h, error, R, _x, G);
+                device_update_with_scalar(_P, h, error, R, G);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
 
+                    _x[i] += G[i] * error; // state update
+
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        float v = G[i] * R * G[j];
+                        const auto v = G[i] * R * G[j];
 
                         // add measurement noise
                         ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i] + v); 
@@ -626,7 +628,6 @@ namespace hf {
                     const float * h,
                     const float error,
                     const float R,
-                    float x[STATE_DIM],
                     float G[STATE_DIM]);
     };
 

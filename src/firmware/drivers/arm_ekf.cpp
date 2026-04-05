@@ -70,7 +70,6 @@ void EKF::device_update_with_scalar(
         const float * h,
         const float error,
         const float R,
-        float x[STATE_DIM],
         float G[STATE_DIM])
 {
     arm_matrix_instance_f32 Hm = {1, STATE_DIM, (float *)h};
@@ -117,7 +116,6 @@ void EKF::device_update_with_scalar(
     // Calculate the Kalman gain and perform the state update
     for (int i=0; i<STATE_DIM; i++) {
         G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-        x[i] = x[i] + G[i] * error; // state update
     }
 
     mat_mult(&Gm, &Hm, &tmpNN1m); // GH
