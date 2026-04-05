@@ -106,7 +106,7 @@ namespace hf {
                 _accelSubSampler = ThreeAxisSubSampler::finalize(_accelSubSampler);
                 _gyroSubSampler = ThreeAxisSubSampler::finalize(_gyroSubSampler);
 
-                const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
+                const auto dt = (msec_curr - _lastPredictionMs) / 1000.f;
 
                 const auto accel = _accelSubSampler.subSample;
                 const auto gyro = _gyroSubSampler.subSample;
