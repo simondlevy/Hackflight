@@ -59,9 +59,6 @@ namespace hf {
             static constexpr float MAX_COVARIANCE = 100;
             static constexpr float MIN_COVARIANCE = 1e-6;
 
-            // Small number epsilon, to prevent dividing by zero
-            static constexpr float EPSILON = 1e-6f;
-
             // the reversion of pitch and roll to zero
             static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
 
@@ -223,7 +220,7 @@ namespace hf {
                 const float dtwz = dt*gyro->z;
 
                 // compute the quaternion values in [w,x,y,z] order
-                const float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPSILON;
+                const float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + Quaternion::EPSILON;
                 const float ca = device_cos(angle/2.0f);
                 const float sa = device_sin(angle/2.0f);
                 const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
@@ -247,7 +244,7 @@ namespace hf {
 
                 // normalize and store the result
                 const float norm = device_sqrt(
-                        tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + EPSILON;
+                        tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + Quaternion::EPSILON;
 
                 _q.w = tmpq0/norm; 
                 _q.x = tmpq1/norm; 
@@ -524,7 +521,7 @@ namespace hf {
                             0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                                 fabsf(v2) < 10)) {
 
-                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + EPSILON;
+                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + Quaternion::EPSILON;
                     const float ca = device_cos(angle / 2.0f);
                     const float sa = device_sin(angle / 2.0f);
                     const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
@@ -542,7 +539,7 @@ namespace hf {
 
                     // normalize and store the result
                     float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                            tmpq3 * tmpq3) + EPSILON;
+                            tmpq3 * tmpq3) + Quaternion::EPSILON;
                     _q.w = tmpq0 / norm;
                     _q.x = tmpq1 / norm;
                     _q.y = tmpq2 / norm;
