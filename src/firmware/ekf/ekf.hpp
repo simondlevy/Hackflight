@@ -190,6 +190,11 @@ namespace hf {
                 float Ft[STATE_DIM][STATE_DIM] = {};
                 device_mat_trans(F, Ft);
 
+                float Pnew[STATE_DIM][STATE_DIM] = {};
+                device_mat_mult(FP, Ft, Pnew);
+
+                //memcpy(_P, Pnew, STATE_DIM*STATE_DIM*sizeof(float));
+
                 device_predict(F, _P);
 
                 // -----------------------------------------------------
