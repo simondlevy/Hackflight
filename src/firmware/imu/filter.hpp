@@ -15,6 +15,7 @@
 #pragma once
 
 #include <firmware/imu/sensor.hpp>
+#include <firmware/imu/three_axis.hpp>
 #include <firmware/imu/three_axis_lpf.hpp>
 
 namespace hf {
@@ -37,7 +38,22 @@ namespace hf {
 
         public:
 
-            IMU::FilteredData output;
+            class Data {
+
+                public:
+
+                    ThreeAxis gyroDps;
+                    ThreeAxis accelGs;
+
+                    Data() = default;
+
+                    Data(const ThreeAxis & gyroDps, const ThreeAxis & accelGs) 
+                        : gyroDps(gyroDps), accelGs(accelGs) {}
+
+                    Data& operator=(const Data& other) = default;
+            };
+
+            Data output;
 
             bool isGyroCalibrated;
 
@@ -46,12 +62,12 @@ namespace hf {
             ImuFilter() = default;
 
             ImuFilter(
-                    const IMU::FilteredData & output,
+                    const Data & output,
                     const bool isGyroCalibrated,
-                    const IMU::ThreeAxis & gyroSum,
-                    const IMU::ThreeAxis & gyroSumOfSquares,
+                    const ThreeAxis & gyroSum,
+                    const ThreeAxis & gyroSumOfSquares,
                     const uint16_t  gyroSampleCount,
-                    const IMU::ThreeAxis & gyroBias,
+                    const ThreeAxis & gyroBias,
                     const uint32_t gyroVarianceSampleTimeMsec,
                     const ThreeAxisLpf & accelLpf,
                     const ThreeAxisLpf & gyroLpf) 
@@ -90,7 +106,7 @@ namespace hf {
                     (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
                     square(gyromean);
 
-                const auto gyroval = IMU::ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
+                const auto gyroval = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
 
                 const auto gyroSum = filter.isGyroCalibrated ?
                     filter._gyroSum : filter._gyroSum + gyroval;
@@ -101,7 +117,7 @@ namespace hf {
 
                 const auto accelraw = imuraw.accel;
                 const auto accel = scale(
-                        IMU::ThreeAxis(accelraw.x, accelraw.y, accelraw.z),
+                        ThreeAxis(accelraw.x, accelraw.y, accelraw.z),
                         accel_range_gs);
 
                 const auto newBufferIndex = filter._gyroSampleCount + 1;
@@ -115,7 +131,7 @@ namespace hf {
                 const bool isGyroVarianceLow = gyrovariance < GYRO_RAW_VARIANCE_BASE;
 
                 const bool inSampleWindow = (filter._gyroVarianceSampleTimeMsec +
-                     GYRO_MIN_BIAS_TIMEOUT_MS) < msec_curr;
+                        GYRO_MIN_BIAS_TIMEOUT_MS) < msec_curr;
 
                 const auto shouldUpdate =
                     wantUpdate && isGyroVarianceLow && inSampleWindow;
@@ -157,7 +173,7 @@ namespace hf {
 
                 const auto accelFiltered = filter._accelLpf.output;
 
-                const auto output = IMU::FilteredData(gyroFiltered, accelFiltered);
+                const auto output = Data(gyroFiltered, accelFiltered);
 
                 return ImuFilter(output, isGyroCalibrated, gyroSum,
                         gyroSumOfSquares, gyroSampleCount, gyroBias,
@@ -166,20 +182,20 @@ namespace hf {
 
         private:
 
-            IMU::ThreeAxis _gyroSum;
-            IMU::ThreeAxis _gyroSumOfSquares;
+            ThreeAxis _gyroSum;
+            ThreeAxis _gyroSumOfSquares;
             uint16_t _gyroSampleCount;
-            IMU::ThreeAxis _gyroBias;
+            ThreeAxis _gyroBias;
             uint32_t _gyroVarianceSampleTimeMsec;
             ThreeAxisLpf _accelLpf;
             ThreeAxisLpf _gyroLpf;
 
-            static auto square(const IMU::ThreeAxis & vec) -> IMU::ThreeAxis
+            static auto square(const ThreeAxis & vec) -> ThreeAxis
             {
                 return vec * vec;
             }
 
-            static auto scale(const IMU::ThreeAxis & vec, const int16_t s) -> IMU::ThreeAxis
+            static auto scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
             {
                 return vec * 2 * (float)s / 65536;
             }

@@ -55,67 +55,6 @@ namespace hf {
                     RawData& operator=(const RawData& other) = default;
             };
 
-            class ThreeAxis {
-
-                public:
-
-                    float x;
-                    float y;
-                    float z;
-
-                    ThreeAxis() = default;
-
-                    ThreeAxis(const float x, const float y, const float z) 
-                        : x(x), y(y), z(z) {}
-
-                    ThreeAxis& operator=(const ThreeAxis& other) = default;
-
-                    ThreeAxis operator+(const ThreeAxis& other) const
-                    {
-                        return ThreeAxis(x+other.x, y+other.y, z+other.z);
-                    }
-
-                    ThreeAxis operator-(const ThreeAxis& other) const
-                    {
-                        return ThreeAxis(x-other.x, y-other.y, z-other.z);
-                    }
-
-                    ThreeAxis operator*(const ThreeAxis& other) const
-                    {
-                        return ThreeAxis(x*other.x, y*other.y, z*other.z);
-                    }
-
-                    ThreeAxis operator*(const float v) const
-                    {
-                        return ThreeAxis(x*v, y*v, z*v);
-                    }
-
-                    ThreeAxis operator/(const float d) const
-                    {
-                        return ThreeAxis(x/d, y/d, z/d);
-                    }
-
-                    bool operator<(const float v) const
-                    {
-                        return x < v && y < v && z < v;
-                    }
-            };
-
-            class FilteredData {
-
-                public:
-
-                    ThreeAxis gyroDps;
-                    ThreeAxis accelGs;
-
-                    FilteredData() = default;
-
-                    FilteredData(const ThreeAxis & gyroDps, const ThreeAxis & accelGs) 
-                        : gyroDps(gyroDps), accelGs(accelGs) {}
-
-                    FilteredData& operator=(const FilteredData& other) = default;
-            };
-
             auto begin() -> bool;
 
             auto gyroRangeDps() -> int16_t;

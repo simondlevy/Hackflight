@@ -16,8 +16,7 @@
 
 #pragma once
 
-#include <firmware/imu/sensor.hpp>
-
+#include <firmware/imu/three_axis.hpp>
 
 namespace hf {
 
@@ -26,8 +25,8 @@ namespace hf {
         public:
 
             float conversionFactor;
-            IMU::ThreeAxis sum;
-            IMU::ThreeAxis subSample;
+            ThreeAxis sum;
+            ThreeAxis subSample;
             uint32_t count;
 
             ThreeAxisSubSampler() = default;
@@ -36,8 +35,8 @@ namespace hf {
  
             ThreeAxisSubSampler
                 (const float conversionFactor,
-                 const IMU::ThreeAxis sum={},
-                 const IMU::ThreeAxis subSample={},
+                 const ThreeAxis sum={},
+                 const ThreeAxis subSample={},
                  const uint32_t count={})
                 :
                     conversionFactor(conversionFactor),
@@ -46,13 +45,13 @@ namespace hf {
                     count(count) {}
 
             static auto accumulate(const ThreeAxisSubSampler & subSampler,
-                    const IMU::ThreeAxis & sample) -> ThreeAxisSubSampler
+                    const ThreeAxis & sample) -> ThreeAxisSubSampler
             {
                 const auto sum = subSampler.sum;
 
                 return ThreeAxisSubSampler(
                         subSampler.conversionFactor,
-                        IMU::ThreeAxis(
+                        ThreeAxis(
                             sum.x + sample.x,
                             sum.y + sample.y,
                             sum.z + sample.z),
@@ -71,8 +70,8 @@ namespace hf {
 
                     ThreeAxisSubSampler(
                             conversionFactor,
-                            IMU::ThreeAxis(), // sum
-                            IMU::ThreeAxis(
+                            ThreeAxis(), // sum
+                            ThreeAxis(
                                 sum.x * conversionFactor / count,
                                 sum.y * conversionFactor / count,
                                 sum.z * conversionFactor / count),

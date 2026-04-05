@@ -18,7 +18,7 @@
 
 #include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
-#include <firmware/imu/sensor.hpp>
+#include <firmware/imu/filter.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <num.hpp>
@@ -116,8 +116,8 @@ namespace hf {
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
-                const IMU::ThreeAxis * accel = &_accelSubSampler.subSample;
-                const IMU::ThreeAxis * gyro = &_gyroSubSampler.subSample;
+                const ThreeAxis * accel = &_accelSubSampler.subSample;
+                const ThreeAxis * gyro = &_gyroSubSampler.subSample;
 
                 const float d0 = gyro->x*dt/2;
                 const float d1 = gyro->y*dt/2;
@@ -264,7 +264,7 @@ namespace hf {
 
             } // predict
 
-            void update(const IMU::FilteredData & imudata,
+            void update(const ImuFilter::Data & imudata,
                     const uint32_t msec_curr)
             {
                 addProcessNoise(msec_curr);
@@ -380,7 +380,7 @@ namespace hf {
             // Quaternion used for initial orientation [w,x,y,z]
             float _qinit0, _qinit1, _qinit2, _qinit3;
 
-            IMU::ThreeAxis _gyroLatest;
+            ThreeAxis _gyroLatest;
 
             ThreeAxisSubSampler _accelSubSampler = ThreeAxisSubSampler(GRAVITY);
             ThreeAxisSubSampler _gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
@@ -424,6 +424,7 @@ namespace hf {
                     };
 
                     ekf_addCovarianceNoise(noise);
+
                     ekf_enforceSymmetry();
 
                     _lastProcessNoiseUpdateMs = msec_curr;
@@ -432,7 +433,7 @@ namespace hf {
 
             void updateWithFlow(const OpticalFlowFilter & offilter)
             {
-                const IMU::ThreeAxis *gyro = &_gyroLatest;
+                const ThreeAxis *gyro = &_gyroLatest;
 
                 // [pixels] (same in x and y)
                 float Npix = 35.0;                      

@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <datatypes.hpp>
-
 namespace hf {
 
     class LPF {

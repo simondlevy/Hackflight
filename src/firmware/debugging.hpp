@@ -17,7 +17,9 @@
 #pragma once
 
 #include <hackflight.h>
+#include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
+#include <firmware/imu/three_axis.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/timer.hpp>
@@ -161,7 +163,7 @@ namespace hf {
                 }
             }
 
-            void report(const IMU::ThreeAxis & vec)
+            void report(const ThreeAxis & vec)
             {
                 if (_helper.ready()) {
 
@@ -170,7 +172,7 @@ namespace hf {
                 }
             }
 
-            void report(const IMU::FilteredData & imufilt)
+            void report(const ImuFilter::Data & imufilt)
             {
                 if (_helper.ready()) {
 
