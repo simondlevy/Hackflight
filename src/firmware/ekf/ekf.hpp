@@ -117,8 +117,8 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                axis3fSubSamplerFinalize(&_accelSubSampler, "accel");
-                axis3fSubSamplerFinalize(&_gyroSubSampler, "gyro");
+                axis3fSubSamplerFinalize(&_accelSubSampler);
+                axis3fSubSamplerFinalize(&_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 

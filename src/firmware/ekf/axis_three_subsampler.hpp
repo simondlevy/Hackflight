@@ -46,7 +46,7 @@ namespace hf {
                     subSample(subSample) {}
 
             static auto accumulate(const ThreeAxisSubSampler & subSampler,
-                    const IMU::ThreeAxis* sample)
+                    const IMU::ThreeAxis* sample) -> ThreeAxisSubSampler
             {
                 const auto sum = subSampler.sum;
 
@@ -58,6 +58,33 @@ namespace hf {
                         subSampler.count + 1,
                         subSampler.conversionFactor,
                         subSampler.subSample);
+            }
+
+            static auto finalize (const ThreeAxisSubSampler &
+                    subSampler)-> ThreeAxisSubSampler
+            {
+                return subSampler.count > 0 ?
+                    subSampler :
+                    subSampler;
+
+                /*
+                   if (subSampler->count > 0) {
+
+                   subSampler->subSample.x = 
+                   subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
+                   subSampler->subSample.y = 
+                   subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
+                   subSampler->subSample.z = 
+                   subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
+
+                // Reset
+                subSampler->count = 0;
+                subSampler->sum.x = 0;
+                subSampler->sum.y = 0;
+                subSampler->sum.z = 0;
+                }
+
+                return &subSampler->subSample;*/
             }
 
     };
@@ -86,8 +113,7 @@ namespace hf {
         subSampler->count++;
     }
 
-    static IMU::ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler,
-            const char * label) 
+    static IMU::ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler)
     {
         if (subSampler->count > 0) {
 
