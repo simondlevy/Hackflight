@@ -45,7 +45,7 @@
 using namespace hf;
 
 #define _DEBUG
-//#define _POSHOLD
+#define _POSHOLD
 
 #ifdef _POSHOLD
 static const uint8_t LED_PIN = 9;

@@ -37,6 +37,29 @@ static void mat_mult(
 
 //////////////////////////////////////////////////////////////////////////////
 
+// C = A * B
+void EKF::device_mat_mult(
+        const float A[STATE_DIM][STATE_DIM],
+        const float B[STATE_DIM][STATE_DIM],
+        float C[STATE_DIM][STATE_DIM])
+
+{
+    static __attribute__((aligned(4))) arm_matrix_instance_f32 _A = { 
+        STATE_DIM, STATE_DIM, (float *)A
+    };
+
+    static __attribute__((aligned(4))) arm_matrix_instance_f32 _B = { 
+        STATE_DIM, STATE_DIM, (float *)B
+    };
+
+    arm_matrix_instance_f32 _C = {};
+    _C.numRows = STATE_DIM;
+    _C.numCols = STATE_DIM;
+    _C.pData = (float*)C;
+
+    mat_mult(&_A, &_B, &_C);
+}
+
 void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
         float P[STATE_DIM][STATE_DIM])
 {
