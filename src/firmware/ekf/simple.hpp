@@ -618,6 +618,13 @@ namespace hf {
                         ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i] + v); 
                     }
                 }
+
+                /*
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    printf("%f(%f) ", newG[i], G[i]);
+                    printf("\n");
+                }*/
             }
 
             void ekf_pset(const uint8_t i, const uint8_t j, const float pval)

@@ -136,11 +136,11 @@ void EKF::device_update_with_scalar(
         STATE_DIM, STATE_DIM, tmpNN3d
     };
 
-    static float HTd[STATE_DIM * 1];
-    static arm_matrix_instance_f32 HTm = {STATE_DIM, 1, HTd};
+    static float Ht[STATE_DIM * 1];
+    static arm_matrix_instance_f32 HTm = {STATE_DIM, 1, Ht};
 
-    static float PHTd[STATE_DIM * 1];
-    static arm_matrix_instance_f32 PHTm = {STATE_DIM, 1, PHTd};
+    static float PHt[STATE_DIM * 1];
+    static arm_matrix_instance_f32 PHTm = {STATE_DIM, 1, PHt};
 
     arm_matrix_instance_f32 _p_m = {};
     _p_m.numRows = STATE_DIM;
@@ -153,12 +153,12 @@ void EKF::device_update_with_scalar(
     for (int i=0; i<STATE_DIM; i++) { 
         // Add the element of HPH' to the above
         // this obviously only works if the update is scalar (as in this function)
-        HPHR += Hm.pData[i]*PHTd[i]; 
+        HPHR += Hm.pData[i]*PHt[i]; 
     }
 
     // Calculate the Kalman gain and perform the state update
     for (int i=0; i<STATE_DIM; i++) {
-        G[i] = PHTd[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+        G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
     }
 
     arm_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
