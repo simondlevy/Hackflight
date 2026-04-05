@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <firmware/ekf/axis_three_subsampler.hpp>
+#include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/opticalflow/filter.hpp>
