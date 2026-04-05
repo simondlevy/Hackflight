@@ -523,7 +523,8 @@ namespace hf {
                 if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
                         smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
 
-                    const auto angle = device_sqrt(v.x*v.x + v.y*v.y + v.z*v.z) + Num::EPSILON;
+                    const auto angle = ThreeAxis::l2norm(v) + Num::EPSILON;
+
                     const auto ca = device_cos(angle / 2.0f);
                     const auto sa = device_sin(angle / 2.0f);
                     const auto dq = Quaternion(
