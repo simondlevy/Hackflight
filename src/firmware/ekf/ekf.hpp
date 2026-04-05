@@ -539,10 +539,7 @@ namespace hf {
                     float norm = device_sqrt(
                             tmpq.w * tmpq.w + tmpq.x * tmpq.x + tmpq.y * tmpq.y + 
                             tmpq.z * tmpq.z) + Num::EPSILON;
-                    _q.w = tmpq.w / norm;
-                    _q.x = tmpq.x / norm;
-                    _q.y = tmpq.y / norm;
-                    _q.z = tmpq.z / norm;
+                    _q = _q / norm;
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can

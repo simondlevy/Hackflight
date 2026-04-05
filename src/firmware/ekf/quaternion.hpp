@@ -40,6 +40,11 @@ namespace hf {
 
             Quaternion& operator=(const Quaternion& other) = default;
 
+            Quaternion operator/(const float d) const
+            {
+                return Quaternion(w/d, x/d, y/d, z/d);
+            }
+#if 0
             Quaternion operator+(const Quaternion& other) const
             {
                 return Quaternion(w+other.w, x+other.x, y+other.y, z+other.z);
@@ -60,10 +65,7 @@ namespace hf {
                 return Quaternion(w*v, x*v, y*v, z*v);
             }
 
-            Quaternion operator/(const float d) const
-            {
-                return Quaternion(w/d, x/d, y/d, z/d);
-            }
+#endif
     };
 
 }
