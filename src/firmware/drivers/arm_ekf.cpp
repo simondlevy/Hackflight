@@ -35,6 +35,8 @@ static void mat_mult(
             (arm_matrix_instance_f32 *)pDst);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
         float P[STATE_DIM][STATE_DIM])
 {
