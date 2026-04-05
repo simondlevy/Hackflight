@@ -429,43 +429,6 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            static void axis3fSubSamplerInit(ThreeAxisSubSampler_t* subSampler, const
-                    float conversionFactor) { memset(subSampler, 0,
-                        sizeof(ThreeAxisSubSampler_t));
-                    subSampler->conversionFactor = conversionFactor;
-            }
-
-            static void axis3fSubSamplerAccumulate(ThreeAxisSubSampler_t* subSampler,
-                    const IMU::ThreeAxis* sample) {
-                subSampler->sum.x += sample->x;
-                subSampler->sum.y += sample->y;
-                subSampler->sum.z += sample->z;
-
-                subSampler->count++;
-            }
-
-            static IMU::ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler,
-                    const char * label) 
-            {
-                if (subSampler->count > 0) {
-
-                    subSampler->subSample.x = 
-                        subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.y = 
-                        subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-                    subSampler->subSample.z = 
-                        subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
-
-                    // Reset
-                    subSampler->count = 0;
-                    subSampler->sum.x = 0;
-                    subSampler->sum.y = 0;
-                    subSampler->sum.z = 0;
-                }
-
-                return &subSampler->subSample;
-            }
-
             void addProcessNoise(const uint32_t msec_curr) 
             {
                 float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
