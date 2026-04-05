@@ -64,12 +64,16 @@ namespace hf {
                     subSampler)-> ThreeAxisSubSampler
             {
                 return subSampler.count > 0 ?
-                    subSampler :
+
+                    ThreeAxisSubSampler(
+                            IMU::ThreeAxis(), // sum
+                            0,                // count
+                            subSampler.conversionFactor,
+                            subSampler.subSample) :
+
                     subSampler;
 
                 /*
-                   if (subSampler->count > 0) {
-
                    subSampler->subSample.x = 
                    subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
                    subSampler->subSample.y = 
@@ -77,14 +81,7 @@ namespace hf {
                    subSampler->subSample.z = 
                    subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
 
-                // Reset
-                subSampler->count = 0;
-                subSampler->sum.x = 0;
-                subSampler->sum.y = 0;
-                subSampler->sum.z = 0;
-                }
-
-                return &subSampler->subSample;*/
+                   */
             }
 
     };
