@@ -120,22 +120,6 @@ void EKF::device_update_with_scalar(
     // The Kalman gain as a column vector
     static arm_matrix_instance_f32 Gm = {STATE_DIM, 1, (float *)G};
 
-    // Temporary matrices for the covariance updates
-    static float tmpNN1d[STATE_DIM * STATE_DIM];
-    static arm_matrix_instance_f32 tmpNN1m = {
-        STATE_DIM, STATE_DIM, tmpNN1d
-    };
-
-    static float tmpNN2d[STATE_DIM * STATE_DIM];
-    static arm_matrix_instance_f32 tmpNN2m = {
-        STATE_DIM, STATE_DIM, tmpNN2d
-    };
-
-    static float tmpNN3d[STATE_DIM * STATE_DIM];
-    static arm_matrix_instance_f32 tmpNN3m = {
-        STATE_DIM, STATE_DIM, tmpNN3d
-    };
-
     static float Ht[STATE_DIM * 1];
     static arm_matrix_instance_f32 HTm = {STATE_DIM, 1, Ht};
 
@@ -160,6 +144,22 @@ void EKF::device_update_with_scalar(
     for (int i=0; i<STATE_DIM; i++) {
         G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
     }
+
+    // -----------------------------------------------------------------------
+
+    // Temporary matrices for the covariance updates
+    static float tmpNN1d[STATE_DIM * STATE_DIM];
+    static arm_matrix_instance_f32 tmpNN1m = {
+        STATE_DIM, STATE_DIM, tmpNN1d
+    };
+    static float tmpNN2d[STATE_DIM * STATE_DIM];
+    static arm_matrix_instance_f32 tmpNN2m = {
+        STATE_DIM, STATE_DIM, tmpNN2d
+    };
+    static float tmpNN3d[STATE_DIM * STATE_DIM];
+    static arm_matrix_instance_f32 tmpNN3m = {
+        STATE_DIM, STATE_DIM, tmpNN3d
+    };
 
     arm_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
     for (int i=0; i<STATE_DIM; i++) { 
