@@ -641,7 +641,12 @@ namespace hf {
                     const float A[STATE_DIM][STATE_DIM],
                     float At[STATE_DIM][STATE_DIM])
             {
-            }
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        At[i][j] = A[j][i];
+                    }
+                }
+             }
 
             // Hardware-dependent --------------------------------------------
 
