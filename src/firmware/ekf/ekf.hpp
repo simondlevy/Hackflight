@@ -222,7 +222,7 @@ namespace hf {
                 const auto ca = device_cos(angle/2);
                 const auto sa = device_sin(angle/2);
                 const auto dq = Quaternion(
-                        ca , sa*dtw.x/angle , sa*dtw.y/angle , sa*dtw.z/angle);
+                        ca, sa*dtw.x/angle, sa*dtw.y/angle, sa*dtw.z/angle);
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
                 auto tmpq = Quaternion(
@@ -242,8 +242,7 @@ namespace hf {
                 }
 
                 // normalize and store the result
-                const auto norm = Quaternion::l2norm(tmpq) + Num::EPSILON;
-                _q = tmpq / norm;
+                _q = tmpq / (Quaternion::l2norm(tmpq) + Num::EPSILON);
 
                 _didPredict = true;
                 _lastPredictionMs = msec_curr;
