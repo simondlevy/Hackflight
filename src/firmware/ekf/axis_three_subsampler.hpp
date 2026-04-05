@@ -63,25 +63,22 @@ namespace hf {
             static auto finalize (const ThreeAxisSubSampler &
                     subSampler)-> ThreeAxisSubSampler
             {
+                const auto count = subSampler.count;
+                const auto sum = subSampler.sum;
+                const auto conversionFactor = subSampler.conversionFactor;
+
                 return subSampler.count > 0 ?
 
                     ThreeAxisSubSampler(
                             IMU::ThreeAxis(), // sum
                             0,                // count
-                            subSampler.conversionFactor,
-                            subSampler.subSample) :
+                            conversionFactor,
+                            IMU::ThreeAxis(
+                                sum.x * conversionFactor / count,
+                                sum.y * conversionFactor / count,
+                                sum.z * conversionFactor / count)) :
 
                     subSampler;
-
-                /*
-                   subSampler->subSample.x = 
-                   subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-                   subSampler->subSample.y = 
-                   subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-                   subSampler->subSample.z = 
-                   subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
-
-                   */
             }
 
     };
