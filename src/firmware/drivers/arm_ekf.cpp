@@ -88,9 +88,14 @@ void EKF::device_mat_trans(
 void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
         float P[STATE_DIM][STATE_DIM])
 {
+    // ------------------------------------------------------------------
+
     float FP[STATE_DIM * STATE_DIM] = {};
 
-    float Ft[STATE_DIM * STATE_DIM] = {};
+    arm_matrix_instance_f32 _P = {};
+    _P.numRows = STATE_DIM;
+    _P.numCols = STATE_DIM;
+    _P.pData = (float*)P;
 
     static __attribute__((aligned(4))) arm_matrix_instance_f32 _F = { 
         STATE_DIM, STATE_DIM, (float *)F
@@ -100,17 +105,21 @@ void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
         STATE_DIM, STATE_DIM, FP
     };
 
+    mat_mult(&_F, &_P, &_FP);
+
+    // ------------------------------------------------------------------
+
+    float Ft[STATE_DIM * STATE_DIM] = {};
+
     static __attribute__((aligned(4))) arm_matrix_instance_f32 _Ft = { 
         STATE_DIM, STATE_DIM, Ft
     };
 
-    arm_matrix_instance_f32 _P = {};
-    _P.numRows = STATE_DIM;
-    _P.numCols = STATE_DIM;
-    _P.pData = (float*)P;
 
-    mat_mult(&_F, &_P, &_FP); // F P
     mat_trans(&_F, &_Ft); // F'
+
+    // ------------------------------------------------------------------
+
     mat_mult(&_FP, &_Ft, &_P); // F P F'
 }
 

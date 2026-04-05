@@ -184,17 +184,6 @@ namespace hf {
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
-                float FP[STATE_DIM][STATE_DIM] = {};
-                device_mat_mult(F, _P, FP);
-
-                float Ft[STATE_DIM][STATE_DIM] = {};
-                device_mat_trans(F, Ft);
-
-                float Pnew[STATE_DIM][STATE_DIM] = {};
-                device_mat_mult(FP, Ft, Pnew);
-
-                //memcpy(_P, Pnew, STATE_DIM*STATE_DIM*sizeof(float));
-
                 device_predict(F, _P);
 
                 // -----------------------------------------------------
