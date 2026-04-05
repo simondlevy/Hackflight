@@ -71,9 +71,6 @@ namespace hf {
  
             EKF()
             {
-                axis3fSubSamplerInit(&_accelSubSampler, GRAVITY);
-                axis3fSubSamplerInit(&_gyroSubSampler, Num::DEG2RAD);
-
                 ekf_init();
 
                 // Reset the attitude quaternion
@@ -117,8 +114,8 @@ namespace hf {
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                axis3fSubSamplerFinalize(&_accelSubSampler);
-                axis3fSubSamplerFinalize(&_gyroSubSampler);
+                _accelSubSampler = ThreeAxisSubSampler::finalize(_accelSubSampler);
+                _gyroSubSampler = ThreeAxisSubSampler::finalize(_gyroSubSampler);
 
                 const float dt = (msec_curr - _lastPredictionMs) / 1000.0f;
 
@@ -291,8 +288,11 @@ namespace hf {
             {
                 addProcessNoise(msec_curr);
 
-                axis3fSubSamplerAccumulate(&_accelSubSampler, &imudata.accelGs);
-                axis3fSubSamplerAccumulate(&_gyroSubSampler, &imudata.gyroDps);
+                _accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        _accelSubSampler, imudata.accelGs);
+
+                _gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        _gyroSubSampler, imudata.gyroDps);
 
                 _gyroLatest = imudata.gyroDps;
 
@@ -404,8 +404,8 @@ namespace hf {
 
             IMU::ThreeAxis _gyroLatest;
 
-            ThreeAxisSubSampler_t _accelSubSampler;
-            ThreeAxisSubSampler_t _gyroSubSampler;
+            ThreeAxisSubSampler _accelSubSampler = ThreeAxisSubSampler(GRAVITY);
+            ThreeAxisSubSampler _gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
 
             float _predictedNX;
             float _predictedNY;

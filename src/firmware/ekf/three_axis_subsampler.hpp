@@ -35,10 +35,10 @@ namespace hf {
             ThreeAxisSubSampler& operator=(const ThreeAxisSubSampler& other) = default;
  
             ThreeAxisSubSampler
-                (float conversionFactor,
-                 IMU::ThreeAxis sum,
-                 IMU::ThreeAxis subSample,
-                 uint32_t count)
+                (const float conversionFactor,
+                 const IMU::ThreeAxis sum={},
+                 const IMU::ThreeAxis subSample={},
+                 const uint32_t count={})
                 :
                     conversionFactor(conversionFactor),
                     sum(sum),
@@ -46,16 +46,16 @@ namespace hf {
                     count(count) {}
 
             static auto accumulate(const ThreeAxisSubSampler & subSampler,
-                    const IMU::ThreeAxis* sample) -> ThreeAxisSubSampler
+                    const IMU::ThreeAxis & sample) -> ThreeAxisSubSampler
             {
                 const auto sum = subSampler.sum;
 
                 return ThreeAxisSubSampler(
                         subSampler.conversionFactor,
                         IMU::ThreeAxis(
-                            sum.x + sample->x,
-                            sum.y + sample->y,
-                            sum.z + sample->z),
+                            sum.x + sample.x,
+                            sum.y + sample.y,
+                            sum.z + sample.z),
                         subSampler.subSample,
                         subSampler.count + 1);
             }
@@ -82,50 +82,4 @@ namespace hf {
             }
 
     };
-
-    typedef struct {
-        IMU::ThreeAxis sum;
-        uint32_t count;
-        float conversionFactor;
-        IMU::ThreeAxis subSample;
-    } ThreeAxisSubSampler_t;
-
-    static void axis3fSubSamplerInit(ThreeAxisSubSampler_t* subSampler, const
-            float conversionFactor)
-    {
-        memset(subSampler, 0, sizeof(ThreeAxisSubSampler_t));
-        subSampler->conversionFactor = conversionFactor;
-    }
-
-    static void axis3fSubSamplerAccumulate(ThreeAxisSubSampler_t* subSampler,
-            const IMU::ThreeAxis* sample)
-    {
-        subSampler->sum.x += sample->x;
-        subSampler->sum.y += sample->y;
-        subSampler->sum.z += sample->z;
-
-        subSampler->count++;
-    }
-
-    static IMU::ThreeAxis* axis3fSubSamplerFinalize(ThreeAxisSubSampler_t* subSampler)
-    {
-        if (subSampler->count > 0) {
-
-            subSampler->subSample.x = 
-                subSampler->sum.x * subSampler->conversionFactor / subSampler->count;
-            subSampler->subSample.y = 
-                subSampler->sum.y * subSampler->conversionFactor / subSampler->count;
-            subSampler->subSample.z = 
-                subSampler->sum.z * subSampler->conversionFactor / subSampler->count;
-
-            // Reset
-            subSampler->count = 0;
-            subSampler->sum.x = 0;
-            subSampler->sum.y = 0;
-            subSampler->sum.z = 0;
-        }
-
-        return &subSampler->subSample;
-    }
-
 }
