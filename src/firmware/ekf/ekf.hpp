@@ -524,26 +524,25 @@ namespace hf {
                     const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + Num::EPSILON;
                     const float ca = device_cos(angle / 2.0f);
                     const float sa = device_sin(angle / 2.0f);
-                    const float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
+                    const auto dq = Quaternion(
+                            ca, sa*v0/angle, sa*v1/angle, sa*v2/angle);
 
                     // Rotate the vehicle's attitude by the delta quaternion vector
                     // computed above
-                    const float tmpq0 = dq[0] * _q.w - dq[1] * _q.x - 
-                        dq[2] * _q.y - dq[3] * _q.z;
-                    const float tmpq1 = dq[1] * _q.w + dq[0] * _q.x + 
-                        dq[3] * _q.y - dq[2] * _q.z;
-                    const float tmpq2 = dq[2] * _q.w - dq[3] * _q.x + 
-                        dq[0] * _q.y + dq[1] * _q.z;
-                    const float tmpq3 = dq[3] * _q.w + dq[2] * _q.x - 
-                        dq[1] * _q.y + dq[0] * _q.z;
+                    const auto tmpq = Quaternion(
+                            dq.w*_q.w - dq.x*_q.x - dq.y*_q.y - dq.z*_q.z,
+                            dq.x*_q.w + dq.w*_q.x + dq.z*_q.y - dq.y*_q.z,
+                            dq.y*_q.w - dq.z*_q.x + dq.w*_q.y + dq.x*_q.z,
+                            dq.z*_q.w + dq.y*_q.x - dq.x*_q.y + dq.w*_q.z);
 
                     // normalize and store the result
-                    float norm = device_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
-                            tmpq3 * tmpq3) + Num::EPSILON;
-                    _q.w = tmpq0 / norm;
-                    _q.x = tmpq1 / norm;
-                    _q.y = tmpq2 / norm;
-                    _q.z = tmpq3 / norm;
+                    float norm = device_sqrt(
+                            tmpq.w * tmpq.w + tmpq.x * tmpq.x + tmpq.y * tmpq.y + 
+                            tmpq.z * tmpq.z) + Num::EPSILON;
+                    _q.w = tmpq.w / norm;
+                    _q.x = tmpq.x / norm;
+                    _q.y = tmpq.y / norm;
+                    _q.z = tmpq.z / norm;
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can
