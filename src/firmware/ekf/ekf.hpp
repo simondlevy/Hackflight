@@ -36,7 +36,6 @@ namespace hf {
 
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_XY = 100;
             static constexpr float STDEV_INITIAL_POSITION_Z = 1;
             static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
@@ -93,8 +92,6 @@ namespace hf {
                 // Add in the initial process noise 
                 const float pinit[STATE_DIM] = {
 
-                    STDEV_INITIAL_POSITION_XY,
-                    STDEV_INITIAL_POSITION_XY,
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_VELOCITY,
@@ -134,34 +131,20 @@ namespace hf {
                 static float F[STATE_DIM][STATE_DIM];
 
                 // position
-                F[STATE_X][STATE_X] = 1;
-                F[STATE_Y][STATE_Y] = 1;
                 F[STATE_Z][STATE_Z] = 1;
 
                 // position from body-frame velocity
-                F[STATE_X][STATE_VX] = _r00*dt;
-                F[STATE_Y][STATE_VX] = _r10*dt;
                 F[STATE_Z][STATE_VX] = _r20*dt;
 
-                F[STATE_X][STATE_VY] = _r01*dt;
-                F[STATE_Y][STATE_VY] = _r11*dt;
                 F[STATE_Z][STATE_VY] = _r21*dt;
 
-                F[STATE_X][STATE_VZ] = _r02*dt;
-                F[STATE_Y][STATE_VZ] = _r12*dt;
                 F[STATE_Z][STATE_VZ] = _r22*dt;
 
                 // position from attitude error
-                F[STATE_X][STATE_D0] = (vy*_r02 - vz*_r01)*dt;
-                F[STATE_Y][STATE_D0] = (vy*_r12 - vz*_r11)*dt;
                 F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
 
-                F[STATE_X][STATE_D1] = (-vx*_r02 + vz*_r00)*dt;
-                F[STATE_Y][STATE_D1] = (-vx*_r12 + vz*_r10)*dt;
                 F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
 
-                F[STATE_X][STATE_D2] = (vx*_r01 - vy*_r00)*dt;
-                F[STATE_Y][STATE_D2] = (vx*_r11 - vy*_r10)*dt;
                 F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
 
                 // body-frame velocity from body-frame velocity
@@ -220,8 +203,6 @@ namespace hf {
                 const float dz = _x[STATE_VZ] * dt + accel->z * dt2 / 2.0f; 
 
                 // position update
-                _x[STATE_X] += _r00 * dx + _r01 * dy + _r02 * dz;
-                _x[STATE_Y] += _r10 * dx + _r11 * dy + _r12 * dz;
                 _x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
                     GRAVITY * dt2 / 2.0f;
 
@@ -373,8 +354,6 @@ namespace hf {
             // Indexes to acceless the vehicle's state, stored as a column vector
             enum
             {
-                STATE_X,
-                STATE_Y,
                 STATE_Z,
                 STATE_VX,
                 STATE_VY,
@@ -383,7 +362,6 @@ namespace hf {
                 STATE_D1,
                 STATE_D2,
                 STATE_DIM
-
             };
 
             //////////////////////////////////////////////////////////////////
@@ -436,8 +414,6 @@ namespace hf {
                 if (dt > 0) {
 
                     const float noise[STATE_DIM] = {
-                        PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                        PROC_NOISE_ACCEL_XY*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                         PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                         PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                         PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
