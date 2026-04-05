@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <firmware/ekf/axis_three_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/opticalflow/filter.hpp>
@@ -384,13 +385,6 @@ namespace hf {
                 STATE_DIM
 
             };
-
-            typedef struct {
-                IMU::ThreeAxis sum;
-                uint32_t count;
-                float conversionFactor;
-                IMU::ThreeAxis subSample;
-            } ThreeAxisSubSampler_t;
 
             //////////////////////////////////////////////////////////////////
 
