@@ -44,7 +44,8 @@
 #include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
-#define _POSHOLD
+//#define _DEBUG
+//#define _POSHOLD
 
 #ifdef _POSHOLD
 static const uint8_t LED_PIN = 9;
@@ -147,10 +148,12 @@ void loop()
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
+#ifdef _DEBUG
 #ifdef _POSHOLD
     _debugger.report(state, true);
 #else
-    //_debugger.report(state);
+    _debugger.report(state);
+#endif
 #endif
     //_profiler.report();
 
