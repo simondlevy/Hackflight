@@ -110,7 +110,7 @@ void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
 
 void EKF::device_update_with_scalar(
         const float P[STATE_DIM][STATE_DIM],
-        const float * h,
+        const float h[STATE_DIM],
         const float error,
         const float R,
         float G[STATE_DIM])
