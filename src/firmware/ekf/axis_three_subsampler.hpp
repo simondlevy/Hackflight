@@ -44,6 +44,22 @@ namespace hf {
                     count(count),
                     conversionFactor(conversionFactor),
                     subSample(subSample) {}
+
+            static auto accumulate(const ThreeAxisSubSampler & subSampler,
+                    const IMU::ThreeAxis* sample)
+            {
+                const auto sum = subSampler.sum;
+
+                return ThreeAxisSubSampler(
+                        IMU::ThreeAxis(
+                            sum.x + sample->x,
+                            sum.y + sample->y,
+                            sum.z + sample->z),
+                        subSampler.count + 1,
+                        subSampler.conversionFactor,
+                        subSampler.subSample);
+            }
+
     };
 
     typedef struct {
