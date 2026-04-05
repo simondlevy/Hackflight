@@ -42,7 +42,11 @@ void EKF::device_mat_mult(
         const float B[STATE_DIM][STATE_DIM],
         float C[STATE_DIM][STATE_DIM])
 {
-    (void)A;
+    static __attribute__((aligned(4))) arm_matrix_instance_f32 _A = { 
+        STATE_DIM, STATE_DIM, (float *)A
+    };
+
+    (void)_A;
     (void)B;
     (void)C;
 }
