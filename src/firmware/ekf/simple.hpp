@@ -184,7 +184,11 @@ namespace hf {
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
+                float FP[STATE_DIM][STATE_DIM] = {};
+                mat_mult(F, _P, FP);
+
                 device_predict(F, _P);
+
 
                 // -----------------------------------------------------
 
