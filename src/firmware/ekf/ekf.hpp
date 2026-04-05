@@ -111,13 +111,13 @@ namespace hf {
                 const auto accel = _accelSubSampler.subSample;
                 const auto gyro = _gyroSubSampler.subSample;
 
-                const float d0 = gyro.x*dt/2;
-                const float d1 = gyro.y*dt/2;
-                const float d2 = gyro.z*dt/2;
+                const auto d0 = gyro.x*dt/2;
+                const auto d1 = gyro.y*dt/2;
+                const auto d2 = gyro.z*dt/2;
 
-                const float vx = _x[STATE_VX];
-                const float vy = _x[STATE_VY];
-                const float vz = _x[STATE_VZ];
+                const auto vx = _x[STATE_VX];
+                const auto vy = _x[STATE_VY];
+                const auto vz = _x[STATE_VZ];
 
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
@@ -180,26 +180,26 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
                 device_predict(F, _P);
 
-                const float dt2 = dt * dt;
+                const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const float tmpSPX = _x[STATE_VX];
-                const float tmpSPY = _x[STATE_VY];
-                const float tmpSPZ = _x[STATE_VZ];
+                const auto tmpSPX = _x[STATE_VX];
+                const auto tmpSPY = _x[STATE_VY];
+                const auto tmpSPZ = _x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const float dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const float dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
                 // thrust can only be produced in the body's Z direction
-                const float dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
                 _x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
                     GRAVITY * dt2 / 2.0f;
 
-                const float accelx = isFlying ? 0 : accel.x;
-                const float accely = isFlying ? 0 : accel.y;
+                const auto accelx = isFlying ? 0.f : accel.x;
+                const auto accely = isFlying ? 0.f : accel.y;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -221,33 +221,34 @@ namespace hf {
                 const auto angle = ThreeAxis::l2norm(dtw) + Num::EPSILON;
                 const auto ca = device_cos(angle/2);
                 const auto sa = device_sin(angle/2);
-                const float dq[4] = {ca , sa*dtw.x/angle , sa*dtw.y/angle , sa*dtw.z/angle};
+                const auto dq = Quaternion(
+                        ca , sa*dtw.x/angle , sa*dtw.y/angle , sa*dtw.z/angle);
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
-
-                float tmpq0 = dq[0]*_q.w - dq[1]*_q.x - dq[2]*_q.y - dq[3]*_q.z;
-                float tmpq1 = dq[1]*_q.w + dq[0]*_q.x + dq[3]*_q.y - dq[2]*_q.z;
-                float tmpq2 = dq[2]*_q.w - dq[3]*_q.x + dq[0]*_q.y + dq[1]*_q.z;
-                float tmpq3 = dq[3]*_q.w + dq[2]*_q.x - dq[1]*_q.y + dq[0]*_q.z;
+                auto tmpq = Quaternion(
+                        dq.w*_q.w - dq.x*_q.x - dq.y*_q.y - dq.z*_q.z,
+                        dq.x*_q.w + dq.w*_q.x + dq.z*_q.y - dq.y*_q.z,
+                        dq.y*_q.w - dq.z*_q.x + dq.w*_q.y + dq.x*_q.z,
+                        dq.z*_q.w + dq.y*_q.x - dq.x*_q.y + dq.w*_q.z);
 
                 if (!isFlying) {
 
-                    const float keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                    const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                    tmpq0 = keep * tmpq0 + ROLLPITCH_ZERO_REVERSION;
-                    tmpq1 = keep * tmpq1; 
-                    tmpq2 = keep * tmpq2; 
-                    tmpq3 = keep * tmpq3; 
+                    tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION;
+                    tmpq.x = keep * tmpq.x; 
+                    tmpq.y = keep * tmpq.y; 
+                    tmpq.z = keep * tmpq.z; 
                 }
 
                 // normalize and store the result
-                const float norm = device_sqrt(
-                        tmpq0*tmpq0 + tmpq1*tmpq1 + tmpq2*tmpq2 + tmpq3*tmpq3) + Num::EPSILON;
+                const auto norm = device_sqrt(
+                        tmpq.w*tmpq.w + tmpq.x*tmpq.x + tmpq.y*tmpq.y + tmpq.z*tmpq.z) + Num::EPSILON;
 
-                _q.w = tmpq0/norm; 
-                _q.x = tmpq1/norm; 
-                _q.y = tmpq2/norm; 
-                _q.z = tmpq3/norm;
+                _q.w = tmpq.w/norm; 
+                _q.x = tmpq.x/norm; 
+                _q.y = tmpq.y/norm; 
+                _q.z = tmpq.z/norm;
 
                 _didPredict = true;
                 _lastPredictionMs = msec_curr;
@@ -508,9 +509,9 @@ namespace hf {
             void finalize()
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
-                const float v0 = _x[STATE_D0];
-                const float v1 = _x[STATE_D1];
-                const float v2 = _x[STATE_D2];
+                const auto v0 = _x[STATE_D0];
+                const auto v1 = _x[STATE_D1];
+                const auto v2 = _x[STATE_D2];
 
                 // Move attitude error into attitude if any of the angle errors are
                 // large enough
@@ -518,9 +519,9 @@ namespace hf {
                             0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                                 fabsf(v2) < 10)) {
 
-                    const float angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + Num::EPSILON;
-                    const float ca = device_cos(angle / 2.0f);
-                    const float sa = device_sin(angle / 2.0f);
+                    const auto angle = device_sqrt(v0*v0 + v1*v1 + v2*v2) + Num::EPSILON;
+                    const auto ca = device_cos(angle / 2.0f);
+                    const auto sa = device_sin(angle / 2.0f);
                     const auto dq = Quaternion(
                             ca, sa*v0/angle, sa*v1/angle, sa*v2/angle);
 
