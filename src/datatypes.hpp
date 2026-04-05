@@ -92,6 +92,4 @@ namespace hf {
 
             Setpoint& operator=(const Setpoint& other) = default;
     };
-
-    //typedef void (*mixFun_t)(const Setpoint & setpoint, float motorvals[]);
 }

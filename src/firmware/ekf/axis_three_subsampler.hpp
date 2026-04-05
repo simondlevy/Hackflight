@@ -18,7 +18,33 @@
 
 #include <firmware/imu/sensor.hpp>
 
+
 namespace hf {
+
+    class ThreeAxisSubSampler {
+
+        public:
+
+            IMU::ThreeAxis sum;
+            uint32_t count;
+            float conversionFactor;
+            IMU::ThreeAxis subSample;
+
+            ThreeAxisSubSampler() = default;
+
+            ThreeAxisSubSampler& operator=(const ThreeAxisSubSampler& other) = default;
+ 
+            ThreeAxisSubSampler
+                (IMU::ThreeAxis sum,
+                 uint32_t count,
+                 float conversionFactor,
+                 IMU::ThreeAxis subSample)
+                :
+                    sum(sum),
+                    count(count),
+                    conversionFactor(conversionFactor),
+                    subSample(subSample) {}
+    };
 
     typedef struct {
         IMU::ThreeAxis sum;
@@ -26,7 +52,6 @@ namespace hf {
         float conversionFactor;
         IMU::ThreeAxis subSample;
     } ThreeAxisSubSampler_t;
-
 
     static void axis3fSubSamplerInit(ThreeAxisSubSampler_t* subSampler, const
             float conversionFactor)
@@ -66,6 +91,5 @@ namespace hf {
 
         return &subSampler->subSample;
     }
-
 
 }
