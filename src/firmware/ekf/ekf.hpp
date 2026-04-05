@@ -183,7 +183,7 @@ namespace hf {
                 F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1}
-                float FP[STATE_DIM][STATE_DIM] = {};
+                //float FP[STATE_DIM][STATE_DIM] = {};
                 //device_mat_mult(F, _P, FP);
 
                 device_predict(F, _P);
@@ -628,6 +628,10 @@ namespace hf {
                     const float A[STATE_DIM][STATE_DIM],
                     const float B[STATE_DIM][STATE_DIM],
                     float C[STATE_DIM][STATE_DIM]);
+
+            static void device_mat_trans(
+                    const float A[STATE_DIM][STATE_DIM],
+                    float At[STATE_DIM][STATE_DIM]);
 
             static void device_predict(
                     const float F[STATE_DIM][STATE_DIM],
