@@ -126,21 +126,3 @@ void EKF::device_update_with_scalar(
     mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
     mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'
 }
-
-
-float EKF::device_cos(const float x)
-{
-    return arm_cos_f32(x);
-}
-
-float EKF::device_sin(const float x)
-{
-    return arm_sin_f32(x);
-}
-
-float EKF::device_sqrt(const float32_t in) 
-{
-    float pOut = 0;
-    arm_sqrt_f32(in, &pOut);
-    return pOut;
-}

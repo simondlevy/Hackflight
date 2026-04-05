@@ -216,23 +216,12 @@ namespace hf {
                 _x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _r22);
 
-                // attitude update (rotate by gyroscope), we do this in quaternions
+                // Attitude update (rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                const auto angle = ThreeAxis::l2norm(dtw);
-                const auto ca = device_cos(angle/2);
-                const auto sa = device_sin(angle/2);
-                const auto dq = Quaternion(
-                        ca, sa*dtw.x/angle, sa*dtw.y/angle, sa*dtw.z/angle);
-
-                // rotate the vehicle's attitude by the delta quaternion vector computed above
-                auto tmpq = Quaternion(
-                        dq.w*_q.w - dq.x*_q.x - dq.y*_q.y - dq.z*_q.z,
-                        dq.x*_q.w + dq.w*_q.x + dq.z*_q.y - dq.y*_q.z,
-                        dq.y*_q.w - dq.z*_q.x + dq.w*_q.y + dq.x*_q.z,
-                        dq.z*_q.w + dq.y*_q.x - dq.x*_q.y + dq.w*_q.z);
+                auto tmpq = rotate(dtw, _q);
 
                 if (!isFlying) {
 
@@ -430,7 +419,6 @@ namespace hf {
                 float thetapix = 0.71674f;
 
                 //~~~ Body rates ~~~
-                // TODO check if this is feasible or if some filtering has to be done
                 float omegax_b = gyro.x * Num::DEG2RAD;
                 float omegay_b = gyro.y * Num::DEG2RAD;
 
@@ -513,6 +501,23 @@ namespace hf {
                 return fabsf(v) < MAX_ANGLE;
             }
 
+            static auto rotate(
+                    const ThreeAxis & v, const Quaternion & q)-> Quaternion
+            {
+                const auto angle = ThreeAxis::l2norm(v);
+                const auto ca = cos(angle / 2);
+                const auto sa = sin(angle / 2);
+                const auto dq = Quaternion(
+                        ca, sa*v.x/angle, sa*v.y/angle, sa*v.z/angle);
+
+                return Quaternion(
+                        dq.w*q.w - dq.x*q.x - dq.y*q.y - dq.z*q.z,
+                        dq.x*q.w + dq.w*q.x + dq.z*q.y - dq.y*q.z,
+                        dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
+                        dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
+
+            }
+
             void finalize()
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
@@ -523,28 +528,12 @@ namespace hf {
                 if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
                         smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
 
-                    const auto angle = ThreeAxis::l2norm(v);
-
-                    const auto ca = device_cos(angle / 2.0f);
-                    const auto sa = device_sin(angle / 2.0f);
-                    const auto dq = Quaternion(
-                            ca, sa*v.x/angle, sa*v.y/angle, sa*v.z/angle);
-
-                    // Rotate the vehicle's attitude by the delta quaternion vector
-                    // computed above
-                    const auto tmpq = Quaternion(
-                            dq.w*_q.w - dq.x*_q.x - dq.y*_q.y - dq.z*_q.z,
-                            dq.x*_q.w + dq.w*_q.x + dq.z*_q.y - dq.y*_q.z,
-                            dq.y*_q.w - dq.z*_q.x + dq.w*_q.y + dq.x*_q.z,
-                            dq.z*_q.w + dq.y*_q.x - dq.x*_q.y + dq.w*_q.z);
-
                     // normalize and store the result
-                    _q = _q / Quaternion::l2norm(tmpq);
+                    _q = _q / Quaternion::l2norm(rotate(v, _q));
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and accel
-
                 _r00 = _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z;
                 _r01 = 2 * _q.x * _q.y - 2 * _q.w * _q.z;
                 _r02 = 2 * _q.x * _q.z + 2 * _q.w * _q.y;
@@ -639,10 +628,6 @@ namespace hf {
                     const float R,
                     float x[STATE_DIM],
                     float G[STATE_DIM]);
-
-            static float device_cos(const float x);
-            static float device_sin(const float x);
-            static float device_sqrt(const float in);
     };
 
 }
