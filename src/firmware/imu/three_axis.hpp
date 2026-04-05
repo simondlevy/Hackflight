@@ -17,6 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
+#include <num.hpp>
 
 namespace hf {
 
@@ -62,7 +63,7 @@ namespace hf {
 
             static auto l2norm(const ThreeAxis& v) -> float
             {
-                return sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
+                return sqrtf(v.x*v.x + v.y*v.y + v.z*v.z) + Num::EPSILON;
             }
 
             bool operator<(const float v) const

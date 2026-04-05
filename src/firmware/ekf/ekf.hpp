@@ -221,7 +221,7 @@ namespace hf {
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                const auto angle = ThreeAxis::l2norm(dtw) + Num::EPSILON;
+                const auto angle = ThreeAxis::l2norm(dtw);
                 const auto ca = device_cos(angle/2);
                 const auto sa = device_sin(angle/2);
                 const auto dq = Quaternion(
@@ -245,7 +245,7 @@ namespace hf {
                 }
 
                 // normalize and store the result
-                _q = tmpq / (Quaternion::l2norm(tmpq) + Num::EPSILON);
+                _q = tmpq / Quaternion::l2norm(tmpq);
 
                 _didPredict = true;
                 _lastPredictionMs = msec_curr;
@@ -523,7 +523,7 @@ namespace hf {
                 if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
                         smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
 
-                    const auto angle = ThreeAxis::l2norm(v) + Num::EPSILON;
+                    const auto angle = ThreeAxis::l2norm(v);
 
                     const auto ca = device_cos(angle / 2.0f);
                     const auto sa = device_sin(angle / 2.0f);
@@ -539,7 +539,7 @@ namespace hf {
                             dq.z*_q.w + dq.y*_q.x - dq.x*_q.y + dq.w*_q.z);
 
                     // normalize and store the result
-                    _q = _q / (Quaternion::l2norm(tmpq) + Num::EPSILON);
+                    _q = _q / Quaternion::l2norm(tmpq);
                 }
 
                 // Convert the new attitude to a rotation matrix, such that we can

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
+#include <num.hpp>
 
 namespace hf {
 
@@ -47,7 +48,7 @@ namespace hf {
 
             static auto l2norm(const Quaternion& q) -> float
             {
-                return sqrtf(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z);
+                return sqrtf(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z) + Num::EPSILON;
             }
     };
 
