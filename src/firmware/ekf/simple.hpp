@@ -622,6 +622,27 @@ namespace hf {
                 }
             }
 
+            static void mat_mult(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const float B[STATE_DIM][STATE_DIM],
+                    float C[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i][j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i][j] += A[i][k] * B[k][j];
+                        }
+                    }
+                }
+            }
+
+            static void mat_trans(
+                    const float A[STATE_DIM][STATE_DIM],
+                    float At[STATE_DIM][STATE_DIM])
+            {
+            }
+
             // Hardware-dependent --------------------------------------------
 
             static void device_mat_mult(
