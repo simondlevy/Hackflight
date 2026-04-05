@@ -24,9 +24,6 @@ namespace hf {
 
         public:
 
-            // Small number epsilon, to prevent dividing by zero
-            static constexpr float EPSILON = 1e-6f;
-
             float w;
             float x;
             float y;
