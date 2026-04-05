@@ -648,8 +648,14 @@ namespace hf {
             static void mult(
                     const float A[STATE_DIM][STATE_DIM],
                     const float x[STATE_DIM],
-                    float y[STATE_DIM][STATE_DIM])
+                    float y[STATE_DIM])
             {
+                for (int i=0; i<STATE_DIM; i++) {
+                    y[i] = 0; 
+                    for (int j=0; j<STATE_DIM; j++) {
+                        y[i] += A[i][j] * x[j];
+                    }
+                }
             }
 
             static void trans(
@@ -661,7 +667,7 @@ namespace hf {
                         At[i][j] = A[j][i];
                     }
                 }
-             }
+            }
 
             // Hardware-dependent --------------------------------------------
 
