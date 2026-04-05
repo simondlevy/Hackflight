@@ -242,8 +242,7 @@ namespace hf {
                 }
 
                 // normalize and store the result
-                const auto norm = device_sqrt(
-                        tmpq.w*tmpq.w + tmpq.x*tmpq.x + tmpq.y*tmpq.y + tmpq.z*tmpq.z) + Num::EPSILON;
+                const auto norm = Quaternion::l2norm(tmpq) + Num::EPSILON;
 
                 _q.w = tmpq.w/norm; 
                 _q.x = tmpq.x/norm; 
