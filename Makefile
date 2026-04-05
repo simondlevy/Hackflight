@@ -7,7 +7,7 @@ PORT = /dev/ttyACM0
 LIBS = $(HOME)/Documents/Arduino/libraries
 
 build: $(SKETCH).ino
-	arduino-cli compile --libraries $(LIBS) --libraries ../../.. \
+	arduino-cli compile --libraries $(LIBS) --libraries . \
 		--fqbn $(FQBN) $(SKETCH).ino
 
 flash:
