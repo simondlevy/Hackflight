@@ -190,7 +190,9 @@ namespace hf {
                 float Ft[STATE_DIM][STATE_DIM] = {};
                 mat_trans(F, Ft);
 
-                device_predict(F, _P);
+                mat_mult(FP, Ft, _P);
+
+                // device_predict(F, _P);
 
 
                 // -----------------------------------------------------
