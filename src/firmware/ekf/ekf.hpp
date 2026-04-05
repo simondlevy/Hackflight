@@ -215,15 +215,13 @@ namespace hf {
 
                 // attitude update (rotate by gyroscope), we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
-                const float dtwx = dt*gyro.x;
-                const float dtwy = dt*gyro.y;
-                const float dtwz = dt*gyro.z;
+                const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                const float angle = device_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + Num::EPSILON;
-                const float ca = device_cos(angle/2.0f);
-                const float sa = device_sin(angle/2.0f);
-                const float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
+                const auto angle = ThreeAxis::l2norm(dtw) + Num::EPSILON;
+                const auto ca = device_cos(angle/2);
+                const auto sa = device_sin(angle/2);
+                const float dq[4] = {ca , sa*dtw.x/angle , sa*dtw.y/angle , sa*dtw.z/angle};
 
                 // rotate the vehicle's attitude by the delta quaternion vector computed above
 
@@ -437,7 +435,6 @@ namespace hf {
                 // TODO check if this is feasible or if some filtering has to be done
                 float omegax_b = gyro.x * Num::DEG2RAD;
                 float omegay_b = gyro.y * Num::DEG2RAD;
-
 
                 float dx_g = _x[STATE_VX];
                 float dy_g = _x[STATE_VY];
