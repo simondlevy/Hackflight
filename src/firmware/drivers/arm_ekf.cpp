@@ -57,6 +57,22 @@ void EKF::device_mat_mult(
     arm_mat_mult(&_A, &_B, &_C);
 }
 
+void EKF::device_mat_trans(
+        const float A[STATE_DIM][STATE_DIM],
+        float At[STATE_DIM][STATE_DIM])
+{
+    static __attribute__((aligned(4))) arm_matrix_instance_f32 _A = { 
+        STATE_DIM, STATE_DIM, (float *)A
+    };
+
+    static __attribute__((aligned(4))) arm_matrix_instance_f32 _At = { 
+        STATE_DIM, STATE_DIM, (float *)At
+    };
+
+    arm_mat_trans(&_A, &_At);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 
