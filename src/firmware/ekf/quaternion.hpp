@@ -29,7 +29,7 @@ namespace hf {
             float y;
             float z;
 
-            Quaternion() = default;
+            Quaternion() : w(1), x(0), y(0), z(0) {}
 
             Quaternion(
                     const float w,
