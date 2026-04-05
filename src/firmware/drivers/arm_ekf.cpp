@@ -93,16 +93,12 @@ void EKF::device_predict(const float F[STATE_DIM][STATE_DIM],
 
     // ------------------------------------------------------------------
 
-    static __attribute__((aligned(4))) arm_matrix_instance_f32 _F = { 
-        STATE_DIM, STATE_DIM, (float *)F
+    static __attribute__((aligned(4))) arm_matrix_instance_f32 _P = { 
+        STATE_DIM, STATE_DIM, (float *)P
     };
 
     static __attribute__((aligned(4))) arm_matrix_instance_f32 _Ft = { 
         STATE_DIM, STATE_DIM, (float *)Ft
-    };
-
-    static __attribute__((aligned(4))) arm_matrix_instance_f32 _P = { 
-        STATE_DIM, STATE_DIM, (float *)P
     };
 
     static __attribute__((aligned(4))) arm_matrix_instance_f32 _FP = { 
