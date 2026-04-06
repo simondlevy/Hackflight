@@ -185,12 +185,12 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
                 float FP[STATE_DIM][STATE_DIM] = {};
-                mult(F, _P, FP);
+                dot(F, _P, FP);
 
                 float Ft[STATE_DIM][STATE_DIM] = {};
                 trans(F, Ft);
 
-                mult(FP, Ft, _P);
+                dot(FP, Ft, _P);
 
                 // -----------------------------------------------------
 
@@ -594,37 +594,46 @@ namespace hf {
                 }
             }
 
-            void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
+            void ekf_updateWithScalar(
+                    const float * h,
+                    const float error,
+                    const float stdMeasNoise)
             {
                 float G[STATE_DIM] = {};
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                device_update_with_scalar(_P, h, error, R, G);
+                float PHt[STATE_DIM] = {};
+                dot(_P, h, PHt); // PH'
 
-                float newG[STATE_DIM] = {};
-                simple_update_with_scalar(_P, h, error, R, newG);
-
-                // add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    _x[i] += G[i] * error; // state update
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        const auto v = G[i] * R * G[j];
-
-                        // add measurement noise
-                        ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i] + v); 
-                    }
+                float HPHR = R; // HPH' + R
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    HPHR += h[i] * PHt[i]; 
                 }
 
-                /*
-                for (int i=0; i<STATE_DIM; i++) {
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                }
 
-                    printf("%f(%f) ", newG[i], G[i]);
-                    printf("\n");
-                }*/
+                float GH[STATE_DIM][STATE_DIM] = {};
+                float GH_I[STATE_DIM][STATE_DIM] = {};
+                float GH_I_P[STATE_DIM][STATE_DIM] = {};
+
+                outer(G, h, GH);
+
+                // GH - I
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    GH[i][i] -= 1; 
+                }
+
+                // (GH - I)'
+                trans(GH, GH_I);
+
+                // (GH - I)*P
+                dot(GH, P, GH_I_P); 
+
+                // (GH - I)*P*(GH - I)'
+                dot(GH_I_P, GH_I, _P);
             }
 
             void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
@@ -639,7 +648,7 @@ namespace hf {
             }
 
             // C = A * B
-            static void mult(
+            static void dot(
                     const float A[STATE_DIM][STATE_DIM],
                     const float B[STATE_DIM][STATE_DIM],
                     float C[STATE_DIM][STATE_DIM])
@@ -655,7 +664,7 @@ namespace hf {
             }
 
             // y = A * x
-            static void mult(
+            static void dot(
                     const float A[STATE_DIM][STATE_DIM],
                     const float x[STATE_DIM],
                     float y[STATE_DIM])
@@ -668,6 +677,20 @@ namespace hf {
                 }
             }
 
+            // A = x * y
+            static void outer(
+                    const float x[STATE_DIM],
+                    const float y[STATE_DIM],
+                    float C[STATE_DIM][STATE_DIM])
+            {
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    for (size_t j=0; j<STATE_DIM; j++) {
+                        C[i][j] = x[i] * y[j];
+                    }
+                }
+            }
+
+            // At = A^T
             static void trans(
                     const float A[STATE_DIM][STATE_DIM],
                     float At[STATE_DIM][STATE_DIM])
@@ -678,60 +701,6 @@ namespace hf {
                     }
                 }
             }
-
-            void simple_update_with_scalar(
-                    const float P[STATE_DIM][STATE_DIM],
-                    const float h[STATE_DIM],
-                    const float error,
-                    const float R,
-                    float G[STATE_DIM])
-            {
-                float PH[STATE_DIM] = {};
-                mult(P, h, PH);
-
-                float HPHR = R; // HPH' + R
-                for (int i=0; i<STATE_DIM; i++) { 
-                    // Add the element of HPH' to the above
-                    // this obviously only works if the update is scalar (as in this function)
-                    HPHR += h[i]*PH[i]; 
-                }
-
-                // Calculate the Kalman gain and perform the state update
-                for (int i=0; i<STATE_DIM; i++) {
-                    G[i] = PH[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                }
-
-                /*
-                arm_mat_mult(&Gm, &Hm, &tmpNN1m); // GH
-                for (int i=0; i<STATE_DIM; i++) { 
-                    tmpNN1d[STATE_DIM*i+i] -= 1; 
-                } // GH - I
-                arm_mat_trans(&tmpNN1m, &tmpNN2m); // (GH - I)'
-                arm_mat_mult(&tmpNN1m, &_p_m, &tmpNN3m); // (GH - I)*P
-                arm_mat_mult(&tmpNN3m, &tmpNN2m, &_p_m); // (GH - I)*P*(GH - I)'*/
-            }
-
-            // Hardware-dependent --------------------------------------------
-
-            static void device_mat_mult(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const float B[STATE_DIM][STATE_DIM],
-                    float C[STATE_DIM][STATE_DIM]);
-
-            static void device_mat_trans(
-                    const float A[STATE_DIM][STATE_DIM],
-                    float At[STATE_DIM][STATE_DIM]);
-
-            static void device_predict(
-                    const float F[STATE_DIM][STATE_DIM],
-                    float P[STATE_DIM][STATE_DIM]);
-
-            static void device_update_with_scalar(
-                    const float P[STATE_DIM][STATE_DIM],
-                    const float * h,
-                    const float error,
-                    const float R,
-                    float G[STATE_DIM]);
     };
 
 }
