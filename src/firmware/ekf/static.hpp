@@ -233,13 +233,12 @@ namespace hf {
                 const auto dx = ekf._x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
                 const auto dy = ekf._x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
-                return ekf;
-#if 0
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = ekf._x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
 
                 // position update
-                _x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
+                const auto z = ekf._x[STATE_Z] +
+                    ekf._r20 * dx + ekf._r21 * dy + ekf._r22 * dz -
                     GRAVITY * dt2 / 2.0f;
 
                 const auto accelx = isFlying ? 0.f : accel.x;
@@ -248,31 +247,45 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
-                        - GRAVITY * _r20);
+                const auto vx = ekf._x[STATE_VX] +
+                    dt * (accelx + gyro.z * tmpSPY -
+                            gyro.y * tmpSPZ - GRAVITY * ekf._r20);
 
-                _x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
-                        - GRAVITY * _r21);
+                const auto vy = ekf._x[STATE_VY] +
+                    dt * (accely - gyro.z * tmpSPX +
+                            gyro.x * tmpSPZ - GRAVITY * ekf._r21);
 
-                _x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
-                        - GRAVITY * _r22);
+                const auto vz = ekf._x[STATE_VZ] +
+                    dt * (accel.z + gyro.y * tmpSPX -
+                            gyro.x * tmpSPY - GRAVITY * ekf._r22);
+
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                auto tmpq = rotate(dtw, _q);
+                auto tmpq = rotate(dtw, ekf._q);
 
-                if (!isFlying) {
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                    const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                const auto newtmpq = isFlying ? tmpq :
+                    Quaternion(
+                            keep * tmpq.w + ROLLPITCH_ZERO_REVERSION,
+                            keep * tmpq.x,
+                            keep * tmpq.y,
+                            tmpq.z); 
 
-                    tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION;
-                    tmpq.x = keep * tmpq.x; 
-                    tmpq.y = keep * tmpq.y; 
-                    tmpq.z = keep * tmpq.z; 
-                }
+
+                (void)z;
+                (void)vx;
+                (void)vy;
+                (void)vz;
+                (void)dtw;
+                (void)newtmpq;
+
+                return ekf;
+#if 0
 
                 // normalize and store the result
                 _q = tmpq / Quaternion::l2norm(tmpq);
