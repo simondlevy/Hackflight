@@ -14,7 +14,7 @@ flash:
 	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
 clean:
-	rm -rf obj
+	rm -rf /tmp/arduino/
 
 edit:
 	vim $(SKETCH).ino
