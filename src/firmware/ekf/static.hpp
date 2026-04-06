@@ -220,25 +220,21 @@ namespace hf {
 
                 dot(FP, Ft, P);
 
-                (void)accel;
-                (void)P;
-
-                return ekf;
-#if 0
-
                 // -----------------------------------------------------
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _x[STATE_VX];
-                const auto tmpSPY = _x[STATE_VY];
-                const auto tmpSPZ = _x[STATE_VZ];
+                const auto tmpSPX = ekf._x[STATE_VX];
+                const auto tmpSPY = ekf._x[STATE_VY];
+                const auto tmpSPZ = ekf._x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = ekf._x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = ekf._x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
 
+                return ekf;
+#if 0
                 // thrust can only be produced in the body's Z direction
                 const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
 
