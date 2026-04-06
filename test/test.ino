@@ -44,9 +44,7 @@ static auto eigen_update_with_scalar(
 
     const auto GH_I = GH.transpose();
 
-    const auto GH_I_P = GH * P;
-
-    return GH_I_P * GH_I;
+    return GH * P * GH_I;
 }
 
 
