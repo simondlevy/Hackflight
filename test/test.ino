@@ -21,13 +21,14 @@ static void dumpmat(const Matrix A)
     printf("\n");
 }
 
+/*
 static void dumpvec(const Vector x)
 {
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+6.4f ", x(i));
     }
     printf("\n");
-}
+}*/
 
 static auto eigen_update_with_scalar(
         const Matrix P,
@@ -45,17 +46,13 @@ static auto eigen_update_with_scalar(
 
     const auto GH_I = GH.transpose();
 
-    dumpmat(GH_I);
+    const auto GH_I_P = GH * P;
+
+    dumpmat(GH_I_P);
 
     return P;
 
 #if 0
-
-    float GH_I[STATE_DIM][STATE_DIM] = {};
-    float GH_I_P[STATE_DIM][STATE_DIM] = {};
-
-    // (GH - I)'
-    trans(GH, GH_I);
 
     // (GH - I)*P
     dot(GH, P, GH_I_P); 
@@ -79,13 +76,14 @@ static void dumpmat(const float A[STATE_DIM][STATE_DIM])
     printf("\n");
 }
 
+/*
 static void dumpvec(const float x[STATE_DIM])
 {
     for (size_t i=0; i<STATE_DIM; ++i) {
         printf("%+6.4f ", x[i]);
     }
     printf("\n");
-}
+}*/
 
 
 // C = A * B
@@ -175,10 +173,10 @@ static void simple_update_with_scalar(
     // (GH - I)'
     trans(GH, GH_I);
 
-    dumpmat(GH_I);
-
     // (GH - I)*P
     dot(GH, P, GH_I_P); 
+
+    dumpmat(GH_I_P);
 
     // (GH - I)*P*(GH - I)'
     dot(GH_I_P, GH_I, P);
