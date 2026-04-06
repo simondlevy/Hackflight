@@ -38,12 +38,13 @@ static auto eigen_update_with_scalar(
 {
     const auto PHt = P * h;
 
-    // Division here corresponds to matrix inversion in the non-scalar case
+    // Division here corresponds to matrix inversion in a full implementation
     const auto G = PHt / (R + h.dot(PHt));
 
-    const auto GH = G * h.transpose() - Matrix::Identity(STATE_DIM, STATE_DIM);
+    const auto GH_I =
+        G * h.transpose() - Matrix::Identity(STATE_DIM, STATE_DIM);
 
-    return GH * P * GH.transpose();
+    return GH_I * P * GH_I.transpose();
 }
 
 
