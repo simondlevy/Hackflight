@@ -188,6 +188,96 @@ namespace hf {
                 _lastProcessNoiseUpdateMs = 0;
             }
 
+            static auto predict(
+                    const EKF & ekf,
+                    const uint32_t msec_curr,
+                    bool isFlying) -> EKF
+            {
+                return ekf;
+#if 0
+                _accelSubSampler = ThreeAxisSubSampler::finalize(_accelSubSampler);
+                _gyroSubSampler = ThreeAxisSubSampler::finalize(_gyroSubSampler);
+
+                const auto dt = (msec_curr - _lastPredictionMs) / 1000.f;
+
+                const auto accel = _accelSubSampler.subSample;
+                const auto gyro = _gyroSubSampler.subSample;
+
+                // The linearized Jacobean matrix
+                static float F[STATE_DIM][STATE_DIM];
+
+                makeJacobian(dt, gyro, F);
+
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
+
+                float FP[STATE_DIM][STATE_DIM] = {};
+                dot(F, _P, FP);
+
+                float Ft[STATE_DIM][STATE_DIM] = {};
+                trans(F, Ft);
+
+                dot(FP, Ft, _P);
+
+                // -----------------------------------------------------
+
+                const auto dt2 = dt * dt;
+
+                // keep previous time step's state for the update
+                const auto tmpSPX = _x[STATE_VX];
+                const auto tmpSPY = _x[STATE_VY];
+                const auto tmpSPZ = _x[STATE_VZ];
+
+                // position updates in the body frame (will be rotated to inertial frame)
+                const auto dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
+                const auto dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+
+                // thrust can only be produced in the body's Z direction
+                const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
+
+                // position update
+                _x[STATE_Z] += _r20 * dx + _r21 * dy + _r22 * dz - 
+                    GRAVITY * dt2 / 2.0f;
+
+                const auto accelx = isFlying ? 0.f : accel.x;
+                const auto accely = isFlying ? 0.f : accel.y;
+
+                // body-velocity update: accelerometers - gyros cross velocity
+                // - gravity in body frame
+
+                _x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                        - GRAVITY * _r20);
+
+                _x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                        - GRAVITY * _r21);
+
+                _x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                        - GRAVITY * _r22);
+
+                // Attitude update (rotate by gyroscope): we do this in quaternions
+                // this is the gyroscope angular velocity integrated over the sample period
+                const auto dtw = gyro * dt;
+
+                // compute the quaternion values in [w,x,y,z] order
+                auto tmpq = rotate(dtw, _q);
+
+                if (!isFlying) {
+
+                    const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+
+                    tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION;
+                    tmpq.x = keep * tmpq.x; 
+                    tmpq.y = keep * tmpq.y; 
+                    tmpq.z = keep * tmpq.z; 
+                }
+
+                // normalize and store the result
+                _q = tmpq / Quaternion::l2norm(tmpq);
+
+                _didPredict = true;
+                _lastPredictionMs = msec_curr;
+#endif
+            } // predict
+
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
                 _accelSubSampler = ThreeAxisSubSampler::finalize(_accelSubSampler);
