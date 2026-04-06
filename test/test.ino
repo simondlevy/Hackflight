@@ -41,7 +41,7 @@ static auto eigen_update_with_scalar(
 
     const auto G = PHt / HPHR;
 
-    const auto GH = G * h.transpose();
+    const auto GH = G * h.transpose() - Matrix::Identity(STATE_DIM, STATE_DIM);
 
     dumpmat(GH);
 
@@ -167,20 +167,18 @@ static void simple_update_with_scalar(
         G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
     }
 
-    dumpvec(G);
-
     float GH[STATE_DIM][STATE_DIM] = {};
     float GH_I[STATE_DIM][STATE_DIM] = {};
     float GH_I_P[STATE_DIM][STATE_DIM] = {};
 
     outer(G, h, GH);
 
-    dumpmat(GH);
-
     // GH - I
     for (size_t i=0; i<STATE_DIM; i++) { 
         GH[i][i] -= 1; 
     }
+
+    dumpmat(GH);
 
     // (GH - I)'
     trans(GH, GH_I);
