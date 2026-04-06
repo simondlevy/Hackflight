@@ -193,15 +193,23 @@ namespace hf {
                     const uint32_t msec_curr,
                     bool isFlying) -> EKF
             {
+                const auto accelSubSampler =
+                    ThreeAxisSubSampler::finalize(ekf._accelSubSampler);
+                const auto gyroSubSampler =
+                    ThreeAxisSubSampler::finalize(ekf._gyroSubSampler);
+
+                const auto dt = (msec_curr - ekf._lastPredictionMs) / 1000.f;
+
+                const auto accel = accelSubSampler.subSample;
+                const auto gyro = gyroSubSampler.subSample;
+
+                (void)dt;
+                (void)accel;
+                (void)gyro;
+
                 return ekf;
 #if 0
-                _accelSubSampler = ThreeAxisSubSampler::finalize(_accelSubSampler);
-                _gyroSubSampler = ThreeAxisSubSampler::finalize(_gyroSubSampler);
 
-                const auto dt = (msec_curr - _lastPredictionMs) / 1000.f;
-
-                const auto accel = _accelSubSampler.subSample;
-                const auto gyro = _gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
