@@ -16,6 +16,8 @@
 
 #pragma once
 
+//#include <ArduinoEigenDense.h>
+
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
@@ -70,7 +72,7 @@ namespace hf {
         public:
 
             EKF& operator=(const EKF& other) = default;
- 
+
             EKF()
             {
                 ekf_init();
@@ -116,71 +118,10 @@ namespace hf {
                 const auto accel = _accelSubSampler.subSample;
                 const auto gyro = _gyroSubSampler.subSample;
 
-                const auto d0 = gyro.x*dt/2;
-                const auto d1 = gyro.y*dt/2;
-                const auto d2 = gyro.z*dt/2;
-
-                const auto vx = _x[STATE_VX];
-                const auto vy = _x[STATE_VY];
-                const auto vz = _x[STATE_VZ];
-
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
 
-                // position
-                F[STATE_Z][STATE_Z] = 1;
-
-                // position from body-frame velocity
-                F[STATE_Z][STATE_VX] = _r20*dt;
-
-                F[STATE_Z][STATE_VY] = _r21*dt;
-
-                F[STATE_Z][STATE_VZ] = _r22*dt;
-
-                // position from attitude error
-                F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
-
-                F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
-
-                F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
-
-                // body-frame velocity from body-frame velocity
-                F[STATE_VX][STATE_VX] = 1; //drag negligible
-                F[STATE_VY][STATE_VX] =-gyro.z*dt;
-                F[STATE_VZ][STATE_VX] = gyro.y*dt;
-
-                F[STATE_VX][STATE_VY] = gyro.z*dt;
-                F[STATE_VY][STATE_VY] = 1; //drag negligible
-                F[STATE_VZ][STATE_VY] =-gyro.x*dt;
-
-                F[STATE_VX][STATE_VZ] =-gyro.y*dt;
-                F[STATE_VY][STATE_VZ] = gyro.x*dt;
-                F[STATE_VZ][STATE_VZ] = 1; //drag negligible
-
-                // body-frame velocity from attitude error
-                F[STATE_VX][STATE_D0] =  0;
-                F[STATE_VY][STATE_D0] = -GRAVITY*_r22*dt;
-                F[STATE_VZ][STATE_D0] =  GRAVITY*_r21*dt;
-
-                F[STATE_VX][STATE_D1] =  GRAVITY*_r22*dt;
-                F[STATE_VY][STATE_D1] =  0;
-                F[STATE_VZ][STATE_D1] = -GRAVITY*_r20*dt;
-
-                F[STATE_VX][STATE_D2] = -GRAVITY*_r21*dt;
-                F[STATE_VY][STATE_D2] =  GRAVITY*_r20*dt;
-                F[STATE_VZ][STATE_D2] =  0;
-
-                F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-                F[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
-
-                F[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-                F[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
-
-                F[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-                F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-                F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                makeJacobian(dt, gyro, F);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
@@ -352,6 +293,9 @@ namespace hf {
                 STATE_DIM
             };
 
+            //typedef Eigen::MatrixXd Matrix;
+            //typedef Eigen::VectorXd Vector;
+
             //////////////////////////////////////////////////////////////////
 
             // State vector
@@ -359,6 +303,9 @@ namespace hf {
 
             // Covariance matrix
             __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
+
+            //Vector _newx = Vector(STATE_DIM);
+            //Vector _newP = Matrix(STATE_DIM, STATE_DIM);
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -502,6 +449,75 @@ namespace hf {
                 }
             }
 
+            void makeJacobian(
+                    const float dt,
+                    const ThreeAxis & gyro,
+                    float F[STATE_DIM][STATE_DIM])
+            {
+                const auto vx = _x[STATE_VX];
+                const auto vy = _x[STATE_VY];
+                const auto vz = _x[STATE_VZ];
+
+                const auto d0 = gyro.x*dt/2;
+                const auto d1 = gyro.y*dt/2;
+                const auto d2 = gyro.z*dt/2;
+
+                // position
+                F[STATE_Z][STATE_Z] = 1;
+
+                // position from body-frame velocity
+                F[STATE_Z][STATE_VX] = _r20*dt;
+
+                F[STATE_Z][STATE_VY] = _r21*dt;
+
+                F[STATE_Z][STATE_VZ] = _r22*dt;
+
+                // position from attitude error
+                F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
+
+                F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
+
+                F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
+
+                // body-frame velocity from body-frame velocity
+                F[STATE_VX][STATE_VX] = 1; //drag negligible
+                F[STATE_VY][STATE_VX] =-gyro.z*dt;
+                F[STATE_VZ][STATE_VX] = gyro.y*dt;
+
+                F[STATE_VX][STATE_VY] = gyro.z*dt;
+                F[STATE_VY][STATE_VY] = 1; //drag negligible
+                F[STATE_VZ][STATE_VY] =-gyro.x*dt;
+
+                F[STATE_VX][STATE_VZ] =-gyro.y*dt;
+                F[STATE_VY][STATE_VZ] = gyro.x*dt;
+                F[STATE_VZ][STATE_VZ] = 1; //drag negligible
+
+                // body-frame velocity from attitude error
+                F[STATE_VX][STATE_D0] =  0;
+                F[STATE_VY][STATE_D0] = -GRAVITY*_r22*dt;
+                F[STATE_VZ][STATE_D0] =  GRAVITY*_r21*dt;
+
+                F[STATE_VX][STATE_D1] =  GRAVITY*_r22*dt;
+                F[STATE_VY][STATE_D1] =  0;
+                F[STATE_VZ][STATE_D1] = -GRAVITY*_r20*dt;
+
+                F[STATE_VX][STATE_D2] = -GRAVITY*_r21*dt;
+                F[STATE_VY][STATE_D2] =  GRAVITY*_r20*dt;
+                F[STATE_VZ][STATE_D2] =  0;
+
+                F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
+                F[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
+
+                F[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
+                F[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                F[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
+
+                F[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
+                F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
+                F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+            }
+
             static auto bigenough(const float v) -> bool
             {
                 return fabsf(v) > MIN_ANGLE;
@@ -580,6 +596,7 @@ namespace hf {
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
                     _P[k][k] += noise[k] * noise[k];
+                    //_newP(k, k) += noise[k] * noise[k];
                 }
             }
 
@@ -590,6 +607,7 @@ namespace hf {
                     for (int j=i; j<STATE_DIM; j++) {
 
                         ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i]);
+                        //new_ekf_pset(i, j, 0.5 * _newP(i,j) + 0.5 * _newP(j,i));
                     }
                 }
             }
@@ -646,9 +664,22 @@ namespace hf {
 
                         // add measurement noise
                         ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i] + v); 
+                        //new_ekf_pset(i, j, 0.5 * _newP(i,j) + 0.5 * _newP(j,i) + v); 
                     }
                 }
             }
+
+            /*
+            void new_ekf_pset(const uint8_t i, const uint8_t j, const float pval)
+            {
+                if (isnan(pval) || pval > MAX_COVARIANCE) {
+                    _newP(i,j) = _newP(j,i) = MAX_COVARIANCE;
+                } else if ( i==j && pval < MIN_COVARIANCE ) {
+                    _newP(i,j) = _newP(j,i) = MIN_COVARIANCE;
+                } else {
+                    _newP(i,j) = _newP(j,i) = pval;
+                }
+            }*/
 
             void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
             {
