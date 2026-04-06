@@ -30,7 +30,6 @@
 #include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
-//#include <firmware/ekf/simple.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
@@ -45,8 +44,10 @@
 #include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
-#define _DEBUG
-#define _POSHOLD
+//#define _DEBUG
+//#define _PROFILE
+
+//#define _POSHOLD
 
 #ifdef _POSHOLD
 static const uint8_t LED_PIN = 9;
@@ -156,7 +157,10 @@ void loop()
     _debugger.report(state);
 #endif
 #endif
-    //_profiler.report();
+
+#ifdef _PROFILE
+    _profiler.report();
+#endif
 
     const auto setpoint = mksetpoint(rxdata.axes);
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,

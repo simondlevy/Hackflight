@@ -602,14 +602,50 @@ namespace hf {
                 }
             }
 
-            void ekf_updateWithScalar(const float * h, const float error, const float stdMeasNoise)
+            void ekf_updateWithScalar(
+                    const float * h,
+                    const float error,
+                    const float stdMeasNoise)
             {
                 static float G[STATE_DIM];
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                device_update_with_scalar(_P, h, error, R, G);
+#ifdef _SIMPLE
+                float PHt[STATE_DIM] = {};
+                dot(_P, h, PHt); // PH'
 
+                float HPHR = R; // HPH' + R
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    HPHR += h[i] * PHt[i]; 
+                }
+
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                }
+
+                float GH[STATE_DIM][STATE_DIM] = {};
+                float GH_I[STATE_DIM][STATE_DIM] = {};
+                float GH_I_P[STATE_DIM][STATE_DIM] = {};
+
+                outer(G, h, GH);
+
+                // GH - I
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    GH[i][i] -= 1; 
+                }
+
+                // (GH - I)'
+                trans(GH, GH_I);
+
+                // (GH - I)*P
+                dot(GH, _P, GH_I_P); 
+
+                // (GH - I)*P*(GH - I)'
+                dot(GH_I_P, GH_I, _P);
+#else
+                device_update_with_scalar(_P, h, error, R, G);
+#endif
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
 
