@@ -16,7 +16,7 @@
 
 #pragma once
 
-//#include <ArduinoEigenDense.h>
+#include <ArduinoEigenDense.h>
 
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/three_axis_subsampler.hpp>
@@ -293,8 +293,8 @@ namespace hf {
                 STATE_DIM
             };
 
-            //typedef Eigen::MatrixXd Matrix;
-            //typedef Eigen::VectorXd Vector;
+            typedef Eigen::MatrixXd Matrix;
+            typedef Eigen::VectorXd Vector;
 
             //////////////////////////////////////////////////////////////////
 
@@ -304,8 +304,8 @@ namespace hf {
             // Covariance matrix
             __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
 
-            //Vector _newx = Vector(STATE_DIM);
-            //Vector _newP = Matrix(STATE_DIM, STATE_DIM);
+            Vector _newx;
+            Vector _newP;
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -582,6 +582,10 @@ namespace hf {
 
             void ekf_init()
             {
+                //_newx = Vector(STATE_DIM);
+
+                //_newP = Matrix(STATE_DIM, STATE_DIM);
+
                 for (int i=0; i< STATE_DIM; i++) {
 
                     _x[i] = 0;
