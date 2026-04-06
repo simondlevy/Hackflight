@@ -144,13 +144,13 @@ void EKF::device_update_with_scalar(
     }
 
     static float GH[STATE_DIM][STATE_DIM];
+    static float GH_I[STATE_DIM][STATE_DIM];
+    static float GH_I_P[STATE_DIM][STATE_DIM];
 
     // Temporary matrices for the covariance updates
-    static arm_matrix_instance_f32 GHm = { STATE_DIM, STATE_DIM, (float *)GH };
-    static float GH_Id[STATE_DIM * STATE_DIM];
-    static arm_matrix_instance_f32 GH_Im = { STATE_DIM, STATE_DIM, GH_Id };
-    static float GH_I_Pd[STATE_DIM * STATE_DIM];
-    static arm_matrix_instance_f32 GH_I_Pm = { STATE_DIM, STATE_DIM, GH_I_Pd };
+    static arm_matrix_instance_f32 GHm ={ STATE_DIM, STATE_DIM, (float *)GH };
+    static arm_matrix_instance_f32 GH_Im = { STATE_DIM, STATE_DIM, (float *)GH_I };
+    static arm_matrix_instance_f32 GH_I_Pm = { STATE_DIM, STATE_DIM, (float *)GH_I_P };
 
     // The Kalman gain as a column vector
     static arm_matrix_instance_f32 Gm = {STATE_DIM, 1, (float *)G};
