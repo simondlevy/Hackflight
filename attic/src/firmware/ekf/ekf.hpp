@@ -31,6 +31,8 @@
 #undef _C
 #endif
 
+#define _SIMPLE
+
 namespace hf {
 
     class EKF { 
@@ -184,6 +186,7 @@ namespace hf {
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
+#ifdef _SIMPLE
                 float FP[STATE_DIM][STATE_DIM] = {};
                 dot(F, _P, FP);
 
@@ -191,6 +194,11 @@ namespace hf {
                 trans(F, Ft);
 
                 dot(FP, Ft, _P);
+#else
+
+                device_predict(F, _P);
+#endif
+
 
                 // -----------------------------------------------------
 
@@ -603,6 +611,7 @@ namespace hf {
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
+#ifdef _SIMPLE
                 float PHt[STATE_DIM] = {};
                 dot(_P, h, PHt); // PH'
 
@@ -634,7 +643,9 @@ namespace hf {
 
                 // (GH - I)*P*(GH - I)'
                 dot(GH_I_P, GH_I, _P);
-
+#else
+                device_update_with_scalar(_P, h, error, R, G);
+#endif
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
 
@@ -715,6 +726,28 @@ namespace hf {
                     }
                 }
             }
+
+            // Hardware-dependent --------------------------------------------
+
+            static void device_mat_mult(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const float B[STATE_DIM][STATE_DIM],
+                    float C[STATE_DIM][STATE_DIM]);
+
+            static void device_mat_trans(
+                    const float A[STATE_DIM][STATE_DIM],
+                    float At[STATE_DIM][STATE_DIM]);
+
+            static void device_predict(
+                    const float F[STATE_DIM][STATE_DIM],
+                    float P[STATE_DIM][STATE_DIM]);
+
+            static void device_update_with_scalar(
+                    const float P[STATE_DIM][STATE_DIM],
+                    const float * h,
+                    const float error,
+                    const float R,
+                    float G[STATE_DIM]);
     };
 
 }
