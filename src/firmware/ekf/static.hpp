@@ -203,18 +203,16 @@ namespace hf {
                 const auto accel = accelSubSampler.subSample;
                 const auto gyro = gyroSubSampler.subSample;
 
-                (void)dt;
-                (void)accel;
-                (void)gyro;
-
-                return ekf;
-#if 0
-
-
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
 
-                makeJacobian(dt, gyro, F);
+                makeJacobian(ekf, dt, gyro, F);
+
+                (void)accel;
+
+                return ekf;
+
+#if 0
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
@@ -299,7 +297,7 @@ namespace hf {
                 // The linearized Jacobean matrix
                 static float F[STATE_DIM][STATE_DIM];
 
-                makeJacobian(dt, gyro, F);
+                makeJacobian(*this, dt, gyro, F);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
@@ -608,14 +606,15 @@ namespace hf {
                 }
             }
 
-            void makeJacobian(
+            static void makeJacobian(
+                    const EKF & ekf,
                     const float dt,
                     const ThreeAxis & gyro,
                     float F[STATE_DIM][STATE_DIM])
             {
-                const auto vx = _x[STATE_VX];
-                const auto vy = _x[STATE_VY];
-                const auto vz = _x[STATE_VZ];
+                const auto vx = ekf._x[STATE_VX];
+                const auto vy = ekf._x[STATE_VY];
+                const auto vz = ekf._x[STATE_VZ];
 
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -625,18 +624,18 @@ namespace hf {
                 F[STATE_Z][STATE_Z] = 1;
 
                 // position from body-frame velocity
-                F[STATE_Z][STATE_VX] = _r20*dt;
+                F[STATE_Z][STATE_VX] = ekf._r20*dt;
 
-                F[STATE_Z][STATE_VY] = _r21*dt;
+                F[STATE_Z][STATE_VY] = ekf._r21*dt;
 
-                F[STATE_Z][STATE_VZ] = _r22*dt;
+                F[STATE_Z][STATE_VZ] = ekf._r22*dt;
 
                 // position from attitude error
-                F[STATE_Z][STATE_D0] = (vy*_r22 - vz*_r21)*dt;
+                F[STATE_Z][STATE_D0] = (vy*ekf._r22 - vz*ekf._r21)*dt;
 
-                F[STATE_Z][STATE_D1] = (-vx*_r22 + vz*_r20)*dt;
+                F[STATE_Z][STATE_D1] = (-vx*ekf._r22 + vz*ekf._r20)*dt;
 
-                F[STATE_Z][STATE_D2] = (vx*_r21 - vy*_r20)*dt;
+                F[STATE_Z][STATE_D2] = (vx*ekf._r21 - vy*ekf._r20)*dt;
 
                 // body-frame velocity from body-frame velocity
                 F[STATE_VX][STATE_VX] = 1; //drag negligible
@@ -653,15 +652,15 @@ namespace hf {
 
                 // body-frame velocity from attitude error
                 F[STATE_VX][STATE_D0] =  0;
-                F[STATE_VY][STATE_D0] = -GRAVITY*_r22*dt;
-                F[STATE_VZ][STATE_D0] =  GRAVITY*_r21*dt;
+                F[STATE_VY][STATE_D0] = -GRAVITY*ekf._r22*dt;
+                F[STATE_VZ][STATE_D0] =  GRAVITY*ekf._r21*dt;
 
-                F[STATE_VX][STATE_D1] =  GRAVITY*_r22*dt;
+                F[STATE_VX][STATE_D1] =  GRAVITY*ekf._r22*dt;
                 F[STATE_VY][STATE_D1] =  0;
-                F[STATE_VZ][STATE_D1] = -GRAVITY*_r20*dt;
+                F[STATE_VZ][STATE_D1] = -GRAVITY*ekf._r20*dt;
 
-                F[STATE_VX][STATE_D2] = -GRAVITY*_r21*dt;
-                F[STATE_VY][STATE_D2] =  GRAVITY*_r20*dt;
+                F[STATE_VX][STATE_D2] = -GRAVITY*ekf._r21*dt;
+                F[STATE_VY][STATE_D2] =  GRAVITY*ekf._r20*dt;
                 F[STATE_VZ][STATE_D2] =  0;
 
                 F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
