@@ -48,14 +48,9 @@ static auto eigen_update_with_scalar(
 
     const auto GH_I_P = GH * P;
 
-    dumpmat(GH_I_P);
-
-    return P;
+    return GH_I_P * GH_I;
 
 #if 0
-
-    // (GH - I)*P
-    dot(GH, P, GH_I_P); 
 
     // (GH - I)*P*(GH - I)'
     dot(GH_I_P, GH_I, P);
@@ -176,8 +171,6 @@ static void simple_update_with_scalar(
     // (GH - I)*P
     dot(GH, P, GH_I_P); 
 
-    dumpmat(GH_I_P);
-
     // (GH - I)*P*(GH - I)'
     dot(GH_I_P, GH_I, P);
 }
@@ -210,7 +203,7 @@ void loop()
 
     simple_update_with_scalar(P_simple, h_simple, error, R);
 
-    //dumpmat(P_simple);
+    dumpmat(P_simple);
 
     // ----------------------------------------------------
 
@@ -228,7 +221,7 @@ void loop()
         43, 44, 45, 46, 47, 48, 49,
         50, 51, 52, 53, 54, 55, 56;
  
-    eigen_update_with_scalar(P_eigen, h_eigen, error, R);
+    dumpmat(eigen_update_with_scalar(P_eigen, h_eigen, error, R));
 
     printf("\n ------------------------------------- \n");
 
