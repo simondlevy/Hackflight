@@ -74,8 +74,15 @@ namespace hf {
 
             EKF()
             {
-                ekf_init();
+                for (int i=0; i< STATE_DIM; i++) {
 
+                    _x[i] = 0;
+
+                    for (int j=0; j < STATE_DIM; j++) {
+                        _P[i][j] = 0; 
+                    }
+                }
+ 
                 // Initialize the rotation matrix
                 _r00 = 1;
                 _r01 = 0;
@@ -572,18 +579,6 @@ namespace hf {
                 ekf_enforceSymmetry();
 
             } // finalize
-
-            void ekf_init()
-            {
-                for (int i=0; i< STATE_DIM; i++) {
-
-                    _x[i] = 0;
-
-                    for (int j=0; j < STATE_DIM; j++) {
-                        _P[i][j] = 0; 
-                    }
-                }
-            }
 
             void ekf_addCovarianceNoise(const float * noise)
             {
