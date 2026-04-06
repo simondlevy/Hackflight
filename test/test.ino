@@ -43,22 +43,16 @@ static auto eigen_update_with_scalar(
 
     const auto GH = G * h.transpose() - Matrix::Identity(STATE_DIM, STATE_DIM);
 
-    dumpmat(GH);
+    const auto GH_I = GH.transpose();
+
+    dumpmat(GH_I);
 
     return P;
 
 #if 0
 
-    float GH[STATE_DIM][STATE_DIM] = {};
     float GH_I[STATE_DIM][STATE_DIM] = {};
     float GH_I_P[STATE_DIM][STATE_DIM] = {};
-
-    outer(G, h, GH);
-
-    // GH - I
-    for (size_t i=0; i<STATE_DIM; i++) { 
-        GH[i][i] -= 1; 
-    }
 
     // (GH - I)'
     trans(GH, GH_I);
@@ -178,10 +172,10 @@ static void simple_update_with_scalar(
         GH[i][i] -= 1; 
     }
 
-    dumpmat(GH);
-
     // (GH - I)'
     trans(GH, GH_I);
+
+    dumpmat(GH_I);
 
     // (GH - I)*P
     dot(GH, P, GH_I_P); 
