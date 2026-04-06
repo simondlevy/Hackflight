@@ -38,9 +38,7 @@ static auto eigen_update_with_scalar(
 {
     const auto PHt = P * h;
 
-    const auto HPHR = R + h.dot(PHt);
-
-    const auto G = PHt / HPHR;
+    const auto G = PHt / (R + h.dot(PHt));
 
     const auto GH = G * h.transpose() - Matrix::Identity(STATE_DIM, STATE_DIM);
 
@@ -49,12 +47,6 @@ static auto eigen_update_with_scalar(
     const auto GH_I_P = GH * P;
 
     return GH_I_P * GH_I;
-
-#if 0
-
-    // (GH - I)*P*(GH - I)'
-    dot(GH_I_P, GH_I, P);
-#endif
 }
 
 
