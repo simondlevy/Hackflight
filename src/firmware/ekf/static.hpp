@@ -95,6 +95,14 @@ namespace hf {
                     const float measuredNX,
                     const float measuredNY,
                     const float r00,
+                    const float r01,
+                    const float r02,
+                    const float r10,
+                    const float r11,
+                    const float r12,
+                    const float r20,
+                    const float r21,
+                    const float r22,
                     const bool didPredict,
                     const bool didUpdateWithFlowDeck,
                     const ZRangerFilter zrangerFilterLatest,
@@ -113,6 +121,14 @@ namespace hf {
                 _measuredNX = measuredNX;
                 _measuredNY = measuredNY;
                 _r00 = r00;
+                _r01 = r01;
+                _r02 = r02;
+                _r10 = r10;
+                _r11 = r11;
+                _r12 = r12;
+                _r20 = r20;
+                _r21 = r21;
+                _r22 = r22;
                 _didPredict = didPredict;
                 _didUpdateWithFlowDeck = didUpdateWithFlowDeck;
                 _zrangerFilterLatest = zrangerFilterLatest;
