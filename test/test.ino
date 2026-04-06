@@ -37,13 +37,13 @@ static auto eigen_update_with_scalar(
 {
     const auto PHt = P * h;
 
-    dumpvec(PHt);
+    const auto HPHR = R + h.dot(PHt);
+
+    printf("%f\n", HPHR);
 
     return P;
 
 #if 0
-    float PHt[STATE_DIM] = {};
-    dot(P, h, PHt); // PH'
 
     float HPHR = R; // HPH' + R
     for (size_t i=0; i<STATE_DIM; i++) { 
@@ -163,12 +163,12 @@ static void simple_update_with_scalar(
     float PHt[STATE_DIM] = {};
     dot(P, h, PHt); // PH'
 
-    dumpvec(PHt);
-
     float HPHR = R; // HPH' + R
     for (size_t i=0; i<STATE_DIM; i++) { 
         HPHR += h[i] * PHt[i]; 
     }
+
+    printf("%f\n", HPHR);
 
     for (size_t i=0; i<STATE_DIM; i++) {
         G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
