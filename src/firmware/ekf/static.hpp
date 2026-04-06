@@ -277,18 +277,17 @@ namespace hf {
                             tmpq.z); 
 
 
-                (void)z;
-                (void)vx;
-                (void)vy;
-                (void)vz;
-                (void)dtw;
-                (void)newtmpq;
+                // normalize and store the result
+                const auto q = newtmpq / Quaternion::l2norm(newtmpq);
+
+                const float x[STATE_DIM] = {z, vx, vy, vz,
+                    ekf._x[STATE_D0], ekf._x[STATE_D1], ekf._x[STATE_D2]};
+
+                (void)x;
+                (void)q;
 
                 return ekf;
 #if 0
-
-                // normalize and store the result
-                _q = tmpq / Quaternion::l2norm(tmpq);
 
                 _didPredict = true;
                 _lastPredictionMs = msec_curr;
