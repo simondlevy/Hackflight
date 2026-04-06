@@ -31,6 +31,7 @@
 #undef _P
 #undef _B
 #undef _C
+#undef F
 #endif
 
 namespace hf {
@@ -122,6 +123,8 @@ namespace hf {
                 static float F[STATE_DIM][STATE_DIM];
 
                 makeJacobian(dt, gyro, F);
+
+                const auto newF = makeJacobian(dt, gyro);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
@@ -447,6 +450,76 @@ namespace hf {
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
                             zrfilter.stdev);
                 }
+            }
+
+            auto makeJacobian(const float dt, const ThreeAxis & gyro) -> Matrix
+            {
+                const auto vx = _x[STATE_VX];
+                const auto vy = _x[STATE_VY];
+                const auto vz = _x[STATE_VZ];
+
+                const auto d0 = gyro.x*dt/2;
+                const auto d1 = gyro.y*dt/2;
+                const auto d2 = gyro.z*dt/2;
+
+                auto F = Matrix(STATE_DIM, STATE_DIM);
+
+                // position
+                F(STATE_Z,STATE_Z) = 1;
+
+                // position from body-frame velocity
+                F(STATE_Z,STATE_VX) = _r20*dt;
+
+                F(STATE_Z,STATE_VY) = _r21*dt;
+
+                F(STATE_Z,STATE_VZ) = _r22*dt;
+
+                // position from attitude error
+                F(STATE_Z,STATE_D0) = (vy*_r22 - vz*_r21)*dt;
+
+                F(STATE_Z,STATE_D1) = (-vx*_r22 + vz*_r20)*dt;
+
+                F(STATE_Z,STATE_D2) = (vx*_r21 - vy*_r20)*dt;
+
+                // body-frame velocity from body-frame velocity
+                F(STATE_VX,STATE_VX) = 1; //drag negligible
+                F(STATE_VY,STATE_VX) =-gyro.z*dt;
+                F(STATE_VZ,STATE_VX) = gyro.y*dt;
+
+                F(STATE_VX,STATE_VY) = gyro.z*dt;
+                F(STATE_VY,STATE_VY) = 1; //drag negligible
+                F(STATE_VZ,STATE_VY) =-gyro.x*dt;
+
+                F(STATE_VX,STATE_VZ) =-gyro.y*dt;
+                F(STATE_VY,STATE_VZ) = gyro.x*dt;
+                F(STATE_VZ,STATE_VZ) = 1; //drag negligible
+
+                // body-frame velocity from attitude error
+                F(STATE_VX,STATE_D0) =  0;
+                F(STATE_VY,STATE_D0) = -GRAVITY*_r22*dt;
+                F(STATE_VZ,STATE_D0) =  GRAVITY*_r21*dt;
+
+                F(STATE_VX,STATE_D1) =  GRAVITY*_r22*dt;
+                F(STATE_VY,STATE_D1) =  0;
+                F(STATE_VZ,STATE_D1) = -GRAVITY*_r20*dt;
+
+                F(STATE_VX,STATE_D2) = -GRAVITY*_r21*dt;
+                F(STATE_VY,STATE_D2) =  GRAVITY*_r20*dt;
+                F(STATE_VZ,STATE_D2) =  0;
+
+                F(STATE_D0,STATE_D0) =  1 - d1*d1/2 - d2*d2/2;
+                F(STATE_D0,STATE_D1) =  d2 + d0*d1/2;
+                F(STATE_D0,STATE_D2) = -d1 + d0*d2/2;
+
+                F(STATE_D1,STATE_D0) = -d2 + d0*d1/2;
+                F(STATE_D1,STATE_D1) =  1 - d0*d0/2 - d2*d2/2;
+                F(STATE_D1,STATE_D2) =  d0 + d1*d2/2;
+
+                F(STATE_D2,STATE_D0) =  d1 + d0*d2/2;
+                F(STATE_D2,STATE_D1) = -d0 + d1*d2/2;
+                F(STATE_D2,STATE_D2) = 1 - d0*d0/2 - d1*d1/2;
+
+                return F;
             }
 
             void makeJacobian(
