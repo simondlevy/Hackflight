@@ -31,6 +31,8 @@
 #undef _C
 #endif
 
+#define _SIMPLE
+
 namespace hf {
 
     class EKF { 
@@ -184,7 +186,19 @@ namespace hf {
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
+#ifdef _SIMPLE
+                float FP[STATE_DIM][STATE_DIM] = {};
+                dot(F, _P, FP);
+
+                float Ft[STATE_DIM][STATE_DIM] = {};
+                trans(F, Ft);
+
+                dot(FP, Ft, _P);
+#else
+
                 device_predict(F, _P);
+#endif
+
 
                 // -----------------------------------------------------
 
@@ -619,6 +633,61 @@ namespace hf {
                     _P[i][j] = _P[j][i] = MIN_COVARIANCE;
                 } else {
                     _P[i][j] = _P[j][i] = pval;
+                }
+            }
+
+            // C = A * B
+            static void dot(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const float B[STATE_DIM][STATE_DIM],
+                    float C[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i][j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i][j] += A[i][k] * B[k][j];
+                        }
+                    }
+                }
+            }
+
+            // y = A * x
+            static void dot(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const float x[STATE_DIM],
+                    float y[STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+                    y[i] = 0; 
+                    for (int j=0; j<STATE_DIM; j++) {
+                        y[i] += A[i][j] * x[j];
+                    }
+                }
+            }
+
+            // A = x * y
+            static void outer(
+                    const float x[STATE_DIM],
+                    const float y[STATE_DIM],
+                    float C[STATE_DIM][STATE_DIM])
+            {
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    for (size_t j=0; j<STATE_DIM; j++) {
+                        C[i][j] = x[i] * y[j];
+                    }
+                }
+            }
+
+            // At = A^T
+            static void trans(
+                    const float A[STATE_DIM][STATE_DIM],
+                    float At[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        At[i][j] = A[j][i];
+                    }
                 }
             }
 
