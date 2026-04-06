@@ -630,7 +630,7 @@ namespace hf {
                 trans(GH, GH_I);
 
                 // (GH - I)*P
-                dot(GH, P, GH_I_P); 
+                dot(GH, _P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'
                 dot(GH_I_P, GH_I, _P);
