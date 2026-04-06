@@ -208,21 +208,23 @@ namespace hf {
 
                 makeJacobian(ekf, dt, gyro, F);
 
-                (void)accel;
-
-                return ekf;
-
-#if 0
-
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
                 float FP[STATE_DIM][STATE_DIM] = {};
-                dot(F, _P, FP);
+                dot(F, ekf._P, FP);
 
                 float Ft[STATE_DIM][STATE_DIM] = {};
                 trans(F, Ft);
 
-                dot(FP, Ft, _P);
+                float P[STATE_DIM][STATE_DIM] = {};
+
+                dot(FP, Ft, P);
+
+                (void)accel;
+                (void)P;
+
+                return ekf;
+#if 0
 
                 // -----------------------------------------------------
 
