@@ -85,21 +85,31 @@ namespace hf {
 
             EKF& operator=(const EKF& other) = default;
 
+            // From predict()
             EKF(
                     const EKF & other,
-                    const float x[STATE_DIM],
+                    const float z,
+                    const float vx,
+                    const float vy,
+                    const float vz,
                     const Quaternion q,
-                    const bool didPredict,
-                    const uint32_t lastPredictionMs)
+                    const uint32_t msec_curr)
             {
-
                 _q = q;
-                _didPredict = didPredict;
-                _lastPredictionMs = lastPredictionMs;
+
+                _didPredict = true;
+
+                _lastPredictionMs = msec_curr;
+
+                _x[STATE_Z] = z;
+                _x[STATE_VX] = vx;
+                _x[STATE_VY] = vy;
+                _x[STATE_VZ] = vz;
+                _x[STATE_D0] = other._x[STATE_D0];
+                _x[STATE_D1] = other._x[STATE_D1];
+                _x[STATE_D2] = other._x[STATE_D2];
 
                 for (int i=0; i< STATE_DIM; i++) {
-                    _x[i] = x[i];
-
                     for (int j=0; j < STATE_DIM; j++) {
                         _P[i][j] = other._P[i][j]; 
                     }
@@ -257,14 +267,10 @@ namespace hf {
                             keep * tmpq.y,
                             tmpq.z); 
 
-
                 // normalize and store the result
                 const auto q = newtmpq / Quaternion::l2norm(newtmpq);
 
-                const float x[STATE_DIM] = {z, vx, vy, vz,
-                    ekf._x[STATE_D0], ekf._x[STATE_D1], ekf._x[STATE_D2]};
-
-                return EKF(ekf, x, q, true, msec_curr);
+                return EKF(ekf, z, vx, vy, vz, q, msec_curr);
 
             } // predict
 
