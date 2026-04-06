@@ -90,6 +90,17 @@ namespace hf {
                     const ThreeAxis gyroLatest,
                     const ThreeAxisSubSampler accelSubSampler,
                     const ThreeAxisSubSampler gyroSubSampler,
+                    const float predictedNX,
+                    const float predictedNY,
+                    const float measuredNX,
+                    const float measuredNY,
+                    const float r00,
+                    const bool didPredict,
+                    const bool didUpdateWithFlowDeck,
+                    const ZRangerFilter zrangerFilterLatest,
+                    const OpticalFlowFilter opticalFlowFilterLatest,
+                    const uint32_t lastPredictionMs,
+                    const uint32_t lastProcessNoiseUpdateMs,
                     const float x[STATE_DIM],
                     const float P[STATE_DIM][STATE_DIM])
             {
@@ -97,7 +108,17 @@ namespace hf {
                 _gyroLatest = gyroLatest;
                 _accelSubSampler = accelSubSampler;
                 _gyroSubSampler = gyroSubSampler;
-
+                _predictedNX = predictedNX;
+                _predictedNY = predictedNY;
+                _measuredNX = measuredNX;
+                _measuredNY = measuredNY;
+                _r00 = r00;
+                _didPredict = didPredict;
+                _didUpdateWithFlowDeck = didUpdateWithFlowDeck;
+                _zrangerFilterLatest = zrangerFilterLatest;
+                _opticalFlowFilterLatest = opticalFlowFilterLatest;
+                _lastPredictionMs = lastPredictionMs;
+                _lastProcessNoiseUpdateMs = lastProcessNoiseUpdateMs;
 
                 for (int i=0; i< STATE_DIM; i++) {
 
