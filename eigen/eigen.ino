@@ -29,8 +29,7 @@
 
 #include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
-//#include <firmware/ekf/ekf.hpp>
-#include <firmware/ekf/eigehpp>
+#include <firmware/ekf/eigen.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
@@ -94,7 +93,6 @@ void setup()
 // Loop
 void loop()
 {
-
     // Debugging
     static Debugger _debugger;
     static Profiler _profiler;
@@ -132,7 +130,7 @@ void loop()
         _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
-        _ekf.update(_zrangerFilter, _opticalFlowFilter);
+        _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
     }
 #else
     (void)_flowdeckTimer;
@@ -142,10 +140,10 @@ void loop()
 
     // Run the system dynamics to predict the state forward.
     if (_ekfPredictionTimer.ready()) {
-        _ekf.predict(millis(), _flyingCheck.isFlying); 
+        _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
     }
 
-    _ekf.update(_imuFilter.output, millis());
+    _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
     const auto state = EKF::getVehicleState(_ekf);
 
