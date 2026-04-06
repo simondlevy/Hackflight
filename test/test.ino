@@ -21,6 +21,61 @@ static void dumpmat(const Matrix A)
     printf("\n");
 }
 
+static void dumpvec(const Vector x)
+{
+    for (size_t i=0; i<STATE_DIM; ++i) {
+        printf("%+6.4f ", x(i));
+    }
+    printf("\n");
+}
+
+static auto eigen_update_with_scalar(
+        const Matrix P,
+        const Vector h,
+        const float error,
+        const float R) -> Matrix
+{
+    const auto PHt = P * h;
+
+    dumpvec(PHt);
+
+    return P;
+
+#if 0
+    float PHt[STATE_DIM] = {};
+    dot(P, h, PHt); // PH'
+
+    float HPHR = R; // HPH' + R
+    for (size_t i=0; i<STATE_DIM; i++) { 
+        HPHR += h[i] * PHt[i]; 
+    }
+
+    for (size_t i=0; i<STATE_DIM; i++) {
+        G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+    }
+
+    float GH[STATE_DIM][STATE_DIM] = {};
+    float GH_I[STATE_DIM][STATE_DIM] = {};
+    float GH_I_P[STATE_DIM][STATE_DIM] = {};
+
+    outer(G, h, GH);
+
+    // GH - I
+    for (size_t i=0; i<STATE_DIM; i++) { 
+        GH[i][i] -= 1; 
+    }
+
+    // (GH - I)'
+    trans(GH, GH_I);
+
+    // (GH - I)*P
+    dot(GH, P, GH_I_P); 
+
+    // (GH - I)*P*(GH - I)'
+    dot(GH_I_P, GH_I, P);
+#endif
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -101,11 +156,14 @@ static void simple_update_with_scalar(
         float P[STATE_DIM][STATE_DIM],
         const float h[STATE_DIM],
         const float error,
-        const float R,
-        float G[STATE_DIM])
+        const float R)
 {
+    float G[STATE_DIM] = {};
+
     float PHt[STATE_DIM] = {};
     dot(P, h, PHt); // PH'
+
+    dumpvec(PHt);
 
     float HPHR = R; // HPH' + R
     for (size_t i=0; i<STATE_DIM; i++) { 
@@ -163,11 +221,9 @@ void loop()
         {50, 51, 52, 53, 54, 55, 56},
     };
 
-    float G_simple[STATE_DIM] = {};
+    simple_update_with_scalar(P_simple, h_simple, error, R);
 
-    simple_update_with_scalar(P_simple, h_simple, error, R, G_simple);
-
-    dumpmat(P_simple);
+    //dumpmat(P_simple);
 
     // ----------------------------------------------------
 
@@ -185,9 +241,9 @@ void loop()
         43, 44, 45, 46, 47, 48, 49,
         50, 51, 52, 53, 54, 55, 56;
  
-    printf("\n ------------------------------------- \n");
+    eigen_update_with_scalar(P_eigen, h_eigen, error, R);
 
-    dumpmat(P_eigen);
+    printf("\n ------------------------------------- \n");
 
     delay(1000);
 }
