@@ -86,64 +86,45 @@ namespace hf {
             EKF& operator=(const EKF& other) = default;
 
             EKF(
-                    const Quaternion q,
-                    const ThreeAxis gyroLatest,
-                    const ThreeAxisSubSampler accelSubSampler,
-                    const ThreeAxisSubSampler gyroSubSampler,
-                    const float predictedNX,
-                    const float predictedNY,
-                    const float measuredNX,
-                    const float measuredNY,
-                    const float r00,
-                    const float r01,
-                    const float r02,
-                    const float r10,
-                    const float r11,
-                    const float r12,
-                    const float r20,
-                    const float r21,
-                    const float r22,
-                    const bool didPredict,
-                    const bool didUpdateWithFlowDeck,
-                    const ZRangerFilter zrangerFilterLatest,
-                    const OpticalFlowFilter opticalFlowFilterLatest,
-                    const uint32_t lastPredictionMs,
-                    const uint32_t lastProcessNoiseUpdateMs,
+                    const EKF & other,
                     const float x[STATE_DIM],
-                    const float P[STATE_DIM][STATE_DIM])
+                    const Quaternion q,
+                    const bool didPredict,
+                    const uint32_t lastPredictionMs)
             {
+
                 _q = q;
-                _gyroLatest = gyroLatest;
-                _accelSubSampler = accelSubSampler;
-                _gyroSubSampler = gyroSubSampler;
-                _predictedNX = predictedNX;
-                _predictedNY = predictedNY;
-                _measuredNX = measuredNX;
-                _measuredNY = measuredNY;
-                _r00 = r00;
-                _r01 = r01;
-                _r02 = r02;
-                _r10 = r10;
-                _r11 = r11;
-                _r12 = r12;
-                _r20 = r20;
-                _r21 = r21;
-                _r22 = r22;
                 _didPredict = didPredict;
-                _didUpdateWithFlowDeck = didUpdateWithFlowDeck;
-                _zrangerFilterLatest = zrangerFilterLatest;
-                _opticalFlowFilterLatest = opticalFlowFilterLatest;
                 _lastPredictionMs = lastPredictionMs;
-                _lastProcessNoiseUpdateMs = lastProcessNoiseUpdateMs;
 
                 for (int i=0; i< STATE_DIM; i++) {
-
                     _x[i] = x[i];
 
                     for (int j=0; j < STATE_DIM; j++) {
-                        _P[i][j] = P[i][j]; 
+                        _P[i][j] = other._P[i][j]; 
                     }
                 }
+
+                _gyroLatest = other._gyroLatest;
+                _accelSubSampler = other._accelSubSampler;
+                _gyroSubSampler = other._gyroSubSampler;
+                _predictedNX = other._predictedNX;
+                _predictedNY = other._predictedNY;
+                _measuredNX = other._measuredNX;
+                _measuredNY = other._measuredNY;
+                _r00 = other._r00;
+                _r01 = other._r01;
+                _r02 = other._r02;
+                _r10 = other._r10;
+                _r11 = other._r11;
+                _r12 = other._r12;
+                _r20 = other._r20;
+                _r21 = other._r21;
+                _r22 = other._r22;
+                _didUpdateWithFlowDeck = other._didUpdateWithFlowDeck;
+                _zrangerFilterLatest = other._zrangerFilterLatest;
+                _opticalFlowFilterLatest = other._opticalFlowFilterLatest;
+                _lastProcessNoiseUpdateMs = other._lastProcessNoiseUpdateMs;
             }
 
             EKF()
@@ -283,15 +264,8 @@ namespace hf {
                 const float x[STATE_DIM] = {z, vx, vy, vz,
                     ekf._x[STATE_D0], ekf._x[STATE_D1], ekf._x[STATE_D2]};
 
-                (void)x;
-                (void)q;
+                return EKF(ekf, x, q, true, msec_curr);
 
-                return ekf;
-#if 0
-
-                _didPredict = true;
-                _lastPredictionMs = msec_curr;
-#endif
             } // predict
 
             void predict(const uint32_t msec_curr, bool isFlying) 
