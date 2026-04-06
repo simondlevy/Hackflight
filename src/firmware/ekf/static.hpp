@@ -68,9 +68,52 @@ namespace hf {
             static constexpr float MIN_ANGLE = 1e-4;
             static constexpr float MAX_ANGLE = 10;
 
+            // Indexes to acceless the vehicle's state, stored as a column vector
+            enum
+            {
+                STATE_Z,
+                STATE_VX,
+                STATE_VY,
+                STATE_VZ,
+                STATE_D0,
+                STATE_D1,
+                STATE_D2,
+                STATE_DIM
+            };
+
         public:
 
             EKF& operator=(const EKF& other) = default;
+
+            EKF(
+                    //const float x[STATE_DIM],
+                    const float P[STATE_DIM][STATE_DIM],
+                    const Quaternion q,
+                    const ThreeAxis gyroLatest,
+                    const ThreeAxisSubSampler accelSubSampler,
+                    const ThreeAxisSubSampler gyroSubSampler, 
+                    const float predictedNX,
+                    const float predictedNY,
+                    const float measuredNX,
+                    const float measuredNY,
+                    const float r00,
+                    const float r01,
+                    const float r02,
+                    const float r10,
+                    const float r11,
+                    const float r12,
+                    const float r20,
+                    const float r21,
+                    const float r22,
+                    const bool didPredict,
+                    const bool didUpdateWithFlowDeck,
+                    const ZRangerFilter zrangerFilterLatest,
+                    const OpticalFlowFilter opticalFlowFilterLatest,
+                    const uint32_t lastPredictionMs,
+                    const uint32_t lastProcessNoiseUpdateMs)
+                    {
+                        EKF();
+                    }
 
             EKF()
             {
@@ -82,7 +125,7 @@ namespace hf {
                         _P[i][j] = 0; 
                     }
                 }
- 
+
                 // Initialize the rotation matrix
                 _r00 = 1;
                 _r01 = 0;
@@ -285,19 +328,6 @@ namespace hf {
             }
 
         private:
-
-            // Indexes to acceless the vehicle's state, stored as a column vector
-            enum
-            {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
-            };
 
             //////////////////////////////////////////////////////////////////
 
