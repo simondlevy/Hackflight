@@ -111,7 +111,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                ekf_addCovarianceNoise(pinit);
+                ekf_addCovarianceNoise(pinit, _P);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -272,7 +272,8 @@ namespace hf {
                     (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
-                    addProcessNoise(dt, msec_curr);
+                    addProcessNoise(dt, msec_curr, _P);
+                    _lastProcessNoiseUpdateMs = msec_curr;
                 }
 
                 _accelSubSampler = ThreeAxisSubSampler::accumulate(
@@ -397,7 +398,8 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            void addProcessNoise(const float dt, const uint32_t msec_curr) 
+            static void addProcessNoise(const float dt, const uint32_t msec_curr,
+                    float P[STATE_DIM][STATE_DIM]) 
             {
                 const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
@@ -409,11 +411,9 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                ekf_addCovarianceNoise(noise);
+                ekf_addCovarianceNoise(noise, P);
 
-                ekf_enforceSymmetry(_P);
-
-                _lastProcessNoiseUpdateMs = msec_curr;
+                ekf_enforceSymmetry(P);
             }
 
             void updateWithFlow(const OpticalFlowFilter & offilter)
@@ -537,10 +537,11 @@ namespace hf {
 
             } // finalize
 
-            void ekf_addCovarianceNoise(const float * noise)
+            static void ekf_addCovarianceNoise(const float * noise,
+                    float P[STATE_DIM][STATE_DIM])
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    _P[k][k] += noise[k] * noise[k];
+                    P[k][k] += noise[k] * noise[k];
                 }
             }
 
