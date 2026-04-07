@@ -448,7 +448,7 @@ namespace hf {
                     h[EkfCore::STATE_Z] = 1 / cosf(angle); 
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
-                            zrfilter.stdev, _core.x, _core.P);
+                            zrfilter.stdev);
                 }
             }
  
@@ -491,7 +491,7 @@ namespace hf {
 
                 // First update
                 ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
-                        offilter.stdDevX*FLOW_RESOLUTION, _core.x, _core.P);
+                        offilter.stdDevX*FLOW_RESOLUTION);
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[EkfCore::STATE_DIM] = {};
@@ -506,7 +506,7 @@ namespace hf {
 
                 // Second update
                 ekf_updateWithScalar(hy, (measuredNY-predictedNY),
-                        offilter.stdDevY*FLOW_RESOLUTION, _core.x, _core.P);
+                        offilter.stdDevY*FLOW_RESOLUTION);
             }
 
             void enforceSymmetry()
@@ -514,19 +514,17 @@ namespace hf {
                 _core.enforceSymmetry(MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
-            static void ekf_updateWithScalar(
+            void ekf_updateWithScalar(
                     const float * h,
                     const float error,
-                    const float stdMeasNoise,
-                    float x[EkfCore::STATE_DIM],
-                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
+                    const float stdMeasNoise)
             {
                 static float G[EkfCore::STATE_DIM];
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
                 float PHt[EkfCore::STATE_DIM] = {};
-                EkfCore::dot(P, h, PHt); // PH'
+                EkfCore::dot(_core.P, h, PHt); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
@@ -552,23 +550,23 @@ namespace hf {
                 EkfCore::trans(GH, GH_I);
 
                 // (GH - I)*P
-                EkfCore::dot(GH, P, GH_I_P); 
+                EkfCore::dot(GH, _core.P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'
-                EkfCore::dot(GH_I_P, GH_I, P);
+                EkfCore::dot(GH_I_P, GH_I, _core.P);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<EkfCore::STATE_DIM; i++) {
 
-                    x[i] += G[i] * error; // state update
+                    _core.x[i] += G[i] * error; // state update
 
                     for (int j=i; j<EkfCore::STATE_DIM; j++) {
 
                         const auto v = G[i] * R * G[j];
 
                         // add measurement noise
-                        P[i][j] = P[j][i] =
-                            ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i] + v); 
+                        _core.P[i][j] = _core.P[j][i] =
+                            ekf_pval(i, j, 0.5*_core.P[i][j] + 0.5*_core.P[j][i] + v); 
                     }
                 }
             }
