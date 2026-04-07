@@ -34,6 +34,15 @@ namespace hf {
                 yx(0), yy(1), yz(0), 
                 zx(0), zy(0), zz(1) {}
 
+            Rotation(
+                    const float xx, const float xy, const float xz,
+                    const float yx, const float yy, const float yz,
+                    const float zx, const float zy, const float zz)
+                :
+                    xx(xx), xy(xy), xz(xz), 
+                    yx(yx), yy(yy), yz(yz), 
+                    zx(zx), zy(zy), zz(zz) {}
+
             Rotation& operator=(const Rotation& other) = default;
     };
 

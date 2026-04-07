@@ -211,15 +211,16 @@ namespace hf {
 
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and accel
-                    _R.xx = _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z;
-                    _R.xy = 2 * _q.x * _q.y - 2 * _q.w * _q.z;
-                    _R.xz = 2 * _q.x * _q.z + 2 * _q.w * _q.y;
-                    _R.yx = 2 * _q.x * _q.y + 2 * _q.w * _q.z;
-                    _R.yy = _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z;
-                    _R.yz = 2 * _q.y * _q.z - 2 * _q.w * _q.x;
-                    _R.zx = 2 * _q.x * _q.z - 2 * _q.w * _q.y;
-                    _R.zy = 2 * _q.y * _q.z + 2 * _q.w * _q.x;
-                    _R.zz = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
+                    _R = Rotation(
+                            _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z,
+                            2 * _q.x * _q.y - 2 * _q.w * _q.z,
+                            2 * _q.x * _q.z + 2 * _q.w * _q.y,
+                            2 * _q.x * _q.y + 2 * _q.w * _q.z,
+                            _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z,
+                            2 * _q.y * _q.z - 2 * _q.w * _q.x,
+                            2 * _q.x * _q.z - 2 * _q.w * _q.y,
+                            2 * _q.y * _q.z + 2 * _q.w * _q.x,
+                            _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z);
 
                     // reset the attitude error
                     _core.x[EkfCore::STATE_D0] = 0;
@@ -393,7 +394,6 @@ namespace hf {
                 F[EkfCore::STATE_D2][EkfCore::STATE_D0] =  d1 + d0*d2/2;
                 F[EkfCore::STATE_D2][EkfCore::STATE_D1] = -d0 + d1*d2/2;
                 F[EkfCore::STATE_D2][EkfCore::STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
-
              }
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)
