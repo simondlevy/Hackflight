@@ -154,7 +154,7 @@ namespace hf {
                 _r22 = 1;
 
                 // Add in the initial process noise 
-                auto noise = Vector(STATE_DIM);
+                auto noise = xzeros();
                 noise << 
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
@@ -164,7 +164,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW;
 
-                _P = ekf_addCovarianceNoise(zeros(), noise);
+                _P = ekf_addCovarianceNoise(pzeros(), noise);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -401,7 +401,7 @@ namespace hf {
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                auto F = Matrix(STATE_DIM, STATE_DIM);
+                auto F = pzeros();
 
                 // position
                 F(STATE_Z,STATE_Z) = 1;
@@ -472,9 +472,14 @@ namespace hf {
                 return Matrix::Identity(STATE_DIM, STATE_DIM); 
             }
 
-            static auto zeros() -> Matrix
+            static auto pzeros() -> Matrix
             {
                 return Matrix(STATE_DIM, STATE_DIM); 
+            }
+
+            static auto xzeros() -> Vector
+            {
+                return Vector(STATE_DIM); 
             }
 
             static auto rotate(
