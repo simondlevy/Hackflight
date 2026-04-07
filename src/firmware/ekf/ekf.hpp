@@ -441,7 +441,7 @@ namespace hf {
                     // updates are done in the scalar update function below
                     h[EkfCore::STATE_Z] = 1 / cosf(angle); 
 
-                    ekf_updateWithScalar(h, measuredDistance-predictedDistance,
+                    updateWithScalar(h, measuredDistance-predictedDistance,
                             zrfilter.stdev);
                 }
             }
@@ -493,7 +493,7 @@ namespace hf {
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
                 // First update
-                ekf_updateWithScalar(h, measuredN-predictedN,
+                updateWithScalar(h, measuredN-predictedN,
                         stdev*FLOW_RESOLUTION);
              }
 
@@ -502,7 +502,7 @@ namespace hf {
                 _core.enforceSymmetry(MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
-            void ekf_updateWithScalar(
+            void updateWithScalar(
                     const float * h,
                     const float error,
                     const float stdMeasNoise)
@@ -536,7 +536,5 @@ namespace hf {
                         dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
                         dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
             }
-
     };
-
 }
