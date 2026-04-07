@@ -566,7 +566,7 @@ namespace hf {
                     float x[STATE_DIM],
                     float P[STATE_DIM][STATE_DIM])
             {
-                auto G = zeros();
+                auto G = zerovec();
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
@@ -662,9 +662,14 @@ namespace hf {
                     pval;
             }
 
-            static auto zeros() -> Vector
+            static auto zerovec() -> Vector
             {
-                return Vector(7);
+                return Vector(STATE_DIM);
+            }
+
+            static auto zeromat() -> Matrix
+            {
+                return Matrix(STATE_DIM, STATE_DIM);
             }
 
             // C = A * B
