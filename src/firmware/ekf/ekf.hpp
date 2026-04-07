@@ -68,19 +68,6 @@ namespace hf {
             static constexpr float MIN_ANGLE = 1e-4;
             static constexpr float MAX_ANGLE = 10;
 
-            // Indexes to acceless the vehicle's state, stored as a column vector
-            enum
-            {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
-            };
-
         public:
 
             EKF& operator=(const EKF& other) = default;
@@ -101,7 +88,7 @@ namespace hf {
                 _R[2][2] = 1;
 
                 // Add in the initial process noise 
-                const float pinit[STATE_DIM] = {
+                const float pinit[EkfCore::STATE_DIM] = {
 
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
@@ -131,15 +118,15 @@ namespace hf {
                 const auto gyro = _gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
-                float F[STATE_DIM][STATE_DIM] = {};
+                float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 makeJacobian(dt, gyro, _x, _R, F);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
-                float FP[STATE_DIM][STATE_DIM] = {};
+                float FP[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 dot(F, _P, FP);
 
-                float Ft[STATE_DIM][STATE_DIM] = {};
+                float Ft[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 trans(F, Ft);
 
                 dot(FP, Ft, _P);
@@ -149,19 +136,19 @@ namespace hf {
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _x[STATE_VX];
-                const auto tmpSPY = _x[STATE_VY];
-                const auto tmpSPZ = _x[STATE_VZ];
+                const auto tmpSPX = _x[EkfCore::STATE_VX];
+                const auto tmpSPY = _x[EkfCore::STATE_VY];
+                const auto tmpSPZ = _x[EkfCore::STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = _x[EkfCore::STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = _x[EkfCore::STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = _x[EkfCore::STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 // position update
-                _x[STATE_Z] += _R[2][0] * dx + _R[2][1] * dy + _R[2][2] * dz - 
+                _x[EkfCore::STATE_Z] += _R[2][0] * dx + _R[2][1] * dy + _R[2][2] * dz - 
                     GRAVITY * dt2 / 2;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -170,13 +157,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                _x[EkfCore::STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _R[2][0]);
 
-                _x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                _x[EkfCore::STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
                         - GRAVITY * _R[2][1]);
 
-                _x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                _x[EkfCore::STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _R[2][2]);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
@@ -233,7 +220,7 @@ namespace hf {
                 if (_didUpdateWithFlowDeck || _didPredict) {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const auto v = ThreeAxis(_x[STATE_D0], _x[STATE_D1], _x[STATE_D2]);
+                    const auto v = ThreeAxis(_x[EkfCore::STATE_D0], _x[EkfCore::STATE_D1], _x[EkfCore::STATE_D2]);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -257,9 +244,9 @@ namespace hf {
                     _R[2][2] = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
 
                     // reset the attitude error
-                    _x[STATE_D0] = 0;
-                    _x[STATE_D1] = 0;
-                    _x[STATE_D2] = 0;
+                    _x[EkfCore::STATE_D0] = 0;
+                    _x[EkfCore::STATE_D1] = 0;
+                    _x[EkfCore::STATE_D2] = 0;
 
                     ekf_enforceSymmetry(_P);
                 }
@@ -286,22 +273,22 @@ namespace hf {
                 const auto x = ekf._x;
 
                 const auto dx =
-                    ekf._R[0][0]*x[STATE_VX] +
-                    ekf._R[0][1]*x[STATE_VY] +
-                    ekf._R[0][2]*x[STATE_VZ];
+                    ekf._R[0][0]*x[EkfCore::STATE_VX] +
+                    ekf._R[0][1]*x[EkfCore::STATE_VY] +
+                    ekf._R[0][2]*x[EkfCore::STATE_VZ];
 
                 // make right positive
                 const auto dy = -(
-                        ekf._R[1][0]*x[STATE_VX] +
-                        ekf._R[1][1]*x[STATE_VY] +
-                        ekf._R[1][2]*x[STATE_VZ]); 
+                        ekf._R[1][0]*x[EkfCore::STATE_VX] +
+                        ekf._R[1][1]*x[EkfCore::STATE_VY] +
+                        ekf._R[1][2]*x[EkfCore::STATE_VZ]); 
 
-                const auto z = x[STATE_Z];
+                const auto z = x[EkfCore::STATE_Z];
 
                 const auto dz =
-                    ekf._R[2][0]*x[STATE_VX] +
-                    ekf._R[2][1]*x[STATE_VY] +
-                    ekf._R[2][2]*x[STATE_VZ];
+                    ekf._R[2][0]*x[EkfCore::STATE_VX] +
+                    ekf._R[2][1]*x[EkfCore::STATE_VY] +
+                    ekf._R[2][2]*x[EkfCore::STATE_VZ];
 
                 const auto q0 = ekf._q.w;
                 const auto q1 = ekf._q.x;
@@ -332,10 +319,10 @@ namespace hf {
             //////////////////////////////////////////////////////////////////
 
             // State vector
-            __attribute__((aligned(4))) float _x[STATE_DIM];
+            __attribute__((aligned(4))) float _x[EkfCore::STATE_DIM];
 
             // Covariance matrix
-            __attribute__((aligned(4))) float _P[STATE_DIM][STATE_DIM];
+            __attribute__((aligned(4))) float _P[EkfCore::STATE_DIM][EkfCore::STATE_DIM];
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -366,79 +353,79 @@ namespace hf {
             static void makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
-                    const float x[STATE_DIM],
+                    const float x[EkfCore::STATE_DIM],
                     const float R[3][3],
-                    float F[STATE_DIM][STATE_DIM])
+                    float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                const auto vx = x[STATE_VX];
-                const auto vy = x[STATE_VY];
-                const auto vz = x[STATE_VZ];
+                const auto vx = x[EkfCore::STATE_VX];
+                const auto vy = x[EkfCore::STATE_VY];
+                const auto vz = x[EkfCore::STATE_VZ];
 
                 // position
-                F[STATE_Z][STATE_Z] = 1;
+                F[EkfCore::STATE_Z][EkfCore::STATE_Z] = 1;
 
                 // position from body-frame velocity
-                F[STATE_Z][STATE_VX] = R[2][0]*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_VX] = R[2][0]*dt;
 
-                F[STATE_Z][STATE_VY] = R[2][1]*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_VY] = R[2][1]*dt;
 
-                F[STATE_Z][STATE_VZ] = R[2][2]*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_VZ] = R[2][2]*dt;
 
                 // position from attitude error
-                F[STATE_Z][STATE_D0] = (vy*R[2][2] - vz*R[2][1])*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_D0] = (vy*R[2][2] - vz*R[2][1])*dt;
 
-                F[STATE_Z][STATE_D1] = (-vx*R[2][2] + vz*R[2][0])*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_D1] = (-vx*R[2][2] + vz*R[2][0])*dt;
 
-                F[STATE_Z][STATE_D2] = (vx*R[2][1] - vy*R[2][0])*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_D2] = (vx*R[2][1] - vy*R[2][0])*dt;
 
                 // body-frame velocity from body-frame velocity
-                F[STATE_VX][STATE_VX] = 1; //drag negligible
-                F[STATE_VY][STATE_VX] =-gyro.z*dt;
-                F[STATE_VZ][STATE_VX] = gyro.y*dt;
+                F[EkfCore::STATE_VX][EkfCore::STATE_VX] = 1; //drag negligible
+                F[EkfCore::STATE_VY][EkfCore::STATE_VX] =-gyro.z*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_VX] = gyro.y*dt;
 
-                F[STATE_VX][STATE_VY] = gyro.z*dt;
-                F[STATE_VY][STATE_VY] = 1; //drag negligible
-                F[STATE_VZ][STATE_VY] =-gyro.x*dt;
+                F[EkfCore::STATE_VX][EkfCore::STATE_VY] = gyro.z*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_VY] = 1; //drag negligible
+                F[EkfCore::STATE_VZ][EkfCore::STATE_VY] =-gyro.x*dt;
 
-                F[STATE_VX][STATE_VZ] =-gyro.y*dt;
-                F[STATE_VY][STATE_VZ] = gyro.x*dt;
-                F[STATE_VZ][STATE_VZ] = 1; //drag negligible
+                F[EkfCore::STATE_VX][EkfCore::STATE_VZ] =-gyro.y*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_VZ] = gyro.x*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_VZ] = 1; //drag negligible
 
                 // body-frame velocity from attitude error
-                F[STATE_VX][STATE_D0] =  0;
-                F[STATE_VY][STATE_D0] = -GRAVITY*R[2][2]*dt;
-                F[STATE_VZ][STATE_D0] =  GRAVITY*R[2][1]*dt;
+                F[EkfCore::STATE_VX][EkfCore::STATE_D0] =  0;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D0] = -GRAVITY*R[2][2]*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D0] =  GRAVITY*R[2][1]*dt;
 
-                F[STATE_VX][STATE_D1] =  GRAVITY*R[2][2]*dt;
-                F[STATE_VY][STATE_D1] =  0;
-                F[STATE_VZ][STATE_D1] = -GRAVITY*R[2][0]*dt;
+                F[EkfCore::STATE_VX][EkfCore::STATE_D1] =  GRAVITY*R[2][2]*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D1] =  0;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D1] = -GRAVITY*R[2][0]*dt;
 
-                F[STATE_VX][STATE_D2] = -GRAVITY*R[2][1]*dt;
-                F[STATE_VY][STATE_D2] =  GRAVITY*R[2][0]*dt;
-                F[STATE_VZ][STATE_D2] =  0;
+                F[EkfCore::STATE_VX][EkfCore::STATE_D2] = -GRAVITY*R[2][1]*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D2] =  GRAVITY*R[2][0]*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D2] =  0;
 
-                F[STATE_D0][STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[STATE_D0][STATE_D1] =  d2 + d0*d1/2;
-                F[STATE_D0][STATE_D2] = -d1 + d0*d2/2;
+                F[EkfCore::STATE_D0][EkfCore::STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                F[EkfCore::STATE_D0][EkfCore::STATE_D1] =  d2 + d0*d1/2;
+                F[EkfCore::STATE_D0][EkfCore::STATE_D2] = -d1 + d0*d2/2;
 
-                F[STATE_D1][STATE_D0] = -d2 + d0*d1/2;
-                F[STATE_D1][STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[STATE_D1][STATE_D2] =  d0 + d1*d2/2;
+                F[EkfCore::STATE_D1][EkfCore::STATE_D0] = -d2 + d0*d1/2;
+                F[EkfCore::STATE_D1][EkfCore::STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                F[EkfCore::STATE_D1][EkfCore::STATE_D2] =  d0 + d1*d2/2;
 
-                F[STATE_D2][STATE_D0] =  d1 + d0*d2/2;
-                F[STATE_D2][STATE_D1] = -d0 + d1*d2/2;
-                F[STATE_D2][STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                F[EkfCore::STATE_D2][EkfCore::STATE_D0] =  d1 + d0*d2/2;
+                F[EkfCore::STATE_D2][EkfCore::STATE_D1] = -d0 + d1*d2/2;
+                F[EkfCore::STATE_D2][EkfCore::STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
              }
 
             static void addProcessNoise(const float dt, const uint32_t msec_curr,
-                    float P[STATE_DIM][STATE_DIM]) 
+                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM]) 
             {
-                const float noise[STATE_DIM] = {
+                const float noise[EkfCore::STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
@@ -456,23 +443,23 @@ namespace hf {
             static void updateWithRange(
                     const ZRangerFilter & zrfilter,
                     const float R[3][3],
-                    float x[STATE_DIM],
-                    float P[STATE_DIM][STATE_DIM])
+                    float x[EkfCore::STATE_DIM],
+                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
                 // Updates the filter with a measured distance in the zb direction using the
-                float h[STATE_DIM] = {};
+                float h[EkfCore::STATE_DIM] = {};
 
                 // Only update the filter if the measurement is reliable 
                 // (\hat{h} -> infty when R[2][2] -> 0)
                 if (fabs(R[2][2]) > 0.1f && R[2][2] > 0) {
                     const auto angle = max(0, fabsf(acosf(R[2][2])) -
                             Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = x[STATE_Z] / cosf(angle);
+                    const auto predictedDistance = x[EkfCore::STATE_Z] / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
                     // updates are done in the scalar update function below
-                    h[STATE_Z] = 1 / cosf(angle); 
+                    h[EkfCore::STATE_Z] = 1 / cosf(angle); 
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
                             zrfilter.stdev, x, P);
@@ -483,8 +470,8 @@ namespace hf {
                     const OpticalFlowFilter & offilter,
                     const ThreeAxis & gyro,
                     const float r22,
-                    float x[STATE_DIM],
-                    float P[STATE_DIM][STATE_DIM])
+                    float x[EkfCore::STATE_DIM],
+                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
@@ -499,23 +486,23 @@ namespace hf {
                 const auto omegax_b = gyro.x * Num::DEG2RAD;
                 const auto omegay_b = gyro.y * Num::DEG2RAD;
 
-                const auto dx_g = x[STATE_VX];
-                const auto dy_g = x[STATE_VY];
+                const auto dx_g = x[EkfCore::STATE_VX];
+                const auto dy_g = x[EkfCore::STATE_VY];
 
                 // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(x[STATE_Z], 0.1);
+                const auto z_g  = max(x[EkfCore::STATE_Z], 0.1);
 
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
-                float hx[STATE_DIM] = {};
+                float hx[EkfCore::STATE_DIM] = {};
                 const auto predictedNX = (offilter.dt * Npix / thetapix ) * 
                     ((dx_g * r22 / z_g) - omegay_b);
                 const auto measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dx (and z?)
-                hx[STATE_Z] = (Npix * offilter.dt / thetapix) * 
+                hx[EkfCore::STATE_Z] = (Npix * offilter.dt / thetapix) * 
                     ((r22 * dx_g) / (-z_g * z_g));
-                hx[STATE_VX] = (Npix * offilter.dt / thetapix) * 
+                hx[EkfCore::STATE_VX] = (Npix * offilter.dt / thetapix) * 
                     (r22 / z_g);
 
                 //First update
@@ -523,15 +510,15 @@ namespace hf {
                         offilter.stdDevX*FLOW_RESOLUTION, x, P);
 
                 // ~~~ Y velocity prediction and update ~~~
-                float hy[STATE_DIM] = {};
+                float hy[EkfCore::STATE_DIM] = {};
                 const auto predictedNY = (offilter.dt * Npix / thetapix ) * 
                     ((dy_g * r22 / z_g) + omegax_b);
                 const auto measuredNY = offilter.dpixely*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dy (and z?)
-                hy[STATE_Z] = (Npix * offilter.dt / thetapix) * 
+                hy[EkfCore::STATE_Z] = (Npix * offilter.dt / thetapix) * 
                     ((r22 * dy_g) / (-z_g * z_g));
-                hy[STATE_VY] = (Npix * offilter.dt / thetapix) * (r22 / z_g);
+                hy[EkfCore::STATE_VY] = (Npix * offilter.dt / thetapix) * (r22 / z_g);
 
                 // Second update
                 ekf_updateWithScalar(hy, (measuredNY-predictedNY),
@@ -539,23 +526,23 @@ namespace hf {
             }
 
             static void ekf_init(
-                    float x[STATE_DIM], float P[STATE_DIM][STATE_DIM]) 
+                    float x[EkfCore::STATE_DIM], float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM]) 
             {
-                for (int i=0; i< STATE_DIM; i++) {
+                for (int i=0; i< EkfCore::STATE_DIM; i++) {
 
                     x[i] = 0;
 
-                    for (int j=0; j < STATE_DIM; j++) {
+                    for (int j=0; j < EkfCore::STATE_DIM; j++) {
                         P[i][j] = 0; 
                     }
                 }
             }
 
-            static void ekf_enforceSymmetry(float P[STATE_DIM][STATE_DIM])
+            static void ekf_enforceSymmetry(float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
-                for (int i=0; i<STATE_DIM; i++) {
+                for (int i=0; i<EkfCore::STATE_DIM; i++) {
 
-                    for (int j=i; j<STATE_DIM; j++) {
+                    for (int j=i; j<EkfCore::STATE_DIM; j++) {
 
                         P[i][j] = P[j][i] =
                             ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i]);
@@ -567,33 +554,33 @@ namespace hf {
                     const float * h,
                     const float error,
                     const float stdMeasNoise,
-                    float x[STATE_DIM],
-                    float P[STATE_DIM][STATE_DIM])
+                    float x[EkfCore::STATE_DIM],
+                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
-                static float G[STATE_DIM];
+                static float G[EkfCore::STATE_DIM];
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                float PHt[STATE_DIM] = {};
+                float PHt[EkfCore::STATE_DIM] = {};
                 dot(P, h, PHt); // PH'
 
                 float HPHR = R; // HPH' + R
-                for (size_t i=0; i<STATE_DIM; i++) { 
+                for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
                     HPHR += h[i] * PHt[i]; 
                 }
 
-                for (size_t i=0; i<STATE_DIM; i++) {
+                for (size_t i=0; i<EkfCore::STATE_DIM; i++) {
                     G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
-                float GH[STATE_DIM][STATE_DIM] = {};
-                float GH_I[STATE_DIM][STATE_DIM] = {};
-                float GH_I_P[STATE_DIM][STATE_DIM] = {};
+                float GH[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
+                float GH_I[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
+                float GH_I_P[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
 
                 outer(G, h, GH);
 
                 // GH - I
-                for (size_t i=0; i<STATE_DIM; i++) { 
+                for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
                     GH[i][i] -= 1; 
                 }
 
@@ -607,11 +594,11 @@ namespace hf {
                 dot(GH_I_P, GH_I, P);
 
                 // add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
+                for (int i=0; i<EkfCore::STATE_DIM; i++) {
 
                     x[i] += G[i] * error; // state update
 
-                    for (int j=i; j<STATE_DIM; j++) {
+                    for (int j=i; j<EkfCore::STATE_DIM; j++) {
 
                         const auto v = G[i] * R * G[j];
 
@@ -623,9 +610,9 @@ namespace hf {
             }
 
             static void ekf_addCovarianceNoise(const float * noise,
-                    float P[STATE_DIM][STATE_DIM])
+                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                for (uint8_t k=0; k<EkfCore::STATE_DIM; ++k) {
                     P[k][k] += noise[k] * noise[k];
                 }
             }
@@ -668,14 +655,14 @@ namespace hf {
 
             // C = A * B
             static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const float B[STATE_DIM][STATE_DIM],
-                    float C[STATE_DIM][STATE_DIM])
+                    const float A[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
+                    const float B[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
+                    float C[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
+                for (int i=0; i<EkfCore::STATE_DIM; ++i) {
+                    for (int j=0; j<EkfCore::STATE_DIM; ++j) {
                         C[i][j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
+                        for (int k=0; k<EkfCore::STATE_DIM; ++k) {
                             C[i][j] += A[i][k] * B[k][j];
                         }
                     }
@@ -684,13 +671,13 @@ namespace hf {
 
             // y = A * x
             static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const float x[STATE_DIM],
-                    float y[STATE_DIM])
+                    const float A[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
+                    const float x[EkfCore::STATE_DIM],
+                    float y[EkfCore::STATE_DIM])
             {
-                for (int i=0; i<STATE_DIM; i++) {
+                for (int i=0; i<EkfCore::STATE_DIM; i++) {
                     y[i] = 0; 
-                    for (int j=0; j<STATE_DIM; j++) {
+                    for (int j=0; j<EkfCore::STATE_DIM; j++) {
                         y[i] += A[i][j] * x[j];
                     }
                 }
@@ -698,12 +685,12 @@ namespace hf {
 
             // A = x * y
             static void outer(
-                    const float x[STATE_DIM],
-                    const float y[STATE_DIM],
-                    float C[STATE_DIM][STATE_DIM])
+                    const float x[EkfCore::STATE_DIM],
+                    const float y[EkfCore::STATE_DIM],
+                    float C[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
-                for (size_t i=0; i<STATE_DIM; i++) {
-                    for (size_t j=0; j<STATE_DIM; j++) {
+                for (size_t i=0; i<EkfCore::STATE_DIM; i++) {
+                    for (size_t j=0; j<EkfCore::STATE_DIM; j++) {
                         C[i][j] = x[i] * y[j];
                     }
                 }
@@ -711,11 +698,11 @@ namespace hf {
 
             // At = A^T
             static void trans(
-                    const float A[STATE_DIM][STATE_DIM],
-                    float At[STATE_DIM][STATE_DIM])
+                    const float A[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
+                    float At[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
+                for (int i=0; i<EkfCore::STATE_DIM; ++i) {
+                    for (int j=0; j<EkfCore::STATE_DIM; ++j) {
                         At[i][j] = A[j][i];
                     }
                 }
