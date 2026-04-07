@@ -196,9 +196,11 @@ namespace hf {
                 _gyroLatest = imudata.gyroDps;
 
                 if (_didUpdateWithFlowDeck) {
+
                     updateWithRange(_zrangerFilterLatest, _R);
-                    updateWithFlow(_opticalFlowFilterLatest,_gyroLatest,
-                            _R[2][2]); }
+
+                    updateWithFlow(_opticalFlowFilterLatest, _gyroLatest,_R[2][2]);
+                }
 
                 if (_didUpdateWithFlowDeck || _didPredict) {
 
@@ -444,75 +446,21 @@ namespace hf {
                 }
             }
  
-            void updateWithFlow(
-                    const OpticalFlowFilter & offilter,
-                    const ThreeAxis & gyro,
-                    const float r22)
+            void updateWithFlow(const OpticalFlowFilter & offilter,
+                    const ThreeAxis & gyro, const float r22)
             {
-                // [pixels] (same in x and y)
-                const float Npix = 35.0;                      
+                updateWithFlowAxis(offilter.dt, r22, offilter.dpixelx,
+                        offilter.stdDevX, EkfCore::STATE_VX, gyro.y);
 
-                //float thetapix = Num::DEG2RAD * 4.0f;
-                // [rad]    (same in x and y)
-                // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
-                // corresponding ground length
-                const float thetapix = 0.71674f;
-
-                //~~~ Body rates ~~~
-
-                // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(_core.x[EkfCore::STATE_Z], 0.1);
-
-                ///////////////////////////////////////////////////////////////
-
-                const auto dx_g = _core.x[EkfCore::STATE_VX];
-
-                const auto omegay_b = gyro.y * Num::DEG2RAD;
-
-                // ~~~ X velocity prediction and update ~~~
-                // predicts the number of accumulated pixels in the x-direction
-                float hx[EkfCore::STATE_DIM] = {};
-                const auto predictedNX = (offilter.dt * Npix / thetapix ) * 
-                    ((dx_g * r22 / z_g) - omegay_b);
-                const auto measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
-
-                // derive measurement equation with respect to dx (and z?)
-                hx[EkfCore::STATE_Z] = (Npix * offilter.dt / thetapix) * 
-                    ((r22 * dx_g) / (-z_g * z_g));
-                hx[EkfCore::STATE_VX] = (Npix * offilter.dt / thetapix) * 
-                    (r22 / z_g);
-
-                // First update
-                ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
-                        offilter.stdDevX*FLOW_RESOLUTION);
-
-                ///////////////////////////////////////////////////////////////
-
-                const auto dy_g = _core.x[EkfCore::STATE_VY];
-
-                const auto omegax_b = gyro.x * Num::DEG2RAD;
-
-                // ~~~ Y velocity prediction and update ~~~
-                float hy[EkfCore::STATE_DIM] = {};
-                const auto predictedNY = (offilter.dt * Npix / thetapix ) * 
-                    ((dy_g * r22 / z_g) + omegax_b);
-                const auto measuredNY = offilter.dpixely*FLOW_RESOLUTION;
-
-                // derive measurement equation with respect to dy (and z?)
-                hy[EkfCore::STATE_Z] = (Npix * offilter.dt / thetapix) * 
-                    ((r22 * dy_g) / (-z_g * z_g));
-                hy[EkfCore::STATE_VY] = (Npix * offilter.dt / thetapix) * (r22 / z_g);
-
-                // Second update
-                ekf_updateWithScalar(hy, (measuredNY-predictedNY),
-                        offilter.stdDevY*FLOW_RESOLUTION);
+                updateWithFlowAxis(offilter.dt, r22, offilter.dpixely,
+                        offilter.stdDevY, EkfCore::STATE_VY, gyro.x);
             }
 
-            void foo(
+            void updateWithFlowAxis(
                     const float dt,
-                    const float dd,
-                    const float stdev,
                     const float r22,
+                    const float dpixel,
+                    const float stdev,
                     const uint8_t state_index,
                     const float gyroval)
             {
@@ -537,7 +485,7 @@ namespace hf {
                 const auto predictedN = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
 
-                const auto measuredN = dd*FLOW_RESOLUTION;
+                const auto measuredN = dpixel*FLOW_RESOLUTION;
 
                 h[EkfCore::STATE_Z] = (Npix * dt / thetapix) * 
                     ((r22 * dg) / (-z_g * z_g));
