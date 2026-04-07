@@ -483,7 +483,6 @@ namespace hf {
                             zrfilter.stdev, x, P);
                 }
             }
-
  
             static void updateWithFlow(
                     const OpticalFlowFilter & offilter,
@@ -493,27 +492,23 @@ namespace hf {
                     float P[STATE_DIM][STATE_DIM])
             {
                 // [pixels] (same in x and y)
-                float Npix = 35.0;                      
+                const float Npix = 35.0;                      
 
                 //float thetapix = Num::DEG2RAD * 4.0f;
                 // [rad]    (same in x and y)
                 // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
                 // corresponding ground length
-                float thetapix = 0.71674f;
+                const float thetapix = 0.71674f;
 
                 //~~~ Body rates ~~~
-                float omegax_b = gyro.x * Num::DEG2RAD;
-                float omegay_b = gyro.y * Num::DEG2RAD;
+                const auto omegax_b = gyro.x * Num::DEG2RAD;
+                const auto omegay_b = gyro.y * Num::DEG2RAD;
 
-                float dx_g = x[STATE_VX];
-                float dy_g = x[STATE_VY];
-                float z_g = 0.0;
+                const auto dx_g = x[STATE_VX];
+                const auto dy_g = x[STATE_VY];
+
                 // Saturate elevation in prediction and correction to avoid singularities
-                if ( x[STATE_Z] < 0.1f ) {
-                    z_g = 0.1;
-                } else {
-                    z_g = x[STATE_Z];
-                }
+                const auto z_g  = max(x[STATE_Z], 0.1);
 
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
