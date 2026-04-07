@@ -544,7 +544,34 @@ namespace hf {
                 }
             }
 
-            void ekf_updateWithScalar(
+            //////////////////////////////////////////////////////////////////
+
+            static void ekf_init(
+                    float x[STATE_DIM], float P[STATE_DIM][STATE_DIM]) 
+            {
+                for (int i=0; i< STATE_DIM; i++) {
+
+                    x[i] = 0;
+
+                    for (int j=0; j < STATE_DIM; j++) {
+                        P[i][j] = 0; 
+                    }
+                }
+            }
+
+            static void ekf_enforceSymmetry(float P[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        P[i][j] = P[j][i] =
+                            ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i]);
+                    }
+                }
+            }
+
+            static void ekf_updateWithScalar(
                     const float * h,
                     const float error,
                     const float stdMeasNoise,
@@ -599,33 +626,6 @@ namespace hf {
                         // add measurement noise
                         P[i][j] = P[j][i] =
                             ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i] + v); 
-                    }
-                }
-            }
-
-            //////////////////////////////////////////////////////////////////
-
-            static void ekf_init(
-                    float x[STATE_DIM], float P[STATE_DIM][STATE_DIM]) 
-            {
-                for (int i=0; i< STATE_DIM; i++) {
-
-                    x[i] = 0;
-
-                    for (int j=0; j < STATE_DIM; j++) {
-                        P[i][j] = 0; 
-                    }
-                }
-            }
-
-            static void ekf_enforceSymmetry(float P[STATE_DIM][STATE_DIM])
-            {
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        P[i][j] = P[j][i] =
-                            ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i]);
                     }
                 }
             }
