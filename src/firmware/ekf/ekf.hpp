@@ -530,7 +530,7 @@ namespace hf {
                     const float minCovariance,
                     const float maxCovariance)
             {
-                static float G[EkfCore::STATE_DIM];
+                float G[EkfCore::STATE_DIM] = {};
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
