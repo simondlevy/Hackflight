@@ -153,18 +153,18 @@ namespace hf {
                 const auto tmpSPZ = _x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2.0f);
-                const auto dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2.0f);
+                const auto dx = _x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = _x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2.0f; 
+                const auto dz = _x[STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 // position update
                 _x[STATE_Z] += _R[2][0] * dx + _R[2][1] * dy + _R[2][2] * dz - 
-                    GRAVITY * dt2 / 2.0f;
+                    GRAVITY * dt2 / 2;
 
-                const auto accelx = isFlying ? 0.f : accel.x;
-                const auto accely = isFlying ? 0.f : accel.y;
+                const auto accelx = isFlying ? 0 : accel.x;
+                const auto accely = isFlying ? 0 : accel.y;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -261,8 +261,6 @@ namespace hf {
                     _x[STATE_D2] = 0;
 
                     ekf_enforceSymmetry(_P);
-
-
                 }
 
                 if (_didUpdateWithFlowDeck) {
@@ -466,14 +464,10 @@ namespace hf {
                 // Only update the filter if the measurement is reliable 
                 // (\hat{h} -> infty when R[2][2] -> 0)
                 if (fabs(R[2][2]) > 0.1f && R[2][2] > 0) {
-                    float angle = 
-                        fabsf(acosf(R[2][2])) - 
-                        Num::DEG2RAD * (15.0f / 2.0f);
-                    if (angle < 0.0f) {
-                        angle = 0.0f;
-                    }
-                    float predictedDistance = x[STATE_Z] / cosf(angle);
-                    float measuredDistance = zrfilter.distance_m;
+                    const auto angle = max(0, fabsf(acosf(R[2][2])) -
+                            Num::DEG2RAD * (15.0f / 2));
+                    const auto predictedDistance = x[STATE_Z] / cosf(angle);
+                    const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
                     // updates are done in the scalar update function below
