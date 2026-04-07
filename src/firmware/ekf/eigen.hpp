@@ -662,6 +662,11 @@ namespace hf {
                     pval;
             }
 
+            static auto zeros() -> Vector
+            {
+                return Vector(7);
+            }
+
             // C = A * B
             static void dot(
                     const float A[STATE_DIM][STATE_DIM],
