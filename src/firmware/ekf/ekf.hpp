@@ -285,7 +285,7 @@ namespace hf {
                 _gyroLatest = imudata.gyroDps;
 
                 if (_didUpdateWithFlowDeck) {
-                    updateWithRange(_zrangerFilterLatest);
+                    updateWithRange(_zrangerFilterLatest, _R, _x, _P);
                     updateWithFlow(_opticalFlowFilterLatest);
                 }
 
@@ -508,21 +508,27 @@ namespace hf {
                         offilter.stdDevY*FLOW_RESOLUTION, _x, _P);
             }
 
-            void updateWithRange(const ZRangerFilter & zrfilter)
+            //////////////////////////////////////////////////////////////////
+
+            static void updateWithRange(
+                    const ZRangerFilter & zrfilter,
+                    const float R[3][3],
+                    float x[STATE_DIM],
+                    float P[STATE_DIM][STATE_DIM])
             {
                 // Updates the filter with a measured distance in the zb direction using the
                 float h[STATE_DIM] = {};
 
                 // Only update the filter if the measurement is reliable 
                 // (\hat{h} -> infty when R[2][2] -> 0)
-                if (fabs(_R[2][2]) > 0.1f && _R[2][2] > 0) {
+                if (fabs(R[2][2]) > 0.1f && R[2][2] > 0) {
                     float angle = 
-                        fabsf(acosf(_R[2][2])) - 
+                        fabsf(acosf(R[2][2])) - 
                         Num::DEG2RAD * (15.0f / 2.0f);
                     if (angle < 0.0f) {
                         angle = 0.0f;
                     }
-                    float predictedDistance = _x[STATE_Z] / cosf(angle);
+                    float predictedDistance = x[STATE_Z] / cosf(angle);
                     float measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
@@ -530,12 +536,11 @@ namespace hf {
                     h[STATE_Z] = 1 / cosf(angle); 
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
-                            zrfilter.stdev, _x, _P);
+                            zrfilter.stdev, x, P);
                 }
             }
 
-            //////////////////////////////////////////////////////////////////
-
+ 
             static void ekf_init(
                     float x[STATE_DIM], float P[STATE_DIM][STATE_DIM]) 
             {
