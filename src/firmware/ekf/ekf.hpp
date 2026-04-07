@@ -70,17 +70,6 @@ namespace hf {
             {
                 _core.init();
 
-                // Initialize the rotation matrix
-                _R[0][0] = 1;
-                _R[0][1] = 0;
-                _R[0][2] = 0;
-                _R[1][0] = 0;
-                _R[1][1] = 1;
-                _R[1][2] = 0;
-                _R[2][0] = 0;
-                _R[2][1] = 0;
-                _R[2][2] = 1;
-
                 // Add in the initial process noise 
                 const float pinit[EkfCore::STATE_DIM] = {
 
@@ -134,7 +123,7 @@ namespace hf {
                 const auto dz = _core.x[EkfCore::STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 // position update
-                _core.x[EkfCore::STATE_Z] += _R[2][0] * dx + _R[2][1] * dy + _R[2][2] * dz - 
+                _core.x[EkfCore::STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
                     GRAVITY * dt2 / 2;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -144,13 +133,13 @@ namespace hf {
                 // - gravity in body frame
 
                 _core.x[EkfCore::STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
-                        - GRAVITY * _R[2][0]);
+                        - GRAVITY * _R.zx);
 
                 _core.x[EkfCore::STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
-                        - GRAVITY * _R[2][1]);
+                        - GRAVITY * _R.zy);
 
                 _core.x[EkfCore::STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
-                        - GRAVITY * _R[2][2]);
+                        - GRAVITY * _R.zz);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
@@ -200,7 +189,7 @@ namespace hf {
 
                     updateWithRange(_zrangerFilterLatest, _R);
 
-                    updateWithFlow(_opticalFlowFilterLatest, _gyroLatest,_R[2][2]);
+                    updateWithFlow(_opticalFlowFilterLatest, _gyroLatest,_R.zz);
                 }
 
                 if (_didUpdateWithFlowDeck || _didPredict) {
@@ -222,15 +211,15 @@ namespace hf {
 
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and accel
-                    _R[0][0] = _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z;
-                    _R[0][1] = 2 * _q.x * _q.y - 2 * _q.w * _q.z;
-                    _R[0][2] = 2 * _q.x * _q.z + 2 * _q.w * _q.y;
-                    _R[1][0] = 2 * _q.x * _q.y + 2 * _q.w * _q.z;
-                    _R[1][1] = _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z;
-                    _R[1][2] = 2 * _q.y * _q.z - 2 * _q.w * _q.x;
-                    _R[2][0] = 2 * _q.x * _q.z - 2 * _q.w * _q.y;
-                    _R[2][1] = 2 * _q.y * _q.z + 2 * _q.w * _q.x;
-                    _R[2][2] = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
+                    _R.xx = _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z;
+                    _R.xy = 2 * _q.x * _q.y - 2 * _q.w * _q.z;
+                    _R.xz = 2 * _q.x * _q.z + 2 * _q.w * _q.y;
+                    _R.yx = 2 * _q.x * _q.y + 2 * _q.w * _q.z;
+                    _R.yy = _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z;
+                    _R.yz = 2 * _q.y * _q.z - 2 * _q.w * _q.x;
+                    _R.zx = 2 * _q.x * _q.z - 2 * _q.w * _q.y;
+                    _R.zy = 2 * _q.y * _q.z + 2 * _q.w * _q.x;
+                    _R.zz = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
 
                     // reset the attitude error
                     _core.x[EkfCore::STATE_D0] = 0;
@@ -262,22 +251,22 @@ namespace hf {
                 const auto x = ekf._core.x;
 
                 const auto dx =
-                    ekf._R[0][0]*x[EkfCore::STATE_VX] +
-                    ekf._R[0][1]*x[EkfCore::STATE_VY] +
-                    ekf._R[0][2]*x[EkfCore::STATE_VZ];
+                    ekf._R.xx*x[EkfCore::STATE_VX] +
+                    ekf._R.xy*x[EkfCore::STATE_VY] +
+                    ekf._R.xz*x[EkfCore::STATE_VZ];
 
                 // make right positive
                 const auto dy = -(
-                        ekf._R[1][0]*x[EkfCore::STATE_VX] +
-                        ekf._R[1][1]*x[EkfCore::STATE_VY] +
-                        ekf._R[1][2]*x[EkfCore::STATE_VZ]); 
+                        ekf._R.yx*x[EkfCore::STATE_VX] +
+                        ekf._R.yy*x[EkfCore::STATE_VY] +
+                        ekf._R.yz*x[EkfCore::STATE_VZ]); 
 
                 const auto z = x[EkfCore::STATE_Z];
 
                 const auto dz =
-                    ekf._R[2][0]*x[EkfCore::STATE_VX] +
-                    ekf._R[2][1]*x[EkfCore::STATE_VY] +
-                    ekf._R[2][2]*x[EkfCore::STATE_VZ];
+                    ekf._R.zx*x[EkfCore::STATE_VX] +
+                    ekf._R.zy*x[EkfCore::STATE_VY] +
+                    ekf._R.zz*x[EkfCore::STATE_VZ];
 
                 const auto q0 = ekf._q.w;
                 const auto q1 = ekf._q.x;
@@ -321,7 +310,7 @@ namespace hf {
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            float _R[3][3];
+            Rotation _R;
 
             bool _didPredict;
 
@@ -339,7 +328,7 @@ namespace hf {
                     const float dt,
                     const ThreeAxis & gyro,
                     const float x[EkfCore::STATE_DIM],
-                    const float R[3][3],
+                    const Rotation &R,
                     float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {
                 const auto d0 = gyro.x*dt/2;
@@ -354,18 +343,18 @@ namespace hf {
                 F[EkfCore::STATE_Z][EkfCore::STATE_Z] = 1;
 
                 // position from body-frame velocity
-                F[EkfCore::STATE_Z][EkfCore::STATE_VX] = R[2][0]*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_VX] = R.zx*dt;
 
-                F[EkfCore::STATE_Z][EkfCore::STATE_VY] = R[2][1]*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_VY] = R.zy*dt;
 
-                F[EkfCore::STATE_Z][EkfCore::STATE_VZ] = R[2][2]*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_VZ] = R.zz*dt;
 
                 // position from attitude error
-                F[EkfCore::STATE_Z][EkfCore::STATE_D0] = (vy*R[2][2] - vz*R[2][1])*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
 
-                F[EkfCore::STATE_Z][EkfCore::STATE_D1] = (-vx*R[2][2] + vz*R[2][0])*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
 
-                F[EkfCore::STATE_Z][EkfCore::STATE_D2] = (vx*R[2][1] - vy*R[2][0])*dt;
+                F[EkfCore::STATE_Z][EkfCore::STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
 
                 // body-frame velocity from body-frame velocity
                 F[EkfCore::STATE_VX][EkfCore::STATE_VX] = 1; //drag negligible
@@ -382,15 +371,15 @@ namespace hf {
 
                 // body-frame velocity from attitude error
                 F[EkfCore::STATE_VX][EkfCore::STATE_D0] =  0;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D0] = -GRAVITY*R[2][2]*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D0] =  GRAVITY*R[2][1]*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D0] = -GRAVITY*R.zz*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D0] =  GRAVITY*R.zy*dt;
 
-                F[EkfCore::STATE_VX][EkfCore::STATE_D1] =  GRAVITY*R[2][2]*dt;
+                F[EkfCore::STATE_VX][EkfCore::STATE_D1] =  GRAVITY*R.zz*dt;
                 F[EkfCore::STATE_VY][EkfCore::STATE_D1] =  0;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D1] = -GRAVITY*R[2][0]*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D1] = -GRAVITY*R.zx*dt;
 
-                F[EkfCore::STATE_VX][EkfCore::STATE_D2] = -GRAVITY*R[2][1]*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D2] =  GRAVITY*R[2][0]*dt;
+                F[EkfCore::STATE_VX][EkfCore::STATE_D2] = -GRAVITY*R.zy*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D2] =  GRAVITY*R.zx*dt;
                 F[EkfCore::STATE_VZ][EkfCore::STATE_D2] =  0;
 
                 F[EkfCore::STATE_D0][EkfCore::STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
@@ -425,15 +414,15 @@ namespace hf {
             }
 
             void updateWithRange(const ZRangerFilter & zrfilter,
-                    const float R[3][3])
+                    const Rotation &R)
             {
                 // Updates the filter with a measured distance in the zb direction using the
                 float h[EkfCore::STATE_DIM] = {};
 
                 // Only update the filter if the measurement is reliable 
-                // (\hat{h} -> infty when R[2][2] -> 0)
-                if (fabs(R[2][2]) > 0.1f && R[2][2] > 0) {
-                    const auto angle = max(0, fabsf(acosf(R[2][2])) -
+                // (\hat{h} -> infty when R.zz -> 0)
+                if (fabs(R.zz) > 0.1f && R.zz > 0) {
+                    const auto angle = max(0, fabsf(acosf(R.zz)) -
                             Num::DEG2RAD * (15.0f / 2));
                     const auto predictedDistance = _core.x[EkfCore::STATE_Z] / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
