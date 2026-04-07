@@ -261,7 +261,27 @@ namespace hf {
                     const ImuFilter::Data & imudata,
                     const uint32_t msec_curr) -> EKF
             {
-#if 0
+
+                const auto dt =
+                    (msec_curr - ekf._lastProcessNoiseUpdateMs) / 1000.0f;
+
+                auto shouldUpdate = dt > 0;
+
+                auto noise = xzeros();
+                noise <<
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT;
+
+                const auto P = shouldUpdate ?
+                    ekf_addCovarianceNoise(ekf._P, noise) : ekf._P;
+
+                (void)P;
+ #if 0
                 addProcessNoise(msec_curr);
 
                 _accelSubSampler = ThreeAxisSubSampler::accumulate(
