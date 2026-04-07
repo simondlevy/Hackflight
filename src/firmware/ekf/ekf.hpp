@@ -459,14 +459,15 @@ namespace hf {
                 const float thetapix = 0.71674f;
 
                 //~~~ Body rates ~~~
-                const auto omegax_b = gyro.x * Num::DEG2RAD;
-                const auto omegay_b = gyro.y * Num::DEG2RAD;
-
-                const auto dx_g = _core.x[EkfCore::STATE_VX];
-                const auto dy_g = _core.x[EkfCore::STATE_VY];
 
                 // Saturate elevation in prediction and correction to avoid singularities
                 const auto z_g  = max(_core.x[EkfCore::STATE_Z], 0.1);
+
+                ///////////////////////////////////////////////////////////////
+
+                const auto dx_g = _core.x[EkfCore::STATE_VX];
+
+                const auto omegay_b = gyro.y * Num::DEG2RAD;
 
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
@@ -485,6 +486,12 @@ namespace hf {
                 ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
                         offilter.stdDevX*FLOW_RESOLUTION);
 
+                ///////////////////////////////////////////////////////////////
+
+                const auto dy_g = _core.x[EkfCore::STATE_VY];
+
+                const auto omegax_b = gyro.x * Num::DEG2RAD;
+
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[EkfCore::STATE_DIM] = {};
                 const auto predictedNY = (offilter.dt * Npix / thetapix ) * 
@@ -500,6 +507,47 @@ namespace hf {
                 ekf_updateWithScalar(hy, (measuredNY-predictedNY),
                         offilter.stdDevY*FLOW_RESOLUTION);
             }
+
+            void foo(
+                    const float dt,
+                    const float dd,
+                    const float stdev,
+                    const float r22,
+                    const uint8_t state_index,
+                    const float gyroval)
+            {
+                // [pixels] (same in x and y)
+                const float Npix = 35.0;                      
+
+                //float thetapix = Num::DEG2RAD * 4.0f;
+                // [rad]    (same in x and y)
+                // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
+                // corresponding ground length
+                const float thetapix = 0.71674f;
+
+                // Saturate elevation in prediction and correction to avoid singularities
+                const auto z_g  = max(_core.x[EkfCore::STATE_Z], 0.1);
+
+                const auto dg = _core.x[state_index];
+
+                const auto omegab = gyroval * Num::DEG2RAD;
+
+                float h[EkfCore::STATE_DIM] = {};
+
+                const auto predictedN = (dt * Npix / thetapix ) * 
+                    ((dg * r22 / z_g) - omegab);
+
+                const auto measuredN = dd*FLOW_RESOLUTION;
+
+                h[EkfCore::STATE_Z] = (Npix * dt / thetapix) * 
+                    ((r22 * dg) / (-z_g * z_g));
+
+                h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
+
+                // First update
+                ekf_updateWithScalar(h, measuredN-predictedN,
+                        stdev*FLOW_RESOLUTION);
+             }
 
             void enforceSymmetry()
             {
