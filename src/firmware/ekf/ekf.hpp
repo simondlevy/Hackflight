@@ -92,7 +92,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                ekf_addCovarianceNoise(pinit, _core.P);
+                _core.addCovarianceNoise(pinit);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -426,7 +426,7 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                ekf_addCovarianceNoise(noise, _core.P);
+                _core.addCovarianceNoise(noise);
 
                 enforceSymmetry();
             }
@@ -577,14 +577,6 @@ namespace hf {
                         P[i][j] = P[j][i] =
                             ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i] + v); 
                     }
-                }
-            }
-
-            static void ekf_addCovarianceNoise(const float * noise,
-                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
-            {
-                for (uint8_t k=0; k<EkfCore::STATE_DIM; ++k) {
-                    P[k][k] += noise[k] * noise[k];
                 }
             }
 

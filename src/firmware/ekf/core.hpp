@@ -67,6 +67,13 @@ namespace hf {
                 }
             }
 
+            void addCovarianceNoise(const float * noise)
+            {
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    P[k][k] += noise[k] * noise[k];
+                }
+            }
+
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
                     const float maxval) -> float
@@ -77,13 +84,6 @@ namespace hf {
                     pval;
             }
 
-
-            void addCovarianceNoise(const float * noise)
-            {
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    P[k][k] += noise[k] * noise[k];
-                }
-            }
 
             // C = A * B
             static void dot(
