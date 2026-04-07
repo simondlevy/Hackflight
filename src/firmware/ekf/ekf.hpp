@@ -458,7 +458,7 @@ namespace hf {
 
                 //First update
                 ekf_updateWithScalar(hx, (_measuredNX-_predictedNX), 
-                        offilter.stdDevX*FLOW_RESOLUTION);
+                        offilter.stdDevX*FLOW_RESOLUTION, _x, _P);
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[STATE_DIM] = {};
@@ -473,7 +473,7 @@ namespace hf {
 
                 // Second update
                 ekf_updateWithScalar(hy, (_measuredNY-_predictedNY),
-                        offilter.stdDevY*FLOW_RESOLUTION);
+                        offilter.stdDevY*FLOW_RESOLUTION, _x, _P);
             }
 
             void updateWithRange(const ZRangerFilter & zrfilter)
@@ -498,7 +498,7 @@ namespace hf {
                     h[STATE_Z] = 1 / cosf(angle); 
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
-                            zrfilter.stdev);
+                            zrfilter.stdev, _x, _P);
                 }
             }
 
@@ -547,14 +547,16 @@ namespace hf {
             void ekf_updateWithScalar(
                     const float * h,
                     const float error,
-                    const float stdMeasNoise)
+                    const float stdMeasNoise,
+                    float x[STATE_DIM],
+                    float P[STATE_DIM][STATE_DIM])
             {
                 static float G[STATE_DIM];
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
                 float PHt[STATE_DIM] = {};
-                dot(_P, h, PHt); // PH'
+                dot(P, h, PHt); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -580,23 +582,23 @@ namespace hf {
                 trans(GH, GH_I);
 
                 // (GH - I)*P
-                dot(GH, _P, GH_I_P); 
+                dot(GH, P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'
-                dot(GH_I_P, GH_I, _P);
+                dot(GH_I_P, GH_I, P);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
 
-                    _x[i] += G[i] * error; // state update
+                    x[i] += G[i] * error; // state update
 
                     for (int j=i; j<STATE_DIM; j++) {
 
                         const auto v = G[i] * R * G[j];
 
                         // add measurement noise
-                        _P[i][j] = _P[j][i] =
-                            ekf_pval(i, j, 0.5*_P[i][j] + 0.5*_P[j][i] + v); 
+                        P[i][j] = P[j][i] =
+                            ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i] + v); 
                     }
                 }
             }
