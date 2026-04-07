@@ -448,7 +448,7 @@ namespace hf {
                     h[EkfCore::STATE_Z] = 1 / cosf(angle); 
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
-                            zrfilter.stdev, MIN_COVARIANCE, MAX_COVARIANCE);
+                            zrfilter.stdev);
                 }
             }
  
@@ -491,7 +491,7 @@ namespace hf {
 
                 // First update
                 ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
-                        offilter.stdDevX*FLOW_RESOLUTION, MIN_COVARIANCE, MAX_COVARIANCE);
+                        offilter.stdDevX*FLOW_RESOLUTION);
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[EkfCore::STATE_DIM] = {};
@@ -506,7 +506,7 @@ namespace hf {
 
                 // Second update
                 ekf_updateWithScalar(hy, (measuredNY-predictedNY),
-                        offilter.stdDevY*FLOW_RESOLUTION, MIN_COVARIANCE, MAX_COVARIANCE);
+                        offilter.stdDevY*FLOW_RESOLUTION);
             }
 
             void enforceSymmetry()
@@ -515,6 +515,15 @@ namespace hf {
             }
 
             void ekf_updateWithScalar(
+                    const float * h,
+                    const float error,
+                    const float stdMeasNoise)
+            {
+                ekf_updateWithScalar(h, error, stdMeasNoise,
+                        MIN_COVARIANCE, MAX_COVARIANCE);
+            }
+
+             void ekf_updateWithScalar(
                     const float * h,
                     const float error,
                     const float stdMeasNoise,
