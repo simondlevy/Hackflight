@@ -566,18 +566,11 @@ namespace hf {
 
                         // add measurement noise
                         _core.P[i][j] = _core.P[j][i] =
-                            ekf_pval(i, j, 0.5*_core.P[i][j] + 0.5*_core.P[j][i] + v); 
+                            EkfCore::get_pval(i, j,
+                                    0.5*_core.P[i][j] + 0.5*_core.P[j][i] + v,
+                                    MIN_COVARIANCE, MAX_COVARIANCE); 
                     }
                 }
-            }
-
-            static auto ekf_pval(
-                    const int i, const int j, const float pval) -> float
-            {
-                return
-                    isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                    i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                    pval;
             }
 
             static auto bigenough(const float v) -> bool
