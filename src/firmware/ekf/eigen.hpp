@@ -278,7 +278,9 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT;
 
                 const auto P = shouldUpdate ?
-                    ekf_addCovarianceNoise(ekf._P, noise) : ekf._P;
+                    ekf_enforceSymmetry(
+                            ekf_addCovarianceNoise(ekf._P, noise)) :
+                    ekf._P;
 
                 (void)P;
  #if 0
@@ -518,6 +520,32 @@ namespace hf {
                         dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
 
             }
+
+            static auto ekf_enforceSymmetry(const Matrix & P) -> Matrix
+            {
+                auto Psymm = P;
+
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        Psymm(i,j) = Psymm(j,i) =
+                            ekf_pset(i, j, 0.5 * P(i,j) + 0.5 * P(j,i));
+                    }
+                }
+
+                return Psymm;
+            }
+
+            static auto ekf_pset(const uint8_t i, const uint8_t j,
+                    const float pval) -> float
+            {
+                return 
+                    isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                    i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                    pval;
+            }
+
 
     };
 
