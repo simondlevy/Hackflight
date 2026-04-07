@@ -431,7 +431,7 @@ namespace hf {
                 enforceSymmetry();
             }
 
-            static void updateWithRange(
+            void updateWithRange(
                     const ZRangerFilter & zrfilter,
                     const float R[3][3],
                     float x[EkfCore::STATE_DIM],
@@ -457,7 +457,7 @@ namespace hf {
                 }
             }
  
-            static void updateWithFlow(
+            void updateWithFlow(
                     const OpticalFlowFilter & offilter,
                     const ThreeAxis & gyro,
                     const float r22,
