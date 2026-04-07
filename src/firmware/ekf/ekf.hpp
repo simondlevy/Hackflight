@@ -589,7 +589,8 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i]);
+                        _P[i][j] = _P[j][i] =
+                            ekf_pval(i, j, 0.5*_P[i][j] + 0.5*_P[j][i]);
                     }
                 }
             }
@@ -645,20 +646,19 @@ namespace hf {
                         const auto v = G[i] * R * G[j];
 
                         // add measurement noise
-                        ekf_pset(i, j, 0.5 * _P[i][j] + 0.5 * _P[j][i] + v); 
+                        _P[i][j] = _P[j][i] =
+                            ekf_pval(i, j, 0.5*_P[i][j] + 0.5*_P[j][i] + v); 
                     }
                 }
             }
 
-            void ekf_pset(const uint8_t i, const uint8_t j, const float pval)
+            static auto ekf_pval(
+                    const int i, const int j, const float pval) -> float
             {
-                if (isnan(pval) || pval > MAX_COVARIANCE) {
-                    _P[i][j] = _P[j][i] = MAX_COVARIANCE;
-                } else if ( i==j && pval < MIN_COVARIANCE ) {
-                    _P[i][j] = _P[j][i] = MIN_COVARIANCE;
-                } else {
-                    _P[i][j] = _P[j][i] = pval;
-                }
+                return
+                    isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                    i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                    pval;
             }
 
             // C = A * B
