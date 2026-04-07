@@ -67,13 +67,26 @@ namespace hf {
             static constexpr float MIN_ANGLE = 1e-4;
             static constexpr float MAX_ANGLE = 10;
 
+            // Indexes to acceless the vehicle's state, stored as a column vector
+            enum
+            {
+                STATE_Z,
+                STATE_VX,
+                STATE_VY,
+                STATE_VZ,
+                STATE_D0,
+                STATE_D1,
+                STATE_D2,
+                STATE_DIM
+            };
+
         public:
 
             EKF& operator=(const EKF& other) = default;
  
             EKF()
             {
-                ekf_init();
+                ekf_init(_x, _P);
 
                 // Initialize the rotation matrix
                 _r00 = 1;
@@ -339,19 +352,6 @@ namespace hf {
 
         private:
 
-            // Indexes to acceless the vehicle's state, stored as a column vector
-            enum
-            {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
-            };
-
             //////////////////////////////////////////////////////////////////
 
             // State vector
@@ -410,7 +410,7 @@ namespace hf {
 
                     ekf_addCovarianceNoise(noise);
 
-                    ekf_enforceSymmetry();
+                    ekf_enforceSymmetry(_P);
 
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
@@ -502,33 +502,6 @@ namespace hf {
                 }
             }
 
-            static auto bigenough(const float v) -> bool
-            {
-                return fabsf(v) > MIN_ANGLE;
-            }
-
-            static auto smallenough(const float v) -> bool
-            {
-                return fabsf(v) < MAX_ANGLE;
-            }
-
-            static auto rotate(
-                    const ThreeAxis & v, const Quaternion & q)-> Quaternion
-            {
-                const auto angle = ThreeAxis::l2norm(v);
-                const auto ca = cos(angle / 2);
-                const auto sa = sin(angle / 2);
-                const auto dq = Quaternion(
-                        ca, sa*v.x/angle, sa*v.y/angle, sa*v.z/angle);
-
-                return Quaternion(
-                        dq.w*q.w - dq.x*q.x - dq.y*q.y - dq.z*q.z,
-                        dq.x*q.w + dq.w*q.x + dq.z*q.y - dq.y*q.z,
-                        dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
-                        dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
-
-            }
-
             void finalize()
             {
                 // Incorporate the attitude error (Kalman filter state) with the attitude
@@ -560,38 +533,14 @@ namespace hf {
                 _x[STATE_D1] = 0;
                 _x[STATE_D2] = 0;
 
-                ekf_enforceSymmetry();
+                ekf_enforceSymmetry(_P);
 
             } // finalize
-
-            void ekf_init()
-            {
-                for (int i=0; i< STATE_DIM; i++) {
-
-                    _x[i] = 0;
-
-                    for (int j=0; j < STATE_DIM; j++) {
-                        _P[i][j] = 0; 
-                    }
-                }
-            }
 
             void ekf_addCovarianceNoise(const float * noise)
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
                     _P[k][k] += noise[k] * noise[k];
-                }
-            }
-
-            void ekf_enforceSymmetry()
-            {
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        _P[i][j] = _P[j][i] =
-                            ekf_pval(i, j, 0.5*_P[i][j] + 0.5*_P[j][i]);
-                    }
                 }
             }
 
@@ -650,6 +599,60 @@ namespace hf {
                             ekf_pval(i, j, 0.5*_P[i][j] + 0.5*_P[j][i] + v); 
                     }
                 }
+            }
+
+            //////////////////////////////////////////////////////////////////
+
+            static void ekf_init(
+                    float x[STATE_DIM], float P[STATE_DIM][STATE_DIM]) 
+            {
+                for (int i=0; i< STATE_DIM; i++) {
+
+                    x[i] = 0;
+
+                    for (int j=0; j < STATE_DIM; j++) {
+                        P[i][j] = 0; 
+                    }
+                }
+            }
+
+            static void ekf_enforceSymmetry(float P[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        P[i][j] = P[j][i] =
+                            ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i]);
+                    }
+                }
+            }
+
+            static auto bigenough(const float v) -> bool
+            {
+                return fabsf(v) > MIN_ANGLE;
+            }
+
+            static auto smallenough(const float v) -> bool
+            {
+                return fabsf(v) < MAX_ANGLE;
+            }
+
+            static auto rotate(
+                    const ThreeAxis & v, const Quaternion & q)-> Quaternion
+            {
+                const auto angle = ThreeAxis::l2norm(v);
+                const auto ca = cos(angle / 2);
+                const auto sa = sin(angle / 2);
+                const auto dq = Quaternion(
+                        ca, sa*v.x/angle, sa*v.y/angle, sa*v.z/angle);
+
+                return Quaternion(
+                        dq.w*q.w - dq.x*q.x - dq.y*q.y - dq.z*q.z,
+                        dq.x*q.w + dq.w*q.x + dq.z*q.y - dq.y*q.z,
+                        dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
+                        dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
+
             }
 
             static auto ekf_pval(
