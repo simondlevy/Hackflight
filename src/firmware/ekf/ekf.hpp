@@ -580,6 +580,15 @@ namespace hf {
                 }
             }
 
+            static auto ekf_pval(
+                    const int i, const int j, const float pval) -> float
+            {
+                return
+                    isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
+                    i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
+                    pval;
+            }
+
             static auto bigenough(const float v) -> bool
             {
                 return fabsf(v) > MIN_ANGLE;
@@ -607,14 +616,6 @@ namespace hf {
 
             }
 
-            static auto ekf_pval(
-                    const int i, const int j, const float pval) -> float
-            {
-                return
-                    isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
-                    i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
-                    pval;
-            }
     };
 
 }

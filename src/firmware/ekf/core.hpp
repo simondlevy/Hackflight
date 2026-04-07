@@ -54,6 +54,66 @@ namespace hf {
                 }
             }
 
+            void updateWithScalar(
+                    const float * h,
+                    const float error,
+                    const float stdMeasNoise,
+                    const float minCovariance,
+                    const float maxCovariance)
+            {
+                float G[STATE_DIM] = {};
+
+                const auto R = stdMeasNoise*stdMeasNoise;
+
+                float PHt[STATE_DIM] = {};
+                dot(P, h, PHt); // PH'
+
+                float HPHR = R; // HPH' + R
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    HPHR += h[i] * PHt[i]; 
+                }
+
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                }
+
+                float GH[STATE_DIM][STATE_DIM] = {};
+                float GH_I[STATE_DIM][STATE_DIM] = {};
+                float GH_I_P[STATE_DIM][STATE_DIM] = {};
+
+                outer(G, h, GH);
+
+                // GH - I
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    GH[i][i] -= 1; 
+                }
+
+                // (GH - I)'
+                trans(GH, GH_I);
+
+                // (GH - I)*P
+                dot(GH, P, GH_I_P); 
+
+                // (GH - I)*P*(GH - I)'
+                dot(GH_I_P, GH_I, _P);
+
+                // add the measurement variance and ensure boundedness and symmetry
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    x[i] += G[i] * error; // state update
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        const auto v = G[i] * R * G[j];
+
+                        // add measurement noise
+                        P[i][j] = P[j][i] =
+                            get_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i] + v,
+                                    minCovariance, maxCovariance); 
+                    }
+                }
+            }
+ 
             void enforceSymmetry(const float minval, const float maxval)
             {
                 for (int i=0; i<STATE_DIM; i++) {
