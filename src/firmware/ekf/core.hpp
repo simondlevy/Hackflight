@@ -54,7 +54,7 @@ namespace hf {
                 }
             }
 
-            void updateWithScalar(
+             void updateWithScalar(
                     const float * h,
                     const float error,
                     const float stdMeasNoise,
@@ -95,7 +95,7 @@ namespace hf {
                 dot(GH, P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'
-                dot(GH_I_P, GH_I, _P);
+                dot(GH_I_P, GH_I, P);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
@@ -113,7 +113,8 @@ namespace hf {
                     }
                 }
             }
- 
+
+
             void enforceSymmetry(const float minval, const float maxval)
             {
                 for (int i=0; i<STATE_DIM; i++) {

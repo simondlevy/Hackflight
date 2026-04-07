@@ -519,69 +519,8 @@ namespace hf {
                     const float error,
                     const float stdMeasNoise)
             {
-                ekf_updateWithScalar(h, error, stdMeasNoise,
+                _core.updateWithScalar(h, error, stdMeasNoise,
                         MIN_COVARIANCE, MAX_COVARIANCE);
-            }
-
-             void ekf_updateWithScalar(
-                    const float * h,
-                    const float error,
-                    const float stdMeasNoise,
-                    const float minCovariance,
-                    const float maxCovariance)
-            {
-                float G[EkfCore::STATE_DIM] = {};
-
-                const auto R = stdMeasNoise*stdMeasNoise;
-
-                float PHt[EkfCore::STATE_DIM] = {};
-                EkfCore::dot(_core.P, h, PHt); // PH'
-
-                float HPHR = R; // HPH' + R
-                for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
-                    HPHR += h[i] * PHt[i]; 
-                }
-
-                for (size_t i=0; i<EkfCore::STATE_DIM; i++) {
-                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                }
-
-                float GH[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                float GH_I[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                float GH_I_P[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-
-                EkfCore::outer(G, h, GH);
-
-                // GH - I
-                for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
-                    GH[i][i] -= 1; 
-                }
-
-                // (GH - I)'
-                EkfCore::trans(GH, GH_I);
-
-                // (GH - I)*P
-                EkfCore::dot(GH, _core.P, GH_I_P); 
-
-                // (GH - I)*P*(GH - I)'
-                EkfCore::dot(GH_I_P, GH_I, _core.P);
-
-                // add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<EkfCore::STATE_DIM; i++) {
-
-                    _core.x[i] += G[i] * error; // state update
-
-                    for (int j=i; j<EkfCore::STATE_DIM; j++) {
-
-                        const auto v = G[i] * R * G[j];
-
-                        // add measurement noise
-                        _core.P[i][j] = _core.P[j][i] =
-                            EkfCore::get_pval(i, j,
-                                    0.5*_core.P[i][j] + 0.5*_core.P[j][i] + v,
-                                    minCovariance, maxCovariance); 
-                    }
-                }
             }
 
             static auto bigenough(const float v) -> bool
@@ -608,7 +547,6 @@ namespace hf {
                         dq.x*q.w + dq.w*q.x + dq.z*q.y - dq.y*q.z,
                         dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
                         dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
-
             }
 
     };
