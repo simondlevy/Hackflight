@@ -268,7 +268,12 @@ namespace hf {
             void update(const ImuFilter::Data & imudata,
                     const uint32_t msec_curr)
             {
-                addProcessNoise(msec_curr);
+                const auto dt =
+                    (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+
+                if (dt > 0) {
+                    addProcessNoise(dt, msec_curr);
+                }
 
                 _accelSubSampler = ThreeAxisSubSampler::accumulate(
                         _accelSubSampler, imudata.accelGs);
@@ -392,28 +397,23 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            void addProcessNoise(const uint32_t msec_curr) 
+            void addProcessNoise(const float dt, const uint32_t msec_curr) 
             {
-                float dt = (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
 
-                if (dt > 0) {
+                ekf_addCovarianceNoise(noise);
 
-                    const float noise[STATE_DIM] = {
-                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                    };
+                ekf_enforceSymmetry(_P);
 
-                    ekf_addCovarianceNoise(noise);
-
-                    ekf_enforceSymmetry(_P);
-
-                    _lastProcessNoiseUpdateMs = msec_curr;
-                }
+                _lastProcessNoiseUpdateMs = msec_curr;
             }
 
             void updateWithFlow(const OpticalFlowFilter & offilter)
