@@ -25,13 +25,6 @@
 #include <firmware/zranger/filter.hpp>
 #include <num.hpp>
 
-// We want to use _P for the covariance matrix, but Arduino pre-defines it
-#ifdef _P
-#undef _P
-#undef _B
-#undef _C
-#endif
-
 namespace hf {
 
     class EKF { 
@@ -74,7 +67,7 @@ namespace hf {
  
             EKF()
             {
-                ekf_init(_x, _P);
+                ekf_init(_core.x, _core.P);
 
                 // Initialize the rotation matrix
                 _R[0][0] = 1;
@@ -99,7 +92,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                ekf_addCovarianceNoise(pinit, _P);
+                ekf_addCovarianceNoise(pinit, _core.P);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -119,36 +112,36 @@ namespace hf {
 
                 // The linearized Jacobean matrix
                 float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                makeJacobian(dt, gyro, _x, _R, F);
+                makeJacobian(dt, gyro, _core.x, _R, F);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
                 float FP[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                EkfCore::dot(F, _P, FP);
+                EkfCore::dot(F, _core.P, FP);
 
                 float Ft[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 EkfCore::trans(F, Ft);
 
-                EkfCore::dot(FP, Ft, _P);
+                EkfCore::dot(FP, Ft, _core.P);
 
                 // -----------------------------------------------------
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _x[EkfCore::STATE_VX];
-                const auto tmpSPY = _x[EkfCore::STATE_VY];
-                const auto tmpSPZ = _x[EkfCore::STATE_VZ];
+                const auto tmpSPX = _core.x[EkfCore::STATE_VX];
+                const auto tmpSPY = _core.x[EkfCore::STATE_VY];
+                const auto tmpSPZ = _core.x[EkfCore::STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _x[EkfCore::STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = _x[EkfCore::STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = _core.x[EkfCore::STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = _core.x[EkfCore::STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _x[EkfCore::STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = _core.x[EkfCore::STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 // position update
-                _x[EkfCore::STATE_Z] += _R[2][0] * dx + _R[2][1] * dy + _R[2][2] * dz - 
+                _core.x[EkfCore::STATE_Z] += _R[2][0] * dx + _R[2][1] * dy + _R[2][2] * dz - 
                     GRAVITY * dt2 / 2;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -157,13 +150,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _x[EkfCore::STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                _core.x[EkfCore::STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _R[2][0]);
 
-                _x[EkfCore::STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                _core.x[EkfCore::STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
                         - GRAVITY * _R[2][1]);
 
-                _x[EkfCore::STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                _core.x[EkfCore::STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _R[2][2]);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
@@ -198,7 +191,7 @@ namespace hf {
                     (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
-                    addProcessNoise(dt, msec_curr, _P);
+                    addProcessNoise(dt, msec_curr, _core.P);
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
 
@@ -211,16 +204,16 @@ namespace hf {
                 _gyroLatest = imudata.gyroDps;
 
                 if (_didUpdateWithFlowDeck) {
-                    updateWithRange(_zrangerFilterLatest, _R, _x, _P);
+                    updateWithRange(_zrangerFilterLatest, _R, _core.x, _core.P);
                     updateWithFlow(
                             _opticalFlowFilterLatest, _gyroLatest, _R[2][2],
-                            _x, _P);
+                            _core.x, _core.P);
                 }
 
                 if (_didUpdateWithFlowDeck || _didPredict) {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const auto v = ThreeAxis(_x[EkfCore::STATE_D0], _x[EkfCore::STATE_D1], _x[EkfCore::STATE_D2]);
+                    const auto v = ThreeAxis(_core.x[EkfCore::STATE_D0], _core.x[EkfCore::STATE_D1], _core.x[EkfCore::STATE_D2]);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -244,11 +237,11 @@ namespace hf {
                     _R[2][2] = _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z;
 
                     // reset the attitude error
-                    _x[EkfCore::STATE_D0] = 0;
-                    _x[EkfCore::STATE_D1] = 0;
-                    _x[EkfCore::STATE_D2] = 0;
+                    _core.x[EkfCore::STATE_D0] = 0;
+                    _core.x[EkfCore::STATE_D1] = 0;
+                    _core.x[EkfCore::STATE_D2] = 0;
 
-                    ekf_enforceSymmetry(_P);
+                    ekf_enforceSymmetry(_core.P);
                 }
 
                 if (_didUpdateWithFlowDeck) {
@@ -270,7 +263,7 @@ namespace hf {
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
-                const auto x = ekf._x;
+                const auto x = ekf._core.x;
 
                 const auto dx =
                     ekf._R[0][0]*x[EkfCore::STATE_VX] +
@@ -318,11 +311,7 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            // State vector
-            __attribute__((aligned(4))) float _x[EkfCore::STATE_DIM];
-
-            // Covariance matrix
-            __attribute__((aligned(4))) float _P[EkfCore::STATE_DIM][EkfCore::STATE_DIM];
+            EkfCore _core;
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -526,7 +515,8 @@ namespace hf {
             }
 
             static void ekf_init(
-                    float x[EkfCore::STATE_DIM], float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM]) 
+                    float x[EkfCore::STATE_DIM],
+                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM]) 
             {
                 for (int i=0; i< EkfCore::STATE_DIM; i++) {
 
