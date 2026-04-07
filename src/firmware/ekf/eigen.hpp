@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <ArduinoEigenDense.h>
+
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
@@ -80,10 +82,13 @@ namespace hf {
                 STATE_DIM
             };
 
+            typedef Eigen::MatrixXd Matrix;
+            typedef Eigen::VectorXd Vector;
+
         public:
 
             EKF& operator=(const EKF& other) = default;
- 
+
             EKF()
             {
                 ekf_init(_x, _P);
