@@ -42,7 +42,7 @@ namespace hf {
             __attribute__((aligned(4))) float P[STATE_DIM][STATE_DIM];
 
 
-            EkfCore() 
+            void init()
             {
                 for (int i=0; i< STATE_DIM; i++) {
 

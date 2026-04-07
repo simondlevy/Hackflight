@@ -67,7 +67,7 @@ namespace hf {
  
             EKF()
             {
-                ekf_init(_core.x, _core.P);
+                _core.init();
 
                 // Initialize the rotation matrix
                 _R[0][0] = 1;
@@ -512,20 +512,6 @@ namespace hf {
                 // Second update
                 ekf_updateWithScalar(hy, (measuredNY-predictedNY),
                         offilter.stdDevY*FLOW_RESOLUTION, x, P);
-            }
-
-            static void ekf_init(
-                    float x[EkfCore::STATE_DIM],
-                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM]) 
-            {
-                for (int i=0; i< EkfCore::STATE_DIM; i++) {
-
-                    x[i] = 0;
-
-                    for (int j=0; j < EkfCore::STATE_DIM; j++) {
-                        P[i][j] = 0; 
-                    }
-                }
             }
 
             static void ekf_enforceSymmetry(float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
