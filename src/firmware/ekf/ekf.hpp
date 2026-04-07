@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <firmware/ekf/ekf_core.hpp>
+#include <firmware/ekf/core.hpp>
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
