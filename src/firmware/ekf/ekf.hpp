@@ -408,12 +408,6 @@ namespace hf {
             ThreeAxisSubSampler _accelSubSampler = ThreeAxisSubSampler(GRAVITY);
             ThreeAxisSubSampler _gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
 
-            float _predictedNX;
-            float _predictedNY;
-
-            float _measuredNX;
-            float _measuredNY;
-
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
             float _R[3][3];
@@ -478,9 +472,9 @@ namespace hf {
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
                 float hx[STATE_DIM] = {};
-                _predictedNX = (offilter.dt * Npix / thetapix ) * 
+                const auto predictedNX = (offilter.dt * Npix / thetapix ) * 
                     ((dx_g * _R[2][2] / z_g) - omegay_b);
-                _measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
+                const auto measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dx (and z?)
                 hx[STATE_Z] = (Npix * offilter.dt / thetapix) * 
@@ -489,14 +483,14 @@ namespace hf {
                     (_R[2][2] / z_g);
 
                 //First update
-                ekf_updateWithScalar(hx, (_measuredNX-_predictedNX), 
+                ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
                         offilter.stdDevX*FLOW_RESOLUTION, _x, _P);
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[STATE_DIM] = {};
-                _predictedNY = (offilter.dt * Npix / thetapix ) * 
+                const auto predictedNY = (offilter.dt * Npix / thetapix ) * 
                     ((dy_g * _R[2][2] / z_g) + omegax_b);
-                _measuredNY = offilter.dpixely*FLOW_RESOLUTION;
+                const auto measuredNY = offilter.dpixely*FLOW_RESOLUTION;
 
                 // derive measurement equation with respect to dy (and z?)
                 hy[STATE_Z] = (Npix * offilter.dt / thetapix) * 
@@ -504,7 +498,7 @@ namespace hf {
                 hy[STATE_VY] = (Npix * offilter.dt / thetapix) * (_R[2][2] / z_g);
 
                 // Second update
-                ekf_updateWithScalar(hy, (_measuredNY-_predictedNY),
+                ekf_updateWithScalar(hy, (measuredNY-predictedNY),
                         offilter.stdDevY*FLOW_RESOLUTION, _x, _P);
             }
 
