@@ -160,19 +160,18 @@ namespace hf {
                 _r22 = 1;
 
                 // Add in the initial process noise 
-                const float pinit[STATE_DIM] = {
-
+                auto noise = Vector(STATE_DIM);
+                noise << 
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
-                };
+                    STDEV_INITIAL_ATTITUDE_YAW;
 
                 _P = ekf_addCovarianceNoise(
-                        Matrix(STATE_DIM, STATE_DIM),pinit);
+                        Matrix(STATE_DIM, STATE_DIM), noise);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -269,6 +268,34 @@ namespace hf {
                     const ImuFilter::Data & imudata,
                     const uint32_t msec_curr) -> EKF
             {
+#if 0
+                addProcessNoise(msec_curr);
+
+                _accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        _accelSubSampler, imudata.accelGs);
+
+                _gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        _gyroSubSampler, imudata.gyroDps);
+
+                _gyroLatest = imudata.gyroDps;
+
+                if (_didUpdateWithFlowDeck) {
+                    updateWithRange(_zrangerFilterLatest);
+                    updateWithFlow(_opticalFlowFilterLatest);
+                }
+
+                if (_didUpdateWithFlowDeck || _didPredict) {
+                    finalize();
+                }
+
+                if (_didUpdateWithFlowDeck) {
+                    _didUpdateWithFlowDeck = false;
+                }
+
+                if (_didPredict) {
+                    _didPredict = false;
+                }
+#endif
                 return ekf;
             }
 
@@ -441,10 +468,10 @@ namespace hf {
                 return F;
             }
 
-            static auto ekf_addCovarianceNoise(
-                    const Matrix & P, const float noise[STATE_DIM]) -> Matrix
+            static auto ekf_addCovarianceNoise(const Matrix & P,
+                    const Vector noise) -> Matrix
             {
-                return P;
+                return P + Matrix::Identity(STATE_DIM, STATE_DIM) * noise;
             }
 
             static auto rotate(
