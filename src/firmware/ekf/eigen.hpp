@@ -117,12 +117,6 @@ namespace hf {
                 _x(STATE_D1) = other._x(STATE_D1);
                 _x(STATE_D2) = other._x(STATE_D2);
 
-                for (int i=0; i< STATE_DIM; i++) {
-                    for (int j=0; j < STATE_DIM; j++) {
-                        _P(i,j) = other._P(i,j); 
-                    }
-                }
-
                 _gyroLatest = other._gyroLatest;
                 _accelSubSampler = other._accelSubSampler;
                 _gyroSubSampler = other._gyroSubSampler;
@@ -170,8 +164,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW;
 
-                _P = ekf_addCovarianceNoise(
-                        Matrix(STATE_DIM, STATE_DIM), noise);
+                _P = ekf_addCovarianceNoise(zeros(), noise);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -471,7 +464,17 @@ namespace hf {
             static auto ekf_addCovarianceNoise(const Matrix & P,
                     const Vector noise) -> Matrix
             {
-                return P + Matrix::Identity(STATE_DIM, STATE_DIM) * noise;
+                return P + identity() * noise;
+            }
+
+            static auto identity() -> Matrix
+            {
+                return Matrix::Identity(STATE_DIM, STATE_DIM); 
+            }
+
+            static auto zeros() -> Matrix
+            {
+                return Matrix(STATE_DIM, STATE_DIM); 
             }
 
             static auto rotate(
