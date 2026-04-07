@@ -566,7 +566,7 @@ namespace hf {
                     float x[STATE_DIM],
                     float P[STATE_DIM][STATE_DIM])
             {
-                static float G[STATE_DIM];
+                auto G = zeros();
 
                 const auto R = stdMeasNoise*stdMeasNoise;
 
@@ -579,7 +579,7 @@ namespace hf {
                 }
 
                 for (size_t i=0; i<STATE_DIM; i++) {
-                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                    G(i) = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
                 float GH[STATE_DIM][STATE_DIM] = {};
@@ -605,11 +605,11 @@ namespace hf {
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<STATE_DIM; i++) {
 
-                    x[i] += G[i] * error; // state update
+                    x[i] += G(i) * error; // state update
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto v = G[i] * R * G[j];
+                        const auto v = G(i) * R * G(j);
 
                         // add measurement noise
                         P[i][j] = P[j][i] =
@@ -699,13 +699,13 @@ namespace hf {
 
             // A = x * y
             static void outer(
-                    const float x[STATE_DIM],
+                    const Vector x,
                     const float y[STATE_DIM],
                     float C[STATE_DIM][STATE_DIM])
             {
                 for (size_t i=0; i<STATE_DIM; i++) {
                     for (size_t j=0; j<STATE_DIM; j++) {
-                        C[i][j] = x[i] * y[j];
+                        C[i][j] = x(i) * y[j];
                     }
                 }
             }
