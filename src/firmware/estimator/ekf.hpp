@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <firmware/estimator/ekf_core.hpp>
 #include <firmware/estimator/quaternion.hpp>
 #include <firmware/estimator/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
