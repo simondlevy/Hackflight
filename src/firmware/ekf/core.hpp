@@ -54,7 +54,19 @@ namespace hf {
                 }
             }
 
-             void updateWithScalar(
+            // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
+            void predict(const float F[STATE_DIM][STATE_DIM])
+            {
+                float FP[STATE_DIM][STATE_DIM] = {};
+                dot(F, P, FP);
+
+                float Ft[STATE_DIM][STATE_DIM] = {};
+                trans(F, Ft);
+
+                dot(FP, Ft, P);
+            }
+
+            void updateWithScalar(
                     const float * h,
                     const float error,
                     const float stdMeasNoise,
@@ -113,7 +125,6 @@ namespace hf {
                     }
                 }
             }
-
 
             void enforceSymmetry(const float minval, const float maxval)
             {

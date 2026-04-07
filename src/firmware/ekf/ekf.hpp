@@ -116,13 +116,16 @@ namespace hf {
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
+                _core.predict(F);
+
+                /*
                 float FP[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 EkfCore::dot(F, _core.P, FP);
 
                 float Ft[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 EkfCore::trans(F, Ft);
 
-                EkfCore::dot(FP, Ft, _core.P);
+                EkfCore::dot(FP, Ft, _core.P);*/
 
                 // -----------------------------------------------------
 
