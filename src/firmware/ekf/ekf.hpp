@@ -191,7 +191,7 @@ namespace hf {
                     (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
-                    addProcessNoise(dt, msec_curr, _core.P);
+                    addProcessNoise(dt, msec_curr);
                     _lastProcessNoiseUpdateMs = msec_curr;
                 }
 
@@ -213,7 +213,10 @@ namespace hf {
                 if (_didUpdateWithFlowDeck || _didPredict) {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const auto v = ThreeAxis(_core.x[EkfCore::STATE_D0], _core.x[EkfCore::STATE_D1], _core.x[EkfCore::STATE_D2]);
+                    const auto v = ThreeAxis(
+                            _core.x[EkfCore::STATE_D0],
+                            _core.x[EkfCore::STATE_D1],
+                            _core.x[EkfCore::STATE_D2]);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -241,7 +244,7 @@ namespace hf {
                     _core.x[EkfCore::STATE_D1] = 0;
                     _core.x[EkfCore::STATE_D2] = 0;
 
-                    ekf_enforceSymmetry(_core.P);
+                    enforceSymmetry();
                 }
 
                 if (_didUpdateWithFlowDeck) {
@@ -411,8 +414,7 @@ namespace hf {
 
              }
 
-            static void addProcessNoise(const float dt, const uint32_t msec_curr,
-                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM]) 
+            void addProcessNoise(const float dt, const uint32_t msec_curr)
             {
                 const float noise[EkfCore::STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
@@ -424,9 +426,9 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                ekf_addCovarianceNoise(noise, P);
+                ekf_addCovarianceNoise(noise, _core.P);
 
-                ekf_enforceSymmetry(P);
+                enforceSymmetry();
             }
 
             static void updateWithRange(
@@ -514,16 +516,9 @@ namespace hf {
                         offilter.stdDevY*FLOW_RESOLUTION, x, P);
             }
 
-            static void ekf_enforceSymmetry(float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
+            void enforceSymmetry()
             {
-                for (int i=0; i<EkfCore::STATE_DIM; i++) {
-
-                    for (int j=i; j<EkfCore::STATE_DIM; j++) {
-
-                        P[i][j] = P[j][i] =
-                            ekf_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i]);
-                    }
-                }
+                _core.enforceSymmetry(MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
             static void ekf_updateWithScalar(
