@@ -16,14 +16,6 @@
 
 #pragma once
 
-#include <firmware/estimator/quaternion.hpp>
-#include <firmware/estimator/three_axis_subsampler.hpp>
-#include <firmware/flow_filter.hpp>
-#include <firmware/imu/filter.hpp>
-#include <firmware/opticalflow/filter.hpp>
-#include <firmware/zranger/filter.hpp>
-#include <num.hpp>
-
 namespace hf {
 
     class EkfCore { 
