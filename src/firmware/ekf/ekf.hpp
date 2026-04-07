@@ -124,12 +124,12 @@ namespace hf {
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
 
                 float FP[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                dot(F, _P, FP);
+                EkfCore::dot(F, _P, FP);
 
                 float Ft[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                trans(F, Ft);
+                EkfCore::trans(F, Ft);
 
-                dot(FP, Ft, _P);
+                EkfCore::dot(FP, Ft, _P);
 
                 // -----------------------------------------------------
 
@@ -562,7 +562,7 @@ namespace hf {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
                 float PHt[EkfCore::STATE_DIM] = {};
-                dot(P, h, PHt); // PH'
+                EkfCore::dot(P, h, PHt); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
@@ -577,7 +577,7 @@ namespace hf {
                 float GH_I[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
                 float GH_I_P[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
 
-                outer(G, h, GH);
+                EkfCore::outer(G, h, GH);
 
                 // GH - I
                 for (size_t i=0; i<EkfCore::STATE_DIM; i++) { 
@@ -585,13 +585,13 @@ namespace hf {
                 }
 
                 // (GH - I)'
-                trans(GH, GH_I);
+                EkfCore::trans(GH, GH_I);
 
                 // (GH - I)*P
-                dot(GH, P, GH_I_P); 
+                EkfCore::dot(GH, P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'
-                dot(GH_I_P, GH_I, P);
+                EkfCore::dot(GH_I_P, GH_I, P);
 
                 // add the measurement variance and ensure boundedness and symmetry
                 for (int i=0; i<EkfCore::STATE_DIM; i++) {
@@ -651,61 +651,6 @@ namespace hf {
                     isnan(pval) || pval > MAX_COVARIANCE ? MAX_COVARIANCE :
                     i==j && pval < MIN_COVARIANCE ? MIN_COVARIANCE :
                     pval;
-            }
-
-            // C = A * B
-            static void dot(
-                    const float A[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
-                    const float B[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
-                    float C[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
-            {
-                for (int i=0; i<EkfCore::STATE_DIM; ++i) {
-                    for (int j=0; j<EkfCore::STATE_DIM; ++j) {
-                        C[i][j] = 0;
-                        for (int k=0; k<EkfCore::STATE_DIM; ++k) {
-                            C[i][j] += A[i][k] * B[k][j];
-                        }
-                    }
-                }
-            }
-
-            // y = A * x
-            static void dot(
-                    const float A[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
-                    const float x[EkfCore::STATE_DIM],
-                    float y[EkfCore::STATE_DIM])
-            {
-                for (int i=0; i<EkfCore::STATE_DIM; i++) {
-                    y[i] = 0; 
-                    for (int j=0; j<EkfCore::STATE_DIM; j++) {
-                        y[i] += A[i][j] * x[j];
-                    }
-                }
-            }
-
-            // A = x * y
-            static void outer(
-                    const float x[EkfCore::STATE_DIM],
-                    const float y[EkfCore::STATE_DIM],
-                    float C[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
-            {
-                for (size_t i=0; i<EkfCore::STATE_DIM; i++) {
-                    for (size_t j=0; j<EkfCore::STATE_DIM; j++) {
-                        C[i][j] = x[i] * y[j];
-                    }
-                }
-            }
-
-            // At = A^T
-            static void trans(
-                    const float A[EkfCore::STATE_DIM][EkfCore::STATE_DIM],
-                    float At[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
-            {
-                for (int i=0; i<EkfCore::STATE_DIM; ++i) {
-                    for (int j=0; j<EkfCore::STATE_DIM; ++j) {
-                        At[i][j] = A[j][i];
-                    }
-                }
             }
     };
 
