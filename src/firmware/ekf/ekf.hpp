@@ -204,11 +204,9 @@ namespace hf {
                 _gyroLatest = imudata.gyroDps;
 
                 if (_didUpdateWithFlowDeck) {
-                    updateWithRange(_zrangerFilterLatest, _R, _core.x, _core.P);
-                    updateWithFlow(
-                            _opticalFlowFilterLatest, _gyroLatest, _R[2][2],
-                            _core.x, _core.P);
-                }
+                    updateWithRange(_zrangerFilterLatest, _R);
+                    updateWithFlow(_opticalFlowFilterLatest,_gyroLatest,
+                            _R[2][2]); }
 
                 if (_didUpdateWithFlowDeck || _didPredict) {
 
@@ -431,11 +429,8 @@ namespace hf {
                 enforceSymmetry();
             }
 
-            void updateWithRange(
-                    const ZRangerFilter & zrfilter,
-                    const float R[3][3],
-                    float x[EkfCore::STATE_DIM],
-                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
+            void updateWithRange(const ZRangerFilter & zrfilter,
+                    const float R[3][3])
             {
                 // Updates the filter with a measured distance in the zb direction using the
                 float h[EkfCore::STATE_DIM] = {};
@@ -445,7 +440,7 @@ namespace hf {
                 if (fabs(R[2][2]) > 0.1f && R[2][2] > 0) {
                     const auto angle = max(0, fabsf(acosf(R[2][2])) -
                             Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = x[EkfCore::STATE_Z] / cosf(angle);
+                    const auto predictedDistance = _core.x[EkfCore::STATE_Z] / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
@@ -453,16 +448,14 @@ namespace hf {
                     h[EkfCore::STATE_Z] = 1 / cosf(angle); 
 
                     ekf_updateWithScalar(h, measuredDistance-predictedDistance,
-                            zrfilter.stdev, x, P);
+                            zrfilter.stdev, _core.x, _core.P);
                 }
             }
  
             void updateWithFlow(
                     const OpticalFlowFilter & offilter,
                     const ThreeAxis & gyro,
-                    const float r22,
-                    float x[EkfCore::STATE_DIM],
-                    float P[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
+                    const float r22)
             {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
@@ -477,11 +470,11 @@ namespace hf {
                 const auto omegax_b = gyro.x * Num::DEG2RAD;
                 const auto omegay_b = gyro.y * Num::DEG2RAD;
 
-                const auto dx_g = x[EkfCore::STATE_VX];
-                const auto dy_g = x[EkfCore::STATE_VY];
+                const auto dx_g = _core.x[EkfCore::STATE_VX];
+                const auto dy_g = _core.x[EkfCore::STATE_VY];
 
                 // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(x[EkfCore::STATE_Z], 0.1);
+                const auto z_g  = max(_core.x[EkfCore::STATE_Z], 0.1);
 
                 // ~~~ X velocity prediction and update ~~~
                 // predicts the number of accumulated pixels in the x-direction
@@ -496,9 +489,9 @@ namespace hf {
                 hx[EkfCore::STATE_VX] = (Npix * offilter.dt / thetapix) * 
                     (r22 / z_g);
 
-                //First update
+                // First update
                 ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
-                        offilter.stdDevX*FLOW_RESOLUTION, x, P);
+                        offilter.stdDevX*FLOW_RESOLUTION, _core.x, _core.P);
 
                 // ~~~ Y velocity prediction and update ~~~
                 float hy[EkfCore::STATE_DIM] = {};
@@ -513,7 +506,7 @@ namespace hf {
 
                 // Second update
                 ekf_updateWithScalar(hy, (measuredNY-predictedNY),
-                        offilter.stdDevY*FLOW_RESOLUTION, x, P);
+                        offilter.stdDevY*FLOW_RESOLUTION, _core.x, _core.P);
             }
 
             void enforceSymmetry()
