@@ -146,6 +146,8 @@ namespace hf {
                 }
             }
 
+        private:
+
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
                     const float maxval) -> float
@@ -155,7 +157,6 @@ namespace hf {
                     i==j && pval < minval ? minval :
                     pval;
             }
-
 
             // C = A * B
             static void dot(
@@ -211,5 +212,6 @@ namespace hf {
                     }
                 }
             }
+
     };
 }
