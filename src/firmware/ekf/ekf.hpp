@@ -138,7 +138,7 @@ namespace hf {
                 const auto vz = _x[STATE_VZ];
 
                 // The linearized Jacobean matrix
-                static float F[STATE_DIM][STATE_DIM];
+                float F[STATE_DIM][STATE_DIM] = {};
 
                 // position
                 F[STATE_Z][STATE_Z] = 1;
@@ -426,6 +426,10 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
+            static void makeJacobian(float F[STATE_DIM][STATE_DIM])
+            {
+            }
+
             static void addProcessNoise(const float dt, const uint32_t msec_curr,
                     float P[STATE_DIM][STATE_DIM]) 
             {
@@ -443,8 +447,6 @@ namespace hf {
 
                 ekf_enforceSymmetry(P);
             }
-
-            //////////////////////////////////////////////////////////////////
 
             static void updateWithRange(
                     const ZRangerFilter & zrfilter,
