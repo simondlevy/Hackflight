@@ -286,7 +286,9 @@ namespace hf {
 
                 if (_didUpdateWithFlowDeck) {
                     updateWithRange(_zrangerFilterLatest, _R, _x, _P);
-                    updateWithFlow(_opticalFlowFilterLatest);
+                    updateWithFlow(
+                            _opticalFlowFilterLatest, _gyroLatest, _R[2][2],
+                            _x, _P);
                 }
 
                 if (_didUpdateWithFlowDeck || _didPredict) {
@@ -442,66 +444,6 @@ namespace hf {
                 ekf_enforceSymmetry(P);
             }
 
-            void updateWithFlow(const OpticalFlowFilter & offilter)
-            {
-                const auto gyro = _gyroLatest;
-
-                // [pixels] (same in x and y)
-                float Npix = 35.0;                      
-
-                //float thetapix = Num::DEG2RAD * 4.0f;
-                // [rad]    (same in x and y)
-                // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
-                // corresponding ground length
-                float thetapix = 0.71674f;
-
-                //~~~ Body rates ~~~
-                float omegax_b = gyro.x * Num::DEG2RAD;
-                float omegay_b = gyro.y * Num::DEG2RAD;
-
-                float dx_g = _x[STATE_VX];
-                float dy_g = _x[STATE_VY];
-                float z_g = 0.0;
-                // Saturate elevation in prediction and correction to avoid singularities
-                if ( _x[STATE_Z] < 0.1f ) {
-                    z_g = 0.1;
-                } else {
-                    z_g = _x[STATE_Z];
-                }
-
-                // ~~~ X velocity prediction and update ~~~
-                // predicts the number of accumulated pixels in the x-direction
-                float hx[STATE_DIM] = {};
-                const auto predictedNX = (offilter.dt * Npix / thetapix ) * 
-                    ((dx_g * _R[2][2] / z_g) - omegay_b);
-                const auto measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
-
-                // derive measurement equation with respect to dx (and z?)
-                hx[STATE_Z] = (Npix * offilter.dt / thetapix) * 
-                    ((_R[2][2] * dx_g) / (-z_g * z_g));
-                hx[STATE_VX] = (Npix * offilter.dt / thetapix) * 
-                    (_R[2][2] / z_g);
-
-                //First update
-                ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
-                        offilter.stdDevX*FLOW_RESOLUTION, _x, _P);
-
-                // ~~~ Y velocity prediction and update ~~~
-                float hy[STATE_DIM] = {};
-                const auto predictedNY = (offilter.dt * Npix / thetapix ) * 
-                    ((dy_g * _R[2][2] / z_g) + omegax_b);
-                const auto measuredNY = offilter.dpixely*FLOW_RESOLUTION;
-
-                // derive measurement equation with respect to dy (and z?)
-                hy[STATE_Z] = (Npix * offilter.dt / thetapix) * 
-                    ((_R[2][2] * dy_g) / (-z_g * z_g));
-                hy[STATE_VY] = (Npix * offilter.dt / thetapix) * (_R[2][2] / z_g);
-
-                // Second update
-                ekf_updateWithScalar(hy, (measuredNY-predictedNY),
-                        offilter.stdDevY*FLOW_RESOLUTION, _x, _P);
-            }
-
             //////////////////////////////////////////////////////////////////
 
             static void updateWithRange(
@@ -535,6 +477,69 @@ namespace hf {
             }
 
  
+            static void updateWithFlow(
+                    const OpticalFlowFilter & offilter,
+                    const ThreeAxis & gyro,
+                    const float r22,
+                    float x[STATE_DIM],
+                    float P[STATE_DIM][STATE_DIM])
+            {
+                // [pixels] (same in x and y)
+                float Npix = 35.0;                      
+
+                //float thetapix = Num::DEG2RAD * 4.0f;
+                // [rad]    (same in x and y)
+                // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
+                // corresponding ground length
+                float thetapix = 0.71674f;
+
+                //~~~ Body rates ~~~
+                float omegax_b = gyro.x * Num::DEG2RAD;
+                float omegay_b = gyro.y * Num::DEG2RAD;
+
+                float dx_g = x[STATE_VX];
+                float dy_g = x[STATE_VY];
+                float z_g = 0.0;
+                // Saturate elevation in prediction and correction to avoid singularities
+                if ( x[STATE_Z] < 0.1f ) {
+                    z_g = 0.1;
+                } else {
+                    z_g = x[STATE_Z];
+                }
+
+                // ~~~ X velocity prediction and update ~~~
+                // predicts the number of accumulated pixels in the x-direction
+                float hx[STATE_DIM] = {};
+                const auto predictedNX = (offilter.dt * Npix / thetapix ) * 
+                    ((dx_g * r22 / z_g) - omegay_b);
+                const auto measuredNX = offilter.dpixelx*FLOW_RESOLUTION;
+
+                // derive measurement equation with respect to dx (and z?)
+                hx[STATE_Z] = (Npix * offilter.dt / thetapix) * 
+                    ((r22 * dx_g) / (-z_g * z_g));
+                hx[STATE_VX] = (Npix * offilter.dt / thetapix) * 
+                    (r22 / z_g);
+
+                //First update
+                ekf_updateWithScalar(hx, (measuredNX-predictedNX), 
+                        offilter.stdDevX*FLOW_RESOLUTION, x, P);
+
+                // ~~~ Y velocity prediction and update ~~~
+                float hy[STATE_DIM] = {};
+                const auto predictedNY = (offilter.dt * Npix / thetapix ) * 
+                    ((dy_g * r22 / z_g) + omegax_b);
+                const auto measuredNY = offilter.dpixely*FLOW_RESOLUTION;
+
+                // derive measurement equation with respect to dy (and z?)
+                hy[STATE_Z] = (Npix * offilter.dt / thetapix) * 
+                    ((r22 * dy_g) / (-z_g * z_g));
+                hy[STATE_VY] = (Npix * offilter.dt / thetapix) * (r22 / z_g);
+
+                // Second update
+                ekf_updateWithScalar(hy, (measuredNY-predictedNY),
+                        offilter.stdDevY*FLOW_RESOLUTION, x, P);
+            }
+
             static void ekf_init(
                     float x[STATE_DIM], float P[STATE_DIM][STATE_DIM]) 
             {
