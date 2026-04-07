@@ -282,18 +282,18 @@ namespace hf {
                             ekf_addCovarianceNoise(ekf._P, noise)) :
                     ekf._P;
 
-                (void)P;
- #if 0
-                addProcessNoise(msec_curr);
+                const auto lastProcessNoiseUpdateMs = shouldUpdate ? msec_curr :
+                    ekf._lastProcessNoiseUpdateMs;
 
-                _accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        _accelSubSampler, imudata.accelGs);
+                const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        ekf._accelSubSampler, imudata.accelGs);
 
-                _gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        _gyroSubSampler, imudata.gyroDps);
+                const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        ekf._gyroSubSampler, imudata.gyroDps);
 
-                _gyroLatest = imudata.gyroDps;
+                const auto gyroLatest = imudata.gyroDps;
 
+#if 0
                 if (_didUpdateWithFlowDeck) {
                     updateWithRange(_zrangerFilterLatest);
                     updateWithFlow(_opticalFlowFilterLatest);
