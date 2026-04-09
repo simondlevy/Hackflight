@@ -46,15 +46,9 @@ namespace hf {
 
             EkfCore()
             {
-                for (int i=0; i< STATE_DIM; i++) {
-
-                    x[i] = 0;
-
-                    for (int j=0; j < STATE_DIM; j++) {
-                        P[i*STATE_DIM+j] = 0; 
-                    }
-                }
-             }
+                x = vector();
+                P = matrix();
+            }
 
             // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
             void predict(const matrix & F)
