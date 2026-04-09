@@ -238,12 +238,13 @@ namespace hf {
                 const auto dt =
                     (msec_curr - ekf.lastProcessNoiseUpdateMs) / 1000.0f;
 
-#if 0
-                if (dt > 0) {
-                    addProcessNoise(dt, msec_curr);
-                    lastProcessNoiseUpdateMs = msec_curr;
-                }
+                const auto P =dt > 0 ? addProcessNoise(ekf.P, dt, msec_curr) :
+                    ekf.P;
 
+                const auto lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
+                    ekf.lastProcessNoiseUpdateMs;
+
+#if 0
                 accelSubSampler = ThreeAxisSubSampler::accumulate(
                         accelSubSampler, imudata.accelGs);
 
@@ -548,6 +549,24 @@ namespace hf {
                 F[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 return F;
+            }
+
+            static auto addProcessNoise(const matrix & P, const float dt,
+                    const uint32_t msec_curr) ->matrix
+            {
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
+
+                
+
+                return enforceSymmetry(addCovarianceNoise(P, noise));
             }
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)
