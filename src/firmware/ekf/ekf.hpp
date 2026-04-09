@@ -259,7 +259,7 @@ namespace hf {
 
             } // predict
 
-             void update(const ImuFilter::Data & imudata,
+            void update(const ImuFilter::Data & imudata,
                     const uint32_t msec_curr)
             {
                 const auto dt =
@@ -336,14 +336,6 @@ namespace hf {
                 }
             }
 
-            void update(const ZRangerFilter & zrfilter,
-                    const OpticalFlowFilter & offilter)
-            {
-                zrangerFilterLatest = zrfilter;
-                opticalFlowFilterLatest = offilter;
-                didUpdateWithFlowDeck = true;
-            }
-
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
                 const auto x = ekf.core.x;
@@ -388,6 +380,14 @@ namespace hf {
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
+            }
+
+            void update(const ZRangerFilter & zrfilter,
+                    const OpticalFlowFilter & offilter)
+            {
+                zrangerFilterLatest = zrfilter;
+                opticalFlowFilterLatest = offilter;
+                didUpdateWithFlowDeck = true;
             }
 
         private:
@@ -517,23 +517,6 @@ namespace hf {
                 return enforceSymmetry(addCovarianceNoise(P, noise));
             }
 
-            void addProcessNoise(const float dt, const uint32_t msec_curr)
-            {
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
-
-                addCovarianceNoise(noise);
-
-                core.P = enforceSymmetry(core.P);
-            }
-
             static auto updateWithRange(
                     const Core & core,
                     const ZRangerFilter & zrfilter,
@@ -554,16 +537,6 @@ namespace hf {
                         zrfilter.stdev);
             }
 
-            void updateWithFlow(const OpticalFlowFilter & offilter,
-                    const ThreeAxis & gyro, const float r22)
-            {
-                core = updateWithFlowAxis(core, offilter.dt, r22,
-                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
-
-                core = updateWithFlowAxis(core, offilter.dt, r22,
-                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
-            }
-
             static auto updateWithFlowAxis(
                     const Core & core,
                     const float dt,
@@ -582,7 +555,8 @@ namespace hf {
                 // corresponding ground length
                 const float thetapix = 0.71674f;
 
-                // Saturate elevation in prediction and correction to avoid singularities
+                // Saturate elevation in prediction and correction to avoid
+                // singularities
                 const auto z_g  = max(core.x[STATE_Z], 0.1);
 
                 const auto dg = core.x[state_index];
@@ -694,13 +668,6 @@ namespace hf {
                 return Pnew;
             }
 
-            void addCovarianceNoise(const float * noise)
-            {
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    core.P[k*STATE_DIM+k] += noise[k] * noise[k];
-                }
-            }
-
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
                     const float maxval) -> float
@@ -796,5 +763,43 @@ namespace hf {
                         dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
                         dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
             }
+
+            //////////////////////////////////////////////////////////////////
+
+            void addCovarianceNoise(const float * noise)
+            {
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    core.P[k*STATE_DIM+k] += noise[k] * noise[k];
+                }
+            }
+
+
+            void addProcessNoise(const float dt, const uint32_t msec_curr)
+            {
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
+
+                addCovarianceNoise(noise);
+
+                core.P = enforceSymmetry(core.P);
+            }
+
+            void updateWithFlow(const OpticalFlowFilter & offilter,
+                    const ThreeAxis & gyro, const float r22)
+            {
+                core = updateWithFlowAxis(core, offilter.dt, r22,
+                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
+
+                core = updateWithFlowAxis(core, offilter.dt, r22,
+                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
+            }
+
     };
 }
