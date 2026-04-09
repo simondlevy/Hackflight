@@ -672,10 +672,9 @@ namespace hf {
                     const float minCovariance,
                     const float maxCovariance) -> EKF
             {
-#if 0
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                const auto PHt = dot(P, h); // PH'
+                const auto PHt = dot(ekf.P, h); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -698,14 +697,15 @@ namespace hf {
                 const auto GH_I = trans(GH);
 
                 // (GH - I)*P
-                const auto GH_I_P = dot(GH, P); 
+                const auto GH_I_P = dot(GH, ekf.P); 
 
                 // (GH - I)*P*(GH - I)'
-                P = dot(GH_I_P, GH_I);
+                auto P = dot(GH_I_P, GH_I);
 
                 // State update
+                auto x = vector();
                 for (int i=0; i<STATE_DIM; i++) {
-                    x[i] += G[i] * error; // state update
+                    x[i] = ekf.x[i] + G[i] * error; 
                 }
 
                 // Add the measurement variance and ensure boundedness and symmetry
@@ -721,7 +721,6 @@ namespace hf {
                                     minCovariance, maxCovariance); 
                     }
                 }
-#endif
 
                 return ekf;
             }
