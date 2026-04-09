@@ -88,6 +88,13 @@ namespace hf {
 
             class Core {
 
+                // State vector
+                vector x;
+
+                // Covariance matrix
+                matrix P;
+
+                Core& operator=(const Core& other) = default;
             };
 
         public:
@@ -118,19 +125,19 @@ namespace hf {
 
             EKF(const EKF & ekf, const vector x, const matrix & P)
                 :
-                x(x),
-                P(P),
-                q(ekf.q),
-                gyroLatest(ekf.gyroLatest),
-                accelSubSampler(ekf.accelSubSampler),
-                gyroSubSampler(ekf.gyroSubSampler),
-                R(ekf.R),
-                didPredict(ekf.didPredict),
-                didUpdateWithFlowDeck(ekf.didUpdateWithFlowDeck),
-                zrangerFilterLatest(ekf.zrangerFilterLatest),
-                opticalFlowFilterLatest(ekf.opticalFlowFilterLatest),
-                lastPredictionMs(ekf.lastPredictionMs),
-                lastProcessNoiseUpdateMs(ekf.lastProcessNoiseUpdateMs) {}
+                    x(x),
+                    P(P),
+                    q(ekf.q),
+                    gyroLatest(ekf.gyroLatest),
+                    accelSubSampler(ekf.accelSubSampler),
+                    gyroSubSampler(ekf.gyroSubSampler),
+                    R(ekf.R),
+                    didPredict(ekf.didPredict),
+                    didUpdateWithFlowDeck(ekf.didUpdateWithFlowDeck),
+                    zrangerFilterLatest(ekf.zrangerFilterLatest),
+                    opticalFlowFilterLatest(ekf.opticalFlowFilterLatest),
+                    lastPredictionMs(ekf.lastPredictionMs),
+                    lastProcessNoiseUpdateMs(ekf.lastProcessNoiseUpdateMs) {}
 
             EKF(
                     const vector x,
