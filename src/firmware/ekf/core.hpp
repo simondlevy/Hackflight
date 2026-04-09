@@ -62,8 +62,7 @@ namespace hf {
                 matrix FP;
                 dot(F, P, FP);
 
-                matrix Ft;
-                trans(F, Ft);
+                const auto Ft = trans(F);
 
                 dot(FP, Ft, P);
             }
@@ -98,8 +97,7 @@ namespace hf {
                 }
 
                 // (GH - I)'
-                matrix GH_I;
-                trans(GH, GH_I);
+                const auto GH_I = trans(GH);
 
                 // (GH - I)*P
                 matrix GH_I_P;
@@ -179,13 +177,17 @@ namespace hf {
             }
 
             // At = A^T
-            static void trans(const matrix & A, matrix & At)
+            static auto trans(const matrix & A) -> matrix
             {
+                auto At = matrix();
+
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
                         At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
                     }
                 }
+
+                return At;
             }
 
             // C = A * B
