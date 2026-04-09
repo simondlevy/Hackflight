@@ -117,7 +117,6 @@ namespace hf {
 
                 const auto newF = new_makeJacobian(dt, gyro, _core.x, _R);
 
-
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
@@ -423,7 +422,62 @@ namespace hf {
                 const auto vy = x[2];
                 const auto vz = x[3];
 
-                return tinyekf::Matrix();
+                return tinyekf::Matrix(
+                        1,
+                        R.zx*dt,
+                        R.zy*dt,
+                        R.zz*dt,
+                        (vy*R.zz - vz*R.zy)*dt,
+                        (-vx*R.zz + vz*R.zx)*dt,
+                        (vx*R.zy - vy*R.zx)*dt,
+
+                        0,
+                        1,
+                        gyro.z*dt,
+                        -gyro.y*dt,
+                        0,
+                        GRAVITY*R.zz*dt,
+                        -GRAVITY*R.zy*dt,
+
+                        0,
+                        -gyro.z*dt,
+                        1,
+                        gyro.x*dt,
+                        -GRAVITY*R.zz*dt,
+                        0,
+                        GRAVITY*R.zx*dt,
+
+                        0,
+                        gyro.y*dt,
+                        -gyro.x*dt,
+                        1,
+                        GRAVITY*R.zy*dt,
+                        -GRAVITY*R.zx*dt,
+                        0,
+
+                        0,
+                        0,
+                        0,
+                        0,
+                        1 - d1*d1/2 - d2*d2/2,
+                        d2 + d0*d1/2,
+                        -d1 + d0*d2/2,
+
+                        0,
+                        0,
+                        0,
+                        0,
+                        -d2 + d0*d1/2,
+                        1 - d0*d0/2 - d2*d2/2,
+                        d0 + d1*d2/2,
+
+                        0,
+                        0,
+                        0,
+                        0,
+                        d1 + d0*d2/2,
+                        -d0 + d1*d2/2,
+                        1 - d0*d0/2 - d1*d1/2);
             }
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)
