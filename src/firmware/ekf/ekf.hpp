@@ -259,92 +259,6 @@ namespace hf {
 
             } // predict
 
-            static auto update(
-                    const EKF & ekf, 
-                    const ImuFilter::Data & imudata,
-                    const uint32_t msec_curr) -> EKF
-            {
-                const auto dt =
-                    (msec_curr - ekf.lastProcessNoiseUpdateMs) / 1000.0f;
-
-                const auto P =dt > 0 ? addProcessNoise(ekf.core.P, dt, msec_curr) :
-                    ekf.core.P;
-
-                const auto lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
-                    ekf.lastProcessNoiseUpdateMs;
-
-                const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.accelSubSampler, imudata.accelGs);
-
-                const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.gyroSubSampler, imudata.gyroDps);
-
-                const auto gyroLatest = imudata.gyroDps;
-
-                (void)P;
-                (void)lastProcessNoiseUpdateMs;
-                (void)accelSubSampler;
-                (void)gyroSubSampler;
-                (void)gyroLatest;
-
-#if 0
-                if (didUpdateWithFlowDeck) {
-
-                    updateWithRange(zrangerFilterLatest, R);
-
-                    updateWithFlow(opticalFlowFilterLatest, gyroLatest,R.zz);
-                }
-
-                if (didUpdateWithFlowDeck || didPredict) {
-
-                    // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const auto v = ThreeAxis(
-                            x[STATE_D0],
-                            x[STATE_D1],
-                            x[STATE_D2]);
-
-                    // Move attitude error into attitude if any of the angle errors are
-                    // large enough
-                    if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
-                            smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
-
-                        // normalize and store the result
-                        q = q / Quaternion::l2norm(rotate(v, q));
-                    }
-
-                    // Convert the new attitude to a rotation matrix, such that we can
-                    // rotate body-frame velocity and accel
-                    R = Rotation(
-                            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
-                            2 * q.x * q.y - 2 * q.w * q.z,
-                            2 * q.x * q.z + 2 * q.w * q.y,
-                            2 * q.x * q.y + 2 * q.w * q.z,
-                            q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z,
-                            2 * q.y * q.z - 2 * q.w * q.x,
-                            2 * q.x * q.z - 2 * q.w * q.y,
-                            2 * q.y * q.z + 2 * q.w * q.x,
-                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
-
-                    // reset the attitude error
-                    x[STATE_D0] = 0;
-                    x[STATE_D1] = 0;
-                    x[STATE_D2] = 0;
-
-                    enforceSymmetry();
-                }
-
-                if (didUpdateWithFlowDeck) {
-                    didUpdateWithFlowDeck = false;
-                }
-
-                if (didPredict) {
-                    didPredict = false;
-                }
-#endif
-
-                return ekf;
-            }
-
              void update(const ImuFilter::Data & imudata,
                     const uint32_t msec_curr)
             {
@@ -366,8 +280,12 @@ namespace hf {
 
                 if (didUpdateWithFlowDeck) {
 
-                    updateWithRange(zrangerFilterLatest, R);
+                    const float rzz = R.zz;
 
+                    // Update the filter iff the measurement is reliable 
+                    core = fabs(rzz) > 0.1 && rzz > 0 ?
+                        updateWithRange(core, zrangerFilterLatest, rzz) : core;
+                    
                     updateWithFlow(opticalFlowFilterLatest, gyroLatest,R.zz);
                 }
 
@@ -616,26 +534,24 @@ namespace hf {
                 core.P = enforceSymmetry(core.P);
             }
 
-            void updateWithRange(const ZRangerFilter & zrfilter,
-                    const Rotation &R)
+            static auto updateWithRange(
+                    const Core & core,
+                    const ZRangerFilter & zrfilter,
+                    const float rzz) -> Core
             {
 
-                // Only update the filter if the measurement is reliable 
-                // (\hat{h} -> infty when R.zz -> 0)
-                if (fabs(R.zz) > 0.1f && R.zz > 0) {
-                    const auto angle = max(0, fabsf(acosf(R.zz)) -
-                            Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = core.x[STATE_Z] / cosf(angle);
-                    const auto measuredDistance = zrfilter.distance_m;
+                const auto angle = max(0, fabsf(acosf(rzz)) -
+                        Num::DEG2RAD * (15.0f / 2));
+                const auto predictedDistance = core.x[STATE_Z] / cosf(angle);
+                const auto measuredDistance = zrfilter.distance_m;
 
-                    // This just acts like a gain for the sensor model. Further
-                    // updates are done in the scalar update function below
-                    const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
+                // This just acts like a gain for the sensor model. Further
+                // updates are done in the scalar update function below
+                const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
-                    core = updateWithScalar(core, h,
-                            measuredDistance-predictedDistance,
-                            zrfilter.stdev);
-                }
+                return updateWithScalar(core, h,
+                        measuredDistance-predictedDistance,
+                        zrfilter.stdev);
             }
 
             void updateWithFlow(const OpticalFlowFilter & offilter,
