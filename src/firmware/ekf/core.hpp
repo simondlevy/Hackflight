@@ -209,18 +209,6 @@ namespace hf {
 
             static void outer(
                     const float x[STATE_DIM],
-                    const float y[STATE_DIM],
-                    float C[STATE_DIM][STATE_DIM])
-            {
-                for (size_t i=0; i<STATE_DIM; i++) {
-                    for (size_t j=0; j<STATE_DIM; j++) {
-                        C[i][j] = x[i] * y[j];
-                    }
-                }
-            }
-
-            static void outer(
-                    const float x[STATE_DIM],
                     const vector & y,
                     float C[STATE_DIM][STATE_DIM])
             {
