@@ -120,7 +120,23 @@ namespace hf {
                     const OpticalFlowFilter & opticalFlowFilterLatest,
                     const uint32_t lastPredictionMs,
                     const uint32_t lastProcessNoiseUpdateMs)
-            {}
+
+                :
+
+                x(x),
+                P(P),
+                q(q),
+                gyroLatest(gyroLatest),
+                accelSubSampler(accelSubSampler),
+                gyroSubSampler(gyroSubSampler),
+                R(R),
+                didPredict(didPredict),
+                didUpdateWithFlowDeck(didUpdateWithFlowDeck),
+                zrangerFilterLatest(zrangerFilterLatest),
+                opticalFlowFilterLatest(opticalFlowFilterLatest),
+                lastPredictionMs(lastPredictionMs),
+                lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs)
+                {}
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
