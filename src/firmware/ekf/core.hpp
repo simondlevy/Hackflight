@@ -53,11 +53,7 @@ namespace hf {
             // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
             void predict(const matrix & F)
             {
-                const auto FP = dot(F, P);
-
-                const auto Ft = trans(F);
-
-                P = dot(FP, Ft);
+                P = dot(dot(F, P), trans(F));
             }
 
             void updateWithScalar(
