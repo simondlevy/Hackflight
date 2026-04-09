@@ -90,20 +90,20 @@ namespace hf {
                     G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
-                float GH[STATE_DIM][STATE_DIM] = {};
+                matrix GH;
                 outer(G, h, GH);
 
                 // GH - I
                 for (size_t i=0; i<STATE_DIM; i++) { 
-                    GH[i][i] -= 1; 
+                    GH[i*STATE_DIM+i] -= 1; 
                 }
 
                 // (GH - I)'
-                float GH_I[STATE_DIM][STATE_DIM] = {};
+                matrix GH_I;
                 trans(GH, GH_I);
 
                 // (GH - I)*P
-                float GH_I_P[STATE_DIM][STATE_DIM] = {};
+                matrix GH_I_P;
                 dot(GH, P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'
@@ -163,6 +163,38 @@ namespace hf {
                     isnan(pval) || pval > maxval ? maxval :
                     i==j && pval < minval ? minval :
                     pval;
+            }
+
+            // C = A * B
+            static void dot(
+                    const matrix & A,
+                    const matrix & B,
+                    float C[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i][j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i][j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                        }
+                    }
+                }
+            }
+
+            // C = A * B
+            static void dot(
+                    const matrix & A,
+                    const float B[STATE_DIM][STATE_DIM],
+                    matrix & C)
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i*STATE_DIM+j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k][j];
+                        }
+                    }
+                }
             }
 
             // C = A * B
