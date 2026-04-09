@@ -495,7 +495,10 @@ namespace hf {
                     const float error,
                     const float stdMeasNoise)
             {
-                _core.updateWithScalar(h, error, stdMeasNoise,
+                const EkfCore::vector hh = {
+                    h[0], h[1], h[2], h[3], h[4], h[5], h[6]
+                };
+                _core.updateWithScalar(hh, error, stdMeasNoise,
                         MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
