@@ -98,7 +98,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                addCovarianceNoise(pinit);
+                P = addCovarianceNoise(matrix(), pinit);
 
                 didPredict = false;
                 didUpdateWithFlowDeck = false;
