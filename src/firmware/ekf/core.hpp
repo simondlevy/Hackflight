@@ -53,12 +53,11 @@ namespace hf {
             // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
             void predict(const matrix & F)
             {
-                matrix FP;
-                dot(F, P, FP);
+                const auto FP = dot(F, P);
 
                 const auto Ft = trans(F);
 
-                dot(FP, Ft, P);
+                P = dot(FP, Ft);
             }
 
             void updateWithScalar(
@@ -70,8 +69,7 @@ namespace hf {
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                vector PHt;
-                dot(P, h, PHt); // PH'
+                const auto PHt = dot(P, h); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -94,11 +92,10 @@ namespace hf {
                 const auto GH_I = trans(GH);
 
                 // (GH - I)*P
-                matrix GH_I_P;
-                dot(GH, P, GH_I_P); 
+                const auto GH_I_P = dot(GH, P); 
 
                 // (GH - I)*P*(GH - I)'
-                dot(GH_I_P, GH_I, P);
+                P = dot(GH_I_P, GH_I);
 
                 // State update
                 for (int i=0; i<STATE_DIM; i++) {
@@ -185,8 +182,10 @@ namespace hf {
             }
 
             // C = A * B
-            static void dot(const matrix & A, const matrix & B, matrix & C)
+            static auto dot(const matrix & A, const matrix & B) -> matrix
             {
+                auto C = matrix();
+
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
                         C[i*STATE_DIM+j] = 0;
@@ -195,17 +194,23 @@ namespace hf {
                         }
                     }
                 }
+
+                return C;
             }
 
             // y = A * x
-            static void dot(const matrix & A, const vector & x, vector & y)
+            static auto dot(const matrix & A, const vector & x) -> vector
             {
+                vector y = vector();
+
                 for (int i=0; i<STATE_DIM; i++) {
                     y[i] = 0; 
                     for (int j=0; j<STATE_DIM; j++) {
                         y[i] += A[i*STATE_DIM+j] * x[j];
                     }
                 }
+
+                return y;
             }
 
     };
