@@ -106,6 +106,22 @@ namespace hf {
                 lastProcessNoiseUpdateMs = 0;
             }
 
+            EKF(const EKF & ekf, const vector x, const matrix & P)
+                :
+                x(x),
+                P(P),
+                q(ekf.q),
+                gyroLatest(ekf.gyroLatest),
+                accelSubSampler(ekf.accelSubSampler),
+                gyroSubSampler(ekf.gyroSubSampler),
+                R(ekf.R),
+                didPredict(ekf.didPredict),
+                didUpdateWithFlowDeck(ekf.didUpdateWithFlowDeck),
+                zrangerFilterLatest(ekf.zrangerFilterLatest),
+                opticalFlowFilterLatest(ekf.opticalFlowFilterLatest),
+                lastPredictionMs(ekf.lastPredictionMs),
+                lastProcessNoiseUpdateMs(ekf.lastProcessNoiseUpdateMs) {}
+
             EKF(
                     const vector x,
                     const matrix & P,
@@ -722,20 +738,7 @@ namespace hf {
                     }
                 }
 
-                return EKF(
-                        x,
-                        P,
-                        ekf.q,
-                        ekf.gyroLatest,
-                        ekf.accelSubSampler,
-                        ekf.gyroSubSampler,
-                        ekf.R,
-                        ekf.didPredict,
-                        ekf.didUpdateWithFlowDeck,
-                        ekf.zrangerFilterLatest,
-                        ekf.opticalFlowFilterLatest,
-                        ekf.lastPredictionMs,
-                        ekf.lastProcessNoiseUpdateMs);
+                return EKF(ekf, x, P);
             }
 
              void updateWithScalar(
