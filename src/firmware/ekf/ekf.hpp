@@ -80,12 +80,6 @@ namespace hf {
 
             typedef std::array<float, STATE_DIM> vector;
 
-            // State vector
-            vector x;
-
-            // Covariance matrix
-            matrix P;
-
             class Core {
 
                 public:
@@ -124,7 +118,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                P = addCovarianceNoise(matrix(), pinit);
+                core.P = addCovarianceNoise(matrix(), pinit);
 
                 didUpdateWithFlowDeck = false;
                 lastProcessNoiseUpdateMs = 0;
@@ -160,8 +154,7 @@ namespace hf {
 
                 :
 
-                x(x),
-                P(P),
+                core(Core(x, P)),
                 q(q),
                 gyroLatest(gyroLatest),
                 accelSubSampler(accelSubSampler),
@@ -189,24 +182,24 @@ namespace hf {
                 const auto gyro = gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
-                const auto F = makeJacobian(dt, gyro, ekf.x, ekf.R);
+                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.R);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
-                const auto P = dot(dot(F, ekf.P), trans(F));
+                const auto P = dot(dot(F, ekf.core.P), trans(F));
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = ekf.x[STATE_VX];
-                const auto tmpSPY = ekf.x[STATE_VY];
-                const auto tmpSPZ = ekf.x[STATE_VZ];
+                const auto tmpSPX = ekf.core.x[STATE_VX];
+                const auto tmpSPY = ekf.core.x[STATE_VY];
+                const auto tmpSPZ = ekf.core.x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = ekf.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = ekf.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = ekf.core.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = ekf.core.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = ekf.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = ekf.core.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
@@ -214,21 +207,21 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 auto x = vector();
-                x[STATE_Z] = ekf.x[STATE_Z] + ekf.R.zx * dx + ekf.R.zy * dy +
+                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.R.zx * dx + ekf.R.zy * dy +
                     ekf.R.zz * dz - GRAVITY * dt2 / 2;
 
-                x[STATE_VX] = ekf.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
+                x[STATE_VX] = ekf.core.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
                         gyro.y * tmpSPZ - GRAVITY * ekf.R.zx);
 
-                x[STATE_VY] = ekf.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
+                x[STATE_VY] = ekf.core.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
                         gyro.x * tmpSPZ - GRAVITY * ekf.R.zy);
 
-                x[STATE_VZ] = ekf.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
+                x[STATE_VZ] = ekf.core.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
                         gyro.x * tmpSPY - GRAVITY * ekf.R.zz);
 
-                x[STATE_D0] = ekf.x[STATE_D0];
-                x[STATE_D1] = ekf.x[STATE_D1];
-                x[STATE_D2] = ekf.x[STATE_D2];
+                x[STATE_D0] = ekf.core.x[STATE_D0];
+                x[STATE_D1] = ekf.core.x[STATE_D1];
+                x[STATE_D2] = ekf.core.x[STATE_D2];
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
@@ -274,8 +267,8 @@ namespace hf {
                 const auto dt =
                     (msec_curr - ekf.lastProcessNoiseUpdateMs) / 1000.0f;
 
-                const auto P =dt > 0 ? addProcessNoise(ekf.P, dt, msec_curr) :
-                    ekf.P;
+                const auto P =dt > 0 ? addProcessNoise(ekf.core.P, dt, msec_curr) :
+                    ekf.core.P;
 
                 const auto lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
                     ekf.lastProcessNoiseUpdateMs;
@@ -382,9 +375,9 @@ namespace hf {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
                     const auto v = ThreeAxis(
-                            x[STATE_D0],
-                            x[STATE_D1],
-                            x[STATE_D2]);
+                            core.x[STATE_D0],
+                            core.x[STATE_D1],
+                            core.x[STATE_D2]);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -409,11 +402,11 @@ namespace hf {
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
 
                     // reset the attitude error
-                    x[STATE_D0] = 0;
-                    x[STATE_D1] = 0;
-                    x[STATE_D2] = 0;
+                    core.x[STATE_D0] = 0;
+                    core.x[STATE_D1] = 0;
+                    core.x[STATE_D2] = 0;
 
-                    P = enforceSymmetry(P);
+                    core.P = enforceSymmetry(core.P);
                 }
 
                 if (didUpdateWithFlowDeck) {
@@ -435,7 +428,7 @@ namespace hf {
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
-                const auto x = ekf.x;
+                const auto x = ekf.core.x;
 
                 const auto dx =
                     ekf.R.xx*x[STATE_VX] +
@@ -620,7 +613,7 @@ namespace hf {
 
                 addCovarianceNoise(noise);
 
-                P = enforceSymmetry(P);
+                core.P = enforceSymmetry(core.P);
             }
 
             void updateWithRange(const ZRangerFilter & zrfilter,
@@ -632,7 +625,7 @@ namespace hf {
                 if (fabs(R.zz) > 0.1f && R.zz > 0) {
                     const auto angle = max(0, fabsf(acosf(R.zz)) -
                             Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = x[STATE_Z] / cosf(angle);
+                    const auto predictedDistance = core.x[STATE_Z] / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
@@ -672,9 +665,9 @@ namespace hf {
                 const float thetapix = 0.71674f;
 
                 // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(x[STATE_Z], 0.1);
+                const auto z_g  = max(core.x[STATE_Z], 0.1);
 
-                const auto dg = x[state_index];
+                const auto dg = core.x[state_index];
 
                 const auto omegab = gyroval * Num::DEG2RAD;
 
@@ -765,7 +758,7 @@ namespace hf {
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                const auto PHt = dot(P, h); // PH'
+                const auto PHt = dot(core.P, h); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -788,14 +781,14 @@ namespace hf {
                 const auto GH_I = trans(GH);
 
                 // (GH - I)*P
-                const auto GH_I_P = dot(GH, P); 
+                const auto GH_I_P = dot(GH, core.P); 
 
                 // (GH - I)*P*(GH - I)'
-                P = dot(GH_I_P, GH_I);
+                core.P = dot(GH_I_P, GH_I);
 
                 // State update
                 for (int i=0; i<STATE_DIM; i++) {
-                    x[i] += G[i] * error; // state update
+                    core.x[i] += G[i] * error; // state update
                 }
 
                 // Add the measurement variance and ensure boundedness and symmetry
@@ -806,16 +799,17 @@ namespace hf {
                         const auto v = G[i] * R * G[j];
 
                         // add measurement noise
-                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i] + v,
+                        core.P[i*STATE_DIM+j] = core.P[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*core.P[i*STATE_DIM+j] +
+                                    0.5*core.P[j*STATE_DIM+i] + v,
                                     minCovariance, maxCovariance); 
                     }
                 }
             }
 
-            static auto enforceSymmetry(const matrix & P) -> matrix
-            {
-                auto Pnew = matrix();
+             static auto enforceSymmetry(const matrix & P) -> matrix
+             {
+                 auto Pnew = matrix();
 
                 for (int i=0; i<STATE_DIM; i++) {
 
@@ -846,7 +840,7 @@ namespace hf {
             void addCovarianceNoise(const float * noise)
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    P[k*STATE_DIM+k] += noise[k] * noise[k];
+                    core.P[k*STATE_DIM+k] += noise[k] * noise[k];
                 }
             }
 
