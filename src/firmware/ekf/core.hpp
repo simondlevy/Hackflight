@@ -37,6 +37,8 @@ namespace hf {
                 STATE_DIM
             };
 
+            typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
+
             typedef std::array<float, STATE_DIM> vector;
 
             // State vector
@@ -213,6 +215,53 @@ namespace hf {
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
                         At[i][j] = A[j][i];
+                    }
+                }
+            }
+
+            //////////////////////////////////////////////////////////////////
+
+            // C = A * B
+            static void dot(const matrix & A, const matrix & B, matrix & C)
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i*STATE_DIM+j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i*STATE_DIM+j]+=
+                                A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                        }
+                    }
+                }
+            }
+
+            // y = A * x
+            static void dot(const matrix & A, const vector & x, vector & y)
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+                    y[i] = 0; 
+                    for (int j=0; j<STATE_DIM; j++) {
+                        y[i] += A[i*STATE_DIM+j] * x[j];
+                    }
+                }
+            }
+
+            // C = x * y
+            static void outer(const vector & x, const vector & y, matrix & C)
+            {
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    for (size_t j=0; j<STATE_DIM; j++) {
+                        C[i*STATE_DIM+j] = x[i] * y[j];
+                    }
+                }
+            }
+
+            // At = A^T
+            static void trans(const matrix & A, matrix & At)
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
                     }
                 }
             }
