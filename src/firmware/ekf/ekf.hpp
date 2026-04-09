@@ -132,6 +132,15 @@ namespace hf {
                 lastProcessNoiseUpdateMs = 0;
             }
 
+            EKF(const Core & core)
+                : core(core)
+            {
+                didPredict = false;
+                didUpdateWithFlowDeck = false;
+                lastPredictionMs = 0;
+                lastProcessNoiseUpdateMs = 0;
+             }
+
             EKF(const EKF & ekf, const vector x, const matrix & P)
                 :
                     x(x),
