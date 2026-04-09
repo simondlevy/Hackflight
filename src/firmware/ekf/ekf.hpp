@@ -80,6 +80,16 @@ namespace hf {
 
             typedef std::array<float, STATE_DIM> vector;
 
+            // State vector
+            vector x;
+
+            // Covariance matrix
+            matrix P;
+
+            class Core {
+
+            };
+
         public:
 
             EKF& operator=(const EKF& other) = default;
@@ -462,12 +472,6 @@ namespace hf {
         private:
 
             //////////////////////////////////////////////////////////////////
-
-            // State vector
-            vector x;
-
-            // Covariance matrix
-            matrix P;
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
