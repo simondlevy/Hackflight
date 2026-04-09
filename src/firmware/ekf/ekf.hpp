@@ -155,26 +155,27 @@ namespace hf {
                 // The linearized Jacobean matrix
                 const auto F = makeJacobian(dt, gyro, ekf.x, ekf.R);
 
-#if 0
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
-                P = dot(dot(F, P), trans(F));
+                const auto P = dot(dot(F, ekf.P), trans(F));
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = x[STATE_VX];
-                const auto tmpSPY = x[STATE_VY];
-                const auto tmpSPZ = x[STATE_VZ];
+                const auto tmpSPX = ekf.x[STATE_VX];
+                const auto tmpSPY = ekf.x[STATE_VY];
+                const auto tmpSPZ = ekf.x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = ekf.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = ekf.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = x[STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = ekf.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
+
+#if 0
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
