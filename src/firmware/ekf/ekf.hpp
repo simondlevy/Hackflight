@@ -230,7 +230,86 @@ namespace hf {
 
             } // predict
 
-            void update(const ImuFilter::Data & imudata,
+            static auto update(
+                    const EKF & ekf, 
+                    const ImuFilter::Data & imudata,
+                    const uint32_t msec_curr) -> EKF
+            {
+                const auto dt =
+                    (msec_curr - ekf.lastProcessNoiseUpdateMs) / 1000.0f;
+
+#if 0
+                if (dt > 0) {
+                    addProcessNoise(dt, msec_curr);
+                    lastProcessNoiseUpdateMs = msec_curr;
+                }
+
+                accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        accelSubSampler, imudata.accelGs);
+
+                gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        gyroSubSampler, imudata.gyroDps);
+
+                gyroLatest = imudata.gyroDps;
+
+                if (didUpdateWithFlowDeck) {
+
+                    updateWithRange(zrangerFilterLatest, R);
+
+                    updateWithFlow(opticalFlowFilterLatest, gyroLatest,R.zz);
+                }
+
+                if (didUpdateWithFlowDeck || didPredict) {
+
+                    // Incorporate the attitude error (Kalman filter state) with the attitude
+                    const auto v = ThreeAxis(
+                            x[STATE_D0],
+                            x[STATE_D1],
+                            x[STATE_D2]);
+
+                    // Move attitude error into attitude if any of the angle errors are
+                    // large enough
+                    if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
+                            smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
+
+                        // normalize and store the result
+                        q = q / Quaternion::l2norm(rotate(v, q));
+                    }
+
+                    // Convert the new attitude to a rotation matrix, such that we can
+                    // rotate body-frame velocity and accel
+                    R = Rotation(
+                            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
+                            2 * q.x * q.y - 2 * q.w * q.z,
+                            2 * q.x * q.z + 2 * q.w * q.y,
+                            2 * q.x * q.y + 2 * q.w * q.z,
+                            q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z,
+                            2 * q.y * q.z - 2 * q.w * q.x,
+                            2 * q.x * q.z - 2 * q.w * q.y,
+                            2 * q.y * q.z + 2 * q.w * q.x,
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
+
+                    // reset the attitude error
+                    x[STATE_D0] = 0;
+                    x[STATE_D1] = 0;
+                    x[STATE_D2] = 0;
+
+                    enforceSymmetry();
+                }
+
+                if (didUpdateWithFlowDeck) {
+                    didUpdateWithFlowDeck = false;
+                }
+
+                if (didPredict) {
+                    didPredict = false;
+                }
+#endif
+
+                return ekf;
+            }
+
+             void update(const ImuFilter::Data & imudata,
                     const uint32_t msec_curr)
             {
                 const auto dt =
@@ -615,6 +694,24 @@ namespace hf {
                                     minCovariance, maxCovariance); 
                     }
                 }
+            }
+
+            static auto enforceSymmetry(const matrix & P,
+                    const float minval, const float maxval) -> matrix
+            {
+                auto newP = matrix();
+
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        newP[i*STATE_DIM+j] = newP[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
+                                    minval, maxval);
+                    }
+                }
+
+                return newP;
             }
 
             void enforceSymmetry(const float minval, const float maxval)
