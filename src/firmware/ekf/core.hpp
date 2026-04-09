@@ -51,7 +51,7 @@ namespace hf {
                     x[i] = 0;
 
                     for (int j=0; j < STATE_DIM; j++) {
-                        P[i][j] = 0; 
+                        P[i*STATE_DIM+j] = 0; 
                     }
                 }
              }
@@ -122,8 +122,8 @@ namespace hf {
                         const auto v = G[i] * R * G[j];
 
                         // add measurement noise
-                        P[i][j] = P[j][i] =
-                            get_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i] + v,
+                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i] + v,
                                     minCovariance, maxCovariance); 
                     }
                 }
@@ -136,8 +136,8 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        P[i][j] = P[j][i] =
-                            get_pval(i, j, 0.5*P[i][j] + 0.5*P[j][i],
+                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
                                     minval, maxval);
                     }
                 }
@@ -146,14 +146,15 @@ namespace hf {
             void addCovarianceNoise(const float * noise)
             {
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    P[k][k] += noise[k] * noise[k];
+                    P[k*STATE_DIM+k] += noise[k] * noise[k];
                 }
             }
 
         private:
 
             // Covariance matrix
-            __attribute__((aligned(4))) float P[STATE_DIM][STATE_DIM];
+            matrix P;
+            //__attribute__((aligned(4))) float P[STATE_DIM][STATE_DIM];
 
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
@@ -185,50 +186,26 @@ namespace hf {
                 }
             }
 
-            ////////////////////////////////////////////////////////////
-
             // C = A * B
-            static void dot(
-                    const matrix & A,
-                    const matrix & B,
-                    float C[STATE_DIM][STATE_DIM])
+            static void dot(const matrix & A, const matrix & B, matrix & C)
             {
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
-                        C[i][j] = 0;
+                        C[i*STATE_DIM+j] = 0;
                         for (int k=0; k<STATE_DIM; ++k) {
-                            C[i][j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
                         }
                     }
                 }
             }
 
             // y = A * x
-            static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const vector & x,
-                    vector & y)
+            static void dot(const matrix & A, const vector & x, vector & y)
             {
                 for (int i=0; i<STATE_DIM; i++) {
                     y[i] = 0; 
                     for (int j=0; j<STATE_DIM; j++) {
-                        y[i] += A[i][j] * x[j];
-                    }
-                }
-            }
-
-            // C = A * B
-            static void dot(
-                    const matrix & A,
-                    const float B[STATE_DIM][STATE_DIM],
-                    matrix & C)
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        C[i*STATE_DIM+j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k][j];
-                        }
+                        y[i] += A[i*STATE_DIM+j] * x[j];
                     }
                 }
             }
