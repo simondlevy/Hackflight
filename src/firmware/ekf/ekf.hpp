@@ -99,8 +99,7 @@ namespace hf {
                 const auto gyro = _gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
-                float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                makeJacobian(dt, gyro, _core.x, _R, F);
+                const auto F = makeJacobian(dt, gyro, _core.x, _R);
 
                 _core.predict(F);
 
@@ -323,12 +322,11 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            static void makeJacobian(
+            static auto makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
                     const EkfCore::vector x,
-                    const Rotation &R,
-                    float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
+                    const Rotation &R) -> EkfCore::matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -338,62 +336,68 @@ namespace hf {
                 const auto vy = x[EkfCore::STATE_VY];
                 const auto vz = x[EkfCore::STATE_VZ];
 
+                const size_t N = EkfCore::STATE_DIM;
+
+                auto F = EkfCore::matrix();
+
                 // position
-                F[EkfCore::STATE_Z][EkfCore::STATE_Z] = 1;
-                F[EkfCore::STATE_Z][EkfCore::STATE_VX] = R.zx*dt;
-                F[EkfCore::STATE_Z][EkfCore::STATE_VY] = R.zy*dt;
-                F[EkfCore::STATE_Z][EkfCore::STATE_VZ] = R.zz*dt;
-                F[EkfCore::STATE_Z][EkfCore::STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
-                F[EkfCore::STATE_Z][EkfCore::STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
-                F[EkfCore::STATE_Z][EkfCore::STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_Z] = 1;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_VX] = R.zx*dt;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_VY] = R.zy*dt;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_VZ] = R.zz*dt;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
+                F[EkfCore::STATE_Z*N+EkfCore::STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
 
-                F[EkfCore::STATE_VX][EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_VX][EkfCore::STATE_VX] = 1; 
-                F[EkfCore::STATE_VX][EkfCore::STATE_VY] = gyro.z*dt;
-                F[EkfCore::STATE_VX][EkfCore::STATE_VZ] =-gyro.y*dt;
-                F[EkfCore::STATE_VX][EkfCore::STATE_D0] =  0;
-                F[EkfCore::STATE_VX][EkfCore::STATE_D1] =  GRAVITY*R.zz*dt;
-                F[EkfCore::STATE_VX][EkfCore::STATE_D2] = -GRAVITY*R.zy*dt;
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_VX] = 1; 
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_VY] = gyro.z*dt;
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_VZ] =-gyro.y*dt;
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_D0] =  0;
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_D1] =  GRAVITY*R.zz*dt;
+                F[EkfCore::STATE_VX*N+EkfCore::STATE_D2] = -GRAVITY*R.zy*dt;
 
-                F[EkfCore::STATE_VY][EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_VY][EkfCore::STATE_VX] =-gyro.z*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_VY] = 1; 
-                F[EkfCore::STATE_VY][EkfCore::STATE_VZ] = gyro.x*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D0] = -GRAVITY*R.zz*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D1] =  0;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D2] =  GRAVITY*R.zx*dt;
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_VX] =-gyro.z*dt;
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_VY] = 1; 
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_VZ] = gyro.x*dt;
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_D0] = -GRAVITY*R.zz*dt;
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_D1] =  0;
+                F[EkfCore::STATE_VY*N+EkfCore::STATE_D2] =  GRAVITY*R.zx*dt;
 
-                F[EkfCore::STATE_VZ][EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_VZ][EkfCore::STATE_VX] = gyro.y*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_VY] =-gyro.x*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_VZ] = 1; 
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D0] =  GRAVITY*R.zy*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D1] = -GRAVITY*R.zx*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D2] =  0;
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_VX] = gyro.y*dt;
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_VY] =-gyro.x*dt;
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_VZ] = 1; 
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_D0] =  GRAVITY*R.zy*dt;
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_D1] = -GRAVITY*R.zx*dt;
+                F[EkfCore::STATE_VZ*N+EkfCore::STATE_D2] =  0;
 
-                F[EkfCore::STATE_D0][EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_D0][EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D0][EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D0][EkfCore::STATE_VZ] = 0; 
-                F[EkfCore::STATE_D0][EkfCore::STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[EkfCore::STATE_D0][EkfCore::STATE_D1] =  d2 + d0*d1/2;
-                F[EkfCore::STATE_D0][EkfCore::STATE_D2] = -d1 + d0*d2/2;
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_VZ] = 0; 
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_D1] =  d2 + d0*d1/2;
+                F[EkfCore::STATE_D0*N+EkfCore::STATE_D2] = -d1 + d0*d2/2;
 
-                F[EkfCore::STATE_D1][EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_D1][EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D1][EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D1][EkfCore::STATE_VZ] = 0; 
-                F[EkfCore::STATE_D1][EkfCore::STATE_D0] = -d2 + d0*d1/2;
-                F[EkfCore::STATE_D1][EkfCore::STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[EkfCore::STATE_D1][EkfCore::STATE_D2] =  d0 + d1*d2/2;
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_VZ] = 0; 
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_D0] = -d2 + d0*d1/2;
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                F[EkfCore::STATE_D1*N+EkfCore::STATE_D2] =  d0 + d1*d2/2;
 
-                F[EkfCore::STATE_D2][EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_D2][EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D2][EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D2][EkfCore::STATE_VZ] = 0; 
-                F[EkfCore::STATE_D2][EkfCore::STATE_D0] =  d1 + d0*d2/2;
-                F[EkfCore::STATE_D2][EkfCore::STATE_D1] = -d0 + d1*d2/2;
-                F[EkfCore::STATE_D2][EkfCore::STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_VZ] = 0; 
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_D0] =  d1 + d0*d2/2;
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_D1] = -d0 + d1*d2/2;
+                F[EkfCore::STATE_D2*N+EkfCore::STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+
+                return F;
              }
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)

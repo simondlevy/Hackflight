@@ -57,16 +57,8 @@ namespace hf {
              }
 
             // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
-            void predict(const float FF[STATE_DIM][STATE_DIM])
+            void predict(const matrix & F)
             {
-                matrix F = {};
-
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        F[i*STATE_DIM+j] = FF[i][j];
-                    }
-                }
-
                 matrix FP;
                 dot(F, P, FP);
 
@@ -194,19 +186,6 @@ namespace hf {
             }
 
             ////////////////////////////////////////////////////////////
-
-            /*
-            // At = A^T
-            static void trans(
-                    const float A[STATE_DIM][STATE_DIM],
-                    matrix & At)
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        At[i*STATE_DIM+j] = A[j][i];
-                    }
-                }
-            }*/
 
             // C = A * B
             static void dot(
