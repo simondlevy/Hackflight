@@ -632,7 +632,8 @@ namespace hf {
                     // updates are done in the scalar update function below
                     const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
-                    updateWithScalar(h, measuredDistance-predictedDistance,
+                    core = updateWithScalar(core, h,
+                            measuredDistance-predictedDistance,
                             zrfilter.stdev);
                 }
             }
