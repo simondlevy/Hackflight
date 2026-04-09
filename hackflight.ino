@@ -44,8 +44,8 @@
 #include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
-#define _DEBUG
-//#define _PROFILE
+//#define _DEBUG
+#define _PROFILE
 
 #define _POSHOLD
 
