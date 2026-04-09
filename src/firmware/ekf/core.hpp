@@ -75,7 +75,7 @@ namespace hf {
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                float PHt[STATE_DIM] = {};
+                vector PHt;
                 dot(P, h, PHt); // PH'
 
                 float HPHR = R; // HPH' + R
@@ -182,22 +182,8 @@ namespace hf {
             // y = A * x
             static void dot(
                     const float A[STATE_DIM][STATE_DIM],
-                    const float x[STATE_DIM],
-                    float y[STATE_DIM])
-            {
-                for (int i=0; i<STATE_DIM; i++) {
-                    y[i] = 0; 
-                    for (int j=0; j<STATE_DIM; j++) {
-                        y[i] += A[i][j] * x[j];
-                    }
-                }
-            }
-
-            // y = A * x
-            static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
                     const vector & x,
-                    float y[STATE_DIM])
+                    vector & y)
             {
                 for (int i=0; i<STATE_DIM; i++) {
                     y[i] = 0; 
