@@ -143,22 +143,6 @@ namespace hf {
                 lastPredictionMs = 0;
              }
 
-            EKF(const EKF & ekf, const vector x, const matrix & P)
-                :
-                    x(x),
-                    P(P),
-                    q(ekf.q),
-                    gyroLatest(ekf.gyroLatest),
-                    accelSubSampler(ekf.accelSubSampler),
-                    gyroSubSampler(ekf.gyroSubSampler),
-                    R(ekf.R),
-                    didUpdateWithFlowDeck(ekf.didUpdateWithFlowDeck),
-                    zrangerFilterLatest(ekf.zrangerFilterLatest),
-                    opticalFlowFilterLatest(ekf.opticalFlowFilterLatest),
-                    lastProcessNoiseUpdateMs(ekf.lastProcessNoiseUpdateMs),
-                    didPredict(ekf.didPredict),
-                    lastPredictionMs(ekf.lastPredictionMs) {}
-
             EKF(
                     const vector x,
                     const matrix & P,
@@ -712,16 +696,16 @@ namespace hf {
             }
 
             static auto updateWithScalar(
-                    const EKF & ekf,
+                    const Core & core,
                     const vector & h,
                     const float error,
                     const float stdMeasNoise,
                     const float minCovariance,
-                    const float maxCovariance) -> EKF
+                    const float maxCovariance) -> Core
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
-                const auto PHt = dot(ekf.P, h); // PH'
+                const auto PHt = dot(core.P, h); // PH'
 
                 float HPHR = R; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -744,7 +728,7 @@ namespace hf {
                 const auto GH_I = trans(GH);
 
                 // (GH - I)*P
-                const auto GH_I_P = dot(GH, ekf.P); 
+                const auto GH_I_P = dot(GH, core.P); 
 
                 // (GH - I)*P*(GH - I)'
                 auto P = dot(GH_I_P, GH_I);
@@ -752,7 +736,7 @@ namespace hf {
                 // State update
                 auto x = vector();
                 for (int i=0; i<STATE_DIM; i++) {
-                    x[i] = ekf.x[i] + G[i] * error; 
+                    x[i] = core.x[i] + G[i] * error; 
                 }
 
                 // Add the measurement variance and ensure boundedness and symmetry
@@ -769,7 +753,7 @@ namespace hf {
                     }
                 }
 
-                return EKF(ekf, x, P);
+                return Core(x, P);
             }
 
              void updateWithScalar(
