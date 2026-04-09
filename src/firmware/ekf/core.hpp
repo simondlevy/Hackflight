@@ -109,10 +109,14 @@ namespace hf {
                 // (GH - I)*P*(GH - I)'
                 dot(GH_I_P, GH_I, P);
 
-                // add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
 
+                // State update
+                for (int i=0; i<STATE_DIM; i++) {
                     x[i] += G[i] * error; // state update
+                }
+
+                // Add the measurement variance and ensure boundedness and symmetry
+                for (int i=0; i<STATE_DIM; i++) {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
@@ -124,6 +128,7 @@ namespace hf {
                                     minCovariance, maxCovariance); 
                     }
                 }
+
             }
 
             void enforceSymmetry(const float minval, const float maxval)
