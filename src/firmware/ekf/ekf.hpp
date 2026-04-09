@@ -74,7 +74,9 @@ namespace hf {
                 STATE_D1,
                 STATE_D2,
                 STATE_DIM
-            };        public:
+            };
+        
+        public:
 
             EKF& operator=(const EKF& other) = default;
 
@@ -308,10 +310,6 @@ namespace hf {
             typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
 
             typedef std::array<float, STATE_DIM> vector;
-
-            // State vector
-            vector x;
-
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -583,7 +581,8 @@ namespace hf {
                 }
             }
 
-        private:
+            // State vector
+            vector x;
 
             // Covariance matrix
             matrix P;
