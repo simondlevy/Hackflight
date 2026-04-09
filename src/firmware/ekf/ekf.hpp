@@ -370,7 +370,7 @@ namespace hf {
                     x[STATE_D1] = 0;
                     x[STATE_D2] = 0;
 
-                    enforceSymmetry();
+                    P = enforceSymmetry(P);
                 }
 
                 if (didUpdateWithFlowDeck) {
@@ -564,7 +564,7 @@ namespace hf {
 
                 addCovarianceNoise(noise);
 
-                enforceSymmetry();
+                P = enforceSymmetry(P);
             }
 
             void updateWithRange(const ZRangerFilter & zrfilter,
@@ -696,18 +696,22 @@ namespace hf {
                 }
             }
 
-            void enforceSymmetry()
+            static auto enforceSymmetry(const matrix & P) -> matrix
             {
+                auto Pnew = matrix();
+
                 for (int i=0; i<STATE_DIM; i++) {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
+                        Pnew[i*STATE_DIM+j] = Pnew[j*STATE_DIM+i] =
                             get_pval(i, j,
                                     0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
                                     MIN_COVARIANCE, MAX_COVARIANCE);
                     }
                 }
+
+                return Pnew;
             }
 
             static auto addCovarianceNoise(const matrix & P,
