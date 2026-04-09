@@ -557,20 +557,21 @@ namespace hf {
             void updateWithFlow(const OpticalFlowFilter & offilter,
                     const ThreeAxis & gyro, const float r22)
             {
-                updateWithFlowAxis(offilter.dt, r22, offilter.dpixelx,
-                        offilter.stdDevX, STATE_VX, gyro.y);
+                core = updateWithFlowAxis(core, offilter.dt, r22,
+                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
 
-                updateWithFlowAxis(offilter.dt, r22, offilter.dpixely,
-                        offilter.stdDevY, STATE_VY, gyro.x);
+                core = updateWithFlowAxis(core, offilter.dt, r22,
+                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
             }
 
-            void updateWithFlowAxis(
+            static auto updateWithFlowAxis(
+                    const Core & core,
                     const float dt,
                     const float r22,
                     const float dpixel,
                     const float stdev,
                     const uint8_t state_index,
-                    const float gyroval)
+                    const float gyroval) -> Core
             {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
@@ -600,8 +601,7 @@ namespace hf {
 
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
-                // First update
-                core = updateWithScalar(core, h, measuredN-predictedN,
+                return updateWithScalar(core, h, measuredN-predictedN,
                         stdev*FLOW_RESOLUTION);
             }
 
