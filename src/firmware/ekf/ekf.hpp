@@ -685,7 +685,7 @@ namespace hf {
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
                 // First update
-                updateWithScalar(h, measuredN-predictedN,
+                core = updateWithScalar(core, h, measuredN-predictedN,
                         stdev*FLOW_RESOLUTION);
             }
 
@@ -746,60 +746,6 @@ namespace hf {
                 }
 
                 return Core(x, P);
-            }
-
-             void updateWithScalar(const vector & h, const float error,
-                     const float stdMeasNoise)
-            {
-                const auto R = stdMeasNoise*stdMeasNoise;
-
-                const auto PHt = dot(core.P, h); // PH'
-
-                float HPHR = R; // HPH' + R
-                for (size_t i=0; i<STATE_DIM; i++) { 
-                    HPHR += h[i] * PHt[i]; 
-                }
-
-                vector G;
-                for (size_t i=0; i<STATE_DIM; i++) {
-                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
-                }
-
-                auto GH = outer(G, h);
-
-                // GH - I
-                for (size_t i=0; i<STATE_DIM; i++) { 
-                    GH[i*STATE_DIM+i] -= 1; 
-                }
-
-                // (GH - I)'
-                const auto GH_I = trans(GH);
-
-                // (GH - I)*P
-                const auto GH_I_P = dot(GH, core.P); 
-
-                // (GH - I)*P*(GH - I)'
-                core.P = dot(GH_I_P, GH_I);
-
-                // State update
-                for (int i=0; i<STATE_DIM; i++) {
-                    core.x[i] += G[i] * error; // state update
-                }
-
-                // Add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        const auto v = G[i] * R * G[j];
-
-                        // add measurement noise
-                        core.P[i*STATE_DIM+j] = core.P[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*core.P[i*STATE_DIM+j] +
-                                    0.5*core.P[j*STATE_DIM+i] + v,
-                                    MIN_COVARIANCE, MAX_COVARIANCE); 
-                    }
-                }
             }
 
              static auto enforceSymmetry(const matrix & P) -> matrix
