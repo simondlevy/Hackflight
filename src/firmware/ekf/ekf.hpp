@@ -68,8 +68,6 @@ namespace hf {
  
             EKF()
             {
-                _core.init();
-
                 // Add in the initial process noise 
                 const float pinit[EkfCore::STATE_DIM] = {
 
@@ -122,15 +120,15 @@ namespace hf {
                 // thrust can only be produced in the body's Z direction
                 const auto dz = _core.x[EkfCore::STATE_VZ] * dt + accel.z * dt2 / 2; 
 
-                // position update
-                _core.x[EkfCore::STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
-                    GRAVITY * dt2 / 2;
-
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
+
+                // position update
+                _core.x[EkfCore::STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
+                    GRAVITY * dt2 / 2;
 
                 _core.x[EkfCore::STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _R.zx);

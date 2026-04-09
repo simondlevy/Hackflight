@@ -29,7 +29,6 @@
 
 #include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
-//#include <firmware/ekf/newekf.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>

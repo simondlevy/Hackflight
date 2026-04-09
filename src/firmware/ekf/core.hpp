@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2022 Bitcraze AB, 2025 Simon D. Levy
+ * Copyright (C) 2011-2022 Bitcraze AB, 2026 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,11 +38,7 @@ namespace hf {
             // State vector
             __attribute__((aligned(4))) float x[STATE_DIM];
 
-            // Covariance matrix
-            __attribute__((aligned(4))) float P[STATE_DIM][STATE_DIM];
-
-
-            void init()
+            EkfCore()
             {
                 for (int i=0; i< STATE_DIM; i++) {
 
@@ -52,7 +48,7 @@ namespace hf {
                         P[i][j] = 0; 
                     }
                 }
-            }
+             }
 
             // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
             void predict(const float F[STATE_DIM][STATE_DIM])
@@ -107,7 +103,6 @@ namespace hf {
                 // (GH - I)*P*(GH - I)'
                 dot(GH_I_P, GH_I, P);
 
-
                 // State update
                 for (int i=0; i<STATE_DIM; i++) {
                     x[i] += G[i] * error; // state update
@@ -150,6 +145,9 @@ namespace hf {
             }
 
         private:
+
+            // Covariance matrix
+            __attribute__((aligned(4))) float P[STATE_DIM][STATE_DIM];
 
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
