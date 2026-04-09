@@ -722,7 +722,20 @@ namespace hf {
                     }
                 }
 
-                return ekf;
+                return EKF(
+                        x,
+                        P,
+                        ekf.q,
+                        ekf.gyroLatest,
+                        ekf.accelSubSampler,
+                        ekf.gyroSubSampler,
+                        ekf.R,
+                        ekf.didPredict,
+                        ekf.didUpdateWithFlowDeck,
+                        ekf.zrangerFilterLatest,
+                        ekf.opticalFlowFilterLatest,
+                        ekf.lastPredictionMs,
+                        ekf.lastProcessNoiseUpdateMs);
             }
 
              void updateWithScalar(
