@@ -393,8 +393,6 @@ namespace hf {
 
         private:
 
-            //////////////////////////////////////////////////////////////////
-
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
@@ -418,9 +416,6 @@ namespace hf {
 
             bool didPredict;
             uint32_t lastPredictionMs;
-
-
-            //////////////////////////////////////////////////////////////////
 
             static auto makeJacobian(
                     const float dt,
