@@ -244,15 +244,21 @@ namespace hf {
                 const auto lastProcessNoiseUpdateMs = dt > 0 ? msec_curr :
                     ekf.lastProcessNoiseUpdateMs;
 
+                const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        ekf.accelSubSampler, imudata.accelGs);
+
+                const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        ekf.gyroSubSampler, imudata.gyroDps);
+
+                const auto gyroLatest = imudata.gyroDps;
+
+                (void)P;
+                (void)lastProcessNoiseUpdateMs;
+                (void)accelSubSampler;
+                (void)gyroSubSampler;
+                (void)gyroLatest;
+
 #if 0
-                accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        accelSubSampler, imudata.accelGs);
-
-                gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        gyroSubSampler, imudata.gyroDps);
-
-                gyroLatest = imudata.gyroDps;
-
                 if (didUpdateWithFlowDeck) {
 
                     updateWithRange(zrangerFilterLatest, R);
