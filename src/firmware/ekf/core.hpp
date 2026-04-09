@@ -89,9 +89,6 @@ namespace hf {
                 }
 
                 float GH[STATE_DIM][STATE_DIM] = {};
-                float GH_I[STATE_DIM][STATE_DIM] = {};
-                float GH_I_P[STATE_DIM][STATE_DIM] = {};
-
                 outer(G, h, GH);
 
                 // GH - I
@@ -100,9 +97,11 @@ namespace hf {
                 }
 
                 // (GH - I)'
+                float GH_I[STATE_DIM][STATE_DIM] = {};
                 trans(GH, GH_I);
 
                 // (GH - I)*P
+                float GH_I_P[STATE_DIM][STATE_DIM] = {};
                 dot(GH, P, GH_I_P); 
 
                 // (GH - I)*P*(GH - I)'

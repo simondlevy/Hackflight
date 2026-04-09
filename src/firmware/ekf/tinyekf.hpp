@@ -82,7 +82,8 @@ namespace tinyekf {
                 dot(FP, Ft, P);
             }
 
-            void updateWithScalar(const Vector & h,
+            void updateWithScalar(
+                    const Vector & h,
                     const float error,
                     const float stdMeasNoise,
                     const float minCovariance,
