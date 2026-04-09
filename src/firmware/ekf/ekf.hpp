@@ -194,18 +194,17 @@ namespace hf {
                 // compute the quaternion values in [w,x,y,z] order
                 auto tmpq = rotate(dtw, q);
 
-                if (!isFlying) {
+                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
-                    const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
-
-                    tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION;
-                    tmpq.x = keep * tmpq.x; 
-                    tmpq.y = keep * tmpq.y; 
-                    tmpq.z = keep * tmpq.z; 
-                }
+                const auto newtmpq = isFlying ? tmpq : 
+                    Quaternion(
+                            tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION,
+                            tmpq.x = keep * tmpq.x, 
+                            tmpq.y = keep * tmpq.y, 
+                            tmpq.z = keep * tmpq.z); 
 
                 // normalize and store the result
-                q = tmpq / Quaternion::l2norm(tmpq);
+                q = newtmpq / Quaternion::l2norm(newtmpq);
 
                 didPredict = true;
                 lastPredictionMs = msec_curr;
