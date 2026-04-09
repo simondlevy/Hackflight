@@ -414,8 +414,6 @@ namespace hf {
             void updateWithRange(const ZRangerFilter & zrfilter,
                     const Rotation &R)
             {
-                // Updates the filter with a measured distance in the zb direction using the
-                float h[EkfCore::STATE_DIM] = {};
 
                 // Only update the filter if the measurement is reliable 
                 // (\hat{h} -> infty when R.zz -> 0)
@@ -427,13 +425,13 @@ namespace hf {
 
                     // This just acts like a gain for the sensor model. Further
                     // updates are done in the scalar update function below
-                    h[EkfCore::STATE_Z] = 1 / cosf(angle); 
+                    const EkfCore::vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
                     updateWithScalar(h, measuredDistance-predictedDistance,
                             zrfilter.stdev);
                 }
             }
- 
+
             void updateWithFlow(const OpticalFlowFilter & offilter,
                     const ThreeAxis & gyro, const float r22)
             {
@@ -468,7 +466,7 @@ namespace hf {
 
                 const auto omegab = gyroval * Num::DEG2RAD;
 
-                float h[EkfCore::STATE_DIM] = {};
+                EkfCore::vector h = {0, 0, 0, 0, 0, 0, 0};
 
                 const auto predictedN = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
@@ -491,14 +489,11 @@ namespace hf {
             }
 
             void updateWithScalar(
-                    const float * h,
+                    const EkfCore::vector & h,
                     const float error,
                     const float stdMeasNoise)
             {
-                const EkfCore::vector hh = {
-                    h[0], h[1], h[2], h[3], h[4], h[5], h[6]
-                };
-                _core.updateWithScalar(hh, error, stdMeasNoise,
+                _core.updateWithScalar(h, error, stdMeasNoise,
                         MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
