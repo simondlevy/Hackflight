@@ -106,6 +106,22 @@ namespace hf {
                 lastProcessNoiseUpdateMs = 0;
             }
 
+            EKF(
+                    const vector x,
+                    const matrix & P,
+                    const Quaternion & q,
+                    const ThreeAxis & gyroLatest,
+                    const ThreeAxisSubSampler & accelSubSampler,
+                    const ThreeAxisSubSampler & gyroSubSampler,
+                    const Rotation & R,
+                    const bool didPredict,
+                    const bool didUpdateWithFlowDeck,
+                    const ZRangerFilter & zrangerFilterLatest,
+                    const OpticalFlowFilter & opticalFlowFilterLatest,
+                    const uint32_t lastPredictionMs,
+                    const uint32_t lastProcessNoiseUpdateMs)
+            {}
+
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
                 accelSubSampler = ThreeAxisSubSampler::finalize(accelSubSampler);
