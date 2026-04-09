@@ -286,7 +286,8 @@ namespace hf {
                     core = fabs(rzz) > 0.1 && rzz > 0 ?
                         updateWithRange(core, zrangerFilterLatest, rzz) : core;
                     
-                    updateWithFlow(opticalFlowFilterLatest, gyroLatest,R.zz);
+                    core = updateWithFlow(core, opticalFlowFilterLatest,
+                            gyroLatest,R.zz);
                 }
 
                 if (didUpdateWithFlowDeck || didPredict) {
@@ -497,6 +498,18 @@ namespace hf {
                 F[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 return F;
+            }
+
+            static auto updateWithFlow(
+                    const Core & core,
+                    const OpticalFlowFilter & offilter,
+                    const ThreeAxis & gyro, const float r22) -> Core
+            {
+                const auto newcore = updateWithFlowAxis(core, offilter.dt, r22,
+                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
+
+                return updateWithFlowAxis(newcore, offilter.dt, r22,
+                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
             }
 
             static auto addProcessNoise(const matrix & P, const float dt,
@@ -773,7 +786,6 @@ namespace hf {
                 }
             }
 
-
             void addProcessNoise(const float dt, const uint32_t msec_curr)
             {
                 const float noise[STATE_DIM] = {
@@ -789,16 +801,6 @@ namespace hf {
                 addCovarianceNoise(noise);
 
                 core.P = enforceSymmetry(core.P);
-            }
-
-            void updateWithFlow(const OpticalFlowFilter & offilter,
-                    const ThreeAxis & gyro, const float r22)
-            {
-                core = updateWithFlowAxis(core, offilter.dt, r22,
-                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
-
-                core = updateWithFlowAxis(core, offilter.dt, r22,
-                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
             }
 
     };
