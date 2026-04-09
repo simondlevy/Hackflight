@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include <firmware/ekf/core.hpp>
+#include <array>
+
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/rotation.hpp>
-#include <firmware/ekf/state.h>
 #include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu/filter.hpp>
@@ -63,10 +63,21 @@ namespace hf {
             static constexpr float MIN_ANGLE = 1e-4;
             static constexpr float MAX_ANGLE = 10;
 
-        public:
+            // Indexes to acceless the vehicle's state, stored as a column vector
+            enum
+            {
+                STATE_Z,
+                STATE_VX,
+                STATE_VY,
+                STATE_VZ,
+                STATE_D0,
+                STATE_D1,
+                STATE_D2,
+                STATE_DIM
+            };        public:
 
             EKF& operator=(const EKF& other) = default;
- 
+
             EKF()
             {
                 // Add in the initial process noise 
@@ -81,7 +92,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                _core.addCovarianceNoise(pinit);
+                addCovarianceNoise(pinit);
 
                 _didPredict = false;
                 _didUpdateWithFlowDeck = false;
@@ -100,25 +111,24 @@ namespace hf {
                 const auto gyro = _gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
-                const auto F = makeJacobian(dt, gyro, _core.x, _R);
+                const auto F = makeJacobian(dt, gyro, x, _R);
 
-                _core.predict(F);
-
-                // -----------------------------------------------------
+                // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
+                P = dot(dot(F, P), trans(F));
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _core.x[STATE_VX];
-                const auto tmpSPY = _core.x[STATE_VY];
-                const auto tmpSPZ = _core.x[STATE_VZ];
+                const auto tmpSPX = x[STATE_VX];
+                const auto tmpSPY = x[STATE_VY];
+                const auto tmpSPZ = x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _core.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = _core.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _core.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = x[STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
@@ -127,16 +137,16 @@ namespace hf {
                 // - gravity in body frame
 
                 // position update
-                _core.x[STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
+                x[STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
                     GRAVITY * dt2 / 2;
 
-                _core.x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _R.zx);
 
-                _core.x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
                         - GRAVITY * _R.zy);
 
-                _core.x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _R.zz);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
@@ -194,9 +204,9 @@ namespace hf {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
                     const auto v = ThreeAxis(
-                            _core.x[STATE_D0],
-                            _core.x[STATE_D1],
-                            _core.x[STATE_D2]);
+                            x[STATE_D0],
+                            x[STATE_D1],
+                            x[STATE_D2]);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -221,9 +231,9 @@ namespace hf {
                             _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z);
 
                     // reset the attitude error
-                    _core.x[STATE_D0] = 0;
-                    _core.x[STATE_D1] = 0;
-                    _core.x[STATE_D2] = 0;
+                    x[STATE_D0] = 0;
+                    x[STATE_D1] = 0;
+                    x[STATE_D2] = 0;
 
                     enforceSymmetry();
                 }
@@ -247,7 +257,7 @@ namespace hf {
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
-                const auto x = ekf._core.x;
+                const auto x = ekf.x;
 
                 const auto dx =
                     ekf._R.xx*x[STATE_VX] +
@@ -295,7 +305,13 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            EkfCore _core;
+            typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
+
+            typedef std::array<float, STATE_DIM> vector;
+
+            // State vector
+            vector x;
+
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -326,8 +342,8 @@ namespace hf {
             static auto makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
-                    const EkfCore::vector x,
-                    const Rotation &R) -> EkfCore::matrix
+                    const vector x,
+                    const Rotation &R) -> matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -339,7 +355,7 @@ namespace hf {
 
                 const size_t N = STATE_DIM;
 
-                auto F = EkfCore::matrix();
+                auto F = matrix();
 
                 // position
                 F[STATE_Z*N+STATE_Z] = 1;
@@ -399,7 +415,7 @@ namespace hf {
                 F[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 return F;
-             }
+            }
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)
             {
@@ -413,7 +429,7 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                _core.addCovarianceNoise(noise);
+                addCovarianceNoise(noise);
 
                 enforceSymmetry();
             }
@@ -427,12 +443,12 @@ namespace hf {
                 if (fabs(R.zz) > 0.1f && R.zz > 0) {
                     const auto angle = max(0, fabsf(acosf(R.zz)) -
                             Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = _core.x[STATE_Z] / cosf(angle);
+                    const auto predictedDistance = x[STATE_Z] / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
                     // updates are done in the scalar update function below
-                    const EkfCore::vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
+                    const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
                     updateWithScalar(h, measuredDistance-predictedDistance,
                             zrfilter.stdev);
@@ -467,13 +483,13 @@ namespace hf {
                 const float thetapix = 0.71674f;
 
                 // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(_core.x[STATE_Z], 0.1);
+                const auto z_g  = max(x[STATE_Z], 0.1);
 
-                const auto dg = _core.x[state_index];
+                const auto dg = x[state_index];
 
                 const auto omegab = gyroval * Num::DEG2RAD;
 
-                EkfCore::vector h = {0, 0, 0, 0, 0, 0, 0};
+                vector h = {0, 0, 0, 0, 0, 0, 0};
 
                 const auto predictedN = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
@@ -488,19 +504,171 @@ namespace hf {
                 // First update
                 updateWithScalar(h, measuredN-predictedN,
                         stdev*FLOW_RESOLUTION);
-             }
-
-            void enforceSymmetry()
-            {
-                _core.enforceSymmetry(MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
             void updateWithScalar(
-                    const EkfCore::vector & h,
+                    const vector & h,
+                    const float error,
+                    const float stdMeasNoise,
+                    const float minCovariance,
+                    const float maxCovariance)
+            {
+                const auto R = stdMeasNoise*stdMeasNoise;
+
+                const auto PHt = dot(P, h); // PH'
+
+                float HPHR = R; // HPH' + R
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    HPHR += h[i] * PHt[i]; 
+                }
+
+                vector G;
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                }
+
+                auto GH = outer(G, h);
+
+                // GH - I
+                for (size_t i=0; i<STATE_DIM; i++) { 
+                    GH[i*STATE_DIM+i] -= 1; 
+                }
+
+                // (GH - I)'
+                const auto GH_I = trans(GH);
+
+                // (GH - I)*P
+                const auto GH_I_P = dot(GH, P); 
+
+                // (GH - I)*P*(GH - I)'
+                P = dot(GH_I_P, GH_I);
+
+                // State update
+                for (int i=0; i<STATE_DIM; i++) {
+                    x[i] += G[i] * error; // state update
+                }
+
+                // Add the measurement variance and ensure boundedness and symmetry
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        const auto v = G[i] * R * G[j];
+
+                        // add measurement noise
+                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i] + v,
+                                    minCovariance, maxCovariance); 
+                    }
+                }
+            }
+
+            void enforceSymmetry(const float minval, const float maxval)
+            {
+                for (int i=0; i<STATE_DIM; i++) {
+
+                    for (int j=i; j<STATE_DIM; j++) {
+
+                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
+                                    minval, maxval);
+                    }
+                }
+            }
+
+            void addCovarianceNoise(const float * noise)
+            {
+                for (uint8_t k=0; k<STATE_DIM; ++k) {
+                    P[k*STATE_DIM+k] += noise[k] * noise[k];
+                }
+            }
+
+        private:
+
+            // Covariance matrix
+            matrix P;
+
+            static auto get_pval(const int i, const int j,
+                    const float pval, const float minval,
+                    const float maxval) -> float
+            {
+                return
+                    isnan(pval) || pval > maxval ? maxval :
+                    i==j && pval < minval ? minval :
+                    pval;
+            }
+
+            // C = x * y
+            static auto outer(const vector & x, const vector & y) -> matrix
+            {
+                auto C = matrix();
+
+                for (size_t i=0; i<STATE_DIM; i++) {
+                    for (size_t j=0; j<STATE_DIM; j++) {
+                        C[i*STATE_DIM+j] = x[i] * y[j];
+                    }
+                }
+
+                return C;
+            }
+
+            // At = A^T
+            static auto trans(const matrix & A) -> matrix
+            {
+                auto At = matrix();
+
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
+                    }
+                }
+
+                return At;
+            }
+
+            // C = A * B
+            static auto dot(const matrix & A, const matrix & B) -> matrix
+            {
+                auto C = matrix();
+
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i*STATE_DIM+j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                        }
+                    }
+                }
+
+                return C;
+            }
+
+            // y = A * x
+            static auto dot(const matrix & A, const vector & x) -> vector
+            {
+                vector y = vector();
+
+                for (int i=0; i<STATE_DIM; i++) {
+                    y[i] = 0; 
+                    for (int j=0; j<STATE_DIM; j++) {
+                        y[i] += A[i*STATE_DIM+j] * x[j];
+                    }
+                }
+
+                return y;
+            }
+
+            void enforceSymmetry()
+            {
+                enforceSymmetry(MIN_COVARIANCE, MAX_COVARIANCE);
+            }
+
+            void updateWithScalar(
+                    const vector & h,
                     const float error,
                     const float stdMeasNoise)
             {
-                _core.updateWithScalar(h, error, stdMeasNoise,
+                updateWithScalar(h, error, stdMeasNoise,
                         MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
