@@ -73,8 +73,6 @@ namespace hf {
                     const float minCovariance,
                     const float maxCovariance)
             {
-                float G[STATE_DIM] = {};
-
                 const auto R = stdMeasNoise*stdMeasNoise;
 
                 float PHt[STATE_DIM] = {};
@@ -85,6 +83,7 @@ namespace hf {
                     HPHR += h[i] * PHt[i]; 
                 }
 
+                float G[STATE_DIM] = {};
                 for (size_t i=0; i<STATE_DIM; i++) {
                     G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 }

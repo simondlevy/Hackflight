@@ -69,22 +69,8 @@ namespace hf {
  
             EKF()
             {
-                _core.init();
-
                 // Add in the initial process noise 
-                const float pinit[EkfCore::STATE_DIM] = {
-                    STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
-                };
-
-                _core.addCovarianceNoise(pinit);
-
-                _newcore.addCovarianceNoise(
+                _core.addCovarianceNoise(
                         tinyekf::Vector(
                             STDEV_INITIAL_POSITION_Z,
                             STDEV_INITIAL_VELOCITY,
@@ -111,28 +97,25 @@ namespace hf {
                 const auto gyro = _gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
-                float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM] = {};
-                makeJacobian(dt, gyro, _core.x, _R, F);
+                const auto F = makeJacobian(dt, gyro, _core.x, _R);
                 _core.predict(F);
-
-                const auto newF = new_makeJacobian(dt, gyro, _core.x, _R);
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _core.x[1];
-                const auto tmpSPY = _core.x[2];
-                const auto tmpSPZ = _core.x[3];
+                const auto tmpSPX = _core.x._1;
+                const auto tmpSPY = _core.x._2;
+                const auto tmpSPZ = _core.x._3;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _core.x[1] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = _core.x[2] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = _core.x._1 * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = _core.x._2 * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _core.x[3] * dt + accel.z * dt2 / 2; 
+                const auto dz = _core.x._3 * dt + accel.z * dt2 / 2; 
 
                 // position update
-                _core.x[0] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
+                _core.x._0 += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
                     GRAVITY * dt2 / 2;
 
                 const auto accelx = isFlying ? 0 : accel.x;
@@ -141,13 +124,13 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
 
-                _core.x[1] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                _core.x._1 += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _R.zx);
 
-                _core.x[2] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                _core.x._2 += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
                         - GRAVITY * _R.zy);
 
-                _core.x[3] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                _core.x._3 += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _R.zz);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
@@ -204,10 +187,7 @@ namespace hf {
                 if (_didUpdateWithFlowDeck || _didPredict) {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const auto v = ThreeAxis(
-                            _core.x[4],
-                            _core.x[5],
-                            _core.x[6]);
+                    const auto v = ThreeAxis(_core.x._4, _core.x._5, _core.x._6);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -232,9 +212,9 @@ namespace hf {
                             _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z);
 
                     // reset the attitude error
-                    _core.x[4] = 0;
-                    _core.x[5] = 0;
-                    _core.x[6] = 0;
+                    _core.x._4 = 0;
+                    _core.x._5 = 0;
+                    _core.x._6 = 0;
 
                     enforceSymmetry();
                 }
@@ -261,22 +241,16 @@ namespace hf {
                 const auto x = ekf._core.x;
 
                 const auto dx =
-                    ekf._R.xx*x[1] +
-                    ekf._R.xy*x[2] +
-                    ekf._R.xz*x[3];
+                    ekf._R.xx*x._1 + ekf._R.xy*x._2 + ekf._R.xz*x._3;
 
                 // make right positive
                 const auto dy = -(
-                        ekf._R.yx*x[1] +
-                        ekf._R.yy*x[2] +
-                        ekf._R.yz*x[3]); 
+                        ekf._R.yx*x._1 + ekf._R.yy*x._2 + ekf._R.yz*x._3); 
 
-                const auto z = x[0];
+                const auto z = x._0;
 
                 const auto dz =
-                    ekf._R.zx*x[1] +
-                    ekf._R.zy*x[2] +
-                    ekf._R.zz*x[3];
+                    ekf._R.zx*x._1 + ekf._R.zy*x._2 + ekf._R.zz*x._3;
 
                 const auto q0 = ekf._q.w;
                 const auto q1 = ekf._q.x;
@@ -306,9 +280,7 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            tinyekf::Core _newcore;
-
-            EkfCore _core;
+            tinyekf::Core _core;
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
@@ -336,91 +308,19 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            static void makeJacobian(
+            static auto makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
-                    const float x[EkfCore::STATE_DIM],
-                    const Rotation &R,
-                    float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
-            {
-                const auto d0 = gyro.x*dt/2;
-                const auto d1 = gyro.y*dt/2;
-                const auto d2 = gyro.z*dt/2;
-
-                const auto vx = x[1];
-                const auto vy = x[2];
-                const auto vz = x[3];
-
-                F[0][0] = 1;
-                F[0][1] = R.zx*dt;
-                F[0][2] = R.zy*dt;
-                F[0][3] = R.zz*dt;
-                F[0][4] = (vy*R.zz - vz*R.zy)*dt;
-                F[0][5] = (-vx*R.zz + vz*R.zx)*dt;
-                F[0][6] = (vx*R.zy - vy*R.zx)*dt;
-
-                F[1][0] = 0;
-                F[1][1] = 1;
-                F[1][2] = gyro.z*dt;
-                F[1][3] =-gyro.y*dt;
-                F[1][4] =  0;
-                F[1][5] =  GRAVITY*R.zz*dt;
-                F[1][6] = -GRAVITY*R.zy*dt;
-
-                F[2][0] = 0;
-                F[2][1] =-gyro.z*dt;
-                F[2][2] = 1;
-                F[2][3] = gyro.x*dt;
-                F[2][4] = -GRAVITY*R.zz*dt;
-                F[2][5] =  0;
-                F[2][6] =  GRAVITY*R.zx*dt;
-
-                F[3][0] = 0;
-                F[3][1] = gyro.y*dt;
-                F[3][2] =-gyro.x*dt;
-                F[3][3] = 1;
-                F[3][4] =  GRAVITY*R.zy*dt;
-                F[3][5] = -GRAVITY*R.zx*dt;
-                F[3][6] =  0;
-
-                F[4][0] = 0;
-                F[4][1] = 0;
-                F[4][2] = 0;
-                F[4][3] = 0;
-                F[4][4] = 1 - d1*d1/2 - d2*d2/2;
-                F[4][5] =  d2 + d0*d1/2;
-                F[4][6] = -d1 + d0*d2/2;
-
-                F[5][0] = 0;
-                F[5][1] = 0;
-                F[5][2] = 0;
-                F[5][3] = 0;
-                F[5][4] = -d2 + d0*d1/2;
-                F[5][5] =  1 - d0*d0/2 - d2*d2/2;
-                F[5][6] =  d0 + d1*d2/2;
-
-                F[6][0] = 0;
-                F[6][1] = 0;
-                F[6][2] = 0;
-                F[6][3] = 0;
-                F[6][4] =  d1 + d0*d2/2;
-                F[6][5] = -d0 + d1*d2/2;
-                F[6][6] = 1 - d0*d0/2 - d1*d1/2;
-            }
-
-            static auto new_makeJacobian(
-                    const float dt,
-                    const ThreeAxis & gyro,
-                    const float x[EkfCore::STATE_DIM],
+                    const tinyekf::Vector x,
                     const Rotation &R) -> tinyekf::Matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                const auto vx = x[1];
-                const auto vy = x[2];
-                const auto vz = x[3];
+                const auto vx = x._1;
+                const auto vy = x._2;
+                const auto vz = x._3;
 
                 return tinyekf::Matrix(
                         1,
@@ -482,17 +382,14 @@ namespace hf {
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)
             {
-                const float noise[EkfCore::STATE_DIM] = {
+                _core.addCovarianceNoise(tinyekf::Vector(
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                     PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
-
-                _core.addCovarianceNoise(noise);
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT));
 
                 enforceSymmetry();
             }
@@ -508,7 +405,7 @@ namespace hf {
                 if (fabs(R.zz) > 0.1f && R.zz > 0) {
                     const auto angle = max(0, fabsf(acosf(R.zz)) -
                             Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = _core.x[0] / cosf(angle);
+                    const auto predictedDistance = _core.x._0 / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
@@ -524,10 +421,10 @@ namespace hf {
                     const ThreeAxis & gyro, const float r22)
             {
                 updateWithFlowAxis(offilter.dt, r22, offilter.dpixelx,
-                        offilter.stdDevX, 1, gyro.y);
+                        offilter.stdDevX, _core.x._1, 1, gyro.y);
 
                 updateWithFlowAxis(offilter.dt, r22, offilter.dpixely,
-                        offilter.stdDevY, 2, gyro.x);
+                        offilter.stdDevY, _core.x._2, 2, gyro.x);
             }
 
             void updateWithFlowAxis(
@@ -535,6 +432,7 @@ namespace hf {
                     const float r22,
                     const float dpixel,
                     const float stdev,
+                    const float stateval,
                     const uint8_t state_index,
                     const float gyroval)
             {
@@ -548,18 +446,18 @@ namespace hf {
                 const float thetapix = 0.71674f;
 
                 // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(_core.x[0], 0.1);
+                const auto z_g  = max(_core.x._0, 0.1);
 
-                const auto dg = _core.x[state_index];
+                const auto dg = stateval;
 
                 const auto omegab = gyroval * Num::DEG2RAD;
-
-                float h[EkfCore::STATE_DIM] = {};
 
                 const auto predictedN = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
 
                 const auto measuredN = dpixel*FLOW_RESOLUTION;
+
+                float h[7] = {};
 
                 h[0] = (Npix * dt / thetapix) * ((r22 * dg) / (-z_g * z_g));
 
@@ -580,7 +478,9 @@ namespace hf {
                     const float error,
                     const float stdMeasNoise)
             {
-                _core.updateWithScalar(h, error, stdMeasNoise,
+                const auto hvec = tinyekf::Vector(
+                        h[0], h[1], h[2], h[3], h[4], h[5], h[6]);
+                _core.updateWithScalar(hvec, error, stdMeasNoise,
                         MIN_COVARIANCE, MAX_COVARIANCE);
             }
 

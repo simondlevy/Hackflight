@@ -12,7 +12,8 @@ namespace tinyekf {
 
             float _0, _1, _2, _3, _4, _5, _6;
 
-            Vector() = default;
+            Vector()
+               : _0(0), _1(0), _2(0), _3(0), _4(0), _5(0), _6(6) {}
 
             Vector(const float _0, const float _1, const float _2, const float _3, const float _4, const float _5, const float _6)
                : _0(_0), _1(_1), _2(_2), _3(_3), _4(_4), _5(_5), _6(_6) {}
@@ -31,24 +32,33 @@ namespace tinyekf {
                _50,  _51,  _52,  _53,  _54,  _55,  _56, 
                _60,  _61,  _62,  _63,  _64,  _65,  _66;
 
-            Matrix() = default;
+            Matrix() 
+                :
+                    _00(0),  _01(0),  _02(0),  _03(0),  _04(0),  _05(0),  _06(0), 
+                    _10(0),  _11(0),  _12(0),  _13(0),  _14(0),  _15(0),  _16(0), 
+                    _20(0),  _21(0),  _22(0),  _23(0),  _24(0),  _25(0),  _26(0), 
+                    _30(0),  _31(0),  _32(0),  _33(0),  _34(0),  _35(0),  _36(0), 
+                    _40(0),  _41(0),  _42(0),  _43(0),  _44(0),  _45(0),  _46(0), 
+                    _50(0),  _51(0),  _52(0),  _53(0),  _54(0),  _55(0),  _56(0), 
+                    _60(0),  _61(0),  _62(0),  _63(0),  _64(0),  _65(0),  _66(0) {}
+
 
             Matrix(
-              const float _00, const float _01, const float _02, const float _03, const float _04, const float _05, const float _06, 
-              const float _10, const float _11, const float _12, const float _13, const float _14, const float _15, const float _16, 
-              const float _20, const float _21, const float _22, const float _23, const float _24, const float _25, const float _26, 
-              const float _30, const float _31, const float _32, const float _33, const float _34, const float _35, const float _36, 
-              const float _40, const float _41, const float _42, const float _43, const float _44, const float _45, const float _46, 
-              const float _50, const float _51, const float _52, const float _53, const float _54, const float _55, const float _56, 
-              const float _60, const float _61, const float _62, const float _63, const float _64, const float _65, const float _66)
-            :
-              _00(_00), _01(_01), _02(_02), _03(_03), _04(_04), _05(_05), _06(_06), 
-              _10(_10), _11(_11), _12(_12), _13(_13), _14(_14), _15(_15), _16(_16), 
-              _20(_20), _21(_21), _22(_22), _23(_23), _24(_24), _25(_25), _26(_26), 
-              _30(_30), _31(_31), _32(_32), _33(_33), _34(_34), _35(_35), _36(_36), 
-              _40(_40), _41(_41), _42(_42), _43(_43), _44(_44), _45(_45), _46(_46), 
-              _50(_50), _51(_51), _52(_52), _53(_53), _54(_54), _55(_55), _56(_56), 
-              _60(_60), _61(_61), _62(_62), _63(_63), _64(_64), _65(_65), _66(_66) {}
+                    const float _00, const float _01, const float _02, const float _03, const float _04, const float _05, const float _06, 
+                    const float _10, const float _11, const float _12, const float _13, const float _14, const float _15, const float _16, 
+                    const float _20, const float _21, const float _22, const float _23, const float _24, const float _25, const float _26, 
+                    const float _30, const float _31, const float _32, const float _33, const float _34, const float _35, const float _36, 
+                    const float _40, const float _41, const float _42, const float _43, const float _44, const float _45, const float _46, 
+                    const float _50, const float _51, const float _52, const float _53, const float _54, const float _55, const float _56, 
+                    const float _60, const float _61, const float _62, const float _63, const float _64, const float _65, const float _66)
+                :
+                    _00(_00), _01(_01), _02(_02), _03(_03), _04(_04), _05(_05), _06(_06), 
+                    _10(_10), _11(_11), _12(_12), _13(_13), _14(_14), _15(_15), _16(_16), 
+                    _20(_20), _21(_21), _22(_22), _23(_23), _24(_24), _25(_25), _26(_26), 
+                    _30(_30), _31(_31), _32(_32), _33(_33), _34(_34), _35(_35), _36(_36), 
+                    _40(_40), _41(_41), _42(_42), _43(_43), _44(_44), _45(_45), _46(_46), 
+                    _50(_50), _51(_51), _52(_52), _53(_53), _54(_54), _55(_55), _56(_56), 
+                    _60(_60), _61(_61), _62(_62), _63(_63), _64(_64), _65(_65), _66(_66) {}
     };
 
     class Core {
