@@ -696,33 +696,16 @@ namespace hf {
                 }
             }
 
-            static auto enforceSymmetry(const matrix & P,
-                    const float minval, const float maxval) -> matrix
-            {
-                auto newP = matrix();
-
-                for (int i=0; i<STATE_DIM; i++) {
-
-                    for (int j=i; j<STATE_DIM; j++) {
-
-                        newP[i*STATE_DIM+j] = newP[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
-                                    minval, maxval);
-                    }
-                }
-
-                return newP;
-            }
-
-            void enforceSymmetry(const float minval, const float maxval)
+            void enforceSymmetry()
             {
                 for (int i=0; i<STATE_DIM; i++) {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
                         P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
-                                    minval, maxval);
+                            get_pval(i, j,
+                                    0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
+                                    MIN_COVARIANCE, MAX_COVARIANCE);
                     }
                 }
             }
@@ -814,11 +797,6 @@ namespace hf {
                 }
 
                 return y;
-            }
-
-            void enforceSymmetry()
-            {
-                enforceSymmetry(MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
             void updateWithScalar(
