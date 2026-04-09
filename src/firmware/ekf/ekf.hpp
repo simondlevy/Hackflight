@@ -126,19 +126,21 @@ namespace hf {
 
                 P = addCovarianceNoise(matrix(), pinit);
 
-                didPredict = false;
                 didUpdateWithFlowDeck = false;
-                lastPredictionMs = 0;
                 lastProcessNoiseUpdateMs = 0;
+
+                didPredict = false;
+                lastPredictionMs = 0;
             }
 
             EKF(const Core & core)
                 : core(core)
             {
-                didPredict = false;
                 didUpdateWithFlowDeck = false;
-                lastPredictionMs = 0;
                 lastProcessNoiseUpdateMs = 0;
+
+                didPredict = false;
+                lastPredictionMs = 0;
              }
 
             EKF(const EKF & ekf, const vector x, const matrix & P)
@@ -150,12 +152,12 @@ namespace hf {
                     accelSubSampler(ekf.accelSubSampler),
                     gyroSubSampler(ekf.gyroSubSampler),
                     R(ekf.R),
-                    didPredict(ekf.didPredict),
                     didUpdateWithFlowDeck(ekf.didUpdateWithFlowDeck),
                     zrangerFilterLatest(ekf.zrangerFilterLatest),
                     opticalFlowFilterLatest(ekf.opticalFlowFilterLatest),
-                    lastPredictionMs(ekf.lastPredictionMs),
-                    lastProcessNoiseUpdateMs(ekf.lastProcessNoiseUpdateMs) {}
+                    lastProcessNoiseUpdateMs(ekf.lastProcessNoiseUpdateMs),
+                    didPredict(ekf.didPredict),
+                    lastPredictionMs(ekf.lastPredictionMs) {}
 
             EKF(
                     const vector x,
@@ -165,12 +167,12 @@ namespace hf {
                     const ThreeAxisSubSampler & accelSubSampler,
                     const ThreeAxisSubSampler & gyroSubSampler,
                     const Rotation & R,
-                    const bool didPredict,
                     const bool didUpdateWithFlowDeck,
                     const ZRangerFilter & zrangerFilterLatest,
                     const OpticalFlowFilter & opticalFlowFilterLatest,
-                    const uint32_t lastPredictionMs,
-                    const uint32_t lastProcessNoiseUpdateMs)
+                    const uint32_t lastProcessNoiseUpdateMs,
+                    const bool didPredict,
+                    const uint32_t lastPredictionMs)
 
                 :
 
@@ -181,13 +183,12 @@ namespace hf {
                 accelSubSampler(accelSubSampler),
                 gyroSubSampler(gyroSubSampler),
                 R(R),
-                didPredict(didPredict),
                 didUpdateWithFlowDeck(didUpdateWithFlowDeck),
                 zrangerFilterLatest(zrangerFilterLatest),
                 opticalFlowFilterLatest(opticalFlowFilterLatest),
-                lastPredictionMs(lastPredictionMs),
-                lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs)
-                {}
+                lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs),
+                didPredict(didPredict),
+                lastPredictionMs(lastPredictionMs) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
@@ -272,12 +273,12 @@ namespace hf {
                         accelSubSampler,
                         gyroSubSampler,
                         ekf.R,
-                        true, // didPredict,
                         ekf.didUpdateWithFlowDeck,
                         ekf.zrangerFilterLatest,
                         ekf.opticalFlowFilterLatest,
-                        msec_curr,  // lastPredictionMs
-                        ekf.lastProcessNoiseUpdateMs);
+                        ekf.lastProcessNoiseUpdateMs,
+                        true, // didPredict,
+                        msec_curr);  // lastPredictionMs
 
             } // predict
 
@@ -512,15 +513,16 @@ namespace hf {
             // updated by the finalization)
             Rotation R;
 
-            bool didPredict;
-
             bool didUpdateWithFlowDeck;
 
             ZRangerFilter zrangerFilterLatest;
             OpticalFlowFilter opticalFlowFilterLatest;
 
-            uint32_t lastPredictionMs;
             uint32_t lastProcessNoiseUpdateMs;
+
+            bool didPredict;
+            uint32_t lastPredictionMs;
+
 
             //////////////////////////////////////////////////////////////////
 
