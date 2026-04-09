@@ -340,55 +340,57 @@ namespace hf {
 
                 // position
                 F[EkfCore::STATE_Z][EkfCore::STATE_Z] = 1;
-
-                // position from body-frame velocity
                 F[EkfCore::STATE_Z][EkfCore::STATE_VX] = R.zx*dt;
-
                 F[EkfCore::STATE_Z][EkfCore::STATE_VY] = R.zy*dt;
-
                 F[EkfCore::STATE_Z][EkfCore::STATE_VZ] = R.zz*dt;
-
-                // position from attitude error
                 F[EkfCore::STATE_Z][EkfCore::STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
-
                 F[EkfCore::STATE_Z][EkfCore::STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
-
                 F[EkfCore::STATE_Z][EkfCore::STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
 
-                // body-frame velocity from body-frame velocity
-                F[EkfCore::STATE_VX][EkfCore::STATE_VX] = 1; //drag negligible
-                F[EkfCore::STATE_VY][EkfCore::STATE_VX] =-gyro.z*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_VX] = gyro.y*dt;
-
+                F[EkfCore::STATE_VX][EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_VX][EkfCore::STATE_VX] = 1; 
                 F[EkfCore::STATE_VX][EkfCore::STATE_VY] = gyro.z*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_VY] = 1; //drag negligible
-                F[EkfCore::STATE_VZ][EkfCore::STATE_VY] =-gyro.x*dt;
-
                 F[EkfCore::STATE_VX][EkfCore::STATE_VZ] =-gyro.y*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_VZ] = gyro.x*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_VZ] = 1; //drag negligible
-
-                // body-frame velocity from attitude error
                 F[EkfCore::STATE_VX][EkfCore::STATE_D0] =  0;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D0] = -GRAVITY*R.zz*dt;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D0] =  GRAVITY*R.zy*dt;
-
                 F[EkfCore::STATE_VX][EkfCore::STATE_D1] =  GRAVITY*R.zz*dt;
-                F[EkfCore::STATE_VY][EkfCore::STATE_D1] =  0;
-                F[EkfCore::STATE_VZ][EkfCore::STATE_D1] = -GRAVITY*R.zx*dt;
-
                 F[EkfCore::STATE_VX][EkfCore::STATE_D2] = -GRAVITY*R.zy*dt;
+
+                F[EkfCore::STATE_VY][EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_VY][EkfCore::STATE_VX] =-gyro.z*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_VY] = 1; 
+                F[EkfCore::STATE_VY][EkfCore::STATE_VZ] = gyro.x*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D0] = -GRAVITY*R.zz*dt;
+                F[EkfCore::STATE_VY][EkfCore::STATE_D1] =  0;
                 F[EkfCore::STATE_VY][EkfCore::STATE_D2] =  GRAVITY*R.zx*dt;
+
+                F[EkfCore::STATE_VZ][EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_VZ][EkfCore::STATE_VX] = gyro.y*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_VY] =-gyro.x*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_VZ] = 1; 
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D0] =  GRAVITY*R.zy*dt;
+                F[EkfCore::STATE_VZ][EkfCore::STATE_D1] = -GRAVITY*R.zx*dt;
                 F[EkfCore::STATE_VZ][EkfCore::STATE_D2] =  0;
 
+                F[EkfCore::STATE_D0][EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_D0][EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D0][EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D0][EkfCore::STATE_VZ] = 0; 
                 F[EkfCore::STATE_D0][EkfCore::STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
                 F[EkfCore::STATE_D0][EkfCore::STATE_D1] =  d2 + d0*d1/2;
                 F[EkfCore::STATE_D0][EkfCore::STATE_D2] = -d1 + d0*d2/2;
 
+                F[EkfCore::STATE_D1][EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_D1][EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D1][EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D1][EkfCore::STATE_VZ] = 0; 
                 F[EkfCore::STATE_D1][EkfCore::STATE_D0] = -d2 + d0*d1/2;
                 F[EkfCore::STATE_D1][EkfCore::STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
                 F[EkfCore::STATE_D1][EkfCore::STATE_D2] =  d0 + d1*d2/2;
 
+                F[EkfCore::STATE_D2][EkfCore::STATE_Z] = 0; 
+                F[EkfCore::STATE_D2][EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D2][EkfCore::STATE_VX] = 0; 
+                F[EkfCore::STATE_D2][EkfCore::STATE_VZ] = 0; 
                 F[EkfCore::STATE_D2][EkfCore::STATE_D0] =  d1 + d0*d2/2;
                 F[EkfCore::STATE_D2][EkfCore::STATE_D1] = -d0 + d1*d2/2;
                 F[EkfCore::STATE_D2][EkfCore::STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
