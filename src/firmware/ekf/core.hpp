@@ -90,8 +90,7 @@ namespace hf {
                     G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
-                matrix GH;
-                outer(G, h, GH);
+                auto GH = outer(G, h);
 
                 // GH - I
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -154,7 +153,6 @@ namespace hf {
 
             // Covariance matrix
             matrix P;
-            //__attribute__((aligned(4))) float P[STATE_DIM][STATE_DIM];
 
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
@@ -167,13 +165,17 @@ namespace hf {
             }
 
             // C = x * y
-            static void outer(const vector & x, const vector & y, matrix & C)
+            static auto outer(const vector & x, const vector & y) -> matrix
             {
+                auto C = matrix();
+
                 for (size_t i=0; i<STATE_DIM; i++) {
                     for (size_t j=0; j<STATE_DIM; j++) {
                         C[i*STATE_DIM+j] = x[i] * y[j];
                     }
                 }
+
+                return C;
             }
 
             // At = A^T
