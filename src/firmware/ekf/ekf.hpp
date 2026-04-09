@@ -326,7 +326,7 @@ namespace hf {
             static void makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
-                    const float x[EkfCore::STATE_DIM],
+                    const EkfCore::vector x,
                     const Rotation &R,
                     float F[EkfCore::STATE_DIM][EkfCore::STATE_DIM])
             {

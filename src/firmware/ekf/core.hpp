@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <array>
+
 namespace hf {
 
     class EkfCore { 
@@ -35,8 +37,10 @@ namespace hf {
                 STATE_DIM
             };
 
+            typedef std::array<float, STATE_DIM> vector;
+
             // State vector
-            __attribute__((aligned(4))) float x[STATE_DIM];
+            vector x;
 
             EkfCore()
             {
