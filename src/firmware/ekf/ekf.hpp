@@ -175,30 +175,31 @@ namespace hf {
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
 
-#if 0
-
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
+                auto x = vector();
+                x[STATE_Z] = ekf.x[STATE_Z] + ekf.R.zx * dx + ekf.R.zy * dy +
+                    ekf.R.zz * dz - GRAVITY * dt2 / 2;
 
-                // position update
-                x[STATE_Z] += R.zx * dx + R.zy * dy + R.zz * dz - 
-                    GRAVITY * dt2 / 2;
+                x[STATE_VX] = ekf.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
+                        gyro.y * tmpSPZ - GRAVITY * ekf.R.zx);
 
-                x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
-                        - GRAVITY * R.zx);
+                x[STATE_VY] = ekf.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
+                        gyro.x * tmpSPZ - GRAVITY * ekf.R.zy);
 
-                x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
-                        - GRAVITY * R.zy);
+                x[STATE_VZ] = ekf.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
+                        gyro.x * tmpSPY - GRAVITY * ekf.R.zz);
 
-                x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
-                        - GRAVITY * R.zz);
+                x[STATE_D0] = ekf.x[STATE_D0];
+                x[STATE_D1] = ekf.x[STATE_D1];
+                x[STATE_D2] = ekf.x[STATE_D2];
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                auto tmpq = rotate(dtw, q);
+                auto tmpq = rotate(dtw, ekf.q);
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
@@ -210,16 +211,26 @@ namespace hf {
                             tmpq.z = keep * tmpq.z); 
 
                 // normalize and store the result
-                q = newtmpq / Quaternion::l2norm(newtmpq);
+                const auto q = newtmpq / Quaternion::l2norm(newtmpq);
 
-                didPredict = true;
-                lastPredictionMs = msec_curr;
-#endif
-                return ekf;
+                return EKF(
+                        x,
+                        P,
+                        q,
+                        ekf.gyroLatest,
+                        accelSubSampler,
+                        gyroSubSampler,
+                        ekf.R,
+                        true, // didPredict,
+                        ekf.didUpdateWithFlowDeck,
+                        ekf.zrangerFilterLatest,
+                        ekf.opticalFlowFilterLatest,
+                        msec_curr,  // lastPredictionMs
+                        ekf.lastProcessNoiseUpdateMs);
 
             } // predict
 
-             void predict(const uint32_t msec_curr, const bool isFlying) 
+            void predict(const uint32_t msec_curr, const bool isFlying) 
             {
                 accelSubSampler = ThreeAxisSubSampler::finalize(accelSubSampler);
                 gyroSubSampler = ThreeAxisSubSampler::finalize(gyroSubSampler);
