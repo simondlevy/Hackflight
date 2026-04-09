@@ -76,6 +76,10 @@ namespace hf {
                 STATE_DIM
             };
         
+            typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
+
+            typedef std::array<float, STATE_DIM> vector;
+
         public:
 
             EKF& operator=(const EKF& other) = default;
@@ -96,24 +100,24 @@ namespace hf {
 
                 addCovarianceNoise(pinit);
 
-                _didPredict = false;
-                _didUpdateWithFlowDeck = false;
-                _lastPredictionMs = 0;
-                _lastProcessNoiseUpdateMs = 0;
+                didPredict = false;
+                didUpdateWithFlowDeck = false;
+                lastPredictionMs = 0;
+                lastProcessNoiseUpdateMs = 0;
             }
 
             void predict(const uint32_t msec_curr, bool isFlying) 
             {
-                _accelSubSampler = ThreeAxisSubSampler::finalize(_accelSubSampler);
-                _gyroSubSampler = ThreeAxisSubSampler::finalize(_gyroSubSampler);
+                accelSubSampler = ThreeAxisSubSampler::finalize(accelSubSampler);
+                gyroSubSampler = ThreeAxisSubSampler::finalize(gyroSubSampler);
 
-                const auto dt = (msec_curr - _lastPredictionMs) / 1000.f;
+                const auto dt = (msec_curr - lastPredictionMs) / 1000.f;
 
-                const auto accel = _accelSubSampler.subSample;
-                const auto gyro = _gyroSubSampler.subSample;
+                const auto accel = accelSubSampler.subSample;
+                const auto gyro = gyroSubSampler.subSample;
 
                 // The linearized Jacobean matrix
-                const auto F = makeJacobian(dt, gyro, x, _R);
+                const auto F = makeJacobian(dt, gyro, x, R);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
                 P = dot(dot(F, P), trans(F));
@@ -139,24 +143,24 @@ namespace hf {
                 // - gravity in body frame
 
                 // position update
-                x[STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
+                x[STATE_Z] += R.zx * dx + R.zy * dy + R.zz * dz - 
                     GRAVITY * dt2 / 2;
 
                 x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
-                        - GRAVITY * _R.zx);
+                        - GRAVITY * R.zx);
 
                 x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
-                        - GRAVITY * _R.zy);
+                        - GRAVITY * R.zy);
 
                 x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
-                        - GRAVITY * _R.zz);
+                        - GRAVITY * R.zz);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                auto tmpq = rotate(dtw, _q);
+                auto tmpq = rotate(dtw, q);
 
                 if (!isFlying) {
 
@@ -169,10 +173,10 @@ namespace hf {
                 }
 
                 // normalize and store the result
-                _q = tmpq / Quaternion::l2norm(tmpq);
+                q = tmpq / Quaternion::l2norm(tmpq);
 
-                _didPredict = true;
-                _lastPredictionMs = msec_curr;
+                didPredict = true;
+                lastPredictionMs = msec_curr;
 
             } // predict
 
@@ -180,29 +184,29 @@ namespace hf {
                     const uint32_t msec_curr)
             {
                 const auto dt =
-                    (msec_curr - _lastProcessNoiseUpdateMs) / 1000.0f;
+                    (msec_curr - lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
                     addProcessNoise(dt, msec_curr);
-                    _lastProcessNoiseUpdateMs = msec_curr;
+                    lastProcessNoiseUpdateMs = msec_curr;
                 }
 
-                _accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        _accelSubSampler, imudata.accelGs);
+                accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        accelSubSampler, imudata.accelGs);
 
-                _gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        _gyroSubSampler, imudata.gyroDps);
+                gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        gyroSubSampler, imudata.gyroDps);
 
-                _gyroLatest = imudata.gyroDps;
+                gyroLatest = imudata.gyroDps;
 
-                if (_didUpdateWithFlowDeck) {
+                if (didUpdateWithFlowDeck) {
 
-                    updateWithRange(_zrangerFilterLatest, _R);
+                    updateWithRange(zrangerFilterLatest, R);
 
-                    updateWithFlow(_opticalFlowFilterLatest, _gyroLatest,_R.zz);
+                    updateWithFlow(opticalFlowFilterLatest, gyroLatest,R.zz);
                 }
 
-                if (_didUpdateWithFlowDeck || _didPredict) {
+                if (didUpdateWithFlowDeck || didPredict) {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
                     const auto v = ThreeAxis(
@@ -216,21 +220,21 @@ namespace hf {
                             smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
 
                         // normalize and store the result
-                        _q = _q / Quaternion::l2norm(rotate(v, _q));
+                        q = q / Quaternion::l2norm(rotate(v, q));
                     }
 
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and accel
-                    _R = Rotation(
-                            _q.w * _q.w + _q.x * _q.x - _q.y * _q.y - _q.z * _q.z,
-                            2 * _q.x * _q.y - 2 * _q.w * _q.z,
-                            2 * _q.x * _q.z + 2 * _q.w * _q.y,
-                            2 * _q.x * _q.y + 2 * _q.w * _q.z,
-                            _q.w * _q.w - _q.x * _q.x + _q.y * _q.y - _q.z * _q.z,
-                            2 * _q.y * _q.z - 2 * _q.w * _q.x,
-                            2 * _q.x * _q.z - 2 * _q.w * _q.y,
-                            2 * _q.y * _q.z + 2 * _q.w * _q.x,
-                            _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z);
+                    R = Rotation(
+                            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
+                            2 * q.x * q.y - 2 * q.w * q.z,
+                            2 * q.x * q.z + 2 * q.w * q.y,
+                            2 * q.x * q.y + 2 * q.w * q.z,
+                            q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z,
+                            2 * q.y * q.z - 2 * q.w * q.x,
+                            2 * q.x * q.z - 2 * q.w * q.y,
+                            2 * q.y * q.z + 2 * q.w * q.x,
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
 
                     // reset the attitude error
                     x[STATE_D0] = 0;
@@ -240,21 +244,21 @@ namespace hf {
                     enforceSymmetry();
                 }
 
-                if (_didUpdateWithFlowDeck) {
-                    _didUpdateWithFlowDeck = false;
+                if (didUpdateWithFlowDeck) {
+                    didUpdateWithFlowDeck = false;
                 }
 
-                if (_didPredict) {
-                    _didPredict = false;
+                if (didPredict) {
+                    didPredict = false;
                 }
             }
 
             void update(const ZRangerFilter & zrfilter,
                     const OpticalFlowFilter & offilter)
             {
-                _zrangerFilterLatest = zrfilter;
-                _opticalFlowFilterLatest = offilter;
-                _didUpdateWithFlowDeck = true;
+                zrangerFilterLatest = zrfilter;
+                opticalFlowFilterLatest = offilter;
+                didUpdateWithFlowDeck = true;
             }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
@@ -262,41 +266,41 @@ namespace hf {
                 const auto x = ekf.x;
 
                 const auto dx =
-                    ekf._R.xx*x[STATE_VX] +
-                    ekf._R.xy*x[STATE_VY] +
-                    ekf._R.xz*x[STATE_VZ];
+                    ekf.R.xx*x[STATE_VX] +
+                    ekf.R.xy*x[STATE_VY] +
+                    ekf.R.xz*x[STATE_VZ];
 
                 // make right positive
                 const auto dy = -(
-                        ekf._R.yx*x[STATE_VX] +
-                        ekf._R.yy*x[STATE_VY] +
-                        ekf._R.yz*x[STATE_VZ]); 
+                        ekf.R.yx*x[STATE_VX] +
+                        ekf.R.yy*x[STATE_VY] +
+                        ekf.R.yz*x[STATE_VZ]); 
 
                 const auto z = x[STATE_Z];
 
                 const auto dz =
-                    ekf._R.zx*x[STATE_VX] +
-                    ekf._R.zy*x[STATE_VY] +
-                    ekf._R.zz*x[STATE_VZ];
+                    ekf.R.zx*x[STATE_VX] +
+                    ekf.R.zy*x[STATE_VY] +
+                    ekf.R.zz*x[STATE_VZ];
 
-                const auto q0 = ekf._q.w;
-                const auto q1 = ekf._q.x;
-                const auto q2 = ekf._q.y;
-                const auto q3 = ekf._q.z;
+                const auto q0 = ekf.q.w;
+                const auto q1 = ekf.q.x;
+                const auto q2 = ekf.q.y;
+                const auto q3 = ekf.q.z;
 
                 const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
                         q0*q0 - q1*q1 - q2*q2 + q3*q3);
 
-                const auto dphi = ekf._gyroLatest.x;
+                const auto dphi = ekf.gyroLatest.x;
 
                 const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
 
-                const auto dtheta = ekf._gyroLatest.y;
+                const auto dtheta = ekf.gyroLatest.y;
 
                 const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
                         q0*q0 + q1*q1 - q2*q2 - q3*q3); 
 
-                const auto dpsi = ekf._gyroLatest.z;
+                const auto dpsi = ekf.gyroLatest.z;
 
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
@@ -307,33 +311,35 @@ namespace hf {
 
             //////////////////////////////////////////////////////////////////
 
-            typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
+            // State vector
+            vector x;
 
-            typedef std::array<float, STATE_DIM> vector;
+            // Covariance matrix
+            matrix P;
 
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
-            Quaternion _q;
+            Quaternion q;
 
-            ThreeAxis _gyroLatest;
+            ThreeAxis gyroLatest;
 
-            ThreeAxisSubSampler _accelSubSampler = ThreeAxisSubSampler(GRAVITY);
-            ThreeAxisSubSampler _gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
+            ThreeAxisSubSampler accelSubSampler = ThreeAxisSubSampler(GRAVITY);
+            ThreeAxisSubSampler gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Rotation _R;
+            Rotation R;
 
-            bool _didPredict;
+            bool didPredict;
 
-            bool _didUpdateWithFlowDeck;
+            bool didUpdateWithFlowDeck;
 
-            ZRangerFilter _zrangerFilterLatest;
-            OpticalFlowFilter _opticalFlowFilterLatest;
+            ZRangerFilter zrangerFilterLatest;
+            OpticalFlowFilter opticalFlowFilterLatest;
 
-            uint32_t _lastPredictionMs;
-            uint32_t _lastProcessNoiseUpdateMs;
+            uint32_t lastPredictionMs;
+            uint32_t lastProcessNoiseUpdateMs;
 
             //////////////////////////////////////////////////////////////////
 
@@ -580,12 +586,6 @@ namespace hf {
                     P[k*STATE_DIM+k] += noise[k] * noise[k];
                 }
             }
-
-            // State vector
-            vector x;
-
-            // Covariance matrix
-            matrix P;
 
             static auto get_pval(const int i, const int j,
                     const float pval, const float minval,
