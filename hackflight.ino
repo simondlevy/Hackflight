@@ -141,7 +141,8 @@ void loop()
 
     // Run the system dynamics to predict the state forward.
     if (_ekfPredictionTimer.ready()) {
-        _ekf.predict(millis(), _flyingCheck.isFlying); 
+        // _ekf.predict(millis(), _flyingCheck.isFlying); 
+        _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
     }
 
     _ekf.update(_imuFilter.output, millis());
