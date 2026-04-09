@@ -200,6 +200,22 @@ namespace hf {
             // C = A * B
             static void dot(
                     const float A[STATE_DIM][STATE_DIM],
+                    const matrix & B,
+                    matrix & C)
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i*STATE_DIM+j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i*STATE_DIM+j] += A[i][k] * B[k*STATE_DIM+j];
+                        }
+                    }
+                }
+            }
+
+            // C = A * B
+            static void dot(
+                    const float A[STATE_DIM][STATE_DIM],
                     const float B[STATE_DIM][STATE_DIM],
                     float C[STATE_DIM][STATE_DIM])
             {
