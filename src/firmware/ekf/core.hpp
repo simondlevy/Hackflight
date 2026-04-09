@@ -165,113 +165,27 @@ namespace hf {
                     pval;
             }
 
-            // C = A * B
-            static void dot(
-                    const matrix & A,
-                    const matrix & B,
-                    float C[STATE_DIM][STATE_DIM])
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        C[i][j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i][j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
-                        }
-                    }
-                }
-            }
-
-            // C = A * B
-            static void dot(
-                    const matrix & A,
-                    const float B[STATE_DIM][STATE_DIM],
-                    matrix & C)
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        C[i*STATE_DIM+j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k][j];
-                        }
-                    }
-                }
-            }
-
-            // C = A * B
-            static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const matrix & B,
-                    matrix & C)
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        C[i*STATE_DIM+j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j] += A[i][k] * B[k*STATE_DIM+j];
-                        }
-                    }
-                }
-            }
-
-            // C = A * B
-            static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const float B[STATE_DIM][STATE_DIM],
-                    matrix & C)
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-
-                        C[i*STATE_DIM+j] = 0;
-
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j] += A[i][k] * B[k][j];
-                        }
-                    }
-                }
-            }
-
-            // C = A * B
-            static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const float B[STATE_DIM][STATE_DIM],
-                    float C[STATE_DIM][STATE_DIM])
-            {
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        C[i][j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i][j] += A[i][k] * B[k][j];
-                        }
-                    }
-                }
-            }
-
-            // y = A * x
-            static void dot(
-                    const float A[STATE_DIM][STATE_DIM],
-                    const vector & x,
-                    vector & y)
-            {
-                for (int i=0; i<STATE_DIM; i++) {
-                    y[i] = 0; 
-                    for (int j=0; j<STATE_DIM; j++) {
-                        y[i] += A[i][j] * x[j];
-                    }
-                }
-            }
-
-            static void outer(
-                    const vector & x,
-                    const vector & y,
-                    float C[STATE_DIM][STATE_DIM])
+            // C = x * y
+            static void outer(const vector & x, const vector & y, matrix & C)
             {
                 for (size_t i=0; i<STATE_DIM; i++) {
                     for (size_t j=0; j<STATE_DIM; j++) {
-                        C[i][j] = x[i] * y[j];
+                        C[i*STATE_DIM+j] = x[i] * y[j];
                     }
                 }
             }
+
+            // At = A^T
+            static void trans(const matrix & A, matrix & At)
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
+                    }
+                }
+            }
+
+            ////////////////////////////////////////////////////////////
 
             // At = A^T
             static void trans(
@@ -297,49 +211,66 @@ namespace hf {
                 }
             }
 
-            //////////////////////////////////////////////////////////////////
-
             // C = A * B
-            static void dot(const matrix & A, const matrix & B, matrix & C)
+            static void dot(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const float B[STATE_DIM][STATE_DIM],
+                    matrix & C)
             {
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
+
                         C[i*STATE_DIM+j] = 0;
+
                         for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j]+=
-                                A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                            C[i*STATE_DIM+j] += A[i][k] * B[k][j];
+                        }
+                    }
+                }
+            }
+
+            // C = A * B
+            static void dot(
+                    const matrix & A,
+                    const matrix & B,
+                    float C[STATE_DIM][STATE_DIM])
+            {
+                for (int i=0; i<STATE_DIM; ++i) {
+                    for (int j=0; j<STATE_DIM; ++j) {
+                        C[i][j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i][j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
                         }
                     }
                 }
             }
 
             // y = A * x
-            static void dot(const matrix & A, const vector & x, vector & y)
+            static void dot(
+                    const float A[STATE_DIM][STATE_DIM],
+                    const vector & x,
+                    vector & y)
             {
                 for (int i=0; i<STATE_DIM; i++) {
                     y[i] = 0; 
                     for (int j=0; j<STATE_DIM; j++) {
-                        y[i] += A[i*STATE_DIM+j] * x[j];
+                        y[i] += A[i][j] * x[j];
                     }
                 }
             }
 
-            // C = x * y
-            static void outer(const vector & x, const vector & y, matrix & C)
-            {
-                for (size_t i=0; i<STATE_DIM; i++) {
-                    for (size_t j=0; j<STATE_DIM; j++) {
-                        C[i*STATE_DIM+j] = x[i] * y[j];
-                    }
-                }
-            }
-
-            // At = A^T
-            static void trans(const matrix & A, matrix & At)
+            // C = A * B
+            static void dot(
+                    const matrix & A,
+                    const float B[STATE_DIM][STATE_DIM],
+                    matrix & C)
             {
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
-                        At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
+                        C[i*STATE_DIM+j] = 0;
+                        for (int k=0; k<STATE_DIM; ++k) {
+                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k][j];
+                        }
                     }
                 }
             }
