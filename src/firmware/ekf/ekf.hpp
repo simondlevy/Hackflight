@@ -88,14 +88,23 @@ namespace hf {
 
             class Core {
 
-                // State vector
-                vector x;
+                public:
 
-                // Covariance matrix
-                matrix P;
+                    // State vector
+                    vector x;
 
-                Core& operator=(const Core& other) = default;
+                    // Covariance matrix
+                    matrix P;
+
+                    Core() = default;
+
+                    Core& operator=(const Core& other) = default;
+
+                    Core(const vector & x, const matrix & P) 
+                        : x(x), P(P) {}
             };
+
+            Core core;
 
         public:
 
