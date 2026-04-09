@@ -692,9 +692,7 @@ namespace hf {
                     const Core & core,
                     const vector & h,
                     const float error,
-                    const float stdMeasNoise,
-                    const float minCovariance,
-                    const float maxCovariance) -> Core
+                    const float stdMeasNoise) -> Core
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
@@ -742,19 +740,15 @@ namespace hf {
                         // add measurement noise
                         P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
                             get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i] + v,
-                                    minCovariance, maxCovariance); 
+                                    MIN_COVARIANCE, MAX_COVARIANCE); 
                     }
                 }
 
                 return Core(x, P);
             }
 
-             void updateWithScalar(
-                    const vector & h,
-                    const float error,
-                    const float stdMeasNoise,
-                    const float minCovariance,
-                    const float maxCovariance)
+             void updateWithScalar(const vector & h, const float error,
+                     const float stdMeasNoise)
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
@@ -802,7 +796,7 @@ namespace hf {
                         core.P[i*STATE_DIM+j] = core.P[j*STATE_DIM+i] =
                             get_pval(i, j, 0.5*core.P[i*STATE_DIM+j] +
                                     0.5*core.P[j*STATE_DIM+i] + v,
-                                    minCovariance, maxCovariance); 
+                                    MIN_COVARIANCE, MAX_COVARIANCE); 
                     }
                 }
             }
@@ -912,15 +906,6 @@ namespace hf {
                 }
 
                 return y;
-            }
-
-            void updateWithScalar(
-                    const vector & h,
-                    const float error,
-                    const float stdMeasNoise)
-            {
-                updateWithScalar(h, error, stdMeasNoise,
-                        MIN_COVARIANCE, MAX_COVARIANCE);
             }
 
             static auto bigenough(const float v) -> bool
