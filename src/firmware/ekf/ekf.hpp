@@ -19,6 +19,7 @@
 #include <firmware/ekf/core.hpp>
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/rotation.hpp>
+#include <firmware/ekf/state.h>
 #include <firmware/ekf/three_axis_subsampler.hpp>
 #include <firmware/flow_filter.hpp>
 #include <firmware/imu/filter.hpp>
@@ -69,7 +70,7 @@ namespace hf {
             EKF()
             {
                 // Add in the initial process noise 
-                const float pinit[EkfCore::STATE_DIM] = {
+                const float pinit[STATE_DIM] = {
 
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
@@ -108,16 +109,16 @@ namespace hf {
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = _core.x[EkfCore::STATE_VX];
-                const auto tmpSPY = _core.x[EkfCore::STATE_VY];
-                const auto tmpSPZ = _core.x[EkfCore::STATE_VZ];
+                const auto tmpSPX = _core.x[STATE_VX];
+                const auto tmpSPY = _core.x[STATE_VY];
+                const auto tmpSPZ = _core.x[STATE_VZ];
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = _core.x[EkfCore::STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = _core.x[EkfCore::STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                const auto dx = _core.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = _core.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = _core.x[EkfCore::STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = _core.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
 
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
@@ -126,16 +127,16 @@ namespace hf {
                 // - gravity in body frame
 
                 // position update
-                _core.x[EkfCore::STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
+                _core.x[STATE_Z] += _R.zx * dx + _R.zy * dy + _R.zz * dz - 
                     GRAVITY * dt2 / 2;
 
-                _core.x[EkfCore::STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
+                _core.x[STATE_VX] += dt * (accelx + gyro.z * tmpSPY - gyro.y * tmpSPZ
                         - GRAVITY * _R.zx);
 
-                _core.x[EkfCore::STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
+                _core.x[STATE_VY] += dt * (accely - gyro.z * tmpSPX + gyro.x * tmpSPZ
                         - GRAVITY * _R.zy);
 
-                _core.x[EkfCore::STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
+                _core.x[STATE_VZ] += dt * (accel.z + gyro.y * tmpSPX - gyro.x * tmpSPY
                         - GRAVITY * _R.zz);
 
                 // Attitude update (rotate by gyroscope): we do this in quaternions
@@ -193,9 +194,9 @@ namespace hf {
 
                     // Incorporate the attitude error (Kalman filter state) with the attitude
                     const auto v = ThreeAxis(
-                            _core.x[EkfCore::STATE_D0],
-                            _core.x[EkfCore::STATE_D1],
-                            _core.x[EkfCore::STATE_D2]);
+                            _core.x[STATE_D0],
+                            _core.x[STATE_D1],
+                            _core.x[STATE_D2]);
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
@@ -220,9 +221,9 @@ namespace hf {
                             _q.w * _q.w - _q.x * _q.x - _q.y * _q.y + _q.z * _q.z);
 
                     // reset the attitude error
-                    _core.x[EkfCore::STATE_D0] = 0;
-                    _core.x[EkfCore::STATE_D1] = 0;
-                    _core.x[EkfCore::STATE_D2] = 0;
+                    _core.x[STATE_D0] = 0;
+                    _core.x[STATE_D1] = 0;
+                    _core.x[STATE_D2] = 0;
 
                     enforceSymmetry();
                 }
@@ -249,22 +250,22 @@ namespace hf {
                 const auto x = ekf._core.x;
 
                 const auto dx =
-                    ekf._R.xx*x[EkfCore::STATE_VX] +
-                    ekf._R.xy*x[EkfCore::STATE_VY] +
-                    ekf._R.xz*x[EkfCore::STATE_VZ];
+                    ekf._R.xx*x[STATE_VX] +
+                    ekf._R.xy*x[STATE_VY] +
+                    ekf._R.xz*x[STATE_VZ];
 
                 // make right positive
                 const auto dy = -(
-                        ekf._R.yx*x[EkfCore::STATE_VX] +
-                        ekf._R.yy*x[EkfCore::STATE_VY] +
-                        ekf._R.yz*x[EkfCore::STATE_VZ]); 
+                        ekf._R.yx*x[STATE_VX] +
+                        ekf._R.yy*x[STATE_VY] +
+                        ekf._R.yz*x[STATE_VZ]); 
 
-                const auto z = x[EkfCore::STATE_Z];
+                const auto z = x[STATE_Z];
 
                 const auto dz =
-                    ekf._R.zx*x[EkfCore::STATE_VX] +
-                    ekf._R.zy*x[EkfCore::STATE_VY] +
-                    ekf._R.zz*x[EkfCore::STATE_VZ];
+                    ekf._R.zx*x[STATE_VX] +
+                    ekf._R.zy*x[STATE_VY] +
+                    ekf._R.zz*x[STATE_VZ];
 
                 const auto q0 = ekf._q.w;
                 const auto q1 = ekf._q.x;
@@ -332,77 +333,77 @@ namespace hf {
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                const auto vx = x[EkfCore::STATE_VX];
-                const auto vy = x[EkfCore::STATE_VY];
-                const auto vz = x[EkfCore::STATE_VZ];
+                const auto vx = x[STATE_VX];
+                const auto vy = x[STATE_VY];
+                const auto vz = x[STATE_VZ];
 
-                const size_t N = EkfCore::STATE_DIM;
+                const size_t N = STATE_DIM;
 
                 auto F = EkfCore::matrix();
 
                 // position
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_Z] = 1;
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_VX] = R.zx*dt;
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_VY] = R.zy*dt;
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_VZ] = R.zz*dt;
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
-                F[EkfCore::STATE_Z*N+EkfCore::STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
+                F[STATE_Z*N+STATE_Z] = 1;
+                F[STATE_Z*N+STATE_VX] = R.zx*dt;
+                F[STATE_Z*N+STATE_VY] = R.zy*dt;
+                F[STATE_Z*N+STATE_VZ] = R.zz*dt;
+                F[STATE_Z*N+STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
+                F[STATE_Z*N+STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
+                F[STATE_Z*N+STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
 
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_VX] = 1; 
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_VY] = gyro.z*dt;
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_VZ] =-gyro.y*dt;
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_D0] =  0;
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_D1] =  GRAVITY*R.zz*dt;
-                F[EkfCore::STATE_VX*N+EkfCore::STATE_D2] = -GRAVITY*R.zy*dt;
+                F[STATE_VX*N+STATE_Z] = 0; 
+                F[STATE_VX*N+STATE_VX] = 1; 
+                F[STATE_VX*N+STATE_VY] = gyro.z*dt;
+                F[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
+                F[STATE_VX*N+STATE_D0] =  0;
+                F[STATE_VX*N+STATE_D1] =  GRAVITY*R.zz*dt;
+                F[STATE_VX*N+STATE_D2] = -GRAVITY*R.zy*dt;
 
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_VX] =-gyro.z*dt;
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_VY] = 1; 
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_VZ] = gyro.x*dt;
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_D0] = -GRAVITY*R.zz*dt;
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_D1] =  0;
-                F[EkfCore::STATE_VY*N+EkfCore::STATE_D2] =  GRAVITY*R.zx*dt;
+                F[STATE_VY*N+STATE_Z] = 0; 
+                F[STATE_VY*N+STATE_VX] =-gyro.z*dt;
+                F[STATE_VY*N+STATE_VY] = 1; 
+                F[STATE_VY*N+STATE_VZ] = gyro.x*dt;
+                F[STATE_VY*N+STATE_D0] = -GRAVITY*R.zz*dt;
+                F[STATE_VY*N+STATE_D1] =  0;
+                F[STATE_VY*N+STATE_D2] =  GRAVITY*R.zx*dt;
 
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_VX] = gyro.y*dt;
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_VY] =-gyro.x*dt;
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_VZ] = 1; 
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_D0] =  GRAVITY*R.zy*dt;
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_D1] = -GRAVITY*R.zx*dt;
-                F[EkfCore::STATE_VZ*N+EkfCore::STATE_D2] =  0;
+                F[STATE_VZ*N+STATE_Z] = 0; 
+                F[STATE_VZ*N+STATE_VX] = gyro.y*dt;
+                F[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
+                F[STATE_VZ*N+STATE_VZ] = 1; 
+                F[STATE_VZ*N+STATE_D0] =  GRAVITY*R.zy*dt;
+                F[STATE_VZ*N+STATE_D1] = -GRAVITY*R.zx*dt;
+                F[STATE_VZ*N+STATE_D2] =  0;
 
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_VZ] = 0; 
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_D1] =  d2 + d0*d1/2;
-                F[EkfCore::STATE_D0*N+EkfCore::STATE_D2] = -d1 + d0*d2/2;
+                F[STATE_D0*N+STATE_Z] = 0; 
+                F[STATE_D0*N+STATE_VX] = 0; 
+                F[STATE_D0*N+STATE_VX] = 0; 
+                F[STATE_D0*N+STATE_VZ] = 0; 
+                F[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                F[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
+                F[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
 
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_VZ] = 0; 
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_D0] = -d2 + d0*d1/2;
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[EkfCore::STATE_D1*N+EkfCore::STATE_D2] =  d0 + d1*d2/2;
+                F[STATE_D1*N+STATE_Z] = 0; 
+                F[STATE_D1*N+STATE_VX] = 0; 
+                F[STATE_D1*N+STATE_VX] = 0; 
+                F[STATE_D1*N+STATE_VZ] = 0; 
+                F[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
+                F[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                F[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
 
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_Z] = 0; 
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_VX] = 0; 
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_VZ] = 0; 
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_D0] =  d1 + d0*d2/2;
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_D1] = -d0 + d1*d2/2;
-                F[EkfCore::STATE_D2*N+EkfCore::STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                F[STATE_D2*N+STATE_Z] = 0; 
+                F[STATE_D2*N+STATE_VX] = 0; 
+                F[STATE_D2*N+STATE_VX] = 0; 
+                F[STATE_D2*N+STATE_VZ] = 0; 
+                F[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
+                F[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
+                F[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
                 return F;
              }
 
             void addProcessNoise(const float dt, const uint32_t msec_curr)
             {
-                const float noise[EkfCore::STATE_DIM] = {
+                const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                     PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
@@ -426,7 +427,7 @@ namespace hf {
                 if (fabs(R.zz) > 0.1f && R.zz > 0) {
                     const auto angle = max(0, fabsf(acosf(R.zz)) -
                             Num::DEG2RAD * (15.0f / 2));
-                    const auto predictedDistance = _core.x[EkfCore::STATE_Z] / cosf(angle);
+                    const auto predictedDistance = _core.x[STATE_Z] / cosf(angle);
                     const auto measuredDistance = zrfilter.distance_m;
 
                     // This just acts like a gain for the sensor model. Further
@@ -442,10 +443,10 @@ namespace hf {
                     const ThreeAxis & gyro, const float r22)
             {
                 updateWithFlowAxis(offilter.dt, r22, offilter.dpixelx,
-                        offilter.stdDevX, EkfCore::STATE_VX, gyro.y);
+                        offilter.stdDevX, STATE_VX, gyro.y);
 
                 updateWithFlowAxis(offilter.dt, r22, offilter.dpixely,
-                        offilter.stdDevY, EkfCore::STATE_VY, gyro.x);
+                        offilter.stdDevY, STATE_VY, gyro.x);
             }
 
             void updateWithFlowAxis(
@@ -466,7 +467,7 @@ namespace hf {
                 const float thetapix = 0.71674f;
 
                 // Saturate elevation in prediction and correction to avoid singularities
-                const auto z_g  = max(_core.x[EkfCore::STATE_Z], 0.1);
+                const auto z_g  = max(_core.x[STATE_Z], 0.1);
 
                 const auto dg = _core.x[state_index];
 
@@ -479,7 +480,7 @@ namespace hf {
 
                 const auto measuredN = dpixel*FLOW_RESOLUTION;
 
-                h[EkfCore::STATE_Z] = (Npix * dt / thetapix) * 
+                h[STATE_Z] = (Npix * dt / thetapix) * 
                     ((r22 * dg) / (-z_g * z_g));
 
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);

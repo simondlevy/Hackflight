@@ -18,24 +18,13 @@
 
 #include <array>
 
+#include "state.h"
+
 namespace hf {
 
     class EkfCore { 
 
         public:
-
-            // Indexes to acceless the vehicle's state, stored as a column vector
-            enum
-            {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
-            };
 
             typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
 
@@ -111,7 +100,6 @@ namespace hf {
                                     minCovariance, maxCovariance); 
                     }
                 }
-
             }
 
             void enforceSymmetry(const float minval, const float maxval)
