@@ -261,27 +261,29 @@ namespace hf {
                 const auto dt =
                     (msec_curr - lastProcessNoiseUpdateMs) / 1000.0f;
 
+                const auto dtpos = dt > 0;
 
-                if (dt > 0) {
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
 
-                    const float noise[STATE_DIM] = {
-                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                    };
+                if (dtpos) {
 
                     for (uint8_t k=0; k<STATE_DIM; ++k) {
                         core.P[k*STATE_DIM+k] += noise[k] * noise[k];
                     }
 
                     core.P = enforceSymmetry(core.P);
-
-                    lastProcessNoiseUpdateMs = msec_curr;
                 }
+
+                lastProcessNoiseUpdateMs =
+                    dtpos ? msec_curr : lastProcessNoiseUpdateMs;
 
                 accelSubSampler = ThreeAxisSubSampler::accumulate(
                         accelSubSampler, imudata.accelGs);
@@ -331,15 +333,15 @@ namespace hf {
 
                 // reset the attitude error
                 core.x = ready ?
-                vector {
-                    core.x[STATE_Z],
-                    core.x[STATE_VX],
-                    core.x[STATE_VY],
-                    core.x[STATE_VZ],
-                    0,
-                    0,
-                    0
-                } :
+                    vector {
+                        core.x[STATE_Z],
+                        core.x[STATE_VX],
+                        core.x[STATE_VY],
+                        core.x[STATE_VZ],
+                        0,
+                        0,
+                        0
+                    } :
                 core.x;
 
                 core.P = ready ? enforceSymmetry(core.P) : core.P;
