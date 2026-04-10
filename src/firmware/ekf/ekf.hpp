@@ -307,7 +307,9 @@ namespace hf {
                 const auto v = ThreeAxis(
                         core.x[STATE_D0], core.x[STATE_D1], core.x[STATE_D2]);
 
-                if (didUpdateWithFlowDeck || didPredict) {
+                const auto ready = didUpdateWithFlowDeck || didPredict;
+
+                if (ready) {
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
