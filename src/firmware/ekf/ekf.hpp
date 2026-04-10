@@ -309,16 +309,14 @@ namespace hf {
 
                 const auto ready = didUpdateWithFlowDeck || didPredict;
 
+                q = ready &&
+                    (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
+                    smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
+
+                    q / Quaternion::l2norm(rotate(v, q)) : q;
+
                 if (ready) {
 
-                    // Move attitude error into attitude if any of the angle errors are
-                    // large enough
-                    if ((bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
-                            smallenough(v.x) && smallenough(v.y) && smallenough(v.z)) {
-
-                        // normalize and store the result
-                        q = q / Quaternion::l2norm(rotate(v, q));
-                    }
 
                     // Convert the new attitude to a rotation matrix, such that we can
                     // rotate body-frame velocity and accel
