@@ -344,13 +344,9 @@ namespace hf {
 
                 core.P = ready ? enforceSymmetry(core.P) : core.P;
 
-                if (didUpdateWithFlowDeck) {
-                    didUpdateWithFlowDeck = false;
-                }
+                didUpdateWithFlowDeck = false;
 
-                if (didPredict) {
-                    didPredict = false;
-                }
+                didPredict = false;
             }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
