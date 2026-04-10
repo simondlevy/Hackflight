@@ -261,7 +261,7 @@ namespace hf {
                 const auto dt =
                     (msec_curr - lastProcessNoiseUpdateMs) / 1000.0f;
 
-                const auto dtpos = dt > 0;
+                const auto dtpositive = dt > 0;
 
                 const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
@@ -273,18 +273,16 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                if (dtpos) {
-
+                if (dtpositive) {
                     for (uint8_t k=0; k<STATE_DIM; ++k) {
                         core.P[k*STATE_DIM+k] += noise[k] * noise[k];
                     }
-
                 }
 
-                core.P = dtpos ? enforceSymmetry(core.P) : core.P;
+                core.P = dtpositive ? enforceSymmetry(core.P) : core.P;
 
                 lastProcessNoiseUpdateMs =
-                    dtpos ? msec_curr : lastProcessNoiseUpdateMs;
+                    dtpositive ? msec_curr : lastProcessNoiseUpdateMs;
 
                 accelSubSampler = ThreeAxisSubSampler::accumulate(
                         accelSubSampler, imudata.accelGs);
@@ -532,24 +530,6 @@ namespace hf {
 
                 return updateWithFlowAxis(newcore, offilter.dt, r22,
                         offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
-            }
-
-            static auto addProcessNoise(const matrix & P, const float dt,
-                    const uint32_t msec_curr) ->matrix
-            {
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
-
-
-
-                return enforceSymmetry(addCovarianceNoise(P, noise));
             }
 
             static auto updateWithRange(
