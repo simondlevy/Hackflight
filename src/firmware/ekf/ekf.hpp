@@ -303,11 +303,11 @@ namespace hf {
                             gyroLatest,R.zz);
                 }
 
+                const auto ready = didUpdateWithFlowDeck || didPredict;
+
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const auto v = ThreeAxis(
                         core.x[STATE_D0], core.x[STATE_D1], core.x[STATE_D2]);
-
-                const auto ready = didUpdateWithFlowDeck || didPredict;
 
                 q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
@@ -315,12 +315,10 @@ namespace hf {
 
                     q / Quaternion::l2norm(rotate(v, q)) : q;
 
-                if (ready) {
-
-
-                    // Convert the new attitude to a rotation matrix, such that we can
-                    // rotate body-frame velocity and accel
-                    R = Rotation(
+                // Convert the new attitude to a rotation matrix, such that we can
+                // rotate body-frame velocity and accel
+                R = ready ?
+                    Rotation(
                             q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
                             2 * q.x * q.y - 2 * q.w * q.z,
                             2 * q.x * q.z + 2 * q.w * q.y,
@@ -329,15 +327,19 @@ namespace hf {
                             2 * q.y * q.z - 2 * q.w * q.x,
                             2 * q.x * q.z - 2 * q.w * q.y,
                             2 * q.y * q.z + 2 * q.w * q.x,
-                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : R;
+
+                if (ready) {
+
 
                     // reset the attitude error
                     core.x[STATE_D0] = 0;
                     core.x[STATE_D1] = 0;
                     core.x[STATE_D2] = 0;
 
-                    core.P = enforceSymmetry(core.P);
                 }
+
+                core.P = ready ? enforceSymmetry(core.P) : core.P;
 
                 if (didUpdateWithFlowDeck) {
                     didUpdateWithFlowDeck = false;
