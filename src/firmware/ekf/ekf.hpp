@@ -296,15 +296,15 @@ namespace hf {
 
                 const auto rzz = R.zz;
 
-                if (didUpdateWithFlowDeck) {
+                const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
-                    // Update the filter iff the measurement is reliable 
-                    core = fabs(rzz) > 0.1 && rzz > 0 ?
-                        updateWithRange(core, zrangerFilterLatest, rzz) : core;
+                core = rangeok && didUpdateWithFlowDeck ?
+                    updateWithRange(core, zrangerFilterLatest, rzz) : core;
 
-                    core = updateWithFlow(core, opticalFlowFilterLatest,
-                            gyroLatest,R.zz);
-                }
+                core = didUpdateWithFlowDeck ?  
+                    updateWithFlow(core, opticalFlowFilterLatest,
+                            gyroLatest, rzz):
+                    core;
 
                 const auto ready = didUpdateWithFlowDeck || didPredict;
 
