@@ -266,7 +266,23 @@ namespace hf {
                     (msec_curr - lastProcessNoiseUpdateMs) / 1000.0f;
 
                 if (dt > 0) {
-                    addProcessNoise(dt, msec_curr);
+
+                    const float noise[STATE_DIM] = {
+                        PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                        PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                        PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                        MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                        MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                    };
+
+                    for (uint8_t k=0; k<STATE_DIM; ++k) {
+                        core.P[k*STATE_DIM+k] += noise[k] * noise[k];
+                    }
+
+                    core.P = enforceSymmetry(core.P);
+
                     lastProcessNoiseUpdateMs = msec_curr;
                 }
 
@@ -285,7 +301,7 @@ namespace hf {
                     // Update the filter iff the measurement is reliable 
                     core = fabs(rzz) > 0.1 && rzz > 0 ?
                         updateWithRange(core, zrangerFilterLatest, rzz) : core;
-                    
+
                     core = updateWithFlow(core, opticalFlowFilterLatest,
                             gyroLatest,R.zz);
                 }
@@ -771,32 +787,5 @@ namespace hf {
                         dq.y*q.w - dq.z*q.x + dq.w*q.y + dq.x*q.z,
                         dq.z*q.w + dq.y*q.x - dq.x*q.y + dq.w*q.z);
             }
-
-            //////////////////////////////////////////////////////////////////
-
-            void addCovarianceNoise(const float * noise)
-            {
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    core.P[k*STATE_DIM+k] += noise[k] * noise[k];
-                }
-            }
-
-            void addProcessNoise(const float dt, const uint32_t msec_curr)
-            {
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
-
-                addCovarianceNoise(noise);
-
-                core.P = enforceSymmetry(core.P);
-            }
-
     };
 }
