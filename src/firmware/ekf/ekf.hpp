@@ -255,6 +255,106 @@ namespace hf {
 
             } // predict
 
+            static auto update(
+                    const EKF & ekf,
+                    const ImuFilter::Data & imudata,
+                    const uint32_t msec_curr) -> EKF
+            {
+                const auto dt =
+                    (msec_curr - ekf.lastProcessNoiseUpdateMs) / 1000.0f;
+
+                const auto dtpositive = dt > 0;
+
+                const float noise[STATE_DIM] = {
+                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
+                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
+                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                };
+
+                /* XXX
+                core = dtpositive ?
+                    Core(core.x, 
+                            enforceSymmetry(addCovarianceNoise(core.P, noise))) :
+                    core;*/
+
+                const auto lastProcessNoiseUpdateMs =
+                    dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMs;
+
+                const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
+                        ekf.accelSubSampler, imudata.accelGs);
+
+                const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
+                        ekf.gyroSubSampler, imudata.gyroDps);
+
+                const auto gyroLatest = imudata.gyroDps;
+
+                const auto rzz = ekf.R.zz;
+
+                const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
+
+                /* XXX
+                core = rangeok && didUpdateWithFlowDeck ?
+                    updateWithRange(core, zrangerFilterLatest, rzz) : core;
+
+                core = didUpdateWithFlowDeck ?  
+                    updateWithFlow(core, opticalFlowFilterLatest,
+                            gyroLatest, rzz):
+                    core;*/
+
+                const auto ready = ekf.didUpdateWithFlowDeck || ekf.didPredict;
+
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const auto v = ThreeAxis(
+                        ekf.core.x[STATE_D0], ekf.core.x[STATE_D1], ekf.core.x[STATE_D2]);
+
+                // reset the attitude error
+                // XXX const auto x = vector{core.x[0], core.x[1], core.x[2], core.x[3], 0, 0, 0};
+
+                // const auto P = enforceSymmetry(core.P);
+
+                const auto q = ready &&
+                    (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
+                    smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
+                    ekf.q / Quaternion::l2norm(rotate(v, ekf.q)) : ekf.q;
+
+                // Convert the new attitude to a rotation matrix, such that we can
+                // rotate body-frame velocity and accel
+                const auto R = ready ?
+                    Rotation(
+                            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
+                            2 * q.x * q.y - 2 * q.w * q.z,
+                            2 * q.x * q.z + 2 * q.w * q.y,
+                            2 * q.x * q.y + 2 * q.w * q.z,
+                            q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z,
+                            2 * q.y * q.z - 2 * q.w * q.x,
+                            2 * q.x * q.z - 2 * q.w * q.y,
+                            2 * q.y * q.z + 2 * q.w * q.x,
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.R;
+
+                // XXX core = ready ? Core(x, P) : core;
+
+                const auto didUpdateWithFlowDeck = false;
+
+                const auto didPredict = false;
+
+                (void)noise;
+                (void)lastProcessNoiseUpdateMs;
+                (void)accelSubSampler;
+                (void)gyroSubSampler;
+                (void)gyroLatest;
+                (void)rangeok;
+                (void)R;
+                (void)didUpdateWithFlowDeck;
+                (void)didPredict;
+
+                return ekf;
+
+            } // update
+
             void update(const ImuFilter::Data & imudata,
                     const uint32_t msec_curr)
             {
