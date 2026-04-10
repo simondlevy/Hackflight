@@ -273,9 +273,9 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                core.P = dtpositive ? addCovarianceNoise(core.P, noise) : core.P;
-
-                core.P = dtpositive ? enforceSymmetry(core.P) : core.P;
+                core.P = dtpositive ?
+                    enforceSymmetry(addCovarianceNoise(core.P, noise)) :
+                    core.P;
 
                 lastProcessNoiseUpdateMs =
                     dtpositive ? msec_curr : lastProcessNoiseUpdateMs;
