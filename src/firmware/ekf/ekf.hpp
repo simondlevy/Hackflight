@@ -279,8 +279,9 @@ namespace hf {
                         core.P[k*STATE_DIM+k] += noise[k] * noise[k];
                     }
 
-                    core.P = enforceSymmetry(core.P);
                 }
+
+                core.P = dtpos ? enforceSymmetry(core.P) : core.P;
 
                 lastProcessNoiseUpdateMs =
                     dtpos ? msec_curr : lastProcessNoiseUpdateMs;
