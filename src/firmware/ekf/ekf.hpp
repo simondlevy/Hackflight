@@ -329,15 +329,18 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : R;
 
-                if (ready) {
-
-
-                    // reset the attitude error
-                    core.x[STATE_D0] = 0;
-                    core.x[STATE_D1] = 0;
-                    core.x[STATE_D2] = 0;
-
-                }
+                // reset the attitude error
+                core.x = ready ?
+                vector {
+                    core.x[STATE_Z],
+                    core.x[STATE_VX],
+                    core.x[STATE_VY],
+                    core.x[STATE_VZ],
+                    0,
+                    0,
+                    0
+                } :
+                core.x;
 
                 core.P = ready ? enforceSymmetry(core.P) : core.P;
 
