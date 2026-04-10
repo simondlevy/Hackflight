@@ -674,7 +674,7 @@ namespace hf {
             static auto addCovarianceNoise(const matrix & P,
                     const float * noise) -> matrix
             {
-                auto Pnew = matrix();
+                auto Pnew = P;
 
                 for (uint8_t k=0; k<STATE_DIM; ++k) {
                     Pnew[k*STATE_DIM+k] = P[k*STATE_DIM+k] + noise[k]*noise[k];
