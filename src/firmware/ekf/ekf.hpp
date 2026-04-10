@@ -75,7 +75,7 @@ namespace hf {
                 STATE_D2,
                 STATE_DIM
             };
-        
+
             typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
 
             typedef std::array<float, STATE_DIM> vector;
@@ -135,7 +135,7 @@ namespace hf {
 
                 didPredict = false;
                 lastPredictionMs = 0;
-             }
+            }
 
             EKF(
                     const Core & core,
@@ -151,18 +151,18 @@ namespace hf {
                     const bool didPredict,
                     const uint32_t lastPredictionMs)
                 :
-                core(core),
-                q(q),
-                gyroLatest(gyroLatest),
-                accelSubSampler(accelSubSampler),
-                gyroSubSampler(gyroSubSampler),
-                R(R),
-                didUpdateWithFlowDeck(didUpdateWithFlowDeck),
-                zrangerFilterLatest(zrangerFilterLatest),
-                opticalFlowFilterLatest(opticalFlowFilterLatest),
-                lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs),
-                didPredict(didPredict),
-                lastPredictionMs(lastPredictionMs) {}
+                    core(core),
+                    q(q),
+                    gyroLatest(gyroLatest),
+                    accelSubSampler(accelSubSampler),
+                    gyroSubSampler(gyroSubSampler),
+                    R(R),
+                    didUpdateWithFlowDeck(didUpdateWithFlowDeck),
+                    zrangerFilterLatest(zrangerFilterLatest),
+                    opticalFlowFilterLatest(opticalFlowFilterLatest),
+                    lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs),
+                    didPredict(didPredict),
+                    lastPredictionMs(lastPredictionMs) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
@@ -409,11 +409,19 @@ namespace hf {
                     const ZRangerFilter & zrfilter,
                     const OpticalFlowFilter & offilter) -> EKF
             {
-                //zrangerFilterLatest = zrfilter;
-                //opticalFlowFilterLatest = offilter;
-                //didUpdateWithFlowDeck = true;
-
-                return ekf;
+                return EKF(
+                        ekf.core,
+                        ekf.q,
+                        ekf.gyroLatest,
+                        ekf.accelSubSampler,
+                        ekf.gyroSubSampler,
+                        ekf.R,
+                        true, // didUpdateWithFlowDeck,
+                        zrfilter,
+                        offilter,
+                        ekf.lastProcessNoiseUpdateMs,
+                        ekf. didPredict,
+                        ekf. lastPredictionMs);
             }
 
         private:
@@ -545,7 +553,7 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                
+
 
                 return enforceSymmetry(addCovarianceNoise(P, noise));
             }
@@ -671,9 +679,9 @@ namespace hf {
                 return Core(x, P);
             }
 
-             static auto enforceSymmetry(const matrix & P) -> matrix
-             {
-                 auto Pnew = matrix();
+            static auto enforceSymmetry(const matrix & P) -> matrix
+            {
+                auto Pnew = matrix();
 
                 for (int i=0; i<STATE_DIM; i++) {
 

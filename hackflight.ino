@@ -131,7 +131,7 @@ void loop()
         _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
-        _ekf.update(_zrangerFilter, _opticalFlowFilter);
+        _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
     }
 #else
     (void)_flowdeckTimer;
