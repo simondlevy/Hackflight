@@ -655,7 +655,7 @@ namespace hf {
 
             static auto enforceSymmetry(const matrix & P) -> matrix
             {
-                auto Pnew = matrix();
+                auto Pnew = P;
 
                 for (int i=0; i<STATE_DIM; i++) {
 
