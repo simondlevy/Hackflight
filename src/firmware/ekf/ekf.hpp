@@ -261,6 +261,7 @@ namespace hf {
                 const auto dt =
                     (msec_curr - lastProcessNoiseUpdateMs) / 1000.0f;
 
+
                 if (dt > 0) {
 
                     const float noise[STATE_DIM] = {
@@ -401,6 +402,18 @@ namespace hf {
                 zrangerFilterLatest = zrfilter;
                 opticalFlowFilterLatest = offilter;
                 didUpdateWithFlowDeck = true;
+            }
+
+            static auto update(
+                    const EKF &ekf,
+                    const ZRangerFilter & zrfilter,
+                    const OpticalFlowFilter & offilter) -> EKF
+            {
+                //zrangerFilterLatest = zrfilter;
+                //opticalFlowFilterLatest = offilter;
+                //didUpdateWithFlowDeck = true;
+
+                return ekf;
             }
 
         private:
