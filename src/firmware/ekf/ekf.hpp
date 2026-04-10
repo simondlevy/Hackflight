@@ -273,11 +273,7 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                if (dtpositive) {
-                    for (uint8_t k=0; k<STATE_DIM; ++k) {
-                        core.P[k*STATE_DIM+k] += noise[k] * noise[k];
-                    }
-                }
+                core.P = dtpositive ? addCovarianceNoise(core.P, noise) : core.P;
 
                 core.P = dtpositive ? enforceSymmetry(core.P) : core.P;
 
