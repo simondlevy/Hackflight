@@ -138,36 +138,6 @@ namespace hf {
              }
 
             EKF(
-                    const vector x,
-                    const matrix & P,
-                    const Quaternion & q,
-                    const ThreeAxis & gyroLatest,
-                    const ThreeAxisSubSampler & accelSubSampler,
-                    const ThreeAxisSubSampler & gyroSubSampler,
-                    const Rotation & R,
-                    const bool didUpdateWithFlowDeck,
-                    const ZRangerFilter & zrangerFilterLatest,
-                    const OpticalFlowFilter & opticalFlowFilterLatest,
-                    const uint32_t lastProcessNoiseUpdateMs,
-                    const bool didPredict,
-                    const uint32_t lastPredictionMs)
-
-                :
-
-                core(Core(x, P)),
-                q(q),
-                gyroLatest(gyroLatest),
-                accelSubSampler(accelSubSampler),
-                gyroSubSampler(gyroSubSampler),
-                R(R),
-                didUpdateWithFlowDeck(didUpdateWithFlowDeck),
-                zrangerFilterLatest(zrangerFilterLatest),
-                opticalFlowFilterLatest(opticalFlowFilterLatest),
-                lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs),
-                didPredict(didPredict),
-                lastPredictionMs(lastPredictionMs) {}
-
-            EKF(
                     const Core & core,
                     const Quaternion & q,
                     const ThreeAxis & gyroLatest,
