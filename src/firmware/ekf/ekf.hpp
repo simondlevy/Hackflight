@@ -167,6 +167,33 @@ namespace hf {
                 didPredict(didPredict),
                 lastPredictionMs(lastPredictionMs) {}
 
+            EKF(
+                    const Core & core,
+                    const Quaternion & q,
+                    const ThreeAxis & gyroLatest,
+                    const ThreeAxisSubSampler & accelSubSampler,
+                    const ThreeAxisSubSampler & gyroSubSampler,
+                    const Rotation & R,
+                    const bool didUpdateWithFlowDeck,
+                    const ZRangerFilter & zrangerFilterLatest,
+                    const OpticalFlowFilter & opticalFlowFilterLatest,
+                    const uint32_t lastProcessNoiseUpdateMs,
+                    const bool didPredict,
+                    const uint32_t lastPredictionMs)
+                :
+                core(core),
+                q(q),
+                gyroLatest(gyroLatest),
+                accelSubSampler(accelSubSampler),
+                gyroSubSampler(gyroSubSampler),
+                R(R),
+                didUpdateWithFlowDeck(didUpdateWithFlowDeck),
+                zrangerFilterLatest(zrangerFilterLatest),
+                opticalFlowFilterLatest(opticalFlowFilterLatest),
+                lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs),
+                didPredict(didPredict),
+                lastPredictionMs(lastPredictionMs) {}
+
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
             {
@@ -243,8 +270,7 @@ namespace hf {
                 const auto q = newtmpq / Quaternion::l2norm(newtmpq);
 
                 return EKF(
-                        x,
-                        P,
+                        Core(x, P),
                         q,
                         ekf.gyroLatest,
                         accelSubSampler,
