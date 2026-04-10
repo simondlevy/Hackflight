@@ -307,6 +307,11 @@ namespace hf {
                 const auto v = ThreeAxis(
                         core.x[STATE_D0], core.x[STATE_D1], core.x[STATE_D2]);
 
+                // reset the attitude error
+                const auto x = vector{core.x[0], core.x[1], core.x[2], core.x[3], 0, 0, 0};
+
+                const auto P = enforceSymmetry(core.P);
+
                 q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
                     smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
@@ -326,11 +331,6 @@ namespace hf {
                             2 * q.x * q.z - 2 * q.w * q.y,
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : R;
-
-                // reset the attitude error
-                const auto x = vector{core.x[0], core.x[1], core.x[2], core.x[3], 0, 0, 0};
-
-                const auto P = enforceSymmetry(core.P);
 
                 core = ready ? Core(x, P) : core;
 
