@@ -273,9 +273,10 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                core.P = dtpositive ?
-                    enforceSymmetry(addCovarianceNoise(core.P, noise)) :
-                    core.P;
+                core = dtpositive ?
+                    Core(core.x, 
+                            enforceSymmetry(addCovarianceNoise(core.P, noise))) :
+                    core;
 
                 lastProcessNoiseUpdateMs =
                     dtpositive ? msec_curr : lastProcessNoiseUpdateMs;
@@ -327,24 +328,17 @@ namespace hf {
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : R;
 
                 // reset the attitude error
-                core.x = ready ?
-                    vector {
-                        core.x[STATE_Z],
-                        core.x[STATE_VX],
-                        core.x[STATE_VY],
-                        core.x[STATE_VZ],
-                        0,
-                        0,
-                        0
-                    } :
-                core.x;
+                const auto x = vector{core.x[0], core.x[1], core.x[2], core.x[3], 0, 0, 0};
 
-                core.P = ready ? enforceSymmetry(core.P) : core.P;
+                const auto P = enforceSymmetry(core.P);
+
+                core = ready ? Core(x, P) : core;
 
                 didUpdateWithFlowDeck = false;
 
                 didPredict = false;
-            }
+
+            } // update
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
