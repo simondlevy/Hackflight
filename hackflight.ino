@@ -126,9 +126,9 @@ void loop()
 #ifdef _POSHOLD
     if (_flowdeckTimer.ready()) {
 
-        _zrangerFilter = ZRangerFilter::step(_zrangerFilter, _zranger.read());
+        _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
 
-        _opticalFlowFilter = OpticalFlowFilter::step(_opticalFlowFilter,
+        _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
         _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);

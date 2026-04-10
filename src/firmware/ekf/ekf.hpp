@@ -396,14 +396,6 @@ namespace hf {
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
-            void update(const ZRangerFilter & zrfilter,
-                    const OpticalFlowFilter & offilter)
-            {
-                zrangerFilterLatest = zrfilter;
-                opticalFlowFilterLatest = offilter;
-                didUpdateWithFlowDeck = true;
-            }
-
             static auto update(
                     const EKF &ekf,
                     const ZRangerFilter & zrfilter,

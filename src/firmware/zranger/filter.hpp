@@ -44,7 +44,7 @@ namespace hf {
             ZRangerFilter(const float distance_m, const float stdev)
                 : distance_m(distance_m), stdev(stdev) { }
 
-            static auto step(const ZRangerFilter& filter,
+            static auto update(const ZRangerFilter& filter,
                     const uint16_t distance_mm) -> ZRangerFilter
             {
                 static constexpr float EXP_COEFF =
