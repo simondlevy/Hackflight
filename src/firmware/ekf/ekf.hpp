@@ -291,9 +291,9 @@ namespace hf {
 
                 gyroLatest = imudata.gyroDps;
 
-                if (didUpdateWithFlowDeck) {
+                const auto rzz = R.zz;
 
-                    const float rzz = R.zz;
+                if (didUpdateWithFlowDeck) {
 
                     // Update the filter iff the measurement is reliable 
                     core = fabs(rzz) > 0.1 && rzz > 0 ?
@@ -303,13 +303,11 @@ namespace hf {
                             gyroLatest,R.zz);
                 }
 
-                if (didUpdateWithFlowDeck || didPredict) {
+                // Incorporate the attitude error (Kalman filter state) with the attitude
+                const auto v = ThreeAxis(
+                        core.x[STATE_D0], core.x[STATE_D1], core.x[STATE_D2]);
 
-                    // Incorporate the attitude error (Kalman filter state) with the attitude
-                    const auto v = ThreeAxis(
-                            core.x[STATE_D0],
-                            core.x[STATE_D1],
-                            core.x[STATE_D2]);
+                if (didUpdateWithFlowDeck || didPredict) {
 
                     // Move attitude error into attitude if any of the angle errors are
                     // large enough
