@@ -24,7 +24,7 @@ from sys import stdout
 
 class Gamepad:
 
-    SUPPORTED = { 'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
+    SUPPORTED = {'NATIONS RADIOMASTER SIM'}
 
     GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'RX': 1, 'RY': 2}
 
@@ -88,6 +88,8 @@ class Gamepad:
                         if subcode in self.GAMEPAD_AXIS_MAP:
 
                             axis = self.GAMEPAD_AXIS_MAP[subcode]
+
+                            print(code, axis)
 
                             vals[axis] = event.state
 
@@ -154,7 +156,7 @@ class Gamepad:
 
 if __name__ == '__main__':
 
-    gamepad = Gamepad(True)
+    gamepad = Gamepad() # True)
 
     while gamepad.connected:
 
