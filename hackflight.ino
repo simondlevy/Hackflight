@@ -131,6 +131,7 @@ void loop()
         _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
                 micros(), _flowsensor.read());
 
+        // Slower EKF update with range, optical flow
         _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
     }
 #else
@@ -144,7 +145,9 @@ void loop()
         _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
     }
 
-    _ekf.update(_imuFilter.output, millis());
+    // Faster EKF update with IMU readings
+    _ekf = EKF::update(_ekf, _imuFilter.output, millis());
+    //_ekf.update(_imuFilter.output, millis());
 
     const auto state = EKF::getVehicleState(_ekf);
 
