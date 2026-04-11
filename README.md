@@ -35,7 +35,7 @@ example, the maintenance of an error integral in a PID controller:
 
 By using header-only C++ classes whenever possible, avoiding C-style macros,
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
-eschewing inheritance and mutation in favor of
+inheritance, and mutation in favor of
 [functional style](https://queue.acm.org/detail.cfm?id=2038036i),
 and relying on existing Arduino libraries for sensors and actuators,
 Hackflight supports a
