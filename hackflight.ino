@@ -147,7 +147,6 @@ void loop()
 
     // Faster EKF update with IMU readings
     _ekf = EKF::update(_ekf, _imuFilter.output, millis());
-    //_ekf.update(_imuFilter.output, millis());
 
     const auto state = EKF::getVehicleState(_ekf);
 

@@ -341,90 +341,25 @@ namespace hf {
 
             } // update
 
-            void update(const ImuFilter::Data & imudata,
-                    const uint32_t msec_curr)
+            static auto update(
+                    const EKF &ekf,
+                    const ZRangerFilter & zrfilter,
+                    const OpticalFlowFilter & offilter) -> EKF
             {
-                const auto dt =
-                    (msec_curr - lastProcessNoiseUpdateMs) / 1000.0f;
-
-                const auto dtpositive = dt > 0;
-
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
-                };
-
-                core = dtpositive ?
-                    Core(core.x, 
-                            enforceSymmetry(addCovarianceNoise(core.P, noise))) :
-                    core;
-
-                lastProcessNoiseUpdateMs =
-                    dtpositive ? msec_curr : lastProcessNoiseUpdateMs;
-
-                accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        accelSubSampler, imudata.accelGs);
-
-                gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        gyroSubSampler, imudata.gyroDps);
-
-                gyroLatest = imudata.gyroDps;
-
-                const auto rzz = R.zz;
-
-                const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
-
-                core = rangeok && didUpdateWithFlowDeck ?
-                    updateWithRange(core, zrangerFilterLatest, rzz) : core;
-
-                core = didUpdateWithFlowDeck ?  
-                    updateWithFlow(core, opticalFlowFilterLatest,
-                            gyroLatest, rzz):
-                    core;
-
-                const auto ready = didUpdateWithFlowDeck || didPredict;
-
-                // Incorporate the attitude error (Kalman filter state) with the attitude
-                const auto v = ThreeAxis(
-                        core.x[STATE_D0], core.x[STATE_D1], core.x[STATE_D2]);
-
-                // reset the attitude error
-                const auto x = vector{core.x[0], core.x[1], core.x[2], core.x[3], 0, 0, 0};
-
-                const auto P = enforceSymmetry(core.P);
-
-                q = ready &&
-                    (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
-                    smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
-
-                    q / Quaternion::l2norm(rotate(v, q)) : q;
-
-                // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and accel
-                R = ready ?
-                    Rotation(
-                            q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
-                            2 * q.x * q.y - 2 * q.w * q.z,
-                            2 * q.x * q.z + 2 * q.w * q.y,
-                            2 * q.x * q.y + 2 * q.w * q.z,
-                            q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z,
-                            2 * q.y * q.z - 2 * q.w * q.x,
-                            2 * q.x * q.z - 2 * q.w * q.y,
-                            2 * q.y * q.z + 2 * q.w * q.x,
-                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : R;
-
-                core = ready ? Core(x, P) : core;
-
-                didUpdateWithFlowDeck = false;
-
-                didPredict = false;
-
-            } // update
+                return EKF(
+                        ekf.core,
+                        ekf.q,
+                        ekf.gyroLatest,
+                        ekf.accelSubSampler,
+                        ekf.gyroSubSampler,
+                        ekf.R,
+                        true, // didUpdateWithFlowDeck,
+                        zrfilter,
+                        offilter,
+                        ekf.lastProcessNoiseUpdateMs,
+                        ekf. didPredict,
+                        ekf. lastPredictionMs);
+            }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
             {
@@ -470,26 +405,6 @@ namespace hf {
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
                         dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
-            }
-
-            static auto update(
-                    const EKF &ekf,
-                    const ZRangerFilter & zrfilter,
-                    const OpticalFlowFilter & offilter) -> EKF
-            {
-                return EKF(
-                        ekf.core,
-                        ekf.q,
-                        ekf.gyroLatest,
-                        ekf.accelSubSampler,
-                        ekf.gyroSubSampler,
-                        ekf.R,
-                        true, // didUpdateWithFlowDeck,
-                        zrfilter,
-                        offilter,
-                        ekf.lastProcessNoiseUpdateMs,
-                        ekf. didPredict,
-                        ekf. lastPredictionMs);
             }
 
         private:
