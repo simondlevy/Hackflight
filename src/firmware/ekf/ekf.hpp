@@ -275,11 +275,10 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                /* XXX
-                core = dtpositive ?
-                    Core(core.x, 
-                            enforceSymmetry(addCovarianceNoise(core.P, noise))) :
-                    core;*/
+                const auto core = dtpositive ?
+                    Core(ekf.core.x, 
+                            enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
+                    ekf.core;
 
                 const auto lastProcessNoiseUpdateMs =
                     dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMs;
@@ -296,14 +295,13 @@ namespace hf {
 
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
-                /* XXX
-                core = rangeok && didUpdateWithFlowDeck ?
-                    updateWithRange(core, zrangerFilterLatest, rzz) : core;
+                const auto core2 = rangeok && ekf.didUpdateWithFlowDeck ?
+                    updateWithRange(core, ekf.zrangerFilterLatest, rzz) : core;
 
-                core = didUpdateWithFlowDeck ?  
-                    updateWithFlow(core, opticalFlowFilterLatest,
+                const auto core3 = ekf.didUpdateWithFlowDeck ?  
+                    updateWithFlow(core2, ekf.opticalFlowFilterLatest,
                             gyroLatest, rzz):
-                    core;*/
+                    core2;
 
                 const auto ready = ekf.didUpdateWithFlowDeck || ekf.didPredict;
 
@@ -312,9 +310,9 @@ namespace hf {
                         ekf.core.x[STATE_D0], ekf.core.x[STATE_D1], ekf.core.x[STATE_D2]);
 
                 // reset the attitude error
-                // XXX const auto x = vector{core.x[0], core.x[1], core.x[2], core.x[3], 0, 0, 0};
+                const auto x = vector{core3.x[0], core3.x[1], core3.x[2], core3.x[3], 0, 0, 0};
 
-                // const auto P = enforceSymmetry(core.P);
+                const auto P = enforceSymmetry(core3.P);
 
                 const auto q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
@@ -335,23 +333,21 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.R;
 
-                // XXX core = ready ? Core(x, P) : core;
+                const auto core4 = ready ? Core(x, P) : core3;
 
-                const auto didUpdateWithFlowDeck = false;
-
-                const auto didPredict = false;
-
-                (void)noise;
-                (void)lastProcessNoiseUpdateMs;
-                (void)accelSubSampler;
-                (void)gyroSubSampler;
-                (void)gyroLatest;
-                (void)rangeok;
-                (void)R;
-                (void)didUpdateWithFlowDeck;
-                (void)didPredict;
-
-                return ekf;
+                return EKF(
+                        core4,
+                        q,
+                        gyroLatest,
+                        accelSubSampler,
+                        gyroSubSampler,
+                        R,
+                        false, // didUpateWithFlowDeck
+                        ekf.zrangerFilterLatest,
+                        ekf.opticalFlowFilterLatest,
+                        lastProcessNoiseUpdateMs,
+                        false, // didPredict
+                        ekf.lastPredictionMs);
 
             } // update
 
