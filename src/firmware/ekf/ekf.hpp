@@ -127,16 +127,6 @@ namespace hf {
                 lastPredictionMs = 0;
             }
 
-            EKF(const Core & core)
-                : core(core)
-            {
-                didUpdateWithFlowDeck = false;
-                lastProcessNoiseUpdateMs = 0;
-
-                didPredict = false;
-                lastPredictionMs = 0;
-            }
-
             EKF(
                     const Core & core,
                     const Quaternion & q,
