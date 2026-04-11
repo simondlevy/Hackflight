@@ -33,12 +33,14 @@ example, the maintenance of an error integral in a PID controller:
 
 <img src="media/dataflow2.png" width=700>
 
-By using header-only C++ classes whenever possible, avoiding C-style macros and 
-[null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
+By using header-only C++ classes whenever possible, avoiding C-style macros,
+[null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/), eschewing inheritance, and mutation in favor of
+[functional style](https://queue.acm.org/detail.cfm?id=2038036i),
 and relying on existing Arduino libraries for sensors and actuators,
-Hackflight supports a [composable](https://www.progress.com/blogs/what-composability-why-should-you-care) 
+Hackflight supports a
+[composable](https://www.progress.com/blogs/what-composability-why-should-you-care)
 approach to taming the complexity of flight control. The Hackflight [codebase](src/) is
-around 3,000 lines of code.
+under 3,000 lines of code.
 
 # Hardware
 
