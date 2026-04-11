@@ -121,10 +121,10 @@ namespace hf {
                 core.P = addCovarianceNoise(matrix(), pinit);
 
                 didUpdateWithFlowDeck = false;
-                lastProcessNoiseUpdateMs = 0;
+                lastProcessNoiseUpdateMsec = 0;
 
                 didPredict = false;
-                lastPredictionMs = 0;
+                lastPredictionMsec = 0;
             }
 
             EKF(
@@ -137,9 +137,9 @@ namespace hf {
                     const bool didUpdateWithFlowDeck,
                     const ZRangerFilter & zrangerFilterLatest,
                     const OpticalFlowFilter & opticalFlowFilterLatest,
-                    const uint32_t lastProcessNoiseUpdateMs,
+                    const uint32_t lastProcessNoiseUpdateMsec,
                     const bool didPredict,
-                    const uint32_t lastPredictionMs)
+                    const uint32_t lastPredictionMsec)
                 :
                     core(core),
                     q(q),
@@ -150,9 +150,9 @@ namespace hf {
                     didUpdateWithFlowDeck(didUpdateWithFlowDeck),
                     zrangerFilterLatest(zrangerFilterLatest),
                     opticalFlowFilterLatest(opticalFlowFilterLatest),
-                    lastProcessNoiseUpdateMs(lastProcessNoiseUpdateMs),
+                    lastProcessNoiseUpdateMsec(lastProcessNoiseUpdateMsec),
                     didPredict(didPredict),
-                    lastPredictionMs(lastPredictionMs) {}
+                    lastPredictionMsec(lastPredictionMsec) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
@@ -163,7 +163,7 @@ namespace hf {
                 const auto gyroSubSampler =
                     ThreeAxisSubSampler::finalize(ekf.gyroSubSampler);
 
-                const auto dt = (msec_curr - ekf.lastPredictionMs) / 1000.f;
+                const auto dt = (msec_curr - ekf.lastPredictionMsec) / 1000.f;
 
                 const auto accel = accelSubSampler.subSample;
                 const auto gyro = gyroSubSampler.subSample;
@@ -239,9 +239,9 @@ namespace hf {
                         ekf.didUpdateWithFlowDeck,
                         ekf.zrangerFilterLatest,
                         ekf.opticalFlowFilterLatest,
-                        ekf.lastProcessNoiseUpdateMs,
+                        ekf.lastProcessNoiseUpdateMsec,
                         true, // didPredict,
-                        msec_curr);  // lastPredictionMs
+                        msec_curr);  // lastPredictionMsec
 
             } // predict
 
@@ -251,7 +251,7 @@ namespace hf {
                     const uint32_t msec_curr) -> EKF
             {
                 const auto dt =
-                    (msec_curr - ekf.lastProcessNoiseUpdateMs) / 1000.0f;
+                    (msec_curr - ekf.lastProcessNoiseUpdateMsec) / 1000.0f;
 
                 const auto dtpositive = dt > 0;
 
@@ -270,8 +270,8 @@ namespace hf {
                             enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
                     ekf.core;
 
-                const auto lastProcessNoiseUpdateMs =
-                    dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMs;
+                const auto lastProcessNoiseUpdateMsec =
+                    dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMsec;
 
                 const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
                         ekf.accelSubSampler, imudata.accelGs);
@@ -335,9 +335,9 @@ namespace hf {
                         false, // didUpateWithFlowDeck
                         ekf.zrangerFilterLatest,
                         ekf.opticalFlowFilterLatest,
-                        lastProcessNoiseUpdateMs,
+                        lastProcessNoiseUpdateMsec,
                         false, // didPredict
-                        ekf.lastPredictionMs);
+                        ekf.lastPredictionMsec);
 
             } // update
 
@@ -356,9 +356,9 @@ namespace hf {
                         true, // didUpdateWithFlowDeck,
                         zrfilter,
                         offilter,
-                        ekf.lastProcessNoiseUpdateMs,
+                        ekf.lastProcessNoiseUpdateMsec,
                         ekf. didPredict,
-                        ekf. lastPredictionMs);
+                        ekf. lastPredictionMsec);
             }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
@@ -428,10 +428,10 @@ namespace hf {
             ZRangerFilter zrangerFilterLatest;
             OpticalFlowFilter opticalFlowFilterLatest;
 
-            uint32_t lastProcessNoiseUpdateMs;
+            uint32_t lastProcessNoiseUpdateMsec;
 
             bool didPredict;
-            uint32_t lastPredictionMs;
+            uint32_t lastPredictionMsec;
 
             static auto makeJacobian(
                     const float dt,
