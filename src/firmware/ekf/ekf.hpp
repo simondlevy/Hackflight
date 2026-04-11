@@ -265,11 +265,6 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                const auto core = dtpositive ?
-                    Core(ekf.core.x, 
-                            enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
-                    ekf.core;
-
                 const auto lastProcessNoiseUpdateMsec =
                     dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMsec;
 
@@ -285,13 +280,20 @@ namespace hf {
 
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
-                const auto core2 = rangeok && ekf.didUpdateWithFlowDeck ?
-                    updateWithRange(core, ekf.zrangerFilterLatest, rzz) : core;
+                const auto coreWithNoise = dtpositive ?
+                    Core(ekf.core.x, 
+                            enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
+                    ekf.core;
 
-                const auto core3 = ekf.didUpdateWithFlowDeck ?  
-                    updateWithFlow(core2, ekf.opticalFlowFilterLatest,
+                const auto coreWithRange = rangeok && ekf.didUpdateWithFlowDeck ?
+                    updateWithRange(
+                            coreWithNoise, ekf.zrangerFilterLatest, rzz) :
+                    coreWithNoise;
+
+                const auto coreWithRangeAndFlow = ekf.didUpdateWithFlowDeck ?  
+                    updateWithFlow(coreWithRange, ekf.opticalFlowFilterLatest,
                             gyroLatest, rzz):
-                    core2;
+                    coreWithRange;
 
                 const auto ready = ekf.didUpdateWithFlowDeck || ekf.didPredict;
 
@@ -300,9 +302,14 @@ namespace hf {
                         ekf.core.x[STATE_D0], ekf.core.x[STATE_D1], ekf.core.x[STATE_D2]);
 
                 // reset the attitude error
-                const auto x = vector{core3.x[0], core3.x[1], core3.x[2], core3.x[3], 0, 0, 0};
+                const auto x = vector{
+                    coreWithRangeAndFlow.x[0],
+                    coreWithRangeAndFlow.x[1],
+                    coreWithRangeAndFlow.x[2],
+                    coreWithRangeAndFlow.x[3],
+                    0, 0, 0};
 
-                const auto P = enforceSymmetry(core3.P);
+                const auto P = enforceSymmetry(coreWithRangeAndFlow.P);
 
                 const auto q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
@@ -323,10 +330,10 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.R;
 
-                const auto core4 = ready ? Core(x, P) : core3;
+                const auto core = ready ? Core(x, P) : coreWithRangeAndFlow;
 
                 return EKF(
-                        core4,
+                        core,
                         q,
                         gyroLatest,
                         accelSubSampler,
