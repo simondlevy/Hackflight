@@ -16,15 +16,16 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import argparse
+from argparse import ArgumentDefaultsHelpFormatter
 import inputs
 from threading import Thread
 from time import sleep
-from sys import stdout
 
 from msp import Serializer
 
 
-class Gamepad:
+class RadioMaster:
 
     SUPPORTED = {'NATIONS RADIOMASTER SIM'}
 
@@ -87,12 +88,17 @@ class Gamepad:
                 self.connected = False
 
             except OSError:
-                print('Gamepad unplugged')
+                print('RadioMaster unplugged')
                 self.connected = False
 
     def step(self):
 
         try:
+
+            msg = Serializer.serialize_SET_RC(*self.axes)
+
+            sleep(1 / self.UPDATE_RATE_HZ)
+
 
             if self.debug:
 
@@ -100,18 +106,22 @@ class Gamepad:
                       (self.axes[0], self.axes[1], self.axes[2],
                        self.axes[3], self.axes[4]))
 
-            sleep(1 / self.UPDATE_RATE_HZ)
-
-            stdout.flush()
-
         except KeyboardInterrupt:
             self.connected = False
 
 
 if __name__ == '__main__':
 
-    gamepad = Gamepad(True)
+    argparser = argparse.ArgumentParser(
+            formatter_class=ArgumentDefaultsHelpFormatter)
 
-    while gamepad.connected:
+    argparser.add_argument('-d', '--debug', action='store_true',
+                           help='Report channel values')
 
-        gamepad.step()
+    args = argparser.parse_args()
+
+    rm = RadioMaster(args.debug)
+
+    while rm.connected:
+
+        rm.step()
