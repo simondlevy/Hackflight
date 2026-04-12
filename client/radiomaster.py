@@ -26,7 +26,7 @@ class Gamepad:
 
     SUPPORTED = {'NATIONS RADIOMASTER SIM'}
 
-    GAMEPAD_AXIS_MAP = {'Z': 0, 'X': 1, 'Y': 2, 'RX': 3}
+    AXIS_MAP = {'Z': 0, 'X': 1, 'Y': 2, 'RX': 3, 'RY': 4}
 
     UPDATE_RATE_HZ = 100
 
@@ -40,10 +40,6 @@ class Gamepad:
         self.armed = False
         self.debug = debug
         self.connected = True
-        self.thrust = 0
-        self.roll = 0
-        self.pitch = 0
-        self.yaw = 0
 
         gamepads = inputs.devices.gamepads
 
@@ -51,7 +47,8 @@ class Gamepad:
             print('No gamepad detected')
             exit(0)
 
-        self.gamepad_vals = [1500] * 4
+        # Force neutral axis values to start
+        self.axes = [988, 1500, 1500, 1500, 988]
 
         devname = inputs.devices.gamepads[0].name
 
@@ -59,7 +56,7 @@ class Gamepad:
             print(devname + ' not supported')
             exit(0)
 
-        thread = Thread(target=self.threadfun, args=(self.gamepad_vals, ))
+        thread = Thread(target=self.threadfun, args=(self.axes, ))
         thread.daemon = True
         thread.start()
 
@@ -78,9 +75,9 @@ class Gamepad:
 
                         subcode = code[4:]
 
-                        if subcode in self.GAMEPAD_AXIS_MAP:
+                        if subcode in self.AXIS_MAP:
 
-                            axis = self.GAMEPAD_AXIS_MAP[subcode]
+                            axis = self.AXIS_MAP[subcode]
 
                             vals[axis] = event.state
 
@@ -96,24 +93,15 @@ class Gamepad:
                 print('Gamepad unplugged')
                 self.connected = False
 
-    def scale(self, axval):
-
-        return 2 * (axval - 989) / 1024 - 1
-
     def step(self):
 
         try:
 
-            self.thrust = self.scale(self.gamepad_vals[0])
-            self.roll = self.scale(self.gamepad_vals[1])
-            self.pitch = self.scale(self.gamepad_vals[2])
-            self.yaw = self.scale(self.gamepad_vals[3])
-
             if self.debug:
 
-                print('armed=%d | t=%3.3f r=%+3.2f p=%+3.3f y=%+3.3f' %
-                      (self.armed, self.thrust, self.roll, self.pitch,
-                       self.yaw))
+                print('c1=%04d c2=%04d c3=%04d c4=%04d c5=%04d' %
+                      (self.axes[0], self.axes[1], self.axes[2],
+                       self.axes[3], self.axes[4]))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 
