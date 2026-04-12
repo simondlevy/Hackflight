@@ -20,6 +20,7 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import inputs
 from threading import Thread
+from serial import Serial
 from time import sleep
 
 from msp import Serializer
