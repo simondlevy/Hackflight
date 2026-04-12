@@ -37,8 +37,10 @@ void setup()
 
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK) {
-        Serial.println("Error initializing ESP-NOW");
-        return;
+        while (true) {
+            Serial.println("Error initializing ESP-NOW");
+            delay(500);
+        }
     }
 
     // Once ESPNow is successfully Init, we will register for recv CB to

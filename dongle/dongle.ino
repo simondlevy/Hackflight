@@ -15,8 +15,6 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <hackflight.h>
-
 // REPLACE WITH YOUR RECEIVER MAC Address
 static const uint8_t RECEIVER_ADDRESS[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
 
@@ -28,30 +26,31 @@ void serialEvent()
     }
 }
 
+static void reportForever(const char * msg)
+{
+    while (true) {
+        Serial.println(msg);
+        delay(500);
+    }
+}
+
 void setup()
 {
-    // Init Serial Monitor
     Serial.begin(115200);
 
-    // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
 
-    // Init ESP-NOW
     if (esp_now_init() != ESP_OK) {
-        Serial.println("Error initializing ESP-NOW");
-        return;
+        reportForever("Error initializing ESP-NOW");
     }
 
-    // Register peer
     esp_now_peer_info_t peerInfo = {};
     memcpy(peerInfo.peer_addr, RECEIVER_ADDRESS, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
 
-    // Add peer        
     if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        Serial.println("Failed to add peer");
-        return;
+        reportForever("Failed to add peer");
     }
 }
 
