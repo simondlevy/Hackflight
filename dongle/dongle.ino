@@ -18,14 +18,14 @@
 #include <hackflight.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t broadcastAddress[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
+static const uint8_t RECEIVER_ADDRESS[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
 
-// callback when data is sent
-static void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
+void serialEvent()
 {
-    Serial.print("\r\nLast Packet Send Status:\t");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ?
-            "Delivery Success" : "Delivery Fail");
+    while (Serial.available()) {
+        const uint8_t c = Serial.read();
+        esp_now_send(RECEIVER_ADDRESS, &c, 1);
+    }
 }
 
 void setup()
@@ -42,13 +42,9 @@ void setup()
         return;
     }
 
-    // Once ESPNow is successfully Init, we will register for Send CB to
-    // get the status of Trasnmitted packet
-    esp_now_register_send_cb(esp_now_send_cb_t(OnDataSent));
-
     // Register peer
     esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+    memcpy(peerInfo.peer_addr, RECEIVER_ADDRESS, 6);
     peerInfo.channel = 0;  
     peerInfo.encrypt = false;
 
@@ -61,20 +57,4 @@ void setup()
 
 void loop()
 {
-    static uint8_t k;
-
-    const auto c = (char)('A' +k);
-
-    // Send message via ESP-NOW
-    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &c, 1);
-
-    k = (k + 1) % 26;
-
-    if (result == ESP_OK) {
-        Serial.println("Sent with success");
-    }
-    else {
-        Serial.println("Error sending the data");
-    }
-    delay(100);
 }

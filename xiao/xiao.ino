@@ -23,7 +23,7 @@ static void OnDataRecv(
     (void)mac;
 
     for (int k=0; k<len; ++k) {
-        Serial.println((char)incomingData[k]);
+        Serial.println((char)incomingData[k], HEX);
     }
 }
 
