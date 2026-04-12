@@ -38,12 +38,8 @@ class Gamepad:
     def __init__(self, debug=False):
 
         self.armed = False
-        self.hovering = False
         self.debug = debug
         self.connected = True
-        self.vx = 0
-        self.vy = 0
-        self.yawrate = 0
         self.thrust = 0
         self.roll = 0
         self.pitch = 0
@@ -55,7 +51,7 @@ class Gamepad:
             print('No gamepad detected')
             exit(0)
 
-        self.gamepad_vals = [0, 0, 0, 0]
+        self.gamepad_vals = [1500] * 4
 
         devname = inputs.devices.gamepads[0].name
 
@@ -102,30 +98,21 @@ class Gamepad:
 
     def scale(self, axval):
 
-        return axval / 32767
+        return 2 * (axval - 989) / 1024 - 1
 
     def step(self):
 
         try:
 
+            self.thrust = self.scale(self.gamepad_vals[0])
+            self.roll = self.scale(self.gamepad_vals[1])
+            self.pitch = self.scale(self.gamepad_vals[2])
+            self.yaw = self.scale(self.gamepad_vals[3])
+
             if self.debug:
 
-                print('armed=%d' % self.armed, end=' | ')
-
-                if self.hovering:
-
-                    self.thrust = -self.scale(self.gamepad_vals[0])
-                    self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
-                    self.vy = self.scale(self.gamepad_vals[1])
-                    self.yawrate = self.scale(self.gamepad_vals[3])
-
-                    if self.debug:
-                        print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f ' +
-                               'vy=%+3.3f yaw=%+3.f') %
-                              (self.thrust, self.vx, self.vy, self.yawrate))
-
-                else:
-                    print()
+                print('armed=%d | t=%3.3f r=%+3.2f p=%+3.3f y=%+3.3f' %
+                      (self.armed, self.thrust, self.roll, self.pitch, self.yaw))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 

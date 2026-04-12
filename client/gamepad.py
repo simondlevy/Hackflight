@@ -125,21 +125,21 @@ class Gamepad:
 
         try:
 
+            if self.hovering:
+
+                self.thrust = -self.scale(self.gamepad_vals[0])
+                self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
+                self.vy = self.scale(self.gamepad_vals[1])
+                self.yawrate = self.scale(self.gamepad_vals[3])
+
             if self.debug:
 
                 print('armed=%d' % self.armed, end=' | ')
 
                 if self.hovering:
-
-                    self.thrust = -self.scale(self.gamepad_vals[0])
-                    self.vx = -self.scale(self.gamepad_vals[2])  # forward positive
-                    self.vy = self.scale(self.gamepad_vals[1])
-                    self.yawrate = self.scale(self.gamepad_vals[3])
-
-                    if self.debug:
-                        print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f ' +
-                               'vy=%+3.3f yaw=%+3.f') %
-                              (self.thrust, self.vx, self.vy, self.yawrate))
+                    print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f ' +
+                           'vy=%+3.3f yaw=%+3.f') %
+                          (self.thrust, self.vx, self.vy, self.yawrate))
 
                 else:
                     print()
