@@ -1,3 +1,5 @@
+fabrication-toolkit-options.json
+production/
 *.lck
 *-bak
 *-cache
