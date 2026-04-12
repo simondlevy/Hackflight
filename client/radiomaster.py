@@ -80,6 +80,8 @@ class Gamepad:
 
                     code = str(event.code)
 
+                    print(code)
+
                     # Axis
                     if 'ABS' in code:
 
@@ -88,8 +90,6 @@ class Gamepad:
                         if subcode in self.GAMEPAD_AXIS_MAP:
 
                             axis = self.GAMEPAD_AXIS_MAP[subcode]
-
-                            print(code, axis)
 
                             vals[axis] = event.state
 

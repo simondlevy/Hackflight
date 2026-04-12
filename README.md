@@ -28,10 +28,10 @@ avoid injury to you and damage to your vehicle.
 Hackflight attempts to maintain a simple relationship between
 the code and the elements of the flight-control dataflow diagram shown below.
 Boxes represent data, ovals represent functions, and feedback arrows
-represent the need for functions that have state (instance variables); for
+represent the need for functions that have state; for
 example, the maintenance of an error integral in a PID controller:
 
-<img src="media/dataflow2.png" width=700>
+<img src="media/dataflow.png" width=700>
 
 By using header-only C++ classes whenever possible, avoiding C-style macros,
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
