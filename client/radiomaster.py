@@ -37,7 +37,6 @@ class Gamepad:
 
     def __init__(self, debug=False):
 
-        self.armed = False
         self.debug = debug
         self.connected = True
 
@@ -80,10 +79,6 @@ class Gamepad:
                             axis = self.AXIS_MAP[subcode]
 
                             vals[axis] = event.state
-
-                        elif subcode == 'RY':
-
-                            self.armed = not self.armed
 
             except inputs.UnpluggedError:
                 print('No gamepad detected')
