@@ -1,29 +1,29 @@
 /*
-  Rui Santos & Sara Santos - Random Nerd Tutorials Complete project details at
-https://RandomNerdTutorials.com/esp-now-esp32-arduino-ide/  Permission is
-      //hereby granted, free of charge, to any person obtaining a copy of this
-      //software and associated documentation files.
-      The above copyright notice and this permission notice shall be included
-      in all copies or substantial portions of the Software.
+   Hackflight ESPNOW onboard radio sketch
+
+   Copyright (C) 2026 Simon D. Levy
+
+   Based on: https://randomnerdtutorials.com/esp-now-esp32-arduino-ide/
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files.  The above copyright
+   notice and this permission notice shall be included in all copies or
+   substantial portions of the Software.
 */
 
 #include <esp_now.h>
 #include <WiFi.h>
 
-// Structure example to receive data
-// Must match the sender structure
-typedef struct struct_message {
-    char a[32];
-    int b;
-    float c;
-    bool d;
-} struct_message;
+#include <hackflight.h>
+#include <firmware/espnow.h>
 
-// Create a struct_message called myData
-struct_message myData;
+// Create a espnow_message_t called myData
+static espnow_message_t myData;
 
 // callback function that will be executed when data is received
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+static void OnDataRecv(
+        const uint8_t * mac, const uint8_t *incomingData, int len)
+{
   memcpy(&myData, incomingData, sizeof(myData));
   Serial.print("Bytes received: ");
   Serial.println(len);
@@ -38,7 +38,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.println();
 }
  
-void setup() {
+void setup()
+{
   // Initialize Serial Monitor
   Serial.begin(115200);
   
@@ -56,7 +57,7 @@ void setup() {
   esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 }
  
-void loop() {
+void loop()
+{
 
 }
-

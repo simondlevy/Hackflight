@@ -1,11 +1,16 @@
 /*
-Rui Santos & Sara Santos - Random Nerd Tutorials
-Complete project details at
-https://RandomNerdTutorials.com/esp-now-esp32-arduino-ide/ Permission is hereby
-granted, free of charge, to any person obtaining a copy of this software and
-associated documentation files.  The above copyright notice and this permission
-notice shall be included in all copies or substantial portions of the Software.
+   Hackflight ESPNOW dongle sketch
+
+   Copyright (C) 2026 Simon D. Levy
+
+   Based on: https://randomnerdtutorials.com/esp-now-esp32-arduino-ide/
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files.  The above copyright
+   notice and this permission notice shall be included in all copies or
+   substantial portions of the Software.
 */
+
 
 #include <esp_now.h>
 #include <WiFi.h>
@@ -13,27 +18,23 @@ notice shall be included in all copies or substantial portions of the Software.
 // REPLACE WITH YOUR RECEIVER MAC Address
 uint8_t broadcastAddress[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
 
-// Structure example to send data
-// Must match the receiver structure
-typedef struct struct_message {
-  char a[32];
-  int b;
-  float c;
-  bool d;
-} struct_message;
+#include <hackflight.h>
+#include <firmware/espnow.h>
 
-// Create a struct_message called myData
-struct_message myData;
+// Create a espnow_message_t called myData
+static espnow_message_t myData;
 
-esp_now_peer_info_t peerInfo;
+static esp_now_peer_info_t peerInfo;
 
 // callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+static void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
+{
   Serial.print("\r\nLast Packet Send Status:\t");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
  
-void setup() {
+void setup()
+{
   // Init Serial Monitor
   Serial.begin(115200);
  
@@ -62,7 +63,8 @@ void setup() {
   }
 }
  
-void loop() {
+void loop()
+{
   // Set values to send
   strcpy(myData.a, "THIS IS A CHAR");
   myData.b = random(1,20);
@@ -80,4 +82,3 @@ void loop() {
   }
   delay(2000);
 }
-
