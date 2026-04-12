@@ -1,14 +1,19 @@
 /*
-   Hackflight ESPNOW dongle sketch
-
-   Copyright (C) 2026 Simon D. Levy
-
-   Based on: https://randomnerdtutorials.com/esp-now-esp32-arduino-ide/
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files.  The above copyright
-   notice and this permission notice shall be included in all copies or
-   substantial portions of the Software.
+ * Hackflight ESPNOW radio dongle sketch
+ *
+ * Copyright (C) 2026 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 

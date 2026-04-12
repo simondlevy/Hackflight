@@ -1,54 +1,54 @@
 /*
-   Hackflight ESPNOW onboard radio sketch
-
-   Copyright (C) 2026 Simon D. Levy
-
-   Based on: https://randomnerdtutorials.com/esp-now-esp32-arduino-ide/
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files.  The above copyright
-   notice and this permission notice shall be included in all copies or
-   substantial portions of the Software.
-*/
+ * Hackflight ESPNOW onboard radio sketch
+ *
+ * Copyright (C) 2026 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <hackflight.h>
+static HardwareSerial serial(1);
 
-// callback function that will be executed when data is received
-static void OnDataRecv(
-        const uint8_t * mac, const uint8_t *incomingData, int len)
+static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
 
-    for (int k=0; k<len; ++k) {
-        Serial.println((char)incomingData[k], HEX);
+    for (auto k=0; k<len; ++k) {
+
+        serial.write(incomingData[k]);
     }
 }
 
-void setup()
+void setup(void)
 {
-    // Initialize Serial Monitor
-    Serial.begin(115200);
+    serial.begin(115200, SERIAL_8N1, 4, 14); 
 
-    // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
 
-    // Init ESP-NOW
     if (esp_now_init() != ESP_OK) {
+
         while (true) {
             Serial.println("Error initializing ESP-NOW");
             delay(500);
         }
     }
 
-    // Once ESPNow is successfully Init, we will register for recv CB to
-    // get recv packer info
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    esp_now_register_recv_cb(onDataRecv);
 }
 
-void loop()
-{
 
+void loop(void)
+{
 }
