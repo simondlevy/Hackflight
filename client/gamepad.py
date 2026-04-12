@@ -26,7 +26,7 @@ class Gamepad:
 
     SUPPORTED = { 'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
 
-    GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'RX': 1, 'RY': 2}
+    GAMEPAD_AXIS_MAP = {'Y': 0, 'RX': 1, 'RY': 2, 'X': 3}
 
     UPDATE_RATE_HZ = 100
 

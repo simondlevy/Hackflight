@@ -26,7 +26,7 @@ class Gamepad:
 
     SUPPORTED = {'NATIONS RADIOMASTER SIM'}
 
-    GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'RX': 1, 'RY': 2}
+    GAMEPAD_AXIS_MAP = {'Z': 0, 'X': 1, 'Y': 2, 'RX': 3}
 
     UPDATE_RATE_HZ = 100
 
@@ -69,9 +69,6 @@ class Gamepad:
 
     def threadfun(self, vals):
 
-        arming_prev = 0
-        hover_prev = 0
-
         while self.connected:
 
             try:
@@ -79,8 +76,6 @@ class Gamepad:
                 for event in inputs.get_gamepad():
 
                     code = str(event.code)
-
-                    print(code)
 
                     # Axis
                     if 'ABS' in code:
@@ -93,23 +88,9 @@ class Gamepad:
 
                             vals[axis] = event.state
 
-                    # Arming button
-                    elif code == 'BTN_WEST':
-
-                        if not event.state and arming_prev:
+                        elif subcode == 'RY':
 
                             self.armed = not self.armed
-
-                        arming_prev = event.state
-
-                    # Hover button
-                    elif code == 'BTN_TR':
-
-                        if self.armed and not event.state and hover_prev:
-
-                            self.hovering = not self.hovering
-
-                        hover_prev = event.state
 
             except inputs.UnpluggedError:
                 print('No gamepad detected')
@@ -156,7 +137,7 @@ class Gamepad:
 
 if __name__ == '__main__':
 
-    gamepad = Gamepad() # True)
+    gamepad = Gamepad(True)
 
     while gamepad.connected:
 
