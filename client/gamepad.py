@@ -19,14 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import inputs
 from threading import Thread
 from time import sleep
-from sys import stdout
 
 
 class Gamepad:
 
-    SUPPORTED = { 'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
+    SUPPORTED = {'Microsoft X-Box 360 pad', 'Logitech Gamepad F310'}
 
-    GAMEPAD_AXIS_MAP = {'Y': 0, 'RX': 1, 'RY': 2, 'X': 3}
+    GAMEPAD_AXIS_MAP = {'X': 3, 'Y': 0, 'RX': 1, 'RY': 2}
 
     UPDATE_RATE_HZ = 100
 
@@ -80,7 +79,7 @@ class Gamepad:
 
                     code = str(event.code)
 
-                    # Axis
+                    # Stick
                     if 'ABS' in code:
 
                         subcode = code[4:]
@@ -125,6 +124,9 @@ class Gamepad:
 
         try:
 
+            if self.debug:
+                print('armed=%d' % self.armed, end=' | ')
+
             if self.hovering:
 
                 self.thrust = -self.scale(self.gamepad_vals[0])
@@ -132,21 +134,12 @@ class Gamepad:
                 self.vy = self.scale(self.gamepad_vals[1])
                 self.yawrate = self.scale(self.gamepad_vals[3])
 
-            if self.debug:
-
-                print('armed=%d' % self.armed, end=' | ')
-
-                if self.hovering:
+                if self.debug:
                     print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f ' +
                            'vy=%+3.3f yaw=%+3.f') %
                           (self.thrust, self.vx, self.vy, self.yawrate))
 
-                else:
-                    print()
-
             sleep(1 / self.UPDATE_RATE_HZ)
-
-            stdout.flush()
 
         except KeyboardInterrupt:
             self.connected = False

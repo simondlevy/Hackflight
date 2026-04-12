@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-Copyright (C) 2025 Simon D. Levy
+Copyright (C) 2026 Simon D. Levy
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -112,7 +112,8 @@ class Gamepad:
             if self.debug:
 
                 print('armed=%d | t=%3.3f r=%+3.2f p=%+3.3f y=%+3.3f' %
-                      (self.armed, self.thrust, self.roll, self.pitch, self.yaw))
+                      (self.armed, self.thrust, self.roll, self.pitch,
+                       self.yaw))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 
