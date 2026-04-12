@@ -204,6 +204,8 @@ class PythonEmitter(CodeEmitter):
                 self._write('):\n')
                 self._write('        return')
 
+        self._write('\n\n\nclass Serializer:')
+
         # Emit serializer functions for module
         for msgtype in self.msgdict.keys():
 

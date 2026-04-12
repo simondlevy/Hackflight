@@ -51,5 +51,14 @@
    {"vx":      "float"},
    {"vy":      "float"},
    {"yaw":     "float"}
+  ],
+
+  "SET_RC": 
+  [{"ID": 203},
+   {"c1" : "short"},
+   {"c2":  "short"},
+   {"c3":  "short"},
+   {"c4":  "short"},
+   {"c5":  "short"}
   ]
 }
