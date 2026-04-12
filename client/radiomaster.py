@@ -116,10 +116,19 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
+    argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
+                           help='Report channel values')
+
     argparser.add_argument('-d', '--debug', action='store_true',
                            help='Report channel values')
 
     args = argparser.parse_args()
+
+    try:
+        port = Serial(args.port, 115200)
+    except:
+        print('Unable to open port ' + args.port)
+        exit(0)
 
     rm = RadioMaster(args.debug)
 
