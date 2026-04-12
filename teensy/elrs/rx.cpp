@@ -52,9 +52,9 @@ static void onReceiveRcChannels(
     }
 }
 
-void RX::begin()
+void RX::begin(HardwareSerial * serial)
 {
-    _crsf = CRSFforArduino(_serial);
+    _crsf = CRSFforArduino(serial);
 
     if (!_crsf.begin()) {
 
@@ -66,7 +66,7 @@ void RX::begin()
         }
     }
 
-    _crsf.setRcChannelsCallback(onReceiveRcChannels, this);
+    _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
 }
 
 auto RX::read() -> RX::Data

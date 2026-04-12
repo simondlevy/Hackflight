@@ -51,7 +51,12 @@ namespace hf {
 
             RX(HardwareSerial * serial) : _serial(serial) { }
 
-            void begin();
+            static void begin(HardwareSerial *);
+
+            void begin()
+            {
+                begin(_serial);
+            }
 
             auto read() -> Data;
 
