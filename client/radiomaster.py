@@ -20,7 +20,7 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import inputs
 from threading import Thread
-from serial import Serial
+import serial
 from time import sleep
 
 from msp import Serializer
@@ -39,8 +39,9 @@ class RadioMaster:
     ALTITUDE_MIN_M = 0.2
     ALTITUDE_INC_MPS = 0.01
 
-    def __init__(self, debug=False):
+    def __init__(self, port, debug=False):
 
+        self.port = port
         self.debug = debug
         self.connected = True
 
@@ -96,10 +97,9 @@ class RadioMaster:
 
         try:
 
-            msg = Serializer.serialize_SET_RC(*self.axes)
+            self.port.write(Serializer.serialize_SET_RC(*self.axes))
 
             sleep(1 / self.UPDATE_RATE_HZ)
-
 
             if self.debug:
 
@@ -125,12 +125,13 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     try:
-        port = Serial(args.port, 115200)
-    except:
+        port = serial.Serial(args.port, 115200)
+
+    except serial.SerialException:
         print('Unable to open port ' + args.port)
         exit(0)
 
-    rm = RadioMaster(args.debug)
+    rm = RadioMaster(port, args.debug)
 
     while rm.connected:
 
