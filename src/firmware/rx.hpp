@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <Arduino.h>
+
 #include <datatypes.hpp>
 
 namespace hf {

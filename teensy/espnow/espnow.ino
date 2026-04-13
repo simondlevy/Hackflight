@@ -27,14 +27,14 @@ using namespace hf;
 static const uint8_t LED_PIN = LED_BUILTIN;
 
 static auto _led = LED(LED_PIN);
-//static auto _rx = RX(&Serial5);
+static auto _rx = RX(&Serial1);
 static Debugger _debugger;
 
 // Setup
 void setup()
 {
     Serial1.begin(115200);
-    //_rx.begin();
+    _rx.begin();
     _led.begin(); 
 }
 
@@ -43,8 +43,4 @@ void loop()
 {
     _led.blink(true);
     //_debugger.report(_rx.read());
-
-    while (Serial1.available()) {
-        printf("%c\n", Serial1.read());
-    }
 }

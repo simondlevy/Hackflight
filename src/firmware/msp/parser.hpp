@@ -39,10 +39,7 @@ namespace hf {
             {
                 uint8_t result = 0;
 
-                Serial.print("byte=");
-                Serial.print(byte, HEX);
-                Serial.print(" state = ");
-                Serial.println(_state);
+                printf("byte=x%02x state=%d\n", byte, _state);
 
                 switch (_state) {
 
@@ -98,12 +95,9 @@ namespace hf {
                     case 6:
 
                         if (_message_checksum == byte) {
-
                             result = _message_id;
                         }
-
                         _state = 0;
-
                         break;
                 }
 
