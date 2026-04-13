@@ -30,13 +30,14 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/profiling.hpp>
-#include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
+
+#include "rx.hpp"
 
 using namespace hf;
 
@@ -56,6 +57,9 @@ static auto _motors = DshotTeensy4({2, 3, 4, 5});
 // Timers
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
+
+// Debugging
+//static Debugger _debugger;
 
 // Setup
 void setup()
@@ -85,7 +89,7 @@ void loop()
 
     // Disable arming while gyro is calibrating
     const auto rxdata =
-        _imuFilter.isGyroCalibrated ? _rx.read() : RX::Data();
+        _imuFilter.isGyroCalibrated ? _rx.read() : RxData();
 
     const auto imuraw = _imu.read();
 

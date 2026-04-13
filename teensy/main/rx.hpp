@@ -19,37 +19,13 @@
 #include <Arduino.h>
 
 #include <datatypes.hpp>
+#include <firmware/rxdata.hpp>
 
 namespace hf {
 
     class RX {
 
         public:
-
-            class Data {
-
-                public:
-
-                    Setpoint axes;
-                    float aux;
-                    bool is_armed;
-                    bool is_throttle_down;
-
-                    Data() = default;
-
-                    Data(
-                            const Setpoint & axes,
-                            const float aux,
-                            const bool is_armed,
-                            const bool is_throttle_down)
-                        :
-                            axes(axes),
-                            aux(aux),
-                            is_armed(is_armed),
-                            is_throttle_down(is_throttle_down) {}
-
-                    Data& operator=(const Data& other) = default;
-            };
 
             RX(HardwareSerial * serial) : _serial(serial) { }
 
@@ -60,7 +36,7 @@ namespace hf {
                 begin(_serial);
             }
 
-            auto read() -> Data;
+            auto read() -> RxData;
 
         private:
 

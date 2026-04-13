@@ -21,7 +21,7 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-#include <firmware/rx.hpp>
+#include <firmware/rxdata.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {
@@ -105,7 +105,7 @@ namespace hf {
                 }
             }
 
-            void report(const RX::Data & rxdata)
+            void report(const RxData & rxdata)
             {
                 if (_helper.ready()) {
 

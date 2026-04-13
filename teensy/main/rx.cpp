@@ -18,7 +18,7 @@
 
 // Hackflight
 #include <hackflight.h>
-#include <firmware/rx.hpp>
+#include "rx.hpp"
 using namespace hf;
 
 static constexpr uint32_t ELRS_TIMEOUT_MSEC = 500;
@@ -29,7 +29,7 @@ static uint32_t _last_rx_msec;
 
 static CRSFforArduino _crsf;
 
-static RX::Data _data;
+static RxData _data;
 
 float scalechan(const uint8_t k)
 {
@@ -69,7 +69,7 @@ void RX::begin(HardwareSerial * serial)
     _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
 }
 
-auto RX::read() -> RX::Data
+auto RX::read() -> RxData
 {
     _crsf.update();
 
@@ -95,5 +95,5 @@ auto RX::read() -> RX::Data
     }
     _chan5_prev = chan5_curr;
 
-    return RX::Data(_data);
+    return _data;
 }
