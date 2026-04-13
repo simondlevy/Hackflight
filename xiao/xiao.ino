@@ -21,7 +21,6 @@
 
 static HardwareSerial serial(1);
 
-/*
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
@@ -30,13 +29,12 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
         serial.write(incomingData[k]);
     }
-}*/
+}
 
 void setup(void)
 {
     serial.begin(115200, SERIAL_8N1, 0, 1); 
 
-    /*
     WiFi.mode(WIFI_STA);
 
     if (esp_now_init() != ESP_OK) {
@@ -47,15 +45,10 @@ void setup(void)
         }
     }
 
-    esp_now_register_recv_cb(onDataRecv);*/
+    esp_now_register_recv_cb(esp_now_recv_cb_t(onDataRecv));
 }
 
 
 void loop(void)
 {
-    static uint8_t _k;
-
-    serial.write('A' + _k);
-
-    _k = (_k + 1) % 26;
 }

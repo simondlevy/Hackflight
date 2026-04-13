@@ -61,4 +61,11 @@ void setup()
 
 void loop()
 {
+    static uint8_t _k;
+
+    const uint8_t c = 'A' + _k;
+
+    esp_now_send(RECEIVER_ADDRESS, &c, 1);
+
+    _k = (_k + 1) % 26;
 }
