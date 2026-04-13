@@ -29,7 +29,65 @@ namespace hf {
 
     class MspParser {
 
+        private:
+
+            typedef std::array<uint8_t, 256> message_buffer_t;
+
         public:
+
+            MspParser() = default;
+
+            MspParser(
+                    const uint8_t state,
+                    const message_buffer_t message_buffer,
+                    const uint8_t message_expected,
+                    const uint8_t message_received,
+                    const uint8_t message_checksum,
+                    const uint8_t message_index,
+                    const uint8_t message_id)
+                :
+                    _state(state),
+                    _buffer(message_buffer),
+                    _expected(message_expected),
+                    _received(message_received),
+                    _checksum(message_checksum),
+                    _index(message_index),
+                    _id(message_id) {}
+
+            MspParser(const MspParser & parser, const uint8_t state)
+                :
+                    _state(state),
+                    _buffer(parser._buffer),
+                    _expected(parser._expected),
+                    _received(parser._received),
+                    _checksum(parser._checksum),
+                    _index(parser._index),
+                    _id(parser._id) {}
+
+            static auto parse(const MspParser & parser,
+                    const uint8_t byte) -> MspParser
+            {
+                const auto checksum = parser._checksum ^ byte;
+
+                const auto state = 
+                    parser._state == 0 && byte == '$' ? 1 :
+                    parser._state == 1 && byte == 'M' ? 2 :
+                    parser._state == 1 ? 0 :
+                    parser._state == 2 ? 3 :
+                    parser._state == 3 ? 4 :
+                    parser._state == 4 && parser._expected > 0 ? 5 :
+                    parser._state == 4 ? 6 :
+                    parser._state == 5 && (parser._received >=
+                            parser._expected) ? 6 :
+                    parser._state == 6 ? 0 :
+                    parser._state;
+
+                (void)checksum;
+                (void)state;
+
+                return parser;
+
+            }
 
             /**
              * Returns message ID or 0 for not  ready
@@ -62,17 +120,17 @@ namespace hf {
                         break;
 
                     case 3:
-                        _message_length_expected = byte;
-                        _message_checksum = byte;
-                        _message_index = 0;
+                        _expected = byte;
+                        _checksum = byte;
+                        _index = 0;
                         _state++;
                         break;
 
                     case 4:
-                        _message_id = byte;
-                        _message_length_received = 0;
-                        _message_checksum ^= byte;
-                        if (_message_length_expected > 0) {
+                        _id = byte;
+                        _received = 0;
+                        _checksum ^= byte;
+                        if (_expected > 0) {
                             // process payload
                             _state++;
                         }
@@ -83,18 +141,18 @@ namespace hf {
                         break;
 
                     case 5:
-                        _message_buffer[_message_index++] = byte;
-                        _message_checksum ^= byte;
-                        _message_length_received++;
-                        if (_message_length_received >= _message_length_expected) {
+                        _buffer[_index++] = byte;
+                        _checksum ^= byte;
+                        _received++;
+                        if (_received >= _expected) {
                             _state++;
                         }
                         break;
 
                     case 6:
 
-                        if (_message_checksum == byte) {
-                            result = _message_id;
+                        if (_checksum == byte) {
+                            result = _id;
                         }
                         _state = 0;
                         break;
@@ -107,10 +165,10 @@ namespace hf {
             {
                 const uint8_t offset = 4 * index;
                 uint32_t tmp = (uint32_t) (
-                        _message_buffer[offset+3] << 24 |
-                        _message_buffer[offset+2] << 16 |
-                        _message_buffer[offset+1] << 8 |
-                        _message_buffer[offset]);
+                        _buffer[offset+3] << 24 |
+                        _buffer[offset+2] << 16 |
+                        _buffer[offset+1] << 8 |
+                        _buffer[offset]);
                 float value = 0;
                 memcpy(&value, &tmp, 4);
                 return value;
@@ -119,20 +177,20 @@ namespace hf {
             uint16_t getShort(const uint8_t index)
             {
                 const uint8_t offset = 2 * index;
-                int16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+                int16_t value = (_buffer[offset+1] << 8) | _buffer[offset];
                 return value;
             }
 
             uint16_t getUshort(const uint8_t index)
             {
                 const uint8_t offset = 2 * index;
-                uint16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+                uint16_t value = (_buffer[offset+1] << 8) | _buffer[offset];
                 return value;
             }
 
             uint8_t getByte(const uint8_t index)
             {
-                return _message_buffer[index];
+                return _buffer[index];
             }
 
             uint8_t getPayload(uint8_t * payload)
@@ -140,28 +198,27 @@ namespace hf {
                 payload[0] = 36;
                 payload[1] = 77;
                 payload[2] = 62;
-                payload[3] = _message_length_expected;
-                payload[4] = _message_id;
+                payload[3] = _expected;
+                payload[4] = _id;
 
-                for (uint8_t k=0; k<_message_length_expected; ++k) {
-                    payload[k+5] = _message_buffer[k];
+                for (uint8_t k=0; k<_expected; ++k) {
+                    payload[k+5] = _buffer[k];
                 }
 
-                payload[5 + _message_length_expected] = _message_checksum;
+                payload[5 + _expected] = _checksum;
 
-                return _message_length_expected + 6;
+                return _expected + 6;
             }
 
         private:
 
             uint8_t _state;
-            std::array<uint8_t, 256> _message_buffer;
-            uint8_t _message_length_expected;
-            uint8_t _message_length_received;
-            uint8_t _message_checksum;
-            uint8_t _message_index;
-            uint8_t _message_id;
-
+            message_buffer_t _buffer;
+            uint8_t _expected;
+            uint8_t _received;
+            uint8_t _checksum;
+            uint8_t _index;
+            uint8_t _id;
     };
 
 }
