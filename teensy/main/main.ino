@@ -71,39 +71,34 @@ static void onReceiveRcChannels(
     }
 }
 
-class RX {
+static auto rxread() -> RxData
+{
+    _crsf.update();
 
-    public:
+    _data.is_throttle_down = _data.axes.thrust < THROTTLE_DOWN_MAX;
 
-        static auto read() -> RxData
-        {
-            _crsf.update();
+    const auto msec_curr = millis();
 
-            _data.is_throttle_down = _data.axes.thrust < THROTTLE_DOWN_MAX;
+    // Check failsafe via RX timeout
+    if (_last_rx_msec > 0 &&
+            msec_curr > _last_rx_msec &&
+            msec_curr - _last_rx_msec > ELRS_TIMEOUT_MSEC) {
+        _data.is_armed = false;
+    }
 
-            const auto msec_curr = millis();
+    // Push-button arming
+    static float _chan5_prev;
+    const auto chan5_curr = _data.aux;
+    if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
+        _data.is_armed =
+            _data.is_armed ? false :
+            _data.is_throttle_down ? true :
+            _data.is_armed;
+    }
+    _chan5_prev = chan5_curr;
 
-            // Check failsafe via RX timeout
-            if (_last_rx_msec > 0 &&
-                    msec_curr > _last_rx_msec &&
-                    msec_curr - _last_rx_msec > ELRS_TIMEOUT_MSEC) {
-                _data.is_armed = false;
-            }
-
-            // Push-button arming
-            static float _chan5_prev;
-            const auto chan5_curr = _data.aux;
-            if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
-                _data.is_armed =
-                    _data.is_armed ? false :
-                    _data.is_throttle_down ? true :
-                    _data.is_armed;
-            }
-            _chan5_prev = chan5_curr;
-
-            return _data;
-        }    private:
-};
+    return _data;
+}    
 
 static const uint8_t LED_PIN = LED_BUILTIN;
 
@@ -161,7 +156,7 @@ void loop()
 
     // Disable arming while gyro is calibrating
     const auto rxdata =
-        _imuFilter.isGyroCalibrated ? RX::read() : RxData();
+        _imuFilter.isGyroCalibrated ? rxread() : RxData();
 
     _debugger.report(rxdata);
 
