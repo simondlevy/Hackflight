@@ -1,5 +1,5 @@
 /*
-   Hackflight for Teensy 4.0 with ELRs receiver
+   Hackflight with ELRS receiver
 
    Copyright (C) 2026 Simon D. Levy
 
