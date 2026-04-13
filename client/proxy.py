@@ -30,11 +30,14 @@ if __name__ == '__main__':
         print('Unable to open port ' + args.port)
         exit(0)
 
+    k = 0
+
     while True:
 
         try:
 
-            msg = 'A'
+            msg = chr(ord('A') + k)
+            k = (k + 1) % 26
             port.write(msg.encode())
             sleep(.005)
 
