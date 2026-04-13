@@ -40,10 +40,6 @@
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
 
-static constexpr uint32_t ELRS_TIMEOUT_MSEC = 500;
-
-static constexpr float THROTTLE_DOWN_MAX = -0.95;
-
 static uint32_t _last_rx_msec;
 
 static CRSFforArduino _crsf;
@@ -75,14 +71,14 @@ static auto rxread() -> RX
 {
     _crsf.update();
 
-    _rx.is_throttle_down = _rx.axes.thrust < THROTTLE_DOWN_MAX;
+    _rx.is_throttle_down = _rx.axes.thrust < RX::THROTTLE_DOWN_MAX;
 
     const auto msec_curr = millis();
 
     // Check failsafe via RX timeout
     if (_last_rx_msec > 0 &&
             msec_curr > _last_rx_msec &&
-            msec_curr - _last_rx_msec > ELRS_TIMEOUT_MSEC) {
+            msec_curr - _last_rx_msec > RX::TIMEOUT_MSEC) {
         _rx.is_armed = false;
     }
 
