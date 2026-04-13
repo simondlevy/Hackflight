@@ -4,7 +4,7 @@ ROOT = $(HOME)/Desktop/
 
 FQBN = esp32:esp32:XIAO_ESP32C6 # 54:32:04:33:0D:F0
 
-PORT = /dev/ttyACM1
+PORT = /dev/ttyACM0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 

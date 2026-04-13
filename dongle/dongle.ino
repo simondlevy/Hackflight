@@ -68,4 +68,6 @@ void loop()
     esp_now_send(RECEIVER_ADDRESS, &c, 1);
 
     _k = (_k + 1) % 26;
+
+    delay(5);
 }
