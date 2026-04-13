@@ -56,12 +56,21 @@ static void onReceiveRcChannels(
 {
     if (!rcChannels->failsafe) {
 
+        RX::update(
+                _rx, 
+                _crsf.readRcChannel(3),
+                _crsf.readRcChannel(1),
+                _crsf.readRcChannel(2),
+                _crsf.readRcChannel(4),
+                _crsf.readRcChannel(5),
+                millis());
+
         _rx.axes.thrust = scalechan(3);
         _rx.axes.roll = scalechan(1);
         _rx.axes.pitch = scalechan(2);
         _rx.axes.yaw = scalechan(4);
 
-        _rx.aux = scalechan(5);
+        _rx.aux = _crsf.readRcChannel(5);
 
         _last_rx_msec = millis();
     }
