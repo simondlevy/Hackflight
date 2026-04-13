@@ -21,7 +21,7 @@
 #include <firmware/debugging.hpp>
 #include <firmware/led.hpp>
 #include <firmware/msp/parser.hpp>
-#include <firmware/rx.hpp>
+#include <firmware/rxdata.hpp>
 using namespace hf;
 
 static const uint8_t LED_PIN = LED_BUILTIN;
@@ -35,6 +35,11 @@ void serialEvent1()
     while (Serial1.available()) {
 
         const auto msgid = _parser.parse(Serial1.read());
+
+        if (msgid) {
+            //static uint32_t _count;
+            //printf("%04lu: %d\n", ++_count, msgid);
+        }
     }
 }
 
@@ -42,7 +47,6 @@ void serialEvent1()
 void setup()
 {
     Serial1.begin(115200);
-    _rx.begin();
     _led.begin(); 
 }
 
