@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string.h>
+#include <array>
 
 #include <hackflight.h>
 
@@ -156,7 +155,7 @@ namespace hf {
         private:
 
             uint8_t _state;
-            uint8_t _message_buffer[256];
+            std::array<uint8_t, 256> _message_buffer;
             uint8_t _message_length_expected;
             uint8_t _message_length_received;
             uint8_t _message_checksum;
