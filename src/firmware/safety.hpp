@@ -16,7 +16,7 @@
 
 #include <hackflight.h>
 #include <firmware/imu/filter.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 
 namespace hf {
 
@@ -30,15 +30,15 @@ namespace hf {
 
             static auto updateMode(
                     const VehicleState & state,
-                    const RxData & rxdata,
+                    const RX & rx,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
                     isFlipped(state) ? MODE_PANIC :
-                    rxdata.is_armed && imufilt.isGyroCalibrated ? MODE_ARMED :
-                    mode == MODE_ARMED && !rxdata.is_armed ? MODE_IDLE :
+                    rx.is_armed && imufilt.isGyroCalibrated ? MODE_ARMED :
+                    mode == MODE_ARMED && !rx.is_armed ? MODE_IDLE :
                     mode;
             }
 

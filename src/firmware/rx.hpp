@@ -16,13 +16,11 @@
 
 #pragma once
 
-#include <Arduino.h>
-
 #include <datatypes.hpp>
 
 namespace hf {
 
-    class RxData {
+    class RX {
 
         public:
 
@@ -31,9 +29,9 @@ namespace hf {
             bool is_armed;
             bool is_throttle_down;
 
-            RxData() = default;
+            RX() = default;
 
-            RxData(
+            RX(
                     const Setpoint & axes,
                     const float aux,
                     const bool is_armed,
@@ -44,6 +42,6 @@ namespace hf {
                     is_armed(is_armed),
                     is_throttle_down(is_throttle_down) {}
 
-            RxData& operator=(const RxData& other) = default;
+            RX& operator=(const RX& other) = default;
     };
 }

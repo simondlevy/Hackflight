@@ -31,7 +31,7 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/profiling.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
@@ -48,7 +48,7 @@ static uint32_t _last_rx_msec;
 
 static CRSFforArduino _crsf;
 
-static RxData _data;
+static RX _data;
 
 float scalechan(const uint8_t k)
 {
@@ -71,7 +71,7 @@ static void onReceiveRcChannels(
     }
 }
 
-static auto rxread() -> RxData
+static auto rxread() -> RX
 {
     _crsf.update();
 
@@ -155,10 +155,10 @@ void loop()
     _led.blink(_imuFilter.isGyroCalibrated);
 
     // Disable arming while gyro is calibrating
-    const auto rxdata =
-        _imuFilter.isGyroCalibrated ? rxread() : RxData();
+    const auto rx =
+        _imuFilter.isGyroCalibrated ? rxread() : RX();
 
-    _debugger.report(rxdata);
+    _debugger.report(rx);
 
     const auto imuraw = _imu.read();
 
@@ -175,16 +175,16 @@ void loop()
 
     const auto state = EKF::getVehicleState(_ekf);
 
-    _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
+    _mode = Safety::updateMode(state, rx, _imuFilter, _mode);
 
-    const auto setpoint = mksetpoint(rxdata.axes);
+    const auto setpoint = mksetpoint(rx.axes);
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
-            !rxdata.is_throttle_down, dt, state, setpoint);
+            !rx.is_throttle_down, dt, state, setpoint);
 
     _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     if (_mode != MODE_PANIC) {
-        _motors.run(rxdata.is_armed, _mixer.motorvals);
+        _motors.run(rx.is_armed, _mixer.motorvals);
     }
 
     if (_flyingCheckTimer.ready()) {

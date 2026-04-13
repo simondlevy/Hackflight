@@ -21,7 +21,7 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {
@@ -105,17 +105,17 @@ namespace hf {
                 }
             }
 
-            void report(const RxData & rxdata)
+            void report(const RX & rx)
             {
                 if (_helper.ready()) {
 
-                    const auto ax = rxdata.axes;
+                    const auto ax = rx.axes;
 
                     printf("%5lu | armed=%d | throt_down=%d | "
                             "throt=%+3.3f roll=%+3.3f pitch=%3.3f "
                             "yaw=%+3.3f\n",
-                            _helper.count, rxdata.is_armed,
-                            rxdata.is_throttle_down, 
+                            _helper.count, rx.is_armed,
+                            rx.is_throttle_down, 
                             ax.thrust, ax.roll, ax.pitch, ax.yaw);
                 }
             }
