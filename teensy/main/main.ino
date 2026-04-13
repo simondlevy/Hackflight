@@ -75,23 +75,6 @@ class RX {
 
     public:
 
-        static void begin()
-        {
-            _crsf = CRSFforArduino(&Serial5);
-
-            if (!_crsf.begin()) {
-
-                _crsf.end();
-
-                while (true) {
-                    printf("CRSF for Arduino initialisation failed!\n");
-                    delay(500);
-                }
-            }
-
-            _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
-        }
-
         static auto read() -> RxData
         {
             _crsf.update();
@@ -144,7 +127,15 @@ static Debugger _debugger;
 // Setup
 void setup()
 {
-    RX::begin();
+    _crsf = CRSFforArduino(&Serial5);
+    if (!_crsf.begin()) {
+        _crsf.end();
+        while (true) {
+            printf("CRSF for Arduino initialisation failed!\n");
+            delay(500);
+        }
+    }
+    _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
 
     _imu.begin();
     _motors.begin(); 
