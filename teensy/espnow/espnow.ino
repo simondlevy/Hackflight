@@ -40,7 +40,8 @@ void serialEvent1()
 
             static uint32_t _count;
 
-            printf("%04lu: %04d\n", ++_count, _parser.getUshort(0));
+            printf("%04lu: %04d\n", ++_count,
+                    MspParser::getUshort(_parser, 0));
         }
     }
 }

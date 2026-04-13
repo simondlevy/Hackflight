@@ -96,123 +96,13 @@ namespace hf {
                 return p.id;
             }
 
-            /**
-             * Returns message ID or 0 for not  ready
-             */
-            uint8_t parse(const uint8_t byte)
-            {
-                uint8_t result = 0;
-
-                switch (state) {
-
-                    case 0:
-                        if (byte == '$') {  // $
-                            state++;
-                        }
-                        break;
-
-                    case 1:
-                        if (byte == 'M') { // M
-                            state++;
-                        }
-                        else {  // restart and try again
-                            state = 0;
-                        }
-                        break;
-
-                    case 2:
-                        state++;
-                        break;
-
-                    case 3:
-                        expected = byte;
-                        checksum = byte;
-                        index = 0;
-                        state++;
-                        break;
-
-                    case 4:
-                        id = byte;
-                        received = 0;
-                        checksum ^= byte;
-                        if (expected > 0) {
-                            // process payload
-                            state++;
-                        }
-                        else {
-                            // no payload
-                            state += 2;
-                        }
-                        break;
-
-                    case 5:
-                        buffer[index++] = byte;
-                        checksum ^= byte;
-                        received++;
-                        if (received >= expected) {
-                            state++;
-                        }
-                        break;
-
-                    case 6:
-
-                        if (checksum == byte) {
-                            result = id;
-                        }
-                        state = 0;
-                        break;
-                }
-
-                return result;
-            }
-
-            float getFloat(const uint8_t index)
-            {
-                const uint8_t offset = 4 * index;
-                uint32_t tmp = (uint32_t) (
-                        buffer[offset+3] << 24 |
-                        buffer[offset+2] << 16 |
-                        buffer[offset+1] << 8 |
-                        buffer[offset]);
-                float value = 0;
-                memcpy(&value, &tmp, 4);
-                return value;
-            }
-
-            uint16_t getShort(const uint8_t index)
+            static auto getUshort(const MspParser & p,
+                    const uint8_t index) -> uint16_t
             {
                 const uint8_t offset = 2 * index;
-                int16_t value = (buffer[offset+1] << 8) | buffer[offset];
+                const uint16_t value =
+                    (p.buffer[offset+1] << 8) | p.buffer[offset];
                 return value;
-            }
-
-            uint16_t getUshort(const uint8_t index)
-            {
-                const uint8_t offset = 2 * index;
-                uint16_t value = (buffer[offset+1] << 8) | buffer[offset];
-                return value;
-            }
-
-            uint8_t getByte(const uint8_t index)
-            {
-                return buffer[index];
-            }
-
-            uint8_t getPayload(uint8_t * payload)
-            {
-                payload[0] = 36;
-                payload[1] = 77;
-                payload[2] = 62;
-                payload[3] = expected;
-                payload[4] = id;
-
-                for (uint8_t k=0; k<expected; ++k) {
-                    payload[k+5] = buffer[k];
-                }
-
-                payload[5 + expected] = checksum;
-
-                return expected + 6;
             }
 
         private:
