@@ -23,36 +23,24 @@
 
 #include <hackflight.h>
 #include <datatypes.hpp>
-#include <mixers/bfquadx.hpp>
-#include <pidcontrol/pids/position.hpp>
-#include <pidcontrol/stabilizer.hpp>
-
 #include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
-#include <firmware/opticalflow/filter.hpp>
-#include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/rx.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
-#include <firmware/zranger/filter.hpp>
-#include <firmware/zranger/sensor.hpp>
+#include <mixers/bfquadx.hpp>
+#include <pidcontrol/pids/position.hpp>
+#include <pidcontrol/stabilizer.hpp>
+
 using namespace hf;
 
-//#define _DEBUG
-//#define _PROFILE
-//#define _POSHOLD
-
-#ifdef _POSHOLD
-static const uint8_t LED_PIN = 9;
-#else
 static const uint8_t LED_PIN = LED_BUILTIN;
-#endif
 
 // Rate constants
 static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
@@ -64,13 +52,10 @@ static IMU _imu;
 static auto _led = LED(LED_PIN);
 static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
-static ZRanger _zranger;
-static OpticalFlowSensor _flowsensor;
 
 // Timers
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
-static auto _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
 
 // Setup
 void setup()
@@ -79,32 +64,17 @@ void setup()
     _imu.begin();
     _motors.begin(); 
     _led.begin(); 
-
-#ifdef _POSHOLD
-    _zranger.begin();
-    _flowsensor.begin();
-#else
-    (void)_zranger;
-    (void)_flowsensor;
-#endif
 }
 
 // Loop
 void loop()
 {
-
-    // Debugging
-    static Debugger _debugger;
-    static Profiler _profiler;
-
     // Computation
     static EKF _ekf;
     static FlyingCheck _flyingCheck;
     static ImuFilter _imuFilter;
     static Mixer _mixer;
     static StabilizerPid _stabilizerPid;
-    static OpticalFlowFilter _opticalFlowFilter;
-    static ZRangerFilter _zrangerFilter;
 
     // Flight mode
     static mode_e _mode;
@@ -122,23 +92,6 @@ void loop()
     _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
             _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-#ifdef _POSHOLD
-    if (_flowdeckTimer.ready()) {
-
-        _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
-
-        _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
-                micros(), _flowsensor.read());
-
-        // Slower EKF update with range, optical flow
-        _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
-    }
-#else
-    (void)_flowdeckTimer;
-    (void)_zrangerFilter;
-    (void)_opticalFlowFilter;
-#endif
-
     // Run the system dynamics to predict the state forward.
     if (_ekfPredictionTimer.ready()) {
         _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
@@ -150,18 +103,6 @@ void loop()
     const auto state = EKF::getVehicleState(_ekf);
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
-
-#ifdef _DEBUG
-#ifdef _POSHOLD
-    _debugger.report(state, true);
-#else
-    _debugger.report(state);
-#endif
-#endif
-
-#ifdef _PROFILE
-    _profiler.report();
-#endif
 
     const auto setpoint = mksetpoint(rxdata.axes);
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
