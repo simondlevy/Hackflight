@@ -78,8 +78,6 @@ static void onReceiveRcChannels(
 
 static auto rxread() -> RX
 {
-    _crsf.update();
-
     _rx.is_throttle_down = _rx.axes.thrust < RX::THROTTLE_DOWN_MAX;
 
     const auto msec_curr = millis();
@@ -157,6 +155,8 @@ void loop()
     const auto dt = Timer::getDt();
 
     _led.blink(_imuFilter.isGyroCalibrated);
+
+    _crsf.update();
 
     // Disable arming while gyro is calibrating
     const auto rx = _imuFilter.isGyroCalibrated ? rxread() : RX();

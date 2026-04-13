@@ -73,11 +73,22 @@ namespace hf {
 
                 const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
 
-                (void)axes;
-                (void)is_throttle_down;
+                // Check failsafe via timeout
+                const auto timed_out = 
+                    rx.msec_prev > 0 &&
+                    msec_curr > rx.msec_prev &&
+                    msec_curr - rx.msec_prev > TIMEOUT_MSEC;
 
-                return rx;
+                // Push-button arming
+                const auto aux_changed = rx.aux != 0 && aux != rx.aux;
+
+                const auto is_armed = 
+                    timed_out ? false :
+                    aux_changed && rx.is_armed ? false :
+                    aux_changed && rx.is_throttle_down ? true :
+                    rx.is_armed;
+
+                return RX(axes, aux, is_armed, is_throttle_down, msec_curr);
             }
-
     };
 }
