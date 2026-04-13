@@ -87,6 +87,10 @@ namespace hf {
                 newbuf[p.index] = b;
                 const auto buffer = p.state == 5 ? newbuf : p.buffer;
 
+                if (p.state == 5) {
+                    printf("index=%d\n", index);
+                }
+
                 return MspParser(state, buffer, expected, received, checksum,
                         index, id);
             }
@@ -100,9 +104,7 @@ namespace hf {
                     const uint8_t index) -> uint16_t
             {
                 const uint8_t offset = 2 * index;
-                const uint16_t value =
-                    (p.buffer[offset+1] << 8) | p.buffer[offset];
-                return value;
+                return (p.buffer[offset+1] << 8) | p.buffer[offset];
             }
 
         private:

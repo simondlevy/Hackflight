@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
 #include <firmware/led.hpp>
-#include <firmware/msp/parser.hpp>
+#include <firmware/msp/oldparser.hpp>
 #include <firmware/rxdata.hpp>
 using namespace hf;
 
@@ -34,14 +34,17 @@ void serialEvent1()
 {
     while (Serial1.available()) {
 
-        _parser = MspParser::parse(_parser, Serial1.read());
-
-        if (MspParser::getid(_parser) == 203) {
+        if (_parser.parse(Serial1.read()) == 203) {
 
             static uint32_t _count;
 
-            printf("%04lu: %04d\n", ++_count,
-                    MspParser::getUshort(_parser, 0));
+            printf("%04lu: %04d %04d %04d %04d %04d\n",
+                    ++_count,
+                    _parser.getUshort(0),
+                    _parser.getUshort(1),
+                    _parser.getUshort(2),
+                    _parser.getUshort(3),
+                    _parser.getUshort(4));
         }
     }
 }

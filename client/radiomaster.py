@@ -97,15 +97,7 @@ class RadioMaster:
 
         try:
 
-            msg = Serializer.serialize_SET_RC(*self.axes)
-
-            self.port.write(msg)
-
-            '''
-            for byte in msg:
-                print('%d' % byte)
-            print()
-            '''
+            self.port.write(Serializer.serialize_SET_RC(*self.axes))
 
             sleep(1 / self.UPDATE_RATE_HZ)
 
