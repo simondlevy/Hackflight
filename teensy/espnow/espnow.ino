@@ -19,16 +19,24 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-
 #include <firmware/led.hpp>
-//#include <firmware/rx.hpp>
+#include <firmware/msp/parser.hpp>
+#include <firmware/rx.hpp>
 using namespace hf;
 
 static const uint8_t LED_PIN = LED_BUILTIN;
 
 static auto _led = LED(LED_PIN);
-static auto _rx = RX(&Serial1);
 static Debugger _debugger;
+static MspParser _parser;
+
+void serialEvent1()
+{
+    while (Serial1.available()) {
+
+        const auto msgid = _parser.parse(Serial1.read());
+    }
+}
 
 // Setup
 void setup()
