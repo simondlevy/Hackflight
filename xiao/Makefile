@@ -2,11 +2,9 @@ SKETCH = $(shell basename "`pwd`")
 
 ROOT = $(HOME)/Desktop/
 
-#FQBN = esp32:esp32:XIAO_ESP32C6 # 54:32:04:33:0D:F0
-FQBN = esp32:esp32:um_tinypico  # D4:D4:DA:AA:2E:F0
+FQBN = esp32:esp32:XIAO_ESP32C6 # 54:32:04:33:0D:F0
 
-
-PORT = /dev/ttyACM0
+PORT = /dev/ttyACM1
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
