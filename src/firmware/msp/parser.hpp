@@ -54,38 +54,37 @@ namespace hf {
                     index(messageindex),
                     id(messageid) {}
 
-            MspParser(const MspParser & parser, const uint8_t state)
-                :
-                    state(state),
-                    buffer(parser.buffer),
-                    expected(parser.expected),
-                    received(parser.received),
-                    checksum(parser.checksum),
-                    index(parser.index),
-                    id(parser.id) {}
-
-            static auto parse(const MspParser & parser,
-                    const uint8_t byte) -> MspParser
+            static auto parse(const MspParser & p,
+                    const uint8_t b) -> MspParser
             {
-                const auto checksum = parser.checksum ^ byte;
 
                 const auto state = 
-                    parser.state == 0 && byte == '$' ? 1 :
-                    parser.state == 1 && byte == 'M' ? 2 :
-                    parser.state == 1 ? 0 :
-                    parser.state == 2 ? 3 :
-                    parser.state == 3 ? 4 :
-                    parser.state == 4 && parser.expected > 0 ? 5 :
-                    parser.state == 4 ? 6 :
-                    parser.state == 5 && (parser.received >=
-                            parser.expected) ? 6 :
-                    parser.state == 6 ? 0 :
-                    parser.state;
+                    p.state == 0 && b == '$' ? 1 :
+                    p.state == 1 && b == 'M' ? 2 :
+                    p.state == 1 ? 0 :
+                    p.state == 2 ? 3 :
+                    p.state == 3 ? 4 :
+                    p.state == 4 && p.expected > 0 ? 5 :
+                    p.state == 4 ? 6 :
+                    p.state == 5 && (p.received >= p.expected) ? 6 :
+                    p.state == 6 ? 0 :
+                    p.state;
 
-                (void)checksum;
+                const auto expected = p.state == 3 ? b : p.state;
+
+                const auto checksum = p.state == 3 ? b : p.checksum ^ b;
+
+                const auto received = p.state == 5 ? p.received + 1 : 0;
+
+                const auto id = p.state == 6 && p.checksum == b ? p.id : 0;
+
+                (void)expected;
                 (void)state;
+                (void)checksum;
+                (void)received;
+                (void)id;
 
-                return parser;
+                return p;
 
             }
 
