@@ -70,7 +70,7 @@ namespace hf {
                     p.state == 6 ? 0 :
                     p.state;
 
-                const auto expected = p.state == 3 ? b : p.state;
+                const auto expected = p.state == 3 ? b : p.expected;
 
                 const auto checksum = p.state == 3 ? b : p.checksum ^ b;
 
@@ -86,10 +86,6 @@ namespace hf {
                 auto newbuf = p.buffer;
                 newbuf[p.index] = b;
                 const auto buffer = p.state == 5 ? newbuf : p.buffer;
-
-                if (p.state == 5) {
-                    printf("index=%d\n", index);
-                }
 
                 return MspParser(state, buffer, expected, received, checksum,
                         index, id);
