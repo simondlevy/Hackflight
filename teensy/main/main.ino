@@ -40,8 +40,6 @@
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
 
-static uint32_t _last_rx_msec;
-
 static CRSFforArduino _crsf;
 
 static RX _rx;
@@ -56,7 +54,7 @@ static void onReceiveRcChannels(
 {
     if (!rcChannels->failsafe) {
 
-        RX::update(
+        _rx = RX::update(
                 _rx, 
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -64,43 +62,8 @@ static void onReceiveRcChannels(
                 _crsf.readRcChannel(4),
                 _crsf.readRcChannel(5),
                 millis());
-
-        _rx.axes.thrust = scalechan(3);
-        _rx.axes.roll = scalechan(1);
-        _rx.axes.pitch = scalechan(2);
-        _rx.axes.yaw = scalechan(4);
-
-        _rx.aux = _crsf.readRcChannel(5);
-
-        _last_rx_msec = millis();
     }
 }
-
-static auto rxread() -> RX
-{
-    _rx.is_throttle_down = _rx.axes.thrust < RX::THROTTLE_DOWN_MAX;
-
-    const auto msec_curr = millis();
-
-    // Check failsafe via timeout
-    const auto timed_out = 
-        _last_rx_msec > 0 &&
-        msec_curr > _last_rx_msec &&
-        msec_curr - _last_rx_msec > RX::TIMEOUT_MSEC;
-
-    // Push-button arming
-    static uint16_t _aux_prev;
-    const auto aux_changed = _aux_prev != 0 && _aux_prev != _rx.aux;
-    _aux_prev = _rx.aux;
-
-    _rx.is_armed = 
-        timed_out ? false :
-        aux_changed && _rx.is_armed ? false :
-        aux_changed && _rx.is_throttle_down ? true :
-        _rx.is_armed;
-
-    return _rx;
-}    
 
 static const uint8_t LED_PIN = LED_BUILTIN;
 
@@ -159,7 +122,7 @@ void loop()
     _crsf.update();
 
     // Disable arming while gyro is calibrating
-    const auto rx = _imuFilter.isGyroCalibrated ? rxread() : RX();
+    const auto rx = _imuFilter.isGyroCalibrated ? _rx : RX();
 
     _debugger.report(rx);
 
@@ -177,6 +140,9 @@ void loop()
     _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
     const auto state = EKF::getVehicleState(_ekf);
+
+    // Check receiver timeout
+    _rx = RX::checkTimeout(_rx, millis());
 
     _mode = Safety::updateMode(state, rx, _imuFilter, _mode);
 
