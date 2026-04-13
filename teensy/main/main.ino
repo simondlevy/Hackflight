@@ -95,15 +95,17 @@ static auto rxread() -> RX
     }
 
     // Push-button arming
-    static float _chan5_prev;
-    const auto chan5_curr = _rx.aux;
-    if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
+    static uint16_t _aux_prev;
+    const auto aux_changed = _aux_prev != 0 && _aux_prev != _rx.aux;
+
+    // Push-button arming
+    if (aux_changed) {
         _rx.is_armed =
             _rx.is_armed ? false :
             _rx.is_throttle_down ? true :
             _rx.is_armed;
     }
-    _chan5_prev = chan5_curr;
+    _aux_prev = _rx.aux;
 
     return _rx;
 }    
