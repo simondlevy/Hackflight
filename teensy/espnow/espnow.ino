@@ -34,14 +34,11 @@ void serialEvent1()
 {
     while (Serial1.available()) {
 
-        // const auto msgid = _parser.parse(Serial1.read());
         _parser = MspParser::parse(_parser, Serial1.read());
-        const auto msgid = MspParser::getid(_parser);
-        //const auto msgid = _parser.parse(Serial1.read());
 
-        if (msgid) {
+        if (MspParser::getid(_parser) == 203) {
             static uint32_t _count;
-            printf("%04lu: %d\n", ++_count, msgid);
+            printf("%04lu\n", ++_count);
         }
     }
 }
