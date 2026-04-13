@@ -18,6 +18,7 @@
 
 // Third-party libraries
 #include <dshot-teensy4.hpp>  
+#include <CRSFforArduino.hpp>
 
 // Hackflight library
 
@@ -30,16 +31,105 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/profiling.hpp>
+#include <firmware/rxdata.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
-
-#include "rx.hpp"
-
 using namespace hf;
+
+static constexpr uint32_t ELRS_TIMEOUT_MSEC = 500;
+
+static constexpr float THROTTLE_DOWN_MAX = -0.95;
+
+static uint32_t _last_rx_msec;
+
+static CRSFforArduino _crsf;
+
+static RxData _data;
+
+float scalechan(const uint8_t k)
+{
+    return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
+}
+
+static void onReceiveRcChannels(
+        serialReceiverLayer::rcChannels_t *rcChannels, void * obj)
+{
+    if (!rcChannels->failsafe) {
+
+        _data.axes.thrust = scalechan(3);
+        _data.axes.roll = scalechan(1);
+        _data.axes.pitch = scalechan(2);
+        _data.axes.yaw = scalechan(4);
+
+        _data.aux = scalechan(5);
+
+        _last_rx_msec = millis();
+    }
+}
+
+class RX {
+
+    public:
+
+        RX(HardwareSerial * serial) : _serial(serial) { }
+
+        void begin()
+        {
+            begin(_serial);
+        }
+
+        static void begin(HardwareSerial * serial)
+        {
+            _crsf = CRSFforArduino(serial);
+
+            if (!_crsf.begin()) {
+
+                _crsf.end();
+
+                while (true) {
+                    printf("CRSF for Arduino initialisation failed!\n");
+                    delay(500);
+                }
+            }
+
+            _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
+        }
+
+        auto read() -> RxData
+        {
+            _crsf.update();
+
+            _data.is_throttle_down = _data.axes.thrust < THROTTLE_DOWN_MAX;
+
+            const auto msec_curr = millis();
+
+            // Check failsafe via RX timeout
+            if (_last_rx_msec > 0 &&
+                    msec_curr > _last_rx_msec &&
+                    msec_curr - _last_rx_msec > ELRS_TIMEOUT_MSEC) {
+                _data.is_armed = false;
+            }
+
+            // Push-button arming
+            static float _chan5_prev;
+            const auto chan5_curr = _data.aux;
+            if (_chan5_prev != 0 && _chan5_prev != chan5_curr) {
+                _data.is_armed =
+                    _data.is_armed ? false :
+                    _data.is_throttle_down ? true :
+                    _data.is_armed;
+            }
+            _chan5_prev = chan5_curr;
+
+            return _data;
+        }    private:
+
+        HardwareSerial * _serial;
+};
 
 static const uint8_t LED_PIN = LED_BUILTIN;
 
@@ -59,7 +149,7 @@ static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
 
 // Debugging
-//static Debugger _debugger;
+static Debugger _debugger;
 
 // Setup
 void setup()
@@ -90,6 +180,8 @@ void loop()
     // Disable arming while gyro is calibrating
     const auto rxdata =
         _imuFilter.isGyroCalibrated ? _rx.read() : RxData();
+
+    _debugger.report(rxdata);
 
     const auto imuraw = _imu.read();
 
