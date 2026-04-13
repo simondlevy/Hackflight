@@ -43,13 +43,13 @@ namespace hf {
 
                     case 0:
                         if (byte == '$') {  // $
-                            _state++;
+                            _state = 1;
                         }
                         break;
 
                     case 1:
                         if (byte == 'M') { // M
-                            _state++;
+                            _state = 2;
                         }
                         else {  // restart and try again
                             _state = 0;
@@ -57,14 +57,14 @@ namespace hf {
                         break;
 
                     case 2:
-                        _state++;
+                        _state = 3;
                         break;
 
                     case 3:
                         _message_length_expected = byte;
                         _message_checksum = byte;
                         _message_index = 0;
-                        _state++;
+                        _state = 4;
                         break;
 
                     case 4:
@@ -73,11 +73,11 @@ namespace hf {
                         _message_checksum ^= byte;
                         if (_message_length_expected > 0) {
                             // process payload
-                            _state++;
+                            _state = 5;
                         }
                         else {
                             // no payload
-                            _state += 2;
+                            _state = 6;
                         }
                         break;
 
@@ -86,17 +86,15 @@ namespace hf {
                         _message_checksum ^= byte;
                         _message_length_received++;
                         if (_message_length_received >= _message_length_expected) {
-                            _state++;
+                            _state = 6;
                         }
                         break;
 
                     case 6:
 
                         if (_message_checksum == byte) {
-
                             result = _message_id;
                         }
-
                         _state = 0;
 
                         break;
