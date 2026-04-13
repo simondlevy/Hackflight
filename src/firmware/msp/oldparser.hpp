@@ -39,63 +39,63 @@ namespace hf {
             {
                 uint8_t result = 0;
 
-                switch (_state) {
+                switch (state) {
 
                     case 0:
                         if (byte == '$') {  // $
-                            _state = 1;
+                            state = 1;
                         }
                         break;
 
                     case 1:
                         if (byte == 'M') { // M
-                            _state = 2;
+                            state = 2;
                         }
                         else {  // restart and try again
-                            _state = 0;
+                            state = 0;
                         }
                         break;
 
                     case 2:
-                        _state = 3;
+                        state = 3;
                         break;
 
                     case 3:
-                        _message_length_expected = byte;
-                        _message_checksum = byte;
-                        _message_index = 0;
-                        _state = 4;
+                        length_expected = byte;
+                        checksum = byte;
+                        index = 0;
+                        state = 4;
                         break;
 
                     case 4:
-                        _message_id = byte;
-                        _message_length_received = 0;
-                        _message_checksum ^= byte;
-                        if (_message_length_expected > 0) {
+                        id = byte;
+                        length_received = 0;
+                        checksum ^= byte;
+                        if (length_expected > 0) {
                             // process payload
-                            _state = 5;
+                            state = 5;
                         }
                         else {
                             // no payload
-                            _state = 6;
+                            state = 6;
                         }
                         break;
 
                     case 5:
-                        _message_buffer[_message_index++] = byte;
-                        _message_checksum ^= byte;
-                        _message_length_received++;
-                        if (_message_length_received >= _message_length_expected) {
-                            _state = 6;
+                        buffer[index++] = byte;
+                        checksum ^= byte;
+                        length_received++;
+                        if (length_received >= length_expected) {
+                            state = 6;
                         }
                         break;
 
                     case 6:
 
-                        if (_message_checksum == byte) {
-                            result = _message_id;
+                        if (checksum == byte) {
+                            result = id;
                         }
-                        _state = 0;
+                        state = 0;
 
                         break;
                 }
@@ -103,64 +103,22 @@ namespace hf {
                 return result;
             }
 
-            float getFloat(const uint8_t index)
-            {
-                const uint8_t offset = 4 * index;
-                uint32_t tmp = (uint32_t) (
-                        _message_buffer[offset+3] << 24 |
-                        _message_buffer[offset+2] << 16 |
-                        _message_buffer[offset+1] << 8 |
-                        _message_buffer[offset]);
-                float value = 0;
-                memcpy(&value, &tmp, 4);
-                return value;
-            }
-
-            uint16_t getShort(const uint8_t index)
-            {
-                const uint8_t offset = 2 * index;
-                int16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
-                return value;
-            }
-
             uint16_t getUshort(const uint8_t index)
             {
                 const uint8_t offset = 2 * index;
-                uint16_t value = (_message_buffer[offset+1] << 8) | _message_buffer[offset];
+                uint16_t value = (buffer[offset+1] << 8) | buffer[offset];
                 return value;
-            }
-
-            uint8_t getByte(const uint8_t index)
-            {
-                return _message_buffer[index];
-            }
-
-            uint8_t getPayload(uint8_t * payload)
-            {
-                payload[0] = 36;
-                payload[1] = 77;
-                payload[2] = 62;
-                payload[3] = _message_length_expected;
-                payload[4] = _message_id;
-
-                for (uint8_t k=0; k<_message_length_expected; ++k) {
-                    payload[k+5] = _message_buffer[k];
-                }
-
-                payload[5 + _message_length_expected] = _message_checksum;
-
-                return _message_length_expected + 6;
             }
 
         private:
 
-            uint8_t _state;
-            uint8_t _message_buffer[256];
-            uint8_t _message_length_expected;
-            uint8_t _message_length_received;
-            uint8_t _message_checksum;
-            uint8_t _message_index;
-            uint8_t _message_id;
+            uint8_t state;
+            uint8_t buffer[256];
+            uint8_t length_expected;
+            uint8_t length_received;
+            uint8_t checksum;
+            uint8_t index;
+            uint8_t id;
 
     };
 
