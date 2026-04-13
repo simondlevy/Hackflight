@@ -71,7 +71,10 @@ namespace hf {
                         scale(pitch),
                         scale(yaw));
 
+                const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
+
                 (void)axes;
+                (void)is_throttle_down;
 
                 return rx;
             }

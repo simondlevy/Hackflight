@@ -84,10 +84,13 @@ static auto rxread() -> RX
 
     const auto msec_curr = millis();
 
+    const auto timed_out = 
+        _last_rx_msec > 0 &&
+        msec_curr > _last_rx_msec &&
+        msec_curr - _last_rx_msec > RX::TIMEOUT_MSEC;
+
     // Check failsafe via RX timeout
-    if (_last_rx_msec > 0 &&
-            msec_curr > _last_rx_msec &&
-            msec_curr - _last_rx_msec > RX::TIMEOUT_MSEC) {
+    if (timed_out) {
         _rx.is_armed = false;
     }
 
