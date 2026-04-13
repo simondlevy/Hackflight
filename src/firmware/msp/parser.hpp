@@ -76,7 +76,7 @@ namespace hf {
 
                 const auto received = p.state == 5 ? p.received + 1 : 0;
 
-                const auto id = p.state == 6 && p.checksum == b ? p.id : 0;
+                const auto id = p.state == 4 ? b : p.id;
 
                 const auto index =
                     p.state == 3 ? 0 :
@@ -87,8 +87,13 @@ namespace hf {
                 newbuf[p.index] = b;
                 const auto buffer = p.state == 5 ? newbuf : p.buffer;
 
-                return MspParser(state, buffer, expected, received, checksum, index, id);
+                return MspParser(state, buffer, expected, received, checksum,
+                        index, id);
+            }
 
+            static auto getid(const MspParser & p) -> uint8_t
+            {
+                return p.id;
             }
 
             /**
@@ -97,8 +102,6 @@ namespace hf {
             uint8_t parse(const uint8_t byte)
             {
                 uint8_t result = 0;
-
-                //printf("byte=%03d state=%d\n", byte, state);
 
                 switch (state) {
 
