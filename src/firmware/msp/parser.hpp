@@ -78,11 +78,17 @@ namespace hf {
 
                 const auto id = p.state == 6 && p.checksum == b ? p.id : 0;
 
+                const auto index =
+                    p.state == 3 ? 0 :
+                    p.state == 5 ? p.index + 1 :
+                    p.index;
+
                 (void)expected;
                 (void)state;
                 (void)checksum;
                 (void)received;
                 (void)id;
+                (void)index;
 
                 return p;
 
