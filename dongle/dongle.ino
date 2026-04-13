@@ -61,6 +61,7 @@ void setup()
 
 void loop()
 {
+    /*
     static uint8_t _k;
 
     const uint8_t c = 'A' + _k;
@@ -69,5 +70,5 @@ void loop()
 
     _k = (_k + 1) % 26;
 
-    delay(5);
+    delay(5);*/
 }
