@@ -22,7 +22,6 @@
 
 // REPLACE WITH YOUR RECEIVER MAC Address
 static const uint8_t RECEIVER_ADDRESS[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
-//static const uint8_t RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0xAA, 0x31, 0xDC};
 
 void serialEvent()
 {
@@ -65,14 +64,4 @@ void setup()
 
 void loop()
 {
-    /*
-    static uint8_t _k;
-
-    const uint8_t c = 'A' + _k;
-
-    esp_now_send(RECEIVER_ADDRESS, &c, 1);
-
-    _k = (_k + 1) % 26;
-
-    delay(5);*/
 }

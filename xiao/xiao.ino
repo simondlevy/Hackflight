@@ -26,8 +26,6 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *data, int len)
     (void)mac;
 
     serial.write(data, len);
-
-    delay(1);
 }
 
 void setup(void)
