@@ -31,7 +31,7 @@ namespace hf {
 
         private:
 
-            typedef std::array<uint8_t, 256> messagebuffer_t;
+            typedef std::array<uint8_t, 256> buffer_t;
 
         public:
 
@@ -39,20 +39,20 @@ namespace hf {
 
             MspParser(
                     const uint8_t state,
-                    const messagebuffer_t messagebuffer,
-                    const uint8_t messageexpected,
-                    const uint8_t messagereceived,
-                    const uint8_t messagechecksum,
-                    const uint8_t messageindex,
-                    const uint8_t messageid)
+                    const buffer_t buffer,
+                    const uint8_t expected,
+                    const uint8_t received,
+                    const uint8_t checksum,
+                    const uint8_t index,
+                    const uint8_t id)
                 :
                     state(state),
-                    buffer(messagebuffer),
-                    expected(messageexpected),
-                    received(messagereceived),
-                    checksum(messagechecksum),
-                    index(messageindex),
-                    id(messageid) {}
+                    buffer(buffer),
+                    expected(expected),
+                    received(received),
+                    checksum(checksum),
+                    index(index),
+                    id(id) {}
 
             static auto parse(const MspParser & p,
                     const uint8_t b) -> MspParser
@@ -83,19 +83,11 @@ namespace hf {
                     p.state == 5 ? p.index + 1 :
                     p.index;
 
-                auto buffer = p.buffer;
-                buffer[p.index] = b;
-                const auto newbuf = p.state == 5 ? buffer : p.buffer;
+                auto newbuf = p.buffer;
+                newbuf[p.index] = b;
+                const auto buffer = p.state == 5 ? newbuf : p.buffer;
 
-                (void)expected;
-                (void)state;
-                (void)checksum;
-                (void)received;
-                (void)id;
-                (void)index;
-                (void)newbuf;
-
-                return p;
+                return MspParser(state, buffer, expected, received, checksum, index, id);
 
             }
 
@@ -223,7 +215,7 @@ namespace hf {
         private:
 
             uint8_t state;
-            messagebuffer_t buffer;
+            buffer_t buffer;
             uint8_t expected;
             uint8_t received;
             uint8_t checksum;
