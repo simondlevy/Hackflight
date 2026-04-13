@@ -75,16 +75,9 @@ class RX {
 
     public:
 
-        RX(HardwareSerial * serial) : _serial(serial) { }
-
-        void begin()
+        static void begin()
         {
-            begin(_serial);
-        }
-
-        static void begin(HardwareSerial * serial)
-        {
-            _crsf = CRSFforArduino(serial);
+            _crsf = CRSFforArduino(&Serial5);
 
             if (!_crsf.begin()) {
 
@@ -99,7 +92,7 @@ class RX {
             _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
         }
 
-        auto read() -> RxData
+        static auto read() -> RxData
         {
             _crsf.update();
 
@@ -127,8 +120,6 @@ class RX {
 
             return _data;
         }    private:
-
-        HardwareSerial * _serial;
 };
 
 static const uint8_t LED_PIN = LED_BUILTIN;
@@ -141,7 +132,6 @@ static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 // Devices
 static IMU _imu;
 static auto _led = LED(LED_PIN);
-static auto _rx = RX(&Serial5);
 static auto _motors = DshotTeensy4({2, 3, 4, 5});
 
 // Timers
@@ -154,7 +144,8 @@ static Debugger _debugger;
 // Setup
 void setup()
 {
-    _rx.begin();
+    RX::begin();
+
     _imu.begin();
     _motors.begin(); 
     _led.begin(); 
@@ -179,7 +170,7 @@ void loop()
 
     // Disable arming while gyro is calibrating
     const auto rxdata =
-        _imuFilter.isGyroCalibrated ? _rx.read() : RxData();
+        _imuFilter.isGyroCalibrated ? RX::read() : RxData();
 
     _debugger.report(rxdata);
 
