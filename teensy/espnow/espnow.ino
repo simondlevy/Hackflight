@@ -37,8 +37,10 @@ void serialEvent1()
         _parser = MspParser::parse(_parser, Serial1.read());
 
         if (MspParser::getid(_parser) == 203) {
+
             static uint32_t _count;
-            printf("%04lu\n", ++_count);
+
+            printf("%04lu: %04d\n", ++_count, _parser.getUshort(0));
         }
     }
 }
