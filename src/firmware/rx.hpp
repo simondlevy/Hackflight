@@ -43,5 +43,11 @@ namespace hf {
                     is_throttle_down(is_throttle_down) {}
 
             RX& operator=(const RX& other) = default;
+
+            static float scale(const uint16_t val)
+            {
+                return 2 * (val - 1500.f) / 1024;
+            }
+
     };
 }

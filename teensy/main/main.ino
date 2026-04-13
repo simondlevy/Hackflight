@@ -52,7 +52,7 @@ static RX _data;
 
 float scalechan(const uint8_t k)
 {
-    return map((float)_crsf.readRcChannel(k), 989, 2012, -1, +1);
+    return RX::scale(_crsf.readRcChannel(k));
 }
 
 static void onReceiveRcChannels(
