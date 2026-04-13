@@ -83,12 +83,17 @@ namespace hf {
                     p.state == 5 ? p.index + 1 :
                     p.index;
 
+                auto buffer = p.buffer;
+                buffer[p.index] = b;
+                const auto newbuf = p.state == 5 ? buffer : p.buffer;
+
                 (void)expected;
                 (void)state;
                 (void)checksum;
                 (void)received;
                 (void)id;
                 (void)index;
+                (void)newbuf;
 
                 return p;
 
