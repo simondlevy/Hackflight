@@ -76,8 +76,9 @@ static auto _motors = DshotTeensy4({2, 3, 4, 5});
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
 
-// Debugging
+// Debugging / profiling
 static Debugger _debugger;
+static Profiler _profiler;
 
 // Setup
 void setup()
@@ -119,7 +120,8 @@ void loop()
     // Disable arming while gyro is calibrating
     const auto rx = _imuFilter.isGyroCalibrated ? _rx : RX();
 
-    _debugger.report(rx);
+    //_debugger.report(rx);
+    //_profiler.report();
 
     const auto imuraw = _imu.read();
 

@@ -21,7 +21,7 @@
 #include <firmware/debugging.hpp>
 #include <firmware/led.hpp>
 #include <firmware/msp/parser.hpp>
-#include <firmware/rxdata.hpp>
+#include <firmware/rx.hpp>
 using namespace hf;
 
 static const uint8_t LED_PIN = LED_BUILTIN;
@@ -29,6 +29,7 @@ static const uint8_t LED_PIN = LED_BUILTIN;
 static auto _led = LED(LED_PIN);
 static Debugger _debugger;
 static MspParser _parser;
+static RX _rx;
 
 void serialEvent1()
 {
@@ -38,15 +39,14 @@ void serialEvent1()
 
         if (MspParser::getid(_parser) == 203) {
 
-            static uint32_t _count;
-
-            printf("%04lu: %04d %04d %04d %04d %04d\n",
-                    ++_count,
+            _rx = RX::update(
+                    _rx, 
                     MspParser::getUshort(_parser, 0),
                     MspParser::getUshort(_parser, 1),
                     MspParser::getUshort(_parser, 2),
                     MspParser::getUshort(_parser, 3),
-                    MspParser::getUshort(_parser, 4));
+                    MspParser::getUshort(_parser, 4),
+                    millis());
         }
     }
 }
@@ -62,5 +62,8 @@ void setup()
 void loop()
 {
     _led.blink(true);
-    //_debugger.report(_rx.read());
+
+    _rx = RX::checkTimeout(_rx, millis());
+
+    _debugger.report(_rx);
 }

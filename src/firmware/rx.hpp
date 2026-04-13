@@ -73,12 +73,12 @@ namespace hf {
 
                 const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
 
-                // Push-button arming
-                const auto aux_changed = rx.aux != 0 && aux != rx.aux;
+                // Push-button arming; ignores startup transient
+                const auto did_aux_change = rx.aux >= 988 && aux != rx.aux;
 
                 const auto is_armed = 
-                    aux_changed && rx.is_armed ? false :
-                    aux_changed && rx.is_throttle_down ? true :
+                    did_aux_change && rx.is_armed ? false :
+                    did_aux_change && rx.is_throttle_down ? true :
                     rx.is_armed;
 
                 return RX(axes, aux, is_armed, is_throttle_down, msec_curr);
