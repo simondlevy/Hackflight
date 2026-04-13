@@ -97,15 +97,13 @@ static auto rxread() -> RX
     // Push-button arming
     static uint16_t _aux_prev;
     const auto aux_changed = _aux_prev != 0 && _aux_prev != _rx.aux;
-
-    // Push-button arming
-    if (aux_changed) {
-        _rx.is_armed =
-            _rx.is_armed ? false :
-            _rx.is_throttle_down ? true :
-            _rx.is_armed;
-    }
     _aux_prev = _rx.aux;
+
+    _rx.is_armed = 
+        timed_out ? false :
+        aux_changed && _rx.is_armed ? false :
+        aux_changed && _rx.is_throttle_down ? true :
+        _rx.is_armed;
 
     return _rx;
 }    
