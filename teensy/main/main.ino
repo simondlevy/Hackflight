@@ -84,15 +84,11 @@ static auto rxread() -> RX
 
     const auto msec_curr = millis();
 
+    // Check failsafe via timeout
     const auto timed_out = 
         _last_rx_msec > 0 &&
         msec_curr > _last_rx_msec &&
         msec_curr - _last_rx_msec > RX::TIMEOUT_MSEC;
-
-    // Check failsafe via RX timeout
-    if (timed_out) {
-        _rx.is_armed = false;
-    }
 
     // Push-button arming
     static uint16_t _aux_prev;
