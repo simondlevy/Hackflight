@@ -21,8 +21,8 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-// static const uint8_t RECEIVER_ADDRESS[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
-static const uint8_t RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0xAA, 0x31, 0xDC};
+static const uint8_t RECEIVER_ADDRESS[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
+//static const uint8_t RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0xAA, 0x31, 0xDC};
 
 void serialEvent()
 {
@@ -33,12 +33,6 @@ void serialEvent()
     Serial.read(buf, avail);
 
     esp_now_send(RECEIVER_ADDRESS, buf, avail);
-
-    /*
-    while (Serial.available()) {
-        const uint8_t c = Serial.read();
-        esp_now_send(RECEIVER_ADDRESS, &c, 1);
-    }*/
 }
 
 static void reportForever(const char * msg)

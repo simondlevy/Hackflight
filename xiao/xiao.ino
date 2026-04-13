@@ -19,26 +19,20 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-//static HardwareSerial serial(1);
+static HardwareSerial serial(1);
 
 static void onDataRecv(const uint8_t * mac, const uint8_t *data, int len)
 {
     (void)mac;
 
-    //serial.write(data, len);
-
-    for (int k=0; k<len; ++k) {
-        Serial.println((uint8_t)data[k]);
-    }
+    serial.write(data, len);
 
     delay(1);
 }
 
 void setup(void)
 {
-    Serial.begin(115200);
-
-    //serial.begin(115200, SERIAL_8N1, 0, 1); 
+    serial.begin(115200, SERIAL_8N1, 0, 1); 
 
     WiFi.mode(WIFI_STA);
 

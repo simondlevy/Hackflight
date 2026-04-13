@@ -101,9 +101,11 @@ class RadioMaster:
 
             self.port.write(msg)
 
+            '''
             for byte in msg:
                 print('%d' % byte)
             print()
+            '''
 
             sleep(1 / self.UPDATE_RATE_HZ)
 

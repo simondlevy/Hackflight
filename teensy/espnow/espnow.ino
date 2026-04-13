@@ -37,8 +37,8 @@ void serialEvent1()
         const auto msgid = _parser.parse(Serial1.read());
 
         if (msgid) {
-            //static uint32_t _count;
-            //printf("%04lu: %d\n", ++_count, msgid);
+            static uint32_t _count;
+            printf("%04lu: %d\n", ++_count, msgid);
         }
     }
 }

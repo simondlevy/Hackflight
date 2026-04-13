@@ -39,7 +39,7 @@ namespace hf {
             {
                 uint8_t result = 0;
 
-                printf("byte=%03d state=%d\n", byte, _state);
+                //printf("byte=%03d state=%d\n", byte, _state);
 
                 switch (_state) {
 
