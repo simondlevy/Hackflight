@@ -40,14 +40,16 @@
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
 
+static const uint8_t LED_PIN = LED_BUILTIN;
+
+// Rate constants
+static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
+static constexpr float FLYING_CHECK_RATE_HZ         = 25;
+static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
+
 static CRSFforArduino _crsf;
 
 static RX _rx;
-
-float scalechan(const uint8_t k)
-{
-    return RX::scale(_crsf.readRcChannel(k));
-}
 
 static void onReceiveRcChannels(
         serialReceiverLayer::rcChannels_t *rcChannels, void * obj)
@@ -64,13 +66,6 @@ static void onReceiveRcChannels(
                 millis());
     }
 }
-
-static const uint8_t LED_PIN = LED_BUILTIN;
-
-// Rate constants
-static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
-static constexpr float FLYING_CHECK_RATE_HZ         = 25;
-static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 
 // Devices
 static IMU _imu;
