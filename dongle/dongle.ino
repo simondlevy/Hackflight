@@ -20,8 +20,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-// REPLACE WITH YOUR RECEIVER MAC Address
-static const uint8_t RECEIVER_ADDRESS[] = {0x54, 0x32, 0x04, 0x33, 0x0D, 0xF0};
+static const uint8_t RECEIVER_ADDRESS[] = {0x8C, 0xBF, 0xEA, 0xCB, 0x8F, 0x94};
 
 void serialEvent()
 {

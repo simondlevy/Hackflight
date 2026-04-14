@@ -16,7 +16,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#if 0
 #include <Arduino.h>
 
 // Hackflight library
@@ -27,13 +26,13 @@ using namespace hf;
 
 static RX::Data _rxdata;
 
-void serialEvent1()
+void serialEvent5()
 {
     static MspParser _parser;
 
-    while (Serial1.available()) {
+    while (Serial5.available()) {
 
-        _parser = MspParser::parse(_parser, Serial1.read());
+        _parser = MspParser::parse(_parser, Serial5.read());
 
         if (MspParser::getid(_parser) == 203) {
 
@@ -51,11 +50,10 @@ void serialEvent1()
 
 void RX::begin()
 {
-    Serial1.begin(115200);
+    Serial5.begin(115200);
 }
 
 auto RX::read() -> RX::Data
 {
     return _rxdata;
 }
-#endif
