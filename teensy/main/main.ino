@@ -49,15 +49,15 @@ static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 
 static CRSFforArduino _crsf;
 
-static RX _rx;
+static RX::Data _rxdata;
 
 static void onReceiveRcChannels(
         serialReceiverLayer::rcChannels_t *rcChannels, void * obj)
 {
     if (!rcChannels->failsafe) {
 
-        _rx = RX::update(
-                _rx, 
+        _rxdata = RX::Data::update(
+                _rxdata, 
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
                 _crsf.readRcChannel(2),
@@ -118,9 +118,9 @@ void loop()
     _crsf.update();
 
     // Disable arming while gyro is calibrating
-    const auto rx = _imuFilter.isGyroCalibrated ? _rx : RX();
+    const auto rxdata = _imuFilter.isGyroCalibrated ? _rxdata : RX::Data();
 
-    //_debugger.report(rx);
+    //_debugger.report(rxdata);
     //_profiler.report();
 
     const auto imuraw = _imu.read();
@@ -139,18 +139,18 @@ void loop()
     const auto state = EKF::getVehicleState(_ekf);
 
     // Check receiver timeout
-    _rx = RX::checkTimeout(_rx, millis());
+    _rxdata = RX::Data::checkTimeout(_rxdata, millis());
 
-    _mode = Safety::updateMode(state, rx, _imuFilter, _mode);
+    _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
-    const auto setpoint = mksetpoint(rx.axes);
+    const auto setpoint = mksetpoint(rxdata.axes);
     _stabilizerPid = StabilizerPid::run( _stabilizerPid,
-            !rx.is_throttle_down, dt, state, setpoint);
+            !rxdata.is_throttle_down, dt, state, setpoint);
 
     _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
     if (_mode != MODE_PANIC) {
-        _motors.run(rx.is_armed, _mixer.motorvals);
+        _motors.run(rxdata.is_armed, _mixer.motorvals);
     }
 
     if (_flyingCheckTimer.ready()) {

@@ -30,78 +30,84 @@ namespace hf {
 
         public:
 
-            Setpoint axes;
-            bool is_armed;
-            bool is_throttle_down;
+            class Data {
 
-            RX() = default;
+                public:
 
-            RX(
-                    const Setpoint & axes,
-                    const bool is_armed,
-                    const bool is_throttle_down,
-                    const uint16_t aux,
-                    const uint32_t msec_prev)
-                :
-                    axes(axes),
-                    is_armed(is_armed),
-                    is_throttle_down(is_throttle_down),
-                    aux(aux),
-                    msec_prev(msec_prev) {}
+                    Setpoint axes;
+                    bool is_armed;
+                    bool is_throttle_down;
 
-            RX& operator=(const RX& other) = default;
+                    Data() = default;
 
-            static auto update(
-                    const RX & rx,
-                    const uint16_t throttle,
-                    const uint16_t roll,
-                    const uint16_t pitch,
-                    const uint16_t yaw,
-                    const uint16_t aux,
-                    const uint32_t msec_curr) -> RX
-            {
-                const auto axes = Setpoint(
-                        scale(throttle),
-                        scale(roll),
-                        scale(pitch),
-                        scale(yaw));
+                    Data(
+                            const Setpoint & axes,
+                            const bool is_armed,
+                            const bool is_throttle_down,
+                            const uint16_t aux,
+                            const uint32_t msec_prev)
+                        :
+                            axes(axes),
+                            is_armed(is_armed),
+                            is_throttle_down(is_throttle_down),
+                            aux(aux),
+                            msec_prev(msec_prev) {}
 
-                const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
+                    Data& operator=(const Data& other) = default;
 
-                // Push-button arming; ignores startup transient
-                const auto did_aux_change = rx.aux >= 988 && aux != rx.aux;
+                    static auto update(
+                            const Data & data,
+                            const uint16_t throttle,
+                            const uint16_t roll,
+                            const uint16_t pitch,
+                            const uint16_t yaw,
+                            const uint16_t aux,
+                            const uint32_t msec_curr) -> Data
+                    {
+                        const auto axes = Setpoint(
+                                scale(throttle),
+                                scale(roll),
+                                scale(pitch),
+                                scale(yaw));
 
-                const auto is_armed = 
-                    did_aux_change && rx.is_armed ? false :
-                    did_aux_change && rx.is_throttle_down ? true :
-                    rx.is_armed;
+                        const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
 
-                return RX(axes, is_armed, is_throttle_down, aux, msec_curr);
-            }
+                        // Push-button arming; ignores startup transient
+                        const auto did_aux_change = data.aux >= 988 && aux != data.aux;
 
-            static auto checkTimeout(const RX & rx,
-                    const uint32_t msec_curr) -> RX
-            {
-                const auto timed_out = 
-                    rx.msec_prev > 0 &&
-                    msec_curr > rx.msec_prev &&
-                    msec_curr - rx.msec_prev > TIMEOUT_MSEC;
+                        const auto is_armed = 
+                            did_aux_change && data.is_armed ? false :
+                            did_aux_change && data.is_throttle_down ? true :
+                            data.is_armed;
 
-                const auto is_armed = timed_out ? false : rx.is_armed;
+                        return Data(axes, is_armed, is_throttle_down, aux, msec_curr);
+                    }
 
-                return RX(rx.axes, rx.aux, is_armed, rx.is_throttle_down,
-                        rx.msec_prev);
-            } 
+                    static auto checkTimeout(const Data & data,
+                            const uint32_t msec_curr) -> Data
+                    {
+                        const auto timed_out = 
+                            data.msec_prev > 0 &&
+                            msec_curr > data.msec_prev &&
+                            msec_curr - data.msec_prev > TIMEOUT_MSEC;
 
-        private:
+                        const auto is_armed = timed_out ? false : data.is_armed;
 
-            uint16_t aux;
-            uint32_t msec_prev;
+                        return Data(data.axes, data.aux, is_armed, data.is_throttle_down,
+                                data.msec_prev);
+                    } 
 
-            static float scale(const uint16_t val)
-            {
-                return 2 * (val - 1500.f) / 1024;
-            }
+                private:
 
-    };
+                    uint16_t aux;
+                    uint32_t msec_prev;
+
+                    static float scale(const uint16_t val)
+                    {
+                        return 2 * (val - 1500.f) / 1024;
+                    }
+
+            }; // Data::Data
+
+    }; // RX
 }

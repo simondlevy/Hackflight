@@ -29,7 +29,7 @@ static const uint8_t LED_PIN = LED_BUILTIN;
 static auto _led = LED(LED_PIN);
 static Debugger _debugger;
 static MspParser _parser;
-static RX _rx;
+static RX::Data _rxdata;
 
 void serialEvent1()
 {
@@ -39,8 +39,8 @@ void serialEvent1()
 
         if (MspParser::getid(_parser) == 203) {
 
-            _rx = RX::update(
-                    _rx, 
+            _rxdata = RX::Data::update(
+                    _rxdata, 
                     MspParser::getUshort(_parser, 0),
                     MspParser::getUshort(_parser, 1),
                     MspParser::getUshort(_parser, 2),
@@ -63,7 +63,7 @@ void loop()
 {
     _led.blink(true);
 
-    _rx = RX::checkTimeout(_rx, millis());
+    _rxdata = RX::Data::checkTimeout(_rxdata, millis());
 
-    _debugger.report(_rx);
+    _debugger.report(_rxdata);
 }
