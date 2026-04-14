@@ -31,24 +31,22 @@ namespace hf {
         public:
 
             Setpoint axes;
-            uint16_t aux;
             bool is_armed;
             bool is_throttle_down;
-            uint32_t msec_prev;
 
             RX() = default;
 
             RX(
                     const Setpoint & axes,
-                    const uint16_t aux,
                     const bool is_armed,
                     const bool is_throttle_down,
+                    const uint16_t aux,
                     const uint32_t msec_prev)
                 :
                     axes(axes),
-                    aux(aux),
                     is_armed(is_armed),
                     is_throttle_down(is_throttle_down),
+                    aux(aux),
                     msec_prev(msec_prev) {}
 
             RX& operator=(const RX& other) = default;
@@ -78,7 +76,7 @@ namespace hf {
                     did_aux_change && rx.is_throttle_down ? true :
                     rx.is_armed;
 
-                return RX(axes, aux, is_armed, is_throttle_down, msec_curr);
+                return RX(axes, is_armed, is_throttle_down, aux, msec_curr);
             }
 
             static auto checkTimeout(const RX & rx,
@@ -96,6 +94,9 @@ namespace hf {
             } 
 
         private:
+
+            uint16_t aux;
+            uint32_t msec_prev;
 
             static float scale(const uint16_t val)
             {
