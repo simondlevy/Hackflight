@@ -16,34 +16,44 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <Arduino.h>
+
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
-#include <firmware/led.hpp>
+#include <firmware/msp/parser.hpp>
 #include <firmware/rx.hpp>
 using namespace hf;
 
-static const uint8_t LED_PIN = LED_BUILTIN;
+static RX::Data _rxdata;
 
-static auto _led = LED(LED_PIN);
-static Debugger _debugger;
-
-// Setup
-void setup()
+void serialEvent1()
 {
-    RX::begin();
+    static MspParser _parser;
 
-    _led.begin(); 
+    while (Serial1.available()) {
+
+        _parser = MspParser::parse(_parser, Serial1.read());
+
+        if (MspParser::getid(_parser) == 203) {
+
+            _rxdata = RX::Data::update(
+                    _rxdata, 
+                    MspParser::getUshort(_parser, 0),
+                    MspParser::getUshort(_parser, 1),
+                    MspParser::getUshort(_parser, 2),
+                    MspParser::getUshort(_parser, 3),
+                    MspParser::getUshort(_parser, 4),
+                    millis());
+        }
+    }
 }
 
-// Loop
-void loop()
+void RX::begin()
 {
-    _led.blink(true);
+    Serial1.begin(115200);
+}
 
-    auto _rxdata = RX::read();
-
-    _rxdata = RX::Data::checkTimeout(_rxdata, millis());
-
-    _debugger.report(_rxdata);
+auto RX::read() -> RX::Data
+{
+    return _rxdata;
 }

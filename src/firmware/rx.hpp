@@ -93,8 +93,8 @@ namespace hf {
 
                         const auto is_armed = timed_out ? false : data.is_armed;
 
-                        return Data(data.axes, data.aux, is_armed, data.is_throttle_down,
-                                data.msec_prev);
+                        return Data(data.axes, is_armed,
+                                data.is_throttle_down,data.aux, data.msec_prev);
                     } 
 
                 private:
@@ -108,6 +108,10 @@ namespace hf {
                     }
 
             }; // Data::Data
+
+            static void begin();
+
+            static auto read() -> Data;
 
     }; // RX
 }
