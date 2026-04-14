@@ -22,11 +22,13 @@ namespace hf {
 
     class RX {
 
-        public:
+        private:
 
             static constexpr uint32_t TIMEOUT_MSEC = 500;
 
             static constexpr float THROTTLE_DOWN_MAX = -0.95;
+
+        public:
 
             Setpoint axes;
             uint16_t aux;
@@ -50,11 +52,6 @@ namespace hf {
                     msec_prev(msec_prev) {}
 
             RX& operator=(const RX& other) = default;
-
-            static float scale(const uint16_t val)
-            {
-                return 2 * (val - 1500.f) / 1024;
-            }
 
             static auto update(
                     const RX & rx,
@@ -97,5 +94,13 @@ namespace hf {
                 return RX(rx.axes, rx.aux, is_armed, rx.is_throttle_down,
                         rx.msec_prev);
             } 
+
+        private:
+
+            static float scale(const uint16_t val)
+            {
+                return 2 * (val - 1500.f) / 1024;
+            }
+
     };
 }
