@@ -1,5 +1,5 @@
 /*
-   Hackflight with ELRS receiver
+   Hackflight main sketch for Teensy
 
    Copyright (C) 2026 Simon D. Levy
 

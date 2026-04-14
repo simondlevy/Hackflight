@@ -30,7 +30,7 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *data, int len)
 
 void setup(void)
 {
-    serial.begin(115200, SERIAL_8N1, 0, 1); 
+    serial.begin(115200, SERIAL_8N1, 2, 1); 
 
     WiFi.mode(WIFI_STA);
 
