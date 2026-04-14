@@ -45,11 +45,11 @@ under 3,000 lines of code.
 
 # Hardware
 
-Hackflight currently runs on a custom-built micro [quadcopter](media/boltquad2.jpg) that uses 
-the [Crazyfle Bolt 1.1](https://www.bitcraze.io/products/crazyflie-bolt-1-1/)
-flight controller for state estimation and PID control, and a
-[BlueSMIRF v2](https://www.sparkfun.com/sparkfun-bluesmirf-v2.html) for 
-remote control and logging.
+* [Teensy4.0](https://www.pjrc.com/store/teensy40.html)
+
+* [XIAO ESP32-C6](https://www.seeedstudio.com/Seeed-Studio-XIAO-ESP32C6-p-5884.html)
+
+* [BMI088 Shuttle Board](https://www.digikey.com/en/products/detail/bosch-sensortec/SHUTTLE-BOARD-3-0-BMI088/14617528)
 
 # Simulator
 
