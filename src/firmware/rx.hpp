@@ -94,7 +94,7 @@ namespace hf {
                         const auto is_armed = timed_out ? false : data.is_armed;
 
                         return Data(data.axes, is_armed,
-                                data.is_throttle_down,data.aux, data.msec_prev);
+                                data.is_throttle_down, data.aux, data.msec_prev);
                     } 
 
                 private:

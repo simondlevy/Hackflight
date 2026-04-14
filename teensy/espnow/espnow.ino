@@ -41,9 +41,9 @@ void loop()
 {
     _led.blink(true);
 
-    auto _rxdata = RX::read();
+    auto rxdata = RX::read();
 
-    _rxdata = RX::Data::checkTimeout(_rxdata, millis());
+    rxdata = RX::Data::checkTimeout(rxdata, millis());
 
-    _debugger.report(_rxdata);
+    _debugger.report(rxdata);
 }

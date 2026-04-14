@@ -18,7 +18,6 @@
 
 // Third-party libraries
 #include <dshot-teensy4.hpp>  
-#include <CRSFforArduino.hpp>
 
 // Hackflight library
 
@@ -47,26 +46,6 @@ static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
 static constexpr float FLYING_CHECK_RATE_HZ         = 25;
 static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
 
-static CRSFforArduino _crsf;
-
-static RX::Data _rxdata;
-
-static void onReceiveRcChannels(
-        serialReceiverLayer::rcChannels_t *rcChannels, void * obj)
-{
-    if (!rcChannels->failsafe) {
-
-        _rxdata = RX::Data::update(
-                _rxdata, 
-                _crsf.readRcChannel(3),
-                _crsf.readRcChannel(1),
-                _crsf.readRcChannel(2),
-                _crsf.readRcChannel(4),
-                _crsf.readRcChannel(5),
-                millis());
-    }
-}
-
 // Devices
 static IMU _imu;
 static auto _led = LED(LED_PIN);
@@ -83,15 +62,7 @@ static Profiler _profiler;
 // Setup
 void setup()
 {
-    _crsf = CRSFforArduino(&Serial5);
-    if (!_crsf.begin()) {
-        _crsf.end();
-        while (true) {
-            printf("CRSF for Arduino initialisation failed!\n");
-            delay(500);
-        }
-    }
-    _crsf.setRcChannelsCallback(onReceiveRcChannels, nullptr);
+    RX::begin();
 
     _imu.begin();
     _motors.begin(); 
@@ -115,13 +86,10 @@ void loop()
 
     _led.blink(_imuFilter.isGyroCalibrated);
 
-    _crsf.update();
+    auto rxdata = RX::read();
 
     // Disable arming while gyro is calibrating
-    const auto rxdata = _imuFilter.isGyroCalibrated ? _rxdata : RX::Data();
-
-    //_debugger.report(rxdata);
-    //_profiler.report();
+    rxdata = _imuFilter.isGyroCalibrated ? rxdata : RX::Data();
 
     const auto imuraw = _imu.read();
 
@@ -139,7 +107,10 @@ void loop()
     const auto state = EKF::getVehicleState(_ekf);
 
     // Check receiver timeout
-    _rxdata = RX::Data::checkTimeout(_rxdata, millis());
+    rxdata = RX::Data::checkTimeout(rxdata, millis());
+
+    _debugger.report(rxdata);
+    //_profiler.report();
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
 
