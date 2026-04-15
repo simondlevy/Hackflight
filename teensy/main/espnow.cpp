@@ -26,13 +26,13 @@ using namespace hf;
 
 static RX::Data _rxdata;
 
-void serialEvent5()
+void serialEvent1()
 {
     static MspParser _parser;
 
-    while (Serial5.available()) {
+    while (Serial1.available()) {
 
-        _parser = MspParser::parse(_parser, Serial5.read());
+        _parser = MspParser::parse(_parser, Serial1.read());
 
         if (MspParser::getid(_parser) == 203) {
 
@@ -50,7 +50,7 @@ void serialEvent5()
 
 void RX::begin()
 {
-    Serial5.begin(115200);
+    Serial1.begin(115200);
 }
 
 auto RX::read() -> RX::Data
