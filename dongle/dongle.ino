@@ -16,11 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <esp_now.h>
 #include <WiFi.h>
 
+// Flying
 static const uint8_t RECEIVER_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x8F,0x94};
+
+// Proto-board
+//static const uint8_t RECEIVER_ADDRESS[] = {0x54,0x32,0x04,0x33,0x0D,0xF0};
+
 
 void serialEvent()
 {
