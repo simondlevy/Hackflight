@@ -43,18 +43,6 @@ struct_message incomingReadings;
 
 esp_now_peer_info_t peerInfo;
 
-// Callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-    Serial.print("\r\nLast Packet Send Status:\t");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-    if (status ==0){
-        success = "Delivery Success :)";
-    }
-    else{
-        success = "Delivery Fail :(";
-    }
-}
-
 // Callback when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
     memcpy(&incomingReadings, incomingData, sizeof(incomingReadings));
@@ -84,10 +72,6 @@ void setup() {
         return;
     }
 
-    // Once ESPNow is successfully Init, we will register for Send CB to
-    // get the status of Trasnmitted packet
-    esp_now_register_send_cb(esp_now_send_cb_t(OnDataSent));
-
     // Register peer
     memcpy(peerInfo.peer_addr, BROADCAST_ADDRESS, 6);
     peerInfo.channel = 0;
@@ -113,5 +97,5 @@ void loop() {
   else {
     Serial.println("Error sending the data");
   }
-  delay(10000);
+  delay(100);
 }
