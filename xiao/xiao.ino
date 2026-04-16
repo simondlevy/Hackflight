@@ -16,15 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <esp_now.h>
-#include <WiFi.h>
+#include <espnow-transceiver.h>
+
+static const uint8_t DONGLE_ADDRESS[] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
 static HardwareSerial serial(1);
 
-static void onDataRecv(const uint8_t * mac, const uint8_t *data, int len)
+void EspNowTransceiver::recv(const uint8_t * data, const uint8_t len)
 {
-    (void)mac;
-
     serial.write(data, len);
 }
 
@@ -32,17 +31,7 @@ void setup(void)
 {
     serial.begin(115200, SERIAL_8N1, 2, 1); 
 
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-
-        while (true) {
-            Serial.println("Error initializing ESP-NOW");
-            delay(500);
-        }
-    }
-
-    esp_now_register_recv_cb(esp_now_recv_cb_t(onDataRecv));
+    EspNowTransceiver::begin(DONGLE_ADDRESS);
 }
 
 

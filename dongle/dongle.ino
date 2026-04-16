@@ -16,15 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <esp_now.h>
-#include <WiFi.h>
+#include <espnow-transceiver.h>
 
-// Flying
-static const uint8_t RECEIVER_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x8F,0x94};
-
-// Proto-board
-//static const uint8_t RECEIVER_ADDRESS[] = {0x54,0x32,0x04,0x33,0x0D,0xF0};
-
+static const uint8_t XIAO_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x8F,0x94};
 
 void serialEvent()
 {
@@ -34,35 +28,20 @@ void serialEvent()
 
     Serial.read(buf, avail);
 
-    esp_now_send(RECEIVER_ADDRESS, buf, avail);
+    EspNowTransceiver::send(buf, avail);
 }
 
-static void reportForever(const char * msg)
+void EspNowTransceiver::recv(const uint8_t * data, const uint8_t len)
 {
-    while (true) {
-        Serial.println(msg);
-        delay(500);
-    }
+    (void)data;
+    (void)len;
 }
 
 void setup()
 {
     Serial.begin(115200);
 
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-        reportForever("Error initializing ESP-NOW");
-    }
-
-    esp_now_peer_info_t peerInfo = {};
-    memcpy(peerInfo.peer_addr, RECEIVER_ADDRESS, 6);
-    peerInfo.channel = 0;  
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK){
-        reportForever("Failed to add peer");
-    }
+    EspNowTransceiver::begin(XIAO_ADDRESS);
 }
 
 void loop()
