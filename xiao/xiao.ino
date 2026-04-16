@@ -16,25 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <espnow-transceiver.h>
+#include <espnow-transponder.h>
 
 static const uint8_t DONGLE_ADDRESS[] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
 static HardwareSerial serial(1);
 
-void EspNowTransceiver::recv(const uint8_t * data, const uint8_t len)
-{
-    serial.write(data, len);
-}
-
 void setup(void)
 {
     serial.begin(115200, SERIAL_8N1, 2, 1); 
 
-    EspNowTransceiver::begin(DONGLE_ADDRESS);
+    EspNowTransponder::begin(DONGLE_ADDRESS, &serial);
 }
 
 
 void loop(void)
 {
+    EspNowTransponder::step();
 }

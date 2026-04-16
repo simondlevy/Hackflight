@@ -117,7 +117,7 @@ if __name__ == '__main__':
             formatter_class=ArgumentDefaultsHelpFormatter)
 
     argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
-                           help='Report channel values')
+                           help='Serial port for dongle')
 
     argparser.add_argument('-d', '--debug', action='store_true',
                            help='Report channel values')

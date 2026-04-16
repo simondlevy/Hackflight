@@ -16,28 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <espnow-transceiver.h>
+#include <espnow-transponder.h>
 
 static const uint8_t XIAO_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x8F,0x94};
-
-
-void EspNowTransceiver::recv(const uint8_t * data, const uint8_t len)
-{
-    (void)data;
-    (void)len;
-}
 
 void setup()
 {
     Serial.begin(115200);
 
-    EspNowTransceiver::begin(XIAO_ADDRESS);
+    EspNowTransponder::begin(XIAO_ADDRESS, &Serial);
 }
 
 void loop()
 {
-    const auto avail = Serial.available();
-    uint8_t buf[256] = {};
-    Serial.read(buf, avail);
-    EspNowTransceiver::send(buf, avail);
+    EspNowTransponder::step();
 }
