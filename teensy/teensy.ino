@@ -32,7 +32,7 @@
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
-#include <firmware/rx.hpp>
+#include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
@@ -55,6 +55,7 @@ static const uint8_t LED_PIN = LED_BUILTIN;
 static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
 static constexpr float FLYING_CHECK_RATE_HZ         = 25;
 static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
+static constexpr float TELEMETRY_RATE_HZ = 50;
 
 // Devices
 static IMU _imu;
@@ -69,6 +70,7 @@ static OpticalFlowSensor _flowsensor;
 static auto _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
 static auto _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
 static auto _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
+static auto _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
 
 // Debugging / profiling
 static Debugger _debugger;
@@ -77,7 +79,7 @@ static Profiler _profiler;
 // Setup
 void setup()
 {
-    RX::begin();
+    Receiver::begin();
 
     _imu.begin();
     _motors.begin(); 
@@ -110,10 +112,10 @@ void loop()
 
     _led.blink(_imuFilter.isGyroCalibrated);
 
-    auto rxdata = RX::read();
+    auto rxdata = Receiver::read();
 
     // Disable arming while gyro is calibrating
-    rxdata = _imuFilter.isGyroCalibrated ? rxdata : RX::Data();
+    rxdata = _imuFilter.isGyroCalibrated ? rxdata : Receiver::Data();
 
     const auto imuraw = _imu.read();
 
@@ -138,10 +140,15 @@ void loop()
     // Faster EKF update with IMU readings
     _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
+    // Get vehicle state from EKF
     const auto state = EKF::getVehicleState(_ekf);
 
+    // Send telemetry periodically
+    if (_telemetryTimer.ready()) {
+    }
+
     // Check receiver timeout
-    rxdata = RX::Data::checkTimeout(rxdata, millis());
+    rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
     _debugger.report(rxdata);
     //_profiler.report();

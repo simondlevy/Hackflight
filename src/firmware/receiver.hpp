@@ -20,7 +20,7 @@
 
 namespace hf {
 
-    class RX {
+    class Receiver {
 
         private:
 
@@ -113,5 +113,5 @@ namespace hf {
 
             static auto read() -> Data;
 
-    }; // RX
+    }; // receiver
 }

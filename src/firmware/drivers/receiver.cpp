@@ -21,10 +21,10 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/msp/parser.hpp>
-#include <firmware/rx.hpp>
+#include <firmware/receiver.hpp>
 using namespace hf;
 
-static RX::Data _rxdata;
+static Receiver::Data _rxdata;
 
 void serialEvent1()
 {
@@ -36,7 +36,7 @@ void serialEvent1()
 
         if (MspParser::getid(_parser) == 203) {
 
-            _rxdata = RX::Data::update(
+            _rxdata = Receiver::Data::update(
                     _rxdata, 
                     MspParser::getUshort(_parser, 0),
                     MspParser::getUshort(_parser, 1),
@@ -48,12 +48,12 @@ void serialEvent1()
     }
 }
 
-void RX::begin()
+void Receiver::begin()
 {
     Serial1.begin(115200);
 }
 
-auto RX::read() -> RX::Data
+auto Receiver::read() -> Receiver::Data
 {
     return _rxdata;
 }

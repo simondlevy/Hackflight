@@ -22,13 +22,13 @@
 
 namespace hf {
 
-    static Setpoint mksetpoint(const Setpoint & rx_setpoint)
+    static Setpoint mksetpoint(const Setpoint & receiver_setpoint)
     {
         return Setpoint(
-                (rx_setpoint.thrust+1)/2,
-                rx_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
-                rx_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
-                rx_setpoint.yaw);
+                (receiver_setpoint.thrust+1)/2,
+                receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
+                receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
+                receiver_setpoint.yaw);
     }
 }
 
