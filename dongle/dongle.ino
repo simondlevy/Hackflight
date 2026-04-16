@@ -20,16 +20,6 @@
 
 static const uint8_t XIAO_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x8F,0x94};
 
-void serialEvent()
-{
-    const auto avail = Serial.available();
-
-    uint8_t buf[256] = {};
-
-    Serial.read(buf, avail);
-
-    EspNowTransceiver::send(buf, avail);
-}
 
 void EspNowTransceiver::recv(const uint8_t * data, const uint8_t len)
 {
@@ -46,4 +36,8 @@ void setup()
 
 void loop()
 {
+    const auto avail = Serial.available();
+    uint8_t buf[256] = {};
+    Serial.read(buf, avail);
+    EspNowTransceiver::send(buf, avail);
 }
