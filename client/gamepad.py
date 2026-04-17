@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import inputs
 from threading import Thread
 from time import sleep
-
+from sys import stdout
 
 class Gamepad:
 
@@ -137,7 +137,11 @@ class Gamepad:
                 if self.debug:
                     print(('send_hover_setpoint: thrust=%3.3f vx=%+3.2f ' +
                            'vy=%+3.3f yaw=%+3.f') %
-                          (self.thrust, self.vx, self.vy, self.yawrate))
+                          (self.thrust, self.vx, self.vy, self.yawrate),
+                          end='')
+
+            print()
+            #stdout.flush()
 
             sleep(1 / self.UPDATE_RATE_HZ)
 
