@@ -26,6 +26,7 @@ except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
 
+
 class TelemetryParser(MspParser):
 
     def __init__(self):
@@ -63,10 +64,7 @@ if __name__ == '__main__':
     while True:
 
         try:
-
             telemetryParser.parse(port.read(1))
 
         except KeyboardInterrupt:
-
-            break;
-
+            break

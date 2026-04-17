@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-Copyright (C) 2025 Simon D. Levy
+Copyright (C) 2026 Simon D. Levy
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,204 +18,53 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
-import os
-import socket
-import sys
-from threading import Thread
+import serial
 from time import sleep
+from threading import Thread
 
-from gamepad import Gamepad
-
-try:
-    from msp import Parser as MspParser
-except Exception as e:
-    print('%s;\nto install msp: cd ../msppg; make install' % str(e))
-    exit(0)
-
-BLUETOOTH_ADDRESSES = {
-    'bolt': '64:B7:08:86:F2:86',
-    'cf2': '64:B7:08:93:E5:3A',
-    'teensy': '64:B7:08:93:E5:9E',
-    'tinypico': 'D4:D4:DA:AA:2E:F2'
-}
-
-BLUETOOTH_PORT = 1
-
-SOCKET_TIMEOUT = 1
-
-UPDATE_RATE_HZ = 100
-
-SPIKE_VIZ_DIR = '/home/levys/Desktop/framework/viz'
-SPIKE_NETWORK = '/home/levys/Desktop/2025-diff-network/levy/max_100.txt'
-SPIKE_VIZ_PORT = 8100
+from radiomaster import RadioMaster
+from telemetry import TelemetryParser
 
 
-class LoggingParser(MspParser):
-
-    def __init__(self, client, show_state):
-
-        MspParser.__init__(self)
-        self.client = client
-        self.running = True
-        self.show_state = show_state
-        self.spike_viz_client = None
-
-    def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
-
-        if self.show_state:
-            print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-                   'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-                   'psi=%+5.1f dpsi=%+5.1f') %
-                  (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
-
-    def handle_SPIKES(self, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11,
-                      n12, n13, n14, n15):
-
-        if self.spike_viz_client is not None:
-
-            msg = (('{"Event Counts":[%d,%d,%d,%d,%d,%d,%d], ' +
-                    '"Neuron Alias":[0,1,2,3,4,5,6]}\n') %
-                   (n0, n1, n2, n3, n4, n5, n6))
-
-            try:
-                self.spike_viz_client.send(msg.encode())
-
-            except Exception:
-                pass
-
-
-def logging_threadfun(parser, visualize_spikes):
-
-    launched_visualizer = False
-
-    while parser.running:
-
-        if visualize_spikes and not launched_visualizer:
-
-            sleep(1)
-
-            os.system((('cd %s; ' +
-                        'love . -i \'{"source":"request",' +
-                        '"port":%d,"host":"localhost"}\' ' +
-                        '-n %s --show_spike_count --set_num_screen_shot 0 ' +
-                        ' --use_name_neuron ' +
-                        '\'{"0":"I1","1":"I2","2":"S","3":"D1","4":"D2",' +
-                        '"5":"O","6":"S2"}\' --set_font_size 16 > /dev/null &'
-                        ) % (SPIKE_VIZ_DIR, SPIKE_VIZ_PORT, SPIKE_NETWORK)))
-
-            launched_visualizer = True
-
-        try:
-
-            parser.parse(parser.client.recv(1))
-
-        except Exception as e:
-            print('Failed to receiving logging data: ' + str(e))
-            parser.running = False
-            break
-
-
-def connect_to_server(name, port):
-
-    addr = BLUETOOTH_ADDRESSES[name]
-
-    while True:
-
-        try:
-
-            print('Connecting to server %s:%d ... ' % (addr, port), end='')
-            sys.stdout.flush()
-
-            # Create a Bluetooth or IP socket depending on address format
-            client = (socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
-                                    socket.BTPROTO_RFCOMM)
-                      if ':' in addr
-                      else socket.socket(socket.AF_INET, socket.SOCK_STREAM))
-
-            try:
-                client.connect((addr, port))
-                client.settimeout(SOCKET_TIMEOUT)
-                print(' connected')
-                break
-
-            except Exception as e:
-                print(str(e) + ': is server running?')
-                sleep(1)
-
-        except KeyboardInterrupt:
-            break
-
-    return client
-
-
-def main():
-
-    argparser = argparse.ArgumentParser(
+argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
-    argparser.add_argument('-b', '--bluetooth-server',
-                           choices=BLUETOOTH_ADDRESSES.keys(),
-                           default='bolt', help='Bluetooth server')
+argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
+                       help='Serial port for dongle')
 
-    argparser.add_argument('-l', '--log-state', action='store_true',
-                           help='log vehicle state')
+args = argparser.parse_args()
 
-    argparser.add_argument('-s', '--visualize-spikes', action='store_true',
-                           help='Visualize Spiking Neural Network activity')
+try:
+    port = serial.Serial(args.port, 115200)
 
-    args = argparser.parse_args()
+except serial.SerialException:
+    print('Unable to open port ' + args.port)
+    exit(0)
 
-    was_armed = False
 
-    client = connect_to_server(args.bluetooth_server, BLUETOOTH_PORT)
+def telemetry_threadfun(port):
 
-    parser = LoggingParser(client, args.log_state)
-    thread = Thread(target=logging_threadfun,
-                    args=(parser, args.visualize_spikes))
-    thread.daemon = True
-    thread.start()
+    telemetryParser = TelemetryParser()
 
-    if args.visualize_spikes:
-        server_socket = socket.socket()
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_socket.bind(('localhost', SPIKE_VIZ_PORT))
-        server_socket.listen(1)
-        parser.spike_viz_client, _ = server_socket.accept()
-
-    gamepad = Gamepad()
-
-    while gamepad.connected:
-
+    while True:
         try:
+            telemetryParser.parse(port.read(1))
+        except serial.SerialException:
+            print('Unable to read telemtry from port')
 
-            gamepad.step()
-
-            if gamepad.armed != was_armed:
-                client.send(MspParser.serialize_SET_ARMING(gamepad.armed))
-                was_armed = gamepad.armed
-
-            if not gamepad.armed:
-                gamepad.hovering = False
-
-            if gamepad.hovering:
-
-                client.send(MspParser.serialize_SET_HOVER(
-                    gamepad.thrust, gamepad.vx, gamepad.vy, gamepad.yawrate))
-
-            else:
-
-                try:
-
-                    client.send(MspParser.serialize_SET_IDLE())
-
-                except Exception:
-                    print('oopsie')
-                    break
-
-            sleep(1 / UPDATE_RATE_HZ)
-
-        except KeyboardInterrupt:
-            break
+        sleep(0)  # yield
 
 
-main()
+telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
+telemetry_thread.daemon = True
+telemetry_thread.start()
+
+rm = RadioMaster(port)
+
+while rm.connected:
+
+    try:
+        rm.step()
+
+    except KeyboardInterrupt:
+        break
