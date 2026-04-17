@@ -119,9 +119,6 @@ if __name__ == '__main__':
     argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
                            help='Serial port for dongle')
 
-    argparser.add_argument('-d', '--debug', action='store_true',
-                           help='Report channel values')
-
     args = argparser.parse_args()
 
     try:
@@ -131,7 +128,7 @@ if __name__ == '__main__':
         print('Unable to open port ' + args.port)
         exit(0)
 
-    rm = RadioMaster(port, args.debug)
+    rm = RadioMaster(port, True)
 
     while rm.connected:
 

@@ -26,7 +26,7 @@ except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
 
-class LoggingParser(MspParser):
+class TelemetryParser(MspParser):
 
     def __init__(self):
 
@@ -58,13 +58,13 @@ if __name__ == '__main__':
         print('Unable to open port ' + args.port)
         exit(0)
 
-    loggingParser = LoggingParser()
+    telemetryParser = TelemetryParser()
 
     while True:
 
         try:
 
-            loggingParser.parse(port.read(1))
+            telemetryParser.parse(port.read(1))
 
         except KeyboardInterrupt:
 
