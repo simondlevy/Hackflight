@@ -113,5 +113,7 @@ namespace hf {
 
             static auto read() -> Data;
 
+            static void send(const VehicleState & state);
+
     }; // receiver
 }

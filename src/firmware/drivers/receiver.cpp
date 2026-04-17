@@ -21,6 +21,8 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/msp/parser.hpp>
+#include <firmware/msp/serializer.hpp>
+#include <firmware/msp/__messages__.h>
 #include <firmware/receiver.hpp>
 using namespace hf;
 
@@ -56,4 +58,13 @@ void Receiver::begin()
 auto Receiver::read() -> Receiver::Data
 {
     return _rxdata;
+}
+            
+void Receiver::send(const VehicleState & state)
+{
+    static MspSerializer _serializer;
+
+    _serializer.serializeFloats(MSP_STATE, (float *)&state, 10);
+
+    Serial1.write(_serializer.payload, _serializer.payloadSize);
 }
