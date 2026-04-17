@@ -21,7 +21,7 @@ from argparse import ArgumentDefaultsHelpFormatter
 import serial
 
 try:
-    from msp import Parser as MspParser
+    from __msp__ import Parser as MspParser
 except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)

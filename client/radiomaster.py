@@ -23,7 +23,11 @@ from threading import Thread
 import serial
 from time import sleep
 
-from msp import Serializer
+try:
+    from __msp__ import Serializer
+except Exception as e:
+    print('%s;\nto install msp: cd ../msppg; make install' % str(e))
+    exit(0)
 
 
 class RadioMaster:
