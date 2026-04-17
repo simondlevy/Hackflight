@@ -1287,24 +1287,14 @@
 		(uuid "dcf91c1e-1d01-4b07-b3e9-9d82eba43871")
 	)
 	(label "CS"
-		(at 123.19 100.33 0)
+		(at 123.19 102.87 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "17264ab0-df99-49d4-b85c-22bb1885fe7d")
-	)
-	(label "SCK"
-		(at 123.19 97.79 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "2966998f-750a-4060-97f2-e6c2fe8f83b3")
+		(uuid "140325e3-bd6d-43fc-b239-237e434bf38a")
 	)
 	(label "3V3"
 		(at 162.56 111.76 0)
@@ -1317,6 +1307,16 @@
 		(uuid "2b8c2f5e-7074-4a0e-82c2-3c39f0ab400b")
 	)
 	(label "SCL"
+		(at 123.19 100.33 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2fbbb159-19eb-467c-814a-955465f619a4")
+	)
+	(label "MISO"
 		(at 123.19 107.95 0)
 		(effects
 			(font
@@ -1324,7 +1324,17 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "650c3b5c-7dfe-4ec0-91cd-55ddfe4fe333")
+		(uuid "32a9338d-4c32-4ff7-8759-2ae4479410e5")
+	)
+	(label "SDA"
+		(at 123.19 97.79 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3888ede1-d9da-4881-901c-ba7cba6299a3")
 	)
 	(label "3V3"
 		(at 123.19 92.71 0)
@@ -1355,6 +1365,16 @@
 			(justify left bottom)
 		)
 		(uuid "8dcb0f9f-4fe6-44ec-a26f-9587b72727a8")
+	)
+	(label "MOSI"
+		(at 123.19 105.41 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "99402108-9aec-455d-b638-9bf37e1d8a78")
 	)
 	(label "3V3"
 		(at 153.67 88.9 0)
@@ -1406,16 +1426,6 @@
 		)
 		(uuid "ce4401af-04b6-4811-8224-123c9566406b")
 	)
-	(label "MISO"
-		(at 123.19 105.41 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "d8ce4b36-bfa3-43be-a8a4-b06414e4b089")
-	)
 	(label "CS"
 		(at 163.83 101.6 0)
 		(effects
@@ -1436,7 +1446,7 @@
 		)
 		(uuid "e05a6245-6ac0-49bd-9eef-21f98787829d")
 	)
-	(label "SDA"
+	(label "SCK"
 		(at 123.19 110.49 0)
 		(effects
 			(font
@@ -1444,7 +1454,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "f069ff88-aa2b-48f4-b532-cdf638300cf1")
+		(uuid "f1371cee-0dd0-4ab5-abca-d4128b2f8cc7")
 	)
 	(label "MOSI"
 		(at 162.56 99.06 0)
@@ -1455,16 +1465,6 @@
 			(justify left bottom)
 		)
 		(uuid "f926bf29-ad0d-476b-9b16-289fd846a671")
-	)
-	(label "MOSI"
-		(at 123.19 102.87 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "feba97a8-9cde-4fb9-94e0-cc919dea1f5f")
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
