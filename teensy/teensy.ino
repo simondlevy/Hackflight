@@ -145,6 +145,7 @@ void loop()
 
     // Send telemetry periodically
     if (_telemetryTimer.ready()) {
+        Receiver::send(state);
     }
 
     // Check receiver timeout
