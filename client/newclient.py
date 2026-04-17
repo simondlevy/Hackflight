@@ -52,7 +52,7 @@ def telemetry_threadfun(port):
         except:
             print('Unable to read telemtry from port')
 
-        sleep(1e-6)
+        sleep(0) # yield
 
 
 telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
@@ -61,4 +61,8 @@ telemetry_thread.start()
 
 while True:
 
-    sleep(.001)
+    try:
+        sleep(.001)
+
+    except KeyboardInterrupt:
+        break
