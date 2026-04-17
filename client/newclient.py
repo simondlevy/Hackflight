@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import serial
+from time import sleep
+from threading import Thread
 
 from radiomaster import RadioMaster
 from telemetry import TelemetryParser
@@ -40,3 +42,23 @@ except serial.SerialException:
     exit(0)
 
 
+def telemetry_threadfun(port):
+
+    telemetryParser = TelemetryParser()
+
+    while True:
+        try:
+            telemetryParser.parse(port.read(1))
+        except:
+            print('Unable to read telemtry from port')
+
+        sleep(1e-6)
+
+
+telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
+telemetry_thread.daemon = True
+telemetry_thread.start()
+
+while True:
+
+    sleep(.001)
