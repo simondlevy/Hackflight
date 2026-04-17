@@ -59,10 +59,12 @@ telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
 telemetry_thread.daemon = True
 telemetry_thread.start()
 
-while True:
+rm = RadioMaster(port)
+
+while rm.connected:
 
     try:
-        sleep(.001)
+        rm.step()
 
     except KeyboardInterrupt:
         break
