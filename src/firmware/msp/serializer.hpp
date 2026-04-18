@@ -188,11 +188,7 @@ namespace hf {
                     s2 = serializeFloat(s2, src[k]);
                 }
 
-                /*
-                completeSerialize();
-                */
-
-                return s2;
+                return completeSerialize(s2);
             }
 
         private:
