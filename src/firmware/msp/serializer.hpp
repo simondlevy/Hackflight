@@ -38,17 +38,6 @@ namespace hf {
 
             MspSerializer& operator=(const MspSerializer& other) = default;
 
-            MspSerializer(
-                    const payload_t payload,
-                    const uint8_t payloadSize,
-                    const uint8_t payloadChecksum,
-                    const uint8_t payloadIndex)
-                :
-                    _payload(payload),
-                    _payloadSize(payloadSize),
-                    _payloadChecksum(payloadChecksum),
-                    _payloadIndex(payloadIndex) {}
-
             void serializeBytes(
                     const uint8_t messageType, const uint8_t src[], const uint8_t count)
             {
@@ -186,6 +175,17 @@ namespace hf {
         public:
 
         private:
+
+            MspSerializer(
+                    const payload_t payload,
+                    const uint8_t payloadSize,
+                    const uint8_t payloadChecksum,
+                    const uint8_t payloadIndex)
+                :
+                    _payload(payload),
+                    _payloadSize(payloadSize),
+                    _payloadChecksum(payloadChecksum),
+                    _payloadIndex(payloadIndex) {}
 
             static auto serialize8(
                     const MspSerializer & s, const uint8_t a) -> MspSerializer

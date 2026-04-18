@@ -38,23 +38,6 @@ namespace hf {
 
             MspParser() = default;
 
-            MspParser(
-                    const uint8_t state,
-                    const buffer_t buffer,
-                    const uint8_t expected,
-                    const uint8_t received,
-                    const uint8_t checksum,
-                    const uint8_t index,
-                    const uint8_t id)
-                :
-                    state(state),
-                    buffer(buffer),
-                    expected(expected),
-                    received(received),
-                    checksum(checksum),
-                    index(index),
-                    id(id) {}
-
             static auto parse(const MspParser & p,
                     const uint8_t b) -> MspParser
             {
@@ -113,6 +96,24 @@ namespace hf {
             uint8_t checksum;
             uint8_t index;
             uint8_t id;
+
+            MspParser(
+                    const uint8_t state,
+                    const buffer_t buffer,
+                    const uint8_t expected,
+                    const uint8_t received,
+                    const uint8_t checksum,
+                    const uint8_t index,
+                    const uint8_t id)
+                :
+                    state(state),
+                    buffer(buffer),
+                    expected(expected),
+                    received(received),
+                    checksum(checksum),
+                    index(index),
+                    id(id) {}
+
     };
 
 }
