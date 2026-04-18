@@ -1,0 +1,234 @@
+/*
+   Multiwii Serial Protocol serialization support for Hackflight
+
+   Copyright (c) 2025 Simon D. Levy
+
+   This file is part of Hackflight.
+
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
+
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
+
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include <stdint.h>
+#include <array>
+
+namespace hf {
+
+    class MspSerializer {
+
+        private:
+
+            typedef std::array<uint8_t, 256> payload_t;
+
+        public:
+
+            MspSerializer() = default;
+
+            MspSerializer& operator=(const MspSerializer& other) = default;
+
+            void serializeFloats(
+                    const uint8_t messageType, const float src[], const uint8_t count)
+            {
+                prepareToSerializeFloats(messageType, count);
+
+                for (auto k=0; k<count; ++k) {
+                    serializeFloat(src[k]);
+                }
+
+                completeSerialize();
+            }
+
+            auto payloadData() -> uint8_t *
+            {
+                return _payload.data();
+            }
+
+            auto payloadSize() -> uint8_t
+            {
+                return _payloadSize;
+            }
+
+        private:
+
+            payload_t _payload;
+            uint8_t _payloadSize;
+            uint8_t _payloadChecksum;
+            uint8_t _payloadIndex;
+
+            void serialize32(const int32_t a)
+            {
+                serialize8(a & 0xFF);
+                serialize8((a >> 8) & 0xFF);
+                serialize8((a >> 16) & 0xFF);
+                serialize8((a >> 24) & 0xFF);
+            }
+
+            void serialize8(const uint8_t a)
+            {
+                addToOutBuf(a);
+                _payloadChecksum ^= a;
+            }
+
+            void prepareToSerialize(
+                    const uint8_t id, const uint8_t count, const uint8_t size)
+            {
+                _payloadSize = 0;
+                _payloadIndex = 0;
+                _payloadChecksum = 0;
+
+                addToOutBuf('$');
+                addToOutBuf('M');
+                addToOutBuf('>');
+                serialize8(count*size);
+                serialize8(id);
+            }
+
+            void addToOutBuf(const uint8_t a)
+            {
+                _payload[_payloadSize++] = a;
+            }
+
+            void prepareToSerializeFloats(const uint8_t id, const uint8_t count)
+            {
+                prepareToSerialize(id, count, 4);
+            }
+
+            void completeSerialize(void)
+            {
+                serialize8(_payloadChecksum);
+                _payloadIndex = 0;
+            }
+
+            void serializeFloat(const float src)
+            {
+                uint32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
+            }
+
+            //////////////////////////////////////////////////////////////////
+
+        public:
+
+            static auto serializeFloats(
+                    const MspSerializer & s,
+                    const uint8_t messageType,
+                    const float src[],
+                    const uint8_t count) -> MspSerializer
+            {
+                const auto payload = newPrepareToSerializeFloats(messageType, count);
+
+                MspSerializer s2 = MspSerializer(payload, 0, 0, 0);
+
+                for (auto k=0; k<count; ++k) {
+                    s2 = serializeFloat(s2, src[k]);
+                }
+
+                return completeSerialize(s2);
+            }
+
+        private:
+
+            MspSerializer(
+                    const payload_t payload,
+                    const uint8_t payloadSize,
+                    const uint8_t payloadChecksum,
+                    const uint8_t payloadIndex)
+                :
+                    _payload(payload),
+                    _payloadSize(payloadSize),
+                    _payloadChecksum(payloadChecksum),
+                    _payloadIndex(payloadIndex) {}
+
+            static auto serialize8(
+                    const MspSerializer & s, const uint8_t a) -> MspSerializer
+            {
+                const auto s2 = addToOutBuf(s, a);
+
+                return MspSerializer(
+                        s2._payload,
+                        s2._payloadSize,
+                        s2._payloadChecksum ^ a,
+                        s2._payloadIndex);
+            }
+
+            static auto serialize32(
+                    const MspSerializer & s, const int32_t a) -> MspSerializer
+            {
+                const auto s2 = serialize8(s, a & 0xFF);
+                const auto s3 = serialize8(s2, (a >> 8) & 0xFF);
+                const auto s4 = serialize8(s3, (a >> 16) & 0xFF);
+                return serialize8(s4, (a >> 24) & 0xFF);
+
+            }
+
+            static auto addToOutBuf(
+                    const MspSerializer & s, const uint8_t a) -> MspSerializer
+            {
+                auto payload = s._payload;
+
+                payload[s._payloadSize] = a;
+
+                return MspSerializer(
+                        payload,
+                        s._payloadSize + 1,
+                        s._payloadChecksum,
+                        s._payloadIndex);
+            }
+
+            static auto newPrepareToSerialize(
+                    const uint8_t id,
+                    const uint8_t count,
+                    const uint8_t size) -> payload_t
+            {
+                payload_t payload = {};
+
+                payload[0] = '$';
+                payload[1] = 'M';
+                payload[2] = '>';
+                payload[3] = count * size;
+                payload[4] = id;
+
+                return payload;
+            }
+
+            static auto newPrepareToSerializeFloats(
+                    const uint8_t id, const uint8_t count) -> payload_t
+            {
+                return newPrepareToSerialize(id, count, 4);
+            }
+
+            static auto serializeFloat(const MspSerializer & s,
+                    const float src) -> MspSerializer
+            {
+                uint32_t a = {};
+                memcpy(&a, &src, 4);
+                return serialize32(s, a);
+            }
+
+            static auto completeSerialize(
+                    const MspSerializer & s) -> MspSerializer
+            {
+                const auto s2 = serialize8(s, s._payloadChecksum);
+
+                return MspSerializer(
+                        s2._payload,
+                        s2._payloadSize,
+                        s2._payloadChecksum,
+                        0); // _paylodIndex
+            }
+
+    };
+}
