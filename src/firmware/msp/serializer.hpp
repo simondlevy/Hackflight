@@ -43,21 +43,13 @@ namespace hf {
             {
                 prepareToSerialize(id, count, 4);
 
-                uint8_t k = 0;
-
-                while (k++ < count) {
+                for (uint8_t k=0; k<count; ++k) {
                     serializeFloat(5 + k*4, src[k]);
                 }
-
-                //completeSerialize(5 + 4 * count);
 
                 _payload[5 + 4 * count] = _checksum;
 
                 _payloadSize = 6 + 4 * count;
-
-                for (uint8_t k=0; k<_payloadSize; ++k) {
-
-                }
             }
 
             auto payloadData() -> uint8_t *
@@ -105,11 +97,6 @@ namespace hf {
                 serialize8(id, 4);
 
                 _payloadSize = 5;
-            }
-
-            void completeSerialize(const uint8_t k)
-            {
-                _payload[k] = _checksum;
             }
 
             void serializeFloat(const int k, const float src)
