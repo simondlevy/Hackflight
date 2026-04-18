@@ -121,7 +121,7 @@ class MspSerializer {
         }
 
         void prepareToSerialize(
-                const uint8_t type, const uint8_t count, const uint8_t size)
+                const uint8_t id, const uint8_t count, const uint8_t size)
         {
             _payloadSize = 0;
             _payloadIndex = 0;
@@ -131,7 +131,7 @@ class MspSerializer {
             addToOutBuf('M');
             addToOutBuf('>');
             serialize8(count*size);
-            serialize8(type);
+            serialize8(id);
         }
 
         void addToOutBuf(const uint8_t a)
@@ -139,24 +139,24 @@ class MspSerializer {
             _payload[_payloadSize++] = a;
         }
 
-        void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
+        void prepareToSerializeBytes(const uint8_t id, const uint8_t count)
         {
-            prepareToSerialize(type, count, 1);
+            prepareToSerialize(id, count, 1);
         }
 
-        void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
+        void prepareToSerializeInts(const uint8_t id, const uint8_t count)
         {
-            prepareToSerialize(msgtype, count, 4);
+            prepareToSerialize(id, count, 4);
         }
 
-        void prepareToSerializeFloats(const uint8_t msgtype, const uint8_t count)
+        void prepareToSerializeFloats(const uint8_t id, const uint8_t count)
         {
-            prepareToSerialize(msgtype, count, 4);
+            prepareToSerialize(id, count, 4);
         }
 
-        void prepareToSerializeShorts(const uint8_t msgtype, const uint8_t count)
+        void prepareToSerializeShorts(const uint8_t id, const uint8_t count)
         {
-            prepareToSerialize(msgtype, count, 2);
+            prepareToSerialize(id, count, 2);
         }
 
         void completeSerialize(void)
@@ -226,7 +226,7 @@ class MspSerializer {
         }
 
         static auto newPrepareToSerialize(
-                const uint8_t type,
+                const uint8_t id,
                 const uint8_t count,
                 const uint8_t size) -> payload_t
         {
@@ -236,15 +236,15 @@ class MspSerializer {
             payload[1] = 'M';
             payload[2] = '>';
             payload[3] = count * size;
-            payload[4] = type;
+            payload[4] = id;
 
             return payload;
         }
 
         static auto newPrepareToSerializeBytes(
-                const uint8_t type, const uint8_t count) -> payload_t
+                const uint8_t id, const uint8_t count) -> payload_t
         {
-            return newPrepareToSerialize(type, count, 1);
+            return newPrepareToSerialize(id, count, 1);
         }
 
 };
