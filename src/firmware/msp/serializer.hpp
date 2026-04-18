@@ -49,7 +49,9 @@ namespace hf {
                     serializeFloat(5 + k*4, src[k]);
                 }
 
-                completeSerialize(5 + 4 * count);
+                //completeSerialize(5 + 4 * count);
+
+                _payload[5 + 4 * count] = _checksum;
 
                 _payloadSize = 6 + 4 * count;
 
