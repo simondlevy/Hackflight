@@ -82,13 +82,11 @@ namespace hf {
                 serialize8((a >> 24) & 0xFF, k+3);
             }
 
-            void serialize8(const uint8_t a, const uint8_t k, const bool modify_checksum=true)
+            void serialize8(const uint8_t a, const uint8_t k)
             {
                 _payload[k] = a;
 
-                if (modify_checksum) {
-                    _checksum ^= a;
-                }
+                _checksum ^= a;
             }
 
             void prepareToSerialize(
@@ -109,7 +107,7 @@ namespace hf {
 
             void completeSerialize(const uint8_t k)
             {
-                serialize8(_checksum, k, false);
+                _payload[k] = _checksum;
             }
 
             void serializeFloat(const int k, const float src)
