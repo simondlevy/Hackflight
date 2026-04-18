@@ -53,7 +53,7 @@ class MspSerializer {
             prepareToSerializeBytes(messageType, count);
 
             for (auto k=0; k<count; ++k) {
-                serializeByte(src[k]);
+                serialize8(src[k]);
             }
 
             completeSerialize();
@@ -144,11 +144,6 @@ class MspSerializer {
             prepareToSerialize(type, count, 1);
         }
 
-        void serializeByte(const uint8_t src)
-        {
-            serialize8(src);
-        }
-
         void prepareToSerializeInts(const uint8_t msgtype, const uint8_t count)
         {
             prepareToSerialize(msgtype, count, 4);
@@ -186,24 +181,6 @@ class MspSerializer {
 
         //////////////////////////////////////////////////////////////////
 
-        /*
-        static auto void prepareToSerialize(
-                const MspSerializer & s,
-                const uint8_t type,
-                const uint8_t count,
-                const uint8_t size) -> MspSerializer
-        {
-            _payloadSize = 0;
-            _payloadIndex = 0;
-            _payloadChecksum = 0;
-
-            addToOutBuf('$');
-            addToOutBuf('M');
-            addToOutBuf('>');
-            serialize8(count*size);
-            serialize8(type);
-        }*/
-
         static auto serialize8(
                 const MspSerializer & s, const uint8_t a) -> MspSerializer
         {
@@ -214,6 +191,24 @@ class MspSerializer {
                     s2._payloadSize,
                     s2._payloadChecksum ^ a,
                     s2._payloadIndex);
+        }
+
+        static auto serialize16(
+                const MspSerializer & s, const int16_t a) -> MspSerializer
+        {
+            const auto s2 = serialize8(s, a & 0xFF);
+
+            return serialize8(s2, (a >> 8) & 0xFF);
+        }
+
+        static auto serialize32(
+                const MspSerializer & s, const int32_t a) -> MspSerializer
+        {
+            const auto s2 = serialize8(s, a & 0xFF);
+            const auto s3 = serialize8(s2, (a >> 8) & 0xFF);
+            const auto s4 = serialize8(s3, (a >> 16) & 0xFF);
+            return serialize8(s4, (a >> 24) & 0xFF);
+
         }
 
         static auto addToOutBuf(
@@ -228,6 +223,28 @@ class MspSerializer {
                     s._payloadSize + 1,
                     s._payloadChecksum,
                     s._payloadIndex);
+        }
+
+        static auto newPrepareToSerialize(
+                const uint8_t type,
+                const uint8_t count,
+                const uint8_t size) -> payload_t
+        {
+            payload_t payload = {};
+
+            payload[0] = '$';
+            payload[1] = 'M';
+            payload[2] = '>';
+            payload[3] = count * size;
+            payload[4] = type;
+
+            return payload;
+        }
+
+        static auto newPrepareToSerializeBytes(
+                const uint8_t type, const uint8_t count) -> payload_t
+        {
+            return newPrepareToSerialize(type, count, 1);
         }
 
 };
