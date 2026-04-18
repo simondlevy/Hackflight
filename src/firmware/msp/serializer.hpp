@@ -39,9 +39,9 @@ namespace hf {
             MspSerializer& operator=(const MspSerializer& other) = default;
 
             void serializeFloats(
-                    const uint8_t messageType, const float src[], const uint8_t count)
+                    const uint8_t id, const float src[], const uint8_t count)
             {
-                prepareToSerializeFloats(messageType, count);
+                prepareToSerialize(id, count, 4);
 
                 for (auto k=0; k<count; ++k) {
                     serializeFloat(src[k]);
@@ -91,18 +91,15 @@ namespace hf {
                 addToOutBuf('$');
                 addToOutBuf('M');
                 addToOutBuf('>');
+
                 serialize8(count*size);
+
                 serialize8(id);
             }
 
             void addToOutBuf(const uint8_t a)
             {
                 _payload[_payloadSize++] = a;
-            }
-
-            void prepareToSerializeFloats(const uint8_t id, const uint8_t count)
-            {
-                prepareToSerialize(id, count, 4);
             }
 
             void completeSerialize(void)
