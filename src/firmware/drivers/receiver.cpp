@@ -66,5 +66,5 @@ void Receiver::send(const VehicleState & state)
 
     _serializer.serializeFloats(MSP_STATE, (float *)&state, 10);
 
-    Serial1.write(_serializer.payload, _serializer.payloadSize);
+    Serial1.write(_serializer.payloadData(), _serializer.payloadSize());
 }

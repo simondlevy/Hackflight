@@ -22,14 +22,11 @@
 #pragma once
 
 #include <stdint.h>
+#include <array>
 
 class MspSerializer {
 
     public:
-
-        uint8_t payload[256];
-
-        uint8_t payloadSize;
 
         void serializeBytes(
                 const uint8_t messageType, const uint8_t src[], const uint8_t count)
@@ -67,7 +64,21 @@ class MspSerializer {
             completeSerialize();
         }
 
+        auto payloadData() -> uint8_t *
+        {
+            return _payload.data();
+        }
+
+        auto payloadSize() -> uint8_t
+        {
+            return _payloadSize;
+        }
+
     private:
+
+        std::array<uint8_t, 256> _payload;
+
+        uint8_t _payloadSize;
 
         uint8_t _payloadChecksum;
         uint8_t _payloadIndex;
@@ -95,7 +106,7 @@ class MspSerializer {
         void prepareToSerialize(
                 const uint8_t type, const uint8_t count, const uint8_t size)
         {
-            payloadSize = 0;
+            _payloadSize = 0;
             _payloadIndex = 0;
             _payloadChecksum = 0;
 
@@ -108,7 +119,7 @@ class MspSerializer {
 
         void addToOutBuf(const uint8_t a)
         {
-            payload[payloadSize++] = a;
+            _payload[_payloadSize++] = a;
         }
 
         void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
