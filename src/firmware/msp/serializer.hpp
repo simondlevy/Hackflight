@@ -38,18 +38,6 @@ namespace hf {
 
             MspSerializer& operator=(const MspSerializer& other) = default;
 
-            void serializeBytes(
-                    const uint8_t messageType, const uint8_t src[], const uint8_t count)
-            {
-                prepareToSerializeBytes(messageType, count);
-
-                for (auto k=0; k<count; ++k) {
-                    serialize8(src[k]);
-                }
-
-                completeSerialize();
-            }
-
             void serializeFloats(
                     const uint8_t messageType, const float src[], const uint8_t count)
             {
@@ -57,18 +45,6 @@ namespace hf {
 
                 for (auto k=0; k<count; ++k) {
                     serializeFloat(src[k]);
-                }
-
-                completeSerialize();
-            }
-
-            void serializeShorts(
-                    const uint8_t messageType, const int16_t src[], const uint8_t count)
-            {
-                prepareToSerializeShorts(messageType, count);
-
-                for (auto k=0; k<count; ++k) {
-                    serializeShort(src[k]);
                 }
 
                 completeSerialize();
@@ -99,12 +75,6 @@ namespace hf {
                 serialize8((a >> 24) & 0xFF);
             }
 
-            void serialize16(const int16_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-            }
-
             void serialize8(const uint8_t a)
             {
                 addToOutBuf(a);
@@ -130,24 +100,9 @@ namespace hf {
                 _payload[_payloadSize++] = a;
             }
 
-            void prepareToSerializeBytes(const uint8_t id, const uint8_t count)
-            {
-                prepareToSerialize(id, count, 1);
-            }
-
-            void prepareToSerializeInts(const uint8_t id, const uint8_t count)
-            {
-                prepareToSerialize(id, count, 4);
-            }
-
             void prepareToSerializeFloats(const uint8_t id, const uint8_t count)
             {
                 prepareToSerialize(id, count, 4);
-            }
-
-            void prepareToSerializeShorts(const uint8_t id, const uint8_t count)
-            {
-                prepareToSerialize(id, count, 2);
             }
 
             void completeSerialize(void)
@@ -161,13 +116,6 @@ namespace hf {
                 uint32_t a;
                 memcpy(&a, &src, 4);
                 serialize32(a);
-            }
-
-            void serializeShort(const uint16_t src)
-            {
-                int16_t a;
-                memcpy(&a, &src, 2);
-                serialize16(a);
             }
 
             //////////////////////////////////////////////////////////////////
@@ -216,14 +164,6 @@ namespace hf {
                         s2._payloadIndex);
             }
 
-            static auto serialize16(
-                    const MspSerializer & s, const int16_t a) -> MspSerializer
-            {
-                const auto s2 = serialize8(s, a & 0xFF);
-
-                return serialize8(s2, (a >> 8) & 0xFF);
-            }
-
             static auto serialize32(
                     const MspSerializer & s, const int32_t a) -> MspSerializer
             {
@@ -264,28 +204,10 @@ namespace hf {
                 return payload;
             }
 
-            static auto newPrepareToSerializeBytes(
-                    const uint8_t id, const uint8_t count) -> payload_t
-            {
-                return newPrepareToSerialize(id, count, 1);
-            }
-
-            static auto newPrepareToSerializeInts(
-                    const uint8_t id, const uint8_t count) -> payload_t
-            {
-                return newPrepareToSerialize(id, count, 4);
-            }
-
             static auto newPrepareToSerializeFloats(
                     const uint8_t id, const uint8_t count) -> payload_t
             {
                 return newPrepareToSerialize(id, count, 4);
-            }
-
-            static auto newPrepareToSerializeShorts(
-                    const uint8_t id, const uint8_t count) -> payload_t
-            {
-                return newPrepareToSerialize(id, count, 2);
             }
 
             static auto serializeFloat(const MspSerializer & s,
