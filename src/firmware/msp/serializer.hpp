@@ -174,6 +174,27 @@ namespace hf {
 
         public:
 
+            static auto serializeFloats(
+                    const MspSerializer & s,
+                    const uint8_t messageType,
+                    const float src[],
+                    const uint8_t count) -> MspSerializer
+            {
+                const auto payload = newPrepareToSerializeFloats(messageType, count);
+
+                MspSerializer s2 = MspSerializer(payload, 0, 0, 0);
+
+                for (auto k=0; k<count; ++k) {
+                    s2 = serializeFloat(s2, src[k]);
+                }
+
+                /*
+                completeSerialize();
+                */
+
+                return s2;
+            }
+
         private:
 
             MspSerializer(
@@ -270,5 +291,26 @@ namespace hf {
             {
                 return newPrepareToSerialize(id, count, 2);
             }
+
+            static auto serializeFloat(const MspSerializer & s,
+                    const float src) -> MspSerializer
+            {
+                uint32_t a = {};
+                memcpy(&a, &src, 4);
+                return serialize32(s, a);
+            }
+
+            static auto completeSerialize(
+                    const MspSerializer & s) -> MspSerializer
+            {
+                const auto s2 = serialize8(s, s._payloadChecksum);
+
+                return MspSerializer(
+                        s2._payload,
+                        s2._payloadSize,
+                        s2._payloadChecksum,
+                        0); // _paylodIndex
+            }
+
     };
 }
