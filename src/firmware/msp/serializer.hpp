@@ -247,4 +247,22 @@ class MspSerializer {
             return newPrepareToSerialize(id, count, 1);
         }
 
+        static auto newPrepareToSerializeInts(
+                const uint8_t id, const uint8_t count) -> payload_t
+        {
+            return newPrepareToSerialize(id, count, 4);
+        }
+
+        static auto newPrepareToSerializeFloats(
+                const uint8_t id, const uint8_t count) -> payload_t
+        {
+            return newPrepareToSerialize(id, count, 4);
+        }
+
+        static auto newPrepareToSerializeShorts(
+                const uint8_t id, const uint8_t count) -> payload_t
+        {
+            return newPrepareToSerialize(id, count, 2);
+        }
+
 };
