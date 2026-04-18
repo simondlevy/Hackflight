@@ -78,13 +78,6 @@ namespace hf {
                 serialize8((a >> 24) & 0xFF, k+3);
             }
 
-            /*
-            void serialize8(const uint8_t a)
-            {
-                addToOutBuf(a);
-                _payloadChecksum ^= a;
-            }*/
-
             void serialize8(const uint8_t a, const uint8_t k)
             {
                 _payload[k] = a;
@@ -105,11 +98,6 @@ namespace hf {
                 serialize8(id, 4);
 
                 _payloadSize = 5;
-            }
-
-            void addToOutBuf(const uint8_t a)
-            {
-                _payload[_payloadSize++] = a;
             }
 
             void completeSerialize(const uint8_t k)
