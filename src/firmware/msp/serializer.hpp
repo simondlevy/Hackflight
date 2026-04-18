@@ -43,11 +43,13 @@ namespace hf {
             {
                 prepareToSerialize(id, count, 4);
 
-                for (auto k=0; k<count; ++k) {
-                    serializeFloat(k, src[k]);
+                uint8_t k = 0;
+
+                while (k++ < count) {
+                    serializeFloat(5 + k*4, src[k]);
                 }
 
-                completeSerialize();
+                completeSerialize(5 + 4 * count);
 
                 _payloadSize = 6 + 4 * count;
             }
@@ -68,19 +70,20 @@ namespace hf {
             uint8_t _payloadSize;
             uint8_t _payloadChecksum;
 
-            void serialize32(const int32_t a)
+            void serialize32(const uint8_t k, const int32_t a)
             {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-                serialize8((a >> 16) & 0xFF);
-                serialize8((a >> 24) & 0xFF);
+                serialize8(a & 0xFF, k);
+                serialize8((a >> 8) & 0xFF, k+1);
+                serialize8((a >> 16) & 0xFF, k+2);
+                serialize8((a >> 24) & 0xFF, k+3);
             }
 
+            /*
             void serialize8(const uint8_t a)
             {
                 addToOutBuf(a);
                 _payloadChecksum ^= a;
-            }
+            }*/
 
             void serialize8(const uint8_t a, const uint8_t k)
             {
@@ -109,16 +112,16 @@ namespace hf {
                 _payload[_payloadSize++] = a;
             }
 
-            void completeSerialize(void)
+            void completeSerialize(const uint8_t k)
             {
-                serialize8(_payloadChecksum);
+                serialize8(_payloadChecksum, k);
             }
 
             void serializeFloat(const int k, const float src)
             {
                 uint32_t a;
                 memcpy(&a, &src, 4);
-                serialize32(a);
+                serialize32(k, a);
             }
     };
 }
