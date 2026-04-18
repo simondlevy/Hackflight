@@ -65,7 +65,6 @@ namespace hf {
             payload_t _payload;
             uint8_t _payloadSize;
             uint8_t _payloadChecksum;
-            uint8_t _payloadIndex;
 
             void serialize32(const int32_t a)
             {
@@ -85,7 +84,6 @@ namespace hf {
                     const uint8_t id, const uint8_t count, const uint8_t size)
             {
                 _payloadSize = 0;
-                _payloadIndex = 0;
                 _payloadChecksum = 0;
 
                 addToOutBuf('$');
@@ -105,7 +103,6 @@ namespace hf {
             void completeSerialize(void)
             {
                 serialize8(_payloadChecksum);
-                _payloadIndex = 0;
             }
 
             void serializeFloat(const float src)
