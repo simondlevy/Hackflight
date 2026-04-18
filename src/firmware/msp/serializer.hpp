@@ -83,12 +83,13 @@ namespace hf {
             void prepareToSerialize(
                     const uint8_t id, const uint8_t count, const uint8_t size)
             {
-                _payloadSize = 0;
-                _payloadChecksum = 0;
+                _payload[0] = '$';
+                _payload[1] = 'M';
+                _payload[2] = '>';
 
-                addToOutBuf('$');
-                addToOutBuf('M');
-                addToOutBuf('>');
+                _payloadSize = 3;
+
+                _payloadChecksum = 0;
 
                 serialize8(count*size);
 
