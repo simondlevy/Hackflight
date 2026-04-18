@@ -26,7 +26,23 @@
 
 class MspSerializer {
 
+    private:
+
+        typedef std::array<uint8_t, 256> payload_t;
+
     public:
+
+        MspSerializer() = default;
+
+        MspSerializer& operator=(const MspSerializer& other) = default;
+
+        /*
+        MspSerializer(
+        const std::array<uint8_t, 256> _payload;
+        const uint8_t _payloadSize;
+        const uint8_t _payloadChecksum;
+        const uint8_t _payloadIndex);*/
+
 
         void serializeBytes(
                 const uint8_t messageType, const uint8_t src[], const uint8_t count)
@@ -76,10 +92,8 @@ class MspSerializer {
 
     private:
 
-        std::array<uint8_t, 256> _payload;
-
+        payload_t _payload;
         uint8_t _payloadSize;
-
         uint8_t _payloadChecksum;
         uint8_t _payloadIndex;
 
@@ -121,6 +135,15 @@ class MspSerializer {
         {
             _payload[_payloadSize++] = a;
         }
+
+        /*
+        static auto addToOutBuf(
+                const MspSerializer & s, const uint8_t a) -> MspSerializer
+        {
+            auto payload = s.payload;
+            payload[s._payloadSize] = a;
+            return MspSerializer(payload, s._payloadSize + 1);
+        }*/
 
         void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
         {
