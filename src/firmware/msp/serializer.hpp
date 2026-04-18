@@ -24,245 +24,251 @@
 #include <stdint.h>
 #include <array>
 
-class MspSerializer {
+namespace hf {
 
-    private:
+    class MspSerializer {
 
-        typedef std::array<uint8_t, 256> payload_t;
+        private:
 
-    public:
+            typedef std::array<uint8_t, 256> payload_t;
 
-        MspSerializer() = default;
+        public:
 
-        MspSerializer& operator=(const MspSerializer& other) = default;
+            MspSerializer() = default;
 
-        MspSerializer(
-                const payload_t payload,
-                const uint8_t payloadSize,
-                const uint8_t payloadChecksum,
-                const uint8_t payloadIndex)
-            :
-                _payload(payload),
-                _payloadSize(payloadSize),
-                _payloadChecksum(payloadChecksum),
-                _payloadIndex(payloadIndex) {}
+            MspSerializer& operator=(const MspSerializer& other) = default;
 
-        void serializeBytes(
-                const uint8_t messageType, const uint8_t src[], const uint8_t count)
-        {
-            prepareToSerializeBytes(messageType, count);
+            MspSerializer(
+                    const payload_t payload,
+                    const uint8_t payloadSize,
+                    const uint8_t payloadChecksum,
+                    const uint8_t payloadIndex)
+                :
+                    _payload(payload),
+                    _payloadSize(payloadSize),
+                    _payloadChecksum(payloadChecksum),
+                    _payloadIndex(payloadIndex) {}
 
-            for (auto k=0; k<count; ++k) {
-                serialize8(src[k]);
+            void serializeBytes(
+                    const uint8_t messageType, const uint8_t src[], const uint8_t count)
+            {
+                prepareToSerializeBytes(messageType, count);
+
+                for (auto k=0; k<count; ++k) {
+                    serialize8(src[k]);
+                }
+
+                completeSerialize();
             }
 
-            completeSerialize();
-        }
+            void serializeFloats(
+                    const uint8_t messageType, const float src[], const uint8_t count)
+            {
+                prepareToSerializeFloats(messageType, count);
 
-        void serializeFloats(
-                const uint8_t messageType, const float src[], const uint8_t count)
-        {
-            prepareToSerializeFloats(messageType, count);
+                for (auto k=0; k<count; ++k) {
+                    serializeFloat(src[k]);
+                }
 
-            for (auto k=0; k<count; ++k) {
-                serializeFloat(src[k]);
+                completeSerialize();
             }
 
-            completeSerialize();
-        }
+            void serializeShorts(
+                    const uint8_t messageType, const int16_t src[], const uint8_t count)
+            {
+                prepareToSerializeShorts(messageType, count);
 
-        void serializeShorts(
-                const uint8_t messageType, const int16_t src[], const uint8_t count)
-        {
-            prepareToSerializeShorts(messageType, count);
+                for (auto k=0; k<count; ++k) {
+                    serializeShort(src[k]);
+                }
 
-            for (auto k=0; k<count; ++k) {
-                serializeShort(src[k]);
+                completeSerialize();
             }
 
-            completeSerialize();
-        }
+            auto payloadData() -> uint8_t *
+            {
+                return _payload.data();
+            }
 
-        auto payloadData() -> uint8_t *
-        {
-            return _payload.data();
-        }
+            auto payloadSize() -> uint8_t
+            {
+                return _payloadSize;
+            }
 
-        auto payloadSize() -> uint8_t
-        {
-            return _payloadSize;
-        }
+        private:
 
-    private:
+            payload_t _payload;
+            uint8_t _payloadSize;
+            uint8_t _payloadChecksum;
+            uint8_t _payloadIndex;
 
-        payload_t _payload;
-        uint8_t _payloadSize;
-        uint8_t _payloadChecksum;
-        uint8_t _payloadIndex;
+            void serialize32(const int32_t a)
+            {
+                serialize8(a & 0xFF);
+                serialize8((a >> 8) & 0xFF);
+                serialize8((a >> 16) & 0xFF);
+                serialize8((a >> 24) & 0xFF);
+            }
 
-        void serialize32(const int32_t a)
-        {
-            serialize8(a & 0xFF);
-            serialize8((a >> 8) & 0xFF);
-            serialize8((a >> 16) & 0xFF);
-            serialize8((a >> 24) & 0xFF);
-        }
+            void serialize16(const int16_t a)
+            {
+                serialize8(a & 0xFF);
+                serialize8((a >> 8) & 0xFF);
+            }
 
-        void serialize16(const int16_t a)
-        {
-            serialize8(a & 0xFF);
-            serialize8((a >> 8) & 0xFF);
-        }
+            void serialize8(const uint8_t a)
+            {
+                addToOutBuf(a);
+                _payloadChecksum ^= a;
+            }
 
-        void serialize8(const uint8_t a)
-        {
-            addToOutBuf(a);
-            _payloadChecksum ^= a;
-        }
+            void prepareToSerialize(
+                    const uint8_t id, const uint8_t count, const uint8_t size)
+            {
+                _payloadSize = 0;
+                _payloadIndex = 0;
+                _payloadChecksum = 0;
 
-        void prepareToSerialize(
-                const uint8_t id, const uint8_t count, const uint8_t size)
-        {
-            _payloadSize = 0;
-            _payloadIndex = 0;
-            _payloadChecksum = 0;
+                addToOutBuf('$');
+                addToOutBuf('M');
+                addToOutBuf('>');
+                serialize8(count*size);
+                serialize8(id);
+            }
 
-            addToOutBuf('$');
-            addToOutBuf('M');
-            addToOutBuf('>');
-            serialize8(count*size);
-            serialize8(id);
-        }
+            void addToOutBuf(const uint8_t a)
+            {
+                _payload[_payloadSize++] = a;
+            }
 
-        void addToOutBuf(const uint8_t a)
-        {
-            _payload[_payloadSize++] = a;
-        }
+            void prepareToSerializeBytes(const uint8_t id, const uint8_t count)
+            {
+                prepareToSerialize(id, count, 1);
+            }
 
-        void prepareToSerializeBytes(const uint8_t id, const uint8_t count)
-        {
-            prepareToSerialize(id, count, 1);
-        }
+            void prepareToSerializeInts(const uint8_t id, const uint8_t count)
+            {
+                prepareToSerialize(id, count, 4);
+            }
 
-        void prepareToSerializeInts(const uint8_t id, const uint8_t count)
-        {
-            prepareToSerialize(id, count, 4);
-        }
+            void prepareToSerializeFloats(const uint8_t id, const uint8_t count)
+            {
+                prepareToSerialize(id, count, 4);
+            }
 
-        void prepareToSerializeFloats(const uint8_t id, const uint8_t count)
-        {
-            prepareToSerialize(id, count, 4);
-        }
+            void prepareToSerializeShorts(const uint8_t id, const uint8_t count)
+            {
+                prepareToSerialize(id, count, 2);
+            }
 
-        void prepareToSerializeShorts(const uint8_t id, const uint8_t count)
-        {
-            prepareToSerialize(id, count, 2);
-        }
+            void completeSerialize(void)
+            {
+                serialize8(_payloadChecksum);
+                _payloadIndex = 0;
+            }
 
-        void completeSerialize(void)
-        {
-            serialize8(_payloadChecksum);
-            _payloadIndex = 0;
-        }
+            void serializeFloat(const float src)
+            {
+                uint32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
+            }
 
-        void serializeFloat(const float src)
-        {
-            uint32_t a;
-            memcpy(&a, &src, 4);
-            serialize32(a);
-        }
+            void serializeShort(const uint16_t src)
+            {
+                int16_t a;
+                memcpy(&a, &src, 2);
+                serialize16(a);
+            }
 
-        void serializeShort(const uint16_t src)
-        {
-            int16_t a;
-            memcpy(&a, &src, 2);
-            serialize16(a);
-        }
+            //////////////////////////////////////////////////////////////////
 
-        //////////////////////////////////////////////////////////////////
+        public:
 
-        static auto serialize8(
-                const MspSerializer & s, const uint8_t a) -> MspSerializer
-        {
-            const auto s2 = addToOutBuf(s, a);
+        private:
 
-            return MspSerializer(
-                    s2._payload,
-                    s2._payloadSize,
-                    s2._payloadChecksum ^ a,
-                    s2._payloadIndex);
-        }
+            static auto serialize8(
+                    const MspSerializer & s, const uint8_t a) -> MspSerializer
+            {
+                const auto s2 = addToOutBuf(s, a);
 
-        static auto serialize16(
-                const MspSerializer & s, const int16_t a) -> MspSerializer
-        {
-            const auto s2 = serialize8(s, a & 0xFF);
+                return MspSerializer(
+                        s2._payload,
+                        s2._payloadSize,
+                        s2._payloadChecksum ^ a,
+                        s2._payloadIndex);
+            }
 
-            return serialize8(s2, (a >> 8) & 0xFF);
-        }
+            static auto serialize16(
+                    const MspSerializer & s, const int16_t a) -> MspSerializer
+            {
+                const auto s2 = serialize8(s, a & 0xFF);
 
-        static auto serialize32(
-                const MspSerializer & s, const int32_t a) -> MspSerializer
-        {
-            const auto s2 = serialize8(s, a & 0xFF);
-            const auto s3 = serialize8(s2, (a >> 8) & 0xFF);
-            const auto s4 = serialize8(s3, (a >> 16) & 0xFF);
-            return serialize8(s4, (a >> 24) & 0xFF);
+                return serialize8(s2, (a >> 8) & 0xFF);
+            }
 
-        }
+            static auto serialize32(
+                    const MspSerializer & s, const int32_t a) -> MspSerializer
+            {
+                const auto s2 = serialize8(s, a & 0xFF);
+                const auto s3 = serialize8(s2, (a >> 8) & 0xFF);
+                const auto s4 = serialize8(s3, (a >> 16) & 0xFF);
+                return serialize8(s4, (a >> 24) & 0xFF);
 
-        static auto addToOutBuf(
-                const MspSerializer & s, const uint8_t a) -> MspSerializer
-        {
-            auto payload = s._payload;
+            }
 
-            payload[s._payloadSize] = a;
+            static auto addToOutBuf(
+                    const MspSerializer & s, const uint8_t a) -> MspSerializer
+            {
+                auto payload = s._payload;
 
-            return MspSerializer(
-                    payload,
-                    s._payloadSize + 1,
-                    s._payloadChecksum,
-                    s._payloadIndex);
-        }
+                payload[s._payloadSize] = a;
 
-        static auto newPrepareToSerialize(
-                const uint8_t id,
-                const uint8_t count,
-                const uint8_t size) -> payload_t
-        {
-            payload_t payload = {};
+                return MspSerializer(
+                        payload,
+                        s._payloadSize + 1,
+                        s._payloadChecksum,
+                        s._payloadIndex);
+            }
 
-            payload[0] = '$';
-            payload[1] = 'M';
-            payload[2] = '>';
-            payload[3] = count * size;
-            payload[4] = id;
+            static auto newPrepareToSerialize(
+                    const uint8_t id,
+                    const uint8_t count,
+                    const uint8_t size) -> payload_t
+            {
+                payload_t payload = {};
 
-            return payload;
-        }
+                payload[0] = '$';
+                payload[1] = 'M';
+                payload[2] = '>';
+                payload[3] = count * size;
+                payload[4] = id;
 
-        static auto newPrepareToSerializeBytes(
-                const uint8_t id, const uint8_t count) -> payload_t
-        {
-            return newPrepareToSerialize(id, count, 1);
-        }
+                return payload;
+            }
 
-        static auto newPrepareToSerializeInts(
-                const uint8_t id, const uint8_t count) -> payload_t
-        {
-            return newPrepareToSerialize(id, count, 4);
-        }
+            static auto newPrepareToSerializeBytes(
+                    const uint8_t id, const uint8_t count) -> payload_t
+            {
+                return newPrepareToSerialize(id, count, 1);
+            }
 
-        static auto newPrepareToSerializeFloats(
-                const uint8_t id, const uint8_t count) -> payload_t
-        {
-            return newPrepareToSerialize(id, count, 4);
-        }
+            static auto newPrepareToSerializeInts(
+                    const uint8_t id, const uint8_t count) -> payload_t
+            {
+                return newPrepareToSerialize(id, count, 4);
+            }
 
-        static auto newPrepareToSerializeShorts(
-                const uint8_t id, const uint8_t count) -> payload_t
-        {
-            return newPrepareToSerialize(id, count, 2);
-        }
+            static auto newPrepareToSerializeFloats(
+                    const uint8_t id, const uint8_t count) -> payload_t
+            {
+                return newPrepareToSerialize(id, count, 4);
+            }
 
-};
+            static auto newPrepareToSerializeShorts(
+                    const uint8_t id, const uint8_t count) -> payload_t
+            {
+                return newPrepareToSerialize(id, count, 2);
+            }
+    };
+}
