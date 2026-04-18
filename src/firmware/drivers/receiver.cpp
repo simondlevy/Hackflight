@@ -60,18 +60,14 @@ auto Receiver::read() -> Receiver::Data
     return _rxdata;
 }
 
-//#define NEW
-            
 void Receiver::send(const VehicleState & state)
 {
     static MspSerializer _serializer;
 
-#if NEW
     _serializer = MspSerializer::serializeFloats(
             _serializer, MSP_STATE, (float *)&state, 10);
-#else
-    _serializer.serializeFloats(MSP_STATE, (float *)&state, 10);
-#endif
 
-    Serial1.write(_serializer.payloadData(), _serializer.payloadSize());
+    Serial1.write(
+            MspSerializer::payloadBytes(_serializer),
+            MspSerializer::payloadSize(_serializer));
 }

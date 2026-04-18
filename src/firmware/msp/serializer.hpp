@@ -38,35 +38,50 @@ namespace hf {
 
             MspSerializer& operator=(const MspSerializer& other) = default;
 
-            void serializeFloats(
-                    const uint8_t id, const float src[], const uint8_t count)
+            MspSerializer(
+                    const payload_t & payload,
+                    const uint8_t payloadSize) 
+                :
+                    _payload(payload),
+                    _payloadSize(payloadSize) {}
+
+            static auto serializeFloats(
+                    const MspSerializer & serializer,
+                    const uint8_t id,
+                    const float src[],
+                    const uint8_t count)
             {
+                payload_t payload = {};
+
                 uint8_t checksum = 0;
 
-                prepareToSerialize(id, count, 4, _payload, checksum);
+                prepareToSerialize(id, count, 4, payload, checksum);
 
                 for (uint8_t k=0; k<count; ++k) {
-                    serializeFloat(5 + k*4, src[k], _payload, checksum);
+                    serializeFloat(5 + k*4, src[k], payload, checksum);
                 }
 
-                _payload[5 + 4 * count] = checksum;
+                payload[5 + 4 * count] = checksum;
 
-                _payloadSize = 6 + 4 * count;
+                return MspSerializer(payload, 6 + 4 * count);
             }
 
-            auto payloadData() -> uint8_t *
+            static auto payloadBytes(
+                    const MspSerializer & serializer) -> uint8_t *
             {
-                return _payload.data();
+                return (uint8_t *)serializer._payload.data();
             }
 
-            auto payloadSize() -> uint8_t
+            static auto payloadSize(
+                    const MspSerializer & serializer) -> uint8_t
             {
-                return _payloadSize;
+                return serializer._payloadSize;
             }
 
         private:
 
             payload_t _payload;
+
             uint8_t _payloadSize;
 
             static void serialize32(
