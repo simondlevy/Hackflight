@@ -52,6 +52,10 @@ namespace hf {
                 completeSerialize(5 + 4 * count);
 
                 _payloadSize = 6 + 4 * count;
+
+                for (uint8_t k=0; k<_payloadSize; ++k) {
+
+                }
             }
 
             auto payloadData() -> uint8_t *
@@ -68,7 +72,7 @@ namespace hf {
 
             payload_t _payload;
             uint8_t _payloadSize;
-            uint8_t _payloadChecksum;
+            uint8_t _checksum;
 
             void serialize32(const uint8_t k, const int32_t a)
             {
@@ -81,7 +85,7 @@ namespace hf {
             void serialize8(const uint8_t a, const uint8_t k)
             {
                 _payload[k] = a;
-                _payloadChecksum ^= a;
+                _checksum ^= a;
             }
 
             void prepareToSerialize(
@@ -91,7 +95,7 @@ namespace hf {
                 _payload[1] = 'M';
                 _payload[2] = '>';
 
-                _payloadChecksum = 0;
+                _checksum = 0;
 
                 serialize8(count*size, 3);
 
@@ -102,7 +106,7 @@ namespace hf {
 
             void completeSerialize(const uint8_t k)
             {
-                serialize8(_payloadChecksum, k);
+                serialize8(_checksum, k);
             }
 
             void serializeFloat(const int k, const float src)
