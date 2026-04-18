@@ -43,7 +43,7 @@ namespace hf {
             {
                 _checksum = 0;
 
-                prepareToSerialize(id, count, 4, _checksum);
+                prepareToSerialize(id, count, 4, _payload, _checksum);
 
                 for (uint8_t k=0; k<count; ++k) {
                     serializeFloat(5 + k*4, src[k], _checksum);
@@ -89,11 +89,12 @@ namespace hf {
                     const uint8_t id,
                     const uint8_t count,
                     const uint8_t size,
+                    payload_t & payload,
                     uint8_t & checksum)
             {
-                _payload[0] = '$';
-                _payload[1] = 'M';
-                _payload[2] = '>';
+                payload[0] = '$';
+                payload[1] = 'M';
+                payload[2] = '>';
 
                 serialize8(count*size, 3, checksum);
 
