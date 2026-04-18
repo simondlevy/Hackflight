@@ -46,7 +46,7 @@ namespace hf {
                 prepareToSerialize(id, count, 4, _payload, _checksum);
 
                 for (uint8_t k=0; k<count; ++k) {
-                    serializeFloat(5 + k*4, src[k], _checksum);
+                    serializeFloat(5 + k*4, src[k], _payload, _checksum);
                 }
 
                 _payload[5 + 4 * count] = _checksum;
@@ -70,15 +70,23 @@ namespace hf {
             uint8_t _payloadSize;
             uint8_t _checksum;
 
-            void serialize32(const uint8_t k, const int32_t a, uint8_t & checksum)
+            void serialize32(
+                    const uint8_t k,
+                    const int32_t a,
+                    payload_t & payload,
+                    uint8_t & checksum)
             {
-                serialize8(a & 0xFF, k, checksum);
-                serialize8((a >> 8) & 0xFF, k+1, checksum);
-                serialize8((a >> 16) & 0xFF, k+2, checksum);
-                serialize8((a >> 24) & 0xFF, k+3, checksum);
+                serialize8(a & 0xFF, k, payload, checksum);
+                serialize8((a >> 8) & 0xFF, k+1, payload, checksum);
+                serialize8((a >> 16) & 0xFF, k+2, payload, checksum);
+                serialize8((a >> 24) & 0xFF, k+3, payload, checksum);
             }
 
-            void serialize8(const uint8_t a, const uint8_t k, uint8_t &checksum)
+            void serialize8(
+                    const uint8_t a,
+                    const uint8_t k,
+                    payload_t & payload,
+                    uint8_t &checksum)
             {
                 _payload[k] = a;
 
@@ -96,18 +104,20 @@ namespace hf {
                 payload[1] = 'M';
                 payload[2] = '>';
 
-                serialize8(count*size, 3, checksum);
+                serialize8(count*size, 3, payload, checksum);
 
-                serialize8(id, 4, checksum);
-
-                _payloadSize = 5;
+                serialize8(id, 4, payload, checksum);
             }
 
-            void serializeFloat(const int k, const float src, uint8_t & checksum)
+            void serializeFloat(
+                    const int k,
+                    const float src,
+                    payload_t & payload,
+                    uint8_t & checksum)
             {
                 uint32_t a;
                 memcpy(&a, &src, 4);
-                serialize32(k, a, checksum);
+                serialize32(k, a, payload, checksum);
             }
     };
 }
