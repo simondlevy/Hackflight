@@ -80,6 +80,12 @@ namespace hf {
                 _payloadChecksum ^= a;
             }
 
+            void serialize8(const uint8_t a, const uint8_t k)
+            {
+                _payload[k] = a;
+                _payloadChecksum ^= a;
+            }
+
             void prepareToSerialize(
                     const uint8_t id, const uint8_t count, const uint8_t size)
             {
@@ -87,13 +93,13 @@ namespace hf {
                 _payload[1] = 'M';
                 _payload[2] = '>';
 
-                _payloadSize = 3;
-
                 _payloadChecksum = 0;
 
-                serialize8(count*size);
+                serialize8(count*size, 3);
 
-                serialize8(id);
+                serialize8(id, 4);
+
+                _payloadSize = 5;
             }
 
             void addToOutBuf(const uint8_t a)
