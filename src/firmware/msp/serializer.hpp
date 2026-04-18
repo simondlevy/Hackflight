@@ -41,15 +41,15 @@ namespace hf {
             void serializeFloats(
                     const uint8_t id, const float src[], const uint8_t count)
             {
-                _checksum = 0;
+                uint8_t checksum = 0;
 
-                prepareToSerialize(id, count, 4, _payload, _checksum);
+                prepareToSerialize(id, count, 4, _payload, checksum);
 
                 for (uint8_t k=0; k<count; ++k) {
-                    serializeFloat(5 + k*4, src[k], _payload, _checksum);
+                    serializeFloat(5 + k*4, src[k], _payload, checksum);
                 }
 
-                _payload[5 + 4 * count] = _checksum;
+                _payload[5 + 4 * count] = checksum;
 
                 _payloadSize = 6 + 4 * count;
             }
@@ -68,7 +68,6 @@ namespace hf {
 
             payload_t _payload;
             uint8_t _payloadSize;
-            uint8_t _checksum;
 
             static void serialize32(
                     const uint8_t k,
