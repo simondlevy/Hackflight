@@ -139,20 +139,6 @@ class MspSerializer {
             _payload[_payloadSize++] = a;
         }
 
-        static auto addToOutBuf(
-                const MspSerializer & s, const uint8_t a) -> MspSerializer
-        {
-            auto payload = s._payload;
-
-            payload[s._payloadSize] = a;
-
-            return MspSerializer(
-                    payload,
-                    s._payloadSize + 1,
-                    s._payloadChecksum,
-                    s._payloadIndex);
-        }
-
         void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
         {
             prepareToSerialize(type, count, 1);
@@ -197,4 +183,51 @@ class MspSerializer {
             memcpy(&a, &src, 2);
             serialize16(a);
         }
+
+        //////////////////////////////////////////////////////////////////
+
+        /*
+        static auto void prepareToSerialize(
+                const MspSerializer & s,
+                const uint8_t type,
+                const uint8_t count,
+                const uint8_t size) -> MspSerializer
+        {
+            _payloadSize = 0;
+            _payloadIndex = 0;
+            _payloadChecksum = 0;
+
+            addToOutBuf('$');
+            addToOutBuf('M');
+            addToOutBuf('>');
+            serialize8(count*size);
+            serialize8(type);
+        }*/
+
+        static auto serialize8(
+                const MspSerializer & s, const uint8_t a) -> MspSerializer
+        {
+            const auto s2 = addToOutBuf(s, a);
+
+            return MspSerializer(
+                    s2._payload,
+                    s2._payloadSize,
+                    s2._payloadChecksum ^ a,
+                    s2._payloadIndex);
+        }
+
+        static auto addToOutBuf(
+                const MspSerializer & s, const uint8_t a) -> MspSerializer
+        {
+            auto payload = s._payload;
+
+            payload[s._payloadSize] = a;
+
+            return MspSerializer(
+                    payload,
+                    s._payloadSize + 1,
+                    s._payloadChecksum,
+                    s._payloadIndex);
+        }
+
 };
