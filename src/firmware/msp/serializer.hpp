@@ -44,10 +44,12 @@ namespace hf {
                 prepareToSerialize(id, count, 4);
 
                 for (auto k=0; k<count; ++k) {
-                    serializeFloat(src[k]);
+                    serializeFloat(k, src[k]);
                 }
 
                 completeSerialize();
+
+                _payloadSize = 6 + 4 * count;
             }
 
             auto payloadData() -> uint8_t *
@@ -112,7 +114,7 @@ namespace hf {
                 serialize8(_payloadChecksum);
             }
 
-            void serializeFloat(const float src)
+            void serializeFloat(const int k, const float src)
             {
                 uint32_t a;
                 memcpy(&a, &src, 4);
